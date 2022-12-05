@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -172,25 +172,14 @@ public class IOSStateFetcher implements Callable<IOSState> {
 		childElement.height = IOSNodeParser.getIntegerAttribute(xmlNode, "height");
 		childElement.label = IOSNodeParser.getStringAttribute(xmlNode, "label");
 
-//		System.out.println("accessID: " + childElement.accessibilityId);
-//
-//		System.out.println("X: " + childElement.x);
-//		System.out.println("Y: " + childElement.y);
-//		System.out.println("WIDTH: " + childElement.width);
-//		System.out.println("HEIGHT: " + childElement.height);
-
 		String selfCreatedBounds = "[" + childElement.x + "," +
 				childElement.y + "][" +
 				childElement.width + "," +
 				childElement.height + "]";
 
-//		System.out.println("SELF CREATED BOUNDS: " + selfCreatedBounds);
-
 		childElement.rect = iosBoundsRect(selfCreatedBounds);
 		childElement.bounds = iosBoundsRect(selfCreatedBounds);
 
-//		System.out.println("RECT: " + childElement.bounds);
-		
 		// TODO: Check a better way to create State Rect?
 		if(!Rect.contains(biggestRect, childElement.rect)) {
 		    biggestRect = childElement.rect;

@@ -90,7 +90,7 @@ public class AndroidProtocolUtil extends ProtocolUtil {
 		return AndroidAppiumFramework.getCurrentPackage();
 	}
 
-	// Method which constructs the hierachy xpath (absolute path)
+	// Method which constructs the hierarchy xpath (absolute path)
 	// This method is needed as this is the only way to uniquely identify an GUI object if it has no accessibilityID.
 	public static String constructXpath(Widget w) {
 		StringBuilder sb =  new StringBuilder();

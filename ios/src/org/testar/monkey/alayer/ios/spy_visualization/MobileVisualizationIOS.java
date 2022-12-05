@@ -1,3 +1,33 @@
+/***************************************************************************************************
+ *
+ * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************************************/
+
 package org.testar.monkey.alayer.ios.spy_visualization;
 
 import org.testar.monkey.alayer.State;
@@ -47,7 +77,6 @@ public class MobileVisualizationIOS {
         rightside = new JPanel();
         this.start(screenshotPath);
     }
-
 
     /** method which creates all the components in the additional java frame which is created. */
     private void start(String screenshotPath) {
@@ -105,7 +134,6 @@ public class MobileVisualizationIOS {
     /** Method called when the overlay needs to be updated when the state changes. */
     private void updateScreen() {
         // Updates screenshot and overlay
-
         LocalTime startTime = LocalTime.now();
         System.out.println("start updateScreen spy mode: " + startTime);
         String screenshotPath = IOSProtocolUtil.getStateshotSpyMode(usedState);
@@ -118,9 +146,6 @@ public class MobileVisualizationIOS {
         frame.revalidate();
         frame.repaint();
     }
-
-
-
 
     /** Method called from SPY loop to update the tree and overlay of the MobileVisualizationIOS. */
     public void updateStateVisualization(State state) {
@@ -144,12 +169,10 @@ public class MobileVisualizationIOS {
         }
     }
 
-
     /** Method to pass the click in overlay from overlay to tree */
     public void overlayToTree(DefaultMutableTreeNode node) {
         treeVizInstance.triggerTreeClick(node);
     }
-
 
     /** Method to pass the click in tree from tree to overlay */
     public void treeToOverlay(DefaultMutableTreeNode node) {

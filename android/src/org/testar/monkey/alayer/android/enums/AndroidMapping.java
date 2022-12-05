@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -42,7 +42,6 @@ public class AndroidMapping {
     private static Map<Tag<?>, Tag<?>> stateTagMappingAndroid = new HashMap<Tag<?>, Tag<?>>()
     {
         {
-            //put(WidgetPath, Tags.Path); /this path is useless, use xpath instead.
             put(WidgetTitle, AndroidTags.AndroidText);
             put(WidgetControlType, AndroidTags.AndroidClassName);
             put(WidgetClassName, AndroidTags.AndroidClassName);

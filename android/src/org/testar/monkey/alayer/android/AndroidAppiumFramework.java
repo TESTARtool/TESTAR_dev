@@ -579,7 +579,9 @@ public class AndroidAppiumFramework extends SUTBase {
 			String appPath = jsonObject.get("app").getAsString();
 
 			// If emulator is running inside a docker use the APK raw URL
-			if(jsonObject.get("isEmulatorDocker").getAsBoolean()) {
+			if(jsonObject.get("isEmulatorDocker") != null 
+					&& jsonObject.get("ipAddressAppium") != null
+					&& jsonObject.get("isEmulatorDocker").getAsBoolean()) {
 				cap.setCapability("app", appPath);
 				androidAppiumURL = "http://" + jsonObject.get("ipAddressAppium").getAsString() + ":4723/wd/hub";
 			} 

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -78,19 +78,4 @@ public class IOSRootElement extends IOSElement {
 		return false;
 	}
 
-	/*public boolean visibleAt(double x, double y) {
-		if(root == null || root.rect == null) {
-			return false;
-		}
-
-		double rootX = root.rect.x(); // 0
-		double rootY = root.rect.y(); // 0
-		return rect.contains(x - rootX, y - rootY);
-
-		//return true;
-	}
-
-	public boolean visibleAt(double x, double y, boolean obscuredByChildFeature) {
-		return visibleAt(x, y);
-	}*/
 }

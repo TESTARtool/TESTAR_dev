@@ -5,17 +5,6 @@ plugins {
 apply plugin: 'application'
 apply from: 'workflow.gradle'
 
-
-tasks.withType(Tar) {
-    duplicatesStrategy = DuplicatesStrategy.WARN
-}
-
-tasks.withType(Zip) {
-    duplicatesStrategy = DuplicatesStrategy.WARN
-}
-
-
-
 sourceSets {
     main {
         resources {

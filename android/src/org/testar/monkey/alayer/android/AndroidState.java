@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -102,7 +102,6 @@ public class AndroidState extends AndroidWidget implements State {
 	}
 
 	public <T> T get(AndroidWidget w, Tag<T> t) {
-//		System.out.println("HOW OFTEN DO I REACH THIS POINT?");
 		T ret = get(w, t, null);
 		if (ret == null) {
 			throw new NoSuchTagException(t);
@@ -117,8 +116,6 @@ public class AndroidState extends AndroidWidget implements State {
 		if (stateManagementTag != null) {
 			t = stateManagementTag;
 		}
-
-//		System.out.println("THE MAPPING: " + stateManagementTag);
 
 		Object ret = w.tags.get(t);
 

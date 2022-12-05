@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -36,8 +36,7 @@ import org.testar.monkey.alayer.Roles;
 import java.util.*;
 
 public class AndroidRoles {
-	private AndroidRoles() {
-	}
+	private AndroidRoles() {}
 
 	private static final Map<String, Role> tagToRole = new HashMap<>();
 

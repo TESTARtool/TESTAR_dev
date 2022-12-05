@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -49,7 +49,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Set;
 
-
 public class Protocol_android_generic extends AndroidProtocol {
 	int counter = 0;
 
@@ -76,7 +75,6 @@ public class Protocol_android_generic extends AndroidProtocol {
 		actionSelector = new QLearningActionSelector(settings.get(ConfigTags.MaxReward),settings.get(ConfigTags.Discount));
 		super.initialize(settings);
 	}
-
 
 	/**
 	 * Use CodingManager to create the Widget and State identifiers:

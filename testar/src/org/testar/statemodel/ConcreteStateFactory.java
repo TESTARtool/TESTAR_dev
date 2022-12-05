@@ -40,9 +40,6 @@ public abstract class ConcreteStateFactory {
         if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
             screenshot = WdProtocolUtil.getStateshotBinary(newState);
         } else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
-            //TODO NEED NEW APPROACH FOR VISUALIZING ACTION AS WE ONLY NOW ACTION AFTER THE SCREENSHOT IS TAKEN!
-//            Action executedAction = newState.get(Tags.ExecutedAction);
-//            System.out.println("executedAction: " + executedAction);
             screenshot = AndroidProtocolUtil.getStateshotBinary(newState, null);
         } else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
             screenshot = IOSProtocolUtil.getStateshotBinary(newState, null);

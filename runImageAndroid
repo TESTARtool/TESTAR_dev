@@ -1,6 +1,8 @@
 #!/bin/sh
 cat /README.Docker
+echo "Start Xvfb"
+/opt/bin/start-xvfb.sh &
 sleep 2
 cd /testar/bin
-./testar sse=android_generic ShowVisualSettingsDialogOnStartup=false ApplicationName="Android_generic" ApplicationVersion=1 Sequences=2 SequenceLength=5 StateModelEnabled=false Mode=Generate > debug_android_generic.txt
+./testar sse=android_generic SUTConnectorValue="./settings/android_generic/DesiredCapabilitiesDockerEmulator.json" ShowVisualSettingsDialogOnStartup=false ShowSettingsAfterTest=false VisualizeSelectedAction=false FlashFeedback=false UseSystemActions=false ApplicationName="Android_generic" ApplicationVersion=1 Sequences=2 SequenceLength=5 StateModelEnabled=false Mode=Generate > debug_android_generic.txt
 #sh -c "while true; do sleep 1; done"

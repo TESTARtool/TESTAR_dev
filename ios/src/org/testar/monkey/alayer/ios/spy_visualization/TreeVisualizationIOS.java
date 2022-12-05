@@ -1,3 +1,33 @@
+/***************************************************************************************************
+ *
+ * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************************************/
+
 package org.testar.monkey.alayer.ios.spy_visualization;
 
 import org.testar.monkey.Pair;
@@ -28,7 +58,6 @@ public class TreeVisualizationIOS extends JPanel implements TreeSelectionListene
 
     private LinkedList<Pair<DefaultMutableTreeNode, Integer>> toBeReplacedA = null;
     private LinkedList<Pair<DefaultMutableTreeNode, Integer>> toBeReplacedWithB = null;
-
 
     /** Initializer for the tree component of the spy mode visualization (right hand side screen). */
     public TreeVisualizationIOS(MobileVisualizationIOS mobileVisualizationIOS, Widget widget) {
@@ -83,12 +112,10 @@ public class TreeVisualizationIOS extends JPanel implements TreeSelectionListene
         add(splitPane);
     }
 
-
     /** Required by TreeSelectionListener interface.
      * When an object in the tree gets clicked this method is called such that the object can be unfolded and show the
      * detailed information of the clicked tree object.
      */
-
     public void valueChanged(TreeSelectionEvent e) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode)
                 tree.getLastSelectedPathComponent();
@@ -117,7 +144,6 @@ public class TreeVisualizationIOS extends JPanel implements TreeSelectionListene
             triggeredByOverlayClick = false;
         }
     }
-
 
     /** Creates a new tree based on the newly retrieved state (root node).
      * Additionally, calls method which determines which nodes need to be replaced (have changed in the new state)
@@ -150,7 +176,6 @@ public class TreeVisualizationIOS extends JPanel implements TreeSelectionListene
         //Need to use the xPath of the last clicked component to find the representation in the Tree.
         return null;
     }
-
 
     /** Given two trees, return true if they are structurally identical, false otherwise and track at which point in
      * the tree the sub trees are no longer identical.
@@ -194,7 +219,6 @@ public class TreeVisualizationIOS extends JPanel implements TreeSelectionListene
         return false;
     }
 
-
     /** Displays the additional info when a widget is clicked in the tree. */
     private void displayWidgetInfo(Widget nodeWidget) {
         infoPaneLeft.removeAll();
@@ -237,7 +261,6 @@ public class TreeVisualizationIOS extends JPanel implements TreeSelectionListene
                 infoPaneRight.add(new JLabel(accessibilityIdWidget)).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
             }
 
-
             //TODO: THE XPATH AT STARTUP DOESNT FIT IN THE SCREEN. HOWEVER IF ONE UPDATE IN THE EMULATOR HAS OCCURED
             // SCROLLING IS ADDED. FIGURE OUT WHY SCROLLING IS NOT ENABLED FROM THE START.
             infoPaneLeft.add(new JLabel("XPath: ")).setFont(new Font("SansSerif", Font.BOLD, fontSize));
@@ -247,7 +270,6 @@ public class TreeVisualizationIOS extends JPanel implements TreeSelectionListene
                 infoPaneRight.add(new JLabel(String.format("<html><body style=\"text-align: justify;  text-justify: inter-word;\">%s</body></html>",
                         xpathWidget))).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
             }
-
 
             infoPaneLeft.add(new JLabel("Label: ")).setFont(new Font("SansSerif", Font.BOLD, fontSize));
             if (labelWidget.equals("")) {
@@ -299,7 +321,6 @@ public class TreeVisualizationIOS extends JPanel implements TreeSelectionListene
 
             infoPaneLeft.add(new JLabel("Enabled: ")).setFont(new Font("SansSerif", Font.BOLD, fontSize));
             infoPaneRight.add(new JLabel(String.valueOf(enabledWidget))).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
-
 
         } else { //null node
             infoPaneLeft.add(new JLabel("nodeinfo:"));

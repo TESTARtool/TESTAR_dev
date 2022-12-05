@@ -64,7 +64,6 @@ public class SpyMode {
 			System.out.println("SPY MODE, CREATING JAVA JFRAME WINDOW Android");
 			State state = protocol.getState(system);
 			mobileVisualizationAndroid = new MobileVisualizationAndroid(AndroidProtocolUtil.getStateshotSpyMode(state), state);
-			//mobileVisualizationAndroid.createVisualization(AndroidProtocolUtil.getStateshot(state));
 		} else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
 			System.out.println("SPY MODE, CREATING JAVA JFRAME WINDOW iOS");
 			State state = protocol.getState(system);
@@ -79,7 +78,6 @@ public class SpyMode {
 
 			Set<Action> actions = protocol.deriveActions(system, state);
 			protocol.buildStateActionsIdentifiers(state, actions);
-
 
 			//TODO: can we work this into sutvisualization/ canvas?
 			if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -38,7 +38,7 @@ import java.util.concurrent.*;
 
 public class AndroidStateBuilder implements StateBuilder {
 	private static final long serialVersionUID = -4016081519369476126L;
-	
+
 	private static final int defaultThreadPoolCount = 1;
 	private final double timeOut;
 	private transient ExecutorService executor;
@@ -46,7 +46,7 @@ public class AndroidStateBuilder implements StateBuilder {
 	public AndroidStateBuilder(double timeOut) {
 		Assert.isTrue(timeOut > 0);
 		this.timeOut = timeOut;
-		
+
 		// Needed to be able to schedule asynchronous tasks conveniently.
 		executor = Executors.newFixedThreadPool(defaultThreadPoolCount);
 	}
@@ -54,10 +54,8 @@ public class AndroidStateBuilder implements StateBuilder {
 	@Override
 	public State apply(SUT system) throws StateBuildException {
 		try {
-			//System.out.println("Got into TRY of AndroidStateBuilder");
 			Future<AndroidState> future = executor.submit(new AndroidStateFetcher(system));
 			AndroidState state = future.get((long) (timeOut), TimeUnit.SECONDS);
-//			System.out.println("State of TRY of AndroidStateBuilder: " + state);
 			return state;
 		}
 		catch (InterruptedException | ExecutionException e) {
@@ -65,12 +63,11 @@ public class AndroidStateBuilder implements StateBuilder {
 			throw new StateBuildException(e.getMessage());
 		}
 		catch (TimeoutException e) {
-			//System.out.println("Got into CATCH2 of AndroidStateBuilder");
 			AndroidRootElement rootElement = AndroidStateFetcher.buildRoot(system);
 			AndroidState androidState = new AndroidState(rootElement);
 			androidState.set(Tags.Role, Roles.Process);
 			androidState.set(Tags.NotResponding, true);
-			
+
 			return androidState;
 		}
 	}
