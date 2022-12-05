@@ -27,7 +27,7 @@ services:
     environment:
       - CONNECT_TO_GRID=true
       - SELENIUM_HOST=selenium_hub
-      #- RELAXED_SECURITY=true
+      - RELAXED_SECURITY=true
 
   # Docker-Android for mobile website testing with chrome browser
   # Chrome browser exists only for version 7.0 and 7.1.1
@@ -51,7 +51,7 @@ services:
       - SELENIUM_HOST=selenium_hub
       - MOBILE_WEB_TEST=true
       - AUTO_RECORD=true
-      #- RELAXED_SECURITY=true
+      - RELAXED_SECURITY=true
 
   testar:
     image: testar
@@ -63,5 +63,3 @@ services:
       - type: bind
         source: /home/testar/output
         target: /testar/bin/output
-    environment:
-      DISPLAY: $DISPLAY
