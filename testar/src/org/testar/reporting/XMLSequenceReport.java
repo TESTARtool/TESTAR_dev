@@ -104,7 +104,6 @@ public class XMLSequenceReport implements SequenceReport {
        tc.addAttachment(actionImagePath, "Beschrijving");
        testRun.addTestSuite(activeSuite);
         activeSuite.addTestCase(tc);
-        
 
         out.write(testRun.toString());
         out.flush();
@@ -113,7 +112,7 @@ public class XMLSequenceReport implements SequenceReport {
     }
 
     @Override
-    public void addState(State state) {
+    public void addState(State state, Verdict verdict) {
         System.out.println("addState");
         activeSuite = new TestSuite();
         testRun.addTestSuite(activeSuite);

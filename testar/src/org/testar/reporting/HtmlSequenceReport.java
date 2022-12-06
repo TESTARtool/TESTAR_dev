@@ -148,7 +148,7 @@ public class HtmlSequenceReport implements SequenceReport {
     	}
     }
 
-    public void addState(State state){
+    public void addState(State state, Verdict verdict){
         if(firstStateAdded){
             if(firstActionsAdded){
                 writeStateIntoReport(state);

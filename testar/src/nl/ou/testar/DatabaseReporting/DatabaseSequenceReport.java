@@ -7,6 +7,7 @@ import nl.ou.testar.report.ReportDataException;
 import org.fruit.monkey.ProtocolDelegate;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 
@@ -32,7 +33,7 @@ public class DatabaseSequenceReport implements SequenceReport {
     }
 
     @Override
-    public void addState(State state) {
+    public void addState(State state, Verdict verdict) {
         String concreteIdCustom = state.get(Tags.ConcreteIDCustom);
         String abstractId = state.get(Tags.AbstractID);
         try {
@@ -40,7 +41,7 @@ public class DatabaseSequenceReport implements SequenceReport {
             if (searchResult == 0) {
                 int stateId = sqlService.registerState(concreteIdCustom, abstractId,
                         state.get(Tags.Abstract_R_ID), state.get(Tags.Abstract_R_T_ID),
-                        state.get(Tags.Abstract_R_T_P_ID));
+                        state.get(Tags.Abstract_R_T_P_ID), verdict.severity(), verdict.info());
             }
         } catch (ReportDataException e) {
             System.err.println("Cannot add state: " + e.getMessage());

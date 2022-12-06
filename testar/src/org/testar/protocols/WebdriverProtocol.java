@@ -34,6 +34,7 @@ import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -68,6 +69,7 @@ import org.fruit.monkey.orientdb.OrientDbServiceImpl;
 import org.fruit.monkey.webserver.ReportingBuilder;
 import org.fruit.monkey.webserver.ReportingService;
 import org.fruit.monkey.webserver.ReportingServiceDelegate;
+import org.openqa.selenium.devtools.v102.log.Log;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
@@ -149,6 +151,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     private boolean isLocalDatabaseActive = false;
     private boolean isForcedLoginInProgress = false;
 
+
     // List of atributes to identify and close policy popups
     // Set to null to disable this feature
     @SuppressWarnings("serial")
@@ -160,6 +163,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
     // Verdict obtained from messages coming from the web browser console
     protected Verdict webConsoleVerdict = Verdict.OK;
+    BufferedWriter logWriter = null;
+
 
     /**
      * Called once during the life time of TESTAR
@@ -170,6 +175,14 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     @Override
     protected void initialize(Settings settings) {
 
+        try {
+            logWriter = new BufferedWriter(new FileWriter("oracle.log"));
+        }
+        catch(IOException e)
+        {
+            System.err.println("!!! Cannot write to log file !!!");
+            e.printStackTrace();
+        }
         loginURL = settings.get(ConfigTags.ForcedLoginUrl, null);
         loginButtonName = settings.get(ConfigTags.ForcedLoginButtonName, null);
         loginFormID = settings.get(ConfigTags.ForcedLoginFormId, null);
@@ -373,6 +386,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
     @Override
     public void onTestEndEvent() {
+        if (logWriter != null) try {
+            logWriter.close();
+        }
+        catch (IOException e){}
         delegate.updateStatus("Preparing a report", 0);
         this.testReport.saveReport(
                 this.settings().get(ConfigTags.SequenceLength),
@@ -645,7 +662,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
         // adding state to the HTML sequence report:
         System.out.println("Adding state (webdriver protocol)");
-        sequenceReport.addState(latestState);
+        sequenceReport.addState(latestState, getVerdict(latestState));
         testReport.addState(latestState);
 
         if (lastExecutedAction != null && latestState != null) {
@@ -713,6 +730,21 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected Verdict getVerdict(State state) {
         Verdict stateVerdict = super.getVerdict(state);
 
+        if (logWriter != null) try {
+            logWriter.write("=== " + state.get(Tags.ConcreteIDCustom) + " ===\n");
+            RemoteWebDriver driver = WdDriver.getRemoteWebDriver();
+            LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
+            for (LogEntry logEntry: logEntries) {
+                System.out.println(String.format("%s: %s", logEntry.getLevel().toString(), logEntry.getMessage()));
+                logWriter.write(String.format("%s: %s", logEntry.getLevel().toString(), logEntry.getMessage()));
+                logWriter.newLine();
+            }
+        }
+        catch (IOException e) {
+            System.err.println("!!! Cannot write to log file !!!");
+            e.printStackTrace();
+        }
+
         // If Web Console Error Oracle is enabled and we have some pattern to match
         if (settings.get(ConfigTags.WebConsoleErrorOracle, false)
                 && !settings.get(ConfigTags.WebConsoleErrorPattern, "").isEmpty()) {
@@ -728,7 +760,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
                     String consoleErrorMsg = logEntry.getMessage();
                     Matcher matcherError = errorPattern.matcher(consoleErrorMsg);
                     if (matcherError.matches()) {
-                        webConsoleVerdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
+                        webConsoleVerdict = new Verdict(Verdict.SEVERITY_WARNING,
                                 "Web Browser Console Error: " + consoleErrorMsg);
                     }
                 }
@@ -753,7 +785,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
                     String consoleWarningMsg = logEntry.getMessage();
                     Matcher matcherWarning = warningPattern.matcher(consoleWarningMsg);
                     if (matcherWarning.matches()) {
-                        webConsoleVerdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
+                        webConsoleVerdict = new Verdict(Verdict.SEVERITY_WARNING,
                                 "Web Browser Console Warning: " + consoleWarningMsg);
                     }
                 }

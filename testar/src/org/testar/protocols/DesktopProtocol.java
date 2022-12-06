@@ -100,7 +100,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     	
     	latestState = super.getState(system);
         //adding state to the HTML sequence report:
-        htmlReport.addState(latestState);
+      htmlReport.addState(latestState, getVerdict(latestState));
         return latestState;
     }
 

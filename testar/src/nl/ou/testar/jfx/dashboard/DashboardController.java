@@ -17,6 +17,8 @@ import org.testar.monkey.Settings;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -134,7 +136,12 @@ public class DashboardController extends ViewController {
 
 		Button btnViewReports = (Button) view.lookup("#btnViewReports");
 		btnViewReports.setOnAction(event -> {
-			startTesting(view, RuntimeControlsProtocol.Modes.View);
+        try {
+            delegate.openURI(new URI("http://localhost:1080"));
+        }
+        catch (URISyntaxException e) {
+        }
+            //		startTesting(view, RuntimeControlsProtocol.Modes.View);
 		});
 	}
 }

@@ -48,6 +48,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
+import java.net.URI;
 import java.util.*;
 import java.util.List;
 import java.util.logging.Level;
@@ -298,9 +299,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
                         File htmlFile = new File(findHTMLreport());
                         delegate.openURI(htmlFile.toURI());
                     } else {
-                        delegate.popupMessage("Please select a file.html (output/HTMLreports) to use in the View mode");
-                        System.out.println(
-                                "Exception: Please select a file.html (output/HTMLreports) to use in the View mode");
+                        delegate.openURI(new URI("http://localhost:1080"));
+                        this.mode = Modes.Quit;
+                        // delegate.popupMessage("Please select a file.html (output/HTMLreports) to use in the View mode");
+                        // System.out.println(
+                        //         "Exception: Please select a file.html (output/HTMLreports) to use in the View mode");
                     }
                 } else {
                     runTestLoop(mode(), system);

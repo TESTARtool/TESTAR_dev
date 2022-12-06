@@ -238,6 +238,19 @@ public class MySqlServiceImpl implements MySqlService {
         }
     }
 
+    public synchronized void addStateToIteration(int stateId, int iterationId) throws ReportDataException {
+        try {
+            PreparedStatement updateStateStatement = connection
+                    .prepareStatement("UPDATE sequence_items SET iteration_id=? WHERE id=?");
+            updateStateStatement.setInt(1, iterationId);
+            updateStateStatement.setInt(2, stateId);
+
+            updateStateStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new ReportDataException("Failed to add state to iteration: " + e.getMessage());
+        }
+    }
+
     public synchronized void setSelectionInIteration(int iterationId, int lastExecutedActionId, int lastStateId)
             throws ReportDataException {
         try {
@@ -254,15 +267,17 @@ public class MySqlServiceImpl implements MySqlService {
     }
 
     public synchronized int registerState(String concreteIdCustom, String abstractId, String abstractRId,
-            String abstractRTId, String abstractRTPId) throws ReportDataException {
+                                          String abstractRTId, String abstractRTPId, Double severity, String status) throws ReportDataException {
         try {
             PreparedStatement addStateStatement = connection.prepareStatement(
-                    "INSERT INTO sequence_items (concrete_id, abstract_id, abstract_r_id, abstract_r_t_id, abstract_r_t_p_id) VALUES (?, ?, ?, ?, ?)");
+                    "INSERT INTO sequence_items (concrete_id, abstract_id, abstract_r_id, abstract_r_t_id, abstract_r_t_p_id, severity, status) VALUES (?, ?, ?, ?, ?, ?, ?)");
             addStateStatement.setString(1, concreteIdCustom);
             addStateStatement.setString(2, abstractId);
             addStateStatement.setString(3, abstractRId);
             addStateStatement.setString(4, abstractRTId);
             addStateStatement.setString(5, abstractRTPId);
+            addStateStatement.setDouble(6, severity);
+            addStateStatement.setString(7, status);
             addStateStatement.executeUpdate();
 
             final ResultSet resultSet = lastIdStatement.executeQuery();

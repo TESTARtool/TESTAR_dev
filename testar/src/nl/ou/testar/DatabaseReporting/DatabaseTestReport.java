@@ -24,6 +24,7 @@ public class DatabaseTestReport implements TestReport {
 
     private Map<Action, Integer> actionIds;
     private Map<State, Integer> stateIds;
+    private Set<Integer> iterationStateIds;
     private Map<Action, State> actionTargets;
 
     private Set<Action> pendingActions;
@@ -46,6 +47,7 @@ public class DatabaseTestReport implements TestReport {
 
         actionIds = new HashMap<>();
         stateIds = new HashMap<>();
+        iterationStateIds = new HashSet<>();
         actionTargets = new HashMap<>();
 
         pendingActions = new HashSet<>();
@@ -69,7 +71,12 @@ public class DatabaseTestReport implements TestReport {
     public void addState(State state) {
         latestState = state;
         try {
-            stateIds.put(state, sqlService.findState(state.get(Tags.ConcreteIDCustom), state.get(Tags.AbstractID)));
+            Integer stateId = sqlService.findState(state.get(Tags.ConcreteIDCustom), state.get(Tags.AbstractID));
+            stateIds.put(state, stateId);
+            iterationStateIds.add(stateId);
+            // if (stateId > 0) {
+            //     sqlService.addStateToIteration(stateId, iterationId);
+            // }
         }
         catch (ReportDataException e) {
             System.err.println("Could not add a state: " + e.getMessage());
@@ -95,6 +102,11 @@ public class DatabaseTestReport implements TestReport {
 
         try {
             iterationId = sqlService.registerIteration(reportId, verdict.info(), verdict.severity());
+
+            for (Integer stateId: iterationStateIds) {
+                sqlService.addStateToIteration(stateId, iterationId);
+            }
+            iterationStateIds.clear();
 
             for (Action pendingAction: pendingActions) {
                 int actionId = addAction(state, pendingAction, false);

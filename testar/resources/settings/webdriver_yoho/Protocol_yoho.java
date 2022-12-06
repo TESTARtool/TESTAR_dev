@@ -331,12 +331,11 @@ public class Protocol_yoho extends WebdriverProtocol {
 
     // @Override
     // protected ActionSelector createActionSelector() {
-    // return new QLearningActionSelector(settings.get(ConfigTags.MaxReward),
-    // settings.get(ConfigTags.Discount));
+    // return new QLearningActionSelector(settings.get(ConfigTags.MaxReward), settings.get(ConfigTags.Discount));
     // }
 
-    @Override
-    protected ActionSelector getActionSelector() {
-        return qlActionSelector;
-    }
+    // @Override
+    // protected ActionSelector getActionSelector() {
+    //     return qlActionSelector;
+    // }
 }
