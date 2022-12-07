@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,6 +31,8 @@
 package org.testar.monkey.alayer;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.testar.monkey.Assert;
 import org.testar.monkey.Util;
@@ -56,7 +58,7 @@ public final class Verdict implements Serializable {
 
 	public static final double SEVERITY_OK = 			   SEVERITY_MIN;
 	public static final double SEVERITY_FAIL =	   		   SEVERITY_MAX;
-	
+
 	public static final double SEVERITY_UNREPLAYABLE = 0.1;
 
 	public static final Verdict OK = new Verdict(SEVERITY_OK, "No problem detected.", Util.NullVisualizer);
@@ -67,17 +69,31 @@ public final class Verdict implements Serializable {
 	private final double severity;
 	private final Visualizer visualizer;
 
+	private final List<Rect> visualtHighlights;
+	public List<Rect> getVisualtHighlights(){
+		return visualtHighlights;
+	}
+
 	public Verdict(double severity, String info){
-		this(severity, info, Util.NullVisualizer);
+		this(severity, info, Util.NullVisualizer, new ArrayList<>());
+	}
+
+	public Verdict(double severity, String info, List<Rect> visualtHighlights){
+		this(severity, info, Util.NullVisualizer, visualtHighlights);
 	}
 
 	public Verdict(double severity, String info, Visualizer visualizer){
+		this(severity, info, visualizer, new ArrayList<>());
+	}
+
+	public Verdict(double severity, String info, Visualizer visualizer, List<Rect> visualtHighlights){
 		//Assert.isTrue(severity >= 0 && severity <= 1.0);
 		Assert.isTrue(severity >= SEVERITY_MIN && severity <= SEVERITY_MAX);
-		Assert.notNull(info, visualizer);
+		Assert.notNull(info, visualizer, visualtHighlights);
 		this.severity = severity;
 		this.info = info;
 		this.visualizer = visualizer;
+		this.visualtHighlights = visualtHighlights;
 	}
 
 	/**
@@ -124,11 +140,16 @@ public final class Verdict implements Serializable {
 	 * @param verdict A verdict to join with current verdict.
 	 * @return A new verdict that is the result of joining the current verdict with the provided verdict.
 	 */
-	public Verdict join(Verdict verdict){		
-		return new Verdict(Math.max(this.severity, verdict.severity()),
-				(this.info.contains(verdict.info) ? this.info :
-					(this.severity == SEVERITY_OK ? "" : this.info + "\n") + verdict.info())												
-				);		
+	public Verdict join(Verdict verdict){
+		List<Rect> jointHighlights = new ArrayList<>();
+		jointHighlights.addAll(this.visualtHighlights);
+		jointHighlights.addAll(verdict.getVisualtHighlights());
+
+		Verdict jointVerdict = new Verdict(Math.max(this.severity, verdict.severity()),
+				(this.info.contains(verdict.info) ? this.info : (this.severity == SEVERITY_OK ? "" : this.info + "\n") + verdict.info()),
+				jointHighlights);	
+
+		return jointVerdict;
 	}
 
 	@Override

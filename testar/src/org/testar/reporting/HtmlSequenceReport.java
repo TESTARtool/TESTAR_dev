@@ -32,18 +32,25 @@
 package org.testar.reporting;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.testar.monkey.Util;
 import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.Rect;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.OutputStructure;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 
+import java.awt.BasicStroke;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Set;
+
+import javax.imageio.ImageIO;
 
 public class HtmlSequenceReport implements Reporting{
 
@@ -308,17 +315,53 @@ public class HtmlSequenceReport implements Reporting{
         write("</div>"); // Close executed action block container
     }
 
-    public void addTestVerdict(Verdict verdict){
+    public void addTestVerdict(State state, Verdict verdict){
+    	if(!verdict.getVisualtHighlights().isEmpty()) {
+    		highlightVerdictState(state, verdict);
+    	}
+
     	String verdictInfo = verdict.info();
     	if(verdict.severity() > Verdict.OK.severity())
     		verdictInfo = verdictInfo.replace(Verdict.OK.info(), "");
 
-        write("<div id='block' style='display:flex;flex-direction:column'>"); // Open verdict block container
-        write("<h2>Test verdict for this sequence: "+verdictInfo+"</h2>");
-        write("<h4>Severity: "+verdict.severity()+"</h4>");
-        write("</div>"); // Close verdict block container
+    	write("<div id='block' style='display:flex;flex-direction:column'>"); // Open verdict block container
+    	write("<h2>Test verdict for this sequence: </h2>");
+    	for(String info : verdictInfo.split("\n")) {
+    		write("<h2>" + info + "</h2>");
+    	}
+    	write("<h4>Severity: " + verdict.severity() + "</h4>");
+    	write("</div>"); // Close verdict block container
 
-        FINAL_VERDICT_FILENAME = verdict.verdictSeverityTitle();
+    	FINAL_VERDICT_FILENAME = verdict.verdictSeverityTitle();
+    }
+
+    /**
+     * If a verdict highlight was defined, paint it in the last state screenshot.
+     * 
+     * @param state
+     */
+    private void highlightVerdictState(State state, Verdict verdict) {
+    	// Load the image path that exists in the output directory
+    	String imagePath = state.get(Tags.ScreenshotPath);
+    	File imageFile = new File(imagePath);
+    	while(!imageFile.exists()) {
+    		Util.pause(2);
+    	}
+    	try {
+    		// Draw in top of the state screenshot to highlight the erroneous widget
+    		BufferedImage img = ImageIO.read(imageFile);
+    		Graphics2D g2d = img.createGraphics();
+    		g2d.setColor(java.awt.Color.RED);
+    		g2d.setStroke(new BasicStroke(3));
+    		for(Rect r : verdict.getVisualtHighlights()) {
+    			g2d.drawRect((int)r.x(), (int)r.y(), (int)r.width(), (int)r.height());
+    		}
+    		g2d.dispose();
+    		// Save the new image
+    		ImageIO.write(img, "png", imageFile);
+    	} catch(Exception e) {
+    		e.printStackTrace();
+    	}
     }
 
     public void close() {

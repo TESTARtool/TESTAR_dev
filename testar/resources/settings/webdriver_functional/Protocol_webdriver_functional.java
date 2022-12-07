@@ -46,7 +46,13 @@ import static org.testar.monkey.alayer.Tags.Enabled;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
-
+/**
+ * Protocol with functional oracles examples to detect:
+ * - Web dummy button
+ * - Web select list without items
+ * - Web text area with max length 0 + add example to dummy HTML SUT
+ * - If a web text string is a number and contains more than X decimals + add example to dummy HTML SUT
+ */
 public class Protocol_webdriver_functional extends WebdriverProtocol {
 
 	private Action functionalAction = null;
@@ -88,8 +94,15 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 
 		// Add the functional Verdict that detects dummy buttons to the current state verdict.
 		verdict = verdict.join(functionalButtonVerdict(state));
+
 		// Add the functional Verdict that detects select elements without items to the current state verdict.
 		verdict = verdict.join(emptySelectItemsVerdict(state));
+
+		// Add the functional Verdict that detects if exists a number with more than X decimals.
+		verdict = verdict.join(numberWithLotOfDecimals(state, 2));
+
+		// Add the functional Verdict that detects if exists a textArea Widget without length.
+		verdict = verdict.join(textAreaWithoutLength(state, Arrays.asList(WdRoles.WdTEXTAREA)));
 
 		// If the final Verdict is not OK but was already detected in a previous sequence
 		String currentVerdictInfo = verdict.info().replace("\n", " ");
@@ -117,7 +130,11 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 			// NOTE: Because we are comparing the states using the AbstractIDCustom property, 
 			// it is important to consider the used abstraction: test.settings - AbstractStateAttributes (WebWidgetId, WebWidgetTextContent)
 			if(previousStateId.equals(currentStateId)) {
-				functionalVerdict = new Verdict(Verdict.SEVERITY_WARNING, "Dummy Button detected! " + functionalAction.get(Tags.OriginWidget).get(Tags.Desc, ""));
+				Widget w = functionalAction.get(Tags.OriginWidget);
+				String verdictMsg = String.format("Dummy Button detected! Role: %s , Path: %s , Desc: %s", 
+						w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
+
+				functionalVerdict = new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
 			}
 
 			// getState and getVerdict are executed more than one time after executing an action. 
@@ -141,12 +158,61 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 				Long selectItemsLength = (Long) WdDriver.executeScript(query);
 				// Verify that contains at least one item element
 				if (selectItemsLength.intValue() == 0) {
-					selectElementVerdict = new Verdict(Verdict.SEVERITY_WARNING, "Empty Select element detected! " + w.get(Tags.Desc, ""));
+					String verdictMsg = String.format("Empty Select element detected! Role: %s , Path: %s , Desc: %s", 
+							w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
+
+					selectElementVerdict = new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
 				}
 			}
 		}
 
 		return selectElementVerdict;
+	}
+
+	private Verdict numberWithLotOfDecimals(State state, int maxDecimals) {
+		Verdict decimalsVerdict = Verdict.OK;
+		for(Widget w : state) {
+			// If the widget contains a web text that is a double number
+			if(!w.get(WdTags.WebTextContent, "").isEmpty() && isNumeric(w.get(WdTags.WebTextContent))) {
+				// Count the decimal places of the text number
+				String number = w.get(WdTags.WebTextContent).replace(",", ".");
+				int decimalPlaces = number.length() - number.indexOf('.') - 1;
+
+				if(number.contains(".") && decimalPlaces > maxDecimals) {
+					String verdictMsg = String.format("Widget with more than %s decimals! Role: %s , Path: %s , WebId: %s, WebTextContent: %s", 
+							maxDecimals, w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent));
+
+					decimalsVerdict = decimalsVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+				}
+			}
+		}
+		return decimalsVerdict;
+	}
+
+	private Verdict textAreaWithoutLength(State state, List<Role> roles) {
+		Verdict textAreaVerdict = Verdict.OK;
+		for(Widget w : state) {
+			if(roles.contains(w.get(Tags.Role, Roles.Widget)) && w.get(WdTags.WebMaxLength) == 0) {
+
+				String verdictMsg = String.format("TextArea Widget with 0 Length detected! Role: %s , Path: %s , WebId: %s", 
+						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""));
+
+				textAreaVerdict = textAreaVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+			}
+		}
+		return textAreaVerdict;
+	}
+
+	private boolean isNumeric(String strNum) {
+		if (strNum == null) {
+			return false;
+		}
+		try {
+			double d = Double.parseDouble(strNum);
+		} catch (NumberFormatException nfe) {
+			return false;
+		}
+		return true;
 	}
 
 	/**

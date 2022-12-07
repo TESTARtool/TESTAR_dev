@@ -150,7 +150,7 @@ public class XMLSequenceReport implements Reporting {
     }
 
     @Override
-    public void addTestVerdict(Verdict verdict) {
+    public void addTestVerdict(State state, Verdict verdict) {
         System.out.println("addTestVerdict "+verdict);
         out.write(testRun.toString());
         out.flush();

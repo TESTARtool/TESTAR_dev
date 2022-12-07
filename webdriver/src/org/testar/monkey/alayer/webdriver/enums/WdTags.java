@@ -243,4 +243,9 @@ public class WdTags extends TagsBase {
    * Access key of a widget.
    */
   public static final Tag<String> WebAccessKey = from("WebAccessKey", String.class);
+
+  /**
+   * Max length of a text widget.
+   */
+  public static final Tag<Integer> WebMaxLength = from("WebMaxLength", Integer.class);
 }

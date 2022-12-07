@@ -29,6 +29,7 @@
  *******************************************************************************************************/
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -36,6 +37,8 @@ import java.util.Set;
 import org.testar.DerivedActions;
 import org.testar.SutVisualization;
 import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.Rect;
+import org.testar.monkey.alayer.Role;
 import org.testar.monkey.alayer.Roles;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
@@ -45,6 +48,7 @@ import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.windows.UIARoles;
+import org.testar.monkey.alayer.windows.UIATags;
 import org.testar.protocols.DesktopProtocol;
 
 import com.google.common.collect.Comparators;
@@ -54,11 +58,13 @@ import com.google.common.collect.Comparators;
  * - Form has no title 
  * - Checkbox without a caption
  * - List with unsorted items
- * - TODO: Textbox over another textbox
  * - Dummy button (does nothing)
- * - TODO: Two wrong ancor buttons. If you resize the form, these buttons do not align correct.
- * - TODO: Buttons (3x) with proper text (spell checker)
- * - TODO: Tab order is all over the place
+ * - List without child's
+ * - TODO: Buttons (3x) with proper text (spell checker) - OK
+ * - TODO: Textbox over another textbox - OK
+ * - TODO: Two wrong ancor buttons. If you resize the form, these buttons do not align correct. - Research Anchor properties
+ * - TODO: Tab order is all over the place - Research next element properties - Check tree order UIAutomation (sorted?)
+ * - TODO: Make a configurable verdict to detect if dialog or windows do not contains a question mark "?" Notepad and Robin examples
  */
 public class Protocol_desktop_functional extends DesktopProtocol {
 
@@ -114,12 +120,12 @@ public class Protocol_desktop_functional extends DesktopProtocol {
 	protected Verdict getVerdict(State state){
 		Verdict verdict = super.getVerdict(state);
 
-		// Add the Verdict that detects if the SUT contains a form without title
-		verdict = verdict.join(formWithoutTitle(state));
-		// Add the Verdict that detects if the SUT contains a checkbox without title
-		verdict = verdict.join(checkboxWithoutCaption(state));
+		// Add the Verdict that detects if the SUT contains a mandatory widget role without title
+		verdict = verdict.join(mandatoryWidgetRoleWithTitle(state, Arrays.asList(UIARoles.UIAWindow, UIARoles.UIACheckBox, UIARoles.UIAListItem)));
+
 		// Add the Verdict that detects if the SUT contains a list with unsorted elements
-		verdict = verdict.join(sortedListElements(state));
+		verdict = verdict.join(detectEmptyAndUnsortedListElements(state, Arrays.asList(UIARoles.UIAList, UIARoles.UIATree)));
+
 		// Add the functional Verdict that detects dummy buttons to the current state verdict.
 		verdict = verdict.join(dummyButtonVerdict(state));
 
@@ -133,51 +139,43 @@ public class Protocol_desktop_functional extends DesktopProtocol {
 		return verdict;
 	}
 
-	/**
-	 * If some UIAWindow widget of the state contains an empty Title, 
-	 * return a Warning Verdict pointing the Widget Path. 
-	 * 
-	 * @param state
-	 * @return
-	 */
-	private Verdict formWithoutTitle(State state) {
+	private Verdict mandatoryWidgetRoleWithTitle(State state, List<Role> roles) {
+		Verdict emptyTitleVerdict = Verdict.OK;
 		for(Widget w : state) {
-			if(w.get(Tags.Role, Roles.Widget).equals(UIARoles.UIAWindow) && w.get(Tags.Title, "").isEmpty()) {
-				return new Verdict(Verdict.SEVERITY_WARNING, "Form without Title detected! " + w.get(Tags.Path));
+			if(roles.contains(w.get(Tags.Role, Roles.Widget)) && w.get(Tags.Title, "").isEmpty()) {
+
+				String verdictMsg = String.format("Widget without Mandatory Title detected! Role: %s , Path: %s , AutomationId: %s", 
+						w.get(Tags.Role), w.get(Tags.Path), w.get(UIATags.UIAAutomationId, ""));
+
+				emptyTitleVerdict = emptyTitleVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
 			}
 		}
-		return Verdict.OK;
+		return emptyTitleVerdict;
 	}
 
 	/**
-	 * If some UIACheckBox widget of the state contains an empty Title, 
-	 * return a Warning Verdict pointing the Widget Path. 
+	 * Verify that the List elements of the state:
+	 * 1- Are not empty and contain child
+	 * 2- Do not contain unsorted elements
+	 * 
+	 * If these failures are detected, 
+	 * return a Warning Verdict pointing to the List Widget.
 	 * 
 	 * @param state
 	 * @return
 	 */
-	private Verdict checkboxWithoutCaption(State state) {
+	private Verdict detectEmptyAndUnsortedListElements(State state, List<Role> roles) {
 		for(Widget w : state) {
-			if(w.get(Tags.Role, Roles.Widget).equals(UIARoles.UIACheckBox)) {
-				if(w.get(Tags.Title, "").isEmpty()) {
-					return new Verdict(Verdict.SEVERITY_WARNING, "Checkbox without Title detected! " + w.get(Tags.Path));
-				}
-			}
-		}
-		return Verdict.OK;
-	}
+			// 1 - Check that the list is not empty
+			if(roles.contains(w.get(Tags.Role, Roles.Widget)) && w.childCount() < 1) {
 
-	/**
-	 * If some UIAList widget of the state contains unsorted elements, 
-	 * return a Warning Verdict pointing the List Widget.
-	 * 
-	 * @param state
-	 * @return
-	 */
-	private Verdict sortedListElements(State state) {
-		for(Widget w : state) {
-			// If the widget is a List with elements
-			if(w.get(Tags.Role, Roles.Widget).equals(UIARoles.UIAList) && w.childCount() > 0) {
+				String verdictMsg = String.format("Detected a List element without child elements! Title: %s , Role: %s , Path: %s , AutomationId: %s", 
+						w.get(Tags.Title, ""), w.get(Tags.Role), w.get(Tags.Path), w.get(UIATags.UIAAutomationId, ""));
+
+				return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+			}
+			// 2 - Check that the list do not contain unsorted elements
+			else if(roles.contains(w.get(Tags.Role, Roles.Widget)) && w.childCount() > 0) {
 				// Iterate trough the List elements to save all Titles
 				List<String> elementsTitleList = new ArrayList<String>();
 				for(int i = 0; i < w.childCount(); i++) {
@@ -187,7 +185,11 @@ public class Protocol_desktop_functional extends DesktopProtocol {
 				}
 				// Now that we have collected all the list Titles verify that is sorted 
 				if(!isSorted(elementsTitleList)) {
-					return new Verdict(Verdict.SEVERITY_WARNING, "List element with unsorted elements! " + w.get(Tags.Path));
+
+					String verdictMsg = String.format("Detected a List element with unsorted elements! Title: %s , Role: %s , Path: %s , AutomationId: %s", 
+							w.get(Tags.Title, ""), w.get(Tags.Role), w.get(Tags.Path), w.get(UIATags.UIAAutomationId, ""));
+
+					return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
 				}
 			}
 		}
@@ -213,7 +215,11 @@ public class Protocol_desktop_functional extends DesktopProtocol {
 			// NOTE: Because we are comparing the states using the AbstractIDCustom property, 
 			// it is important to consider the used abstraction: test.settings - AbstractStateAttributes (WebWidgetId, WebWidgetTextContent)
 			if(previousStateId.equals(currentStateId)) {
-				functionalVerdict = new Verdict(Verdict.SEVERITY_WARNING, "Dummy Button detected! " + functionalAction.get(Tags.OriginWidget).get(Tags.Desc, ""));
+				Widget w = functionalAction.get(Tags.OriginWidget);
+				String verdictMsg = String.format("Dummy Button detected! Role: %s , Path: %s , Desc: %s", 
+						w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
+
+				functionalVerdict = new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
 			}
 
 			// getState and getVerdict are executed more than one time after executing an action. 
@@ -225,7 +231,6 @@ public class Protocol_desktop_functional extends DesktopProtocol {
 
 		return functionalVerdict;
 	}
-
 
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
