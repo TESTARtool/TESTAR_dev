@@ -9,6 +9,7 @@ import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.actions.WidgetActionCompiler;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.WdElement;
 import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
@@ -18,8 +19,12 @@ import org.testar.protocols.WebdriverProtocol;
 import org.testar.simplestategraph.QLearningActionSelector;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -58,6 +63,10 @@ public class Protocol_yoho extends WebdriverProtocol {
                 put("id", "sncmp-banner-btn-agree");
             }
         };
+
+        // DemoResolver demoResolver = new DemoResolver();
+        // demoResolver.setNextResolver(this);
+        // setActionResolver(demoResolver);
     }
 
     // Jam logging if disabled
@@ -338,4 +347,131 @@ public class Protocol_yoho extends WebdriverProtocol {
     // protected ActionSelector getActionSelector() {
     //     return qlActionSelector;
     // }
+
+    int forcedStep = 0;
+    //private StdActionCompiler actionCompiler = new StdActionCompiler();
+
+
+
+    @Override
+    protected Set<Action> detectForcedActions(State state, WidgetActionCompiler actionCompiler) {
+        System.out.println("<<< Selecting action >>>");
+        String currentUrl = WdDriver.getCurrentUrl();
+        if (currentUrl.startsWith("https://app.yohoapp.io/web/app/dashboard")) {
+            System.out.println("<<< On a dashboard >>>");
+            List<WdWidget> res;
+            switch (forcedStep) {
+                case 0:
+                    List<WdWidget> debug = findByAttribute(state, "controlname");
+                    for (WdWidget item : debug) {
+                        System.out.println("!!! " + item.getAttribute("controlname") + " !!!");
+                    }
+                    res = findByAttribute(state, "controlname", "assignedTeam");
+                    if (res.size() > 0) {
+                        System.out.println("<<< Clicking work progress list >>>");
+                        forcedStep++;
+                        return Collections.singleton(actionCompiler.leftClickAt(res.get(0)));
+                    }
+                    break;
+                case 1:
+                    res = findByAttribute(state, "role", "menuitem");
+                    for (WdWidget item : res) {
+                        if (item.element.textContent.toLowerCase(Locale.ROOT).contains("planning")) {
+                            System.out.println("<<< Setting to \"Planning\" >>>");
+                            forcedStep++;
+                            return Collections.singleton(actionCompiler.leftClickAt(item));
+                        }
+                    }
+                    break;
+                case 2:
+                    res = findByAttribute(state, "controlname", "assignee");
+                    if (res.size() > 0) {
+                        System.out.println("<<< Clicking task category selector >>>");
+                        forcedStep++;
+                        return Collections.singleton(actionCompiler.leftClickAt(res.get(0)));
+                    }
+                    break;
+                case 3:
+                    res = findByAttribute(state, "id", "mat-option-19");
+                    if (res.size() > 0) {
+                        System.out.println("<<< Selecting \"Unassigned\" >>>");
+                        forcedStep++;
+                        return Collections.singleton(actionCompiler.leftClickAt(res.get(0)));
+                    }
+                    break;
+            }
+        }
+        return super.detectForcedActions(state, actionCompiler);//super.selectAction(system, state, actions);
+    }
+
+    private List<WdWidget> findByAttribute(State state, String attr) {
+        List<WdWidget> result = new ArrayList<>();
+        for (Widget widget : state) {
+            if (widget instanceof WdWidget) {
+                WdWidget wdWidget = (WdWidget) widget;
+                if (wdWidget.getAttribute(attr) != null) {
+                    result.add(wdWidget);
+                }
+                addChildrenByAttribute(result, wdWidget, attr);
+            }
+        }
+        return result;
+    }
+
+    private void addChildrenByAttribute(List<WdWidget> list, WdWidget parent, String attr) {
+        for (int i = 0; i < parent.childCount(); i++) {
+            WdWidget child = parent.child(i);
+            if (child.getAttribute(attr) != null) {
+                list.add(child);
+                addChildrenByAttribute(list, child, attr);
+            }
+        }
+    }
+
+    private List<WdWidget> findByAttribute(State state, String attr, String value) {
+        List<WdWidget> result = new ArrayList<>();
+        for (Widget widget : state) {
+            if (widget instanceof WdWidget) {
+                WdWidget wdWidget = (WdWidget) widget;
+                if (value.equals(wdWidget.getAttribute(attr))) {
+                    result.add(wdWidget);
+                }
+                addChildrenByAttribute(result, wdWidget, attr, value);
+            }
+        }
+        return result;
+    }
+
+
+    private void addChildrenByAttribute(List<WdWidget> list, WdWidget parent, String attr, String value) {
+        for (int i = 0; i < parent.childCount(); i++) {
+            WdWidget child = parent.child(i);
+            if (value.equals(child.getAttribute(attr))) {
+                list.add(child);
+                addChildrenByAttribute(list, child, attr, value);
+            }
+        }
+    }
+
+    // private class RecursiveWidgets implements Iterator<WdWidget> {
+
+    //     private Iterator Iterator;
+    //     private WdWidget current;
+
+    //     public RecursiveWidgets(State state) {
+    //         originalIterator = state.iterator();
+    //     }
+
+    //     @Override
+    //     public boolean hasNext() {
+    //         if (currentWidget = )
+    //     }
+
+    //     @Override
+    //     public WdWidget next() {
+    //         // TODO Auto-generated method stub
+    //         return null;
+    //     }
+    // }
 }
+

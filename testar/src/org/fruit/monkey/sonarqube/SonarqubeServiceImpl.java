@@ -220,15 +220,15 @@ public class SonarqubeServiceImpl implements SonarqubeService {
                 newTokenResponse = (ClassicHttpResponse) httpClient.execute(newTokenRequest);
                 status = newTokenResponse.getCode();
             } catch (Exception e) {
-                System.out.println("Not yet ready: " + e);
+                System.out.println("Not yet ready..."/* + e*/);
             } finally {
                 newTokenRequest.reset();
 //                newTokenRequest.releaseConnection();
             }
 
-            if (status != HttpStatus.SC_OK) {
-                System.out.println("Status: " + status);
-            }
+            // if (status != HttpStatus.SC_OK) {
+            //     System.out.println("Status: " + status);
+            // }
 
             try {
                 Thread.sleep(5000);
@@ -273,14 +273,16 @@ public class SonarqubeServiceImpl implements SonarqubeService {
                 "ENV SONAR_TOKEN " + token  + "\n" +
                 "ENV SRC_PATH /usr/src/" + projectSubdir + "\n" +
                 "WORKDIR /usr/src/"  + projectSubdir + "\n" +
-                "RUN if [ -f \"./pom.xml\" ] || [ -f \"gradlew\" ]; then apk add maven openjdk11; fi\n" +
-                "CMD if ! [ -f \"sonar-project.properties\"]; then printf \"sonar.projectKey=" + projectKey +
-                        "\\nsonar.projectName=" + projectName + "\\nsonar.sourceEncoding=UTF-8\" > " +
-                        "sonar-project.properties; fi; " +
-                        "if [ -f \"./pom.xml\" ]; then mvn clean verify sonar:sonar; " +
-                        "elif [ -f \"gradlew\" ]; then ./gradlew -Dsonar.host.url=$SONAR_HOST_URL sonarqube; " +
-                        "else sonar-scanner; " +
-                        "fi";
+                //"RUN if [ -f \"./pom.xml\" ] || [ -f \"gradlew\" ]; then apk add maven openjdk11; fi\n" +
+                "RUN apk add maven openjdk11\n" +
+                "CMD mvn clean verify sonar:sonar";// -D sonar.projectKey=yoho-be -D sonar.host.url=http://sonarqube:9000 -D sonar.login=" + token + ";";
+                // "CMD if ! [ -f \"sonar-project.properties\"]; then printf \"sonar.projectKey=" + projectKey +
+                //         "\\nsonar.projectName=" + projectName + "\\nsonar.sourceEncoding=UTF-8\" > " +
+                //         "sonar-project.properties; fi; " +
+                //         "if [ -f \"./pom.xml\" ]; then mvn clean verify sonar:sonar -D sonar.projectKey=yoho-be -D sonar.host.url=http://sonarqube:9000 -D sonar.login=" + token + ";" +
+                //         "elif [ -f \"gradlew\" ]; then ./gradlew -Dsonar.host.url=$SONAR_HOST_URL sonarqube; " +
+                //         "else sonar-scanner; " +
+                //         "fi";
                 //"RUN npm install typescript --save\n";
 
         final String imageId = dockerPoolService.buildImage(new File(sourcePath), dockerfileContent);
@@ -297,8 +299,8 @@ public class SonarqubeServiceImpl implements SonarqubeService {
         int total = 0;
         int tries = 0;
         String report = null;
-        while (total == 0 && tries < 10) {
-            System.out.println("Try " + tries);
+        while (total == 0/* && tries < 10*/) {
+            System.out.println("Scanning in progress..."/* + tries*/);
             ClassicHttpResponse issuesResponse = (ClassicHttpResponse) httpClient.execute(issuesRequest);
             if (issuesResponse.getCode() == HttpStatus.SC_OK) {
                 try {

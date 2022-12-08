@@ -57,6 +57,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.fruit.monkey.TestarServiceException;
 import org.fruit.monkey.mysql.MySqlService;
 import org.fruit.monkey.mysql.MySqlServiceDelegate;
@@ -345,7 +346,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
         // Initialize HTML Report (Dashboard)
         if (dataAccess != null) {
-            this.testReport = new DatabaseTestReport(dataAccess, settings.get(ConfigTags.SQLReporting));
+            this.testReport = new DatabaseTestReport(dataAccess, settings.get(ConfigTags.SQLReporting) + "_"
+                    + RandomStringUtils.random(8));
             ((DatabaseTestReport) testReport).setDelegate(delegate);
         } else {
             this.testReport = new HtmlTestReport();

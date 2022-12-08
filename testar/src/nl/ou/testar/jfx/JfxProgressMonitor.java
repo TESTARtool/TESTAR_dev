@@ -121,12 +121,6 @@ public class JfxProgressMonitor implements ProgressMonitor {
             }
 
             stageLabel = (Label) view.lookup("#procStage");
-            if (stageLabel == null) {
-            	System.out.println("-= Stage label is null =-");
-            }
-            else {
-            	System.out.println("-= Stage label is not null =-");
-            }
             statusLabel = (Label) view.lookup("#procStatus");
             progressBar = (ProgressBar) view.lookup("#procProgressBar");
             if (this.viewType == ViewType.STATIC_ANALYSIS) {

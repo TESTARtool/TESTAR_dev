@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "/home/michaelt/Downloads/chromedriver" "1920x900+0+0" "https://app.yohoapp.io/app/login"
+SUTConnectorValue = "/home/michaelt/Downloads/chromedriver" "1920x900+0+0" "https://app.yohoapp.io/web/app/dashboard/work-in-progress"
 
 #################################################################
 # Sequences
@@ -36,7 +36,7 @@ SUTConnectorValue = "/home/michaelt/Downloads/chromedriver" "1920x900+0+0" "http
 #################################################################
 
 Sequences = 3
-SequenceLength = 50
+SequenceLength = 5
 
 #################################################################
 # Oracles based on suspicious titles
@@ -202,27 +202,28 @@ RefreshSpyCanvas = 1.0
 SonarDockerize = true
 SonarProjectName = Demo
 SonarProjectKey = demo
-GitUrl = https://stash.marviq.com/scm/yoho/yoho-fe-app-web.git
+GitUrl = https://stash.marviq.com/scm/yoho/yoho-be-api.git
+GitBranch = feature/testar-bug
 GitAuthRequired = true
 GitUsername = michael.tikhonenko
-GitToken = not_allowed_to_publish
+GitToken = put_password_here
 
 ApplicationName = yoho
 ApplicationVersion = 1.0
 ReplayApplicationName = yoho
 ReplayApplicationVersion = 1.0
 
-ForcedLoginUrl = https://app.yohoapp.io/app/login
-ForcedLoginInputKeyAttribute = formcontrolname
-ForcedLoginUsernameInputName = usernameValue
+ForcedLoginUrl = https://app.yohoapp.io/web/login
+ForcedLoginInputKeyAttribute = id
+ForcedLoginUsernameInputName = mat-input-0
 ForcedLoginUsername = +48500000002
-ForcedLoginPasswordInputName = passwordValue
+ForcedLoginPasswordInputName = mat-input-1
 ForcedLoginPassword = yohopin2022
 ReportApiUrl = http://localhost:8888/api
 
-WebConsoleErrorOracle = false
-WebConsoleErrorPattern = .*ERROR.*
+WebConsoleErrorOracle = true
+WebConsoleErrorPattern = .*
 WebConsoleWarningOracle = true
-WebConsoleWarningPattern = .*Warning.*
+WebConsoleWarningPattern = .*
 
 FaultThreshold = 0.1
