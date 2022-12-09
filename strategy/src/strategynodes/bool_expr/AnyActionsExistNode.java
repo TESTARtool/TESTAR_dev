@@ -28,53 +28,54 @@ public class AnyActionsExistNode extends BaseStrategyNode<Boolean>
     @Override
     public Boolean getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted) //todo: check if it works
     {
-        boolean filterVisited       = (VISITED_MODIFIER != null);
-        boolean filterActionTypes   = (FILTER != null && ACTION_TYPE != null);
+        boolean applyFilterVisited       = (VISITED_MODIFIER != null);
+        boolean applyFilterActionTypes   = (FILTER != null && ACTION_TYPE != null);
         
-        if((!filterVisited) && (!filterActionTypes)) //if no filtering is necessary
+        if((!applyFilterVisited) && (!applyFilterActionTypes)) //if no filtering is necessary
             return (actions.size() > 0);
+
         if(VISITED_MODIFIER == VisitedModifier.LEAST_VISITED || VISITED_MODIFIER == VisitedModifier.MOST_VISITED)
         {
-            int targetCount = (VISITED_MODIFIER == VisitedModifier.LEAST_VISITED) ?
-                              Collections.min(actionsExecuted.values()) :
-                              Collections.max(actionsExecuted.values());
-            
-            boolean minActionFound = false;
-            
+            boolean unvisitedActionPreferred = (VISITED_MODIFIER == VisitedModifier.LEAST_VISITED);
+
+            int targetCount;
+            if(actionsExecuted.size() == 0)
+                targetCount = 0;
+            else
+                targetCount = (VISITED_MODIFIER == VisitedModifier.LEAST_VISITED) ?
+                        Collections.min(actionsExecuted.values()) :
+                        Collections.max(actionsExecuted.values());
+
             for(Action action : actions)
             {
+                boolean actionRejected = false;
                 int count = actionsExecuted.getOrDefault(action.get(Tags.AbstractIDCustom), 0);
-                
-                if(filterActionTypes && !actionAllowedByFilter(action, FILTER, ACTION_TYPE)) //check if action is rejected by filter
-                    break; //if yes, move on to the next action
-                
-                if(count == 0 && VISITED_MODIFIER == VisitedModifier.LEAST_VISITED)
-                    return true;
-                else if(count == targetCount)
+
+                if(applyFilterActionTypes)
+                    actionRejected = !actionAllowedByFilter(action, FILTER, ACTION_TYPE); //check if action is rejected by filter
+
+                if(!actionRejected)
                 {
-                    if(VISITED_MODIFIER == VisitedModifier.LEAST_VISITED) //unvisited actions may still be present
-                        minActionFound = true;
-                    else // found a most-visited action
+                    if ((count == 0 && unvisitedActionPreferred) || count == targetCount)
                         return true;
                 }
             }
-            return minActionFound; //defaults to false for most-visited, may be true for least-visited
+            return false;
         }
         else // visited, unvisited, or no modifier
         {
             for(Action action : actions)
             {
-                boolean actionIsVisited = (actionsExecuted.containsKey(action.get(Tags.AbstractIDCustom)));
-                
-                if(filterActionTypes && (!actionAllowedByFilter(action, FILTER, ACTION_TYPE))) //check if action is rejected by filter
-                    break; //if yes, move on to the next action
-                
-                if(filterVisited &&
-                   ((VISITED_MODIFIER == VisitedModifier.VISITED && (!actionIsVisited)) ||
-                    (VISITED_MODIFIER == VisitedModifier.UNVISITED && actionIsVisited)))
-                    break; //move on to the next action
-                
-                return true; //found an action that fits the parameters
+                boolean actionRejected = false;
+
+                if (applyFilterVisited)
+                    actionRejected = !actionMatchesVisitorModifier(action, VISITED_MODIFIER, actionsExecuted);
+
+                if(!actionRejected && applyFilterActionTypes)
+                    actionRejected = !actionAllowedByFilter(action, FILTER, ACTION_TYPE); //check if action is rejected by filter
+
+                if(!actionRejected)
+                    return true; //found an action that fits the parameters
             }
         }
         return false; //found no action that fits the parameters

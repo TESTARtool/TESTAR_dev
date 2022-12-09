@@ -16,7 +16,7 @@ public class SelectRandomActionNode extends BaseActionNode
     private final VisitedModifier   VISITED_MODIFIER;
     private final Filter            FILTER;
     private final ActionType        ACTION_TYPE;
-    
+
     public SelectRandomActionNode(Integer weight, VisitedModifier visitedModifier, Filter filter, ActionType actionType)
     {
         this.WEIGHT             = (weight != null || weight > 0) ? weight : 1;
@@ -24,39 +24,42 @@ public class SelectRandomActionNode extends BaseActionNode
         this.FILTER             = filter;
         this.ACTION_TYPE        = actionType;
     }
-    
+
     @Override
     public Action getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted) //todo: check if it works
     {
         if(actions.size() == 1) //if there's only one action, pick that one
             return new ArrayList<>(actions).get(0);
-        
-        boolean filterVisited       = (VISITED_MODIFIER != null);
-        boolean filterActionTypes   = (FILTER != null && ACTION_TYPE != null);
-        
-        if((!filterVisited) && (!filterActionTypes)) //if no filtering is necessary
+
+        boolean applyFilterVisited       = (VISITED_MODIFIER != null);
+        boolean applyFilterActionTypes   = (FILTER != null && ACTION_TYPE != null);
+
+        if((!applyFilterVisited) && (!applyFilterActionTypes)) //if no filtering is necessary
             return selectRandomAction(actions);
-        
+
         ArrayList filteredActions = new ArrayList();
-        
+
         if(VISITED_MODIFIER == VisitedModifier.LEAST_VISITED || VISITED_MODIFIER == VisitedModifier.MOST_VISITED)
         {
             int targetCount = (VISITED_MODIFIER == VisitedModifier.LEAST_VISITED) ? Integer.MAX_VALUE : 0; //max value for least, zero for most
-            
-            for(Action action : actions)
-            {
+
+            for(Action action : actions) {
+                boolean actionRejected = false;
                 int count = actionsExecuted.getOrDefault(action.get(Tags.AbstractIDCustom), 0);
-                
-                if(filterActionTypes && !actionAllowedByFilter(action, FILTER, ACTION_TYPE)) //check if action is rejected by filter
-                    break; //if yes, move on to the next action
-                
-                if(count == targetCount) //both least and most
-                    filteredActions.add(action);
-                else if(((count > targetCount) && VISITED_MODIFIER == VisitedModifier.LEAST_VISITED) ||
-                        (VISITED_MODIFIER == VisitedModifier.MOST_VISITED) && (count < targetCount))
+
+                if (applyFilterActionTypes)
+                    actionRejected = !actionAllowedByFilter(action, FILTER, ACTION_TYPE); //check if action is rejected by filter
+
+                if (!actionRejected)
                 {
-                    targetCount     = count;
-                    filteredActions.clear();
+                    if (count == targetCount) //both least and most
+                        filteredActions.add(action);
+                    else if (((count > targetCount) && VISITED_MODIFIER == VisitedModifier.LEAST_VISITED) ||
+                            (VISITED_MODIFIER == VisitedModifier.MOST_VISITED) && (count < targetCount))
+                    {
+                        targetCount = count;
+                        filteredActions.clear();
+                    }
                 }
             }
         }
@@ -64,17 +67,19 @@ public class SelectRandomActionNode extends BaseActionNode
         {
             for(Action action : actions)
             {
-                boolean actionIsVisited = (actionsExecuted.containsKey(action.get(Tags.AbstractIDCustom)));
-                
-                if(filterActionTypes && (!actionAllowedByFilter(action, FILTER, ACTION_TYPE))) //check if action is rejected by filter
-                    break; //if yes, move on to the next action
-                
-                if(filterVisited &&
-                   ((VISITED_MODIFIER == VisitedModifier.VISITED && (!actionIsVisited)) ||
-                    (VISITED_MODIFIER == VisitedModifier.UNVISITED && actionIsVisited)))
-                    break; //move on to the next action
-                
-                filteredActions.add(action); //if the loop has made it this far, add the action to the list
+                boolean actionRejected = false;
+
+                if(VISITED_MODIFIER == null)
+                    System.out.print("");
+
+                if (applyFilterVisited)
+                    actionRejected = !actionMatchesVisitorModifier(action, VISITED_MODIFIER, actionsExecuted);
+
+                if(!actionRejected && applyFilterActionTypes)
+                    actionRejected = !actionAllowedByFilter(action, FILTER, ACTION_TYPE); //check if action is rejected by filter
+
+                if(!actionRejected)
+                    filteredActions.add(action); //if the loop has made it this far, add the action to the list
             }
         }
         if(filteredActions.size() == 0) //if nothing has made it through the filter
@@ -84,7 +89,7 @@ public class SelectRandomActionNode extends BaseActionNode
         else
             return selectRandomAction(filteredActions); //pick randomly from the filtered list
     }
-    
+
     @Override
     public String toString()
     {

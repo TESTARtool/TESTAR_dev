@@ -15,7 +15,7 @@ public class ActionListNode extends BaseStrategyNode<Action>
     @Override
     public Action getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
-        if(actions.size() == 1)
+        if(actionStrategies.size() == 1)
             return actionStrategies.get(0).getResult(state, actions, actionsExecuted);
         else
         {

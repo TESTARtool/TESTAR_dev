@@ -1,7 +1,9 @@
 package strategynodes;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.actions.ActionRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
@@ -70,24 +72,28 @@ public enum ActionType
                 @Override
                 public boolean actionIsThisType(Action action)
                 {
-                    return (action.get(Tags.OriginWidget,null).get(WdTags.WebType, "").equalsIgnoreCase("submit") &&
-                            (action.get(Tags.OriginWidget,null).get(Tags.Role) == WdRoles.WdINPUT ||
-                             action.get(Tags.OriginWidget,null).get(Tags.Role) == WdRoles.WdBUTTON));
+                    Widget originWidget = action.get(Tags.OriginWidget, null);
+                    Boolean isSubmit = originWidget.get(WdTags.WebType, "").equalsIgnoreCase("submit");
+                    return (
+                            action.get(Tags.OriginWidget,null).get(WdTags.WebType, "").equalsIgnoreCase("submit") //&&
+                            //(action.get(Tags.OriginWidget,null).get(Tags.Role) == WdRoles.WdINPUT ||
+                             //action.get(Tags.OriginWidget,null).get(Tags.Role) == WdRoles.WdBUTTON)
+                    );
                 }
             };
-    
+
     public abstract boolean actionIsThisType(Action action);
-    
-    
+
+
     public final String string;
     private static final Map<String, ActionType> FROM_STRING = new HashMap<>();
-    
-    
+
+
     ActionType(String plainText)                      {this.string = plainText;}
     public static ActionType toEnum(String plainText) {return FROM_STRING.get(plainText);}
     public String toString() {return this.string;}
-    
-    
+
+
     static
     { Arrays.stream(values()).forEach(e -> FROM_STRING.put(e.string, e)); }
 }

@@ -1,11 +1,7 @@
 IF
-    any-actions unvisited of-type input-action exist
+    any-actions least-visited exist
 THEN
-    select-random unvisited of-type input-action
+    select-random most-visited
 ELSE
-    IF
-       any-actions unvisited of-type scroll-action exist
-    THEN
-        select-random unvisited of-type scroll-action
-    ELSE
-        select-random of-type submit-action
+    select-previous-action
+    select-random least-visited of-type type-action
