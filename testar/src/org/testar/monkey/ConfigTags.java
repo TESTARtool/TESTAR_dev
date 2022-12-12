@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2022 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -49,6 +49,7 @@ public final class ConfigTags {
   public static final Tag<Double> FaultThreshold = Tag.from("FaultThreshold", Double.class);
   public static final Tag<Double> TimeToWaitAfterAction = Tag.from("TimeToWaitAfterAction", Double.class);
   public static final Tag<Boolean> VisualizeActions = Tag.from("VisualizeActions", Boolean.class);
+  public static final Tag<Boolean> UseSystemActions = Tag.from("UseSystemActions", Boolean.class);
   public static final Tag<Boolean> VisualizeSelectedAction = Tag.from("VisualizeSelectedAction", Boolean.class);
   public static final Tag<Boolean> DrawWidgetUnderCursor = Tag.from("DrawWidgetUnderCursor", Boolean.class);
   public static final Tag<Boolean> DrawWidgetInfo = Tag.from("DrawWidgetInfo", Boolean.class);

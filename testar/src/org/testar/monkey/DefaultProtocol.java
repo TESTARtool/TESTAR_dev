@@ -28,7 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-
 package org.testar.monkey;
 
 import static org.testar.monkey.alayer.Tags.ActionDelay;
@@ -88,6 +87,8 @@ import org.testar.serialisation.TestSerialiser;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.openqa.selenium.SessionNotCreatedException;
+import org.testar.monkey.alayer.android.AndroidProtocolUtil;
+import org.testar.monkey.alayer.ios.IOSProtocolUtil;
 
 public class DefaultProtocol extends RuntimeControlsProtocol {
 
@@ -808,10 +809,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		Shape viewPort = state.get(Tags.Shape, null);
 		if(viewPort != null){
 			if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
-				//System.out.println("DEBUG: Using WebDriver specific state shot.");
 				state.set(Tags.ScreenshotPath, WdProtocolUtil.getStateshot(state));
-			}else{
-				//System.out.println("DEBUG: normal state shot");
+			}
+			else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
+				state.set(Tags.ScreenshotPath, AndroidProtocolUtil.getStateshot(state));
+			}
+			else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
+				state.set(Tags.ScreenshotPath, IOSProtocolUtil.getStateshot(state));
+			}
+			else{
 				state.set(Tags.ScreenshotPath, ProtocolUtil.getStateshot(state));
 			}
 		}
