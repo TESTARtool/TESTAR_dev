@@ -4,6 +4,9 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import nl.ou.testar.jfx.dashboard.DashboardDelegate;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.JGitInternalException;
+import org.eclipse.jgit.api.errors.TransportException;
 import org.fruit.monkey.TestarServiceException;
 import org.fruit.monkey.sonarqube.SonarqubeService;
 import org.fruit.monkey.sonarqube.SonarqubeServiceDelegate;
@@ -26,6 +29,9 @@ import java.nio.file.Path;
 public class WhiteboxTestLauncher implements /*ProgressMonitor, */SonarqubeServiceDelegate {
 
     // TODO: should use a special test protocol
+
+    private final static String TERMINATION_REASON_TITLE = "Whitebox testing exception";
+    private final static String TERMINATION_REASON_HEADER_TEXT = "Project analysis failure";
 
     private JfxProgressMonitor progressMonitor;
 
@@ -79,11 +85,20 @@ public class WhiteboxTestLauncher implements /*ProgressMonitor, */SonarqubeServi
         progressMonitor.updateStage("Cloning repository");
         new Thread(() -> {
             Path repositoryPath;
-            if (gitCredentials == null) {
+            try {
+              if (gitCredentials == null) {
                 repositoryPath = gitService.cloneRepository(repositoryUrl, progressMonitor, branchName);
-            }
-            else {
+              } else {
                 repositoryPath = gitService.cloneRepository(repositoryUrl, gitCredentials, progressMonitor, branchName);
+              }
+            }
+            catch (GitAPIException | JGitInternalException e) {
+              System.out.println("Cannot get source code: " + e.getMessage());
+              e.printStackTrace();
+
+              progressMonitor.stop(new JfxProgressMonitor.TerminationReason(TERMINATION_REASON_TITLE,
+                TERMINATION_REASON_HEADER_TEXT, e.getMessage()));
+              return;
             }
             System.out.println("...done");
 
@@ -115,13 +130,8 @@ public class WhiteboxTestLauncher implements /*ProgressMonitor, */SonarqubeServi
                 System.out.println("Whitebox test failed: " + e.getClass().getName());
                 e.printStackTrace();
 
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Whitebox testing exception");
-                alert.setHeaderText("Project analysis failure");
-                alert.setContentText(e.getLocalizedMessage());
-
-                alert.showAndWait();
-                progressMonitor.stop();
+            progressMonitor.stop(new JfxProgressMonitor.TerminationReason(TERMINATION_REASON_TITLE,
+              TERMINATION_REASON_HEADER_TEXT, e.getMessage()));
             }
         }).start();
     }

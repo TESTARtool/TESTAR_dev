@@ -13,10 +13,13 @@ public interface DockerPoolService {
     String buildImage(File destination, String dockerFileContent) throws IOException;
     String startWithImage(String imageId, String name, HostConfig hostConfig);
     String startWithImage(String imageId, String name, HostConfig hostConfig, String[] env);
+    String startWithImage(String imageId, String name, HostConfig hostConfig, String[] env, StrategyIfPresent sip);
     void dispose(boolean alsoRemoveImages);
 
     String getServiceId();
     String getNetworkId();
     void setDelegate(DockerPoolServiceDelegate delegate);
     DockerPoolServiceDelegate getDelegate();
+
+    public enum StrategyIfPresent { REUSE, RESTART, REINSTALL }
 }

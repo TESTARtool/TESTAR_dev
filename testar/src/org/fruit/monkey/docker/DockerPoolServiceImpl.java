@@ -17,6 +17,8 @@ import java.util.*;
 
 public class DockerPoolServiceImpl implements DockerPoolService {
 
+    final String CONTAINER_NAME_PREFIX = "testar";
+
     private String serviceId;
     private DockerPoolServiceDelegate delegate;
 
@@ -59,16 +61,17 @@ public class DockerPoolServiceImpl implements DockerPoolService {
         return delegate;
     }
 
-    public synchronized void start(String serviceId) {
-        this.serviceId = serviceId;
-        final String networkName = "testar_" + serviceId;
-        List<Network> dockerNetworks = dockerClient.listNetworksCmd().withNameFilter(networkName).exec();
-        if(dockerNetworks.size() > 0) {
-            this.networkId = dockerNetworks.get(0).getId();
-        } else {
-            CreateNetworkResponse networkResponse = dockerClient.createNetworkCmd().withName(networkName).withDriver("bridge").withAttachable(true).exec();
-            this.networkId = networkResponse.getId();
-        }
+    public synchronized void start(String name) {
+      String fullName = String.format("%s-%s", CONTAINER_NAME_PREFIX, name);
+      this.serviceId = fullName;
+      final String networkName = fullName;
+      List<Network> dockerNetworks = dockerClient.listNetworksCmd().withNameFilter(networkName).exec();
+      if(dockerNetworks.size() > 0) {
+          this.networkId = dockerNetworks.get(0).getId();
+      } else {
+          CreateNetworkResponse networkResponse = dockerClient.createNetworkCmd().withName(networkName).withDriver("bridge").withAttachable(true).exec();
+          this.networkId = networkResponse.getId();
+      }
     }
 
     public boolean isDockerAvailable() {
@@ -106,7 +109,7 @@ public class DockerPoolServiceImpl implements DockerPoolService {
             dockerFileStream.close();
         }
 
-        System.out.println("OUT"+destination);
+        System.out.println("OUT: "+destination);
         final String imageId = dockerClient.buildImageCmd(destination).exec(new BuildImageResultCallback() {
             @Override
             public void onNext(BuildResponseItem item) {
@@ -135,25 +138,66 @@ public class DockerPoolServiceImpl implements DockerPoolService {
     }
 
     public synchronized String startWithImage(String imageId, String name, HostConfig hostConfig) {
-        return startWithImage(imageId, name, hostConfig, null);
+        return startWithImage(imageId, name, hostConfig, null, StrategyIfPresent.REUSE);
     }
 
     public synchronized String startWithImage(String imageId, String name, HostConfig hostConfig, String[] env) {
-        String containerId = containerIds.get(name);
+      return startWithImage(imageId, name, hostConfig, env, StrategyIfPresent.REUSE);
+    }
+
+    public synchronized String startWithImage(String imageId, String name, HostConfig hostConfig, String[] env, StrategyIfPresent sip) {
+        String fullName = String.format("%s-%s", CONTAINER_NAME_PREFIX, name);
+
+        String containerId = containerIds.get(fullName);
         if (containerId != null) {
             return containerId;
         }
 
-        final CreateContainerCmd cmd = dockerClient.createContainerCmd(imageId)
-                .withName(name)
-                .withHostName(name)
-                .withHostConfig(hostConfig);
-        final CreateContainerResponse containerResponse =
-                (env == null ? cmd.exec() : cmd.withEnv(env).exec());
-        containerId = containerResponse.getId();
-        containerIds.put(name, containerId);
-        dockerClient.connectToNetworkCmd().withContainerId(containerId).withNetworkId(networkId).exec();
-        dockerClient.startContainerCmd(containerId).exec();
+        boolean containerStarted = false;
+
+        ListContainersCmd listContainersCmd = dockerClient.listContainersCmd();
+        List <Container> containerList = listContainersCmd.withNameFilter(Collections.singleton(fullName)).withShowAll(true).exec();
+        if (containerList.size() > 0) {
+          Container container = containerList.get(0);
+          containerId = container.getId();
+
+//          System.out.println("Container state: " + );
+          boolean containerIsRunning = container.getState().toLowerCase(Locale.ROOT).contains("running");
+
+          switch (sip) {
+            case REUSE:
+              if (!containerIsRunning) {
+                dockerClient.startContainerCmd(containerId).exec();
+              }
+              containerStarted = true;
+              break;
+            case RESTART:
+              dockerClient.restartContainerCmd(containerId).exec();
+              containerStarted = true;
+              break;
+            case REINSTALL:
+              if (containerIsRunning) {
+//                System.out.println("Cont")
+                dockerClient.stopContainerCmd(containerId).exec();
+              }
+              dockerClient.removeContainerCmd(containerId).exec();
+              break;
+          }
+        }
+
+        if (!containerStarted) {
+          final CreateContainerCmd cmd = dockerClient.createContainerCmd(imageId)
+            .withName(fullName)
+            .withHostName(fullName)
+            .withHostConfig(hostConfig);
+          final CreateContainerResponse containerResponse =
+            (env == null ? cmd.exec() : cmd.withEnv(env).exec());
+          containerId = containerResponse.getId();
+
+          containerIds.put(fullName, containerId);
+          dockerClient.connectToNetworkCmd().withContainerId(containerId).withNetworkId(networkId).exec();
+          dockerClient.startContainerCmd(containerId).exec();
+        }
 
         return containerId;
     }
