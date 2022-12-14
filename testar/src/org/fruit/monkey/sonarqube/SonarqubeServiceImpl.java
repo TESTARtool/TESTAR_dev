@@ -142,6 +142,9 @@ public class SonarqubeServiceImpl implements SonarqubeService {
             }
             dockerPoolService.getClient().waitContainerCmd(scannerContainerId).exec(new ResultCallback<WaitResponse>() {
 
+                private int connectionTries = 1;
+                private static final int MAX_CONNECTION_TRIES = 3;
+
                 @Override
                 public void onStart(Closeable closeable) {
                 }
@@ -152,11 +155,19 @@ public class SonarqubeServiceImpl implements SonarqubeService {
 
                 @Override
                 public void onError(Throwable throwable) {
-                    if (delegate != null) {
-                        delegate.onError(SonarqubeServiceDelegate.ErrorCode.ANALYSING_ERROR, throwable.getLocalizedMessage());
+                    System.out.println("Exception has been produced when try no. " + connectionTries + " was taken to connect to SQ container.");
+                    throwable.printStackTrace();
+                    if(connectionTries <= MAX_CONNECTION_TRIES) {
+                        ++connectionTries;
+                        System.out.println("Retrying...");
+                    } else {
+                        System.out.println("Maximum number of SQ container connection tries has been reached");
+                        if (delegate != null) {
+                            delegate.onError(SonarqubeServiceDelegate.ErrorCode.ANALYSING_ERROR, throwable.getLocalizedMessage());
+                        }
+                        System.out.println("Closing containers");
+                        dockerPoolService.dispose(false);
                     }
-                    System.out.println("-= Disposing on error =-");
-                    dockerPoolService.dispose(false);
                 }
 
                 @Override
