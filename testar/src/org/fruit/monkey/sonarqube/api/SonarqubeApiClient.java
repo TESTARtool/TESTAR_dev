@@ -1,6 +1,8 @@
 package org.fruit.monkey.sonarqube.api;
 
 import lombok.RequiredArgsConstructor;
+import org.fruit.monkey.sonarqube.api.request.SonarqubePaginatedProjectRequest;
+import org.fruit.monkey.sonarqube.api.response.SonarqubeProjectResponse;
 
 import java.util.ArrayList;
 import java.util.Comparator;

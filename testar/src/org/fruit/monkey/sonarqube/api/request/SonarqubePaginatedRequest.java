@@ -1,4 +1,7 @@
-package org.fruit.monkey.sonarqube.api;
+package org.fruit.monkey.sonarqube.api.request;
+
+import org.fruit.monkey.sonarqube.api.SonarqubeApiException;
+import org.fruit.monkey.sonarqube.api.response.SonarqubeResponse;
 
 public abstract class SonarqubePaginatedRequest<T extends SonarqubeRequest<S>, S extends SonarqubeResponse> {
 

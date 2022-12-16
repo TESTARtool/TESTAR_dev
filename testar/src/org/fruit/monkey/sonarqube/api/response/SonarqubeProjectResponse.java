@@ -1,14 +1,10 @@
-package org.fruit.monkey.sonarqube.api;
+package org.fruit.monkey.sonarqube.api.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
-import org.testar.JavaOutputParser;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
 import java.util.List;
 
 @Data

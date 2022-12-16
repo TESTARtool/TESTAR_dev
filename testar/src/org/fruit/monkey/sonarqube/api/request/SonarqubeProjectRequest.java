@@ -1,4 +1,6 @@
-package org.fruit.monkey.sonarqube.api;
+package org.fruit.monkey.sonarqube.api.request;
+
+import org.fruit.monkey.sonarqube.api.response.SonarqubeProjectResponse;
 
 public class SonarqubeProjectRequest extends SonarqubeRequest<SonarqubeProjectResponse>{
 

@@ -1,9 +1,11 @@
-package org.fruit.monkey.sonarqube.api;
+package org.fruit.monkey.sonarqube.api.request;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.fruit.monkey.sonarqube.api.SonarqubeApiException;
+import org.fruit.monkey.sonarqube.api.response.SonarqubeResponse;
 
 import java.io.IOException;
 import java.util.Base64;

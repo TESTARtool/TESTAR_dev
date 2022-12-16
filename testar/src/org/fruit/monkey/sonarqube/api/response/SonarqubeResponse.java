@@ -1,4 +1,4 @@
-package org.fruit.monkey.sonarqube.api;
+package org.fruit.monkey.sonarqube.api.response;
 
 import lombok.Data;
 

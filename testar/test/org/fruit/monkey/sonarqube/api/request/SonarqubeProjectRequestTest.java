@@ -1,11 +1,11 @@
-package org.fruit.monkey.sonarqube.api;
+package org.fruit.monkey.sonarqube.api.request;
 
 import okhttp3.mockwebserver.RecordedRequest;
+import org.fruit.monkey.sonarqube.api.SonarqubeApiTest;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
