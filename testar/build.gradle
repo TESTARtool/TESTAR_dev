@@ -144,7 +144,7 @@ dependencies {
     implementation jnativehook
     implementation 'com.google.guava:guava:26.0-jre'
     implementation 'mysql:mysql-connector-java:5.1.+'
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.1'
     implementation group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.30.v20200611'
     implementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.30.v20200611'
     implementation group: 'org.eclipse.jetty', name: 'jetty-webapp', version: '9.4.30.v20200611'
@@ -165,6 +165,9 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.13.1'
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.10.0.202012080955-r'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.14.1'
+    testImplementation group: 'com.squareup.okhttp3', name: 'mockwebserver', version: '4.10.0'
+    testImplementation group: 'junit', name: 'junit', version: '4.13.2'
 }
 
 task prepareSettings(type: Copy) {

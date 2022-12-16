@@ -1,0 +1,42 @@
+{
+  "total": 385,
+  "p": 1,
+  "ps": 100,
+  "paging": {
+    "pageIndex": 1,
+    "pageSize": 100,
+    "total": 385
+  },
+  "effortTotal": 8034,
+  "debtTotal": 8034,
+  "issues": [
+    {
+      "key": "AYURC_GPHq_OHAqW8iRJ",
+      "rule": "java:S110",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/app/service/factory/exception/FactoryNotFoundException.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "line": 8,
+      "hash": "1f74552975a5372a6dbb7d6997386481",
+      "textRange": {
+        "startLine": 8,
+        "endLine": 8,
+        "startOffset": 13,
+        "endOffset": 37
+      },
+      "flows": [],
+      "status": "OPEN",
+      "message": "This class has 10 parents which is greater than 5 authorized.",
+      "effort": "6h30min",
+      "debt": "6h30min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "design"
+      ],
+      "creationDate": "2022-08-30T09:23:43+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    }
+  ]
+}
