@@ -7,8 +7,7 @@ import java.util.List;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SonarqubeIssuesResponse {
-    private Paging paging;
+public class SonarqubeIssuesResponse extends SonarqubeResponse{
     private List<Issue> issues;
 
     @Data

@@ -8,7 +8,7 @@ import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import java.io.IOException;
 import java.util.Base64;
 
-public abstract class SonarqubeRequest<T> {
+public abstract class SonarqubeRequest<T extends SonarqubeResponse> {
 
     private final String username;
 

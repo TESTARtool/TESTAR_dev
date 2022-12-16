@@ -13,9 +13,8 @@ import java.util.List;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SonarqubeProjectResponse {
+public class SonarqubeProjectResponse extends SonarqubeResponse {
 
-    private Paging paging;
     private List<Component> components;
 
     @Data
