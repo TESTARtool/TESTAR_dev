@@ -24,6 +24,7 @@ import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class SonarqubeServiceImpl implements SonarqubeService {
@@ -81,8 +82,9 @@ public class SonarqubeServiceImpl implements SonarqubeService {
                     .withPortBindings(PortBinding.parse("9000:9000"));
 
             try {
-                final String serviceImageId = dockerPoolService.buildImage(confDir, "FROM sonarqube:8.2-community\n");
-                dockerPoolService.startWithImage(serviceImageId, "sonarqube", hostConfig);
+                final String serviceImageId = dockerPoolService.buildImage(confDir, "FROM sonarqube:latest\n");
+                dockerPoolService.startWithImage(serviceImageId, "sonarqube", hostConfig, null,
+                  DockerPoolService.StrategyIfPresent.REINSTALL);
             }
             catch (Exception e) {
                 System.out.println("Cannot build Sonarqube image");
@@ -128,6 +130,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
 
             try {
                 scannerContainerId = createAndStartScanner(projectSourceDir, projectKey, projectName, projectSubdir, token);
+                System.out.println("Scanner container ID: " + scannerContainerId);
             } catch (Exception e) {
                 delegate.onError(SonarqubeServiceDelegate.ErrorCode.CONNECTION_ERROR, e.getLocalizedMessage());
                 return;
@@ -135,6 +138,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
 
             // 4. Waiting for a report
 
+            System.out.println("Waiting for report");
             awaitingReport = true;
             if (delegate != null) {
                 delegate.onStageChange(SonarqubeServiceDelegate.InfoStage.CREATING_SCANNER, "Scanning a project");
@@ -210,7 +214,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
         finally {
             if (!awaitingReport) {
                 System.out.println("-= Not awaiting report =-");
-                dockerPoolService.dispose(false);
+//                dockerPoolService.dispose(false);
             }
         }
     }
@@ -285,8 +289,9 @@ public class SonarqubeServiceImpl implements SonarqubeService {
                 "ENV SRC_PATH /usr/src/" + projectSubdir + "\n" +
                 "WORKDIR /usr/src/"  + projectSubdir + "\n" +
                 //"RUN if [ -f \"./pom.xml\" ] || [ -f \"gradlew\" ]; then apk add maven openjdk11; fi\n" +
-                "RUN apk add maven openjdk11\n" +
-                "CMD mvn clean verify sonar:sonar";// -D sonar.projectKey=yoho-be -D sonar.host.url=http://sonarqube:9000 -D sonar.login=" + token + ";";
+                "RUN apk add openjdk11\n" +
+                //"RUN apk add maven openjdk11\n" +
+                "CMD ./mvnw clean verify sonar:sonar -DskipTests";// -D sonar.projectKey=yoho-be -D sonar.host.url=http://sonarqube:9000 -D sonar.login=" + token + ";";
                 // "CMD if ! [ -f \"sonar-project.properties\"]; then printf \"sonar.projectKey=" + projectKey +
                 //         "\\nsonar.projectName=" + projectName + "\\nsonar.sourceEncoding=UTF-8\" > " +
                 //         "sonar-project.properties; fi; " +
@@ -297,7 +302,8 @@ public class SonarqubeServiceImpl implements SonarqubeService {
                 //"RUN npm install typescript --save\n";
 
         final String imageId = dockerPoolService.buildImage(new File(sourcePath), dockerfileContent);
-        final String containerId = dockerPoolService.startWithImage(imageId, "sonar-scanner", hostConfig);
+        final String containerId = dockerPoolService.startWithImage(imageId, "sonar-scanner", hostConfig, null,
+          DockerPoolService.StrategyIfPresent.REINSTALL);
 
         return containerId;
 

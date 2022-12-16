@@ -353,56 +353,60 @@ public class Protocol_yoho extends WebdriverProtocol {
 
 
 
-    @Override
-    protected Set<Action> detectForcedActions(State state, WidgetActionCompiler actionCompiler) {
-        System.out.println("<<< Selecting action >>>");
-        String currentUrl = WdDriver.getCurrentUrl();
-        if (currentUrl.startsWith("https://app.yohoapp.io/web/app/dashboard")) {
-            System.out.println("<<< On a dashboard >>>");
-            List<WdWidget> res;
-            switch (forcedStep) {
-                case 0:
-                    List<WdWidget> debug = findByAttribute(state, "controlname");
-                    for (WdWidget item : debug) {
-                        System.out.println("!!! " + item.getAttribute("controlname") + " !!!");
-                    }
-                    res = findByAttribute(state, "controlname", "assignedTeam");
-                    if (res.size() > 0) {
-                        System.out.println("<<< Clicking work progress list >>>");
-                        forcedStep++;
-                        return Collections.singleton(actionCompiler.leftClickAt(res.get(0)));
-                    }
-                    break;
-                case 1:
-                    res = findByAttribute(state, "role", "menuitem");
-                    for (WdWidget item : res) {
-                        if (item.element.textContent.toLowerCase(Locale.ROOT).contains("planning")) {
-                            System.out.println("<<< Setting to \"Planning\" >>>");
-                            forcedStep++;
-                            return Collections.singleton(actionCompiler.leftClickAt(item));
-                        }
-                    }
-                    break;
-                case 2:
-                    res = findByAttribute(state, "controlname", "assignee");
-                    if (res.size() > 0) {
-                        System.out.println("<<< Clicking task category selector >>>");
-                        forcedStep++;
-                        return Collections.singleton(actionCompiler.leftClickAt(res.get(0)));
-                    }
-                    break;
-                case 3:
-                    res = findByAttribute(state, "id", "mat-option-19");
-                    if (res.size() > 0) {
-                        System.out.println("<<< Selecting \"Unassigned\" >>>");
-                        forcedStep++;
-                        return Collections.singleton(actionCompiler.leftClickAt(res.get(0)));
-                    }
-                    break;
-            }
-        }
-        return super.detectForcedActions(state, actionCompiler);//super.selectAction(system, state, actions);
-    }
+//    @Override
+//    protected Set<Action> detectForcedActions(State state, WidgetActionCompiler actionCompiler) {
+//        System.out.println("<<< Selecting action >>>");
+//        String currentUrl = WdDriver.getCurrentUrl();
+//        if (currentUrl.startsWith("https://app.yohoapp.io/web/app/dashboard")) {
+//            System.out.println("<<< On a dashboard >>>");
+//            List<WdWidget> res;
+//            switch (forcedStep) {
+//                case 0:
+////                    List<WdWidget> debug = findByAttribute(state, "controlname");
+////                    for (WdWidget item : debug) {
+////                        System.out.println("!!! " + item.getAttribute("controlname") + " !!!");
+////                    }
+//                    res = findByAttribute(state, "controlname", "assignedTeam");
+//                    if (res.size() > 0) {
+//                        System.out.println("<<< Clicking work progress list >>>");
+//                        forcedStep++;
+//                        return Collections.singleton(actionCompiler.leftClickAt(res.get(0)));
+//                    }
+//                    break;
+//                case 1:
+//                    res = findByAttribute(state, "role", "menuitem");
+//                    for (WdWidget item : res) {
+//                        if (item.element.textContent.toLowerCase(Locale.ROOT).contains("planning")) {
+//                            System.out.println("<<< Setting to \"Planning\" >>>");
+//                            forcedStep++;
+//                            return Collections.singleton(actionCompiler.leftClickAt(item));
+//                        }
+//                    }
+//                    break;
+//                case 2:
+//                    res = findByAttribute(state, "controlname", "assignee");
+//                    if (res.size() > 0) {
+//                        System.out.println("<<< Clicking task category selector >>>");
+//                        forcedStep++;
+//                        return Collections.singleton(actionCompiler.leftClickAt(res.get(0)));
+//                    }
+//                    break;
+//                case 3:
+//                    List<WdWidget> debug = findByAttribute(state, "controlname");
+//                    for (WdWidget item : debug) {
+//                      System.out.println("!!! " + item.getAttribute("controlname") + " !!!");
+//                    }
+//                    res = findByAttribute(state, "id", "mat-option-19");
+//                    if (res.size() > 0) {
+//                        System.out.println("<<< Selecting \"Unassigned\" >>>");
+//                        forcedStep++;
+//                        return Collections.singleton(actionCompiler.leftClickAt(res.get(0)));
+//                    }
+//                    break;
+//            }
+//        }
+//        return super.detectForcedActions(state, actionCompiler);//super.selectAction(system, state, actions);
+//    }
 
     private List<WdWidget> findByAttribute(State state, String attr) {
         List<WdWidget> result = new ArrayList<>();

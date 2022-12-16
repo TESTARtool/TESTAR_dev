@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.VBox;
@@ -21,6 +22,31 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class JfxProgressMonitor implements ProgressMonitor {
+
+  public static class TerminationReason {
+
+    private final String title;
+    private final String headerText;
+    private final String message;
+
+    public String getTitle() {
+      return title;
+    }
+
+    public String getHeaderText() {
+      return headerText;
+    }
+
+    public String getMessage() {
+      return message;
+    }
+
+    public TerminationReason(String title, String headerText, String message) {
+      this.title = title;
+      this.headerText = headerText;
+      this.message = message;
+    }
+  }
 
     private Parent view;
     private Stage parentStage;
@@ -142,11 +168,24 @@ public class JfxProgressMonitor implements ProgressMonitor {
     }
 
     public void stop() {
+      stop(null);
+    }
+
+    public void stop(TerminationReason reason) {
         Platform.runLater(() -> {
+            if (reason != null) {
+              Alert alert = new Alert(Alert.AlertType.ERROR);
+              alert.setTitle(reason.getTitle());
+              alert.setHeaderText(reason.getHeaderText());
+              alert.setContentText(reason.getMessage());
+
+              alert.showAndWait();
+            }
             if (view == null) {
                 return;
             }
 
+            System.out.println("Closing progress monitor stage");
             final Stage stage = (Stage) view.getScene().getWindow();
             stage.close();
             parentStage.show();
