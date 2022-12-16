@@ -10,40 +10,23 @@ import java.util.Set;
 public class IntOprNode extends BaseStrategyNode<Boolean>
 {
     private BaseStrategyNode<Integer>   left;
-    private Integer                     leftInt;
     private IntegerOperator             operator;
     private BaseStrategyNode<Integer>   right;
-    private Integer                     rightInt;
+
     
-    private boolean leftIsInt = false;
-    private boolean rightIsInt = false;
-    
-    public IntOprNode(Object left, IntegerOperator operator, Object right)
+    public IntOprNode(BaseStrategyNode<Integer>  left, IntegerOperator operator, BaseStrategyNode<Integer>  right)
     {
-        if(left instanceof BaseStrategyNode)
-            this.left = (BaseStrategyNode<Integer>) left;
-        else if (left instanceof Integer)
-        {
-            this.leftInt = (Integer) left;
-            this.leftIsInt = true;
-        }
+        this.left = left;
         this.operator = operator;
-        if(right instanceof BaseStrategyNode)
-            this.right = (BaseStrategyNode<Integer>) right;
-        else if (right instanceof Integer)
-        {
-            this.rightInt = (Integer) right;
-            this.rightIsInt = true;
-        }
+        this.right = right;
     }
     
     @Override
     public Boolean getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
-        Integer leftResult = (leftIsInt) ? leftInt : left.getResult(state, actions, actionsExecuted);
-        Integer rightResult = (rightIsInt) ? rightInt : right.getResult(state, actions, actionsExecuted);
-        
-        return operator.getResult(leftResult, rightResult);
+        return operator.getResult(
+                left.getResult(state, actions, actionsExecuted),
+                right.getResult(state, actions, actionsExecuted));
     }
     
     @Override

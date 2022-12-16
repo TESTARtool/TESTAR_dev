@@ -10,43 +10,23 @@ import java.util.Set;
 public class BoolOprNode extends BaseStrategyNode<Boolean>
 {
     private BaseStrategyNode<Boolean>   left; //can be null if operator is NOT
-    private Boolean                     leftBool;
     private BooleanOperator             operator;
     private BaseStrategyNode<Boolean>   right;
-    private Boolean                     rightBool;
-    
-    private boolean leftIsBool = false;
-    private boolean rightIsBool = false;
-    
-    public BoolOprNode(Object left, BooleanOperator operator, Object right)    {
-        if(left instanceof BaseStrategyNode)
-            this.left = (BaseStrategyNode<Boolean>) left;
-        else if (left instanceof Boolean)
-        {
-            this.leftBool = (Boolean) left;
-            this.leftIsBool = true;
-        }
+
+    public BoolOprNode(BaseStrategyNode<Boolean> left, BooleanOperator operator, BaseStrategyNode<Boolean> right)    {
+
+        this.left = left;
         this.operator = operator;
-        if(right instanceof BaseStrategyNode)
-            this.right = (BaseStrategyNode<Boolean>) right;
-        else if (right instanceof Boolean)
-        {
-            this.rightBool = (Boolean) right;
-            this.rightIsBool = true;
-        }
+        this.right = right;
     }
     
     @Override
     public Boolean getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
-        Boolean rightResult = (rightIsBool) ? rightBool : right.getResult(state, actions, actionsExecuted);
-        if(operator == BooleanOperator.NOT)
-        {
-            Boolean leftResult = (leftIsBool) ? leftBool : left.getResult(state, actions, actionsExecuted);
-            return operator.getResult(leftResult, rightResult);
-        }
+        if(operator != BooleanOperator.NOT)
+            return operator.getResult(left.getResult(state, actions, actionsExecuted), right.getResult(state, actions, actionsExecuted));
         else
-            return operator.getResult(null, rightResult);
+            return operator.getResult(null, right.getResult(state, actions, actionsExecuted));
     }
     
     @Override

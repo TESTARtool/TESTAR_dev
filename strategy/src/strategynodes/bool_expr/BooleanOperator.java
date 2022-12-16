@@ -29,6 +29,12 @@ public enum BooleanOperator
                 @Override
                 public boolean getResult(Boolean left, Boolean right)
                 {return left || right;}
+            },
+    IS ("IS")
+            {
+                @Override
+                public boolean getResult(Boolean left, Boolean right)
+                {return left == right;}
             };
     
     public abstract boolean getResult(Boolean left, Boolean right);

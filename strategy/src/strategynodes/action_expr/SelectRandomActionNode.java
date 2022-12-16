@@ -43,7 +43,8 @@ public class SelectRandomActionNode extends BaseActionNode
         {
             int targetCount = (VISITED_MODIFIER == VisitedModifier.LEAST_VISITED) ? Integer.MAX_VALUE : 0; //max value for least, zero for most
 
-            for(Action action : actions) {
+            for(Action action : actions)
+            {
                 boolean actionRejected = false;
                 int count = actionsExecuted.getOrDefault(action.get(Tags.AbstractIDCustom), 0);
 
@@ -68,9 +69,6 @@ public class SelectRandomActionNode extends BaseActionNode
             for(Action action : actions)
             {
                 boolean actionRejected = false;
-
-                if(VISITED_MODIFIER == null)
-                    System.out.print("");
 
                 if (applyFilterVisited)
                     actionRejected = !actionMatchesVisitorModifier(action, VISITED_MODIFIER, actionsExecuted);

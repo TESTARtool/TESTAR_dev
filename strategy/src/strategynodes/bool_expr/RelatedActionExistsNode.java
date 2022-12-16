@@ -28,15 +28,18 @@ public class RelatedActionExistsNode extends BaseStrategyNode<Boolean>
     @Override
     public Boolean getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted) //todo: check if it works
     {
-        Widget prevWidget = state.get(Tags.PreviousAction).get(Tags.OriginWidget);
-        
-        for(Action action : actions)
+        Action prevAction = state.get(Tags.PreviousAction, null);
+        if(prevAction != null)
         {
-            Widget widget = action.get(Tags.OriginWidget);
-            if((RELATED_ACTION == RelatedAction.CHILD && WidgetsAreParentAndChild(prevWidget, widget)) ||
-               (RELATED_ACTION == RelatedAction.SIBLING && WidgetsAreSiblings(prevWidget, widget)) ||
-               (RELATED_ACTION == RelatedAction.SIBLING_OR_CHILD && (WidgetsAreParentAndChild(prevWidget, widget) || WidgetsAreSiblings(prevWidget, widget))))
-                return true; //if one is found, no need to search further
+            Widget prevWidget = prevAction.get(Tags.OriginWidget, null);
+            for (Action action : actions)
+            {
+                Widget widget = action.get(Tags.OriginWidget);
+                if ((RELATED_ACTION == RelatedAction.CHILD && WidgetsAreParentAndChild(prevWidget, widget)) ||
+                        (RELATED_ACTION == RelatedAction.SIBLING && WidgetsAreSiblings(prevWidget, widget)) ||
+                        (RELATED_ACTION == RelatedAction.SIBLING_OR_CHILD && (WidgetsAreParentAndChild(prevWidget, widget) || WidgetsAreSiblings(prevWidget, widget))))
+                    return true; //if one is found, no need to search further
+            }
         }
         return false;
     }

@@ -37,9 +37,13 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
         if(ctx.AND() != null)           opr = BooleanOperator.AND;
         else if (ctx.XOR() != null)     opr = BooleanOperator.XOR;
         else if (ctx.OR() != null)      opr = BooleanOperator.OR;
+        else if (ctx.IS() != null)      opr = BooleanOperator.IS;
         else                            return null;
         return new BoolOprNode(visit(ctx.left), opr, visit(ctx.right));
     }
+    @Override
+    public BaseStrategyNode visitBaseBool(StrategyParser.BaseBoolContext ctx)
+    { return new PlainBooleanNode(Boolean.valueOf(ctx.BOOLEAN().getText())); }
     
     ////////////////////////
     // number expressions //
@@ -66,11 +70,20 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     @Override
     public NumberOfActionsNode visitNumber_of_actions(StrategyParser.Number_of_actionsContext ctx)
     {
-        VisitedModifier visitModifier = (ctx.VISIT_MODIFIER() == null) ? VisitedModifier.toEnum(ctx.VISIT_MODIFIER().getText()) : null;
-        Filter filter = (ctx.FILTER() == null) ? Filter.toEnum(ctx.FILTER().getText()) : null;
-        ActionType actionType = (ctx.ACTION_TYPE() == null) ? ActionType.toEnum(ctx.ACTION_TYPE().getText()) : null;
+        VisitedModifier visitModifier = (ctx.VISIT_MODIFIER() == null) ? null : VisitedModifier.toEnum(ctx.VISIT_MODIFIER().getText());
+        Filter filter = (ctx.FILTER() == null) ? null : Filter.toEnum(ctx.FILTER().getText());
+        ActionType actionType = (ctx.ACTION_TYPE() == null) ? null : ActionType.toEnum(ctx.ACTION_TYPE().getText());
         
         return new NumberOfActionsNode(visitModifier,filter, actionType);
+    }
+
+    @Override
+    public BaseStrategyNode visitNumber_expr(StrategyParser.Number_exprContext ctx)
+    {
+        if(ctx.number_of_actions() != null)
+            return visit(ctx.number_of_actions());
+        else
+            return new PlainIntegerNode(Integer.parseInt(ctx.NUMBER().getText()));
     }
     
     ////////////////////

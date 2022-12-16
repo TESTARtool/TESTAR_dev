@@ -10,8 +10,8 @@ strategy:           IF ifExpr=bool_expr     THEN thenExpr=action_expr   ELSE els
 
 bool_expr:                        NOT                               expr=bool_expr              #notExpr
 |   LP                            NOT                               expr=bool_expr      RP      #notExpr
-|       left=bool_expr      opr=( AND | XOR | OR )                  right=bool_expr             #boolOprExpr
-|   LP  left=bool_expr      opr=( AND | XOR | OR )                  right=bool_expr     RP      #boolOprExpr
+|       left=bool_expr      opr=( AND | XOR | OR | IS )             right=bool_expr             #boolOprExpr
+|   LP  left=bool_expr      opr=( AND | XOR | OR | IS )             right=bool_expr     RP      #boolOprExpr
 |       left=number_expr    opr=( LT | LE | GT | GE | EQ | NE )     right=number_expr           #numberOprExpr
 |   LP  left=number_expr    opr=( LT | LE | GT | GE | EQ | NE )     right=number_expr   RP      #numberOprExpr
 |                           state_boolean                                                       #stateBool
@@ -67,6 +67,7 @@ NOT:                N O T   | '!'   | '~';
 AND:                A N D   | '&&'  | '&';
 XOR:                X O R   | '^';
 OR:                 O R     | '||'  | '|';
+IS:                 I S     | E Q U A L S;
 
 GT                  : '>';
 GE                  : '>=';

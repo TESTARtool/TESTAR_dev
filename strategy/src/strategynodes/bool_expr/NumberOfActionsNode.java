@@ -26,11 +26,11 @@ public class NumberOfActionsNode extends BaseStrategyNode<Integer>
     @Override
     public Integer getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted) //todo: check if it works
     {
-        boolean filterVisited       = (VISITED_MODIFIER != null);
-        boolean filterActionTypes   = (FILTER != null && ACTION_TYPE != null);
+        boolean applyFilterVisited       = (VISITED_MODIFIER != null);
+        boolean applyFilterActionTypes   = (FILTER != null && ACTION_TYPE != null);
         int numberOfActions = 0;
         
-        if((!filterVisited) && (!filterActionTypes)) //if no filtering is necessary
+        if((!applyFilterVisited) && (!applyFilterActionTypes)) //if no filtering is necessary
             return actions.size();
         
         if(VISITED_MODIFIER == VisitedModifier.LEAST_VISITED || VISITED_MODIFIER == VisitedModifier.MOST_VISITED)
@@ -39,18 +39,22 @@ public class NumberOfActionsNode extends BaseStrategyNode<Integer>
             
             for(Action action : actions)
             {
+                boolean actionRejected = false;
                 int count = actionsExecuted.getOrDefault(action.get(Tags.AbstractIDCustom), 0);
-                
-                if(filterActionTypes && !actionAllowedByFilter(action)) //check if action is rejected by filter
-                    break; //if yes, move on to the next action
-                
-                if(count == targetCount) //both least and most
-                    numberOfActions++;
-                else if(((count > targetCount) && VISITED_MODIFIER == VisitedModifier.LEAST_VISITED) ||
-                        (VISITED_MODIFIER == VisitedModifier.MOST_VISITED) && (count < targetCount))
+
+                if (applyFilterActionTypes)
+                    actionRejected = !actionAllowedByFilter(action, FILTER, ACTION_TYPE); //check if action is rejected by filter
+
+                if (!actionRejected)
                 {
-                    targetCount     = count;
-                    numberOfActions = 0;
+                    if (count == targetCount) //both least and most
+                        numberOfActions++;
+                    else if (((count > targetCount) && VISITED_MODIFIER == VisitedModifier.LEAST_VISITED) ||
+                            (VISITED_MODIFIER == VisitedModifier.MOST_VISITED) && (count < targetCount))
+                    {
+                        targetCount = count;
+                        numberOfActions = 0;
+                    }
                 }
             }
         }
@@ -58,17 +62,16 @@ public class NumberOfActionsNode extends BaseStrategyNode<Integer>
         {
             for(Action action : actions)
             {
-                boolean actionIsVisited = (actionsExecuted.containsKey(action.get(Tags.AbstractIDCustom)));
-                
-                if(filterActionTypes && (!actionAllowedByFilter(action))) //check if action is rejected by filter
-                    break; //if yes, move on to the next action
-                
-                if(filterVisited &&
-                   ((VISITED_MODIFIER == VisitedModifier.VISITED && (!actionIsVisited)) ||
-                    (VISITED_MODIFIER == VisitedModifier.UNVISITED && actionIsVisited)))
-                    break; //move on to the next action
-                
-                numberOfActions++;
+                boolean actionRejected = false;
+
+                if (applyFilterVisited)
+                    actionRejected = !actionMatchesVisitorModifier(action, VISITED_MODIFIER, actionsExecuted);
+
+                if(!actionRejected && applyFilterActionTypes)
+                    actionRejected = !actionAllowedByFilter(action, FILTER, ACTION_TYPE); //check if action is rejected by filter
+
+                if(!actionRejected) //if the loop has made it this far, count the action
+                    numberOfActions++;
             }
         }
         return numberOfActions;

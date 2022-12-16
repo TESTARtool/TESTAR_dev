@@ -1,7 +1,7 @@
 IF
-    any-actions least-visited exist
+    sibling-or-child-action exists IS true
 THEN
-    select-random most-visited
+    4 select-by-related sibling-or-child-action
+    5 select-random least-visited of-type type-action
 ELSE
     select-previous-action
-    select-random least-visited of-type type-action
