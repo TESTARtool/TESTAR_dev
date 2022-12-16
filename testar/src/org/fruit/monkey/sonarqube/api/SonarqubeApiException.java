@@ -16,4 +16,8 @@ public class SonarqubeApiException extends RuntimeException {
     public static SonarqubeApiException sonarqubeApiCallResultedInError(Throwable e) {
         return new SonarqubeApiException("Sending request to Sonarqube API resulted in error", e);
     }
+
+    public static SonarqubeApiException noMorePages() {
+        return new SonarqubeApiException("No more pages of paginated request.");
+    }
 }

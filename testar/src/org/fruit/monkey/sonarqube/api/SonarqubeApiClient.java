@@ -2,6 +2,7 @@ package org.fruit.monkey.sonarqube.api;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -13,20 +14,13 @@ public class SonarqubeApiClient {
     private final String token;
 
     public String getProjectComponentKey() {
-        var projectsRequest = new SonarqubeProjectRequest(host, token);
-        var projectsResponse = projectsRequest.send();
-        var projectsAmount = projectsResponse.getPaging().getTotal();
-        var receivedProjectsAmount = projectsResponse.getComponents().size();
-        var receivedProjects = projectsResponse.getComponents();
-        var pageSize = projectsResponse.getPaging().getPageSize();
-        var page = projectsResponse.getPaging().getPageIndex();
+        var projectsRequest = new SonarqubePaginatedProjectRequest(host, token);
+        var receivedProjects = new ArrayList<SonarqubeProjectResponse.Component>();
 
-        while(receivedProjectsAmount < projectsAmount) {
-            projectsRequest = new SonarqubeProjectRequest(host, token, ++page, pageSize);
-            projectsResponse = projectsRequest.send();
-            receivedProjects.addAll(projectsResponse.getComponents());
-            receivedProjectsAmount += projectsResponse.getComponents().size();
+        while(projectsRequest.hasNextPage()) {
+            receivedProjects.addAll(projectsRequest.getNextPage().getComponents());
         }
+
         return getCurrentProjectKey(receivedProjects);
     }
 
