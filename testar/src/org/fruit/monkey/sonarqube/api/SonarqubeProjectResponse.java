@@ -18,13 +18,6 @@ public class SonarqubeProjectResponse {
     private Paging paging;
     private List<Component> components;
 
-    public String getCurrentProjectKey() {
-        var currentProject = components.stream()
-                                                  .max(Comparator.comparing(t -> t.lastAnalysisDate))
-                                                  .orElseThrow(SonarqubeApiException::projectNotFoundException);
-        return currentProject.getKey();
-    }
-
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Component {

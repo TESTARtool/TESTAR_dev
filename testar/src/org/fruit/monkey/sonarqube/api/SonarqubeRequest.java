@@ -24,7 +24,7 @@ public abstract class SonarqubeRequest<T> {
 
     private static final String AUTH_KEY = "Authorization";
 
-    public SonarqubeRequest(String username, String host, Class<T> responseType) {
+    public SonarqubeRequest(String host, String username, Class<T> responseType) {
         this.username = username;
         this.host = host;
         this.responseType = responseType;
@@ -57,7 +57,7 @@ public abstract class SonarqubeRequest<T> {
     }
 
     private String encodeCredentials() {
-        String sonarqubeCredentials = username + ":";
+        String sonarqubeCredentials = username + SEPARATOR;
         return Base64.getEncoder().encodeToString(sonarqubeCredentials.getBytes());
     }
 }

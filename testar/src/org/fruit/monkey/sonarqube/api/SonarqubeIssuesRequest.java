@@ -8,23 +8,29 @@ public class SonarqubeIssuesRequest extends SonarqubeRequest<SonarqubeIssuesResp
 
     private static final String PAGE_PARAM_KEY = "p";
 
+    private static final String PAGE_SIZE_PARAM_KEY = "ps";
+
     private final String searchParam;
 
     private final int pageIndex;
 
-    public SonarqubeIssuesRequest(String username, String host, String searchParam, int pageIndex) {
-        super(username, host, SonarqubeIssuesResponse.class);
+    private final int pageSize;
+
+    public SonarqubeIssuesRequest(String host, String username, String searchParam, int pageIndex, int pageSize) {
+        super(host, username, SonarqubeIssuesResponse.class);
         this.searchParam = searchParam;
         this.pageIndex = pageIndex;
+        this.pageSize = pageSize;
     }
 
-    public SonarqubeIssuesRequest(String username, String host, String searchParam) {
-        this(username, host, searchParam, 1);
+    public SonarqubeIssuesRequest(String host, String username, String searchParam) {
+        this(host, username, searchParam, 1, 100);
     }
 
     @Override
     protected String buildUri() {
-        return host + REPORT_ENDPOINT_PATH + PROJECT_PARAM_KEY + "=" + searchParam +
-                "&" + PAGE_PARAM_KEY + "=" + pageIndex;
+        return host + REPORT_ENDPOINT_PATH + PROJECT_PARAM_KEY + "=" + searchParam
+                + "&" + PAGE_PARAM_KEY + "=" + pageIndex
+                + "&" + PAGE_SIZE_PARAM_KEY + "=" + pageSize;
     }
 }
