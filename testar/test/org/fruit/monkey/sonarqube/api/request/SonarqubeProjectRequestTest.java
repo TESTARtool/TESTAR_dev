@@ -14,7 +14,7 @@ public class SonarqubeProjectRequestTest extends SonarqubeApiTest {
 
     @Test
     public void shouldReturnSonarqubeIssuesRequest() throws InterruptedException, IOException {
-        mockResponse("sonarqubeapi/projects/sonarqube-projects-response.json");
+        mockResponse("sonarqube-api/projects/sonarqube-projects-response.json");
 
         var sonarqubeIssuesRequest = new SonarqubeProjectRequest(host, "test-token");
         var parsedResponse = sonarqubeIssuesRequest.send();

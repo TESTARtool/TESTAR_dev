@@ -14,7 +14,7 @@ public class SonarqubeIssuesRequestTest extends SonarqubeApiTest {
 
     @Test
     public void shouldReturnSonarqubeIssuesRequest() throws InterruptedException, IOException {
-        mockResponse("sonarqubeapi/sonarqube-issues-response.json");
+        mockResponse("sonarqube-api/issues/sonarqube-issues-response.json");
 
         var sonarqubeIssuesRequest = new SonarqubeIssuesRequest(host,
                                                        "test-token",
@@ -29,8 +29,8 @@ public class SonarqubeIssuesRequestTest extends SonarqubeApiTest {
 
         var paging = parsedResponse.getPaging();
         assertEquals(1, paging.getPageIndex());
-        assertEquals(100, paging.getPageSize());
-        assertEquals(385, paging.getTotal());
+        assertEquals(1, paging.getPageSize());
+        assertEquals(1, paging.getTotal());
         assertEquals(1, parsedResponse.getIssues().size());
 
         var issueFound = parsedResponse.getIssues().get(0);

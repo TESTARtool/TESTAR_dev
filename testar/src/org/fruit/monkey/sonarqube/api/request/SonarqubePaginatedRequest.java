@@ -40,19 +40,19 @@ public abstract class SonarqubePaginatedRequest<T extends SonarqubeRequest<S>, S
     }
 
     private S fetchInitialPage() {
-        var projectsRequest = initialPageRequest();
-        var projectsResponse = projectsRequest.send();
+        var sonarqubePageRequest = initialPageRequest();
+        var sonarqubePageResponse = sonarqubePageRequest.send();
 
-        total = projectsResponse.getPaging().getTotal();
-        pageSize = projectsResponse.getPaging().getPageSize();
-        currentPage = projectsResponse.getPaging().getPageIndex();
+        total = sonarqubePageResponse.getPaging().getTotal();
+        pageSize = sonarqubePageResponse.getPaging().getPageSize();
+        currentPage = sonarqubePageResponse.getPaging().getPageIndex();
 
-        return projectsResponse;
+        return sonarqubePageResponse;
     }
 
     private S fetchNextPage() {
-        var projectsRequest = pageRequest(++currentPage);
-        return projectsRequest.send();
+        var sonarqubePageRequest = pageRequest(++currentPage);
+        return sonarqubePageRequest.send();
     }
 
     protected int getPageSize() {

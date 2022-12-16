@@ -1,0 +1,400 @@
+{
+  "total": 35,
+  "p": 1,
+  "ps": 10,
+  "paging": {
+    "pageIndex": 1,
+    "pageSize": 10,
+    "total": 35
+  },
+  "effortTotal": 8034,
+  "debtTotal": 8034,
+  "issues": [
+    {
+      "key": "AYURC_GPHq_OHAqW8iRJ",
+      "rule": "java:S110",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/app/service/factory/exception/FactoryNotFoundException.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "line": 8,
+      "hash": "1f74552975a5372a6dbb7d6997386481",
+      "textRange": {
+        "startLine": 8,
+        "endLine": 8,
+        "startOffset": 13,
+        "endOffset": 37
+      },
+      "flows": [],
+      "status": "OPEN",
+      "message": "This class has 10 parents which is greater than 5 authorized.",
+      "effort": "6h30min",
+      "debt": "6h30min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "design"
+      ],
+      "creationDate": "2022-08-30T09:23:43+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC-8SHq_OHAqW8iQQ",
+      "rule": "java:S1128",
+      "severity": "MINOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/app/service/invitation/create/InvitationCreateServiceImpl.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "line": 9,
+      "hash": "25ec0fcabe89f9ac1201c842bbc5a0a6",
+      "textRange": {
+        "startLine": 9,
+        "endLine": 9,
+        "startOffset": 0,
+        "endOffset": 61
+      },
+      "flows": [],
+      "status": "OPEN",
+      "message": "Remove this unused import 'org.springframework.context.annotation.PropertySource'.",
+      "effort": "2min",
+      "debt": "2min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "unused"
+      ],
+      "creationDate": "2022-08-30T09:23:43+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC-8SHq_OHAqW8iQR",
+      "rule": "java:S1117",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/app/service/invitation/create/InvitationCreateServiceImpl.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "line": 34,
+      "hash": "26ba44da0888fd366804ed75b7f99b91",
+      "textRange": {
+        "startLine": 34,
+        "endLine": 34,
+        "startOffset": 21,
+        "endOffset": 38
+      },
+      "flows": [],
+      "status": "OPEN",
+      "message": "Rename \"invitationMessage\" which hides the field declared at line 17.",
+      "effort": "5min",
+      "debt": "5min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "cert",
+        "pitfall",
+        "suspicious"
+      ],
+      "creationDate": "2022-08-30T09:23:43+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC_QkHq_OHAqW8iUD",
+      "rule": "common-java:DuplicatedBlocks",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/domain/model/factory/FactoryEntity.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "flows": [],
+      "status": "OPEN",
+      "message": "2 duplicated blocks of code must be removed.",
+      "effort": "30min",
+      "debt": "30min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "pitfall"
+      ],
+      "creationDate": "2022-08-30T09:23:43+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC_RgHq_OHAqW8iUN",
+      "rule": "common-java:DuplicatedBlocks",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/domain/model/feed/FeedEntity.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "flows": [],
+      "status": "OPEN",
+      "message": "1 duplicated blocks of code must be removed.",
+      "effort": "20min",
+      "debt": "20min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "pitfall"
+      ],
+      "creationDate": "2022-08-30T09:23:43+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC_RVHq_OHAqW8iUL",
+      "rule": "common-java:DuplicatedBlocks",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/domain/model/user/UserEntity.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "flows": [],
+      "status": "OPEN",
+      "message": "1 duplicated blocks of code must be removed.",
+      "effort": "20min",
+      "debt": "20min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "pitfall"
+      ],
+      "creationDate": "2022-08-30T09:23:43+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC-wLHq_OHAqW8iOF",
+      "rule": "java:S1172",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/dto/invitation/in/FactorySettingsInDto.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "line": 42,
+      "hash": "3a324d7f213fd8e7730504b954389c5f",
+      "textRange": {
+        "startLine": 42,
+        "endLine": 42,
+        "startOffset": 40,
+        "endOffset": 49
+      },
+      "flows": [
+        {
+          "locations": [
+            {
+              "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/dto/invitation/in/FactorySettingsInDto.java",
+              "textRange": {
+                "startLine": 42,
+                "endLine": 42,
+                "startOffset": 40,
+                "endOffset": 49
+              },
+              "msg": "Remove this unused method parameter factoryId\"."
+            }
+          ]
+        }
+      ],
+      "status": "OPEN",
+      "message": "Remove this unused method parameter \"factoryId\".",
+      "effort": "5min",
+      "debt": "5min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "cert",
+        "unused"
+      ],
+      "creationDate": "2022-08-30T09:23:43+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC_JBHq_OHAqW8iRs",
+      "rule": "common-java:DuplicatedBlocks",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/instructionlibrary/category/repository/entity/CategoryEntity.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "flows": [],
+      "status": "OPEN",
+      "message": "4 duplicated blocks of code must be removed.",
+      "effort": "50min",
+      "debt": "50min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "pitfall"
+      ],
+      "creationDate": "2022-08-30T09:23:43+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC-0yHq_OHAqW8iPK",
+      "rule": "java:S1066",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/security/factory/FactorySettingsSecurityService.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "line": 40,
+      "hash": "e6c737112c7b7f5d115d801fcbadf860",
+      "textRange": {
+        "startLine": 40,
+        "endLine": 40,
+        "startOffset": 12,
+        "endOffset": 14
+      },
+      "flows": [
+        {
+          "locations": [
+            {
+              "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/security/factory/FactorySettingsSecurityService.java",
+              "textRange": {
+                "startLine": 39,
+                "endLine": 39,
+                "startOffset": 8,
+                "endOffset": 10
+              }
+            }
+          ]
+        }
+      ],
+      "status": "OPEN",
+      "message": "Merge this if statement with the enclosing one.",
+      "effort": "5min",
+      "debt": "5min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "clumsy"
+      ],
+      "creationDate": "2022-08-30T09:23:43+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC-0yHq_OHAqW8iPL",
+      "rule": "java:S1066",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/security/factory/FactorySettingsSecurityService.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "line": 62,
+      "hash": "00866fb06196b050d30383fa977faeca",
+      "textRange": {
+        "startLine": 62,
+        "endLine": 62,
+        "startOffset": 12,
+        "endOffset": 14
+      },
+      "flows": [
+        {
+          "locations": [
+            {
+              "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/security/factory/FactorySettingsSecurityService.java",
+              "textRange": {
+                "startLine": 61,
+                "endLine": 61,
+                "startOffset": 8,
+                "endOffset": 10
+              }
+            }
+          ]
+        }
+      ],
+      "status": "OPEN",
+      "message": "Merge this if statement with the enclosing one.",
+      "effort": "5min",
+      "debt": "5min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "clumsy"
+      ],
+      "creationDate": "2022-08-30T09:23:43+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    }
+  ],
+  "components": [
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/dto/invitation/in/FactorySettingsInDto.java",
+      "uuid": "AYURC-FbHq_OHAqW8iAP",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "FactorySettingsInDto.java",
+      "longName": "src/main/java/com/marviq/yoho/dto/invitation/in/FactorySettingsInDto.java",
+      "path": "src/main/java/com/marviq/yoho/dto/invitation/in/FactorySettingsInDto.java"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/domain/model/factory/FactoryEntity.java",
+      "uuid": "AYURC-F0Hq_OHAqW8iKW",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "FactoryEntity.java",
+      "longName": "src/main/java/com/marviq/yoho/domain/model/factory/FactoryEntity.java",
+      "path": "src/main/java/com/marviq/yoho/domain/model/factory/FactoryEntity.java"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/domain/model/feed/FeedEntity.java",
+      "uuid": "AYURC-F1Hq_OHAqW8iKt",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "FeedEntity.java",
+      "longName": "src/main/java/com/marviq/yoho/domain/model/feed/FeedEntity.java",
+      "path": "src/main/java/com/marviq/yoho/domain/model/feed/FeedEntity.java"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/security/factory/FactorySettingsSecurityService.java",
+      "uuid": "AYURC-FdHq_OHAqW8iA5",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "FactorySettingsSecurityService.java",
+      "longName": "src/main/java/com/marviq/yoho/security/factory/FactorySettingsSecurityService.java",
+      "path": "src/main/java/com/marviq/yoho/security/factory/FactorySettingsSecurityService.java"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/app/service/invitation/create/InvitationCreateServiceImpl.java",
+      "uuid": "AYURC-FmHq_OHAqW8iDX",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "InvitationCreateServiceImpl.java",
+      "longName": "src/main/java/com/marviq/yoho/app/service/invitation/create/InvitationCreateServiceImpl.java",
+      "path": "src/main/java/com/marviq/yoho/app/service/invitation/create/InvitationCreateServiceImpl.java"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/app/service/factory/exception/FactoryNotFoundException.java",
+      "uuid": "AYURC-FuHq_OHAqW8iGk",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "FactoryNotFoundException.java",
+      "longName": "src/main/java/com/marviq/yoho/app/service/factory/exception/FactoryNotFoundException.java",
+      "path": "src/main/java/com/marviq/yoho/app/service/factory/exception/FactoryNotFoundException.java"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/domain/model/user/UserEntity.java",
+      "uuid": "AYURC-F1Hq_OHAqW8iKo",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "UserEntity.java",
+      "longName": "src/main/java/com/marviq/yoho/domain/model/user/UserEntity.java",
+      "path": "src/main/java/com/marviq/yoho/domain/model/user/UserEntity.java"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/instructionlibrary/category/repository/entity/CategoryEntity.java",
+      "uuid": "AYURC-FwHq_OHAqW8iHh",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "CategoryEntity.java",
+      "longName": "src/main/java/com/marviq/yoho/instructionlibrary/category/repository/entity/CategoryEntity.java",
+      "path": "src/main/java/com/marviq/yoho/instructionlibrary/category/repository/entity/CategoryEntity.java"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api",
+      "uuid": "AYURC83V2Xt-QbkRm4Ov",
+      "enabled": true,
+      "qualifier": "TRK",
+      "name": "Yoho backend API",
+      "longName": "Yoho backend API"
+    }
+  ],
+  "facets": []
+}
