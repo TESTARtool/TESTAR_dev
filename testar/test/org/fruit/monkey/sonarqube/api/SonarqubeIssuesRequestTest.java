@@ -48,7 +48,7 @@ public class SonarqubeIssuesRequestTest {
 
         assertNotNull(request);
         assertEquals("Basic dGVzdC10b2tlbjo=", request.getHeader("Authorization"));
-        assertEquals("/api/issues/search?componentKeys=123", request.getPath());
+        assertEquals("/api/issues/search?componentKeys=123&p=1", request.getPath());
         var paging = parsedResponse.getPaging();
         assertEquals(1, paging.getPageIndex());
         assertEquals(100, paging.getPageSize());

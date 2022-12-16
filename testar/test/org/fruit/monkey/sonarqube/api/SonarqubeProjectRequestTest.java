@@ -34,21 +34,20 @@ public class SonarqubeProjectRequestTest {
     public void shouldReturnSonarqubeIssuesRequest() throws InterruptedException, IOException {
         var response = new MockResponse();
         var inputStream = getClass().getClassLoader()
-                .getResourceAsStream("sonarqubeapi/sonarqube-projects-response.json");
+                                               .getResourceAsStream("sonarqubeapi/sonarqube-projects-response.json");
 
         response.setBody(IOUtils.toString(inputStream, StandardCharsets.UTF_8));
 
         mockWebServer.enqueue(response);
 
-        var sonarqubeIssuesRequest = new SonarqubeProjectRequest("test-token",
-                "http://localhost:8889");
+        var sonarqubeIssuesRequest = new SonarqubeProjectRequest("test-token", "http://localhost:8889");
         var parsedResponse = sonarqubeIssuesRequest.send();
 
         RecordedRequest request = mockWebServer.takeRequest(1, TimeUnit.SECONDS);
 
         assertNotNull(request);
         assertEquals("Basic dGVzdC10b2tlbjo=", request.getHeader("Authorization"));
-        assertEquals("/api/projects/search", request.getPath());
+        assertEquals("/api/projects/search?p=1", request.getPath());
 
         var paging = parsedResponse.getPaging();
 
@@ -59,6 +58,7 @@ public class SonarqubeProjectRequestTest {
 
         var projectFound = parsedResponse.getComponents().get(0);
         assertEquals("com.marviq.yoho:yoho-be-api", projectFound.getKey());
-        assertEquals(LocalDateTime.of(2022, 12, 14, 15, 20, 53), projectFound.getLastAnalysisDate());
+        assertEquals(LocalDateTime.of(2022, 12, 14, 15, 20, 53),
+                     projectFound.getLastAnalysisDate());
     }
 }
