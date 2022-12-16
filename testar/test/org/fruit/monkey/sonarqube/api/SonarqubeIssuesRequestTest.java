@@ -1,13 +1,9 @@
 package org.fruit.monkey.sonarqube.api;
 
-import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
-import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -24,7 +20,7 @@ public class SonarqubeIssuesRequestTest extends SonarqubeApiTest{
                                                      "123");
         var parsedResponse = sonarqubeIssuesRequest.send();
 
-        RecordedRequest request = mockWebServer.takeRequest(1, TimeUnit.SECONDS);
+        RecordedRequest request = captureRequest();
 
         assertNotNull(request);
         assertEquals("Basic dGVzdC10b2tlbjo=", request.getHeader("Authorization"));

@@ -16,10 +16,16 @@ public class SonarqubeApiClient {
         var projectsRequest = new SonarqubeProjectRequest(host, token);
         var projectsResponse = projectsRequest.send();
         var projectsAmount = projectsResponse.getPaging().getTotal();
-        var receivedProjectsAmount = projectsResponse.getPaging().getPageSize();
+        var receivedProjectsAmount = projectsResponse.getComponents().size();
         var receivedProjects = projectsResponse.getComponents();
-        if(projectsAmount > receivedProjectsAmount) {
-            //TODO
+        var pageSize = projectsResponse.getPaging().getPageSize();
+        var page = projectsResponse.getPaging().getPageIndex();
+
+        while(receivedProjectsAmount < projectsAmount) {
+            projectsRequest = new SonarqubeProjectRequest(host, token, ++page, pageSize);
+            projectsResponse = projectsRequest.send();
+            receivedProjects.addAll(projectsResponse.getComponents());
+            receivedProjectsAmount += projectsResponse.getComponents().size();
         }
         return getCurrentProjectKey(receivedProjects);
     }

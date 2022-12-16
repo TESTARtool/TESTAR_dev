@@ -1,12 +1,9 @@
 package org.fruit.monkey.sonarqube.api;
 
-import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
-import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
@@ -17,12 +14,12 @@ public class SonarqubeProjectRequestTest extends SonarqubeApiTest {
 
     @Test
     public void shouldReturnSonarqubeIssuesRequest() throws InterruptedException, IOException {
-        mockResponse("sonarqubeapi/sonarqube-projects-response.json");
+        mockResponse("sonarqubeapi/projects/sonarqube-projects-response.json");
 
         var sonarqubeIssuesRequest = new SonarqubeProjectRequest(host, "test-token");
         var parsedResponse = sonarqubeIssuesRequest.send();
 
-        RecordedRequest request = mockWebServer.takeRequest(1, TimeUnit.SECONDS);
+        RecordedRequest request = captureRequest();
 
         assertNotNull(request);
         assertEquals("Basic dGVzdC10b2tlbjo=", request.getHeader("Authorization"));
