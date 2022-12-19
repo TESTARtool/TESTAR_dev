@@ -1,0 +1,17 @@
+{
+  "status":"FINISHED",
+  "methodsExecuted":[
+    {
+      "class":"com.marviq.yoho.domain.model.media.MediaEntity",
+      "method":"<init>"
+    },
+    {
+      "class":"com.marviq.yoho.domain.model.user.UserEntity",
+      "method":"getFactory"
+    },
+    {
+      "class":"com.marviq.yoho.domain.repository.feed.FeedRepositoryQueryDslImpl",
+      "method":"listFeedsInFactory"
+    }
+  ]
+}

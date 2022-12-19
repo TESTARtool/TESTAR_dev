@@ -2,6 +2,15 @@ package org.fruit.monkey.btrace;
 
 import lombok.AllArgsConstructor;
 
+import java.sql.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @AllArgsConstructor
 public class BtraceApiClient {
 
@@ -9,14 +18,27 @@ public class BtraceApiClient {
 
     private final static String STATUS_STARTED = "STARTED";
 
-    public boolean startRecordingMethodInvocation() {
+    public boolean startRecordingMethodInvocation() throws BtraceApiException{
         var startRecordingRequest = new BtraceStartRecordingRequest(host);
-        try {
-            var startRecordingResponse = startRecordingRequest.send();
-            return STATUS_STARTED.equals(startRecordingResponse.getStatus());
-        } catch (BtraceApiException e) {
-            e.printStackTrace();
-            return false;
-        }
+        var startRecordingResponse = startRecordingRequest.send();
+        return STATUS_STARTED.equals(startRecordingResponse.getStatus());
+
+    }
+
+    public List<MethodInvocation> finishRecordingMethodInvocation() throws BtraceApiException {
+        var finishRecordingRequest = new BtraceFinishRecordingRequest(host);
+        var finishRecordingResponse = finishRecordingRequest.send();
+        return convertToMethodInvocations(finishRecordingResponse.getMethodsExecuted());
+
+    }
+
+    private List<MethodInvocation> convertToMethodInvocations(List<BtraceFinishRecordingResponse.MethodEntry> methodEntries) {
+        Map<BtraceFinishRecordingResponse.MethodEntry, Long> countedMethodEntries =
+                methodEntries.stream().collect(Collectors.groupingBy(e -> e, Collectors.counting()));
+        return countedMethodEntries.entrySet()
+                                   .stream()
+                                   .map(entry -> new MethodInvocation(entry.getKey().getClassName(),
+                                                                            entry.getKey().getMethodName(),
+                                                                            entry.getValue())).collect(Collectors.toList());
     }
 }

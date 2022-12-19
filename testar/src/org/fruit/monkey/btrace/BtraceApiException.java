@@ -11,6 +11,6 @@ public class BtraceApiException extends RuntimeException {
     }
 
     public static BtraceApiException btraceApiCallResultedInError(Throwable e) {
-        return new BtraceApiException("Sending request to Sonarqube API resulted in error", e);
+        return new BtraceApiException("Sending request to Btrace API service resulted in error", e);
     }
 }

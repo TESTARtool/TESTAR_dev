@@ -2,7 +2,7 @@ package org.fruit.monkey.btrace;
 
 public class BtraceStartRecordingRequest extends BtraceRequest<BtraceStartRecordingResponse>{
 
-    private static final String PROJECTS_ENDPOINT_PATH = "/testar/api/action/start";
+    private static final String START_RECORDING_ENDPOINT_PATH = "/testar/api/action/start";
 
     public BtraceStartRecordingRequest(String host) {
         super(host, BtraceStartRecordingResponse.class);
@@ -10,6 +10,6 @@ public class BtraceStartRecordingRequest extends BtraceRequest<BtraceStartRecord
 
     @Override
     protected String buildUri() {
-        return host + PROJECTS_ENDPOINT_PATH;
+        return host + START_RECORDING_ENDPOINT_PATH;
     }
 }
