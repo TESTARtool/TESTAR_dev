@@ -86,6 +86,8 @@ public class WdDriver extends SUTBase {
   public static boolean forceActivateTab = true;
   public static boolean disableSecurity = false;
 
+  public static String alertMessage = "";
+
   private final Keyboard kbd = AWTKeyboard.build();
   private final Mouse mouse = WdMouse.build();
 
@@ -427,6 +429,7 @@ public class WdDriver extends SUTBase {
    * Make sure the last tab has focus
    */
   public static void activate() {
+    checkAlertMessages();
     updateHandlesList();
 
     // Nothing to activate, or user doesn't want to use this activate feature
@@ -441,6 +444,19 @@ public class WdDriver extends SUTBase {
     catch (NullPointerException | WebDriverException ignored) {
     	remoteWebDriver = null;
     }
+  }
+
+  /**
+   * If an alert is detected save the content of the text message.
+   */
+  private static void checkAlertMessages() {
+	  try {
+		  if(remoteWebDriver.switchTo().alert() != null && !remoteWebDriver.switchTo().alert().getText().isEmpty()) {
+			  alertMessage = remoteWebDriver.switchTo().alert().getText();
+			  remoteWebDriver.switchTo().alert().accept();
+			  System.out.println("Webdriver alert message detected: " + alertMessage);
+		  }
+	  } catch(Exception e) {}
   }
 
   public static Set<String> getWindowHandles() {

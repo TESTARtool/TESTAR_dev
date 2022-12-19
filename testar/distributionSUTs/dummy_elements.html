@@ -9,6 +9,9 @@
 
 <p>Hello User</p>
 
+<!-- START LEFT ELEMENTS -->
+<div style="float: left;">
+
 <h3>Textarea elements</h3>
 <textarea id="textarea_0length" rows="2" cols="20" maxlength="0"></textarea>
 
@@ -19,21 +22,44 @@
 <br>
 <label id="number_3decimals">1.234</label>
 
-<h3>Buttons</h3>
-<div id="buttons" class="tabcontent">
-  <button id="functional_button" onclick="changeText()">FunctionalButton</button>
-  <button id="dummy_button">DummyButton</button>
-</div>
-
 <h3>Dropdown</h3>
 <select id="functional_select">
   <option id="One">One</option>
   <option id="Two">Two</option>
 </select>
-
-<select id="dummy_select">
+<select id="empty_select">
 </select>
 
+<h3>Empty form</h3>
+<form id="someEmptyForm" ></form>
+
+<h3>Empty div</h3>
+<div id="someEmptyDiv"></div>
+
+</div>
+<!-- END LEFT ELEMENTS -->
+
+
+<!-- START RIGHT ELEMENTS -->
+<div style="float: right;">
+
+<h3>Radio buttons </h3>
+<form>
+  <p>Please select your favorite testing tool:</p>
+  <input type="radio" id="testar" name="fav_testing" value="TESTAR"><label for="testar">TESTAR</label>
+</form>
+<form>
+  <p>Please select your favorite Web language:</p>
+  <input type="radio" id="html" name="fav_language" value="HTML"><label for="html">HTML</label><br>
+  <input type="radio" id="css" name="fav_language" value="CSS"><label for="css">CSS</label><br>
+  <input type="radio" id="javascript" name="fav_language" value="JavaScript"><label for="javascript">JavaScript</label>
+</form>
+
+<h3>Buttons</h3>
+<div id="buttons" class="tabcontent">
+  <button id="functional_button" onclick="changeText()">FunctionalButton</button>
+  <button id="dummy_button">DummyButton</button>
+</div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script>
 function changeText() {
@@ -44,6 +70,24 @@ function changeText() {
     }
 }
 </script>
+
+<h3>Alert Buttons</h3>
+<div id="buttonsAlert" class="tabcontent">
+  <button id="good_alert" onclick="alertGoodMessage()">GoodAlert</button>
+  <button id="suspicious_alert" onclick="alertSuspiciousMessage()">SuspiciousAlert</button>
+</div>
+<script>
+function alertGoodMessage() {
+  prompt("Hello, are you having a good day?");
+}
+function alertSuspiciousMessage() {
+  prompt("Add your credentials in this Login field...");
+}
+</script>
+
+
+</div>
+<!-- END RIGHT ELEMENTS -->
    
 </body>
 </html> 

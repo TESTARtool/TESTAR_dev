@@ -41,6 +41,9 @@ import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.plugin.NativeLinker;
 import org.testar.protocols.WebdriverProtocol;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
@@ -52,6 +55,11 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
  * - Web select list without items
  * - Web text area with max length 0 + add example to dummy HTML SUT
  * - If a web text string is a number and contains more than X decimals + add example to dummy HTML SUT
+ * - Radio button panel with only one option (input)
+ * - Panel without children (form, div)
+ * - Web alert with suspicious message
+ * 
+ * - Instead of joining Verdicts, try to recognize and save different Verdict exception in different sequences.
  */
 public class Protocol_webdriver_functional extends WebdriverProtocol {
 
@@ -66,6 +74,18 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 	protected void initTestSession() {
 		super.initTestSession();
 		listErrorVerdictInfo = new ArrayList<>();
+	}
+
+	/**
+	 * This methods is called before each test sequence, before startSystem(),
+	 * allowing for example using external profiling software on the SUT
+	 *
+	 * HTML sequence report will be initialized in the super.preSequencePreparations() for each sequence
+	 */
+	@Override
+	protected void preSequencePreparations() {
+		super.preSequencePreparations();
+		WdDriver.alertMessage = ""; // reset webdriver alert
 	}
 
 	/**
@@ -92,6 +112,72 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 	protected Verdict getVerdict(State state) {
 		Verdict verdict = super.getVerdict(state);
 
+		verdict = getUniqueFunctionalVerdict(verdict, state);
+		//verdict = getJointFunctionalVerdict(verdict, state);
+
+		// If the final Verdict is not OK but was already detected in a previous sequence
+		String currentVerdictInfo = verdict.info().replace("\n", " ");
+		if( listErrorVerdictInfo.stream().anyMatch( verdictInfo -> verdictInfo.contains( currentVerdictInfo ) ) ) {
+			// Consider as OK to continue testing
+			verdict = Verdict.OK;
+			webConsoleVerdict = Verdict.OK;
+		}
+
+		return verdict;
+	}
+
+	/**
+	 * This method returns a unique failure verdict of one state.
+	 * Even if multiple failures can be reported together.
+	 * 
+	 * @param verdict
+	 * @param state
+	 * @return
+	 */
+	private Verdict getUniqueFunctionalVerdict(Verdict verdict, State state) {
+		//TODO: Refactor Verdict class or this method feature
+		// Due this is the unique method, only start the verdict checking if no failure exists.
+		if(verdict == Verdict.OK) {
+			// Check the functional Verdict that detects dummy buttons to the current state verdict.
+			Verdict buttonVerdict = functionalButtonVerdict(state);
+			if(buttonVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( buttonVerdict.info().replace("\n", " ") ))) return buttonVerdict;
+
+			// Check the functional Verdict that detects select elements without items to the current state verdict.
+			Verdict emptyListVerdict = emptySelectItemsVerdict(state);
+			if(emptyListVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( emptyListVerdict.info().replace("\n", " ") ))) return emptyListVerdict;
+
+			// Check the functional Verdict that detects if exists a number with more than X decimals.
+			Verdict decimalsVerdict = numberWithLotOfDecimals(state, 2);
+			if(decimalsVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( decimalsVerdict.info().replace("\n", " ") ))) return decimalsVerdict;
+
+			// Check the functional Verdict that detects if exists a textArea Widget without length.
+			Verdict textAreaVerdict = textAreaWithoutLength(state, Arrays.asList(WdRoles.WdTEXTAREA));
+			if(textAreaVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( textAreaVerdict.info().replace("\n", " ") ))) return textAreaVerdict;
+
+			// Check the functional Verdict that detects if a web element does not contain children.
+			Verdict emptyElementVerdict = elementWithoutChildren(state, Arrays.asList(WdRoles.WdFORM, WdRoles.WdDIV));
+			if(emptyElementVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( emptyElementVerdict.info().replace("\n", " ") ))) return emptyElementVerdict;
+
+			// Check the functional Verdict that detects if a web radio input contains a unique option.
+			Verdict uniqueRadioVerdict = uniqueRadioInput(state);
+			if(uniqueRadioVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( uniqueRadioVerdict.info().replace("\n", " ") ))) return uniqueRadioVerdict;
+
+			// Check the functional Verdict that detects if a web alert contains a suspicious message.
+			Verdict alertSuspiciousVerdict = alertSuspiciousMessage(state, ".*[lL]ogin.*");
+			if(alertSuspiciousVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( alertSuspiciousVerdict.info().replace("\n", " ") ))) return alertSuspiciousVerdict;
+		}
+		return verdict;
+	}
+
+	/**
+	 * This method join all possible failures of one state in the verdict.
+	 * Multiple failures can be reported.
+	 * 
+	 * @param verdict
+	 * @param state
+	 * @return
+	 */
+	private Verdict getJointFunctionalVerdict(Verdict verdict, State state) {
 		// Add the functional Verdict that detects dummy buttons to the current state verdict.
 		verdict = verdict.join(functionalButtonVerdict(state));
 
@@ -104,13 +190,14 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 		// Add the functional Verdict that detects if exists a textArea Widget without length.
 		verdict = verdict.join(textAreaWithoutLength(state, Arrays.asList(WdRoles.WdTEXTAREA)));
 
-		// If the final Verdict is not OK but was already detected in a previous sequence
-		String currentVerdictInfo = verdict.info().replace("\n", " ");
-		if( listErrorVerdictInfo.stream().anyMatch( verdictInfo -> verdictInfo.contains( currentVerdictInfo ) ) ) {
-			// Consider as OK to continue testing
-			verdict = Verdict.OK;
-			webConsoleVerdict = Verdict.OK;
-		}
+		// Add the functional Verdict that detects if a web element does not contain children.
+		verdict = verdict.join(elementWithoutChildren(state, Arrays.asList(WdRoles.WdFORM, WdRoles.WdDIV)));
+
+		// Add the functional Verdict that detects if a web radio input contains a unique option.
+		verdict = verdict.join(uniqueRadioInput(state));
+
+		// Add the functional Verdict that detects if a web alert contains a suspicious message.
+		verdict = verdict.join(alertSuspiciousMessage(state, ".*[lL]ogin.*"));
 
 		return verdict;
 	}
@@ -127,9 +214,12 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 			String previousStateId = latestState.get(Tags.AbstractIDCustom, "NoPreviousId");
 			String currentStateId = state.get(Tags.AbstractIDCustom, "NoCurrentId");
 
-			// NOTE: Because we are comparing the states using the AbstractIDCustom property, 
+			// NOTE 1: Because we are comparing the states using the AbstractIDCustom property, 
 			// it is important to consider the used abstraction: test.settings - AbstractStateAttributes (WebWidgetId, WebWidgetTextContent)
-			if(previousStateId.equals(currentStateId)) {
+			// NOTE 2: A button alert can prompt a message, but TESTAR saves the text message and returns to the state
+			// this is also something to consider :/
+			// TODO: Improve the existence of web alerts messages within the State ID
+			if(previousStateId.equals(currentStateId) && WdDriver.alertMessage.isEmpty()) {
 				Widget w = functionalAction.get(Tags.OriginWidget);
 				String verdictMsg = String.format("Dummy Button detected! Role: %s , Path: %s , Desc: %s", 
 						w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
@@ -179,8 +269,8 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 				int decimalPlaces = number.length() - number.indexOf('.') - 1;
 
 				if(number.contains(".") && decimalPlaces > maxDecimals) {
-					String verdictMsg = String.format("Widget with more than %s decimals! Role: %s , Path: %s , WebId: %s, WebTextContent: %s", 
-							maxDecimals, w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent));
+					String verdictMsg = String.format("Widget with more than %s decimals! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
+							maxDecimals, w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
 
 					decimalsVerdict = decimalsVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
 				}
@@ -203,6 +293,55 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 		return textAreaVerdict;
 	}
 
+	private Verdict elementWithoutChildren(State state, List<Role> roles) {
+		Verdict emptyChildrenVerdict = Verdict.OK;
+		for(Widget w : state) {
+			if(roles.contains(w.get(Tags.Role, Roles.Widget)) && w.childCount() < 1) {
+
+				String verdictMsg = String.format("Detected a Web element without child elements! Role: %s , Path: %s , WebId: %s", 
+						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""));
+
+				emptyChildrenVerdict = emptyChildrenVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+			}
+		}
+		return emptyChildrenVerdict;
+	}
+
+	private Verdict uniqueRadioInput(State state) {
+		Verdict radioInputVerdict = Verdict.OK;
+		for(Widget w : state) {
+			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdINPUT) && !siblingRoleElement(w, WdRoles.WdINPUT)) {
+
+				String verdictMsg = String.format("Detected a Web radio input element with a Unique option! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
+						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
+
+				radioInputVerdict = radioInputVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+			}
+		}
+		return radioInputVerdict;
+	}
+
+	private Verdict alertSuspiciousMessage(State state, String pattern) {
+		Verdict alertVerdict = Verdict.OK;
+		if(!WdDriver.alertMessage.isEmpty()) {
+			Matcher matcher = Pattern.compile(pattern).matcher(WdDriver.alertMessage);
+			if (matcher.find()) {
+				// The widget to remark is the state by default
+				Widget w = state;
+				// But if the alert was prompt by executing an action in a widget, remark this widget
+				if(lastExecutedAction != null  && lastExecutedAction.get(Tags.OriginWidget) != null) {
+					w = lastExecutedAction.get(Tags.OriginWidget);
+				}
+
+				String verdictMsg = String.format("Detected an alert with a suspicious message %s ! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
+						WdDriver.alertMessage, w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
+
+				alertVerdict = alertVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+			}
+		}
+		return alertVerdict;
+	}
+
 	private boolean isNumeric(String strNum) {
 		if (strNum == null) {
 			return false;
@@ -213,6 +352,21 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Check if a widget contains a sibling element.
+	 */
+	private boolean siblingRoleElement(Widget w, Role role) {
+		if(w.parent() == null) return false;
+		Widget parent = w.parent();
+		for(int i=0; i < parent.childCount(); i++) {
+			// If the parent contains a widget child that is not the current widget, return true
+			if(parent.child(i).get(Tags.Role, Roles.Widget).equals(role) && parent.child(i) != w) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -335,6 +489,7 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action) {
 		functionalAction = action;
+		WdDriver.alertMessage = ""; // reset webdriver alert for next state fetch
 		return super.executeAction(system, state, action);
 	}
 

@@ -60,11 +60,17 @@ import com.google.common.collect.Comparators;
  * - List with unsorted items
  * - Dummy button (does nothing)
  * - List without child's
+ * - TODO: Radio button panel with only one option
+ * - TODO: Panel without children
  * - TODO: Buttons (3x) with proper text (spell checker) - OK
- * - TODO: Textbox over another textbox - OK
+ * - TODO: Textbox over another textbox - OK - ElementMap, Rect intersection or existing libraries
+ * - https://www.youtube.com/watch?v=omuxzPT050w
+ * 
  * - TODO: Two wrong ancor buttons. If you resize the form, these buttons do not align correct. - Research Anchor properties
  * - TODO: Tab order is all over the place - Research next element properties - Check tree order UIAutomation (sorted?)
  * - TODO: Make a configurable verdict to detect if dialog or windows do not contains a question mark "?" Notepad and Robin examples
+ * 
+ * - Instead of joining Verdicts, try to recognize and save different Verdict exception in different sequences.
  */
 public class Protocol_desktop_functional extends DesktopProtocol {
 
