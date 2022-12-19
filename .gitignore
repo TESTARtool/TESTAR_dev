@@ -14,3 +14,5 @@ build.bat
 *.class
 *.log
 /logs
+/suts/BuggyWindowsProgram/.vs
+/suts/BuggyWindowsProgram/BuggyProgram/obj
