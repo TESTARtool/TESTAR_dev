@@ -204,8 +204,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//Associate start settings of the first TESTAR dialog
 		this.settings = settings;
 
-		SUT system = null;
-
 		//initialize TESTAR with the given settings:
 		logger.trace("TESTAR initializing with the given protocol settings");
 		initialize(settings);
@@ -241,9 +239,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			} else if (mode() == Modes.Spy) {
 				new SpyMode().runSpyLoop(this);
 			} else if(mode() == Modes.Record) {
-				new RecordMode().runRecordLoop(this, system);
+				new RecordMode().runRecordLoop(this);
 			} else if (mode() == Modes.Generate) {
-				new GenerateMode().runGenerateOuterLoop(this, system);
+				new GenerateMode().runGenerateOuterLoop(this);
 			}
 
 		}catch(WinApiException we) {
@@ -507,29 +505,26 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return currentSeqObject;
 	}
 
-
 	/**
-	 * This method calls the startSystem() if the system is not yet running
+	 * This method calls the startSystem() and starts the LogSerialiser. 
 	 *
 	 * @param system
 	 * @return SUT system
 	 */
-	SUT startSutIfNotRunning(SUT system) {
-		//If system==null, we have started TESTAR from the Generate mode and system has not been started yet (if started in SPY-mode or Record-mode, the system is running already)
-		if (system == null || !system.isRunning()) {
-			system = startSystem();
-			//Reset LogSerialiser
-			LogSerialiser.finish();
-			LogSerialiser.exit();
-			startOfSutDateString = Util.dateString(DATE_FORMAT);
-			LogSerialiser.log(startOfSutDateString + " Starting SUT ...\n", LogSerialiser.LogLevel.Info);
-			LogSerialiser.log("SUT is running!\n", LogSerialiser.LogLevel.Debug);
-			LogSerialiser.log("Building canvas...\n", LogSerialiser.LogLevel.Debug);
+	SUT startSUTandLogger() {
+		// Start the SUT by launching the process or connecting to a running one
+		SUT system = startSystem();
+		// Reset LogSerialiser
+		LogSerialiser.finish();
+		LogSerialiser.exit();
+		startOfSutDateString = Util.dateString(DATE_FORMAT);
+		LogSerialiser.log(startOfSutDateString + " Starting SUT ...\n", LogSerialiser.LogLevel.Info);
+		LogSerialiser.log("SUT is running!\n", LogSerialiser.LogLevel.Debug);
+		LogSerialiser.log("Building canvas...\n", LogSerialiser.LogLevel.Debug);
 
-			//Activate process Listeners if enabled in the test.settings
-			if(enabledProcessListener)
-				processListener.startListeners(system, settings);
-		}
+		// Activate process Listeners if enabled in the test.settings
+		if(enabledProcessListener)
+			processListener.startListeners(system, settings);
 
 		return system;
 	}

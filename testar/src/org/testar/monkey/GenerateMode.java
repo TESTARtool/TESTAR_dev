@@ -53,11 +53,7 @@ public class GenerateMode {
 	 *
 	 * @param system
 	 */
-	public void runGenerateOuterLoop(DefaultProtocol protocol , SUT system) {
-
-		boolean startFromGenerate = false;
-		if(system==null)
-			startFromGenerate = true;
+	public void runGenerateOuterLoop(DefaultProtocol protocol) {
 
 		//method for defining other init actions, like setup of external environment
 		protocol.initTestSession();
@@ -71,27 +67,27 @@ public class GenerateMode {
 		while (protocol.mode() != Modes.Quit && protocol.moreSequences()) {
 			exceptionThrown = false;
 
+			// Prepare the output folders structure
 			synchronized(this){
 				OutputStructure.calculateInnerLoopDateString();
 				OutputStructure.sequenceInnerLoopCount++;
 			}
 
-			//empty method in defaultProtocol - allowing implementation in application specific protocols:
+			//empty method in defaultProtocol - allowing implementation in application specific protocols
+			//HTML report is created here in Desktop and Webdriver protocols
 			protocol.preSequencePreparations();
 
 			//reset the faulty variable because we started a new sequence
 			DefaultProtocol.faultySequence = false;
 
-			//starting system if it's not running yet (TESTAR could be started in SPY-mode or Record-mode):
-			system = protocol.startSutIfNotRunning(system);
+			//starting system or connect to a running one
+			SUT system = protocol.startSUTandLogger();
 
-			if(startFromGenerate) {
-				//Generating the sequence file that can be replayed:
-				protocol.generatedSequence = protocol.getAndStoreGeneratedSequence();
-				protocol.currentSeq = protocol.getAndStoreSequenceFile();
-			}
+			//Generating the sequence file that can be replayed:
+			protocol.generatedSequence = protocol.getAndStoreGeneratedSequence();
+			protocol.currentSeq = protocol.getAndStoreSequenceFile();
 
-			//initializing TESTAR for a new sequence:
+			//initializing TESTAR and the protocol canvas for a new sequence:
 			protocol.startTestSequence(system);
 
 			try {
@@ -185,10 +181,6 @@ public class GenerateMode {
 		 ***** INNER LOOP:
 		 */
 		while (protocol.mode() != Modes.Quit && protocol.moreActions(state)) {
-
-			if (protocol.mode() == Modes.Record) {
-				new RecordMode().runRecordLoop(protocol, system);
-			}
 
 			// getState() including getVerdict() that is saved into the state:
 			LogSerialiser.log("Obtained system state in inner loop of TESTAR...\n", LogSerialiser.LogLevel.Debug);
