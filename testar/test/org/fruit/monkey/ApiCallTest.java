@@ -1,4 +1,4 @@
-package org.fruit.monkey.sonarqube.api;
+package org.fruit.monkey;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
-public abstract class SonarqubeApiTest {
+public abstract class ApiCallTest {
     private MockWebServer mockWebServer;
 
     protected final int port = 8889;

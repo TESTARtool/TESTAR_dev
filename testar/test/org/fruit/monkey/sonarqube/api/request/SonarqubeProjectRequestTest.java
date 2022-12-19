@@ -1,7 +1,7 @@
 package org.fruit.monkey.sonarqube.api.request;
 
 import okhttp3.mockwebserver.RecordedRequest;
-import org.fruit.monkey.sonarqube.api.SonarqubeApiTest;
+import org.fruit.monkey.ApiCallTest;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class SonarqubeProjectRequestTest extends SonarqubeApiTest {
+public class SonarqubeProjectRequestTest extends ApiCallTest {
 
     @Test
     public void shouldReturnSonarqubeIssuesRequest() throws InterruptedException, IOException {

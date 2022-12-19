@@ -1,12 +1,13 @@
 package org.fruit.monkey.sonarqube.api;
 
+import org.fruit.monkey.ApiCallTest;
 import org.junit.Test;
 
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 
-public class SonarqubeApiClientTest extends SonarqubeApiTest {
+public class SonarqubeApiClientTest extends ApiCallTest {
 
     @Test
     public void shouldReturnProjectKey() throws IOException {
