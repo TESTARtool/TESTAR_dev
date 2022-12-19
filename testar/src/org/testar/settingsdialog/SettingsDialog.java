@@ -68,7 +68,7 @@ import static javax.swing.UIManager.*;
 public class SettingsDialog extends JFrame implements Observer {
   private static final long serialVersionUID = 5156320008281200950L;
 
-  static final String TESTAR_VERSION = "2.6.0 (5-Dec-2022)";
+  static final String TESTAR_VERSION = "2.6.1 (20-Dec-2022)";
 
   private String settingsFile;
   private Settings settings;
@@ -173,7 +173,14 @@ public class SettingsDialog extends JFrame implements Observer {
     try {
       Pattern.compile(userInputPattern);
     } catch (PatternSyntaxException exception) {
-      throw new IllegalStateException("Your Oracle is not a valid regular expression!");
+      throw new IllegalStateException("Your Oracle SuspiciousTitles is not a valid regular expression!");
+    }
+
+    userInputPattern = settings.get(ConfigTags.SuspiciousProcessOutput);
+    try {
+    	Pattern.compile(userInputPattern);
+    } catch (PatternSyntaxException exception) {
+    	throw new IllegalStateException("Your SuspiciousProcessOutput is not a valid regular expression!");
     }
 
     if (!new File(settings.get(ConfigTags.OutputDir)).exists()) {
