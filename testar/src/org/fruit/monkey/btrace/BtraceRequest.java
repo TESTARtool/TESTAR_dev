@@ -1,13 +1,10 @@
 package org.fruit.monkey.btrace;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
-import org.fruit.monkey.sonarqube.api.SonarqubeApiException;
 
 import java.io.IOException;
-import java.util.Base64;
 
 public abstract class BtraceRequest<T extends BtraceResponse> {
     protected final String host;
@@ -29,7 +26,7 @@ public abstract class BtraceRequest<T extends BtraceResponse> {
              var httpResponse = httClient.execute(httpRequest)) {
             return objectMapper.readValue(httpResponse.getEntity().getContent(), responseType);
         } catch (IOException e) {
-            throw SonarqubeApiException.sonarqubeApiCallResultedInError(e);
+            throw BtraceApiException.btraceApiCallResultedInError(e);
         }
     }
 

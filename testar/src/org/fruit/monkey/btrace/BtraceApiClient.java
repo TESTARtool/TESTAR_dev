@@ -1,7 +1,8 @@
 package org.fruit.monkey.btrace;
 
-import org.fruit.monkey.sonarqube.api.SonarqubeApiException;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 public class BtraceApiClient {
 
     private String host;

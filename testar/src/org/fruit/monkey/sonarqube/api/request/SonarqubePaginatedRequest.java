@@ -6,6 +6,7 @@ import org.fruit.monkey.sonarqube.api.response.SonarqubeResponse;
 public abstract class SonarqubePaginatedRequest<T extends SonarqubeRequest<S>, S extends SonarqubeResponse> {
 
     protected final String host;
+
     protected final String token;
 
     private int currentPage = 0;

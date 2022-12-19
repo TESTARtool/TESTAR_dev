@@ -1,7 +1,5 @@
 package org.fruit.monkey.btrace;
 
-import org.fruit.monkey.sonarqube.api.SonarqubeApiException;
-
 public class BtraceApiException extends RuntimeException {
 
     private BtraceApiException(String message) {
