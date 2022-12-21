@@ -940,6 +940,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			Action foregroundAction = new ActivateSystem();
 			foregroundAction.set(Tags.Desc, "Bring the system to the foreground.");
 			foregroundAction.set(Tags.OriginWidget, state);
+			foregroundAction.set(Tags.Role, Roles.System);
 			return new HashSet<>(Collections.singletonList(foregroundAction));
 		}
 
@@ -1157,6 +1158,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	protected void buildStateActionsIdentifiers(State state, Set<Action> actions) {
 	    CodingManager.buildIDs(state, actions);
+	    for(Action a : actions)
+	    	if(a.get(Tags.AbstractIDCustom, null) == null)
+	    		buildEnvironmentActionIdentifiers(state, a);
 	}
 
 	/**

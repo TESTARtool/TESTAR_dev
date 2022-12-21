@@ -40,7 +40,6 @@ import org.testar.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.serialisation.LogSerialiser;
 
@@ -190,9 +189,6 @@ public class GenerateMode {
 			//Deriving actions from the state:
 			Set<Action> actions = protocol.deriveActions(system, state);
 			protocol.buildStateActionsIdentifiers(state, actions);
-			for(Action a : actions)
-				if(a.get(Tags.AbstractIDCustom, null) == null)
-					protocol.buildEnvironmentActionIdentifiers(state, a);
 
 			// First check if we have some pre select action to execute (retryDeriveAction or ESC)
 			actions = protocol.preSelectAction(system, state, actions);
@@ -235,9 +231,6 @@ public class GenerateMode {
 		// notify to state model the last state
 		Set<Action> actions = protocol.deriveActions(system, state);
 		protocol.buildStateActionsIdentifiers(state, actions);
-		for(Action a : actions)
-			if(a.get(Tags.AbstractIDCustom, null) == null)
-				protocol.buildEnvironmentActionIdentifiers(state, a);
 
 		protocol.stateModelManager.notifyNewStateReached(state, actions);
 
