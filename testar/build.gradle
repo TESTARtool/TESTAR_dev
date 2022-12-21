@@ -131,6 +131,10 @@ dependencies {
     implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.1'
     implementation group: 'com.orientechnologies', name: 'orientdb-graphdb', version: '3.0.34'
+    // https://mvnrepository.com/artifact/org.languagetool/languagetool-core
+    implementation group: 'org.languagetool', name: 'languagetool-core', version: '5.8'
+    // https://mvnrepository.com/artifact/org.languagetool/language-all
+    implementation group: 'org.languagetool', name: 'language-all', version: '5.8'
 }
 
 task prepareSettings(type: Copy) {

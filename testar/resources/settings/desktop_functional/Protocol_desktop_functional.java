@@ -28,14 +28,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+import org.languagetool.JLanguageTool;
+import org.languagetool.language.BritishEnglish;
+import org.languagetool.rules.RuleMatch;
 import org.testar.DerivedActions;
 import org.testar.SutVisualization;
+import org.testar.monkey.Pair;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Rect;
 import org.testar.monkey.alayer.Role;
@@ -60,11 +65,10 @@ import com.google.common.collect.Comparators;
  * - List with unsorted items
  * - Dummy button (does nothing)
  * - List without child's
+ * - Buttons (3x) with proper text (spell checker)
+ * - Textbox over another textbox (custom overlap method) 
  * - TODO: Radio button panel with only one option
  * - TODO: Panel without children
- * - TODO: Buttons (3x) with proper text (spell checker) - OK
- * - TODO: Textbox over another textbox - OK - ElementMap, Rect intersection or existing libraries
- * - https://www.youtube.com/watch?v=omuxzPT050w
  * 
  * - TODO: Two wrong ancor buttons. If you resize the form, these buttons do not align correct. - Research Anchor properties
  * - TODO: Tab order is all over the place - Research next element properties - Check tree order UIAutomation (sorted?)
@@ -126,14 +130,8 @@ public class Protocol_desktop_functional extends DesktopProtocol {
 	protected Verdict getVerdict(State state){
 		Verdict verdict = super.getVerdict(state);
 
-		// Add the Verdict that detects if the SUT contains a mandatory widget role without title
-		verdict = verdict.join(mandatoryWidgetRoleWithTitle(state, Arrays.asList(UIARoles.UIAWindow, UIARoles.UIACheckBox, UIARoles.UIAListItem)));
-
-		// Add the Verdict that detects if the SUT contains a list with unsorted elements
-		verdict = verdict.join(detectEmptyAndUnsortedListElements(state, Arrays.asList(UIARoles.UIAList, UIARoles.UIATree)));
-
-		// Add the functional Verdict that detects dummy buttons to the current state verdict.
-		verdict = verdict.join(dummyButtonVerdict(state));
+		verdict = getUniqueFunctionalVerdict(verdict, state);
+		//verdict = getJointFunctionalVerdict(verdict, state);
 
 		// If the final Verdict is not OK but was already detected in a previous sequence
 		String currentVerdictInfo = verdict.info().replace("\n", " ");
@@ -143,6 +141,112 @@ public class Protocol_desktop_functional extends DesktopProtocol {
 		}
 
 		return verdict;
+	}
+
+	/**
+	 * This method returns a unique failure verdict of one state.
+	 * Even if multiple failures can be reported together.
+	 * 
+	 * @param verdict
+	 * @param state
+	 * @return
+	 */
+	private Verdict getUniqueFunctionalVerdict(Verdict verdict, State state) {
+		//TODO: Refactor Verdict class or this method feature
+		// Due this is the unique method, only start the verdict checking if no failure exists.
+		if(verdict == Verdict.OK) {
+
+			// Check the functional Verdict that detects dummy buttons to the current state verdict.
+			Verdict buttonVerdict = dummyButtonVerdict(state);
+			if(buttonVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( buttonVerdict.info().replace("\n", " ") ))) return buttonVerdict;
+
+			// Check the functional Verdict that detects if the SUT contains a mandatory widget role without title
+			Verdict mandatoryTitle = mandatoryWidgetRoleWithTitle(state, Arrays.asList(UIARoles.UIAWindow, UIARoles.UIACheckBox, UIARoles.UIAListItem));
+			if(mandatoryTitle != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( mandatoryTitle.info().replace("\n", " ") ))) return mandatoryTitle;
+
+			// Check the functional Verdict that detects if the SUT contains a list with unsorted elements
+			Verdict unsortedVerdict = detectEmptyAndUnsortedListElements(state, Arrays.asList(UIARoles.UIAList, UIARoles.UIATree));
+			if(unsortedVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( unsortedVerdict.info().replace("\n", " ") ))) return unsortedVerdict;
+
+			// Check the functional Verdict that detects if the SUT contains misspelled titles
+			Verdict spellCheckerVerdict = spellChecker(state);
+			if(spellCheckerVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( spellCheckerVerdict.info().replace("\n", " ") ))) return spellCheckerVerdict;
+
+			// Check the functional Verdict that detects if two widgets overlap
+			Verdict widgetsOverlapVerdict = twoLeafWidgetsOverlap(state);
+			if(widgetsOverlapVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( widgetsOverlapVerdict.info().replace("\n", " ") ))) return widgetsOverlapVerdict;
+		}
+		return verdict;
+	}
+
+	/**
+	 * This method join all possible failures of one state in the verdict.
+	 * Multiple failures can be reported.
+	 * 
+	 * @param verdict
+	 * @param state
+	 * @return
+	 */
+	private Verdict getJointFunctionalVerdict(Verdict verdict, State state) {
+		// Add the functional Verdict that detects dummy buttons to the current state verdict.
+		verdict = verdict.join(dummyButtonVerdict(state));
+
+		// Add the Verdict that detects if the SUT contains a mandatory widget role without title
+		verdict = verdict.join(mandatoryWidgetRoleWithTitle(state, Arrays.asList(UIARoles.UIAWindow, UIARoles.UIACheckBox, UIARoles.UIAListItem)));
+
+		// Add the Verdict that detects if the SUT contains a list with unsorted elements
+		verdict = verdict.join(detectEmptyAndUnsortedListElements(state, Arrays.asList(UIARoles.UIAList, UIARoles.UIATree)));
+
+		// Add the Verdict that detects if the SUT contains misspelled titles
+		verdict = verdict.join(spellChecker(state));
+
+		// Add the Verdict that detects if two widgets overlap
+		verdict = verdict.join(twoLeafWidgetsOverlap(state));
+
+		return verdict;
+	}
+
+	private Verdict twoLeafWidgetsOverlap(State state) {
+		Verdict widgetsOverlapVerdict = Verdict.OK;
+
+		// Prepare a list that contains all the Rectangles from the leaf widgets
+		List<Pair<Widget, Rect>> leafWidgetsRects = new ArrayList<>();
+		for(Widget w : state) {
+			if(w.childCount() < 1) {
+				leafWidgetsRects.add(new Pair<Widget, Rect>(w, (Rect)w.get(Tags.Shape)));
+			}
+		}
+		//TODO: Improve this list iteration
+		for(int i = 0; i < leafWidgetsRects.size(); i++) {
+			for(int j = 0; j < leafWidgetsRects.size(); j++) {
+				if(leafWidgetsRects.get(i) != leafWidgetsRects.get(j)) {
+					Rect rectOne = leafWidgetsRects.get(i).right();
+					Rect rectTwo = leafWidgetsRects.get(j).right();
+					if(checkRectIntersection(rectOne, rectTwo)) {
+						Widget firstWidget = leafWidgetsRects.get(i).left();
+						String firstMsg = String.format("Title: %s , Role: %s , Path: %s , AutomationId: %s", 
+								firstWidget.get(Tags.Title, "") , firstWidget.get(Tags.Role), firstWidget.get(Tags.Path), firstWidget.get(UIATags.UIAAutomationId, ""));
+
+						Widget secondWidget = leafWidgetsRects.get(j).left();
+						String secondMsg = String.format("Title: %s , Role: %s , Path: %s , AutomationId: %s", 
+								secondWidget.get(Tags.Title, "") , secondWidget.get(Tags.Role), secondWidget.get(Tags.Path), secondWidget.get(UIATags.UIAAutomationId, ""));
+
+						String verdictMsg = "Two Widgets Overlapping!" + " First! " + firstMsg + ". Second! " + secondMsg;
+
+						widgetsOverlapVerdict = widgetsOverlapVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)firstWidget.get(Tags.Shape), (Rect)secondWidget.get(Tags.Shape))));
+					}
+				}
+			}
+		}
+
+		return widgetsOverlapVerdict;
+	}
+
+	private boolean checkRectIntersection(Rect r1, Rect r2) {
+		return !(r1.x() + r1.width() <= r2.x() ||
+				r1.y() + r1.height() <= r2.y() ||
+				r2.x() + r2.width() <= r1.x() ||
+				r2.y() + r2.height() <= r1.y()); 
 	}
 
 	private Verdict mandatoryWidgetRoleWithTitle(State state, List<Role> roles) {
@@ -157,6 +261,33 @@ public class Protocol_desktop_functional extends DesktopProtocol {
 			}
 		}
 		return emptyTitleVerdict;
+	}
+
+	private Verdict spellChecker(State state) {
+		Verdict spellCheckerVerdict = Verdict.OK;
+		JLanguageTool langTool = new JLanguageTool(new BritishEnglish());
+		// Iterate through all the widgets of the state to apply the spell checker in the title if exists
+		for(Widget w : state) {
+			if(!w.get(Tags.Title, "").isEmpty()) {
+				try {
+					List<RuleMatch> matches = langTool.check(w.get(Tags.Title));
+					for (RuleMatch match : matches) {
+
+						String errorMsg = "Potential error at characters " + match.getFromPos() + "-" + match.getToPos() + " : " + match.getMessage();
+						String correctMsg = "Suggested correction(s): " + match.getSuggestedReplacements();
+
+						String verdictMsg = "Widget Title ( " + w.get(Tags.Title) + " ) " + errorMsg + " " + correctMsg;
+
+						spellCheckerVerdict = spellCheckerVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+					}
+				} catch (IOException ioe) {
+					System.err.println("JLanguageTool error checking widget: " + w.get(Tags.Title));
+					//if(ioe.getMessage() != null) System.err.println(ioe.getMessage());
+				}
+			}
+		}
+
+		return spellCheckerVerdict;
 	}
 
 	/**
