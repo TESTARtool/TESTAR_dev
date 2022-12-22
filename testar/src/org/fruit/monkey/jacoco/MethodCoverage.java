@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 public class MethodCoverage {
     private String className;
     private String methodName;
+    private int initLine;
     private int linesCovered;
     private int linesMissed;
 }

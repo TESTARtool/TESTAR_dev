@@ -16,9 +16,7 @@ public class SonarqubeIssuesRequestTest extends ApiCallTest {
     public void shouldReturnSonarqubeIssuesRequest() throws InterruptedException, IOException {
         mockResponse("sonarqube-api/issues/sonarqube-issues-response.json");
 
-        var sonarqubeIssuesRequest = new SonarqubeIssuesRequest(host,
-                                                       "test-token",
-                                                     "123");
+        var sonarqubeIssuesRequest = new SonarqubeIssuesRequest(host, "test-token", "123");
         var parsedResponse = sonarqubeIssuesRequest.send();
 
         RecordedRequest request = captureRequest();
@@ -34,13 +32,14 @@ public class SonarqubeIssuesRequestTest extends ApiCallTest {
         assertEquals(1, parsedResponse.getIssues().size());
 
         var issueFound = parsedResponse.getIssues().get(0);
-        assertEquals(issueFound.getKey(),"AYURC_GPHq_OHAqW8iRJ");
-        assertEquals(issueFound.getRule(),"java:S110");
-        assertEquals(issueFound.getSeverity(),"MAJOR");
-        assertEquals(issueFound.getComponent(),"com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/app/service/factory/exception/FactoryNotFoundException.java");
+        assertEquals(issueFound.getKey(), "AYURC_GPHq_OHAqW8iRJ");
+        assertEquals(issueFound.getRule(), "java:S110");
+        assertEquals(issueFound.getSeverity(), "MAJOR");
+        assertEquals(issueFound.getComponent(),
+                     "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/app/service/factory/exception/FactoryNotFoundException.java");
         assertEquals(issueFound.getLine().longValue(), 8L);
         assertEquals(issueFound.getMessage(), "This class has 10 parents which is greater than 5 authorized.");
-        assertEquals(issueFound.getType(),"CODE_SMELL");
+        assertEquals(issueFound.getType(), "CODE_SMELL");
     }
 
 }

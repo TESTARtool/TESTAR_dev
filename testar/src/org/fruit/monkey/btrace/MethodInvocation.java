@@ -5,7 +5,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.List;
-import java.util.Objects;
 
 @AllArgsConstructor
 @Getter
@@ -17,5 +16,6 @@ public class MethodInvocation {
     private String methodName;
 
     private List<String> parameterTypes;
+
     private long times;
 }

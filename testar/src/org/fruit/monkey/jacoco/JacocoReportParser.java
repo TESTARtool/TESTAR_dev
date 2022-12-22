@@ -22,6 +22,7 @@ public class JacocoReportParser {
     private static final String METHOD_NODE_NAME = "method";
     private static final String NAME_ATTRIBUTE_NAME = "name";
     private static final String TYPE_ATTRIBUTE_NAME = "type";
+    private static final String INIT_LINE_ATTRIBUTE_NAME= "line";
     private static final String COVERED_ATTRIBUTE_NAME = "covered";
     private static final String MISSED_ATTRIBUTE_NAME = "missed";
     private static final String LINE_TYPE_ATTRIBUTE = "LINE";
@@ -98,6 +99,9 @@ public class JacocoReportParser {
                     childNode.getAttributes().getNamedItem(TYPE_ATTRIBUTE_NAME).getNodeValue().equals(LINE_TYPE_ATTRIBUTE)) {
                 methodsCoverage.add(new MethodCoverage(className,
                                                        methodName,
+                                                       Integer.parseInt(methodNode.getAttributes()
+                                                                                  .getNamedItem(INIT_LINE_ATTRIBUTE_NAME)
+                                                                                  .getNodeValue()),
                                                        Integer.parseInt(childNode.getAttributes()
                                                                                  .getNamedItem(COVERED_ATTRIBUTE_NAME)
                                                                                  .getNodeValue()),
@@ -106,6 +110,10 @@ public class JacocoReportParser {
                                                                                  .getNodeValue())));
             }
         }, methodNode);
+    }
+
+    private List<String> parseMethodParameters(String methodDescription) {
+        return null;
     }
 
     private String parseClassName(Node classNode) {
