@@ -105,7 +105,7 @@ ProtocolClass = webdriver_yoho/Protocol_yoho
 #################################################################\n"
 # State model inference settings
 #################################################################\n"
-StateModelEnabled = false
+StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = remote
 DataStoreServer = localhost
