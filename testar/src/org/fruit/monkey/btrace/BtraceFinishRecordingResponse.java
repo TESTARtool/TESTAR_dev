@@ -2,6 +2,7 @@ package org.fruit.monkey.btrace;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,6 +18,7 @@ public class BtraceFinishRecordingResponse extends BtraceResponse {
     private List<MethodEntry> methodsExecuted;
 
     @Data
+    @EqualsAndHashCode
     public static class MethodEntry {
 
         @JsonProperty("class")
@@ -25,17 +27,7 @@ public class BtraceFinishRecordingResponse extends BtraceResponse {
         @JsonProperty("method")
         private String methodName;
 
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            MethodEntry that = (MethodEntry) o;
-            return Objects.equals(className, that.className) && Objects.equals(methodName, that.methodName);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(className, methodName);
-        }
+        @JsonProperty("parameterTypes")
+        private List<String> parameterTypes;
     }
 }

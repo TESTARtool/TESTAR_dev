@@ -48,12 +48,15 @@ public class BtraceApiClientTest extends ApiCallTest {
     private List<MethodInvocation> expectedMethodInvocations() {
         return List.of(new MethodInvocation("com.marviq.yoho.domain.model.media.MediaEntity",
                                             "<init>",
+                                            List.of("String", "String"),
                                             4),
                        new MethodInvocation("com.marviq.yoho.domain.model.user.UserEntity",
                                             "getFactory",
+                                            List.of(),
                                             2),
                        new MethodInvocation("com.marviq.yoho.domain.repository.feed.FeedRepositoryQueryDslImpl",
                                             "listFeedsInFactory",
+                                            List.of("FactoryId"),
                                             1));
 
 

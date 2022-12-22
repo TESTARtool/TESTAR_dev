@@ -1,30 +1,21 @@
 package org.fruit.monkey.btrace;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
+import java.util.List;
 import java.util.Objects;
 
 @AllArgsConstructor
 @Getter
+@EqualsAndHashCode
 public class MethodInvocation {
 
     private String className;
 
     private String methodName;
 
+    private List<String> parameterTypes;
     private long times;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        MethodInvocation that = (MethodInvocation) o;
-        return times == that.times && Objects.equals(className, that.className) && Objects.equals(methodName, that.methodName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(className, methodName, times);
-    }
 }

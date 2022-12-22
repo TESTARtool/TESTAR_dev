@@ -39,6 +39,7 @@ public class BtraceApiClient {
                                    .stream()
                                    .map(entry -> new MethodInvocation(entry.getKey().getClassName(),
                                                                             entry.getKey().getMethodName(),
+                                                                            entry.getKey().getParameterTypes(),
                                                                             entry.getValue())).collect(Collectors.toList());
     }
 }

@@ -30,14 +30,18 @@ public class BtraceFinishRecordingRequestTest extends ApiCallTest {
         var methodEntry1 = new BtraceFinishRecordingResponse.MethodEntry();
         methodEntry1.setClassName("com.marviq.yoho.domain.model.media.MediaEntity");
         methodEntry1.setMethodName("<init>");
+        methodEntry1.setParameterTypes(List.of("String", "String"));
 
         var methodEntry2 = new BtraceFinishRecordingResponse.MethodEntry();
         methodEntry2.setClassName("com.marviq.yoho.domain.model.user.UserEntity");
         methodEntry2.setMethodName("getFactory");
+        methodEntry2.setParameterTypes(List.of());
 
         var methodEntry3 = new BtraceFinishRecordingResponse.MethodEntry();
         methodEntry3.setClassName("com.marviq.yoho.domain.repository.feed.FeedRepositoryQueryDslImpl");
         methodEntry3.setMethodName("listFeedsInFactory");
+        methodEntry3.setParameterTypes(List.of("FactoryId"));
+
 
         return List.of(methodEntry1, methodEntry2, methodEntry3);
     }

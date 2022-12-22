@@ -3,31 +3,48 @@
   "methodsExecuted":[
     {
       "class":"com.marviq.yoho.domain.model.media.MediaEntity",
-      "method":"<init>"
+      "method":"<init>",
+      "parameterTypes": [
+        "String", "String"
+      ]
     },
     {
       "class":"com.marviq.yoho.domain.model.media.MediaEntity",
-      "method":"<init>"
+      "method":"<init>",
+      "parameterTypes": [
+        "String", "String"
+      ]
     },
     {
       "class":"com.marviq.yoho.domain.model.media.MediaEntity",
-      "method":"<init>"
+      "method":"<init>",
+      "parameterTypes": [
+        "String", "String"
+      ]
     },
     {
       "class":"com.marviq.yoho.domain.model.media.MediaEntity",
-      "method":"<init>"
+      "method":"<init>",
+      "parameterTypes": [
+        "String", "String"
+      ]
     },
     {
       "class":"com.marviq.yoho.domain.model.user.UserEntity",
-      "method":"getFactory"
+      "method":"getFactory",
+      "parameterTypes": []
     },
     {
       "class":"com.marviq.yoho.domain.repository.feed.FeedRepositoryQueryDslImpl",
-      "method":"listFeedsInFactory"
+      "method":"listFeedsInFactory",
+      "parameterTypes": [
+        "FactoryId"
+      ]
     },
     {
       "class":"com.marviq.yoho.domain.model.user.UserEntity",
-      "method":"getFactory"
+      "method":"getFactory",
+      "parameterTypes" : []
     }
   ]
 }
