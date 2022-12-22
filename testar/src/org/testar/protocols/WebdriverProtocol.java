@@ -170,7 +170,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     /**
      * Called once during the life time of TESTAR
      * This method can be used to perform initial setup work
-     * 
+     *
      * @param settings the current TESTAR settings as specified by the user.
      */
     @Override
@@ -347,7 +347,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
         // Initialize HTML Report (Dashboard)
         if (dataAccess != null) {
             this.testReport = new DatabaseTestReport(dataAccess, settings.get(ConfigTags.SQLReporting) + "_"
-                    + RandomStringUtils.random(8));
+                    + RandomStringUtils.random(12, true, true));
             ((DatabaseTestReport) testReport).setDelegate(delegate);
         } else {
             this.testReport = new HtmlTestReport();
@@ -562,7 +562,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
      * override webdriver display scale
      * we return the override value otherwise the display scale obtained from the
      * system.
-     * 
+     *
      * @param sut The system under test
      * @return The display scale.
      */
@@ -611,7 +611,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
      * own state fetching routine. The state should have attached an oracle
      * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
      * state is erroneous and if so why.
-     * 
+     *
      * @return the current state of the SUT with attached oracle.
      */
     @Override
@@ -832,7 +832,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
     /**
      * Execute the selected action.
-     * 
+     *
      * @param system the SUT
      * @param state  the SUT's current state
      * @param action the action to execute
