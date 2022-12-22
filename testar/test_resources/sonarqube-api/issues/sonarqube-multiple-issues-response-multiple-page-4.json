@@ -1,0 +1,210 @@
+{
+  "total": 35,
+  "p": 4,
+  "ps": 10,
+  "paging": {
+    "pageIndex": 4,
+    "pageSize": 10,
+    "total": 35
+  },
+  "effortTotal": 8034,
+  "debtTotal": 8034,
+  "issues": [
+    {
+      "key": "AYURC_KPHq_OHAqW8iR3",
+      "rule": "common-java:DuplicatedBlocks",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/instructionlibrary/insructionset/single/dto/InstructionSetWithFeedbackDto.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "flows": [],
+      "status": "OPEN",
+      "message": "6 duplicated blocks of code must be removed.",
+      "effort": "1h10min",
+      "debt": "1h10min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "pitfall"
+      ],
+      "creationDate": "2022-08-24T09:29:23+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC_VAHq_OHAqW8iUl",
+      "rule": "java:S110",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/feedbackloop/exception/ActionPointNotFoundException.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "line": 12,
+      "hash": "91fecda05dc3e32d5b75af040b3df754",
+      "textRange": {
+        "startLine": 12,
+        "endLine": 12,
+        "startOffset": 13,
+        "endOffset": 41
+      },
+      "flows": [],
+      "status": "OPEN",
+      "message": "This class has 10 parents which is greater than 5 authorized.",
+      "effort": "6h30min",
+      "debt": "6h30min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "design"
+      ],
+      "creationDate": "2022-08-23T05:59:08+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC_U5Hq_OHAqW8iUk",
+      "rule": "java:S110",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/feedbackloop/exception/FeedbackNotFoundException.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "line": 12,
+      "hash": "a59427e098510f47b6eb22f3dac2ebfa",
+      "textRange": {
+        "startLine": 12,
+        "endLine": 12,
+        "startOffset": 13,
+        "endOffset": 38
+      },
+      "flows": [],
+      "status": "OPEN",
+      "message": "This class has 10 parents which is greater than 5 authorized.",
+      "effort": "6h30min",
+      "debt": "6h30min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "design"
+      ],
+      "creationDate": "2022-08-23T05:59:08+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC_UfHq_OHAqW8iUi",
+      "rule": "java:S2637",
+      "severity": "MINOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/feedbackloop/feedback/dto/in/FeedbackCreateDto.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "line": 29,
+      "hash": "16a917ed661d4e650e7f89c1730e221b",
+      "textRange": {
+        "startLine": 29,
+        "endLine": 29,
+        "startOffset": 11,
+        "endOffset": 28
+      },
+      "flows": [],
+      "status": "OPEN",
+      "message": "\"relationType\" is marked \"javax.validation.constraints.NotNull\" but is not initialized in this constructor.",
+      "effort": "15min",
+      "debt": "15min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "cert",
+        "cwe"
+      ],
+      "creationDate": "2022-08-23T05:59:08+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "BUG",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC_TzHq_OHAqW8iUg",
+      "rule": "java:S2160",
+      "severity": "MINOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/feedbackloop/feedback/repository/ChapterFeedbackEntity.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "line": 14,
+      "hash": "7107e9cb4e3727a350e4fb46c2a2ba7e",
+      "textRange": {
+        "startLine": 14,
+        "endLine": 14,
+        "startOffset": 13,
+        "endOffset": 34
+      },
+      "flows": [],
+      "status": "OPEN",
+      "message": "Override the \"equals\" method in this class.",
+      "effort": "30min",
+      "debt": "30min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "suspicious"
+      ],
+      "creationDate": "2022-08-23T05:59:08+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    }
+  ],
+  "components": [
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/feedbackloop/exception/FeedbackNotFoundException.java",
+      "uuid": "AYURC-F4Hq_OHAqW8iMQ",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "FeedbackNotFoundException.java",
+      "longName": "src/main/java/com/marviq/yoho/feedbackloop/exception/FeedbackNotFoundException.java",
+      "path": "src/main/java/com/marviq/yoho/feedbackloop/exception/FeedbackNotFoundException.java"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/instructionlibrary/insructionset/single/dto/InstructionSetWithFeedbackDto.java",
+      "uuid": "AYURC-FxHq_OHAqW8iIS",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "InstructionSetWithFeedbackDto.java",
+      "longName": "src/main/java/com/marviq/yoho/instructionlibrary/insructionset/single/dto/InstructionSetWithFeedbackDto.java",
+      "path": "src/main/java/com/marviq/yoho/instructionlibrary/insructionset/single/dto/InstructionSetWithFeedbackDto.java"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/feedbackloop/exception/ActionPointNotFoundException.java",
+      "uuid": "AYURC-F4Hq_OHAqW8iMR",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "ActionPointNotFoundException.java",
+      "longName": "src/main/java/com/marviq/yoho/feedbackloop/exception/ActionPointNotFoundException.java",
+      "path": "src/main/java/com/marviq/yoho/feedbackloop/exception/ActionPointNotFoundException.java"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/instructionlibrary/episode/repository/model/EpisodeEntity.java",
+      "uuid": "AYURC-FvHq_OHAqW8iHc",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "EpisodeEntity.java",
+      "longName": "src/main/java/com/marviq/yoho/instructionlibrary/episode/repository/model/EpisodeEntity.java",
+      "path": "src/main/java/com/marviq/yoho/instructionlibrary/episode/repository/model/EpisodeEntity.java"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/feedbackloop/feedback/repository/EpisodeFeedbackEntity.java",
+      "uuid": "AYURC-F3Hq_OHAqW8iL4",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "EpisodeFeedbackEntity.java",
+      "longName": "src/main/java/com/marviq/yoho/feedbackloop/feedback/repository/EpisodeFeedbackEntity.java",
+      "path": "src/main/java/com/marviq/yoho/feedbackloop/feedback/repository/EpisodeFeedbackEntity.java"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/feedbackloop/feedback/repository/ChapterFeedbackEntity.java",
+      "uuid": "AYURC-F3Hq_OHAqW8iL3",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "ChapterFeedbackEntity.java",
+      "longName": "src/main/java/com/marviq/yoho/feedbackloop/feedback/repository/ChapterFeedbackEntity.java",
+      "path": "src/main/java/com/marviq/yoho/feedbackloop/feedback/repository/ChapterFeedbackEntity.java"
+    }
+  ],
+  "facets": []
+}

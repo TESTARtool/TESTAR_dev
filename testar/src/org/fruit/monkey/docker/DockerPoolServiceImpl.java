@@ -12,6 +12,8 @@ import com.github.dockerjava.transport.DockerHttpClient;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -28,6 +30,8 @@ public class DockerPoolServiceImpl implements DockerPoolService {
     private Set<String> imageIds;
     private String networkId;
 
+    private static final String WINDOWS_DOCKER_HOST = "tcp://localhost:2375";
+
     final static HashSet<DockerPoolServiceImpl> registry = new HashSet<>();
 
     public DockerPoolServiceImpl() {
@@ -36,13 +40,27 @@ public class DockerPoolServiceImpl implements DockerPoolService {
 
         final DockerClientConfig dockerConfig = DefaultDockerClientConfig.createDefaultConfigBuilder().build();
         dockerHttpClient = new ApacheDockerHttpClient.Builder()
-                .dockerHost(dockerConfig.getDockerHost())
+                .dockerHost(detectDockerHost(dockerConfig))
                 .sslConfig(dockerConfig.getSSLConfig())
                 .maxConnections(100)
                 .build();
         dockerClient = DockerClientImpl.getInstance(dockerConfig, dockerHttpClient);
 
         registry.add(this);
+    }
+
+    private URI detectDockerHost(DockerClientConfig dockerConfig) {
+        URI dockerHost;
+        if(System.getProperty("os.name").toLowerCase().contains("windows")) {
+            try {
+                dockerHost = new URI(WINDOWS_DOCKER_HOST);
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            dockerHost = dockerConfig.getDockerHost();
+        }
+        return dockerHost;
     }
 
     public String getServiceId() {

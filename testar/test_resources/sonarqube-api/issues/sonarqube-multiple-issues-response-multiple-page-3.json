@@ -1,0 +1,410 @@
+{
+  "total": 35,
+  "p": 3,
+  "ps": 10,
+  "paging": {
+    "pageIndex": 3,
+    "pageSize": 10,
+    "total": 35
+  },
+  "effortTotal": 8034,
+  "debtTotal": 8034,
+  "issues": [
+    {
+      "key": "AYURC-y7Hq_OHAqW8iOk",
+      "rule": "java:S1066",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/security/task/FeedbackSecurityService.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "line": 59,
+      "hash": "5cda93c979e82211f691ab14ae1ebf9f",
+      "textRange": {
+        "startLine": 59,
+        "endLine": 59,
+        "startOffset": 16,
+        "endOffset": 18
+      },
+      "flows": [
+        {
+          "locations": [
+            {
+              "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/security/task/FeedbackSecurityService.java",
+              "textRange": {
+                "startLine": 58,
+                "endLine": 58,
+                "startOffset": 12,
+                "endOffset": 14
+              }
+            }
+          ]
+        }
+      ],
+      "status": "OPEN",
+      "message": "Merge this if statement with the enclosing one.",
+      "effort": "5min",
+      "debt": "5min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "clumsy"
+      ],
+      "creationDate": "2022-08-24T11:24:24+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC-y7Hq_OHAqW8iOl",
+      "rule": "java:S1066",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/security/task/FeedbackSecurityService.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "line": 97,
+      "hash": "3aa1c6d067a794be792f0a1dc4808d3d",
+      "textRange": {
+        "startLine": 97,
+        "endLine": 97,
+        "startOffset": 12,
+        "endOffset": 14
+      },
+      "flows": [
+        {
+          "locations": [
+            {
+              "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/security/task/FeedbackSecurityService.java",
+              "textRange": {
+                "startLine": 96,
+                "endLine": 96,
+                "startOffset": 8,
+                "endOffset": 10
+              }
+            }
+          ]
+        }
+      ],
+      "status": "OPEN",
+      "message": "Merge this if statement with the enclosing one.",
+      "effort": "5min",
+      "debt": "5min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "clumsy"
+      ],
+      "creationDate": "2022-08-24T11:24:24+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC-y7Hq_OHAqW8iOm",
+      "rule": "java:S1066",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/security/task/FeedbackSecurityService.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "line": 98,
+      "hash": "f6c8e269fd48523bf2625ba47c4c6baf",
+      "textRange": {
+        "startLine": 98,
+        "endLine": 98,
+        "startOffset": 16,
+        "endOffset": 18
+      },
+      "flows": [
+        {
+          "locations": [
+            {
+              "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/security/task/FeedbackSecurityService.java",
+              "textRange": {
+                "startLine": 97,
+                "endLine": 97,
+                "startOffset": 12,
+                "endOffset": 14
+              }
+            }
+          ]
+        }
+      ],
+      "status": "OPEN",
+      "message": "Merge this if statement with the enclosing one.",
+      "effort": "5min",
+      "debt": "5min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "clumsy"
+      ],
+      "creationDate": "2022-08-24T11:24:24+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC-y7Hq_OHAqW8iOn",
+      "rule": "java:S1066",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/security/task/FeedbackSecurityService.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "line": 123,
+      "hash": "3aa1c6d067a794be792f0a1dc4808d3d",
+      "textRange": {
+        "startLine": 123,
+        "endLine": 123,
+        "startOffset": 12,
+        "endOffset": 14
+      },
+      "flows": [
+        {
+          "locations": [
+            {
+              "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/security/task/FeedbackSecurityService.java",
+              "textRange": {
+                "startLine": 122,
+                "endLine": 122,
+                "startOffset": 8,
+                "endOffset": 10
+              }
+            }
+          ]
+        }
+      ],
+      "status": "OPEN",
+      "message": "Merge this if statement with the enclosing one.",
+      "effort": "5min",
+      "debt": "5min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "clumsy"
+      ],
+      "creationDate": "2022-08-24T11:24:24+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC-y7Hq_OHAqW8iOo",
+      "rule": "java:S1066",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/security/task/FeedbackSecurityService.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "line": 124,
+      "hash": "57e85d7b17ab89c4819604ebbd4ed698",
+      "textRange": {
+        "startLine": 124,
+        "endLine": 124,
+        "startOffset": 16,
+        "endOffset": 18
+      },
+      "flows": [
+        {
+          "locations": [
+            {
+              "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/security/task/FeedbackSecurityService.java",
+              "textRange": {
+                "startLine": 123,
+                "endLine": 123,
+                "startOffset": 12,
+                "endOffset": 14
+              }
+            }
+          ]
+        }
+      ],
+      "status": "OPEN",
+      "message": "Merge this if statement with the enclosing one.",
+      "effort": "5min",
+      "debt": "5min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "clumsy"
+      ],
+      "creationDate": "2022-08-24T11:24:24+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC_MYHq_OHAqW8iSJ",
+      "rule": "java:S1186",
+      "severity": "CRITICAL",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/instructionlibrary/chapter/single/dto/ChapterWithFeedbackDto.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "line": 39,
+      "hash": "62d9266f0dac28caad570100cfebe09e",
+      "textRange": {
+        "startLine": 39,
+        "endLine": 39,
+        "startOffset": 11,
+        "endOffset": 33
+      },
+      "flows": [],
+      "status": "OPEN",
+      "message": "Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.",
+      "effort": "5min",
+      "debt": "5min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "suspicious"
+      ],
+      "creationDate": "2022-08-24T09:29:23+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC_MYHq_OHAqW8iSK",
+      "rule": "java:S2160",
+      "severity": "MINOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/instructionlibrary/chapter/single/dto/ChapterWithFeedbackDto.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "line": 104,
+      "hash": "6ab3963eace939003f87db46421eb855",
+      "textRange": {
+        "startLine": 104,
+        "endLine": 104,
+        "startOffset": 17,
+        "endOffset": 24
+      },
+      "flows": [],
+      "status": "OPEN",
+      "message": "Override the \"equals\" method in this class.",
+      "effort": "30min",
+      "debt": "30min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "suspicious"
+      ],
+      "creationDate": "2022-08-24T09:29:23+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC_HPHq_OHAqW8iRS",
+      "rule": "common-java:DuplicatedBlocks",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/instructionlibrary/episode/list/dto/EpisodeDto.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "flows": [],
+      "status": "OPEN",
+      "message": "2 duplicated blocks of code must be removed.",
+      "effort": "30min",
+      "debt": "30min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "pitfall"
+      ],
+      "creationDate": "2022-08-24T09:29:23+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC_HKHq_OHAqW8iRR",
+      "rule": "java:S2160",
+      "severity": "MINOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/instructionlibrary/episode/list/dto/EpisodeWithFeedbackDto.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "line": 78,
+      "hash": "04bb0abbdb7364174aed47b6ec072ed8",
+      "textRange": {
+        "startLine": 78,
+        "endLine": 78,
+        "startOffset": 17,
+        "endOffset": 25
+      },
+      "flows": [],
+      "status": "OPEN",
+      "message": "Override the \"equals\" method in this class.",
+      "effort": "30min",
+      "debt": "30min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "suspicious"
+      ],
+      "creationDate": "2022-08-24T09:29:23+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC_KUHq_OHAqW8iR4",
+      "rule": "common-java:DuplicatedBlocks",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/instructionlibrary/insructionset/single/dto/InstructionSetDto.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "flows": [],
+      "status": "OPEN",
+      "message": "7 duplicated blocks of code must be removed.",
+      "effort": "1h20min",
+      "debt": "1h20min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "pitfall"
+      ],
+      "creationDate": "2022-08-24T09:29:23+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    }
+  ],
+  "components": [
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/instructionlibrary/chapter/single/dto/ChapterWithFeedbackDto.java",
+      "uuid": "AYURC-FzHq_OHAqW8iJL",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "ChapterWithFeedbackDto.java",
+      "longName": "src/main/java/com/marviq/yoho/instructionlibrary/chapter/single/dto/ChapterWithFeedbackDto.java",
+      "path": "src/main/java/com/marviq/yoho/instructionlibrary/chapter/single/dto/ChapterWithFeedbackDto.java"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/instructionlibrary/insructionset/single/dto/InstructionSetDto.java",
+      "uuid": "AYURC-FxHq_OHAqW8iIT",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "InstructionSetDto.java",
+      "longName": "src/main/java/com/marviq/yoho/instructionlibrary/insructionset/single/dto/InstructionSetDto.java",
+      "path": "src/main/java/com/marviq/yoho/instructionlibrary/insructionset/single/dto/InstructionSetDto.java"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/security/task/FeedbackSecurityService.java",
+      "uuid": "AYURC-FcHq_OHAqW8iAo",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "FeedbackSecurityService.java",
+      "longName": "src/main/java/com/marviq/yoho/security/task/FeedbackSecurityService.java",
+      "path": "src/main/java/com/marviq/yoho/security/task/FeedbackSecurityService.java"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/instructionlibrary/episode/list/dto/EpisodeWithFeedbackDto.java",
+      "uuid": "AYURC-FuHq_OHAqW8iG5",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "EpisodeWithFeedbackDto.java",
+      "longName": "src/main/java/com/marviq/yoho/instructionlibrary/episode/list/dto/EpisodeWithFeedbackDto.java",
+      "path": "src/main/java/com/marviq/yoho/instructionlibrary/episode/list/dto/EpisodeWithFeedbackDto.java"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/instructionlibrary/episode/list/dto/EpisodeDto.java",
+      "uuid": "AYURC-FuHq_OHAqW8iG6",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "EpisodeDto.java",
+      "longName": "src/main/java/com/marviq/yoho/instructionlibrary/episode/list/dto/EpisodeDto.java",
+      "path": "src/main/java/com/marviq/yoho/instructionlibrary/episode/list/dto/EpisodeDto.java"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api",
+      "uuid": "AYURC83V2Xt-QbkRm4Ov",
+      "enabled": true,
+      "qualifier": "TRK",
+      "name": "Yoho backend API",
+      "longName": "Yoho backend API"
+    }
+  ],
+  "facets": []
+}

@@ -1,0 +1,391 @@
+{
+  "total": 35,
+  "p": 2,
+  "ps": 10,
+  "paging": {
+    "pageIndex": 2,
+    "pageSize": 10,
+    "total": 35
+  },
+  "effortTotal": 8034,
+  "debtTotal": 8034,
+  "issues": [
+    {
+      "key": "AYURC-t8Hq_OHAqW8iN6",
+      "rule": "common-java:DuplicatedBlocks",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/dto/user/list/UserListElementDto.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "flows": [],
+      "status": "OPEN",
+      "message": "1 duplicated blocks of code must be removed.",
+      "effort": "20min",
+      "debt": "20min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "pitfall"
+      ],
+      "creationDate": "2022-08-26T09:44:17+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC-t8Hq_OHAqW8iN7",
+      "rule": "java:S107",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/dto/user/list/UserListElementDto.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "line": 50,
+      "hash": "fa87db92f4f0f39c6f38bf07d6ab676d",
+      "textRange": {
+        "startLine": 50,
+        "endLine": 50,
+        "startOffset": 11,
+        "endOffset": 29
+      },
+      "flows": [],
+      "status": "OPEN",
+      "message": "Constructor has 9 parameters, which is greater than 7 authorized.",
+      "effort": "20min",
+      "debt": "20min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "brain-overload"
+      ],
+      "creationDate": "2022-08-26T09:44:17+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC_DeHq_OHAqW8iQ2",
+      "rule": "java:S1130",
+      "severity": "MINOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/app/service/user/edit/UserEditServiceImpl.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "line": 100,
+      "hash": "ee237c4a82dd2953c9f7677a38ca4534",
+      "textRange": {
+        "startLine": 100,
+        "endLine": 100,
+        "startOffset": 96,
+        "endOffset": 121
+      },
+      "flows": [],
+      "status": "OPEN",
+      "message": "Remove the declaration of thrown exception 'com.marviq.yoho.utils.exception.IllegalOperationException' which is a runtime exception.",
+      "effort": "5min",
+      "debt": "5min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "clumsy",
+        "error-handling",
+        "redundant",
+        "unused"
+      ],
+      "creationDate": "2022-08-26T07:12:50+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC_DfHq_OHAqW8iQ3",
+      "rule": "java:S1130",
+      "severity": "MINOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/app/service/user/edit/UserEditServiceImpl.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "line": 120,
+      "hash": "da3b316df568718c3cc770afa4552074",
+      "textRange": {
+        "startLine": 120,
+        "endLine": 120,
+        "startOffset": 15,
+        "endOffset": 40
+      },
+      "flows": [],
+      "status": "OPEN",
+      "message": "Remove the declaration of thrown exception 'com.marviq.yoho.utils.exception.IllegalOperationException' which is a runtime exception.",
+      "effort": "5min",
+      "debt": "5min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "clumsy",
+        "error-handling",
+        "redundant",
+        "unused"
+      ],
+      "creationDate": "2022-08-26T07:12:50+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC_OnHq_OHAqW8iTd",
+      "rule": "java:S1130",
+      "severity": "MINOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/rest/controller/UserController.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "line": 147,
+      "hash": "c363fd01e0694e3cac5b4cc499a45e2e",
+      "textRange": {
+        "startLine": 147,
+        "endLine": 147,
+        "startOffset": 123,
+        "endOffset": 148
+      },
+      "flows": [],
+      "status": "OPEN",
+      "message": "Remove the declaration of thrown exception 'com.marviq.yoho.utils.exception.IllegalOperationException' which is a runtime exception.",
+      "effort": "5min",
+      "debt": "5min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "clumsy",
+        "error-handling",
+        "redundant",
+        "unused"
+      ],
+      "creationDate": "2022-08-26T07:12:50+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC-w3Hq_OHAqW8iOL",
+      "rule": "java:S1066",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/security/user/EditUserSecurityService.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "line": 57,
+      "hash": "b59d4ac21af83acc64125be348d8712b",
+      "textRange": {
+        "startLine": 57,
+        "endLine": 57,
+        "startOffset": 12,
+        "endOffset": 14
+      },
+      "flows": [
+        {
+          "locations": [
+            {
+              "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/security/user/EditUserSecurityService.java",
+              "textRange": {
+                "startLine": 56,
+                "endLine": 56,
+                "startOffset": 8,
+                "endOffset": 10
+              }
+            }
+          ]
+        }
+      ],
+      "status": "OPEN",
+      "message": "Merge this if statement with the enclosing one.",
+      "effort": "5min",
+      "debt": "5min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "clumsy"
+      ],
+      "creationDate": "2022-08-26T07:12:50+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC_UsHq_OHAqW8iUj",
+      "rule": "common-java:DuplicatedBlocks",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/feedbackloop/actionpoint/repository/ActionPointEntity.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "flows": [],
+      "status": "OPEN",
+      "message": "2 duplicated blocks of code must be removed.",
+      "effort": "30min",
+      "debt": "30min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "pitfall"
+      ],
+      "creationDate": "2022-08-25T08:14:01+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC_P5Hq_OHAqW8iT9",
+      "rule": "common-java:DuplicatedBlocks",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/domain/model/task/TaskListViewEntity.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "flows": [],
+      "status": "OPEN",
+      "message": "2 duplicated blocks of code must be removed.",
+      "effort": "30min",
+      "debt": "30min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "pitfall"
+      ],
+      "creationDate": "2022-08-25T07:12:49+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC-ojHq_OHAqW8iNk",
+      "rule": "common-java:DuplicatedBlocks",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/dto/task/list/view/TaskListViewElementDto.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "flows": [],
+      "status": "OPEN",
+      "message": "2 duplicated blocks of code must be removed.",
+      "effort": "30min",
+      "debt": "30min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "pitfall"
+      ],
+      "creationDate": "2022-08-25T07:12:49+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    },
+    {
+      "key": "AYURC-y7Hq_OHAqW8iOj",
+      "rule": "java:S1066",
+      "severity": "MAJOR",
+      "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/security/task/FeedbackSecurityService.java",
+      "project": "com.marviq.yoho:yoho-be-api",
+      "line": 58,
+      "hash": "e3b10cf98e352c406b25f1c01fec47b3",
+      "textRange": {
+        "startLine": 58,
+        "endLine": 58,
+        "startOffset": 12,
+        "endOffset": 14
+      },
+      "flows": [
+        {
+          "locations": [
+            {
+              "component": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/security/task/FeedbackSecurityService.java",
+              "textRange": {
+                "startLine": 57,
+                "endLine": 57,
+                "startOffset": 8,
+                "endOffset": 10
+              }
+            }
+          ]
+        }
+      ],
+      "status": "OPEN",
+      "message": "Merge this if statement with the enclosing one.",
+      "effort": "5min",
+      "debt": "5min",
+      "author": "pawel.dubaj@marviq.com",
+      "tags": [
+        "clumsy"
+      ],
+      "creationDate": "2022-08-24T11:24:24+0000",
+      "updateDate": "2022-12-14T14:23:39+0000",
+      "type": "CODE_SMELL",
+      "organization": "default-organization"
+    }
+  ],
+  "components": [
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/domain/model/task/TaskListViewEntity.java",
+      "uuid": "AYURC-F0Hq_OHAqW8iKG",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "TaskListViewEntity.java",
+      "longName": "src/main/java/com/marviq/yoho/domain/model/task/TaskListViewEntity.java",
+      "path": "src/main/java/com/marviq/yoho/domain/model/task/TaskListViewEntity.java"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/dto/user/list/UserListElementDto.java",
+      "uuid": "AYURC-FZHq_OHAqW8h_s",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "UserListElementDto.java",
+      "longName": "src/main/java/com/marviq/yoho/dto/user/list/UserListElementDto.java",
+      "path": "src/main/java/com/marviq/yoho/dto/user/list/UserListElementDto.java"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/security/task/FeedbackSecurityService.java",
+      "uuid": "AYURC-FcHq_OHAqW8iAo",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "FeedbackSecurityService.java",
+      "longName": "src/main/java/com/marviq/yoho/security/task/FeedbackSecurityService.java",
+      "path": "src/main/java/com/marviq/yoho/security/task/FeedbackSecurityService.java"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/feedbackloop/actionpoint/repository/ActionPointEntity.java",
+      "uuid": "AYURC-F3Hq_OHAqW8iMK",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "ActionPointEntity.java",
+      "longName": "src/main/java/com/marviq/yoho/feedbackloop/actionpoint/repository/ActionPointEntity.java",
+      "path": "src/main/java/com/marviq/yoho/feedbackloop/actionpoint/repository/ActionPointEntity.java"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/app/service/user/edit/UserEditServiceImpl.java",
+      "uuid": "AYURC-FsHq_OHAqW8iFm",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "UserEditServiceImpl.java",
+      "longName": "src/main/java/com/marviq/yoho/app/service/user/edit/UserEditServiceImpl.java",
+      "path": "src/main/java/com/marviq/yoho/app/service/user/edit/UserEditServiceImpl.java"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api",
+      "uuid": "AYURC83V2Xt-QbkRm4Ov",
+      "enabled": true,
+      "qualifier": "TRK",
+      "name": "Yoho backend API",
+      "longName": "Yoho backend API"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/dto/task/list/view/TaskListViewElementDto.java",
+      "uuid": "AYURC-FWHq_OHAqW8h-t",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "TaskListViewElementDto.java",
+      "longName": "src/main/java/com/marviq/yoho/dto/task/list/view/TaskListViewElementDto.java",
+      "path": "src/main/java/com/marviq/yoho/dto/task/list/view/TaskListViewElementDto.java"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/security/user/EditUserSecurityService.java",
+      "uuid": "AYURC-FbHq_OHAqW8iAZ",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "EditUserSecurityService.java",
+      "longName": "src/main/java/com/marviq/yoho/security/user/EditUserSecurityService.java",
+      "path": "src/main/java/com/marviq/yoho/security/user/EditUserSecurityService.java"
+    },
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yoho:yoho-be-api:src/main/java/com/marviq/yoho/rest/controller/UserController.java",
+      "uuid": "AYURC-FzHq_OHAqW8iJ1",
+      "enabled": true,
+      "qualifier": "FIL",
+      "name": "UserController.java",
+      "longName": "src/main/java/com/marviq/yoho/rest/controller/UserController.java",
+      "path": "src/main/java/com/marviq/yoho/rest/controller/UserController.java"
+    }
+  ],
+  "facets": []
+}

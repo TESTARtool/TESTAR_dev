@@ -1,0 +1,18 @@
+{
+  "paging": {
+    "pageIndex": 1,
+    "pageSize": 1,
+    "total": 4
+  },
+  "components": [
+    {
+      "organization": "default-organization",
+      "key": "com.marviq.yohoa:yohoa-be-api",
+      "name": "Yoho backend API a",
+      "qualifier": "TRK",
+      "visibility": "public",
+      "lastAnalysisDate": "2022-12-11T15:20:53+0000",
+      "revision": "df0c495f4b52e2e6e12756c6750aa8c9c955e5fa"
+    }
+  ]
+}

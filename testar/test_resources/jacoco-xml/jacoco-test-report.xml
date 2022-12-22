@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE report PUBLIC "-//JACOCO//DTD Report 1.1//EN" "report.dtd">
+	<report name="testar-microservice">
+		<sessioninfo id="testar-sonar-scanner-f74181b1" start="1671611120609" dump="1671611155035"/>
+		<package name="com/testar/testarmicroservice">
+			<class name="com/testar/testarmicroservice/ActionController$FinishActionRecordingResponse" sourcefilename="ActionController.java">
+				<method name="&lt;init&gt;" desc="(Lcom/testar/testarmicroservice/ActionController$ActionRecordingStatus;Ljava/util/List;)V" line="47">
+					<counter type="INSTRUCTION" missed="0" covered="9"/>
+					<counter type="LINE" missed="0" covered="1"/>
+					<counter type="COMPLEXITY" missed="0" covered="1"/>
+					<counter type="METHOD" missed="0" covered="1"/>
+				</method>
+				<method name="getStatus" desc="()Lcom/testar/testarmicroservice/ActionController$ActionRecordingStatus;" line="50">
+					<counter type="INSTRUCTION" missed="0" covered="3"/>
+					<counter type="LINE" missed="0" covered="1"/>
+					<counter type="COMPLEXITY" missed="0" covered="1"/>
+					<counter type="METHOD" missed="0" covered="1"/>
+				</method>
+				<method name="getMethodsExecuted" desc="()Ljava/util/List;" line="51">
+					<counter type="INSTRUCTION" missed="0" covered="3"/>
+					<counter type="LINE" missed="0" covered="1"/>
+					<counter type="COMPLEXITY" missed="0" covered="1"/>
+					<counter type="METHOD" missed="0" covered="1"/>
+				</method>
+				<counter type="INSTRUCTION" missed="0" covered="15"/>
+				<counter type="LINE" missed="0" covered="3"/>
+				<counter type="COMPLEXITY" missed="0" covered="3"/>
+				<counter type="METHOD" missed="0" covered="3"/>
+				<counter type="CLASS" missed="0" covered="1"/>
+			</class>
+			<package name="com/testar/testarmicroservice/service">
+				<class name="com/testar/testarmicroservice/service/MethodInvocationService" sourcefilename="MethodInvocationService.java">
+					<method name="listenToMethodInvocations" desc="()Z" line="24">
+						<counter type="INSTRUCTION" missed="5" covered="27"/>
+						<counter type="LINE" missed="3" covered="4"/>
+						<counter type="COMPLEXITY" missed="0" covered="1"/>
+						<counter type="METHOD" missed="0" covered="1"/>
+					</method>
+					<method name="&lt;init&gt;" desc="(Lcom/testar/testarmicroservice/TracingConfiguration;Lcom/testar/testarmicroservice/model/MethodInvocationRepository;)V" line="13">
+						<counter type="INSTRUCTION" missed="0" covered="9"/>
+						<counter type="LINE" missed="0" covered="1"/>
+						<counter type="COMPLEXITY" missed="0" covered="1"/>
+						<counter type="METHOD" missed="0" covered="1"/>
+					</method>
+					<counter type="INSTRUCTION" missed="5" covered="48"/>
+					<counter type="LINE" missed="3" covered="9"/>
+					<counter type="COMPLEXITY" missed="0" covered="3"/>
+					<counter type="METHOD" missed="0" covered="3"/>
+					<counter type="CLASS" missed="0" covered="1"/>
+				</class>
+				<sourcefile name="MethodInvocationService.java">
+					<line nr="13" mi="0" ci="9" mb="0" cb="0"/>
+					<line nr="24" mi="0" ci="9" mb="0" cb="0"/>
+					<line nr="25" mi="0" ci="9" mb="0" cb="0"/>
+					<line nr="26" mi="0" ci="7" mb="0" cb="0"/>
+					<line nr="27" mi="0" ci="2" mb="0" cb="0"/>
+					<line nr="28" mi="1" ci="0" mb="0" cb="0"/>
+					<line nr="29" mi="2" ci="0" mb="0" cb="0"/>
+					<line nr="30" mi="2" ci="0" mb="0" cb="0"/>
+					<line nr="35" mi="0" ci="3" mb="0" cb="0"/>
+					<line nr="36" mi="0" ci="4" mb="0" cb="0"/>
+					<line nr="37" mi="0" ci="3" mb="0" cb="0"/>
+					<line nr="38" mi="0" ci="2" mb="0" cb="0"/>
+					<counter type="INSTRUCTION" missed="5" covered="48"/>
+					<counter type="LINE" missed="3" covered="9"/>
+					<counter type="COMPLEXITY" missed="0" covered="3"/>
+					<counter type="METHOD" missed="0" covered="3"/>
+					<counter type="CLASS" missed="0" covered="1"/>
+				</sourcefile>
+			</package>
+			<sourcefile name="ActionController.java">
+				<line nr="18" mi="0" ci="6" mb="0" cb="0"/>
+				<line nr="26" mi="0" ci="5" mb="0" cb="2"/>
+				<line nr="27" mi="0" ci="6" mb="0" cb="0"/>
+				<line nr="28" mi="0" ci="5" mb="0" cb="0"/>
+				<line nr="29" mi="0" ci="1" mb="0" cb="0"/>
+				<line nr="34" mi="0" ci="7" mb="0" cb="0"/>
+				<line nr="35" mi="0" ci="1" mb="0" cb="0"/>
+				<line nr="36" mi="0" ci="2" mb="0" cb="0"/>
+				<line nr="37" mi="0" ci="4" mb="0" cb="0"/>
+				<line nr="38" mi="0" ci="4" mb="0" cb="0"/>
+				<line nr="41" mi="0" ci="6" mb="0" cb="0"/>
+				<line nr="44" mi="0" ci="3" mb="0" cb="0"/>
+				<line nr="47" mi="0" ci="9" mb="0" cb="0"/>
+				<line nr="50" mi="0" ci="3" mb="0" cb="0"/>
+				<line nr="51" mi="0" ci="3" mb="0" cb="0"/>
+				<line nr="54" mi="0" ci="9" mb="0" cb="0"/>
+				<line nr="59" mi="0" ci="3" mb="0" cb="0"/>
+				<line nr="62" mi="0" ci="3" mb="0" cb="0"/>
+				<line nr="64" mi="0" ci="8" mb="0" cb="0"/>
+				<line nr="68" mi="0" ci="16" mb="0" cb="0"/>
+				<line nr="69" mi="0" ci="18" mb="0" cb="0"/>
+				<counter type="INSTRUCTION" missed="0" covered="122"/>
+				<counter type="BRANCH" missed="0" covered="2"/>
+				<counter type="LINE" missed="0" covered="21"/>
+				<counter type="COMPLEXITY" missed="0" covered="15"/>
+				<counter type="METHOD" missed="0" covered="14"/>
+				<counter type="CLASS" missed="0" covered="5"/>
+			</sourcefile>
+			<counter type="INSTRUCTION" missed="10" covered="282"/>
+			<counter type="BRANCH" missed="0" covered="4"/>
+			<counter type="LINE" missed="5" covered="52"/>
+			<counter type="COMPLEXITY" missed="1" covered="29"/>
+			<counter type="METHOD" missed="1" covered="27"/>
+			<counter type="CLASS" missed="0" covered="9"/>
+		</package>
+		<package name="com/testar/testarmicroservice/model">
+			<class name="com/testar/testarmicroservice/model/MethodInvocation" sourcefilename="MethodInvocation.java">
+				<method name="&lt;init&gt;" desc="(Ljava/lang/String;Ljava/lang/String;)V" line="15">
+					<counter type="INSTRUCTION" missed="0" covered="9"/>
+					<counter type="LINE" missed="0" covered="4"/>
+					<counter type="COMPLEXITY" missed="0" covered="1"/>
+					<counter type="METHOD" missed="0" covered="1"/>
+				</method>
+				<method name="getId" desc="()Ljava/lang/Long;" line="22">
+					<counter type="INSTRUCTION" missed="0" covered="3"/>
+					<counter type="LINE" missed="0" covered="1"/>
+					<counter type="COMPLEXITY" missed="0" covered="1"/>
+					<counter type="METHOD" missed="0" covered="1"/>
+				</method>
+				<method name="getClassName" desc="()Ljava/lang/String;" line="24">
+					<counter type="INSTRUCTION" missed="0" covered="3"/>
+					<counter type="LINE" missed="0" covered="1"/>
+					<counter type="COMPLEXITY" missed="0" covered="1"/>
+					<counter type="METHOD" missed="0" covered="1"/>
+				</method>
+				<counter type="INSTRUCTION" missed="91" covered="73"/>
+				<counter type="BRANCH" missed="21" covered="9"/>
+				<counter type="LINE" missed="0" covered="9"/>
+				<counter type="COMPLEXITY" missed="20" covered="7"/>
+				<counter type="METHOD" missed="5" covered="7"/>
+				<counter type="CLASS" missed="0" covered="1"/>
+			</class>
+			<sourcefile name="MethodInvocation.java">
+				<line nr="11" mi="91" ci="52" mb="21" cb="9"/>
+				<line nr="13" mi="0" ci="3" mb="0" cb="0"/>
+				<line nr="15" mi="0" ci="2" mb="0" cb="0"/>
+				<line nr="16" mi="0" ci="3" mb="0" cb="0"/>
+				<line nr="17" mi="0" ci="3" mb="0" cb="0"/>
+				<line nr="18" mi="0" ci="1" mb="0" cb="0"/>
+				<line nr="22" mi="0" ci="3" mb="0" cb="0"/>
+				<line nr="24" mi="0" ci="3" mb="0" cb="0"/>
+				<line nr="26" mi="0" ci="3" mb="0" cb="0"/>
+				<counter type="INSTRUCTION" missed="91" covered="73"/>
+				<counter type="BRANCH" missed="21" covered="9"/>
+				<counter type="LINE" missed="0" covered="9"/>
+				<counter type="COMPLEXITY" missed="20" covered="7"/>
+				<counter type="METHOD" missed="5" covered="7"/>
+				<counter type="CLASS" missed="0" covered="1"/>
+			</sourcefile>
+			<counter type="INSTRUCTION" missed="91" covered="73"/>
+			<counter type="BRANCH" missed="21" covered="9"/>
+			<counter type="LINE" missed="0" covered="9"/>
+			<counter type="COMPLEXITY" missed="20" covered="7"/>
+			<counter type="METHOD" missed="5" covered="7"/>
+			<counter type="CLASS" missed="0" covered="1"/>
+		</package>
+		<counter type="INSTRUCTION" missed="101" covered="355"/>
+		<counter type="BRANCH" missed="21" covered="13"/>
+		<counter type="LINE" missed="5" covered="61"/>
+		<counter type="COMPLEXITY" missed="21" covered="36"/>
+		<counter type="METHOD" missed="6" covered="34"/>
+		<counter type="CLASS" missed="0" covered="10"/>
+	</report>

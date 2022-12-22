@@ -146,6 +146,9 @@ public class SonarqubeServiceImpl implements SonarqubeService {
             }
             dockerPoolService.getClient().waitContainerCmd(scannerContainerId).exec(new ResultCallback<WaitResponse>() {
 
+                private int connectionTries = 1;
+                private static final int MAX_CONNECTION_TRIES = 3;
+
                 @Override
                 public void onStart(Closeable closeable) {
                 }
@@ -156,12 +159,19 @@ public class SonarqubeServiceImpl implements SonarqubeService {
 
                 @Override
                 public void onError(Throwable throwable) {
-                    if (delegate != null) {
-                        delegate.onError(SonarqubeServiceDelegate.ErrorCode.ANALYSING_ERROR, throwable.getLocalizedMessage());
+                    System.out.println("Exception has been produced when try no. " + connectionTries + " was taken to connect to SQ container.");
+                    throwable.printStackTrace();
+                    if(connectionTries <= MAX_CONNECTION_TRIES) {
+                        ++connectionTries;
+                        System.out.println("Retrying...");
+                    } else {
+                        System.out.println("Maximum number of SQ container connection tries has been reached");
+                        if (delegate != null) {
+                            delegate.onError(SonarqubeServiceDelegate.ErrorCode.ANALYSING_ERROR, throwable.getLocalizedMessage());
+                        }
+                        System.out.println("Closing containers");
+                        dockerPoolService.dispose(false);
                     }
-                    System.out.println("-= Sonarqube: an error occurred =-");
-//                    System.out.println("-= Disposing on error =-");
-//                    dockerPoolService.dispose(false);
                 }
 
                 @Override
@@ -281,7 +291,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
                 //"RUN if [ -f \"./pom.xml\" ] || [ -f \"gradlew\" ]; then apk add maven openjdk11; fi\n" +
                 "RUN apk add openjdk11\n" +
                 //"RUN apk add maven openjdk11\n" +
-                "CMD ./mvnw clean verify sonar:sonar -DskipTests";// -D sonar.projectKey=yoho-be -D sonar.host.url=http://sonarqube:9000 -D sonar.login=" + token + ";";
+                "CMD mvn org.jacoco:jacoco-maven-plugin:0.8.8:prepare-agent verify org.jacoco:jacoco-maven-plugin:0.8.2:report sonar:sonar -Dsonar.java.coveragePlugin=jacoco";// -D sonar.projectKey=yoho-be -D sonar.host.url=http://sonarqube:9000 -D sonar.login=" + token + ";";
                 // "CMD if ! [ -f \"sonar-project.properties\"]; then printf \"sonar.projectKey=" + projectKey +
                 //         "\\nsonar.projectName=" + projectName + "\\nsonar.sourceEncoding=UTF-8\" > " +
                 //         "sonar-project.properties; fi; " +
