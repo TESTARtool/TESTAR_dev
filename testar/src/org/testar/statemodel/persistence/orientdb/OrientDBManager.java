@@ -104,6 +104,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
     @Override
     public void persistAbstractState(AbstractState abstractState) {
+        entityManager.getConnection().getDatabaseSession().begin();
         // create an entity to persist to the database
         EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
         VertexEntity abstractStateEntity = new VertexEntity(entityClass);
@@ -115,6 +116,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         } catch (HydrationException e) {
             e.printStackTrace();
             System.out.println("Encountered a problem while saving abstract state with id " + abstractState.getStateId() + " to the orient database");
+            entityManager.getConnection().getDatabaseSession().commit();
             return;
         }
 
@@ -123,9 +125,11 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
         // deal with the unvisited actions on the states
         persistUnvisitedActions(abstractState, abstractStateEntity);
+        entityManager.getConnection().getDatabaseSession().commit();
     }
 
     private void persistUnvisitedActions(AbstractState abstractState, VertexEntity abstractStateEntity) {
+        entityManager.getConnection().getDatabaseSession().begin();
         abstractStateEntity.enableUpdate(false);
 
         // prepare the black hole entity that is needed for the unvisited actions
@@ -139,6 +143,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         catch (HydrationException ex) {
             ex.printStackTrace();
             System.out.println("Encountered a problem while hydrating the black hole class for state " + abstractState.getStateId());
+            entityManager.getConnection().getDatabaseSession().commit();
             return;
         }
 
@@ -180,6 +185,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             System.out.println(ex.getMessage());
             exit(1);
         }
+        entityManager.getConnection().getDatabaseSession().commit();
     }
 
     @Override
@@ -189,6 +195,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
     @Override
     public void persistConcreteState(ConcreteState concreteState) {
+        entityManager.getConnection().getDatabaseSession().begin();
         // create an entity to persist to the database
         EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.ConcreteState);
         VertexEntity concreteStateEntity = new VertexEntity(entityClass);
@@ -202,6 +209,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         catch (HydrationException e) {
             e.printStackTrace();
             System.out.println("Encountered a problem while saving concrete state with id " + concreteState.getId() + " to the orient database");
+            entityManager.getConnection().getDatabaseSession().commit();
             return;
         }
 
@@ -213,6 +221,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
         // optional: if an abstract state is provided, we connect the concrete state to it using an isAbstractedBy relation
         if (concreteState.getAbstractState() == null) {
+            entityManager.getConnection().getDatabaseSession().commit();
             return;
         }
         EntityClass targetEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
@@ -224,6 +233,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         } catch (HydrationException e) {
             e.printStackTrace();
             System.out.println("Encountered a problem while saving abstract state with id " + concreteState.getAbstractState().getStateId() + " to the orient database");
+            entityManager.getConnection().getDatabaseSession().commit();
             return;
         }
 
@@ -244,6 +254,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             //@todo add some meaningful logging here as well
         }
         entityManager.saveEntity(edgeEntity);
+        entityManager.getConnection().getDatabaseSession().commit();
     }
 
     /**
@@ -313,6 +324,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
     @Override
     public void persistAbstractStateTransition(AbstractStateTransition abstractStateTransition) {
+        entityManager.getConnection().getDatabaseSession().begin();
         if (abstractStateTransition.getSourceState() == null || abstractStateTransition.getTargetState() == null || abstractStateTransition.getAction() == null) {
             System.out.println("Objects missing in abstract state transition");
             return;
@@ -334,6 +346,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             stateHydrator.hydrate(targetVertexEntity, abstractStateTransition.getTargetState());
         } catch (HydrationException e) {
             //@todo add some meaningful logging here
+            entityManager.getConnection().getDatabaseSession().commit();
             return;
         }
 
@@ -353,6 +366,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             //@todo add some meaningful logging here as well
         }
         entityManager.saveEntity(actionEntity);
+        entityManager.getConnection().getDatabaseSession().commit();
     }
 
     @Override
@@ -361,6 +375,8 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             System.out.println("Objects missing in concrete state transition");
             return;
         }
+
+        entityManager.getConnection().getDatabaseSession().begin();
 
         // persist the source and target states
         persistConcreteState(concreteStateTransition.getSourceState());
@@ -378,6 +394,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             stateHydrator.hydrate(targetVertexEntity, concreteStateTransition.getTargetState());
         } catch (HydrationException e) {
             //@todo add some meaningful logging here
+            entityManager.getConnection().getDatabaseSession().commit();
             return;
         }
 
@@ -398,6 +415,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         }
         actionEntity.enableUpdate(false);
         entityManager.saveEntity(actionEntity);
+        entityManager.getConnection().getDatabaseSession().commit();
     }
 
     @Override
