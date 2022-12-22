@@ -166,6 +166,7 @@ dependencies {
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.10.0.202012080955-r'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.14.1'
+    implementation group: 'com.github.javaparser', name: 'javaparser-core', version: '3.24.9'
     testImplementation group: 'com.squareup.okhttp3', name: 'mockwebserver', version: '4.10.0'
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
 }
