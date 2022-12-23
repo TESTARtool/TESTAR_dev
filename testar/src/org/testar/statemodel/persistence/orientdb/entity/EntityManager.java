@@ -237,66 +237,64 @@ public class EntityManager {
      * This method will attempt to create a new class if it is not already present in the database
      * @param entityClass
      */
-    public void createClass(EntityClass entityClass) {
-        try (ODatabaseSession db = connection.getDatabaseSession()) {
-            // check if the class already exists
-            OClass oClass = db.getClass(entityClass.getClassName());
-            if (oClass != null) return;
+    public void createClass(EntityClass entityClass, ODatabaseSession db) {
+        // check if the class already exists
+        OClass oClass = db.getClass(entityClass.getClassName());
+        if (oClass != null) return;
 
-            // no class yet, let's create it
-            String entitySuperClass = entityClass.isVertex() ? "V" : entityClass.isEdge() ? "E" : "";
-            String superClassName = entityClass.getSuperClassName() != null ? entityClass.getSuperClassName() : entitySuperClass;
-            oClass = db.createClass(entityClass.getClassName(), superClassName);
+        // no class yet, let's create it
+        String entitySuperClass = entityClass.isVertex() ? "V" : entityClass.isEdge() ? "E" : "";
+        String superClassName = entityClass.getSuperClassName() != null ? entityClass.getSuperClassName() : entitySuperClass;
+        oClass = db.createClass(entityClass.getClassName(), superClassName);
 
-            Set<String> propertyBlackList = new HashSet<>();
-            // if the entityclass has a super class, we need to filter out the properties that have already been
-            // created in the super class, as OrientDB will throw an error if we try to create it again in the child class
-            if (entityClass.getSuperClassName() != null) {
-                // fetch the superclass
-                EntityClass superClass = EntityClassFactory.createEntityClass(EntityClassFactory.getEntityClassName(superClassName));
-                if (superClass != null) {
-                    propertyBlackList = superClass.getProperties().stream().map(Property::getPropertyName).collect(Collectors.toSet());
-                }
+        Set<String> propertyBlackList = new HashSet<>();
+        // if the entityclass has a super class, we need to filter out the properties that have already been
+        // created in the super class, as OrientDB will throw an error if we try to create it again in the child class
+        if (entityClass.getSuperClassName() != null) {
+            // fetch the superclass
+            EntityClass superClass = EntityClassFactory.createEntityClass(EntityClassFactory.getEntityClassName(superClassName));
+            if (superClass != null) {
+                propertyBlackList = superClass.getProperties().stream().map(Property::getPropertyName).collect(Collectors.toSet());
+            }
+        }
+
+        // set the properties
+        for (Property property : entityClass.getProperties()) {
+            // for the auto-increment fields, we need to create a sequence
+            if (property.isAutoIncrement()) {
+                String sequenceName = createSequenceId(entityClass, property);
+                System.out.println("creating sequence: " + sequenceName);
+                db.getMetadata().getSequenceLibrary().createSequence(sequenceName, OSequence.SEQUENCE_TYPE.ORDERED, null);
             }
 
-            // set the properties
-            for (Property property : entityClass.getProperties()) {
-                // for the auto-increment fields, we need to create a sequence
-                if (property.isAutoIncrement()) {
-                    String sequenceName = createSequenceId(entityClass, property);
-                    System.out.println("creating sequence: " + sequenceName);
-                    db.getMetadata().getSequenceLibrary().createSequence(sequenceName, OSequence.SEQUENCE_TYPE.ORDERED, null);
-                }
+            // we might need to skip adding certain properties
+            // check if this property needs to be skipped
+            if (propertyBlackList.contains(property.getPropertyName())) {
+                continue;
+            }
 
-                // we might need to skip adding certain properties
-                // check if this property needs to be skipped
-                if (propertyBlackList.contains(property.getPropertyName())) {
-                    continue;
-                }
+            OProperty dbProperty = null;
+            // binary types we do not create, as they will be stored as separate binary records
+            if (property.getPropertyType() == OType.BINARY) {
+                continue;
+            }
+            // for linked and embedded type a childtype needs to be specified
+            else if (property.getPropertyType().isEmbedded() || property.getPropertyType().isLink()) {
+                dbProperty = oClass.createProperty(property.getPropertyName(), property.getPropertyType(), property.getChildType());
+            }
+            else {
+                dbProperty = oClass.createProperty(property.getPropertyName(), property.getPropertyType());
+            }
 
-                OProperty dbProperty = null;
-                // binary types we do not create, as they will be stored as separate binary records
-                if (property.getPropertyType() == OType.BINARY) {
-                    continue;
-                }
-                // for linked and embedded type a childtype needs to be specified
-                else if (property.getPropertyType().isEmbedded() || property.getPropertyType().isLink()) {
-                    dbProperty = oClass.createProperty(property.getPropertyName(), property.getPropertyType(), property.getChildType());
-                }
-                else {
-                    dbProperty = oClass.createProperty(property.getPropertyName(), property.getPropertyType());
-                }
+            dbProperty.setReadonly(property.isReadOnly());
+            dbProperty.setMandatory(property.isMandatory());
+            dbProperty.setNotNull(!property.isNullable());
 
-                dbProperty.setReadonly(property.isReadOnly());
-                dbProperty.setMandatory(property.isMandatory());
-                dbProperty.setNotNull(!property.isNullable());
-
-                // we add an index for certain property fields
-                if (property.isIndexAble()) {
-                    String indexField = entityClass.getClassName() + "." + property.getPropertyName() + "Idx";
-                    OClass.INDEX_TYPE indexType = property.isIdentifier() ? OClass.INDEX_TYPE.UNIQUE_HASH_INDEX : OClass.INDEX_TYPE.NOTUNIQUE_HASH_INDEX;
-                    oClass.createIndex(indexField, indexType,property.getPropertyName());
-                }
+            // we add an index for certain property fields
+            if (property.isIndexAble()) {
+                String indexField = entityClass.getClassName() + "." + property.getPropertyName() + "Idx";
+                OClass.INDEX_TYPE indexType = property.isIdentifier() ? OClass.INDEX_TYPE.UNIQUE_HASH_INDEX : OClass.INDEX_TYPE.NOTUNIQUE_HASH_INDEX;
+                oClass.createIndex(indexField, indexType,property.getPropertyName());
             }
         }
     }

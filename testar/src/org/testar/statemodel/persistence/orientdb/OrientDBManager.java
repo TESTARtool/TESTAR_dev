@@ -89,9 +89,13 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             entityClassSet.add(EntityClassFactory.createEntityClass(className));
         }
         // make sure the entityclasses are sorted by dependency on super classes first
-        for (EntityClass entityClass : DependencyHelper.sortDependenciesForDeletion(entityClassSet)) {
+        try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
+          db.begin();
+          for (EntityClass entityClass : DependencyHelper.sortDependenciesForDeletion(entityClassSet)) {
             System.out.println("Creating " + entityClass.getClassName() + " - " + entityClass.getSuperClassName());
-            entityManager.createClass(entityClass);
+            entityManager.createClass(entityClass, db);
+          }
+          db.commit();
         }
     }
 

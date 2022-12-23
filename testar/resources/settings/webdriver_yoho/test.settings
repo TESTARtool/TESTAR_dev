@@ -36,7 +36,7 @@ SUTConnectorValue = "/Users/michaeltikhonenko/Downloads/chromedriver" "1920x900+
 #################################################################
 
 Sequences = 3
-SequenceLength = 30
+SequenceLength = 3
 
 #################################################################
 # Oracles based on suspicious titles
