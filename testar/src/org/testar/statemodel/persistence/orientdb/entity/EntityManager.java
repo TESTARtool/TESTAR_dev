@@ -236,6 +236,7 @@ public class EntityManager {
     /**
      * This method will attempt to create a new class if it is not already present in the database
      * @param entityClass
+     * @param db
      */
     public void createClass(EntityClass entityClass, ODatabaseSession db) {
         // check if the class already exists
@@ -302,15 +303,14 @@ public class EntityManager {
     /**
      * This method saves an entity to the data store.
      * @param entity
+     * @param db
      */
-    public void saveEntity(DocumentEntity entity) {
-        try (ODatabaseSession db = connection.getDatabaseSession()) {
-            if (entity.getEntityClass().isVertex()) {
-                saveVertexEntity((VertexEntity) entity, db);
-            }
-            else if (entity.getEntityClass().isEdge()) {
-                saveEdgeEntity((EdgeEntity) entity, db);
-            }
+    public void saveEntity(DocumentEntity entity, ODatabaseSession db) {
+        if (entity.getEntityClass().isVertex()) {
+            saveVertexEntity((VertexEntity) entity, db);
+        }
+        else if (entity.getEntityClass().isEdge()) {
+            saveEdgeEntity((EdgeEntity) entity, db);
         }
     }
 
@@ -348,7 +348,9 @@ public class EntityManager {
                 if (oVertex.getProperty(property.getPropertyName()) == null) {
                     // fetch the sequence
                     OSequence sequence = db.getMetadata().getSequenceLibrary().getSequence(createSequenceId(entity.getEntityClass(), property));
-                    setProperty(oVertex, property.getPropertyName(), sequence.next(), db);
+                    if (sequence != null) {
+                      setProperty(oVertex, property.getPropertyName(), sequence.next(), db);
+                    }
                 }
             }
         }
@@ -410,7 +412,9 @@ public class EntityManager {
                     if (sourceVertex.getProperty(property.getPropertyName()) == null) {
                         // fetch the sequence
                         OSequence sequence = db.getMetadata().getSequenceLibrary().getSequence(createSequenceId(entity.getSourceEntity().getEntityClass(), property));
-                        setProperty(sourceVertex, property.getPropertyName(), sequence.next(), db);
+                        if (sequence != null) {
+                          setProperty(sourceVertex, property.getPropertyName(), sequence.next(), db);
+                        }
                     }
                 }
             }
@@ -442,7 +446,9 @@ public class EntityManager {
                     if (targetVertex.getProperty(property.getPropertyName()) == null) {
                         // fetch the sequence
                         OSequence sequence = db.getMetadata().getSequenceLibrary().getSequence(createSequenceId(entity.getTargetEntity().getEntityClass(), property));
-                        setProperty(targetVertex, property.getPropertyName(), sequence.next(), db);
+                        if (sequence != null) {
+                          setProperty(targetVertex, property.getPropertyName(), sequence.next(), db);
+                        }
                     }
                 }
             }
@@ -464,7 +470,9 @@ public class EntityManager {
                 if (edge.getProperty(property.getPropertyName()) == null) {
                     // fetch the sequence
                     OSequence sequence = db.getMetadata().getSequenceLibrary().getSequence(createSequenceId(entity.getEntityClass(), property));
-                    setProperty(edge, property.getPropertyName(), sequence.next(), db);
+                    if (sequence != null) {
+                      setProperty(edge, property.getPropertyName(), sequence.next(), db);
+                    }
                 }
             }
         }
@@ -472,7 +480,7 @@ public class EntityManager {
         edge.save();
     }
 
-    public void deleteEntity(DocumentEntity entity) {
+    public void deleteEntity(DocumentEntity entity, ODatabaseSession db) {
             // we delete an entity based on its class and its id
             EntityClass entityClass = entity.getEntityClass();
 
@@ -483,39 +491,38 @@ public class EntityManager {
             }
             Set<Object> idValues = new HashSet<>();
             idValues.add(entity.getPropertyValue(identifier.getPropertyName()).getValue());
-            deleteEntities(entityClass, idValues);
+            deleteEntities(entityClass, idValues, db);
     }
 
     /**
      * Delete entities in a given entity class, based on a provided set of id values.
      * @param entityClass
      * @param idValues
+     * @param db
      */
-    public void deleteEntities(EntityClass entityClass, Set<Object> idValues) {
-        try (ODatabaseSession db = connection.getDatabaseSession()) {
-            String typeName;
-            if (entityClass.getEntityType() == EntityClass.EntityType.Vertex) {
-                typeName = "VERTEX";
-            }
-            else if (entityClass.getEntityType() == EntityClass.EntityType.Edge) {
-                typeName = "EDGE";
-            }
-            else {
-                // should not happen
-                return;
-            }
-
-            Property identifier = entityClass.getIdentifier();
-            if (identifier == null) {
-                // cannot delete without an id value
-                return;
-            }
-
-            String stmt = "DELETE " + typeName + " " + entityClass.getClassName() + " WHERE " + identifier.getPropertyName() + " IN :" + identifier.getPropertyName();
-            Map<String, Object> params = new HashMap<>();
-            params.put(identifier.getPropertyName(), idValues);
-            db.command(stmt, params);
+    public void deleteEntities(EntityClass entityClass, Set<Object> idValues, ODatabaseSession db) {
+        String typeName;
+        if (entityClass.getEntityType() == EntityClass.EntityType.Vertex) {
+            typeName = "VERTEX";
         }
+        else if (entityClass.getEntityType() == EntityClass.EntityType.Edge) {
+            typeName = "EDGE";
+        }
+        else {
+            // should not happen
+            return;
+        }
+
+        Property identifier = entityClass.getIdentifier();
+        if (identifier == null) {
+            // cannot delete without an id value
+            return;
+        }
+
+        String stmt = "DELETE " + typeName + " " + entityClass.getClassName() + " WHERE " + identifier.getPropertyName() + " IN :" + identifier.getPropertyName();
+        Map<String, Object> params = new HashMap<>();
+        params.put(identifier.getPropertyName(), idValues);
+        db.command(stmt, params);
     }
 
     /**
@@ -525,6 +532,7 @@ public class EntityManager {
      * @param element
      * @param propertyName
      * @param propertyValue
+     * @param db
      */
     private void setProperty(OElement element, String propertyName, Object propertyValue, ODatabaseSession db) {
         if (propertyValue instanceof Boolean)
@@ -611,40 +619,40 @@ public class EntityManager {
      * This method retrieves all stored instances of a given class.
      * @param entityClass
      * @param entityProperties a map containing property values to use in selection, with the property name used as a key
+     * @param db
      * @return
      */
-    public Set<DocumentEntity> retrieveAllOfClass(EntityClass entityClass, Map<String, PropertyValue> entityProperties) {
+    public Set<DocumentEntity> retrieveAllOfClass(EntityClass entityClass, Map<String, PropertyValue> entityProperties,
+                                                  ODatabaseSession db) {
         HashSet<DocumentEntity> documents = new HashSet<>();
-        try (ODatabaseSession db = connection.getDatabaseSession()) {
-            String stmt = "SELECT FROM " + entityClass.getClassName();
+        String stmt = "SELECT FROM " + entityClass.getClassName();
 
-            OResultSet rs;
-            // check if there are properties that we need
-            if (entityProperties != null && !entityProperties.isEmpty()) {
-                Map<String, Object> params = new HashMap<>();
-                StringJoiner stringJoiner = new StringJoiner(" AND ");
-                stmt += " WHERE ";
-                for (String propertyName : entityProperties.keySet()) {
-                    stringJoiner.add(propertyName + " = :" + propertyName);
-                    params.put(propertyName, getConvertedValue(entityProperties.get(propertyName).getType(), entityProperties.get(propertyName).getValue()));
-                }
-                stmt += stringJoiner.toString();
-                rs = db.query(stmt, params);
+        OResultSet rs;
+        // check if there are properties that we need
+        if (entityProperties != null && !entityProperties.isEmpty()) {
+            Map<String, Object> params = new HashMap<>();
+            StringJoiner stringJoiner = new StringJoiner(" AND ");
+            stmt += " WHERE ";
+            for (String propertyName : entityProperties.keySet()) {
+                stringJoiner.add(propertyName + " = :" + propertyName);
+                params.put(propertyName, getConvertedValue(entityProperties.get(propertyName).getType(), entityProperties.get(propertyName).getValue()));
             }
-            else {
-                rs = db.query(stmt);
-            }
+            stmt += stringJoiner.toString();
+            rs = db.query(stmt, params);
+        }
+        else {
+            rs = db.query(stmt);
+        }
 
-            while (rs.hasNext()) {
-                OResult result = rs.next();
-                if (result.isVertex()) {
-                    documents.add(extractVertexEntity(result, entityClass));
-                }
-                else if (result.isEdge()) {
-                    documents.add(extractEdgeEntity(result));
-                }
-                // should not happen, but we just ignore the result
+        while (rs.hasNext()) {
+            OResult result = rs.next();
+            if (result.isVertex()) {
+                documents.add(extractVertexEntity(result, entityClass));
             }
+            else if (result.isEdge()) {
+                documents.add(extractEdgeEntity(result));
+            }
+            // should not happen, but we just ignore the result
         }
         return documents;
     }
@@ -653,42 +661,40 @@ public class EntityManager {
      * THis method retrieves an entity of a given entity class from the data store, for a given id value.
      * @param entityClass
      * @param idValue
+     * @param db
      * @return
      */
-    public DocumentEntity retrieveEntity(EntityClass entityClass, Object idValue) {
-        try (ODatabaseSession db = connection.getDatabaseSession()) {
-            // first we have to retrieve the identifying field
-            Property identifier = entityClass.getIdentifier();
-            if (identifier == null) return null; // cannot search without an id field
+    public DocumentEntity retrieveEntity(EntityClass entityClass, Object idValue, ODatabaseSession db) {
+        // first we have to retrieve the identifying field
+        Property identifier = entityClass.getIdentifier();
+        if (identifier == null) return null; // cannot search without an id field
 
-            String idField = identifier.getPropertyName();
-            // convert the id value to the correct type to use in the database query
-            idValue = getConvertedValue(identifier.getPropertyType(), idValue);
+        String idField = identifier.getPropertyName();
+        // convert the id value to the correct type to use in the database query
+        idValue = getConvertedValue(identifier.getPropertyType(), idValue);
 
-            // prepare a statement and execute it
-            String stmt = "SELECT FROM " + entityClass.getClassName() + " WHERE " + idField + " = :" + idField;
-            // get the id parameter ready
-            Map<String, Object> params = new HashMap<>();
-            params.put(idField, idValue);
-            //execute the query using statement and parameters
-            OResultSet rs = db.query(stmt, params);
+        // prepare a statement and execute it
+        String stmt = "SELECT FROM " + entityClass.getClassName() + " WHERE " + idField + " = :" + idField;
+        // get the id parameter ready
+        Map<String, Object> params = new HashMap<>();
+        params.put(idField, idValue);
+        //execute the query using statement and parameters
+        OResultSet rs = db.query(stmt, params);
 
-            // process the results
-            if (!rs.hasNext()) {
-                return null;
-            }
+        // process the results
+        if (!rs.hasNext()) {
+            return null;
+        }
 
-            OResult oResult = rs.next();
-            if (oResult.isVertex()) {
-                return extractVertexEntity(oResult, entityClass);
-            }
-            else if (oResult.isEdge()) {
-                return extractEdgeEntity(oResult);
-            }
-            else {
-                return null;
-            }
-
+        OResult oResult = rs.next();
+        if (oResult.isVertex()) {
+            return extractVertexEntity(oResult, entityClass);
+        }
+        else if (oResult.isEdge()) {
+            return extractEdgeEntity(oResult);
+        }
+        else {
+            return null;
         }
     }
 
