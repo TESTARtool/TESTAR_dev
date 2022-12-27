@@ -24,6 +24,8 @@ public class StaticAnalysisResolver {
     private JacocoReportParser jacocoReportParser;
     private JavaProjectParser javaProjectParser;
 
+    private static final String WINDOWS_SEPARATOR = "\\";
+
     public HashMap<String, List<AnalysedMethodEntry>> resolveMethodEntries() {
         var javaUnits = javaProjectParser.parseJavaUnits();
         var projectKey = sonarqubeApiClient.getProjectComponentKey();
@@ -37,20 +39,16 @@ public class StaticAnalysisResolver {
 
     private List<AnalysedMethodEntry> createMethodEntries(JavaUnit javaUnit, List<SQIssue> sqIssues, List<MethodCoverage> jacocoCoverage) {
         var javaUnitIssues = sqIssues.stream()
-                                               .filter(sqIssue -> sqIssue.getLocation()
-                                                                        .replace("/", ".")
-                                                                        .replace("\\", ".")
-                                                                        .endsWith(javaUnit.getUnitName()))
+                                               .filter(sqIssue -> checkLocation(sqIssue.getLocation(), javaUnit.getFileLocation()))
                                                .filter(sqIssue -> checkIfIssueInJavaUnit(javaUnit, sqIssue))
                                                .map(this::createIssue)
                                                .collect(Collectors.toList());
+
         var javaUnitCoverage = jacocoCoverage.stream()
                                              .filter(coverage -> coverage.getClassName().endsWith(javaUnit.getUnitName()))
                                              .filter(methodCoverage -> checkIfJavaUnitIsCovered(javaUnit, methodCoverage))
                                              .collect(Collectors.toList());
-        if(javaUnit.getUnitName().equals("com.example.OrderManager")) {
-            System.out.println("TEST");
-        }
+
         return javaUnit.getMethods()
                        .stream()
                        .map(methodDeclaration -> new AnalysedMethodEntry(null,
@@ -60,6 +58,14 @@ public class StaticAnalysisResolver {
                                                                          findCoverage(methodDeclaration, javaUnitCoverage),
                                                                          findIssues(methodDeclaration, javaUnitIssues)))
                        .collect(Collectors.toList());
+    }
+
+    private boolean checkLocation(String issueFileLocation, String javaUnitLocation) {
+        if(System.getProperty("os.name").toLowerCase().contains("windows")) {
+            return javaUnitLocation.replace(WINDOWS_SEPARATOR, "/").endsWith(issueFileLocation);
+        } else {
+            return javaUnitLocation.endsWith(issueFileLocation);
+        }
     }
 
     private boolean checkIfIssueInJavaUnit(JavaUnit javaUnit, SQIssue sqIssue) {
