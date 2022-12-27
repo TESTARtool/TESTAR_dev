@@ -215,7 +215,6 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         }
 
         try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
-            db.begin();
             // save the entity!
             entityManager.saveEntity(concreteStateEntity, db);
 
@@ -224,7 +223,6 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
             // optional: if an abstract state is provided, we connect the concrete state to it using an isAbstractedBy relation
             if (concreteState.getAbstractState() == null) {
-              db.commit();
               return;
             }
             EntityClass targetEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
@@ -236,7 +234,6 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             } catch (HydrationException e) {
             e.printStackTrace();
             System.out.println("Encountered a problem while saving abstract state with id " + concreteState.getAbstractState().getStateId() + " to the orient database");
-            db.commit();
             return;
         }
 
