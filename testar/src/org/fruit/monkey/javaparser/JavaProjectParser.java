@@ -35,24 +35,29 @@ public class JavaProjectParser {
     }
 
     private void parseCompilationUnit(CompilationUnit compilationUnit) {
-        for(TypeDeclaration<?> typeDeclaration: compilationUnit.getTypes()) {
-            if(typeDeclaration.isClassOrInterfaceDeclaration()) {
-                parseClass(typeDeclaration.asClassOrInterfaceDeclaration());
+        var fileLocation = compilationUnit.getStorage()
+                                          .map(CompilationUnit.Storage::getPath)
+                                          .map(Path::toString)
+                                          .orElse("");
+        for (TypeDeclaration<?> typeDeclaration : compilationUnit.getTypes()) {
+            if (typeDeclaration.isClassOrInterfaceDeclaration()) {
+                parseClass(typeDeclaration.asClassOrInterfaceDeclaration(), fileLocation);
             } else if (typeDeclaration.isEnumDeclaration()) {
-                parseClass(typeDeclaration.asEnumDeclaration());
+                parseClass(typeDeclaration.asEnumDeclaration(), fileLocation);
             }
         }
     }
 
-    private void parseClass(TypeDeclaration<?> declaration) {
+    private void parseClass(TypeDeclaration<?> declaration, String fileLocation) {
         var javaUnit = new JavaUnit(declaration.getFullyQualifiedName().orElse(""),
-                                   declaration.getMethods().stream()
-                                                           .map(this::parseMethod)
-                                                           .collect(Collectors.toList()));
+                                    fileLocation,
+                                    declaration.getMethods().stream()
+                                               .map(this::parseMethod)
+                                               .collect(Collectors.toList()));
 
         declaration.getMembers().forEach(member -> {
-            if(member.isClassOrInterfaceDeclaration()) {
-                parseClass(member.asClassOrInterfaceDeclaration());
+            if (member.isClassOrInterfaceDeclaration()) {
+                parseClass(member.asClassOrInterfaceDeclaration(), fileLocation);
             } else if (member.isConstructorDeclaration()) {
                 javaUnit.getMethods().add(parseMethod(member.asConstructorDeclaration()));
             }
@@ -61,7 +66,7 @@ public class JavaProjectParser {
     }
 
     private MethodDeclaration parseMethod(CallableDeclaration<?> methodDeclaration) {
-        var methodRange = methodDeclaration.getRange().orElse(new Range(new Position(0,0), new Position(0,0)));
+        var methodRange = methodDeclaration.getRange().orElse(new Range(new Position(0, 0), new Position(0, 0)));
         var parameters = methodDeclaration.getParameters().stream().map(param -> param.getType().toString()).collect(Collectors.toList());
         return new MethodDeclaration(methodDeclaration.isConstructorDeclaration() ? "<init>" : methodDeclaration.getNameAsString(),
                                      parameters,

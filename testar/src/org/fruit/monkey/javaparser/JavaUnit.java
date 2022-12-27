@@ -9,5 +9,6 @@ import java.util.List;
 @AllArgsConstructor
 public class JavaUnit {
     private String unitName;
+    private String fileLocation;
     private List<MethodDeclaration> methods;
 }
