@@ -37,11 +37,22 @@ public class StaticAnalysisResolverTest {
     private JacocoReportParser jacocoReportParser;
 
     @Test
-    public void shouldResolveMethodEntries() {
+    public void shouldResolveMethodEntriesWindows() {
+        System.setProperty("os.name", "Windows 10");
+        shouldResolveMethodEntriesWindows(expectedJavaUnitsWindows());
+    }
+
+    @Test
+    public void shouldResolveMethodEntriesLinux() {
+        System.setProperty("os.name", "Ubuntu 20.04");
+        shouldResolveMethodEntriesWindows(expectedJavaUnitsWindows());
+    }
+
+    public void shouldResolveMethodEntriesWindows(List<JavaUnit> javaUnits) {
         when(jacocoReportParser.parseReport()).thenReturn(List.of());
         when(sonarqubeApiClient.getProjectComponentKey()).thenReturn("");
         when(sonarqubeApiClient.getDetectedIssues(anyString())).thenReturn(List.of());
-        when(javaProjectParser.parseJavaUnits()).thenReturn(expectedJavaUnits());
+        when(javaProjectParser.parseJavaUnits()).thenReturn(javaUnits);
 
         var resolver = new StaticAnalysisResolver(sonarqubeApiClient, jacocoReportParser, javaProjectParser);
 
@@ -53,11 +64,22 @@ public class StaticAnalysisResolverTest {
     }
 
     @Test
-    public void shouldResolveMethodEntriesWithCoverage() {
+    public void shouldResolveMethodEntriesWithCoverageWindows() {
+        System.setProperty("os.name", "Windows 10");
+        shouldResolveMethodEntriesWithCoverage(expectedJavaUnitsWindows());
+    }
+
+    @Test
+    public void shouldResolveMethodEntriesWithCoverageLinux() {
+        System.setProperty("os.name", "Ubuntu 20.04");
+        shouldResolveMethodEntriesWithCoverage(expectedJavaUnitsLinux());
+    }
+
+    public void shouldResolveMethodEntriesWithCoverage(List<JavaUnit> javaUnits) {
         when(jacocoReportParser.parseReport()).thenReturn(expectedCoverage());
         when(sonarqubeApiClient.getProjectComponentKey()).thenReturn("");
         when(sonarqubeApiClient.getDetectedIssues(anyString())).thenReturn(List.of());
-        when(javaProjectParser.parseJavaUnits()).thenReturn(expectedJavaUnits());
+        when(javaProjectParser.parseJavaUnits()).thenReturn(javaUnits);
 
         var resolver = new StaticAnalysisResolver(sonarqubeApiClient, jacocoReportParser, javaProjectParser);
 
@@ -69,11 +91,22 @@ public class StaticAnalysisResolverTest {
     }
 
     @Test
-    public void shouldResolveMethodEntriesWithCoverageAndIssues() {
+    public void shouldResolveMethodEntriesWithCoverageAndIssuesWindows() {
+        System.setProperty("os.name", "Windows 10");
+        shouldResolveMethodEntriesWithCoverageAndIssues(expectedJavaUnitsWindows());
+    }
+
+    @Test
+    public void shouldResolveMethodEntriesWithCoverageAndIssuesLinux() {
+        System.setProperty("os.name", "Ubuntu 20.04");
+        shouldResolveMethodEntriesWithCoverageAndIssues(expectedJavaUnitsLinux());
+    }
+
+    public void shouldResolveMethodEntriesWithCoverageAndIssues(List<JavaUnit> javaUnits) {
         when(jacocoReportParser.parseReport()).thenReturn(expectedCoverage());
         when(sonarqubeApiClient.getProjectComponentKey()).thenReturn("");
         when(sonarqubeApiClient.getDetectedIssues(anyString())).thenReturn(expectedSQIssues());
-        when(javaProjectParser.parseJavaUnits()).thenReturn(expectedJavaUnits());
+        when(javaProjectParser.parseJavaUnits()).thenReturn(javaUnits);
 
         var resolver = new StaticAnalysisResolver(sonarqubeApiClient, jacocoReportParser, javaProjectParser);
 
@@ -193,7 +226,7 @@ public class StaticAnalysisResolverTest {
         );
     }
 
-    private List<JavaUnit> expectedJavaUnits() {
+    private List<JavaUnit> expectedJavaUnitsWindows() {
         return List.of(
                 new JavaUnit("com.example.orderline.OrderLine",
                              "C:\\Users\\Kacper\\Documents\\Marviq\\TESTAR_dev_clean\\testar\\test_resources\\javaparser\\src\\com\\example\\orderline\\OrderLine.java",
@@ -233,6 +266,52 @@ public class StaticAnalysisResolverTest {
 
                 new JavaUnit("com.example.Order",
                              "C:\\Users\\Kacper\\Documents\\Marviq\\TESTAR_dev_clean\\testar\\test_resources\\javaparser\\src\\com\\example\\Order.java",
+                             List.of(
+                                     new MethodDeclaration("<init>", List.of("List<OrderLine>", "BigDecimal"), 6, 9)
+                             ))
+        );
+    }
+
+    private List<JavaUnit> expectedJavaUnitsLinux() {
+        return List.of(
+                new JavaUnit("com.example.orderline.OrderLine",
+                             "/home/testar/TESTAR_dev_clean/testar/test_resources/javaparser/src/com/example/orderline/OrderLine.java",
+                             List.of(
+                                     new MethodDeclaration("<init>", List.of("String"), 7, 13),
+                                     new MethodDeclaration("getProductNumber", List.of(), 19, 39),
+                                     new MethodDeclaration("setProductNumber", List.of("String"), 99, 120)
+                             )),
+
+                new JavaUnit("com.example.OrderManager",
+                             "/home/testar/TESTAR_dev_clean/testar/test_resources/javaparser/src/com/example/OrderManager.java",
+                             List.of(
+                                     new MethodDeclaration("<init>", List.of(), 200, 249),
+                                     new MethodDeclaration("submitOrder", List.of("List<OrderLine>", "BigDecimal"), 250, 300)
+                             )),
+
+                new JavaUnit("com.example.OrderManager.OrderFactoryImpl",
+                             "/home/testar/TESTAR_dev_clean/testar/test_resources/javaparser/src/com/example/OrderManager.java",
+                             List.of(
+                                     new MethodDeclaration("createOrder", List.of("List<OrderLine>", "BigDecimal"), 301, 350)
+                             )),
+
+                new JavaUnit("com.example.OrderManager.Bill",
+                             "/home/testar/TESTAR_dev_clean/testar/test_resources/javaparser/src/com/example/OrderManager.java",
+                             List.of(
+                                     new MethodDeclaration("<init>", List.of("String", "BigDecimal"), 3, 30),
+                                     new MethodDeclaration("prepareBill", List.of("String", "BigDecimal"), 48, 60),
+                                     new MethodDeclaration("prepareBill", List.of("BigDecimal"), 99, 111),
+                                     new MethodDeclaration("prepareBill", List.of("String", "com.example.monetary.BigDecimal"), 148, 151)
+                             )),
+
+                new JavaUnit("com.example.OrderFactory",
+                             "/home/testar/TESTAR_dev_clean/testar/test_resources/javaparser/src/com/example/OrderFactory.java",
+                             List.of(
+                                     new MethodDeclaration("createOrder", List.of("List<OrderLine>", "BigDecimal"), 6, 6)
+                             )),
+
+                new JavaUnit("com.example.Order",
+                             "/home/testar/TESTAR_dev_clean/testar/test_resources/javaparser/src/com/example/Order.java",
                              List.of(
                                      new MethodDeclaration("<init>", List.of("List<OrderLine>", "BigDecimal"), 6, 9)
                              ))
