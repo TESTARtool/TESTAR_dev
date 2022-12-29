@@ -89,9 +89,13 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             entityClassSet.add(EntityClassFactory.createEntityClass(className));
         }
         // make sure the entityclasses are sorted by dependency on super classes first
-        for (EntityClass entityClass : DependencyHelper.sortDependenciesForDeletion(entityClassSet)) {
+        try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
+//          db.begin();
+          for (EntityClass entityClass : DependencyHelper.sortDependenciesForDeletion(entityClassSet)) {
             System.out.println("Creating " + entityClass.getClassName() + " - " + entityClass.getSuperClassName());
-            entityManager.createClass(entityClass);
+            entityManager.createClass(entityClass, db);
+          }
+//          db.commit();
         }
     }
 
@@ -104,7 +108,6 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
     @Override
     public void persistAbstractState(AbstractState abstractState) {
-        entityManager.getConnection().getDatabaseSession().begin();
         // create an entity to persist to the database
         EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
         VertexEntity abstractStateEntity = new VertexEntity(entityClass);
@@ -116,20 +119,22 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         } catch (HydrationException e) {
             e.printStackTrace();
             System.out.println("Encountered a problem while saving abstract state with id " + abstractState.getStateId() + " to the orient database");
-            entityManager.getConnection().getDatabaseSession().commit();
             return;
         }
 
         // save the entity!
-        entityManager.saveEntity(abstractStateEntity);
+      try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
+        db.begin();
+        entityManager.saveEntity(abstractStateEntity, db);
 
         // deal with the unvisited actions on the states
-        persistUnvisitedActions(abstractState, abstractStateEntity);
-        entityManager.getConnection().getDatabaseSession().commit();
+      persistUnvisitedActions(abstractState, abstractStateEntity, db);
+      db.commit();
+      }
     }
 
-    private void persistUnvisitedActions(AbstractState abstractState, VertexEntity abstractStateEntity) {
-        entityManager.getConnection().getDatabaseSession().begin();
+    private void persistUnvisitedActions(AbstractState abstractState, VertexEntity abstractStateEntity, ODatabaseSession db) {
+        db.begin();
         abstractStateEntity.enableUpdate(false);
 
         // prepare the black hole entity that is needed for the unvisited actions
@@ -143,7 +148,6 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         catch (HydrationException ex) {
             ex.printStackTrace();
             System.out.println("Encountered a problem while hydrating the black hole class for state " + abstractState.getStateId());
-            entityManager.getConnection().getDatabaseSession().commit();
             return;
         }
 
@@ -155,37 +159,36 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         Set<AbstractAction> visitedActions = abstractState.getVisitedActions();
         // we need to prepare the unique action id's that are used in orientdb, so that we can delete them.
         Set<Object> visitedActionIds = new HashSet<>();
+      EntityClass unvisitedActionEntityClass = null;
         for (AbstractAction action : visitedActions) {
-            String sourceId = (String)abstractStateEntity.getPropertyValue("uid").getValue();
-            String targetId = (String)blackHole.getPropertyValue("blackHoleId").getValue();
-            String actionId = action.getActionId();
-            String modelIdentifier = abstractState.getModelIdentifier();
-            visitedActionIds.add(HydrationHelper.createOrientDbActionId(sourceId, targetId, actionId, modelIdentifier));
+          String sourceId = (String) abstractStateEntity.getPropertyValue("uid").getValue();
+          String targetId = (String) blackHole.getPropertyValue("blackHoleId").getValue();
+          String actionId = action.getActionId();
+          String modelIdentifier = abstractState.getModelIdentifier();
+          visitedActionIds.add(HydrationHelper.createOrientDbActionId(sourceId, targetId, actionId, modelIdentifier));
         }
         // then do a batch delete from the database
-        EntityClass unvisitedActionEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.UnvisitedAbstractAction);
-        entityManager.deleteEntities(unvisitedActionEntityClass, visitedActionIds);
+        /*EntityClass */unvisitedActionEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.UnvisitedAbstractAction);
+        entityManager.deleteEntities(unvisitedActionEntityClass, visitedActionIds, db);
 
         // step 2:
         // all unvisited actions go to the black hole vertex!
         try {
-            EntityHydrator actionHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_ACTION);
-            for (AbstractAction unvisitedAction : abstractState.getUnvisitedActions()) {
-                EdgeEntity actionEntity = new EdgeEntity(unvisitedActionEntityClass, abstractStateEntity, blackHole);
-                actionEntity.enableUpdate(false);
-                actionHydrator.hydrate(actionEntity, unvisitedAction);
-                entityManager.saveEntity(actionEntity);
-            }
+          EntityHydrator actionHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_ACTION);
+          for (AbstractAction unvisitedAction : abstractState.getUnvisitedActions()) {
+            EdgeEntity actionEntity = new EdgeEntity(unvisitedActionEntityClass, abstractStateEntity, blackHole);
+            actionEntity.enableUpdate(false);
+            actionHydrator.hydrate(actionEntity, unvisitedAction);
+            entityManager.saveEntity(actionEntity, db);
+          }
+        } catch (HydrationException ex) {
+          System.out.println(ex.getMessage());
+        } catch (NullPointerException ex) {
+          ex.printStackTrace();
+          System.out.println(ex.getMessage());
+          exit(1);
         }
-        catch (HydrationException ex) {
-            System.out.println(ex.getMessage());
-        }
-        catch (NullPointerException ex) {
-            ex.printStackTrace();
-            System.out.println(ex.getMessage());
-            exit(1);
-        }
-        entityManager.getConnection().getDatabaseSession().commit();
+        db.commit();
     }
 
     @Override
@@ -195,7 +198,6 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
     @Override
     public void persistConcreteState(ConcreteState concreteState) {
-        entityManager.getConnection().getDatabaseSession().begin();
         // create an entity to persist to the database
         EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.ConcreteState);
         VertexEntity concreteStateEntity = new VertexEntity(entityClass);
@@ -209,31 +211,29 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         catch (HydrationException e) {
             e.printStackTrace();
             System.out.println("Encountered a problem while saving concrete state with id " + concreteState.getId() + " to the orient database");
-            entityManager.getConnection().getDatabaseSession().commit();
             return;
         }
 
-        // save the entity!
-        entityManager.saveEntity(concreteStateEntity);
+        try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
+            // save the entity!
+            entityManager.saveEntity(concreteStateEntity, db);
 
-        // store the widgettree attached to this concrete state
-        persistWidgetTree(concreteState, concreteStateEntity);
+            // store the widgettree attached to this concrete state
+            persistWidgetTree(concreteState, concreteStateEntity, db);
 
-        // optional: if an abstract state is provided, we connect the concrete state to it using an isAbstractedBy relation
-        if (concreteState.getAbstractState() == null) {
-            entityManager.getConnection().getDatabaseSession().commit();
-            return;
-        }
-        EntityClass targetEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
-        VertexEntity abstractStateEntity = new VertexEntity(targetEntityClass);
-        // hydrate the entity to a format the orient database can store
-        try {
-            EntityHydrator hydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_STATE);
-            hydrator.hydrate(abstractStateEntity, concreteState.getAbstractState());
-        } catch (HydrationException e) {
+            // optional: if an abstract state is provided, we connect the concrete state to it using an isAbstractedBy relation
+            if (concreteState.getAbstractState() == null) {
+              return;
+            }
+            EntityClass targetEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
+            VertexEntity abstractStateEntity = new VertexEntity(targetEntityClass);
+            // hydrate the entity to a format the orient database can store
+            try {
+              EntityHydrator hydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_STATE);
+              hydrator.hydrate(abstractStateEntity, concreteState.getAbstractState());
+            } catch (HydrationException e) {
             e.printStackTrace();
             System.out.println("Encountered a problem while saving abstract state with id " + concreteState.getAbstractState().getStateId() + " to the orient database");
-            entityManager.getConnection().getDatabaseSession().commit();
             return;
         }
 
@@ -247,26 +247,26 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         edgeEntity.enableUpdate(false);
 
         try {
-            EntityHydrator entityHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACTED_BY);
-            entityHydrator.hydrate(edgeEntity, null);
+          EntityHydrator entityHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACTED_BY);
+          entityHydrator.hydrate(edgeEntity, null);
+        } catch (HydrationException ex) {
+          //@todo add some meaningful logging here as well
         }
-        catch (HydrationException ex) {
-            //@todo add some meaningful logging here as well
-        }
-        entityManager.saveEntity(edgeEntity);
-        entityManager.getConnection().getDatabaseSession().commit();
+        entityManager.saveEntity(edgeEntity, db);
+        db.commit();
+      }
     }
 
     /**
      * This method will store a widget tree to the orient database.
      * @param widget
      */
-    private void persistWidgetTree(Widget widget, VertexEntity widgetEntity) {
+    private void persistWidgetTree(Widget widget, VertexEntity widgetEntity, ODatabaseSession db) {
         widgetEntity.enableUpdate(false);
         // we assume the root widget of the tree has already been stored, as this will be the concrete state
         // we loop through the child widgets and for each widget, store the widget and then store the needed edges between them
         for (Widget childWidget : widget.getChildren()) {
-            VertexEntity childWidgetEntity = persistWidget(childWidget);
+            VertexEntity childWidgetEntity = persistWidget(childWidget, db);
             if (childWidgetEntity == null) {
                 System.out.println("Encountered an error persisting the widget with id " + childWidget.getId());
                 return;
@@ -288,10 +288,10 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
                 System.out.println("Encountered a problem while saving the inter-widget relation to the orient database");
                 return;
             }
-            entityManager.saveEntity(isChildEntity);
+            entityManager.saveEntity(isChildEntity, db);
 
             // go down the widget tree and do it again
-            persistWidgetTree(childWidget, childWidgetEntity);
+            persistWidgetTree(childWidget, childWidgetEntity, db);
         }
     }
 
@@ -300,7 +300,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
      * @param widget
      * @return
      */
-    private VertexEntity persistWidget(Widget widget) {
+    private VertexEntity persistWidget(Widget widget, ODatabaseSession db) {
         // create an entity to persist to the database
         EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.Widget);
         VertexEntity vertexEntity = new VertexEntity(entityClass);
@@ -318,7 +318,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         }
 
         // save the widget
-        entityManager.saveEntity(vertexEntity);
+        entityManager.saveEntity(vertexEntity, db);
         return vertexEntity;
     }
 
@@ -365,8 +365,10 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         catch (HydrationException ex) {
             //@todo add some meaningful logging here as well
         }
-        entityManager.saveEntity(actionEntity);
-        entityManager.getConnection().getDatabaseSession().commit();
+
+        try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
+            entityManager.saveEntity(actionEntity, db);
+        }
     }
 
     @Override
@@ -414,8 +416,9 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             //@todo add some meaningful logging here as well
         }
         actionEntity.enableUpdate(false);
-        entityManager.saveEntity(actionEntity);
-        entityManager.getConnection().getDatabaseSession().commit();
+        try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
+            entityManager.saveEntity(actionEntity, db);
+        }
     }
 
     @Override
@@ -470,7 +473,9 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
         // step 1: persist the state model entity to the database. if it already exists, nothing will happen
         stateModelEntity.enableUpdate(false);
-        entityManager.saveEntity(stateModelEntity);
+        try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
+          entityManager.saveEntity(stateModelEntity, db);
+        }
 
         // step 2: see if there are abstract states present in the data store that are tied to this abstract state model
         EntityClass abstractStateClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
@@ -482,43 +487,47 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         if (stateModelClassIdentifier == null) throw new RuntimeException("Error occurred: abstract state model does not have an id property set.");
         entityProperties.put("modelIdentifier", stateModelEntity.getPropertyValue(stateModelClassIdentifier.getPropertyName()));
 
-        Set<DocumentEntity> retrievedDocuments = entityManager.retrieveAllOfClass(abstractStateClass, entityProperties);
-        if (retrievedDocuments.isEmpty()) {
-            System.out.println("Could not find abstract states in the model");
-        }
-        else {
-            // we need to create the abstract states from the returned document entities
-            try {
-                EntityExtractor<AbstractState> abstractStateExtractor = ExtractorFactory.getExtractor(ExtractorFactory.EXTRACTOR_ABSTRACT_STATE);
-                for (DocumentEntity documentEntity : retrievedDocuments) {
-                    AbstractState abstractState = abstractStateExtractor.extract(documentEntity, abstractStateModel);
-                    abstractStateModel.addState(abstractState);
-                }
-            } catch (ExtractionException | StateModelException e) {
-                e.printStackTrace();
-            }
-        }
+        try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
+          db.begin();
+          Set<DocumentEntity> retrievedDocuments = entityManager.retrieveAllOfClass(abstractStateClass, entityProperties, db);
+          if (retrievedDocuments.isEmpty()) {
+              System.out.println("Could not find abstract states in the model");
+          }
+          else {
+              // we need to create the abstract states from the returned document entities
+              try {
+                  EntityExtractor<AbstractState> abstractStateExtractor = ExtractorFactory.getExtractor(ExtractorFactory.EXTRACTOR_ABSTRACT_STATE);
+                  for (DocumentEntity documentEntity : retrievedDocuments) {
+                      AbstractState abstractState = abstractStateExtractor.extract(documentEntity, abstractStateModel);
+                      abstractStateModel.addState(abstractState);
+                  }
+              } catch (ExtractionException | StateModelException e) {
+                  e.printStackTrace();
+              }
+          }
 
-        // step 3: fetch the transitions from the database
-        EntityClass abstractActionClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractAction);
-        if (abstractActionClass == null) throw new RuntimeException("Error occurred: could not retrieve an abstract action entity class");
+          // step 3: fetch the transitions from the database
+          EntityClass abstractActionClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractAction);
+          if (abstractActionClass == null) throw new RuntimeException("Error occurred: could not retrieve an abstract action entity class");
 
-        retrievedDocuments = entityManager.retrieveAllOfClass(abstractActionClass, entityProperties);
-        if (retrievedDocuments.isEmpty()) {
-            System.out.println("Could not find abstract actions in the model");
-        }
-        else {
-            System.out.println(retrievedDocuments.size() + " number of abstract actions were returned");
-            // we need to create the transitions from the returned document entities
-            try {
-                EntityExtractor<AbstractStateTransition> abstractStateTransitionEntityExtractor = ExtractorFactory.getExtractor(ExtractorFactory.EXTRACTOR_ABSTRACT_STATE_TRANSITION);
-                for (DocumentEntity documentEntity : retrievedDocuments) {
-                    AbstractStateTransition abstractStateTransition = abstractStateTransitionEntityExtractor.extract(documentEntity, abstractStateModel);
-                    abstractStateModel.addTransition( abstractStateTransition.getSourceState(), abstractStateTransition.getTargetState(), abstractStateTransition.getAction());
-                }
-            } catch (ExtractionException | StateModelException e) {
-                e.printStackTrace();
-            }
+            retrievedDocuments = entityManager.retrieveAllOfClass(abstractActionClass, entityProperties, db);
+          if (retrievedDocuments.isEmpty()) {
+              System.out.println("Could not find abstract actions in the model");
+          }
+          else {
+              System.out.println(retrievedDocuments.size() + " number of abstract actions were returned");
+              // we need to create the transitions from the returned document entities
+              try {
+                  EntityExtractor<AbstractStateTransition> abstractStateTransitionEntityExtractor = ExtractorFactory.getExtractor(ExtractorFactory.EXTRACTOR_ABSTRACT_STATE_TRANSITION);
+                  for (DocumentEntity documentEntity : retrievedDocuments) {
+                      AbstractStateTransition abstractStateTransition = abstractStateTransitionEntityExtractor.extract(documentEntity, abstractStateModel);
+                      abstractStateModel.addTransition( abstractStateTransition.getSourceState(), abstractStateTransition.getTargetState(), abstractStateTransition.getAction());
+                  }
+              } catch (ExtractionException | StateModelException e) {
+                  e.printStackTrace();
+              }
+          }
+          db.commit();
         }
 
         // enable the event listener again
@@ -536,7 +545,9 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             e.printStackTrace();
         }
 
-        entityManager.saveEntity(vertexEntity);
+        try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
+          entityManager.saveEntity(vertexEntity, db);
+        }
     }
 
     @Override
@@ -578,37 +589,41 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             System.out.println("Encountered a problem while hydrating the accessed relation for sequence node " + sequenceNode.getNodeId());
         }
 
-        entityManager.saveEntity(accessedEdge);
+        try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
+          db.begin();
+          entityManager.saveEntity(accessedEdge, db);
 
-        // if this is the first node in the sequence, we also have to create a relation between the sequence and this node to indicate this
-        if (!sequenceNode.isFirstNode() || sequenceNode.getSequence() == null) return;
+          // if this is the first node in the sequence, we also have to create a relation between the sequence and this node to indicate this
+          if (!sequenceNode.isFirstNode() || sequenceNode.getSequence() == null) return;
 
-        // no need to update the node again
-        nodeEntity.enableUpdate(false);
+          // no need to update the node again
+          nodeEntity.enableUpdate(false);
 
-        // create a vertex entity for the test sequence
-        EntityClass sequenceClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.TestSequence);
-        VertexEntity sequenceEntity = new VertexEntity(sequenceClass);
-        try {
+          // create a vertex entity for the test sequence
+          EntityClass sequenceClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.TestSequence);
+          VertexEntity sequenceEntity = new VertexEntity(sequenceClass);
+          try {
             EntityHydrator sequenceHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_SEQUENCE);
             sequenceHydrator.hydrate(sequenceEntity, sequenceNode.getSequence());
-        } catch (HydrationException e) {
+          } catch (HydrationException e) {
             e.printStackTrace();
-        }
-        // no need to update the sequence either
-        sequenceEntity.enableUpdate(false);
+          }
+          // no need to update the sequence either
+          sequenceEntity.enableUpdate(false);
 
-        // now an edge entity for the relation
-        EntityClass firstNodeClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.FirstNode);
-        EdgeEntity firstNodeEntity = new EdgeEntity(firstNodeClass, sequenceEntity, nodeEntity);
-        try {
+          // now an edge entity for the relation
+          EntityClass firstNodeClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.FirstNode);
+          EdgeEntity firstNodeEntity = new EdgeEntity(firstNodeClass, sequenceEntity, nodeEntity);
+          try {
             EntityHydrator firstNodeHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_FIRST_NODE);
             firstNodeHydrator.hydrate(firstNodeEntity, null);
-        } catch (HydrationException e) {
+          } catch (HydrationException e) {
             e.printStackTrace();
-        }
+          }
 
-        entityManager.saveEntity(firstNodeEntity);
+          entityManager.saveEntity(firstNodeEntity, db);
+          db.commit();
+        }
     }
 
     @Override
@@ -647,7 +662,9 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             e.printStackTrace();
         }
 
-        entityManager.saveEntity(step);
+        try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
+          entityManager.saveEntity(step, db);
+        }
     }
 
     @Override
