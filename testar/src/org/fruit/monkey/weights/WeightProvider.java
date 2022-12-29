@@ -15,10 +15,13 @@ public class WeightProvider {
     private boolean isPreparing;
 
     public boolean startPreparingVerdict() {
-        return false;
+        isPreparing = btraceApiClient.startRecordingMethodInvocation();
+        return isPreparing;
     }
 
     public WeightVerdict provideWeightVerdict() {
-        return null;
+        var recordedMethods = btraceApiClient.finishRecordingMethodInvocation();
+        isPreparing = false;
+        return weightCalculator.calculateWeight(recordedMethods, repository);
     }
 }
