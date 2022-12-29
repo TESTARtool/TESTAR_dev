@@ -1,12 +1,18 @@
 package nl.ou.testar.parser;
 
-import org.fruit.Pair;
-import org.fruit.alayer.Action;
-
 import static org.junit.Assert.*;
 
-import org.fruit.alayer.actions.*;
 import org.junit.Test;
+import org.testar.monkey.Pair;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.actions.CompoundAction;
+import org.testar.monkey.alayer.actions.KeyDown;
+import org.testar.monkey.alayer.actions.KeyUp;
+import org.testar.monkey.alayer.actions.MouseDown;
+import org.testar.monkey.alayer.actions.MouseMove;
+import org.testar.monkey.alayer.actions.MouseUp;
+import org.testar.monkey.alayer.actions.Type;
+
 import java.util.List;
 
 public class ActionParserTest {

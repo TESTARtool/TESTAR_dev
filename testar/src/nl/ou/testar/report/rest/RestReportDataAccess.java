@@ -260,6 +260,7 @@ public class RestReportDataAccess implements ReportDataAccess {
                 new BasicNameValuePair("totalSequences", String.valueOf(totalSequences)),
                 new BasicNameValuePair("url", url));
         } catch (ReportNetworkException | ReportParseException e) {
+            e.printStackTrace();
             throw new ReportDataException("Failed to finalize report: " + e.getMessage());
     }
     }
@@ -532,7 +533,8 @@ public class RestReportDataAccess implements ReportDataAccess {
             ClassicHttpResponse response = httpClient.execute(request);
             if (response.getCode() != HttpStatus.SC_OK) {
                 System.err.println(String.format("Failed to PUT data to %s: %d %s", uri, response.getCode(), response.getReasonPhrase()));
-                throw new ReportNetworkException(response.getReasonPhrase(), uri);
+                System.err.println(response);
+                throw new ReportNetworkException(uri, response.getReasonPhrase());
             }
             String responseString = EntityUtils.toString(response.getEntity());
             return responseString;

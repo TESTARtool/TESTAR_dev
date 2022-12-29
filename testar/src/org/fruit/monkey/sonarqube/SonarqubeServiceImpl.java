@@ -281,15 +281,21 @@ public class SonarqubeServiceImpl implements SonarqubeService {
 //        projectStream.close();
 
         final HostConfig hostConfig = HostConfig.newHostConfig()
-                .withBinds(new Bind(sourcePath/* + "/" + projectSubdir*/, new Volume("/usr/src")));
+                .withBinds(new Bind(sourcePath/* + "/" + projectSubdir*/, new Volume("/usr/src")))
+                .withCpuCount(4L);
         final String dockerfileContent =
                 "FROM sonarsource/sonar-scanner-cli:latest AS sonarqube_scan\n" +
-                "ENV SONAR_HOST_URL http://sonarqube:9000\n" +
+                "ENV SONAR_HOST_URL http://testar-sonarqube:9000\n" +
                 "ENV SONAR_TOKEN " + token  + "\n" +
                 "ENV SRC_PATH /usr/src/" + projectSubdir + "\n" +
+//                "ENV MAVEN_OPTS -javaagent:/usr/jacoco/org.jacoco.agent-0.8.8-runtime.jar=destfile=/usr/src/report/jacoco.exec,includes=*,jmx=true,dumponexit=true\n" +
+//                "RUN mkdir /usr/jacoco\n" +
+                "RUN apk add maven openjdk11\n" +
+
+//                "RUN wget https://repo1.maven.org/maven2/org/jacoco/org.jacoco.agent/0.8.8/org.jacoco.agent-0.8.8-runtime.jar -P /usr/jacoco\n" +
+//                "RUN mkdir /usr/src/report\n" +
                 "WORKDIR /usr/src/"  + projectSubdir + "\n" +
                 //"RUN if [ -f \"./pom.xml\" ] || [ -f \"gradlew\" ]; then apk add maven openjdk11; fi\n" +
-                "RUN apk add openjdk11\n" +
                 //"RUN apk add maven openjdk11\n" +
                 "CMD mvn org.jacoco:jacoco-maven-plugin:0.8.8:prepare-agent verify org.jacoco:jacoco-maven-plugin:0.8.2:report sonar:sonar -Dsonar.java.coveragePlugin=jacoco";// -D sonar.projectKey=yoho-be -D sonar.host.url=http://sonarqube:9000 -D sonar.login=" + token + ";";
                 // "CMD if ! [ -f \"sonar-project.properties\"]; then printf \"sonar.projectKey=" + projectKey +

@@ -30,8 +30,6 @@
 
 package org.testar.reporting;
 
-import static org.junit.jupiter.api.Assertions.assertSame;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
