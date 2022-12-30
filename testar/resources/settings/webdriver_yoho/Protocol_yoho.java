@@ -1,5 +1,14 @@
 import nl.ou.testar.resolver.MySQLSerialResolver;
 import nl.ou.testar.resolver.OrientDBSerialResolver;
+import org.fruit.monkey.btrace.BtraceApiClient;
+import org.fruit.monkey.weights.FileAnalysedMethodEntryRepository;
+import org.fruit.monkey.weights.WeightCalculator;
+import org.fruit.monkey.weights.WeightProvider;
+import org.fruit.monkey.weights.WeightVerdict;
+import org.openqa.selenium.logging.LogEntries;
+import org.openqa.selenium.logging.LogEntry;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.ActionSelector;
 import org.testar.SutVisualization;
 import org.testar.monkey.ConfigTags;
@@ -19,6 +28,9 @@ import org.testar.protocols.WebdriverProtocol;
 import org.testar.simplestategraph.QLearningActionSelector;
 
 import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,6 +39,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
@@ -43,6 +58,9 @@ public class Protocol_yoho extends WebdriverProtocol {
     // protected OrientDBSerialResolver orientDbSerialResolver;
 
     protected QLearningActionSelector qlActionSelector;
+    protected WeightProvider weightProvider;
+
+    private static final BigDecimal WEIGHT_VERDICT_THRESHOLD = new BigDecimal(40);
 
     @Override
     protected void initialize(Settings settings) {
@@ -56,6 +74,12 @@ public class Protocol_yoho extends WebdriverProtocol {
         qlActionSelector = new QLearningActionSelector(settings.get(ConfigTags.MaxReward),
                 settings.get(ConfigTags.Discount));
 
+        weightProvider = new WeightProvider(
+                new FileAnalysedMethodEntryRepository(),
+                new BtraceApiClient(settings.get(ConfigTags.BtraceServiceHost)),
+                new WeightCalculator()
+        );
+
         // List of atributes to identify and close policy popups
         // Set to null to disable this feature
         policyAttributes = new HashMap<String, String>() {
@@ -67,6 +91,13 @@ public class Protocol_yoho extends WebdriverProtocol {
         // DemoResolver demoResolver = new DemoResolver();
         // demoResolver.setNextResolver(this);
         // setActionResolver(demoResolver);
+    }
+
+    @Override
+    protected boolean executeAction(SUT system, State state, Action action) {
+        weightProvider.startPreparingVerdict();
+        boolean result = super.executeAction(system, state, action);
+        return result;
     }
 
     // Jam logging if disabled
@@ -331,6 +362,34 @@ public class Protocol_yoho extends WebdriverProtocol {
             }
         }
         return null;
+    }
+
+    @Override
+    protected Verdict getVerdict(State state) {
+        Verdict stateVerdict = super.getVerdict(state);
+        if(weightProvider.isPreparing()) {
+            var weightVerdict = weightProvider.provideWeightVerdict();
+            stateVerdict.join(deriveVerdict(weightVerdict));
+        }
+        return stateVerdict;
+    }
+
+    private Verdict deriveVerdict(WeightVerdict weightVerdict) {
+        if(weightVerdict.getSeverityVerdict().compareTo(WEIGHT_VERDICT_THRESHOLD) >= 0) {
+            return new Verdict(Verdict.SEVERITY_MAX,
+                               String.format("Static analysis verdict: Static analysis score above threshold: %s",
+                                             weightVerdict.getSeverityVerdict()));
+        } else {
+            return new Verdict(calculateSeverity(weightVerdict.getSeverityVerdict()),
+                               String.format("Static analysis verdict: Static analysis under threshold: %s",
+                                                                               weightVerdict.getSeverityVerdict()));
+        }
+    }
+
+    private double calculateSeverity(BigDecimal weightVerdictSeverity) {
+        return weightVerdictSeverity.divide(WEIGHT_VERDICT_THRESHOLD, MathContext.DECIMAL64)
+                                    .doubleValue();
+
     }
 
     @Override

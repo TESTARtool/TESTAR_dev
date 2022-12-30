@@ -21,6 +21,7 @@ public class WeightProvider {
 
     public WeightVerdict provideWeightVerdict() {
         var recordedMethods = btraceApiClient.finishRecordingMethodInvocation();
+        System.out.println("RECEIVED RECORDED METHODS: " + recordedMethods);
         isPreparing = false;
         return weightCalculator.calculateWeight(recordedMethods, repository);
     }

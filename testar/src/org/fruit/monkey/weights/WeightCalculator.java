@@ -30,6 +30,9 @@ public class WeightCalculator {
     private final static BigDecimal COVERAGE_COEFFICIENT = BigDecimal.valueOf(0.2);
 
     public WeightVerdict calculateWeight(List<MethodInvocation> methodInvocations, AnalysedMethodEntryRepository repository) {
+        if(methodInvocations.isEmpty()) {
+            return WeightVerdict.zero();
+        }
         var analysedMethodEntriesToInclude = extractAnalysedMethodEntries(methodInvocations, repository);
         var overallScore = ISSUES_COEFFICIENT.multiply(calculateIssuesScore(analysedMethodEntriesToInclude))
                                              .add(COVERAGE_COEFFICIENT.multiply(calculateCoverageScore(analysedMethodEntriesToInclude)));

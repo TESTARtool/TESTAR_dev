@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "/Users/michaeltikhonenko/Downloads/chromedriver" "1920x900+0+0" "https://app.yohoapp.io/web/app/dashboard/work-in-progress"
+SUTConnectorValue = "/Users/michaeltikhonenko/Downloads/chromedriver" "1920x900+0+0" "https://tst.yoho.marviq.net/web/app/dashboard/work-in-progress"
 
 #################################################################
 # Sequences
@@ -213,12 +213,12 @@ ApplicationVersion = 1.0
 ReplayApplicationName = yoho
 ReplayApplicationVersion = 1.0
 
-ForcedLoginUrl = https://app.yohoapp.io/web/login
+ForcedLoginUrl = https://tst.yoho.marviq.net/web/login
 ForcedLoginInputKeyAttribute = id
 ForcedLoginUsernameInputName = mat-input-0
-ForcedLoginUsername = +48500000005
+ForcedLoginUsername = +48500000003
 ForcedLoginPasswordInputName = mat-input-1
-ForcedLoginPassword = yohopin2022
+ForcedLoginPassword = password
 ReportApiUrl = http://localhost:8888/api
 
 WebConsoleErrorOracle = true
@@ -227,3 +227,5 @@ WebConsoleWarningOracle = true
 WebConsoleWarningPattern = .*
 
 FaultThreshold = 0.1
+
+BtraceServiceHost = http://tst.yoho.marviq.net

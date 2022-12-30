@@ -196,6 +196,8 @@ public final class ConfigTags {
   public static final Tag<String> ForcedLoginPasswordInputName = Tag.from("ForcedLoginPasswordInputName", String.class);
   public static final Tag<String> ForcedLoginPassword = Tag.from("ForcedLoginPassword", String.class);
 
+  public static final Tag<String> BtraceServiceHost = Tag.from("BtraceServiceHost", String.class);
+
   /*
   //TODO web driver settings for login feature
   public static final Tag<Pair<String, String>> Login = Tag.from("Login", (Class<Pair<String, String>>) (Class<?>) Pair.class);
