@@ -1,11 +1,11 @@
 package org.fruit.monkey.weights;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,8 +17,17 @@ public class FileAnalysedMethodEntryRepository implements AnalysedMethodEntryRep
     private final String filePath;
     private HashMap<String, ArrayList<AnalysedMethodEntry>> methodEntries;
 
+    private static final String DEFAULT_REPOSITORY_FILE_PATH = "static-analysis-repository";
+
     public FileAnalysedMethodEntryRepository(String filePath) {
         this.filePath = filePath;
+    }
+
+    public FileAnalysedMethodEntryRepository() {
+        this.filePath = Paths.get(System.getProperty("user.dir"))
+                             .getParent()
+                             .resolve(DEFAULT_REPOSITORY_FILE_PATH)
+                             .toString();
     }
 
     @Override
@@ -37,7 +46,7 @@ public class FileAnalysedMethodEntryRepository implements AnalysedMethodEntryRep
             this.methodEntries = (HashMap<String, ArrayList<AnalysedMethodEntry>>) objectInputStream.readObject();
         } catch (IOException e) {
             throw FileRepositoryException.repositoryFileNotFound(filePath, e);
-        } catch (ClassNotFoundException e){
+        } catch (ClassNotFoundException e) {
             throw FileRepositoryException.repositoryFileDeserializationIssue(filePath, e);
         }
     }

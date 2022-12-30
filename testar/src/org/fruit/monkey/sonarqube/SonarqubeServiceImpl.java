@@ -1,7 +1,11 @@
 package org.fruit.monkey.sonarqube;
 
 import com.github.dockerjava.api.async.ResultCallback;
-import com.github.dockerjava.api.model.*;
+import com.github.dockerjava.api.model.Bind;
+import com.github.dockerjava.api.model.HostConfig;
+import com.github.dockerjava.api.model.PortBinding;
+import com.github.dockerjava.api.model.Volume;
+import com.github.dockerjava.api.model.WaitResponse;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.hc.client5.http.classic.HttpClient;
@@ -9,7 +13,11 @@ import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
-import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.codehaus.jettison.json.JSONException;
@@ -17,22 +25,31 @@ import org.codehaus.jettison.json.JSONObject;
 import org.fruit.monkey.TestarServiceException;
 import org.fruit.monkey.docker.DockerPoolService;
 import org.fruit.monkey.docker.DockerPoolServiceImpl;
+import org.fruit.monkey.jacoco.JacocoReportParser;
+import org.fruit.monkey.javaparser.JavaProjectParser;
+import org.fruit.monkey.sonarqube.api.SonarqubeApiClient;
 import org.fruit.monkey.sonarqube.model.SQComponent;
 import org.fruit.monkey.sonarqube.model.SQPage;
+import org.fruit.monkey.weights.FileAnalysedMethodEntryRepository;
+import org.fruit.monkey.weights.StaticAnalysisResolver;
 
-import java.io.*;
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class SonarqubeServiceImpl implements SonarqubeService {
 
     private final String serviceId;
-    private HttpClient httpClient ;
+    private HttpClient httpClient;
     private DockerPoolService dockerPoolService;
     private SonarqubeServiceDelegate delegate;
+
+    private String token;
 
     private Gson gson = new Gson();
 
@@ -79,14 +96,13 @@ public class SonarqubeServiceImpl implements SonarqubeService {
             }
 
             HostConfig hostConfig = HostConfig.newHostConfig()
-                    .withPortBindings(PortBinding.parse("9000:9000"));
+                                              .withPortBindings(PortBinding.parse("9000:9000"));
 
             try {
                 final String serviceImageId = dockerPoolService.buildImage(confDir, "FROM sonarqube:latest\n");
                 dockerPoolService.startWithImage(serviceImageId, "sonarqube", hostConfig, null,
-                  DockerPoolService.StrategyIfPresent.REINSTALL);
-            }
-            catch (Exception e) {
+                                                 DockerPoolService.StrategyIfPresent.REINSTALL);
+            } catch (Exception e) {
                 System.out.println("Cannot build Sonarqube image");
                 e.printStackTrace();
                 if (delegate != null) {
@@ -102,13 +118,12 @@ public class SonarqubeServiceImpl implements SonarqubeService {
                 delegate.onStatusChange("Waiting for response", null, null);
             }
 
-            String token = null;
             String errorMessage = "Could not register on a local service";
 
             try {
                 token = obtainServiceToken(projectKey, projectName);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
+                e.printStackTrace();
                 errorMessage = e.getLocalizedMessage();
             }
 
@@ -132,6 +147,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
                 scannerContainerId = createAndStartScanner(projectSourceDir, projectKey, projectName, projectSubdir, token);
                 System.out.println("Scanner container ID: " + scannerContainerId);
             } catch (Exception e) {
+                e.printStackTrace();
                 delegate.onError(SonarqubeServiceDelegate.ErrorCode.CONNECTION_ERROR, e.getLocalizedMessage());
                 return;
             }
@@ -161,7 +177,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
                 public void onError(Throwable throwable) {
                     System.out.println("Exception has been produced when try no. " + connectionTries + " was taken to connect to SQ container.");
                     throwable.printStackTrace();
-                    if(connectionTries <= MAX_CONNECTION_TRIES) {
+                    if (connectionTries <= MAX_CONNECTION_TRIES) {
                         ++connectionTries;
                         System.out.println("Retrying...");
                     } else {
@@ -182,14 +198,23 @@ public class SonarqubeServiceImpl implements SonarqubeService {
                         if (delegate != null) {
                             delegate.onComplete(issuesReport);
                         }
-                    }
-                    catch (Exception e) {
+                        var jacocoPath = Paths.get(projectSourceDir, "target", "site", "jacoco", "jacoco.xml").toString();
+                        System.out.println("JACOCO: " + jacocoPath);
+                        var staticAnalysisResolver = new StaticAnalysisResolver(
+                                new SonarqubeApiClient("http://localhost:9000", token),
+                                new JacocoReportParser(jacocoPath),
+                                new JavaProjectParser(projectSourceDir)
+                        );
+
+                        var repository = new FileAnalysedMethodEntryRepository();
+                        repository.saveAll(staticAnalysisResolver.resolveMethodEntries());
+                    } catch (Exception e) {
+                        e.printStackTrace();
                         System.out.println("No report available: " + e.getLocalizedMessage());
                         if (delegate != null) {
                             delegate.onError(SonarqubeServiceDelegate.ErrorCode.ANALYSING_ERROR, e.getLocalizedMessage());
                         }
-                    }
-                    finally {
+                    } finally {
                         try {
                             Thread.sleep(10000);
                         } catch (InterruptedException e) {
@@ -206,12 +231,12 @@ public class SonarqubeServiceImpl implements SonarqubeService {
             });
 
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println("Something went wrong");
             if (delegate != null) {
                 delegate.onError(SonarqubeServiceDelegate.ErrorCode.UNKNOWN_ERROR, e.getLocalizedMessage());
             }
-        }
-        finally {
+        } finally {
             if (!awaitingReport) {
                 System.out.println("-= Not awaiting report =-");
 //                dockerPoolService.dispose(false);
@@ -247,8 +272,8 @@ public class SonarqubeServiceImpl implements SonarqubeService {
 
             try {
                 Thread.sleep(5000);
+            } catch (Exception e) {
             }
-            catch (Exception e) {}
         }
 
         if (status != HttpStatus.SC_OK) {
@@ -281,35 +306,35 @@ public class SonarqubeServiceImpl implements SonarqubeService {
 //        projectStream.close();
 
         final HostConfig hostConfig = HostConfig.newHostConfig()
-                .withBinds(new Bind(sourcePath/* + "/" + projectSubdir*/, new Volume("/usr/src")))
-                .withCpuCount(4L);
+                                                .withBinds(new Bind(sourcePath/* + "/" + projectSubdir*/, new Volume("/usr/src")))
+                                                .withCpuCount(4L);
         final String dockerfileContent =
                 "FROM sonarsource/sonar-scanner-cli:latest AS sonarqube_scan\n" +
-                "ENV SONAR_HOST_URL http://testar-sonarqube:9000\n" +
-                "ENV SONAR_TOKEN " + token  + "\n" +
-                "ENV SRC_PATH /usr/src/" + projectSubdir + "\n" +
+                        "ENV SONAR_HOST_URL http://testar-sonarqube:9000\n" +
+                        "ENV SONAR_TOKEN " + token + "\n" +
+                        "ENV SRC_PATH /usr/src/" + projectSubdir + "\n" +
 //                "ENV MAVEN_OPTS -javaagent:/usr/jacoco/org.jacoco.agent-0.8.8-runtime.jar=destfile=/usr/src/report/jacoco.exec,includes=*,jmx=true,dumponexit=true\n" +
 //                "RUN mkdir /usr/jacoco\n" +
-                "RUN apk add maven openjdk11\n" +
+                        "RUN apk add maven openjdk11\n" +
 
 //                "RUN wget https://repo1.maven.org/maven2/org/jacoco/org.jacoco.agent/0.8.8/org.jacoco.agent-0.8.8-runtime.jar -P /usr/jacoco\n" +
 //                "RUN mkdir /usr/src/report\n" +
-                "WORKDIR /usr/src/"  + projectSubdir + "\n" +
-                //"RUN if [ -f \"./pom.xml\" ] || [ -f \"gradlew\" ]; then apk add maven openjdk11; fi\n" +
-                //"RUN apk add maven openjdk11\n" +
-                "CMD mvn org.jacoco:jacoco-maven-plugin:0.8.8:prepare-agent verify org.jacoco:jacoco-maven-plugin:0.8.2:report sonar:sonar -Dsonar.java.coveragePlugin=jacoco";// -D sonar.projectKey=yoho-be -D sonar.host.url=http://sonarqube:9000 -D sonar.login=" + token + ";";
-                // "CMD if ! [ -f \"sonar-project.properties\"]; then printf \"sonar.projectKey=" + projectKey +
-                //         "\\nsonar.projectName=" + projectName + "\\nsonar.sourceEncoding=UTF-8\" > " +
-                //         "sonar-project.properties; fi; " +
-                //         "if [ -f \"./pom.xml\" ]; then mvn clean verify sonar:sonar -D sonar.projectKey=yoho-be -D sonar.host.url=http://sonarqube:9000 -D sonar.login=" + token + ";" +
-                //         "elif [ -f \"gradlew\" ]; then ./gradlew -Dsonar.host.url=$SONAR_HOST_URL sonarqube; " +
-                //         "else sonar-scanner; " +
-                //         "fi";
-                //"RUN npm install typescript --save\n";
+                        "WORKDIR /usr/src/" + projectSubdir + "\n" +
+                        //"RUN if [ -f \"./pom.xml\" ] || [ -f \"gradlew\" ]; then apk add maven openjdk11; fi\n" +
+                        //"RUN apk add maven openjdk11\n" +
+                        "CMD mvn org.jacoco:jacoco-maven-plugin:0.8.8:prepare-agent verify org.jacoco:jacoco-maven-plugin:0.8.2:report sonar:sonar -Dsonar.java.coveragePlugin=jacoco";// -D sonar.projectKey=yoho-be -D sonar.host.url=http://sonarqube:9000 -D sonar.login=" + token + ";";
+        // "CMD if ! [ -f \"sonar-project.properties\"]; then printf \"sonar.projectKey=" + projectKey +
+        //         "\\nsonar.projectName=" + projectName + "\\nsonar.sourceEncoding=UTF-8\" > " +
+        //         "sonar-project.properties; fi; " +
+        //         "if [ -f \"./pom.xml\" ]; then mvn clean verify sonar:sonar -D sonar.projectKey=yoho-be -D sonar.host.url=http://sonarqube:9000 -D sonar.login=" + token + ";" +
+        //         "elif [ -f \"gradlew\" ]; then ./gradlew -Dsonar.host.url=$SONAR_HOST_URL sonarqube; " +
+        //         "else sonar-scanner; " +
+        //         "fi";
+        //"RUN npm install typescript --save\n";
 
         final String imageId = dockerPoolService.buildImage(new File(sourcePath), dockerfileContent);
         final String containerId = dockerPoolService.startWithImage(imageId, "sonar-scanner", hostConfig, null,
-          DockerPoolService.StrategyIfPresent.REINSTALL);
+                                                                    DockerPoolService.StrategyIfPresent.REINSTALL);
 
         return containerId;
 
@@ -336,8 +361,8 @@ public class SonarqubeServiceImpl implements SonarqubeService {
             if (total == 0) {
                 try {
                     Thread.sleep(5000);
+                } catch (Exception e) {
                 }
-                catch (Exception e) {}
 
                 tries++;
             }
@@ -360,8 +385,9 @@ public class SonarqubeServiceImpl implements SonarqubeService {
             ClassicHttpResponse projectsResponse = (ClassicHttpResponse) httpClient.execute(projectsRequest);
             if (projectsResponse.getCode() == HttpStatus.SC_OK) {
                 try {
-                    Type projectsPageType = new TypeToken<SQPage<SQComponent>>(){}.getType();
-                    SQPage<SQComponent> projectsPage =  gson.fromJson(EntityUtils.toString(projectsResponse.getEntity()), projectsPageType);
+                    Type projectsPageType = new TypeToken<SQPage<SQComponent>>() {
+                    }.getType();
+                    SQPage<SQComponent> projectsPage = gson.fromJson(EntityUtils.toString(projectsResponse.getEntity()), projectsPageType);
                     SQComponent[] components = projectsPage.getComponents();
                     if (components != null) {
                         total = components.length;
@@ -371,8 +397,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
                     }
 
                     tries++;
-                }
-                catch (ParseException e) {
+                } catch (ParseException e) {
                     e.printStackTrace();
                 }
                 projectsRequest.reset();

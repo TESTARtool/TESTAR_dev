@@ -1,8 +1,17 @@
 package org.fruit.monkey.docker;
 
 import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.command.*;
-import com.github.dockerjava.api.model.*;
+import com.github.dockerjava.api.command.BuildImageResultCallback;
+import com.github.dockerjava.api.command.CreateContainerCmd;
+import com.github.dockerjava.api.command.CreateContainerResponse;
+import com.github.dockerjava.api.command.CreateNetworkResponse;
+import com.github.dockerjava.api.command.ListContainersCmd;
+import com.github.dockerjava.api.command.RemoveContainerCmd;
+import com.github.dockerjava.api.model.BuildResponseItem;
+import com.github.dockerjava.api.model.Container;
+import com.github.dockerjava.api.model.HostConfig;
+import com.github.dockerjava.api.model.Network;
+import com.github.dockerjava.api.model.ResponseItem;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientConfig;
 import com.github.dockerjava.core.DockerClientImpl;
@@ -15,7 +24,16 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class DockerPoolServiceImpl implements DockerPoolService {
 
@@ -41,6 +59,7 @@ public class DockerPoolServiceImpl implements DockerPoolService {
         final DockerClientConfig dockerConfig = DefaultDockerClientConfig.createDefaultConfigBuilder().build();
         dockerHttpClient = new ApacheDockerHttpClient.Builder()
                 .dockerHost(detectDockerHost(dockerConfig))
+                .responseTimeout(Duration.of(1, ChronoUnit.HOURS))
                 .sslConfig(dockerConfig.getSSLConfig())
                 .maxConnections(100)
                 .build();
@@ -144,7 +163,7 @@ public class DockerPoolServiceImpl implements DockerPoolService {
                 }
                 super.onNext(item);
             }
-        }).awaitImageId();
+        }).awaitImageId(1, TimeUnit.HOURS);
 
         if (delegate != null) {
             delegate.onStatusChange("Finalizing", null, null);

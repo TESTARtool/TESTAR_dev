@@ -1,10 +1,11 @@
 package org.fruit.monkey.sonarqube.api;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import org.fruit.monkey.sonarqube.api.response.SonarqubeIssuesResponse;
 
-@Getter
+@Data
 @AllArgsConstructor
 public class SQIssue {
 

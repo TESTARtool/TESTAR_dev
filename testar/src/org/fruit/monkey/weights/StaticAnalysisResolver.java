@@ -69,6 +69,10 @@ public class StaticAnalysisResolver {
     }
 
     private boolean checkIfIssueInJavaUnit(JavaUnit javaUnit, SQIssue sqIssue) {
+        if(sqIssue == null || sqIssue.getLine() == null || javaUnit == null) {
+            System.out.println("SQ issue or line or javaunit is null");
+            return false;
+        }
         return checkIfInJavaUnitRanges(sqIssue.getLine(), javaUnit);
     }
 
