@@ -824,10 +824,12 @@ public class Main {
 		}
 
 		if(!invalidExpressions.toString().isEmpty()) {
-			System.err.println(invalidExpressions.toString());
-			System.err.println("Settings Initialization Error! An invalid regular expression was detected in the TESTAR settings: " + testSettingsFileName);
-			System.err.println("Settings Initialization Error! Please fix the expressions or remove all characters and start TESTAR again.");
-			stopTestar();
+			invalidExpressions.append(System.getProperty("line.separator"));
+			invalidExpressions.append("Settings Initialization Error! An invalid regular expression was detected in the TESTAR settings: " + testSettingsFileName);
+			invalidExpressions.append(System.getProperty("line.separator"));
+			invalidExpressions.append("Settings Initialization Error! Please fix the expressions or remove all characters and start TESTAR again.");
+			invalidExpressions.append(System.getProperty("line.separator"));
+			throw new IllegalStateException(invalidExpressions.toString());
 		}
 	}
 }
