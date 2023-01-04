@@ -15,10 +15,21 @@ import com.github.stefanbirkner.systemlambda.SystemLambda;
 
 public class TestRegularExpressionSettings {
 
+	private static String test_protocol = "webdriver_generic";
+	private static File temp_settings = new File(Main.settingsDir);
+	private static File temp_protocol = new File(Main.settingsDir + File.separator + test_protocol);
 	private static List<File> initialOutputFiles = new ArrayList<>();
 
 	@BeforeClass
-	public static void initialOutput() {
+	public static void initialDirectory() {
+		// Create the protocol temp directory
+		File protocolDir = new File(Main.testarDir + "resources" + File.separator + "settings" + File.separator + test_protocol);
+		try {
+			FileUtils.copyDirectory(protocolDir, temp_protocol);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		File output = new File(Main.outputDir);
 		if(output.exists()) {
 			for (File seq : output.listFiles()) {
@@ -29,20 +40,28 @@ public class TestRegularExpressionSettings {
 
 	@AfterClass
 	public static void cleanUp() {
+		// Clean the settings temp directory
+		try {
+			FileUtils.deleteDirectory(temp_settings);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 		// Delete all the sequence output directories that were created in these Unit tests
 		File output = new File(Main.outputDir);
-		for (File seq : output.listFiles()) {
-			if(!initialOutputFiles.contains(seq)) {
-				try {
-					FileUtils.deleteDirectory(seq);
-				} catch (IOException e) {
-					e.printStackTrace();
+		if(output.exists()) {
+			for (File seq : output.listFiles()) {
+				if(!initialOutputFiles.contains(seq)) {
+					try {
+						FileUtils.deleteDirectory(seq);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		}
 	}
 
-	private String[] args = {"testar", "sse=webdriver_generic", "ShowVisualSettingsDialogOnStartup=false", "Mode=Generate", "Sequences=0", "SequenceLength=0", "ClickFilter=.*.*"};
+	private String[] args = {"testar", "sse="+test_protocol, "ShowVisualSettingsDialogOnStartup=false", "AlwaysCompile=true", "Mode=Generate", "Sequences=0", "SequenceLength=0", "ClickFilter=.*.*"};
 	private List<Tag<String>> regularExpressionTags = Arrays.asList(
 			ConfigTags.ProcessesToKillDuringTest,
 			ConfigTags.ClickFilter,
