@@ -58,6 +58,13 @@ public class TestRegularExpressionSettings {
 					}
 				}
 			}
+			if(initialOutputFiles.isEmpty()) {
+				try {
+					FileUtils.deleteDirectory(output);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -39,6 +39,7 @@ import static org.testar.monkey.alayer.Tags.OracleVerdict;
 import static org.testar.monkey.alayer.Tags.SystemState;
 
 import java.awt.Desktop;
+import java.awt.GraphicsEnvironment;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -68,6 +69,7 @@ import org.testar.monkey.alayer.actions.ActivateSystem;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.KillProcess;
 import org.testar.monkey.alayer.devices.AWTMouse;
+import org.testar.monkey.alayer.devices.DummyMouse;
 import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.devices.Mouse;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
@@ -111,7 +113,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	File currentSeq;
 
-	protected Mouse mouse = AWTMouse.build();
+	protected Mouse mouse;
 
 	protected ProcessListener processListener = new ProcessListener();
 	boolean enabledProcessListener = false;
@@ -203,6 +205,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		//Associate start settings of the first TESTAR dialog
 		this.settings = settings;
+
+		// If the environment is not headless, initialize the AWT mouse
+		if (!GraphicsEnvironment.isHeadless()) {
+			mouse = AWTMouse.build();
+		} else {
+			System.out.println("Headless environment! Initializing a DummyMouse device");
+			mouse = DummyMouse.build();
+		}
 
 		//initialize TESTAR with the given settings:
 		logger.trace("TESTAR initializing with the given protocol settings");
@@ -330,7 +340,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		try {
-			if (!settings.get(ConfigTags.UnattendedTests)) {
+			if (!settings.get(ConfigTags.UnattendedTests) && !GraphicsEnvironment.isHeadless()) {
 				LogSerialiser.log("Registering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
 				java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
 				logger.setLevel(Level.OFF);
@@ -1116,7 +1126,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private void closeTestarTestSession(){
 		//cleaning the variables started in initialize()
 		try {
-			if (!settings.get(ConfigTags.UnattendedTests)) {
+			if (!settings.get(ConfigTags.UnattendedTests) && !GraphicsEnvironment.isHeadless()) {
 				if (GlobalScreen.isNativeHookRegistered()) {
 					LogSerialiser.log("Unregistering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
 					GlobalScreen.removeNativeMouseMotionListener(eventHandler);
