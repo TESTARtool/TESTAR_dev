@@ -30,14 +30,16 @@
  *******************************************************************************************************/
 
 
-import org.fruit.alayer.Action;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
-import org.fruit.monkey.Settings;
+import org.testar.DerivedActions;
+import org.testar.SutVisualization;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Verdict;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.exceptions.StateBuildException;
+import org.testar.monkey.alayer.exceptions.SystemStartException;
+import org.testar.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
 
 import java.util.Set;
@@ -143,7 +145,6 @@ public class Protocol_desktop_generic_pure_random extends DesktopProtocol {
 	 */
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
-
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.
 		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
@@ -151,7 +152,16 @@ public class Protocol_desktop_generic_pure_random extends DesktopProtocol {
 
 		// Derive left-click actions, click and type actions, and scroll actions from
 		// all widgets of the GUI:
-		actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
+		DerivedActions derived = deriveClickTypeScrollActionsFromAllWidgets(actions, state);
+
+		// The other option would be deriving actions only from the top level widgets:
+		// DerivedActions derived = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, state);
+
+		Set<Action> filteredActions = derived.getFilteredActions();
+		actions = derived.getAvailableActions();
+
+		//Showing the grey dots for filtered actions if visualization is on:
+		if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
 
 		//return the set of derived actions
 		return actions;

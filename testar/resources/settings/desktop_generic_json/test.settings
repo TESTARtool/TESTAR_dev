@@ -37,10 +37,11 @@ SequenceLength = 100
 #################################################################
 # Oracles based on suspicious titles
 #
-# Regular expression
+# Regular expression and Tags to apply them
 #################################################################
 
 SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+TagsForSuspiciousOracle = Title
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -72,11 +73,13 @@ ProcessLogs = .*.*
 #################################################################
 # Actionfilter
 #
-# Regular expression. More filters can be added in Spy mode,
+# Regular expression and Tags to apply them.
+# More filters can be added in Spy mode,
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
 ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*
+TagsToFilter = Title
 
 #################################################################
 # Processfilter
@@ -94,14 +97,6 @@ SUTProcesses =
 #################################################################
 
 ProtocolClass = desktop_generic_json/Protocol_desktop_generic_json
-
-#################################################################
-# Graphdatabase settings (experimental)
-#################################################################
-GraphDBEnabled = false
-GraphDBUrl =
-GraphDBUser =
-GraphDBPassword =
 
 #################################################################
 # State identifier attributes

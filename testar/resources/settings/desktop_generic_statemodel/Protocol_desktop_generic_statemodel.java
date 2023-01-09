@@ -29,8 +29,12 @@
 *******************************************************************************************************/
 
 import java.util.Set;
-import org.fruit.alayer.*;
-import org.fruit.alayer.exceptions.ActionBuildException;
+
+import org.testar.RandomActionSelector;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.protocols.DesktopProtocol;
 
 /**
@@ -91,16 +95,16 @@ public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 
 		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
-		Action retAction = preSelectAction(state, actions);
+		Action retAction = super.selectAction(state, actions);
 		if (retAction== null) {
 			//if no preSelected actions are needed, then implement your own action selection strategy
 			//using the action selector of the state model:
 			retAction = stateModelManager.getAbstractActionToExecute(actions);
 		}
 		if(retAction==null) {
-			System.out.println("State model based action selection did not find an action. Using default action selection.");
-			// if state model fails, use default:
-			retAction = super.selectAction(state, actions);
+			System.out.println("State model based action selection did not find an action. Using random action selection.");
+			// if state model fails, use random (default would call preSelectAction() again, causing double actions HTML report):
+			retAction = RandomActionSelector.selectAction(actions);
 		}
 		return retAction;
 	}

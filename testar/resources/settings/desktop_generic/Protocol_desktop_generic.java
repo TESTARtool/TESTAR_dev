@@ -31,10 +31,16 @@
 
 import java.util.Set;
 
-import org.fruit.Util;
-import org.fruit.alayer.*;
-import org.fruit.alayer.exceptions.*;
-import org.fruit.monkey.Settings;
+import org.testar.DerivedActions;
+import org.testar.SutVisualization;
+import org.testar.monkey.Settings;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Verdict;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.exceptions.StateBuildException;
+import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.protocols.DesktopProtocol;
 
 /**
@@ -75,7 +81,7 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 * @return  a started SUT, ready to be tested.
 	 */
 	@Override
-	protected SUT startSystem() throws SystemStartException{
+	protected SUT startSystem() throws SystemStartException {
 		return super.startSystem();
 	}
 
@@ -102,7 +108,7 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 * @return  the current state of the SUT with attached oracle.
 	 */
 	@Override
-	protected State getState(SUT system) throws StateBuildException{
+	protected State getState(SUT system) throws StateBuildException {
 		return super.getState(system);
 	}
 
@@ -137,25 +143,29 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 * @return  a set of actions
 	 */
 	@Override
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.
 		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
 		Set<Action> actions = super.deriveActions(system,state);
 
-
 		// Derive left-click actions, click and type actions, and scroll actions from
-		// top level (highest Z-index) widgets of the GUI:
-		actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
+		// top level widgets of the GUI:
+		DerivedActions derived = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, state);
 
-		if(actions.isEmpty()){
+		if(derived.getAvailableActions().isEmpty()){
 			// If the top level widgets did not have any executable widgets, try all widgets:
-//			System.out.println("No actions from top level widgets, changing to all widgets.");
 			// Derive left-click actions, click and type actions, and scroll actions from
 			// all widgets of the GUI:
-			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
+			derived = deriveClickTypeScrollActionsFromAllWidgets(actions, state);
 		}
+
+		Set<Action> filteredActions = derived.getFilteredActions();
+		actions = derived.getAvailableActions();
+
+		//Showing the grey dots for filtered actions if visualization is on:
+		if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
 
 		//return the set of derived actions
 		return actions;

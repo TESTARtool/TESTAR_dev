@@ -55,6 +55,29 @@ function traverseElementTestar(parentWrapped, rootElement, ignoredTags) {
         traverseElementTestar(childWrapped, rootElement, ignoredTags);
         parentWrapped.wrappedChildren.push(childWrapped);
     }
+	
+	// Descend through Shadow DOM Web Elements
+	if(parentWrapped.element.shadowRoot !== null){
+		var shadowNodes = parentWrapped.element.shadowRoot.childNodes;
+		for (var i = 0; i < shadowNodes.length; i++) {
+			var childShadowElement = shadowNodes[i];
+			
+			// Filter ignored tags or non-element nodes
+			if (childShadowElement.nodeType === 3) {
+				parentWrapped.textContent += childShadowElement.textContent;
+				parentWrapped.textContent = parentWrapped.textContent.trim();
+				continue;
+			}
+			if (childShadowElement.nodeType !== 1 ||
+				ignoredTags.includes(childShadowElement.nodeName.toLowerCase())) {
+				continue;
+			}
+			
+			var childShadowWrapped = wrapElementTestar(childShadowElement, parentWrapped["xOffset"], parentWrapped["yOffset"]);
+			traverseElementTestar(childShadowWrapped, rootElement, ignoredTags);
+			parentWrapped.wrappedChildren.push(childShadowWrapped);
+		}
+	}
 
     // No need for it anymore, save serialization effort
     delete parentWrapped['element'];
@@ -117,11 +140,6 @@ function getChildNodesTestar(parentWrapped) {
         top += parseInt(style.getPropertyValue('padding-top'));
         parentWrapped["yOffset"] = parentWrapped['rect'][1] + top;
     }
-	
-	// Shadow Web Elements
-	if(childNodes.length === 0 && parentWrapped.element.shadowRoot !== null){
-		childNodes = parentWrapped.element.shadowRoot.childNodes;
-	}
 
     return childNodes;
 }
@@ -268,6 +286,24 @@ function getDimensionsTestar(element) {
         borderWidth: parseInt(style.borderLeftWidth, 10) + parseInt(style.borderRightWidth, 10),
         borderHeight: parseInt(style.borderTopWidth, 10) + parseInt(style.borderBottomWidth, 10)
     };
+}
+
+/*
+ * Determine if the document body exceeds the height of the browser window
+ * Used to determine if the browser contains a vertical scrollbar
+ * @return {bool} true if the document body is higher
+ */
+function isPageVerticalScrollable(){
+	return (document.body.clientHeight > window.innerHeight);
+}
+
+/*
+ * Determine if the document body exceeds the width of the browser window
+ * Used to determine if the browser contains a horizontal scrollbar
+ * @return {bool} true if the document body is wider
+ */
+function isPageHorizontalScrollable(){
+	return (document.body.clientWidth > window.innerWidth);
 }
 
 /*

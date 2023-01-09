@@ -31,18 +31,19 @@
 
 import java.io.File;
 import java.util.Set;
-import nl.ou.testar.SimpleGuiStateGraph.GuiStateGraphWithVisitedActions;
-import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
-import org.fruit.Util;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.exceptions.*;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
-import org.fruit.alayer.Tags;
+
+import org.testar.ProtocolUtil;
+import org.testar.simplestategraph.GuiStateGraphWithVisitedActions;
+import org.testar.monkey.Util;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Settings;
 import org.sikuli.script.FindFailed;
 import org.sikuli.script.Screen;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.exceptions.ActionFailedException;
 import org.testar.protocols.DesktopProtocol;
 
 /**
@@ -84,7 +85,7 @@ public class Protocol_desktop_simple_stategraph_sikulix extends DesktopProtocol 
 	 * @return  a set of actions
 	 */
 	@Override
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.
@@ -119,7 +120,7 @@ public class Protocol_desktop_simple_stategraph_sikulix extends DesktopProtocol 
 		// HTML is not having the unvisited actions by default, so
 		// adding actions and unvisited actions to the HTML sequence report:
 		try {
-			htmlReport.addActionsAndUnvisitedActions(actions, stateGraphWithVisitedActions.getConcreteIdsOfUnvisitedActions(state));
+			htmlReport.addActionsAndUnvisitedActions(actions, stateGraphWithVisitedActions.getAbstractCustomIdsOfUnvisitedActions(state));
 		}catch(Exception e){
 			// catching null for the first state or any new state, when unvisited actions is still null,
 			// not adding the unvisited actions on those cases:
@@ -127,7 +128,7 @@ public class Protocol_desktop_simple_stategraph_sikulix extends DesktopProtocol 
 		}
 		//Call the preSelectAction method from the DefaultProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
-		Action retAction = preSelectAction(state, actions);
+		Action retAction = super.selectAction(state, actions);
 		if (retAction== null) {
 			//if no preSelected actions are needed, then implement your own action selection strategy
 			// Maintaining memory of visited states and selected actions, and selecting randomly from unvisited actions:
@@ -156,7 +157,7 @@ public class Protocol_desktop_simple_stategraph_sikulix extends DesktopProtocol 
 			//System.out.println("DEBUG: action: "+action.toString());
 			//System.out.println("DEBUG: action short: "+action.toShortString());
 			if(action.toShortString().equalsIgnoreCase("LeftClickAt")){
-				String widgetScreenshotPath = protocolUtil.getActionshot(state,action);
+				String widgetScreenshotPath = ProtocolUtil.getActionshot(state,action);
 				Screen sikuliScreen = new Screen();
 				try {
 					//System.out.println("DEBUG: sikuli clicking ");
@@ -173,7 +174,7 @@ public class Protocol_desktop_simple_stategraph_sikulix extends DesktopProtocol 
 			}else if(action.toShortString().contains("ClickTypeInto(")){
 				String textToType = action.toShortString().substring(action.toShortString().indexOf("("), action.toShortString().indexOf(")"));
 				//System.out.println("parsed text:"+textToType);
-				String widgetScreenshotPath = protocolUtil.getActionshot(state,action);
+				String widgetScreenshotPath = ProtocolUtil.getActionshot(state,action);
 				Util.pause(halfWait);
 				Screen sikuliScreen = new Screen();
 				try {
