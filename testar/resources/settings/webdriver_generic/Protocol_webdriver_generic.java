@@ -52,78 +52,17 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 public class Protocol_webdriver_generic extends WebdriverProtocol {
 
-	/**
-	 * Called once during the life time of TESTAR
-	 * This method can be used to perform initial setup work
-	 *
-	 * @param settings the current TESTAR settings as specified by the user.
-	 */
-	@Override
-	protected void initialize(Settings settings) {
-		super.initialize(settings);
-
-		/*
-		These settings are initialized in WebdriverProtocol:
-
-		// Classes that are deemed clickable by the web framework
-		// getting from the settings file:
-		clickableClasses = settings.get(ConfigTags.ClickableClasses);
-
-		// Disallow links and pages with these extensions
-		// Set to null to ignore this feature
-		// getting from the settings file:
-		deniedExtensions = settings.get(ConfigTags.DeniedExtensions).contains("null") ? null : settings.get(ConfigTags.DeniedExtensions);
-
-		// Define a whitelist of allowed domains for links and pages
-		// An empty list will be filled with the domain from the sut connector
-		// Set to null to ignore this feature
-		// getting from the settings file:
-		domainsAllowed = settings.get(ConfigTags.DomainsAllowed).contains("null") ? null : settings.get(ConfigTags.DomainsAllowed);
-
-		// If true, follow links opened in new tabs
-		// If false, stay with the original (ignore links opened in new tabs)
-		// getting from the settings file:
-		WdDriver.followLinks = settings.get(ConfigTags.FollowLinks);
-
-		//Force the browser to run in full screen mode
-		WdDriver.fullScreen = true;
-
-		//Force webdriver to switch to a new tab if opened
-		//This feature can block the correct display of select dropdown elements 
-		WdDriver.forceActivateTab = true;
-		*/
-
-		// URL + form name, username input id + value, password input id + value
-		// Set login to null to disable this feature
-		// TODO: getting from the settings file, not sure if this works:
-		login = Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
-		username = Pair.from("username", "");
-		password = Pair.from("password", "");
-
-		// List of attributes to identify and close policy popups
-		// Set to null to disable this feature
-		//TODO put into settings file
-		policyAttributes = new HashMap<String, String>() {{
-			put("class", "lfr-btn-label");
-		}};
-	}
+	private List<String> listErrorVerdictInfo = new ArrayList<>();
 
 	/**
-	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
-	 * take care of
-	 * 1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
-	 * out what executable to run)
-	 * 2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-	 * the SUT's configuratio files etc.)
-	 * 3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
-	 * seconds until they have finished loading)
-	 *
-	 * @return a started SUT, ready to be tested.
+	 * This method is called before the first test sequence, allowing for example setting up the test environment
 	 */
 	@Override
-	protected SUT startSystem() throws SystemStartException {
-		return super.startSystem();
+	protected void initTestSession() {
+		super.initTestSession();
+		listErrorVerdictInfo = new ArrayList<>();
 	}
+
 
 	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
@@ -160,15 +99,15 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	 */
 	@Override
 	protected Verdict getVerdict(State state) {
-
 		Verdict verdict = super.getVerdict(state);
-		// system crashes, non-responsiveness and suspicious titles automatically detected!
 
-		//-----------------------------------------------------------------------------
-		// MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
-		//-----------------------------------------------------------------------------
-
-		// ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
+		// If the final Verdict is not OK but was already detected in a previous sequence
+		String currentVerdictInfo = verdict.info().replace("\n", " ");
+		if( listErrorVerdictInfo.stream().anyMatch( verdictInfo -> verdictInfo.contains( currentVerdictInfo ) ) ) {
+			// Consider as OK to continue testing
+			verdict = Verdict.OK;
+			webConsoleVerdict = Verdict.OK;
+		}
 
 		return verdict;
 	}
@@ -251,7 +190,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 		//if(actions.isEmpty()) {
 		//	return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
 		//}
-		
+
 		// If we have forced actions, prioritize and filter the other ones
 		if (forcedActions != null && forcedActions.size() > 0) {
 			filteredActions = actions;
@@ -281,47 +220,20 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 			return true;
 		}
 
+		if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSPAN) && containsClassAncestor(widget, "sort-pages")) {
+			return true;
+		}
+
 		Set<String> clickSet = new HashSet<>(clickableClasses);
 		clickSet.retainAll(element.cssClasses);
 		return clickSet.size() > 0;
 	}
 
+	private boolean containsClassAncestor(Widget widget, String ancestorClass) {
+		if(widget.parent() == null) return false;
 
-	/**
-	 * Select one of the possible actions (e.g. at random)
-	 *
-	 * @param state   the SUT's current state
-	 * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
-	 * @return the selected action (non-null!)
-	 */
-	@Override
-	protected Action selectAction(State state, Set<Action> actions) {
-		return super.selectAction(state, actions);
-	}
-
-	/**
-	 * Execute the selected action.
-	 *
-	 * @param system the SUT
-	 * @param state  the SUT's current state
-	 * @param action the action to execute
-	 * @return whether or not the execution succeeded
-	 */
-	@Override
-	protected boolean executeAction(SUT system, State state, Action action) {
-		return super.executeAction(system, state, action);
-	}
-
-	/**
-	 * TESTAR uses this method to determine when to stop the generation of actions for the
-	 * current sequence. You could stop the sequence's generation after a given amount of executed
-	 * actions or after a specific time etc.
-	 *
-	 * @return if <code>true</code> continue generation, else stop
-	 */
-	@Override
-	protected boolean moreActions(State state) {
-		return super.moreActions(state);
+		if(widget.parent().get(WdTags.WebCssClasses, "").contains(ancestorClass)) return true;
+		else return containsClassAncestor(widget.parent(), ancestorClass);
 	}
 
 	/**
@@ -330,17 +242,10 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	@Override
 	protected void finishSequence() {
 		super.finishSequence();
-	}
-
-	/**
-	 * TESTAR uses this method to determine when to stop the entire test.
-	 * You could stop the test after a given amount of generated sequences or
-	 * after a specific time etc.
-	 *
-	 * @return if <code>true</code> continue test, else stop
-	 */
-	@Override
-	protected boolean moreSequences() {
-		return super.moreSequences();
+		// If the final Verdict is not OK and the verdict is not saved in the list
+		// This is a new run fail verdict
+		if(getFinalVerdict().severity() > Verdict.SEVERITY_OK && !listErrorVerdictInfo.contains(getFinalVerdict().info().replace("\n", " "))) {
+			listErrorVerdictInfo.add(getFinalVerdict().info().replace("\n", " "));
+		}
 	}
 }

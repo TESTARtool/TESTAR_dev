@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://www.ou.nl"
+SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://www.san.gva.es/cita_previa/citaprevia_general_val.html"
 
 #################################################################
 # Sequences
@@ -36,7 +36,7 @@ SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://www.
 #################################################################
 
 Sequences = 1
-SequenceLength = 100
+SequenceLength = 10
 
 #################################################################
 # Oracles based on suspicious titles
@@ -103,6 +103,23 @@ SUTProcesses =
 ProtocolClass = webdriver_generic/Protocol_webdriver_generic
 
 #################################################################
+# State model inference settings
+#################################################################
+StateModelEnabled = false
+DataStore = 
+DataStoreType = remote
+DataStoreServer = 
+DataStoreDirectory = 
+DataStoreDB = 
+DataStoreUser = 
+DataStorePassword = 
+DataStoreMode = instant
+ApplicationName = gva
+ApplicationVersion = 1
+ActionSelectionAlgorithm = random
+StateModelStoreWidgets = true
+
+#################################################################
 # State identifier attributes
 #
 # Specify the widget attributes that you wish to use in constructing
@@ -113,9 +130,9 @@ AbstractStateAttributes = WebWidgetId
 #################################################################
 # WebDriver features
 #################################################################
-ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
+ClickableClasses = 
 DeniedExtensions = pdf;jpg;png
-DomainsAllowed = www.ou.nl;mijn.awo.ou.nl;login.awo.ou.nl
+DomainsAllowed = www.tramita.gva.es;www.gva.es
 FollowLinks = true
 BrowserFullScreen = true
 SwitchNewTabs = true
@@ -123,10 +140,10 @@ SwitchNewTabs = true
 #################################################################
 # WebDriver Browser Console Oracles
 #################################################################
-WebConsoleErrorOracle = false
-WebConsoleErrorPattern = .*.*
+WebConsoleErrorOracle = true
+WebConsoleErrorPattern = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
 WebConsoleWarningOracle = false
-WebConsoleWarningPattern = .*.*
+WebConsoleWarningPattern = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
 
 #################################################################
 # Override display scale
@@ -168,19 +185,19 @@ FaultThreshold = 1.0E-9
 DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
-ActionDuration = 0.1
+ActionDuration = 0.3
 ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
-TimeToWaitAfterAction = 0.1
+TimeToWaitAfterAction = 0.3
 StartupTime = 2.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true
 CopyFromTo =
-VisualizeActions = false
+VisualizeActions = true
 VisualizeSelectedAction = true
 TestGenerator = random
 MaxReward = 9999999
