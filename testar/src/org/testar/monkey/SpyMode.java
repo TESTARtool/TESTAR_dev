@@ -38,6 +38,10 @@ import org.testar.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.android.AndroidProtocolUtil;
+import org.testar.monkey.alayer.android.spy_visualization.MobileVisualizationAndroid;
+import org.testar.monkey.alayer.ios.IOSProtocolUtil;
+import org.testar.monkey.alayer.ios.spy_visualization.MobileVisualizationIOS;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
 
@@ -52,6 +56,20 @@ public class SpyMode {
 		SUT system = protocol.startSystem();
 		protocol.cv = protocol.buildCanvas();
 
+		//TODO: this must stay here as there is no canvas function called in the original default protocol
+		MobileVisualizationAndroid mobileVisualizationAndroid = null;
+		MobileVisualizationIOS mobileVisualizationIOS = null;
+
+		if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
+			System.out.println("SPY MODE, CREATING JAVA JFRAME WINDOW Android");
+			State state = protocol.getState(system);
+			mobileVisualizationAndroid = new MobileVisualizationAndroid(AndroidProtocolUtil.getStateshotSpyMode(state), state);
+		} else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
+			System.out.println("SPY MODE, CREATING JAVA JFRAME WINDOW iOS");
+			State state = protocol.getState(system);
+			mobileVisualizationIOS = new MobileVisualizationIOS(IOSProtocolUtil.getStateshotSpyMode(state), state);
+		}
+
 		while(protocol.mode() == Modes.Spy && system.isRunning()) {
 
 			State state = protocol.getState(system);
@@ -61,16 +79,26 @@ public class SpyMode {
 			Set<Action> actions = protocol.deriveActions(system, state);
 			protocol.buildStateActionsIdentifiers(state, actions);
 
-			//in Spy-mode, always visualize the widget info under the mouse cursor:
-			SutVisualization.visualizeState(protocol.visualizationOn, 
-					protocol.markParentWidget, 
-					protocol.mouse, 
-					protocol.lastPrintParentsOf, 
-					protocol.cv, 
-					state);
+			//TODO: can we work this into sutvisualization/ canvas?
+			if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
+				assert mobileVisualizationAndroid != null;
+				mobileVisualizationAndroid.updateStateVisualization(state);
+			} else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
+				assert mobileVisualizationIOS != null;
+				mobileVisualizationIOS.updateStateVisualization(state);
+			}
+			else {
+				//in Spy-mode, always visualize the widget info under the mouse cursor:
+				SutVisualization.visualizeState(protocol.visualizationOn,
+						protocol.markParentWidget,
+						protocol.mouse,
+						protocol.lastPrintParentsOf,
+						protocol.cv,
+						state);
 
-			//in Spy-mode, always visualize the green dots:
-			protocol.visualizeActions(protocol.cv, state, actions);
+				//in Spy-mode, always visualize the green dots:
+				protocol.visualizeActions(protocol.cv, state, actions);
+			}
 
 			protocol.cv.end();
 
@@ -81,6 +109,19 @@ public class SpyMode {
 					this.wait(msRefresh);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
+				}
+			}
+
+			// TODO: can we work this into canvas thing?
+			if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
+				assert mobileVisualizationAndroid != null;
+				if (mobileVisualizationAndroid.closedSpyVisualization) {
+					break;
+				}
+			} else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
+				assert mobileVisualizationIOS != null;
+				if (mobileVisualizationIOS.closedSpyVisualization) {
+					break;
 				}
 			}
 

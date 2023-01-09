@@ -6,6 +6,8 @@ import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
+import org.testar.monkey.alayer.android.AndroidProtocolUtil;
+import org.testar.monkey.alayer.ios.IOSProtocolUtil;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
 
@@ -37,6 +39,10 @@ public abstract class ConcreteStateFactory {
         AWTCanvas screenshot;
         if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
             screenshot = WdProtocolUtil.getStateshotBinary(newState);
+        } else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
+            screenshot = AndroidProtocolUtil.getStateshotBinary(newState, null);
+        } else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
+            screenshot = IOSProtocolUtil.getStateshotBinary(newState, null);
         }
         else screenshot = ProtocolUtil.getStateshotBinary(newState);
 
