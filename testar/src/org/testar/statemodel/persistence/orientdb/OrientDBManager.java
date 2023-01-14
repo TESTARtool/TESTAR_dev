@@ -30,7 +30,7 @@ import java.util.*;
 import static java.lang.System.exit;
 
 
-public class OrientDBManager implements PersistenceManager, StateModelEventListener {
+public class OrientDBManager implements PersistenceManager/*, QLearningManager*/, StateModelEventListener {
 
     /**
      * Helper class for dealing with events
@@ -128,13 +128,12 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         entityManager.saveEntity(abstractStateEntity, db);
 
         // deal with the unvisited actions on the states
-      persistUnvisitedActions(abstractState, abstractStateEntity, db);
-      db.commit();
+        persistUnvisitedActions(abstractState, abstractStateEntity, db);
+        db.commit();
       }
     }
 
     private void persistUnvisitedActions(AbstractState abstractState, VertexEntity abstractStateEntity, ODatabaseSession db) {
-        db.begin();
         abstractStateEntity.enableUpdate(false);
 
         // prepare the black hole entity that is needed for the unvisited actions
@@ -151,7 +150,9 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             return;
         }
 
-        // Steps:
+      db.begin();
+
+      // Steps:
         // 1) delete the unvisited actions that are no longer unvisited
         // 2) save the unvisited actions (for newly saved states)
 
@@ -187,8 +188,9 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
           ex.printStackTrace();
           System.out.println(ex.getMessage());
           exit(1);
+        } finally {
+          db.commit();
         }
-        db.commit();
     }
 
     @Override
@@ -215,6 +217,8 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         }
 
         try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
+            db.begin();
+
             // save the entity!
             entityManager.saveEntity(concreteStateEntity, db);
 
@@ -223,6 +227,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
             // optional: if an abstract state is provided, we connect the concrete state to it using an isAbstractedBy relation
             if (concreteState.getAbstractState() == null) {
+              db.commit();
               return;
             }
             EntityClass targetEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
@@ -234,6 +239,8 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             } catch (HydrationException e) {
             e.printStackTrace();
             System.out.println("Encountered a problem while saving abstract state with id " + concreteState.getAbstractState().getStateId() + " to the orient database");
+
+            db.commit();
             return;
         }
 
@@ -378,7 +385,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             return;
         }
 
-        entityManager.getConnection().getDatabaseSession().begin();
+//        entityManager.getConnection().getDatabaseSession().begin();
 
         // persist the source and target states
         persistConcreteState(concreteStateTransition.getSourceState());
@@ -396,7 +403,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             stateHydrator.hydrate(targetVertexEntity, concreteStateTransition.getTargetState());
         } catch (HydrationException e) {
             //@todo add some meaningful logging here
-            entityManager.getConnection().getDatabaseSession().commit();
+//            entityManager.getConnection().getDatabaseSession().commit();
             return;
         }
 
@@ -488,7 +495,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         entityProperties.put("modelIdentifier", stateModelEntity.getPropertyValue(stateModelClassIdentifier.getPropertyName()));
 
         try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
-          db.begin();
+//          db.begin();
           Set<DocumentEntity> retrievedDocuments = entityManager.retrieveAllOfClass(abstractStateClass, entityProperties, db);
           if (retrievedDocuments.isEmpty()) {
               System.out.println("Could not find abstract states in the model");
@@ -496,7 +503,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
           else {
               // we need to create the abstract states from the returned document entities
               try {
-                  EntityExtractor<AbstractState> abstractStateExtractor = ExtractorFactory.getExtractor(ExtractorFactory.EXTRACTOR_ABSTRACT_STATE);
+                  EntityExtractor<AbstractState, AbstractStateModel> abstractStateExtractor = ExtractorFactory.getExtractor(ExtractorFactory.EXTRACTOR_ABSTRACT_STATE);
                   for (DocumentEntity documentEntity : retrievedDocuments) {
                       AbstractState abstractState = abstractStateExtractor.extract(documentEntity, abstractStateModel);
                       abstractStateModel.addState(abstractState);
@@ -518,7 +525,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
               System.out.println(retrievedDocuments.size() + " number of abstract actions were returned");
               // we need to create the transitions from the returned document entities
               try {
-                  EntityExtractor<AbstractStateTransition> abstractStateTransitionEntityExtractor = ExtractorFactory.getExtractor(ExtractorFactory.EXTRACTOR_ABSTRACT_STATE_TRANSITION);
+                  EntityExtractor<AbstractStateTransition, AbstractStateModel> abstractStateTransitionEntityExtractor = ExtractorFactory.getExtractor(ExtractorFactory.EXTRACTOR_ABSTRACT_STATE_TRANSITION);
                   for (DocumentEntity documentEntity : retrievedDocuments) {
                       AbstractStateTransition abstractStateTransition = abstractStateTransitionEntityExtractor.extract(documentEntity, abstractStateModel);
                       abstractStateModel.addTransition( abstractStateTransition.getSourceState(), abstractStateTransition.getTargetState(), abstractStateTransition.getAction());
@@ -527,10 +534,13 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
                   e.printStackTrace();
               }
           }
-          db.commit();
+//          db.commit();
         }
 
+        abstractStateModel.onReady();
+
         // enable the event listener again
+
         setListening(true);
     }
 
@@ -724,4 +734,50 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
     public EntityManager getEntityManager() {
     	return entityManager;
     }
+
+//    @Override
+//    public void initQLearningModel(QLearningModel model) {
+//
+//      EntityClass actionClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.ConcreteAction);
+//
+//      Map<String, PropertyValue> entityProperties = new HashMap<>();
+//      Property actionClassIdentifier = actionClass.getIdentifier();
+//      if (actionClassIdentifier == null) throw new RuntimeException("Error occurred: abstract state model does not have an id property set.");
+//      entityProperties.put("modelIdentifier", new PropertyValue(OType.STRING, model.getModelIdentifier()));
+//
+//      try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
+//        Set<DocumentEntity> retrievedActions = entityManager.retrieveAllOfClass(actionClass, entityProperties, db);
+//        if (retrievedActions.isEmpty()) {
+//          System.out.println("Could not find abstract states in the model");
+//        }
+//        else {
+//          try {
+//            EntityExtractor<ConcreteAction> abstractStateExtractor = ExtractorFactory.getExtractor(ExtractorFactory.EX);
+//            for (DocumentEntity documentEntity : retrievedDocuments) {
+//              AbstractState abstractState = abstractStateExtractor.extract(documentEntity, abstractStateModel);
+//              abstractStateModel.addState(abstractState);
+//            }
+//          } catch (ExtractionException | StateModelException e) {
+//            e.printStackTrace();
+//          }
+//        }
+//      }
+
+
+//      EntityClass qlModelClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractStateModel);
+//
+//      Map<String, PropertyValue> entityProperties = new HashMap<>();
+//      Property qlModelClassIdentifier = qlModelClass.getIdentifier();
+//
+//      if (qlModelClassIdentifier == null) throw new RuntimeException("Error occurred: abstract state model does not have an id property set.");
+//
+//      //TODO: if we need some model identifier in QLearning graph
+//      entityProperties.put("modelIdentifier", ModelEntity.getPropertyValue(stateModelClassIdentifier.getPropertyName()));
+
+//    }
+
+//    @Override
+//    public void persistQLearningProgress(QLearningModel model) {
+//
+//    }
 }

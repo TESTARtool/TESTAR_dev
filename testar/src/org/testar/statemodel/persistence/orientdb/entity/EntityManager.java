@@ -147,7 +147,7 @@ public class EntityManager {
         Property identifier = edgeEntity.getEntityClass().getIdentifier();
         OResultSet rs;
         if (identifier != null) {
-            rs = retrieveEdgeWithId(edgeEntity, db);
+            rs = retrieveEntityWithId(edgeEntity, db);
         }
         else {
             rs = retrieveEdgeWithoutId(edgeEntity, db);
@@ -167,25 +167,56 @@ public class EntityManager {
         throw new EntityNotFoundException();
     }
 
+  /**
+   * Method retrieves a discrete entity from the data store.
+   * @param entity
+   * @param db
+   * @return
+   * @throws EntityNotFoundException
+   */
+  private OElement retrieveElement(DocumentEntity entity, ODatabaseSession db) throws EntityNotFoundException {
+    Property identifier = entity.getEntityClass().getIdentifier();
+    OResultSet rs;
+
+    // Discrete elements can be retrieved only by IDs
+    if (identifier == null) {
+      throw new EntityNotFoundException();
+    }
+    rs = retrieveEntityWithId(entity, db);
+
+    // process the results
+    if (!rs.hasNext()) {
+      throw new EntityNotFoundException();
+    }
+
+    Optional<OElement> op = rs.next().getElement();
+    if (op.isPresent()) {
+      return op.get();
+    }
+
+    // if we made it here, no element was found
+    throw new EntityNotFoundException();
+  }
+
     /**
      * Method retrieves an edge from the data store based on the value of a unique id field.
-     * @param edgeEntity
+     * @param entity
      * @param db
      * @return
      * @throws EntityNotFoundException
      */
-    private OResultSet retrieveEdgeWithId(EdgeEntity edgeEntity, ODatabaseSession db) throws EntityNotFoundException {
-        Property identifier = edgeEntity.getEntityClass().getIdentifier();
+    private OResultSet retrieveEntityWithId(DocumentEntity entity, ODatabaseSession db) throws EntityNotFoundException {
+        Property identifier = entity.getEntityClass().getIdentifier();
         if (identifier == null) {
             throw  new EntityNotFoundException();
         }
         // first we prepare the statement to execute
-        String className = edgeEntity.getEntityClass().getClassName();
+        String className = entity.getEntityClass().getClassName();
         String idField = identifier.getPropertyName();
         String stmt = "SELECT FROM " + className + " WHERE " + idField + " = :" + idField;
         // get the id parameter ready
         Map<String, Object> params = new HashMap<>();
-        params.put(idField, edgeEntity.getPropertyValue(idField).getValue());
+        params.put(idField, entity.getPropertyValue(idField).getValue());
         //execute the query using statement and parameters
         OResultSet rs = db.query(stmt, params);
         return rs;
@@ -311,6 +342,9 @@ public class EntityManager {
         }
         else if (entity.getEntityClass().isEdge()) {
             saveEdgeEntity((EdgeEntity) entity, db);
+        }
+        else {
+            saveDiscreteEntity((DiscreteEntity) entity, db);
         }
     }
 
@@ -479,8 +513,52 @@ public class EntityManager {
 
         edge.save();
     }
+  /**
+   * This method saves a "discrete" (neither vertex nor edge) entity to the data store.
+   * @param entity
+   * @param db
+   */
+  private void saveDiscreteEntity(DiscreteEntity entity, ODatabaseSession db) {
+    OElement element = null;
+    try {
+      element = retrieveElement(entity, db);
+    }
+    catch (EntityNotFoundException e) {}
 
-    public void deleteEntity(DocumentEntity entity, ODatabaseSession db) {
+    if (element == null) {
+      element = db.newElement(entity.getEntityClass().getClassName());
+    }
+    else {
+      if (!entity.updateEnabled()) {
+        return;
+      }
+    }
+
+    // now we have to add or update properties!
+    for (String propertyName : entity.getPropertyNames()) {
+      setProperty(element, propertyName, entity.getPropertyValue(propertyName).getValue(), db);
+    }
+
+    // check if one of the properties is an auto-increment field.
+    // in that case we need to ask a sequence to provide a value
+    for (Property property : entity.getEntityClass().getProperties()) {
+      if (property.isAutoIncrement()) {
+        // make sure the property does not have a value yet
+        if (element.getProperty(property.getPropertyName()) == null) {
+          // fetch the sequence
+          OSequence sequence = db.getMetadata().getSequenceLibrary().getSequence(createSequenceId(entity.getEntityClass(), property));
+          if (sequence != null) {
+            setProperty(element, property.getPropertyName(), sequence.next(), db);
+          }
+        }
+      }
+    }
+
+    element.save();
+  }
+
+
+  public void deleteEntity(DocumentEntity entity, ODatabaseSession db) {
             // we delete an entity based on its class and its id
             EntityClass entityClass = entity.getEntityClass();
 
@@ -652,6 +730,9 @@ public class EntityManager {
             else if (result.isEdge()) {
                 documents.add(extractEdgeEntity(result));
             }
+            else {
+              documents.add(extractDiscreteEntity(result, entityClass));
+            }
             // should not happen, but we just ignore the result
         }
         return documents;
@@ -694,7 +775,7 @@ public class EntityManager {
             return extractEdgeEntity(oResult);
         }
         else {
-            return null;
+            return extractDiscreteEntity(oResult, entityClass);
         }
     }
 
@@ -798,6 +879,17 @@ public class EntityManager {
         // get the rest of the edge
         EdgeEntity edgeEntity = processEdgeEntity(sourceVertexEntity, oEdge, true);
         return edgeEntity;
+    }
+
+    private DiscreteEntity extractDiscreteEntity(OResult result, EntityClass entityClass) {
+      if (!result.getElement().isPresent()) return null;
+      OElement element = result.getElement().get();
+
+      // set the attributes
+      DiscreteEntity entity = new DiscreteEntity(entityClass);
+      setProperties(entity, element);
+
+      return entity;
     }
 
     // returns a sequence id for an entity property

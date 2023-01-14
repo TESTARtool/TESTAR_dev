@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class AbstractStateModel {
 
@@ -178,12 +179,20 @@ public class AbstractStateModel {
         throw new StateNotFoundException();
     }
 
-    /**
+  /**
      * This method returns all the states in the abstract state model
      * @return
      */
     public Set<AbstractState> getStates() {
         return new HashSet<>(states.values());
+    }
+
+    /**
+     * This method returns all the actions in the abstract state model
+     * @return
+     */
+    public Set<AbstractAction> getActions() {
+      return stateTransitions.stream().map(AbstractStateTransition::getAction).collect(Collectors.toSet());
     }
 
     /**
@@ -300,5 +309,9 @@ public class AbstractStateModel {
      */
     public String getApplicationVersion() {
         return applicationVersion;
+    }
+
+    public void onReady() {
+      emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_MODEL_READY, this));
     }
 }

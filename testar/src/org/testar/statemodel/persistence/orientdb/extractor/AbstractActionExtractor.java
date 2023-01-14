@@ -10,11 +10,11 @@ import org.testar.statemodel.persistence.orientdb.entity.PropertyValue;
 
 import java.util.Set;
 
-public class AbstractActionExtractor implements EntityExtractor<AbstractAction> {
+public class AbstractActionExtractor<M> implements EntityExtractor<AbstractAction, M> {
 
 
     @Override
-    public AbstractAction extract(DocumentEntity entity, AbstractStateModel abstractStateModel) throws ExtractionException {
+    public AbstractAction extract(DocumentEntity entity, M abstractStateModel) throws ExtractionException {
         if (!(entity instanceof EdgeEntity)) {
             throw new ExtractionException("Abstract action extractor expects an edge entity. Instance of " + entity.getClass().toString() + " was given.");
         }

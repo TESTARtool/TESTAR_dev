@@ -5,7 +5,7 @@ import java.util.Set;
 
 public class EntityClass {
 
-    public enum EntityType {Vertex, Edge}
+    public enum EntityType {Vertex, Edge, Discrete}
 
     // name of the class
     private String className;

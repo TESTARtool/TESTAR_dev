@@ -35,8 +35,8 @@ SUTConnectorValue = "/Users/michaeltikhonenko/Downloads/chromedriver" "1920x900+
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 5
-SequenceLength = 100
+Sequences = 2
+SequenceLength = 10
 
 #################################################################
 # Oracles based on suspicious titles
@@ -225,6 +225,8 @@ WebConsoleErrorOracle = true
 WebConsoleErrorPattern = .*
 WebConsoleWarningOracle = true
 WebConsoleWarningPattern = .*
+
+WebConsoleCustomOracle = true;
 
 FaultThreshold = 0.1
 

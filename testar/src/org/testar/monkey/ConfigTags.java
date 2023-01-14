@@ -31,6 +31,7 @@
 
 package org.testar.monkey;
 
+import org.sikuli.script.Do;
 import org.testar.monkey.alayer.Tag;
 
 import java.util.List;
@@ -165,6 +166,7 @@ public final class ConfigTags {
   public static final Tag<String> WebConsoleErrorPattern = Tag.from("WebConsoleErrorPattern", String.class);
   public static final Tag<Boolean> WebConsoleWarningOracle = Tag.from("WebConsoleWarningOracle", Boolean.class);
   public static final Tag<String> WebConsoleWarningPattern = Tag.from("WebConsoleWarningPattern", String.class);
+  public static final Tag<String> CustomOracle = Tag.from("CustomOracle", String.class);
 
   public static final Tag<Boolean> FlashFeedback = Tag.from("FlashFeedback", Boolean.class);
   public static final Tag<String> ProtocolCompileDirectory = Tag.from("ProtocolCompileDirectory", String.class);
@@ -197,6 +199,10 @@ public final class ConfigTags {
   public static final Tag<String> ForcedLoginPassword = Tag.from("ForcedLoginPassword", String.class);
 
   public static final Tag<String> BtraceServiceHost = Tag.from("BtraceServiceHost", String.class);
+
+  public static final Tag<Boolean> QLearningEnabled = Tag.from("QLearningEnabled", Boolean.class);
+  public static final Tag<Double> QLearningAlpha = Tag.from("QLearningAlpha", Double.class);
+  public static final Tag<Double> QLearningGamma = Tag.from("QLearningGamma", Double.class);
 
   /*
   //TODO web driver settings for login feature

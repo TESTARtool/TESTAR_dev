@@ -4,8 +4,8 @@ import org.testar.statemodel.AbstractStateModel;
 import org.testar.statemodel.exceptions.ExtractionException;
 import org.testar.statemodel.persistence.orientdb.entity.DocumentEntity;
 
-public interface EntityExtractor<T> {
+public interface EntityExtractor<T, M> {
 
-    T extract(DocumentEntity entity, AbstractStateModel abstractStateModel) throws ExtractionException;
+    T extract(DocumentEntity entity, M model) throws ExtractionException;
 
 }
