@@ -226,7 +226,7 @@ WebConsoleErrorPattern = .*
 WebConsoleWarningOracle = true
 WebConsoleWarningPattern = .*
 
-WebConsoleCustomOracle = true;
+WebConsoleCustomOracle = true
 
 FaultThreshold = 0.1
 

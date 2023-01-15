@@ -262,7 +262,9 @@ public class SonarqubeServiceImpl implements SonarqubeService {
             } catch (Exception e) {
                 System.out.println("Not yet ready..."/* + e*/);
             } finally {
-                newTokenRequest.reset();
+                if (status >= 400 && status < 500) {
+                  newTokenRequest.reset();
+                }
 //                newTokenRequest.releaseConnection();
             }
 
@@ -289,6 +291,9 @@ public class SonarqubeServiceImpl implements SonarqubeService {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        finally {
+          newTokenRequest.reset();
+        }
 
         return null;
     }
@@ -306,10 +311,11 @@ public class SonarqubeServiceImpl implements SonarqubeService {
 //        projectStream.close();
 
         final HostConfig hostConfig = HostConfig.newHostConfig()
-                                                .withBinds(new Bind(sourcePath/* + "/" + projectSubdir*/, new Volume("/usr/src")))
+//                                                .withBinds(new Bind(sourcePath/* + "/" + projectSubdir*/, new Volume("/usr/src")))
                                                 .withCpuCount(4L);
         final String dockerfileContent =
                 "FROM sonarsource/sonar-scanner-cli:latest AS sonarqube_scan\n" +
+                        "COPY . /usr/src \n" +
                         "ENV SONAR_HOST_URL http://testar-sonarqube:9000\n" +
                         "ENV SONAR_TOKEN " + token + "\n" +
                         "ENV SRC_PATH /usr/src/" + projectSubdir + "\n" +

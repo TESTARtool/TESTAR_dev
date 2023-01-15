@@ -165,16 +165,12 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			}
 		});
 
-		System.out.println("(0)");
 		isValidJavaEnvironment();
 
-		System.out.println("(1)");
 		verifyTestarInitialDirectory();
 
-		System.out.println("(2)");
 		initTestarSSE(getParameters(), null);
 
-		System.out.println("(3)");
 		String testSettingsFileName = getTestSettingsFile();
 		System.out.println("Test settings is <" + testSettingsFileName + ">");
 
@@ -193,7 +189,6 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 		// TESTAR GUI is enabled, we're going to show again the GUI when the selected
 		// protocol execution finishes
 		else {
-			System.out.println("(9)");
 			startTestarDialog(primaryStage, settings, testSettingsFileName);
 		}
 
@@ -294,7 +289,6 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 		// and that there is exactly one.
 
 		// Allow users to use command line to choose a protocol modifying sse file
-		System.out.println("[0]");
 		if (rawParameters == null) {
 			rawParameters = parameters.getRaw();
 		}
@@ -672,7 +666,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			defaults.add(Pair.from(WebConsoleWarningOracle, false));
 			defaults.add(Pair.from(WebConsoleWarningPattern, ".*.*"));
 
-      defaults.add(Pair.from(CustomOracle, false));
+//      defaults.add(Pair.from(CustomOracle, false));
       defaults.add(Pair.from(QLearningEnabled, false));
 
 			defaults.add(Pair.from(ProtocolSpecificSetting_1, ""));
