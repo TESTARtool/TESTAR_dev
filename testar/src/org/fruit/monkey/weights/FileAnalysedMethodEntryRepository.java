@@ -5,6 +5,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +21,11 @@ public class FileAnalysedMethodEntryRepository implements AnalysedMethodEntryRep
     private HashMap<String, ArrayList<AnalysedMethodEntry>> methodEntries;
 
     private static final String DEFAULT_REPOSITORY_FILE_PATH = "static-analysis-repository";
+
+    @Override
+    public boolean staticAnalysisResultAvailable() {
+        return Files.exists(Path.of(filePath));
+    }
 
     public FileAnalysedMethodEntryRepository(String filePath) {
         this.filePath = filePath;

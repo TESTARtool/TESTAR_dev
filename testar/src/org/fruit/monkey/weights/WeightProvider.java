@@ -19,6 +19,10 @@ public class WeightProvider {
         return isPreparing;
     }
 
+    public boolean isStaticAnalysisAvailable() {
+        return repository.staticAnalysisResultAvailable();
+    }
+
     public WeightVerdict provideWeightVerdict() {
         var recordedMethods = btraceApiClient.finishRecordingMethodInvocation();
         System.out.println("RECEIVED RECORDED METHODS: " + recordedMethods);

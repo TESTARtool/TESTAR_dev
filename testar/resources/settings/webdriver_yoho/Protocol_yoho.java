@@ -367,7 +367,7 @@ public class Protocol_yoho extends WebdriverProtocol {
     @Override
     protected Verdict getVerdict(State state) {
         Verdict stateVerdict = super.getVerdict(state);
-        if(weightProvider.isPreparing()) {
+        if(weightProvider.isPreparing() && weightProvider.isStaticAnalysisAvailable()) {
             var weightVerdict = weightProvider.provideWeightVerdict();
             stateVerdict.join(deriveVerdict(weightVerdict));
         }
