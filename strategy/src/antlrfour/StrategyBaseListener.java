@@ -41,13 +41,25 @@ public class StrategyBaseListener implements StrategyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterBaseBool(StrategyParser.BaseBoolContext ctx) { }
+	@Override public void enterIf_else_then(StrategyParser.If_else_thenContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitBaseBool(StrategyParser.BaseBoolContext ctx) { }
+	@Override public void exitIf_else_then(StrategyParser.If_else_thenContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterPlainBool(StrategyParser.PlainBoolContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPlainBool(StrategyParser.PlainBoolContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -173,25 +185,25 @@ public class StrategyBaseListener implements StrategyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSubStrategy(StrategyParser.SubStrategyContext ctx) { }
+	@Override public void enterAction_expr(StrategyParser.Action_exprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSubStrategy(StrategyParser.SubStrategyContext ctx) { }
+	@Override public void exitAction_expr(StrategyParser.Action_exprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterActionList(StrategyParser.ActionListContext ctx) { }
+	@Override public void enterAction_list(StrategyParser.Action_listContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitActionList(StrategyParser.ActionListContext ctx) { }
+	@Override public void exitAction_list(StrategyParser.Action_listContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

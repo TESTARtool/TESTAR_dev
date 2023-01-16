@@ -10,11 +10,11 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
-public class SelectByRelationNode extends BaseActionNode
+public class SelectRelationNode extends BaseActionNode
 {
     private final RelatedAction RELATED_ACTION;
     
-    public SelectByRelationNode(Integer weight, RelatedAction relatedAction)
+    public SelectRelationNode(Integer weight, RelatedAction relatedAction)
     {
         this.WEIGHT         = (weight != null || weight > 0) ? weight : 1;
         this.RELATED_ACTION = relatedAction;
@@ -31,8 +31,12 @@ public class SelectByRelationNode extends BaseActionNode
     {
         if(actions.size() == 1)
             return new ArrayList<Action>(actions).get(0);
-        
-        Widget            prevWidget      = state.get(Tags.PreviousAction).get(Tags.OriginWidget);
+
+        Action prevAction =  state.get(Tags.PreviousAction, null);
+        if(prevAction == null)
+            return selectRandomAction(actions);
+
+        Widget            prevWidget      = prevAction.get(Tags.OriginWidget, null);
         ArrayList<Action> filteredActions = new ArrayList<>();
         
         for(Action action : actions)

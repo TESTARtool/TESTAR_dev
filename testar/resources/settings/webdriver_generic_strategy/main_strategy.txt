@@ -1,7 +1,3 @@
-IF
-    sibling-or-child-action exists IS true
-THEN
-    4 select-by-related sibling-or-child-action
-    5 select-random least-visited of-type type-action
-ELSE
-    select-previous-action
+/*4 select-by-related sibling-or-child-action*/
+5 select-random least-visited of-type type-action
+/*select-previous*/

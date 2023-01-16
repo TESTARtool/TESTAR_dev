@@ -1,8 +1,10 @@
 grammar Strategy;
 
-strategy_file:      strategy EOF;
+strategy_file:  strategy EOF;
 
-strategy:           IF ifExpr=bool_expr     THEN thenExpr=action_expr   ELSE elseExpr=action_expr;
+strategy:       if_else_then | action_list;
+
+if_else_then:   IF ifExpr=bool_expr     THEN thenExpr=action_expr   ELSE elseExpr=action_expr;
 
 /////////////////////
 // IF parser rules //
@@ -16,7 +18,7 @@ bool_expr:                        NOT                               expr=bool_ex
 |   LP  left=number_expr    opr=( LT | LE | GT | GE | EQ | NE )     right=number_expr   RP      #numberOprExpr
 |                           state_boolean                                                       #stateBool
 |   LP                      state_boolean                                               RP      #stateBool
-|                           BOOLEAN                                                             #baseBool
+|                           BOOLEAN                                                             #plainBool
 ;
 
 
@@ -34,12 +36,14 @@ state_boolean:      'state-changed'                                             
 // THEN and ELSE parser rules //
 ////////////////////////////////
 
-action_expr:        strategy        #subStrategy
-|                   action+         #actionList;
 
-action: NUMBER?     'select-previous-action'                                                #selectPreviousAction
+action_expr:        if_else_then | action_list;
+
+action_list:        action+;
+
+action: NUMBER?     'select-previous'                                                       #selectPreviousAction
 |       NUMBER?     'select-random'             VISIT_MODIFIER?     (FILTER ACTION_TYPE)?   #selectRandomAction
-|       NUMBER?     'select-by-related'         RELATED_ACTION                              #selectRelatedAction
+|       NUMBER?     'select-related'            RELATED_ACTION                              #selectRelatedAction
 ;
 
 

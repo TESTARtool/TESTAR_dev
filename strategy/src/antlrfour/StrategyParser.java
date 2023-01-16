@@ -23,21 +23,21 @@ public class StrategyParser extends Parser {
 		IF=25, THEN=26, ELSE=27, NUMBER=28, BOOLEAN=29, LP=30, RP=31, COMMENT=32, 
 		WHITESPACE=33, ANY=34;
 	public static final int
-		RULE_strategy_file = 0, RULE_strategy = 1, RULE_bool_expr = 2, RULE_number_expr = 3, 
-		RULE_number_of_actions = 4, RULE_state_boolean = 5, RULE_action_expr = 6, 
-		RULE_action = 7;
+		RULE_strategy_file = 0, RULE_strategy = 1, RULE_if_else_then = 2, RULE_bool_expr = 3, 
+		RULE_number_expr = 4, RULE_number_of_actions = 5, RULE_state_boolean = 6, 
+		RULE_action_expr = 7, RULE_action_list = 8, RULE_action = 9;
 	private static String[] makeRuleNames() {
 		return new String[] {
-			"strategy_file", "strategy", "bool_expr", "number_expr", "number_of_actions", 
-			"state_boolean", "action_expr", "action"
+			"strategy_file", "strategy", "if_else_then", "bool_expr", "number_expr", 
+			"number_of_actions", "state_boolean", "action_expr", "action_list", "action"
 		};
 	}
 	public static final String[] ruleNames = makeRuleNames();
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, "'n-actions'", "'state-changed'", "'any-actions'", "'sut'", "'select-previous-action'", 
-			"'select-random'", "'select-by-related'", null, null, null, null, null, 
+			null, "'n-actions'", "'state-changed'", "'any-actions'", "'sut'", "'select-previous'", 
+			"'select-random'", "'select-related'", null, null, null, null, null, 
 			null, null, null, null, null, null, "'>'", "'>='", "'<'", "'<='", null, 
 			"'!='", null, null, null, null, null, "'('", "')'"
 		};
@@ -133,9 +133,9 @@ public class StrategyParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(16);
+			setState(20);
 			strategy();
-			setState(17);
+			setState(21);
 			match(EOF);
 			}
 		}
@@ -152,20 +152,11 @@ public class StrategyParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class StrategyContext extends ParserRuleContext {
-		public Bool_exprContext ifExpr;
-		public Action_exprContext thenExpr;
-		public Action_exprContext elseExpr;
-		public TerminalNode IF() { return getToken(StrategyParser.IF, 0); }
-		public TerminalNode THEN() { return getToken(StrategyParser.THEN, 0); }
-		public TerminalNode ELSE() { return getToken(StrategyParser.ELSE, 0); }
-		public Bool_exprContext bool_expr() {
-			return getRuleContext(Bool_exprContext.class,0);
+		public If_else_thenContext if_else_then() {
+			return getRuleContext(If_else_thenContext.class,0);
 		}
-		public List<Action_exprContext> action_expr() {
-			return getRuleContexts(Action_exprContext.class);
-		}
-		public Action_exprContext action_expr(int i) {
-			return getRuleContext(Action_exprContext.class,i);
+		public Action_listContext action_list() {
+			return getRuleContext(Action_listContext.class,0);
 		}
 		public StrategyContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -190,20 +181,95 @@ public class StrategyParser extends Parser {
 		StrategyContext _localctx = new StrategyContext(_ctx, getState());
 		enterRule(_localctx, 2, RULE_strategy);
 		try {
+			setState(25);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case IF:
+				enterOuterAlt(_localctx, 1);
+				{
+				setState(23);
+				if_else_then();
+				}
+				break;
+			case T__4:
+			case T__5:
+			case T__6:
+			case NUMBER:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(24);
+				action_list();
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	@SuppressWarnings("CheckReturnValue")
+	public static class If_else_thenContext extends ParserRuleContext {
+		public Bool_exprContext ifExpr;
+		public Action_exprContext thenExpr;
+		public Action_exprContext elseExpr;
+		public TerminalNode IF() { return getToken(StrategyParser.IF, 0); }
+		public TerminalNode THEN() { return getToken(StrategyParser.THEN, 0); }
+		public TerminalNode ELSE() { return getToken(StrategyParser.ELSE, 0); }
+		public Bool_exprContext bool_expr() {
+			return getRuleContext(Bool_exprContext.class,0);
+		}
+		public List<Action_exprContext> action_expr() {
+			return getRuleContexts(Action_exprContext.class);
+		}
+		public Action_exprContext action_expr(int i) {
+			return getRuleContext(Action_exprContext.class,i);
+		}
+		public If_else_thenContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_if_else_then; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterIf_else_then(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitIf_else_then(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitIf_else_then(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final If_else_thenContext if_else_then() throws RecognitionException {
+		If_else_thenContext _localctx = new If_else_thenContext(_ctx, getState());
+		enterRule(_localctx, 4, RULE_if_else_then);
+		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(19);
+			setState(27);
 			match(IF);
-			setState(20);
-			((StrategyContext)_localctx).ifExpr = bool_expr(0);
-			setState(21);
+			setState(28);
+			((If_else_thenContext)_localctx).ifExpr = bool_expr(0);
+			setState(29);
 			match(THEN);
-			setState(22);
-			((StrategyContext)_localctx).thenExpr = action_expr();
-			setState(23);
+			setState(30);
+			((If_else_thenContext)_localctx).thenExpr = action_expr();
+			setState(31);
 			match(ELSE);
-			setState(24);
-			((StrategyContext)_localctx).elseExpr = action_expr();
+			setState(32);
+			((If_else_thenContext)_localctx).elseExpr = action_expr();
 			}
 		}
 		catch (RecognitionException re) {
@@ -230,20 +296,20 @@ public class StrategyParser extends Parser {
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
-	public static class BaseBoolContext extends Bool_exprContext {
+	public static class PlainBoolContext extends Bool_exprContext {
 		public TerminalNode BOOLEAN() { return getToken(StrategyParser.BOOLEAN, 0); }
-		public BaseBoolContext(Bool_exprContext ctx) { copyFrom(ctx); }
+		public PlainBoolContext(Bool_exprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterBaseBool(this);
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterPlainBool(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitBaseBool(this);
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitPlainBool(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitBaseBool(this);
+			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitPlainBool(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -369,25 +435,25 @@ public class StrategyParser extends Parser {
 		int _parentState = getState();
 		Bool_exprContext _localctx = new Bool_exprContext(_ctx, _parentState);
 		Bool_exprContext _prevctx = _localctx;
-		int _startState = 4;
-		enterRecursionRule(_localctx, 4, RULE_bool_expr, _p);
+		int _startState = 6;
+		enterRecursionRule(_localctx, 6, RULE_bool_expr, _p);
 		int _la;
 		try {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(56);
+			setState(64);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,0,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,1,_ctx) ) {
 			case 1:
 				{
 				_localctx = new NotExprContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
 
-				setState(27);
+				setState(35);
 				match(NOT);
-				setState(28);
+				setState(36);
 				((NotExprContext)_localctx).expr = bool_expr(9);
 				}
 				break;
@@ -396,13 +462,13 @@ public class StrategyParser extends Parser {
 				_localctx = new NotExprContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(29);
+				setState(37);
 				match(LP);
-				setState(30);
+				setState(38);
 				match(NOT);
-				setState(31);
+				setState(39);
 				((NotExprContext)_localctx).expr = bool_expr(0);
-				setState(32);
+				setState(40);
 				match(RP);
 				}
 				break;
@@ -411,11 +477,11 @@ public class StrategyParser extends Parser {
 				_localctx = new BoolOprExprContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(34);
+				setState(42);
 				match(LP);
-				setState(35);
+				setState(43);
 				((BoolOprExprContext)_localctx).left = bool_expr(0);
-				setState(36);
+				setState(44);
 				((BoolOprExprContext)_localctx).opr = _input.LT(1);
 				_la = _input.LA(1);
 				if ( !(((_la) & ~0x3f) == 0 && ((1L << _la) & 491520L) != 0) ) {
@@ -426,9 +492,9 @@ public class StrategyParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(37);
+				setState(45);
 				((BoolOprExprContext)_localctx).right = bool_expr(0);
-				setState(38);
+				setState(46);
 				match(RP);
 				}
 				break;
@@ -437,9 +503,9 @@ public class StrategyParser extends Parser {
 				_localctx = new NumberOprExprContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(40);
+				setState(48);
 				((NumberOprExprContext)_localctx).left = number_expr();
-				setState(41);
+				setState(49);
 				((NumberOprExprContext)_localctx).opr = _input.LT(1);
 				_la = _input.LA(1);
 				if ( !(((_la) & ~0x3f) == 0 && ((1L << _la) & 33030144L) != 0) ) {
@@ -450,7 +516,7 @@ public class StrategyParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(42);
+				setState(50);
 				((NumberOprExprContext)_localctx).right = number_expr();
 				}
 				break;
@@ -459,11 +525,11 @@ public class StrategyParser extends Parser {
 				_localctx = new NumberOprExprContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(44);
+				setState(52);
 				match(LP);
-				setState(45);
+				setState(53);
 				((NumberOprExprContext)_localctx).left = number_expr();
-				setState(46);
+				setState(54);
 				((NumberOprExprContext)_localctx).opr = _input.LT(1);
 				_la = _input.LA(1);
 				if ( !(((_la) & ~0x3f) == 0 && ((1L << _la) & 33030144L) != 0) ) {
@@ -474,9 +540,9 @@ public class StrategyParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(47);
+				setState(55);
 				((NumberOprExprContext)_localctx).right = number_expr();
-				setState(48);
+				setState(56);
 				match(RP);
 				}
 				break;
@@ -485,7 +551,7 @@ public class StrategyParser extends Parser {
 				_localctx = new StateBoolContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(50);
+				setState(58);
 				state_boolean();
 				}
 				break;
@@ -494,28 +560,28 @@ public class StrategyParser extends Parser {
 				_localctx = new StateBoolContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(51);
+				setState(59);
 				match(LP);
-				setState(52);
+				setState(60);
 				state_boolean();
-				setState(53);
+				setState(61);
 				match(RP);
 				}
 				break;
 			case 8:
 				{
-				_localctx = new BaseBoolContext(_localctx);
+				_localctx = new PlainBoolContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(55);
+				setState(63);
 				match(BOOLEAN);
 				}
 				break;
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(63);
+			setState(71);
 			_errHandler.sync(this);
-			_alt = getInterpreter().adaptivePredict(_input,1,_ctx);
+			_alt = getInterpreter().adaptivePredict(_input,2,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
@@ -525,9 +591,9 @@ public class StrategyParser extends Parser {
 					_localctx = new BoolOprExprContext(new Bool_exprContext(_parentctx, _parentState));
 					((BoolOprExprContext)_localctx).left = _prevctx;
 					pushNewRecursionContext(_localctx, _startState, RULE_bool_expr);
-					setState(58);
+					setState(66);
 					if (!(precpred(_ctx, 7))) throw new FailedPredicateException(this, "precpred(_ctx, 7)");
-					setState(59);
+					setState(67);
 					((BoolOprExprContext)_localctx).opr = _input.LT(1);
 					_la = _input.LA(1);
 					if ( !(((_la) & ~0x3f) == 0 && ((1L << _la) & 491520L) != 0) ) {
@@ -538,14 +604,14 @@ public class StrategyParser extends Parser {
 						_errHandler.reportMatch(this);
 						consume();
 					}
-					setState(60);
+					setState(68);
 					((BoolOprExprContext)_localctx).right = bool_expr(8);
 					}
 					} 
 				}
-				setState(65);
+				setState(73);
 				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,1,_ctx);
+				_alt = getInterpreter().adaptivePredict(_input,2,_ctx);
 			}
 			}
 		}
@@ -587,22 +653,22 @@ public class StrategyParser extends Parser {
 
 	public final Number_exprContext number_expr() throws RecognitionException {
 		Number_exprContext _localctx = new Number_exprContext(_ctx, getState());
-		enterRule(_localctx, 6, RULE_number_expr);
+		enterRule(_localctx, 8, RULE_number_expr);
 		try {
-			setState(68);
+			setState(76);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T__0:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(66);
+				setState(74);
 				number_of_actions();
 				}
 				break;
 			case NUMBER:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(67);
+				setState(75);
 				match(NUMBER);
 				}
 				break;
@@ -647,30 +713,30 @@ public class StrategyParser extends Parser {
 
 	public final Number_of_actionsContext number_of_actions() throws RecognitionException {
 		Number_of_actionsContext _localctx = new Number_of_actionsContext(_ctx, getState());
-		enterRule(_localctx, 8, RULE_number_of_actions);
+		enterRule(_localctx, 10, RULE_number_of_actions);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(70);
+			setState(78);
 			match(T__0);
-			setState(72);
-			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,3,_ctx) ) {
-			case 1:
-				{
-				setState(71);
-				match(VISIT_MODIFIER);
-				}
-				break;
-			}
-			setState(76);
+			setState(80);
 			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,4,_ctx) ) {
 			case 1:
 				{
-				setState(74);
+				setState(79);
+				match(VISIT_MODIFIER);
+				}
+				break;
+			}
+			setState(84);
+			_errHandler.sync(this);
+			switch ( getInterpreter().adaptivePredict(_input,5,_ctx) ) {
+			case 1:
+				{
+				setState(82);
 				match(FILTER);
-				setState(75);
+				setState(83);
 				match(ACTION_TYPE);
 				}
 				break;
@@ -779,17 +845,17 @@ public class StrategyParser extends Parser {
 
 	public final State_booleanContext state_boolean() throws RecognitionException {
 		State_booleanContext _localctx = new State_booleanContext(_ctx, getState());
-		enterRule(_localctx, 10, RULE_state_boolean);
+		enterRule(_localctx, 12, RULE_state_boolean);
 		int _la;
 		try {
-			setState(93);
+			setState(101);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T__1:
 				_localctx = new StateChangedContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(78);
+				setState(86);
 				match(T__1);
 				}
 				break;
@@ -797,31 +863,31 @@ public class StrategyParser extends Parser {
 				_localctx = new AnyActionsExistsContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(79);
+				setState(87);
 				match(T__2);
-				setState(81);
+				setState(89);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==VISIT_MODIFIER) {
 					{
-					setState(80);
+					setState(88);
 					match(VISIT_MODIFIER);
 					}
 				}
 
-				setState(85);
+				setState(93);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==FILTER) {
 					{
-					setState(83);
+					setState(91);
 					match(FILTER);
-					setState(84);
+					setState(92);
 					match(ACTION_TYPE);
 					}
 				}
 
-				setState(87);
+				setState(95);
 				match(EXIST);
 				}
 				break;
@@ -829,11 +895,11 @@ public class StrategyParser extends Parser {
 				_localctx = new SutTypeContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(88);
+				setState(96);
 				match(T__3);
-				setState(89);
+				setState(97);
 				match(FILTER);
-				setState(90);
+				setState(98);
 				match(SUT_TYPE);
 				}
 				break;
@@ -841,9 +907,9 @@ public class StrategyParser extends Parser {
 				_localctx = new RelatedActionExistsContext(_localctx);
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(91);
+				setState(99);
 				match(RELATED_ACTION);
-				setState(92);
+				setState(100);
 				match(EXIST);
 				}
 				break;
@@ -864,101 +930,118 @@ public class StrategyParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class Action_exprContext extends ParserRuleContext {
+		public If_else_thenContext if_else_then() {
+			return getRuleContext(If_else_thenContext.class,0);
+		}
+		public Action_listContext action_list() {
+			return getRuleContext(Action_listContext.class,0);
+		}
 		public Action_exprContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_action_expr; }
-	 
-		public Action_exprContext() { }
-		public void copyFrom(Action_exprContext ctx) {
-			super.copyFrom(ctx);
-		}
-	}
-	@SuppressWarnings("CheckReturnValue")
-	public static class ActionListContext extends Action_exprContext {
-		public List<ActionContext> action() {
-			return getRuleContexts(ActionContext.class);
-		}
-		public ActionContext action(int i) {
-			return getRuleContext(ActionContext.class,i);
-		}
-		public ActionListContext(Action_exprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterActionList(this);
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterAction_expr(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitActionList(this);
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitAction_expr(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitActionList(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	@SuppressWarnings("CheckReturnValue")
-	public static class SubStrategyContext extends Action_exprContext {
-		public StrategyContext strategy() {
-			return getRuleContext(StrategyContext.class,0);
-		}
-		public SubStrategyContext(Action_exprContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterSubStrategy(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitSubStrategy(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitSubStrategy(this);
+			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitAction_expr(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 
 	public final Action_exprContext action_expr() throws RecognitionException {
 		Action_exprContext _localctx = new Action_exprContext(_ctx, getState());
-		enterRule(_localctx, 12, RULE_action_expr);
-		int _la;
+		enterRule(_localctx, 14, RULE_action_expr);
 		try {
-			setState(101);
+			setState(105);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case IF:
-				_localctx = new SubStrategyContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(95);
-				strategy();
+				setState(103);
+				if_else_then();
 				}
 				break;
 			case T__4:
 			case T__5:
 			case T__6:
 			case NUMBER:
-				_localctx = new ActionListContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(97); 
-				_errHandler.sync(this);
-				_la = _input.LA(1);
-				do {
-					{
-					{
-					setState(96);
-					action();
-					}
-					}
-					setState(99); 
-					_errHandler.sync(this);
-					_la = _input.LA(1);
-				} while ( ((_la) & ~0x3f) == 0 && ((1L << _la) & 268435680L) != 0 );
+				setState(104);
+				action_list();
 				}
 				break;
 			default:
 				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	@SuppressWarnings("CheckReturnValue")
+	public static class Action_listContext extends ParserRuleContext {
+		public List<ActionContext> action() {
+			return getRuleContexts(ActionContext.class);
+		}
+		public ActionContext action(int i) {
+			return getRuleContext(ActionContext.class,i);
+		}
+		public Action_listContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_action_list; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).enterAction_list(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof StrategyListener ) ((StrategyListener)listener).exitAction_list(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof StrategyVisitor ) return ((StrategyVisitor<? extends T>)visitor).visitAction_list(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final Action_listContext action_list() throws RecognitionException {
+		Action_listContext _localctx = new Action_listContext(_ctx, getState());
+		enterRule(_localctx, 16, RULE_action_list);
+		int _la;
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(108); 
+			_errHandler.sync(this);
+			_la = _input.LA(1);
+			do {
+				{
+				{
+				setState(107);
+				action();
+				}
+				}
+				setState(110); 
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+			} while ( ((_la) & ~0x3f) == 0 && ((1L << _la) & 268435680L) != 0 );
 			}
 		}
 		catch (RecognitionException re) {
@@ -1045,27 +1128,27 @@ public class StrategyParser extends Parser {
 
 	public final ActionContext action() throws RecognitionException {
 		ActionContext _localctx = new ActionContext(_ctx, getState());
-		enterRule(_localctx, 14, RULE_action);
+		enterRule(_localctx, 18, RULE_action);
 		int _la;
 		try {
-			setState(123);
+			setState(132);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,15,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,16,_ctx) ) {
 			case 1:
 				_localctx = new SelectPreviousActionContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(104);
+				setState(113);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==NUMBER) {
 					{
-					setState(103);
+					setState(112);
 					match(NUMBER);
 					}
 				}
 
-				setState(106);
+				setState(115);
 				match(T__4);
 				}
 				break;
@@ -1073,36 +1156,36 @@ public class StrategyParser extends Parser {
 				_localctx = new SelectRandomActionContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(108);
+				setState(117);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==NUMBER) {
 					{
-					setState(107);
+					setState(116);
 					match(NUMBER);
 					}
 				}
 
-				setState(110);
+				setState(119);
 				match(T__5);
-				setState(112);
+				setState(121);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==VISIT_MODIFIER) {
 					{
-					setState(111);
+					setState(120);
 					match(VISIT_MODIFIER);
 					}
 				}
 
-				setState(116);
+				setState(125);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==FILTER) {
 					{
-					setState(114);
+					setState(123);
 					match(FILTER);
-					setState(115);
+					setState(124);
 					match(ACTION_TYPE);
 					}
 				}
@@ -1113,19 +1196,19 @@ public class StrategyParser extends Parser {
 				_localctx = new SelectRelatedActionContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(119);
+				setState(128);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==NUMBER) {
 					{
-					setState(118);
+					setState(127);
 					match(NUMBER);
 					}
 				}
 
-				setState(121);
+				setState(130);
 				match(T__6);
-				setState(122);
+				setState(131);
 				match(RELATED_ACTION);
 				}
 				break;
@@ -1144,7 +1227,7 @@ public class StrategyParser extends Parser {
 
 	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 		switch (ruleIndex) {
-		case 2:
+		case 3:
 			return bool_expr_sempred((Bool_exprContext)_localctx, predIndex);
 		}
 		return true;
@@ -1158,82 +1241,86 @@ public class StrategyParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\u0004\u0001\"~\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001\u0002"+
+		"\u0004\u0001\"\u0087\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001\u0002"+
 		"\u0002\u0007\u0002\u0002\u0003\u0007\u0003\u0002\u0004\u0007\u0004\u0002"+
-		"\u0005\u0007\u0005\u0002\u0006\u0007\u0006\u0002\u0007\u0007\u0007\u0001"+
-		"\u0000\u0001\u0000\u0001\u0000\u0001\u0001\u0001\u0001\u0001\u0001\u0001"+
-		"\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0002\u0001\u0002\u0001"+
-		"\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0001"+
-		"\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0001"+
-		"\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0001"+
-		"\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0001"+
-		"\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0003\u00029\b\u0002\u0001"+
-		"\u0002\u0001\u0002\u0001\u0002\u0005\u0002>\b\u0002\n\u0002\f\u0002A\t"+
-		"\u0002\u0001\u0003\u0001\u0003\u0003\u0003E\b\u0003\u0001\u0004\u0001"+
-		"\u0004\u0003\u0004I\b\u0004\u0001\u0004\u0001\u0004\u0003\u0004M\b\u0004"+
-		"\u0001\u0005\u0001\u0005\u0001\u0005\u0003\u0005R\b\u0005\u0001\u0005"+
-		"\u0001\u0005\u0003\u0005V\b\u0005\u0001\u0005\u0001\u0005\u0001\u0005"+
-		"\u0001\u0005\u0001\u0005\u0001\u0005\u0003\u0005^\b\u0005\u0001\u0006"+
-		"\u0001\u0006\u0004\u0006b\b\u0006\u000b\u0006\f\u0006c\u0003\u0006f\b"+
-		"\u0006\u0001\u0007\u0003\u0007i\b\u0007\u0001\u0007\u0001\u0007\u0003"+
-		"\u0007m\b\u0007\u0001\u0007\u0001\u0007\u0003\u0007q\b\u0007\u0001\u0007"+
-		"\u0001\u0007\u0003\u0007u\b\u0007\u0001\u0007\u0003\u0007x\b\u0007\u0001"+
-		"\u0007\u0001\u0007\u0003\u0007|\b\u0007\u0001\u0007\u0000\u0001\u0004"+
-		"\b\u0000\u0002\u0004\u0006\b\n\f\u000e\u0000\u0002\u0001\u0000\u000f\u0012"+
-		"\u0001\u0000\u0013\u0018\u008e\u0000\u0010\u0001\u0000\u0000\u0000\u0002"+
-		"\u0013\u0001\u0000\u0000\u0000\u00048\u0001\u0000\u0000\u0000\u0006D\u0001"+
-		"\u0000\u0000\u0000\bF\u0001\u0000\u0000\u0000\n]\u0001\u0000\u0000\u0000"+
-		"\fe\u0001\u0000\u0000\u0000\u000e{\u0001\u0000\u0000\u0000\u0010\u0011"+
-		"\u0003\u0002\u0001\u0000\u0011\u0012\u0005\u0000\u0000\u0001\u0012\u0001"+
-		"\u0001\u0000\u0000\u0000\u0013\u0014\u0005\u0019\u0000\u0000\u0014\u0015"+
-		"\u0003\u0004\u0002\u0000\u0015\u0016\u0005\u001a\u0000\u0000\u0016\u0017"+
-		"\u0003\f\u0006\u0000\u0017\u0018\u0005\u001b\u0000\u0000\u0018\u0019\u0003"+
-		"\f\u0006\u0000\u0019\u0003\u0001\u0000\u0000\u0000\u001a\u001b\u0006\u0002"+
-		"\uffff\uffff\u0000\u001b\u001c\u0005\u000e\u0000\u0000\u001c9\u0003\u0004"+
-		"\u0002\t\u001d\u001e\u0005\u001e\u0000\u0000\u001e\u001f\u0005\u000e\u0000"+
-		"\u0000\u001f \u0003\u0004\u0002\u0000 !\u0005\u001f\u0000\u0000!9\u0001"+
-		"\u0000\u0000\u0000\"#\u0005\u001e\u0000\u0000#$\u0003\u0004\u0002\u0000"+
-		"$%\u0007\u0000\u0000\u0000%&\u0003\u0004\u0002\u0000&\'\u0005\u001f\u0000"+
-		"\u0000\'9\u0001\u0000\u0000\u0000()\u0003\u0006\u0003\u0000)*\u0007\u0001"+
-		"\u0000\u0000*+\u0003\u0006\u0003\u0000+9\u0001\u0000\u0000\u0000,-\u0005"+
-		"\u001e\u0000\u0000-.\u0003\u0006\u0003\u0000./\u0007\u0001\u0000\u0000"+
-		"/0\u0003\u0006\u0003\u000001\u0005\u001f\u0000\u000019\u0001\u0000\u0000"+
-		"\u000029\u0003\n\u0005\u000034\u0005\u001e\u0000\u000045\u0003\n\u0005"+
-		"\u000056\u0005\u001f\u0000\u000069\u0001\u0000\u0000\u000079\u0005\u001d"+
-		"\u0000\u00008\u001a\u0001\u0000\u0000\u00008\u001d\u0001\u0000\u0000\u0000"+
-		"8\"\u0001\u0000\u0000\u00008(\u0001\u0000\u0000\u00008,\u0001\u0000\u0000"+
-		"\u000082\u0001\u0000\u0000\u000083\u0001\u0000\u0000\u000087\u0001\u0000"+
-		"\u0000\u00009?\u0001\u0000\u0000\u0000:;\n\u0007\u0000\u0000;<\u0007\u0000"+
-		"\u0000\u0000<>\u0003\u0004\u0002\b=:\u0001\u0000\u0000\u0000>A\u0001\u0000"+
-		"\u0000\u0000?=\u0001\u0000\u0000\u0000?@\u0001\u0000\u0000\u0000@\u0005"+
-		"\u0001\u0000\u0000\u0000A?\u0001\u0000\u0000\u0000BE\u0003\b\u0004\u0000"+
-		"CE\u0005\u001c\u0000\u0000DB\u0001\u0000\u0000\u0000DC\u0001\u0000\u0000"+
-		"\u0000E\u0007\u0001\u0000\u0000\u0000FH\u0005\u0001\u0000\u0000GI\u0005"+
-		"\b\u0000\u0000HG\u0001\u0000\u0000\u0000HI\u0001\u0000\u0000\u0000IL\u0001"+
-		"\u0000\u0000\u0000JK\u0005\r\u0000\u0000KM\u0005\u000b\u0000\u0000LJ\u0001"+
-		"\u0000\u0000\u0000LM\u0001\u0000\u0000\u0000M\t\u0001\u0000\u0000\u0000"+
-		"N^\u0005\u0002\u0000\u0000OQ\u0005\u0003\u0000\u0000PR\u0005\b\u0000\u0000"+
-		"QP\u0001\u0000\u0000\u0000QR\u0001\u0000\u0000\u0000RU\u0001\u0000\u0000"+
-		"\u0000ST\u0005\r\u0000\u0000TV\u0005\u000b\u0000\u0000US\u0001\u0000\u0000"+
-		"\u0000UV\u0001\u0000\u0000\u0000VW\u0001\u0000\u0000\u0000W^\u0005\f\u0000"+
-		"\u0000XY\u0005\u0004\u0000\u0000YZ\u0005\r\u0000\u0000Z^\u0005\n\u0000"+
-		"\u0000[\\\u0005\t\u0000\u0000\\^\u0005\f\u0000\u0000]N\u0001\u0000\u0000"+
-		"\u0000]O\u0001\u0000\u0000\u0000]X\u0001\u0000\u0000\u0000][\u0001\u0000"+
-		"\u0000\u0000^\u000b\u0001\u0000\u0000\u0000_f\u0003\u0002\u0001\u0000"+
-		"`b\u0003\u000e\u0007\u0000a`\u0001\u0000\u0000\u0000bc\u0001\u0000\u0000"+
-		"\u0000ca\u0001\u0000\u0000\u0000cd\u0001\u0000\u0000\u0000df\u0001\u0000"+
-		"\u0000\u0000e_\u0001\u0000\u0000\u0000ea\u0001\u0000\u0000\u0000f\r\u0001"+
-		"\u0000\u0000\u0000gi\u0005\u001c\u0000\u0000hg\u0001\u0000\u0000\u0000"+
-		"hi\u0001\u0000\u0000\u0000ij\u0001\u0000\u0000\u0000j|\u0005\u0005\u0000"+
-		"\u0000km\u0005\u001c\u0000\u0000lk\u0001\u0000\u0000\u0000lm\u0001\u0000"+
-		"\u0000\u0000mn\u0001\u0000\u0000\u0000np\u0005\u0006\u0000\u0000oq\u0005"+
-		"\b\u0000\u0000po\u0001\u0000\u0000\u0000pq\u0001\u0000\u0000\u0000qt\u0001"+
-		"\u0000\u0000\u0000rs\u0005\r\u0000\u0000su\u0005\u000b\u0000\u0000tr\u0001"+
-		"\u0000\u0000\u0000tu\u0001\u0000\u0000\u0000u|\u0001\u0000\u0000\u0000"+
-		"vx\u0005\u001c\u0000\u0000wv\u0001\u0000\u0000\u0000wx\u0001\u0000\u0000"+
-		"\u0000xy\u0001\u0000\u0000\u0000yz\u0005\u0007\u0000\u0000z|\u0005\t\u0000"+
-		"\u0000{h\u0001\u0000\u0000\u0000{l\u0001\u0000\u0000\u0000{w\u0001\u0000"+
-		"\u0000\u0000|\u000f\u0001\u0000\u0000\u0000\u00108?DHLQU]cehlptw{";
+		"\u0005\u0007\u0005\u0002\u0006\u0007\u0006\u0002\u0007\u0007\u0007\u0002"+
+		"\b\u0007\b\u0002\t\u0007\t\u0001\u0000\u0001\u0000\u0001\u0000\u0001\u0001"+
+		"\u0001\u0001\u0003\u0001\u001a\b\u0001\u0001\u0002\u0001\u0002\u0001\u0002"+
+		"\u0001\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0001\u0003\u0001\u0003"+
+		"\u0001\u0003\u0001\u0003\u0001\u0003\u0001\u0003\u0001\u0003\u0001\u0003"+
+		"\u0001\u0003\u0001\u0003\u0001\u0003\u0001\u0003\u0001\u0003\u0001\u0003"+
+		"\u0001\u0003\u0001\u0003\u0001\u0003\u0001\u0003\u0001\u0003\u0001\u0003"+
+		"\u0001\u0003\u0001\u0003\u0001\u0003\u0001\u0003\u0001\u0003\u0001\u0003"+
+		"\u0001\u0003\u0001\u0003\u0001\u0003\u0001\u0003\u0003\u0003A\b\u0003"+
+		"\u0001\u0003\u0001\u0003\u0001\u0003\u0005\u0003F\b\u0003\n\u0003\f\u0003"+
+		"I\t\u0003\u0001\u0004\u0001\u0004\u0003\u0004M\b\u0004\u0001\u0005\u0001"+
+		"\u0005\u0003\u0005Q\b\u0005\u0001\u0005\u0001\u0005\u0003\u0005U\b\u0005"+
+		"\u0001\u0006\u0001\u0006\u0001\u0006\u0003\u0006Z\b\u0006\u0001\u0006"+
+		"\u0001\u0006\u0003\u0006^\b\u0006\u0001\u0006\u0001\u0006\u0001\u0006"+
+		"\u0001\u0006\u0001\u0006\u0001\u0006\u0003\u0006f\b\u0006\u0001\u0007"+
+		"\u0001\u0007\u0003\u0007j\b\u0007\u0001\b\u0004\bm\b\b\u000b\b\f\bn\u0001"+
+		"\t\u0003\tr\b\t\u0001\t\u0001\t\u0003\tv\b\t\u0001\t\u0001\t\u0003\tz"+
+		"\b\t\u0001\t\u0001\t\u0003\t~\b\t\u0001\t\u0003\t\u0081\b\t\u0001\t\u0001"+
+		"\t\u0003\t\u0085\b\t\u0001\t\u0000\u0001\u0006\n\u0000\u0002\u0004\u0006"+
+		"\b\n\f\u000e\u0010\u0012\u0000\u0002\u0001\u0000\u000f\u0012\u0001\u0000"+
+		"\u0013\u0018\u0096\u0000\u0014\u0001\u0000\u0000\u0000\u0002\u0019\u0001"+
+		"\u0000\u0000\u0000\u0004\u001b\u0001\u0000\u0000\u0000\u0006@\u0001\u0000"+
+		"\u0000\u0000\bL\u0001\u0000\u0000\u0000\nN\u0001\u0000\u0000\u0000\fe"+
+		"\u0001\u0000\u0000\u0000\u000ei\u0001\u0000\u0000\u0000\u0010l\u0001\u0000"+
+		"\u0000\u0000\u0012\u0084\u0001\u0000\u0000\u0000\u0014\u0015\u0003\u0002"+
+		"\u0001\u0000\u0015\u0016\u0005\u0000\u0000\u0001\u0016\u0001\u0001\u0000"+
+		"\u0000\u0000\u0017\u001a\u0003\u0004\u0002\u0000\u0018\u001a\u0003\u0010"+
+		"\b\u0000\u0019\u0017\u0001\u0000\u0000\u0000\u0019\u0018\u0001\u0000\u0000"+
+		"\u0000\u001a\u0003\u0001\u0000\u0000\u0000\u001b\u001c\u0005\u0019\u0000"+
+		"\u0000\u001c\u001d\u0003\u0006\u0003\u0000\u001d\u001e\u0005\u001a\u0000"+
+		"\u0000\u001e\u001f\u0003\u000e\u0007\u0000\u001f \u0005\u001b\u0000\u0000"+
+		" !\u0003\u000e\u0007\u0000!\u0005\u0001\u0000\u0000\u0000\"#\u0006\u0003"+
+		"\uffff\uffff\u0000#$\u0005\u000e\u0000\u0000$A\u0003\u0006\u0003\t%&\u0005"+
+		"\u001e\u0000\u0000&\'\u0005\u000e\u0000\u0000\'(\u0003\u0006\u0003\u0000"+
+		"()\u0005\u001f\u0000\u0000)A\u0001\u0000\u0000\u0000*+\u0005\u001e\u0000"+
+		"\u0000+,\u0003\u0006\u0003\u0000,-\u0007\u0000\u0000\u0000-.\u0003\u0006"+
+		"\u0003\u0000./\u0005\u001f\u0000\u0000/A\u0001\u0000\u0000\u000001\u0003"+
+		"\b\u0004\u000012\u0007\u0001\u0000\u000023\u0003\b\u0004\u00003A\u0001"+
+		"\u0000\u0000\u000045\u0005\u001e\u0000\u000056\u0003\b\u0004\u000067\u0007"+
+		"\u0001\u0000\u000078\u0003\b\u0004\u000089\u0005\u001f\u0000\u00009A\u0001"+
+		"\u0000\u0000\u0000:A\u0003\f\u0006\u0000;<\u0005\u001e\u0000\u0000<=\u0003"+
+		"\f\u0006\u0000=>\u0005\u001f\u0000\u0000>A\u0001\u0000\u0000\u0000?A\u0005"+
+		"\u001d\u0000\u0000@\"\u0001\u0000\u0000\u0000@%\u0001\u0000\u0000\u0000"+
+		"@*\u0001\u0000\u0000\u0000@0\u0001\u0000\u0000\u0000@4\u0001\u0000\u0000"+
+		"\u0000@:\u0001\u0000\u0000\u0000@;\u0001\u0000\u0000\u0000@?\u0001\u0000"+
+		"\u0000\u0000AG\u0001\u0000\u0000\u0000BC\n\u0007\u0000\u0000CD\u0007\u0000"+
+		"\u0000\u0000DF\u0003\u0006\u0003\bEB\u0001\u0000\u0000\u0000FI\u0001\u0000"+
+		"\u0000\u0000GE\u0001\u0000\u0000\u0000GH\u0001\u0000\u0000\u0000H\u0007"+
+		"\u0001\u0000\u0000\u0000IG\u0001\u0000\u0000\u0000JM\u0003\n\u0005\u0000"+
+		"KM\u0005\u001c\u0000\u0000LJ\u0001\u0000\u0000\u0000LK\u0001\u0000\u0000"+
+		"\u0000M\t\u0001\u0000\u0000\u0000NP\u0005\u0001\u0000\u0000OQ\u0005\b"+
+		"\u0000\u0000PO\u0001\u0000\u0000\u0000PQ\u0001\u0000\u0000\u0000QT\u0001"+
+		"\u0000\u0000\u0000RS\u0005\r\u0000\u0000SU\u0005\u000b\u0000\u0000TR\u0001"+
+		"\u0000\u0000\u0000TU\u0001\u0000\u0000\u0000U\u000b\u0001\u0000\u0000"+
+		"\u0000Vf\u0005\u0002\u0000\u0000WY\u0005\u0003\u0000\u0000XZ\u0005\b\u0000"+
+		"\u0000YX\u0001\u0000\u0000\u0000YZ\u0001\u0000\u0000\u0000Z]\u0001\u0000"+
+		"\u0000\u0000[\\\u0005\r\u0000\u0000\\^\u0005\u000b\u0000\u0000][\u0001"+
+		"\u0000\u0000\u0000]^\u0001\u0000\u0000\u0000^_\u0001\u0000\u0000\u0000"+
+		"_f\u0005\f\u0000\u0000`a\u0005\u0004\u0000\u0000ab\u0005\r\u0000\u0000"+
+		"bf\u0005\n\u0000\u0000cd\u0005\t\u0000\u0000df\u0005\f\u0000\u0000eV\u0001"+
+		"\u0000\u0000\u0000eW\u0001\u0000\u0000\u0000e`\u0001\u0000\u0000\u0000"+
+		"ec\u0001\u0000\u0000\u0000f\r\u0001\u0000\u0000\u0000gj\u0003\u0004\u0002"+
+		"\u0000hj\u0003\u0010\b\u0000ig\u0001\u0000\u0000\u0000ih\u0001\u0000\u0000"+
+		"\u0000j\u000f\u0001\u0000\u0000\u0000km\u0003\u0012\t\u0000lk\u0001\u0000"+
+		"\u0000\u0000mn\u0001\u0000\u0000\u0000nl\u0001\u0000\u0000\u0000no\u0001"+
+		"\u0000\u0000\u0000o\u0011\u0001\u0000\u0000\u0000pr\u0005\u001c\u0000"+
+		"\u0000qp\u0001\u0000\u0000\u0000qr\u0001\u0000\u0000\u0000rs\u0001\u0000"+
+		"\u0000\u0000s\u0085\u0005\u0005\u0000\u0000tv\u0005\u001c\u0000\u0000"+
+		"ut\u0001\u0000\u0000\u0000uv\u0001\u0000\u0000\u0000vw\u0001\u0000\u0000"+
+		"\u0000wy\u0005\u0006\u0000\u0000xz\u0005\b\u0000\u0000yx\u0001\u0000\u0000"+
+		"\u0000yz\u0001\u0000\u0000\u0000z}\u0001\u0000\u0000\u0000{|\u0005\r\u0000"+
+		"\u0000|~\u0005\u000b\u0000\u0000}{\u0001\u0000\u0000\u0000}~\u0001\u0000"+
+		"\u0000\u0000~\u0085\u0001\u0000\u0000\u0000\u007f\u0081\u0005\u001c\u0000"+
+		"\u0000\u0080\u007f\u0001\u0000\u0000\u0000\u0080\u0081\u0001\u0000\u0000"+
+		"\u0000\u0081\u0082\u0001\u0000\u0000\u0000\u0082\u0083\u0005\u0007\u0000"+
+		"\u0000\u0083\u0085\u0005\t\u0000\u0000\u0084q\u0001\u0000\u0000\u0000"+
+		"\u0084u\u0001\u0000\u0000\u0000\u0084\u0080\u0001\u0000\u0000\u0000\u0085"+
+		"\u0013\u0001\u0000\u0000\u0000\u0011\u0019@GLPTY]einquy}\u0080\u0084";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

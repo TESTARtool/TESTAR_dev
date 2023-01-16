@@ -36,9 +36,9 @@ ANY=34
 'state-changed'=2
 'any-actions'=3
 'sut'=4
-'select-previous-action'=5
+'select-previous'=5
 'select-random'=6
-'select-by-related'=7
+'select-related'=7
 '>'=19
 '>='=20
 '<'=21

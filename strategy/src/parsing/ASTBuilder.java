@@ -18,9 +18,14 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     @Override
     public StrategyNode visitStrategy_file(StrategyParser.Strategy_fileContext ctx)
     {return (StrategyNode) visit(ctx.strategy());}
+
     @Override
     public StrategyNode visitStrategy(StrategyParser.StrategyContext ctx)
-    {return new StrategyNode(visit(ctx.ifExpr), visit(ctx.thenExpr), visit(ctx.elseExpr));}
+    {
+        if(ctx.if_else_then() != null)
+            return new StrategyNode((IfThenElseNode) visit(ctx.if_else_then()));
+        else return new StrategyNode((ActionListNode) visit(ctx.action_list()));
+    }
     
     /////////////////////////
     // boolean expressions //
@@ -42,15 +47,15 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
         return new BoolOprNode(visit(ctx.left), opr, visit(ctx.right));
     }
     @Override
-    public BaseStrategyNode visitBaseBool(StrategyParser.BaseBoolContext ctx)
-    { return new PlainBooleanNode(Boolean.valueOf(ctx.BOOLEAN().getText())); }
+    public PlainBooleanNode visitPlainBool(StrategyParser.PlainBoolContext ctx)
+    { return new PlainBooleanNode(Boolean.parseBoolean(ctx.BOOLEAN().getText())); }
     
     ////////////////////////
     // number expressions //
     ////////////////////////
 
     @Override
-    public BaseStrategyNode visitNumberOprExpr(StrategyParser.NumberOprExprContext ctx)
+    public IntOprNode visitNumberOprExpr(StrategyParser.NumberOprExprContext ctx)
     {
         IntegerOperator opr;
         if(ctx.LT() != null)            opr = IntegerOperator.LT;
@@ -118,10 +123,8 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     // action expressions //
     ////////////////////////
 
-//    @Override public BaseStrategyNode visitSubStrategy(StrategyParser.SubStrategyContext ctx)
-//    { return visit(ctx.strategy()); }
-
-    @Override public ActionListNode visitActionList(StrategyParser.ActionListContext ctx)
+    @Override
+    public ActionListNode visitAction_list(StrategyParser.Action_listContext ctx)
     {
         List<BaseActionNode> actionNodes = new ArrayList<>();
         for(int i = 0; i < ctx.getChildCount(); i++)
@@ -130,11 +133,11 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     }
     
     @Override
-    public SelectPreviousActionNode visitSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx)
+    public SelectPreviousNode visitSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx)
     {
         int weight = ctx.NUMBER() == null ? 1 : Integer.parseInt(ctx.NUMBER().getText());
         
-        return new SelectPreviousActionNode(weight);
+        return new SelectPreviousNode(weight);
     }
     @Override
     public SelectRandomActionNode visitSelectRandomAction(StrategyParser.SelectRandomActionContext ctx)
@@ -146,11 +149,11 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
         
         return new SelectRandomActionNode(weight, visitModifier, filter, actionType);
     }
-    @Override public SelectByRelationNode visitSelectRelatedAction(StrategyParser.SelectRelatedActionContext ctx)
+    @Override public SelectRelationNode visitSelectRelatedAction(StrategyParser.SelectRelatedActionContext ctx)
     {
         int weight = ctx.NUMBER() == null ? 1 : Integer.parseInt(ctx.NUMBER().getText());
         RelatedAction relatedAction = (ctx.RELATED_ACTION() == null) ? null : RelatedAction.toEnum(ctx.RELATED_ACTION().getText());
         
-        return new SelectByRelationNode(weight, relatedAction);
+        return new SelectRelationNode(weight, relatedAction);
     }
 }
