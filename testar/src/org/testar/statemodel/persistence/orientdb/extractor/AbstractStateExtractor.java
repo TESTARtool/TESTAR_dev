@@ -10,7 +10,7 @@ import org.testar.statemodel.persistence.orientdb.entity.*;
 import java.util.HashSet;
 import java.util.Set;
 
-public class AbstractStateExtractor implements EntityExtractor<AbstractState> {
+public class AbstractStateExtractor<M> implements EntityExtractor<AbstractState, M> {
 
     private AbstractActionExtractor abstractActionExtractor;
 
@@ -23,7 +23,7 @@ public class AbstractStateExtractor implements EntityExtractor<AbstractState> {
     }
 
     @Override
-    public AbstractState extract(DocumentEntity entity, AbstractStateModel abstractStateModel) throws ExtractionException {
+    public AbstractState extract(DocumentEntity entity, M abstractStateModel) throws ExtractionException {
         if (!(entity instanceof VertexEntity)) {
             throw new ExtractionException("Abstract state extractor expects a vertex entity. Instance of " + entity.getClass().toString() + " was given.");
         }

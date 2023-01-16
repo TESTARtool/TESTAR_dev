@@ -9,7 +9,7 @@ import java.util.Map;
 public class EntityClassFactory {
 
     public enum EntityClassName {AbstractState, AbstractAction, AbstractStateModel, Widget, ConcreteState, ConcreteAction, isParentOf, isChildOf, isAbstractedBy,
-        BlackHole, UnvisitedAbstractAction, TestSequence, SequenceNode, SequenceStep, Accessed, FirstNode}
+        BlackHole, UnvisitedAbstractAction, TestSequence, SequenceNode, SequenceStep, Accessed, FirstNode, QLearningModel, QLearningReward}
 
     // a repo for generated classes, so we don't execute the same generation code over and over if not needed
     private static Map<EntityClassName, EntityClass> entityClasses = new HashMap<>();
@@ -37,6 +37,8 @@ public class EntityClassFactory {
         classNameMap.put("SequenceStep", EntityClassName.SequenceStep);
         classNameMap.put("Accessed", EntityClassName.Accessed);
         classNameMap.put("FirstNode", EntityClassName.FirstNode);
+
+        classNameMap.put("QLearningReward", EntityClassName.QLearningReward);
     }
 
     /**
@@ -88,7 +90,7 @@ public class EntityClassFactory {
 
             case BlackHole:
                 return createBlackHoleClass();
-                
+
             case UnvisitedAbstractAction:
                 return createUnvisitedAbstractActionClass();
 
@@ -106,6 +108,9 @@ public class EntityClassFactory {
 
             case FirstNode:
                 return createFirstNodeClass();
+
+          case QLearningReward:
+                return createQLearningRewardClass();
 
             default:
                 return null;
@@ -535,4 +540,32 @@ public class EntityClassFactory {
         return entityClass;
     }
 
+  private static EntityClass createQLearningRewardClass() {
+      EntityClass entityClass = new EntityClass("QLearningReward", EntityClass.EntityType.Discrete);
+      Property id = new Property("modelIdentifier", OType.STRING);
+      id.setMandatory(true);
+      id.setNullable(false);
+      id.setIdentifier(true);
+      id.setIndexAble(true);
+      Property actionId = new Property("actionId", OType.STRING);
+      actionId.setMandatory(true);
+      actionId.setNullable(false);
+      actionId.setIdentifier(true);
+      actionId.setIndexAble(true);
+      entityClass.addProperty(actionId);
+      Property targetActionId = new Property("targetActionId", OType.STRING);
+      targetActionId.setMandatory(true);
+      targetActionId.setNullable(false);
+      targetActionId.setIdentifier(true);
+      targetActionId.setIndexAble(true);
+      entityClass.addProperty(targetActionId);
+      Property value = new Property("value", OType.DOUBLE);
+      value.setMandatory(true);
+      value.setNullable(true);
+      value.setIdentifier(false);
+      value.setIndexAble(true);
+      entityClass.addProperty(value);
+      entityClasses.put(EntityClassName.QLearningReward, entityClass);
+      return entityClass;
+    }
 }

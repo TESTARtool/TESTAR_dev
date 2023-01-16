@@ -121,7 +121,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	/**
 	 * This method scans the settings directory of TESTAR for a file that end with
 	 * extension SUT_SETTINGS_EXT
-	 * 
+	 *
 	 * @return A list of file names that have extension SUT_SETTINGS_EXT
 	 */
 	public static String[] getSSE() {
@@ -165,16 +165,12 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			}
 		});
 
-		System.out.println("(0)");
 		isValidJavaEnvironment();
 
-		System.out.println("(1)");
 		verifyTestarInitialDirectory();
 
-		System.out.println("(2)");
 		initTestarSSE(getParameters(), null);
 
-		System.out.println("(3)");
 		String testSettingsFileName = getTestSettingsFile();
 		System.out.println("Test settings is <" + testSettingsFileName + ">");
 
@@ -193,7 +189,6 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 		// TESTAR GUI is enabled, we're going to show again the GUI when the selected
 		// protocol execution finishes
 		else {
-			System.out.println("(9)");
 			startTestarDialog(primaryStage, settings, testSettingsFileName);
 		}
 
@@ -294,7 +289,6 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 		// and that there is exactly one.
 
 		// Allow users to use command line to choose a protocol modifying sse file
-		System.out.println("[0]");
 		if (rawParameters == null) {
 			rawParameters = parameters.getRaw();
 		}
@@ -581,7 +575,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	 * Load the default settings for all the configurable settings and add/overwrite
 	 * with those from the file This is needed because the user might not have set
 	 * all the possible settings in the test.settings file.
-	 * 
+	 *
 	 * @param args
 	 * @param file
 	 * @return An instance of Settings
@@ -671,6 +665,9 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 			defaults.add(Pair.from(WebConsoleErrorPattern, ".*.*"));
 			defaults.add(Pair.from(WebConsoleWarningOracle, false));
 			defaults.add(Pair.from(WebConsoleWarningPattern, ".*.*"));
+
+//      defaults.add(Pair.from(CustomOracle, false));
+      defaults.add(Pair.from(QLearningEnabled, false));
 
 			defaults.add(Pair.from(ProtocolSpecificSetting_1, ""));
 			defaults.add(Pair.from(ProtocolSpecificSetting_2, ""));
@@ -788,7 +785,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	/**
 	 * This method creates a sse file to change TESTAR protocol if sett param
 	 * matches an existing protocol
-	 * 
+	 *
 	 * @param sett
 	 * @throws IOException
 	 */
@@ -933,7 +930,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	/**
 	 * This method initializes the coding manager with custom tags to use for
 	 * constructing concrete and abstract state ids, if provided of course.
-	 * 
+	 *
 	 * @param settings
 	 */
 	private static void initCodingManager(Settings settings) {

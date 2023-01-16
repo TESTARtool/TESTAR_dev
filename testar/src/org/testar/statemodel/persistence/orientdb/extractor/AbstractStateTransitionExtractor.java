@@ -13,7 +13,7 @@ import org.testar.statemodel.persistence.orientdb.entity.EdgeEntity;
 import org.testar.statemodel.persistence.orientdb.entity.PropertyValue;
 import org.testar.statemodel.persistence.orientdb.entity.VertexEntity;
 
-public class AbstractStateTransitionExtractor implements EntityExtractor<AbstractStateTransition> {
+public class AbstractStateTransitionExtractor implements EntityExtractor<AbstractStateTransition, AbstractStateModel> {
 
     private AbstractStateExtractor abstractStateExtractor;
 
