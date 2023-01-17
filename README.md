@@ -180,6 +180,10 @@ https://github.com/TESTARtool/TESTAR_dev/wiki/Development:-Increase-Java-memory
 ## Known issues
 https://github.com/TESTARtool/TESTAR_dev/issues
 
+## Supported Java SE versions
+
+Testar needs Java Standard Edition (SE) to run and we support the Java SE LTS versions that are currently under Oracle Extended Support  ( https://www.oracle.com/java/technologies/java-se-support-roadmap.html ) . Other versions might work.
+
 ## Release notes
 https://github.com/TESTARtool/TESTAR_dev/wiki/TESTAR-release-notes
 
