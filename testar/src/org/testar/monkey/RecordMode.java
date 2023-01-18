@@ -59,44 +59,35 @@ public class RecordMode {
 	 * Method to run TESTAR on Record User Actions Mode.
 	 * @param system
 	 */
-	public void runRecordLoop(DefaultProtocol protocol, SUT system) {
-		boolean startedRecordMode = false;
-
-		//If system it's null means that we have started TESTAR from the Record User Actions Mode
-		//We need to invoke the SUT & the canvas representation
-		if(system == null) {
-
-			synchronized(this){
-				OutputStructure.calculateInnerLoopDateString();
-				OutputStructure.sequenceInnerLoopCount++;
-			}
-
-			protocol.preSequencePreparations();
-
-			//reset the faulty variable because we started a new execution
-			DefaultProtocol.faultySequence = false;
-
-			system = protocol.startSystem();
-			startedRecordMode = true;
-			protocol.cv = protocol.buildCanvas();
-			protocol.actionCount = 1;
-
-			//Reset LogSerialiser
-			LogSerialiser.finish();
-			LogSerialiser.exit();
-
-			//Generating the sequence file that can be replayed:
-			protocol.generatedSequence = protocol.getAndStoreGeneratedSequence();
-			protocol.currentSeq = protocol.getAndStoreSequenceFile();
-
-			//Activate process Listeners if enabled in the test.settings
-			if(protocol.enabledProcessListener)
-				protocol.processListener.startListeners(system, protocol.settings());
-
-			// notify the statemodelmanager
-			protocol.stateModelManager.notifyTestSequencedStarted();
+	public void runRecordLoop(DefaultProtocol protocol) {
+		// Prepare the output folders structure
+		synchronized(this){
+			OutputStructure.calculateInnerLoopDateString();
+			OutputStructure.sequenceInnerLoopCount++;
 		}
-		//else, SUT & canvas exists (startSystem() & buildCanvas() created from Generate mode)
+
+		//empty method in defaultProtocol - allowing implementation in application specific protocols
+		//HTML report is created here in Desktop and Webdriver protocols
+		protocol.preSequencePreparations();
+
+		//reset the faulty variable because we started a new execution
+		DefaultProtocol.faultySequence = false;
+
+		//We need to invoke the SUT & the canvas representation
+		SUT system = protocol.startSUTandLogger();
+		protocol.cv = protocol.buildCanvas();
+		protocol.actionCount = 1;
+
+		//Generating the sequence file that can be replayed:
+		protocol.generatedSequence = protocol.getAndStoreGeneratedSequence();
+		protocol.currentSeq = protocol.getAndStoreSequenceFile();
+
+		//Activate process Listeners if enabled in the test.settings
+		if(protocol.enabledProcessListener)
+			protocol.processListener.startListeners(system, protocol.settings());
+
+		// notify the statemodelmanager
+		protocol.stateModelManager.notifyTestSequencedStarted();
 
 		/**
 		 * Start Record User Action Loop
@@ -106,14 +97,13 @@ public class RecordMode {
 			protocol.cv.begin();
 			Util.clear(protocol.cv);
 
-			Set<Action> actions = protocol.deriveActions(system,state);
+			Set<Action> actions = protocol.deriveActions(system, state);
 			protocol.buildStateActionsIdentifiers(state, actions);
 
 			//notify the state model manager of the new state
 			protocol.stateModelManager.notifyNewStateReached(state, actions);
 
 			// If no actions are derived, create an ESC action
-			// In Generate mode, this is done in the preSelectAction method
 			if(actions.isEmpty()){
 				if (protocol.escAttempts >= MAX_ESC_ATTEMPTS){
 					LogSerialiser.log("No available actions to execute! Tried ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
@@ -160,20 +150,12 @@ public class RecordMode {
 			protocol.cv.end();
 		}
 
-		//If user change to Generate mode & we start TESTAR on Record mode, invoke Generate mode with the created SUT
-		if(protocol.mode() == Modes.Generate && startedRecordMode){
-			Util.clear(protocol.cv);
-			protocol.cv.end();
-
-			new GenerateMode().runGenerateOuterLoop(protocol, system);
-		}
-
 		//If user closes the SUT while in Record-mode, TESTAR will close (or go back to SettingsDialog):
 		if(!system.isRunning()){
 			protocol.mode = Modes.Quit;
 		}
 
-		if(startedRecordMode && protocol.mode() == Modes.Quit){
+		if(protocol.mode() == Modes.Quit){
 			// notify the statemodelmanager
 			protocol.stateModelManager.notifyTestSequenceStopped();
 
@@ -195,7 +177,7 @@ public class RecordMode {
 
 	/**
 	 * Waits for an user UI action.
-	 * Requirement: Mode must be GenerateManual.
+	 * Requirement: Mode must be Record.
 	 */
 	private void waitUserActionLoop(DefaultProtocol protocol, SUT system, State state, ActionStatus actionStatus){
 		while (protocol.mode() == Modes.Record && !actionStatus.isUserEventAction()){
@@ -236,7 +218,7 @@ public class RecordMode {
 	}
 
 	/**
-	 * Records user action (for example for Generate-Manual)
+	 * Records user action.
 	 *
 	 * @param state
 	 * @return

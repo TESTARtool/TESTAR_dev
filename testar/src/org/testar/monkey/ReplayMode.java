@@ -251,9 +251,6 @@ public class ReplayMode {
 			// notify to state model the last state
 			Set<Action> actions = protocol.deriveActions(system, state);
 			protocol.buildStateActionsIdentifiers(state, actions);
-			for(Action a : actions)
-				if(a.get(Tags.AbstractIDCustom, null) == null)
-					protocol.buildEnvironmentActionIdentifiers(state, a);
 
 			protocol.stateModelManager.notifyNewStateReached(state, actions);
 

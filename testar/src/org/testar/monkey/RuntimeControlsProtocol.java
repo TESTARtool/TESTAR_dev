@@ -31,7 +31,6 @@
 package org.testar.monkey;
 
 import org.testar.EventHandler;
-import org.testar.FlashFeedback;
 import org.testar.IEventListener;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.monkey.alayer.devices.KBKeys;
@@ -63,36 +62,6 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 
 	public EventHandler initializeEventHandler() {
 		return new EventHandler(this);
-	}
-
-	//TODO think how the modes should be implemented
-	/**
-	 * Implement the SHIFT + ARROW-LEFT or SHIFT + ARROW-RIGHT toggling mode feature
-	 * Show the flashfeedback in the upperleft corner of the screen
-	 * @param forward is set in keyDown method
-	 */
-	private synchronized void nextMode() {
-		switch(mode){
-		case Record:
-			mode = Modes.Generate; break;
-		case Generate:
-			mode = Modes.Record; break;
-		default:
-			break;
-		}
-
-		// Add some logging
-		// Add the FlashFeedback about the mode you are in in the upper left corner.
-		String modeParamS = "";
-		if (mode == Modes.Record)
-			modeParamS = " (" + settings.get(ConfigTags.TimeToWaitAfterAction) + " wait time between actions)";
-
-		String modeNfo = "'" + mode + "' mode active." + modeParamS;
-		LogSerialiser.log(modeNfo + "\n", LogSerialiser.LogLevel.Info);
-		if (settings.get(ConfigTags.FlashFeedback)) {
-			FlashFeedback.flash(modeNfo, 1000);
-		}
-
 	}
 
 	/**
@@ -141,18 +110,6 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 			}
 		}
 
-		// SHIFT + ARROW-RIGHT --> go to the next mode
-		else if(key == KBKeys.VK_RIGHT && pressed.contains(KBKeys.VK_SHIFT)) {
-			if(mode.equals(Modes.Record) || mode.equals(Modes.Generate))
-				nextMode();
-		}
-
-		// SHIFT + ARROW-LEFT --> go to the previous mode
-		else if(key == KBKeys.VK_LEFT && pressed.contains(KBKeys.VK_SHIFT)) {
-			if(mode.equals(Modes.Record) || mode.equals(Modes.Generate))
-				nextMode();
-		}
-
 		// SHIFT + ARROW-DOWN --> stop TESTAR run
 		else if(key == KBKeys.VK_DOWN && pressed.contains(KBKeys.VK_SHIFT)){
 			LogSerialiser.log("User requested to stop monkey!\n", LogSerialiser.LogLevel.Info);
@@ -173,10 +130,10 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 			System.setProperty("DEBUG_WINDOWS_PROCESS_NAMES","true");
 		}
 
-		// In GenerateManual mode you can press any key except SHIFT to add a user keyboard
+		// In Record mode you can press any key except SHIFT to add a user keyboard
 		// This is because SHIFT is used for the TESTAR shortcuts
 		// This is not ideal, because now special characters and capital letters and other events that needs SHIFT
-		// cannot be recorded as an user event in GenerateManual....
+		// cannot be recorded as an user event in Record....
 		else if (!pressed.contains(KBKeys.VK_SHIFT) && mode() == Modes.Record && userEvent == null) {
 			//System.out.println("USER_EVENT key_down! " + key.toString());
 			userEvent = new Object[]{key}; // would be ideal to set it up at keyUp
@@ -204,7 +161,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 	public void mouseDown(MouseButtons btn, double x, double y){}
 
 	/**
-	 * In GenerateManual the user can add user events by clicking and the ecent is added when releasing the mouse
+	 * In Record mode the user can add user events by clicking and the event is added when releasing the mouse
 	 * @param btn
 	 * @param x
 	 * @param y

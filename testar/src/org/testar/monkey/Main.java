@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -44,6 +44,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 import org.testar.monkey.alayer.windows.Windows10;
@@ -102,7 +104,7 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 
 		isValidJavaEnvironment();
-		
+
 		verifyTestarInitialDirectory();
 
 		initTestarSSE(args);
@@ -116,6 +118,9 @@ public class Main {
 		// We only want to execute TESTAR one time with the selected settings.
 		if(!settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)){
 
+			// Verify settings regular expressions before starting TESTAR
+			verifyRegularExpressionSettings(settings, testSettingsFileName);
+
 			setTestarDirectory(settings);
 
 			initCodingManager(settings);
@@ -124,13 +129,16 @@ public class Main {
 
 			startTestar(settings);
 		}
-
 		//TESTAR GUI is enabled, we're going to show again the GUI when the selected protocol execution finishes
 		else{
 			while(startTestarDialog(settings, testSettingsFileName)) {
 
+				// The dialog can change the test settings file, we need to reload the settings
 				testSettingsFileName = getTestSettingsFile();
 				settings = loadTestarSettings(args, testSettingsFileName);
+
+				// Verify settings regular expressions before starting TESTAR
+				verifyRegularExpressionSettings(settings, testSettingsFileName);
 
 				setTestarDirectory(settings);
 
@@ -142,12 +150,7 @@ public class Main {
 			}
 		}
 
-		TestSerialiser.exit();
-		ScreenshotSerialiser.exit();
-		LogSerialiser.exit();
-
-		System.exit(0);
-
+		stopTestar();
 	}
 
 	private static boolean isValidJavaEnvironment() {
@@ -311,7 +314,7 @@ public class Main {
 			LogSerialiser.log("There is an issue with the configuration file: " + ce.getMessage() + "\n", LogSerialiser.LogLevel.Critical);
 		}
 
-		//TODO: Understand what this exactly does?
+		// Override the settings by checking the JVM arguments
 		overrideWithUserProperties(settings);
 		Float SST = settings.get(ConfigTags.StateScreenshotSimilarityThreshold, null);
 		if (SST != null) {
@@ -354,7 +357,6 @@ public class Main {
 		if (settings.get(ConfigTags.AlwaysCompile)) {
 			compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass), settings.get(ConfigTags.ProtocolCompileDirectory));			
 		}
-		
 
 		URLClassLoader loader = null;
 
@@ -422,6 +424,17 @@ public class Main {
 			ScreenshotSerialiser.exit();
 			LogSerialiser.exit();
 		}
+	}
+
+	/**
+	 * Close the Serialiser classes and stop the TESTAR process. 
+	 */
+	private static void stopTestar() {
+		TestSerialiser.exit();
+		ScreenshotSerialiser.exit();
+		LogSerialiser.exit();
+
+		System.exit(0);
 	}
 
 	// TODO: This methods should be part of the Settings class. It contains all the default values of the settings.
@@ -779,6 +792,44 @@ public class Main {
 		} else {
 			System.out.printf("WARNING: Current OS %s has no concrete environment implementation, using default environment\n", NativeLinker.getPLATFORM_OS());
 			Environment.setInstance(new UnknownEnvironment());
+		}
+	}
+
+	/**
+	 * Check if filter and oracles regular expressions are valid. 
+	 * 
+	 * @param settings
+	 * @return
+	 */
+	private static void verifyRegularExpressionSettings(Settings settings, String testSettingsFileName) {
+		StringBuilder invalidExpressions = new StringBuilder();
+
+		List<Tag<String>> regularExpressionTags = Arrays.asList(
+				ConfigTags.ProcessesToKillDuringTest,
+				ConfigTags.ClickFilter,
+				ConfigTags.SuspiciousTitles,
+				ConfigTags.SuspiciousProcessOutput,
+				ConfigTags.ProcessLogs,
+				ConfigTags.WebConsoleErrorPattern,
+				ConfigTags.WebConsoleWarningPattern
+				);
+
+		for(Tag<String> tag : regularExpressionTags) {
+			try {
+				Pattern.compile(settings.get(tag));
+			} catch (PatternSyntaxException exception) {
+				invalidExpressions.append(System.getProperty("line.separator"));
+				invalidExpressions.append("Error! Your " + tag.name() + " is not a valid regular expression! " + settings.get(tag));
+			}
+		}
+
+		if(!invalidExpressions.toString().isEmpty()) {
+			invalidExpressions.append(System.getProperty("line.separator"));
+			invalidExpressions.append("Settings Initialization Error! An invalid regular expression was detected in the TESTAR settings: " + testSettingsFileName);
+			invalidExpressions.append(System.getProperty("line.separator"));
+			invalidExpressions.append("Settings Initialization Error! Please fix the expressions or remove all characters and start TESTAR again.");
+			invalidExpressions.append(System.getProperty("line.separator"));
+			throw new IllegalStateException(invalidExpressions.toString());
 		}
 	}
 }

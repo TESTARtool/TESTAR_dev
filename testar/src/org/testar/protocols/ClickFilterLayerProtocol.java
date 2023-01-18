@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013 - 2022 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -28,9 +28,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.testar.protocols;
 
+import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.util.Set;
@@ -53,7 +53,7 @@ import org.testar.managers.FilteringManager;
 public class ClickFilterLayerProtocol extends DefaultProtocol {
 
     private boolean preciseCoding = false; // false =>  CodingManager.ABSTRACT_R_T_ID; true => CodingManager.ABSTRACT_R_T_P_ID
-    private boolean displayWhiteTabu = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
+    private boolean displayWhiteTabu = false;
     private boolean whiteTabuMode = false; // true => white, false = tabu
     private boolean shiftPressed = false;
 
@@ -72,7 +72,11 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
 		filteringManager = new FilteringManager();
 		dataManager = new DataManager();
 		filteringManager.loadFilters();
-		dataManager.loadInputValues();		
+		dataManager.loadInputValues();
+		// If the environment is not headless, initialize the CAPS LOCK display mouse
+		if (!GraphicsEnvironment.isHeadless()) {
+			displayWhiteTabu = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
+		}
 	}
 
 	/**
