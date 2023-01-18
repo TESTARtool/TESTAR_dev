@@ -10,11 +10,11 @@ import strategynodes.BaseStrategyNode;
 import java.util.Map;
 import java.util.Set;
 
-public class RelatedActionExistsNode extends BaseStrategyNode<Boolean>
+public class AnyExistRelatedActionNode extends BaseStrategyNode<Boolean>
 {
     private final RelatedAction RELATED_ACTION;
     
-    public RelatedActionExistsNode(RelatedAction relatedAction)
+    public AnyExistRelatedActionNode(RelatedAction relatedAction)
     {
         this.RELATED_ACTION = relatedAction;
     }

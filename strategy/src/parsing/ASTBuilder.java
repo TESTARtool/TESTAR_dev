@@ -99,13 +99,13 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     public StateChangedNode visitStateChanged(StrategyParser.StateChangedContext ctx)
     {return new StateChangedNode();}
     @Override
-    public AnyActionsExistNode visitAnyActionsExists(StrategyParser.AnyActionsExistsContext ctx)
+    public AnyExistNode visitAnyExist(StrategyParser.AnyExistContext ctx)
     {
         VisitedModifier visitModifier = (ctx.VISIT_MODIFIER() == null) ? null :  VisitedModifier.toEnum(ctx.VISIT_MODIFIER().getText());
         Filter filter = (ctx.FILTER() == null) ? null : Filter.toEnum(ctx.FILTER().getText());
         ActionType actionType = (ctx.ACTION_TYPE() == null) ? null : ActionType.toEnum(ctx.ACTION_TYPE().getText());
         
-        return new AnyActionsExistNode(visitModifier,filter, actionType);
+        return new AnyExistNode(visitModifier, filter, actionType);
     }
     @Override
     public SutNode visitSutType(StrategyParser.SutTypeContext ctx)
@@ -116,8 +116,8 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
         return new SutNode(filter, sutType);
     }
     @Override
-    public RelatedActionExistsNode visitRelatedActionExists(StrategyParser.RelatedActionExistsContext ctx)
-    { return new RelatedActionExistsNode(RelatedAction.toEnum(ctx.RELATED_ACTION().getText())); }
+    public AnyExistRelatedActionNode visitAnyExistRelatedAction(StrategyParser.AnyExistRelatedActionContext ctx)
+    { return new AnyExistRelatedActionNode(RelatedAction.toEnum(ctx.RELATED_ACTION().getText())); }
     
     ////////////////////////
     // action expressions //

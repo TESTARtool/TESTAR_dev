@@ -1,4 +1,4 @@
-// Generated from java-escape by ANTLR 4.11.1
+// Generated from C:/Users/lh3/IdeaProjects/TESTAR/strategy/src/antlrfour\Strategy.g4 by ANTLR 4.9.2
 package antlrfour;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -10,7 +10,6 @@ import org.antlr.v4.runtime.tree.TerminalNode;
  * which can be extended to create a listener which only needs to handle a subset
  * of the available methods.
  */
-@SuppressWarnings("CheckReturnValue")
 public class StrategyBaseListener implements StrategyListener {
 	/**
 	 * {@inheritDoc}
@@ -149,13 +148,25 @@ public class StrategyBaseListener implements StrategyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterAnyActionsExists(StrategyParser.AnyActionsExistsContext ctx) { }
+	@Override public void enterAnyExistRelatedAction(StrategyParser.AnyExistRelatedActionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitAnyActionsExists(StrategyParser.AnyActionsExistsContext ctx) { }
+	@Override public void exitAnyExistRelatedAction(StrategyParser.AnyExistRelatedActionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterAnyExist(StrategyParser.AnyExistContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitAnyExist(StrategyParser.AnyExistContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -168,18 +179,6 @@ public class StrategyBaseListener implements StrategyListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitSutType(StrategyParser.SutTypeContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterRelatedActionExists(StrategyParser.RelatedActionExistsContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitRelatedActionExists(StrategyParser.RelatedActionExistsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

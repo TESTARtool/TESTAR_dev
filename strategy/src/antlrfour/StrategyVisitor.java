@@ -1,4 +1,4 @@
-// Generated from java-escape by ANTLR 4.11.1
+// Generated from C:/Users/lh3/IdeaProjects/TESTAR/strategy/src/antlrfour\Strategy.g4 by ANTLR 4.9.2
 package antlrfour;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
@@ -83,12 +83,19 @@ public interface StrategyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStateChanged(StrategyParser.StateChangedContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code anyActionsExists}
+	 * Visit a parse tree produced by the {@code anyExistRelatedAction}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitAnyActionsExists(StrategyParser.AnyActionsExistsContext ctx);
+	T visitAnyExistRelatedAction(StrategyParser.AnyExistRelatedActionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code anyExist}
+	 * labeled alternative in {@link StrategyParser#state_boolean}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAnyExist(StrategyParser.AnyExistContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code sutType}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
@@ -96,13 +103,6 @@ public interface StrategyVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitSutType(StrategyParser.SutTypeContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code relatedActionExists}
-	 * labeled alternative in {@link StrategyParser#state_boolean}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitRelatedActionExists(StrategyParser.RelatedActionExistsContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link StrategyParser#action_expr}.
 	 * @param ctx the parse tree

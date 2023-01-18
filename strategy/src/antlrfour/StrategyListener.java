@@ -1,4 +1,4 @@
-// Generated from java-escape by ANTLR 4.11.1
+// Generated from C:/Users/lh3/IdeaProjects/TESTAR/strategy/src/antlrfour\Strategy.g4 by ANTLR 4.9.2
 package antlrfour;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
@@ -130,17 +130,29 @@ public interface StrategyListener extends ParseTreeListener {
 	 */
 	void exitStateChanged(StrategyParser.StateChangedContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code anyActionsExists}
+	 * Enter a parse tree produced by the {@code anyExistRelatedAction}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
 	 * @param ctx the parse tree
 	 */
-	void enterAnyActionsExists(StrategyParser.AnyActionsExistsContext ctx);
+	void enterAnyExistRelatedAction(StrategyParser.AnyExistRelatedActionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code anyActionsExists}
+	 * Exit a parse tree produced by the {@code anyExistRelatedAction}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
 	 * @param ctx the parse tree
 	 */
-	void exitAnyActionsExists(StrategyParser.AnyActionsExistsContext ctx);
+	void exitAnyExistRelatedAction(StrategyParser.AnyExistRelatedActionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code anyExist}
+	 * labeled alternative in {@link StrategyParser#state_boolean}.
+	 * @param ctx the parse tree
+	 */
+	void enterAnyExist(StrategyParser.AnyExistContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code anyExist}
+	 * labeled alternative in {@link StrategyParser#state_boolean}.
+	 * @param ctx the parse tree
+	 */
+	void exitAnyExist(StrategyParser.AnyExistContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code sutType}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
@@ -153,18 +165,6 @@ public interface StrategyListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitSutType(StrategyParser.SutTypeContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code relatedActionExists}
-	 * labeled alternative in {@link StrategyParser#state_boolean}.
-	 * @param ctx the parse tree
-	 */
-	void enterRelatedActionExists(StrategyParser.RelatedActionExistsContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code relatedActionExists}
-	 * labeled alternative in {@link StrategyParser#state_boolean}.
-	 * @param ctx the parse tree
-	 */
-	void exitRelatedActionExists(StrategyParser.RelatedActionExistsContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link StrategyParser#action_expr}.
 	 * @param ctx the parse tree

@@ -12,13 +12,13 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-public class AnyActionsExistNode extends BaseStrategyNode<Boolean>
+public class AnyExistNode extends BaseStrategyNode<Boolean>
 {
     private final VisitedModifier   VISITED_MODIFIER;
     private final Filter            FILTER;
     private final ActionType        ACTION_TYPE;
     
-    public AnyActionsExistNode(VisitedModifier visitedModifier, Filter filter, ActionType actionType)
+    public AnyExistNode(VisitedModifier visitedModifier, Filter filter, ActionType actionType)
     {
         this.VISITED_MODIFIER = visitedModifier;
         this.FILTER      = filter;

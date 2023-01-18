@@ -26,10 +26,10 @@ number_expr:         number_of_actions | NUMBER;
 
 number_of_actions:  'n-actions'      VISIT_MODIFIER?   (FILTER     ACTION_TYPE)?;
 
-state_boolean:      'state-changed'                                                             #stateChanged
-|                   'any-actions'    VISIT_MODIFIER?   (FILTER     ACTION_TYPE)?      EXIST     #anyActionsExists
-|                   'sut'            FILTER             SUT_TYPE                                #sutType
-|                    RELATED_ACTION  EXIST                                                      #relatedActionExists
+state_boolean:      'state-changed'                                                         #stateChanged
+|                   'any-exist'             RELATED_ACTION                                  #anyExistRelatedAction
+|                   'any-exist'             VISIT_MODIFIER?   (FILTER     ACTION_TYPE)?     #anyExist
+|                   'sut'                   FILTER             SUT_TYPE                     #sutType
 ;
 
 ////////////////////////////////
@@ -64,7 +64,6 @@ ACTION_TYPE:        'click-action' | 'type-action' | 'drag-action' | 'scroll-act
 // lexer rules //
 /////////////////
 
-EXIST:              'exist' | 'exists';
 FILTER:             'of-type' | 'not-of-type';
 
 NOT:                N O T   | '!'   | '~';
