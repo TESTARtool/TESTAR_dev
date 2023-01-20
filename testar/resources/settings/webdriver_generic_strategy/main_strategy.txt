@@ -1,3 +1,3 @@
-/*4 select-by-related sibling-or-child-action*/
+/*4 select-related sibling-or-child-action*/
 5 select-random least-visited of-type type-action
 /*select-previous*/
