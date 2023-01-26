@@ -121,9 +121,7 @@ ProtocolSpecificSetting_5 =
 #################################################################
 
 StrategyFile = settings/desktop_generic_strategy/test_strategy.txt
-# SecondaryStrategyFile =
-# UseSecondaryStrategy = false
-# FormModeProbability = 0.8
+UseSingleFill = false
 #################################################################
 # Other more advanced settings
 #################################################################

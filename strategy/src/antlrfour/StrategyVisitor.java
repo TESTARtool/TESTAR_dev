@@ -1,4 +1,4 @@
-// Generated from C:/Users/lh3/IdeaProjects/TESTAR/strategy/src/antlrfour\Strategy.g4 by ANTLR 4.9.2
+// Generated from java-escape by ANTLR 4.11.1
 package antlrfour;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
@@ -23,11 +23,11 @@ public interface StrategyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStrategy(StrategyParser.StrategyContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link StrategyParser#if_else_then}.
+	 * Visit a parse tree produced by {@link StrategyParser#if_then_else}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitIf_else_then(StrategyParser.If_else_thenContext ctx);
+	T visitIf_then_else(StrategyParser.If_then_elseContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code plainBool}
 	 * labeled alternative in {@link StrategyParser#bool_expr}.

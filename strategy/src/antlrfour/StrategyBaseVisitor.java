@@ -1,4 +1,4 @@
-// Generated from C:/Users/lh3/IdeaProjects/TESTAR/strategy/src/antlrfour\Strategy.g4 by ANTLR 4.9.2
+// Generated from java-escape by ANTLR 4.11.1
 package antlrfour;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
@@ -10,6 +10,7 @@ import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
  * @param <T> The return type of the visit operation. Use {@link Void} for
  * operations with no return type.
  */
+@SuppressWarnings("CheckReturnValue")
 public class StrategyBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements StrategyVisitor<T> {
 	/**
 	 * {@inheritDoc}
@@ -31,7 +32,7 @@ public class StrategyBaseVisitor<T> extends AbstractParseTreeVisitor<T> implemen
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitIf_else_then(StrategyParser.If_else_thenContext ctx) { return visitChildren(ctx); }
+	@Override public T visitIf_then_else(StrategyParser.If_then_elseContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

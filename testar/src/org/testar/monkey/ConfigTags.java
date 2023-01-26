@@ -35,7 +35,8 @@ import org.testar.monkey.alayer.Tag;
 
 import java.util.List;
 
-public final class ConfigTags {
+public final class ConfigTags
+{
   public static final Tag<String> ProcessesToKillDuringTest = Tag.from("ProcessesToKillDuringTest", String.class);
   public static final Tag<Boolean> ShowVisualSettingsDialogOnStartup = Tag.from("ShowVisualSettingsDialogOnStartup", Boolean.class);
   public static final Tag<Integer> LogLevel = Tag.from("LogLevel", Integer.class);
@@ -158,9 +159,7 @@ public final class ConfigTags {
   public static final Tag<Pair<String, String>> Username = Tag.from("Username", (Class<Pair<String, String>>) (Class<?>) Pair.class);
   public static final Tag<Pair<String, String>> Password = Tag.from("Password", (Class<Pair<String, String>>) (Class<?>) Pair.class);
   */
-  
+
   public static final Tag<String> StrategyFile = Tag.from("StrategyFile", String.class);
-  public static final Tag<String> SecondaryStrategyFile = Tag.from("SecondaryStrategyFile", String.class);
-  public static final Tag<Boolean> UseSecondaryStrategy = Tag.from("UseSecondaryStrategy", Boolean.class);
-  public static final Tag<Double> FormModeProbability = Tag.from("FormModeProbability", Double.class);
+  public static final Tag<Boolean> UseSingleFill = Tag.from("UseSingleFill", Boolean.class);
 }

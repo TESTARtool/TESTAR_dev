@@ -29,13 +29,16 @@
  */
 
  import org.apache.commons.lang.SerializationUtils;
+ import org.testar.RandomActionSelector;
  import org.testar.SutVisualization;
  import org.testar.monkey.ConfigTags;
  import org.testar.monkey.DefaultProtocol;
  import org.testar.monkey.Settings;
  import org.testar.monkey.alayer.*;
  import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+ import org.testar.monkey.alayer.actions.NOP;
  import org.testar.monkey.alayer.actions.StdActionCompiler;
+ import org.testar.monkey.alayer.actions.WdFillFormAction;
  import org.testar.monkey.alayer.exceptions.ActionBuildException;
  import org.testar.monkey.alayer.exceptions.StateBuildException;
  import org.testar.monkey.alayer.webdriver.enums.WdRoles;
@@ -54,19 +57,14 @@
 {
     private ParseUtil               parseUtil;
     private Map<String, Integer>    actionsExecuted      = new HashMap<String, Integer>();
-//    private boolean                 useSecondaryStrategy;
-//    private boolean                 formStrategyActive = false;
-//    private double                  formModeProbability;
+    private boolean                 UseSingleFill;
     
     @Override
     protected void initialize(Settings settings)
     {
         super.initialize(settings);
         parseUtil = new ParseUtil(settings.get(ConfigTags.StrategyFile));
-        
-        //for detecting forms and switching to form filling mode with some probability
-//        useSecondaryStrategy = settings.get(ConfigTags.UseSecondaryStrategy);
-//        formModeProbability = settings.get(ConfigTags.FormModeProbability);
+        UseSingleFill = settings.get(ConfigTags.UseSingleFill);
     }
     
     @Override
@@ -97,22 +95,22 @@
         
         // Check if forced actions are needed to stay within allowed domains
         Set<Action> forcedActions = detectForcedActions(state, ac);
-        
-        
+
         // iterate through all widgets
         for (Widget widget : state)
         {
-//            if(useSecondaryStrategy && !formStrategyActive)
-//            {
-//                if(isAtBrowserCanvas(widget) && isForm(widget))
-//                {
-//                    if(Math.random() <= formModeProbability)
-//                    {
-//                        formStrategyActive = true;
-//                        System.out.println("Form filling mode ON");
-//                    }
-//                }
-//            }
+            if(UseSingleFill)
+            {
+                // fill forms actions
+                if (isAtBrowserCanvas(widget) && isForm(widget))
+                {
+                    String protocol = settings.get(ConfigTags.ProtocolClass, "");
+                    Action formFillingAction = new WdFillFormAction(ac, widget, protocol.substring(0, protocol.lastIndexOf('/')));
+                    if(!(formFillingAction instanceof NOP))// do nothing with NOP actions - the form was not actionable
+                        actions.add(formFillingAction);
+
+                }
+            }
             
             // only consider enabled and non-tabu widgets
             if (!widget.get(Enabled, true)) {
@@ -172,7 +170,18 @@
             filteredActions = actions;
             actions = forcedActions;
         }
-        
+
+        if(UseSingleFill && actions.size() > 1)
+        {
+            Set<Action> fillFormActions = new HashSet<>();
+            for (Action action : actions)
+            {
+                if(action instanceof WdFillFormAction)
+                    fillFormActions.add(action);
+            }
+            actions = fillFormActions;
+        }
+
         //Showing the grey dots for filtered actions if visualization is on:
         if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
         
@@ -182,6 +191,9 @@
     @Override
     protected Action selectAction(State state, Set<Action> actions)
     {
+        if(UseSingleFill)
+            return RandomActionSelector.selectAction(actions); //the list only contains FillFormActions
+
         //clone the action
         Action selectedAction = (Action) SerializationUtils.clone(parseUtil.selectAction(state, actions, actionsExecuted));
         

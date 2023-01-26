@@ -1,4 +1,4 @@
-// Generated from C:/Users/lh3/IdeaProjects/TESTAR/strategy/src/antlrfour\Strategy.g4 by ANTLR 4.9.2
+// Generated from java-escape by ANTLR 4.11.1
 package antlrfour;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
@@ -28,15 +28,15 @@ public interface StrategyListener extends ParseTreeListener {
 	 */
 	void exitStrategy(StrategyParser.StrategyContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link StrategyParser#if_else_then}.
+	 * Enter a parse tree produced by {@link StrategyParser#if_then_else}.
 	 * @param ctx the parse tree
 	 */
-	void enterIf_else_then(StrategyParser.If_else_thenContext ctx);
+	void enterIf_then_else(StrategyParser.If_then_elseContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link StrategyParser#if_else_then}.
+	 * Exit a parse tree produced by {@link StrategyParser#if_then_else}.
 	 * @param ctx the parse tree
 	 */
-	void exitIf_else_then(StrategyParser.If_else_thenContext ctx);
+	void exitIf_then_else(StrategyParser.If_then_elseContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code plainBool}
 	 * labeled alternative in {@link StrategyParser#bool_expr}.

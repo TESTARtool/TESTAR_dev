@@ -581,10 +581,8 @@ public class Main {
 			defaults.add(Pair.from(FollowLinks, true));
 			defaults.add(Pair.from(BrowserFullScreen, true));
 			defaults.add(Pair.from(SwitchNewTabs, true));
-			defaults.add(Pair.from(StrategyFile, "test_strategy.txt"));
-			defaults.add(Pair.from(SecondaryStrategyFile, "test_strategy_secondary.txt"));
-			defaults.add(Pair.from(UseSecondaryStrategy, false));
-			defaults.add(Pair.from(FormModeProbability, 0.8));
+			defaults.add(Pair.from(StrategyFile, "main_strategy.txt"));
+			defaults.add(Pair.from(UseSingleFill, false));
 			
 			/*
 			//TODO web driver settings for login feature

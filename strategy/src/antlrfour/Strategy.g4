@@ -2,9 +2,9 @@ grammar Strategy;
 
 strategy_file:  strategy EOF;
 
-strategy:       if_else_then | action_list;
+strategy:       if_then_else | action_list;
 
-if_else_then:   IF ifExpr=bool_expr     THEN thenExpr=action_expr   ELSE elseExpr=action_expr;
+if_then_else:   IF ifExpr=bool_expr     THEN thenExpr=action_expr   ELSE elseExpr=action_expr;
 
 /////////////////////
 // IF parser rules //
@@ -37,7 +37,7 @@ state_boolean:      'state-changed'                                             
 ////////////////////////////////
 
 
-action_expr:        if_else_then | action_list;
+action_expr:        if_then_else | action_list;
 
 action_list:        action+;
 

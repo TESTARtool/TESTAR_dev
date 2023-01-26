@@ -17,15 +17,21 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     
     @Override
     public StrategyNode visitStrategy_file(StrategyParser.Strategy_fileContext ctx)
-    {return (StrategyNode) visit(ctx.strategy());}
+    {
+        return (StrategyNode) visit(ctx.strategy());
+    }
 
     @Override
     public StrategyNode visitStrategy(StrategyParser.StrategyContext ctx)
     {
-        if(ctx.if_else_then() != null)
-            return new StrategyNode((IfThenElseNode) visit(ctx.if_else_then()));
-        else return new StrategyNode((ActionListNode) visit(ctx.action_list()));
+        return
+                (ctx.if_then_else() != null) ?
+                        new StrategyNode((IfThenElseNode) visit(ctx.if_then_else())) :
+                        new StrategyNode((ActionListNode) visit(ctx.action_list()));
     }
+
+    @Override public IfThenElseNode visitIf_then_else(StrategyParser.If_then_elseContext ctx)
+    { return new IfThenElseNode(visit(ctx.ifExpr), visit(ctx.thenExpr), visit(ctx.elseExpr)); }
     
     /////////////////////////
     // boolean expressions //
