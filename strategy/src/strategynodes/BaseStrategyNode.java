@@ -29,8 +29,8 @@ public abstract class BaseStrategyNode<T>
         boolean actionIsVisited = (actionsExecuted.containsKey(action.get(Tags.AbstractIDCustom)));
 
         return (
-                (visitedModifier == VisitedModifier.VISITED && (!actionIsVisited)) ||
-                (visitedModifier == VisitedModifier.UNVISITED && actionIsVisited)
+                (visitedModifier == VisitedModifier.VISITED && actionIsVisited) ||
+                (visitedModifier == VisitedModifier.UNVISITED && (!actionIsVisited))
         );
     }
 }

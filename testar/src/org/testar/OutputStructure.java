@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,12 +31,12 @@
 
 package org.testar;
 
-import java.io.File;
-
-import org.testar.monkey.Util;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
+import org.testar.monkey.Util;
 import org.testar.monkey.Settings;
+
+import java.io.File;
 
 public class OutputStructure {
 
@@ -50,6 +50,7 @@ public class OutputStructure {
 	public static String executedSUTname;
 	public static int sequenceInnerLoopCount;
 
+	public static String outerLoopName;
 	public static String outerLoopOutputDir;
 	public static String sequencesOutputDir;
 	public static String screenshotsOutputDir;
@@ -59,17 +60,11 @@ public class OutputStructure {
 	public static String processListenerDir;
 
 	public static void calculateOuterLoopDateString() {
-		startOuterLoopDateString = "";
 		String date = Util.dateString(OutputStructure.DATE_FORMAT);
 		date = date + "s";
 		date = date.substring(0, 16) + "m" + date.substring(17);
 		date = date.substring(0, 13) + "h" + date.substring(14);
-		if (System.getenv("HOSTNAME") != null)
-		{
-			startOuterLoopDateString = System.getenv("HOSTNAME")+"_";
-
-		}
-		startOuterLoopDateString +=  date;
+		startOuterLoopDateString = date;
 	}
 
 	public static void calculateInnerLoopDateString() {
@@ -108,15 +103,14 @@ public class OutputStructure {
 					String sutName = sutConnectorValue.substring(startSUT, endSUT);
 					executedSUTname = sutName;
 				}
-			} catch (Exception e) {
-				// e.printStackTrace();
-				System.out.println("Warning: This run generation will be stored with empty name");
+			}catch(Exception e) {
+				System.out.println("Error: This run generation will be stored with empty name");
 			}
 
 		}else {
 			executedSUTname = settings.get(ConfigTags.ApplicationName,"");
 		}
-		
+
 		String version = settings.get(ConfigTags.ApplicationVersion,"");
 		if(!version.isEmpty())
 			executedSUTname += "_" + version;
@@ -124,8 +118,8 @@ public class OutputStructure {
 	}
 
 	public static void createOutputFolders() {
-
-		outerLoopOutputDir = Main.outputDir + File.separator + startOuterLoopDateString + "_" + executedSUTname;
+		outerLoopName = startOuterLoopDateString + "_" + executedSUTname;
+		outerLoopOutputDir = Main.outputDir + File.separator + outerLoopName;
 		File runDir = new File(outerLoopOutputDir);
 		runDir.mkdirs();
 

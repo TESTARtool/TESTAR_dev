@@ -171,7 +171,7 @@ ProtocolSpecificSetting_5 =
 #################################################################
 
 StrategyFile = settings/webdriver_generic_strategy/relation_strategy.txt
-UseSingleFill = true
+UseSingleFill = false
 
 #################################################################
 # Other more advanced settings

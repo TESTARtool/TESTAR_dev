@@ -46,5 +46,5 @@ public class AnyExistRelatedActionNode extends BaseStrategyNode<Boolean>
     
     @Override
     public String toString()
-    { return RELATED_ACTION.toString() + " exist"; }
+    { return "any-exist " + RELATED_ACTION.toString(); }
 }
