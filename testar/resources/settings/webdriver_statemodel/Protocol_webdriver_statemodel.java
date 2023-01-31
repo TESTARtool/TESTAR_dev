@@ -161,18 +161,7 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 
 		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
-		Action retAction = super.selectAction(state, actions);
-		if (retAction== null) {
-			//if no preSelected actions are needed, then implement your own action selection strategy
-			//using the action selector of the state model:
-			retAction = stateModelManager.getAbstractActionToExecute(actions);
-		}
-		if(retAction==null) {
-			System.out.println("State model based action selection did not find an action. Using random action selection.");
-			// if state model fails, using random:
-			retAction = RandomActionSelector.selectAction(actions);
-		}
-		return retAction;
+		return super.selectAction(state, actions);
 	}
 
 }

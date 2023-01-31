@@ -282,19 +282,12 @@ public class Protocol_android_generic extends AndroidProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-
-		Action retAction = stateModelManager.getAbstractActionToExecute(actions);
+		return super.selectAction(state, actions);
 
 		// Uncomment the next line to use the Qlearning action selector
 //			System.out.println("Q-learning action selector");
 //			retAction = actionSelector.selectAction(state,actions);
-		if(retAction==null) {
-			System.out.println("State model based action selection did not find an action. Using random action selection.");
-			// if state model fails, use random (default would call preSelectAction() again, causing double actions HTML report):
-			retAction = RandomActionSelector.selectAction(actions);
-		}
 
-		return retAction;
 	}
 
 	private boolean notBanned(Widget w) {
