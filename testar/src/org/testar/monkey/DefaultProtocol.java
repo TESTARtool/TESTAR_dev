@@ -1073,7 +1073,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	protected Action selectAction(State state, Set<Action> actions){
 		Assert.isTrue(actions != null && !actions.isEmpty());
-		return RandomActionSelector.selectAction(actions);
+
+		//Using the action selector of the state model:
+		Action retAction = stateModelManager.getAbstractActionToExecute(actions);
+		// If state model fails, use random:
+		if (retAction == null) {
+			System.out.println("State model based action selection did not find an action. Using random action selection.");
+			return RandomActionSelector.selectAction(actions);
+		}
+		return retAction;
 	}
 
 	protected String getRandomText(Widget w){
