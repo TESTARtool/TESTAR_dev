@@ -101,7 +101,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	public static String reportingTmpDir = extrasDir + "reporting" + File.separator + "tmp" + File.separator;
 
 	public static String sonarqubeDir = extrasDir + "sonarqube";
-	public static String sonarqubeClientDir = extrasDir + "sonarqube_client";
+  public static String sonarqubeOutputDir = sonarqubeDir + File.separator + "output";
 
 	private static DockerPoolService reportingDockerService = new DockerPoolServiceImpl();
 

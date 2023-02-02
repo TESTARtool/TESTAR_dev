@@ -32,6 +32,7 @@ import org.fruit.monkey.sonarqube.model.SQComponent;
 import org.fruit.monkey.sonarqube.model.SQPage;
 import org.fruit.monkey.weights.FileAnalysedMethodEntryRepository;
 import org.fruit.monkey.weights.StaticAnalysisResolver;
+import org.testar.monkey.Main;
 
 import java.io.Closeable;
 import java.io.File;
@@ -198,7 +199,7 @@ public class SonarqubeServiceImpl implements SonarqubeService {
                         if (delegate != null) {
                             delegate.onComplete(issuesReport);
                         }
-                        var jacocoPath = Paths.get(projectSourceDir, "target", "site", "jacoco", "jacoco.xml").toString();
+                        var jacocoPath = Paths.get(Main.sonarqubeOutputDir, "jacoco.xml").toString();
                         System.out.println("JACOCO: " + jacocoPath);
                         var staticAnalysisResolver = new StaticAnalysisResolver(
                                 new SonarqubeApiClient("http://localhost:9000", token),
@@ -310,8 +311,9 @@ public class SonarqubeServiceImpl implements SonarqubeService {
 //        projectStream.flush();
 //        projectStream.close();
 
+        final String outputDir = new File(Main.sonarqubeOutputDir).getAbsolutePath();
         final HostConfig hostConfig = HostConfig.newHostConfig()
-//                                                .withBinds(new Bind(sourcePath/* + "/" + projectSubdir*/, new Volume("/usr/src")))
+                                                .withBinds(new Bind(outputDir, new Volume("/output")))
                                                 .withCpuCount(4L);
         final String dockerfileContent =
                 "FROM sonarsource/sonar-scanner-cli:latest AS sonarqube_scan\n" +
@@ -328,7 +330,9 @@ public class SonarqubeServiceImpl implements SonarqubeService {
                         "WORKDIR /usr/src/" + projectSubdir + "\n" +
                         //"RUN if [ -f \"./pom.xml\" ] || [ -f \"gradlew\" ]; then apk add maven openjdk11; fi\n" +
                         //"RUN apk add maven openjdk11\n" +
-                        "CMD mvn org.jacoco:jacoco-maven-plugin:0.8.8:prepare-agent verify org.jacoco:jacoco-maven-plugin:0.8.2:report sonar:sonar -Dsonar.java.coveragePlugin=jacoco";// -D sonar.projectKey=yoho-be -D sonar.host.url=http://sonarqube:9000 -D sonar.login=" + token + ";";
+                        "CMD mvn org.jacoco:jacoco-maven-plugin:0.8.8:prepare-agent verify " +
+                          "org.jacoco:jacoco-maven-plugin:0.8.2:report sonar:sonar -Dsonar.java.coveragePlugin=jacoco " +
+                          "&& cp target/site/jacoco/jacoco.xml /output";// -D sonar.projectKey=yoho-be -D sonar.host.url=http://sonarqube:9000 -D sonar.login=" + token + ";";
         // "CMD if ! [ -f \"sonar-project.properties\"]; then printf \"sonar.projectKey=" + projectKey +
         //         "\\nsonar.projectName=" + projectName + "\\nsonar.sourceEncoding=UTF-8\" > " +
         //         "sonar-project.properties; fi; " +
