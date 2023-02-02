@@ -5,10 +5,7 @@ import org.fruit.monkey.btrace.MethodInvocation;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class WeightCalculator {
@@ -99,6 +96,7 @@ public class WeightCalculator {
 
     private BigDecimal calculateCoverageScore(List<AnalysedMethodEntry> analysedMethodEntries) {
         var coverageValues = analysedMethodEntries.stream()
+                                                  .filter(Objects::nonNull)
                                                   .map(analysedMethodEntry -> analysedMethodEntry.getCoverage())
                                                   .collect(Collectors.toList());
         var averageCoverage = coverageValues.stream().reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
@@ -109,7 +107,9 @@ public class WeightCalculator {
 
     private BigDecimal calculateIssuesScore(List<AnalysedMethodEntry> analysedMethodEntries) {
         return analysedMethodEntries.stream()
+                                    .filter(Objects::nonNull)
                                     .flatMap(analysedMethodEntry -> analysedMethodEntry.getIssues().stream())
+                                    .filter(Objects::nonNull)
                                     .map(issue -> ISSUE_TYPE_SCORES.getOrDefault(issue.getType(), BigDecimal.ONE)
                                                                    .multiply(SEVERITY_SCORES.getOrDefault(issue.getSeverity(),
                                                                                                           BigDecimal.ONE)))
