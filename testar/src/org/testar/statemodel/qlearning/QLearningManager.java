@@ -3,29 +3,18 @@ package org.testar.statemodel.qlearning;
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import org.testar.monkey.Pair;
-import org.testar.monkey.alayer.Tag;
 import org.testar.statemodel.*;
 import org.testar.statemodel.event.StateModelEvent;
 import org.testar.statemodel.event.StateModelEventListener;
-import org.testar.statemodel.exceptions.ExtractionException;
 import org.testar.statemodel.exceptions.HydrationException;
 import org.testar.statemodel.exceptions.InvalidEventException;
-import org.testar.statemodel.exceptions.StateModelException;
-import org.testar.statemodel.persistence.PersistenceManager;
 import org.testar.statemodel.persistence.orientdb.entity.*;
-import org.testar.statemodel.persistence.orientdb.extractor.EntityExtractor;
-import org.testar.statemodel.persistence.orientdb.extractor.ExtractorFactory;
 import org.testar.statemodel.persistence.orientdb.hydrator.EntityHydrator;
-import org.testar.statemodel.sequence.Sequence;
-import org.testar.statemodel.sequence.SequenceManager;
-import org.testar.statemodel.sequence.SequenceNode;
-import org.testar.statemodel.sequence.SequenceStep;
 import org.testar.statemodel.util.EventHelper;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.lang.System.exit;
 
@@ -105,13 +94,13 @@ public class QLearningManager implements StateModelEventListener {
           element -> (String) element.getPropertyValue("actionId").getValue(),
           Function.identity()));
 
-      Set<AbstractAction> abstractActions = stateModel.getActions();
+      Set<AbstractAction> abstractActions = stateModel.getAbstractActions();
 
       /**
        * Build reversed maps on concrete IDs
        */
 
-        Map<String, AbstractState> abstractStatesByConcreteId = stateModel.getStates().stream().flatMap(
+        Map<String, AbstractState> abstractStatesByConcreteId = stateModel.getAbstractStates().stream().flatMap(
           state -> state.getConcreteStateIds().stream().map(id -> new Pair<>(id, state))
         ).collect(Collectors.toMap(Pair::left, Pair::right));
         Map<String, AbstractAction> abstractActionsByConcreteId = abstractActions.stream().flatMap(

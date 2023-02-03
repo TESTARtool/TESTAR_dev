@@ -90,7 +90,7 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
     }
 
     @Override
-    public void persistConcreteState(ConcreteState concreteState) {
+    public void persistConcreteState(IConcreteState concreteState) {
         processRequest(() -> delegateManager.persistConcreteState(concreteState), concreteState);
     }
 
@@ -161,8 +161,8 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
                 break;
 
             case ABSTRACT_STATE_MODEL_INITIALIZED:
-                initAbstractStateModel((AbstractStateModel) (event.getPayload()));
-                break;
+              initAbstractStateModel((AbstractStateModel) (event.getPayload()));
+              break;
 
             case SEQUENCE_STARTED:
                 persistSequence((Sequence) event.getPayload());

@@ -68,9 +68,9 @@ public class AbstractStateTransitionExtractor implements EntityExtractor<Abstrac
         }
 
         AbstractState abstractSourceState;
-        if (abstractStateModel.containsState(abstractStateId)) {
+        if (abstractStateModel.containsAbstractState(abstractStateId)) {
             try {
-                abstractSourceState = abstractStateModel.getState(abstractStateId);
+                abstractSourceState = abstractStateModel.getAbstractState(abstractStateId);
             }
             catch (StateModelException ex) {
                 ex.printStackTrace();
@@ -94,9 +94,9 @@ public class AbstractStateTransitionExtractor implements EntityExtractor<Abstrac
         }
 
         AbstractState abstractTargetState;
-        if (abstractStateModel.containsState(abstractStateId)) {
+        if (abstractStateModel.containsAbstractState(abstractStateId)) {
             try {
-                abstractTargetState = abstractStateModel.getState(abstractStateId);
+                abstractTargetState = abstractStateModel.getAbstractState(abstractStateId);
             }
             catch (StateModelException ex) {
                 ex.printStackTrace();

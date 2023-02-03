@@ -100,9 +100,9 @@ public class ModelManager implements StateModelManager {
         AbstractState newAbstractState;
 
         // fetch or create an abstract state
-        if (abstractStateModel.containsState(abstractStateId)) {
+        if (abstractStateModel.containsAbstractState(abstractStateId)) {
             try {
-                newAbstractState = abstractStateModel.getState(abstractStateId);
+                newAbstractState = abstractStateModel.getAbstractState(abstractStateId);
                 // update the abstract state
                 AbstractStateService.updateAbstractStateActions(newAbstractState, actions);
             }
@@ -122,7 +122,7 @@ public class ModelManager implements StateModelManager {
             // no action is being executed, so we consider this an initial state
             newAbstractState.setInitial(true);
             try {
-                abstractStateModel.addState(newAbstractState);
+                abstractStateModel.addAbstractState(newAbstractState);
             } catch (StateModelException e) {
                 e.printStackTrace();
                 throw new RuntimeException("An error occurred while adding a new abstract state to the model");
@@ -137,7 +137,7 @@ public class ModelManager implements StateModelManager {
 
             //add a transition to the statemodel
             try {
-                abstractStateModel.addTransition(currentAbstractState, newAbstractState, actionUnderExecution);
+                abstractStateModel.addAbstractTransition(currentAbstractState, newAbstractState, actionUnderExecution);
             } catch (StateModelException e) {
                 e.printStackTrace();
                 throw new RuntimeException("Encountered a problem adding a state transition into the statemodel");
@@ -174,10 +174,10 @@ public class ModelManager implements StateModelManager {
         concreteActionUnderExecution = null;
 
         // temporarily output the nr of states in the model
-        System.out.println(abstractStateModel.getStates().size() + " abstract states in the model");
+        System.out.println(abstractStateModel.getAbstractStates().size() + " abstract states in the model");
 
         // temporarily output the number of unvisited actions still left
-        System.out.println(abstractStateModel.getStates().stream().map(AbstractState::getUnvisitedActions).flatMap(
+        System.out.println(abstractStateModel.getAbstractStates().stream().map(AbstractState::getUnvisitedActions).flatMap(
                 Collection::stream
         ).count() + " unvisited actions left");
         System.out.println("----------------------------");

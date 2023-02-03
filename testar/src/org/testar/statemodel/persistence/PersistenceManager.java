@@ -48,7 +48,7 @@ public interface PersistenceManager {
      * This method persists a concrete state.
      * @param concreteState
      */
-    void persistConcreteState(ConcreteState concreteState);
+    void persistConcreteState(IConcreteState concreteState);
 
     /**
      * This method persists a concrete action.

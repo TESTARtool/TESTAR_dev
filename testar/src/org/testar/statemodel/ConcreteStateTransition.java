@@ -5,9 +5,9 @@ import org.testar.statemodel.persistence.Persistable;
 public class ConcreteStateTransition implements Persistable {
 
     // a transition is a trinity consisting of two states as endpoints and an action to tie these together
-    private ConcreteState sourceState;
-    private ConcreteState targetState;
-    private ConcreteAction action;
+    private IConcreteState sourceState;
+    private IConcreteState targetState;
+    private IConcreteAction action;
 
     /**
      * Constructor
@@ -15,7 +15,7 @@ public class ConcreteStateTransition implements Persistable {
      * @param targetState
      * @param action
      */
-    public ConcreteStateTransition(ConcreteState sourceState, ConcreteState targetState, ConcreteAction action) {
+    public ConcreteStateTransition(IConcreteState sourceState, IConcreteState targetState, IConcreteAction action) {
         this.sourceState = sourceState;
         this.targetState = targetState;
         this.action = action;
@@ -73,7 +73,7 @@ public class ConcreteStateTransition implements Persistable {
      * Get the source state for this transition
      * @return
      */
-    public ConcreteState getSourceState() {
+    public IConcreteState getSourceState() {
         return sourceState;
     }
 
@@ -81,7 +81,7 @@ public class ConcreteStateTransition implements Persistable {
      * Get the target state for this transition
      * @return
      */
-    public ConcreteState getTargetState() {
+    public IConcreteState getTargetState() {
         return targetState;
     }
 
@@ -89,7 +89,7 @@ public class ConcreteStateTransition implements Persistable {
      * Get the executed action for this transition
      * @return
      */
-    public ConcreteAction getAction() {
+    public IConcreteAction getAction() {
         return action;
     }
 

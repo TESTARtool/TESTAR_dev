@@ -28,14 +28,15 @@ public class AbstractStateModel {
     // a set of tags that was used to `form` the abstract state model
     private Set<Tag<?>> tags;
 
-    private Set<AbstractStateTransition> stateTransitions;
+    private Set<AbstractStateTransition> abstractStateTransitions;
+
     // we store the transitions twice extra, once by the source state and once by the target state for fast bi-directional lookup
     // the extra overhead is minimal
-    private Map<String, Set<AbstractStateTransition>> stateTransitionsBySource;
-    private Map<String, Set<AbstractStateTransition>> stateTransitionsByTarget;
+    private Map<String, Set<AbstractStateTransition>> abstractStateTransitionsBySource;
+    private Map<String, Set<AbstractStateTransition>> abstractStateTransitionsByTarget;
 
     // the states in the model
-    private Map<String, AbstractState> states;
+    private Map<String, AbstractState> abstractStates;
 
     // set of initial states
     private Map<String, AbstractState> initialStates;
@@ -60,10 +61,10 @@ public class AbstractStateModel {
         this.applicationVersion = applicationVersion;
         this.tags = tags;
         // sets are empty when the model is just created
-        stateTransitions = new HashSet<>();
-        stateTransitionsBySource = new HashMap<>();
-        stateTransitionsByTarget = new HashMap<>();
-        states = new HashMap<>();
+        abstractStateTransitions = new HashSet<>();
+        abstractStateTransitionsBySource = new HashMap<>();
+        abstractStateTransitionsByTarget = new HashMap<>();
+        abstractStates = new HashMap<>();
         initialStates = new HashMap<>();
         this.eventListeners = new HashSet<>();
         for (int i = 0; i < eventListeners.length;i++) {
@@ -81,20 +82,20 @@ public class AbstractStateModel {
     }
 
     /**
-     * This method adds a new state transition to the model
+     * This method adds a new abstract state transition to the model
      * @param sourceState
      * @param targetState
      * @param executedAction
      * @throws StateModelException
      */
-    public void addTransition(AbstractState sourceState, AbstractState targetState, AbstractAction executedAction) throws StateModelException{
+    public void addAbstractTransition(AbstractState sourceState, AbstractState targetState, AbstractAction executedAction) throws StateModelException{
         checkStateId(sourceState.getStateId());
         checkStateId(targetState.getStateId());
 
         // check if the transition already exists
-        if (stateTransitionsBySource.containsKey(sourceState.getStateId())) {
+        if (abstractStateTransitionsBySource.containsKey(sourceState.getStateId())) {
             // loop through all the transitions that have the same source state and check for matches
-            for(AbstractStateTransition stateTransition : stateTransitionsBySource.get(sourceState.getStateId())) {
+            for(AbstractStateTransition stateTransition : abstractStateTransitionsBySource.get(sourceState.getStateId())) {
                 if (targetState.getStateId().equals(stateTransition.getTargetStateId()) && executedAction.getActionId().equals(stateTransition.getActionId())) {
                     // the transition already exists. We send an update event to deal with changes in the states and actions
                     // now we notify our listeners of the possible update
@@ -112,48 +113,48 @@ public class AbstractStateModel {
         // temporarily tell the state model not to emit events. We do not want to give double updates.
         deactivateEvents();
 
-        addTransition(newStateTransition);
-        addState(sourceState);
-        addState(targetState);
+        addAbstractTransition(newStateTransition);
+        addAbstractState(sourceState);
+        addAbstractState(targetState);
 
         activateEvents();
         emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_TRANSITION_ADDED, newStateTransition));
     }
 
     /**
-     * Helper method to add a transition to several storage attributes
+     * Helper method to add an abstract transition to several storage attributes
      * @param newTransition
      */
-    private void addTransition(AbstractStateTransition newTransition) {
-        stateTransitions.add(newTransition);
+    private void addAbstractTransition(AbstractStateTransition newTransition) {
+        abstractStateTransitions.add(newTransition);
         // add the transitions to the source map
-        if (!stateTransitionsBySource.containsKey(newTransition.getSourceStateId())) {
-            stateTransitionsBySource.put(newTransition.getSourceStateId(), new HashSet<>());
+        if (!abstractStateTransitionsBySource.containsKey(newTransition.getSourceStateId())) {
+            abstractStateTransitionsBySource.put(newTransition.getSourceStateId(), new HashSet<>());
         }
-        stateTransitionsBySource.get(newTransition.getSourceStateId()).add(newTransition);
+        abstractStateTransitionsBySource.get(newTransition.getSourceStateId()).add(newTransition);
 
         // and then to the target map
-        if (!stateTransitionsByTarget.containsKey(newTransition.getTargetStateId())) {
-            stateTransitionsByTarget.put(newTransition.getTargetStateId(), new HashSet<>());
+        if (!abstractStateTransitionsByTarget.containsKey(newTransition.getTargetStateId())) {
+            abstractStateTransitionsByTarget.put(newTransition.getTargetStateId(), new HashSet<>());
         }
-        stateTransitionsByTarget.get(newTransition.getTargetStateId()).add(newTransition);
+        abstractStateTransitionsByTarget.get(newTransition.getTargetStateId()).add(newTransition);
     }
 
     /**
-     * This method adds a new state to the collection of states
+     * This method adds a new abstract state to the collection of states
      * @param newState
      * @throws StateModelException
      */
-    public void addState(AbstractState newState) throws StateModelException {
+    public void addAbstractState(AbstractState newState) throws StateModelException {
         checkStateId(newState.getStateId());
-        if (!containsState(newState.getStateId())) {
+        if (!containsAbstractState(newState.getStateId())) {
             // provide the state with this state model's abstract identifier
             newState.setModelIdentifier(modelIdentifier);
             // provide the state with the event listeners from this state model
             for (StateModelEventListener eventListener: eventListeners) {
                 newState.addEventListener(eventListener);
             }
-            this.states.put(newState.getStateId(), newState);
+            this.abstractStates.put(newState.getStateId(), newState);
             emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_ADDED, newState));
         }
         else {
@@ -166,42 +167,42 @@ public class AbstractStateModel {
         }
     }
 
-    /**
-     * This method retrieves a state for a given identifier, if present
+  /**
+     * This method retrieves an abstract state for a given identifier, if present
      * @param abstractStateId the identifier of the state to retrieve
      * @return
      * @throws StateModelException
      */
-    public AbstractState getState(String abstractStateId) throws StateModelException {
-        if (containsState(abstractStateId)) {
-            return states.get(abstractStateId);
+    public AbstractState getAbstractState(String abstractStateId) throws StateModelException {
+        if (containsAbstractState(abstractStateId)) {
+            return abstractStates.get(abstractStateId);
         }
         throw new StateNotFoundException();
     }
 
-  /**
-     * This method returns all the states in the abstract state model
+    /**
+     * This method returns all the abstract states in the abstract state model
      * @return
      */
-    public Set<AbstractState> getStates() {
-        return new HashSet<>(states.values());
+    public Set<AbstractState> getAbstractStates() {
+        return new HashSet<>(abstractStates.values());
     }
 
     /**
-     * This method returns all the actions in the abstract state model
+     * This method returns all the abstract actions in the abstract state model
      * @return
      */
-    public Set<AbstractAction> getActions() {
-      return stateTransitions.stream().map(AbstractStateTransition::getAction).collect(Collectors.toSet());
+    public Set<AbstractAction> getAbstractActions() {
+      return abstractStateTransitions.stream().map(AbstractStateTransition::getAction).collect(Collectors.toSet());
     }
 
     /**
-     * This method returns true if a requested state is contained in this model
+     * This method returns true if a requested abstract state is contained in this model
      * @param abstractStateId the identifier for the state
      * @return
      */
-    public boolean containsState(String abstractStateId) {
-        return this.states.containsKey(abstractStateId);
+    public boolean containsAbstractState(String abstractStateId) {
+        return this.abstractStates.containsKey(abstractStateId);
     }
 
     /**
@@ -219,11 +220,11 @@ public class AbstractStateModel {
 
     /**
      * This is a helper method to check if the abstract Id that is provided is valid.
-     * @param abstractStateId identifier to verify
+     * @param stateId identifier to verify
      * @throws StateModelException
      */
-    private void checkStateId(String abstractStateId) throws StateModelException{
-        if (abstractStateId == null || abstractStateId.equals("")) {
+    protected void checkStateId(String stateId) throws StateModelException{
+        if (stateId == null || stateId.equals("")) {
             throw new InvalidStateIdException();
         }
     }
@@ -234,7 +235,7 @@ public class AbstractStateModel {
      * @return
      */
     public Set<AbstractStateTransition> getOutgoingTransitionsForState(String stateId) {
-        return stateTransitionsBySource.get(stateId);
+        return abstractStateTransitionsBySource.get(stateId);
     }
 
     /**
@@ -243,7 +244,7 @@ public class AbstractStateModel {
      * @return
      */
     public Set<AbstractStateTransition> getIncomingTransitionsForState(String stateId) {
-        return stateTransitionsByTarget.get(stateId);
+        return abstractStateTransitionsByTarget.get(stateId);
     }
 
     /**
@@ -258,7 +259,7 @@ public class AbstractStateModel {
      * Notify our listeners of emitted events
      * @param event
      */
-    private void emitEvent(StateModelEvent event) {
+    protected void emitEvent(StateModelEvent event) {
         if (!emitEvents) return;
         for (StateModelEventListener eventListener: eventListeners) {
             eventListener.eventReceived(event);
@@ -284,14 +285,14 @@ public class AbstractStateModel {
     /**
      * Set the abstract state model to not emit events.
      */
-    private void deactivateEvents() {
+    protected void deactivateEvents() {
         emitEvents = false;
     }
 
     /**
      * Set the abstract state model to emit events.
      */
-    private void activateEvents() {
+    protected void activateEvents() {
         emitEvents = true;
     }
 

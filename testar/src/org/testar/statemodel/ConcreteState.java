@@ -1,11 +1,10 @@
 package org.testar.statemodel;
 
-import org.testar.statemodel.persistence.Persistable;
 import org.testar.monkey.alayer.Tag;
 
 import java.util.Set;
 
-public class ConcreteState extends Widget implements Persistable {
+public class ConcreteState extends Widget implements IConcreteState {
 
     // a set of tags that was used in creating the concrete state id
     private Set<Tag<?>> tags;

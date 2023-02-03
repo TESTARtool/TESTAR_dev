@@ -1,6 +1,6 @@
 package org.testar.statemodel;
 
-public class ConcreteAction extends Widget {
+public class ConcreteAction extends Widget implements IConcreteAction {
 
     /**
      * The concrete action id.

@@ -199,7 +199,7 @@ public class OrientDBManager implements PersistenceManager/*, QLearningManager*/
     }
 
     @Override
-    public void persistConcreteState(ConcreteState concreteState) {
+    public void persistConcreteState(IConcreteState concreteState) {
         // create an entity to persist to the database
         EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.ConcreteState);
         VertexEntity concreteStateEntity = new VertexEntity(entityClass);
@@ -222,8 +222,11 @@ public class OrientDBManager implements PersistenceManager/*, QLearningManager*/
             // save the entity!
             entityManager.saveEntity(concreteStateEntity, db);
 
-            // store the widgettree attached to this concrete state
-            persistWidgetTree(concreteState, concreteStateEntity, db);
+            // store the widget tree attached to this concrete state
+            // (not applicable to proxy objects)
+            if (concreteState instanceof ConcreteState) {
+              persistWidgetTree((ConcreteState) concreteState, concreteStateEntity, db);
+            }
 
             // optional: if an abstract state is provided, we connect the concrete state to it using an isAbstractedBy relation
             if (concreteState.getAbstractState() == null) {
@@ -506,7 +509,7 @@ public class OrientDBManager implements PersistenceManager/*, QLearningManager*/
                   EntityExtractor<AbstractState, AbstractStateModel> abstractStateExtractor = ExtractorFactory.getExtractor(ExtractorFactory.EXTRACTOR_ABSTRACT_STATE);
                   for (DocumentEntity documentEntity : retrievedDocuments) {
                       AbstractState abstractState = abstractStateExtractor.extract(documentEntity, abstractStateModel);
-                      abstractStateModel.addState(abstractState);
+                      abstractStateModel.addAbstractState(abstractState);
                   }
               } catch (ExtractionException | StateModelException e) {
                   e.printStackTrace();
@@ -528,7 +531,7 @@ public class OrientDBManager implements PersistenceManager/*, QLearningManager*/
                   EntityExtractor<AbstractStateTransition, AbstractStateModel> abstractStateTransitionEntityExtractor = ExtractorFactory.getExtractor(ExtractorFactory.EXTRACTOR_ABSTRACT_STATE_TRANSITION);
                   for (DocumentEntity documentEntity : retrievedDocuments) {
                       AbstractStateTransition abstractStateTransition = abstractStateTransitionEntityExtractor.extract(documentEntity, abstractStateModel);
-                      abstractStateModel.addTransition( abstractStateTransition.getSourceState(), abstractStateTransition.getTargetState(), abstractStateTransition.getAction());
+                      abstractStateModel.addAbstractTransition( abstractStateTransition.getSourceState(), abstractStateTransition.getTargetState(), abstractStateTransition.getAction());
                   }
               } catch (ExtractionException | StateModelException e) {
                   e.printStackTrace();
