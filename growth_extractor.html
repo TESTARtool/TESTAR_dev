@@ -1,0 +1,102 @@
+<!doctype html>
+<body>
+<input type="file" id="fileInput" name="filefield" multiple="multiple">
+<div id="fileDisplayArea" style="width: 400px; height: 50px;"></div>
+<div id="covInstContainer" style="width: 500px; height: 400px;"></div>
+<div id="covBranContainer" style="width: 500px; height: 400px;"></div>
+<script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js" type="text/javascript"></script>
+<script>
+// https://jsfiddle.net/b1ynb405/
+var fileInput = document.getElementById('fileInput');
+var fileDisplayArea = document.getElementById('fileDisplayArea');
+
+fileInput.addEventListener('change', function(e) {
+    const coverageFiles = fileInput.files;
+
+    // Validate we are reading txt files
+    for (var i = 0; i < coverageFiles.length; i++){
+        var textType = /text.*/;
+        if(!coverageFiles[i].type.match(textType)){
+            fileDisplayArea.innerText = "Some text coverageFile is not supported!"
+            throw new Error('Some text coverageFile is not supported!');
+        }
+    }
+	
+    myfunction(coverageFiles);
+});
+
+async function myfunction(coverageFiles) {
+	var allDataInst = [];
+	var allDataBran = [];
+	
+	const averageInstList = [];
+	const averageBranList = [];
+	
+	const average = (array) => array.reduce((a, b) => a + b) / array.length;
+
+	// 1 coverage line is extracted by the dumper every 5 seconds
+	// Example, 144 lines = 720 seconds = 12 minutes
+	var line = 24;
+	while(line <= 144){
+		for (var i = 0; i < coverageFiles.length; i++){
+			const fileReader = new SyncFileReader(coverageFiles[i]);
+			const arrayBuffer = await fileReader.readAsText();
+			// Coverage metrics created with Windows CR LF
+			var arrLines = arrayBuffer.split("\r\n");
+
+			// Time | 2021_09_13_11_28_33 | Missed Instructions | 16,305 of 18,288 | Cov | 10,84 | Missed Branches | 1,167 of 1,214 | Cov | 3,87 | Missed | 1,465 | Cxty | 1,738 | Missed | 3,610 | Lines | 4,184 | Missed | 864 | Methods | 1,127 | Missed | 67 | Classes | 153
+			allDataInst.push( parseFloat( arrLines[line].split(" | ")[5].replace(",",".") ) );
+			allDataBran.push( parseFloat( arrLines[line].split(" | ")[9].replace(",",".") ) );
+		}
+		//console.log(allDataInst);
+		var avIns = average(allDataInst);
+		console.log(avIns);
+		averageInstList.push(avIns)
+		allDataInst = [];
+		
+		//console.log(allDataBran);
+		var avBran = average(allDataBran);
+		console.log(avBran);
+		averageBranList.push(avBran)
+		allDataBran = [];
+		
+		// This incremental line value is used to extract the growth curves with more or less precision
+		// Increment the line one by one will extract the growth values every 5 seconds
+		// If we do it every 3 lines, it will be every 15 seconds
+		line = line + 3; 
+	}
+	
+	console.log(averageInstList);
+	console.log(averageBranList);
+}
+
+function SyncFileReader(file) {
+    let self = this;
+    let ready = false;
+    let result = '';
+
+    const sleep = function (ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    self.readAsText = async function() {
+        while (ready === false) {
+          await sleep(100);
+        }
+        return result;
+    }    
+
+    const reader = new FileReader();
+    reader.onloadend = function(evt) {
+        result = evt.target.result;
+        ready = true;
+    };
+    reader.readAsText(file);
+}
+
+function isEmpty(str) {
+    return (!str || str.length === 0 );
+}
+</script>
+</body>
+</html>

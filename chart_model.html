@@ -54,11 +54,21 @@ async function myfunction(modelFiles) {
         const arrayBuffer = await fileReader.readAsText();
 		// Model metrics created with Windows CR LF
         var arrLines = arrayBuffer.split("\r\n");
-        for (var line = 0; line < arrLines.length; line++) {
+        
+		for (var line = 0; line < arrLines.length; line++) {
+        //for (var line = 0; line < number; line++) { //Restrict the maximum number of lines because parallel instances do not exactly have the same build, deploy, and running seconds
 		    // Skip empty line, usually at the end of the file
-			if(isEmpty(arrLines[line])) continue;
-			// Skip the lines that contains EXC message, dumper was extracting info but DB was not ready yet
-			if(containsExc(arrLines[line])) continue;
+			if(isEmpty(arrLines[line])){ 
+				continue;
+			}
+			// Skip the lines that contains EXC message
+			// Dumper metrics starts extracting DB info BEFORE DB is deployed and the TESTAR model is created
+			// We replace these lines with value 0, similar to code coverage graphs
+			if(containsExc(arrLines[line])){ 
+				singleDataAbsState.unshift( 0 );
+				singleDataUnviAct.unshift( 0 );
+				continue;
+			}
 			// Time | 2022_01_26_20_18_41 | AbstractStates 6 | AbstractActions 10 | UnvisitedActions 88 | ConcreteStates 6 | ConcreteActions 10
 			singleDataAbsState.push( parseInt( arrLines[line].split(" | ")[2].replace("AbstractStates","").trim() ) );
 			singleDataUnviAct.push( parseInt( arrLines[line].split(" | ")[4].replace("UnvisitedActions","").trim() ) );
@@ -78,11 +88,16 @@ async function myfunction(modelFiles) {
 	// Enable legend colours
 	chartAbsState.legend().enabled(true)
 	chartUnviAct.legend().enabled(true)
+	
+	chartAbsState.xAxis().labels().format(function() { return(parseInt(this.value) * 5); });
+	chartUnviAct.xAxis().labels().format(function() { return(parseInt(this.value) * 5); });
+	chartAbsState.xAxis().title("seconds");
+	chartUnviAct.xAxis().title("seconds");
 
 	//draw the chart on the page
 	chartAbsState.draw();
 	chartUnviAct.draw();
-	console.log('finish drawing stuff');
+	console.log('finish drawing');
 }
 
 function SyncFileReader(file) {
@@ -113,7 +128,7 @@ function isEmpty(str) {
     return (!str || str.length === 0 );
 }
 function containsExc(str) {
-    return (str.includes("EXC"));
+    return (str.includes("EXC") || str.includes("ERROR"));
 }
 </script>
 </body>

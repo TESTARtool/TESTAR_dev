@@ -1,0 +1,75 @@
+FILES:
+- runner.sh
+Crontab script that we need to prepare for each Ubuntu worker.
+This script is automatically executed when the Ubuntu worker starts.
+Replace qsamba credentials with the correct ones to allow the automatic connection.
+Each worker contains an associated static IP address (range 10.10X.0.XXX because it is a private network for experiments).
+Then every 60 seconds, the worker plays with the {queue,current,done} folder to check the pending script tasks, the current execution, and the finished ones.
+When a script task finishes, the worker will reboot to have a new and clean environment.
+
+- runner_parabank_docker.sh and runner_shopizer_docker.sh
+This is the script task that the runner reads from the {scheduler/10.102.0.2XX/queue} directory. 
+Indicate the number of dockers we want to deploy in the experiments (in our case, we prepared 1 to 6). 
+Clean, Copy, and Deploy the dumper, apache, and OrientDB.
+Wait and clean old docker containers.
+Clean, Copy, and Compile TESTAR.
+Build and deploy the Docker containers that contain TESTAR inside.
+Dumper takes care of extracting the coverage and model metrics every 5 seconds.
+In this script task, we extract performance metrics every 5 seconds.
+At the end of the TESTAR docker exploration, stop everything, and move the metrics results to the central results directory.
+
+- Dockerfile
+Prepares the Docker image with selenium/standalone-chrome, Java 11, and xvfb software.
+
+- runImage
+This is the entry point script of the docker containers.
+Starts xvfb, change to TESTAR protocols directory, then executes the desired parabank or shopizer distributed protocol.
+
+- qsamba architecture used for the experiments
+qsamba\fernando
+├───results
+│   └───dockers_X (this folder contains all the results for the execution with the same number of dockers)
+│       ├───coverage (this folder contains the code coverage metrics)
+│       ├───model (this folder contains the state model metrics)
+│       ├───performance (this folder contains the cpu and memory usage metrics)
+│       └───output
+│           └───hash_timestamp_parabank
+│               ├───HTMLreports
+│               ├───logs
+│               ├───scrshots
+│               └───sequences
+├───scheduler
+│   └───10.102.0.2XX (each worker machine used for the experiments creates this folder to read pending tasks to execute)
+│       ├───current
+│       ├───done
+│       └───queue (add the scripts we want to execute for the experiments ex: runner_parabank_docker.sh)
+├───scripts
+└───suts
+    ├───apache-tomcat-parabank
+    ├───dumper_parabank
+    ├───orientdb-3.0.34
+    └───TESTAR_dev
+        ├───core
+        ├───gradle
+        ├───graphdb
+        ├───linux
+        ├───native
+        ├───suts
+        ├───testar
+        │   └───resources
+        │       └───settings
+        │           └───webdriver_distributed_parabank
+        ├───webdriver
+        └───windows
+		
+		
+
+- Other files that are not part of the final architecture but that can be used as local examples.
+
+- makeAndRunMultipleDocker.sh
+Build TESTAR with gradlew, build a docker image using the Dockerfile, then runs one or multiple docker containers.
+
+- run_dockers_parabank.bat
+Batch file to experiment with a Windows environment.
+Clean, Copy, and Deploy the dumper, apache, and OrientDB.
+Then build TESTAR with gradlew, build a docker image using the Dockerfile, then runs one or multiple docker containers. 

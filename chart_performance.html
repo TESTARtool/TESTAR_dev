@@ -69,8 +69,8 @@ async function myfunction(performanceFiles) {
         allDataCpu.push(singleDataCpu)
         allDataMem.push(singleDataMem)
         console.log(performanceFiles[i].name);
-        chartCpu.line(allDataCpu[i]).name(performanceFiles[i].name).stroke({thickness: 0.03});
-        chartMem.line(allDataMem[i]).name(performanceFiles[i].name).stroke({thickness: 0.03});
+        chartCpu.line(allDataCpu[i]).name(performanceFiles[i].name).stroke({thickness: 0.01});
+        chartMem.line(allDataMem[i]).name(performanceFiles[i].name).stroke({thickness: 0.01});
 		
 	}
 

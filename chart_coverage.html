@@ -54,7 +54,9 @@ async function myfunction(coverageFiles) {
         const arrayBuffer = await fileReader.readAsText();
 		// Coverage metrics created with Windows CR LF
         var arrLines = arrayBuffer.split("\r\n");
-        for (var line = 0; line < arrLines.length; line++) {
+		
+		for (var line = 0; line < arrLines.length; line++) {
+        //for (var line = 0; line < number; line++) { //Restrict the maximum number of lines because parallel instances do not exactly have the same build, deploy, and running seconds
 		    // Skip empty line, usually at the end of the file
 			if(isEmpty(arrLines[line])) continue;
 			// Time | 2021_09_13_11_28_33 | Missed Instructions | 16,305 of 18,288 | Cov | 10,84 | Missed Branches | 1,167 of 1,214 | Cov | 3,87 | Missed | 1,465 | Cxty | 1,738 | Missed | 3,610 | Lines | 4,184 | Missed | 864 | Methods | 1,127 | Missed | 67 | Classes | 153
@@ -76,11 +78,16 @@ async function myfunction(coverageFiles) {
 	// Enable legend colours
 	chartInst.legend().enabled(true)
 	chartBran.legend().enabled(true)
+	
+	chartInst.xAxis().labels().format(function() { return(parseInt(this.value) * 5); });
+	chartBran.xAxis().labels().format(function() { return(parseInt(this.value) * 5); });
+	chartInst.xAxis().title("seconds");
+	chartBran.xAxis().title("seconds");
 
 	//draw the chart on the page
 	chartInst.draw();
 	chartBran.draw();
-	console.log('finish drawing stuff');
+	console.log('finish drawing');
 }
 
 function SyncFileReader(file) {
