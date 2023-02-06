@@ -35,6 +35,9 @@ package org.testar.monkey.alayer;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.testar.CodingManager;
 import org.testar.monkey.Drag;
 
 /**
@@ -43,7 +46,7 @@ import org.testar.monkey.Drag;
  * They are attached to a <code>State</code> and form a Widget Tree.
  * In fact a <code>State</code> is a Widget itself and is the root
  * of the Widget Tree.
- * 
+ *
  * @see State
  */
 public interface Widget extends Taggable, Serializable {
@@ -54,7 +57,7 @@ public interface Widget extends Taggable, Serializable {
 	void remove();
 	void moveTo(Widget p, int idx);
 	Widget addChild();
-	
+
 	/**
 	 * For scrollable widgets, compute drag segments of scrolling options.
 	 * @param scrollArrowSize The size of scrolling arrows.
@@ -63,14 +66,39 @@ public interface Widget extends Taggable, Serializable {
 	 * @author: urueda
 	 */
 	Drag[] scrollDrags(double scrollArrowSize, double scrollThick);
-	
+
 	/**
 	 * @param tab tabulator for indentation.
 	 * @return Computes a string representation for the widget.
 	 * @author urueda
 	 */
 	public String getRepresentation(String tab);
-	
-	public abstract String toString(Tag<?>... tags);
-	
+
+  /**
+   * Get the Abstract Tags from a Widget (defined by users)
+   * to prepare a string that represents it at an abstract level.
+   *
+   * @return String that represents the widget at an abstract level.
+   */
+  default String getAbstractRepresentation() {
+    StringBuilder repr = new StringBuilder();
+    repr.append("AbstractIDCustom=" + this.get(Tags.AbstractIDCustom));
+    for(Tag<?> tag : CodingManager.getCustomTagsForAbstractId()) {
+      if(this.get(tag, null) != null) {
+        repr.append("," + tag.name() + "=" + this.get(tag));
+      }
+    }
+
+    final String abstractRepresentation = repr.toString();
+
+    // When no custom tag values can be retrieved then log a warning
+    if (StringUtils.equals(abstractRepresentation, "AbstractIDCustom=null")) {
+      LogManager.getLogger(Widget.class).warn("Widget has no custom tags, default abstractRepresentation is returned");
+    }
+
+    return abstractRepresentation;
+  }
+
+  public abstract String toString(Tag<?>... tags);
+
 }

@@ -1,6 +1,6 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,19 +27,60 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar;
 
+/**
+ *  @author Sebastian Bauersfeld
+ */
+package nl.ou.testar.ReinforcementLearning.ActionSelectors;
+import org.testar.monkey.alayer.*;
 
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.Set;
+/**
+ * The 'No Operation' action.
+ */
+public class ProtocolAction extends TaggableBase implements Action {
 
-public class RandomActionSelector<S, A> implements ActionSelector<S, A> {
+    public static final String PROTOCOL_ID = "Protocol Action"; // by urueda
+    private Action action;
 
-    public A selectAction(S state, @Nonnull Set<A> actions) {
-        long graphTime = System.currentTimeMillis();
-        Random rnd = new Random(graphTime);
-        return new ArrayList<A>(actions).get(rnd.nextInt(actions.size()));
+    public ProtocolAction(Action action){
+        this.action = action;
     }
+
+    public ProtocolAction(){
+        this.action = null;
+    }
+
+    public void setAction(Action action){
+        this.action = action;
+    }
+
+    public void run(SUT system, State state, double duration){
+        if(action!=null)
+            action.run(system, state, duration);
+    }
+
+    public String toString(){ return PROTOCOL_ID; }
+
+    // by urueda
+    @Override
+    public String toString(Role... discardParameters) {
+        return toString();
+    }
+
+    // by urueda
+    @Override
+    public String toShortString() {
+        Role r = get(Tags.Role, null);
+        if (r != null)
+            return r.toString();
+        else
+            return toString();
+    }
+
+    // by urueda
+    @Override
+    public String toParametersString() {
+        return "";
+    }
+
 }

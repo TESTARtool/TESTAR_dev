@@ -35,23 +35,25 @@ import org.testar.RandomActionSelector;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
+import org.testar.statemodel.AbstractAction;
+import org.testar.statemodel.AbstractState;
 
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Set;
 
-public class QLearningActionSelector implements ActionSelector {
+public class QLearningActionSelector implements ActionSelector<State, Action> {
     private double R_MAX;
     private double gammaDiscount;
     private GuiStateGraphForQlearning graph;
-    private RandomActionSelector randomActionSelector;
+    private RandomActionSelector<State, Action> randomActionSelector;
 
     public QLearningActionSelector(double R_MAX, double gammaDiscount){
         System.out.println("DEBUG: creating Q-learning action selector, R-MAX="+R_MAX+", gammaDiscount="+gammaDiscount);
         this.R_MAX = R_MAX;
         this.gammaDiscount=gammaDiscount;
         graph = new GuiStateGraphForQlearning(R_MAX,gammaDiscount);
-        randomActionSelector = new RandomActionSelector();
+        randomActionSelector = new RandomActionSelector<>();
     }
 
     public void resetGraphForNewTestSequence(){

@@ -1109,7 +1109,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
      * to be killed or the SUT needs to be brought back
      * to foreground. The latter is then done by selectActions in the
      * AbstractProtocol.
-     * 
+     *
      * @param system
      * @param state
      * @return
@@ -1170,7 +1170,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
      * to be put in the foreground, then the action that is returned is putting it
      * in the foreground.
      * Otherwise it returns null.
-     * 
+     *
      * @param state
      * @param actions
      * @return null if no preSelected actions are needed.
@@ -1282,7 +1282,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
      * to be put in the foreground, then the action is putting it in the foreground.
      * Otherwise the action is selected according to
      * action selection mechanism selected.
-     * 
+     *
      * @param state
      * @param actions
      * @return
@@ -1299,7 +1299,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 
     /**
      * STOP criteria for selecting more actions for a sequence
-     * 
+     *
      * @param state
      * @return
      */
@@ -1321,7 +1321,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 
     /**
      * STOP criteria deciding whether more sequences are required in a test run
-     * 
+     *
      * @return
      */
     @Override
@@ -1397,7 +1397,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
      * Use CodingManager to create the Widget and State identifiers:
      * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom,
      * Abstract_R_ID, Abstract_R_T_ID, Abstract_R_T_P_ID
-     * 
+     *
      * @param state
      */
     protected void buildStateIdentifiers(State state) {
@@ -1407,7 +1407,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
     /**
      * Use CodingManager to create the Actions identifiers:
      * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom
-     * 
+     *
      * @param state
      * @param actions
      */
@@ -1418,7 +1418,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
     /**
      * Use CodingManager to create the specific environment Action identifiers:
      * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom
-     * 
+     *
      * @param state
      * @param action
      */
@@ -1428,7 +1428,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 
     /**
      * Replay Mode using State Model Sequence Layer.
-     * 
+     *
      * @param settings
      * @throws StateModelException
      *                             import
@@ -1733,7 +1733,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 
     /**
      * Replay a Type action requires to reuse the same text.
-     * 
+     *
      * @param actionToReplay
      * @param actionDescriptionReplay
      * @return
@@ -1751,7 +1751,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
         return actionToReplay;
     }
 
-    protected ActionSelector getActionSelector() {
+    protected ActionSelector<State, Action> getActionSelector() {
         return randomActionSelector;
     }
 }

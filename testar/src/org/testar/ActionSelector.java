@@ -8,6 +8,6 @@ import org.testar.monkey.alayer.State;
 /**
  * ActionSelector
  */
-public interface ActionSelector {
-    Action selectAction(State state, Set<Action> actions);
+public interface ActionSelector<S, A> {
+    A selectAction(S state, Set<A> actions);
 }

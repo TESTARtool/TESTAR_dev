@@ -34,6 +34,7 @@ import org.testar.RandomActionSelector;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
+import org.testar.statemodel.AbstractAction;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -46,7 +47,7 @@ public class GuiStateGraphWithVisitedActions {
     protected String previousStateAbstractCustomId;
     protected String previousActionAbstractCustomId;
 
-    private RandomActionSelector randomActionSelector;
+    private RandomActionSelector<State, Action> randomActionSelector;
 
     public GuiStateGraphWithVisitedActions() {
         idBasedGuiStates = new HashSet<IdBasedGuiState>();

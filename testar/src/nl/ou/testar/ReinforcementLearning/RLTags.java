@@ -1,6 +1,7 @@
 /***************************************************************************************************
  *
  * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,19 +28,51 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar;
 
+package nl.ou.testar.ReinforcementLearning;
 
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.HashSet;
 import java.util.Set;
 
-public class RandomActionSelector<S, A> implements ActionSelector<S, A> {
+import org.testar.monkey.alayer.Tag;
+import org.testar.monkey.alayer.TagsBase;
 
-    public A selectAction(S state, @Nonnull Set<A> actions) {
-        long graphTime = System.currentTimeMillis();
-        Random rnd = new Random(graphTime);
-        return new ArrayList<A>(actions).get(rnd.nextInt(actions.size()));
-    }
+public class RLTags extends TagsBase  {
+
+	private RLTags () {}
+
+	/**
+	 * Reinforcement Learning Sarsa Value
+	 */
+	public static final Tag<Float> SarsaValue = from("sarsaValue", Float.class);
+
+	public static final Tag<Integer> ExCounter = from("exCounter", Integer.class);
+
+	public static final Tag<Integer> ActionCounter = from("actionCounter", Integer.class);
+
+	public static final Tag<Float> QLearningValue = from("qvalue", Float.class);
+
+	private static Set<Tag<?>> reinforcementLearningTags = new HashSet<Tag<?>>() {
+		{
+			add(SarsaValue);
+			add(ExCounter);
+			add(ActionCounter);
+			add(QLearningValue);
+		}
+	};
+
+	public static Tag<?> getTag(String tagName){
+		for(Tag<?> tag: reinforcementLearningTags){
+			if(tag.name().equals(tagName)){
+				System.out.println("-*-*-*-*-*-*-*-*-*-*-*-*");
+				System.out.println(tag);
+				return tag;
+			}
+		}
+		return SarsaValue;
+	}
+
+	public static Set<Tag<?>> getReinforcementLearningTags() {
+		return reinforcementLearningTags;
+	}
 }

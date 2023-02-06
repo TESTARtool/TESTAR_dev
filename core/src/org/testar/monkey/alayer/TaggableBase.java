@@ -47,13 +47,13 @@ public class TaggableBase implements Taggable, Serializable {
 	private static final long serialVersionUID = 3941511707954247582L;
 	private Map<Tag<?>, Object> tagValues = Util.newHashMap();
 	boolean allFetched;
-	
+
 	public interface NativePeer{
 		long access();
 		void release();
 		boolean valid();
 	}
-	
+
 	private final static class InvalidPeer implements NativePeer {
 		private InvalidPeer() {
 		}
@@ -90,13 +90,13 @@ public class TaggableBase implements Taggable, Serializable {
 
 	public final Iterable<Tag<?>> tags() {
 		Set<Tag<?>> ret =new HashSet<Tag<?>>();
-		
+
 		if(!allFetched){
 			for(Tag<?> t : tagDomain())
 				get(t, null);
 			allFetched = true;
 		}
-		
+
 		for(Tag<?> t : tagValues.keySet()){
 			if(tagValues.get(t) != null)
 				ret.add(t);
@@ -112,6 +112,10 @@ public class TaggableBase implements Taggable, Serializable {
 		Assert.isTrue(tag.type().isInstance(value), "Value not of type required by this tag!");
 		tagValues.put(tag, value);
 	}
+
+  public Map<Tag<?>, Object> getTagValues() {
+    return tagValues;
+  }
 
 	public void remove(Tag<?> tag) { tagValues.put(Assert.notNull(tag), null); }
 }
