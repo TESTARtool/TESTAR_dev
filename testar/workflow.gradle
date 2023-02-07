@@ -242,6 +242,14 @@ task runTestDesktopGenericStateModel(type: Exec, dependsOn: createDatabaseOrient
     doLast {
         String output = standardOutput.toString()
 
+        // Check that State Model was calculating the execution path
+        // This is not only to check that the model is enabled, but also to check the model action selection mechanism
+        if(output.readLines().any{line->line.contains("New execution path")}) {
+            println "\n${output} \nTESTAR State Model is enabled and calculates the execution path"
+        } else {
+            throw new GradleException("\n${output} \nERROR: TESTAR State Model does NOT calculate the execution path")
+        }
+
         // Check that output contains 3 abstract states in the State Model inference
         if(output.readLines().any{line->line.contains("3 abstract states in the model")}) {
             println "\n${output} \nTESTAR State Model has been inferred sucessfully"
