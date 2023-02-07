@@ -24,16 +24,12 @@ The gradle wrapper version indicated inside `TESTAR_dev\gradle\wrapper\gradle-wr
 NOTE that this task doesn't generate an executable distribution by default.
 
 #### windows.dll (Allows TESTAR execution on Windows)
-TESTAR includes by default the file `windows.dll` inside `\testar\resources\windows10\` directory, which allows to run TESTAR on Windows 10 systems.
-
-#### gradlew windowsDistribution (Allows TESTAR execution on Windows)
-`gradlew windowsDistribution` task : Create a new file `windows.dll`, which has preference over the default one.  
-This tasks requires the installation of Visual Studio tools:  
-https://github.com/TESTARtool/TESTAR_dev/wiki/Development:-Update-Windows-UIAutomation-(windows.dll)
+TESTAR includes by default the file `windows.dll` inside `\testar\resources\windows10\` directory, which allows to run TESTAR on Windows 10 systems. 
+If you do not need to modify Windows API native calls, the following java level compilation instructions are enough. 
 
 #### gradlew installDist (Create TESTAR Distribution)
 `gradlew installDist` task : creates a runnable TESTAR distribution in the `\testar\target\install\testar\bin\` directory.  
-By default, `windows.dll` should be copied from `\testar\resources\windows10\` directory and overwritten by the new dll file if the `gradlew windowsDistribution` task was executed.
+By default, `windows.dll` is copied from `\testar\resources\windows10\` directory and is ready to use.
 
 1. Run `.\gradlew installDist` in the root of the project, or `TESTAR_dev -> distribution -> installDist` with the IDE
 2. Change directory to `\testar\target\install\testar\bin\`
@@ -47,6 +43,12 @@ To build the zip execute the following command.
 
 1. Run `.\gradlew distZip` in the root of the project. 
 2. Extract the zip on the machine where TESTAR is used.
+
+#### gradlew windowsDistribution (Create a new windows.dll file)
+_We recommend users ignore this task if they DO NOT need to modify Windows API native calls._ 
+`gradlew windowsDistribution` task : Create a new file `windows.dll`, which has preference over the default one. 
+This tasks requires the installation of Visual Studio C++ tools:  
+https://github.com/TESTARtool/TESTAR_dev/wiki/Development:-Update-Windows-UIAutomation-(windows.dll)
 
 #### Running Gradle in Eclipse
 The following procedure has been performed
