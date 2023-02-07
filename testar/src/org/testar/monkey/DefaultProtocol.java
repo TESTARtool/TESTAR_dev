@@ -1064,16 +1064,24 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	/**
-	 * Returns the next action that will be selected. If unwanted processes need to be killed, the action kills them. If the SUT needs
-	 * to be put in the foreground, then the action is putting it in the foreground. Otherwise the action is selected according to
-	 * action selection mechanism selected.
-	 * @param state
-	 * @param actions
-	 * @return
+	 * Select one of the available actions using the action selection algorithm of your choice. 
+	 * The default select action mechanism tries to use the state model action selector. 
+	 * If the state model is not enabled, it returns a random action. 
+	 *
+	 * @param state the SUT's current state
+	 * @param actions the set of derived actions
+	 * @return  the selected action
 	 */
 	protected Action selectAction(State state, Set<Action> actions){
 		Assert.isTrue(actions != null && !actions.isEmpty());
-		return RandomActionSelector.selectAction(actions);
+
+		//Using the action selector of the state model:
+		Action retAction = stateModelManager.getAbstractActionToExecute(actions);
+		// If state model is not enabled, use random:
+		if (retAction == null) {
+			return RandomActionSelector.selectAction(actions);
+		}
+		return retAction;
 	}
 
 	protected String getRandomText(Widget w){
