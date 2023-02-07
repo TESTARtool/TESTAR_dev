@@ -1,0 +1,65 @@
+# Original: https://github.com/budtmo/docker-android/blob/master/docker-compose.yml
+#
+# Note: It requires docker-compose 1.13.0
+# OS note: Android emultaror requires a Linux Host with KVM enabled
+#
+# Usage: docker-compose -f docker-compose-android.yml up
+version: "2.2"
+
+services:
+  # Selenium hub
+  selenium_hub:
+    image: selenium/hub:3.14.0-curium
+    ports:
+      - 4444:4444
+
+  # Using Appium Docker Android  
+  real_device:
+    image: appium/appium
+    depends_on:
+      - selenium_hub
+    network_mode: "service:selenium_hub"
+    privileged: true
+    volumes:
+      - /dev/bus/usb:/dev/bus/usb
+      - ~/.android:/root/.android
+      - $PWD/example/sample_apk:/root/tmp
+    environment:
+      - CONNECT_TO_GRID=true
+      - SELENIUM_HOST=selenium_hub
+      - RELAXED_SECURITY=true
+
+  # Docker-Android for mobile website testing with chrome browser
+  # Chrome browser exists only for version 7.0 and 7.1.1
+  samsung_galaxy_web_7.1.1:
+    image: budtmo/docker-android-x86-8.1
+    privileged: true
+    # Increase scale number if needed
+    scale: 1
+    depends_on: 
+      - selenium_hub
+      - real_device
+    ports:
+      - 6080:6080
+      - 4723:4723
+    volumes:
+      - ./video-samsung_7.1.1:/tmp/video
+    environment:
+      - DEVICE=Samsung Galaxy S6
+      - CONNECT_TO_GRID=true
+      - APPIUM=true
+      - SELENIUM_HOST=selenium_hub
+      - MOBILE_WEB_TEST=true
+      - AUTO_RECORD=true
+      - RELAXED_SECURITY=true
+
+  testar:
+    image: testar
+    build:
+      context: ./
+      dockerfile: ./DockerfileAndroid
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - type: bind
+        source: /home/testar/output
+        target: /testar/bin/output

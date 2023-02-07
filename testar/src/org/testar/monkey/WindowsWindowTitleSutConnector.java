@@ -44,11 +44,13 @@ public class WindowsWindowTitleSutConnector implements SutConnector {
     private String windowTitle;
     private double maxEngangeTime;
     private StateBuilder builder;
+    private boolean forceToForeground;
 
-    public WindowsWindowTitleSutConnector(String windowTitle, double maxEngangeTime, StateBuilder builder) {
+    public WindowsWindowTitleSutConnector(String windowTitle, double maxEngangeTime, StateBuilder builder, boolean forceToForeground) {
         this.windowTitle = windowTitle;
         this.maxEngangeTime = maxEngangeTime;
         this.builder = builder;
+        this.forceToForeground = forceToForeground;
     }
 
     @Override
@@ -63,7 +65,8 @@ public class WindowsWindowTitleSutConnector implements SutConnector {
             if (suts != null){
                 for (SUT theSUT : suts){
                     state = getStateByWindowTitle(theSUT);
-                    if (state.get(Tags.Foreground)){
+                    // If the system is in the foreground or if the option to force to the foreground is enabled
+                    if (state.get(Tags.Foreground) || forceToForeground){
                         for (Widget w : state){
                             role = w.get(Tags.Role, null);
                             if (role != null && Role.isOneOf(role, NativeLinker.getNativeRole_Window())){

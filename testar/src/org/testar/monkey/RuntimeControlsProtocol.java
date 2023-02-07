@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2021 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,11 +28,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-
 package org.testar.monkey;
 
 import org.testar.EventHandler;
-import org.testar.FlashFeedback;
 import org.testar.IEventListener;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.monkey.alayer.devices.KBKeys;
@@ -43,207 +41,143 @@ import java.util.Set;
 
 public abstract class RuntimeControlsProtocol extends AbstractProtocol implements IEventListener {
 
-    //TODO create a settings to turn off all the runtime controls (for "headless"-mode, for example in continuous integration)
+	//TODO create a settings to turn off all the runtime controls (for "headless"-mode, for example in continuous integration)
 
-    protected double delay = Double.MIN_VALUE;
-    protected Object[] userEvent = null;
-    protected boolean markParentWidget = false;
-    protected boolean visualizationOn = false;
+	protected double delay = Double.MIN_VALUE;
+	protected Object[] userEvent = null;
+	protected boolean markParentWidget = false;
+	protected boolean visualizationOn = false;
 
-    public enum Modes{
-        Spy,
-        Record,
-        Generate,
-        Quit,
-        View,
-        Replay;
-    }
+	public enum Modes{
+		Spy,
+		Record,
+		Generate,
+		Quit,
+		View,
+		Replay;
+	}
 
-    protected Modes mode;
-    private Set<KBKeys> pressed = EnumSet.noneOf(KBKeys.class);
+	protected Modes mode;
+	private Set<KBKeys> pressed = EnumSet.noneOf(KBKeys.class);
 
-    public EventHandler initializeEventHandler() {
-    	return new EventHandler(this);
-    }
+	public EventHandler initializeEventHandler() {
+		return new EventHandler(this);
+	}
 
+	/**
+	 * Set the mode with the given parameter value
+	 * @param mode
+	 */
+	protected synchronized void setMode(Modes mode){
+		if (mode() == mode) return;
+		else this.mode = mode;
+	}
 
-    //TODO think how the modes should be implemented
-    /**
-     * Implement the SHIFT + ARROW-LEFT or SHIFT + ARROW-RIGHT toggling mode feature
-     * Show the flashfeedback in the upperleft corner of the screen
-     * @param forward is set in keyDown method
-     */
-    private synchronized void nextMode() {
-    	switch(mode){
-    	case Record:
-    		mode = Modes.Generate; break;
-    	case Generate:
-    		mode = Modes.Record; break;
-    	default:
-    		break;
-    	}
+	/**
+	 * Return the mode TESTAR is currently in
+	 * @return
+	 */
+	public synchronized Modes mode(){ return mode; }
 
-    	// Add some logging
-    	// Add the FlashFeedback about the mode you are in in the upper left corner.
-    	String modeParamS = "";
-    	if (mode == Modes.Record)
-    		modeParamS = " (" + settings.get(ConfigTags.TimeToWaitAfterAction) + " wait time between actions)";
+	private final static double SLOW_MOTION = 2.0;
+	//TODO: key commands come through java.awt.event but are the key codes same for all OS? if they are the same, then move to platform independent protocol?
+	//TODO: Investigate better shortcut combinations to control TESTAR that does not interfere with SUT
+	// (e.g. SHIFT + 1 puts an ! in the notepad and hence interferes with SUT state, but the
+	// event is not recorded as a user event).
+	/**
+	 * Override the default keylistener to implement the TESTAR shortcuts
+	 * SHIFT + SPACE
+	 * SHIFT + ARROW-UP
+	 * SHIFT + ARROW-RIGHT
+	 * SHIFT + ARROW-LEFT
+	 * SHIFT + ARROW-DOWN
+	 * SHIFT + {0, 1, 2, 3, 4}
+	 * SHIFT + ALT
+	 * @param key
+	 */
+	@Override
+	public void keyDown(KBKeys key){
+		pressed.add(key);
 
-    	String modeNfo = "'" + mode + "' mode active." + modeParamS;
-    	LogSerialiser.log(modeNfo + "\n", LogSerialiser.LogLevel.Info);
-        if (settings.get(ConfigTags.FlashFeedback)) {
-    	    FlashFeedback.flash(modeNfo, 1000);
-        }
-    	
-    }
+		//  SHIFT + SPACE are pressed --> Toggle slow motion test
+		if (pressed.contains(KBKeys.VK_SHIFT) && key == KBKeys.VK_SPACE){
+			if (this.delay == Double.MIN_VALUE){
+				this.delay = settings().get(ConfigTags.TimeToWaitAfterAction).doubleValue();
+				settings().set(ConfigTags.TimeToWaitAfterAction, SLOW_MOTION);
+			} else{
+				settings().set(ConfigTags.TimeToWaitAfterAction, this.delay);
+				delay = Double.MIN_VALUE;
+			}
+		}
 
-    /**
-     * Set the mode with the given parameter value
-     * @param mode
-     */
-    protected synchronized void setMode(Modes mode){
-        if (mode() == mode) return;
-        else this.mode = mode;
-    }
+		// SHIFT + ARROW-DOWN --> stop TESTAR run
+		else if(key == KBKeys.VK_DOWN && pressed.contains(KBKeys.VK_SHIFT)){
+			LogSerialiser.log("User requested to stop monkey!\n", LogSerialiser.LogLevel.Info);
+			mode = Modes.Quit;
+		}
 
+		// SHIFT + ARROW-UP --> toggle visualization on / off
+		else if(key == KBKeys.VK_UP && pressed.contains(KBKeys.VK_SHIFT)){
+			if(visualizationOn){
+				visualizationOn = false;
+			}else{
+				visualizationOn = true;
+			}
+		}
 
-    /**
-     * Return the mode TESTAR is currently in
-     * @return
-     */
-    public synchronized Modes mode(){ return mode; }
+		// SHIFT + 0 --> print in the PID, Windows Handle, and process name of the running applications
+		else if (key == KBKeys.VK_0  && pressed.contains(KBKeys.VK_SHIFT)) {
+			System.setProperty("DEBUG_WINDOWS_PROCESS_NAMES","true");
+		}
 
-    private final static double SLOW_MOTION = 2.0;
-    //TODO: key commands come through java.awt.event but are the key codes same for all OS? if they are the same, then move to platform independent protocol?
-    //TODO: Investigate better shortcut combinations to control TESTAR that does not interfere with SUT
-    // (e.g. SHIFT + 1 puts an ! in the notepad and hence interferes with SUT state, but the
-    // event is not recorded as a user event).
-    /**
-     * Override the default keylistener to implement the TESTAR shortcuts
-     * SHIFT + SPACE
-     * SHIFT + ARROW-UP
-     * SHIFT + ARROW-RIGHT
-     * SHIFT + ARROW-LEFT
-     * SHIFT + ARROW-DOWN
-     * SHIFT + {0, 1, 2, 3, 4}
-     * SHIFT + ALT
-     * @param key
-     */
-    @Override
-    public void keyDown(KBKeys key){
-        pressed.add(key);
+		// In Record mode you can press any key except SHIFT to add a user keyboard
+		// This is because SHIFT is used for the TESTAR shortcuts
+		// This is not ideal, because now special characters and capital letters and other events that needs SHIFT
+		// cannot be recorded as an user event in Record....
+		else if (!pressed.contains(KBKeys.VK_SHIFT) && mode() == Modes.Record && userEvent == null) {
+			//System.out.println("USER_EVENT key_down! " + key.toString());
+			userEvent = new Object[]{key}; // would be ideal to set it up at keyUp
+		}
 
-        //  SHIFT + SPACE are pressed --> Toggle slow motion test
-        if (pressed.contains(KBKeys.VK_SHIFT) && key == KBKeys.VK_SPACE){
-            if (this.delay == Double.MIN_VALUE){
-                this.delay = settings().get(ConfigTags.TimeToWaitAfterAction).doubleValue();
-                settings().set(ConfigTags.TimeToWaitAfterAction, SLOW_MOTION);
-            } else{
-                settings().set(ConfigTags.TimeToWaitAfterAction, this.delay);
-                delay = Double.MIN_VALUE;
-            }
-        }
+		// SHIFT + ALT --> Toggle widget-tree hierarchy display
+		if (pressed.contains(KBKeys.VK_ALT) && pressed.contains(KBKeys.VK_SHIFT)) {
+			markParentWidget = !markParentWidget;
+		}
+	}
 
-            // SHIFT + ARROW-RIGHT --> go to the next mode
-        else if(key == KBKeys.VK_RIGHT && pressed.contains(KBKeys.VK_SHIFT)) {
-            if(mode.equals(Modes.Record) || mode.equals(Modes.Generate))
-            	nextMode();
-        }
+	//jnativehook is platform independent
+	@Override
+	public void keyUp(KBKeys key){
+		pressed.remove(key);
+	}
 
-            // SHIFT + ARROW-LEFT --> go to the previous mode
-        else if(key == KBKeys.VK_LEFT && pressed.contains(KBKeys.VK_SHIFT)) {
-            if(mode.equals(Modes.Record) || mode.equals(Modes.Generate))
-            	nextMode();
-        }
+	/**
+	 * TESTAR does not listen to mouse down clicks in any mode
+	 * @param btn
+	 * @param x
+	 * @param y
+	 */
+	@Override
+	public void mouseDown(MouseButtons btn, double x, double y){}
 
-            // SHIFT + ARROW-DOWN --> stop TESTAR run
-        else if(key == KBKeys.VK_DOWN && pressed.contains(KBKeys.VK_SHIFT)){
-            LogSerialiser.log("User requested to stop monkey!\n", LogSerialiser.LogLevel.Info);
-            mode = Modes.Quit;
-        }
+	/**
+	 * In Record mode the user can add user events by clicking and the event is added when releasing the mouse
+	 * @param btn
+	 * @param x
+	 * @param y
+	 */
+	@Override
+	public void mouseUp(MouseButtons btn, double x, double y){
+		// In GenerateManual the user can add user events by clicking
+		if (mode() == Modes.Record && userEvent == null){
+			userEvent = new Object[]{
+					btn,
+					new Double(x),
+					new Double(y)
+			};
+		}
+	}
 
-        // SHIFT + ARROW-UP --> toggle visualization on / off
-        else if(key == KBKeys.VK_UP && pressed.contains(KBKeys.VK_SHIFT)){
-            if(visualizationOn){
-                visualizationOn = false;
-            }else{
-                visualizationOn = true;
-            }
-        }
-
-        //Disabled and replaced with Shift + Arrow Up to toggle visualization on/off:
-//        // SHIFT + 1 --> toggle action visualization
-//        else if(key == KBKeys.VK_1 && pressed.contains(KBKeys.VK_SHIFT))
-//            settings().set(ConfigTags.VisualizeActions, !settings().get(ConfigTags.VisualizeActions));
-//
-//            // SHIFT + 2 --> toggle showing accessibility properties of the widget
-//        else if(key == KBKeys.VK_2 && pressed.contains(KBKeys.VK_SHIFT))
-//            settings().set(ConfigTags.DrawWidgetUnderCursor, !settings().get(ConfigTags.DrawWidgetUnderCursor));
-//
-//            // SHIFT + 3 --> toggle basic or all accessibility properties of the widget
-//        else if(key == KBKeys.VK_3 && pressed.contains(KBKeys.VK_SHIFT))
-//            settings().set(ConfigTags.DrawWidgetInfo, !settings().get(ConfigTags.DrawWidgetInfo));
-//
-//            // SHIFT + 4 --> toggle the widget tree
-//        else if (key == KBKeys.VK_4  && pressed.contains(KBKeys.VK_SHIFT))
-//            settings().set(ConfigTags.DrawWidgetTree, !settings.get(ConfigTags.DrawWidgetTree));
-
-            // SHIFT + 0 --> undocumented feature
-        else if (key == KBKeys.VK_0  && pressed.contains(KBKeys.VK_SHIFT))
-            System.setProperty("DEBUG_WINDOWS_PROCESS_NAMES","true");
-
-            // TODO: Find out if this commented code is anything useful
-		/*else if (key == KBKeys.VK_ENTER && pressed.contains(KBKeys.VK_SHIFT)){
-			AdhocServer.startAdhocServer();
-			mode = Modes.AdhocTest;
-			LogSerialiser.log("'" + mode + "' mode active.\n", LogSerialiser.LogLevel.Info);
-		}*/
-
-            // In GenerateManual mode you can press any key except SHIFT to add a user keyboard
-            // This is because SHIFT is used for the TESTAR shortcuts
-            // This is not ideal, because now special characters and capital letters and other events that needs SHIFT
-            // cannot be recorded as an user event in GenerateManual....
-        else if (!pressed.contains(KBKeys.VK_SHIFT) && mode() == Modes.Record && userEvent == null){
-            //System.out.println("USER_EVENT key_down! " + key.toString());
-            userEvent = new Object[]{key}; // would be ideal to set it up at keyUp
-        }
-
-        // SHIFT + ALT --> Toggle widget-tree hieracrhy display
-        if (pressed.contains(KBKeys.VK_ALT) && pressed.contains(KBKeys.VK_SHIFT))
-            markParentWidget = !markParentWidget;
-    }
-
-    //jnativehook is platform independent
-    @Override
-    public void keyUp(KBKeys key){
-        pressed.remove(key);
-    }
-
-    /**
-     * TESTAR does not listen to mouse down clicks in any mode
-     * @param btn
-     * @param x
-     * @param y
-     */
-    @Override
-    public void mouseDown(MouseButtons btn, double x, double y){}
-
-    /**
-     * In GenerateManual the user can add user events by clicking and the ecent is added when releasing the mouse
-     * @param btn
-     * @param x
-     * @param y
-     */
-    @Override
-    public void mouseUp(MouseButtons btn, double x, double y){
-        // In GenerateManual the user can add user events by clicking
-        if (mode() == Modes.Record && userEvent == null){
-            //System.out.println("USER_EVENT mouse_up!");
-            userEvent = new Object[]{
-                    btn,
-                    new Double(x),
-                    new Double(y)
-            };
-        }
-    }
+	@Override
+	public void mouseMoved(double x, double y) {}
 }

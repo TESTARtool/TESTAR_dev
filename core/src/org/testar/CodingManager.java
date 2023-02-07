@@ -204,9 +204,8 @@ public class CodingManager {
 						return true;
 					}
 					catch (NoSuchTagException ex) {
-						System.out.println("No origin widget found for action role: ");
-						System.out.println(action.get(Tags.Role));
-						System.out.println(action.get(Tags.Desc));
+						System.out.println("Coding Action AbstractIDCustom: No origin widget found for action role: " + action.get(Tags.Role));
+						System.out.println("Coding Action AbstractIDCustom: " + action.get(Tags.Desc));
 						return false;
 					}
 				}).

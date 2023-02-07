@@ -104,11 +104,11 @@ public class Protocol_desktop_simple_stategraph extends DesktopProtocol {
 		}
 		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
-		Action retAction = super.selectAction(state, actions);
+		//if no preSelected actions are needed, then implement your own action selection strategy
+		// Maintaining memory of visited states and selected actions, and selecting randomly from unvisited actions:
+		Action retAction = stateGraphWithVisitedActions.selectAction(state,actions);
 		if (retAction== null) {
-			//if no preSelected actions are needed, then implement your own action selection strategy
-			// Maintaining memory of visited states and selected actions, and selecting randomly from unvisited actions:
-			retAction = stateGraphWithVisitedActions.selectAction(state,actions);
+			retAction = super.selectAction(state, actions);
 		}
 		return retAction;
 	}
