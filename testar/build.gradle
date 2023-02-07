@@ -112,7 +112,6 @@ dependencies {
     implementation project(':ios')
     implementation project(':android')
     implementation files('./lib/jsyntaxpane-1.1.5.jar')
-    implementation files('./lib/sikulixapi.jar')
     implementation files('./lib/eye2.jar')
     implementation jnativehook
     implementation 'com.google.guava:guava:26.0-jre'
@@ -132,6 +131,7 @@ dependencies {
     implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.1'
     implementation group: 'com.orientechnologies', name: 'orientdb-graphdb', version: '3.0.34'
+    implementation group: 'com.sikulix', name: 'sikulixapi', version: '2.0.5'
 }
 
 task prepareSettings(type: Copy) {
