@@ -82,7 +82,7 @@ import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
 import org.testar.monkey.alayer.windows.WinApiException;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
-import org.testar.managers.DataManager;
+import org.testar.managers.InputDataManager;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.serialisation.ScreenshotSerialiser;
 import org.testar.serialisation.TestSerialiser;
@@ -1084,8 +1084,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return retAction;
 	}
 
+	/**
+	 * Invoke the InputDataManager class and computes a random text data input: 
+	 * Number, Alphabetic, URL, Date or Email. 
+	 * 
+	 * @param w
+	 * @return The random data input.
+	 */
 	protected String getRandomText(Widget w){
-		return DataManager.getRandomData();
+		return InputDataManager.getRandomTextInputData(w);
 	}
 
 	/**
