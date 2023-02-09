@@ -35,9 +35,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.openqa.selenium.logging.LogType;
-import org.openqa.selenium.logging.LoggingPreferences;
-import org.openqa.selenium.remote.CapabilityType;
 import org.testar.monkey.alayer.devices.AWTKeyboard;
 import org.testar.monkey.alayer.devices.Keyboard;
 import org.testar.monkey.alayer.devices.Mouse;
@@ -72,7 +69,6 @@ import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.util.List;
 import java.util.*;
-import java.util.logging.Level;
 
 
 public class WdDriver extends SUTBase {
@@ -165,12 +161,6 @@ public class WdDriver extends SUTBase {
         .usingAnyFreePort()
         .build();
     ChromeOptions options = new ChromeOptions();
-
-    /** Enables TESTAR to read the browser logs **/
-    LoggingPreferences logPrefs = new LoggingPreferences();
-    logPrefs.enable(LogType.BROWSER, Level.ALL);
-    options.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
-
     options.addArguments("load-extension=" + extensionPath);
     options.addArguments("disable-infobars");
     if(fullScreen) {
