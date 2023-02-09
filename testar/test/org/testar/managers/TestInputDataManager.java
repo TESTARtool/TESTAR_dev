@@ -13,6 +13,8 @@ import org.junit.Test;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.stub.WidgetStub;
 
 public class TestInputDataManager {
 
@@ -37,6 +39,37 @@ public class TestInputDataManager {
 		assertNotNull(alphabetic);
 		assertTrue(alphabetic.length() == 10);
 		assertTrue(alphabetic.matches("[a-zA-Z]+"));
+
+		alphabetic = InputDataManager.getRandomAlphabeticInput(1);
+		System.out.println("test obtainAlphabeticInput(): " + alphabetic);
+		assertNotNull(alphabetic);
+		assertTrue(alphabetic.length() == 1);
+		assertTrue(alphabetic.matches("[a-zA-Z]+"));
+	}
+
+	@Test
+	public void notValidAlphabeticInput() {
+		// Redirect the error stream to assert that if the alphabetic count is less than 1,
+		// a random alphabetic input data is obtained and the error message is printed
+		ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+		System.setErr(new PrintStream(outContent));
+		String alphabetic = InputDataManager.getRandomAlphabeticInput(0);
+		assertNotNull(alphabetic);
+		assertTrue(!alphabetic.isEmpty());
+		assertTrue(alphabetic.matches("[a-zA-Z]+"));
+		assertTrue(outContent.size() > 0);
+		System.out.println("test notValidAlphabeticInput(): " + outContent.toString());
+		System.out.println("test notValidAlphabeticInput(): " + alphabetic);
+
+		outContent = new ByteArrayOutputStream();
+		System.setErr(new PrintStream(outContent));
+		alphabetic = InputDataManager.getRandomAlphabeticInput(-1);
+		assertNotNull(alphabetic);
+		assertTrue(!alphabetic.isEmpty());
+		assertTrue(alphabetic.matches("[a-zA-Z]+"));
+		assertTrue(outContent.size() > 0);
+		System.out.println("test notValidAlphabeticInput(): " + outContent.toString());
+		System.out.println("test notValidAlphabeticInput(): " + alphabetic);
 	}
 
 	//TODO: Do we want to create erroneous URLs intentionally? improve URL verification
@@ -89,6 +122,32 @@ public class TestInputDataManager {
 		assertNotNull(fileData);
 		assertTrue(!fileData.isEmpty());
 		assertTrue(outContent.size() == 0);
+	}
+
+	@Test
+	public void emptyFileInputData() {
+		// Redirect the error stream to assert that if the file does not exists,
+		// a random input data is obtained and the error message is printed
+		ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+		System.setErr(new PrintStream(outContent));
+		String fileData = InputDataManager.getRandomTextFromCustomInputDataFile("/not/exists/custom_input_data.txt");
+		assertNotNull(fileData);
+		assertTrue(!fileData.isEmpty());
+		assertTrue(outContent.size() > 0);
+		System.out.println("test emptyFileInputData(): " + outContent.toString());
+		System.out.println("test emptyFileInputData(): " + fileData);
+	}
+
+	@Test
+	@Repeat( times = 100 )
+	public void obtainInputDataFromWidget() {
+		WidgetStub widget = new WidgetStub();
+		widget.set(WdTags.WebType, "number");
+		String widgetNumber = InputDataManager.getRandomTextInputData(widget);
+		System.out.println("test obtainInputDataFromWidget(): " + widgetNumber);
+		assertNotNull(widgetNumber);
+		assertTrue(!widgetNumber.isEmpty());
+		assertTrue(isNumeric(widgetNumber));
 	}
 
 	private boolean isNumeric(String strNum) {

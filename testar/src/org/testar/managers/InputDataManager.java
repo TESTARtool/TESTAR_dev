@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Random;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.testar.monkey.alayer.Widget;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
 
 import com.google.common.collect.Lists;
 
@@ -64,7 +65,10 @@ public class InputDataManager {
 	 * @return
 	 */
 	public static String getRandomTextInputData(Widget w){
-		//TODO: Make the random input data more intelligent widget properties
+		// Use some widget Tag property to determine the type of input data
+		if(w.get(WdTags.WebType, "").toLowerCase().contains("email")) { return getRandomEmailInput(); }
+		if(w.get(WdTags.WebType, "").toLowerCase().contains("number")) { return getRandomNumberInput(); }
+		if(w.get(WdTags.WebType, "").toLowerCase().contains("url")) { return getRandomUrlInput(); }
 
 		return getRandomTextInputData();
 	}
@@ -103,7 +107,11 @@ public class InputDataManager {
 	 * Computes a random alphabetic. 
 	 * @return The random alphabetic.
 	 */
-	public static String getRandomAlphabeticInput(int count){   				
+	public static String getRandomAlphabeticInput(int count){
+		if(count < 1) {
+			System.err.println("Random Alphabetic Input length " + count + " cannot be less than 1. Return a random Alphabetic Input of length 10.");
+			count = 10;
+		}
 		return RandomStringUtils.randomAlphabetic(count);
 	}
 
@@ -121,7 +129,7 @@ public class InputDataManager {
 				"www.fooboo.org",
 				"www.testar.org");
 
-		return urls.get(new Random().nextInt(urls.size()));   	
+		return urls.get(new Random().nextInt(urls.size()));
 	}
 
 	/**
@@ -143,7 +151,7 @@ public class InputDataManager {
 				"1st January",
 				"2001 February");
 
-		return dates.get(new Random().nextInt(dates.size()));   	
+		return dates.get(new Random().nextInt(dates.size()));
 	}
 
 	/**
@@ -152,11 +160,11 @@ public class InputDataManager {
 	 */
 	public static String getRandomEmailInput(){
 		List<String> emails = Lists.newArrayList(
-				"foo@boo.org", 
-				"boo@foo.org", 
+				"foo@boo.org",
+				"boo@foo.org",
 				"fooboo@org.com",
 				"foo-boo@foo.com");
 
-		return emails.get(new Random().nextInt(emails.size()));   	
+		return emails.get(new Random().nextInt(emails.size()));
 	}
 }
