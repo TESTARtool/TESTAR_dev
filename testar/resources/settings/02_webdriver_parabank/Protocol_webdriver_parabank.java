@@ -29,7 +29,6 @@
  */
 
 import org.testar.managers.InputDataManager;
-import org.testar.monkey.ConfigTags;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
@@ -91,9 +90,10 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 		// iterate through all widgets
 		for (Widget widget : state) {
 
-			// If the web state contains a form, derive a compound action to fill the form
+			// If the web state contains a form, start a new mode that only focuses on deriving form filling actions
 			if(isAtBrowserCanvas(widget) && widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdFORM)) {
-				addFormFillingAction(actions, widget, ac);
+				Set<Action> formFillingActions = formFillingModeDeriveActions(widget, ac);
+				if(!formFillingActions.isEmpty()) { return formFillingActions; }
 			}
 
 			// only consider enabled and non-tabu widgets
@@ -126,65 +126,25 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 		return actions;
 	}
 
-	/**
-	 * Based on a widget WdForm automatically derive a compound action that includes:
-	 * - Type text input data in the input and text area widgets
-	 * - Click the submit button of the form
-	 * 
-	 * @param widgetForm
-	 * @param ac
-	 * @return
-	 */
-	private void addFormFillingAction(Set<Action> actions, Widget widgetForm, StdActionCompiler ac){
-		CompoundAction.Builder formFillingAction = new CompoundAction.Builder();
-		// First, add all type actions
-		inputDataAction(widgetForm, ac, formFillingAction);
-		// If the form does not contain typeable widgets, just ignore it and do not derive an action
-		if(formFillingAction.compoundActionsCount() < 1) return;
-		// If typeable actions exists, finally, add the submit click action
-		clickSubmitAction(widgetForm, ac, formFillingAction);
-		actions.add(formFillingAction.build(widgetForm));
+	private Set<Action> formFillingModeDeriveActions(Widget widget, StdActionCompiler ac){
+		Set<Action> formFillingActions = new HashSet<>();
+
+		deriveFormFilling(formFillingActions, widget, ac);
+
+		return formFillingActions;
 	}
 
-	/**
-	 * Iterate through the form widget elements to check if these are input or text area widgets. 
-	 * Then automatically include a type action in the compound action. 
-	 * 
-	 * @param widget
-	 * @param ac
-	 * @param formFillingAction
-	 */
-	private void inputDataAction(Widget widget, StdActionCompiler ac, CompoundAction.Builder formFillingAction) {
-		// Type input only on typeable and not clickable widgets
-		if(widget.get(Enabled, false) && !widget.get(Blocked, true)
-				&& isTypeable(widget) && !isClickable(widget)) {
-			formFillingAction.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true), 1);
+	private void deriveFormFilling(Set<Action> formFillingActions, Widget widget, StdActionCompiler ac){
+		if(widget.get(Enabled, false) && !widget.get(Blocked, true) && isTypeable(widget)) {
+			formFillingActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
+		}
+		if(widget.get(Enabled, false) && !widget.get(Blocked, true) && isClickable(widget)) {
+			formFillingActions.add(ac.leftClickAt(widget));
 		}
 
 		// Iterate through the form element widgets
 		for(int i = 0; i < widget.childCount(); i++) {
-			inputDataAction(widget.child(i), ac, formFillingAction);
-		}
-	}
-
-	/**
-	 * Iterate through the form widget elements to check if these are input submit widgets. 
-	 * Then automatically include a click action in the compound action. 
-	 * 
-	 * @param widget
-	 * @param ac
-	 * @param formFillingAction
-	 */
-	private void clickSubmitAction(Widget widget, StdActionCompiler ac, CompoundAction.Builder formFillingAction) {
-		// Clickable widgets but ignoring select elements
-		if(widget.get(Enabled, false) && !widget.get(Blocked, true)
-				&& isClickable(widget) && !widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)) {
-			formFillingAction.add(ac.leftClickAt(widget), 1);
-		}
-
-		// Iterate through the form element widgets
-		for(int i = 0; i < widget.childCount(); i++) {
-			clickSubmitAction(widget.child(i), ac, formFillingAction);
+			deriveFormFilling(formFillingActions, widget.child(i), ac);
 		}
 	}
 
@@ -229,26 +189,5 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Select one of the possible actions (e.g. at random)
-	 *
-	 * @param state   the SUT's current state
-	 * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
-	 * @return the selected action (non-null!)
-	 */
-	@Override
-	protected Action selectAction(State state, Set<Action> actions) {
-		// Prioritize form filling actions
-		for(Action a : actions) {
-			if(a.get(Tags.OriginWidget, null) != null && a.get(Tags.OriginWidget).get(Tags.Role, Roles.Widget).equals(WdRoles.WdFORM)) {
-				// Give time to the form filling action to type the text
-				settings.set(ConfigTags.ActionDuration, 5.0);
-				return a;
-			}
-		}
-		settings.set(ConfigTags.ActionDuration, 0.5);
-		return super.selectAction(state, actions);
 	}
 }
