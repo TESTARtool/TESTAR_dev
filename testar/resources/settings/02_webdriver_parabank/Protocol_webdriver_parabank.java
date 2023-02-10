@@ -28,390 +28,227 @@
  *
  */
 
-import org.testar.SutVisualization;
 import org.testar.managers.InputDataManager;
-import org.testar.monkey.Util;
+import org.testar.monkey.ConfigTags;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
-import org.testar.monkey.alayer.exceptions.StateBuildException;
-import org.testar.monkey.alayer.exceptions.SystemStartException;
-import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.WdElement;
 import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.plugin.NativeLinker;
-import org.testar.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
 
 import java.util.*;
 
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
-import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
-import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
-
 
 public class Protocol_webdriver_parabank extends WebdriverProtocol {
 
-  /**
-   * Called once during the life time of TESTAR
-   * This method can be used to perform initial setup work
-   *
-   * @param settings the current TESTAR settings as specified by the user.
-   */
-  @Override
-  protected void initialize(Settings settings) {
-    super.initialize(settings);
+	/**
+	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
+	 * This can be used for example for bypassing a login screen by filling the username and password
+	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+	 * the SUT's configuration files etc.)
+	 */
+	@Override
+	protected void beginSequence(SUT system, State state) {
+		super.beginSequence(system, state);
 
-    // List of atributes to identify and close policy popups
-    // Set to null to disable this feature
-    policyAttributes = new HashMap<String, String>() {{ put("class", "lfr-btn-label"); }};
-  }
+		// Add your login sequence here
+		waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","username", "john", state, system, 5,1.0);
 
-  /**
-   * This method is called when TESTAR starts the System Under Test (SUT). The method should
-   * take care of
-   * 1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
-   * out what executable to run)
-   * 2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-   * the SUT's configuratio files etc.)
-   * 3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
-   * seconds until they have finished loading)
-   *
-   * @return a started SUT, ready to be tested.
-   */
-  @Override
-  protected SUT startSystem() throws SystemStartException {
-	  return super.startSystem();
-  }
+		waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","password", "demo", state, system, 5,1.0);
 
-  /**
-   * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
-   * This can be used for example for bypassing a login screen by filling the username and password
-   * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-   * the SUT's configuration files etc.)
-   */
-  @Override
-  protected void beginSequence(SUT system, State state) {
-	  super.beginSequence(system, state);
-
-	  // Add your login sequence here
-	  /*
-	  waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","username", "john", state, system, 5,1.0);
-
-	  waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","password", "demo", state, system, 5,1.0);
-
-	  waitAndLeftClickWidgetWithMatchingTag("value", "Log In", state, system, 5, 1.0);
-	  */
-
-	  /*
-	   * If you have issues typing special characters
-	   * 
-	   * Try to use Paste Action with method:
-	   * waitLeftClickAndPasteIntoWidgetWithMatchingTag
-	   */
-	  //waitLeftClickAndPasteIntoWidgetWithMatchingTag("name", "username", "john", state, system, 5,1.0);
-
-
-	  /*
-	   * You can also use multiple Tags to find the correct widget. 
-	   * This is because some widgets have common Tags Values.  
-	   */
-	  /*
-	  Map<String, String> mapParabank = new HashMap<String, String>();
-	  mapParabank.put("Href", "about.htm");
-	  mapParabank.put("TextContent", "About Us");
-	  mapParabank.put("Display", "inline");
-
-	  waitAndLeftClickWidgetWithMatchingTags(mapParabank, state, system, 5, 1.0);
-	  */
-  }
-
-  /**
-   * This method is called when TESTAR requests the state of the SUT.
-   * Here you can add additional information to the SUT's state or write your
-   * own state fetching routine. The state should have attached an oracle
-   * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
-   * state is erroneous and if so why.
-   *
-   * @return the current state of the SUT with attached oracle.
-   */
-  @Override
-  protected State getState(SUT system) throws StateBuildException {
-      State state = super.getState(system);
-
-      return state;
-  }
-
-  /**
-   * This is a helper method used by the default implementation of <code>buildState()</code>
-   * It examines the SUT's current state and returns an oracle verdict.
-   *
-   * @return oracle verdict, which determines whether the state is erroneous and why.
-   */
-  @Override
-  protected Verdict getVerdict(State state) {
-
-    Verdict verdict = super.getVerdict(state);
-    // system crashes, non-responsiveness and suspicious titles automatically detected!
-
-    //-----------------------------------------------------------------------------
-    // MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
-    //-----------------------------------------------------------------------------
-
-    // ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
-
-    for(Widget w : state) {
-      if(w.get(WdTags.WebTextContent,"").contains("internal error")) {
-        return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
-                "Discovered suspicious widget 'Web Text Content' : '" + w.get(WdTags.WebTextContent,"") + "'.");
-      }
-    }
-
-    return verdict;
-  }
-
-  /**
-   * This method is used by TESTAR to determine the set of currently available actions.
-   * You can use the SUT's current state, analyze the widgets and their properties to create
-   * a set of sensible actions, such as: "Click every Button which is enabled" etc.
-   * The return value is supposed to be non-null. If the returned set is empty, TESTAR
-   * will stop generation of the current action and continue with the next one.
-   *
-   * @param system the SUT
-   * @param state  the SUT's current state
-   * @return a set of actions
-   */
-  @Override
-  protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
-    // Kill unwanted processes, force SUT to foreground
-    Set<Action> actions = super.deriveActions(system, state);
-    Set<Action> filteredActions = new HashSet<>();
-
-    // create an action compiler, which helps us create actions
-    // such as clicks, drag&drop, typing ...
-    StdActionCompiler ac = new AnnotatingActionCompiler();
-
-    // Check if forced actions are needed to stay within allowed domains
-    Set<Action> forcedActions = detectForcedActions(state, ac);
-
-    // Add triggered actions here, before deriving the actions in a normal way:
-      /*
-      //Check if the trigger element is found:
-      Widget triggerWidget = getWidgetWithMatchingTag("name","payee.name", state);
-      if(triggerWidget!=null){
-          // The element was found, create the triggered action and return it:
-          // Creating a builder for a compound action that includes multiple actions as one item:
-          CompoundAction.Builder multiAction = new CompoundAction.Builder();
-          // Creating an action to type text into the Payee Name field:
-          multiAction.add(ac.clickTypeInto(triggerWidget, "Triggered Payer Name", true),1.0);
-          // Creating an action to type text into name="payee.address.street":
-          multiAction.add(ac.clickTypeInto(getWidgetWithMatchingTag("name","payee.address.street", state),
-                  "Triggered Payer Street", true),1.0);
-          // Creating an action to type text into name="payee.address.city":
-          multiAction.add(ac.clickTypeInto(getWidgetWithMatchingTag("name","payee.address.city", state),
-                  "Triggered City", true),1.0);
-          // Creating an action to type text into name="payee.address.state":
-          multiAction.add(ac.clickTypeInto(getWidgetWithMatchingTag("name","payee.address.state", state),
-                  "Triggered State", true),1.0);
-          // Creating an action to type text into name="payee.zipCode":
-          multiAction.add(ac.clickTypeInto(getWidgetWithMatchingTag("name","payee.address.zipCode", state),
-                  "12345", true),1.0);
-          // Creating an action to type text into name="payee.phoneNumber":
-          multiAction.add(ac.clickTypeInto(getWidgetWithMatchingTag("name","payee.phoneNumber", state),
-                  "123456789", true),1.0);
-          // Creating an action to type text into name="payee.accountNumber":
-          multiAction.add(ac.clickTypeInto(getWidgetWithMatchingTag("name","payee.accountNumber", state),
-                  "12341234", true),1.0);
-          // Creating an action to type text into name="verifyAccount":
-          multiAction.add(ac.clickTypeInto(getWidgetWithMatchingTag("name","verifyAccount", state),
-                  "12341234", true),1.0);
-          // Creating an action to type text into name="amount":
-          multiAction.add(ac.clickTypeInto(getWidgetWithMatchingTag("name","amount", state),
-                  "100", true),1.0);
-          // Creating a click action on Send Payment button, <input type="submit" class="button" value="Send Payment">
-          multiAction.add(ac.leftClickAt(getWidgetWithMatchingTag("value","Send Payment", state)),1.0);
-          // Adding the compound action into the actions that will be returned:
-          actions.add(multiAction.build());
-          // Returning actions having only the triggered action, before the normal derive actions:
-          return actions;
-      }
-*/
-
-    // iterate through all widgets
-    for (Widget widget : state) {
-
-    	// Skip Admin and logout page widget
-    	if(widget.get(WdTags.WebHref,"").contains("admin.htm")
-    			|| widget.get(WdTags.WebHref,"").contains("logout.htm")) {
-    		continue;
-    	}
-
-      // only consider enabled and non-tabu widgets
-      if (!widget.get(Enabled, true)) {
-        continue;
-      }
-
-      // The blackListed widgets are those that have been filtered during the SPY mode with the
-      //CAPS_LOCK + SHIFT + Click clickfilter functionality.
-      if(blackListed(widget)){
-    	  if(isTypeable(widget)){
-    		  filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
-    	  } else {
-    		  filteredActions.add(ac.leftClickAt(widget));
-    	  }
-    	  continue;
-      }
-
-      // slides can happen, even though the widget might be blocked
-      addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
-
-      // If the element is blocked, Testar can't click on or type in the widget
-      if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
-    	  continue;
-      }
-
-      // type into text boxes
-      if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
-    	  if(whiteListed(widget) || isUnfiltered(widget)){
-    		  // Type a random Number, Alphabetic, URL, Date or Email input
-    		  actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
-    		  // Paste a random input from a customizable input data file
-    		  // Check testar/bin/settings/custom_input_data.txt
-    		  //actions.add(ac.pasteTextInto(widget, InputDataManager.getRandomTextFromCustomInputDataFile(System.getProperty("user.dir") + "/settings/custom_input_data.txt"), true));
-    	  }else{
-    		  // filtered and not white listed:
-    		  filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
-    	  }
-      }
-
-      // left clicks, but ignore links outside domain
-      if (isAtBrowserCanvas(widget) && isClickable(widget)) {
-          if(whiteListed(widget) || isUnfiltered(widget)){
-              if (!isLinkDenied(widget)) {
-                  actions.add(ac.leftClickAt(widget));
-              }else{
-                  // link denied:
-                  filteredActions.add(ac.leftClickAt(widget));
-              }
-          }else{
-              // filtered and not white listed:
-              filteredActions.add(ac.leftClickAt(widget));
-          }
-      }
-    }
-	
-	// If we have forced actions, prioritize and filter the other ones
-	if (forcedActions != null && forcedActions.size() > 0) {
-		filteredActions = actions;
-		actions = forcedActions;
+		waitAndLeftClickWidgetWithMatchingTag("value", "Log In", state, system, 5, 1.0);
 	}
 
-	//Showing the grey dots for filtered actions if visualization is on:
-    if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
-    
-    return actions;
-  }
+	/**
+	 * This method is used by TESTAR to determine the set of currently available actions.
+	 * You can use the SUT's current state, analyze the widgets and their properties to create
+	 * a set of sensible actions, such as: "Click every Button which is enabled" etc.
+	 * The return value is supposed to be non-null. If the returned set is empty, TESTAR
+	 * will stop generation of the current action and continue with the next one.
+	 *
+	 * @param system the SUT
+	 * @param state  the SUT's current state
+	 * @return a set of actions
+	 */
+	@Override
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
+		Set<Action> actions = super.deriveActions(system, state);
 
-  @Override
-  protected boolean isClickable(Widget widget) {
-    Role role = widget.get(Tags.Role, Roles.Widget);
-    if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
-      // Input type are special...
-      if (role.equals(WdRoles.WdINPUT)) {
-        String type = ((WdWidget) widget).element.type;
-        return WdRoles.clickableInputTypes().contains(type);
-      }
-      return true;
-    }
+		// create an action compiler, which helps us create actions
+		// such as clicks, drag&drop, typing ...
+		StdActionCompiler ac = new AnnotatingActionCompiler();
 
-    WdElement element = ((WdWidget) widget).element;
-    if (element.isClickable) {
-      return true;
-    }
+		// Check if forced actions are needed to stay within allowed domains
+		Set<Action> forcedActions = detectForcedActions(state, ac);
+		if(forcedActions != null && !forcedActions.isEmpty()) { return forcedActions; }
 
-    Set<String> clickSet = new HashSet<>(clickableClasses);
-    clickSet.retainAll(element.cssClasses);
-    return clickSet.size() > 0;
-  }
+		// iterate through all widgets
+		for (Widget widget : state) {
 
-  @Override
-  protected boolean isTypeable(Widget widget) {
-	  Role role = widget.get(Tags.Role, Roles.Widget);
-	  if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
+			// If the web state contains a form, derive a compound action to fill the form
+			if(isAtBrowserCanvas(widget) && widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdFORM)) {
+				addFormFillingAction(actions, widget, ac);
+			}
 
-		  // Specific class="input" for parasoft SUT
-		  if(widget.get(WdTags.WebCssClasses, "").contains("input")) {
-			  return true;
-		  }
+			// only consider enabled and non-tabu widgets
+			if (!widget.get(Enabled, true)) { continue; }
 
-		  // Input type are special...
-		  if (role.equals(WdRoles.WdINPUT)) {
-			  String type = ((WdWidget) widget).element.type;
-			  return WdRoles.typeableInputTypes().contains(type.toLowerCase());
-		  }
-		  return true;
-	  }
+			// If the element is blocked, Testar can't click on or type in the widget
+			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) { continue; }
 
-	  return false;
-  }
+			// type into text boxes
+			if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
+				if(whiteListed(widget) || isUnfiltered(widget)){
+					// Type a random Number, Alphabetic, URL, Date or Email input
+					actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
+					// Paste a random input from a customizable input data file
+					// Check testar/bin/settings/custom_input_data.txt
+					//actions.add(ac.pasteTextInto(widget, InputDataManager.getRandomTextFromCustomInputDataFile(System.getProperty("user.dir") + "/settings/custom_input_data.txt"), true));
+				}
+			}
 
-  /**
-   * Select one of the possible actions (e.g. at random)
-   *
-   * @param state   the SUT's current state
-   * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
-   * @return the selected action (non-null!)
-   */
-  @Override
-  protected Action selectAction(State state, Set<Action> actions) {
-    return super.selectAction(state, actions);
-  }
+			// left clicks, but ignore links outside domain
+			if (isAtBrowserCanvas(widget) && isClickable(widget)) {
+				if(whiteListed(widget) || isUnfiltered(widget)){
+					if (!isLinkDenied(widget)) {
+						actions.add(ac.leftClickAt(widget));
+					}
+				}
+			}
+		}
 
-  /**
-   * Execute the selected action.
-   *
-   * @param system the SUT
-   * @param state  the SUT's current state
-   * @param action the action to execute
-   * @return whether or not the execution succeeded
-   */
-  @Override
-  protected boolean executeAction(SUT system, State state, Action action) {
-    return super.executeAction(system, state, action);
-  }
+		return actions;
+	}
 
-  /**
-   * TESTAR uses this method to determine when to stop the generation of actions for the
-   * current sequence. You could stop the sequence's generation after a given amount of executed
-   * actions or after a specific time etc.
-   *
-   * @return if <code>true</code> continue generation, else stop
-   */
-  @Override
-  protected boolean moreActions(State state) {
-    return super.moreActions(state);
-  }
+	/**
+	 * Based on a widget WdForm automatically derive a compound action that includes:
+	 * - Type text input data in the input and text area widgets
+	 * - Click the submit button of the form
+	 * 
+	 * @param widgetForm
+	 * @param ac
+	 * @return
+	 */
+	private void addFormFillingAction(Set<Action> actions, Widget widgetForm, StdActionCompiler ac){
+		CompoundAction.Builder formFillingAction = new CompoundAction.Builder();
+		// First, add all type actions
+		inputDataAction(widgetForm, ac, formFillingAction);
+		// If the form does not contain typeable widgets, just ignore it and do not derive an action
+		if(formFillingAction.compoundActionsCount() < 1) return;
+		// If typeable actions exists, finally, add the submit click action
+		clickSubmitAction(widgetForm, ac, formFillingAction);
+		actions.add(formFillingAction.build(widgetForm));
+	}
 
-  /**
-   * This method is invoked each time after TESTAR finished the generation of a sequence.
-   */
-  @Override
-  protected void finishSequence() {
-    super.finishSequence();
-  }
+	/**
+	 * Iterate through the form widget elements to check if these are input or text area widgets. 
+	 * Then automatically include a type action in the compound action. 
+	 * 
+	 * @param widget
+	 * @param ac
+	 * @param formFillingAction
+	 */
+	private void inputDataAction(Widget widget, StdActionCompiler ac, CompoundAction.Builder formFillingAction) {
+		// Type input only on typeable and not clickable widgets
+		if(widget.get(Enabled, false) && !widget.get(Blocked, true)
+				&& isTypeable(widget) && !isClickable(widget)) {
+			formFillingAction.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true), 1);
+		}
 
-  /**
-   * TESTAR uses this method to determine when to stop the entire test.
-   * You could stop the test after a given amount of generated sequences or
-   * after a specific time etc.
-   *
-   * @return if <code>true</code> continue test, else stop
-   */
-  @Override
-  protected boolean moreSequences() {
-    return super.moreSequences();
-  }
+		// Iterate through the form element widgets
+		for(int i = 0; i < widget.childCount(); i++) {
+			inputDataAction(widget.child(i), ac, formFillingAction);
+		}
+	}
+
+	/**
+	 * Iterate through the form widget elements to check if these are input submit widgets. 
+	 * Then automatically include a click action in the compound action. 
+	 * 
+	 * @param widget
+	 * @param ac
+	 * @param formFillingAction
+	 */
+	private void clickSubmitAction(Widget widget, StdActionCompiler ac, CompoundAction.Builder formFillingAction) {
+		// Clickable widgets but ignoring select elements
+		if(widget.get(Enabled, false) && !widget.get(Blocked, true)
+				&& isClickable(widget) && !widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)) {
+			formFillingAction.add(ac.leftClickAt(widget), 1);
+		}
+
+		// Iterate through the form element widgets
+		for(int i = 0; i < widget.childCount(); i++) {
+			clickSubmitAction(widget.child(i), ac, formFillingAction);
+		}
+	}
+
+	@Override
+	protected boolean isClickable(Widget widget) {
+		Role role = widget.get(Tags.Role, Roles.Widget);
+		if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
+			// Input type are special...
+			if (role.equals(WdRoles.WdINPUT)) {
+				String type = ((WdWidget) widget).element.type;
+				return WdRoles.clickableInputTypes().contains(type);
+			}
+			return true;
+		}
+
+		WdElement element = ((WdWidget) widget).element;
+		if (element.isClickable) {
+			return true;
+		}
+
+		Set<String> clickSet = new HashSet<>(clickableClasses);
+		clickSet.retainAll(element.cssClasses);
+		return clickSet.size() > 0;
+	}
+
+	@Override
+	protected boolean isTypeable(Widget widget) {
+		Role role = widget.get(Tags.Role, Roles.Widget);
+		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
+
+			// Specific class="input" for parasoft SUT
+			if(widget.get(WdTags.WebCssClasses, "").contains("input")) {
+				return true;
+			}
+
+			// Input type are special...
+			if (role.equals(WdRoles.WdINPUT)) {
+				String type = ((WdWidget) widget).element.type;
+				return WdRoles.typeableInputTypes().contains(type.toLowerCase());
+			}
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Select one of the possible actions (e.g. at random)
+	 *
+	 * @param state   the SUT's current state
+	 * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
+	 * @return the selected action (non-null!)
+	 */
+	@Override
+	protected Action selectAction(State state, Set<Action> actions) {
+		// Prioritize form filling actions
+		for(Action a : actions) {
+			if(a.get(Tags.OriginWidget, null) != null && a.get(Tags.OriginWidget).get(Tags.Role, Roles.Widget).equals(WdRoles.WdFORM)) {
+				// Give time to the form filling action to type the text
+				settings.set(ConfigTags.ActionDuration, 5.0);
+				return a;
+			}
+		}
+		settings.set(ConfigTags.ActionDuration, 0.5);
+		return super.selectAction(state, actions);
+	}
 }

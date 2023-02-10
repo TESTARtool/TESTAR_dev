@@ -61,7 +61,11 @@ public final class CompoundAction extends TaggableBase implements Action {
 		private List<Double> relativeDurations = Util.newArrayList();
 		private List<Action> actions = Util.newArrayList();
 		double durationSum = 0.0;
-		
+
+		public int compoundActionsCount() {
+			return actions.size();
+		}
+
 		public Builder add(Action a, double relativeDuration){
 			Assert.notNull(a);
 			Assert.isTrue(relativeDuration >= 0);
