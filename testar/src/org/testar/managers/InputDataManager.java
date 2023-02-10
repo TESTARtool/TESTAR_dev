@@ -79,8 +79,7 @@ public class InputDataManager {
 	 * @return The random data input.
 	 */
 	public static String getRandomTextInputData(){
-		Random rnd = new Random(System.currentTimeMillis());
-		switch(rnd.nextInt(5)){
+		switch(new Random().nextInt(5)){
 		case 0:
 			return getRandomNumberInput();
 		case 1:
