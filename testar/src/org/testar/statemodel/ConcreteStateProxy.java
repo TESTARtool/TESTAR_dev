@@ -8,16 +8,16 @@ public class ConcreteStateProxy implements IConcreteState {
 
   // a set of tags that was used in creating the concrete state id
   private String id;
-  private Set<Tag<?>> tags;
+//  private Set<Tag<?>> tags;
 
   /**
    * The abstract state that is abstracted from this concrete state.
    */
   private AbstractState abstractState;
 
-  public ConcreteStateProxy(String id, Set<Tag<?>> tags, AbstractState abstractState) {
+  public ConcreteStateProxy(String id/*, Set<Tag<?>> tags*/, AbstractState abstractState) {
     this.id = id;
-    this.tags = tags;
+//    this.tags = tags;
     this.abstractState = abstractState;
   }
 

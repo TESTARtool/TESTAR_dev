@@ -28,7 +28,7 @@ public class AbstractStateModel {
     // a set of tags that was used to `form` the abstract state model
     private Set<Tag<?>> tags;
 
-    private Set<AbstractStateTransition> abstractStateTransitions;
+    private Map<String, AbstractStateTransition> abstractStateTransitions;
 
     // we store the transitions twice extra, once by the source state and once by the target state for fast bi-directional lookup
     // the extra overhead is minimal
@@ -61,7 +61,7 @@ public class AbstractStateModel {
         this.applicationVersion = applicationVersion;
         this.tags = tags;
         // sets are empty when the model is just created
-        abstractStateTransitions = new HashSet<>();
+        abstractStateTransitions = new HashMap<>();
         abstractStateTransitionsBySource = new HashMap<>();
         abstractStateTransitionsByTarget = new HashMap<>();
         abstractStates = new HashMap<>();
@@ -126,7 +126,7 @@ public class AbstractStateModel {
      * @param newTransition
      */
     private void addAbstractTransition(AbstractStateTransition newTransition) {
-        abstractStateTransitions.add(newTransition);
+        abstractStateTransitions.put(newTransition.getActionId(), newTransition);
         // add the transitions to the source map
         if (!abstractStateTransitionsBySource.containsKey(newTransition.getSourceStateId())) {
             abstractStateTransitionsBySource.put(newTransition.getSourceStateId(), new HashSet<>());
@@ -189,11 +189,19 @@ public class AbstractStateModel {
     }
 
     /**
+     * This method returns an abstract actions by its id
+     * @return
+     */
+    public AbstractAction getAbstractAction(String abstractActionId) {
+      return abstractStateTransitions.get(abstractActionId).getAction();
+    }
+
+    /**
      * This method returns all the abstract actions in the abstract state model
      * @return
      */
     public Set<AbstractAction> getAbstractActions() {
-      return abstractStateTransitions.stream().map(AbstractStateTransition::getAction).collect(Collectors.toSet());
+      return abstractStateTransitions.values().stream().map(AbstractStateTransition::getAction).collect(Collectors.toSet());
     }
 
     /**
