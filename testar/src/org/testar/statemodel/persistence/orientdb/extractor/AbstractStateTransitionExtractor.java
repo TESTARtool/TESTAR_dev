@@ -100,7 +100,7 @@ public class AbstractStateTransitionExtractor implements EntityExtractor<Abstrac
             }
             catch (StateModelException ex) {
                 ex.printStackTrace();
-                throw new RuntimeException("Could not retrieve source state from statemodel");
+                throw new RuntimeException("Could not retrieve target state from statemodel");
             }
         }
         else {
