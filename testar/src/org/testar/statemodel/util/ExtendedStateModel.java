@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class ExtendedStateModel extends AbstractStateModel {
 
-  private Set<ConcreteStateTransition> concreteStateTransitions;
+  private Map<String, ConcreteStateTransition> concreteStateTransitions;
 
   private Map<String, Set<ConcreteStateTransition>> concreteStateTransitionsBySource;
   private Map<String, Set<ConcreteStateTransition>> concreteStateTransitionsByTarget;
@@ -34,7 +34,7 @@ public class ExtendedStateModel extends AbstractStateModel {
    */
   public ExtendedStateModel(String modelIdentifier, String applicationName, String applicationVersion, Set<Tag<?>> tags, StateModelEventListener... eventListeners) {
     super(modelIdentifier, applicationName, applicationVersion, tags, eventListeners);
-    concreteStateTransitions = new HashSet<>();
+    concreteStateTransitions = new HashMap<>();
     concreteStateTransitionsBySource = new HashMap<>();
     concreteStateTransitionsByTarget = new HashMap<>();
     concreteStates = new HashMap<>();
@@ -84,7 +84,7 @@ public class ExtendedStateModel extends AbstractStateModel {
    * @param newTransition
    */
   private void addConcreteTransition(ConcreteStateTransition newTransition) {
-    concreteStateTransitions.add(newTransition);
+    concreteStateTransitions.put(newTransition.getAction().getActionId(),  newTransition);
     // add the transitions to the source map
     if (!concreteStateTransitionsBySource.containsKey(newTransition.getSourceStateId())) {
       concreteStateTransitionsBySource.put(newTransition.getSourceStateId(), new HashSet<>());
@@ -139,11 +139,19 @@ public class ExtendedStateModel extends AbstractStateModel {
   }
 
   /**
+   * This method returns a concrete action for a given identifier, if present
+   * @return
+   */
+  public IConcreteAction getConcreteAction(String actionId) {
+    return concreteStateTransitions.get(actionId).getAction();
+  }
+
+  /**
    * This method returns all the concrete actions in the abstract state model
    * @return
    */
   public Set<IConcreteAction> getConcreteActions() {
-    return concreteStateTransitions.stream().map(ConcreteStateTransition::getAction).collect(Collectors.toSet());
+    return concreteStateTransitions.values().stream().map(ConcreteStateTransition::getAction).collect(Collectors.toSet());
   }
 
   /**

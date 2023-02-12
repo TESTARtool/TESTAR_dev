@@ -7,7 +7,7 @@ import java.util.Set;
 public class ConcreteState extends Widget implements IConcreteState {
 
     // a set of tags that was used in creating the concrete state id
-//    private Set<Tag<?>> tags;
+   private Set<Tag<?>> tags;
 
     /**
      * The abstract state that is abstracted from this concrete state.
