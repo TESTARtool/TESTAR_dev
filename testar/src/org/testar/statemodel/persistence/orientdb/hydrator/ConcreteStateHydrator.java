@@ -3,6 +3,7 @@ package org.testar.statemodel.persistence.orientdb.hydrator;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import org.testar.statemodel.AbstractState;
 import org.testar.statemodel.ConcreteState;
+import org.testar.statemodel.IConcreteState;
 import org.testar.statemodel.exceptions.HydrationException;
 import org.testar.statemodel.persistence.orientdb.entity.Property;
 import org.testar.statemodel.persistence.orientdb.entity.PropertyValue;
@@ -18,12 +19,12 @@ public class ConcreteStateHydrator implements EntityHydrator<VertexEntity>{
 
     @Override
     public void hydrate(VertexEntity target, Object source) throws HydrationException {
-        if (!(source instanceof ConcreteState)) {
+        if (!(source instanceof IConcreteState)) {
             throw new HydrationException();
         }
 
         // fetch the connected abstract state
-        AbstractState abstractState = ((ConcreteState) source).getAbstractState();
+        AbstractState abstractState = ((IConcreteState) source).getAbstractState();
         if (abstractState == null) {
             throw new HydrationException("No abstract state is connected to the concrete state with id " + ((ConcreteState) source).getId());
         }
@@ -35,16 +36,20 @@ public class ConcreteStateHydrator implements EntityHydrator<VertexEntity>{
         }
 
         // for the unique id, we add in the model identifier for the abstract state. Otherwise, we could get the same concrete states shared across models
-        String uniqueId = abstractState.getModelIdentifier() + "-" + ((ConcreteState) source).getId();
+        String uniqueId = abstractState.getModelIdentifier() + "-" + ((IConcreteState) source).getId();
         target.addPropertyValue(identifier.getPropertyName(), new PropertyValue(identifier.getPropertyType(), uniqueId));
 
         // of course we also have to add the state id for use in our in-memory model
-        target.addPropertyValue("stateId", new PropertyValue(OType.STRING, ((ConcreteState) source).getId()));
+        target.addPropertyValue("stateId", new PropertyValue(OType.STRING, ((IConcreteState) source).getId()));
 
         // we need to add a widgetId property, as this is inherited from the orientdb base class
         //@todo this is hardcoded in now to fix an inheritance issue. Ideally, this needs to be solved in the entity classes
-        String widgetId = ((ConcreteState) source).getId() + "-" + ((ConcreteState) source).getId();
+        String widgetId = ((IConcreteState) source).getId() + "-" + ((IConcreteState) source).getId();
         target.addPropertyValue("widgetId", new PropertyValue(OType.STRING, uniqueId));
+
+        if (!(source instanceof ConcreteState)) {
+            return;
+        }
 
         // add the screenshot
         if (((ConcreteState) source).getScreenshot() != null) {

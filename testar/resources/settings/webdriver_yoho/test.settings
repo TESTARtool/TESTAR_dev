@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "/Users/michaeltikhonenko/Downloads/chromedriver" "1920x900+0+0" "https://tst.yoho.marviq.net/web/app/dashboard/work-in-progress"
+SUTConnectorValue = "/home/michaelt/Downloads/chromedriver_linux64/chromedriver" "1920x900+0+0" "https://tst.yoho.marviq.net/web/app/dashboard/work-in-progress"
 
 #################################################################
 # Sequences
