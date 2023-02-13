@@ -16,13 +16,14 @@ public abstract class BaseStrategyNode<T>
     
     protected Boolean validActionExists(VisitedModifier visitedModifier, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
-        return switch(visitedModifier)
+        switch(visitedModifier)
                 {
-                    case LEAST_VISITED -> validLeastVisitedExists(actions, actionsExecuted);
-                    case MOST_VISITED -> validMostVisitedExists(actions, actionsExecuted);
-                    case UNVISITED -> validUnvisitedExists(actions, actionsExecuted);
-                    case VISITED -> validVisitedExists(actions, actionsExecuted);
+                    case LEAST_VISITED: return validLeastVisitedExists(actions, actionsExecuted);
+                    case MOST_VISITED: return validMostVisitedExists(actions, actionsExecuted);
+                    case UNVISITED: return validUnvisitedExists(actions, actionsExecuted);
+                    case VISITED: return validVisitedExists(actions, actionsExecuted);
                 };
+        return null;
     }
     private boolean validLeastVisitedExists(Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
@@ -74,13 +75,14 @@ public abstract class BaseStrategyNode<T>
     }
     protected List<Action> filterByVisitedModifier(VisitedModifier visitedModifier, List<Action> actions, Map<String, Integer> actionsExecuted)
     {
-        return switch(visitedModifier)
+        switch(visitedModifier)
                 {
                     case LEAST_VISITED -> filterLeastVisited(actions, actionsExecuted);
                     case MOST_VISITED -> filterMostVisited(actions, actionsExecuted);
                     case UNVISITED -> filterUnvisited(actions, actionsExecuted);
                     case VISITED -> filterVisited(actions, actionsExecuted);
                 };
+        return null;
     }
     
     private List<Action> filterLeastVisited(List<Action> actions, Map<String, Integer> actionsExecuted)
