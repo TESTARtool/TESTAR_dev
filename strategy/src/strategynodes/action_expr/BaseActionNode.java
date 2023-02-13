@@ -4,10 +4,7 @@ import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import strategynodes.BaseStrategyNode;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 public abstract class BaseActionNode extends BaseStrategyNode<Action>
 {
@@ -24,7 +21,7 @@ public abstract class BaseActionNode extends BaseStrategyNode<Action>
         return new ArrayList<>(actions).get(rnd.nextInt(actions.size())); //return a random action
     }
     
-    protected Action selectRandomAction(ArrayList<Action> actions)
+    protected Action selectRandomAction(List<Action> actions)
     {
         Random rnd = new Random();
         return actions.get(rnd.nextInt(actions.size())); //return a random action

@@ -1,6 +1,5 @@
 package strategynodes;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;

@@ -33,6 +33,6 @@ public class SelectPreviousNode extends BaseActionNode
     @Override
     public String toString()
     {
-        return WEIGHT + " select-previous-action";
+        return WEIGHT + " select-previous";
     }
 }

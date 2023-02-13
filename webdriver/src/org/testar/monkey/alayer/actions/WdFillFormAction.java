@@ -293,7 +293,7 @@ public class WdFillFormAction extends TaggableBase implements Action {
                     }
                 }
                 if (fields.containsKey(element.name) && fields.get(element.name) != null) {
-                    formBuilder.add(ac.clickTypeInto(widget, fields.get(element.name), true), 2);
+                    formBuilder.add(ac.clickTypeInto(w, fields.get(element.name), true), 2);
                     numberOfActions += 2;
                 }
             } else {

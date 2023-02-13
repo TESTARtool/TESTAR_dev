@@ -5,56 +5,53 @@ import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
 import strategynodes.RelatedAction;
+import strategynodes.VisitedModifier;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class SelectRelationNode extends BaseActionNode
 {
+    private final VisitedModifier   VISITED_MODIFIER;
     private final RelatedAction RELATED_ACTION;
     
-    public SelectRelationNode(Integer weight, RelatedAction relatedAction)
+    public SelectRelationNode(Integer weight, VisitedModifier visitedModifier, RelatedAction relatedAction)
     {
-        this.WEIGHT         = (weight != null || weight > 0) ? weight : 1;
+        this.WEIGHT = (weight != null || weight > 0) ? weight : 1;
+        this.VISITED_MODIFIER = visitedModifier;
         this.RELATED_ACTION = relatedAction;
     }
-    
-    private boolean WidgetsAreParentAndChild(Widget parent, Widget child)
-    { return child.parent().equals(parent); }
-    
-    private boolean WidgetsAreSiblings(Widget widget1, Widget widget2)
-    { return widget1.parent().equals(widget2.parent()); }
     
     @Override
     public Action getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted) //todo: check if it works
     {
-        if(actions.size() == 1)
-            return new ArrayList<Action>(actions).get(0);
-
-        Action prevAction =  state.get(Tags.PreviousAction, null);
-        if(prevAction == null)
-            return selectRandomAction(actions);
-
-        Widget            prevWidget      = prevAction.get(Tags.OriginWidget, null);
-        ArrayList<Action> filteredActions = new ArrayList<>();
+        if(actions.size() == 1) //if there's only one action, pick that one
+            return new ArrayList<>(actions).get(0);
         
-        for(Action action : actions)
+        List<Action> filteredActions = new ArrayList(actions);
+        
+        Action prevAction = state.get(Tags.PreviousAction, null);
+        if(prevAction != null)
         {
-            Widget widget = action.get(Tags.OriginWidget);
-            if((RELATED_ACTION == RelatedAction.CHILD && WidgetsAreParentAndChild(prevWidget, widget)) ||
-               (RELATED_ACTION == RelatedAction.SIBLING && WidgetsAreSiblings(prevWidget, widget)) ||
-               (RELATED_ACTION == RelatedAction.SIBLING_OR_CHILD && (WidgetsAreParentAndChild(prevWidget, widget) || WidgetsAreSiblings(prevWidget, widget))))
-                filteredActions.add(action);
+            filteredActions = filterByRelation(prevAction, filteredActions, RELATED_ACTION);
+            
+            if(VISITED_MODIFIER != null)
+                filteredActions = filterByVisitedModifier(VISITED_MODIFIER, filteredActions, actionsExecuted);
         }
-        
-        if(filteredActions.size() > 0)
-            return selectRandomAction(filteredActions);
         else
             return selectRandomAction(actions);
+        
+        if(filteredActions.isEmpty()) //if nothing has made it through the filters
+            return selectRandomAction(actions); //default to picking randomly
+        else if (filteredActions.size() == 1)
+            return new ArrayList<>(actions).get(0);
+        else
+            return selectRandomAction(filteredActions); //pick randomly from the filtered list
     }
     
     @Override
     public String toString()
-    { return WEIGHT + " select-by-relation " + RELATED_ACTION.toString(); }
+    { return WEIGHT + " select-random " + RELATED_ACTION.toString(); }
 }

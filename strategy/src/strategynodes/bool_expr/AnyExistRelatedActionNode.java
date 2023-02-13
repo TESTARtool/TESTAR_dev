@@ -6,45 +6,39 @@ import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
 import strategynodes.RelatedAction;
 import strategynodes.BaseStrategyNode;
+import strategynodes.VisitedModifier;
 
 import java.util.Map;
 import java.util.Set;
 
 public class AnyExistRelatedActionNode extends BaseStrategyNode<Boolean>
 {
-    private final RelatedAction RELATED_ACTION;
+    private final VisitedModifier VISITED_MODIFIER;
+    private final     RelatedAction   RELATED_ACTION;
     
-    public AnyExistRelatedActionNode(RelatedAction relatedAction)
+    public AnyExistRelatedActionNode(VisitedModifier visitedModifier, RelatedAction relatedAction)
     {
+        this.VISITED_MODIFIER = visitedModifier;
         this.RELATED_ACTION = relatedAction;
     }
     
-    private boolean WidgetsAreParentAndChild(Widget parent, Widget child)
-    { return child.parent().equals(parent); }
-    
-    private boolean WidgetsAreSiblings(Widget widget1, Widget widget2)
-    { return widget1.parent().equals(widget2.parent()); }
-    
     @Override
-    public Boolean getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted) //todo: check if it works
+    public Boolean getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted) //todo: add modifier
     {
         Action prevAction = state.get(Tags.PreviousAction, null);
+        
         if(prevAction != null)
-        {
-            Widget prevWidget = prevAction.get(Tags.OriginWidget, null);
-            for (Action action : actions)
-            {
-                Widget widget = action.get(Tags.OriginWidget);
-                if ((RELATED_ACTION == RelatedAction.CHILD && WidgetsAreParentAndChild(prevWidget, widget)) ||
-                        (RELATED_ACTION == RelatedAction.SIBLING && WidgetsAreSiblings(prevWidget, widget)) ||
-                        (RELATED_ACTION == RelatedAction.SIBLING_OR_CHILD && (WidgetsAreParentAndChild(prevWidget, widget) || WidgetsAreSiblings(prevWidget, widget))))
-                    return true; //if one is found, no need to search further
-            }
-        }
+            return validRelationExists(prevAction, actions, RELATED_ACTION);
+        
         return false;
     }
     
     @Override
     public String toString()
-    { return RELATED_ACTION.toString() + " exist"; }
+    {
+        String string = "any-exist";
+        if(VISITED_MODIFIER != null) string += " " + VISITED_MODIFIER;
+        string += RELATED_ACTION.toString();
+        return string;
+    }
 }

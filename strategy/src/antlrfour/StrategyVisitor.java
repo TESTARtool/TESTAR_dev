@@ -1,4 +1,4 @@
-// Generated from java-escape by ANTLR 4.11.1
+// Generated from C:/Users/lh3/IdeaProjects/TESTAR/strategy/src/antlrfour\Strategy.g4 by ANTLR 4.9.2
 package antlrfour;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
@@ -123,17 +123,17 @@ public interface StrategyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code selectRandomAction}
-	 * labeled alternative in {@link StrategyParser#action}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSelectRandomAction(StrategyParser.SelectRandomActionContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code selectRelatedAction}
 	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitSelectRelatedAction(StrategyParser.SelectRelatedActionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code selectRandomAction}
+	 * labeled alternative in {@link StrategyParser#action}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSelectRandomAction(StrategyParser.SelectRandomActionContext ctx);
 }

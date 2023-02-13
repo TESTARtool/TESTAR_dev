@@ -123,7 +123,10 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     }
     @Override
     public AnyExistRelatedActionNode visitAnyExistRelatedAction(StrategyParser.AnyExistRelatedActionContext ctx)
-    { return new AnyExistRelatedActionNode(RelatedAction.toEnum(ctx.RELATED_ACTION().getText())); }
+    {
+        VisitedModifier visitModifier = (ctx.VISIT_MODIFIER() == null) ? null:  VisitedModifier.toEnum(ctx.VISIT_MODIFIER().getText());
+        return new AnyExistRelatedActionNode(visitModifier, RelatedAction.toEnum(ctx.RELATED_ACTION().getText()));
+    }
     
     ////////////////////////
     // action expressions //
@@ -132,7 +135,7 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     @Override
     public ActionListNode visitAction_list(StrategyParser.Action_listContext ctx)
     {
-        List<BaseActionNode> actionNodes = new ArrayList<>();
+        List<BaseActionNode> actionNodes = new ArrayList();
         for(int i = 0; i < ctx.getChildCount(); i++)
             actionNodes.add((BaseActionNode) visit(ctx.action(i)));
         return new ActionListNode(actionNodes);
@@ -158,8 +161,9 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     @Override public SelectRelationNode visitSelectRelatedAction(StrategyParser.SelectRelatedActionContext ctx)
     {
         int weight = ctx.NUMBER() == null ? 1 : Integer.parseInt(ctx.NUMBER().getText());
+        VisitedModifier visitModifier = (ctx.VISIT_MODIFIER() == null) ? null:  VisitedModifier.toEnum(ctx.VISIT_MODIFIER().getText());
         RelatedAction relatedAction = (ctx.RELATED_ACTION() == null) ? null : RelatedAction.toEnum(ctx.RELATED_ACTION().getText());
         
-        return new SelectRelationNode(weight, relatedAction);
+        return new SelectRelationNode(weight, visitModifier, relatedAction);
     }
 }

@@ -1,4 +1,4 @@
-// Generated from java-escape by ANTLR 4.11.1
+// Generated from C:/Users/lh3/IdeaProjects/TESTAR/strategy/src/antlrfour\Strategy.g4 by ANTLR 4.9.2
 package antlrfour;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
@@ -198,18 +198,6 @@ public interface StrategyListener extends ParseTreeListener {
 	 */
 	void exitSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code selectRandomAction}
-	 * labeled alternative in {@link StrategyParser#action}.
-	 * @param ctx the parse tree
-	 */
-	void enterSelectRandomAction(StrategyParser.SelectRandomActionContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code selectRandomAction}
-	 * labeled alternative in {@link StrategyParser#action}.
-	 * @param ctx the parse tree
-	 */
-	void exitSelectRandomAction(StrategyParser.SelectRandomActionContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code selectRelatedAction}
 	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
@@ -221,4 +209,16 @@ public interface StrategyListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitSelectRelatedAction(StrategyParser.SelectRelatedActionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code selectRandomAction}
+	 * labeled alternative in {@link StrategyParser#action}.
+	 * @param ctx the parse tree
+	 */
+	void enterSelectRandomAction(StrategyParser.SelectRandomActionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code selectRandomAction}
+	 * labeled alternative in {@link StrategyParser#action}.
+	 * @param ctx the parse tree
+	 */
+	void exitSelectRandomAction(StrategyParser.SelectRandomActionContext ctx);
 }

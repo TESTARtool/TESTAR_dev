@@ -27,7 +27,7 @@ number_expr:         number_of_actions | NUMBER;
 number_of_actions:  'n-actions'      VISIT_MODIFIER?   (FILTER     ACTION_TYPE)?;
 
 state_boolean:      'state-changed'                                                         #stateChanged
-|                   'any-exist'             RELATED_ACTION                                  #anyExistRelatedAction
+|                   'any-exist'             VISIT_MODIFIER?    RELATED_ACTION               #anyExistRelatedAction
 |                   'any-exist'             VISIT_MODIFIER?   (FILTER     ACTION_TYPE)?     #anyExist
 |                   'sut'                   FILTER             SUT_TYPE                     #sutType
 ;
@@ -42,8 +42,8 @@ action_expr:        if_then_else | action_list;
 action_list:        action+;
 
 action: NUMBER?     'select-previous'                                                       #selectPreviousAction
+|       NUMBER?     'select-random'             VISIT_MODIFIER?      RELATED_ACTION         #selectRelatedAction
 |       NUMBER?     'select-random'             VISIT_MODIFIER?     (FILTER ACTION_TYPE)?   #selectRandomAction
-|       NUMBER?     'select-related'            RELATED_ACTION                              #selectRelatedAction
 ;
 
 

@@ -8,9 +8,7 @@ import strategynodes.BaseStrategyNode;
 import strategynodes.Filter;
 import strategynodes.VisitedModifier;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class AnyExistNode extends BaseStrategyNode<Boolean>
 {
@@ -21,73 +19,30 @@ public class AnyExistNode extends BaseStrategyNode<Boolean>
     public AnyExistNode(VisitedModifier visitedModifier, Filter filter, ActionType actionType)
     {
         this.VISITED_MODIFIER = visitedModifier;
-        this.FILTER      = filter;
+        this.FILTER = filter;
         this.ACTION_TYPE = actionType;
     }
     
     @Override
-    public Boolean getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted) //todo: check if it works
+    public Boolean getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
-        boolean applyFilterVisited       = (VISITED_MODIFIER != null);
-        boolean applyFilterActionTypes   = (FILTER != null && ACTION_TYPE != null);
+        boolean validActionFound = (VISITED_MODIFIER == null && FILTER == null && ACTION_TYPE == null && !actions.isEmpty());
         
-        if((!applyFilterVisited) && (!applyFilterActionTypes)) //if no filtering is necessary
-            return (actions.size() > 0);
-
-        if(VISITED_MODIFIER == VisitedModifier.LEAST_VISITED || VISITED_MODIFIER == VisitedModifier.MOST_VISITED)
-        {
-            boolean unvisitedActionPreferred = (VISITED_MODIFIER == VisitedModifier.LEAST_VISITED);
-
-            int targetCount;
-            if(actionsExecuted.size() == 0)
-                targetCount = 0;
-            else
-                targetCount = (VISITED_MODIFIER == VisitedModifier.LEAST_VISITED) ?
-                        Collections.min(actionsExecuted.values()) :
-                        Collections.max(actionsExecuted.values());
-
-            for(Action action : actions)
-            {
-                boolean actionRejected = false;
-                int count = actionsExecuted.getOrDefault(action.get(Tags.AbstractIDCustom), 0);
-
-                if(applyFilterActionTypes)
-                    actionRejected = !actionAllowedByFilter(action, FILTER, ACTION_TYPE); //check if action is rejected by filter
-
-                if(!actionRejected)
-                {
-                    if ((count == 0 && unvisitedActionPreferred) || count == targetCount)
-                        return true;
-                }
-            }
-            return false;
-        }
-        else // visited, unvisited, or no modifier
-        {
-            for(Action action : actions)
-            {
-                boolean actionRejected = false;
-
-                if (applyFilterVisited)
-                    actionRejected = !actionMatchesVisitorModifier(action, VISITED_MODIFIER, actionsExecuted);
-
-                if(!actionRejected && applyFilterActionTypes)
-                    actionRejected = !actionAllowedByFilter(action, FILTER, ACTION_TYPE); //check if action is rejected by filter
-
-                if(!actionRejected)
-                    return true; //found an action that fits the parameters
-            }
-        }
-        return false; //found no action that fits the parameters
+        if(VISITED_MODIFIER != null)
+            validActionFound = validActionExists(VISITED_MODIFIER, actions, actionsExecuted);
+        
+        if(FILTER != null && ACTION_TYPE != null)
+            validActionFound = validActionTypeExists(actions, FILTER, ACTION_TYPE);
+        
+        return validActionFound;
     }
     
     @Override
     public String toString()
     {
-        String string = "any-actions";
-        if(VISITED_MODIFIER != null) string += " " + VISITED_MODIFIER.toString();
-        if(FILTER != null) string += " " + FILTER.toString() + " " + ACTION_TYPE.toString();
-        string += " exist";
+        String string = "any-exist";
+        if(VISITED_MODIFIER != null) string += " " + VISITED_MODIFIER;
+        if(FILTER != null) string += " " + FILTER + " " + ACTION_TYPE.toString();
         return string;
     }
 }
