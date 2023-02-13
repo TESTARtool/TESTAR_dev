@@ -31,8 +31,11 @@
 
 package org.testar.protocols;
 
+import org.apache.commons.io.FileUtils;
 import org.testar.DerivedActions;
+import org.testar.OutputStructure;
 import org.testar.monkey.Drag;
+import org.testar.monkey.Main;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.ActionRoles;
@@ -42,7 +45,17 @@ import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
 import org.testar.monkey.ConfigTags;
+import org.testar.protocols.experiments.WriterExperiments;
+import org.testar.serialisation.LogSerialiser;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -689,5 +702,65 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     		}
     	}
     	return new HashSet<>();
+    }
+
+    /**
+     * Compress TESTAR output run report folder
+     */
+    protected void compressOutputRunFolder() {
+        Util.compressFolder(OutputStructure.outerLoopOutputDir, Main.outputDir, OutputStructure.outerLoopName);
+    }
+
+    /**
+     * Obtain the IP address of the current host to create a folder inside destFolder,
+     * then copy all TESTAR output run results inside created folder.
+     *
+     * This is an utility method intended to copy output results inside a file server shared folder,
+     * used to save data of TESTAR experiments.
+     *
+     * @param destFolder
+     */
+    protected void copyOutputToNewFolderUsingIpAddress(String destFolder) {
+        // Obtain the ip address of the host
+        // https://stackoverflow.com/a/38342964
+        String ipAddress = "127.0.0.1";
+        try(final DatagramSocket socket = new DatagramSocket()){
+            socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+            ipAddress = socket.getLocalAddress().getHostAddress();
+        } catch (SocketException | UnknownHostException e) {
+            LogSerialiser.log("ERROR copyOutputToNewFolderUsingIpAddress: Obtaining host ip address",
+                    LogSerialiser.LogLevel.Info);
+            System.err.println("ERROR copyOutputToNewFolderUsingIpAddress: Obtaining host ip address");
+            e.printStackTrace();
+        }
+
+        // Create a new directory inside desired destination using the ipAddress as name
+        String folderIpAddress = destFolder + File.separator + ipAddress + File.separator + settings.get(ConfigTags.ApplicationName, "");
+        try {
+            Files.createDirectories(Paths.get(folderIpAddress));
+        } catch (IOException e) {
+            LogSerialiser.log("ERROR copyOutputToNewFolderUsingIpAddress: Creating new folder with ip name",
+                    LogSerialiser.LogLevel.Info);
+            System.err.println("ERROR copyOutputToNewFolderUsingIpAddress: Creating new folder with ip name");
+            e.printStackTrace();
+            return;
+        }
+
+        // Copy run zip file to desired ip address output folder
+        File outputZipFile = new File(Main.outputDir + File.separator + OutputStructure.outerLoopName + ".zip");
+        try {
+            if(outputZipFile.exists()) {
+                File fileIpAddressOutput = new File(folderIpAddress + File.separator + ipAddress + "_" + outputZipFile.getName());
+                FileUtils.copyFile(outputZipFile, fileIpAddressOutput);
+                System.out.println(String.format("Sucessfull copy %s to %s", outputZipFile, fileIpAddressOutput));
+            }
+        } catch (IOException e) {
+            LogSerialiser.log("ERROR copyOutputToNewFolderUsingIpAddress: ERROR ZIP : " + outputZipFile,
+                    LogSerialiser.LogLevel.Info);
+            System.err.println("ERROR copyOutputToNewFolderUsingIpAddress: ERROR ZIP : " + outputZipFile);
+            e.printStackTrace();
+        }
+
+        // Create a folder inside the centralized file server and copy the metrics results
     }
 }

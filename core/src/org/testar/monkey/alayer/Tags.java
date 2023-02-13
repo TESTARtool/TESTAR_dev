@@ -218,4 +218,5 @@ public final class Tags extends TagsBase {
 	
 	public static Tag<Boolean> StateChanged = from("StateChanged", Boolean.class);
 	public static Tag<Action> PreviousAction = from("PreviousAction", Action.class);
+	public static Tag<String> PreviousActionID = from("PreviousAction", String.class);
 }

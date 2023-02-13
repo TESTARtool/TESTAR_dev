@@ -41,12 +41,14 @@
  import org.testar.monkey.alayer.actions.WdFillFormAction;
  import org.testar.monkey.alayer.exceptions.ActionBuildException;
  import org.testar.monkey.alayer.exceptions.StateBuildException;
- import org.testar.monkey.alayer.webdriver.enums.WdRoles;
  import org.testar.monkey.alayer.webdriver.enums.WdTags;
  import org.testar.protocols.WebdriverProtocol;
  import parsing.ParseUtil;
 
- import java.util.*;
+ import java.util.HashMap;
+ import java.util.HashSet;
+ import java.util.Map;
+ import java.util.Set;
 
  import static org.testar.monkey.alayer.Tags.Blocked;
  import static org.testar.monkey.alayer.Tags.Enabled;
@@ -197,30 +199,27 @@
         //clone the action
         Action selectedAction = (Action) SerializationUtils.clone(parseUtil.selectAction(state, actions, actionsExecuted));
         
-        Widget selectedWidget = selectedAction.get(Tags.OriginWidget, null);
-        
-        //if statement to switch back to regular strategy
-//        if(formStrategyActive && selectedWidget != null && isSubmitButton(selectedWidget))
-//        {
-//            formStrategyActive = false;
-//            System.out.println("Form filling mode OFF");
-//        }
-        
         if(DefaultProtocol.lastExecutedAction != null)
+        {
             state.set(Tags.PreviousAction, DefaultProtocol.lastExecutedAction);
+            state.set(Tags.PreviousActionID, DefaultProtocol.lastExecutedAction.get(Tags.AbstractIDCustom, null));
+        }
         
         String actionID = selectedAction.get(Tags.AbstractIDCustom);
-        Integer timesUsed = actionsExecuted.containsKey(actionID) ? actionsExecuted.get(actionID) : 0; //get the use count for the action
+        Integer timesUsed = actionsExecuted.getOrDefault(actionID, 0); //get the use count for the action
         actionsExecuted.put(actionID, timesUsed + 1); //increase by one
         
         return selectedAction;
     }
-    
-//    private Boolean isSubmitButton(Widget submit_widget)
-//    {
-//        if(submit_widget == null)
-//            return false;
-//        Role[] roles = new Role[]{WdRoles.WdINPUT, WdRoles.WdBUTTON};
-//        return Role.isOneOf(submit_widget.get(Tags.Role, Roles.Widget), roles) && submit_widget.get(WdTags.WebType,"").equalsIgnoreCase("submit");
-//    }
+
+    @Override
+    protected void closeTestSession()
+    {
+        super.closeTestSession();
+        if(settings.get(ConfigTags.Mode).equals(Modes.Generate))
+        {
+            compressOutputRunFolder();
+            copyOutputToNewFolderUsingIpAddress("N:");
+        }
+    }
 }
