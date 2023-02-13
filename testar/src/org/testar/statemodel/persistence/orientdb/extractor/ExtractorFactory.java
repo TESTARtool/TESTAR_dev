@@ -45,7 +45,16 @@ public abstract class ExtractorFactory {
             case EXTRACTOR_ABSTRACT_STATE_TRANSITION:
                 return createAbstractStateTransitionExtractor();
 
-            default: throw new ExtractionException("Illegal extractor type specified");
+            case EXTRACTOR_CONCRETE_STATE:
+              return createConcreteStateExtractor();
+
+            case EXTRACTOR_CONCRETE_ACTION:
+              return createConcreteActionExtractor();
+
+            case EXTRACTOR_CONCRETE_STATE_TRANSITION:
+              return createConcreteStateTransitionExtractor();
+
+          default: throw new ExtractionException("Illegal extractor type specified");
         }
     }
 
