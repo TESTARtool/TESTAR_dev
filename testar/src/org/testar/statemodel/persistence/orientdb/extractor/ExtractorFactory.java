@@ -1,5 +1,7 @@
 package org.testar.statemodel.persistence.orientdb.extractor;
 
+import org.testar.statemodel.ConcreteState;
+import org.testar.statemodel.ConcreteStateProxy;
 import org.testar.statemodel.exceptions.ExtractionException;
 
 import java.util.HashMap;
@@ -13,7 +15,13 @@ public abstract class ExtractorFactory {
 
     public static final int EXTRACTOR_ABSTRACT_STATE_TRANSITION = 3;
 
-    // a repo for generated classes, so we don't execute the same generation code over and over if not needed
+  public static final int EXTRACTOR_CONCRETE_STATE = 4;
+
+  public static final int EXTRACTOR_CONCRETE_ACTION = 5;
+
+  public static final int EXTRACTOR_CONCRETE_STATE_TRANSITION = 6;
+
+  // a repo for generated classes, so we don't execute the same generation code over and over if not needed
     private static Map<Integer, EntityExtractor> extractors = new HashMap<>();
 
     /**
@@ -70,5 +78,31 @@ public abstract class ExtractorFactory {
             return null;
         }
     }
+
+  private static ConcreteStateProxyExtractor createConcreteStateExtractor() {
+    ConcreteStateProxyExtractor concreteStateExtractor = null;
+    concreteStateExtractor = new ConcreteStateProxyExtractor();
+    extractors.put(EXTRACTOR_CONCRETE_STATE, concreteStateExtractor);
+    return concreteStateExtractor;
+  }
+
+  private static ConcreteActionProxyExtractor createConcreteActionExtractor() {
+    ConcreteActionProxyExtractor concreteActionExtractor = new ConcreteActionProxyExtractor();
+    extractors.put(EXTRACTOR_CONCRETE_ACTION, concreteActionExtractor);
+    return concreteActionExtractor;
+  }
+
+  private static ConcreteStateTransitionExtractor createConcreteStateTransitionExtractor() {
+    try {
+      ConcreteStateProxyExtractor concreteStateExtractor = (ConcreteStateProxyExtractor) ExtractorFactory.getExtractor(EXTRACTOR_CONCRETE_STATE);
+      ConcreteActionProxyExtractor concreteActionExtractor = (ConcreteActionProxyExtractor) ExtractorFactory.getExtractor(EXTRACTOR_CONCRETE_ACTION);
+      ConcreteStateTransitionExtractor concreteStateTransitionExtractor = new ConcreteStateTransitionExtractor(concreteStateExtractor, concreteActionExtractor);
+      extractors.put(EXTRACTOR_CONCRETE_STATE_TRANSITION, concreteStateTransitionExtractor);
+      return concreteStateTransitionExtractor;
+    }
+    catch (ExtractionException ex) {
+      return null;
+    }
+  }
 
 }
