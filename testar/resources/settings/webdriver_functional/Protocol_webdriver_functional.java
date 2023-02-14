@@ -281,7 +281,7 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 			// For the web select elements with an Id property
 			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) && !w.get(WdTags.WebId, "").isEmpty()) {
 				String elementId = w.get(WdTags.WebId, "");
-				String query = String.format("return [...document.getElementById('accountId').options].map(o => o.value)", elementId);
+				String query = String.format("return [...document.getElementById('%s').options].map(o => o.value)", elementId);
 				ArrayList<String> selectOptionsList = (ArrayList<String>) WdDriver.executeScript(query);
 
 				// Now that we have collected all the array list of the option values verify that is sorted 
