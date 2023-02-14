@@ -59,6 +59,10 @@ import org.testar.protocols.DesktopProtocol;
 import com.google.common.collect.Comparators;
 
 /**
+ * TODO: Multiple HTMl reports for the same sequence with Verdicts separately
+ * TODO: Add verdict message to HTML report
+ * TODO: Continue improving Unique Verdict per Sequence
+ * 
  * Protocol with functional oracles examples to detect:
  * - Form has no title 
  * - Checkbox without a caption
@@ -69,6 +73,9 @@ import com.google.common.collect.Comparators;
  * - Textbox over another textbox (custom overlap method) 
  * - TODO: Radio button panel with only one option
  * - TODO: Panel without children
+ * - TODO: Radio button not selected (UIAIsSelectedButton)
+ * - TODO: Select list item and check if parent changed the value after click
+ * - TODO: Resize the SUT to detect overlaping of the anchors
  * 
  * - TODO: Two wrong ancor buttons. If you resize the form, these buttons do not align correct. - Research Anchor properties
  * - TODO: Tab order is all over the place - Research next element properties - Check tree order UIAutomation (sorted?)
@@ -131,7 +138,6 @@ public class Protocol_desktop_functional extends DesktopProtocol {
 		Verdict verdict = super.getVerdict(state);
 
 		verdict = getUniqueFunctionalVerdict(verdict, state);
-		//verdict = getJointFunctionalVerdict(verdict, state);
 
 		// If the final Verdict is not OK but was already detected in a previous sequence
 		String currentVerdictInfo = verdict.info().replace("\n", " ");
@@ -176,33 +182,6 @@ public class Protocol_desktop_functional extends DesktopProtocol {
 			Verdict widgetsOverlapVerdict = twoLeafWidgetsOverlap(state);
 			if(widgetsOverlapVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( widgetsOverlapVerdict.info().replace("\n", " ") ))) return widgetsOverlapVerdict;
 		}
-		return verdict;
-	}
-
-	/**
-	 * This method join all possible failures of one state in the verdict.
-	 * Multiple failures can be reported.
-	 * 
-	 * @param verdict
-	 * @param state
-	 * @return
-	 */
-	private Verdict getJointFunctionalVerdict(Verdict verdict, State state) {
-		// Add the functional Verdict that detects dummy buttons to the current state verdict.
-		verdict = verdict.join(dummyButtonVerdict(state));
-
-		// Add the Verdict that detects if the SUT contains a mandatory widget role without title
-		verdict = verdict.join(mandatoryWidgetRoleWithTitle(state, Arrays.asList(UIARoles.UIAWindow, UIARoles.UIACheckBox, UIARoles.UIAListItem)));
-
-		// Add the Verdict that detects if the SUT contains a list with unsorted elements
-		verdict = verdict.join(detectEmptyAndUnsortedListElements(state, Arrays.asList(UIARoles.UIAList, UIARoles.UIATree)));
-
-		// Add the Verdict that detects if the SUT contains misspelled titles
-		verdict = verdict.join(spellChecker(state));
-
-		// Add the Verdict that detects if two widgets overlap
-		verdict = verdict.join(twoLeafWidgetsOverlap(state));
-
 		return verdict;
 	}
 
@@ -340,7 +319,7 @@ public class Protocol_desktop_functional extends DesktopProtocol {
 	private Verdict dummyButtonVerdict(State state) {
 		// If the last executed action is a click on a web button
 		if(functionalAction != null 
-				&& functionalAction.get(Tags.OriginWidget) != null 
+				&& functionalAction.get(Tags.OriginWidget, null) != null 
 				&& functionalAction.get(Tags.Desc, "").contains("Click")
 				&& functionalAction.get(Tags.OriginWidget).get(Tags.Role, Roles.Widget).equals(UIARoles.UIAButton)) {
 

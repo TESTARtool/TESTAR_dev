@@ -29,10 +29,13 @@
  */
 
 import org.testar.SutVisualization;
+import org.testar.monkey.Pair;
+import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.WdElement;
 import org.testar.monkey.alayer.webdriver.WdWidget;
@@ -43,6 +46,7 @@ import org.testar.protocols.WebdriverProtocol;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
@@ -58,6 +62,9 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
  * - Radio button panel with only one option (input)
  * - Panel without children (form, div)
  * - Web alert with suspicious message
+ * - TODO: JavaScript loop to hang the browser - devTools
+ * - TODO: JavaScript refresh browser constantly - devTools
+ * - TODO: textarea with rows and columns to detect enter click
  * 
  * - Instead of joining Verdicts, try to recognize and save different Verdict exception in different sequences.
  */
@@ -89,6 +96,37 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 	}
 
 	/**
+	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
+	 * take care of
+	 * 1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
+	 * out what executable to run)
+	 * 2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+	 * the SUT's configuratio files etc.)
+	 * 3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
+	 * seconds until they have finished loading)
+	 *
+	 * @return a started SUT, ready to be tested.
+	 */
+	@Override
+	protected SUT startSystem() throws SystemStartException {
+		SUT system = super.startSystem();
+
+		// https://github.com/ferpasri/parabank/tree/injected_failures
+		// custom_compile_and_deploy.bat
+		// http://localhost:8080/parabank
+		// parabank script login sequence
+		/*
+		Util.pause(1);
+		WdDriver.executeScript("document.getElementsByName('username')[0].setAttribute('value','john');");
+		WdDriver.executeScript("document.getElementsByName('password')[0].setAttribute('value','demo');");
+		WdDriver.executeScript("document.getElementsByName('login')[0].submit();");
+		Util.pause(1);
+		*/
+
+		return system;
+	}
+
+	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
 	 * This can be used for example for bypassing a login screen by filling the username and password
 	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
@@ -113,7 +151,6 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 		Verdict verdict = super.getVerdict(state);
 
 		verdict = getUniqueFunctionalVerdict(verdict, state);
-		//verdict = getJointFunctionalVerdict(verdict, state);
 
 		// If the final Verdict is not OK but was already detected in a previous sequence
 		String currentVerdictInfo = verdict.info().replace("\n", " ");
@@ -165,47 +202,18 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 			// Check the functional Verdict that detects if a web alert contains a suspicious message.
 			Verdict alertSuspiciousVerdict = alertSuspiciousMessage(state, ".*[lL]ogin.*");
 			if(alertSuspiciousVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( alertSuspiciousVerdict.info().replace("\n", " ") ))) return alertSuspiciousVerdict;
+
+			// Check the functional Verdict that detects if web table contains duplicated rows.
+			Verdict duplicateRowsInTableVerdict = duplicateRowsInTable(state);
+			if(duplicateRowsInTableVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( duplicateRowsInTableVerdict.info().replace("\n", " ") ))) return duplicateRowsInTableVerdict;
 		}
-		return verdict;
-	}
-
-	/**
-	 * This method join all possible failures of one state in the verdict.
-	 * Multiple failures can be reported.
-	 * 
-	 * @param verdict
-	 * @param state
-	 * @return
-	 */
-	private Verdict getJointFunctionalVerdict(Verdict verdict, State state) {
-		// Add the functional Verdict that detects dummy buttons to the current state verdict.
-		verdict = verdict.join(functionalButtonVerdict(state));
-
-		// Add the functional Verdict that detects select elements without items to the current state verdict.
-		verdict = verdict.join(emptySelectItemsVerdict(state));
-
-		// Add the functional Verdict that detects if exists a number with more than X decimals.
-		verdict = verdict.join(numberWithLotOfDecimals(state, 2));
-
-		// Add the functional Verdict that detects if exists a textArea Widget without length.
-		verdict = verdict.join(textAreaWithoutLength(state, Arrays.asList(WdRoles.WdTEXTAREA)));
-
-		// Add the functional Verdict that detects if a web element does not contain children.
-		verdict = verdict.join(elementWithoutChildren(state, Arrays.asList(WdRoles.WdFORM, WdRoles.WdDIV)));
-
-		// Add the functional Verdict that detects if a web radio input contains a unique option.
-		verdict = verdict.join(uniqueRadioInput(state));
-
-		// Add the functional Verdict that detects if a web alert contains a suspicious message.
-		verdict = verdict.join(alertSuspiciousMessage(state, ".*[lL]ogin.*"));
-
 		return verdict;
 	}
 
 	private Verdict functionalButtonVerdict(State state) {
 		// If the last executed action is a click on a web button
 		if(functionalAction != null 
-				&& functionalAction.get(Tags.OriginWidget) != null 
+				&& functionalAction.get(Tags.OriginWidget, null) != null 
 				&& functionalAction.get(Tags.Desc, "").contains("Click")
 				&& functionalAction.get(Tags.OriginWidget).get(Tags.Role, Roles.Widget).equals(WdRoles.WdBUTTON)) {
 
@@ -310,7 +318,7 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 	private Verdict uniqueRadioInput(State state) {
 		Verdict radioInputVerdict = Verdict.OK;
 		for(Widget w : state) {
-			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdINPUT) && !siblingRoleElement(w, WdRoles.WdINPUT)) {
+			if(isRadioInput(w) && !siblingRoleElement(w, WdRoles.WdINPUT)) {
 
 				String verdictMsg = String.format("Detected a Web radio input element with a Unique option! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
 						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
@@ -321,6 +329,62 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 		return radioInputVerdict;
 	}
 
+	private boolean isRadioInput(Widget w) {
+		return w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdINPUT) && w.get(WdTags.WebType, "").equalsIgnoreCase("radio");
+	}
+
+	private Verdict duplicateRowsInTable(State state) {
+		Verdict duplicateRowsInTableVerdict = Verdict.OK;
+		for(Widget w : state) {
+			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdTABLE)) {
+				List<Pair<Widget, String>> rowElementsDescription = new ArrayList<>();
+				extractAllRowDescriptionsFromTable(w, rowElementsDescription);
+
+				// https://stackoverflow.com/a/52296246
+				List<String> duplicatedDescriptions =    
+						rowElementsDescription.stream().collect(Collectors.groupingBy(Pair::right))
+						.entrySet()
+						.stream()
+						.filter(e -> e.getValue().size() > 1)
+						.map(Map.Entry::getKey)
+						.collect(Collectors.toList());
+
+				// If the list of duplicated descriptions contains a matching prepare the verdict
+				if(!duplicatedDescriptions.isEmpty()) {
+					String verdictMsg = String.format("Detected a Table with duplicated rows! Role: %s , WebId: %s", 
+							w.get(Tags.Role), w.get(WdTags.WebId, ""));
+
+					duplicateRowsInTableVerdict = duplicateRowsInTableVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+				}
+
+			}
+		}
+
+		return duplicateRowsInTableVerdict;
+	}
+
+	private void extractAllRowDescriptionsFromTable(Widget w, List<Pair<Widget, String>> rowElementsDescription) {
+		if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdTR)) {
+			rowElementsDescription.add(new Pair<Widget, String>(w, obtainWidgetTreeDescription(w)));
+		}
+
+		// Iterate through the form element widgets
+		for(int i = 0; i < w.childCount(); i++) {
+			extractAllRowDescriptionsFromTable(w.child(i), rowElementsDescription);
+		}
+	}
+
+	private String obtainWidgetTreeDescription(Widget w) {
+		String widgetDesc = w.get(WdTags.WebTextContent, "");
+
+		// Iterate through the form element widgets
+		for(int i = 0; i < w.childCount(); i++) {
+			widgetDesc = widgetDesc + "_" + obtainWidgetTreeDescription(w.child(i));
+		}
+
+		return widgetDesc;
+	}
+
 	private Verdict alertSuspiciousMessage(State state, String pattern) {
 		Verdict alertVerdict = Verdict.OK;
 		if(!WdDriver.alertMessage.isEmpty()) {
@@ -329,7 +393,7 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 				// The widget to remark is the state by default
 				Widget w = state;
 				// But if the alert was prompt by executing an action in a widget, remark this widget
-				if(lastExecutedAction != null  && lastExecutedAction.get(Tags.OriginWidget) != null) {
+				if(lastExecutedAction != null  && lastExecutedAction.get(Tags.OriginWidget, null) != null) {
 					w = lastExecutedAction.get(Tags.OriginWidget);
 				}
 
