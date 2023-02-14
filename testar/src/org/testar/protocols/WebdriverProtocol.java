@@ -53,6 +53,9 @@ import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
@@ -101,12 +104,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	// List of atributes to identify and close policy popups
 	// Set to null to disable this feature
 	@SuppressWarnings("serial")
-	protected Map<String, String> policyAttributes = new HashMap<String, String>()
-	{
-		{ 
-			put("id", "_cookieDisplay_WAR_corpcookieportlet_okButton");
-		}
-	};
+	protected Multimap<String, String> policyAttributes = ArrayListMultimap.create();
 
 	// Verdict obtained from messages coming from the web browser console
 	protected Verdict webConsoleVerdict = Verdict.OK;
@@ -146,6 +144,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		//Force webdriver to switch to a new tab if opened
 		//This feature can block the correct display of select dropdown elements 
 		WdDriver.forceActivateTab = settings.get(ConfigTags.SwitchNewTabs);
+
+		policyAttributes.put("title", "_cookieDisplay_WAR_corpcookieportlet_okButton");
 	}
 	
 	/**
@@ -584,9 +584,11 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 			WdElement element = ((WdWidget) widget).element;
 			boolean isPopup = true;
-			for (Map.Entry<String, String> entry : policyAttributes.entrySet()) {
-				String attribute = element.attributeMap.get(entry.getKey());
-				isPopup &= entry.getValue().equals(attribute);
+			for (String key : policyAttributes.keySet()) {
+				String attribute = element.attributeMap.get(key);
+				for (String entryValue: policyAttributes.get(key)) {
+					isPopup &= entryValue.equals(attribute);
+				}
 			}
 			if (isPopup) {
 				return new HashSet<>(Collections.singletonList(ac.leftClickAt(widget)));

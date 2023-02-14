@@ -28,6 +28,7 @@
  *
  */
 
+import com.google.common.collect.ArrayListMultimap;
 import org.testar.SutVisualization;
 import org.testar.monkey.Pair;
 import org.testar.monkey.alayer.*;
@@ -103,9 +104,8 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 		// List of attributes to identify and close policy popups
 		// Set to null to disable this feature
 		//TODO put into settings file
-		policyAttributes = new HashMap<String, String>() {{
-			put("class", "lfr-btn-label");
-		}};
+		policyAttributes = ArrayListMultimap.create();
+		policyAttributes.put("class", "lfr-btn-label");
 	}
 
 	/**
