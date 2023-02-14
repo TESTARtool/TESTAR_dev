@@ -77,10 +77,10 @@ public abstract class BaseStrategyNode<T>
     {
         switch(visitedModifier)
                 {
-                    case LEAST_VISITED -> filterLeastVisited(actions, actionsExecuted);
-                    case MOST_VISITED -> filterMostVisited(actions, actionsExecuted);
-                    case UNVISITED -> filterUnvisited(actions, actionsExecuted);
-                    case VISITED -> filterVisited(actions, actionsExecuted);
+                    case LEAST_VISITED: filterLeastVisited(actions, actionsExecuted);
+                    case MOST_VISITED: filterMostVisited(actions, actionsExecuted);
+                    case UNVISITED: filterUnvisited(actions, actionsExecuted);
+                    case VISITED: filterVisited(actions, actionsExecuted);
                 };
         return null;
     }
