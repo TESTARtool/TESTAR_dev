@@ -46,7 +46,20 @@ import org.testar.protocols.WebdriverProtocol;
 
 import com.google.common.collect.Comparators;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -76,6 +89,10 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 	private Action functionalAction = null;
 	private Verdict functionalVerdict = Verdict.OK;
 	private List<String> listErrorVerdictInfo = new ArrayList<>();
+
+	// Watcher service
+	Path downloadsPath;
+	private List<String> watchEventDownloadedFiles = new ArrayList<>();
 
 	/**
 	 * This method is called before the first test sequence, allowing for example setting up the test environment
@@ -141,6 +158,35 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 		// Reset the functional action and verdict
 		functionalAction = null;
 		functionalVerdict = Verdict.OK;
+
+		// Reset the list of downloaded files
+		watchEventDownloadedFiles = new ArrayList<>();
+		// Create a watch service to check which files are downloaded when testing the SUT
+		try {
+			WatchService watchDownloadService = FileSystems.getDefault().newWatchService();
+			downloadsPath = Paths.get(System.getProperty("user.home") + "/Downloads");
+			System.out.println("Register WatchService in : " + downloadsPath);
+			downloadsPath.register(watchDownloadService, StandardWatchEventKinds.ENTRY_CREATE);
+			ExecutorService executor = Executors.newFixedThreadPool(1);
+			executor.submit(() -> {
+				// Watch all the possible downloaded files
+				WatchKey key;
+				try {
+					while ((key = watchDownloadService.take()) != null) {
+						for (WatchEvent<?> event : key.pollEvents()) {
+							if(!((Path) event.context()).toString().contains(".tmp") && !((Path) event.context()).toString().contains(".crdownload")) {
+								watchEventDownloadedFiles.add(((Path) event.context()).toString());
+							}
+						}
+						key.reset();
+					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			});
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -178,6 +224,10 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 		//TODO: Refactor Verdict class or this method feature
 		// Due this is the unique method, only start the verdict checking if no failure exists.
 		if(verdict == Verdict.OK) {
+			// Check the functional Verdict that detects if a downloaded file is empty.
+			Verdict watcherEmptyfileVerdict = watcherFileEmptyFile();
+			if(watcherEmptyfileVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( watcherEmptyfileVerdict.info().replace("\n", " ") ))) return watcherEmptyfileVerdict;
+
 			// Check the functional Verdict that detects dummy buttons to the current state verdict.
 			Verdict buttonVerdict = functionalButtonVerdict(state);
 			if(buttonVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( buttonVerdict.info().replace("\n", " ") ))) return buttonVerdict;
@@ -439,6 +489,41 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 			}
 		}
 		return alertVerdict;
+	}
+
+	private Verdict watcherFileEmptyFile() {
+		Verdict watcherEmptyfileVerdict = Verdict.OK;
+
+		try {
+			// If the register watcher detected some downloaded file
+			if(!watchEventDownloadedFiles.isEmpty()) {
+				// Iterate trough these files to check if they have content
+				for(String file : watchEventDownloadedFiles) {
+					String filePath = downloadsPath.toAbsolutePath() + File.separator + file;
+					BufferedReader br = new BufferedReader(new FileReader(filePath));     
+					if (br.readLine() == null) {
+						// If last actions was executed over a widget, remark it
+						if(lastExecutedAction != null  && lastExecutedAction.get(Tags.OriginWidget, null) != null) {
+							Widget w = lastExecutedAction.get(Tags.OriginWidget);
+
+							String verdictMsg = String.format("Detected a downloaded file of 0kb after interacting with! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
+									WdDriver.alertMessage, w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
+
+							watcherEmptyfileVerdict = watcherEmptyfileVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+						} 
+						// If there is no widget in the last executed action, just report a message
+						else {
+							String verdictMsg = String.format("Detected a downloaded file of 0kb!");
+
+							watcherEmptyfileVerdict = watcherEmptyfileVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg));
+						}
+
+					}
+				}
+			}
+		} catch(Exception e) {}
+
+		return watcherEmptyfileVerdict;
 	}
 
 	private boolean isNumeric(String strNum) {
