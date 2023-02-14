@@ -43,6 +43,9 @@ import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.plugin.NativeLinker;
 import org.testar.protocols.WebdriverProtocol;
+
+import com.google.common.collect.Comparators;
+
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -180,8 +183,12 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 			if(buttonVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( buttonVerdict.info().replace("\n", " ") ))) return buttonVerdict;
 
 			// Check the functional Verdict that detects select elements without items to the current state verdict.
-			Verdict emptyListVerdict = emptySelectItemsVerdict(state);
-			if(emptyListVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( emptyListVerdict.info().replace("\n", " ") ))) return emptyListVerdict;
+			Verdict emptySelectListVerdict = emptySelectItemsVerdict(state);
+			if(emptySelectListVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( emptySelectListVerdict.info().replace("\n", " ") ))) return emptySelectListVerdict;
+
+			// Check the functional Verdict that detects select elements with unsorted items to the current state verdict.
+			Verdict unsortedSelectListVerdict = unsortedSelectOptionsVerdict(state);
+			if(unsortedSelectListVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( unsortedSelectListVerdict.info().replace("\n", " ") ))) return unsortedSelectListVerdict;
 
 			// Check the functional Verdict that detects if exists a number with more than X decimals.
 			Verdict decimalsVerdict = numberWithLotOfDecimals(state, 2);
@@ -246,7 +253,7 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 	}
 
 	private Verdict emptySelectItemsVerdict(State state) {
-		Verdict selectElementVerdict = Verdict.OK;
+		Verdict emptySelectListVerdict = Verdict.OK;
 
 		for(Widget w : state) {
 			// For the web select elements with an Id property
@@ -255,16 +262,44 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 				String query = String.format("return document.getElementById('%s').length", elementId);
 				Long selectItemsLength = (Long) WdDriver.executeScript(query);
 				// Verify that contains at least one item element
-				if (selectItemsLength.intValue() == 0) {
-					String verdictMsg = String.format("Empty Select element detected! Role: %s , Path: %s , Desc: %s", 
+				if (selectItemsLength.intValue() <= 1) {
+					String verdictMsg = String.format("Empty or Unique Select element detected! Role: %s , Path: %s , Desc: %s", 
 							w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
 
-					selectElementVerdict = new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+					emptySelectListVerdict = new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
 				}
 			}
 		}
 
-		return selectElementVerdict;
+		return emptySelectListVerdict;
+	}
+
+	private Verdict unsortedSelectOptionsVerdict(State state) {
+		Verdict unsortedSelectElementVerdict = Verdict.OK;
+
+		for(Widget w : state) {
+			// For the web select elements with an Id property
+			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) && !w.get(WdTags.WebId, "").isEmpty()) {
+				String elementId = w.get(WdTags.WebId, "");
+				String query = String.format("return [...document.getElementById('accountId').options].map(o => o.value)", elementId);
+				ArrayList<String> selectOptionsList = (ArrayList<String>) WdDriver.executeScript(query);
+
+				// Now that we have collected all the array list of the option values verify that is sorted 
+				if(!isSorted(selectOptionsList)) {
+
+					String verdictMsg = String.format("Detected a Select web element with unsorted elements! Role: %s , Path: %s , WebId: %s", 
+							w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""));
+
+					return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+				}
+			}
+		}
+
+		return unsortedSelectElementVerdict;
+	}
+
+	private static boolean isSorted(List<String> listOfStrings) {
+		return Comparators.isInOrder(listOfStrings, Comparator.<String> naturalOrder());
 	}
 
 	private Verdict numberWithLotOfDecimals(State state, int maxDecimals) {
