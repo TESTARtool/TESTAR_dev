@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
  * Copyright (c) 2018 Open Universiteit - www.ou.nl
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -44,18 +44,18 @@ import java.io.OutputStream;
 
 /**
  * Provides access to the classic native WinApi Functions.
- */ 
+ */
 public final class Windows{
 
 	private Windows(){}
 
 	/* GDI PixelFormat */
-	public static final long PixelFormatIndexed      = 0x00010000; 
-	public static final long PixelFormatGDI          = 0x00020000; 
-	public static final long PixelFormatAlpha        = 0x00040000; 
-	public static final long PixelFormatPAlpha       = 0x00080000; 
-	public static final long PixelFormatExtended     = 0x00100000; 
-	public static final long PixelFormatCanonical    = 0x00200000; 
+	public static final long PixelFormatIndexed      = 0x00010000;
+	public static final long PixelFormatGDI          = 0x00020000;
+	public static final long PixelFormatAlpha        = 0x00040000;
+	public static final long PixelFormatPAlpha       = 0x00080000;
+	public static final long PixelFormatExtended     = 0x00100000;
+	public static final long PixelFormatCanonical    = 0x00200000;
 
 	public static final long PixelFormatUndefined = 0;
 	public static final long PixelFormatDontCare  = 0;
@@ -63,18 +63,18 @@ public final class Windows{
 	public static final long PixelFormat1bppIndexed    =  (1 | ( 1 << 8) | PixelFormatIndexed | PixelFormatGDI);
 	public static final long PixelFormat4bppIndexed    =  (2 | ( 4 << 8) | PixelFormatIndexed | PixelFormatGDI);
 	public static final long PixelFormat8bppIndexed    =  (3 | ( 8 << 8) | PixelFormatIndexed | PixelFormatGDI);
-	public static final long PixelFormat16bppGrayScale =  (4 | (16 << 8) | PixelFormatExtended); 
-	public static final long PixelFormat16bppRGB555    =  (5 | (16 << 8) | PixelFormatGDI); 
-	public static final long PixelFormat16bppRGB565    =  (6 | (16 << 8) | PixelFormatGDI); 
-	public static final long PixelFormat16bppARGB1555  =  (7 | (16 << 8) | PixelFormatAlpha | PixelFormatGDI); 
-	public static final long PixelFormat24bppRGB       =  (8 | (24 << 8) | PixelFormatGDI); 
-	public static final long PixelFormat32bppRGB       =  (9 | (32 << 8) | PixelFormatGDI); 
-	public static final long PixelFormat32bppARGB      =  (10 | (32 << 8) | PixelFormatAlpha | PixelFormatGDI | PixelFormatCanonical); 
-	public static final long PixelFormat32bppPARGB     =  (11 | (32 << 8) | PixelFormatAlpha | PixelFormatPAlpha | PixelFormatGDI); 
-	public static final long PixelFormat48bppRGB       =  (12 | (48 << 8) | PixelFormatExtended); 
-	public static final long PixelFormat64bppARGB      =  (13 | (64 << 8) | PixelFormatAlpha  | PixelFormatCanonical | PixelFormatExtended); 
-	public static final long PixelFormat64bppPARGB     =  (14 | (64 << 8) | PixelFormatAlpha  | PixelFormatPAlpha | PixelFormatExtended); 
-	public static final long PixelFormatMax            =   15; 
+	public static final long PixelFormat16bppGrayScale =  (4 | (16 << 8) | PixelFormatExtended);
+	public static final long PixelFormat16bppRGB555    =  (5 | (16 << 8) | PixelFormatGDI);
+	public static final long PixelFormat16bppRGB565    =  (6 | (16 << 8) | PixelFormatGDI);
+	public static final long PixelFormat16bppARGB1555  =  (7 | (16 << 8) | PixelFormatAlpha | PixelFormatGDI);
+	public static final long PixelFormat24bppRGB       =  (8 | (24 << 8) | PixelFormatGDI);
+	public static final long PixelFormat32bppRGB       =  (9 | (32 << 8) | PixelFormatGDI);
+	public static final long PixelFormat32bppARGB      =  (10 | (32 << 8) | PixelFormatAlpha | PixelFormatGDI | PixelFormatCanonical);
+	public static final long PixelFormat32bppPARGB     =  (11 | (32 << 8) | PixelFormatAlpha | PixelFormatPAlpha | PixelFormatGDI);
+	public static final long PixelFormat48bppRGB       =  (12 | (48 << 8) | PixelFormatExtended);
+	public static final long PixelFormat64bppARGB      =  (13 | (64 << 8) | PixelFormatAlpha  | PixelFormatCanonical | PixelFormatExtended);
+	public static final long PixelFormat64bppPARGB     =  (14 | (64 << 8) | PixelFormatAlpha  | PixelFormatPAlpha | PixelFormatExtended);
+	public static final long PixelFormatMax            =   15;
 
 
 	/* UIA Orientation types */
@@ -82,14 +82,14 @@ public final class Windows{
 	public static final long OrientationType_Horizontal = 1;
 	public static final long OrientationType_Vertical = 2;
 
-	/* UIA window interaction state */	
+	/* UIA window interaction state */
 	public static final long WindowInteractionState_Running = 0;
 	public static final long WindowInteractionState_Closing = 1;
 	public static final long WindowInteractionState_ReadyForUserInteraction = 2;
 	public static final long WindowInteractionState_BlockedByModalWindow = 3;
 	public static final long WindowInteractionState_NotResponding = 4;
 
-	/* UIA window visual state */	
+	/* UIA window visual state */
 	public static final long WindowVisualState_Normal = 0;
 	public static final long WindowVisualState_Maximized = 1;
 	public static final long WindowVisualState_Minimized = 2;
@@ -100,7 +100,7 @@ public final class Windows{
 	public static final long AutomationElementMode_Full = 1;
 
 
-	/* UIA tree scope */	
+	/* UIA tree scope */
 	public static final long TreeScope_Element = 1;
 	public static final long TreeScope_Children = 2;
 	public static final long TreeScope_Descendants = 4;
@@ -453,7 +453,7 @@ public final class Windows{
 	public static final int LVIR_LABEL = 2;
 	public static final int LVIR_SELECTBOUNDS = 3;
 
-	
+
 	public static final long SC_CLOSE = 0xF060;
 
 
@@ -517,7 +517,7 @@ public final class Windows{
 	public static final int Gdiplus_FontStyleItalic       = 2;
 	public static final int Gdiplus_FontStyleBoldItalic   = 3;
 	public static final int Gdiplus_FontStyleUnderline    = 4;
-	public static final int Gdiplus_FontStyleStrikeout    = 8; 
+	public static final int Gdiplus_FontStyleStrikeout    = 8;
 
 	public static final int Gdiplus_UnitWorld        = 0;
 	public static final int Gdiplus_UnitDisplay      = 1;
@@ -556,11 +556,11 @@ public final class Windows{
 	public static final long READ_CONTROL = 0x00020000L;
 	public static final long SYNCHRONIZE = 0x00100000L;
 	public static final long WRITE_DAC = 0x00040000L;
-	public static final long WRITE_OWNER = 0x00080000L;	
+	public static final long WRITE_OWNER = 0x00080000L;
 	public static final long PROCESS_QUERY_INFORMATION = 0x0400;
 	public static final long PROCESS_VM_READ = 0x0010;
 	public static final long PROCESS_TERMINATE = 0x0001;
-	
+
 	public static final long WAIT_ABANDONED = 0x00000080L;
 	public static final long WAIT_OBJECT_0 = 0x00000000L;
 	public static final long WAIT_TIMEOUT = 0x00000102L;
@@ -618,10 +618,10 @@ public final class Windows{
 	public static native boolean IsIconic(long hWnd);
 	public static native long GetProcessId(long hProcess) throws WinApiException;
 	public static native boolean TextOut(int hdc, int x, int y, String text);
-	public static native boolean InvalidateRect(int hwnd, int x, int y, int width, int height, boolean bErased);	
-	public static native int GetWindowDC(int hwnd);	
-	public static native int SetPixel(int hdc, int x, int y, int color);	
-	public static native int RGBMacro(int red, int green, int blue);	
+	public static native boolean InvalidateRect(int hwnd, int x, int y, int width, int height, boolean bErased);
+	public static native int GetWindowDC(int hwnd);
+	public static native int SetPixel(int hdc, int x, int y, int color);
+	public static native int RGBMacro(int red, int green, int blue);
 	public static native int[] GetClientRect(int hwnd);
 	public static native byte[] loadFile(String name);
 	public static native boolean SetCursorPos(int x, int y);
@@ -637,7 +637,7 @@ public final class Windows{
 	public static native String GetMenuString(int hMenu, int uIDItem, int uFlag);
 	public static native int GetMenuItemCount(int hMenu);
 	public static native int GetSubMenu(int hMenu, int nPos);
-	public static native long GetSystemMenu(long hWnd, boolean bRevert);    
+	public static native long GetSystemMenu(long hWnd, boolean bRevert);
 	public static native long GetMenu(long hWnd);
 	public static native int[] GetMenuBarInfo(int hwnd, int idObject, int idItem);
 	public static native long[] EnumWindows();
@@ -647,7 +647,7 @@ public final class Windows{
 	public static native long[] EnumChildWindows(long hWndParent);
 	public static native boolean IsWindow(long hwnd);
 	public static native boolean IsWindowVisible(long hwnd);
-	public static native String GetClassName(long hwnd);    
+	public static native String GetClassName(long hwnd);
 	public static native int[] GetToolBarItemRect(int hwnd, int index, boolean dropdown);
 	public static native int GetToolBarButtonCount(int hwnd);
 	public static native int[] GetToolButtonInfo(int hwnd, int index);
@@ -662,7 +662,7 @@ public final class Windows{
 	public static native int CreateSolidBrush(int color);
 	public static native int ReleaseDC(int hwnd, int hdc);
 	public static native long SelectObject(long hdc, long hgdiobj);
-	public static native boolean DeleteObject(int hObject);    
+	public static native boolean DeleteObject(int hObject);
 	public static native int GetParent(int hwnd);
 	public static native long GetWindow(long hwnd, long flags);
 	public static native int GetAncestor(int hwnd, int flags);
@@ -674,33 +674,33 @@ public final class Windows{
 	public static native boolean Rectangle(int hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
 	public static native int GetSystemMetrics(int nIndex);
 	public static native long GetNextWindow(long hWnd, long wCmd);
-	public static native long[] CreateProcess(String applicationName, String commandLine, 
-			boolean inheritHandles, long creationFlags, 
-			String[] environment, String currentDir, 
+	public static native long[] CreateProcess(String applicationName, String commandLine,
+			boolean inheritHandles, long creationFlags,
+			String[] environment, String currentDir,
 			String desktop, String title, long[] startupInfo);
 	public static native boolean CloseHandle(long hObject);
 	public static native void ExitProcess(long exitCode);
 	public static native boolean TerminateProcess(long hProcess, long exitCode);
 	public static native boolean SetWindowPos(long hwnd, long hwndInsertAfter, long x, long y, long cx, long cy, long uFlags);
-	public static native long CreateWindowEx(long dwExStyle, String lpClassName, String lpWindowName, long dwStyle, 
-			long x, long y, long nWidth, long nHeight, long hWndParent, long hMenu, 
+	public static native long CreateWindowEx(long dwExStyle, String lpClassName, String lpWindowName, long dwStyle,
+			long x, long y, long nWidth, long nHeight, long hWndParent, long hMenu,
 			long hInstance, long lpParam);
-	public static native void UpdateLayeredWindow(long hwnd, long hdcDst, long pptDstX, long pptDstY, 
+	public static native void UpdateLayeredWindow(long hwnd, long hdcDst, long pptDstX, long pptDstY,
 			long psizeCX, long psizeCY, long hdcSrc, long pptSrcX, long pptSrcY, long crKey, int pblendOp,
-			int pblendFlags, int pblendSCAlpha, int pblendAlphaFormat, long dwFlags);	
+			int pblendFlags, int pblendSCAlpha, int pblendAlphaFormat, long dwFlags);
 	public static native boolean ShowWindow(long hwnd, long nCmdShow);
-	public static native long[] PeekMessage(long hwnd, long wMsgFilterMin, long wMsgFilterMax, long wRemoveMsg);	
+	public static native long[] PeekMessage(long hwnd, long wMsgFilterMin, long wMsgFilterMax, long wRemoveMsg);
 	public static native long[] GetMessage(long hwnd, long wMsgFilterMin, long wMsgFilterMax);
 	public static native boolean TranslateMessage(long[] lpMsg);
 	public static native long DispatchMessage(long[] lpmsg);
-	public static native long GetModuleHandleEx(long dwFlags, String lpModuleName);	
+	public static native long GetModuleHandleEx(long dwFlags, String lpModuleName);
 	public static native long GetCurrentModule();
 	public static native long MonitorFromPoint(long x, long y, long dwFlags);
 	public static long GetPrimaryMonitorHandle(){ return MonitorFromPoint(0, 0, MONITOR_DEFAULTTOPRIMARY); /* because point {0,0} is always on the primary monitor!! */ }
 	public static native long[] GetMonitorInfo(long hMonitor);
 	public static native long GetDC(long hWnd);
 	public static native long CreateCompatibleDC(long hdc);
-	public static native long CreateCompatibleBitmap(long hdc, long nWidth, long nHeight);	
+	public static native long CreateCompatibleBitmap(long hdc, long nWidth, long nHeight);
 	public static native long[] EnumProcesses() throws WinApiException;
 	public static native long[] EnumProcessModules(long hProcess) throws WinApiException;
 	public static native String GetModuleBaseName(long hProcess, long hModule) throws WinApiException;
@@ -716,7 +716,7 @@ public final class Windows{
 	public static native long Gdiplus_Graphics_FillRectangle(long pGraphics, long pBrush, double x, double y, double width, double height) throws GDIException;
 	public static native long Gdiplus_Graphics_DrawEllipse(long pGraphics, long pPen, double x, double y, double width, double height) throws GDIException;
 	public static native long Gdiplus_Graphics_FillEllipse(long pGraphics, long pBrush, double x, double y, double width, double height) throws GDIException;
-	public static native long Gdiplus_Graphics_DrawString(long pGraphics, String text, long pFont, double x, double y, long pBrush) throws GDIException;	
+	public static native long Gdiplus_Graphics_DrawString(long pGraphics, String text, long pFont, double x, double y, long pBrush) throws GDIException;
 
 	public static native void Gdiplus_Graphics_DrawImage(long pGraphics, long pImage, long x, long y) throws GDIException;
 	public static native void Gdiplus_Graphics_DrawImage(long pGraphics, long x, long y, long width, long height, long imgWidth, long imgHeight, long pixelFormat, int[] data) throws GDIException;
@@ -741,7 +741,10 @@ public final class Windows{
 	public static native String	GetProcessNameFromHWND(long hwnd);
 	// end by urueda
 
-	public static native boolean InitializeAccessBridge(); // by ferpasri & urueda
+  // Determines whether the system considers that a specified application is not responding
+  public static native boolean IsHungAppWindow(long hwnd);
+
+  public static native boolean InitializeAccessBridge(); // by ferpasri & urueda
 	// begin by urueda
 	public static native long[]   GetAccessibleContext(long hwnd); // vmid x ac
 	public static native long 	  GetHWNDFromAccessibleContext(long vmid, long ac);
@@ -753,7 +756,7 @@ public final class Windows{
 
 	public static String Gdiplus_Status2String(int statusCode){
 		switch(statusCode){
-		case Gdiplus_Ok:   				          return "Ok"; 
+		case Gdiplus_Ok:   				          return "Ok";
 		case Gdiplus_GenericError:                return "GenericError";
 		case Gdiplus_InvalidParameter:            return "InvalidParameter";
 		case Gdiplus_OutOfMemory:                 return "OutOfMemory";
@@ -827,18 +830,18 @@ public final class Windows{
 	public static native long IApplicationActivationManager_ActivateApplication(long pAppActMngr, String appUserModelId, String arguments, int options) throws UIAException; // by wcoux
 
 
-	/* UIAutomation */	
+	/* UIAutomation */
 	public static native long IUIAutomation_GetRootElement(long pAutomation) throws UIAException;
 	public static native long IUIAutomation_CreateCacheRequest(long pAutomation) throws UIAException;
 	public static native long IUIAutomation_ElementFromPoint(long pAutomation, long x, long y);
 	public static native long IUIAutomation_ElementFromHandle(long pAutomation, long hwnd);
 	public static native long IUIAutomation_ElementFromHandleBuildCache(long pAutomation, long hwnd, long pCacheRequest);
 	public static native long IUIAutomation_CreateTrueCondition(long pAutomation) throws UIAException;
-	public static native long IUIAutomation_CreateAndCondition(long pAutomation, long pCond1, long pCond2) throws UIAException;	
+	public static native long IUIAutomation_CreateAndCondition(long pAutomation, long pCond1, long pCond2) throws UIAException;
 	public static native long IUIAutomation_CreatePropertyCondition(long pAutomation, long propertyId, String value) throws UIAException;
 	public static native long IUIAutomation_CreatePropertyCondition(long pAutomation, long propertyId, boolean value) throws UIAException;
 	public static native long IUIAutomation_CreatePropertyCondition(long pAutomation, long propertyId, int value) throws UIAException;
-	public static native long IUIAutomation_get_ControlViewCondition(long pAutomation) throws UIAException;	
+	public static native long IUIAutomation_get_ControlViewCondition(long pAutomation) throws UIAException;
 	public static native boolean IUIAutomation_CompareElements(long pAutomation, long pEl1, long pEl2) throws UIAException;
 
 
@@ -848,7 +851,7 @@ public final class Windows{
 	public static native void IUIAutomationCacheRequest_put_TreeScope(long pRequest, long treeScope) throws UIAException;
 	public static native void IUIAutomationCacheRequest_put_AutomationElementMode(long pRequest, long mode) throws UIAException;
 
-	public static native String IUIAutomationElement_get_AutomationId(long pElement, boolean fromCache);	
+	public static native String IUIAutomationElement_get_AutomationId(long pElement, boolean fromCache);
 	public static native long[] IUIAutomationElement_GetRuntimeId(long pElement);
 	public static native String IUIAutomationElement_get_AcceleratorKey(long pElement, boolean fromCache);
 	public static native String IUIAutomationElement_get_AccessKey(long pElement, boolean fromCache);
@@ -866,16 +869,16 @@ public final class Windows{
 	public static native long IUIAutomationElement_get_ProcessId(long pElement, boolean fromCache);
 	public static native long IUIAutomationElement_get_NativeWindowHandle(long pElement, boolean fromCache);
 	public static native boolean IUIAutomationElement_get_IsContentElement(long pElement, boolean fromCache);
-	public static native boolean IUIAutomationElement_get_IsControlElement(long pElement, boolean fromCache);	
+	public static native boolean IUIAutomationElement_get_IsControlElement(long pElement, boolean fromCache);
 	public static native boolean IUIAutomationElement_get_IsEnabled(long pElement, boolean fromCache);
 	public static native boolean IUIAutomationElement_get_HasKeyboardFocus(long pElement, boolean fromCache);
 	public static native boolean IUIAutomationElement_get_IsKeyboardFocusable(long pElement, boolean fromCache);
 	public static native boolean IUIAutomationElement_get_IsOffscreen(long pElement, boolean fromCache);
-	public static native long[] IUIAutomationElement_get_BoundingRectangle(long pElement, boolean fromCache);	
+	public static native long[] IUIAutomationElement_get_BoundingRectangle(long pElement, boolean fromCache);
 	public static native long IUIAutomationElement_GetPattern(long pElement, long patternId, boolean fromCache);
-	public static native Object IUIAutomationElement_GetCurrentPropertyValue(long pElement, long propertyId, boolean fromCache); // by urueda	
+	public static native Object IUIAutomationElement_GetCurrentPropertyValue(long pElement, long propertyId, boolean fromCache); // by urueda
 	public static native Object IUIAutomationElement_GetPropertyValueEx(long pElement, long propertyId, boolean ignoreDefaultValue, boolean fromCache);
-	public static native long IUIAutomationElement_GetCachedChildren(long pElement);	
+	public static native long IUIAutomationElement_GetCachedChildren(long pElement);
 	public static native long IUIAutomationElement_FindAll(long pElement, long treeScope, long pCondition) throws UIAException;
 	public static native long IUIAutomationElement_FindAllBuildCache(long pElement, long treeScope, long pCondition, long pCacheRequest) throws UIAException;
 	public static native boolean IUIAutomationWindowPattern_get_CanMaximize(long pElement, boolean fromCache);
@@ -909,7 +912,7 @@ public final class Windows{
 
 			for(int i = 0; i < rid1.length; i++){
 				if(rid1[i] != rid2[i])
-					return false;				
+					return false;
 			}
 			return true;
 		}finally{
@@ -939,7 +942,7 @@ public final class Windows{
 			loadLib(name);
 		}
 	}
-	
+
 	private static void loadLib(String name) throws IOException {
 		InputStream in = Windows.class.getResourceAsStream(name);
 		File fileOut = File.createTempFile("fruit_windows", ".dll");
