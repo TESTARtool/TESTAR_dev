@@ -1,3 +1,2 @@
-include 'core', 'windows', 'testar', 'linux', 'webdriver'
-include 'strategy'
+include 'core', 'windows', 'testar', 'linux', 'webdriver', 'android', 'ios'
 

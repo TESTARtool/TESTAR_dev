@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-
 package org.testar.monkey;
 
 import static org.testar.monkey.alayer.Tags.ActionDelay;
@@ -40,6 +39,7 @@ import static org.testar.monkey.alayer.Tags.OracleVerdict;
 import static org.testar.monkey.alayer.Tags.SystemState;
 
 import java.awt.Desktop;
+import java.awt.GraphicsEnvironment;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -69,6 +69,7 @@ import org.testar.monkey.alayer.actions.ActivateSystem;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.KillProcess;
 import org.testar.monkey.alayer.devices.AWTMouse;
+import org.testar.monkey.alayer.devices.DummyMouse;
 import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.devices.Mouse;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
@@ -88,6 +89,8 @@ import org.testar.serialisation.TestSerialiser;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.openqa.selenium.SessionNotCreatedException;
+import org.testar.monkey.alayer.android.AndroidProtocolUtil;
+import org.testar.monkey.alayer.ios.IOSProtocolUtil;
 
 public class DefaultProtocol extends RuntimeControlsProtocol {
 
@@ -110,7 +113,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	File currentSeq;
 
-	protected Mouse mouse = AWTMouse.build();
+	protected Mouse mouse;
 
 	protected ProcessListener processListener = new ProcessListener();
 	boolean enabledProcessListener = false;
@@ -203,7 +206,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//Associate start settings of the first TESTAR dialog
 		this.settings = settings;
 
-		SUT system = null;
+		// If the environment is not headless, initialize the AWT mouse
+		if (!GraphicsEnvironment.isHeadless()) {
+			mouse = AWTMouse.build();
+		} else {
+			System.out.println("Headless environment! Initializing a DummyMouse device");
+			mouse = DummyMouse.build();
+		}
 
 		//initialize TESTAR with the given settings:
 		logger.trace("TESTAR initializing with the given protocol settings");
@@ -240,9 +249,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			} else if (mode() == Modes.Spy) {
 				new SpyMode().runSpyLoop(this);
 			} else if(mode() == Modes.Record) {
-				new RecordMode().runRecordLoop(this, system);
+				new RecordMode().runRecordLoop(this);
 			} else if (mode() == Modes.Generate) {
-				new GenerateMode().runGenerateOuterLoop(this, system);
+				new GenerateMode().runGenerateOuterLoop(this);
 			}
 
 		}catch(WinApiException we) {
@@ -331,7 +340,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		try {
-			if (!settings.get(ConfigTags.UnattendedTests)) {
+			if (!settings.get(ConfigTags.UnattendedTests) && !GraphicsEnvironment.isHeadless()) {
 				LogSerialiser.log("Registering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
 				java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
 				logger.setLevel(Level.OFF);
@@ -506,29 +515,26 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return currentSeqObject;
 	}
 
-
 	/**
-	 * This method calls the startSystem() if the system is not yet running
+	 * This method calls the startSystem() and starts the LogSerialiser. 
 	 *
 	 * @param system
 	 * @return SUT system
 	 */
-	SUT startSutIfNotRunning(SUT system) {
-		//If system==null, we have started TESTAR from the Generate mode and system has not been started yet (if started in SPY-mode or Record-mode, the system is running already)
-		if (system == null || !system.isRunning()) {
-			system = startSystem();
-			//Reset LogSerialiser
-			LogSerialiser.finish();
-			LogSerialiser.exit();
-			startOfSutDateString = Util.dateString(DATE_FORMAT);
-			LogSerialiser.log(startOfSutDateString + " Starting SUT ...\n", LogSerialiser.LogLevel.Info);
-			LogSerialiser.log("SUT is running!\n", LogSerialiser.LogLevel.Debug);
-			LogSerialiser.log("Building canvas...\n", LogSerialiser.LogLevel.Debug);
+	SUT startSUTandLogger() {
+		// Start the SUT by launching the process or connecting to a running one
+		SUT system = startSystem();
+		// Reset LogSerialiser
+		LogSerialiser.finish();
+		LogSerialiser.exit();
+		startOfSutDateString = Util.dateString(DATE_FORMAT);
+		LogSerialiser.log(startOfSutDateString + " Starting SUT ...\n", LogSerialiser.LogLevel.Info);
+		LogSerialiser.log("SUT is running!\n", LogSerialiser.LogLevel.Debug);
+		LogSerialiser.log("Building canvas...\n", LogSerialiser.LogLevel.Debug);
 
-			//Activate process Listeners if enabled in the test.settings
-			if(enabledProcessListener)
-				processListener.startListeners(system, settings);
-		}
+		// Activate process Listeners if enabled in the test.settings
+		if(enabledProcessListener)
+			processListener.startListeners(system, settings);
 
 		return system;
 	}
@@ -808,10 +814,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		Shape viewPort = state.get(Tags.Shape, null);
 		if(viewPort != null){
 			if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
-				//System.out.println("DEBUG: Using WebDriver specific state shot.");
 				state.set(Tags.ScreenshotPath, WdProtocolUtil.getStateshot(state));
-			}else{
-				//System.out.println("DEBUG: normal state shot");
+			}
+			else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
+				state.set(Tags.ScreenshotPath, AndroidProtocolUtil.getStateshot(state));
+			}
+			else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
+				state.set(Tags.ScreenshotPath, IOSProtocolUtil.getStateshot(state));
+			}
+			else{
 				state.set(Tags.ScreenshotPath, ProtocolUtil.getStateshot(state));
 			}
 		}
@@ -939,6 +950,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			Action foregroundAction = new ActivateSystem();
 			foregroundAction.set(Tags.Desc, "Bring the system to the foreground.");
 			foregroundAction.set(Tags.OriginWidget, state);
+			foregroundAction.set(Tags.Role, Roles.System);
 			return new HashSet<>(Collections.singletonList(foregroundAction));
 		}
 
@@ -1052,16 +1064,24 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	/**
-	 * Returns the next action that will be selected. If unwanted processes need to be killed, the action kills them. If the SUT needs
-	 * to be put in the foreground, then the action is putting it in the foreground. Otherwise the action is selected according to
-	 * action selection mechanism selected.
-	 * @param state
-	 * @param actions
-	 * @return
+	 * Select one of the available actions using the action selection algorithm of your choice. 
+	 * The default select action mechanism tries to use the state model action selector. 
+	 * If the state model is not enabled, it returns a random action. 
+	 *
+	 * @param state the SUT's current state
+	 * @param actions the set of derived actions
+	 * @return  the selected action
 	 */
 	protected Action selectAction(State state, Set<Action> actions){
 		Assert.isTrue(actions != null && !actions.isEmpty());
-		return RandomActionSelector.selectAction(actions);
+
+		//Using the action selector of the state model:
+		Action retAction = stateModelManager.getAbstractActionToExecute(actions);
+		// If state model is not enabled, use random:
+		if (retAction == null) {
+			return RandomActionSelector.selectAction(actions);
+		}
+		return retAction;
 	}
 
 	protected String getRandomText(Widget w){
@@ -1114,7 +1134,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private void closeTestarTestSession(){
 		//cleaning the variables started in initialize()
 		try {
-			if (!settings.get(ConfigTags.UnattendedTests)) {
+			if (!settings.get(ConfigTags.UnattendedTests) && !GraphicsEnvironment.isHeadless()) {
 				if (GlobalScreen.isNativeHookRegistered()) {
 					LogSerialiser.log("Unregistering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
 					GlobalScreen.removeNativeMouseMotionListener(eventHandler);
@@ -1156,6 +1176,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	protected void buildStateActionsIdentifiers(State state, Set<Action> actions) {
 	    CodingManager.buildIDs(state, actions);
+	    for(Action a : actions)
+	    	if(a.get(Tags.AbstractIDCustom, null) == null)
+	    		buildEnvironmentActionIdentifiers(state, a);
 	}
 
 	/**

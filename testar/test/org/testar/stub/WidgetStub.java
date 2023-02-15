@@ -36,6 +36,7 @@ import org.testar.monkey.Drag;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tag;
+import org.testar.monkey.alayer.TaggableBase;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
@@ -50,7 +51,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-public class WidgetStub implements Widget {
+public class WidgetStub extends TaggableBase implements Widget {
 	private static final long serialVersionUID = 1828072828801243863L;
 
 	Map<Tag<?>, Object> tags = Util.newHashMap();
@@ -121,27 +122,6 @@ public class WidgetStub implements Widget {
 	public String toString(Tag<?>... tags){
 		return Util.treeDesc(this, 2, tags);
 	}
-
-	@Override
-	public <T> T get(Tag<T> tag) throws NoSuchTagException {
-		Object returnObject = tags.get(tag);
-		return (T) returnObject;
-	}
-
-	@Override
-	public final <T> T get(Tag<T> tag, T defaultValue) {
-		Object returnObject = tags.get(tag);
-		if(returnObject == null) return defaultValue;
-		return (T) returnObject;
-	}
-
-	@Override
-	public Iterable<Tag<?>> tags() {
-		return tags(this);
-	}
-
-	@Override
-	public final <T> void set(Tag<T> tag, T value) { tags.put(tag, value); }
 
 	@Override
 	public void remove(Tag<?> tag) {
