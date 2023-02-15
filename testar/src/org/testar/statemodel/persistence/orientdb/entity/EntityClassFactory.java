@@ -9,7 +9,12 @@ import java.util.Map;
 public class EntityClassFactory {
 
     public enum EntityClassName {AbstractState, AbstractAction, AbstractStateModel, Widget, ConcreteState, ConcreteAction, isParentOf, isChildOf, isAbstractedBy,
-        BlackHole, UnvisitedAbstractAction, TestSequence, SequenceNode, SequenceStep, Accessed, FirstNode, QLearningModel, QLearningReward}
+        BlackHole, UnvisitedAbstractAction, TestSequence, SequenceNode, SequenceStep, Accessed, FirstNode, QLearningModel,
+
+        QLearningReward,
+
+        ExtendedStateModel
+    }
 
     // a repo for generated classes, so we don't execute the same generation code over and over if not needed
     private static Map<EntityClassName, EntityClass> entityClasses = new HashMap<>();
@@ -39,6 +44,8 @@ public class EntityClassFactory {
         classNameMap.put("FirstNode", EntityClassName.FirstNode);
 
         classNameMap.put("QLearningReward", EntityClassName.QLearningReward);
+
+        classNameMap.put("ExtendedStateModel", EntityClassName.ExtendedStateModel);
     }
 
     /**
@@ -109,8 +116,11 @@ public class EntityClassFactory {
             case FirstNode:
                 return createFirstNodeClass();
 
-          case QLearningReward:
-                return createQLearningRewardClass();
+            case QLearningReward:
+                  return createQLearningRewardClass();
+
+            case ExtendedStateModel:
+              return createExtendedStateModelClass();
 
             default:
                 return null;
@@ -183,7 +193,15 @@ public class EntityClassFactory {
     }
 
     private static EntityClass createAbstractStateModelClass() {
-        EntityClass abstractStateModelClass = new EntityClass("AbstractStateModel", EntityClass.EntityType.Vertex);
+      return createStateModelClass("AbstractStateModel");
+    }
+
+    private static EntityClass createExtendedStateModelClass() {
+      return createStateModelClass("ExtendedStateModel");
+    }
+
+    private static EntityClass createStateModelClass(String modelClassName) {
+        EntityClass abstractStateModelClass = new EntityClass(modelClassName, EntityClass.EntityType.Vertex);
         Property id = new Property("modelIdentifier", OType.STRING);
         id.setMandatory(true);
         id.setNullable(false);

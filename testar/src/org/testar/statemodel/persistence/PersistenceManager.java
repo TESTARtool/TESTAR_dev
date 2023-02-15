@@ -7,7 +7,7 @@ import org.testar.statemodel.sequence.SequenceNode;
 import org.testar.statemodel.sequence.SequenceStep;
 import org.testar.statemodel.*;
 
-public interface PersistenceManager {
+public interface PersistenceManager<M extends AbstractStateModel> {
 
     // the data will be stored instantly as requests reach the  persistence manager
     String DATA_STORE_MODE_INSTANT = "instant";
@@ -58,9 +58,9 @@ public interface PersistenceManager {
 
     /**
      * This method initializes and abstract state model before use in Testar.
-     * @param abstractStateModel
+     * @param stateModel
      */
-    void initAbstractStateModel(AbstractStateModel abstractStateModel);
+    void initAbstractStateModel(M stateModel);
 
     /**
      * This method persists a sequence to the orient data store.
@@ -88,10 +88,10 @@ public interface PersistenceManager {
 
     /**
      * This method returns true if the model is deterministic, meaning no transitions lead to more than one target state.
-     * @param abstractStateModel
+     * @param stateModel
      * @return
      */
-    boolean modelIsDeterministic(AbstractStateModel abstractStateModel);
+    boolean modelIsDeterministic(M stateModel);
 
     /**
      * This method returns the nr of non-deterministic actions in the model, meaning the same actions ends in more
@@ -99,7 +99,7 @@ public interface PersistenceManager {
      * @param abstractStateModel
      * @return
      */
-    public int getNrOfNondeterministicActions(AbstractStateModel abstractStateModel);
+    public int getNrOfNondeterministicActions(M stateModel);
 
     EntityManager getEntityManager();
 

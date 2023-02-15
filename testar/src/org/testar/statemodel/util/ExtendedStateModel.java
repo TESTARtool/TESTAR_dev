@@ -47,7 +47,7 @@ public class ExtendedStateModel extends AbstractStateModel {
    * @param executedAction
    * @throws StateModelException
    */
-  public void addConcreteTransition(ConcreteState sourceState, ConcreteState targetState, ConcreteAction executedAction) throws StateModelException{
+  public void addConcreteTransition(IConcreteState sourceState, IConcreteState targetState, IConcreteAction executedAction) throws StateModelException{
     checkStateId(sourceState.getId());
     checkStateId(targetState.getId());
 
@@ -103,7 +103,7 @@ public class ExtendedStateModel extends AbstractStateModel {
    * @param newState
    * @throws StateModelException
    */
-  public void addConcreteState(ConcreteState newState) throws StateModelException {
+  public void addConcreteState(IConcreteState newState) throws StateModelException {
     checkStateId(newState.getId());
     if (!containsAbstractState(newState.getId())) {
 

@@ -30,7 +30,7 @@ import java.util.*;
 import static java.lang.System.exit;
 
 
-public class OrientDBManager implements PersistenceManager/*, QLearningManager*/, StateModelEventListener {
+public class OrientDBManager<M extends AbstractStateModel> implements PersistenceManager<M>/*, QLearningManager*/, StateModelEventListener {
 
     /**
      * Helper class for dealing with events
@@ -40,7 +40,7 @@ public class OrientDBManager implements PersistenceManager/*, QLearningManager*/
     /**
      * Manager class that will handle the OrientDB specific communications with the database
      */
-    private EntityManager entityManager;
+    protected EntityManager entityManager;
 
     /**
      * Is the manager listening to events?
@@ -463,7 +463,7 @@ public class OrientDBManager implements PersistenceManager/*, QLearningManager*/
     }
 
     @Override
-    public void initAbstractStateModel(AbstractStateModel abstractStateModel) {
+    public void initAbstractStateModel(M abstractStateModel) {
         // there are two options here: either the abstract state model already exists in the database,
         // in which case we load it, or it doesn't exist yet, in which case we save it
         // first, disable the event listener. We do not want to process the events resulting from our object creations
@@ -472,79 +472,84 @@ public class OrientDBManager implements PersistenceManager/*, QLearningManager*/
         EntityClass stateModelClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractStateModel);
         VertexEntity stateModelEntity = new VertexEntity(stateModelClass);
 
-        // hydrate the entity with the abstract state model information
-        try {
-            EntityHydrator stateModelHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_STATE_MODEL);
-            stateModelHydrator.hydrate(stateModelEntity, abstractStateModel);
-        }
-        catch (HydrationException ex) {
-            ex.printStackTrace();
-        }
-
-        // step 1: persist the state model entity to the database. if it already exists, nothing will happen
-        stateModelEntity.enableUpdate(false);
-        try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
-          entityManager.saveEntity(stateModelEntity, db);
-        }
-
-        // step 2: see if there are abstract states present in the data store that are tied to this abstract state model
-        EntityClass abstractStateClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
-        if (abstractStateClass == null) throw new RuntimeException("Error occurred: could not retrieve an abstract state entity class.");
-
-        // in order to retrieve the abstract states, we need to provide the abstract state model identifier to the query
-        Map<String, PropertyValue> entityProperties = new HashMap<>();
         Property stateModelClassIdentifier = stateModelClass.getIdentifier();
         if (stateModelClassIdentifier == null) throw new RuntimeException("Error occurred: abstract state model does not have an id property set.");
-        entityProperties.put("modelIdentifier", stateModelEntity.getPropertyValue(stateModelClassIdentifier.getPropertyName()));
 
-        try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
-//          db.begin();
-          Set<DocumentEntity> retrievedDocuments = entityManager.retrieveAllOfClass(abstractStateClass, entityProperties, db);
-          if (retrievedDocuments.isEmpty()) {
-              System.out.println("Could not find abstract states in the model");
-          }
-          else {
-              // we need to create the abstract states from the returned document entities
-              try {
-                  EntityExtractor<AbstractState, AbstractStateModel> abstractStateExtractor = ExtractorFactory.getExtractor(ExtractorFactory.EXTRACTOR_ABSTRACT_STATE);
-                  for (DocumentEntity documentEntity : retrievedDocuments) {
-                      AbstractState abstractState = abstractStateExtractor.extract(documentEntity, abstractStateModel);
-                      abstractStateModel.addAbstractState(abstractState);
-                  }
-              } catch (ExtractionException | StateModelException e) {
-                  e.printStackTrace();
-              }
-          }
-
-          // step 3: fetch the transitions from the database
-          EntityClass abstractActionClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractAction);
-          if (abstractActionClass == null) throw new RuntimeException("Error occurred: could not retrieve an abstract action entity class");
-
-            retrievedDocuments = entityManager.retrieveAllOfClass(abstractActionClass, entityProperties, db);
-          if (retrievedDocuments.isEmpty()) {
-              System.out.println("Could not find abstract actions in the model");
-          }
-          else {
-              System.out.println(retrievedDocuments.size() + " number of abstract actions were returned");
-              // we need to create the transitions from the returned document entities
-              try {
-                  EntityExtractor<AbstractStateTransition, AbstractStateModel> abstractStateTransitionEntityExtractor = ExtractorFactory.getExtractor(ExtractorFactory.EXTRACTOR_ABSTRACT_STATE_TRANSITION);
-                  for (DocumentEntity documentEntity : retrievedDocuments) {
-                      AbstractStateTransition abstractStateTransition = abstractStateTransitionEntityExtractor.extract(documentEntity, abstractStateModel);
-                      abstractStateModel.addAbstractTransition( abstractStateTransition.getSourceState(), abstractStateTransition.getTargetState(), abstractStateTransition.getAction());
-                  }
-              } catch (ExtractionException | StateModelException e) {
-                  e.printStackTrace();
-              }
-          }
-//          db.commit();
-        }
+        populateStateModel(abstractStateModel, stateModelClassIdentifier.getPropertyName(), stateModelEntity);
 
         abstractStateModel.onReady();
 
         // enable the event listener again
 
         setListening(true);
+    }
+
+    protected void populateStateModel(M stateModel, String stateModelClassName, VertexEntity stateModelEntity) {
+      // in order to retrieve the abstract states, we need to provide the abstract state model identifier to the query
+      Map<String, PropertyValue> entityProperties = new HashMap<>();
+      entityProperties.put("modelIdentifier", stateModelEntity.getPropertyValue(stateModelClassName));
+
+      // hydrate the entity with the abstract state model information
+      try {
+        EntityHydrator stateModelHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_STATE_MODEL);
+        stateModelHydrator.hydrate(stateModelEntity, stateModel);
+      }
+      catch (HydrationException ex) {
+        ex.printStackTrace();
+      }
+
+      // step 1: persist the state model entity to the database. if it already exists, nothing will happen
+      stateModelEntity.enableUpdate(false);
+      try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
+        entityManager.saveEntity(stateModelEntity, db);
+      }
+
+      // step 2: see if there are abstract states present in the data store that are tied to this abstract state model
+      EntityClass abstractStateClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
+      if (abstractStateClass == null) throw new RuntimeException("Error occurred: could not retrieve an abstract state entity class.");
+
+      try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
+//          db.begin();
+        Set<DocumentEntity> retrievedDocuments = entityManager.retrieveAllOfClass(abstractStateClass, entityProperties, db);
+        if (retrievedDocuments.isEmpty()) {
+          System.out.println("Could not find abstract states in the model");
+        }
+        else {
+          // we need to create the abstract states from the returned document entities
+          try {
+            EntityExtractor<AbstractState, AbstractStateModel> abstractStateExtractor = ExtractorFactory.getExtractor(ExtractorFactory.EXTRACTOR_ABSTRACT_STATE);
+            for (DocumentEntity documentEntity : retrievedDocuments) {
+              AbstractState abstractState = abstractStateExtractor.extract(documentEntity, stateModel);
+              stateModel.addAbstractState(abstractState);
+            }
+          } catch (ExtractionException | StateModelException e) {
+            e.printStackTrace();
+          }
+        }
+
+        // step 3: fetch the transitions from the database
+        EntityClass abstractActionClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractAction);
+        if (abstractActionClass == null) throw new RuntimeException("Error occurred: could not retrieve an abstract action entity class");
+
+        retrievedDocuments = entityManager.retrieveAllOfClass(abstractActionClass, entityProperties, db);
+        if (retrievedDocuments.isEmpty()) {
+          System.out.println("Could not find abstract actions in the model");
+        }
+        else {
+          System.out.println(retrievedDocuments.size() + " number of abstract actions were returned");
+          // we need to create the transitions from the returned document entities
+          try {
+            EntityExtractor<AbstractStateTransition, AbstractStateModel> abstractStateTransitionEntityExtractor = ExtractorFactory.getExtractor(ExtractorFactory.EXTRACTOR_ABSTRACT_STATE_TRANSITION);
+            for (DocumentEntity documentEntity : retrievedDocuments) {
+              AbstractStateTransition abstractStateTransition = abstractStateTransitionEntityExtractor.extract(documentEntity, stateModel);
+              stateModel.addAbstractTransition( abstractStateTransition.getSourceState(), abstractStateTransition.getTargetState(), abstractStateTransition.getAction());
+            }
+          } catch (ExtractionException | StateModelException e) {
+            e.printStackTrace();
+          }
+        }
+//          db.commit();
+      }
     }
 
     public void persistSequence(Sequence sequence) {
@@ -705,7 +710,7 @@ public class OrientDBManager implements PersistenceManager/*, QLearningManager*/
                 break;
 
             case ABSTRACT_STATE_MODEL_INITIALIZED:
-                initAbstractStateModel((AbstractStateModel) (event.getPayload()));
+                initAbstractStateModel((M) (event.getPayload()));
                 break;
 
             case SEQUENCE_STARTED:
