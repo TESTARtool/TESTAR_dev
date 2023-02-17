@@ -28,17 +28,16 @@
  *
  */
 
-package org.fruit.alayer.actions;
+package org.testar.monkey.alayer.actions;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.fruit.Assert;
-import org.fruit.alayer.*;
-import org.fruit.alayer.exceptions.ActionFailedException;
-import org.fruit.alayer.exceptions.PositionException;
-import org.fruit.alayer.webdriver.WdWidget;
-import org.fruit.alayer.webdriver.enums.WdRoles;
-import org.openqa.selenium.remote.RemoteWebDriver;
+import org.testar.monkey.Assert;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.exceptions.ActionFailedException;
+import org.testar.monkey.alayer.exceptions.PositionException;
+import org.testar.monkey.alayer.webdriver.WdWidget;
+import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.openqa.selenium.remote.RemoteWebElement;
 
 public class WdRemoteClickAction extends TaggableBase implements Action {

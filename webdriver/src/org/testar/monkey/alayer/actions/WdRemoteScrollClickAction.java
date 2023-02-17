@@ -28,13 +28,13 @@
  *
  */
 
-package org.fruit.alayer.actions;
+package org.testar.monkey.alayer.actions;
 
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.exceptions.ActionFailedException;
-import org.fruit.alayer.webdriver.WdWidget;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.exceptions.ActionFailedException;
+import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 
@@ -53,7 +53,7 @@ public class WdRemoteScrollClickAction extends WdRemoteClickAction {
             RemoteWebElement remoteElement = widget.element.remoteWebElement;
             RemoteWebDriver d = (RemoteWebDriver)remoteElement.getWrappedDriver();
             d.executeScript("arguments[0].scrollIntoView(true)", remoteElement);
-            org.fruit.Util.pause(0.1);
+            org.testar.monkey.Util.pause(0.1);
             remoteElement.click();
         }
         catch (Exception e) {

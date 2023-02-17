@@ -28,17 +28,17 @@
  *
  */
 
-package org.fruit.alayer.actions;
+package org.testar.monkey.alayer.actions;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.fruit.Assert;
-import org.fruit.Pair;
-import org.fruit.alayer.*;
-import org.fruit.alayer.exceptions.ActionFailedException;
-import org.fruit.alayer.exceptions.PositionException;
-import org.fruit.alayer.webdriver.WdWidget;
-import org.fruit.alayer.webdriver.enums.WdTags;
+import org.testar.monkey.Assert;
+import org.testar.monkey.Pair;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.exceptions.ActionFailedException;
+import org.testar.monkey.alayer.exceptions.PositionException;
+import org.testar.monkey.alayer.webdriver.WdWidget;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 
@@ -96,7 +96,7 @@ public class WdRemoteTypeAction extends TaggableBase implements Action {
             RemoteWebDriver d = (RemoteWebDriver)remoteElement.getWrappedDriver();
             d.executeScript("arguments[0].scrollIntoView(true)", remoteElement);
             remoteElement.clear();
-            org.fruit.Util.pause(0.05);
+            org.testar.monkey.Util.pause(0.05);
             remoteElement.sendKeys(keys);
         }
         catch (Exception e) {
