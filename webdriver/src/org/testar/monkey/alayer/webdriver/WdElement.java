@@ -122,7 +122,7 @@ public class WdElement extends TaggableBase implements Serializable {
     textContent = ((String) packedElement.get("textContent")).replaceAll("\\s+", " ").trim();
     title = attributeMap.getOrDefault("title","");
     href = attributeMap.getOrDefault("href", "");
-    value = packedElement.get("value");
+    value = attributeMap.getOrDefault("value", "");
     style = attributeMap.getOrDefault("style", "");
     target = attributeMap.getOrDefault("target", "");
     alt = attributeMap.getOrDefault("alt", "");
