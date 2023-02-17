@@ -77,7 +77,7 @@ public class WdRemoteClickAction extends TaggableBase implements Action {
     public WdRemoteClickAction(WdWidget widget) {
         this.widget = widget;
         this.set(Tags.OriginWidget, widget);
-        this.set(Tags.Desc, "Remote click " + widget.element.remoteWebElement.getId());
+        this.set(Tags.Desc, "Remote click " + widget.element.getElementDescription());
         this.set(Tags.Role, WdActionRoles.RemoteClick);
         Role role = widget.get(Tags.Role, Roles.Widget);
         if (!role.equals(WdRoles.WdOPTION)) {

@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://www.ou.nl"
+SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://www.jotform.com/build/230473756350355"
 
 #################################################################
 # Sequences
@@ -44,7 +44,7 @@ SequenceLength = 100
 # Regular expression
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+SuspiciousTitles =
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -113,9 +113,9 @@ AbstractStateAttributes = WebWidgetId
 ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
 DeniedExtensions = pdf;jpg;png
 DomainsAllowed = www.ou.nl;mijn.awo.ou.nl;login.awo.ou.nl
-FollowLinks = true
+FollowLinks = false
 BrowserFullScreen = true
-SwitchNewTabs = true
+SwitchNewTabs = false
 
 #################################################################
 # Override display scale

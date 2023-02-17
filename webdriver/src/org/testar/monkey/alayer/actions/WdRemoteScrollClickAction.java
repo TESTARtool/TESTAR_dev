@@ -43,7 +43,7 @@ public class WdRemoteScrollClickAction extends WdRemoteClickAction {
 
     public WdRemoteScrollClickAction(WdWidget widget) {
         super(widget);
-        this.set(Tags.Desc, "Remote scroll and click " + widget.element.remoteWebElement.getId());
+        this.set(Tags.Desc, "Remote scroll and click " + widget.element.getElementDescription());
         this.set(Tags.Role, WdActionRoles.RemoteScrollClick);
     }
 
