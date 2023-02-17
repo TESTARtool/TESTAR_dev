@@ -31,7 +31,9 @@
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
+import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.WdElement;
 import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
@@ -39,6 +41,7 @@ import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.plugin.NativeLinker;
 import org.testar.protocols.WebdriverProtocol;
 
+import java.awt.Rectangle;
 import java.util.*;
 
 import static org.testar.monkey.alayer.Tags.Blocked;
@@ -90,11 +93,17 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 		// iterate through all widgets
 		for (Widget widget : state) {
 
-			// If the web state contains a form, start a new mode that only focuses on deriving form filling actions
-			if(isAtBrowserCanvas(widget) && widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdFORM)) {
+			// If the web state contains a form, start a new mode that only focuses on deriving form filling actions.
+			// We need to ignore activity URL because contains a persistent form that does not disappear. 
+			//
+			// Next isAtBrowserCanvas condition need to be improved, 
+			// we probably want to check if the form is partially visible in the state.
+			//if(isAtBrowserCanvas(widget)) {
+			if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdFORM) && !WdDriver.getCurrentUrl().contains("activity.htm")) {
 				Set<Action> formFillingActions = formFillingModeDeriveActions(widget, ac);
 				if(!formFillingActions.isEmpty()) { return formFillingActions; }
 			}
+			//}
 
 			// only consider enabled and non-tabu widgets
 			if (!widget.get(Enabled, true)) { continue; }
@@ -126,25 +135,83 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 		return actions;
 	}
 
-	private Set<Action> formFillingModeDeriveActions(Widget widget, StdActionCompiler ac){
+	private Set<Action> formFillingModeDeriveActions(Widget formWidget, StdActionCompiler ac){
 		Set<Action> formFillingActions = new HashSet<>();
 
-		deriveFormFilling(formFillingActions, widget, ac);
+		// Click and type form elements
+		deriveFormFilling(formFillingActions, formWidget, ac);
+
+		// Add the possibility to page down (scroll down) if a widget of the form is not visible below
+		if(formContainsNonVisibleWidgetsBelow(formWidget)) {
+			Action pageDown = ac.hitKey(KBKeys.VK_PAGE_DOWN);
+			pageDown.set(Tags.OriginWidget, formWidget);
+			formFillingActions.add(pageDown);
+		}
 
 		return formFillingActions;
 	}
 
 	private void deriveFormFilling(Set<Action> formFillingActions, Widget widget, StdActionCompiler ac){
-		if(widget.get(Enabled, false) && !widget.get(Blocked, true) && isTypeable(widget)) {
+		if(widget.get(Enabled, false) && !widget.get(Blocked, true) && isTypeable(widget) && isAtBrowserCanvas(widget)) {
 			formFillingActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
 		}
-		if(widget.get(Enabled, false) && !widget.get(Blocked, true) && isClickable(widget)) {
+		if(widget.get(Enabled, false) && !widget.get(Blocked, true) && isClickable(widget) && isAtBrowserCanvas(widget)) {
 			formFillingActions.add(ac.leftClickAt(widget));
 		}
 
 		// Iterate through the form element widgets
 		for(int i = 0; i < widget.childCount(); i++) {
 			deriveFormFilling(formFillingActions, widget.child(i), ac);
+		}
+	}
+
+	private boolean formContainsNonVisibleWidgetsBelow(Widget formWidget) {
+		boolean areaBelow = false;
+
+		// If the widget is not at browser canvas
+		if(!isAtBrowserCanvas(formWidget)) {
+			Shape widgetShape = formWidget.get(Tags.Shape, null);
+			Shape stateShape = formWidget.root().get(Tags.Shape, null);
+			if (widgetShape != null && stateShape != null) {
+				Rectangle stateRect = new java.awt.Rectangle((int)stateShape.x(), (int)stateShape.y(), (int)stateShape.width(), (int)stateShape.height());
+				Rectangle widgetRect = new java.awt.Rectangle((int)widgetShape.x(), (int)widgetShape.y(), (int)widgetShape.width(), (int)widgetShape.height());
+				// Check if is contains area below the form
+				areaBelow = isAreaBelow(widgetRect, stateRect);
+			}
+		}
+
+		if(formWidget.childCount() > 0) {
+			// Iterate through the form element widgets
+			for(int i = 0; i < formWidget.childCount(); i++) {
+				areaBelow = areaBelow || formContainsNonVisibleWidgetsBelow(formWidget.child(i));
+			}
+		}
+
+		return areaBelow;
+	}
+
+	/**
+	 * Hi, can you generate me a java method that compares two rectangles (R1 and R2) 
+	 * and returns a boolean that indicates if R2 contains an area below R1?
+	 * 
+	 * ChatGPT:
+	 * Sure, here is an example Java method that takes two Rectangle objects (r1 and r2) 
+	 * and returns true if r2 contains an area below r1, and false otherwise:
+	 * 
+	 * @param r1
+	 * @param r2
+	 * @return
+	 */
+	private boolean isAreaBelow(Rectangle r1, Rectangle r2) {
+		if (r1.getMaxY() < r2.getMaxY()) {
+			// r1 is completely above r2
+			return false;
+		} else if (r1.getMinY() >= r2.getMaxY()) {
+			// r1 is completely below r2
+			return true;
+		} else {
+			// r1 intersects r2
+			return r1.getMinY() < r2.getMaxY();
 		}
 	}
 
