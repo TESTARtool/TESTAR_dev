@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,14 +30,20 @@
 
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
-import org.fruit.alayer.*;
-import org.fruit.alayer.exceptions.*;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Main;
+import org.testar.monkey.Assert;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Main;
 import org.testar.OutputStructure;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.protocols.DesktopProtocol;
 
 /**
@@ -48,7 +54,7 @@ import org.testar.protocols.DesktopProtocol;
 public class Protocol_test_gradle_workflow_desktop_generic extends DesktopProtocol {
 
 	@Override
-	protected State getState(SUT system) throws StateBuildException{
+	protected State getState(SUT system) throws StateBuildException {
 		State state = super.getState(system);
 
 		// DEBUG: That widgets have screen bounds in the GUI of the remote server
@@ -64,7 +70,7 @@ public class Protocol_test_gradle_workflow_desktop_generic extends DesktopProtoc
 	}
 
 	@Override
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.
@@ -85,6 +91,44 @@ public class Protocol_test_gradle_workflow_desktop_generic extends DesktopProtoc
 
 		//return the set of derived actions
 		return actions;
+	}
+
+	/**
+	 * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
+	 *
+	 * super.postSequenceProcessing() is adding test verdict into the HTML sequence report
+	 */
+	@Override
+	protected void postSequenceProcessing() {
+		// Verify that OnlySaveFaultySequences works correctly with OK and failure sequences
+		File outputSequencesFolder = null;
+		try {
+			outputSequencesFolder = new File(OutputStructure.sequencesOutputDir).getCanonicalFile();
+		} catch(IOException e) { e.printStackTrace(); }
+
+		// If OnlySaveFaultySequences enabled and sequence verdict is OK, sequence folder must be empty
+		if(settings().get(ConfigTags.OnlySaveFaultySequences) && (getVerdict(latestState).join(processVerdict)).severity() == Verdict.OK.severity()) {
+			Assert.isTrue(folderIsEmpty(outputSequencesFolder.toPath()), "TESTAR output sequences is empty because verdict is OK and OnlySaveFaultySequences is enabled");
+		}
+		// Else, if OnlySaveFaultySequences enabled and sequence verdict is a failure,
+		// Or if OnlySaveFaultySequences disabled,
+		// sequence folder must contains a .testar file
+		else {
+			Assert.isTrue(!folderIsEmpty(outputSequencesFolder.toPath()), "TESTAR output sequences is not empty");
+		}
+
+		super.postSequenceProcessing();
+	}
+
+	private boolean folderIsEmpty(Path path) {
+		if (Files.isDirectory(path)) {
+			try (DirectoryStream<Path> directory = Files.newDirectoryStream(path)) {
+				return !directory.iterator().hasNext();
+			} catch (IOException e) {
+				return false;
+			}
+		}
+		return false;
 	}
 
 	@Override

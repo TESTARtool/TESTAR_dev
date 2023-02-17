@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2021 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -33,10 +33,10 @@ package org.testar;
 
 import java.io.File;
 
-import org.fruit.Util;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Main;
-import org.fruit.monkey.Settings;
+import org.testar.monkey.Util;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Main;
+import org.testar.monkey.Settings;
 
 public class OutputStructure {
 
@@ -59,11 +59,17 @@ public class OutputStructure {
 	public static String processListenerDir;
 
 	public static void calculateOuterLoopDateString() {
+		startOuterLoopDateString = "";
 		String date = Util.dateString(OutputStructure.DATE_FORMAT);
 		date = date + "s";
 		date = date.substring(0, 16) + "m" + date.substring(17);
 		date = date.substring(0, 13) + "h" + date.substring(14);
-		startOuterLoopDateString = date;
+		if (System.getenv("HOSTNAME") != null)
+		{
+			startOuterLoopDateString = System.getenv("HOSTNAME")+"_";
+
+		}
+		startOuterLoopDateString +=  date;
 	}
 
 	public static void calculateInnerLoopDateString() {
@@ -102,10 +108,11 @@ public class OutputStructure {
 					String sutName = sutConnectorValue.substring(startSUT, endSUT);
 					executedSUTname = sutName;
 				}
-			}catch(Exception e) {
-				System.out.println("Error: This run generation will be stored with empty name");
+			} catch (Exception e) {
+				// e.printStackTrace();
+				System.out.println("Warning: This run generation will be stored with empty name");
 			}
-			
+
 		}else {
 			executedSUTname = settings.get(ConfigTags.ApplicationName,"");
 		}

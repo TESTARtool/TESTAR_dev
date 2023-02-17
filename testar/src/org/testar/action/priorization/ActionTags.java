@@ -33,8 +33,8 @@ package org.testar.action.priorization;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.fruit.alayer.Tag;
-import org.fruit.alayer.TagsBase;
+import org.testar.monkey.alayer.Tag;
+import org.testar.monkey.alayer.TagsBase;
 
 public class ActionTags extends TagsBase  {
 

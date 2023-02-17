@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "chromedriver.exe" "1920x900+0+0" "https://parabank.parasoft.com/"
+SUTConnectorValue = "C:\\SeleniumWebDrivers\\ChromeDriver\\chromedriver.exe" "1920x900+0+0" "https://para.testar.org/"
 
 #################################################################
 # Sequences
@@ -112,10 +112,18 @@ AbstractStateAttributes = WebWidgetId
 #################################################################
 ClickableClasses = 
 DeniedExtensions = pdf;jpg;png;pfx;xml
-DomainsAllowed = parabank.parasoft.com
+DomainsAllowed = para.testar.org
 FollowLinks = true
 BrowserFullScreen = true
 SwitchNewTabs = true
+
+#################################################################
+# WebDriver Browser Console Oracles
+#################################################################
+WebConsoleErrorOracle = false
+WebConsoleErrorPattern = .*.*
+WebConsoleWarningOracle = false
+WebConsoleWarningPattern = .*.*
 
 #################################################################
 # Override display scale

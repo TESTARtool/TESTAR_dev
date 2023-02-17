@@ -13,3 +13,11 @@ build.bat
 *.sse
 *.class
 *.log
+/logs
+/testar/settings
+/testar/output
+/testar/suts
+/testar/testar
+/testar/testar.bat
+/testar/windows.dll
+/testar/index.log

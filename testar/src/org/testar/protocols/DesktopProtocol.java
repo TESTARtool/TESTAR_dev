@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019, 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2021 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,29 +31,29 @@
 
 package org.testar.protocols;
 
-import nl.ou.testar.DerivedActions;
-import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
-import nl.ou.testar.RandomActionSelector;
-import org.fruit.Drag;
-import org.fruit.Environment;
-import org.fruit.alayer.*;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.monkey.ConfigTags;
+import org.testar.DerivedActions;
+import org.testar.reporting.Reporting;
+import org.testar.monkey.Drag;
+import org.testar.monkey.Environment;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.StdActionCompiler;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.exceptions.StateBuildException;
+import org.testar.monkey.ConfigTags;
 import org.testar.OutputStructure;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
+import static org.testar.monkey.alayer.Tags.Blocked;
+import static org.testar.monkey.alayer.Tags.Enabled;
 
 public class DesktopProtocol extends GenericUtilsProtocol {
     //Attributes for adding slide actions
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
-    protected HtmlSequenceReport htmlReport;
+    protected Reporting htmlReport;
     protected State latestState;
 
     /**
@@ -62,7 +62,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     @Override
     protected void preSequencePreparations() {
         //initializing the HTML sequence report:
-        htmlReport = new HtmlSequenceReport();
+        htmlReport = getReporter();
     }
     
     /**
@@ -127,28 +127,11 @@ public class DesktopProtocol extends GenericUtilsProtocol {
      * @return
      */
     @Override
-    protected Action preSelectAction(State state, Set<Action> actions){
-        // adding available actions into the HTML report:
-        htmlReport.addActions(actions);
-        return(super.preSelectAction(state, actions));
-    }
-
-    /**
-     * Select one of the available actions (e.g. at random)
-     * @param state the SUT's current state
-     * @param actions the set of derived actions
-     * @return  the selected action (non-null!)
-     */
-    @Override
-    protected Action selectAction(State state, Set<Action> actions){
-        //Call the preSelectAction method from the DefaultProtocol so that, if necessary,
-        //unwanted processes are killed and SUT is put into foreground.
-        Action retAction = preSelectAction(state, actions);
-        if (retAction == null) {
-            //if no preSelected actions are needed, then implement your own strategy
-            retAction = RandomActionSelector.selectAction(actions);
-        }
-        return retAction;
+    protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions){
+    	actions = super.preSelectAction(system, state, actions);
+    	// adding available actions into the HTML report:
+    	htmlReport.addActions(actions);
+    	return actions;
     }
 
     /**
@@ -164,31 +147,51 @@ public class DesktopProtocol extends GenericUtilsProtocol {
         htmlReport.addSelectedAction(state, action);
         return super.executeAction(system, state, action);
     }
+    
+    /**
+     * Replay the saved action
+     */
+    @Override
+    protected boolean replayAction(SUT system, State state, Action action, double actionWaitTime, double actionDuration){
+        // adding the action that is going to be executed into HTML report:
+        htmlReport.addSelectedAction(state, action);
+        return super.replayAction(system, state, action, actionWaitTime, actionDuration);
+    }
 
     /**
      * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
      */
     @Override
     protected void postSequenceProcessing() {
-        htmlReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
-        
+        String status = "";
+        String statusInfo = "";
+
+        if(mode() == Modes.Replay) {
+            htmlReport.addTestVerdict(getReplayVerdict().join(processVerdict));
+            status = (getReplayVerdict().join(processVerdict)).verdictSeverityTitle();
+            statusInfo = (getReplayVerdict().join(processVerdict)).info();
+        }
+        else {
+            htmlReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
+            status = (getVerdict(latestState).join(processVerdict)).verdictSeverityTitle();
+            statusInfo = (getVerdict(latestState).join(processVerdict)).info();
+        }
+
         String sequencesPath = getGeneratedSequenceName();
         try {
-        	sequencesPath = new File(getGeneratedSequenceName()).getCanonicalPath();
-        }catch (Exception e) {}
-        		
-        String status = (getVerdict(latestState).join(processVerdict)).verdictSeverityTitle();
-		String statusInfo = (getVerdict(latestState).join(processVerdict)).info();
-		
-		statusInfo = statusInfo.replace("\n"+Verdict.OK.info(), "");
-		
-		//Timestamp(generated by logger) SUTname Mode SequenceFileObject Status "StatusInfo"
-		INDEXLOG.info(OutputStructure.executedSUTname
-				+ " " + settings.get(ConfigTags.Mode, mode())
-				+ " " + sequencesPath
-				+ " " + status + " \"" + statusInfo + "\"" );
-		
-		htmlReport.close();
+            sequencesPath = new File(getGeneratedSequenceName()).getCanonicalPath();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        statusInfo = statusInfo.replace("\n"+ Verdict.OK.info(), "");
+
+        //Timestamp(generated by logger) SUTname Mode SequenceFileObject Status "StatusInfo"
+        INDEXLOG.info(OutputStructure.executedSUTname
+                + " " + settings.get(ConfigTags.Mode, mode())
+                + " " + sequencesPath
+                + " " + status + " \"" + statusInfo + "\"" );
+
+        htmlReport.close();
     }
 
     /**
