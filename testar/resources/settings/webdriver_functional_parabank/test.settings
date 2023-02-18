@@ -44,7 +44,7 @@ SequenceLength = 20
 # Regular expression and Tags to apply them
 #################################################################
 
-SuspiciousTitles = 
+SuspiciousTitles = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
 TagsForSuspiciousOracle = Title;WebName;WebTagName
 
 #################################################################
@@ -140,7 +140,7 @@ SwitchNewTabs = true
 #################################################################
 # WebDriver Browser Console Oracles
 #################################################################
-WebConsoleErrorOracle = false
+WebConsoleErrorOracle = true
 WebConsoleErrorPattern = .*.*
 WebConsoleWarningOracle = false
 WebConsoleWarningPattern = .*.*

@@ -49,9 +49,20 @@ public final class Verdict implements Serializable {
 	// Verdict severities
 	// PASS
 	public static final double SEVERITY_MIN = 0.0;
-	public static final double SEVERITY_WARNING = 		   0.00000001; // must be less than FAULT THRESHOLD @test.settings
-	public static final double SEVERITY_SUSPICIOUS_TITLE = 0.00000009; // suspicious title
-	// FAIL
+
+	// WARNING
+	public static final double SEVERITY_WARNING =              0.00000001; // must be less than FAULT THRESHOLD @test.settings
+	public static final double SEVERITY_WARNING_DECIMALS =     0.00000002;
+	public static final double SEVERITY_WARNING_TABLE_ROWS =   0.00000003;
+	public static final double SEVERITY_WARNING_ORPHAN_ITEM =  0.00000004;
+	public static final double SEVERITY_WARNING_UNSORTED =     0.00000005;
+	public static final double SEVERITY_WARNING_NON_WRITABLE = 0.00000006;
+
+	// SUSPICIOUS_TITLE
+	public static final double SEVERITY_SUSPICIOUS_ALERT = 0.19999998; // suspicious alert
+	public static final double SEVERITY_SUSPICIOUS_TITLE = 0.19999999; // suspicious title
+
+	// CRASH
 	public static final double SEVERITY_NOT_RESPONDING =   0.99999990; // unresponsive
 	public static final double SEVERITY_NOT_RUNNING =	   0.99999999; // crash? unexpected close?
 	public static final double SEVERITY_MAX = 1.0;
@@ -109,18 +120,22 @@ public final class Verdict implements Serializable {
 	public String info(){ return info; }
 
 	public String verdictSeverityTitle() {
-		if(severity == Verdict.SEVERITY_MIN)
-			return "OK";
-		if(severity == Verdict.SEVERITY_WARNING)
-			return "WARNING";
-		if(severity == Verdict.SEVERITY_SUSPICIOUS_TITLE)
-			return "SUSPICIOUS_TITLE";
-		if(severity == Verdict.SEVERITY_NOT_RESPONDING)
-			return "NOT_RESPONDING";
-		if(severity == Verdict.SEVERITY_NOT_RUNNING)
-			return "NOT_RUNNING";
-		if(severity == Verdict.SEVERITY_UNREPLAYABLE)
-			return "NOT_REPLAYABLE";
+		if(severity == Verdict.SEVERITY_MIN) return "OK";
+
+		if(severity == Verdict.SEVERITY_WARNING) return "WARNING";
+		if(severity == Verdict.SEVERITY_WARNING_DECIMALS) return "SEVERITY_WARNING_DECIMALS";
+		if(severity == Verdict.SEVERITY_WARNING_TABLE_ROWS) return "SEVERITY_WARNING_TABLE_ROWS";
+		if(severity == Verdict.SEVERITY_WARNING_ORPHAN_ITEM) return "SEVERITY_WARNING_ORPHAN_ITEM";
+		if(severity == Verdict.SEVERITY_WARNING_UNSORTED) return "SEVERITY_WARNING_UNSORTED";
+		if(severity == Verdict.SEVERITY_WARNING_NON_WRITABLE) return "SEVERITY_WARNING_NON_WRITABLE";
+
+		if(severity == Verdict.SEVERITY_SUSPICIOUS_ALERT) return "SUSPICIOUS_ALERT";
+		if(severity == Verdict.SEVERITY_SUSPICIOUS_TITLE) return "SUSPICIOUS_TITLE";
+
+		if(severity == Verdict.SEVERITY_NOT_RESPONDING) return "NOT_RESPONDING";
+		if(severity == Verdict.SEVERITY_NOT_RUNNING) return "NOT_RUNNING";
+
+		if(severity == Verdict.SEVERITY_UNREPLAYABLE) return "NOT_REPLAYABLE";
 
 		return "ERROR";
 	}

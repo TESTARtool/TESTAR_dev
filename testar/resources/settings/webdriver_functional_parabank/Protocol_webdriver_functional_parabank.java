@@ -206,74 +206,93 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 	 */
 	@Override
 	protected Verdict getVerdict(State state) {
+		// Obtain suspicious title verdicts
 		Verdict verdict = super.getVerdict(state);
+
+		// If the suspicious title Verdict is not OK but was already detected in a previous sequence
+		// Consider as OK and continue the checking functional Verdicts
+		// Else return the suspicious Verdict
+		String suspiciousTitleVerdictInfo = verdict.info().replace("\n", " ");
+		if( listErrorVerdictInfo.stream().anyMatch( verdictInfo -> verdictInfo.contains( suspiciousTitleVerdictInfo ))) {
+			verdict = Verdict.OK;
+			webConsoleVerdict = Verdict.OK;
+		} else {
+			return verdict;
+		}
 
 		verdict = getUniqueFunctionalVerdict(verdict, state);
 
-		// If the final Verdict is not OK but was already detected in a previous sequence
-		String currentVerdictInfo = verdict.info().replace("\n", " ");
-		if( listErrorVerdictInfo.stream().anyMatch( verdictInfo -> verdictInfo.contains( currentVerdictInfo ) ) ) {
-			// Consider as OK to continue testing
+		// If the functional Verdict is not OK but was already detected in a previous sequence
+		// Consider as OK and continue the checking future state
+		String functionalVerdictInfo = verdict.info().replace("\n", " ");
+		if( listErrorVerdictInfo.stream().anyMatch( verdictInfo -> verdictInfo.contains( functionalVerdictInfo ))) {
 			verdict = Verdict.OK;
-			webConsoleVerdict = Verdict.OK;
 		}
 
 		return verdict;
 	}
 
 	/**
-	 * This method returns a unique failure verdict of one state.
-	 * Even if multiple failures can be reported together.
+	 * This method returns a unique functional failure verdict of one state. 
+	 * We do not join and do not report multiple failures together.
 	 * 
 	 * @param verdict
 	 * @param state
 	 * @return
 	 */
 	private Verdict getUniqueFunctionalVerdict(Verdict verdict, State state) {
-		//TODO: Refactor Verdict class or this method feature
-		// Due this is the unique method, only start the verdict checking if no failure exists.
-		if(verdict == Verdict.OK) {
-			// Check the functional Verdict that detects if a downloaded file is empty.
-			Verdict watcherEmptyfileVerdict = watcherFileEmptyFile();
-			if(watcherEmptyfileVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( watcherEmptyfileVerdict.info().replace("\n", " ") ))) return watcherEmptyfileVerdict;
+		// Check the functional Verdict that detects if a downloaded file is empty.
+		verdict = watcherFileEmptyFile();
+		if (shouldReturnVerdict(verdict)) return verdict;
 
-			// Check the functional Verdict that detects dummy buttons to the current state verdict.
-			Verdict buttonVerdict = functionalButtonVerdict(state);
-			if(buttonVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( buttonVerdict.info().replace("\n", " ") ))) return buttonVerdict;
+		// Check the functional Verdict that detects dummy buttons to the current state verdict.
+		verdict = functionalButtonVerdict(state);
+		if (shouldReturnVerdict(verdict)) return verdict;
 
-			// Check the functional Verdict that detects select elements without items to the current state verdict.
-			Verdict emptySelectListVerdict = WebVerdict.verdictEmptySelectItemsVerdict(state);
-			if(emptySelectListVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( emptySelectListVerdict.info().replace("\n", " ") ))) return emptySelectListVerdict;
+		// Check the functional Verdict that detects select elements without items to the current state verdict.
+		verdict = WebVerdict.verdictEmptySelectItemsVerdict(state);
+		if (shouldReturnVerdict(verdict)) return verdict;
 
-			// Check the functional Verdict that detects select elements with unsorted items to the current state verdict.
-			Verdict unsortedSelectListVerdict = WebVerdict.verdictUnsortedSelectOptionsVerdict(state);
-			if(unsortedSelectListVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( unsortedSelectListVerdict.info().replace("\n", " ") ))) return unsortedSelectListVerdict;
+		// Check the functional Verdict that detects select elements with unsorted items to the current state verdict.
+		verdict = WebVerdict.verdictUnsortedSelectOptionsVerdict(state);
+		if (shouldReturnVerdict(verdict)) return verdict;
 
-			// Check the functional Verdict that detects if exists a number with more than X decimals.
-			Verdict decimalsVerdict = WebVerdict.verdictNumberWithLotOfDecimals(state, 2);
-			if(decimalsVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( decimalsVerdict.info().replace("\n", " ") ))) return decimalsVerdict;
+		// Check the functional Verdict that detects if exists a number with more than X decimals.
+		verdict = WebVerdict.verdictNumberWithLotOfDecimals(state, 2);
+		if (shouldReturnVerdict(verdict)) return verdict;
 
-			// Check the functional Verdict that detects if exists a textArea Widget without length.
-			Verdict textAreaVerdict = WebVerdict.verdictTextAreaWithoutLength(state, Arrays.asList(WdRoles.WdTEXTAREA));
-			if(textAreaVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( textAreaVerdict.info().replace("\n", " ") ))) return textAreaVerdict;
+		// Check the functional Verdict that detects if exists a textArea Widget without length.
+		verdict = WebVerdict.verdictTextAreaWithoutLength(state, Arrays.asList(WdRoles.WdTEXTAREA));
+		if (shouldReturnVerdict(verdict)) return verdict;
 
-			// Check the functional Verdict that detects if a web element does not contain children.
-			Verdict emptyElementVerdict = WebVerdict.verdictElementWithoutChildren(state, Arrays.asList(WdRoles.WdFORM, WdRoles.WdDIV));
-			if(emptyElementVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( emptyElementVerdict.info().replace("\n", " ") ))) return emptyElementVerdict;
+		// Check the functional Verdict that detects if a web element does not contain children.
+		verdict = WebVerdict.verdictElementWithoutChildren(state, Arrays.asList(WdRoles.WdFORM, WdRoles.WdDIV));
+		if (shouldReturnVerdict(verdict)) return verdict;
 
-			// Check the functional Verdict that detects if a web radio input contains a unique option.
-			Verdict uniqueRadioVerdict = WebVerdict.verdictUniqueRadioInput(state);
-			if(uniqueRadioVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( uniqueRadioVerdict.info().replace("\n", " ") ))) return uniqueRadioVerdict;
+		// Check the functional Verdict that detects if a web radio input contains a unique option.
+		verdict = WebVerdict.verdictUniqueRadioInput(state);
+		if (shouldReturnVerdict(verdict)) return verdict;
 
-			// Check the functional Verdict that detects if a web alert contains a suspicious message.
-			Verdict alertSuspiciousVerdict = WebVerdict.verdictAlertSuspiciousMessage(state, ".*[lL]ogin.*", lastExecutedAction);
-			if(alertSuspiciousVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( alertSuspiciousVerdict.info().replace("\n", " ") ))) return alertSuspiciousVerdict;
+		// Check the functional Verdict that detects if a web alert contains a suspicious message.
+		verdict = WebVerdict.verdictAlertSuspiciousMessage(state, ".*[lL]ogin.*", lastExecutedAction);
+		if (shouldReturnVerdict(verdict)) return verdict;
 
-			// Check the functional Verdict that detects if web table contains duplicated rows.
-			Verdict duplicateRowsInTableVerdict = WebVerdict.verdictDetectDuplicatedRowsInTable(state);
-			if(duplicateRowsInTableVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( duplicateRowsInTableVerdict.info().replace("\n", " ") ))) return duplicateRowsInTableVerdict;
-		}
+		// Check the functional Verdict that detects if web table contains duplicated rows.
+		verdict = WebVerdict.verdictDetectDuplicatedRowsInTable(state);
+		if (shouldReturnVerdict(verdict)) return verdict;
+
 		return verdict;
+	}
+
+	/**
+	 * We want to return the verdict if it is not OK, 
+	 * and not on the detected failures list (it's a new failure). 
+	 * 
+	 * @param verdict
+	 * @return
+	 */
+	private boolean shouldReturnVerdict(Verdict verdict) {
+		return verdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch(info -> info.contains(verdict.info().replace("\n", " ")));
 	}
 
 	private Verdict functionalButtonVerdict(State state) {
