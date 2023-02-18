@@ -34,8 +34,6 @@ package org.testar.settingsdialog;
 import org.testar.monkey.*;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.settingsdialog.dialog.*;
-import org.testar.settingsdialog.dialog.StateModelPanel;
-
 import org.testar.extendedsettings.ExtendedSettingsFactory;
 
 import javax.imageio.ImageIO;
@@ -251,6 +249,7 @@ public class SettingsDialog extends JFrame implements Observer {
     settingPanels.put(GENERAL_TAB_INDEX, new Pair<>("General Settings", new GeneralPanel(this)));
     settingPanels.put(settingPanels.size() + 1, new Pair<>("Filters", new FilterPanel()));
     settingPanels.put(settingPanels.size() + 1, new Pair<>("Oracles", new OraclePanel()));
+    settingPanels.put(settingPanels.size() + 1, new Pair<>("Functional Verdicts", new FunctionalVerdictPanel()));
     settingPanels.put(settingPanels.size() + 1, new Pair<>("Time Settings", new TimingPanel()));
     settingPanels.put(settingPanels.size() + 1, new Pair<>("Misc", new MiscPanel()));
     settingPanels.put(settingPanels.size() + 1, new Pair<>("State Model", StateModelPanel.createStateModelPanel()));
