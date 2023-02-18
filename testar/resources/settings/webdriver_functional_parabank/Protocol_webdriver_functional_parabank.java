@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2023 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -81,10 +81,17 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
  * - TODO: JavaScript loop to hang the browser - devTools
  * - TODO: JavaScript refresh browser constantly - devTools
  * - TODO: textarea with rows and columns to detect enter click
+ * - TODO: Spell checker in a file list that allows users to uncomment or configure. Also prepare a specific directory for the spell checker errors found. this will not block the sequence
+ * - TODO: Customize spell checker to ignore some widgets
+ * - TODO: Add URL related with the states (clickable link)
+ * - TODO: List of possible issues for different verdicts and allow user to customize different oracles for the SUT elements. List like spell checking
+ * - TODO: Now draw the widget highlight in all the screenshots of the state. Only in the last HTML report screen.
+ * - TODO: Use the state screenshots of the sequences to train and use a model
+ * - TODO: screenshot_sequence_x_states vs screenshot_sequence_x_actions
  * 
  * - Instead of joining Verdicts, try to recognize and save different Verdict exception in different sequences.
  */
-public class Protocol_webdriver_functional extends WebdriverProtocol {
+public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 
 	private Action functionalAction = null;
 	private Verdict functionalVerdict = Verdict.OK;
@@ -135,13 +142,12 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 		// custom_compile_and_deploy.bat
 		// http://localhost:8080/parabank
 		// parabank script login sequence
-		/*
+
 		Util.pause(1);
 		WdDriver.executeScript("document.getElementsByName('username')[0].setAttribute('value','john');");
 		WdDriver.executeScript("document.getElementsByName('password')[0].setAttribute('value','demo');");
 		WdDriver.executeScript("document.getElementsByName('login')[0].submit();");
 		Util.pause(1);
-		*/
 
 		return system;
 	}
@@ -158,6 +164,8 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 		// Reset the functional action and verdict
 		functionalAction = null;
 		functionalVerdict = Verdict.OK;
+
+		//TODO: Reader of the logs should use log4j format
 
 		// Reset the list of downloaded files
 		watchEventDownloadedFiles = new ArrayList<>();
@@ -386,6 +394,8 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 		return textAreaVerdict;
 	}
 
+	//TODO: Check bug fixed by Robin (for example some div exists and will be filled later)
+	// TODO: Improve this element without children using white list and black list using the class name to filtering out
 	private Verdict elementWithoutChildren(State state, List<Role> roles) {
 		Verdict emptyChildrenVerdict = Verdict.OK;
 		for(Widget w : state) {
@@ -400,6 +410,7 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 		return emptyChildrenVerdict;
 	}
 
+	// TODO: Improve with Robin code
 	private Verdict uniqueRadioInput(State state) {
 		Verdict radioInputVerdict = Verdict.OK;
 		for(Widget w : state) {
@@ -660,6 +671,27 @@ public class Protocol_webdriver_functional extends WebdriverProtocol {
 		Set<String> clickSet = new HashSet<>(clickableClasses);
 		clickSet.retainAll(element.cssClasses);
 		return clickSet.size() > 0;
+	}
+
+	@Override
+	protected boolean isTypeable(Widget widget) {
+		Role role = widget.get(Tags.Role, Roles.Widget);
+		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
+
+			// Specific class="input" for parasoft SUT
+			if(widget.get(WdTags.WebCssClasses, "").contains("input")) {
+				return true;
+			}
+
+			// Input type are special...
+			if (role.equals(WdRoles.WdINPUT)) {
+				String type = ((WdWidget) widget).element.type;
+				return WdRoles.typeableInputTypes().contains(type.toLowerCase());
+			}
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
