@@ -31,16 +31,34 @@
 
 package org.testar.protocols;
 
+import org.apache.commons.io.FileUtils;
 import org.testar.DerivedActions;
+import org.testar.OutputStructure;
+import org.testar.jacoco.JacocoFilesCreator;
+import org.testar.jacoco.MergeJacocoFiles;
 import org.testar.monkey.Drag;
+import org.testar.monkey.Main;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
+import org.testar.protocols.experiments.WriterExperiments;
+import org.testar.protocols.experiments.WriterExperimentsParams;
+import org.testar.serialisation.LogSerialiser;
+
 import org.testar.monkey.ConfigTags;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.DatagramSocket;
+import java.net.SocketException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -687,4 +705,308 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     	}
     	return new HashSet<>();
     }
+
+    /**
+     * Disconnect from Windows Remote Desktop without close the GUI session.
+     */
+    protected void disconnectRDP() {
+		try {
+			// bat file that uses tscon.exe to disconnect without stop GUI session
+			File disconnectBatFile = new File(Main.settingsDir + File.separator + "disconnectRDP.bat").getCanonicalFile();
+
+			// Launch and disconnect from RDP session
+			// This will prompt the UAC permission window if enabled in the System
+			if(disconnectBatFile.exists()) {
+				System.out.println("Running: " + disconnectBatFile);
+				Runtime.getRuntime().exec("cmd /c start \"\" " + disconnectBatFile);
+			} else {
+				System.out.println("THIS BAT DOES NOT EXIST: " + disconnectBatFile);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// Wait because disconnect from system modifies internal Screen resolution
+		Util.pause(60);
+    }
+
+	// Java Coverage: It may happen that the SUT and its JVM unexpectedly close or stop responding
+	// we use this variable to store after each action the last correct coverage
+	private String lastCorrectJacocoCoverageFile = "";
+	private String lastActionMergedCoverageFile = "";
+
+	// Java Coverage: Save all JaCoCo sequence reports, to merge them at the end of the execution
+	private Set<String> jacocoFiles = new HashSet<>();
+
+	protected long startSequenceTime;
+	protected long startRunTime;
+
+	/**
+	 * Copy settings protocolName build.xml file to jacoco directory
+	 * Example: "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
+	 */
+	protected void copyJacocoBuildFile() {
+		// JaCoCo: Move settings protocolName build.xml file to jacoco directory
+		try {
+			// Copy "bin/settings/protocolName/build.xml" file to "bin/jacoco/build.xml"
+			String protocolName = settings.get(ConfigTags.ProtocolClass,"").split("/")[0];
+			File originalBuildFile = new File(Main.settingsDir + File.separator + protocolName + File.separator + "build.xml").getCanonicalFile();
+			System.out.println("originalBuildFile: " + originalBuildFile);
+			if(originalBuildFile.exists()) {
+				File destbuildFile = new File(Main.testarDir + File.separator + "jacoco" + File.separator + "build.xml").getCanonicalFile();
+				System.out.println("destbuildFile: " + destbuildFile);
+				if(destbuildFile.exists()) {
+					destbuildFile.delete();
+				}
+				FileUtils.copyFile(originalBuildFile, destbuildFile);
+			}
+		} catch (Exception e) {
+			LogSerialiser.log("ERROR Trying to move settings protocolName build.xml file to jacoco directory",
+			        LogSerialiser.LogLevel.Info);
+			System.err.println("ERROR Trying to move settings protocolName build.xml file to jacoco directory");
+		}
+	}
+
+	/**
+	 * Extract and create JaCoCo action coverage report.
+	 */
+	protected void extractJacocoActionReport() {
+	    try {
+	        System.out.println("Extracting JaCoCo report for Action number: " + actionCount);
+
+	        // Dump the JaCoCo Action report from the remote JVM
+	        // Example: jacoco-upm_sequence_1_action_3.exec
+	        String jacocoFileAction = JacocoFilesCreator.dumpAndGetJacocoActionFileName(Integer.toString(actionCount));
+
+	        // If is not empty, save as last correct file in case the SUT crashes executing next actions
+	        if(!jacocoFileAction.isEmpty() && new File(jacocoFileAction).exists()) {
+	            lastCorrectJacocoCoverageFile = jacocoFileAction;
+	        }
+
+	        // Create the output JaCoCo Action report (Ex: "jacoco_reports/upm_sequence_1_action_3/report_jacoco.csv")
+	        // And get a string that represents obtained coverage
+	        String actionCoverage = JacocoFilesCreator.createJacocoActionReport(jacocoFileAction, Integer.toString(actionCount));
+	        long  actionTime = System.currentTimeMillis() - startSequenceTime;
+
+	        // Prepare and write the coverage metrics information
+	        String information = "Sequence | " + OutputStructure.sequenceInnerLoopCount +
+	                " | actionnr | " + actionCount +
+	                " | time | " + actionTime +
+	                " | " + actionCoverage;
+			WriterExperiments.writeMetrics(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
+					.setFilename("coverageMetrics")
+					.setInformation(information)
+					.build());
+
+	        extractJacocoActionMergedReport(jacocoFileAction);
+
+	    } catch (Exception e) {
+	        LogSerialiser.log("ERROR Creating JaCoCo coverage for specific action: " + actionCount,
+	                LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR Creating JaCoCo coverage for specific action: " + actionCount);
+	    }
+
+	    try {
+	        extractStateModelMetrics();
+	    } catch(Exception e) {
+	        LogSerialiser.log("ERROR Extracting state model metrics: " + actionCount, LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR Extracting state model metrics: " + actionCount);
+	    }
+	}
+
+	/**
+	 * Execute a State Model query to extract information about number of states and actions.
+	 */
+	protected void extractStateModelMetrics() {
+	    String resultAbstractStates = "AbstractStates " + stateModelManager.queryStateModel("select count(*) from AbstractState");
+	    String resultAbstractActions = "AbstractActions " + stateModelManager.queryStateModel("select count(*) from AbstractAction");
+	    String resultUnvisitedActions = "UnvisitedActions " + stateModelManager.queryStateModel("select count(*) from UnvisitedAbstractAction");
+	    String resultConcreteStates = "ConcreteStates " + stateModelManager.queryStateModel("select count(*) from ConcreteState");
+	    String resultConcreteActions = "ConcreteActions " + stateModelManager.queryStateModel("select count(*) from ConcreteAction");
+
+	    // Prepare and write the state model metrics information
+	    String information = "SequenceTotal | " + OutputStructure.sequenceInnerLoopCount +
+	            " | actionnr | " + actionCount +
+	            " | " + resultAbstractStates +
+	            " | " + resultAbstractActions +
+	            " | " + resultUnvisitedActions +
+	            " | " + resultConcreteStates +
+	            " | " + resultConcreteActions;
+		WriterExperiments.writeMetrics(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
+				.setFilename("stateModelMetrics")
+				.setInformation(information)
+				.build());
+	}
+
+	/**
+	 * Prepare and create the continuous action merge coverage report.
+	 * Always merge current action coverage with previous one (even previous sequences).
+	 *
+	 * @param jacocoFileAction
+	 */
+	private void extractJacocoActionMergedReport(String jacocoFileAction) {
+	    // First one will not exists
+	    if(lastActionMergedCoverageFile.isEmpty()) lastActionMergedCoverageFile = jacocoFileAction;
+
+	    try {
+	        System.out.println("Extracting JaCoCo Merged report for Action number: " + actionCount);
+
+	        if(new File(jacocoFileAction).length() > 0 && new File(lastActionMergedCoverageFile).length() > 0) {
+	            String actionMergedJacocoFilename = OutputStructure.outerLoopOutputDir + File.separator +
+	                    "merged-jacoco-" + OutputStructure.executedSUTname +
+	                    "_sequence_" + OutputStructure.sequenceInnerLoopCount +
+	                    "_action_" + actionCount;
+	            File actionMergedJacocoFile = new File(actionMergedJacocoFilename);
+
+	            Set<String> filesToMerge = new HashSet<>(Arrays.asList(lastActionMergedCoverageFile, jacocoFileAction));
+
+	            MergeJacocoFiles mergeActionsJacoco = new MergeJacocoFiles();
+	            mergeActionsJacoco.testarExecuteMojo(new ArrayList<>(filesToMerge), actionMergedJacocoFile);
+
+	            long  runTime = System.currentTimeMillis() - startRunTime;
+	            String iterativeActionMerge = JacocoFilesCreator.createJacocoActionMergedReport(actionMergedJacocoFile.getCanonicalPath(), Integer.toString(actionCount));
+
+	            // Prepare and write the merged coverage metrics information
+	            String information = "Merged Sequence | " + OutputStructure.sequenceInnerLoopCount +
+	                    " | actionnr | " + actionCount +
+	                    " | time | " + runTime +
+	                    " | " + iterativeActionMerge;
+				WriterExperiments.writeMetrics(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
+						.setFilename("coverageMetricsMerged")
+						.setInformation(information)
+						.build());
+
+	            lastActionMergedCoverageFile = actionMergedJacocoFilename;
+	        }
+	    } catch (Exception e) {
+	        LogSerialiser.log("ERROR Creating JaCoCo Iterative Merged Coverage for specific action: " + actionCount,
+	                LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR Creating JaCoCo Iterative Merged Coverage for specific action: " + actionCount);
+	    }
+	}
+
+	/**
+	 * Extract and create JaCoCo sequence coverage report.
+	 */
+	protected void extractJacocoSequenceReport() {
+		// Dump the sequence JaCoCo report from the remote JVM
+		// Example: jacoco-upm_sequence_1.exec
+		String jacocoFile = JacocoFilesCreator.dumpAndGetJacocoSequenceFileName();
+		if(!jacocoFile.isEmpty() && new File(jacocoFile).exists()) {
+			lastCorrectJacocoCoverageFile = jacocoFile;
+		}
+
+		// Add lastCorrectJacocoCoverageFile file to this set list, for merging at the end of the TESTAR run
+		// If everything works correctly will be the sequence report, if not, last correct action jacoco.exec file
+		jacocoFiles.add(lastCorrectJacocoCoverageFile);
+
+		// Create the output JaCoCo report (Ex: "jacoco_reports/upm_sequence_1/report_jacoco.csv")
+		// And get a string that represents obtained coverage
+		String sequenceCoverage = JacocoFilesCreator.createJacocoSequenceReport(jacocoFile);
+		long  sequenceTime = System.currentTimeMillis() - startSequenceTime;
+
+		// Prepare and write the coverage metrics information
+		String information = "SequenceTotal | " + OutputStructure.sequenceInnerLoopCount +
+		        " | actionnr | " + actionCount +
+		        " | time | " + sequenceTime +
+		        " | " + sequenceCoverage;
+		WriterExperiments.writeMetrics(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
+				.setFilename("coverageMetrics")
+				.setInformation(information)
+				.build());
+
+		// reset value
+		lastCorrectJacocoCoverageFile = "";
+	}
+
+	/**
+	 * Merge all JaCoCo sequences files and create a run coverage merged report
+	 */
+	protected void extractJacocoRunReport() {
+		try {
+			// Merge all jacoco.exec sequence files
+			MergeJacocoFiles mergeJacoco = new MergeJacocoFiles();
+			File mergedJacocoFile = new File(OutputStructure.outerLoopOutputDir + File.separator + "jacoco_merged.exec");
+			mergeJacoco.testarExecuteMojo(new ArrayList<>(jacocoFiles), mergedJacocoFile);
+
+			// Then create the report that contains the coverage of all executed sequences (Ex: jacoco_reports/TOTAL_MERGED/report_jacoco.csv)
+			// And get a string that represents obtained coverage
+			String runCoverage = JacocoFilesCreator.createJacocoMergedReport(mergedJacocoFile.getCanonicalPath());
+			long  runTime = System.currentTimeMillis() - startRunTime;
+
+			// Prepare and write the coverage metrics information
+			String information = "RunTotal | time | " + runTime + " | " + runCoverage;
+			WriterExperiments.writeMetrics(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
+					.setFilename("coverageMetrics")
+					.setInformation(information)
+					.build());
+
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+	        LogSerialiser.log("ERROR: Trying to MergeMojo feature with JaCoCo Files",
+	                    LogSerialiser.LogLevel.Info);
+			System.err.println("ERROR: Trying to MergeMojo feature with JaCoCo Files");
+		}
+	}
+
+	/**
+	 * Compress TESTAR output run report folder
+	 */
+	protected void compressOutputRunFolder() {
+	    Util.compressFolder(OutputStructure.outerLoopOutputDir, Main.outputDir, OutputStructure.outerLoopName);
+	}
+
+	/**
+	 * Obtain the IP address of the current host to create a folder inside destFolder,
+	 * then copy all TESTAR output run results inside created folder.
+	 *
+	 * This is an utility method intended to copy output results inside a file server shared folder,
+	 * used to save data of TESTAR experiments.
+	 *
+	 * @param destFolder
+	 */
+	protected void copyOutputToNewFolderUsingIpAddress(String destFolder) {
+	    // Obtain the ip address of the host
+	    // https://stackoverflow.com/a/38342964
+	    String ipAddress = "127.0.0.1";
+	    try(final DatagramSocket socket = new DatagramSocket()){
+	        socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+	        ipAddress = socket.getLocalAddress().getHostAddress();
+	    } catch (SocketException | UnknownHostException e) {
+	        LogSerialiser.log("ERROR copyOutputToNewFolderUsingIpAddress: Obtaining host ip address",
+	                LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR copyOutputToNewFolderUsingIpAddress: Obtaining host ip address");
+	        e.printStackTrace();
+	    }
+
+	    // Create a new directory inside desired destination using the ipAddress as name
+	    String folderIpAddress = destFolder + File.separator + ipAddress + File.separator + settings.get(ConfigTags.ApplicationName, "");
+	    try {
+	        Files.createDirectories(Paths.get(folderIpAddress));
+	    } catch (IOException e) {
+	        LogSerialiser.log("ERROR copyOutputToNewFolderUsingIpAddress: Creating new folder with ip name",
+	                LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR copyOutputToNewFolderUsingIpAddress: Creating new folder with ip name");
+	        e.printStackTrace();
+	        return;
+	    }
+
+	    // Copy run zip file to desired ip address output folder
+	    File outputZipFile = new File(Main.outputDir + File.separator + OutputStructure.outerLoopName + ".zip");
+	    try {
+	        if(outputZipFile.exists()) {
+	            File fileIpAddressOutput = new File(folderIpAddress + File.separator + ipAddress + "_" + outputZipFile.getName());
+	            FileUtils.copyFile(outputZipFile, fileIpAddressOutput);
+	            System.out.println(String.format("Sucessfull copy %s to %s", outputZipFile, fileIpAddressOutput));
+	        }
+	    } catch (IOException e) {
+	        LogSerialiser.log("ERROR copyOutputToNewFolderUsingIpAddress: ERROR ZIP : " + outputZipFile,
+	                LogSerialiser.LogLevel.Info);
+	        System.err.println("ERROR copyOutputToNewFolderUsingIpAddress: ERROR ZIP : " + outputZipFile);
+	        e.printStackTrace();
+	    }
+
+	    // Create a folder inside the centralized file server and copy the metrics results
+	    WriterExperiments.copyMetricsToFolder(settings, destFolder, ipAddress);
+	}
 }

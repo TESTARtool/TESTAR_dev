@@ -32,6 +32,8 @@ package org.testar.extendedsettings;
 
 import org.testar.visualvalidation.VisualValidationSettings;
 
+import nl.ou.testar.ReinforcementLearning.ReinforcementLearningSettings;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -79,6 +81,10 @@ public class ExtendedSettingsFactory {
 
     public static VisualValidationSettings createVisualValidationSettings() {
         return createSettings(VisualValidationSettings.class, VisualValidationSettings::CreateDefault);
+    }
+
+    public static ReinforcementLearningSettings createReinforcementLearningSettings() {
+        return createSettings(ReinforcementLearningSettings.class, ReinforcementLearningSettings::CreateDefault);
     }
 
     public static ExampleSetting createTestSetting() {

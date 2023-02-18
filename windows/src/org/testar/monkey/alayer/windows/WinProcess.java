@@ -61,6 +61,8 @@ public final class WinProcess extends SUTBase {
 
 	private static final String EMPTY_STRING = ""; // by wcoux
 
+	public static boolean java_execution = false;
+
 	public static boolean politelyToForeground(long hwnd) throws WinApiException{
 		return Windows.SetForegroundWindow(hwnd);
 	}
@@ -126,6 +128,34 @@ public final class WinProcess extends SUTBase {
 	public static WinProcess fromExecutable(String path, boolean ProcessListenerEnabled) throws SystemStartException{
 		try{
 			Assert.notNull(path);
+
+			// Force the execution of the SUT via Java
+			if(java_execution) {
+
+				System.out.println("Executing SUT via Java process...");
+
+				final Process process = Runtime.getRuntime().exec(path);
+				Field field = process.getClass().getDeclaredField("handle");
+				field.setAccessible(true);
+
+				long processHandle = field.getLong(process);
+
+				Util.pause(5);
+
+				long pid = Windows.GetProcessId(processHandle);
+
+				WinProcess returnProcess = fromPID(pid);
+
+				if(ProcessListenerEnabled) {
+					returnProcess.set(Tags.StdErr,process.getErrorStream());
+					returnProcess.set(Tags.StdOut, process.getInputStream());
+					returnProcess.set(Tags.StdIn, process.getOutputStream());
+				}
+
+				returnProcess.set(Tags.Path, path);
+				returnProcess.set(Tags.Desc, path);
+				return returnProcess;
+			}
 
 			//Disabled with browsers, only allow it with desktop applications executed with command_line
 			if(!ProcessListenerEnabled) {

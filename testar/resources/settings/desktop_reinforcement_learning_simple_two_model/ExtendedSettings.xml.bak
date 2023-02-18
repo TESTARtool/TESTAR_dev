@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<root>
+    <reinforcementLearningSettings>
+        <alpha>0.99</alpha>
+        <gamma>0.99</gamma>
+        <defaultValue>50000.0</defaultValue>
+        <defaultReward>0.0</defaultReward>
+        <epsilon>0.75</epsilon>
+        <maxQValue>50000.0</maxQValue>
+        <decayRate>0.00033</decayRate>
+        <temperature>0.99999</temperature>
+        <rewardFunction>CounterBasedRewardFunction</rewardFunction>
+        <policy>OptimisticQValuesInitializationPolicy</policy>
+    </reinforcementLearningSettings>
+    <visualValidationSettings>
+        <enabled>false</enabled>
+    </visualValidationSettings>
+    <version>1</version>
+</root>
