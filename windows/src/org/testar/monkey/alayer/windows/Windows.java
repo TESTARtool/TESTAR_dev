@@ -754,6 +754,13 @@ public final class Windows{
 	public static native Object[] GetAccessibleContextProperties(long vmid, long ac);
 	// end by urueda
 
+	// Java Swing Table Cell Properties
+	public static native long[] GetAccessibleTable(long vmid, long ac); // accessibleContext x accessibleTable
+	public static native int[] GetNumberOfTableRowColumn(long vmid, long ac); // row x column
+	public static native void SelectTableRow(long vmid, long ac, int row);
+	public static native void SelectTableCell(long vmid, long ac, int row, int column);
+	public static native Object[] GetTableCellProperties(long vmid, long ac, int row, int column);
+	
 	public static String Gdiplus_Status2String(int statusCode){
 		switch(statusCode){
 		case Gdiplus_Ok:   				          return "Ok";

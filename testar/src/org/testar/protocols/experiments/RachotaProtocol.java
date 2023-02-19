@@ -142,7 +142,7 @@ public class RachotaProtocol extends JavaSwingProtocol {
 		// rachota: check at windows level if SUT stops responding
 		// Does not seems to work, at least with Rachota
 		try {
-			if(Windows.IsHungAppWindow(system.get(Tags.HWND, (long)0))) {
+			if(WinProcess.isHungWindow(system.get(Tags.HWND, (long)0))) {
 				Verdict freezeVerdict = new Verdict(Verdict.SEVERITY_NOT_RESPONDING, "WinProcess.isHungWindow(system) Rachota stops responding");
 				state.set(Tags.OracleVerdict, freezeVerdict);
 			}

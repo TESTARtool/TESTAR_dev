@@ -277,6 +277,22 @@ public final class WinProcess extends SUTBase {
 		return ret;
 	}
 
+	/**
+	 * Determines whether the Windows system considers that a specified application is not responding.
+	 * https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-ishungappwindow
+	 *
+	 * @param hwnd
+	 * @return if application window hung or not
+	 */
+	public static boolean isHungWindow(long hwnd) {
+		try {
+			return Windows.IsHungAppWindow(hwnd);
+		} catch(Exception e) {
+			System.out.println("Internal error with Windows.IsHungAppWindow API call");
+		}
+		return false;
+	}
+
 	public static void killProcess(long pid) throws SystemStopException{
 		try{
 			long hProcess = Windows.OpenProcess(Windows.PROCESS_TERMINATE, false, pid);
