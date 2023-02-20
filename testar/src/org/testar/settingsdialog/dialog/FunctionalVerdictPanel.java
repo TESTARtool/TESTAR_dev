@@ -31,6 +31,8 @@
 package org.testar.settingsdialog.dialog;
 
 import java.util.Arrays;
+import java.util.Vector;
+
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -119,12 +121,12 @@ class MyTableModel extends DefaultTableModel {
 		return column == checkBoxColumn;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void setValueAt(Object value, int row, int column) {
 		if (value instanceof Boolean && column == checkBoxColumn) {
 			// Update the visual checkbox element
-			getDataVector().get(row).set(column, (boolean)value);
+			Vector<Object> rowData = (Vector<Object>) getDataVector().get(row);
+			rowData.set(column, (boolean)value);
 			fireTableCellUpdated(row, column);
 			// Update the web verdict enabling/disabling list
 			String webVerdictName = (String) super.getValueAt(row, 0);
