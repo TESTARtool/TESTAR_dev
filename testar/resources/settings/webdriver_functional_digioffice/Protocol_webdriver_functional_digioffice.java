@@ -47,6 +47,7 @@ import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.plugin.NativeLinker;
 import org.testar.protocols.WebdriverProtocol;
+import org.testar.verdicts.WebVerdict;
 
 import com.google.common.collect.Comparators;
 
@@ -257,17 +258,27 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 	 */
 	@Override
 	protected Verdict getVerdict(State state) {
+		// Obtain suspicious title verdicts
 		Verdict verdict = super.getVerdict(state);
 
-		verdict = getUniqueFunctionalVerdict(verdict, state);
-		//verdict = getJointFunctionalVerdict(verdict, state);
-
-		// If the final Verdict is not OK but was already detected in a previous sequence
-		String currentVerdictInfo = verdict.info().replace("\n", " ");
-		if( listErrorVerdictInfo.stream().anyMatch( verdictInfo -> verdictInfo.contains( currentVerdictInfo ) ) ) {
-			// Consider as OK to continue testing
+		// If the suspicious title Verdict is not OK but was already detected in a previous sequence
+		// Consider as OK and continue the checking functional Verdicts
+		// Else return the suspicious Verdict
+		String suspiciousTitleVerdictInfo = verdict.info().replace("\n", " ");
+		if( listErrorVerdictInfo.stream().anyMatch( verdictInfo -> verdictInfo.contains( suspiciousTitleVerdictInfo ))) {
 			verdict = Verdict.OK;
 			webConsoleVerdict = Verdict.OK;
+		} else {
+			return verdict;
+		}
+
+		verdict = getUniqueFunctionalVerdict(verdict, state);
+
+		// If the functional Verdict is not OK but was already detected in a previous sequence
+		// Consider as OK and continue the checking future state
+		String functionalVerdictInfo = verdict.info().replace("\n", " ");
+		if( listErrorVerdictInfo.stream().anyMatch( verdictInfo -> verdictInfo.contains( functionalVerdictInfo ))) {
+			verdict = Verdict.OK;
 		}
 
 		return verdict;
@@ -282,109 +293,77 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 	 * @return
 	 */
 	private Verdict getUniqueFunctionalVerdict(Verdict verdict, State state) {
-		//TODO: Refactor Verdict class or this method feature
-		// Due this is the unique method, only start the verdict checking if no failure exists.
-		if(verdict == Verdict.OK) {
-			// Check the functional Verdict that detects if a downloaded file is empty.
-			Verdict watcherEmptyfileVerdict = watcherFileEmptyFile();
-			if(watcherEmptyfileVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( watcherEmptyfileVerdict.info().replace("\n", " ") ))) return watcherEmptyfileVerdict;
 
-			// Check the functional Verdict that detects dummy buttons to the current state verdict.
-			Verdict buttonVerdict = functionalButtonVerdict(state);
-			if(buttonVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( buttonVerdict.info().replace("\n", " ") ))) return buttonVerdict;
+		// Check the functional Verdict that detects if a widget is enabled when there are unsaved changes in a form
+		verdict = unsavedChangesButtonStateVerdict(state);
+        if (shouldReturnVerdict(verdict)) return verdict;
+		
+		// Check the functional Verdict that detects if a downloaded file is empty.
+		verdict = watcherFileEmptyFile();
+        if (shouldReturnVerdict(verdict)) return verdict;
 
-			// Check the functional Verdict that detects select elements without items to the current state verdict.
-			Verdict emptySelectListVerdict = emptySelectItemsVerdict(state);
-			if(emptySelectListVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( emptySelectListVerdict.info().replace("\n", " ") ))) return emptySelectListVerdict;
+		// Check the functional Verdict that detects dummy buttons to the current state verdict.
+		verdict = functionalButtonVerdict(state);
+        if (shouldReturnVerdict(verdict)) return verdict;
+        
+		// Check the functional Verdict that detects select elements without items to the current state verdict.
+		verdict = emptySelectItemsVerdict(state);
+        if (shouldReturnVerdict(verdict)) return verdict;
 
-	        // Add the functional Verdict that detects select elements with only one item to the current state verdict.
-	        Verdict oneItemSelectItemsVerdict = verdict.join(oneItemSelectItemsVerdict(state));
-			if(oneItemSelectItemsVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( oneItemSelectItemsVerdict.info().replace("\n", " ") ))) return oneItemSelectItemsVerdict;
+        // Add the functional Verdict that detects select elements with only one item to the current state verdict.
+        verdict = verdict.join(oneItemSelectItemsVerdict(state));
+        if (shouldReturnVerdict(verdict)) return verdict;
 
-	        // Add the functional Verdict that detect that dropdownlist has more than theshold value items
-	        Verdict tooManyItemSelectItemsVerdict = verdict.join(tooManyItemSelectItemsVerdict(state, 5));
-			if(tooManyItemSelectItemsVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( tooManyItemSelectItemsVerdict.info().replace("\n", " ") ))) return tooManyItemSelectItemsVerdict;
+        // Add the functional Verdict that detect that dropdownlist has more than theshold value items
+        verdict = verdict.join(tooManyItemSelectItemsVerdict(state, 5));
+        if (shouldReturnVerdict(verdict)) return verdict;
 
-			// Check the functional Verdict that detects select elements with unsorted items to the current state verdict.
-			Verdict unsortedSelectListVerdict = unsortedSelectOptionsVerdict(state);
-			if(unsortedSelectListVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( unsortedSelectListVerdict.info().replace("\n", " ") ))) return unsortedSelectListVerdict;
+		// Check the functional Verdict that detects select elements with unsorted items to the current state verdict.
+		verdict = unsortedSelectOptionsVerdict(state);
+        if (shouldReturnVerdict(verdict)) return verdict;
 
-			// Check the functional Verdict that detects if exists a number with more than X decimals.
-			Verdict decimalsVerdict = numberWithLotOfDecimals(state, 2);
-			if(decimalsVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( decimalsVerdict.info().replace("\n", " ") ))) return decimalsVerdict;
+		// Check the functional Verdict that detects if exists a number with more than X decimals.
+		verdict = numberWithLotOfDecimals(state, 2);
+        if (shouldReturnVerdict(verdict)) return verdict;
 
-			// Check the functional Verdict that detects if exists a textArea Widget without length.
-			Verdict textAreaVerdict = textAreaWithoutLength(state, Arrays.asList(WdRoles.WdTEXTAREA));
-			if(textAreaVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( textAreaVerdict.info().replace("\n", " ") ))) return textAreaVerdict;
+		// Check the functional Verdict that detects if exists a textArea Widget without length.
+		verdict = WebVerdict.verdictTextAreaWithoutLength(state, Arrays.asList(WdRoles.WdTEXTAREA));
+        if (shouldReturnVerdict(verdict)) return verdict;
 
-			// Check the functional Verdict that detects if a web element does not contain children.
-			Verdict emptyElementVerdict = elementWithoutChildren(state, Arrays.asList(WdRoles.WdFORM, WdRoles.WdDIV));
-			if(emptyElementVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( emptyElementVerdict.info().replace("\n", " ") ))) return emptyElementVerdict;
+		// Check the functional Verdict that detects if a web element does not contain children.
+		//verdict = elementWithoutChildren(state, Arrays.asList(WdRoles.WdFORM, WdRoles.WdDIV));
+        //if (shouldReturnVerdict(verdict)) return verdict;
 
-			// Check the functional Verdict that detects if a web radio input contains a unique option.
-			Verdict uniqueRadioVerdict = uniqueRadioInput(state);
-			if(uniqueRadioVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( uniqueRadioVerdict.info().replace("\n", " ") ))) return uniqueRadioVerdict;
+		// Check the functional Verdict that detects if a web radio input contains a unique option.
+		verdict = uniqueRadioInput(state);
+        if (shouldReturnVerdict(verdict)) return verdict;
 
-			// Check the functional Verdict that detects if a web alert contains a suspicious message.
-			Verdict alertSuspiciousVerdict = alertSuspiciousMessage(state, ".*[lL]ogin.*");
-			if(alertSuspiciousVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( alertSuspiciousVerdict.info().replace("\n", " ") ))) return alertSuspiciousVerdict;
+		// Check the functional Verdict that detects if a web alert contains a suspicious message.
+		verdict = alertSuspiciousMessage(state, ".*[lL]ogin.*");
+        if (shouldReturnVerdict(verdict)) return verdict;
 
-			// Check the functional Verdict that detects if web table contains duplicated rows.
-			Verdict duplicateRowsInTableVerdict = duplicateRowsInTable(state);
-			if(duplicateRowsInTableVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( duplicateRowsInTableVerdict.info().replace("\n", " ") ))) return duplicateRowsInTableVerdict;
-			
-	        // Add the Verdict that detects if the SUT contains misspelled titles
-	        Verdict spellCheckerVerdict = verdict.join(spellChecker(state, Arrays.asList(WdRoles.WdLABEL, WdRoles.WdA)));
-			if(spellCheckerVerdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch( info -> info.contains( spellCheckerVerdict.info().replace("\n", " ") ))) return spellCheckerVerdict;
+		// Check the functional Verdict that detects if web table contains duplicated rows.
+		verdict =  duplicateRowsInTable(state);
+        if (shouldReturnVerdict(verdict)) return verdict;
+		
+        // Add the Verdict that detects if the SUT contains misspelled titles
+        verdict = verdict.join(spellChecker(state, Arrays.asList(WdRoles.WdLABEL, WdRoles.WdA)));
+        if (shouldReturnVerdict(verdict)) return verdict;
 
-		}
 		return verdict;
 	}
 
 	/**
-	 * This method join all possible failures of one state in the verdict.
-	 * Multiple failures can be reported.
+	 * We want to return the verdict if it is not OK, 
+	 * and not on the detected failures list (it's a new failure). 
 	 * 
 	 * @param verdict
-	 * @param state
 	 * @return
 	 */
-	private Verdict getJointFunctionalVerdict(Verdict verdict, State state) {
-		// Add the functional Verdict that detects dummy buttons to the current state verdict.
-		verdict = verdict.join(functionalButtonVerdict(state));
-
-		// Add the functional Verdict that detects select elements without items to the current state verdict.
-        verdict = verdict.join(emptySelectItemsVerdict(state));
-        
-        // Add the functional Verdict that detects select elements with only one item to the current state verdict.
-        verdict = verdict.join(oneItemSelectItemsVerdict(state));
-
-        // Add the functional Verdict that detect that dropdownlist has more than theshold value items
-        verdict = verdict.join(tooManyItemSelectItemsVerdict(state, 5));
-        
-		// Add the functional Verdict that detects if exists a number with more than X decimals.
-		verdict = verdict.join(numberWithLotOfDecimals(state, 2));
-
-		// Add the functional Verdict that detects if exists a textArea Widget without length.
-		verdict = verdict.join(textAreaWithoutLength(state, Arrays.asList(WdRoles.WdTEXTAREA)));
-
-		// Add the functional Verdict that detects if a web element does not contain children.
-		//verdict = verdict.join(elementWithoutChildren(state, Arrays.asList(WdRoles.WdFORM, WdRoles.WdDIV)));
-
-		// Add the functional Verdict that detects if a web radio input contains a unique option.
-		verdict = verdict.join(uniqueRadioInput(state));
-
-		// Add the functional Verdict that detects if a web alert contains a suspicious message.
-		verdict = verdict.join(alertSuspiciousMessage(state, ".*[lL]ogin.*"));
-
-        // Add the Verdict that detects if the SUT contains misspelled titles
-        //verdict = verdict.join(spellChecker(state, Arrays.asList(WdRoles.WdLABEL, WdRoles.WdA)));
-        
-        // Add the Verdict that detects duplicate rows in a table. In principle every row should have unique data.
-        verdict = verdict.join(duplicateRowsInTable(state));
-        
-		return verdict;
+	private boolean shouldReturnVerdict(Verdict verdict) {
+		return verdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch(info -> info.contains(verdict.info().replace("\n", " ")));
 	}
+
     private Verdict spellChecker(State state, List<Role> roles) 
     {
         Verdict spellCheckerVerdict = Verdict.OK;
@@ -426,9 +405,8 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
         return spellCheckerVerdict;
     }
 
-
 	private Verdict functionalButtonVerdict(State state) {
-		// If the last executed action is a click on a web button
+		// If the last executed action is type text in a textbox
 		if(functionalAction != null 
 				&& functionalAction.get(Tags.OriginWidget, null) != null 
 				&& functionalAction.get(Tags.Desc, "").contains("Click")
@@ -461,6 +439,58 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 
 		return functionalVerdict;
 	}
+	
+	private Boolean _pristineState = true; // TODO: should be reset when TESTAR opens up a new webpage or form
+	
+	// Oracle idea 3a
+	private Verdict unsavedChangesButtonStateVerdict(State state) {
+		List<String> descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges = new ArrayList<>();
+		descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("btnOpslaan");
+		descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("btnOpslaanEnSluiten");
+		Boolean hasUnsavedChanges = false;
+		
+		// If the last executed action is typing in INPUT field
+		if(functionalAction != null
+				&& functionalAction.get(Tags.OriginWidget, null) != null 
+				&& functionalAction.get(Tags.Desc, "").startsWith("Type")
+				&& functionalAction.get(Tags.OriginWidget).get(Tags.Role, Roles.Widget).equals(WdRoles.WdINPUT)
+				&& functionalAction.get(Tags.OriginWidget).get(WdTags.WebMaxLength) > 0) 
+		{
+			System.out.println("functionalAction desc: " + functionalAction.get(Tags.Desc, ""));
+			hasUnsavedChanges = true;
+		}
+		
+		if (hasUnsavedChanges || _pristineState)
+		{
+			for(Widget w : state) {
+				if (descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.contains(w.get(Tags.Desc, ""))) {
+					
+					if (hasUnsavedChanges)	{
+						// Check that widgets are turned on when the last action was a type action in a input field
+						if (w.get(WdTags.WebCssClasses, "").contains("item-disabled"))	{
+							String verdictMsg = String.format("Widget is not enabled while it should be! Role: %s , Path: %s , Desc: %s", 
+									w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
+							return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+						}
+					}
+					else {
+						if (_pristineState)
+						{
+							// check that widgets are turned off when there was no action executed yet
+							if (!w.get(WdTags.WebCssClasses, "").contains("item-disabled"))	{
+								String verdictMsg = String.format("Widget is enabled while it should not be! Role: %s , Path: %s , Desc: %s", 
+										w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
+								return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+							}
+						}
+					}
+					
+				}
+			}
+		}
+		_pristineState = false;
+		return Verdict.OK;
+	}
 
 	private Verdict emptySelectItemsVerdict(State state) {
 		Verdict selectElementVerdict = Verdict.OK;
@@ -484,6 +514,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		return selectElementVerdict;
 	}
 
+    
 	private Verdict unsortedSelectOptionsVerdict(State state) {
 		Verdict unsortedSelectElementVerdict = Verdict.OK;
 
@@ -491,23 +522,31 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 			// For the web select elements with an Id property
 			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) && !w.get(WdTags.WebId, "").isEmpty()) {
 				String elementId = w.get(WdTags.WebId, "");
-				String query = String.format("return [...document.getElementById('%s').options].map(o => o.value)", elementId);
-				ArrayList<String> selectOptionsList = (ArrayList<String>) WdDriver.executeScript(query);
 
-				// Now that we have collected all the array list of the option values verify that is sorted 
-				if(!isSorted(selectOptionsList)) {
-
-					String verdictMsg = String.format("Detected a Select web element with unsorted elements! Role: %s , Path: %s , WebId: %s", 
-							w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""));
-
-					return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
-				}
+                String querylength = String.format("return ((document.getElementById('%s') != null) ? document.getElementById('%s').length : 0)", elementId, elementId);
+				Long selectItemsLength = (Long) WdDriver.executeScript(querylength);
+                
+                if (selectItemsLength > 1)
+                { 
+    				String query = String.format("return [...document.getElementById('%s').options].map(o => o.value)", elementId);
+    				ArrayList<String> selectOptionsList = (ArrayList<String>) WdDriver.executeScript(query);
+    
+    				// Now that we have collected all the array list of the option values verify that is sorted 
+    				if(!isSorted(selectOptionsList)) {
+    
+    					String verdictMsg = String.format("Detected a Select web element with unsorted elements! Role: %s , Path: %s , WebId: %s", 
+    							w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""));
+    
+    					return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+    				}
+                }
 			}
 		}
 
 		return unsortedSelectElementVerdict;
 	}
 	
+    
 	private static boolean isSorted(List<String> listOfStrings) {
 		return Comparators.isInOrder(listOfStrings, Comparator.<String> naturalOrder());
 	}
@@ -585,6 +624,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		return decimalsVerdict;
 	}
 
+    /*
 	private Verdict textAreaWithoutLength(State state, List<Role> roles) {
 		Verdict textAreaVerdict = Verdict.OK;
 		for(Widget w : state) {
@@ -598,14 +638,15 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		}
 		return textAreaVerdict;
 	}
-
+    */
+    
 	private Verdict elementWithoutChildren(State state, List<Role> roles) {
 		Verdict emptyChildrenVerdict = Verdict.OK;
 		for(Widget w : state) {
 			if(roles.contains(w.get(Tags.Role, Roles.Widget)) && w.childCount() < 1) {
 
-				String verdictMsg = String.format("Detected a Web element without child elements! Role: %s , Path: %s , WebId: %s", 
-						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""));
+				String verdictMsg = String.format("Detected a Web element without child elements! Role: %s , Path: %s , WebId: %s, WebCssClasses: %s",
+						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId), w.get(WdTags.WebCssClasses),"");
 
 				emptyChildrenVerdict = emptyChildrenVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
 			}

@@ -23,7 +23,7 @@ Mode = Generate
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "D:\\Tools\\chromedrivers\\chromedriver110.exe" "1720x800+0+0" "http://digiofficelocal.dodev.nl"
+SUTConnectorValue = "D:\\Tools\\chromedrivers\\chromedriver110.exe" "1720x800+0+0" "https://digiofficelocal.dodev.nl"
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
@@ -42,8 +42,8 @@ AccessBridgeEnabled = false
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 150
-SequenceLength = 150
+Sequences = 3
+SequenceLength = 10
 
 #################################################################
 # Oracles based on suspicious titles
@@ -51,7 +51,7 @@ SequenceLength = 150
 # Regular expression and Tags to apply them
 #################################################################
 
-SuspiciousTitles = ^(?=.*[eE]rror.*|.*[eE]xcepti[o?]n.*|.*[Ee]xceptie.*|.*[fF]out.*|.*[pP]robleem.*)(?!.*[vV]alidatiefout.*|Fout bij synchronisatie|Foutmelding|.*Stoppen ?[bB]ij ?[eE]xceptie|Had klein probleem en wilde overleggen|Aantal[ ]fout|Fout|ctl00_cphDetail_ctl00_dbcPowerShellValidatieScript_fcFoutmelding_pnlWrapper|Alleen wanneer taak foutief is|0 fouten gevonden).*|\\^.*\\^|XSS 5 is mogelijk|Pagina generatietijd -> Server : [0-9]*[1-9]\\.|<[^>]*>|\\&.*\\;|\\%\\w\\w|\\$\\w\\w|^(.*)\\1+
+SuspiciousTitles = ^(?=.*[eE]rror.*|.*[eE]xcepti[o?]n.*|.*[Ee]xceptie.*|.*[fF]out.*|.*[pP]robleem.*)(?!.*[vV]alidatiefout.*|Fout bij synchronisatie|Foutmelding|.*Stoppen ?[bB]ij ?[eE]xceptie|Had klein probleem en wilde overleggen|Aantal[ ]fout|Fout|ctl00_cphDetail_ctl00_dbcPowerShellValidatieScript_fcFoutmelding_pnlWrapper|Alleen wanneer taak foutief is|0 fouten gevonden).*|\\^.*\\^|XSS 5 is mogelijk|Pagina generatietijd -> Server : [0-9]*[1-9]\\.|<[^>]*>|\\&.*\\;|\\%\\w\\w|\\$\\w\\w|\\b((\\D)+)(\\s*\\W*\\s*)\\1(\\b|\\W)
 TagsForSuspiciousOracle = Title;WebName;WebTagName;Desc
 
 #################################################################
@@ -230,5 +230,5 @@ AlwaysCompile = false
 PathToReplaySequence = ./output/temp
 VisualizeActions = false
 ExplorationSampleInterval = 1
-OnlySaveFaultySequences = false
+OnlySaveFaultySequences = true
 OfflineGraphConversion = true
