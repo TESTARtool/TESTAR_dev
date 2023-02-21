@@ -30,6 +30,7 @@
 
 import com.google.common.collect.ArrayListMultimap;
 import org.testar.SutVisualization;
+import org.testar.managers.InputDataManager;
 import org.testar.monkey.Pair;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
@@ -207,7 +208,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 			//CAPS_LOCK + SHIFT + Click clickfilter functionality.
 			if(blackListed(widget)){
 				if(isTypeable(widget)){
-					filteredActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+					filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
 				} else {
 					filteredActions.add(ac.leftClickAt(widget));
 				}
@@ -225,10 +226,10 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 			// type into text boxes
 			if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
 				if(whiteListed(widget) || isUnfiltered(widget)){
-					actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+					actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
 				}else{
 					// filtered and not white listed:
-					filteredActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+					filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
 				}
 			}
 

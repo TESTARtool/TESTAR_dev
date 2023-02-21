@@ -38,6 +38,7 @@ import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.plugin.NativeLinker;
+import org.testar.managers.InputDataManager;
 import org.testar.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
 
@@ -154,7 +155,7 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
 
 			// type into text boxes
 			if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-				actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+				actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
 			}
 
 			// left clicks, but ignore links outside domain

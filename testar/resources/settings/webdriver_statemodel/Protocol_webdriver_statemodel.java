@@ -31,6 +31,7 @@
 
 import com.google.common.collect.ArrayListMultimap;
 import org.testar.RandomActionSelector;
+import org.testar.managers.InputDataManager;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
@@ -112,7 +113,7 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 
 			// type into text boxes
 			if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-				actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+				actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
 			}
 
 			// left clicks, but ignore links outside domain
