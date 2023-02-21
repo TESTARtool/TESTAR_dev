@@ -77,6 +77,7 @@ public class TestWebdriverForcedActions {
 		widget.set(Tags.Shape, Rect.fromCoordinates(0, 0, 100, 100));
 		widget.set(Tags.Role, Roles.Button);
 		widget.set(Tags.Path, "[0,0,1]");
+		widget.set(WdTags.WebIsFullOnScreen, true);
 
 		// Build widget and state identifiers
 		CodingManager.buildIDs(state);
