@@ -37,8 +37,8 @@ public enum ActionType
                 public boolean actionIsThisType(Action action)
                 {
                     return (
-                            action.get(Tags.Role,  null) == ActionRoles.Drag ||
-                            action.get(Tags.Role, null) == ActionRoles.LeftDrag);
+                            action.get(Tags.Role,  ActionRoles.Action) == ActionRoles.Drag ||
+                            action.get(Tags.Role, ActionRoles.Action) == ActionRoles.LeftDrag);
                 }
             },
     SCROLL ("scroll-action")
@@ -46,7 +46,10 @@ public enum ActionType
                 @Override
                 public boolean actionIsThisType(Action action)
                 {
-                    return (action.get(Tags.Slider, null) != null);
+                    return (
+                            action.get(Tags.Slider, null) != null ||
+                            action.get(Tags.Role,  ActionRoles.Action) == ActionRoles.HitKeyScrollDownAction
+                    );
                 }
             },
     HIT_KEY ("hit-key-action")
@@ -55,7 +58,7 @@ public enum ActionType
                 public boolean actionIsThisType(Action action)
                 {
                     return (
-                            action.get(Tags.Role,  null) == ActionRoles.HitKey);
+                            action.get(Tags.Role,  ActionRoles.Action) == ActionRoles.HitKey);
                 }
             },
     INPUT ("input-action")
@@ -63,7 +66,9 @@ public enum ActionType
                 @Override
                 public boolean actionIsThisType(Action action)
                 {
-                    return (action.get(Tags.OriginWidget,null).get(Tags.Role,  null).equals(WdRoles.WdINPUT));
+                    if(action.get(Tags.OriginWidget,null) == null)
+                        return false;
+                    return (action.get(Tags.OriginWidget).get(Tags.Role, ActionRoles.Action).equals(WdRoles.WdINPUT));
                 }
             },
     SUBMIT ("submit-action")
@@ -71,6 +76,8 @@ public enum ActionType
                 @Override
                 public boolean actionIsThisType(Action action)
                 {
+                    if(action.get(Tags.OriginWidget,null) == null)
+                        return false;
                     Widget originWidget = action.get(Tags.OriginWidget, null);
                     Boolean isSubmit = originWidget.get(WdTags.WebType, "").equalsIgnoreCase("submit");
                     return (

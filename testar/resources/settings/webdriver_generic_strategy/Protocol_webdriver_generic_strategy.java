@@ -35,16 +35,16 @@
  import org.testar.monkey.DefaultProtocol;
  import org.testar.monkey.Settings;
  import org.testar.monkey.alayer.*;
- import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
- import org.testar.monkey.alayer.actions.NOP;
- import org.testar.monkey.alayer.actions.StdActionCompiler;
- import org.testar.monkey.alayer.actions.WdFillFormAction;
+ import org.testar.monkey.alayer.Shape;
+ import org.testar.monkey.alayer.actions.*;
+ import org.testar.monkey.alayer.devices.KBKeys;
  import org.testar.monkey.alayer.exceptions.ActionBuildException;
  import org.testar.monkey.alayer.exceptions.StateBuildException;
  import org.testar.monkey.alayer.webdriver.enums.WdTags;
  import org.testar.protocols.WebdriverProtocol;
  import parsing.ParseUtil;
 
+ import java.awt.*;
  import java.util.HashMap;
  import java.util.HashSet;
  import java.util.Map;
@@ -101,18 +101,27 @@
         // iterate through all widgets
         for (Widget widget : state)
         {
-            if(UseSingleFill)
+            // Add the possibility to page down (scroll down) if a widget of the form is not visible below
+            if(isForm(widget) && formContainsNonVisibleWidgetsBelow(widget, widget))
             {
-                // fill forms actions
-                if (isAtBrowserCanvas(widget) && isForm(widget))
-                {
-                    String protocol = settings.get(ConfigTags.ProtocolClass, "");
-                    Action formFillingAction = new WdFillFormAction(ac, widget, protocol.substring(0, protocol.lastIndexOf('/')));
-                    if(!(formFillingAction instanceof NOP))// do nothing with NOP actions - the form was not actionable
-                        actions.add(formFillingAction);
-
-                }
+                Action pageDown = ac.hitKey(KBKeys.VK_PAGE_DOWN);
+                pageDown.set(Tags.OriginWidget, widget);
+                pageDown.set(Tags.Role, ActionRoles.HitKeyScrollDownAction);
+                actions.add(pageDown);
             }
+
+//            if(UseSingleFill)
+//            {
+//                // fill forms actions
+//                if (isAtBrowserCanvas(widget) && isForm(widget))
+//                {
+//                    String protocol = settings.get(ConfigTags.ProtocolClass, "");
+//                    Action formFillingAction = new WdFillFormAction(ac, widget, protocol.substring(0, protocol.lastIndexOf('/')));
+//                    if(!(formFillingAction instanceof NOP))// do nothing with NOP actions - the form was not actionable
+//                        actions.add(formFillingAction);
+//
+//                }
+//            }
             
             // only consider enabled and non-tabu widgets
             if (!widget.get(Enabled, true)) {
@@ -130,16 +139,18 @@
             }
             
             // slides can happen, even though the widget might be blocked
-            addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
-            
+//            addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
+
             // If the element is blocked, Testar can't click on or type in the widget
             if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
                 continue;
             }
             
             // type into text boxes
-            if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
-                if(whiteListed(widget) || isUnfiltered(widget)){
+            if (isAtBrowserCanvas(widget) && isTypeable(widget))
+            {
+                if(whiteListed(widget) || isUnfiltered(widget))
+                {
                     actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
                 }else{
                     // filtered and not white listed:
@@ -173,16 +184,16 @@
             actions = forcedActions;
         }
 
-        if(UseSingleFill && actions.size() > 1)
-        {
-            Set<Action> fillFormActions = new HashSet<>();
-            for (Action action : actions)
-            {
-                if(action instanceof WdFillFormAction)
-                    fillFormActions.add(action);
-            }
-            actions = fillFormActions;
-        }
+//        if(UseSingleFill && actions.size() > 1)
+//        {
+//            Set<Action> fillFormActions = new HashSet<>();
+//            for (Action action : actions)
+//            {
+//                if(action instanceof WdFillFormAction)
+//                    fillFormActions.add(action);
+//            }
+//            actions = fillFormActions;
+//        }
 
         //Showing the grey dots for filtered actions if visualization is on:
         if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
@@ -193,8 +204,8 @@
     @Override
     protected Action selectAction(State state, Set<Action> actions)
     {
-        if(UseSingleFill)
-            return RandomActionSelector.selectAction(actions); //the list only contains FillFormActions
+//        if(UseSingleFill)
+//            return RandomActionSelector.selectAction(actions); //the list only contains FillFormActions
 
         //clone the action
         Action selectedAction = (Action) SerializationUtils.clone(parseUtil.selectAction(state, actions, actionsExecuted));
@@ -210,6 +221,57 @@
         actionsExecuted.put(actionID, timesUsed + 1); //increase by one
         
         return selectedAction;
+    }
+
+    private boolean formContainsNonVisibleWidgetsBelow(Widget formWidget, Widget mainWidget)
+    {
+        boolean areaBelow = false;
+
+        // If the widget is not at browser canvas
+        if(!isAtBrowserCanvas(formWidget)) {
+            Shape widgetShape = formWidget.get(Tags.Shape, null);
+            Shape stateShape = mainWidget.get(Tags.Shape, null);
+            if (widgetShape != null && stateShape != null) {
+                Rectangle stateRect = new java.awt.Rectangle((int)stateShape.x(), (int)stateShape.y(), (int)stateShape.width(), (int)stateShape.height());
+                Rectangle widgetRect = new java.awt.Rectangle((int)widgetShape.x(), (int)widgetShape.y(), (int)widgetShape.width(), (int)widgetShape.height());
+                // Check if is contains area below the form
+                areaBelow = isAreaBelow(widgetRect, stateRect);
+            }
+        }
+
+        if(formWidget.childCount() > 0) {
+            // Iterate through the form element widgets
+            for(int i = 0; i < formWidget.childCount(); i++) {
+                areaBelow = areaBelow || formContainsNonVisibleWidgetsBelow(formWidget.child(i), mainWidget);
+            }
+        }
+
+        return areaBelow;
+    }
+
+    /**
+     * Hi, can you generate me a java method that compares two rectangles (R1 and R2)
+     * and returns a boolean that indicates if R2 contains an area below R1?
+     *
+     * ChatGPT:
+     * Sure, here is an example Java method that takes two Rectangle objects (r1 and r2)
+     * and returns true if r2 contains an area below r1, and false otherwise:
+     *
+     * @param r1
+     * @param r2
+     * @return
+     */
+    private boolean isAreaBelow(Rectangle r1, Rectangle r2) {
+        if (r1.getMaxY() < r2.getMaxY()) {
+            // r1 is completely above r2
+            return false;
+        } else if (r1.getMinY() >= r2.getMaxY()) {
+            // r1 is completely below r2
+            return true;
+        } else {
+            // r1 intersects r2
+            return r1.getMinY() < r2.getMaxY();
+        }
     }
 
     @Override

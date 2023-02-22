@@ -109,6 +109,8 @@ dependencies {
     implementation project(':webdriver')
     implementation project(':windows')
     implementation project(':linux')
+    implementation project(':android')
+    implementation project(':ios')
     implementation project(':strategy')
     implementation files('./lib/jsyntaxpane-1.1.5.jar')
     implementation files('./lib/sikulixapi.jar')
@@ -133,6 +135,7 @@ dependencies {
     implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.1'
     implementation group: 'com.orientechnologies', name: 'orientdb-graphdb', version: '3.0.34'
+    implementation project(path: ':core')
 }
 
 task prepareSettings(type: Copy) {

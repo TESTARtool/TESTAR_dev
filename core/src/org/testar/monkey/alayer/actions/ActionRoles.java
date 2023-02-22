@@ -70,5 +70,6 @@ public final class ActionRoles {
 	DropDown = Role.from("DropDown", Click, KeyDown),
 	PasteTextInto = Role.from("PasteTextInto", ClickAt, Paste),
 	Drag = Role.from("Drag", MouseDown, MouseUp, MouseMove),
-	LeftDrag = Role.from("LeftDrag", Drag);
+	LeftDrag = Role.from("LeftDrag", Drag),
+	HitKeyScrollDownAction = Role.from("HitKeyScrollDownAction", HitKey);
 }
