@@ -29,6 +29,7 @@
  *
  */
 
+import com.google.common.collect.ArrayListMultimap;
 import org.testar.RandomActionSelector;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.alayer.*;
@@ -65,9 +66,8 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 
 		// List of atributes to identify and close policy popups
 		// Set to null to disable this feature
-		policyAttributes = new HashMap<String, String>() {{ 
-			put("id", "sncmp-banner-btn-agree");
-		}};
+		policyAttributes = ArrayListMultimap.create();
+		policyAttributes.put("id", "sncmp-banner-btn-agree");
 	}
 
 	/**

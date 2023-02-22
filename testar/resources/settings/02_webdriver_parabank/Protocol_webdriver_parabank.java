@@ -28,6 +28,7 @@
  *
  */
 
+import com.google.common.collect.ArrayListMultimap;
 import org.testar.SutVisualization;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.Util;
@@ -67,7 +68,8 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 
     // List of atributes to identify and close policy popups
     // Set to null to disable this feature
-    policyAttributes = new HashMap<String, String>() {{ put("class", "lfr-btn-label"); }};
+    policyAttributes = ArrayListMultimap.create();
+    policyAttributes.put("class", "lfr-btn-label");
   }
 
   /**
