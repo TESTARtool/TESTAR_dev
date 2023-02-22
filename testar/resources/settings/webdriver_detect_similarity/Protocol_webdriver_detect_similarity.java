@@ -40,6 +40,7 @@ import org.testar.plugin.NativeLinker;
 import org.testar.action.priorization.ActionTags;
 import org.testar.action.priorization.SimilarityDetection;
 import org.testar.action.priorization.WeightedAction;
+import org.testar.managers.InputDataManager;
 import org.testar.protocols.WebdriverProtocol;
 
 import java.util.*;
@@ -123,7 +124,7 @@ public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
 
 			// type into text boxes
 			if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-				actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+				actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
 			}
 
 			// left clicks, but ignore links outside domain

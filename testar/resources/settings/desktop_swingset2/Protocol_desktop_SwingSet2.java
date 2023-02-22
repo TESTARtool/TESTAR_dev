@@ -29,6 +29,8 @@
  *******************************************************************************************************/
 
 import java.util.Set;
+
+import org.testar.managers.InputDataManager;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.SUT;
@@ -85,7 +87,7 @@ public class Protocol_desktop_SwingSet2 extends DesktopProtocol {
 
                     // type into text boxes
                     if((isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) && !isSourceCodeEditWidget(w)) {
-                        actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+                        actions.add(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
                     }
 
                     //Force actions on some widgets with a wrong accessibility

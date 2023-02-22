@@ -56,6 +56,7 @@ import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.devices.AWTKeyboard;
 import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.devices.Keyboard;
+import org.testar.managers.InputDataManager;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.alayer.Tags;
 import org.testar.protocols.DesktopProtocol;
@@ -364,7 +365,7 @@ public class Protocol_winapi_web_one_drive extends DesktopProtocol {
 
 					// type into text boxes
 					if(isTypeable(w)){
-						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+						actions.add(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
 					}
 
 					// slides
