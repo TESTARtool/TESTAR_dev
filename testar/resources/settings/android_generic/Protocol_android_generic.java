@@ -30,6 +30,7 @@
 
 import org.testar.CodingManager;
 import org.testar.RandomActionSelector;
+import org.testar.managers.InputDataManager;
 import org.testar.screenshotjson.JsonUtils;
 import org.testar.simplestategraph.QLearningActionSelector;
 import org.testar.monkey.alayer.*;
@@ -211,7 +212,7 @@ public class Protocol_android_generic extends AndroidProtocol {
 			if (isTypeable(widget) && notBanned(widget)/*&& (whiteListed(widget) || isUnfiltered(widget))*/) {
 				actions.add(
 						new AndroidActionType(state, widget,
-							this.getRandomText(widget),
+							InputDataManager.getRandomTextInputData(widget),
 							widget.get(AndroidTags.AndroidAccessibilityId,""),
 							widget.get(AndroidTags.AndroidText,""),
 							widget.get(AndroidTags.AndroidClassName,""))

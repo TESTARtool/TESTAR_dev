@@ -82,7 +82,6 @@ import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
 import org.testar.monkey.alayer.windows.WinApiException;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
-import org.testar.managers.DataManager;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.serialisation.ScreenshotSerialiser;
 import org.testar.serialisation.TestSerialiser;
@@ -1082,10 +1081,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			return RandomActionSelector.selectAction(actions);
 		}
 		return retAction;
-	}
-
-	protected String getRandomText(Widget w){
-		return DataManager.getRandomData();
 	}
 
 	/**

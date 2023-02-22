@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2016 - 2022 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
+* Copyright (c) 2016 - 2023 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -54,7 +54,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -66,6 +65,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Set;
 
 
@@ -78,6 +78,27 @@ public class FilteringManager
   public static final String XML_UI_FILTER_VERSION = "1.0.20170515";
   //By default it uses the root path (bin), but it's modified to the selected settings
   public static String PROTOCOL_FILTER_FILE = "protocol_filter.xml";
+
+  // Widget filter types
+  private static final int WIDGET_ACTION_TABU_FILTER = Integer.MIN_VALUE,
+		  WIDGET_ACTION_WHITE_FILTER = Integer.MIN_VALUE + 1,
+		  PRIMITIVE_DATA_TYPE_TEXT = -1,
+		  PRIMITIVE_DATA_TYPE_NUMBER = -2,
+		  ANY_DATA_TYPE = -427,
+		  BASIC_DATA_TYPE_DATE = -13451473,
+		  BASIC_DATA_TYPE_WEBURL = -134513313,
+		  BASIC_DATA_TYPE_EMAIL = -1345133417;
+
+  public static LinkedHashMap<String,Integer> DATA_TYPES;
+  static {
+	  DATA_TYPES = new LinkedHashMap<String,Integer>();
+	  DATA_TYPES.put("ANY",				ANY_DATA_TYPE);
+	  DATA_TYPES.put("PRIMITIVE_TEXT", 	PRIMITIVE_DATA_TYPE_TEXT);
+	  DATA_TYPES.put("PRIMITIVE_NUMBER", 	PRIMITIVE_DATA_TYPE_NUMBER);
+	  DATA_TYPES.put("BASIC_DATE", 		BASIC_DATA_TYPE_DATE);
+	  DATA_TYPES.put("BASIC_EMAIL", 		BASIC_DATA_TYPE_EMAIL);
+	  DATA_TYPES.put("BASIC_WEBURL",		BASIC_DATA_TYPE_WEBURL);
+  }
 
   private static final String XML_TAG_UI_FILTER_ROOT = "TESTAR_uifilter",
       XML_TAG_UI_FILTERING_TYPES = "filtering_types",
@@ -161,11 +182,11 @@ public class FilteringManager
       writer.write("\t</coding_types>\n");
       // filterING types
       writer.write("\t<" + XML_TAG_UI_FILTERING_TYPES + ">\n");
-      writer.write("\t\t<" + XML_TAG_UI_FILTERING + " type=\"" + DataManager.WIDGET_ACTION_TABU_FILTER + "\" desc=\"TABU LIST\"/>\n");
-      writer.write("\t\t<" + XML_TAG_UI_FILTERING + " type=\"" + DataManager.WIDGET_ACTION_WHITE_FILTER + "\" desc=\"WHITE LIST\"/>\n");
-      if (DataManager.DATA_TYPES != null) {
-        for (String type : DataManager.DATA_TYPES.keySet()) {
-          writer.write("\t\t<" + XML_TAG_UI_FILTERING + " type=\"" + DataManager.DATA_TYPES.get(type).toString() + "\" desc=\"" + type + "\"/>\n");
+      writer.write("\t\t<" + XML_TAG_UI_FILTERING + " type=\"" + WIDGET_ACTION_TABU_FILTER + "\" desc=\"TABU LIST\"/>\n");
+      writer.write("\t\t<" + XML_TAG_UI_FILTERING + " type=\"" + WIDGET_ACTION_WHITE_FILTER + "\" desc=\"WHITE LIST\"/>\n");
+      if (DATA_TYPES != null) {
+        for (String type : DATA_TYPES.keySet()) {
+          writer.write("\t\t<" + XML_TAG_UI_FILTERING + " type=\"" + DATA_TYPES.get(type).toString() + "\" desc=\"" + type + "\"/>\n");
         }
       }
       writer.write("\t</" + XML_TAG_UI_FILTERING_TYPES + ">\n");
@@ -284,19 +305,19 @@ public class FilteringManager
     }
     WidgetInfo winfo = widgetsFilterList.get(widgetID);
     switch (widgetFilter) {
-      case DataManager.ANY_DATA_TYPE:
+      case ANY_DATA_TYPE:
         widgetsFilterList.remove(widgetID);
         break;
-      case DataManager.WIDGET_ACTION_TABU_FILTER: // cycle: white -> regular -> tabu
-        if (winfo != null && winfo.filterCode.intValue() == DataManager.WIDGET_ACTION_WHITE_FILTER) {
+      case WIDGET_ACTION_TABU_FILTER: // cycle: white -> regular -> tabu
+        if (winfo != null && winfo.filterCode.intValue() == WIDGET_ACTION_WHITE_FILTER) {
           widgetsFilterList.remove(widgetID);
         }
         else {
           widgetsFilterList.put(widgetID, wi);
         }
         break;
-      case DataManager.WIDGET_ACTION_WHITE_FILTER: // cycle: tabu -> regular -> white
-        if (winfo != null && winfo.filterCode.intValue() == DataManager.WIDGET_ACTION_TABU_FILTER) {
+      case WIDGET_ACTION_WHITE_FILTER: // cycle: tabu -> regular -> white
+        if (winfo != null && winfo.filterCode.intValue() == WIDGET_ACTION_TABU_FILTER) {
           widgetsFilterList.remove(widgetID);
         }
         else {
@@ -350,31 +371,9 @@ public class FilteringManager
 
   private void manageWhiteTabuLists (Widget w, boolean whiteTabuMode, boolean preciseCoding)
   {
-    filterLists(w, whiteTabuMode ? DataManager.WIDGET_ACTION_WHITE_FILTER : DataManager.WIDGET_ACTION_TABU_FILTER,
+    filterLists(w, whiteTabuMode ? WIDGET_ACTION_WHITE_FILTER : WIDGET_ACTION_TABU_FILTER,
         preciseCoding ? CodingManager.ABSTRACT_R_T_P_ID : CodingManager.ABSTRACT_R_T_ID);
     saveFilters();
-  }
-
-  /**
-   * Opens a Dialog asking for "Widget input value type" - not used at the moment
-   *
-   * @param state
-   * @param mouse
-   * @param preciseCoding
-   */
-  public void setWidgetFilter (State state, Mouse mouse, boolean preciseCoding)
-  {
-    Widget cursorWidget = getWidgetUnderCursor(state, mouse);
-    if (cursorWidget == null || DataManager.DATA_TYPES == null || DataManager.DATA_TYPES.isEmpty()) {
-      return;
-    }
-    Object[] options = DataManager.DATA_TYPES.keySet().toArray();
-    String s = (String) JOptionPane.showInputDialog(new JFrame(), "Input values:", "Widget input value type",
-        JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
-    if (DataManager.DATA_TYPES.containsKey(s)) {
-      filterLists(cursorWidget, DataManager.DATA_TYPES.get(s), preciseCoding ? CodingManager.ABSTRACT_R_T_P_ID : CodingManager.ABSTRACT_R_T_ID);
-      saveFilters();
-    }
   }
 
   public boolean blackListed (Widget w)
@@ -383,7 +382,7 @@ public class FilteringManager
     if (wi == null) {
       wi = widgetsFilterList.get(w.get(Tags.Abstract_R_T_ID));
     }
-    return (wi != null && wi.filterCode.intValue() == DataManager.WIDGET_ACTION_TABU_FILTER);
+    return (wi != null && wi.filterCode.intValue() == WIDGET_ACTION_TABU_FILTER);
   }
 
   public boolean whiteListed (Widget w)
@@ -392,30 +391,7 @@ public class FilteringManager
     if (wi == null) {
       wi = widgetsFilterList.get(w.get(Tags.Abstract_R_T_ID));
     }
-    return (wi != null && wi.filterCode.intValue() == DataManager.WIDGET_ACTION_WHITE_FILTER);
-  }
-
-  public String getRandomText (Widget w)
-  {
-    String wid = w.get(Tags.Abstract_R_T_P_ID);
-    ;
-    if (!widgetsFilterList.containsKey(wid)) {
-      wid = w.get(Tags.Abstract_R_T_ID);
-    }
-    if (widgetsFilterList.containsKey(wid)) {
-      int widgetFilter = widgetsFilterList.get(wid).filterCode;
-      if (widgetFilter == DataManager.PRIMITIVE_DATA_TYPE_NUMBER) {
-        return DataManager.getRandomPrimitiveDataTypeNumber();
-      }
-      else if (widgetFilter == DataManager.PRIMITIVE_DATA_TYPE_TEXT) {
-        return DataManager.getRandomPrimitiveDataTypeText();
-      }
-      Set<String> dataSamples = DataManager.INPUT_VALUES.get(widgetFilter);
-      if (dataSamples != null) {
-        return DataManager.getRandom(dataSamples);
-      }
-    }
-    return null;
+    return (wi != null && wi.filterCode.intValue() == WIDGET_ACTION_WHITE_FILTER);
   }
 
   public void visualizeActions (Canvas canvas, State state)
@@ -440,10 +416,10 @@ public class FilteringManager
     Pen pen = null;
     int widgetFilter = widgetsFilterList.get(widgetID).filterCode;
     switch (widgetFilter) {
-      case DataManager.WIDGET_ACTION_WHITE_FILTER:
+      case WIDGET_ACTION_WHITE_FILTER:
         pen = (preciseCoding ? PEN_PRECISE_WHITE : PEN_WHITE);
         break;
-      case DataManager.WIDGET_ACTION_TABU_FILTER:
+      case WIDGET_ACTION_TABU_FILTER:
         pen = (preciseCoding ? PEN_PRECISE_BLACK : PEN_BLACK);
         break;
       default:
