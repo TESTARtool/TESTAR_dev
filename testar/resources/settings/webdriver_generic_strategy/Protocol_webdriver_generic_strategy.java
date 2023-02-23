@@ -31,6 +31,7 @@
  import org.apache.commons.lang.SerializationUtils;
  import org.testar.RandomActionSelector;
  import org.testar.SutVisualization;
+ import org.testar.managers.InputDataManager;
  import org.testar.monkey.ConfigTags;
  import org.testar.monkey.DefaultProtocol;
  import org.testar.monkey.Settings;
@@ -131,7 +132,7 @@
             //CAPS_LOCK + SHIFT + Click clickfilter functionality.
             if(blackListed(widget)){
                 if(isTypeable(widget)){
-                    filteredActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+                    filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
                 } else {
                     filteredActions.add(ac.leftClickAt(widget));
                 }
@@ -151,17 +152,17 @@
             {
                 if(whiteListed(widget) || isUnfiltered(widget))
                 {
-                    actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+                    actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
                 }else{
                     // filtered and not white listed:
-                    filteredActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+                    filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
                 }
             }
             
             // left clicks, but ignore links outside domain
             if (isAtBrowserCanvas(widget) && isClickable(widget)) {
                 if(whiteListed(widget) || isUnfiltered(widget)){
-                    if (!isLinkDenied(widget)) {
+                    if (!isLinkDenied(widget) && widget.get(WdTags.WebType, "").equalsIgnoreCase("submit")) {
                         actions.add(ac.leftClickAt(widget));
                     }else{
                         // link denied:

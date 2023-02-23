@@ -58,7 +58,7 @@ RELATED_ACTION:     'sibling-action' | 'child-action' | 'sibling-or-child-action
 SUT_TYPE:           'windows' | 'linux' | 'android' | 'web';
 
 ACTION_TYPE:        'click-action' | 'type-action' | 'drag-action' | 'scroll-action' | 'hit-key-action'
-|                   'input-action' | 'submit-action';
+|                   'form-input-action' | 'form-submit-action' | 'form-field-action';
 
 /////////////////
 // lexer rules //

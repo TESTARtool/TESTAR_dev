@@ -1,6 +1,7 @@
 package strategynodes;
 
 import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.Roles;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.actions.ActionRoles;
@@ -57,21 +58,10 @@ public enum ActionType
                 @Override
                 public boolean actionIsThisType(Action action)
                 {
-                    return (
-                            action.get(Tags.Role,  ActionRoles.Action) == ActionRoles.HitKey);
+                    return action.get(Tags.Role,  ActionRoles.Action) == ActionRoles.HitKey;
                 }
             },
-    INPUT ("input-action")
-            {
-                @Override
-                public boolean actionIsThisType(Action action)
-                {
-                    if(action.get(Tags.OriginWidget,null) == null)
-                        return false;
-                    return (action.get(Tags.OriginWidget).get(Tags.Role, ActionRoles.Action).equals(WdRoles.WdINPUT));
-                }
-            },
-    SUBMIT ("submit-action")
+    FORM_INPUT("form-input-action")
             {
                 @Override
                 public boolean actionIsThisType(Action action)
@@ -79,12 +69,39 @@ public enum ActionType
                     if(action.get(Tags.OriginWidget,null) == null)
                         return false;
                     Widget originWidget = action.get(Tags.OriginWidget, null);
-                    Boolean isSubmit = originWidget.get(WdTags.WebType, "").equalsIgnoreCase("submit");
-                    return (
-                            action.get(Tags.OriginWidget,null).get(WdTags.WebType, "").equalsIgnoreCase("submit") //&&
-                            //(action.get(Tags.OriginWidget,null).get(Tags.Role) == WdRoles.WdINPUT ||
-                             //action.get(Tags.OriginWidget,null).get(Tags.Role) == WdRoles.WdBUTTON)
-                    );
+                    if(!isChildOfFormWidget(originWidget))
+                        return false;
+                    return originWidget.get(Tags.Role, ActionRoles.Action).equals(WdRoles.WdINPUT);
+                }
+            },
+    FORM_FIELD ("form-field-action")
+            {
+                @Override
+                public boolean actionIsThisType(Action action)
+                {
+                    if(action.get(Tags.OriginWidget,null) == null)
+                        return false;
+                    Widget originWidget = action.get(Tags.OriginWidget, null);
+                    if(!isChildOfFormWidget(originWidget))
+                        return false;
+                    return
+                            (
+                                originWidget.get(Tags.Role, ActionRoles.Action).equals(WdRoles.WdINPUT) &&
+                                (!originWidget.get(WdTags.WebType, "").equalsIgnoreCase("submit"))
+                            );
+                }
+            },
+    FORM_SUBMIT("form-submit-action")
+            {
+                @Override
+                public boolean actionIsThisType(Action action)
+                {
+                    if(action.get(Tags.OriginWidget,null) == null)
+                        return false;
+                    Widget originWidget = action.get(Tags.OriginWidget, null);
+                    if(!isChildOfFormWidget(originWidget))
+                        return false;
+                    return originWidget.get(WdTags.WebType, "").equalsIgnoreCase("submit");
                 }
             };
 
@@ -102,4 +119,11 @@ public enum ActionType
 
     static
     { Arrays.stream(values()).forEach(e -> FROM_STRING.put(e.string, e)); }
+
+    private static boolean isChildOfFormWidget(Widget widget)
+    {
+        if(widget.parent() == null) return false;
+        else if (widget.parent().get(Tags.Role, Roles.Widget).equals(WdRoles.WdFORM)) return true;
+        else return isChildOfFormWidget(widget.parent());
+    }
 }
