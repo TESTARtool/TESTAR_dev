@@ -2,10 +2,9 @@ package strategynodes.action_expr;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Tags;
 import strategynodes.ActionType;
 import strategynodes.Filter;
-import strategynodes.VisitedModifier;
+import strategynodes.VisitModifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,14 +13,14 @@ import java.util.Set;
 
 public class SelectRandomActionNode extends BaseActionNode
 {
-    private final VisitedModifier   VISITED_MODIFIER;
+    private final VisitModifier VISIT_MODIFIER;
     private final Filter            FILTER;
     private final ActionType        ACTION_TYPE;
 
-    public SelectRandomActionNode(Integer weight, VisitedModifier visitedModifier, Filter filter, ActionType actionType)
+    public SelectRandomActionNode(Integer weight, VisitModifier visitModifier, Filter filter, ActionType actionType)
     {
         this.WEIGHT             = (weight != null || weight > 0) ? weight : 1;
-        this.VISITED_MODIFIER   = visitedModifier;
+        this.VISIT_MODIFIER = visitModifier;
         this.FILTER             = filter;
         this.ACTION_TYPE        = actionType;
     }
@@ -31,20 +30,20 @@ public class SelectRandomActionNode extends BaseActionNode
     {
         if(actions.size() == 1) //if there's only one action, pick that one
             return new ArrayList<>(actions).get(0);
-        
-        List<Action> filteredActions = new ArrayList(actions);
-        
-        if(VISITED_MODIFIER != null)
-            filteredActions = filterByVisitedModifier(VISITED_MODIFIER, filteredActions, actionsExecuted);
-        
-        if(FILTER != null && ACTION_TYPE != null)
-            filteredActions = filterByActionType(filteredActions, FILTER, ACTION_TYPE);
-        
-        
+
+        //filter by action type
+        List<Action> filteredActions = (FILTER != null && ACTION_TYPE != null) ?
+                filterByActionType(actions, FILTER, ACTION_TYPE) :
+                new ArrayList<>(actions);
+
+        //filter by visit modifier
+        if(VISIT_MODIFIER != null)
+            filteredActions = filterByVisitModifier(VISIT_MODIFIER, filteredActions, actionsExecuted);
+
         if(filteredActions.isEmpty()) //if nothing has made it through the filters
             return selectRandomAction(actions); //default to picking randomly
         else if (filteredActions.size() == 1)
-            return new ArrayList<>(actions).get(0);
+            return new ArrayList<>(filteredActions).get(0);
         else
             return selectRandomAction(filteredActions); //pick randomly from the filtered list
     }
@@ -53,7 +52,7 @@ public class SelectRandomActionNode extends BaseActionNode
     public String toString()
     {
         String string = WEIGHT + " select-random";
-        if(VISITED_MODIFIER != null) string += " " + VISITED_MODIFIER;
+        if(VISIT_MODIFIER != null) string += " " + VISIT_MODIFIER;
         if(FILTER != null) string += " " + FILTER + " " + ACTION_TYPE.toString();
         return string;
     }

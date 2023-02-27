@@ -2,9 +2,7 @@ IF
     any-exist unvisited of-type form-field-action
 THEN
     select-random unvisited of-type form-field-action
-ELSE
-    IF
-       any-exist of-type scroll-action
+ELSE IF any-exist unvisited of-type scroll-action
     THEN
         select-random of-type scroll-action
     ELSE

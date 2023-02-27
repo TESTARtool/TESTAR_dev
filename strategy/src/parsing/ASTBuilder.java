@@ -81,7 +81,7 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     @Override
     public NumberOfActionsNode visitNumber_of_actions(StrategyParser.Number_of_actionsContext ctx)
     {
-        VisitedModifier visitModifier = (ctx.VISIT_MODIFIER() == null) ? null : VisitedModifier.toEnum(ctx.VISIT_MODIFIER().getText());
+        VisitModifier visitModifier = (ctx.VISIT_MODIFIER() == null) ? null : VisitModifier.toEnum(ctx.VISIT_MODIFIER().getText());
         Filter filter = (ctx.FILTER() == null) ? null : Filter.toEnum(ctx.FILTER().getText());
         ActionType actionType = (ctx.ACTION_TYPE() == null) ? null : ActionType.toEnum(ctx.ACTION_TYPE().getText());
         
@@ -107,7 +107,7 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     @Override
     public AnyExistNode visitAnyExist(StrategyParser.AnyExistContext ctx)
     {
-        VisitedModifier visitModifier = (ctx.VISIT_MODIFIER() == null) ? null :  VisitedModifier.toEnum(ctx.VISIT_MODIFIER().getText());
+        VisitModifier visitModifier = (ctx.VISIT_MODIFIER() == null) ? null :  VisitModifier.toEnum(ctx.VISIT_MODIFIER().getText());
         Filter filter = (ctx.FILTER() == null) ? null : Filter.toEnum(ctx.FILTER().getText());
         ActionType actionType = (ctx.ACTION_TYPE() == null) ? null : ActionType.toEnum(ctx.ACTION_TYPE().getText());
         
@@ -124,7 +124,7 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     @Override
     public AnyExistRelatedActionNode visitAnyExistRelatedAction(StrategyParser.AnyExistRelatedActionContext ctx)
     {
-        VisitedModifier visitModifier = (ctx.VISIT_MODIFIER() == null) ? null:  VisitedModifier.toEnum(ctx.VISIT_MODIFIER().getText());
+        VisitModifier visitModifier = (ctx.VISIT_MODIFIER() == null) ? null:  VisitModifier.toEnum(ctx.VISIT_MODIFIER().getText());
         return new AnyExistRelatedActionNode(visitModifier, RelatedAction.toEnum(ctx.RELATED_ACTION().getText()));
     }
     
@@ -152,7 +152,7 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     public SelectRandomActionNode visitSelectRandomAction(StrategyParser.SelectRandomActionContext ctx)
     {
         int weight = ctx.NUMBER() == null ? 1 : Integer.parseInt(ctx.NUMBER().getText());
-        VisitedModifier visitModifier = (ctx.VISIT_MODIFIER() == null) ? null:  VisitedModifier.toEnum(ctx.VISIT_MODIFIER().getText());
+        VisitModifier visitModifier = (ctx.VISIT_MODIFIER() == null) ? null:  VisitModifier.toEnum(ctx.VISIT_MODIFIER().getText());
         Filter filter = (ctx.FILTER() == null) ? null: Filter.toEnum(ctx.FILTER().getText());
         ActionType actionType = (ctx.ACTION_TYPE() == null) ? null: ActionType.toEnum(ctx.ACTION_TYPE().getText());
         
@@ -161,7 +161,7 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     @Override public SelectRelationNode visitSelectRelatedAction(StrategyParser.SelectRelatedActionContext ctx)
     {
         int weight = ctx.NUMBER() == null ? 1 : Integer.parseInt(ctx.NUMBER().getText());
-        VisitedModifier visitModifier = (ctx.VISIT_MODIFIER() == null) ? null:  VisitedModifier.toEnum(ctx.VISIT_MODIFIER().getText());
+        VisitModifier visitModifier = (ctx.VISIT_MODIFIER() == null) ? null:  VisitModifier.toEnum(ctx.VISIT_MODIFIER().getText());
         RelatedAction relatedAction = (ctx.RELATED_ACTION() == null) ? null : RelatedAction.toEnum(ctx.RELATED_ACTION().getText());
         
         return new SelectRelationNode(weight, visitModifier, relatedAction);

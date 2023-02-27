@@ -14,9 +14,9 @@ public abstract class BaseStrategyNode<T>
     @Override
     public abstract String toString();
     
-    protected Boolean validActionExists(VisitedModifier visitedModifier, Set<Action> actions, Map<String, Integer> actionsExecuted)
+    protected Boolean validActionExists(VisitModifier visitModifier, List<Action> actions, Map<String, Integer> actionsExecuted)
     {
-        switch(visitedModifier)
+        switch(visitModifier)
                 {
                     case LEAST_VISITED: return validLeastVisitedExists(actions, actionsExecuted);
                     case MOST_VISITED: return validMostVisitedExists(actions, actionsExecuted);
@@ -25,7 +25,7 @@ public abstract class BaseStrategyNode<T>
                 };
         return null;
     }
-    private boolean validLeastVisitedExists(Set<Action> actions, Map<String, Integer> actionsExecuted)
+    private boolean validLeastVisitedExists(List<Action> actions, Map<String, Integer> actionsExecuted)
     {
         int targetCount = (actionsExecuted.size() == 0) ? 0 : Collections.min(actionsExecuted.values());
         
@@ -39,7 +39,7 @@ public abstract class BaseStrategyNode<T>
         return false;
     }
     
-    private boolean validMostVisitedExists(Set<Action> actions, Map<String, Integer> actionsExecuted)
+    private boolean validMostVisitedExists(List<Action> actions, Map<String, Integer> actionsExecuted)
     {
         int targetCount = (actionsExecuted.size() == 0) ? 0 : Collections.max(actionsExecuted.values());
         for(Action action : actions)
@@ -52,7 +52,7 @@ public abstract class BaseStrategyNode<T>
         return false;
     }
     
-    private boolean validUnvisitedExists(Set<Action> actions, Map<String, Integer> actionsExecuted)
+    private boolean validUnvisitedExists(List<Action> actions, Map<String, Integer> actionsExecuted)
     {
         for(Action action : actions)
         {
@@ -63,7 +63,7 @@ public abstract class BaseStrategyNode<T>
         return false;
     }
     
-    private boolean validVisitedExists(Set<Action> actions, Map<String, Integer> actionsExecuted)
+    private boolean validVisitedExists(List<Action> actions, Map<String, Integer> actionsExecuted)
     {
         for(Action action : actions)
         {
@@ -73,14 +73,14 @@ public abstract class BaseStrategyNode<T>
         }
         return false;
     }
-    protected List<Action> filterByVisitedModifier(VisitedModifier visitedModifier, List<Action> actions, Map<String, Integer> actionsExecuted)
+    protected List<Action> filterByVisitModifier(VisitModifier visitModifier, List<Action> actions, Map<String, Integer> actionsExecuted)
     {
-        switch(visitedModifier)
+        switch(visitModifier)
                 {
-                    case LEAST_VISITED: filterLeastVisited(actions, actionsExecuted);
-                    case MOST_VISITED: filterMostVisited(actions, actionsExecuted);
-                    case UNVISITED: filterUnvisited(actions, actionsExecuted);
-                    case VISITED: filterVisited(actions, actionsExecuted);
+                    case LEAST_VISITED: return filterLeastVisited(actions, actionsExecuted);
+                    case MOST_VISITED: return filterMostVisited(actions, actionsExecuted);
+                    case UNVISITED: return filterUnvisited(actions, actionsExecuted);
+                    case VISITED: return filterVisited(actions, actionsExecuted);
                 };
         return null;
     }
@@ -148,18 +148,8 @@ public abstract class BaseStrategyNode<T>
         }
         return filteredActions;
     }
-    
-    protected boolean validActionTypeExists(Set<Action> actions, Filter filter, ActionType actionType)
-    {
-        for(Action action : actions)
-        {
-            boolean actionIsOfType = (actionType.actionIsThisType(action));
-            if((filter == Filter.INCLUDE && actionIsOfType) || (filter == Filter.EXCLUDE && (!actionIsOfType)))
-                return true;
-        }
-        return false;
-    }
-    protected List<Action> filterByActionType(List<Action> actions, Filter filter, ActionType actionType)
+
+    protected List<Action> filterByActionType(Set<Action> actions, Filter filter, ActionType actionType)
     {
         List<Action> filteredActions = new ArrayList<>();
         for(Action action : actions)
@@ -171,10 +161,10 @@ public abstract class BaseStrategyNode<T>
         return filteredActions;
     }
     
-    protected boolean validRelationExists(Action prevAction, Set<Action> actions, RelatedAction relatedAction)
+    protected boolean validRelationExists(Action prevAction, VisitModifier visitModifier, RelatedAction relatedAction, List<Action> actions, Map<String, Integer> actionsExecuted)
     {
         Widget prevWidget = prevAction.get(Tags.OriginWidget);
-        
+
         for(Action action : actions)
         {
             Widget widget = action.get(Tags.OriginWidget);

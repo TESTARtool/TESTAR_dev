@@ -2,38 +2,42 @@ package strategynodes.bool_expr;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Tags;
 import strategynodes.ActionType;
 import strategynodes.BaseStrategyNode;
 import strategynodes.Filter;
-import strategynodes.VisitedModifier;
+import strategynodes.VisitModifier;
 
 import java.util.*;
 
 public class NumberOfActionsNode extends BaseStrategyNode<Integer>
 {
-    private final VisitedModifier   VISITED_MODIFIER;
+    private final VisitModifier VISIT_MODIFIER;
     private final Filter            FILTER;
     private final ActionType        ACTION_TYPE;
     
-    public NumberOfActionsNode(VisitedModifier visitedModifier, Filter filter, ActionType actionType)
+    public NumberOfActionsNode(VisitModifier visitModifier, Filter filter, ActionType actionType)
     {
-        this.VISITED_MODIFIER   = visitedModifier;
+        this.VISIT_MODIFIER = visitModifier;
         this.FILTER             = filter;
         this.ACTION_TYPE        = actionType;
     }
     
     @Override
-    public Integer getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted) //todo: check if it works
+    public Integer getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
-        List<Action> filteredActions = new ArrayList(actions);
-        
-        if(VISITED_MODIFIER != null)
-            filteredActions = filterByVisitedModifier(VISITED_MODIFIER, filteredActions, actionsExecuted);
-        
-        if(FILTER != null && ACTION_TYPE != null)
-            filteredActions = filterByActionType(filteredActions, FILTER, ACTION_TYPE);
-        
+        //if there are no filters to apply, any action is valid
+        if(VISIT_MODIFIER == null && FILTER == null && ACTION_TYPE == null && !actions.isEmpty())
+            return actions.size();
+
+        //filter by action type
+        List<Action> filteredActions = (FILTER != null && ACTION_TYPE != null) ?
+                filterByActionType(actions, FILTER, ACTION_TYPE) :
+                new ArrayList<>(actions);
+
+        //filter by visit modifier
+        if(VISIT_MODIFIER != null)
+            filteredActions = filterByVisitModifier(VISIT_MODIFIER, filteredActions, actionsExecuted);
+
         return filteredActions.size();
     }
     
@@ -41,8 +45,8 @@ public class NumberOfActionsNode extends BaseStrategyNode<Integer>
     public String toString()
     {
         String string = "n-actions";
-        if(VISITED_MODIFIER != null) string += " " + VISITED_MODIFIER.toString();
-        if(FILTER != null) string += " " + FILTER.toString() + " " + ACTION_TYPE.toString();
+        if(VISIT_MODIFIER != null) string += " " + VISIT_MODIFIER;
+        if(FILTER != null) string += " " + FILTER + " " + ACTION_TYPE.toString();
         return string;
     }
 }
