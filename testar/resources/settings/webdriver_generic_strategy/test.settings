@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "http://localhost:8000/forms/emanf1nf2nl1pasteltexurlusremanf1nf2nl1pasteltexurlusremanf1nf2nl1pasteltexurlusremanf1nf2nl1pasteltexurlusremanf1nf2nl1pasteltexurlusremanf1nf2nl1pasteltexurlusr"
+SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://django.testar.org/forms/emanf1nf2nl1pasteltexurlusremanf1nf2nl1pasteltexurlusremanf1nf2nl1pasteltexurlusremanf1nf2nl1pasteltexurlusremanf1nf2nl1pasteltexurlusremanf1nf2nl1pasteltexurlusr"
 
 #################################################################
 # Sequences
@@ -170,7 +170,7 @@ ProtocolSpecificSetting_5 =
 # Strategy settings
 #################################################################
 
-StrategyFile = settings/webdriver_generic_strategy/relation_strategy.txt
+StrategyFile = settings/webdriver_generic_strategy/human_strategy.txt
 UseSingleFill = false
 
 #################################################################

@@ -225,9 +225,9 @@ public abstract class BaseStrategyNode<T>
     }
     private boolean widgetIsChild(Widget parent, Widget child)
     {
-        return (child.parent().get(Tags.ConcreteIDCustom).equals(parent.get(Tags.ConcreteIDCustom)));
+        return (child.parent().get(Tags.AbstractIDCustom).equals(parent.get(Tags.AbstractIDCustom)));
     }
     
     private boolean widgetIsSibling(Widget widget1, Widget widget2)
-    { return widget1.parent().get(Tags.ConcreteIDCustom).equals(widget2.parent().get(Tags.ConcreteIDCustom)); }
+    { return widget1.parent().get(Tags.AbstractIDCustom).equals(widget2.parent().get(Tags.AbstractIDCustom)); }
 }
