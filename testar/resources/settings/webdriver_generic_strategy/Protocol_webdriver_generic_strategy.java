@@ -121,7 +121,7 @@
         for (Widget widget : state)
         {
             // Add the possibility to page down (scroll down) if a widget of the form is not visible below
-            if(isForm(widget) && formContainsNonVisibleWidgetsBelow(widget))
+            if(isForm(widget) && formContainsNonVisibleSubmitButtonBelow(widget))
             {
                 Action pageDown = ac.hitKey(KBKeys.VK_PAGE_DOWN);
                 pageDown.set(Tags.OriginWidget, widget);
@@ -240,6 +240,25 @@
         actionsExecuted.put(actionID, timesUsed + 1); //increase by one
         
         return selectedAction;
+    }
+
+    private boolean formContainsNonVisibleSubmitButtonBelow(Widget formChildWidget)
+    {
+    	boolean submitButtonBelow = false;
+
+    	// If the widget is not at browser canvas
+    	if(!isAtBrowserCanvas(formChildWidget)) {
+    		submitButtonBelow = formChildWidget.get(WdTags.WebType, "").equalsIgnoreCase("submit");
+    	}
+
+    	if(formChildWidget.childCount() > 0) {
+    		// Iterate through the form element widgets
+    		for(int i = 0; i < formChildWidget.childCount(); i++) {
+    			submitButtonBelow = submitButtonBelow || formContainsNonVisibleWidgetsBelow(formChildWidget.child(i));
+    		}
+    	}
+
+    	return submitButtonBelow;
     }
 
     private boolean formContainsNonVisibleWidgetsBelow(Widget formChildWidget)
