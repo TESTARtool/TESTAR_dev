@@ -120,13 +120,13 @@ public class InputDataManager {
 	 */
 	public static String getRandomUrlInput(){
 		List<String> urls = Lists.newArrayList(
-				"www.foo.com", 
-				"www.boo.com", 
-				"www.fooboo.com",
-				"www.foo.org",
-				"www.boo.org",
-				"www.fooboo.org",
-				"www.testar.org");
+				"https://www.foo.com",
+				"http://www.boo.com",
+				"https://www.fooboo.com",
+				"http://www.foo.org",
+				"https://www.boo.org",
+				"http://www.fooboo.org",
+				"https://www.testar.org");
 
 		return urls.get(new Random().nextInt(urls.size()));
 	}

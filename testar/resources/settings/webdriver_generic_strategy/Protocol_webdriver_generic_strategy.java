@@ -29,23 +29,28 @@
  */
 
  import org.apache.commons.lang.SerializationUtils;
- import org.testar.RandomActionSelector;
  import org.testar.SutVisualization;
  import org.testar.managers.InputDataManager;
  import org.testar.monkey.ConfigTags;
  import org.testar.monkey.DefaultProtocol;
  import org.testar.monkey.Settings;
- import org.testar.monkey.alayer.*;
  import org.testar.monkey.alayer.Shape;
- import org.testar.monkey.alayer.actions.*;
+ import org.testar.monkey.alayer.*;
+ import org.testar.monkey.alayer.actions.ActionRoles;
+ import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+ import org.testar.monkey.alayer.actions.StdActionCompiler;
  import org.testar.monkey.alayer.devices.KBKeys;
  import org.testar.monkey.alayer.exceptions.ActionBuildException;
  import org.testar.monkey.alayer.exceptions.StateBuildException;
+ import org.testar.monkey.alayer.webdriver.WdDriver;
  import org.testar.monkey.alayer.webdriver.enums.WdTags;
  import org.testar.protocols.WebdriverProtocol;
  import parsing.ParseUtil;
 
  import java.awt.*;
+ import java.io.File;
+ import java.io.FileWriter;
+ import java.io.IOException;
  import java.util.HashMap;
  import java.util.HashSet;
  import java.util.Map;
@@ -53,8 +58,6 @@
 
  import static org.testar.monkey.alayer.Tags.Blocked;
  import static org.testar.monkey.alayer.Tags.Enabled;
- import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
- import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
  public class Protocol_webdriver_generic_strategy extends WebdriverProtocol
 {
@@ -68,6 +71,21 @@
         super.initialize(settings);
         parseUtil = new ParseUtil(settings.get(ConfigTags.StrategyFile));
         UseSingleFill = settings.get(ConfigTags.UseSingleFill);
+
+
+        try {
+            File myObj = new File("metrics.txt");
+            if (myObj.createNewFile())
+            {
+                System.out.println("File created: " + myObj.getName());
+            } else
+            {
+                System.out.println("File already exists.");
+            }
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
     
     @Override
@@ -132,7 +150,7 @@
             //CAPS_LOCK + SHIFT + Click clickfilter functionality.
             if(blackListed(widget)){
                 if(isTypeable(widget)){
-                    filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
+                    filteredActions.add(ac.pasteTextInto(widget, InputDataManager.getRandomTextInputData(widget), true));
                 } else {
                     filteredActions.add(ac.leftClickAt(widget));
                 }
@@ -152,10 +170,10 @@
             {
                 if(whiteListed(widget) || isUnfiltered(widget))
                 {
-                    actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
+                    actions.add(ac.pasteTextInto(widget, InputDataManager.getRandomTextInputData(widget), true));
                 }else{
                     // filtered and not white listed:
-                    filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
+                    filteredActions.add(ac.pasteTextInto(widget, InputDataManager.getRandomTextInputData(widget), true));
                 }
             }
             
@@ -229,9 +247,11 @@
         boolean areaBelow = false;
 
         // If the widget is not at browser canvas
-        if(!isAtBrowserCanvas(formChildWidget)) {
+        if(!isAtBrowserCanvas(formChildWidget))
+        {
             Shape widgetShape = formChildWidget.get(Tags.Shape, null);
-            if (widgetShape != null && cv != null) {
+            if (widgetShape != null && cv != null)
+            {
                 Rectangle canvasRect = new java.awt.Rectangle((int)cv.x(), (int)cv.y(), (int)cv.width(), (int)cv.height());
                 Rectangle widgetRect = new java.awt.Rectangle((int)widgetShape.x(), (int)widgetShape.y(), (int)widgetShape.width(), (int)widgetShape.height());
                 // Check if is contains area below the form
@@ -274,6 +294,44 @@
         }
     }
 
+    /**
+     * TESTAR uses this method to determine when to stop the generation of actions for the
+     * current sequence. You can stop deriving more actions after:
+     * - a specified amount of executed actions, which is specified through the SequenceLength setting, or
+     * - after a specific time, that is set in the MaxTime setting
+     * @return  if <code>true</code> continue generation, else stop
+     */
+    @Override
+    protected boolean moreActions(State state)
+    {
+        for(Widget widget : state)
+        {
+            if(widget.get(WdTags.WebTextContent, "").equalsIgnoreCase("return to form"))
+                return false;
+        }
+        return super.moreActions(state);
+    }
+
+    /**
+     * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
+     *
+     * super.postSequenceProcessing() is adding test verdict into the HTML sequence report
+     */
+    @Override
+    protected void postSequenceProcessing()
+    {
+        super.postSequenceProcessing();
+
+        try {
+            FileWriter myWriter = new FileWriter("metrics.txt");
+            myWriter.write(WdDriver.getCurrentUrl() + " no. actions: " + (actionCount-1));
+            myWriter.close();
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected void closeTestSession()
     {
@@ -281,7 +339,7 @@
         if(settings.get(ConfigTags.Mode).equals(Modes.Generate))
         {
             compressOutputRunFolder();
-            copyOutputToNewFolderUsingIpAddress("N:");
+//            copyOutputToNewFolderUsingIpAddress("N:");
         }
     }
 }
