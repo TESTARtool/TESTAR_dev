@@ -358,7 +358,7 @@
         if(settings.get(ConfigTags.Mode).equals(Modes.Generate))
         {
             compressOutputRunFolder();
-//            copyOutputToNewFolderUsingIpAddress("N:");
+            copyOutputToNewFolderUsingIpAddress("N:");
         }
     }
 }
