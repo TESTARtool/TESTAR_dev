@@ -103,7 +103,7 @@
         for (Widget widget : state)
         {
             // Add the possibility to page down (scroll down) if a widget of the form is not visible below
-            if(isForm(widget) && formContainsNonVisibleWidgetsBelow(widget, widget))
+            if(isForm(widget) && formContainsNonVisibleWidgetsBelow(widget))
             {
                 Action pageDown = ac.hitKey(KBKeys.VK_PAGE_DOWN);
                 pageDown.set(Tags.OriginWidget, widget);
@@ -224,26 +224,25 @@
         return selectedAction;
     }
 
-    private boolean formContainsNonVisibleWidgetsBelow(Widget formWidget, Widget mainWidget)
+    private boolean formContainsNonVisibleWidgetsBelow(Widget formChildWidget)
     {
         boolean areaBelow = false;
 
         // If the widget is not at browser canvas
-        if(!isAtBrowserCanvas(formWidget)) {
-            Shape widgetShape = formWidget.get(Tags.Shape, null);
-            Shape stateShape = mainWidget.get(Tags.Shape, null);
-            if (widgetShape != null && stateShape != null) {
-                Rectangle stateRect = new java.awt.Rectangle((int)stateShape.x(), (int)stateShape.y(), (int)stateShape.width(), (int)stateShape.height());
+        if(!isAtBrowserCanvas(formChildWidget)) {
+            Shape widgetShape = formChildWidget.get(Tags.Shape, null);
+            if (widgetShape != null && cv != null) {
+                Rectangle canvasRect = new java.awt.Rectangle((int)cv.x(), (int)cv.y(), (int)cv.width(), (int)cv.height());
                 Rectangle widgetRect = new java.awt.Rectangle((int)widgetShape.x(), (int)widgetShape.y(), (int)widgetShape.width(), (int)widgetShape.height());
                 // Check if is contains area below the form
-                areaBelow = isAreaBelow(widgetRect, stateRect);
+                areaBelow = isAreaBelow(widgetRect, canvasRect);
             }
         }
 
-        if(formWidget.childCount() > 0) {
+        if(formChildWidget.childCount() > 0) {
             // Iterate through the form element widgets
-            for(int i = 0; i < formWidget.childCount(); i++) {
-                areaBelow = areaBelow || formContainsNonVisibleWidgetsBelow(formWidget.child(i), mainWidget);
+            for(int i = 0; i < formChildWidget.childCount(); i++) {
+                areaBelow = areaBelow || formContainsNonVisibleWidgetsBelow(formChildWidget.child(i));
             }
         }
 
