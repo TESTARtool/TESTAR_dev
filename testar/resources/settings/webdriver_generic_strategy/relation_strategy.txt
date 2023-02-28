@@ -2,5 +2,9 @@ IF
     any-exist sibling-or-child-action
 THEN
     select-related sibling-or-child-action
-ELSE
-    select-random
+ELSE IF
+        any-exist unvisited of-type form-submit-action
+    THEN
+        select-random unvisited of-type form-submit-action
+    ELSE
+        select-random of-type scroll-action

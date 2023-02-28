@@ -254,7 +254,7 @@
     	if(formChildWidget.childCount() > 0) {
     		// Iterate through the form element widgets
     		for(int i = 0; i < formChildWidget.childCount(); i++) {
-    			submitButtonBelow = submitButtonBelow || formContainsNonVisibleWidgetsBelow(formChildWidget.child(i));
+    			submitButtonBelow = submitButtonBelow || formContainsNonVisibleSubmitButtonBelow(formChildWidget.child(i));
     		}
     	}
 
