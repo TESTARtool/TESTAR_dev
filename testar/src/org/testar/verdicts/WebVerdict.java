@@ -59,7 +59,7 @@ import com.google.common.collect.Comparators;
 public class WebVerdict {
 
 	// By default consider that all the verdicts of the class are enabled
-	public static List<String> enabledVerdicts = Arrays.stream(WebVerdict.class.getDeclaredMethods())
+	public static List<String> enabledWebVerdicts = Arrays.stream(WebVerdict.class.getDeclaredMethods())
 			.filter(classMethod -> java.lang.reflect.Modifier.isPublic(classMethod.getModifiers()))
 			.map(java.lang.reflect.Method::getName)
 			.collect(Collectors.toList());
@@ -67,7 +67,7 @@ public class WebVerdict {
 	public static Verdict verdictAlertSuspiciousMessage(State state, String pattern, Action lastExecutedAction) {
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-		if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
 
 		// If it is enabled, then execute the verdict implementation
 		Verdict alertVerdict = Verdict.OK;
@@ -93,7 +93,7 @@ public class WebVerdict {
 	public static Verdict verdictNumberWithLotOfDecimals(State state, int maxDecimals) {
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-		if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
 
 		// If it is enabled, then execute the verdict implementation
 		Verdict decimalsVerdict = Verdict.OK;
@@ -128,11 +128,10 @@ public class WebVerdict {
 		return true;
 	}
 
-	// TODO: Improve visualization highlighting the specific rows
 	public static Verdict verdictDetectDuplicatedRowsInTable(State state) {
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-		if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
 
 		// If it is enabled, then execute the verdict implementation
 		Verdict duplicateRowsInTableVerdict = Verdict.OK;
@@ -191,7 +190,7 @@ public class WebVerdict {
 	public static Verdict verdictEmptySelectItemsVerdict(State state) {
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-		if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
 
 		// If it is enabled, then execute the verdict implementation
 		Verdict emptySelectListVerdict = Verdict.OK;
@@ -217,7 +216,7 @@ public class WebVerdict {
 	public static Verdict verdictUnsortedSelectOptionsVerdict(State state) {
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-		if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
 
 		// If it is enabled, then execute the verdict implementation
 		Verdict unsortedSelectElementVerdict = Verdict.OK;
@@ -250,7 +249,7 @@ public class WebVerdict {
 	public static Verdict verdictTextAreaWithoutLength(State state, List<Role> roles) {
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-		if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
 
 		// If it is enabled, then execute the verdict implementation
 		Verdict textAreaVerdict = Verdict.OK;
@@ -271,7 +270,7 @@ public class WebVerdict {
 	public static Verdict verdictElementWithoutChildren(State state, List<Role> roles) {
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-		if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
 
 		// If it is enabled, then execute the verdict implementation
 		Verdict emptyChildrenVerdict = Verdict.OK;
@@ -287,16 +286,15 @@ public class WebVerdict {
 		return emptyChildrenVerdict;
 	}
 
-	// TODO: Improve with Robin code
 	public static Verdict verdictUniqueRadioInput(State state) {
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-		if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
 
 		// If it is enabled, then execute the verdict implementation
 		Verdict radioInputVerdict = Verdict.OK;
 		for(Widget w : state) {
-			if(isRadioInput(w) && !siblingRoleElement(w, WdRoles.WdINPUT)) {
+			if(isRadioInput(w) && !siblingRoleElementIsRadioInput(w)) {
 
 				String verdictMsg = String.format("Detected a Web radio input element with a Unique option! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
 						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
@@ -312,14 +310,17 @@ public class WebVerdict {
 	}
 
 	/**
-	 * Check if a widget contains a sibling element.
+	 * Check if a widget contains a sibling radio input web element. 
+	 * 
+	 * @param w
+	 * @return
 	 */
-	private static boolean siblingRoleElement(Widget w, Role role) {
+	private static boolean siblingRoleElementIsRadioInput(Widget w) {
 		if(w.parent() == null) return false;
 		Widget parent = w.parent();
 		for(int i=0; i < parent.childCount(); i++) {
 			// If the parent contains a widget child that is not the current widget, return true
-			if(parent.child(i).get(Tags.Role, Roles.Widget).equals(role) && parent.child(i) != w) {
+			if(isRadioInput(parent.child(i)) && parent.child(i) != w) {
 				return true;
 			}
 		}

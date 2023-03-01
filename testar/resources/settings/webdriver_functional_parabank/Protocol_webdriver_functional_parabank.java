@@ -28,6 +28,9 @@
  *
  */
 
+import org.languagetool.language.AmericanEnglish;
+import org.languagetool.language.BritishEnglish;
+import org.languagetool.language.Dutch;
 import org.testar.SutVisualization;
 import org.testar.monkey.Pair;
 import org.testar.monkey.Util;
@@ -43,6 +46,8 @@ import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.plugin.NativeLinker;
 import org.testar.protocols.WebdriverProtocol;
+import org.testar.reporting.HTMLStateVerdictReport;
+import org.testar.verdicts.GenericVerdict;
 import org.testar.verdicts.WebVerdict;
 
 import com.google.common.collect.Comparators;
@@ -79,11 +84,11 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
  * - Radio button panel with only one option (input)
  * - Panel without children (form, div)
  * - Web alert with suspicious message
+ * - Spell checker in a file list that allows users to uncomment or configure. Also prepare a specific directory for the spell checker errors found. this will not block the sequence
+ * 
  * - TODO: JavaScript loop to hang the browser - devTools
  * - TODO: JavaScript refresh browser constantly - devTools
  * - TODO: textarea with rows and columns to detect enter click
- * - TODO: Spell checker in a file list that allows users to uncomment or configure. Also prepare a specific directory for the spell checker errors found. this will not block the sequence
- * - TODO: Customize spell checker to ignore some widgets
  * - TODO: Add URL related with the states (clickable link)
  * - TODO: List of possible issues for different verdicts and allow user to customize different oracles for the SUT elements. List like spell checking
  * - TODO: Now draw the widget highlight in all the screenshots of the state. Only in the last HTML report screen.
@@ -241,6 +246,13 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 	 * @return
 	 */
 	private Verdict getUniqueFunctionalVerdict(Verdict verdict, State state) {
+		// Check the functional Verdict that detects the spell checking.
+		// Instead of stop the sequence and report a warning verdict,
+		// report the information in a specific HTML report
+		// and continue testing
+		Verdict spellCheckerVerdict = GenericVerdict.verdictSpellChecker(state, WdTags.WebTextContent, new AmericanEnglish());
+		if(spellCheckerVerdict != Verdict.OK) HTMLStateVerdictReport.reportStateVerdict(actionCount, state, spellCheckerVerdict);
+
 		// Check the functional Verdict that detects if a downloaded file is empty.
 		verdict = watcherFileEmptyFile();
 		if (shouldReturnVerdict(verdict)) return verdict;

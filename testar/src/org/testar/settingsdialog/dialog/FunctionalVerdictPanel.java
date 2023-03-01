@@ -38,13 +38,18 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.table.DefaultTableModel;
+
 import org.testar.monkey.Settings;
 import org.testar.settingsdialog.SettingsPanel;
+import org.testar.verdicts.GenericVerdict;
 import org.testar.verdicts.WebVerdict;
 
 public class FunctionalVerdictPanel extends SettingsPanel {
 
 	private static final long serialVersionUID = -6397375336958507515L;
+
+	private GenericTableModel genericVerdictsModel = new GenericTableModel(new String[]{"Generic Verdict Name", "Enable Generic Verdict"});
+	private WebTableModel webVerdictsModel = new WebTableModel(new String[]{"Web Verdict Name", "Enable Web Verdict"});
 
 	public FunctionalVerdictPanel() {
 		setLayout(null);
@@ -61,19 +66,28 @@ public class FunctionalVerdictPanel extends SettingsPanel {
 		 * Load the dynamic table elements
 		 */
 
-		System.out.println("FunctionalVerdictPanel Initial WebVerdict.enabledVerdicts: " + Arrays.toString(WebVerdict.enabledVerdicts.toArray()));
+		System.out.println("FunctionalVerdictPanel Initial GenericVerdict.enabledVerdicts: " + Arrays.toString(GenericVerdict.enabledVerdicts.toArray()));
+		System.out.println("FunctionalVerdictPanel Initial WebVerdict.enabledWebVerdicts: " + Arrays.toString(WebVerdict.enabledWebVerdicts.toArray()));
 
-		// Prepare the table model
-		MyTableModel webVerdictsModel = new MyTableModel();
 		// Add the interactive CheckBox Rows
-		for(String webVerdictName : WebVerdict.enabledVerdicts) {
+		for(String genericVerdictName : GenericVerdict.enabledVerdicts) {
+			genericVerdictsModel.addRow(new Object[]{genericVerdictName, true});
+		}
+		for(String webVerdictName : WebVerdict.enabledWebVerdicts) {
 			webVerdictsModel.addRow(new Object[]{webVerdictName, true});
 		}
 
-		// Create a panel on which we are going to dynamically add the existing verdict methods
+		// Create a panel on which we are going to dynamically add the existing verdict methods		
+		JScrollPane genericVerdictsScrollPanel = new JScrollPane();
+		genericVerdictsScrollPanel.setViewportView(new JTable(genericVerdictsModel));
+		genericVerdictsScrollPanel.setBounds(10, 35, 600, 100);
+		genericVerdictsScrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+		genericVerdictsScrollPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		add(genericVerdictsScrollPanel);
+
 		JScrollPane webVerdictsScrollPanel = new JScrollPane();
 		webVerdictsScrollPanel.setViewportView(new JTable(webVerdictsModel));
-		webVerdictsScrollPanel.setBounds(10, 35, 600, 300);
+		webVerdictsScrollPanel.setBounds(10, 140, 600, 100);
 		webVerdictsScrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 		webVerdictsScrollPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		add(webVerdictsScrollPanel);
@@ -95,19 +109,20 @@ public class FunctionalVerdictPanel extends SettingsPanel {
 	 */
 	@Override
 	public void extractInformation(final Settings settings) {
-		System.out.println("FunctionalVerdictPanel Final Customized WebVerdict.enabledVerdicts: " + Arrays.toString(WebVerdict.enabledVerdicts.toArray()));
+		System.out.println("FunctionalVerdictPanel Final GenericVerdict.enabledVerdicts: " + Arrays.toString(GenericVerdict.enabledVerdicts.toArray()));
+		System.out.println("FunctionalVerdictPanel Final WebVerdict.enabledWebVerdicts: " + Arrays.toString(WebVerdict.enabledWebVerdicts.toArray()));
 	}
 
 }
 
-class MyTableModel extends DefaultTableModel {
+class GenericTableModel extends DefaultTableModel {
 
 	private static final long serialVersionUID = 5044738094695892624L;
 
 	int checkBoxColumn = 1;
 
-	public MyTableModel() {
-		super(new String[]{"Web Verdict Name", "Enable Web Verdict"}, 0);
+	public GenericTableModel(Object[] columnNames) {
+		super(columnNames, 0);
 	}
 
 	@Override
@@ -128,11 +143,30 @@ class MyTableModel extends DefaultTableModel {
 			Vector<Object> rowData = (Vector<Object>) getDataVector().get(row);
 			rowData.set(column, (boolean)value);
 			fireTableCellUpdated(row, column);
-			// Update the web verdict enabling/disabling list
-			String webVerdictName = (String) super.getValueAt(row, 0);
-			if((boolean)value) WebVerdict.enabledVerdicts.add(webVerdictName);
-			else WebVerdict.enabledVerdicts.remove(webVerdictName);
+			// Update the functional verdict enabling/disabling list
+			updateVerdict(value, row);
 		}
 	}
 
+	protected void updateVerdict(Object value, int row) {
+		String genericVerdictName = (String) super.getValueAt(row, 0);
+		if((boolean)value) GenericVerdict.enabledVerdicts.add(genericVerdictName);
+		else GenericVerdict.enabledVerdicts.remove(genericVerdictName);
+	}
+}
+
+class WebTableModel extends GenericTableModel {
+
+	private static final long serialVersionUID = 870552870418011092L;
+
+	public WebTableModel(Object[] columnNames) {
+		super(columnNames);
+	}
+
+	@Override
+	protected void updateVerdict(Object value, int row) {
+		String webVerdictName = (String) super.getValueAt(row, 0);
+		if((boolean)value) WebVerdict.enabledWebVerdicts.add(webVerdictName);
+		else WebVerdict.enabledWebVerdicts.remove(webVerdictName);
+	}
 }

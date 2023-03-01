@@ -85,6 +85,14 @@ public final class Verdict implements Serializable {
 		return visualtHighlights;
 	}
 
+	private String description = "";
+	public void addDescription(String description) {
+		this.description = this.description + description;
+	}
+	public String getDescription() {
+		return this.description;
+	}
+
 	public Verdict(double severity, String info){
 		this(severity, info, Util.NullVisualizer, new ArrayList<>());
 	}
@@ -162,7 +170,9 @@ public final class Verdict implements Serializable {
 
 		Verdict jointVerdict = new Verdict(Math.max(this.severity, verdict.severity()),
 				(this.info.contains(verdict.info) ? this.info : (this.severity == SEVERITY_OK ? "" : this.info + "\n") + verdict.info()),
-				jointHighlights);	
+				jointHighlights);
+
+		jointVerdict.addDescription(verdict.getDescription());
 
 		return jointVerdict;
 	}
