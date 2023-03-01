@@ -5,6 +5,7 @@ import org.testar.statemodel.AbstractAction;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
+import org.testar.reinforcementlearning.*;
 
 import java.util.Collection;
 import java.util.HashSet;

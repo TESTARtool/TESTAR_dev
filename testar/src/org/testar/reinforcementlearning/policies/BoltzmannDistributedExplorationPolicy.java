@@ -1,7 +1,7 @@
 package org.testar.reinforcementlearning.policies;
 
 import org.testar.RandomActionSelector;
-import org.testar.reinforcementlearning.RLTags;
+import org.testar.reinforcementlearning.*;
 import org.testar.statemodel.AbstractAction;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;

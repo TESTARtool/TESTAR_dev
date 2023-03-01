@@ -1,6 +1,15 @@
 package org.testar.statemodel;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testar.CodingManager;
+import org.testar.reinforcementlearning.actionselectors.ReinforcementLearningActionSelector;
+import org.testar.reinforcementlearning.policies.PolicyFactory;
+import org.testar.reinforcementlearning.qfunctions.QFunction;
+import org.testar.reinforcementlearning.qfunctions.QFunctionFactory;
+import org.testar.reinforcementlearning.rewardfunctions.RewardFunction;
+import org.testar.reinforcementlearning.rewardfunctions.RewardFunctionFactory;
+import org.testar.reinforcementlearning.utils.ReinforcementLearningUtil;
 import org.testar.statemodel.actionselector.ActionSelector;
 import org.testar.statemodel.actionselector.CompoundFactory;
 import org.testar.statemodel.event.StateModelEventListener;
@@ -18,6 +27,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class StateModelManagerFactory {
+
+    private static final Logger logger = LogManager.getLogger(StateModelManagerFactory.class);
 
     public static StateModelManager getStateModelManager(Settings settings) {
         // first check if the state model module is enabled
@@ -55,18 +66,54 @@ public class StateModelManagerFactory {
         eventListeners.add((StateModelEventListener) persistenceManager);
         SequenceManager sequenceManager = new SequenceManager(eventListeners, modelIdentifier);
 
-        // create the abstract state model and then the state model manager
-        AbstractStateModel abstractStateModel = new AbstractStateModel(modelIdentifier,
-                settings.get(ConfigTags.ApplicationName),
-                settings.get(ConfigTags.ApplicationVersion),
-                abstractTags,
-                persistenceManager instanceof StateModelEventListener ? (StateModelEventListener) persistenceManager : null);
-        ActionSelector actionSelector = CompoundFactory.getCompoundActionSelector(settings);
+//        // create the abstract state model and then the state model manager
+//        AbstractStateModel abstractStateModel = new AbstractStateModel(modelIdentifier,
+//                settings.get(ConfigTags.ApplicationName),
+//                settings.get(ConfigTags.ApplicationVersion),
+//                abstractTags,
+//                persistenceManager instanceof StateModelEventListener ? (StateModelEventListener) persistenceManager : null);
+//        ActionSelector actionSelector = CompoundFactory.getCompoundActionSelector(settings);
 
         // should we store widgets?
         boolean storeWidgets = settings.get(ConfigTags.StateModelStoreWidgets);
 
-        return new ModelManager(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
+        // create the abstract state model and then the state model manager
+        AbstractStateModelReinforcementLearning abstractStateModel = new AbstractStateModelReinforcementLearning(modelIdentifier,
+                settings.get(ConfigTags.ApplicationName),
+                settings.get(ConfigTags.ApplicationVersion),
+                abstractTags,
+                persistenceManager != null ? (StateModelEventListener) persistenceManager : null);
+        String stateModelRL = settings.get(ConfigTags.StateModelReinforcementLearningEnabled, "");
+
+        if (!stateModelRL.equals("")) {
+            Tag<Float> tag = ReinforcementLearningUtil.getTag(settings);
+            final ActionSelector actionSelector = new ReinforcementLearningActionSelector(PolicyFactory.getPolicy(settings)) ;
+
+            final RewardFunction rewardFunction = RewardFunctionFactory.getRewardFunction(settings);
+            final QFunction qFunction = QFunctionFactory.getQFunction(settings);
+
+//            logger.info("State model with Reinforcement Learning Model Manager selected");
+            logger.info("State model with QLearningModelManager selected");
+            return new QLearningModelManager(abstractStateModel,
+                    actionSelector,
+                    persistenceManager,
+                    concreteStateTags,
+                    sequenceManager,
+                    storeWidgets,
+                    rewardFunction,
+                    qFunction,
+                    tag);
+        }
+        ActionSelector actionSelector = CompoundFactory.getCompoundActionSelector(settings);
+
+        logger.info("State model with modelManager selected");
+        return new ModelManager(abstractStateModel,
+                actionSelector,
+                persistenceManager,
+                concreteStateTags,
+                sequenceManager,
+                storeWidgets);
     }
+
 
 }

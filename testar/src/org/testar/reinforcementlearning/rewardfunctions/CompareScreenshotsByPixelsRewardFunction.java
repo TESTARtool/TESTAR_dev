@@ -22,7 +22,7 @@ public class CompareScreenshotsByPixelsRewardFunction implements RewardFunction 
     private static final Logger logger = LogManager.getLogger(CompareScreenshotsByPixelsRewardFunction.class);
     private final static float defaultReward = 0f;
     AWTCanvas previousStateCanvas = null;
-    Function<State, AWTCanvas> getStateshotBinary = es.upv.staq.testar.ProtocolUtil::getStateshotBinary;
+    Function<State, AWTCanvas> getStateshotBinary = org.testar.ProtocolUtil::getStateshotBinary;
     private final CompareScreenshotsByPixelsHelper helper;
 
     public CompareScreenshotsByPixelsRewardFunction(CompareScreenshotsByPixelsHelper helper) {

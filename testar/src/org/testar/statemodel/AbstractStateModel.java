@@ -30,7 +30,7 @@ public class AbstractStateModel {
     private Set<AbstractStateTransition> stateTransitions;
     // we store the transitions twice extra, once by the source state and once by the target state for fast bi-directional lookup
     // the extra overhead is minimal
-    private Map<String, Set<AbstractStateTransition>> stateTransitionsBySource;
+    protected Map<String, Set<AbstractStateTransition>> stateTransitionsBySource;
     private Map<String, Set<AbstractStateTransition>> stateTransitionsByTarget;
 
     // the states in the model
@@ -123,7 +123,7 @@ public class AbstractStateModel {
      * Helper method to add a transition to several storage attributes
      * @param newTransition
      */
-    private void addTransition(AbstractStateTransition newTransition) {
+    protected void addTransition(AbstractStateTransition newTransition) {
         stateTransitions.add(newTransition);
         // add the transitions to the source map
         if (!stateTransitionsBySource.containsKey(newTransition.getSourceStateId())) {
@@ -213,7 +213,7 @@ public class AbstractStateModel {
      * @param abstractStateId identifier to verify
      * @throws StateModelException
      */
-    private void checkStateId(String abstractStateId) throws StateModelException{
+    protected void checkStateId(String abstractStateId) throws StateModelException{
         if (abstractStateId == null || abstractStateId.equals("")) {
             throw new InvalidStateIdException();
         }
@@ -249,7 +249,7 @@ public class AbstractStateModel {
      * Notify our listeners of emitted events
      * @param event
      */
-    private void emitEvent(StateModelEvent event) {
+    protected void emitEvent(StateModelEvent event) {
         if (!emitEvents) return;
         for (StateModelEventListener eventListener: eventListeners) {
             eventListener.eventReceived(event);
@@ -275,14 +275,14 @@ public class AbstractStateModel {
     /**
      * Set the abstract state model to not emit events.
      */
-    private void deactivateEvents() {
+    protected void deactivateEvents() {
         emitEvents = false;
     }
 
     /**
      * Set the abstract state model to emit events.
      */
-    private void activateEvents() {
+    protected void activateEvents() {
         emitEvents = true;
     }
 

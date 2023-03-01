@@ -21,7 +21,7 @@ public class ModelManager implements StateModelManager {
     private AbstractStateModel abstractStateModel;
 
     // current abstract state of the SUT
-    private AbstractState currentAbstractState;
+    protected AbstractState currentAbstractState;
 
     // the action that is currently being executed, if applicable
     private AbstractAction actionUnderExecution;
@@ -269,6 +269,14 @@ public class ModelManager implements StateModelManager {
     @Override
     public void notifyTestSequenceInterruptedBySystem(String message) {
         sequenceManager.notifyInterruptionBySystem(message);
+    }
+
+    public ConcreteState getCurrentConcreteState() {
+        return currentConcreteState;
+    }
+
+    protected SequenceManager getSequenceManager() {
+        return sequenceManager;
     }
 
 }
