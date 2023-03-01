@@ -1,12 +1,15 @@
 package org.testar.statemodel.persistence.orientdb.extractor;
 
 import com.orientechnologies.orient.core.metadata.schema.OType;
+
+import nl.ou.testar.ReinforcementLearning.RLTags;
+
 import org.testar.statemodel.AbstractAction;
-import org.testar.statemodel.AbstractStateModel;
 import org.testar.statemodel.exceptions.ExtractionException;
 import org.testar.statemodel.persistence.orientdb.entity.DocumentEntity;
 import org.testar.statemodel.persistence.orientdb.entity.EdgeEntity;
 import org.testar.statemodel.persistence.orientdb.entity.PropertyValue;
+import org.testar.monkey.alayer.Tag;
 
 import java.util.Set;
 
@@ -46,6 +49,36 @@ public class AbstractActionExtractor<M> implements EntityExtractor<AbstractActio
         for (String concreteActionId : concreteActionIds) {
             action.addConcreteActionId(concreteActionId);
         }
+
+        for(Tag<?> t : RLTags.getReinforcementLearningTags()) {
+
+            PropertyValue valueRL = entity.getPropertyValue(t.name());
+
+            if(valueRL == null) {
+                continue;
+            }
+
+            if (valueRL.getType() == OType.FLOAT) {
+                action.addAttribute(t, (Float) valueRL.getValue());
+            }
+
+            if (valueRL.getType() == OType.INTEGER) {
+                action.addAttribute(t, (Integer) valueRL.getValue());
+            }
+
+            if (valueRL.getType() == OType.DOUBLE) {
+                action.addAttribute(t, (Double) valueRL.getValue());
+            }
+
+            if (valueRL.getType() == OType.STRING) {
+                action.addAttribute(t, (String) valueRL.getValue());
+            }
+
+            System.out.println(String.format("Extracted RLTag %s with value %s for the Action %s",
+                    t.name(), action.getAttributes().get(t).toString(), actionId));
+        }
+
+
         return action;
     }
 }

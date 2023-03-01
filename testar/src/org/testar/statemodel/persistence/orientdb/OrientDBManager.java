@@ -382,6 +382,51 @@ public class OrientDBManager<M extends AbstractStateModel> implements Persistenc
     }
 
     @Override
+    public void persistAbstractActionAttributeUpdated(AbstractStateTransition abstractStateTransition) {
+        if (abstractStateTransition.getSourceState() == null || abstractStateTransition.getTargetState() == null || abstractStateTransition.getAction() == null) {
+            System.out.println("persist ActionAttributeUpdated Objects missing in abstract state transition");
+            return;
+        }
+
+        /**
+         * Obtain the Abstract Action of this Transition to update the attributes
+         */
+
+        EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
+        VertexEntity sourceVertexEntity = new VertexEntity(entityClass);
+        VertexEntity targetVertexEntity = new VertexEntity(entityClass);
+
+        // hydrate the entities to a format the orient database can store
+        try {
+            EntityHydrator stateHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_STATE);
+            stateHydrator.hydrate(sourceVertexEntity, abstractStateTransition.getSourceState());
+            stateHydrator.hydrate(targetVertexEntity, abstractStateTransition.getTargetState());
+        } catch (HydrationException e) {
+            //@todo add some meaningful logging here
+            return;
+        }
+
+        // no need to update the abstract states anymore
+        sourceVertexEntity.enableUpdate(false);
+        targetVertexEntity.enableUpdate(false);
+
+        entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractAction);
+        EdgeEntity actionEntity = new EdgeEntity(entityClass, sourceVertexEntity, targetVertexEntity);
+
+        try {
+            EntityHydrator actionHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_ACTION);
+            actionHydrator.hydrate(actionEntity, abstractStateTransition.getAction());
+        }
+        catch (HydrationException ex) {
+            //@todo add some meaningful logging here as well
+        }
+
+        try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
+          entityManager.saveEntity(actionEntity, db);
+        }
+    }
+
+    @Override
     public void persistConcreteStateTransition(ConcreteStateTransition concreteStateTransition) {
         if (concreteStateTransition.getSourceState() == null || concreteStateTransition.getTargetState() == null | concreteStateTransition.getAction() == null) {
             System.out.println("Objects missing in concrete state transition");
@@ -708,6 +753,10 @@ public class OrientDBManager<M extends AbstractStateModel> implements Persistenc
             case ABSTRACT_STATE_TRANSITION_CHANGED:
                 //@todo the abstract action changed event needs to just update the action attributes
                 persistAbstractStateTransition((AbstractStateTransition) (event.getPayload()));
+                break;
+
+            case ABSTRACT_ACTION_ATTRIBUTE_UPDATED:
+                persistAbstractActionAttributeUpdated((AbstractStateTransition) (event.getPayload()));
                 break;
 
             case ABSTRACT_STATE_MODEL_INITIALIZED:

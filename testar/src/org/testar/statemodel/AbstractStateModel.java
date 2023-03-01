@@ -32,7 +32,7 @@ public class AbstractStateModel {
 
     // we store the transitions twice extra, once by the source state and once by the target state for fast bi-directional lookup
     // the extra overhead is minimal
-    private Map<String, Set<AbstractStateTransition>> abstractStateTransitionsBySource;
+    protected Map<String, Set<AbstractStateTransition>> abstractStateTransitionsBySource;
     private Map<String, Set<AbstractStateTransition>> abstractStateTransitionsByTarget;
 
     // the states in the model
@@ -125,7 +125,7 @@ public class AbstractStateModel {
      * Helper method to add an abstract transition to several storage attributes
      * @param newTransition
      */
-    private void addAbstractTransition(AbstractStateTransition newTransition) {
+    protected void addAbstractTransition(AbstractStateTransition newTransition) {
         abstractStateTransitions.put(newTransition.getActionId(), newTransition);
         // add the transitions to the source map
         if (!abstractStateTransitionsBySource.containsKey(newTransition.getSourceStateId())) {
@@ -231,8 +231,8 @@ public class AbstractStateModel {
      * @param stateId identifier to verify
      * @throws StateModelException
      */
-    protected void checkStateId(String stateId) throws StateModelException{
-        if (stateId == null || stateId.equals("")) {
+    protected void checkStateId(String abstractStateId) throws StateModelException{
+        if (abstractStateId == null || abstractStateId.equals("")) {
             throw new InvalidStateIdException();
         }
     }

@@ -24,7 +24,7 @@ public class ModelManager implements StateModelManager {
     private AbstractStateModel abstractStateModel;
 
     // current abstract state of the SUT
-    private AbstractState currentAbstractState;
+    protected AbstractState currentAbstractState;
 
     // the action that is currently being executed, if applicable
     private AbstractAction actionUnderExecution;
@@ -278,6 +278,14 @@ public class ModelManager implements StateModelManager {
     public OResultSet queryStateModel(String query) {
     	EntityManager manager = persistenceManager.getEntityManager();
     	return manager.getConnection().getDatabaseSession().query(query);
+    }
+
+    public ConcreteState getCurrentConcreteState() {
+        return currentConcreteState;
+    }
+
+    protected SequenceManager getSequenceManager() {
+        return sequenceManager;
     }
 
 }
