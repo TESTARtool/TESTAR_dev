@@ -84,12 +84,12 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
  * - Radio button panel with only one option (input)
  * - Panel without children (form, div)
  * - Web alert with suspicious message
- * - Spell checker in a file list that allows users to uncomment or configure. Also prepare a specific directory for the spell checker errors found. this will not block the sequence
+ * - Spell checker in a file list that allows users to ignore. Also prepare a specific directory for the spell checker errors found.
+ * - Add URL related with the states
  * 
  * - TODO: JavaScript loop to hang the browser - devTools
  * - TODO: JavaScript refresh browser constantly - devTools
  * - TODO: textarea with rows and columns to detect enter click
- * - TODO: Add URL related with the states (clickable link)
  * - TODO: List of possible issues for different verdicts and allow user to customize different oracles for the SUT elements. List like spell checking
  * - TODO: Now draw the widget highlight in all the screenshots of the state. Only in the last HTML report screen.
  * - TODO: Use the state screenshots of the sequences to train and use a model

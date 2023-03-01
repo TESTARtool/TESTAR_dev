@@ -40,6 +40,7 @@ import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.OutputStructure;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
 
 import java.awt.BasicStroke;
 import java.awt.Graphics2D;
@@ -178,6 +179,7 @@ public class HtmlSequenceReport implements Reporting{
     		}
     		write("<div id='block' style='display:flex;flex-direction:column'>"); // Open state block container
     		write("<h2>State "+innerLoopCounter+"</h2>");
+    		if(!state.get(WdTags.WebHref, "").isEmpty()) write("<h2>" + state.get(WdTags.WebHref) + "</h2>"); // Add URL if exists
     		write("<h4>ConcreteIDCustom="+state.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable")+"</h4>");
     		write("<h4>AbstractIDCustom="+state.get(Tags.AbstractIDCustom, "NoAbstractIdCustomAvailable")+"</h4>");
     		write("<p><img src=\""+imagePath+"\"></p>");

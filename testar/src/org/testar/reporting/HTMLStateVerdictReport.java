@@ -54,6 +54,7 @@ import org.testar.monkey.alayer.android.AndroidProtocolUtil;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 import org.testar.monkey.alayer.ios.IOSProtocolUtil;
 import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
 
@@ -119,6 +120,7 @@ public class HTMLStateVerdictReport {
 
 			write("<div id='block' style='display:flex;flex-direction:column'>"); // Open state block container
 			write("<h2>State</h2>");
+			if(!state.get(WdTags.WebHref, "").isEmpty()) write("<h2>" + state.get(WdTags.WebHref) + "</h2>"); // Add URL if exists
 			write("<h4>ConcreteIDCustom="+state.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable")+"</h4>");
 			write("<h4>AbstractIDCustom="+state.get(Tags.AbstractIDCustom, "NoAbstractIdCustomAvailable")+"</h4>");
 			write("<p><img src=\""+stateScreenshot.replaceFirst(".\\/output(.*)scrshots", "../scrshots")+"\"></p>");

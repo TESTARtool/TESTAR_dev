@@ -291,6 +291,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     		
     	}
 
+    	state.set(WdTags.WebHref, WdDriver.getCurrentUrl());
+
     	latestState = state;
     	
     	//Spy mode didn't use the html report
