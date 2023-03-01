@@ -35,6 +35,9 @@ package org.testar.monkey.alayer;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.testar.CodingManager;
 import org.testar.monkey.Drag;
 
 /**
@@ -72,5 +75,31 @@ public interface Widget extends Taggable, Serializable {
 	public String getRepresentation(String tab);
 	
 	public abstract String toString(Tag<?>... tags);
-	
+
+	/**
+	 * Get the Abstract Tags from a Widget (defined by users)
+	 * to prepare a string that represents it at an abstract level.
+	 *
+	 * @return String that represents the widget at an abstract level.
+	 */
+	default String getAbstractRepresentation() {
+		StringBuilder repr = new StringBuilder();
+		repr.append("AbstractIDCustom=" + this.get(Tags.AbstractIDCustom));
+		for(Tag<?> tag : CodingManager.getCustomTagsForAbstractId()) {
+			if(this.get(tag, null) != null) {
+				repr.append("," + tag.name() + "=" + this.get(tag));
+			}
+		}
+
+		final String abstractRepresentation = repr.toString();
+
+		// When no custom tag values can be retrieved then log a warning
+		if (StringUtils.equals(abstractRepresentation, "AbstractIDCustom=null")) {
+			LogManager.getLogger(Widget.class).warn("Widget has no custom tags, default abstractRepresentation is returned");
+		}
+
+		return abstractRepresentation;
+	}
+
+
 }

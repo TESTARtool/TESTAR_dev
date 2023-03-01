@@ -1,0 +1,41 @@
+package org.testar.reinforcementlearning.policies;
+
+import org.testar.RandomActionSelector;
+import org.testar.statemodel.AbstractAction;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.Set;
+
+public class ProtocolEpsilonGreedyPolicy implements Policy {
+    private static final Logger logger = LogManager.getLogger(ProtocolEpsilonGreedyPolicy.class);
+
+    private final float epsilon; //The epsilon parameter should be between 0 and 1
+
+    private final GreedyPolicy greedyPolicy;
+
+    public ProtocolEpsilonGreedyPolicy(final GreedyPolicy greedyPolicy, final float epsilon) {
+        logger.info("EpsilonGreedyPolicy initialized with epsilon='{}'", epsilon);
+        this.greedyPolicy = greedyPolicy;
+        this.epsilon = epsilon;
+    }
+
+    /**
+     * For a {@link Set<AbstractAction>} selects actions to execute
+     * @return An {@link AbstractAction} selected by the {@link Policy}, can be {@code null}
+     */
+    @Override
+    public AbstractAction applyPolicy(Set<AbstractAction> actions) {
+        float randomValue = getRandomValue();
+        if (randomValue < 1 - epsilon) {
+            return greedyPolicy.applyPolicy(actions);
+        }
+        if (randomValue < (1 - epsilon) + 0.25 * epsilon)
+            return RandomActionSelector.selectAbstractAction(actions);
+        return new AbstractAction("ProtocolAction");
+    }
+
+    float getRandomValue() {
+        return (float) Math.random();
+    }
+}
