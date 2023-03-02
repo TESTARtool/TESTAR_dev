@@ -63,6 +63,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
 
 import java.awt.*;
@@ -157,7 +158,25 @@ public class WdDriver extends SUTBase {
     	remoteWebDriver.manage().window().setPosition(screenPosition);
     }
 
+    remoteWebDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+
     remoteWebDriver.get(url);
+
+    // Working with https connections in chromedriver, sometimes we can find that:
+    // A webpage is temporarily down or moved permanently to a new web address. 
+    // Try to detect this issue and refresh the webpage.  
+    String tempDownMsg = "might be temporarily down or it may have moved permanently to a new web address";
+    int tries = 3;
+    while(remoteWebDriver.getPageSource().contains(tempDownMsg) && tries > 0) {
+    	System.out.println("Refresh browser because detected: " + tempDownMsg);
+    	Util.pause(1);
+    	remoteWebDriver.navigate().refresh();
+    	Util.pause(5);
+    	tries = tries - 1;
+    }
+    if(remoteWebDriver.getPageSource().contains(tempDownMsg)) {
+    	System.err.println("ISSUE trying to connect to the desired webpage: " + tempDownMsg);
+    }
 
     CanvasDimensions.startThread();
 
