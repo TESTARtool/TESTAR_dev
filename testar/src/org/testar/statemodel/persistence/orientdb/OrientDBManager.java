@@ -485,9 +485,6 @@ public class OrientDBManager<M extends AbstractStateModel> implements Persistenc
     }
 
     protected void populateStateModel(M stateModel, String stateModelClassName, VertexEntity stateModelEntity) {
-      // in order to retrieve the abstract states, we need to provide the abstract state model identifier to the query
-      Map<String, PropertyValue> entityProperties = new HashMap<>();
-      entityProperties.put("modelIdentifier", stateModelEntity.getPropertyValue(stateModelClassName));
 
       // hydrate the entity with the abstract state model information
       try {
@@ -508,6 +505,10 @@ public class OrientDBManager<M extends AbstractStateModel> implements Persistenc
       EntityClass abstractStateClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
       if (abstractStateClass == null) throw new RuntimeException("Error occurred: could not retrieve an abstract state entity class.");
 
+      // in order to retrieve the abstract states, we need to provide the abstract state model identifier to the query
+      Map<String, PropertyValue> entityProperties = new HashMap<>();
+      entityProperties.put("modelIdentifier", stateModelEntity.getPropertyValue(stateModelClassName));
+      
       try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
 //          db.begin();
         Set<DocumentEntity> retrievedDocuments = entityManager.retrieveAllOfClass(abstractStateClass, entityProperties, db);
