@@ -179,7 +179,13 @@ public class HtmlSequenceReport implements Reporting{
     		}
     		write("<div id='block' style='display:flex;flex-direction:column'>"); // Open state block container
     		write("<h2>State "+innerLoopCounter+"</h2>");
-    		if(!state.get(WdTags.WebHref, "").isEmpty()) write("<h2>" + state.get(WdTags.WebHref) + "</h2>"); // Add URL if exists
+
+    		// Add state URL if exists (<a href="https://example.com" target="_blank">https://example.com</a>)
+    		if(!state.get(WdTags.WebHref, "").isEmpty()) {
+    			String stateURL = state.get(WdTags.WebHref);
+    			write("<a href=\"" + stateURL + "\"target=\"_blank\">" + stateURL + "</a>"); 
+    		}
+
     		write("<h4>ConcreteIDCustom="+state.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable")+"</h4>");
     		write("<h4>AbstractIDCustom="+state.get(Tags.AbstractIDCustom, "NoAbstractIdCustomAvailable")+"</h4>");
     		write("<p><img src=\""+imagePath+"\"></p>");
