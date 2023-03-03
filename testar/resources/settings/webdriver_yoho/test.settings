@@ -216,9 +216,9 @@ ReplayApplicationVersion = 1.0
 ForcedLoginUrl = https://tst.yoho.marviq.net/web/login
 ForcedLoginInputKeyAttribute = id
 ForcedLoginUsernameInputName = mat-input-0
-ForcedLoginUsername = +48500000003
+ForcedLoginUsername = +48500000005
 ForcedLoginPasswordInputName = mat-input-1
-ForcedLoginPassword = password
+ForcedLoginPassword = yohopin2022
 ReportApiUrl = http://localhost:8888/api
 
 WebConsoleErrorOracle = true
