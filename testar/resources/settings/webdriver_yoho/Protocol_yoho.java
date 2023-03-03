@@ -61,6 +61,7 @@ public class Protocol_yoho extends WebdriverProtocol {
     protected WeightProvider weightProvider;
 
     private static final BigDecimal WEIGHT_VERDICT_THRESHOLD = new BigDecimal(40);
+    private boolean weightProviderEnabled = false;
 
     @Override
     protected void initialize(Settings settings) {
@@ -74,11 +75,13 @@ public class Protocol_yoho extends WebdriverProtocol {
         qlActionSelector = new QLearningActionSelector(settings.get(ConfigTags.MaxReward),
                 settings.get(ConfigTags.Discount));
 
-        weightProvider = new WeightProvider(
-                new FileAnalysedMethodEntryRepository(),
-                new BtraceApiClient(settings.get(ConfigTags.BtraceServiceHost)),
-                new WeightCalculator()
-        );
+        if (weightProviderEnabled) {
+            weightProvider = new WeightProvider(
+                    new FileAnalysedMethodEntryRepository(),
+                    new BtraceApiClient(settings.get(ConfigTags.BtraceServiceHost)),
+                    new WeightCalculator()
+            );
+        }
 
         // List of atributes to identify and close policy popups
         // Set to null to disable this feature
@@ -95,7 +98,9 @@ public class Protocol_yoho extends WebdriverProtocol {
 
     @Override
     protected boolean executeAction(SUT system, State state, Action action) {
-        weightProvider.startPreparingVerdict();
+        if (weightProviderEnabled) {
+            weightProvider.startPreparingVerdict();
+        }
         boolean result = super.executeAction(system, state, action);
         return result;
     }
@@ -367,7 +372,7 @@ public class Protocol_yoho extends WebdriverProtocol {
     @Override
     protected Verdict getVerdict(State state) {
         Verdict stateVerdict = super.getVerdict(state);
-        if(weightProvider.isPreparing() && weightProvider.isStaticAnalysisAvailable()) {
+        if(weightProviderEnabled && weightProvider.isPreparing() && weightProvider.isStaticAnalysisAvailable()) {
             var weightVerdict = weightProvider.provideWeightVerdict();
             stateVerdict.join(deriveVerdict(weightVerdict));
         }
