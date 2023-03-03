@@ -28,7 +28,7 @@
  *
  */
 
-package org.testar.verdicts;
+package functional_oracles.generic;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,8 +37,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
 import org.languagetool.JLanguageTool;
 import org.languagetool.Language;
 import org.languagetool.rules.RuleMatch;
@@ -50,13 +48,7 @@ import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.Widget;
 
-public class GenericVerdict {
-
-	// By default consider that all the verdicts of the class are enabled
-	public static List<String> enabledVerdicts = Arrays.stream(GenericVerdict.class.getDeclaredMethods())
-			.filter(classMethod -> java.lang.reflect.Modifier.isPublic(classMethod.getModifiers()))
-			.map(java.lang.reflect.Method::getName)
-			.collect(Collectors.toList());
+public class SpellCheckingGenericOracle {
 
 	// Load the ignore file from the settings directory
 	public static String spellingIgnoreFile = Main.settingsDir + File.separator + "SpellingIgnoreList.txt";
@@ -78,13 +70,9 @@ public class GenericVerdict {
 		return readSpellingIgnoreFromFile;
 	}).get();
 
-	public static Verdict verdictSpellChecker(State state, Tag<String> tagTextChecker, Language languageChecker) {
-		// If this method is NOT enabled, just return verdict OK
-		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-		if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
-
-		// If it is enabled, then execute the verdict implementation
+	public static Verdict getVerdict(State state, Tag<String> tagTextChecker, Language languageChecker) {
 		Verdict spellCheckerVerdict = Verdict.OK;
+		
 		JLanguageTool langTool = new JLanguageTool(languageChecker);
 		// Iterate through all the widgets of the state to apply the spell checker in the desired String Tag
 		for(Widget w : state) {

@@ -109,11 +109,16 @@ public class ExtendedSettingFile implements Serializable {
      * @param fileAccessMutex Mutex for thread-safe access.
      */
 	public ExtendedSettingFile(@NonNull String fileLocation, @NonNull ReentrantReadWriteLock fileAccessMutex) {
-        _fileAccessMutex = fileAccessMutex;
-        _absolutePath = System.getProperty("user.dir") +
-                (fileLocation.startsWith(".") ? fileLocation.substring(1) : (fileLocation.startsWith(File.separator)
-                        ? fileLocation : File.separator + fileLocation));
-    }
+		_fileAccessMutex = fileAccessMutex;
+		// Check if user is setting the XML file location as Absolute Path
+		if(new File(fileLocation).isAbsolute()) {
+			_absolutePath = fileLocation;
+		} else {
+			_absolutePath = System.getProperty("user.dir") +
+					(fileLocation.startsWith(".") ? fileLocation.substring(1) : (fileLocation.startsWith(File.separator)
+							? fileLocation : File.separator + fileLocation));
+		}
+	}
 
     /**
      * Try to load the requested data element from the XML file.

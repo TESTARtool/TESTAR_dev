@@ -47,9 +47,10 @@ import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.plugin.NativeLinker;
 import org.testar.protocols.WebdriverProtocol;
-import org.testar.verdicts.WebVerdict;
 
 import com.google.common.collect.Comparators;
+
+import functional_oracles.web.TextAreaWithoutLengthWebOracle;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -327,7 +328,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
         if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if exists a textArea Widget without length.
-		verdict = WebVerdict.verdictTextAreaWithoutLength(state, Arrays.asList(WdRoles.WdTEXTAREA));
+		verdict = TextAreaWithoutLengthWebOracle.getVerdict(state, Arrays.asList(WdRoles.WdTEXTAREA));
         if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if a web element does not contain children.

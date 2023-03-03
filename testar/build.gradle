@@ -15,7 +15,7 @@ sourceSets {
 
     oracle {
         java {
-            srcDirs =['resources/settings']
+            srcDirs = ['resources/settings','resources/functional_oracles']
         }
 
         compileClasspath += main.output
@@ -96,6 +96,7 @@ task cleanDebugging(type: Exec, dependsOn:'deleteDebugging') {
 
 task deleteDebugging(type: Delete){
     delete 'settings'
+    delete 'functional_oracles'
     delete 'suts'
     delete 'output'
     delete 'testar'
@@ -155,6 +156,17 @@ task prepareOracles(type: Copy) {
 task prepareOutputFolder(type: Copy) {
     from 'resources/output'
     into 'target/scripts/output'
+}
+
+task prepareFunctionalOraclesDirectory(type: Copy) {
+    from 'resources/functional_oracles'
+    into 'target/scripts/functional_oracles'
+}
+
+task prepareCopyOfUpdateOracleScript(type: Copy) {
+    from '../testar/resources'
+    into 'target/scripts'
+    include 'update_functional_oracles.bat'
 }
 
 /**

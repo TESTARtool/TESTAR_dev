@@ -66,8 +66,9 @@ public class Main {
 	public static String SSE_ACTIVATED = null;
 
 	//Default paths
-	public static String testarDir = "." + File.separator;
+	public static String testarDir = System.getProperty("user.dir") + File.separator;
 	public static String settingsDir = testarDir + "settings" + File.separator;
+	public static String functionalOraclesDir = testarDir + "functional_oracles" + File.separator;
 	public static String outputDir = testarDir + "output" + File.separator;
 	public static String tempDir = outputDir + "temp" + File.separator;
 

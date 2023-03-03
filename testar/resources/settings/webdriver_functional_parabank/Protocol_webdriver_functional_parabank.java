@@ -47,10 +47,11 @@ import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.plugin.NativeLinker;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.reporting.HTMLStateVerdictReport;
-import org.testar.verdicts.GenericVerdict;
-import org.testar.verdicts.WebVerdict;
 
 import com.google.common.collect.Comparators;
+
+import functional_oracles.generic.*;
+import functional_oracles.web.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -87,6 +88,9 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
  * - Spell checker in a file list that allows users to ignore. Also prepare a specific directory for the spell checker errors found.
  * - Add URL related with the states
  * 
+ * - TODO: Priority if state is child count 0 - then refresh
+ * - TODO: disable attribute WdTags 
+ * 
  * - TODO: JavaScript loop to hang the browser - devTools
  * - TODO: JavaScript refresh browser constantly - devTools
  * - TODO: textarea with rows and columns to detect enter click
@@ -94,6 +98,8 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
  * - TODO: Now draw the widget highlight in all the screenshots of the state. Only in the last HTML report screen.
  * - TODO: Use the state screenshots of the sequences to train and use a model
  * - TODO: screenshot_sequence_x_states vs screenshot_sequence_x_actions
+ * - TODO: For the verdictElementWithoutChildren oracle we need a similar list like the spell checking to ignore intentional empty DIVs with custom functionalities.
+ * - TODO: For the verdictFormWithoutChildren one warning verdict may be a form with only hidden elements. Check if clickable or visible at canvas.
  * 
  * - Instead of joining Verdicts, try to recognize and save different Verdict exception in different sequences.
  */
@@ -250,7 +256,7 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 		// Instead of stop the sequence and report a warning verdict,
 		// report the information in a specific HTML report
 		// and continue testing
-		Verdict spellCheckerVerdict = GenericVerdict.verdictSpellChecker(state, WdTags.WebTextContent, new AmericanEnglish());
+		Verdict spellCheckerVerdict = SpellCheckingGenericOracle.getVerdict(state, WdTags.WebTextContent, new AmericanEnglish());
 		if(spellCheckerVerdict != Verdict.OK) HTMLStateVerdictReport.reportStateVerdict(actionCount, state, spellCheckerVerdict);
 
 		// Check the functional Verdict that detects if a downloaded file is empty.
@@ -262,35 +268,35 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects select elements without items to the current state verdict.
-		verdict = WebVerdict.verdictEmptySelectItemsVerdict(state);
+		verdict = EmptySelectItemsWebOracle.getVerdict(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects select elements with unsorted items to the current state verdict.
-		verdict = WebVerdict.verdictUnsortedSelectOptionsVerdict(state);
+		verdict = UnsortedSelectOptionsWebOracle.getVerdict(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if exists a number with more than X decimals.
-		verdict = WebVerdict.verdictNumberWithLotOfDecimals(state, 2);
+		verdict = NumberWithLotOfDecimalsWebOracle.getVerdict(state, 2);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if exists a textArea Widget without length.
-		verdict = WebVerdict.verdictTextAreaWithoutLength(state, Arrays.asList(WdRoles.WdTEXTAREA));
+		verdict = TextAreaWithoutLengthWebOracle.getVerdict(state, Arrays.asList(WdRoles.WdTEXTAREA));
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if a web element does not contain children.
-		verdict = WebVerdict.verdictElementWithoutChildren(state, Arrays.asList(WdRoles.WdFORM, WdRoles.WdDIV));
+		verdict = ElementWithoutChildrenWebOracle.getVerdict(state, Arrays.asList(WdRoles.WdFORM, WdRoles.WdDIV));
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if a web radio input contains a unique option.
-		verdict = WebVerdict.verdictUniqueRadioInput(state);
+		verdict = UniqueRadioInputWebOracle.getVerdict(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if a web alert contains a suspicious message.
-		verdict = WebVerdict.verdictAlertSuspiciousMessage(state, ".*[lL]ogin.*", lastExecutedAction);
+		verdict = AlertSuspiciousMessageWebOracle.getVerdict(state, ".*[lL]ogin.*", lastExecutedAction);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if web table contains duplicated rows.
-		verdict = WebVerdict.verdictDetectDuplicatedRowsInTable(state);
+		verdict = DuplicateTableRowWebOracle.getVerdict(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		return verdict;
