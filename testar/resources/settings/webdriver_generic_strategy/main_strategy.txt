@@ -1,4 +1,6 @@
-select-previous
-/*5 select-random least-visited of-type type-action*/
-/*4 select-related sibling-or-child-action*/
-
+IF
+    any-exist sibling-or-child-action
+THEN
+    select-random sibling-or-child-action
+ELSE
+    select-random

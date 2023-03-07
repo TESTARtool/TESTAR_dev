@@ -1,7 +1,7 @@
 IF
     any-exist sibling-or-child-action
 THEN
-    select-related sibling-or-child-action
+    select-random sibling-or-child-action
 ELSE IF
         any-exist unvisited of-type form-submit-action
     THEN

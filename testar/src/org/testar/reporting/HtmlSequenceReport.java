@@ -185,7 +185,7 @@ public class HtmlSequenceReport implements Reporting{
     public void addActions(Set<Action> actions){
         if(!firstActionsAdded) firstActionsAdded = true;
         write("<div id='block' style='display:flex;flex-direction:column'>"); // Open derived actions block container
-        write("<h4>Set of actions:</h4><ul>");
+        write("<h4>Set of " + actions.size() + " actions:</h4><ul>");
         for(Action action:actions){
             write("<li>");
             try{
@@ -292,7 +292,7 @@ public class HtmlSequenceReport implements Reporting{
         write("<div id='block' style='display:flex;flex-direction:column'>"); // Open executed action block container
         write("<h2>Selected Action "+innerLoopCounter+" leading to State "+innerLoopCounter+"\"</h2>");
         write("<h4>ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable"));
-        write(" AbstractIDCustom="+action.get(Tags.AbstractIDCustom, "NoConcreteIdCustomAvailable"));
+        write(" || AbstractIDCustom="+action.get(Tags.AbstractIDCustom, "NoConcreteIdCustomAvailable"));
 
         try{
         	if(action.get(Tags.Desc)!=null) {

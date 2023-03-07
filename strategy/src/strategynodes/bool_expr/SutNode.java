@@ -22,7 +22,7 @@ public class SutNode extends BaseStrategyNode<Boolean>
     @Override
     public Boolean getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
     {
-        return null; //todo: implement
+        return SUT_TYPE.sutIsThisType();
     }
     
     @Override
