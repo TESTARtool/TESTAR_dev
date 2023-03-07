@@ -11,6 +11,11 @@ import java.util.Set;
 
 public class RandomActionSelector implements ActionSelector{
 
+	@Override
+	public void notifyNewSequence() {
+		//
+	}
+
     @Override
     public AbstractAction selectAction(AbstractState currentState, AbstractStateModel abstractStateModel) throws ActionNotFoundException {
         long graphTime = System.currentTimeMillis();

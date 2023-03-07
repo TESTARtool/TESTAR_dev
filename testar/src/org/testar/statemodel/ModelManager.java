@@ -250,6 +250,7 @@ public class ModelManager implements StateModelManager {
     @Override
     public void notifyTestSequencedStarted() {
         sequenceManager.startNewSequence();
+        actionSelector.notifyNewSequence();
     }
 
     @Override
