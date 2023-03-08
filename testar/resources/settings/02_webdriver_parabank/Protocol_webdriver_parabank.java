@@ -31,8 +31,8 @@
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.HasDevTools;
-import org.openqa.selenium.devtools.v104.performance.Performance;
-import org.openqa.selenium.devtools.v104.performance.model.Metric;
+import org.openqa.selenium.devtools.v109.performance.Performance;
+import org.openqa.selenium.devtools.v109.performance.model.Metric;
 import com.google.common.collect.ArrayListMultimap;
 import org.testar.SutVisualization;
 import org.testar.managers.InputDataManager;
