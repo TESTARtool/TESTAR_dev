@@ -28,6 +28,7 @@
  *
  */
 
+import com.google.common.collect.ArrayListMultimap;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
@@ -37,6 +38,7 @@ import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.plugin.NativeLinker;
+import org.testar.managers.InputDataManager;
 import org.testar.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
 
@@ -105,9 +107,8 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
 		 * Set to null to disable this feature
 		 */
 		// Currently only at Java protocol level (need code re-compilation)
-		policyAttributes = new HashMap<String, String>() {{
-		    put("class", "iAgreeButton");
-		}};
+		policyAttributes = ArrayListMultimap.create();
+		policyAttributes.put("class", "iAgreeButton");
 	}
 
 	/**
@@ -154,7 +155,7 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
 
 			// type into text boxes
 			if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-				actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+				actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
 			}
 
 			// left clicks, but ignore links outside domain

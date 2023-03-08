@@ -30,6 +30,8 @@
 
 package org.testar.monkey.alayer.webdriver.enums;
 
+import java.util.Map;
+
 import org.testar.monkey.alayer.Rect;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.TagsBase;
@@ -248,4 +250,11 @@ public class WdTags extends TagsBase {
    * Max length of a text widget.
    */
   public static final Tag<Integer> WebMaxLength = from("WebMaxLength", Integer.class);
+
+  /**
+   * The attribute map we obtain through the JavaScript plugin.
+   */
+  @SuppressWarnings("unchecked")
+  public static final Tag<Map<String, String>> WebAttributeMap = from("WebAttributeMap", (Class<Map<String, String>>) (Class<?>) Map.class);
+
 }

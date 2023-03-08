@@ -33,10 +33,11 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.HasDevTools;
-import org.openqa.selenium.devtools.v104.network.Network;
+import org.openqa.selenium.devtools.v109.network.Network;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.SutVisualization;
+import org.testar.managers.InputDataManager;
 import org.testar.monkey.Settings;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
@@ -173,10 +174,10 @@ public class Protocol_webdriver_security_analysis extends WebdriverProtocol {
                 // type into text boxes
                 if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
                     if(whiteListed(widget) || isUnfiltered(widget))
-                        actions.add(ac.clickTypeInto(widget, getRandomText(widget), true));
+                        actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
                     else
                         // filtered and not white listed:
-                        filteredActions.add(ac.clickTypeInto(widget, getRandomText(widget), true));
+                        filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
                 }
             }
         }

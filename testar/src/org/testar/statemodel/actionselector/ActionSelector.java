@@ -7,6 +7,8 @@ import org.testar.statemodel.exceptions.ActionNotFoundException;
 
 public interface ActionSelector {
 
+	public void notifyNewSequence();
+
     /**
      * This method returns an action to execute
      * @param currentState

@@ -16,6 +16,11 @@ public class CompoundActionSelector implements ActionSelector{
     }
 
     @Override
+    public void notifyNewSequence() {
+    	selectors.forEach(selector -> selector.notifyNewSequence());
+    }
+
+    @Override
     public AbstractAction selectAction(AbstractState currentState, AbstractStateModel abstractStateModel) throws ActionNotFoundException {
         for(ActionSelector selector:selectors) {
             try {

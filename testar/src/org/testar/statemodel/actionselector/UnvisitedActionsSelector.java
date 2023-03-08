@@ -17,6 +17,11 @@ public class UnvisitedActionsSelector implements ActionSelector {
     private final int MAX_HOPS = 4;
 
     @Override
+    public void notifyNewSequence() {
+    	//
+    }
+
+    @Override
     public AbstractAction selectAction(AbstractState currentState, AbstractStateModel abstractStateModel) throws ActionNotFoundException{
         Set<AbstractAction> unvisitedActions = getUnvisitedActions(currentState, abstractStateModel, MAX_HOPS);
         if (unvisitedActions.size() == 0) {

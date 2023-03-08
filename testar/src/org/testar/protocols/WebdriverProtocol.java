@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -44,15 +44,16 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
@@ -98,15 +99,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	protected Pair<String, String> username = Pair.from("username", "");
 	protected Pair<String, String> password = Pair.from("password", "");
 
-	// List of atributes to identify and close policy popups
-	// Set to null to disable this feature
-	@SuppressWarnings("serial")
-	protected Map<String, String> policyAttributes = new HashMap<String, String>()
-	{
-		{ 
-			put("id", "_cookieDisplay_WAR_corpcookieportlet_okButton");
-		}
-	};
+	// List of attributes to identify and close policy popups
+	protected Multimap<String, String> policyAttributes = ArrayListMultimap.create();
 
 	// Verdict obtained from messages coming from the web browser console
 	protected Verdict webConsoleVerdict = Verdict.OK;
@@ -526,7 +520,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			return actions;
 		}
 
-		return null;
+		return new HashSet<Action>();
 	}
 
 	/*
@@ -534,7 +528,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 */
 	protected Set<Action> detectForcedLogin(State state) {
 		if (login == null || username == null || password == null) {
-			return null;
+			return new HashSet<Action>();
 		}
 
 		// Check if the current page is a login page
@@ -566,36 +560,39 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			}
 		}
 
-		return null;
+		return new HashSet<Action>();
 	}
 
 	/*
 	 * Force closing of Policies Popup
 	 */
-	protected Set<Action> detectForcedPopupClick(State state,
-			StdActionCompiler ac) {
+	protected Set<Action> detectForcedPopupClick(State state, StdActionCompiler ac) {
+		Set<Action> popupClickActions = new HashSet<Action>();
+
 		if (policyAttributes == null || policyAttributes.size() == 0) {
-			return null;
+			return popupClickActions;
 		}
 
 		for (Widget widget : state) {
-			// Only enabled, visible widgets
-			if (!widget.get(Enabled, true) || widget.get(Blocked, false)) {
+			// If not visible widget, ignore
+			if (!isAtBrowserCanvas(widget) || widget.get(WdTags.WebAttributeMap, null) == null) {
 				continue;
 			}
 
-			WdElement element = ((WdWidget) widget).element;
-			boolean isPopup = true;
-			for (Map.Entry<String, String> entry : policyAttributes.entrySet()) {
-				String attribute = element.attributeMap.get(entry.getKey());
-				isPopup &= entry.getValue().equals(attribute);
+			// If some of the attributed matches, add the possible click action
+			boolean popupMatches = false;
+			for (String key : policyAttributes.keySet()) {
+				String attribute = widget.get(WdTags.WebAttributeMap).get(key);
+				for (String entryValue: policyAttributes.get(key)) {
+					popupMatches |= entryValue.equals(attribute);
+				}
 			}
-			if (isPopup) {
-				return new HashSet<>(Collections.singletonList(ac.leftClickAt(widget)));
+			if (popupMatches) {
+				popupClickActions.add(ac.leftClickAt(widget));
 			}
 		}
 
-		return null;
+		return popupClickActions;
 	}
 
 	/*
@@ -616,7 +613,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			}
 		}
 
-		return null;
+		return new HashSet<Action>();
 	}
 
 	/*

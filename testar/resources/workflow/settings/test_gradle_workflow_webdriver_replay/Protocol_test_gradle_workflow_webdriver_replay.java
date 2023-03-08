@@ -42,6 +42,7 @@ import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.monkey.Settings;
 import org.testar.OutputStructure;
+import org.testar.managers.InputDataManager;
 import org.testar.protocols.WebdriverProtocol;
 
 import java.io.File;
@@ -111,7 +112,7 @@ public class Protocol_test_gradle_workflow_webdriver_replay extends WebdriverPro
 
             // type into text boxes
             if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-                actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+                actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
             }
 
             // left clicks, but ignore links outside domain
