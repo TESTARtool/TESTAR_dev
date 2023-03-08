@@ -172,7 +172,10 @@ public class WebVerdict {
 
 		// Iterate through the form element widgets
 		for(int i = 0; i < w.childCount(); i++) {
-			extractAllRowDescriptionsFromTable(w.child(i), rowElementsDescription);
+			// If the children of the table are not sub-tables
+			if(!w.child(i).get(Tags.Role, Roles.Widget).equals(WdRoles.WdTABLE)) {
+				extractAllRowDescriptionsFromTable(w.child(i), rowElementsDescription);
+			}
 		}
 	}
 

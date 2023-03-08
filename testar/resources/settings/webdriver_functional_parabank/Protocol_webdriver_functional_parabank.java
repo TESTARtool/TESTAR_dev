@@ -222,7 +222,7 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 		if( listErrorVerdictInfo.stream().anyMatch( verdictInfo -> verdictInfo.contains( suspiciousTitleVerdictInfo ))) {
 			verdict = Verdict.OK;
 			webConsoleVerdict = Verdict.OK;
-		} else {
+		} else if (verdict.severity() != Verdict.OK.severity()) {
 			return verdict;
 		}
 
