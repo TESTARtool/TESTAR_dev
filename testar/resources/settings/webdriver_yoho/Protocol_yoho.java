@@ -280,7 +280,7 @@ public class Protocol_yoho extends WebdriverProtocol {
             // left clicks, but ignore links outside domain
             if (isAtBrowserCanvas(widget) && isClickable(widget)) {
                 if (whiteListed(widget) || isUnfiltered(widget)) {
-                    if (!isLinkDenied(widget)) {
+                    if (!isLinkDenied(widget) && !((widget instanceof WdWidget) && isActionUnwanted((WdWidget) widget))) {
                         actions.add(ac.leftClickAt(widget));
                     } else {
                         // link denied:
@@ -541,5 +541,17 @@ public class Protocol_yoho extends WebdriverProtocol {
     //         return null;
     //     }
     // }
+
+    private boolean isActionUnwanted(WdWidget widget) {
+        if (("yoho-avatar".equals(widget.get(WdTags.WebTagName)) && "true".equals(widget.getAttribute("ng-reflect-big"))) ||
+        ("img".equals(widget.get(WdTags.WebTagName))) && "avatar-image".equals(widget.getAttribute("alt"))) {
+            return true;
+        }
+        WdWidget parent = widget.parent();
+        if (parent == null) {
+            return false;
+        }
+        return isActionUnwanted(parent);
+    }
 }
 
