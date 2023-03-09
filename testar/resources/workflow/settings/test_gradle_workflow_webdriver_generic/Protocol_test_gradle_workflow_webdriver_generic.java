@@ -63,6 +63,9 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
  */
 public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverProtocol {
 
+	private String cookieNecessaryIdValue = "_cookieDisplay_WAR_corpcookieportlet_necessaryCookiesButton";
+	private String cookieAllIdValue = "_cookieDisplay_WAR_corpcookieportlet_allCookiesButton";
+
     /**
      * Called once during the life time of TESTAR
      * This method can be used to perform initial setup work
@@ -88,6 +91,12 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
         Assert.collectionContains(domainsAllowed, "login.awo.ou.nl");
         Assert.collectionSize(settings.get(ConfigTags.DeniedExtensions), 3);
         Assert.collectionSize(deniedExtensions, 3);
+
+        // Add a force click action for policy attributes
+        policyAttributes.put("id", "bad");
+        policyAttributes.put("id", cookieNecessaryIdValue);
+        policyAttributes.put("id", cookieAllIdValue);
+        policyAttributes.put("id", "nothing");
     }
 
     @Override
@@ -101,8 +110,7 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
     }
 
     @Override
-    protected Set<Action> deriveActions(SUT system, State state)
-            throws ActionBuildException {
+    protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
         // Kill unwanted processes, force SUT to foreground
         Set<Action> actions = super.deriveActions(system, state);
 
@@ -112,6 +120,15 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
 
         // Check if forced actions are needed to stay within allowed domains
         Set<Action> forcedActions = detectForcedActions(state, ac);
+
+        if(actionCount() == 1) {
+        	//Assert that the first action is executed in one of the two policy buttons
+        	Assert.isTrue(forcedActions.size() == 2);
+        	Assert.isTrue(forcedActions.iterator().next().get(Tags.OriginWidget, null) != null);
+        	String policyClickWidgetId = forcedActions.iterator().next().get(Tags.OriginWidget).get(WdTags.WebId, "");
+        	Assert.isTrue(policyClickWidgetId.equals(cookieNecessaryIdValue) || policyClickWidgetId.equals(cookieAllIdValue));
+        }
+
         if (forcedActions != null && forcedActions.size() > 0) {
             return forcedActions;
         }

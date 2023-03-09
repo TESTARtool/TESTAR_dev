@@ -28,6 +28,7 @@
  *
  */
 
+import com.google.common.collect.ArrayListMultimap;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
@@ -106,9 +107,8 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
 		 * Set to null to disable this feature
 		 */
 		// Currently only at Java protocol level (need code re-compilation)
-		policyAttributes = new HashMap<String, String>() {{
-		    put("class", "iAgreeButton");
-		}};
+		policyAttributes = ArrayListMultimap.create();
+		policyAttributes.put("class", "iAgreeButton");
 	}
 
 	/**
