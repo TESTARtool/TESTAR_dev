@@ -90,7 +90,7 @@ public class WebVerdict {
 		return alertVerdict;
 	}
 
-	public static Verdict verdictNumberWithLotOfDecimals(State state, int maxDecimals) {
+	public static Verdict verdictNumberWithLotOfDecimals(State state, int maxDecimals, boolean englishCulture) {
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
 		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
@@ -98,17 +98,34 @@ public class WebVerdict {
 		// If it is enabled, then execute the verdict implementation
 		Verdict decimalsVerdict = Verdict.OK;
 		for(Widget w : state) {
+			
+			
 			// If the widget contains a web text that is a double number
-			if(!w.get(WdTags.WebTextContent, "").isEmpty() && isNumeric(w.get(WdTags.WebTextContent))) {
-				// Count the decimal places of the text number
-				String number = w.get(WdTags.WebTextContent).replace(",", ".");
-				int decimalPlaces = number.length() - number.indexOf('.') - 1;
+			if(!w.get(WdTags.WebTextContent, "").isEmpty()) {
 
-				if(number.contains(".") && decimalPlaces > maxDecimals) {
-					String verdictMsg = String.format("Widget with more than %s decimals! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
-							maxDecimals, w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
+				String number = w.get(WdTags.WebTextContent);
+				
+				// https://en.wikipedia.org/wiki/Decimal_separator#History
+				// Convert number to an English double, such as 1000.50
+				if (englishCulture)
+				{
+					number = number.replace(",",""); // remove "," thousands separator
+				}
+				else
+				{
+					number = number.replace(".","").replace(" ","").replace(",", "."); // remove "," and " " thousands separators, and replace "," decimal to "."
+				}
 
-					decimalsVerdict = decimalsVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_DECIMALS, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+				if (isNumeric(number)) {
+					// Count the decimal places of the text number
+					int decimalPlaces = number.length() - number.indexOf('.') - 1;
+
+					if(number.contains(".") && decimalPlaces > maxDecimals) {
+						String verdictMsg = String.format("Widget with more than %s decimals! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
+								maxDecimals, w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
+	
+						decimalsVerdict = decimalsVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_DECIMALS, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+					}
 				}
 			}
 		}
@@ -201,11 +218,11 @@ public class WebVerdict {
 			// For the web select elements with an Id property
 			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) && !w.get(WdTags.WebId, "").isEmpty()) {
 				String elementId = w.get(WdTags.WebId, "");
-				String query = String.format("return document.getElementById('%s').length", elementId);
+				String query = String.format("return ((document.getElementById('%s') != null) ? document.getElementById('%s').length : 3)", elementId, elementId);
 				Long selectItemsLength = (Long) WdDriver.executeScript(query);
 				// Verify that contains at least one item element
-				if (selectItemsLength.intValue() <= 1) {
-					String verdictMsg = String.format("Empty or Unique Select element detected! Role: %s , Path: %s , Desc: %s", 
+				if (selectItemsLength.intValue() == 0) {
+					String verdictMsg = String.format("Empty select element detected! Role: %s , Path: %s , Desc: %s", 
 							w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
 
 					emptySelectListVerdict = new Verdict(Verdict.SEVERITY_WARNING_ORPHAN_ITEM, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
@@ -216,6 +233,57 @@ public class WebVerdict {
 		return emptySelectListVerdict;
 	}
 
+	public static Verdict oneItemSelectItemsVerdict(State state) {
+		// If this method is NOT enabled, just return verdict OK
+		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
+		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
+
+		Verdict selectElementVerdict = Verdict.OK;
+		for(Widget w : state) {
+			// For the web select elements with an Id property
+			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) && !w.get(WdTags.WebId, "").isEmpty()) {
+				String elementId = w.get(WdTags.WebId, "");
+				String query = String.format("return ((document.getElementById('%s') != null) ? document.getElementById('%s').length : 3)", elementId, elementId);
+				Long selectItemsLength = (Long) WdDriver.executeScript(query);
+
+				if (selectItemsLength.intValue() == 1) {
+					String verdictMsg = String.format("Only one item in select element detected! Role: %s , Path: %s , Desc: %s", 
+							w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
+
+					selectElementVerdict = new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+				}
+			}
+		}
+
+		return selectElementVerdict;
+	}
+
+	public static Verdict tooManyItemSelectItemsVerdict(State state, int thresholdValue) {
+		// If this method is NOT enabled, just return verdict OK
+		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
+		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
+
+		Verdict selectElementVerdict = Verdict.OK;
+		for(Widget w : state) {
+			// For the web select elements with an Id property
+			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) && !w.get(WdTags.WebId, "").isEmpty()) {
+				String elementId = w.get(WdTags.WebId, "");
+				String query = String.format("return ((document.getElementById('%s') != null) ? document.getElementById('%s').length : 3)", elementId, elementId);
+				Long selectItemsLength = (Long) WdDriver.executeScript(query);
+
+                // Report error if dropdownlist has more items than thresholdValue
+				if (selectItemsLength.intValue() > thresholdValue) {
+					String verdictMsg = String.format("Dropdownlist has %d items, which is more than theshold value of %s! Role: %s , Path: %s , Desc: %s", 
+							selectItemsLength.intValue(), thresholdValue, w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
+
+					selectElementVerdict = new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+				}
+			}
+		}
+
+		return selectElementVerdict;
+	}
+	
 	public static Verdict verdictUnsortedSelectOptionsVerdict(State state) {
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
@@ -227,17 +295,22 @@ public class WebVerdict {
 			// For the web select elements with an Id property
 			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) && !w.get(WdTags.WebId, "").isEmpty()) {
 				String elementId = w.get(WdTags.WebId, "");
-				String query = String.format("return [...document.getElementById('%s').options].map(o => o.value)", elementId);
-				@SuppressWarnings("unchecked")
-				ArrayList<String> selectOptionsList = (ArrayList<String>) WdDriver.executeScript(query);
+				String querylength = String.format("return ((document.getElementById('%s') != null) ? document.getElementById('%s').length : 0)", elementId, elementId);
+				Long selectItemsLength = (Long) WdDriver.executeScript(querylength);
 
-				// Now that we have collected all the array list of the option values verify that is sorted 
-				if(!isSorted(selectOptionsList)) {
+				if (selectItemsLength > 1) { 
+					String query = String.format("return [...document.getElementById('%s').options].map(o => o.value)", elementId);
+					@SuppressWarnings("unchecked")
+					ArrayList<String> selectOptionsList = (ArrayList<String>) WdDriver.executeScript(query);
 
-					String verdictMsg = String.format("Detected a Select web element with unsorted elements! Role: %s , Path: %s , WebId: %s", 
-							w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""));
+					// Now that we have collected all the array list of the option values verify that is sorted 
+					if(!isSorted(selectOptionsList)) {
 
-					return new Verdict(Verdict.SEVERITY_WARNING_UNSORTED, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+						String verdictMsg = String.format("Detected a Select web element with unsorted elements! Role: %s , Path: %s , WebId: %s", 
+								w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""));
+
+						return new Verdict(Verdict.SEVERITY_WARNING_UNSORTED, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+					}
 				}
 			}
 		}

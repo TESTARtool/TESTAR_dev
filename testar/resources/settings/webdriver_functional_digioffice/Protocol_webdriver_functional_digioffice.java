@@ -28,10 +28,9 @@
  *
  */
 
-import org.languagetool.JLanguageTool;
+import org.languagetool.language.AmericanEnglish;
 import org.languagetool.language.BritishEnglish;
 import org.languagetool.language.Dutch;
-import org.languagetool.rules.RuleMatch;
 import org.testar.SutVisualization;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.Pair;
@@ -40,6 +39,7 @@ import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.WdElement;
@@ -48,6 +48,8 @@ import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.plugin.NativeLinker;
 import org.testar.protocols.WebdriverProtocol;
+import org.testar.reporting.HTMLStateVerdictReport;
+import org.testar.verdicts.GenericVerdict;
 import org.testar.verdicts.WebVerdict;
 
 import com.google.common.collect.Comparators;
@@ -69,9 +71,7 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.File;
+
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
@@ -86,9 +86,16 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
  * - Radio button panel with only one option (input)
  * - Panel without children (form, div)
  * - Web alert with suspicious message
+ * - Spell checker in a file list that allows users to ignore. Also prepare a specific directory for the spell checker errors found.
+ * - Add URL related with the states
+ * 
  * - TODO: JavaScript loop to hang the browser - devTools
  * - TODO: JavaScript refresh browser constantly - devTools
  * - TODO: textarea with rows and columns to detect enter click
+ * - TODO: List of possible issues for different verdicts and allow user to customize different oracles for the SUT elements. List like spell checking
+ * - TODO: Now draw the widget highlight in all the screenshots of the state. Only in the last HTML report screen.
+ * - TODO: Use the state screenshots of the sequences to train and use a model
+ * - TODO: screenshot_sequence_x_states vs screenshot_sequence_x_actions
  * 
  * - Instead of joining Verdicts, try to recognize and save different Verdict exception in different sequences.
  */
@@ -102,7 +109,9 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 	Path downloadsPath;
 	private List<String> watchEventDownloadedFiles = new ArrayList<>();
 
-    private List<String> listSpellingIgnoreList = new ArrayList<>();
+	// Variable to track is a new form appeared in the state (should be reset when TESTAR opens up a new webpage or form)
+	private Boolean _pristineStateForm = true;
+
 	/**
 	 * This method is called before the first test sequence, allowing for example setting up the test environment
 	 */
@@ -110,61 +119,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 	protected void initTestSession() {
 		super.initTestSession();
 		listErrorVerdictInfo = new ArrayList<>();
-        loadSpellingIgnoreListFromFile(getSpellingIgnoreListFilePath());
-
 	}
-
-    private String getSpellingIgnoreListFilePath()
-    {
-        return "D:\\TESTAR\\bin\\SpellingIgnoreList.txt";
-    }
-    
-    private void loadSpellingIgnoreListFromFile(String filePath)
-    {
-        try
-        {
-            File file = new File(filePath);
-            if(file.exists() && !file.isDirectory()) 
-            {
-              Scanner s = new Scanner(file);
-           
-              while (s.hasNextLine()){
-                listSpellingIgnoreList.add(s.nextLine());
-              }
-              
-              s.close();
-            }
-        }
-        catch(java.io.FileNotFoundException ex)
-        {
-            // ignore errors
-        }
-        Collections.sort(listSpellingIgnoreList);
-    }
-    
-    private void saveSpellingIgnoreListToFile(String filePath)
-    {    
-        try
-        {
-        FileWriter writer = new FileWriter(filePath); 
-        for(String str: listSpellingIgnoreList) {
-          writer.write(str + System.lineSeparator());
-        }
-        writer.close();
-        }
-        catch(java.io.IOException ex)
-        {
-            // ignore errors
-        }
-    }
-    
-    
-    protected boolean isOnIgnoreList(String text)
-    {
-        if (text.startsWith("Pagina generatietijd")) return true;
-        return listSpellingIgnoreList.contains(text);
-    }
-
 	/**
 	 * This methods is called before each test sequence, before startSystem(),
 	 * allowing for example using external profiling software on the SUT
@@ -193,6 +148,13 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 	protected SUT startSystem() throws SystemStartException {
 		SUT system = super.startSystem();
 
+		// Reset the functional action and verdict
+		functionalAction = null;
+		functionalVerdict = Verdict.OK;
+		// Reset the form track for the new sequence
+		// This will allow to check again the formButtonMustBeDisabledIfNoChangesVerdict verdict
+		_pristineStateForm = true;
+
 		// https://github.com/ferpasri/parabank/tree/injected_failures
 		// custom_compile_and_deploy.bat
 		// http://localhost:8080/parabank
@@ -209,6 +171,31 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 	}
 
 	/**
+	 * This method is called when the TESTAR requests the state of the SUT.
+	 * Here you can add additional information to the SUT's state or write your
+	 * own state fetching routine. The state should have attached an oracle
+	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
+	 * state is erroneous and if so why.
+	 *
+	 * super.getState(system) puts the state information also to the HTML sequence report
+	 *
+	 * @return  the current state of the SUT with attached oracle.
+	 */
+	@Override
+	protected State getState(SUT system) throws StateBuildException {
+		// If we are in a new URL state, reset the form tracking
+		// This will allow to check again the formButtonMustBeDisabledIfNoChangesVerdict verdict
+		if(latestState != null 
+				&& !latestState.get(WdTags.WebHref, "").isEmpty()
+				&& !latestState.get(WdTags.WebHref).equals(WdDriver.getCurrentUrl())) 
+		{
+			_pristineStateForm = true;
+		}
+
+		return super.getState(system);
+	}
+
+	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
 	 * This can be used for example for bypassing a login screen by filling the username and password
 	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
@@ -217,9 +204,8 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 	@Override
 	protected void beginSequence(SUT system, State state) {
 		super.beginSequence(system, state);
-		// Reset the functional action and verdict
-		functionalAction = null;
-		functionalVerdict = Verdict.OK;
+
+		//TODO: Reader of the logs should use log4j format
 
 		// Reset the list of downloaded files
 		watchEventDownloadedFiles = new ArrayList<>();
@@ -286,70 +272,76 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 	}
 
 	/**
-	 * This method returns a unique failure verdict of one state.
-	 * Even if multiple failures can be reported together.
+	 * This method returns a unique functional failure verdict of one state. 
+	 * We do not join and do not report multiple failures together.
 	 * 
 	 * @param verdict
 	 * @param state
 	 * @return
 	 */
 	private Verdict getUniqueFunctionalVerdict(Verdict verdict, State state) {
+		// Check the functional Verdict that detects the spell checking.
+		// Instead of stop the sequence and report a warning verdict,
+		// report the information in a specific HTML report
+		// and continue testing
+		Verdict spellCheckerVerdict = GenericVerdict.verdictSpellChecker(state, WdTags.WebTextContent, new Dutch());
+		if(spellCheckerVerdict != Verdict.OK) HTMLStateVerdictReport.reportStateVerdict(actionCount, state, spellCheckerVerdict);
 
-		// Check the functional Verdict that detects if a widget is enabled when there are unsaved changes in a form
-		verdict = unsavedChangesButtonStateVerdict(state);
-        if (shouldReturnVerdict(verdict)) return verdict;
-		
+		// Check the functional Verdict that detects if a form button is disabled after modifying the form inputs.
+		verdict = formButtonEnabledAfterTypingChangesVerdict(state);
+		if (shouldReturnVerdict(verdict)) return verdict;
+
+		// Check the functional Verdict that detects if a form button is enabled when it must not.
+		verdict = formButtonMustBeDisabledIfNoChangesVerdict(state);
+		if (shouldReturnVerdict(verdict)) return verdict;
+
 		// Check the functional Verdict that detects if a downloaded file is empty.
 		verdict = watcherFileEmptyFile();
-        if (shouldReturnVerdict(verdict)) return verdict;
+		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects dummy buttons to the current state verdict.
 		verdict = functionalButtonVerdict(state);
-        if (shouldReturnVerdict(verdict)) return verdict;
-        
+		if (shouldReturnVerdict(verdict)) return verdict;
+
 		// Check the functional Verdict that detects select elements without items to the current state verdict.
-		verdict = emptySelectItemsVerdict(state);
-        if (shouldReturnVerdict(verdict)) return verdict;
+		verdict = WebVerdict.verdictEmptySelectItemsVerdict(state);
+		if (shouldReturnVerdict(verdict)) return verdict;
 
         // Add the functional Verdict that detects select elements with only one item to the current state verdict.
-        verdict = verdict.join(oneItemSelectItemsVerdict(state));
+        verdict = WebVerdict.oneItemSelectItemsVerdict(state);
         if (shouldReturnVerdict(verdict)) return verdict;
 
         // Add the functional Verdict that detect that dropdownlist has more than theshold value items
-        verdict = verdict.join(tooManyItemSelectItemsVerdict(state, 5));
+        verdict = WebVerdict.tooManyItemSelectItemsVerdict(state, 5);
         if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects select elements with unsorted items to the current state verdict.
-		verdict = unsortedSelectOptionsVerdict(state);
-        if (shouldReturnVerdict(verdict)) return verdict;
+		verdict = WebVerdict.verdictUnsortedSelectOptionsVerdict(state);
+		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if exists a number with more than X decimals.
-		verdict = numberWithLotOfDecimals(state, 2);
-        if (shouldReturnVerdict(verdict)) return verdict;
+		verdict = WebVerdict.verdictNumberWithLotOfDecimals(state, 2, false);
+		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if exists a textArea Widget without length.
 		verdict = WebVerdict.verdictTextAreaWithoutLength(state, Arrays.asList(WdRoles.WdTEXTAREA));
-        if (shouldReturnVerdict(verdict)) return verdict;
+		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if a web element does not contain children.
-		//verdict = elementWithoutChildren(state, Arrays.asList(WdRoles.WdFORM, WdRoles.WdDIV));
-        //if (shouldReturnVerdict(verdict)) return verdict;
+		verdict = WebVerdict.verdictElementWithoutChildren(state, Arrays.asList(WdRoles.WdFORM));
+		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if a web radio input contains a unique option.
-		verdict = uniqueRadioInput(state);
-        if (shouldReturnVerdict(verdict)) return verdict;
+		verdict = WebVerdict.verdictUniqueRadioInput(state);
+		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if a web alert contains a suspicious message.
-		verdict = alertSuspiciousMessage(state, ".*[lL]ogin.*");
-        if (shouldReturnVerdict(verdict)) return verdict;
+		verdict = WebVerdict.verdictAlertSuspiciousMessage(state, ".*[lL]ogin.*", lastExecutedAction);
+		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if web table contains duplicated rows.
-		verdict =  duplicateRowsInTable(state);
-        if (shouldReturnVerdict(verdict)) return verdict;
-		
-        // Add the Verdict that detects if the SUT contains misspelled titles
-        verdict = verdict.join(spellChecker(state, Arrays.asList(WdRoles.WdLABEL, WdRoles.WdA)));
-        if (shouldReturnVerdict(verdict)) return verdict;
+		verdict = WebVerdict.verdictDetectDuplicatedRowsInTable(state);
+		if (shouldReturnVerdict(verdict)) return verdict;
 
 		return verdict;
 	}
@@ -365,49 +357,8 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		return verdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch(info -> info.contains(verdict.info().replace("\n", " ")));
 	}
 
-    private Verdict spellChecker(State state, List<Role> roles) 
-    {
-        Verdict spellCheckerVerdict = Verdict.OK;
-        JLanguageTool langTool = new JLanguageTool(new Dutch());
-        // Iterate through all the widgets of the state to apply the spell checker in the title if exists
-        for(Widget w : state) 
-        {
-            String webTextContent = w.get(WdTags.WebTextContent, "");
-            if (!isOnIgnoreList(webTextContent))
-            {
-                if(
-                   //roles.contains(w.get(Tags.Role, Roles.Widget)) && 
-                   !w.get(WdTags.WebTextContent, "").isEmpty()) 
-                {
-                    try 
-                    {
-                        List<RuleMatch> matches = langTool.check(w.get(WdTags.WebTextContent));
-                        for (RuleMatch match : matches) {
-
-                            String errorMsg = "Potential error at characters " + match.getFromPos() + "-" + match.getToPos() + " : " + match.getMessage();
-                            String correctMsg = "Suggested correction(s): " + match.getSuggestedReplacements();
-
-                            String verdictMsg = "Widget Title ( " + w.get(WdTags.WebTextContent) + " ) " + errorMsg + " " + correctMsg;
-                            String spellingSuspect = "//" + w.get(WdTags.WebTextContent); // + "#errorMsg: " + errorMsg + "#correctMsg: " + correctMsg;
-                            if (!listSpellingIgnoreList.contains(spellingSuspect))
-                                listSpellingIgnoreList.add(spellingSuspect);
-                            spellCheckerVerdict = spellCheckerVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
-                        }
-                        
-                    }
-                    catch (IOException ioe) {
-                        System.err.println("JLanguageTool error checking widget: " + w.get(WdTags.WebTextContent));
-                      //if(ioe.getMessage() != null) System.err.println(ioe.getMessage());
-                    }
-                }
-            }
-        }
-
-        return spellCheckerVerdict;
-    }
-
 	private Verdict functionalButtonVerdict(State state) {
-		// If the last executed action is type text in a textbox
+		// If the last executed action is a click on a web button
 		if(functionalAction != null 
 				&& functionalAction.get(Tags.OriginWidget, null) != null 
 				&& functionalAction.get(Tags.Desc, "").contains("Click")
@@ -440,348 +391,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 
 		return functionalVerdict;
 	}
-	
-	private Boolean _pristineState = true; // TODO: should be reset when TESTAR opens up a new webpage or form
-	
-	// Oracle idea 3a
-	private Verdict unsavedChangesButtonStateVerdict(State state) {
-		List<String> descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges = new ArrayList<>();
-		descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("btnOpslaan");
-		descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("btnOpslaanEnSluiten");
-		Boolean hasUnsavedChanges = false;
-		
-		// If the last executed action is typing in INPUT field
-		if(functionalAction != null
-				&& functionalAction.get(Tags.OriginWidget, null) != null 
-				&& functionalAction.get(Tags.Desc, "").startsWith("Type")
-				&& functionalAction.get(Tags.OriginWidget).get(Tags.Role, Roles.Widget).equals(WdRoles.WdINPUT)
-				&& functionalAction.get(Tags.OriginWidget).get(WdTags.WebMaxLength) > 0) 
-		{
-			System.out.println("functionalAction desc: " + functionalAction.get(Tags.Desc, ""));
-			hasUnsavedChanges = true;
-		}
-		
-		if (hasUnsavedChanges || _pristineState)
-		{
-			for(Widget w : state) {
-				if (descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.contains(w.get(Tags.Desc, ""))) {
-					
-					if (hasUnsavedChanges)	{
-						// Check that widgets are turned on when the last action was a type action in a input field
-						if (w.get(WdTags.WebCssClasses, "").contains("item-disabled"))	{
-							String verdictMsg = String.format("Widget is not enabled while it should be! Role: %s , Path: %s , Desc: %s", 
-									w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
-							return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
-						}
-					}
-					else {
-						if (_pristineState)
-						{
-							// check that widgets are turned off when there was no action executed yet
-							if (!w.get(WdTags.WebCssClasses, "").contains("item-disabled"))	{
-								String verdictMsg = String.format("Widget is enabled while it should not be! Role: %s , Path: %s , Desc: %s", 
-										w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
-								return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
-							}
-						}
-					}
-					
-				}
-			}
-		}
-		_pristineState = false;
-		return Verdict.OK;
-	}
 
-	private Verdict emptySelectItemsVerdict(State state) {
-		Verdict selectElementVerdict = Verdict.OK;
-
-		for(Widget w : state) {
-			// For the web select elements with an Id property
-			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) && !w.get(WdTags.WebId, "").isEmpty()) {
-				String elementId = w.get(WdTags.WebId, "");
-				String query = String.format("return ((document.getElementById('%s') != null) ? document.getElementById('%s').length : 3)", elementId, elementId);
-				Long selectItemsLength = (Long) WdDriver.executeScript(query);
-				// Verify that contains at least one item element
-				if (selectItemsLength.intValue() == 0) {
-					String verdictMsg = String.format("Empty Select element detected! Role: %s , Path: %s , Desc: %s", 
-							w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
-
-					selectElementVerdict = new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
-				}
-			}
-		}
-
-		return selectElementVerdict;
-	}
-
-    
-	private Verdict unsortedSelectOptionsVerdict(State state) {
-		Verdict unsortedSelectElementVerdict = Verdict.OK;
-
-		for(Widget w : state) {
-			// For the web select elements with an Id property
-			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) && !w.get(WdTags.WebId, "").isEmpty()) {
-				String elementId = w.get(WdTags.WebId, "");
-
-                String querylength = String.format("return ((document.getElementById('%s') != null) ? document.getElementById('%s').length : 0)", elementId, elementId);
-				Long selectItemsLength = (Long) WdDriver.executeScript(querylength);
-                
-                if (selectItemsLength > 1)
-                { 
-    				String query = String.format("return [...document.getElementById('%s').options].map(o => o.value)", elementId);
-    				ArrayList<String> selectOptionsList = (ArrayList<String>) WdDriver.executeScript(query);
-    
-    				// Now that we have collected all the array list of the option values verify that is sorted 
-    				if(!isSorted(selectOptionsList)) {
-    
-    					String verdictMsg = String.format("Detected a Select web element with unsorted elements! Role: %s , Path: %s , WebId: %s", 
-    							w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""));
-    
-    					return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
-    				}
-                }
-			}
-		}
-
-		return unsortedSelectElementVerdict;
-	}
-	
-    
-	private static boolean isSorted(List<String> listOfStrings) {
-		return Comparators.isInOrder(listOfStrings, Comparator.<String> naturalOrder());
-	}
-
-
-	private Verdict oneItemSelectItemsVerdict(State state) {
-		Verdict selectElementVerdict = Verdict.OK;
-
-		for(Widget w : state) {
-			// For the web select elements with an Id property
-			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) && !w.get(WdTags.WebId, "").isEmpty()) {
-				String elementId = w.get(WdTags.WebId, "");
-				String query = String.format("return ((document.getElementById('%s') != null) ? document.getElementById('%s').length : 3)", elementId, elementId);
-				Long selectItemsLength = (Long) WdDriver.executeScript(query);
-
-                // Verify that contains at least two item elements
-				if (selectItemsLength.intValue() == 1) {
-					String verdictMsg = String.format("Only one item in select element detected! Role: %s , Path: %s , Desc: %s", 
-							w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
-
-					selectElementVerdict = new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
-				}
-			}
-		}
-
-		return selectElementVerdict;
-	}
-	
-	
-
-	private Verdict tooManyItemSelectItemsVerdict(State state, int thresholdValue) {
-		Verdict selectElementVerdict = Verdict.OK;
-
-		for(Widget w : state) {
-			// For the web select elements with an Id property
-			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) && !w.get(WdTags.WebId, "").isEmpty()) {
-				String elementId = w.get(WdTags.WebId, "");
-				String query = String.format("return ((document.getElementById('%s') != null) ? document.getElementById('%s').length : 3)", elementId, elementId);
-				Long selectItemsLength = (Long) WdDriver.executeScript(query);
-
-                // Report error if dropdownlist has more items than thresholdValue
-				if (selectItemsLength.intValue() > thresholdValue) {
-					String verdictMsg = String.format("Dropdownlist has %d items, which is more than theshold value of %s! Role: %s , Path: %s , Desc: %s", 
-							selectItemsLength.intValue(), thresholdValue, w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
-
-					selectElementVerdict = new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
-				}
-			}
-		}
-
-		return selectElementVerdict;
-	}
-
-	private Verdict numberWithLotOfDecimals(State state, int maxDecimals) {
-		Verdict decimalsVerdict = Verdict.OK;
-		for(Widget w : state) {
-            if(!w.get(WdTags.WebTextContent, "").isEmpty())
-            {
-                String number = w.get(WdTags.WebTextContent).replace(",", ".");
-    			// If the widget contains a web text that is a double number
-                // In Dutch, the decimal separator is a comma.
-    			if(w.get(WdTags.WebTextContent).contains(",") && isNumeric(number) ) {
-    				// Count the decimal places of the text number
-    				int decimalPlaces = number.length() - number.indexOf('.') - 1;
-    
-    				if(number.contains(".") && decimalPlaces > maxDecimals) {
-    					String verdictMsg = String.format("Widget with more than %s decimals! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
-    							maxDecimals, w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
-    
-    					decimalsVerdict = decimalsVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
-    				}
-    			}
-            }
-		}
-		return decimalsVerdict;
-	}
-
-    /*
-	private Verdict textAreaWithoutLength(State state, List<Role> roles) {
-		Verdict textAreaVerdict = Verdict.OK;
-		for(Widget w : state) {
-			if(roles.contains(w.get(Tags.Role, Roles.Widget)) && w.get(WdTags.WebMaxLength) == 0) {
-
-				String verdictMsg = String.format("TextArea Widget with 0 Length detected! Role: %s , Path: %s , WebId: %s", 
-						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""));
-
-				textAreaVerdict = textAreaVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
-			}
-		}
-		return textAreaVerdict;
-	}
-    */
-    
-	private Verdict elementWithoutChildren(State state, List<Role> roles) {
-		Verdict emptyChildrenVerdict = Verdict.OK;
-		for(Widget w : state) {
-			if(roles.contains(w.get(Tags.Role, Roles.Widget)) && w.childCount() < 1) {
-
-				String verdictMsg = String.format("Detected a Web element without child elements! Role: %s , Path: %s , WebId: %s, WebCssClasses: %s",
-						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId), w.get(WdTags.WebCssClasses),"");
-
-				emptyChildrenVerdict = emptyChildrenVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
-			}
-		}
-		return emptyChildrenVerdict;
-	}
-
-    private static Boolean isRadioButton(Widget radio_widget){
-        Role[] roles = new Role[]{WdRoles.WdINPUT};
-        return Role.isOneOf(radio_widget.get(Tags.Role, Roles.Widget), roles) && radio_widget.get(WdTags.WebType,"").equalsIgnoreCase("radio");
-    }
-    
-    /*
-	private Verdict uniqueRadioInput(State state) {
-		Verdict radioInputVerdict = Verdict.OK;
-		for(Widget w : state) {
-			if(isRadioButton(w) && !siblingRoleElementIsRadioButton(w)) {
-
-				String verdictMsg = String.format("Detected a Web radio input element with a Unique option! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
-						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
-
-				radioInputVerdict = radioInputVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
-			}
-		}
-		return radioInputVerdict;
-	}
-*/
-
-   private Verdict uniqueRadioInput(State state) {
-		Verdict radioInputVerdict = Verdict.OK;
-		for(Widget w : state) {
-            if (isRadioButton(w)) {
-                Widget form = findParentByRole(w, WdRoles.WdFORM);
-                if (form == null)
-                {
-                   String verdictMsg = String.format("Detected a Web radio input element which is not contained in a HTML form element! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
-                     w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
-                   radioInputVerdict = radioInputVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
-                }
-                else
-                {
-                   List<Widget> inputFields = findChildsByRole(form, WdRoles.WdINPUT);
-                   Boolean otherRadioButtonWithSameNameFound = false;
-                   for(Widget inputField : inputFields) {
-                       if (isRadioButton(inputField) && w != inputField && w.get(WdTags.Desc, "").equals(inputField.get(WdTags.Desc, "")))
-                       {
-                           otherRadioButtonWithSameNameFound = true;
-                       }
-                   }
-        			if(!otherRadioButtonWithSameNameFound) {
-        
-        				String verdictMsg = String.format("Detected a Web radio input element with a Unique option! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
-        						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
-        
-        				radioInputVerdict = radioInputVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
-        			}
-                 }
-            }
-		}
-		return radioInputVerdict;
-	}
-	
-	private Verdict duplicateRowsInTable(State state) {
-		Verdict duplicateRowsInTableVerdict = Verdict.OK;
-		for(Widget w : state) {
-			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdTABLE)) {
-				List<Pair<Widget, String>> rowElementsDescription = new ArrayList<>();
-				extractAllRowDescriptionsFromTable(w, rowElementsDescription);
-
-				// https://stackoverflow.com/a/52296246
-				List<String> duplicatedDescriptions =    
-						rowElementsDescription.stream().collect(Collectors.groupingBy(Pair::right))
-						.entrySet()
-						.stream()
-						.filter(e -> e.getValue().size() > 1)
-						.map(Map.Entry::getKey)
-						.collect(Collectors.toList());
-
-				// If the list of duplicated descriptions contains a matching prepare the verdict
-				if(!duplicatedDescriptions.isEmpty()) {
-					String verdictMsg = String.format("Detected a Table with duplicated rows! Role: %s , WebId: %s", 
-							w.get(Tags.Role), w.get(WdTags.WebId, ""));
-
-					duplicateRowsInTableVerdict = duplicateRowsInTableVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
-				}
-
-			}
-		}
-
-		return duplicateRowsInTableVerdict;
-	}
-
-	private void extractAllRowDescriptionsFromTable(Widget w, List<Pair<Widget, String>> rowElementsDescription) {
-		if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdTR)) {
-			rowElementsDescription.add(new Pair<Widget, String>(w, obtainWidgetTreeDescription(w)));
-		}
-
-		// Iterate through the form element widgets
-		for(int i = 0; i < w.childCount(); i++) {
-			extractAllRowDescriptionsFromTable(w.child(i), rowElementsDescription);
-		}
-	}
-
-	private String obtainWidgetTreeDescription(Widget w) {
-		String widgetDesc = w.get(WdTags.WebTextContent, "");
-
-		// Iterate through the form element widgets
-		for(int i = 0; i < w.childCount(); i++) {
-			widgetDesc = widgetDesc + "_" + obtainWidgetTreeDescription(w.child(i));
-		}
-
-		return widgetDesc;
-	}
-
-	private Verdict alertSuspiciousMessage(State state, String pattern) {
-		Verdict alertVerdict = Verdict.OK;
-		if(!WdDriver.alertMessage.isEmpty()) {
-			Matcher matcher = Pattern.compile(pattern).matcher(WdDriver.alertMessage);
-			if (matcher.find()) {
-				// The widget to remark is the state by default
-				Widget w = state;
-				// But if the alert was prompt by executing an action in a widget, remark this widget
-				if(lastExecutedAction != null  && lastExecutedAction.get(Tags.OriginWidget, null) != null) {
-					w = lastExecutedAction.get(Tags.OriginWidget);
-				}
-
-				String verdictMsg = String.format("Detected an alert with a suspicious message %s ! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
-						WdDriver.alertMessage, w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
-
-				alertVerdict = alertVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
-			}
-		}
-		return alertVerdict;
-	}
 
 	private Verdict watcherFileEmptyFile() {
 		Verdict watcherEmptyfileVerdict = Verdict.OK;
@@ -818,64 +428,69 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		return watcherEmptyfileVerdict;
 	}
 
-	private boolean isNumeric(String strNum) {
-		if (strNum == null) {
-			return false;
-		}
-		try {
-			double d = Double.parseDouble(strNum);
-		} catch (NumberFormatException nfe) {
-			return false;
-		}
-		return true;
-	}
+	private Verdict formButtonEnabledAfterTypingChangesVerdict(State state) {
+		List<String> descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges = new ArrayList<>();
+		descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("submit-button");
+		descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("save-button");
+		descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("cancel-button");
 
-    private Widget findParentByRole(Widget w, Role role)
-    {
-        if (w.get(Tags.Role, Roles.Widget).equals(role)) return w;
-        Widget parent = w.parent();
-        if (parent == null) return null;
-        return findParentByRole(parent, role);
-    }
-    
-    private ArrayList<Widget> findChildsByRole(Widget w, Role role)
-    {
-        ArrayList<Widget> childs = new ArrayList<>();  
-        if (w.get(Tags.Role, Roles.Widget).equals(role)) { 
-            childs.add(w); 
-        }
-        for(int i=0; i < w.childCount(); i++) {
-            childs.addAll(findChildsByRole(w.child(i), role));
-        }
-        return childs;
-    }
-    
-	/**
-	 * Check if a widget contains a sibling element.
-	 */
-	private boolean siblingRoleElement(Widget w, Role role) {
-		if(w.parent() == null) return false;
-		Widget parent = w.parent();
-		for(int i=0; i < parent.childCount(); i++) {
-			// If the parent contains a widget child that is not the current widget, return true
-			if(parent.child(i).get(Tags.Role, Roles.Widget).equals(role) && parent.child(i) != w) {
-				return true;
+		// If the last executed action is typing in a son of a form
+		if(functionalAction != null
+				&& functionalAction.get(Tags.OriginWidget, null) != null 
+				&& functionalAction.get(Tags.Desc, "").startsWith("Type")
+				&& isSonOfFormWidget(functionalAction.get(Tags.OriginWidget))
+				&& functionalAction.get(Tags.OriginWidget).get(WdTags.WebMaxLength) > 0) 
+		{
+			// Because the form was altered, update the tracking variable
+			// this will avoid false positives on formButtonMustBeDisabledIfNoChangesVerdict
+			_pristineStateForm = false;
+
+			for(Widget w : state) {
+				if (descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.contains(w.get(Tags.Desc, ""))) {
+					// Check that widgets are turned on when the last action was a type action in a input field
+					if (w.get(WdTags.WebIsDisabled, false))	{
+						String verdictMsg = String.format("Form Widget is NOT enabled while it should be! Role: %s , Path: %s , Desc: %s", 
+								w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
+						return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+					}
+				}
 			}
 		}
-		return false;
+
+		return Verdict.OK;
 	}
 
-	private boolean siblingRoleElementIsRadioButton(Widget w) {
-		if(w.parent() == null) return false;
-		Widget parent = w.parent();
-		for(int i=0; i < parent.childCount(); i++) {
-			// If the parent contains a widget child that is not the current widget, return true
-			if(isRadioButton(parent.child(i)) && parent.child(i) != w) {
-				return true;
+	private Verdict formButtonMustBeDisabledIfNoChangesVerdict(State state) {
+		List<String> descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges = new ArrayList<>();
+		descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges.add("submit-button");
+		descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges.add("save-button");
+		descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges.add("cancel-button");
+
+		// If we are in a state with an unaltered form, apply the verdict
+		if (_pristineStateForm)
+		{
+			for(Widget w : state) {
+				if (descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges.contains(w.get(Tags.Desc, ""))) {
+					// check that widgets are turned off when there was no action executed yet
+					if (!w.get(WdTags.WebIsDisabled, false))	{
+						String verdictMsg = String.format("Form Widget IS enabled while it should not be! Role: %s , Path: %s , Desc: %s", 
+								w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
+						return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+					}
+
+				}
 			}
 		}
-		return false;
+
+		return Verdict.OK;
 	}
+
+	private boolean isSonOfFormWidget(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(Tags.Role, Roles.Widget).equals(WdRoles.WdFORM)) return true;
+		else return isSonOfFormWidget(widget.parent());
+	}
+
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
 	 * You can use the SUT's current state, analyze the widgets and their properties to create
@@ -965,6 +580,8 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 
 	@Override
 	protected boolean isClickable(Widget widget) {
+		if(widget.get(WdTags.WebIsDisabled, false)) return false;
+
 		Role role = widget.get(Tags.Role, Roles.Widget);
 		if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
 			// Input type are special...
@@ -983,6 +600,27 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		Set<String> clickSet = new HashSet<>(clickableClasses);
 		clickSet.retainAll(element.cssClasses);
 		return clickSet.size() > 0;
+	}
+
+	@Override
+	protected boolean isTypeable(Widget widget) {
+		Role role = widget.get(Tags.Role, Roles.Widget);
+		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
+
+			// Specific class="input" for parasoft SUT
+			if(widget.get(WdTags.WebCssClasses, "").contains("input")) {
+				return true;
+			}
+
+			// Input type are special...
+			if (role.equals(WdRoles.WdINPUT)) {
+				String type = ((WdWidget) widget).element.type;
+				return WdRoles.typeableInputTypes().contains(type.toLowerCase());
+			}
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -1011,8 +649,5 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		if(getFinalVerdict().severity() > Verdict.SEVERITY_OK && !listErrorVerdictInfo.contains(getFinalVerdict().info().replace("\n", " "))) {
 			listErrorVerdictInfo.add(getFinalVerdict().info().replace("\n", " "));
 		}
-
-        saveSpellingIgnoreListToFile(getSpellingIgnoreListFilePath());
 	}
-
 }

@@ -312,7 +312,7 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if exists a number with more than X decimals.
-		verdict = WebVerdict.verdictNumberWithLotOfDecimals(state, 2);
+		verdict = WebVerdict.verdictNumberWithLotOfDecimals(state, 2, true);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if exists a textArea Widget without length.
