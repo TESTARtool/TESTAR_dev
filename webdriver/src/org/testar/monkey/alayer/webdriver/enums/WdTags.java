@@ -206,6 +206,11 @@ public class WdTags extends TagsBase {
   public static final Tag<Boolean> WebIsEnabled = from("WebIsEnabled", Boolean.class);
 
   /**
+   * Whether this widget is disabled (web property "disabled")
+   */
+  public static final Tag<Boolean> WebIsDisabled = from("WebIsDisabled", Boolean.class);
+
+  /**
    * Whether this widget is currently blocked.
    */
   public static final Tag<Boolean> WebIsBlocked = from("WebIsBlocked", Boolean.class);

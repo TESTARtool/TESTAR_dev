@@ -317,7 +317,7 @@ public class StateManagementTags {
     public static final Tag<String> WebWidgetDisplay = Tag.from("Web Widget display", String.class);
     public static final Tag<Boolean> WebWidgetIsOffScreen = Tag.from("Web Widget Is Off Screen", Boolean.class);
     public static final Tag<String> WebWidgetSrc = Tag.from("Web Widget src", String.class);
-    
+    public static final Tag<Boolean> WebWidgetIsDisabled = Tag.from("Web Widget Is Disabled", Boolean.class);
     
     // a set containing the tags that are available for state management
     private static Set<Tag<?>> stateManagementTags = new HashSet<Tag<?>>() {
@@ -405,6 +405,7 @@ public class StateManagementTags {
             add(WebWidgetDisplay);
             add(WebWidgetIsOffScreen);
             add(WebWidgetSrc);
+            add(WebWidgetIsDisabled);
         }
     };
 
@@ -499,6 +500,7 @@ public class StateManagementTags {
         settingsMap.put(WebWidgetDisplay, "WebWidgetDisplay");
         settingsMap.put(WebWidgetIsOffScreen, "WebWidgetIsOffScreen");
         settingsMap.put(WebWidgetSrc, "WebWidgetSrc");
+        settingsMap.put(WebWidgetIsDisabled, "WebWidgetIsDisabled");
     }
 
     // a mapping of a tag to its group
@@ -583,6 +585,7 @@ public class StateManagementTags {
             put(WebWidgetDisplay, Group.WebDriver);
             put(WebWidgetIsOffScreen, Group.WebDriver);
             put(WebWidgetSrc, Group.WebDriver);
+            put(WebWidgetIsDisabled, Group.WebDriver);
         }
     };
 

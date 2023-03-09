@@ -64,7 +64,7 @@ public class WdElement extends TaggableBase implements Serializable {
   public String display, type;
   public int maxLength;
 
-  boolean enabled, ignore;
+  boolean enabled, ignore, disabled;
   public boolean isClickable;
   public boolean isShadow;
   boolean isContentElement, isControlElement;
@@ -124,6 +124,7 @@ public class WdElement extends TaggableBase implements Serializable {
     type = attributeMap.getOrDefault("type", "");
     src = attributeMap.getOrDefault("src", "");
     maxLength = Integer.valueOf(attributeMap.getOrDefault("maxlength", "-1"));
+    disabled = Boolean.valueOf(attributeMap.getOrDefault("disabled", "false"));
 
     String classesString = attributeMap.getOrDefault("class", "");
     if (classesString != null) {

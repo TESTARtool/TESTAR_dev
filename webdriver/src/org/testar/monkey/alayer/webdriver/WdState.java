@@ -294,6 +294,9 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(WdTags.WebIsEnabled)) {
 			ret = w.element.enabled;
 		}
+		else if (t.equals(WdTags.WebIsDisabled)) {
+			ret = w.element.disabled;
+		}
 		else if (t.equals(WdTags.WebIsBlocked)) {
 			ret = w.element.blocked;
 		}

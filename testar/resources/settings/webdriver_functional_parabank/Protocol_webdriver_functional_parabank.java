@@ -39,6 +39,7 @@ import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.WdElement;
@@ -108,6 +109,9 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 	Path downloadsPath;
 	private List<String> watchEventDownloadedFiles = new ArrayList<>();
 
+	// Variable to track is a new form appeared in the state (should be reset when TESTAR opens up a new webpage or form)
+	private Boolean _pristineStateForm = true;
+
 	/**
 	 * This method is called before the first test sequence, allowing for example setting up the test environment
 	 */
@@ -145,6 +149,13 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 	protected SUT startSystem() throws SystemStartException {
 		SUT system = super.startSystem();
 
+		// Reset the functional action and verdict
+		functionalAction = null;
+		functionalVerdict = Verdict.OK;
+		// Reset the form track for the new sequence
+		// This will allow to check again the formButtonMustBeDisabledIfNoChangesVerdict verdict
+		_pristineStateForm = true;
+
 		// https://github.com/ferpasri/parabank/tree/injected_failures
 		// custom_compile_and_deploy.bat
 		// http://localhost:8080/parabank
@@ -160,6 +171,31 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 	}
 
 	/**
+	 * This method is called when the TESTAR requests the state of the SUT.
+	 * Here you can add additional information to the SUT's state or write your
+	 * own state fetching routine. The state should have attached an oracle
+	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
+	 * state is erroneous and if so why.
+	 *
+	 * super.getState(system) puts the state information also to the HTML sequence report
+	 *
+	 * @return  the current state of the SUT with attached oracle.
+	 */
+	@Override
+	protected State getState(SUT system) throws StateBuildException {
+		// If we are in a new URL state, reset the form tracking
+		// This will allow to check again the formButtonMustBeDisabledIfNoChangesVerdict verdict
+		if(latestState != null 
+				&& !latestState.get(WdTags.WebHref, "").isEmpty()
+				&& !latestState.get(WdTags.WebHref).equals(WdDriver.getCurrentUrl())) 
+		{
+			_pristineStateForm = true;
+		}
+
+		return super.getState(system);
+	}
+
+	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
 	 * This can be used for example for bypassing a login screen by filling the username and password
 	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
@@ -168,9 +204,6 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 	@Override
 	protected void beginSequence(SUT system, State state) {
 		super.beginSequence(system, state);
-		// Reset the functional action and verdict
-		functionalAction = null;
-		functionalVerdict = Verdict.OK;
 
 		//TODO: Reader of the logs should use log4j format
 
@@ -253,6 +286,14 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 		// and continue testing
 		Verdict spellCheckerVerdict = GenericVerdict.verdictSpellChecker(state, WdTags.WebTextContent, new AmericanEnglish());
 		if(spellCheckerVerdict != Verdict.OK) HTMLStateVerdictReport.reportStateVerdict(actionCount, state, spellCheckerVerdict);
+
+		// Check the functional Verdict that detects if a form button is disabled after modifying the form inputs.
+		verdict = formButtonEnabledAfterTypingChangesVerdict(state);
+		if (shouldReturnVerdict(verdict)) return verdict;
+
+		// Check the functional Verdict that detects if a form button is enabled when it must not.
+		verdict = formButtonMustBeDisabledIfNoChangesVerdict(state);
+		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if a downloaded file is empty.
 		verdict = watcherFileEmptyFile();
@@ -378,6 +419,69 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 		return watcherEmptyfileVerdict;
 	}
 
+	private Verdict formButtonEnabledAfterTypingChangesVerdict(State state) {
+		List<String> descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges = new ArrayList<>();
+		descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("submit-button");
+		descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("save-button");
+		descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("cancel-button");
+
+		// If the last executed action is typing in a son of a form
+		if(functionalAction != null
+				&& functionalAction.get(Tags.OriginWidget, null) != null 
+				&& functionalAction.get(Tags.Desc, "").startsWith("Type")
+				&& isSonOfFormWidget(functionalAction.get(Tags.OriginWidget))
+				&& functionalAction.get(Tags.OriginWidget).get(WdTags.WebMaxLength) > 0) 
+		{
+			// Because the form was altered, update the tracking variable
+			// this will avoid false positives on formButtonMustBeDisabledIfNoChangesVerdict
+			_pristineStateForm = false;
+
+			for(Widget w : state) {
+				if (descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.contains(w.get(Tags.Desc, ""))) {
+					// Check that widgets are turned on when the last action was a type action in a input field
+					if (w.get(WdTags.WebIsDisabled, false))	{
+						String verdictMsg = String.format("Form Widget is NOT enabled while it should be! Role: %s , Path: %s , Desc: %s", 
+								w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
+						return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+					}
+				}
+			}
+		}
+
+		return Verdict.OK;
+	}
+
+	private Verdict formButtonMustBeDisabledIfNoChangesVerdict(State state) {
+		List<String> descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges = new ArrayList<>();
+		descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges.add("submit-button");
+		descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges.add("save-button");
+		descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges.add("cancel-button");
+
+		// If we are in a state with an unaltered form, apply the verdict
+		if (_pristineStateForm)
+		{
+			for(Widget w : state) {
+				if (descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges.contains(w.get(Tags.Desc, ""))) {
+					// check that widgets are turned off when there was no action executed yet
+					if (!w.get(WdTags.WebIsDisabled, false))	{
+						String verdictMsg = String.format("Form Widget IS enabled while it should not be! Role: %s , Path: %s , Desc: %s", 
+								w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
+						return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+					}
+
+				}
+			}
+		}
+
+		return Verdict.OK;
+	}
+
+	private boolean isSonOfFormWidget(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(Tags.Role, Roles.Widget).equals(WdRoles.WdFORM)) return true;
+		else return isSonOfFormWidget(widget.parent());
+	}
+
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
 	 * You can use the SUT's current state, analyze the widgets and their properties to create
@@ -467,6 +571,8 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 
 	@Override
 	protected boolean isClickable(Widget widget) {
+		if(widget.get(WdTags.WebIsDisabled, false)) return false;
+
 		Role role = widget.get(Tags.Role, Roles.Widget);
 		if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
 			// Input type are special...

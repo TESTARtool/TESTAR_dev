@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<form id="custom_form">
+  <label for="text-input">Text Input:</label>
+  <input type="text" id="text-input" name="text-input" maxlength="20" oninput="enableSubmitButtonTextInput()"><br>
+
+  <label for="textarea">Textarea:</label>
+  <textarea id="textarea-input" name="textarea" maxlength="20">Existing text</textarea><br>
+
+  <input type="submit" id="submit-button" value="Submit" disabled="true">
+  <input type="submit" id="save-button" value="Save" disabled="true">
+  <input type="submit" id="cancel-button" value="Cancel">
+</form>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+  var form = document.getElementById("custom_form");
+  var textInput = document.getElementById("text-input");
+  var textareaInput = document.getElementById("textarea-input");
+  var submitButton = document.getElementById("submit-button");
+  var saveButton = document.getElementById("save-button");
+
+  function enableSubmitButtonTextInput() {
+    if (textInput.value.length > 0) {
+      submitButton.disabled = false;
+    } else {
+      submitButton.disabled = true;
+    }
+  }
+
+  textareaInput.addEventListener('input', function() {
+    if (textareaInput.value.length > 0) {
+      submitButton.disabled = false;
+    } else {
+      submitButton.disabled = true;
+    }
+  });
+</script>
+
+</body>
+</html> 
