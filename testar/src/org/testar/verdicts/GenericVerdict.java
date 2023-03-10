@@ -78,7 +78,7 @@ public class GenericVerdict {
 		return readSpellingIgnoreFromFile;
 	}).get();
 
-	public static Verdict verdictSpellChecker(State state, Tag<String> tagTextChecker, Language languageChecker) {
+	public static Verdict SpellChecker(State state, Tag<String> tagTextChecker, Language languageChecker) {
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
 		if(!enabledVerdicts.contains(methodName)) return Verdict.OK;

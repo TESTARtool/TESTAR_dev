@@ -284,7 +284,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		// Instead of stop the sequence and report a warning verdict,
 		// report the information in a specific HTML report
 		// and continue testing
-		Verdict spellCheckerVerdict = GenericVerdict.verdictSpellChecker(state, WdTags.WebTextContent, new Dutch());
+		Verdict spellCheckerVerdict = GenericVerdict.SpellChecker(state, WdTags.WebTextContent, new Dutch());
 		if(spellCheckerVerdict != Verdict.OK) HTMLStateVerdictReport.reportStateVerdict(actionCount, state, spellCheckerVerdict);
 
 		// Check the functional Verdict that detects if a form button is disabled after modifying the form inputs.
@@ -304,43 +304,43 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects select elements without items to the current state verdict.
-		verdict = WebVerdict.verdictEmptySelectItemsVerdict(state);
+		verdict = WebVerdict.EmptySelectItems(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
         // Add the functional Verdict that detects select elements with only one item to the current state verdict.
-        verdict = WebVerdict.oneItemSelectItemsVerdict(state);
+        verdict = WebVerdict.SingleSelectItems(state);
         if (shouldReturnVerdict(verdict)) return verdict;
 
         // Add the functional Verdict that detect that dropdownlist has more than theshold value items
-        verdict = WebVerdict.tooManyItemSelectItemsVerdict(state, 5);
+        verdict = WebVerdict.TooManyItemSelectItems(state, 50);
         if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects select elements with unsorted items to the current state verdict.
-		verdict = WebVerdict.verdictUnsortedSelectOptionsVerdict(state);
+		verdict = WebVerdict.UnsortedSelectItems(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if exists a number with more than X decimals.
-		verdict = WebVerdict.verdictNumberWithLotOfDecimals(state, 2, false);
+		verdict = WebVerdict.NumberWithLotOfDecimals(state, 2, false);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if exists a textArea Widget without length.
-		verdict = WebVerdict.verdictTextAreaWithoutLength(state, Arrays.asList(WdRoles.WdTEXTAREA));
+		verdict = WebVerdict.TextAreaWithoutLength(state, Arrays.asList(WdRoles.WdTEXTAREA));
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if a web element does not contain children.
-		verdict = WebVerdict.verdictElementWithoutChildren(state, Arrays.asList(WdRoles.WdFORM));
+		verdict = WebVerdict.ElementWithoutChildren(state, Arrays.asList(WdRoles.WdFORM));
 		if (shouldReturnVerdict(verdict)) return verdict;
 
-		// Check the functional Verdict that detects if a web radio input contains a unique option.
-		verdict = WebVerdict.verdictUniqueRadioInput(state);
+		// Check the functional Verdict that detects if a web radio input contains a single option.
+		verdict = WebVerdict.SingleRadioInput(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if a web alert contains a suspicious message.
-		verdict = WebVerdict.verdictAlertSuspiciousMessage(state, ".*[lL]ogin.*", lastExecutedAction);
+		verdict = WebVerdict.AlertSuspiciousMessage(state, ".*[lL]ogin.*", lastExecutedAction);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if web table contains duplicated rows.
-		verdict = WebVerdict.verdictDetectDuplicatedRowsInTable(state);
+		verdict = WebVerdict.DetectDuplicatedRowsInTable(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		return verdict;

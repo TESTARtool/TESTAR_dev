@@ -64,7 +64,7 @@ public class WebVerdict {
 			.map(java.lang.reflect.Method::getName)
 			.collect(Collectors.toList());
 
-	public static Verdict verdictAlertSuspiciousMessage(State state, String pattern, Action lastExecutedAction) {
+	public static Verdict AlertSuspiciousMessage(State state, String pattern, Action lastExecutedAction) {
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
 		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
@@ -90,7 +90,16 @@ public class WebVerdict {
 		return alertVerdict;
 	}
 
-	public static Verdict verdictNumberWithLotOfDecimals(State state, int maxDecimals, boolean englishCulture) {
+	// Detect a number with more than given maxDecimals.
+	// For example: maxDecimals=2 and englishCulture=true
+	// GOOD: 10.02
+	// GOOD: 0
+	// GOOD: 10.2
+	// BAD: 10.002
+	// BAD: 100.0003
+	// This is possibly wrong because the number should have been nicely formatted. 
+	// In rare cases a number with more than 2 decimals is required.
+	public static Verdict NumberWithLotOfDecimals(State state, int maxDecimals, boolean englishCulture) {
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
 		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
@@ -145,7 +154,16 @@ public class WebVerdict {
 		return true;
 	}
 
-	public static Verdict verdictDetectDuplicatedRowsInTable(State state) {
+	// Detect duplicated rows in a table by concatenating all visible values with an _ underscore
+	// GOOD: A_B_C
+	//       D_E_F
+	// BAD:  A_B_C
+	//       A_B_C
+	// It makes no sense to present a user with multiple rows in a table that is precisely the same.
+	// The user cannot distinguish one row from another.
+	// The underlying bug could be a technical issue (i.e. all cells have an 'undefined' value) or
+	// is more functional, such as a missing column which should make the rows unique and distinguishable
+	public static Verdict DetectDuplicatedRowsInTable(State state) {
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
 		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
@@ -207,7 +225,12 @@ public class WebVerdict {
 		return widgetDesc;
 	}
 
-	public static Verdict verdictEmptySelectItemsVerdict(State state) {
+	// Detect if a select element (such as a listbox or dropdownlist) has no items.
+	// It makes no sense to let a user choose an item out of empty list. 
+	// It should be better to disable the widget or make it invisible until there are 2 or more items to choose from.
+	// The underlying issue could be a technical issue, i.e. a function wasn't called that should fillup the items or
+	// a query filter from the database didn't lead to any results	
+	public static Verdict EmptySelectItems(State state) {
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
 		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
@@ -233,7 +256,7 @@ public class WebVerdict {
 		return emptySelectListVerdict;
 	}
 
-	public static Verdict oneItemSelectItemsVerdict(State state) {
+	public static Verdict SingleSelectItems(State state) {
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
 		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
@@ -250,7 +273,7 @@ public class WebVerdict {
 					String verdictMsg = String.format("Only one item in select element detected! Role: %s , Path: %s , Desc: %s", 
 							w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
 
-					selectElementVerdict = new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+					selectElementVerdict = new Verdict(Verdict.SEVERITY_WARNING_ORPHAN_ITEM, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
 				}
 			}
 		}
@@ -258,7 +281,7 @@ public class WebVerdict {
 		return selectElementVerdict;
 	}
 
-	public static Verdict tooManyItemSelectItemsVerdict(State state, int thresholdValue) {
+	public static Verdict TooManyItemSelectItems(State state, int thresholdValue) {
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
 		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
@@ -276,7 +299,7 @@ public class WebVerdict {
 					String verdictMsg = String.format("Dropdownlist has %d items, which is more than theshold value of %s! Role: %s , Path: %s , Desc: %s", 
 							selectItemsLength.intValue(), thresholdValue, w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
 
-					selectElementVerdict = new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+					selectElementVerdict = new Verdict(Verdict.SEVERITY_WARNING_MANY_ITEMS, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
 				}
 			}
 		}
@@ -284,7 +307,7 @@ public class WebVerdict {
 		return selectElementVerdict;
 	}
 	
-	public static Verdict verdictUnsortedSelectOptionsVerdict(State state) {
+	public static Verdict UnsortedSelectItems(State state) {
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
 		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
@@ -322,7 +345,7 @@ public class WebVerdict {
 		return Comparators.isInOrder(listOfStrings, Comparator.<String> naturalOrder());
 	}
 
-	public static Verdict verdictTextAreaWithoutLength(State state, List<Role> roles) {
+	public static Verdict TextAreaWithoutLength(State state, List<Role> roles) {
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
 		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
@@ -343,7 +366,7 @@ public class WebVerdict {
 
 	//TODO: Check bug fixed by Robin (for example some div exists and will be filled later)
 	// TODO: Improve this element without children using white list and black list using the class name to filtering out
-	public static Verdict verdictElementWithoutChildren(State state, List<Role> roles) {
+	public static Verdict ElementWithoutChildren(State state, List<Role> roles) {
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
 		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
@@ -362,45 +385,61 @@ public class WebVerdict {
 		return emptyChildrenVerdict;
 	}
 
-	public static Verdict verdictUniqueRadioInput(State state) {
+	
+	public static Verdict SingleRadioInput(State state) {
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
 		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
 
 		// If it is enabled, then execute the verdict implementation
 		Verdict radioInputVerdict = Verdict.OK;
+
 		for(Widget w : state) {
-			if(isRadioInput(w) && !siblingRoleElementIsRadioInput(w)) {
-
-				String verdictMsg = String.format("Detected a Web radio input element with a Unique option! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
-						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
-
-				radioInputVerdict = radioInputVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_ORPHAN_ITEM, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
-			}
+            if (isRadioInput(w)) {
+                Widget form = findParentByRole(w, WdRoles.WdFORM);
+                if (form != null)
+                {
+                   List<Widget> inputFields = findChildsByRole(form, WdRoles.WdINPUT);
+                   Boolean otherRadioButtonWithSameNameFound = false;
+                   for(Widget inputField : inputFields) {
+                       if (isRadioInput(inputField) && w != inputField && w.get(WdTags.Desc, "").equals(inputField.get(WdTags.Desc, "")))
+                       {
+                           otherRadioButtonWithSameNameFound = true;
+                       }
+                   }
+        			if(!otherRadioButtonWithSameNameFound) {
+        
+        				String verdictMsg = String.format("Detected a Web radio input element with a Unique option! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
+        						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
+        				radioInputVerdict = radioInputVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_ORPHAN_ITEM, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+        			}
+                 }
+            }
 		}
 		return radioInputVerdict;
 	}
-
+	
+    private static Widget findParentByRole(Widget w, Role role)
+    {
+        if (w.get(Tags.Role, Roles.Widget).equals(role)) return w;
+        Widget parent = w.parent();
+        if (parent == null) return null;
+        return findParentByRole(parent, role);
+    }
+    
+    private static ArrayList<Widget> findChildsByRole(Widget w, Role role)
+    {
+        ArrayList<Widget> childs = new ArrayList<>();  
+        if (w.get(Tags.Role, Roles.Widget).equals(role)) { 
+            childs.add(w); 
+        }
+        for(int i=0; i < w.childCount(); i++) {
+            childs.addAll(findChildsByRole(w.child(i), role));
+        }
+        return childs;
+    }
+	
 	private static boolean isRadioInput(Widget w) {
 		return w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdINPUT) && w.get(WdTags.WebType, "").equalsIgnoreCase("radio");
 	}
-
-	/**
-	 * Check if a widget contains a sibling radio input web element. 
-	 * 
-	 * @param w
-	 * @return
-	 */
-	private static boolean siblingRoleElementIsRadioInput(Widget w) {
-		if(w.parent() == null) return false;
-		Widget parent = w.parent();
-		for(int i=0; i < parent.childCount(); i++) {
-			// If the parent contains a widget child that is not the current widget, return true
-			if(isRadioInput(parent.child(i)) && parent.child(i) != w) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 }

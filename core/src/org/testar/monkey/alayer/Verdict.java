@@ -57,6 +57,8 @@ public final class Verdict implements Serializable {
 	public static final double SEVERITY_WARNING_ORPHAN_ITEM =  0.00000004;
 	public static final double SEVERITY_WARNING_UNSORTED =     0.00000005;
 	public static final double SEVERITY_WARNING_NON_WRITABLE = 0.00000006;
+	public static final double SEVERITY_WARNING_MANY_ITEMS =   0.00000007;
+	
 
 	// SUSPICIOUS_TITLE
 	public static final double SEVERITY_SUSPICIOUS_ALERT = 0.19999998; // suspicious alert

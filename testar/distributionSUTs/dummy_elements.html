@@ -15,20 +15,66 @@
 <h3>Textarea elements</h3>
 <textarea id="textarea_0length" rows="2" cols="20" maxlength="0"></textarea>
 
+<h3>Textbox</h3>
+<input name="txtSearchbox" type="text" id="txtSearchbox" accesskey="1" class="characterMap" autocomplete="off" " placeholder="Search in TESTAR" style="width:300px;" ischaractermapped="true">
+
 <h3>Number elements</h3>
 <label id="number_integer">1234</label>
 <br>
 <label id="number_2decimals">12.34</label>
 <br>
 <label id="number_3decimals">1.234</label>
+<br>
+<label id="number_3_decimals_comma">1,234</label>
+
+<h3>Repeating labels elements</h3>
+<label id="repeatingtext1">The quick brown fox jumps over the lazy dogThe quick brown fox jumps over the lazy dog</label><br/>
+<label id="repeatingtext2">ApplesApplesApples</label><br/>
+<label id="repeatingtext3">IBM AT Computer</label><br/>
+<label id="repeatingtext4">Lamp ShadeLamp Shade</label><br/>
+<label id="repeatingtext5">OrangesOranges</label><br/>
+<label id="repeatingtext6">I am a Potato</label><br/>
+<label id="repeatingtext7">i am i am i am a potato</label><br/>
+
+<h3>HTML element in labels</h3>
+<label id="htmltagsintext1_notok">The%20%3Cb%3Equick%3C%2Fb%3E%20brown%20fox%20jumps%20%3Ci%3Eover%20the%20lazy%3C%2Fi%3E%20dog</label><br/>
+<label id="htmltagsintext1_notok">The &lt;b&gt;quick&lt;/b&gt; brown fox jumps &lt;i&gt;over the lazy&lt;/i&gt; dog</label><br/>
+<label id="htmltagsintext1_ok">The <b>quick</b> brown fox jumps <i>over the lazy</i> dog</label>
 
 <h3>Dropdown</h3>
+<label>functional select</label>
 <select id="functional_select">
   <option id="One">One</option>
   <option id="Two">Two</option>
-</select>
+  <option id="Three">Three</option>	
+</select><br/>
+<label>empty select</label>
 <select id="empty_select">
-</select>
+</select><br/>
+<label>one item select</label>
+<select id="one_item_select">
+  <option id="One">One</option>
+</select><br/>
+<label>many item select</label>
+<select id="toomany_item_select">
+  <option id="One">One</option>
+  <option id="Two">Two</option>
+  <option id="Three">Three</option>	
+  <option id="Four">Four</option>	
+  <option id="Five">Five</option>	
+  <option id="Six">Six</option>	
+  <option id="Eight">Eight</option>	
+  <option id="Nine">Nine</option>	
+  <option id="Ten">Ten</option>	
+</select><br/>
+<label>duplicate in item select</label>
+<select id="toomany_item_select">
+  <option id="One">One</option>
+  <option id="Two">Two</option>
+  <option id="Three">Three</option>	
+  <option id="Four">Three</option>	
+  <option id="Five">Five</option>	
+</select><br/>
 
 <h3>Empty form</h3>
 <form id="someEmptyForm" ></form>
@@ -44,16 +90,34 @@
 <div style="float: right;">
 
 <h3>Radio buttons </h3>
+<!-- note that radiobuttons in a form with the same name form one group -->
 <form>
   <p>Please select your favorite testing tool:</p>
   <input type="radio" id="testar" name="fav_testing" value="TESTAR"><label for="testar">TESTAR</label>
+</form>
+<form>
+  <p>Please select your favorite pet:</p>
+  <input type="radio" id="monkey" name="fav_testing" value="Monkey"><label for="Monkey">Monkey</label>
+  <input type="checkbox" id="dog" name="fav_testing" value="Dog"><label for="Dog">Dog</label>
 </form>
 <form>
   <p>Please select your favorite Web language:</p>
   <input type="radio" id="html" name="fav_language" value="HTML"><label for="html">HTML</label><br>
   <input type="radio" id="css" name="fav_language" value="CSS"><label for="css">CSS</label><br>
   <input type="radio" id="javascript" name="fav_language" value="JavaScript"><label for="javascript">JavaScript</label>
+
 </form>
+<form>
+	<p>Please select And or Or:</p>
+	<table id="ChooseAndOr" cellspacing="0" cellpadding="0" border="0" style="border-collapse: collapse;">
+		<tr>
+			<td><input id="radioAnd" type="radio" name="ChooseAndOr" value="AND" checked="checked"><label for="radioAnd">And</label></td>
+			<td><input id="radioOr"  type="radio" name="ChooseAndOr" value="OR"><label for="radioOr">Or</label></td>
+		</tr>
+	</table>
+</form>
+<p>Radio button not embedded in form:</p>
+  <input type="radio" id="radioNotInAForm" name="radioNotInAForm" value="IShouldBeEmbeddedInForm"><label for="radioNotInAForm">I should be embedded in a form</label><br>
 
 <h3>Buttons</h3>
 <div id="buttons" class="tabcontent">
@@ -71,6 +135,12 @@ function changeText() {
 }
 </script>
 
+<h3>Checkboxes</h3>
+<form>
+  <p>Please sign the agreement:</p>
+  <input type="checkbox" id="IAgreeUsingTestar" name="IAgreeUsingTestar" value="IAgreeUsingTestar">I agree using TESTAR</input>
+</form>
+
 <h3>Alert Buttons</h3>
 <div id="buttonsAlert" class="tabcontent">
   <button id="good_alert" onclick="alertGoodMessage()">GoodAlert</button>
@@ -84,6 +154,56 @@ function alertSuspiciousMessage() {
   prompt("Add your credentials in this Login field...");
 }
 </script>
+
+<h3>Table with duplicate data</h3>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-568a{background-color:#D9E1F2;font-weight:bold;text-align:left;vertical-align:top}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+</style>
+<table class="tg">
+<thead>
+  <tr>
+    <th class="tg-568a">Nr</th>
+    <th class="tg-568a">Description</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-0lax">1</td>
+    <td class="tg-0lax">Testar</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">2</td>
+    <td class="tg-0lax">DigiOffice</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">2</td>
+    <td class="tg-0lax">DigiOffice</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">1</td>
+    <td class="tg-0lax">Testar</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">3</td>
+    <td class="tg-0lax">Word</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">4</td>
+    <td class="tg-0lax">Excel</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">5</td>
+    <td class="tg-0lax">PowerPoint</td>
+  </tr>
+</tbody>
+</table>
+
 
 
 </div>
