@@ -388,7 +388,7 @@ public class WebVerdict {
 		return duplicateSelectItemsVerdict;
 	}
 
-	public static Set<String> findDuplicates(List<String> list) {
+	private static Set<String> findDuplicates(List<String> list) {
 	    Set<String> set = new HashSet<>();
 	    Set<String> duplicates = new HashSet<>();
 	    for (String s : list) {
@@ -399,8 +399,6 @@ public class WebVerdict {
 	    }
 	    return duplicates;
 	}
-
-
 	
 	private static boolean isSorted(List<String> listOfStrings) {
 		return Comparators.isInOrder(listOfStrings, Comparator.<String> naturalOrder());
