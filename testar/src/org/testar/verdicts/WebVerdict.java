@@ -52,6 +52,8 @@ import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 
 import com.google.common.collect.Comparators;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * All public methods in this class must start with "verdict" naming. 
@@ -341,6 +343,65 @@ public class WebVerdict {
 		return unsortedSelectElementVerdict;
 	}
 
+	// Detect duplicated items in a Select (dropdownlist/listbox)
+	// GOOD: One
+	//       Two
+	// BAD:  One
+	//       One
+	// It makes no sense to present a user with multiple items in a list that have precisely the same display value.
+	// The user cannot distinguish one item from another.
+	// The underlying bug could be a technical issue (i.e. all or some items have an 'undefined' value) or
+	// is functional, such as the items should have a more distinguishable display value
+	public static Verdict DuplicateSelectItems(State state) {
+		// If this method is NOT enabled, just return verdict OK
+		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
+		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
+
+		// If it is enabled, then execute the verdict implementation
+		Verdict duplicateSelectItemsVerdict = Verdict.OK;
+		for(Widget w : state) {
+			// For the web select elements with an Id property
+			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) && !w.get(WdTags.WebId, "").isEmpty()) {
+				String elementId = w.get(WdTags.WebId, "");
+				String querylength = String.format("return ((document.getElementById('%s') != null) ? document.getElementById('%s').length : 0)", elementId, elementId);
+				Long selectItemsLength = (Long) WdDriver.executeScript(querylength);
+
+				if (selectItemsLength > 1) { 
+					String query = String.format("return [...document.getElementById('%s').options].map(o => o.value)", elementId);
+					@SuppressWarnings("unchecked")
+					ArrayList<String> selectOptionsList = (ArrayList<String>) WdDriver.executeScript(query);
+
+					Set<String> duplicates = findDuplicates(selectOptionsList);
+					
+					// Now that we have collected all the duplicates in a list verify that there are no duplicates
+					if(duplicates.size() > 0)
+					{
+						String verdictMsg = String.format("Detected a Select web element with duplicate elements! Role: %s , Path: %s , WebId: %s , Duplicate item(s): %s", 
+								w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), String.join(",", duplicates));
+
+						return new Verdict(Verdict.SEVERITY_WARNING_DUPLICATE_ITEMS, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+					}
+				}
+			}
+		}
+
+		return duplicateSelectItemsVerdict;
+	}
+
+	public static Set<String> findDuplicates(List<String> list) {
+	    Set<String> set = new HashSet<>();
+	    Set<String> duplicates = new HashSet<>();
+	    for (String s : list) {
+	        if (set.contains(s)) {
+	            duplicates.add(s);
+	        }
+	        set.add(s);
+	    }
+	    return duplicates;
+	}
+
+
+	
 	private static boolean isSorted(List<String> listOfStrings) {
 		return Comparators.isInOrder(listOfStrings, Comparator.<String> naturalOrder());
 	}

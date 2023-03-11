@@ -51,14 +51,14 @@ public final class Verdict implements Serializable {
 	public static final double SEVERITY_MIN = 0.0;
 
 	// WARNING
-	public static final double SEVERITY_WARNING =              0.00000001; // must be less than FAULT THRESHOLD @test.settings
-	public static final double SEVERITY_WARNING_DECIMALS =     0.00000002;
-	public static final double SEVERITY_WARNING_TABLE_ROWS =   0.00000003;
-	public static final double SEVERITY_WARNING_ORPHAN_ITEM =  0.00000004;
-	public static final double SEVERITY_WARNING_UNSORTED =     0.00000005;
-	public static final double SEVERITY_WARNING_NON_WRITABLE = 0.00000006;
-	public static final double SEVERITY_WARNING_MANY_ITEMS =   0.00000007;
-	
+	public static final double SEVERITY_WARNING =              		0.00000001; // must be less than FAULT THRESHOLD @test.settings
+	public static final double SEVERITY_WARNING_DECIMALS =     		0.00000002;
+	public static final double SEVERITY_WARNING_TABLE_ROWS =   		0.00000003;
+	public static final double SEVERITY_WARNING_ORPHAN_ITEM =  		0.00000004;
+	public static final double SEVERITY_WARNING_UNSORTED =     		0.00000005;
+	public static final double SEVERITY_WARNING_NON_WRITABLE = 		0.00000006;
+	public static final double SEVERITY_WARNING_MANY_ITEMS =   		0.00000007;
+	public static final double SEVERITY_WARNING_DUPLICATE_ITEMS =	0.00000008;
 
 	// SUSPICIOUS_TITLE
 	public static final double SEVERITY_SUSPICIOUS_ALERT = 0.19999998; // suspicious alert
@@ -138,7 +138,9 @@ public final class Verdict implements Serializable {
 		if(severity == Verdict.SEVERITY_WARNING_ORPHAN_ITEM) return "SEVERITY_WARNING_ORPHAN_ITEM";
 		if(severity == Verdict.SEVERITY_WARNING_UNSORTED) return "SEVERITY_WARNING_UNSORTED";
 		if(severity == Verdict.SEVERITY_WARNING_NON_WRITABLE) return "SEVERITY_WARNING_NON_WRITABLE";
-
+		if(severity == Verdict.SEVERITY_WARNING_MANY_ITEMS) return "SEVERITY_WARNING_MANY_ITEMS";
+		if(severity == Verdict.SEVERITY_WARNING_DUPLICATE_ITEMS) return "SEVERITY_WARNING_DUPLICATE_ITEMS";
+		
 		if(severity == Verdict.SEVERITY_SUSPICIOUS_ALERT) return "SUSPICIOUS_ALERT";
 		if(severity == Verdict.SEVERITY_SUSPICIOUS_TITLE) return "SUSPICIOUS_TITLE";
 

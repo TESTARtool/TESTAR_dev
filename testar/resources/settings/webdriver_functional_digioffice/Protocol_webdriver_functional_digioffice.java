@@ -318,7 +318,11 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		// Check the functional Verdict that detects select elements with unsorted items to the current state verdict.
 		verdict = WebVerdict.UnsortedSelectItems(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
-
+		
+		// Check the functional Verdict that detects select elements with duplicate items to the current state verdict.
+		verdict = WebVerdict.DuplicateSelectItems(state);
+		if (shouldReturnVerdict(verdict)) return verdict;
+		
 		// Check the functional Verdict that detects if exists a number with more than X decimals.
 		verdict = WebVerdict.NumberWithLotOfDecimals(state, 2, false);
 		if (shouldReturnVerdict(verdict)) return verdict;
