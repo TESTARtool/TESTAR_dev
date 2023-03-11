@@ -75,6 +75,16 @@
   <option id="Four">Three</option>	
   <option id="Five">Five</option>	
 </select><br/>
+<label>Readonly empty item select (should be ignored)</label>
+<select id="readonly_empty_item_select" readonly>	
+</select><br/>
+<label>disabled empty item select (should be ignored)</label>
+<select id="disabled_empty_item_select" disabled>	
+</select><br/>
+<label>disabled one item select (should be ignored)</label>
+<select id="disabled_one_item_select" disabled>	
+  <option id="One">One</option>
+</select><br/>
 
 <h3>Empty form</h3>
 <form id="someEmptyForm" ></form>
@@ -116,8 +126,6 @@
 		</tr>
 	</table>
 </form>
-<p>Radio button not embedded in form:</p>
-  <input type="radio" id="radioNotInAForm" name="radioNotInAForm" value="IShouldBeEmbeddedInForm"><label for="radioNotInAForm">I should be embedded in a form</label><br>
 
 <h3>Buttons</h3>
 <div id="buttons" class="tabcontent">
