@@ -44,9 +44,9 @@
 <h3>Dropdown</h3>
 <label>functional select</label>
 <select id="functional_select">
-  <option id="One">One</option>
-  <option id="Two">Two</option>
-  <option id="Three">Three</option>	
+  <option id="One" value="One">1</option>
+  <option id="Two" value="Two">2</option>
+  <option id="Three" value="Three">3</option>	
 </select><br/>
 <label>empty select</label>
 <select id="empty_select">
@@ -57,23 +57,32 @@
 </select><br/>
 <label>many item select</label>
 <select id="toomany_item_select">
-  <option id="One">One</option>
-  <option id="Two">Two</option>
-  <option id="Three">Three</option>	
-  <option id="Four">Four</option>	
-  <option id="Five">Five</option>	
-  <option id="Six">Six</option>	
-  <option id="Eight">Eight</option>	
-  <option id="Nine">Nine</option>	
-  <option id="Ten">Ten</option>	
+  <option id="One">01</option>
+  <option id="Two">02</option>
+  <option id="Three">03</option>	
+  <option id="Four">04</option>	
+  <option id="Five">05</option>	
+  <option id="Six">06</option>	
+  <option id="Seven">07</option>	
+  <option id="Eight">08</option>	
+  <option id="Nine">09</option>		
+  <option id="Ten">10</option>		
 </select><br/>
 <label>duplicate in item select</label>
-<select id="toomany_item_select">
-  <option id="One">One</option>
-  <option id="Two">Two</option>
-  <option id="Three">Three</option>	
-  <option id="Four">Three</option>	
-  <option id="Five">Five</option>	
+<select id="duplicate_item_select">
+  <option id="One">1</option>
+  <option id="Two">2</option>
+  <option id="Three">3</option>	
+  <option id="Four">4</option>	
+  <option id="Five">5</option>	
+</select><br/>
+<label>unsorted items in select</label>
+<select id="unsorted_items_in_select">
+  <option id="id5" value="5">E</option>
+  <option id="id4" value="4">D</option>
+  <option id="id3" value="3">A</option>
+  <option id="id2" value="2">B</option>
+  <option id="id1" value="1">C</option>
 </select><br/>
 <label>Readonly empty item select (should be ignored)</label>
 <select id="readonly_empty_item_select" readonly>	

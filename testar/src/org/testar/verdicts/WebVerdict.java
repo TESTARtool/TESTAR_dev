@@ -324,7 +324,7 @@ public class WebVerdict {
 				Long selectItemsLength = (Long) WdDriver.executeScript(querylength);
 
 				if (selectItemsLength > 1) { 
-					String query = String.format("return [...document.getElementById('%s').options].map(o => o.value)", elementId);
+					String query = String.format("return [...document.getElementById('%s').options].map(o => o.text)", elementId);
 					@SuppressWarnings("unchecked")
 					ArrayList<String> selectOptionsList = (ArrayList<String>) WdDriver.executeScript(query);
 
