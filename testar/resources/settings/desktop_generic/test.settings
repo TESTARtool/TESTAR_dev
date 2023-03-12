@@ -98,6 +98,18 @@ SUTProcesses =
 
 ProtocolClass = desktop_generic/Protocol_desktop_generic
 
+#################################################################\n"
+# State model inference settings
+#################################################################\n"
+StateModelEnabled = false
+DataStore = OrientDB
+DataStoreType = remote
+DataStoreServer = localhost
+DataStoreDB = testar
+DataStoreUser = testar
+DataStorePassword = testar
+DataStoreMode = instant
+
 #################################################################
 # State identifier attributes
 #
