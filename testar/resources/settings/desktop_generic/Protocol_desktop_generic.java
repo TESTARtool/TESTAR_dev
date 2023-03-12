@@ -31,7 +31,6 @@
 
 import java.util.Set;
 
-import org.testar.CodingManager;
 import org.testar.DerivedActions;
 import org.testar.SutVisualization;
 import org.testar.monkey.ConfigTags;
@@ -114,7 +113,7 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	protected State getState(SUT system) throws StateBuildException {
 		State state = super.getState(system);
 		// Creating a JSON file with information about widgets and their location on the screenshot:
-		if(settings.get(ConfigTags.Mode) == Modes.Generate)
+		if(settings.get(ConfigTags.CreateWidgetInfoJsonFile))
 			JsonUtils.createWidgetInfoJsonFile(state);
 
 		return state;
