@@ -96,7 +96,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_generic_action_selection/Protocol_desktop_generic_action_selection
+ProtocolClass = desktop_generic_action_selection/Protocol_desktop_action_selector
 
 #################################################################
 # State identifier attributes

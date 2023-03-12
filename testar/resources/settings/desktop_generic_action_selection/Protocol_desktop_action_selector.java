@@ -32,21 +32,44 @@
 import java.util.Set;
 
 import org.testar.PrioritizeNewActionsSelector;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Settings;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.protocols.DesktopProtocol;
+import org.testar.simplestategraph.GuiStateGraphWithVisitedActions;
+import org.testar.simplestategraph.QLearningActionSelector;
 
 /**
  * This protocol provides default TESTAR behaviour to test Windows desktop applications.
  *
  * It uses random action selection algorithm.
  */
-public class Protocol_desktop_generic_action_selection extends DesktopProtocol {
+public class Protocol_desktop_action_selector extends DesktopProtocol {
 
 
-	private PrioritizeNewActionsSelector selector = new PrioritizeNewActionsSelector();
+	private PrioritizeNewActionsSelector selector;
+//	private QLearningActionSelector selector;
+//	private GuiStateGraphWithVisitedActions selector;
+
+	/**
+	 * Called once during the life time of TESTAR
+	 * This method can be used to perform initial setup work
+	 * @param   settings  the current TESTAR settings as specified by the user.
+	 */
+	@Override
+	protected void initialize(Settings settings){
+		// initializing simple GUI state graph for Q-learning:
+		// this implementation uses concreteStateID for state abstraction, so it may find too many states:
+
+		selector = new PrioritizeNewActionsSelector();
+//		selector = new QLearningActionSelector(settings.get(ConfigTags.MaxReward),settings.get(ConfigTags.Discount));
+//		selector = new GuiStateGraphWithVisitedActions();
+
+		super.initialize(settings);
+	}
 
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
@@ -97,6 +120,12 @@ public class Protocol_desktop_generic_action_selection extends DesktopProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
+		// FOR Q-LEARNING ACTION SELECTOR
+		//Action action = selector.selectAction(state, actions);
+
+		// FOR STATE GRAPH WITH VISITED ACTIONS ACTION SELECTOR
+		//Action action = selector.selectAction(state, actions);
+
 		Action action = super.selectAction(state, actions);
 		return(action);
 	}
@@ -113,6 +142,7 @@ public class Protocol_desktop_generic_action_selection extends DesktopProtocol {
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
+		// FOR PRIORITIZE-NEW-ACTIONS ACTION SELECTOR
 		selector.addExecutedAction(action);
 		/*System.out.println("Executed action: " + action.get(Tags.Desc, "NoCurrentDescAvailable")
 		+ " -- Times executed: " + selector.timesExecuted(action));*/
