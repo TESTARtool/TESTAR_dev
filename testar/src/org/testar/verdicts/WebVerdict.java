@@ -367,17 +367,27 @@ public class WebVerdict {
 				Long selectItemsLength = (Long) WdDriver.executeScript(querylength);
 
 				if (selectItemsLength > 1) { 
-					String query = String.format("return [...document.getElementById('%s').options].map(o => o.value)", elementId);
+					String queryTexts = String.format("return [...document.getElementById('%s').options].map(o => o.text)", elementId);
+					String queryValues = String.format("return [...document.getElementById('%s').options].map(o => o.value)", elementId);
 					@SuppressWarnings("unchecked")
-					ArrayList<String> selectOptionsList = (ArrayList<String>) WdDriver.executeScript(query);
+					ArrayList<String> selectOptionsTextsList = (ArrayList<String>) WdDriver.executeScript(queryTexts);
+					ArrayList<String> selectOptionsValuesList = (ArrayList<String>) WdDriver.executeScript(queryValues);
 
-					Set<String> duplicates = findDuplicates(selectOptionsList);
+					Set<String> duplicatesTexts = findDuplicates(selectOptionsTextsList);
+					Set<String> duplicatesValues = findDuplicates(selectOptionsValuesList);
 					
 					// Now that we have collected all the duplicates in a list verify that there are no duplicates
-					if(duplicates.size() > 0)
+					if(duplicatesTexts.size() > 0)
 					{
-						String verdictMsg = String.format("Detected a Select web element with duplicate elements! Role: %s , Path: %s , WebId: %s , Duplicate item(s): %s", 
-								w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), String.join(",", duplicates));
+						String verdictMsg = String.format("Detected a Select web element with duplicate display value elements! Role: %s , Path: %s , WebId: %s , Duplicate item(s): %s", 
+								w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), String.join(",", duplicatesTexts));
+
+						return new Verdict(Verdict.SEVERITY_WARNING_DUPLICATE_ITEMS, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+					}
+					if(duplicatesValues.size() > 0)
+					{
+						String verdictMsg = String.format("Detected a Select web element with duplicate underlying value elements! Role: %s , Path: %s , WebId: %s , Duplicate item(s): %s", 
+								w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), String.join(",", duplicatesValues));
 
 						return new Verdict(Verdict.SEVERITY_WARNING_DUPLICATE_ITEMS, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
 					}
