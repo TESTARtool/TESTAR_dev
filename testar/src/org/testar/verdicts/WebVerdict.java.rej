@@ -1,0 +1,52 @@
+diff a/testar/src/org/testar/verdicts/WebVerdict.java b/testar/src/org/testar/verdicts/WebVerdict.java	(rejected hunks)
+@@ -476,9 +476,49 @@
+ 	    }
+ 	    return duplicates;
+ 	}
+-	
++
+ 	private static boolean isSorted(List<String> listOfStrings) {
++<<<<<<< HEAD
+ 		return Comparators.isInOrder(listOfStrings, Comparator.<String> naturalOrder()) || Comparators.isInOrder(listOfStrings, Comparator.<String> naturalOrder());
++=======
++		if(Comparators.isInOrder(listOfStrings, Comparator.<String> naturalOrder())) {
++			return true;
++		} else if(collatorPrimaryOrder(listOfStrings)) {
++			return true;
++		} else if(monthComparator(listOfStrings)) {
++			return true;
++		}
++
++		return false;
++	}
++
++	/**
++	 * This primary order ignores capital letter comparison. 
++	 * @param original
++	 * @return
++	 */
++	private static boolean collatorPrimaryOrder(List<String> original) {
++		List<String> copyListOfStrings = new ArrayList<>(original);
++		Collator coll = Collator.getInstance(Locale.US);
++		// Primary: a vs b
++		// SECONDARY: a vs �
++		// TERTIARY: a vs A
++		// IDENTICAL: unicode comparison
++		coll.setStrength(Collator.PRIMARY);
++		Collections.sort(copyListOfStrings, coll);
++		return original.equals(copyListOfStrings);
++	}
++
++	private static boolean monthComparator(List<String> original) {
++		List<String> copyListOfStrings = new ArrayList<>(original);
++		Comparator<String> comp = Comparator.comparing(s -> Month.valueOf(s.toUpperCase()));
++		try {
++			copyListOfStrings.sort(comp);
++		} catch(IllegalArgumentException iae) {
++			return false;
++		}
++		return original.equals(copyListOfStrings);
++>>>>>>> 0bf60fd2155858eb409893aed8cbb2bd480f51ae
+ 	}
+ 
+ 	public static Verdict TextAreaWithoutLength(State state, List<Role> roles) {

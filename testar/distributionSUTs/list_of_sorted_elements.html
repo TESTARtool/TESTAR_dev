@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+<h2>Web elements</h2>
+
+<p>Hello User</p>
+
+<!-- START LEFT ELEMENTS -->
+<div style="float: left;">
+
+<h3>Unsorted Dropdown</h3>
+
+<label>unsorted letters in select</label>
+<select id="unsorted_letters">
+  <option id="id5" value="5">E</option>
+  <option id="id4" value="4">D</option>
+  <option id="id3" value="3">A</option>
+  <option id="id2" value="2">B</option>
+  <option id="id1" value="1">C</option>
+</select><br/>
+
+<label>unsorted numbers in select</label>
+<select id="unsorted_numbers">
+  <option id="one" value="1">1</option>
+  <option id="three" value="3">3</option>
+  <option id="two" value="2">2</option>
+  <option id="four" value="4">4</option>
+</select><br/>
+
+</div>
+<!-- END LEFT ELEMENTS -->
+
+
+<!-- START RIGHT ELEMENTS -->
+<div style="float: right;">
+
+<h3>Sorted Dropdown</h3>
+
+<label>sorted months in select</label>
+<select id="sorted_months">
+  <option id="January" value="January">January</option>
+  <option id="February" value="February">February</option>
+  <option id="March" value="March">March</option>
+  <option id="April" value="April">April</option>
+</select><br/>
+
+<label>sorted without special character</label>
+<select id="sorted_sql">
+  <option id="Enquete" value="Enquete">Enquete</option>
+  <option id="met" value="Enquete met afsluitmogelijkheid">Enquete met afsluitmogelijkheid</option>
+</select><br/>
+
+<label>sorted with special character</label>
+<select id="sorted_excel">
+  <option id="met_char" value="Enquete met afsluitmogelijkheid&#60;">Enquete met afsluitmogelijkheid&#60;</option>
+  <option id="Enquete_char" value="Enquete&#60;">Enquete&#60;</option>
+</select><br/>
+
+<label>sorted capitals</label>
+<select id="sorted_capitals">
+  <option id="albacete" value="albacete">albacete</option>
+  <option id="Albacete" value="Albacete">Albacete</option>
+  <option id="valencia" value="valencia">valencia</option>
+  <option id="Valencia" value="Valencia">Valencia</option>
+</select><br/>
+
+<label>unsorted capital letter accepted by collatorPrimaryOrder</label>
+<select id="unsorted_capitals">
+  <option id="Alicante" value="Alicante">Alicante</option>
+  <option id="alicante" value="alicante">alicante</option>
+  <option id="Castellon" value="Castellon">Castellon</option>
+  <option id="castellon" value="castellon">castellon</option>
+</select><br/>
+
+</div>
+<!-- END RIGHT ELEMENTS -->
+   
+</body>
+</html> 

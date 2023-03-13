@@ -30,10 +30,14 @@
 
 package org.testar.verdicts;
 
+import java.text.Collator;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -401,7 +405,8 @@ public class WebVerdict {
 						String verdictMsg = String.format("Detected a Select web element with unsorted elements! Role: %s , Path: %s , WebId: %s", 
 								w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""));
 
-						return new Verdict(Verdict.SEVERITY_WARNING_UNSORTED, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+                        Verdict matchVerdict = new Verdict(Verdict.SEVERITY_WARNING_UNSORTED, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+                        unsortedSelectElementVerdict = unsortedSelectElementVerdict.join(matchVerdict);
 					}
 				}
 			}
@@ -476,9 +481,45 @@ public class WebVerdict {
 	    }
 	    return duplicates;
 	}
-	
+
 	private static boolean isSorted(List<String> listOfStrings) {
-		return Comparators.isInOrder(listOfStrings, Comparator.<String> naturalOrder()) || Comparators.isInOrder(listOfStrings, Comparator.<String> naturalOrder());
+		if(Comparators.isInOrder(listOfStrings, Comparator.<String> naturalOrder())) {
+			return true;
+		} else if(collatorPrimaryOrder(listOfStrings)) {
+			return true;
+		} else if(monthComparator(listOfStrings)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * This primary order ignores capital letter comparison. 
+	 * @param original
+	 * @return
+	 */
+	private static boolean collatorPrimaryOrder(List<String> original) {
+		List<String> copyListOfStrings = new ArrayList<>(original);
+		Collator coll = Collator.getInstance(Locale.US);
+		// Primary: a vs b
+		// SECONDARY: a vs ä
+		// TERTIARY: a vs A
+		// IDENTICAL: unicode comparison
+		coll.setStrength(Collator.PRIMARY);
+		Collections.sort(copyListOfStrings, coll);
+		return original.equals(copyListOfStrings);
+	}
+
+	private static boolean monthComparator(List<String> original) {
+		List<String> copyListOfStrings = new ArrayList<>(original);
+		Comparator<String> comp = Comparator.comparing(s -> Month.valueOf(s.toUpperCase()));
+		try {
+			copyListOfStrings.sort(comp);
+		} catch(IllegalArgumentException iae) {
+			return false;
+		}
+		return original.equals(copyListOfStrings);
 	}
 
 	public static Verdict TextAreaWithoutLength(State state, List<Role> roles) {

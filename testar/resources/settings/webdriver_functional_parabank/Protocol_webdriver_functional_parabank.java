@@ -615,6 +615,11 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 
 	@Override
 	protected boolean isTypeable(Widget widget) {
+		// If the web widget contains the "readonly" attribute, we do not want to derive type actions
+		if(widget.get(WdTags.WebAttributeMap, null) != null && widget.get(WdTags.WebAttributeMap).containsKey("readonly")) {
+			return false;
+		}
+
 		Role role = widget.get(Tags.Role, Roles.Widget);
 		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
 
