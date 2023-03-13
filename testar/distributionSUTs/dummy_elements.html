@@ -28,14 +28,153 @@
 <label id="number_3_decimals_comma">1,234</label>
 
 <h3>Repeating labels elements</h3>
-<label id="repeatingtext1">The quick brown fox jumps over the lazy dogThe quick brown fox jumps over the lazy dog</label><br/>
-<label id="repeatingtext2">ApplesApplesApples</label><br/>
-<label id="repeatingtext3">IBM AT Computer</label><br/>
-<label id="repeatingtext4">Lamp ShadeLamp Shade</label><br/>
-<label id="repeatingtext5">OrangesOranges</label><br/>
-<label id="repeatingtext6">I am a Potato</label><br/>
-<label id="repeatingtext7">i am i am i am a potato</label><br/>
-
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+.tg .tg-0pky{border-color:inherit;text-align:left;vertical-align:top}
+</style>
+<table class="tg">
+<thead>
+  <tr>
+    <th class="tg-0lax">text</th>
+    <th class="tg-0lax">should match or no match</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-0lax">somebody@somewhere.com; somebody@somewhere.com</td>
+    <td class="tg-0lax">match</td>
+  </tr>
+    <tr>
+    <td class="tg-0lax">persid_12;persid_12</td>
+    <td class="tg-0lax">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">persid_13;persid_133</td>
+    <td class="tg-0lax">no match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">The quick brown fox jumps over the lazy dogThe quick brown fox jumps over the lazy dog</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">E-mail inkomend / uitgaand</td>
+    <td class="tg-0pky">no match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">SharePoint - InkomendDocument</td>
+    <td class="tg-0pky">no match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">(Maak een keuze...)</td>
+    <td class="tg-0pky">no match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">Notificatie Offertetraject &gt; 25000 Euro</td>
+    <td class="tg-0pky">no match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">ApplesApplesApples</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">Apples Apples Apples</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">IBM AT Computer</td>
+    <td class="tg-0pky">no match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">Lamp ShadeLamp Shade</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">OrangesOranges</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">I am a Potato</td>
+    <td class="tg-0pky">no match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">i am i am i am a potato</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">bert Bakkerbert</td>
+    <td class="tg-0pky">no match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">1212</td>
+    <td class="tg-0pky">no match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">22</td>
+    <td class="tg-0pky">no match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">aaaa</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">de aller aller beste</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">het het beste idee idee</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">21 21</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">22 22</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">11 11</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">2222</td>
+    <td class="tg-0pky">no match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">de dansende dansende</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">a Feedback afronden, Feedback afronden, Feedback afronden</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">Geachte heer, mevrouw, Geachte heer, mevrouw,</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">Geachte heer mevrouw Geachte heer mevrouw</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">This is some text. This is some text in between. This is some text.</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">Companyname -&gt; Contactperson; Companyname -&gt; Contactperson</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+  </tr>
+</tbody>
+</table>
 <h3>HTML element in labels</h3>
 <label id="htmltagsintext1_notok">The%20%3Cb%3Equick%3C%2Fb%3E%20brown%20fox%20jumps%20%3Ci%3Eover%20the%20lazy%3C%2Fi%3E%20dog</label><br/>
 <label id="htmltagsintext1_notok">The &lt;b&gt;quick&lt;/b&gt; brown fox jumps &lt;i&gt;over the lazy&lt;/i&gt; dog</label><br/>

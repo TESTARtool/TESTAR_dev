@@ -258,6 +258,65 @@ public class WebVerdict {
 		return emptySelectListVerdict;
 	}
 
+	// Detects duplicate or repeated text in descriptions of widgets
+	// BAD: The quick brown fox jumps over the lazy dogThe quick brown fox jumps over the lazy dog
+	//		undefined undefined
+	//		undefined, undefined
+	//		someid_12;someid_12
+	//		somebody@somewhere.com; somebody@somewhere.com
+	//		12;12
+	// GOOD:The quick brown fox jumps over the lazy dog
+	//		undefined
+	//		someid_12
+	// The idea is that a value or description should not have repeated text, values or words, because in rare cases this is applicable.
+	// For example, the TO field of an e-mail should only have unique e-mailadresses, or the Authors field of a report should only have unique authors
+	// This could be a technical issue, where a boundary of a loop is off, or concatenating a string value twice.
+	public static Verdict DetectDuplicateText(State state)
+	{
+		Verdict verdict = Verdict.OK;
+		// The expression looks only if the start of the text is repeated somewhere else in the text
+		String patternRegex = "^(?=\\b(.*\\D.*)(\\s*\\W*\\s*)\\1(\\b|\\W))(?!\\W)";
+		Pattern pattern = Pattern.compile(patternRegex);
+		
+		for(Widget w : state) {
+			// TODO: Is Desc a good tag? Should the same tags be used as the suspicious text verdicts which are set in the UI?
+			String desc = w.get(Tags.Desc, "");
+			Matcher matcher = pattern.matcher(desc);
+			
+			if (matcher.find()) {
+				String verdictMsg = String.format("Detected duplicated or repeated text in description of widget! Role: %s , Path: %s , WebId: %s , Desc: %s", 
+						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""));
+				verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_DUPLICATE_ITEMS, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+			}
+		}
+		return verdict;
+	}
+	
+	// Detect HTML or XML tags in description of widget.
+	// BAD: The%20%3Cb%3Equick%3C%2Fb%3E%20brown%20fox%20jumps%20%3Ci%3Eover%20the%20lazy%3C%2Fi%3E%20dog
+	// 		The <b>quick</b> brown fox jumps <i>over the lazy</i> dog
+	// GOOD:The quick brown fox jumps over the lazy dog
+	// The idea is that a description should not show markup tags, but should probably show the text in bold, italic, and so on.
+	public static Verdict DetectHTMLOrXMLTagsInText(State state)
+	{
+		Verdict verdict = Verdict.OK;
+		String patternRegex = "\\&.*\\;|\\%\\w\\w|\\$\\w\\w|<[^>]*>";
+		Pattern pattern = Pattern.compile(patternRegex);
+		
+		for(Widget w : state) {
+			// TODO: Is Desc a good tag? Should the same tags be used as the suspicious text verdicts which are set in the UI?
+			String desc = w.get(Tags.Desc, "");
+			Matcher matcher = pattern.matcher(desc);
+			
+			if (matcher.find()) {
+				String verdictMsg = String.format("Detected HTML or XML tags in description of widget! Role: %s , Path: %s , WebId: %s , Desc: %s", 
+						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""));
+				verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_DUPLICATE_ITEMS, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+			}
+		}
+		return verdict;
+	}
+	
 	public static Verdict SingleSelectItems(State state) {
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
@@ -309,6 +368,14 @@ public class WebVerdict {
 		return selectElementVerdict;
 	}
 	
+	// Detect that items in a dropdownlist are not sorted alphabetically
+	// As a rule of thumb, items in a dropdownlist should be listed alphabetically, because:
+	//	-          user can pick an item easier by name
+	//	-          user can typ the part of the name and the focus is then automatically set to the first item found with the typed characters
+	// GOOD: A, B, C
+	// BAD:  B, C, A
+	// Note that there are different sorting types, such as natural, alphabetic, ascii, numerical, dictionary, logical orders. 
+	// This verdict tests with natural order.
 	public static Verdict UnsortedSelectItems(State state) {
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
@@ -411,7 +478,7 @@ public class WebVerdict {
 	}
 	
 	private static boolean isSorted(List<String> listOfStrings) {
-		return Comparators.isInOrder(listOfStrings, Comparator.<String> naturalOrder());
+		return Comparators.isInOrder(listOfStrings, Comparator.<String> naturalOrder()) || Comparators.isInOrder(listOfStrings, Comparator.<String> naturalOrder());
 	}
 
 	public static Verdict TextAreaWithoutLength(State state, List<Role> roles) {

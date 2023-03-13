@@ -286,7 +286,7 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 		// and continue testing
 		Verdict spellCheckerVerdict = GenericVerdict.SpellChecker(state, WdTags.WebTextContent, new AmericanEnglish());
 		if(spellCheckerVerdict != Verdict.OK) HTMLStateVerdictReport.reportStateVerdict(actionCount, state, spellCheckerVerdict);
-
+		
 		// Check the functional Verdict that detects if a form button is disabled after modifying the form inputs.
 		verdict = formButtonEnabledAfterTypingChangesVerdict(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
@@ -303,6 +303,14 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 		verdict = functionalButtonVerdict(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
+		// Check the functional Verdict that detects duplicate or repeated text in descriptions of widgets
+		verdict = WebVerdict.DetectDuplicateText(state);
+		if (shouldReturnVerdict(verdict)) return verdict;
+		
+		// Check the functional Verdict that detects HTML or XML tags in descriptions of widgets
+		verdict = WebVerdict.DetectHTMLOrXMLTagsInText(state);
+		if (shouldReturnVerdict(verdict)) return verdict;
+		
 		// Check the functional Verdict that detects select elements without items to the current state verdict.
 		verdict = WebVerdict.EmptySelectItems(state);
 		if (shouldReturnVerdict(verdict)) return verdict;

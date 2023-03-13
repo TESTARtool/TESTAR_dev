@@ -284,9 +284,12 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		// Instead of stop the sequence and report a warning verdict,
 		// report the information in a specific HTML report
 		// and continue testing
+		
+
+		
 		Verdict spellCheckerVerdict = GenericVerdict.SpellChecker(state, WdTags.WebTextContent, new Dutch());
 		if(spellCheckerVerdict != Verdict.OK) HTMLStateVerdictReport.reportStateVerdict(actionCount, state, spellCheckerVerdict);
-
+		
 		// Check the functional Verdict that detects if a form button is disabled after modifying the form inputs.
 		verdict = formButtonEnabledAfterTypingChangesVerdict(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
@@ -301,6 +304,14 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 
 		// Check the functional Verdict that detects dummy buttons to the current state verdict.
 		verdict = functionalButtonVerdict(state);
+		if (shouldReturnVerdict(verdict)) return verdict;
+		
+		// Check the functional Verdict that detects duplicate or repeated text in descriptions of widgets
+		verdict = WebVerdict.DetectDuplicateText(state);
+		if (shouldReturnVerdict(verdict)) return verdict;
+		
+		// Check the functional Verdict that detects HTML or XML tags in descriptions of widgets
+		verdict = WebVerdict.DetectHTMLOrXMLTagsInText(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects select elements without items to the current state verdict.
@@ -318,11 +329,11 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		// Check the functional Verdict that detects select elements with unsorted items to the current state verdict.
 		verdict = WebVerdict.UnsortedSelectItems(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
-		
+
 		// Check the functional Verdict that detects select elements with duplicate items to the current state verdict.
 		verdict = WebVerdict.DuplicateSelectItems(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
-		
+
 		// Check the functional Verdict that detects if exists a number with more than X decimals.
 		verdict = WebVerdict.NumberWithLotOfDecimals(state, 2, false);
 		if (shouldReturnVerdict(verdict)) return verdict;
@@ -349,6 +360,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 
 		return verdict;
 	}
+
 
 	/**
 	 * We want to return the verdict if it is not OK, 
@@ -434,9 +446,9 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 
 	private Verdict formButtonEnabledAfterTypingChangesVerdict(State state) {
 		List<String> descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges = new ArrayList<>();
-		descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("submit-button");
-		descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("save-button");
-		descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("cancel-button");
+		descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("Opslaan");
+		descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("Opslaan en sluiten");
+		//descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("cancel-button");
 
 		// If the last executed action is typing in a son of a form
 		if(functionalAction != null
@@ -466,9 +478,9 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 
 	private Verdict formButtonMustBeDisabledIfNoChangesVerdict(State state) {
 		List<String> descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges = new ArrayList<>();
-		descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges.add("submit-button");
-		descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges.add("save-button");
-		descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges.add("cancel-button");
+		descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges.add("Opslaan");
+		descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges.add("Opslaan en sluiten");
+		//descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges.add("cancel-button");
 
 		// If we are in a state with an unaltered form, apply the verdict
 		if (_pristineStateForm)
