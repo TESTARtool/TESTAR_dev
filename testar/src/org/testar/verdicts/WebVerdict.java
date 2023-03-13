@@ -279,7 +279,7 @@ public class WebVerdict {
 	{
 		Verdict verdict = Verdict.OK;
 		// The expression looks only if the start of the text is repeated somewhere else in the text
-		String patternRegex = "^(?=\\b(.*\\D.*)(\\s*\\W*\\s*)\\1(\\b|\\W))(?!\\W)";
+		String patternRegex = "^(?=\\b(.*\\D.*)(\\s*\\W*\\s*)\\1(\\b|\\W))(?!\\W)"; // ^(?=\b(.*\D.*)(\s*\W*\s*)\1(\b|\W))(?!\W)
 		Pattern pattern = Pattern.compile(patternRegex);
 		
 		for(Widget w : state) {
@@ -315,7 +315,7 @@ public class WebVerdict {
 			if (matcher.find()) {
 				String verdictMsg = String.format("Detected HTML or XML tags in description of widget! Role: %s , Path: %s , WebId: %s , Desc: %s", 
 						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""));
-				verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_DUPLICATE_ITEMS, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+				verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
 			}
 		}
 		return verdict;

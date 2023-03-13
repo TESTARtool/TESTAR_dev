@@ -285,11 +285,9 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		// report the information in a specific HTML report
 		// and continue testing
 		
-
-		
 		Verdict spellCheckerVerdict = GenericVerdict.SpellChecker(state, WdTags.WebTextContent, new Dutch());
 		if(spellCheckerVerdict != Verdict.OK) HTMLStateVerdictReport.reportStateVerdict(actionCount, state, spellCheckerVerdict);
-		
+
 		// Check the functional Verdict that detects if a form button is disabled after modifying the form inputs.
 		verdict = formButtonEnabledAfterTypingChangesVerdict(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
@@ -305,7 +303,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		// Check the functional Verdict that detects dummy buttons to the current state verdict.
 		verdict = functionalButtonVerdict(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
-		
+
 		// Check the functional Verdict that detects duplicate or repeated text in descriptions of widgets
 		verdict = WebVerdict.DetectDuplicateText(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
@@ -360,8 +358,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 
 		return verdict;
 	}
-
-
+	
 	/**
 	 * We want to return the verdict if it is not OK, 
 	 * and not on the detected failures list (it's a new failure). 
