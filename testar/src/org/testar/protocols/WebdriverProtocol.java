@@ -87,6 +87,7 @@ import org.testar.monkey.alayer.Roles;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.Shape;
 import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.Widget;
@@ -165,6 +166,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     // Verdict obtained from messages coming from the web browser console
     protected Verdict webConsoleVerdict = Verdict.OK;
     BufferedWriter logWriter = null;
+    BufferedWriter actionWriter = null;
 
 
     /**
@@ -178,10 +180,11 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
         try {
             logWriter = new BufferedWriter(new FileWriter("oracle.log"));
+            actionWriter = new BufferedWriter(new FileWriter("actions.log"));
         }
         catch(IOException e)
         {
-            System.err.println("!!! Cannot write to log file !!!");
+            System.err.println("!!! Cannot write to log files !!!");
             e.printStackTrace();
         }
         loginURL = settings.get(ConfigTags.ForcedLoginUrl, null);
@@ -388,8 +391,13 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
     @Override
     public void onTestEndEvent() {
-        if (logWriter != null) try {
-            logWriter.close();
+        try {
+            if (logWriter != null) {
+                logWriter.close();
+            }
+            if (actionWriter != null) {
+                actionWriter.close();
+            }
         }
         catch (IOException e){}
         delegate.updateStatus("Preparing a report", 0);
@@ -845,6 +853,16 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
         testReport.addSelectedAction(state, action);
         boolean result = super.executeAction(system, state, action);
         System.out.println("Executed action: " + action.toShortString());
+        if (actionWriter != null) {
+            try {
+                actionWriter.write(action.toString() + "\n");
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+        isForcedLoginInProgress = false;
         return result;
     }
 
@@ -1001,6 +1019,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
         StdActionCompiler actionCompiler = new StdActionCompiler();
         if (currentUrl.startsWith(loginURL)) {
             if (isForcedLoginInProgress) {
+                System.out.println("!!! Login in progress !!!");
                 return null;
             }
 
@@ -1075,8 +1094,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
                 CompoundAction actions = builder.build();
                 return new HashSet<>(Collections.singletonList(actions));
             }
-        } else {
-            isForcedLoginInProgress = false;
+        // } else {
+        //     isForcedLoginInProgress = false;
         }
 
         return null;
@@ -1205,6 +1224,16 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
      */
     protected boolean isLinkDenied(Widget widget) {
         String linkUrl = widget.get(Tags.ValuePattern, "");
+        if (actionWriter != null) try {
+            for (Tag<?> tag: widget.tags()) {
+                actionWriter.write("--- " + tag.name() + ": " + widget.get(tag).toString() + " ---\n");
+            }
+            actionWriter.write("Abstract representation: " + widget.getAbstractRepresentation() + "\n");
+            actionWriter.write("Link: " + linkUrl + "\n");
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         // Not a link or local file, allow
         if (linkUrl == null || linkUrl.startsWith("file:///")) {
