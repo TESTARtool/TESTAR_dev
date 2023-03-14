@@ -191,3 +191,11 @@ https://github.com/TESTARtool/TESTAR_dev/wiki/TESTAR-release-notes
 
 ## Required tools to create a windows.dll to update UIAutomation API
 https://github.com/TESTARtool/TESTAR_dev/wiki/Development:-Update-Windows-UIAutomation-(windows.dll)
+
+## Sonarqube analysis
+
+Adapt the fields based on your sonarqube server configuration ``ProjectName`` and ``sqp_0123xyz``
+
+``gradlew sonar -Dsonar.projectKey=ProjectName -Dsonar.host.url=http://localhost:9000 -Dsonar.login=sqp_0123xyz``
+
+``gradlew test jacocoTestReport sonar -Dsonar.projectKey=ProjectName -Dsonar.host.url=http://localhost:9000 -Dsonar.login=sqp_0123xyz``
