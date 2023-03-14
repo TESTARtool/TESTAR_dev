@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -375,6 +375,7 @@ public class IOSAppiumFramework extends SUTBase {
 
 	private static Document loadXML(String xml) throws ParserConfigurationException, SAXException, IOException {
 		DocumentBuilderFactory fctr = DocumentBuilderFactory.newInstance();
+		fctr.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 		DocumentBuilder bldr = fctr.newDocumentBuilder();
 		InputSource insrc = new InputSource(new StringReader(xml));
 		return bldr.parse(insrc);
