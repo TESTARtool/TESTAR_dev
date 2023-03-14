@@ -35,7 +35,7 @@ SUTConnectorValue = "/home/michaelt/Downloads/chromedriver_linux64/chromedriver"
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 2
+Sequences = 1
 SequenceLength = 10
 
 #################################################################
@@ -231,3 +231,24 @@ WebConsoleCustomOracle = true
 FaultThreshold = 0.1
 
 BtraceServiceHost = http://tst.yoho.marviq.net
+
+#################################################################
+# Extended settings file
+#
+# Relative path to extended settings file.
+#################################################################
+ExtendedSettingsFile = ./settings/webdriver_shopizer_reinforcement_learning/ExtendedRLStateUtility.xml
+
+#################################################################
+# Reinforcement learning settings
+#################################################################
+Alpha = 1.0
+Gamma = 0.99
+DefaultValue = 0.0
+DefaultReward = 0.0
+Epsilon = 0.7
+MaxQValue = 1.0
+DecayRate = 0.0001
+Temperature = 1.0
+RewardFunction = WidgetTreeBasedRewardFunction
+Policy = EpsilonGreedyPolicy
