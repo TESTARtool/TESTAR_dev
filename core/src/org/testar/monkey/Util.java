@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,7 +32,6 @@
 package org.testar.monkey;
 
 import org.testar.monkey.alayer.devices.Mouse;
-import org.testar.monkey.alayer.exceptions.SystemStopException;
 import org.testar.monkey.alayer.exceptions.WidgetNotFoundException;
 import org.testar.monkey.alayer.*;
 
@@ -52,75 +51,14 @@ import java.util.zip.GZIPOutputStream;
  */
 public final class Util {
 
-	private Util() {
-	}
-
-	public enum NullObject {NullObject;}
-
-	public static final NullObject Null = NullObject.NullObject;
+	private Util() {}
 
 	private static final String lineSep = System.getProperty("line.separator");
-
-	public static final Shape InvisibleShape = new Shape() {
-		private static final long serialVersionUID = 3038370744728060922L;
-
-		public double x() {
-			return 0;
-		}
-
-		public double y() {
-			return 0;
-		}
-
-		public double width() {
-			return 0;
-		}
-
-		public double height() {
-			return 0;
-		}
-
-		public void paint(Canvas canvas, Pen pen) {
-		}
-
-		public boolean contains(double x, double y) {
-			return false;
-		}
-	};
 
 	public static final Visualizer NullVisualizer = new Visualizer() {
 		private static final long serialVersionUID = 95857074998765550L;
 
 		public void run(State s, Canvas c, Pen pen) {
-		}
-	};
-
-	public static final Searcher NullSearcher = new Searcher() {
-		private static final long serialVersionUID = 7810562741429319061L;
-
-		public SearchFlag apply(Widget widget, UnFunc<Widget, SearchFlag> visitor) {
-			return SearchFlag.OK;
-		}
-	};
-
-	public static final Searcher AllSearcher = new Searcher() {
-		private static final long serialVersionUID = 7410528704889829161L;
-
-		public SearchFlag apply(Widget widget, UnFunc<Widget, SearchFlag> visitor) {
-			return visitor.apply(widget);
-		}
-	};
-
-	public static final HitTester TrueTester = new HitTester() {
-		private static final long serialVersionUID = -7254950185633885998L;
-
-		public boolean apply(double x, double y) {
-			return true;
-		}
-
-		@Override
-		public boolean apply(double x, double y, boolean obscuredByChildFeature) {
-			return true;
 		}
 	};
 
@@ -544,46 +482,6 @@ public final class Util {
 		}
 	}
 
-	public static File createTempDir() {
-		return createTempDir("org.fruit.", Long.toString(System.nanoTime()));
-	}
-
-	public static File createTempDir(String pref, String suff) {
-		File ret;
-		try {
-			ret = File.createTempFile(pref, suff);
-			if (!ret.delete() || !ret.mkdir()) {
-				return null;
-			}
-			return ret;
-		} catch (IOException e) {
-			return null;
-		}
-	}
-
-	public static File createTempFile() {
-		return createTempFile("org.fruit.", Long.toString(System.nanoTime()), null);
-	}
-
-	public static File createTempFile(String content) {
-		return createTempFile("org.fruit.", Long.toString(System.nanoTime()), content);
-	}
-
-	public static File createTempFile(String pref, String suff, String content) {
-		File dest;
-		try {
-			dest = File.createTempFile(pref, suff);
-			if (content != null) {
-				PrintWriter out = new PrintWriter(dest);
-				out.print(content);
-				out.close();
-			}
-			return dest;
-		} catch (IOException e) {
-			return null;
-		}
-	}
-
 	public static void saveToFile(String content, String file) throws IOException {
 		Assert.notNull(content, file);
 		File dest = new File(file);
@@ -807,10 +705,6 @@ public final class Util {
 		}
 	}
 
-	public static boolean isMember(State state, Widget widget) {
-		return Assert.notNull(widget.root()) == state;
-	}
-
 	public static double length(double x1, double y1, double x2, double y2) {
 		double a = x1 - x2;
 		double b = y1 - y2;
@@ -853,16 +747,6 @@ public final class Util {
 		}
 	}
 
-	public static File generateUniqueFile(String dir, String prefix) {
-		Assert.notNull(dir, prefix);
-		//int i = 0;
-		int i = 1;
-		File f;
-		while ((f = new File(dir + File.separator + prefix + i)).exists())
-			i++;
-		return f;
-	}
-
 	public static String lineSep() {
 		return lineSep;
 	}
@@ -891,18 +775,6 @@ public final class Util {
 			System.out.println("Exception caught calculating time between <" + fromDate + "> and <" + toDate + ">");
 			e.printStackTrace();
 			return e.getMessage();
-		}
-	}
-
-	public static boolean stop(SUT system) {
-		try {
-			if (system == null) {
-				return true;
-			}
-			system.stop();
-			return true;
-		} catch (SystemStopException ste) {
-			return false;
 		}
 	}
 
