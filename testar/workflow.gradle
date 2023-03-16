@@ -176,15 +176,15 @@ task runTestDesktopGenericTitleNameSuspiciousTitle(type: Exec, dependsOn:['insta
 
 // Download OrientDB 3.0.34 from the official wep page
 task downloadOrientDB(type: Download, dependsOn: installDist) {
-    src 'https://s3.us-east-2.amazonaws.com/orientdb3/releases/3.0.34/orientdb-3.0.34.zip'
+    src 'https://repo1.maven.org/maven2/com/orientechnologies/orientdb-community/3.0.34/orientdb-community-3.0.34.zip'
     dest 'target/install/testar/bin'
     overwrite false
 }
 // Verify that we downloaded the correct OrientDB file
 task verifyOrientDB(type: Verify, dependsOn: downloadOrientDB) {
-    src new File(downloadOrientDB.dest, 'orientdb-3.0.34.zip')
+    src new File(downloadOrientDB.dest, 'orientdb-community-3.0.34.zip')
     algorithm 'MD5'
-    checksum 'a0619e5522e7d849d4f1067bf08e3857'
+    checksum '37a87c9c8b3ed3778f6103b15c7e184b'
 }
 // Extract OrientDB binary files
 task downloadAndUnzipOrientDB(type: Copy, dependsOn: verifyOrientDB) {
@@ -196,7 +196,7 @@ task downloadAndUnzipOrientDB(type: Copy, dependsOn: verifyOrientDB) {
         return;
     }
     
-    from zipTree(new File(downloadOrientDB.dest, 'orientdb-3.0.34.zip'))
+    from zipTree(new File(downloadOrientDB.dest, 'orientdb-community-3.0.34.zip'))
     into downloadOrientDB.dest
 }
 // Execute a command line to create a testar OrientDB database with admin admin credentials
@@ -211,7 +211,7 @@ task createDatabaseOrientDB(type: Exec, dependsOn: downloadAndUnzipOrientDB){
     // Read command line output
     standardOutput = new ByteArrayOutputStream()
     errorOutput = new ByteArrayOutputStream()
-    workingDir 'target/install/testar/bin/orientdb-3.0.34/bin'
+    workingDir 'target/install/testar/bin/orientdb-community-3.0.34/bin'
     commandLine 'cmd', '/c', 'console.bat CREATE DATABASE plocal:../databases/testar admin admin'
     // Ignore errors creating the database because we check the output buffer message
     ignoreExitValue true

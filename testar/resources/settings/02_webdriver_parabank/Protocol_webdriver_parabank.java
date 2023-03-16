@@ -28,8 +28,9 @@
  *
  */
 
+import com.google.common.collect.ArrayListMultimap;
 import org.testar.SutVisualization;
-
+import org.testar.managers.InputDataManager;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
@@ -67,7 +68,8 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 
     // List of atributes to identify and close policy popups
     // Set to null to disable this feature
-    policyAttributes = new HashMap<String, String>() {{ put("class", "lfr-btn-label"); }};
+    policyAttributes = ArrayListMultimap.create();
+    policyAttributes.put("class", "lfr-btn-label");
   }
 
   /**
@@ -258,7 +260,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
       //CAPS_LOCK + SHIFT + Click clickfilter functionality.
       if(blackListed(widget)){
     	  if(isTypeable(widget)){
-    		  filteredActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+    		  filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
     	  } else {
     		  filteredActions.add(ac.leftClickAt(widget));
     	  }
@@ -276,10 +278,14 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
       // type into text boxes
       if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
     	  if(whiteListed(widget) || isUnfiltered(widget)){
-    		  actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+    		  // Type a random Number, Alphabetic, URL, Date or Email input
+    		  actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
+    		  // Paste a random input from a customizable input data file
+    		  // Check testar/bin/settings/custom_input_data.txt
+    		  //actions.add(ac.pasteTextInto(widget, InputDataManager.getRandomTextFromCustomInputDataFile(System.getProperty("user.dir") + "/settings/custom_input_data.txt"), true));
     	  }else{
     		  // filtered and not white listed:
-    		  filteredActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+    		  filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
     	  }
       }
 

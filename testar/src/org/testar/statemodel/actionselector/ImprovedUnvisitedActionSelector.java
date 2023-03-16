@@ -37,6 +37,12 @@ public class ImprovedUnvisitedActionSelector implements ActionSelector {
     }
 
     @Override
+    public void notifyNewSequence() {
+    	executionPath = new LinkedList<>();
+    	System.out.println("Reset State Model execution path due to new sequence starting");
+    }
+
+    @Override
     public AbstractAction selectAction(AbstractState currentState, AbstractStateModel abstractStateModel) throws ActionNotFoundException {
         // if the flow was altered, this could be because of non-determinism in the model
         // when that is the case, this action selector is not really useful anymore, because it can get stuck in a loop
