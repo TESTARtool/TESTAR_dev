@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -45,6 +46,7 @@ import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.protocols.DesktopProtocol;
+import org.testar.screenshotjson.JsonUtils;
 
 /**
  * This protocol is used to test TESTAR by executing a gradle CI workflow.
@@ -56,6 +58,10 @@ public class Protocol_test_gradle_workflow_desktop_generic extends DesktopProtoc
 	@Override
 	protected State getState(SUT system) throws StateBuildException {
 		State state = super.getState(system);
+
+		// Creating a JSON file with information about widgets and their location on the screenshot:
+		if(settings.get(ConfigTags.Mode) == Modes.Generate && settings.get(ConfigTags.CreateWidgetInfoJsonFile))
+			JsonUtils.createWidgetInfoJsonFile(state);
 
 		// DEBUG: That widgets have screen bounds in the GUI of the remote server
 		for(Widget w : state) {
@@ -115,6 +121,22 @@ public class Protocol_test_gradle_workflow_desktop_generic extends DesktopProtoc
 		// sequence folder must contains a .testar file
 		else {
 			Assert.isTrue(!folderIsEmpty(outputSequencesFolder.toPath()), "TESTAR output sequences is not empty");
+		}
+
+		// Verify the JsonUtils created a JSON State file
+		File screenshotsFolder = null;
+		try {
+			screenshotsFolder = new File(OutputStructure.screenshotsOutputDir).getCanonicalFile();
+			File[] subdirectories = screenshotsFolder.listFiles(File::isDirectory);
+			Assert.isTrue(subdirectories.length > 0, "TESTAR screenshotsFolder did not contains a screenshot sequence directory");
+
+			File[] jsonFileList = subdirectories[0].listFiles((dir, name) -> name.endsWith(".json"));
+			if (jsonFileList != null) {
+				Arrays.stream(jsonFileList).forEach(file -> System.out.println(file.getName()));
+			}
+			Assert.isTrue(jsonFileList.length > 0, "TESTAR screenshotsFolder did not create a JSON file using JsonUtils feature");
+		} catch(IOException e) {
+			Assert.isTrue(screenshotsFolder != null, "TESTAR screenshotsFolder did not exists");
 		}
 
 		super.postSequenceProcessing();

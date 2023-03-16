@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -93,9 +93,9 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
 	 * the SUT's configuration files etc.)
 	 */
-	 @Override
+	@Override
 	protected void beginSequence(SUT system, State state){
-	 	super.beginSequence(system, state);
+		super.beginSequence(system, state);
 	}
 
 	/**
@@ -179,9 +179,12 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	}
 
 	/**
-	 * Select one of the available actions using an action selection algorithm (for example random action selection)
-	 *
-	 * super.selectAction(state, actions) updates information to the HTML sequence report
+	 * Select one of the available actions using an action selection algorithm. 
+	 * 
+	 * It uses the state model action selector if the state model inference settings are configured and enabled. 
+	 * If the state model is not enabled, it returns a random action. 
+	 * 
+	 * super.selectAction(state, actions) also updates the HTML sequence report information. 
 	 *
 	 * @param state the SUT's current state
 	 * @param actions the set of derived actions
@@ -189,7 +192,7 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		return(super.selectAction(state, actions));
+		return super.selectAction(state, actions);
 	}
 
 	/**

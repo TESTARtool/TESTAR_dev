@@ -4,7 +4,7 @@
 # Set the mode you want TESTAR to start in: Spy, Generate, Replay
 #################################################################
 
-Mode = Generate
+Mode = Spy
 
 #################################################################
 # Connect to the System Under Test (SUT)
@@ -96,7 +96,19 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_generic_action_selection/Protocol_desktop_action_selector
+ProtocolClass = desktop_generic_action_selector/Protocol_desktop_generic_action_selector
+
+#################################################################
+# State model inference settings
+#################################################################
+StateModelEnabled = false
+DataStore = OrientDB
+DataStoreType = remote
+DataStoreServer = localhost
+DataStoreDB = testar
+DataStoreUser = testar
+DataStorePassword = testar
+DataStoreMode = instant
 
 #################################################################
 # State identifier attributes
@@ -109,7 +121,7 @@ AbstractStateAttributes = WidgetControlType
 #################################################################
 # Other more advanced settings
 #################################################################
-
+CreateWidgetInfoJsonFile = false
 ProcessesToKillDuringTest =
 OutputDir = ./output
 PathToReplaySequence = ./output/temp
