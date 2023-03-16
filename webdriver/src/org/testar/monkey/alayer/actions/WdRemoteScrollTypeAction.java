@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2019 - 2023 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2021 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2021 - 2023 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,24 +30,40 @@
 
 package org.testar.monkey.alayer.actions;
 
-import org.testar.monkey.alayer.Role;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.exceptions.ActionFailedException;
+import org.testar.monkey.alayer.webdriver.WdWidget;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.RemoteWebElement;
 
-public class WdActionRoles {
-	private WdActionRoles(){}
+public class WdRemoteScrollTypeAction extends WdRemoteTypeAction {
+	private static final long serialVersionUID = 5967321502092097275L;
 
-	public static final Role
+	public WdRemoteScrollTypeAction(WdWidget widget, CharSequence keys) {
+		super(widget, keys);
+		this.set(Tags.Desc, "Remote scroll and type " + keys + " to widget " 
+				+ widget.element.getElementDescription() + " : " + widget.element.remoteWebElement.getId());
+		this.set(Tags.Role, WdActionRoles.RemoteScrollType);
+	}
 
-	ExecuteScript = Role.from("ExecuteScript", ActionRoles.Action), 
-	CloseTabScript = Role.from("CloseTabScript", ExecuteScript),
-	HistoryBackScript = Role.from("HistoryBackScript", ExecuteScript),
-	SubmitScript = Role.from("SubmitScript", ExecuteScript),
-	SetAttributeScript = Role.from("SetAttributeScript", ExecuteScript),
-	FormFillingAction = Role.from("FormFillingAction", ActionRoles.CompoundAction),
-	SelectListAction = Role.from("SelectListAction", ExecuteScript),
-	RemoteAction = Role.from("RemoteAction", ActionRoles.Action),
-	RemoteClick = Role.from("RemoteClick", WdActionRoles.RemoteAction),
-	RemoteScrollClick = Role.from("RemoteScrollClick", WdActionRoles.RemoteClick),
-	RemoteType = Role.from("RemoteType", WdActionRoles.RemoteAction),
-	RemoteScrollType = Role.from("RemoteScrollType", WdActionRoles.RemoteType);
+	@Override
+	public void run(SUT system, State state, double duration) throws ActionFailedException {
+		try {
+			RemoteWebElement remoteElement = widget.element.remoteWebElement;
+			RemoteWebDriver d = (RemoteWebDriver)remoteElement.getWrappedDriver();
+			d.executeScript("arguments[0].scrollIntoView(true)", remoteElement);
+			remoteElement.clear();
+			org.testar.monkey.Util.pause(0.1);
+			remoteElement.sendKeys(keys);
+		}
+		catch (Exception e) {
+			logger.warn("Remote scroll and type action failed", e);
+		}
+	}
+
+	@Override
+	public String toShortString() {
+		return "Remote scroll and type " + keys + " " + widget.element.getElementDescription();
+	}
 
 }

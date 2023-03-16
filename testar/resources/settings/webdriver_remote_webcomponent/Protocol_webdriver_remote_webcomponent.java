@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2023 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,6 +29,7 @@
  */
 
 import org.testar.SutVisualization;
+import org.testar.managers.InputDataManager;
 import org.testar.monkey.Pair;
 import org.testar.monkey.Settings;
 import org.testar.monkey.alayer.*;
@@ -42,6 +43,8 @@ import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.plugin.NativeLinker;
 import org.testar.protocols.WebdriverProtocol;
 
+import com.google.common.collect.ArrayListMultimap;
+
 import java.util.*;
 
 import static org.testar.monkey.alayer.Tags.Blocked;
@@ -52,17 +55,17 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 public class Protocol_webdriver_remote_webcomponent extends WebdriverProtocol {
 
-    /**
-     * Called once during the life time of TESTAR
-     * This method can be used to perform initial setup work
-     *
-     * @param settings the current TESTAR settings as specified by the user.
-     */
-    @Override
-    protected void initialize(Settings settings) {
-        super.initialize(settings);
+	/**
+	 * Called once during the life time of TESTAR
+	 * This method can be used to perform initial setup work
+	 *
+	 * @param settings the current TESTAR settings as specified by the user.
+	 */
+	@Override
+	protected void initialize(Settings settings) {
+		super.initialize(settings);
 
-        /*
+		/*
         These settings are initialized in WebdriverProtocol:
 
         // Classes that are deemed clickable by the web framework
@@ -91,22 +94,21 @@ public class Protocol_webdriver_remote_webcomponent extends WebdriverProtocol {
         //Force webdriver to switch to a new tab if opened
         //This feature can block the correct display of select dropdown elements 
         WdDriver.forceActivateTab = true;
-         */
+		 */
 
-        // URL + form name, username input id + value, password input id + value
-        // Set login to null to disable this feature
-        //TODO put into settings file
-        login = Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
-        username = Pair.from("username", "");
-        password = Pair.from("password", "");
+		// URL + form name, username input id + value, password input id + value
+		// Set login to null to disable this feature
+		//TODO put into settings file
+		login = Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
+		username = Pair.from("username", "");
+		password = Pair.from("password", "");
 
-        // List of atributes to identify and close policy popups
-        // Set to null to disable this feature
-        //TODO put into settings file
-        policyAttributes = new HashMap<String, String>() {{
-            put("class", "lfr-btn-label");
-        }};
-    }
+		// List of atributes to identify and close policy popups
+		// Set to null to disable this feature
+		//TODO put into settings file
+		policyAttributes = ArrayListMultimap.create();
+		policyAttributes.put("id", "_cookieDisplay_WAR_corpcookieportlet_necessaryCookiesButton");
+	}
 
 	/**
 	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
@@ -207,7 +209,7 @@ public class Protocol_webdriver_remote_webcomponent extends WebdriverProtocol {
 			//CAPS_LOCK + SHIFT + Click clickfilter functionality.
 			if(blackListed(widget)){
 				if(isTypeable(widget)){
-					filteredActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+					filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
 				} else {
 					filteredActions.add(ac.leftClickAt(widget));
 				}
@@ -225,10 +227,10 @@ public class Protocol_webdriver_remote_webcomponent extends WebdriverProtocol {
 			// type into text boxes
 			if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
 				if(whiteListed(widget) || isUnfiltered(widget)){
-					actions.add(new WdRemoteTypeAction((WdWidget)widget, getRandomText(widget)));
+					actions.add(new WdRemoteScrollTypeAction((WdWidget)widget, InputDataManager.getRandomTextInputData(widget)));
 				}else{
 					// filtered and not white listed:
-					filteredActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+					filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
 				}
 			}
 
@@ -236,7 +238,7 @@ public class Protocol_webdriver_remote_webcomponent extends WebdriverProtocol {
 			if (isAtBrowserCanvas(widget) && isClickable(widget)) {
 				if(whiteListed(widget) || isUnfiltered(widget)){
 					if (!isLinkDenied(widget)) {
-						actions.add(new WdRemoteClickAction((WdWidget)widget));
+						actions.add(new WdRemoteScrollClickAction((WdWidget)widget));
 					}else{
 						// link denied:
 						filteredActions.add(ac.leftClickAt(widget));
@@ -251,7 +253,7 @@ public class Protocol_webdriver_remote_webcomponent extends WebdriverProtocol {
 		//if(actions.isEmpty()) {
 		//	return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
 		//}
-		
+
 		// If we have forced actions, prioritize and filter the other ones
 		if (forcedActions != null && forcedActions.size() > 0) {
 			filteredActions = actions;
@@ -300,13 +302,13 @@ public class Protocol_webdriver_remote_webcomponent extends WebdriverProtocol {
 
 		return false;
 	}
-	
+
 	/**
 	 * Instead of use leftClickAt Windows level Action, use WdRemoteClickAction. 
 	 */
 	@Override
 	protected Action clickForcedPopupWidget(StdActionCompiler ac, Widget widget) {
-	    return new WdRemoteClickAction((WdWidget)widget);
+		return new WdRemoteClickAction((WdWidget)widget);
 	}
 
 	/**

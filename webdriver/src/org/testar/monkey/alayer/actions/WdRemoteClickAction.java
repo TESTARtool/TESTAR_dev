@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2021 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2021 - 2023 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -41,73 +41,75 @@ import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.openqa.selenium.remote.RemoteWebElement;
 
 public class WdRemoteClickAction extends TaggableBase implements Action {
+	private static final long serialVersionUID = -965497351267324232L;
 
-    protected WdWidget widget;
-    protected static final Logger logger = LogManager.getLogger();
-    
-    private static final Pen LClickPen = Pen.newPen().setColor(Color.Green)
-            .setFillPattern(FillPattern.Solid).setStrokeWidth(3).build();
+	protected WdWidget widget;
+	protected static final Logger logger = LogManager.getLogger();
 
-    public static class ClickVisualizer implements Visualizer {
-        private static final long serialVersionUID = -2006402344810634504L;
-        
-        private final double width, height;
-        private final Pen pen;
-        private final Rect rec;
+	private static final Pen LClickPen = Pen.newPen().setColor(Color.Green)
+			.setFillPattern(FillPattern.Solid).setStrokeWidth(3).build();
 
-        public ClickVisualizer(Rect rec, Pen pen, double width, double height){
-            Assert.notNull(rec, pen);
-            this.width = width;
-            this.height = height;
-            this.pen = pen;
-            this.rec = rec;
-        }
+	public static class ClickVisualizer implements Visualizer {
+		private static final long serialVersionUID = -2006402344810634504L;
 
-        public void run(State state, Canvas canvas, Pen pen) {
-            Assert.notNull(state, canvas, pen);
-            pen = Pen.merge(pen, this.pen);
-            try {
-                double mx = rec.x() + (rec.width() / 2.0);
-                double my = rec.y() + (rec.height() / 2.0);
-                canvas.ellipse(pen, mx - width * .5, my - height * .5, width, height);
-            } catch (PositionException pe) {}
-        }
-    }
+		private final double width, height;
+		private final Pen pen;
+		private final Rect rec;
 
-    public WdRemoteClickAction(WdWidget widget) {
-        this.widget = widget;
-        this.set(Tags.OriginWidget, widget);
-        this.set(Tags.Desc, "Remote click " + widget.element.remoteWebElement.getId());
-        this.set(Tags.Role, WdActionRoles.RemoteClick);
-        Role role = widget.get(Tags.Role, Roles.Widget);
-        if (!role.equals(WdRoles.WdOPTION)) {
-            this.set(Tags.Visualizer, new ClickVisualizer(widget.element.rect, LClickPen, 10, 10));
-        }
-    }
+		public ClickVisualizer(Rect rec, Pen pen, double width, double height){
+			Assert.notNull(rec, pen);
+			this.width = width;
+			this.height = height;
+			this.pen = pen;
+			this.rec = rec;
+		}
 
-    @Override
-    public void run(SUT system, State state, double duration) throws ActionFailedException {
-        try {
-            RemoteWebElement remoteElement = widget.element.remoteWebElement;
-            remoteElement.click();
-        }
-        catch (Exception e) {
-            logger.warn("Remote click action failed", e);
-        }
-    }
+		public void run(State state, Canvas canvas, Pen pen) {
+			Assert.notNull(state, canvas, pen);
+			pen = Pen.merge(pen, this.pen);
+			try {
+				double mx = rec.x() + (rec.width() / 2.0);
+				double my = rec.y() + (rec.height() / 2.0);
+				canvas.ellipse(pen, mx - width * .5, my - height * .5, width, height);
+			} catch (PositionException pe) {}
+		}
+	}
 
-    @Override
-    public String toShortString() {
-        return "Remote click " + widget.element.getElementDescription();
-    }
+	public WdRemoteClickAction(WdWidget widget) {
+		this.widget = widget;
+		this.set(Tags.OriginWidget, widget);
+		this.set(Tags.Desc, "Remote click " + widget.element.getElementDescription() + " : " 
+				+ widget.element.remoteWebElement.getId());
+		this.set(Tags.Role, WdActionRoles.RemoteClick);
+		Role role = widget.get(Tags.Role, Roles.Widget);
+		if (!role.equals(WdRoles.WdOPTION)) {
+			this.set(Tags.Visualizer, new ClickVisualizer(widget.element.rect, LClickPen, 10, 10));
+		}
+	}
 
-    @Override
-    public String toParametersString() {
-        return toShortString();
-    }
+	@Override
+	public void run(SUT system, State state, double duration) throws ActionFailedException {
+		try {
+			RemoteWebElement remoteElement = widget.element.remoteWebElement;
+			remoteElement.click();
+		}
+		catch (Exception e) {
+			logger.warn("Remote click action failed", e);
+		}
+	}
 
-    @Override
-    public String toString(Role... discardParameters) {
-        return toShortString();
-    }
+	@Override
+	public String toShortString() {
+		return "Remote click " + widget.element.getElementDescription();
+	}
+
+	@Override
+	public String toParametersString() {
+		return toShortString();
+	}
+
+	@Override
+	public String toString(Role... discardParameters) {
+		return toShortString();
+	}
 }

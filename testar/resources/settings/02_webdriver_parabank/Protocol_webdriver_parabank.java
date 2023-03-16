@@ -69,7 +69,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
     // List of atributes to identify and close policy popups
     // Set to null to disable this feature
     policyAttributes = ArrayListMultimap.create();
-    policyAttributes.put("class", "lfr-btn-label");
+    policyAttributes.put("id", "_cookieDisplay_WAR_corpcookieportlet_necessaryCookiesButton");
   }
 
   /**

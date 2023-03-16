@@ -106,7 +106,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 		// Set to null to disable this feature
 		//TODO put into settings file
 		policyAttributes = ArrayListMultimap.create();
-		policyAttributes.put("class", "lfr-btn-label");
+		policyAttributes.put("id", "_cookieDisplay_WAR_corpcookieportlet_necessaryCookiesButton");
 	}
 
 	/**

@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2021 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2021 - 2023 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -39,31 +39,32 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 
 public class WdRemoteScrollClickAction extends WdRemoteClickAction {
-    private static final long serialVersionUID = -4804242088760009256L;
+	private static final long serialVersionUID = -4804242088760009256L;
 
-    public WdRemoteScrollClickAction(WdWidget widget) {
-        super(widget);
-        this.set(Tags.Desc, "Remote scroll and click " + widget.element.remoteWebElement.getId());
-        this.set(Tags.Role, WdActionRoles.RemoteScrollClick);
-    }
+	public WdRemoteScrollClickAction(WdWidget widget) {
+		super(widget);
+		this.set(Tags.Desc, "Remote scroll and click " + widget.element.getElementDescription() + " : " 
+				+ widget.element.remoteWebElement.getId());
+		this.set(Tags.Role, WdActionRoles.RemoteScrollClick);
+	}
 
-    @Override
-    public void run(SUT system, State state, double duration) throws ActionFailedException {
-        try {
-            RemoteWebElement remoteElement = widget.element.remoteWebElement;
-            RemoteWebDriver d = (RemoteWebDriver)remoteElement.getWrappedDriver();
-            d.executeScript("arguments[0].scrollIntoView(true)", remoteElement);
-            org.testar.monkey.Util.pause(0.1);
-            remoteElement.click();
-        }
-        catch (Exception e) {
-            logger.warn("Remote scroll and click action failed", e);
-        }
-    }
+	@Override
+	public void run(SUT system, State state, double duration) throws ActionFailedException {
+		try {
+			RemoteWebElement remoteElement = widget.element.remoteWebElement;
+			RemoteWebDriver d = (RemoteWebDriver)remoteElement.getWrappedDriver();
+			d.executeScript("arguments[0].scrollIntoView(true)", remoteElement);
+			org.testar.monkey.Util.pause(0.1);
+			remoteElement.click();
+		}
+		catch (Exception e) {
+			logger.warn("Remote scroll and click action failed", e);
+		}
+	}
 
-    @Override
-    public String toShortString() {
-        return "Remote scroll and click " + widget.element.getElementDescription();
-    }
+	@Override
+	public String toShortString() {
+		return "Remote scroll and click " + widget.element.getElementDescription();
+	}
 
 }

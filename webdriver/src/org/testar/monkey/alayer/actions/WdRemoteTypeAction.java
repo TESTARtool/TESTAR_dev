@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2021 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2021 - 2023 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -39,83 +39,82 @@ import org.testar.monkey.alayer.exceptions.ActionFailedException;
 import org.testar.monkey.alayer.exceptions.PositionException;
 import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 
 public class WdRemoteTypeAction extends TaggableBase implements Action {
+	private static final long serialVersionUID = -7167990248634363307L;
 
-    protected WdWidget widget;
-    protected CharSequence keys;
-    protected static final Logger logger = LogManager.getLogger();
+	protected WdWidget widget;
+	protected CharSequence keys;
+	protected static final Logger logger = LogManager.getLogger();
 
-    private static final Pen TypePen = Pen.newPen().setColor(Color.Blue)
-            .setFillPattern(FillPattern.None).setStrokeWidth(3).build();
-    
-    public static class TypeVisualizer implements Visualizer {
+	private static final Pen TypePen = Pen.newPen().setColor(Color.Blue)
+			.setFillPattern(FillPattern.None).setStrokeWidth(3).build();
 
-        private static final long serialVersionUID = 856304220974950751L;
+	public static class TypeVisualizer implements Visualizer {
 
-        final String text;
-        final Pen pen;
-        final Rect rect;
+		private static final long serialVersionUID = 856304220974950751L;
 
-        public TypeVisualizer(Rect rect, String text, Pen pen){
-            Assert.notNull(rect, text, pen);
-            this.text = text;
-            this.pen = pen;
-            this.rect = rect;
-        }
+		final String text;
+		final Pen pen;
+		final Rect rect;
 
-        public void run(State state, Canvas cv, Pen pen) {
-            Assert.notNull(state, cv, pen);
-            pen = Pen.merge(pen, this.pen);
-            try { 
-                Pair<Double, Double> m = cv.textMetrics(pen, text);
-                double mx = rect.x() + (rect.width() / 2.0);
-                double my = rect.y() + (rect.height() / 2.0);
-                
-                cv.text(pen, mx - (m.left() / 2.0), my - (m.right() / 2.0), 0, text);
-            } catch (PositionException pe) {}
-        }
-    }
+		public TypeVisualizer(Rect rect, String text, Pen pen){
+			Assert.notNull(rect, text, pen);
+			this.text = text;
+			this.pen = pen;
+			this.rect = rect;
+		}
 
-    public WdRemoteTypeAction(WdWidget widget, CharSequence keys) {
-        this.widget = widget;
-        this.keys = keys;
+		public void run(State state, Canvas cv, Pen pen) {
+			Assert.notNull(state, cv, pen);
+			pen = Pen.merge(pen, this.pen);
+			try { 
+				Pair<Double, Double> m = cv.textMetrics(pen, text);
+				double mx = rect.x() + (rect.width() / 2.0);
+				double my = rect.y() + (rect.height() / 2.0);
 
-        this.set(Tags.OriginWidget, widget);
-        this.set(Tags.Desc, "Remote type " + keys + " " + widget.element.remoteWebElement.getId());
-        this.set(Tags.Role, WdActionRoles.RemoteType);
-        this.set(Tags.Visualizer, new TypeVisualizer(widget.get(WdTags.WebBoundingRectangle), keys.toString(), TypePen));
-    }
-                                                                                            
-    @Override
-    public void run(SUT system, State state, double duration) throws ActionFailedException {
-        try {
-            RemoteWebElement remoteElement = widget.element.remoteWebElement;
-            RemoteWebDriver d = (RemoteWebDriver)remoteElement.getWrappedDriver();
-            d.executeScript("arguments[0].scrollIntoView(true)", remoteElement);
-            remoteElement.clear();
-            org.testar.monkey.Util.pause(0.05);
-            remoteElement.sendKeys(keys);
-        }
-        catch (Exception e) {
-            logger.warn("Remote type action failed", e);
-        }
-    }
+				cv.text(pen, mx - (m.left() / 2.0), my - (m.right() / 2.0), 0, text);
+			} catch (PositionException pe) {}
+		}
+	}
 
-    @Override
-    public String toShortString() {
-        return "Remote type " + keys + " " + widget.element.getElementDescription();
-    }
+	public WdRemoteTypeAction(WdWidget widget, CharSequence keys) {
+		this.widget = widget;
+		this.keys = keys;
 
-    @Override
-    public String toParametersString() {
-        return toShortString();
-    }
+		this.set(Tags.OriginWidget, widget);
+		this.set(Tags.Desc, "Remote type " + keys + " to widget " 
+				+ widget.element.getElementDescription() + " : " + widget.element.remoteWebElement.getId());
+		this.set(Tags.Role, WdActionRoles.RemoteType);
+		this.set(Tags.Visualizer, new TypeVisualizer(widget.get(WdTags.WebBoundingRectangle), keys.toString(), TypePen));
+	}
 
-    @Override
-    public String toString(Role... discardParameters) {
-        return toShortString();
-    }
+	@Override
+	public void run(SUT system, State state, double duration) throws ActionFailedException {
+		try {
+			RemoteWebElement remoteElement = widget.element.remoteWebElement;
+			remoteElement.clear();
+			org.testar.monkey.Util.pause(0.1);
+			remoteElement.sendKeys(keys);
+		}
+		catch (Exception e) {
+			logger.warn("Remote type action failed", e);
+		}
+	}
+
+	@Override
+	public String toShortString() {
+		return "Remote type " + keys + " " + widget.element.getElementDescription();
+	}
+
+	@Override
+	public String toParametersString() {
+		return toShortString();
+	}
+
+	@Override
+	public String toString(Role... discardParameters) {
+		return toShortString();
+	}
 }
