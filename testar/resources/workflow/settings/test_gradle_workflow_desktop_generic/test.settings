@@ -106,7 +106,7 @@ AbstractStateAttributes = WidgetControlType
 #################################################################
 # Other more advanced settings
 #################################################################
-
+CreateWidgetInfoJsonFile = true
 ProcessesToKillDuringTest =
 OutputDir = ./output
 PathToReplaySequence = ./output/temp
