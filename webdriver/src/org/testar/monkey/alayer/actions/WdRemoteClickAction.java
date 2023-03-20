@@ -38,6 +38,8 @@ import org.testar.monkey.alayer.exceptions.ActionFailedException;
 import org.testar.monkey.alayer.exceptions.PositionException;
 import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
+import org.openqa.selenium.ElementClickInterceptedException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.remote.RemoteWebElement;
 
 public class WdRemoteClickAction extends TaggableBase implements Action {
@@ -92,6 +94,14 @@ public class WdRemoteClickAction extends TaggableBase implements Action {
 		try {
 			RemoteWebElement remoteElement = widget.element.remoteWebElement;
 			remoteElement.click();
+		}
+		catch (ElementClickInterceptedException ie) {
+			// This happens when other element obscure the desired element to interact with
+			logger.warn(String.format("%s : %s", this.get(Tags.Desc, ""), ie.getMessage()));
+		}
+		catch (StaleElementReferenceException se) {
+			// This happens when the state changes between obtaining the widget and executing the action
+			logger.warn(String.format("%s : %s", this.get(Tags.Desc, ""), se.getMessage()));
 		}
 		catch (Exception e) {
 			logger.warn("Remote click action failed", e);

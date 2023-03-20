@@ -33,6 +33,8 @@ package org.testar.monkey.alayer.actions;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.exceptions.ActionFailedException;
 import org.testar.monkey.alayer.webdriver.WdWidget;
+import org.openqa.selenium.ElementClickInterceptedException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
 
@@ -51,10 +53,20 @@ public class WdRemoteScrollTypeAction extends WdRemoteTypeAction {
 		try {
 			RemoteWebElement remoteElement = widget.element.remoteWebElement;
 			RemoteWebDriver d = (RemoteWebDriver)remoteElement.getWrappedDriver();
-			d.executeScript("arguments[0].scrollIntoView(true)", remoteElement);
+			// Scroll the element to the middle of the screen
+			// Because scrolling the element to the top may provoke an obscuration by some web headers
+			d.executeScript("arguments[0].scrollIntoView({block: 'center'})", remoteElement);
 			remoteElement.clear();
 			org.testar.monkey.Util.pause(0.1);
 			remoteElement.sendKeys(keys);
+		}
+		catch (ElementClickInterceptedException ie) {
+			// This happens when other element obscure the desired element to interact with
+			logger.warn(String.format("%s : %s", this.get(Tags.Desc, ""), ie.getMessage()));
+		}
+		catch (StaleElementReferenceException se) {
+			// This happens when the state changes between obtaining the widget and executing the action
+			logger.warn(String.format("%s : %s", this.get(Tags.Desc, ""), se.getMessage()));
 		}
 		catch (Exception e) {
 			logger.warn("Remote scroll and type action failed", e);

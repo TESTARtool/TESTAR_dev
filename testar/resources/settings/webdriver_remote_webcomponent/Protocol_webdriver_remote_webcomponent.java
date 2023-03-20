@@ -209,9 +209,9 @@ public class Protocol_webdriver_remote_webcomponent extends WebdriverProtocol {
 			//CAPS_LOCK + SHIFT + Click clickfilter functionality.
 			if(blackListed(widget)){
 				if(isTypeable(widget)){
-					filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
+					filteredActions.add(new WdRemoteTypeAction((WdWidget)widget, InputDataManager.getRandomTextInputData(widget)));
 				} else {
-					filteredActions.add(ac.leftClickAt(widget));
+					filteredActions.add(new WdRemoteClickAction((WdWidget)widget));
 				}
 				continue;
 			}
@@ -227,10 +227,10 @@ public class Protocol_webdriver_remote_webcomponent extends WebdriverProtocol {
 			// type into text boxes
 			if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
 				if(whiteListed(widget) || isUnfiltered(widget)){
-					actions.add(new WdRemoteScrollTypeAction((WdWidget)widget, InputDataManager.getRandomTextInputData(widget)));
+					actions.add(new WdRemoteTypeAction((WdWidget)widget, InputDataManager.getRandomTextInputData(widget)));
 				}else{
 					// filtered and not white listed:
-					filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
+					filteredActions.add(new WdRemoteTypeAction((WdWidget)widget, InputDataManager.getRandomTextInputData(widget)));
 				}
 			}
 
@@ -238,21 +238,17 @@ public class Protocol_webdriver_remote_webcomponent extends WebdriverProtocol {
 			if (isAtBrowserCanvas(widget) && isClickable(widget)) {
 				if(whiteListed(widget) || isUnfiltered(widget)){
 					if (!isLinkDenied(widget)) {
-						actions.add(new WdRemoteScrollClickAction((WdWidget)widget));
+						actions.add(new WdRemoteClickAction((WdWidget)widget));
 					}else{
 						// link denied:
-						filteredActions.add(ac.leftClickAt(widget));
+						filteredActions.add(new WdRemoteClickAction((WdWidget)widget));
 					}
 				}else{
 					// filtered and not white listed:
-					filteredActions.add(ac.leftClickAt(widget));
+					filteredActions.add(new WdRemoteClickAction((WdWidget)widget));
 				}
 			}
 		}
-
-		//if(actions.isEmpty()) {
-		//	return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
-		//}
 
 		// If we have forced actions, prioritize and filter the other ones
 		if (forcedActions != null && forcedActions.size() > 0) {
