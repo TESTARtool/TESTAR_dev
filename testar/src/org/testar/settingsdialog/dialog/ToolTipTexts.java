@@ -50,8 +50,10 @@ public class ToolTipTexts {
       "sequence. Contrary to the Replay-Mode, it will not execute any actions,<br>\n" +
       "but only show you the screenshots that were recorded during sequence<br>\n" +
       "generation. This is ideal if a sequence turns out not to be reproducible.\n</html>";
+  public static String btnModelTTT = "<html>\nStart in State Model Analysis Mode:<br>\n" +
+		  "This mode allows you to connect with OrientDB to inspect the inferred models.\n</html>";
   public static String btnRecordTTT = "<html>\nStart in RECORD Mode:<br>\n" +
-          "This modes enables the tester to manually record (part of) a sequence.\n</html>";
+		  "This modes enables the tester to manually record (part of) a sequence.\n</html>";
 
   // TTTs for the general tab
   public static String sutConnectorTTT = "How does TESTAR connect to the SUT";

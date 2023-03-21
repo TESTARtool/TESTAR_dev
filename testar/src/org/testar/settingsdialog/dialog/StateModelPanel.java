@@ -378,7 +378,7 @@ public class StateModelPanel extends SettingsPanel {
     }
 
     // this helper method will start a jetty integrated server and show the model listings page
-    private void openServer() {
+    public void openServer() {
         try {
             label14.setText("");
             // create a config object for the orientdb database connection info
