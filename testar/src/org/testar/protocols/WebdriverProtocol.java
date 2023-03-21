@@ -59,11 +59,10 @@ import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.testar.monkey.Environment;
-import org.testar.monkey.Main;
-import org.testar.monkey.Pair;
+import org.testar.monkey.*;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
+import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.webdriver.WdDriver;
@@ -74,8 +73,6 @@ import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.monkey.alayer.windows.WinProcess;
 import org.testar.monkey.alayer.windows.Windows;
 import org.testar.plugin.NativeLinker;
-import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Settings;
 import org.testar.OutputStructure;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.reporting.Reporting;
@@ -809,5 +806,47 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				}
 			}
 		} catch (Exception e) {}
+	}
+
+	/**
+	 * Add additional TESTAR keyboard shortcuts in SPY mode to enable the CSS clickable customization of widgets.
+	 * @param key
+	 */
+	@Override
+	public void keyDown(KBKeys key) {
+		super.keyDown(key);
+		if (mode() == Modes.Spy){
+			if (key == KBKeys.VK_RIGHT) {
+				try {
+					// Obtain the widget aimed with the mouse cursor
+					Widget w = Util.widgetFromPoint(latestState, mouse.cursor().x(), mouse.cursor().y());
+					// Add the widget web CSS class property as clickable
+					WdElement element = ((WdWidget) w).element;
+					for(String s : element.cssClasses)
+						if(s!=null && !s.isEmpty())
+							clickableClasses.add(s);
+					// And save the new CSS class property in the test.setting file
+					Util.saveToFile(settings.toFileString(), Main.getTestSettingsFile());
+				} catch(Exception e) {
+					System.out.println("ERROR adding the widget from point: " + "x(" + mouse.cursor().x() + "), y("+ mouse.cursor().y() +")");
+				}
+			}
+
+			if (key == KBKeys.VK_LEFT) {
+				try {
+					// Obtain the widget aimed with the mouse cursor
+					Widget w = Util.widgetFromPoint(latestState, mouse.cursor().x(), mouse.cursor().y());
+					// Remove the widget web CSS class property from all clickables
+					WdElement element = ((WdWidget) w).element;
+					for(String s : element.cssClasses)
+						if(s!=null && !s.isEmpty())
+							clickableClasses.remove(s);
+					// And save the new CSS class property in the test.setting file
+					Util.saveToFile(settings.toFileString(), Main.getTestSettingsFile());
+				} catch(Exception e) {
+					System.out.println("ERROR removing the widget from point: " + "x(" + mouse.cursor().x() + "), y("+ mouse.cursor().y() +")");
+				}
+			}
+		}
 	}
 }
