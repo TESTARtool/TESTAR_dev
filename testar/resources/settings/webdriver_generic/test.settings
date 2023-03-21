@@ -102,6 +102,18 @@ SUTProcesses =
 
 ProtocolClass = webdriver_generic/Protocol_webdriver_generic
 
+#################################################################\n"
+# State model inference settings
+#################################################################\n"
+StateModelEnabled = false
+DataStore = OrientDB
+DataStoreType = remote
+DataStoreServer = localhost
+DataStoreDB = testar
+DataStoreUser = testar
+DataStorePassword = testar
+DataStoreMode = instant
+
 #################################################################
 # State identifier attributes
 #
@@ -186,3 +198,4 @@ TestGenerator = random
 MaxReward = 9999999
 Discount = .95
 RefreshSpyCanvas = 1.0
+FormFillingAction = false

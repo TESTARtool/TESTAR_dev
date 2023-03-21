@@ -93,6 +93,7 @@ public final class ConfigTags {
 
 
   public static final Tag<Boolean> CreateWidgetInfoJsonFile = Tag.from("CreateWidgetInfoJsonFile", Boolean.class);
+  public static final Tag<Boolean> FormFillingAction = Tag.from("FormFillingAction", Boolean.class);
 
   // state model config tags
   public static final Tag<Boolean> StateModelEnabled = Tag.from("StateModelEnabled", Boolean.class);
