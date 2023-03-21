@@ -275,21 +275,30 @@ public class WebVerdict {
 	// The idea is that a value or description should not have repeated text, values or words, because in rare cases this is applicable.
 	// For example, the TO field of an e-mail should only have unique e-mailadresses, or the Authors field of a report should only have unique authors
 	// This could be a technical issue, where a boundary of a loop is off, or concatenating a string value twice.
-	public static Verdict DetectDuplicateText(State state)
+	public static Verdict DetectDuplicateText(State state, String ignorePatternRegEx)
 	{
+		// TODO: Add Ignore list support (list or regex?, for false positivies like 'DocDoc', 'DossierDossier', 'GebrGebr', 'RelRel', dateformats: '03-03-2023 10:43:37', '01-01-2023' '00-00-1900'
+		
+		// If this method is NOT enabled, just return verdict OK
+		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
+		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
+
 		Verdict verdict = Verdict.OK;
 		// The expression looks only if the start of the text is repeated somewhere else in the text
 		String patternRegex = "^(?=\\b(.*\\D.*)(\\s*\\W*\\s*)\\1(\\b|\\W))(?!\\W)"; // ^(?=\b(.*\D.*)(\s*\W*\s*)\1(\b|\W))(?!\W)
 		Pattern pattern = Pattern.compile(patternRegex);
 		
+		Pattern ignorePattern = Pattern.compile(ignorePatternRegEx);
+		
 		for(Widget w : state) {
-			// TODO: Is Desc a good tag? Should the same tags be used as the suspicious text verdicts which are set in the UI?
-			String desc = w.get(Tags.Desc, "");
+			// TODO: Is WebValue a good tag? Should the same tags be used as the suspicious text verdicts which are set in the UI?
+			String desc = w.get(WdTags.WebValue, "");
 			Matcher matcher = pattern.matcher(desc);
+			Matcher ignoreMatcher = ignorePattern.matcher(desc);
 			
-			if (matcher.find()) {
-				String verdictMsg = String.format("Detected duplicated or repeated text in description of widget! Role: %s , Path: %s , WebId: %s , Desc: %s", 
-						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""));
+			if (matcher.find() && (ignorePatternRegEx == "" || !ignoreMatcher.find())) {
+				String verdictMsg = String.format("Detected duplicated or repeated text in description of widget! Role: %s , Path: %s , WebId: %s , Desc: %s , WebValue: %s", 
+						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebValue, ""));
 				verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_DUPLICATE_ITEMS, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
 			}
 		}
@@ -301,20 +310,28 @@ public class WebVerdict {
 	// 		The <b>quick</b> brown fox jumps <i>over the lazy</i> dog
 	// GOOD:The quick brown fox jumps over the lazy dog
 	// The idea is that a description should not show markup tags, but should probably show the text in bold, italic, and so on.
-	public static Verdict DetectHTMLOrXMLTagsInText(State state)
+	// If there are html tags which can be ignored, then this can be specified in the ignorePatternRegEx parameter 
+	public static Verdict DetectHTMLOrXMLTagsInText(State state, String ignorePatternRegEx)
 	{
+		// If this method is NOT enabled, just return verdict OK
+		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
+		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
+
 		Verdict verdict = Verdict.OK;
 		String patternRegex = "\\&.*\\;|\\%\\w\\w|\\$\\w\\w|<[^>]*>";
 		Pattern pattern = Pattern.compile(patternRegex);
 		
+		Pattern ignorePattern = Pattern.compile(ignorePatternRegEx);
+		
 		for(Widget w : state) {
-			// TODO: Is Desc a good tag? Should the same tags be used as the suspicious text verdicts which are set in the UI?
-			String desc = w.get(Tags.Desc, "");
+			// TODO: Is WebValue a good tag? Should the same tags be used as the suspicious text verdicts which are set in the UI?
+			String desc = w.get(WdTags.WebValue, "");
 			Matcher matcher = pattern.matcher(desc);
+			Matcher ignoreMatcher = ignorePattern.matcher(desc);
 			
-			if (matcher.find()) {
-				String verdictMsg = String.format("Detected HTML or XML tags in description of widget! Role: %s , Path: %s , WebId: %s , Desc: %s", 
-						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""));
+			if (matcher.find() && (ignorePatternRegEx == "" || !ignoreMatcher.find())) {
+				String verdictMsg = String.format("Detected HTML or XML tags in description of widget! Role: %s , Path: %s , WebId: %s , Desc: %s , WebValue: %s", 
+						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebValue, ""));
 				verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
 			}
 		}
@@ -371,6 +388,8 @@ public class WebVerdict {
 
 		return selectElementVerdict;
 	}
+	
+	// TODO: Give optionally a list of Custom comparators, such as 'Security level'
 	
 	// Detect that items in a dropdownlist are not sorted alphabetically
 	// As a rule of thumb, items in a dropdownlist should be listed alphabetically, because:

@@ -304,11 +304,11 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects duplicate or repeated text in descriptions of widgets
-		verdict = WebVerdict.DetectDuplicateText(state);
+		verdict = WebVerdict.DetectDuplicateText(state, "");
 		if (shouldReturnVerdict(verdict)) return verdict;
 		
 		// Check the functional Verdict that detects HTML or XML tags in descriptions of widgets
-		verdict = WebVerdict.DetectHTMLOrXMLTagsInText(state);
+		verdict = WebVerdict.DetectHTMLOrXMLTagsInText(state, "");
 		if (shouldReturnVerdict(verdict)) return verdict;
 		
 		// Check the functional Verdict that detects select elements without items to the current state verdict.

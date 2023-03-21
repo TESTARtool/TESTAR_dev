@@ -285,8 +285,8 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		// report the information in a specific HTML report
 		// and continue testing
 		
-		Verdict spellCheckerVerdict = GenericVerdict.SpellChecker(state, WdTags.WebTextContent, new Dutch());
-		if(spellCheckerVerdict != Verdict.OK) HTMLStateVerdictReport.reportStateVerdict(actionCount, state, spellCheckerVerdict);
+		//Verdict spellCheckerVerdict = GenericVerdict.SpellChecker(state, WdTags.WebTextContent, new Dutch());
+		//if(spellCheckerVerdict != Verdict.OK) HTMLStateVerdictReport.reportStateVerdict(actionCount, state, spellCheckerVerdict);
 
 		// Check the functional Verdict that detects if a form button is disabled after modifying the form inputs.
 		verdict = formButtonEnabledAfterTypingChangesVerdict(state);
@@ -305,11 +305,11 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects duplicate or repeated text in descriptions of widgets
-		verdict = WebVerdict.DetectDuplicateText(state);
+		verdict = WebVerdict.DetectDuplicateText(state, "DocDoc|DossierDossier|GebrGebr|RelRel|\\d\\d-\\d\\d-\\d\\d\\d\\d\\s\\d\\d:\\d\\d:\\d\\d|\\d\\d-\\d\\d-\\d\\d\\d\\d");
 		if (shouldReturnVerdict(verdict)) return verdict;
 		
 		// Check the functional Verdict that detects HTML or XML tags in descriptions of widgets
-		verdict = WebVerdict.DetectHTMLOrXMLTagsInText(state);
+		verdict = WebVerdict.DetectHTMLOrXMLTagsInText(state,"<HuisstijlDir>|<VersieEnDatum>|<<major version>>\\.<<minor version>>|<<version>> \\(<<version date>>\\)");
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects select elements without items to the current state verdict.
@@ -341,8 +341,8 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if a web element does not contain children.
-		verdict = WebVerdict.ElementWithoutChildren(state, Arrays.asList(WdRoles.WdFORM));
-		if (shouldReturnVerdict(verdict)) return verdict;
+		//verdict = WebVerdict.ElementWithoutChildren(state, Arrays.asList(WdRoles.WdFORM));
+		//if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if a web radio input contains a single option.
 		verdict = WebVerdict.SingleRadioInput(state);
@@ -355,6 +355,10 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		// Check the functional Verdict that detects if web table contains duplicated rows.
 		verdict = WebVerdict.DetectDuplicatedRowsInTable(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
+
+        // Check untranslated text tags
+        verdict = detectUntranslatedText(state);
+        if (shouldReturnVerdict(verdict)) return verdict;
 
 		return verdict;
 	}
@@ -370,6 +374,33 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		return verdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch(info -> info.contains(verdict.info().replace("\n", " ")));
 	}
 
+
+	// Detect text decoraged with ^ charachters, this means that this text has no translation key and will not be translated when UI language is changed in DigiOffice
+	// BAD:  ^Untranslated text^
+    //       ^UntranslatedText^
+	// GOOD: Untranslated text
+	private Verdict detectUntranslatedText(State state)
+	{
+		Verdict verdict = Verdict.OK;
+		String patternRegex = "\\^.*\\^";
+		Pattern pattern = Pattern.compile(patternRegex);
+		
+		for(Widget w : state) {
+			// TODO: Is WebValue a good tag? Should the same tags be used as the suspicious text verdicts which are set in the UI?
+			String desc = w.get(WdTags.WebValue, "");
+			Matcher matcher = pattern.matcher(desc);
+			
+			if (matcher.find()) {
+				String verdictMsg = String.format("Detected untranslated tags in widget! Role: %s , Path: %s , WebId: %s , Desc: %s , WebValue: %s", 
+						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebValue, ""));
+				verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+			}
+		}
+		return verdict;
+	}
+
+    // TODO: Gives false positives when opening Div style forms, such as Notitie fields. The OK button seems to be working in the UI, but TESTAR doesn't see that as a change.'
+    // Dummy button
 	private Verdict functionalButtonVerdict(State state) {
 		// If the last executed action is a click on a web button
 		if(functionalAction != null 
@@ -441,11 +472,12 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		return watcherEmptyfileVerdict;
 	}
 
+    // TODO: if the user creates a new entity in the app then the Save button is enabled on open. We could look for the text "<Nieuw>" (ctl00_cphDetail_ctl01_lblTitle) in the title of the page to notice that it is a new record.
 	private Verdict formButtonEnabledAfterTypingChangesVerdict(State state) {
 		List<String> descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges = new ArrayList<>();
-		descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("Opslaan");
-		descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("Opslaan en sluiten");
-		//descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("cancel-button");
+		descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("btnOpslaan");
+		descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("btnOpslaanEnSluiten");
+		descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("btnOpslaanEnNieuw");
 
 		// If the last executed action is typing in a son of a form
 		if(functionalAction != null
@@ -461,8 +493,8 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 			for(Widget w : state) {
 				if (descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.contains(w.get(Tags.Desc, ""))) {
 					// Check that widgets are turned on when the last action was a type action in a input field
-					if (w.get(WdTags.WebIsDisabled, false))	{
-						String verdictMsg = String.format("Form Widget is NOT enabled while it should be! Role: %s , Path: %s , Desc: %s", 
+					if (isDisabled(w))	{
+						String verdictMsg = String.format("Form widget is not enabled while it should be! Role: %s , Path: %s , Desc: %s", 
 								w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
 						return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
 					}
@@ -472,12 +504,18 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 
 		return Verdict.OK;
 	}
+	
+	private boolean isDisabled(Widget w)
+	{
+		//return w.get(WdTags.WebIsDisabled, false);
+        return w.get(WdTags.WebCssClasses, "").contains("item-disabled");
+	}
 
 	private Verdict formButtonMustBeDisabledIfNoChangesVerdict(State state) {
 		List<String> descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges = new ArrayList<>();
-		descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges.add("Opslaan");
-		descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges.add("Opslaan en sluiten");
-		//descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges.add("cancel-button");
+		descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges.add("btnOpslaan");
+		descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges.add("btnOpslaanEnSluiten");
+		descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges.add("btnOpslaanEnNieuw");
 
 		// If we are in a state with an unaltered form, apply the verdict
 		if (_pristineStateForm)
@@ -485,8 +523,8 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 			for(Widget w : state) {
 				if (descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges.contains(w.get(Tags.Desc, ""))) {
 					// check that widgets are turned off when there was no action executed yet
-					if (!w.get(WdTags.WebIsDisabled, false))	{
-						String verdictMsg = String.format("Form Widget IS enabled while it should not be! Role: %s , Path: %s , Desc: %s", 
+					if (!isDisabled(w))	{
+						String verdictMsg = String.format("Form widget is enabled while it should not be! Role: %s , Path: %s , Desc: %s", 
 								w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
 						return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
 					}
@@ -530,6 +568,10 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 
 		// iterate through all widgets
 		for (Widget widget : state) {
+            if(isAtBrowserCanvas(widget) && isMenuItemClickable(widget)) {
+        	   	actions.add(ac.leftClickAt(widget));
+            }
+
 			// only consider enabled and non-tabu widgets
 			if (!widget.get(Enabled, true)) {
 				continue;
@@ -593,6 +635,15 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 
 	@Override
 	protected boolean isClickable(Widget widget) {
+        // If the web widget contains the "readonly" attribute, we do not want to derive type actions
+        if(widget.get(WdTags.WebAttributeMap, null) != null && widget.get(WdTags.WebAttributeMap).containsKey("disabled")) {
+            return false;
+        }
+        
+        if(widget.get(WdTags.WebAttributeMap, null) != null && widget.get(WdTags.WebAttributeMap).containsKey("display") && widget.get(WdTags.WebAttributeMap).get("display").contains("none")){
+            return false;
+        }
+
 		if(widget.get(WdTags.WebIsDisabled, false)) return false;
 
 		Role role = widget.get(Tags.Role, Roles.Widget);
@@ -615,8 +666,20 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		return clickSet.size() > 0;
 	}
 
+    private boolean isMenuItemClickable(Widget widget) {
+    	if(widget.get(WdTags.WebCssClasses, "").contains("[item,")) {
+    		return true;
+    	}
+    	return false;
+    }
+
 	@Override
 	protected boolean isTypeable(Widget widget) {
+        //If the web widget contains the "readonly" attribute, we do not want to derive type actions
+		if(widget.get(WdTags.WebAttributeMap, null) != null && widget.get(WdTags.WebAttributeMap).containsKey("readonly")) {
+			return false;
+		}
+
 		Role role = widget.get(Tags.Role, Roles.Widget);
 		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
 
