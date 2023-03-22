@@ -31,6 +31,9 @@
 
 import java.util.Set;
 
+import org.testar.IActionDerive;
+import org.testar.IActionExecutor;
+import org.testar.IActionSelector;
 import org.testar.PrioritizeNewActionsSelector;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
@@ -50,9 +53,7 @@ import org.testar.simplestategraph.QLearningActionSelector;
 public class Protocol_desktop_generic_action_selector extends DesktopProtocol {
 
 
-	private PrioritizeNewActionsSelector selector;
-//	private QLearningActionSelector selector;
-//	private GuiStateGraphWithVisitedActions selector;
+	private IActionSelector selector;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -64,9 +65,9 @@ public class Protocol_desktop_generic_action_selector extends DesktopProtocol {
 		// initializing simple GUI state graph for Q-learning:
 		// this implementation uses concreteStateID for state abstraction, so it may find too many states:
 
-		selector = new PrioritizeNewActionsSelector();
+//		selector = new PrioritizeNewActionsSelector();
 //		selector = new QLearningActionSelector(settings.get(ConfigTags.MaxReward),settings.get(ConfigTags.Discount));
-//		selector = new GuiStateGraphWithVisitedActions();
+		selector = new GuiStateGraphWithVisitedActions();
 
 		super.initialize(settings);
 	}
@@ -103,7 +104,9 @@ public class Protocol_desktop_generic_action_selector extends DesktopProtocol {
 		}
 		
 		// Generate mode visualization purposes (Shift + Up)
-		actions = selector.getPrioritizedActions(actions);
+		if(selector instanceof IActionDerive) {
+			actions = ((IActionDerive) selector).deriveActions(actions);
+		}
 
 		//return the set of derived actions
 		return actions;
@@ -120,13 +123,9 @@ public class Protocol_desktop_generic_action_selector extends DesktopProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		// FOR Q-LEARNING ACTION SELECTOR
-		//Action action = selector.selectAction(state, actions);
-
-		// FOR STATE GRAPH WITH VISITED ACTIONS ACTION SELECTOR
-		//Action action = selector.selectAction(state, actions);
-
-		Action action = super.selectAction(state, actions);
+		Action action = selector.selectAction(state, actions);
+		if(action == null)
+			action = super.selectAction(state, actions);
 		return(action);
 	}
 
@@ -142,8 +141,10 @@ public class Protocol_desktop_generic_action_selector extends DesktopProtocol {
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
-		// FOR PRIORITIZE-NEW-ACTIONS ACTION SELECTOR
-		selector.addExecutedAction(action);
+		if(selector instanceof IActionExecutor)
+		{
+			((IActionExecutor) selector).executeAction(action);
+		}
 		/*System.out.println("Executed action: " + action.get(Tags.Desc, "NoCurrentDescAvailable")
 		+ " -- Times executed: " + selector.timesExecuted(action));*/
 		return super.executeAction(system, state, action);
