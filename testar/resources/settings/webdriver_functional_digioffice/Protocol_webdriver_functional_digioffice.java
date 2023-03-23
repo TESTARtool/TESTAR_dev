@@ -304,8 +304,8 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		verdict = functionalButtonVerdict(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
-		// Check the functional Verdict that detects duplicate or repeated text in descriptions of widgets
-		verdict = WebVerdict.DetectDuplicateText(state, "DocDoc|DossierDossier|GebrGebr|RelRel|\\d\\d-\\d\\d-\\d\\d\\d\\d\\s\\d\\d:\\d\\d:\\d\\d|\\d\\d-\\d\\d-\\d\\d\\d\\d");
+		// Check the functional Verdict that detects duplicate or repeated text in descriptions of widgets, ignore some common terms of DigiOffice, date, datetime, 3 phone formats and postal code
+		verdict = WebVerdict.DetectDuplicateText(state, "DocDoc|DossierDossier|GebrGebr|RelRel|\\d\\d-\\d\\d-\\d\\d\\d\\d\\s\\d\\d:\\d\\d:\\d\\d|\\d\\d-\\d\\d-\\d\\d\\d\\d|\\d\\d - \\d\\d \\d\\d \\d\\d \\d\\d|\\(?\\d\\d\\d\\)? -? ?\\d\\d\\d \\d\\d \\d\\d|\\(?\\d\\d\\d\\d\\)? -? ?\\d\\d \\d\\d \\d\\d|\\d\\d\\d\\d [A-Z][A-Z]");
 		if (shouldReturnVerdict(verdict)) return verdict;
 		
 		// Check the functional Verdict that detects HTML or XML tags in descriptions of widgets

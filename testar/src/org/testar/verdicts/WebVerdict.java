@@ -193,10 +193,14 @@ public class WebVerdict {
 				// If the list of duplicated descriptions contains a matching prepare the verdict
 				if(!duplicatedDescriptions.isEmpty()) {
 					for(Pair<Widget, String> duplicatedWidget : duplicatedDescriptions) {
-						String verdictMsg = String.format("Detected a duplicated rows in a Table! Role: %s , WebId: %s, Description: %s", 
+						// Ignore empty rows
+						if (!duplicatedWidget.right().replaceAll("_","").isEmpty())
+						{
+							String verdictMsg = String.format("Detected a duplicated rows in a Table! Role: %s , WebId: %s, Description: %s", 
 								duplicatedWidget.left().get(Tags.Role), duplicatedWidget.left().get(WdTags.WebId, ""), duplicatedWidget.right());
 
-						duplicateRowsInTableVerdict = duplicateRowsInTableVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_TABLE_ROWS, verdictMsg, Arrays.asList((Rect)duplicatedWidget.left().get(Tags.Shape))));
+							duplicateRowsInTableVerdict = duplicateRowsInTableVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_TABLE_ROWS, verdictMsg, Arrays.asList((Rect)duplicatedWidget.left().get(Tags.Shape))));
+						}
 					}
 				}
 
@@ -275,10 +279,9 @@ public class WebVerdict {
 	// The idea is that a value or description should not have repeated text, values or words, because in rare cases this is applicable.
 	// For example, the TO field of an e-mail should only have unique e-mailadresses, or the Authors field of a report should only have unique authors
 	// This could be a technical issue, where a boundary of a loop is off, or concatenating a string value twice.
+	// If False positives arise, the ignorePatternRegEx could be used to fine-tune the detection by ignoring these false positives with a anti-pattern
 	public static Verdict DetectDuplicateText(State state, String ignorePatternRegEx)
 	{
-		// TODO: Add Ignore list support (list or regex?, for false positivies like 'DocDoc', 'DossierDossier', 'GebrGebr', 'RelRel', dateformats: '03-03-2023 10:43:37', '01-01-2023' '00-00-1900'
-		
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
 		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
@@ -310,7 +313,8 @@ public class WebVerdict {
 	// 		The <b>quick</b> brown fox jumps <i>over the lazy</i> dog
 	// GOOD:The quick brown fox jumps over the lazy dog
 	// The idea is that a description should not show markup tags, but should probably show the text in bold, italic, and so on.
-	// If there are html tags which can be ignored, then this can be specified in the ignorePatternRegEx parameter 
+	// If there are html tags which can be ignored, then this can be specified in the ignorePatternRegEx parameter
+	// If False positives arise, the ignorePatternRegEx could be used to fine-tune the detection by ignoring these false positives with a anti-pattern
 	public static Verdict DetectHTMLOrXMLTagsInText(State state, String ignorePatternRegEx)
 	{
 		// If this method is NOT enabled, just return verdict OK
