@@ -53,6 +53,9 @@
  import java.io.File;
  import java.io.FileWriter;
  import java.io.IOException;
+ import java.util.ArrayList;
+ import java.util.Collections;
+ import java.util.Comparator;
  import java.util.HashMap;
  import java.util.HashSet;
  import java.util.Map;
@@ -66,6 +69,7 @@
 {
     private ParseUtil               parseUtil;
     private Map<String, Integer>    actionsExecuted      = new HashMap<String, Integer>();
+    private Map<String, Integer>    debugActionsExecuted      = new HashMap<String, Integer>();
     private boolean                 UseSingleFill;
     
     @Override
@@ -242,7 +246,14 @@
         String actionID = selectedAction.get(Tags.AbstractIDCustom);
         Integer timesUsed = actionsExecuted.getOrDefault(actionID, 0); //get the use count for the action
         actionsExecuted.put(actionID, timesUsed + 1); //increase by one
-        
+
+        String widgetPath = selectedAction.get(Tags.OriginWidget).get(Tags.Path).trim();
+        String widgetDesc = selectedAction.get(Tags.OriginWidget).get(Tags.Desc);
+
+        String identifier = widgetPath + ":" + widgetDesc;
+        Integer timesDescUsed = debugActionsExecuted.getOrDefault(identifier, 0); //get the use count for the action
+        debugActionsExecuted.put(identifier, timesDescUsed + 1); //increase by one
+
         return selectedAction;
     }
 
@@ -347,7 +358,11 @@
     {
         try
         {
-            FileWriter myWriter = new FileWriter(Main.outputDir + File.separator + outerLoopName + File.separator +"log_form_values.txt");
+            FileWriter myWriter = new FileWriter(Main.outputDir + File.separator + outerLoopName + File.separator +"log_form_values.txt", true);
+
+            myWriter.write("---------- DEBUG FORM ----------");
+            myWriter.write(System.getProperty("line.separator"));
+
             myWriter.write(WdDriver.getCurrentUrl());
             myWriter.write(System.getProperty("line.separator"));
             myWriter.write("No. actions: " + (actionCount-1));
@@ -380,6 +395,7 @@
     protected void postSequenceProcessing()
     {
         super.postSequenceProcessing();
+        logActionCount(latestState);
 
 //        try
 //        {
@@ -392,6 +408,71 @@
 //            System.out.println("An error occurred.");
 //            e.printStackTrace();
 //        }
+    }
+
+    /**
+     * Print the <li> web elements corresponding to the filled form values
+     *
+     * param state
+     */
+    private void logActionCount(State state)
+    {
+    	try
+    	{
+    		// convert the map entries to a list
+    		java.util.List<Map.Entry<String, Integer>> entryList = new ArrayList<>(debugActionsExecuted.entrySet());
+
+    		// Courtesy of ChatGPT
+    		// sort the list by the keys (which are String values)
+    		Collections.sort(entryList, new Comparator<Map.Entry<String, Integer>>() {
+    		    @Override
+    		    public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+    		        String[] parts1 = o1.getKey().split(":");
+    		        String[] parts2 = o2.getKey().split(":");
+
+    		        int[] arr1 = getIntArray(parts1[0]);
+    		        int[] arr2 = getIntArray(parts2[0]);
+
+    		        for (int i = 0; i < Math.min(arr1.length, arr2.length); i++) {
+    		            if (arr1[i] != arr2[i]) {
+    		                return arr1[i] - arr2[i];
+    		            }
+    		        }
+
+    		        if (arr1.length != arr2.length) {
+    		            return arr1.length - arr2.length;
+    		        }
+
+    		        return parts1[1].compareTo(parts2[1]);
+    		    }
+
+    		    private int[] getIntArray(String s) {
+    		        String[] parts = s.replaceAll("\\[|\\]|\\s", "").split(",");
+    		        int[] result = new int[parts.length];
+    		        for (int i = 0; i < parts.length; i++) {
+    		            result[i] = Integer.parseInt(parts[i]);
+    		        }
+    		        return result;
+    		    }
+    		});
+
+    		FileWriter myWriter = new FileWriter(Main.outputDir + File.separator + outerLoopName + File.separator + "log_form_values.txt", true);
+
+    		myWriter.write("---------- Actions Executed ----------");
+    		myWriter.write(System.getProperty( "line.separator" ));
+    		for (Map.Entry<String, Integer> entry : entryList) {
+    			String line = entry.getKey() + " , " + entry.getValue();
+    			myWriter.write(line);
+    			myWriter.write(System.getProperty( "line.separator" ));
+    		}
+
+    		myWriter.close();
+    	}
+    	catch (IOException e)
+    	{
+    		System.out.println("An error occurred.");
+    		e.printStackTrace();
+    	}
     }
 
     @Override

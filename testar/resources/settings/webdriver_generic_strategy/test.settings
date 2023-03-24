@@ -105,7 +105,7 @@ ProtocolClass = webdriver_generic_strategy/Protocol_webdriver_generic_strategy
 #################################################################\n"
 # State model inference settings
 #################################################################\n"
-StateModelEnabled = true
+StateModelEnabled = false
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreDirectory = C:\\Users\\testar\\Desktop\\orientdb-3.0.34\\databases

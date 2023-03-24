@@ -189,11 +189,24 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		ret.set(Tags.Role, ActionRoles.ClickTypeInto);
 		return ret;
 	}
-	
+
+	public Action pasteTextInto(Widget w, String text, boolean replaceText){
+		Action ret = super.pasteTextInto(w, text, replaceText);
+
+		String pastedDesc = ret.get(Tags.Desc, "");
+
+		String widgetPath = ret.get(Tags.OriginWidget).get(Tags.Path).trim();
+		String widgetDesc = ret.get(Tags.OriginWidget).get(Tags.Desc);
+		String identifier = widgetPath + ":" + widgetDesc;
+
+		ret.set(Tags.Desc, "'" + pastedDesc + "' into '" + identifier + "'");
+		return ret;
+	}
+
 	@Override
 	public Action pasteAndReplaceText(final Position position, final String text){
 		Action ret = super.pasteAndReplaceText(position, text);
-		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate("pasted text", DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
+		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
 		ret.set(Tags.Role, ActionRoles.PasteTextInto);
 		ret.set(Tags.Desc, "Paste Text: " + StringEscapeUtils.escapeHtml4(text));
 		return ret;
@@ -202,7 +215,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 	@Override
 	public Action pasteAndAppendText(final Position position, final String text){
 		Action ret = super.pasteAndAppendText(position, text);
-		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate("pasted text", DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
+		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
 		ret.set(Tags.Role, ActionRoles.PasteTextInto);
 		ret.set(Tags.Desc, "Append Paste Text: " + StringEscapeUtils.escapeHtml4(text));
 		return ret;
