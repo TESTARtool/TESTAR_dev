@@ -171,6 +171,7 @@ public class WdDriver extends SUTBase {
     	options.addArguments("--disable-web-security");
     	options.addArguments("--allow-running-insecure-content");
     }
+    options.addArguments("--remote-allow-origins=*");
 
     Map<String, Object> prefs = new HashMap<>();
     prefs.put("profile.default_content_setting_values.notifications", 1);

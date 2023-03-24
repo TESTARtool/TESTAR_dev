@@ -3,8 +3,8 @@ IF
 THEN
     select-random sibling-or-child-action
 ELSE IF
-        any-exist unvisited of-type form-submit-action
+        any-exist of-type scroll-action
     THEN
-        select-random unvisited of-type form-submit-action
-    ELSE
         select-random of-type scroll-action
+    ELSE
+        select-random unvisited of-type form-submit-action

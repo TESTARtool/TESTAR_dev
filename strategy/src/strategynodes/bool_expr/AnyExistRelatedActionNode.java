@@ -31,17 +31,16 @@ public class AnyExistRelatedActionNode extends BaseStrategyNode<Boolean>
 
         if(prevAction != null)
         {
-            if(VISIT_MODIFIER == null)
-                validActionFound = !actions.isEmpty(); //if there are no filters to apply, any action is valid
-            else
-            {
-                //filter by visit modifier
-                List<Action> filteredActions = filterByVisitModifier(VISIT_MODIFIER, new ArrayList<Action>(actions), actionsExecuted);
+//            if(VISIT_MODIFIER == null)
+//                validActionFound = !actions.isEmpty(); //if there are no filters to apply, any action is valid
 
-                //check by relation
-                validActionFound = validRelationExists(prevAction, VISIT_MODIFIER, RELATED_ACTION, filteredActions, actionsExecuted);
-            }
+            List<Action> filteredActions = new ArrayList<>(actions);
 
+            if(VISIT_MODIFIER != null) //filter by visit modifier
+                filteredActions = filterByVisitModifier(VISIT_MODIFIER, filteredActions, actionsExecuted);
+
+            //check by relation
+            validActionFound = validRelationExists(prevAction, VISIT_MODIFIER, RELATED_ACTION, filteredActions, actionsExecuted);
         }
         return validActionFound;
     }
@@ -49,7 +48,7 @@ public class AnyExistRelatedActionNode extends BaseStrategyNode<Boolean>
     @Override
     public String toString()
     {
-        String string = "any-exist";
+        String string = "any-exist ";
         if(VISIT_MODIFIER != null) string += " " + VISIT_MODIFIER;
         string += RELATED_ACTION.toString();
         return string;

@@ -33,6 +33,7 @@
  import org.testar.managers.InputDataManager;
  import org.testar.monkey.ConfigTags;
  import org.testar.monkey.DefaultProtocol;
+ import org.testar.monkey.Main;
  import org.testar.monkey.Settings;
  import org.testar.monkey.alayer.Shape;
  import org.testar.monkey.alayer.*;
@@ -43,6 +44,7 @@
  import org.testar.monkey.alayer.exceptions.ActionBuildException;
  import org.testar.monkey.alayer.exceptions.StateBuildException;
  import org.testar.monkey.alayer.webdriver.WdDriver;
+ import org.testar.monkey.alayer.webdriver.enums.WdRoles;
  import org.testar.monkey.alayer.webdriver.enums.WdTags;
  import org.testar.protocols.WebdriverProtocol;
  import parsing.ParseUtil;
@@ -56,6 +58,7 @@
  import java.util.Map;
  import java.util.Set;
 
+ import static org.testar.OutputStructure.outerLoopName;
  import static org.testar.monkey.alayer.Tags.Blocked;
  import static org.testar.monkey.alayer.Tags.Enabled;
 
@@ -226,14 +229,15 @@
 //        if(UseSingleFill)
 //            return RandomActionSelector.selectAction(actions); //the list only contains FillFormActions
 
-        //clone the action
-        Action selectedAction = (Action) SerializationUtils.clone(parseUtil.selectAction(state, actions, actionsExecuted));
-        
         if(DefaultProtocol.lastExecutedAction != null)
         {
             state.set(Tags.PreviousAction, DefaultProtocol.lastExecutedAction);
             state.set(Tags.PreviousActionID, DefaultProtocol.lastExecutedAction.get(Tags.AbstractIDCustom, null));
         }
+
+        //clone the action
+//        Action selectedAction = (Action) SerializationUtils.clone(parseUtil.selectAction(state, actions, actionsExecuted));
+        Action selectedAction = parseUtil.selectAction(state, actions, actionsExecuted);
         
         String actionID = selectedAction.get(Tags.AbstractIDCustom);
         Integer timesUsed = actionsExecuted.getOrDefault(actionID, 0); //get the use count for the action
@@ -326,10 +330,46 @@
         for(Widget widget : state)
         {
             if(widget.get(WdTags.WebTextContent, "").equalsIgnoreCase("return to form"))
+            {
+                logFormValues(state);
                 return false;
+            }
         }
         return super.moreActions(state);
     }
+
+    /**
+     * Print the <li> web elements corresponding to the filled form values
+     *
+     * param state
+     */
+    private void logFormValues(State state)
+    {
+        try
+        {
+            FileWriter myWriter = new FileWriter(Main.outputDir + File.separator + outerLoopName + File.separator +"log_form_values.txt");
+            myWriter.write(WdDriver.getCurrentUrl());
+            myWriter.write(System.getProperty("line.separator"));
+            myWriter.write("No. actions: " + (actionCount-1));
+            myWriter.write(System.getProperty("line.separator"));
+            myWriter.write(System.getProperty("line.separator"));
+            for(Widget w : state)
+            {
+                if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdLI))
+                {
+                    myWriter.write(w.get((WdTags.WebTextContent)));;
+                    myWriter.write(System.getProperty("line.separator"));
+                }
+            }
+            myWriter.close();
+        }
+        catch (IOException e)
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+    }
+
 
     /**
      * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
@@ -341,14 +381,17 @@
     {
         super.postSequenceProcessing();
 
-        try {
-            FileWriter myWriter = new FileWriter("metrics.txt");
-            myWriter.write(WdDriver.getCurrentUrl() + " no. actions: " + (actionCount-1));
-            myWriter.close();
-        } catch (IOException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
-        }
+//        try
+//        {
+//            FileWriter myWriter = new FileWriter("metrics.txt");
+//            myWriter.write(WdDriver.getCurrentUrl() + " no. actions: " + (actionCount-1));
+//            myWriter.close();
+//        }
+//        catch (IOException e)
+//        {
+//            System.out.println("An error occurred.");
+//            e.printStackTrace();
+//        }
     }
 
     @Override
@@ -358,7 +401,7 @@
         if(settings.get(ConfigTags.Mode).equals(Modes.Generate))
         {
             compressOutputRunFolder();
-            copyOutputToNewFolderUsingIpAddress("N:");
+//            copyOutputToNewFolderUsingIpAddress("N:");
         }
     }
 }
