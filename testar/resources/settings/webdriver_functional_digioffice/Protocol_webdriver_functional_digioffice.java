@@ -285,8 +285,8 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		// report the information in a specific HTML report
 		// and continue testing
 		
-		//Verdict spellCheckerVerdict = GenericVerdict.SpellChecker(state, WdTags.WebTextContent, new Dutch());
-		//if(spellCheckerVerdict != Verdict.OK) HTMLStateVerdictReport.reportStateVerdict(actionCount, state, spellCheckerVerdict);
+		Verdict spellCheckerVerdict = GenericVerdict.SpellChecker(state, WdTags.WebTextContent, new Dutch(), "Pagina generatietijd.*");
+		if(spellCheckerVerdict != Verdict.OK) HTMLStateVerdictReport.reportStateVerdict(actionCount, state, spellCheckerVerdict);
 
 		// Check the functional Verdict that detects if a form button is disabled after modifying the form inputs.
 		verdict = formButtonEnabledAfterTypingChangesVerdict(state);

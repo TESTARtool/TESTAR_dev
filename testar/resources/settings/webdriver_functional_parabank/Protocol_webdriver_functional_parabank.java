@@ -284,7 +284,7 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 		// Instead of stop the sequence and report a warning verdict,
 		// report the information in a specific HTML report
 		// and continue testing
-		Verdict spellCheckerVerdict = GenericVerdict.SpellChecker(state, WdTags.WebTextContent, new AmericanEnglish());
+		Verdict spellCheckerVerdict = GenericVerdict.SpellChecker(state, WdTags.WebTextContent, new AmericanEnglish(), "");
 		if(spellCheckerVerdict != Verdict.OK) HTMLStateVerdictReport.reportStateVerdict(actionCount, state, spellCheckerVerdict);
 		
 		// Check the functional Verdict that detects if a form button is disabled after modifying the form inputs.
