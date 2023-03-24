@@ -51,20 +51,35 @@ public final class Verdict implements Serializable {
 	public static final double SEVERITY_MIN = 0.0;
 
 	// WARNING
-	public static final double SEVERITY_WARNING =              		0.00000001; // must be less than FAULT THRESHOLD @test.settings
-	public static final double SEVERITY_WARNING_DECIMALS =     		0.00000002;
-	public static final double SEVERITY_WARNING_TABLE_ROWS =   		0.00000003;
-	public static final double SEVERITY_WARNING_ORPHAN_ITEM =  		0.00000004;
-	public static final double SEVERITY_WARNING_UNSORTED =     		0.00000005;
-	public static final double SEVERITY_WARNING_NON_WRITABLE = 		0.00000006;
-	public static final double SEVERITY_WARNING_MANY_ITEMS =   		0.00000007;
-	public static final double SEVERITY_WARNING_DUPLICATE_ITEMS =	0.00000008;
+	public static final double SEVERITY_WARNING =              		                     0.00000001; // must be less than FAULT THRESHOLD @test.settings
+	
+	// WARNING GROUP: DATA
+	public static final double SEVERITY_WARNING_DATA_CONFIGURATION_SETTING_NOT_WORKING = 0.00000002;
+	public static final double SEVERITY_WARNING_DATA_DATA_VALUE_NOT_STORED_OR_DELETED =  0.00000003;
+	public static final double SEVERITY_WARNING_DATA_DATA_MAPPING_FAULT = 	             0.00000004;
+	public static final double SEVERITY_WARNING_DATA_FILTERING_FAULT = 	                 0.00000005;
+	public static final double SEVERITY_WARNING_DATA_FUNCTIONAL_DOMAIN_SPECIFIC_FAULT =  0.00000006;
+	public static final double SEVERITY_WARNING_DATA_INPUT_VALIDATION_FAULT =            0.00000007;
+	public static final double SEVERITY_WARNING_DATA_SORTING_FAULT =		             0.00000008;
+	public static final double SEVERITY_WARNING_DATA_VISUAL_DOCUMENT_GENERATION_OR_CONVERSION_FAULT = 0.00000009;
 
-	// SUSPICIOUS_TITLE
+	// WARNING GROUP: RESOURCE
+	public static final double SEVERITY_WARNING_RESOURCE_PERFORMANCE_ISSUE =	         0.00000010;
+	public static final double SEVERITY_WARNING_RESOURCE_NOT_FOUND_FAULT =	             0.00000011;
+
+	// WARNING GROUP: UI
+	public static final double SEVERITY_WARNING_UI_TRANSLATION_OR_SPELLING_ISSUE =     	 0.00000012;
+	public static final double SEVERITY_WARNING_UI_FLOW_FAULT =                          0.00000013;
+	public static final double SEVERITY_WARNING_UI_ITEM_VISIBILITY_FAULT =               0.00000014;
+	public static final double SEVERITY_WARNING_UI_ITEM_WRONG_VALUE_FAULT =              0.00000015;
+	public static final double SEVERITY_WARNING_UI_TRIMMED_SECURITY_FAULT =              0.00000016;
+	public static final double SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT =     		 0.00000017;
+	
+	// SUSPICIOUS GROUP: EXCEPTION
 	public static final double SEVERITY_SUSPICIOUS_ALERT = 0.19999998; // suspicious alert
 	public static final double SEVERITY_SUSPICIOUS_TITLE = 0.19999999; // suspicious title
 
-	// CRASH
+	// SUSPICIOUS GROUP: RESOURCE
 	public static final double SEVERITY_NOT_RESPONDING =   0.99999990; // unresponsive
 	public static final double SEVERITY_NOT_RUNNING =	   0.99999999; // crash? unexpected close?
 	public static final double SEVERITY_MAX = 1.0;
@@ -133,17 +148,34 @@ public final class Verdict implements Serializable {
 		if(severity == Verdict.SEVERITY_MIN) return "OK";
 
 		if(severity == Verdict.SEVERITY_WARNING) return "WARNING";
-		if(severity == Verdict.SEVERITY_WARNING_DECIMALS) return "SEVERITY_WARNING_DECIMALS";
-		if(severity == Verdict.SEVERITY_WARNING_TABLE_ROWS) return "SEVERITY_WARNING_TABLE_ROWS";
-		if(severity == Verdict.SEVERITY_WARNING_ORPHAN_ITEM) return "SEVERITY_WARNING_ORPHAN_ITEM";
-		if(severity == Verdict.SEVERITY_WARNING_UNSORTED) return "SEVERITY_WARNING_UNSORTED";
-		if(severity == Verdict.SEVERITY_WARNING_NON_WRITABLE) return "SEVERITY_WARNING_NON_WRITABLE";
-		if(severity == Verdict.SEVERITY_WARNING_MANY_ITEMS) return "SEVERITY_WARNING_MANY_ITEMS";
-		if(severity == Verdict.SEVERITY_WARNING_DUPLICATE_ITEMS) return "SEVERITY_WARNING_DUPLICATE_ITEMS";
 		
+		// WARNING GROUP: DATA
+		if(severity == Verdict.SEVERITY_WARNING_DATA_CONFIGURATION_SETTING_NOT_WORKING) return "WARNING_DATA_CONFIGURATION_SETTING_NOT_WORKING";
+		if(severity == Verdict.SEVERITY_WARNING_DATA_DATA_VALUE_NOT_STORED_OR_DELETED) return "_WARNING_DATA_DATA_VALUE_NOT_STORED_OR_DELETED";
+		if(severity == Verdict.SEVERITY_WARNING_DATA_DATA_MAPPING_FAULT) return "WARNING_DATA_DATA_MAPPING_FAULT";
+		if(severity == Verdict.SEVERITY_WARNING_DATA_FILTERING_FAULT) return "WARNING_DATA_FILTERING_FAULT";
+		if(severity == Verdict.SEVERITY_WARNING_DATA_FUNCTIONAL_DOMAIN_SPECIFIC_FAULT) return "WARNING_DATA_FUNCTIONAL_DOMAIN_SPECIFIC_FAULT";
+		if(severity == Verdict.SEVERITY_WARNING_DATA_INPUT_VALIDATION_FAULT) return "WARNING_DATA_INPUT_VALIDATION_FAULT";
+		if(severity == Verdict.SEVERITY_WARNING_DATA_SORTING_FAULT) return "WARNING_DATA_SORTING_FAULT";
+		if(severity == Verdict.SEVERITY_WARNING_DATA_VISUAL_DOCUMENT_GENERATION_OR_CONVERSION_FAULT) return "WARNING_DATA_VISUAL_DOCUMENT_GENERATION_OR_CONVERSION_FAULT";
+
+		// WARNING GROUP: RESOURCE
+		if(severity == Verdict.SEVERITY_WARNING_RESOURCE_PERFORMANCE_ISSUE) return "WARNING_RESOURCE_PERFORMANCE_ISSUE";
+		if(severity == Verdict.SEVERITY_WARNING_RESOURCE_NOT_FOUND_FAULT) return "WARNING_RESOURCE_NOT_FOUND_FAULT";
+
+		// WARNING GROUP: UI
+		if(severity == Verdict.SEVERITY_WARNING_UI_TRANSLATION_OR_SPELLING_ISSUE) return "WARNING_UI_TRANSLATION_OR_SPELLING_ISSUE";
+		if(severity == Verdict.SEVERITY_WARNING_UI_FLOW_FAULT) return "WARNING_UI_FLOW_FAULT";
+		if(severity == Verdict.SEVERITY_WARNING_UI_ITEM_VISIBILITY_FAULT) return "WARNING_UI_ITEM_VISIBILITY_FAULT";
+		if(severity == Verdict.SEVERITY_WARNING_UI_ITEM_WRONG_VALUE_FAULT) return "WARNING_UI_ITEM_WRONG_VALUE_FAULT";
+		if(severity == Verdict.SEVERITY_WARNING_UI_TRIMMED_SECURITY_FAULT) return "WARNING_UI_TRIMMED_SECURITY_FAULT";
+		if(severity == Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT) return "WARNING_UI_VISUAL_OR_RENDERING_FAULT";
+
+		// SUSPICIOUS GROUP: EXCEPTION
 		if(severity == Verdict.SEVERITY_SUSPICIOUS_ALERT) return "SUSPICIOUS_ALERT";
 		if(severity == Verdict.SEVERITY_SUSPICIOUS_TITLE) return "SUSPICIOUS_TITLE";
 
+		// SUSPICIOUS GROUP: RESOURCE
 		if(severity == Verdict.SEVERITY_NOT_RESPONDING) return "NOT_RESPONDING";
 		if(severity == Verdict.SEVERITY_NOT_RUNNING) return "NOT_RUNNING";
 

@@ -391,7 +391,7 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 				String verdictMsg = String.format("Dummy Button detected! Role: %s , Path: %s , Desc: %s", 
 						w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
 
-				functionalVerdict = new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+				functionalVerdict = new Verdict(Verdict.SEVERITY_WARNING_UI_FLOW_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
 			}
 
 			// getState and getVerdict are executed more than one time after executing an action. 
@@ -422,13 +422,13 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 							String verdictMsg = String.format("Detected a downloaded file of 0kb after interacting with! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
 									WdDriver.alertMessage, w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
 
-							watcherEmptyfileVerdict = watcherEmptyfileVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+							watcherEmptyfileVerdict = watcherEmptyfileVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_DATA_DATA_VALUE_NOT_STORED_OR_DELETED, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
 						} 
 						// If there is no widget in the last executed action, just report a message
 						else {
 							String verdictMsg = String.format("Detected a downloaded file of 0kb!");
 
-							watcherEmptyfileVerdict = watcherEmptyfileVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg));
+							watcherEmptyfileVerdict = watcherEmptyfileVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_DATA_DATA_VALUE_NOT_STORED_OR_DELETED, verdictMsg));
 						}
 
 					}
@@ -462,7 +462,7 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 					if (w.get(WdTags.WebIsDisabled, false))	{
 						String verdictMsg = String.format("Form Widget is NOT enabled while it should be! Role: %s , Path: %s , Desc: %s", 
 								w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
-						return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+						return new Verdict(Verdict.SEVERITY_WARNING_UI_ITEM_VISIBILITY_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
 					}
 				}
 			}
@@ -486,7 +486,7 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 					if (!w.get(WdTags.WebIsDisabled, false))	{
 						String verdictMsg = String.format("Form Widget IS enabled while it should not be! Role: %s , Path: %s , Desc: %s", 
 								w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
-						return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+						return new Verdict(Verdict.SEVERITY_WARNING_UI_ITEM_VISIBILITY_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
 					}
 
 				}

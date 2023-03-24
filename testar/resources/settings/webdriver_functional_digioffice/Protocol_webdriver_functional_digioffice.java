@@ -28,6 +28,10 @@
  *
  */
 
+import org.openqa.selenium.devtools.DevTools;
+import org.openqa.selenium.devtools.HasDevTools;
+import org.openqa.selenium.devtools.v109.performance.Performance;
+import org.openqa.selenium.devtools.v109.performance.model.Metric;
 import org.languagetool.language.AmericanEnglish;
 import org.languagetool.language.BritishEnglish;
 import org.languagetool.language.Dutch;
@@ -104,6 +108,8 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 	private Action functionalAction = null;
 	private Verdict functionalVerdict = Verdict.OK;
 	private List<String> listErrorVerdictInfo = new ArrayList<>();
+	private DevTools devTools;
+    private List<Metric> metricList = new ArrayList<>(); 
 
 	// Watcher service
 	Path downloadsPath;
@@ -155,6 +161,11 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		// This will allow to check again the formButtonMustBeDisabledIfNoChangesVerdict verdict
 		_pristineStateForm = true;
 
+        // Initialize devtools for performance verdict
+        // Initialize a session of the web developers tool
+	    devTools = ((HasDevTools) WdDriver.getRemoteWebDriver()).getDevTools();
+	    devTools.createSessionIfThereIsNotOne();
+
 		// https://github.com/ferpasri/parabank/tree/injected_failures
 		// custom_compile_and_deploy.bat
 		// http://localhost:8080/parabank
@@ -192,6 +203,9 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 			_pristineStateForm = true;
 		}
 
+        devTools.send(Performance.enable(Optional.empty()));
+	    metricList = devTools.send(Performance.getMetrics());
+	   
 		return super.getState(system);
 	}
 
@@ -285,7 +299,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		// report the information in a specific HTML report
 		// and continue testing
 		
-		Verdict spellCheckerVerdict = GenericVerdict.SpellChecker(state, WdTags.WebTextContent, new Dutch(), "Pagina generatietijd.*");
+		Verdict spellCheckerVerdict = GenericVerdict.SpellChecker(state, WdTags.WebTextContent, new Dutch(), "Pagina generatietijd.*|\\d\\d.*");
 		if(spellCheckerVerdict != Verdict.OK) HTMLStateVerdictReport.reportStateVerdict(actionCount, state, spellCheckerVerdict);
 
 		// Check the functional Verdict that detects if a form button is disabled after modifying the form inputs.
@@ -293,8 +307,15 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if a form button is enabled when it must not.
-		verdict = formButtonMustBeDisabledIfNoChangesVerdict(state);
-		if (shouldReturnVerdict(verdict)) return verdict;
+		//verdict = formButtonMustBeDisabledIfNoChangesVerdict(state);
+		//if (shouldReturnVerdict(verdict)) return verdict;
+
+        verdict = detectSlowPerformance(10.0); // seconds
+        if (shouldReturnVerdict(verdict)) return verdict;
+        
+        // Checks for zero numbers in tables
+        verdict = detectZeroNumbers(state);
+        if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if a downloaded file is empty.
 		verdict = watcherFileEmptyFile();
@@ -363,6 +384,30 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		return verdict;
 	}
 	
+
+    private Verdict detectSlowPerformance(double taskDurationThreshold)
+    {
+//metricList Info https://pptr.dev/next/api/puppeteer.page.metrics
+        // Print all devTools performance metrics
+//	    for(Metric m : metricList) {
+//		  System.out.println(m.getName() + " = " + m.getValue());
+//	  }
+       Verdict verdict = Verdict.OK;
+       double taskDuration = 0.0;
+       Optional<Metric> metric = metricList.stream().filter(m -> "TaskDuration".equals(m.getName())).findFirst();
+       
+       if (metric.isPresent())
+       {
+           taskDuration = metric.get().getValue().doubleValue();
+           if (taskDuration > taskDurationThreshold)
+           {
+               String verdictMsg = String.format("Detected slow pageload with metric TaskDuration which is combined duration of all tasks performed by browser. TaskDuration: %.02f seconds", taskDuration);
+			  verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_RESOURCE_PERFORMANCE_ISSUE, verdictMsg));
+           }
+       }
+       return verdict;
+    }
+
 	/**
 	 * We want to return the verdict if it is not OK, 
 	 * and not on the detected failures list (it's a new failure). 
@@ -375,6 +420,34 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 	}
 
 
+	// Detect text that contains zero values in tables
+	// BAD:  0.00
+    //       $ 0.00
+	// GOOD: 
+	// If zero values are shown in tables/grids, then this clutter the grid. It is better to don't display zero values. 
+	// Exception to this rule may be row totals or column totals. 
+	private Verdict detectZeroNumbers(State state)
+	{
+		Verdict verdict = Verdict.OK;
+		String patternRegex = "\\s0[\\.,]0\\s";
+		Pattern pattern = Pattern.compile(patternRegex);
+		
+		for(Widget w : state) {
+			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdTD)) {
+
+				String desc = w.get(WdTags.WebValue, "");
+				Matcher matcher = pattern.matcher(desc);
+			
+				if (matcher.find()) {
+					String verdictMsg = String.format("Detected zero values in table/grids! Role: %s , Path: %s , WebId: %s , Desc: %s , WebValue: %s", 
+							w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebValue, ""));
+					verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+				}
+			}
+		}
+		return verdict;
+	}
+	
 	// Detect text decoraged with ^ charachters, this means that this text has no translation key and will not be translated when UI language is changed in DigiOffice
 	// BAD:  ^Untranslated text^
     //       ^UntranslatedText^
@@ -393,7 +466,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 			if (matcher.find()) {
 				String verdictMsg = String.format("Detected untranslated tags in widget! Role: %s , Path: %s , WebId: %s , Desc: %s , WebValue: %s", 
 						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebValue, ""));
-				verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+				verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_TRANSLATION_OR_SPELLING_ISSUE, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
 			}
 		}
 		return verdict;
@@ -423,7 +496,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 				String verdictMsg = String.format("Dummy Button detected! Role: %s , Path: %s , Desc: %s", 
 						w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
 
-				functionalVerdict = new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+				functionalVerdict = new Verdict(Verdict.SEVERITY_WARNING_UI_FLOW_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
 			}
 
 			// getState and getVerdict are executed more than one time after executing an action. 
@@ -455,13 +528,13 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 							String verdictMsg = String.format("Detected a downloaded file of 0kb after interacting with! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
 									WdDriver.alertMessage, w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
 
-							watcherEmptyfileVerdict = watcherEmptyfileVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+							watcherEmptyfileVerdict = watcherEmptyfileVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_DATA_DATA_VALUE_NOT_STORED_OR_DELETED, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
 						} 
 						// If there is no widget in the last executed action, just report a message
 						else {
 							String verdictMsg = String.format("Detected a downloaded file of 0kb!");
 
-							watcherEmptyfileVerdict = watcherEmptyfileVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg));
+							watcherEmptyfileVerdict = watcherEmptyfileVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_DATA_DATA_VALUE_NOT_STORED_OR_DELETED, verdictMsg));
 						}
 
 					}
@@ -496,7 +569,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 					if (isDisabled(w))	{
 						String verdictMsg = String.format("Form widget is not enabled while it should be! Role: %s , Path: %s , Desc: %s", 
 								w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
-						return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+						return new Verdict(Verdict.SEVERITY_WARNING_UI_ITEM_VISIBILITY_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
 					}
 				}
 			}
@@ -526,7 +599,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 					if (!isDisabled(w))	{
 						String verdictMsg = String.format("Form widget is enabled while it should not be! Role: %s , Path: %s , Desc: %s", 
 								w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
-						return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+						return new Verdict(Verdict.SEVERITY_WARNING_UI_ITEM_VISIBILITY_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
 					}
 
 				}
@@ -599,6 +672,14 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 			if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
 				if(whiteListed(widget) || isUnfiltered(widget)){
 					actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
+                    //actions.add(ac.pasteTextInto(widget, "\"'[]$(>%)@#>+_|:* $?{}/\\,Aa", true));
+                    //actions.add(ac.pasteTextInto(widget, "<memo>bla bla bla", true)); // #942
+                    //actions.add(ac.pasteTextIntoo(widget, "é € ý ì", true)); 
+                    //actions.add(ac.pasteTextInto(widget, "@#", true)); // #70973
+                    //actions.add(ac.pasteTextInto(widget, "01-01-2020", true)); // #70296
+                    //actions.add(ac.pasteTextInto(widget, "31-12-2023", true)); // #70296
+                    //actions.add(ac.pasteTextInto(widget, "<script>x=5;alert(`XSS ${x} mogelijk`);</script>", true)); // #58157
+                    //actions.add(ac.pasteTextInto(widget, new String(new char[260]).replace("\0", "A"), true)); // #71074
 				}else{
 					// filtered and not white listed:
 					filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
@@ -610,6 +691,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 				if(whiteListed(widget) || isUnfiltered(widget)){
 					if (!isLinkDenied(widget)) {
 						actions.add(ac.leftClickAt(widget));
+                        //actions.add(ac.rightClickAt(widget));
 					}else{
 						// link denied:
 						filteredActions.add(ac.leftClickAt(widget));

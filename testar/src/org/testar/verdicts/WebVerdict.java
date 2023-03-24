@@ -139,7 +139,7 @@ public class WebVerdict {
 						String verdictMsg = String.format("Widget with more than %s decimals! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
 								maxDecimals, w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
 	
-						decimalsVerdict = decimalsVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_DECIMALS, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+						decimalsVerdict = decimalsVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
 					}
 				}
 			}
@@ -199,7 +199,7 @@ public class WebVerdict {
 							String verdictMsg = String.format("Detected a duplicated rows in a Table! Role: %s , WebId: %s, Description: %s", 
 								duplicatedWidget.left().get(Tags.Role), duplicatedWidget.left().get(WdTags.WebId, ""), duplicatedWidget.right());
 
-							duplicateRowsInTableVerdict = duplicateRowsInTableVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_TABLE_ROWS, verdictMsg, Arrays.asList((Rect)duplicatedWidget.left().get(Tags.Shape))));
+							duplicateRowsInTableVerdict = duplicateRowsInTableVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_DATA_FILTERING_FAULT, verdictMsg, Arrays.asList((Rect)duplicatedWidget.left().get(Tags.Shape))));
 						}
 					}
 				}
@@ -258,7 +258,7 @@ public class WebVerdict {
 					String verdictMsg = String.format("Empty select element detected! Role: %s , Path: %s , Desc: %s", 
 							w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
 
-					emptySelectListVerdict = new Verdict(Verdict.SEVERITY_WARNING_ORPHAN_ITEM, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+					emptySelectListVerdict = new Verdict(Verdict.SEVERITY_WARNING_UI_ITEM_VISIBILITY_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
 				}
 			}
 		}
@@ -302,7 +302,7 @@ public class WebVerdict {
 			if (matcher.find() && (ignorePatternRegEx == "" || !ignoreMatcher.find())) {
 				String verdictMsg = String.format("Detected duplicated or repeated text in description of widget! Role: %s , Path: %s , WebId: %s , Desc: %s , WebValue: %s", 
 						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebValue, ""));
-				verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_DUPLICATE_ITEMS, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+				verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_ITEM_WRONG_VALUE_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
 			}
 		}
 		return verdict;
@@ -336,7 +336,7 @@ public class WebVerdict {
 			if (matcher.find() && (ignorePatternRegEx == "" || !ignoreMatcher.find())) {
 				String verdictMsg = String.format("Detected HTML or XML tags in description of widget! Role: %s , Path: %s , WebId: %s , Desc: %s , WebValue: %s", 
 						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebValue, ""));
-				verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+				verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_ITEM_WRONG_VALUE_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
 			}
 		}
 		return verdict;
@@ -359,7 +359,7 @@ public class WebVerdict {
 					String verdictMsg = String.format("Only one item in select element detected! Role: %s , Path: %s , Desc: %s", 
 							w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
 
-					selectElementVerdict = new Verdict(Verdict.SEVERITY_WARNING_ORPHAN_ITEM, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+					selectElementVerdict = new Verdict(Verdict.SEVERITY_WARNING_UI_ITEM_VISIBILITY_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
 				}
 			}
 		}
@@ -385,7 +385,7 @@ public class WebVerdict {
 					String verdictMsg = String.format("Dropdownlist has %d items, which is more than theshold value of %s! Role: %s , Path: %s , Desc: %s", 
 							selectItemsLength.intValue(), thresholdValue, w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
 
-					selectElementVerdict = new Verdict(Verdict.SEVERITY_WARNING_MANY_ITEMS, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+					selectElementVerdict = new Verdict(Verdict.SEVERITY_WARNING_DATA_FILTERING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
 				}
 			}
 		}
@@ -428,7 +428,7 @@ public class WebVerdict {
 						String verdictMsg = String.format("Detected a Select web element with unsorted elements! Role: %s , Path: %s , WebId: %s", 
 								w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""));
 
-                        Verdict matchVerdict = new Verdict(Verdict.SEVERITY_WARNING_UNSORTED, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+                        Verdict matchVerdict = new Verdict(Verdict.SEVERITY_WARNING_DATA_SORTING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
                         unsortedSelectElementVerdict = unsortedSelectElementVerdict.join(matchVerdict);
 					}
 				}
@@ -477,14 +477,14 @@ public class WebVerdict {
 						String verdictMsg = String.format("Detected a Select web element with duplicate display value elements! Role: %s , Path: %s , WebId: %s , Duplicate item(s): %s", 
 								w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), String.join(",", duplicatesTexts));
 
-						return new Verdict(Verdict.SEVERITY_WARNING_DUPLICATE_ITEMS, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+						return new Verdict(Verdict.SEVERITY_WARNING_DATA_FILTERING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
 					}
 					if(duplicatesValues.size() > 0)
 					{
 						String verdictMsg = String.format("Detected a Select web element with duplicate underlying value elements! Role: %s , Path: %s , WebId: %s , Duplicate item(s): %s", 
 								w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), String.join(",", duplicatesValues));
 
-						return new Verdict(Verdict.SEVERITY_WARNING_DUPLICATE_ITEMS, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+						return new Verdict(Verdict.SEVERITY_WARNING_DATA_FILTERING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
 					}
 				}
 			}
@@ -558,7 +558,7 @@ public class WebVerdict {
 				String verdictMsg = String.format("TextArea Widget with 0 Length detected! Role: %s , Path: %s , WebId: %s", 
 						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""));
 
-				textAreaVerdict = textAreaVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_NON_WRITABLE, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+				textAreaVerdict = textAreaVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_FLOW_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
 			}
 		}
 		return textAreaVerdict;
@@ -579,7 +579,7 @@ public class WebVerdict {
 				String verdictMsg = String.format("Detected a Web element without child elements! Role: %s , Path: %s , WebId: %s", 
 						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""));
 
-				emptyChildrenVerdict = emptyChildrenVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_ORPHAN_ITEM, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+				emptyChildrenVerdict = emptyChildrenVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
 			}
 		}
 		return emptyChildrenVerdict;
@@ -611,7 +611,7 @@ public class WebVerdict {
         
         				String verdictMsg = String.format("Detected a Web radio input element with a Unique option! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
         						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
-        				radioInputVerdict = radioInputVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_ORPHAN_ITEM, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+        				radioInputVerdict = radioInputVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_ITEM_VISIBILITY_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
         			}
                  }
             }

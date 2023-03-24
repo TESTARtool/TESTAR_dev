@@ -150,7 +150,7 @@ public class GenericVerdict {
 							if (!spellingIgnoreList.contains(spellingSuspect)) {
 								spellingIgnoreList.add(spellingSuspect);
 							}
-							spellCheckerVerdict = spellCheckerVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+							spellCheckerVerdict = spellCheckerVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_TRANSLATION_OR_SPELLING_ISSUE, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
 						}
 	
 					}
