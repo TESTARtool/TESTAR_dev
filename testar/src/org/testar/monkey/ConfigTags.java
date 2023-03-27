@@ -92,6 +92,9 @@ public final class ConfigTags
   public static final Tag<Boolean> AccessBridgeEnabled = Tag.from("AccessBridgeEnabled", Boolean.class);
   public static final Tag<String> SUTProcesses = Tag.from("SUTProcesses", String.class); // Shift+0 shortcut to debug (STDOUT) windows' process names
 
+
+  public static final Tag<Boolean> CreateWidgetInfoJsonFile = Tag.from("CreateWidgetInfoJsonFile", Boolean.class);
+
   // state model config tags
   public static final Tag<Boolean> StateModelEnabled = Tag.from("StateModelEnabled", Boolean.class);
   public static final Tag<String> DataStore = Tag.from("DataStore", String.class);

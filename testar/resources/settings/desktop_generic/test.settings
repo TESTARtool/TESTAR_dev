@@ -99,6 +99,18 @@ SUTProcesses =
 ProtocolClass = desktop_generic/Protocol_desktop_generic
 
 #################################################################
+# State model inference settings
+#################################################################
+StateModelEnabled = false
+DataStore = OrientDB
+DataStoreType = remote
+DataStoreServer = localhost
+DataStoreDB = testar
+DataStoreUser = testar
+DataStorePassword = testar
+DataStoreMode = instant
+
+#################################################################
 # State identifier attributes
 #
 # Specify the widget attributes that you wish to use in constructing
@@ -118,7 +130,7 @@ ProtocolSpecificSetting_5 =
 #################################################################
 # Other more advanced settings
 #################################################################
-
+CreateWidgetInfoJsonFile = true
 ProcessesToKillDuringTest =
 OutputDir = ./output
 PathToReplaySequence = ./output/temp
