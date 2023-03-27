@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2023 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -37,9 +37,9 @@ import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.plugin.NativeLinker;
-import org.testar.action.priorization.ActionTags;
+import org.testar.IActionExecutor;
+import org.testar.IActionSelector;
 import org.testar.action.priorization.SimilarityDetection;
-import org.testar.action.priorization.WeightedAction;
 import org.testar.managers.InputDataManager;
 import org.testar.protocols.WebdriverProtocol;
 
@@ -51,20 +51,11 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 /**
- * Sample protocol that tries to detect similar Actions between previous and current State,
- * to decrease the possibilities to select a static widget and previous executed Action.
- * 
- * Actions have an OriginWidget associated, and Widgets have an AbtractIDCustom property
- * that allows TESTAR to identify web elements based on Abstract Properties.
- * Example: WebWidgetId (test.settings -> AbstractStateAttributes)
- * 
- * If some Action.OriginWidget still existing between previous and current State
- * or if some Action.OriginWidget was executed previously,
- * increase a numeric similarity weight that will reduce the % to be selected
+ * This protocol provides additional implementation to improve TESTAR action selection mechanism. 
  */
-public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
-	
-	private SimilarityDetection similarActions;
+public class Protocol_webdriver_generic_action_selector extends WebdriverProtocol {
+
+	private IActionSelector selector;
 
 	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
@@ -75,9 +66,17 @@ public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
 	@Override
 	protected void beginSequence(SUT system, State state) {
 		super.beginSequence(system, state);
-		// 5 is the default maximum numeric weight
-		// the more it is increased, the more the probability % of selecting "similar" actions is reduced
-		similarActions = new SimilarityDetection(deriveActions(system, state), 5);
+
+		/**
+		 * Detect and reduce the selection similar actions between previous and current state. 
+		 * The executed action additional increases the counter in 1. 
+		 * This selector uses the action origin widget AbstractIDCustom to match the similarity. 
+		 * 
+		 * 5 is the default maximum numeric weight. 
+		 * As this value increases, there is less probability % of selecting a "similar" action. 
+		 * This selector is reset in each new sequence. 
+		 */
+		selector = new SimilarityDetection(deriveActions(system, state), 5);
 	}
 
 	/**
@@ -92,8 +91,7 @@ public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
 	 * @return a set of actions
 	 */
 	@Override
-	protected Set<Action> deriveActions(SUT system, State state)
-			throws ActionBuildException {
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 		// Kill unwanted processes, force SUT to foreground
 		Set<Action> actions = super.deriveActions(system, state);
 
@@ -160,7 +158,6 @@ public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
 		return clickSet.size() > 0;
 	}
 
-
 	/**
 	 * Select one of the possible actions (e.g. at random)
 	 *
@@ -170,48 +167,14 @@ public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions) {
-		
-		// Given the current set of Actions of the State take the OriginWidget AbstractCustomID,
-		// and compare with the previous existing Actions/OriginWidget to increase the similarity value.
-		// Minimal similarity value 1, Maximal similarity is given in the constructor. 
-		// Higher similarity value means that Action/OriginWidget remains more time static in the State.
-		
-		actions = similarActions.modifySimilarActions(actions);
-
-		System.out.println("---------------------- DEBUG SIMILARITY VALUES ----------------------------------------");
-		for(Action a : actions) {
-			System.out.println("Widget : " + a.get(Tags.OriginWidget).get(WdTags.WebId) +
-					" with similarity : " + a.get(ActionTags.SimilarityValue, 0));
+		// Use the desired action selector
+		Action action = selector.selectAction(state, actions);
+		// If no action is available with the selector, use the state model or a random selection
+		if(action == null)
+		{
+			action = super.selectAction(state, actions);
 		}
-		
-		return reduceProbabilityBySimilarity(state, actions);
-	}
-	
-	private Action reduceProbabilityBySimilarity(State state, Set<Action> actions) {
-		// Check the totalWeight
-		double totalWeight = 0;
-		for(Action a : actions) {
-			totalWeight = totalWeight + (1.0 / a.get(ActionTags.SimilarityValue));
-		}
-		
-		// Just in case, if something wrong return purely random
-		if(totalWeight == 0) {
-			return super.selectAction(state, actions);
-		}
-		
-		System.out.println("*************************** DEBUG SIMILARITY PROBABILITY ***************************");
-		
-		// Create a percentage weight of each action based on the totalWeight
-		WeightedAction actionProbability = new WeightedAction();
-		for(Action a : actions) {
-			double actionWeight = (1.0 / a.get(ActionTags.SimilarityValue)) / totalWeight * 100;
-			actionProbability.addEntry(a, actionWeight);
-			
-			System.out.println("Widget : " + a.get(Tags.OriginWidget).get(WdTags.WebId) +
-					" with similarity : " + actionWeight);
-		}
-		
-		return actionProbability.getRandom();
+		return action;
 	}
 
 	/**
@@ -224,9 +187,10 @@ public class Protocol_webdriver_detect_similarity extends WebdriverProtocol {
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action) {
-		// Increase the similarity (weight value) of an executed action
-		// to reduce the % to be selected next iteration
-		similarActions.increaseSpecificExecutedAction(action);
+		if(selector instanceof IActionExecutor)
+		{
+			((IActionExecutor) selector).executeAction(action);
+		}
 		return super.executeAction(system, state, action);
 	}
 

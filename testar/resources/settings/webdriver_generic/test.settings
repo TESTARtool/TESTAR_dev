@@ -102,9 +102,9 @@ SUTProcesses =
 
 ProtocolClass = webdriver_generic/Protocol_webdriver_generic
 
-#################################################################\n"
+#################################################################
 # State model inference settings
-#################################################################\n"
+#################################################################
 StateModelEnabled = false
 DataStore = OrientDB
 DataStoreType = remote

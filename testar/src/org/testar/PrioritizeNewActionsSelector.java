@@ -122,10 +122,6 @@ public class PrioritizeNewActionsSelector extends RandomActionSelector implement
         previousActions = actions;
         return(prioritizedActions);
     }
-
-    /*public void addExecutedAction(Action action){
-        executedActions.add(action);
-    }*/
     
     public void addExecutedAction(Action action){
     	for(Map.Entry<Action, Integer> entry : executedActions.entrySet()){

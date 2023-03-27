@@ -53,9 +53,8 @@ import org.sikuli.script.FindFailed;
 import org.sikuli.script.Screen;
 
 /**
- * This protocol provides default TESTAR behaviour to test Windows desktop applications.
- *
- * It uses random action selection algorithm.
+ * This protocol shows how to integrate visual recognition software, such as Eye or Sikuli, 
+ * to recognize the widgets of the SUT. 
  */
 public class Protocol_desktop_widget_recognition extends DesktopProtocol {
 
@@ -76,8 +75,8 @@ public class Protocol_desktop_widget_recognition extends DesktopProtocol {
 	protected void initialize(Settings settings){
 		// initializing simple GUI state graph:
 		stateGraphWithVisitedActions = new GuiStateGraphWithVisitedActions();
-//		detector = Detector.EYE;
-		 detector = Detector.SCREEN;
+		//detector = Detector.EYE;
+		detector = Detector.SCREEN;
 		super.initialize(settings);
 	}
 
