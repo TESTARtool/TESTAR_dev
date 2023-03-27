@@ -1,10 +1,10 @@
 IF
-    any-exist sibling-or-child-action
+	(NOT prev-action) OR (prev-action of-type form-submit-action)
 THEN
-    select-random sibling-or-child-action
+	select-random unvisited of-type form-field-action
 ELSE IF
-        any-exist of-type scroll-action
-    THEN
-        select-random of-type scroll-action
-    ELSE
+		any-exist sibling-or-child-action
+	THEN
+		select-random sibling-or-child-action
+	ELSE
         select-random unvisited of-type form-submit-action

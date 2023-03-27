@@ -97,6 +97,13 @@ public interface StrategyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitAnyExist(StrategyParser.AnyExistContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code prevAction}
+	 * labeled alternative in {@link StrategyParser#state_boolean}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPrevAction(StrategyParser.PrevActionContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code sutType}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
 	 * @param ctx the parse tree

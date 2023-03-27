@@ -114,6 +114,14 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
         return new AnyExistNode(visitModifier, filter, actionType);
     }
     @Override
+    public PrevActionNode visitPrevAction(StrategyParser.PrevActionContext ctx)
+    {
+        Filter filter = (ctx.FILTER() == null) ? null : Filter.toEnum(ctx.FILTER().getText());
+        ActionType actionType = (ctx.ACTION_TYPE() == null) ? null : ActionType.toEnum(ctx.ACTION_TYPE().getText());
+
+        return new PrevActionNode(filter, actionType);
+    }
+    @Override
     public SutNode visitSutType(StrategyParser.SutTypeContext ctx)
     {
         Filter filter = (ctx.FILTER() == null) ? null : Filter.toEnum(ctx.FILTER().getText());

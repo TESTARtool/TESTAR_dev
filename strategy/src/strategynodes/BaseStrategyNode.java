@@ -149,13 +149,18 @@ public abstract class BaseStrategyNode<T>
         return filteredActions;
     }
 
+    protected boolean filterAllowsAction(Action action, Filter filter, ActionType actionType)
+    {
+        return ((filter == Filter.INCLUDE && actionType.actionIsThisType(action)) ||
+                (filter == Filter.EXCLUDE && (!actionType.actionIsThisType(action))));
+    }
+
     protected List<Action> filterByActionType(Set<Action> actions, Filter filter, ActionType actionType)
     {
         List<Action> filteredActions = new ArrayList<>();
         for(Action action : actions)
         {
-            boolean actionIsOfType = (actionType.actionIsThisType(action));
-            if((filter == Filter.INCLUDE && actionIsOfType) || (filter == Filter.EXCLUDE && (!actionIsOfType)))
+            if(filterAllowsAction(action, filter, actionType))
                 filteredActions.add(action);
         }
         return filteredActions;

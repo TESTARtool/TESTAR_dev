@@ -154,6 +154,18 @@ public interface StrategyListener extends ParseTreeListener {
 	 */
 	void exitAnyExist(StrategyParser.AnyExistContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code prevAction}
+	 * labeled alternative in {@link StrategyParser#state_boolean}.
+	 * @param ctx the parse tree
+	 */
+	void enterPrevAction(StrategyParser.PrevActionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code prevAction}
+	 * labeled alternative in {@link StrategyParser#state_boolean}.
+	 * @param ctx the parse tree
+	 */
+	void exitPrevAction(StrategyParser.PrevActionContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code sutType}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
 	 * @param ctx the parse tree

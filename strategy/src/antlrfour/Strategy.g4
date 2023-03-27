@@ -29,6 +29,7 @@ number_of_actions:  'n-actions'      VISIT_MODIFIER?   (FILTER     ACTION_TYPE)?
 state_boolean:      'state-changed'                                                         #stateChanged
 |                   'any-exist'             VISIT_MODIFIER?    RELATED_ACTION               #anyExistRelatedAction
 |                   'any-exist'             VISIT_MODIFIER?   (FILTER     ACTION_TYPE)?     #anyExist
+|                   'prev-action'                             (FILTER     ACTION_TYPE)?     #prevAction
 |                   'sut'                   FILTER             SUT_TYPE                     #sutType
 ;
 
