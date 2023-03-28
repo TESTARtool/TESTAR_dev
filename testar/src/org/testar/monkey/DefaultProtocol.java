@@ -1079,7 +1079,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		Action retAction = stateModelManager.getAbstractActionToExecute(actions);
 		// If state model is not enabled, use random:
 		if (retAction == null) {
-			return RandomActionSelector.selectAction(actions);
+			return RandomActionSelector.selectRandomAction(actions);
 		}
 		return retAction;
 	}
