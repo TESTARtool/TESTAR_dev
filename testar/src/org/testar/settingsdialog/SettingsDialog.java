@@ -75,6 +75,7 @@ public class SettingsDialog extends JFrame implements Observer {
   //TODO: what is this ret variable. Cant you just return settings in the run method?
   private Settings ret;
 
+  private JTabbedPane jTabsPane;
   private JButton btnGenerate;
   private JButton btnSpy;
   private JButton btnReplay;
@@ -84,6 +85,11 @@ public class SettingsDialog extends JFrame implements Observer {
   //private JButton btnRecord; // Record mode is disabled temporally
 
   private static final int GENERAL_TAB_INDEX = 1;
+  private static final int FILTER_TAB_INDEX = 2;
+  private static final int ORACLES_TAB_INDEX = 3;
+  private static final int TIMES_TAB_INDEX = 4;
+  private static final int MISC_TAB_INDEX = 5;
+  private static final int MODEL_TAB_INDEX = 6;
   private final Map<Integer, Pair<String, SettingsPanel>> settingPanels = new HashMap<>();
 
   /**
@@ -249,14 +255,14 @@ public class SettingsDialog extends JFrame implements Observer {
     btnModel = getBtnModel();
     //btnRecord = getBtnRecord(); // Record mode is disabled temporally
 
-    JTabbedPane jTabsPane = new JTabbedPane();
+    jTabsPane = new JTabbedPane();
     jTabsPane.addTab("About", new AboutPanel());
     settingPanels.put(GENERAL_TAB_INDEX, new Pair<>("General Settings", new GeneralPanel(this)));
-    settingPanels.put(settingPanels.size() + 1, new Pair<>("Filters", new FilterPanel()));
-    settingPanels.put(settingPanels.size() + 1, new Pair<>("Oracles", new OraclePanel()));
-    settingPanels.put(settingPanels.size() + 1, new Pair<>("Time Settings", new TimingPanel()));
-    settingPanels.put(settingPanels.size() + 1, new Pair<>("Misc", new MiscPanel()));
-    settingPanels.put(settingPanels.size() + 1, new Pair<>("State Model", modelPanel = StateModelPanel.createStateModelPanel()));
+    settingPanels.put(FILTER_TAB_INDEX, new Pair<>("Filters", new FilterPanel()));
+    settingPanels.put(ORACLES_TAB_INDEX, new Pair<>("Oracles", new OraclePanel()));
+    settingPanels.put(TIMES_TAB_INDEX, new Pair<>("Time Settings", new TimingPanel()));
+    settingPanels.put(MISC_TAB_INDEX, new Pair<>("Misc", new MiscPanel()));
+    settingPanels.put(MODEL_TAB_INDEX, new Pair<>("State Model", modelPanel = StateModelPanel.createStateModelPanel()));
 
     settingPanels.forEach((k,v) -> jTabsPane.add(v.left(),v.right()));
 
@@ -419,6 +425,7 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   private void btnModelActionPerformed(ActionEvent evt) {
+	  jTabsPane.setSelectedIndex(MODEL_TAB_INDEX);
 	  modelPanel.openServer();
   }
 
