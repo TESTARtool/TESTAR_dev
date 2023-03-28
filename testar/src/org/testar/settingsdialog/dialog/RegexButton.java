@@ -38,6 +38,10 @@ import java.util.regex.PatternSyntaxException;
 
 import javax.swing.JButton;
 import javax.swing.JTextArea;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Highlighter;
+import javax.swing.text.Highlighter.HighlightPainter;
 
 public class RegexButton extends JButton implements ActionListener {
 	private static final long serialVersionUID = 8671774402267591519L;
@@ -57,16 +61,42 @@ public class RegexButton extends JButton implements ActionListener {
 			try {
 				Pattern.compile(regexExpression);
 			} catch (PatternSyntaxException exception) {
-				// If regex syntaxis is wrong, red color
+				// If the regex syntax is wrong, paint the red color on the button
 				this.setBackground(Color.RED);
+				// Clear possible previous highlights and highlight the wrong regex characters
+				if(exception.getMessage() != null) {
+					clearTextArea();
+					highlightTextArea(exception);
+				}
 				return;
 			}
-			// If regex syntaxis is correct, green color
+			// If the regex syntax is correct, paint the green color on the button
 			this.setBackground(Color.GREEN);
+			// Then clear possible previous highlights
+			clearTextArea();
 		} else {
-			// If empty field, default color
+			// If the field is empty, remove the background colors
 			this.setBackground(null);
+			// Then clear possible previous highlights
+			clearTextArea();
 		}
+	}
+
+	private void highlightTextArea(PatternSyntaxException exception) {
+		Highlighter highlighter = textAreaRegex.getHighlighter();
+		HighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(Color.RED);
+
+		int indexNumber = exception.getMessage().indexOf("near index") + 10;
+		int endNumber = exception.getMessage().indexOf("\n");
+
+		int regexPointer = Integer.parseInt(exception.getMessage().substring(indexNumber, endNumber).trim());
+		try {
+			highlighter.addHighlight(regexPointer, regexPointer + 1, painter);
+		} catch (BadLocationException e) { }
+	}
+
+	private void clearTextArea() {
+		textAreaRegex.getHighlighter().removeAllHighlights();
 	}
 
 }
