@@ -31,10 +31,13 @@
 import com.google.common.collect.ArrayListMultimap;
 import org.testar.SutVisualization;
 import org.testar.managers.InputDataManager;
+import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Pair;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.NOP;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
+import org.testar.monkey.alayer.actions.WdFillFormAction;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
@@ -200,6 +203,17 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 
 		// iterate through all widgets
 		for (Widget widget : state) {
+			// fill forms actions
+			if (settings.get(ConfigTags.FormFillingAction) && isAtBrowserCanvas(widget) && isForm(widget)) {
+				String protocol = settings.get(ConfigTags.ProtocolClass, "");
+				Action formFillingAction = new WdFillFormAction(ac, widget, protocol.substring(0, protocol.lastIndexOf('/')));
+				if(formFillingAction instanceof NOP){
+					// do nothing with NOP actions - the form was not actionable
+				}else{
+					actions.add(formFillingAction);
+				}
+			}
+
 			// only consider enabled and non-tabu widgets
 			if (!widget.get(Enabled, true)) {
 				continue;

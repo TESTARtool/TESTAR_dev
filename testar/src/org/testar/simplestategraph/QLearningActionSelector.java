@@ -30,6 +30,7 @@
 
 package org.testar.simplestategraph;
 
+import org.testar.IActionSelector;
 import org.testar.RandomActionSelector;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
@@ -39,7 +40,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Set;
 
-public class QLearningActionSelector {
+public class QLearningActionSelector implements IActionSelector {
     private double R_MAX;
     private double gammaDiscount;
     private GuiStateGraphForQlearning graph;
@@ -55,6 +56,7 @@ public class QLearningActionSelector {
         graph.startANewTestSequence();
     }
 
+    @Override
     public Action selectAction(State state, Set<Action> actions) {
         // saving the starting node of the graph:
         if(graph.startingStateAbstractCustomId==null){
@@ -96,7 +98,7 @@ public class QLearningActionSelector {
         ArrayList<String> actionIdsWithMaxQvalue = currentQlearningGuiState.getActionsIdsWithMaxQvalue(actions);
         if(actionIdsWithMaxQvalue.size()==0){
             System.out.println("ERROR: Qlearning did not find actions with max Q value!");
-            returnAction = RandomActionSelector.selectAction(actions);
+            returnAction = RandomActionSelector.selectRandomAction(actions);
         }else{
             //selecting randomly of the actionIDs that have max Q value:
             System.out.println("DEBUG: IDs of actions with max Q value:");
@@ -114,7 +116,7 @@ public class QLearningActionSelector {
         if(returnAction==null){
             // backup if action selection did not find an action:
             System.out.println("ERROR: QlearningActionSelector.selectAction(): no action found! Getting purely random action.");
-            returnAction = RandomActionSelector.selectAction(actions);
+            returnAction = RandomActionSelector.selectRandomAction(actions);
         }
         //updating the list of states:
         graph.qlearningGuiStates.remove(currentQlearningGuiState); // should not be a problem if state not there (new state)?

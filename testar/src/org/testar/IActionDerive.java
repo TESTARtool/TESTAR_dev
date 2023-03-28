@@ -27,26 +27,12 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
-
 package org.testar;
 
 import org.testar.monkey.alayer.Action;
-import org.testar.monkey.alayer.State;
 
-import java.util.ArrayList;
-import java.util.Random;
 import java.util.Set;
 
-public class RandomActionSelector implements IActionSelector{
-
-    public static Action selectRandomAction(Set<Action> actions) {
-        long graphTime = System.currentTimeMillis();
-        Random rnd = new Random(graphTime);
-        return new ArrayList<Action>(actions).get(rnd.nextInt(actions.size()));
-    }
-
-    @Override
-    public Action selectAction(State state, Set<Action> actions) {
-        return selectRandomAction(actions);
-    }
+public interface IActionDerive{
+    Set<Action> deriveActions(Set<Action> actions);
 }
