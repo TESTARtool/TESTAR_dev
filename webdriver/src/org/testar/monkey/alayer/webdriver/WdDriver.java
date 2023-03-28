@@ -210,6 +210,9 @@ public class WdDriver extends SUTBase {
     Map<String, Object> prefs = new HashMap<>();
     prefs.put("profile.default_content_setting_values.notifications", 1);
     options.setExperimentalOption("prefs", prefs);
+    
+    // Fix to chromedriver 111 https://github.com/SeleniumHQ/selenium/issues/11750
+    options.addArguments("--remote-allow-origins=*");
 
     return new ChromeDriver(service, options);
   }

@@ -55,12 +55,15 @@ import org.apache.commons.io.FilenameUtils;
 import org.testar.monkey.Main;
 import org.testar.monkey.Settings;
 import org.testar.settingsdialog.OracleEditor;
+import org.testar.settingsdialog.SettingsDialog;
 import org.testar.settingsdialog.SettingsPanel;
 
 public class FunctionalOraclePanel extends SettingsPanel {
 
 	private static final long serialVersionUID = -6397375336958507515L;
 
+	private SettingsDialog settingsDialog;
+	
 	private GenericTableModel genericVerdictsModel = new GenericTableModel(new String[]{"Generic Verdict Name", "Enable Generic Verdict", "Edit Oracle", "Severity"});
 	private DesktopTableModel desktopVerdictsModel = new DesktopTableModel(new String[]{"Desktop Verdict Name", "Enable Desktop Verdict", "Edit Oracle", "Severity"});
 	private WebTableModel webVerdictsModel = new WebTableModel(new String[]{"Web Verdict Name", "Enable Web Verdict", "Edit Oracle", "Severity"});
@@ -69,7 +72,8 @@ public class FunctionalOraclePanel extends SettingsPanel {
 	private List<OracleEditor> desktopList = new ArrayList<>();
 	private List<OracleEditor> webList = new ArrayList<>();
 
-	public FunctionalOraclePanel() {
+	public FunctionalOraclePanel(SettingsDialog settingsDialog) {
+		this.settingsDialog = settingsDialog;
 		setLayout(null);
 
 		/**
@@ -112,7 +116,7 @@ public class FunctionalOraclePanel extends SettingsPanel {
 				if (listOfFiles[i].isFile() && listOfFiles[i].getName().contains(".java")) {
 					File file = new File(Main.functionalOraclesDir + File.separator + verdictFolder + File.separator + listOfFiles[i].getName());
 					String absolutePath = file.getAbsolutePath();
-					OracleEditor oracleEditor = new OracleEditor(Main.functionalOraclesDir, absolutePath.replace(".java", ""));
+					OracleEditor oracleEditor = new OracleEditor(settingsDialog, Main.functionalOraclesDir, absolutePath.replace(".java", ""));
 					list.add(oracleEditor);
 				}
 			}

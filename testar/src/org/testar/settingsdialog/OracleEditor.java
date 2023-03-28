@@ -33,16 +33,10 @@ package org.testar.settingsdialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarInputStream;
-import java.util.jar.JarOutputStream;
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
@@ -51,12 +45,13 @@ import javax.tools.ToolProvider;
 
 import jsyntaxpane.DefaultSyntaxKit;
 
-import org.testar.monkey.Main;
 import org.testar.monkey.Util;
 
 public class OracleEditor extends javax.swing.JDialog {
 	private static final long serialVersionUID = 5922037291232012481L;
 
+	private SettingsDialog settingsDialog;
+	
 	private String oraclesDir;
 	private String oracleFileName;
 	private String oracleJavaFile;
@@ -66,7 +61,8 @@ public class OracleEditor extends javax.swing.JDialog {
 		return oracleFileName;
 	}
 
-	public OracleEditor(String oraclesDir, String oracleFileName) {
+	public OracleEditor(SettingsDialog settingsDialog, String oraclesDir, String oracleFileName) {
+		this.settingsDialog = settingsDialog;
 		this.oraclesDir = oraclesDir;
 		this.oracleFileName = oracleFileName;
 		this.oracleJavaFile = oracleFileName + ".java";
@@ -103,7 +99,7 @@ public class OracleEditor extends javax.swing.JDialog {
 		jScrollPane1.getVerticalScrollBar().setUnitIncrement(5);
 
 
-		btnCompile.setText("Save and Compile");
+		btnCompile.setText("Save, Compile, and RELOAD TESTAR");
 		btnCompile.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				btnCompileActionPerformed(evt);
@@ -148,13 +144,15 @@ public class OracleEditor extends javax.swing.JDialog {
 
 	private void compile() {
 		try {
-			console.setText("Compiling...");
+			console.setText("Reloading...");
 			console.update(console.getGraphics());
 			File oracleFile = getOracleFile();
 			Util.saveToFile(codeEditor.getText(), oracleFile.getPath());
 			compileOracleToClassFile();
-			//addOracleClassFileToJar(); // Is not possible to modify the class because the jar is being executed
-			console.setText(console.getText() + "OK");
+			addOracleClassFileToJar();
+			console.setText(console.getText() + "Reloading...");
+			settingsDialog.saveCurrentSettings();
+			System.exit(0);
 		} catch (IOException t) {
 			console.setText(console.getText() + "\n" + t.getMessage());
 		}
@@ -196,29 +194,20 @@ public class OracleEditor extends javax.swing.JDialog {
 		}
 	}
 
-	public void addOracleClassFileToJar() throws IOException {
-		String jarFile = Main.testarDir.replace("bin", "lib") + "testar.jar";
-		File updatedClassFile = new File(oracleJavaClass);
-		String fileName = updatedClassFile.getName();
+	private void addOracleClassFileToJar() throws IOException {
+		try {
+			System.out.println("Updating TESTAR external Oracles: " + oracleJavaClass);
+			ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/c", "update_functional_oracles.bat");
 
-		// Create a new JAR file with the updated class
-		try (JarInputStream inputStream = new JarInputStream(new FileInputStream(jarFile));
-				JarOutputStream outputStream = new JarOutputStream(new FileOutputStream(jarFile))) {
-			JarEntry entry;
-			while ((entry = inputStream.getNextJarEntry()) != null) {
-				// If the entry is the class file we want to update
-				if (entry.getName().contains(fileName)) {
-					outputStream.putNextEntry(entry);
-					try (InputStream updatedClass = new FileInputStream(updatedClassFile)) {
-						byte[] buffer = new byte[1024];
-						int bytesRead;
-						while ((bytesRead = updatedClass.read(buffer)) != -1) {
-							outputStream.write(buffer, 0, bytesRead);
-						}
-					}
-					outputStream.closeEntry();
-				}
-			}
+			// Redirect the subprocess' streams to the current process' shell streams
+			pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+			pb.redirectInput(ProcessBuilder.Redirect.INHERIT);
+			pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+
+			// Start the subprocess
+			Process p = pb.start();
+		} catch (IOException e) {
+			System.err.println("Exception Updating TESTAR external Oracles: " + oracleJavaClass);
 		}
 	}
 

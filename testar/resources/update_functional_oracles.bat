@@ -1,4 +1,6 @@
 @echo off
+timeout 5
+
 set "folder=functional_oracles"
 set "library=../lib/testar.jar"
 
@@ -9,3 +11,5 @@ for /r "%parent%" %%i in (*.class) do (
     set "relativepath=%folder%!fullpath:%parent%=!"
 	jar uf %library% !relativepath!
 )
+
+call testar.bat && exit
