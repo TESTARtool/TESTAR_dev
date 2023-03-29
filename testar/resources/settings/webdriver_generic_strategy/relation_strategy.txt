@@ -3,8 +3,8 @@ IF
 THEN
 	select-random unvisited of-type form-field-action
 ELSE IF
-		any-exist sibling-or-child-action
+		any-exist unvisited sibling-or-child-action
 	THEN
-		select-random sibling-or-child-action
+		select-random unvisited sibling-or-child-action
 	ELSE
         select-random unvisited of-type form-submit-action

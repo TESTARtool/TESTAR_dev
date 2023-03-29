@@ -195,8 +195,8 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 
 		String pastedDesc = ret.get(Tags.Desc, "");
 
-		String widgetPath = ret.get(Tags.OriginWidget).get(Tags.Path).trim();
-		String widgetDesc = ret.get(Tags.OriginWidget).get(Tags.Desc);
+		String widgetPath = ret.get(Tags.OriginWidget).get(Tags.Path, "").trim();
+		String widgetDesc = ret.get(Tags.OriginWidget).get(Tags.Desc, "");
 		String identifier = widgetPath + ":" + widgetDesc;
 
 		ret.set(Tags.Desc, "'" + pastedDesc + "' into '" + identifier + "'");
