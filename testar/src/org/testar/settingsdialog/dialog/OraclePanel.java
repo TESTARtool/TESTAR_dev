@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -57,6 +57,9 @@ public class OraclePanel extends SettingsPanel {
     private JTextArea txtTagsForSuspTitles = new JTextArea();
     private JTextArea txtProcTitles = new JTextArea();
 
+    private RegexButton regexButtonSuspTitle = new RegexButton(txtSuspTitles);
+    private RegexButton regexButtonProcTitle = new RegexButton(txtProcTitles);
+
     private JCheckBox processCheckBox;
     private JSpinner spnFreezeTime;
 
@@ -70,9 +73,12 @@ public class OraclePanel extends SettingsPanel {
     public OraclePanel() {
         setLayout(null);
 
-        suspiciousTitleLabel.setBounds(10, 5, 600, 27);
+        suspiciousTitleLabel.setBounds(10, 5, 450, 27);
         suspiciousTitleLabel.setToolTipText(ToolTipTexts.suspiciousTitlesTTT);
         add(suspiciousTitleLabel);
+
+        regexButtonSuspTitle.setBounds(500, 5, 110, 27);
+        add(regexButtonSuspTitle);
 
         txtSuspTitles.setLineWrap(true);
         JScrollPane suspTitlePane = new JScrollPane(txtSuspTitles);
@@ -97,6 +103,9 @@ public class OraclePanel extends SettingsPanel {
         processCheckBox = new JCheckBox("Enable Process Listener");
         processCheckBox.setBounds(300, 220, 200, 27);
         add(processCheckBox);
+        
+        regexButtonProcTitle.setBounds(500, 220, 110, 27);
+        add(regexButtonProcTitle);
 
         txtProcTitles.setLineWrap(true);
         JScrollPane suspiciousProcessPane = new JScrollPane(txtProcTitles);
