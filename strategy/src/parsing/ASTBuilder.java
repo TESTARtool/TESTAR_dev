@@ -100,7 +100,9 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseStrategyNode>
     ////////////////////
     // state booleans //
     ////////////////////
-    
+
+    @Override public BaseStrategyNode visitStateBool(StrategyParser.StateBoolContext ctx)
+    {return visit(ctx.state_boolean());}
     @Override
     public StateChangedNode visitStateChanged(StrategyParser.StateChangedContext ctx)
     {return new StateChangedNode();}

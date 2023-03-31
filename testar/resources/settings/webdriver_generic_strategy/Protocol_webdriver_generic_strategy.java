@@ -171,6 +171,31 @@
             if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
                 continue;
             }
+
+            if(isAtBrowserCanvas(widget))
+            {
+                String webType = widget.get(WdTags.WebType, "");
+                if(webType.equalsIgnoreCase("date"))
+                {
+                    actions.add(ac.clickTypeInto(widget, 0.1,0.5, InputDataManager.getRandomDateNumber(), false));
+                    continue;
+                }
+                else if(webType.equalsIgnoreCase("time"))
+                {
+                    actions.add(ac.clickTypeInto(widget, 0.1, 0.5, InputDataManager.getRandomTimeNumber(), false));
+                    continue;
+                }
+                else if(webType.equalsIgnoreCase("week"))
+                {
+                    actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomWeekNumber(), false));
+                    continue;
+                }
+                else if(webType.equalsIgnoreCase("checkbox"))
+                {
+                    actions.add(ac.leftClickAt(widget));
+                    continue;
+                }
+            }
             
             // type into text boxes
             if (isAtBrowserCanvas(widget) && isTypeable(widget))
@@ -482,7 +507,7 @@
         if(settings.get(ConfigTags.Mode).equals(Modes.Generate))
         {
             compressOutputRunFolder();
-            copyOutputToNewFolderUsingIpAddress("N:");
+//            copyOutputToNewFolderUsingIpAddress("N:");
         }
     }
 }

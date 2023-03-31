@@ -69,6 +69,9 @@ public class InputDataManager {
 		if(w.get(WdTags.WebType, "").toLowerCase().contains("email")) { return getRandomEmailInput(); }
 		if(w.get(WdTags.WebType, "").toLowerCase().contains("number")) { return getRandomNumberInput(); }
 		if(w.get(WdTags.WebType, "").toLowerCase().contains("url")) { return getRandomUrlInput(); }
+		if(w.get(WdTags.WebType, "").equalsIgnoreCase("date")) { return getRandomDateNumber(); }
+		if(w.get(WdTags.WebType, "").equalsIgnoreCase("time")) { return getRandomTimeNumber(); }
+		if(w.get(WdTags.WebType, "").equalsIgnoreCase("week")) { return getRandomWeekNumber(); }
 
 		return getRandomTextInputData();
 	}
@@ -165,5 +168,38 @@ public class InputDataManager {
 				"foo-boo@foo.com");
 
 		return emails.get(new Random().nextInt(emails.size()));
+	}
+
+	public static String getRandomDateNumber()
+	{
+		List<String> dates = Lists.newArrayList(
+				"22032017",
+				"03222017",
+				"22032017",
+				"01011900",
+				"12127357",
+				"01011001");
+
+		return dates.get(new Random().nextInt(dates.size()));
+	}
+
+	public static String getRandomTimeNumber()
+	{
+		List<String> times = Lists.newArrayList(
+				"2217",
+				"2220",
+				"0355",
+				"0132",
+				"1212",
+				"1101");
+
+		return times.get(new Random().nextInt(times.size()));
+	}
+
+	public static String getRandomWeekNumber()
+	{
+		String week = Integer.toString(new Random().nextInt(52)+1);
+		String year = Integer.toString(new Random().nextInt(9999));
+		return week + year;
 	}
 }

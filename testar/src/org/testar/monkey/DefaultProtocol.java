@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
@@ -690,7 +691,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				" AbstractID = " + state.get(Tags.Abstract_R_ID,"Abstract_R_ID not available") +"\n"+
 				" ConcreteID CUSTOM = "+ state.get(Tags.ConcreteIDCustom,"ConcreteID CUSTOM not available")+
 				" AbstractID CUSTOM = "+state.get(Tags.AbstractIDCustom,"AbstractID CUSTOM not available")+"\n",
-				actionRepresentation[0]) + "\n",
+				actionRepresentation[0]) +
+				"Timestamp: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(action.get(Tags.TimeStamp, (long)-1)) + "\n\n",
 				LogSerialiser.LogLevel.Info);
 	}
 
@@ -1001,6 +1003,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			double halfWait = waitTime == 0 ? 0.01 : waitTime / 2.0; // seconds
 			Util.pause(halfWait); // help for a better match of the state' actions visualization
 			action.run(system, state, settings.get(ConfigTags.ActionDuration));
+			action.set(Tags.TimeStamp, System.currentTimeMillis());
 			int waitCycles = (int) (MAX_ACTION_WAIT_FRAME / halfWait);
 			long actionCPU;
 			do {
