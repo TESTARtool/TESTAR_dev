@@ -32,6 +32,7 @@
 package org.testar.reporting;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.testar.monkey.Main;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Rect;
@@ -47,8 +48,10 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
@@ -83,7 +86,8 @@ public class HtmlSequenceReport implements Reporting{
     private int innerLoopCounter = 0;
 
     public HtmlSequenceReport() {
-        try{
+    	copyCentralHTML();
+    	try{
             //TODO put filename into settings, name with sequence number
             // creating a new file for the report
         	htmlFilename = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString+"_"
@@ -114,6 +118,7 @@ public class HtmlSequenceReport implements Reporting{
      * @param pathReplayedSequence
      */
     public HtmlSequenceReport(String pathReplayedSequence) {
+    	copyCentralHTML();
         try {
         	htmlFilename = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString+"_"
                     + OutputStructure.executedSUTname + REPORT_FILENAME_MID + OutputStructure.sequenceInnerLoopCount
@@ -131,6 +136,14 @@ public class HtmlSequenceReport implements Reporting{
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+    }
+
+    private void copyCentralHTML() {
+    	File sourceFile = new File(Main.outputDir + File.separator + "graphs" + File.separator + "!Directory_summarized.html");
+    	File destFile = new File(OutputStructure.htmlOutputDir + File.separator + "!Directory_summarized.html");
+    	try {
+    		Files.copy(sourceFile.toPath(), destFile.toPath());
+    	} catch (IOException e) { }
     }
 
     public void addTitle(int h, String text){
