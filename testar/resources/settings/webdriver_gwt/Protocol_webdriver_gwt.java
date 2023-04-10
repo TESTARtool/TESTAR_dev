@@ -188,9 +188,7 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
 			return true;
 		}
 
-		Set<String> clickSet = new HashSet<>(clickableClasses);
-		clickSet.retainAll(element.cssClasses);
-		return clickSet.size() > 0;
+		return containCSSClasses(widget, clickableClasses);
 	}
 
 }

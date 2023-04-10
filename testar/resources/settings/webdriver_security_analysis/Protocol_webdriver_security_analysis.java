@@ -251,27 +251,4 @@ public class Protocol_webdriver_security_analysis extends WebdriverProtocol {
         else
             return super.executeAction(system, state, new NOP());
     }
-
-    /** Enables TESTAR to click components that are outside the window **/
-    @Override
-    protected boolean isClickable(Widget widget) {
-        Role role = widget.get(Tags.Role, Roles.Widget);
-        if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
-            // Input type are special...
-            if (role.equals(WdRoles.WdINPUT)) {
-                String type = ((WdWidget) widget).element.type;
-                return WdRoles.clickableInputTypes().contains(type);
-            }
-            return true;
-        }
-
-        WdElement element = ((WdWidget) widget).element;
-        if (element.isClickable) {
-            return true;
-        }
-
-        Set<String> clickSet = new HashSet<>(clickableClasses);
-        clickSet.retainAll(element.cssClasses);
-        return clickSet.size() > 0;
-    }
 }
