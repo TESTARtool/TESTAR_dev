@@ -400,6 +400,7 @@ public class Settings extends TaggableBase implements Serializable {
 					+"#################################################################\n"
 					+"\n"
 					+"ClickableClasses = " + Util.lineSep()
+					+"TypeableClasses = " + Util.lineSep()
 					+"DeniedExtensions = " + Util.lineSep()
 					+"DomainsAllowed = " + Util.lineSep()
 					+"FollowLinks = " + Util.lineSep()
