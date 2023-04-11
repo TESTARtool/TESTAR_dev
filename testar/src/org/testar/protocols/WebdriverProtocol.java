@@ -771,38 +771,37 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 	@Override
 	protected boolean isTypeable(Widget widget) {
+		if (containCSSClasses(widget, typeableClasses)) return true;
+
 		Role role = widget.get(Tags.Role, Roles.Widget);
 		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
 			// Input type are special...
 			if (role.equals(WdRoles.WdINPUT)) {
 				String type = ((WdWidget) widget).element.type;
-				if(WdRoles.typeableInputTypes().contains(type.toLowerCase())){
-					return true;
-				}
+				return WdRoles.typeableInputTypes().contains(type.toLowerCase());
 			}
 			return true;
 		}
-		return containCSSClasses(widget, typeableClasses);
+		return false;
 	}
 
 	@Override
 	protected boolean isClickable(Widget widget) {
+		WdElement element = ((WdWidget) widget).element;
+		if (element.isClickable || containCSSClasses(widget, clickableClasses)) {
+			return true;
+		}
+
 		Role role = widget.get(Tags.Role, Roles.Widget);
 		if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
 			// Input type are special...
 			if (role.equals(WdRoles.WdINPUT)) {
-				String type = ((WdWidget) widget).element.type;
-				if (WdRoles.clickableInputTypes().contains(type)) return true;
+				String type = element.type;
+				return WdRoles.clickableInputTypes().contains(type);
 			}
 			return true;
 		}
-
-
-		WdElement element = ((WdWidget) widget).element;
-		if (element.isClickable) {
-			return true;
-		}
-		return containCSSClasses(widget, clickableClasses);
+		return false;
 	}
 
 	/**
