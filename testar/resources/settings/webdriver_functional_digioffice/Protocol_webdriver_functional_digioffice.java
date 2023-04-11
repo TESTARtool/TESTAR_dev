@@ -83,6 +83,7 @@ import static org.testar.monkey.alayer.Tags.Enabled;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
+
 /**
  * Protocol with functional oracles examples to detect:
  * - Web dummy button
@@ -106,7 +107,6 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
  * - Instead of joining Verdicts, try to recognize and save different Verdict exception in different sequences.
  */
 public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol {
-
 	private Action functionalAction = null;
 	private Verdict functionalVerdict = Verdict.OK;
 	private List<String> listErrorVerdictInfo = new ArrayList<>();
@@ -119,6 +119,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 
 	// Variable to track is a new form appeared in the state (should be reset when TESTAR opens up a new webpage or form)
 	private Boolean _pristineStateForm = true;
+    private Boolean _isDetailPage = false;
 
 /**
 	 * Called once during the life time of TESTAR
@@ -230,15 +231,29 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 	 */
 	@Override
 	protected State getState(SUT system) throws StateBuildException {
+        String webUrl = WdDriver.getCurrentUrl();
+        
 		// If we are in a new URL state, reset the form tracking
 		// This will allow to check again the formButtonMustBeDisabledIfNoChangesVerdict verdict
 		if(latestState != null 
 				&& !latestState.get(WdTags.WebHref, "").isEmpty()
-				&& !latestState.get(WdTags.WebHref).equals(WdDriver.getCurrentUrl())) 
+				&& !latestState.get(WdTags.WebHref).equals(webUrl)) 
 		{
-			_pristineStateForm = true;
-		}
-
+           System.out.println("New form : " + webUrl);
+          
+          // Check RecID is present in the web url. If RecID is not present, but Entity is present in querystring then it is a new entity detailpage in DigiOffice.
+          if(webUrl.contains("RecID=") && webUrl.contains("Entity=")) {
+              _pristineStateForm = true;
+              _isDetailPage = true;
+              System.out.println("Set pristineState to TRUE");
+          }
+          else {
+              _pristineStateForm = false;
+              _isDetailPage = false;
+              System.out.println("Set pristineState to FALSE");
+          }
+        }
+        
         devTools.send(Performance.enable(Optional.empty()));
 	    metricList = devTools.send(Performance.getMetrics());
 	   
@@ -256,7 +271,9 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		super.beginSequence(system, state);
 
 		//TODO: Reader of the logs should use log4j format
-
+        
+        loadSensitiveDataListFromFile();
+        
 		// Reset the list of downloaded files
 		watchEventDownloadedFiles = new ArrayList<>();
 		// Create a watch service to check which files are downloaded when testing the SUT
@@ -371,17 +388,76 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		Pattern pattern = Pattern.compile(patternRegex);
 		
 		for(Widget w : state) {
-				String desc = w.get(WdTags.WebTextContent, "");
-				Matcher matcher = pattern.matcher(desc);
-			
-				if (matcher.find()) {
-					String verdictMsg = String.format("Detected debug or test data values! Role: %s , Path: %s , WebId: %s , Desc: %s , WebTextContent: %s", 
-							w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebTextContent, ""));
-					verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_ITEM_WRONG_VALUE_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
-				}
+			String desc = w.get(WdTags.WebTextContent, "");
+			Matcher matcher = pattern.matcher(desc);
+
+			if (matcher.find()) {
+				String verdictMsg = String.format("Detected debug or test data values! Role: %s , Path: %s , WebId: %s , Desc: %s , WebTextContent: %s", 
+						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebTextContent, ""));
+				verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_ITEM_WRONG_VALUE_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+			}
 		}
 		return verdict;
 	}
+
+    // Detect UI items that contain sensitive texts, such as passwords
+	// BAD:  Pa$$w0rd
+    //       7n_8Q~DyBzoE4aqBBXA-B7gVdX~5zFCZk5yVvb7b
+	// GOOD: *******
+	// Sensitive data such as Passwords and ClientSecrets should not be visible in their original form the UI, database, configuration or log files.
+    // This data should be encrypted if they must be shown or stored somewhere.
+    // There are two options to provide a list of sensitive data:
+    // 1. Fill a ../Settings/SensitiveDataList.txt file with all sensitive text.
+    // 2. Give a regular expression with matches sensitive text
+    // Using the SensitiveDataList.txt file is the preferred way, because the sensitive data is then not in the protocol and you don't have to rewrite the data as a regular expression.
+	private Verdict detectSensitiveData(State state, String sensitiveTextPatternRegEx)
+	{
+		Verdict verdict = Verdict.OK;
+		Pattern pattern = Pattern.compile(sensitiveTextPatternRegEx);
+		
+		for(Widget w : state) {
+			String desc = w.get(WdTags.WebTextContent, "");
+            Matcher matcher = pattern.matcher(desc);
+
+            if (!desc.isEmpty() && (sensitiveDataList.contains(desc) || matcher.find()))
+            {
+            	String verdictMsg = String.format("Detected sensitive data values! Role: %s , Path: %s , WebId: %s , Desc: %s , WebTextContent: %s", 
+						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebTextContent, ""));
+				verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_ITEM_WRONG_VALUE_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+            }
+		}
+		return verdict;
+	}
+
+    // Load the sensitive data file from the settings directory
+	public static String sensitiveDataListFile = Main.settingsDir + File.separator + "SensitiveDataList.txt";
+
+	// Custom load sensitive data
+	private static List<String> sensitiveDataList = new ArrayList<>();
+	
+    private static void loadSensitiveDataListFromFile()
+    {
+        try
+        {
+        	sensitiveDataList.clear();
+            File file = new File(sensitiveDataListFile);
+            if(file.exists() && !file.isDirectory()) 
+            {
+              Scanner s = new Scanner(file);
+           
+              while (s.hasNextLine()){
+            	  sensitiveDataList.add(s.nextLine());
+              }
+              
+              s.close();
+            }
+        }
+        catch(java.io.FileNotFoundException ex)
+        {
+            // ignore errors
+        }
+        Collections.sort(sensitiveDataList);
+    }
 
 	// Detect text that contains zero values in tables
 	// BAD:  0.00
@@ -396,8 +472,8 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		Pattern pattern = Pattern.compile(patternRegex);
 		
 		for(Widget w : state) {
-			//if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdTD)) {
-
+			if (isSonOfTD(w))
+            {
 				String desc = w.get(WdTags.WebTextContent, "");
 				Matcher matcher = pattern.matcher(desc);
 			
@@ -406,7 +482,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 							w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebTextContent, ""));
 					verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
 				}
-			//}
+			}
 		}
 		return verdict;
 	}
@@ -434,6 +510,41 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		}
 		return verdict;
 	}
+	
+	// Detect widgets that should be in sync
+	// Examples:
+	//       Form title should match match title bar
+    //       Recordcount of grid should match with number of records shown in grid when record count is lower than 50 (due to paging feature in grid)
+	//		 Column total does should match the sum of all cell values in column
+	//       Warning icon should match the warning message
+    //		 Focused navigation item should match Title
+	//
+	private Verdict detectWidgetsThatShouldBeInSync(State state)
+	{
+		Verdict verdict = Verdict.OK;
+
+		// Page title
+		String queryPageTitle = "return document.querySelector('#ctl00_cphDetail_ctl00_pnlMenu > div.ContentTitle').innerText";
+		String pageTitle = (String) WdDriver.executeScript(queryPageTitle);
+
+		// Navigation selected
+		String queryNavigationItem = "elm = document.querySelector('div.workspace-explorer.workspace-view.sb-nav'); if (elm) elm.querySelector('.treenode-selected > span > a').firstChild.textContent";
+		String navItem = (String) WdDriver.executeScript(queryNavigationItem);
+
+		if (pageTitle != null && navItem != null && !pageTitle.isEmpty() && !navItem.isEmpty())
+		{
+            System.out.println("Comparing page title '" + pageTitle + "' and '" + navItem + "'");
+            
+			if (!pageTitle.equals(navItem))
+			{
+				String verdictMsg = String.format("Page title and navigation item are not the same! PageTitle: %s , NavigationItem: %s", 
+						pageTitle, navItem);
+				verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_ITEM_WRONG_VALUE_FAULT, verdictMsg));
+			}
+		}
+		return verdict;
+	}
+
 
     // TODO: Gives false positives when opening Div style forms, such as Notitie fields. The OK button seems to be working in the UI, but TESTAR doesn't see that as a change.'
     // Dummy button
@@ -528,7 +639,6 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		return watcherEmptyfileVerdict;
 	}
 
-    // TODO: if the user creates a new entity in the app then the Save button is enabled on open. We could look for the text "<Nieuw>" (ctl00_cphDetail_ctl01_lblTitle) in the title of the page to notice that it is a new record.
 	private Verdict formButtonEnabledAfterTypingChangesVerdict(State state) {
 		List<String> descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges = new ArrayList<>();
 		descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("btnOpslaan");
@@ -536,9 +646,10 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("btnOpslaanEnNieuw");
 
 		// If the last executed action is typing in a son of a form
-		if(functionalAction != null
+		if(_isDetailPage
+                && functionalAction != null
 				&& functionalAction.get(Tags.OriginWidget, null) != null 
-				&& functionalAction.get(Tags.Desc, "").startsWith("Type")
+				&& (functionalAction.get(Tags.Desc, "").startsWith("Type") || functionalAction.get(Tags.Desc, "").startsWith("Paste"))
 				&& isSonOfFormWidget(functionalAction.get(Tags.OriginWidget))
 				&& functionalAction.get(Tags.OriginWidget).get(WdTags.WebMaxLength) > 0) 
 		{
@@ -574,7 +685,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges.add("btnOpslaanEnNieuw");
 
 		// If we are in a state with an unaltered form, apply the verdict
-		if (_pristineStateForm)
+		if (_isDetailPage && _pristineStateForm)
 		{
 			for(Widget w : state) {
 				if (descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges.contains(w.get(Tags.Desc, ""))) {
@@ -595,6 +706,12 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 	private boolean isSonOfFormWidget(Widget widget) {
 		if(widget.parent() == null) return false;
 		else if (widget.parent().get(Tags.Role, Roles.Widget).equals(WdRoles.WdFORM)) return true;
+		else return isSonOfFormWidget(widget.parent());
+	}
+
+	private boolean isSonOfTD(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(Tags.Role, Roles.Widget).equals(WdRoles.WdTD)) return true;
 		else return isSonOfFormWidget(widget.parent());
 	}
 
@@ -793,6 +910,8 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		}
 	}
 
+	
+
 	/**
 	 * This method returns a unique functional failure verdict of one state. 
 	 * We do not join and do not report multiple failures together.
@@ -811,13 +930,16 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		//if(spellCheckerVerdict != Verdict.OK) HTMLStateVerdictReport.reportStateVerdict(actionCount, state, spellCheckerVerdict);
 
 		// Check the functional Verdict that detects if a form button is disabled after modifying the form inputs.
-		verdict = formButtonEnabledAfterTypingChangesVerdict(state);
-		if (shouldReturnVerdict(verdict)) return verdict;
+		//verdict = formButtonEnabledAfterTypingChangesVerdict(state);
+		//if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if a form button is enabled when it must not.
 		//verdict = formButtonMustBeDisabledIfNoChangesVerdict(state);
 		//if (shouldReturnVerdict(verdict)) return verdict;
 
+		verdict = detectWidgetsThatShouldBeInSync(state);
+		if (shouldReturnVerdict(verdict)) return verdict;
+		
         verdict = detectCommonTestOrDummyPhrases(state);
         if (shouldReturnVerdict(verdict)) return verdict;
         
@@ -837,13 +959,19 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects duplicate or repeated text in descriptions of widgets, ignore some common terms of DigiOffice, date, datetime, 3 phone formats and postal code
-		verdict = WebVerdict.DetectDuplicateText(state, "DocDoc|DossierDossier|GebrGebr|RelRel|\\d\\d-\\d\\d-\\d\\d\\d\\d\\s\\d\\d:\\d\\d:\\d\\d|\\d\\d-\\d\\d-\\d\\d\\d\\d|\\d\\d - \\d\\d \\d\\d \\d\\d \\d\\d|\\(?\\d\\d\\d\\)? -? ?\\d\\d\\d \\d\\d \\d\\d|\\(?\\d\\d\\d\\d\\)? -? ?\\d\\d \\d\\d \\d\\d|\\d\\d\\d\\d [A-Z][A-Z]|\\d\\d-\\d\\d-\\d\\d");
+		verdict = WebVerdict.DetectDuplicateText(state, "MM|AA|A{260}|0\\.0\\.0|0,0,0|Logo;Logo|DocDoc|DossierDossier|GebrGebr|RelRel|\\d\\d:\\d\\d:\\d\\d|\\d\\d-\\d\\d-\\d\\d\\d\\d\\s\\d\\d:\\d\\d:\\d\\d|\\d\\d-\\d\\d-\\d\\d\\d*\\d*|\\d\\d - \\d\\d \\d\\d \\d\\d \\d\\d|\\(?\\d\\d\\d\\)? -? ?\\d\\d\\d \\d\\d \\d\\d|\\(?\\d\\d\\d\\d\\)? -? ?\\d\\d \\d\\d \\d\\d|\\d\\d\\d\\d [A-Z][A-Z]|\\d\\d-\\d\\d-\\d\\d|0\\.0\\/0\\.0|0,0\\/0,0");
 		if (shouldReturnVerdict(verdict)) return verdict;
 		
 		// Check the functional Verdict that detects HTML or XML tags in descriptions of widgets
-		verdict = WebVerdict.DetectHTMLOrXMLTagsInText(state,"<HuisstijlDir>|<VersieEnDatum>|<<major version>>\\.<<minor version>>|<<version>> \\(<<version date>>\\)");
+		verdict = WebVerdict.DetectHTMLOrXMLTagsInText(state,"%3Cscript%3Econsole\\.error%28%27XSS%20is%20possible%27%29%3B%3C%2Fscript%3E|.*\\.Config|.*_DMS_.*|.*_Bouw_.*|.*_CRM_.*|.*_Beheer_.*|ZoekFilter_.*|<memo>alpha beta gamma|.*>console\\.error\\(.*|<HuisstijlDir>|<VersieEnDatum>|<<major version>>\\.<<minor version>>|<<version>> \\(<<version date>>\\)");
 		if (shouldReturnVerdict(verdict)) return verdict;
 
+        // Check the functional Verdict that detects sensitive data, such as passwords or client secrets
+        // https://en.wikipedia.org/wiki/List_of_the_most_common_passwords
+        //verdict = detectSensitiveData(state, "123456|123456789|12345|qwerty|password|12345678|111111|123123|1234567890|1234567|qwerty123|000000|1q2w3e|aa12345678|abc123|password1|1234|qwertyuiop|123321|password123");
+        verdict = detectSensitiveData(state, "123456|123456789|qwerty|password|12345678|111111|123123|1234567890|1234567|qwerty123|000000|1q2w3e|aa12345678|abc123|password1|qwertyuiop|123321|password123");
+        if (shouldReturnVerdict(verdict)) return verdict;
+        
 		// Check the functional Verdict that detects select elements without items to the current state verdict.
 		verdict = WebVerdict.EmptySelectItems(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
