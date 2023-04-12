@@ -524,24 +524,33 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		Verdict verdict = Verdict.OK;
 
 		// Page title
-		String queryPageTitle = "return document.querySelector('#ctl00_cphDetail_ctl00_pnlMenu > div.ContentTitle').innerText";
+		String queryPageTitle = "return document.navContent.document.querySelector('#ctl00_cphDetail_ctl00_pnlMenu > div.ContentTitle').innerText";
 		String pageTitle = (String) WdDriver.executeScript(queryPageTitle);
 
 		// Navigation selected
-		String queryNavigationItem = "elm = document.querySelector('div.workspace-explorer.workspace-view.sb-nav'); if (elm) elm.querySelector('.treenode-selected > span > a').firstChild.textContent";
+		String queryNavigationItem = "elm = document.querySelector('ul.treeview'); if (elm) return elm.querySelector('.treenode-selected > span > a').firstChild.textContent";
 		String navItem = (String) WdDriver.executeScript(queryNavigationItem);
 
-		if (pageTitle != null && navItem != null && !pageTitle.isEmpty() && !navItem.isEmpty())
+		if (pageTitle != null && navItem != null && (!pageTitle.isEmpty() || !navItem.isEmpty()))
 		{
-            System.out.println("Comparing page title '" + pageTitle + "' and '" + navItem + "'");
+            System.out.println("Comparing page title '" + pageTitle + "' and content title '" + navItem + "'");
             
 			if (!pageTitle.equals(navItem))
 			{
-				String verdictMsg = String.format("Page title and navigation item are not the same! PageTitle: %s , NavigationItem: %s", 
+				String verdictMsg = String.format("Page title and navigation title are not the same! PageTitle: %s , NavigationItem: %s", 
 						pageTitle, navItem);
 				verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_ITEM_WRONG_VALUE_FAULT, verdictMsg));
 			}
 		}
+
+        String checkTableTDsAndTableCount = "for(let a of document.navContent.document.querySelectorAll('.table-data')) {recCount = Number(a.parentElement.parentElement.parentElement.querySelector('.total').innerText.replace(/\\D/g, '')); if (recCount <= 50 && Math.max(a.getElementsByTagName('tr').length-1,0) != recCount) { return 'Table has ' + (a.getElementsByTagName('tr').length-1).toString() + ' rows and tablecount '+ recCount +' are not equal';}}";
+        String checkTableTDsAndTableCountMessage = (String)WdDriver.executeScript(checkTableTDsAndTableCount); // if table and tablecount are not equal, then this is reported
+        
+        if (checkTableTDsAndTableCountMessage != null && !checkTableTDsAndTableCountMessage.isEmpty())
+        {
+            System.out.println("Comparing checkTableTDsAndTableCountMessage: " + checkTableTDsAndTableCountMessage);
+            verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_ITEM_WRONG_VALUE_FAULT, checkTableTDsAndTableCountMessage));
+        }
 		return verdict;
 	}
 
