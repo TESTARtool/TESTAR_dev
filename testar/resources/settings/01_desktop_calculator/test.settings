@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = c:\\windows\\system32\\notepad.exe
+SUTConnectorValue = java -jar suts/Calculator.jar
 
 #################################################################
 # Sequences
@@ -31,8 +31,8 @@ SUTConnectorValue = c:\\windows\\system32\\notepad.exe
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 2
-SequenceLength = 20
+Sequences = 8
+SequenceLength = 10
 
 #################################################################
 # Oracles based on suspicious titles
@@ -96,7 +96,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = 01_desktop_generic_pure_random/Protocol_desktop_generic_pure_random
+ProtocolClass = 01_desktop_calculator/Protocol_01_desktop_calculator
 
 #################################################################
 # State identifier attributes
@@ -131,13 +131,13 @@ FaultThreshold = 0.000000001
 DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
-ActionDuration = 0.1
+ActionDuration = 0.3
 ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
-TimeToWaitAfterAction = 0.1
+TimeToWaitAfterAction = 0.3
 StartupTime = 10.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
