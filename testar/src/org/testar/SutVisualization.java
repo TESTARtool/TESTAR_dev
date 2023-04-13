@@ -94,7 +94,7 @@ public class SutVisualization {
                 	String titleText = "Title: " + cursorWidget.get(Tags.Title, "");
                 	String roleText = "Role: " + cursorWidget.get(Role, Roles.Widget).toString();
                 	String enabledText = "Enabled: " + cursorWidget.get(Tags.Enabled, false);
-                	String shapeText = "Shape: " + cursorWidget.get(Tags.Shape);
+                	String shapeText = "Shape: " + cursorWidget.get(Tags.Shape, Rect.from(0, 0, 0, 0));
                 	String pathText = "Path: " + cursorWidget.get(Tags.Path, "");
 
                 	// Calculate the maximum length of the widget properties strings
