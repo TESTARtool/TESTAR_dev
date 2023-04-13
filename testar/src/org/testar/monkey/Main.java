@@ -316,10 +316,6 @@ public class Main {
 
 		// Override the settings by checking the JVM arguments
 		overrideWithUserProperties(settings);
-		Float SST = settings.get(ConfigTags.StateScreenshotSimilarityThreshold, null);
-		if (SST != null) {
-			System.setProperty("SCRSHOT_SIMILARITY_THRESHOLD", SST.toString());
-		}
 
 		return settings;
 	}
@@ -461,11 +457,7 @@ public class Main {
 			defaults.add(Pair.from(PathToReplaySequence, tempDir));
 			defaults.add(Pair.from(ActionDuration, 0.1));
 			defaults.add(Pair.from(TimeToWaitAfterAction, 0.1));
-			defaults.add(Pair.from(ExecuteActions, true));
-			defaults.add(Pair.from(DrawWidgetUnderCursor, false));
-			defaults.add(Pair.from(DrawWidgetInfo, true));
 			defaults.add(Pair.from(VisualizeActions, false));
-			defaults.add(Pair.from(VisualizeSelectedAction, false));
 			defaults.add(Pair.from(SequenceLength, 10));
 			defaults.add(Pair.from(ReplayRetryTime, 30.0));
 			defaults.add(Pair.from(Sequences, 1));
@@ -474,7 +466,7 @@ public class Main {
 			defaults.add(Pair.from(SUTConnectorValue, ""));
 			defaults.add(Pair.from(Delete, new ArrayList<String>()));
 			defaults.add(Pair.from(CopyFromTo, new ArrayList<Pair<String, String>>()));
-			defaults.add(Pair.from(SuspiciousTitles, "(?!x)x"));
+			defaults.add(Pair.from(SuspiciousTags, "(?!x)x"));
 			defaults.add(Pair.from(ClickFilter, "(?!x)x"));
 			defaults.add(Pair.from(MyClassPath, Arrays.asList(settingsDir)));
 			defaults.add(Pair.from(ProtocolClass, "org.testar.monkey.DefaultProtocol"));
@@ -482,22 +474,11 @@ public class Main {
 			defaults.add(Pair.from(UseRecordedActionDurationAndWaitTimeDuringReplay, true));
 			defaults.add(Pair.from(StopGenerationOnFault, true));
 			defaults.add(Pair.from(TimeToFreeze, 10.0));
-			defaults.add(Pair.from(ShowSettingsAfterTest, true));
 			defaults.add(Pair.from(RefreshSpyCanvas, 0.5));
 			defaults.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
-			defaults.add(Pair.from(TestGenerator, "random"));
 			defaults.add(Pair.from(MaxReward, 9999999.0));
 			defaults.add(Pair.from(Discount, .95));
-			defaults.add(Pair.from(AlgorithmFormsFilling, false));
-			defaults.add(Pair.from(TypingTextsForExecutedAction, 10));
-			defaults.add(Pair.from(DrawWidgetTree, false));
-			defaults.add(Pair.from(ExplorationSampleInterval, 1));
-			defaults.add(Pair.from(ForceToSequenceLength, true));
-			defaults.add(Pair.from(NonReactingUIThreshold, 100)); // number of executed actions
-			defaults.add(Pair.from(OfflineGraphConversion, true));
-			defaults.add(Pair.from(StateScreenshotSimilarityThreshold, Float.MIN_VALUE)); // disabled
-			defaults.add(Pair.from(UnattendedTests, false)); // disabled
-			defaults.add(Pair.from(AccessBridgeEnabled, false)); // disabled
+			defaults.add(Pair.from(AccessBridgeEnabled, false));
 			defaults.add(Pair.from(SUTProcesses, ""));
 			defaults.add(Pair.from(StateModelEnabled, false));
 			defaults.add(Pair.from(DataStore, ""));
@@ -686,16 +667,6 @@ public class Main {
 			settings.set(ConfigTags.ShowVisualSettingsDialogOnStartup, !(new Boolean(p).booleanValue()));
 			LogSerialiser.log("Property <" + pS + "> overridden to <" + p + ">", LogSerialiser.LogLevel.Critical);
 		}
-		// TestGenerator
-		pS = ConfigTags.TestGenerator.name();
-		p = System.getProperty(pS, null);
-		if (p == null) {
-			p = System.getProperty("TG", null); // mnemonic
-		}
-		if (p != null) {
-			settings.set(ConfigTags.TestGenerator, p);
-			LogSerialiser.log("Property <" + pS + "> overridden to <" + p + ">", LogSerialiser.LogLevel.Critical);
-		}
 		// SequenceLength
 		pS = ConfigTags.SequenceLength.name();
 		p = System.getProperty(pS, null);
@@ -710,56 +681,6 @@ public class Main {
 			} catch (NumberFormatException e) {
 				LogSerialiser.log("Property <" + pS + "> could not be set! (using default)", LogSerialiser.LogLevel.Critical);
 			}
-		}
-		// ForceToSequenceLength
-		pS = ConfigTags.ForceToSequenceLength.name();
-		p = System.getProperty(pS, null);
-		if (p == null) {
-			p = System.getProperty("F2SL", null); // mnemonic
-		}
-		if (p != null) {
-			settings.set(ConfigTags.ForceToSequenceLength, new Boolean(p).booleanValue());
-			LogSerialiser.log("Property <" + pS + "> overridden to <" + p + ">", LogSerialiser.LogLevel.Critical);
-		}
-		// TypingTextsForExecutedAction
-		pS = ConfigTags.TypingTextsForExecutedAction.name();
-		p = System.getProperty(pS, null);
-		if (p == null) {
-			p = System.getProperty("TT", null); // mnemonic
-		}
-		if (p != null) {
-			try {
-				Integer tt = new Integer(p);
-				settings.set(ConfigTags.TypingTextsForExecutedAction, tt);
-				LogSerialiser.log("Property <" + pS + "> overridden to <" + tt.toString() + ">", LogSerialiser.LogLevel.Critical);
-			} catch (NumberFormatException e) {
-				LogSerialiser.log("Property <" + pS + "> could not be set! (using default)", LogSerialiser.LogLevel.Critical);
-			}
-		}
-		// StateScreenshotSimilarityThreshold
-		pS = ConfigTags.StateScreenshotSimilarityThreshold.name();
-		p = System.getProperty(pS, null);
-		if (p == null) {
-			p = System.getProperty("SST", null); // mnemonic
-		}
-		if (p != null) {
-			try {
-				Float sst = new Float(p);
-				settings.set(ConfigTags.StateScreenshotSimilarityThreshold, sst);
-				LogSerialiser.log("Property <" + pS + "> overridden to <" + sst.toString() + ">", LogSerialiser.LogLevel.Critical);
-			} catch (NumberFormatException e) {
-				LogSerialiser.log("Property <" + pS + "> could not be set! (using default)", LogSerialiser.LogLevel.Critical);
-			}
-		}
-		// UnattendedTests
-		pS = ConfigTags.UnattendedTests.name();
-		p = System.getProperty(pS, null);
-		if (p == null) {
-			p = System.getProperty("UT", null); // mnemonic
-		}
-		if (p != null) {
-			settings.set(ConfigTags.UnattendedTests, new Boolean(p).booleanValue());
-			LogSerialiser.log("Property <" + pS + "> overridden to <" + p + ">", LogSerialiser.LogLevel.Critical);
 		}
 	}
 
@@ -809,7 +730,7 @@ public class Main {
 		List<Tag<String>> regularExpressionTags = Arrays.asList(
 				ConfigTags.ProcessesToKillDuringTest,
 				ConfigTags.ClickFilter,
-				ConfigTags.SuspiciousTitles,
+				ConfigTags.SuspiciousTags,
 				ConfigTags.SuspiciousProcessOutput,
 				ConfigTags.ProcessLogs,
 				ConfigTags.WebConsoleErrorPattern,

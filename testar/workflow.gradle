@@ -79,7 +79,7 @@ task runTestDesktopGenericCommandLineSuspiciousTitle(type: Exec, dependsOn:'inst
     group = 'test_testar_workflow'
     description ='runTestDesktopGenericCommandLineSuspiciousTitle'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_command_and_suspicious" TagsForSuspiciousOracle="NotExist;UIAAutomationId" SuspiciousTitles=".*MenuBar.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2 OnlySaveFaultySequences=true'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_command_and_suspicious" TagsForSuspiciousOracle="NotExist;UIAAutomationId" SuspiciousTags=".*MenuBar.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2 OnlySaveFaultySequences=true'
     doLast {
         String output = standardOutput.toString()
 
@@ -102,7 +102,7 @@ task runTestDesktopGenericCommandLineSettingsFilterSuspiciousTitle(type: Exec, d
     group = 'test_testar_workflow'
     description ='runTestDesktopGenericCommandLineSettingsFilterSuspiciousTitle'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_command_settings_filter_and_suspicious" TagsToFilter="NotExist;Desc" ClickFilter=".*[sS]ystem.*|.*[cC]lose.*|.*[mM]inimize.*|.*[mM]aximize.*|Text Editor|File|Edit|View|Help|Word Wrap" SuspiciousTitles=".*[sS]cript.*" TimeToWaitAfterAction=2.0 ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_command_settings_filter_and_suspicious" TagsToFilter="NotExist;Desc" ClickFilter=".*[sS]ystem.*|.*[cC]lose.*|.*[mM]inimize.*|.*[mM]aximize.*|Text Editor|File|Edit|View|Help|Word Wrap" SuspiciousTags=".*[sS]cript.*" TimeToWaitAfterAction=2.0 ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2'
     doLast {
         String output = standardOutput.toString()
 
@@ -132,7 +132,7 @@ task runTestDesktopGenericProcessNameSuspiciousTitle(type: Exec, dependsOn:['ins
     group = 'test_testar_workflow'
     description ='runTestDesktopGenericProcessNameSuspiciousTitle'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_process_and_suspicious" SuspiciousTitles=".*[fF]ormat.*|.*[fF]ormato.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=SUT_PROCESS_NAME SUTConnectorValue="notepad.exe" Sequences=1 SequenceLength=2'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_process_and_suspicious" SuspiciousTags=".*[fF]ormat.*|.*[fF]ormato.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=SUT_PROCESS_NAME SUTConnectorValue="notepad.exe" Sequences=1 SequenceLength=2'
     doLast {
         String output = standardOutput.toString()
 
@@ -157,7 +157,7 @@ task runTestDesktopGenericTitleNameSuspiciousTitle(type: Exec, dependsOn:['insta
     group = 'test_testar_workflow'
     description ='runTestDesktopGenericTitleNameSuspiciousTitle'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_title_and_suspicious" SuspiciousTitles=".*[fF]ormat.*|.*[fF]ormato.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=SUT_WINDOW_TITLE SUTConnectorValue="Notepad" Sequences=1 SequenceLength=2'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_title_and_suspicious" SuspiciousTags=".*[fF]ormat.*|.*[fF]ormato.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=SUT_WINDOW_TITLE SUTConnectorValue="Notepad" Sequences=1 SequenceLength=2'
     doLast {
         String output = standardOutput.toString()
 
@@ -288,7 +288,7 @@ task runTestWebdriverSuspiciousTitle(type: Exec) {
     group = 'test_testar_workflow'
     description ='runTestWebdriverSuspiciousTitle'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_generic AlwaysCompile=true ApplicationName="webdriver_and_suspicious" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTitles=".*[oO]nderwijs.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_generic AlwaysCompile=true ApplicationName="webdriver_and_suspicious" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[oO]nderwijs.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
     doLast {
         String output = standardOutput.toString()
 

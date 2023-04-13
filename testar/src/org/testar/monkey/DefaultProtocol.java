@@ -340,7 +340,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		try {
-			if (!settings.get(ConfigTags.UnattendedTests) && !GraphicsEnvironment.isHeadless()) {
+			if (!GraphicsEnvironment.isHeadless()) {
 				LogSerialiser.log("Registering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
 				java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
 				logger.setLevel(Level.OFF);
@@ -848,7 +848,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//------------------------
 
 		if (this.suspiciousTitlesPattern == null)
-			this.suspiciousTitlesPattern = Pattern.compile(settings().get(ConfigTags.SuspiciousTitles), Pattern.UNICODE_CHARACTER_CLASS);
+			this.suspiciousTitlesPattern = Pattern.compile(settings().get(ConfigTags.SuspiciousTags), Pattern.UNICODE_CHARACTER_CLASS);
 
 		// search all widgets for suspicious String Values
 		Verdict suspiciousValueVerdict = Verdict.OK;
@@ -1130,7 +1130,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private void closeTestarTestSession(){
 		//cleaning the variables started in initialize()
 		try {
-			if (!settings.get(ConfigTags.UnattendedTests) && !GraphicsEnvironment.isHeadless()) {
+			if (!GraphicsEnvironment.isHeadless()) {
 				if (GlobalScreen.isNativeHookRegistered()) {
 					LogSerialiser.log("Unregistering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
 					GlobalScreen.removeNativeMouseMotionListener(eventHandler);

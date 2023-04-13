@@ -146,7 +146,7 @@ public class OraclePanel extends SettingsPanel {
      */
     @Override
     public void populateFrom(final Settings settings) {
-        txtSuspTitles.setText(settings.get(ConfigTags.SuspiciousTitles));
+        txtSuspTitles.setText(settings.get(ConfigTags.SuspiciousTags));
         txtTagsForSuspTitles.setText(StringUtils.join(settings.get(ConfigTags.TagsForSuspiciousOracle), ";"));
         processCheckBox.setSelected(settings.get(ConfigTags.ProcessListenerEnabled));
         txtProcTitles.setText(settings.get(ConfigTags.SuspiciousProcessOutput));
@@ -168,7 +168,7 @@ public class OraclePanel extends SettingsPanel {
      */
     @Override
     public void extractInformation(final Settings settings) {
-        settings.set(ConfigTags.SuspiciousTitles, txtSuspTitles.getText());
+        settings.set(ConfigTags.SuspiciousTags, txtSuspTitles.getText());
         settings.set(ConfigTags.TagsForSuspiciousOracle, Arrays.asList(txtTagsForSuspTitles.getText().split(";")));
         settings.set(ConfigTags.ProcessListenerEnabled, processCheckBox.isSelected());
         settings.set(ConfigTags.SuspiciousProcessOutput, txtProcTitles.getText());

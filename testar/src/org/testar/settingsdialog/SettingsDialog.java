@@ -177,11 +177,11 @@ public class SettingsDialog extends JFrame implements Observer {
       throw new IllegalStateException("Your ClickFilter is not a valid regular expression!");
     }
 
-    userInputPattern = settings.get(ConfigTags.SuspiciousTitles);
+    userInputPattern = settings.get(ConfigTags.SuspiciousTags);
     try {
       Pattern.compile(userInputPattern);
     } catch (PatternSyntaxException exception) {
-      throw new IllegalStateException("Your Oracle SuspiciousTitles is not a valid regular expression!");
+      throw new IllegalStateException("Your Oracle SuspiciousTags is not a valid regular expression!");
     }
 
     userInputPattern = settings.get(ConfigTags.SuspiciousProcessOutput);
