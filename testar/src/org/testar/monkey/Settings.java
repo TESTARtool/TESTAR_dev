@@ -504,6 +504,8 @@ public class Settings extends TaggableBase implements Serializable {
 		secondarySettingsList.add(ConfigTags.CreateWidgetInfoJsonFile);
 		secondarySettingsList.add(ConfigTags.MyClassPath);
 		secondarySettingsList.add(ConfigTags.ProtocolCompileDirectory);
+		secondarySettingsList.add(ConfigTags.OutputDir);
+		secondarySettingsList.add(ConfigTags.TempDir);
 		secondarySettingsList.add(ConfigTags.ReportingClass);
 
 		StringJoiner secondaryString = new StringJoiner(System.getProperty("line.separator"));

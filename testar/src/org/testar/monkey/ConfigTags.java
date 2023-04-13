@@ -271,16 +271,18 @@ public final class ConfigTags {
 	public static final Tag<String> ProtocolCompileDirectory = Tag.from("ProtocolCompileDirectory", String.class, 
 			"The relative path on which compile the TESTAR protocols and create the class files");
 
+	public static final Tag<String> OutputDir = Tag.from("OutputDir", String.class, 
+			"The relative path to save TESTAR output results");
+
+	public static final Tag<String> TempDir = Tag.from("TempDir", String.class, 
+			"The relative path to temporarily  save TESTAR files");
+
 	public static final Tag<String> ReportingClass = Tag.from("ReportingClass", String.class, 
 			"Sets whether create a HTML or NUNIT report");
 
 	/**
 	 * Other settings
 	 */
-
-	public static final Tag<String> OutputDir = Tag.from("OutputDir", String.class);
-
-	public static final Tag<String> TempDir = Tag.from("TempDir", String.class);
 
 	public static final Tag<Double> FaultThreshold = Tag.from("FaultThreshold", Double.class);
 
