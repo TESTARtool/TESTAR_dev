@@ -30,11 +30,7 @@
 
 import java.util.Set;
 
-import org.testar.DerivedActions;
-import org.testar.IActionDerive;
-import org.testar.IActionExecutor;
-import org.testar.IActionSelector;
-import org.testar.PrioritizeNewActionsSelector;
+import org.testar.*;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
 import org.testar.monkey.alayer.Action;
@@ -51,7 +47,7 @@ import org.testar.simplestategraph.QLearningActionSelector;
  */
 public class Protocol_desktop_generic_action_selector extends DesktopProtocol {
 
-	private IActionSelector selector;
+	private ActionSelectorAdapter selector;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -78,7 +74,7 @@ public class Protocol_desktop_generic_action_selector extends DesktopProtocol {
 		 * Initialize a simple in-memory state model to prioritize the unvisited actions along the run. 
 		 * This implementation uses AbstractIDCustom abstraction to identify states and actions. 
 		 */
-		selector = new GuiStateGraphWithVisitedActions();
+		selector = new ActionSelectorAdapter(new GuiStateGraphWithVisitedActions());
 	}
 
 	/**
@@ -112,9 +108,7 @@ public class Protocol_desktop_generic_action_selector extends DesktopProtocol {
 		}
 
 		// Generate mode visualization purposes (Shift + Up)
-		if(selector instanceof IActionDerive) {
-			actions = ((IActionDerive) selector).deriveActions(actions);
-		}
+		actions = selector.deriveActions(actions);
 
 		//return the set of derived actions
 		return actions;
@@ -153,17 +147,7 @@ public class Protocol_desktop_generic_action_selector extends DesktopProtocol {
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
-		if(selector instanceof IActionExecutor)
-		{
-			((IActionExecutor) selector).executeAction(action);
-		}
-
-		if(selector instanceof PrioritizeNewActionsSelector)
-		{
-			System.out.println("Executed action: " + action.get(Tags.Desc, "NoCurrentDescAvailable")
-			+ " -- Times executed: " + ((PrioritizeNewActionsSelector) selector).timesExecuted(action));
-		}
-
+		selector.executeAction(action);
 		return super.executeAction(system, state, action);
 	}
 }

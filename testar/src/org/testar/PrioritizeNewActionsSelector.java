@@ -31,6 +31,7 @@
 package org.testar;
 
 import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.Tags;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -145,6 +146,8 @@ public class PrioritizeNewActionsSelector extends RandomActionSelector implement
     @Override
     public void executeAction(Action action) {
         this.addExecutedAction(action);
+        System.out.println("Executed action: " + action.get(Tags.Desc, "NoCurrentDescAvailable")
+                + " -- Times executed: " + this.timesExecuted(action));
     }
 
     @Override
