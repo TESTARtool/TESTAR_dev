@@ -5,11 +5,11 @@ import org.testar.monkey.alayer.State;
 
 import java.util.Set;
 
-public class ActionSelectorAdapter implements IActionSelector, IActionExecutor, IActionDerive{
+public class ActionSelectorProxy implements IActionSelector, IActionExecutor, IActionDerive{
 
     private final Object selector;
 
-    public ActionSelectorAdapter(Object selector) {
+    public ActionSelectorProxy(Object selector) {
         this.selector = selector;
     }
 

@@ -28,7 +28,7 @@
  *
  */
 
-import org.testar.ActionSelectorAdapter;
+import org.testar.ActionSelectorProxy;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
@@ -54,7 +54,7 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
  */
 public class Protocol_webdriver_generic_action_selector extends WebdriverProtocol {
 
-	private ActionSelectorAdapter selector;
+	private ActionSelectorProxy selector;
 
 	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
@@ -75,7 +75,7 @@ public class Protocol_webdriver_generic_action_selector extends WebdriverProtoco
 		 * As this value increases, there is less probability % of selecting a "similar" action. 
 		 * This selector is reset in each new sequence. 
 		 */
-		selector = new ActionSelectorAdapter(new SimilarityDetection(deriveActions(system, state), 5));
+		selector = new ActionSelectorProxy(new SimilarityDetection(deriveActions(system, state), 5));
 	}
 
 	/**

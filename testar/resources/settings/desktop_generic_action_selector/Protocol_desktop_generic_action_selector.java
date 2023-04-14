@@ -31,23 +31,20 @@
 import java.util.Set;
 
 import org.testar.*;
-import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.protocols.DesktopProtocol;
 import org.testar.simplestategraph.GuiStateGraphWithVisitedActions;
-import org.testar.simplestategraph.QLearningActionSelector;
 
 /**
  * This protocol provides additional implementation to improve TESTAR action selection mechanism. 
  */
 public class Protocol_desktop_generic_action_selector extends DesktopProtocol {
 
-	private ActionSelectorAdapter selector;
+	private ActionSelectorProxy selector;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -74,7 +71,7 @@ public class Protocol_desktop_generic_action_selector extends DesktopProtocol {
 		 * Initialize a simple in-memory state model to prioritize the unvisited actions along the run. 
 		 * This implementation uses AbstractIDCustom abstraction to identify states and actions. 
 		 */
-		selector = new ActionSelectorAdapter(new GuiStateGraphWithVisitedActions());
+		selector = new ActionSelectorProxy(new GuiStateGraphWithVisitedActions());
 	}
 
 	/**
