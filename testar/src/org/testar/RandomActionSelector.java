@@ -39,14 +39,23 @@ import java.util.Set;
 
 public class RandomActionSelector implements IActionSelector{
 
-    public static Action selectRandomAction(Set<Action> actions) {
-        long graphTime = System.currentTimeMillis();
-        Random rnd = new Random(graphTime);
-        return new ArrayList<Action>(actions).get(rnd.nextInt(actions.size()));
-    }
+	public static Action selectRandomActionUsingSystemTime(Set<Action> actions) {
+		long graphTime = System.currentTimeMillis();
+		Random rnd = new Random(graphTime);
+		return new ArrayList<Action>(actions).get(rnd.nextInt(actions.size()));
+	}
 
-    @Override
-    public Action selectAction(State state, Set<Action> actions) {
-        return selectRandomAction(actions);
-    }
+	public static Action selectRandomAction(Set<Action> actions) {
+		// Convert the Set to an ArrayList for easier indexing
+		ArrayList<Action> actionList = new ArrayList<>(actions);
+		// Generate a random index within the bounds of the ArrayList
+		int randomIndex = new Random().nextInt(actionList.size());
+		// Retrieve the Action at the generated index and return it
+		return actionList.get(randomIndex);
+	}
+
+	@Override
+	public Action selectAction(State state, Set<Action> actions) {
+		return selectRandomAction(actions);
+	}
 }

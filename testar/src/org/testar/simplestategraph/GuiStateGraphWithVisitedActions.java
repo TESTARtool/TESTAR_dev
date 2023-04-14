@@ -58,6 +58,7 @@ public class GuiStateGraphWithVisitedActions implements IActionSelector {
     //TODO move into a new action selector:
     @Override
     public Action selectAction(State state, Set<Action> actions){
+        System.out.println("---------------------------------------------------------");
         // saving the starting node of the graph:
         if(startingStateAbstractCustomId==null){
             startingStateAbstractCustomId=state.get(Tags.AbstractIDCustom);
@@ -119,6 +120,7 @@ public class GuiStateGraphWithVisitedActions implements IActionSelector {
         // saving the state and action for state transition after knowing the target state:
         previousActionAbstractCustomId = returnAction.get(Tags.AbstractIDCustom);
         previousStateAbstractCustomId = state.get(Tags.AbstractIDCustom);
+        System.out.println(this.getClass() + ": return selected action = " + returnAction.get(Tags.Desc, "NoDescAvailable"));
         return returnAction;
     }
 

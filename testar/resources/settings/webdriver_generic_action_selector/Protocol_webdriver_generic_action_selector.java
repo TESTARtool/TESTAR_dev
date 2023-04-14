@@ -132,6 +132,9 @@ public class Protocol_webdriver_generic_action_selector extends WebdriverProtoco
 			}
 		}
 
+		// Use the action selector algorithm to filter some of the existing derived actions
+		actions = selector.deriveActions(actions);
+
 		return actions;
 	}
 
@@ -166,7 +169,7 @@ public class Protocol_webdriver_generic_action_selector extends WebdriverProtoco
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions) {
-		// Use the desired action selector
+		// Use the desired action selector to select the next action to execute
 		Action action = selector.selectAction(state, actions);
 		// If no action is available with the selector, use the state model or a random selection
 		if(action == null)
@@ -186,7 +189,10 @@ public class Protocol_webdriver_generic_action_selector extends WebdriverProtoco
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action) {
+		// Update the action selector algorithm with the action were are going to execute
+		// This usually tracks which actions are being executed to reduce the probability in the next iteration
 		selector.executeAction(action);
+		// Then, execute the selected action
 		return super.executeAction(system, state, action);
 	}
 
