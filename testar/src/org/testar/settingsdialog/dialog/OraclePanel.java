@@ -47,18 +47,18 @@ public class OraclePanel extends SettingsPanel {
 
     private static final long serialVersionUID = -8633257917450402330L;
 
-    private JLabel suspiciousTitleLabel = new JLabel("Suspicious Titles based on Tags values (regular expression)");
-    private JLabel suspiciousTitleTagsLabel = new JLabel("Tags to apply the Suspicious Titles (semicolon to customize multiple Tags)");
-    private JLabel suspiciousProcessLabel = new JLabel("Suspicious Process Output (regular expression)");
+    private JLabel suspiciousTagsRegexLabel = new JLabel("Suspicious Tags values (regular expression)");
+    private JLabel applySuspiciousTagsLabel = new JLabel("Tags to apply the Suspicious Tags values (semicolon to customize multiple Tags)");
+    private JLabel suspiciousProcessRegexLabel = new JLabel("Suspicious Process Output (regular expression)");
     private JLabel freezeTimeLabel = new JLabel("Freeze Time:");
     private JLabel secondsLabel = new JLabel("seconds");
 
-    private JTextArea txtSuspTitles = new JTextArea();
-    private JTextArea txtTagsForSuspTitles = new JTextArea();
-    private JTextArea txtProcTitles = new JTextArea();
+    private JTextArea txtSuspTagsRegex = new JTextArea();
+    private JTextArea txtApplySuspTags = new JTextArea();
+    private JTextArea txtSuspProccesRegex = new JTextArea();
 
-    private RegexButton regexButtonSuspTitle = new RegexButton(txtSuspTitles);
-    private RegexButton regexButtonProcTitle = new RegexButton(txtProcTitles);
+    private RegexButton regexButtonSuspTags = new RegexButton(txtSuspTagsRegex);
+    private RegexButton regexButtonSuspProcces = new RegexButton(txtSuspProccesRegex);
 
     private JCheckBox processCheckBox;
     private JSpinner spnFreezeTime;
@@ -73,46 +73,46 @@ public class OraclePanel extends SettingsPanel {
     public OraclePanel() {
         setLayout(null);
 
-        suspiciousTitleLabel.setBounds(10, 5, 450, 27);
-        suspiciousTitleLabel.setToolTipText(ToolTipTexts.suspiciousTitlesTTT);
-        add(suspiciousTitleLabel);
+        suspiciousTagsRegexLabel.setBounds(10, 5, 450, 27);
+        suspiciousTagsRegexLabel.setToolTipText(ToolTipTexts.suspiciousTagsTTT);
+        add(suspiciousTagsRegexLabel);
 
-        regexButtonSuspTitle.setBounds(500, 5, 110, 27);
-        add(regexButtonSuspTitle);
+        regexButtonSuspTags.setBounds(500, 5, 110, 27);
+        add(regexButtonSuspTags);
 
-        txtSuspTitles.setLineWrap(true);
-        JScrollPane suspTitlePane = new JScrollPane(txtSuspTitles);
-        suspTitlePane.setBounds(10, 35, 600, 100);
-        suspTitlePane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        suspTitlePane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        add(suspTitlePane);
+        txtSuspTagsRegex.setLineWrap(true);
+        JScrollPane suspTagsRegexPane = new JScrollPane(txtSuspTagsRegex);
+        suspTagsRegexPane.setBounds(10, 35, 600, 100);
+        suspTagsRegexPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        suspTagsRegexPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        add(suspTagsRegexPane);
 
-        suspiciousTitleTagsLabel.setBounds(10, 130, 600, 27);
-        add(suspiciousTitleTagsLabel);
+        applySuspiciousTagsLabel.setBounds(10, 130, 600, 27);
+        add(applySuspiciousTagsLabel);
 
-        txtTagsForSuspTitles.setLineWrap(true);
-        JScrollPane tagsForSuspTitlesPane = new JScrollPane(txtTagsForSuspTitles);
-        tagsForSuspTitlesPane.setBounds(10, 160, 600, 50);
-        tagsForSuspTitlesPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        tagsForSuspTitlesPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        add(tagsForSuspTitlesPane);
+        txtApplySuspTags.setLineWrap(true);
+        JScrollPane tagsApplySuspTagsPane = new JScrollPane(txtApplySuspTags);
+        tagsApplySuspTagsPane.setBounds(10, 160, 600, 50);
+        tagsApplySuspTagsPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        tagsApplySuspTagsPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        add(tagsApplySuspTagsPane);
 
-        suspiciousProcessLabel.setBounds(10, 220, 280, 27);
-        add(suspiciousProcessLabel);
+        suspiciousProcessRegexLabel.setBounds(10, 220, 280, 27);
+        add(suspiciousProcessRegexLabel);
 
         processCheckBox = new JCheckBox("Enable Process Listener");
         processCheckBox.setBounds(300, 220, 200, 27);
         add(processCheckBox);
         
-        regexButtonProcTitle.setBounds(500, 220, 110, 27);
-        add(regexButtonProcTitle);
+        regexButtonSuspProcces.setBounds(500, 220, 110, 27);
+        add(regexButtonSuspProcces);
 
-        txtProcTitles.setLineWrap(true);
-        JScrollPane suspiciousProcessPane = new JScrollPane(txtProcTitles);
-        suspiciousProcessPane.setBounds(10, 250, 600, 50);
-        suspiciousProcessPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        suspiciousProcessPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        add(suspiciousProcessPane);
+        txtSuspProccesRegex.setLineWrap(true);
+        JScrollPane suspProcessRegexPane = new JScrollPane(txtSuspProccesRegex);
+        suspProcessRegexPane.setBounds(10, 250, 600, 50);
+        suspProcessRegexPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        suspProcessRegexPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        add(suspProcessRegexPane);
 
         enableWebConsoleErrorOracle = new JCheckBox("Enable Web Console Error Oracle");
         enableWebConsoleErrorOracle.setBounds(10, 300, 300, 27);
@@ -146,10 +146,10 @@ public class OraclePanel extends SettingsPanel {
      */
     @Override
     public void populateFrom(final Settings settings) {
-        txtSuspTitles.setText(settings.get(ConfigTags.SuspiciousTags));
-        txtTagsForSuspTitles.setText(StringUtils.join(settings.get(ConfigTags.TagsForSuspiciousOracle), ";"));
+    	txtSuspTagsRegex.setText(settings.get(ConfigTags.SuspiciousTags));
+        txtApplySuspTags.setText(StringUtils.join(settings.get(ConfigTags.TagsForSuspiciousOracle), ";"));
         processCheckBox.setSelected(settings.get(ConfigTags.ProcessListenerEnabled));
-        txtProcTitles.setText(settings.get(ConfigTags.SuspiciousProcessOutput));
+        txtSuspProccesRegex.setText(settings.get(ConfigTags.SuspiciousProcessOutput));
         spnFreezeTime.setValue(settings.get(ConfigTags.TimeToFreeze));
         // Web Browser Console Oracles elements
         enableWebConsoleErrorOracle.setSelected(settings.get(ConfigTags.WebConsoleErrorOracle));
@@ -168,10 +168,10 @@ public class OraclePanel extends SettingsPanel {
      */
     @Override
     public void extractInformation(final Settings settings) {
-        settings.set(ConfigTags.SuspiciousTags, txtSuspTitles.getText());
-        settings.set(ConfigTags.TagsForSuspiciousOracle, Arrays.asList(txtTagsForSuspTitles.getText().split(";")));
+        settings.set(ConfigTags.SuspiciousTags, txtSuspTagsRegex.getText());
+        settings.set(ConfigTags.TagsForSuspiciousOracle, Arrays.asList(txtApplySuspTags.getText().split(";")));
         settings.set(ConfigTags.ProcessListenerEnabled, processCheckBox.isSelected());
-        settings.set(ConfigTags.SuspiciousProcessOutput, txtProcTitles.getText());
+        settings.set(ConfigTags.SuspiciousProcessOutput, txtSuspProccesRegex.getText());
         settings.set(ConfigTags.TimeToFreeze, (Double) spnFreezeTime.getValue());
         // Web Browser Console Oracles elements
         settings.set(ConfigTags.WebConsoleErrorOracle, enableWebConsoleErrorOracle.isSelected());

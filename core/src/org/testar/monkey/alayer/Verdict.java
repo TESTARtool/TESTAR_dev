@@ -48,7 +48,7 @@ public final class Verdict implements Serializable {
 	// PASS
 	public static final double SEVERITY_MIN = 0.0;
 	public static final double SEVERITY_WARNING = 		   0.00000001; // must be less than FAULT THRESHOLD @test.settings
-	public static final double SEVERITY_SUSPICIOUS_TITLE = 0.00000009; // suspicious title
+	public static final double SEVERITY_SUSPICIOUS_TAG = 0.00000009; // suspicious tag
 	// FAIL
 	public static final double SEVERITY_NOT_RESPONDING =   0.99999990; // unresponsive
 	public static final double SEVERITY_NOT_RUNNING =	   0.99999999; // crash? unexpected close?
@@ -97,8 +97,8 @@ public final class Verdict implements Serializable {
 			return "OK";
 		if(severity == Verdict.SEVERITY_WARNING)
 			return "WARNING";
-		if(severity == Verdict.SEVERITY_SUSPICIOUS_TITLE)
-			return "SUSPICIOUS_TITLE";
+		if(severity == Verdict.SEVERITY_SUSPICIOUS_TAG)
+			return "SUSPICIOUS_TAG";
 		if(severity == Verdict.SEVERITY_NOT_RESPONDING)
 			return "NOT_RESPONDING";
 		if(severity == Verdict.SEVERITY_NOT_RUNNING)

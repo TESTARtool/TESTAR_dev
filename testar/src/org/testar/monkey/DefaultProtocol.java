@@ -854,7 +854,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		Verdict suspiciousValueVerdict = Verdict.OK;
 		for(Widget w : state) {
 			suspiciousValueVerdict = suspiciousStringValueMatcher(w);
-			if(suspiciousValueVerdict.severity() == Verdict.SEVERITY_SUSPICIOUS_TITLE) {
+			if(suspiciousValueVerdict.severity() == Verdict.SEVERITY_SUSPICIOUS_TAG) {
 				return suspiciousValueVerdict;
 			}
 		}
@@ -898,8 +898,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				Pen RedPen = Pen.newPen().setColor(Color.Red).setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
 				// visualize the problematic widget, by marking it with a red box
 				if(w.get(Tags.Shape, null) != null)
-					visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
-				return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
+					visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Tag", 0.5, 0.5);
+				return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TAG,
 						"Discovered suspicious widget '" + tagForSuspiciousOracle + "' : '" + tagValue + "'.", visualizer);
 			}
 		}
