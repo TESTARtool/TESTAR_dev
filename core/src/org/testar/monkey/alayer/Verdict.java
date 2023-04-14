@@ -51,7 +51,7 @@ public final class Verdict implements Serializable {
 	public static final double SEVERITY_SUSPICIOUS_TAG = 0.00000009; // suspicious tag
 	// FAIL
 	public static final double SEVERITY_NOT_RESPONDING =   0.99999990; // unresponsive
-	public static final double SEVERITY_NOT_RUNNING =	   0.99999999; // crash? unexpected close?
+	public static final double SEVERITY_UNEXPECTEDCLOSE =	   0.99999999; // crash? unexpected close?
 	public static final double SEVERITY_MAX = 1.0;
 
 	public static final double SEVERITY_OK = 			   SEVERITY_MIN;
@@ -101,8 +101,8 @@ public final class Verdict implements Serializable {
 			return "SUSPICIOUS_TAG";
 		if(severity == Verdict.SEVERITY_NOT_RESPONDING)
 			return "NOT_RESPONDING";
-		if(severity == Verdict.SEVERITY_NOT_RUNNING)
-			return "NOT_RUNNING";
+		if(severity == Verdict.SEVERITY_UNEXPECTEDCLOSE)
+			return "UNEXPECTEDCLOSE";
 		if(severity == Verdict.SEVERITY_UNREPLAYABLE)
 			return "NOT_REPLAYABLE";
 

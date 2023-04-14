@@ -101,7 +101,7 @@ public class FileHandling {
             targetFolder = "sequences_suspicious_tag";
         else if (sev == Verdict.SEVERITY_NOT_RESPONDING)
             targetFolder = "sequences_unresponsive";
-        else if (sev == Verdict.SEVERITY_NOT_RUNNING)
+        else if (sev == Verdict.SEVERITY_UNEXPECTEDCLOSE)
             targetFolder = "sequences_unexpectedclose";
         else if (sev == Verdict.SEVERITY_FAIL)
             targetFolder = "sequences_fail";

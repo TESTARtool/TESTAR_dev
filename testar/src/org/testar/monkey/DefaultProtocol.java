@@ -835,9 +835,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		// ORACLES FOR FREE
 		//-------------------
 
-		// if the SUT is not running, we assume it crashed
+		// if the SUT is not running and closed unexpectedly, we assume it crashed
 		if(!state.get(IsRunning, false))
-			return new Verdict(Verdict.SEVERITY_NOT_RUNNING, "System is offline! I assume it crashed!");
+			return new Verdict(Verdict.SEVERITY_UNEXPECTEDCLOSE, "System is offline! Closed Unexpectedly! I assume it crashed!");
 
 		// if the SUT does not respond within a given amount of time, we assume it crashed
 		if(state.get(Tags.NotResponding, false)){
