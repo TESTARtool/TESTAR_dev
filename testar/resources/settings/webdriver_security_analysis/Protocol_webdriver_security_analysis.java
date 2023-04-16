@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2023 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -44,10 +44,7 @@ import org.testar.monkey.alayer.actions.*;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.webdriver.WdDriver;
-import org.testar.monkey.alayer.webdriver.WdElement;
 import org.testar.monkey.alayer.webdriver.WdWidget;
-import org.testar.monkey.alayer.webdriver.enums.WdRoles;
-import org.testar.plugin.NativeLinker;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.securityanalysis.*;
 import org.testar.securityanalysis.helpers.SecurityOracleOrchestrator;

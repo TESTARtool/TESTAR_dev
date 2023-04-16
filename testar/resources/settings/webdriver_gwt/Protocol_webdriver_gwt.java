@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2023 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -33,11 +33,7 @@ import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
-import org.testar.monkey.alayer.webdriver.WdElement;
-import org.testar.monkey.alayer.webdriver.WdWidget;
-import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
-import org.testar.plugin.NativeLinker;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
@@ -60,53 +56,8 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
 	protected void initialize(Settings settings) {
 		super.initialize(settings);
 
-		/**
-		 * Classes that are deemed clickable by the web framework
-		 */
-		// clickableClasses are initialized in the WebdriverProtocol with the test.settings file
-		//clickableClasses = settings.get(ConfigTags.ClickableClasses);
-
-		// User can also use this Java protocol to customize them (need code re-compilation)
-		/*clickableClasses = Arrays.asList(
-				// Dropdown op top right
-				"selectItemLiteText",
-				// Menu items on the left
-				"etreeCell", "etreeCellSelected", "etreeCellSelectedOver",
-				// Checkboxes
-				"checkboxFalse", "checkboxFalseOver", "checkboxTrue", "checkboxTrueOver",
-				// Tiles
-				"showcaseTileIcon",
-				// Scrolling stuff
-				"vScrollStart", "vScrollEnd"
-				);
-		 */
-
-		/**
-		 * Disallow links and pages with these extensions
-		 * Set to null to ignore this feature
-		 */
-		// deniedExtensions are initialized in the WebdriverProtocol with the test.settings file
-		//deniedExtensions = settings.get(ConfigTags.DeniedExtensions);
-
-		// User can also use this Java protocol to customize them (need code re-compilation)
-		//deniedExtensions = Arrays.asList("pdf", "jpg", "png", "jsp");
-
-		/**
-		 * Define a whitelist of allowed domains for links and pages
-		 * An empty list will be filled with the domain from the sut connector
-		 * Set to null to ignore this feature
-		 */
-		// domainsAllowed are initialized in the WebdriverProtocol with the test.settings file 
-		//domainsAllowed = settings.get(ConfigTags.DomainsAllowed);
-
-		// User can also use this Java protocol to customize them (need code re-compilation)
-		//domainsAllowed = Arrays.asList("www.smartclient.com");
-
-		/**
-		 * List of attributes to identify and close policy popups
-		 * Set to null to disable this feature
-		 */
-		// Currently only at Java protocol level (need code re-compilation)
+		// List of attributes to identify and close policy popups
+		// Set to null to disable this feature
 		policyAttributes = ArrayListMultimap.create();
 		policyAttributes.put("class", "iAgreeButton");
 	}
@@ -145,10 +96,9 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
 			}
 
 			// slides can happen, even though the widget might be blocked
-			// addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget,
-			//     state);
+			// addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
 
-			// If the element is blocked, Testar can't click on or type in the widget
+			// If the element is blocked, TESTAR can't click on or type in the widget
 			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
 				continue;
 			}
@@ -170,25 +120,15 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
 	}
 
 	@Override
-	protected boolean isClickable(Widget widget) {
-		Role role = widget.get(Tags.Role, Roles.Widget);
-		if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
-			/*
-      // Input type are special...
-      if (role.equals(WdRoles.WdINPUT)) {
-        String type = ((WdWidget) widget).element.type;
-        return WdRoles.clickableInputTypes().contains(type);
-      }
-			 */
-			return true;
+	protected boolean isAtBrowserCanvas(Widget widget) {
+		// GWT uses the popupPolicies visibility style to make visible or hide the policy container
+		if(widget.get(WdTags.WebCssClasses, "").contains("iAgreeButton")) {
+			Widget policyContainer = widget.parent();
+			return policyContainer.get(WdTags.WebAttributeMap).toString().contains("style=visibility: visible");
 		}
 
-		WdElement element = ((WdWidget) widget).element;
-		if (element.isClickable) {
-			return true;
-		}
-
-		return containCSSClasses(widget, clickableClasses);
+		return super.isAtBrowserCanvas(widget);
 	}
+
 
 }
