@@ -113,7 +113,8 @@ AbstractStateAttributes = WebWidgetId
 #################################################################
 # WebDriver features
 #################################################################
-ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
+ClickableClasses = 
+TypeableClasses = 
 DeniedExtensions = pdf;jpg;png;pfx;xml
 DomainsAllowed = 
 FollowLinks = false

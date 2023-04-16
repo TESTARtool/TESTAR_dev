@@ -549,6 +549,8 @@ public class Main {
 				}
 			}));
 
+			defaults.add(Pair.from(TypeableClasses, new ArrayList<String>()));
+
 			defaults.add(Pair.from(DeniedExtensions, new ArrayList<String>() {
 				{
 					add("pdf");

@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2021 - 2022 Open Universiteit - www.ou.nl
- * Copyright (c) 2021 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2021 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2021 - 2023 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -95,7 +95,7 @@ public class Protocol_test_gradle_workflow_webdriver_form_filling extends Webdri
 		State state = getState(system);
 		boolean loggedUser = false;
 		for(Widget widget : state) {
-			if(widget.get(WdTags.WebTextContent, "").trim().equals("John Smith")) {
+			if(widget.get(WdTags.WebTextContent, "").trim().equals("Welcome")) {
 				loggedUser = true;
 			}
 		}
