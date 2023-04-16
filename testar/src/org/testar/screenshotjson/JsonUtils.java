@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -46,7 +46,10 @@ import java.util.Set;
 
 public class JsonUtils {
 
-    public static void createFullWidgetTreeJsonFile(State state, String fileNamePath){
+    public static boolean createFullWidgetTreeJsonFile(State state, String fileNamePath){
+    	// If the state has no children, do not continue
+    	if(state.childCount() == 0) return false;
+
         Set<FullWidgetInfoJsonObject> widgetTreeObjects = new HashSet<FullWidgetInfoJsonObject>();
         for(Widget widget:state){
             Set<Pair<String, String>> widgetTags = new HashSet<Pair<String, String>>();
@@ -56,17 +59,19 @@ public class JsonUtils {
             }
             widgetTreeObjects.add(new FullWidgetInfoJsonObject(widgetTags));
         }
-        writeJsonToFile(widgetTreeObjects,fileNamePath);
+        return writeJsonToFile(widgetTreeObjects,fileNamePath);
     }
 
-    public static void createWidgetInfoJsonFile(State state){
-    	
+    public static boolean createWidgetInfoJsonFile(State state){
+    	// If the state has no children, do not continue
+    	if(state.childCount() == 0) return false;
+
     	Rect sutRect;
     	try {
     		sutRect = (Rect) state.child(0).get(Tags.Shape, null);
     	}catch(NullPointerException e){
     		System.out.println("ERROR: Reading State bounds for JSON file");
-    		return;
+    		return false;
     	}
 
         Set<WidgetJsonObject> widgetJsonObjects = new HashSet<WidgetJsonObject>();
@@ -95,10 +100,10 @@ public class JsonUtils {
         ScreenshotWidgetJsonObject screenshotWidgetJsonObject = new ScreenshotWidgetJsonObject(widgetJsonObjects, screenshotPath);
         String filePath = screenshotPath.substring(0, screenshotPath.lastIndexOf("."))+".json";
 
-        writeJsonToFile(screenshotWidgetJsonObject, filePath);
+        return writeJsonToFile(screenshotWidgetJsonObject, filePath);
     }
 
-    private static void writeJsonToFile(Object objectToWrite, String fileNamePath){
+    private static boolean writeJsonToFile(Object objectToWrite, String fileNamePath){
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try{
             FileWriter fileWriter = new FileWriter(fileNamePath);
@@ -108,6 +113,8 @@ public class JsonUtils {
         }catch(Exception e){
             System.out.println("ERROR: Writing JSON into file failed!");
             e.printStackTrace();
+            return false;
         }
+        return true;
     }
 }

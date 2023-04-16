@@ -31,6 +31,7 @@
 package org.testar;
 
 import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.Tags;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -60,6 +61,7 @@ public class PrioritizeNewActionsSelector extends RandomActionSelector implement
     private Map<Action, Integer> executedActions = new HashMap<>();
 
     public Set<Action> getPrioritizedActions(Set<Action> actions) {
+        System.out.println("---------------------------------------------------------");
         Set<Action> prioritizedActions = new HashSet<Action>();
         //checking if it is the first round of actions:
         if(previousActions==null) {
@@ -120,7 +122,7 @@ public class PrioritizeNewActionsSelector extends RandomActionSelector implement
         
         //saving the current actions for the next round:
         previousActions = actions;
-        return(prioritizedActions);
+        return prioritizedActions;
     }
     
     public void addExecutedAction(Action action){
@@ -145,6 +147,8 @@ public class PrioritizeNewActionsSelector extends RandomActionSelector implement
     @Override
     public void executeAction(Action action) {
         this.addExecutedAction(action);
+        System.out.println("Executed action: " + action.get(Tags.Desc, "NoCurrentDescAvailable")
+                + " -- Times executed: " + this.timesExecuted(action));
     }
 
     @Override
