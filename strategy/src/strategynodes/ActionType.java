@@ -5,6 +5,7 @@ import org.testar.monkey.alayer.Roles;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.actions.ActionRoles;
+import org.testar.monkey.alayer.actions.WdActionRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 
@@ -85,6 +86,19 @@ public enum ActionType
                     Widget originWidget = action.get(Tags.OriginWidget, null);
                     if(!isChildOfFormWidget(originWidget))
                         return false;
+                    if(isChildOfFormWidget(originWidget))
+                    {
+                    	// Some web SUT as Parabank contains Select dropdown elements in the form
+                    	if(action.get(Tags.Role, ActionRoles.Action).equals(WdActionRoles.SelectListAction))
+                    	{
+                    		return true;
+                    	}
+                    	// Some web SUT as Parabank contains text area elements in the form
+                    	else if(originWidget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdTEXTAREA))
+                    	{
+                    		return true;
+                    	}
+                    }
                     return
                             (
                                 originWidget.get(Tags.Role, ActionRoles.Action).equals(WdRoles.WdINPUT) &&

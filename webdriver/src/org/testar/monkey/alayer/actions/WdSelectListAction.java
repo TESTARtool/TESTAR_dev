@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2023 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -43,24 +43,31 @@ public class WdSelectListAction extends TaggableBase implements Action {
     private static final long serialVersionUID = -5522966388178892530L;
 
     private String elementId;
+    private String uniqueName;
     private String value;
 
-    public WdSelectListAction(String elementId, String value, Widget widget) {
+    public WdSelectListAction(String elementId, String uniqueName, String value, Widget widget) {
         this.elementId = elementId;
+        this.uniqueName = uniqueName;
         this.value = value;
         this.set(Tags.Role, WdActionRoles.SelectListAction);
-        this.set(Tags.Desc, "Set Webdriver select list script to set into " + elementId + " : " + value);
+        this.set(Tags.Desc, "Set Webdriver select list script to set into id '" + elementId + "' or name '" + uniqueName + "' : " + value);
         this.set(Tags.OriginWidget, widget);
     }
 
     @Override
     public void run(SUT system, State state, double duration) {
-        WdDriver.executeScript(String.format("document.getElementById('%s').value='%s'", elementId, value));
+    	if(!elementId.isEmpty()) {
+    		WdDriver.executeScript(String.format("document.getElementById('%s').value='%s'", elementId, value));
+    	}
+    	else if(!uniqueName.isEmpty()) {
+    		WdDriver.executeScript(String.format("document.getElementsByName('%s')[0].options[%s].selected = true", uniqueName, value));
+    	}
     }
 
     @Override
     public String toShortString() {
-        return "Set select list on id '" + elementId + "' to '" + value + "'";
+        return "Set select list on id '" + elementId + "' or name '" + uniqueName + "' to '" + value + "'";
     }
 
     @Override

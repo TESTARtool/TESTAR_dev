@@ -1,0 +1,6 @@
+IF
+    (any-exist)
+THEN
+	select-random
+ELSE
+    select-previous
