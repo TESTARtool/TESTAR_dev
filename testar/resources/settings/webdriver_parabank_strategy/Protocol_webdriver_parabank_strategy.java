@@ -92,18 +92,16 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		WdDriver.executeScript("document.getElementsByName('login')[0].submit();");
 		Util.pause(1);
 
-		/** Select only one form URL you want to test **/
-
-		// Load bill payment URL
-		WdDriver.getRemoteWebDriver().get("https://para.testar.org/parabank/billpay.htm");
-
-		// Load update profile URL
-		// TODO: This profile form already contains default values
-		// WdDriver.getRemoteWebDriver().get("https://para.testar.org/parabank/updateprofile.htm");
-
-		// Load contact us URL
-		// TODO: Not all form elements are mandatory to send the contact message
-		// WdDriver.getRemoteWebDriver().get("https://para.testar.org/parabank/contact.htm");
+		/* 
+		 * Load the form URL we want to test
+		 * 
+		 * https://para.testar.org/parabank/billpay.htm
+		 * https://para.testar.org/parabank/updateprofile.htm
+		 * https://para.testar.org/parabank/contact.htm
+		 */
+		String[] parts = settings.get(ConfigTags.SUTConnectorValue, "").split(" ");
+		String formURL = parts[parts.length - 1].replace("\"", "");
+		WdDriver.getRemoteWebDriver().get(formURL);
 		Util.pause(1);
 
 		return system;

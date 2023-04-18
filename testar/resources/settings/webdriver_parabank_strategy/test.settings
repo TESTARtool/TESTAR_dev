@@ -27,7 +27,7 @@ Mode = Generate
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://para.testar.org/"
+SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://para.testar.org/parabank/billpay.htm"
 
 #################################################################
 # Sequences
@@ -113,8 +113,8 @@ DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = instant
-ApplicationName = parabank
-ApplicationVersion = 1
+ApplicationName = parabank_bill
+ApplicationVersion = human_strategy
 ResetDataStore = false
 StateModelStoreWidgets = true
 
