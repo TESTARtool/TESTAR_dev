@@ -87,7 +87,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected static Set<String> existingCssClasses = new HashSet<>();
 
 	// WedDriver settings from file:
-	protected List<String> clickableClasses, deniedExtensions, domainsAllowed;
+	protected List<String> clickableClasses, typeableClasses, deniedExtensions, domainsAllowed;
 
 	// URL + form name, username input id + value, password input id + value
 	// Set login to null to disable this feature
@@ -117,6 +117,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 		// Classes that are deemed clickable by the web framework
 		clickableClasses = settings.get(ConfigTags.ClickableClasses);
+
+		// Classes that are deemed typeable by the web framework
+		typeableClasses = settings.get(ConfigTags.TypeableClasses);
 
 		// Disallow links and pages with these extensions
 		// Set to null to ignore this feature
@@ -756,8 +759,20 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	    return role.equals(WdRoles.WdFORM);
 	}
 
+	/*
+	Check whether the widget's web element contains at least one of the accepted css classes
+	 */
+	protected boolean containCSSClasses(Widget widget, List<String> cssClasses){
+		WdElement element = ((WdWidget) widget).element;
+		Set<String> cssSet = new HashSet<>(cssClasses);
+		cssSet.retainAll(element.cssClasses);
+		return cssSet.size() > 0;
+	}
+
 	@Override
 	protected boolean isTypeable(Widget widget) {
+		if (containCSSClasses(widget, typeableClasses)) return true;
+
 		Role role = widget.get(Tags.Role, Roles.Widget);
 		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
 			// Input type are special...
@@ -767,7 +782,25 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			}
 			return true;
 		}
+		return false;
+	}
 
+	@Override
+	protected boolean isClickable(Widget widget) {
+		WdElement element = ((WdWidget) widget).element;
+		if (element.isClickable || containCSSClasses(widget, clickableClasses)) {
+			return true;
+		}
+
+		Role role = widget.get(Tags.Role, Roles.Widget);
+		if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
+			// Input type are special...
+			if (role.equals(WdRoles.WdINPUT)) {
+				String type = element.type;
+				return WdRoles.clickableInputTypes().contains(type);
+			}
+			return true;
+		}
 		return false;
 	}
 

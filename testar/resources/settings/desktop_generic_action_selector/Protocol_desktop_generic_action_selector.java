@@ -30,17 +30,12 @@
 
 import java.util.Set;
 
-import org.testar.DerivedActions;
-import org.testar.IActionDerive;
-import org.testar.IActionExecutor;
-import org.testar.IActionSelector;
-import org.testar.PrioritizeNewActionsSelector;
+import org.testar.*;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.protocols.DesktopProtocol;
 import org.testar.simplestategraph.GuiStateGraphWithVisitedActions;
@@ -51,7 +46,7 @@ import org.testar.simplestategraph.QLearningActionSelector;
  */
 public class Protocol_desktop_generic_action_selector extends DesktopProtocol {
 
-	private IActionSelector selector;
+	private ActionSelectorProxy selector;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -66,19 +61,19 @@ public class Protocol_desktop_generic_action_selector extends DesktopProtocol {
 		 * Compare the descriptions of the actions in the current and previous state, 
 		 * to prioritize the selection of new actions in the current state. 
 		 */
-		// selector = new PrioritizeNewActionsSelector();
+		// selector = new ActionSelectorProxy(new PrioritizeNewActionsSelector());
 
 		/**
 		 *  Initialize a simple GUI state graph for Q-learning. 
 		 *  This implementation uses AbstractIDCustom abstraction to identify states and actions. 
 		 */
-		// selector = new QLearningActionSelector(settings.get(ConfigTags.MaxReward), settings.get(ConfigTags.Discount));
+		// selector = new ActionSelectorProxy(new QLearningActionSelector(settings.get(ConfigTags.MaxReward), settings.get(ConfigTags.Discount)));
 
 		/**
 		 * Initialize a simple in-memory state model to prioritize the unvisited actions along the run. 
 		 * This implementation uses AbstractIDCustom abstraction to identify states and actions. 
 		 */
-		selector = new GuiStateGraphWithVisitedActions();
+		selector = new ActionSelectorProxy(new GuiStateGraphWithVisitedActions());
 	}
 
 	/**
@@ -111,10 +106,8 @@ public class Protocol_desktop_generic_action_selector extends DesktopProtocol {
 			derived = deriveClickTypeScrollActionsFromAllWidgets(actions, state);
 		}
 
-		// Generate mode visualization purposes (Shift + Up)
-		if(selector instanceof IActionDerive) {
-			actions = ((IActionDerive) selector).deriveActions(actions);
-		}
+		// Use the action selector algorithm to filter some of the existing derived actions
+		actions = selector.deriveActions(actions);
 
 		//return the set of derived actions
 		return actions;
@@ -131,7 +124,7 @@ public class Protocol_desktop_generic_action_selector extends DesktopProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		// Use the desired action selector
+		// Use the desired action selector to select the next action to execute
 		Action action = selector.selectAction(state, actions);
 		// If no action is available with the selector, use the state model or a random selection
 		if(action == null)
@@ -153,17 +146,10 @@ public class Protocol_desktop_generic_action_selector extends DesktopProtocol {
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
-		if(selector instanceof IActionExecutor)
-		{
-			((IActionExecutor) selector).executeAction(action);
-		}
-
-		if(selector instanceof PrioritizeNewActionsSelector)
-		{
-			System.out.println("Executed action: " + action.get(Tags.Desc, "NoCurrentDescAvailable")
-			+ " -- Times executed: " + ((PrioritizeNewActionsSelector) selector).timesExecuted(action));
-		}
-
+		// Update the action selector algorithm with the action were are going to execute
+		// This usually tracks which actions are being executed to reduce the probability in the next iteration
+		selector.executeAction(action);
+		// Then, execute the selected action
 		return super.executeAction(system, state, action);
 	}
 }

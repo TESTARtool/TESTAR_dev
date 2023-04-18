@@ -426,6 +426,7 @@ public class Settings extends TaggableBase implements Serializable {
 				, "#################################################################"
 				, ""
 				, ConfigTags.ClickableClasses.name() + " = "
+				, ConfigTags.TypeableClasses.name() + " = "
 				, ConfigTags.DeniedExtensions.name() + " = "
 				, ConfigTags.DomainsAllowed.name() + " = "
 				, ConfigTags.FollowLinks.name() + " = "

@@ -55,13 +55,17 @@ import org.testar.screenshotjson.JsonUtils;
  */
 public class Protocol_test_gradle_workflow_desktop_generic extends DesktopProtocol {
 
+	// The JsonUtils should create this state JSON file by default
+	// But if TESTAR loads a state without children, this file will not be created
+	boolean jsonCreated = true;
+
 	@Override
 	protected State getState(SUT system) throws StateBuildException {
 		State state = super.getState(system);
 
 		// Creating a JSON file with information about widgets and their location on the screenshot:
 		if(settings.get(ConfigTags.Mode) == Modes.Generate && settings.get(ConfigTags.CreateWidgetInfoJsonFile))
-			JsonUtils.createWidgetInfoJsonFile(state);
+			jsonCreated = JsonUtils.createWidgetInfoJsonFile(state);
 
 		// DEBUG: That widgets have screen bounds in the GUI of the remote server
 		for(Widget w : state) {
@@ -124,19 +128,21 @@ public class Protocol_test_gradle_workflow_desktop_generic extends DesktopProtoc
 		}
 
 		// Verify the JsonUtils created a JSON State file
-		File screenshotsFolder = null;
-		try {
-			screenshotsFolder = new File(OutputStructure.screenshotsOutputDir).getCanonicalFile();
-			File[] subdirectories = screenshotsFolder.listFiles(File::isDirectory);
-			Assert.isTrue(subdirectories.length > 0, "TESTAR screenshotsFolder did not contains a screenshot sequence directory");
+		if(jsonCreated) {
+			File screenshotsFolder = null;
+			try {
+				screenshotsFolder = new File(OutputStructure.screenshotsOutputDir).getCanonicalFile();
+				File[] subdirectories = screenshotsFolder.listFiles(File::isDirectory);
+				Assert.isTrue(subdirectories.length > 0, "TESTAR screenshotsFolder did not contains a screenshot sequence directory");
 
-			File[] jsonFileList = subdirectories[0].listFiles((dir, name) -> name.endsWith(".json"));
-			if (jsonFileList != null) {
-				Arrays.stream(jsonFileList).forEach(file -> System.out.println(file.getName()));
+				File[] jsonFileList = subdirectories[0].listFiles((dir, name) -> name.endsWith(".json"));
+				if (jsonFileList != null) {
+					Arrays.stream(jsonFileList).forEach(file -> System.out.println(file.getName()));
+				}
+				Assert.isTrue(jsonFileList.length > 0, "TESTAR screenshotsFolder did not create a JSON file using JsonUtils feature");
+			} catch(IOException e) {
+				Assert.isTrue(screenshotsFolder != null, "TESTAR screenshotsFolder did not exists");
 			}
-			Assert.isTrue(jsonFileList.length > 0, "TESTAR screenshotsFolder did not create a JSON file using JsonUtils feature");
-		} catch(IOException e) {
-			Assert.isTrue(screenshotsFolder != null, "TESTAR screenshotsFolder did not exists");
 		}
 
 		super.postSequenceProcessing();

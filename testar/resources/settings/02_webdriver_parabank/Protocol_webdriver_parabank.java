@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2023 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,16 +31,11 @@
 import com.google.common.collect.ArrayListMultimap;
 import org.testar.SutVisualization;
 import org.testar.managers.InputDataManager;
-import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
-import org.testar.monkey.alayer.webdriver.WdDriver;
-import org.testar.monkey.alayer.webdriver.WdElement;
-import org.testar.monkey.alayer.webdriver.WdWidget;
-import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.plugin.NativeLinker;
 import org.testar.monkey.Settings;
@@ -318,28 +313,6 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
   }
 
   @Override
-  protected boolean isClickable(Widget widget) {
-    Role role = widget.get(Tags.Role, Roles.Widget);
-    if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
-      // Input type are special...
-      if (role.equals(WdRoles.WdINPUT)) {
-        String type = ((WdWidget) widget).element.type;
-        return WdRoles.clickableInputTypes().contains(type);
-      }
-      return true;
-    }
-
-    WdElement element = ((WdWidget) widget).element;
-    if (element.isClickable) {
-      return true;
-    }
-
-    Set<String> clickSet = new HashSet<>(clickableClasses);
-    clickSet.retainAll(element.cssClasses);
-    return clickSet.size() > 0;
-  }
-
-  @Override
   protected boolean isTypeable(Widget widget) {
 	  Role role = widget.get(Tags.Role, Roles.Widget);
 	  if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
@@ -348,16 +321,9 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 		  if(widget.get(WdTags.WebCssClasses, "").contains("input")) {
 			  return true;
 		  }
-
-		  // Input type are special...
-		  if (role.equals(WdRoles.WdINPUT)) {
-			  String type = ((WdWidget) widget).element.type;
-			  return WdRoles.typeableInputTypes().contains(type.toLowerCase());
-		  }
-		  return true;
 	  }
 
-	  return false;
+	  return super.isTypeable(widget);
   }
 
   /**

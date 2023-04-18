@@ -126,6 +126,7 @@ AbstractStateAttributes = WebWidgetId
 # WebDriver features
 #################################################################
 ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
+TypeableClasses = 
 DeniedExtensions = pdf;jpg;png
 DomainsAllowed = www.ou.nl;mijn.awo.ou.nl;login.awo.ou.nl
 FollowLinks = true

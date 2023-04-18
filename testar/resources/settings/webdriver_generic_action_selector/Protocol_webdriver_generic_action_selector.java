@@ -28,17 +28,12 @@
  *
  */
 
+import org.testar.ActionSelectorProxy;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
-import org.testar.monkey.alayer.webdriver.WdElement;
-import org.testar.monkey.alayer.webdriver.WdWidget;
-import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
-import org.testar.plugin.NativeLinker;
-import org.testar.IActionExecutor;
-import org.testar.IActionSelector;
 import org.testar.action.priorization.SimilarityDetection;
 import org.testar.managers.InputDataManager;
 import org.testar.protocols.WebdriverProtocol;
@@ -55,7 +50,7 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
  */
 public class Protocol_webdriver_generic_action_selector extends WebdriverProtocol {
 
-	private IActionSelector selector;
+	private ActionSelectorProxy selector;
 
 	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
@@ -76,7 +71,7 @@ public class Protocol_webdriver_generic_action_selector extends WebdriverProtoco
 		 * As this value increases, there is less probability % of selecting a "similar" action. 
 		 * This selector is reset in each new sequence. 
 		 */
-		selector = new SimilarityDetection(deriveActions(system, state), 5);
+		selector = new ActionSelectorProxy(new SimilarityDetection(deriveActions(system, state), 5));
 	}
 
 	/**
@@ -133,29 +128,10 @@ public class Protocol_webdriver_generic_action_selector extends WebdriverProtoco
 			}
 		}
 
+		// Use the action selector algorithm to filter some of the existing derived actions
+		actions = selector.deriveActions(actions);
+
 		return actions;
-	}
-
-	@Override
-	protected boolean isClickable(Widget widget) {
-		Role role = widget.get(Tags.Role, Roles.Widget);
-		if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
-			// Input type are special...
-			if (role.equals(WdRoles.WdINPUT)) {
-				String type = ((WdWidget) widget).element.type;
-				return WdRoles.clickableInputTypes().contains(type);
-			}
-			return true;
-		}
-
-		WdElement element = ((WdWidget) widget).element;
-		if (element.isClickable) {
-			return true;
-		}
-
-		Set<String> clickSet = new HashSet<>(clickableClasses);
-		clickSet.retainAll(element.cssClasses);
-		return clickSet.size() > 0;
 	}
 
 	/**
@@ -167,7 +143,7 @@ public class Protocol_webdriver_generic_action_selector extends WebdriverProtoco
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions) {
-		// Use the desired action selector
+		// Use the desired action selector to select the next action to execute
 		Action action = selector.selectAction(state, actions);
 		// If no action is available with the selector, use the state model or a random selection
 		if(action == null)
@@ -187,10 +163,10 @@ public class Protocol_webdriver_generic_action_selector extends WebdriverProtoco
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action) {
-		if(selector instanceof IActionExecutor)
-		{
-			((IActionExecutor) selector).executeAction(action);
-		}
+		// Update the action selector algorithm with the action were are going to execute
+		// This usually tracks which actions are being executed to reduce the probability in the next iteration
+		selector.executeAction(action);
+		// Then, execute the selected action
 		return super.executeAction(system, state, action);
 	}
 

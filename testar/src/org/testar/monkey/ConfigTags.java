@@ -144,6 +144,10 @@ public final class ConfigTags {
 			"Indicate which web CSS classes need to be considered clickable");
 
 	@SuppressWarnings("unchecked")
+	public static final Tag<List<String>> TypeableClasses = Tag.from("TypeableClasses", (Class<List<String>>) (Class<?>) List.class, 
+			"Indicate which web CSS classes need to be considered typeable");
+
+	@SuppressWarnings("unchecked")
 	public static final Tag<List<String>> DeniedExtensions = Tag.from("DeniedExtensions", (Class<List<String>>) (Class<?>) List.class, 
 			"Indicate which web URL extensions need to be ignored when testing");
 

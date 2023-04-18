@@ -111,6 +111,7 @@ AbstractStateAttributes = WebWidgetId
 # WebDriver features
 #################################################################
 ClickableClasses = 
+TypeableClasses = 
 DeniedExtensions = pdf;jpg;png;pfx;xml
 DomainsAllowed = para.testar.org
 FollowLinks = true
