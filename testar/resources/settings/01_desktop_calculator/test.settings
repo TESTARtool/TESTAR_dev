@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = c:\\windows\\system32\\notepad.exe
+SUTConnectorValue = java -jar suts/Calculator.jar
 
 #################################################################
 # Sequences
@@ -31,16 +31,16 @@ SUTConnectorValue = c:\\windows\\system32\\notepad.exe
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 2
-SequenceLength = 20
+Sequences = 8
+SequenceLength = 10
 
 #################################################################
-# Oracles based on suspicious titles
+# Oracles based on suspicious tag values
 #
 # Regular expression and Tags to apply them
 #################################################################
 
-SuspiciousTitles = 
+SuspiciousTags = 
 TagsForSuspiciousOracle = Title
 
 #################################################################
@@ -88,15 +88,31 @@ TagsToFilter = Title
 # but that you do not want to test.
 #################################################################
 
-SUTProcesses =
+ProcessesToKillDuringTest =
 
 #################################################################
-# Protocolclass
+# SUT Protocol
 #
-# Indicate the location of the protocol class for your specific SUT.
+# ProtocolClass: Indicate the location of the protocol class for your specific SUT
+# AlwaysCompile: Compile the protocol before launching the selected TESTAR mode
 #################################################################
 
-ProtocolClass = 01_desktop_generic_pure_random/Protocol_desktop_generic_pure_random
+ProtocolClass = 01_desktop_calculator/Protocol_01_desktop_calculator
+AlwaysCompile = true
+
+#################################################################
+# Time configurations
+#
+# ActionDuration: Sets the speed, in seconds, at which a GUI action is performed
+# TimeToWaitAfterAction: Sets the delay, in seconds, between UI actions during a test
+# StartupTime: Sets how many seconds to wait for the SUT to be ready for testing
+# MaxTime: Sets a time, in seconds, after which the test run is finished (e.g. stop after an hour)
+#################################################################
+
+ActionDuration = 0.0
+TimeToWaitAfterAction = 0.3
+StartupTime = 10.0
+MaxTime = 3.1536E7
 
 #################################################################
 # State identifier attributes
@@ -104,7 +120,7 @@ ProtocolClass = 01_desktop_generic_pure_random/Protocol_desktop_generic_pure_ran
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WidgetControlType
+AbstractStateAttributes = WidgetControlType,WidgetTitle
 
 #################################################################
 # Settings (string) that can be used for user specified protocols
@@ -116,35 +132,39 @@ ProtocolSpecificSetting_4 =
 ProtocolSpecificSetting_5 = 
 
 #################################################################
+# Sets whether to display TESTAR dialog. If false is used, then TESTAR will run in the mode of the Mode property
+#################################################################
+
+ShowVisualSettingsDialogOnStartup = true
+
+#################################################################
+# Sets whether to keep the SUTs GUI active in the screen (e.g. when its minimised or when a process is started and its UI is in front, etc.)
+#################################################################
+
+ForceForeground = true
+
+#################################################################
+# Sets whether to display overlay information, inside the SPY mode, for all the UI actions derived from the test set up
+#################################################################
+
+VisualizeActions = false
+
+#################################################################
 # Other more advanced settings
 #################################################################
 
-ProcessesToKillDuringTest =
 OutputDir = ./output
 PathToReplaySequence = ./output/temp
 TempDir = ./output/temp
 UseRecordedActionDurationAndWaitTimeDuringReplay = false
-ForceForeground = true
 LogLevel = 1
-ExecuteActions = true
 FaultThreshold = 0.000000001
-DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
-ActionDuration = 0.1
-ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
-MaxTime = 3.1536E7
-ShowSettingsAfterTest = true
-TimeToWaitAfterAction = 0.1
-StartupTime = 10.0
-DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true
 CopyFromTo =
-VisualizeActions = false
-VisualizeSelectedAction = true
-TestGenerator = random
 MaxReward = 9999999
 Discount = .95

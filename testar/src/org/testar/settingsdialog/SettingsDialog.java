@@ -177,11 +177,11 @@ public class SettingsDialog extends JFrame implements Observer {
       throw new IllegalStateException("Your ClickFilter is not a valid regular expression!");
     }
 
-    userInputPattern = settings.get(ConfigTags.SuspiciousTitles);
+    userInputPattern = settings.get(ConfigTags.SuspiciousTags);
     try {
       Pattern.compile(userInputPattern);
     } catch (PatternSyntaxException exception) {
-      throw new IllegalStateException("Your Oracle SuspiciousTitles is not a valid regular expression!");
+      throw new IllegalStateException("Your Oracle SuspiciousTags is not a valid regular expression!");
     }
 
     userInputPattern = settings.get(ConfigTags.SuspiciousProcessOutput);
@@ -261,7 +261,7 @@ public class SettingsDialog extends JFrame implements Observer {
     settingPanels.put(FILTER_TAB_INDEX, new Pair<>("Filters", new FilterPanel()));
     settingPanels.put(ORACLES_TAB_INDEX, new Pair<>("Oracles", new OraclePanel()));
     settingPanels.put(TIMES_TAB_INDEX, new Pair<>("Time Settings", new TimingPanel()));
-    settingPanels.put(MISC_TAB_INDEX, new Pair<>("Misc", new MiscPanel()));
+    //settingPanels.put(MISC_TAB_INDEX, new Pair<>("Misc", new MiscPanel())); // TODO: Misc panel is disabled temporally from the GUI
     settingPanels.put(MODEL_TAB_INDEX, new Pair<>("State Model", modelPanel = StateModelPanel.createStateModelPanel()));
 
     settingPanels.forEach((k,v) -> jTabsPane.add(v.left(),v.right()));

@@ -49,7 +49,7 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 
-public class Protocol_webdriver_parabank extends WebdriverProtocol {
+public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 
   /**
    * Called once during the life time of TESTAR
@@ -162,7 +162,7 @@ public class Protocol_webdriver_parabank extends WebdriverProtocol {
 
     for(Widget w : state) {
       if(w.get(WdTags.WebTextContent,"").contains("internal error")) {
-        return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
+        return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TAG,
                 "Discovered suspicious widget 'Web Text Content' : '" + w.get(WdTags.WebTextContent,"") + "'.");
       }
     }

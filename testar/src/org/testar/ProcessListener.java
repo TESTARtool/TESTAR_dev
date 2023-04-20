@@ -133,8 +133,8 @@ public class ProcessListener{
 							if(DefaultProtocol.lastExecutedAction!=null)
 								actionId=DefaultProtocol.lastExecutedAction.get(Tags.ConcreteID);
 
-							Verdict verdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
-									"Process Listener suspicious title: '" + ch + ", on Action:	'"+actionId+".");
+							Verdict verdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TAG,
+									"Process Listener suspicious tag: '" + ch + ", on Action:	'"+actionId+".");
 
 							//Set that we found an error
 							DefaultProtocol.processVerdict = verdict;
@@ -205,8 +205,8 @@ public class ProcessListener{
 							if(DefaultProtocol.lastExecutedAction!=null)
 								actionId=DefaultProtocol.lastExecutedAction.get(Tags.ConcreteID);
 
-							Verdict verdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
-									"Process Listener suspicious title: '" + ch + ", on Action:	'"+actionId+".");
+							Verdict verdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TAG,
+									"Process Listener suspicious tag: '" + ch + ", on Action:	'"+actionId+".");
 
 							//Set that we found an error
 							DefaultProtocol.processVerdict = verdict;

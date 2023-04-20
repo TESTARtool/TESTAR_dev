@@ -1,8 +1,7 @@
-
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -49,7 +48,7 @@ import java.util.Set;
  *
  * It uses random action selection algorithm.
  */
-public class Protocol_desktop_generic_pure_random extends DesktopProtocol {
+public class Protocol_01_desktop_calculator extends DesktopProtocol {
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -92,9 +91,9 @@ public class Protocol_desktop_generic_pure_random extends DesktopProtocol {
 	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
 	 * the SUT's configuration files etc.)
 	 */
-	 @Override
+	@Override
 	protected void beginSequence(SUT system, State state){
-	 	super.beginSequence(system, state);
+		super.beginSequence(system, state);
 	}
 
 	/**
@@ -151,11 +150,12 @@ public class Protocol_desktop_generic_pure_random extends DesktopProtocol {
 		Set<Action> actions = super.deriveActions(system,state);
 
 		// Derive left-click actions, click and type actions, and scroll actions from
-		// all widgets of the GUI:
-		DerivedActions derived = deriveClickTypeScrollActionsFromAllWidgets(actions, state);
 
-		// The other option would be deriving actions only from the top level widgets:
-		// DerivedActions derived = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, state);
+		// all widgets of the GUI:
+		//DerivedActions derived = deriveClickTypeScrollActionsFromAllWidgets(actions, state);
+
+		// the top level widgets of the GUI such as menu items:
+		DerivedActions derived = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, state);
 
 		Set<Action> filteredActions = derived.getFilteredActions();
 		actions = derived.getAvailableActions();
@@ -178,7 +178,7 @@ public class Protocol_desktop_generic_pure_random extends DesktopProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		return(super.selectAction(state, actions));
+		return super.selectAction(state, actions);
 	}
 
 	/**
