@@ -28,7 +28,9 @@
  *
  */
 
- import org.apache.commons.lang.SerializationUtils;
+ import org.apache.commons.io.FilenameUtils;
+ import org.testar.OutputStructure;
+ import org.testar.RandomActionSelector;
  import org.testar.SutVisualization;
  import org.testar.managers.InputDataManager;
  import org.testar.monkey.ConfigTags;
@@ -53,13 +55,8 @@
  import java.io.File;
  import java.io.FileWriter;
  import java.io.IOException;
- import java.util.ArrayList;
- import java.util.Collections;
- import java.util.Comparator;
- import java.util.HashMap;
- import java.util.HashSet;
- import java.util.Map;
- import java.util.Set;
+ import java.net.URL;
+ import java.util.*;
 
  import static org.testar.OutputStructure.outerLoopName;
  import static org.testar.monkey.alayer.Tags.Blocked;
@@ -68,31 +65,29 @@
  public class Protocol_webdriver_generic_strategy extends WebdriverProtocol
 {
     private ParseUtil               parseUtil;
+    private RandomActionSelector    selector;
+    private boolean useRandom = false;
     private Map<String, Integer>    actionsExecuted      = new HashMap<String, Integer>();
     private Map<String, Integer>    debugActionsExecuted      = new HashMap<String, Integer>();
-    private boolean                 UseSingleFill;
     
     @Override
     protected void initialize(Settings settings)
     {
         super.initialize(settings);
-        parseUtil = new ParseUtil(settings.get(ConfigTags.StrategyFile));
-//        UseSingleFill = settings.get(ConfigTags.UseSingleFill);
 
+        useRandom = (settings.get(ConfigTags.StrategyFile).equals("")) ? true : false;
+        if (useRandom)
+            selector = new RandomActionSelector();
+        else
+            parseUtil = new ParseUtil(settings.get(ConfigTags.StrategyFile));
+    }
 
-//        try {
-//            File myObj = new File("metrics.txt");
-//            if (myObj.createNewFile())
-//            {
-//                System.out.println("File created: " + myObj.getName());
-//            } else
-//            {
-//                System.out.println("File already exists.");
-//            }
-//        } catch (IOException e) {
-//            System.out.println("An error occurred.");
-//            e.printStackTrace();
-//        }
+    @Override
+    protected void beginSequence(SUT system, State state)
+    {
+        super.beginSequence(system, state);
+        state.set(Tags.PreviousAction, null);
+        state.set(Tags.PreviousActionID, null);
     }
     
     @Override
@@ -135,19 +130,6 @@
                 pageDown.set(Tags.Role, ActionRoles.HitKeyScrollDownAction);
                 actions.add(pageDown);
             }
-
-//            if(UseSingleFill)
-//            {
-//                // fill forms actions
-//                if (isAtBrowserCanvas(widget) && isForm(widget))
-//                {
-//                    String protocol = settings.get(ConfigTags.ProtocolClass, "");
-//                    Action formFillingAction = new WdFillFormAction(ac, widget, protocol.substring(0, protocol.lastIndexOf('/')));
-//                    if(!(formFillingAction instanceof NOP))// do nothing with NOP actions - the form was not actionable
-//                        actions.add(formFillingAction);
-//
-//                }
-//            }
             
             // only consider enabled and non-tabu widgets
             if (!widget.get(Enabled, true)) {
@@ -177,17 +159,17 @@
                 String webType = widget.get(WdTags.WebType, "");
                 if(webType.equalsIgnoreCase("date"))
                 {
-                    actions.add(ac.clickTypeInto(widget, 0.1,0.5, InputDataManager.getRandomDateNumber(), false));
+                    actions.add(ac.clickAndTypeText(widget, 0.1,0.5, InputDataManager.getRandomDateNumber()));
                     continue;
                 }
                 else if(webType.equalsIgnoreCase("time"))
                 {
-                    actions.add(ac.clickTypeInto(widget, 0.1, 0.5, InputDataManager.getRandomTimeNumber(), false));
+                    actions.add(ac.clickAndTypeText(widget, 0.1, 0.5, InputDataManager.getRandomTimeNumber()));
                     continue;
                 }
                 else if(webType.equalsIgnoreCase("week"))
                 {
-                    actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomWeekNumber(), false));
+                    actions.add(ac.clickAndTypeText(widget, InputDataManager.getRandomWeekNumber()));
                     continue;
                 }
                 else if(webType.equalsIgnoreCase("checkbox"))
@@ -225,26 +207,11 @@
             }
         }
         
-        //if(actions.isEmpty()) {
-        //	return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
-        //}
-        
         // If we have forced actions, prioritize and filter the other ones
         if (forcedActions != null && forcedActions.size() > 0) {
             filteredActions = actions;
             actions = forcedActions;
         }
-
-//        if(UseSingleFill && actions.size() > 1)
-//        {
-//            Set<Action> fillFormActions = new HashSet<>();
-//            for (Action action : actions)
-//            {
-//                if(action instanceof WdFillFormAction)
-//                    fillFormActions.add(action);
-//            }
-//            actions = fillFormActions;
-//        }
 
         //Showing the grey dots for filtered actions if visualization is on:
         if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
@@ -255,8 +222,6 @@
     @Override
     protected Action selectAction(State state, Set<Action> actions)
     {
-//        if(UseSingleFill)
-//            return RandomActionSelector.selectAction(actions); //the list only contains FillFormActions
 
         if(DefaultProtocol.lastExecutedAction != null)
         {
@@ -264,9 +229,9 @@
             state.set(Tags.PreviousActionID, DefaultProtocol.lastExecutedAction.get(Tags.AbstractIDCustom, null));
         }
 
-        //clone the action
-//        Action selectedAction = (Action) SerializationUtils.clone(parseUtil.selectAction(state, actions, actionsExecuted));
-        Action selectedAction = parseUtil.selectAction(state, actions, actionsExecuted);
+        Action selectedAction = (useRandom) ?
+                selector.selectAction(actions):
+                parseUtil.selectAction(state, actions, actionsExecuted);
         
         String actionID = selectedAction.get(Tags.AbstractIDCustom);
         Integer timesUsed = actionsExecuted.getOrDefault(actionID, 0); //get the use count for the action
@@ -385,7 +350,7 @@
         {
             FileWriter myWriter = new FileWriter(Main.outputDir + File.separator + outerLoopName + File.separator +"log_form_values.txt", true);
 
-            myWriter.write("---------- DEBUG FORM ----------");
+            myWriter.write("---------- FORM VALUES LOG----------");
             myWriter.write(System.getProperty("line.separator"));
 
             myWriter.write(WdDriver.getCurrentUrl());
@@ -422,17 +387,66 @@
         super.postSequenceProcessing();
         logActionCount(latestState);
 
-//        try
-//        {
-//            FileWriter myWriter = new FileWriter("metrics.txt");
-//            myWriter.write(WdDriver.getCurrentUrl() + " no. actions: " + (actionCount-1));
-//            myWriter.close();
-//        }
-//        catch (IOException e)
-//        {
-//            System.out.println("An error occurred.");
-//            e.printStackTrace();
-//        }
+        try
+        {
+            File logFile = new File(Main.outputDir + File.separator + outerLoopName + File.separator +
+                    settings.get(ConfigTags.ApplicationName,"application") + "_"+ settings.get(ConfigTags.ApplicationVersion,"1") + ".csv");
+            FileWriter myWriter = new FileWriter(logFile, true);
+
+            String delimiter = ";";
+
+            if(logFile.length() == 0) //file empty or nonexistent
+            {
+                myWriter.write("URL");
+                myWriter.write(delimiter + "form length and field types");
+                myWriter.write(delimiter + "strategy");
+                myWriter.write(delimiter + "timestamp");
+                myWriter.write(delimiter + "total time in msec");
+                myWriter.write(delimiter + "number of fields");
+                myWriter.write(delimiter + "actions executed");
+                myWriter.write(delimiter + "actual actions used");
+                myWriter.write(delimiter + "number of fields filled");
+                myWriter.write(delimiter + "average time per action");
+                myWriter.write(delimiter + "filled fields");
+                myWriter.write(delimiter + "average actions per field");
+                myWriter.write(delimiter + "submit");
+                myWriter.write(System.getProperty( "line.separator" ));
+            }
+
+            String fieldCodes = FilenameUtils.getBaseName(new URL(WdDriver.getCurrentUrl()).getPath()); //get the last part of the url, only works for one form
+            int numFields = fieldCodes.length() / 3; //length should be a multiple of 3
+            int actionCount = actionsExecuted.values().stream().mapToInt(Integer::intValue).sum();
+            String submitSuccess = (DefaultProtocol.lastExecutedAction.get(Tags.OriginWidget).get(WdTags.WebType, "").equalsIgnoreCase("submit")) ? "yes" : "no";
+
+            Long endTimestamp = DefaultProtocol.lastExecutedAction.get(Tags.TimeStamp, null);
+
+
+            myWriter.write(WdDriver.getCurrentUrl());
+            myWriter.write(delimiter + settings.get(ConfigTags.ApplicationName,"application"));
+            myWriter.write(delimiter + settings.get(ConfigTags.ApplicationVersion,"1"));
+            myWriter.write(delimiter + OutputStructure.startInnerLoopDateString);
+            myWriter.write(delimiter + "total time in msec");
+            myWriter.write(delimiter + numFields);
+            myWriter.write(delimiter + actionCount);
+            myWriter.write(delimiter + "actual actions used");
+            myWriter.write(delimiter + "number of fields filled");
+            myWriter.write(delimiter + "average time per action");
+            myWriter.write(delimiter + "filled fields");
+            myWriter.write(delimiter + "average actions per field");
+            myWriter.write(delimiter + submitSuccess);
+            myWriter.write(System.getProperty( "line.separator" ));
+
+
+
+    		myWriter.write(System.getProperty( "line.separator" ));
+            myWriter.write(WdDriver.getCurrentUrl() + " no. actions: " + (actionCount-1));
+            myWriter.close();
+        }
+        catch (IOException e)
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     /**

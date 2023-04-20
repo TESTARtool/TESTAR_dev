@@ -277,6 +277,30 @@ public class StdActionCompiler {
 		return ret;
 	}
 
+	public Action clickAndTypeText(Widget w, double relX, double relY, String text)
+	{
+		Finder wf = abstractor.apply(w);
+		Action ret = clickAndTypeText(new WidgetPosition(wf, Tags.Shape, relX, relY, true), text);
+		ret.set(Tags.Targets, Util.newArrayList(wf));
+		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
+		ret.set(Tags.OriginWidget, w);
+		return ret;
+	}
+
+	public Action clickAndTypeText(Widget w, String text)
+	{ return clickAndTypeText(w, 0.5, 0.5, text); }
+
+	public Action clickAndTypeText(final Position position, final String text)
+	{
+		Assert.notNull(position, text);
+		// clicking the widget to select it:
+		CompoundAction.Builder builder = new CompoundAction.Builder().add(leftClickAt(position), 1);
+
+		// Typing the new text:
+		builder.add(new Type(text), 1);
+		return builder.build();
+	}
+
 	public Action clickAndReplaceText(final Position position, final String text){
 		Assert.notNull(position, text);
 		// clicking the widget to select it:

@@ -67,6 +67,7 @@ public final class ActionRoles {
 	Type = Role.from("Type", HitKey),
 	Paste = Role.from("Paste", HitKey),
 	ClickTypeInto = Role.from("ClickTypeInto", ClickAt, Type),
+    ClickAndTypeText = Role.from("ClickAndTypeText", ClickAt, Type),
 	DropDown = Role.from("DropDown", Click, KeyDown),
 	PasteTextInto = Role.from("PasteTextInto", ClickAt, Paste),
 	Drag = Role.from("Drag", MouseDown, MouseUp, MouseMove),

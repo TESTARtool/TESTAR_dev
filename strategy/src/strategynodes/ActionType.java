@@ -31,6 +31,7 @@ public enum ActionType
                     return (
                             action.get(Tags.Role,  null) == ActionRoles.Type ||
                             action.get(Tags.Role, null) == ActionRoles.ClickTypeInto ||
+                            action.get(Tags.Role, null) == ActionRoles.ClickAndTypeText ||
                             action.get(Tags.Role, null) == ActionRoles.PasteTextInto);
                 }
             },

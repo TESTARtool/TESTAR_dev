@@ -1,6 +1,6 @@
 IF
-    (any-exist)
+    prev-action AND (any-exist unvisited sibling-action)
 THEN
-	select-random
+	select-random sibling-action
 ELSE
-    select-previous
+    select-random

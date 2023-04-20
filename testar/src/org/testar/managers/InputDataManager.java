@@ -198,7 +198,7 @@ public class InputDataManager {
 
 	public static String getRandomWeekNumber()
 	{
-		String week = Integer.toString(new Random().nextInt(52)+1);
+		String week = Integer.toString(new Random().nextInt(51)+1);
 		String year = Integer.toString(new Random().nextInt(9999));
 		return week + year;
 	}

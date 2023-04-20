@@ -169,6 +169,18 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 	}
 
 	@Override
+	public Action clickAndTypeText(final Position position, final String text)
+	{
+		Action ret = super.clickAndTypeText(position, text);
+		//ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate(text, 5, "..."), TypePen));
+		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
+		//ret.set(Tags.Desc, "Type '" + Util.abbreviate(text, 5, "...") + "' into '" + position.toString() + "'");
+		ret.set(Tags.Desc, "Type '" + Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "...") + "' into '" + position.toString() + "'");
+		ret.set(Tags.Role, ActionRoles.ClickAndTypeText);
+		return ret;
+	}
+
+	@Override
 	public Action clickAndReplaceText(final Position position, final String text){
 		Action ret = super.clickAndReplaceText(position, text);
 		//ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate(text, 5, "..."), TypePen));

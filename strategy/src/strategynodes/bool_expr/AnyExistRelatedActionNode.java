@@ -31,9 +31,6 @@ public class AnyExistRelatedActionNode extends BaseStrategyNode<Boolean>
 
         if(prevAction != null)
         {
-//            if(VISIT_MODIFIER == null)
-//                validActionFound = !actions.isEmpty(); //if there are no filters to apply, any action is valid
-
             List<Action> filteredActions = new ArrayList<>(actions);
 
             if(VISIT_MODIFIER != null) //filter by visit modifier
