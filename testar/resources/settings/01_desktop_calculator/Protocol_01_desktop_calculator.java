@@ -122,7 +122,7 @@ public class Protocol_01_desktop_calculator extends DesktopProtocol {
 		// The super methods implements the implicit online state oracles for:
 		// system crashes
 		// non-responsiveness
-		// suspicious titles
+		// suspicious tags
 		Verdict verdict = super.getVerdict(state);
 
 		//--------------------------------------------------------

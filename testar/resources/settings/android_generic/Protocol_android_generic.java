@@ -169,7 +169,7 @@ public class Protocol_android_generic extends AndroidProtocol {
 		// The super methods implements the implicit online state oracles for:
 		// system crashes
 		// non-responsiveness
-		// suspicious titles
+		// suspicious tags
 		Verdict verdict = super.getVerdict(state);
 		
 		//--------------------------------------------------------

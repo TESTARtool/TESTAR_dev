@@ -131,7 +131,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	protected Verdict getVerdict(State state) {
 
 		Verdict verdict = super.getVerdict(state);
-		// system crashes, non-responsiveness and suspicious titles automatically detected!
+		// system crashes, non-responsiveness and suspicious tags automatically detected!
 
 		//-----------------------------------------------------------------------------
 		// MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)

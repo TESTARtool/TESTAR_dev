@@ -128,6 +128,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		this.replayVerdict = replayVerdict;
 	}
 
+	Verdict finalVerdict = Verdict.OK;
+	public Verdict getFinalVerdict() {
+		return finalVerdict;
+	}
+
 	protected String lastPrintParentsOf = "null-id";
 	protected int actionCount;
 
@@ -631,7 +636,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	    fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
 	    fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
 	    fragment.set(SystemState, state);
-	    fragment.set(OracleVerdict, getVerdict(state));
+	    fragment.set(OracleVerdict, getFinalVerdict());
 
 	    //Find the target widget of the current action, and save the title into the fragment
 	    if (state != null && action.get(Tags.OriginWidget, null) != null){
@@ -717,7 +722,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	@Override
 	protected void beginSequence(SUT system, State state){
-
+		// Reset the final verdict for the new sequence
+		finalVerdict = Verdict.OK;
 	}
 
 	@Override
