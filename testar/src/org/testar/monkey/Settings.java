@@ -330,6 +330,36 @@ public class Settings extends TaggableBase implements Serializable {
 				, ConfigTags.SequenceLength.name() + " = "
 				, ""
 				, "#################################################################"
+				, "# SUT Protocol"
+				, "#"
+				, "# ProtocolClass: " + ConfigTags.ProtocolClass.getDescription()
+				, "# AlwaysCompile: " + ConfigTags.AlwaysCompile.getDescription()
+				, "#################################################################"
+				, ""
+				, ConfigTags.ProtocolClass.name() + " = "
+				, ConfigTags.AlwaysCompile.name() + " = "
+				, ""
+				, "#################################################################"
+				, "# Actionfilter"
+				, "#"
+				, "# Regular expression and Tags to apply them."
+				, "# More filters can be added in Spy mode, "
+				, "# these will be added to the protocol_filter.xml file."
+				, "#################################################################"
+				, ""
+				, ConfigTags.ClickFilter.name() + " = "
+				, ConfigTags.TagsToFilter.name() + " = "
+				, ""
+				, "#################################################################"
+				, "# Processfilter"
+				, "#"
+				, "# Regular expression. Kill the processes that your SUT can start up"
+				, "# but that you do not want to test."
+				, "#################################################################"
+				, ""
+				, ConfigTags.ProcessesToKillDuringTest.name() + " = "
+				, ""
+				, "#################################################################"
 				, "# Oracles based on suspicious tag values"
 				, "#"
 				, "# Regular expression and Tags to apply them"
@@ -366,35 +396,36 @@ public class Settings extends TaggableBase implements Serializable {
 				, ConfigTags.ProcessLogs.name() + " = "
 				, ""
 				, "#################################################################"
-				, "# Actionfilter"
+				, "# Time configurations"
 				, "#"
-				, "# Regular expression and Tags to apply them."
-				, "# More filters can be added in Spy mode, "
-				, "# these will be added to the protocol_filter.xml file."
+				, "# ActionDuration: " + ConfigTags.ActionDuration.getDescription()
+				, "# TimeToWaitAfterAction: " + ConfigTags.TimeToWaitAfterAction.getDescription()
+				, "# StartupTime: " + ConfigTags.StartupTime.getDescription()
+				, "# MaxTime: " + ConfigTags.MaxTime.getDescription()
 				, "#################################################################"
 				, ""
-				, ConfigTags.ClickFilter.name() + " = "
-				, ConfigTags.TagsToFilter.name() + " = "
-				, ""
-				, "#################################################################"
-				, "# Processfilter"
-				, "#"
-				, "# Regular expression. Kill the processes that your SUT can start up"
-				, "# but that you do not want to test."
-				, "#################################################################"
-				, ""
-				, ConfigTags.ProcessesToKillDuringTest.name() + " = "
-				, ""
-				, "#################################################################"
-				, "# Protocolclass"
-				, "#"
-				, "# Indicate the location of the protocol class for your specific SUT."
-				, "#################################################################"
-				, ""
-				, ConfigTags.ProtocolClass.name() + " = "
+				, ConfigTags.ActionDuration.name() + " = "
+				, ConfigTags.TimeToWaitAfterAction.name() + " = "
+				, ConfigTags.StartupTime.name() + " = "
+				, ConfigTags.MaxTime.name() + " = "
 				, ""
 				, "#################################################################"
 				, "# State model inference settings"
+				, "#"
+				, "# StateModelEnabled: " + ConfigTags.StateModelEnabled.getDescription()
+				, "# DataStore: " + ConfigTags.DataStore.getDescription()
+				, "# DataStoreType: " + ConfigTags.DataStoreType.getDescription()
+				, "# DataStoreServer: " + ConfigTags.DataStoreServer.getDescription()
+				, "# DataStoreDirectory: " + ConfigTags.DataStoreDirectory.getDescription()
+				, "# DataStoreDB: " + ConfigTags.DataStoreDB.getDescription()
+				, "# DataStoreUser: " + ConfigTags.DataStoreUser.getDescription()
+				, "# DataStorePassword: " + ConfigTags.DataStorePassword.getDescription()
+				, "# DataStoreMode: " + ConfigTags.DataStoreMode.getDescription()
+				, "# ApplicationName: " + ConfigTags.ApplicationName.getDescription()
+				, "# ApplicationVersion: " + ConfigTags.ApplicationVersion.getDescription()
+				, "# ActionSelectionAlgorithm: " + ConfigTags.ActionSelectionAlgorithm.getDescription()
+				, "# StateModelStoreWidgets: " + ConfigTags.StateModelStoreWidgets.getDescription()
+				, "# ResetDataStore: " + ConfigTags.ResetDataStore.getDescription()
 				, "#################################################################"
 				, ""
 				, ConfigTags.StateModelEnabled.name() + " = "
@@ -423,6 +454,14 @@ public class Settings extends TaggableBase implements Serializable {
 				, ""
 				, "#################################################################"
 				, "# WebDriver features"
+				, "#"
+				, "# ClickableClasses: " + ConfigTags.ClickableClasses.getDescription()
+				, "# TypeableClasses: " + ConfigTags.TypeableClasses.getDescription()
+				, "# DeniedExtensions: " + ConfigTags.DeniedExtensions.getDescription()
+				, "# DomainsAllowed: " + ConfigTags.DomainsAllowed.getDescription()
+				, "# FollowLinks: " + ConfigTags.FollowLinks.getDescription()
+				, "# BrowserFullScreen: " + ConfigTags.BrowserFullScreen.getDescription()
+				, "# SwitchNewTabs: " + ConfigTags.SwitchNewTabs.getDescription()
 				, "#################################################################"
 				, ""
 				, ConfigTags.ClickableClasses.name() + " = "
@@ -435,6 +474,11 @@ public class Settings extends TaggableBase implements Serializable {
 				, ""
 				, "#################################################################"
 				, "# WebDriver Browser Console Oracles"
+				, "#"
+				, "# WebConsoleErrorOracle: " + ConfigTags.WebConsoleErrorOracle.getDescription()
+				, "# WebConsoleErrorPattern: " + ConfigTags.WebConsoleErrorPattern.getDescription()
+				, "# WebConsoleWarningOracle: " + ConfigTags.WebConsoleWarningOracle.getDescription()
+				, "# WebConsoleWarningPattern: " + ConfigTags.WebConsoleWarningPattern.getDescription()
 				, "#################################################################"
 				, ""
 				, ConfigTags.WebConsoleErrorOracle.name() + " = "
@@ -480,25 +524,20 @@ public class Settings extends TaggableBase implements Serializable {
 		// Second, create a list of secondary configuration tags settings
 		// To add their descriptions to the file
 		List<Tag<?>> secondarySettingsList = new ArrayList<>();
-		secondarySettingsList.add(ConfigTags.ActionDuration);
-		secondarySettingsList.add(ConfigTags.TimeToWaitAfterAction);
-		secondarySettingsList.add(ConfigTags.StartupTime);
-		secondarySettingsList.add(ConfigTags.MaxTime);
-		secondarySettingsList.add(ConfigTags.FormFillingAction);
-		secondarySettingsList.add(ConfigTags.SUTProcesses);
 		secondarySettingsList.add(ConfigTags.ShowVisualSettingsDialogOnStartup);
 		secondarySettingsList.add(ConfigTags.ForceForeground);
+		secondarySettingsList.add(ConfigTags.VisualizeActions);
+		secondarySettingsList.add(ConfigTags.FormFillingAction);
+		secondarySettingsList.add(ConfigTags.SUTProcesses);
 		secondarySettingsList.add(ConfigTags.LogLevel);
 		secondarySettingsList.add(ConfigTags.OnlySaveFaultySequences);
 		secondarySettingsList.add(ConfigTags.ReplayRetryTime);
 		secondarySettingsList.add(ConfigTags.StopGenerationOnFault);
 		secondarySettingsList.add(ConfigTags.TimeToFreeze);
 		secondarySettingsList.add(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay);
-		secondarySettingsList.add(ConfigTags.VisualizeActions);
 		secondarySettingsList.add(ConfigTags.UseSystemActions);
 		secondarySettingsList.add(ConfigTags.PathToReplaySequence);
 		secondarySettingsList.add(ConfigTags.RefreshSpyCanvas);
-		secondarySettingsList.add(ConfigTags.AlwaysCompile);
 		secondarySettingsList.add(ConfigTags.FlashFeedback);
 		secondarySettingsList.add(ConfigTags.MaxReward);
 		secondarySettingsList.add(ConfigTags.Discount);

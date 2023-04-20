@@ -91,12 +91,28 @@ TagsToFilter = Title
 ProcessesToKillDuringTest =
 
 #################################################################
-# Protocolclass
+# SUT Protocol
 #
-# Indicate the location of the protocol class for your specific SUT.
+# ProtocolClass: Indicate the location of the protocol class for your specific SUT
+# AlwaysCompile: Compile the protocol before launching the selected TESTAR mode
 #################################################################
 
 ProtocolClass = 01_desktop_calculator/Protocol_01_desktop_calculator
+AlwaysCompile = true
+
+#################################################################
+# Time configurations
+#
+# ActionDuration: Sets the speed, in seconds, at which a GUI action is performed
+# TimeToWaitAfterAction: Sets the delay, in seconds, between UI actions during a test
+# StartupTime: Sets how many seconds to wait for the SUT to be ready for testing
+# MaxTime: Sets a time, in seconds, after which the test run is finished (e.g. stop after an hour)
+#################################################################
+
+ActionDuration = 0.0
+TimeToWaitAfterAction = 0.3
+StartupTime = 10.0
+MaxTime = 3.1536E7
 
 #################################################################
 # State identifier attributes
@@ -116,6 +132,24 @@ ProtocolSpecificSetting_4 =
 ProtocolSpecificSetting_5 = 
 
 #################################################################
+# Sets whether to display TESTAR dialog. If false is used, then TESTAR will run in the mode of the Mode property
+#################################################################
+
+ShowVisualSettingsDialogOnStartup = true
+
+#################################################################
+# Sets whether to keep the SUTs GUI active in the screen (e.g. when its minimised or when a process is started and its UI is in front, etc.)
+#################################################################
+
+ForceForeground = true
+
+#################################################################
+# Sets whether to display overlay information, inside the SPY mode, for all the UI actions derived from the test set up
+#################################################################
+
+VisualizeActions = false
+
+#################################################################
 # Other more advanced settings
 #################################################################
 
@@ -123,21 +157,14 @@ OutputDir = ./output
 PathToReplaySequence = ./output/temp
 TempDir = ./output/temp
 UseRecordedActionDurationAndWaitTimeDuringReplay = false
-ForceForeground = true
 LogLevel = 1
 FaultThreshold = 0.000000001
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
-ActionDuration = 0.0
-ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
-MaxTime = 3.1536E7
-TimeToWaitAfterAction = 0.3
-StartupTime = 10.0
 TimeToFreeze = 30.0
 StopGenerationOnFault = true
 CopyFromTo =
-VisualizeActions = false
 MaxReward = 9999999
 Discount = .95

@@ -221,7 +221,7 @@ public final class ConfigTags {
 			"Sets whether to display TESTAR dialog. If false is used, then TESTAR will run in the mode of the Mode property");
 
 	public static final Tag<Boolean> ForceForeground = Tag.from("ForceForeground", Boolean.class, 
-			"Sets whether to keep the SUT’s GUI active in the screen (e.g. when its minimised or when a process is started and its UI is in front, etc.)");
+			"Sets whether to keep the SUTs GUI active in the screen (e.g. when its minimised or when a process is started and its UI is in front, etc.)");
 
 	public static final Tag<Integer> LogLevel = Tag.from("LogLevel", Integer.class, 
 			"Sets the logging level to critical messages (0), information messages (1) or debug messages (2)");
