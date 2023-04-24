@@ -165,5 +165,4 @@ public final class ConfigTags
   */
 
   public static final Tag<String> StrategyFile = Tag.from("StrategyFile", String.class);
-  public static final Tag<Boolean> UseSingleFill = Tag.from("UseSingleFill", Boolean.class);
 }

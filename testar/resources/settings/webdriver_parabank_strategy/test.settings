@@ -173,7 +173,6 @@ ProtocolSpecificSetting_5 =
 #################################################################
 
 StrategyFile = settings/webdriver_generic_strategy/human_strategy.txt
-UseSingleFill = false
 
 #################################################################
 # Other more advanced settings

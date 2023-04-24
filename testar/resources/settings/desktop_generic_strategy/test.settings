@@ -121,7 +121,7 @@ ProtocolSpecificSetting_5 =
 #################################################################
 
 StrategyFile = settings/desktop_generic_strategy/test_strategy.txt
-UseSingleFill = false
+
 #################################################################
 # Other more advanced settings
 #################################################################

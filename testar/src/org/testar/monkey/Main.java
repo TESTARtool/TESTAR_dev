@@ -595,8 +595,7 @@ public class Main {
 			defaults.add(Pair.from(FollowLinks, true));
 			defaults.add(Pair.from(BrowserFullScreen, true));
 			defaults.add(Pair.from(SwitchNewTabs, true));
-			defaults.add(Pair.from(StrategyFile, "main_strategy.txt"));
-			defaults.add(Pair.from(UseSingleFill, false));
+			defaults.add(Pair.from(StrategyFile, ""));
 			
 			/*
 			//TODO web driver settings for login feature

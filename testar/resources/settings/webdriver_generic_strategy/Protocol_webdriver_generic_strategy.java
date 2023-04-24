@@ -69,7 +69,8 @@
     private boolean useRandom = false;
     private Map<String, Integer>    actionsExecuted      = new HashMap<String, Integer>();
     private Map<String, Integer>    debugActionsExecuted      = new HashMap<String, Integer>();
-    private long startTimestamp, start_epoch, end_epoch;
+    private long startTimestamp;
+    private double start_epoch, end_epoch;
     private int numFieldsFilled;
 
     @Override
@@ -88,8 +89,8 @@
     protected void beginSequence(SUT system, State state)
     {
         super.beginSequence(system, state);
-        state.set(Tags.PreviousAction, null);
-        state.set(Tags.PreviousActionID, null);
+        state.remove(Tags.PreviousAction);
+        state.remove(Tags.PreviousActionID);
         startTimestamp = System.currentTimeMillis();
     }
     
@@ -373,9 +374,9 @@
                         numFieldsFilled++;
 
                     if(splitWebTextContent[0].equalsIgnoreCase("begin_epoch"))
-                        start_epoch = Long.parseLong(splitWebTextContent[1]);
+                        start_epoch = Double.parseDouble(splitWebTextContent[1]);
                     else if(splitWebTextContent[0].equalsIgnoreCase("end_epoch"))
-                        end_epoch = Long.parseLong(splitWebTextContent[1]);
+                        end_epoch = Double.parseDouble(splitWebTextContent[1]);
 
                     myWriter.write(webTextContent);
                     myWriter.write(System.getProperty("line.separator"));
@@ -408,7 +409,7 @@
     {
         try
         {
-            File logFile = new File(Main.outputDir + File.separator + outerLoopName + File.separator +
+            File logFile = new File(Main.outputDir + File.separator +
                     settings.get(ConfigTags.ApplicationName,"application") + "_"+ settings.get(ConfigTags.ApplicationVersion,"1") + ".csv");
             FileWriter myWriter = new FileWriter(logFile, true);
 
@@ -417,16 +418,16 @@
             if(logFile.length() == 0) //file empty or nonexistent
             {
                 myWriter.write("URL");
-                myWriter.write(delimiter + "form length and field types");
+                myWriter.write(delimiter + "application name");
+                myWriter.write(delimiter + "application version");
                 myWriter.write(delimiter + "strategy");
                 myWriter.write(delimiter + "start datetime");
                 myWriter.write(delimiter + "timestamp TESTAR start");
                 myWriter.write(delimiter + "timestamp TESTAR end");
                 myWriter.write(delimiter + "timestamp server start");
                 myWriter.write(delimiter + "timestamp server end");
-                myWriter.write(delimiter + "total time in msec");
                 myWriter.write(delimiter + "number of fields");
-                myWriter.write(delimiter + "minimum actions needed");
+                myWriter.write(delimiter + "action limit");
                 myWriter.write(delimiter + "actions executed");
                 myWriter.write(delimiter + "number of fields filled");
                 myWriter.write(delimiter + "submit");
@@ -434,20 +435,23 @@
             }
 
             String fieldCodes = FilenameUtils.getBaseName(new URL(WdDriver.getCurrentUrl()).getPath()); //get the last part of the url, only works for one form
+            String strategy = (useRandom) ? "Random" : "Human strategy";
             int numFields = fieldCodes.length() / 3; //length should be a multiple of 3
-//            int actionCount = actionsExecuted.values().stream().mapToInt(Integer::intValue).sum();
+//            int numActions = actionsExecuted.values().stream().mapToInt(Integer::intValue).sum();
             String submitSuccess = (DefaultProtocol.lastExecutedAction.get(Tags.OriginWidget).get(WdTags.WebType, "").equalsIgnoreCase("submit")) ? "yes" : "no";
 
 
             myWriter.write(WdDriver.getCurrentUrl());
             myWriter.write(delimiter + settings.get(ConfigTags.ApplicationName,"application"));
             myWriter.write(delimiter + settings.get(ConfigTags.ApplicationVersion,"1"));
+            myWriter.write(delimiter + strategy);
             myWriter.write(delimiter + OutputStructure.startInnerLoopDateString);
             myWriter.write(delimiter + startTimestamp);
             myWriter.write(delimiter + DefaultProtocol.lastExecutedAction.get(Tags.TimeStamp, null));
             myWriter.write(delimiter + start_epoch);
             myWriter.write(delimiter + end_epoch);
             myWriter.write(delimiter + numFields);
+            myWriter.write(delimiter + settings.get(ConfigTags.SequenceLength));
             myWriter.write(delimiter + (actionCount-1));
             myWriter.write(delimiter + (numFieldsFilled-5)); //minus formstring, begin_epoch, end_epoch, delta_epoch, datetime
             myWriter.write(delimiter + submitSuccess);
@@ -517,7 +521,6 @@
     			myWriter.write(line);
     			myWriter.write(System.getProperty( "line.separator" ));
     		}
-
     		myWriter.close();
     	}
     	catch (IOException e)

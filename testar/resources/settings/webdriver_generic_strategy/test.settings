@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://webformsut.testar.org/forms/da1timcb0wee/urlnf1usrpas"
+SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://webformsut.testar.org/forms/da1timcb0weeurlnf1usrpas"
 
 #################################################################
 # Sequences
@@ -171,7 +171,6 @@ ProtocolSpecificSetting_5 =
 #################################################################
 
 StrategyFile = settings/webdriver_generic_strategy/human_strategy.txt
-UseSingleFill = false
 
 #################################################################
 # Other more advanced settings
