@@ -48,7 +48,7 @@ import java.util.Set;
  *
  * It uses random action selection algorithm.
  */
-public class Protocol_01_desktop_calculator extends DesktopProtocol {
+public class Protocol_01_desktop_generic_pure_random extends DesktopProtocol {
 
 	/**
 	 * Called once during the life time of TESTAR

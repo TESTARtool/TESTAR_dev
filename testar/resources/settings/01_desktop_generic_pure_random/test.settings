@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = java -jar suts/Calculator.jar
+SUTConnectorValue = c:\\windows\\system32\\notepad.exe
 
 #################################################################
 # Sequences
@@ -97,7 +97,7 @@ ProcessesToKillDuringTest =
 # AlwaysCompile: Compile the protocol before launching the selected TESTAR mode
 #################################################################
 
-ProtocolClass = 01_desktop_calculator/Protocol_01_desktop_calculator
+ProtocolClass = 01_desktop_generic_pure_random/Protocol_01_desktop_generic_pure_random
 AlwaysCompile = true
 
 #################################################################
