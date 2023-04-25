@@ -28,12 +28,9 @@
  *
  */
 
+import org.testar.RandomActionSelector;
 import org.testar.managers.InputDataManager;
-import org.testar.monkey.ConfigTags;
-import org.testar.monkey.DefaultProtocol;
-import org.testar.monkey.Main;
-import org.testar.monkey.Settings;
-import org.testar.monkey.Util;
+import org.testar.monkey.*;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
@@ -54,13 +51,7 @@ import parsing.ParseUtil;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.testar.OutputStructure.outerLoopName;
 import static org.testar.monkey.alayer.Tags.Blocked;
@@ -69,6 +60,8 @@ import static org.testar.monkey.alayer.Tags.Enabled;
 public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 {
 	private ParseUtil               parseUtil;
+	private RandomActionSelector    selector;
+	private boolean useRandom = false;
 	private Map<String, Integer>    actionsExecuted      = new HashMap<String, Integer>();
 	private Map<String, Integer>    debugActionsExecuted      = new HashMap<String, Integer>();
 
@@ -76,7 +69,21 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 	protected void initialize(Settings settings)
 	{
 		super.initialize(settings);
-		parseUtil = new ParseUtil(settings.get(ConfigTags.StrategyFile));
+
+		useRandom = (settings.get(ConfigTags.StrategyFile).equals("")) ? true : false;
+		if (useRandom)
+			selector = new RandomActionSelector();
+		else
+			parseUtil = new ParseUtil(settings.get(ConfigTags.StrategyFile));
+	}
+
+	@Override
+	protected void beginSequence(SUT system, State state)
+	{
+		super.beginSequence(system, state);
+		state.remove(Tags.PreviousAction);
+		state.remove(Tags.PreviousActionID);
+		startTimestamp = System.currentTimeMillis();
 	}
 
 	@Override
@@ -352,8 +359,9 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 			state.set(Tags.PreviousAction, DefaultProtocol.lastExecutedAction);
 			state.set(Tags.PreviousActionID, DefaultProtocol.lastExecutedAction.get(Tags.AbstractIDCustom, null));
 		}
-
-		Action selectedAction = parseUtil.selectAction(state, actions, actionsExecuted);
+		Action selectedAction = (useRandom) ?
+				selector.selectAction(actions):
+				parseUtil.selectAction(state, actions, actionsExecuted);
 
 		String actionID = selectedAction.get(Tags.AbstractIDCustom);
 		Integer timesUsed = actionsExecuted.getOrDefault(actionID, 0); //get the use count for the action
@@ -508,7 +516,7 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate))
 		{
 			compressOutputRunFolder();
-			//copyOutputToNewFolderUsingIpAddress("N:");
+			copyOutputToNewFolderUsingIpAddress("N:");
 		}
 	}
 }
