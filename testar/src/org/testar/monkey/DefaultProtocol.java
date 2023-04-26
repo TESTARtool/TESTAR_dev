@@ -982,8 +982,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println("DEBUG: Forcing ESC action in preActionSelection : Actions derivation seems to be EMPTY !");
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
 			Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
+			escAction.set(Tags.OriginWidget, state);
 			buildEnvironmentActionIdentifiers(state, escAction);
 			return new HashSet<>(Collections.singletonList(escAction));
+		}
+
+		// If there is an ActivateSystem action
+		// We need to force its selection to move the system to the foreground
+		Action forceForegroungAction = actions.stream().filter(a -> a instanceof ActivateSystem)
+				.findAny().orElse(null);
+		if (forceForegroungAction != null) {
+			System.out.println("DEBUG: Forcing the System to be in the foreground !");
+			return new HashSet<>(Collections.singletonList(forceForegroungAction));
 		}
 
 		return actions;
