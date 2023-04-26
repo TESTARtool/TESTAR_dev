@@ -32,6 +32,7 @@ import org.testar.RandomActionSelector;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.*;
 import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.actions.ActionRoles;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.actions.WdSelectListAction;
@@ -51,30 +52,43 @@ import parsing.ParseUtil;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
+import java.util.Map.Entry;
 
 import static org.testar.OutputStructure.outerLoopName;
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
 
+/**
+ * Existing Parabank forms:
+ * 
+ * 1- OpenAccount: openaccount.htm
+ * 2- Transfer Funds: transfer.htm
+ * 3- Bill Payment Service: billpay.htm
+ * 4- Find Transactions: findtrans.htm
+ * 5- Update Profile: updateprofile.htm
+ * 6- Apply for a Loan: requestloan.htm
+ * 7- Customer Care: contact.htm
+ * 
+ * (filtered) Account Activity: activity.htm
+ */
 public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 {
-	private ParseUtil               parseUtil;
-	private RandomActionSelector    selector;
-	private boolean useRandom = false;
-	private Map<String, Integer>    actionsExecuted      = new HashMap<String, Integer>();
-	private Map<String, Integer>    debugActionsExecuted      = new HashMap<String, Integer>();
+	private ParseUtil parseUtil;
+	private boolean strategyRandom = false;
+	private Widget formFillingWidget = null;
+	private Map<String, Integer> formActionsExecuted = new HashMap<String, Integer>();
+	private Map<String, Integer> formsCompleted = new HashMap<String, Integer>();
 
 	@Override
 	protected void initialize(Settings settings)
 	{
 		super.initialize(settings);
 
-		useRandom = (settings.get(ConfigTags.StrategyFile).equals("")) ? true : false;
-		if (useRandom)
-			selector = new RandomActionSelector();
-		else
-			parseUtil = new ParseUtil(settings.get(ConfigTags.StrategyFile));
+		strategyRandom = (settings.get(ConfigTags.StrategyFile).equals("")) ? true : false;
+		parseUtil = new ParseUtil(settings.get(ConfigTags.StrategyFile));
 	}
 
 	@Override
@@ -83,7 +97,10 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		super.beginSequence(system, state);
 		state.remove(Tags.PreviousAction);
 		state.remove(Tags.PreviousActionID);
-		startTimestamp = System.currentTimeMillis();
+		// Reset the executed form actions and completed forms count before each sequence
+		formActionsExecuted = new HashMap<String, Integer>();
+		formsCompleted = new HashMap<String, Integer>();
+		formsCompleted.computeIfAbsent("total", key -> 0);
 	}
 
 	@Override
@@ -97,18 +114,6 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		WdDriver.executeScript("document.getElementsByName('username')[0].setAttribute('value','john');");
 		WdDriver.executeScript("document.getElementsByName('password')[0].setAttribute('value','demo');");
 		WdDriver.executeScript("document.getElementsByName('login')[0].submit();");
-		Util.pause(1);
-
-		/* 
-		 * Load the form URL we want to test
-		 * 
-		 * https://para.testar.org/parabank/billpay.htm
-		 * https://para.testar.org/parabank/updateprofile.htm
-		 * https://para.testar.org/parabank/contact.htm
-		 */
-		String[] parts = settings.get(ConfigTags.SUTConnectorValue, "").split(" ");
-		String formURL = parts[parts.length - 1].replace("\"", "");
-		WdDriver.getRemoteWebDriver().get(formURL);
 		Util.pause(1);
 
 		return system;
@@ -129,7 +134,51 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 			state.set(Tags.StateChanged, stateChanged);
 		}
 
+		// In the TESTAR state check if we are in form filling mode
+		activateFormFillingMode(state);
+
 		return state;
+	}
+
+	private void activateFormFillingMode(State state)
+	{
+		Widget currentWidgetForm = null;
+		for (Widget widget : state)
+		{
+			if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdFORM))
+			{
+				currentWidgetForm = widget;
+			} 
+		}
+
+		// If the web state contains a form, start a new mode that only focuses on deriving form filling actions.
+		if(currentWidgetForm != null)
+		{
+			formFillingWidget = currentWidgetForm;
+		}
+		else
+		{
+			// If current state does not contains a form, and it was previously in form filling mode
+			// This means that a form was submitted
+			if(formFillingWidget != null)
+			{
+				try
+				{
+					// Increase the existing filled form by 1
+					String urlPath = new URL(WdDriver.getCurrentUrl()).getPath();
+					urlPath = urlPath.substring(urlPath.lastIndexOf('/') + 1);
+					formsCompleted.put(urlPath, formsCompleted.getOrDefault(urlPath, 0) + 1);
+					// Also track the total count of filled forms
+					formsCompleted.put("total", formsCompleted.getOrDefault("total", 0) + 1);
+				}
+				catch(MalformedURLException e)
+				{
+					e.printStackTrace();
+				}
+			}
+			// Finally set as null
+			formFillingWidget = null;
+		}
 	}
 
 	@Override
@@ -146,17 +195,28 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		Set<Action> forcedActions = detectForcedActions(state, ac);
 		if(forcedActions != null && !forcedActions.isEmpty()) return forcedActions;
 
-		// iterate through all widgets
-		for (Widget widget : state)
+		// If the web state contains a formFillingWidget, start a new mode that only focuses on deriving form filling actions.
+		if(formFillingWidget != null)
 		{
-			// If the web state contains a form, start a new mode that only focuses on deriving form filling actions.
-			// We need to ignore activity URL because contains a persistent form that does not disappear. 
-			if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdFORM) && !WdDriver.getCurrentUrl().contains("activity.htm"))
+			// If we found a form, initialize the page htm as 0 value (only if absent)
+			try
 			{
-				Set<Action> formFillingActions = formFillingModeDeriveActions(widget, ac);
-				if(!formFillingActions.isEmpty()) return formFillingActions;
+				String urlPath = new URL(WdDriver.getCurrentUrl()).getPath();
+				urlPath = urlPath.substring(urlPath.lastIndexOf('/') + 1);
+				formsCompleted.computeIfAbsent(urlPath, key -> 0);
+			}
+			catch(MalformedURLException e)
+			{
+				e.printStackTrace();
 			}
 
+			Set<Action> formFillingActions = formFillingModeDeriveActions(formFillingWidget, ac);
+			if(!formFillingActions.isEmpty()) return formFillingActions;
+		}
+
+		// Else, iterate through all widgets
+		for (Widget widget : state)
+		{
 			// only consider enabled and non-tabu widgets
 			if (!widget.get(Enabled, true)) continue;
 
@@ -179,10 +239,11 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 				{
 					// Click on select web items opens the menu but does not allow TESTAR to select an item,
 					// thats why we need a custom action selection
-					if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)) {
+					if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT))
+					{
 						actions.add(randomFromSelectList(widget));
 					}
-					else if (!isLinkDenied(widget) && widget.get(WdTags.WebType, "").equalsIgnoreCase("submit"))
+					else if (!isLinkDenied(widget))
 					{
 						actions.add(ac.leftClickAt(widget));
 					}
@@ -221,10 +282,12 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		{
 			// Click on select web items opens the menu but does not allow TESTAR to select an item,
 			// thats why we need a custom action selection
-			if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)) {
+			if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT))
+			{
 				formFillingActions.add(randomFromSelectList(widget));
 			}
-			else {
+			else
+			{
 				formFillingActions.add(ac.leftClickAt(widget));
 			}
 		}
@@ -310,8 +373,10 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 
 	private String getRandomParabankData(Widget widget)
 	{
-		// The Bill Payment form requires an amount number
-		if(widget.get(WdTags.WebName, "").contains("amount"))
+		// Input widgets that require a correct amount number
+		if(widget.get(WdTags.WebName, "").contains("amount") 
+				|| widget.get(WdTags.WebId, "").contains("amount")
+				|| widget.get(WdTags.WebId, "").contains("downPayment"))
 		{
 			return InputDataManager.getRandomNumberInput();
 		}
@@ -321,6 +386,15 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 				|| widget.get(WdTags.WebName, "").contains("verifyAccount"))
 		{
 			return "12345";
+		}
+		// The Find Transactions page requires specific data for different inputs
+		else if(widget.get(WdTags.WebId, "").contains("criteria.transactionId"))
+		{
+			return "12145";
+		}
+		else if(widget.get(WdTags.WebId, "").contains("Date"))
+		{
+			return "12-11-2022";
 		}
 
 		return InputDataManager.getRandomTextInputData(widget);
@@ -333,16 +407,20 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 	 * @param w
 	 * @return
 	 */
-	private Action randomFromSelectList(Widget w) {
+	private Action randomFromSelectList(Widget w)
+	{
 		int selectLength = 1;
 		String elementName = w.get(WdTags.WebName, "");
 
 		// Get the number of elements of the specific select list item
-		try {
+		try
+		{
 			String query = String.format("document.getElementsByName('%s')[0].length", elementName);
 			Object response = WdDriver.executeScript(query);
 			selectLength = ( response != null ? Integer.parseInt(response.toString()) : 1 );
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			System.out.println("*** ACTION WARNING: problems trying to obtain select list length: " + elementName);
 		}
 
@@ -359,78 +437,34 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 			state.set(Tags.PreviousAction, DefaultProtocol.lastExecutedAction);
 			state.set(Tags.PreviousActionID, DefaultProtocol.lastExecutedAction.get(Tags.AbstractIDCustom, null));
 		}
-		Action selectedAction = (useRandom) ?
-				selector.selectAction(actions):
-				parseUtil.selectAction(state, actions, actionsExecuted);
+
+		// If we are in form filling mode and the strategy is not random,
+		// Use the strategy to fill the form as a human
+		Action selectedAction = (formFillingWidget != null && !strategyRandom) ?
+				parseUtil.selectAction(state, actions, formActionsExecuted):
+					RandomActionSelector.selectAction(actions);
 
 		String actionID = selectedAction.get(Tags.AbstractIDCustom);
-		Integer timesUsed = actionsExecuted.getOrDefault(actionID, 0); //get the use count for the action
-		actionsExecuted.put(actionID, timesUsed + 1); //increase by one
-
-		if(selectedAction.get(Tags.OriginWidget, null) != null) {
-			String widgetPath = selectedAction.get(Tags.OriginWidget).get(Tags.Path).trim();
-			String widgetDesc = selectedAction.get(Tags.OriginWidget).get(Tags.Desc);
-
-			//TODO: debugActionsExecuted is not tracking non-executed actions
-			String identifier = widgetPath + ":" + widgetDesc;
-			Integer timesDescUsed = debugActionsExecuted.getOrDefault(identifier, 0); //get the use count for the action
-			debugActionsExecuted.put(identifier, timesDescUsed + 1); //increase by one
-		}
+		Integer timesUsed = formActionsExecuted.getOrDefault(actionID, 0); //get the use count for the action
+		formActionsExecuted.put(actionID, timesUsed + 1); //increase by one
 
 		return selectedAction;
 	}
 
-	/**
-	 * TESTAR uses this method to determine when to stop the generation of actions for the
-	 * current sequence. You can stop deriving more actions after:
-	 * - a specified amount of executed actions, which is specified through the SequenceLength setting, or
-	 * - after a specific time, that is set in the MaxTime setting
-	 * @return  if <code>true</code> continue generation, else stop
-	 */
 	@Override
-	protected boolean moreActions(State state)
+	protected boolean executeAction(SUT system, State state, Action action)
 	{
-		for(Widget widget : state)
+		// If we are in form filling mode and last action was click in a submit button
+		if(formFillingWidget != null 
+				&& action.get(Tags.Role, ActionRoles.Action) == ActionRoles.LeftClickAt
+				&& action.get(Tags.OriginWidget).get(WdTags.WebType, "").equalsIgnoreCase("submit"))
 		{
-			// IF some of the forms was filled properly, stop the testing run
-			if(widget.get(WdTags.WebTextContent, "").equalsIgnoreCase("Bill Payment Complete") 
-					|| widget.get(WdTags.WebTextContent, "").equalsIgnoreCase("Profile Updated")
-					|| widget.get(WdTags.WebTextContent, "").equalsIgnoreCase("A Customer Care Representative will be contacting you."))
-			{
-				logFormValues(state);
-				return false;
-			}
+			// Reset form actions because next time we need to fill completely again
+			formActionsExecuted = new HashMap<String, Integer>();
 		}
-		return super.moreActions(state);
+
+		return super.executeAction(system, state, action);
 	}
-
-	/**
-	 * Print the <li> web elements corresponding to the filled form values
-	 *
-	 * param state
-	 */
-	private void logFormValues(State state)
-	{
-		try
-		{
-			FileWriter myWriter = new FileWriter(Main.outputDir + File.separator + outerLoopName + File.separator +"log_form_values.txt", true);
-
-			myWriter.write("---------- DEBUG FORM ----------");
-			myWriter.write(System.getProperty("line.separator"));
-
-			myWriter.write(WdDriver.getCurrentUrl());
-			myWriter.write(System.getProperty("line.separator"));
-			myWriter.write("No. actions: " + (actionCount-1));
-			myWriter.write(System.getProperty("line.separator"));
-			myWriter.close();
-		}
-		catch (IOException e)
-		{
-			System.out.println("An error occurred.");
-			e.printStackTrace();
-		}
-	}
-
 
 	/**
 	 * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
@@ -441,70 +475,28 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 	protected void postSequenceProcessing()
 	{
 		super.postSequenceProcessing();
-		logActionCount(latestState);
+		logFilledForms();
 	}
 
-	/**
-	 * Print the <li> web elements corresponding to the filled form values
-	 *
-	 * param state
-	 */
-	private void logActionCount(State state)
+	private void logFilledForms()
 	{
 		try
 		{
-			// convert the map entries to a list
-			java.util.List<Map.Entry<String, Integer>> entryList = new ArrayList<>(debugActionsExecuted.entrySet());
+			FileWriter myWriter = new FileWriter(Main.outputDir + File.separator + outerLoopName + File.separator + "log_filled_forms.txt", true);
 
-			// Courtesy of ChatGPT
-			// sort the list by the keys (which are String values)
-			Collections.sort(entryList, new Comparator<Map.Entry<String, Integer>>() {
-				@Override
-				public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
-					String[] parts1 = o1.getKey().split(":");
-					String[] parts2 = o2.getKey().split(":");
+			myWriter.write("---------- SEQUENCES " + sequenceCount() + "----------");
+			myWriter.write(System.getProperty("line.separator"));
 
-					int[] arr1 = getIntArray(parts1[0]);
-					int[] arr2 = getIntArray(parts2[0]);
-
-					for (int i = 0; i < Math.min(arr1.length, arr2.length); i++) {
-						if (arr1[i] != arr2[i]) {
-							return arr1[i] - arr2[i];
-						}
-					}
-
-					if (arr1.length != arr2.length) {
-						return arr1.length - arr2.length;
-					}
-
-					return parts1[1].compareTo(parts2[1]);
-				}
-
-				private int[] getIntArray(String s) {
-					String[] parts = s.replaceAll("\\[|\\]|\\s", "").split(",");
-					int[] result = new int[parts.length];
-					for (int i = 0; i < parts.length; i++) {
-						result[i] = Integer.parseInt(parts[i]);
-					}
-					return result;
-				}
-			});
-
-			FileWriter myWriter = new FileWriter(Main.outputDir + File.separator + outerLoopName + File.separator + "log_form_values.txt", true);
-
-			myWriter.write("---------- Actions Executed ----------");
-			myWriter.write(System.getProperty( "line.separator" ));
-			for (Map.Entry<String, Integer> entry : entryList) {
-				String line = entry.getKey() + " , " + entry.getValue();
-				myWriter.write(line);
-				myWriter.write(System.getProperty( "line.separator" ));
+			for (Entry<String, Integer> forms : formsCompleted.entrySet())
+			{
+				myWriter.write(forms.getKey() + " : " + forms.getValue());
+				myWriter.write(System.getProperty("line.separator"));
 			}
 
 			myWriter.close();
 		}
 		catch (IOException e)
 		{
-			System.out.println("An error occurred.");
 			e.printStackTrace();
 		}
 	}
