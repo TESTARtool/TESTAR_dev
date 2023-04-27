@@ -88,7 +88,7 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		super.initialize(settings);
 
 		strategyRandom = (settings.get(ConfigTags.StrategyFile).equals("")) ? true : false;
-		parseUtil = new ParseUtil(settings.get(ConfigTags.StrategyFile));
+		if(!strategyRandom) parseUtil = new ParseUtil(settings.get(ConfigTags.StrategyFile));
 	}
 
 	@Override
