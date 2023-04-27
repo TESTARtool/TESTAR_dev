@@ -96,6 +96,31 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 	@Override
 	protected SUT startSystem() throws SystemStartException
 	{
+		try {
+			File parabankFolder = new File(Main.settingsDir + File.separator + "webdriver_parabank_strategy");
+
+			// First stop any possible apache parabank instance
+			File parabankStop = new File(parabankFolder + File.separator + "apache_parabank_stop.bat").getCanonicalFile();
+			if(parabankStop.exists()) {
+				Process proc = Runtime.getRuntime().exec("cmd /c " + parabankStop, null, parabankFolder);
+				Util.pause(10); // Wait seconds for apache parabank to stop
+			} else {
+				throw new SystemStartException("parabankStop does not exists");
+			}
+
+			// bat file that downloads and deploy the parabank SUT
+			File parabankStart = new File(parabankFolder + File.separator + "apache_parabank_start.bat").getCanonicalFile();
+			if(parabankStart.exists()) {
+				Process proc = Runtime.getRuntime().exec("cmd /c " + parabankStart, null, parabankFolder);
+				Util.pause(60); // Wait seconds for parabank to be deployed
+			} else {
+				throw new SystemStartException("parabankStart does not exists");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new SystemStartException("ERROR running Apache Parabank");
+		}
+
 		SUT system = super.startSystem();
 
 		/** Perform the login in Start System to work for Spy and Generate mode **/
@@ -613,7 +638,7 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate))
 		{
 			compressOutputRunFolder();
-			copyOutputToNewFolderUsingIpAddress("N:");
+			//copyOutputToNewFolderUsingIpAddress("N:");
 		}
 	}
 
