@@ -166,6 +166,16 @@
                     actions.add(ac.clickAndTypeText(widget, 0.1,0.5, InputDataManager.getRandomDateNumber()));
                     continue;
                 }
+                else if(webType.equalsIgnoreCase("datetime-local"))
+                {
+                    actions.add(ac.clickAndTypeText(widget, 0.1,0.5, InputDataManager.getRandomDateTimeNumber()));
+                    continue;
+                }
+                else if(webType.equalsIgnoreCase("number"))
+                {
+                    actions.add(ac.clickAndTypeText(widget, 0.1, 0.5, InputDataManager.getRandomNumberInput()));
+                    continue;
+                }
                 else if(webType.equalsIgnoreCase("time"))
                 {
                     actions.add(ac.clickAndTypeText(widget, 0.1, 0.5, InputDataManager.getRandomTimeNumber()));
@@ -179,6 +189,11 @@
                 else if(webType.equalsIgnoreCase("checkbox"))
                 {
                     actions.add(ac.leftClickAt(widget));
+                    continue;
+                }
+                else if(webType.equalsIgnoreCase("range"))
+                {
+                    actions.add(ac.leftClickAt(widget, 0.1, 0.5));
                     continue;
                 }
             }
@@ -370,7 +385,10 @@
                     String webTextContent = w.get((WdTags.WebTextContent));
                     String strippedWebTextContent = webTextContent.replaceAll("\\s", ""); //remove all spaces
                     String[] splitWebTextContent = strippedWebTextContent.split("=");
-                    if(splitWebTextContent.length == 2)
+
+                    if(splitWebTextContent[0].toLowerCase().contains("range") && !splitWebTextContent[1].equals("50"))
+                        numFieldsFilled++;
+                    else if(splitWebTextContent.length == 2)
                         numFieldsFilled++;
 
                     if(splitWebTextContent[0].equalsIgnoreCase("begin_epoch"))
@@ -430,6 +448,7 @@
                 myWriter.write(delimiter + "number of fields");
                 myWriter.write(delimiter + "actions executed");
                 myWriter.write(delimiter + "number of fields filled");
+                myWriter.write(delimiter + "maximum actions per field");
                 myWriter.write(delimiter + "submit");
                 myWriter.write(System.getProperty( "line.separator" ));
             }
@@ -454,6 +473,7 @@
             myWriter.write(delimiter + numFields);
             myWriter.write(delimiter + (actionCount-1));
             myWriter.write(delimiter + (numFieldsFilled-5)); //minus formstring, begin_epoch, end_epoch, delta_epoch, datetime
+            myWriter.write(delimiter + Collections.max(actionsExecuted.values()));
             myWriter.write(delimiter + submitSuccess);
             myWriter.write(System.getProperty( "line.separator" ));
 

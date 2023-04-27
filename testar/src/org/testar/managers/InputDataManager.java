@@ -173,12 +173,25 @@ public class InputDataManager {
 	public static String getRandomDateNumber()
 	{
 		List<String> dates = Lists.newArrayList(
-				"22032017",
-				"03222017",
+				"15062017",
+				"11052017",
 				"22032017",
 				"01011900",
 				"12127357",
 				"01011001");
+
+		return dates.get(new Random().nextInt(dates.size()));
+	}
+
+	public static String getRandomDateTimeNumber()
+	{
+		List<String> dates = Lists.newArrayList(
+				"0502299990350",
+				"2604398720909",
+				"1503496390445",
+				"0902925340921",
+				"0403634541806",
+				"2209820210912");
 
 		return dates.get(new Random().nextInt(dates.size()));
 	}
