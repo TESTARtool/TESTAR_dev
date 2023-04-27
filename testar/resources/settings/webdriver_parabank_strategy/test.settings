@@ -27,7 +27,7 @@ Mode = Generate
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://para.testar.org/parabank/billpay.htm"
+SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "http://10.102.0.41:8080/parabank/"
 
 #################################################################
 # Sequences
@@ -35,8 +35,8 @@ SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://para
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 1
-SequenceLength = 20
+Sequences = 30
+SequenceLength = 500
 
 #################################################################
 # Oracles based on suspicious titles
@@ -82,8 +82,8 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
-TagsToFilter = Title;WebName;WebTagName
+ClickFilter = .*admin.htm.*|.*logout.htm.*|.*activity.htm.*
+TagsToFilter = WebHref
 
 #################################################################
 # Processfilter
@@ -102,9 +102,9 @@ SUTProcesses =
 
 ProtocolClass = webdriver_parabank_strategy/Protocol_webdriver_parabank_strategy
 
-#################################################################\n"
+#################################################################
 # State model inference settings
-#################################################################\n"
+#################################################################
 StateModelEnabled = false
 DataStore = OrientDB
 DataStoreType = plocal
@@ -113,7 +113,7 @@ DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = instant
-ApplicationName = parabank_bill
+ApplicationName = parabank
 ApplicationVersion = human_strategy
 ResetDataStore = false
 StateModelStoreWidgets = true
@@ -130,8 +130,8 @@ AbstractStateAttributes = WebWidgetId
 # WebDriver features
 #################################################################
 ClickableClasses = 
-DeniedExtensions = pdf;jpg;png
-DomainsAllowed = www.ou.nl;mijn.awo.ou.nl;login.awo.ou.nl
+DeniedExtensions = pdf;jpg;png;pfx
+DomainsAllowed = 
 FollowLinks = true
 BrowserFullScreen = true
 SwitchNewTabs = true
@@ -196,7 +196,7 @@ ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
-TimeToWaitAfterAction = 0.1
+TimeToWaitAfterAction = 1
 StartupTime = 2.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
