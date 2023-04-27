@@ -94,6 +94,25 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 	}
 
 	@Override
+	protected SUT startSystem() throws SystemStartException
+	{
+		SUT system = super.startSystem();
+
+		/** Perform the login in Start System to work for Spy and Generate mode **/
+
+		// Parabank script login sequence
+		WdDriver.executeScript("document.getElementsByName('username')[0].setAttribute('value','john');");
+		WdDriver.executeScript("document.getElementsByName('password')[0].setAttribute('value','demo');");
+		WdDriver.executeScript("document.getElementsByName('login')[0].submit();");
+		Util.pause(1);
+
+		// Reset formFillingWidget in StartSystem because beginSequence is after getState
+		formFillingWidget = null;
+
+		return system;
+	}
+
+	@Override
 	protected void beginSequence(SUT system, State state)
 	{
 		super.beginSequence(system, state);
@@ -109,22 +128,6 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		// Reset the metrics before each sequence
 		metricsFormsCompleted = new HashMap<String, Metrics>();
 		metricsFormsCompleted.put("total", new Metrics());
-	}
-
-	@Override
-	protected SUT startSystem() throws SystemStartException
-	{
-		SUT system = super.startSystem();
-
-		/** Perform the login in Start System to work for Spy and Generate mode **/
-
-		// Parabank script login sequence
-		WdDriver.executeScript("document.getElementsByName('username')[0].setAttribute('value','john');");
-		WdDriver.executeScript("document.getElementsByName('password')[0].setAttribute('value','demo');");
-		WdDriver.executeScript("document.getElementsByName('login')[0].submit();");
-		Util.pause(1);
-
-		return system;
 	}
 
 	@Override
@@ -513,6 +516,27 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		Integer timesUsed = strategyActionsExecuted.getOrDefault(actionID, 0); //get the use count for the action
 		strategyActionsExecuted.put(actionID, timesUsed + 1); //increase by one
 
+		// If we are in form filling mode, initialize in the metrics the existing input elements
+		if(formFillingWidget != null)
+		{
+			for(Action action : actions)
+			{
+				if(!action.get(Tags.OriginWidget).get(WdTags.WebType, "").equalsIgnoreCase("submit"))
+				{
+					// Update the input count metrics information
+					Widget inputWidget = action.get(Tags.OriginWidget);
+					// Get the web id of the input to identity it
+					String inputId = inputWidget.get(WdTags.WebId, "");
+					// If there is no web id, get the web name
+					// Also, some web elements contain a dynamic web id we can not use to track the form input element
+					// In this case, also use the web name (bill payment -> phone)
+					if(inputId.isEmpty() || inputId.length() > 25) inputId = inputWidget.get(WdTags.WebName, "input");
+					Metrics formMetricsHTM = metricsFormsCompleted.get(getHTM());
+					formMetricsHTM.emptyInputInitialization(inputId);
+				}
+			}
+		}
+
 		return selectedAction;
 	}
 
@@ -530,7 +554,7 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 			// If there is no web id, get the web name
 			// Also, some web elements contain a dynamic web id we can not use to track the form input element
 			// In this case, also use the web name (bill payment -> phone)
-			if(inputId.isEmpty() || inputId.length() > 20) inputId = inputWidget.get(WdTags.WebName, "input");
+			if(inputId.isEmpty() || inputId.length() > 25) inputId = inputWidget.get(WdTags.WebName, "input");
 			Metrics formMetricsHTM = metricsFormsCompleted.get(getHTM());
 			formMetricsHTM.addOrUpdateInputCount(inputId);
 		}
@@ -565,9 +589,7 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		{
 			FileWriter myWriter = new FileWriter(Main.outputDir + File.separator + outerLoopName + File.separator + "log_filled_forms.txt", true);
 
-			myWriter.write("---------- SEQUENCES " + sequenceCount() + "----------");
-			myWriter.write(System.getProperty("line.separator"));
-			myWriter.write("formId : filledFormCount : [{inputId=count, inputId=count, inputId=count, ...}, num_succes_submit, num_unsucces_submit]");
+			myWriter.write("---------- SEQUENCE " + sequenceCount() + "----------");
 			myWriter.write(System.getProperty("line.separator"));
 
 			for (Entry<String, Metrics> forms : metricsFormsCompleted.entrySet())
@@ -659,6 +681,12 @@ class Metrics {
 			formInputCount.put(inputId, 1);
 		} else {
 			formInputCount.put(inputId, formInputCount.get(inputId) + 1);
+		}
+	}
+
+	public void emptyInputInitialization(String inputId) {
+		if(!formInputCount.containsKey(inputId)) {
+			formInputCount.put(inputId, 0);
 		}
 	}
 }
