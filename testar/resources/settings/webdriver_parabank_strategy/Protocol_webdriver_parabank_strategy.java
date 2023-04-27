@@ -83,7 +83,6 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		super.beginSequence(system, state);
 		state.remove(Tags.PreviousAction);
 		state.remove(Tags.PreviousActionID);
-		startTimestamp = System.currentTimeMillis();
 	}
 
 	@Override

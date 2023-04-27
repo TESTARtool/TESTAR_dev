@@ -69,8 +69,8 @@
     private boolean useRandom = false;
     private Map<String, Integer>    actionsExecuted      = new HashMap<String, Integer>();
     private Map<String, Integer>    debugActionsExecuted      = new HashMap<String, Integer>();
-    private long startTimestamp;
-    private double start_epoch, end_epoch;
+    private String startTimestamp;
+    private String start_epoch, end_epoch;
     private int numFieldsFilled;
 
     @Override
@@ -91,7 +91,7 @@
         super.beginSequence(system, state);
         state.remove(Tags.PreviousAction);
         state.remove(Tags.PreviousActionID);
-        startTimestamp = System.currentTimeMillis();
+        startTimestamp = Long.toString(System.currentTimeMillis());
     }
     
     @Override
@@ -374,9 +374,9 @@
                         numFieldsFilled++;
 
                     if(splitWebTextContent[0].equalsIgnoreCase("begin_epoch"))
-                        start_epoch = Double.parseDouble(splitWebTextContent[1]);
+                        start_epoch = splitWebTextContent[1];
                     else if(splitWebTextContent[0].equalsIgnoreCase("end_epoch"))
-                        end_epoch = Double.parseDouble(splitWebTextContent[1]);
+                        end_epoch = splitWebTextContent[1];
 
                     myWriter.write(webTextContent);
                     myWriter.write(System.getProperty("line.separator"));
@@ -426,8 +426,8 @@
                 myWriter.write(delimiter + "timestamp TESTAR end");
                 myWriter.write(delimiter + "timestamp server start");
                 myWriter.write(delimiter + "timestamp server end");
-                myWriter.write(delimiter + "number of fields");
                 myWriter.write(delimiter + "action limit");
+                myWriter.write(delimiter + "number of fields");
                 myWriter.write(delimiter + "actions executed");
                 myWriter.write(delimiter + "number of fields filled");
                 myWriter.write(delimiter + "submit");
@@ -450,8 +450,8 @@
             myWriter.write(delimiter + DefaultProtocol.lastExecutedAction.get(Tags.TimeStamp, null));
             myWriter.write(delimiter + start_epoch);
             myWriter.write(delimiter + end_epoch);
-            myWriter.write(delimiter + numFields);
             myWriter.write(delimiter + settings.get(ConfigTags.SequenceLength));
+            myWriter.write(delimiter + numFields);
             myWriter.write(delimiter + (actionCount-1));
             myWriter.write(delimiter + (numFieldsFilled-5)); //minus formstring, begin_epoch, end_epoch, delta_epoch, datetime
             myWriter.write(delimiter + submitSuccess);
