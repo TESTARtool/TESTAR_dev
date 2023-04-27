@@ -72,8 +72,6 @@ import static org.testar.monkey.alayer.Tags.Enabled;
  * 6- Apply for a Loan: requestloan.htm
  * 7- Customer Care: contact.htm
  * 
- * form.htm: 1 : [[n_fill_field1, n_fill_field2, n_fill_field3], num_succes_submit, num_unsucces_submit]
- * 
  * (filtered) Account Activity: activity.htm
  */
 public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
@@ -81,8 +79,10 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 	private ParseUtil parseUtil;
 	private boolean strategyRandom = false;
 	private Widget formFillingWidget = null;
-	private Map<String, Integer> formActionsExecuted = new HashMap<String, Integer>();
-	private Map<String, Integer> formsCompleted = new HashMap<String, Integer>();
+	private Map<String, Integer> strategyActionsExecuted = new HashMap<String, Integer>();
+
+	// form.htm , 1 : [[n_fill_field1, n_fill_field2, n_fill_field3], num_succes_submit, num_unsucces_submit]
+	private Map<String, Metrics> metricsFormsCompleted = new HashMap<String, Metrics>();
 
 	@Override
 	protected void initialize(Settings settings)
@@ -99,10 +99,16 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		super.beginSequence(system, state);
 		state.remove(Tags.PreviousAction);
 		state.remove(Tags.PreviousActionID);
-		// Reset the executed form actions and completed forms count before each sequence
-		formActionsExecuted = new HashMap<String, Integer>();
-		formsCompleted = new HashMap<String, Integer>();
-		formsCompleted.computeIfAbsent("total", key -> 0);
+
+		// Reset the strategy calculation before each sequence
+		strategyActionsExecuted = new HashMap<String, Integer>();
+
+		// Reset the last executed action track
+		lastExecutedAction = null;
+
+		// Reset the metrics before each sequence
+		metricsFormsCompleted = new HashMap<String, Metrics>();
+		metricsFormsCompleted.put("total", new Metrics());
 	}
 
 	@Override
@@ -137,13 +143,6 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		}
 
 		// In the TESTAR state check if we are in form filling mode
-		activateFormFillingMode(state);
-
-		return state;
-	}
-
-	private void activateFormFillingMode(State state)
-	{
 		Widget currentWidgetForm = null;
 		for (Widget widget : state)
 		{
@@ -152,11 +151,30 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 				currentWidgetForm = widget;
 			} 
 		}
+		formFillingModeChecking(state, currentWidgetForm);
 
+		return state;
+	}
+
+	private void formFillingModeChecking(State state, Widget currentWidgetForm)
+	{
 		// If the web state contains a form, start a new mode that only focuses on deriving form filling actions.
 		if(currentWidgetForm != null)
 		{
 			formFillingWidget = currentWidgetForm;
+
+			// If last action was a submit click, but we still are in a form filling mode
+			// This means that we unsuccessfully clicked submit
+			// Example: Bill Pay clicking submit without filling all inputs
+			if(lastExecutedAction != null 
+					&& lastExecutedAction.get(Tags.OriginWidget) != null
+					&& lastExecutedAction.get(Tags.Role, ActionRoles.Action) == ActionRoles.LeftClickAt
+					&& lastExecutedAction.get(Tags.OriginWidget).get(WdTags.WebType, "").equalsIgnoreCase("submit"))
+			{
+				Metrics formMetrics = metricsFormsCompleted.get(getHTM());
+				formMetrics.increaseUnsuccess();
+			}
+
 		}
 		else
 		{
@@ -164,23 +182,36 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 			// This means that a form was submitted
 			if(formFillingWidget != null)
 			{
-				try
+				// Increase the filled form by 1
+				Metrics formMetrics = metricsFormsCompleted.get(getHTM());
+				if(formMetrics != null)
 				{
-					// Increase the existing filled form by 1
-					String urlPath = new URL(WdDriver.getCurrentUrl()).getPath();
-					urlPath = urlPath.substring(urlPath.lastIndexOf('/') + 1);
-					formsCompleted.put(urlPath, formsCompleted.getOrDefault(urlPath, 0) + 1);
-					// Also track the total count of filled forms
-					formsCompleted.put("total", formsCompleted.getOrDefault("total", 0) + 1);
+					formMetrics.increaseCount();
 				}
-				catch(MalformedURLException e)
-				{
-					e.printStackTrace();
+				// Check if submitted success by reading Error message in the state
+				if(checkSuccessForm(state)) {
+					formMetrics.increaseSuccess();
+				} else {
+					formMetrics.increaseUnsuccess();
 				}
+
+				// Also track the total count of filled forms
+				metricsFormsCompleted.get("total").increaseCount();
 			}
 			// Finally set as null
 			formFillingWidget = null;
 		}
+	}
+
+	private boolean checkSuccessForm(State state) {
+		for (Widget widget : state)
+		{
+			if(widget.get(WdTags.WebTextContent, "").contains("Error"))
+			{
+				return false;
+			} 
+		}
+		return true;
 	}
 
 	@Override
@@ -201,15 +232,10 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		if(formFillingWidget != null)
 		{
 			// If we found a form, initialize the page htm as 0 value (only if absent)
-			try
+			Metrics formMetrics = metricsFormsCompleted.get(getHTM());
+			if(formMetrics == null)
 			{
-				String urlPath = new URL(WdDriver.getCurrentUrl()).getPath();
-				urlPath = urlPath.substring(urlPath.lastIndexOf('/') + 1);
-				formsCompleted.computeIfAbsent(urlPath, key -> 0);
-			}
-			catch(MalformedURLException e)
-			{
-				e.printStackTrace();
+				metricsFormsCompleted.put(getHTM(), new Metrics());
 			}
 
 			Set<Action> formFillingActions = formFillingModeDeriveActions(formFillingWidget, ac);
@@ -428,7 +454,7 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 	private Action randomFromSelectList(Widget w)
 	{
 		int selectLength = 1;
-		
+
 		String elementId = w.get(WdTags.WebId, "");
 		if(!elementId.isEmpty())
 		{
@@ -446,7 +472,7 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 
 			return new WdSelectListAction(elementId, "", Integer.toString(selectLength-1), w);
 		}
-		
+
 		String elementName = w.get(WdTags.WebName, "");
 		if(!elementName.isEmpty())
 		{
@@ -480,12 +506,12 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		// If we are in form filling mode and the strategy is not random,
 		// Use the strategy to fill the form as a human
 		Action selectedAction = (formFillingWidget != null && !strategyRandom) ?
-				parseUtil.selectAction(state, actions, formActionsExecuted):
+				parseUtil.selectAction(state, actions, strategyActionsExecuted):
 					RandomActionSelector.selectAction(actions);
 
 		String actionID = selectedAction.get(Tags.AbstractIDCustom);
-		Integer timesUsed = formActionsExecuted.getOrDefault(actionID, 0); //get the use count for the action
-		formActionsExecuted.put(actionID, timesUsed + 1); //increase by one
+		Integer timesUsed = strategyActionsExecuted.getOrDefault(actionID, 0); //get the use count for the action
+		strategyActionsExecuted.put(actionID, timesUsed + 1); //increase by one
 
 		return selectedAction;
 	}
@@ -493,13 +519,29 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action)
 	{
+		// If we are in form filling mode and we executed an action that is not submit
+		if(formFillingWidget != null
+				&& !action.get(Tags.OriginWidget).get(WdTags.WebType, "").equalsIgnoreCase("submit"))
+		{
+			// Update the input count metrics information
+			Widget inputWidget = action.get(Tags.OriginWidget);
+			// Get the web id of the input to identity it
+			String inputId = inputWidget.get(WdTags.WebId, "");
+			// If there is no web id, get the web name
+			// Also, some web elements contain a dynamic web id we can not use to track the form input element
+			// In this case, also use the web name (bill payment -> phone)
+			if(inputId.isEmpty() || inputId.length() > 20) inputId = inputWidget.get(WdTags.WebName, "input");
+			Metrics formMetricsHTM = metricsFormsCompleted.get(getHTM());
+			formMetricsHTM.addOrUpdateInputCount(inputId);
+		}
+
 		// If we are in form filling mode and last action was click in a submit button
 		if(formFillingWidget != null 
 				&& action.get(Tags.Role, ActionRoles.Action) == ActionRoles.LeftClickAt
 				&& action.get(Tags.OriginWidget).get(WdTags.WebType, "").equalsIgnoreCase("submit"))
 		{
 			// Reset form actions because next time we need to fill completely again
-			formActionsExecuted = new HashMap<String, Integer>();
+			strategyActionsExecuted = new HashMap<String, Integer>();
 		}
 
 		return super.executeAction(system, state, action);
@@ -525,10 +567,12 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 
 			myWriter.write("---------- SEQUENCES " + sequenceCount() + "----------");
 			myWriter.write(System.getProperty("line.separator"));
+			myWriter.write("formId : filledFormCount : [{inputId=count, inputId=count, inputId=count, ...}, num_succes_submit, num_unsucces_submit]");
+			myWriter.write(System.getProperty("line.separator"));
 
-			for (Entry<String, Integer> forms : formsCompleted.entrySet())
+			for (Entry<String, Metrics> forms : metricsFormsCompleted.entrySet())
 			{
-				myWriter.write(forms.getKey() + " : " + forms.getValue());
+				myWriter.write(forms.getKey() + " : " + forms.getValue().getFormCount() + " : " + Arrays.toString(forms.getValue().getFormActions()));
 				myWriter.write(System.getProperty("line.separator"));
 			}
 
@@ -548,6 +592,73 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		{
 			compressOutputRunFolder();
 			copyOutputToNewFolderUsingIpAddress("N:");
+		}
+	}
+
+	private String getHTM() {
+		String formHTM = "failed";
+		try {
+			formHTM = new URL(WdDriver.getCurrentUrl()).getPath();
+			formHTM = formHTM.substring(formHTM.lastIndexOf('/') + 1);
+		}
+		catch(MalformedURLException e)
+		{
+			e.printStackTrace();
+		}
+		return formHTM;
+	}
+}
+
+class Metrics {
+	private Integer formCount;
+	// [{n_fill_field1, n_fill_field2, n_fill_field3}, num_succes_submit, num_unsucces_submit]
+	private Object[] formActions;
+	// {inputId=n_fill, inputId=n_fill, inputId=n_fill}
+	private Map<String, Integer> formInputCount = new HashMap<>();
+
+	public Metrics() {
+		this.formCount = 0;
+		this.formActions = new Object[3];
+		this.formActions[0] = formInputCount;
+		this.formActions[1] = 0;
+		this.formActions[2] = 0;
+	}
+
+	public void increaseCount() {
+		this.formCount ++;
+	}
+
+	public Integer getFormCount() {
+		return formCount;
+	}
+
+	public void increaseSuccess() {
+		int value = (int) formActions[1];
+		formActions[1] = value + 1;
+	}
+
+	public void increaseUnsuccess() {
+		int value = (int) formActions[2];
+		formActions[2] = value + 1;
+	}
+
+	public Object[] getFormActions() {
+		return formActions;
+	}
+
+	public void setFormActions(Object[] formActions) {
+		this.formActions = formActions;
+	}
+
+	public Map<String, Integer> getInputs() {
+		return formInputCount;
+	}
+
+	public void addOrUpdateInputCount(String inputId) {
+		if(!formInputCount.containsKey(inputId)) {
+			formInputCount.put(inputId, 1);
+		} else {
+			formInputCount.put(inputId, formInputCount.get(inputId) + 1);
 		}
 	}
 }
