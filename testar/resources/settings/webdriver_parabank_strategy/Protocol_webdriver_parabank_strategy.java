@@ -72,6 +72,8 @@ import static org.testar.monkey.alayer.Tags.Enabled;
  * 6- Apply for a Loan: requestloan.htm
  * 7- Customer Care: contact.htm
  * 
+ * form.htm: 1 : [[n_fill_field1, n_fill_field2, n_fill_field3], num_succes_submit, num_unsucces_submit]
+ * 
  * (filtered) Account Activity: activity.htm
  */
 public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
@@ -396,8 +398,24 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		{
 			return "12-11-2022";
 		}
+		// Customer Care: contact.htm
+		else if(isSonOfContactForm(widget))
+		{
+			return InputDataManager.getRandomAlphabeticInput(10);
+		}
 
 		return InputDataManager.getRandomTextInputData(widget);
+	}
+
+	private boolean isSonOfContactForm(Widget widget)
+	{
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(Tags.Role, Roles.Widget).equals(WdRoles.WdFORM) 
+				&& widget.parent().get(WdTags.WebName, "").equals("contact"))
+		{
+			return true;
+		}
+		else return isSonOfContactForm(widget.parent());
 	}
 
 
@@ -410,23 +428,44 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 	private Action randomFromSelectList(Widget w)
 	{
 		int selectLength = 1;
+		
+		String elementId = w.get(WdTags.WebId, "");
+		if(!elementId.isEmpty())
+		{
+			// Get the number of elements of the specific select list item
+			try
+			{
+				String query = String.format("return document.getElementById('%s').length", elementId);
+				Object response = WdDriver.executeScript(query);
+				selectLength = ( response != null ? Integer.parseInt(response.toString()) : 1 );
+			}
+			catch (Exception e)
+			{
+				System.out.println("*** ACTION WARNING: problems trying to obtain select list length: " + elementId);
+			}
+
+			return new WdSelectListAction(elementId, "", Integer.toString(selectLength-1), w);
+		}
+		
 		String elementName = w.get(WdTags.WebName, "");
-
-		// Get the number of elements of the specific select list item
-		try
+		if(!elementName.isEmpty())
 		{
-			String query = String.format("document.getElementsByName('%s')[0].length", elementName);
-			Object response = WdDriver.executeScript(query);
-			selectLength = ( response != null ? Integer.parseInt(response.toString()) : 1 );
-		}
-		catch (Exception e)
-		{
-			System.out.println("*** ACTION WARNING: problems trying to obtain select list length: " + elementName);
+			// Get the number of elements of the specific select list item
+			try
+			{
+				String query = String.format("return document.getElementsByName('%s')[0].length", elementName);
+				Object response = WdDriver.executeScript(query);
+				selectLength = ( response != null ? Integer.parseInt(response.toString()) : 1 );
+			}
+			catch (Exception e)
+			{
+				System.out.println("*** ACTION WARNING: problems trying to obtain select list length: " + elementName);
+			}
+
+			return new WdSelectListAction("", elementName, Integer.toString(selectLength-1), w);
 		}
 
-		Action selectAction = new WdSelectListAction("", elementName, Integer.toString(selectLength-1), w);
-
-		return selectAction;
+		return new AnnotatingActionCompiler().leftClickAt(w);
 	}
 
 	@Override
