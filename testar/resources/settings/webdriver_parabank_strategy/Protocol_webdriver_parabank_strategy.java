@@ -28,6 +28,7 @@
  *
  */
 
+import org.testar.CodingManager;
 import org.testar.RandomActionSelector;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.*;
@@ -85,6 +86,27 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 	// form.htm , 1 : [[n_fill_field1, n_fill_field2, n_fill_field3], num_succes_submit, num_unsucces_submit]
 	private Map<String, Metrics> metricsFormsCompleted = new HashMap<String, Metrics>();
 
+	@Override
+	protected void buildStateActionsIdentifiers(State state, Set<Action> actions) {
+		CodingManager.buildIDs(state, actions);
+		for(Action action : actions) {
+			if(action.get(Tags.OriginWidget) != null) {
+
+				Widget widget = action.get(Tags.OriginWidget);
+
+				String collisionId = CodingManager.lowCollisionID(state.get(Tags.AbstractIDCustom)
+						+ widget.get(Tags.AbstractIDCustom)
+						+ action.get(Tags.Role));
+
+				String actionAbstractId = CodingManager.ID_PREFIX_ACTION 
+						+ CodingManager.ID_PREFIX_ABSTRACT_CUSTOM 
+						+ collisionId;
+
+				action.set(Tags.AbstractIDCustom, actionAbstractId);
+			}
+		}
+	}
+	
 	@Override
 	protected void initialize(Settings settings)
 	{
@@ -356,6 +378,7 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		{
 			Action pageDown = ac.hitKey(KBKeys.VK_PAGE_DOWN);
 			formWidget.set(WdTags.WebId, getHTM()+".page.down"); // Ex: findtrans.htm.page.down
+			pageDown.set(Tags.Role, ActionRoles.HitKeyScrollDownAction);
 			pageDown.set(Tags.OriginWidget, formWidget);
 			formFillingActions.add(pageDown);
 		}
@@ -527,13 +550,14 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 				String query = String.format("return document.getElementById('%s').length", elementId);
 				Object response = WdDriver.executeScript(query);
 				selectLength = ( response != null ? Integer.parseInt(response.toString()) : 1 );
+				selectLength = new Random().nextInt(selectLength);
 			}
 			catch (Exception e)
 			{
 				System.out.println("*** ACTION WARNING: problems trying to obtain select list length: " + elementId);
 			}
 
-			return new WdSelectListAction(elementId, "", Integer.toString(selectLength-1), w);
+			return new WdSelectListAction(elementId, "", Integer.toString(selectLength), w);
 		}
 
 		String elementName = w.get(WdTags.WebName, "");
@@ -545,13 +569,14 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 				String query = String.format("return document.getElementsByName('%s')[0].length", elementName);
 				Object response = WdDriver.executeScript(query);
 				selectLength = ( response != null ? Integer.parseInt(response.toString()) : 1 );
+				selectLength = new Random().nextInt(selectLength);
 			}
 			catch (Exception e)
 			{
 				System.out.println("*** ACTION WARNING: problems trying to obtain select list length: " + elementName);
 			}
 
-			return new WdSelectListAction("", elementName, Integer.toString(selectLength-1), w);
+			return new WdSelectListAction("", elementName, Integer.toString(selectLength), w);
 		}
 
 		return new AnnotatingActionCompiler().leftClickAt(w);
