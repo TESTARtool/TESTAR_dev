@@ -772,7 +772,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * used to save data of TESTAR experiments.
      *
      * @param destFolder
-     * @param filename
+     * @param outputFile
      */
     protected void copyOutputFileToNewFolderUsingIpAddress(String destFolder, File outputFile) {
         // Obtain the ip address of the host

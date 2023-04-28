@@ -482,7 +482,7 @@
         try
         {
             outputCsvFile = new File(Main.outputDir + File.separator +
-                    settings.get(ConfigTags.ApplicationName,"application") + "_"+ settings.get(ConfigTags.ApplicationVersion,"1") + ".csv");
+                    settings.get(ConfigTags.ApplicationName,"application") + "_" + settings.get(ConfigTags.ApplicationVersion,"1") + ".csv");
             FileWriter myWriter = new FileWriter(outputCsvFile, true);
 
             String delimiter = ";";
