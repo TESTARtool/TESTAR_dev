@@ -69,9 +69,10 @@
     private boolean useRandom = false;
     private Map<String, Integer>    actionsExecuted      = new HashMap<String, Integer>();
     private Map<String, Integer>    debugActionsExecuted      = new HashMap<String, Integer>();
-    private String startTimestamp;
-    private String start_epoch, end_epoch;
-    private int numFieldsFilled;
+    private String startTimestamp = "";
+    private String start_epoch = "";
+    private String end_epoch = "";
+    private int numFieldsFilled = -1;
 
     @Override
     protected void initialize(Settings settings)
@@ -191,9 +192,11 @@
                     actions.add(ac.leftClickAt(widget));
                     continue;
                 }
-                else if(webType.equalsIgnoreCase("range"))
+                else if(webType.toLowerCase().contains("range"))
                 {
-                    actions.add(ac.leftClickAt(widget, 0.1, 0.5));
+                    double[] values = new double[] {0.1, 0.2, 0.3, 0.4, 0.6, 0.7, 0.8, 0.9, 1.0}; //no 0.5
+                    Random r = new Random();
+                    actions.add(ac.leftClickAt(widget, values[r.nextInt(values.length)], 0.5));
                     continue;
                 }
             }
