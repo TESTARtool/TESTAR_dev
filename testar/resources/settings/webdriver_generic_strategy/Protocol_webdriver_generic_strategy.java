@@ -80,11 +80,11 @@
     protected void buildStateActionsIdentifiers(State state, Set<Action> actions)
     {
     	CodingManager.buildIDs(state, actions);
-    	// Radio buttons are special form elements
-    	// We only want to select one radio button widget per group
-    	// For this reason, we use the widget web name property to identify all actions in a group as the same
     	for(Action action : actions)
     	{
+    		// Radio buttons are special form elements
+    		// We only want to select one radio button widget per group
+    		// For this reason, we use the widget web name property to identify all actions in a group as the same
     		if(action.get(Tags.OriginWidget) != null && action.get(Tags.OriginWidget).get(WdTags.WebType, "").equals("radio"))
     		{
 
@@ -93,6 +93,22 @@
 
     			String collisionId = CodingManager.lowCollisionID(state.get(Tags.AbstractIDCustom)
     					+ widgetWebName
+    					+ action.get(Tags.Role));
+
+    			String radioActionAbstractId = CodingManager.ID_PREFIX_ACTION 
+    					+ CodingManager.ID_PREFIX_ABSTRACT_CUSTOM 
+    					+ collisionId;
+
+    			action.set(Tags.AbstractIDCustom, radioActionAbstractId);
+    		}
+    		// For other elements, use the widget abstract identifier to identify independent actions
+    		// The widget abstract identifier relies on the AbstractStateAttributes (WebWidgetId)
+    		else if (action.get(Tags.OriginWidget) != null)
+    		{
+    			Widget widget = action.get(Tags.OriginWidget);
+
+    			String collisionId = CodingManager.lowCollisionID(state.get(Tags.AbstractIDCustom)
+    					+ widget.get(Tags.AbstractIDCustom)
     					+ action.get(Tags.Role));
 
     			String radioActionAbstractId = CodingManager.ID_PREFIX_ACTION 
