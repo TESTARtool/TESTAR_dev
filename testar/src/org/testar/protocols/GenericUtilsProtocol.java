@@ -774,7 +774,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * @param destFolder
      * @param filename
      */
-    protected void copyOutputFileToNewFolderUsingIpAddress(String destFolder, String filename) {
+    protected void copyOutputFileToNewFolderUsingIpAddress(String destFolder, File outputFile) {
         // Obtain the ip address of the host
         // https://stackoverflow.com/a/38342964
         String ipAddress = "127.0.0.1";
@@ -801,7 +801,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
         }
 
         // Copy file to desired ip address output folder
-        File outputFile = new File(Main.outputDir + File.separator + filename);
+//        File outputFile = new File(Main.outputDir + File.separator + filename);
         try {
             if(outputFile.exists()) {
                 File fileIpAddressOutput = new File(folderIpAddress + File.separator + ipAddress + "_" + outputFile.getName());
