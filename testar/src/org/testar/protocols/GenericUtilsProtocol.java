@@ -805,7 +805,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
         try {
             if(outputFile.exists()) {
                 File fileIpAddressOutput = new File(folderIpAddress + File.separator + ipAddress + "_" + outputFile.getName());
-                FileUtils.copyFile(outputFile, fileIpAddressOutput, true); //copy and replace
+                FileUtils.copyFile(outputFile, fileIpAddressOutput); //copy and replace
                 System.out.println(String.format("Sucessfull copy %s to %s", outputFile, fileIpAddressOutput));
             }
         } catch (IOException e) {
