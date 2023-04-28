@@ -111,11 +111,11 @@
     					+ widget.get(Tags.AbstractIDCustom)
     					+ action.get(Tags.Role));
 
-    			String radioActionAbstractId = CodingManager.ID_PREFIX_ACTION 
+    			String elementActionAbstractId = CodingManager.ID_PREFIX_ACTION 
     					+ CodingManager.ID_PREFIX_ABSTRACT_CUSTOM 
     					+ collisionId;
 
-    			action.set(Tags.AbstractIDCustom, radioActionAbstractId);
+    			action.set(Tags.AbstractIDCustom, elementActionAbstractId);
     		}
     	}
     }
