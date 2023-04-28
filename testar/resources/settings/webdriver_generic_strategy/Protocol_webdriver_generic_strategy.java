@@ -73,6 +73,7 @@
     private String start_epoch = "";
     private String end_epoch = "";
     private int numFieldsFilled = -1;
+    private String outputCsvFileName;
 
     @Override
     protected void initialize(Settings settings)
@@ -430,8 +431,8 @@
     {
         try
         {
-            File logFile = new File(Main.outputDir + File.separator +
-                    settings.get(ConfigTags.ApplicationName,"application") + "_"+ settings.get(ConfigTags.ApplicationVersion,"1") + ".csv");
+            outputCsvFileName = settings.get(ConfigTags.ApplicationName,"application") + "_"+ settings.get(ConfigTags.ApplicationVersion,"1") + ".csv";
+            File logFile = new File(Main.outputDir + File.separator + outputCsvFileName);
             FileWriter myWriter = new FileWriter(logFile, true);
 
             String delimiter = ";";
@@ -559,8 +560,9 @@
         super.closeTestSession();
         if(settings.get(ConfigTags.Mode).equals(Modes.Generate))
         {
-            compressOutputRunFolder();
+//            compressOutputRunFolder();
 //            copyOutputToNewFolderUsingIpAddress("N:");
+            copyOutputFileToNewFolderUsingIpAddress("N:", outputCsvFileName);
         }
     }
 }

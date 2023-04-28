@@ -763,4 +763,58 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 
         // Create a folder inside the centralized file server and copy the metrics results
     }
+
+    /**
+     * Obtain the IP address of the current host to create a folder inside destFolder,
+     * then copy chosen TESTAR output file inside created folder.
+     *
+     * This is an utility method intended to copy output results inside a file server shared folder,
+     * used to save data of TESTAR experiments.
+     *
+     * @param destFolder
+     * @param filename
+     */
+    protected void copyOutputFileToNewFolderUsingIpAddress(String destFolder, String filename) {
+        // Obtain the ip address of the host
+        // https://stackoverflow.com/a/38342964
+        String ipAddress = "127.0.0.1";
+        try(final DatagramSocket socket = new DatagramSocket()){
+            socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+            ipAddress = socket.getLocalAddress().getHostAddress();
+        } catch (SocketException | UnknownHostException e) {
+            LogSerialiser.log("ERROR copyOutputToNewFolderUsingIpAddress: Obtaining host ip address",
+                    LogSerialiser.LogLevel.Info);
+            System.err.println("ERROR copyOutputToNewFolderUsingIpAddress: Obtaining host ip address");
+            e.printStackTrace();
+        }
+
+        // Create a new directory inside desired destination using the ipAddress as name
+        String folderIpAddress = destFolder + File.separator + ipAddress + File.separator + settings.get(ConfigTags.ApplicationName, "");
+        try {
+            Files.createDirectories(Paths.get(folderIpAddress));
+        } catch (IOException e) {
+            LogSerialiser.log("ERROR copyOutputToNewFolderUsingIpAddress: Creating new folder with ip name",
+                    LogSerialiser.LogLevel.Info);
+            System.err.println("ERROR copyOutputToNewFolderUsingIpAddress: Creating new folder with ip name");
+            e.printStackTrace();
+            return;
+        }
+
+        // Copy file to desired ip address output folder
+        File outputFile = new File(Main.outputDir + File.separator + filename);
+        try {
+            if(outputFile.exists()) {
+                File fileIpAddressOutput = new File(folderIpAddress + File.separator + ipAddress + "_" + outputFile.getName());
+                FileUtils.copyFile(outputFile, fileIpAddressOutput, true); //copy and replace
+                System.out.println(String.format("Sucessfull copy %s to %s", outputFile, fileIpAddressOutput));
+            }
+        } catch (IOException e) {
+            LogSerialiser.log("ERROR copyOutputFileToNewFolderUsingIpAddress: ERROR FILE : " + outputFile,
+                    LogSerialiser.LogLevel.Info);
+            System.err.println("ERROR copyOutputFileToNewFolderUsingIpAddress: ERROR FILE : " + outputFile);
+            e.printStackTrace();
+        }
+
+        // Create a folder inside the centralized file server and copy the metrics results
+    }
 }
