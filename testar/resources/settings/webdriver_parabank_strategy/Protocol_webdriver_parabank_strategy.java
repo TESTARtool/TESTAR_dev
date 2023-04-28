@@ -52,6 +52,7 @@ import parsing.ParseUtil;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
@@ -112,7 +113,15 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 			File parabankStart = new File(parabankFolder + File.separator + "apache_parabank_start.bat").getCanonicalFile();
 			if(parabankStart.exists()) {
 				Process proc = Runtime.getRuntime().exec("cmd /c " + parabankStart, null, parabankFolder);
-				Util.pause(60); // Wait seconds for parabank to be deployed
+				// Wait until apache web server is deployed
+				while(!apacheWebIsReady()) {
+					try {
+						System.out.println("Waiting for a web service in localhost:8080 ...");
+						Thread.sleep(5000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
 			} else {
 				throw new SystemStartException("parabankStart does not exists");
 			}
@@ -135,6 +144,31 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		formFillingWidget = null;
 
 		return system;
+	}
+
+	private static boolean apacheWebIsReady() {
+		try {
+			// Try to connect to the localhost apache tomcat web server
+			URL url = new URL("http://localhost:8080/parabank");
+			HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection();
+			httpConnection.setRequestMethod("GET");
+			httpConnection.connect();
+
+			// If we have get connection with the web app, everything is ready
+			if(httpConnection.getResponseCode() == 200) {
+				httpConnection.disconnect();
+				return true;
+			} 
+			// If not, server is probably being deployed
+			else {
+				httpConnection.disconnect();
+				return false;
+			}
+		} 
+		catch (Exception e) {
+			System.out.println("*** http://localhost:8080 is NOT ready ***");
+		}
+		return false;
 	}
 
 	@Override
@@ -321,6 +355,7 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		if(formContainsNonVisibleSubmitButtonBelow(formWidget))
 		{
 			Action pageDown = ac.hitKey(KBKeys.VK_PAGE_DOWN);
+			formWidget.set(WdTags.WebId, getHTM()+".page.down"); // Ex: findtrans.htm.page.down
 			pageDown.set(Tags.OriginWidget, formWidget);
 			formFillingActions.add(pageDown);
 		}
