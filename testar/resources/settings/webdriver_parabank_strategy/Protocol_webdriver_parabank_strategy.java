@@ -651,6 +651,10 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		{
 			// Reset form actions because next time we need to fill completely again
 			strategyActionsExecuted = new HashMap<String, Integer>();
+			// Submit actions require extra time to load next state
+			boolean executed = super.executeAction(system, state, action);
+			Util.pause(5);
+			return executed;
 		}
 
 		return super.executeAction(system, state, action);
