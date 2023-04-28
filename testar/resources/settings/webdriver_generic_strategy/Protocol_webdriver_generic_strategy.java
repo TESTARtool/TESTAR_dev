@@ -29,6 +29,7 @@
  */
 
  import org.apache.commons.io.FilenameUtils;
+ import org.testar.CodingManager;
  import org.testar.OutputStructure;
  import org.testar.RandomActionSelector;
  import org.testar.SutVisualization;
@@ -74,6 +75,34 @@
     private String end_epoch = "";
     private int numFieldsFilled = -1;
     private File outputCsvFile;
+
+    @Override
+    protected void buildStateActionsIdentifiers(State state, Set<Action> actions)
+    {
+    	CodingManager.buildIDs(state, actions);
+    	// Radio buttons are special form elements
+    	// We only want to select one radio button widget per group
+    	// For this reason, we use the widget web name property to identify all actions in a group as the same
+    	for(Action action : actions)
+    	{
+    		if(action.get(Tags.OriginWidget) != null && action.get(Tags.OriginWidget).get(WdTags.WebType, "").equals("radio"))
+    		{
+
+    			Widget widget = action.get(Tags.OriginWidget);
+    			String widgetWebName = widget.get(WdTags.WebName, "");
+
+    			String collisionId = CodingManager.lowCollisionID(state.get(Tags.AbstractIDCustom)
+    					+ widgetWebName
+    					+ action.get(Tags.Role));
+
+    			String radioActionAbstractId = CodingManager.ID_PREFIX_ACTION 
+    					+ CodingManager.ID_PREFIX_ABSTRACT_CUSTOM 
+    					+ collisionId;
+
+    			action.set(Tags.AbstractIDCustom, radioActionAbstractId);
+    		}
+    	}
+    }
 
     @Override
     protected void initialize(Settings settings)
@@ -189,6 +218,11 @@
                     continue;
                 }
                 else if(webType.equalsIgnoreCase("checkbox"))
+                {
+                    actions.add(ac.leftClickAt(widget));
+                    continue;
+                }
+                else if(webType.equalsIgnoreCase("radio"))
                 {
                     actions.add(ac.leftClickAt(widget));
                     continue;
