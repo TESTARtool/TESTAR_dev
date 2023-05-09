@@ -83,7 +83,7 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
     public void keyDown(KBKeys key) {    	
         super.keyDown(key);        
         if (mode() == Modes.Spy){ 
-        	if (key == KBKeys.VK_CAPS_LOCK)
+        	if (key == KBKeys.VK_CAPS_LOCK || key == KBKeys.VK_ALT)
         		displayWhiteTabu = !displayWhiteTabu;
         	else if (key == KBKeys.VK_TAB)
         		preciseCoding = !preciseCoding;
