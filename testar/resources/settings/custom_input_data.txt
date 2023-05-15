@@ -10,6 +10,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 \\
 @#
 <
+' OR 1=1 OR ''='
 <script>console.error('XSS is possible');</script>
 %3Cscript%3Econsole.error%28%27XSS%20is%20possible%27%29%3B%3C%2Fscript%3E
 <memo>alpha beta gamma
@@ -73,15 +74,13 @@ INF
 0xffffffffffffffff
 0xabad1dea
 123456789012345678901234567890123456789
-1,000.00
-1 000.00
-1'000.00
-1,000,000.00
-1 000 000.00
-1'000'000.00
-1.000,00
 1 000,00
 1'000,00
+1.000.000,00
+1 000 000,00
+1'000'000,00
+1.000,00
+1 000,00
 1.000.000,00
 1 000 000,00
 1'000'000,00
@@ -95,3 +94,12 @@ INF
 ì
 南乔治亚岛和南桑威奇群岛
 Géorgie du Sud-et-les Îles Sandwich du Sud
+&lt;
+&gt;
+&quot;
+&apos;
+&amp;
+&
+#
+#000000
+ 

@@ -83,6 +83,10 @@ import static org.testar.monkey.alayer.Tags.Enabled;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.parser.ParseException;
+import org.apache.logging.log4j.core.parser.XmlLogEventParser;
+
 
 /**
  * Protocol with functional oracles examples to detect:
@@ -241,6 +245,9 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		{
            System.out.println("New form : " + webUrl);
           
+          // Give UI some time to initialize the new form, otherwise false positives arise because not everything is in sync
+          wait(4000);
+          
           // Check RecID is present in the web url. If RecID is not present, but Entity is present in querystring then it is a new entity detailpage in DigiOffice.
           if(webUrl.contains("RecID=") && webUrl.contains("Entity=")) {
               _pristineStateForm = true;
@@ -260,6 +267,17 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		return super.getState(system);
 	}
 
+    public static void wait(int ms)
+    {
+        try
+        {
+            Thread.sleep(ms);
+        }
+        catch(InterruptedException ex)
+        {
+            Thread.currentThread().interrupt();
+        }
+    }
 	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
 	 * This can be used for example for bypassing a login screen by filling the username and password
@@ -416,7 +434,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		Pattern pattern = Pattern.compile(sensitiveTextPatternRegEx);
 		
 		for(Widget w : state) {
-			String desc = w.get(WdTags.WebTextContent, "");
+			String desc = w.get(WdTags.WebTextContent, ""); //TODO: comments in html could leak passwords
             Matcher matcher = pattern.matcher(desc);
 
             if (!desc.isEmpty() && (sensitiveDataList.contains(desc) || matcher.find()))
@@ -510,7 +528,33 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		}
 		return verdict;
 	}
-	
+
+	// Detect the replacement character ï¿½ (often displayed as a black rhombus with a white question mark) is a symbol found in the Unicode standard at code point U+FFFD in the Specials table. 
+    // It is used to indicate problems when a system is unable to render a stream of data to correct symbols
+    // https://en.wikipedia.org/wiki/Specials_(Unicode_block)
+    // U+FFFD ï¿½ REPLACEMENT CHARACTER used to replace an unknown, unrecognized, or unrepresentable character
+	// BAD:  ï¿½
+    //       fï¿½r
+	// GOOD: fÃ¼r
+    private Verdict detectUnicodeReplacementCharacter(State state)
+	{
+		Verdict verdict = Verdict.OK;
+		String patternRegex = ".*ï¿½.*"; // Look for a Unicode Replacement character.
+		Pattern pattern = Pattern.compile(patternRegex);
+		
+		for(Widget w : state) {
+			String desc = w.get(WdTags.WebValue, "");
+			Matcher matcher = pattern.matcher(desc);
+			
+			if (matcher.find()) {
+				String verdictMsg = String.format("Detected Unicode Replacement Character in widget! Role: %s , Path: %s , WebId: %s , Desc: %s , WebValue: %s", 
+						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebValue, ""));
+				verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_TRANSLATION_OR_SPELLING_ISSUE, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+			}
+		}
+		return verdict;
+	}
+
 	// Detect widgets that should be in sync
 	// Examples:
 	//       Form title should match match title bar
@@ -784,7 +828,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
                     actions.add(ac.pasteTextInto(widget, InputDataManager.getRandomTextFromCustomInputDataFile(System.getProperty("user.dir") + "/settings/custom_input_data.txt"), true));
                     //actions.add(ac.pasteTextInto(widget, "\"'[]$(>%)@#>+_|:* $?{}/\\,Aa", true));
                     //actions.add(ac.pasteTextInto(widget, "<memo>bla bla bla", true)); // #942
-                    //actions.add(ac.pasteTextIntoo(widget, "é € ý ì", true)); 
+                    //actions.add(ac.pasteTextIntoo(widget, "Ã© â‚¬ Ã½ Ã¬", true)); 
                     //actions.add(ac.pasteTextInto(widget, "@#", true)); // #70973
                     //actions.add(ac.pasteTextInto(widget, "01-01-2020", true)); // #70296
                     //actions.add(ac.pasteTextInto(widget, "31-12-2023", true)); // #70296
@@ -919,7 +963,89 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		}
 	}
 
-	
+	private Verdict twoLeafWidgetsOverlap(State state) {
+		Verdict widgetsOverlapVerdict = Verdict.OK;
+
+		// Prepare a list that contains all the Rectangles from the leaf widgets
+		List<Pair<Widget, Rect>> leafWidgetsRects = new ArrayList<>();
+		for(Widget w : state) {
+			if(w.childCount() < 1 && w.get(Tags.Shape, null) != null) {
+				leafWidgetsRects.add(new Pair<Widget, Rect>(w, (Rect)w.get(Tags.Shape)));
+			}
+		}
+		//TODO: Improve this list iteration
+        //TODO: every overlap is reported double, because the widgets overlap on both sides. Make an ignore list if an overlap is detected. Or try use a INNER JOIN linq query to find all the overlapping widgets. 
+		for(int i = 0; i < leafWidgetsRects.size(); i++) {
+			for(int j = 0; j < leafWidgetsRects.size(); j++) {
+                if(leafWidgetsRects.get(i) != leafWidgetsRects.get(j)) {
+					Rect rectOne = leafWidgetsRects.get(i).right();
+					Rect rectTwo = leafWidgetsRects.get(j).right();
+					if(checkRectIntersection(rectOne, rectTwo)) {
+						Widget firstWidget = leafWidgetsRects.get(i).left();
+						String firstMsg = String.format("Title: %s , WebTextContent: %s , Role: %s , Path: %s , WebId: %s , X: %f, Y: %f, Width: %f, Height %f", 
+								firstWidget.get(Tags.Title, ""), firstWidget.get(WdTags.WebTextContent, ""), firstWidget.get(Tags.Role), firstWidget.get(Tags.Path), firstWidget.get(WdTags.WebId, ""), rectOne.x(), rectOne.y(), rectOne.width(), rectOne.height());
+
+						Widget secondWidget = leafWidgetsRects.get(j).left();
+						String secondMsg = String.format("Title: %s , WebTextContent: %s , Role: %s , Path: %s , WebId: %s , X: %f, Y: %f, Width: %f, Height %f", 
+								secondWidget.get(Tags.Title, ""), secondWidget.get(WdTags.WebTextContent, ""), secondWidget.get(Tags.Role), secondWidget.get(Tags.Path), secondWidget.get(WdTags.WebId, ""), rectTwo.x(), rectTwo.y(), rectTwo.width(), rectTwo.height());
+
+						String verdictMsg = "Two Widgets Overlapping!" + "<br/>First!  " + firstMsg + "<br/>Second! " + secondMsg;
+                        
+                        // Trying to rule out some false positivies
+                        if (!firstWidget.get(WdTags.WebTextContent, "").isEmpty() && !secondWidget.get(WdTags.WebTextContent, "").isEmpty())
+                        {
+                            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList((Rect)firstWidget.get(Tags.Shape), (Rect)secondWidget.get(Tags.Shape)));
+						     //return verdict;
+                            widgetsOverlapVerdict = widgetsOverlapVerdict.join(verdict);
+                        }
+					}
+				}
+			}
+		}
+
+		return widgetsOverlapVerdict;
+	}
+
+	private boolean checkRectIntersection(Rect r1, Rect r2) {
+		return !(r1.x() + r1.width() <= r2.x() ||
+				r1.y() + r1.height() <= r2.y() ||
+				r2.x() + r2.width() <= r1.x() ||
+				r2.y() + r2.height() <= r1.y()); 
+	}
+
+	private void testLog4J() {
+     String logEntries = "<log4j:event logger=\"Log4JLibs.LogExample\" timestamp=\"1683569806499\" level=\"INFO\" thread=\"main\">\r\n" + 
+        		"<log4j:message><![CDATA[Info AAAAAAAAAAAAAAAAAAAAAaa]]></log4j:message>\r\n" + 
+        		"</log4j:event><log4j:event logger=\"Log4JLibs.LogExample\" timestamp=\"1683569806501\" level=\"WARN\" thread=\"main\">\r\n" + 
+        		"<log4j:message><![CDATA[Warn BBBBBBBBBBBBBBBBBBbBBB]]></log4j:message>\r\n" + 
+        		"</log4j:event>";
+                
+        XmlLogEventParser parser = new XmlLogEventParser();
+        try {
+        	int beginIndex = 0;
+        	String endTag = "</log4j:event>";
+        	
+            // Parse the log file and iterate over the list of log events
+        	while(logEntries.length() > 0) 
+        	{
+	        	int eventIndex = logEntries.indexOf(endTag);
+	        	String logEntry = logEntries.substring(beginIndex, eventIndex);
+	        	logEntries = logEntries.substring(eventIndex + endTag.length());
+                LogEvent event = parser.parseFrom(logEntry);
+                System.out.println(event.getMessage());
+                break;
+             }
+         
+        }
+        catch(ParseException ex)
+        {
+        }
+          finally {
+            // Close the input stream
+            //inputStream.close();
+        }
+    }
+
 
 	/**
 	 * This method returns a unique functional failure verdict of one state. 
@@ -935,6 +1061,10 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		// report the information in a specific HTML report
 		// and continue testing
 		
+		// Check the functional Verdict that detects if two widgets overlap
+	    //verdict = twoLeafWidgetsOverlap(state);
+		//if (shouldReturnVerdict(verdict)) return verdict;
+
 		//Verdict spellCheckerVerdict = GenericVerdict.SpellChecker(state, WdTags.WebTextContent, new Dutch(), "Pagina generatietijd.*|\\d\\d.*");
 		//if(spellCheckerVerdict != Verdict.OK) HTMLStateVerdictReport.reportStateVerdict(actionCount, state, spellCheckerVerdict);
 
@@ -945,7 +1075,8 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		// Check the functional Verdict that detects if a form button is enabled when it must not.
 		//verdict = formButtonMustBeDisabledIfNoChangesVerdict(state);
 		//if (shouldReturnVerdict(verdict)) return verdict;
-
+        //testLog4J();
+        
 		verdict = detectWidgetsThatShouldBeInSync(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
 		
@@ -1010,8 +1141,8 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if a web element does not contain children.
-		//verdict = WebVerdict.ElementWithoutChildren(state, Arrays.asList(WdRoles.WdFORM));
-		//if (shouldReturnVerdict(verdict)) return verdict;
+		verdict = WebVerdict.ElementWithoutChildren(state, Arrays.asList(WdRoles.WdFORM));
+		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if a web radio input contains a single option.
 		verdict = WebVerdict.SingleRadioInput(state);
@@ -1027,6 +1158,10 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 
         // Check untranslated text tags
         verdict = detectUntranslatedText(state);
+        if (shouldReturnVerdict(verdict)) return verdict;
+        
+        // Check The replacement character ï¿½ (often displayed as a black rhombus with a white question mark) is a symbol found in the Unicode standard at code point U+FFFD in the Specials table. It is used to indicate problems when a system is unable to render a stream of data to correct symbols
+        verdict = detectUnicodeReplacementCharacter(state);
         if (shouldReturnVerdict(verdict)) return verdict;
 
 		return verdict;
