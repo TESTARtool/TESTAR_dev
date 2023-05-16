@@ -397,78 +397,49 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 		Set<Action> forcedActions = detectForcedActions(state, ac);
 
 		/*
-		// Check if the trigger payment element is found:
-		Widget payeeWidget = getWidgetWithMatchingTag(
-				"name", "payee.name", state);
+		// Check if the update profile element is found:
+		Widget nameWidget = getWidgetWithMatchingTag(
+				"id", "customer.firstName", state);
 
-		if(payeeWidget!=null){
-
-			// Bill pay element found, create and return the triggered action:
+		if(nameWidget != null){
+			// Update profile found, create and return the triggered action:
 			// Create a compound action to include multiple actions as one:
 			CompoundAction.Builder multiAction = new CompoundAction.Builder();
 
-			// Action to type text into the Payee Name field:
+			// Action to type text into the Name field:
 			multiAction.add(ac.clickTypeInto(
-					payeeWidget, "Triggered Payer Name", true), 1.0);
+					nameWidget, "Triggered Name", true), 1.0);
 
-			// Action to type text into name="payee.address.street":
-			Widget addressWidget = getWidgetWithMatchingTag(
-					"name", "payee.address.street", state);
+			// Action to type text into id="customer.lastName":
+			Widget lastNameWidget = getWidgetWithMatchingTag(
+					"id", "customer.lastName", state);
 			multiAction.add(ac.clickTypeInto(
-					addressWidget, "Triggered Payer Street", true), 1.0);
+					lastNameWidget, "Triggered Last Name", true), 1.0);
 
-			// Action to type text into name="payee.address.city":
+			// Action to type text into id="customer.address.street":
+			Widget streetWidget = getWidgetWithMatchingTag(
+					"id", "customer.address.street", state);
+			multiAction.add(ac.clickTypeInto(
+					streetWidget, "Triggered Street", true), 1.0);
+
+			// Action to type text into id="customer.address.city":
 			Widget cityWidget = getWidgetWithMatchingTag(
-					"name", "payee.address.city", state);
+					"id", "customer.address.city", state);
 			multiAction.add(ac.clickTypeInto(
 					cityWidget, "Triggered City", true), 1.0);
 
-			// Action to type text into name="payee.address.state":
-			Widget stateWidget = getWidgetWithMatchingTag(
-					"name", "payee.address.state", state);
-			multiAction.add(ac.clickTypeInto(
-					stateWidget, "Triggered State", true), 1.0);
+			// You can add here more form widgets
 
-			// Action to type text into name="payee.zipCode":
-			Widget zipWidget = getWidgetWithMatchingTag(
-					"name", "payee.address.zipCode", state);
-			multiAction.add(ac.clickTypeInto(
-					zipWidget, "12121", true), 1.0);
-
-			// Action to type text into name="payee.phoneNumber":
-			Widget phoneWidget = getWidgetWithMatchingTag(
-					"name", "payee.phoneNumber", state);
-			multiAction.add(ac.clickTypeInto(
-					phoneWidget, "123456789", true), 1.0);
-
-			// Action to type text into name="payee.accountNumber":
-			Widget accountWidget = getWidgetWithMatchingTag(
-					"name", "payee.accountNumber", state);
-			multiAction.add(ac.clickTypeInto(
-					accountWidget, "12345", true), 1.0);
-
-			// Action to type text into name="verifyAccount":
-			Widget verifyWidget = getWidgetWithMatchingTag(
-					"name", "verifyAccount", state);
-			multiAction.add(ac.clickTypeInto(
-					verifyWidget, "12345", true), 1.0);
-
-			// Action to type text into name="amount":
-			Widget amountWidget = getWidgetWithMatchingTag(
-					"name", "amount", state);
-			multiAction.add(ac.clickTypeInto(
-					amountWidget, "100", true), 1.0);
-
-			// Action on Send Payment button, value="Send Payment"
+			// Action on Update Profile button, value="Update Profile"
 			Widget submitWidget = getWidgetWithMatchingTag(
-					"value", "Send Payment", state);
+					"value", "Update Profile", state);
 			multiAction.add(ac.leftClickAt(submitWidget), 1.0);
 
-			// Build the bill payment compound action
-			Action billPayAction = multiAction.build();
+			// Build the update profile compound action
+			Action updateProfileAction = multiAction.build();
 
-			// Returning a list of actions having only the billPayAction
-			return new HashSet<>(Collections.singletonList(billPayAction));
+			// Returning a list of actions having only the updateProfileAction
+			return new HashSet<>(Collections.singletonList(updateProfileAction));
 		}
 		 */
 
