@@ -158,8 +158,10 @@ public class ProtocolEditor extends javax.swing.JDialog {
 			List<File> fileList = new ArrayList<File>(1); fileList.add(compileDir);
 			Util.compileJava(settingsDir, fileList, System.getProperty("java.class.path"));  
 			console.setText(console.getText() + "OK");
-		} catch (IOException t) {
-			console.setText(console.getText() + "\n" + t.getMessage());
+		} catch (IOException | RuntimeException t) {
+			if(t.getMessage() != null) {
+				console.setText(console.getText() + "\n" + t.getMessage());
+			}
 		}
 	}
 
