@@ -88,8 +88,8 @@ public class SettingsDialog extends JFrame implements Observer {
   private static final int FILTER_TAB_INDEX = 2;
   private static final int ORACLES_TAB_INDEX = 3;
   private static final int TIMES_TAB_INDEX = 4;
-  private static final int MISC_TAB_INDEX = 5;
-  private static final int MODEL_TAB_INDEX = 6;
+  //private static final int MISC_TAB_INDEX = 5;
+  private static final int MODEL_TAB_INDEX = 5;
   private final Map<Integer, Pair<String, SettingsPanel>> settingPanels = new HashMap<>();
 
   /**
