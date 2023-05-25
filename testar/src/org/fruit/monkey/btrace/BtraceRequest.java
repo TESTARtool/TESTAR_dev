@@ -2,6 +2,7 @@ package org.fruit.monkey.btrace;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 
 import java.io.IOException;
@@ -12,6 +13,10 @@ public abstract class BtraceRequest<T extends BtraceResponse> {
     private final Class<T> responseType;
 
     private ObjectMapper objectMapper;
+
+    protected HttpUriRequestBase makeRequest(String uri) {
+        return new HttpPost(uri);
+    }
 
     public BtraceRequest(String host, Class<T> responseType) {
         this.host = host;
