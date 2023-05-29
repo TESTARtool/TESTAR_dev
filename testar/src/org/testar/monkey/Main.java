@@ -44,6 +44,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -121,6 +122,8 @@ public class Main {
 			// Verify settings regular expressions before starting TESTAR
 			verifyRegularExpressionSettings(settings, testSettingsFileName);
 
+			escapeSpecialCharactersInFileWritingSettings(settings);
+
 			setTestarDirectory(settings);
 
 			initCodingManager(settings);
@@ -139,6 +142,8 @@ public class Main {
 
 				// Verify settings regular expressions before starting TESTAR
 				verifyRegularExpressionSettings(settings, testSettingsFileName);
+
+				escapeSpecialCharactersInFileWritingSettings(settings);
 
 				setTestarDirectory(settings);
 
@@ -755,6 +760,31 @@ public class Main {
 			invalidExpressions.append("Settings Initialization Error! Please fix the expressions or remove all characters and start TESTAR again.");
 			invalidExpressions.append(System.getProperty("line.separator"));
 			throw new IllegalStateException(invalidExpressions.toString());
+		}
+	}
+
+	/**
+	 * Escape special characters in settings that are used to write directories or files. 
+	 * 
+	 * @param settings
+	 * @return
+	 */
+	private static void escapeSpecialCharactersInFileWritingSettings(Settings settings) {
+		List<Tag<String>> writeSystemTags = Arrays.asList(
+				ConfigTags.ApplicationName,
+				ConfigTags.ApplicationVersion
+				);
+
+		for(Tag<String> tag : writeSystemTags) {
+			Pattern p = Pattern.compile("[\\/?:*\"|><]");
+			Matcher m = p.matcher(settings.get(tag, ""));
+
+			if(m.find()) {
+				String value = settings.get(tag, "").replaceAll("[\\/?:*\"|><]", "_");
+				System.out.println(String.format("Info: Replacing %s special characters from %s to %s", 
+						tag.name(), settings.get(tag, ""), value));
+				settings.set(tag, value);
+			}
 		}
 	}
 }

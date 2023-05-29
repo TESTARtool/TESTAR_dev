@@ -684,6 +684,8 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     		State newState = getState(system);
     		Set<Action> newActions = deriveActions(system, newState);
     		if(!newActions.isEmpty()) {
+    			// If retry was able to derive new actions, build the identifiers and return them
+    			buildStateActionsIdentifiers(newState, newActions);
     			return newActions;
     		}
     	}
