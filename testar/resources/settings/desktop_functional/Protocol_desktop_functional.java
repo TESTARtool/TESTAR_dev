@@ -191,13 +191,13 @@ public class Protocol_desktop_functional extends DesktopProtocol {
 		// Prepare a list that contains all the Rectangles from the leaf widgets
 		List<Pair<Widget, Rect>> leafWidgetsRects = new ArrayList<>();
 		for(Widget w : state) {
-			if(w.childCount() < 1) {
+			if(w.childCount() < 1 && w.get(Tags.Shape, null) != null) {
 				leafWidgetsRects.add(new Pair<Widget, Rect>(w, (Rect)w.get(Tags.Shape)));
 			}
 		}
-		//TODO: Improve this list iteration
+
 		for(int i = 0; i < leafWidgetsRects.size(); i++) {
-			for(int j = 0; j < leafWidgetsRects.size(); j++) {
+			for(int j = i + 1; j < leafWidgetsRects.size(); j++) {
 				if(leafWidgetsRects.get(i) != leafWidgetsRects.get(j)) {
 					Rect rectOne = leafWidgetsRects.get(i).right();
 					Rect rectTwo = leafWidgetsRects.get(j).right();
