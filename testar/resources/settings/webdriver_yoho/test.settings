@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "/home/michaelt/Downloads/chromedriver_linux64/chromedriver" "1920x900+0+0" "https://tst.yoho.marviq.net/web/app/dashboard/work-in-progress"
+SUTConnectorValue = "/home/michaelt/Downloads/chromedriver_linux64/chromedriver" "1920x900+0+0" "http://localhost:1080"
 
 #################################################################
 # Sequences
@@ -35,8 +35,8 @@ SUTConnectorValue = "/home/michaelt/Downloads/chromedriver_linux64/chromedriver"
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 1
-SequenceLength = 10
+Sequences = 5
+SequenceLength = 50
 
 #################################################################
 # Oracles based on suspicious titles
@@ -213,12 +213,12 @@ ApplicationVersion = 1.0
 ReplayApplicationName = yoho
 ReplayApplicationVersion = 1.0
 
-ForcedLoginUrl = https://tst.yoho.marviq.net/web/login
+ForcedLoginUrl = http://localhost:1080/login
 ForcedLoginInputKeyAttribute = id
 ForcedLoginUsernameInputName = mat-input-0
 ForcedLoginUsername = +48500000005
 ForcedLoginPasswordInputName = mat-input-1
-ForcedLoginPassword = yohopin2022
+ForcedLoginPassword = password
 ReportApiUrl = http://localhost:8888/api
 
 WebConsoleErrorOracle = true
@@ -230,7 +230,7 @@ WebConsoleCustomOracle = true
 
 FaultThreshold = 0.1
 
-BtraceServiceHost = http://tst.yoho.marviq.net
+BtraceServiceHost = http://localhost:8088
 
 #################################################################
 # Extended settings file
