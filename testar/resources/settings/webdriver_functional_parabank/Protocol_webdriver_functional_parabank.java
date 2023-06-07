@@ -303,6 +303,10 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 		verdict = functionalButtonVerdict(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
+		// Check the functional Verdict that detects if two leaf widgets overlap
+		verdict = twoLeafWidgetsOverlap(state);
+		if (shouldReturnVerdict(verdict)) return verdict;
+
 		// Check the functional Verdict that detects duplicate or repeated text in descriptions of widgets
 		verdict = WebVerdict.DetectDuplicateText(state, "");
 		if (shouldReturnVerdict(verdict)) return verdict;
@@ -367,6 +371,51 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 	 */
 	private boolean shouldReturnVerdict(Verdict verdict) {
 		return verdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch(info -> info.contains(verdict.info().replace("\n", " ")));
+	}
+
+	private Verdict twoLeafWidgetsOverlap(State state) {
+		Verdict widgetsOverlapVerdict = Verdict.OK;
+
+		// Prepare a list that contains all the Rectangles from the leaf widgets
+		List<Pair<Widget, Rect>> leafWidgetsRects = new ArrayList<>();
+		for(Widget w : state) {
+			if(w.childCount() < 1 && w.get(Tags.Shape, null) != null) {
+				leafWidgetsRects.add(new Pair<Widget, Rect>(w, (Rect)w.get(Tags.Shape)));
+			}
+		}
+
+		for(int i = 0; i < leafWidgetsRects.size(); i++) {
+			for(int j = i + 1; j < leafWidgetsRects.size(); j++) {
+				if(leafWidgetsRects.get(i) != leafWidgetsRects.get(j)) {
+					Rect rectOne = leafWidgetsRects.get(i).right();
+					Rect rectTwo = leafWidgetsRects.get(j).right();
+					if(checkRectIntersection(rectOne, rectTwo)) {
+						Widget firstWidget = leafWidgetsRects.get(i).left();
+						String firstMsg = String.format("Title: %s , Role: %s , Path: %s , Desc: %s", 
+								firstWidget.get(Tags.Title, "") , firstWidget.get(Tags.Role), firstWidget.get(Tags.Path), firstWidget.get(Tags.Desc, ""));
+
+						Widget secondWidget = leafWidgetsRects.get(j).left();
+						String secondMsg = String.format("Title: %s , Role: %s , Path: %s , Desc: %s", 
+								secondWidget.get(Tags.Title, "") , secondWidget.get(Tags.Role), secondWidget.get(Tags.Path), secondWidget.get(Tags.Desc, ""));
+
+						String verdictMsg = "Two Widgets Overlapping!" + " First! " + firstMsg + ". Second! " + secondMsg;
+
+						widgetsOverlapVerdict = widgetsOverlapVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)firstWidget.get(Tags.Shape), (Rect)secondWidget.get(Tags.Shape))));
+					}
+				}
+			}
+		}
+
+		return widgetsOverlapVerdict;
+	}
+
+	private boolean checkRectIntersection(Rect r1, Rect r2) {
+		// TODO: If some widget contains a negative x or y axis
+		// This checking can provoke a false positive recognition
+		return !(r1.x() + r1.width() <= r2.x() ||
+				r1.y() + r1.height() <= r2.y() ||
+				r2.x() + r2.width() <= r1.x() ||
+				r2.y() + r2.height() <= r1.y()); 
 	}
 
 	private Verdict functionalButtonVerdict(State state) {
