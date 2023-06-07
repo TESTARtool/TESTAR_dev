@@ -1013,6 +1013,248 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 				r2.y() + r2.height() <= r1.y()); 
 	}
 
+	private Verdict widgetAlignmentMetric(State state, double tresholdValue) {
+		Verdict widgetAlignmentMetricVerdict = Verdict.OK;
+
+	    ArrayList<Rect> regions = getRegions(state);
+        
+		// returns a value from 0.00 to 100.0. Lower is bad alignment.
+		double alignmentMetric = calculateAlignmentMetric(regions);
+        
+        if (alignmentMetric <= tresholdValue)
+        {
+            String webUrl = WdDriver.getCurrentUrl();
+            String verdictMsg = String.format("Alignment metric for page '%s' with value %f is below treshold value %f!",  webUrl, alignmentMetric, tresholdValue);
+            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
+		    widgetAlignmentMetricVerdict = widgetAlignmentMetricVerdict.join(verdict);
+        }
+
+		return widgetAlignmentMetricVerdict;
+	}
+
+    private ArrayList<Rect> getRegions(State state)
+    {
+        	// Prepare a list that contains all the Rectangles from the leaf widgets
+        ArrayList<Rect> regions = new ArrayList<Rect>();
+      
+		for(Widget w : state) {
+			if(w.childCount() < 1 && w.get(Tags.Shape, null) != null) {
+ 				regions.add((Rect)w.get(Tags.Shape));
+			}
+		}
+        return regions;
+    }
+
+    // Copied from: https://github.com/mathieuzen/questim/blob/workingapp/src/be/lilab/questim/server/Alignment.java
+    private double calculateAlignmentMetric(ArrayList<Rect> regions)
+    {	
+        int treshold = 1;
+		int verticalAlignment1 = 0;
+		int horizontalAlignment1 = 0;
+		int verticalAlignment2 = 0;
+		int horizontalAlignment2 = 0;
+		int DAV = 0;
+		int DAH = 0;
+		int n = regions.size();
+		double value = 0.0;
+		
+		for(int i=0; i<regions.size();i++){	
+			Rect r1 = regions.get(i);
+			verticalAlignment1 = 0;
+			horizontalAlignment1 = 0;
+			verticalAlignment2 = 0;
+			horizontalAlignment2 = 0;
+			for(int j=0; j<regions.size();j++){
+				if(j!=i){				
+				Rect r2 = regions.get(j);
+					if((r1.x()<=r2.x()+treshold) && (r1.x()>=r2.x()-treshold))
+						verticalAlignment1=1;
+					if((r1.x()+r1.width()<=r2.x()+r2.width()+treshold) && (r1.x()+r1.width()>=r2.x()+r2.width()-treshold))
+						verticalAlignment2=1;
+					if((r1.y()<=r2.y()+treshold) && (r1.y()>=r2.y()-treshold))
+						horizontalAlignment1=1;
+					if((r1.y()+r1.height()<=r2.y()+r2.height()+treshold) && (r1.y()+r1.height()>=r2.y()+r2.height()-treshold))
+						horizontalAlignment2=1;
+				}
+			}
+			
+			DAV += verticalAlignment1 + verticalAlignment2;
+			DAH += horizontalAlignment1 + horizontalAlignment2;
+			
+		}
+		
+		value = (double)(DAV + DAH)/(n*4);
+		return value * 100;
+    }
+    
+    private Verdict widgetBalanceMetric(State state, double tresholdValue) {
+		Verdict widgetBalanceMetricVerdict = Verdict.OK;
+
+		ArrayList<Rect> regions = getRegions(state);
+        Rect sutRect = (Rect) state.child(0).get(Tags.Shape, null);
+        
+		// returns a value from 0.00 to 100.0. Lower is bad alignment.
+		double balanceMetric = calculateBalanceMetric(regions, sutRect.width(), sutRect.height());
+        
+        if (balanceMetric <= tresholdValue)
+        {
+            String webUrl = WdDriver.getCurrentUrl();
+            String verdictMsg = String.format("Balance metric for page '%s' with value %f is below treshold value %f!",  webUrl, balanceMetric, tresholdValue);
+            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
+		    widgetBalanceMetricVerdict = widgetBalanceMetricVerdict.join(verdict);
+        }
+
+		return widgetBalanceMetricVerdict;
+	}
+    
+   public double calculateBalanceMetric(ArrayList<Rect> regions, double frameWidth, double frameHeight) {
+		
+		double [][] belonging = new double [regions.size()][4];
+		double [] a = new double [regions.size()];
+		double value = 0.0;
+		
+		double BMvert;
+		double BMhori;
+		
+		double amax = 0;
+		
+		double wl = 0;
+		double wr = 0;
+		double wt = 0;
+		double wb = 0;
+		
+		for(int i=0;i<regions.size();i++){
+			
+			Rect r = regions.get(i);
+			
+			
+			a[i] = (double)r.width()* (double)r.height();
+			if(a[i]>amax){
+				amax = a[i];
+			}
+			
+			
+			//Belonging tests
+			//UL
+			
+			if((r.x() < frameWidth/2) && (r.x()+r.width() > frameWidth/2) && (r.y() < frameHeight/2) && (r.y()+r.height() > frameHeight/2))
+			{
+				belonging[i][0] = ((double)(frameWidth/2 - r.x())  * (frameHeight/2 - r.y()))/(r.width()*r.height());
+			}
+			
+			else if((frameWidth/2 - r.x() < r.width()) && (frameHeight/2 - r.y() > r.height()))
+			{
+				belonging[i][0] = ((double)(frameWidth/2 - r.x())/(r.width()));
+			}
+			
+			else if((frameWidth/2 - r.x() > r.width()) && (frameHeight/2 - r.y() < r.height()))
+			{
+				belonging[i][0] = ((double)(frameHeight/2 - r.y())/(r.height()));
+			}
+			
+			else if((frameWidth/2 - r.x() > r.width()) && (frameHeight/2 - r.y() > r.height()))
+			{
+				belonging[i][0] = 1;
+			}
+			
+			//UR
+						
+			if((r.x() < frameWidth/2) && (r.x()+r.width() > frameWidth/2) && (r.y()+r.height() > frameHeight/2))
+			{
+				belonging[i][1] = ((double)(r.x()+r.width()  - frameWidth/2)  * (frameHeight/2 - r.y()))/(r.width()*r.height());
+			}
+			
+			else if((r.x()+r.width() > frameWidth/2) && (r.y()+r.height() < frameHeight/2))
+			{
+				belonging[i][1] = ((double)(r.x()+r.width()  - frameWidth/2)/(r.width()));
+			}
+			
+			else if((r.x() > frameWidth/2) && (r.y()+r.height() > frameHeight/2))
+			{
+				belonging[i][1] = ((double)(frameHeight/2 - r.y())/(r.height()));
+			}
+			
+			if((r.x() > frameWidth/2) && (r.y()+r.height() < frameHeight/2))
+			{
+				belonging[i][1] = 1;
+			}
+			
+			//LL
+			
+			if((r.x() < frameWidth/2) && (r.x()+r.width() > frameWidth/2) && (r.y() < frameHeight/2) && (r.y()+r.height() > frameHeight/2))
+			{
+				belonging[i][2] = ((double)(frameWidth/2 - r.x())  * (r.y()+r.height() - frameHeight/2))/(r.width()*r.height());
+			}
+			
+			else if((r.x() < frameWidth/2) && (r.x()+r.width() < frameWidth/2) && (r.y() < frameHeight/2) && (r.y()+r.height() > frameHeight/2))
+			{
+				belonging[i][2] = ((double)(r.y()+r.height()-frameHeight/2)/(r.height()));
+			}
+			
+			else if((r.x() < frameWidth/2) && (r.x()+r.width() > frameWidth/2) && (r.y() > frameHeight/2) && (r.y()+r.height() > frameHeight/2))
+			{
+				belonging[i][2] = ((double)(frameWidth/2 - r.x())/(r.width()));
+			}
+			
+			else if((r.x() < frameWidth/2) && (r.x()+r.width() < frameWidth/2) && (r.y() > frameHeight/2) && (r.y()+r.height() > frameHeight/2))
+			{
+				belonging[i][2] = 1;
+			}
+			
+			//LR
+			if((r.x() < frameWidth/2) && (r.x()+r.width() > frameWidth/2) && (r.y() < frameHeight/2) && (r.y()+r.height() > frameHeight/2))
+			{
+				belonging[i][3] = ((double)(r.x()+r.width()  - frameWidth/2)  * (r.y()+r.height() - frameHeight/2))/(r.width()*r.height());
+			}
+			
+			else if((r.x() > frameWidth/2) && (r.x()+r.width() > frameWidth/2) && (r.y() < frameHeight/2) && (r.y()+r.height() > frameHeight/2))
+			{
+				belonging[i][3] = ((double)(r.y()+r.height()-frameHeight/2)/(r.height()));
+			}
+			
+			else if((r.x() < frameWidth/2) && (r.x()+r.width() > frameWidth/2) && (r.y() > frameHeight/2) && (r.y()+r.height() > frameHeight/2))
+			{
+				belonging[i][3] = ((double)(r.x()+r.width()-frameWidth/2)/(r.width()));
+			}
+			
+			else if((r.x() > frameWidth/2) && (r.x()+r.width() > frameWidth/2) && (r.y() > frameHeight/2) && (r.y()+r.height() > frameHeight/2))
+			{
+				belonging[i][3] = 1;
+			}
+			
+			for(int j=0; j<4; j++){
+				if(belonging[i][j]<0){
+					belonging[i][j]=0;
+				}
+			}
+			
+			
+			if(belonging[i][0] == 1 || belonging[i][1] == 1 || belonging[i][2] == 1 || belonging [i][3] == 1)
+			{
+			wl += belonging[i][0]*(1+(frameWidth/2 - (r.x()+r.width()/2))/frameWidth/2)*(a[i]/amax)+belonging[i][2]*(1+(frameWidth/2 - (r.x()+r.width()/2))/frameWidth/2)*(a[i]/amax);
+			wr += belonging[i][1]*(1+((r.x()+r.width()/2) - frameWidth/2)/frameWidth/2)*(a[i]/amax)+belonging[i][3]*(1+((r.x()+r.width()/2) - frameWidth/2)/frameWidth/2)*(a[i]/amax);
+			wt += belonging[i][0]*(1+(frameHeight/2 - (r.y()+r.height()/2))/frameHeight/2)*(a[i]/amax)+belonging[i][1]*(1+(frameHeight/2 - (r.y()+r.height()/2))/frameHeight/2)*(a[i]/amax);
+			wb += belonging[i][2]*(1+((r.y()+r.height()/2) - frameHeight/2)/frameHeight/2)*(a[i]/amax)+belonging[i][3]*(1+((r.y()+r.height()/2) - frameHeight/2)/frameHeight/2)*(a[i]/amax);
+			}
+			else
+			{
+			wl += belonging[i][0]*(a[i]/amax)+belonging[i][2]*(a[i]/amax);
+			wr += belonging[i][1]*(a[i]/amax)+belonging[i][3]*(a[i]/amax);
+			wt += belonging[i][0]*(a[i]/amax)+belonging[i][1]*(a[i]/amax);
+			wb += belonging[i][2]*(a[i]/amax)+belonging[i][3]*(a[i]/amax);
+			}
+			
+		}
+			
+			
+			BMvert = (wl-wr)/Math.max(wl,wr);
+			BMhori = (wt-wb)/Math.max(wt,wb);
+			
+			value = 1-(Math.abs(BMvert)+Math.abs(BMhori))/2;			
+		
+		return 100 - value * 100;
+	}
+
 	private void testLog4J() {
      String logEntries = "<log4j:event logger=\"Log4JLibs.LogExample\" timestamp=\"1683569806499\" level=\"INFO\" thread=\"main\">\r\n" + 
         		"<log4j:message><![CDATA[Info AAAAAAAAAAAAAAAAAAAAAaa]]></log4j:message>\r\n" + 
@@ -1076,6 +1318,12 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		//verdict = formButtonMustBeDisabledIfNoChangesVerdict(state);
 		//if (shouldReturnVerdict(verdict)) return verdict;
         //testLog4J();
+        
+        verdict = widgetAlignmentMetric(state, 50.0);
+        if (shouldReturnVerdict(verdict)) return verdict;
+        
+        verdict = widgetBalanceMetric(state, 50.0);
+        if (shouldReturnVerdict(verdict)) return verdict;
         
 		verdict = detectWidgetsThatShouldBeInSync(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
