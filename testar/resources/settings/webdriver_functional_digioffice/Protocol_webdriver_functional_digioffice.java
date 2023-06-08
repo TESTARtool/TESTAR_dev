@@ -88,6 +88,7 @@ import org.apache.logging.log4j.core.parser.ParseException;
 import org.apache.logging.log4j.core.parser.XmlLogEventParser;
 
 
+
 /**
  * Protocol with functional oracles examples to detect:
  * - Web dummy button
@@ -1460,6 +1461,128 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		return value * 100;
 	}
 
+    /**
+	 * Obtain all leaf widgets of the State and verify if they overlap. 
+	 * We can completely ignore leaf widgets (by Role or Web Class) if the are part of an undesired sub-tree. 
+	 * Or we can consider the parent of the leaf widget to verify if it overlaps with other leaf widgets. 
+	 * 
+	 * @param state
+	 * @param ignoreByRoles
+	 * @param ignoreByClasses
+	 * @param parentByRoles
+	 * @param parentByClasses
+	 * @return
+	 */
+	private Verdict twoLeafWidgetsOverlap(State state,  List<Role> ignoredRoles,  List<String> ignoredClasses,  List<Role> getParentByRoles,  List<String> getParentByClasses) {
+		Verdict widgetsOverlapVerdict = Verdict.OK;
+
+		// Prepare a list that contains all the Rectangles from the leaf widgets
+		List<Pair<Widget, Rect>> leafWidgetsRects = new ArrayList<>();
+		for(Widget w : state) {
+			if(w.childCount() < 1 && w.get(Tags.Shape, null) != null) {
+				// Some Widgets, such as Table Data (TD) with span elements, may produce false positives when verifying the leaf widget content. 
+				// We can completely ignore the widget or sub-tree widgets that descend from these undesired Roles or Classes. 
+				if(isOrDescendFromRole(w, ignoredRoles) || isOrDescendFromClass(w, ignoredClasses)) {
+					continue;
+				} 
+				// With other widgets, such as icons, we may want to consider the parent as a leaf widget. 
+				// We can ignore the leaf widget but consider his parent the leaf one. 
+				else if(isOrDescendFromRole(w, getParentByRoles) || isOrDescendFromClass(w, getParentByClasses)) {
+					if(w.parent() != null && w.parent().get(Tags.Shape, null) != null) {
+                        Rect parentRect = (Rect)w.parent().get(Tags.Shape);
+                        // Only include rect if it has surface
+                        if (parentRect.width() > 0 && parentRect.height() > 0) {
+						  leafWidgetsRects.add(new Pair<Widget, Rect>(w.parent(), parentRect));
+                        }
+					}
+				} else {
+                    Rect widgetRect = (Rect)w.get(Tags.Shape);
+                     // Only include rect if it has surface
+                    if (widgetRect.width() > 0 && widgetRect.height() > 0) {
+    					leafWidgetsRects.add(new Pair<Widget, Rect>(w, widgetRect));
+                    }
+				}
+			}
+		}
+
+		for(int i = 0; i < leafWidgetsRects.size(); i++) {
+			for(int j = i + 1; j < leafWidgetsRects.size(); j++) {
+				if(leafWidgetsRects.get(i) != leafWidgetsRects.get(j)) {
+					Rect rectOne = leafWidgetsRects.get(i).right();
+					Rect rectTwo = leafWidgetsRects.get(j).right();
+                    Widget firstWidget = leafWidgetsRects.get(i).left();
+                    Widget secondWidget = leafWidgetsRects.get(j).left();
+					if(checkRectIntersection(rectOne, rectTwo) && firstWidget != secondWidget) {
+						String firstMsg = String.format("Title: %s , WebTextContent: %s , Role: %s , Class: %s , Path: %s , WebId: %s , X: %d, Y: %d, Width: %d, Height %d", 
+						firstWidget.get(Tags.Title, ""), firstWidget.get(WdTags.WebTextContent, ""), firstWidget.get(Tags.Role), firstWidget.get(WdTags.WebCssClasses, ""), firstWidget.get(Tags.Path), firstWidget.get(WdTags.WebId, ""), (long)rectOne.x(), (long)rectOne.y(), (long)rectOne.width(), (long)rectOne.height());
+
+						String secondMsg = String.format("Title: %s , WebTextContent: %s , Role: %s , Class: %s , Path: %s , WebId: %s , X: %d, Y: %d, Width: %d, Height %d", 
+					    secondWidget.get(Tags.Title, ""), secondWidget.get(WdTags.WebTextContent, ""), secondWidget.get(Tags.Role), firstWidget.get(WdTags.WebCssClasses, ""), secondWidget.get(Tags.Path), secondWidget.get(WdTags.WebId, ""), (long)rectTwo.x(), (long)rectTwo.y(), (long)rectTwo.width(), (long)rectTwo.height());
+
+						String verdictMsg = "Two Widgets Overlapping!" + " First in RED! " + firstMsg + ". Second in BLUE! " + secondMsg;
+
+						// Custom colors of overlapping widgets
+						Rect firstWidgetRect = (Rect)firstWidget.get(Tags.Shape);
+						firstWidgetRect.setColor(java.awt.Color.RED);
+						Rect secondWidgetRect = (Rect)secondWidget.get(Tags.Shape);
+						secondWidgetRect.setColor(java.awt.Color.BLUE);
+
+						//widgetsOverlapVerdict = widgetsOverlapVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList(firstWidgetRect, secondWidgetRect)));
+                        widgetsOverlapVerdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList(firstWidgetRect, secondWidgetRect));
+					}
+				}
+			}
+		}
+
+		return widgetsOverlapVerdict;
+	}
+
+	private boolean isOrDescendFromRole(Widget widget, List<Role> roles) {
+        if (roles.size() == 0) return false;
+		if (roles.contains(widget.get(Tags.Role, Roles.Widget))) return true;
+		else if(widget.parent() == null) return false;
+		else return isOrDescendFromRole(widget.parent(), roles);
+	}
+	private boolean isOrDescendFromClass(Widget widget, List<String> webClasses) {
+        if (webClasses.size() == 0) return false;
+		if (webClasses.stream().anyMatch(str -> widget.get(WdTags.WebCssClasses, "").contains(str))) return true;
+		else if(widget.parent() == null) return false;
+		else return isOrDescendFromClass(widget.parent(), webClasses);
+	}
+
+    private int getMaxWidgetTreeDepth(Widget widget) {
+		int maxChildDepth = 0;
+		if (widget.childCount() > 0) {
+			for (int i = 0; i < widget.childCount(); i++) {
+				Widget child = widget.child(i);
+				int childDepth = getMaxWidgetTreeDepth(child);
+				maxChildDepth = Math.max(maxChildDepth, childDepth);
+			}
+		}
+
+		return maxChildDepth + 1;
+	}
+
+	private List<Widget> getWidgetsAtDepth(Widget original, int targetDepth) {
+		List<Widget> result = new ArrayList<>();
+		getWidgetsAtDepthRecursive(original, 1, targetDepth, result);
+		return result;
+	}
+
+	private void getWidgetsAtDepthRecursive(Widget widget, int currentDepth, int targetDepth, List<Widget> result) {
+		if (currentDepth == targetDepth) {
+			result.add(widget);
+		} else if (currentDepth < targetDepth) {
+			if (widget.childCount() > 0) {
+				for (int i = 0; i < widget.childCount(); i++) {
+					Widget child = widget.child(i);
+					getWidgetsAtDepthRecursive(child, currentDepth + 1, targetDepth, result);
+				}
+			}
+		}
+	}
+
+
 	private void testLog4J() {
      String logEntries = "<log4j:event logger=\"Log4JLibs.LogExample\" timestamp=\"1683569806499\" level=\"INFO\" thread=\"main\">\r\n" + 
         		"<log4j:message><![CDATA[Info AAAAAAAAAAAAAAAAAAAAAaa]]></log4j:message>\r\n" + 
@@ -1524,6 +1647,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		//if (shouldReturnVerdict(verdict)) return verdict;
         //testLog4J();
         
+        /*
         verdict = widgetAlignmentMetric(state, 50.0);
         if (shouldReturnVerdict(verdict)) return verdict;
         
@@ -1538,10 +1662,25 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
         
         verdict = widgetDensityMetric(state, 50.0);
         if (shouldReturnVerdict(verdict)) return verdict;
+        */
         
         /*verdict = widgetSimplicityMetric(state, 25.0, 75.0);
         if (shouldReturnVerdict(verdict)) return verdict;
         */
+        
+        // Check the functional Verdict that detects if two leaf widgets overlap
+		// Also, add the roles or the classes of the widget sub-trees are needed to ignore
+		verdict = twoLeafWidgetsOverlap(state, 
+				Collections.emptyList(), // ignoredRoles, 
+				Arrays.asList("sizer","previewsizer","navigation-sizer"), // ignoredClasses
+				Arrays.asList(WdRoles.WdSPAN, WdRoles.WdA), // getParentByRoles
+				Collections.emptyList()); // getParentByClasses
+		if (shouldReturnVerdict(verdict)) return verdict;
+
+		// Check the functional Verdict that detects correct vertical alignment in role groups
+		//verdict = alignmentForWidgetGroups(state, Arrays.asList(WdRoles.WdUL));
+		//if (shouldReturnVerdict(verdict)) return verdict;
+
         /*
          Element Balance (best score: 1.0) refers to the overall symmetry, balanced element distribution (e.g., consistent space
 between elements), and skewness of the elements. Alignment
