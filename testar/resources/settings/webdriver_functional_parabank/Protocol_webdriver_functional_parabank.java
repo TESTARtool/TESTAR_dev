@@ -304,8 +304,17 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if two leaf widgets overlap
-		verdict = twoLeafWidgetsOverlap(state);
+		// Also, add the roles or the classes of the widget sub-trees are needed to ignore
+		verdict = twoLeafWidgetsOverlap(state, 
+				Arrays.asList(WdRoles.WdTD), // ignoredRoles, 
+				Arrays.asList("span-class"), // ignoredClasses
+				Collections.emptyList(), // getParentByRoles
+				Collections.emptyList()); // getParentByClasses
 		if (shouldReturnVerdict(verdict)) return verdict;
+
+		// Check the functional Verdict that detects correct vertical alignment in role groups
+		//verdict = alignmentForWidgetGroups(state, Arrays.asList(WdRoles.WdUL));
+		//if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects duplicate or repeated text in descriptions of widgets
 		verdict = WebVerdict.DetectDuplicateText(state, "");
@@ -373,14 +382,39 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 		return verdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch(info -> info.contains(verdict.info().replace("\n", " ")));
 	}
 
-	private Verdict twoLeafWidgetsOverlap(State state) {
+	/**
+	 * Obtain all leaf widgets of the State and verify if they overlap. 
+	 * We can completely ignore leaf widgets (by Role or Web Class) if the are part of an undesired sub-tree. 
+	 * Or we can consider the parent of the leaf widget to verify if it overlaps with other leaf widgets. 
+	 * 
+	 * @param state
+	 * @param ignoreByRoles
+	 * @param ignoreByClasses
+	 * @param parentByRoles
+	 * @param parentByClasses
+	 * @return
+	 */
+	private Verdict twoLeafWidgetsOverlap(State state,  List<Role> ignoredRoles,  List<String> ignoredClasses,  List<Role> getParentByRoles,  List<String> getParentByClasses) {
 		Verdict widgetsOverlapVerdict = Verdict.OK;
 
 		// Prepare a list that contains all the Rectangles from the leaf widgets
 		List<Pair<Widget, Rect>> leafWidgetsRects = new ArrayList<>();
 		for(Widget w : state) {
 			if(w.childCount() < 1 && w.get(Tags.Shape, null) != null) {
-				leafWidgetsRects.add(new Pair<Widget, Rect>(w, (Rect)w.get(Tags.Shape)));
+				// Some Widgets, such as Table Data (TD) with span elements, may produce false positives when verifying the leaf widget content. 
+				// We can completely ignore the widget or sub-tree widgets that descend from these undesired Roles or Classes. 
+				if(isOrDescendFromRole(w, ignoredRoles) || isOrDescendFromClass(w, ignoredClasses)) {
+					continue;
+				} 
+				// With other widgets, such as icons, we may want to consider the parent as a leaf widget. 
+				// We can ignore the leaf widget but consider his parent the leaf one. 
+				else if(isOrDescendFromRole(w, getParentByRoles) || isOrDescendFromClass(w, getParentByClasses)) {
+					if(w.parent() != null && w.parent().get(Tags.Shape, null) != null) {
+						leafWidgetsRects.add(new Pair<Widget, Rect>(w.parent(), (Rect)w.parent().get(Tags.Shape)));
+					}
+				} else {
+					leafWidgetsRects.add(new Pair<Widget, Rect>(w, (Rect)w.get(Tags.Shape)));
+				}
 			}
 		}
 
@@ -400,7 +434,13 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 
 						String verdictMsg = "Two Widgets Overlapping!" + " First! " + firstMsg + ". Second! " + secondMsg;
 
-						widgetsOverlapVerdict = widgetsOverlapVerdict.join(new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)firstWidget.get(Tags.Shape), (Rect)secondWidget.get(Tags.Shape))));
+						// Custom colors of overlapping widgets
+						Rect firstWidgetRect = (Rect)firstWidget.get(Tags.Shape);
+						firstWidgetRect.setColor(java.awt.Color.RED);
+						Rect secondWidgetRect = (Rect)secondWidget.get(Tags.Shape);
+						secondWidgetRect.setColor(java.awt.Color.BLUE);
+
+						widgetsOverlapVerdict = widgetsOverlapVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList(firstWidgetRect, secondWidgetRect)));
 					}
 				}
 			}
@@ -416,6 +456,101 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 				r1.y() + r1.height() <= r2.y() ||
 				r2.x() + r2.width() <= r1.x() ||
 				r2.y() + r2.height() <= r1.y()); 
+	}
+
+	private boolean isOrDescendFromRole(Widget widget, List<Role> roles) {
+		if (roles.contains(widget.get(Tags.Role, Roles.Widget))) return true;
+		else if(widget.parent() == null) return false;
+		else return isOrDescendFromRole(widget.parent(), roles);
+	}
+	private boolean isOrDescendFromClass(Widget widget, List<String> webClasses) {
+		if (webClasses.stream().anyMatch(str -> widget.get(WdTags.WebCssClasses, "").contains(str))) return true;
+		else if(widget.parent() == null) return false;
+		else return isOrDescendFromClass(widget.parent(), webClasses);
+	}
+
+	// TODO: Improve by using the widgetAlignmentMetric functionality
+	private Verdict alignmentForWidgetGroups(State state, List<Role> roleGroups) {
+		Verdict alignmentVerdict = Verdict.OK;
+
+		for(Widget w : state) {
+			// If we found a widget group role on which verify the alignment 
+			// and the widget contains a visible children
+			if(roleGroups.contains(w.get(Tags.Role, Roles.Widget)) && w.childCount() > 0) {
+				// Obtain the max depth of this widget sub-tree
+				int maxDepth = getMaxWidgetTreeDepth(w);
+				// Depth 1 corresponds to the original widget we descend
+				// Then, we start at depth 2
+				for(int i = 2; i <= maxDepth; i++) {
+					// Get all sub-tree widgets at depth i
+					List<Widget> groupWidgets = getWidgetsAtDepth(w, i);
+					// Get the axis alignment of the first widget
+					double verticalPosAlignment = ((Rect)groupWidgets.get(0).get(Tags.Shape)).x();
+					double horizontalPosAlignment = ((Rect)groupWidgets.get(0).get(Tags.Shape)).y();
+					// Verify all sub-tree widgets are in the same alignment
+					for(Widget verifyWidget : groupWidgets) {
+						if(verifyWidget.get(Tags.Shape, null) != null) {
+							Rect childRect = (Rect)verifyWidget.get(Tags.Shape);
+
+							Verdict verticalAlignmentVerdict = Verdict.OK;
+							Verdict horizontalAlignmentVerdict = Verdict.OK;
+
+							if(childRect.x() != verticalPosAlignment) {
+								String verdictMsg = String.format("Invalid Vertical Alignment Detected! Title: %s , Role: %s , Path: %s , Desc: %s", 
+										verifyWidget.get(Tags.Title, "") , verifyWidget.get(Tags.Role), verifyWidget.get(Tags.Path), verifyWidget.get(Tags.Desc, ""));
+
+								verticalAlignmentVerdict = new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)verifyWidget.get(Tags.Shape)));
+							}
+
+							if(childRect.y() != horizontalPosAlignment) {
+								String verdictMsg = String.format("Invalid Horizontal Alignment Detected! Title: %s , Role: %s , Path: %s , Desc: %s", 
+										verifyWidget.get(Tags.Title, "") , verifyWidget.get(Tags.Role), verifyWidget.get(Tags.Path), verifyWidget.get(Tags.Desc, ""));
+
+								horizontalAlignmentVerdict = new Verdict(Verdict.SEVERITY_WARNING, verdictMsg, Arrays.asList((Rect)verifyWidget.get(Tags.Shape)));
+							}
+
+							if(verticalAlignmentVerdict != Verdict.OK && horizontalAlignmentVerdict != Verdict.OK) {
+								alignmentVerdict = alignmentVerdict.join(verticalAlignmentVerdict).join(horizontalAlignmentVerdict);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return alignmentVerdict;
+	}
+
+	private int getMaxWidgetTreeDepth(Widget widget) {
+		int maxChildDepth = 0;
+		if (widget.childCount() > 0) {
+			for (int i = 0; i < widget.childCount(); i++) {
+				Widget child = widget.child(i);
+				int childDepth = getMaxWidgetTreeDepth(child);
+				maxChildDepth = Math.max(maxChildDepth, childDepth);
+			}
+		}
+
+		return maxChildDepth + 1;
+	}
+
+	private List<Widget> getWidgetsAtDepth(Widget original, int targetDepth) {
+		List<Widget> result = new ArrayList<>();
+		getWidgetsAtDepthRecursive(original, 1, targetDepth, result);
+		return result;
+	}
+
+	private void getWidgetsAtDepthRecursive(Widget widget, int currentDepth, int targetDepth, List<Widget> result) {
+		if (currentDepth == targetDepth) {
+			result.add(widget);
+		} else if (currentDepth < targetDepth) {
+			if (widget.childCount() > 0) {
+				for (int i = 0; i < widget.childCount(); i++) {
+					Widget child = widget.child(i);
+					getWidgetsAtDepthRecursive(child, currentDepth + 1, targetDepth, result);
+				}
+			}
+		}
 	}
 
 	private Verdict functionalButtonVerdict(State state) {

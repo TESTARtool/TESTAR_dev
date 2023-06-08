@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<style>
+    table {
+      border-collapse: collapse;
+    }
+    
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+      max-width: 150px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    th {
+      background-color: #f2f2f2;
+    }
+
+    #second_button {
+      margin-left: -10px; /* Adjust this value to control the overlap */
+    }
+	</style>
+</head>
+<body>
+
+	<p>Hello User</p>
+
+	<h3>Correct ellipsis table text (no span)</h3>
+	<table>
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Country</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Long Name TESTAR scriptless testing tool</td>
+				<td>Joe</td>
+			</tr>
+			<tr>
+				<td>Spain</td>
+				<td>Netherlands</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<h3>False positive ellipsis table text (span element)</h3>
+	<table>
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Country</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><span class="span-class">Long Name TESTAR scriptless testing tool</span></td>
+				<td><span class="span-class">Joe</span></td>
+			</tr>
+			<tr>
+				<td><span class="span-class">Spain</span></td>
+				<td><span class="span-class">Netherlands</span></td>
+			</tr>
+		</tbody>
+	</table>
+
+	<h3>True Overlap</h3>
+	<div id="buttons">
+		<button id="first_button" onclick="changeText()">FirstButton</button>
+		<button id="second_button" onclick="changeText()">SecondButton</button>
+	</div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<script>
+	function changeText(){
+		if ($("p").is(':contains(Hello)')) {
+			$("p:contains(Hello)").text("This is a TESTAR web example");
+		} else {
+			$("p:contains(TESTAR)").text("Hello user");
+		}
+	}
+	</script>
+
+</body>
+</html>

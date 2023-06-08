@@ -372,9 +372,9 @@ public class HtmlSequenceReport implements Reporting{
     		// Draw in top of the state screenshot to highlight the erroneous widget
     		BufferedImage img = ImageIO.read(imageFile);
     		Graphics2D g2d = img.createGraphics();
-    		g2d.setColor(java.awt.Color.RED);
     		g2d.setStroke(new BasicStroke(3));
     		for(Rect r : verdict.getVisualtHighlights()) {
+    			g2d.setColor(r.getColor());
     			g2d.drawRect((int)r.x(), (int)r.y(), (int)r.width(), (int)r.height());
     		}
     		g2d.dispose();
