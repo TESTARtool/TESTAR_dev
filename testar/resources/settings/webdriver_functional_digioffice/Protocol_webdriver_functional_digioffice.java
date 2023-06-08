@@ -1093,7 +1093,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		ArrayList<Rect> regions = getRegions(state);
         Rect sutRect = (Rect) state.child(0).get(Tags.Shape, null);
         
-		// returns a value from 0.00 to 100.0. Lower is bad alignment.
+		// returns a value from 0.00 to 100.0. Lower is bad balance.
 		double balanceMetric = calculateBalanceMetric(regions, sutRect.width(), sutRect.height());
         
         if (balanceMetric <= tresholdValue)
@@ -1255,6 +1255,211 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		return 100 - value * 100;
 	}
 
+    private Verdict widgetCenterAlignmentMetric(State state, double tresholdValue) {
+		Verdict widgetCenterAlignmentVerdict = Verdict.OK;
+
+		ArrayList<Rect> regions = getRegions(state);
+        
+		// returns a value from 0.00 to 100.0. Lower is bad alignment.
+		double metric = calculateCenterAlignment(regions);
+        
+        if (metric <= tresholdValue)
+        {
+            String webUrl = WdDriver.getCurrentUrl();
+            String verdictMsg = String.format("Center alignment metric for page '%s' with value %f is below treshold value %f!",  webUrl, metric, tresholdValue);
+            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
+		    widgetCenterAlignmentVerdict = widgetCenterAlignmentVerdict.join(verdict);
+        }
+
+		return widgetCenterAlignmentVerdict;
+	}
+
+    public double calculateCenterAlignment(ArrayList<Rect> regions) {
+		int treshold = 5;
+		int verticalCentralAlignment = 0;
+		int horizontalCentralAlignment = 0;
+		int CAV = 0;
+		int CAH = 0;
+		int n = regions.size();
+		double value = 0;
+		
+		for(int i=0; i<regions.size();i++){	
+			Rect r1 = regions.get(i);
+			verticalCentralAlignment = 0;
+			horizontalCentralAlignment = 0;
+			for(int j=0; j<regions.size();j++){
+				if(j!=i){				
+				Rect r2 = regions.get(j);
+					if((r1.x()+r1.width()/2<=r2.x()+r2.width()/2+treshold) && (r1.x()+r1.width()/2>=r2.x()+r2.width()/2-treshold))
+						verticalCentralAlignment = 1;
+					if((r1.y()+r1.height()/2<=r2.y()+r2.height()/2+treshold) && (r1.y()+r1.height()/2>=r2.y()+r2.height()/2-treshold))
+						horizontalCentralAlignment = 1;
+				}
+			}
+			
+			CAV += verticalCentralAlignment;
+			CAH += horizontalCentralAlignment;
+			
+		}
+		
+		value = (double)(CAV + CAH)/(n*2);
+		return value * 100;
+
+	}
+
+    private Verdict widgetConcentricityMetric(State state, double tresholdValue) {
+		Verdict widgetConcentricityVerdict = Verdict.OK;
+
+		ArrayList<Rect> regions = getRegions(state);
+        Rect sutRect = (Rect) state.child(0).get(Tags.Shape, null);
+        
+		// returns a value from 0.00 to 100.0.
+		double metric = calculateConcentricity(regions, sutRect.width(), sutRect.height());
+        
+        if (metric <= tresholdValue)
+        {
+            String webUrl = WdDriver.getCurrentUrl();
+            String verdictMsg = String.format("Concentricity metric for page '%s' with value %f is below treshold value %f!",  webUrl, metric, tresholdValue);
+            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
+		    widgetConcentricityVerdict = widgetConcentricityVerdict.join(verdict);
+        }
+
+		return widgetConcentricityVerdict;
+	}
+    
+    public double calculateConcentricity(ArrayList<Rect> region, double frameWidth, double frameHeight){
+		
+		double value = 0.0;
+		double ddiag = Math.hypot((double)frameWidth/2,(double)frameHeight/2);
+		double dbar = 0.0;
+		double dic = 0.0;
+		int xc = ((int)frameWidth)/2;
+		int yc = ((int)frameHeight)/2;
+		
+		for(int i=0;i<region.size();i++){
+			Rect r = region.get(i);
+			
+			dbar += Math.hypot((double)(r.x()+r.width()/2)-xc, (double)(r.y()+r.height()/2)-yc);
+		}
+		
+		dbar/=region.size();
+		
+		value = dbar/ddiag;
+		
+		return value * 100;
+		
+	}
+
+    private Verdict widgetDensityMetric(State state, double tresholdValue) {
+		Verdict widgetDensityVerdict = Verdict.OK;
+
+		ArrayList<Rect> regions = getRegions(state);
+        Rect sutRect = (Rect) state.child(0).get(Tags.Shape, null);
+        
+		// returns a value from 0.00 to 100.0.
+		double metric = calculateConcentricity(regions, sutRect.width(), sutRect.height());
+        
+        if (metric <= tresholdValue)
+        {
+            String webUrl = WdDriver.getCurrentUrl();
+            String verdictMsg = String.format("Density metric for page '%s' with value %f is below treshold value %f!",  webUrl, metric, tresholdValue);
+            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
+		    widgetDensityVerdict = widgetDensityVerdict.join(verdict);
+        }
+
+		return widgetDensityVerdict;
+	}
+
+    public double calculateDensity(ArrayList<Rect> regions, double frameWidth, double frameHeight) { 
+        double value = 0;
+		int areaframe=0;
+		int area=0;
+		
+		for(int i=0; i<regions.size(); i++){
+			Rect r = regions.get(i);
+			if(r.x()!=0 || r.y()!=0)
+			{
+				area += r.width()*r.height();
+			}
+			
+			areaframe = (int)frameWidth*(int)frameHeight;
+		
+			value = area/areaframe;
+		
+		}
+		
+		return value * 100;
+
+	}
+
+    private Verdict widgetSimplicityMetric(State state, double tresholdMinValue, double tresholdMaxValue) {
+		Verdict widgetSimplicityVerdict = Verdict.OK;
+
+		ArrayList<Rect> regions = getRegions(state);
+        Rect sutRect = (Rect) state.child(0).get(Tags.Shape, null);
+        
+		// returns a value from 0.00 to 100.0.
+		double metric = calculateSimplicity(regions, sutRect.width(), sutRect.height());
+        
+        if (metric < tresholdMinValue)
+        {
+            String webUrl = WdDriver.getCurrentUrl();
+            String verdictMsg = String.format("Simplicity metric for page '%s' with value %f is below treshold minimum value %f! Design too simple.",  webUrl, metric, tresholdMinValue);
+            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
+		    widgetSimplicityVerdict = widgetSimplicityVerdict.join(verdict);
+        }
+        
+        if (metric > tresholdMaxValue)
+        {
+            String webUrl = WdDriver.getCurrentUrl();
+            String verdictMsg = String.format("Simplicity metric for page '%s' with value %f is higher then treshold maximum value %f! Design too complex.",  webUrl, metric, tresholdMaxValue);
+            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
+		    widgetSimplicityVerdict = widgetSimplicityVerdict.join(verdict);
+        }
+
+		return widgetSimplicityVerdict;
+	}
+
+    public static double calculateSimplicity(ArrayList<Rect> regions, double frameWidth, double frameHeight){
+		int treshold = 1;
+		double value = 0.0;
+		
+		int verticalAlignment1 = 0;
+		int horizontalAlignment1 = 0;
+		int verticalAlignment2 = 0;
+		int horizontalAlignment2 = 0;
+		int DAV = 0;
+		int DAH = 0;
+		int n = regions.size();
+		
+		for(int i=0; i<regions.size();i++){	
+			Rect r1 = regions.get(i);
+			verticalAlignment1 = 0;
+			horizontalAlignment1 = 0;
+			verticalAlignment2 = 0;
+			horizontalAlignment2 = 0;
+			for(int j=0; j<regions.size();j++){
+				if(j!=i){				
+				Rect r2 = regions.get(j);
+					if(!(r1.x()<=r2.x()+treshold) && !(r1.x()>=r2.x()-treshold))
+						verticalAlignment1=1;
+					if(!(r1.x()+r1.width()<=r2.x()+r2.width()+treshold) && !(r1.x()+r1.width()>=r2.x()+r2.width()-treshold))
+						verticalAlignment2=1;
+					if(!(r1.y()<=r2.y()+treshold) && !(r1.y()>=r2.y()-treshold))
+						horizontalAlignment1=1;
+					if(!(r1.y()+r1.height()<=r2.y()+r2.height()+treshold) && !(r1.y()+r1.height()>=r2.y()+r2.height()-treshold))
+						horizontalAlignment2=1;
+				}
+			}
+			
+			DAV += verticalAlignment1 + verticalAlignment2;
+			DAH += horizontalAlignment1 + horizontalAlignment2;					
+		}
+		value = (double) 1/(DAV+DAH+n);
+		
+		return value * 100;
+	}
+
 	private void testLog4J() {
      String logEntries = "<log4j:event logger=\"Log4JLibs.LogExample\" timestamp=\"1683569806499\" level=\"INFO\" thread=\"main\">\r\n" + 
         		"<log4j:message><![CDATA[Info AAAAAAAAAAAAAAAAAAAAAaa]]></log4j:message>\r\n" + 
@@ -1325,6 +1530,36 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
         verdict = widgetBalanceMetric(state, 50.0);
         if (shouldReturnVerdict(verdict)) return verdict;
         
+        verdict = widgetCenterAlignmentMetric(state, 50.0);
+        if (shouldReturnVerdict(verdict)) return verdict;
+        
+        verdict = widgetConcentricityMetric(state, 50.0);
+        if (shouldReturnVerdict(verdict)) return verdict;
+        
+        verdict = widgetDensityMetric(state, 50.0);
+        if (shouldReturnVerdict(verdict)) return verdict;
+        
+        /*verdict = widgetSimplicityMetric(state, 25.0, 75.0);
+        if (shouldReturnVerdict(verdict)) return verdict;
+        */
+        /*
+         Element Balance (best score: 1.0) refers to the overall symmetry, balanced element distribution (e.g., consistent space
+between elements), and skewness of the elements. Alignment
+(best score: 1.0) pertains to the checking of alignment among
+elements. During computation, three vertical (left, middle, and
+right) and three horizontal (top, middle, and horizon) imaginary lines are drawn for each element to measure the score.
+Color Unity (best score: 1.0) shows the color use based on
+the ratio of dominant to non-dominant colors. Font Size and
+Type Unity (best score: 1.0) investigates the consistency of
+font sizes and types present in the text. Element size (best
+score: 0.5) is intended to verify whether elements are excessively small or large for mobile interfaces. Scores lower than
+0.5 mean the elements are small, while scores higher than 0.5
+imply the elements are large, on average. Density (best score:
+0.5) computes how much space is occupied. Scores of less
+than 0.5 translate into simplicity in design, whereas higher
+scores imply over-populated designs.*/
+        
+        /*
 		verdict = detectWidgetsThatShouldBeInSync(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
 		
@@ -1411,7 +1646,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
         // Check The replacement character � (often displayed as a black rhombus with a white question mark) is a symbol found in the Unicode standard at code point U+FFFD in the Specials table. It is used to indicate problems when a system is unable to render a stream of data to correct symbols
         verdict = detectUnicodeReplacementCharacter(state);
         if (shouldReturnVerdict(verdict)) return verdict;
-
+*/
 		return verdict;
 	}
 }
