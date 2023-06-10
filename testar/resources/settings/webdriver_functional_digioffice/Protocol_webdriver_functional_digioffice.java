@@ -766,7 +766,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 	private boolean isSonOfTD(Widget widget) {
 		if(widget.parent() == null) return false;
 		else if (widget.parent().get(Tags.Role, Roles.Widget).equals(WdRoles.WdTD)) return true;
-		else return isSonOfFormWidget(widget.parent());
+		else return isSonOfTD(widget.parent());
 	}
 
 	/**
@@ -1473,38 +1473,47 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 	 * @param parentByClasses
 	 * @return
 	 */
-	private Verdict twoLeafWidgetsOverlap(State state,  List<Role> ignoredRoles,  List<String> ignoredClasses,  List<Role> getParentByRoles,  List<String> getParentByClasses) {
+	private Verdict twoLeafWidgetsOverlap(State state,  List<Role> ignoredRoles,  List<String> ignoredClasses) {
 		Verdict widgetsOverlapVerdict = Verdict.OK;
 
 		// Prepare a list that contains all the Rectangles from the leaf widgets
 		List<Pair<Widget, Rect>> leafWidgetsRects = new ArrayList<>();
 		for(Widget w : state) {
-			if(w.childCount() < 1 && w.get(Tags.Shape, null) != null) {
-				// Some Widgets, such as Table Data (TD) with span elements, may produce false positives when verifying the leaf widget content. 
-				// We can completely ignore the widget or sub-tree widgets that descend from these undesired Roles or Classes. 
-				if(isOrDescendFromRole(w, ignoredRoles) || isOrDescendFromClass(w, ignoredClasses)) {
-					continue;
-				} 
-				// With other widgets, such as icons, we may want to consider the parent as a leaf widget. 
-				// We can ignore the leaf widget but consider his parent the leaf one. 
-				else if(isOrDescendFromRole(w, getParentByRoles) || isOrDescendFromClass(w, getParentByClasses)) {
-					if(w.parent() != null && w.parent().get(Tags.Shape, null) != null) {
-                        Rect parentRect = (Rect)w.parent().get(Tags.Shape);
-                        // Only include rect if it has surface
-                        if (parentRect.width() > 0 && parentRect.height() > 0) {
-						  leafWidgetsRects.add(new Pair<Widget, Rect>(w.parent(), parentRect));
+            if (w.get(Tags.Shape, null) != null)
+            {
+                Rect rect = (Rect) w.get(Tags.Shape, null);
+
+    			if(w.get(Tags.Shape, null) != null) {
+    				// Some Widgets, such as Table Data (TD) with span elements, may produce false positives when verifying the leaf widget content. 
+    				// We can completely ignore the widget or sub-tree widgets that descend from these undesired Roles or Classes. 
+    				if(isOrDescendFromRole(w, ignoredRoles) || isOrDescendFromClass(w, ignoredClasses)) {
+    					continue;
+    				} else {
+                        Rect widgetRect = (Rect)w.get(Tags.Shape);
+                         // Only include rect if it has surface
+                        if (widgetRect.width() > 0 && widgetRect.height() > 0) {
+                            boolean isContained = isContainedInAllParentsRect(w,w);
+                            
+                             String msgWidget = String.format("Title: %s , WebTextContent: %s , Role: %s , Class: %s , Path: %s , WebId: %s , X: %d, Y: %d, Width: %d, Height %d", 
+    						w.get(Tags.Title, ""), w.get(WdTags.WebTextContent, ""), w.get(Tags.Role), w.get(WdTags.WebCssClasses, ""), w.get(Tags.Path), w.get(WdTags.WebId, ""), (long)widgetRect.x(), (long)widgetRect.y(), (long)widgetRect.width(), (long)widgetRect.height());
+                            // TODO: if style {position: fixed}, then the widget could also be visible outside all the parent rectangulars. Thus if position is 'fixed', then should be added to list.
+                            if (isContained)
+                            {
+                                System.out.println("CONTAINED BY PARENTS: " + msgWidget);
+        					    leafWidgetsRects.add(new Pair<Widget, Rect>(w, widgetRect));
+                            }
+                            else
+                            {
+                                System.out.println("NOT CONTAINED BY PARENTS: " + msgWidget);
+                            }
+                            
                         }
-					}
-				} else {
-                    Rect widgetRect = (Rect)w.get(Tags.Shape);
-                     // Only include rect if it has surface
-                    if (widgetRect.width() > 0 && widgetRect.height() > 0) {
-    					leafWidgetsRects.add(new Pair<Widget, Rect>(w, widgetRect));
-                    }
-				}
-			}
+    				}
+    			}
+            }
 		}
 
+        List<String> reported = new ArrayList();
 		for(int i = 0; i < leafWidgetsRects.size(); i++) {
 			for(int j = i + 1; j < leafWidgetsRects.size(); j++) {
 				if(leafWidgetsRects.get(i) != leafWidgetsRects.get(j)) {
@@ -1512,24 +1521,32 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 					Rect rectTwo = leafWidgetsRects.get(j).right();
                     Widget firstWidget = leafWidgetsRects.get(i).left();
                     Widget secondWidget = leafWidgetsRects.get(j).left();
-					if(checkRectIntersection(rectOne, rectTwo) && firstWidget != secondWidget) {
+                    
+                    // no parent/child relationship, if they then intersect still then report
+					if(!isChildOf(firstWidget,secondWidget) && !isChildOf(secondWidget, firstWidget) && checkRectIntersection(rectOne, rectTwo) && firstWidget != secondWidget) {
+                        
 						String firstMsg = String.format("Title: %s , WebTextContent: %s , Role: %s , Class: %s , Path: %s , WebId: %s , X: %d, Y: %d, Width: %d, Height %d", 
 						firstWidget.get(Tags.Title, ""), firstWidget.get(WdTags.WebTextContent, ""), firstWidget.get(Tags.Role), firstWidget.get(WdTags.WebCssClasses, ""), firstWidget.get(Tags.Path), firstWidget.get(WdTags.WebId, ""), (long)rectOne.x(), (long)rectOne.y(), (long)rectOne.width(), (long)rectOne.height());
 
 						String secondMsg = String.format("Title: %s , WebTextContent: %s , Role: %s , Class: %s , Path: %s , WebId: %s , X: %d, Y: %d, Width: %d, Height %d", 
-					    secondWidget.get(Tags.Title, ""), secondWidget.get(WdTags.WebTextContent, ""), secondWidget.get(Tags.Role), firstWidget.get(WdTags.WebCssClasses, ""), secondWidget.get(Tags.Path), secondWidget.get(WdTags.WebId, ""), (long)rectTwo.x(), (long)rectTwo.y(), (long)rectTwo.width(), (long)rectTwo.height());
+					    secondWidget.get(Tags.Title, ""), secondWidget.get(WdTags.WebTextContent, ""), secondWidget.get(Tags.Role), secondWidget.get(WdTags.WebCssClasses, ""), secondWidget.get(Tags.Path), secondWidget.get(WdTags.WebId, ""), (long)rectTwo.x(), (long)rectTwo.y(), (long)rectTwo.width(), (long)rectTwo.height());
 
 						String verdictMsg = "Two Widgets Overlapping!" + " First in RED! " + firstMsg + ". Second in BLUE! " + secondMsg;
-
-						// Custom colors of overlapping widgets
-						Rect firstWidgetRect = (Rect)firstWidget.get(Tags.Shape);
-						firstWidgetRect.setColor(java.awt.Color.RED);
-						Rect secondWidgetRect = (Rect)secondWidget.get(Tags.Shape);
-						secondWidgetRect.setColor(java.awt.Color.BLUE);
-
-						//widgetsOverlapVerdict = widgetsOverlapVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList(firstWidgetRect, secondWidgetRect)));
-                        widgetsOverlapVerdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList(firstWidgetRect, secondWidgetRect));
-					}
+                        
+                        // Avoid duplicate message of other sides
+                        if (!reported.contains(secondMsg + firstMsg))
+                        {
+    						// Custom colors of overlapping widgets
+    						Rect firstWidgetRect = (Rect)firstWidget.get(Tags.Shape);
+    						firstWidgetRect.setColor(java.awt.Color.RED);
+    						Rect secondWidgetRect = (Rect)secondWidget.get(Tags.Shape);
+    						secondWidgetRect.setColor(java.awt.Color.BLUE);
+    
+    						//widgetsOverlapVerdict = widgetsOverlapVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList(firstWidgetRect, secondWidgetRect)));
+                            widgetsOverlapVerdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList(firstWidgetRect, secondWidgetRect));
+    					    reported.add(firstMsg + secondMsg);
+                        }
+                    }
 				}
 			}
 		}
@@ -1548,6 +1565,35 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		if (webClasses.stream().anyMatch(str -> widget.get(WdTags.WebCssClasses, "").contains(str))) return true;
 		else if(widget.parent() == null) return false;
 		else return isOrDescendFromClass(widget.parent(), webClasses);
+	}
+
+    private boolean isChildOf(Widget widget, Widget searchParent)
+    {
+        if (widget == null || searchParent == null || widget == searchParent || widget.parent() == null) return false;
+        if (widget.parent() == searchParent) return true;
+        else return isChildOf(widget.parent(), searchParent);
+    }
+   
+
+	private boolean isRect1ContainedInRect2(Rect r1, Rect r2) {
+		return (r1.x() >= r2.x() && 
+                r1.y() >= r2.y() &&
+                ((r1.x() + r1.width()) <= (r2.x() + r2.width())) &&
+                ((r1.y() + r1.height()) <= (r2.y() + r2.height())));
+	}
+
+	private boolean isContainedInAllParentsRect(Widget startWidget, Widget targetWidget) {
+        Widget parent = startWidget.parent();
+		if(parent == null) return true;
+
+        Rect targetWidgetRect = (Rect) targetWidget.get(Tags.Shape, null);
+        Rect parentRect = (Rect) parent.get(Tags.Shape, null);
+        if (targetWidgetRect == null || parentRect == null) return true;
+        
+        // Some Widget have a height of 0, while the child widgets are still shown. Therefore we ignore height 0 and continue.
+        if (parentRect.height() == 0 || isRect1ContainedInRect2(targetWidgetRect, parentRect))
+            return isContainedInAllParentsRect(parent, targetWidget);
+        else return false;
 	}
 
     private int getMaxWidgetTreeDepth(Widget widget) {
@@ -1670,12 +1716,10 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
         
         // Check the functional Verdict that detects if two leaf widgets overlap
 		// Also, add the roles or the classes of the widget sub-trees are needed to ignore
-		verdict = twoLeafWidgetsOverlap(state, 
+ 		verdict = twoLeafWidgetsOverlap(state, 
 				Collections.emptyList(), // ignoredRoles, 
-				Arrays.asList("sizer","previewsizer","navigation-sizer"), // ignoredClasses
-				Arrays.asList(WdRoles.WdSPAN, WdRoles.WdA), // getParentByRoles
-				Collections.emptyList()); // getParentByClasses
-		if (shouldReturnVerdict(verdict)) return verdict;
+                Arrays.asList("ui-dialog-content","ui-widget-overlay","ui-resizable-handle","sizer","previewsizer","navigation-sizer","ui-draggable")); // ignoredClasses				
+ 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects correct vertical alignment in role groups
 		//verdict = alignmentForWidgetGroups(state, Arrays.asList(WdRoles.WdUL));
