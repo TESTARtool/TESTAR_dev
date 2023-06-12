@@ -273,6 +273,9 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(WdTags.WebStyle)) {
 			ret = w.element.style;
 		}
+		else if (t.equals(WdTags.WebStyleOverflow)) {
+			ret = w.element.styleOverflow;
+		}
 		else if (t.equals(WdTags.WebTarget)) {
 			ret = w.element.target;
 		}

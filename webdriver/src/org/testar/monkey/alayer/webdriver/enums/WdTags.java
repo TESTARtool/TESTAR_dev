@@ -107,7 +107,12 @@ public class WdTags extends TagsBase {
    * Web style of a widget.
    */
   public static final Tag<String> WebStyle = from("WebStyle", String.class);
-  
+
+  /**
+   * Web style overflow property of a widget.
+   */
+  public static final Tag<String> WebStyleOverflow = from("WebStyleOverflow", String.class);
+
   /**
    * Web target of a widget.
    */

@@ -434,11 +434,16 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 
 						String verdictMsg = "Two Widgets Overlapping!" + " First! " + firstMsg + ". Second! " + secondMsg;
 
+						int alpha = 127; // 50% transparent
+
 						// Custom colors of overlapping widgets
 						Rect firstWidgetRect = (Rect)firstWidget.get(Tags.Shape);
-						firstWidgetRect.setColor(java.awt.Color.RED);
+						java.awt.Color transparentRed = new java.awt.Color(255, 0, 0, alpha);
+						firstWidgetRect.setColor(transparentRed);
+
 						Rect secondWidgetRect = (Rect)secondWidget.get(Tags.Shape);
-						secondWidgetRect.setColor(java.awt.Color.BLUE);
+						java.awt.Color transparentYellow = new java.awt.Color(255, 204, 0, alpha);
+						secondWidgetRect.setColor(transparentYellow);
 
 						widgetsOverlapVerdict = widgetsOverlapVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList(firstWidgetRect, secondWidgetRect)));
 					}

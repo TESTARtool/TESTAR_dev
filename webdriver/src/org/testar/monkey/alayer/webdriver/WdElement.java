@@ -70,7 +70,7 @@ public class WdElement extends TaggableBase implements Serializable {
   boolean isContentElement, isControlElement;
   boolean hasKeyboardFocus, isKeyboardFocusable;
   String acceleratorKey, accessKey;
-  String valuePattern, href, value, style, target, alt, src;
+  String valuePattern, href, value, style, styleOverflow, target, alt, src;
 
   double zindex;
   Rect rect;
@@ -119,6 +119,7 @@ public class WdElement extends TaggableBase implements Serializable {
     href = attributeMap.getOrDefault("href", "");
     value = attributeMap.getOrDefault("value", "");
     style = attributeMap.getOrDefault("style", "");
+    styleOverflow = (packedElement.get("styleOverflow") == null) ? "" : (String) packedElement.get("styleOverflow");
     target = attributeMap.getOrDefault("target", "");
     alt = attributeMap.getOrDefault("alt", "");
     type = attributeMap.getOrDefault("type", "");

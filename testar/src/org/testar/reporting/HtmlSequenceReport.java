@@ -375,7 +375,14 @@ public class HtmlSequenceReport implements Reporting{
     		g2d.setStroke(new BasicStroke(3));
     		for(Rect r : verdict.getVisualtHighlights()) {
     			g2d.setColor(r.getColor());
-    			g2d.drawRect((int)r.x(), (int)r.y(), (int)r.width(), (int)r.height());
+    			// If the color is not opaque, fill a Rect with the color
+    			if(r.getColor().getAlpha() > 1 && r.getColor().getAlpha() < 255) {
+    				g2d.fillRect((int)r.x(), (int)r.y(), (int)r.width(), (int)r.height());
+    			} 
+    			// Else (is opaque), draw a Rect with the color
+    			else {
+    				g2d.drawRect((int)r.x(), (int)r.y(), (int)r.width(), (int)r.height());
+    			}
     		}
     		g2d.dispose();
     		// Save the new image
