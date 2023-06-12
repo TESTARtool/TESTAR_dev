@@ -79,7 +79,7 @@ task runTestDesktopGenericCommandLineSuspiciousTag(type: Exec, dependsOn:'instal
     group = 'test_testar_workflow'
     description ='runTestDesktopGenericCommandLineSuspiciousTag'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_command_and_suspicious" TagsForSuspiciousOracle="NotExist;UIAAutomationId" SuspiciousTags=".*MenuBar.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2 OnlySaveFaultySequences=true'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_command_and_suspicious" TagsForSuspiciousOracle="NotExist;UIAAutomationId;Role" SuspiciousTags=".*MenuBar.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2 OnlySaveFaultySequences=true'
     doLast {
         String output = standardOutput.toString()
 

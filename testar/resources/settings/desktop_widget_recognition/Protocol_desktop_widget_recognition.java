@@ -212,6 +212,7 @@ public class Protocol_desktop_widget_recognition extends DesktopProtocol {
 		Screen sikuliScreen = new Screen();
 		try {
 			waitForScreenshotFile(widgetScreenshotPath, waitTime);
+			widgetScreenshotPath = new File(widgetScreenshotPath).getAbsolutePath();
 			Util.pause(1);
 			if(action.toShortString().equalsIgnoreCase("LeftClickAt")){
 				sikuliScreen.click(widgetScreenshotPath);

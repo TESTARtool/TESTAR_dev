@@ -117,7 +117,7 @@ public class Protocol_test_gradle_workflow_desktop_generic extends DesktopProtoc
 		} catch(IOException e) { e.printStackTrace(); }
 
 		// If OnlySaveFaultySequences enabled and sequence verdict is OK, sequence folder must be empty
-		if(settings().get(ConfigTags.OnlySaveFaultySequences) && (getVerdict(latestState).join(processVerdict)).severity() == Verdict.OK.severity()) {
+		if(settings().get(ConfigTags.OnlySaveFaultySequences) && (getFinalVerdict()).severity() == Verdict.OK.severity()) {
 			Assert.isTrue(folderIsEmpty(outputSequencesFolder.toPath()), "TESTAR output sequences is empty because verdict is OK and OnlySaveFaultySequences is enabled");
 		}
 		// Else, if OnlySaveFaultySequences enabled and sequence verdict is a failure,

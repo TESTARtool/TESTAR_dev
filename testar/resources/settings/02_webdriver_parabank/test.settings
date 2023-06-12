@@ -45,7 +45,7 @@ SequenceLength = 20
 #################################################################
 
 SuspiciousTags = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
-TagsForSuspiciousOracle = Title;WebName;WebTagName
+TagsForSuspiciousOracle = Title;WebTextContent
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -82,8 +82,8 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
-TagsToFilter = Title;WebName;WebTagName
+ClickFilter = .*admin.htm.*|.*logout.htm.*
+TagsToFilter = Title;WebName;WebTagName;WebHref
 
 #################################################################
 # Processfilter

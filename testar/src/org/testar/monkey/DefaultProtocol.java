@@ -128,6 +128,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		this.replayVerdict = replayVerdict;
 	}
 
+	Verdict finalVerdict = Verdict.OK;
+	public Verdict getFinalVerdict() {
+		return finalVerdict;
+	}
+
 	protected String lastPrintParentsOf = "null-id";
 	protected int actionCount;
 
@@ -631,7 +636,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	    fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
 	    fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
 	    fragment.set(SystemState, state);
-	    fragment.set(OracleVerdict, getVerdict(state));
+	    fragment.set(OracleVerdict, getFinalVerdict());
 
 	    //Find the target widget of the current action, and save the title into the fragment
 	    if (state != null && action.get(Tags.OriginWidget, null) != null){
@@ -717,7 +722,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	@Override
 	protected void beginSequence(SUT system, State state){
-
+		// Reset the final verdict for the new sequence
+		finalVerdict = Verdict.OK;
 	}
 
 	@Override
@@ -869,10 +875,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		for(String tagForSuspiciousOracle : settings.get(ConfigTags.TagsForSuspiciousOracle)){
 			String tagValue = "";
 			// First finding the Tag that matches the TagsToFilter string, then getting the value of that Tag:
-			for(Tag tag : w.tags()){
-				if(tag.name().equals(tagForSuspiciousOracle)){
+			for(Tag<?> tag : w.tags()){
+				if(w.get(tag, null) != null && tag.name().equals(tagForSuspiciousOracle)){
 					// Force the replacement of new line characters to avoid the usage of (?s) regex in the regular expression
-					tagValue = w.get(tag, "").toString().replace("\n", " ").replace("\r", " ");
+					tagValue = w.get(tag).toString().replace("\n", " ").replace("\r", " ");
 					break;
 					//System.out.println("DEBUG: tag found, "+tagToFilter+"="+tagValue);
 				}
@@ -976,8 +982,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println("DEBUG: Forcing ESC action in preActionSelection : Actions derivation seems to be EMPTY !");
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
 			Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
+			escAction.set(Tags.OriginWidget, state);
 			buildEnvironmentActionIdentifiers(state, escAction);
 			return new HashSet<>(Collections.singletonList(escAction));
+		}
+
+		// If there is an ActivateSystem action
+		// We need to force its selection to move the system to the foreground
+		Action forceForegroungAction = actions.stream().filter(a -> a instanceof ActivateSystem)
+				.findAny().orElse(null);
+		if (forceForegroungAction != null) {
+			System.out.println("DEBUG: Forcing the System to be in the foreground !");
+			return new HashSet<>(Collections.singletonList(forceForegroungAction));
 		}
 
 		return actions;
