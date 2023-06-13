@@ -65,7 +65,7 @@ task runTestar(type: Exec) {
 
     group = 'custom_testar'
     description ='runTESTAR'
-    environment "JAVA_OPTS", "--module-path $jfxHome --add-modules javafx.controls,javafx.fxml"
+    environment "JAVA_OPTS", "--module-path $jfxHome;$jfxHome\\lib --add-modules javafx.controls,javafx.fxml"
     workingDir 'target/install/testar/bin'
 
     if (System.getProperty("os.name").toLowerCase().contains("win")) {
