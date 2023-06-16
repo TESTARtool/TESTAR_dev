@@ -79,15 +79,19 @@ public class FunctionalVerdictPanel extends SettingsPanel {
 
 		// Create a panel on which we are going to dynamically add the existing verdict methods		
 		JScrollPane genericVerdictsScrollPanel = new JScrollPane();
-		genericVerdictsScrollPanel.setViewportView(new JTable(genericVerdictsModel));
-		genericVerdictsScrollPanel.setBounds(10, 35, 600, 100);
+		JTable genericTable = new JTable(genericVerdictsModel);
+		genericTable.setAutoCreateRowSorter(true);
+		genericVerdictsScrollPanel.setViewportView(genericTable);
+		genericVerdictsScrollPanel.setBounds(10, 35, 600, 150);
 		genericVerdictsScrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 		genericVerdictsScrollPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		add(genericVerdictsScrollPanel);
 
 		JScrollPane webVerdictsScrollPanel = new JScrollPane();
-		webVerdictsScrollPanel.setViewportView(new JTable(webVerdictsModel));
-		webVerdictsScrollPanel.setBounds(10, 140, 600, 100);
+		JTable webVerdictsTable = new JTable(webVerdictsModel);
+		webVerdictsTable.setAutoCreateRowSorter(true);
+		webVerdictsScrollPanel.setViewportView(webVerdictsTable);
+		webVerdictsScrollPanel.setBounds(10, 190, 600, 150);
 		webVerdictsScrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 		webVerdictsScrollPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		add(webVerdictsScrollPanel);

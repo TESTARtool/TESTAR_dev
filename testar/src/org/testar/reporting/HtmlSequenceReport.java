@@ -356,6 +356,25 @@ public class HtmlSequenceReport implements Reporting{
     	FINAL_VERDICT_FILENAME = verdict.verdictSeverityTitle();
     }
 
+    private void makeGrayScaleImg(BufferedImage image)
+    {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        
+        for(int i=0; i<height; i++) {
+        
+           for(int j=0; j<width; j++) {
+           
+        	  java.awt.Color c = new java.awt.Color(image.getRGB(j, i));
+              int red = (int)(c.getRed() * 0.299);
+              int green = (int)(c.getGreen() * 0.587);
+              int blue = (int)(c.getBlue() *0.114);
+              java.awt.Color newColor = new java.awt.Color(red+green+blue,red+green+blue,red+green+blue);
+              
+              image.setRGB(j,i,newColor.getRGB());
+           }
+        }
+    }
     /**
      * If a verdict highlight was defined, paint it in the last state screenshot.
      * 
@@ -365,18 +384,32 @@ public class HtmlSequenceReport implements Reporting{
     	// Load the image path that exists in the output directory
     	String imagePath = state.get(Tags.ScreenshotPath);
     	File imageFile = new File(imagePath);
+    	
     	while(!imageFile.exists()) {
     		Util.pause(2);
     	}
+    	
     	try {
     		// Draw in top of the state screenshot to highlight the erroneous widget
-    		BufferedImage img = ImageIO.read(imageFile);
-    		Graphics2D g2d = img.createGraphics();
+            BufferedImage img = ImageIO.read(imageFile);
+            Graphics2D g2d = img.createGraphics();
+            
+           // Check if transparant color is used, then make screenshot gray
+            for(Rect r : verdict.getVisualtHighlights()) {
+    			// If the color is not opaque, fill a Rect with the color
+    			if(r.getColor().getAlpha() > 1 && r.getColor().getAlpha() < 255) {
+    				makeGrayScaleImg(img);
+    				break;
+    			}
+            }
+            
     		g2d.setStroke(new BasicStroke(3));
     		for(Rect r : verdict.getVisualtHighlights()) {
     			g2d.setColor(r.getColor());
     			// If the color is not opaque, fill a Rect with the color
     			if(r.getColor().getAlpha() > 1 && r.getColor().getAlpha() < 255) {
+    				g2d.drawRect((int)r.x(), (int)r.y(), (int)r.width(), (int)r.height());
+    				g2d.setColor(new java.awt.Color(r.getColor().getRed(), r.getColor().getGreen(), r.getColor().getBlue(), r.getColor().getAlpha() / 2));
     				g2d.fillRect((int)r.x(), (int)r.y(), (int)r.width(), (int)r.height());
     			} 
     			// Else (is opaque), draw a Rect with the color

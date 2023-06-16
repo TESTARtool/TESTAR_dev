@@ -70,9 +70,10 @@ public class WdElement extends TaggableBase implements Serializable {
   boolean isContentElement, isControlElement;
   boolean hasKeyboardFocus, isKeyboardFocusable;
   String acceleratorKey, accessKey;
-  String valuePattern, href, value, style, styleOverflow, target, alt, src;
+  String valuePattern, href, value, style, styleOverflow, styleOverflowX, styleOverflowY, stylePosition, target, alt, src;
 
   double zindex;
+  double styleOpacity;
   Rect rect;
   boolean scrollPattern, hScroll, vScroll;
   public double hScrollViewSize, vScrollViewSize, hScrollPercent, vScrollPercent;
@@ -120,6 +121,9 @@ public class WdElement extends TaggableBase implements Serializable {
     value = attributeMap.getOrDefault("value", "");
     style = attributeMap.getOrDefault("style", "");
     styleOverflow = (packedElement.get("styleOverflow") == null) ? "" : (String) packedElement.get("styleOverflow");
+    styleOverflowX = (packedElement.get("styleOverflowX") == null) ? "" : (String) packedElement.get("styleOverflowX");
+    styleOverflowY = (packedElement.get("styleOverflowY") == null) ? "" : (String) packedElement.get("styleOverflowY");
+    stylePosition = (packedElement.get("stylePosition") == null) ? "" : (String) packedElement.get("stylePosition");
     target = attributeMap.getOrDefault("target", "");
     alt = attributeMap.getOrDefault("alt", "");
     type = attributeMap.getOrDefault("type", "");
@@ -133,6 +137,7 @@ public class WdElement extends TaggableBase implements Serializable {
     }
     display = (String) packedElement.get("display");
 
+    styleOpacity = castObjectToDouble(packedElement.get("styleOpacity"),1.0);
     zindex = (double) (long) packedElement.get("zIndex");
     fillRect(packedElement);
     fillDimensions(packedElement);
@@ -298,4 +303,12 @@ public class WdElement extends TaggableBase implements Serializable {
 	  
 	  return (long)o;
   }
+
+  private Double castObjectToDouble(Object o, double defaultValue) {
+    Double val = defaultValue;
+    if (o instanceof Number) {
+        val = ((Number) o).doubleValue();
+    }
+    return val;
+}
 }

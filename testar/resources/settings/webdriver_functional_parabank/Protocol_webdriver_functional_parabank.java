@@ -287,6 +287,24 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 		Verdict spellCheckerVerdict = GenericVerdict.SpellChecker(state, WdTags.WebTextContent, new AmericanEnglish(), "");
 		if(spellCheckerVerdict != Verdict.OK) HTMLStateVerdictReport.reportStateVerdict(actionCount, state, spellCheckerVerdict);
 		
+        verdict = GenericVerdict.WidgetAlignmentMetric(state, 50.0);
+        if (shouldReturnVerdict(verdict)) return verdict;
+        
+        verdict = GenericVerdict.WidgetBalanceMetric(state, 50.0);
+        if (shouldReturnVerdict(verdict)) return verdict;
+        
+        verdict = GenericVerdict.WidgetCenterAlignmentMetric(state, 50.0);
+        if (shouldReturnVerdict(verdict)) return verdict;
+        
+        verdict = GenericVerdict.WidgetConcentricityMetric(state, 50.0);
+        if (shouldReturnVerdict(verdict)) return verdict;
+       
+        verdict = GenericVerdict.WidgetDensityMetric(state, 10.0, 90.0);
+        if (shouldReturnVerdict(verdict)) return verdict;
+        
+        verdict = GenericVerdict.WidgetSimplicityMetric(state, 50.0);
+        if (shouldReturnVerdict(verdict)) return verdict;
+        
 		// Check the functional Verdict that detects if a form button is disabled after modifying the form inputs.
 		verdict = formButtonEnabledAfterTypingChangesVerdict(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
@@ -303,6 +321,7 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 		verdict = functionalButtonVerdict(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
+        /*
 		// Check the functional Verdict that detects if two leaf widgets overlap
 		// Also, add the roles or the classes of the widget sub-trees are needed to ignore
 		verdict = twoLeafWidgetsOverlap(state, 
@@ -311,19 +330,43 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 				Collections.emptyList(), // getParentByRoles
 				Collections.emptyList()); // getParentByClasses
 		if (shouldReturnVerdict(verdict)) return verdict;
-
+        */
+        
+        // Check the functional Verdict that detects if two widgets overlap
+		// Also, add the roles or the classes of the widget sub-trees are needed to ignore
+ 		verdict = GenericVerdict.WidgetClashDetection(state, 
+				Collections.emptyList(), // ignoredRoles, 
+                Collections.emptyList(), // ignoredClasses
+                true,  // joinVerdicts	
+                false, // checkOnlyLeafWidgets
+                true); // checkWebStyles	
+ 		if (shouldReturnVerdict(verdict)) return verdict;
+ 
 		// Check the functional Verdict that detects correct vertical alignment in role groups
 		//verdict = alignmentForWidgetGroups(state, Arrays.asList(WdRoles.WdUL));
 		//if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects duplicate or repeated text in descriptions of widgets
-		verdict = WebVerdict.DetectDuplicateText(state, "");
+		verdict = WebVerdict.DuplicateText(state, "");
 		if (shouldReturnVerdict(verdict)) return verdict;
 		
+		// Check for common test or dummy phrases, such as 'Test' or 'Debug'
+        verdict = GenericVerdict.CommonTestOrDummyPhrases(state, WdTags.WebTextContent);
+        if (shouldReturnVerdict(verdict)) return verdict;
+        
+        // Checks for zero numbers in tables
+        verdict = WebVerdict.ZeroNumbersInTable(state);
+        if (shouldReturnVerdict(verdict)) return verdict;
+        
 		// Check the functional Verdict that detects HTML or XML tags in descriptions of widgets
-		verdict = WebVerdict.DetectHTMLOrXMLTagsInText(state, "");
+		verdict = WebVerdict.HTMLOrXMLTagsInText(state, "");
 		if (shouldReturnVerdict(verdict)) return verdict;
 		
+        // Check the functional Verdict that detects sensitive data, such as passwords or client secrets
+        // https://en.wikipedia.org/wiki/List_of_the_most_common_passwords
+        verdict = GenericVerdict.SensitiveData(state, WdTags.WebTextContent, "123456|123456789|qwerty|password|12345678|111111|123123|1234567890|1234567|qwerty123|000000|1q2w3e|aa12345678|abc123|password1|qwertyuiop|123321|password123");
+        if (shouldReturnVerdict(verdict)) return verdict;
+        
 		// Check the functional Verdict that detects select elements without items to the current state verdict.
 		verdict = WebVerdict.EmptySelectItems(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
@@ -365,8 +408,12 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if web table contains duplicated rows.
-		verdict = WebVerdict.DetectDuplicatedRowsInTable(state);
+		verdict = WebVerdict.DuplicatedRowsInTable(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
+
+        // Check The replacement character � (often displayed as a black rhombus with a white question mark) is a symbol found in the Unicode standard at code point U+FFFD in the Specials table. It is used to indicate problems when a system is unable to render a stream of data to correct symbols
+        verdict = GenericVerdict.UnicodeReplacementCharacter(state, WdTags.WebTextContent);
+        if (shouldReturnVerdict(verdict)) return verdict;
 
 		return verdict;
 	}
@@ -394,6 +441,7 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 	 * @param parentByClasses
 	 * @return
 	 */
+    /*
 	private Verdict twoLeafWidgetsOverlap(State state,  List<Role> ignoredRoles,  List<String> ignoredClasses,  List<Role> getParentByRoles,  List<String> getParentByClasses) {
 		Verdict widgetsOverlapVerdict = Verdict.OK;
 
@@ -453,6 +501,8 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 
 		return widgetsOverlapVerdict;
 	}
+
+    */
 
 	private boolean checkRectIntersection(Rect r1, Rect r2) {
 		// TODO: If some widget contains a negative x or y axis

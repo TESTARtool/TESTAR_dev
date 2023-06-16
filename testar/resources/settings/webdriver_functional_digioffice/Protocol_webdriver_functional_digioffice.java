@@ -87,8 +87,6 @@ import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.parser.ParseException;
 import org.apache.logging.log4j.core.parser.XmlLogEventParser;
 
-
-
 /**
  * Protocol with functional oracles examples to detect:
  * - Web dummy button
@@ -104,7 +102,6 @@ import org.apache.logging.log4j.core.parser.XmlLogEventParser;
  * - TODO: JavaScript loop to hang the browser - devTools
  * - TODO: JavaScript refresh browser constantly - devTools
  * - TODO: textarea with rows and columns to detect enter click
- * - TODO: List of possible issues for different verdicts and allow user to customize different oracles for the SUT elements. List like spell checking
  * - TODO: Now draw the widget highlight in all the screenshots of the state. Only in the last HTML report screen.
  * - TODO: Use the state screenshots of the sequences to train and use a model
  * - TODO: screenshot_sequence_x_states vs screenshot_sequence_x_actions
@@ -208,18 +205,6 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 	    devTools = ((HasDevTools) WdDriver.getRemoteWebDriver()).getDevTools();
 	    devTools.createSessionIfThereIsNotOne();
 
-		// https://github.com/ferpasri/parabank/tree/injected_failures
-		// custom_compile_and_deploy.bat
-		// http://localhost:8080/parabank
-		// parabank script login sequence
-		/*
-		Util.pause(1);
-		WdDriver.executeScript("document.getElementsByName('username')[0].setAttribute('value','john');");
-		WdDriver.executeScript("document.getElementsByName('password')[0].setAttribute('value','demo');");
-		WdDriver.executeScript("document.getElementsByName('login')[0].submit();");
-		Util.pause(1);
-		*/
-
 		return system;
 	}
 
@@ -262,8 +247,8 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
           }
         }
         
-        devTools.send(Performance.enable(Optional.empty()));
-	    metricList = devTools.send(Performance.getMetrics());
+        //devTools.send(Performance.enable(Optional.empty()));
+	    //metricList = devTools.send(Performance.getMetrics());
 	   
 		return super.getState(system);
 	}
@@ -290,9 +275,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		super.beginSequence(system, state);
 
 		//TODO: Reader of the logs should use log4j format
-        
-        loadSensitiveDataListFromFile();
-        
+                
 		// Reset the list of downloaded files
 		watchEventDownloadedFiles = new ArrayList<>();
 		// Create a watch service to check which files are downloaded when testing the SUT
@@ -392,121 +375,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 	}
 
 
-	// Detect UI items that contain dummy, test or debug text
-	// BAD:  Debug
-    //       Dummy
-    //       test
-	// GOOD: 
-	// When programmers debugging a program where they could only notice the problem in an other environment than the developer machine,
-    // then they sometimes add code which show a message or value with a phrase or word such as 'debug' or 'test'. If the programmer
-    // forget to remove that temporary code, then this text can be shown in a production release of the software.
-	private Verdict detectCommonTestOrDummyPhrases(State state)
-	{
-		Verdict verdict = Verdict.OK;
-		String patternRegex = "[Dd]ummy|[Tt]est][Dd]ebug";
-		Pattern pattern = Pattern.compile(patternRegex);
-		
-		for(Widget w : state) {
-			String desc = w.get(WdTags.WebTextContent, "");
-			Matcher matcher = pattern.matcher(desc);
-
-			if (matcher.find()) {
-				String verdictMsg = String.format("Detected debug or test data values! Role: %s , Path: %s , WebId: %s , Desc: %s , WebTextContent: %s", 
-						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebTextContent, ""));
-				verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_ITEM_WRONG_VALUE_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
-			}
-		}
-		return verdict;
-	}
-
-    // Detect UI items that contain sensitive texts, such as passwords
-	// BAD:  Pa$$w0rd
-    //       7n_8Q~DyBzoE4aqBBXA-B7gVdX~5zFCZk5yVvb7b
-	// GOOD: *******
-	// Sensitive data such as Passwords and ClientSecrets should not be visible in their original form the UI, database, configuration or log files.
-    // This data should be encrypted if they must be shown or stored somewhere.
-    // There are two options to provide a list of sensitive data:
-    // 1. Fill a ../Settings/SensitiveDataList.txt file with all sensitive text.
-    // 2. Give a regular expression with matches sensitive text
-    // Using the SensitiveDataList.txt file is the preferred way, because the sensitive data is then not in the protocol and you don't have to rewrite the data as a regular expression.
-	private Verdict detectSensitiveData(State state, String sensitiveTextPatternRegEx)
-	{
-		Verdict verdict = Verdict.OK;
-		Pattern pattern = Pattern.compile(sensitiveTextPatternRegEx);
-		
-		for(Widget w : state) {
-			String desc = w.get(WdTags.WebTextContent, ""); //TODO: comments in html could leak passwords
-            Matcher matcher = pattern.matcher(desc);
-
-            if (!desc.isEmpty() && (sensitiveDataList.contains(desc) || matcher.find()))
-            {
-            	String verdictMsg = String.format("Detected sensitive data values! Role: %s , Path: %s , WebId: %s , Desc: %s , WebTextContent: %s", 
-						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebTextContent, ""));
-				verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_ITEM_WRONG_VALUE_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
-            }
-		}
-		return verdict;
-	}
-
-    // Load the sensitive data file from the settings directory
-	public static String sensitiveDataListFile = Main.settingsDir + File.separator + "SensitiveDataList.txt";
-
-	// Custom load sensitive data
-	private static List<String> sensitiveDataList = new ArrayList<>();
-	
-    private static void loadSensitiveDataListFromFile()
-    {
-        try
-        {
-        	sensitiveDataList.clear();
-            File file = new File(sensitiveDataListFile);
-            if(file.exists() && !file.isDirectory()) 
-            {
-              Scanner s = new Scanner(file);
-           
-              while (s.hasNextLine()){
-            	  sensitiveDataList.add(s.nextLine());
-              }
-              
-              s.close();
-            }
-        }
-        catch(java.io.FileNotFoundException ex)
-        {
-            // ignore errors
-        }
-        Collections.sort(sensitiveDataList);
-    }
-
-	// Detect text that contains zero values in tables
-	// BAD:  0.00
-    //       $ 0.00
-	// GOOD: 
-	// If zero values are shown in tables/grids, then this clutter the grid. It is better to don't display zero values. 
-	// Exception to this rule may be row totals or column totals. 
-	private Verdict detectZeroNumbers(State state)
-	{
-		Verdict verdict = Verdict.OK;
-		String patternRegex = "\\s0[\\.,]0\\s";
-		Pattern pattern = Pattern.compile(patternRegex);
-		
-		for(Widget w : state) {
-			if (isSonOfTD(w))
-            {
-				String desc = w.get(WdTags.WebTextContent, "");
-				Matcher matcher = pattern.matcher(desc);
-			
-				if (matcher.find()) {
-					String verdictMsg = String.format("Detected zero values in table/grids! Role: %s , Path: %s , WebId: %s , Desc: %s , WebTextContent: %s", 
-							w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebTextContent, ""));
-					verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
-				}
-			}
-		}
-		return verdict;
-	}
-	
-	// Detect text decoraged with ^ charachters, this means that this text has no translation key and will not be translated when UI language is changed in DigiOffice
+	// Detect text decorated with ^ characters, this means in DigiOffice that this text has no translation key and will not be translated when UI language is changed in DigiOffice
 	// BAD:  ^Untranslated text^
     //       ^UntranslatedText^
 	// GOOD: Untranslated text
@@ -523,32 +392,6 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 			
 			if (matcher.find()) {
 				String verdictMsg = String.format("Detected untranslated tags in widget! Role: %s , Path: %s , WebId: %s , Desc: %s , WebValue: %s", 
-						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebValue, ""));
-				verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_TRANSLATION_OR_SPELLING_ISSUE, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
-			}
-		}
-		return verdict;
-	}
-
-	// Detect the replacement character � (often displayed as a black rhombus with a white question mark) is a symbol found in the Unicode standard at code point U+FFFD in the Specials table. 
-    // It is used to indicate problems when a system is unable to render a stream of data to correct symbols
-    // https://en.wikipedia.org/wiki/Specials_(Unicode_block)
-    // U+FFFD � REPLACEMENT CHARACTER used to replace an unknown, unrecognized, or unrepresentable character
-	// BAD:  �
-    //       f�r
-	// GOOD: für
-    private Verdict detectUnicodeReplacementCharacter(State state)
-	{
-		Verdict verdict = Verdict.OK;
-		String patternRegex = ".*�.*"; // Look for a Unicode Replacement character.
-		Pattern pattern = Pattern.compile(patternRegex);
-		
-		for(Widget w : state) {
-			String desc = w.get(WdTags.WebValue, "");
-			Matcher matcher = pattern.matcher(desc);
-			
-			if (matcher.find()) {
-				String verdictMsg = String.format("Detected Unicode Replacement Character in widget! Role: %s , Path: %s , WebId: %s , Desc: %s , WebValue: %s", 
 						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebValue, ""));
 				verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_TRANSLATION_OR_SPELLING_ISSUE, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
 			}
@@ -763,11 +606,6 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		else return isSonOfFormWidget(widget.parent());
 	}
 
-	private boolean isSonOfTD(Widget widget) {
-		if(widget.parent() == null) return false;
-		else if (widget.parent().get(Tags.Role, Roles.Widget).equals(WdRoles.WdTD)) return true;
-		else return isSonOfTD(widget.parent());
-	}
 
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
@@ -827,14 +665,6 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 				if(whiteListed(widget) || isUnfiltered(widget)){
 					actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
                     actions.add(ac.pasteTextInto(widget, InputDataManager.getRandomTextFromCustomInputDataFile(System.getProperty("user.dir") + "/settings/custom_input_data.txt"), true));
-                    //actions.add(ac.pasteTextInto(widget, "\"'[]$(>%)@#>+_|:* $?{}/\\,Aa", true));
-                    //actions.add(ac.pasteTextInto(widget, "<memo>bla bla bla", true)); // #942
-                    //actions.add(ac.pasteTextIntoo(widget, "é € ý ì", true)); 
-                    //actions.add(ac.pasteTextInto(widget, "@#", true)); // #70973
-                    //actions.add(ac.pasteTextInto(widget, "01-01-2020", true)); // #70296
-                    //actions.add(ac.pasteTextInto(widget, "31-12-2023", true)); // #70296
-                    //actions.add(ac.pasteTextInto(widget, "<script>x=5;alert(`XSS ${x} mogelijk`);</script>", true)); // #58157
-                    //actions.add(ac.pasteTextInto(widget, new String(new char[260]).replace("\0", "A"), true)); // #71074
 				}else{
 					// filtered and not white listed:
 					filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
@@ -964,670 +794,6 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		}
 	}
 
-	private Verdict twoLeafWidgetsOverlap(State state) {
-		Verdict widgetsOverlapVerdict = Verdict.OK;
-
-		// Prepare a list that contains all the Rectangles from the leaf widgets
-		List<Pair<Widget, Rect>> leafWidgetsRects = new ArrayList<>();
-		for(Widget w : state) {
-			if(w.childCount() < 1 && w.get(Tags.Shape, null) != null) {
-				leafWidgetsRects.add(new Pair<Widget, Rect>(w, (Rect)w.get(Tags.Shape)));
-			}
-		}
-		//TODO: Improve this list iteration
-        //TODO: every overlap is reported double, because the widgets overlap on both sides. Make an ignore list if an overlap is detected. Or try use a INNER JOIN linq query to find all the overlapping widgets. 
-		for(int i = 0; i < leafWidgetsRects.size(); i++) {
-			for(int j = 0; j < leafWidgetsRects.size(); j++) {
-                if(leafWidgetsRects.get(i) != leafWidgetsRects.get(j)) {
-					Rect rectOne = leafWidgetsRects.get(i).right();
-					Rect rectTwo = leafWidgetsRects.get(j).right();
-					if(checkRectIntersection(rectOne, rectTwo)) {
-						Widget firstWidget = leafWidgetsRects.get(i).left();
-						String firstMsg = String.format("Title: %s , WebTextContent: %s , Role: %s , Path: %s , WebId: %s , X: %f, Y: %f, Width: %f, Height %f", 
-								firstWidget.get(Tags.Title, ""), firstWidget.get(WdTags.WebTextContent, ""), firstWidget.get(Tags.Role), firstWidget.get(Tags.Path), firstWidget.get(WdTags.WebId, ""), rectOne.x(), rectOne.y(), rectOne.width(), rectOne.height());
-
-						Widget secondWidget = leafWidgetsRects.get(j).left();
-						String secondMsg = String.format("Title: %s , WebTextContent: %s , Role: %s , Path: %s , WebId: %s , X: %f, Y: %f, Width: %f, Height %f", 
-								secondWidget.get(Tags.Title, ""), secondWidget.get(WdTags.WebTextContent, ""), secondWidget.get(Tags.Role), secondWidget.get(Tags.Path), secondWidget.get(WdTags.WebId, ""), rectTwo.x(), rectTwo.y(), rectTwo.width(), rectTwo.height());
-
-						String verdictMsg = "Two Widgets Overlapping!" + "<br/>First!  " + firstMsg + "<br/>Second! " + secondMsg;
-                        
-                        // Trying to rule out some false positivies
-                        if (!firstWidget.get(WdTags.WebTextContent, "").isEmpty() && !secondWidget.get(WdTags.WebTextContent, "").isEmpty())
-                        {
-                            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList((Rect)firstWidget.get(Tags.Shape), (Rect)secondWidget.get(Tags.Shape)));
-						     //return verdict;
-                            widgetsOverlapVerdict = widgetsOverlapVerdict.join(verdict);
-                        }
-					}
-				}
-			}
-		}
-
-		return widgetsOverlapVerdict;
-	}
-
-	private boolean checkRectIntersection(Rect r1, Rect r2) {
-		return !(r1.x() + r1.width() <= r2.x() ||
-				r1.y() + r1.height() <= r2.y() ||
-				r2.x() + r2.width() <= r1.x() ||
-				r2.y() + r2.height() <= r1.y()); 
-	}
-
-	private Verdict widgetAlignmentMetric(State state, double tresholdValue) {
-		Verdict widgetAlignmentMetricVerdict = Verdict.OK;
-
-	    ArrayList<Rect> regions = getRegions(state);
-        
-		// returns a value from 0.00 to 100.0. Lower is bad alignment.
-		double alignmentMetric = calculateAlignmentMetric(regions);
-        
-        if (alignmentMetric <= tresholdValue)
-        {
-            String webUrl = WdDriver.getCurrentUrl();
-            String verdictMsg = String.format("Alignment metric for page '%s' with value %f is below treshold value %f!",  webUrl, alignmentMetric, tresholdValue);
-            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
-		    widgetAlignmentMetricVerdict = widgetAlignmentMetricVerdict.join(verdict);
-        }
-
-		return widgetAlignmentMetricVerdict;
-	}
-
-    private ArrayList<Rect> getRegions(State state)
-    {
-        	// Prepare a list that contains all the Rectangles from the leaf widgets
-        ArrayList<Rect> regions = new ArrayList<Rect>();
-      
-		for(Widget w : state) {
-			if(w.childCount() < 1 && w.get(Tags.Shape, null) != null) {
- 				regions.add((Rect)w.get(Tags.Shape));
-			}
-		}
-        return regions;
-    }
-
-    // Copied from: https://github.com/mathieuzen/questim/blob/workingapp/src/be/lilab/questim/server/Alignment.java
-    private double calculateAlignmentMetric(ArrayList<Rect> regions)
-    {	
-        int treshold = 1;
-		int verticalAlignment1 = 0;
-		int horizontalAlignment1 = 0;
-		int verticalAlignment2 = 0;
-		int horizontalAlignment2 = 0;
-		int DAV = 0;
-		int DAH = 0;
-		int n = regions.size();
-		double value = 0.0;
-		
-		for(int i=0; i<regions.size();i++){	
-			Rect r1 = regions.get(i);
-			verticalAlignment1 = 0;
-			horizontalAlignment1 = 0;
-			verticalAlignment2 = 0;
-			horizontalAlignment2 = 0;
-			for(int j=0; j<regions.size();j++){
-				if(j!=i){				
-				Rect r2 = regions.get(j);
-					if((r1.x()<=r2.x()+treshold) && (r1.x()>=r2.x()-treshold))
-						verticalAlignment1=1;
-					if((r1.x()+r1.width()<=r2.x()+r2.width()+treshold) && (r1.x()+r1.width()>=r2.x()+r2.width()-treshold))
-						verticalAlignment2=1;
-					if((r1.y()<=r2.y()+treshold) && (r1.y()>=r2.y()-treshold))
-						horizontalAlignment1=1;
-					if((r1.y()+r1.height()<=r2.y()+r2.height()+treshold) && (r1.y()+r1.height()>=r2.y()+r2.height()-treshold))
-						horizontalAlignment2=1;
-				}
-			}
-			
-			DAV += verticalAlignment1 + verticalAlignment2;
-			DAH += horizontalAlignment1 + horizontalAlignment2;
-			
-		}
-		
-		value = (double)(DAV + DAH)/(n*4);
-		return value * 100;
-    }
-    
-    private Verdict widgetBalanceMetric(State state, double tresholdValue) {
-		Verdict widgetBalanceMetricVerdict = Verdict.OK;
-
-		ArrayList<Rect> regions = getRegions(state);
-        Rect sutRect = (Rect) state.child(0).get(Tags.Shape, null);
-        
-		// returns a value from 0.00 to 100.0. Lower is bad balance.
-		double balanceMetric = calculateBalanceMetric(regions, sutRect.width(), sutRect.height());
-        
-        if (balanceMetric <= tresholdValue)
-        {
-            String webUrl = WdDriver.getCurrentUrl();
-            String verdictMsg = String.format("Balance metric for page '%s' with value %f is below treshold value %f!",  webUrl, balanceMetric, tresholdValue);
-            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
-		    widgetBalanceMetricVerdict = widgetBalanceMetricVerdict.join(verdict);
-        }
-
-		return widgetBalanceMetricVerdict;
-	}
-    
-   public double calculateBalanceMetric(ArrayList<Rect> regions, double frameWidth, double frameHeight) {
-		
-		double [][] belonging = new double [regions.size()][4];
-		double [] a = new double [regions.size()];
-		double value = 0.0;
-		
-		double BMvert;
-		double BMhori;
-		
-		double amax = 0;
-		
-		double wl = 0;
-		double wr = 0;
-		double wt = 0;
-		double wb = 0;
-		
-		for(int i=0;i<regions.size();i++){
-			
-			Rect r = regions.get(i);
-			
-			
-			a[i] = (double)r.width()* (double)r.height();
-			if(a[i]>amax){
-				amax = a[i];
-			}
-			
-			
-			//Belonging tests
-			//UL
-			
-			if((r.x() < frameWidth/2) && (r.x()+r.width() > frameWidth/2) && (r.y() < frameHeight/2) && (r.y()+r.height() > frameHeight/2))
-			{
-				belonging[i][0] = ((double)(frameWidth/2 - r.x())  * (frameHeight/2 - r.y()))/(r.width()*r.height());
-			}
-			
-			else if((frameWidth/2 - r.x() < r.width()) && (frameHeight/2 - r.y() > r.height()))
-			{
-				belonging[i][0] = ((double)(frameWidth/2 - r.x())/(r.width()));
-			}
-			
-			else if((frameWidth/2 - r.x() > r.width()) && (frameHeight/2 - r.y() < r.height()))
-			{
-				belonging[i][0] = ((double)(frameHeight/2 - r.y())/(r.height()));
-			}
-			
-			else if((frameWidth/2 - r.x() > r.width()) && (frameHeight/2 - r.y() > r.height()))
-			{
-				belonging[i][0] = 1;
-			}
-			
-			//UR
-						
-			if((r.x() < frameWidth/2) && (r.x()+r.width() > frameWidth/2) && (r.y()+r.height() > frameHeight/2))
-			{
-				belonging[i][1] = ((double)(r.x()+r.width()  - frameWidth/2)  * (frameHeight/2 - r.y()))/(r.width()*r.height());
-			}
-			
-			else if((r.x()+r.width() > frameWidth/2) && (r.y()+r.height() < frameHeight/2))
-			{
-				belonging[i][1] = ((double)(r.x()+r.width()  - frameWidth/2)/(r.width()));
-			}
-			
-			else if((r.x() > frameWidth/2) && (r.y()+r.height() > frameHeight/2))
-			{
-				belonging[i][1] = ((double)(frameHeight/2 - r.y())/(r.height()));
-			}
-			
-			if((r.x() > frameWidth/2) && (r.y()+r.height() < frameHeight/2))
-			{
-				belonging[i][1] = 1;
-			}
-			
-			//LL
-			
-			if((r.x() < frameWidth/2) && (r.x()+r.width() > frameWidth/2) && (r.y() < frameHeight/2) && (r.y()+r.height() > frameHeight/2))
-			{
-				belonging[i][2] = ((double)(frameWidth/2 - r.x())  * (r.y()+r.height() - frameHeight/2))/(r.width()*r.height());
-			}
-			
-			else if((r.x() < frameWidth/2) && (r.x()+r.width() < frameWidth/2) && (r.y() < frameHeight/2) && (r.y()+r.height() > frameHeight/2))
-			{
-				belonging[i][2] = ((double)(r.y()+r.height()-frameHeight/2)/(r.height()));
-			}
-			
-			else if((r.x() < frameWidth/2) && (r.x()+r.width() > frameWidth/2) && (r.y() > frameHeight/2) && (r.y()+r.height() > frameHeight/2))
-			{
-				belonging[i][2] = ((double)(frameWidth/2 - r.x())/(r.width()));
-			}
-			
-			else if((r.x() < frameWidth/2) && (r.x()+r.width() < frameWidth/2) && (r.y() > frameHeight/2) && (r.y()+r.height() > frameHeight/2))
-			{
-				belonging[i][2] = 1;
-			}
-			
-			//LR
-			if((r.x() < frameWidth/2) && (r.x()+r.width() > frameWidth/2) && (r.y() < frameHeight/2) && (r.y()+r.height() > frameHeight/2))
-			{
-				belonging[i][3] = ((double)(r.x()+r.width()  - frameWidth/2)  * (r.y()+r.height() - frameHeight/2))/(r.width()*r.height());
-			}
-			
-			else if((r.x() > frameWidth/2) && (r.x()+r.width() > frameWidth/2) && (r.y() < frameHeight/2) && (r.y()+r.height() > frameHeight/2))
-			{
-				belonging[i][3] = ((double)(r.y()+r.height()-frameHeight/2)/(r.height()));
-			}
-			
-			else if((r.x() < frameWidth/2) && (r.x()+r.width() > frameWidth/2) && (r.y() > frameHeight/2) && (r.y()+r.height() > frameHeight/2))
-			{
-				belonging[i][3] = ((double)(r.x()+r.width()-frameWidth/2)/(r.width()));
-			}
-			
-			else if((r.x() > frameWidth/2) && (r.x()+r.width() > frameWidth/2) && (r.y() > frameHeight/2) && (r.y()+r.height() > frameHeight/2))
-			{
-				belonging[i][3] = 1;
-			}
-			
-			for(int j=0; j<4; j++){
-				if(belonging[i][j]<0){
-					belonging[i][j]=0;
-				}
-			}
-			
-			
-			if(belonging[i][0] == 1 || belonging[i][1] == 1 || belonging[i][2] == 1 || belonging [i][3] == 1)
-			{
-			wl += belonging[i][0]*(1+(frameWidth/2 - (r.x()+r.width()/2))/frameWidth/2)*(a[i]/amax)+belonging[i][2]*(1+(frameWidth/2 - (r.x()+r.width()/2))/frameWidth/2)*(a[i]/amax);
-			wr += belonging[i][1]*(1+((r.x()+r.width()/2) - frameWidth/2)/frameWidth/2)*(a[i]/amax)+belonging[i][3]*(1+((r.x()+r.width()/2) - frameWidth/2)/frameWidth/2)*(a[i]/amax);
-			wt += belonging[i][0]*(1+(frameHeight/2 - (r.y()+r.height()/2))/frameHeight/2)*(a[i]/amax)+belonging[i][1]*(1+(frameHeight/2 - (r.y()+r.height()/2))/frameHeight/2)*(a[i]/amax);
-			wb += belonging[i][2]*(1+((r.y()+r.height()/2) - frameHeight/2)/frameHeight/2)*(a[i]/amax)+belonging[i][3]*(1+((r.y()+r.height()/2) - frameHeight/2)/frameHeight/2)*(a[i]/amax);
-			}
-			else
-			{
-			wl += belonging[i][0]*(a[i]/amax)+belonging[i][2]*(a[i]/amax);
-			wr += belonging[i][1]*(a[i]/amax)+belonging[i][3]*(a[i]/amax);
-			wt += belonging[i][0]*(a[i]/amax)+belonging[i][1]*(a[i]/amax);
-			wb += belonging[i][2]*(a[i]/amax)+belonging[i][3]*(a[i]/amax);
-			}
-			
-		}
-			
-			
-			BMvert = (wl-wr)/Math.max(wl,wr);
-			BMhori = (wt-wb)/Math.max(wt,wb);
-			
-			value = 1-(Math.abs(BMvert)+Math.abs(BMhori))/2;			
-		
-		return 100 - value * 100;
-	}
-
-    private Verdict widgetCenterAlignmentMetric(State state, double tresholdValue) {
-		Verdict widgetCenterAlignmentVerdict = Verdict.OK;
-
-		ArrayList<Rect> regions = getRegions(state);
-        
-		// returns a value from 0.00 to 100.0. Lower is bad alignment.
-		double metric = calculateCenterAlignment(regions);
-        
-        if (metric <= tresholdValue)
-        {
-            String webUrl = WdDriver.getCurrentUrl();
-            String verdictMsg = String.format("Center alignment metric for page '%s' with value %f is below treshold value %f!",  webUrl, metric, tresholdValue);
-            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
-		    widgetCenterAlignmentVerdict = widgetCenterAlignmentVerdict.join(verdict);
-        }
-
-		return widgetCenterAlignmentVerdict;
-	}
-
-    public double calculateCenterAlignment(ArrayList<Rect> regions) {
-		int treshold = 5;
-		int verticalCentralAlignment = 0;
-		int horizontalCentralAlignment = 0;
-		int CAV = 0;
-		int CAH = 0;
-		int n = regions.size();
-		double value = 0;
-		
-		for(int i=0; i<regions.size();i++){	
-			Rect r1 = regions.get(i);
-			verticalCentralAlignment = 0;
-			horizontalCentralAlignment = 0;
-			for(int j=0; j<regions.size();j++){
-				if(j!=i){				
-				Rect r2 = regions.get(j);
-					if((r1.x()+r1.width()/2<=r2.x()+r2.width()/2+treshold) && (r1.x()+r1.width()/2>=r2.x()+r2.width()/2-treshold))
-						verticalCentralAlignment = 1;
-					if((r1.y()+r1.height()/2<=r2.y()+r2.height()/2+treshold) && (r1.y()+r1.height()/2>=r2.y()+r2.height()/2-treshold))
-						horizontalCentralAlignment = 1;
-				}
-			}
-			
-			CAV += verticalCentralAlignment;
-			CAH += horizontalCentralAlignment;
-			
-		}
-		
-		value = (double)(CAV + CAH)/(n*2);
-		return value * 100;
-
-	}
-
-    private Verdict widgetConcentricityMetric(State state, double tresholdValue) {
-		Verdict widgetConcentricityVerdict = Verdict.OK;
-
-		ArrayList<Rect> regions = getRegions(state);
-        Rect sutRect = (Rect) state.child(0).get(Tags.Shape, null);
-        
-		// returns a value from 0.00 to 100.0.
-		double metric = calculateConcentricity(regions, sutRect.width(), sutRect.height());
-        
-        if (metric <= tresholdValue)
-        {
-            String webUrl = WdDriver.getCurrentUrl();
-            String verdictMsg = String.format("Concentricity metric for page '%s' with value %f is below treshold value %f!",  webUrl, metric, tresholdValue);
-            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
-		    widgetConcentricityVerdict = widgetConcentricityVerdict.join(verdict);
-        }
-
-		return widgetConcentricityVerdict;
-	}
-    
-    public double calculateConcentricity(ArrayList<Rect> region, double frameWidth, double frameHeight){
-		
-		double value = 0.0;
-		double ddiag = Math.hypot((double)frameWidth/2,(double)frameHeight/2);
-		double dbar = 0.0;
-		double dic = 0.0;
-		int xc = ((int)frameWidth)/2;
-		int yc = ((int)frameHeight)/2;
-		
-		for(int i=0;i<region.size();i++){
-			Rect r = region.get(i);
-			
-			dbar += Math.hypot((double)(r.x()+r.width()/2)-xc, (double)(r.y()+r.height()/2)-yc);
-		}
-		
-		dbar/=region.size();
-		
-		value = dbar/ddiag;
-		
-		return value * 100;
-		
-	}
-
-    private Verdict widgetDensityMetric(State state, double tresholdValue) {
-		Verdict widgetDensityVerdict = Verdict.OK;
-
-		ArrayList<Rect> regions = getRegions(state);
-        Rect sutRect = (Rect) state.child(0).get(Tags.Shape, null);
-        
-		// returns a value from 0.00 to 100.0.
-		double metric = calculateConcentricity(regions, sutRect.width(), sutRect.height());
-        
-        if (metric <= tresholdValue)
-        {
-            String webUrl = WdDriver.getCurrentUrl();
-            String verdictMsg = String.format("Density metric for page '%s' with value %f is below treshold value %f!",  webUrl, metric, tresholdValue);
-            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
-		    widgetDensityVerdict = widgetDensityVerdict.join(verdict);
-        }
-
-		return widgetDensityVerdict;
-	}
-
-    public double calculateDensity(ArrayList<Rect> regions, double frameWidth, double frameHeight) { 
-        double value = 0;
-		int areaframe=0;
-		int area=0;
-		
-		for(int i=0; i<regions.size(); i++){
-			Rect r = regions.get(i);
-			if(r.x()!=0 || r.y()!=0)
-			{
-				area += r.width()*r.height();
-			}
-			
-			areaframe = (int)frameWidth*(int)frameHeight;
-		
-			value = area/areaframe;
-		
-		}
-		
-		return value * 100;
-
-	}
-
-    private Verdict widgetSimplicityMetric(State state, double tresholdMinValue, double tresholdMaxValue) {
-		Verdict widgetSimplicityVerdict = Verdict.OK;
-
-		ArrayList<Rect> regions = getRegions(state);
-        Rect sutRect = (Rect) state.child(0).get(Tags.Shape, null);
-        
-		// returns a value from 0.00 to 100.0.
-		double metric = calculateSimplicity(regions, sutRect.width(), sutRect.height());
-        
-        if (metric < tresholdMinValue)
-        {
-            String webUrl = WdDriver.getCurrentUrl();
-            String verdictMsg = String.format("Simplicity metric for page '%s' with value %f is below treshold minimum value %f! Design too simple.",  webUrl, metric, tresholdMinValue);
-            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
-		    widgetSimplicityVerdict = widgetSimplicityVerdict.join(verdict);
-        }
-        
-        if (metric > tresholdMaxValue)
-        {
-            String webUrl = WdDriver.getCurrentUrl();
-            String verdictMsg = String.format("Simplicity metric for page '%s' with value %f is higher then treshold maximum value %f! Design too complex.",  webUrl, metric, tresholdMaxValue);
-            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
-		    widgetSimplicityVerdict = widgetSimplicityVerdict.join(verdict);
-        }
-
-		return widgetSimplicityVerdict;
-	}
-
-    public static double calculateSimplicity(ArrayList<Rect> regions, double frameWidth, double frameHeight){
-		int treshold = 1;
-		double value = 0.0;
-		
-		int verticalAlignment1 = 0;
-		int horizontalAlignment1 = 0;
-		int verticalAlignment2 = 0;
-		int horizontalAlignment2 = 0;
-		int DAV = 0;
-		int DAH = 0;
-		int n = regions.size();
-		
-		for(int i=0; i<regions.size();i++){	
-			Rect r1 = regions.get(i);
-			verticalAlignment1 = 0;
-			horizontalAlignment1 = 0;
-			verticalAlignment2 = 0;
-			horizontalAlignment2 = 0;
-			for(int j=0; j<regions.size();j++){
-				if(j!=i){				
-				Rect r2 = regions.get(j);
-					if(!(r1.x()<=r2.x()+treshold) && !(r1.x()>=r2.x()-treshold))
-						verticalAlignment1=1;
-					if(!(r1.x()+r1.width()<=r2.x()+r2.width()+treshold) && !(r1.x()+r1.width()>=r2.x()+r2.width()-treshold))
-						verticalAlignment2=1;
-					if(!(r1.y()<=r2.y()+treshold) && !(r1.y()>=r2.y()-treshold))
-						horizontalAlignment1=1;
-					if(!(r1.y()+r1.height()<=r2.y()+r2.height()+treshold) && !(r1.y()+r1.height()>=r2.y()+r2.height()-treshold))
-						horizontalAlignment2=1;
-				}
-			}
-			
-			DAV += verticalAlignment1 + verticalAlignment2;
-			DAH += horizontalAlignment1 + horizontalAlignment2;					
-		}
-		value = (double) 1/(DAV+DAH+n);
-		
-		return value * 100;
-	}
-
-    /**
-	 * Obtain all leaf widgets of the State and verify if they overlap. 
-	 * We can completely ignore leaf widgets (by Role or Web Class) if the are part of an undesired sub-tree. 
-	 * Or we can consider the parent of the leaf widget to verify if it overlaps with other leaf widgets. 
-	 * 
-	 * @param state
-	 * @param ignoreByRoles
-	 * @param ignoreByClasses
-	 * @param parentByRoles
-	 * @param parentByClasses
-	 * @return
-	 */
-	private Verdict twoLeafWidgetsOverlap(State state,  List<Role> ignoredRoles,  List<String> ignoredClasses) {
-		Verdict widgetsOverlapVerdict = Verdict.OK;
-
-		// Prepare a list that contains all the Rectangles from the leaf widgets
-		List<Pair<Widget, Rect>> leafWidgetsRects = new ArrayList<>();
-		for(Widget w : state) {
-            if (w.get(Tags.Shape, null) != null)
-            {
-                Rect rect = (Rect) w.get(Tags.Shape, null);
-
-    			if(w.get(Tags.Shape, null) != null) {
-    				// Some Widgets, such as Table Data (TD) with span elements, may produce false positives when verifying the leaf widget content. 
-    				// We can completely ignore the widget or sub-tree widgets that descend from these undesired Roles or Classes. 
-    				if(isOrDescendFromRole(w, ignoredRoles) || isOrDescendFromClass(w, ignoredClasses)) {
-    					continue;
-    				} else {
-                        Rect widgetRect = (Rect)w.get(Tags.Shape);
-                         // Only include rect if it has surface
-                        if (widgetRect.width() > 0 && widgetRect.height() > 0) {
-                            boolean isContained = isContainedInAllParentsRect(w,w);
-                            
-                             String msgWidget = String.format("Title: %s , WebTextContent: %s , Role: %s , Class: %s , Path: %s , WebId: %s , X: %d, Y: %d, Width: %d, Height %d", 
-    						w.get(Tags.Title, ""), w.get(WdTags.WebTextContent, ""), w.get(Tags.Role), w.get(WdTags.WebCssClasses, ""), w.get(Tags.Path), w.get(WdTags.WebId, ""), (long)widgetRect.x(), (long)widgetRect.y(), (long)widgetRect.width(), (long)widgetRect.height());
-                            // TODO: if style {position: fixed}, then the widget could also be visible outside all the parent rectangulars. Thus if position is 'fixed', then should be added to list.
-                            if (isContained)
-                            {
-                                System.out.println("CONTAINED BY PARENTS: " + msgWidget);
-        					    leafWidgetsRects.add(new Pair<Widget, Rect>(w, widgetRect));
-                            }
-                            else
-                            {
-                                System.out.println("NOT CONTAINED BY PARENTS: " + msgWidget);
-                            }
-                            
-                        }
-    				}
-    			}
-            }
-		}
-
-        List<String> reported = new ArrayList();
-		for(int i = 0; i < leafWidgetsRects.size(); i++) {
-			for(int j = i + 1; j < leafWidgetsRects.size(); j++) {
-				if(leafWidgetsRects.get(i) != leafWidgetsRects.get(j)) {
-					Rect rectOne = leafWidgetsRects.get(i).right();
-					Rect rectTwo = leafWidgetsRects.get(j).right();
-                    Widget firstWidget = leafWidgetsRects.get(i).left();
-                    Widget secondWidget = leafWidgetsRects.get(j).left();
-                    
-                    // no parent/child relationship, if they then intersect still then report
-					if(!isChildOf(firstWidget,secondWidget) && !isChildOf(secondWidget, firstWidget) && checkRectIntersection(rectOne, rectTwo) && firstWidget != secondWidget) {
-                        
-						String firstMsg = String.format("Title: %s , WebTextContent: %s , Role: %s , Class: %s , Path: %s , WebId: %s , X: %d, Y: %d, Width: %d, Height %d", 
-						firstWidget.get(Tags.Title, ""), firstWidget.get(WdTags.WebTextContent, ""), firstWidget.get(Tags.Role), firstWidget.get(WdTags.WebCssClasses, ""), firstWidget.get(Tags.Path), firstWidget.get(WdTags.WebId, ""), (long)rectOne.x(), (long)rectOne.y(), (long)rectOne.width(), (long)rectOne.height());
-
-						String secondMsg = String.format("Title: %s , WebTextContent: %s , Role: %s , Class: %s , Path: %s , WebId: %s , X: %d, Y: %d, Width: %d, Height %d", 
-					    secondWidget.get(Tags.Title, ""), secondWidget.get(WdTags.WebTextContent, ""), secondWidget.get(Tags.Role), secondWidget.get(WdTags.WebCssClasses, ""), secondWidget.get(Tags.Path), secondWidget.get(WdTags.WebId, ""), (long)rectTwo.x(), (long)rectTwo.y(), (long)rectTwo.width(), (long)rectTwo.height());
-
-						String verdictMsg = "Two Widgets Overlapping!" + " First in RED! " + firstMsg + ". Second in BLUE! " + secondMsg;
-                        
-                        // Avoid duplicate message of other sides
-                        if (!reported.contains(secondMsg + firstMsg))
-                        {
-    						// Custom colors of overlapping widgets
-    						Rect firstWidgetRect = (Rect)firstWidget.get(Tags.Shape);
-    						firstWidgetRect.setColor(java.awt.Color.RED);
-    						Rect secondWidgetRect = (Rect)secondWidget.get(Tags.Shape);
-    						secondWidgetRect.setColor(java.awt.Color.BLUE);
-    
-    						//widgetsOverlapVerdict = widgetsOverlapVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList(firstWidgetRect, secondWidgetRect)));
-                            widgetsOverlapVerdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList(firstWidgetRect, secondWidgetRect));
-    					    reported.add(firstMsg + secondMsg);
-                        }
-                    }
-				}
-			}
-		}
-
-		return widgetsOverlapVerdict;
-	}
-
-	private boolean isOrDescendFromRole(Widget widget, List<Role> roles) {
-        if (roles.size() == 0) return false;
-		if (roles.contains(widget.get(Tags.Role, Roles.Widget))) return true;
-		else if(widget.parent() == null) return false;
-		else return isOrDescendFromRole(widget.parent(), roles);
-	}
-	private boolean isOrDescendFromClass(Widget widget, List<String> webClasses) {
-        if (webClasses.size() == 0) return false;
-		if (webClasses.stream().anyMatch(str -> widget.get(WdTags.WebCssClasses, "").contains(str))) return true;
-		else if(widget.parent() == null) return false;
-		else return isOrDescendFromClass(widget.parent(), webClasses);
-	}
-
-    private boolean isChildOf(Widget widget, Widget searchParent)
-    {
-        if (widget == null || searchParent == null || widget == searchParent || widget.parent() == null) return false;
-        if (widget.parent() == searchParent) return true;
-        else return isChildOf(widget.parent(), searchParent);
-    }
-   
-
-	private boolean isRect1ContainedInRect2(Rect r1, Rect r2) {
-		return (r1.x() >= r2.x() && 
-                r1.y() >= r2.y() &&
-                ((r1.x() + r1.width()) <= (r2.x() + r2.width())) &&
-                ((r1.y() + r1.height()) <= (r2.y() + r2.height())));
-	}
-
-	private boolean isContainedInAllParentsRect(Widget startWidget, Widget targetWidget) {
-        Widget parent = startWidget.parent();
-		if(parent == null) return true;
-
-        Rect targetWidgetRect = (Rect) targetWidget.get(Tags.Shape, null);
-        Rect parentRect = (Rect) parent.get(Tags.Shape, null);
-        if (targetWidgetRect == null || parentRect == null) return true;
-        
-        // Some Widget have a height of 0, while the child widgets are still shown. Therefore we ignore height 0 and continue.
-        if (parentRect.height() == 0 || isRect1ContainedInRect2(targetWidgetRect, parentRect))
-            return isContainedInAllParentsRect(parent, targetWidget);
-        else return false;
-	}
-
-    private int getMaxWidgetTreeDepth(Widget widget) {
-		int maxChildDepth = 0;
-		if (widget.childCount() > 0) {
-			for (int i = 0; i < widget.childCount(); i++) {
-				Widget child = widget.child(i);
-				int childDepth = getMaxWidgetTreeDepth(child);
-				maxChildDepth = Math.max(maxChildDepth, childDepth);
-			}
-		}
-
-		return maxChildDepth + 1;
-	}
-
-	private List<Widget> getWidgetsAtDepth(Widget original, int targetDepth) {
-		List<Widget> result = new ArrayList<>();
-		getWidgetsAtDepthRecursive(original, 1, targetDepth, result);
-		return result;
-	}
-
-	private void getWidgetsAtDepthRecursive(Widget widget, int currentDepth, int targetDepth, List<Widget> result) {
-		if (currentDepth == targetDepth) {
-			result.add(widget);
-		} else if (currentDepth < targetDepth) {
-			if (widget.childCount() > 0) {
-				for (int i = 0; i < widget.childCount(); i++) {
-					Widget child = widget.child(i);
-					getWidgetsAtDepthRecursive(child, currentDepth + 1, targetDepth, result);
-				}
-			}
-		}
-	}
-
 
 	private void testLog4J() {
      String logEntries = "<log4j:event logger=\"Log4JLibs.LogExample\" timestamp=\"1683569806499\" level=\"INFO\" thread=\"main\">\r\n" + 
@@ -1677,10 +843,6 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		// report the information in a specific HTML report
 		// and continue testing
 		
-		// Check the functional Verdict that detects if two widgets overlap
-	    //verdict = twoLeafWidgetsOverlap(state);
-		//if (shouldReturnVerdict(verdict)) return verdict;
-
 		//Verdict spellCheckerVerdict = GenericVerdict.SpellChecker(state, WdTags.WebTextContent, new Dutch(), "Pagina generatietijd.*|\\d\\d.*");
 		//if(spellCheckerVerdict != Verdict.OK) HTMLStateVerdictReport.reportStateVerdict(actionCount, state, spellCheckerVerdict);
 
@@ -1691,69 +853,83 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		// Check the functional Verdict that detects if a form button is enabled when it must not.
 		//verdict = formButtonMustBeDisabledIfNoChangesVerdict(state);
 		//if (shouldReturnVerdict(verdict)) return verdict;
+
         //testLog4J();
         
-        /*
-        verdict = widgetAlignmentMetric(state, 50.0);
+        verdict = GenericVerdict.WidgetAlignmentMetric(state, 50.0);
         if (shouldReturnVerdict(verdict)) return verdict;
         
-        verdict = widgetBalanceMetric(state, 50.0);
+        verdict = GenericVerdict.WidgetBalanceMetric(state, 50.0);
         if (shouldReturnVerdict(verdict)) return verdict;
         
-        verdict = widgetCenterAlignmentMetric(state, 50.0);
+        verdict = GenericVerdict.WidgetCenterAlignmentMetric(state, 50.0);
         if (shouldReturnVerdict(verdict)) return verdict;
         
-        verdict = widgetConcentricityMetric(state, 50.0);
+        verdict = GenericVerdict.WidgetConcentricityMetric(state, 50.0);
         if (shouldReturnVerdict(verdict)) return verdict;
-        
-        verdict = widgetDensityMetric(state, 50.0);
-        if (shouldReturnVerdict(verdict)) return verdict;
-        */
-        
-        /*verdict = widgetSimplicityMetric(state, 25.0, 75.0);
+       
+        /* 
+        verdict = GenericVerdict.WidgetDensityMetric(state, 10.0, 90.0);
         if (shouldReturnVerdict(verdict)) return verdict;
         */
+        verdict = GenericVerdict.WidgetSimplicityMetric(state, 50.0);
+        if (shouldReturnVerdict(verdict)) return verdict;
         
-        // Check the functional Verdict that detects if two leaf widgets overlap
+        
+        // Check the functional Verdict that detects if two widgets overlap
 		// Also, add the roles or the classes of the widget sub-trees are needed to ignore
- 		verdict = twoLeafWidgetsOverlap(state, 
-				Collections.emptyList(), // ignoredRoles, 
-                Arrays.asList("ui-dialog-content","ui-widget-overlay","ui-resizable-handle","sizer","previewsizer","navigation-sizer","ui-draggable")); // ignoredClasses				
+ 		verdict = GenericVerdict.WidgetClashDetection(state, 
+				Arrays.asList(WdRoles.WdCOL, WdRoles.WdCOLGROUP), // ignoredRoles, 
+                Arrays.asList(
+                /* whitelist: */
+                    "multipleFindsWrapper",
+                    "workspace-wrapper",
+                    "modalOverlay",
+                    "cke_dialog_background_cover",
+                    "EntityListContainer",
+                    "list-wrapper",
+                    "tabs",
+                    "RegProfButtons",
+                    "ui-datepicker",
+                    "RegistratieProfiel-SidePanel",
+                    "table-loader", 
+                    "dropdown-caret-wrapper", 
+                    "fa-caret-down", 
+                    "text", 
+                    "ui-state-default", 
+                    "collapsable-hitarea", 
+                    "view-ec", 
+                    "spinner", 
+                    "opslaanensluiten", 
+                    "pijlbenedendropdown", 
+                    "ui-dialog-content",
+                    "ui-widget-overlay",
+                    "ui-resizable-handle",
+                    "sizer",
+                    "previewsizer",
+                    "navigation-sizer",
+                    "ui-draggable",
+                /* temporary until bug solved: */ 
+                    "fa-sort-down",
+                    "fa-sort-up",
+                    "fa-external-link-alt"
+                             ), //ignoredClasses
+                true, // joinVerdicts	
+                false,  // checkOnlyLeafWidgets
+                true); // checkWebStyles	
  		if (shouldReturnVerdict(verdict)) return verdict;
 
-		// Check the functional Verdict that detects correct vertical alignment in role groups
-		//verdict = alignmentForWidgetGroups(state, Arrays.asList(WdRoles.WdUL));
-		//if (shouldReturnVerdict(verdict)) return verdict;
-
-        /*
-         Element Balance (best score: 1.0) refers to the overall symmetry, balanced element distribution (e.g., consistent space
-between elements), and skewness of the elements. Alignment
-(best score: 1.0) pertains to the checking of alignment among
-elements. During computation, three vertical (left, middle, and
-right) and three horizontal (top, middle, and horizon) imaginary lines are drawn for each element to measure the score.
-Color Unity (best score: 1.0) shows the color use based on
-the ratio of dominant to non-dominant colors. Font Size and
-Type Unity (best score: 1.0) investigates the consistency of
-font sizes and types present in the text. Element size (best
-score: 0.5) is intended to verify whether elements are excessively small or large for mobile interfaces. Scores lower than
-0.5 mean the elements are small, while scores higher than 0.5
-imply the elements are large, on average. Density (best score:
-0.5) computes how much space is occupied. Scores of less
-than 0.5 translate into simplicity in design, whereas higher
-scores imply over-populated designs.*/
-        
-        /*
 		verdict = detectWidgetsThatShouldBeInSync(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
 		
-        verdict = detectCommonTestOrDummyPhrases(state);
+        verdict = GenericVerdict.CommonTestOrDummyPhrases(state, WdTags.WebTextContent);
         if (shouldReturnVerdict(verdict)) return verdict;
         
         //verdict = detectSlowPerformance(20.0); // seconds
         //if (shouldReturnVerdict(verdict)) return verdict;
         
         // Checks for zero numbers in tables
-        verdict = detectZeroNumbers(state);
+        verdict = WebVerdict.ZeroNumbersInTable(state);
         if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if a downloaded file is empty.
@@ -1765,17 +941,17 @@ scores imply over-populated designs.*/
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects duplicate or repeated text in descriptions of widgets, ignore some common terms of DigiOffice, date, datetime, 3 phone formats and postal code
-		verdict = WebVerdict.DetectDuplicateText(state, "MM|AA|A{260}|0\\.0\\.0|0,0,0|Logo;Logo|DocDoc|DossierDossier|GebrGebr|RelRel|\\d\\d:\\d\\d:\\d\\d|\\d\\d-\\d\\d-\\d\\d\\d\\d\\s\\d\\d:\\d\\d:\\d\\d|\\d\\d-\\d\\d-\\d\\d\\d*\\d*|\\d\\d - \\d\\d \\d\\d \\d\\d \\d\\d|\\(?\\d\\d\\d\\)? -? ?\\d\\d\\d \\d\\d \\d\\d|\\(?\\d\\d\\d\\d\\)? -? ?\\d\\d \\d\\d \\d\\d|\\d\\d\\d\\d [A-Z][A-Z]|\\d\\d-\\d\\d-\\d\\d|0\\.0\\/0\\.0|0,0\\/0,0");
+		verdict = WebVerdict.DuplicateText(state, "MM|AA|A{260}|0\\.0\\.0|0,0,0|Logo;Logo|DocDoc|DossierDossier|GebrGebr|RelRel|\\d\\d:\\d\\d:\\d\\d|\\d\\d-\\d\\d-\\d\\d\\d\\d\\s\\d\\d:\\d\\d:\\d\\d|\\d\\d-\\d\\d-\\d\\d\\d*\\d*|\\d\\d - \\d\\d \\d\\d \\d\\d \\d\\d|\\(?\\d\\d\\d\\)? -? ?\\d\\d\\d \\d\\d \\d\\d|\\(?\\d\\d\\d\\d\\)? -? ?\\d\\d \\d\\d \\d\\d|\\d\\d\\d\\d [A-Z][A-Z]|\\d\\d-\\d\\d-\\d\\d|0\\.0\\/0\\.0|0,0\\/0,0");
 		if (shouldReturnVerdict(verdict)) return verdict;
 		
 		// Check the functional Verdict that detects HTML or XML tags in descriptions of widgets
-		verdict = WebVerdict.DetectHTMLOrXMLTagsInText(state,"%3Cscript%3Econsole\\.error%28%27XSS%20is%20possible%27%29%3B%3C%2Fscript%3E|.*\\.Config|.*_DMS_.*|.*_Bouw_.*|.*_CRM_.*|.*_Beheer_.*|ZoekFilter_.*|<memo>alpha beta gamma|.*>console\\.error\\(.*|<HuisstijlDir>|<VersieEnDatum>|<<major version>>\\.<<minor version>>|<<version>> \\(<<version date>>\\)");
+		verdict = WebVerdict.HTMLOrXMLTagsInText(state,"%3Cscript%3Econsole\\.error%28%27XSS%20is%20possible%27%29%3B%3C%2Fscript%3E|.*\\.Config|.*_DMS_.*|.*_Bouw_.*|.*_CRM_.*|.*_Beheer_.*|ZoekFilter_.*|<memo>alpha beta gamma|.*>console\\.error\\(.*|<HuisstijlDir>|<VersieEnDatum>|<<major version>>\\.<<minor version>>|<<version>> \\(<<version date>>\\)");
 		if (shouldReturnVerdict(verdict)) return verdict;
 
         // Check the functional Verdict that detects sensitive data, such as passwords or client secrets
         // https://en.wikipedia.org/wiki/List_of_the_most_common_passwords
         //verdict = detectSensitiveData(state, "123456|123456789|12345|qwerty|password|12345678|111111|123123|1234567890|1234567|qwerty123|000000|1q2w3e|aa12345678|abc123|password1|1234|qwertyuiop|123321|password123");
-        verdict = detectSensitiveData(state, "123456|123456789|qwerty|password|12345678|111111|123123|1234567890|1234567|qwerty123|000000|1q2w3e|aa12345678|abc123|password1|qwertyuiop|123321|password123");
+        verdict = GenericVerdict.SensitiveData(state, WdTags.WebTextContent, "123456|123456789|qwerty|password|12345678|111111|123123|1234567890|1234567|qwerty123|000000|1q2w3e|aa12345678|abc123|password1|qwertyuiop|123321|password123");
         if (shouldReturnVerdict(verdict)) return verdict;
         
 		// Check the functional Verdict that detects select elements without items to the current state verdict.
@@ -1819,7 +995,7 @@ scores imply over-populated designs.*/
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if web table contains duplicated rows.
-		verdict = WebVerdict.DetectDuplicatedRowsInTable(state);
+		verdict = WebVerdict.DuplicatedRowsInTable(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
         // Check untranslated text tags
@@ -1827,9 +1003,9 @@ scores imply over-populated designs.*/
         if (shouldReturnVerdict(verdict)) return verdict;
         
         // Check The replacement character � (often displayed as a black rhombus with a white question mark) is a symbol found in the Unicode standard at code point U+FFFD in the Specials table. It is used to indicate problems when a system is unable to render a stream of data to correct symbols
-        verdict = detectUnicodeReplacementCharacter(state);
+        verdict = GenericVerdict.UnicodeReplacementCharacter(state, WdTags.WebTextContent);
         if (shouldReturnVerdict(verdict)) return verdict;
-*/
+
 		return verdict;
 	}
 }

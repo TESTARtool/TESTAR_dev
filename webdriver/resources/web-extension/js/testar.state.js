@@ -171,6 +171,11 @@ function wrapElementTestar(element, xOffset, yOffset) {
         value: element.value,
         display: computedStyle.getPropertyValue('display'),
         styleOverflow: computedStyle.overflow,
+		styleOverflowX: computedStyle.overflowX,
+		styleOverflowY: computedStyle.overflowY,
+		stylePosition: computedStyle.position,
+		styleOpacity: computedStyle.opacity,
+		
 
         zIndex: getZIndexTestar(element),
         rect: getRectTestar(element, xOffset, yOffset),

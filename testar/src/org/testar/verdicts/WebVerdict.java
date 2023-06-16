@@ -59,9 +59,6 @@ import com.google.common.collect.Comparators;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * All public methods in this class must start with "verdict" naming. 
- */
 public class WebVerdict {
 
 	// By default consider that all the verdicts of the class are enabled
@@ -169,7 +166,7 @@ public class WebVerdict {
 	// The user cannot distinguish one row from another.
 	// The underlying bug could be a technical issue (i.e. all cells have an 'undefined' value) or
 	// is more functional, such as a missing column which should make the rows unique and distinguishable
-	public static Verdict DetectDuplicatedRowsInTable(State state) {
+	public static Verdict DuplicatedRowsInTable(State state) {
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
 		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
@@ -280,7 +277,7 @@ public class WebVerdict {
 	// For example, the TO field of an e-mail should only have unique e-mailadresses, or the Authors field of a report should only have unique authors
 	// This could be a technical issue, where a boundary of a loop is off, or concatenating a string value twice.
 	// If False positives arise, the ignorePatternRegEx could be used to fine-tune the detection by ignoring these false positives with a anti-pattern
-	public static Verdict DetectDuplicateText(State state, String ignorePatternRegEx)
+	public static Verdict DuplicateText(State state, String ignorePatternRegEx)
 	{
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
@@ -315,7 +312,7 @@ public class WebVerdict {
 	// The idea is that a description should not show markup tags, but should probably show the text in bold, italic, and so on.
 	// If there are html tags which can be ignored, then this can be specified in the ignorePatternRegEx parameter
 	// If False positives arise, the ignorePatternRegEx could be used to fine-tune the detection by ignoring these false positives with a anti-pattern
-	public static Verdict DetectHTMLOrXMLTagsInText(State state, String ignorePatternRegEx)
+	public static Verdict HTMLOrXMLTagsInText(State state, String ignorePatternRegEx)
 	{
 		// If this method is NOT enabled, just return verdict OK
 		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
@@ -642,4 +639,42 @@ public class WebVerdict {
 	private static boolean isRadioInput(Widget w) {
 		return w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdINPUT) && w.get(WdTags.WebType, "").equalsIgnoreCase("radio");
 	}
+	
+
+	// Detect text that contains zero values in tables
+	// BAD:  0.00
+    //       $ 0.00
+	// GOOD: 
+	// If zero values are shown in tables/grids, then this clutter the grid. It is better to don't display zero values. 
+	// Exception to this rule may be row totals or column totals. 
+	public static Verdict ZeroNumbersInTable(State state)
+	{
+		Verdict verdict = Verdict.OK;
+		String patternRegex = "\\s0[\\.,]0\\s";
+		Pattern pattern = Pattern.compile(patternRegex);
+		
+		for(Widget w : state) {
+			if (isSonOfTD(w))
+            {
+				String desc = w.get(WdTags.WebTextContent, "");
+				Matcher matcher = pattern.matcher(desc);
+			
+				if (matcher.find()) {
+					String verdictMsg = String.format("Detected zero values in table/grids! Role: %s , Path: %s , WebId: %s , Desc: %s , WebTextContent: %s", 
+							w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebTextContent, ""));
+					verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+				}
+			}
+		}
+		return verdict;
+	}
+	
+	private static boolean isSonOfTD(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(Tags.Role, Roles.Widget).equals(WdRoles.WdTD)) return true;
+		else return isSonOfTD(widget.parent());
+	}
+	
+
+
 }

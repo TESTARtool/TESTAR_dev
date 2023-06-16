@@ -109,9 +109,29 @@ public class WdTags extends TagsBase {
   public static final Tag<String> WebStyle = from("WebStyle", String.class);
 
   /**
+   * Web style opacity property of a widget.
+   */
+  public static final Tag<Double> WebStyleOpacity = from("WebStyleOpacity", Double.class);
+
+  /**
+   * Web style position property of a widget.
+   */
+  public static final Tag<String> WebStylePosition = from("WebStylePosition", String.class);
+
+  /**
    * Web style overflow property of a widget.
    */
   public static final Tag<String> WebStyleOverflow = from("WebStyleOverflow", String.class);
+
+  /**
+   * Web style overflow-x property of a widget.
+   */
+  public static final Tag<String> WebStyleOverflowX = from("WebStyleOverflowX", String.class);
+
+  /**
+   * Web style overflow-y property of a widget.
+   */
+  public static final Tag<String> WebStyleOverflowY = from("WebStyleOverflowY", String.class);
 
   /**
    * Web target of a widget.
