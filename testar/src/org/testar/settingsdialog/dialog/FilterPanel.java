@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -50,14 +50,20 @@ public class FilterPanel extends SettingsPanel {
     private JTextArea txtClickFilter = new JTextArea();
     private JTextArea txtTagsToFilter = new JTextArea();
     private JTextArea txtProcessFilter = new JTextArea();
+    
+    private RegexButton regexButtonClickFilter = new RegexButton(txtClickFilter);
+    private RegexButton regexButtonProcFilter = new RegexButton(txtProcessFilter);
 
     public FilterPanel() {
         filterLabel.setToolTipText(ToolTipTexts.label1TTT);
         killProcessLabel.setToolTipText(ToolTipTexts.label2TTT);
 
         setLayout(null);
-        filterLabel.setBounds(10, 5, 600, 27);
+        filterLabel.setBounds(10, 5, 400, 27);
         add(filterLabel);
+
+        regexButtonClickFilter.setBounds(500, 5, 110, 27);
+        add(regexButtonClickFilter);
 
         txtClickFilter.setLineWrap(true);
         JScrollPane clickFilterPane = new JScrollPane(txtClickFilter);
@@ -76,8 +82,11 @@ public class FilterPanel extends SettingsPanel {
         tagsToFilterPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         add(tagsToFilterPane);
 
-        killProcessLabel.setBounds(10, 210, 600, 27);
+        killProcessLabel.setBounds(10, 210, 400, 27);
         add(killProcessLabel);
+        
+        regexButtonProcFilter.setBounds(500, 210, 110, 27);
+        add(regexButtonProcFilter);
 
         txtProcessFilter.setLineWrap(true);
         JScrollPane processFilterPane = new JScrollPane(txtProcessFilter);

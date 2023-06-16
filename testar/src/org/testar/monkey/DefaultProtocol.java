@@ -128,6 +128,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		this.replayVerdict = replayVerdict;
 	}
 
+	Verdict finalVerdict = Verdict.OK;
+	public Verdict getFinalVerdict() {
+		return finalVerdict;
+	}
+
 	protected String lastPrintParentsOf = "null-id";
 	protected int actionCount;
 
@@ -248,7 +253,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			} else if (mode() == Modes.Spy) {
 				new SpyMode().runSpyLoop(this);
 			} else if(mode() == Modes.Record) {
-				new RecordMode().runRecordLoop(this);
+				//new RecordMode().runRecordLoop(this);
+				System.out.println("Dear User, TESTAR Record mode is disabled temporarily.");
 			} else if (mode() == Modes.Generate) {
 				new GenerateMode().runGenerateOuterLoop(this);
 			}
@@ -327,7 +333,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				settings.get(ConfigTags.SUTProcesses)
 				);
 
-		if ( mode() == Modes.Generate || mode() == Modes.Record || mode() == Modes.Replay ) {
+		if ( mode() == Modes.Generate || /*mode() == Modes.Record ||*/ mode() == Modes.Replay ) {
 			//Create the output folders
 			OutputStructure.calculateOuterLoopDateString();
 			OutputStructure.sequenceInnerLoopCount = 0;
@@ -339,7 +345,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		try {
-			if (!settings.get(ConfigTags.UnattendedTests) && !GraphicsEnvironment.isHeadless()) {
+			if (!GraphicsEnvironment.isHeadless()) {
 				LogSerialiser.log("Registering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
 				java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
 				logger.setLevel(Level.OFF);
@@ -630,7 +636,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	    fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
 	    fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
 	    fragment.set(SystemState, state);
-	    fragment.set(OracleVerdict, getVerdict(state));
+	    fragment.set(OracleVerdict, getFinalVerdict());
 
 	    //Find the target widget of the current action, and save the title into the fragment
 	    if (state != null && action.get(Tags.OriginWidget, null) != null){
@@ -716,7 +722,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	@Override
 	protected void beginSequence(SUT system, State state){
-
+		// Reset the final verdict for the new sequence
+		finalVerdict = Verdict.OK;
 	}
 
 	@Override
@@ -834,9 +841,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		// ORACLES FOR FREE
 		//-------------------
 
-		// if the SUT is not running, we assume it crashed
+		// if the SUT is not running and closed unexpectedly, we assume it crashed
 		if(!state.get(IsRunning, false))
-			return new Verdict(Verdict.SEVERITY_NOT_RUNNING, "System is offline! I assume it crashed!");
+			return new Verdict(Verdict.SEVERITY_UNEXPECTEDCLOSE, "System is offline! Closed Unexpectedly! I assume it crashed!");
 
 		// if the SUT does not respond within a given amount of time, we assume it crashed
 		if(state.get(Tags.NotResponding, false)){
@@ -847,13 +854,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//------------------------
 
 		if (this.suspiciousTitlesPattern == null)
-			this.suspiciousTitlesPattern = Pattern.compile(settings().get(ConfigTags.SuspiciousTitles), Pattern.UNICODE_CHARACTER_CLASS);
+			this.suspiciousTitlesPattern = Pattern.compile(settings().get(ConfigTags.SuspiciousTags), Pattern.UNICODE_CHARACTER_CLASS);
 
 		// search all widgets for suspicious String Values
 		Verdict suspiciousValueVerdict = Verdict.OK;
 		for(Widget w : state) {
 			suspiciousValueVerdict = suspiciousStringValueMatcher(w);
-			if(suspiciousValueVerdict.severity() == Verdict.SEVERITY_SUSPICIOUS_TITLE) {
+			if(suspiciousValueVerdict.severity() == Verdict.SEVERITY_SUSPICIOUS_TAG) {
 				return suspiciousValueVerdict;
 			}
 		}
@@ -868,10 +875,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		for(String tagForSuspiciousOracle : settings.get(ConfigTags.TagsForSuspiciousOracle)){
 			String tagValue = "";
 			// First finding the Tag that matches the TagsToFilter string, then getting the value of that Tag:
-			for(Tag tag : w.tags()){
-				if(tag.name().equals(tagForSuspiciousOracle)){
+			for(Tag<?> tag : w.tags()){
+				if(w.get(tag, null) != null && tag.name().equals(tagForSuspiciousOracle)){
 					// Force the replacement of new line characters to avoid the usage of (?s) regex in the regular expression
-					tagValue = w.get(tag, "").toString().replace("\n", " ").replace("\r", " ");
+					tagValue = w.get(tag).toString().replace("\n", " ").replace("\r", " ");
 					break;
 					//System.out.println("DEBUG: tag found, "+tagToFilter+"="+tagValue);
 				}
@@ -897,8 +904,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				Pen RedPen = Pen.newPen().setColor(Color.Red).setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
 				// visualize the problematic widget, by marking it with a red box
 				if(w.get(Tags.Shape, null) != null)
-					visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
-				return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
+					visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Tag", 0.5, 0.5);
+				return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TAG,
 						"Discovered suspicious widget '" + tagForSuspiciousOracle + "' : '" + tagValue + "'.", visualizer);
 			}
 		}
@@ -975,8 +982,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println("DEBUG: Forcing ESC action in preActionSelection : Actions derivation seems to be EMPTY !");
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
 			Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
+			escAction.set(Tags.OriginWidget, state);
 			buildEnvironmentActionIdentifiers(state, escAction);
 			return new HashSet<>(Collections.singletonList(escAction));
+		}
+
+		// If there is an ActivateSystem action
+		// We need to force its selection to move the system to the foreground
+		Action forceForegroungAction = actions.stream().filter(a -> a instanceof ActivateSystem)
+				.findAny().orElse(null);
+		if (forceForegroungAction != null) {
+			System.out.println("DEBUG: Forcing the System to be in the foreground !");
+			return new HashSet<>(Collections.singletonList(forceForegroungAction));
 		}
 
 		return actions;
@@ -1078,7 +1095,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		Action retAction = stateModelManager.getAbstractActionToExecute(actions);
 		// If state model is not enabled, use random:
 		if (retAction == null) {
-			return RandomActionSelector.selectAction(actions);
+			return RandomActionSelector.selectRandomAction(actions);
 		}
 		return retAction;
 	}
@@ -1129,7 +1146,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private void closeTestarTestSession(){
 		//cleaning the variables started in initialize()
 		try {
-			if (!settings.get(ConfigTags.UnattendedTests) && !GraphicsEnvironment.isHeadless()) {
+			if (!GraphicsEnvironment.isHeadless()) {
 				if (GlobalScreen.isNativeHookRegistered()) {
 					LogSerialiser.log("Unregistering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
 					GlobalScreen.removeNativeMouseMotionListener(eventHandler);

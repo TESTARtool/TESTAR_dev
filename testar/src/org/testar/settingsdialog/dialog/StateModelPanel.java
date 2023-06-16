@@ -35,6 +35,9 @@ import org.testar.StateManagementTags;
 import org.testar.statemodel.analysis.AnalysisManager;
 import org.testar.statemodel.analysis.webserver.JettyServer;
 import org.testar.statemodel.persistence.orientdb.entity.Config;
+
+import com.orientechnologies.orient.core.exception.ODatabaseException;
+import com.orientechnologies.orient.core.exception.OSecurityAccessException;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
@@ -378,7 +381,7 @@ public class StateModelPanel extends SettingsPanel {
     }
 
     // this helper method will start a jetty integrated server and show the model listings page
-    private void openServer() {
+    public void openServer() {
         try {
             label14.setText("");
             // create a config object for the orientdb database connection info
@@ -392,6 +395,33 @@ public class StateModelPanel extends SettingsPanel {
             AnalysisManager analysisManager = new AnalysisManager(config, outputDir);
             JettyServer jettyServer = new JettyServer();
             jettyServer.start(outputDir, analysisManager);
+        } catch (ODatabaseException de) {
+        	// There it can be a root cause that indicates that the IP address or server is not running
+        	if(de.getCause() != null && de.getCause().getMessage() != null && de.getCause().getMessage().contains("Cannot create a connection")) {
+        		popupMessage(de.getCause().getMessage());
+        		return;
+        	} 
+        	// If the database does not exists
+        	else if(de.getMessage() != null && de.getMessage().contains("Cannot open database")) {
+        		popupMessage(de.getMessage());
+        		return;
+        	} 
+        	// Not expected exception, throw trace in the console
+        	else {
+        		de.printStackTrace();
+        		return;
+        	}
+        } catch (OSecurityAccessException se) {
+        	// If the user credential are wrong
+        	if(se.getMessage() != null && se.getMessage().contains("User or password not valid")) {
+        		popupMessage(se.getMessage());
+        		return;
+        	} 
+        	// Not expected exception, throw trace in the console
+        	else {
+        		se.printStackTrace();
+        		return;
+        	}
         } catch (IOException e) {
         	// If the exception is because the server is already running, just catch and connect
         	if(e.getCause() != null && e.getCause().getMessage() != null && e.getCause().getMessage().contains("Address already in use")) {
@@ -412,6 +442,15 @@ public class StateModelPanel extends SettingsPanel {
         }
 
         openBrowser();
+    }
+
+    private void popupMessage(String connectionMessage) {
+    	JFrame frame = new JFrame();
+    	String header = "Incorrect OrientDB settings";
+    	String userMessage = "Cannot connect with OrientDB to view the State Model";
+    	userMessage = userMessage.concat("\nReason: " + connectionMessage);
+    	userMessage = userMessage.concat("\nPlease review the OrientDB connection settings");
+    	JOptionPane.showMessageDialog(frame, userMessage, header, JOptionPane.ERROR_MESSAGE);
     }
 
     private void openBrowser() {

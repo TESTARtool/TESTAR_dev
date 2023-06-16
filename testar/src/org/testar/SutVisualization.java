@@ -79,37 +79,56 @@ public class SutVisualization {
 
         if(cursorWidget != null){
             Widget rootW = cursorWidget;
-            while (rootW.parent() != null && rootW.parent() != rootW)
+            while (rootW.parent() != null && rootW.parent() != rootW) {
                 rootW = rootW.parent();
+            }
             Shape cwShape = cursorWidget.get(Tags.Shape, null);
 
             if(cwShape != null){
                 cwShape.paint(canvas, Pen.PEN_MARK_ALPHA);
                 cwShape.paint(canvas, Pen.PEN_MARK_BORDER);
                 if (!showExtendedWidgetInfo){
-                    String rootText = "State: " + rootW.get(Tags.ConcreteID),
-                            widConcreteText = CodingManager.CONCRETE_ID + ": " + cursorWidget.get(Tags.ConcreteID),
-                            roleText = "Role: " + cursorWidget.get(Role, Roles.Widget).toString(),
-                            idxText = "Path: " + cursorWidget.get(Tags.Path);
+                	// Widget properties we are going to show in Spy mode when the information is not extended
+                	String rootText = "StateID: " + rootW.get(Tags.AbstractIDCustom, "");
+                	String widgetText = "WidgetID: " + cursorWidget.get(Tags.AbstractIDCustom, "");
+                	String titleText = "Title: " + cursorWidget.get(Tags.Title, "");
+                	String roleText = "Role: " + cursorWidget.get(Role, Roles.Widget).toString();
+                	String enabledText = "Enabled: " + cursorWidget.get(Tags.Enabled, false);
+                	String shapeText = "Shape: " + cursorWidget.get(Tags.Shape, Rect.from(0, 0, 0, 0));
+                	String pathText = "Path: " + cursorWidget.get(Tags.Path, "");
 
-                    double miniwidgetInfoW = Math.max(Math.max(Math.max(rootText.length(), widConcreteText.length()), roleText.length()),idxText.length()) * 8; if (miniwidgetInfoW < 256) miniwidgetInfoW = 256;
-                    double miniwidgetInfoH = 80; // 20 * 4
-                    Shape minicwShape = Rect.from(cwShape.x() + cwShape.width()/2 + 32,
-                            cwShape.y() + cwShape.height()/2 + 32,
-                            miniwidgetInfoW, miniwidgetInfoH);
-                    Shape repositionShape = ProtocolUtil.calculateWidgetInfoShape(canvas,minicwShape, miniwidgetInfoW, miniwidgetInfoH);
-                    if (repositionShape != minicwShape){
-                        double x = repositionShape.x() - repositionShape.width() - 32,
-                                y = repositionShape.y() - repositionShape.height() - 32;
-                        if (x < 0) x = 0; if (y < 0) y = 0;
-                        minicwShape = Rect.from(x,y,repositionShape.width(), repositionShape.height());
-                    }
-                    canvas.rect(Pen.PEN_WHITE_ALPHA, minicwShape.x(), minicwShape.y(), miniwidgetInfoW, miniwidgetInfoH);
-                    canvas.rect(Pen.PEN_BLACK, minicwShape.x(), minicwShape.y(), miniwidgetInfoW, miniwidgetInfoH);
-                    canvas.text(Pen.PEN_RED, minicwShape.x(), minicwShape.y(), 0, rootText);
-                    canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 20, 0, idxText);
-                    canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 40, 0, roleText);
-                    canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 60, 0, widConcreteText);
+                	// Calculate the maximum length of the widget properties strings
+                	String[] textArray = {rootText, widgetText, titleText, roleText, enabledText, shapeText, pathText};
+                	int maxLength = 0;
+                	for (String text : textArray) {
+                		maxLength = Math.max(maxLength, text.length());
+                	}
+                	double miniwidgetInfoW = maxLength * 8.0;
+                	if (miniwidgetInfoW < 256) miniwidgetInfoW = 256;
+                	double miniwidgetInfoH = 20 * textArray.length; // Each property uses a height of 20
+
+                	// Create the Shape of the visual rectangles we draw in Spy mode
+                	Shape minicwShape = Rect.from(cwShape.x() + cwShape.width()/2 + 32,
+                			cwShape.y() + cwShape.height()/2 + 32,
+                			miniwidgetInfoW, miniwidgetInfoH);
+                	Shape repositionShape = ProtocolUtil.calculateWidgetInfoShape(canvas,minicwShape, miniwidgetInfoW, miniwidgetInfoH);
+                	if (repositionShape != minicwShape){
+                		double x = repositionShape.x() - repositionShape.width() - 32,
+                				y = repositionShape.y() - repositionShape.height() - 32;
+                		if (x < 0) x = 0; if (y < 0) y = 0;
+                		minicwShape = Rect.from(x,y,repositionShape.width(), repositionShape.height());
+                	}
+
+                	// Draw the rectangle and widget properties in the screen
+                	canvas.rect(Pen.PEN_WHITE_ALPHA, minicwShape.x(), minicwShape.y(), miniwidgetInfoW, miniwidgetInfoH);
+                	canvas.rect(Pen.PEN_BLACK, minicwShape.x(), minicwShape.y(), miniwidgetInfoW, miniwidgetInfoH);
+                	canvas.text(Pen.PEN_RED, minicwShape.x(), minicwShape.y(), 0, rootText);
+                	canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 20, 0, widgetText);
+                	canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 40, 0, titleText);
+                	canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 60, 0, roleText);
+                	canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 80, 0, enabledText);
+                	canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 100, 0, shapeText);
+                	canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 120, 0, pathText);
                 }
 
                 // TODO: Check if this is useful. If not, just remove it.

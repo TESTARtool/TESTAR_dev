@@ -1,6 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,16 +31,31 @@
 package org.testar;
 
 import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.State;
 
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Set;
 
-public class RandomActionSelector {
+public class RandomActionSelector implements IActionSelector{
 
-    public static Action selectAction(Set<Action> actions) {
-        long graphTime = System.currentTimeMillis();
-        Random rnd = new Random(graphTime);
-        return new ArrayList<Action>(actions).get(rnd.nextInt(actions.size()));
-    }
+	public static Action selectRandomActionUsingSystemTime(Set<Action> actions) {
+		long graphTime = System.currentTimeMillis();
+		Random rnd = new Random(graphTime);
+		return new ArrayList<Action>(actions).get(rnd.nextInt(actions.size()));
+	}
+
+	public static Action selectRandomAction(Set<Action> actions) {
+		// Convert the Set to an ArrayList for easier indexing
+		ArrayList<Action> actionList = new ArrayList<>(actions);
+		// Generate a random index within the bounds of the ArrayList
+		int randomIndex = new Random().nextInt(actionList.size());
+		// Retrieve the Action at the generated index and return it
+		return actionList.get(randomIndex);
+	}
+
+	@Override
+	public Action selectAction(State state, Set<Action> actions) {
+		return selectRandomAction(actions);
+	}
 }

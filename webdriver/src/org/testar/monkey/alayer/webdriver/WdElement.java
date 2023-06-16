@@ -63,6 +63,7 @@ public class WdElement extends TaggableBase implements Serializable {
   public String id, name, genericTitle, tagName, textContent, helpText, title;
   public List<String> cssClasses = new ArrayList<>();
   public String display, type;
+  public int maxLength;
 
   boolean enabled, ignore;
   public boolean isClickable;
@@ -128,6 +129,7 @@ public class WdElement extends TaggableBase implements Serializable {
     alt = attributeMap.getOrDefault("alt", "");
     type = attributeMap.getOrDefault("type", "");
     src = attributeMap.getOrDefault("src", "");
+    maxLength = Integer.valueOf(attributeMap.getOrDefault("maxlength", "-1"));
 
     remoteWebElement = (RemoteWebElement)packedElement.get("element");
     checked = asBool(packedElement.getOrDefault("checked", false));
