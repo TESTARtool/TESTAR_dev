@@ -223,7 +223,7 @@ public class Metrics {
  			
  			value = 1-(Math.abs(BMvert)+Math.abs(BMhori))/2;			
  		
- 		return 100 - value * 100;
+ 		return value * 100;
  	}
     
     public static double calculateCenterAlignment(ArrayList<Rect> regions) {

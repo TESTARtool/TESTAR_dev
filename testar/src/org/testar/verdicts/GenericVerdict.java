@@ -313,7 +313,7 @@ public class GenericVerdict {
 		// returns a value from 0.00 to 100.0. Lower is bad alignment.
 		double alignmentMetric = Metrics.calculateAlignmentMetric(regions);
         
-        if (alignmentMetric <= thresholdValue)
+        if (alignmentMetric < thresholdValue)
         {
             String verdictMsg = String.format("Alignment metric with value %f is below threshold value %f!",  alignmentMetric, thresholdValue);
             Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
@@ -329,18 +329,20 @@ public class GenericVerdict {
     public static Verdict WidgetBalanceMetric(State state, double tresholdValue) {
 		Verdict widgetBalanceMetricVerdict = Verdict.OK;
 
-		ArrayList<Rect> regions = getRegions(state);
         Rect sutRect = (Rect) state.child(0).get(Tags.Shape, null);
-        
-		double balanceMetric = Metrics.calculateBalanceMetric(regions, sutRect.width(), sutRect.height());
-        
-        if (balanceMetric <= tresholdValue)
-        {
-            String verdictMsg = String.format("Balance metric with value %f is below treshold value %f!",  balanceMetric, tresholdValue);
-            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
-		    widgetBalanceMetricVerdict = widgetBalanceMetricVerdict.join(verdict);
-        }
-
+		if (sutRect.width() > 0 && sutRect.height() > 0)
+		{
+			ArrayList<Rect> regions = getRegions(state);
+	        
+			double balanceMetric = Metrics.calculateBalanceMetric(regions, sutRect.width(), sutRect.height());
+	        
+	        if (balanceMetric < tresholdValue)
+	        {
+	            String verdictMsg = String.format("Balance metric with value %f is below treshold value %f!",  balanceMetric, tresholdValue);
+	            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
+			    widgetBalanceMetricVerdict = widgetBalanceMetricVerdict.join(verdict);
+	        }
+		}
 		return widgetBalanceMetricVerdict;
 	}
 
@@ -355,7 +357,7 @@ public class GenericVerdict {
 		// returns a value from 0.00 to 100.0. Lower is bad alignment.
 		double metric = Metrics.calculateCenterAlignment(regions);
         
-        if (metric <= tresholdValue)
+        if (metric < tresholdValue)
         {
             String verdictMsg = String.format("Center alignment metric with value %f is below treshold value %f!",  metric, tresholdValue);
             Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
@@ -371,19 +373,21 @@ public class GenericVerdict {
     public static Verdict WidgetConcentricityMetric(State state, double tresholdValue) {
 		Verdict widgetConcentricityVerdict = Verdict.OK;
 
-		ArrayList<Rect> regions = getRegions(state);
         Rect sutRect = (Rect) state.child(0).get(Tags.Shape, null);
-        
-		// returns a value from 0.00 to 100.0.
-		double metric = Metrics.calculateConcentricity(regions, sutRect.width(), sutRect.height());
-        
-        if (metric <= tresholdValue)
-        {
-            String verdictMsg = String.format("Concentricity metric with value %f is below treshold value %f!",  metric, tresholdValue);
-            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
-		    widgetConcentricityVerdict = widgetConcentricityVerdict.join(verdict);
-        }
-
+		if (sutRect.width() > 0 && sutRect.height() > 0)
+		{
+			ArrayList<Rect> regions = getRegions(state);
+	        
+			// returns a value from 0.00 to 100.0.
+			double metric = Metrics.calculateConcentricity(regions, sutRect.width(), sutRect.height());
+	        
+	        if (metric < tresholdValue)
+	        {
+	            String verdictMsg = String.format("Concentricity metric with value %f is below treshold value %f!",  metric, tresholdValue);
+	            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
+			    widgetConcentricityVerdict = widgetConcentricityVerdict.join(verdict);
+	        }
+		}
 		return widgetConcentricityVerdict;
 	}
     
@@ -393,26 +397,28 @@ public class GenericVerdict {
     public static Verdict WidgetDensityMetric(State state, double tresholdMinValue, double tresholdMaxValue) {
 		Verdict widgetDensityVerdict = Verdict.OK;
 
-		ArrayList<Rect> regions = getRegions(state);
         Rect sutRect = (Rect) state.child(0).get(Tags.Shape, null);
-        
-		// returns a value from 0.00 to 100.0.
-		double metric = Metrics.calculateDensity(regions, sutRect.width(), sutRect.height());
-        
-        if (metric < tresholdMinValue)
-        {
-            String verdictMsg = String.format("Density metric with value %f is below treshold minimum value %f! Design too simple.", metric, tresholdMinValue);
-            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
-            widgetDensityVerdict = widgetDensityVerdict.join(verdict);
-        }
-        
-        if (metric > tresholdMaxValue)
-        {
-            String verdictMsg = String.format("Density metric with value %f is higher then treshold maximum value %f! Design too complex.",  metric, tresholdMaxValue);
-            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
-            widgetDensityVerdict = widgetDensityVerdict.join(verdict);
-        }
-
+		if (sutRect.width() > 0 && sutRect.height() > 0)
+		{
+			ArrayList<Rect> regions = getRegions(state);
+	        
+			// returns a value from 0.00 to 100.0.
+			double metric = Metrics.calculateDensity(regions, sutRect.width(), sutRect.height());
+	        
+	        if (metric < tresholdMinValue)
+	        {
+	            String verdictMsg = String.format("Density metric with value %f is below treshold minimum value %f! Design too simple.", metric, tresholdMinValue);
+	            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
+	            widgetDensityVerdict = widgetDensityVerdict.join(verdict);
+	        }
+	        
+	        if (metric > tresholdMaxValue)
+	        {
+	            String verdictMsg = String.format("Density metric with value %f is higher then treshold maximum value %f! Design too complex.",  metric, tresholdMaxValue);
+	            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
+	            widgetDensityVerdict = widgetDensityVerdict.join(verdict);
+	        }
+		}
 		return widgetDensityVerdict;
 	}
 
@@ -421,19 +427,20 @@ public class GenericVerdict {
     // A default threshold value is around 50.0
     public static Verdict WidgetSimplicityMetric(State state, double tresholdValue) {
 		Verdict widgetSimplicityVerdict = Verdict.OK;
-
-		ArrayList<Rect> regions = getRegions(state);
         Rect sutRect = (Rect) state.child(0).get(Tags.Shape, null);
-        
-		double metric = Metrics.calculateSimplicity(regions, sutRect.width(), sutRect.height());
-        
-        if (metric <= tresholdValue)
-        {
-            String verdictMsg = String.format("Simplicity metric with value %f is below treshold value %f!",  metric, tresholdValue);
-            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
-		    widgetSimplicityVerdict = widgetSimplicityVerdict.join(verdict);
-        }
-
+		if (sutRect.width() > 0 && sutRect.height() > 0)
+		{
+			ArrayList<Rect> regions = getRegions(state);
+	        
+			double metric = Metrics.calculateSimplicity(regions, sutRect.width(), sutRect.height());
+	        
+	        if (metric < tresholdValue)
+	        {
+	            String verdictMsg = String.format("Simplicity metric with value %f is below treshold value %f!",  metric, tresholdValue);
+	            Verdict verdict = new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
+			    widgetSimplicityVerdict = widgetSimplicityVerdict.join(verdict);
+	        }
+		}
 		return widgetSimplicityVerdict;
 	}
     
