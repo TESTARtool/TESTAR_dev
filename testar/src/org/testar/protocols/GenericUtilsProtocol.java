@@ -44,6 +44,7 @@ import org.testar.plugin.OperatingSystems;
 import org.testar.monkey.ConfigTags;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -104,8 +105,12 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
         while (numberOfRetries<maxNumberOfRetries){
             Widget widget = getWidgetWithMatchingTags(tagValues, state);
             if (widget != null) {
+                // When the desired widget to interact with is found,
+                // Create the triggered action, build the identifier, and execute it.
                 StdActionCompiler ac = new AnnotatingActionCompiler();
-                executeAction(system, state, ac.leftClickAt(widget));
+                Action triggeredAction = ac.leftClickAt(widget);
+                buildStateActionsIdentifiers(state, Collections.singleton(triggeredAction));
+                executeAction(system, state, triggeredAction);
                 return true;
             }
             else {
@@ -136,9 +141,12 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
             //looking for a widget with matching tag value:
             Widget widget = getWidgetWithMatchingTag(tag,value,state);
             if(widget!=null){
+                // When the desired widget to interact with is found,
+                // Create the triggered action, build the identifier, and execute it.
                 StdActionCompiler ac = new AnnotatingActionCompiler();
-                //System.out.println("DEBUG: left mouse click on a widget with "+tag.toString()+"=" + value);
-                executeAction(system,state,ac.leftClickAt(widget));
+                Action triggeredAction = ac.leftClickAt(widget);
+                buildStateActionsIdentifiers(state, Collections.singleton(triggeredAction));
+                executeAction(system, state, triggeredAction);
                 // is waiting needed after the action has been executed?
                 return true;
             }
@@ -205,8 +213,12 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
         while(numberOfRetries<maxNumberOfRetries){
             Widget widget = getWidgetWithMatchingTags(tagValues,state);
             if(widget!=null){
+                // When the desired widget to interact with is found,
+                // Create the triggered action, build the identifier, and execute it.
                 StdActionCompiler ac = new AnnotatingActionCompiler();
-                executeAction(system,state,ac.clickTypeInto(widget, textToType, true));
+                Action triggeredAction = ac.clickTypeInto(widget, textToType, true);
+                buildStateActionsIdentifiers(state, Collections.singleton(triggeredAction));
+                executeAction(system, state, triggeredAction);
                 return true;
             }
             else {
@@ -238,8 +250,12 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
             //looking for a widget with matching tag value:
             Widget widget = getWidgetWithMatchingTag(tag,value,state);
             if(widget!=null){
+                // When the desired widget to interact with is found,
+                // Create the triggered action, build the identifier, and execute it.
                 StdActionCompiler ac = new AnnotatingActionCompiler();
-                executeAction(system,state,ac.clickTypeInto(widget, textToType, true));
+                Action triggeredAction = ac.clickTypeInto(widget, textToType, true);
+                buildStateActionsIdentifiers(state, Collections.singleton(triggeredAction));
+                executeAction(system, state, triggeredAction);
                 // is waiting needed after the action has been executed?
                 return true;
             }
@@ -307,8 +323,12 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
         while(numberOfRetries<maxNumberOfRetries){
             Widget widget = getWidgetWithMatchingTags(tagValues,state);
             if(widget!=null){
+                // When the desired widget to interact with is found,
+                // Create the triggered action, build the identifier, and execute it.
                 StdActionCompiler ac = new AnnotatingActionCompiler();
-                executeAction(system,state,ac.pasteTextInto(widget, textToPaste, true));
+                Action triggeredAction = ac.pasteTextInto(widget, textToPaste, true);
+                buildStateActionsIdentifiers(state, Collections.singleton(triggeredAction));
+                executeAction(system, state, triggeredAction);
                 return true;
             }
             else {
@@ -340,8 +360,12 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
             //looking for a widget with matching tag value:
             Widget widget = getWidgetWithMatchingTag(tag,value,state);
             if(widget!=null){
+                // When the desired widget to interact with is found,
+                // Create the triggered action, build the identifier, and execute it.
                 StdActionCompiler ac = new AnnotatingActionCompiler();
-                executeAction(system, state, ac.pasteTextInto(widget, textToPaste, true));
+                Action triggeredAction = ac.pasteTextInto(widget, textToPaste, true);
+                buildStateActionsIdentifiers(state, Collections.singleton(triggeredAction));
+                executeAction(system, state, triggeredAction);
                 // is waiting needed after the action has been executed?
                 return true;
             }
