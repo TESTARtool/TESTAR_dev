@@ -594,11 +594,10 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
         for(String tagToFilter : settings.get(ConfigTags.TagsToFilter)){
             String tagValue = "";
             // First finding the Tag that matches the TagsToFilter string, then getting the value of that Tag:
-            for(Tag tag : w.tags()){
-                if(tag.name().equals(tagToFilter)){
-                    tagValue = w.get(tag, "");
+            for(Tag<?> tag : w.tags()){
+                if(w.get(tag, null) != null && tag.name().equals(tagToFilter)){
+                    tagValue = w.get(tag).toString();
                     break;
-                    //System.out.println("DEBUG: tag found, "+tagToFilter+"="+tagValue);
                 }
             }
 
@@ -685,6 +684,8 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     		State newState = getState(system);
     		Set<Action> newActions = deriveActions(system, newState);
     		if(!newActions.isEmpty()) {
+    			// If retry was able to derive new actions, build the identifiers and return them
+    			buildStateActionsIdentifiers(newState, newActions);
     			return newActions;
     		}
     	}

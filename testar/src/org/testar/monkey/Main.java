@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -44,6 +44,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 import org.testar.monkey.alayer.windows.Windows10;
@@ -102,7 +105,7 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 
 		isValidJavaEnvironment();
-		
+
 		verifyTestarInitialDirectory();
 
 		initTestarSSE(args);
@@ -116,6 +119,11 @@ public class Main {
 		// We only want to execute TESTAR one time with the selected settings.
 		if(!settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)){
 
+			// Verify settings regular expressions before starting TESTAR
+			verifyRegularExpressionSettings(settings, testSettingsFileName);
+
+			escapeSpecialCharactersInFileWritingSettings(settings);
+
 			setTestarDirectory(settings);
 
 			initCodingManager(settings);
@@ -124,13 +132,18 @@ public class Main {
 
 			startTestar(settings);
 		}
-
 		//TESTAR GUI is enabled, we're going to show again the GUI when the selected protocol execution finishes
 		else{
 			while(startTestarDialog(settings, testSettingsFileName)) {
 
+				// The dialog can change the test settings file, we need to reload the settings
 				testSettingsFileName = getTestSettingsFile();
 				settings = loadTestarSettings(args, testSettingsFileName);
+
+				// Verify settings regular expressions before starting TESTAR
+				verifyRegularExpressionSettings(settings, testSettingsFileName);
+
+				escapeSpecialCharactersInFileWritingSettings(settings);
 
 				setTestarDirectory(settings);
 
@@ -142,12 +155,7 @@ public class Main {
 			}
 		}
 
-		TestSerialiser.exit();
-		ScreenshotSerialiser.exit();
-		LogSerialiser.exit();
-
-		System.exit(0);
-
+		stopTestar();
 	}
 
 	private static boolean isValidJavaEnvironment() {
@@ -311,12 +319,8 @@ public class Main {
 			LogSerialiser.log("There is an issue with the configuration file: " + ce.getMessage() + "\n", LogSerialiser.LogLevel.Critical);
 		}
 
-		//TODO: Understand what this exactly does?
+		// Override the settings by checking the JVM arguments
 		overrideWithUserProperties(settings);
-		Float SST = settings.get(ConfigTags.StateScreenshotSimilarityThreshold, null);
-		if (SST != null) {
-			System.setProperty("SCRSHOT_SIMILARITY_THRESHOLD", SST.toString());
-		}
 
 		return settings;
 	}
@@ -354,7 +358,6 @@ public class Main {
 		if (settings.get(ConfigTags.AlwaysCompile)) {
 			compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass), settings.get(ConfigTags.ProtocolCompileDirectory));			
 		}
-		
 
 		URLClassLoader loader = null;
 
@@ -424,6 +427,17 @@ public class Main {
 		}
 	}
 
+	/**
+	 * Close the Serialiser classes and stop the TESTAR process. 
+	 */
+	private static void stopTestar() {
+		TestSerialiser.exit();
+		ScreenshotSerialiser.exit();
+		LogSerialiser.exit();
+
+		System.exit(0);
+	}
+
 	// TODO: This methods should be part of the Settings class. It contains all the default values of the settings.
 	/**
 	 * Load the default settings for all the configurable settings and add/overwrite with those from the file
@@ -448,11 +462,7 @@ public class Main {
 			defaults.add(Pair.from(PathToReplaySequence, tempDir));
 			defaults.add(Pair.from(ActionDuration, 0.1));
 			defaults.add(Pair.from(TimeToWaitAfterAction, 0.1));
-			defaults.add(Pair.from(ExecuteActions, true));
-			defaults.add(Pair.from(DrawWidgetUnderCursor, false));
-			defaults.add(Pair.from(DrawWidgetInfo, true));
 			defaults.add(Pair.from(VisualizeActions, false));
-			defaults.add(Pair.from(VisualizeSelectedAction, false));
 			defaults.add(Pair.from(SequenceLength, 10));
 			defaults.add(Pair.from(ReplayRetryTime, 30.0));
 			defaults.add(Pair.from(Sequences, 1));
@@ -461,7 +471,7 @@ public class Main {
 			defaults.add(Pair.from(SUTConnectorValue, ""));
 			defaults.add(Pair.from(Delete, new ArrayList<String>()));
 			defaults.add(Pair.from(CopyFromTo, new ArrayList<Pair<String, String>>()));
-			defaults.add(Pair.from(SuspiciousTitles, "(?!x)x"));
+			defaults.add(Pair.from(SuspiciousTags, "(?!x)x"));
 			defaults.add(Pair.from(ClickFilter, "(?!x)x"));
 			defaults.add(Pair.from(MyClassPath, Arrays.asList(settingsDir)));
 			defaults.add(Pair.from(ProtocolClass, "org.testar.monkey.DefaultProtocol"));
@@ -469,22 +479,11 @@ public class Main {
 			defaults.add(Pair.from(UseRecordedActionDurationAndWaitTimeDuringReplay, true));
 			defaults.add(Pair.from(StopGenerationOnFault, true));
 			defaults.add(Pair.from(TimeToFreeze, 10.0));
-			defaults.add(Pair.from(ShowSettingsAfterTest, true));
 			defaults.add(Pair.from(RefreshSpyCanvas, 0.5));
 			defaults.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
-			defaults.add(Pair.from(TestGenerator, "random"));
 			defaults.add(Pair.from(MaxReward, 9999999.0));
 			defaults.add(Pair.from(Discount, .95));
-			defaults.add(Pair.from(AlgorithmFormsFilling, false));
-			defaults.add(Pair.from(TypingTextsForExecutedAction, 10));
-			defaults.add(Pair.from(DrawWidgetTree, false));
-			defaults.add(Pair.from(ExplorationSampleInterval, 1));
-			defaults.add(Pair.from(ForceToSequenceLength, true));
-			defaults.add(Pair.from(NonReactingUIThreshold, 100)); // number of executed actions
-			defaults.add(Pair.from(OfflineGraphConversion, true));
-			defaults.add(Pair.from(StateScreenshotSimilarityThreshold, Float.MIN_VALUE)); // disabled
-			defaults.add(Pair.from(UnattendedTests, false)); // disabled
-			defaults.add(Pair.from(AccessBridgeEnabled, false)); // disabled
+			defaults.add(Pair.from(AccessBridgeEnabled, false));
 			defaults.add(Pair.from(SUTProcesses, ""));
 			defaults.add(Pair.from(StateModelEnabled, false));
 			defaults.add(Pair.from(DataStore, ""));
@@ -505,6 +504,8 @@ public class Main {
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
 			defaults.add(Pair.from(ProcessLogs, ".*.*"));
 			defaults.add(Pair.from(OverrideWebDriverDisplayScale, ""));
+			defaults.add(Pair.from(CreateWidgetInfoJsonFile, false));
+			defaults.add(Pair.from(FormFillingAction, false));
 
 			// Oracles for webdriver browser console
 			defaults.add(Pair.from(WebConsoleErrorOracle, false));
@@ -533,6 +534,8 @@ public class Main {
 					add("v-menubar-menuitem-caption");
 				}
 			}));
+
+			defaults.add(Pair.from(TypeableClasses, new ArrayList<String>()));
 
 			defaults.add(Pair.from(DeniedExtensions, new ArrayList<String>() {
 				{
@@ -594,7 +597,7 @@ public class Main {
 					settings = Settings.fromFileCmd(defaults, file, argv);
 				}catch(IOException e) {
 					System.out.println("Error with command line properties. Examples:");
-					System.out.println("testar SUTConnectorValue=\"C:\\\\Windows\\\\System32\\\\notepad.exe\" Sequences=11 SequenceLength=12 SuspiciousTitle=.*aaa.*");
+					System.out.println("testar SUTConnectorValue=\"C:\\\\Windows\\\\System32\\\\notepad.exe\" Sequences=11 SequenceLength=12 SuspiciousTags=.*aaa.*");
 					System.out.println("SUTConnectorValue=\" \"\"C:\\\\Program Files\\\\Internet Explorer\\\\iexplore.exe\"\" \"\"https://www.google.es\"\" \"");
 				}
 				//SUTConnectorValue=" ""C:\\Program Files\\Internet Explorer\\iexplore.exe"" ""https://www.google.es"" "
@@ -677,16 +680,6 @@ public class Main {
 			settings.set(ConfigTags.ShowVisualSettingsDialogOnStartup, !(new Boolean(p).booleanValue()));
 			LogSerialiser.log("Property <" + pS + "> overridden to <" + p + ">", LogSerialiser.LogLevel.Critical);
 		}
-		// TestGenerator
-		pS = ConfigTags.TestGenerator.name();
-		p = System.getProperty(pS, null);
-		if (p == null) {
-			p = System.getProperty("TG", null); // mnemonic
-		}
-		if (p != null) {
-			settings.set(ConfigTags.TestGenerator, p);
-			LogSerialiser.log("Property <" + pS + "> overridden to <" + p + ">", LogSerialiser.LogLevel.Critical);
-		}
 		// SequenceLength
 		pS = ConfigTags.SequenceLength.name();
 		p = System.getProperty(pS, null);
@@ -701,56 +694,6 @@ public class Main {
 			} catch (NumberFormatException e) {
 				LogSerialiser.log("Property <" + pS + "> could not be set! (using default)", LogSerialiser.LogLevel.Critical);
 			}
-		}
-		// ForceToSequenceLength
-		pS = ConfigTags.ForceToSequenceLength.name();
-		p = System.getProperty(pS, null);
-		if (p == null) {
-			p = System.getProperty("F2SL", null); // mnemonic
-		}
-		if (p != null) {
-			settings.set(ConfigTags.ForceToSequenceLength, new Boolean(p).booleanValue());
-			LogSerialiser.log("Property <" + pS + "> overridden to <" + p + ">", LogSerialiser.LogLevel.Critical);
-		}
-		// TypingTextsForExecutedAction
-		pS = ConfigTags.TypingTextsForExecutedAction.name();
-		p = System.getProperty(pS, null);
-		if (p == null) {
-			p = System.getProperty("TT", null); // mnemonic
-		}
-		if (p != null) {
-			try {
-				Integer tt = new Integer(p);
-				settings.set(ConfigTags.TypingTextsForExecutedAction, tt);
-				LogSerialiser.log("Property <" + pS + "> overridden to <" + tt.toString() + ">", LogSerialiser.LogLevel.Critical);
-			} catch (NumberFormatException e) {
-				LogSerialiser.log("Property <" + pS + "> could not be set! (using default)", LogSerialiser.LogLevel.Critical);
-			}
-		}
-		// StateScreenshotSimilarityThreshold
-		pS = ConfigTags.StateScreenshotSimilarityThreshold.name();
-		p = System.getProperty(pS, null);
-		if (p == null) {
-			p = System.getProperty("SST", null); // mnemonic
-		}
-		if (p != null) {
-			try {
-				Float sst = new Float(p);
-				settings.set(ConfigTags.StateScreenshotSimilarityThreshold, sst);
-				LogSerialiser.log("Property <" + pS + "> overridden to <" + sst.toString() + ">", LogSerialiser.LogLevel.Critical);
-			} catch (NumberFormatException e) {
-				LogSerialiser.log("Property <" + pS + "> could not be set! (using default)", LogSerialiser.LogLevel.Critical);
-			}
-		}
-		// UnattendedTests
-		pS = ConfigTags.UnattendedTests.name();
-		p = System.getProperty(pS, null);
-		if (p == null) {
-			p = System.getProperty("UT", null); // mnemonic
-		}
-		if (p != null) {
-			settings.set(ConfigTags.UnattendedTests, new Boolean(p).booleanValue());
-			LogSerialiser.log("Property <" + pS + "> overridden to <" + p + ">", LogSerialiser.LogLevel.Critical);
 		}
 	}
 
@@ -785,6 +728,69 @@ public class Main {
 		} else {
 			System.out.printf("WARNING: Current OS %s has no concrete environment implementation, using default environment\n", NativeLinker.getPLATFORM_OS());
 			Environment.setInstance(new UnknownEnvironment());
+		}
+	}
+
+	/**
+	 * Check if filter and oracles regular expressions are valid. 
+	 * 
+	 * @param settings
+	 * @return
+	 */
+	private static void verifyRegularExpressionSettings(Settings settings, String testSettingsFileName) {
+		StringBuilder invalidExpressions = new StringBuilder();
+
+		List<Tag<String>> regularExpressionTags = Arrays.asList(
+				ConfigTags.ProcessesToKillDuringTest,
+				ConfigTags.ClickFilter,
+				ConfigTags.SuspiciousTags,
+				ConfigTags.SuspiciousProcessOutput,
+				ConfigTags.ProcessLogs,
+				ConfigTags.WebConsoleErrorPattern,
+				ConfigTags.WebConsoleWarningPattern
+				);
+
+		for(Tag<String> tag : regularExpressionTags) {
+			try {
+				Pattern.compile(settings.get(tag));
+			} catch (PatternSyntaxException exception) {
+				invalidExpressions.append(System.getProperty("line.separator"));
+				invalidExpressions.append("Error! Your " + tag.name() + " is not a valid regular expression! " + settings.get(tag));
+			}
+		}
+
+		if(!invalidExpressions.toString().isEmpty()) {
+			invalidExpressions.append(System.getProperty("line.separator"));
+			invalidExpressions.append("Settings Initialization Error! An invalid regular expression was detected in the TESTAR settings: " + testSettingsFileName);
+			invalidExpressions.append(System.getProperty("line.separator"));
+			invalidExpressions.append("Settings Initialization Error! Please fix the expressions or remove all characters and start TESTAR again.");
+			invalidExpressions.append(System.getProperty("line.separator"));
+			throw new IllegalStateException(invalidExpressions.toString());
+		}
+	}
+
+	/**
+	 * Escape special characters in settings that are used to write directories or files. 
+	 * 
+	 * @param settings
+	 * @return
+	 */
+	private static void escapeSpecialCharactersInFileWritingSettings(Settings settings) {
+		List<Tag<String>> writeSystemTags = Arrays.asList(
+				ConfigTags.ApplicationName,
+				ConfigTags.ApplicationVersion
+				);
+
+		for(Tag<String> tag : writeSystemTags) {
+			Pattern p = Pattern.compile("[\\/?:*\"|><]");
+			Matcher m = p.matcher(settings.get(tag, ""));
+
+			if(m.find()) {
+				String value = settings.get(tag, "").replaceAll("[\\/?:*\"|><]", "_");
+				System.out.println(String.format("Info: Replacing %s special characters from %s to %s", 
+						tag.name(), settings.get(tag, ""), value));
+				settings.set(tag, value);
+			}
 		}
 	}
 }

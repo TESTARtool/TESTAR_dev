@@ -1,36 +1,33 @@
 /***************************************************************************************************
-*
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-* 2. Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-* 3. Neither the name of the copyright holder nor the names of its
-* contributors may be used to endorse or promote products derived from
-* this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************************************/
+ *
+ * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************************************/
 
-
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.testar.monkey.alayer;
 
 import java.io.IOException;
@@ -65,10 +62,17 @@ public final class Tag<T> implements Serializable{
 		return ret;
 	}
 
+	public static <T> Tag<T> from(String name, Class<T> valueType, String description){
+		Tag<T> ret = from(name, valueType);
+		ret.description = description;
+		return ret;
+	}
+
 	private static final long serialVersionUID = -1215427100999751182L;
 	private final Class<T> clazz;
 	private final String name;
 	private int hashcode;
+	private String description = "";
 
 	private Tag(String name, Class<T> clazz){
 		this.clazz = clazz;
@@ -80,15 +84,14 @@ public final class Tag<T> implements Serializable{
 	 * @return the name of the tag
 	 */
 	public String name() { return name; }
-	
-	
+
 	/**
 	 * The type of the values associated with this tag (e.g. <code>String</code>)
 	 * @return value type
 	 */
 	public Class<T> type() { return clazz; }
 	public String toString(){ return name; }
-	
+
 	public int hashCode(){
 		int ret = hashcode;
 		if(ret == 0){
@@ -96,6 +99,10 @@ public final class Tag<T> implements Serializable{
 			hashcode = ret;
 		}
 		return hashcode;
+	}
+
+	public String getDescription() {
+		return description;
 	}
 
 	public boolean equals(Object other){
@@ -107,17 +114,16 @@ public final class Tag<T> implements Serializable{
 		}
 		return false;
 	}
-	
+
 	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
 		ois.defaultReadObject();
 	}
-	
+
 	private Object readResolve() throws ObjectStreamException{
 		Tag<?> existing = existingTags.putIfAbsent(this, this);		
 		return existing == null ? this : existing;
 	}
-	
-	// by urueda
+
 	public boolean isOneOf(Tag<?>... oneOf){
 		Assert.notNull(this, oneOf);
 		for(Tag<?> o : oneOf){
@@ -126,5 +132,5 @@ public final class Tag<T> implements Serializable{
 		}
 		return false;
 	}	
-	
+
 }

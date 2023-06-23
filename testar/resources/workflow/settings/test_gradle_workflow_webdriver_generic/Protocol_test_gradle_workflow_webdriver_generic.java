@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2021 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2021 - 2023 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,6 @@
  *
  */
 
-
 import org.apache.commons.io.FileUtils;
 import org.testar.monkey.Assert;
 import org.testar.monkey.alayer.*;
@@ -36,15 +35,12 @@ import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
-import org.testar.monkey.alayer.webdriver.WdElement;
-import org.testar.monkey.alayer.webdriver.WdWidget;
-import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
-import org.testar.plugin.NativeLinker;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.monkey.Settings;
 import org.testar.OutputStructure;
+import org.testar.managers.InputDataManager;
 import org.testar.protocols.WebdriverProtocol;
 
 import java.io.File;
@@ -61,6 +57,9 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
  * ".github/workflows/gradle.yml"
  */
 public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverProtocol {
+
+	private String cookieNecessaryIdValue = "_cookieDisplay_WAR_corpcookieportlet_necessaryCookiesButton";
+	private String cookieAllIdValue = "_cookieDisplay_WAR_corpcookieportlet_allCookiesButton";
 
     /**
      * Called once during the life time of TESTAR
@@ -87,6 +86,15 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
         Assert.collectionContains(domainsAllowed, "login.awo.ou.nl");
         Assert.collectionSize(settings.get(ConfigTags.DeniedExtensions), 3);
         Assert.collectionSize(deniedExtensions, 3);
+        Assert.collectionContains(settings.get(ConfigTags.ClickableClasses), "v-menubar-menuitem");
+        Assert.collectionContains(settings.get(ConfigTags.ClickableClasses), "v-menubar-menuitem-caption");
+        Assert.collectionContains(settings.get(ConfigTags.TypeableClasses), "custom-type-input");
+
+        // Add a force click action for policy attributes
+        policyAttributes.put("id", "bad");
+        policyAttributes.put("id", cookieNecessaryIdValue);
+        policyAttributes.put("id", cookieAllIdValue);
+        policyAttributes.put("id", "nothing");
     }
 
     @Override
@@ -100,8 +108,7 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
     }
 
     @Override
-    protected Set<Action> deriveActions(SUT system, State state)
-            throws ActionBuildException {
+    protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
         // Kill unwanted processes, force SUT to foreground
         Set<Action> actions = super.deriveActions(system, state);
 
@@ -111,6 +118,15 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
 
         // Check if forced actions are needed to stay within allowed domains
         Set<Action> forcedActions = detectForcedActions(state, ac);
+
+        if(actionCount() == 1) {
+        	//Assert that the first action is executed in one of the two policy buttons
+        	Assert.isTrue(forcedActions.size() == 2);
+        	Assert.isTrue(forcedActions.iterator().next().get(Tags.OriginWidget, null) != null);
+        	String policyClickWidgetId = forcedActions.iterator().next().get(Tags.OriginWidget).get(WdTags.WebId, "");
+        	Assert.isTrue(policyClickWidgetId.equals(cookieNecessaryIdValue) || policyClickWidgetId.equals(cookieAllIdValue));
+        }
+
         if (forcedActions != null && forcedActions.size() > 0) {
             return forcedActions;
         }
@@ -132,7 +148,7 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
 
             // type into text boxes
             if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-                actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+                actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
             }
 
             // left clicks, but ignore links outside domain
@@ -144,43 +160,6 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
         }
 
         return actions;
-    }
-
-    @Override
-    protected boolean isClickable(Widget widget) {
-        Role role = widget.get(Tags.Role, Roles.Widget);
-        if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
-            // Input type are special...
-            if (role.equals(WdRoles.WdINPUT)) {
-                String type = ((WdWidget) widget).element.type;
-                return WdRoles.clickableInputTypes().contains(type);
-            }
-            return true;
-        }
-
-        WdElement element = ((WdWidget) widget).element;
-        if (element.isClickable) {
-            return true;
-        }
-
-        Set<String> clickSet = new HashSet<>(clickableClasses);
-        clickSet.retainAll(element.cssClasses);
-        return clickSet.size() > 0;
-    }
-
-    @Override
-    protected boolean isTypeable(Widget widget) {
-        Role role = widget.get(Tags.Role, Roles.Widget);
-        if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
-            // Input type are special...
-            if (role.equals(WdRoles.WdINPUT)) {
-                String type = ((WdWidget) widget).element.type;
-                return WdRoles.typeableInputTypes().contains(type);
-            }
-            return true;
-        }
-
-        return false;
     }
 
     @Override

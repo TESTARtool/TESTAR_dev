@@ -42,6 +42,8 @@ import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.ConfigTags;
 import org.testar.OutputStructure;
+import org.testar.managers.InputDataManager;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
@@ -172,9 +174,9 @@ public class DesktopProtocol extends GenericUtilsProtocol {
             statusInfo = (getReplayVerdict().join(processVerdict)).info();
         }
         else {
-            htmlReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
-            status = (getVerdict(latestState).join(processVerdict)).verdictSeverityTitle();
-            statusInfo = (getVerdict(latestState).join(processVerdict)).info();
+            htmlReport.addTestVerdict(getFinalVerdict());
+            status = (getFinalVerdict()).verdictSeverityTitle();
+            statusInfo = (getFinalVerdict()).info();
         }
 
         String sequencesPath = getGeneratedSequenceName();
@@ -266,7 +268,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
             //CAPS_LOCK + SHIFT + Click clickfilter functionality.
             if (blackListed(w)) {
             	if(isTypeable(w)) {
-            		derived.addFilteredAction(ac.clickTypeInto(w, this.getRandomText(w), true));
+            		derived.addFilteredAction(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
             	} else {
             		derived.addFilteredAction(ac.leftClickAt(w));
             	}
@@ -282,11 +284,11 @@ public class DesktopProtocol extends GenericUtilsProtocol {
                 if(isTypeable(w)){
                     if(isUnfiltered(w) || whiteListed(w)) {
                         //Create a type action with the Action Compiler, and add it to the set of derived actions
-                        derived.addAvailableAction(ac.clickTypeInto(w, this.getRandomText(w), true));
+                        derived.addAvailableAction(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
                         return derived;
                     }else{
                         // Filtered and not white listed:
-                        derived.addFilteredAction(ac.clickTypeInto(w, this.getRandomText(w), true));
+                        derived.addFilteredAction(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
                         return derived;
                     }
                 }
@@ -350,7 +352,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
             //CAPS_LOCK + SHIFT + Click clickfilter functionality.
             if (blackListed(w)) {
             	if(isTypeable(w)) {
-            		derived.addFilteredAction(ac.clickTypeInto(w, this.getRandomText(w), true));
+            		derived.addFilteredAction(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
             	} else {
             		derived.addFilteredAction(ac.leftClickAt(w));
             	}
@@ -366,10 +368,10 @@ public class DesktopProtocol extends GenericUtilsProtocol {
                 if(isTypeable(w)){
                     if(isUnfiltered(w) || whiteListed(w)) {
                         //Create a type action with the Action Compiler, and add it to the set of derived actions
-                        derived.addAvailableAction(ac.clickTypeInto(w, this.getRandomText(w), true));
+                        derived.addAvailableAction(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
                     }else{
                         // Filtered and not white listed:
-                        derived.addFilteredAction(ac.clickTypeInto(w, this.getRandomText(w), true));
+                        derived.addFilteredAction(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
                     }
                 }
 
@@ -449,7 +451,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
                     // We want to create actions that consist of typing into them
                     if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
                         //Create a type action with the Action Compiler, and add it to the set of derived actions
-                        actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+                        actions.add(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
                     }
                     //Add sliding actions (like scroll, drag and drop) to the derived actions
                     //method defined below.
@@ -508,7 +510,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
                     // We want to create actions that consist of typing into them
                     if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
                         //Create a type action with the Action Compiler, and add it to the set of derived actions
-                        actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+                        actions.add(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
                     }
                     //Add sliding actions (like scroll, drag and drop) to the derived actions
                     //method defined below.

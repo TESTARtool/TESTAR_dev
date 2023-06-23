@@ -24,16 +24,12 @@ The gradle wrapper version indicated inside `TESTAR_dev\gradle\wrapper\gradle-wr
 NOTE that this task doesn't generate an executable distribution by default.
 
 #### windows.dll (Allows TESTAR execution on Windows)
-TESTAR includes by default the file `windows.dll` inside `\testar\resources\windows10\` directory, which allows to run TESTAR on Windows 10 systems.
-
-#### gradlew windowsDistribution (Allows TESTAR execution on Windows)
-`gradlew windowsDistribution` task : Create a new file `windows.dll`, which has preference over the default one.  
-This tasks requires the installation of Visual Studio tools:  
-https://github.com/TESTARtool/TESTAR_dev/wiki/Development:-Update-Windows-UIAutomation-(windows.dll)
+TESTAR includes by default the file `windows.dll` inside `\testar\resources\windows10\` directory, which allows to run TESTAR on Windows 10 systems. 
+If you do not need to modify Windows API native calls, the following java level compilation instructions are enough. 
 
 #### gradlew installDist (Create TESTAR Distribution)
 `gradlew installDist` task : creates a runnable TESTAR distribution in the `\testar\target\install\testar\bin\` directory.  
-By default, `windows.dll` should be copied from `\testar\resources\windows10\` directory and overwritten by the new dll file if the `gradlew windowsDistribution` task was executed.
+By default, `windows.dll` is copied from `\testar\resources\windows10\` directory and is ready to use.
 
 1. Run `.\gradlew installDist` in the root of the project, or `TESTAR_dev -> distribution -> installDist` with the IDE
 2. Change directory to `\testar\target\install\testar\bin\`
@@ -47,6 +43,12 @@ To build the zip execute the following command.
 
 1. Run `.\gradlew distZip` in the root of the project. 
 2. Extract the zip on the machine where TESTAR is used.
+
+#### gradlew windowsDistribution (Create a new windows.dll file)
+_We recommend users ignore this task if they DO NOT need to modify Windows API native calls._ 
+`gradlew windowsDistribution` task : Create a new file `windows.dll`, which has preference over the default one. 
+This tasks requires the installation of Visual Studio C++ tools:  
+https://github.com/TESTARtool/TESTAR_dev/wiki/Development:-Update-Windows-UIAutomation-(windows.dll)
 
 #### Running Gradle in Eclipse
 The following procedure has been performed
@@ -110,11 +112,11 @@ Some of the most interesting parameters that can help to integrate TESTAR as an 
 
 		Sequences & SequenceLength -> The number of iterations and actions that TESTAR will execute
 
-		SuspiciousTitles -> The errors that TESTAR will search in the execution
+		SuspiciousTags -> The errors that TESTAR will search in the execution
 
 Example: 
 
-``testar sse=desktop_generic ShowVisualSettingsDialogOnStartup=false Sequences=5 SequenceLength=100 Mode=Generate SUTConnectorValue=" ""C:\\Program Files\\VideoLAN\\VLC\\vlc.exe"" " SuspiciousTitles=".*[eE]rror.*|.*[eE]xcep[ct]ion.*"``
+``testar sse=desktop_generic ShowVisualSettingsDialogOnStartup=false Sequences=5 SequenceLength=100 Mode=Generate SUTConnectorValue=" ""C:\\Program Files\\VideoLAN\\VLC\\vlc.exe"" " SuspiciousTags=".*[eE]rror.*|.*[eE]xcep[ct]ion.*"``
 
 ## State Model / Graph database support
 TESTAR uses orientdb graph database http://orientdb.com , to create TESTAR GUI State Models.  
@@ -126,8 +128,8 @@ The State Model consists on Widgets and States obtained from getState() method t
 The protocols ``desktop_generic_statemodel`` and ``webdriver_statemodel`` contain the default settings implementation which shows how TESTAR State Model could be used.
 
 ### Download OrientDB 3.0.34 GA Community Edition (August 31st, 2020)
-https://www.orientdb.org/download
-https://s3.us-east-2.amazonaws.com/orientdb3/releases/3.0.34/orientdb-3.0.34.zip
+https://www.orientdb.org/download  
+https://repo1.maven.org/maven2/com/orientechnologies/orientdb-community/3.0.34/orientdb-community-3.0.34.zip  
 
 ``Warning: Since August 2020 there is version 3.1.X of OrientDB, however TESTAR currently requires the use of versions 3.0.X``
 
@@ -164,7 +166,7 @@ Also is possible to connect at file level without deploy the OrientDB locally:
 		StateModelEnabled = true
 		DataStore = OrientDB
 		DataStoreType = plocal
-		DataStoreDirectory = C:\\Users\\testar\\Desktop\\orientdb-3.0.34\\databases
+		DataStoreDirectory = C:\\Users\\testar\\Desktop\\orientdb-community-3.0.34\\databases
 		DataStoreDB = testar
 		DataStoreUser = testar
 		DataStorePassword = testar
@@ -179,6 +181,10 @@ https://github.com/TESTARtool/TESTAR_dev/wiki/Development:-Increase-Java-memory
 
 ## Known issues
 https://github.com/TESTARtool/TESTAR_dev/issues
+
+## Supported Java SE versions
+
+Testar needs Java Standard Edition (SE) to run and we support the Java SE LTS versions that are currently under Oracle Extended Support  ( https://www.oracle.com/java/technologies/java-se-support-roadmap.html ) . Other versions might work.
 
 ## Release notes
 https://github.com/TESTARtool/TESTAR_dev/wiki/TESTAR-release-notes

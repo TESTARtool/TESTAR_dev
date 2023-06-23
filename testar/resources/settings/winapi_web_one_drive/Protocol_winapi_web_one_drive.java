@@ -56,6 +56,7 @@ import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.devices.AWTKeyboard;
 import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.devices.Keyboard;
+import org.testar.managers.InputDataManager;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.alayer.Tags;
 import org.testar.protocols.DesktopProtocol;
@@ -256,7 +257,7 @@ public class Protocol_winapi_web_one_drive extends DesktopProtocol {
 	protected Verdict getVerdict(State state){
 
 		Verdict verdict = super.getVerdict(state);
-		// system crashes, non-responsiveness and suspicious titles automatically detected!
+		// system crashes, non-responsiveness and suspicious tags automatically detected!
 
 		//-----------------------------------------------------------------------------
 		// MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
@@ -266,7 +267,7 @@ public class Protocol_winapi_web_one_drive extends DesktopProtocol {
 		String title;
 		Shape shape;
 
-		// search all widgets for suspicious titles
+		// search all widgets for suspicious tags
 		for(Widget w : state){
 
 			role = w.get(Tags.Role, null);
@@ -364,7 +365,7 @@ public class Protocol_winapi_web_one_drive extends DesktopProtocol {
 
 					// type into text boxes
 					if(isTypeable(w)){
-						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+						actions.add(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
 					}
 
 					// slides

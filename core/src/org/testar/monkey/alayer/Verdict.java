@@ -47,12 +47,12 @@ public final class Verdict implements Serializable {
 	// Verdict severities
 	// PASS
 	public static final double SEVERITY_MIN = 0.0;
-	public static final double SEVERITY_WARNING = 		   0.00000001; // must be less than FAULT THRESHOLD @test.settings
-	public static final double SEVERITY_SUSPICIOUS_TITLE = 0.00000009; // suspicious title
-	public static final double SEVERITY_SUSPICIOUS_LOG = 0.00000099;   // suspicious message in log file or command output (LogOracle)
 	// FAIL
+	public static final double SEVERITY_WARNING = 		   0.7; // custom verdict
+	public static final double SEVERITY_SUSPICIOUS_TAG = 0.8; // suspicious tag
+	public static final double SEVERITY_SUSPICIOUS_LOG = 0.89; // suspicious message in log file or command output (LogOracle)
 	public static final double SEVERITY_NOT_RESPONDING =   0.99999990; // unresponsive
-	public static final double SEVERITY_NOT_RUNNING =	   0.99999999; // crash? unexpected close?
+	public static final double SEVERITY_UNEXPECTEDCLOSE =	   0.99999999; // crash? unexpected close?
 	public static final double SEVERITY_MAX = 1.0;
 
 	public static final double SEVERITY_OK = 			   SEVERITY_MIN;
@@ -98,12 +98,12 @@ public final class Verdict implements Serializable {
 			return "OK";
 		if(severity == Verdict.SEVERITY_WARNING)
 			return "WARNING";
-		if(severity == Verdict.SEVERITY_SUSPICIOUS_TITLE)
-			return "SUSPICIOUS_TITLE";
+		if(severity == Verdict.SEVERITY_SUSPICIOUS_TAG)
+			return "SUSPICIOUS_TAG";
 		if(severity == Verdict.SEVERITY_NOT_RESPONDING)
 			return "NOT_RESPONDING";
-		if(severity == Verdict.SEVERITY_NOT_RUNNING)
-			return "NOT_RUNNING";
+		if(severity == Verdict.SEVERITY_UNEXPECTEDCLOSE)
+			return "UNEXPECTEDCLOSE";
 		if(severity == Verdict.SEVERITY_UNREPLAYABLE)
 			return "NOT_REPLAYABLE";
 

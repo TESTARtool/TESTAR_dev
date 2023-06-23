@@ -50,8 +50,10 @@ public class ToolTipTexts {
       "sequence. Contrary to the Replay-Mode, it will not execute any actions,<br>\n" +
       "but only show you the screenshots that were recorded during sequence<br>\n" +
       "generation. This is ideal if a sequence turns out not to be reproducible.\n</html>";
+  public static String btnModelTTT = "<html>\nStart in State Model Analysis Mode:<br>\n" +
+		  "This mode allows you to connect with OrientDB to inspect the inferred models.\n</html>";
   public static String btnRecordTTT = "<html>\nStart in RECORD Mode:<br>\n" +
-          "This modes enables the tester to manually record (part of) a sequence.\n</html>";
+		  "This modes enables the tester to manually record (part of) a sequence.\n</html>";
 
   // TTTs for the general tab
   public static String sutConnectorTTT = "How does TESTAR connect to the SUT";
@@ -103,7 +105,7 @@ public class ToolTipTexts {
   public static String label1TTT = "<html>\nClick-filter:<br>\n" +
       "Certain actions that TESTARs wants to execute might be dangerous or<br>\n" +
       "undesirable, such as printing out documents, creating, moving or deleting files.<br>\n" +
-      "TESTAR will not execute clicks on any widget whose title matches the given regular expression.<br>\n" +
+      "TESTAR will not execute clicks on any widget whose tag matches the given regular expression.<br>\n" +
       "To see whether or not your expression works, simply start TESTAR in Spy-Mode, which will<br>\n" +
       "visualize the detected actions.\n</html>";
   public static String label2TTT = "<html>\nProcesses to kill:<br>\n" +
@@ -112,10 +114,10 @@ public class ToolTipTexts {
       "TESTAR will kill any process whose name matches the given regular expression.\n</html>";
 
   // TTTs for the oracle panel
-  public static String suspiciousTitlesTTT =
+  public static String suspiciousTagsTTT =
       "<html>\nThis is a very simple oracle in the form of a regular expression, " +
-          "which is applied to each<br>widget's Title property. " +
-          "If TESTAR finds a widget on the screen, whose title matches the given<br>\n" +
+          "which is applied to each<br>widget's Tags property. " +
+          "If TESTAR finds a widget on the screen, whose Tag value matches the given<br>\n" +
           "expression, it will consider the current sequence to be erroneous.\n</html>";
   public static String enableVisualValidationTTT = "Use visual validation to validate the text labels";
 
