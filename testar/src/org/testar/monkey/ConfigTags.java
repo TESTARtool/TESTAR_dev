@@ -78,9 +78,11 @@ public final class ConfigTags {
 	public static final Tag<String> LogOracleRegex = Tag.from("LogOracleRegex", String.class, 
 			"Regular expressions ORACLE to find suspicious messages in the logs");
 
+	@SuppressWarnings("unchecked")
 	public static final Tag<List<String>> LogOracleCommands = Tag.from("LogOracleCommands", (Class<List<String>>) (Class<?>) List.class, 
 			"A list of commands of which standard output should be monitored");
 
+	@SuppressWarnings("unchecked")
 	public static final Tag<List<String>> LogOracleFiles = Tag.from("LogOracleFiles", (Class<List<String>>) (Class<?>) List.class, 
 			"A list of paths of log files to monitor");
 
