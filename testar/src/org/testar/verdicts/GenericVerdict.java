@@ -463,6 +463,7 @@ public class GenericVerdict {
 
 		// Prepare a list that contains all the Rectangles from the leaf widgets
 		List<Pair<Widget, Rect>> leafWidgetsRects = new ArrayList<>();
+		
 		for(Widget w : state) {
             // ignore or include leaf widgets. Widgets must have a shape. For web applications the opacity should be higher than zero
             if ((!checkLeafWidgetsOnly || checkLeafWidgetsOnly && w.childCount() < 1) && w.get(Tags.Shape, null) != null && 
@@ -472,13 +473,15 @@ public class GenericVerdict {
 
     			if(w.get(Tags.Shape, null) != null) {
     				// We can completely ignore the widget or sub-tree widgets that descend from these undesired Roles or Classes. 
-    				if(isOrDescendFromRole(w, ignoredRoles) || isOrDescendFromClass(w, ignoredClasses)) {
+    				if(isRoleWithoutAnyRealEstateOnCanvas(w) || isOrDescendFromRole(w, ignoredRoles) || isOrDescendFromClass(w, ignoredClasses)) {
     					continue;
     				} else {
                         Rect widgetRect = (Rect)w.get(Tags.Shape);
                          // Only include rect if it has surface
-                        if (widgetRect.width() > 0 && widgetRect.height() > 0) {
+                        if (widgetRect.width() > 0 && widgetRect.height() > 0 ) {
                             boolean isContainedOrVisible = isContainedInAllParentsRectOrIsAllowedToBeOutsideParentRects(w,w, checkWebStyles);
+                            
+                            //System.out.println("isContainedOrVisible: " + isContainedOrVisible + " Widget: " + clashedWidgetMsg(w, widgetRect));
                             
                             if (isContainedOrVisible) {
         					   leafWidgetsRects.add(new Pair<Widget, Rect>(w, widgetRect));
@@ -558,6 +561,14 @@ public class GenericVerdict {
 		else return isOrDescendFromClass(widget.parent(), webClasses);
 	}
 	
+	private static boolean isRoleWithoutAnyRealEstateOnCanvas(Widget widget)
+	{
+		// Fixed roles that should be ignored, because they do not take any real estate on the canvas
+		List<Role> ignoreSpecificRoles = Arrays.asList(WdRoles.WdCOL, WdRoles.WdCOLGROUP, WdRoles.WdTR, WdRoles.WdSPAN);
+		if (ignoreSpecificRoles.contains(widget.get(Tags.Role, Roles.Widget))) return true;
+		return false;
+	}
+	
     private static boolean isChildOf(Widget widget, Widget searchParent)
     {
         if (widget == null || searchParent == null || widget == searchParent || widget.parent() == null) return false;
@@ -608,9 +619,12 @@ public class GenericVerdict {
                 String positionStyle = startWidget.get(WdTags.WebStylePosition, "static");
 
                 // Check overflow style properties. If value is default or visible, then element is not really contained, but the widget is allowed to be visible outside of the parent element and is visible in the UI.
-                return overflowStyle == "" || overflowStyle.equalsIgnoreCase("visible") || positionStyle.equalsIgnoreCase("fixed") ||
+                boolean isAllowedToOverflow = overflowStyle == "" || overflowStyle.equalsIgnoreCase("visible") || positionStyle.equalsIgnoreCase("fixed") ||
                        ((overflowStyleX == "" || overflowStyleX.equalsIgnoreCase("visible")) && isRect1OverflowingOnXOnRect2(targetWidgetRect, parentRect)) ||
                        ((overflowStyleY == "" || overflowStyleY.equalsIgnoreCase("visible")) && isRect1OverflowingOnYOnRect2(targetWidgetRect, parentRect));
+                
+                if (isAllowedToOverflow)
+                	return isContainedInAllParentsRectOrIsAllowedToBeOutsideParentRects(parent, targetWidget, checkWebStyles);
             }
             
             return false;
