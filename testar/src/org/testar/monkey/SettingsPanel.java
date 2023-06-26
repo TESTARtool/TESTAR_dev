@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.fruit.monkey;
+package org.testar.monkey;
 
 import javax.swing.*;
 

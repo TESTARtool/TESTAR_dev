@@ -1,4 +1,4 @@
-package nl.ou.testar.TagVisualization;
+package org.testar.settingsdialog.TagVisualization;
 
 public class TagFilter {
     private static ITagFilter instance;

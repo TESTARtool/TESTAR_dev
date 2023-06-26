@@ -36,7 +36,8 @@ import org.testar.serialisation.LogSerialiser;
 import org.testar.serialisation.ScreenshotSerialiser;
 import org.testar.serialisation.TestSerialiser;
 import org.testar.monkey.alayer.Tag;
-import org.testar.TagVisualization.TagFilter;
+import org.testar.settingsdialog.TagVisualization.ConcreteTagFilter;
+import org.testar.settingsdialog.TagVisualization.TagFilter;
 
 import javax.swing.*;
 import java.io.*;

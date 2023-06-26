@@ -1,6 +1,6 @@
-package nl.ou.testar.TagVisualization;
+package org.testar.settingsdialog.TagVisualization;
 
-import org.fruit.alayer.Tag;
+import org.testar.monkey.alayer.Tag;
 import java.util.Set;
 
 public interface ITagFilter {

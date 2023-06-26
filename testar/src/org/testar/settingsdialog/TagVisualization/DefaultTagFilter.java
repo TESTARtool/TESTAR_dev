@@ -1,8 +1,8 @@
-package nl.ou.testar.TagVisualization;
+package org.testar.settingsdialog.TagVisualization;
 
-import es.upv.staq.testar.StateManagementTags;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.windows.UIATags;
+import org.testar.StateManagementTags;
+import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.windows.UIATags;
 
 import java.util.Collections;
 import java.util.HashSet;

@@ -1,85 +1,14 @@
-package org.fruit.monkey.dialog;
+package org.testar.settingsdialog.dialog;
 
-import org.testar.TagVisualization.DefaultTagFilter;
-import org.testar.TagVisualization.TagFilter;
-import org.fruit.monkey.Settings;
-import org.fruit.monkey.SettingsPanel;
+import org.testar.settingsdialog.TagVisualization.DefaultTagFilter;
+import org.testar.settingsdialog.TagVisualization.TagFilter;
+import org.testar.monkey.Settings;
+import org.testar.settingsdialog.SettingsPanel;
+import org.testar.settingsdialog.dialog.TreeSetListModel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.*;
-
-class TreeSetListModel<T extends Comparable<T>> extends AbstractListModel<T> {
-    private static final long serialVersionUID = 1L;
-    private TreeSet<T> treeSet;
-
-    public TreeSetListModel() {
-        treeSet = new TreeSet<T>();
-    }
-
-    public TreeSetListModel(Comparator<? super T> comparator) {
-        treeSet = new TreeSet<T>(comparator);
-    }
-
-    @Override
-    public T getElementAt(int index) {
-        if (index < 0 || index >= getSize()) {
-            String s = "index, " + index + ", is out of bounds for getSize() = "
-                    + getSize();
-            throw new IllegalArgumentException(s);
-        }
-        Iterator<T> iterator = treeSet.iterator();
-        int count = 0;
-        while (iterator.hasNext()) {
-            T t = (T) iterator.next();
-            if (index == count) {
-                return t;
-            }
-            count++;
-        }
-        // out of index. return null. will probably never reach this
-        return null;
-    }
-
-    @Override
-    public int getSize() {
-        return treeSet.size();
-    }
-
-    public int getIndexOf(T t) {
-        int index = 0;
-        for (T treeItem : treeSet) {
-            if (treeItem.equals(treeItem)) {
-                return index;
-            }
-            index++;
-        }
-        return -1;
-    }
-
-    public boolean add(T t) {
-        boolean result = treeSet.add(t);
-        if (result) {
-            int index = getIndexOf(t);
-            fireIntervalAdded(this, index, index + 1);
-        }
-        return result;
-    }
-
-    public boolean remove(T t) {
-        int index = getIndexOf(t);
-        if (index < 0) {
-            return false;
-        }
-        boolean result = treeSet.remove(t);
-        fireIntervalRemoved(this, index, index + 1);
-        return result;
-    }
-
-    public void clear() {
-        treeSet.clear();
-    }
-}
 
 public class SpyModePanel extends SettingsPanel {
 
@@ -179,7 +108,7 @@ public class SpyModePanel extends SettingsPanel {
     }
 
     @Override
-    public void extractInformation(Settings settings) {
+    public void extractInformation(final Settings settings) {
         // TODO read the information from the settings file.
 
         // Create and set the new tag filter.
@@ -192,7 +121,7 @@ public class SpyModePanel extends SettingsPanel {
     }
 
     @Override
-    public void populateFrom(Settings settings) {
+    public void populateFrom(final Settings settings) {
         // TODO store the information in the settings file.
     }
 }
