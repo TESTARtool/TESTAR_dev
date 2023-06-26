@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019, 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2021 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,26 +31,31 @@
 
 package org.testar.protocols;
 
-import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
-import nl.ou.testar.RandomActionSelector;
-import org.fruit.Environment;
-import org.fruit.alayer.*;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.monkey.ConfigTags;
+import org.testar.DerivedActions;
+import org.testar.reporting.Reporting;
+import org.testar.monkey.Drag;
+import org.testar.monkey.Environment;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.StdActionCompiler;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.exceptions.StateBuildException;
+import org.testar.monkey.ConfigTags;
 import org.testar.OutputStructure;
+import org.testar.managers.InputDataManager;
+
 import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
+import static org.testar.monkey.alayer.Tags.Blocked;
+import static org.testar.monkey.alayer.Tags.Enabled;
 
 public class DesktopProtocol extends GenericUtilsProtocol {
     //Attributes for adding slide actions
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
-    protected HtmlSequenceReport htmlReport;
+    protected Reporting htmlReport;
     protected State latestState;
 
     /**
@@ -59,7 +64,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     @Override
     protected void preSequencePreparations() {
         //initializing the HTML sequence report:
-        htmlReport = new HtmlSequenceReport();
+        htmlReport = getReporter();
     }
     
     /**
@@ -124,28 +129,11 @@ public class DesktopProtocol extends GenericUtilsProtocol {
      * @return
      */
     @Override
-    protected Action preSelectAction(State state, Set<Action> actions){
-        // adding available actions into the HTML report:
-        htmlReport.addActions(actions);
-        return(super.preSelectAction(state, actions));
-    }
-
-    /**
-     * Select one of the available actions (e.g. at random)
-     * @param state the SUT's current state
-     * @param actions the set of derived actions
-     * @return  the selected action (non-null!)
-     */
-    @Override
-    protected Action selectAction(State state, Set<Action> actions){
-        //Call the preSelectAction method from the DefaultProtocol so that, if necessary,
-        //unwanted processes are killed and SUT is put into foreground.
-        Action retAction = preSelectAction(state, actions);
-        if (retAction == null) {
-            //if no preSelected actions are needed, then implement your own strategy
-            retAction = RandomActionSelector.selectAction(actions);
-        }
-        return retAction;
+    protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions){
+    	actions = super.preSelectAction(system, state, actions);
+    	// adding available actions into the HTML report:
+    	htmlReport.addActions(actions);
+    	return actions;
     }
 
     /**
@@ -161,34 +149,261 @@ public class DesktopProtocol extends GenericUtilsProtocol {
         htmlReport.addSelectedAction(state, action);
         return super.executeAction(system, state, action);
     }
+    
+    /**
+     * Replay the saved action
+     */
+    @Override
+    protected boolean replayAction(SUT system, State state, Action action, double actionWaitTime, double actionDuration){
+        // adding the action that is going to be executed into HTML report:
+        htmlReport.addSelectedAction(state, action);
+        return super.replayAction(system, state, action, actionWaitTime, actionDuration);
+    }
 
     /**
      * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
      */
     @Override
     protected void postSequenceProcessing() {
-        htmlReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
-        
+        String status = "";
+        String statusInfo = "";
+
+        if(mode() == Modes.Replay) {
+            htmlReport.addTestVerdict(getReplayVerdict().join(processVerdict));
+            status = (getReplayVerdict().join(processVerdict)).verdictSeverityTitle();
+            statusInfo = (getReplayVerdict().join(processVerdict)).info();
+        }
+        else {
+            htmlReport.addTestVerdict(getFinalVerdict());
+            status = (getFinalVerdict()).verdictSeverityTitle();
+            statusInfo = (getFinalVerdict()).info();
+        }
+
         String sequencesPath = getGeneratedSequenceName();
         try {
-        	sequencesPath = new File(getGeneratedSequenceName()).getCanonicalPath();
-        }catch (Exception e) {}
-        		
-        String status = (getVerdict(latestState).join(processVerdict)).verdictSeverityTitle();
-		String statusInfo = (getVerdict(latestState).join(processVerdict)).info();
-		
-		statusInfo = statusInfo.replace("\n"+Verdict.OK.info(), "");
-		
-		//Timestamp(generated by logger) SUTname Mode SequenceFileObject Status "StatusInfo"
-		INDEXLOG.info(OutputStructure.executedSUTname
-				+ " " + settings.get(ConfigTags.Mode, mode())
-				+ " " + sequencesPath
-				+ " " + status + " \"" + statusInfo + "\"" );
+            sequencesPath = new File(getGeneratedSequenceName()).getCanonicalPath();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        statusInfo = statusInfo.replace("\n"+ Verdict.OK.info(), "");
+
+        //Timestamp(generated by logger) SUTname Mode SequenceFileObject Status "StatusInfo"
+        INDEXLOG.info(OutputStructure.executedSUTname
+                + " " + settings.get(ConfigTags.Mode, mode())
+                + " " + sequencesPath
+                + " " + status + " \"" + statusInfo + "\"" );
+
+        htmlReport.close();
     }
 
     /**
-     * Iterating through all widgets of the given state
+     * Iterating through all widgets of the given state. 
      *
+     * Adding derived actions into the given set of actions and returning the modified set of actions.
+     *
+     * @param actions
+     * @param state
+     * @return
+     */
+    protected DerivedActions deriveClickTypeScrollActionsFromAllWidgets(Set<Action> actions, State state){
+
+        Set<Action> filteredActions = new HashSet<>();
+        DerivedActions derived = new DerivedActions(actions, filteredActions);
+
+        // Iterate through all widgets of the state to find all possible actions that TESTAR can click on
+        for(Widget w : state){
+            derived = getMultipleActionsFromWidget(w,derived);
+        }
+        return derived;
+    }
+
+    /**
+     * Iterating top level widgets of the given state. 
+     * These are elements like Menus or emerging Windows. 
+     *
+     * Adding derived top level actions into the given set of actions and returning the modified set of actions.
+     * 
+     * @param actions
+     * @param state
+     * @return
+     */
+    protected DerivedActions deriveClickTypeScrollActionsFromTopLevelWidgets(Set<Action> actions, State state){
+
+        Set<Action> filteredActions = new HashSet<>();
+        DerivedActions derived = new DerivedActions(actions, filteredActions);
+
+        // Iterate through top level widgets of the state trying to execute more interesting actions
+        for(Widget w : getTopWidgets(state)){
+            derived = getMultipleActionsFromWidget(w,derived);
+        }
+        return derived;
+    }
+
+    /**
+     * Given a widget, check if it is possible to derive an available or filter action on it. 
+     * If widget is enabled and unfiltered, derive only one available action. 
+     * Current Action priority: Typeable > Clickable > Draggable.
+     * 
+     * @param w
+     * @param derived
+     * @return
+     */
+    private DerivedActions getActionFromWidget(Widget w, DerivedActions derived){
+        // To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
+        StdActionCompiler ac = new AnnotatingActionCompiler();
+
+        if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
+            // filtering out actions on menu-containers (that would add an action in the middle of the menu)
+            return derived; // skip this widget
+        }
+
+        // Only consider enabled and non-blocked widgets
+        if(!w.get(Enabled, true) || w.get(Blocked, false)) {
+            // widget not enabled or is blocked:
+            return derived; // skip this widget
+        }else{
+
+            // Do not build actions for widgets on the blacklist
+            // The blackListed widgets are those that have been filtered during the SPY mode with the
+            //CAPS_LOCK + SHIFT + Click clickfilter functionality.
+            if (blackListed(w)) {
+            	if(isTypeable(w)) {
+            		derived.addFilteredAction(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
+            	} else {
+            		derived.addFilteredAction(ac.leftClickAt(w));
+            	}
+                return derived;
+            }else{
+
+                //For widgets that are:
+                // - typeable
+                // and
+                // - unFiltered by any of the regular expressions in the Filter-tab, or
+                // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
+                // We want to create actions that consist of typing into them
+                if(isTypeable(w)){
+                    if(isUnfiltered(w) || whiteListed(w)) {
+                        //Create a type action with the Action Compiler, and add it to the set of derived actions
+                        derived.addAvailableAction(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
+                        return derived;
+                    }else{
+                        // Filtered and not white listed:
+                        derived.addFilteredAction(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
+                        return derived;
+                    }
+                }
+
+                //For widgets that are:
+                // - clickable
+                // and
+                // - unFiltered by any of the regular expressions in the Filter-tab, or
+                // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
+                // We want to create actions that consist of left clicking on them
+                if(isClickable(w)) {
+                    if((isUnfiltered(w) || whiteListed(w))){
+                        //Create a left click action with the Action Compiler, and add it to the set of derived actions
+                        derived.addAvailableAction(ac.leftClickAt(w));
+                        return derived;
+                    }else{
+                        // Filtered and not white listed:
+                        derived.addFilteredAction(ac.leftClickAt(w));
+                        return derived;
+                    }
+                }
+
+                //Add sliding actions (like scroll, drag and drop) to the derived actions
+                //method defined below.
+                Drag[] drags = null;
+                //If there are scroll (drags/drops) actions possible
+                if((drags = w.scrollDrags(SCROLL_ARROW_SIZE,SCROLL_THICK)) != null) {
+                    derived = addSlidingActions(derived, ac, drags, w);
+                    return derived;
+                }
+            }
+        }
+        return derived;
+    }
+    
+    /**
+     * Given a widget, check if it is possible to derive an available or filter multiple actions on it. 
+     * If widget is enabled and unfiltered, derive all possible actions.
+     * 
+     * @param w
+     * @param derived
+     * @return
+     */
+    private DerivedActions getMultipleActionsFromWidget(Widget w, DerivedActions derived){
+        // To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
+        StdActionCompiler ac = new AnnotatingActionCompiler();
+
+        if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
+            // filtering out actions on menu-containers (that would add an action in the middle of the menu)
+            return derived; // skip this widget
+        }
+
+        // Only consider enabled and non-blocked widgets
+        if(!w.get(Enabled, true) || w.get(Blocked, false)) {
+            // widget not enabled or is blocked:
+            return derived; // skip this widget
+        }else{
+
+            // Do not build actions for widgets on the blacklist
+            // The blackListed widgets are those that have been filtered during the SPY mode with the
+            //CAPS_LOCK + SHIFT + Click clickfilter functionality.
+            if (blackListed(w)) {
+            	if(isTypeable(w)) {
+            		derived.addFilteredAction(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
+            	} else {
+            		derived.addFilteredAction(ac.leftClickAt(w));
+            	}
+                return derived;
+            }else{
+
+                //For widgets that are:
+                // - typeable
+                // and
+                // - unFiltered by any of the regular expressions in the Filter-tab, or
+                // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
+                // We want to create actions that consist of typing into them
+                if(isTypeable(w)){
+                    if(isUnfiltered(w) || whiteListed(w)) {
+                        //Create a type action with the Action Compiler, and add it to the set of derived actions
+                        derived.addAvailableAction(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
+                    }else{
+                        // Filtered and not white listed:
+                        derived.addFilteredAction(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
+                    }
+                }
+
+                //For widgets that are:
+                // - clickable
+                // and
+                // - unFiltered by any of the regular expressions in the Filter-tab, or
+                // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
+                // We want to create actions that consist of left clicking on them
+                if(isClickable(w)) {
+                    if((isUnfiltered(w) || whiteListed(w))){
+                        //Create a left click action with the Action Compiler, and add it to the set of derived actions
+                        derived.addAvailableAction(ac.leftClickAt(w));
+                    }else{
+                        // Filtered and not white listed:
+                        derived.addFilteredAction(ac.leftClickAt(w));
+                    }
+                }
+
+                //Add sliding actions (like scroll, drag and drop) to the derived actions
+                //method defined below.
+                Drag[] drags = null;
+                //If there are scroll (drags/drops) actions possible
+                if((drags = w.scrollDrags(SCROLL_ARROW_SIZE,SCROLL_THICK)) != null) {
+                    derived = addSlidingActions(derived, ac, drags, w);
+                }
+            }
+        }
+        return derived;
+    }
+
+    /**
      * Adding derived actions into the given set of actions and returning the modified set of actions.
      *
      * @param actions
@@ -196,14 +411,13 @@ public class DesktopProtocol extends GenericUtilsProtocol {
      * @param state
      * @return
      */
+    @Deprecated
     protected Set<Action> deriveClickTypeScrollActionsFromAllWidgetsOfState(Set<Action> actions, SUT system, State state){
         // To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
         StdActionCompiler ac = new AnnotatingActionCompiler();
 
         // To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
         for(Widget w : state){
-            //optional: iterate through top level widgets based on Z-index:
-            //for(Widget w : getTopWidgets(state)){
 
             if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
                 // filtering out actions on menu-containers (that would add an action in the middle of the menu)
@@ -237,17 +451,16 @@ public class DesktopProtocol extends GenericUtilsProtocol {
                     // We want to create actions that consist of typing into them
                     if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
                         //Create a type action with the Action Compiler, and add it to the set of derived actions
-                        actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+                        actions.add(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
                     }
                     //Add sliding actions (like scroll, drag and drop) to the derived actions
                     //method defined below.
-                    addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w, state);
+                    addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w);
                 }
             }
         }
         return actions;
     }
-
 
     /**
      * Adding derived actions into the given set of actions and returning the modified set of actions.
@@ -257,14 +470,13 @@ public class DesktopProtocol extends GenericUtilsProtocol {
      * @param state
      * @return
      */
+    @Deprecated
     protected Set<Action> deriveClickTypeScrollActionsFromTopLevelWidgets(Set<Action> actions, SUT system, State state){
         // To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
         StdActionCompiler ac = new AnnotatingActionCompiler();
 
-        // To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
+        // iterate through top level widgets based on Z-index:
         for(Widget w : getTopWidgets(state)){
-            //optional: iterate through top level widgets based on Z-index:
-            //for(Widget w : getTopWidgets(state)){
 
             if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
                 // filtering out actions on menu-containers (that would add an action in the middle of the menu)
@@ -298,11 +510,11 @@ public class DesktopProtocol extends GenericUtilsProtocol {
                     // We want to create actions that consist of typing into them
                     if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
                         //Create a type action with the Action Compiler, and add it to the set of derived actions
-                        actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+                        actions.add(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
                     }
                     //Add sliding actions (like scroll, drag and drop) to the derived actions
                     //method defined below.
-                    addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w, state);
+                    addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w);
                 }
             }
         }

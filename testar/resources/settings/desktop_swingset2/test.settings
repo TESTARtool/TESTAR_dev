@@ -46,12 +46,13 @@ Sequences = 1
 SequenceLength = 100
 
 #################################################################
-# Oracles based on suspicious titles
+# Oracles based on suspicious tag values
 #
-# Regular expression
+# Regular expression and Tags to apply them
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+SuspiciousTags = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+TagsForSuspiciousOracle = Title
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -83,11 +84,13 @@ ProcessLogs = .*.*
 #################################################################
 # Actionfilter
 #
-# Regular expression. More filters can be added in Spy mode,
+# Regular expression and Tags to apply them.
+# More filters can be added in Spy mode,
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
 ClickFilter = .*[eE]xit.*|.*Close.*|.*[sS]ave.*|.*Minimize.*
+TagsToFilter = Title
 
 #################################################################
 # Processfilter
@@ -96,7 +99,7 @@ ClickFilter = .*[eE]xit.*|.*Close.*|.*[sS]ave.*|.*Minimize.*
 # but that you do not want to test.
 #################################################################
 
-SUTProcesses =
+ProcessesToKillDuringTest =
 
 #################################################################
 # Protocolclass
@@ -118,16 +121,13 @@ AbstractStateAttributes = WidgetControlType
 # Other more advanced settings
 #################################################################
 
-ProcessesToKillDuringTest =
 OutputDir = ./output
 PathToReplaySequence = ./output/temp
 TempDir = ./output/temp
 UseRecordedActionDurationAndWaitTimeDuringReplay = false
 ForceForeground = true
 LogLevel = 1
-ExecuteActions = true
 FaultThreshold = 0.000000001
-DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
 ActionDuration = 0.1
@@ -135,15 +135,11 @@ ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
-ShowSettingsAfterTest = true
 TimeToWaitAfterAction = 0.1
 StartupTime = 10.0
-DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true
 CopyFromTo =
 VisualizeActions = false
-VisualizeSelectedAction = true
-TestGenerator = random
 MaxReward = 9999999
 Discount = .95

@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018, 2019, 2020 Open Universiteit - www.ou.nl
- * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2023 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,25 +28,20 @@
  *
  */
 
-import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
-import org.fruit.Pair;
-import org.fruit.alayer.*;
-import org.fruit.alayer.actions.*;
-import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
-import org.fruit.alayer.webdriver.*;
-import org.fruit.alayer.webdriver.enums.WdRoles;
-import org.fruit.alayer.webdriver.enums.WdTags;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
+import com.google.common.collect.ArrayListMultimap;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.StdActionCompiler;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.managers.InputDataManager;
+import org.testar.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
 
 import java.util.*;
 
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
+import static org.testar.monkey.alayer.Tags.Blocked;
+import static org.testar.monkey.alayer.Tags.Enabled;
 
 
 public class Protocol_webdriver_gwt extends WebdriverProtocol {
@@ -61,48 +56,10 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
 	protected void initialize(Settings settings) {
 		super.initialize(settings);
 
-		// Classes that are deemed clickable by the web framework
-		clickableClasses = Arrays.asList(
-				// Dropdown op top right
-				"selectItemLiteText",
-				// Menu items on the left
-				"etreeCell", "etreeCellSelected", "etreeCellSelectedOver",
-				// Checkboxes
-				"checkboxFalse", "checkboxFalseOver", "checkboxTrue", "checkboxTrueOver",
-				// Tiles
-				"showcaseTileIcon",
-				// Scrolling stuff
-				"vScrollStart", "vScrollEnd"
-				);
-
-		// Disallow links and pages with these extensions
-		// Set to null to ignore this feature
-		deniedExtensions = Arrays.asList("pdf", "jpg", "png", "jsp");
-
-		// Define a whitelist of allowed domains for links and pages
-		// An empty list will be filled with the domain from the sut connector
-		// Set to null to ignore this feature
-		domainsAllowed = Arrays.asList("www.smartclient.com");
-
-		// If true, follow links opened in new tabs
-		// If false, stay with the original (ignore links opened in new tabs)
-		followLinks = true;
-
-		// Propagate followLinks setting
-		WdDriver.followLinks = followLinks;
-
-		// List of atributes to identify and close policy popups
+		// List of attributes to identify and close policy popups
 		// Set to null to disable this feature
-		policyAttributes = new HashMap<String, String>() {{
-			put("class", "iAgreeButton");
-		}};
-
-		//Force the browser to run in full screen mode
-		WdDriver.fullScreen = true;
-		
-		//Force webdriver to switch to a new tab if opened
-		//This feature can block the correct display of select dropdown elements 
-		WdDriver.forceActivateTab = true;
+		policyAttributes = ArrayListMultimap.create();
+		policyAttributes.put("class", "iAgreeButton");
 	}
 
 	/**
@@ -139,17 +96,16 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
 			}
 
 			// slides can happen, even though the widget might be blocked
-			// addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget,
-			//     state);
+			// addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
 
-			// If the element is blocked, Testar can't click on or type in the widget
+			// If the element is blocked, TESTAR can't click on or type in the widget
 			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
 				continue;
 			}
 
 			// type into text boxes
 			if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-				actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+				actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
 			}
 
 			// left clicks, but ignore links outside domain
@@ -164,41 +120,15 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
 	}
 
 	@Override
-	protected boolean isClickable(Widget widget) {
-		Role role = widget.get(Tags.Role, Roles.Widget);
-		if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
-			/*
-      // Input type are special...
-      if (role.equals(WdRoles.WdINPUT)) {
-        String type = ((WdWidget) widget).element.type;
-        return WdRoles.clickableInputTypes().contains(type);
-      }
-			 */
-			return true;
+	protected boolean isAtBrowserCanvas(Widget widget) {
+		// GWT uses the popupPolicies visibility style to make visible or hide the policy container
+		if(widget.get(WdTags.WebCssClasses, "").contains("iAgreeButton")) {
+			Widget policyContainer = widget.parent();
+			return policyContainer.get(WdTags.WebAttributeMap).toString().contains("style=visibility: visible");
 		}
 
-		WdElement element = ((WdWidget) widget).element;
-		if (element.isClickable) {
-			return true;
-		}
-
-		Set<String> clickSet = new HashSet<>(clickableClasses);
-		clickSet.retainAll(element.cssClasses);
-		return clickSet.size() > 0;
+		return super.isAtBrowserCanvas(widget);
 	}
 
-	@Override
-	protected boolean isTypeable(Widget widget) {
-		Role role = widget.get(Tags.Role, Roles.Widget);
-		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
-			// Input type are special...
-			if (role.equals(WdRoles.WdINPUT)) {
-				String type = ((WdWidget) widget).element.type;
-				return WdRoles.typeableInputTypes().contains(type);
-			}
-			return true;
-		}
 
-		return false;
-	}
 }

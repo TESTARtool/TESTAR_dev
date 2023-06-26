@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,11 +31,19 @@
 
 import java.util.Set;
 
-import org.fruit.Util;
-import org.fruit.alayer.*;
-import org.fruit.alayer.exceptions.*;
-import org.fruit.monkey.Settings;
+import org.testar.DerivedActions;
+import org.testar.SutVisualization;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Settings;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Verdict;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.exceptions.StateBuildException;
+import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.protocols.DesktopProtocol;
+import org.testar.screenshotjson.JsonUtils;
 
 /**
  * This protocol provides default TESTAR behaviour to test Windows desktop applications.
@@ -75,7 +83,7 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 * @return  a started SUT, ready to be tested.
 	 */
 	@Override
-	protected SUT startSystem() throws SystemStartException{
+	protected SUT startSystem() throws SystemStartException {
 		return super.startSystem();
 	}
 
@@ -85,9 +93,9 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
 	 * the SUT's configuration files etc.)
 	 */
-	 @Override
+	@Override
 	protected void beginSequence(SUT system, State state){
-	 	super.beginSequence(system, state);
+		super.beginSequence(system, state);
 	}
 
 	/**
@@ -102,8 +110,13 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 * @return  the current state of the SUT with attached oracle.
 	 */
 	@Override
-	protected State getState(SUT system) throws StateBuildException{
-		return super.getState(system);
+	protected State getState(SUT system) throws StateBuildException {
+		State state = super.getState(system);
+		// Creating a JSON file with information about widgets and their location on the screenshot:
+		if(settings.get(ConfigTags.Mode) == Modes.Generate && settings.get(ConfigTags.CreateWidgetInfoJsonFile))
+			JsonUtils.createWidgetInfoJsonFile(state);
+
+		return state;
 	}
 
 	/**
@@ -116,7 +129,7 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 		// The super methods implements the implicit online state oracles for:
 		// system crashes
 		// non-responsiveness
-		// suspicious titles
+		// suspicious tags
 		Verdict verdict = super.getVerdict(state);
 
 		//--------------------------------------------------------
@@ -137,34 +150,41 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 * @return  a set of actions
 	 */
 	@Override
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.
 		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
 		Set<Action> actions = super.deriveActions(system,state);
 
-
 		// Derive left-click actions, click and type actions, and scroll actions from
-		// top level (highest Z-index) widgets of the GUI:
-		actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
+		// top level widgets of the GUI:
+		DerivedActions derived = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, state);
 
-		if(actions.isEmpty()){
+		if(derived.getAvailableActions().isEmpty()){
 			// If the top level widgets did not have any executable widgets, try all widgets:
-//			System.out.println("No actions from top level widgets, changing to all widgets.");
 			// Derive left-click actions, click and type actions, and scroll actions from
 			// all widgets of the GUI:
-			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
+			derived = deriveClickTypeScrollActionsFromAllWidgets(actions, state);
 		}
+
+		Set<Action> filteredActions = derived.getFilteredActions();
+		actions = derived.getAvailableActions();
+
+		//Showing the grey dots for filtered actions if visualization is on:
+		if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
 
 		//return the set of derived actions
 		return actions;
 	}
 
 	/**
-	 * Select one of the available actions using an action selection algorithm (for example random action selection)
-	 *
-	 * super.selectAction(state, actions) updates information to the HTML sequence report
+	 * Select one of the available actions using an action selection algorithm. 
+	 * 
+	 * It uses the state model action selector if the state model inference settings are configured and enabled. 
+	 * If the state model is not enabled, it returns a random action. 
+	 * 
+	 * super.selectAction(state, actions) also updates the HTML sequence report information. 
 	 *
 	 * @param state the SUT's current state
 	 * @param actions the set of derived actions
@@ -172,7 +192,7 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		return(super.selectAction(state, actions));
+		return super.selectAction(state, actions);
 	}
 
 	/**
@@ -233,4 +253,43 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	protected void postSequenceProcessing() {
 		super.postSequenceProcessing();
 	}
+
+	/**
+	 * This method allow users to customize the Widget and State identifiers.
+	 *
+	 * By default TESTAR uses the CodingManager to create the Widget and State identifiers:
+	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom,
+	 * Abstract_R_ID, Abstract_R_T_ID, Abstract_R_T_P_ID
+	 *
+	 * @param state
+	 */
+	@Override
+	protected void buildStateIdentifiers(State state) {
+		super.buildStateIdentifiers(state);
+	}
+
+	/**
+	 * This method allow users to customize the Actions identifiers.
+	 *
+	 * By default TESTAR uses the CodingManager to create the Actions identifiers:
+	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom
+	 *
+	 * @param state
+	 * @param actions
+	 */
+	@Override
+	protected void buildStateActionsIdentifiers(State state, Set<Action> actions) { super.buildStateActionsIdentifiers(state, actions); }
+
+	/**
+	 * This method allow users to customize the environment Action identifiers.
+	 * These are Actions not related to a Widget (ForceToForeground, Keyboard, KillProcess, etc...)
+	 *
+	 * By default TESTAR uses the CodingManager to create the specific environment Action identifiers:
+	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom
+	 *
+	 * @param state
+	 * @param action
+	 */
+	@Override
+	protected void buildEnvironmentActionIdentifiers(State state, Action action) { super.buildEnvironmentActionIdentifiers(state, action); }
 }

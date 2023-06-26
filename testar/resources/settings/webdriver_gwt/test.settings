@@ -39,12 +39,13 @@ Sequences = 1
 SequenceLength = 100
 
 #################################################################
-# Oracles based on suspicious titles
+# Oracles based on suspicious tag values
 #
-# Regular expression
+# Regular expression and Tags to apply them
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+SuspiciousTags = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+TagsForSuspiciousOracle = Title;WebName;WebTagName
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -76,11 +77,13 @@ ProcessLogs = .*.*
 #################################################################
 # Actionfilter
 #
-# Regular expression. More filters can be added in Spy mode,
+# Regular expression and Tags to apply them.
+# More filters can be added in Spy mode,
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
 ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
+TagsToFilter = Title;WebName;WebTagName
 
 #################################################################
 # Processfilter
@@ -89,7 +92,7 @@ ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]ri
 # but that you do not want to test.
 #################################################################
 
-SUTProcesses =
+ProcessesToKillDuringTest =
 
 #################################################################
 # Protocolclass
@@ -106,6 +109,25 @@ ProtocolClass = webdriver_gwt/Protocol_webdriver_gwt
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
 AbstractStateAttributes = WebWidgetId
+
+#################################################################
+# WebDriver features
+#################################################################
+ClickableClasses = selectItemLiteText;etreeCell;etreeCellSelected;etreeCellSelectedOver;checkboxFalse;checkboxFalseOver;checkboxTrue;checkboxTrueOver;showcaseTileIcon;vScrollStart;vScrollEnd
+TypeableClasses = 
+DeniedExtensions = pdf;jpg;png;jsp
+DomainsAllowed = www.smartclient.com
+FollowLinks = true
+BrowserFullScreen = true
+SwitchNewTabs = true
+
+#################################################################
+# WebDriver Browser Console Oracles
+#################################################################
+WebConsoleErrorOracle = false
+WebConsoleErrorPattern = .*.*
+WebConsoleWarningOracle = false
+WebConsoleWarningPattern = .*.*
 
 #################################################################
 # Override display scale
@@ -126,16 +148,13 @@ OverrideWebDriverDisplayScale =
 # Other more advanced settings
 #################################################################
 
-ProcessesToKillDuringTest =
 OutputDir = ./output
 PathToReplaySequence = ./output/temp
 TempDir = ./output/temp
 UseRecordedActionDurationAndWaitTimeDuringReplay = false
 ForceForeground = true
 LogLevel = 1
-ExecuteActions = true
 FaultThreshold = 1.0E-9
-DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
 ActionDuration = 0.1
@@ -143,16 +162,12 @@ ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
-ShowSettingsAfterTest = true
 TimeToWaitAfterAction = 0.1
 StartupTime = 2.0
-DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true
 CopyFromTo =
 VisualizeActions = false
-VisualizeSelectedAction = true
-TestGenerator = random
 MaxReward = 9999999
 Discount = .95
 RefreshSpyCanvas = 1.0

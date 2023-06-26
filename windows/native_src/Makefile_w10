@@ -1,42 +1,44 @@
+# We use nmake to compile the makefile that builds the windows DLL
+# Thus, you need to install nmake c++ tools
+# Packages needed: C++ tools, CLI tools, and one Windows SDK package for libraries dependencies
+#
+# Visual Studio 2017 Build Tools: https://aka.ms/vs/15/release/vs_buildtools.exe
+# Visual Studio 2019 Build Tools: https://aka.ms/vs/16/release/vs_buildtools.exe
+# Visual Studio 2022 Build Tools: https://aka.ms/vs/17/release/vs_buildtools.exe
+#
+# This file is invoked from: compile_w10.bat
+
 LIBS= ole32.lib user32.lib comsuppw.lib oleaut32.lib comctl32.lib gdi32.lib\
       Msimg32.lib GDIplus.lib kernel32.lib psapi.lib shcore.lib
 
 INCLUDES= /I "$(JAVA_HOME)\include"\
 		  /I "$(JAVA_HOME)\include\win32"\
 		  /I AccessBridge
-		  # vcvarsall.bat adds the Windows SDK directories to the INCLUDE environment variable,
-		  # which is automatically used by the compiler.
-		  # So it is not necessary to manually specify the path here.
-		  # /I "C:\Program Files (x86)\Windows Kits\10\Include\10.0.14393.0\um"
-
 
 DLLFILE="..\target\resources\main\windows.dll"
 
-JAVA_CLASSFILE = "..\target\classes\java\main\org\fruit\alayer\windows\Windows.class"
-JAVA_CLASS = org.fruit.alayer.windows.Windows
+JAVA_CLASSFILE = "..\target\classes\java\main\org\testar\monkey\alayer\windows\Windows.class"
+JAVA_SOURCE = "..\src\org\testar\monkey\alayer\windows\Windows.java"
 
 OBJFILES= main_w10.obj\
-# by urueda
 		  AccessBridgeCalls.obj
 
 HPPFILES= windows.h\
 
-
 CPPFLAGS= /EHsc /O2 /MD /wd4311 /wd4312
-
 
 all: windows.h $(DLLFILE)
 
 windows.h: $(JAVA_CLASSFILE)
-	javah -jni -force -o windows.h -classpath ..\target\classes\java\main $(JAVA_CLASS)
+     javac -h  tmp -classpath  .;..\target\classes\java\main\;..\..\core\target\classes\java\main  $(JAVA_SOURCE)
+     move tmp\*.h .
+     rename org*.h windows.h
+     RD /S /Q tmp
 
 $(OBJFILES): windows.h
 
 .cpp.obj:
-# cl $(CPPFLAGS) /c $*.cpp $(INCLUDES)
-# by urueda
 	cl $(CPPFLAGS) /c "AccessBridge\AccessBridgeCalls.c" $*.cpp $(INCLUDES)
-
 
 $(DLLFILE): $(OBJFILES)
 	cl $(OBJFILES) /link $(LIBS) /DLL /OUT:$(DLLFILE)
