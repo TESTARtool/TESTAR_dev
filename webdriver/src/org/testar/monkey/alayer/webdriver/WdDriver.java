@@ -548,4 +548,16 @@ public class WdDriver extends SUTBase {
       }
     }
   }
+
+  public static boolean webdriverElementIsDisplayed(String elementXPath) {
+	  if(remoteWebDriver != null) {
+		  try {
+			  return remoteWebDriver.findElement(By.xpath(elementXPath)).isDisplayed();
+		  } catch (Exception e) {
+			  return false;
+		  }
+	  }
+	  return false;
+  }
+
 }

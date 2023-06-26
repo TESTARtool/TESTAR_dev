@@ -147,7 +147,17 @@ public class WdTags extends TagsBase {
    * Web display style of a widget.
    */
   public static final Tag<String> WebDisplay = from("WebDisplay", String.class);
-  
+
+  /**
+   * Web element XPath.
+   */
+  public static final Tag<String> WebXPath = from("WebXPath", String.class);
+
+  /**
+   * Web element is displayed in the screen or not.
+   */
+  public static final Tag<Boolean> WebIsDisplayed = from("WebIsDisplayed", Boolean.class);
+
   /**
    * Web type of input of a widget.
    */

@@ -171,19 +171,19 @@ function wrapElementTestar(element, xOffset, yOffset) {
         value: element.value,
         display: computedStyle.getPropertyValue('display'),
         styleOverflow: computedStyle.overflow,
-		styleOverflowX: computedStyle.overflowX,
-		styleOverflowY: computedStyle.overflowY,
-		stylePosition: computedStyle.position,
-		styleOpacity: computedStyle.opacity,
-		
+        styleOverflowX: computedStyle.overflowX,
+        styleOverflowY: computedStyle.overflowY,
+        stylePosition: computedStyle.position,
+        styleOpacity: computedStyle.opacity,
 
         zIndex: getZIndexTestar(element),
         rect: getRectTestar(element, xOffset, yOffset),
         dimensions: getDimensionsTestar(element),
         isBlocked: getIsBlockedTestar(element, xOffset, yOffset),
         isClickable: isClickableTestar(element, xOffset, yOffset),
-		isShadowElement: shadowElement,
+        isShadowElement: shadowElement,
         hasKeyboardFocus: document.activeElement === element,
+        xpath: getXPath(element),
 
         wrappedChildren: [],
         xOffset: xOffset,
@@ -413,3 +413,42 @@ function getAttributeMapTestar(element) {
         return map;
     }, {});
 }
+
+function getXPath(element) {
+  try {
+    // Create an array to store the path
+    var path = [];
+
+    // Iterate through the ancestors of the element
+    while (element && element.nodeType === Node.ELEMENT_NODE) {
+      var index = 1;
+      var sibling = element.previousSibling;
+
+      // Find the index of the element among its siblings
+      while (sibling) {
+        if (sibling.nodeType === Node.ELEMENT_NODE && sibling.nodeName === element.nodeName) {
+          index++;
+        }
+        sibling = sibling.previousSibling;
+      }
+
+      // Build the XPath expression for the element
+      var tagName = element.nodeName.toLowerCase();
+      var pathSegment = tagName + '[' + index + ']';
+      path.unshift(pathSegment);
+
+      // Move up to the parent element
+      element = element.parentNode;
+    }
+
+    // Join the path segments to form the XPath
+    var xpath = path.length ? '/' + path.join('/') : '';
+
+    return xpath;
+  } catch (error) {
+    // Handle any errors and return an empty string
+    console.error('Error occurred while obtaining XPath:', error);
+    return '';
+  }
+}
+

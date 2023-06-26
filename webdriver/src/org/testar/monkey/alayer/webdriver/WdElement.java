@@ -60,6 +60,7 @@ public class WdElement extends TaggableBase implements Serializable {
   boolean isModal = false; // i.c.w. access key
 
   public String id, name, genericTitle, tagName, textContent, helpText, title;
+  public String xpath = "";
   public List<String> cssClasses = new ArrayList<>();
   public String display, type;
   public int maxLength;
@@ -130,6 +131,7 @@ public class WdElement extends TaggableBase implements Serializable {
     src = attributeMap.getOrDefault("src", "");
     maxLength = Integer.valueOf(attributeMap.getOrDefault("maxlength", "-1"));
     disabled = Boolean.valueOf(attributeMap.getOrDefault("disabled", "false"));
+    xpath = (packedElement.get("xpath") == null) ? "" : (String) packedElement.get("xpath");
 
     String classesString = attributeMap.getOrDefault("class", "");
     if (classesString != null) {

@@ -297,6 +297,12 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(WdTags.WebDisplay)) {
 			ret = w.element.display;
 		}
+		else if (t.equals(WdTags.WebXPath)) {
+			ret = w.element.xpath;
+		}
+		else if (t.equals(WdTags.WebIsDisplayed)) {
+			ret = WdDriver.webdriverElementIsDisplayed(w.element.xpath);
+		}
 		else if (t.equals(WdTags.WebType)) {
 			ret = w.element.type;
 		}
