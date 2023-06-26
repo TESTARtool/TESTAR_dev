@@ -856,6 +856,9 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 
         //testLog4J();
         
+        verdict = WebVerdict.imageResolutionDifferences(state,0,0);
+        if (shouldReturnVerdict(verdict)) return verdict;
+
         verdict = GenericVerdict.WidgetAlignmentMetric(state, 50.0);
         if (shouldReturnVerdict(verdict)) return verdict;
         

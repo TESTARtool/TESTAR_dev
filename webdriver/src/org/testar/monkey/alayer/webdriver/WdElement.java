@@ -87,7 +87,8 @@ public class WdElement extends TaggableBase implements Serializable {
   public long scrollWidth, scrollHeight;
   public long scrollLeft, scrollTop;
   private long borderWidth, borderHeight;
-
+  public long naturalWidth, naturalHeight; 
+  public long displayedWidth, displayedHeight;   
   public transient Map<String, String> attributeMap;
 
   public WdElement(WdRootElement root, WdElement parent) {
@@ -129,6 +130,10 @@ public class WdElement extends TaggableBase implements Serializable {
     alt = attributeMap.getOrDefault("alt", "");
     type = attributeMap.getOrDefault("type", "");
     src = attributeMap.getOrDefault("src", "");
+	naturalWidth = (packedElement.get("naturalWidth") == null) ? 0 : castDimensionsToLong(packedElement.get("naturalWidth"));
+	naturalHeight = (packedElement.get("naturalHeight") == null) ? 0 : castDimensionsToLong(packedElement.get("naturalHeight"));
+	displayedWidth = (packedElement.get("displayedWidth") == null) ? 0 : castDimensionsToLong(packedElement.get("displayedWidth"));
+	displayedHeight = (packedElement.get("displayedHeight") == null) ? 0 : castDimensionsToLong(packedElement.get("displayedHeight"));
     maxLength = Integer.valueOf(attributeMap.getOrDefault("maxlength", "-1"));
     disabled = Boolean.valueOf(attributeMap.getOrDefault("disabled", "false"));
     xpath = (packedElement.get("xpath") == null) ? "" : (String) packedElement.get("xpath");

@@ -172,6 +172,26 @@ public class WdTags extends TagsBase {
    * Web zIndex of a widget
    */
   public static final Tag<Double> WebZIndex = from("WebZIndex", Double.class);
+  
+  /**
+   * Web naturalWidth of a widget
+   */
+  public static final Tag<Long> WebNaturalWidth = from("WebNaturalWidth", Long.class);
+  
+  /**
+   * Web naturalHeight of a widget
+   */
+  public static final Tag<Long> WebNaturalHeight = from("WebNaturalHeight", Long.class);
+  
+  /**
+   * Web Width of a widget
+   */
+  public static final Tag<Long> WebDisplayedWidth = from("WebDisplayedWidth", Long.class);
+  
+  /**
+   * Web Height of a widget
+   */
+  public static final Tag<Long> WebDisplayedHeight = from("WebDisplayedHeight", Long.class);
 
   /**
    * Web Control Type Identifier of a widget.

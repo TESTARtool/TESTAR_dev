@@ -287,6 +287,9 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 		Verdict spellCheckerVerdict = GenericVerdict.SpellChecker(state, WdTags.WebTextContent, new AmericanEnglish(), "");
 		if(spellCheckerVerdict != Verdict.OK) HTMLStateVerdictReport.reportStateVerdict(actionCount, state, spellCheckerVerdict);
 		
+        verdict = WebVerdict.imageResolutionDifferences(state,0,0);
+        if (shouldReturnVerdict(verdict)) return verdict;
+
         verdict = GenericVerdict.WidgetAlignmentMetric(state, 50.0);
         if (shouldReturnVerdict(verdict)) return verdict;
         

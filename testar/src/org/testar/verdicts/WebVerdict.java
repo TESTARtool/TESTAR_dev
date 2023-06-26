@@ -675,6 +675,38 @@ public class WebVerdict {
 		else return isSonOfTD(widget.parent());
 	}
 	
+	// Detect images which are not shown in their natural resolution.
+	// If the natural width is 1000 and the displayed width is 2000, then the image is blown up and may look pixelized.
+	// If the natural width is 1000 and the displayed width is 500, then the image is shown smaller than it really is and uses more bandwidth to download the image than needed which leads to performance issues.
+	// To ignore small images a minimal width and height can be given because small images are sometimes used as 'fillers' or they don't have much bandwidth issues. The default minimum values are 0.
+	// BAD:  Natural width : 1000
+	//       Displayed width: 2000
+	// GOOD: Natural width : 1000
+	//       Displayed width: 1000
+	public static Verdict imageResolutionDifferences(State state, long minimalWidth, long minimalHeight)
+	{
+		Verdict verdict = Verdict.OK;
 
+		for (Widget w : state)
+		{
+			Long naturalWidth = w.get(WdTags.WebNaturalWidth);
+			Long naturalHeight = w.get(WdTags.WebNaturalHeight);
+			if (naturalWidth > minimalWidth && naturalHeight > minimalHeight)
+			{
+				Rect widgetRect = (Rect)w.get(Tags.Shape);
 
+				Long displayedWidth = w.get(WdTags.WebDisplayedWidth);
+				Long displayedHeight = w.get(WdTags.WebDisplayedHeight);
+
+				if (!naturalWidth.equals(displayedWidth) || !naturalHeight.equals(displayedHeight))
+				{
+					String verdictMsg = String.format("Detected image resolution difference! Role: %s , Path: %s , Natural width: %d , Displayed width: %d , Natural height: %d , Displayed height: %d , Src: %s, Alt: %s",
+						w.get(Tags.Role), w.get(Tags.Path), naturalWidth, displayedWidth, naturalHeight, displayedHeight, w.get(WdTags.WebSrc), w.get(WdTags.WebAlt));
+
+					verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList(widgetRect)));
+				}
+			}
+		}
+		return verdict;
+	}
 }

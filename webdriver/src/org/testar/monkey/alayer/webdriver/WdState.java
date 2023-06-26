@@ -309,6 +309,18 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(WdTags.WebSrc)) {
 			ret = w.element.src;
 		}
+		else if (t.equals(WdTags.WebNaturalWidth)) {
+			ret = w.element.naturalWidth;
+		}
+		else if (t.equals(WdTags.WebNaturalHeight)) {
+			ret = w.element.naturalHeight;
+		}
+		else if (t.equals(WdTags.WebDisplayedWidth)) {
+			ret = w.element.displayedWidth;
+		}
+		else if (t.equals(WdTags.WebDisplayedHeight)) {
+			ret = w.element.displayedHeight;
+		}
 		else if (t.equals(WdTags.WebZIndex)) {
 			ret = w.element.zindex;
 		}
