@@ -130,6 +130,14 @@ jobs:
         name: runTestWebdriverParabankFormFilling-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_form_filling
     
+    - name: Run webdriver to login in parabank and execute webdriver remote actions
+      run: ./gradlew runTestWebdriverParabankRemoteActions
+    - name: Save runTestWebdriverParabankRemoteActions HTML report artifact
+      uses: actions/upload-artifact@v2.2.4
+      with:
+        name: runTestWebdriverParabankRemoteActions-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_remote_actions
+    
     - name: Run TESTAR Replay mode with a web page to check that replayed correctly
       run: ./gradlew runTestWebdriverCorrectReplay
     - name: Save runTestWebdriverCorrectReplay HTML report artifact
@@ -205,6 +213,9 @@ jobs:
     - name: Run webdriver to login in parabank using form filling
       run: ./gradlew runTestWebdriverParabankFormFilling
     
+    - name: Run webdriver to login in parabank and execute webdriver remote actions
+      run: ./gradlew runTestWebdriverParabankRemoteActions
+    
     - name: Run TESTAR Replay mode with a web page to check that replayed correctly
       run: ./gradlew runTestWebdriverCorrectReplay
     
@@ -269,6 +280,9 @@ jobs:
     
     - name: Run webdriver to login in parabank using form filling
       run: ./gradlew runTestWebdriverParabankFormFilling
+    
+    - name: Run webdriver to login in parabank and execute webdriver remote actions
+      run: ./gradlew runTestWebdriverParabankRemoteActions
     
     - name: Run TESTAR Replay mode with a web page to check that replayed correctly
       run: ./gradlew runTestWebdriverCorrectReplay

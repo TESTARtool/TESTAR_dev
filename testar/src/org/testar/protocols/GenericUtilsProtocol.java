@@ -107,8 +107,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
             if (widget != null) {
                 // When the desired widget to interact with is found,
                 // Create the triggered action, build the identifier, and execute it.
-                StdActionCompiler ac = new AnnotatingActionCompiler();
-                Action triggeredAction = ac.leftClickAt(widget);
+                Action triggeredAction = triggeredClickAction(state, widget);
                 buildStateActionsIdentifiers(state, Collections.singleton(triggeredAction));
                 executeAction(system, state, triggeredAction);
                 return true;
@@ -143,8 +142,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
             if(widget!=null){
                 // When the desired widget to interact with is found,
                 // Create the triggered action, build the identifier, and execute it.
-                StdActionCompiler ac = new AnnotatingActionCompiler();
-                Action triggeredAction = ac.leftClickAt(widget);
+                Action triggeredAction = triggeredClickAction(state, widget);
                 buildStateActionsIdentifiers(state, Collections.singleton(triggeredAction));
                 executeAction(system, state, triggeredAction);
                 // is waiting needed after the action has been executed?
@@ -215,8 +213,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
             if(widget!=null){
                 // When the desired widget to interact with is found,
                 // Create the triggered action, build the identifier, and execute it.
-                StdActionCompiler ac = new AnnotatingActionCompiler();
-                Action triggeredAction = ac.clickTypeInto(widget, textToType, true);
+                Action triggeredAction = triggeredTypeAction(state, widget, textToType, true);
                 buildStateActionsIdentifiers(state, Collections.singleton(triggeredAction));
                 executeAction(system, state, triggeredAction);
                 return true;
@@ -252,8 +249,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
             if(widget!=null){
                 // When the desired widget to interact with is found,
                 // Create the triggered action, build the identifier, and execute it.
-                StdActionCompiler ac = new AnnotatingActionCompiler();
-                Action triggeredAction = ac.clickTypeInto(widget, textToType, true);
+                Action triggeredAction = triggeredTypeAction(state, widget, textToType, true);
                 buildStateActionsIdentifiers(state, Collections.singleton(triggeredAction));
                 executeAction(system, state, triggeredAction);
                 // is waiting needed after the action has been executed?
@@ -325,8 +321,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
             if(widget!=null){
                 // When the desired widget to interact with is found,
                 // Create the triggered action, build the identifier, and execute it.
-                StdActionCompiler ac = new AnnotatingActionCompiler();
-                Action triggeredAction = ac.pasteTextInto(widget, textToPaste, true);
+                Action triggeredAction = triggeredPasteAction(state, widget, textToPaste, true);
                 buildStateActionsIdentifiers(state, Collections.singleton(triggeredAction));
                 executeAction(system, state, triggeredAction);
                 return true;
@@ -362,8 +357,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
             if(widget!=null){
                 // When the desired widget to interact with is found,
                 // Create the triggered action, build the identifier, and execute it.
-                StdActionCompiler ac = new AnnotatingActionCompiler();
-                Action triggeredAction = ac.pasteTextInto(widget, textToPaste, true);
+                Action triggeredAction = triggeredPasteAction(state, widget, textToPaste, true);
                 buildStateActionsIdentifiers(state, Collections.singleton(triggeredAction));
                 executeAction(system, state, triggeredAction);
                 // is waiting needed after the action has been executed?
@@ -715,4 +709,29 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     	}
     	return new HashSet<>();
     }
+
+    /**
+     * By default, trigger click widget using LeftClickAt (Windows level). 
+     */
+    protected Action triggeredClickAction(State state, Widget widget) {
+    	StdActionCompiler ac = new AnnotatingActionCompiler();
+    	return ac.leftClickAt(widget);
+    }
+
+    /**
+     * By default, trigger click and type text using ClickTypeInto (Windows level). 
+     */
+    protected Action triggeredTypeAction(State state, Widget widget, String textToType, boolean replaceText) {
+    	StdActionCompiler ac = new AnnotatingActionCompiler();
+    	return ac.clickTypeInto(widget, textToType, replaceText);
+    }
+
+    /**
+     * By default, trigger click and paste text using ClickPasteInto (Windows level). 
+     */
+    protected Action triggeredPasteAction(State state, Widget widget, String textToPaste, boolean replaceText) {
+    	StdActionCompiler ac = new AnnotatingActionCompiler();
+    	return ac.pasteTextInto(widget, textToPaste, replaceText);
+    }
+
 }

@@ -586,22 +586,11 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				}
 			}
 			if (popupMatches) {
-				popupClickActions.add(clickForcedPopupWidget(ac, widget));
+				popupClickActions.add(triggeredClickAction(state, widget));
 			}
 		}
 
 		return popupClickActions;
-	}
-
-	/**
-	 * By default click popup widget using LeftClickAt (Windows level). 
-	 * 
-	 * @param ac
-	 * @param widget
-	 * @return leftClickAt(widget)
-	 */
-	protected Action clickForcedPopupWidget(StdActionCompiler ac, Widget widget) {
-	    return ac.leftClickAt(widget);
 	}
 
 	/*

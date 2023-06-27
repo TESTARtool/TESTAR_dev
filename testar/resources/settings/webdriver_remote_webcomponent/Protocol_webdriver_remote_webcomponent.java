@@ -32,6 +32,7 @@ import org.testar.SutVisualization;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.Pair;
 import org.testar.monkey.Settings;
+import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
@@ -65,49 +66,11 @@ public class Protocol_webdriver_remote_webcomponent extends WebdriverProtocol {
 	protected void initialize(Settings settings) {
 		super.initialize(settings);
 
-		/*
-        These settings are initialized in WebdriverProtocol:
-
-        // Classes that are deemed clickable by the web framework
-        // getting from the settings file:
-        clickableClasses = settings.get(ConfigTags.ClickableClasses);
-
-        // Disallow links and pages with these extensions
-        // Set to null to ignore this feature
-        // getting from the settings file:
-        deniedExtensions = settings.get(ConfigTags.DeniedExtensions).contains("null") ? null : settings.get(ConfigTags.DeniedExtensions);
-
-        // Define a whitelist of allowed domains for links and pages
-        // An empty list will be filled with the domain from the sut connector
-        // Set to null to ignore this feature
-        // getting from the settings file:
-        domainsAllowed = settings.get(ConfigTags.DomainsAllowed).contains("null") ? null : settings.get(ConfigTags.DomainsAllowed);
-
-        // If true, follow links opened in new tabs
-        // If false, stay with the original (ignore links opened in new tabs)
-        // getting from the settings file:
-        WdDriver.followLinks = settings.get(ConfigTags.FollowLinks);
-
-        //Force the browser to run in full screen mode
-        WdDriver.fullScreen = true;
-
-        //Force webdriver to switch to a new tab if opened
-        //This feature can block the correct display of select dropdown elements 
-        WdDriver.forceActivateTab = true;
-		 */
-
-		// URL + form name, username input id + value, password input id + value
-		// Set login to null to disable this feature
-		//TODO put into settings file
-		login = Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
-		username = Pair.from("username", "");
-		password = Pair.from("password", "");
-
 		// List of atributes to identify and close policy popups
 		// Set to null to disable this feature
 		//TODO put into settings file
 		policyAttributes = ArrayListMultimap.create();
-		policyAttributes.put("id", "_cookieDisplay_WAR_corpcookieportlet_necessaryCookiesButton");
+		policyAttributes.put("class", "lfr-btn-label");
 	}
 
 	/**
@@ -136,6 +99,16 @@ public class Protocol_webdriver_remote_webcomponent extends WebdriverProtocol {
 	@Override
 	protected void beginSequence(SUT system, State state) {
 		super.beginSequence(system, state);
+
+		/** 
+		 * Trigger Parabank Login actions
+		 * triggeredClickAction and triggeredTypeAction methods
+		 * Execute this Login with WdRemote actions instead of GUI level actions
+		 */
+		waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","username", "john", state, system, 5,1.0);
+		waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","password", "demo", state, system, 5,1.0);
+		waitAndLeftClickWidgetWithMatchingTag("value", "Log In", state, system, 5, 1.0);
+		Util.pause(1);
 	}
 
 	/**
@@ -300,11 +273,23 @@ public class Protocol_webdriver_remote_webcomponent extends WebdriverProtocol {
 	}
 
 	/**
-	 * Instead of use leftClickAt Windows level Action, use WdRemoteClickAction. 
+	 * When executing triggered actions such as login or click popup cookies, 
+	 * instead of using leftClickAt Windows level Action, use WdRemoteClickAction. 
 	 */
 	@Override
-	protected Action clickForcedPopupWidget(StdActionCompiler ac, Widget widget) {
+	protected Action triggeredClickAction(State state, Widget widget) {
+		StdActionCompiler ac = new AnnotatingActionCompiler();
 		return new WdRemoteClickAction((WdWidget)widget);
+	}
+
+	/**
+	 * When executing triggered actions such as login or click popup cookies, 
+	 * instead of using clickTypeInto Windows level Action, use WdRemoteTypeAction. 
+	 */
+	@Override
+	protected Action triggeredTypeAction(State state, Widget widget, String textToType, boolean replaceText) {
+		StdActionCompiler ac = new AnnotatingActionCompiler();
+		return new WdRemoteTypeAction((WdWidget)widget, textToType);
 	}
 
 	/**

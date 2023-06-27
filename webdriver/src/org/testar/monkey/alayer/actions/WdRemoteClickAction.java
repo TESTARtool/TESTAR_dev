@@ -122,4 +122,9 @@ public class WdRemoteClickAction extends TaggableBase implements Action {
 	public String toString(Role... discardParameters) {
 		return toShortString();
 	}
+
+	@Override
+	public String toString() {
+		return toShortString();
+	}
 }
