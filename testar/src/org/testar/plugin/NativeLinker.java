@@ -41,6 +41,10 @@ import org.testar.monkey.alayer.webdriver.WdStateBuilder;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.monkey.alayer.windows.*;
+import org.testar.monkey.alayer.yolo.YoloCanvas;
+import org.testar.monkey.alayer.yolo.YoloFramework;
+import org.testar.monkey.alayer.yolo.YoloStateBuilder;
+import org.testar.monkey.alayer.yolo.enums.YoloRoles;
 import org.testar.monkey.alayer.android.AndroidAppiumFramework;
 import org.testar.monkey.alayer.android.AndroidCanvas;
 import org.testar.monkey.alayer.android.AndroidStateBuilder;
@@ -113,6 +117,14 @@ public class NativeLinker {
 		PLATFORM_OS.remove(OperatingSystems.IOS);
 	}
 
+	public static void addYOLO() {
+		PLATFORM_OS.add(OperatingSystems.YOLO);
+	}
+
+	public static void cleanYOLO() {
+		PLATFORM_OS.remove(OperatingSystems.YOLO);
+	}
+
 	public static Set<OperatingSystems> getPLATFORM_OS() {
 		return PLATFORM_OS;
 	}
@@ -133,6 +145,9 @@ public class NativeLinker {
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.IOS)) {
 			return new IOSStateBuilder(timeToFreeze);
+		}
+		if (PLATFORM_OS.contains(OperatingSystems.YOLO)) {
+			return new YoloStateBuilder(timeToFreeze);
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7)) {
@@ -169,6 +184,9 @@ public class NativeLinker {
 		if (PLATFORM_OS.contains(OperatingSystems.IOS)) {
 			return new IOSCanvas(pen);
 		}
+		if (PLATFORM_OS.contains(OperatingSystems.YOLO)) {
+			return new YoloCanvas(pen);
+		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			return GDIScreenCanvas.fromPrimaryMonitor(pen);
 			//return JavaScreenCanvas.fromPrimaryMonitor(pen);
@@ -195,6 +213,9 @@ public class NativeLinker {
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.IOS)) {
 			return IOSAppiumFramework.fromCapabilities(executableCommand);
+		}
+		if (PLATFORM_OS.contains(OperatingSystems.YOLO)) {
+			return YoloFramework.fromExecutable(executableCommand);
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7)) {
@@ -232,6 +253,9 @@ public class NativeLinker {
 		}
 		else if (PLATFORM_OS.contains(OperatingSystems.IOS)) {
 			return IOSAppiumFramework.fromAll();
+		}
+		else if (PLATFORM_OS.contains(OperatingSystems.YOLO)) {
+			return YoloFramework.fromAll();
 		}
 		else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return WinProcess.fromAll();
@@ -271,6 +295,9 @@ public class NativeLinker {
 			//TODO: Implement Emulator + internal android usage
 			return 0;
 		}
+		if (PLATFORM_OS.contains(OperatingSystems.YOLO)) {
+			return 0;
+		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return (int)(WinProcess.getMemUsage((WinProcess)nativeSUT) / 1024); // byte -> KB
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
@@ -294,6 +321,9 @@ public class NativeLinker {
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.IOS)) {
 			//TODO: Implement Emulator + internal android usage
+			return new long[]{0, 0, 0};
+		}
+		if (PLATFORM_OS.contains(OperatingSystems.YOLO)) {
 			return new long[]{0, 0, 0};
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
@@ -320,6 +350,9 @@ public class NativeLinker {
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.IOS)) {
 			return IOSRoles.rolesSet();
+		}
+		if (PLATFORM_OS.contains(OperatingSystems.YOLO)) {
+			return YoloRoles.rolesSet();
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return UIARoles.rolesSet();
