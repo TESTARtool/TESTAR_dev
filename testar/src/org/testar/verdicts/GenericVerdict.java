@@ -542,8 +542,8 @@ public class GenericVerdict {
                     Widget secondWidget = leafWidgetsRects.get(j).left();
                     
                     // no parent/child relationship and intersect then report
-					if(!isChildOf(firstWidget,secondWidget) && !isChildOf(secondWidget, firstWidget) && checkRectIntersection(rectOne, rectTwo) && firstWidget != secondWidget && 
-							firstWidget.get(WdTags.WebIsDisplayed) && secondWidget.get(WdTags.WebIsDisplayed)) {
+					if(!isChildOf(firstWidget,secondWidget) && !isChildOf(secondWidget, firstWidget) && checkRectIntersection(rectOne, rectTwo) && firstWidget != secondWidget 
+							/*&& firstWidget.get(WdTags.WebIsDisplayed) && secondWidget.get(WdTags.WebIsDisplayed)*/) {
                         
 						String firstMsg = clashedWidgetMsg(firstWidget, rectOne);
 
