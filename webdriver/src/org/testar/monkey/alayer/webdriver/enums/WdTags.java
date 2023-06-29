@@ -147,7 +147,12 @@ public class WdTags extends TagsBase {
    * Web display style of a widget.
    */
   public static final Tag<String> WebDisplay = from("WebDisplay", String.class);
-
+ 
+  /**
+   * Web element visibility is hidden or collapse.
+   */
+  public static final Tag<Boolean> WebIsHidden = from("WebIsHidden", Boolean.class);
+   
   /**
    * Web element XPath.
    */

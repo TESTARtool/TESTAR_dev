@@ -170,6 +170,7 @@ function wrapElementTestar(element, xOffset, yOffset) {
         textContent: "",
         value: element.value,
         display: computedStyle.getPropertyValue('display'),
+		visibility: computedStyle.visibility,
         styleOverflow: computedStyle.overflow,
         styleOverflowX: computedStyle.overflowX,
         styleOverflowY: computedStyle.overflowY,

@@ -71,7 +71,7 @@ public class WdElement extends TaggableBase implements Serializable {
   boolean isContentElement, isControlElement;
   boolean hasKeyboardFocus, isKeyboardFocusable;
   String acceleratorKey, accessKey;
-  String valuePattern, href, value, style, styleOverflow, styleOverflowX, styleOverflowY, stylePosition, target, alt, src;
+  String valuePattern, href, value, style, styleOverflow, styleOverflowX, styleOverflowY, stylePosition, target, alt, src, visibility;
 
   double zindex;
   double styleOpacity;
@@ -135,7 +135,8 @@ public class WdElement extends TaggableBase implements Serializable {
 	displayedWidth = (packedElement.get("displayedWidth") == null) ? 0 : castDimensionsToLong(packedElement.get("displayedWidth"));
 	displayedHeight = (packedElement.get("displayedHeight") == null) ? 0 : castDimensionsToLong(packedElement.get("displayedHeight"));
     maxLength = Integer.valueOf(attributeMap.getOrDefault("maxlength", "-1"));
-    disabled = Boolean.valueOf(attributeMap.getOrDefault("disabled", "false"));
+    disabled = attributeMap.containsKey("disabled"); // when attribute disabled is present, then element is disabled (no matter its value). See: https://www.w3schools.com/TAGS/att_disabled.asp
+	visibility = (packedElement.get("visibility") == null) ? "" : (String) packedElement.get("visibility");
     xpath = (packedElement.get("xpath") == null) ? "" : (String) packedElement.get("xpath");
 
     String classesString = attributeMap.getOrDefault("class", "");
@@ -157,7 +158,7 @@ public class WdElement extends TaggableBase implements Serializable {
     isKeyboardFocusable = getIsFocusable();
     hasKeyboardFocus = (Boolean) packedElement.get("hasKeyboardFocus");
 
-    enabled = !Constants.hiddenTags.contains(tagName);
+    enabled = !Constants.hiddenTags.contains(tagName) && !disabled;
     if (display != null && display.toLowerCase().equals("none")) {
       enabled = false;
     }

@@ -182,6 +182,10 @@ public class GenericVerdict {
     // forget to remove that temporary code, then this text can be shown in a production release of the software.
 	public static Verdict CommonTestOrDummyPhrases(State state, Tag<String> tagTextChecker)
 	{
+		// If this method is NOT enabled, just return verdict OK
+		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
+		if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+		
 		Verdict verdict = Verdict.OK;
 		String patternRegex = "[Dd]ummy|[Tt]est][Dd]ebug";
 		Pattern pattern = Pattern.compile(patternRegex);
@@ -211,6 +215,10 @@ public class GenericVerdict {
     // Using the SensitiveDataList.txt file is the preferred way, because the sensitive data is then not in the protocol and you don't have to rewrite the data as a regular expression.
 	public static Verdict SensitiveData(State state, Tag<String> tagTextChecker, String sensitiveTextPatternRegEx)
 	{
+		// If this method is NOT enabled, just return verdict OK
+		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
+		if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+		
 		Verdict verdict = Verdict.OK;
 		Pattern pattern = Pattern.compile(sensitiveTextPatternRegEx);
 		
@@ -272,6 +280,10 @@ public class GenericVerdict {
 	// GOOD: für
     public static Verdict UnicodeReplacementCharacter(State state, Tag<String> tagTextChecker)
 	{
+		// If this method is NOT enabled, just return verdict OK
+		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
+		if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+		
 		Verdict verdict = Verdict.OK;
 		String patternRegex = ".*�.*"; // Look for a Unicode Replacement character.
 		Pattern pattern = Pattern.compile(patternRegex);
@@ -306,6 +318,10 @@ public class GenericVerdict {
     // based on the work of "Towards an evaluation of graphical user interfaces aesthetics based on metrics" Zen, Mathieu ; Vanderdonckt, Jean
     // A default threshold value is around 50.0   
 	public static Verdict WidgetAlignmentMetric(State state, double thresholdValue) {
+		// If this method is NOT enabled, just return verdict OK
+		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
+		if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+		
 		Verdict widgetAlignmentMetricVerdict = Verdict.OK;
 
 	    ArrayList<Rect> regions = getRegions(state);
@@ -327,6 +343,10 @@ public class GenericVerdict {
     // based on the work of "Towards an evaluation of graphical user interfaces aesthetics based on metrics" Zen, Mathieu ; Vanderdonckt, Jean
     // A default threshold value is around 50.0
     public static Verdict WidgetBalanceMetric(State state, double tresholdValue) {
+		// If this method is NOT enabled, just return verdict OK
+		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
+		if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+		
 		Verdict widgetBalanceMetricVerdict = Verdict.OK;
 
         Rect sutRect = (Rect) state.child(0).get(Tags.Shape, null);
@@ -350,6 +370,10 @@ public class GenericVerdict {
     // based on the work of "Towards an evaluation of graphical user interfaces aesthetics based on metrics" Zen, Mathieu ; Vanderdonckt, Jean
     // A default threshold value is around 50.0
     public static Verdict WidgetCenterAlignmentMetric(State state, double tresholdValue) {
+		// If this method is NOT enabled, just return verdict OK
+		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
+		if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+		
 		Verdict widgetCenterAlignmentVerdict = Verdict.OK;
 
 		ArrayList<Rect> regions = getRegions(state);
@@ -371,6 +395,10 @@ public class GenericVerdict {
     // based on the work of "Towards an evaluation of graphical user interfaces aesthetics based on metrics" Zen, Mathieu ; Vanderdonckt, Jean
     // A default threshold value is around 50.0
     public static Verdict WidgetConcentricityMetric(State state, double tresholdValue) {
+		// If this method is NOT enabled, just return verdict OK
+		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
+		if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+		
 		Verdict widgetConcentricityVerdict = Verdict.OK;
 
         Rect sutRect = (Rect) state.child(0).get(Tags.Shape, null);
@@ -395,6 +423,10 @@ public class GenericVerdict {
     // based on the work of "Towards an evaluation of graphical user interfaces aesthetics based on metrics" Zen, Mathieu ; Vanderdonckt, Jean
     // A default threshold value is around minValue: 25, maxValue 75
     public static Verdict WidgetDensityMetric(State state, double tresholdMinValue, double tresholdMaxValue) {
+		// If this method is NOT enabled, just return verdict OK
+		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
+		if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+		
 		Verdict widgetDensityVerdict = Verdict.OK;
 
         Rect sutRect = (Rect) state.child(0).get(Tags.Shape, null);
@@ -426,6 +458,10 @@ public class GenericVerdict {
     // based on the work of "Towards an evaluation of graphical user interfaces aesthetics based on metrics" Zen, Mathieu ; Vanderdonckt, Jean
     // A default threshold value is around 50.0
     public static Verdict WidgetSimplicityMetric(State state, double tresholdValue) {
+		// If this method is NOT enabled, just return verdict OK
+		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
+		if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+		
 		Verdict widgetSimplicityVerdict = Verdict.OK;
         Rect sutRect = (Rect) state.child(0).get(Tags.Shape, null);
 		if (sutRect.width() > 0 && sutRect.height() > 0)
@@ -459,6 +495,10 @@ public class GenericVerdict {
 	 * @return
 	 */
 	public static Verdict WidgetClashDetection(State state,  List<Role> ignoredRoles,  List<String> ignoredClasses, boolean joinVerdicts, boolean checkLeafWidgetsOnly, boolean checkWebStyles) {
+		// If this method is NOT enabled, just return verdict OK
+		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
+		if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+		
 		Verdict widgetsClasDetectionVerdict = Verdict.OK;
 
 		// Prepare a list that contains all the Rectangles from the leaf widgets
@@ -502,7 +542,8 @@ public class GenericVerdict {
                     Widget secondWidget = leafWidgetsRects.get(j).left();
                     
                     // no parent/child relationship and intersect then report
-					if(!isChildOf(firstWidget,secondWidget) && !isChildOf(secondWidget, firstWidget) && checkRectIntersection(rectOne, rectTwo) && firstWidget != secondWidget) {
+					if(!isChildOf(firstWidget,secondWidget) && !isChildOf(secondWidget, firstWidget) && checkRectIntersection(rectOne, rectTwo) && firstWidget != secondWidget && 
+							firstWidget.get(WdTags.WebIsDisplayed) && secondWidget.get(WdTags.WebIsDisplayed)) {
                         
 						String firstMsg = clashedWidgetMsg(firstWidget, rectOne);
 
@@ -564,7 +605,7 @@ public class GenericVerdict {
 	private static boolean isRoleWithoutAnyRealEstateOnCanvas(Widget widget)
 	{
 		// Fixed roles that should be ignored, because they do not take any real estate on the canvas
-		List<Role> ignoreSpecificRoles = Arrays.asList(WdRoles.WdCOL, WdRoles.WdCOLGROUP, WdRoles.WdTR, WdRoles.WdSPAN);
+		List<Role> ignoreSpecificRoles = Arrays.asList(WdRoles.WdCOL, WdRoles.WdCOLGROUP, WdRoles.WdTR, WdRoles.WdSPAN, WdRoles.WdUnknown);
 		if (ignoreSpecificRoles.contains(widget.get(Tags.Role, Roles.Widget))) return true;
 		return false;
 	}
@@ -599,7 +640,12 @@ public class GenericVerdict {
 	}
 
 	private static boolean isContainedInAllParentsRectOrIsAllowedToBeOutsideParentRects(Widget startWidget, Widget targetWidget, boolean checkWebStyles) {
-        Widget parent = startWidget.parent();
+        
+		if (checkWebStyles) {
+        	if (!startWidget.get(WdTags.WebIsEnabled, true) || startWidget.get(WdTags.WebIsHidden)) return false;
+        }
+        	
+		Widget parent = startWidget.parent();
 		if(parent == null) return true;
 
         Rect targetWidgetRect = (Rect) targetWidget.get(Tags.Shape, null);
@@ -611,8 +657,7 @@ public class GenericVerdict {
             return isContainedInAllParentsRectOrIsAllowedToBeOutsideParentRects(parent, targetWidget, checkWebStyles);
         else
         { 
-            if (checkWebStyles)
-            {
+        	if (checkWebStyles) {
                 String overflowStyle = parent.get(WdTags.WebStyleOverflow, "");
                 String overflowStyleX = parent.get(WdTags.WebStyleOverflowX, "");
                 String overflowStyleY = parent.get(WdTags.WebStyleOverflowY, "");

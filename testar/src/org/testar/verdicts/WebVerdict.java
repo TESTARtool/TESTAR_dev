@@ -111,7 +111,6 @@ public class WebVerdict {
 		Verdict decimalsVerdict = Verdict.OK;
 		for(Widget w : state) {
 			
-			
 			// If the widget contains a web text that is a double number
 			if(!w.get(WdTags.WebTextContent, "").isEmpty()) {
 
@@ -246,7 +245,7 @@ public class WebVerdict {
 		Verdict emptySelectListVerdict = Verdict.OK;
 		for(Widget w : state) {
 			// For the web select elements with an Id property
-			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) && !w.get(WdTags.WebId, "").isEmpty()) {
+			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) && !w.get(WdTags.WebId, "").isEmpty() && w.get(WdTags.WebIsEnabled, true)) {
 				String elementId = w.get(WdTags.WebId, "");
 				String query = String.format("return ((document.getElementById('%s') != null) ? document.getElementById('%s').length : 3)", elementId, elementId);
 				Long selectItemsLength = (Long) WdDriver.executeScript(query);
@@ -347,7 +346,7 @@ public class WebVerdict {
 		Verdict selectElementVerdict = Verdict.OK;
 		for(Widget w : state) {
 			// For the web select elements with an Id property
-			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) && !w.get(WdTags.WebId, "").isEmpty()) {
+			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) && !w.get(WdTags.WebId, "").isEmpty() && w.get(WdTags.WebIsEnabled, true)) {
 				String elementId = w.get(WdTags.WebId, "");
 				String query = String.format("return ((document.getElementById('%s') != null) ? document.getElementById('%s').length : 3)", elementId, elementId);
 				Long selectItemsLength = (Long) WdDriver.executeScript(query);
@@ -550,7 +549,7 @@ public class WebVerdict {
 		// If it is enabled, then execute the verdict implementation
 		Verdict textAreaVerdict = Verdict.OK;
 		for(Widget w : state) {
-			if(roles.contains(w.get(Tags.Role, Roles.Widget)) && w.get(WdTags.WebMaxLength) == 0) {
+			if(roles.contains(w.get(Tags.Role, Roles.Widget)) && w.get(WdTags.WebMaxLength) == 0 && w.get(WdTags.WebIsEnabled, true)) {
 
 				String verdictMsg = String.format("TextArea Widget with 0 Length detected! Role: %s , Path: %s , WebId: %s", 
 						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""));
@@ -592,7 +591,7 @@ public class WebVerdict {
 		Verdict radioInputVerdict = Verdict.OK;
 
 		for(Widget w : state) {
-            if (isRadioInput(w)) {
+            if (isRadioInput(w) && w.get(WdTags.WebIsEnabled, true)) {
                 Widget form = findParentByRole(w, WdRoles.WdFORM);
                 if (form != null)
                 {
@@ -649,6 +648,10 @@ public class WebVerdict {
 	// Exception to this rule may be row totals or column totals. 
 	public static Verdict ZeroNumbersInTable(State state)
 	{
+		// If this method is NOT enabled, just return verdict OK
+		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
+		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
+		
 		Verdict verdict = Verdict.OK;
 		String patternRegex = "\\s0[\\.,]0\\s";
 		Pattern pattern = Pattern.compile(patternRegex);
@@ -678,32 +681,38 @@ public class WebVerdict {
 	// Detect images which are not shown in their natural resolution.
 	// If the natural width is 1000 and the displayed width is 2000, then the image is blown up and may look pixelized.
 	// If the natural width is 1000 and the displayed width is 500, then the image is shown smaller than it really is and uses more bandwidth to download the image than needed which leads to performance issues.
-	// To ignore small images a minimal width and height can be given because small images are sometimes used as 'fillers' or they don't have much bandwidth issues. The default minimum values are 0.
-	// BAD:  Natural width : 1000
-	//       Displayed width: 2000
-	// GOOD: Natural width : 1000
-	//       Displayed width: 1000
+	// To ignore small images a minimal width and height can be given because small images are sometimes used as 'fillers' or they don't have much bandwidth issues. The default minimum values are 1.
+	// BAD:  Natural size : 1000 x 1000 px
+	//       Displayed size: 2000 x 2000 px
+	// GOOD: Natural size : 1000 x 1000 px
+	//       Displayed size: 1000 x 1000 px
 	public static Verdict imageResolutionDifferences(State state, long minimalWidth, long minimalHeight)
 	{
+		// If this method is NOT enabled, just return verdict OK
+		String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
+		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
+
 		Verdict verdict = Verdict.OK;
 
 		for (Widget w : state)
 		{
 			Long naturalWidth = w.get(WdTags.WebNaturalWidth);
 			Long naturalHeight = w.get(WdTags.WebNaturalHeight);
-			if (naturalWidth > minimalWidth && naturalHeight > minimalHeight)
-			{
-				Rect widgetRect = (Rect)w.get(Tags.Shape);
-
-				Long displayedWidth = w.get(WdTags.WebDisplayedWidth);
-				Long displayedHeight = w.get(WdTags.WebDisplayedHeight);
-
-				if (!naturalWidth.equals(displayedWidth) || !naturalHeight.equals(displayedHeight))
+			Long displayedWidth = w.get(WdTags.WebDisplayedWidth);
+			Long displayedHeight = w.get(WdTags.WebDisplayedHeight);
+			if (w.get(WdTags.WebIsEnabled, true) && !w.get(WdTags.WebIsHidden))
+			{			
+				if (naturalWidth >= minimalWidth && naturalHeight >= minimalHeight && displayedWidth >= minimalWidth && displayedHeight >= minimalHeight)
 				{
-					String verdictMsg = String.format("Detected image resolution difference! Role: %s , Path: %s , Natural width: %d , Displayed width: %d , Natural height: %d , Displayed height: %d , Src: %s, Alt: %s",
-						w.get(Tags.Role), w.get(Tags.Path), naturalWidth, displayedWidth, naturalHeight, displayedHeight, w.get(WdTags.WebSrc), w.get(WdTags.WebAlt));
+					if (!naturalWidth.equals(displayedWidth) || !naturalHeight.equals(displayedHeight))
+					{
+						Rect widgetRect = (Rect)w.get(Tags.Shape);
+										
+						String verdictMsg = String.format("Detected image resolution difference! Role: %s , Path: %s , Natural size %d x %d px , Displayed size: %d x %d px, Src: %s, Alt: %s",
+							w.get(Tags.Role), w.get(Tags.Path), naturalWidth, naturalHeight, displayedWidth, displayedHeight, w.get(WdTags.WebSrc), w.get(WdTags.WebAlt));
 
-					verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList(widgetRect)));
+						verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList(widgetRect)));
+					}
 				}
 			}
 		}
