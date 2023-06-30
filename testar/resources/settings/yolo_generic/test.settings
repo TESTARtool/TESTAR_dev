@@ -31,7 +31,7 @@ SUTConnectorValue = suts/Calculator.jar
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 2
+Sequences = 1
 SequenceLength = 5
 
 #################################################################
@@ -107,6 +107,16 @@ ProtocolClass = yolo_generic/Protocol_yolo_generic
 AbstractStateAttributes = WidgetControlType
 
 #################################################################
+# Yolo settings to configure the location of the project and model
+#################################################################
+
+YoloProjectAbsolutePath = C:/Users/FernandoTESTAR/Desktop/Yolo/yolov5
+YoloPythonServiceRelativePath = detectTESTAR.py
+YoloModelAbsolutePath = C:/Users/FernandoTESTAR/Desktop/Yolo/yolov5/yolo_weights.pt
+YoloInputImagesDirectory = C:/Users/FernandoTESTAR/Desktop/Yolo/yolov5/data/images/input
+YoloModelOutputDirectory = C:/Users/FernandoTESTAR/Desktop/Yolo/yolov5/data/images/output
+
+#################################################################
 # Other more advanced settings
 #################################################################
 
@@ -126,7 +136,7 @@ Delete =
 MaxTime = 3.1536E7
 TimeToWaitAfterAction = 2
 StartupTime = 2.0
-TimeToFreeze = 30.0
+TimeToFreeze = 60.0
 StopGenerationOnFault = true
 CopyFromTo =
 VisualizeActions = false

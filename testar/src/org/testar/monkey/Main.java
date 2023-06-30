@@ -574,6 +574,12 @@ public class Main {
 			defaults.add(Pair.from(BrowserFullScreen, true));
 			defaults.add(Pair.from(SwitchNewTabs, true));
 
+			defaults.add(Pair.from(YoloProjectAbsolutePath, "C:/Users/username/Desktop/yolov5"));
+			defaults.add(Pair.from(YoloPythonServiceRelativePath, "detectTESTAR.py"));
+			defaults.add(Pair.from(YoloModelAbsolutePath, "C:/Users/username/Desktop/yolov5/yolo_weights.pt"));
+			defaults.add(Pair.from(YoloInputImagesDirectory, "C:/Users/username/Desktop/yolov5/data/images/input"));
+			defaults.add(Pair.from(YoloModelOutputDirectory, "C:/Users/username/Desktop/yolov5/data/images/input"));
+
 			/*
 			//TODO web driver settings for login feature
 			defaults.add(Pair.from(Login, null)); // null = feature not enabled

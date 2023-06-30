@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,6 +31,8 @@
 
 package org.testar.plugin;
 
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Settings;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.devices.ProcessHandle;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
@@ -43,6 +45,7 @@ import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.monkey.alayer.windows.*;
 import org.testar.monkey.alayer.yolo.YoloCanvas;
 import org.testar.monkey.alayer.yolo.YoloFramework;
+import org.testar.monkey.alayer.yolo.YoloProcHandle;
 import org.testar.monkey.alayer.yolo.YoloStateBuilder;
 import org.testar.monkey.alayer.yolo.enums.YoloRoles;
 import org.testar.monkey.alayer.android.AndroidAppiumFramework;
@@ -63,14 +66,14 @@ import static org.testar.monkey.alayer.windows.UIARoles.*;
  * A native connector.
  */
 public class NativeLinker {
-	
+
 	private NativeLinker() {}
-	
+
 	private static long lastCPUquery = 0;
 
 	private static EnumSet<OperatingSystems> PLATFORM_OS = determinePlatform();
 	private static String osName;
-	
+
 	/**
 	 * Determines the platform this executable is currently running on.
 	 * @return The Operating system the executable is currently running on.
@@ -96,7 +99,7 @@ public class NativeLinker {
 	public static void addWdDriverOS() {
 		PLATFORM_OS.add(OperatingSystems.WEBDRIVER);
 	}
-	
+
 	public static void cleanWdDriverOS() {
 		PLATFORM_OS.remove(OperatingSystems.WEBDRIVER);
 	}
@@ -136,7 +139,11 @@ public class NativeLinker {
 	 * @param SUTProcesses A regex of the set of processes that conform the SUT.
 	 * @return A StateBuilder instance.
 	 */
-	public static StateBuilder getNativeStateBuilder(Double timeToFreeze, boolean accessBridgeEnabled, String SUTProcesses) {
+	public static StateBuilder getNativeStateBuilder(Settings settings) {
+		Double timeToFreeze = settings.get(ConfigTags.TimeToFreeze);
+		boolean accessBridgeEnabled = settings.get(ConfigTags.AccessBridgeEnabled);
+		String SUTProcesses = settings.get(ConfigTags.SUTProcesses);
+		
 		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
 			return new WdStateBuilder(timeToFreeze);
 		}
@@ -147,7 +154,12 @@ public class NativeLinker {
 			return new IOSStateBuilder(timeToFreeze);
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.YOLO)) {
-			return new YoloStateBuilder(timeToFreeze);
+			return new YoloStateBuilder(timeToFreeze, 
+					settings.get(ConfigTags.YoloProjectAbsolutePath, ""), 
+					settings.get(ConfigTags.YoloPythonServiceRelativePath, ""), 
+					settings.get(ConfigTags.YoloModelAbsolutePath, ""),
+					settings.get(ConfigTags.YoloInputImagesDirectory, ""),
+					settings.get(ConfigTags.YoloModelOutputDirectory, ""));
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7)) {
@@ -164,7 +176,7 @@ public class NativeLinker {
 		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
 			return new AtSpiStateBuilder(timeToFreeze);
 		}
-		
+
 		System.out.println("TESTAR detected OS: " + osName + " and this is not yet supported. If the detected OS is wrong, please contact the TESTAR team at info@testar.org. Exiting with Exception.");
 		throw new UnsupportedPlatformException();
 	}
@@ -185,7 +197,7 @@ public class NativeLinker {
 			return new IOSCanvas(pen);
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.YOLO)) {
-			return new YoloCanvas(pen);
+			return YoloCanvas.fromPrimaryMonitor(pen);
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			return GDIScreenCanvas.fromPrimaryMonitor(pen);
@@ -277,6 +289,8 @@ public class NativeLinker {
 			return new WinProcHandle(processPID);
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return new LinuxProcessHandle(processPID);
+		else if (PLATFORM_OS.contains(OperatingSystems.YOLO))
+			return new YoloProcHandle(processPID);
 		throw new UnsupportedPlatformException();
 	}
 

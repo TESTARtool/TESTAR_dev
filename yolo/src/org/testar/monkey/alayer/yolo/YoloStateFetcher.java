@@ -33,15 +33,23 @@ package org.testar.monkey.alayer.yolo;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
+
+import java.awt.AWTException;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 public class YoloStateFetcher implements Callable<YoloState> {
 
 	private final SUT system;
-	public String yoloWeights = "";
+	private final YoloPythonModel yoloPyModel;
 
-	public YoloStateFetcher(SUT system) {
+	public YoloStateFetcher(SUT system, YoloPythonModel yoloPyModel) {
 		this.system = system;
+		this.yoloPyModel = yoloPyModel;
 	}
 
 	public static YoloRootElement buildRoot(SUT system) throws StateBuildException {
@@ -85,11 +93,39 @@ public class YoloStateFetcher implements Callable<YoloState> {
 			return rootElement;
 
 		rootElement.pid = system.get(Tags.PID, (long)-1);
-		System.out.println("YoloStateFetcher buildYoloSkeleton");
-		System.out.println("rootElement.pid: " + rootElement.pid);
 
-		// Here we invoke the yolo model with the desired screenshot
-		// Obtain the number of yolo elements to create the widget tree
+		// Here we indicate to the Yolo model the desired screenshot to analyze
+		// Then, we obtain the existing Yolo elements to create the widget tree
+		List<String> yoloElements = new ArrayList<>();
+		try {
+			yoloElements = yoloPyModel.processImageWithYolo();
+		} catch (IOException | AWTException | InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		// Get the screen resolution
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		int screenWidth = (int) screenSize.getWidth();
+		int screenHeight = (int) screenSize.getHeight();
+
+		rootElement.normalizedRect = Rect.from(0, 0, screenWidth, screenHeight);
+
+		rootElement.children = new ArrayList<YoloElement>(yoloElements.size());
+		for (String line : yoloElements) {
+			YoloElement childElement = new YoloElement(rootElement);
+			rootElement.children.add(childElement);
+			childElement.zindex = 1.0;
+
+			String[] values = line.split(" ");
+			String type = values[0];
+			double x = Double.parseDouble(values[1]) * screenWidth;
+			double y = Double.parseDouble(values[2]) * screenHeight;
+			double width = Double.parseDouble(values[3]) * screenWidth;
+			double height = Double.parseDouble(values[4]) * screenHeight;
+
+			childElement.widgetType = type;
+			childElement.normalizedRect = Rect.from(x, y, width, height);
+		}
 
 		buildTLCMap(rootElement);
 

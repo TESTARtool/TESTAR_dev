@@ -31,6 +31,7 @@
 package org.testar.monkey.alayer.yolo.enums;
 
 import org.testar.monkey.alayer.Rect;
+import org.testar.monkey.alayer.Role;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.TagsBase;
 
@@ -44,6 +45,6 @@ public class YoloTags extends TagsBase {
 
 	public static final Tag<String> YoloWidgetType = from("YoloWidgetType", String.class);
 
-	public static final Tag<YoloRoles> YoloWidgetRole = from("YoloWidgetRole", YoloRoles.class);
+	public static final Tag<Role> YoloWidgetRole = from("YoloWidgetRole", Role.class);
 
 }

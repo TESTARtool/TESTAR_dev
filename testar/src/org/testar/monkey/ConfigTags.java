@@ -285,6 +285,25 @@ public final class ConfigTags {
 			"Sets whether create a HTML or NUNIT report");
 
 	/**
+	 * Yolo plugin settings
+	 */
+
+	public static final Tag<String> YoloProjectAbsolutePath = Tag.from("YoloProjectAbsolutePath", String.class, 
+			"Absolute Path that points to an installed Yolo project");
+
+	public static final Tag<String> YoloPythonServiceRelativePath = Tag.from("YoloPythonServiceRelativePath", String.class, 
+			"Relative Path that points to the python service that must be inside YoloProjectAbsolutePath");
+
+	public static final Tag<String> YoloModelAbsolutePath = Tag.from("YoloModelAbsolutePath", String.class, 
+			"Absolute Path that points to the yolo model we want to use");
+
+	public static final Tag<String> YoloInputImagesDirectory = Tag.from("YoloInputImagesDirectory", String.class, 
+			"Absolute Path that points to the directory on which TESTAR will save the images that Yolo needs to process");
+
+	public static final Tag<String> YoloModelOutputDirectory = Tag.from("YoloModelOutputDirectory", String.class, 
+			"Absolute Path that points to the output directory that Yolo uses to save the widget coordinates");
+
+	/**
 	 * Other settings
 	 */
 

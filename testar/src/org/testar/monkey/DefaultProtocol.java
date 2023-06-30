@@ -327,11 +327,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//EventHandler is implemented in RuntimeControlsProtocol (super class):
 		eventHandler = initializeEventHandler();
 
-		builder = NativeLinker.getNativeStateBuilder(
-				settings.get(ConfigTags.TimeToFreeze),
-				settings.get(ConfigTags.AccessBridgeEnabled),
-				settings.get(ConfigTags.SUTProcesses)
-				);
+		builder = NativeLinker.getNativeStateBuilder(settings);
 
 		if ( mode() == Modes.Generate || /*mode() == Modes.Record ||*/ mode() == Modes.Replay ) {
 			//Create the output folders

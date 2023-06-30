@@ -33,6 +33,8 @@ import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.*;
+import org.testar.monkey.alayer.yolo.enums.YoloRoles;
+import org.testar.monkey.alayer.yolo.enums.YoloTags;
 import org.testar.monkey.Settings;
 import org.testar.protocols.YoloProtocol;
 
@@ -134,6 +136,11 @@ public class Protocol_yolo_generic extends YoloProtocol {
 		return actions;
 	}
 
+	@Override
+	protected boolean isClickable(Widget w) {
+		return w.get(YoloTags.YoloWidgetType, "noType").equals("0");
+	}
+	
 	/**
 	 * Select one of the available actions using an action selection algorithm (for example random action selection)
 	 *

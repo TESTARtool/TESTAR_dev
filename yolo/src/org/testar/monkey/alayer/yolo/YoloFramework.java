@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.testar.monkey.Assert;
+import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.exceptions.SystemStopException;
@@ -70,6 +71,10 @@ public class YoloFramework extends SUTBase {
 
 			System.out.println("Yolo SUT started with PID: " + pid);
 			this.set(Tags.PID, pid);
+
+			// TODO: Improve GUI launch wait time
+			// We want to wait until the GUI of the SUT is launched
+			Util.pause(5);
 
 			yoloSUT = this;
 		} catch (IOException e) {

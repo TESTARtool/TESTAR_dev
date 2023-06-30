@@ -38,14 +38,30 @@ import java.util.concurrent.*;
 
 public class YoloStateBuilder implements StateBuilder {
 	private static final long serialVersionUID = 8199967877414181450L;
-	
+
 	private static final int defaultThreadPoolCount = 1;
 	private final double timeOut;
 	private transient ExecutorService executor;
+	//private final YoloDnnModel yoloModel;
+	private final YoloPythonModel yoloPyModel;
 
-	public YoloStateBuilder(double timeOut) {
+	public YoloStateBuilder(double timeOut, 
+			String yoloProjectAbsolutePath, 
+			String yoloPythonServiceRelativePath, 
+			String yoloModelAbsolutePath, 
+			String yoloInputImagesDirectory,
+			String yoloModelOutputDirectory) {
+
 		Assert.isTrue(timeOut > 0);
 		this.timeOut = timeOut;
+
+		// In this YoloStateBuilder class we load and start the Yolo model only once
+		this.yoloPyModel = new YoloPythonModel(
+				yoloProjectAbsolutePath, 
+				yoloPythonServiceRelativePath, 
+				yoloModelAbsolutePath, 
+				yoloInputImagesDirectory, 
+				yoloModelOutputDirectory);
 
 		// Needed to be able to schedule asynchronous tasks conveniently.
 		executor = Executors.newFixedThreadPool(defaultThreadPoolCount);
@@ -54,7 +70,8 @@ public class YoloStateBuilder implements StateBuilder {
 	@Override
 	public State apply(SUT system) throws StateBuildException {
 		try {
-			Future<YoloState> future = executor.submit(new YoloStateFetcher(system));
+			// Future YoloStateFetcher calls send the images to the loaded Yolo model
+			Future<YoloState> future = executor.submit(new YoloStateFetcher(system, yoloPyModel));
 			YoloState state = future.get((long) (timeOut), TimeUnit.SECONDS);
 			return state;
 		}

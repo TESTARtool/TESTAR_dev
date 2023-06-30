@@ -8,4 +8,7 @@ sourceSets {
 
 dependencies {
     implementation project(':core')
+    implementation project(':windows')
+    // https://mvnrepository.com/artifact/org.openpnp/opencv
+    implementation group: 'org.openpnp', name: 'opencv', version: '4.6.0-0'
 }
