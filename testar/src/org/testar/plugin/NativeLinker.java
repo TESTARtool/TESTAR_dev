@@ -197,7 +197,7 @@ public class NativeLinker {
 			return new IOSCanvas(pen);
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.YOLO)) {
-			return YoloCanvas.fromPrimaryMonitor(pen);
+			return new YoloCanvas(pen);
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			return GDIScreenCanvas.fromPrimaryMonitor(pen);

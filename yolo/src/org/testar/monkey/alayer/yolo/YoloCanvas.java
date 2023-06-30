@@ -30,275 +30,91 @@
 
 package org.testar.monkey.alayer.yolo;
 
-import org.testar.monkey.Assert;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.geom.Point2D;
+
+import javax.swing.SwingUtilities;
+
 import org.testar.monkey.Pair;
-import org.testar.monkey.Util;
 import org.testar.monkey.alayer.Canvas;
-import org.testar.monkey.alayer.Color;
-import org.testar.monkey.alayer.FillPattern;
 import org.testar.monkey.alayer.Pen;
-import org.testar.monkey.alayer.StrokeCaps;
-import org.testar.monkey.alayer.StrokePattern;
-import org.testar.monkey.alayer.windows.Windows;
 
 public class YoloCanvas implements Canvas {
+	private TransparentPainter transparentPainter;
+	private double x, y, width, height;
+	private Pen defaultPen;
 
-	double x, y;
-	long width, height;
-	boolean running;
-	long hwnd, gdiplusToken, hScreen, hDC, hBitmap, pGraphics, hClearBrush;
-	int blendOp, blendFlags, blendSourceConstantAlpha, blendAlphaFormat;
-	Thread bgt;
-
-	Pen defaultPen;
-	double fontSize, strokeWidth;
-	String font;
-	StrokePattern strokePattern;
-	FillPattern fillPattern;
-	StrokeCaps strokeCaps;
-	Color color;
-	long pPen, pBrush, pFont, pFontFamily;
-
-	public static YoloCanvas fromPrimaryMonitor(){
-		return fromPrimaryMonitor(Pen.PEN_DEFAULT);
-	}
-
-	/**
-	 * Creates a ScreenCanvas for the system's primary monitor
-	 * @return ScreenCanvas for the primary monitor
-	 */
-	public static YoloCanvas fromPrimaryMonitor(Pen defaultPen){
-		long handle = Windows.GetPrimaryMonitorHandle();
-		long mi[] = Windows.GetMonitorInfo(handle);
-		long x = mi[1];
-		long y = mi[2];
-		long width = mi[3] - mi[1];
-		long height = mi[4] - mi[2];
-		return new YoloCanvas(x, y, width, height, defaultPen);
-	}
-
-	private class BackgroundThread implements Runnable{
-		public void run() {
-
-			blendOp = 0;
-			blendFlags = 0;
-			blendSourceConstantAlpha = 255;
-			blendAlphaFormat = (int)Windows.AC_SRC_ALPHA;
-
-			// create overlay window
-			hwnd = Windows.CreateWindowEx(Windows.WS_EX_LAYERED | Windows.WS_EX_TRANSPARENT  | Windows.WS_EX_TOOLWINDOW | 
-					Windows.WS_EX_TOPMOST |	Windows.WS_EX_NOACTIVATE, null,	"OverlayWindow", Windows.WS_OVERLAPPEDWINDOW,
-					(int)x, (int)y, width, height, 0,	0, Windows.GetCurrentModule(),	0);		
-
-			gdiplusToken = Windows.GdiplusStartup();
-			hScreen = Windows.GetDC(0);			
-			hDC = Windows.CreateCompatibleDC(hScreen);			
-			hBitmap = Windows.CreateCompatibleBitmap(hScreen, width, height);
-			Windows.SelectObject(hDC, hBitmap);
-			pGraphics = Windows.Gdiplus_Graphics_FromHDC(hDC);
-			hClearBrush = Windows.Gdiplus_SolidBrush_Create(255, 0, 0, 0);
-			running = true;
-
-			long[] hMsg;
-
-			while(running){
-				while((hMsg = Windows.PeekMessage(hwnd, 0, 0, Windows.PM_NOREMOVE)) != null){
-					Windows.GetMessage(hwnd, 0, 0 );
-					Windows.TranslateMessage(hMsg);
-					Windows.DispatchMessage(hMsg);
-				}
-				Util.pause(.1);
-				Windows.SetWindowPos(hwnd, Windows.HWND_TOPMOST, (int)x, (int)y, width, height, Windows.SWP_SHOWWINDOW);
-			}
-		}
-	}
-
-	public YoloCanvas(long x, long y, long width, long height){
-		this(x, y, width, height, Pen.PEN_DEFAULT);
-	}
-	
-	/**
-	 * Create a ScreenCanvas with the given dimensions.
-	 */
-	public YoloCanvas(double x, double y, long width, long height, Pen defaultPen){
-		Assert.notNull(defaultPen);
-		Assert.isTrue(width >= 0 && height >= 0);
-
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
+	public YoloCanvas(Pen defaultPen) {
 		this.defaultPen = defaultPen;
-
-		bgt = new Thread(new BackgroundThread());
-		bgt.setDaemon(true);  // we want the VM to shutdown even if our background thread is still running
-		bgt.start();
-
-		while(!running)
-			Util.pause(0.01);
-		
-		pPen = Windows.Gdiplus_Pen_Create(0, 0, 0, 0, 1);
-		pBrush = Windows.Gdiplus_SolidBrush_Create(0, 0, 0, 0);
-		
-		adjustPen(defaultPen);
-	}
-
-	public void release(){
-		if(!running)
-			return;
-		running = false;
-		
-		try { bgt.join();}
-		catch (InterruptedException e) { e.printStackTrace(); }
-
-		if(pFont != 0)
-			Windows.Gdiplus_Font_Destroy(pFont);
-		if(pFontFamily != 0)
-			Windows.Gdiplus_FontFamily_Destroy(pFontFamily);
-		if(pPen != 0)
-			Windows.Gdiplus_Pen_Destroy(pPen);
-		if(pBrush != 0)
-			Windows.Gdiplus_SolidBrush_Destroy(pBrush);
-		if(hClearBrush != 0)
-			Windows.Gdiplus_SolidBrush_Destroy(hClearBrush);
-		if(gdiplusToken != 0)
-			Windows.GdiplusShutdown(gdiplusToken);
-	}
-
-	public void finalize(){ release(); }
-
-	private void check(){
-		if(!running)
-			throw new IllegalStateException("YoloCanvas window is not running!");
-	}
-
-	public double width() { return width; }
-	public double height() { return height; }
-	public double x() { return x; }
-	public double y() { return y; }
-	public void begin() { check(); }
-	public Pen defaultPen() { return defaultPen; }
-
-	public void end() {
-		check();
-		Windows.UpdateLayeredWindow(hwnd, hScreen, (int)x, (int)y, width, height, hDC, 0, 0, 0, 
-				blendOp, blendFlags, blendSourceConstantAlpha, blendAlphaFormat, 
-				Windows.ULW_ALPHA);
-	}
-	
-	public void line(Pen pen, double x1, double y1, double x2, double y2) {
-		check();
-		adjustPen(pen);
-		Windows.Gdiplus_Graphics_DrawLine(pGraphics, pPen, x1 - this.x, y1 - this.y, x2 - this.x, y2 - this.y);
-	}
-
-	public void text(Pen pen, double x, double y, double angle, String text) {
-		check();
-		adjustPen(pen);
-		Windows.Gdiplus_Graphics_DrawString(pGraphics, text, pFont, x - this.x, y - this.y, pBrush);
-	}
-
-	public void clear(double x, double y, double width, double height) {
-		check();
-		Windows.Gdiplus_Graphics_FillRectangle(pGraphics, hClearBrush, x - this.x, y - this.y, width, height);
-	}
-
-	public void image(Pen pen, double x, double y, double width, double height,
-			int[] image, int imageWidth, int imageHeight) {
-		check();
-		adjustPen(pen);
-		Windows.Gdiplus_Graphics_DrawImage(pGraphics, (int)(x - this.x), (int)(y - this.y), (int)width, (int)height, imageWidth, imageHeight, Windows.PixelFormat32bppARGB, image);
-	}
-
-	public void ellipse(Pen pen, double x, double y, double width, double height) {
-		check();
-		adjustPen(pen);
-		if(fillPattern == FillPattern.Solid)
-			Windows.Gdiplus_Graphics_FillEllipse(pGraphics, pBrush, x - this.x, y - this.y, width, height);		
-		else
-			Windows.Gdiplus_Graphics_DrawEllipse(pGraphics, pPen, x - this.x, y - this.y, width, height);
-	}
-
-	public void rect(Pen pen, double x, double y, double width, double height) {
-		check();
-		adjustPen(pen);
-		if(fillPattern == FillPattern.Solid)
-			Windows.Gdiplus_Graphics_FillRectangle(pGraphics, pBrush, x - this.x, y - this.y, width, height);
-		else
-			Windows.Gdiplus_Graphics_DrawRectangle(pGraphics, pPen, x - this.x, y - this.y, width, height);
-	}
-	
-	public Pair<Double, Double> textMetrics(Pen pen, String text) {
-		Assert.notNull(pen, text);
-		return Pair.from(text.length() * 2., 20.);
-	}
-	
-	private void adjustPen(Pen pen){
-		Double tstrokeWidth = pen.strokeWidth();
-		if(tstrokeWidth == null)
-			tstrokeWidth = defaultPen.strokeWidth();
-		
-		StrokePattern tstrokePattern = pen.strokePattern();
-		if(tstrokePattern == null)
-			tstrokePattern = defaultPen.strokePattern();
-		
-		StrokeCaps tstrokeCaps = pen.strokeCaps();
-		if(tstrokeCaps == null)
-			tstrokeCaps = defaultPen.strokeCaps();
-
-		if(!tstrokeWidth.equals(strokeWidth) || tstrokePattern != strokePattern || tstrokeCaps != strokeCaps){
-			strokePattern = tstrokePattern;
-			strokeWidth = tstrokeWidth;
-			strokeCaps = tstrokeCaps;
-			Windows.Gdiplus_Pen_SetWidth(pPen, strokeWidth);
-		}
-		
-		Color tcolor = pen.color();
-		if(tcolor == null)
-			tcolor = defaultPen.color();
-				
-		if(!tcolor.equals(color)){
-			color = tcolor;
-			Windows.Gdiplus_Pen_SetColor(pPen, color.alpha(), color.red(), color.green(), color.blue());
-			Windows.Gdiplus_SolidBrush_SetColor(pBrush, Math.min(color.alpha(), 254), color.red(), color.green(), color.blue());
-		}
-		
-		String tfont = pen.font();
-		if(tfont == null)
-			tfont = defaultPen.font();
-		
-		Double tfontSize = pen.fontSize();
-		if(tfontSize == null)
-			tfontSize = defaultPen.fontSize();
-		
-		if(!tfont.equals(font) || !tfontSize.equals(fontSize)){
-			font = tfont;
-			fontSize = tfontSize;
-			if(pFont != 0)
-				Windows.Gdiplus_Font_Destroy(pFont);
-			if(pFontFamily != 0)
-				Windows.Gdiplus_FontFamily_Destroy(pFontFamily);
-			
-			pFontFamily = Windows.Gdiplus_FontFamily_Create(font);
-			pFont = Windows.Gdiplus_Font_Create(pFontFamily, fontSize, Windows.Gdiplus_FontStyleRegular, Windows.Gdiplus_UnitPixel);
-		}
-		
-		FillPattern tfillPattern = pen.fillPattern();
-		if(tfillPattern == null)
-			tfillPattern = defaultPen.fillPattern();
-		
-		if(tfillPattern != fillPattern){
-			fillPattern = tfillPattern;
-		}
-	}
-
-	public void triangle(Pen pen, double x1, double y1, double x2, double y2,
-			double x3, double y3) {
-		throw new UnsupportedOperationException();
+		this.transparentPainter = new TransparentPainter();
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		this.x = 0;
+		this.y= 0;
+		this.width = screenSize.getWidth();
+		this.height = screenSize.getHeight();
 	}
 
 	@Override
-	public String toString() {
-		return "x: " + x + ", y: " + y + ", width: " + width + ", height: " + height ;
+	public double width() { return width; }
+
+	@Override
+	public double height() { return height; }
+
+	@Override
+	public double x() { return x; }
+
+	@Override
+	public double y() { return y; }
+
+	@Override
+	public Pen defaultPen() { return defaultPen; }
+
+	@Override
+	public void begin() {
+		this.transparentPainter.setVisible(false);
+		SwingUtilities.invokeLater(() -> {
+			this.transparentPainter.repaint();
+			this.transparentPainter.setVisible(true);
+		});
 	}
+
+	@Override
+	public void end() {
+		this.transparentPainter.clearDotPositions();
+	}
+
+	@Override
+	public void release() {
+		this.transparentPainter.clearDotPositions();
+		this.transparentPainter.setVisible(false);
+	}
+
+	@Override
+	public void line(Pen pen, double x1, double y1, double x2, double y2) { }
+
+	@Override
+	public void text(Pen pen, double x, double y, double angle, String text) { }
+
+	@Override
+	public Pair<Double, Double> textMetrics(Pen pen, String text) { return null; }
+
+	@Override
+	public void clear(double x, double y, double width, double height) { }
+
+	@Override
+	public void triangle(Pen pen, double x1, double y1, double x2, double y2, double x3, double y3) { }
+
+	@Override
+	public void image(Pen pen, double x, double y, double width, double height, int[] image, int imageWidth,
+			int imageHeight) { }
+
+	@Override
+	public void ellipse(Pen pen, double x, double y, double width, double height) {
+		this.transparentPainter.addDotPosition(new Point2D.Double(x, y));
+	}
+
+	@Override
+	public void rect(Pen pen, double x, double y, double width, double height) { }
+
 }
