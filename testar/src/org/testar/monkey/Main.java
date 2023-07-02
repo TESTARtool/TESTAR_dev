@@ -574,6 +574,7 @@ public class Main {
 			defaults.add(Pair.from(BrowserFullScreen, true));
 			defaults.add(Pair.from(SwitchNewTabs, true));
 
+			defaults.add(Pair.from(YoloPythonCommand, "python"));
 			defaults.add(Pair.from(YoloProjectAbsolutePath, "C:/Users/username/Desktop/yolov5"));
 			defaults.add(Pair.from(YoloPythonServiceRelativePath, "detectTESTAR.py"));
 			defaults.add(Pair.from(YoloModelAbsolutePath, "C:/Users/username/Desktop/yolov5/yolo_weights.pt"));

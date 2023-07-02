@@ -30,52 +30,32 @@
 
 package org.testar.monkey.alayer.yolo;
 
+import org.testar.ProtocolUtil;
+import org.testar.monkey.alayer.AWTCanvas;
 import org.testar.monkey.alayer.Rect;
-import org.testar.monkey.alayer.TaggableBase;
+import org.testar.monkey.alayer.Shape;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.Verdict;
+import org.testar.serialisation.ScreenshotSerialiser;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+public class YoloProtocolUtil extends ProtocolUtil {
 
-public class YoloElement extends TaggableBase implements Serializable {
-	private static final long serialVersionUID = -7029419934623458138L;
+	public static String getStateshot(State state) {
+		Shape viewPort = state.get(Tags.Shape, null);
 
-	List<YoloElement> children = new ArrayList<>();
-	YoloElement parent;
-	YoloRootElement root;
-	YoloWidget backRef;
+		//If the state Shape is not properly obtained, or the State has an error, use full monitor screen
+		if (viewPort == null || (state.get(Tags.OracleVerdict, Verdict.OK).severity() > Verdict.SEVERITY_OK))
+			viewPort = state.get(Tags.Shape, null); // get the SUT process canvas (usually, full monitor screen)
 
-	// Default Yolo properties
-	Rect rect;
-	Rect normalizedRect;
-	String widgetType; // int represented as String
+		if (viewPort.width() <= 0 || viewPort.height() <= 0)
+			return null;
 
-	// TODO: Integrate OCR image recognition software
-	String text;
+		Rect stateRect = Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height());
 
-	// TODO: Check if possible to obtain a ZIndex
-	double zindex = 0.0;
-	// TODO: Check if possible recognize a gray not enabled element
-	boolean enabled = true;
+		AWTCanvas scrshot = AWTCanvas.fromScreenshot(stateRect, state.get(Tags.HWND, (long)0), AWTCanvas.StorageFormat.PNG, 1);
 
-	public YoloElement(){ this(null); }
-
-	public YoloElement(YoloElement parent){
-		this.parent = parent;
-		if(parent != null) {
-			root = parent.root;
-		}
-		enabled = true;
+		return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), scrshot);
 	}
 
-	private void writeObject(ObjectOutputStream oos) throws IOException{
-		oos.defaultWriteObject();
-	}
-
-	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
-		ois.defaultReadObject();
-	}
 }

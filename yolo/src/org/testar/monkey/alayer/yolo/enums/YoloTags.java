@@ -41,6 +41,8 @@ public class YoloTags extends TagsBase {
 
 	public static final Tag<Boolean> YoloEnabled = from("YoloEnabled", Boolean.class);
 
+	public static final Tag<Rect> YoloRect = from("YoloRect", Rect.class);
+
 	public static final Tag<Rect> YoloNormalizedRect = from("YoloNormalizedRect", Rect.class);
 
 	public static final Tag<String> YoloWidgetType = from("YoloWidgetType", String.class);

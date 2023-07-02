@@ -49,7 +49,7 @@ public class YoloRootElement extends YoloElement {
 	}
 
 	public boolean visibleAt(YoloElement el, double x, double y){
-		if(el.normalizedRect == null || !el.normalizedRect.contains(x, y) || !this.normalizedRect.contains(x, y)) {
+		if(el.rect == null || !el.rect.contains(x, y) || !this.rect.contains(x, y)) {
 			return false;
 		}
 
@@ -58,7 +58,7 @@ public class YoloRootElement extends YoloElement {
 	}
 
 	public boolean visibleAt(YoloElement el, double x, double y, boolean obscuredByChildFeature){
-		if(el.normalizedRect == null || !el.normalizedRect.contains(x, y) || !this.normalizedRect.contains(x, y)) {
+		if(el.rect == null || !el.rect.contains(x, y) || !this.rect.contains(x, y)) {
 			return false;
 		}
 
@@ -70,7 +70,7 @@ public class YoloRootElement extends YoloElement {
 	boolean obscuredByChildren(YoloElement el, double x, double y){
 		for(int i = 0; i < el.children.size(); i++){
 			YoloElement child = el.children.get(i);
-			if(child.normalizedRect != null && child.normalizedRect.contains(x, y) && child.zindex >= el.zindex) {
+			if(child.rect != null && child.rect.contains(x, y) && child.zindex >= el.zindex) {
 				return true;
 			}
 		}

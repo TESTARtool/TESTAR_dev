@@ -155,10 +155,11 @@ public class NativeLinker {
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.YOLO)) {
 			return new YoloStateBuilder(timeToFreeze, 
+					settings.get(ConfigTags.YoloPythonCommand, ""), 
 					settings.get(ConfigTags.YoloProjectAbsolutePath, ""), 
 					settings.get(ConfigTags.YoloPythonServiceRelativePath, ""), 
-					settings.get(ConfigTags.YoloModelAbsolutePath, ""),
-					settings.get(ConfigTags.YoloInputImagesDirectory, ""),
+					settings.get(ConfigTags.YoloModelAbsolutePath, ""), 
+					settings.get(ConfigTags.YoloInputImagesDirectory, ""), 
 					settings.get(ConfigTags.YoloModelOutputDirectory, ""));
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
@@ -285,12 +286,12 @@ public class NativeLinker {
 	}
 
 	public static ProcessHandle getNativeProcessHandle(long processPID){
-		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
+		if (PLATFORM_OS.contains(OperatingSystems.YOLO))
+			return new YoloProcHandle(processPID);
+		else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return new WinProcHandle(processPID);
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return new LinuxProcessHandle(processPID);
-		else if (PLATFORM_OS.contains(OperatingSystems.YOLO))
-			return new YoloProcHandle(processPID);
 		throw new UnsupportedPlatformException();
 	}
 

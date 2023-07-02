@@ -38,12 +38,20 @@ import java.util.List;
 import org.testar.monkey.Assert;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.devices.AWTKeyboard;
+import org.testar.monkey.alayer.devices.AWTMouse;
+import org.testar.monkey.alayer.devices.Keyboard;
+import org.testar.monkey.alayer.devices.Mouse;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.exceptions.SystemStopException;
+import org.testar.monkey.alayer.windows.WinProcessActivator;
 
 public class YoloFramework extends SUTBase {
 
 	public static YoloFramework yoloSUT = null;
+	final Keyboard kbd = AWTKeyboard.build();
+	final Mouse mouse = AWTMouse.build();
+	private long pid;
 
 	public static YoloFramework fromExecutable(String path) throws SystemStartException {
 		if (yoloSUT != null) {
@@ -67,7 +75,7 @@ public class YoloFramework extends SUTBase {
 			Process process = processBuilder.start();
 
 			// Get the PID of the process (Java 9 or above)
-			long pid = getProcessId(process);
+			pid = getProcessId(process);
 
 			System.out.println("Yolo SUT started with PID: " + pid);
 			this.set(Tags.PID, pid);
@@ -92,6 +100,19 @@ public class YoloFramework extends SUTBase {
 	private long getProcessId(Process process) {
 		ProcessHandle handle = process.toHandle();
 		return handle.pid();
+	}
+
+	@SuppressWarnings("unchecked")
+	protected <T> T fetch(Tag<T> tag){		
+		if(tag.equals(Tags.StandardKeyboard))
+			return (T)kbd;
+		else if(tag.equals(Tags.StandardMouse))
+			return (T)mouse;
+		else if(tag.equals(Tags.PID))
+			return (T)(Long)pid;
+		else if(tag.equals(Tags.SystemActivator))
+			return (T) new WinProcessActivator(pid); // Invoke Windows Activator
+		return null;
 	}
 
 	public static List<SUT> fromAll() {

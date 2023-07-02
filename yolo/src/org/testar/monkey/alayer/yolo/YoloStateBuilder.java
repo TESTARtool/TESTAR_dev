@@ -46,6 +46,7 @@ public class YoloStateBuilder implements StateBuilder {
 	private final YoloPythonModel yoloPyModel;
 
 	public YoloStateBuilder(double timeOut, 
+			String yoloPythonCommand, 
 			String yoloProjectAbsolutePath, 
 			String yoloPythonServiceRelativePath, 
 			String yoloModelAbsolutePath, 
@@ -57,6 +58,7 @@ public class YoloStateBuilder implements StateBuilder {
 
 		// In this YoloStateBuilder class we load and start the Yolo model only once
 		this.yoloPyModel = new YoloPythonModel(
+				yoloPythonCommand, 
 				yoloProjectAbsolutePath, 
 				yoloPythonServiceRelativePath, 
 				yoloModelAbsolutePath, 

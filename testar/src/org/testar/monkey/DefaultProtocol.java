@@ -80,6 +80,7 @@ import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.visualizers.ShapeVisualizer;
 import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
 import org.testar.monkey.alayer.windows.WinApiException;
+import org.testar.monkey.alayer.yolo.YoloProtocolUtil;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
 import org.testar.serialisation.LogSerialiser;
@@ -823,6 +824,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 			else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
 				state.set(Tags.ScreenshotPath, IOSProtocolUtil.getStateshot(state));
+			}
+			else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.YOLO)) {
+				state.set(Tags.ScreenshotPath, YoloProtocolUtil.getStateshot(state));
 			}
 			else{
 				state.set(Tags.ScreenshotPath, ProtocolUtil.getStateshot(state));

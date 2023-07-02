@@ -515,6 +515,7 @@ public class Settings extends TaggableBase implements Serializable {
 				, "# Yolo settings to configure the location of the project and model"
 				, "#################################################################"
 				, ""
+				, ConfigTags.YoloPythonCommand.name() + " = "
 				, ConfigTags.YoloProjectAbsolutePath.name() + " = "
 				, ConfigTags.YoloPythonServiceRelativePath.name() + " = "
 				, ConfigTags.YoloModelAbsolutePath.name() + " = "

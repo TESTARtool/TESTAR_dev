@@ -27,8 +27,6 @@ public class YoloProcHandle implements ProcessHandle {
 			int exitCode = process.waitFor();
 			if (exitCode == 0) {
 				System.out.println("Process with PID " + pid + " killed successfully.");
-			} else {
-				System.err.println("Failed to kill process with PID " + pid + ".");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

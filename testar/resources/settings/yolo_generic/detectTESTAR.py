@@ -65,6 +65,8 @@ def run(
         else:
             input_img_dir = str(input_img_dir)
 
+            counter = 0  # Reset Counter variable
+
             output_file = os.path.join(str(output_txt_dir), 'widgets.txt')
             ## If the GUI widgets txt file exists, delete it before writing a new one
             if os.path.exists(output_file):

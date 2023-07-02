@@ -140,7 +140,7 @@ public class YoloState extends YoloWidget implements State {
 			ret = new org.testar.monkey.alayer.yolo.YoloHitTester(w.element);
 		}
 		else if (t.equals(Tags.Shape)) {
-			ret = w.element.normalizedRect;
+			ret = w.element.rect;
 		}
 		else if (t.equals(Tags.Enabled)) {
 			ret = w.element.enabled;
@@ -158,7 +158,7 @@ public class YoloState extends YoloWidget implements State {
 			ret = true;
 		}
 		else if (t.equals(Tags.Foreground)) {
-			ret = true;
+			ret = w == this ? ((YoloRootElement) w.element.root).isForeground : null;
 		}
 		else if (t.equals(Tags.ZIndex)) {
 			ret = w.element.zindex;
@@ -169,6 +169,9 @@ public class YoloState extends YoloWidget implements State {
 		 */
 		else if (t.equals(YoloTags.YoloEnabled)) {
 			ret = w.element.enabled;
+		}
+		else if (t.equals(YoloTags.YoloRect)) {
+			ret = w.element.rect;
 		}
 		else if (t.equals(YoloTags.YoloNormalizedRect)) {
 			ret = w.element.normalizedRect;

@@ -110,11 +110,12 @@ AbstractStateAttributes = WidgetControlType
 # Yolo settings to configure the location of the project and model
 #################################################################
 
-YoloProjectAbsolutePath = C:/Users/FernandoTESTAR/Desktop/Yolo/yolov5
+YoloPythonCommand = python
+YoloProjectAbsolutePath = C:/Users/username/Desktop/yolov5
 YoloPythonServiceRelativePath = detectTESTAR.py
-YoloModelAbsolutePath = C:/Users/FernandoTESTAR/Desktop/Yolo/yolov5/yolo_weights.pt
-YoloInputImagesDirectory = C:/Users/FernandoTESTAR/Desktop/Yolo/yolov5/data/images/input
-YoloModelOutputDirectory = C:/Users/FernandoTESTAR/Desktop/Yolo/yolov5/data/images/output
+YoloModelAbsolutePath = C:/Users/username/Desktop/yolov5/yolo_weights.pt
+YoloInputImagesDirectory = C:/Users/username/Desktop/yolov5/data/images/input
+YoloModelOutputDirectory = C:/Users/username/Desktop/yolov5/data/images/output
 
 #################################################################
 # Other more advanced settings

@@ -138,9 +138,16 @@ public class Protocol_yolo_generic extends YoloProtocol {
 
 	@Override
 	protected boolean isClickable(Widget w) {
+		// 0 represents a button class in the Yolo trained model
 		return w.get(YoloTags.YoloWidgetType, "noType").equals("0");
 	}
-	
+
+	@Override
+	protected boolean isTypeable(Widget w) {
+		// 1 represents a text edit class in the Yolo trained model
+		return w.get(YoloTags.YoloWidgetType, "noType").equals("1");
+	}
+
 	/**
 	 * Select one of the available actions using an action selection algorithm (for example random action selection)
 	 *

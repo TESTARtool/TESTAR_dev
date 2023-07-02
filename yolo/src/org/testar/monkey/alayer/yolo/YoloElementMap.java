@@ -48,10 +48,10 @@ public class YoloElementMap {
 			}else if (o1.zindex > o2.zindex){
 				return BETTER;
 			}else{
-				if(o1.normalizedRect != null){
-					if(o2.normalizedRect != null){
-						double area1 = Rect.area(o1.normalizedRect);
-						double area2 = Rect.area(o2.normalizedRect);
+				if(o1.rect != null){
+					if(o2.rect != null){
+						double area1 = Rect.area(o1.rect);
+						double area2 = Rect.area(o2.rect);
 						return area1 < area2 ? BETTER : (area1 > area2 ? WORSE : EVEN);
 					}else{
 						return BETTER;
@@ -70,7 +70,7 @@ public class YoloElementMap {
 
 		public Builder addElement(YoloElement element){
 			Assert.notNull(element);
-			if(element.normalizedRect != null)
+			if(element.rect != null)
 				elements.add(element);		
 			return this;
 		}
@@ -88,7 +88,7 @@ public class YoloElementMap {
 
 	public YoloElement at(double x, double y){
 		for(YoloElement element : elements){
-			if(element.normalizedRect.contains(x, y))
+			if(element.rect.contains(x, y))
 				return element;
 		}
 		return null;
@@ -98,7 +98,7 @@ public class YoloElementMap {
 		for(YoloElement obstacle : elements){
 			if(obstacle.zindex <= element.zindex || obstacle == element)
 				break;
-			if(obstacle.normalizedRect.contains(x, y))
+			if(obstacle.rect.contains(x, y))
 				return true;
 		}
 		return false;

@@ -288,6 +288,9 @@ public final class ConfigTags {
 	 * Yolo plugin settings
 	 */
 
+	public static final Tag<String> YoloPythonCommand = Tag.from("YoloPythonCommand", String.class, 
+			"Command used to invoke python software (pyhon, python3, etc)");
+
 	public static final Tag<String> YoloProjectAbsolutePath = Tag.from("YoloProjectAbsolutePath", String.class, 
 			"Absolute Path that points to an installed Yolo project");
 

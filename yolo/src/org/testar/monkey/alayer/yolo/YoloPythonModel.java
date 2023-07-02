@@ -1,9 +1,36 @@
+/***************************************************************************************************
+ *
+ * Copyright (c) 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2023 Open Universiteit - www.ou.nl
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************************************/
+
 package org.testar.monkey.alayer.yolo;
 
 import java.awt.AWTException;
-import java.awt.Rectangle;
-import java.awt.Robot;
-import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,18 +47,21 @@ import javax.imageio.ImageIO;
 
 public class YoloPythonModel {
 
+	private final String yoloPythonCommand;
 	private final String yoloProjectAbsolutePath;
 	private final String yoloPythonServiceRelativePath;
 	private final String yoloModelAbsolutePath;
 	private final String yoloInputImagesDirectory;
 	private final String yoloModelOutputDirectory;
 
-	public YoloPythonModel(String yoloProjectAbsolutePath, 
+	public YoloPythonModel(String yoloPythonCommand, 
+			String yoloProjectAbsolutePath, 
 			String yoloPythonServiceRelativePath, 
 			String yoloModelAbsolutePath, 
 			String yoloInputImagesDirectory,
 			String yoloModelOutputDirectory) {
 
+		this.yoloPythonCommand = yoloPythonCommand;
 		this.yoloProjectAbsolutePath = yoloProjectAbsolutePath;
 		this.yoloPythonServiceRelativePath = yoloPythonServiceRelativePath;
 		this.yoloModelAbsolutePath = yoloModelAbsolutePath;
@@ -48,7 +78,7 @@ public class YoloPythonModel {
 			String pyApiService = yoloProjectAbsolutePath + File.separator + yoloPythonServiceRelativePath;
 
 			ProcessBuilder processBuilder = new ProcessBuilder(
-					"python", pyApiService, 
+					yoloPythonCommand, pyApiService, 
 					"--weights", yoloModelAbsolutePath, 
 					"--input_img_dir", yoloInputImagesDirectory, 
 					"--output_txt_dir", yoloModelOutputDirectory);
@@ -81,9 +111,9 @@ public class YoloPythonModel {
 		}
 	}
 
-	public List<String> processImageWithYolo() throws IOException, AWTException, InterruptedException {
+	public List<String> processImageWithYolo(BufferedImage image) throws IOException, AWTException, InterruptedException {
 		// Prepare the screenshot that Yolo reads
-		saveScreenshotToYolo();
+		saveScreenshotToYolo(image);
 
 		// Extract widgets boundaries using the response of the Yolo invokation
 		String outputCoordinates = obtainYoloOutput();
@@ -98,7 +128,7 @@ public class YoloPythonModel {
 		return stringList;
 	}
 
-	private void saveScreenshotToYolo() throws IOException, AWTException, InterruptedException {
+	private void saveScreenshotToYolo(BufferedImage image) throws IOException, AWTException, InterruptedException {
 		// Waits until no image exists in the directory
 		// This is done to do not interfere with the python service
 		Path scrPath = Paths.get(yoloInputImagesDirectory, "state.png");
@@ -106,16 +136,9 @@ public class YoloPythonModel {
 			Thread.sleep(500);
 		}
 
-		// Create a Robot object
-		Robot robot = new Robot();
-
-		// Capture the screen using the Robot's createScreenCapture method
-		Rectangle screenRect = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
-		BufferedImage screenshot = robot.createScreenCapture(screenRect);
-
 		// Save the screenshot to the specified location
 		File output = new File(yoloInputImagesDirectory + File.separator + "state.png");
-		ImageIO.write(screenshot, "png", output);
+		ImageIO.write(image, "png", output);
 	}
 
 	private String obtainYoloOutput() throws IOException, InterruptedException {
