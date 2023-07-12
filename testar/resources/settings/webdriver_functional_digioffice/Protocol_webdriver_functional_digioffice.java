@@ -82,7 +82,9 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 /**
  * Protocol with functional oracles examples to detect:
     Oracle idea  3: formButtonEnabledAfterTypingChangesVerdict and formButtonMustBeDisabledIfNoChangesVerdict
-    Oracle idea  6: GenericVerdict.UnicodeReplacementCharacter and unicode characters added custom_input_data.txt
+    Oracle idea  4: Single quote ', double quote ", ' OR 1=1 OR ''=' and @# added to custom_input_data.txt. This will trigger 500 Internal Server Error if SQL Injection is possible or leak data.
+	Oracle idea  5: '<memo>alpha beta gamma' added to custom_input_data.txt to trigger parsing errors
+	Oracle idea  6: GenericVerdict.UnicodeReplacementCharacter and unicode characters added custom_input_data.txt
     Oracle idea  7: Just switch username in DigiOffice database to login with a user with different permissions and config
     Oracle idea  8: GenericVerdict.WidgetClashDetection
     Oracle idea 11: Generic.Spellchecker
