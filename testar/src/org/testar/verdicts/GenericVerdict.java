@@ -285,8 +285,8 @@ public class GenericVerdict {
 		if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
 		
 		Verdict verdict = Verdict.OK;
-		String patternRegex = ".*�.*"; // Look for a Unicode Replacement character.
-		Pattern pattern = Pattern.compile(patternRegex);
+		String patternRegex = ".*\\uFFFD.*"; // Look for a Unicode Replacement character: .*\uFFFD.*
+		Pattern pattern = Pattern.compile(patternRegex, Pattern.UNICODE_CHARACTER_CLASS);
 		
 		for(Widget w : state) {
 			String desc = w.get(tagTextChecker, "");

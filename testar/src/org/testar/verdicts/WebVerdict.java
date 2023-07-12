@@ -318,7 +318,7 @@ public class WebVerdict {
 		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
 
 		Verdict verdict = Verdict.OK;
-		String patternRegex = "\\&.*\\;|\\%\\w\\w|\\$\\w\\w|<[^>]*>";
+		String patternRegex = "\\&.*\\;|\\%\\w\\w|\\$\\w\\w|<[^>]*>"; // \&.*\;|\%\w\w|\$\w\w|<[^>]*>
 		Pattern pattern = Pattern.compile(patternRegex);
 		
 		Pattern ignorePattern = Pattern.compile(ignorePatternRegEx);
@@ -679,6 +679,7 @@ public class WebVerdict {
 	}
 	
 	// Detect images which are not shown in their natural resolution.
+	// SVG images are ignored, because these vector based imaged stay sharp when they are resized
 	// If the natural width is 1000 and the displayed width is 2000, then the image is blown up and may look pixelized.
 	// If the natural width is 1000 and the displayed width is 500, then the image is shown smaller than it really is and uses more bandwidth to download the image than needed which leads to performance issues.
 	// To ignore small images a minimal width and height can be given because small images are sometimes used as 'fillers' or they don't have much bandwidth issues. The default minimum values are 1.
@@ -700,7 +701,7 @@ public class WebVerdict {
 			Long naturalHeight = w.get(WdTags.WebNaturalHeight);
 			Long displayedWidth = w.get(WdTags.WebDisplayedWidth);
 			Long displayedHeight = w.get(WdTags.WebDisplayedHeight);
-			if (w.get(WdTags.WebIsEnabled, true) && !w.get(WdTags.WebIsHidden))
+			if (w.get(WdTags.WebIsEnabled, true) && !w.get(WdTags.WebIsHidden) && !w.get(WdTags.WebSrc).toLowerCase().contains("svg"))
 			{			
 				if (naturalWidth >= minimalWidth && naturalHeight >= minimalHeight && displayedWidth >= minimalWidth && displayedHeight >= minimalHeight)
 				{
