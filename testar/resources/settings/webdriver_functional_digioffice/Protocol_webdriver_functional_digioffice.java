@@ -28,10 +28,6 @@
  *
  */
 
-import org.openqa.selenium.devtools.DevTools;
-import org.openqa.selenium.devtools.HasDevTools;
-import org.openqa.selenium.devtools.v109.performance.Performance;
-import org.openqa.selenium.devtools.v109.performance.model.Metric;
 import org.languagetool.language.AmericanEnglish;
 import org.languagetool.language.BritishEnglish;
 import org.languagetool.language.Dutch;
@@ -83,37 +79,47 @@ import static org.testar.monkey.alayer.Tags.Enabled;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
-import org.apache.logging.log4j.core.LogEvent;
-import org.apache.logging.log4j.core.parser.ParseException;
-import org.apache.logging.log4j.core.parser.XmlLogEventParser;
-
 /**
  * Protocol with functional oracles examples to detect:
- * - Web dummy button
- * - Web select list without items
- * - Web text area with max length 0 + add example to dummy HTML SUT
- * - If a web text string is a number and contains more than X decimals + add example to dummy HTML SUT
- * - Radio button panel with only one option (input)
- * - Panel without children (form, div)
- * - Web alert with suspicious message
- * - Spell checker in a file list that allows users to ignore. Also prepare a specific directory for the spell checker errors found.
- * - Add URL related with the states
- * 
- * - TODO: JavaScript loop to hang the browser - devTools
- * - TODO: JavaScript refresh browser constantly - devTools
- * - TODO: textarea with rows and columns to detect enter click
- * - TODO: Now draw the widget highlight in all the screenshots of the state. Only in the last HTML report screen.
- * - TODO: Use the state screenshots of the sequences to train and use a model
- * - TODO: screenshot_sequence_x_states vs screenshot_sequence_x_actions
- * 
- * - Instead of joining Verdicts, try to recognize and save different Verdict exception in different sequences.
+    Oracle idea  3: formButtonEnabledAfterTypingChangesVerdict and formButtonMustBeDisabledIfNoChangesVerdict
+    Oracle idea  6: GenericVerdict.UnicodeReplacementCharacter and unicode characters added custom_input_data.txt
+    Oracle idea  7: Just switch username in DigiOffice database to login with a user with different permissions and config
+    Oracle idea  8: GenericVerdict.WidgetClashDetection
+    Oracle idea 11: Generic.Spellchecker
+    Oracle idea 12: WebVerdict.SingleSelectItems
+    Oracle idea 18: WebVerdict.UnsortedSelectItems
+    Oracle idea 20: functionalButtonVerdict // Dummy button detection
+    Oracle idea 22: GenericVerdict.SensitiveData
+    Oracle idea 24: Long text (261x A chars) added to custom_input_data.txt
+    Oracle idea 28: WebVerdict.imageResolutionDifferences
+    Oracle idea 30: GenericVerdict.WidgetAlignmentMetric
+    Oracle idea 31: Just run TESTAR on multiple machines at the same time
+    Oracle idea 34: WebVerdict.HTMLOrXMLTagsInText
+    Oracle idea 40: WebVerdict.DuplicateText
+    Oracle idea 44: WebVerdict.TooManyItemSelectItems
+    Oracle idea 48: WebVerdict.NumberWithLotOfDecimals
+    Oracle idea 50: WebVerdict.TextAreaWithoutLength
+    Oracle idea 51: WebVerdict.EmptySelectItems
+    Oracle idea 52: WebVerdict.SingleRadioInput
+    Oracle idea 57: WebVerdict.AlertSuspiciousMessage
+    Oracle idea 59: WebVerdict.ElementWithoutChildren
+    Oracle idea 65: watcherFileEmptyFile
+    Oracle idea 70: WebVerdict.DuplicatedRowsInTable
+    Oracle idea 75: GenericVerdict.SensitiveData
+    Oracle idea 79: detectWidgetsThatShouldBeInSync
+    Oracle idea 81: watcherFileEmptyFile
+    Oracle idea 89: WebVerdict.DuplicateSelectItems
+    Oracle idea 90: GenericVerdict.CommonTestOrDummyPhrases
+    Oracle idea 94: WebVerdict.ZeroNumbersInTable
+    Oracle idea 97: TESTAR GUI > Tab Oracles > checkboxes Enable Web Console [Error,Warning] Oracle
+    Oracle idea 98: detectUntranslatedText
+    Oracle idea 99: Added XSS script in custom_input_data.txt which write a console error which will be picked up by Oracle idea 97
  */
+
 public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol {
 	private Action functionalAction = null;
 	private Verdict functionalVerdict = Verdict.OK;
 	private List<String> listErrorVerdictInfo = new ArrayList<>();
-	private DevTools devTools;
-    private List<Metric> metricList = new ArrayList<>(); 
 
 	// Watcher service
 	Path downloadsPath;
@@ -200,11 +206,6 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		// This will allow to check again the formButtonMustBeDisabledIfNoChangesVerdict verdict
 		_pristineStateForm = true;
 
-        // Initialize devtools for performance verdict
-        // Initialize a session of the web developers tool
-	    devTools = ((HasDevTools) WdDriver.getRemoteWebDriver()).getDevTools();
-	    devTools.createSessionIfThereIsNotOne();
-
 		return system;
 	}
 
@@ -232,7 +233,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
            System.out.println("New form : " + webUrl);
           
           // Give UI some time to initialize the new form, otherwise false positives arise because not everything is in sync
-          wait(4000);
+          //wait(4000);
           
           // Check RecID is present in the web url. If RecID is not present, but Entity is present in querystring then it is a new entity detailpage in DigiOffice.
           if(webUrl.contains("RecID=") && webUrl.contains("Entity=")) {
@@ -246,9 +247,6 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
               System.out.println("Set pristineState to FALSE");
           }
         }
-        
-        //devTools.send(Performance.enable(Optional.empty()));
-	    //metricList = devTools.send(Performance.getMetrics());
 	   
 		return super.getState(system);
 	}
@@ -274,8 +272,6 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 	protected void beginSequence(SUT system, State state) {
 		super.beginSequence(system, state);
 
-		//TODO: Reader of the logs should use log4j format
-                
 		// Reset the list of downloaded files
 		watchEventDownloadedFiles = new ArrayList<>();
 		// Create a watch service to check which files are downloaded when testing the SUT
@@ -340,29 +336,6 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		return verdict;
 	}
 
-    private Verdict detectSlowPerformance(double taskDurationThreshold)
-    {
-//metricList Info https://pptr.dev/next/api/puppeteer.page.metrics
-        // Print all devTools performance metrics
-//	    for(Metric m : metricList) {
-//		  System.out.println(m.getName() + " = " + m.getValue());
-//	  }
-       Verdict verdict = Verdict.OK;
-       double taskDuration = 0.0;
-       Optional<Metric> metric = metricList.stream().filter(m -> "TaskDuration".equals(m.getName())).findFirst();
-       
-       if (metric.isPresent())
-       {
-           taskDuration = metric.get().getValue().doubleValue();
-           if (taskDuration > taskDurationThreshold)
-           {
-               String verdictMsg = String.format("Detected slow pageload with metric TaskDuration which is combined duration of all tasks performed by browser. TaskDuration: %.02f seconds", taskDuration);
-			  verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_RESOURCE_PERFORMANCE_ISSUE, verdictMsg));
-           }
-       }
-       return verdict;
-    }
-
 	/**
 	 * We want to return the verdict if it is not OK, 
 	 * and not on the detected failures list (it's a new failure). 
@@ -386,13 +359,12 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		Pattern pattern = Pattern.compile(patternRegex);
 		
 		for(Widget w : state) {
-			// TODO: Is WebValue a good tag? Should the same tags be used as the suspicious text verdicts which are set in the UI?
-			String desc = w.get(WdTags.WebValue, "");
+			String desc = w.get(WdTags.WebTextContent, "");
 			Matcher matcher = pattern.matcher(desc);
 			
 			if (matcher.find()) {
-				String verdictMsg = String.format("Detected untranslated tags in widget! Role: %s , Path: %s , WebId: %s , Desc: %s , WebValue: %s", 
-						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebValue, ""));
+				String verdictMsg = String.format("Detected untranslated tags in widget! Role: %s , Path: %s , WebId: %s , Desc: %s , WebTextContent: %s", 
+						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebTextContent, ""));
 				verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_TRANSLATION_OR_SPELLING_ISSUE, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
 			}
 		}
@@ -454,8 +426,8 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 
 			// Compare previous and current state AbstractIDCustom identifiers
 			// to determine if interacting with the button does nothing in the SUT state
-			String previousStateId = latestState.get(Tags.AbstractIDCustom, "NoPreviousId");
-			String currentStateId = state.get(Tags.AbstractIDCustom, "NoCurrentId");
+			String previousStateId = latestState.get(Tags.ConcreteIDCustom, "NoPreviousId");
+			String currentStateId = state.get(Tags.ConcreteIDCustom, "NoCurrentId");
 
 			// NOTE 1: Because we are comparing the states using the AbstractIDCustom property, 
 			// it is important to consider the used abstraction: test.settings - AbstractStateAttributes (WebWidgetId, WebWidgetTextContent)
@@ -793,42 +765,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 			listErrorVerdictInfo.add(getFinalVerdict().info().replace("\n", " "));
 		}
 	}
-
-
-	private void testLog4J() {
-     String logEntries = "<log4j:event logger=\"Log4JLibs.LogExample\" timestamp=\"1683569806499\" level=\"INFO\" thread=\"main\">\r\n" + 
-        		"<log4j:message><![CDATA[Info AAAAAAAAAAAAAAAAAAAAAaa]]></log4j:message>\r\n" + 
-        		"</log4j:event><log4j:event logger=\"Log4JLibs.LogExample\" timestamp=\"1683569806501\" level=\"WARN\" thread=\"main\">\r\n" + 
-        		"<log4j:message><![CDATA[Warn BBBBBBBBBBBBBBBBBBbBBB]]></log4j:message>\r\n" + 
-        		"</log4j:event>";
-                
-        XmlLogEventParser parser = new XmlLogEventParser();
-        try {
-        	int beginIndex = 0;
-        	String endTag = "</log4j:event>";
-        	
-            // Parse the log file and iterate over the list of log events
-        	while(logEntries.length() > 0) 
-        	{
-	        	int eventIndex = logEntries.indexOf(endTag);
-	        	String logEntry = logEntries.substring(beginIndex, eventIndex);
-	        	logEntries = logEntries.substring(eventIndex + endTag.length());
-                LogEvent event = parser.parseFrom(logEntry);
-                System.out.println(event.getMessage());
-                break;
-             }
-         
-        }
-        catch(ParseException ex)
-        {
-        }
-          finally {
-            // Close the input stream
-            //inputStream.close();
-        }
-    }
-
-
+    
 	/**
 	 * This method returns a unique functional failure verdict of one state. 
 	 * We do not join and do not report multiple failures together.
@@ -853,15 +790,14 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		// Check the functional Verdict that detects if a form button is enabled when it must not.
 		//verdict = formButtonMustBeDisabledIfNoChangesVerdict(state);
 		//if (shouldReturnVerdict(verdict)) return verdict;
-
-        //testLog4J();
         
         verdict = WebVerdict.imageResolutionDifferences(state,2,2);
         if (shouldReturnVerdict(verdict)) return verdict;
-
+        
         verdict = GenericVerdict.WidgetAlignmentMetric(state, 50.0);
         if (shouldReturnVerdict(verdict)) return verdict;
         
+        /*
         verdict = GenericVerdict.WidgetBalanceMetric(state, 50.0);
         if (shouldReturnVerdict(verdict)) return verdict;
         
@@ -871,13 +807,13 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
         verdict = GenericVerdict.WidgetConcentricityMetric(state, 50.0);
         if (shouldReturnVerdict(verdict)) return verdict;
        
-        /* 
+        
         verdict = GenericVerdict.WidgetDensityMetric(state, 10.0, 90.0);
         if (shouldReturnVerdict(verdict)) return verdict;
-        */
+        
         verdict = GenericVerdict.WidgetSimplicityMetric(state, 50.0);
         if (shouldReturnVerdict(verdict)) return verdict;
-        
+        */
         
         // Check the functional Verdict that detects if two widgets overlap
 		// Also, add the roles or the classes of the widget sub-trees are needed to ignore
@@ -888,7 +824,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
                     "multipleFindsWrapper",
                     "workspace-wrapper",
                     "modalOverlay",
-                    "cke_dialog_background_cover",
+                    "cke", // CKE editor 
                     "EntityListContainer",
                     "list-wrapper",
                     "tabs",
@@ -903,7 +839,8 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
                     "collapsable-hitarea", 
                     "view-ec", 
                     "spinner", 
-                    "opslaanensluiten", 
+                    "opslaanensluiten", // overlay icon
+                    "opslaanennieuw", // overlay icon 
                     "pijlbenedendropdown", 
                     "ui-dialog-content",
                     "ui-widget-overlay",
@@ -912,24 +849,42 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
                     "previewsizer",
                     "navigation-sizer",
                     "ui-draggable",
-                /* temporary until bug solved: */ 
+                    "groepsvaktoevoegen", // due overlay icon
+                    "veldtoevoegen", // due overlay icon
+                    "voorbeeldweergave", // due overlay icon
+                    "mat-button-focus-overlay", // due material design
+                    "group-menu", // due material design
+                    "cdk-overlay-container", // CDK
+                    "cdk-visually-hidden", // CDK               
+                    
+                /* temporary until bug solved: */
+                    "main-page-preview",
+                    "ad",
+                    "navImageContainer",
+                    "workspace-container",
+                    "workspace-toggler",
+                    "environment",
+                    "hitarea",
                     "fa-sort-down",
                     "fa-sort-up",
-                    "fa-external-link-alt"
+                    "fa-external-link-alt",
+                    "group-title",
+                    "mat-card-header",
+                    "mat-ripple",
+                    "mat-slide-toggle-thumb-container",
+                    "table-h-slider", // horizontal slider
+                    "submit-bar-wrap" // OK/Cancel button bar in Angular wizard 
                              ), //ignoredClasses
                 true, // joinVerdicts	
                 false,  // checkOnlyLeafWidgets
                 true); // checkWebStyles	
  		if (shouldReturnVerdict(verdict)) return verdict;
-
+        
 		verdict = detectWidgetsThatShouldBeInSync(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
 		
         verdict = GenericVerdict.CommonTestOrDummyPhrases(state, WdTags.WebTextContent);
         if (shouldReturnVerdict(verdict)) return verdict;
-        
-        //verdict = detectSlowPerformance(20.0); // seconds
-        //if (shouldReturnVerdict(verdict)) return verdict;
         
         // Checks for zero numbers in tables
         verdict = WebVerdict.ZeroNumbersInTable(state);
@@ -954,7 +909,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
         // Check the functional Verdict that detects sensitive data, such as passwords or client secrets
         // https://en.wikipedia.org/wiki/List_of_the_most_common_passwords
         //verdict = detectSensitiveData(state, "123456|123456789|12345|qwerty|password|12345678|111111|123123|1234567890|1234567|qwerty123|000000|1q2w3e|aa12345678|abc123|password1|1234|qwertyuiop|123321|password123");
-        verdict = GenericVerdict.SensitiveData(state, WdTags.WebTextContent, "123456|123456789|qwerty|password|12345678|111111|123123|1234567890|1234567|qwerty123|000000|1q2w3e|aa12345678|abc123|password1|qwertyuiop|123321|password123");
+        verdict = GenericVerdict.SensitiveData(state, WdTags.WebTextContent, "qwerty123");
         if (shouldReturnVerdict(verdict)) return verdict;
         
 		// Check the functional Verdict that detects select elements without items to the current state verdict.
@@ -978,15 +933,16 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if exists a number with more than X decimals.
-		verdict = WebVerdict.NumberWithLotOfDecimals(state, 2, false);
+		verdict = WebVerdict.NumberWithLotOfDecimals(state, 3, false);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if exists a textArea Widget without length.
-		verdict = WebVerdict.TextAreaWithoutLength(state, Arrays.asList(WdRoles.WdTEXTAREA));
+		verdict = WebVerdict.TextAreaWithoutLength(state, Arrays.asList(WdRoles.WdTEXTAREA, WdRoles.WdINPUT));
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if a web element does not contain children.
-		verdict = WebVerdict.ElementWithoutChildren(state, Arrays.asList(WdRoles.WdFORM));
+		//verdict = WebVerdict.ElementWithoutChildren(state, Arrays.asList(WdRoles.WdFORM, WdRoles.WdSELECT, WdRoles.WdTR, WdRoles.WdOPTGROUP, WdRoles.WdCOLGROUP, WdRoles.WdFIELDSET, WdRoles.WdDL, WdRoles.WdDATALIST, WdRoles.WdBODY));
+		verdict = WebVerdict.ElementWithoutChildren(state, Arrays.asList(WdRoles.WdSELECT, WdRoles.WdTR, WdRoles.WdOPTGROUP, WdRoles.WdCOLGROUP, WdRoles.WdFIELDSET, WdRoles.WdDL, WdRoles.WdDATALIST));
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if a web radio input contains a single option.
@@ -994,7 +950,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if a web alert contains a suspicious message.
-		verdict = WebVerdict.AlertSuspiciousMessage(state, ".*[lL]ogin.*", lastExecutedAction);
+		verdict = WebVerdict.AlertSuspiciousMessage(state, ".*[lL]ogin.*|.*[eE]rror.*|.*[eE]xcepti[o?]n.*|.*[Ee]xceptie.*|.*[fF]out.*|.*[pP]robleem.*", lastExecutedAction);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if web table contains duplicated rows.

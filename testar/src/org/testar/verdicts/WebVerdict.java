@@ -290,14 +290,13 @@ public class WebVerdict {
 		Pattern ignorePattern = Pattern.compile(ignorePatternRegEx);
 		
 		for(Widget w : state) {
-			// TODO: Is WebValue a good tag? Should the same tags be used as the suspicious text verdicts which are set in the UI?
-			String desc = w.get(WdTags.WebValue, "");
+			String desc = w.get(WdTags.WebTextContent, "");
 			Matcher matcher = pattern.matcher(desc);
 			Matcher ignoreMatcher = ignorePattern.matcher(desc);
 			
 			if (matcher.find() && (ignorePatternRegEx == "" || !ignoreMatcher.find())) {
-				String verdictMsg = String.format("Detected duplicated or repeated text in description of widget! Role: %s , Path: %s , WebId: %s , Desc: %s , WebValue: %s", 
-						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebValue, ""));
+				String verdictMsg = String.format("Detected duplicated or repeated text in description of widget! Role: %s , Path: %s , WebId: %s , Desc: %s , WebTextContent: %s", 
+						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebTextContent, ""));
 				verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_ITEM_WRONG_VALUE_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
 			}
 		}
@@ -310,7 +309,7 @@ public class WebVerdict {
 	// GOOD:The quick brown fox jumps over the lazy dog
 	// The idea is that a description should not show markup tags, but should probably show the text in bold, italic, and so on.
 	// If there are html tags which can be ignored, then this can be specified in the ignorePatternRegEx parameter
-	// If False positives arise, the ignorePatternRegEx could be used to fine-tune the detection by ignoring these false positives with a anti-pattern
+	// If False positives arise, the ignorePatternRegEx could be used to fine-tune the detection by ignoring these false positives with an anti-pattern
 	public static Verdict HTMLOrXMLTagsInText(State state, String ignorePatternRegEx)
 	{
 		// If this method is NOT enabled, just return verdict OK
@@ -318,20 +317,19 @@ public class WebVerdict {
 		if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
 
 		Verdict verdict = Verdict.OK;
-		String patternRegex = "\\&.*\\;|\\%\\w\\w|\\$\\w\\w|<[^>]*>"; // \&.*\;|\%\w\w|\$\w\w|<[^>]*>
+		String patternRegex = "\\&.*\\;|\\w\\%\\w\\w|<[^>]*>"; // \&.*\;|\w\%\w\w|<[^>]*>
 		Pattern pattern = Pattern.compile(patternRegex);
 		
 		Pattern ignorePattern = Pattern.compile(ignorePatternRegEx);
 		
 		for(Widget w : state) {
-			// TODO: Is WebValue a good tag? Should the same tags be used as the suspicious text verdicts which are set in the UI?
-			String desc = w.get(WdTags.WebValue, "");
+			String desc = w.get(WdTags.WebTextContent, "");
 			Matcher matcher = pattern.matcher(desc);
 			Matcher ignoreMatcher = ignorePattern.matcher(desc);
 			
 			if (matcher.find() && (ignorePatternRegEx == "" || !ignoreMatcher.find())) {
-				String verdictMsg = String.format("Detected HTML or XML tags in description of widget! Role: %s , Path: %s , WebId: %s , Desc: %s , WebValue: %s", 
-						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebValue, ""));
+				String verdictMsg = String.format("Detected HTML or XML tags in description of widget! Role: %s , Path: %s , WebId: %s , Desc: %s , WebTextContent: %s", 
+						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebTextContent, ""));
 				verdict = verdict.join(new Verdict(Verdict.SEVERITY_WARNING_UI_ITEM_WRONG_VALUE_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
 			}
 		}

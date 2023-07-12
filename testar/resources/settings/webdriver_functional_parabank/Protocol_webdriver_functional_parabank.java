@@ -51,6 +51,8 @@ import org.testar.protocols.WebdriverProtocol;
 import org.testar.reporting.HTMLStateVerdictReport;
 import org.testar.verdicts.GenericVerdict;
 import org.testar.verdicts.WebVerdict;
+import org.testar.monkey.Settings;
+import org.testar.monkey.Main;
 
 import com.google.common.collect.Comparators;
 
@@ -131,6 +133,39 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 	protected void preSequencePreparations() {
 		super.preSequencePreparations();
 		WdDriver.alertMessage = ""; // reset webdriver alert
+	}
+
+     /**
+	 * Called once during the life time of TESTAR
+	 * This method can be used to perform initial setup work
+	 * @param   settings  the current TESTAR settings as specified by the user.
+	 */
+	@Override
+	protected void initialize(Settings settings){
+
+       if (settings.get(org.testar.monkey.ConfigTags.AlwaysCompile))
+       {
+		try {
+			// bat file that uses tscon.exe to disconnect without stop GUI session
+			File disconnectBatFile = new File(Main.settingsDir + File.separator + "webdriver_functional_parabank" + File.separator + "disconnectRDP.bat").getCanonicalFile();
+
+			// Launch and disconnect from RDP session
+			// This will prompt the UAC permission window if enabled in the System
+			if(disconnectBatFile.exists()) {
+				System.out.println("Running: " + disconnectBatFile);
+				Runtime.getRuntime().exec("cmd /c start \"\" " + disconnectBatFile);
+			} else {
+				System.out.println("THIS BAT DOES NOT EXIST: " + disconnectBatFile);
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// Wait because disconnect from system modifies internal Screen resolution
+		Util.pause(30);
+       }
+		super.initialize(settings);
 	}
 
 	/**
@@ -287,12 +322,14 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 		Verdict spellCheckerVerdict = GenericVerdict.SpellChecker(state, WdTags.WebTextContent, new AmericanEnglish(), "");
 		if(spellCheckerVerdict != Verdict.OK) HTMLStateVerdictReport.reportStateVerdict(actionCount, state, spellCheckerVerdict);
 		
-        verdict = WebVerdict.imageResolutionDifferences(state,1,1);
+        verdict = WebVerdict.imageResolutionDifferences(state,2,2); // ignore the 1x1 clear.gif image
         if (shouldReturnVerdict(verdict)) return verdict;
-
+        
+        
         verdict = GenericVerdict.WidgetAlignmentMetric(state, 50.0);
         if (shouldReturnVerdict(verdict)) return verdict;
         
+        /*
         verdict = GenericVerdict.WidgetBalanceMetric(state, 50.0);
         if (shouldReturnVerdict(verdict)) return verdict;
         
@@ -307,6 +344,7 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
         
         verdict = GenericVerdict.WidgetSimplicityMetric(state, 50.0);
         if (shouldReturnVerdict(verdict)) return verdict;
+        */
         
 		// Check the functional Verdict that detects if a form button is disabled after modifying the form inputs.
 		verdict = formButtonEnabledAfterTypingChangesVerdict(state);
@@ -323,24 +361,13 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 		// Check the functional Verdict that detects dummy buttons to the current state verdict.
 		verdict = functionalButtonVerdict(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
-
-        /*
-		// Check the functional Verdict that detects if two leaf widgets overlap
-		// Also, add the roles or the classes of the widget sub-trees are needed to ignore
-		verdict = twoLeafWidgetsOverlap(state, 
-				Arrays.asList(WdRoles.WdTD), // ignoredRoles, 
-				Arrays.asList("span-class"), // ignoredClasses
-				Collections.emptyList(), // getParentByRoles
-				Collections.emptyList()); // getParentByClasses
-		if (shouldReturnVerdict(verdict)) return verdict;
-        */
         
         // Check the functional Verdict that detects if two widgets overlap
 		// Also, add the roles or the classes of the widget sub-trees are needed to ignore
  		verdict = GenericVerdict.WidgetClashDetection(state, 
 				Collections.emptyList(), // ignoredRoles, 
                 Collections.emptyList(), // ignoredClasses
-                true,  // joinVerdicts	
+                false,  // joinVerdicts	
                 false, // checkOnlyLeafWidgets
                 true); // checkWebStyles	
  		if (shouldReturnVerdict(verdict)) return verdict;
@@ -350,7 +377,7 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 		//if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects duplicate or repeated text in descriptions of widgets
-		verdict = WebVerdict.DuplicateText(state, "");
+        verdict = WebVerdict.DuplicateText(state, "");
 		if (shouldReturnVerdict(verdict)) return verdict;
 		
 		// Check for common test or dummy phrases, such as 'Test' or 'Debug'
@@ -362,12 +389,13 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
         if (shouldReturnVerdict(verdict)) return verdict;
         
 		// Check the functional Verdict that detects HTML or XML tags in descriptions of widgets
-		verdict = WebVerdict.HTMLOrXMLTagsInText(state, "");
+		verdict = WebVerdict.HTMLOrXMLTagsInText(state, "%3Cscript%3Econsole\\.error%28%27XSS%20is%20possible%27%29%3B%3C%2Fscript%3E|<memo>alpha beta gamma|.*>console\\.error\\(.*");
 		if (shouldReturnVerdict(verdict)) return verdict;
 		
         // Check the functional Verdict that detects sensitive data, such as passwords or client secrets
         // https://en.wikipedia.org/wiki/List_of_the_most_common_passwords
-        verdict = GenericVerdict.SensitiveData(state, WdTags.WebTextContent, "123456|123456789|qwerty|password|12345678|111111|123123|1234567890|1234567|qwerty123|000000|1q2w3e|aa12345678|abc123|password1|qwertyuiop|123321|password123");
+        //verdict = GenericVerdict.SensitiveData(state, WdTags.WebTextContent, "123456|123456789|qwerty|password|12345678|111111|123123|1234567890|1234567|qwerty123|000000|1q2w3e|aa12345678|abc123|password1|qwertyuiop|123321|password123");
+        verdict = GenericVerdict.SensitiveData(state, WdTags.WebTextContent, "qwerty|qwerty123|1q2w3e|aa12345678|abc123|password1|qwertyuiop|123321|password123");
         if (shouldReturnVerdict(verdict)) return verdict;
         
 		// Check the functional Verdict that detects select elements without items to the current state verdict.
@@ -395,11 +423,11 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if exists a textArea Widget without length.
-		verdict = WebVerdict.TextAreaWithoutLength(state, Arrays.asList(WdRoles.WdTEXTAREA));
+		verdict = WebVerdict.TextAreaWithoutLength(state, Arrays.asList(WdRoles.WdTEXTAREA, WdRoles.WdINPUT));
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if a web element does not contain children.
-		verdict = WebVerdict.ElementWithoutChildren(state, Arrays.asList(WdRoles.WdFORM, WdRoles.WdDIV));
+		verdict = WebVerdict.ElementWithoutChildren(state, Arrays.asList(WdRoles.WdFORM, WdRoles.WdDIV, WdRoles.WdSELECT, WdRoles.WdTR, WdRoles.WdOPTGROUP, WdRoles.WdCOLGROUP, WdRoles.WdFIELDSET, WdRoles.WdDL, WdRoles.WdDATALIST, WdRoles.WdBODY));
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if a web radio input contains a single option.
@@ -407,7 +435,7 @@ public class Protocol_webdriver_functional_parabank extends WebdriverProtocol {
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if a web alert contains a suspicious message.
-		verdict = WebVerdict.AlertSuspiciousMessage(state, ".*[lL]ogin.*", lastExecutedAction);
+		verdict = WebVerdict.AlertSuspiciousMessage(state, ".*[lL]ogin.*|.*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*", lastExecutedAction);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if web table contains duplicated rows.
