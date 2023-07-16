@@ -68,6 +68,12 @@ public class YoloPythonModel {
 		this.yoloInputImagesDirectory = yoloInputImagesDirectory;
 		this.yoloModelOutputDirectory = yoloModelOutputDirectory;
 
+		try {
+			deleteExistingImageFile();
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
+		
 		initializeYoloPythonService();
 	}
 
@@ -143,24 +149,37 @@ public class YoloPythonModel {
 
 	private String obtainYoloOutput() throws IOException, InterruptedException {
 		// Wait until Yolo has created the output txt result file
-		Path filePath = Paths.get(yoloModelOutputDirectory, "widgets.txt");
-		while (!Files.exists(filePath)) {
+		Path filePathOut = Paths.get(yoloModelOutputDirectory, "widgets.txt");
+		Path filePathIn = Paths.get(yoloInputImagesDirectory, "state.png");
+		while (!Files.exists(filePathOut) || Files.exists(filePathIn)) {
 			Thread.sleep(500);
 		}
 
 		// Yolo output file exists, read it
-		byte[] fileBytes = Files.readAllBytes(filePath);
+		byte[] fileBytes = Files.readAllBytes(filePathOut);
 		String outputResult = new String(fileBytes);
 
 		// Before returning the content, delete the file to clear the output folder for next iteration
-		Files.delete(filePath);
+		Files.delete(filePathOut);
 
-		// Wait until the file deletion is complete
-		while (Files.exists(filePath)) {
-			Thread.sleep(100);
-		}
+		// Wait until the file deletion is complete => NO LONGER REQUIRED (O.K. BECAUSE OF HANDSHAKE)
+		//while (Files.exists(filePathOut)) {
+		//	Thread.sleep(100);
+		//}
 
 		return outputResult;
 	}
 
+	private void deleteExistingImageFile() throws IOException, InterruptedException{
+		Path filePath = Paths.get(yoloInputImagesDirectory, "state.png");
+
+		if (Files.exists(filePath)) {
+			Files.delete(filePath);
+
+			// Wait until the file deletion is complete
+			while (Files.exists(filePath)) {
+				Thread.sleep(100);
+			}
+		}
+	}
 }
