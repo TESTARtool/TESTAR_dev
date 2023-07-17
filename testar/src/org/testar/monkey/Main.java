@@ -36,6 +36,8 @@ import org.testar.serialisation.LogSerialiser;
 import org.testar.serialisation.ScreenshotSerialiser;
 import org.testar.serialisation.TestSerialiser;
 import org.testar.monkey.alayer.Tag;
+import org.testar.settingsdialog.TagVisualization.ConcreteTagFilter;
+import org.testar.settingsdialog.TagVisualization.TagFilter;
 
 import javax.swing.*;
 import java.io.*;
@@ -104,9 +106,11 @@ public class Main {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		isValidJavaEnvironment();
+        isValidJavaEnvironment();
 
-		verifyTestarInitialDirectory();
+        verifyTestarInitialDirectory();
+
+		initTagVisualization();
 
 		initTestarSSE(args);
 
@@ -356,7 +360,7 @@ public class Main {
 
 		// Compile the Java protocols if AlwaysCompile setting is true
 		if (settings.get(ConfigTags.AlwaysCompile)) {
-			compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass), settings.get(ConfigTags.ProtocolCompileDirectory));			
+			compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass), settings.get(ConfigTags.ProtocolCompileDirectory));
 		}
 
 		URLClassLoader loader = null;
@@ -428,7 +432,7 @@ public class Main {
 	}
 
 	/**
-	 * Close the Serialiser classes and stop the TESTAR process. 
+	 * Close the Serialiser classes and stop the TESTAR process.
 	 */
 	private static void stopTestar() {
 		TestSerialiser.exit();
@@ -657,9 +661,9 @@ public class Main {
 	}
 
 	/**
-	 * This method allow us to define and use settings as JVM arguments. 
+	 * This method allow us to define and use settings as JVM arguments.
 	 * Example: -DShowVisualSettingsDialogOnStartup=false testar
-	 * 
+	 *
 	 * @param settings
 	 */
 	private static void overrideWithUserProperties(Settings settings) {
@@ -726,8 +730,8 @@ public class Main {
 	}
 
 	/**
-	 * Check if filter and oracles regular expressions are valid. 
-	 * 
+	 * Check if filter and oracles regular expressions are valid.
+	 *
 	 * @param settings
 	 * @return
 	 */
@@ -764,8 +768,8 @@ public class Main {
 	}
 
 	/**
-	 * Escape special characters in settings that are used to write directories or files. 
-	 * 
+	 * Escape special characters in settings that are used to write directories or files.
+	 *
 	 * @param settings
 	 * @return
 	 */
@@ -781,10 +785,14 @@ public class Main {
 
 			if(m.find()) {
 				String value = settings.get(tag, "").replaceAll("[\\/?:*\"|><]", "_");
-				System.out.println(String.format("Info: Replacing %s special characters from %s to %s", 
+				System.out.println(String.format("Info: Replacing %s special characters from %s to %s",
 						tag.name(), settings.get(tag, ""), value));
 				settings.set(tag, value);
 			}
 		}
 	}
+
+    private static void initTagVisualization() {
+        TagFilter.setInstance(new ConcreteTagFilter());
+    }
 }
