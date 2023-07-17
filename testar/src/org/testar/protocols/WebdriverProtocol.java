@@ -586,7 +586,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				}
 			}
 			if (popupMatches) {
-				popupClickActions.add(ac.leftClickAt(widget));
+				popupClickActions.add(triggeredClickAction(state, widget));
 			}
 		}
 

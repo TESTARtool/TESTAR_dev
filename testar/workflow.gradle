@@ -341,6 +341,26 @@ task runTestWebdriverParabankFormFilling(type: Exec) {
     }
 }
 
+// Interact with para.testar.org executing webdriver remote actions
+task runTestWebdriverParabankRemoteActions(type: Exec) {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestWebdriverParabankRemoteActions'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_remote_parabank AlwaysCompile=true ApplicationName="webdriver_remote_actions" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=1 ProtocolSpecificSetting_1=john ProtocolSpecificSetting_2=demo TagsToFilter=WebHref ClickFilter="^(?!(.*sitemap.*)$).*$"'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Check that output detects the browser console error message
+        if(output.readLines().any{line->line.contains("No problem detected.")}) {
+            println "\n${output} \nTESTAR webdriver remote acitons were executed sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Executing TESTAR")
+        }
+    }
+}
+
 // Verify that TESTAR correctly replays a sequence
 task runTestWebdriverCorrectReplay(type: Exec) {
     // Read command line output
