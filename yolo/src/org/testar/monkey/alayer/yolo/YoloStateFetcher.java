@@ -124,16 +124,16 @@ public class YoloStateFetcher implements Callable<YoloState> {
 			windowHandle = Windows.GetNextWindow(windowHandle, Windows.GW_HWNDNEXT);
 		}
 
-        // Get the window rect of the SUT (x1, y1, x2, y2)
-        long r[] = Windows.GetWindowRect(rootElement.windowsHandle);
-        int c[] = Windows.GetClientRect((int)rootElement.windowsHandle);
-        int offsetX = (int)r[2] - c[2] - (int)r[0];
-        int offsetY = (int)r[3] - c[3] - (int)r[1];
-        Rect rootRect = Rect.fromCoordinates((int)r[0] + offsetX/2, (int)r[1], (int)r[2] - offsetX/2, (int)r[3] - offsetX/2);
+		// Get the window rect of the SUT (x1, y1, x2, y2)
+		long r[] = Windows.GetWindowRect(rootElement.windowsHandle);
+		int c[] = Windows.GetClientRect((int)rootElement.windowsHandle);
+		int offsetX = (int)r[2] - c[2] - (int)r[0];
+		int offsetY = (int)r[3] - c[3] - (int)r[1];
+		Rect rootRect = Rect.fromCoordinates((int)r[0] + offsetX/2, (int)r[1], (int)r[2] - offsetX/2, (int)r[3] - offsetX/2);
 
-        // The root element / state, uses the rect position obtained with the Windows API
-        Rect windowRect = Rect.fromCoordinates((int)r[0], (int)r[1], (int)r[2], (int)r[3]);
-        rootElement.rect = windowRect;
+		// The root element / state, uses the rect position obtained with the Windows API
+		Rect windowRect = Rect.fromCoordinates((int)r[0], (int)r[1], (int)r[2], (int)r[3]);
+		rootElement.rect = windowRect;
 
 		// If the root element / state is in the foreground, extract children data
 		if(rootElement.isForeground) {
@@ -167,13 +167,14 @@ public class YoloStateFetcher implements Callable<YoloState> {
 						Double.parseDouble(values[3]), 
 						Double.parseDouble(values[4]));
 
-                // We need to denormalize the values to match the GUI screen
-                double x = (Double.parseDouble(values[1]) * rootRect.width()) + windowRect.x() - offsetX/2;
-                double y = (Double.parseDouble(values[2]) * rootRect.height()) + windowRect.y() - offsetY/2;
-                double width = Double.parseDouble(values[3]) * windowRect.width();
-                double height = Double.parseDouble(values[4]) * windowRect.height();
+				// We need to denormalize the values to match the GUI screen
+				double x = (Double.parseDouble(values[1]) * rootRect.width()) + windowRect.x() + offsetX/2;
+				double y = (Double.parseDouble(values[2]) * rootRect.height()) + windowRect.y() + offsetY/2;
+				double width = Double.parseDouble(values[3]) * windowRect.width();
+				double height = Double.parseDouble(values[4]) * windowRect.height();
 
-				childElement.rect = Rect.from(x, y, width, height);
+				// Yolo returns the x,y values of the center of a rectangle
+				childElement.rect = Rect.fromCenter(x, y, width, height);
 			}
 		}
 

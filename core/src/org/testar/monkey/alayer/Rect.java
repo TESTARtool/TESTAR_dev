@@ -72,6 +72,11 @@ public final class Rect implements Shape {
 
 	public static Rect from(double x, double y, double width, double height){ return new Rect(x, y, width, height); }
 	public static Rect fromCoordinates(double x1, double y1, double x2, double y2){ return new Rect(x1, y1, x2 - x1, y2 - y1); }
+	public static Rect fromCenter(double x, double y, double width, double height) {
+		double rectX = x - (width / 2.0);
+		double rectY = y - (height / 2.0);
+		return new Rect(rectX, rectY, width, height);
+	}
 
 	private Rect(double x, double y, double width, double height){
 		Assert.isTrue(width >= 0 && height >= 0,
