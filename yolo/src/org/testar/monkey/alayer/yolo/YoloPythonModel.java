@@ -139,7 +139,7 @@ public class YoloPythonModel {
 		// This is done to do not interfere with the python service
 		Path scrPath = Paths.get(yoloInputImagesDirectory, "state.png");
 		while (Files.exists(scrPath)) {
-			Thread.sleep(500);
+			Thread.sleep(50);
 		}
 
 		// Save the screenshot to the specified location
@@ -152,7 +152,7 @@ public class YoloPythonModel {
 		Path filePathOut = Paths.get(yoloModelOutputDirectory, "widgets.txt");
 		Path filePathIn = Paths.get(yoloInputImagesDirectory, "state.png");
 		while (!Files.exists(filePathOut) || Files.exists(filePathIn)) {
-			Thread.sleep(500);
+			Thread.sleep(50);
 		}
 
 		// Yolo output file exists, read it
@@ -178,7 +178,7 @@ public class YoloPythonModel {
 
 			// Wait until the file deletion is complete
 			while (Files.exists(filePath)) {
-				Thread.sleep(100);
+				Thread.sleep(50);
 			}
 		}
 	}

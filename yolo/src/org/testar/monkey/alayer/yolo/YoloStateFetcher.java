@@ -161,19 +161,18 @@ public class YoloStateFetcher implements Callable<YoloState> {
 
 				childElement.widgetType = values[0];
 
-				childElement.normalizedRect = Rect.from(
+				childElement.normalizedRect = Rect.fromCenter(
 						Double.parseDouble(values[1]), 
 						Double.parseDouble(values[2]), 
 						Double.parseDouble(values[3]), 
 						Double.parseDouble(values[4]));
 
 				// We need to denormalize the values to match the GUI screen
-				double x = (Double.parseDouble(values[1]) * rootRect.width()) + windowRect.x() + offsetX/2;
-				double y = (Double.parseDouble(values[2]) * rootRect.height()) + windowRect.y() + offsetY/2;
-				double width = Double.parseDouble(values[3]) * windowRect.width();
-				double height = Double.parseDouble(values[4]) * windowRect.height();
+				double x = Double.parseDouble(values[1]) * rootRect.width() + rootRect.x();
+				double y = Double.parseDouble(values[2]) * rootRect.height() + rootRect.y();
+				double width = Double.parseDouble(values[3]) * rootRect.width();
+				double height = Double.parseDouble(values[4]) * rootRect.height();
 
-				// Yolo returns the x,y values of the center of a rectangle
 				childElement.rect = Rect.fromCenter(x, y, width, height);
 			}
 		}
