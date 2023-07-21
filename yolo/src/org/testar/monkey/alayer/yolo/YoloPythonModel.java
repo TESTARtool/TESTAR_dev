@@ -145,6 +145,7 @@ public class YoloPythonModel {
 		// Save the screenshot to the specified location
 		File output = new File(yoloInputImagesDirectory + File.separator + "state.png");
 		ImageIO.write(image, "png", output);
+		
 	}
 
 	private String obtainYoloOutput() throws IOException, InterruptedException {
@@ -152,7 +153,7 @@ public class YoloPythonModel {
 		Path filePathOut = Paths.get(yoloModelOutputDirectory, "widgets.txt");
 		Path filePathIn = Paths.get(yoloInputImagesDirectory, "state.png");
 		while (!Files.exists(filePathOut) || Files.exists(filePathIn)) {
-			Thread.sleep(50);
+			Thread.sleep(100);
 		}
 
 		// Yolo output file exists, read it
@@ -162,10 +163,10 @@ public class YoloPythonModel {
 		// Before returning the content, delete the file to clear the output folder for next iteration
 		Files.delete(filePathOut);
 
-		// Wait until the file deletion is complete => NO LONGER REQUIRED (O.K. BECAUSE OF HANDSHAKE)
-		//while (Files.exists(filePathOut)) {
-		//	Thread.sleep(100);
-		//}
+		// Wait until the file deletion is complete
+		while (Files.exists(filePathOut)) {
+			Thread.sleep(50);
+		}
 
 		return outputResult;
 	}

@@ -44,6 +44,13 @@ def run(
     stride, names, pt = model.stride, model.names, model.pt
     imgsz = check_img_size(imgsz, s=stride)  # check image size
 
+    output_file = os.path.join(str(output_txt_dir), 'widgets.txt')
+    # If the GUI widgets txt file exists, delete it before starting
+    if os.path.exists(output_file):
+        os.remove(output_file)
+    # Also wait a second for the case that image file must be deleted at initialisation
+    time.sleep(1)
+
     # Run inference
     model.warmup(imgsz=(1 if pt or model.triton else bs, 3, *imgsz))  # warmup
     seen, windows, dt = 0, [], (Profile(), Profile(), Profile())
@@ -57,8 +64,8 @@ def run(
 
         counter += 1  # Increment the counter
 
-        # If the directory is empty wait for 1 second
-        if not os.listdir(input_img_dir):
+        # If the image directory is empty or there is still a widgets txt file, wait a while
+        if not os.listdir(input_img_dir) or os.listdir(output_txt_dir):
             time.sleep(1)
 
         # Else, process the image with the yolo model
@@ -68,9 +75,6 @@ def run(
             counter = 0  # Reset Counter variable
 
             output_file = os.path.join(str(output_txt_dir), 'widgets.txt')
-            ## If the GUI widgets txt file exists, delete it before writing a new one
-            if os.path.exists(output_file):
-                os.remove(output_file)
 
             # Dataloader
             bs = 1  # batch_size
@@ -112,12 +116,15 @@ def run(
                             with open(f'{str(output_file)}', 'a') as f:
                                 f.write(('%g ' * len(line)).rstrip() % line + '\n')
 
-                        # Get the TESTAR GUI images and delete them (clean for next iteration)
-                        files = os.listdir(input_img_dir)
-                        for file_name in files:
-                            file_path = os.path.join(input_img_dir, file_name)  # Get the full file path
-                            print(f"RESULTS! for image '{file_path}'")
-                            os.remove(file_path)  # Delete the image file
+            # Get the TESTAR GUI images and delete them (clean for next iteration)
+            files = os.listdir(input_img_dir)
+            for file_name in files:
+                file_path = os.path.join(input_img_dir, file_name)  # Get the full file path
+                print(f"RESULTS! for image '{file_path}'")
+                os.remove(file_path)  # Delete the image file
+            # Wait until effectively deleted
+            while os.listdir(input_img_dir):
+                time.sleep(0.1)
 
     print("END... BYE")
 
@@ -129,3 +136,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     run(**vars(args))
+
