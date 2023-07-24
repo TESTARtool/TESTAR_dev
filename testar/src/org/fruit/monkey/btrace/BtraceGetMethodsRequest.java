@@ -5,7 +5,7 @@ import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 
 public class BtraceGetMethodsRequest extends BtraceRequest<BtraceFinishRecordingResponse> {
 
-    private static final String GET_METHODS_ENDPOINT_PATH = "/testar/api/action/methods";
+    private static final String GET_METHODS_ENDPOINT_PATH = "/api/btrace/action/methods";
     private String sequenceId;
     private long durationMillis;
 

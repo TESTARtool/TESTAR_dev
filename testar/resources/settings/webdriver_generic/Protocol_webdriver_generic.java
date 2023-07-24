@@ -28,7 +28,11 @@
  *
  */
 
+import org.fruit.monkey.btrace.BtraceApiClient;
+import org.openqa.selenium.Cookie;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.SutVisualization;
+import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Pair;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
@@ -36,6 +40,7 @@ import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
+import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.WdElement;
 import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
@@ -51,6 +56,9 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 
 public class Protocol_webdriver_generic extends WebdriverProtocol {
+
+	private BtraceApiClient btrace;
+	Boolean flag = false;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -99,6 +107,8 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 		policyAttributes = new HashMap<String, String>() {{
 			put("class", "lfr-btn-label");
 		}};
+
+		btrace = new BtraceApiClient(settings.get(ConfigTags.BtraceServiceHost));
 	}
 
 	/**
@@ -127,6 +137,13 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	@Override
 	protected void beginSequence(SUT system, State state) {
 		super.beginSequence(system, state);
+
+//		RemoteWebDriver driver = WdDriver.getRemoteWebDriver();
+//		driver.manage().addCookie(new Cookie("testarSequenceToken", "testsession1"));
+
+		waitLeftClickAndPasteIntoWidgetWithMatchingTag(WdTags.WebGenericTitle, "Phone Number", "+48500000005", state, system, 3, 1);
+		waitLeftClickAndPasteIntoWidgetWithMatchingTag(WdTags.WebGenericTitle, "Password", "password", state, system, 3, 1);
+		waitAndLeftClickWidgetWithMatchingTag(WdTags.Desc, "Log In", state, system, 3, 1);
 	}
 
 	/**
@@ -153,6 +170,12 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	 */
 	@Override
 	protected Verdict getVerdict(State state) {
+		if(flag) {
+			System.out.println("TRUE");
+			var recordedMethods = btrace.finishRecordingMethodInvocation();
+			System.out.println("RECEIVED RECORDED METHODS: " + recordedMethods);
+			flag=false;
+		}
 
 		Verdict verdict = super.getVerdict(state);
 		// system crashes, non-responsiveness and suspicious titles automatically detected!
@@ -302,6 +325,8 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action) {
+		btrace.startRecordingMethodInvocation();
+		flag=true;
 		return super.executeAction(system, state, action);
 	}
 

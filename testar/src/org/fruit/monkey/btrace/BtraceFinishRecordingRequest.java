@@ -2,7 +2,7 @@ package org.fruit.monkey.btrace;
 
 public class BtraceFinishRecordingRequest extends BtraceRequest<BtraceFinishRecordingResponse> {
 
-    private static final String FINISH_RECORDING_ENDPOINT_PATH = "/testar/api/action/stop";
+    private static final String FINISH_RECORDING_ENDPOINT_PATH = "/api/btrace/action/stop";
 
     public BtraceFinishRecordingRequest(String host) {
         super(host, BtraceFinishRecordingResponse.class);

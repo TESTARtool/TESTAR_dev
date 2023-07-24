@@ -25,7 +25,10 @@ public abstract class BtraceRequest<T extends BtraceResponse> {
     }
 
     protected T send() {
-        var httpRequest = new HttpPost(buildUri());
+        var httpRequest = makeRequest(buildUri());
+        System.out.println(httpRequest);
+
+        System.out.println(buildUri());
 
         try (var httClient = HttpClientBuilder.create().build();
              var httpResponse = httClient.execute(httpRequest)) {

@@ -35,7 +35,7 @@ StateModelEnabled = false
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "/Users/michaeltikhonenko/Downloads/chromedriver" "1920x900+0+0" "https://tst.yoho.marviq.net/web/login"
+SUTConnectorValue = "D:\\Testar\\chromedriver\\chromedriver.exe" "1920x900+0+0" "http://localhost"
 
 #################################################################
 # Sequences
@@ -44,7 +44,7 @@ SUTConnectorValue = "/Users/michaeltikhonenko/Downloads/chromedriver" "1920x900+
 #################################################################
 
 Sequences = 1
-SequenceLength = 100
+SequenceLength = 5
 
 #################################################################
 # Oracles based on suspicious titles
@@ -211,3 +211,4 @@ ForcedLoginUsername = +48500000014
 ForcedLoginPasswordInputName = mat-input-1
 ForcedLoginPassword = password
 
+BtraceServiceHost = http://localhost:8088

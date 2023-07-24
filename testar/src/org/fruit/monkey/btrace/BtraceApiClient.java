@@ -30,6 +30,9 @@ public class BtraceApiClient {
     }
 
     public List<MethodInvocation> finishRecordingMethodInvocation() throws BtraceApiException {
+        for (Cookie c: WdDriver.getRemoteWebDriver().manage().getCookies()) {
+            System.out.println(c);
+        }
         Cookie sessionCookie = WdDriver.getRemoteWebDriver().manage().getCookieNamed("testarSequenceToken");
         if (startTime == 0 || sessionCookie == null) {
             System.out.println("Wrong session ");

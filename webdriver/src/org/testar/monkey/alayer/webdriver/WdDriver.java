@@ -211,6 +211,9 @@ public class WdDriver extends SUTBase {
     prefs.put("profile.default_content_setting_values.notifications", 1);
     options.setExperimentalOption("prefs", prefs);
 
+    // Workaround to fix https://github.com/SeleniumHQ/selenium/issues/11750
+    options.addArguments("--remote-allow-origins=*");
+
     return new ChromeDriver(service, options);
   }
 
