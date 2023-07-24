@@ -97,58 +97,62 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 	 */
 	@Override
 	public void keyDown(KBKeys key){
-		pressed.add(key);
+		if (settings.get(ConfigTags.KeyBoardListener)) {
+			pressed.add(key);
 
-		//  SHIFT + SPACE are pressed --> Toggle slow motion test
-		if (pressed.contains(KBKeys.VK_SHIFT) && key == KBKeys.VK_SPACE){
-			if (this.delay == Double.MIN_VALUE){
-				this.delay = settings().get(ConfigTags.TimeToWaitAfterAction).doubleValue();
-				settings().set(ConfigTags.TimeToWaitAfterAction, SLOW_MOTION);
-			} else{
-				settings().set(ConfigTags.TimeToWaitAfterAction, this.delay);
-				delay = Double.MIN_VALUE;
+			//  SHIFT + SPACE are pressed --> Toggle slow motion test
+			if (pressed.contains(KBKeys.VK_SHIFT) && key == KBKeys.VK_SPACE){
+				if (this.delay == Double.MIN_VALUE){
+					this.delay = settings().get(ConfigTags.TimeToWaitAfterAction).doubleValue();
+					settings().set(ConfigTags.TimeToWaitAfterAction, SLOW_MOTION);
+				} else{
+					settings().set(ConfigTags.TimeToWaitAfterAction, this.delay);
+					delay = Double.MIN_VALUE;
+				}
 			}
-		}
 
-		// SHIFT + ARROW-DOWN --> stop TESTAR run
-		else if(key == KBKeys.VK_DOWN && pressed.contains(KBKeys.VK_SHIFT)){
-			LogSerialiser.log("User requested to stop monkey!\n", LogSerialiser.LogLevel.Info);
-			mode = Modes.Quit;
-		}
-
-		// SHIFT + ARROW-UP --> toggle visualization on / off
-		else if(key == KBKeys.VK_UP && pressed.contains(KBKeys.VK_SHIFT)){
-			if(visualizationOn){
-				visualizationOn = false;
-			}else{
-				visualizationOn = true;
+			// SHIFT + ARROW-DOWN --> stop TESTAR run
+			else if(key == KBKeys.VK_DOWN && pressed.contains(KBKeys.VK_SHIFT)){
+				LogSerialiser.log("User requested to stop monkey!\n", LogSerialiser.LogLevel.Info);
+				mode = Modes.Quit;
 			}
-		}
 
-		// SHIFT + 0 --> print in the PID, Windows Handle, and process name of the running applications
-		else if (key == KBKeys.VK_0  && pressed.contains(KBKeys.VK_SHIFT)) {
-			System.setProperty("DEBUG_WINDOWS_PROCESS_NAMES","true");
-		}
+			// SHIFT + ARROW-UP --> toggle visualization on / off
+			else if(key == KBKeys.VK_UP && pressed.contains(KBKeys.VK_SHIFT)){
+				if(visualizationOn){
+					visualizationOn = false;
+				}else{
+					visualizationOn = true;
+				}
+			}
 
-		// In Record mode you can press any key except SHIFT to add a user keyboard
-		// This is because SHIFT is used for the TESTAR shortcuts
-		// This is not ideal, because now special characters and capital letters and other events that needs SHIFT
-		// cannot be recorded as an user event in Record....
-		else if (!pressed.contains(KBKeys.VK_SHIFT) && mode() == Modes.Record && userEvent == null) {
-			//System.out.println("USER_EVENT key_down! " + key.toString());
-			userEvent = new Object[]{key}; // would be ideal to set it up at keyUp
-		}
+			// SHIFT + 0 --> print in the PID, Windows Handle, and process name of the running applications
+			else if (key == KBKeys.VK_0  && pressed.contains(KBKeys.VK_SHIFT)) {
+				System.setProperty("DEBUG_WINDOWS_PROCESS_NAMES","true");
+			}
 
-		// SHIFT + ALT --> Toggle widget-tree hierarchy display
-		if (pressed.contains(KBKeys.VK_ALT) && pressed.contains(KBKeys.VK_SHIFT)) {
-			markParentWidget = !markParentWidget;
+			// In Record mode you can press any key except SHIFT to add a user keyboard
+			// This is because SHIFT is used for the TESTAR shortcuts
+			// This is not ideal, because now special characters and capital letters and other events that needs SHIFT
+			// cannot be recorded as an user event in Record....
+			else if (!pressed.contains(KBKeys.VK_SHIFT) && mode() == Modes.Record && userEvent == null) {
+				//System.out.println("USER_EVENT key_down! " + key.toString());
+				userEvent = new Object[]{key}; // would be ideal to set it up at keyUp
+			}
+
+			// SHIFT + ALT --> Toggle widget-tree hierarchy display
+			if (pressed.contains(KBKeys.VK_ALT) && pressed.contains(KBKeys.VK_SHIFT)) {
+				markParentWidget = !markParentWidget;
+			}
 		}
 	}
 
 	//jnativehook is platform independent
 	@Override
 	public void keyUp(KBKeys key){
-		pressed.remove(key);
+		if (settings.get(ConfigTags.KeyBoardListener)) {
+			pressed.remove(key);
+		}
 	}
 
 	/**

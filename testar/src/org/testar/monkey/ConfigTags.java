@@ -243,6 +243,9 @@ public final class ConfigTags {
 
 	public static final Tag<Boolean> VisualizeActions = Tag.from("VisualizeActions", Boolean.class, 
 			"Sets whether to display overlay information, inside the SPY mode, for all the UI actions derived from the test set up");
+	
+	public static final Tag<Boolean> KeyBoardListener = Tag.from("KeyBoardListener", Boolean.class, 
+			"Sets whether to listen to keyboard shortcuts during the exceution");
 
 	public static final Tag<Boolean> UseSystemActions = Tag.from("UseSystemActions", Boolean.class, 
 			"ANDROID: Indicate if add system calls");

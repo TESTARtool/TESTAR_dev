@@ -463,6 +463,7 @@ public class Main {
 			defaults.add(Pair.from(ActionDuration, 0.1));
 			defaults.add(Pair.from(TimeToWaitAfterAction, 0.1));
 			defaults.add(Pair.from(VisualizeActions, false));
+			defaults.add(Pair.from(KeyBoardListener, true));
 			defaults.add(Pair.from(SequenceLength, 10));
 			defaults.add(Pair.from(ReplayRetryTime, 30.0));
 			defaults.add(Pair.from(Sequences, 1));
