@@ -112,7 +112,7 @@ public class YoloProtocol extends GenericUtilsProtocol {
 	@Override
 	protected boolean isClickable(Widget w) {
 		Role role = w.get(Tags.Role, Roles.Widget);
-		return role.equals(YoloRoles.YoloButton);
+		return role.equals(YoloRoles.YoloButton) || role.equals(YoloRoles.YoloCheckBox) || role.equals(YoloRoles.YoloRadioButton) || role.equals(YoloRoles.YoloComboBox);
 	}
 
 	@Override

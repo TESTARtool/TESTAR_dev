@@ -139,7 +139,15 @@ public class Protocol_yolo_generic extends YoloProtocol {
 	@Override
 	protected boolean isClickable(Widget w) {
 		// 0 represents a button class in the Yolo trained model
-		return w.get(YoloTags.YoloWidgetType, "noType").equals("0");
+		// 2 represents a checkbox class in the Yolo trained model
+		// 3 represents a radiobutton class in the Yolo trained model
+		// 4 represents a combobox class in the Yolo trained model
+		String  widgettype = w.get(YoloTags.YoloWidgetType, "noType");
+		return  widgettype.equals("0") ||
+				widgettype.equals("2") ||
+				widgettype.equals("3") ||
+				widgettype.equals("4")
+			    ;
 	}
 
 	@Override
