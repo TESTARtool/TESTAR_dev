@@ -1,12 +1,16 @@
 package org.testar.statemodel.persistence.orientdb.extractor;
 
 import com.orientechnologies.orient.core.metadata.schema.OType;
+
+import org.testar.monkey.alayer.Tag;
 import org.testar.statemodel.AbstractAction;
 import org.testar.statemodel.AbstractStateModel;
+import org.testar.statemodel.StateModelTags;
 import org.testar.statemodel.exceptions.ExtractionException;
 import org.testar.statemodel.persistence.orientdb.entity.DocumentEntity;
 import org.testar.statemodel.persistence.orientdb.entity.EdgeEntity;
 import org.testar.statemodel.persistence.orientdb.entity.PropertyValue;
+import org.testar.statemodel.persistence.orientdb.entity.TypeConvertor;
 
 import java.util.Set;
 
@@ -46,6 +50,27 @@ public class AbstractActionExtractor implements EntityExtractor<AbstractAction> 
         for (String concreteActionId : concreteActionIds) {
             action.addConcreteActionId(concreteActionId);
         }
+
+        // get existing State Model Tags
+        for(Tag<?> t : StateModelTags.getStateModelTags()) {
+
+        	PropertyValue valueRL = entity.getPropertyValue(t.name());
+
+        	if(valueRL == null) {
+        		continue;
+        	}
+
+        	if (valueRL.getType() != TypeConvertor.getInstance().getOrientDBType(t.type())) {
+        		throw new ExtractionException(String.format("ERROR retrieving State Model value from State Model."
+        				+ " %s was expected, but %s was given",
+        				TypeConvertor.getInstance().getOrientDBType(t.type()), valueRL.getType()));
+        	}
+        	action.addAttribute(t, valueRL.getValue());
+
+        	System.out.println(String.format("Extracted State Model Tag %s with value %s for the Action %s",
+        			t.name(), valueRL.getValue().toString(), actionId));
+        }
+
         return action;
     }
 }

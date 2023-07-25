@@ -248,6 +248,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					popupMessage("Please select a file.html (output/HTMLreports) to use in the View mode");
 					System.out.println("Exception: Please select a file.html (output/HTMLreports) to use in the View mode");
 				}
+			} else if (mode() == Modes.Listening) {
+				new ListeningMode().runListeningLoop(this);
 			} else if (mode() == Modes.Replay && isValidFile()) {
 				new ReplayMode().runReplayLoop(this);
 			} else if (mode() == Modes.Spy) {
@@ -323,6 +325,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		startTime = Util.time();
 		this.settings = settings;
 		mode = settings.get(ConfigTags.Mode);
+		if (settings.get(ConfigTags.ListeningMode, false)) {
+			System.out.println("Running TESTAR in Listening mode...");
+			this.mode = Modes.Listening;
+		} 
 
 		//EventHandler is implemented in RuntimeControlsProtocol (super class):
 		eventHandler = initializeEventHandler();
@@ -333,7 +339,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				settings.get(ConfigTags.SUTProcesses)
 				);
 
-		if ( mode() == Modes.Generate || /*mode() == Modes.Record ||*/ mode() == Modes.Replay ) {
+		if ( mode() == Modes.Generate || /*mode() == Modes.Record ||*/ mode() == Modes.Replay || mode() == Modes.Listening ) {
 			//Create the output folders
 			OutputStructure.calculateOuterLoopDateString();
 			OutputStructure.sequenceInnerLoopCount = 0;

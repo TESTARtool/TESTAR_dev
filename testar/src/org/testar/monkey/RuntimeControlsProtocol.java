@@ -54,7 +54,8 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 		Generate,
 		Quit,
 		View,
-		Replay;
+		Replay,
+		Listening;
 	}
 
 	protected Modes mode;
@@ -161,15 +162,15 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 	public void mouseDown(MouseButtons btn, double x, double y){}
 
 	/**
-	 * In Record mode the user can add user events by clicking and the event is added when releasing the mouse
+	 * In Record or Listening modes the user can add user events by clicking and the event is added when releasing the mouse
 	 * @param btn
 	 * @param x
 	 * @param y
 	 */
 	@Override
 	public void mouseUp(MouseButtons btn, double x, double y){
-		// In GenerateManual the user can add user events by clicking
-		if (mode() == Modes.Record && userEvent == null){
+		// In Record or Listening modes the user can add user events by clicking
+		if ((mode() == Modes.Record || mode() == Modes.Listening) && userEvent == null){
 			userEvent = new Object[]{
 					btn,
 					new Double(x),
