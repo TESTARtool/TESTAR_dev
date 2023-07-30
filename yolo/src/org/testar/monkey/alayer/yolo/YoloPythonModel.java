@@ -149,7 +149,8 @@ public class YoloPythonModel {
 	}
 
 	private String obtainYoloOutput() throws IOException, InterruptedException {
-		// Wait until Yolo has created the output txt result file
+		// Wait until Yolo has created the output txt result file and
+		// deleted the image file to indicate that it is processed.
 		Path filePathOut = Paths.get(yoloModelOutputDirectory, "widgets.txt");
 		Path filePathIn = Paths.get(yoloInputImagesDirectory, "state.png");
 		while (!Files.exists(filePathOut) || Files.exists(filePathIn)) {

@@ -47,6 +47,7 @@ public class YoloRoles {
 	YoloCheckBox = from("2", "YoloCheckBox", YoloRoles.YoloWidget),
 	YoloRadioButton = from("3", "YoloRadioButton", YoloRoles.YoloWidget),
 	YoloComboBox = from("4", "YoloComboBox", YoloRoles.YoloWidget),
+	YoloLabel = from("5", "YoloLabel", YoloRoles.YoloWidget),
 	YoloUnknown = from("-1", "YoloUnknown", Roles.Widget);
 
 	private static Role from(String tag, String name, Role... inheritFrom) {

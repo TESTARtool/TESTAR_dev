@@ -142,11 +142,13 @@ public class Protocol_yolo_generic extends YoloProtocol {
 		// 2 represents a checkbox class in the Yolo trained model
 		// 3 represents a radiobutton class in the Yolo trained model
 		// 4 represents a combobox class in the Yolo trained model
+		// 5 represents a label class in the Yolo trained model which could be a menu item as well
 		String  widgettype = w.get(YoloTags.YoloWidgetType, "noType");
 		return  widgettype.equals("0") ||
 				widgettype.equals("2") ||
 				widgettype.equals("3") ||
-				widgettype.equals("4")
+				widgettype.equals("4") ||
+				widgettype.equals("5")
 			    ;
 	}
 

@@ -111,11 +111,11 @@ AbstractStateAttributes = WidgetControlType
 #################################################################
 
 YoloPythonCommand = python
-YoloProjectAbsolutePath = C:/Users/dirk.verlinden/yolo-integration-testar
+YoloProjectAbsolutePath = C:/Users/dirk.verlinden/data/yolo-integration-testar
 YoloPythonServiceRelativePath = detectTESTAR.py
-YoloModelAbsolutePath = C:/Users/dirk.verlinden/yolo-integration-testar/yolo_weights.pt
-YoloInputImagesDirectory = C:/Users/dirk.verlinden/yolo-integration-testar/data/images/input
-YoloModelOutputDirectory = C:/Users/dirk.verlinden/yolo-integration-testar/data/images/output
+YoloModelAbsolutePath = C:/Users/dirk.verlinden/data/yolo-integration-testar/yolo_weights.pt
+YoloInputImagesDirectory = C:/Users/dirk.verlinden/data/yolo-integration-testar/data/images/input
+YoloModelOutputDirectory = C:/Users/dirk.verlinden/data/yolo-integration-testar/data/images/output
 
 #################################################################
 # Other more advanced settings

@@ -48,8 +48,8 @@ def run(
     # If the GUI widgets txt file exists, delete it before starting
     if os.path.exists(output_file):
         os.remove(output_file)
-    # Also wait a second for the case that image file must be deleted at initialisation
-    time.sleep(1)
+    # Also wait a while for the case that image file must be deleted at initialisation
+    time.sleep(2)
 
     # Run inference
     model.warmup(imgsz=(1 if pt or model.triton else bs, 3, *imgsz))  # warmup
@@ -64,7 +64,7 @@ def run(
 
         counter += 1  # Increment the counter
 
-        # If the image directory is empty or there is still a widgets txt file, wait a while
+        # If the image directory is empty or there is still a widgets txt file, wait a while (handshake)
         if not os.listdir(input_img_dir) or os.listdir(output_txt_dir):
             time.sleep(1)
 
