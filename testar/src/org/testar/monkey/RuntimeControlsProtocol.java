@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -40,8 +40,6 @@ import java.util.Set;
 
 
 public abstract class RuntimeControlsProtocol extends AbstractProtocol implements IEventListener {
-
-	//TODO create a settings to turn off all the runtime controls (for "headless"-mode, for example in continuous integration)
 
 	protected double delay = Double.MIN_VALUE;
 	protected Object[] userEvent = null;
