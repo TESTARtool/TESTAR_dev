@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Properties;
 
 import org.jnativehook.keyboard.NativeKeyEvent;
+import org.junit.Assume;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.testar.EventHandler;
 import org.testar.monkey.RuntimeControlsProtocol.Modes;
@@ -13,6 +15,12 @@ import org.testar.monkey.RuntimeControlsProtocol.Modes;
 public class TestRuntimeControlListener {
 
 	private DefaultProtocol defaultProtocol;
+
+	@BeforeClass
+	public static void setup() {
+		// To avoid issues with java awt robot, we only execute this unit tests in windows environments.
+		Assume.assumeTrue(System.getProperty("os.name").toLowerCase().contains("windows"));
+	}
 
 	@Before
 	public void prepare_test_protocol() {
