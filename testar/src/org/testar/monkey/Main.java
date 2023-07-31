@@ -54,6 +54,7 @@ import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
 import org.testar.extendedsettings.ExtendedSettingFile;
 import org.testar.extendedsettings.ExtendedSettingsFactory;
+import org.testar.managers.NativeHookManager;
 import org.testar.settingsdialog.SettingsDialog;
 
 import static org.testar.monkey.Util.compileProtocol;
@@ -431,6 +432,9 @@ public class Main {
 	 * Close the Serialiser classes and stop the TESTAR process. 
 	 */
 	private static void stopTestar() {
+		//Unregister the JNativeHook library
+		NativeHookManager.unregisterNativeHook();
+
 		TestSerialiser.exit();
 		ScreenshotSerialiser.exit();
 		LogSerialiser.exit();

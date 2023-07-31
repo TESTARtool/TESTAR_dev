@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.jnativehook.keyboard.NativeKeyEvent;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.testar.EventHandler;
 import org.testar.monkey.RuntimeControlsProtocol.Modes;
+
+import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 
 public class TestRuntimeControlListener {
 
