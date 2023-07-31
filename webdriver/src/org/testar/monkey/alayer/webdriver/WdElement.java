@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,6 +30,7 @@
 
 package org.testar.monkey.alayer.webdriver;
 
+import org.openqa.selenium.remote.RemoteWebElement;
 import org.testar.monkey.alayer.Rect;
 import org.testar.monkey.alayer.TaggableBase;
 
@@ -70,13 +71,16 @@ public class WdElement extends TaggableBase implements Serializable {
   boolean isContentElement, isControlElement;
   boolean hasKeyboardFocus, isKeyboardFocusable;
   String acceleratorKey, accessKey;
-  String valuePattern, href, value, style, target, alt, src;
-
+  String valuePattern, href, style, target, alt, src;
+  Object value;
+  
   double zindex;
-  Rect rect;
+  public Rect rect;
   boolean scrollPattern, hScroll, vScroll;
   public double hScrollViewSize, vScrollViewSize, hScrollPercent, vScrollPercent;
   boolean isFullVisibleOnScreen;
+
+  boolean checked, selected;
 
   // Keep these here for fillScrollValues
   protected String overflowX, overflowY;
@@ -85,6 +89,8 @@ public class WdElement extends TaggableBase implements Serializable {
   public long scrollWidth, scrollHeight;
   public long scrollLeft, scrollTop;
   private long borderWidth, borderHeight;
+
+  public RemoteWebElement remoteWebElement;   // Reference to the remote Web Element
 
   public transient Map<String, String> attributeMap;
 
@@ -109,7 +115,7 @@ public class WdElement extends TaggableBase implements Serializable {
     	System.out.println("-------------------------------------------------------------------------------------");
     	throw e;
     }
-    
+
     id = attributeMap.getOrDefault("id", "");
     name = attributeMap.getOrDefault("name", "");
     genericTitle = (String) packedElement.get("name");
@@ -124,6 +130,10 @@ public class WdElement extends TaggableBase implements Serializable {
     type = attributeMap.getOrDefault("type", "");
     src = attributeMap.getOrDefault("src", "");
     maxLength = Integer.valueOf(attributeMap.getOrDefault("maxlength", "-1"));
+
+    remoteWebElement = (RemoteWebElement)packedElement.get("element");
+    checked = asBool(packedElement.getOrDefault("checked", false));
+    selected = asBool(packedElement.getOrDefault("selected", false));
 
     String classesString = attributeMap.getOrDefault("class", "");
     if (classesString != null) {
@@ -171,6 +181,11 @@ public class WdElement extends TaggableBase implements Serializable {
     }*/
   }
 
+  private boolean asBool(Object o) {
+    if (o == null) return false;
+    else return (Boolean)o;
+  }
+
   private void writeObject(ObjectOutputStream oos) throws IOException {
     oos.defaultWriteObject();
   }
@@ -193,8 +208,8 @@ public class WdElement extends TaggableBase implements Serializable {
 	  else if(id != null && !id.isEmpty()) {
 		  return id;
 	  }
-	  else if(value != null && !value.isEmpty()) {
-		  return value;
+	  else if(value != null) {
+		  return value.toString();
 	  }
 	  else if(tagName != null && !tagName.isEmpty()) {
 		  return tagName;

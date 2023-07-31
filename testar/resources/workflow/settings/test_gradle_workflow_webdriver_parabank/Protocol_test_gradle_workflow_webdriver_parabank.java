@@ -44,6 +44,8 @@ import org.testar.managers.InputDataManager;
 import org.testar.protocols.WebdriverProtocol;
 
 import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.*;
 
 import static org.testar.monkey.alayer.Tags.Blocked;
@@ -107,11 +109,35 @@ public class Protocol_test_gradle_workflow_webdriver_parabank extends WebdriverP
         }
 
         Assert.isTrue(loggedUser, String.format("Trying to login in parabank app with user %s and pass %s" , user, pass));
+
+        // Verify login screenshots were created properly
+
+        String outputScreenshotsDir = OutputStructure.screenshotsOutputDir + File.separator 
+        		+ OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname + "_sequence_" + OutputStructure.sequenceInnerLoopCount;
+        File screenshotsFolder = new File(outputScreenshotsDir);
+
+        try {
+        	screenshotsFolder = screenshotsFolder.getCanonicalFile();
+        } catch(IOException e) {
+        	e.printStackTrace();
+        }
+
+        Assert.isTrue(screenshotsFolder.exists());
+
+        // Get all PNG files in the folder that contain "_ACC"
+        File[] pngFiles = screenshotsFolder.listFiles(new FilenameFilter() {
+        	@Override
+        	public boolean accept(File dir, String name) {
+        		return name.toLowerCase().endsWith(".png") && name.contains("_ACC");
+        	}
+        });
+
+        // Verify if there are at least 3 PNG files with "_ACC"
+        Assert.isTrue(pngFiles != null && pngFiles.length >= 3);
     }
 
     @Override
-    protected Set<Action> deriveActions(SUT system, State state)
-            throws ActionBuildException {
+    protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
         // Kill unwanted processes, force SUT to foreground
         Set<Action> actions = super.deriveActions(system, state);
 
