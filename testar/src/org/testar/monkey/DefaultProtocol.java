@@ -51,7 +51,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -59,9 +58,11 @@ import java.util.zip.GZIPInputStream;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.testar.*;
+import org.testar.managers.NativeHookManager;
 import org.testar.reporting.Reporting;
 import org.testar.statemodel.StateModelManager;
 import org.testar.statemodel.StateModelManagerFactory;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.monkey.alayer.*;
@@ -85,8 +86,6 @@ import org.testar.plugin.OperatingSystems;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.serialisation.ScreenshotSerialiser;
 import org.testar.serialisation.TestSerialiser;
-import org.jnativehook.GlobalScreen;
-import org.jnativehook.NativeHookException;
 import org.openqa.selenium.SessionNotCreatedException;
 import org.testar.monkey.alayer.android.AndroidProtocolUtil;
 import org.testar.monkey.alayer.ios.IOSProtocolUtil;
@@ -324,9 +323,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		this.settings = settings;
 		mode = settings.get(ConfigTags.Mode);
 
-		//EventHandler is implemented in RuntimeControlsProtocol (super class):
-		eventHandler = initializeEventHandler();
-
 		builder = NativeLinker.getNativeStateBuilder(
 				settings.get(ConfigTags.TimeToFreeze),
 				settings.get(ConfigTags.AccessBridgeEnabled),
@@ -344,29 +340,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			stateModelManager = StateModelManagerFactory.getStateModelManager(settings);
 		}
 
-		try {
-			if (!GraphicsEnvironment.isHeadless()) {
-				LogSerialiser.log("Registering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
-				java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
-				logger.setLevel(Level.OFF);
-				logger.setUseParentHandlers(false);
+		//EventHandler is implemented in RuntimeControlsProtocol (super class):
+		eventHandler = initializeEventHandler();
 
-				if (GlobalScreen.isNativeHookRegistered()) {
-					GlobalScreen.unregisterNativeHook();
-				}
-				GlobalScreen.registerNativeHook();
-				GlobalScreen.addNativeKeyListener(eventHandler);
-				GlobalScreen.addNativeMouseListener(eventHandler);
-				GlobalScreen.addNativeMouseMotionListener(eventHandler);
-				LogSerialiser.log("Successfully registered keyboard and mouse hooks!\n", LogSerialiser.LogLevel.Debug);
-			}
+		//Initialize the JNativeHook library and register keyboard and mouse listeners
+		NativeHookManager.registerNativeHook(eventHandler);
 
-			LogSerialiser.log("'" + mode() + "' mode active.\n", LogSerialiser.LogLevel.Info);
-
-		} catch (NativeHookException e) {
-			LogSerialiser.log("Unable to install keyboard and mouse hooks!\n", LogSerialiser.LogLevel.Critical);
-			throw new RuntimeException("Unable to install keyboard and mouse hooks!", e);
-		}
+		LogSerialiser.log("'" + mode() + "' mode active.\n", LogSerialiser.LogLevel.Info);
 	}
 
 	/**
@@ -1144,24 +1124,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * method for closing the internal TESTAR test session
 	 */
 	private void closeTestarTestSession(){
-		//cleaning the variables started in initialize()
-		try {
-			if (!GraphicsEnvironment.isHeadless()) {
-				if (GlobalScreen.isNativeHookRegistered()) {
-					LogSerialiser.log("Unregistering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
-					GlobalScreen.removeNativeMouseMotionListener(eventHandler);
-					GlobalScreen.removeNativeMouseListener(eventHandler);
-					GlobalScreen.removeNativeKeyListener(eventHandler);
-					GlobalScreen.unregisterNativeHook();
-				}
-			}
-		} catch (NativeHookException e) {
-			e.printStackTrace();
-		} catch (NullPointerException e) {
-			// no ConfigTags
-			e.printStackTrace();
-		}
-
+		// Cleaning the JNativeHook native listeners started in initialize()
+		NativeHookManager.unregisterNativeListener(eventHandler);
 	}
 
 	@Override
