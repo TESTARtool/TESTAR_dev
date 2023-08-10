@@ -84,6 +84,9 @@ public class NativeLinker {
 		switch (osName) {
 		case "Windows 10":
 			return EnumSet.of(OperatingSystems.WINDOWS, OperatingSystems.WINDOWS_10);
+		// We suppose that behavior of Windows 10 and Windows 11 is exactly the same...
+		case "Windows 11":
+			return EnumSet.of(OperatingSystems.WINDOWS, OperatingSystems.WINDOWS_10);
 		case "Windows 7":
 			return EnumSet.of(OperatingSystems.WINDOWS, OperatingSystems.WINDOWS_7);
 		default:

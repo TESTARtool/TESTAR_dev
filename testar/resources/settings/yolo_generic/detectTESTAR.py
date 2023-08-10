@@ -23,10 +23,10 @@ def run(
         output_txt_dir,  # Output directory to store Yolo results
         dnn=True,  # use OpenCV DNN for ONNX inference
         data='data/coco128.yaml',  # dataset.yaml path
-        imgsz=(640, 640),  # inference size (height, width)
-        conf_thres=0.25,  # confidence threshold
+        imgsz=(512, 512),  # inference size (height, width)
+        conf_thres=0.1,  # confidence threshold
         iou_thres=0.45,  # NMS IOU threshold
-        max_det=1000,  # maximum detections per image
+        max_det=100,  # maximum detections per image
         device='',  # cuda device, i.e. 0 or 0,1,2,3 or cpu
         save_conf=False,  # save confidences in --save-txt labels
         save_crop=False,  # save cropped prediction boxes
