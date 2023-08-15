@@ -1,6 +1,4 @@
-package strategynodes.bool_expr;
-
-import org.testar.monkey.alayer.Action;
+package strategynodes.condition;
 
 import java.util.HashMap;
 import java.util.Map;

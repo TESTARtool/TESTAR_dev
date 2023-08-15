@@ -1,6 +1,13 @@
-IF
-    any-actions of-type click-action exist
-THEN
-    select-previous-action
-ELSE
-    select-random least-visited
+8 select-previous
+9 IF any-exist is TRUE
+	THEN 7 select-random unvisited
+	ELSE 3 select-random most-visited
+5 IF any-exist unvisited
+	THEN 5 select-previous
+	ELSE IF any-exist
+		THEN 4 select-random unvisited
+		ELSE 6 select-previous
+		2 select-random least-visited
+1 IF NOT any-exist
+	THEN 20 select-random visited
+	ELSE 9 select-random

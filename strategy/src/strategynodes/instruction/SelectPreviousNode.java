@@ -1,18 +1,17 @@
-package strategynodes.action_expr;
+package strategynodes.instruction;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
+import strategynodes.BaseActionNode;
 
 import java.util.Map;
 import java.util.Set;
 
 public class SelectPreviousNode extends BaseActionNode
 {
-    private Integer WEIGHT;
-    
     public SelectPreviousNode(Integer weight)
-    { this.WEIGHT = (weight != null || weight > 0) ? weight : 1; }
+    { this.WEIGHT = weight; }
     
     @Override
     public Action getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted) //todo: check if it works correctly

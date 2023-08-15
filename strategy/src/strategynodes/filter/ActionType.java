@@ -1,4 +1,4 @@
-package strategynodes;
+package strategynodes.filter;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Roles;
@@ -89,16 +89,12 @@ public enum ActionType
                         return false;
                     if(isChildOfFormWidget(originWidget))
                     {
-                    	// Some web SUT as Parabank contains Select dropdown elements in the form
-                    	if(action.get(Tags.Role, ActionRoles.Action).equals(WdActionRoles.SelectListAction))
-                    	{
-                    		return true;
-                    	}
-                    	// Some web SUT as Parabank contains text area elements in the form
-                    	else if(originWidget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdTEXTAREA))
-                    	{
-                    		return true;
-                    	}
+                        // Some web SUT like Parabank contains Select dropdown elements in the form
+                        if(action.get(Tags.Role, ActionRoles.Action).equals(WdActionRoles.SelectListAction))
+                            return true;
+                        // Some web SUT like Parabank contains text area elements in the form
+                        else if(originWidget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdTEXTAREA))
+                            return true;
                     }
                     return
                             (

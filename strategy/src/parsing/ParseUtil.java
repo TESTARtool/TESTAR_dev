@@ -39,8 +39,8 @@ public class ParseUtil
     
     private StrategyNode BuildAST(CharStream chars)
     {
-        StrategyLexer                       lexer  = new StrategyLexer(chars);
-        CommonTokenStream                   tokens = new CommonTokenStream(lexer);
+        StrategyLexer     lexer  = new StrategyLexer(chars);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
         StrategyParser                      parser = new StrategyParser(tokens);
         StrategyParser.Strategy_fileContext tree   = parser.strategy_file();
         

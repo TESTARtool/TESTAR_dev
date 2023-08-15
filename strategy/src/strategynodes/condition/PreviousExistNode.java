@@ -1,21 +1,22 @@
-package strategynodes.bool_expr;
+package strategynodes.condition;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
-import strategynodes.ActionType;
-import strategynodes.BaseStrategyNode;
-import strategynodes.Filter;
+import strategynodes.filter.ActionType;
+import strategynodes.BaseBooleanNode;
+import strategynodes.filter.Filter;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 
-public class PrevActionNode extends BaseStrategyNode<Boolean>
+public class PreviousExistNode extends BaseBooleanNode
 {
-    private final Filter            FILTER;
-    private final ActionType        ACTION_TYPE;
+    private final Filter     FILTER;
+    private final ActionType ACTION_TYPE;
 
-    public PrevActionNode(Filter filter, ActionType actionType)
+    public PreviousExistNode(Filter filter, ActionType actionType)
     {
         this.FILTER = filter;
         this.ACTION_TYPE = actionType;
@@ -38,8 +39,13 @@ public class PrevActionNode extends BaseStrategyNode<Boolean>
     @Override
     public String toString()
     {
-        String string = "prev-action";
-        if(FILTER != null) string += " " + FILTER + " " + ACTION_TYPE.toString();
-        return string;
+        StringJoiner joiner = new StringJoiner(" ");
+        joiner.add("previous-exist");
+        if(FILTER != null)
+        {
+            joiner.add(FILTER.toString());
+            joiner.add(ACTION_TYPE.toString());
+        }
+        return joiner.toString();
     }
 }

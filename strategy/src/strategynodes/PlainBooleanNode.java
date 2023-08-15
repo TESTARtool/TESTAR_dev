@@ -1,18 +1,16 @@
-package strategynodes.bool_expr;
+package strategynodes;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
-import strategynodes.BaseStrategyNode;
 
 import java.util.Map;
 import java.util.Set;
 
-public class PlainBooleanNode extends BaseStrategyNode<Boolean>
+public class PlainBooleanNode extends BaseBooleanNode
 {
     private final boolean VALUE;
 
-    public PlainBooleanNode(boolean value)
-    { VALUE = value; }
+    public PlainBooleanNode(boolean value) { VALUE = value; }
 
     @Override
     public Boolean getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)

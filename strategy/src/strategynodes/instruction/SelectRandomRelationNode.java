@@ -1,26 +1,24 @@
-package strategynodes.action_expr;
+package strategynodes.instruction;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
-import strategynodes.RelatedAction;
-import strategynodes.VisitModifier;
+import strategynodes.BaseActionNode;
+import strategynodes.filter.Modifier;
+import strategynodes.filter.Relation;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-public class SelectRelationNode extends BaseActionNode
+public class SelectRandomRelationNode extends BaseActionNode
 {
-    private final VisitModifier VISITED_MODIFIER;
-    private final RelatedAction RELATED_ACTION;
+    private final Modifier MODIFIER;
+    private final Relation RELATION;
     
-    public SelectRelationNode(Integer weight, VisitModifier visitModifier, RelatedAction relatedAction)
+    public SelectRandomRelationNode(Integer weight, Modifier modifier, Relation relation)
     {
-        this.WEIGHT = (weight != null || weight > 0) ? weight : 1;
-        this.VISITED_MODIFIER = visitModifier;
-        this.RELATED_ACTION = relatedAction;
+        assignWeight(weight);
+        this.MODIFIER = modifier;
+        this.RELATION = relation;
     }
     
     @Override
@@ -36,11 +34,11 @@ public class SelectRelationNode extends BaseActionNode
             return selectRandomAction(actions);
 
         //filter by relation
-        filteredActions = filterByRelation(prevAction, filteredActions, RELATED_ACTION);
+        filteredActions = filterByRelation(prevAction, filteredActions, RELATION);
 
-        //filter by visit modifier
-        if(VISITED_MODIFIER != null)
-            filteredActions = filterByVisitModifier(VISITED_MODIFIER, filteredActions, actionsExecuted);
+        //filter by modifier
+        if(MODIFIER != null)
+            filteredActions = filterByVisitModifier(MODIFIER, filteredActions, actionsExecuted);
         
         if(filteredActions.isEmpty()) //if nothing has made it through the filters
             return selectRandomAction(actions); //default to picking randomly
@@ -52,5 +50,13 @@ public class SelectRelationNode extends BaseActionNode
 
     @Override
     public String toString()
-    { return WEIGHT + " select-random " + RELATED_ACTION.toString(); }
+    {
+        StringJoiner joiner = new StringJoiner(" ");
+        joiner.add(Integer.toString(WEIGHT));
+        joiner.add("select-random");
+        if(MODIFIER != null)
+            joiner.add(MODIFIER.toString());
+        joiner.add(RELATION.toString());
+        return joiner.toString();
+    }
 }

@@ -1,18 +1,16 @@
-package strategynodes.bool_expr;
+package strategynodes;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
-import strategynodes.BaseStrategyNode;
 
 import java.util.Map;
 import java.util.Set;
 
-public class PlainIntegerNode extends BaseStrategyNode<Integer>
+public class PlainIntegerNode extends BaseIntegerNode
 {
     private final int VALUE;
 
-    public PlainIntegerNode(int value)
-    { VALUE = value; }
+    public PlainIntegerNode(int value) { VALUE = value; }
 
     @Override
     public Integer getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)

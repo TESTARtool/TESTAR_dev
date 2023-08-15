@@ -1,14 +1,18 @@
-package strategynodes.action_expr;
+package strategynodes;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
-import strategynodes.BaseStrategyNode;
 
 import java.util.*;
 
-public abstract class BaseActionNode extends BaseStrategyNode<Action>
+public abstract class BaseActionNode extends BaseNode<Action>
 {
     protected int WEIGHT;
+    
+    public void assignWeight(int weight)
+    {
+        this.WEIGHT = (weight > 0) ? weight : 1;
+    }
     
     @Override
     public abstract Action getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted);

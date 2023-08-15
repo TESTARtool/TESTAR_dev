@@ -1,23 +1,23 @@
-package strategynodes.bool_expr;
+package strategynodes.condition;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
-import strategynodes.ActionType;
-import strategynodes.BaseStrategyNode;
-import strategynodes.Filter;
-import strategynodes.VisitModifier;
+import strategynodes.filter.ActionType;
+import strategynodes.BaseIntegerNode;
+import strategynodes.filter.Filter;
+import strategynodes.filter.Modifier;
 
 import java.util.*;
 
-public class NumberOfActionsNode extends BaseStrategyNode<Integer>
+public class NumberOfActionsNode extends BaseIntegerNode
 {
-    private final VisitModifier VISIT_MODIFIER;
-    private final Filter            FILTER;
-    private final ActionType        ACTION_TYPE;
+    private final Modifier   VISIT_MODIFIER;
+    private final Filter     FILTER;
+    private final ActionType ACTION_TYPE;
     
-    public NumberOfActionsNode(VisitModifier visitModifier, Filter filter, ActionType actionType)
+    public NumberOfActionsNode(Modifier modifier, Filter filter, ActionType actionType)
     {
-        this.VISIT_MODIFIER = visitModifier;
+        this.VISIT_MODIFIER = modifier;
         this.FILTER             = filter;
         this.ACTION_TYPE        = actionType;
     }
@@ -44,9 +44,15 @@ public class NumberOfActionsNode extends BaseStrategyNode<Integer>
     @Override
     public String toString()
     {
-        String string = "n-actions";
-        if(VISIT_MODIFIER != null) string += " " + VISIT_MODIFIER;
-        if(FILTER != null) string += " " + FILTER + " " + ACTION_TYPE.toString();
-        return string;
+        StringJoiner joiner = new StringJoiner(" ");
+        joiner.add("n-actions");
+        if(VISIT_MODIFIER != null)
+            joiner.add(VISIT_MODIFIER.toString());
+        if(FILTER != null)
+        {
+            joiner.add(FILTER.toString());
+            joiner.add(ACTION_TYPE.toString());
+        }
+        return joiner.toString();
     }
 }

@@ -1,4 +1,4 @@
-package strategynodes;
+package strategynodes.filter;
 
 import java.util.HashMap;
 import java.util.Map;

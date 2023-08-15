@@ -1,7 +1,9 @@
 import org.apache.commons.lang.SerializationUtils;
 import org.testar.DerivedActions;
+import org.testar.RandomActionSelector;
 import org.testar.SutVisualization;
 import org.testar.monkey.ConfigTags;
+import org.testar.monkey.DefaultProtocol;
 import org.testar.monkey.Settings;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;
@@ -12,6 +14,7 @@ import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.protocols.DesktopProtocol;
 import parsing.ParseUtil;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -49,13 +52,31 @@ import java.util.Set;
 public class Protocol_desktop_generic_strategy extends DesktopProtocol
 {
 	private ParseUtil            parseUtil;
-	private Map<String, Integer> actionsExecuted = new HashMap<String, Integer>();
+	private RandomActionSelector selector;
+	private boolean              useRandom = false;
+	private Map<String, Integer>    actionsExecuted      = new HashMap<String, Integer>();
+	private Map<String, Integer>    debugActionsExecuted      = new HashMap<String, Integer>();
+	
+	
 	
 	@Override
 	protected void initialize(Settings settings)
 	{
 		super.initialize(settings);
-		parseUtil = new ParseUtil(settings.get(ConfigTags.StrategyFile));
+		
+		useRandom = (settings.get(ConfigTags.StrategyFile).equals("")) ? true : false;
+		if (useRandom)
+			selector = new RandomActionSelector();
+		else
+			parseUtil = new ParseUtil(settings.get(ConfigTags.StrategyFile));
+	}
+	
+	@Override
+	protected void beginSequence(SUT system, State state)
+	{
+		super.beginSequence(system, state);
+		state.remove(Tags.PreviousAction);
+		state.remove(Tags.PreviousActionID);
 	}
 	
 	@Override
@@ -94,13 +115,18 @@ public class Protocol_desktop_generic_strategy extends DesktopProtocol
 	@Override
 	protected Action selectAction(State state, Set<Action> actions)
 	{
-		Action selectedAction = (Action) SerializationUtils.clone(parseUtil.selectAction(state, actions, actionsExecuted)); //clone the action
+		if(DefaultProtocol.lastExecutedAction != null)
+		{
+			state.set(Tags.PreviousAction, DefaultProtocol.lastExecutedAction);
+			state.set(Tags.PreviousActionID, DefaultProtocol.lastExecutedAction.get(Tags.AbstractIDCustom, null));
+		}
 		
-		Action prevAction = state.get(Tags.PreviousAction, null);
-		state.set(Tags.PreviousAction, selectedAction);
+		Action selectedAction = (useRandom) ?
+								selector.selectAction(actions):
+								parseUtil.selectAction(state, actions, actionsExecuted);
 		
 		String actionID = selectedAction.get(Tags.AbstractIDCustom);
-		Integer timesUsed = actionsExecuted.containsKey(actionID) ? actionsExecuted.get(actionID) : 0; //get the use count for the action
+		Integer timesUsed = actionsExecuted.getOrDefault(actionID, 0); //get the use count for the action
 		actionsExecuted.put(actionID, timesUsed + 1); //increase by one
 		
 		return selectedAction;

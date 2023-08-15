@@ -1,4 +1,4 @@
-// Generated from java-escape by ANTLR 4.11.1
+// Generated from C:/Users/lh3/IdeaProjects/TESTAR/strategy/src/antlrfour\Strategy.g4 by ANTLR 4.12.0
 package antlrfour;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -41,13 +41,61 @@ public class StrategyBaseListener implements StrategyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterIf_then_else(StrategyParser.If_then_elseContext ctx) { }
+	@Override public void enterAction(StrategyParser.ActionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitIf_then_else(StrategyParser.If_then_elseContext ctx) { }
+	@Override public void exitAction(StrategyParser.ActionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterCond_action(StrategyParser.Cond_actionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCond_action(StrategyParser.Cond_actionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSelectRelation(StrategyParser.SelectRelationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSelectRelation(StrategyParser.SelectRelationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSelectRandomAction(StrategyParser.SelectRandomActionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSelectRandomAction(StrategyParser.SelectRandomActionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -77,6 +125,18 @@ public class StrategyBaseListener implements StrategyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterIntOprExpr(StrategyParser.IntOprExprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitIntOprExpr(StrategyParser.IntOprExprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterStateBool(StrategyParser.StateBoolContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -96,42 +156,6 @@ public class StrategyBaseListener implements StrategyListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitBoolOprExpr(StrategyParser.BoolOprExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterNumberOprExpr(StrategyParser.NumberOprExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitNumberOprExpr(StrategyParser.NumberOprExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterNumber_expr(StrategyParser.Number_exprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitNumber_expr(StrategyParser.Number_exprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterNumber_of_actions(StrategyParser.Number_of_actionsContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitNumber_of_actions(StrategyParser.Number_of_actionsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -173,13 +197,13 @@ public class StrategyBaseListener implements StrategyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterPrevAction(StrategyParser.PrevActionContext ctx) { }
+	@Override public void enterPreviousExist(StrategyParser.PreviousExistContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitPrevAction(StrategyParser.PrevActionContext ctx) { }
+	@Override public void exitPreviousExist(StrategyParser.PreviousExistContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -197,61 +221,25 @@ public class StrategyBaseListener implements StrategyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterAction_expr(StrategyParser.Action_exprContext ctx) { }
+	@Override public void enterNActions(StrategyParser.NActionsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitAction_expr(StrategyParser.Action_exprContext ctx) { }
+	@Override public void exitNActions(StrategyParser.NActionsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterAction_list(StrategyParser.Action_listContext ctx) { }
+	@Override public void enterPlainInt(StrategyParser.PlainIntContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitAction_list(StrategyParser.Action_listContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterSelectRelatedAction(StrategyParser.SelectRelatedActionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitSelectRelatedAction(StrategyParser.SelectRelatedActionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterSelectRandomAction(StrategyParser.SelectRandomActionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitSelectRandomAction(StrategyParser.SelectRandomActionContext ctx) { }
+	@Override public void exitPlainInt(StrategyParser.PlainIntContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

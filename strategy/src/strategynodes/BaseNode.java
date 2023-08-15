@@ -4,19 +4,23 @@ import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
+import strategynodes.filter.ActionType;
+import strategynodes.filter.Filter;
+import strategynodes.filter.Modifier;
+import strategynodes.filter.Relation;
 
 import java.util.*;
 
-public abstract class BaseStrategyNode<T>
+public abstract class BaseNode<T>
 {
     public abstract T getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted);
     
     @Override
     public abstract String toString();
     
-    protected Boolean validActionExists(VisitModifier visitModifier, List<Action> actions, Map<String, Integer> actionsExecuted)
+    protected Boolean validActionExists(Modifier modifier, List<Action> actions, Map<String, Integer> actionsExecuted)
     {
-        switch(visitModifier)
+        switch(modifier)
                 {
                     case LEAST_VISITED: return validLeastVisitedExists(actions, actionsExecuted);
                     case MOST_VISITED: return validMostVisitedExists(actions, actionsExecuted);
@@ -73,9 +77,9 @@ public abstract class BaseStrategyNode<T>
         }
         return false;
     }
-    protected List<Action> filterByVisitModifier(VisitModifier visitModifier, List<Action> actions, Map<String, Integer> actionsExecuted)
+    protected List<Action> filterByVisitModifier(Modifier modifier, List<Action> actions, Map<String, Integer> actionsExecuted)
     {
-        switch(visitModifier)
+        switch(modifier)
                 {
                     case LEAST_VISITED: return filterLeastVisited(actions, actionsExecuted);
                     case MOST_VISITED: return filterMostVisited(actions, actionsExecuted);
@@ -166,14 +170,14 @@ public abstract class BaseStrategyNode<T>
         return filteredActions;
     }
     
-    protected boolean validRelationExists(Action prevAction, VisitModifier visitModifier, RelatedAction relatedAction, List<Action> actions, Map<String, Integer> actionsExecuted)
+    protected boolean validRelationExists(Action prevAction, Modifier modifier, Relation relation, List<Action> actions, Map<String, Integer> actionsExecuted)
     {
         Widget prevWidget = prevAction.get(Tags.OriginWidget);
 
         for(Action action : actions)
         {
             Widget widget = action.get(Tags.OriginWidget);
-            switch(relatedAction)
+            switch(relation)
             {
                 case CHILD:
                     if(widgetIsChild(prevWidget, widget))
@@ -192,7 +196,7 @@ public abstract class BaseStrategyNode<T>
         return false;
     }
     
-    protected List<Action> filterByRelation(Action prevAction, List<Action> actions, RelatedAction relatedAction)
+    protected List<Action> filterByRelation(Action prevAction, List<Action> actions, Relation relation)
     {
         List<Action> filteredActions = new ArrayList<>();
         Widget prevWidget = prevAction.get(Tags.OriginWidget);
@@ -200,7 +204,7 @@ public abstract class BaseStrategyNode<T>
         for(Action action : actions)
         {
             Widget widget = action.get(Tags.OriginWidget);
-            switch(relatedAction)
+            switch(relation)
             {
                 case CHILD:
                     if(widgetIsChild(prevWidget, widget))

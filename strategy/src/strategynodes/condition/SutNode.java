@@ -1,14 +1,14 @@
-package strategynodes.bool_expr;
+package strategynodes.condition;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
-import strategynodes.BaseStrategyNode;
-import strategynodes.Filter;
+import strategynodes.BaseBooleanNode;
+import strategynodes.filter.Filter;
 
 import java.util.Map;
 import java.util.Set;
 
-public class SutNode extends BaseStrategyNode<Boolean>
+public class SutNode extends BaseBooleanNode
 {
     private final Filter  FILTER;
     private final SutType SUT_TYPE;
@@ -21,9 +21,7 @@ public class SutNode extends BaseStrategyNode<Boolean>
     
     @Override
     public Boolean getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
-    {
-        return SUT_TYPE.sutIsThisType();
-    }
+    { return SUT_TYPE.sutIsThisType(); }
     
     @Override
     public String toString() {return "sut " + FILTER.toString() + " " + SUT_TYPE.toString();}

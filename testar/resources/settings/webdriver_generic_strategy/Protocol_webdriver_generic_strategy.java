@@ -295,7 +295,6 @@
     @Override
     protected Action selectAction(State state, Set<Action> actions)
     {
-
         if(DefaultProtocol.lastExecutedAction != null)
         {
             state.set(Tags.PreviousAction, DefaultProtocol.lastExecutedAction);
