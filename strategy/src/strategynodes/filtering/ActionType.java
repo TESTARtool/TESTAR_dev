@@ -1,4 +1,4 @@
-package strategynodes.filter;
+package strategynodes.filtering;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Roles;

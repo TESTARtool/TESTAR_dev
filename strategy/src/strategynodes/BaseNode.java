@@ -4,10 +4,10 @@ import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
-import strategynodes.filter.ActionType;
-import strategynodes.filter.Filter;
-import strategynodes.filter.Modifier;
-import strategynodes.filter.Relation;
+import strategynodes.filtering.ActionType;
+import strategynodes.filtering.Filter;
+import strategynodes.filtering.Modifier;
+import strategynodes.filtering.Relation;
 
 import java.util.*;
 

@@ -2,10 +2,10 @@ package strategynodes.condition;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
-import strategynodes.filter.ActionType;
+import strategynodes.filtering.ActionType;
 import strategynodes.BaseBooleanNode;
-import strategynodes.filter.Filter;
-import strategynodes.filter.Modifier;
+import strategynodes.filtering.Filter;
+import strategynodes.filtering.Modifier;
 
 import java.util.*;
 

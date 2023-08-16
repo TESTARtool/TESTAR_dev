@@ -3,7 +3,6 @@ package strategynodes.condition;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import strategynodes.BaseBooleanNode;
-import strategynodes.condition.BooleanOperator;
 
 import java.util.Map;
 import java.util.Set;

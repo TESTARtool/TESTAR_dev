@@ -24,8 +24,8 @@ uncond_action:  INT? 'select-previous'                                          
 
 bool_expr:                        NOT                               expr=bool_expr              #notExpr
 |   LP                            NOT                               expr=bool_expr      RP      #notExpr
-|       left=bool_expr      opr=( AND | XOR | OR | IS )             right=bool_expr             #boolOprExpr
-|   LP  left=bool_expr      opr=( AND | XOR | OR | IS )             right=bool_expr     RP      #boolOprExpr
+|       left=bool_expr      opr=( AND | XOR | OR | EQUALS )         right=bool_expr             #boolOprExpr
+|   LP  left=bool_expr      opr=( AND | XOR | OR | EQUALS )         right=bool_expr     RP      #boolOprExpr
 |       left=int_expr       opr=( LT | LE | GT | GE | EQ | NE )     right=int_expr              #intOprExpr
 |   LP  left=int_expr       opr=( LT | LE | GT | GE | EQ | NE )     right=int_expr      RP      #intOprExpr
 |                           state_boolean                                                       #stateBool
@@ -66,7 +66,7 @@ NOT:                N O T   | '!'   | '~';
 AND:                A N D   | '&&'  | '&';
 XOR:                X O R   | '^';
 OR:                 O R     | '||'  | '|';
-IS:                 I S     | E Q U A L S;
+EQUALS:             E Q U A L S | I S;
 
 GT                  : '>';
 GE                  : '>=';

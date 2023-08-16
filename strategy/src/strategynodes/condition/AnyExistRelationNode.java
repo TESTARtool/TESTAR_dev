@@ -4,8 +4,8 @@ import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import strategynodes.BaseBooleanNode;
-import strategynodes.filter.Modifier;
-import strategynodes.filter.Relation;
+import strategynodes.filtering.Modifier;
+import strategynodes.filtering.Relation;
 
 import java.util.*;
 

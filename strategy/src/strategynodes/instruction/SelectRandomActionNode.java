@@ -3,9 +3,9 @@ package strategynodes.instruction;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import strategynodes.BaseActionNode;
-import strategynodes.filter.ActionType;
-import strategynodes.filter.Filter;
-import strategynodes.filter.Modifier;
+import strategynodes.filtering.ActionType;
+import strategynodes.filtering.Filter;
+import strategynodes.filtering.Modifier;
 
 import java.util.*;
 

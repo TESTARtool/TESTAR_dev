@@ -4,14 +4,8 @@ import antlrfour.StrategyBaseVisitor;
 import antlrfour.StrategyParser;
 import strategynodes.*;
 import strategynodes.condition.*;
-import strategynodes.filter.ActionType;
-import strategynodes.filter.Filter;
-import strategynodes.filter.Modifier;
-import strategynodes.filter.Relation;
-import strategynodes.instruction.IfThenElseNode;
-import strategynodes.instruction.SelectPreviousNode;
-import strategynodes.instruction.SelectRandomActionNode;
-import strategynodes.instruction.SelectRandomRelationNode;
+import strategynodes.filtering.*;
+import strategynodes.instruction.*;
 
 import java.util.ArrayList;
 
@@ -98,7 +92,7 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseNode>
         if(ctx.AND() != null)           opr = BooleanOperator.AND;
         else if (ctx.XOR() != null)     opr = BooleanOperator.XOR;
         else if (ctx.OR() != null)      opr = BooleanOperator.OR;
-        else if (ctx.IS() != null)      opr = BooleanOperator.IS;
+        else if (ctx.EQUALS() != null)  opr = BooleanOperator.EQUALS;
         else                            return null;
         return new BoolOprNode((BaseBooleanNode) visit(ctx.left), opr, (BaseBooleanNode) visit(ctx.right));
     }

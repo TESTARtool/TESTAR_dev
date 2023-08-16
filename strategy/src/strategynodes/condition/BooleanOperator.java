@@ -28,7 +28,7 @@ public enum BooleanOperator
                 public boolean getResult(Boolean left, Boolean right)
                 {return left || right;}
             },
-    IS ("IS", "EQUALS")
+    EQUALS ("EQUALS", "IS")
             {
                 @Override
                 public boolean getResult(Boolean left, Boolean right)

@@ -18,7 +18,7 @@ public class StrategyParser extends Parser {
 		new PredictionContextCache();
 	public static final int
 		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, MODIFIER=8, RELATION=9, 
-		SUT=10, ACTION_TYPE=11, FILTER=12, NOT=13, AND=14, XOR=15, OR=16, IS=17, 
+		SUT=10, ACTION_TYPE=11, FILTER=12, NOT=13, AND=14, XOR=15, OR=16, EQUALS=17, 
 		GT=18, GE=19, LT=20, LE=21, EQ=22, NE=23, INT=24, BOOL=25, IF=26, THEN=27, 
 		ELSE=28, LP=29, RP=30, COMMENT=31, WHITESPACE=32, ANY=33;
 	public static final int
@@ -44,9 +44,9 @@ public class StrategyParser extends Parser {
 	private static String[] makeSymbolicNames() {
 		return new String[] {
 			null, null, null, null, null, null, null, null, "MODIFIER", "RELATION", 
-			"SUT", "ACTION_TYPE", "FILTER", "NOT", "AND", "XOR", "OR", "IS", "GT", 
-			"GE", "LT", "LE", "EQ", "NE", "INT", "BOOL", "IF", "THEN", "ELSE", "LP", 
-			"RP", "COMMENT", "WHITESPACE", "ANY"
+			"SUT", "ACTION_TYPE", "FILTER", "NOT", "AND", "XOR", "OR", "EQUALS", 
+			"GT", "GE", "LT", "LE", "EQ", "NE", "INT", "BOOL", "IF", "THEN", "ELSE", 
+			"LP", "RP", "COMMENT", "WHITESPACE", "ANY"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -691,7 +691,7 @@ public class StrategyParser extends Parser {
 		public TerminalNode AND() { return getToken(StrategyParser.AND, 0); }
 		public TerminalNode XOR() { return getToken(StrategyParser.XOR, 0); }
 		public TerminalNode OR() { return getToken(StrategyParser.OR, 0); }
-		public TerminalNode IS() { return getToken(StrategyParser.IS, 0); }
+		public TerminalNode EQUALS() { return getToken(StrategyParser.EQUALS, 0); }
 		public BoolOprExprContext(Bool_exprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
