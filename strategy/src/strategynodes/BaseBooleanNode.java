@@ -8,5 +8,6 @@ import java.util.*;
 public abstract class BaseBooleanNode extends BaseNode<Boolean>
 {
     @Override
-    public abstract Boolean getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted);
+    public abstract Boolean getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted,
+                                      ArrayList<String> operatingSystems);
 }

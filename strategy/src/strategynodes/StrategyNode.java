@@ -21,10 +21,10 @@ public class StrategyNode extends BaseNode<Action>
     }
     
     @Override
-    public Action getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
+    public Action getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted, ArrayList<String> operatingSystems)
     {
         if(actionList.size() == 1)
-            return actionList.get(0).getResult(state, actions, actionsExecuted);
+            return actionList.get(0).getResult(state, actions, actionsExecuted, operatingSystems);
         else
         {
             Random r = new Random();
@@ -34,7 +34,7 @@ public class StrategyNode extends BaseNode<Action>
             {
                 tracker -= currentAction.GetWeight();
                 if(tracker <= 0) //once the tracker reaches zero, that action gets picked
-                    return currentAction.getResult(state, actions, actionsExecuted);
+                    return currentAction.getResult(state, actions, actionsExecuted, operatingSystems);
             }
         }
         return null; //something went wrong

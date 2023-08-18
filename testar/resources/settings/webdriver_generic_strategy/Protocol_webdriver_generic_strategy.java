@@ -49,6 +49,8 @@
  import org.testar.monkey.alayer.webdriver.WdDriver;
  import org.testar.monkey.alayer.webdriver.enums.WdRoles;
  import org.testar.monkey.alayer.webdriver.enums.WdTags;
+ import org.testar.plugin.NativeLinker;
+ import org.testar.plugin.OperatingSystems;
  import org.testar.protocols.WebdriverProtocol;
  import parsing.ParseUtil;
 
@@ -70,6 +72,7 @@
     private boolean useRandom = false;
     private Map<String, Integer>    actionsExecuted      = new HashMap<String, Integer>();
     private Map<String, Integer>    debugActionsExecuted      = new HashMap<String, Integer>();
+    private ArrayList<String> operatingSystems = new ArrayList<>();
     private String startTimestamp = "";
     private String start_epoch = "";
     private String end_epoch = "";
@@ -125,11 +128,14 @@
     {
         super.initialize(settings);
 
-        useRandom = (settings.get(ConfigTags.StrategyFile).equals("")) ? true : false;
+        useRandom = settings.get(ConfigTags.StrategyFile).equals("");
         if (useRandom)
             selector = new RandomActionSelector();
         else
             parseUtil = new ParseUtil(settings.get(ConfigTags.StrategyFile));
+    
+        for(OperatingSystems OS : NativeLinker.getPLATFORM_OS())
+            operatingSystems.add(OS.toString());
     }
 
     @Override
@@ -303,7 +309,7 @@
 
         Action selectedAction = (useRandom) ?
                 selector.selectAction(actions):
-                parseUtil.selectAction(state, actions, actionsExecuted);
+                parseUtil.selectAction(state, actions, actionsExecuted, operatingSystems);
         
         String actionID = selectedAction.get(Tags.AbstractIDCustom);
         Integer timesUsed = actionsExecuted.getOrDefault(actionID, 0); //get the use count for the action

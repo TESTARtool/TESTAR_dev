@@ -24,7 +24,7 @@ public class SelectRandomActionNode extends BaseActionNode
     }
 
     @Override
-    public Action getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted) //todo: check if it works
+    public Action getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted, ArrayList<String> operatingSystems) //todo: check if it works
     {
         if(actions.size() == 1) //if there's only one action, pick that one
             return new ArrayList<>(actions).get(0);

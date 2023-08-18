@@ -6,6 +6,7 @@ import strategynodes.BaseActionNode;
 import strategynodes.BaseNode;
 import strategynodes.StrategyNode;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -33,12 +34,12 @@ public class IfThenElseNode extends BaseActionNode
     }
     
     @Override
-    public Action getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
+    public Action getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted, ArrayList<String> operatingSystems)
     {
-            if (ifChild.getResult(state, actions, actionsExecuted))
-                return thenChild.getResult(state, actions, actionsExecuted);
+            if (ifChild.getResult(state, actions, actionsExecuted, operatingSystems))
+                return thenChild.getResult(state, actions, actionsExecuted, operatingSystems);
             else if (elseChild != null)
-                return elseChild.getResult(state, actions, actionsExecuted);
+                return elseChild.getResult(state, actions, actionsExecuted, operatingSystems);
             else return selectRandomAction(actions);
     }
     

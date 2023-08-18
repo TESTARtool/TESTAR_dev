@@ -51,7 +51,7 @@ MODIFIER:       'visited' | 'unvisited' | 'most-visited' | 'least-visited';
 
 RELATION:       'sibling' | 'child' | 'sibling-or-child';
 
-SUT:            'windows' | 'linux' | 'android' | 'web';
+SUT:            'windows' | 'unix' | 'ios' | 'android' | 'web';
 
 ACTION_TYPE:    'click-action' | 'type-action' | 'drag-action' | 'scroll-action' | 'hit-key-action'
 |               'form-input-action' | 'form-submit-action' | 'form-field-action';

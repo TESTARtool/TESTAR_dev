@@ -21,7 +21,7 @@ public class AnyExistRelationNode extends BaseBooleanNode
     }
     
     @Override
-    public Boolean getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
+    public Boolean getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted, ArrayList<String> operatingSystems)
     {
         Action prevAction = state.get(Tags.PreviousAction, null);
         boolean validActionFound = false;

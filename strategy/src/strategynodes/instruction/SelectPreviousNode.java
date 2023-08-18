@@ -5,6 +5,7 @@ import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import strategynodes.BaseActionNode;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,7 +15,7 @@ public class SelectPreviousNode extends BaseActionNode
     { this.WEIGHT = weight; }
     
     @Override
-    public Action getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted) //todo: check if it works correctly
+    public Action getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted, ArrayList<String> operatingSystems) //todo: check if it works correctly
     {
         Action previousAction = state.get(Tags.PreviousAction, null);
         

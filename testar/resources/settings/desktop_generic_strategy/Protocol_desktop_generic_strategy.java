@@ -11,10 +11,13 @@ import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
+import org.testar.plugin.NativeLinker;
+import org.testar.plugin.OperatingSystems;
 import org.testar.protocols.DesktopProtocol;
 import parsing.ParseUtil;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -55,9 +58,7 @@ public class Protocol_desktop_generic_strategy extends DesktopProtocol
 	private RandomActionSelector selector;
 	private boolean              useRandom = false;
 	private Map<String, Integer>    actionsExecuted      = new HashMap<String, Integer>();
-	private Map<String, Integer>    debugActionsExecuted      = new HashMap<String, Integer>();
-	
-	
+	private ArrayList<String> operatingSystems = new ArrayList<>();
 	
 	@Override
 	protected void initialize(Settings settings)
@@ -69,6 +70,9 @@ public class Protocol_desktop_generic_strategy extends DesktopProtocol
 			selector = new RandomActionSelector();
 		else
 			parseUtil = new ParseUtil(settings.get(ConfigTags.StrategyFile));
+		
+		for(OperatingSystems OS : NativeLinker.getPLATFORM_OS())
+			operatingSystems.add(OS.toString());
 	}
 	
 	@Override
@@ -123,7 +127,7 @@ public class Protocol_desktop_generic_strategy extends DesktopProtocol
 		
 		Action selectedAction = (useRandom) ?
 								selector.selectAction(actions):
-								parseUtil.selectAction(state, actions, actionsExecuted);
+								parseUtil.selectAction(state, actions, actionsExecuted, operatingSystems);
 		
 		String actionID = selectedAction.get(Tags.AbstractIDCustom);
 		Integer timesUsed = actionsExecuted.getOrDefault(actionID, 0); //get the use count for the action

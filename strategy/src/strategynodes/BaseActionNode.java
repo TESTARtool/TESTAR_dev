@@ -15,7 +15,8 @@ public abstract class BaseActionNode extends BaseNode<Action>
     }
     
     @Override
-    public abstract Action getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted);
+    public abstract Action getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted,
+                                     ArrayList<String> operatingSystems);
     
     public int GetWeight() {return WEIGHT;}
     

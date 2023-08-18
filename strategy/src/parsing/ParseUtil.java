@@ -10,6 +10,7 @@ import org.testar.monkey.alayer.State;
 import strategynodes.StrategyNode;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,9 +49,9 @@ public class ParseUtil
         return visitor.visitStrategy_file(tree); //create and return AST tree
     }
     
-    public Action selectAction(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
+    public Action selectAction(State state, Set<Action> actions, Map<String, Integer> actionsExecuted, ArrayList<String> operatingSystems)
     {
-        return StrategyTree.getResult(state, actions, actionsExecuted);
+        return StrategyTree.getResult(state, actions, actionsExecuted, operatingSystems);
     }
     
     public void printStrategy()

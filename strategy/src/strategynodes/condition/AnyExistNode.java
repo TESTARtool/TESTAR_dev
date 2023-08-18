@@ -23,7 +23,7 @@ public class AnyExistNode extends BaseBooleanNode
     }
     
     @Override
-    public Boolean getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
+    public Boolean getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted, ArrayList<String> operatingSystems)
     {
         //if there are no filters to apply, any action is valid
         if (MODIFIER == null && FILTER == null && ACTION_TYPE == null && !actions.isEmpty())

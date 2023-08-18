@@ -13,7 +13,8 @@ import java.util.*;
 
 public abstract class BaseNode<T>
 {
-    public abstract T getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted);
+    public abstract T getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted,
+                                ArrayList<String> operatingSystems);
     
     @Override
     public abstract String toString();

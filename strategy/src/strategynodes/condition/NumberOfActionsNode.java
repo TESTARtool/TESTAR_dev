@@ -23,7 +23,7 @@ public class NumberOfActionsNode extends BaseIntegerNode
     }
     
     @Override
-    public Integer getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted)
+    public Integer getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted, ArrayList<String> operatingSystems)
     {
         //if there are no filters to apply, any action is valid
         if(VISIT_MODIFIER == null && FILTER == null && ACTION_TYPE == null && !actions.isEmpty())
