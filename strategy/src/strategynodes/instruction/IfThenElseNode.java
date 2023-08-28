@@ -47,8 +47,7 @@ public class IfThenElseNode extends BaseActionNode
     public String toString()
     {
         StringJoiner joiner = new StringJoiner("\n");
-        joiner.add(Integer.toString(WEIGHT));
-        joiner.add("IF " + ifChild.toString());
+        joiner.add(WEIGHT + " IF " + ifChild.toString());
         joiner.add("THEN " + thenChild.toString());
         if(elseChild != null)
             joiner.add("ELSE " + elseChild.toString());

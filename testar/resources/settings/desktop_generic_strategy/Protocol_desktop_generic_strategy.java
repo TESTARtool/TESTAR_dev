@@ -126,8 +126,8 @@ public class Protocol_desktop_generic_strategy extends DesktopProtocol
 		}
 		
 		Action selectedAction = (useRandom) ?
-								selector.selectAction(actions):
-								parseUtil.selectAction(state, actions, actionsExecuted, operatingSystems);
+				selector.selectAction(state, actions):
+				parseUtil.selectAction(state, actions, actionsExecuted, operatingSystems);
 		
 		String actionID = selectedAction.get(Tags.AbstractIDCustom);
 		Integer timesUsed = actionsExecuted.getOrDefault(actionID, 0); //get the use count for the action

@@ -308,7 +308,7 @@
         }
 
         Action selectedAction = (useRandom) ?
-                selector.selectAction(actions):
+                selector.selectAction(state, actions):
                 parseUtil.selectAction(state, actions, actionsExecuted, operatingSystems);
         
         String actionID = selectedAction.get(Tags.AbstractIDCustom);

@@ -541,7 +541,7 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		// Use the strategy to fill the form as a human
 		Action selectedAction = (formFillingWidget != null && !strategyRandom) ?
 				parseUtil.selectAction(state, actions, strategyActionsExecuted, operatingSystems):
-					RandomActionSelector.selectAction(actions);
+					RandomActionSelector.selectRandomAction(actions);
 
 		String actionID = selectedAction.get(Tags.AbstractIDCustom);
 		Integer timesUsed = strategyActionsExecuted.getOrDefault(actionID, 0); //get the use count for the action
@@ -643,7 +643,7 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		super.closeTestSession();
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate))
 		{
-			compressOutputRunFolder();
+//			compressOutputRunFolder();
 			//copyOutputToNewFolderUsingIpAddress("N:");
 		}
 	}
