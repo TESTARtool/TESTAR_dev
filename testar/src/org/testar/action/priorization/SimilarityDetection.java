@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,10 +32,26 @@ package org.testar.action.priorization;
 
 import java.util.Set;
 
+import org.testar.IActionExecutor;
+import org.testar.IActionSelector;
+import org.testar.RandomActionSelector;
 import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 
-public class SimilarityDetection {
+/**
+ * Sample class that tries to detect similar Actions between previous and current State,
+ * to decrease the possibilities to select a static widget and previous executed Action.
+ * 
+ * Actions have an OriginWidget associated, and Widgets have an AbtractIDCustom property
+ * that allows TESTAR to identify web elements based on Abstract Properties.
+ * Example: WebWidgetId (test.settings -> AbstractStateAttributes)
+ * 
+ * If some Action.OriginWidget still existing between previous and current State
+ * or if some Action.OriginWidget was executed previously,
+ * increase a numeric similarity weight that will reduce the % to be selected
+ */
+public class SimilarityDetection implements IActionSelector, IActionExecutor {
 
 	private Set<Action> similarityActions;
 	private int maxValue;
@@ -56,6 +72,24 @@ public class SimilarityDetection {
 		}
 	}
 
+
+	@Override
+	public Action selectAction(State state, Set<Action> actions) {
+		// Given the current set of Actions of the State take the OriginWidget AbstractCustomID,
+		// and compare with the previous existing Actions/OriginWidget to increase the similarity value.
+		// Minimal similarity value 1, Maximal similarity is given in the constructor. 
+		// Higher similarity value means that Action/OriginWidget remains more time static in the State.
+		actions = modifySimilarActions(actions);
+
+		System.out.println("--------------------- DEBUG SIMILARITY VALUES ---------------------");
+		for(Action a : actions) {
+			System.out.println("Widget : " + a.get(Tags.OriginWidget).get(Tags.Desc, "") +
+					" with similarity : " + a.get(ActionTags.SimilarityValue, 0));
+		}
+
+		return reduceProbabilityBySimilarity(state, actions);
+	}
+
 	/**
 	 * Given the current set of Actions of the State take the OriginWidget AbstractCustomID,
 	 * and compare with the previous existing Actions/OriginWidget to increase the similarity value.
@@ -67,8 +101,7 @@ public class SimilarityDetection {
 	 * @param newActions
 	 * @return actions with similarity value modified
 	 */
-	public Set<Action> modifySimilarActions(Set<Action> newActions){
-
+	private Set<Action> modifySimilarActions(Set<Action> newActions){
 		for(Action newAction : newActions) {
 			for (Action oldAction : similarityActions) {
 
@@ -123,23 +156,58 @@ public class SimilarityDetection {
 		if(similarityValue > maxValue) {similarityValue = maxValue;}
 		return similarityValue;
 	}
-	
+
+	private Action reduceProbabilityBySimilarity(State state, Set<Action> actions) {
+		// Check the totalWeight
+		double totalWeight = 0;
+		for(Action a : actions) {
+			totalWeight = totalWeight + (1.0 / a.get(ActionTags.SimilarityValue));
+		}
+
+		// Just in case, if something wrong return purely random
+		if(totalWeight == 0) {
+			return RandomActionSelector.selectRandomAction(actions);
+		}
+
+		System.out.println("******************* DEBUG SIMILARITY PROBABILITY ******************");
+
+		// Create a percentage weight of each action based on the totalWeight
+		WeightedAction actionProbability = new WeightedAction();
+		for(Action a : actions) {
+			double actionWeight = (1.0 / a.get(ActionTags.SimilarityValue)) / totalWeight * 100;
+			actionProbability.addEntry(a, actionWeight);
+
+			System.out.println("Widget : " + a.get(Tags.OriginWidget).get(Tags.Desc, "") + " with similarity : " + actionWeight);
+		}
+
+		return actionProbability.getRandom();
+	}
+
+
+	@Override
+	public void executeAction(Action action) {
+		increaseSpecificExecutedAction(action);
+	}
+
 	/**
 	 * Additional method to increase the similarity value of an executed action.
 	 * 
 	 * @param executedAction
 	 */
-	public void increaseSpecificExecutedAction(Action executedAction) {
+	private void increaseSpecificExecutedAction(Action executedAction) {
 		String executedID = executedAction.get(Tags.OriginWidget).get(Tags.AbstractIDCustom, "NopeExecuted");
-		
+
+		System.out.println("====================== DEBUG EXECUTED ACTION ======================");
+
 		for(Action savedAction : similarityActions) {
 			String savedID = savedAction.get(Tags.OriginWidget).get(Tags.AbstractIDCustom, "NopeSaved");
-			
+
 			if(savedID.equals(executedID)) {
 				savedAction.set(ActionTags.SimilarityValue, increaseSimilarityValue(savedAction));
+				System.out.println("Increase executed Widget : " + savedAction.get(Tags.OriginWidget).get(Tags.Desc, "") + 
+						" to : " + savedAction.get(ActionTags.SimilarityValue, -1));
 				return;
 			}
 		}
 	}
-
 }

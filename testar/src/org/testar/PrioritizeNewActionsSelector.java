@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019, 2020 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,6 +31,7 @@
 package org.testar;
 
 import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.Tags;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,7 +50,7 @@ import java.util.Set;
  * If addExecutedAction() is used every time an action executed, then the least executed actions are prioritized.
  *
  */
-public class PrioritizeNewActionsSelector {
+public class PrioritizeNewActionsSelector extends RandomActionSelector implements IActionExecutor, IActionDerive{
 
     public PrioritizeNewActionsSelector() {
         // empty constructor, required because of previousActions that will be set during first use
@@ -60,6 +61,7 @@ public class PrioritizeNewActionsSelector {
     private Map<Action, Integer> executedActions = new HashMap<>();
 
     public Set<Action> getPrioritizedActions(Set<Action> actions) {
+        System.out.println("---------------------------------------------------------");
         Set<Action> prioritizedActions = new HashSet<Action>();
         //checking if it is the first round of actions:
         if(previousActions==null) {
@@ -120,12 +122,8 @@ public class PrioritizeNewActionsSelector {
         
         //saving the current actions for the next round:
         previousActions = actions;
-        return(prioritizedActions);
+        return prioritizedActions;
     }
-
-    /*public void addExecutedAction(Action action){
-        executedActions.add(action);
-    }*/
     
     public void addExecutedAction(Action action){
     	for(Map.Entry<Action, Integer> entry : executedActions.entrySet()){
@@ -144,6 +142,18 @@ public class PrioritizeNewActionsSelector {
     		}
     	}
         return 0;
+    }
+
+    @Override
+    public void executeAction(Action action) {
+        this.addExecutedAction(action);
+        System.out.println("Executed action: " + action.get(Tags.Desc, "NoCurrentDescAvailable")
+                + " -- Times executed: " + this.timesExecuted(action));
+    }
+
+    @Override
+    public Set<Action> deriveActions(Set<Action> actions) {
+        return this.getPrioritizedActions(actions);
     }
 }
 

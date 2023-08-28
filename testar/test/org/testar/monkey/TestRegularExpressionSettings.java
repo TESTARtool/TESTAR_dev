@@ -72,7 +72,7 @@ public class TestRegularExpressionSettings {
 	private List<Tag<String>> regularExpressionTags = Arrays.asList(
 			ConfigTags.ProcessesToKillDuringTest,
 			ConfigTags.ClickFilter,
-			ConfigTags.SuspiciousTitles,
+			ConfigTags.SuspiciousTags,
 			ConfigTags.SuspiciousProcessOutput,
 			ConfigTags.ProcessLogs,
 			ConfigTags.WebConsoleErrorPattern,

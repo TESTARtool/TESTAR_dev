@@ -59,11 +59,10 @@ import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.testar.monkey.Environment;
-import org.testar.monkey.Main;
-import org.testar.monkey.Pair;
+import org.testar.monkey.*;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
+import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.webdriver.WdDriver;
@@ -74,8 +73,6 @@ import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.monkey.alayer.windows.WinProcess;
 import org.testar.monkey.alayer.windows.Windows;
 import org.testar.plugin.NativeLinker;
-import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Settings;
 import org.testar.OutputStructure;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.reporting.Reporting;
@@ -90,7 +87,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected static Set<String> existingCssClasses = new HashSet<>();
 
 	// WedDriver settings from file:
-	protected List<String> clickableClasses, deniedExtensions, domainsAllowed;
+	protected List<String> clickableClasses, typeableClasses, deniedExtensions, domainsAllowed;
 
 	// URL + form name, username input id + value, password input id + value
 	// Set login to null to disable this feature
@@ -120,6 +117,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 		// Classes that are deemed clickable by the web framework
 		clickableClasses = settings.get(ConfigTags.ClickableClasses);
+
+		// Classes that are deemed typeable by the web framework
+		typeableClasses = settings.get(ConfigTags.TypeableClasses);
 
 		// Disallow links and pages with these extensions
 		// Set to null to ignore this feature
@@ -328,7 +328,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     				String consoleErrorMsg = logEntry.getMessage();
     				Matcher matcherError = errorPattern.matcher(consoleErrorMsg);
     				if(matcherError.matches()) {
-    					webConsoleVerdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, "Web Browser Console Error: " + consoleErrorMsg);
+    					webConsoleVerdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TAG, "Web Browser Console Error: " + consoleErrorMsg);
     				}
     			}
     		}
@@ -349,7 +349,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     				String consoleWarningMsg = logEntry.getMessage();
     				Matcher matcherWarning = warningPattern.matcher(consoleWarningMsg);
     				if(matcherWarning.matches()) {
-    					webConsoleVerdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, "Web Browser Console Warning: " + consoleWarningMsg);
+    					webConsoleVerdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TAG, "Web Browser Console Warning: " + consoleWarningMsg);
     				}
     			}
     		}
@@ -436,9 +436,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
             statusInfo = (getReplayVerdict().join(processVerdict)).info();
         }
         else {
-            htmlReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
-            status = (getVerdict(latestState).join(processVerdict)).verdictSeverityTitle();
-            statusInfo = (getVerdict(latestState).join(processVerdict)).info();
+            htmlReport.addTestVerdict(getFinalVerdict());
+            status = (getFinalVerdict()).verdictSeverityTitle();
+            statusInfo = (getFinalVerdict()).info();
         }
 
         String sequencesPath = getGeneratedSequenceName();
@@ -586,7 +586,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				}
 			}
 			if (popupMatches) {
-				popupClickActions.add(ac.leftClickAt(widget));
+				popupClickActions.add(triggeredClickAction(state, widget));
 			}
 		}
 
@@ -759,8 +759,20 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	    return role.equals(WdRoles.WdFORM);
 	}
 
+	/*
+	Check whether the widget's web element contains at least one of the accepted css classes
+	 */
+	protected boolean containCSSClasses(Widget widget, List<String> cssClasses){
+		WdElement element = ((WdWidget) widget).element;
+		Set<String> cssSet = new HashSet<>(cssClasses);
+		cssSet.retainAll(element.cssClasses);
+		return cssSet.size() > 0;
+	}
+
 	@Override
 	protected boolean isTypeable(Widget widget) {
+		if (containCSSClasses(widget, typeableClasses)) return true;
+
 		Role role = widget.get(Tags.Role, Roles.Widget);
 		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
 			// Input type are special...
@@ -770,7 +782,25 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			}
 			return true;
 		}
+		return false;
+	}
 
+	@Override
+	protected boolean isClickable(Widget widget) {
+		WdElement element = ((WdWidget) widget).element;
+		if (element.isClickable || containCSSClasses(widget, clickableClasses)) {
+			return true;
+		}
+
+		Role role = widget.get(Tags.Role, Roles.Widget);
+		if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
+			// Input type are special...
+			if (role.equals(WdRoles.WdINPUT)) {
+				String type = element.type;
+				return WdRoles.clickableInputTypes().contains(type);
+			}
+			return true;
+		}
 		return false;
 	}
 
@@ -809,5 +839,47 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				}
 			}
 		} catch (Exception e) {}
+	}
+
+	/**
+	 * Add additional TESTAR keyboard shortcuts in SPY mode to enable the CSS clickable customization of widgets.
+	 * @param key
+	 */
+	@Override
+	public void keyDown(KBKeys key) {
+		super.keyDown(key);
+		if (mode() == Modes.Spy){
+			if (key == KBKeys.VK_RIGHT) {
+				try {
+					// Obtain the widget aimed with the mouse cursor
+					Widget w = Util.widgetFromPoint(latestState, mouse.cursor().x(), mouse.cursor().y());
+					// Add the widget web CSS class property as clickable
+					WdElement element = ((WdWidget) w).element;
+					for(String s : element.cssClasses)
+						if(s!=null && !s.isEmpty())
+							clickableClasses.add(s);
+					// And save the new CSS class property in the test.setting file
+					Util.saveToFile(settings.toFileString(), Main.getTestSettingsFile());
+				} catch(Exception e) {
+					System.out.println("ERROR adding the widget from point: " + "x(" + mouse.cursor().x() + "), y("+ mouse.cursor().y() +")");
+				}
+			}
+
+			if (key == KBKeys.VK_LEFT) {
+				try {
+					// Obtain the widget aimed with the mouse cursor
+					Widget w = Util.widgetFromPoint(latestState, mouse.cursor().x(), mouse.cursor().y());
+					// Remove the widget web CSS class property from all clickables
+					WdElement element = ((WdWidget) w).element;
+					for(String s : element.cssClasses)
+						if(s!=null && !s.isEmpty())
+							clickableClasses.remove(s);
+					// And save the new CSS class property in the test.setting file
+					Util.saveToFile(settings.toFileString(), Main.getTestSettingsFile());
+				} catch(Exception e) {
+					System.out.println("ERROR removing the widget from point: " + "x(" + mouse.cursor().x() + "), y("+ mouse.cursor().y() +")");
+				}
+			}
+		}
 	}
 }

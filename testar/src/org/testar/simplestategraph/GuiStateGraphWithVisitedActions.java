@@ -30,6 +30,7 @@
 
 package org.testar.simplestategraph;
 
+import org.testar.IActionSelector;
 import org.testar.RandomActionSelector;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
@@ -40,7 +41,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-public class GuiStateGraphWithVisitedActions {
+public class GuiStateGraphWithVisitedActions implements IActionSelector {
     protected Set<IdBasedGuiState> idBasedGuiStates;
     protected String startingStateAbstractCustomId;
     protected String previousStateAbstractCustomId;
@@ -55,7 +56,9 @@ public class GuiStateGraphWithVisitedActions {
     }
 
     //TODO move into a new action selector:
+    @Override
     public Action selectAction(State state, Set<Action> actions){
+        System.out.println("---------------------------------------------------------");
         // saving the starting node of the graph:
         if(startingStateAbstractCustomId==null){
             startingStateAbstractCustomId=state.get(Tags.AbstractIDCustom);
@@ -88,7 +91,7 @@ public class GuiStateGraphWithVisitedActions {
         if(currentIdBasedGuiState.getUnvisitedActionIds().size()==actions.size()){
             // all actions unvisited -> new state -> randomly select action:
             System.out.println(this.getClass()+": new state, selecting randomly from "+actions.size()+" available actions");
-            returnAction = RandomActionSelector.selectAction(actions);
+            returnAction = RandomActionSelector.selectRandomAction(actions);
         }else{
             // already visited state
             if(currentIdBasedGuiState.getUnvisitedActionIds().size()==0){
@@ -108,7 +111,7 @@ public class GuiStateGraphWithVisitedActions {
         if(returnAction==null){
             // backup if action selection did not find an action:
             System.out.println(this.getClass()+": selectAction(): no unvisited actions found! Getting purely random action.");
-            returnAction = RandomActionSelector.selectAction(actions);
+            returnAction = RandomActionSelector.selectRandomAction(actions);
         }
         //updating the list of states:
         idBasedGuiStates.remove(currentIdBasedGuiState); // should not be a problem if state not there (new state)?
@@ -117,6 +120,7 @@ public class GuiStateGraphWithVisitedActions {
         // saving the state and action for state transition after knowing the target state:
         previousActionAbstractCustomId = returnAction.get(Tags.AbstractIDCustom);
         previousStateAbstractCustomId = state.get(Tags.AbstractIDCustom);
+        System.out.println(this.getClass() + ": return selected action = " + returnAction.get(Tags.Desc, "NoDescAvailable"));
         return returnAction;
     }
 

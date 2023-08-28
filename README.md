@@ -112,11 +112,11 @@ Some of the most interesting parameters that can help to integrate TESTAR as an 
 
 		Sequences & SequenceLength -> The number of iterations and actions that TESTAR will execute
 
-		SuspiciousTitles -> The errors that TESTAR will search in the execution
+		SuspiciousTags -> The errors that TESTAR will search in the execution
 
 Example: 
 
-``testar sse=desktop_generic ShowVisualSettingsDialogOnStartup=false Sequences=5 SequenceLength=100 Mode=Generate SUTConnectorValue=" ""C:\\Program Files\\VideoLAN\\VLC\\vlc.exe"" " SuspiciousTitles=".*[eE]rror.*|.*[eE]xcep[ct]ion.*"``
+``testar sse=desktop_generic ShowVisualSettingsDialogOnStartup=false Sequences=5 SequenceLength=100 Mode=Generate SUTConnectorValue=" ""C:\\Program Files\\VideoLAN\\VLC\\vlc.exe"" " SuspiciousTags=".*[eE]rror.*|.*[eE]xcep[ct]ion.*"``
 
 ## State Model / Graph database support
 TESTAR uses orientdb graph database http://orientdb.com , to create TESTAR GUI State Models.  

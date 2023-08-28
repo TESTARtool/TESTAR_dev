@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2023 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -36,13 +36,18 @@ public class WdActionRoles {
 	private WdActionRoles(){}
 
 	public static final Role
-	
+
 	ExecuteScript = Role.from("ExecuteScript", ActionRoles.Action), 
 	CloseTabScript = Role.from("CloseTabScript", ExecuteScript),
 	HistoryBackScript = Role.from("HistoryBackScript", ExecuteScript),
 	SubmitScript = Role.from("SubmitScript", ExecuteScript),
 	SetAttributeScript = Role.from("SetAttributeScript", ExecuteScript),
 	FormFillingAction = Role.from("FormFillingAction", ActionRoles.CompoundAction),
-	SelectListAction = Role.from("SelectListAction", ExecuteScript);
-	
+	SelectListAction = Role.from("SelectListAction", ExecuteScript),
+	RemoteAction = Role.from("RemoteAction", ActionRoles.Action),
+	RemoteClick = Role.from("RemoteClick", WdActionRoles.RemoteAction),
+	RemoteScrollClick = Role.from("RemoteScrollClick", WdActionRoles.RemoteClick),
+	RemoteType = Role.from("RemoteType", WdActionRoles.RemoteAction),
+	RemoteScrollType = Role.from("RemoteScrollType", WdActionRoles.RemoteType);
+
 }

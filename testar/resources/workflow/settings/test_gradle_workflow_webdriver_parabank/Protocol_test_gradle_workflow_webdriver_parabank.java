@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2021 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2021 - 2023 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -35,11 +35,7 @@ import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
-import org.testar.monkey.alayer.webdriver.WdElement;
-import org.testar.monkey.alayer.webdriver.WdWidget;
-import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
-import org.testar.plugin.NativeLinker;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.monkey.Settings;
@@ -48,6 +44,8 @@ import org.testar.managers.InputDataManager;
 import org.testar.protocols.WebdriverProtocol;
 
 import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.*;
 
 import static org.testar.monkey.alayer.Tags.Blocked;
@@ -75,6 +73,8 @@ public class Protocol_test_gradle_workflow_webdriver_parabank extends WebdriverP
         //WebDriver settings and features verification
         Assert.collectionContains(domainsAllowed, "para.testar.org");
         Assert.collectionSize(deniedExtensions, 5);
+        Assert.isTrue(settings.get(ConfigTags.ClickableClasses).isEmpty());
+        Assert.isTrue(settings.get(ConfigTags.TypeableClasses).isEmpty());
     }
 
     /**
@@ -103,17 +103,41 @@ public class Protocol_test_gradle_workflow_webdriver_parabank extends WebdriverP
         State stateAfterLogin = getState(system);
         boolean loggedUser = false;
         for(Widget widget : stateAfterLogin) {
-            if(widget.get(WdTags.WebTextContent, "").trim().equals("John Smith")) {
+            if(widget.get(WdTags.WebTextContent, "").trim().equals("Welcome")) {
                 loggedUser = true;
             }
         }
 
         Assert.isTrue(loggedUser, String.format("Trying to login in parabank app with user %s and pass %s" , user, pass));
+
+        // Verify login screenshots were created properly
+
+        String outputScreenshotsDir = OutputStructure.screenshotsOutputDir + File.separator 
+        		+ OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname + "_sequence_" + OutputStructure.sequenceInnerLoopCount;
+        File screenshotsFolder = new File(outputScreenshotsDir);
+
+        try {
+        	screenshotsFolder = screenshotsFolder.getCanonicalFile();
+        } catch(IOException e) {
+        	e.printStackTrace();
+        }
+
+        Assert.isTrue(screenshotsFolder.exists());
+
+        // Get all PNG files in the folder that contain "_ACC"
+        File[] pngFiles = screenshotsFolder.listFiles(new FilenameFilter() {
+        	@Override
+        	public boolean accept(File dir, String name) {
+        		return name.toLowerCase().endsWith(".png") && name.contains("_ACC");
+        	}
+        });
+
+        // Verify if there are at least 3 PNG files with "_ACC"
+        Assert.isTrue(pngFiles != null && pngFiles.length >= 3);
     }
 
     @Override
-    protected Set<Action> deriveActions(SUT system, State state)
-            throws ActionBuildException {
+    protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
         // Kill unwanted processes, force SUT to foreground
         Set<Action> actions = super.deriveActions(system, state);
 
@@ -156,43 +180,6 @@ public class Protocol_test_gradle_workflow_webdriver_parabank extends WebdriverP
         }
 
         return actions;
-    }
-
-    @Override
-    protected boolean isClickable(Widget widget) {
-        Role role = widget.get(Tags.Role, Roles.Widget);
-        if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
-            // Input type are special...
-            if (role.equals(WdRoles.WdINPUT)) {
-                String type = ((WdWidget) widget).element.type;
-                return WdRoles.clickableInputTypes().contains(type);
-            }
-            return true;
-        }
-
-        WdElement element = ((WdWidget) widget).element;
-        if (element.isClickable) {
-            return true;
-        }
-
-        Set<String> clickSet = new HashSet<>(clickableClasses);
-        clickSet.retainAll(element.cssClasses);
-        return clickSet.size() > 0;
-    }
-
-    @Override
-    protected boolean isTypeable(Widget widget) {
-        Role role = widget.get(Tags.Role, Roles.Widget);
-        if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
-            // Input type are special...
-            if (role.equals(WdRoles.WdINPUT)) {
-                String type = ((WdWidget) widget).element.type;
-                return WdRoles.typeableInputTypes().contains(type);
-            }
-            return true;
-        }
-
-        return false;
     }
 
     @Override

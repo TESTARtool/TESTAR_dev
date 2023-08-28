@@ -57,6 +57,7 @@ import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -117,8 +118,11 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
         while (numberOfRetries<maxNumberOfRetries){
             Widget widget = getWidgetWithMatchingTags(tagValues, state);
             if (widget != null) {
-                StdActionCompiler ac = new AnnotatingActionCompiler();
-                executeAction(system, state, ac.leftClickAt(widget));
+                // When the desired widget to interact with is found,
+                // Create the triggered action, build the identifier, and execute it.
+                Action triggeredAction = triggeredClickAction(state, widget);
+                buildStateActionsIdentifiers(state, Collections.singleton(triggeredAction));
+                executeAction(system, state, triggeredAction);
                 return true;
             }
             else {
@@ -149,9 +153,11 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
             //looking for a widget with matching tag value:
             Widget widget = getWidgetWithMatchingTag(tag,value,state);
             if(widget!=null){
-                StdActionCompiler ac = new AnnotatingActionCompiler();
-                //System.out.println("DEBUG: left mouse click on a widget with "+tag.toString()+"=" + value);
-                executeAction(system,state,ac.leftClickAt(widget));
+                // When the desired widget to interact with is found,
+                // Create the triggered action, build the identifier, and execute it.
+                Action triggeredAction = triggeredClickAction(state, widget);
+                buildStateActionsIdentifiers(state, Collections.singleton(triggeredAction));
+                executeAction(system, state, triggeredAction);
                 // is waiting needed after the action has been executed?
                 return true;
             }
@@ -218,8 +224,11 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
         while(numberOfRetries<maxNumberOfRetries){
             Widget widget = getWidgetWithMatchingTags(tagValues,state);
             if(widget!=null){
-                StdActionCompiler ac = new AnnotatingActionCompiler();
-                executeAction(system,state,ac.clickTypeInto(widget, textToType, true));
+                // When the desired widget to interact with is found,
+                // Create the triggered action, build the identifier, and execute it.
+                Action triggeredAction = triggeredTypeAction(state, widget, textToType, true);
+                buildStateActionsIdentifiers(state, Collections.singleton(triggeredAction));
+                executeAction(system, state, triggeredAction);
                 return true;
             }
             else {
@@ -251,8 +260,11 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
             //looking for a widget with matching tag value:
             Widget widget = getWidgetWithMatchingTag(tag,value,state);
             if(widget!=null){
-                StdActionCompiler ac = new AnnotatingActionCompiler();
-                executeAction(system,state,ac.clickTypeInto(widget, textToType, true));
+                // When the desired widget to interact with is found,
+                // Create the triggered action, build the identifier, and execute it.
+                Action triggeredAction = triggeredTypeAction(state, widget, textToType, true);
+                buildStateActionsIdentifiers(state, Collections.singleton(triggeredAction));
+                executeAction(system, state, triggeredAction);
                 // is waiting needed after the action has been executed?
                 return true;
             }
@@ -320,8 +332,11 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
         while(numberOfRetries<maxNumberOfRetries){
             Widget widget = getWidgetWithMatchingTags(tagValues,state);
             if(widget!=null){
-                StdActionCompiler ac = new AnnotatingActionCompiler();
-                executeAction(system,state,ac.pasteTextInto(widget, textToPaste, true));
+                // When the desired widget to interact with is found,
+                // Create the triggered action, build the identifier, and execute it.
+                Action triggeredAction = triggeredPasteAction(state, widget, textToPaste, true);
+                buildStateActionsIdentifiers(state, Collections.singleton(triggeredAction));
+                executeAction(system, state, triggeredAction);
                 return true;
             }
             else {
@@ -353,8 +368,11 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
             //looking for a widget with matching tag value:
             Widget widget = getWidgetWithMatchingTag(tag,value,state);
             if(widget!=null){
-                StdActionCompiler ac = new AnnotatingActionCompiler();
-                executeAction(system, state, ac.pasteTextInto(widget, textToPaste, true));
+                // When the desired widget to interact with is found,
+                // Create the triggered action, build the identifier, and execute it.
+                Action triggeredAction = triggeredPasteAction(state, widget, textToPaste, true);
+                buildStateActionsIdentifiers(state, Collections.singleton(triggeredAction));
+                executeAction(system, state, triggeredAction);
                 // is waiting needed after the action has been executed?
                 return true;
             }
@@ -607,11 +625,10 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
         for(String tagToFilter : settings.get(ConfigTags.TagsToFilter)){
             String tagValue = "";
             // First finding the Tag that matches the TagsToFilter string, then getting the value of that Tag:
-            for(Tag tag : w.tags()){
-                if(tag.name().equals(tagToFilter)){
-                    tagValue = w.get(tag, "");
+            for(Tag<?> tag : w.tags()){
+                if(w.get(tag, null) != null && tag.name().equals(tagToFilter)){
+                    tagValue = w.get(tag).toString();
                     break;
-                    //System.out.println("DEBUG: tag found, "+tagToFilter+"="+tagValue);
                 }
             }
 
@@ -698,6 +715,8 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     		State newState = getState(system);
     		Set<Action> newActions = deriveActions(system, newState);
     		if(!newActions.isEmpty()) {
+    			// If retry was able to derive new actions, build the identifiers and return them
+    			buildStateActionsIdentifiers(newState, newActions);
     			return newActions;
     		}
     	}
@@ -705,116 +724,26 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     }
 
     /**
-     * Compress TESTAR output run report folder
+     * By default, trigger click widget using LeftClickAt (Windows level). 
      */
-    protected void compressOutputRunFolder() {
-        Util.compressFolder(OutputStructure.outerLoopOutputDir, Main.outputDir, OutputStructure.outerLoopName);
+    protected Action triggeredClickAction(State state, Widget widget) {
+    	StdActionCompiler ac = new AnnotatingActionCompiler();
+    	return ac.leftClickAt(widget);
     }
 
     /**
-     * Obtain the IP address of the current host to create a folder inside destFolder,
-     * then copy all TESTAR output run results inside created folder.
-     *
-     * This is an utility method intended to copy output results inside a file server shared folder,
-     * used to save data of TESTAR experiments.
-     *
-     * @param destFolder
+     * By default, trigger click and type text using ClickTypeInto (Windows level). 
      */
-    protected void copyOutputToNewFolderUsingIpAddress(String destFolder) {
-        // Obtain the ip address of the host
-        // https://stackoverflow.com/a/38342964
-        String ipAddress = "127.0.0.1";
-        try(final DatagramSocket socket = new DatagramSocket()){
-            socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
-            ipAddress = socket.getLocalAddress().getHostAddress();
-        } catch (SocketException | UnknownHostException e) {
-            LogSerialiser.log("ERROR copyOutputToNewFolderUsingIpAddress: Obtaining host ip address",
-                    LogSerialiser.LogLevel.Info);
-            System.err.println("ERROR copyOutputToNewFolderUsingIpAddress: Obtaining host ip address");
-            e.printStackTrace();
-        }
-
-        // Create a new directory inside desired destination using the ipAddress as name
-        String folderIpAddress = destFolder + File.separator + ipAddress + File.separator + settings.get(ConfigTags.ApplicationName, "");
-        try {
-            Files.createDirectories(Paths.get(folderIpAddress));
-        } catch (IOException e) {
-            LogSerialiser.log("ERROR copyOutputToNewFolderUsingIpAddress: Creating new folder with ip name",
-                    LogSerialiser.LogLevel.Info);
-            System.err.println("ERROR copyOutputToNewFolderUsingIpAddress: Creating new folder with ip name");
-            e.printStackTrace();
-            return;
-        }
-
-        // Copy run zip file to desired ip address output folder
-        File outputZipFile = new File(Main.outputDir + File.separator + OutputStructure.outerLoopName + ".zip");
-        try {
-            if(outputZipFile.exists()) {
-                File fileIpAddressOutput = new File(folderIpAddress + File.separator + ipAddress + "_" + outputZipFile.getName());
-                FileUtils.copyFile(outputZipFile, fileIpAddressOutput);
-                System.out.println(String.format("Sucessfull copy %s to %s", outputZipFile, fileIpAddressOutput));
-            }
-        } catch (IOException e) {
-            LogSerialiser.log("ERROR copyOutputToNewFolderUsingIpAddress: ERROR ZIP : " + outputZipFile,
-                    LogSerialiser.LogLevel.Info);
-            System.err.println("ERROR copyOutputToNewFolderUsingIpAddress: ERROR ZIP : " + outputZipFile);
-            e.printStackTrace();
-        }
-
-        // Create a folder inside the centralized file server and copy the metrics results
+    protected Action triggeredTypeAction(State state, Widget widget, String textToType, boolean replaceText) {
+    	StdActionCompiler ac = new AnnotatingActionCompiler();
+    	return ac.clickTypeInto(widget, textToType, replaceText);
     }
 
     /**
-     * Obtain the IP address of the current host to create a folder inside destFolder,
-     * then copy chosen TESTAR output file inside created folder.
-     *
-     * This is an utility method intended to copy output results inside a file server shared folder,
-     * used to save data of TESTAR experiments.
-     *
-     * @param destFolder
-     * @param outputFile
+     * By default, trigger click and paste text using ClickPasteInto (Windows level). 
      */
-    protected void copyOutputFileToNewFolderUsingIpAddress(String destFolder, File outputFile) {
-        // Obtain the ip address of the host
-        // https://stackoverflow.com/a/38342964
-        String ipAddress = "127.0.0.1";
-        try(final DatagramSocket socket = new DatagramSocket()){
-            socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
-            ipAddress = socket.getLocalAddress().getHostAddress();
-        } catch (SocketException | UnknownHostException e) {
-            LogSerialiser.log("ERROR copyOutputToNewFolderUsingIpAddress: Obtaining host ip address",
-                    LogSerialiser.LogLevel.Info);
-            System.err.println("ERROR copyOutputToNewFolderUsingIpAddress: Obtaining host ip address");
-            e.printStackTrace();
-        }
-
-        // Create a new directory inside desired destination using the ipAddress as name
-        String folderIpAddress = destFolder + File.separator + ipAddress + File.separator + settings.get(ConfigTags.ApplicationName, "");
-        try {
-            Files.createDirectories(Paths.get(folderIpAddress));
-        } catch (IOException e) {
-            LogSerialiser.log("ERROR copyOutputToNewFolderUsingIpAddress: Creating new folder with ip name",
-                    LogSerialiser.LogLevel.Info);
-            System.err.println("ERROR copyOutputToNewFolderUsingIpAddress: Creating new folder with ip name");
-            e.printStackTrace();
-            return;
-        }
-
-        // Copy file to desired ip address output folder
-//        File outputFile = new File(Main.outputDir + File.separator + filename);
-        try {
-            if(outputFile.exists()) {
-                File fileIpAddressOutput = new File(folderIpAddress + File.separator + ipAddress + "_" + outputFile.getName());
-                FileUtils.copyFile(outputFile, fileIpAddressOutput); //copy and replace
-                System.out.println(String.format("Sucessfull copy %s to %s", outputFile, fileIpAddressOutput));
-            }
-        } catch (IOException e) {
-            LogSerialiser.log("ERROR copyOutputFileToNewFolderUsingIpAddress: ERROR FILE : " + outputFile,
-                    LogSerialiser.LogLevel.Info);
-            System.err.println("ERROR copyOutputFileToNewFolderUsingIpAddress: ERROR FILE : " + outputFile);
-            e.printStackTrace();
-        }
-
-        // Create a folder inside the centralized file server and copy the metrics results
+    protected Action triggeredPasteAction(State state, Widget widget, String textToPaste, boolean replaceText) {
+    	StdActionCompiler ac = new AnnotatingActionCompiler();
+    	return ac.pasteTextInto(widget, textToPaste, replaceText);
     }
 }
