@@ -212,3 +212,12 @@ ForcedLoginPasswordInputName = mat-input-1
 ForcedLoginPassword = password
 
 BtraceServiceHost = http://localhost:8088
+
+SonarDockerize = true
+SonarProjectName = Demo
+SonarProjectKey = demo
+GitUrl = https://stash.marviq.com/scm/yoho/yoho-be-api.git
+GitBranch = feature/testar-bug
+GitAuthRequired = true
+GitUsername = michael.tikhonenko
+GitToken = put_password_here

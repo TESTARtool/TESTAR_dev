@@ -19,6 +19,7 @@ public class BtraceApiClient {
     private final static String STATUS_STARTED = "STARTED";
 
     private long startTime;
+    private String sequenceId;
 
     public BtraceApiClient(String host) {
         this.host = host;
@@ -26,6 +27,13 @@ public class BtraceApiClient {
 
     public boolean startRecordingMethodInvocation() throws BtraceApiException{
         startTime = System.currentTimeMillis();
+//        if(this.sequenceId!=null) {
+//            Cookie sessionCookie = WdDriver.getRemoteWebDriver().manage().getCookieNamed("testarSequenceToken");
+//            String sessionId = sessionCookie.getValue();
+//            BtraceStartRecordingRequest request = new BtraceStartRecordingRequest(this.host, sessionId);
+//            BtraceStartRecordingResponse response = request.send();
+//            System.out.println(response);
+//        }
         return true;
     }
 
@@ -40,9 +48,17 @@ public class BtraceApiClient {
         }
 
         String sessionId = sessionCookie.getValue();
+        this.sequenceId = sessionId;
         long duration = System.currentTimeMillis() - startTime;
         BtraceGetMethodsRequest request = new BtraceGetMethodsRequest(host, sessionId, duration);
         BtraceFinishRecordingResponse response = request.send();
+
+        for (BtraceFinishRecordingResponse.MethodEntry m: (List<BtraceFinishRecordingResponse.MethodEntry>)(response.getMethodsExecuted())){
+            System.out.println(m.methodName);
+            System.out.println(m.parameterTypes);
+            System.out.println(m.className);
+            System.out.println("----------------");
+        }
 
         return convertToMethodInvocations(response.getMethodsExecuted());
     }

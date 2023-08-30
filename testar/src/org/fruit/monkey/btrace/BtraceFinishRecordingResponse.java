@@ -21,12 +21,12 @@ public class BtraceFinishRecordingResponse extends BtraceResponse {
     public static class MethodEntry {
 
         @JsonProperty("class")
-        private String className;
+        public String className;
 
         @JsonProperty("method")
-        private String methodName;
+        public String methodName;
 
         @JsonProperty("parameterTypes")
-        private List<String> parameterTypes;
+        public List<String> parameterTypes;
     }
 }

@@ -36,6 +36,7 @@ import org.testar.monkey.Main;
 
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
@@ -300,20 +301,22 @@ public class SonarqubeServiceImpl implements SonarqubeService {
     }
 
     private String createAndStartScanner(String sourcePath, String projectKey, String projectName, String projectSubdir, String token) throws IOException {
-//        File projectFile = new File(sourcePath + "/" + projectSubdir + "/" + "sonar-project.properties");
-//        System.out.println("Project file: " + projectFile.getAbsolutePath());
-//        FileOutputStream projectStream = new FileOutputStream(projectFile);
-//
-//        projectStream.write(("sonar.projectKey=" + projectKey + "\n").getBytes(StandardCharsets.UTF_8));
-//        projectStream.write(("sonar.projectName=" + projectName + "\n").getBytes(StandardCharsets.UTF_8));
-//        projectStream.write(("sonar.sourceEncoding=UTF-8\n").getBytes(StandardCharsets.UTF_8));
-//
-//        projectStream.flush();
-//        projectStream.close();
+        File projectFile = new File(sourcePath + "/" + projectSubdir + "/" + "sonar-project.properties");
+        System.out.println("Project file: " + projectFile.getAbsolutePath());
+        FileOutputStream projectStream = new FileOutputStream(projectFile);
+
+        projectStream.write(("sonar.projectKey=" + projectKey + "\n").getBytes(StandardCharsets.UTF_8));
+        projectStream.write(("sonar.projectName=" + projectName + "\n").getBytes(StandardCharsets.UTF_8));
+        projectStream.write(("sonar.sourceEncoding=UTF-8\n").getBytes(StandardCharsets.UTF_8));
+        projectStream.write(("sonar.java.binaries=/testar-api\n").getBytes(StandardCharsets.UTF_8));
+
+        projectStream.flush();
+        projectStream.close();
 
         final String outputDir = new File(Main.sonarqubeOutputDir).getAbsolutePath();
         final HostConfig hostConfig = HostConfig.newHostConfig()
                                                 .withBinds(new Bind(outputDir, new Volume("/output")))
+                                                .withBinds(new Bind(new File("D:\\Testar\\TESTAR_dev\\testar\\resources\\testar-api").getAbsolutePath(), new Volume("/testar-api")))
                                                 .withCpuCount(4L);
         final String dockerfileContent =
                 "FROM sonarsource/sonar-scanner-cli:latest AS sonarqube_scan\n" +
@@ -321,18 +324,19 @@ public class SonarqubeServiceImpl implements SonarqubeService {
                         "ENV SONAR_HOST_URL http://testar-sonarqube:9000\n" +
                         "ENV SONAR_TOKEN " + token + "\n" +
                         "ENV SRC_PATH /usr/src/" + projectSubdir + "\n" +
+                        "ENV SONAR_JAVA_BINARIES " + "/testar-api" + "\n" +
 //                "ENV MAVEN_OPTS -javaagent:/usr/jacoco/org.jacoco.agent-0.8.8-runtime.jar=destfile=/usr/src/report/jacoco.exec,includes=*,jmx=true,dumponexit=true\n" +
 //                "RUN mkdir /usr/jacoco\n" +
                         "RUN apk add maven openjdk11\n" +
 
 //                "RUN wget https://repo1.maven.org/maven2/org/jacoco/org.jacoco.agent/0.8.8/org.jacoco.agent-0.8.8-runtime.jar -P /usr/jacoco\n" +
 //                "RUN mkdir /usr/src/report\n" +
-                        "WORKDIR /usr/src/" + projectSubdir + "\n" +
+                        "WORKDIR /usr/src/" + projectSubdir + "\n" ;
                         //"RUN if [ -f \"./pom.xml\" ] || [ -f \"gradlew\" ]; then apk add maven openjdk11; fi\n" +
                         //"RUN apk add maven openjdk11\n" +
-                        "CMD mvn org.jacoco:jacoco-maven-plugin:0.8.8:prepare-agent verify " +
-                          "org.jacoco:jacoco-maven-plugin:0.8.2:report sonar:sonar -Dsonar.java.coveragePlugin=jacoco " +
-                          "&& cp target/site/jacoco/jacoco.xml /output";// -D sonar.projectKey=yoho-be -D sonar.host.url=http://sonarqube:9000 -D sonar.login=" + token + ";";
+                        //"CMD mvn org.jacoco:jacoco-maven-plugin:0.8.8:prepare-agent verify " +
+                        //  "org.jacoco:jacoco-maven-plugin:0.8.2:report sonar:sonar -Dsonar.java.coveragePlugin=jacoco " +
+                         // "&& cp target/site/jacoco/jacoco.xml /output";// -D sonar.projectKey=yoho-be -D sonar.host.url=http://sonarqube:9000 -D sonar.login=" + token + ";";
         // "CMD if ! [ -f \"sonar-project.properties\"]; then printf \"sonar.projectKey=" + projectKey +
         //         "\\nsonar.projectName=" + projectName + "\\nsonar.sourceEncoding=UTF-8\" > " +
         //         "sonar-project.properties; fi; " +

@@ -11,11 +11,11 @@ import java.util.List;
 @EqualsAndHashCode
 public class MethodInvocation {
 
-    private String className;
+    public String className;
 
-    private String methodName;
+    public String methodName;
 
-    private List<String> parameterTypes;
+    public List<String> parameterTypes;
 
-    private long times;
+    public long times;
 }

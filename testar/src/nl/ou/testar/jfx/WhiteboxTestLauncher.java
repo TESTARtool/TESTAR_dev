@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 //import java.net.URISyntaxException;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
 
 public class WhiteboxTestLauncher implements /*ProgressMonitor, */SonarqubeServiceDelegate {
@@ -85,21 +86,22 @@ public class WhiteboxTestLauncher implements /*ProgressMonitor, */SonarqubeServi
         progressMonitor.updateStage("Cloning repository");
         new Thread(() -> {
             Path repositoryPath;
-            try {
-              if (gitCredentials == null) {
-                repositoryPath = gitService.cloneRepository(repositoryUrl, progressMonitor, branchName);
-              } else {
-                repositoryPath = gitService.cloneRepository(repositoryUrl, gitCredentials, progressMonitor, branchName);
-              }
-            }
-            catch (GitAPIException | JGitInternalException e) {
-              System.out.println("Cannot get source code: " + e.getMessage());
-              e.printStackTrace();
-
-              progressMonitor.stop(new JfxProgressMonitor.TerminationReason(TERMINATION_REASON_TITLE,
-                TERMINATION_REASON_HEADER_TEXT, e.getMessage()));
-              return;
-            }
+//            try {
+//              if (gitCredentials == null) {
+//                repositoryPath = gitService.cloneRepository(repositoryUrl, progressMonitor, branchName);
+//              } else {
+//                repositoryPath = gitService.cloneRepository(repositoryUrl, gitCredentials, progressMonitor, branchName);
+//              }
+                repositoryPath = FileSystems.getDefault().getPath("D:\\Marviq\\yoho\\yoho-be-api");
+//            }
+//            catch (GitAPIException | JGitInternalException e) {
+//              System.out.println("Cannot get source code: " + e.getMessage());
+//              e.printStackTrace();
+//
+//              progressMonitor.stop(new JfxProgressMonitor.TerminationReason(TERMINATION_REASON_TITLE,
+//                TERMINATION_REASON_HEADER_TEXT, e.getMessage()));
+//              return;
+//            }
             System.out.println("...done");
 
             progressMonitor.updateStage("Analysing code");
