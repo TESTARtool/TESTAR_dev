@@ -1,32 +1,32 @@
 /***************************************************************************************************
-*
-* Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-* 2. Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-* 3. Neither the name of the copyright holder nor the names of its
-* contributors may be used to endorse or promote products derived from
-* this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************************************/
+ *
+ * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************************************/
 
 package org.testar.monkey;
 
@@ -57,7 +57,7 @@ public class Settings extends TaggableBase implements Serializable {
 	public static final String SUT_CONNECTOR_WEBDRIVER = "WEB_DRIVER";
 
 	private static String settingsPath;
-	
+
 	public static String getSettingsPath() {
 		return settingsPath;
 	}
@@ -65,7 +65,7 @@ public class Settings extends TaggableBase implements Serializable {
 	public static void setSettingsPath(String path) {
 		settingsPath = path;
 	}
-	
+
 	public static class ConfigParseException extends FruitException{
 		private static final long serialVersionUID = -245853379631399673L;
 		public ConfigParseException(String message) {
@@ -78,7 +78,7 @@ public class Settings extends TaggableBase implements Serializable {
 			StringBuilder sb = new StringBuilder();
 			String stringSeparator = getStringSeparator(tag);
 			List<?> l = (List<?>) value;
-			
+
 			int i = 0;
 			for(Object o : l){
 				if(i > 0)
@@ -91,7 +91,7 @@ public class Settings extends TaggableBase implements Serializable {
 			StringBuilder sb = new StringBuilder();
 			@SuppressWarnings("unchecked")
 			List<Pair<String, String>> l = (List<Pair<String, String>>) value;
-			
+
 			int i = 0;
 			for(Pair<String, String> p : l){
 				if(i > 0)
@@ -103,7 +103,7 @@ public class Settings extends TaggableBase implements Serializable {
 		}
 		return Util.toString(value);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static <T> T parse(String stringValue, Tag<T> tag) throws ConfigParseException{
 		if(tag.type().equals(Double.class)){
@@ -155,8 +155,8 @@ public class Settings extends TaggableBase implements Serializable {
 		}
 		throw new ConfigParseException("");
 	}
-	
-	
+
+
 	public static Settings FromFile(String path) throws IOException{
 		return fromFile(new ArrayList<Pair<?, ?>>(), path);
 	}
@@ -182,16 +182,16 @@ public class Settings extends TaggableBase implements Serializable {
 		InputStreamReader isw = new InputStreamReader(fis, "UTF-8");
 		Reader in = new BufferedReader(isw);
 		props.load(in);
-		
+
 		for(String sett : argv) {
 			//Ignore sse value
 			if(sett.toString().contains("sse=")) continue;
-			
+
 			System.out.println(sett.toString());
 			StringReader sr = new StringReader(sett);
 			props.load(sr);
 		}
-		
+
 		in.close();			
 		if (isw != null) isw.close();
 		if (fis != null) fis.close();
@@ -218,9 +218,9 @@ public class Settings extends TaggableBase implements Serializable {
 
 		for(String key : props.stringPropertyNames()){
 			String value = props.getProperty(key);
-			
+
 			Tag<?> defaultTag = null;
-			
+
 			for(Pair<?, ?> pair : defaults){
 				Tag<?> tag = (Tag<?>)pair.left();
 				if(tag.name().equals(key)){
@@ -249,209 +249,16 @@ public class Settings extends TaggableBase implements Serializable {
 		}
 		return sb.toString();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	/**
 	 * Make the default file Structure for the test.settings file
 	 */
-	public String toFileString() throws IOException{
-		StringBuilder sb = new StringBuilder();
-
+	public String toFileString() throws IOException {
+		// Create the default settings structure
+		StringBuilder sb = new StringBuilder(testSettingsStructure());
+		// Then add the settings values
 		try {
-			//test.setting default structure
-			sb.append("#################################################################\n"
-					+"# TESTAR mode\n"
-					+"#\n"
-					+"# Set the mode you want TESTAR to start in: Spy, Generate, Replay\n"
-					+"#################################################################\n"
-					+"\n"
-					+"Mode =" + Util.lineSep()
-					+"\n"
-					+"#################################################################\n"
-					+"# Connect to the System Under Test (SUT)\n"
-					+"#\n"
-					+"# Indicate how you want to connect to the SUT:\n"
-					+"#\n"
-					+"# SUTCONNECTOR = COMMAND_LINE, SUTConnectorValue property must be a command line that\n"
-					+"# starts the SUT.\n"
-					+"# It should work from a Command Prompt terminal window (e.g. java - jar SUTs/calc.jar ).\n"
-					+"# For web applications, follow the next format: web_browser_path SUT_URL.\n"
-					+"#\n"
-					+"# SUTCONNECTOR = SUT_WINDOW_TITLE, then SUTConnectorValue property must be the title displayed\n"
-					+"# in the SUT main window. The SUT must be manually started and closed.\n"
-					+"#\n"
-					+"# SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.\n"
-					+"# The SUT must be manually started and closed.\n"
-					+"#################################################################\n"
-					+"SUTConnector = " + Util.lineSep()
-					+"SUTConnectorValue = " + Util.lineSep()
-					+"\n"
-					+"#################################################################\n"
-					+"# Java Swing applications & Access Bridge Enabled\n"
-					+"#\n"
-					+"# Activate the Java Access Bridge in your Windows System:\n"
-					+"#		(Control Panel / Ease of Access / Ease of Access Center / Make the computer easier to see)\n"
-					+"#\n"
-					+"# Enable the variable Access Bridge Enabled in TESTAR as true\n"
-					+"#################################################################\n"
-					+"\n"
-					+"AccessBridgeEnabled = " + Util.lineSep()
-					+"\n"
-					+"#################################################################\n"
-					+"# Sequences\n"
-					+"#\n"
-					+"# Number of sequences and the length of these sequences\n"
-					+"#################################################################\n"
-					+"\n"
-					+"Sequences = " + Util.lineSep()
-					+"SequenceLength = " + Util.lineSep()
-					+"\n"
-					+"#################################################################\n"
-					+"# Oracles based on suspicious titles\n"
-					+"#\n"
-					+"# Regular expression and Tags to apply them\n"
-					+"#################################################################\n"
-					+"\n"
-					+"SuspiciousTitles = " + Util.lineSep()
-					+"TagsForSuspiciousOracle = " + Util.lineSep()
-					+"\n"
-					+"#################################################################\n"
-					+"# Oracles based on Suspicious Outputs detected by Process Listeners\n"
-					+"#\n"
-					+"# Requires ProcessListenerEnabled\n"
-					+"# (Only available for desktop applications through COMMAND_LINE)\n"
-					+"#\n"
-					+"# Regular expression SuspiciousProcessOutput contains the specification\n"
-					+"# of what is considered to be suspicious output.\n"
-					+"#################################################################\n"
-					+"\n"
-					+"ProcessListenerEnabled = " + Util.lineSep()
-					+"SuspiciousProcessOutput = " + Util.lineSep()
-					+"\n"
-					+"#################################################################\n"
-					+"# Process Logs\n"
-					+"#\n"
-					+"# Required ProcessListenerEnabled\n"
-					+"# (Only available for desktop applications through COMMAND_LINE)\n"
-					+"#\n"
-					+"# Allow TESTAR to store execution logs coming from the processes.\n"
-					+"# You can use the regular expression ProcessLogs below to filter\n"
-					+"# the logs. Use .*.* if you want to store all the outputs of the \n"
-					+"# process.\n"
-					+"#################################################################\n"
-					+"\n"
-					+"ProcessLogs = " + Util.lineSep()
-					+"\n"
-					+"#################################################################\n"
-					+"# Actionfilter\n"
-					+"#\n"
-					+"# Regular expression and Tags to apply them.\n"
-					+"# More filters can be added in Spy mode,\n"
-					+"# these will be added to the protocol_filter.xml file.\n"
-					+"#################################################################\n"
-					+"\n"
-					+"ClickFilter = " + Util.lineSep()
-					+"TagsToFilter = " + Util.lineSep()
-					+"\n"
-					+"#################################################################\n"
-					+"# Processfilter\n"
-					+"#\n"
-					+"# Regular expression. Kill the processes that your SUT can start up\n"
-					+"# but that you do not want to test.\n"
-					+"#################################################################\n"
-					+"\n"
-					+"SUTProcesses = " + Util.lineSep()
-					+"\n"
-					+"#################################################################\n"
-					+"# Protocolclass\n"
-					+"#\n"
-					+"# Indicate the location of the protocol class for your specific SUT.\n"
-					+"#################################################################\n"
-					+"\n"
-					+"ProtocolClass = " + Util.lineSep()
-					+"\n"
-					+"#################################################################\n"
-					+"# State model inference settings\n"
-					+"#################################################################\n"
-					+"StateModelEnabled = " + Util.lineSep()
-					+"DataStore = " + Util.lineSep()
-					+"DataStoreType = " + Util.lineSep()
-					+"DataStoreServer = " + Util.lineSep()
-					+"DataStoreDirectory = " + Util.lineSep()
-					+"DataStoreDB = " + Util.lineSep()
-					+"DataStoreUser = " + Util.lineSep()
-					+"DataStorePassword = " + Util.lineSep()
-					+"DataStoreMode = " + Util.lineSep()
-					+"ApplicationName = " + Util.lineSep()
-					+"ApplicationVersion = " + Util.lineSep()
-					+"ActionSelectionAlgorithm = " + Util.lineSep()
-					+"StateModelStoreWidgets = " + Util.lineSep()
-					+"\n"
-					+"#################################################################\n"
-					+"# State identifier attributes\n"
-					+"#\n"
-					+"# Specify the widget attributes that you wish to use in constructing\n"
-					+"# the widget and state hash strings. Use a comma separated list.\n"
-					+"#################################################################\n"
-					+"AbstractStateAttributes = " + Util.lineSep()
-					+"\n"
-					+"#################################################################\n"
-					+"# WebDriver features\n"
-					+"#################################################################\n"
-					+"\n"
-					+"ClickableClasses = " + Util.lineSep()
-					+"TypeableClasses = " + Util.lineSep()
-					+"DeniedExtensions = " + Util.lineSep()
-					+"DomainsAllowed = " + Util.lineSep()
-					+"FollowLinks = " + Util.lineSep()
-					+"BrowserFullScreen = " + Util.lineSep()
-					+"SwitchNewTabs = " + Util.lineSep()
-					+"\n"
-					+"#################################################################\n"
-					+"# WebDriver Browser Console Oracles\n"
-					+"#################################################################\n"
-					+"WebConsoleErrorOracle = " + Util.lineSep()
-					+"WebConsoleErrorPattern = " + Util.lineSep()
-					+"WebConsoleWarningOracle = " + Util.lineSep()
-					+"WebConsoleWarningPattern = " + Util.lineSep()
-					+"\n"
-					+"#################################################################\n"
-					+"# Override display scale\n"
-					+"#\n"
-					+"# Overrides the displayscale obtained from the system.\n"
-					+"# Can solve problems when the mouse clicks are not aligned with\n"
-					+"# the elements on the screen. This can easily be detected when\n"
-					+"# running the spy mode. For example hover over a text element and\n"
-					+"# the popup window should appear with information about the\n"
-					+"# element, if the popup window is not shown or when the mouse is\n"
-					+"# located somewhere else you can try to override the displayscale\n"
-					+"# Values should be provided as doubles (1.5).\n"
-					+"#################################################################\n"
-					+"\n"
-					+"OverrideWebDriverDisplayScale = " + Util.lineSep()
-					+"\n"
-					+"#################################################################\n"
-					+"# Settings (string) that can be used for user specified protocols\n"
-					+"#################################################################\n"
-					+"\n"
-					+"ProtocolSpecificSetting_1 = " + Util.lineSep()
-					+"ProtocolSpecificSetting_2 = " + Util.lineSep()
-					+"ProtocolSpecificSetting_3 = " + Util.lineSep()
-					+"ProtocolSpecificSetting_4 = " + Util.lineSep()
-					+"ProtocolSpecificSetting_5 = " + Util.lineSep()
-					+"\n"
-					+"#################################################################\n"
-					+"# Extended settings file\n"
-					+"#\n"
-					+"# Relative path to extended settings file.\n"
-					+"#################################################################\n"
-					+"ExtendedSettingsFile =" + Util.lineSep()
-					+"\n"
-					+"#################################################################\n"
-					+"# Other more advanced settings\n"
-					+"#################################################################\n");
-
-
 			for(Tag<?> t : tags()){
 				int ini = sb.indexOf(t.name()+" =");
 				int end = sb.indexOf(System.lineSeparator(), ini);
@@ -463,15 +270,309 @@ public class Settings extends TaggableBase implements Serializable {
 					sb.append(t.name()).append(" = ").append(escapeBackslash(print((Tag<Object>) t, get(t)))).append(Util.lineSep());
 				}
 			}
-			
+
 		} catch (NoSuchTagException e) {
-			System.out.println("Error trying to save current settings "+e);
+			System.out.println("Error trying to save current settings " + e);
 		}
 
 		return sb.toString();
 	}
-	
-	
+
+	private String testSettingsStructure() {
+		// First, create the main structure that contains specific format and descriptions
+		String mainString = String.join(System.getProperty("line.separator")
+				, "#################################################################"
+				, "# TESTAR mode"
+				, "#"
+				, "# Set the mode you want TESTAR to start in: Spy, Generate, Replay"
+				, "#################################################################"
+				, ""
+				, ConfigTags.Mode.name() + " = "
+				, ""
+				, "#################################################################"
+				, "# Connect to the System Under Test (SUT)"
+				, "#"
+				, "# Indicate how you want to connect to the SUT:"
+				, "#"
+				, "# SUTCONNECTOR = COMMAND_LINE, SUTConnectorValue property must be a command line that"
+				, "# starts the SUT."
+				, "# It should work from a Command Prompt terminal window (e.g. java - jar SUTs/calc.jar )."
+				, "# For web applications, follow the next format: web_browser_path SUT_URL."
+				, "#"
+				, "# SUTCONNECTOR = SUT_WINDOW_TITLE, then SUTConnectorValue property must be the title displayed"
+				, "# in the SUT main window. The SUT must be manually started and closed."
+				, "#"
+				, "# SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT."
+				, "# The SUT must be manually started and closed."
+				, "#################################################################"
+				, ""
+				, ConfigTags.SUTConnector.name() + " = "
+				, ConfigTags.SUTConnectorValue.name() + " = "
+				, ""
+				, "#################################################################"
+				, "# Java Swing applications & Access Bridge Enabled"
+				, "#"
+				, "# Activate the Java Access Bridge in your Windows System:"
+				, "#		(Control Panel / Ease of Access / Ease of Access Center / Make the computer easier to see)"
+				, "#"
+				, "# Enable the variable Access Bridge Enabled in TESTAR as true"
+				, "#################################################################"
+				, ""
+				, ConfigTags.AccessBridgeEnabled.name() + " = "
+				, ""
+				, "#################################################################"
+				, "# Sequences"
+				, "#"
+				, "# Number of sequences and the length of these sequences"
+				, "#################################################################"
+				, ""
+				, ConfigTags.Sequences.name() + " = "
+				, ConfigTags.SequenceLength.name() + " = "
+				, ""
+				, "#################################################################"
+				, "# SUT Protocol"
+				, "#"
+				, "# ProtocolClass: " + ConfigTags.ProtocolClass.getDescription()
+				, "# AlwaysCompile: " + ConfigTags.AlwaysCompile.getDescription()
+				, "#################################################################"
+				, ""
+				, ConfigTags.ProtocolClass.name() + " = "
+				, ConfigTags.AlwaysCompile.name() + " = "
+				, ""
+				, "#################################################################"
+				, "# Actionfilter"
+				, "#"
+				, "# Regular expression and Tags to apply them."
+				, "# More filters can be added in Spy mode, "
+				, "# these will be added to the protocol_filter.xml file."
+				, "#################################################################"
+				, ""
+				, ConfigTags.ClickFilter.name() + " = "
+				, ConfigTags.TagsToFilter.name() + " = "
+				, ""
+				, "#################################################################"
+				, "# Processfilter"
+				, "#"
+				, "# Regular expression. Kill the processes that your SUT can start up"
+				, "# but that you do not want to test."
+				, "#################################################################"
+				, ""
+				, ConfigTags.ProcessesToKillDuringTest.name() + " = "
+				, ""
+				, "#################################################################"
+				, "# Oracles based on suspicious tag values"
+				, "#"
+				, "# Regular expression and Tags to apply them"
+				, "#################################################################"
+				, ""
+				, ConfigTags.SuspiciousTags.name() + " = "
+				, ConfigTags.TagsForSuspiciousOracle.name() + " = "
+				, ""
+				, "#################################################################"
+				, "# Oracles based on Suspicious Outputs detected by Process Listeners"
+				, "#"
+				, "# Requires ProcessListenerEnabled"
+				, "# (Only available for desktop applications through COMMAND_LINE)"
+				, "#"
+				, "# Regular expression SuspiciousProcessOutput contains the specification"
+				, "# of what is considered to be suspicious output."
+				, "#################################################################"
+				, ""
+				, ConfigTags.ProcessListenerEnabled.name() + " = "
+				, ConfigTags.SuspiciousProcessOutput.name() + " = "
+				, ""
+				, "#################################################################"
+				, "# Process Logs"
+				, "#"
+				, "# Required ProcessListenerEnabled"
+				, "# (Only available for desktop applications through COMMAND_LINE)"
+				, "#"
+				, "# Allow TESTAR to store execution logs coming from the processes."
+				, "# You can use the regular expression ProcessLogs below to filter"
+				, "# the logs. Use .*.* if you want to store all the outputs of the "
+				, "# process."
+				, "#################################################################"
+				, ""
+				, ConfigTags.ProcessLogs.name() + " = "
+				, ""
+				, "#################################################################"
+				, "# Time configurations"
+				, "#"
+				, "# ActionDuration: " + ConfigTags.ActionDuration.getDescription()
+				, "# TimeToWaitAfterAction: " + ConfigTags.TimeToWaitAfterAction.getDescription()
+				, "# StartupTime: " + ConfigTags.StartupTime.getDescription()
+				, "# MaxTime: " + ConfigTags.MaxTime.getDescription()
+				, "#################################################################"
+				, ""
+				, ConfigTags.ActionDuration.name() + " = "
+				, ConfigTags.TimeToWaitAfterAction.name() + " = "
+				, ConfigTags.StartupTime.name() + " = "
+				, ConfigTags.MaxTime.name() + " = "
+				, ""
+				, "#################################################################"
+				, "# State model inference settings"
+				, "#"
+				, "# StateModelEnabled: " + ConfigTags.StateModelEnabled.getDescription()
+				, "# DataStore: " + ConfigTags.DataStore.getDescription()
+				, "# DataStoreType: " + ConfigTags.DataStoreType.getDescription()
+				, "# DataStoreServer: " + ConfigTags.DataStoreServer.getDescription()
+				, "# DataStoreDirectory: " + ConfigTags.DataStoreDirectory.getDescription()
+				, "# DataStoreDB: " + ConfigTags.DataStoreDB.getDescription()
+				, "# DataStoreUser: " + ConfigTags.DataStoreUser.getDescription()
+				, "# DataStorePassword: " + ConfigTags.DataStorePassword.getDescription()
+				, "# DataStoreMode: " + ConfigTags.DataStoreMode.getDescription()
+				, "# ApplicationName: " + ConfigTags.ApplicationName.getDescription()
+				, "# ApplicationVersion: " + ConfigTags.ApplicationVersion.getDescription()
+				, "# ActionSelectionAlgorithm: " + ConfigTags.ActionSelectionAlgorithm.getDescription()
+				, "# StateModelStoreWidgets: " + ConfigTags.StateModelStoreWidgets.getDescription()
+				, "# ResetDataStore: " + ConfigTags.ResetDataStore.getDescription()
+				, "#################################################################"
+				, ""
+				, ConfigTags.StateModelEnabled.name() + " = "
+				, ConfigTags.DataStore.name() + " = "
+				, ConfigTags.DataStoreType.name() + " = "
+				, ConfigTags.DataStoreServer.name() + " = "
+				, ConfigTags.DataStoreDirectory.name() + " = "
+				, ConfigTags.DataStoreDB.name() + " = "
+				, ConfigTags.DataStoreUser.name() + " = "
+				, ConfigTags.DataStorePassword.name() + " = "
+				, ConfigTags.DataStoreMode.name() + " = "
+				, ConfigTags.ApplicationName.name() + " = "
+				, ConfigTags.ApplicationVersion.name() + " = "
+				, ConfigTags.ActionSelectionAlgorithm.name() + " = "
+				, ConfigTags.StateModelStoreWidgets.name() + " = "
+				, ConfigTags.ResetDataStore.name() + " = "
+				, ""
+				, "#################################################################"
+				, "# State identifier attributes"
+				, "#"
+				, "# Specify the widget attributes that you wish to use in constructing"
+				, "# the widget and state hash strings. Use a comma separated list."
+				, "#################################################################"
+				, ""
+				, ConfigTags.AbstractStateAttributes.name() + " = "
+				, ""
+				, "#################################################################"
+				, "# WebDriver features"
+				, "#"
+				, "# ClickableClasses: " + ConfigTags.ClickableClasses.getDescription()
+				, "# TypeableClasses: " + ConfigTags.TypeableClasses.getDescription()
+				, "# DeniedExtensions: " + ConfigTags.DeniedExtensions.getDescription()
+				, "# DomainsAllowed: " + ConfigTags.DomainsAllowed.getDescription()
+				, "# FollowLinks: " + ConfigTags.FollowLinks.getDescription()
+				, "# BrowserFullScreen: " + ConfigTags.BrowserFullScreen.getDescription()
+				, "# SwitchNewTabs: " + ConfigTags.SwitchNewTabs.getDescription()
+				, "#################################################################"
+				, ""
+				, ConfigTags.ClickableClasses.name() + " = "
+				, ConfigTags.TypeableClasses.name() + " = "
+				, ConfigTags.DeniedExtensions.name() + " = "
+				, ConfigTags.DomainsAllowed.name() + " = "
+				, ConfigTags.FollowLinks.name() + " = "
+				, ConfigTags.BrowserFullScreen.name() + " = "
+				, ConfigTags.SwitchNewTabs.name() + " = "
+				, ""
+				, "#################################################################"
+				, "# WebDriver Browser Console Oracles"
+				, "#"
+				, "# WebConsoleErrorOracle: " + ConfigTags.WebConsoleErrorOracle.getDescription()
+				, "# WebConsoleErrorPattern: " + ConfigTags.WebConsoleErrorPattern.getDescription()
+				, "# WebConsoleWarningOracle: " + ConfigTags.WebConsoleWarningOracle.getDescription()
+				, "# WebConsoleWarningPattern: " + ConfigTags.WebConsoleWarningPattern.getDescription()
+				, "#################################################################"
+				, ""
+				, ConfigTags.WebConsoleErrorOracle.name() + " = "
+				, ConfigTags.WebConsoleErrorPattern.name() + " = "
+				, ConfigTags.WebConsoleWarningOracle.name() + " = "
+				, ConfigTags.WebConsoleWarningPattern.name() + " = "
+				, ""
+				, "#################################################################"
+				, "# Override display scale"
+				, "#"
+				, "# Overrides the displayscale obtained from the system."
+				, "# Can solve problems when the mouse clicks are not aligned with"
+				, "# the elements on the screen. This can easily be detected when"
+				, "# running the spy mode. For example hover over a text element and"
+				, "# the popup window should appear with information about the"
+				, "# element, if the popup window is not shown or when the mouse is"
+				, "# located somewhere else you can try to override the displayscale"
+				, "# Values should be provided as doubles (1.5)."
+				, "#################################################################"
+				, ""
+				, ConfigTags.OverrideWebDriverDisplayScale.name() + " = "
+				, ""
+				, "#################################################################"
+				, "# Settings (string) that can be used for user specified protocols"
+				, "#################################################################"
+				, ""
+				, ConfigTags.ProtocolSpecificSetting_1.name() + " = "
+				, ConfigTags.ProtocolSpecificSetting_2.name() + " = "
+				, ConfigTags.ProtocolSpecificSetting_3.name() + " = "
+				, ConfigTags.ProtocolSpecificSetting_4.name() + " = "
+				, ConfigTags.ProtocolSpecificSetting_5.name() + " = "
+				, ""
+				, "#################################################################"
+				, "# Extended settings file"
+				, "#"
+				, "# Relative path to extended settings file."
+				, "#################################################################"
+				, ""
+				, ConfigTags.ExtendedSettingsFile.name() + " = "
+				, ""
+				);
+
+		// Second, create a list of secondary configuration tags settings
+		// To add their descriptions to the file
+		List<Tag<?>> secondarySettingsList = new ArrayList<>();
+		secondarySettingsList.add(ConfigTags.ShowVisualSettingsDialogOnStartup);
+		secondarySettingsList.add(ConfigTags.ForceForeground);
+		secondarySettingsList.add(ConfigTags.VisualizeActions);
+		secondarySettingsList.add(ConfigTags.FormFillingAction);
+		secondarySettingsList.add(ConfigTags.SUTProcesses);
+		secondarySettingsList.add(ConfigTags.LogLevel);
+		secondarySettingsList.add(ConfigTags.OnlySaveFaultySequences);
+		secondarySettingsList.add(ConfigTags.ReplayRetryTime);
+		secondarySettingsList.add(ConfigTags.StopGenerationOnFault);
+		secondarySettingsList.add(ConfigTags.TimeToFreeze);
+		secondarySettingsList.add(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay);
+		secondarySettingsList.add(ConfigTags.UseSystemActions);
+		secondarySettingsList.add(ConfigTags.PathToReplaySequence);
+		secondarySettingsList.add(ConfigTags.RefreshSpyCanvas);
+		secondarySettingsList.add(ConfigTags.FlashFeedback);
+		secondarySettingsList.add(ConfigTags.MaxReward);
+		secondarySettingsList.add(ConfigTags.Discount);
+		secondarySettingsList.add(ConfigTags.CreateWidgetInfoJsonFile);
+		secondarySettingsList.add(ConfigTags.MyClassPath);
+		secondarySettingsList.add(ConfigTags.ProtocolCompileDirectory);
+		secondarySettingsList.add(ConfigTags.OutputDir);
+		secondarySettingsList.add(ConfigTags.TempDir);
+		secondarySettingsList.add(ConfigTags.ReportingClass);
+
+		StringJoiner secondaryString = new StringJoiner(System.getProperty("line.separator"));
+		for(Tag<?> set : secondarySettingsList) {
+			// Make sure it contains a description
+			if(!set.getDescription().isEmpty()) {
+				secondaryString.add("#################################################################");
+				secondaryString.add("# " + set.getDescription());
+				secondaryString.add("#################################################################");
+				secondaryString.add("");
+				secondaryString.add(set.name() + " = ");
+				secondaryString.add("");
+			}
+		}
+
+		// Finally, create the structure for other settings
+		StringJoiner otherString = new StringJoiner(System.getProperty("line.separator"));
+		otherString.add("#################################################################");
+		otherString.add("# Other settings");
+		otherString.add("#################################################################");
+		otherString.add("");
+
+		return mainString
+				.concat(System.getProperty("line.separator") + secondaryString.toString())
+				.concat(System.getProperty("line.separator") + otherString.toString());
+	}
+
 	private String escapeBackslash(String string){ return string.replace("\\", "\\\\");	}
 
 	/**
@@ -480,22 +581,22 @@ public class Settings extends TaggableBase implements Serializable {
 	private void verifySettings() {
 		// verify the concrete and abstract state settings
 		// the values provided should be valid state management tags
-        Set<String> allowedStateAttributes = StateManagementTags.getAllTags().stream().map(StateManagementTags::getSettingsStringFromTag).collect(Collectors.toSet());
+		Set<String> allowedStateAttributes = StateManagementTags.getAllTags().stream().map(StateManagementTags::getSettingsStringFromTag).collect(Collectors.toSet());
 
 		// add only the state management tags that are available
 		Set<String> stateSet = new HashSet<>();
-        try {
-            List<String> abstractStateAttributes = get(ConfigTags.AbstractStateAttributes);
-            for (String abstractStateAttribute : abstractStateAttributes) {
-                if (allowedStateAttributes.contains(abstractStateAttribute)) {
-                    stateSet.add(abstractStateAttribute);
-                }
-            }
-            set(ConfigTags.AbstractStateAttributes, new ArrayList<>(stateSet));
-        }
-        catch (NoSuchTagException ex) {
-            // no need to do anything, nothing to verify
-        }
+		try {
+			List<String> abstractStateAttributes = get(ConfigTags.AbstractStateAttributes);
+			for (String abstractStateAttribute : abstractStateAttributes) {
+				if (allowedStateAttributes.contains(abstractStateAttribute)) {
+					stateSet.add(abstractStateAttribute);
+				}
+			}
+			set(ConfigTags.AbstractStateAttributes, new ArrayList<>(stateSet));
+		}
+		catch (NoSuchTagException ex) {
+			// no need to do anything, nothing to verify
+		}
 	}
 
 	private static String getStringSeparator(Tag<?> tag) {

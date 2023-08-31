@@ -68,7 +68,7 @@ import static javax.swing.UIManager.*;
 public class SettingsDialog extends JFrame implements Observer {
   private static final long serialVersionUID = 5156320008281200950L;
 
-  static final String TESTAR_VERSION = "2.6.2 (10-Feb-2023)";
+  static final String TESTAR_VERSION = "2.6.5 (27-Jun-2023)";
 
   private String settingsFile;
   private Settings settings;
@@ -88,8 +88,9 @@ public class SettingsDialog extends JFrame implements Observer {
   private static final int FILTER_TAB_INDEX = 2;
   private static final int ORACLES_TAB_INDEX = 3;
   private static final int TIMES_TAB_INDEX = 4;
-  private static final int MISC_TAB_INDEX = 5;
-  private static final int MODEL_TAB_INDEX = 6;
+  //private static final int MISC_TAB_INDEX = 5;
+  private static final int MODEL_TAB_INDEX = 5;
+  private static final int ADVANCED_TAB_INDEX = 6;
   private final Map<Integer, Pair<String, SettingsPanel>> settingPanels = new HashMap<>();
 
   /**
@@ -177,11 +178,11 @@ public class SettingsDialog extends JFrame implements Observer {
       throw new IllegalStateException("Your ClickFilter is not a valid regular expression!");
     }
 
-    userInputPattern = settings.get(ConfigTags.SuspiciousTitles);
+    userInputPattern = settings.get(ConfigTags.SuspiciousTags);
     try {
       Pattern.compile(userInputPattern);
     } catch (PatternSyntaxException exception) {
-      throw new IllegalStateException("Your Oracle SuspiciousTitles is not a valid regular expression!");
+      throw new IllegalStateException("Your Oracle SuspiciousTags is not a valid regular expression!");
     }
 
     userInputPattern = settings.get(ConfigTags.SuspiciousProcessOutput);
@@ -261,8 +262,9 @@ public class SettingsDialog extends JFrame implements Observer {
     settingPanels.put(FILTER_TAB_INDEX, new Pair<>("Filters", new FilterPanel()));
     settingPanels.put(ORACLES_TAB_INDEX, new Pair<>("Oracles", new OraclePanel()));
     settingPanels.put(TIMES_TAB_INDEX, new Pair<>("Time Settings", new TimingPanel()));
-    settingPanels.put(MISC_TAB_INDEX, new Pair<>("Misc", new MiscPanel()));
+    //settingPanels.put(MISC_TAB_INDEX, new Pair<>("Misc", new MiscPanel())); // TODO: Misc panel is disabled temporally from the GUI
     settingPanels.put(MODEL_TAB_INDEX, new Pair<>("State Model", modelPanel = StateModelPanel.createStateModelPanel()));
+    settingPanels.put(ADVANCED_TAB_INDEX, new Pair<>("Advanced Options", new AdvancedPanel()));
 
     settingPanels.forEach((k,v) -> jTabsPane.add(v.left(),v.right()));
 

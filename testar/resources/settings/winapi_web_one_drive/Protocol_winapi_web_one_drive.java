@@ -257,7 +257,7 @@ public class Protocol_winapi_web_one_drive extends DesktopProtocol {
 	protected Verdict getVerdict(State state){
 
 		Verdict verdict = super.getVerdict(state);
-		// system crashes, non-responsiveness and suspicious titles automatically detected!
+		// system crashes, non-responsiveness and suspicious tags automatically detected!
 
 		//-----------------------------------------------------------------------------
 		// MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
@@ -267,7 +267,7 @@ public class Protocol_winapi_web_one_drive extends DesktopProtocol {
 		String title;
 		Shape shape;
 
-		// search all widgets for suspicious titles
+		// search all widgets for suspicious tags
 		for(Widget w : state){
 
 			role = w.get(Tags.Role, null);

@@ -328,7 +328,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     				String consoleErrorMsg = logEntry.getMessage();
     				Matcher matcherError = errorPattern.matcher(consoleErrorMsg);
     				if(matcherError.matches()) {
-    					webConsoleVerdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, "Web Browser Console Error: " + consoleErrorMsg);
+    					webConsoleVerdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TAG, "Web Browser Console Error: " + consoleErrorMsg);
     				}
     			}
     		}
@@ -349,7 +349,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     				String consoleWarningMsg = logEntry.getMessage();
     				Matcher matcherWarning = warningPattern.matcher(consoleWarningMsg);
     				if(matcherWarning.matches()) {
-    					webConsoleVerdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, "Web Browser Console Warning: " + consoleWarningMsg);
+    					webConsoleVerdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TAG, "Web Browser Console Warning: " + consoleWarningMsg);
     				}
     			}
     		}
@@ -436,9 +436,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
             statusInfo = (getReplayVerdict().join(processVerdict)).info();
         }
         else {
-            htmlReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
-            status = (getVerdict(latestState).join(processVerdict)).verdictSeverityTitle();
-            statusInfo = (getVerdict(latestState).join(processVerdict)).info();
+            htmlReport.addTestVerdict(getFinalVerdict());
+            status = (getFinalVerdict()).verdictSeverityTitle();
+            statusInfo = (getFinalVerdict()).info();
         }
 
         String sequencesPath = getGeneratedSequenceName();
@@ -586,7 +586,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				}
 			}
 			if (popupMatches) {
-				popupClickActions.add(ac.leftClickAt(widget));
+				popupClickActions.add(triggeredClickAction(state, widget));
 			}
 		}
 

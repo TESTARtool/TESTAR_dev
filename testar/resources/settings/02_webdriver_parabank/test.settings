@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://para.testar.org/"
+SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "https://para.testar.org/"
 
 #################################################################
 # Sequences
@@ -35,17 +35,17 @@ SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x900+0+0" "https://para
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 1
-SequenceLength = 100
+Sequences = 5
+SequenceLength = 20
 
 #################################################################
-# Oracles based on suspicious titles
+# Oracles based on suspicious tag values
 #
 # Regular expression and Tags to apply them
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
-TagsForSuspiciousOracle = Title;WebName;WebTagName
+SuspiciousTags = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+TagsForSuspiciousOracle = Title;WebTextContent
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -82,8 +82,8 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
-TagsToFilter = Title;WebName;WebTagName
+ClickFilter = .*admin.htm.*|.*logout.htm.*
+TagsToFilter = Title;WebName;WebTagName;WebHref
 
 #################################################################
 # Processfilter
@@ -92,32 +92,65 @@ TagsToFilter = Title;WebName;WebTagName
 # but that you do not want to test.
 #################################################################
 
-SUTProcesses =
+ProcessesToKillDuringTest =
 
 #################################################################
-# Protocolclass
+# SUT Protocol
 #
-# Indicate the location of the protocol class for your specific SUT.
+# ProtocolClass: Indicate the location of the protocol class for your specific SUT
+# AlwaysCompile: Compile the protocol before launching the selected TESTAR mode
 #################################################################
 
-ProtocolClass = 02_webdriver_parabank/Protocol_webdriver_parabank
+ProtocolClass = 02_webdriver_parabank/Protocol_02_webdriver_parabank
+AlwaysCompile = true
+
+#################################################################
+# Time configurations
+#
+# ActionDuration: Sets the speed, in seconds, at which a GUI action is performed
+# TimeToWaitAfterAction: Sets the delay, in seconds, between UI actions during a test
+# StartupTime: Sets how many seconds to wait for the SUT to be ready for testing
+# MaxTime: Sets a time, in seconds, after which the test run is finished (e.g. stop after an hour)
+#################################################################
+
+ActionDuration = 0.1
+TimeToWaitAfterAction = 0.1
+StartupTime = 2.0
+MaxTime = 3.1536E7
 
 #################################################################
 # State model inference settings
+#
+# StateModelEnabled: Enable or disable the State Model feature
+# DataStore: The graph database we use to store the State Model: OrientDB
+# DataStoreType: The mode we use to connect to the database: remote or plocal
+# DataStoreServer: IP address to connect if we desired to use remote mode
+# DataStoreDirectory: Path of the directory on which local OrientDB exists, if we use plocal mode
+# DataStoreDB: The name of the desired database on which we want to store the State Model.
+# DataStoreUser: User credential to authenticate TESTAR in OrientDB
+# DataStorePassword: Password credential to authenticate TESTAR in OrientDB
+# DataStoreMode: Indicate how TESTAR should store the model objects in the database: instant, delayed, hybrid, none
+# ApplicationName: Name to identify the SUT. Especially important to identify a State Model
+# ApplicationVersion: Version to identify the SUT. Especially important to identify a State Model
+# ActionSelectionAlgorithm: State Model Action Selection mechanism to explore the SUT: random or unvisited
+# StateModelStoreWidgets: Save all widget tree information in the State Model every time TESTAR discovers a new Concrete State
+# ResetDataStore: WARNING: Delete all existing State Models from the selected database before creating a new one
 #################################################################
+
 StateModelEnabled = false
-DataStore =
+DataStore = 
 DataStoreType = remote
-DataStoreServer =
-DataStoreDirectory =
-DataStoreDB =
-DataStoreUser =
-DataStorePassword =
+DataStoreServer = 
+DataStoreDirectory = 
+DataStoreDB = 
+DataStoreUser = 
+DataStorePassword = 
 DataStoreMode = none
 ApplicationName = Parabank
-ApplicationVersion =
+ApplicationVersion = 
 ActionSelectionAlgorithm = random
 StateModelStoreWidgets = true
+ResetDataStore = false
 
 #################################################################
 # State identifier attributes
@@ -129,7 +162,16 @@ AbstractStateAttributes = WebWidgetId
 
 #################################################################
 # WebDriver features
+#
+# ClickableClasses: Indicate which web CSS classes need to be considered clickable
+# TypeableClasses: Indicate which web CSS classes need to be considered typeable
+# DeniedExtensions: Indicate which web URL extensions need to be ignored when testing
+# DomainsAllowed: Indicate which web URL domains need to be ignored when testing
+# FollowLinks: Indicate if allowing to follow links opened in new tabs
+# BrowserFullScreen: Indicate if perform the web testing with the browser in full screen
+# SwitchNewTabs: Indicate if switch to a new web tab if opened
 #################################################################
+
 ClickableClasses = 
 TypeableClasses = 
 DeniedExtensions = pdf;jpg;png;pfx;xml
@@ -140,7 +182,13 @@ SwitchNewTabs = true
 
 #################################################################
 # WebDriver Browser Console Oracles
+#
+# WebConsoleErrorOracle: Enable or Disable applying ORACLES to the browser error console
+# WebConsoleErrorPattern: Regular expressions ORACLE to find suspicious messages in the browser error console
+# WebConsoleWarningOracle: Enable or Disable applying ORACLES to the browser warning console
+# WebConsoleWarningPattern: Regular expressions ORACLE to find suspicious messages in the browser warning console
 #################################################################
+
 WebConsoleErrorOracle = false
 WebConsoleErrorPattern = .*.*
 WebConsoleWarningOracle = false
@@ -171,35 +219,39 @@ ProtocolSpecificSetting_4 =
 ProtocolSpecificSetting_5 = 
 
 #################################################################
+# Sets whether to display TESTAR dialog. If false is used, then TESTAR will run in the mode of the Mode property
+#################################################################
+
+ShowVisualSettingsDialogOnStartup = true
+
+#################################################################
+# Sets whether to keep the SUTs GUI active in the screen (e.g. when its minimised or when a process is started and its UI is in front, etc.)
+#################################################################
+
+ForceForeground = true
+
+#################################################################
+# Sets whether to display overlay information, inside the SPY mode, for all the UI actions derived from the test set up
+#################################################################
+
+VisualizeActions = false
+
+#################################################################
 # Other more advanced settings
 #################################################################
 
-ProcessesToKillDuringTest =
 OutputDir = ./output
 PathToReplaySequence = ./output/temp
 TempDir = ./output/temp
 UseRecordedActionDurationAndWaitTimeDuringReplay = false
-ForceForeground = true
 LogLevel = 1
-ExecuteActions = true
 FaultThreshold = 1.0E-9
-DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
-ActionDuration = 0.1
-ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
-MaxTime = 3.1536E7
-ShowSettingsAfterTest = true
-TimeToWaitAfterAction = 0.1
-StartupTime = 2.0
-DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true
 CopyFromTo =
-VisualizeActions = false
-VisualizeSelectedAction = true
-TestGenerator = random
 MaxReward = 9999999
 Discount = .95

@@ -164,15 +164,15 @@ public class IOSProtocol extends GenericUtilsProtocol {
      */
     @Override
     protected void postSequenceProcessing() {
-        htmlReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
+        htmlReport.addTestVerdict(getFinalVerdict());
 
         String sequencesPath = getGeneratedSequenceName();
         try {
             sequencesPath = new File(getGeneratedSequenceName()).getCanonicalPath();
         }catch (Exception e) {}
 
-        String status = (getVerdict(latestState).join(processVerdict)).verdictSeverityTitle();
-        String statusInfo = (getVerdict(latestState).join(processVerdict)).info();
+        String status = (getFinalVerdict()).verdictSeverityTitle();
+        String statusInfo = (getFinalVerdict()).info();
 
         statusInfo = statusInfo.replace("\n"+Verdict.OK.info(), "");
 
