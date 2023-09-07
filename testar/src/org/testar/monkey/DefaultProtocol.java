@@ -57,6 +57,9 @@ import java.util.zip.GZIPInputStream;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
 import org.testar.*;
 import org.testar.managers.NativeHookManager;
 import org.testar.reporting.Reporting;
@@ -426,7 +429,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private void popupMessage(String message) {
 		if(settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
 			JFrame frame = new JFrame();
-			JOptionPane.showMessageDialog(frame, message);
+
+			JTextArea textArea = new JTextArea(message);
+			textArea.setWrapStyleWord(true);
+			textArea.setLineWrap(true);
+			textArea.setEditable(false);
+
+			JScrollPane scrollPane = new JScrollPane(textArea);
+			scrollPane.setPreferredSize(new java.awt.Dimension(400, 200));
+
+			JOptionPane.showMessageDialog(frame, scrollPane);
 		}
 	}
 
@@ -722,6 +734,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			throw new SystemStartException(ioe);
 		}
 		String sutConnectorType = settings().get(ConfigTags.SUTConnector);
+
+		// WindowsTitle, ProcessName, and CommandLine must have a SUTConnectorValue:
+		String connectorValue = settings().get(ConfigTags.SUTConnectorValue);
+		if(connectorValue == null || connectorValue.length() == 0) {
+			String msg = "It seems that the SUTConnectorValue setting is null or empty!\n"
+					+ "Please provide a valid value for the SUTConnector: " + sutConnectorType;
+			popupMessage(msg);
+			throw new SystemStartException(msg);
+		}
+
 		if (sutConnectorType.equals(Settings.SUT_CONNECTOR_WINDOW_TITLE)) {
 			WindowsWindowTitleSutConnector sutConnector = new WindowsWindowTitleSutConnector(settings().get(ConfigTags.SUTConnectorValue), 
 					Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), 
@@ -733,9 +755,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0));
 			return sutConnector.startOrConnectSut();
 		}else{
-			// COMMANDLINE and WebDriver SUT CONNECTOR:
-			Assert.hasTextSetting(settings().get(ConfigTags.SUTConnectorValue), "SUTConnectorValue");
-
 			//Read the settings to know if user wants to start the process listener
 			if(settings.get(ConfigTags.ProcessListenerEnabled)) {
 				enabledProcessListener = processListener.enableProcessListeners(settings);

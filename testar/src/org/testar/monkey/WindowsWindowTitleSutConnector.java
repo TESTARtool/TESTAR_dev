@@ -55,7 +55,6 @@ public class WindowsWindowTitleSutConnector implements SutConnector {
 
     @Override
     public SUT startOrConnectSut() throws SystemStartException {
-        Assert.hasTextSetting(windowTitle, "SUTConnectorValue");
         List<SUT> suts = null;
         State state; Role role; String title;
         long now = System.currentTimeMillis();
