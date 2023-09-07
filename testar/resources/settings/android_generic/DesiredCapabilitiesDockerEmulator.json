@@ -1,12 +1,12 @@
 {
   "deviceName": "Samsung Galaxy S6",
   "platformName": "Android",
-  "app": "https://github.com/appium/java-client/raw/master/src/test/resources/apps/ApiDemos-debug.apk",
+  "app": "https://github.com/appium/android-apidemos/releases/download/v3.1.0/ApiDemos-debug.apk",
   "automationName" : "UiAutomator2",
   "allowTestPackages": true,
   "newCommandTimeout": 500000,
   "appWaitActivity": "io.appium.android.apis.ApiDemos",
-  "autoGrantPermissions": false,
+  "autoGrantPermissions": true,
   "isEmulatorDocker": true,
-  "ipAddressAppium": 10.101.0.224
+  "ipAddressAppium": 10.102.0.198
 }

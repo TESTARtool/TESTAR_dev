@@ -1,6 +1,7 @@
-/**
- * Copyright (c) 2019 - 2023 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2023 Universitat Politecnica de Valencia - www.upv.es
+/***************************************************************************************************
+ *
+ * Copyright (c) 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2023 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -25,29 +26,39 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *
- */
+ *******************************************************************************************************/
 
-package org.testar.monkey.alayer.actions;
+package org.testar.settingsdialog.dialog;
 
-import org.testar.monkey.alayer.Role;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Settings;
+import org.testar.settingsdialog.SettingsPanel;
 
-public class WdActionRoles {
-	private WdActionRoles(){}
+import javax.swing.*;
 
-	public static final Role
+public class AdvancedPanel extends SettingsPanel {
 
-	ExecuteScript = Role.from("ExecuteScript", ActionRoles.Action), 
-	CloseTabScript = Role.from("CloseTabScript", ExecuteScript),
-	HistoryBackScript = Role.from("HistoryBackScript", ExecuteScript),
-	SubmitScript = Role.from("SubmitScript", ExecuteScript),
-	SetAttributeScript = Role.from("SetAttributeScript", ExecuteScript),
-	FormFillingAction = Role.from("FormFillingAction", ActionRoles.CompoundAction),
-	SelectListAction = Role.from("SelectListAction", ExecuteScript),
-	RemoteAction = Role.from("RemoteAction", ActionRoles.Action),
-	RemoteClick = Role.from("RemoteClick", WdActionRoles.RemoteAction),
-	RemoteScrollClick = Role.from("RemoteScrollClick", WdActionRoles.RemoteClick),
-	RemoteType = Role.from("RemoteType", WdActionRoles.RemoteAction),
-	RemoteScrollType = Role.from("RemoteScrollType", WdActionRoles.RemoteType);
+	private JCheckBox keyBoardListenCheck;
+
+	public AdvancedPanel() {
+		setLayout(null);
+
+		keyBoardListenCheck = new JCheckBox("Listen to Keyboard shortcuts");
+		keyBoardListenCheck.setBounds(10, 12, 192, 21);
+		add(keyBoardListenCheck);
+	}
+
+	public void populateFrom(final Settings settings) {
+		keyBoardListenCheck.setSelected(settings.get(ConfigTags.KeyBoardListener));
+	}
+
+	/**
+	 * Retrieve information from the Advanced GUI.
+	 * @param settings reference to the object where the settings will be stored.
+	 */
+	@Override
+	public void extractInformation(final Settings settings) {
+		settings.set(ConfigTags.KeyBoardListener, keyBoardListenCheck.isSelected());
+	}
 
 }

@@ -28,30 +28,33 @@
  *
  */
 
-import com.google.common.collect.ArrayListMultimap;
 import org.testar.SutVisualization;
 import org.testar.managers.InputDataManager;
-import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Pair;
+import org.testar.monkey.Settings;
+import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
-import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
-import org.testar.monkey.alayer.actions.NOP;
-import org.testar.monkey.alayer.actions.StdActionCompiler;
-import org.testar.monkey.alayer.actions.WdFillFormAction;
+import org.testar.monkey.alayer.actions.*;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
+import org.testar.monkey.alayer.webdriver.*;
+import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
-import org.testar.monkey.Settings;
+import org.testar.plugin.NativeLinker;
 import org.testar.protocols.WebdriverProtocol;
+
+import com.google.common.collect.ArrayListMultimap;
+
 import java.util.*;
+
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 
-public class Protocol_webdriver_generic extends WebdriverProtocol {
+public class Protocol_webdriver_remote_webcomponent extends WebdriverProtocol {
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -63,18 +66,11 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	protected void initialize(Settings settings) {
 		super.initialize(settings);
 
-		// URL + form name, username input id + value, password input id + value
-		// Set login to null to disable this feature
-		// TODO: getting from the settings file, not sure if this works:
-		login = Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
-		username = Pair.from("username", "");
-		password = Pair.from("password", "");
-
-		// List of attributes to identify and close policy popups
+		// List of atributes to identify and close policy popups
 		// Set to null to disable this feature
 		//TODO put into settings file
 		policyAttributes = ArrayListMultimap.create();
-		policyAttributes.put("id", "_cookieDisplay_WAR_corpcookieportlet_necessaryCookiesButton");
+		policyAttributes.put("class", "lfr-btn-label");
 	}
 
 	/**
@@ -103,6 +99,16 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	@Override
 	protected void beginSequence(SUT system, State state) {
 		super.beginSequence(system, state);
+
+		/** 
+		 * Trigger Parabank Login actions
+		 * triggeredClickAction and triggeredTypeAction methods
+		 * Execute this Login with WdRemote actions instead of GUI level actions
+		 */
+		waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","username", "john", state, system, 5,1.0);
+		waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","password", "demo", state, system, 5,1.0);
+		waitAndLeftClickWidgetWithMatchingTag("value", "Log In", state, system, 5, 1.0);
+		Util.pause(1);
 	}
 
 	/**
@@ -131,7 +137,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	protected Verdict getVerdict(State state) {
 
 		Verdict verdict = super.getVerdict(state);
-		// system crashes, non-responsiveness and suspicious tags automatically detected!
+		// system crashes, non-responsiveness and suspicious titles automatically detected!
 
 		//-----------------------------------------------------------------------------
 		// MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
@@ -168,17 +174,6 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 
 		// iterate through all widgets
 		for (Widget widget : state) {
-			// fill forms actions
-			if (settings.get(ConfigTags.FormFillingAction) && isAtBrowserCanvas(widget) && isForm(widget)) {
-				String protocol = settings.get(ConfigTags.ProtocolClass, "");
-				Action formFillingAction = new WdFillFormAction(ac, widget, protocol.substring(0, protocol.lastIndexOf('/')));
-				if(formFillingAction instanceof NOP){
-					// do nothing with NOP actions - the form was not actionable
-				}else{
-					actions.add(formFillingAction);
-				}
-			}
-
 			// only consider enabled and non-tabu widgets
 			if (!widget.get(Enabled, true)) {
 				continue;
@@ -187,9 +182,9 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 			//CAPS_LOCK + SHIFT + Click clickfilter functionality.
 			if(blackListed(widget)){
 				if(isTypeable(widget)){
-					filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
+					filteredActions.add(new WdRemoteTypeAction((WdWidget)widget, InputDataManager.getRandomTextInputData(widget)));
 				} else {
-					filteredActions.add(ac.leftClickAt(widget));
+					filteredActions.add(new WdRemoteClickAction((WdWidget)widget));
 				}
 				continue;
 			}
@@ -205,10 +200,10 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 			// type into text boxes
 			if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
 				if(whiteListed(widget) || isUnfiltered(widget)){
-					actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
+					actions.add(new WdRemoteTypeAction((WdWidget)widget, InputDataManager.getRandomTextInputData(widget)));
 				}else{
 					// filtered and not white listed:
-					filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
+					filteredActions.add(new WdRemoteTypeAction((WdWidget)widget, InputDataManager.getRandomTextInputData(widget)));
 				}
 			}
 
@@ -216,14 +211,14 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 			if (isAtBrowserCanvas(widget) && isClickable(widget)) {
 				if(whiteListed(widget) || isUnfiltered(widget)){
 					if (!isLinkDenied(widget)) {
-						actions.add(ac.leftClickAt(widget));
+						actions.add(new WdRemoteClickAction((WdWidget)widget));
 					}else{
 						// link denied:
-						filteredActions.add(ac.leftClickAt(widget));
+						filteredActions.add(new WdRemoteClickAction((WdWidget)widget));
 					}
 				}else{
 					// filtered and not white listed:
-					filteredActions.add(ac.leftClickAt(widget));
+					filteredActions.add(new WdRemoteClickAction((WdWidget)widget));
 				}
 			}
 		}
@@ -240,6 +235,62 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 		return actions;
 	}
 
+	@Override
+	protected boolean isClickable(Widget widget) {
+		Role role = widget.get(Tags.Role, Roles.Widget);
+		if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
+			// Input type are special...
+			if (role.equals(WdRoles.WdINPUT)) {
+				String type = ((WdWidget) widget).element.type;
+				return WdRoles.clickableInputTypes().contains(type);
+			}
+			return true;
+		}
+
+		WdElement element = ((WdWidget) widget).element;
+		if (element.isClickable) {
+			return true;
+		}
+
+		Set<String> clickSet = new HashSet<>(clickableClasses);
+		clickSet.retainAll(element.cssClasses);
+		return clickSet.size() > 0;
+	}
+
+	@Override
+	protected boolean isTypeable(Widget widget) {
+		Role role = widget.get(Tags.Role, Roles.Widget);
+		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
+			// Input type are special...
+			if (role.equals(WdRoles.WdINPUT)) {
+				String type = ((WdWidget) widget).element.type;
+				return WdRoles.typeableInputTypes().contains(type);
+			}
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * When executing triggered actions such as login or click popup cookies, 
+	 * instead of using leftClickAt Windows level Action, use WdRemoteClickAction. 
+	 */
+	@Override
+	protected Action triggeredClickAction(State state, Widget widget) {
+		StdActionCompiler ac = new AnnotatingActionCompiler();
+		return new WdRemoteClickAction((WdWidget)widget);
+	}
+
+	/**
+	 * When executing triggered actions such as login or click popup cookies, 
+	 * instead of using clickTypeInto Windows level Action, use WdRemoteTypeAction. 
+	 */
+	@Override
+	protected Action triggeredTypeAction(State state, Widget widget, String textToType, boolean replaceText) {
+		StdActionCompiler ac = new AnnotatingActionCompiler();
+		return new WdRemoteTypeAction((WdWidget)widget, textToType);
+	}
 
 	/**
 	 * Select one of the possible actions (e.g. at random)
