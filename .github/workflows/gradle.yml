@@ -304,11 +304,22 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     
+    - name: Prepare TESTAR protocols
+      run: ./gradlew init_workflow_test
+    
     - name: Build TESTAR with Gradle
       run: ./gradlew build
     
     - name: Prepare installed distribution of TESTAR with Gradle
       run: ./gradlew installDist
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt install -y xvfb x11-utils libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xfixes0 xdotool
+    
+    - name: Run webdriver protocol and detect SuspiciousTag
+      run: xvfb-run ./gradlew runTestWebdriverSuspiciousTagUbuntu
 
   macos:
     runs-on: macos-latest

@@ -30,42 +30,74 @@
 
 package org.testar.monkey;
 
-import org.testar.monkey.alayer.SUT;
-import org.testar.monkey.alayer.Tags;
+import org.testar.CodingManager;
+import org.testar.ProtocolUtil;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.plugin.NativeLinker;
 
 import java.util.List;
 
-public class WindowsProcessNameSutConnector implements SutConnector {
+public class SutConnectorWindowTitle implements SutConnector {
 
-    private String processName;
-    private double maxEngageTime;
+    private String windowTitle;
+    private double maxEngangeTime;
+    private StateBuilder builder;
+    private boolean forceToForeground;
 
-    public WindowsProcessNameSutConnector(String processName, double maxEngageTime) {
-        this.processName = processName;
-        this.maxEngageTime = maxEngageTime;
+    public SutConnectorWindowTitle(String windowTitle, double maxEngangeTime, StateBuilder builder, boolean forceToForeground) {
+        this.windowTitle = windowTitle;
+        this.maxEngangeTime = maxEngangeTime;
+        this.builder = builder;
+        this.forceToForeground = forceToForeground;
     }
 
     @Override
     public SUT startOrConnectSut() throws SystemStartException {
         List<SUT> suts = null;
+        State state; Role role; String title;
         long now = System.currentTimeMillis();
         do{
             Util.pauseMs(100);
             suts = NativeLinker.getNativeProcesses();
             if (suts != null){
-                String desc;
                 for (SUT theSUT : suts){
-                    desc = theSUT.get(Tags.Desc, null);
-                    if (desc != null && desc.contains(processName)){
-                        System.out.println("SUT with Process Name -" + processName + "- DETECTED!");
-                        return theSUT;
+                    state = getStateByWindowTitle(theSUT);
+                    // If the system is in the foreground or if the option to force to the foreground is enabled
+                    if (state.get(Tags.Foreground) || forceToForeground){
+                        for (Widget w : state){
+                            role = w.get(Tags.Role, null);
+                            if (role != null && Role.isOneOf(role, NativeLinker.getNativeRole_Window())){
+                                title = w.get(Tags.Title, null);
+                                if (title != null && title.contains(windowTitle)){
+                                    System.out.println("SUT with Window Title -" + windowTitle + "- DETECTED!");
+                                    return theSUT;
+                                }
+                            }
+                        }
                     }
                 }
             }
-        } while (System.currentTimeMillis() - now < maxEngageTime);
-        throw new SystemStartException("SUT Process Name not found!: -" + processName + "-");
+        } while (System.currentTimeMillis() - now < maxEngangeTime);
+        throw new SystemStartException("SUT Window Title not found!: -" + windowTitle + "-");
+    }
+
+    protected State getStateByWindowTitle(SUT system) throws StateBuildException {
+        Assert.notNull(system);
+        State state = builder.apply(system);
+
+        CodingManager.buildIDs(state);
+
+        Shape viewPort = state.get(Tags.Shape, null);
+        if(viewPort != null){
+            state.set(Tags.ScreenshotPath, ProtocolUtil.getStateshot(state));
+            //Don't include WdProtocolUtil option because TESTAR doesn't connect to webdrivers through the windows title
+        }
+
+        state = ProtocolUtil.calculateZIndices(state);
+
+        return state;
     }
 
 }

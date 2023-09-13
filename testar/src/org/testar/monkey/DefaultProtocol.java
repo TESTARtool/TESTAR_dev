@@ -745,13 +745,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		if (sutConnectorType.equals(Settings.SUT_CONNECTOR_WINDOW_TITLE)) {
-			WindowsWindowTitleSutConnector sutConnector = new WindowsWindowTitleSutConnector(settings().get(ConfigTags.SUTConnectorValue), 
+			SutConnectorWindowTitle sutConnector = new SutConnectorWindowTitle(settings().get(ConfigTags.SUTConnectorValue), 
 					Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), 
 					builder,
 					settings().get(ConfigTags.ForceForeground));
 			return sutConnector.startOrConnectSut();
 		}else if (sutConnectorType.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME)) {
-			WindowsProcessNameSutConnector sutConnector = new WindowsProcessNameSutConnector(settings().get(ConfigTags.SUTConnectorValue), 
+			SutConnectorProcessName sutConnector = new SutConnectorProcessName(settings().get(ConfigTags.SUTConnectorValue), 
 					Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0));
 			return sutConnector.startOrConnectSut();
 		}else{
@@ -761,7 +761,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 
 			// for most windows applications and most jar files, this is where the SUT gets created!
-			WindowsCommandLineSutConnector sutConnector = new WindowsCommandLineSutConnector(settings.get(ConfigTags.SUTConnectorValue),
+			SutConnectorCommandLine sutConnector = new SutConnectorCommandLine(settings.get(ConfigTags.SUTConnectorValue),
 					enabledProcessListener, settings().get(ConfigTags.StartupTime)*1000, Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), builder, settings.get(ConfigTags.FlashFeedback));
 			//TODO startupTime and maxEngageTime seems to be the same, except one is double and the other is long?
 			return sutConnector.startOrConnectSut();
