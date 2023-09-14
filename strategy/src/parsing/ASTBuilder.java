@@ -61,9 +61,9 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseNode>
     @Override
     public SelectRandomRelationNode visitSelectRelation(StrategyParser.SelectRelationContext ctx)
     {
-        int      weight   =    (ctx.INT() == null)         ? 1     : Integer.parseInt(ctx.INT().getText());
-        Modifier modifier = (ctx.MODIFIER() == null) ? null : Modifier.toEnum(ctx.MODIFIER().getText());
-        Relation relation = Relation.toEnum(ctx.MODIFIER().getText());
+        int      weight   =    (ctx.INT() == null)          ? 1     : Integer.parseInt(ctx.INT().getText());
+        Modifier modifier = (ctx.MODIFIER() == null)        ? null  : Modifier.toEnum(ctx.MODIFIER().getText());
+        Relation relation = Relation.toEnum(ctx.RELATION().getText());
         return new SelectRandomRelationNode(weight, modifier, relation);
     }
     
