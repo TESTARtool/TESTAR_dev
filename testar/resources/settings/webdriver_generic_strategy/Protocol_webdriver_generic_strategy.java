@@ -53,6 +53,7 @@
  import org.testar.plugin.OperatingSystems;
  import org.testar.protocols.WebdriverProtocol;
  import parsing.ParseUtil;
+ import writers.CSVFileWriter;
 
  import java.awt.*;
  import java.io.File;
@@ -484,63 +485,41 @@
 
     private void logResults()
     {
+        CSVFileWriter csvWriter = new CSVFileWriter(Main.outputDir,
+        settings.get(ConfigTags.ApplicationName,"application") + "_" + settings.get(ConfigTags.ApplicationVersion,"1"));
+    
+        if(csvWriter.fileIsEmpty()) //file empty or nonexistent
+        {
+            try
+            {
+                csvWriter.addRow("URL", "application name", "application version", "strategy", "start datetime",
+                "timestamp TESTAR start", "timestamp TESTAR end", "timestamp server start", "timestamp server end",
+                "action limit", "number of fields", "actions executed", "number of fields filled",
+                "maximum actions per field", "submit");
+            }
+            catch(IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+    
+        String fieldCodes = FilenameUtils.getBaseName(new URL(WdDriver.getCurrentUrl()).getPath()); //get the last part of the url, only works for one form
+        String strategy = (useRandom) ? "Random" : "Human strategy";
+        int numFields = fieldCodes.length() / 3; //length should be a multiple of 3
+        String submitSuccess = (DefaultProtocol.lastExecutedAction.get(Tags.OriginWidget).get(WdTags.WebType, "").equalsIgnoreCase("submit")) ? "yes" : "no";
+    
+        //numFieldsFilled-5 = formstring, begin_epoch, end_epoch, delta_epoch, datetime
+        
         try
         {
-            outputCsvFile = new File(Main.outputDir + File.separator +
-                    settings.get(ConfigTags.ApplicationName,"application") + "_" + settings.get(ConfigTags.ApplicationVersion,"1") + ".csv");
-            FileWriter myWriter = new FileWriter(outputCsvFile, true);
-
-            String delimiter = ";";
-
-            if(outputCsvFile.length() == 0) //file empty or nonexistent
-            {
-                myWriter.write("URL");
-                myWriter.write(delimiter + "application name");
-                myWriter.write(delimiter + "application version");
-                myWriter.write(delimiter + "strategy");
-                myWriter.write(delimiter + "start datetime");
-                myWriter.write(delimiter + "timestamp TESTAR start");
-                myWriter.write(delimiter + "timestamp TESTAR end");
-                myWriter.write(delimiter + "timestamp server start");
-                myWriter.write(delimiter + "timestamp server end");
-                myWriter.write(delimiter + "action limit");
-                myWriter.write(delimiter + "number of fields");
-                myWriter.write(delimiter + "actions executed");
-                myWriter.write(delimiter + "number of fields filled");
-                myWriter.write(delimiter + "maximum actions per field");
-                myWriter.write(delimiter + "submit");
-                myWriter.write(System.getProperty( "line.separator" ));
-            }
-
-            String fieldCodes = FilenameUtils.getBaseName(new URL(WdDriver.getCurrentUrl()).getPath()); //get the last part of the url, only works for one form
-            String strategy = (useRandom) ? "Random" : "Human strategy";
-            int numFields = fieldCodes.length() / 3; //length should be a multiple of 3
-//            int numActions = actionsExecuted.values().stream().mapToInt(Integer::intValue).sum();
-            String submitSuccess = (DefaultProtocol.lastExecutedAction.get(Tags.OriginWidget).get(WdTags.WebType, "").equalsIgnoreCase("submit")) ? "yes" : "no";
-
-
-            myWriter.write(WdDriver.getCurrentUrl());
-            myWriter.write(delimiter + settings.get(ConfigTags.ApplicationName,"application"));
-            myWriter.write(delimiter + settings.get(ConfigTags.ApplicationVersion,"1"));
-            myWriter.write(delimiter + strategy);
-            myWriter.write(delimiter + OutputStructure.startInnerLoopDateString);
-            myWriter.write(delimiter + startTimestamp);
-            myWriter.write(delimiter + DefaultProtocol.lastExecutedAction.get(Tags.TimeStamp, null));
-            myWriter.write(delimiter + start_epoch);
-            myWriter.write(delimiter + end_epoch);
-            myWriter.write(delimiter + settings.get(ConfigTags.SequenceLength));
-            myWriter.write(delimiter + numFields);
-            myWriter.write(delimiter + (actionCount-1));
-            myWriter.write(delimiter + (numFieldsFilled-5)); //minus formstring, begin_epoch, end_epoch, delta_epoch, datetime
-            myWriter.write(delimiter + Collections.max(actionsExecuted.values()));
-            myWriter.write(delimiter + submitSuccess);
-            myWriter.write(System.getProperty( "line.separator" ));
-
-            myWriter.close();
+            csvWriter.addRow(WdDriver.getCurrentUrl(), settings.get(ConfigTags.ApplicationName, "application"),
+            settings.get(ConfigTags.ApplicationVersion,"1"), strategy, OutputStructure.startInnerLoopDateString,
+            startTimestamp, DefaultProtocol.lastExecutedAction.get(Tags.TimeStamp, null).toString(), start_epoch, end_epoch,
+            Integer.toString(settings.get(ConfigTags.SequenceLength)), Integer.toString(numFields), Integer.toString(actionCount - 1), Integer.toString(numFieldsFilled - 5),
+            Integer.toString(Collections.max(actionsExecuted.values())), submitSuccess);
         }
-        catch (IOException e)
+        catch(IOException e)
         {
-            System.out.println("An error occurred.");
             e.printStackTrace();
         }
     }

@@ -49,4 +49,7 @@ public class CSVFileWriter
     
     public void setNewFile(String filePath, String fileName)
     { this.file = new File(filePath + File.separator + fileName + ".csv"); }
+    
+    public boolean fileIsEmpty()
+    { return (file.length() == 0); }
 }
