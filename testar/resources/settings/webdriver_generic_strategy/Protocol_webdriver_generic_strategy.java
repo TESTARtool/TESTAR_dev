@@ -1,72 +1,73 @@
- /**
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the copyright holder nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- */
+/**
+* Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+* Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*
+* 1. Redistributions of source code must retain the above copyright notice,
+* this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright
+* notice, this list of conditions and the following disclaimer in the
+* documentation and/or other materials provided with the distribution.
+* 3. Neither the name of the copyright holder nor the names of its
+* contributors may be used to endorse or promote products derived from
+* this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*/
 
- import org.apache.commons.io.FilenameUtils;
- import org.testar.CodingManager;
- import org.testar.OutputStructure;
- import org.testar.RandomActionSelector;
- import org.testar.SutVisualization;
- import org.testar.managers.InputDataManager;
- import org.testar.monkey.ConfigTags;
- import org.testar.monkey.DefaultProtocol;
- import org.testar.monkey.Main;
- import org.testar.monkey.Settings;
- import org.testar.monkey.alayer.Shape;
- import org.testar.monkey.alayer.*;
- import org.testar.monkey.alayer.actions.ActionRoles;
- import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
- import org.testar.monkey.alayer.actions.StdActionCompiler;
- import org.testar.monkey.alayer.devices.KBKeys;
- import org.testar.monkey.alayer.exceptions.ActionBuildException;
- import org.testar.monkey.alayer.exceptions.StateBuildException;
- import org.testar.monkey.alayer.webdriver.WdDriver;
- import org.testar.monkey.alayer.webdriver.enums.WdRoles;
- import org.testar.monkey.alayer.webdriver.enums.WdTags;
- import org.testar.plugin.NativeLinker;
- import org.testar.plugin.OperatingSystems;
- import org.testar.protocols.WebdriverProtocol;
- import parsing.ParseUtil;
- import writers.CSVFileWriter;
+import org.apache.commons.io.FilenameUtils;
+import org.testar.CodingManager;
+import org.testar.OutputStructure;
+import org.testar.RandomActionSelector;
+import org.testar.SutVisualization;
+import org.testar.managers.InputDataManager;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.DefaultProtocol;
+import org.testar.monkey.Main;
+import org.testar.monkey.Settings;
+import org.testar.monkey.alayer.Shape;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.actions.ActionRoles;
+import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.StdActionCompiler;
+import org.testar.monkey.alayer.devices.KBKeys;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.exceptions.StateBuildException;
+import org.testar.monkey.alayer.webdriver.WdDriver;
+import org.testar.monkey.alayer.webdriver.enums.WdRoles;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.plugin.NativeLinker;
+import org.testar.plugin.OperatingSystems;
+import org.testar.protocols.WebdriverProtocol;
+import parsing.ParseUtil;
+import writers.CSVFileWriter;
 
- import java.awt.*;
- import java.io.File;
- import java.io.FileWriter;
- import java.io.IOException;
- import java.net.URL;
- import java.util.*;
+import java.awt.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
 
- import static org.testar.OutputStructure.outerLoopName;
- import static org.testar.monkey.alayer.Tags.Blocked;
- import static org.testar.monkey.alayer.Tags.Enabled;
+import static org.testar.OutputStructure.outerLoopName;
+import static org.testar.monkey.alayer.Tags.Blocked;
+import static org.testar.monkey.alayer.Tags.Enabled;
 
- public class Protocol_webdriver_generic_strategy extends WebdriverProtocol
+public class Protocol_webdriver_generic_strategy extends WebdriverProtocol
 {
     private ParseUtil               parseUtil;
     private RandomActionSelector    selector;
@@ -83,45 +84,45 @@
     @Override
     protected void buildStateActionsIdentifiers(State state, Set<Action> actions)
     {
-    	CodingManager.buildIDs(state, actions);
-    	for(Action action : actions)
-    	{
-    		// Radio buttons are special form elements
-    		// We only want to select one radio button widget per group
-    		// For this reason, we use the widget web name property to identify all actions in a group as the same
-    		if(action.get(Tags.OriginWidget) != null && action.get(Tags.OriginWidget).get(WdTags.WebType, "").equals("radio"))
-    		{
+        CodingManager.buildIDs(state, actions);
+        for(Action action : actions)
+        {
+            // Radio buttons are special form elements
+            // We only want to select one radio button widget per group
+            // For this reason, we use the widget web name property to identify all actions in a group as the same
+            if(action.get(Tags.OriginWidget) != null && action.get(Tags.OriginWidget).get(WdTags.WebType, "").equals("radio"))
+            {
 
-    			Widget widget = action.get(Tags.OriginWidget);
-    			String widgetWebName = widget.get(WdTags.WebName, "");
+                Widget widget = action.get(Tags.OriginWidget);
+                String widgetWebName = widget.get(WdTags.WebName, "");
 
-    			String collisionId = CodingManager.lowCollisionID(state.get(Tags.AbstractIDCustom)
-    					+ widgetWebName
-    					+ action.get(Tags.Role));
+                String collisionId = CodingManager.lowCollisionID(state.get(Tags.AbstractIDCustom)
+                        + widgetWebName
+                        + action.get(Tags.Role));
 
-    			String radioActionAbstractId = CodingManager.ID_PREFIX_ACTION 
-    					+ CodingManager.ID_PREFIX_ABSTRACT_CUSTOM 
-    					+ collisionId;
+                String radioActionAbstractId = CodingManager.ID_PREFIX_ACTION
+                        + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM
+                        + collisionId;
 
-    			action.set(Tags.AbstractIDCustom, radioActionAbstractId);
-    		}
-    		// For other elements, use the widget abstract identifier to identify independent actions
-    		// The widget abstract identifier relies on the AbstractStateAttributes (WebWidgetId)
-    		else if (action.get(Tags.OriginWidget) != null)
-    		{
-    			Widget widget = action.get(Tags.OriginWidget);
+                action.set(Tags.AbstractIDCustom, radioActionAbstractId);
+            }
+            // For other elements, use the widget abstract identifier to identify independent actions
+            // The widget abstract identifier relies on the AbstractStateAttributes (WebWidgetId)
+            else if (action.get(Tags.OriginWidget) != null)
+            {
+                Widget widget = action.get(Tags.OriginWidget);
 
-    			String collisionId = CodingManager.lowCollisionID(state.get(Tags.AbstractIDCustom)
-    					+ widget.get(Tags.AbstractIDCustom)
-    					+ action.get(Tags.Role));
+                String collisionId = CodingManager.lowCollisionID(state.get(Tags.AbstractIDCustom)
+                        + widget.get(Tags.AbstractIDCustom)
+                        + action.get(Tags.Role));
 
-    			String elementActionAbstractId = CodingManager.ID_PREFIX_ACTION 
-    					+ CodingManager.ID_PREFIX_ABSTRACT_CUSTOM 
-    					+ collisionId;
+                String elementActionAbstractId = CodingManager.ID_PREFIX_ACTION
+                        + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM
+                        + collisionId;
 
-    			action.set(Tags.AbstractIDCustom, elementActionAbstractId);
-    		}
-    	}
+                action.set(Tags.AbstractIDCustom, elementActionAbstractId);
+            }
+        }
     }
 
     @Override
@@ -328,21 +329,21 @@
 
     private boolean formContainsNonVisibleSubmitButtonBelow(Widget formChildWidget)
     {
-    	boolean submitButtonBelow = false;
+        boolean submitButtonBelow = false;
 
-    	// If the widget is not at browser canvas
-    	if(!isAtBrowserCanvas(formChildWidget)) {
-    		submitButtonBelow = formChildWidget.get(WdTags.WebType, "").equalsIgnoreCase("submit");
-    	}
+        // If the widget is not at browser canvas
+        if(!isAtBrowserCanvas(formChildWidget)) {
+            submitButtonBelow = formChildWidget.get(WdTags.WebType, "").equalsIgnoreCase("submit");
+        }
 
-    	if(formChildWidget.childCount() > 0) {
-    		// Iterate through the form element widgets
-    		for(int i = 0; i < formChildWidget.childCount(); i++) {
-    			submitButtonBelow = submitButtonBelow || formContainsNonVisibleSubmitButtonBelow(formChildWidget.child(i));
-    		}
-    	}
+        if(formChildWidget.childCount() > 0) {
+            // Iterate through the form element widgets
+            for(int i = 0; i < formChildWidget.childCount(); i++) {
+                submitButtonBelow = submitButtonBelow || formContainsNonVisibleSubmitButtonBelow(formChildWidget.child(i));
+            }
+        }
 
-    	return submitButtonBelow;
+        return submitButtonBelow;
     }
 
     private boolean formContainsNonVisibleWidgetsBelow(Widget formChildWidget)
@@ -480,10 +481,17 @@
     {
         super.postSequenceProcessing();
         logActionCount(latestState);
-        logResults();
+        try
+        {
+            logResults();
+        }
+        catch(MalformedURLException e)
+        {
+            e.printStackTrace();
+        }
     }
 
-    private void logResults()
+    private void logResults() throws MalformedURLException
     {
         CSVFileWriter csvWriter = new CSVFileWriter(Main.outputDir,
         settings.get(ConfigTags.ApplicationName,"application") + "_" + settings.get(ConfigTags.ApplicationVersion,"1"));
