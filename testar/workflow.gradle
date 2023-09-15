@@ -322,6 +322,26 @@ task runTestWebdriverSuspiciousTagUbuntu(type: Exec) {
     }
 }
 
+// macOS: Verify that TESTAR correctly executes chromedriver
+task runTestWebdriverSuspiciousTagMacOS(type: Exec) {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestWebdriverSuspiciousTagMacOS'
+    workingDir 'target/install/testar/bin'
+    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_webdriver_generic SUTConnectorValue=" ""/usr/local/share/chromedriver-mac-x64/chromedriver"" ""https://www.ou.nl"" " FlashFeedback=false AlwaysCompile=true ApplicationName="webdriver_and_suspicious" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[oO]nderwijs.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Use Onderwijs
+        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'ValuePattern' : 'https://www.ou.nl/onderwijs")}) {
+            println "\n${output} \nTESTAR has successfully connect with WEB_DRIVER and detected Onderwijs Suspicious Tag! "
+        } else {
+            throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with WEB_DRIVER")
+        }
+    }
+}
+
 // Connect to para.testar.org, make a login and detect the browser console error message
 task runTestWebdriverParabankLoginAndConsoleError(type: Exec) {
 	// Read command line output
