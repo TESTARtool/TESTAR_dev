@@ -3,13 +3,17 @@ package writers;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringJoiner;
 
 public class CSVFileWriter
 {
-    FileWriter              writer;
-    private File            file;
-    private String          delimiter;
+    FileWriter                      writer;
+    private File                    file;
+    private String                  delimiter;
+    private Map<Integer, Field>      fields; //the fields and their data
+    private Map<String, Integer>    fieldsIndex; //the lookup that insures a fixed order
     
     public CSVFileWriter(String filePath, String fileName)
     { this(filePath, fileName, ";"); }
@@ -18,28 +22,96 @@ public class CSVFileWriter
     {
         setNewFile(filePath, fileName);
         this.delimiter = delimiter;
+        fields = new HashMap<>();
+        fieldsIndex = new HashMap<>();
     }
-    
-    public void addRow(String... values) throws IOException
-    { addRow(true, values); } //default is append
-    
-    public void addRow(boolean append, String... values) throws IOException
+
+    public boolean createFile()
     {
-        StringJoiner    joiner;
         try
         {
-            writer = new FileWriter(this.file, append); //recreate as needed
+            return file.createNewFile();
+        } catch (IOException e)
+        {
+            System.out.println("The CSV file could not be created.");
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void addField(String shortName, String name, String value)
+    {
+        Field newField = new Field(shortName, name, value);
+        int index = fieldsIndex.size();
+        fields.put(index, newField);
+        fieldsIndex.put(shortName, index);
+    }
+
+    public void addField(String shortName, String name)
+    {
+        Field newField = new Field(shortName, name, null);
+        int index = fieldsIndex.size();
+        fields.put(index, newField);
+        fieldsIndex.put(shortName, index);
+    }
+
+    public void setFieldValue(String shortName, String newValue)
+    {
+        Integer index = fieldsIndex.get(shortName);
+        if(index != null) //no warning if field doesn't exist
+        {
+            Field field = fields.get(index);
+            field.setValue(newValue);
+        }
+    }
+
+    public void resetValue(String shortName)
+    {
+        Integer index = fieldsIndex.get(shortName);
+        if(index != null) //no warning if field doesn't exist
+        {
+            Field field = fields.get(index);
+            field.resetValue();
+        }
+    }
+
+    public void resetValues()
+    {
+        for(Field field : fields.values())
+            field.resetValue();
+    }
+
+    public void writeTitleRow()
+    {
+       writeRow(false);
+    }
+
+    public void writeCurrentRow()
+    {
+        writeRow(true);
+    }
+
+    private void writeRow(boolean normalRow)
+    {
+        StringJoiner joiner;
+        try
+        {
+            writer = new FileWriter(this.file, false); //recreate writer as needed, always overwrite file
             joiner = new StringJoiner(this.delimiter);
-    
-            for(String v : values)
-                joiner.add(v);
+
+            for(int i = 0; i < fields.size(); i++)
+            {
+                if(normalRow)
+                    joiner.add(fields.get(i).getValue());
+                else
+                    joiner.add(fields.get(i).getName());
+            }
             joiner.add(System.getProperty("line.separator"));
             writer.write(joiner.toString());
             writer.close();
         }
         catch (IOException e)
         {
-            System.out.println("The CSV file could not be found, created, or written in.");
+            System.out.println("The CSV file could not be written in.");
             e.printStackTrace();
         }
     }
@@ -52,4 +124,24 @@ public class CSVFileWriter
     
     public boolean fileIsEmpty()
     { return (file.length() == 0); }
+
+    private class Field
+    {
+        private String shortName;
+        private String name;
+        private String value;
+
+        public Field(String shortName, String name, String value)
+        {
+            this.shortName = shortName;
+            this.name = name;
+            this.value = value;
+        }
+
+        public String getShortName() {return shortName;}
+        public String getName() {return name;}
+        public String getValue() {return value;}
+        public void setValue(String newValue) {value = newValue;}
+        public void resetValue() {value = null;}
+    }
 }
