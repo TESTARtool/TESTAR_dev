@@ -486,6 +486,47 @@ public class WebVerdict {
 
 		return duplicateSelectItemsVerdict;
 	}
+	
+	// Detect duplicated items in an unnumbered lists (UL)
+	// GOOD: One
+	//       Two
+	// BAD:  One
+	//       One
+	// It makes no sense to present a user with multiple (menu)items in a list that have precisely the same display value.
+	// The user cannot distinguish one item from another.
+	// The underlying bug could be a technical issue (i.e. all or some items have an 'undefined' value) or
+	// is functional, such as the items should have a more distinguishable display value
+	public static Verdict DuplicateULItems(State state) {
+
+		// If it is enabled, then execute the verdict implementation
+		Verdict duplicateItemsVerdict = Verdict.OK;
+		for(Widget w : state) {
+			// Check for elements with role UL and at least two childs
+			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdUL) && w.childCount() > 1) {
+
+			    ArrayList<String> selectOptionsTextsList = new ArrayList<>();
+                
+                // Gather texts of options
+                for(int i=0; i < w.childCount(); i++) {
+                   String itemText = w.child(i).get(WdTags.WebInnerText);
+                   if (w.child(i).get(Tags.Role, Roles.Widget).equals(WdRoles.WdLI) && !itemText.isEmpty()) {    
+                     selectOptionsTextsList.add(itemText);
+                   }
+                }
+                Set<String> duplicatesTexts = findDuplicates(selectOptionsTextsList);
+                  
+                  // Now that we have collected all the duplicates in a list verify that there are no duplicates
+				if(duplicatesTexts.size() > 0)
+				{
+					String verdictMsg = String.format("Detected a Unnumbered List (UL) web element with duplicate option elements! Role: %s , Path: %s , WebId: %s , Duplicate item(s): %s", 
+							w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), String.join(",", duplicatesTexts));
+
+					duplicateItemsVerdict = duplicateItemsVerdict.join(new Verdict(Verdict.SEVERITY_WARNING_DATA_FILTERING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+				}
+		     }
+        }
+        return duplicateItemsVerdict;
+    }
 
 	private static Set<String> findDuplicates(List<String> list) {
 	    Set<String> set = new HashSet<>();

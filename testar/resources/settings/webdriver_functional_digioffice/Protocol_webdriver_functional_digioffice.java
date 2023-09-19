@@ -103,6 +103,7 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
     Oracle idea 30: GenericVerdict.WidgetAlignmentMetric
     Oracle idea 31: Just run TESTAR on multiple machines at the same time
     Oracle idea 34: WebVerdict.HTMLOrXMLTagsInText
+	Oracle idea 39: WebVerdict.DuplicateULItems
     Oracle idea 40: WebVerdict.DuplicateText
     Oracle idea 44: WebVerdict.TooManyItemSelectItems
     Oracle idea 48: WebVerdict.NumberWithLotOfDecimals
@@ -983,13 +984,13 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		verdict = WebVerdict.EmptySelectItems(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
-        // Add the functional Verdict that detects select elements with only one item to the current state verdict.
-        verdict = WebVerdict.SingleSelectItems(state);
-        if (shouldReturnVerdict(verdict)) return verdict;
+		// Add the functional Verdict that detects select elements with only one item to the current state verdict.
+		verdict = WebVerdict.SingleSelectItems(state);
+		if (shouldReturnVerdict(verdict)) return verdict;
 
-        // Add the functional Verdict that detect that dropdownlist has more than theshold value items
-        verdict = WebVerdict.TooManyItemSelectItems(state, 50);
-        if (shouldReturnVerdict(verdict)) return verdict;
+		// Add the functional Verdict that detect that dropdownlist has more than theshold value items
+		verdict = WebVerdict.TooManyItemSelectItems(state, 50);
+		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects select elements with unsorted items to the current state verdict.
 		verdict = WebVerdict.UnsortedSelectItems(state);
@@ -997,6 +998,10 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 
 		// Check the functional Verdict that detects select elements with duplicate items to the current state verdict.
 		verdict = WebVerdict.DuplicateSelectItems(state);
+		if (shouldReturnVerdict(verdict)) return verdict;
+
+		// Check the functional Verdict that detects Unnumbered List (UL) child elements with duplicate items to the current state verdict.
+		verdict = WebVerdict.DuplicateULItems(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
 		// Check the functional Verdict that detects if exists a number with more than X decimals.
@@ -1024,13 +1029,13 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		verdict = WebVerdict.DuplicatedRowsInTable(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
-        // Check untranslated text tags
-        verdict = detectUntranslatedText(state);
-        if (shouldReturnVerdict(verdict)) return verdict;
+		// Check untranslated text tags
+		verdict = detectUntranslatedText(state);
+		if (shouldReturnVerdict(verdict)) return verdict;
         
-        // Check The replacement character � (often displayed as a black rhombus with a white question mark) is a symbol found in the Unicode standard at code point U+FFFD in the Specials table. It is used to indicate problems when a system is unable to render a stream of data to correct symbols
-        verdict = GenericVerdict.UnicodeReplacementCharacter(state, WdTags.WebTextContent);
-        if (shouldReturnVerdict(verdict)) return verdict;
+		// Check The replacement character � (often displayed as a black rhombus with a white question mark) is a symbol found in the Unicode standard at code point U+FFFD in the Specials table. It is used to indicate problems when a system is unable to render a stream of data to correct symbols
+		verdict = GenericVerdict.UnicodeReplacementCharacter(state, WdTags.WebTextContent);
+		if (shouldReturnVerdict(verdict)) return verdict;
 
 		return verdict;
 	}
