@@ -59,7 +59,7 @@ public class WdElement extends TaggableBase implements Serializable {
   //long culture = 0L;
   boolean isModal = false; // i.c.w. access key
 
-  public String id, name, genericTitle, tagName, textContent, helpText, title;
+  public String id, name, genericTitle, tagName, textContent, helpText, title, innerText;
   public String xpath = "";
   public List<String> cssClasses = new ArrayList<>();
   public String display, type;
@@ -118,6 +118,7 @@ public class WdElement extends TaggableBase implements Serializable {
     genericTitle = (String) packedElement.get("name");
     tagName = (String) packedElement.get("tagName");
     textContent = ((String) packedElement.get("textContent")).replaceAll("\\s+", " ").trim();
+    innerText = (packedElement.get("innerText") == null) ? "" : ((String) packedElement.get("innerText")).replaceAll("\\s+", " ").trim();
     title = attributeMap.getOrDefault("title","");
     href = attributeMap.getOrDefault("href", "");
     value = attributeMap.getOrDefault("value", "");

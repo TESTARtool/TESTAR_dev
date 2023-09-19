@@ -92,7 +92,12 @@ public class WdTags extends TagsBase {
    * Web text context of a widget.
    */
   public static final Tag<String> WebTextContent = from("WebTextContent", String.class);
-  
+
+  /**
+   * Web inner text of a widget.
+   */
+  public static final Tag<String> WebInnerText = from("WebInnerText", String.class);
+
   /**
    * Web Hypertext Reference of a widget.
    */
