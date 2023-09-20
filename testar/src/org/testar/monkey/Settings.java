@@ -310,6 +310,14 @@ public class Settings extends TaggableBase implements Serializable {
 				, ConfigTags.SUTConnectorValue.name() + " = "
 				, ""
 				, "#################################################################"
+				, "# Regular expressions that indicates which processes conform the SUT"
+				, "#"
+				, "# This regex expression can be used to attach TESTAR to a multi-processes SUT"
+				, "#################################################################"
+				, ""
+				, ConfigTags.SUTProcesses.name() + " = "
+				, ""
+				, "#################################################################"
 				, "# Java Swing applications & Access Bridge Enabled"
 				, "#"
 				, "# Activate the Java Access Bridge in your Windows System:"
@@ -528,7 +536,6 @@ public class Settings extends TaggableBase implements Serializable {
 		secondarySettingsList.add(ConfigTags.ForceForeground);
 		secondarySettingsList.add(ConfigTags.VisualizeActions);
 		secondarySettingsList.add(ConfigTags.FormFillingAction);
-		secondarySettingsList.add(ConfigTags.SUTProcesses);
 		secondarySettingsList.add(ConfigTags.LogLevel);
 		secondarySettingsList.add(ConfigTags.OnlySaveFaultySequences);
 		secondarySettingsList.add(ConfigTags.ReplayRetryTime);
