@@ -1,8 +1,11 @@
 #!/bin/sh
 cat /README.Docker
-echo "Start Xvfb"
-/opt/bin/start-xvfb.sh &
-sleep 2
+echo "Internal Docker Display is"
+echo $DISPLAY
+echo "whoami"
+whoami
+echo "Starting TESTAR..."
 cd /testar/bin
-./testar
+# Run TESTAR with the Xvfb server
+xvfb-run ./testar sse=webdriver_docker_parabank
 #sh -c "while true; do sleep 1; done"
