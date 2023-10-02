@@ -151,6 +151,9 @@ public class HtmlSequenceReport implements Reporting{
         if(firstStateAdded){
             if(firstActionsAdded){
                 writeStateIntoReport(state);
+            }else if(state.get(Tags.OracleVerdict, Verdict.OK).severity() > Verdict.SEVERITY_OK){
+                //if the first state contains a failure, write the same state in case it was a login
+                writeStateIntoReport(state);
             }else{
                 //don't write the state as it is the same - getState is run twice in the beginning, before the first action
             }

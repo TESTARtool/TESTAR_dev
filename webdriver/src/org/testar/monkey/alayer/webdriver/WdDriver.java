@@ -90,6 +90,8 @@ public class WdDriver extends SUTBase {
     String driverPath = parts[0].replace("\"", "");
 
     String osName = System.getProperty("os.name");
+    //TODO: Check what is this condition aim to change in the SUTConnectorValue
+    //TODO: If not sure just remove and refactor because this can provoke IndexOutOfBoundsException 
     if(!driverPath.contains(".exe") && osName.contains("Windows")) {
     	driverPath = sutConnector.substring(0, sutConnector.indexOf(".exe")+4);
     	driverPath = driverPath.replace("\"", "");

@@ -1,8 +1,20 @@
 #!/bin/sh
 cat /README.Docker
-echo "Start Xvfb"
-/opt/bin/start-xvfb.sh &
-sleep 2
+echo "Internal Docker Display is"
+echo $DISPLAY
+echo "whoami"
+whoami
+echo "Starting TESTAR..."
 cd /testar/bin
-./testar
+###################################################################
+# Run TESTAR with the Xvfb server
+# Configure TESTAR protocol and settings trought command line
+###################################################################
+xvfb-run ./testar sse=02_webdriver_parabank Mode=Generate SUTConnector=WEB_DRIVER SUTConnectorValue=" ""/usr/bin/chromedriver"" ""https://para.testar.org/"" " Sequences=1 SequenceLength=10 ShowVisualSettingsDialogOnStartup=false VisualizeActions=false FlashFeedback=false ProtocolCompileDirectory="/tmp"
+###################################################################
+# Next command can be used for debugging purposes. 
+# Instead of running TESTAR in the docker container, 
+# you can make this container commands continuously sleep. 
+# Then, open a Command Line Interface inside the running container.
+###################################################################
 #sh -c "while true; do sleep 1; done"
