@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\SeleniumWebDrivers\\ChromeDriver\\chromedriver.exe" "1920x900+0+0" "https://www.ou.nl"
+SUTConnectorValue = "C:\\SeleniumWebDrivers\\ChromeDriver\\chromedriver.exe" "1920x900+0+0" "https://para.testar.org/parabank/cookies.htm"
 
 #################################################################
 # Sequences
@@ -113,7 +113,7 @@ AbstractStateAttributes = WebWidgetId
 ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
 TypeableClasses = custom-type-input
 DeniedExtensions = pdf;jpg;png
-DomainsAllowed = mijn.awo.ou.nl;login.awo.ou.nl
+DomainsAllowed = testar.org
 FollowLinks = true
 BrowserFullScreen = true
 SwitchNewTabs = true

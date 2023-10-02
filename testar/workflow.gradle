@@ -282,20 +282,19 @@ task runTestDesktopGenericStateModelCustomAbstraction(type: Exec, dependsOn: cre
 
 // Windows OS
 // Verify that TESTAR correctly executes chromedriver
-// To be sure, connect to ou.nl and detect Onderwijs suspicious tag ValuePattern
+// To be sure, connect to para.testar.org and detect .*[fF]orums.* suspicious tag ValuePattern
 task runTestWebdriverSuspiciousTag(type: Exec) {
 	// Read command line output
     standardOutput = new ByteArrayOutputStream()
     group = 'test_testar_workflow'
     description ='runTestWebdriverSuspiciousTag'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_generic AlwaysCompile=true ApplicationName="webdriver_and_suspicious" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[oO]nderwijs.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_generic AlwaysCompile=true ApplicationName="webdriver_and_suspicious" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[fF]orums.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
     doLast {
         String output = standardOutput.toString()
 
-		// Use Onderwijs
-        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'ValuePattern' : 'https://www.ou.nl/onderwijs")}) {
-            println "\n${output} \nTESTAR has successfully connect with WEB_DRIVER and detected Onderwijs Suspicious Tag! "
+        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'ValuePattern' : 'http://forums.parasoft.com/")}) {
+            println "\n${output} \nTESTAR has successfully connect with WEB_DRIVER and detected .*[fF]orums.* Suspicious Tag! "
         } else {
             throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with WEB_DRIVER")
         }
@@ -309,13 +308,12 @@ task runTestWebdriverSuspiciousTagUbuntu(type: Exec) {
     group = 'test_testar_workflow'
     description ='runTestWebdriverSuspiciousTagUbuntu'
     workingDir 'target/install/testar/bin'
-    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_webdriver_generic SUTConnectorValue=" ""/usr/local/share/chromedriver-linux64/chromedriver"" ""https://www.ou.nl"" " FlashFeedback=false AlwaysCompile=true ApplicationName="webdriver_and_suspicious" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[oO]nderwijs.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
+    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_webdriver_generic SUTConnectorValue=" ""/usr/local/share/chromedriver-linux64/chromedriver"" ""https://para.testar.org/parabank/cookies.htm"" " FlashFeedback=false AlwaysCompile=true ApplicationName="webdriver_and_suspicious" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[fF]orums.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
     doLast {
         String output = standardOutput.toString()
 
-		// Use Onderwijs
-        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'ValuePattern' : 'https://www.ou.nl/onderwijs")}) {
-            println "\n${output} \nTESTAR has successfully connect with WEB_DRIVER and detected Onderwijs Suspicious Tag! "
+        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'ValuePattern' : 'http://forums.parasoft.com/")}) {
+            println "\n${output} \nTESTAR has successfully connect with WEB_DRIVER and detected .*[fF]orums.* Suspicious Tag! "
         } else {
             throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with WEB_DRIVER")
         }
@@ -329,13 +327,12 @@ task runTestWebdriverSuspiciousTagMacOS(type: Exec) {
     group = 'test_testar_workflow'
     description ='runTestWebdriverSuspiciousTagMacOS'
     workingDir 'target/install/testar/bin'
-    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_webdriver_generic SUTConnectorValue=" ""/usr/local/share/chromedriver-mac-x64/chromedriver"" ""https://www.ou.nl"" " FlashFeedback=false AlwaysCompile=true ApplicationName="webdriver_and_suspicious" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[oO]nderwijs.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
+    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_webdriver_generic SUTConnectorValue=" ""/usr/local/share/chromedriver-mac-x64/chromedriver"" ""https://para.testar.org/parabank/cookies.htm"" " FlashFeedback=false AlwaysCompile=true ApplicationName="webdriver_and_suspicious" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[fF]orums.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
     doLast {
         String output = standardOutput.toString()
 
-		// Use Onderwijs
-        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'ValuePattern' : 'https://www.ou.nl/onderwijs")}) {
-            println "\n${output} \nTESTAR has successfully connect with WEB_DRIVER and detected Onderwijs Suspicious Tag! "
+        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'ValuePattern' : 'http://forums.parasoft.com/")}) {
+            println "\n${output} \nTESTAR has successfully connect with WEB_DRIVER and detected .*[fF]orums.* Suspicious Tag! "
         } else {
             throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with WEB_DRIVER")
         }
