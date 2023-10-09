@@ -68,8 +68,6 @@ import static javax.swing.UIManager.*;
 public class SettingsDialog extends JFrame implements Observer {
   private static final long serialVersionUID = 5156320008281200950L;
 
-  static final String TESTAR_VERSION = "2.6.7 (10-Oct-2023)";
-
   private String settingsFile;
   private Settings settings;
   //TODO: what is this ret variable. Cant you just return settings in the run method?
@@ -234,8 +232,10 @@ public class SettingsDialog extends JFrame implements Observer {
       System.out.println("Switched to <" + settingsFile + ">");
       Main.SSE_ACTIVATED = sutSettings;
       
-    } catch (ConfigException cfe) {
-      LogSerialiser.log("Unable to switch to <" + sutSettings + "> settings!\n");
+    } catch (IOException ioe) {
+    	String msg = "Unable to switch to <" + sutSettings + "> settings!";
+    	LogSerialiser.log(msg);
+    	System.err.println(msg);
     }
   }
 
@@ -292,7 +292,7 @@ public class SettingsDialog extends JFrame implements Observer {
     jTabsPane.setSelectedIndex(GENERAL_TAB_INDEX);
 
     setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-    setTitle("TESTAR " + TESTAR_VERSION);
+    setTitle("TESTAR " + Main.TESTAR_VERSION);
     setLocationByPlatform(true);
     setName("TESTAR Settings"); // NOI18N
     setResizable(false);
