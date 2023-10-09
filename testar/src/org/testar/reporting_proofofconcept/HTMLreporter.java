@@ -205,7 +205,7 @@ public class HTMLreporter implements Reporting
         htmlReportUtil.addFooter();
         //rename file before writing report
         String fileName = htmlReportUtil.getFileName();
-        String htmlFilenameVerdict = fileName.replace(".html", "_" + FINAL_VERDICT_FILENAME + "_New_" + ".html");
+        String htmlFilenameVerdict = fileName.replace(".html", "_" + FINAL_VERDICT_FILENAME + "_poc_" + ".html");
         htmlReportUtil.renameFile(htmlFilenameVerdict);
     
         htmlReportUtil.writeReport();

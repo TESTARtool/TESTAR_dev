@@ -26,8 +26,10 @@ public class ReportManager implements Reporting
         //TODO put filename into settings, name with sequence number
         // creating a new file for the report
         fileName = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString + "_"
-        + OutputStructure.executedSUTname + REPORT_FILENAME_MID + OutputStructure.sequenceInnerLoopCount;
+        + OutputStructure.executedSUTname + REPORT_FILENAME_MID + OutputStructure.sequenceInnerLoopCount + "_poc";
 //            + REPORT_FILENAME_AFT; // <- file extension is taken care of by individual reporters
+//        fileName = "C:\\Users\\testar\\Desktop\\TESTAR_dev" + File.separator + "poc_" + OutputStructure.startInnerLoopDateString + "_"
+//        + OutputStructure.executedSUTname + REPORT_FILENAME_MID + OutputStructure.sequenceInnerLoopCount;
         
         if(html)
             htmlReporter = new HTMLreporter(fileName, replay);

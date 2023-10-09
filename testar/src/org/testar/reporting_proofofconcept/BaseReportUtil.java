@@ -34,7 +34,7 @@ public abstract class BaseReportUtil
         try
         {
             Path newPath = Paths.get(newDirectory);
-            Path oldPath = Path.of(file.getAbsolutePath());
+            Path oldPath = Paths.get(file.getAbsolutePath());
             String fileName = file.getName();
             Files.move(oldPath, newPath.resolveSibling(fileName));
         }
@@ -54,24 +54,25 @@ public abstract class BaseReportUtil
         return file.getPath();
     }
     
-    public void writeReport(String... content)
+    public void writeReport()
     {
-        if (!file.exists())
+        try
         {
-            try
-            {
+            file.getParentFile().mkdirs();
+
+            if (!file.exists())
                 file.createNewFile();
-                PrintWriter writer = new PrintWriter(file, CHARSET);
-                
-                for(String str : content)
-                    writer.println(str);
-    
-                writer.close();
-            }
-            catch(IOException e)
-            {
-                e.printStackTrace();
-            }
+
+            PrintWriter writer = new PrintWriter(file, CHARSET);
+
+            for(String str : content)
+                writer.println(str);
+
+            writer.close();
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
         }
     }
     
