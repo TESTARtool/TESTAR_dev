@@ -68,7 +68,7 @@ import static javax.swing.UIManager.*;
 public class SettingsDialog extends JFrame implements Observer {
   private static final long serialVersionUID = 5156320008281200950L;
 
-  static final String TESTAR_VERSION = "2.6.6 (15-Sep-2023)";
+  static final String TESTAR_VERSION = "2.6.7 (10-Oct-2023)";
 
   private String settingsFile;
   private Settings settings;
