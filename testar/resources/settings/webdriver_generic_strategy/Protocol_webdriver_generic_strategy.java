@@ -503,12 +503,12 @@ public class Protocol_webdriver_generic_strategy extends WebdriverProtocol
         csvWriter.addField("timestampTestarEnd", "timestamp TESTAR end", DefaultProtocol.lastExecutedAction.get(Tags.TimeStamp, null).toString());
 //        csvWriter.addField("timestampServerStart", "timestamp server start", start_epoch);
 //        csvWriter.addField("timestampServerEnd", "timestamp server end", end_epoch);
-//        csvWriter.addField("actionLimit", "action limit", Integer.toString(settings.get(ConfigTags.SequenceLength)));
-//        csvWriter.addField("numberOfFields", "number of fields", Integer.toString(numFields));
+        csvWriter.addField("actionLimit", "action limit", Integer.toString(settings.get(ConfigTags.SequenceLength)));
+        csvWriter.addField("numberOfFields", "number of fields", Integer.toString(numFields));
         csvWriter.addField("actionsExecuted", "actions executed", Integer.toString(actionCount-1));
         csvWriter.addField("numberOfFieldsFilled", "number of fields filled", Integer.toString(numFieldsFilled));
         csvWriter.addField("maxActionsPerField", "maximum actions per field", Integer.toString(Collections.max(actionsExecuted.values())));
-        csvWriter.addField("numberOfSubmits", "number of submits", submitSuccess);
+        csvWriter.addField("submit", "successful submit", submitSuccess);
     
         if(createNewFile || csvWriter.fileIsEmpty()) //file empty or nonexistent
         {

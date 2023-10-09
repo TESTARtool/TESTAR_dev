@@ -95,7 +95,7 @@ public class CSVFileWriter
         StringJoiner joiner;
         try
         {
-            writer = new FileWriter(this.file, false); //recreate writer as needed, always overwrite file
+            writer = new FileWriter(this.file, normalRow); //recreate writer as needed, append if normal row
             joiner = new StringJoiner(this.delimiter);
 
             for(int i = 0; i < fields.size(); i++)
