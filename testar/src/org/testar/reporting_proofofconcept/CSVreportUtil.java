@@ -5,16 +5,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
 
-public class CSVreporter extends BaseReporter
+public class CSVreportUtil extends BaseReportUtil
 {
     private String               delimiter;
     private Map<Integer, Field>  fields; //the fields and their data
     private Map<String, Integer> fieldsIndex; //the lookup that insures a fixed order
     private boolean              fieldsLocked = false;
     
-    public CSVreporter(String filePath, String delimiter)
+    public CSVreportUtil(String filePath, String delimiter)
     {
-        super(new File(filePath.endsWith(".csv") ? filePath : filePath + ".csv"));
+        super(filePath, "csv");
         this.delimiter = delimiter;
         fields         = new HashMap<>();
         fieldsIndex    = new HashMap<>();
