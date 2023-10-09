@@ -1,5 +1,7 @@
-# This selenium docker image already contains chromedriver and xvfb
-FROM selenium/standalone-chrome
+# Seleniarm docker image for ARM architectures
+# https://github.com/TESTARtool/TESTAR_dev/issues/374
+# This seleniarm docker image already contains chromedriver and xvfb
+FROM seleniarm/standalone-chromium
 
 # Update image dependencies and java
 RUN sudo apt-get -o Acquire::Check-Valid-Until=false -o Acquire::Check-Date=false update
@@ -9,7 +11,7 @@ RUN sudo apt-get install -y openjdk-17-jdk libxkbcommon-x11-0
 # gradlew distTar do this task
 ADD testar/target/distributions/testar.tar .
 
-ENV JAVA_HOME "/usr/lib/jvm/java-17-openjdk-amd64"
+ENV JAVA_HOME "/usr/lib/jvm/java-17-openjdk-arm64"
 ENV DISPLAY=":99"
 
 # Prepare the TESTAR files and permissions

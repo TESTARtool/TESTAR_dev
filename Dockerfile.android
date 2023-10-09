@@ -1,4 +1,4 @@
-# This selenium docker image already contains chromedriver and xvfb
+# This docker image already contains chromedriver and xvfb
 FROM selenium/standalone-chrome
 
 # Update image dependencies and java
@@ -13,9 +13,9 @@ ENV JAVA_HOME "/usr/lib/jvm/java-17-openjdk-amd64"
 ENV DISPLAY=":99"
 
 # Prepare the TESTAR files and permissions
-COPY runImage /runImage
+COPY runImageAndroid /runImageAndroid
 COPY README.Docker /README.Docker
-RUN sudo chmod 777 /runImage
+RUN sudo chmod 777 /runImageAndroid
 RUN sudo chmod -R 777 /testar
 
-CMD [ "sh", "/runImage"]
+CMD [ "sh", "/runImageAndroid"]
