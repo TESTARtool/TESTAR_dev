@@ -36,6 +36,7 @@ import java.util.Set;
 
 import org.testar.ActionStatus;
 import org.testar.OutputStructure;
+import org.testar.ProtocolUtil;
 import org.testar.SutVisualization;
 import org.testar.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.monkey.alayer.Action;
@@ -49,6 +50,10 @@ import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.devices.MouseButtons;
 import org.testar.monkey.alayer.exceptions.WidgetNotFoundException;
+import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
+import org.testar.monkey.alayer.webdriver.WebDriverEventHandler;
+import org.testar.plugin.NativeLinker;
+import org.testar.plugin.OperatingSystems;
 import org.testar.serialisation.LogSerialiser;
 
 public class RecordMode {
@@ -132,10 +137,14 @@ public class RecordMode {
 			ActionStatus actionStatus = new ActionStatus();
 
 			//Start Wait User Action Loop to obtain the Action did by the User
+			System.out.println("PARSA: Start wait for user actions\n");
 			waitUserActionLoop(protocol, system, state, actionStatus);
+			System.out.println("PARSA: End wait for user actions\n");
+			System.out.println("PARSA: Executing action: " + actionStatus.getAction().get(Tags.Desc) + "\n");
 
 			//Save the user action information into the logs
 			if (actionStatus.isUserEventAction()) {
+				System.out.println("PARSA: Start if A\n");
 
 				protocol.buildStateActionsIdentifiers(state, Collections.singleton(actionStatus.getAction()));
 
@@ -241,39 +250,77 @@ public class RecordMode {
 	 * @param state
 	 * @return
 	 */
+	//this is the record user action place
 	private Action mapUserEvent(DefaultProtocol protocol, State state){
-		Assert.notNull(protocol.userEvent);
-		if (protocol.userEvent[0] instanceof MouseButtons){ // mouse events
-			double x = ((Double) protocol.userEvent[1]).doubleValue();
-			double y = ((Double) protocol.userEvent[2]).doubleValue();
-			Widget w = null;
-			try {
-				w = Util.widgetFromPoint(state, x, y);
-				x = 0.5; y = 0.5;
-				if (protocol.userEvent[0] == MouseButtons.BUTTON1) // left click
-					return (new AnnotatingActionCompiler()).leftClickAt(w,x,y);
-				else if (protocol.userEvent[0] == MouseButtons.BUTTON3) // right click
-					return (new AnnotatingActionCompiler()).rightClickAt(w,x,y);
-			} catch (WidgetNotFoundException we){
-				System.out.println("Mapping user event ... widget not found @(" + x + "," + y + ")");
-				return null;
+		if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
+			Assert.notNull(protocol.userEvent);
+			if (protocol.userEvent[0] instanceof MouseButtons){ // mouse events
+				double x = ((Double) protocol.userEvent[1]).doubleValue();
+				double y = ((Double) protocol.userEvent[2]).doubleValue();
+				Widget w = null;
+				try {
+					w = Util.widgetFromPoint(state, x, y);
+					x = 0.5; y = 0.5;
+					if (protocol.userEvent[0] == MouseButtons.BUTTON1) // left click
+						return (new AnnotatingActionCompiler()).leftClickAt(w,x,y);
+					else if (protocol.userEvent[0] == MouseButtons.BUTTON3) // right click
+						return (new AnnotatingActionCompiler()).rightClickAt(w,x,y);
+				} catch (WidgetNotFoundException we){
+					System.out.println("Mapping user event ... widget not found @(" + x + "," + y + ")");
+					return null;
+				}
+			} else if (protocol.userEvent[0] instanceof KBKeys) // key events
+				return (new AnnotatingActionCompiler()).hitKey((KBKeys) protocol.userEvent[0]);
+			else if (protocol.userEvent[0] instanceof String){ // type events
+				if (DefaultProtocol.lastExecutedAction == null)
+					return null;
+				List<Finder> targets = DefaultProtocol.lastExecutedAction.get(Tags.Targets,null);
+				if (targets == null || targets.size() != 1)
+					return null;
+				try {
+					Widget w = targets.get(0).apply(state);
+					return (new AnnotatingActionCompiler()).clickTypeInto(w, (String) protocol.userEvent[0], true);
+				} catch (WidgetNotFoundException we){
+					return null;
+				}
 			}
-		} else if (protocol.userEvent[0] instanceof KBKeys) // key events
-			return (new AnnotatingActionCompiler()).hitKey((KBKeys) protocol.userEvent[0]);
-		else if (protocol.userEvent[0] instanceof String){ // type events
-			if (DefaultProtocol.lastExecutedAction == null)
-				return null;
-			List<Finder> targets = DefaultProtocol.lastExecutedAction.get(Tags.Targets,null);
-			if (targets == null || targets.size() != 1)
-				return null;
-			try {
-				Widget w = targets.get(0).apply(state);
-				return (new AnnotatingActionCompiler()).clickTypeInto(w, (String) protocol.userEvent[0], true);
-			} catch (WidgetNotFoundException we){
-				return null;
+			return null;
+			
+
+		} else {
+			Assert.notNull(protocol.userEvent);
+			if (protocol.userEvent[0] instanceof MouseButtons){ // mouse events
+				double x = ((Double) protocol.userEvent[1]).doubleValue();
+				double y = ((Double) protocol.userEvent[2]).doubleValue();
+				Widget w = null;
+				try {
+					w = Util.widgetFromPoint(state, x, y);
+					x = 0.5; y = 0.5;
+					if (protocol.userEvent[0] == MouseButtons.BUTTON1) // left click
+						return (new AnnotatingActionCompiler()).leftClickAt(w,x,y);
+					else if (protocol.userEvent[0] == MouseButtons.BUTTON3) // right click
+						return (new AnnotatingActionCompiler()).rightClickAt(w,x,y);
+				} catch (WidgetNotFoundException we){
+					System.out.println("Mapping user event ... widget not found @(" + x + "," + y + ")");
+					return null;
+				}
+			} else if (protocol.userEvent[0] instanceof KBKeys) // key events
+				return (new AnnotatingActionCompiler()).hitKey((KBKeys) protocol.userEvent[0]);
+			else if (protocol.userEvent[0] instanceof String){ // type events
+				if (DefaultProtocol.lastExecutedAction == null)
+					return null;
+				List<Finder> targets = DefaultProtocol.lastExecutedAction.get(Tags.Targets,null);
+				if (targets == null || targets.size() != 1)
+					return null;
+				try {
+					Widget w = targets.get(0).apply(state);
+					return (new AnnotatingActionCompiler()).clickTypeInto(w, (String) protocol.userEvent[0], true);
+				} catch (WidgetNotFoundException we){
+					return null;
+				}
 			}
+			return null;
 		}
-		return null;
 	}
 
 }
