@@ -31,6 +31,7 @@
 package org.testar.settings;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -164,17 +165,23 @@ public class Settings extends TaggableBase implements Serializable {
 	 * @return An instance of Settings
 	 * @throws IOException
 	 */
-	public static Settings loadSettings(String[] argv, String file) throws IOException {
-		Assert.notNull(file);
+	public static Settings loadSettings(String[] argv, String filePath) throws IOException {
+		if (filePath == null || filePath.isEmpty()) {
+			throw new IllegalArgumentException("Settings.loadSettings: filePath cannot be null or empty");
+		}
+
+		if (!new File(filePath).exists()) {
+			throw new IOException("Settings.loadSettings: The specified file does not exist: " + filePath);
+		}
 
 		// Initialize the settings with the configured values
 		// Prioritize the argv > file > default
-		Settings settings = loadSettings(SettingsDefaults.getSettingsDefaults(), file, argv);
+		Settings settings = loadSettings(SettingsDefaults.getSettingsDefaults(), filePath, argv);
 
 		try{
 			settings.get(ConfigTags.ExtendedSettingsFile);
 		} catch (NoSuchTagException e){
-			settings.set(ConfigTags.ExtendedSettingsFile, file.replace(Main.SETTINGS_FILE, ExtendedSettingFile.FileName));
+			settings.set(ConfigTags.ExtendedSettingsFile, filePath.replace(Main.SETTINGS_FILE, ExtendedSettingFile.FileName));
 		}
 
 		ExtendedSettingsFactory.Initialize(settings.get(ConfigTags.ExtendedSettingsFile));
@@ -182,11 +189,11 @@ public class Settings extends TaggableBase implements Serializable {
 		return settings;
 	}
 
-	private static Settings loadSettings(List<Pair<?, ?>> defaults, String path, String[] argv) throws IOException {
+	private static Settings loadSettings(List<Pair<?, ?>> defaults, String filePath, String[] argv) throws IOException {
 		// If user use command line to input properties, mix file settings with cmd properties
 		if(argv.length > 0) {
 			try {
-				return fromFileCmd(defaults, path, argv);
+				return fromFileCmd(defaults, filePath, argv);
 			}catch(IOException e) {
 				System.out.println("Error with command line properties. Examples:");
 				System.out.println("testar SUTConnectorValue=\"C:\\\\Windows\\\\System32\\\\notepad.exe\" Sequences=11 SequenceLength=12 SuspiciousTags=.*aaa.*");
@@ -196,13 +203,12 @@ public class Settings extends TaggableBase implements Serializable {
 			//SUTConnectorValue="C:\\Windows\\System32\\notepad.exe"
 		}
 
-		return fromFile(defaults, path);
+		return fromFile(defaults, filePath);
 	}
 
-	private static Settings fromFile(List<Pair<?, ?>> defaults, String path) throws IOException {
-		Assert.notNull(path);
+	private static Settings fromFile(List<Pair<?, ?>> defaults, String filePath) throws IOException {
 		Properties props = new Properties();
-		FileInputStream fis = new FileInputStream(path);
+		FileInputStream fis = new FileInputStream(filePath);
 		InputStreamReader isw = new InputStreamReader(fis, "UTF-8");
 		Reader in = new BufferedReader(isw);
 		props.load(in);
@@ -213,10 +219,9 @@ public class Settings extends TaggableBase implements Serializable {
 		return new Settings(defaults, new Properties(props));
 	}
 
-	private static Settings fromFileCmd(List<Pair<?, ?>> defaults, String path, String[] argv) throws IOException {
-		Assert.notNull(path);
+	private static Settings fromFileCmd(List<Pair<?, ?>> defaults, String filePath, String[] argv) throws IOException {
 		Properties props = new Properties();
-		FileInputStream fis = new FileInputStream(path);
+		FileInputStream fis = new FileInputStream(filePath);
 		InputStreamReader isw = new InputStreamReader(fis, "UTF-8");
 		Reader in = new BufferedReader(isw);
 		props.load(in);

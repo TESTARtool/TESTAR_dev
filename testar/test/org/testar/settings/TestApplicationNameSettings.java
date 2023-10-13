@@ -1,4 +1,4 @@
-package org.testar.monkey;
+package org.testar.settings;
 
 import static org.testar.monkey.ConfigTags.ApplicationName;
 import static org.testar.monkey.ConfigTags.ApplicationVersion;
@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.junit.Test;
-import org.testar.settings.Settings;
+import org.testar.monkey.*;
 
 public class TestApplicationNameSettings {
 

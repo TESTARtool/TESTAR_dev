@@ -1,4 +1,4 @@
-package org.testar.monkey;
+package org.testar.settings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Properties;
 
 import org.junit.Test;
+import org.testar.monkey.*;
 import org.testar.monkey.alayer.Tag;
-import org.testar.settings.Settings;
 
 public class TestRegularExpressionSettings {
 

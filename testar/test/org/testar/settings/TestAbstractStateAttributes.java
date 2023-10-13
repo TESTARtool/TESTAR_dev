@@ -1,4 +1,4 @@
-package org.testar.monkey;
+package org.testar.settings;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.junit.Test;
-import org.testar.settings.Settings;
+import org.testar.monkey.*;
 
 public class TestAbstractStateAttributes {
 

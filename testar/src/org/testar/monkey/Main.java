@@ -176,9 +176,10 @@ public class Main {
         // Verify if we are in the correct executable testar directory (contains testar.bat)
 		if(!filesName.contains("testar.bat")) {
 			System.out.println("WARNING: We cannot find testar.bat executable file.");
-			System.out.println("WARNING: Please change to /testar/bin/ folder (contains testar.bat) and try to execute again.");
+			System.out.println("WARNING: Please change to /testar/bin/ folder (contains testar.bat) and try to execute testar again.");
 			System.out.println(String.format("WARNING: Current directory %s with existing files:", new File(testarDir).getAbsolutePath()));
 			filesName.forEach(System.out::println);
+			System.exit(-1);
 		}
 	}
 
@@ -222,12 +223,20 @@ public class Main {
 
 		String[] files = getSSE();
 
-		// If there is more than 1, then delete them all
+		// If there is more than 1 sse file, then delete them all
 		if (files != null && files.length > 1) {
 			System.out.println("Too many *.sse files - exactly one expected!");
 			for (String f : files) {
-				System.out.println("Delete file <" + f + "> = " + new File(f).delete());
+				System.out.println("Delete file <" + f + "> = " + new File(settingsDir + f).delete());
 			}
+			files = null;
+		}
+
+		// If the protocol of selected sse file does not exist, delete it
+		// Example: unknown.sse file exists but the settings/unknown folder does not
+		if(files != null && files.length == 1 && !existsSSE(files[0].replace(SUT_SETTINGS_EXT, ""))) {
+			System.out.println("Protocol of indicated .sse file does not exist");
+			System.out.println("Delete file <" + files[0] + "> = " + new File(settingsDir + files[0]).delete());
 			files = null;
 		}
 
@@ -412,18 +421,9 @@ public class Main {
 	 */
 	public static void protocolFromCmd(String sett) throws IOException {
 		String sseName = sett.substring(sett.indexOf("=")+1);
-		boolean existSSE = false;
-
-		//Check if choose protocol exist
-		for (File f : new File(settingsDir).listFiles()) {
-			if (new File(settingsDir + sseName + File.separator + SETTINGS_FILE).exists()) {
-				existSSE = true;
-				break;
-			}
-		}
 
 		//Command line protocol doesn't exist
-		if(!existSSE) {System.out.println("Protocol: "+sseName+" doesn't exist");}
+		if(!existsSSE(sseName)) {System.out.println("CMD Protocol: " + sseName + " doesn't exist");}
 
 		else{
 			//Obtain previous sse file and delete it (if exist)
@@ -443,6 +443,17 @@ public class Main {
 			System.out.println("Protocol changed from command line to: "+sseName);
 
 		}
+	}
+
+	// Check if sse protocol exist
+	private static boolean existsSSE(String sseName) {
+		for (File f : new File(settingsDir).listFiles()) {
+			if (new File(settingsDir + sseName + File.separator + SETTINGS_FILE).exists()) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
