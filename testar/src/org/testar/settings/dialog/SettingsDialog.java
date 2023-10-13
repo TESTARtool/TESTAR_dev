@@ -29,14 +29,12 @@
 *******************************************************************************************************/
 
 
-package org.testar.settingsdialog;
+package org.testar.settings.dialog;
 
 import org.testar.monkey.*;
 import org.testar.serialisation.LogSerialiser;
-import org.testar.settingsdialog.dialog.*;
-import org.testar.settingsdialog.dialog.StateModelPanel;
-
-import org.testar.extendedsettings.ExtendedSettingsFactory;
+import org.testar.settings.Settings;
+import org.testar.settings.extended.ExtendedSettingsFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -227,7 +225,7 @@ public class SettingsDialog extends JFrame implements Observer {
     new File(settingsDir + previousSSE).renameTo(new File(settingsDir + sse));
     try {
       settingsFile = settingsDir + sutSettings + File.separator + Main.SETTINGS_FILE;
-      settings = Main.loadSettings(new String[0], settingsFile);
+      settings = Settings.loadSettings(new String[0], settingsFile);
       populateInformation(settings);
       System.out.println("Switched to <" + settingsFile + ">");
       Main.SSE_ACTIVATED = sutSettings;

@@ -188,12 +188,13 @@ If you encounter any errors, please create an issue and provide details about yo
 
 ### Ubuntu (For Web systems under test)
 
-- Ubuntu 18, 20, and 22 are operating system versions that have been used to run the chromedriver package of TESTAR for testing web applications.  
+- Ubuntu 20 and 22 LTS are operating system versions that have been used to run the chromedriver package of TESTAR for testing web applications.  
 ``NOTE:`` It is important to use an environment with Graphical User Interface or to install and enable the Xvfb (X virtual framebuffer) server.  
 
 ### macOS (For Web systems under test)
 
 - macOS Monterey (version 12) operating system is used in the GitHub Action to run the chromedriver package of TESTAR for testing web applications.  
+``NOTE:`` The host architecture of tested macOS Monterey is an AMD64. The ARM architecture may require at least different software components, such as seleniarm docker images and chromedriver arm versions.   
 
 ### Android
 

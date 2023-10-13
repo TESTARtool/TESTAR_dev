@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.settings;
+package org.testar.settings.extended;
 
 import java.io.File;
 import java.io.FileWriter;

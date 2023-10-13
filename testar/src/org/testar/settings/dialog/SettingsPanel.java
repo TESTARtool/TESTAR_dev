@@ -28,33 +28,33 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.settings;
+package org.testar.settings.dialog;
 
-import org.testar.extendedsettings.ExtendedSettingBase;
+import org.testar.settings.Settings;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.swing.*;
 
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
-public class TestSetting extends ExtendedSettingBase<TestSetting> {
+/**
+ * Abstract class for all common functionality for a SettingsPanel.
+ */
+public abstract class SettingsPanel extends JPanel {
+    /**
+     * Populate the fields from Settings structure.
+     *
+     * @param settings The settings to load.
+     */
+    public abstract void populateFrom(final Settings settings);
 
-    static final String DEFAULT_VALUE = "Default";
-    public String value;
+    /**
+     * Retrieve information from the GUI.
+     *
+     * @param settings reference to the object where the settings will be stored.
+     */
+    public abstract void extractInformation(final Settings settings);
 
-    public static TestSetting CreateDefault() {
-        TestSetting DefaultInstance = new TestSetting();
-        DefaultInstance.value = DEFAULT_VALUE;
-        return DefaultInstance;
-    }
-
-    @Override
-    public int compareTo(TestSetting other) {
-        int res = -1;
-        if (this.value.equals(other.value)) {
-            res = 0;
-        }
-        return res;
+    /**
+     * Validate that the settings are valid.
+     */
+    public void checkSettings() {
     }
 }

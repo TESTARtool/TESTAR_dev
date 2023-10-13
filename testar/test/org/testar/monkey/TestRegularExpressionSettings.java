@@ -7,6 +7,7 @@ import java.util.Properties;
 
 import org.junit.Test;
 import org.testar.monkey.alayer.Tag;
+import org.testar.settings.Settings;
 
 public class TestRegularExpressionSettings {
 

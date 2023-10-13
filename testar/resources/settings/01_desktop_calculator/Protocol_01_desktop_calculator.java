@@ -38,8 +38,8 @@ import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
-import org.testar.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
+import org.testar.settings.Settings;
 
 import java.util.Set;
 

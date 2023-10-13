@@ -28,12 +28,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.settings;
+package org.testar.settings.extended;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.testar.extendedsettings.ExtendedSettingFile;
+import org.testar.settings.extended.ExtendedSettingFile;
 
 import java.io.File;
 import java.io.FileNotFoundException;

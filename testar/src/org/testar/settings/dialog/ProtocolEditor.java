@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.settingsdialog;
+package org.testar.settings.dialog;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;

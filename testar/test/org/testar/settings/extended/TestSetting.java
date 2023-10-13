@@ -28,11 +28,33 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.extendedsettings;
+package org.testar.settings.extended;
 
-public interface IExtendedSetting {
-    /**
-     * Save the setting to disk.
-     */
-    void Save();
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import org.testar.settings.extended.ExtendedSettingBase;
+
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+public class TestSetting extends ExtendedSettingBase<TestSetting> {
+
+    static final String DEFAULT_VALUE = "Default";
+    public String value;
+
+    public static TestSetting CreateDefault() {
+        TestSetting DefaultInstance = new TestSetting();
+        DefaultInstance.value = DEFAULT_VALUE;
+        return DefaultInstance;
+    }
+
+    @Override
+    public int compareTo(TestSetting other) {
+        int res = -1;
+        if (this.value.equals(other.value)) {
+            res = 0;
+        }
+        return res;
+    }
 }

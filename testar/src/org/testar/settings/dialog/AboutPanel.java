@@ -29,9 +29,7 @@
  *******************************************************************************************************/
 
 
-package org.testar.settingsdialog.dialog;
-
-import org.testar.settingsdialog.SettingsDialog;
+package org.testar.settings.dialog;
 
 import javax.swing.*;
 import java.awt.*;

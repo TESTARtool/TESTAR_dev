@@ -35,6 +35,8 @@ import org.testar.StateManagementTags;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.serialisation.ScreenshotSerialiser;
 import org.testar.serialisation.TestSerialiser;
+import org.testar.settings.Settings;
+import org.testar.settings.dialog.SettingsDialog;
 import org.testar.monkey.alayer.Tag;
 
 import javax.swing.*;
@@ -44,14 +46,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
-import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 import org.testar.monkey.alayer.windows.Windows10;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
-import org.testar.extendedsettings.ExtendedSettingFile;
-import org.testar.extendedsettings.ExtendedSettingsFactory;
 import org.testar.managers.NativeHookManager;
-import org.testar.settingsdialog.SettingsDialog;
 
 import static org.testar.monkey.Util.compileProtocol;
 import static org.testar.monkey.ConfigTags.*;
@@ -112,7 +110,7 @@ public class Main {
 		System.out.println("TESTAR version is <" + TESTAR_VERSION + ">");
 		System.out.println("Test settings is <" + testSettingsFileName + ">");
 
-		Settings settings = loadSettings(args, testSettingsFileName);
+		Settings settings = Settings.loadSettings(args, testSettingsFileName);
 
 		// Continuous Integration: If GUI is disabled TESTAR was executed from command line.
 		// We only want to execute TESTAR one time with the selected settings.
@@ -132,7 +130,7 @@ public class Main {
 
 				// The dialog can change the test settings file, we need to reload the settings
 				testSettingsFileName = getTestSettingsFile();
-				settings = loadSettings(args, testSettingsFileName);
+				settings = Settings.loadSettings(args, testSettingsFileName);
 
 				setTestarDirectory(settings);
 
@@ -405,186 +403,6 @@ public class Main {
 		LogSerialiser.exit();
 
 		System.exit(0);
-	}
-
-	// TODO: This methods should be part of the Settings class. It contains all the default values of the settings.
-	/**
-	 * Load the default settings for all the configurable settings and add/overwrite with those from the file
-	 * This is needed because the user might not have set all the possible settings in the test.settings file.
-	 * @param argv
-	 * @param file
-	 * @return An instance of Settings
-	 * @throws IOException
-	 */
-	public static Settings loadSettings(String[] argv, String file) throws IOException {
-		Assert.notNull(file);
-
-		List<Pair<?, ?>> defaults = new ArrayList<Pair<?, ?>>();
-		defaults.add(Pair.from(ProcessesToKillDuringTest, "(?!x)x"));
-		defaults.add(Pair.from(ShowVisualSettingsDialogOnStartup, true));
-		defaults.add(Pair.from(FaultThreshold, 0.1));
-		defaults.add(Pair.from(LogLevel, 1));
-		defaults.add(Pair.from(Mode, RuntimeControlsProtocol.Modes.Spy));
-		defaults.add(Pair.from(OutputDir, outputDir));
-		defaults.add(Pair.from(TempDir, tempDir));
-		defaults.add(Pair.from(OnlySaveFaultySequences, false));
-		defaults.add(Pair.from(PathToReplaySequence, tempDir));
-		defaults.add(Pair.from(ActionDuration, 0.1));
-		defaults.add(Pair.from(TimeToWaitAfterAction, 0.1));
-		defaults.add(Pair.from(VisualizeActions, false));
-		defaults.add(Pair.from(KeyBoardListener, true));
-		defaults.add(Pair.from(SequenceLength, 10));
-		defaults.add(Pair.from(ReplayRetryTime, 30.0));
-		defaults.add(Pair.from(Sequences, 1));
-		defaults.add(Pair.from(MaxTime, 31536000.0));
-		defaults.add(Pair.from(StartupTime, 8.0));
-		defaults.add(Pair.from(SUTConnectorValue, ""));
-		defaults.add(Pair.from(Delete, new ArrayList<String>()));
-		defaults.add(Pair.from(CopyFromTo, new ArrayList<Pair<String, String>>()));
-		defaults.add(Pair.from(SuspiciousTags, "(?!x)x"));
-		defaults.add(Pair.from(ClickFilter, "(?!x)x"));
-		defaults.add(Pair.from(MyClassPath, Arrays.asList(settingsDir)));
-		defaults.add(Pair.from(ProtocolClass, "org.testar.monkey.DefaultProtocol"));
-		defaults.add(Pair.from(ForceForeground, true));
-		defaults.add(Pair.from(UseRecordedActionDurationAndWaitTimeDuringReplay, true));
-		defaults.add(Pair.from(StopGenerationOnFault, true));
-		defaults.add(Pair.from(TimeToFreeze, 10.0));
-		defaults.add(Pair.from(RefreshSpyCanvas, 0.5));
-		defaults.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
-		defaults.add(Pair.from(MaxReward, 9999999.0));
-		defaults.add(Pair.from(Discount, .95));
-		defaults.add(Pair.from(AccessBridgeEnabled, false));
-		defaults.add(Pair.from(SUTProcesses, ""));
-		defaults.add(Pair.from(StateModelEnabled, false));
-		defaults.add(Pair.from(DataStore, ""));
-		defaults.add(Pair.from(DataStoreType, ""));
-		defaults.add(Pair.from(DataStoreServer, ""));
-		defaults.add(Pair.from(DataStoreDirectory, ""));
-		defaults.add(Pair.from(DataStoreDB, ""));
-		defaults.add(Pair.from(DataStoreUser, ""));
-		defaults.add(Pair.from(DataStorePassword, ""));
-		defaults.add(Pair.from(DataStoreMode, ""));
-		defaults.add(Pair.from(ResetDataStore, false));
-		defaults.add(Pair.from(ApplicationName, ""));
-		defaults.add(Pair.from(ApplicationVersion, ""));
-		defaults.add(Pair.from(ActionSelectionAlgorithm, "random"));
-		defaults.add(Pair.from(StateModelStoreWidgets, true));
-		defaults.add(Pair.from(AlwaysCompile, true));
-		defaults.add(Pair.from(ProcessListenerEnabled, false));
-		defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
-		defaults.add(Pair.from(ProcessLogs, ".*.*"));
-		defaults.add(Pair.from(OverrideWebDriverDisplayScale, ""));
-		defaults.add(Pair.from(CreateWidgetInfoJsonFile, false));
-		defaults.add(Pair.from(FormFillingAction, false));
-
-		// Oracles for webdriver browser console
-		defaults.add(Pair.from(WebConsoleErrorOracle, false));
-		defaults.add(Pair.from(WebConsoleErrorPattern, ".*.*"));
-		defaults.add(Pair.from(WebConsoleWarningOracle, false));
-		defaults.add(Pair.from(WebConsoleWarningPattern, ".*.*"));
-
-		defaults.add(Pair.from(ProtocolSpecificSetting_1, ""));
-		defaults.add(Pair.from(ProtocolSpecificSetting_2, ""));
-		defaults.add(Pair.from(ProtocolSpecificSetting_3, ""));
-		defaults.add(Pair.from(ProtocolSpecificSetting_4, ""));
-		defaults.add(Pair.from(ProtocolSpecificSetting_5, ""));
-		defaults.add(Pair.from(FlashFeedback, true));
-		defaults.add(Pair.from(ProtocolCompileDirectory, "./settings"));
-		defaults.add(Pair.from(ReportingClass,"HTML Reporting"));
-
-		defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
-			{
-				add("WidgetControlType");
-			}
-		}));
-
-		defaults.add(Pair.from(ClickableClasses, new ArrayList<String>() {
-			{
-				add("v-menubar-menuitem");
-				add("v-menubar-menuitem-caption");
-			}
-		}));
-
-		defaults.add(Pair.from(TypeableClasses, new ArrayList<String>()));
-
-		defaults.add(Pair.from(DeniedExtensions, new ArrayList<String>() {
-			{
-				add("pdf");
-				add("jpg");
-				add("png");
-			}
-		}));
-
-		defaults.add(Pair.from(DomainsAllowed, new ArrayList<String>() {
-			{
-				add("www.ou.nl");
-				add("mijn.awo.ou.nl");
-				add("login.awo.ou.nl");
-			}
-		}));
-
-		defaults.add(Pair.from(TagsToFilter, new ArrayList<String>() {
-			{
-				add("Title");
-				add("WebName");
-				add("WebTagName");
-			}
-		}));
-
-
-		defaults.add(Pair.from(TagsForSuspiciousOracle, new ArrayList<String>() {
-			{
-				add("Title");
-				add("WebName");
-				add("WebTagName");
-			}
-		}));
-
-		defaults.add(Pair.from(FollowLinks, true));
-		defaults.add(Pair.from(BrowserFullScreen, true));
-		defaults.add(Pair.from(SwitchNewTabs, true));
-
-		/*
-		//TODO web driver settings for login feature
-		defaults.add(Pair.from(Login, null)); // null = feature not enabled
-		// login = Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
-		defaults.add(Pair.from(Username, ""));
-		defaults.add(Pair.from(Password, ""));
-		 */
-
-		//Overwrite the default settings with those from the file
-		Settings settings = Settings.fromFile(defaults, file);
-
-		//If user use command line to input properties, mix file settings with cmd properties
-		if(argv.length>0) {
-			try {
-				settings = Settings.fromFileCmd(defaults, file, argv);
-			}catch(IOException e) {
-				System.out.println("Error with command line properties. Examples:");
-				System.out.println("testar SUTConnectorValue=\"C:\\\\Windows\\\\System32\\\\notepad.exe\" Sequences=11 SequenceLength=12 SuspiciousTags=.*aaa.*");
-				System.out.println("SUTConnectorValue=\" \"\"C:\\\\Program Files\\\\Internet Explorer\\\\iexplore.exe\"\" \"\"https://www.google.es\"\" \"");
-			}
-			//SUTConnectorValue=" ""C:\\Program Files\\Internet Explorer\\iexplore.exe"" ""https://www.google.es"" "
-			//SUTConnectorValue="C:\\Windows\\System32\\notepad.exe"
-		}
-
-		// Inform users that the abstract state properties and the abstract action properties have at least 1 value
-		if ((settings.get(AbstractStateAttributes)).isEmpty()) {
-			String msg = "************************** WARNING: AbstractStateAttributes test.settings is empty! **************************\n"
-					+ "Please provide at least 1 valid abstract state attribute or leave the key out of the settings file\n"
-					+ "Widget, State, and Action AbstractIDCustom values will not work properly until AbstractStateAttributes is configured";
-			System.err.println(msg);
-		}
-
-		try{
-			settings.get(ConfigTags.ExtendedSettingsFile);
-		} catch (NoSuchTagException e){
-			settings.set(ConfigTags.ExtendedSettingsFile, file.replace(SETTINGS_FILE, ExtendedSettingFile.FileName));
-		}
-
-		ExtendedSettingsFactory.Initialize(settings.get(ConfigTags.ExtendedSettingsFile));
-
-		return settings;
 	}
 
 	/**

@@ -28,13 +28,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.settings;
-
-import org.testar.extendedsettings.ExtendedSettingBase;
+package org.testar.settings.extended;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import org.testar.settings.extended.ExtendedSettingBase;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)

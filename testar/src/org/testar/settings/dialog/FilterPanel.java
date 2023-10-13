@@ -28,12 +28,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.settingsdialog.dialog;
+package org.testar.settings.dialog;
 
 import org.apache.commons.lang3.StringUtils;
 import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Settings;
-import org.testar.settingsdialog.SettingsPanel;
+import org.testar.settings.Settings;
 
 import javax.swing.*;
 

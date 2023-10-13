@@ -28,7 +28,7 @@
 *******************************************************************************************************/
 
 
-package org.testar.settingsdialog.dialog;
+package org.testar.settings.dialog;
 
 import org.testar.CodingManager;
 import org.testar.StateManagementTags;
@@ -40,8 +40,7 @@ import com.orientechnologies.orient.core.exception.ODatabaseException;
 import com.orientechnologies.orient.core.exception.OSecurityAccessException;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Settings;
-import org.testar.settingsdialog.SettingsPanel;
+import org.testar.settings.Settings;
 
 import javax.swing.*;
 import java.awt.*;

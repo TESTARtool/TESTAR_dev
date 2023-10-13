@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2023 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,33 +28,36 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.settingsdialog;
+package org.testar.settings.dialog;
 
-import org.testar.monkey.Settings;
+import org.testar.monkey.ConfigTags;
+import org.testar.settings.Settings;
 
 import javax.swing.*;
 
-/**
- * Abstract class for all common functionality for a SettingsPanel.
- */
-public abstract class SettingsPanel extends JPanel {
-    /**
-     * Populate the fields from Settings structure.
-     *
-     * @param settings The settings to load.
-     */
-    public abstract void populateFrom(final Settings settings);
+public class AdvancedPanel extends SettingsPanel {
 
-    /**
-     * Retrieve information from the GUI.
-     *
-     * @param settings reference to the object where the settings will be stored.
-     */
-    public abstract void extractInformation(final Settings settings);
+	private JCheckBox keyBoardListenCheck;
 
-    /**
-     * Validate that the settings are valid.
-     */
-    public void checkSettings() {
-    }
+	public AdvancedPanel() {
+		setLayout(null);
+
+		keyBoardListenCheck = new JCheckBox("Listen to Keyboard shortcuts");
+		keyBoardListenCheck.setBounds(10, 12, 192, 21);
+		add(keyBoardListenCheck);
+	}
+
+	public void populateFrom(final Settings settings) {
+		keyBoardListenCheck.setSelected(settings.get(ConfigTags.KeyBoardListener));
+	}
+
+	/**
+	 * Retrieve information from the Advanced GUI.
+	 * @param settings reference to the object where the settings will be stored.
+	 */
+	@Override
+	public void extractInformation(final Settings settings) {
+		settings.set(ConfigTags.KeyBoardListener, keyBoardListenCheck.isSelected());
+	}
+
 }

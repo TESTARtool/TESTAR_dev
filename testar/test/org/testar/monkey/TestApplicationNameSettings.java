@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.junit.Test;
+import org.testar.settings.Settings;
 
 public class TestApplicationNameSettings {
 
