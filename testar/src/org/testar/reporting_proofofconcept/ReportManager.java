@@ -16,20 +16,14 @@ public class ReportManager implements Reporting
     
     private boolean firstStateAdded = false;
     private boolean firstActionsAdded = false;
-    private static final String REPORT_FILENAME_MID = "_sequence_";
-    private static String       fileName;
-    
-//    private int innerLoopCounter = 0;
     
     public ReportManager(boolean replay, boolean html, boolean plainText)
     {
         //TODO put filename into settings, name with sequence number
         // creating a new file for the report
-        fileName = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString + "_"
-        + OutputStructure.executedSUTname + REPORT_FILENAME_MID + OutputStructure.sequenceInnerLoopCount + "_poc";
-//            + REPORT_FILENAME_AFT; // <- file extension is taken care of by individual reporters
-//        fileName = "C:\\Users\\testar\\Desktop\\TESTAR_dev" + File.separator + "poc_" + OutputStructure.startInnerLoopDateString + "_"
-//        + OutputStructure.executedSUTname + REPORT_FILENAME_MID + OutputStructure.sequenceInnerLoopCount;
+        String fileName =
+                OutputStructure.htmlOutputDir + "/" + OutputStructure.startInnerLoopDateString + "_"
+                + OutputStructure.executedSUTname + "_sequence_" + OutputStructure.sequenceInnerLoopCount + "_poc"; //no File.separator
         
         if(html)
             htmlReporter = new HTMLreporter(fileName, replay);
@@ -38,10 +32,10 @@ public class ReportManager implements Reporting
 //            plainTextReporter = new PlainTextReporter(filename, replay);
     }
     
-    public void generateReport()
+    public void finishReport()
     {
         if(htmlReporter != null)
-            htmlReporter.generateReport();
+            htmlReporter.finishReport();
         
 //        if(plainTextReporter != null)
 //            plainTextReporter.generateReport();
@@ -73,13 +67,11 @@ public class ReportManager implements Reporting
             if(htmlReporter != null)
                 htmlReporter.addState(state);
         }
-//        innerLoopCounter++;
     }
     
     
     public void addActions(Set<Action> actions)
     {
-//        if(!firstActionsAdded)
         firstActionsAdded = true;
     
         if(htmlReporter != null)
@@ -88,7 +80,6 @@ public class ReportManager implements Reporting
     
     public void addActionsAndUnvisitedActions(Set<Action> actions, Set<String> concreteIdsOfUnvisitedActions)
     {
-//        if(!firstActionsAdded)
         firstActionsAdded = true;
     
         if(htmlReporter != null)

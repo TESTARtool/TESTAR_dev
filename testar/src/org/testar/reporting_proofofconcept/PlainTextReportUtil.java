@@ -3,7 +3,6 @@ package org.testar.reporting_proofofconcept;
 import org.apache.commons.lang.StringUtils;
 import org.testar.monkey.Assert;
 
-import java.io.File;
 import java.util.Collections;
 
 public class PlainTextReportUtil extends BaseReportUtil
@@ -18,19 +17,18 @@ public class PlainTextReportUtil extends BaseReportUtil
     {
         Assert.isTrue(level >= 1 && level <= 6, "Invalid heading level: must be between 1 and 6");
         Assert.notNull(text);
-        content.add(StringUtils.repeat("#", level)); //repeat # char
-        content.add(text);
+        content.add(StringUtils.repeat("#", level) + text); //repeat # char
     }
 
     public void addParagraph(String text)
     {
         Assert.notNull(text);
-        addLineBreak();
+        addEmptyLine();
         Collections.addAll(content, splitStringAtNewline(text));
-        addLineBreak();
+        addEmptyLine();
     }
 
-    public void addLineBreak()
+    public void addEmptyLine()
     {
         content.add("");
     }

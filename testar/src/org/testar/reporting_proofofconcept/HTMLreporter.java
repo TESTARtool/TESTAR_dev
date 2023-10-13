@@ -8,7 +8,6 @@ import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -16,11 +15,10 @@ import java.util.StringJoiner;
 public class HTMLreporter implements Reporting
 {
     private HTMLreportUtil htmlReportUtil;
-    
-//    private static final String REPORT_FILENAME_MID = "_sequence_";
-    private static String       FINAL_VERDICT_FILENAME = "OK";
     private int innerLoopCounter = 0;
-//    private static String       fileName;
+    
+    private String openBlockContainer = "<div class='block' style='display:flex;flex-direction:column'>";
+    private String closeBlockContainer = "</div>";
     
     public HTMLreporter(String fileName, boolean replay) //replay or record mode
     {
@@ -33,14 +31,13 @@ public class HTMLreporter implements Reporting
     
     private void startReport()
     {
-        htmlReportUtil.addHeader();
         StringJoiner joiner = new StringJoiner("\n");
         joiner.add("function reverse(){");
         joiner.add("let direction = document.getElementById('main').style.flexDirection;");
         joiner.add("if(direction === 'column') document.getElementById('main').style.flexDirection = " + "'column-reverse';");
         joiner.add("else document.getElementById('main').style.flexDirection = 'column';}");
-        htmlReportUtil.addScript(joiner.toString());
-        htmlReportUtil.addTitle("TESTAR execution sequence report", true);
+        
+        htmlReportUtil.addHeader("TESTAR execution sequence report", joiner.toString());
     }
     
     private void addReplayHeading()
@@ -68,14 +65,15 @@ public class HTMLreporter implements Reporting
             String replaceString = imagePath.substring(indexStart,indexScrn);
             imagePath = imagePath.replace(replaceString,"../");
         }
-        htmlReportUtil.addContent("<div id='block' style='display:flex;flex-direction:column'>"); // Open state block container
+        htmlReportUtil.addContent(openBlockContainer); // Open state block container
         htmlReportUtil.addHeading(2, "State " + innerLoopCounter);
         htmlReportUtil.addHeading(4, "ConcreteIDCustom="+state.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable"));
         htmlReportUtil.addHeading(4, "AbstractIDCustom="+state.get(Tags.AbstractIDCustom, "NoAbstractIdCustomAvailable"));
         htmlReportUtil.addParagraph("<img src=\""+imagePath+"\">");
-        htmlReportUtil.addContent("</div>"); // Close state block container
+        htmlReportUtil.addContent(closeBlockContainer); // Close state block container
         
         innerLoopCounter++;
+        htmlReportUtil.writeToFile();
     }
     
     
@@ -100,7 +98,7 @@ public class HTMLreporter implements Reporting
     @Override
     public void addActions(Set<Action> actions)
     {
-        htmlReportUtil.addContent("<div id='block' style='display:flex;flex-direction:column'>"); // Open derived actions block container
+        htmlReportUtil.addContent(openBlockContainer); // Open derived actions block container
         htmlReportUtil.addHeading(4, "Set of actions:");
     
         ArrayList<String> actionStrings = new ArrayList<>();
@@ -108,13 +106,15 @@ public class HTMLreporter implements Reporting
             actionStrings.add(getActionString(action));
         
         htmlReportUtil.addList(false, actionStrings);
-        htmlReportUtil.addContent("</div>"); // Close derived actions block container
+        htmlReportUtil.addContent(closeBlockContainer); // Close derived actions block container
+    
+        htmlReportUtil.writeToFile();
     }
     
     @Override
     public void addActionsAndUnvisitedActions(Set<Action> actions, Set<String> concreteIdsOfUnvisitedActions)
     {
-        htmlReportUtil.addContent("<div id='block' style='display:flex;flex-direction:column'>"); // Open derived actions block container
+        htmlReportUtil.addContent(openBlockContainer); // Open derived actions block container
         
         ArrayList<String> actionStrings = new ArrayList<>();
         if(actions.size()==concreteIdsOfUnvisitedActions.size())
@@ -142,7 +142,9 @@ public class HTMLreporter implements Reporting
             }
         }
         htmlReportUtil.addList(false, actionStrings);
-        htmlReportUtil.addContent("</div>"); // Close derived actions block container
+        htmlReportUtil.addContent(closeBlockContainer); // Close derived actions block container
+    
+        htmlReportUtil.writeToFile();
     }
     
     @Override
@@ -158,13 +160,13 @@ public class HTMLreporter implements Reporting
             screenshotDir = screenshotDir.replace(replaceString,"../");
         }
     
-        String actionPath = screenshotDir + File.separator
+        String actionPath = screenshotDir + "/"
                             + OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname
                             + "_sequence_" + OutputStructure.sequenceInnerLoopCount
-                            + File.separator + state.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable")
+                            + "/" + state.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable")
                             + "_" + action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable") + ".png";
     
-        htmlReportUtil.addContent("<div id='block' style='display:flex;flex-direction:column'>"); // Open executed action block container
+        htmlReportUtil.addContent(openBlockContainer); // Open executed action block container
         htmlReportUtil.addHeading(2, "Selected Action "+innerLoopCounter+" leading to State "+innerLoopCounter);
     
         String stateString = "ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable");
@@ -180,7 +182,9 @@ public class HTMLreporter implements Reporting
             actionPath = actionPath.replace("./output","..");
     
         htmlReportUtil.addParagraph("<img src=\""+actionPath+"\">");
-        htmlReportUtil.addContent("</div>"); // Close executed action block container
+        htmlReportUtil.addContent(closeBlockContainer); // Close executed action block container
+    
+        htmlReportUtil.writeToFile();
     }
     
     @Override
@@ -190,24 +194,21 @@ public class HTMLreporter implements Reporting
         if(verdict.severity() > Verdict.OK.severity())
             verdictInfo = verdictInfo.replace(Verdict.OK.info(), "");
     
-        htmlReportUtil.addContent("<div id='block' style='display:flex;flex-direction:column'>"); // Open verdict block container
+        htmlReportUtil.addContent(openBlockContainer); // Open verdict block container
         htmlReportUtil.addHeading(2, "Test verdict for this sequence: " + verdictInfo);
         htmlReportUtil.addHeading(4, "Severity: " + verdict.severity());
-        htmlReportUtil.addContent("</div>"); // Close verdict block container
-    
-        FINAL_VERDICT_FILENAME = verdict.verdictSeverityTitle();
+        htmlReportUtil.addContent(closeBlockContainer); // Close verdict block container
+        
+        htmlReportUtil.appendToFileName("_" + verdict.verdictSeverityTitle() + "_poc_");
+        htmlReportUtil.writeToFile();
     }
     
     @Override
-    public void generateReport()
+    public void finishReport()
     {
         htmlReportUtil.addContent("</div>"); // Close the main div container
         htmlReportUtil.addFooter();
-        //rename file before writing report
-        String fileName = htmlReportUtil.getFileName();
-        String htmlFilenameVerdict = fileName.replace(".html", "_" + FINAL_VERDICT_FILENAME + "_poc_" + ".html");
-        htmlReportUtil.renameFile(htmlFilenameVerdict);
     
-        htmlReportUtil.writeReport();
+        htmlReportUtil.writeToFile();
     }
 }

@@ -1,6 +1,5 @@
 package org.testar.reporting_proofofconcept;
 
-import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -82,6 +81,8 @@ public class CSVreportUtil extends BaseReportUtil
             joiner.add(fields.get(i).getValue());
         content.add(joiner.toString());
         resetValues();
+        
+        writeToFile();
     }
 
     private class Field

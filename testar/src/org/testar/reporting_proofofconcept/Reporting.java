@@ -44,5 +44,5 @@ public interface Reporting
     public void addActionsAndUnvisitedActions(Set<Action> actions, Set<String> concreteIdsOfUnvisitedActions);
     public void addSelectedAction(State state, Action action);
     public void addTestVerdict(Verdict verdict);
-    public void generateReport();
+    public void finishReport();
 }

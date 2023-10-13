@@ -2,8 +2,8 @@ package org.testar.reporting_proofofconcept;
 
 import org.testar.monkey.Assert;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class HTMLreportUtil extends BaseReportUtil
 {
@@ -14,69 +14,69 @@ public class HTMLreportUtil extends BaseReportUtil
     
     public void addContent(String text)
     {
+        if(text.contains("\n"))     Collections.addAll(content, splitStringAtNewline(text));
+        else                        content.add(text);
+    }
+    
+    public void addContent(String text, String tag)
+    {
+        
         if(text.contains("\n"))
+        {
+            content.add("<" + tag + ">");
             Collections.addAll(content, splitStringAtNewline(text));
+            content.add("</" + tag + ">");
+        }
         else
-            content.add(text);
+            content.add("<"+tag+">"+text+"</"+tag+">");
     }
     
-    public void addHeader()
+    public void addHeader(String title)
     {
-        addContent("<!DOCTYPE html>");
-        addContent("<html>");
+        addHeader(title, "");
     }
     
-    public void addTitle(String text, boolean inclHeadTags)
+    public void addHeader(String title, String script)
     {
-        Assert.notNull(text);
-        if(inclHeadTags)
-            addContent("<head>");
-        addContent("<title>");
-        addContent(text); //Accessibility Evaluation Report
-        addContent("</title>");
-        if(inclHeadTags)
-            addContent("</head>");
-    }
+        Assert.notNull(script);
+        Assert.notNull(title);
     
-    public void addScript(String text)
-    {
-        Assert.notNull(text);
-        addContent("<script>");
-        addContent(text);
-        addContent("</script>");
-    }
-    
-    public void addStartBody()
-    {
-        addContent("<body>");
+        content.add("<!DOCTYPE html>");
+        content.add("<html lang=\"en\">");
+        if(!script.equals(""))
+            addContent(script, "script");
+        content.add("<head>");
+        content.add("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>");
+        addContent(title, "title");
+        content.add("</head>");
+        content.add("<body>");
     }
     
     public void addFooter()
     {
-        addContent("</body>");
-        addContent("</html>");
+        content.add("</body>");
+        content.add("</html>");
     }
+    
     
     public void addHeading(int level, String text)
     {
         Assert.isTrue(level >= 1 && level <= 6, "Invalid HTML heading level");
         Assert.notNull(text);
-        addContent("<h" + level + ">" + text + "</h" + level + ">");
+        addContent(text, "h" + level);
     }
     
     public void addParagraph(String text) {
         Assert.notNull(text);
-        addContent("<p>");
-        addContent(text);
-        addContent("</p>");
+        addContent(text, "p");
     }
     
     public void addLineBreak()
     {
-        addContent("<br>");
+        content.add("<br>");
     }
     
-    public void addList(boolean ordered, ArrayList<String> items)
+    public void addList(boolean ordered, List<String> items)
     {
         if(ordered)
             content.add("<ol>");
@@ -84,7 +84,7 @@ public class HTMLreportUtil extends BaseReportUtil
             content.add("<ul>");
     
         for(String item : items)
-            content.add("<li>" + item + "</li>");
+            addContent(item,"li");
         
         if(ordered)
             content.add("</ol>");

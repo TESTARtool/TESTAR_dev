@@ -203,7 +203,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
                 + " " + status + " \"" + statusInfo + "\"" );
 
         htmlReport.close();
-        reportManager.generateReport();
+        reportManager.finishReport();
     }
 
     /**
