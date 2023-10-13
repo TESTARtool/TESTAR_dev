@@ -253,6 +253,9 @@ public class RecordMode {
 	//this is the record user action place
 	private Action mapUserEvent(DefaultProtocol protocol, State state){
 		if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
+//			EventFiringWebDriver eventFiringWebDriver = new EventFiringWebDriver(driver);
+//			WebDriverEventHandler webDriverEventHandler = new WebDriverEventHandler();
+//			eventFiringWebDriver.register(webDriverEventHandler);
 			Assert.notNull(protocol.userEvent);
 			if (protocol.userEvent[0] instanceof MouseButtons){ // mouse events
 				double x = ((Double) protocol.userEvent[1]).doubleValue();
