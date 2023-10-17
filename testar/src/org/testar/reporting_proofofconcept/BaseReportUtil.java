@@ -1,6 +1,7 @@
 package org.testar.reporting_proofofconcept;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -9,28 +10,27 @@ import java.util.ArrayList;
 
 public abstract class BaseReportUtil
 {
-    protected static final  String            CHARSET = "UTF-8";
     private                 File              file;
     protected               ArrayList<String> content = new ArrayList<>();
     private          final  String            FILE_SUFFIX; // lower case, includes period
-    
+
     protected BaseReportUtil(String fileString, String fileSuffix)
     {
         FILE_SUFFIX = (fileSuffix.toLowerCase().startsWith(".")) ? fileSuffix : "." + fileSuffix; //add period if not included
         this.file = new File(enforceFileSuffix(fileString));
         createFile();
     }
-    
+
     private String enforceFileSuffix(String fileName)
     {
         return fileName.toLowerCase().endsWith(FILE_SUFFIX) ? fileName : fileName + FILE_SUFFIX;
     }
-    
+
     protected String[] splitStringAtNewline(String longString)
     {
         return longString.split("\\r?\\n|\\r");
     }
-    
+
     private void createFile()
     {
         if (!file.exists())
@@ -50,32 +50,55 @@ public abstract class BaseReportUtil
             }
         }
     }
-    
-    public boolean appendToFileName(String appendToName)
+
+    public void appendToFileName(String appendToName)
     {
-        return file.renameTo(new File(enforceFileSuffix(file.getName().replace(".html", appendToName))));
+//        return file.renameTo(new File(enforceFileSuffix(file.getName().replace(".html", appendToName))));
+        try
+        {
+            Path oldFile = Paths.get(file.getAbsolutePath()); // get full name
+            Path directory = Paths.get(file.getParent()); //get directory
+            String newName = enforceFileSuffix(file.getName().replace(".html", appendToName));
+            Files.move(oldFile, oldFile.resolveSibling(newName));
+            file = new File(directory + File.separator + newName); //update the file path
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
-    
-    public boolean renameFile(String newName)
+
+    public void renameFile(String newName)
     {
-        return file.renameTo(new File(enforceFileSuffix(newName)));
+//        return file.renameTo(new File(enforceFileSuffix(newName)));
+        try
+        {
+            Path path = Paths.get(file.getAbsolutePath()); // get full name
+            Files.move(path, path.resolveSibling(enforceFileSuffix(newName)));
+            file = new File(path.getParent() + File.separator + newName); //update the file path
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
-    
+
     public void moveFile(String newDirectory)
     {
         try
         {
             Path newPath = Paths.get(newDirectory);
-            Path oldPath = Paths.get(file.getAbsolutePath());
+            Path oldPath = Paths.get(file.getAbsolutePath()); //full name
             String fileName = file.getName();
             Files.move(oldPath, newPath.resolveSibling(fileName));
+            file = new File(newPath + File.separator + file); //update the file path
         }
         catch(IOException e)
         {
             e.printStackTrace();
         }
     }
-    
+
     public void duplicateFile(String destinationPath)
     {
         try
@@ -92,18 +115,18 @@ public abstract class BaseReportUtil
             e.printStackTrace();
         }
     }
-    
+
     public void writeToFile()
     {
         if(!content.isEmpty())
         {
             try
             {
-                PrintWriter writer = new PrintWriter(file, CHARSET);
-        
+                PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file, true), StandardCharsets.UTF_8));
+
                 for(String str : content)
                     writer.println(str);
-        
+
                 writer.close();
                 content.clear(); //empty the queue
             }

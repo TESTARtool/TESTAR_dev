@@ -43,10 +43,10 @@ public class HTMLreportUtil extends BaseReportUtil
     
         content.add("<!DOCTYPE html>");
         content.add("<html lang=\"en\">");
+        content.add("<head>");
         if(!script.equals(""))
             addContent(script, "script");
-        content.add("<head>");
-        content.add("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>");
+        content.add("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
         addContent(title, "title");
         content.add("</head>");
         content.add("<body>");
