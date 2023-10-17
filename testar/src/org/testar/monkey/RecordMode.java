@@ -50,6 +50,7 @@ import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.devices.MouseButtons;
 import org.testar.monkey.alayer.exceptions.WidgetNotFoundException;
+import org.testar.monkey.alayer.webdriver.CanvasDimensions;
 import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
 import org.testar.monkey.alayer.webdriver.WebDriverEventHandler;
 import org.testar.plugin.NativeLinker;
@@ -258,11 +259,16 @@ public class RecordMode {
 //			eventFiringWebDriver.register(webDriverEventHandler);
 			Assert.notNull(protocol.userEvent);
 			if (protocol.userEvent[0] instanceof MouseButtons){ // mouse events
+				// Extract the x,y coordinates form the user input mouse event
 				double x = ((Double) protocol.userEvent[1]).doubleValue();
 				double y = ((Double) protocol.userEvent[2]).doubleValue();
-				Widget w = null;
+				// Because the widget web coordinates are inside the system host browser, 
+				// there is a mismatching browser-web deviation that must be calculated.
+				int browserHeightDeviation = CanvasDimensions.getCanvasY();
+				int browserWidthDeviation = CanvasDimensions.getCanvasX();
 				try {
-					w = Util.widgetFromPoint(state, x, y);
+					// Extract the widget from the point by subtracting the browser deviation
+					Widget w = Util.widgetFromPoint(state, x - browserWidthDeviation, y - browserHeightDeviation);
 					x = 0.5; y = 0.5;
 					if (protocol.userEvent[0] == MouseButtons.BUTTON1) // left click
 						return (new AnnotatingActionCompiler()).leftClickAt(w,x,y);
