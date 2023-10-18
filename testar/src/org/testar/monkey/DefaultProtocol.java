@@ -51,17 +51,21 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
 import org.testar.*;
+import org.testar.managers.NativeHookManager;
 import org.testar.reporting.Reporting;
 import org.testar.statemodel.StateModelManager;
 import org.testar.statemodel.StateModelManagerFactory;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.monkey.alayer.*;
@@ -85,8 +89,6 @@ import org.testar.plugin.OperatingSystems;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.serialisation.ScreenshotSerialiser;
 import org.testar.serialisation.TestSerialiser;
-import org.jnativehook.GlobalScreen;
-import org.jnativehook.NativeHookException;
 import org.openqa.selenium.SessionNotCreatedException;
 import org.testar.monkey.alayer.android.AndroidProtocolUtil;
 import org.testar.monkey.alayer.ios.IOSProtocolUtil;
@@ -330,9 +332,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			this.mode = Modes.Listening;
 		} 
 
-		//EventHandler is implemented in RuntimeControlsProtocol (super class):
-		eventHandler = initializeEventHandler();
-
 		builder = NativeLinker.getNativeStateBuilder(
 				settings.get(ConfigTags.TimeToFreeze),
 				settings.get(ConfigTags.AccessBridgeEnabled),
@@ -350,29 +349,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			stateModelManager = StateModelManagerFactory.getStateModelManager(settings);
 		}
 
-		try {
-			if (!GraphicsEnvironment.isHeadless()) {
-				LogSerialiser.log("Registering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
-				java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
-				logger.setLevel(Level.OFF);
-				logger.setUseParentHandlers(false);
+		//EventHandler is implemented in RuntimeControlsProtocol (super class):
+		eventHandler = initializeEventHandler();
 
-				if (GlobalScreen.isNativeHookRegistered()) {
-					GlobalScreen.unregisterNativeHook();
-				}
-				GlobalScreen.registerNativeHook();
-				GlobalScreen.addNativeKeyListener(eventHandler);
-				GlobalScreen.addNativeMouseListener(eventHandler);
-				GlobalScreen.addNativeMouseMotionListener(eventHandler);
-				LogSerialiser.log("Successfully registered keyboard and mouse hooks!\n", LogSerialiser.LogLevel.Debug);
-			}
+		//Initialize the JNativeHook library and register keyboard and mouse listeners
+		NativeHookManager.registerNativeHook(eventHandler);
 
-			LogSerialiser.log("'" + mode() + "' mode active.\n", LogSerialiser.LogLevel.Info);
-
-		} catch (NativeHookException e) {
-			LogSerialiser.log("Unable to install keyboard and mouse hooks!\n", LogSerialiser.LogLevel.Critical);
-			throw new RuntimeException("Unable to install keyboard and mouse hooks!", e);
-		}
+		LogSerialiser.log("'" + mode() + "' mode active.\n", LogSerialiser.LogLevel.Info);
 	}
 
 	/**
@@ -452,7 +435,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private void popupMessage(String message) {
 		if(settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
 			JFrame frame = new JFrame();
-			JOptionPane.showMessageDialog(frame, message);
+
+			JTextArea textArea = new JTextArea(message);
+			textArea.setWrapStyleWord(true);
+			textArea.setLineWrap(true);
+			textArea.setEditable(false);
+
+			JScrollPane scrollPane = new JScrollPane(textArea);
+			scrollPane.setPreferredSize(new java.awt.Dimension(400, 200));
+
+			JOptionPane.showMessageDialog(frame, scrollPane);
 		}
 	}
 
@@ -748,27 +740,34 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			throw new SystemStartException(ioe);
 		}
 		String sutConnectorType = settings().get(ConfigTags.SUTConnector);
+
+		// WindowsTitle, ProcessName, and CommandLine must have a SUTConnectorValue:
+		String connectorValue = settings().get(ConfigTags.SUTConnectorValue);
+		if(connectorValue == null || connectorValue.length() == 0) {
+			String msg = "It seems that the SUTConnectorValue setting is null or empty!\n"
+					+ "Please provide a valid value for the SUTConnector: " + sutConnectorType;
+			popupMessage(msg);
+			throw new SystemStartException(msg);
+		}
+
 		if (sutConnectorType.equals(Settings.SUT_CONNECTOR_WINDOW_TITLE)) {
-			WindowsWindowTitleSutConnector sutConnector = new WindowsWindowTitleSutConnector(settings().get(ConfigTags.SUTConnectorValue), 
+			SutConnectorWindowTitle sutConnector = new SutConnectorWindowTitle(settings().get(ConfigTags.SUTConnectorValue), 
 					Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), 
 					builder,
 					settings().get(ConfigTags.ForceForeground));
 			return sutConnector.startOrConnectSut();
 		}else if (sutConnectorType.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME)) {
-			WindowsProcessNameSutConnector sutConnector = new WindowsProcessNameSutConnector(settings().get(ConfigTags.SUTConnectorValue), 
+			SutConnectorProcessName sutConnector = new SutConnectorProcessName(settings().get(ConfigTags.SUTConnectorValue), 
 					Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0));
 			return sutConnector.startOrConnectSut();
 		}else{
-			// COMMANDLINE and WebDriver SUT CONNECTOR:
-			Assert.hasTextSetting(settings().get(ConfigTags.SUTConnectorValue), "SUTConnectorValue");
-
 			//Read the settings to know if user wants to start the process listener
 			if(settings.get(ConfigTags.ProcessListenerEnabled)) {
 				enabledProcessListener = processListener.enableProcessListeners(settings);
 			}
 
 			// for most windows applications and most jar files, this is where the SUT gets created!
-			WindowsCommandLineSutConnector sutConnector = new WindowsCommandLineSutConnector(settings.get(ConfigTags.SUTConnectorValue),
+			SutConnectorCommandLine sutConnector = new SutConnectorCommandLine(settings.get(ConfigTags.SUTConnectorValue),
 					enabledProcessListener, settings().get(ConfigTags.StartupTime)*1000, Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), builder, settings.get(ConfigTags.FlashFeedback));
 			//TODO startupTime and maxEngageTime seems to be the same, except one is double and the other is long?
 			return sutConnector.startOrConnectSut();
@@ -1150,24 +1149,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * method for closing the internal TESTAR test session
 	 */
 	private void closeTestarTestSession(){
-		//cleaning the variables started in initialize()
-		try {
-			if (!GraphicsEnvironment.isHeadless()) {
-				if (GlobalScreen.isNativeHookRegistered()) {
-					LogSerialiser.log("Unregistering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
-					GlobalScreen.removeNativeMouseMotionListener(eventHandler);
-					GlobalScreen.removeNativeMouseListener(eventHandler);
-					GlobalScreen.removeNativeKeyListener(eventHandler);
-					GlobalScreen.unregisterNativeHook();
-				}
-			}
-		} catch (NativeHookException e) {
-			e.printStackTrace();
-		} catch (NullPointerException e) {
-			// no ConfigTags
-			e.printStackTrace();
-		}
-
+		// Cleaning the JNativeHook native listeners started in initialize()
+		NativeHookManager.unregisterNativeListener(eventHandler);
 	}
 
 	@Override

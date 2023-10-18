@@ -42,7 +42,7 @@ import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.windows.WinApiException;
 import org.testar.plugin.NativeLinker;
 
-public class WindowsCommandLineSutConnector implements SutConnector {
+public class SutConnectorCommandLine implements SutConnector {
 
     private String SUTConnectorValue;
     private boolean processListenerEnabled;
@@ -53,7 +53,7 @@ public class WindowsCommandLineSutConnector implements SutConnector {
     private boolean flashFeedback;
     private static final Logger logger = LogManager.getLogger();
 
-    public WindowsCommandLineSutConnector(String SUTConnectorValue, boolean processListenerEnabled, double startupTime, long maxEngageTime, StateBuilder builder, boolean flashFeedback) {
+    public SutConnectorCommandLine(String SUTConnectorValue, boolean processListenerEnabled, double startupTime, long maxEngageTime, StateBuilder builder, boolean flashFeedback) {
         this.SUTConnectorValue = SUTConnectorValue;
         this.processListenerEnabled = processListenerEnabled;
         this.startupTime = startupTime;

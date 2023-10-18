@@ -38,6 +38,9 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 import org.testar.StateManagementTags;
@@ -236,7 +239,7 @@ public class Settings extends TaggableBase implements Serializable {
 			}
 		}
 
-		verifySettings();
+		verifySettings(this);
 	}
 
 	public String toString(){
@@ -575,10 +578,26 @@ public class Settings extends TaggableBase implements Serializable {
 
 	private String escapeBackslash(String string){ return string.replace("\\", "\\\\");	}
 
+	private static String getStringSeparator(Tag<?> tag) {
+		return tag.equals(ConfigTags.AbstractStateAttributes)
+				? "," : ";";
+	}
+
+	/**
+	 * Verify the settings provided by the user. 
+	 * 
+	 * @param settings
+	 */
+	private void verifySettings(Settings settings) {
+		verifyStateModelSettings();
+		verifyRegularExpressionSettings(settings);
+		escapeSpecialCharactersInFileWritingSettings(settings);
+	}
+
 	/**
 	 * This method will check if the provided settings for the concrete and abstract state models are valid.
 	 */
-	private void verifySettings() {
+	private void verifyStateModelSettings() {
 		// verify the concrete and abstract state settings
 		// the values provided should be valid state management tags
 		Set<String> allowedStateAttributes = StateManagementTags.getAllTags().stream().map(StateManagementTags::getSettingsStringFromTag).collect(Collectors.toSet());
@@ -599,8 +618,67 @@ public class Settings extends TaggableBase implements Serializable {
 		}
 	}
 
-	private static String getStringSeparator(Tag<?> tag) {
-		return tag.equals(ConfigTags.AbstractStateAttributes)
-				? "," : ";";
+	/**
+	 * Verify if filter and oracles regular expressions settings are valid. 
+	 * 
+	 * @param settings
+	 * @return
+	 */
+	private static void verifyRegularExpressionSettings(Settings settings) {
+		StringBuilder invalidExpressions = new StringBuilder();
+
+		List<Tag<String>> regularExpressionTags = Arrays.asList(
+				ConfigTags.ProcessesToKillDuringTest,
+				ConfigTags.ClickFilter,
+				ConfigTags.SuspiciousTags,
+				ConfigTags.SuspiciousProcessOutput,
+				ConfigTags.ProcessLogs,
+				ConfigTags.WebConsoleErrorPattern,
+				ConfigTags.WebConsoleWarningPattern
+				);
+
+		for(Tag<String> tag : regularExpressionTags) {
+			try {
+				Pattern.compile(settings.get(tag, ""));
+			} catch (PatternSyntaxException exception) {
+				invalidExpressions.append(System.getProperty("line.separator"));
+				invalidExpressions.append("Error! Your " + tag.name() + " setting is not a valid regular expression! " + settings.get(tag));
+			}
+		}
+
+		if(!invalidExpressions.toString().isEmpty()) {
+			invalidExpressions.append(System.getProperty("line.separator"));
+			invalidExpressions.append("Settings Initialization Error! An invalid regular expression was detected in the TESTAR settings.");
+			invalidExpressions.append(System.getProperty("line.separator"));
+			invalidExpressions.append("Settings Initialization Error! Please fix the expressions or remove all characters and start TESTAR again.");
+			invalidExpressions.append(System.getProperty("line.separator"));
+			throw new IllegalStateException(invalidExpressions.toString());
+		}
 	}
+
+	/**
+	 * Escape special characters in settings that are used to write directories or files. 
+	 * 
+	 * @param settings
+	 * @return
+	 */
+	private static void escapeSpecialCharactersInFileWritingSettings(Settings settings) {
+		List<Tag<String>> writeSystemTags = Arrays.asList(
+				ConfigTags.ApplicationName,
+				ConfigTags.ApplicationVersion
+				);
+
+		for(Tag<String> tag : writeSystemTags) {
+			Pattern p = Pattern.compile("[\\\\/?:*\"|><]");
+			Matcher m = p.matcher(settings.get(tag, ""));
+
+			if(m.find()) {
+				String value = settings.get(tag, "").replaceAll("[\\\\/?:*\"|><]", "_") + "_";
+				System.out.println(String.format("Info: Replacing %s special characters from %s to %s", 
+						tag.name(), settings.get(tag, ""), value));
+				settings.set(tag, value);
+			}
+		}
+	}
+
 }

@@ -213,10 +213,12 @@ public class OverlayVisualization extends JLayeredPane {
             this.node = node;
             Widget widget = (Widget)node.getUserObject();
             Rect bounds = widget.get(AndroidTags.AndroidBounds);
-            this.setBounds((int)((((double)overlay.width)/overlay.originalWidth)*bounds.x()),
-                    (int)((((double)overlay.height)/overlay.originalHeight)*bounds.y()),
-                    (int)((((double)overlay.width)/overlay.originalWidth)*bounds.width()),
-                    (int)((((double)overlay.height)/overlay.originalHeight)*bounds.height()));
+            // Reduce 1 pixel of the sides of the widget that we highlight with colors
+            // This will avoid opaque bounds to cover the state image
+            this.setBounds((int)((((double)overlay.width)/overlay.originalWidth)*bounds.x()) +1 ,
+                    (int)((((double)overlay.height)/overlay.originalHeight)*bounds.y()) +1 ,
+                    (int)((((double)overlay.width)/overlay.originalWidth)*bounds.width()) -1 ,
+                    (int)((((double)overlay.height)/overlay.originalHeight)*bounds.height()) -1);
 
             //this.setOpaque(true);
             this.setBackground(new Color(0, 0, 255, 0));

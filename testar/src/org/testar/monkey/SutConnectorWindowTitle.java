@@ -39,14 +39,14 @@ import org.testar.plugin.NativeLinker;
 
 import java.util.List;
 
-public class WindowsWindowTitleSutConnector implements SutConnector {
+public class SutConnectorWindowTitle implements SutConnector {
 
     private String windowTitle;
     private double maxEngangeTime;
     private StateBuilder builder;
     private boolean forceToForeground;
 
-    public WindowsWindowTitleSutConnector(String windowTitle, double maxEngangeTime, StateBuilder builder, boolean forceToForeground) {
+    public SutConnectorWindowTitle(String windowTitle, double maxEngangeTime, StateBuilder builder, boolean forceToForeground) {
         this.windowTitle = windowTitle;
         this.maxEngangeTime = maxEngangeTime;
         this.builder = builder;
@@ -55,7 +55,6 @@ public class WindowsWindowTitleSutConnector implements SutConnector {
 
     @Override
     public SUT startOrConnectSut() throws SystemStartException {
-        Assert.hasTextSetting(windowTitle, "SUTConnectorValue");
         List<SUT> suts = null;
         State state; Role role; String title;
         long now = System.currentTimeMillis();

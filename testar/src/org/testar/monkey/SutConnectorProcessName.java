@@ -37,19 +37,18 @@ import org.testar.plugin.NativeLinker;
 
 import java.util.List;
 
-public class WindowsProcessNameSutConnector implements SutConnector {
+public class SutConnectorProcessName implements SutConnector {
 
     private String processName;
     private double maxEngageTime;
 
-    public WindowsProcessNameSutConnector(String processName, double maxEngageTime) {
+    public SutConnectorProcessName(String processName, double maxEngageTime) {
         this.processName = processName;
         this.maxEngageTime = maxEngageTime;
     }
 
     @Override
     public SUT startOrConnectSut() throws SystemStartException {
-        Assert.hasTextSetting(processName, "SUTConnectorValue");
         List<SUT> suts = null;
         long now = System.currentTimeMillis();
         do{
