@@ -57,23 +57,43 @@ public class HTMLreporter implements Reporting
     @Override
     public void addState(State state)
     {
-        String imagePath = state.get(Tags.ScreenshotPath);
-        if(imagePath.contains("./output"))
-        {
-            int indexStart = imagePath.indexOf("./output");
-            int indexScrn = imagePath.indexOf("scrshots");
-            String replaceString = imagePath.substring(indexStart,indexScrn);
-            imagePath = imagePath.replace(replaceString,"../");
-        }
+//        String imagePath = state.get(Tags.ScreenshotPath);
+//        if(imagePath.contains("./output"))
+//        {
+//            int indexStart = imagePath.indexOf("./output");
+//            int indexScrn = imagePath.indexOf("scrshots");
+//            String replaceString = imagePath.substring(indexStart,indexScrn);
+//            imagePath = imagePath.replace(replaceString,"../");
+//        }
+//        imagePath = imagePath.replace("\\", "/"); // ensure forward slashes
+        String imagePath = prepareScreenshotImagePath(state.get(Tags.ScreenshotPath));
+        String concreteIDCustom = state.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable");
+        String abstractIDCustom = state.get(Tags.AbstractIDCustom, "NoAbstractIdCustomAvailable");
+
         htmlReportUtil.addContent(openBlockContainer); // Open state block container
         htmlReportUtil.addHeading(2, "State " + innerLoopCounter);
-        htmlReportUtil.addHeading(4, "ConcreteIDCustom="+state.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable"));
-        htmlReportUtil.addHeading(4, "AbstractIDCustom="+state.get(Tags.AbstractIDCustom, "NoAbstractIdCustomAvailable"));
-        htmlReportUtil.addParagraph("<img src=\""+imagePath+"\">");
+        htmlReportUtil.addHeading(4, "ConcreteIDCustom="+concreteIDCustom);
+        htmlReportUtil.addHeading(4, "AbstractIDCustom="+abstractIDCustom);
+
+        String altText = "screenshot: state=" + innerLoopCounter + ", ConcreteIDCustom="+concreteIDCustom+", AbstractIDCustom="+abstractIDCustom;
+        htmlReportUtil.addParagraph("<img src=\"" + imagePath + "\" alt=\"" + altText + "\">");
         htmlReportUtil.addContent(closeBlockContainer); // Close state block container
         
         innerLoopCounter++;
         htmlReportUtil.writeToFile();
+    }
+
+
+    private String prepareScreenshotImagePath(String path)
+    {
+        if(path.contains("./output"))
+        {
+            int indexStart = path.indexOf("./output");
+            int indexScrn = path.indexOf("scrshots");
+            String replaceString = path.substring(indexStart,indexScrn);
+            path = path.replace(replaceString,"../");
+        }
+        return path.replace("\\", "/"); // ensure forward slashes
     }
     
     
@@ -150,21 +170,25 @@ public class HTMLreporter implements Reporting
     @Override
     public void addSelectedAction(State state, Action action)
     {
-        String screenshotDir = OutputStructure.screenshotsOutputDir;
-    
-        if(screenshotDir.contains("./output"))
-        {
-            int indexStart = screenshotDir.indexOf("./output");
-            int indexScrn = screenshotDir.indexOf("scrshots");
-            String replaceString = screenshotDir.substring(indexStart,indexScrn);
-            screenshotDir = screenshotDir.replace(replaceString,"../");
-        }
+        String screenshotDir = prepareScreenshotImagePath(OutputStructure.screenshotsOutputDir);
+        String stateConcreteIDCustom = state.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable");
+        String stateAbstractIDCustom = state.get(Tags.AbstractIDCustom, "NoAbstractIdCustomAvailable");
+
+//        String screenshotDir = OutputStructure.screenshotsOutputDir;
+//
+//        if(screenshotDir.contains("./output"))
+//        {
+//            int indexStart = screenshotDir.indexOf("./output");
+//            int indexScrn = screenshotDir.indexOf("scrshots");
+//            String replaceString = screenshotDir.substring(indexStart,indexScrn);
+//            screenshotDir = screenshotDir.replace(replaceString,"../");
+//        }
     
         String actionPath = screenshotDir + "/"
                             + OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname
                             + "_sequence_" + OutputStructure.sequenceInnerLoopCount
-                            + "/" + state.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable")
-                            + "_" + action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable") + ".png";
+                            + "/" + stateConcreteIDCustom
+                            + "_" + stateAbstractIDCustom + ".png";
     
         htmlReportUtil.addContent(openBlockContainer); // Open executed action block container
         htmlReportUtil.addHeading(2, "Selected Action "+innerLoopCounter+" leading to State "+innerLoopCounter);
@@ -180,8 +204,12 @@ public class HTMLreporter implements Reporting
     
         if(actionPath.contains("./output"))
             actionPath = actionPath.replace("./output","..");
+
+        actionPath = actionPath.replace("\\", "/");
+
+        String altText = "screenshot: action, ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable");
     
-        htmlReportUtil.addParagraph("<img src=\""+actionPath+"\">");
+        htmlReportUtil.addParagraph("<img src=\""+actionPath+"\" alt=\"" + altText + "\">");
         htmlReportUtil.addContent(closeBlockContainer); // Close executed action block container
     
         htmlReportUtil.writeToFile();
