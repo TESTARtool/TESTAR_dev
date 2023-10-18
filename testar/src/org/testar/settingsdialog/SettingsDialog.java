@@ -81,6 +81,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private JButton btnReplay;
   private JButton btnView;
   private JButton btnModel;
+  private JButton btnListening;
   private StateModelPanel modelPanel;
   //private JButton btnRecord; // Record mode is disabled temporally
 
@@ -254,6 +255,7 @@ public class SettingsDialog extends JFrame implements Observer {
     btnReplay = getBtnReplay();
     btnView = getBtnView();
     btnModel = getBtnModel();
+    btnListening = getBtnListening();
     //btnRecord = getBtnRecord(); // Record mode is disabled temporally
 
     jTabsPane = new JTabbedPane();
@@ -318,6 +320,7 @@ public class SettingsDialog extends JFrame implements Observer {
                             .addComponent(btnReplay, PREFERRED_SIZE, 129, PREFERRED_SIZE)
                             .addComponent(btnView, PREFERRED_SIZE, 129, PREFERRED_SIZE)
                             .addComponent(btnModel, PREFERRED_SIZE, 129, PREFERRED_SIZE)
+                            .addComponent(btnListening, PREFERRED_SIZE, 129, PREFERRED_SIZE)
                             //.addComponent(btnRecord, PREFERRED_SIZE, 129, PREFERRED_SIZE) // Record mode is disabled temporally
                     )
                 .addPreferredGap(RELATED)
@@ -340,6 +343,8 @@ public class SettingsDialog extends JFrame implements Observer {
     group.addComponent(btnView, 120, 120, 120);
     group.addGap(2, 2, 2);
     group.addComponent(btnModel, 120, 120, 120);
+    group.addGap(2, 2, 2);
+    group.addComponent(btnListening, 120, 120, 120);
 
     return group;
   }
@@ -429,6 +434,19 @@ public class SettingsDialog extends JFrame implements Observer {
   private void btnModelActionPerformed(ActionEvent evt) {
 	  jTabsPane.setSelectedIndex(MODEL_TAB_INDEX);
 	  modelPanel.openServer();
+  }
+
+  private JButton getBtnListening() throws IOException {
+	  JButton btn = new JButton();
+	  btn.setBackground(new Color(255, 255, 255));
+	  btn.setIcon(new ImageIcon(loadIcon("/icons/button_listening.png")));
+	  btn.setFocusPainted(false);
+	  btn.addActionListener(this::btnListeningActionPerformed);
+	  return btn;
+  }
+
+  private void btnListeningActionPerformed(ActionEvent evt) {
+	  start(RuntimeControlsProtocol.Modes.Listening);
   }
 
 // Record mode is disabled temporally

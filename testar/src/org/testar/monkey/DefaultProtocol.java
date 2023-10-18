@@ -327,10 +327,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		startTime = Util.time();
 		this.settings = settings;
 		mode = settings.get(ConfigTags.Mode);
-		if (settings.get(ConfigTags.ListeningMode, false)) {
-			System.out.println("Running TESTAR in Listening mode...");
-			this.mode = Modes.Listening;
-		} 
 
 		builder = NativeLinker.getNativeStateBuilder(
 				settings.get(ConfigTags.TimeToFreeze),

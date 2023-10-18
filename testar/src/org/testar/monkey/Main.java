@@ -564,7 +564,6 @@ public class Main {
 			defaults.add(Pair.from(FollowLinks, true));
 			defaults.add(Pair.from(BrowserFullScreen, true));
 			defaults.add(Pair.from(SwitchNewTabs, true));
-			defaults.add(Pair.from(ListeningMode, false));
 
 			/*
 			//TODO web driver settings for login feature

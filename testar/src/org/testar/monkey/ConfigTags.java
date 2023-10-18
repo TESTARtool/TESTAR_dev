@@ -306,7 +306,4 @@ public final class ConfigTags {
 	public static final Tag<Pair<String, String>> Username = Tag.from("Username", (Class<Pair<String, String>>) (Class<?>) Pair.class);
 	public static final Tag<Pair<String, String>> Password = Tag.from("Password", (Class<Pair<String, String>>) (Class<?>) Pair.class);
 	 */
-
-	public static final Tag<Boolean> ListeningMode = Tag.from("ListeningMode", Boolean.class, 
-			"Enable TESTAR in Listening mode to save actions in the State Model");
 }

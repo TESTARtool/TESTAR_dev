@@ -54,6 +54,8 @@ import org.testar.monkey.alayer.actions.UnknownEventAction;
 import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.devices.MouseButtons;
 import org.testar.monkey.alayer.exceptions.WidgetNotFoundException;
+import org.testar.monkey.alayer.webdriver.CanvasDimensions;
+
 import com.google.common.collect.Sets;
 
 public class ListeningMode {
@@ -65,6 +67,8 @@ public class ListeningMode {
 	 * @param system
 	 */
 	public void runListeningLoop(DefaultProtocol protocol) {
+		System.out.println("Running TESTAR in Listening mode... runListeningLoop");
+
 		// Prepare the output folders structure
 		synchronized(this){
 			OutputStructure.calculateInnerLoopDateString();
@@ -268,11 +272,16 @@ public class ListeningMode {
 	private Action mapUserEvent(DefaultProtocol protocol, SUT system, State state){
 		Assert.notNull(protocol.userEvent);
 		if (protocol.userEvent[0] instanceof MouseButtons){ // mouse events
+			// Extract the x,y coordinates form the user input mouse event
 			double x = ((Double) protocol.userEvent[1]).doubleValue();
 			double y = ((Double) protocol.userEvent[2]).doubleValue();
-			Widget w = null;
+			// Because the widget web coordinates are inside the system host browser, 
+			// there is a mismatching browser-web deviation that must be calculated.
+			int browserHeightDeviation = CanvasDimensions.getCanvasY();
+			int browserWidthDeviation = CanvasDimensions.getCanvasX();
 			try {
-				w = Util.widgetFromPoint(state, x, y);
+				// Extract the widget from the point by subtracting the browser deviation
+				Widget w = Util.widgetFromPoint(state, x - browserWidthDeviation, y - browserHeightDeviation);
 				x = 0.5; y = 0.5;
 				if (protocol.userEvent[0] == MouseButtons.BUTTON1) // left click
 					return (new AnnotatingActionCompiler()).leftClickAt(w,x,y);

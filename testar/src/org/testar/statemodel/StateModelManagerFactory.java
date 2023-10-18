@@ -11,6 +11,7 @@ import org.testar.statemodel.sequence.SequenceManager;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Settings;
+import org.testar.monkey.RuntimeControlsProtocol.Modes;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -55,7 +56,8 @@ public class StateModelManagerFactory {
         eventListeners.add((StateModelEventListener) persistenceManager);
         SequenceManager sequenceManager = new SequenceManager(eventListeners, modelIdentifier);
 
-        if(settings.get(ConfigTags.ListeningMode, false)) {
+        if(settings.get(ConfigTags.Mode) == Modes.Listening) {
+        	System.out.println("TESTAR State Model enabled with Listening mode... AbstractStateModelListener");
 
         	// create the abstract state model and then the state model manager
         	AbstractStateModelListener abstractStateModelListener = new AbstractStateModelListener(modelIdentifier,
