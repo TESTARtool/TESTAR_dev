@@ -17,8 +17,8 @@ public class HTMLreporter implements Reporting
     private HTMLreportUtil htmlReportUtil;
     private int innerLoopCounter = 0;
     
-    private String openBlockContainer = "<div class='block' style='display:flex;flex-direction:column'>";
-    private String closeBlockContainer = "</div>";
+    private final String openBlockContainer = "<div class='block' style='display:flex;flex-direction:column'>";
+    private final String closeBlockContainer = "</div>";
     
     public HTMLreporter(String fileName, boolean replay) //replay or record mode
     {
@@ -57,15 +57,6 @@ public class HTMLreporter implements Reporting
     @Override
     public void addState(State state)
     {
-//        String imagePath = state.get(Tags.ScreenshotPath);
-//        if(imagePath.contains("./output"))
-//        {
-//            int indexStart = imagePath.indexOf("./output");
-//            int indexScrn = imagePath.indexOf("scrshots");
-//            String replaceString = imagePath.substring(indexStart,indexScrn);
-//            imagePath = imagePath.replace(replaceString,"../");
-//        }
-//        imagePath = imagePath.replace("\\", "/"); // ensure forward slashes
         String imagePath = prepareScreenshotImagePath(state.get(Tags.ScreenshotPath));
         String concreteIDCustom = state.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable");
         String abstractIDCustom = state.get(Tags.AbstractIDCustom, "NoAbstractIdCustomAvailable");
@@ -172,28 +163,18 @@ public class HTMLreporter implements Reporting
     {
         String screenshotDir = prepareScreenshotImagePath(OutputStructure.screenshotsOutputDir);
         String stateConcreteIDCustom = state.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable");
-        String stateAbstractIDCustom = state.get(Tags.AbstractIDCustom, "NoAbstractIdCustomAvailable");
+        String actionConcreteIDCustom = action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable");
 
-//        String screenshotDir = OutputStructure.screenshotsOutputDir;
-//
-//        if(screenshotDir.contains("./output"))
-//        {
-//            int indexStart = screenshotDir.indexOf("./output");
-//            int indexScrn = screenshotDir.indexOf("scrshots");
-//            String replaceString = screenshotDir.substring(indexStart,indexScrn);
-//            screenshotDir = screenshotDir.replace(replaceString,"../");
-//        }
-    
         String actionPath = screenshotDir + "/"
                             + OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname
                             + "_sequence_" + OutputStructure.sequenceInnerLoopCount
                             + "/" + stateConcreteIDCustom
-                            + "_" + stateAbstractIDCustom + ".png";
+                            + "_" + actionConcreteIDCustom + ".png";
     
         htmlReportUtil.addContent(openBlockContainer); // Open executed action block container
         htmlReportUtil.addHeading(2, "Selected Action "+innerLoopCounter+" leading to State "+innerLoopCounter);
     
-        String stateString = "ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable");
+        String stateString = "ConcreteIDCustom="+actionConcreteIDCustom;
         if(action.get(Tags.Desc) != null)
         {
             String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
@@ -207,7 +188,7 @@ public class HTMLreporter implements Reporting
 
         actionPath = actionPath.replace("\\", "/");
 
-        String altText = "screenshot: action, ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable");
+        String altText = "screenshot: action, ConcreteIDCustom="+actionConcreteIDCustom;
     
         htmlReportUtil.addParagraph("<img src=\""+actionPath+"\" alt=\"" + altText + "\">");
         htmlReportUtil.addContent(closeBlockContainer); // Close executed action block container
