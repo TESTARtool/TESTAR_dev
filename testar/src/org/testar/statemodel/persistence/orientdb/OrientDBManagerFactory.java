@@ -7,7 +7,7 @@ import org.testar.statemodel.persistence.PersistenceManagerFactory;
 import org.testar.statemodel.persistence.QueueManager;
 import org.testar.statemodel.util.EventHelper;
 import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Settings;
+import org.testar.settings.Settings;
 
 public class OrientDBManagerFactory implements PersistenceManagerFactory {
 

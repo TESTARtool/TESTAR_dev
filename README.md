@@ -17,7 +17,8 @@ It should be possible to build the project using the instructions provided in th
 `gradlew` is the instruction to use the gradle wrapper. 
 
 TESTAR will download the wrapper dependencies in the system and will use it to compile.  
-The gradle wrapper version indicated inside `TESTAR_dev\gradle\wrapper\gradle-wrapper.properties`
+The gradle wrapper version indicated inside `TESTAR_dev\gradle\wrapper\gradle-wrapper.properties`  
+Check the [Gradle Compatibility Matrix](https://docs.gradle.org/current/userguide/compatibility.html)  
 
 #### gradlew build (Files Compilation)
 `gradlew build` task : is configured to compile TESTAR project at Java level for error and warning checking.  
@@ -176,15 +177,41 @@ https://hub.docker.com/u/testartool
 
 https://hub.docker.com/r/testartool/testar-chromedriver
 
+## Supported Operative Systems
+If you encounter any errors, please create an issue and provide details about your operating system, Java, and TESTAR version.  
+
+### Windows (For Desktop and Web systems under test)
+
+- Windows 10 x64 is the operating system with the most active support due to being the one used by the project developers. 
+- Windows 11, Server 2016, Server 2019, and Server 2022 are also recommended because they are compatible with the Windows API. 
+- Windows 7 and Server 2012, are not officially maintained. You can find an old development version in [master_windows7](https://github.com/TESTARtool/TESTAR_dev/tree/master_windows7). 
+
+### Ubuntu (For Web systems under test)
+
+- Ubuntu 20 and 22 LTS are operating system versions that have been used to run the chromedriver package of TESTAR for testing web applications.  
+``NOTE:`` It is important to use an environment with Graphical User Interface or to install and enable the Xvfb (X virtual framebuffer) server.  
+
+### macOS (For Web systems under test)
+
+- macOS Monterey (version 12) operating system is used in the GitHub Action to run the chromedriver package of TESTAR for testing web applications.  
+``NOTE:`` The host architecture of tested macOS Monterey is an AMD64. The ARM architecture may require at least different software components, such as seleniarm docker images and chromedriver arm versions.   
+
+### Android
+
+It is possible to prepare an Emulator, Docker container, or Virtual Machine that contains Android to test mobile applications. [Regardless of the TESTAR host machine, it is necessary to connect to a local or remote Appium service for testing mobile applications](https://github.com/TESTARtool/TESTAR_dev/wiki/TESTAR-and-Appium-for-Mobile-Systems).  
+
+## Supported Java SE versions
+
+TESTAR needs Java Standard Edition (SE) to run and we support the Java SE Long-Term Support (LTS) versions that are currently under Oracle Extended Support  ( https://www.oracle.com/java/technologies/java-se-support-roadmap.html ) . Other versions might work.  
+
+- Java 8 support has been maintained up until TESTAR v2.6.6. From this point forward, it is important to note that future updates may introduce incompatibility issues with Java 8 due to potential changes in libraries.  
+- Starting from TESTAR v2.6.7, we offer official support for Java 11, 17, and 21, which are the last three LTS versions. If you encounter any errors, please create an issue and provide details about your operating system, Java, and TESTAR version.  
+
 ## Increase Java memory
 https://github.com/TESTARtool/TESTAR_dev/wiki/Development:-Increase-Java-memory
 
 ## Known issues
 https://github.com/TESTARtool/TESTAR_dev/issues
-
-## Supported Java SE versions
-
-Testar needs Java Standard Edition (SE) to run and we support the Java SE LTS versions that are currently under Oracle Extended Support  ( https://www.oracle.com/java/technologies/java-se-support-roadmap.html ) . Other versions might work.
 
 ## Release notes
 https://github.com/TESTARtool/TESTAR_dev/wiki/TESTAR-release-notes

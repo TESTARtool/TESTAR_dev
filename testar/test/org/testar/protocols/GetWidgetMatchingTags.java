@@ -33,7 +33,6 @@ package org.testar.protocols;
 import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.monkey.alayer.windows.UIATags;

@@ -75,6 +75,7 @@ import org.testar.monkey.alayer.windows.Windows;
 import org.testar.plugin.NativeLinker;
 import org.testar.OutputStructure;
 import org.testar.serialisation.LogSerialiser;
+import org.testar.settings.Settings;
 import org.testar.reporting.Reporting;
 
 public class WebdriverProtocol extends GenericUtilsProtocol {

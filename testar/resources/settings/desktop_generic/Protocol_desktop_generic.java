@@ -34,7 +34,6 @@ import java.util.Set;
 import org.testar.DerivedActions;
 import org.testar.SutVisualization;
 import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Settings;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
@@ -44,6 +43,7 @@ import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.protocols.DesktopProtocol;
 import org.testar.screenshotjson.JsonUtils;
+import org.testar.settings.Settings;
 
 /**
  * This protocol provides default TESTAR behaviour to test Windows desktop applications.

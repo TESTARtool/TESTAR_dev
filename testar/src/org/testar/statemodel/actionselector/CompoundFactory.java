@@ -1,7 +1,7 @@
 package org.testar.statemodel.actionselector;
 
 import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Settings;
+import org.testar.settings.Settings;
 
 import java.util.ArrayList;
 import java.util.List;
