@@ -53,7 +53,6 @@ public abstract class BaseReportUtil
 
     public void appendToFileName(String appendToName)
     {
-//        return file.renameTo(new File(enforceFileSuffix(file.getName().replace(".html", appendToName))));
         try
         {
             Path oldFile = Paths.get(file.getAbsolutePath()); // get full name
@@ -70,7 +69,6 @@ public abstract class BaseReportUtil
 
     public void renameFile(String newName)
     {
-//        return file.renameTo(new File(enforceFileSuffix(newName)));
         try
         {
             Path path = Paths.get(file.getAbsolutePath()); // get full name
