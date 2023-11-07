@@ -82,7 +82,7 @@ public final class CompoundAction extends TaggableBase implements Action {
 
 		public CompoundAction build(Widget originWidget){
 		    CompoundAction compoundAction = build();
-		    compoundAction.set(Tags.OriginWidget, originWidget);
+		    compoundAction.mapActionToWidget(originWidget);
 		    return compoundAction;
 		}
 	}

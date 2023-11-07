@@ -26,6 +26,8 @@ public class TestEnvironmentActions extends DefaultProtocol {
 	private static WidgetStub widget;
 	private static StdActionCompiler ac = new AnnotatingActionCompiler();
 
+	private static String pathTest = "[0,0,1]";
+
 	@BeforeClass
 	public static void setup() {
 		// To avoid issues with java awt robot, we only execute this unit tests in windows environments.
@@ -42,7 +44,7 @@ public class TestEnvironmentActions extends DefaultProtocol {
 
 		widget.set(Tags.Shape, Rect.fromCoordinates(0, 0, 100, 100));
 		widget.set(Tags.Role, Roles.Button);
-		widget.set(Tags.Path, "[0,0,1]");
+		widget.set(Tags.Path, pathTest);
 
 		// Build widget and state identifiers
 		buildStateIdentifiers(state);
@@ -63,6 +65,10 @@ public class TestEnvironmentActions extends DefaultProtocol {
 		Assert.isTrue(actions.size() == 1);
 		Assert.isTrue(actions.iterator().next().getClass().getName().equals(ActivateSystem.class.getName()));
 		Assert.notNull(actions.iterator().next().get(Tags.OriginWidget));
+
+		Assert.notNull(state.get(Tags.ActionSet));
+		Assert.isTrue(state.get(Tags.ActionSet).size() == 1);
+		Assert.isTrue(state.get(Tags.ActionSet).iterator().next().getClass().getName().equals(ActivateSystem.class.getName()));
 
 		// Then build the action identifier
 		buildStateActionsIdentifiers(state, actions);
@@ -93,6 +99,11 @@ public class TestEnvironmentActions extends DefaultProtocol {
 		// We must have the leftClick and the ActivateSystem actions
 		Assert.isTrue(defaultActions.size() == 2);
 
+		// The state only must have the ActivateSystem action
+		Assert.notNull(state.get(Tags.ActionSet));
+		Assert.isTrue(state.get(Tags.ActionSet).size() == 1);
+		Assert.isTrue(state.get(Tags.ActionSet).iterator().next().getClass().getName().equals(ActivateSystem.class.getName()));
+
 		// Because there exists an ActivateSystem action
 		// preSelectAction must force to return it
 		Set<Action> preSelectedActions = preSelectAction(system, state, defaultActions);
@@ -113,6 +124,11 @@ public class TestEnvironmentActions extends DefaultProtocol {
 		// This method already builds the environment action identifier
 		Set<Action> preActions = preSelectAction(system, state, initialActions);
 		Assert.isTrue(preActions.size() == 1);
+
+		// The state only must have the ActivateSystem action
+		Assert.notNull(state.get(Tags.ActionSet));
+		Assert.isTrue(state.get(Tags.ActionSet).size() == 1);
+		Assert.isTrue(state.get(Tags.ActionSet).iterator().next().get(Tags.Desc, "").contains("Hit Key"));
 
 		// To check that Action identifiers were built
 		Assert.notNull(preActions.iterator().next().get(Tags.AbstractIDCustom));
