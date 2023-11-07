@@ -39,6 +39,8 @@ import org.testar.monkey.alayer.webdriver.enums.WdTags;
 
 /** Enables TESTAR to use special characters in input fields **/
 public class WdSecurityInjectionAction extends TaggableBase implements Action {
+    private static final long serialVersionUID = 754070773402916305L;
+
     private WebElement element;
     private String text;
 

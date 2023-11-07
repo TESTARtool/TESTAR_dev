@@ -239,10 +239,10 @@ public class ReplayMode {
 
 									Util.pause(actionDelay);
 
-									state = protocol.getState(system);
-
 									//Saving the actions and the executed action into replayable test sequence:
 									protocol.saveActionIntoFragmentForReplayableSequence(actionToReplay, state, actions);
+
+									state = protocol.getState(system);
 
 									protocol.setReplayVerdict(protocol.getVerdict(state));
 				}

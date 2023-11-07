@@ -91,7 +91,7 @@ public class WdElement extends TaggableBase implements Serializable {
   public long scrollLeft, scrollTop;
   private long borderWidth, borderHeight;
 
-  public RemoteWebElement remoteWebElement;   // Reference to the remote Web Element
+  public transient RemoteWebElement remoteWebElement; // Reference to the remote Web Element
 
   public transient Map<String, String> attributeMap;
 
@@ -101,8 +101,7 @@ public class WdElement extends TaggableBase implements Serializable {
   }
 
   @SuppressWarnings("unchecked")
-  public WdElement(Map<String, Object> packedElement,
-		  			WdRootElement root, WdElement parent) {
+  public WdElement(Map<String, Object> packedElement, WdRootElement root, WdElement parent) {
     this.root = root;
     this.parent = parent;
 
@@ -119,7 +118,7 @@ public class WdElement extends TaggableBase implements Serializable {
 
     id = attributeMap.getOrDefault("id", "");
     name = attributeMap.getOrDefault("name", "");
-    genericTitle = (String) packedElement.get("name");
+    genericTitle = (String) packedElement.getOrDefault("name", "");
     tagName = (String) packedElement.get("tagName");
     textContent = ((String) packedElement.get("textContent")).replaceAll("\\s+", " ").trim();
     title = attributeMap.getOrDefault("title","");
@@ -193,8 +192,7 @@ public class WdElement extends TaggableBase implements Serializable {
     oos.defaultWriteObject();
   }
 
-  private void readObject(ObjectInputStream ois)
-      throws IOException, ClassNotFoundException {
+  private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
     ois.defaultReadObject();
   }
   
