@@ -46,7 +46,7 @@ import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.DefaultProtocol;
-import org.testar.monkey.Settings;
+import org.testar.settings.Settings;
 import org.testar.monkey.RuntimeControlsProtocol.Modes;
 
 public class ProcessListener{

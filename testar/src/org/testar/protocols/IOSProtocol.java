@@ -36,7 +36,7 @@ import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Settings;
+import org.testar.settings.Settings;
 import org.testar.OutputStructure;
 import org.testar.monkey.alayer.ios.enums.IOSTags;
 

@@ -32,12 +32,12 @@ import java.util.Set;
 
 import org.testar.*;
 import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Settings;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.protocols.DesktopProtocol;
+import org.testar.settings.Settings;
 import org.testar.simplestategraph.GuiStateGraphWithVisitedActions;
 import org.testar.simplestategraph.QLearningActionSelector;
 

@@ -17,6 +17,7 @@ import org.testar.monkey.alayer.actions.ActivateSystem;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.windows.WinProcessActivator;
+import org.testar.settings.Settings;
 import org.testar.stub.StateStub;
 import org.testar.stub.WidgetStub;
 

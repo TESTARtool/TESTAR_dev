@@ -89,6 +89,7 @@ import org.testar.plugin.OperatingSystems;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.serialisation.ScreenshotSerialiser;
 import org.testar.serialisation.TestSerialiser;
+import org.testar.settings.Settings;
 import org.openqa.selenium.SessionNotCreatedException;
 import org.testar.monkey.alayer.android.AndroidProtocolUtil;
 import org.testar.monkey.alayer.ios.IOSProtocolUtil;
