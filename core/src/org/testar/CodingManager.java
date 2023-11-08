@@ -272,7 +272,7 @@ public class CodingManager {
 	//  STATES CODING
 	// ###############
 	
-	private static String codify(Widget state, Tag<?>... tags){
+	public static String codify(Widget state, Tag<?>... tags){
 		return lowCollisionID(getTaggedString(state, tags));
 	}
 
@@ -301,7 +301,7 @@ public class CodingManager {
 	//  IDS CODING
 	// ############
 
-	private static String lowCollisionID(String text){ // reduce ID collision probability
+	public static String lowCollisionID(String text){ // reduce ID collision probability
 		CRC32 crc32 = new CRC32();
 		crc32.update(text.getBytes());
 		return Integer.toUnsignedString(text.hashCode(), Character.MAX_RADIX) +
