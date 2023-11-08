@@ -181,8 +181,9 @@ public class PlainTextReporter implements Reporting
         if(verdict.severity() > Verdict.OK.severity())
             verdictInfo = verdictInfo.replace(Verdict.OK.info(), "");
         
-        plainTextReportUtil.addHeading(2, "Test verdict for this sequence: " + verdictInfo);
-        plainTextReportUtil.addHeading(4, "Severity: " + verdict.severity());
+        plainTextReportUtil.addHorizontalLine();
+        plainTextReportUtil.addHeading(3, "Test verdict for this sequence: " + verdictInfo);
+        plainTextReportUtil.addHeading(5, "Severity: " + verdict.severity());
     
         plainTextReportUtil.appendToFileName("_" + verdict.verdictSeverityTitle() + "_poc_");
         plainTextReportUtil.writeToFile();
