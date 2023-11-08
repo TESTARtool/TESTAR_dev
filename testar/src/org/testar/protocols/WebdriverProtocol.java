@@ -31,27 +31,6 @@
 
 package org.testar.protocols;
 
-import static org.testar.monkey.alayer.Tags.Blocked;
-import static org.testar.monkey.alayer.Tags.Enabled;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
-
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.ArrayUtils;
@@ -73,15 +52,24 @@ import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.monkey.alayer.windows.WinProcess;
 import org.testar.monkey.alayer.windows.Windows;
 import org.testar.plugin.NativeLinker;
-import org.testar.OutputStructure;
 import org.testar.serialisation.LogSerialiser;
-import org.testar.reporting.Reporting;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+
+import static org.testar.monkey.alayer.Tags.Blocked;
+import static org.testar.monkey.alayer.Tags.Enabled;
 
 public class WebdriverProtocol extends GenericUtilsProtocol {
     //Attributes for adding slide actions
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
-    protected Reporting htmlReport;
     protected State latestState;
     
     protected static Set<String> existingCssClasses = new HashSet<>();
@@ -147,8 +135,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 */
 	@Override
 	protected void preSequencePreparations() {
-		//initializing the HTML sequence report:
-		htmlReport = getReporter();
+		super.preSequencePreparations();
 		// reset web browser console verdict
 		webConsoleVerdict = Verdict.OK;
 	}
@@ -284,25 +271,16 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     		+ WinProcess.procName(system.get(Tags.PID)) + "\n");
     		
     	}
-
-    	latestState = state;
-    	
-    	//Spy mode didn't use the html report
+		
     	if(settings.get(ConfigTags.Mode) == Modes.Spy) {
 
     		for(Widget w : state) {
     			WdElement element = ((WdWidget) w).element;
-    			for(String s : element.cssClasses) {
-    				existingCssClasses.add(s);
-    			}
+				existingCssClasses.addAll(element.cssClasses);
     		}
-    		
-        	return state;
     	}
     	
-        //adding state to the HTML sequence report:
-        htmlReport.addState(latestState);
-        return latestState;
+        return state;
     }
 
     /**
@@ -361,7 +339,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     }
 
     /**
-     * Overwriting to add HTML report writing into it
+     * Overwriting to add action information
      *
      * @param state
      * @param actions
@@ -380,10 +358,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     		actions = new HashSet<>(Collections.singletonList(histBackAction));
     	}
     	// super preSelectAction will not derive ESC action
-    	actions = super.preSelectAction(system, state, actions);
-    	// adding available actions into the HTML report:
-    	htmlReport.addActions(actions);
-    	return actions;
+    	return super.preSelectAction(system, state, actions);
     }
 
     /**
@@ -396,67 +371,6 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     @Override
     protected Action selectAction(State state, Set<Action> actions) {
     	return super.selectAction(state, actions);
-    }
-
-    /**
-     * Execute the selected action.
-     * @param system the SUT
-     * @param state the SUT's current state
-     * @param action the action to execute
-     * @return whether or not the execution succeeded
-     */
-    @Override
-    protected boolean executeAction(SUT system, State state, Action action){
-        // adding the action that is going to be executed into HTML report:
-        htmlReport.addSelectedAction(state, action);
-        return super.executeAction(system, state, action);
-    }
-
-    /**
-     * Replay the saved action
-     */
-    @Override
-    protected boolean replayAction(SUT system, State state, Action action, double actionWaitTime, double actionDuration){
-        // adding the action that is going to be executed into HTML report:
-        htmlReport.addSelectedAction(state, action);
-        return super.replayAction(system, state, action, actionWaitTime, actionDuration);
-    }
-
-    /**
-     * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
-     */
-    @Override
-    protected void postSequenceProcessing() {
-        String status = "";
-        String statusInfo = "";
-
-        if(mode() == Modes.Replay) {
-            htmlReport.addTestVerdict(getReplayVerdict().join(processVerdict));
-            status = (getReplayVerdict().join(processVerdict)).verdictSeverityTitle();
-            statusInfo = (getReplayVerdict().join(processVerdict)).info();
-        }
-        else {
-            htmlReport.addTestVerdict(getFinalVerdict());
-            status = (getFinalVerdict()).verdictSeverityTitle();
-            statusInfo = (getFinalVerdict()).info();
-        }
-
-        String sequencesPath = getGeneratedSequenceName();
-        try {
-            sequencesPath = new File(getGeneratedSequenceName()).getCanonicalPath();
-        } catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		statusInfo = statusInfo.replace("\n"+Verdict.OK.info(), "");
-
-        //Timestamp(generated by logger) SUTname Mode SequenceFileObject Status "StatusInfo"
-        INDEXLOG.info(OutputStructure.executedSUTname
-                + " " + settings.get(ConfigTags.Mode, mode())
-                + " " + sequencesPath
-                + " " + status + " \"" + statusInfo + "\"" );
-
-        htmlReport.close();
     }
     
     @Override

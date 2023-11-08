@@ -30,10 +30,6 @@
 
 package org.testar.monkey;
 
-import java.util.Arrays;
-import java.util.Set;
-import java.util.StringJoiner;
-
 import org.testar.OutputStructure;
 import org.testar.SutVisualization;
 import org.testar.monkey.RuntimeControlsProtocol.Modes;
@@ -42,6 +38,10 @@ import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.serialisation.LogSerialiser;
+
+import java.util.Arrays;
+import java.util.Set;
+import java.util.StringJoiner;
 
 public class GenerateMode {
 
@@ -73,7 +73,7 @@ public class GenerateMode {
 			}
 
 			//empty method in defaultProtocol - allowing implementation in application specific protocols
-			//HTML report is created here in Desktop and Webdriver protocols
+			//HTML report is created here in DefaultProtocol
 			protocol.preSequencePreparations();
 
 			//reset the faulty variable because we started a new sequence

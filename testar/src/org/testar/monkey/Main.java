@@ -32,29 +32,31 @@ package org.testar.monkey;
 
 import org.testar.CodingManager;
 import org.testar.StateManagementTags;
+import org.testar.extendedsettings.ExtendedSettingFile;
+import org.testar.extendedsettings.ExtendedSettingsFactory;
+import org.testar.managers.NativeHookManager;
+import org.testar.monkey.alayer.Tag;
+import org.testar.monkey.alayer.exceptions.NoSuchTagException;
+import org.testar.monkey.alayer.windows.Windows10;
+import org.testar.plugin.NativeLinker;
+import org.testar.plugin.OperatingSystems;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.serialisation.ScreenshotSerialiser;
 import org.testar.serialisation.TestSerialiser;
-import org.testar.monkey.alayer.Tag;
+import org.testar.settingsdialog.SettingsDialog;
 
 import javax.swing.*;
-import java.io.*;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
-import org.testar.monkey.alayer.exceptions.NoSuchTagException;
-import org.testar.monkey.alayer.windows.Windows10;
-import org.testar.plugin.NativeLinker;
-import org.testar.plugin.OperatingSystems;
-import org.testar.extendedsettings.ExtendedSettingFile;
-import org.testar.extendedsettings.ExtendedSettingsFactory;
-import org.testar.managers.NativeHookManager;
-import org.testar.settingsdialog.SettingsDialog;
 
-import static org.testar.monkey.Util.compileProtocol;
 import static org.testar.monkey.ConfigTags.*;
+import static org.testar.monkey.Util.compileProtocol;
 
 public class Main {
 
@@ -497,6 +499,8 @@ public class Main {
 			defaults.add(Pair.from(OverrideWebDriverDisplayScale, ""));
 			defaults.add(Pair.from(CreateWidgetInfoJsonFile, false));
 			defaults.add(Pair.from(FormFillingAction, false));
+			defaults.add(Pair.from(ReportInHTML, true));
+			defaults.add(Pair.from(ReportInPlainText, false));
 
 			// Oracles for webdriver browser console
 			defaults.add(Pair.from(WebConsoleErrorOracle, false));

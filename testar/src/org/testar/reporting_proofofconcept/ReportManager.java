@@ -6,13 +6,13 @@ import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 
-import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Set;
 
 public class ReportManager implements Reporting
 {
-    private HTMLreporter                   htmlReporter;
-//    private PlainTextReporter   plainTextReporter;
+    private ArrayList<Reporting> reporters;
     
     private boolean firstStateAdded = false;
     private boolean firstActionsAdded = false;
@@ -24,48 +24,40 @@ public class ReportManager implements Reporting
         String fileName =
                 OutputStructure.htmlOutputDir + "/" + OutputStructure.startInnerLoopDateString + "_"
                 + OutputStructure.executedSUTname + "_sequence_" + OutputStructure.sequenceInnerLoopCount + "_poc"; //no File.separator
+    
+        if(!Arrays.asList(html, plainText).contains(Boolean.TRUE)) //if none of the options are true
+            //todo: throw error or disable reporting
+            return;
+        
+        reporters = new ArrayList<>();
         
         if(html)
-            htmlReporter = new HTMLreporter(fileName, replay);
-        
-//        if(plainText)
-//            plainTextReporter = new PlainTextReporter(filename, replay);
+            reporters.add(new HTMLreporter(fileName, replay));
+        if(plainText)
+            reporters.add(new PlainTextReporter(fileName, replay));
     }
     
     public void finishReport()
     {
-        if(htmlReporter != null)
-            htmlReporter.finishReport();
-        
-//        if(plainTextReporter != null)
-//            plainTextReporter.generateReport();
+        for(Reporting reporter : reporters)
+            reporter.finishReport();
     }
     
     public void addState(State state)
     {
         if(firstStateAdded)
         {
-            if(firstActionsAdded)
-            {
-                if(htmlReporter != null)
-                    htmlReporter.addState(state);
-            }
-            else if(state.get(Tags.OracleVerdict, Verdict.OK).severity() > Verdict.SEVERITY_OK)
-            {
-                //if the first state contains a failure, write the same state in case it was a login
-                if(htmlReporter != null)
-                    htmlReporter.addState(state);
-            }
-            else
-            {
-                //don't write the state as it is the same - getState is run twice in the beginning, before the first action
-            }
+            if(firstActionsAdded || (state.get(Tags.OracleVerdict, Verdict.OK).severity() > Verdict.SEVERITY_OK))
+            { //if the first state contains a failure, write the same state in case it was a login
+                for(Reporting reporter : reporters)
+                    reporter.addState(state);
+            } //no else branch: don't write the state as it is the same - getState is run twice in the beginning, before the first action
         }
         else
         {
             firstStateAdded = true;
-            if(htmlReporter != null)
-                htmlReporter.addState(state);
+            for(Reporting reporter : reporters)
+                reporter.addState(state);
         }
     }
     
@@ -74,33 +66,27 @@ public class ReportManager implements Reporting
     {
         firstActionsAdded = true;
     
-        if(htmlReporter != null)
-            htmlReporter.addActions(actions);
+        for(Reporting reporter : reporters)
+            reporter.addActions(actions);
     }
     
     public void addActionsAndUnvisitedActions(Set<Action> actions, Set<String> concreteIdsOfUnvisitedActions)
     {
         firstActionsAdded = true;
     
-        if(htmlReporter != null)
-            htmlReporter.addActionsAndUnvisitedActions(actions, concreteIdsOfUnvisitedActions);
-//        if(plainTextReporter != null)
-//            plainTextReporter.addActionsAndUnvisitedActions(actions, concreteIdsOfUnvisitedActions);
+        for(Reporting reporter : reporters)
+            reporter.addActionsAndUnvisitedActions(actions, concreteIdsOfUnvisitedActions);
     }
     
     public void addSelectedAction(State state, Action action)
     {
-        if(htmlReporter != null)
-            htmlReporter.addSelectedAction(state, action);
-//        if(plainTextReporter != null)
-//            plainTextReporter.addSelectedAction(state, action);
+        for(Reporting reporter : reporters)
+            reporter.addSelectedAction(state, action);
     }
     
     public void addTestVerdict(Verdict verdict)
     {
-        if(htmlReporter != null)
-            htmlReporter.addTestVerdict(verdict);
-//        if(plainTextReporter != null)
-//            plainTextReporter.addTestVerdict(verdict);
+        for(Reporting reporter : reporters)
+            reporter.addTestVerdict(verdict);
     }
 }

@@ -32,7 +32,9 @@
 package org.testar.protocols;
 
 import org.testar.DerivedActions;
-import org.testar.reporting.Reporting;
+import org.testar.OutputStructure;
+import org.testar.managers.InputDataManager;
+import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Drag;
 import org.testar.monkey.Environment;
 import org.testar.monkey.alayer.*;
@@ -40,15 +42,13 @@ import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
-import org.testar.monkey.ConfigTags;
-import org.testar.OutputStructure;
-import org.testar.managers.InputDataManager;
-import org.testar.reporting_proofofconcept.ReportManager;
+import org.testar.reporting.Reporting;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
 
@@ -57,7 +57,6 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
     protected Reporting htmlReport;
-    private ReportManager reportManager;
     protected State latestState;
 
     /**
@@ -65,9 +64,8 @@ public class DesktopProtocol extends GenericUtilsProtocol {
      */
     @Override
     protected void preSequencePreparations() {
-        //initializing the HTML sequence report:
-        htmlReport = getReporter();
-        reportManager = new ReportManager((mode() == Modes.Replay), true, false);
+        super.preSequencePreparations();
+        htmlReport = getReporter(); //old
     }
     
     /**
@@ -95,15 +93,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
      */
     @Override
     protected State getState(SUT system) throws StateBuildException {
-        //Spy mode didn't use the html report
-    	if(settings.get(ConfigTags.Mode) == Modes.Spy)
         	return super.getState(system);
-    	
-    	latestState = super.getState(system);
-        //adding state to the HTML sequence report:
-        htmlReport.addState(latestState);
-        reportManager.addState(latestState);
-        return latestState;
     }
 
     /**
@@ -137,7 +127,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     	actions = super.preSelectAction(system, state, actions);
     	// adding available actions into the HTML report:
     	htmlReport.addActions(actions);
-        reportManager.addActions(actions);
+//        reportManager.addActions(actions);
     	return actions;
     }
 
@@ -152,7 +142,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     protected boolean executeAction(SUT system, State state, Action action){
         // adding the action that is going to be executed into HTML report:
         htmlReport.addSelectedAction(state, action);
-        reportManager.addSelectedAction(state, action);
+//        reportManager.addSelectedAction(state, action);
         return super.executeAction(system, state, action);
     }
     
@@ -163,7 +153,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     protected boolean replayAction(SUT system, State state, Action action, double actionWaitTime, double actionDuration){
         // adding the action that is going to be executed into HTML report:
         htmlReport.addSelectedAction(state, action);
-        reportManager.addSelectedAction(state, action);
+//        reportManager.addSelectedAction(state, action);
         return super.replayAction(system, state, action, actionWaitTime, actionDuration);
     }
 
@@ -172,18 +162,19 @@ public class DesktopProtocol extends GenericUtilsProtocol {
      */
     @Override
     protected void postSequenceProcessing() {
+        super.postSequenceProcessing();
         String status = "";
         String statusInfo = "";
 
         if(mode() == Modes.Replay) {
             htmlReport.addTestVerdict(getReplayVerdict().join(processVerdict));
-            reportManager.addTestVerdict(getReplayVerdict().join(processVerdict));
+//            reportManager.addTestVerdict(getReplayVerdict().join(processVerdict));
             status = (getReplayVerdict().join(processVerdict)).verdictSeverityTitle();
             statusInfo = (getReplayVerdict().join(processVerdict)).info();
         }
         else {
             htmlReport.addTestVerdict(getFinalVerdict());
-            reportManager.addTestVerdict(getFinalVerdict());
+//            reportManager.addTestVerdict(getFinalVerdict());
             status = (getFinalVerdict()).verdictSeverityTitle();
             statusInfo = (getFinalVerdict()).info();
         }
@@ -203,7 +194,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
                 + " " + status + " \"" + statusInfo + "\"" );
 
         htmlReport.close();
-        reportManager.finishReport();
+//        reportManager.finishReport();
     }
 
     /**

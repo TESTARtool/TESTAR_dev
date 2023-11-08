@@ -30,23 +30,17 @@
 
 package org.testar.monkey;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.Serializable;
-import java.io.StringReader;
+import org.testar.StateManagementTags;
+import org.testar.monkey.alayer.Tag;
+import org.testar.monkey.alayer.TaggableBase;
+import org.testar.monkey.alayer.exceptions.NoSuchTagException;
+
+import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
-
-import org.testar.StateManagementTags;
-import org.testar.monkey.alayer.Tag;
-import org.testar.monkey.alayer.TaggableBase;
-import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 
 import static java.util.stream.Collectors.toList;
 
@@ -550,6 +544,8 @@ public class Settings extends TaggableBase implements Serializable {
 		secondarySettingsList.add(ConfigTags.OutputDir);
 		secondarySettingsList.add(ConfigTags.TempDir);
 		secondarySettingsList.add(ConfigTags.ReportingClass);
+		secondarySettingsList.add(ConfigTags.ReportInHTML);
+		secondarySettingsList.add(ConfigTags.ReportInPlainText);
 
 		StringJoiner secondaryString = new StringJoiner(System.getProperty("line.separator"));
 		for(Tag<?> set : secondarySettingsList) {
