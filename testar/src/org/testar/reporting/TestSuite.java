@@ -33,6 +33,7 @@ package org.testar.reporting;
 import java.util.LinkedList;
 import java.util.List;
 
+@Deprecated
 public class TestSuite {
     List<TestCase> testCases = new LinkedList<TestCase>();
 

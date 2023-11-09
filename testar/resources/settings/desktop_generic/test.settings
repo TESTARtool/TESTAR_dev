@@ -153,3 +153,5 @@ CopyFromTo =
 VisualizeActions = false
 MaxReward = 9999999
 Discount = .95
+ReportInHTML = true
+ReportInPlainText = true

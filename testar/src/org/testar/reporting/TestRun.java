@@ -37,6 +37,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+@Deprecated
 public class TestRun {
     public int randomseed;
     public int asserts = 0;

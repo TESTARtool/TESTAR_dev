@@ -30,20 +30,19 @@
 
 package org.testar.reporting;
 
+import org.testar.OutputStructure;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Verdict;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Set;
 
-import org.testar.monkey.alayer.Action;
-import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Verdict;
-import org.testar.OutputStructure;
 
-
-
-
+@Deprecated
 public class XMLSequenceReport implements Reporting {
 
     class CommandLine {

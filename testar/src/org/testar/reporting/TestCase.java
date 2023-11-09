@@ -30,16 +30,15 @@
 
 package org.testar.reporting;
 
-import static org.junit.jupiter.api.Assertions.assertSame;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.Map.Entry;
+import java.util.Random;
 
+@Deprecated
 public class TestCase {
 
     private Map<String, String> attachment =new HashMap<String,String>();

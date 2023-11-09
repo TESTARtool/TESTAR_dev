@@ -43,6 +43,7 @@ import java.util.Map.Entry;
 /**
  * HTML reporter for accessibility evaluation
  */
+@Deprecated
 public final class HTMLReporter {
 
     // ----

@@ -30,11 +30,13 @@
 
 package org.testar.reporting;
 
-import org.testar.monkey.alayer.State;
-import java.util.Set;
 import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Verdict;
 
+import java.util.Set;
+
+@Deprecated
 public interface Reporting {
     public void addSequenceStep(State state, String actionImagePath);
     public void addState(State state);
