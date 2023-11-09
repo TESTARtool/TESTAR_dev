@@ -931,7 +931,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		// And then select action will take care of making the next action to select the killing of the process.
 		String processRE = settings().get(ConfigTags.ProcessesToKillDuringTest);
 		if (processRE != null && !processRE.isEmpty()){
-			state.set(Tags.RunningProcesses, system.getRunningProcesses());
+
+			//TODO: Using ALL system running processes may be a bad idea
+			//state.set(Tags.RunningProcesses, system.getRunningProcesses());
+
+			//TODO: We probably want the NEW launched system processes during the testing execution
+			state.set(Tags.RunningProcesses, SystemProcessHandling.getNewLaunchedProcesses(this.contextRunningProcesses));
+
 			for(Pair<Long, String> process : state.get(Tags.RunningProcesses, Collections.<Pair<Long,String>>emptyList())){
 				if(process.left().longValue() != system.get(Tags.PID).longValue() &&
 						process.right() != null && process.right().matches(processRE)){ // pid x name

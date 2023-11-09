@@ -88,7 +88,7 @@ TagsToFilter = Title
 # but that you do not want to test.
 #################################################################
 
-ProcessesToKillDuringTest =
+ProcessesToKillDuringTest = .*explorer.exe.*|.*chrome.exe.*|.*firefox.exe.*|.*msedge.exe.*|.*iexplore.exe.*
 
 #################################################################
 # Protocolclass
@@ -121,7 +121,7 @@ StateModelStoreWidgets = true
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WidgetPath,WidgetControlType
+AbstractStateAttributes = WidgetPath,WidgetControlType,WidgetTitle
 
 #################################################################
 # Settings (string) that can be used for user specified protocols
@@ -150,7 +150,7 @@ ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
-TimeToWaitAfterAction = 1
+TimeToWaitAfterAction = 2
 StartupTime = 10.0
 TimeToFreeze = 30.0
 StopGenerationOnFault = true

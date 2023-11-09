@@ -30,6 +30,7 @@
 
 package org.testar;
 
+import org.testar.monkey.Pair;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.Tags;
@@ -84,6 +85,57 @@ public class SystemProcessHandling {
             if (kill)
                 killProcess(pi1,MAX_KILL_WINDOW);
         }
+    }
+
+    public static List<Pair<Long, String>> getNewLaunchedProcesses(List<ProcessInfo> contextRunningProcesses) {
+    	List<Pair<Long, String>> nonContextProcesses = new ArrayList<>();
+
+    	for (ProcessInfo pi1 : getAllRunningProcesses()) {
+    		boolean isInContext = false;
+    		for (ProcessInfo pi2 : contextRunningProcesses) {
+    			if (pi1.pid == pi2.pid) {
+    				isInContext = true;
+    				break;
+    			}
+    		}
+    		if (!isInContext) {
+    			nonContextProcesses.add(new Pair<>(pi1.pid, pi1.Desc));
+    		}
+    	}
+
+    	return nonContextProcesses;
+    }
+
+    private static List<ProcessInfo> getAllRunningProcesses(){
+    	List<ProcessInfo> runningProcesses = new ArrayList<ProcessInfo>();
+    	long pid, handle; String desc;
+    	List<SUT> runningP = NativeLinker.getNativeProcesses();
+
+    	for (SUT sut : runningP){
+    		pid = sut.get(Tags.PID, Long.MIN_VALUE);
+    		if (pid != Long.MIN_VALUE){
+    			handle = sut.get(Tags.HANDLE, Long.MIN_VALUE);
+    			desc = sut.get(Tags.Desc, null);
+    			ProcessInfo pi = new ProcessInfo(sut,pid,handle,desc);
+    			runningProcesses.add(pi);
+    		}
+    	}
+    	return runningProcesses;
+    }
+
+    public static boolean moreThanOneProcessRunning(String processName) {
+    	List<SUT> runningP = NativeLinker.getNativeProcesses();
+
+    	long explorerCount = runningP.stream()
+    			.map(sut -> new ProcessInfo(
+    					sut,
+    					sut.get(Tags.PID, Long.MIN_VALUE),
+    					sut.get(Tags.HANDLE, Long.MIN_VALUE),
+    					sut.get(Tags.Desc, null)))
+    			.filter(pi -> pi.Desc != null && pi.Desc.equalsIgnoreCase(processName))
+    			.count();
+
+    	return explorerCount > 1;
     }
 
     //TODO native linker is used and that requires platform specific implementation. move to SystemProcessHandling class

@@ -40,6 +40,7 @@ import java.util.Set;
 
 import org.testar.CodingManager;
 import org.testar.RandomActionSelector;
+import org.testar.SystemProcessHandling;
 import org.testar.monkey.Main;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.Action;
@@ -55,15 +56,33 @@ import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.windows.UIARoles;
+import org.testar.monkey.alayer.windows.UIATags;
 import org.testar.protocols.DesktopProtocol;
 
+/**
+ * 
+ * Recommendation to automate killing the explorer process window if OBS opens a new file explorer:
+ * https://superuser.com/questions/1008342/how-to-close-one-explorer-exes-window-instead-of-ending-the-whole-process
+ * 
+ * Also, when starting TESTAR close the explorer.exe process that manages the File Explorer windows
+ * 
+ * If not, TESTAR could open lot of file explorer windows and force OBS system to the foreground
+ *
+ */
 public class Protocol_desktop_generic_obs extends DesktopProtocol {
 
 	@Override
 	protected SUT startSystem() throws SystemStartException {
+		// Helper checking to do not run the OBS testing with more than one explorer process
+		if(SystemProcessHandling.moreThanOneProcessRunning("explorer.exe")) {
+			System.out.println("WARNING: More than one explorer process running");
+			System.out.println("WARNING: This could open lot of File Explorer window");
+			System.exit(0);
+		}
+
 		// Launch obs system using a batch file that changes to the correct directory
 		launchObsSystem();
-		Util.pause(5);
+		Util.pause(10);
 		// Then TESTAR will connect with process name
 		SUT system =  super.startSystem();
 		// Move the mouse to the corner because previous sequence mouse position may affect the model determinism (popup description)
@@ -102,9 +121,37 @@ public class Protocol_desktop_generic_obs extends DesktopProtocol {
 		return state;
 	}
 
+	@Override
+	protected void beginSequence(SUT system, State state){
+		super.beginSequence(system, state);
+		// If no clickable UIAMenuItem or UIAListItem exists in top widgets
+		// This means the update window message has appeared
+		Set<Action> initialActions = deriveActions(system, state);
+		boolean existsMenuOrListWidget = checkForMenuOrListWidget(initialActions);
+		// Force the closing window action
+		if(!existsMenuOrListWidget) {
+			initialActions.iterator().next().run(system, state, 1);
+			Util.pause(1);
+			// Move the mouse to the corner because previous sequence mouse position may affect the model determinism (popup description)
+			mouse.setCursor(5, 5);
+			Util.pause(1);
+		}
+	}
+
+	private boolean checkForMenuOrListWidget(Set<Action> actions) {
+		for (Action action : actions) {
+			if (action.get(Tags.OriginWidget, null) != null) {
+				if (isClickable(action.get(Tags.OriginWidget))) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	private boolean toolTipWidgetExists(State state) {
 		for(Widget w : state) {
-			if(w.get(Tags.Role, Roles.Widget).equals(UIARoles.UIAToolTip)) {
+			if(w.get(UIATags.UIAAutomationId, "").contains("qtooltip_label")) {
 				return true;
 			}
 		}
@@ -115,15 +162,7 @@ public class Protocol_desktop_generic_obs extends DesktopProtocol {
 	protected void buildStateIdentifiers(State state) {
 		super.buildStateIdentifiers(state);
 
-		// For menu and list widgets enrich the abstract custom id by using the widget title
-		// This widget title is not being used by default because it is a dynamic property when text appear
-		List<Role> list = Arrays.asList(new Role[]{UIARoles.UIAMenuItem, UIARoles.UIAListItem});
 		for(Widget w : state) {
-			if(list.contains(w.get(Tags.Role, Roles.Widget))) {
-				String titleAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(w, Tags.Title, Tags.Role, Tags.Path);
-				w.set(Tags.AbstractIDCustom, titleAbstractId);
-			}
-
 			// Ignore StatusBar widgets since these are different and dynamic
 			if(isSonOfStatusBarWidget(w)) {
 				w.set(Tags.AbstractIDCustom, "");
@@ -132,7 +171,7 @@ public class Protocol_desktop_generic_obs extends DesktopProtocol {
 			// Ignore tool tip messages that appear when the mouse position is over a widget
 			// However, this in not enough because tool tip messages affects all widget paths
 			// This is probably not needed anymore due to the getState checking that moves the mouse
-			if(w.get(Tags.Role, Roles.Widget).equals(UIARoles.UIAToolTip)) {
+			if(w.get(UIATags.UIAAutomationId, "").contains("qtooltip_label")) {
 				w.set(Tags.AbstractIDCustom, "");
 			}
 		}
@@ -248,10 +287,10 @@ public class Protocol_desktop_generic_obs extends DesktopProtocol {
 		// Kill the obs process
 		try {
 			String processName = "obs64.exe";
-			Process process = Runtime.getRuntime().exec("taskkill /IM " + processName);
+			Process process = Runtime.getRuntime().exec("taskkill /F /IM " + processName);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Util.pause(5);
+		Util.pause(2);
 	}
 }
