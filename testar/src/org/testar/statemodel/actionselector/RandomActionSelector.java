@@ -16,6 +16,11 @@ public class RandomActionSelector implements ActionSelector{
 		//
 	}
 
+	@Override
+	public void notifyNonDeterministicAction(String abstractIdCustom) {
+		// 
+	}
+
     @Override
     public AbstractAction selectAction(AbstractState currentState, AbstractStateModel abstractStateModel) throws ActionNotFoundException {
         long graphTime = System.currentTimeMillis();

@@ -9,6 +9,8 @@ public interface ActionSelector {
 
 	public void notifyNewSequence();
 
+	public void notifyNonDeterministicAction(String abstractIdCustom);
+
     /**
      * This method returns an action to execute
      * @param currentState

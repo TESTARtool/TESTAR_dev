@@ -22,6 +22,11 @@ public class UnvisitedActionsSelector implements ActionSelector {
     }
 
     @Override
+    public void notifyNonDeterministicAction(String abstractIdCustom) {
+    	// 
+    }
+
+    @Override
     public AbstractAction selectAction(AbstractState currentState, AbstractStateModel abstractStateModel) throws ActionNotFoundException{
         Set<AbstractAction> unvisitedActions = getUnvisitedActions(currentState, abstractStateModel, MAX_HOPS);
         if (unvisitedActions.size() == 0) {

@@ -21,6 +21,11 @@ public class CompoundActionSelector implements ActionSelector{
     }
 
     @Override
+    public void notifyNonDeterministicAction(String abstractIdCustom) {
+    	selectors.forEach(selector -> selector.notifyNonDeterministicAction(abstractIdCustom));
+    }
+
+    @Override
     public AbstractAction selectAction(AbstractState currentState, AbstractStateModel abstractStateModel) throws ActionNotFoundException {
         for(ActionSelector selector:selectors) {
             try {

@@ -239,6 +239,7 @@ public class ModelManager implements StateModelManager {
                 }
             }
             System.out.println("Could not find action with abstractIdCustom : " +abstractIdCustom);
+            actionSelector.notifyNonDeterministicAction(abstractIdCustom);
             errorMessages.add("The actions selector returned the action with abstractIdCustom: " + abstractIdCustom + " . However, TESTAR was " +
                     "unable to find the action in its executable actions");
         } catch (ActionNotFoundException e) {

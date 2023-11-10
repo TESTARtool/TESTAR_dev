@@ -19,6 +19,11 @@ public class ImprovedUnvisitedActionSelector implements ActionSelector {
     private LinkedList<AbstractAction> executionPath;
 
     /**
+     * A list of non deterministic actions.
+     */
+    private Set<String> listOfNonDeterministicActions;
+
+    /**
      * The maximum nr of times that the flow can be altered.
      */
     private final int MAX_FLOW_ALTERATIONS = 1;
@@ -33,6 +38,7 @@ public class ImprovedUnvisitedActionSelector implements ActionSelector {
      */
     ImprovedUnvisitedActionSelector() {
         executionPath = new LinkedList<>();
+        listOfNonDeterministicActions = new HashSet<>();
         nrOfFlowAlterations = 0;
     }
 
@@ -40,6 +46,11 @@ public class ImprovedUnvisitedActionSelector implements ActionSelector {
     public void notifyNewSequence() {
     	executionPath = new LinkedList<>();
     	System.out.println("Reset State Model execution path due to new sequence starting");
+    }
+
+    @Override
+    public void notifyNonDeterministicAction(String abstractIdCustom) {
+    	listOfNonDeterministicActions.add(abstractIdCustom);
     }
 
     @Override
@@ -113,10 +124,15 @@ public class ImprovedUnvisitedActionSelector implements ActionSelector {
             long graphTime = System.currentTimeMillis();
             Random rnd = new Random(graphTime);
             List<AbstractAction> unvisitedActions = new ArrayList<>(nodePath.getLast().getAbstractState().getUnvisitedActions());
-            AbstractAction unvisitedAction  = unvisitedActions.get(rnd.nextInt(unvisitedActions.size()));
+            // excluding non-deterministic actions
+            unvisitedActions.removeIf(action -> listOfNonDeterministicActions.contains(action.getActionId()));
 
-            // now merge the two streams and return the linkedlist
-            return Stream.concat(actionStream, Stream.of(unvisitedAction)).collect(Collectors.toCollection(LinkedList::new));
+            if (!unvisitedActions.isEmpty()) {
+                AbstractAction unvisitedAction = unvisitedActions.get(rnd.nextInt(unvisitedActions.size()));
+
+                // now merge the two streams and return the linkedlist
+                return Stream.concat(actionStream, Stream.of(unvisitedAction)).collect(Collectors.toCollection(LinkedList::new));
+            }
         }
 
         // if we made it here, this means the states in the current leaves of our selector tree did not contain
