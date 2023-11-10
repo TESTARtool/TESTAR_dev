@@ -51,7 +51,6 @@ import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
-import org.testar.monkey.alayer.actions.KillProcess;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
@@ -167,20 +166,14 @@ public class Protocol_desktop_generic_obs extends DesktopProtocol {
 		// This widget title is not being used by default because it is a dynamic property when text appear
 		List<Role> list = Arrays.asList(new Role[]{UIARoles.UIAMenuItem, UIARoles.UIAListItem, UIARoles.UIACheckBox, UIARoles.UIAComboBox});
 		for(Widget w : state) {
-			if(list.contains(w.get(Tags.Role, Roles.Widget))) {
-				String titleAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(w, Tags.Title, Tags.Role, Tags.Path);
-				w.set(Tags.AbstractIDCustom, titleAbstractId);
-			}
-
 			// Ignore StatusBar widgets since these are different and dynamic
 			if(isSonOfStatusBarWidget(w)) {
 				w.set(Tags.AbstractIDCustom, "");
 			}
 
-			// Ignore title property of widget sons of the stats window since these are different and dynamic
+			// Ignore all properties of widget sons of the stats window since these are different and dynamic
 			if(isSonOfStatsWindow(w)) {
-				String rolePathAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(w, Tags.Role, Tags.Path);
-				w.set(Tags.AbstractIDCustom, rolePathAbstractId);
+				w.set(Tags.AbstractIDCustom, "");
 			}
 
 			// Ignore tool tip messages that appear when the mouse position is over a widget
@@ -188,6 +181,11 @@ public class Protocol_desktop_generic_obs extends DesktopProtocol {
 			// This is probably not needed anymore due to the getState checking that moves the mouse
 			if(w.get(UIATags.UIAAutomationId, "").contains("qtooltip_label")) {
 				w.set(Tags.AbstractIDCustom, "");
+			}
+
+			if(list.contains(w.get(Tags.Role, Roles.Widget))) {
+				String titleAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(w, Tags.Title, Tags.Role, Tags.Path);
+				w.set(Tags.AbstractIDCustom, titleAbstractId);
 			}
 		}
 
@@ -200,6 +198,16 @@ public class Protocol_desktop_generic_obs extends DesktopProtocol {
 			}
 		}
 		state.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_STATE + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.lowCollisionID(finalStateAbstractIdCustom.toString()));
+
+		// When some widget opens the file explorer or browser,
+		// TESTAR will kill the process but the detected state abstract id is the same than the initial state
+		// This provokes the State Model to consider kill process is part of the initial state
+		// Then a loop in the State Model path calculations
+		// To avoid this similar abstract state id for future change detection issues, 
+		// we can modify the state abstract id manually
+		if(!state.get(Tags.Foreground, true)) {
+			state.set(Tags.AbstractIDCustom, (state.get(Tags.AbstractIDCustom) + "background"));
+		}
 	}
 
 	private boolean isSonOfStatusBarWidget(Widget w) {
@@ -210,8 +218,7 @@ public class Protocol_desktop_generic_obs extends DesktopProtocol {
 	}
 
 	private boolean isSonOfStatsWindow(Widget w) {
-		if(isWindowStats(w)) return true;
-		else if(w.parent() == null) return false;
+		if(w.parent() == null) return false;
 		else if (isWindowStats(w.parent())) return true;
 		else return isSonOfStatsWindow(w.parent());
 	}
@@ -284,18 +291,6 @@ public class Protocol_desktop_generic_obs extends DesktopProtocol {
 			}
 		}
 		return new HashSet<>();
-	}
-
-	@Override
-	protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions){
-		// When some widget opens the file explorer or browser,
-		// TESTAR will kill the process but the detected state abstract id is the same than the initial state
-		// To avoid this similar abstract state id for future change detection issues, 
-		// we can modify the state abstract id manually
-		if(actions.size() == 1 && actions.iterator().next() instanceof KillProcess) {
-			state.set(Tags.AbstractIDCustom, (state.get(Tags.AbstractIDCustom) + "killprocess"));
-		}
-		return super.preSelectAction(system, state, actions);
 	}
 
 	@Override
