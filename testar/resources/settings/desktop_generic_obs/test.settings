@@ -78,7 +78,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*|.*[nN]ew.*|.*[oO]pen.*|.*[lL]oad.*|.*[iI]mport.*|.*[eE]xport.*|.*[sS]earch .*|.* [sS]earch.*
+ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*|.*[nN]ew.*|.*[oO]pen.*|.*[lL]oad.*|.*[iI]mport.*|.*[eE]xport.*|.*[sS]earch.*|.*[iI]ntegri.*|.*[uU]pdates.*|.*[aA]ctualiza.*
 TagsToFilter = Title
 
 #################################################################
@@ -121,7 +121,7 @@ StateModelStoreWidgets = true
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WidgetPath,WidgetControlType,WidgetTitle
+AbstractStateAttributes = WidgetPath,WidgetControlType
 
 #################################################################
 # Settings (string) that can be used for user specified protocols

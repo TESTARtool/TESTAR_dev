@@ -51,6 +51,7 @@ import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.KillProcess;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
@@ -162,10 +163,24 @@ public class Protocol_desktop_generic_obs extends DesktopProtocol {
 	protected void buildStateIdentifiers(State state) {
 		super.buildStateIdentifiers(state);
 
+		// For menu and list widgets enrich the abstract custom id by using the widget title
+		// This widget title is not being used by default because it is a dynamic property when text appear
+		List<Role> list = Arrays.asList(new Role[]{UIARoles.UIAMenuItem, UIARoles.UIAListItem, UIARoles.UIACheckBox, UIARoles.UIAComboBox});
 		for(Widget w : state) {
+			if(list.contains(w.get(Tags.Role, Roles.Widget))) {
+				String titleAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(w, Tags.Title, Tags.Role, Tags.Path);
+				w.set(Tags.AbstractIDCustom, titleAbstractId);
+			}
+
 			// Ignore StatusBar widgets since these are different and dynamic
 			if(isSonOfStatusBarWidget(w)) {
 				w.set(Tags.AbstractIDCustom, "");
+			}
+
+			// Ignore title property of widget sons of the stats window since these are different and dynamic
+			if(isSonOfStatsWindow(w)) {
+				String rolePathAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(w, Tags.Role, Tags.Path);
+				w.set(Tags.AbstractIDCustom, rolePathAbstractId);
 			}
 
 			// Ignore tool tip messages that appear when the mouse position is over a widget
@@ -192,6 +207,18 @@ public class Protocol_desktop_generic_obs extends DesktopProtocol {
 		else if(w.parent() == null) return false;
 		else if (w.parent().get(Tags.Role, Roles.Widget).equals(UIARoles.UIAStatusBar)) return true;
 		else return isSonOfStatusBarWidget(w.parent());
+	}
+
+	private boolean isSonOfStatsWindow(Widget w) {
+		if(isWindowStats(w)) return true;
+		else if(w.parent() == null) return false;
+		else if (isWindowStats(w.parent())) return true;
+		else return isSonOfStatsWindow(w.parent());
+	}
+
+	private boolean isWindowStats(Widget w) {
+		return w.get(Tags.Role, Roles.Widget).equals(UIARoles.UIAWindow) 
+				&& (w.get(Tags.Title, "").toLowerCase().contains("stats") || w.get(Tags.Title, "").toLowerCase().contains("sticas"));
 	}
 
 	@Override
@@ -257,6 +284,18 @@ public class Protocol_desktop_generic_obs extends DesktopProtocol {
 			}
 		}
 		return new HashSet<>();
+	}
+
+	@Override
+	protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions){
+		// When some widget opens the file explorer or browser,
+		// TESTAR will kill the process but the detected state abstract id is the same than the initial state
+		// To avoid this similar abstract state id for future change detection issues, 
+		// we can modify the state abstract id manually
+		if(actions.size() == 1 && actions.iterator().next() instanceof KillProcess) {
+			state.set(Tags.AbstractIDCustom, (state.get(Tags.AbstractIDCustom) + "killprocess"));
+		}
+		return super.preSelectAction(system, state, actions);
 	}
 
 	@Override
