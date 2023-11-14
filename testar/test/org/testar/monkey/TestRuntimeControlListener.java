@@ -10,6 +10,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.testar.EventHandler;
 import org.testar.monkey.RuntimeControlsProtocol.Modes;
+import org.testar.settings.Settings;
 
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 

@@ -47,7 +47,7 @@ import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.devices.Mouse;
 import org.testar.monkey.alayer.visualizers.ShapeVisualizer;
-import org.testar.monkey.Settings;
+import org.testar.settings.Settings;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

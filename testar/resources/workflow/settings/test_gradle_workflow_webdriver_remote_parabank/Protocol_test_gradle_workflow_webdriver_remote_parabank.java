@@ -43,7 +43,7 @@ import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
-import org.testar.monkey.Settings;
+import org.testar.settings.Settings;
 import org.testar.OutputStructure;
 import org.testar.protocols.WebdriverProtocol;
 

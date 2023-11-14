@@ -43,7 +43,9 @@ import org.testar.plugin.OperatingSystems;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.serialisation.ScreenshotSerialiser;
 import org.testar.serialisation.TestSerialiser;
-import org.testar.settingsdialog.SettingsDialog;
+import org.testar.settings.Settings;
+import org.testar.settings.dialog.SettingsDialog;
+import org.testar.monkey.alayer.Tag;
 
 import javax.swing.*;
 import java.io.File;
@@ -54,11 +56,17 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
+import org.testar.monkey.alayer.windows.Windows10;
+import org.testar.plugin.NativeLinker;
+import org.testar.plugin.OperatingSystems;
+import org.testar.managers.NativeHookManager;
 
 import static org.testar.monkey.ConfigTags.*;
 import static org.testar.monkey.Util.compileProtocol;
 
 public class Main {
+
+	public static final String TESTAR_VERSION = "2.6.7 (10-Oct-2023)";
 
 	//public static final String TESTAR_DIR_PROPERTY = "DIRNAME"; //Use the OS environment to obtain TESTAR directory
 	public static final String SETTINGS_FILE = "test.settings";
@@ -70,7 +78,6 @@ public class Main {
 	public static String settingsDir = testarDir + "settings" + File.separator;
 	public static String outputDir = testarDir + "output" + File.separator;
 	public static String tempDir = outputDir + "temp" + File.separator;
-
 
 	/**
 	 * This method scans the settings directory of TESTAR for a file that end with extension SUT_SETTINGS_EXT
@@ -110,9 +117,10 @@ public class Main {
 		initTestarSSE(args);
 
 		String testSettingsFileName = getTestSettingsFile();
+		System.out.println("TESTAR version is <" + TESTAR_VERSION + ">");
 		System.out.println("Test settings is <" + testSettingsFileName + ">");
 
-		Settings settings = loadTestarSettings(args, testSettingsFileName);
+		Settings settings = Settings.loadSettings(args, testSettingsFileName);
 
 		// Continuous Integration: If GUI is disabled TESTAR was executed from command line.
 		// We only want to execute TESTAR one time with the selected settings.
@@ -132,7 +140,7 @@ public class Main {
 
 				// The dialog can change the test settings file, we need to reload the settings
 				testSettingsFileName = getTestSettingsFile();
-				settings = loadTestarSettings(args, testSettingsFileName);
+				settings = Settings.loadSettings(args, testSettingsFileName);
 
 				setTestarDirectory(settings);
 
@@ -178,9 +186,10 @@ public class Main {
         // Verify if we are in the correct executable testar directory (contains testar.bat)
 		if(!filesName.contains("testar.bat")) {
 			System.out.println("WARNING: We cannot find testar.bat executable file.");
-			System.out.println("WARNING: Please change to /testar/bin/ folder (contains testar.bat) and try to execute again.");
+			System.out.println("WARNING: Please change to /testar/bin/ folder (contains testar.bat) and try to execute testar again.");
 			System.out.println(String.format("WARNING: Current directory %s with existing files:", new File(testarDir).getAbsolutePath()));
 			filesName.forEach(System.out::println);
+			System.exit(-1);
 		}
 	}
 
@@ -224,12 +233,20 @@ public class Main {
 
 		String[] files = getSSE();
 
-		// If there is more than 1, then delete them all
+		// If there is more than 1 sse file, then delete them all
 		if (files != null && files.length > 1) {
 			System.out.println("Too many *.sse files - exactly one expected!");
 			for (String f : files) {
-				System.out.println("Delete file <" + f + "> = " + new File(f).delete());
+				System.out.println("Delete file <" + f + "> = " + new File(settingsDir + f).delete());
 			}
+			files = null;
+		}
+
+		// If the protocol of selected sse file does not exist, delete it
+		// Example: unknown.sse file exists but the settings/unknown folder does not
+		if(files != null && files.length == 1 && !existsSSE(files[0].replace(SUT_SETTINGS_EXT, ""))) {
+			System.out.println("Protocol of indicated .sse file does not exist");
+			System.out.println("Delete file <" + files[0] + "> = " + new File(settingsDir + files[0]).delete());
 			files = null;
 		}
 
@@ -289,29 +306,6 @@ public class Main {
 
 		}
 		SSE_ACTIVATED = null;
-	}
-
-	//TODO: After know what overrideWithUserProperties does, unify this method with loadSettings
-	/**
-	 * Load the settings of the selected test.settings file
-	 * 
-	 * @param args
-	 * @param testSettingsFileName
-	 * @return settings
-	 */
-	private static Settings loadTestarSettings(String[] args, String testSettingsFileName){
-
-		Settings settings = null;
-		try {
-			settings = loadSettings(args, testSettingsFileName);
-		} catch (ConfigException ce) {
-			LogSerialiser.log("There is an issue with the configuration file: " + ce.getMessage() + "\n", LogSerialiser.LogLevel.Critical);
-		}
-
-		// Override the settings by checking the JVM arguments
-		overrideWithUserProperties(settings);
-
-		return settings;
 	}
 
 	/**
@@ -430,187 +424,6 @@ public class Main {
 		System.exit(0);
 	}
 
-	// TODO: This methods should be part of the Settings class. It contains all the default values of the settings.
-	/**
-	 * Load the default settings for all the configurable settings and add/overwrite with those from the file
-	 * This is needed because the user might not have set all the possible settings in the test.settings file.
-	 * @param argv
-	 * @param file
-	 * @return An instance of Settings
-	 * @throws ConfigException
-	 */
-	public static Settings loadSettings(String[] argv, String file) throws ConfigException {
-		Assert.notNull(file);
-		try {
-			List<Pair<?, ?>> defaults = new ArrayList<Pair<?, ?>>();
-			defaults.add(Pair.from(ProcessesToKillDuringTest, "(?!x)x"));
-			defaults.add(Pair.from(ShowVisualSettingsDialogOnStartup, true));
-			defaults.add(Pair.from(FaultThreshold, 0.1));
-			defaults.add(Pair.from(LogLevel, 1));
-			defaults.add(Pair.from(Mode, RuntimeControlsProtocol.Modes.Spy));
-			defaults.add(Pair.from(OutputDir, outputDir));
-			defaults.add(Pair.from(TempDir, tempDir));
-			defaults.add(Pair.from(OnlySaveFaultySequences, false));
-			defaults.add(Pair.from(PathToReplaySequence, tempDir));
-			defaults.add(Pair.from(ActionDuration, 0.1));
-			defaults.add(Pair.from(TimeToWaitAfterAction, 0.1));
-			defaults.add(Pair.from(VisualizeActions, false));
-			defaults.add(Pair.from(KeyBoardListener, true));
-			defaults.add(Pair.from(SequenceLength, 10));
-			defaults.add(Pair.from(ReplayRetryTime, 30.0));
-			defaults.add(Pair.from(Sequences, 1));
-			defaults.add(Pair.from(MaxTime, 31536000.0));
-			defaults.add(Pair.from(StartupTime, 8.0));
-			defaults.add(Pair.from(SUTConnectorValue, ""));
-			defaults.add(Pair.from(Delete, new ArrayList<String>()));
-			defaults.add(Pair.from(CopyFromTo, new ArrayList<Pair<String, String>>()));
-			defaults.add(Pair.from(SuspiciousTags, "(?!x)x"));
-			defaults.add(Pair.from(ClickFilter, "(?!x)x"));
-			defaults.add(Pair.from(MyClassPath, Arrays.asList(settingsDir)));
-			defaults.add(Pair.from(ProtocolClass, "org.testar.monkey.DefaultProtocol"));
-			defaults.add(Pair.from(ForceForeground, true));
-			defaults.add(Pair.from(UseRecordedActionDurationAndWaitTimeDuringReplay, true));
-			defaults.add(Pair.from(StopGenerationOnFault, true));
-			defaults.add(Pair.from(TimeToFreeze, 10.0));
-			defaults.add(Pair.from(RefreshSpyCanvas, 0.5));
-			defaults.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
-			defaults.add(Pair.from(MaxReward, 9999999.0));
-			defaults.add(Pair.from(Discount, .95));
-			defaults.add(Pair.from(AccessBridgeEnabled, false));
-			defaults.add(Pair.from(SUTProcesses, ""));
-			defaults.add(Pair.from(StateModelEnabled, false));
-			defaults.add(Pair.from(DataStore, ""));
-			defaults.add(Pair.from(DataStoreType, ""));
-			defaults.add(Pair.from(DataStoreServer, ""));
-			defaults.add(Pair.from(DataStoreDirectory, ""));
-			defaults.add(Pair.from(DataStoreDB, ""));
-			defaults.add(Pair.from(DataStoreUser, ""));
-			defaults.add(Pair.from(DataStorePassword, ""));
-			defaults.add(Pair.from(DataStoreMode, ""));
-			defaults.add(Pair.from(ResetDataStore, false));
-			defaults.add(Pair.from(ApplicationName, ""));
-			defaults.add(Pair.from(ApplicationVersion, ""));
-			defaults.add(Pair.from(ActionSelectionAlgorithm, "random"));
-			defaults.add(Pair.from(StateModelStoreWidgets, true));
-			defaults.add(Pair.from(AlwaysCompile, true));
-			defaults.add(Pair.from(ProcessListenerEnabled, false));
-			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
-			defaults.add(Pair.from(ProcessLogs, ".*.*"));
-			defaults.add(Pair.from(OverrideWebDriverDisplayScale, ""));
-			defaults.add(Pair.from(CreateWidgetInfoJsonFile, false));
-			defaults.add(Pair.from(FormFillingAction, false));
-			defaults.add(Pair.from(ReportInHTML, true));
-			defaults.add(Pair.from(ReportInPlainText, false));
-
-			// Oracles for webdriver browser console
-			defaults.add(Pair.from(WebConsoleErrorOracle, false));
-			defaults.add(Pair.from(WebConsoleErrorPattern, ".*.*"));
-			defaults.add(Pair.from(WebConsoleWarningOracle, false));
-			defaults.add(Pair.from(WebConsoleWarningPattern, ".*.*"));
-
-			defaults.add(Pair.from(ProtocolSpecificSetting_1, ""));
-			defaults.add(Pair.from(ProtocolSpecificSetting_2, ""));
-			defaults.add(Pair.from(ProtocolSpecificSetting_3, ""));
-			defaults.add(Pair.from(ProtocolSpecificSetting_4, ""));
-			defaults.add(Pair.from(ProtocolSpecificSetting_5, ""));
-			defaults.add(Pair.from(FlashFeedback, true));
-			defaults.add(Pair.from(ProtocolCompileDirectory, "./settings"));
-			defaults.add(Pair.from(ReportingClass,"HTML Reporting"));
-
-			defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
-				{
-					add("WidgetControlType");
-				}
-			}));
-
-			defaults.add(Pair.from(ClickableClasses, new ArrayList<String>() {
-				{
-					add("v-menubar-menuitem");
-					add("v-menubar-menuitem-caption");
-				}
-			}));
-
-			defaults.add(Pair.from(TypeableClasses, new ArrayList<String>()));
-
-			defaults.add(Pair.from(DeniedExtensions, new ArrayList<String>() {
-				{
-					add("pdf");
-					add("jpg");
-					add("png");
-				}
-			}));
-
-			defaults.add(Pair.from(DomainsAllowed, new ArrayList<String>() {
-				{
-					add("www.ou.nl");
-					add("mijn.awo.ou.nl");
-					add("login.awo.ou.nl");
-				}
-			}));
-
-            defaults.add(Pair.from(TagsToFilter, new ArrayList<String>() {
-                {
-                    add("Title");
-                    add("WebName");
-                    add("WebTagName");
-                }
-            }));
-
-
-			defaults.add(Pair.from(TagsForSuspiciousOracle, new ArrayList<String>() {
-				{
-					add("Title");
-					add("WebName");
-					add("WebTagName");
-				}
-			}));
-
-			defaults.add(Pair.from(FollowLinks, true));
-			defaults.add(Pair.from(BrowserFullScreen, true));
-			defaults.add(Pair.from(SwitchNewTabs, true));
-
-			/*
-			//TODO web driver settings for login feature
-			defaults.add(Pair.from(Login, null)); // null = feature not enabled
-			// login = Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
-			defaults.add(Pair.from(Username, ""));
-			defaults.add(Pair.from(Password, ""));
-			*/
-
-			//Overwrite the default settings with those from the file
-			Settings settings = Settings.fromFile(defaults, file);
-
-			//If user use command line to input properties, mix file settings with cmd properties
-			if(argv.length>0) {
-				try {
-					settings = Settings.fromFileCmd(defaults, file, argv);
-				}catch(IOException e) {
-					System.out.println("Error with command line properties. Examples:");
-					System.out.println("testar SUTConnectorValue=\"C:\\\\Windows\\\\System32\\\\notepad.exe\" Sequences=11 SequenceLength=12 SuspiciousTags=.*aaa.*");
-					System.out.println("SUTConnectorValue=\" \"\"C:\\\\Program Files\\\\Internet Explorer\\\\iexplore.exe\"\" \"\"https://www.google.es\"\" \"");
-				}
-				//SUTConnectorValue=" ""C:\\Program Files\\Internet Explorer\\iexplore.exe"" ""https://www.google.es"" "
-				//SUTConnectorValue="C:\\Windows\\System32\\notepad.exe"
-			}
-
-			// check that the abstract state properties and the abstract action properties have at least 1 value
-			if ((settings.get(AbstractStateAttributes)).isEmpty()) {
-				throw new ConfigException("Please provide at least 1 valid abstract state attribute or leave the key out of the settings file");
-			}
-
-			try{
-				settings.get(ConfigTags.ExtendedSettingsFile);
-			} catch (NoSuchTagException e){
-				settings.set(ConfigTags.ExtendedSettingsFile, file.replace(SETTINGS_FILE, ExtendedSettingFile.FileName));
-			}
-			ExtendedSettingsFactory.Initialize(settings.get(ConfigTags.ExtendedSettingsFile));
-
-			return settings;
-		} catch (IOException ioe) {
-			throw new ConfigException("Unable to load configuration file!", ioe);
-		}
-	}
-
 	/**
 	 * This method creates a sse file to change TESTAR protocol if sett param matches an existing protocol
 	 * @param sett
@@ -618,18 +431,9 @@ public class Main {
 	 */
 	public static void protocolFromCmd(String sett) throws IOException {
 		String sseName = sett.substring(sett.indexOf("=")+1);
-		boolean existSSE = false;
-
-		//Check if choose protocol exist
-		for (File f : new File(settingsDir).listFiles()) {
-			if (new File(settingsDir + sseName + File.separator + SETTINGS_FILE).exists()) {
-				existSSE = true;
-				break;
-			}
-		}
 
 		//Command line protocol doesn't exist
-		if(!existSSE) {System.out.println("Protocol: "+sseName+" doesn't exist");}
+		if(!existsSSE(sseName)) {System.out.println("CMD Protocol: " + sseName + " doesn't exist");}
 
 		else{
 			//Obtain previous sse file and delete it (if exist)
@@ -650,40 +454,15 @@ public class Main {
 
 		}
 	}
-
-	/**
-	 * This method allow us to define and use settings as JVM arguments. 
-	 * Example: -DShowVisualSettingsDialogOnStartup=false testar
-	 * 
-	 * @param settings
-	 */
-	private static void overrideWithUserProperties(Settings settings) {
-		String pS, p;
-		// headless mode
-		pS = ConfigTags.ShowVisualSettingsDialogOnStartup.name();
-		p = System.getProperty(pS, null);
-		if (p == null) {
-			p = System.getProperty("headless", null); // mnemonic
-		}
-		if (p != null) {
-			settings.set(ConfigTags.ShowVisualSettingsDialogOnStartup, !(Boolean.valueOf(p)));
-			LogSerialiser.log("Property <" + pS + "> overridden to <" + p + ">", LogSerialiser.LogLevel.Critical);
-		}
-		// SequenceLength
-		pS = ConfigTags.SequenceLength.name();
-		p = System.getProperty(pS, null);
-		if (p == null) {
-			p = System.getProperty("SL", null); // mnemonic
-		}
-		if (p != null) {
-			try {
-				Integer sl = Integer.valueOf(p);
-				settings.set(ConfigTags.SequenceLength, sl);
-				LogSerialiser.log("Property <" + pS + "> overridden to <" + sl.toString() + ">", LogSerialiser.LogLevel.Critical);
-			} catch (NumberFormatException e) {
-				LogSerialiser.log("Property <" + pS + "> could not be set! (using default)", LogSerialiser.LogLevel.Critical);
+	// Check if sse protocol exist
+	private static boolean existsSSE(String sseName) {
+		for (File f : new File(settingsDir).listFiles()) {
+			if (new File(settingsDir + sseName + File.separator + SETTINGS_FILE).exists()) {
+				return true;
 			}
 		}
+
+		return false;
 	}
 
 	/**

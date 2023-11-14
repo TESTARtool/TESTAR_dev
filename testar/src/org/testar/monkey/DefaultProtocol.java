@@ -60,19 +60,10 @@ import org.testar.reporting_proofofconcept.ReportManager;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.serialisation.ScreenshotSerialiser;
 import org.testar.serialisation.TestSerialiser;
-import org.testar.statemodel.StateModelManager;
-import org.testar.statemodel.StateModelManagerFactory;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.*;
-import java.util.List;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
-
-import static org.testar.monkey.alayer.Tags.*;
+import org.testar.settings.Settings;
+import org.openqa.selenium.SessionNotCreatedException;
+import org.testar.monkey.alayer.android.AndroidProtocolUtil;
+import org.testar.monkey.alayer.ios.IOSProtocolUtil;
 
 public class DefaultProtocol extends RuntimeControlsProtocol {
 

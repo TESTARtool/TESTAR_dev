@@ -30,11 +30,14 @@
 
 package org.testar.protocols;
 
-import org.testar.monkey.Settings;
-import org.testar.monkey.alayer.Action;
-import org.testar.monkey.alayer.SUT;
-import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Widget;
+import org.testar.plugin.NativeLinker;
+import org.testar.reporting.HtmlSequenceReport;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.exceptions.StateBuildException;
+import org.testar.monkey.ConfigTags;
+import org.testar.settings.Settings;
+import org.testar.OutputStructure;
 import org.testar.monkey.alayer.android.actions.AndroidBackAction;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;

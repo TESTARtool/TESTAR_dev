@@ -36,7 +36,7 @@ import java.io.File;
 import org.testar.monkey.Util;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
-import org.testar.monkey.Settings;
+import org.testar.settings.Settings;
 
 public class OutputStructure {
 

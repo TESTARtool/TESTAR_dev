@@ -31,21 +31,14 @@
 package org.testar.protocols;
 
 import org.junit.Assume;
-import org.testar.monkey.alayer.actions.ActionRoles;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.testar.monkey.alayer.Role;
-import org.testar.monkey.alayer.Roles;
 import org.testar.monkey.alayer.Tags;
-import org.testar.monkey.alayer.Widget;
-import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.monkey.alayer.windows.UIARoles;
-import org.testar.monkey.alayer.windows.UIATags;
 import org.testar.stub.StateStub;
 import org.testar.stub.WidgetStub;
 
 import static org.junit.Assert.*;
-import static org.testar.monkey.alayer.windows.UIARoles.*;
 
 public class GetWidgetIsClickable {
 

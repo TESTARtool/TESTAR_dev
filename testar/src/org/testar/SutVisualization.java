@@ -35,7 +35,7 @@ import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.devices.Mouse;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Settings;
+import org.testar.settings.Settings;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;

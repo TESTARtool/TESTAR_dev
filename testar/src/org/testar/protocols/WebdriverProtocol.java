@@ -53,18 +53,8 @@ import org.testar.monkey.alayer.windows.WinProcess;
 import org.testar.monkey.alayer.windows.Windows;
 import org.testar.plugin.NativeLinker;
 import org.testar.serialisation.LogSerialiser;
-
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
-
-import static org.testar.monkey.alayer.Tags.Blocked;
-import static org.testar.monkey.alayer.Tags.Enabled;
+import org.testar.settings.Settings;
+import org.testar.reporting.Reporting;
 
 public class WebdriverProtocol extends GenericUtilsProtocol {
     //Attributes for adding slide actions

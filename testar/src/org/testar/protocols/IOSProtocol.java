@@ -37,6 +37,9 @@ import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
+import org.testar.monkey.ConfigTags;
+import org.testar.settings.Settings;
+import org.testar.OutputStructure;
 import org.testar.monkey.alayer.ios.enums.IOSTags;
 import org.testar.plugin.NativeLinker;
 

@@ -19,4 +19,3 @@ RUN sudo chmod 777 /runImage
 RUN sudo chmod -R 777 /testar
 
 CMD [ "sh", "/runImage"]
-
