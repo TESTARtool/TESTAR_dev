@@ -32,11 +32,8 @@ package org.testar.monkey;
 
 import org.testar.CodingManager;
 import org.testar.StateManagementTags;
-import org.testar.extendedsettings.ExtendedSettingFile;
-import org.testar.extendedsettings.ExtendedSettingsFactory;
 import org.testar.managers.NativeHookManager;
 import org.testar.monkey.alayer.Tag;
-import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 import org.testar.monkey.alayer.windows.Windows10;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
@@ -45,7 +42,6 @@ import org.testar.serialisation.ScreenshotSerialiser;
 import org.testar.serialisation.TestSerialiser;
 import org.testar.settings.Settings;
 import org.testar.settings.dialog.SettingsDialog;
-import org.testar.monkey.alayer.Tag;
 
 import javax.swing.*;
 import java.io.File;
@@ -56,10 +52,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
-import org.testar.monkey.alayer.windows.Windows10;
-import org.testar.plugin.NativeLinker;
-import org.testar.plugin.OperatingSystems;
-import org.testar.managers.NativeHookManager;
 
 import static org.testar.monkey.ConfigTags.*;
 import static org.testar.monkey.Util.compileProtocol;

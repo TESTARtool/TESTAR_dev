@@ -61,9 +61,19 @@ import org.testar.serialisation.LogSerialiser;
 import org.testar.serialisation.ScreenshotSerialiser;
 import org.testar.serialisation.TestSerialiser;
 import org.testar.settings.Settings;
-import org.openqa.selenium.SessionNotCreatedException;
-import org.testar.monkey.alayer.android.AndroidProtocolUtil;
-import org.testar.monkey.alayer.ios.IOSProtocolUtil;
+import org.testar.statemodel.StateModelManager;
+import org.testar.statemodel.StateModelManagerFactory;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.*;
+import java.util.List;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
+
+import static org.testar.monkey.alayer.Tags.*;
 
 public class DefaultProtocol extends RuntimeControlsProtocol {
 
@@ -128,24 +138,24 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	protected List<ProcessInfo> contextRunningProcesses = null;
-	protected static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+	protected static final String            DATE_FORMAT             = "yyyy-MM-dd HH:mm:ss";
 	protected static final Logger INDEXLOG = LogManager.getLogger();
 	protected double passSeverity = Verdict.SEVERITY_OK;
 
 	public static Action lastExecutedAction = null;
 
 	protected EventHandler eventHandler;
-	protected Canvas cv;
-	protected Pattern clickFilterPattern = null;
-	protected Map<String, Matcher> clickFilterMatchers = new WeakHashMap<String, Matcher>();
-	protected Pattern suspiciousTitlesPattern = null;
+	protected Canvas               cv;
+	protected Pattern              clickFilterPattern      = null;
+	protected Map<String, Matcher> clickFilterMatchers     = new WeakHashMap<String, Matcher>();
+	protected Pattern              suspiciousTitlesPattern = null;
 	protected Map<String, Matcher> suspiciousTitlesMatchers = new WeakHashMap<String, Matcher>();
 	private StateBuilder builder;
 	
 	protected int escAttempts = 0;
 
 	protected StateModelManager stateModelManager;
-	private String startOfSutDateString; //value set when SUT started, used for calculating the duration of test
+	private   String            startOfSutDateString; //value set when SUT started, used for calculating the duration of test
 
 	// Creating a logger with log4j library:
 	private static Logger logger = LogManager.getLogger();
@@ -333,9 +343,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			File seqFile = new File(settings.get(ConfigTags.PathToReplaySequence));
 
-			FileInputStream fis = new FileInputStream(seqFile);
+			FileInputStream     fis = new FileInputStream(seqFile);
 			BufferedInputStream bis = new BufferedInputStream(fis);
-			GZIPInputStream gis = new GZIPInputStream(bis);
+			GZIPInputStream   gis = new GZIPInputStream(bis);
 			ObjectInputStream ois = new ObjectInputStream(gis);
 
 			ois.readObject();
