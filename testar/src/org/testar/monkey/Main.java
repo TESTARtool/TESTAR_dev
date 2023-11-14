@@ -666,7 +666,7 @@ public class Main {
 			p = System.getProperty("headless", null); // mnemonic
 		}
 		if (p != null) {
-			settings.set(ConfigTags.ShowVisualSettingsDialogOnStartup, !(new Boolean(p).booleanValue()));
+			settings.set(ConfigTags.ShowVisualSettingsDialogOnStartup, !(Boolean.valueOf(p)));
 			LogSerialiser.log("Property <" + pS + "> overridden to <" + p + ">", LogSerialiser.LogLevel.Critical);
 		}
 		// SequenceLength
@@ -677,7 +677,7 @@ public class Main {
 		}
 		if (p != null) {
 			try {
-				Integer sl = new Integer(p);
+				Integer sl = Integer.valueOf(p);
 				settings.set(ConfigTags.SequenceLength, sl);
 				LogSerialiser.log("Property <" + pS + "> overridden to <" + sl.toString() + ">", LogSerialiser.LogLevel.Critical);
 			} catch (NumberFormatException e) {

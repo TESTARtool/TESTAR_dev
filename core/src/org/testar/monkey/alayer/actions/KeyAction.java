@@ -65,7 +65,7 @@ public abstract class KeyAction extends TaggableBase implements Action {
 			if (key.equals(KBKeys.VK_ARROBA) ||
 				key.equals(KBKeys.VK_EXCLAMATION_MARK) ||
 				key.equals(KBKeys.VK_UNDERSCORE)) // java.awt.Robot throwing "Invalid key code"
-				altNumpad(system,new Integer(key.code()).toString());
+				altNumpad(system, Integer.toString(key.code()));
 			else
 				performKeyAction(system,key);
 		}catch(NoSuchTagException tue){

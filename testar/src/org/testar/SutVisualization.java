@@ -222,7 +222,7 @@ public class SutVisualization {
         for(Action a : actions){
             //a.get(Visualizer, Util.NullVisualizer).run(state, canvas, Pen.PEN_IGNORE);
             zindex = getTargetZindex(state,a);
-            zindexes.put(a, new Integer(zindex));
+            zindexes.put(a, Integer.valueOf(zindex));
             if (zindex < minz)
                 minz = zindex;
             if (zindex > maxz)

@@ -535,8 +535,8 @@ public class StateFetcher implements Callable<UIAState>{
 
 				Rect rect = null;
 				try {
-					rect = Rect.from(new Double(x).doubleValue(), new Double(y).doubleValue(),
-									 new Double(width).doubleValue(), new Double(height).doubleValue());
+					rect = Rect.from(Double.valueOf(x).doubleValue(), Double.valueOf(y).doubleValue(),
+									 Double.valueOf(width).doubleValue(), Double.valueOf(height).doubleValue());
 					//if (parent.parent == null)
 					//	parent.rect = el.rect; // fix UI actions at root widget
 				} catch (Exception e){
@@ -575,7 +575,7 @@ public class StateFetcher implements Callable<UIAState>{
 					}*/
 					
 						long childAC;
-						int c = new Integer(childrenCount).intValue();
+						int c = Integer.valueOf(childrenCount).intValue();
 						el.children = new ArrayList<UIAElement>(c);
 						for (int i=0; i<c; i++){
 							childAC =  Windows.GetAccessibleChildFromContext(vmidAC[0],vmidAC[1],i);

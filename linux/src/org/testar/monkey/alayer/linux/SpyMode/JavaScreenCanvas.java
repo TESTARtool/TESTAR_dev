@@ -155,7 +155,8 @@ public class JavaScreenCanvas implements Canvas {
 
         runningCheck();
         //System.out.println("Draw Line: (" + x1 + ", " + y1 + ").");
-        _paneReference.addDrawableContent(new DrawableLine(new Point(new Double(x1).intValue(), new Double(y1).intValue()), pen, _defaultPen, new Point(new Double(x2).intValue(), new Double(y2).intValue())));
+        _paneReference.addDrawableContent(new DrawableLine(new Point(Double.valueOf(x1).intValue(), Double.valueOf(y1).intValue()), pen, _defaultPen,
+                                                           new Point(Double.valueOf(x2).intValue(), Double.valueOf(y2).intValue())));
 
     }
 
@@ -165,7 +166,7 @@ public class JavaScreenCanvas implements Canvas {
 
         runningCheck();
         //System.out.println("Draw Text: (" + x + ", " + y + ").");
-        _paneReference.addDrawableContent(new DrawableText(new Point(new Double(x).intValue(), new Double(y).intValue()), pen, _defaultPen, text));
+        _paneReference.addDrawableContent(new DrawableText(new Point(Double.valueOf(x).intValue(), Double.valueOf(y).intValue()), pen, _defaultPen, text));
 
     }
 
@@ -175,8 +176,8 @@ public class JavaScreenCanvas implements Canvas {
 
         runningCheck();
         //System.out.println("Draw Ellipse: (" + x + ", " + y + ").");
-        _paneReference.addDrawableContent(new DrawableEllipse(new Point(new Double(x).intValue(), new Double(y).intValue()), pen, _defaultPen,
-                new Rectangle(new Double(x).intValue(), new Double(y).intValue(), new Double(width).intValue(), new Double(height).intValue())));
+        _paneReference.addDrawableContent(new DrawableEllipse(new Point(Double.valueOf(x).intValue(), Double.valueOf(y).intValue()), pen, _defaultPen,
+                new Rectangle(Double.valueOf(x).intValue(), Double.valueOf(y).intValue(), Double.valueOf(width).intValue(), Double.valueOf(height).intValue())));
 
     }
 
@@ -202,8 +203,8 @@ public class JavaScreenCanvas implements Canvas {
 
         runningCheck();
         //System.out.println("Draw Rect: (" + x + ", " + y + ").");
-        _paneReference.addDrawableContent(new DrawableRect(new Point(new Double(x).intValue(), new Double(y).intValue()), pen, _defaultPen,
-                new Rectangle(new Double(x).intValue(), new Double(y).intValue(), new Double(width).intValue(), new Double(height).intValue())));
+        _paneReference.addDrawableContent(new DrawableRect(new Point(Double.valueOf(x).intValue(), Double.valueOf(y).intValue()), pen, _defaultPen,
+                new Rectangle(Double.valueOf(x).intValue(), Double.valueOf(y).intValue(), Double.valueOf(width).intValue(), Double.valueOf(height).intValue())));
 
     }
 
