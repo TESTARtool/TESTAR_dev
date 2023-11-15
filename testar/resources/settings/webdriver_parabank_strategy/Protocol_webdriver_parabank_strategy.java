@@ -28,6 +28,7 @@
  *
  */
 
+import org.testar.CodingManager;
 import org.python.antlr.ast.Str;
 import org.testar.RandomActionSelector;
 import org.testar.managers.InputDataManager;
@@ -54,6 +55,7 @@ import parsing.ParseUtil;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
@@ -88,6 +90,27 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 	private ArrayList<String> operatingSystems = new ArrayList<>();
 
 	@Override
+	protected void buildStateActionsIdentifiers(State state, Set<Action> actions) {
+		CodingManager.buildIDs(state, actions);
+		for(Action action : actions) {
+			if(action.get(Tags.OriginWidget) != null) {
+
+				Widget widget = action.get(Tags.OriginWidget);
+
+				String collisionId = CodingManager.lowCollisionID(state.get(Tags.AbstractIDCustom)
+						+ widget.get(Tags.AbstractIDCustom)
+						+ action.get(Tags.Role));
+
+				String actionAbstractId = CodingManager.ID_PREFIX_ACTION 
+						+ CodingManager.ID_PREFIX_ABSTRACT_CUSTOM 
+						+ collisionId;
+
+				action.set(Tags.AbstractIDCustom, actionAbstractId);
+			}
+		}
+	}
+	
+	@Override
 	protected void initialize(Settings settings)
 	{
 		super.initialize(settings);
@@ -118,7 +141,15 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 			File parabankStart = new File(parabankFolder + File.separator + "apache_parabank_start.bat").getCanonicalFile();
 			if(parabankStart.exists()) {
 				Process proc = Runtime.getRuntime().exec("cmd /c " + parabankStart, null, parabankFolder);
-				Util.pause(60); // Wait seconds for parabank to be deployed
+				// Wait until apache web server is deployed
+				while(!apacheWebIsReady()) {
+					try {
+						System.out.println("Waiting for a web service in localhost:8080 ...");
+						Thread.sleep(5000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
 			} else {
 				throw new SystemStartException("parabankStart does not exists");
 			}
@@ -141,6 +172,31 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		formFillingWidget = null;
 
 		return system;
+	}
+
+	private static boolean apacheWebIsReady() {
+		try {
+			// Try to connect to the localhost apache tomcat web server
+			URL url = new URL("http://localhost:8080/parabank");
+			HttpURLConnection httpConnection = (HttpURLConnection) url.openConnection();
+			httpConnection.setRequestMethod("GET");
+			httpConnection.connect();
+
+			// If we have get connection with the web app, everything is ready
+			if(httpConnection.getResponseCode() == 200) {
+				httpConnection.disconnect();
+				return true;
+			} 
+			// If not, server is probably being deployed
+			else {
+				httpConnection.disconnect();
+				return false;
+			}
+		} 
+		catch (Exception e) {
+			System.out.println("*** http://localhost:8080 is NOT ready ***");
+		}
+		return false;
 	}
 
 	@Override
@@ -327,6 +383,8 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		if(formContainsNonVisibleSubmitButtonBelow(formWidget))
 		{
 			Action pageDown = ac.hitKey(KBKeys.VK_PAGE_DOWN);
+			formWidget.set(WdTags.WebId, getHTM()+".page.down"); // Ex: findtrans.htm.page.down
+			pageDown.set(Tags.Role, ActionRoles.HitKeyScrollDownAction);
 			pageDown.set(Tags.OriginWidget, formWidget);
 			formFillingActions.add(pageDown);
 		}
@@ -498,13 +556,14 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 				String query = String.format("return document.getElementById('%s').length", elementId);
 				Object response = WdDriver.executeScript(query);
 				selectLength = ( response != null ? Integer.parseInt(response.toString()) : 1 );
+				selectLength = new Random().nextInt(selectLength);
 			}
 			catch (Exception e)
 			{
 				System.out.println("*** ACTION WARNING: problems trying to obtain select list length: " + elementId);
 			}
 
-			return new WdSelectListAction(elementId, "", Integer.toString(selectLength-1), w);
+			return new WdSelectListAction(elementId, "", Integer.toString(selectLength), w);
 		}
 
 		String elementName = w.get(WdTags.WebName, "");
@@ -516,13 +575,14 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 				String query = String.format("return document.getElementsByName('%s')[0].length", elementName);
 				Object response = WdDriver.executeScript(query);
 				selectLength = ( response != null ? Integer.parseInt(response.toString()) : 1 );
+				selectLength = new Random().nextInt(selectLength);
 			}
 			catch (Exception e)
 			{
 				System.out.println("*** ACTION WARNING: problems trying to obtain select list length: " + elementName);
 			}
 
-			return new WdSelectListAction("", elementName, Integer.toString(selectLength-1), w);
+			return new WdSelectListAction("", elementName, Integer.toString(selectLength), w);
 		}
 
 		return new AnnotatingActionCompiler().leftClickAt(w);
@@ -597,6 +657,10 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		{
 			// Reset form actions because next time we need to fill completely again
 			strategyActionsExecuted = new HashMap<String, Integer>();
+			// Submit actions require extra time to load next state
+			boolean executed = super.executeAction(system, state, action);
+			Util.pause(5);
+			return executed;
 		}
 
 		return super.executeAction(system, state, action);

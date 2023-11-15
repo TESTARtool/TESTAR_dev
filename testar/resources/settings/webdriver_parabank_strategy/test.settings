@@ -124,7 +124,7 @@ StateModelStoreWidgets = true
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WebWidgetId
+AbstractStateAttributes = WebWidgetId,WebWidgetName
 
 #################################################################
 # WebDriver features
@@ -190,14 +190,14 @@ FaultThreshold = 1.0E-9
 DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
-ActionDuration = 0.1
+ActionDuration = 0.5
 ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
-TimeToWaitAfterAction = 2
-StartupTime = 2.0
+TimeToWaitAfterAction = 1
+StartupTime = 10.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true

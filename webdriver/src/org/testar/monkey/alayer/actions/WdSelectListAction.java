@@ -57,11 +57,15 @@ public class WdSelectListAction extends TaggableBase implements Action {
 
     @Override
     public void run(SUT system, State state, double duration) {
-    	if(!elementId.isEmpty()) {
-    		WdDriver.executeScript(String.format("document.getElementById('%s').options[%s].selected = true", elementId, value));
-    	}
-    	else if(!uniqueName.isEmpty()) {
-    		WdDriver.executeScript(String.format("document.getElementsByName('%s')[0].options[%s].selected = true", uniqueName, value));
+    	try {
+    		if(!elementId.isEmpty()) {
+    			WdDriver.executeScript(String.format("document.getElementById('%s').options[%s].selected = true", elementId, value));
+    		}
+    		else if(!uniqueName.isEmpty()) {
+    			WdDriver.executeScript(String.format("document.getElementsByName('%s')[0].options[%s].selected = true", uniqueName, value));
+    		}
+    	} catch (Exception e) {
+    		System.err.println("ERROR: Executing WdSelectListAction: " + this.get(Tags.Desc, ""));
     	}
     }
 
