@@ -68,20 +68,29 @@ import static javax.swing.UIManager.*;
 public class SettingsDialog extends JFrame implements Observer {
   private static final long serialVersionUID = 5156320008281200950L;
 
-  static final String TESTAR_VERSION = "2.6.2 (10-Feb-2023)";
+  static final String TESTAR_VERSION = "2.6.5 (27-Jun-2023)";
 
   private String settingsFile;
   private Settings settings;
   //TODO: what is this ret variable. Cant you just return settings in the run method?
   private Settings ret;
 
+  private JTabbedPane jTabsPane;
   private JButton btnGenerate;
   private JButton btnSpy;
   private JButton btnReplay;
   private JButton btnView;
-  private JButton btnRecord;
+  private JButton btnModel;
+  private StateModelPanel modelPanel;
+  //private JButton btnRecord; // Record mode is disabled temporally
 
   private static final int GENERAL_TAB_INDEX = 1;
+  private static final int FILTER_TAB_INDEX = 2;
+  private static final int ORACLES_TAB_INDEX = 3;
+  private static final int TIMES_TAB_INDEX = 4;
+  //private static final int MISC_TAB_INDEX = 5;
+  private static final int MODEL_TAB_INDEX = 5;
+  private static final int ADVANCED_TAB_INDEX = 6;
   private final Map<Integer, Pair<String, SettingsPanel>> settingPanels = new HashMap<>();
 
   /**
@@ -169,11 +178,11 @@ public class SettingsDialog extends JFrame implements Observer {
       throw new IllegalStateException("Your ClickFilter is not a valid regular expression!");
     }
 
-    userInputPattern = settings.get(ConfigTags.SuspiciousTitles);
+    userInputPattern = settings.get(ConfigTags.SuspiciousTags);
     try {
       Pattern.compile(userInputPattern);
     } catch (PatternSyntaxException exception) {
-      throw new IllegalStateException("Your Oracle SuspiciousTitles is not a valid regular expression!");
+      throw new IllegalStateException("Your Oracle SuspiciousTags is not a valid regular expression!");
     }
 
     userInputPattern = settings.get(ConfigTags.SuspiciousProcessOutput);
@@ -244,16 +253,18 @@ public class SettingsDialog extends JFrame implements Observer {
     btnSpy = getBtnSpy();
     btnReplay = getBtnReplay();
     btnView = getBtnView();
-    btnRecord = getBtnRecord();
+    btnModel = getBtnModel();
+    //btnRecord = getBtnRecord(); // Record mode is disabled temporally
 
-    JTabbedPane jTabsPane = new JTabbedPane();
+    jTabsPane = new JTabbedPane();
     jTabsPane.addTab("About", new AboutPanel());
     settingPanels.put(GENERAL_TAB_INDEX, new Pair<>("General Settings", new GeneralPanel(this)));
-    settingPanels.put(settingPanels.size() + 1, new Pair<>("Filters", new FilterPanel()));
-    settingPanels.put(settingPanels.size() + 1, new Pair<>("Oracles", new OraclePanel()));
-    settingPanels.put(settingPanels.size() + 1, new Pair<>("Time Settings", new TimingPanel()));
-    settingPanels.put(settingPanels.size() + 1, new Pair<>("Misc", new MiscPanel()));
-    settingPanels.put(settingPanels.size() + 1, new Pair<>("State Model", StateModelPanel.createStateModelPanel()));
+    settingPanels.put(FILTER_TAB_INDEX, new Pair<>("Filters", new FilterPanel()));
+    settingPanels.put(ORACLES_TAB_INDEX, new Pair<>("Oracles", new OraclePanel()));
+    settingPanels.put(TIMES_TAB_INDEX, new Pair<>("Time Settings", new TimingPanel()));
+    //settingPanels.put(MISC_TAB_INDEX, new Pair<>("Misc", new MiscPanel())); // TODO: Misc panel is disabled temporally from the GUI
+    settingPanels.put(MODEL_TAB_INDEX, new Pair<>("State Model", modelPanel = StateModelPanel.createStateModelPanel()));
+    settingPanels.put(ADVANCED_TAB_INDEX, new Pair<>("Advanced Options", new AdvancedPanel()));
 
     settingPanels.forEach((k,v) -> jTabsPane.add(v.left(),v.right()));
 
@@ -306,7 +317,8 @@ public class SettingsDialog extends JFrame implements Observer {
                             .addComponent(btnSpy, PREFERRED_SIZE, 129, PREFERRED_SIZE)
                             .addComponent(btnReplay, PREFERRED_SIZE, 129, PREFERRED_SIZE)
                             .addComponent(btnView, PREFERRED_SIZE, 129, PREFERRED_SIZE)
-                            .addComponent(btnRecord, PREFERRED_SIZE, 129, PREFERRED_SIZE)
+                            .addComponent(btnModel, PREFERRED_SIZE, 129, PREFERRED_SIZE)
+                            //.addComponent(btnRecord, PREFERRED_SIZE, 129, PREFERRED_SIZE) // Record mode is disabled temporally
                     )
                 .addPreferredGap(RELATED)
                 .addComponent(jTabsPane, PREFERRED_SIZE, 400, PREFERRED_SIZE)
@@ -321,11 +333,13 @@ public class SettingsDialog extends JFrame implements Observer {
     group.addGap(2, 2, 2);
     group.addComponent(btnGenerate, 120, 120, 120);
     group.addGap(2, 2, 2);
-    group.addComponent(btnRecord, 120, 120, 120);
-    group.addGap(2, 2, 2);
+    //group.addComponent(btnRecord, 120, 120, 120); // Record mode is disabled temporally
+    //group.addGap(2, 2, 2);
     group.addComponent(btnReplay, 120, 120, 120);
     group.addGap(2, 2, 2);
     group.addComponent(btnView, 120, 120, 120);
+    group.addGap(2, 2, 2);
+    group.addComponent(btnModel, 120, 120, 120);
 
     return group;
   }
@@ -383,7 +397,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private JButton getBtnView() throws IOException {
     JButton btn = new JButton();
     btn.setBackground(new Color(255, 255, 255));
-    btn.setIcon(new ImageIcon(loadIcon("/icons/button_view.png")));
+    btn.setIcon(new ImageIcon(loadIcon("/icons/view_report.png")));
     btn.setToolTipText(ToolTipTexts.btnViewTTT);
     btn.setFocusPainted(false);
     btn.addActionListener(this::btnViewActionPerformed);
@@ -402,19 +416,35 @@ public class SettingsDialog extends JFrame implements Observer {
     }
   }
 
-  private JButton getBtnRecord() throws IOException {
-    JButton btn = new JButton();
-    btn.setBackground(new Color(255, 255, 255));
-    btn.setIcon(new ImageIcon(loadIcon("/icons/button_record.png")));
-    btn.setToolTipText(ToolTipTexts.btnRecordTTT);
-    btn.setFocusPainted(false);
-    btn.addActionListener(this::btnRecordActionPerformed);
-    return btn;
+  private JButton getBtnModel() throws IOException {
+	  JButton btn = new JButton();
+	  btn.setBackground(new Color(255, 255, 255));
+	  btn.setIcon(new ImageIcon(loadIcon("/icons/view_model.PNG")));
+	  btn.setToolTipText(ToolTipTexts.btnModelTTT);
+	  btn.setFocusPainted(false);
+	  btn.addActionListener(this::btnModelActionPerformed);
+	  return btn;
   }
 
-  private void btnRecordActionPerformed(ActionEvent evt) {
-      start(RuntimeControlsProtocol.Modes.Record);
-    }
+  private void btnModelActionPerformed(ActionEvent evt) {
+	  jTabsPane.setSelectedIndex(MODEL_TAB_INDEX);
+	  modelPanel.openServer();
+  }
+
+// Record mode is disabled temporally
+//  private JButton getBtnRecord() throws IOException {
+//	  JButton btn = new JButton();
+//	  btn.setBackground(new Color(255, 255, 255));
+//	  btn.setIcon(new ImageIcon(loadIcon("/icons/button_record.png")));
+//	  btn.setToolTipText(ToolTipTexts.btnRecordTTT);
+//	  btn.setFocusPainted(false);
+//	  btn.addActionListener(this::btnRecordActionPerformed);
+//	  return btn;
+//  }
+//
+//  private void btnRecordActionPerformed(ActionEvent evt) {
+//	  start(RuntimeControlsProtocol.Modes.Record);
+//  }
 
   @Override
   public void update(Observable o, Object arg) {

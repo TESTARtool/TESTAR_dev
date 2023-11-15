@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2023 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -33,7 +33,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.HasDevTools;
-import org.openqa.selenium.devtools.v112.network.Network;
+import org.openqa.selenium.devtools.v113.network.Network;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.SutVisualization;
@@ -44,10 +44,7 @@ import org.testar.monkey.alayer.actions.*;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.webdriver.WdDriver;
-import org.testar.monkey.alayer.webdriver.WdElement;
 import org.testar.monkey.alayer.webdriver.WdWidget;
-import org.testar.monkey.alayer.webdriver.enums.WdRoles;
-import org.testar.plugin.NativeLinker;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.securityanalysis.*;
 import org.testar.securityanalysis.helpers.SecurityOracleOrchestrator;
@@ -250,28 +247,5 @@ public class Protocol_webdriver_security_analysis extends WebdriverProtocol {
             return super.executeAction(system, state, action);
         else
             return super.executeAction(system, state, new NOP());
-    }
-
-    /** Enables TESTAR to click components that are outside the window **/
-    @Override
-    protected boolean isClickable(Widget widget) {
-        Role role = widget.get(Tags.Role, Roles.Widget);
-        if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
-            // Input type are special...
-            if (role.equals(WdRoles.WdINPUT)) {
-                String type = ((WdWidget) widget).element.type;
-                return WdRoles.clickableInputTypes().contains(type);
-            }
-            return true;
-        }
-
-        WdElement element = ((WdWidget) widget).element;
-        if (element.isClickable) {
-            return true;
-        }
-
-        Set<String> clickSet = new HashSet<>(clickableClasses);
-        clickSet.retainAll(element.cssClasses);
-        return clickSet.size() > 0;
     }
 }

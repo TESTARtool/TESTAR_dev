@@ -2,76 +2,71 @@ grammar Strategy;
 
 strategy_file:  strategy EOF;
 
-strategy:       if_then_else | action_list;
+strategy:       action+;
 
-if_then_else:   IF ifExpr=bool_expr     THEN thenExpr=action_expr   ELSE elseExpr=action_expr;
+/////////////////////////
+// action parser rules //
+/////////////////////////
 
-/////////////////////
-// IF parser rules //
-/////////////////////
+action: cond_action | uncond_action;
+
+cond_action:    INT? IF ifExpr=bool_expr     THEN thenExpr=strategy   ELSE elseExpr=strategy
+|               INT? IF ifExpr=bool_expr     THEN thenExpr=strategy;
+
+uncond_action:  INT? 'select-previous'                                                   #selectPreviousAction
+|               INT? 'select-random'             MODIFIER?      RELATION                 #selectRelation
+|               INT? 'select-random'             MODIFIER?     (FILTER ACTION_TYPE)?     #selectRandomAction
+;
+
+//////////////////////////
+// boolean parser rules //
+//////////////////////////
 
 bool_expr:                        NOT                               expr=bool_expr              #notExpr
 |   LP                            NOT                               expr=bool_expr      RP      #notExpr
-|       left=bool_expr      opr=( AND | XOR | OR | IS )             right=bool_expr             #boolOprExpr
-|   LP  left=bool_expr      opr=( AND | XOR | OR | IS )             right=bool_expr     RP      #boolOprExpr
-|       left=number_expr    opr=( LT | LE | GT | GE | EQ | NE )     right=number_expr           #numberOprExpr
-|   LP  left=number_expr    opr=( LT | LE | GT | GE | EQ | NE )     right=number_expr   RP      #numberOprExpr
+|       left=bool_expr      opr=( AND | XOR | OR | EQUALS )         right=bool_expr             #boolOprExpr
+|   LP  left=bool_expr      opr=( AND | XOR | OR | EQUALS )         right=bool_expr     RP      #boolOprExpr
+|       left=int_expr       opr=( LT | LE | GT | GE | EQ | NE )     right=int_expr              #intOprExpr
+|   LP  left=int_expr       opr=( LT | LE | GT | GE | EQ | NE )     right=int_expr      RP      #intOprExpr
 |                           state_boolean                                                       #stateBool
 |   LP                      state_boolean                                               RP      #stateBool
-|                           BOOLEAN                                                             #plainBool
+|                           BOOL                                                                #plainBool
+;
+state_boolean:      'state-changed'                                                       #stateChanged
+|                   'any-exist'             MODIFIER?    RELATION                         #anyExistRelatedAction
+|                   'any-exist'             MODIFIER?   (FILTER     ACTION_TYPE)?         #anyExist
+|                   'previous-exist'                    (FILTER     ACTION_TYPE)?         #previousExist
+|                   'sut'                   FILTER       SUT                              #sutType
 ;
 
-
-number_expr:         number_of_actions | NUMBER;
-
-number_of_actions:  'n-actions'      VISIT_MODIFIER?   (FILTER     ACTION_TYPE)?;
-
-state_boolean:      'state-changed'                                                         #stateChanged
-|                   'any-exist'             VISIT_MODIFIER?    RELATED_ACTION               #anyExistRelatedAction
-|                   'any-exist'             VISIT_MODIFIER?   (FILTER     ACTION_TYPE)?     #anyExist
-|                   'prev-action'                             (FILTER     ACTION_TYPE)?     #prevAction
-|                   'sut'                   FILTER             SUT_TYPE                     #sutType
+int_expr:           'n-actions'             MODIFIER?   (FILTER     ACTION_TYPE)?         #nActions
+|                   INT                                                                   #plainInt
 ;
 
-////////////////////////////////
-// THEN and ELSE parser rules //
-////////////////////////////////
+///////////////////////////
+// filtering lexer rules //
+///////////////////////////
 
+MODIFIER:       'visited' | 'unvisited' | 'most-visited' | 'least-visited';
 
-action_expr:        if_then_else | action_list;
+RELATION:       'sibling' | 'child' | 'sibling-or-child';
 
-action_list:        action+;
+SUT:            'windows' | 'unix' | 'ios' | 'android' | 'web';
 
-action: NUMBER?     'select-previous'                                                       #selectPreviousAction
-|       NUMBER?     'select-random'             VISIT_MODIFIER?      RELATED_ACTION         #selectRelatedAction
-|       NUMBER?     'select-random'             VISIT_MODIFIER?     (FILTER ACTION_TYPE)?   #selectRandomAction
-;
+ACTION_TYPE:    'click-action' | 'type-action' | 'drag-action' | 'scroll-action' | 'hit-key-action'
+|               'form-input-action' | 'form-submit-action' | 'form-field-action';
 
+FILTER:         'of-type' | 'not-of-type';
 
-////////////////////////
-// common lexer rules //
-////////////////////////
-
-VISIT_MODIFIER:     'visited' | 'unvisited' | 'most-visited' | 'least-visited';
-
-RELATED_ACTION:     'sibling-action' | 'child-action' | 'sibling-or-child-action';
-
-SUT_TYPE:           'windows' | 'linux' | 'android' | 'web';
-
-ACTION_TYPE:        'click-action' | 'type-action' | 'drag-action' | 'scroll-action' | 'hit-key-action'
-|                   'form-input-action' | 'form-submit-action' | 'form-field-action';
-
-/////////////////
-// lexer rules //
-/////////////////
-
-FILTER:             'of-type' | 'not-of-type';
+//////////////////////////
+// operator lexer rules //
+//////////////////////////
 
 NOT:                N O T   | '!'   | '~';
 AND:                A N D   | '&&'  | '&';
 XOR:                X O R   | '^';
 OR:                 O R     | '||'  | '|';
-IS:                 I S     | E Q U A L S;
+EQUALS:             E Q U A L S | I S;
 
 GT                  : '>';
 GE                  : '>=';
@@ -80,16 +75,25 @@ LE                  : '<=';
 EQ                  : '==' | '=';
 NE                  : '!=';
 
+INT:                [0-9]+; //[1-9][0-9]* for non-zero
+BOOL:               TRUE | FALSE;
+
+//////////////////////
+// term lexer rules //
+//////////////////////
+
 IF:                 I F;
 THEN:               T H E N;
 ELSE:               E L S E;
 
-NUMBER:             [0-9]+; //[1-9][0-9]* for non-zero
-BOOLEAN:            TRUE | FALSE;
 LP:                 '(';
 RP:                 ')';
 COMMENT:            '/*' .*? '*/'                   -> skip;
 WHITESPACE:         (' ' | '\t' | '\r' | '\n')+     -> skip;
+
+/////////////////////
+// lexer fragments //
+/////////////////////
 
 fragment TRUE:      T R U E;
 fragment FALSE:     F A L S E;

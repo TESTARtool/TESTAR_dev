@@ -46,6 +46,8 @@ import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 public class TaggableBase implements Taggable, Serializable {
 	private static final long serialVersionUID = 3941511707954247582L;
 	private Map<Tag<?>, Object> tagValues = Util.newHashMap();
+	// flag used to track whether all tags have been fetched or not
+	// optimize tag retrieval, ensuring that the fetch() method is only called once for each tag
 	boolean allFetched;
 	
 	public final <T> T get(Tag<T> tag) throws NoSuchTagException {

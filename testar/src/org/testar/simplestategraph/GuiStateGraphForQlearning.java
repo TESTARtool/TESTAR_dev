@@ -67,12 +67,12 @@ public class GuiStateGraphForQlearning {
      * @return
      */
     protected Action getActionWithAbstractCustomId(Set<Action> actions, String abstractCustomActionId){
-        System.out.println("DEBUG: trying to find action with a matching ID:");
+        //System.out.println("DEBUG: trying to find action with a matching ID:");
         for(Action action:actions){
-            System.out.println("DEBUG: action.AbstractIDCustom="+action.get(Tags.AbstractIDCustom)+", idToMatch="+abstractCustomActionId);
+            //System.out.println("DEBUG: action.AbstractIDCustom="+action.get(Tags.AbstractIDCustom)+", idToMatch="+abstractCustomActionId);
             // find the action with abstractCustomId:
             if(action.get(Tags.AbstractIDCustom).equals(abstractCustomActionId)){
-                System.out.println("DEBUG: match found!");
+                //System.out.println("DEBUG: match found!");
                 return action;
             }
         }

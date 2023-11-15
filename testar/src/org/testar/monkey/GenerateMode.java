@@ -110,6 +110,8 @@ public class GenerateMode {
 				 */
 				Verdict stateVerdict = runGenerateInnerLoop(protocol, system, state);
 
+				protocol.finalVerdict = stateVerdict.join(DefaultProtocol.processVerdict);
+
 				//calling finishSequence() to allow scripting GUI interactions to close the SUT:
 				protocol.finishSequence();
 
@@ -121,10 +123,8 @@ public class GenerateMode {
 				if (DefaultProtocol.faultySequence)
 					LogSerialiser.log("Sequence contained faults!\n", LogSerialiser.LogLevel.Critical);
 
-				Verdict finalVerdict = stateVerdict.join(DefaultProtocol.processVerdict);
-
 				//Copy sequence file into proper directory:
-				protocol.classifyAndCopySequenceIntoAppropriateDirectory(finalVerdict, 
+				protocol.classifyAndCopySequenceIntoAppropriateDirectory(protocol.getFinalVerdict(), 
 						protocol.generatedSequence, 
 						protocol.currentSeq);
 
@@ -217,15 +217,15 @@ public class GenerateMode {
 			DefaultProtocol.lastExecutedAction = action;
 			protocol.actionCount++;
 
-			//Saving the actions and the executed action into replayable test sequence:
-			protocol.saveActionIntoFragmentForReplayableSequence(action, state, actions);
-
 			// Resetting the visualization:
 			Util.clear(protocol.cv);
 			protocol.cv.end();
 
 			// fetch the new state
 			state = protocol.getState(system);
+
+			//Saving the actions and the executed action into replayable test sequence:
+			protocol.saveActionIntoFragmentForReplayableSequence(action, state, actions);
 		}
 
 		// notify to state model the last state

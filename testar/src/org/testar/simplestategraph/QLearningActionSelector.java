@@ -30,6 +30,7 @@
 
 package org.testar.simplestategraph;
 
+import org.testar.IActionSelector;
 import org.testar.RandomActionSelector;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
@@ -39,7 +40,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Set;
 
-public class QLearningActionSelector {
+public class QLearningActionSelector implements IActionSelector {
     private double R_MAX;
     private double gammaDiscount;
     private GuiStateGraphForQlearning graph;
@@ -55,7 +56,9 @@ public class QLearningActionSelector {
         graph.startANewTestSequence();
     }
 
+    @Override
     public Action selectAction(State state, Set<Action> actions) {
+        System.out.println("---------------------------------------------------------");
         // saving the starting node of the graph:
         if(graph.startingStateAbstractCustomId==null){
             graph.startingStateAbstractCustomId=state.get(Tags.AbstractIDCustom);
@@ -67,18 +70,16 @@ public class QLearningActionSelector {
         // If it's a new state:
         if(currentQlearningGuiState==null) { // did not contain the state ID -> a new state
             // new state:
-//            System.out.println(this.getClass()+": selectAction(): new state");
             currentQlearningGuiState = graph.createQlearningGuiState(state, actions);
         }else{
             //update the actions of the state - for some reason the action IDs are changing:
             currentQlearningGuiState.updateActionIdsOfTheStateIntoModel(actions, R_MAX);
         }
 
-
-        System.out.println("DEBUG: state ID from model="+currentQlearningGuiState.getAbstractCustomStateId());
-       for(String id:currentQlearningGuiState.abstractCustomActionIdsAndQValues.keySet()){
-            System.out.println("DEBUG: id="+id+", Q-value="+currentQlearningGuiState.abstractCustomActionIdsAndQValues.get(id));
-       }
+//        System.out.println("DEBUG: state ID from model="+currentQlearningGuiState.getAbstractCustomStateId());
+//        for(String id:currentQlearningGuiState.abstractCustomActionIdsAndQValues.keySet()){
+//        	System.out.println("DEBUG: id="+id+", Q-value="+currentQlearningGuiState.abstractCustomActionIdsAndQValues.get(id));
+//        }
 
         // adding state transition to the graph: previous state + previous action = current state
         if(graph.previousStateAbstractCustomId!=null && graph.previousActionAbstractCustomId != null){ //else the first action and there is no transition yet
@@ -87,24 +88,24 @@ public class QLearningActionSelector {
                 System.out.println(this.getClass()+": ERROR: GuiStateGraphWithVisitedActions did not find previous state!");
             }else{
                 graph.qlearningGuiStates.remove(previousState);//removing the old version of the state
-//                System.out.println(this.getClass()+": new state transition: previousStateId="+previousStateAbstractCustomId+", targetStateId="+state.get(Tags.AbstractIDCustom)+", previousActionAbstractCustomId="+previousActionAbstractCustomId);
                 previousState.addStateTransition(new GuiStateTransition(graph.previousStateAbstractCustomId,state.get(Tags.AbstractIDCustom),graph.previousActionAbstractCustomId),gammaDiscount,currentQlearningGuiState.getMaxQValueOfTheState(actions));
                 graph.qlearningGuiStates.add(previousState);//adding the updated version of the state
             }
         }
+        
         Action returnAction = null;
         ArrayList<String> actionIdsWithMaxQvalue = currentQlearningGuiState.getActionsIdsWithMaxQvalue(actions);
         if(actionIdsWithMaxQvalue.size()==0){
             System.out.println("ERROR: Qlearning did not find actions with max Q value!");
-            returnAction = RandomActionSelector.selectAction(actions);
+            returnAction = RandomActionSelector.selectRandomAction(actions);
         }else{
             //selecting randomly of the actionIDs that have max Q value:
-            System.out.println("DEBUG: IDs of actions with max Q value:");
-            for(String id:actionIdsWithMaxQvalue){
-                System.out.println("DEBUG: id="+id);
-            }
-            long graphTime = System.currentTimeMillis();
-            Random rnd = new Random(graphTime);
+//        	System.out.println("DEBUG: IDs of actions with max Q value:");
+//        	for(String id:actionIdsWithMaxQvalue){
+//        		System.out.println("DEBUG: id="+id);
+//        	}
+
+            Random rnd = new Random();
             String abstractCustomIdOfRandomAction = actionIdsWithMaxQvalue.get(rnd.nextInt(actionIdsWithMaxQvalue.size()));
             System.out.println("DEBUG: randomly chosen id="+abstractCustomIdOfRandomAction);
             System.out.println("DEBUG: stateID from state="+state.get(Tags.AbstractIDCustom));
@@ -114,7 +115,7 @@ public class QLearningActionSelector {
         if(returnAction==null){
             // backup if action selection did not find an action:
             System.out.println("ERROR: QlearningActionSelector.selectAction(): no action found! Getting purely random action.");
-            returnAction = RandomActionSelector.selectAction(actions);
+            returnAction = RandomActionSelector.selectRandomAction(actions);
         }
         //updating the list of states:
         graph.qlearningGuiStates.remove(currentQlearningGuiState); // should not be a problem if state not there (new state)?
@@ -122,6 +123,7 @@ public class QLearningActionSelector {
         // saving the state and action for state transition after knowing the target state:
         graph.previousActionAbstractCustomId = returnAction.get(Tags.AbstractIDCustom);
         graph.previousStateAbstractCustomId = state.get(Tags.AbstractIDCustom);
+        System.out.println("DEBUG: return selected action = " + returnAction.get(Tags.Desc, "NoDescAvailable"));
         return returnAction;
     }
 

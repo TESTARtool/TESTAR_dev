@@ -29,6 +29,7 @@
  */
 
 import org.testar.CodingManager;
+import org.python.antlr.ast.Str;
 import org.testar.RandomActionSelector;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.*;
@@ -47,6 +48,7 @@ import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.plugin.NativeLinker;
+import org.testar.plugin.OperatingSystems;
 import org.testar.protocols.WebdriverProtocol;
 import parsing.ParseUtil;
 
@@ -85,6 +87,7 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 
 	// form.htm , 1 : [[n_fill_field1, n_fill_field2, n_fill_field3], num_succes_submit, num_unsucces_submit]
 	private Map<String, Metrics> metricsFormsCompleted = new HashMap<String, Metrics>();
+	private ArrayList<String> operatingSystems = new ArrayList<>();
 
 	@Override
 	protected void buildStateActionsIdentifiers(State state, Set<Action> actions) {
@@ -114,6 +117,9 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 
 		strategyRandom = (settings.get(ConfigTags.StrategyFile).equals("")) ? true : false;
 		if(!strategyRandom) parseUtil = new ParseUtil(settings.get(ConfigTags.StrategyFile));
+		
+		for(OperatingSystems OS : NativeLinker.getPLATFORM_OS())
+			operatingSystems.add(OS.toString());
 	}
 
 	@Override
@@ -594,8 +600,8 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		// If we are in form filling mode and the strategy is not random,
 		// Use the strategy to fill the form as a human
 		Action selectedAction = (formFillingWidget != null && !strategyRandom) ?
-				parseUtil.selectAction(state, actions, strategyActionsExecuted):
-					RandomActionSelector.selectAction(actions);
+				parseUtil.selectAction(state, actions, strategyActionsExecuted, operatingSystems):
+					RandomActionSelector.selectRandomAction(actions);
 
 		String actionID = selectedAction.get(Tags.AbstractIDCustom);
 		Integer timesUsed = strategyActionsExecuted.getOrDefault(actionID, 0); //get the use count for the action
@@ -701,7 +707,7 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		super.closeTestSession();
 		if(settings.get(ConfigTags.Mode).equals(Modes.Generate))
 		{
-			compressOutputRunFolder();
+//			compressOutputRunFolder();
 			//copyOutputToNewFolderUsingIpAddress("N:");
 		}
 	}

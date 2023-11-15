@@ -97,11 +97,11 @@ public class FileHandling {
             targetFolder = "sequences_ok";
         else if (sev == Verdict.SEVERITY_WARNING)
             targetFolder = "sequences_warning";
-        else if (sev == Verdict.SEVERITY_SUSPICIOUS_TITLE)
-            targetFolder = "sequences_suspicioustitle";
+        else if (sev == Verdict.SEVERITY_SUSPICIOUS_TAG)
+            targetFolder = "sequences_suspicious_tag";
         else if (sev == Verdict.SEVERITY_NOT_RESPONDING)
             targetFolder = "sequences_unresponsive";
-        else if (sev == Verdict.SEVERITY_NOT_RUNNING)
+        else if (sev == Verdict.SEVERITY_UNEXPECTEDCLOSE)
             targetFolder = "sequences_unexpectedclose";
         else if (sev == Verdict.SEVERITY_FAIL)
             targetFolder = "sequences_fail";

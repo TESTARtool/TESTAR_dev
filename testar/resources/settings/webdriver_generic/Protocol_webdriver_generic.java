@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2023 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,18 +31,17 @@
 import com.google.common.collect.ArrayListMultimap;
 import org.testar.SutVisualization;
 import org.testar.managers.InputDataManager;
+import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Pair;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.NOP;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
+import org.testar.monkey.alayer.actions.WdFillFormAction;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
-import org.testar.monkey.alayer.webdriver.WdElement;
-import org.testar.monkey.alayer.webdriver.WdWidget;
-import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
-import org.testar.plugin.NativeLinker;
 import org.testar.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
 import java.util.*;
@@ -64,37 +63,6 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	protected void initialize(Settings settings) {
 		super.initialize(settings);
 
-		/*
-		These settings are initialized in WebdriverProtocol:
-
-		// Classes that are deemed clickable by the web framework
-		// getting from the settings file:
-		clickableClasses = settings.get(ConfigTags.ClickableClasses);
-
-		// Disallow links and pages with these extensions
-		// Set to null to ignore this feature
-		// getting from the settings file:
-		deniedExtensions = settings.get(ConfigTags.DeniedExtensions).contains("null") ? null : settings.get(ConfigTags.DeniedExtensions);
-
-		// Define a whitelist of allowed domains for links and pages
-		// An empty list will be filled with the domain from the sut connector
-		// Set to null to ignore this feature
-		// getting from the settings file:
-		domainsAllowed = settings.get(ConfigTags.DomainsAllowed).contains("null") ? null : settings.get(ConfigTags.DomainsAllowed);
-
-		// If true, follow links opened in new tabs
-		// If false, stay with the original (ignore links opened in new tabs)
-		// getting from the settings file:
-		WdDriver.followLinks = settings.get(ConfigTags.FollowLinks);
-
-		//Force the browser to run in full screen mode
-		WdDriver.fullScreen = true;
-
-		//Force webdriver to switch to a new tab if opened
-		//This feature can block the correct display of select dropdown elements 
-		WdDriver.forceActivateTab = true;
-		*/
-
 		// URL + form name, username input id + value, password input id + value
 		// Set login to null to disable this feature
 		// TODO: getting from the settings file, not sure if this works:
@@ -106,7 +74,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 		// Set to null to disable this feature
 		//TODO put into settings file
 		policyAttributes = ArrayListMultimap.create();
-		policyAttributes.put("class", "lfr-btn-label");
+		policyAttributes.put("id", "_cookieDisplay_WAR_corpcookieportlet_necessaryCookiesButton");
 	}
 
 	/**
@@ -163,7 +131,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	protected Verdict getVerdict(State state) {
 
 		Verdict verdict = super.getVerdict(state);
-		// system crashes, non-responsiveness and suspicious titles automatically detected!
+		// system crashes, non-responsiveness and suspicious tags automatically detected!
 
 		//-----------------------------------------------------------------------------
 		// MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
@@ -200,6 +168,17 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 
 		// iterate through all widgets
 		for (Widget widget : state) {
+			// fill forms actions
+			if (settings.get(ConfigTags.FormFillingAction) && isAtBrowserCanvas(widget) && isForm(widget)) {
+				String protocol = settings.get(ConfigTags.ProtocolClass, "");
+				Action formFillingAction = new WdFillFormAction(ac, widget, protocol.substring(0, protocol.lastIndexOf('/')));
+				if(formFillingAction instanceof NOP){
+					// do nothing with NOP actions - the form was not actionable
+				}else{
+					actions.add(formFillingAction);
+				}
+			}
+
 			// only consider enabled and non-tabu widgets
 			if (!widget.get(Enabled, true)) {
 				continue;
@@ -249,10 +228,6 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 			}
 		}
 
-		//if(actions.isEmpty()) {
-		//	return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
-		//}
-		
 		// If we have forced actions, prioritize and filter the other ones
 		if (forcedActions != null && forcedActions.size() > 0) {
 			filteredActions = actions;
@@ -263,28 +238,6 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 		if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
 
 		return actions;
-	}
-
-	@Override
-	protected boolean isClickable(Widget widget) {
-		Role role = widget.get(Tags.Role, Roles.Widget);
-		if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
-			// Input type are special...
-			if (role.equals(WdRoles.WdINPUT)) {
-				String type = ((WdWidget) widget).element.type;
-				return WdRoles.clickableInputTypes().contains(type);
-			}
-			return true;
-		}
-
-		WdElement element = ((WdWidget) widget).element;
-		if (element.isClickable) {
-			return true;
-		}
-
-		Set<String> clickSet = new HashSet<>(clickableClasses);
-		clickSet.retainAll(element.cssClasses);
-		return clickSet.size() > 0;
 	}
 
 

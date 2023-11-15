@@ -58,36 +58,36 @@ jobs:
         name: runTestDesktopGenericMultiTags-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_multitags
 
-    - name: Run desktop_generic protocol that contains SuspiciousTitle with TESTAR
-      run: ./gradlew runTestDesktopGenericCommandLineSuspiciousTitle
-    - name: Save runTestDesktopGenericCommandLineSuspiciousTitle HTML report artifact
+    - name: Run desktop_generic protocol that contains SuspiciousTag with TESTAR
+      run: ./gradlew runTestDesktopGenericCommandLineSuspiciousTag
+    - name: Save runTestDesktopGenericCommandLineSuspiciousTag HTML report artifact
       uses: actions/upload-artifact@v2.2.4
       with:
-        name: runTestDesktopGenericCommandLineSuspiciousTitle-artifact
+        name: runTestDesktopGenericCommandLineSuspiciousTag-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_command_and_suspicious
     
-    - name: Run desktop_generic protocol using specific filtering and detect a SuspiciousTitle with TESTAR
-      run: ./gradlew runTestDesktopGenericCommandLineSettingsFilterSuspiciousTitle
-    - name: Save runTestDesktopGenericCommandLineSettingsFilterSuspiciousTitle HTML report artifact
+    - name: Run desktop_generic protocol using specific filtering and detect a SuspiciousTag with TESTAR
+      run: ./gradlew runTestDesktopGenericCommandLineSettingsFilterSuspiciousTag
+    - name: Save runTestDesktopGenericCommandLineSettingsFilterSuspiciousTag HTML report artifact
       uses: actions/upload-artifact@v2.2.4
       with:
-        name: runTestDesktopGenericCommandLineSettingsFilterSuspiciousTitle-artifact
+        name: runTestDesktopGenericCommandLineSettingsFilterSuspiciousTag-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_command_settings_filter_and_suspicious
     
-    - name: Run desktop_generic protocol but connect using SUT_PROCESS_NAME and detect SuspiciousTitle
-      run: ./gradlew runTestDesktopGenericProcessNameSuspiciousTitle
-    - name: Save runTestDesktopGenericProcessNameSuspiciousTitle HTML report artifact
+    - name: Run desktop_generic protocol but connect using SUT_PROCESS_NAME and detect SuspiciousTag
+      run: ./gradlew runTestDesktopGenericProcessNameSuspiciousTag
+    - name: Save runTestDesktopGenericProcessNameSuspiciousTag HTML report artifact
       uses: actions/upload-artifact@v2.2.4
       with:
-        name: runTestDesktopGenericProcessNameSuspiciousTitle-artifact
+        name: runTestDesktopGenericProcessNameSuspiciousTag-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_process_and_suspicious
     
-    - name: Run desktop_generic protocol but connect using SUT_WINDOW_TITLE and detect SuspiciousTitle
-      run: ./gradlew runTestDesktopGenericTitleNameSuspiciousTitle
-    - name: Save runTestDesktopGenericTitleNameSuspiciousTitle HTML report artifact
+    - name: Run desktop_generic protocol but connect using SUT_WINDOW_TITLE and detect SuspiciousTag
+      run: ./gradlew runTestDesktopGenericTitleNameSuspiciousTag
+    - name: Save runTestDesktopGenericTitleNameSuspiciousTag HTML report artifact
       uses: actions/upload-artifact@v2.2.4
       with:
-        name: runTestDesktopGenericTitleNameSuspiciousTitle-artifact
+        name: runTestDesktopGenericTitleNameSuspiciousTag-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_title_and_suspicious
     
     - name: Run desktop_generic with OrientDB to infer a TESTAR State Model
@@ -106,12 +106,12 @@ jobs:
         name: runTestDesktopGenericStateModelCustomAbstraction-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_state_model_custom
     
-    - name: Run webdriver protocol and detect SuspiciousTitle
-      run: ./gradlew runTestWebdriverSuspiciousTitle
-    - name: Save runTestWebdriverSuspiciousTitle HTML report artifact
+    - name: Run webdriver protocol and detect SuspiciousTag
+      run: ./gradlew runTestWebdriverSuspiciousTag
+    - name: Save runTestWebdriverSuspiciousTag HTML report artifact
       uses: actions/upload-artifact@v2.2.4
       with:
-        name: runTestWebdriverSuspiciousTitle-artifact
+        name: runTestWebdriverSuspiciousTag-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_and_suspicious
     
     - name: Run webdriver to login in parabank and detect browser console error
@@ -129,6 +129,14 @@ jobs:
       with:
         name: runTestWebdriverParabankFormFilling-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_form_filling
+    
+    - name: Run webdriver to login in parabank and execute webdriver remote actions
+      run: ./gradlew runTestWebdriverParabankRemoteActions
+    - name: Save runTestWebdriverParabankRemoteActions HTML report artifact
+      uses: actions/upload-artifact@v2.2.4
+      with:
+        name: runTestWebdriverParabankRemoteActions-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_remote_actions
     
     - name: Run TESTAR Replay mode with a web page to check that replayed correctly
       run: ./gradlew runTestWebdriverCorrectReplay
@@ -178,17 +186,17 @@ jobs:
     - name: Run desktop_generic protocol with TESTAR to test waitAndLeftClickWidgetWithMatchingTags feature
       run: ./gradlew runTestDesktopGenericMultiTags
 
-    - name: Run desktop_generic protocol that contains SuspiciousTitle with TESTAR
-      run: ./gradlew runTestDesktopGenericCommandLineSuspiciousTitle
+    - name: Run desktop_generic protocol that contains SuspiciousTag with TESTAR
+      run: ./gradlew runTestDesktopGenericCommandLineSuspiciousTag
     
-    - name: Run desktop_generic protocol using specific filtering and detect a SuspiciousTitle with TESTAR
-      run: ./gradlew runTestDesktopGenericCommandLineSettingsFilterSuspiciousTitle
+    - name: Run desktop_generic protocol using specific filtering and detect a SuspiciousTag with TESTAR
+      run: ./gradlew runTestDesktopGenericCommandLineSettingsFilterSuspiciousTag
     
-    - name: Run desktop_generic protocol but connect using SUT_PROCESS_NAME and detect SuspiciousTitle
-      run: ./gradlew runTestDesktopGenericProcessNameSuspiciousTitle
+    - name: Run desktop_generic protocol but connect using SUT_PROCESS_NAME and detect SuspiciousTag
+      run: ./gradlew runTestDesktopGenericProcessNameSuspiciousTag
     
-    - name: Run desktop_generic protocol but connect using SUT_WINDOW_TITLE and detect SuspiciousTitle
-      run: ./gradlew runTestDesktopGenericTitleNameSuspiciousTitle
+    - name: Run desktop_generic protocol but connect using SUT_WINDOW_TITLE and detect SuspiciousTag
+      run: ./gradlew runTestDesktopGenericTitleNameSuspiciousTag
     
     - name: Run desktop_generic with OrientDB to infer a TESTAR State Model
       run: ./gradlew runTestDesktopGenericStateModel
@@ -196,14 +204,17 @@ jobs:
     - name: Run desktop_generic doing a customization in the AbstractIDCustom identifer
       run: ./gradlew runTestDesktopGenericStateModelCustomAbstraction
     
-    - name: Run webdriver protocol and detect SuspiciousTitle
-      run: ./gradlew runTestWebdriverSuspiciousTitle
+    - name: Run webdriver protocol and detect SuspiciousTag
+      run: ./gradlew runTestWebdriverSuspiciousTag
     
     - name: Run webdriver to login in parabank and detect browser console error
       run: ./gradlew runTestWebdriverParabankLoginAndConsoleError
     
     - name: Run webdriver to login in parabank using form filling
       run: ./gradlew runTestWebdriverParabankFormFilling
+    
+    - name: Run webdriver to login in parabank and execute webdriver remote actions
+      run: ./gradlew runTestWebdriverParabankRemoteActions
     
     - name: Run TESTAR Replay mode with a web page to check that replayed correctly
       run: ./gradlew runTestWebdriverCorrectReplay
@@ -243,17 +254,17 @@ jobs:
     - name: Run desktop_generic protocol with TESTAR to test waitAndLeftClickWidgetWithMatchingTags feature
       run: ./gradlew runTestDesktopGenericMultiTags
 
-    - name: Run desktop_generic protocol that contains SuspiciousTitle with TESTAR
-      run: ./gradlew runTestDesktopGenericCommandLineSuspiciousTitle
+    - name: Run desktop_generic protocol that contains SuspiciousTag with TESTAR
+      run: ./gradlew runTestDesktopGenericCommandLineSuspiciousTag
     
-    - name: Run desktop_generic protocol using specific filtering and detect a SuspiciousTitle with TESTAR
-      run: ./gradlew runTestDesktopGenericCommandLineSettingsFilterSuspiciousTitle
+    - name: Run desktop_generic protocol using specific filtering and detect a SuspiciousTag with TESTAR
+      run: ./gradlew runTestDesktopGenericCommandLineSettingsFilterSuspiciousTag
     
-    - name: Run desktop_generic protocol but connect using SUT_PROCESS_NAME and detect SuspiciousTitle
-      run: ./gradlew runTestDesktopGenericProcessNameSuspiciousTitle
+    - name: Run desktop_generic protocol but connect using SUT_PROCESS_NAME and detect SuspiciousTag
+      run: ./gradlew runTestDesktopGenericProcessNameSuspiciousTag
     
-    - name: Run desktop_generic protocol but connect using SUT_WINDOW_TITLE and detect SuspiciousTitle
-      run: ./gradlew runTestDesktopGenericTitleNameSuspiciousTitle
+    - name: Run desktop_generic protocol but connect using SUT_WINDOW_TITLE and detect SuspiciousTag
+      run: ./gradlew runTestDesktopGenericTitleNameSuspiciousTag
     
     - name: Run desktop_generic with OrientDB to infer a TESTAR State Model
       run: ./gradlew runTestDesktopGenericStateModel
@@ -261,14 +272,17 @@ jobs:
     - name: Run desktop_generic doing a customization in the AbstractIDCustom identifer
       run: ./gradlew runTestDesktopGenericStateModelCustomAbstraction
     
-    - name: Run webdriver protocol and detect SuspiciousTitle
-      run: ./gradlew runTestWebdriverSuspiciousTitle
+    - name: Run webdriver protocol and detect SuspiciousTag
+      run: ./gradlew runTestWebdriverSuspiciousTag
     
     - name: Run webdriver to login in parabank and detect browser console error
       run: ./gradlew runTestWebdriverParabankLoginAndConsoleError
     
     - name: Run webdriver to login in parabank using form filling
       run: ./gradlew runTestWebdriverParabankFormFilling
+    
+    - name: Run webdriver to login in parabank and execute webdriver remote actions
+      run: ./gradlew runTestWebdriverParabankRemoteActions
     
     - name: Run TESTAR Replay mode with a web page to check that replayed correctly
       run: ./gradlew runTestWebdriverCorrectReplay
