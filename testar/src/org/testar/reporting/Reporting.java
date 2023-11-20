@@ -36,13 +36,13 @@ import org.testar.monkey.alayer.Verdict;
 
 import java.util.Set;
 
-@Deprecated
-public interface Reporting {
-    public void addSequenceStep(State state, String actionImagePath);
+public interface Reporting
+{
+//    public void addSequenceStep(State state, String actionImagePath);
     public void addState(State state);
     public void addActions(Set<Action> actions);
     public void addActionsAndUnvisitedActions(Set<Action> actions, Set<String> concreteIdsOfUnvisitedActions);
     public void addSelectedAction(State state, Action action);
     public void addTestVerdict(Verdict verdict);
-    public void close();
+    public void finishReport();
 }

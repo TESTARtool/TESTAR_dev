@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.reporting;
+package org.testar.reporting_depricated;
 
 import java.util.LinkedList;
 import java.util.List;

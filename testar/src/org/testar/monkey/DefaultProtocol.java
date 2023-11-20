@@ -56,7 +56,7 @@ import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
 import org.testar.monkey.alayer.windows.WinApiException;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
-import org.testar.reporting_proofofconcept.ReportManager;
+import org.testar.reporting.ReportManager;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.serialisation.ScreenshotSerialiser;
 import org.testar.serialisation.TestSerialiser;

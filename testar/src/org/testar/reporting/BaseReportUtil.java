@@ -1,4 +1,4 @@
-package org.testar.reporting_proofofconcept;
+package org.testar.reporting;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

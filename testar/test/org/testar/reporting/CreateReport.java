@@ -3,7 +3,6 @@ package org.testar.reporting;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testar.reporting_proofofconcept.HTMLreportUtil;
 
 import java.io.*;
 import java.util.Scanner;

@@ -29,7 +29,7 @@
  *******************************************************************************************************/
 
 
-package org.testar.reporting;
+package org.testar.reporting_depricated;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.testar.monkey.alayer.Action;

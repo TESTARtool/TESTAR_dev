@@ -31,18 +31,12 @@
 package org.testar.protocols;
 
 import org.testar.plugin.NativeLinker;
-import org.testar.reporting.HtmlSequenceReport;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
-import org.testar.monkey.ConfigTags;
 import org.testar.settings.Settings;
-import org.testar.OutputStructure;
 import org.testar.monkey.alayer.android.actions.AndroidBackAction;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
-import org.testar.monkey.alayer.exceptions.ActionBuildException;
-import org.testar.monkey.alayer.exceptions.StateBuildException;
-import org.testar.plugin.NativeLinker;
 
 import java.util.Collections;
 import java.util.HashSet;

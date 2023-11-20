@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.reporting_proofofconcept;
+package org.testar.reporting_depricated;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
@@ -36,13 +36,13 @@ import org.testar.monkey.alayer.Verdict;
 
 import java.util.Set;
 
-public interface Reporting
-{
-//    public void addSequenceStep(State state, String actionImagePath);
+@Deprecated
+public interface Reporting {
+    public void addSequenceStep(State state, String actionImagePath);
     public void addState(State state);
     public void addActions(Set<Action> actions);
     public void addActionsAndUnvisitedActions(Set<Action> actions, Set<String> concreteIdsOfUnvisitedActions);
     public void addSelectedAction(State state, Action action);
     public void addTestVerdict(Verdict verdict);
-    public void finishReport();
+    public void close();
 }
