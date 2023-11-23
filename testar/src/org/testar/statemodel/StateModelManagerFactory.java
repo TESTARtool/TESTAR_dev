@@ -10,7 +10,7 @@ import org.testar.statemodel.persistence.PersistenceManagerFactoryBuilder;
 import org.testar.statemodel.sequence.SequenceManager;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Settings;
+import org.testar.settings.Settings;
 
 import java.util.Arrays;
 import java.util.HashSet;

@@ -58,8 +58,8 @@ task customZipDistribution(type: Zip) {
     include '*'
    	include '*/**' //include subdirectories
 
-   	archiveName 'testarDistribution.zip'
-   	destinationDir(file('target/install'))
+   	archiveFileName.set 'testarDistribution.zip'
+   	getDestinationDirectory().set(file('target/install'))
 }
 
 /**

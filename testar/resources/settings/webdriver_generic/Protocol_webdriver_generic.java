@@ -42,8 +42,9 @@ import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
-import org.testar.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
+import org.testar.settings.Settings;
+
 import java.util.*;
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;

@@ -33,8 +33,7 @@ package org.testar;
 
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
-import org.testar.monkey.Util;
-import org.testar.monkey.Settings;
+import org.testar.settings.Settings;
 
 import java.io.File;
 

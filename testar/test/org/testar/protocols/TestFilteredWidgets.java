@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.testar.monkey.Assert;
 import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Settings;
+import org.testar.settings.Settings;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.Rect;
 import org.testar.monkey.alayer.Tags;
