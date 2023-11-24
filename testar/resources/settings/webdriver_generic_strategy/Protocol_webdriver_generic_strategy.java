@@ -36,7 +36,7 @@ import org.testar.managers.InputDataManager;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.DefaultProtocol;
 import org.testar.monkey.Main;
-import org.testar.monkey.Settings;
+import org.testar.settings.Settings;
 import org.testar.monkey.alayer.Shape;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.ActionRoles;

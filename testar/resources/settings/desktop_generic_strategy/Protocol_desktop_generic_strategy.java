@@ -1,27 +1,3 @@
-import org.apache.commons.lang.SerializationUtils;
-import org.testar.DerivedActions;
-import org.testar.RandomActionSelector;
-import org.testar.SutVisualization;
-import org.testar.monkey.ConfigTags;
-import org.testar.monkey.DefaultProtocol;
-import org.testar.monkey.Settings;
-import org.testar.monkey.alayer.Action;
-import org.testar.monkey.alayer.SUT;
-import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Tags;
-import org.testar.monkey.alayer.exceptions.ActionBuildException;
-import org.testar.monkey.alayer.exceptions.StateBuildException;
-import org.testar.plugin.NativeLinker;
-import org.testar.plugin.OperatingSystems;
-import org.testar.protocols.DesktopProtocol;
-import parsing.ParseUtil;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 /***************************************************************************************************
  *
  * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
@@ -51,6 +27,28 @@ import java.util.Set;
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
+
+import org.testar.DerivedActions;
+import org.testar.RandomActionSelector;
+import org.testar.SutVisualization;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.DefaultProtocol;
+import org.testar.settings.Settings;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.exceptions.StateBuildException;
+import org.testar.plugin.NativeLinker;
+import org.testar.plugin.OperatingSystems;
+import org.testar.protocols.DesktopProtocol;
+import parsing.ParseUtil;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class Protocol_desktop_generic_strategy extends DesktopProtocol
 {

@@ -41,7 +41,7 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 
 import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Settings;
+import org.testar.settings.Settings;
 import org.testar.OutputStructure;
 import org.testar.serialisation.LogSerialiser;
 

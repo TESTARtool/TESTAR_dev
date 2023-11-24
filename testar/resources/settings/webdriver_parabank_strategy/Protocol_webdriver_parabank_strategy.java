@@ -29,7 +29,6 @@
  */
 
 import org.testar.CodingManager;
-import org.python.antlr.ast.Str;
 import org.testar.RandomActionSelector;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.*;
@@ -47,6 +46,7 @@ import org.testar.monkey.alayer.webdriver.WdElement;
 import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.settings.Settings;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
 import org.testar.protocols.WebdriverProtocol;
