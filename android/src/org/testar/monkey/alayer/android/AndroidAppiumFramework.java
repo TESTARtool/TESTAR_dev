@@ -162,7 +162,7 @@ public class AndroidAppiumFramework extends SUTBase {
 	 * Uses unique accessibility ID if present, otherwise uses xpath. 
 	 * 
 	 * @param id
-	 * @param value
+	 * @param text
 	 * @param w
 	 */
 	public static void sendKeysTextTextElementById(String id, String text, Widget w){
