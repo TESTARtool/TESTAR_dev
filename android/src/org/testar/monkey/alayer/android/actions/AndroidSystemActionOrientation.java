@@ -44,7 +44,7 @@ public class AndroidSystemActionOrientation extends TaggableBase implements Acti
     public AndroidSystemActionOrientation(State state, Widget widget) {
         this.widget = widget;
         this.set(Tags.Role, AndroidRoles.AndroidWidget);
-        this.set(Tags.OriginWidget, widget);
+        this.mapActionToWidget(widget);
         this.set(Tags.Desc, toShortString());
     }
 
