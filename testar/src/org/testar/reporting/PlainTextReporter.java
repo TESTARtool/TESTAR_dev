@@ -52,7 +52,7 @@ public class PlainTextReporter implements Reporting
         plainTextReportUtil.addHeading(5, "AbstractIDCustom="+abstractIDCustom);
         
         String altText = "screenshot: state=" + innerLoopCounter + ", ConcreteIDCustom="+concreteIDCustom+", AbstractIDCustom="+abstractIDCustom;
-        plainTextReportUtil.addParagraph("Image: " + imagePath + " - " + altText);
+        plainTextReportUtil.addParagraph("Image: " + imagePath + "\n" + altText);
         
         innerLoopCounter++;
         plainTextReportUtil.writeToFile();
@@ -168,7 +168,7 @@ public class PlainTextReporter implements Reporting
         
         String altText = "screenshot: action, ConcreteIDCustom="+actionConcreteIDCustom;
         
-        plainTextReportUtil.addParagraph("Image: " + actionPath + " - " + altText);
+        plainTextReportUtil.addParagraph("Image: " + actionPath + "\n" + altText);
     
     
         plainTextReportUtil.writeToFile();
