@@ -73,7 +73,7 @@ task debuggingDistribution(type: Exec, dependsOn:'debugFiles') {
     commandLine 'cmd', '/c', 'dir'
 }
 
-task debugFiles(type: Copy) {
+task debugFiles(type: Copy, dependsOn:'build') {
     from 'target/scripts/.'
     into '.'
 }
