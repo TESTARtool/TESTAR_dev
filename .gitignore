@@ -21,3 +21,10 @@ build.bat
 /testar/testar.bat
 /testar/windows.dll
 /testar/index.log
+tesweb-extension/css/style.css
+tesweb-extension/manifest.json
+tesweb-extension/js/testar.state.js
+tesweb-extension/js/testar.init.start.js
+tesweb-extension/js/testar.init.end.js
+tesweb-extension/js/testar.canvas.js
+tesweb-extension/images/icon.png
