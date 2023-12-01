@@ -35,6 +35,8 @@ import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.*;
 
 public class WdHistoryBackAction extends TaggableBase implements Action {
+  private static final long serialVersionUID = -4564430451637399460L;
+
   public WdHistoryBackAction() {
 	  this.set(Tags.Role, WdActionRoles.HistoryBackScript);
 	  this.set(Tags.Desc, "Execute Webdriver script to load the previous URL in the history list");

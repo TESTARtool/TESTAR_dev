@@ -67,7 +67,7 @@ public class StdActionCompiler {
 		Position position = new WidgetPosition(wf, Tags.Shape, 0.5, 0.5, true);
 		position.obscuredByChildFeature(false); // even if any other widget is at foreground
 		Action ret = mouseMove(w, position);
-		ret.set(Tags.OriginWidget, w);
+		ret.mapActionToWidget(w);
 		return ret;
 	}
 	
@@ -112,7 +112,7 @@ public class StdActionCompiler {
 		Action ret = leftClickAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
 		ret.set(Tags.Targets, Util.newArrayList(wf));
 		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
-		ret.set(Tags.OriginWidget, w);
+		ret.mapActionToWidget(w);
 		return ret;
 	}
 
@@ -136,7 +136,7 @@ public class StdActionCompiler {
 		ret.set(Tags.Desc, "Right Click at '" + w.get(Tags.Desc, "<no description>") + "'");
 		ret.set(Tags.Targets, Util.newArrayList(wf));
 		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
-		ret.set(Tags.OriginWidget, w);
+		ret.mapActionToWidget(w);
 		return ret;
 	}
 
@@ -160,7 +160,7 @@ public class StdActionCompiler {
 		Action ret = leftTripleClickAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
 		ret.set(Tags.Targets,  Util.newArrayList(wf));
 		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
-		ret.set(Tags.OriginWidget, w);
+		ret.mapActionToWidget(w);
 		return ret;
 	}
 	
@@ -184,7 +184,7 @@ public class StdActionCompiler {
 		Action ret = leftDoubleClickAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
 		ret.set(Tags.Targets, Util.newArrayList(wf));
 		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
-		ret.set(Tags.OriginWidget, w);
+		ret.mapActionToWidget(w);
 		return ret;
 	}
 
@@ -204,7 +204,7 @@ public class StdActionCompiler {
 		Action ret = dropDownAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
 		ret.set(Tags.Targets, Util.newArrayList(wf));
 		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
-		ret.set(Tags.OriginWidget, w);
+		ret.mapActionToWidget(w);
 		return ret;
 	}
 	
@@ -214,7 +214,7 @@ public class StdActionCompiler {
 
 	public Action dragFromTo(Widget from, Widget to){
 		Action ret = dragFromTo(from, 0.5, 0.5, to, 0.5, 0.5);
-		ret.set(Tags.OriginWidget, from);
+		ret.mapActionToWidget(from);
 		return ret;
 	}
 
@@ -237,7 +237,7 @@ public class StdActionCompiler {
 
 	public Action slideFromTo(Position from, Position to, Widget widget){
 		Action action = slideFromTo(from, to);
-		action.set(Tags.OriginWidget, widget);
+		action.mapActionToWidget(widget);
 		return action;
 	}
 
@@ -333,7 +333,7 @@ public class StdActionCompiler {
 		}
 		ret.set(Tags.Targets, Util.newArrayList(wf));
 		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
-		ret.set(Tags.OriginWidget, w);
+		ret.mapActionToWidget(w);
 		return ret;
 	}
 

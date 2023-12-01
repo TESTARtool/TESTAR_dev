@@ -221,11 +221,11 @@ public class GenerateMode {
 			Util.clear(protocol.cv);
 			protocol.cv.end();
 
-			// fetch the new state
-			state = protocol.getState(system);
-
 			//Saving the actions and the executed action into replayable test sequence:
 			protocol.saveActionIntoFragmentForReplayableSequence(action, state, actions);
+
+			// fetch the new state
+			state = protocol.getState(system);
 		}
 
 		// notify to state model the last state

@@ -46,7 +46,7 @@ public class AndroidActionPinch extends TaggableBase implements Action {
 
     public AndroidActionPinch(State state, Widget w, String accessibilityID, boolean zoomIn) {
         this.set(Tags.Role, AndroidRoles.AndroidWidget);
-        this.set(Tags.OriginWidget, w);
+        this.mapActionToWidget(w);
         this.accessibilityId = accessibilityID;
         this.widget = w;
         this.set(Tags.Desc, toShortString());
