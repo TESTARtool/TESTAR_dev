@@ -100,7 +100,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = webdriver_generic_strategy/Protocol_webdriver_generic_strategy
+ProtocolClass = webdriver_webformsut_strategy/Protocol_webdriver_webformsut_strategy
 
 #################################################################\n"
 # State model inference settings
@@ -170,7 +170,7 @@ ProtocolSpecificSetting_5 =
 # Strategy settings
 #################################################################
 
-StrategyFile = settings/webdriver_generic_strategy/main_strategy.txt
+StrategyFile = settings/webdriver_webformsut_strategy/human_strategy.txt
 
 #################################################################
 # Other more advanced settings
