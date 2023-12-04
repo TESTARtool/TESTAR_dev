@@ -72,21 +72,22 @@ public abstract class AbstractProtocol implements UnProc<Settings>	{
 	protected Settings settings;
 	protected Settings settings(){ return settings; }
 
-	protected Reporting getReporter()
-	{
-	    // Replay mode only works with the specific HTML replay report
-	    if(settings.get(ConfigTags.Mode).equals(RuntimeControlsProtocol.Modes.Replay)) {
-	        return new HtmlSequenceReport(settings.get(ConfigTags.PathToReplaySequence));
-	    }
-
-		switch (settings().get(ConfigTags.ReportingClass))
-		{
-			case "NUNIT 3.0 Reporting": return new XMLSequenceReport(); 
-			case "HTML Reporting": return new HtmlSequenceReport();
-		}
-		// In case not specified
-		return new HtmlSequenceReport();
-	}
+	// todo: delete after reimplementing XMLSequenceReport?
+//	protected Reporting getReporter()
+//	{
+//	    // Replay mode only works with the specific HTML replay report
+//	    if(settings.get(ConfigTags.Mode).equals(RuntimeControlsProtocol.Modes.Replay)) {
+//	        return new HtmlSequenceReport(settings.get(ConfigTags.PathToReplaySequence));
+//	    }
+//
+//		switch (settings().get(ConfigTags.ReportingClass))
+//		{
+//			case "NUNIT 3.0 Reporting": return new XMLSequenceReport();
+//			case "HTML Reporting": return new HtmlSequenceReport();
+//		}
+//		// In case not specified
+//		return new HtmlSequenceReport();
+//	}
 	
 	/**
 	 * Initialize is run as the first thing to initialize TESTAR with the given settings
