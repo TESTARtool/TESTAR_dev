@@ -229,8 +229,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 						System.out.println("Exception: Select a log or html file to visualize the TESTAR results");
 					}
 				} else {
-					popupMessage("Please select a file.html (output/HTMLreports) to use in the View mode");
-					System.out.println("Exception: Please select a file.html (output/HTMLreports) to use in the View mode");
+					popupMessage("Please select a file.html (output/reports) to use in the View mode");
+					System.out.println("Exception: Please select a file.html (output/reports) to use in the View mode");
 				}
 			} else if (mode() == Modes.Replay && isValidFile()) {
 				new ReplayMode().runReplayLoop(this);
@@ -396,7 +396,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			String replace = path.substring(startIndex, endIndex+1);
 
-			path = path.replace(replace, File.separator + "HTMLreports" + File.separator);
+			path = path.replace(replace, File.separator + "reports" + File.separator);
 			if (new File(path).exists())
 				foundedHTML = path;
 		}

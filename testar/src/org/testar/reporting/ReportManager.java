@@ -23,7 +23,7 @@ public class ReportManager implements Reporting
         // creating a new file for the report
         String fileName =
                 OutputStructure.htmlOutputDir + "/" + OutputStructure.startInnerLoopDateString + "_"
-                + OutputStructure.executedSUTname + "_sequence_" + OutputStructure.sequenceInnerLoopCount + "_poc"; //no File.separator
+                + OutputStructure.executedSUTname + "_sequence_" + OutputStructure.sequenceInnerLoopCount; //no File.separator
     
         if(!Arrays.asList(html, plainText).contains(Boolean.TRUE)) //if none of the options are true
         {

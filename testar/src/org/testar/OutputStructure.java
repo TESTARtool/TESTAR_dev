@@ -145,7 +145,7 @@ public class OutputStructure {
 		if(!scrnDir.exists())
 			scrnDir.mkdirs();
 
-		htmlOutputDir = outerLoopOutputDir + File.separator + "HTMLreports";
+		htmlOutputDir = outerLoopOutputDir + File.separator + "reports";
 		File htmlDir = new File(htmlOutputDir);
 		if(!htmlDir.exists())
 			htmlDir.mkdirs();

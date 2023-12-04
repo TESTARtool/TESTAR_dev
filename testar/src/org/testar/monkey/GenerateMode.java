@@ -50,7 +50,7 @@ public class GenerateMode {
 	/**
 	 * Method to run TESTAR on Generate mode
 	 *
-	 * @param system
+	 * @param protocol
 	 */
 	public void runGenerateOuterLoop(DefaultProtocol protocol) {
 

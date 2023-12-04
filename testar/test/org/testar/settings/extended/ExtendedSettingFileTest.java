@@ -33,7 +33,6 @@ package org.testar.settings.extended;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.testar.settings.extended.ExtendedSettingFile;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -256,7 +255,7 @@ public class ExtendedSettingFileTest {
         assertFalse(testFile.exists());
         sut = new ExtendedSettingFile(_relativePath + knownFile, fileAccessLock);
         TestSetting elementOne = sut.load(TestSetting.class, TestSetting::CreateDefault);
-        OtherSetting elementTwo = sut.load(OtherSetting.class, OtherSetting::CreateDefault);
+//        OtherSetting elementTwo = sut.load(OtherSetting.class, OtherSetting::CreateDefault);
         assertTrue(testFile.exists());
         assertNotNull(elementOne);
 

@@ -185,7 +185,7 @@ public class PlainTextReporter implements Reporting
         plainTextReportUtil.addHeading(3, "Test verdict for this sequence: " + verdictInfo);
         plainTextReportUtil.addHeading(5, "Severity: " + verdict.severity());
     
-        plainTextReportUtil.appendToFileName("_" + verdict.verdictSeverityTitle() + "_poc_");
+        plainTextReportUtil.appendToFileName("_" + verdict.verdictSeverityTitle());
         plainTextReportUtil.writeToFile();
     }
     

@@ -208,7 +208,7 @@ public class HTMLreporter implements Reporting
         htmlReportUtil.addHeading(4, "Severity: " + verdict.severity());
         htmlReportUtil.addContent(closeBlockContainer); // Close verdict block container
         
-        htmlReportUtil.appendToFileName("_" + verdict.verdictSeverityTitle() + "_poc_");
+        htmlReportUtil.appendToFileName("_" + verdict.verdictSeverityTitle());
         htmlReportUtil.writeToFile();
     }
     
