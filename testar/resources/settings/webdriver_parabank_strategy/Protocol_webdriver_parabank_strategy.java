@@ -28,6 +28,7 @@
  *
  */
 
+import org.antlr.v4.runtime.misc.MultiMap;
 import org.testar.CodingManager;
 import org.testar.RandomActionSelector;
 import org.testar.managers.InputDataManager;
@@ -51,6 +52,7 @@ import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
 import org.testar.protocols.WebdriverProtocol;
 import parsing.ParseUtil;
+import strategynodes.enums.ActionType;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -83,7 +85,7 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 	private ParseUtil parseUtil;
 	private boolean strategyRandom = false;
 	private Widget formFillingWidget = null;
-	private Map<String, Integer> strategyActionsExecuted = new HashMap<String, Integer>();
+	private MultiMap<String, Object> strategyActionsExecuted      = new MultiMap<>();
 
 	// form.htm , 1 : [[n_fill_field1, n_fill_field2, n_fill_field3], num_succes_submit, num_unsucces_submit]
 	private Map<String, Metrics> metricsFormsCompleted = new HashMap<String, Metrics>();
@@ -207,7 +209,7 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		state.remove(Tags.PreviousActionID);
 
 		// Reset the strategy calculation before each sequence
-		strategyActionsExecuted = new HashMap<String, Integer>();
+		strategyActionsExecuted = new MultiMap<>();
 
 		// Reset the last executed action track
 		lastExecutedAction = null;
@@ -604,8 +606,16 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 					RandomActionSelector.selectRandomAction(actions);
 
 		String actionID = selectedAction.get(Tags.AbstractIDCustom);
-		Integer timesUsed = strategyActionsExecuted.getOrDefault(actionID, 0); //get the use count for the action
-		strategyActionsExecuted.put(actionID, timesUsed + 1); //increase by one
+
+		//get the use count for the action
+		List<Object> entry = strategyActionsExecuted.get(actionID); //should return empty collection if nonexistent
+		int timesUsed = entry.isEmpty() ? 0 : (Integer) entry.get(0); //default to zero if empty
+		ActionType actionType = entry.isEmpty() ? ActionType.getActionType(selectedAction) : (ActionType) entry.get(1);
+
+		ArrayList<Object> updatedEntry = new ArrayList<Object>();
+		updatedEntry.add(timesUsed + 1); //increase usage by one
+		updatedEntry.add(actionType);
+		strategyActionsExecuted.replace(actionID, updatedEntry); //replace or create entry
 
 		// If we are in form filling mode, initialize in the metrics the existing input elements
 		if(formFillingWidget != null)
@@ -656,7 +666,7 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 				&& action.get(Tags.OriginWidget).get(WdTags.WebType, "").equalsIgnoreCase("submit"))
 		{
 			// Reset form actions because next time we need to fill completely again
-			strategyActionsExecuted = new HashMap<String, Integer>();
+			strategyActionsExecuted = new MultiMap<>();
 			// Submit actions require extra time to load next state
 			boolean executed = super.executeAction(system, state, action);
 			Util.pause(5);

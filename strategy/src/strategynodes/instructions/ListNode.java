@@ -1,27 +1,29 @@
-package strategynodes;
+package strategynodes.instructions;
 
+import org.antlr.v4.runtime.misc.MultiMap;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
+import strategynodes.BaseNode;
 
 import java.util.*;
 
-public class StrategyNode extends BaseNode<Action>
+public class ListNode extends BaseNode<Action>
 {
-    private List<BaseActionNode> actionList = new ArrayList<BaseActionNode>();
+    private final List<ActionNode> actionList = new ArrayList<>();
     
-    public StrategyNode(List<BaseActionNode> actionStrategies)
+    public ListNode(List<ActionNode> actionStrategies)
     {this.actionList.addAll(actionStrategies);}
     
     private int getTotalWeights()
     {
         int totalWeights = 0;
-        for(BaseActionNode action : this.actionList)
+        for(ActionNode action : this.actionList)
             totalWeights += action.GetWeight();
         return totalWeights;
     }
-    
+
     @Override
-    public Action getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted, ArrayList<String> operatingSystems)
+    public Action getResult(State state, Set<Action> actions, MultiMap<String, Object> actionsExecuted, ArrayList<String> operatingSystems)
     {
         if(actionList.size() == 1)
             return actionList.get(0).getResult(state, actions, actionsExecuted, operatingSystems);
@@ -30,7 +32,7 @@ public class StrategyNode extends BaseNode<Action>
             Random r = new Random();
             int tracker = r.nextInt(getTotalWeights());
             
-            for(BaseActionNode currentAction : this.actionList)
+            for(ActionNode currentAction : this.actionList)
             {
                 tracker -= currentAction.GetWeight();
                 if(tracker <= 0) //once the tracker reaches zero, that action gets picked
@@ -44,7 +46,7 @@ public class StrategyNode extends BaseNode<Action>
     public String toString()
     {
         StringJoiner joiner = new StringJoiner("\n");
-        for(BaseActionNode actionStrategy : this.actionList)
+        for(ActionNode actionStrategy : this.actionList)
             joiner.add(actionStrategy.toString());
         return joiner.toString();
     }

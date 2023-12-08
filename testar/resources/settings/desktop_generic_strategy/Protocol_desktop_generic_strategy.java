@@ -28,6 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
+import org.antlr.v4.runtime.misc.MultiMap;
 import org.testar.DerivedActions;
 import org.testar.RandomActionSelector;
 import org.testar.SutVisualization;
@@ -44,18 +45,16 @@ import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
 import org.testar.protocols.DesktopProtocol;
 import parsing.ParseUtil;
+import strategynodes.enums.ActionType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Protocol_desktop_generic_strategy extends DesktopProtocol
 {
 	private ParseUtil            parseUtil;
 	private RandomActionSelector selector;
 	private boolean              useRandom = false;
-	private Map<String, Integer>    actionsExecuted      = new HashMap<String, Integer>();
+	private MultiMap<String, Object>    actionsExecuted      = new MultiMap<>();
 	private ArrayList<String> operatingSystems = new ArrayList<>();
 	
 	@Override
@@ -126,10 +125,18 @@ public class Protocol_desktop_generic_strategy extends DesktopProtocol
 		Action selectedAction = (useRandom) ?
 				selector.selectAction(state, actions):
 				parseUtil.selectAction(state, actions, actionsExecuted, operatingSystems);
-		
+
 		String actionID = selectedAction.get(Tags.AbstractIDCustom);
-		Integer timesUsed = actionsExecuted.getOrDefault(actionID, 0); //get the use count for the action
-		actionsExecuted.put(actionID, timesUsed + 1); //increase by one
+
+		//get the use count for the action
+		List<Object> entry = actionsExecuted.get(actionID); //should return empty collection if nonexistent
+		int timesUsed = entry.isEmpty() ? 0 : (Integer) entry.get(0); //default to zero if empty
+		ActionType actionType = entry.isEmpty() ? ActionType.getActionType(selectedAction) : (ActionType) entry.get(1);
+
+		ArrayList<Object> updatedEntry = new ArrayList<Object>();
+		updatedEntry.add(timesUsed + 1); //increase usage by one
+		updatedEntry.add(actionType);
+		actionsExecuted.replace(actionID, updatedEntry); //replace or create entry
 		
 		return selectedAction;
 	}

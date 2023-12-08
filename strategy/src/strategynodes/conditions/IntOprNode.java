@@ -1,20 +1,20 @@
-package strategynodes.condition;
+package strategynodes.conditions;
 
+import org.antlr.v4.runtime.misc.MultiMap;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
-import strategynodes.BaseBooleanNode;
 import strategynodes.BaseNode;
+import strategynodes.enums.IntegerOperator;
 
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
 
-public class IntOprNode extends BaseBooleanNode
+public class IntOprNode extends BaseNode<Boolean>
 {
-    private BaseNode<Integer> left;
-    private IntegerOperator   operator;
-    private BaseNode<Integer> right;
+    private final BaseNode<Integer> left;
+    private final IntegerOperator operator;
+    private final BaseNode<Integer> right;
 
     
     public IntOprNode(BaseNode<Integer> left, IntegerOperator operator, BaseNode<Integer> right)
@@ -25,7 +25,7 @@ public class IntOprNode extends BaseBooleanNode
     }
     
     @Override
-    public Boolean getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted, ArrayList<String> operatingSystems)
+    public Boolean getResult(State state, Set<Action> actions, MultiMap<String, Object> actionsExecuted, ArrayList<String> operatingSystems)
     {
         return operator.getResult
                 (left.getResult(state, actions, actionsExecuted, operatingSystems),

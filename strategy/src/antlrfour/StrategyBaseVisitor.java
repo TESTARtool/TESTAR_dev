@@ -1,4 +1,4 @@
-// Generated from C:/Users/lh3/IdeaProjects/TESTAR/strategy/src/antlrfour\Strategy.g4 by ANTLR 4.12.0
+// Generated from C:/Users/testar/Desktop/TESTAR_dev/strategy/src/antlrfour/Strategy.g4 by ANTLR 4.13.1
 package antlrfour;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
@@ -46,6 +46,13 @@ public class StrategyBaseVisitor<T> extends AbstractParseTreeVisitor<T> implemen
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
+	@Override public T visitRepeatPreviousAction(StrategyParser.RepeatPreviousActionContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
 	@Override public T visitSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
@@ -53,7 +60,7 @@ public class StrategyBaseVisitor<T> extends AbstractParseTreeVisitor<T> implemen
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitSelectRelation(StrategyParser.SelectRelationContext ctx) { return visitChildren(ctx); }
+	@Override public T visitSelectByRelation(StrategyParser.SelectByRelationContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -109,7 +116,14 @@ public class StrategyBaseVisitor<T> extends AbstractParseTreeVisitor<T> implemen
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitAnyExistRelatedAction(StrategyParser.AnyExistRelatedActionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitSutType(StrategyParser.SutTypeContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitAnyExistByRelation(StrategyParser.AnyExistByRelationContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -130,14 +144,14 @@ public class StrategyBaseVisitor<T> extends AbstractParseTreeVisitor<T> implemen
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitSutType(StrategyParser.SutTypeContext ctx) { return visitChildren(ctx); }
+	@Override public T visitNActions(StrategyParser.NActionsContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitNActions(StrategyParser.NActionsContext ctx) { return visitChildren(ctx); }
+	@Override public T visitNPrevious(StrategyParser.NPreviousContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

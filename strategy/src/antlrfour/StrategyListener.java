@@ -1,4 +1,4 @@
-// Generated from C:/Users/lh3/IdeaProjects/TESTAR/strategy/src/antlrfour\Strategy.g4 by ANTLR 4.12.0
+// Generated from C:/Users/testar/Desktop/TESTAR_dev/strategy/src/antlrfour/Strategy.g4 by ANTLR 4.13.1
 package antlrfour;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
@@ -48,6 +48,18 @@ public interface StrategyListener extends ParseTreeListener {
 	 */
 	void exitCond_action(StrategyParser.Cond_actionContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code repeatPreviousAction}
+	 * labeled alternative in {@link StrategyParser#uncond_action}.
+	 * @param ctx the parse tree
+	 */
+	void enterRepeatPreviousAction(StrategyParser.RepeatPreviousActionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code repeatPreviousAction}
+	 * labeled alternative in {@link StrategyParser#uncond_action}.
+	 * @param ctx the parse tree
+	 */
+	void exitRepeatPreviousAction(StrategyParser.RepeatPreviousActionContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code selectPreviousAction}
 	 * labeled alternative in {@link StrategyParser#uncond_action}.
 	 * @param ctx the parse tree
@@ -60,17 +72,17 @@ public interface StrategyListener extends ParseTreeListener {
 	 */
 	void exitSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code selectRelation}
+	 * Enter a parse tree produced by the {@code selectByRelation}
 	 * labeled alternative in {@link StrategyParser#uncond_action}.
 	 * @param ctx the parse tree
 	 */
-	void enterSelectRelation(StrategyParser.SelectRelationContext ctx);
+	void enterSelectByRelation(StrategyParser.SelectByRelationContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code selectRelation}
+	 * Exit a parse tree produced by the {@code selectByRelation}
 	 * labeled alternative in {@link StrategyParser#uncond_action}.
 	 * @param ctx the parse tree
 	 */
-	void exitSelectRelation(StrategyParser.SelectRelationContext ctx);
+	void exitSelectByRelation(StrategyParser.SelectByRelationContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code selectRandomAction}
 	 * labeled alternative in {@link StrategyParser#uncond_action}.
@@ -156,17 +168,29 @@ public interface StrategyListener extends ParseTreeListener {
 	 */
 	void exitStateChanged(StrategyParser.StateChangedContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code anyExistRelatedAction}
+	 * Enter a parse tree produced by the {@code sutType}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
 	 * @param ctx the parse tree
 	 */
-	void enterAnyExistRelatedAction(StrategyParser.AnyExistRelatedActionContext ctx);
+	void enterSutType(StrategyParser.SutTypeContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code anyExistRelatedAction}
+	 * Exit a parse tree produced by the {@code sutType}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
 	 * @param ctx the parse tree
 	 */
-	void exitAnyExistRelatedAction(StrategyParser.AnyExistRelatedActionContext ctx);
+	void exitSutType(StrategyParser.SutTypeContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code anyExistByRelation}
+	 * labeled alternative in {@link StrategyParser#state_boolean}.
+	 * @param ctx the parse tree
+	 */
+	void enterAnyExistByRelation(StrategyParser.AnyExistByRelationContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code anyExistByRelation}
+	 * labeled alternative in {@link StrategyParser#state_boolean}.
+	 * @param ctx the parse tree
+	 */
+	void exitAnyExistByRelation(StrategyParser.AnyExistByRelationContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code anyExist}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
@@ -192,18 +216,6 @@ public interface StrategyListener extends ParseTreeListener {
 	 */
 	void exitPreviousExist(StrategyParser.PreviousExistContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code sutType}
-	 * labeled alternative in {@link StrategyParser#state_boolean}.
-	 * @param ctx the parse tree
-	 */
-	void enterSutType(StrategyParser.SutTypeContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code sutType}
-	 * labeled alternative in {@link StrategyParser#state_boolean}.
-	 * @param ctx the parse tree
-	 */
-	void exitSutType(StrategyParser.SutTypeContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code nActions}
 	 * labeled alternative in {@link StrategyParser#int_expr}.
 	 * @param ctx the parse tree
@@ -215,6 +227,18 @@ public interface StrategyListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitNActions(StrategyParser.NActionsContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code nPrevious}
+	 * labeled alternative in {@link StrategyParser#int_expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterNPrevious(StrategyParser.NPreviousContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code nPrevious}
+	 * labeled alternative in {@link StrategyParser#int_expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitNPrevious(StrategyParser.NPreviousContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code plainInt}
 	 * labeled alternative in {@link StrategyParser#int_expr}.

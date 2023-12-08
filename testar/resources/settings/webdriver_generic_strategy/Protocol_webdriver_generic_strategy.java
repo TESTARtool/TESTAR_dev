@@ -28,6 +28,7 @@
 *
 */
 
+import org.antlr.v4.runtime.misc.MultiMap;
 import org.testar.CodingManager;
 import org.testar.OutputStructure;
 import org.testar.RandomActionSelector;
@@ -52,6 +53,7 @@ import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
 import org.testar.protocols.WebdriverProtocol;
 import parsing.ParseUtil;
+import strategynodes.enums.ActionType;
 import writers.CSVFileWriter;
 
 import java.awt.*;
@@ -59,6 +61,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
 import static org.testar.OutputStructure.outerLoopName;
 import static org.testar.monkey.alayer.Tags.Blocked;
@@ -67,9 +70,9 @@ import static org.testar.monkey.alayer.Tags.Enabled;
 public class Protocol_webdriver_generic_strategy extends WebdriverProtocol
 {
     private ParseUtil               parseUtil;
-    private RandomActionSelector    selector;
+    private RandomActionSelector randomSelector;
     private boolean useRandom = false;
-    private Map<String, Integer>    actionsExecuted      = new HashMap<String, Integer>();
+    private MultiMap<String, Object> actionsExecuted      = new MultiMap<>();
     private Map<String, Integer>    debugActionsExecuted      = new HashMap<String, Integer>();
     private ArrayList<String> operatingSystems = new ArrayList<>();
     private String startTimestamp = "";
@@ -126,9 +129,9 @@ public class Protocol_webdriver_generic_strategy extends WebdriverProtocol
     {
         super.initialize(settings);
 
-        useRandom = settings.get(ConfigTags.StrategyFile).equals("");
+        useRandom = settings.get(ConfigTags.StrategyFile).isEmpty();
         if (useRandom)
-            selector = new RandomActionSelector();
+            randomSelector = new RandomActionSelector();
         else
             parseUtil = new ParseUtil(settings.get(ConfigTags.StrategyFile));
     
@@ -285,7 +288,7 @@ public class Protocol_webdriver_generic_strategy extends WebdriverProtocol
         }
         
         // If we have forced actions, prioritize and filter the other ones
-        if (forcedActions != null && forcedActions.size() > 0) {
+        if (forcedActions != null && !forcedActions.isEmpty()) {
             filteredActions = actions;
             actions = forcedActions;
         }
@@ -306,12 +309,20 @@ public class Protocol_webdriver_generic_strategy extends WebdriverProtocol
         }
 
         Action selectedAction = (useRandom) ?
-                selector.selectAction(state, actions):
+                randomSelector.selectAction(state, actions):
                 parseUtil.selectAction(state, actions, actionsExecuted, operatingSystems);
         
         String actionID = selectedAction.get(Tags.AbstractIDCustom);
-        Integer timesUsed = actionsExecuted.getOrDefault(actionID, 0); //get the use count for the action
-        actionsExecuted.put(actionID, timesUsed + 1); //increase by one
+
+        //get the use count for the action
+        List<Object> entry = actionsExecuted.get(actionID); //should return empty collection if nonexistent
+        int timesUsed = entry.isEmpty() ? 0 : (Integer) entry.get(0); //default to zero if empty
+        ActionType actionType = entry.isEmpty() ? ActionType.getActionType(selectedAction) : (ActionType) entry.get(1);
+
+        ArrayList<Object> updatedEntry = new ArrayList<Object>();
+        updatedEntry.add(timesUsed + 1); //increase usage by one
+        updatedEntry.add(actionType);
+        actionsExecuted.replace(actionID, updatedEntry); //replace or create entry
 
         String widgetPath = selectedAction.get(Tags.OriginWidget).get(Tags.Path).trim();
         String widgetDesc = selectedAction.get(Tags.OriginWidget).get(Tags.Desc);
@@ -493,6 +504,12 @@ public class Protocol_webdriver_generic_strategy extends WebdriverProtocol
         String submitSuccess = (DefaultProtocol.lastExecutedAction.get(Tags.OriginWidget).get(WdTags.WebType, "").equalsIgnoreCase("submit")) ? "yes" : "no";
         numFieldsFilled -= 5; //formstring, begin_epoch, end_epoch, delta_epoch, datetime
 
+        ArrayList<Integer> actionUsages = new ArrayList<Integer>();
+        for (String actionID : actionsExecuted.keySet())
+        {
+            actionUsages.add((Integer) actionsExecuted.get(actionID).get(0));
+        }
+        int totalUses = Collections.max(actionUsages);
 
         csvWriter.addField("url", "URL", url);
 //        csvWriter.addField("applicationName", "application name", settings.get(ConfigTags.ApplicationName, "application"));
@@ -507,7 +524,7 @@ public class Protocol_webdriver_generic_strategy extends WebdriverProtocol
         csvWriter.addField("numberOfFields", "number of fields", Integer.toString(numFields));
         csvWriter.addField("actionsExecuted", "actions executed", Integer.toString(actionCount-1));
         csvWriter.addField("numberOfFieldsFilled", "number of fields filled", Integer.toString(numFieldsFilled));
-        csvWriter.addField("maxActionsPerField", "maximum actions per field", Integer.toString(Collections.max(actionsExecuted.values())));
+        csvWriter.addField("maxActionsPerField", "maximum actions per field", Integer.toString(totalUses));
         csvWriter.addField("submit", "successful submit", submitSuccess);
     
         if(createNewFile || csvWriter.fileIsEmpty()) //file empty or nonexistent

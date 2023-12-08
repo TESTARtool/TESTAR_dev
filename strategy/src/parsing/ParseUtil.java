@@ -5,18 +5,18 @@ import antlrfour.StrategyParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.misc.MultiMap;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
-import strategynodes.StrategyNode;
+import strategynodes.instructions.ListNode;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Set;
 
 public class ParseUtil
 {
-    private StrategyNode StrategyTree;
+    private ListNode StrategyTree;
     
     public ParseUtil(String filePath)
     {
@@ -38,7 +38,7 @@ public class ParseUtil
         return chars;
     }
     
-    private StrategyNode BuildAST(CharStream chars)
+    private ListNode BuildAST(CharStream chars)
     {
         StrategyLexer     lexer  = new StrategyLexer(chars);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -49,7 +49,7 @@ public class ParseUtil
         return visitor.visitStrategy_file(tree); //create and return AST tree
     }
     
-    public Action selectAction(State state, Set<Action> actions, Map<String, Integer> actionsExecuted, ArrayList<String> operatingSystems)
+    public Action selectAction(State state, Set<Action> actions, MultiMap<String, Object> actionsExecuted, ArrayList<String> operatingSystems)
     {
         return StrategyTree.getResult(state, actions, actionsExecuted, operatingSystems);
     }

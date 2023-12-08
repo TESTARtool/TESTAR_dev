@@ -1,29 +1,30 @@
-package strategynodes.condition;
+package strategynodes.conditions;
 
+import org.antlr.v4.runtime.misc.MultiMap;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
-import strategynodes.BaseBooleanNode;
+import strategynodes.BaseNode;
+import strategynodes.enums.BooleanOperator;
 
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
 
-public class BoolOprNode extends BaseBooleanNode
+public class BoolOprNode extends BaseNode<Boolean>
 {
-    private BaseBooleanNode left; //can be null if operator is NOT
-    private BooleanOperator operator;
-    private BaseBooleanNode right;
+    private final BaseNode<Boolean> left; //can be null if operator is NOT
+    private final BooleanOperator operator;
+    private final BaseNode<Boolean> right;
 
-    public BoolOprNode(BaseBooleanNode left, BooleanOperator operator, BaseBooleanNode right)    {
-
+    public BoolOprNode(BaseNode<Boolean> left, BooleanOperator operator, BaseNode<Boolean> right)
+    {
         this.left = left;
         this.operator = operator;
         this.right = right;
     }
     
     @Override
-    public Boolean getResult(State state, Set<Action> actions, Map<String, Integer> actionsExecuted, ArrayList<String> operatingSystems)
+    public Boolean getResult(State state, Set<Action> actions, MultiMap<String, Object> actionsExecuted, ArrayList<String> operatingSystems)
     {
         if(operator != BooleanOperator.NOT)
             return operator.getResult(left.getResult(state, actions, actionsExecuted, operatingSystems), right.getResult(state, actions, actionsExecuted, operatingSystems));

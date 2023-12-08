@@ -1,4 +1,4 @@
-// Generated from C:/Users/lh3/IdeaProjects/TESTAR/strategy/src/antlrfour\Strategy.g4 by ANTLR 4.12.0
+// Generated from C:/Users/testar/Desktop/TESTAR_dev/strategy/src/antlrfour/Strategy.g4 by ANTLR 4.13.1
 package antlrfour;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
@@ -35,6 +35,13 @@ public interface StrategyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitCond_action(StrategyParser.Cond_actionContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code repeatPreviousAction}
+	 * labeled alternative in {@link StrategyParser#uncond_action}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRepeatPreviousAction(StrategyParser.RepeatPreviousActionContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code selectPreviousAction}
 	 * labeled alternative in {@link StrategyParser#uncond_action}.
 	 * @param ctx the parse tree
@@ -42,12 +49,12 @@ public interface StrategyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code selectRelation}
+	 * Visit a parse tree produced by the {@code selectByRelation}
 	 * labeled alternative in {@link StrategyParser#uncond_action}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSelectRelation(StrategyParser.SelectRelationContext ctx);
+	T visitSelectByRelation(StrategyParser.SelectByRelationContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code selectRandomAction}
 	 * labeled alternative in {@link StrategyParser#uncond_action}.
@@ -98,12 +105,19 @@ public interface StrategyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStateChanged(StrategyParser.StateChangedContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code anyExistRelatedAction}
+	 * Visit a parse tree produced by the {@code sutType}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitAnyExistRelatedAction(StrategyParser.AnyExistRelatedActionContext ctx);
+	T visitSutType(StrategyParser.SutTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code anyExistByRelation}
+	 * labeled alternative in {@link StrategyParser#state_boolean}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAnyExistByRelation(StrategyParser.AnyExistByRelationContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code anyExist}
 	 * labeled alternative in {@link StrategyParser#state_boolean}.
@@ -119,19 +133,19 @@ public interface StrategyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitPreviousExist(StrategyParser.PreviousExistContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code sutType}
-	 * labeled alternative in {@link StrategyParser#state_boolean}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSutType(StrategyParser.SutTypeContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code nActions}
 	 * labeled alternative in {@link StrategyParser#int_expr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitNActions(StrategyParser.NActionsContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code nPrevious}
+	 * labeled alternative in {@link StrategyParser#int_expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNPrevious(StrategyParser.NPreviousContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code plainInt}
 	 * labeled alternative in {@link StrategyParser#int_expr}.

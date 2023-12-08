@@ -1,4 +1,4 @@
-package strategynodes.condition;
+package strategynodes.enums;
 
 import java.util.Arrays;
 import java.util.HashMap;

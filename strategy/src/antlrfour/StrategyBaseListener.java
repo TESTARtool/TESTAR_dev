@@ -1,4 +1,4 @@
-// Generated from C:/Users/lh3/IdeaProjects/TESTAR/strategy/src/antlrfour\Strategy.g4 by ANTLR 4.12.0
+// Generated from C:/Users/testar/Desktop/TESTAR_dev/strategy/src/antlrfour/Strategy.g4 by ANTLR 4.13.1
 package antlrfour;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -65,6 +65,18 @@ public class StrategyBaseListener implements StrategyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterRepeatPreviousAction(StrategyParser.RepeatPreviousActionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRepeatPreviousAction(StrategyParser.RepeatPreviousActionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -77,13 +89,13 @@ public class StrategyBaseListener implements StrategyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSelectRelation(StrategyParser.SelectRelationContext ctx) { }
+	@Override public void enterSelectByRelation(StrategyParser.SelectByRelationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSelectRelation(StrategyParser.SelectRelationContext ctx) { }
+	@Override public void exitSelectByRelation(StrategyParser.SelectByRelationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -173,13 +185,25 @@ public class StrategyBaseListener implements StrategyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterAnyExistRelatedAction(StrategyParser.AnyExistRelatedActionContext ctx) { }
+	@Override public void enterSutType(StrategyParser.SutTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitAnyExistRelatedAction(StrategyParser.AnyExistRelatedActionContext ctx) { }
+	@Override public void exitSutType(StrategyParser.SutTypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterAnyExistByRelation(StrategyParser.AnyExistByRelationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitAnyExistByRelation(StrategyParser.AnyExistByRelationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -209,18 +233,6 @@ public class StrategyBaseListener implements StrategyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSutType(StrategyParser.SutTypeContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitSutType(StrategyParser.SutTypeContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterNActions(StrategyParser.NActionsContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -228,6 +240,18 @@ public class StrategyBaseListener implements StrategyListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitNActions(StrategyParser.NActionsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNPrevious(StrategyParser.NPreviousContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNPrevious(StrategyParser.NPreviousContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

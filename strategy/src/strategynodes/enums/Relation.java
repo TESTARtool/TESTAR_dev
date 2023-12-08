@@ -1,4 +1,4 @@
-package strategynodes.filtering;
+package strategynodes.enums;
 
 import java.util.HashMap;
 import java.util.Map;
