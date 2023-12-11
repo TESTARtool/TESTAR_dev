@@ -20,13 +20,13 @@ public class HTMLreporter implements Reporting
     private final String openBlockContainer = "<div class='block' style='display:flex;flex-direction:column'>";
     private final String closeBlockContainer = "</div>";
     
-    public HTMLreporter(String fileName, boolean replay) //replay or record mode
+    public HTMLreporter(String fileName, boolean replay) //replay or generate mode
     {
         htmlReportUtil = new HTMLreportUtil(fileName);
         
         startReport();
         if(replay)  addReplayHeading();
-        else        addRecordHeading();
+        else        addGenerateHeading();
     }
     
     private void startReport()
@@ -45,7 +45,7 @@ public class HTMLreporter implements Reporting
         htmlReportUtil.addHeading(1, "TESTAR replay sequence report for file " + ConfigTags.PathToReplaySequence);
     }
     
-    private void addRecordHeading()
+    private void addGenerateHeading()
     {
             htmlReportUtil.addHeading(1, "TESTAR execution sequence report for sequence " + OutputStructure.sequenceInnerLoopCount);
             // HTML button to invoke reverse function
@@ -74,7 +74,6 @@ public class HTMLreporter implements Reporting
         htmlReportUtil.writeToFile();
     }
 
-
     private String prepareScreenshotImagePath(String path)
     {
         if(path.contains("./output"))
@@ -86,7 +85,6 @@ public class HTMLreporter implements Reporting
         }
         return path.replace("\\", "/"); // ensure forward slashes
     }
-    
     
     private String getActionString(Action action)
     {

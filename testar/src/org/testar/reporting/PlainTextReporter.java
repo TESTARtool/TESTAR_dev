@@ -16,13 +16,13 @@ public class PlainTextReporter implements Reporting
 {
     private PlainTextReportUtil plainTextReportUtil;
     private int innerLoopCounter = 0;
-    public PlainTextReporter(String fileName, boolean replay) //replay or record mode
+    public PlainTextReporter(String fileName, boolean replay) //replay or generate mode
     {
         plainTextReportUtil = new PlainTextReportUtil(fileName);
         
         startReport();
         if(replay)  addReplayHeading();
-        else        addRecordHeading();
+        else        addGenerateHeading();
     }
     
     private void startReport()
@@ -35,7 +35,7 @@ public class PlainTextReporter implements Reporting
         plainTextReportUtil.addHeading(2, "TESTAR replay sequence report for file " + ConfigTags.PathToReplaySequence);
     }
     
-    private void addRecordHeading()
+    private void addGenerateHeading()
     {
         plainTextReportUtil.addHeading(2, "TESTAR execution sequence report for sequence " + OutputStructure.sequenceInnerLoopCount);
     }
@@ -58,7 +58,6 @@ public class PlainTextReporter implements Reporting
         plainTextReportUtil.writeToFile();
     }
     
-    
     private String prepareScreenshotImagePath(String path)
     {
         if(path.contains("./output"))
@@ -70,7 +69,6 @@ public class PlainTextReporter implements Reporting
         }
         return path.replace("\\", "/"); // ensure forward slashes
     }
-    
     
     private String getActionString(Action action)
     {

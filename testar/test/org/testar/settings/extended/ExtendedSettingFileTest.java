@@ -255,7 +255,8 @@ public class ExtendedSettingFileTest {
         assertFalse(testFile.exists());
         sut = new ExtendedSettingFile(_relativePath + knownFile, fileAccessLock);
         TestSetting elementOne = sut.load(TestSetting.class, TestSetting::CreateDefault);
-//        OtherSetting elementTwo = sut.load(OtherSetting.class, OtherSetting::CreateDefault);
+        // Load the OtherSettings to provoke the intended exception to test
+        sut.load(OtherSetting.class, OtherSetting::CreateDefault);
         assertTrue(testFile.exists());
         assertNotNull(elementOne);
 

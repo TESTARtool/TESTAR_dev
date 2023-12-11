@@ -14,6 +14,10 @@ public abstract class BaseReportUtil
     protected               ArrayList<String> content = new ArrayList<>();
     private          final  String            FILE_SUFFIX; // lower case, includes period
 
+    public File getFile() {
+    	return file;
+    }
+
     protected BaseReportUtil(String fileString, String fileSuffix)
     {
         FILE_SUFFIX = (fileSuffix.toLowerCase().startsWith(".")) ? fileSuffix : "." + fileSuffix; //add period if not included
@@ -41,8 +45,6 @@ public abstract class BaseReportUtil
             try
             {
                 file.createNewFile();
-//                if (file.createNewFile())
-//                    System.out.println("File created: " + file.getAbsolutePath());
             }
             catch (Exception e)
             {
@@ -73,7 +75,7 @@ public abstract class BaseReportUtil
         {
             Path path = Paths.get(file.getAbsolutePath()); // get full name
             Files.move(path, path.resolveSibling(enforceFileSuffix(newName)));
-            file = new File(path.getParent() + File.separator + newName); //update the file path
+            file = new File(path.getParent() + File.separator + enforceFileSuffix(newName)); //update the file path
         }
         catch (IOException e)
         {
@@ -88,8 +90,9 @@ public abstract class BaseReportUtil
             Path newPath = Paths.get(newDirectory);
             Path oldPath = Paths.get(file.getAbsolutePath()); //full name
             String fileName = file.getName();
-            Files.move(oldPath, newPath.resolveSibling(fileName));
-            file = new File(newPath + File.separator + file); //update the file path
+            //Files.move(oldPath, newPath.resolveSibling(fileName));
+            Files.move(oldPath, newPath.resolve(fileName));
+            file = new File(newPath + File.separator + file.getName()); //update the file path
         }
         catch(IOException e)
         {
@@ -101,7 +104,7 @@ public abstract class BaseReportUtil
     {
         try
         {
-            Files.copy(Paths.get(file.getAbsolutePath()), Paths.get(destinationPath),  StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(Paths.get(file.getAbsolutePath()), Paths.get(destinationPath), StandardCopyOption.REPLACE_EXISTING);
         }
         catch (FileNotFoundException e)
         {

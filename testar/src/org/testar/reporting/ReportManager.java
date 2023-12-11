@@ -1,10 +1,12 @@
 package org.testar.reporting;
 
 import org.testar.OutputStructure;
+import org.testar.monkey.ConfigTags;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
+import org.testar.settings.Settings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,14 +19,17 @@ public class ReportManager implements Reporting
     private boolean firstStateAdded = false;
     private boolean firstActionsAdded = false;
     
-    public ReportManager(boolean replay, boolean html, boolean plainText)
+    public ReportManager(boolean replay, Settings settings)
     {
         //TODO put filename into settings, name with sequence number
         // creating a new file for the report
         String fileName =
                 OutputStructure.htmlOutputDir + "/" + OutputStructure.startInnerLoopDateString + "_"
                 + OutputStructure.executedSUTname + "_sequence_" + OutputStructure.sequenceInnerLoopCount; //no File.separator
-    
+        
+        boolean html = settings.get(ConfigTags.ReportInHTML);
+        boolean plainText = settings.get(ConfigTags.ReportInPlainText);
+        
         if(!Arrays.asList(html, plainText).contains(Boolean.TRUE)) //if none of the options are true
         {
             reportingEnabled = false;
@@ -67,7 +72,6 @@ public class ReportManager implements Reporting
             }
         }
     }
-    
     
     public void addActions(Set<Action> actions)
     {
