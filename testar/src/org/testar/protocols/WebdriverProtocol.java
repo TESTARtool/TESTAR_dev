@@ -28,7 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-
 package org.testar.protocols;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -272,7 +271,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     		+ WinProcess.procName(system.get(Tags.PID)) + "\n");
     		
     	}
-		
+
     	if(settings.get(ConfigTags.Mode) == Modes.Spy) {
 
     		for(Widget w : state) {
@@ -280,7 +279,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				existingCssClasses.addAll(element.cssClasses);
     		}
     	}
-    	
+
         return state;
     }
 

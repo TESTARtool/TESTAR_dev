@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2017 - 2023 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -27,8 +28,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-
 package org.testar.monkey.alayer;
 
 import java.util.HashMap;
@@ -37,9 +36,6 @@ import java.util.Map;
 /**
  * SUT UI soft automation caching.
  * Provides capability to Delay release of cached UI automation elements. 
- * 
- * @author Urko Rueda Molina (alias: urueda)
- *
  */
 public abstract class AutomationCache {
 

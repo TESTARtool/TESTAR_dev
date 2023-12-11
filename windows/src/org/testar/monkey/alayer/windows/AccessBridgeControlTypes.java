@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2017 - 2023 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -35,9 +36,6 @@ import java.util.Map;
 /**
  * Maps the AccessBridge Accessible Roles from AccessBridgePackages.h
  * to UIA Automation control types.
- * 
- * @author Urko Rueda Molina (alias: urueda)
- *
  */
 public class AccessBridgeControlTypes {
 

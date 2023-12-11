@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2017 Open Universiteit - www.ou.nl
+* Copyright (c) 2017 - 2023 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -27,7 +28,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.testar.monkey.alayer.linux.SpyMode;
 
 import org.testar.monkey.Assert;
@@ -37,7 +37,6 @@ import org.testar.monkey.alayer.Pen;
 
 import javax.swing.*;
 import java.awt.*;
-
 
 public class JavaScreenCanvas implements Canvas {
 

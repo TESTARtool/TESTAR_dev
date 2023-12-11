@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -60,14 +60,6 @@ public class AndroidProtocol extends GenericUtilsProtocol {
     }
 
     /**
-     * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
-     */
-    @Override
-    protected void preSequencePreparations() {
-        super.preSequencePreparations();
-    }
-
-    /**
      * This method is called when the TESTAR requests the state of the SUT.
      * Here you can add additional information to the SUT's state or write your
      * own state fetching routine. The state should have attached an oracle
@@ -77,7 +69,7 @@ public class AndroidProtocol extends GenericUtilsProtocol {
      */
     @Override
     protected State getState(SUT system) throws StateBuildException {
-            return super.getState(system);
+        return super.getState(system);
     }
 
     /**

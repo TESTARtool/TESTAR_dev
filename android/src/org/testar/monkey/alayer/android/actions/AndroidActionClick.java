@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,15 +30,13 @@
 
 package org.testar.monkey.alayer.android.actions;
 
-
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.android.AndroidAppiumFramework;
 import org.testar.monkey.alayer.android.enums.AndroidRoles;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 import org.testar.monkey.alayer.exceptions.ActionFailedException;
 
-public class AndroidActionClick extends TaggableBase implements Action
-{
+public class AndroidActionClick extends TaggableBase implements Action {
 
 	private static final long serialVersionUID = 6663144395605910140L;
 
@@ -60,8 +58,7 @@ public class AndroidActionClick extends TaggableBase implements Action
 	}
 
 	@Override
-	public void run(SUT system, State state, double duration) throws ActionFailedException
-	{
+	public void run(SUT system, State state, double duration) throws ActionFailedException {
 		try {
 		    AndroidAppiumFramework.clickElementById(this.accessibilityID, this.widget);
 		} catch(Exception e) {
