@@ -128,6 +128,12 @@ ProtocolSpecificSetting_4 =
 ProtocolSpecificSetting_5 = 
 
 #################################################################
+# Set the types of reports to create
+#################################################################
+ReportInHTML = true
+ReportInPlainText = true
+
+#################################################################
 # Other more advanced settings
 #################################################################
 CreateWidgetInfoJsonFile = true
@@ -153,5 +159,3 @@ CopyFromTo =
 VisualizeActions = false
 MaxReward = 9999999
 Discount = .95
-ReportInHTML = true
-ReportInPlainText = true
