@@ -56,7 +56,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 	}
 
 	protected Modes mode;
-	private Set<KBKeys> pressed = EnumSet.noneOf(KBKeys.class);
+	protected Set<KBKeys> pressed = EnumSet.noneOf(KBKeys.class);
 
 	public EventHandler initializeEventHandler() {
 		return new EventHandler(this);

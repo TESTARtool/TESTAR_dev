@@ -33,6 +33,7 @@ import org.testar.SutVisualization;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
+import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
@@ -40,10 +41,15 @@ import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.plugin.NativeLinker;
+import org.testar.monkey.Main;
 import org.testar.monkey.Pair;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.settings.Settings;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -135,6 +141,17 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 		 */
 	}
 
+	private boolean printWidgetInformation = false;
+
+	@Override
+	public void keyDown(KBKeys key){
+		super.keyDown(key);
+		// If user is pressing ALT + P, track we want to print the widget information
+		if (pressed.contains(KBKeys.VK_ALT) && pressed.contains(KBKeys.VK_P)) {
+			printWidgetInformation = true;
+		}
+	}
+
 	/**
 	 * This method is called when TESTAR requests the state of the SUT.
 	 * Here you can add additional information to the SUT's state or write your
@@ -148,7 +165,41 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 	protected State getState(SUT system) throws StateBuildException {
 		State state = super.getState(system);
 
+		if(printWidgetInformation) {
+			// Print the information from the state widgets
+			printAllWidgetsInformation(state, Main.testarDir);
+
+			// Reset the variable after printing
+			printWidgetInformation = false;
+		}
+
 		return state;
+	}
+
+	private void printAllWidgetsInformation(State state, String path) {
+		String widgetsString = "";
+
+		for(Widget w : state) {
+			widgetsString += w.toString(WdTags.WebId, Tags.Desc, WdTags.WebTagName, WdTags.WebInnerHTML);
+		}
+
+		printToFile(widgetsString, path, "txt");
+	}
+
+	private boolean printToFile(String widgetsString, String path, String extension){
+		// Construct the file path
+		String filePath = path + File.separator + "widgets." + extension;
+
+		try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, true))) {
+			// Add the content to the file
+			writer.print("**********************************************************\n");
+			writer.print(widgetsString);
+			System.out.println("Widgets information successfully written to: " + filePath);
+			return true;
+		} catch (IOException e) {
+			System.err.println("Error writing widgets information to file: " + e.getMessage());
+			return false;
+		}
 	}
 
 	/**
