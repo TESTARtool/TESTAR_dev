@@ -69,7 +69,7 @@ public class ReportManager implements Reporting
             reporters = new ArrayList<>();
     
             if(html)
-                reporters.add(new HTMLreporter(fileName, replay));
+                reporters.add(new HtmlReporter(fileName, replay));
             if(plainText)
                 reporters.add(new PlainTextReporter(fileName, replay));
         }

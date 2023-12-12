@@ -14,7 +14,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class TestHTMLReportUtil
+public class TestHtmlReporter
 {	
 	@Rule
 	public TemporaryFolder tempFolder = new TemporaryFolder();
@@ -29,14 +29,14 @@ public class TestHTMLReportUtil
 	private static final String TEST_COPY_DIRECTORY = "copyDirectory"; // C:/Users/username/AppData/Local/Tmp/junit/copyDirectory
 	private static final String TEST_COPY_FILE = "copyFile"; // C:/Users/username/AppData/Local/Tmp/junit/copyDirectory/copyFile.html
 
-	private HTMLreportUtil htmlReporter;
+	private HtmlFormatUtil htmlReporter;
 
 	@Before
 	public void setUp() throws IOException
 	{
 		tempFolder.newFolder(TEST_ORIGINAL_DIRECTORY);
 		String testFile = tempFolder.getRoot() + File.separator + TEST_ORIGINAL_DIRECTORY + File.separator + TEST_FILE_NAME;
-		htmlReporter = new HTMLreportUtil(testFile);
+		htmlReporter = new HtmlFormatUtil(testFile);
 	}
 
 	@Test

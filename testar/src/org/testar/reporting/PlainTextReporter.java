@@ -44,11 +44,11 @@ import java.util.StringJoiner;
 
 public class PlainTextReporter implements Reporting
 {
-    private PlainTextReportUtil plainTextReportUtil;
+    private PlainTextFormatUtil plainTextReportUtil;
     private int innerLoopCounter = 0;
     public PlainTextReporter(String fileName, boolean replay) //replay or generate mode
     {
-        plainTextReportUtil = new PlainTextReportUtil(fileName);
+        plainTextReportUtil = new PlainTextFormatUtil(fileName);
         
         startReport();
         if(replay)  addReplayHeading();

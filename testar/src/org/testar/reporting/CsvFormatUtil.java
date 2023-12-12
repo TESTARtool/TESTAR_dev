@@ -34,14 +34,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
 
-public class CSVreportUtil extends BaseReportUtil
+public class CsvFormatUtil extends BaseFormatUtil
 {
     private String               delimiter;
     private Map<Integer, Field>  fields; //the fields and their data
     private Map<String, Integer> fieldsIndex; //the lookup that insures a fixed order
     private boolean              fieldsLocked = false;
     
-    public CSVreportUtil(String filePath, String delimiter)
+    public CsvFormatUtil(String filePath, String delimiter)
     {
         super(filePath, "csv");
         this.delimiter = delimiter;

@@ -38,7 +38,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
-public abstract class BaseReportUtil
+public abstract class BaseFormatUtil
 {
     private                 File              file;
     protected               ArrayList<String> content = new ArrayList<>();
@@ -48,7 +48,7 @@ public abstract class BaseReportUtil
     	return file;
     }
 
-    protected BaseReportUtil(String fileString, String fileSuffix)
+    protected BaseFormatUtil(String fileString, String fileSuffix)
     {
         FILE_SUFFIX = (fileSuffix.toLowerCase().startsWith(".")) ? fileSuffix : "." + fileSuffix; //add period if not included
         this.file = new File(enforceFileSuffix(fileString));

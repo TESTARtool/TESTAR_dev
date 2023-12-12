@@ -42,17 +42,17 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.StringJoiner;
 
-public class HTMLreporter implements Reporting
+public class HtmlReporter implements Reporting
 {
-    private HTMLreportUtil htmlReportUtil;
+    private HtmlFormatUtil htmlReportUtil;
     private int innerLoopCounter = 0;
     
     private final String openBlockContainer = "<div class='block' style='display:flex;flex-direction:column'>";
     private final String closeBlockContainer = "</div>";
     
-    public HTMLreporter(String fileName, boolean replay) //replay or generate mode
+    public HtmlReporter(String fileName, boolean replay) //replay or generate mode
     {
-        htmlReportUtil = new HTMLreportUtil(fileName);
+        htmlReportUtil = new HtmlFormatUtil(fileName);
         
         startReport();
         if(replay)  addReplayHeading();
