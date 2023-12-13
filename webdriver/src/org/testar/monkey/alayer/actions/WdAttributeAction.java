@@ -35,6 +35,8 @@ import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.*;
 
 public class WdAttributeAction extends TaggableBase implements Action {
+  private static final long serialVersionUID = 6812147314265385744L;
+
   private String elementId;
   private String key;
   private String value;

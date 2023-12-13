@@ -51,8 +51,8 @@ public class WdSelectListAction extends TaggableBase implements Action {
         this.uniqueName = uniqueName;
         this.value = value;
         this.set(Tags.Role, WdActionRoles.SelectListAction);
-        this.set(Tags.Desc, "Set Webdriver select list script to set into id '" + elementId + "' or name '" + uniqueName + "' : " + value);
-        this.set(Tags.OriginWidget, widget);
+        this.set(Tags.Desc, "Set Webdriver select list script to set into " + elementId + " : " + value);
+        this.mapActionToWidget(widget);
     }
 
     @Override

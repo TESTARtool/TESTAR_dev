@@ -35,6 +35,8 @@ import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.*;
 
 public class WdCloseTabAction extends TaggableBase implements Action {
+  private static final long serialVersionUID = 8984904115521916146L;
+
   public WdCloseTabAction() {
 	  this.set(Tags.Role, WdActionRoles.CloseTabScript);
 	  this.set(Tags.Desc, "Execute Webdriver script to close the current tab");

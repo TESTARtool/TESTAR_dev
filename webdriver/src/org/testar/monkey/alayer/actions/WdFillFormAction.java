@@ -1,6 +1,5 @@
 package org.testar.monkey.alayer.actions;
 
-import org.apache.logging.log4j.Level;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.exceptions.ActionFailedException;
 import org.testar.monkey.alayer.webdriver.WdDriver;
@@ -24,10 +23,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class WdFillFormAction extends TaggableBase implements Action {
+    private static final long serialVersionUID = 1722785941555641691L;
+
     //TODO if this works well, put it into config file:
     private boolean useOnlyWebNameForXmlFileName = true;
-    private StdActionCompiler ac;
-    private Widget widget;
     private Action formFillingAction;
     private boolean hidden = false;
     private String formFileFolder;
@@ -54,14 +53,12 @@ public class WdFillFormAction extends TaggableBase implements Action {
      */
     public WdFillFormAction(StdActionCompiler ac, Widget widget, String formFileFolder) {
         logger.debug("Form filling action created");
-        this.ac=ac;
-        this.widget=widget;
         this.set(Tags.Role, WdActionRoles.FormFillingAction);
         this.formFileFolder = formFileFolder;
         // The desc of the form filling action will be updated with filename later:
         this.set(Tags.Desc, "Fill a form based on XML file.");
         formFillingAction = fillForm(ac, widget);
-        this.set(Tags.OriginWidget, widget);
+        this.mapActionToWidget(widget);
     }
 
     public boolean isHiddenForm() {
@@ -209,7 +206,7 @@ public class WdFillFormAction extends TaggableBase implements Action {
             hidden = true;
         }
         logger.debug("Setting OriginWidget for the form action");
-        formAction.set(Tags.OriginWidget, widget);
+        formAction.mapActionToWidget(widget);
         return formAction;
     }
 
