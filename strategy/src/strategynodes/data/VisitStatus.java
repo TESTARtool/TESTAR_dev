@@ -8,17 +8,17 @@ import strategynodes.enums.VisitType;
 public class VisitStatus
 {
     private final VisitType VISIT_TYPE;
-    private final boolean countApplies;
+    private final boolean intApplies;
     private final Integer visitInt;
 
     public VisitStatus(VisitType visitType, Integer visitInt)
     {
         this.VISIT_TYPE = visitType;
-        this.countApplies =
+        this.intApplies =
                 (visitType == VisitType.VISITED_N ||
                 visitType == VisitType.VISITED_OVER_N ||
                 visitType == VisitType.VISITED_UNDER_N);
-        this.visitInt = (countApplies) ? visitInt : null;
+        this.visitInt = (intApplies) ? visitInt : null;
     }
 
     public VisitType getVisitType()
@@ -60,7 +60,7 @@ public class VisitStatus
 
     public String toString()
     {
-        if (countApplies)
+        if (intApplies)
             return VISIT_TYPE + " " + visitInt;
         else
             return VISIT_TYPE.toString();

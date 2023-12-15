@@ -22,13 +22,6 @@ public class VisitFilter
         this.filteredPastActions = new MultiMap<>();
     }
 
-//    public VisitFilter(VisitType visitType, Integer visitInt)
-//    {
-//        this.visitStatus = new VisitStatus(visitType, visitInt);
-//        this.filteredActions = new ArrayList<>();
-//        this.filteredPastActions = new MultiMap<>();
-//    }
-
     //present actions
     public ArrayList<Action> filter(Collection<Action> actions, MultiMap<String, Object> actionsExecuted)
     {
@@ -197,70 +190,6 @@ public class VisitFilter
         }
         return filteredPastActions;
     }
-
-//    private MultiMap<String, Object> filterPastUnvisited(Collection<Action> actions, MultiMap<String, Object> actionsExecuted, boolean filterByCurrentAvailability)
-//    {
-//        //all past actions are already visited by default
-//        if(!filterByCurrentAvailability)
-//            return actionsExecuted;
-//
-//        //past actions need to be available now, thus create list of available actions
-//        ArrayList<String> availableActions = pastActionsCurrentlyAvailable(actions, actionsExecuted);
-//
-//        for(String pastActionID : actionsExecuted.keySet())
-//        { //only check against list if filtering is needed
-//            if(availableActions.contains(pastActionID))
-//            {
-//                List<Object> entry = actionsExecuted.get(pastActionID); //should return empty collection if nonexistent
-//                ArrayList<Object> copiedEntry = new ArrayList<Object>();
-//                copiedEntry.add(entry.get(0));
-//                copiedEntry.add(entry.get(1));
-//
-//                filteredPastActions.put(pastActionID, copiedEntry);
-//            }
-//        }
-//        return filteredPastActions;
-//    }
-//
-//    private MultiMap<String, Object> filterPastVisitedN(Collection<Action> actions, MultiMap<String, Object> actionsExecuted, boolean filterByCurrentAvailability)
-//    {
-//        //if past actions need to be available now, create list of available actions
-//        ArrayList<String> availableActions = (filterByCurrentAvailability) ? pastActionsCurrentlyAvailable(actions, actionsExecuted) : new ArrayList<>();
-//
-//        for(String pastActionID : actionsExecuted.keySet())
-//        {
-//            //only check against list if filtering is needed
-//            if(!filterByCurrentAvailability || availableActions.contains(pastActionID))
-//            {
-//                //get usage count of action
-//                List<Object> entry = actionsExecuted.get(pastActionID); //should return empty collection if nonexistent
-//                int count = entry.isEmpty() ? 0 : (Integer) entry.get(0); //default to zero if empty
-//                if ((VISIT_STATUS == VisitType.VISITED_N && count == visitCount) ||
-//                        (VISIT_STATUS == VisitType.VISITED_OVER_N && count > visitCount) ||
-//                        (VISIT_STATUS == VisitType.VISITED_UNDER_N && count < visitCount))
-//                {
-//                    // if the action is visited the correct number of times, add to list
-//                    ArrayList<Object> copiedEntry = new ArrayList<Object>();
-//                    copiedEntry.add(count);
-//                    copiedEntry.add(entry.get(1));
-//                    filteredPastActions.put(pastActionID, copiedEntry);
-//                }
-//            }
-//        }
-//        return filteredPastActions;
-//    }
-//
-//    private ArrayList<String> pastActionsCurrentlyAvailable(Collection<Action> actions, MultiMap<String, Object> actionsExecuted)
-//    {
-//        ArrayList<String> actionIDsCurrentlyAvailable = new ArrayList<>();
-//        for(Action action : actions)
-//        {
-//            String actionID = action.get(Tags.AbstractIDCustom);
-//            if(actionsExecuted.containsKey(actionID))
-//                actionIDsCurrentlyAvailable.add(actionID);
-//        }
-//        return actionIDsCurrentlyAvailable;
-//    }
 
     private boolean pastActionIsCurrentlyAvailable(String pastActionID, Collection<Action> actions)
     {
