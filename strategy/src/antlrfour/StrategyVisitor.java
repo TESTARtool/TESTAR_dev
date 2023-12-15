@@ -23,41 +23,36 @@ public interface StrategyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStrategy(StrategyParser.StrategyContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link StrategyParser#action}.
+	 * Visit a parse tree produced by the {@code ifThenElse}
+	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitAction(StrategyParser.ActionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link StrategyParser#cond_action}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCond_action(StrategyParser.Cond_actionContext ctx);
+	T visitIfThenElse(StrategyParser.IfThenElseContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code repeatPreviousAction}
-	 * labeled alternative in {@link StrategyParser#uncond_action}.
+	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitRepeatPreviousAction(StrategyParser.RepeatPreviousActionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code selectPreviousAction}
-	 * labeled alternative in {@link StrategyParser#uncond_action}.
+	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code selectByRelation}
-	 * labeled alternative in {@link StrategyParser#uncond_action}.
+	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitSelectByRelation(StrategyParser.SelectByRelationContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code selectRandomAction}
-	 * labeled alternative in {@link StrategyParser#uncond_action}.
+	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
@@ -153,4 +148,10 @@ public interface StrategyVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitPlainInt(StrategyParser.PlainIntContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link StrategyParser#visit_status}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitVisit_status(StrategyParser.Visit_statusContext ctx);
 }

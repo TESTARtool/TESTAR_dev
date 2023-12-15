@@ -4,19 +4,21 @@ import org.antlr.v4.runtime.misc.MultiMap;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import strategynodes.BaseNode;
+import strategynodes.data.Weight;
+import strategynodes.conditions.BooleanNode;
 
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.StringJoiner;
 
-public class IfThenElseNode extends BaseNode<Action> implements ActionNode
+public class IfThenElseNode extends BaseNode implements ActionNode
 {
     private final Weight weight;
-    private final BaseNode<Boolean>     ifChild;
+    private final BooleanNode           ifChild;
     private final ListNode              thenChild;
     private final ListNode              elseChild;
 
-    public IfThenElseNode(int weight, BaseNode<Boolean> ifChild, ListNode thenChild)
+    public IfThenElseNode(int weight, BooleanNode ifChild, ListNode thenChild)
     {
         this.weight = new Weight(weight);
         this.ifChild =      ifChild;
@@ -24,7 +26,7 @@ public class IfThenElseNode extends BaseNode<Action> implements ActionNode
         this.elseChild =    null;
     }
     
-    public IfThenElseNode(int weight, BaseNode<Boolean> ifChild,  ListNode thenChild, ListNode elseChild)
+    public IfThenElseNode(int weight, BooleanNode ifChild,  ListNode thenChild, ListNode elseChild)
     {
         this.weight = new Weight(weight);
         this.ifChild =      ifChild;
@@ -44,9 +46,7 @@ public class IfThenElseNode extends BaseNode<Action> implements ActionNode
 
     @Override
     public int GetWeight()
-    {
-        return weight.GetWeight();
-    }
+    { return weight.GetWeight(); }
 
     @Override
     public String toString()

@@ -10,14 +10,14 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.StringJoiner;
 
-public class IntOprNode extends BaseNode<Boolean>
+public class IntOprNode extends BaseNode implements BooleanNode
 {
-    private final BaseNode<Integer> left;
+    private final IntegerNode left;
     private final IntegerOperator operator;
-    private final BaseNode<Integer> right;
+    private final IntegerNode right;
 
     
-    public IntOprNode(BaseNode<Integer> left, IntegerOperator operator, BaseNode<Integer> right)
+    public IntOprNode(IntegerNode left, IntegerOperator operator, IntegerNode right)
     {
         this.left = left;
         this.operator = operator;

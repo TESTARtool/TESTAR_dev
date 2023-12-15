@@ -8,7 +8,7 @@ import strategynodes.BaseNode;
 import java.util.ArrayList;
 import java.util.Set;
 
-public class PlainIntegerNode extends BaseNode<Integer>
+public class PlainIntegerNode extends BaseNode implements IntegerNode
 {
     private final int VALUE;
 

@@ -18,7 +18,7 @@ public class RelationFilter
 
     public RelationFilter(Filter filter, Relation relation)
     {
-        include = (filter == Filter.INCLUDE);
+        include = (filter == Filter.INCLUDE || filter == null); //default to include if not present
         this.RELATION = relation;
         filteredActions = new ArrayList<Action>();
     }

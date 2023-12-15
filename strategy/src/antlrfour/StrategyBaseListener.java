@@ -41,25 +41,13 @@ public class StrategyBaseListener implements StrategyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterAction(StrategyParser.ActionContext ctx) { }
+	@Override public void enterIfThenElse(StrategyParser.IfThenElseContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitAction(StrategyParser.ActionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterCond_action(StrategyParser.Cond_actionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitCond_action(StrategyParser.Cond_actionContext ctx) { }
+	@Override public void exitIfThenElse(StrategyParser.IfThenElseContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -264,6 +252,18 @@ public class StrategyBaseListener implements StrategyListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitPlainInt(StrategyParser.PlainIntContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterVisit_status(StrategyParser.Visit_statusContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitVisit_status(StrategyParser.Visit_statusContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

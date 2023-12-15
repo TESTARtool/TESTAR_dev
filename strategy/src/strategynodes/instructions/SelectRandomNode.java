@@ -4,21 +4,23 @@ import org.antlr.v4.runtime.misc.MultiMap;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
+import strategynodes.data.VisitStatus;
 import strategynodes.enums.Relation;
-import strategynodes.filters.VisitedStatusFilter;
+import strategynodes.enums.VisitType;
+import strategynodes.filters.VisitFilter;
 import strategynodes.BaseNode;
 import strategynodes.enums.ActionType;
 import strategynodes.enums.Filter;
-import strategynodes.enums.VisitStatus;
 import strategynodes.filters.ActionTypeFilter;
 import strategynodes.filters.RelationFilter;
+import strategynodes.data.Weight;
 
 import java.util.*;
 
-public class SelectRandomNode extends BaseNode<Action> implements ActionNode
+public class SelectRandomNode extends BaseNode implements ActionNode
 {
     public final Weight weight;
-    private VisitedStatusFilter visitedStatusFilter;
+    private VisitFilter visitFilter;
     private ActionTypeFilter actionTypeFilter;
     private RelationFilter relationFilter;
     ArrayList<Action> filteredActions;
@@ -27,7 +29,7 @@ public class SelectRandomNode extends BaseNode<Action> implements ActionNode
     {
         this.weight = new Weight(weight);
         if(visitStatus != null)
-            visitedStatusFilter = new VisitedStatusFilter(visitStatus);
+            visitFilter = new VisitFilter(visitStatus);
         if(filter != null && actionType != null)
             actionTypeFilter = new ActionTypeFilter(filter, actionType);
         filteredActions = new ArrayList<>();
@@ -36,7 +38,7 @@ public class SelectRandomNode extends BaseNode<Action> implements ActionNode
     {
         this.weight = new Weight(weight);
         if(visitStatus != null)
-            visitedStatusFilter = new VisitedStatusFilter(visitStatus);
+            visitFilter = new VisitFilter(visitStatus);
         if(filter != null && relation != null)
             relationFilter = new RelationFilter(filter, relation);
     }
@@ -49,8 +51,8 @@ public class SelectRandomNode extends BaseNode<Action> implements ActionNode
 
         filteredActions.clear();
 
-        if(visitedStatusFilter != null)
-            filteredActions = visitedStatusFilter.filter(filteredActions, actionsExecuted);
+        if(visitFilter != null)
+            filteredActions = visitFilter.filter(filteredActions, actionsExecuted);
 
         if(actionTypeFilter != null)
             filteredActions = actionTypeFilter.filter(filteredActions);
@@ -77,8 +79,8 @@ public class SelectRandomNode extends BaseNode<Action> implements ActionNode
         StringJoiner joiner = new StringJoiner(" ");
         joiner.add(weight.toString());
         joiner.add("select-random");
-        if(visitedStatusFilter != null)
-            joiner.add(visitedStatusFilter.toString());
+        if(visitFilter != null)
+            joiner.add(visitFilter.toString());
         if(actionTypeFilter != null)
             joiner.add(actionTypeFilter.toString());
         else if (relationFilter != null)

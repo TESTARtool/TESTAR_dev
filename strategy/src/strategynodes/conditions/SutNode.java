@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.StringJoiner;
 
-public class SutNode extends BaseNode<Boolean>
+public class SutNode extends BaseNode implements BooleanNode
 {
     private final boolean include;
     private final SutType SUT_TYPE;

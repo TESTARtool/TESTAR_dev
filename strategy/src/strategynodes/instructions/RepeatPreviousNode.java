@@ -5,10 +5,11 @@ import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import strategynodes.BaseNode;
+import strategynodes.data.Weight;
 
 import java.util.*;
 
-public class RepeatPreviousNode extends BaseNode<Action> implements ActionNode
+public class RepeatPreviousNode extends BaseNode implements ActionNode
 {
     public final Weight weight;
 

@@ -3,25 +3,26 @@ package strategynodes.conditions;
 import org.antlr.v4.runtime.misc.MultiMap;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
-import strategynodes.filters.VisitedStatusFilter;
+import strategynodes.data.VisitStatus;
+import strategynodes.filters.VisitFilter;
 import strategynodes.BaseNode;
 import strategynodes.enums.ActionType;
 import strategynodes.enums.Filter;
-import strategynodes.enums.VisitStatus;
+import strategynodes.enums.VisitType;
 import strategynodes.filters.ActionTypeFilter;
 
 import java.util.*;
 
-public class NrOfActionsNode extends BaseNode<Integer>
+public class NrOfActionsNode extends BaseNode implements IntegerNode
 {
-    private VisitedStatusFilter visitedStatusFilter;
+    private VisitFilter visitFilter;
     private ActionTypeFilter actionTypeFilter;
     ArrayList<Action> filteredActions;
     
     public NrOfActionsNode(VisitStatus visitStatus, Filter filter, ActionType actionType)
     {
         if(visitStatus != null)
-            this.visitedStatusFilter = new VisitedStatusFilter(visitStatus);
+            this.visitFilter = new VisitFilter(visitStatus);
         if(filter != null && actionType != null)
             this.actionTypeFilter = new ActionTypeFilter(filter, actionType);
         filteredActions = new ArrayList<>();
@@ -32,8 +33,8 @@ public class NrOfActionsNode extends BaseNode<Integer>
     {
         filteredActions.clear();
 
-        if(visitedStatusFilter != null)
-            filteredActions = visitedStatusFilter.filter(filteredActions, actionsExecuted);
+        if(visitFilter != null)
+            filteredActions = visitFilter.filter(filteredActions, actionsExecuted);
 
         if(actionTypeFilter != null)
             filteredActions = actionTypeFilter.filter(filteredActions);
@@ -46,8 +47,8 @@ public class NrOfActionsNode extends BaseNode<Integer>
     {
         StringJoiner joiner = new StringJoiner(" ");
         joiner.add("n-actions");
-        if(visitedStatusFilter != null)
-            joiner.add(visitedStatusFilter.toString());
+        if(visitFilter != null)
+            joiner.add(visitFilter.toString());
         if(actionTypeFilter != null)
             joiner.add(actionTypeFilter.toString());
         return joiner.toString();

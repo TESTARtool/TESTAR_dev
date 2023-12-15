@@ -4,20 +4,21 @@ import org.antlr.v4.runtime.misc.MultiMap;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
-import strategynodes.filters.VisitedStatusFilter;
+import strategynodes.data.VisitStatus;
+import strategynodes.enums.VisitType;
+import strategynodes.filters.VisitFilter;
 import strategynodes.BaseNode;
 import strategynodes.enums.ActionType;
 import strategynodes.enums.Filter;
 import strategynodes.enums.Relation;
-import strategynodes.enums.VisitStatus;
 import strategynodes.filters.ActionTypeFilter;
 import strategynodes.filters.RelationFilter;
 
 import java.util.*;
 
-public class AnyExistNode extends BaseNode<Boolean>
+public class AnyExistNode extends BaseNode implements BooleanNode
 {
-    private VisitedStatusFilter visitedStatusFilter;
+    private VisitFilter visitFilter;
     private ActionTypeFilter actionTypeFilter;
     private RelationFilter relationFilter;
     private ArrayList<Action> filteredActions;
@@ -25,7 +26,7 @@ public class AnyExistNode extends BaseNode<Boolean>
     public AnyExistNode(VisitStatus visitStatus, Filter filter, ActionType actionType)
     {
         if(visitStatus != null)
-            this.visitedStatusFilter = new VisitedStatusFilter(visitStatus);
+            this.visitFilter = new VisitFilter(visitStatus);
         if(filter != null && actionType != null)
             this.actionTypeFilter = new ActionTypeFilter(filter, actionType);
         filteredActions = new ArrayList<Action>();
@@ -34,7 +35,7 @@ public class AnyExistNode extends BaseNode<Boolean>
     public AnyExistNode(VisitStatus visitStatus, Filter filter, Relation relation)
     {
         if(visitStatus != null)
-            this.visitedStatusFilter = new VisitedStatusFilter(visitStatus);
+            this.visitFilter = new VisitFilter(visitStatus);
         if(filter != null && relationFilter != null)
             this.relationFilter = new RelationFilter(filter, relation);
         filteredActions = new ArrayList<Action>();
@@ -45,13 +46,13 @@ public class AnyExistNode extends BaseNode<Boolean>
     {
         if (filteredActions.isEmpty()) //and empty list means no possible valid actions
             return false;
-        else if (visitedStatusFilter == null && actionTypeFilter == null)
+        else if (visitFilter == null && actionTypeFilter == null)
             return true; //if there are no filters to apply, any action is valid
 
         filteredActions = new ArrayList<>(actions);
 
-        if(visitedStatusFilter != null)
-            filteredActions = visitedStatusFilter.filter(filteredActions, actionsExecuted);
+        if(visitFilter != null)
+            filteredActions = visitFilter.filter(filteredActions, actionsExecuted);
 
         if(actionTypeFilter != null)
             filteredActions = actionTypeFilter.filter(filteredActions);
@@ -66,8 +67,8 @@ public class AnyExistNode extends BaseNode<Boolean>
     {
         StringJoiner joiner = new StringJoiner(" ");
         joiner.add("any-exist");
-        if(visitedStatusFilter != null)
-            joiner.add(visitedStatusFilter.toString());
+        if(visitFilter != null)
+            joiner.add(visitFilter.toString());
         if(actionTypeFilter != null)
             joiner.add(actionTypeFilter.toString());
         else if(relationFilter != null)

@@ -36,8 +36,7 @@ public enum BooleanOperator
             };
     
     public abstract boolean getResult(Boolean left, Boolean right);
-    
-//    public final ArrayList<String> strings;
+
     private final String mainString;
     private final String altString1;
     private final String altString2;
@@ -66,16 +65,4 @@ public enum BooleanOperator
         this.altString2 = (strings.length > 2) ? strings[2] : strings[0]; //string can't be empty, so duplicate main string
     }
     public String toString() { return getMainString(); }
-//
-//    public static BooleanOperator toEnum(String string) { return FROM_STRING.get(string); }
-//
-//    static
-//    {
-////        Arrays.stream(values()).forEach(e -> FROM_STRING.put(e.strings, e));
-//        for(BooleanOperator value : values())
-//        {
-//            for(String string : value.strings)
-//                FROM_STRING.put(string, value);
-//        }
-//    }
 }

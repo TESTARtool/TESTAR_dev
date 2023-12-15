@@ -4,27 +4,28 @@ import org.antlr.v4.runtime.misc.MultiMap;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import strategynodes.BaseNode;
+import strategynodes.data.VisitStatus;
 import strategynodes.enums.ActionType;
 import strategynodes.enums.Filter;
-import strategynodes.enums.VisitStatus;
+import strategynodes.enums.VisitType;
 import strategynodes.filters.ActionTypeFilter;
-import strategynodes.filters.VisitedStatusFilter;
+import strategynodes.filters.VisitFilter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 
-public class NrOfPreviousActionsNode extends BaseNode<Integer>
+public class NrOfPreviousActionsNode extends BaseNode implements IntegerNode
 {
-    private VisitedStatusFilter visitedStatusFilter;
+    private VisitFilter visitFilter;
     private ActionTypeFilter actionTypeFilter;
     MultiMap<String, Object> filteredPastActions;
 
     public NrOfPreviousActionsNode(VisitStatus visitStatus, Filter filter, ActionType actionType)
     {
         if(visitStatus != null)
-            this.visitedStatusFilter = new VisitedStatusFilter(visitStatus);
+            this.visitFilter = new VisitFilter(visitStatus);
         if(filter != null && actionType != null)
             this.actionTypeFilter = new ActionTypeFilter(filter, actionType);
         filteredPastActions = new MultiMap<>();
@@ -43,8 +44,8 @@ public class NrOfPreviousActionsNode extends BaseNode<Integer>
             filteredPastActions.put(pastActionID, copiedEntry);
         }
 
-        if(visitedStatusFilter != null)
-            filteredPastActions = visitedStatusFilter.filter(actions, filteredPastActions, false);
+        if(visitFilter != null)
+            filteredPastActions = visitFilter.filter(actions, filteredPastActions, false);
 
         if(actionTypeFilter != null)
             filteredPastActions = actionTypeFilter.filter(actions, filteredPastActions, false);
@@ -57,8 +58,8 @@ public class NrOfPreviousActionsNode extends BaseNode<Integer>
     {
         StringJoiner joiner = new StringJoiner(" ");
         joiner.add("n-previous");
-        if(visitedStatusFilter != null)
-            joiner.add(visitedStatusFilter.toString());
+        if(visitFilter != null)
+            joiner.add(visitFilter.toString());
         if(actionTypeFilter != null)
             joiner.add(actionTypeFilter.toString());
         return joiner.toString();

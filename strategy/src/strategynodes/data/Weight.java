@@ -1,4 +1,4 @@
-package strategynodes.instructions;
+package strategynodes.data;
 
 public class Weight
 {

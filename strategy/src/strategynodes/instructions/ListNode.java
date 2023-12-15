@@ -4,10 +4,11 @@ import org.antlr.v4.runtime.misc.MultiMap;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import strategynodes.BaseNode;
+import strategynodes.StrategyNode;
 
 import java.util.*;
 
-public class ListNode extends BaseNode<Action>
+public class ListNode extends BaseNode implements StrategyNode<Action>
 {
     private final List<ActionNode> actionList = new ArrayList<>();
     

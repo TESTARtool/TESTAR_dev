@@ -28,70 +28,62 @@ public interface StrategyListener extends ParseTreeListener {
 	 */
 	void exitStrategy(StrategyParser.StrategyContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link StrategyParser#action}.
+	 * Enter a parse tree produced by the {@code ifThenElse}
+	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 */
-	void enterAction(StrategyParser.ActionContext ctx);
+	void enterIfThenElse(StrategyParser.IfThenElseContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link StrategyParser#action}.
+	 * Exit a parse tree produced by the {@code ifThenElse}
+	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 */
-	void exitAction(StrategyParser.ActionContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link StrategyParser#cond_action}.
-	 * @param ctx the parse tree
-	 */
-	void enterCond_action(StrategyParser.Cond_actionContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link StrategyParser#cond_action}.
-	 * @param ctx the parse tree
-	 */
-	void exitCond_action(StrategyParser.Cond_actionContext ctx);
+	void exitIfThenElse(StrategyParser.IfThenElseContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code repeatPreviousAction}
-	 * labeled alternative in {@link StrategyParser#uncond_action}.
+	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 */
 	void enterRepeatPreviousAction(StrategyParser.RepeatPreviousActionContext ctx);
 	/**
 	 * Exit a parse tree produced by the {@code repeatPreviousAction}
-	 * labeled alternative in {@link StrategyParser#uncond_action}.
+	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 */
 	void exitRepeatPreviousAction(StrategyParser.RepeatPreviousActionContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code selectPreviousAction}
-	 * labeled alternative in {@link StrategyParser#uncond_action}.
+	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 */
 	void enterSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx);
 	/**
 	 * Exit a parse tree produced by the {@code selectPreviousAction}
-	 * labeled alternative in {@link StrategyParser#uncond_action}.
+	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 */
 	void exitSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code selectByRelation}
-	 * labeled alternative in {@link StrategyParser#uncond_action}.
+	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 */
 	void enterSelectByRelation(StrategyParser.SelectByRelationContext ctx);
 	/**
 	 * Exit a parse tree produced by the {@code selectByRelation}
-	 * labeled alternative in {@link StrategyParser#uncond_action}.
+	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 */
 	void exitSelectByRelation(StrategyParser.SelectByRelationContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code selectRandomAction}
-	 * labeled alternative in {@link StrategyParser#uncond_action}.
+	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 */
 	void enterSelectRandomAction(StrategyParser.SelectRandomActionContext ctx);
 	/**
 	 * Exit a parse tree produced by the {@code selectRandomAction}
-	 * labeled alternative in {@link StrategyParser#uncond_action}.
+	 * labeled alternative in {@link StrategyParser#action}.
 	 * @param ctx the parse tree
 	 */
 	void exitSelectRandomAction(StrategyParser.SelectRandomActionContext ctx);
@@ -251,4 +243,14 @@ public interface StrategyListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitPlainInt(StrategyParser.PlainIntContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link StrategyParser#visit_status}.
+	 * @param ctx the parse tree
+	 */
+	void enterVisit_status(StrategyParser.Visit_statusContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link StrategyParser#visit_status}.
+	 * @param ctx the parse tree
+	 */
+	void exitVisit_status(StrategyParser.Visit_statusContext ctx);
 }

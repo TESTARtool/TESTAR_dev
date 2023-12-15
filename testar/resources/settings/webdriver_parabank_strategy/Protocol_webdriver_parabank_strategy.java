@@ -608,11 +608,12 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		String actionID = selectedAction.get(Tags.AbstractIDCustom);
 
 		//get the use count for the action
-		List<Object> entry = strategyActionsExecuted.get(actionID); //should return empty collection if nonexistent
-		int timesUsed = entry.isEmpty() ? 0 : (Integer) entry.get(0); //default to zero if empty
-		ActionType actionType = entry.isEmpty() ? ActionType.getActionType(selectedAction) : (ActionType) entry.get(1);
+		List<Object> entry = strategyActionsExecuted.getOrDefault(actionID, null);
 
-		ArrayList<Object> updatedEntry = new ArrayList<Object>();
+		int timesUsed = (entry == null) ? 0 : (Integer) entry.get(0); //default to zero if null
+		ActionType actionType = (entry == null) ? ActionType.getActionType(selectedAction) : (ActionType) entry.get(1);
+
+		ArrayList<Object> updatedEntry = new ArrayList<>();
 		updatedEntry.add(timesUsed + 1); //increase usage by one
 		updatedEntry.add(actionType);
 		strategyActionsExecuted.replace(actionID, updatedEntry); //replace or create entry

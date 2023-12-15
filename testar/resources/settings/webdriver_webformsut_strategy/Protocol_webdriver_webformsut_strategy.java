@@ -72,7 +72,7 @@ public class Protocol_webdriver_webformsut_strategy extends WebdriverProtocol
     private ParseUtil               parseUtil;
     private RandomActionSelector    selector;
     private boolean useRandom = false;
-    private MultiMap<String, Object> actionsExecuted      = new MultiMap<>();
+    private MultiMap<String, Object> actionsExecuted      = new MultiMap<>(); //index 0: count, index 1: action type
     private Map<String, Integer>    debugActionsExecuted      = new HashMap<String, Integer>();
     private ArrayList<String> operatingSystems = new ArrayList<>();
     private String startTimestamp = "";
@@ -315,11 +315,12 @@ public class Protocol_webdriver_webformsut_strategy extends WebdriverProtocol
         String actionID = selectedAction.get(Tags.AbstractIDCustom);
 
         //get the use count for the action
-        List<Object> entry = actionsExecuted.get(actionID); //should return empty collection if nonexistent
-        int timesUsed = entry.isEmpty() ? 0 : (Integer) entry.get(0); //default to zero if empty
-        ActionType actionType = entry.isEmpty() ? ActionType.getActionType(selectedAction) : (ActionType) entry.get(1);
+        List<Object> entry = actionsExecuted.getOrDefault(actionID, null);
 
-        ArrayList<Object> updatedEntry = new ArrayList<Object>();
+        int timesUsed = (entry == null) ? 0 : (Integer) entry.get(0); //default to zero if null
+        ActionType actionType = (entry == null) ? ActionType.getActionType(selectedAction) : (ActionType) entry.get(1);
+
+        ArrayList<Object> updatedEntry = new ArrayList<>();
         updatedEntry.add(timesUsed + 1); //increase usage by one
         updatedEntry.add(actionType);
         actionsExecuted.replace(actionID, updatedEntry); //replace or create entry

@@ -10,13 +10,13 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.StringJoiner;
 
-public class BoolOprNode extends BaseNode<Boolean>
+public class BoolOprNode extends BaseNode implements BooleanNode
 {
-    private final BaseNode<Boolean> left; //can be null if operator is NOT
+    private final BooleanNode left; //can be null if operator is NOT
     private final BooleanOperator operator;
-    private final BaseNode<Boolean> right;
+    private final BooleanNode right;
 
-    public BoolOprNode(BaseNode<Boolean> left, BooleanOperator operator, BaseNode<Boolean> right)
+    public BoolOprNode(BooleanNode left, BooleanOperator operator, BooleanNode right)
     {
         this.left = left;
         this.operator = operator;

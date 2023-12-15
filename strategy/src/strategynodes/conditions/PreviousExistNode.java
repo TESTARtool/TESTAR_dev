@@ -4,25 +4,26 @@ import org.antlr.v4.runtime.misc.MultiMap;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
-import strategynodes.filters.VisitedStatusFilter;
+import strategynodes.data.VisitStatus;
+import strategynodes.enums.VisitType;
+import strategynodes.filters.VisitFilter;
 import strategynodes.BaseNode;
 import strategynodes.enums.ActionType;
 import strategynodes.enums.Filter;
-import strategynodes.enums.VisitStatus;
 import strategynodes.filters.ActionTypeFilter;
 
 import java.util.*;
 
-public class PreviousExistNode extends BaseNode<Boolean>
+public class PreviousExistNode extends BaseNode implements BooleanNode
 {
-    private VisitedStatusFilter visitedStatusFilter;
+    private VisitFilter visitFilter;
     private ActionTypeFilter actionTypeFilter;
     private MultiMap<String, Object> filteredPastActions;
 
     public PreviousExistNode(VisitStatus visitStatus, Filter filter, ActionType actionType)
     {
         if(visitStatus != null)
-            this.visitedStatusFilter = new VisitedStatusFilter(visitStatus);
+            this.visitFilter = new VisitFilter(visitStatus);
         if(filter != null && actionType != null)
             this.actionTypeFilter = new ActionTypeFilter(filter, actionType);
         filteredPastActions = new MultiMap<>();
@@ -46,8 +47,8 @@ public class PreviousExistNode extends BaseNode<Boolean>
             filteredPastActions.put(pastActionID, copiedEntry);
         }
 
-        if(visitedStatusFilter != null)
-            filteredPastActions = visitedStatusFilter.filter(actions, actionsExecuted, false);
+        if(visitFilter != null)
+            filteredPastActions = visitFilter.filter(actions, actionsExecuted, false);
 
         if(actionTypeFilter != null)
             filteredPastActions = actionTypeFilter.filter(actions, actionsExecuted, false);
@@ -60,8 +61,8 @@ public class PreviousExistNode extends BaseNode<Boolean>
     {
         StringJoiner joiner = new StringJoiner(" ");
         joiner.add("previous-exist");
-        if(visitedStatusFilter != null)
-            joiner.add(visitedStatusFilter.toString());
+        if(visitFilter != null)
+            joiner.add(visitFilter.toString());
         if(actionTypeFilter != null)
             joiner.add(actionTypeFilter.toString());
         return joiner.toString();

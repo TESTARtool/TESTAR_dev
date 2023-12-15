@@ -8,7 +8,7 @@ import strategynodes.BaseNode;
 import java.util.ArrayList;
 import java.util.Set;
 
-public class PlainBooleanNode extends BaseNode<Boolean>
+public class PlainBooleanNode extends BaseNode implements BooleanNode
 {
     private final boolean VALUE;
 

@@ -62,7 +62,7 @@ public class Protocol_desktop_generic_strategy extends DesktopProtocol
 	{
 		super.initialize(settings);
 		
-		useRandom = (settings.get(ConfigTags.StrategyFile).equals("")) ? true : false;
+		useRandom = settings.get(ConfigTags.StrategyFile).isEmpty();
 		if (useRandom)
 			selector = new RandomActionSelector();
 		else
@@ -129,11 +129,12 @@ public class Protocol_desktop_generic_strategy extends DesktopProtocol
 		String actionID = selectedAction.get(Tags.AbstractIDCustom);
 
 		//get the use count for the action
-		List<Object> entry = actionsExecuted.get(actionID); //should return empty collection if nonexistent
-		int timesUsed = entry.isEmpty() ? 0 : (Integer) entry.get(0); //default to zero if empty
-		ActionType actionType = entry.isEmpty() ? ActionType.getActionType(selectedAction) : (ActionType) entry.get(1);
+		List<Object> entry = actionsExecuted.getOrDefault(actionID, null);
 
-		ArrayList<Object> updatedEntry = new ArrayList<Object>();
+		int timesUsed = (entry == null) ? 0 : (Integer) entry.get(0); //default to zero if null
+		ActionType actionType = (entry == null) ? ActionType.getActionType(selectedAction) : (ActionType) entry.get(1);
+
+		ArrayList<Object> updatedEntry = new ArrayList<>();
 		updatedEntry.add(timesUsed + 1); //increase usage by one
 		updatedEntry.add(actionType);
 		actionsExecuted.replace(actionID, updatedEntry); //replace or create entry

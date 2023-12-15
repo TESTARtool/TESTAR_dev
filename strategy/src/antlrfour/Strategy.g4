@@ -8,15 +8,12 @@ strategy:       action+;
 // action parser rules //
 /////////////////////////
 
-action: cond_action | uncond_action;
-
-cond_action:    INT? IF ifExpr=bool_expr     THEN thenExpr=strategy   ELSE elseExpr=strategy
-|               INT? IF ifExpr=bool_expr     THEN thenExpr=strategy;
-
-uncond_action:  INT? 'repeat-previous'                                                   #repeatPreviousAction
-|               INT? 'select-previous'      VISIT_STATUS        (FILTER ACTION_TYPE)?    #selectPreviousAction
-|               INT? 'select-random'        VISIT_STATUS?       FILTER RELATION          #selectByRelation
-|               INT? 'select-random'        VISIT_STATUS?       (FILTER ACTION_TYPE)?    #selectRandomAction
+action:     INT? IF ifExpr=bool_expr    THEN thenExpr=strategy  ELSE elseExpr=strategy  #ifThenElse
+|           INT? IF ifExpr=bool_expr    THEN thenExpr=strategy                          #ifThenElse
+|           INT? 'repeat-previous'                                                      #repeatPreviousAction
+|           INT? 'select-previous'      visit_status?           (FILTER? ACTION_TYPE)?  #selectPreviousAction
+|           INT? 'select-random'        visit_status?           FILTER? RELATION        #selectByRelation
+|           INT? 'select-random'        visit_status?           (FILTER? ACTION_TYPE)?  #selectRandomAction
 ;
 
 //////////////////////////
@@ -34,31 +31,30 @@ bool_expr:                        NOT                               expr=bool_ex
 |                           BOOL                                                                #plainBool
 ;
 state_boolean:  'state-changed'                                                 #stateChanged
-|               'sut'                                   FILTER SUT              #sutType
-|               'any-exist'        VISIT_STATUS?        FILTER RELATION         #anyExistByRelation
-|               'any-exist'        VISIT_STATUS?        (FILTER ACTION_TYPE)?   #anyExist
-|               'previous-exist'   VISIT_STATUS?        (FILTER ACTION_TYPE)?   #previousExist
+|               'sut-is'                                FILTER? SUT_TYPE        #sutType
+|               'any-exist'        visit_status?        FILTER? RELATION        #anyExistByRelation
+|               'any-exist'        visit_status?        (FILTER? ACTION_TYPE)?  #anyExist
+|               'previous-exist'   visit_status?        (FILTER? ACTION_TYPE)?  #previousExist
 ;
 
-int_expr:       'n-actions'        VISIT_STATUS?        (FILTER ACTION_TYPE)?    #nActions
-|               'n-previous'       VISIT_STATUS?         (FILTER ACTION_TYPE)?    #nPrevious
+int_expr:       'n-actions'        visit_status?        (FILTER? ACTION_TYPE)?   #nActions
+|               'n-previous'       visit_status?        (FILTER? ACTION_TYPE)?   #nPrevious
 |               INT                                                              #plainInt
 ;
 
-
+visit_status:   'unvisited' | 'most-visited' | 'least-visited'
+|               'visited' INT |  'visited-over' INT | 'visited-under' INT;
 
 ///////////////////////////
 // filtering lexer rules //
 ///////////////////////////
 
-VISIT_STATUS:       'unvisited' | 'most-visited' | 'least-visited' | 'visited-'INT | 'visited-over-'INT | 'visited-under-'INT;
-
 RELATION:           'sibling' | 'child' | 'sibling-or-child';
 
-SUT:                'windows' | 'unix' | 'ios' | 'android' | 'web';
+SUT_TYPE:           'windows' | 'unix' | 'ios' | 'android' | 'web';
 
 ACTION_TYPE:        'click-action' | 'type-action' | 'drag-action' | 'scroll-action' | 'hit-key-action'
-| 'form-input-action' | 'form-submit-action' | 'form-field-action';
+|                   'form-input-action' | 'form-submit-action' | 'form-field-action';
 
 FILTER:             'of-type' | 'not-of-type';
 

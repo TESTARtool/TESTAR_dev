@@ -9,7 +9,7 @@ import strategynodes.BaseNode;
 import java.util.ArrayList;
 import java.util.Set;
 
-public class StateChangedNode extends BaseNode<Boolean>
+public class StateChangedNode extends BaseNode implements BooleanNode
 {
     @Override
     public Boolean getResult(State state, Set<Action> actions, MultiMap<String, Object> actionsExecuted, ArrayList<String> operatingSystems)

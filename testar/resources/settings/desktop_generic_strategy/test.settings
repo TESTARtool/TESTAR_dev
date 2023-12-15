@@ -120,7 +120,7 @@ ProtocolSpecificSetting_5 =
 # Strategy settings
 #################################################################
 
-StrategyFile = settings/desktop_generic_strategy/test_strategy.txt
+StrategyFile = settings/desktop_generic_strategy/strategy.txt
 
 #################################################################
 # Other more advanced settings

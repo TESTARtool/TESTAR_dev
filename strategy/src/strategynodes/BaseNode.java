@@ -7,9 +7,9 @@ import org.testar.monkey.alayer.Tags;
 
 import java.util.*;
 
-public abstract class BaseNode<T>
+public abstract class BaseNode
 {
-    public abstract T getResult(State state, Set<Action> actions, MultiMap<String, Object> actionsExecuted, ArrayList<String> operatingSystems);
+//    public abstract T getResult(State state, Set<Action> actions, MultiMap<String, Object> actionsExecuted, ArrayList<String> operatingSystems);
 
     protected Action selectRandomAction(Collection<Action> actions)
     {

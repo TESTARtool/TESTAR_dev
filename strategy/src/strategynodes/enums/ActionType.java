@@ -22,7 +22,7 @@ public enum ActionType
     FORM_FIELD ("form-field-action"),
     FORM_SUBMIT("form-submit-action");
 
-    public final String string;
+    private final String string;
     private static final Map<String, ActionType> STRINGS = new HashMap<>(); //lookup
 
     ActionType(String plainText) //constructor

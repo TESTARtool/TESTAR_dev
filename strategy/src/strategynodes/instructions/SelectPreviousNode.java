@@ -5,20 +5,22 @@ import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import strategynodes.BaseNode;
+import strategynodes.data.VisitStatus;
 import strategynodes.enums.ActionType;
 import strategynodes.enums.Filter;
-import strategynodes.enums.VisitStatus;
+import strategynodes.enums.VisitType;
 import strategynodes.filters.ActionTypeFilter;
-import strategynodes.filters.VisitedStatusFilter;
+import strategynodes.filters.VisitFilter;
+import strategynodes.data.Weight;
 
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.StringJoiner;
 
-public class SelectPreviousNode extends BaseNode<Action>
+public class SelectPreviousNode extends BaseNode implements ActionNode
 {
     private final Weight weight;
-    private VisitedStatusFilter visitedStatusFilter;
+    private VisitFilter visitFilter;
     private ActionTypeFilter actionTypeFilter;
     MultiMap<String, Object> filteredPastActions;
 
@@ -26,7 +28,7 @@ public class SelectPreviousNode extends BaseNode<Action>
     {
         this.weight = new Weight(weight);
         if(visitStatus != null)
-            visitedStatusFilter = new VisitedStatusFilter(visitStatus);
+            visitFilter = new VisitFilter(visitStatus);
         if(filter != null && actionType != null)
             actionTypeFilter = new ActionTypeFilter(filter, actionType);
         filteredPastActions = new MultiMap<>();
@@ -42,8 +44,8 @@ public class SelectPreviousNode extends BaseNode<Action>
 
         filteredPastActions.clear();
 
-        if(visitedStatusFilter != null)
-            filteredPastActions = visitedStatusFilter.filter(actions, actionsExecuted, true);
+        if(visitFilter != null)
+            filteredPastActions = visitFilter.filter(actions, actionsExecuted, true);
 
         if(actionTypeFilter != null)
             filteredPastActions = actionTypeFilter.filter(actions, actionsExecuted, true);
@@ -55,13 +57,19 @@ public class SelectPreviousNode extends BaseNode<Action>
     }
 
     @Override
+    public int GetWeight()
+    {
+        return weight.GetWeight();
+    }
+
+    @Override
     public String toString()
     {
         StringJoiner joiner = new StringJoiner(" ");
         joiner.add(weight.toString());
         joiner.add("select-previous");
-        if(visitedStatusFilter != null)
-            joiner.add(visitedStatusFilter.toString());
+        if(visitFilter != null)
+            joiner.add(visitFilter.toString());
         if(actionTypeFilter != null)
             joiner.add(actionTypeFilter.toString());
         return joiner.toString();
