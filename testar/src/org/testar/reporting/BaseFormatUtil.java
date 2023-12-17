@@ -89,7 +89,7 @@ public abstract class BaseFormatUtil
         {
             Path oldFile = Paths.get(file.getAbsolutePath()); // get full name
             Path directory = Paths.get(file.getParent()); //get directory
-            String newName = enforceFileSuffix(file.getName().replace(".html", appendToName));
+            String newName = enforceFileSuffix(file.getName().replace(getFileExtension(file.getName()), appendToName));
             Files.move(oldFile, oldFile.resolveSibling(newName));
             file = new File(directory + File.separator + newName); //update the file path
         }
@@ -97,6 +97,12 @@ public abstract class BaseFormatUtil
         {
             throw new RuntimeException(e);
         }
+    }
+
+    private String getFileExtension(String fileName)
+    {
+        int lastDotIndex = fileName.lastIndexOf(".");
+        return (lastDotIndex == -1) ? ".html" : fileName.substring(lastDotIndex);
     }
 
     public void renameFile(String newName)

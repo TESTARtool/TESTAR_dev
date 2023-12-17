@@ -38,6 +38,7 @@ import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.settings.Settings;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
@@ -48,14 +49,19 @@ public class ReportManager implements Reporting
     private boolean reportingEnabled = true;
     private boolean firstStateAdded = false;
     private boolean firstActionsAdded = false;
-    
+    private String fileName;
+
+    public String getReportFileName()
+    {
+    	return fileName;
+    }
+
     public ReportManager(boolean replay, Settings settings)
     {
         //TODO put filename into settings, name with sequence number
         // creating a new file for the report
-        String fileName =
-                OutputStructure.htmlOutputDir + "/" + OutputStructure.startInnerLoopDateString + "_"
-                + OutputStructure.executedSUTname + "_sequence_" + OutputStructure.sequenceInnerLoopCount; //no File.separator
+        fileName = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString + "_"
+                + OutputStructure.executedSUTname + "_sequence_" + OutputStructure.sequenceInnerLoopCount;
         
         boolean html = settings.get(ConfigTags.ReportInHTML);
         boolean plainText = settings.get(ConfigTags.ReportInPlainText);
