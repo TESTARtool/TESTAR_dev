@@ -1,0 +1,10 @@
+{
+  "deviceName": "VirtualMyExpenses",
+  "platformName": "Android",
+  "app": "suts/org.totschnig.myexpenses_657.apk",
+  "automationName" : "UiAutomator2",
+  "allowTestPackages": true,
+  "newCommandTimeout": 500000,
+  "appWaitActivity": "org.totschnig.myexpenses",
+  "autoGrantPermissions": true
+}
