@@ -82,8 +82,8 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[lL]ogout.*|.*[sS]ave.*|.*[dD]ownload.*
-TagsToFilter = WebTagName;WebTextContent
+ClickFilter = .*[lL]ogout.*|.*[sS]ave.*|.*[dD]ownload.*|list-button|grid-button
+TagsToFilter = WebTagName;WebTextContent;Title;WebId
 
 #################################################################
 # Processfilter
