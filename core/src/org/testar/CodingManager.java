@@ -194,29 +194,12 @@ public class CodingManager {
 	                CodingManager.codify(state.get(Tags.ConcreteID), a, ROLES_ABSTRACT_ACTION));
 	    }
 
-		// for the custom abstract action identifier, we first sort the actions by their path in the widget tree
-		// and then set their ids using incremental counters
-		Map<Role, Integer> roleCounter = new HashMap<>();
-		actions.stream().
-				filter(action -> {
-					try {
-						action.get(Tags.OriginWidget).get(Tags.Path);
-						return true;
-					}
-					catch (NoSuchTagException ex) {
-						System.out.println("Coding Action AbstractIDCustom: No origin widget found for action role: " + action.get(Tags.Role));
-						System.out.println("Coding Action AbstractIDCustom: " + action.get(Tags.Desc));
-						return false;
-					}
-				}).
-				sorted(Comparator.comparing(action -> action.get(Tags.OriginWidget).get(Tags.Path))).
-				forEach(
-					action -> {
-						updateRoleCounter(action, roleCounter);
-						action.set(Tags.AbstractIDCustom, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT_CUSTOM +
-							lowCollisionID(state.get(Tags.AbstractIDCustom) + getAbstractActionIdentifier(action, roleCounter)));
-				}
-		);
+	    // Create the Custom Abstract Id for the derived actions
+	    for (Action a : actions) {
+	    	a.set(Tags.AbstractIDCustom, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT_CUSTOM +
+	    			lowCollisionID(state.get(Tags.AbstractIDCustom) + a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom) + a.get(Tags.Role, ActionRoles.Action)));
+
+	    }
 	}
 
 	/**
