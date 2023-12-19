@@ -97,7 +97,7 @@ public class CsvFormatUtil extends BaseFormatUtil
             field.resetValue();
     }
     
-    private void startNextRow()
+    public void startNextRow()
     {
         if(!fieldsLocked)
         {

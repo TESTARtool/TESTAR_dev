@@ -51,10 +51,10 @@ import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
 import org.testar.protocols.WebdriverProtocol;
+import org.testar.reporting.CsvFormatUtil;
 import org.testar.settings.Settings;
 import parsing.ParseUtil;
 import strategynodes.enums.ActionType;
-import writers.CSVFileWriter;
 
 import java.awt.*;
 import java.io.File;
@@ -494,10 +494,8 @@ public class Protocol_webdriver_webformsut_strategy extends WebdriverProtocol
 
     private void logResults()
     {
-        boolean createNewFile = true;
-
-        CSVFileWriter csvWriter = new CSVFileWriter(Main.outputDir,
-        settings.get(ConfigTags.ApplicationName,"application") + "_" + settings.get(ConfigTags.ApplicationVersion,"1"));
+        CsvFormatUtil csvFormatUtil = new CsvFormatUtil(Main.outputDir +
+            settings.get(ConfigTags.ApplicationName,"application") + "_" + settings.get(ConfigTags.ApplicationVersion,"1"), ";");
 
         String url = WdDriver.getCurrentUrl();
         String fieldCodes = url.substring(url.lastIndexOf('/')); //get the last part of the url, only works for one form
@@ -507,35 +505,27 @@ public class Protocol_webdriver_webformsut_strategy extends WebdriverProtocol
 
         ArrayList<Integer> actionUsages = new ArrayList<Integer>();
         for (String actionID : actionsExecuted.keySet())
-        {
             actionUsages.add((Integer) actionsExecuted.get(actionID).get(0));
-        }
         int totalUses = Collections.max(actionUsages);
-
-
-        csvWriter.addField("url", "URL", url);
-        csvWriter.addField("applicationName", "application name", settings.get(ConfigTags.ApplicationName, "application"));
-        csvWriter.addField("applicationVersion", "application version", settings.get(ConfigTags.ApplicationVersion,"1"));
-        csvWriter.addField("strategy", "strategy", (useRandom) ? "Random" : "Human strategy");
-        csvWriter.addField("startDatetime", "start datetime", OutputStructure.startInnerLoopDateString);
-        csvWriter.addField("timestampTestarStart", "timestamp TESTAR start", startTimestamp);
-        csvWriter.addField("timestampTestarEnd", "timestamp TESTAR end", DefaultProtocol.lastExecutedAction.get(Tags.TimeStamp, null).toString());
-        csvWriter.addField("timestampServerStart", "timestamp server start", start_epoch);
-        csvWriter.addField("timestampServerEnd", "timestamp server end", end_epoch);
-        csvWriter.addField("actionLimit", "action limit", Integer.toString(settings.get(ConfigTags.SequenceLength)));
-        csvWriter.addField("numberOfFields", "number of fields", Integer.toString(numFields));
-        csvWriter.addField("actionsExecuted", "actions executed", Integer.toString(actionCount-1));
-        csvWriter.addField("numberOfFieldsFilled", "number of fields filled", Integer.toString(numFieldsFilled));
-        csvWriter.addField("maxActionsPerField", "maximum actions per field", Integer.toString(totalUses));
-        csvWriter.addField("submit", "successful submit", submitSuccess);
     
-        if(createNewFile || csvWriter.fileIsEmpty()) //file empty or nonexistent
-        {
-            csvWriter.createFile();
-            csvWriter.writeTitleRow();
-        }
-
-        csvWriter.writeCurrentRow();
+    
+        csvFormatUtil.addNewField("url", "URL", url);
+        csvFormatUtil.addNewField("applicationName", "application name", settings.get(ConfigTags.ApplicationName, "application"));
+        csvFormatUtil.addNewField("applicationVersion", "application version", settings.get(ConfigTags.ApplicationVersion,"1"));
+        csvFormatUtil.addNewField("strategy", "strategy", (useRandom) ? "Random" : "Human strategy");
+        csvFormatUtil.addNewField("startDatetime", "start datetime", OutputStructure.startInnerLoopDateString);
+        csvFormatUtil.addNewField("timestampTestarStart", "timestamp TESTAR start", startTimestamp);
+        csvFormatUtil.addNewField("timestampTestarEnd", "timestamp TESTAR end", DefaultProtocol.lastExecutedAction.get(Tags.TimeStamp, null).toString());
+        csvFormatUtil.addNewField("timestampServerStart", "timestamp server start", start_epoch);
+        csvFormatUtil.addNewField("timestampServerEnd", "timestamp server end", end_epoch);
+        csvFormatUtil.addNewField("actionLimit", "action limit", Integer.toString(settings.get(ConfigTags.SequenceLength)));
+        csvFormatUtil.addNewField("numberOfFields", "number of fields", Integer.toString(numFields));
+        csvFormatUtil.addNewField("actionsExecuted", "actions executed", Integer.toString(actionCount-1));
+        csvFormatUtil.addNewField("numberOfFieldsFilled", "number of fields filled", Integer.toString(numFieldsFilled));
+        csvFormatUtil.addNewField("maxActionsPerField", "maximum actions per field", Integer.toString(totalUses));
+        csvFormatUtil.addNewField("submit", "successful submit", submitSuccess);
+        
+        csvFormatUtil.startNextRow();
     }
 
     /**

@@ -67,6 +67,7 @@ import org.testar.statemodel.StateModelManagerFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -670,7 +671,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				" ConcreteID CUSTOM = "+ state.get(Tags.ConcreteIDCustom,"ConcreteID CUSTOM not available")+
 				" AbstractID CUSTOM = "+state.get(Tags.AbstractIDCustom,"AbstractID CUSTOM not available")+"\n",
 				actionRepresentation[0]) +
-				"Timestamp: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(action.get(Tags.TimeStamp, (long)-1)) + "\n\n",
+						  "Timestamp: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(action.get(Tags.TimeStamp, (long)-1)) + "\n\n",
 				LogSerialiser.LogLevel.Info);
 	}
 
