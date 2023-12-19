@@ -29,7 +29,7 @@
  *******************************************************************************************************/
 
 
-package org.testar.reporting;
+package org.testar.reporting_depricated;
 
 import org.testar.monkey.Assert;
 
@@ -43,6 +43,7 @@ import java.util.Map.Entry;
 /**
  * HTML reporter for accessibility evaluation
  */
+@Deprecated
 public final class HTMLReporter {
 
     // ----

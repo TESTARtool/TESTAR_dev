@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.reporting;
+package org.testar.reporting_depricated;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -37,6 +37,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+@Deprecated
 public class TestRun {
     public int randomseed;
     public int asserts = 0;

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,11 +28,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-
 package org.testar.protocols;
 
 import org.testar.DerivedActions;
-import org.testar.reporting.Reporting;
+import org.testar.managers.InputDataManager;
 import org.testar.monkey.Drag;
 import org.testar.monkey.Environment;
 import org.testar.monkey.alayer.*;
@@ -40,14 +39,10 @@ import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
-import org.testar.monkey.ConfigTags;
-import org.testar.OutputStructure;
-import org.testar.managers.InputDataManager;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
 
@@ -55,17 +50,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     //Attributes for adding slide actions
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
-    protected Reporting htmlReport;
     protected State latestState;
-
-    /**
-     * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
-     */
-    @Override
-    protected void preSequencePreparations() {
-        //initializing the HTML sequence report:
-        htmlReport = getReporter();
-    }
     
     /**
      * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
@@ -92,14 +77,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
      */
     @Override
     protected State getState(SUT system) throws StateBuildException {
-        //Spy mode didn't use the html report
-    	if(settings.get(ConfigTags.Mode) == Modes.Spy)
-        	return super.getState(system);
-    	
-    	latestState = super.getState(system);
-        //adding state to the HTML sequence report:
-        htmlReport.addState(latestState);
-        return latestState;
+    	return super.getState(system);
     }
 
     /**
@@ -119,81 +97,6 @@ public class DesktopProtocol extends GenericUtilsProtocol {
         //the foreground. You should add all other actions here yourself.
         // These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
         return super.deriveActions(system,state);
-    }
-
-    /**
-     * Overwriting to add HTML report writing into it
-     *
-     * @param state
-     * @param actions
-     * @return
-     */
-    @Override
-    protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions){
-    	actions = super.preSelectAction(system, state, actions);
-    	// adding available actions into the HTML report:
-    	htmlReport.addActions(actions);
-    	return actions;
-    }
-
-    /**
-     * Execute the selected action.
-     * @param system the SUT
-     * @param state the SUT's current state
-     * @param action the action to execute
-     * @return whether or not the execution succeeded
-     */
-    @Override
-    protected boolean executeAction(SUT system, State state, Action action){
-        // adding the action that is going to be executed into HTML report:
-        htmlReport.addSelectedAction(state, action);
-        return super.executeAction(system, state, action);
-    }
-    
-    /**
-     * Replay the saved action
-     */
-    @Override
-    protected boolean replayAction(SUT system, State state, Action action, double actionWaitTime, double actionDuration){
-        // adding the action that is going to be executed into HTML report:
-        htmlReport.addSelectedAction(state, action);
-        return super.replayAction(system, state, action, actionWaitTime, actionDuration);
-    }
-
-    /**
-     * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
-     */
-    @Override
-    protected void postSequenceProcessing() {
-        String status = "";
-        String statusInfo = "";
-
-        if(mode() == Modes.Replay) {
-            htmlReport.addTestVerdict(getReplayVerdict().join(processVerdict));
-            status = (getReplayVerdict().join(processVerdict)).verdictSeverityTitle();
-            statusInfo = (getReplayVerdict().join(processVerdict)).info();
-        }
-        else {
-            htmlReport.addTestVerdict(getFinalVerdict());
-            status = (getFinalVerdict()).verdictSeverityTitle();
-            statusInfo = (getFinalVerdict()).info();
-        }
-
-        String sequencesPath = getGeneratedSequenceName();
-        try {
-            sequencesPath = new File(getGeneratedSequenceName()).getCanonicalPath();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        statusInfo = statusInfo.replace("\n"+ Verdict.OK.info(), "");
-
-        //Timestamp(generated by logger) SUTname Mode SequenceFileObject Status "StatusInfo"
-        INDEXLOG.info(OutputStructure.executedSUTname
-                + " " + settings.get(ConfigTags.Mode, mode())
-                + " " + sequencesPath
-                + " " + status + " \"" + statusInfo + "\"" );
-
-        htmlReport.close();
     }
 
     /**

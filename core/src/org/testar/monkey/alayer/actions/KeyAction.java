@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2016 - 2023 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -27,7 +28,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.testar.monkey.alayer.actions;
 
 import org.testar.monkey.Assert;
@@ -45,7 +45,6 @@ import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 
 /**
  * An action which presses a given Key on the Keyboard.
- * @author Urko Rueda
  */
 public abstract class KeyAction extends TaggableBase implements Action {
 	private static final long serialVersionUID = 4379174151668501105L;
@@ -65,7 +64,7 @@ public abstract class KeyAction extends TaggableBase implements Action {
 			if (key.equals(KBKeys.VK_ARROBA) ||
 				key.equals(KBKeys.VK_EXCLAMATION_MARK) ||
 				key.equals(KBKeys.VK_UNDERSCORE)) // java.awt.Robot throwing "Invalid key code"
-				altNumpad(system,new Integer(key.code()).toString());
+				altNumpad(system, Integer.toString(key.code()));
 			else
 				performKeyAction(system,key);
 		}catch(NoSuchTagException tue){
