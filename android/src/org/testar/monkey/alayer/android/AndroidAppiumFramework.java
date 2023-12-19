@@ -369,10 +369,6 @@ public class AndroidAppiumFramework extends SUTBase {
 		return driver.getTitle();
 	}
 
-	public static void resetApp(){
-		driver.resetApp();
-	}
-
 	public static void runAppInBackground(Duration duration){
 		driver.runAppInBackground(duration);
 	}
@@ -516,7 +512,7 @@ public class AndroidAppiumFramework extends SUTBase {
 
 	@Override
 	public void stop() throws SystemStopException {
-		driver.closeApp();
+		driver.quit();
 		driver = null;
 	}
 
