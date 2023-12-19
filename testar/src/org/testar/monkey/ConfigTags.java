@@ -283,9 +283,12 @@ public final class ConfigTags {
 
 	public static final Tag<String> TempDir = Tag.from("TempDir", String.class, 
 			"The relative path to temporarily  save TESTAR files");
-
-	public static final Tag<String> ReportingClass = Tag.from("ReportingClass", String.class, 
-			"Sets whether create a HTML or NUNIT report");
+	
+	public static final Tag<Boolean> ReportInHTML = Tag.from("ReportInHTML", Boolean.class,
+			 "Sets whether to create a HTML report");
+	
+	public static final Tag<Boolean> ReportInPlainText = Tag.from("ReportInPlainText", Boolean.class,
+			 "Sets whether to create a plain text report");
 
 	/**
 	 * Other settings

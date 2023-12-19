@@ -34,6 +34,7 @@ import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.monkey.Assert;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.settings.Settings;
@@ -42,6 +43,7 @@ import org.testar.managers.InputDataManager;
 import org.testar.protocols.WebdriverProtocol;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.*;
 
 import static org.testar.monkey.alayer.Tags.Blocked;
@@ -120,6 +122,43 @@ public class Protocol_test_gradle_workflow_webdriver_replay extends WebdriverPro
         }
 
         return actions;
+    }
+
+    @Override
+    protected void postSequenceProcessing() {
+    	super.postSequenceProcessing(); // Finish Reports
+
+    	// Verify html and txt report files were created
+    	File htmlReportFile = new File(reportManager.getReportFileName().concat("_" + getReplayVerdict().verdictSeverityTitle() + ".html"));
+    	File txtReportFile = new File(reportManager.getReportFileName().concat("_" + getReplayVerdict().verdictSeverityTitle() + ".txt"));
+    	System.out.println("htmlReportFile: " + htmlReportFile.getPath());
+    	System.out.println("txtReportFile: " + txtReportFile.getPath());
+    	Assert.isTrue(htmlReportFile.exists());
+    	Assert.isTrue(txtReportFile.exists());
+
+    	// Verify report information
+    	Assert.isTrue(fileContains("<h1>TESTAR replay sequence report", htmlReportFile));
+    	Assert.isTrue(fileContains("TESTAR replay sequence report", txtReportFile));
+
+    	Assert.isTrue(fileContains("<h2>Test verdict for this sequence:", htmlReportFile));
+    	Assert.isTrue(fileContains("Test verdict for this sequence:", txtReportFile));
+    }
+
+    private boolean fileContains(String searchText, File file) {
+    	try (Scanner scanner = new Scanner(file)) {
+    		// Read the content of the file line by line
+    		while (scanner.hasNextLine()) {
+    			String line = scanner.nextLine();
+
+    			// Check if the line contains the specific text
+    			if (line.contains(searchText)) {
+    				return true;
+    			}
+    		}
+    	} catch (FileNotFoundException e) {
+    		e.printStackTrace();
+    	}
+    	return false;
     }
 
     @Override

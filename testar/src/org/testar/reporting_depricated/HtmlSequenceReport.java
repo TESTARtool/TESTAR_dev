@@ -29,7 +29,7 @@
  *******************************************************************************************************/
 
 
-package org.testar.reporting;
+package org.testar.reporting_depricated;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.testar.monkey.alayer.Action;
@@ -45,6 +45,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Set;
 
+@Deprecated
 public class HtmlSequenceReport implements Reporting{
 
     private boolean firstStateAdded = false;

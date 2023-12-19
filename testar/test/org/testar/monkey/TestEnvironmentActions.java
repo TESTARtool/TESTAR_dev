@@ -17,6 +17,7 @@ import org.testar.monkey.alayer.actions.ActivateSystem;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.windows.WinProcessActivator;
+import org.testar.reporting.ReportManager;
 import org.testar.settings.Settings;
 import org.testar.stub.StateStub;
 import org.testar.stub.WidgetStub;
@@ -107,6 +108,7 @@ public class TestEnvironmentActions extends DefaultProtocol {
 
 		// Because there exists an ActivateSystem action
 		// preSelectAction must force to return it
+		reportManager = Mockito.mock(ReportManager.class);
 		Set<Action> preSelectedActions = preSelectAction(system, state, defaultActions);
 		Assert.isTrue(preSelectedActions.size() == 1);
 		Action forcedAction = preSelectedActions.iterator().next();
@@ -123,6 +125,7 @@ public class TestEnvironmentActions extends DefaultProtocol {
 
 		// Because there are no actions, this method returns a Set with one ESC key action
 		// This method already builds the environment action identifier
+		reportManager = Mockito.mock(ReportManager.class);
 		Set<Action> preActions = preSelectAction(system, state, initialActions);
 		Assert.isTrue(preActions.size() == 1);
 

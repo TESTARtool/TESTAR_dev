@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -38,9 +38,9 @@ import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 
-import org.testar.reporting.HtmlSequenceReport;
-import org.testar.reporting.Reporting;
-import org.testar.reporting.XMLSequenceReport;
+import org.testar.reporting_depricated.HtmlSequenceReport;
+import org.testar.reporting_depricated.Reporting;
+import org.testar.reporting_depricated.XMLSequenceReport;
 import org.testar.settings.Settings;
 
 import java.util.Set;
@@ -72,21 +72,22 @@ public abstract class AbstractProtocol implements UnProc<Settings>	{
 	protected Settings settings;
 	protected Settings settings(){ return settings; }
 
-	protected Reporting getReporter()
-	{
-	    // Replay mode only works with the specific HTML replay report
-	    if(settings.get(ConfigTags.Mode).equals(RuntimeControlsProtocol.Modes.Replay)) {
-	        return new HtmlSequenceReport(settings.get(ConfigTags.PathToReplaySequence));
-	    }
-
-		switch (settings().get(ConfigTags.ReportingClass))
-		{
-			case "NUNIT 3.0 Reporting": return new XMLSequenceReport(); 
-			case "HTML Reporting": return new HtmlSequenceReport();
-		}
-		// In case not specified
-		return new HtmlSequenceReport();
-	}
+	// todo: delete after reimplementing XMLSequenceReport?
+//	protected Reporting getReporter()
+//	{
+//	    // Replay mode only works with the specific HTML replay report
+//	    if(settings.get(ConfigTags.Mode).equals(RuntimeControlsProtocol.Modes.Replay)) {
+//	        return new HtmlSequenceReport(settings.get(ConfigTags.PathToReplaySequence));
+//	    }
+//
+//		switch (settings().get(ConfigTags.ReportingClass))
+//		{
+//			case "NUNIT 3.0 Reporting": return new XMLSequenceReport();
+//			case "HTML Reporting": return new HtmlSequenceReport();
+//		}
+//		// In case not specified
+//		return new HtmlSequenceReport();
+//	}
 	
 	/**
 	 * Initialize is run as the first thing to initialize TESTAR with the given settings

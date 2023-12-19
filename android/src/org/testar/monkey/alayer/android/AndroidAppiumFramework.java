@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -162,7 +162,7 @@ public class AndroidAppiumFramework extends SUTBase {
 	 * Uses unique accessibility ID if present, otherwise uses xpath. 
 	 * 
 	 * @param id
-	 * @param value
+	 * @param text
 	 * @param w
 	 */
 	public static void sendKeysTextTextElementById(String id, String text, Widget w){
@@ -369,10 +369,6 @@ public class AndroidAppiumFramework extends SUTBase {
 		return driver.getTitle();
 	}
 
-	public static void resetApp(){
-		driver.resetApp();
-	}
-
 	public static void runAppInBackground(Duration duration){
 		driver.runAppInBackground(duration);
 	}
@@ -516,7 +512,7 @@ public class AndroidAppiumFramework extends SUTBase {
 
 	@Override
 	public void stop() throws SystemStopException {
-		driver.closeApp();
+		driver.quit();
 		driver = null;
 	}
 
