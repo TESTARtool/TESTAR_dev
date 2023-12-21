@@ -31,7 +31,7 @@ SUTConnectorValue = ./settings/android_myexpenses/DesiredCapabilities.json
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 100
+Sequences = 500
 SequenceLength = 3
 
 #################################################################
@@ -121,7 +121,7 @@ StateModelStoreWidgets = true
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WidgetTitle
+AbstractStateAttributes = WidgetPath,WidgetTitle,WidgetControlType
 
 #################################################################
 # Other more advanced settings
@@ -136,7 +136,7 @@ LogLevel = 1
 FaultThreshold = 1.0E-9
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
-ActionDuration = 0.1
+ActionDuration = 0
 ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =

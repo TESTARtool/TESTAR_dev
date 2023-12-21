@@ -188,16 +188,17 @@ public class CodingManager {
 	    for (Action a : actions) {
 	        a.set(Tags.ConcreteID, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE +
 	                CodingManager.codify(state.get(Tags.ConcreteID), a));
-	        a.set(Tags.ConcreteIDCustom, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE_CUSTOM +
-	                CodingManager.codify(state.get(Tags.ConcreteIDCustom), a));
 	        a.set(Tags.AbstractID, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT +
 	                CodingManager.codify(state.get(Tags.ConcreteID), a, ROLES_ABSTRACT_ACTION));
 	    }
-
-	    // Create the Custom Abstract Id for the derived actions
+	    
 	    for (Action a : actions) {
+	    	// Create the Custom Abstract Id for the derived actions
 	    	a.set(Tags.AbstractIDCustom, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT_CUSTOM +
 	    			lowCollisionID(state.get(Tags.AbstractIDCustom) + a.get(Tags.OriginWidget).get(Tags.AbstractIDCustom) + a.get(Tags.Role, ActionRoles.Action)));
+	    	// Create the Custom Concrete Id for the derived actions
+	        a.set(Tags.ConcreteIDCustom, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE_CUSTOM +
+	        		lowCollisionID(state.get(Tags.ConcreteIDCustom) + a.get(Tags.OriginWidget).get(Tags.ConcreteIDCustom) + a.get(Tags.Role, ActionRoles.Action) + a.toString()));
 
 	    }
 	}

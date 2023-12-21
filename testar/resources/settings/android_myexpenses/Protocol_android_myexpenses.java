@@ -28,23 +28,109 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
+import org.openqa.selenium.By;
+import org.testar.CodingManager;
 import org.testar.RandomActionSelector;
+import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.*;
+import org.testar.monkey.alayer.webdriver.WdDriver;
+import org.testar.monkey.alayer.windows.UIARoles;
+import org.testar.monkey.alayer.windows.UIATags;
+import org.testar.monkey.alayer.android.AndroidAppiumFramework;
 import org.testar.monkey.alayer.android.actions.*;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 import org.testar.protocols.AndroidProtocol;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 public class Protocol_android_myexpenses extends AndroidProtocol {
+
+	private String previousStateIdentifier = "";
+
+	@Override
+	protected SUT startSystem() throws SystemStartException {
+		SUT system =  super.startSystem();
+
+		// Move forward the initial states to start the expenses main state
+		Util.pause(2);
+		AndroidAppiumFramework.getDriver().findElement(By.xpath("//*[@text='" + "Next" + "']")).click();
+		Util.pause(2);
+		AndroidAppiumFramework.getDriver().findElement(By.xpath("//*[@text='" + "Next" + "']")).click();
+		Util.pause(2);
+		AndroidAppiumFramework.getDriver().findElement(By.xpath("//*[@text='" + "Get started" + "']")).click();
+		Util.pause(2);
+
+		return system;
+	}
 
 	@Override
 	protected State getState(SUT system) throws StateBuildException {
 		State state = super.getState(system);
 		return state;
+	}
+
+	@Override
+	protected void buildStateIdentifiers(State state) {
+		super.buildStateIdentifiers(state);
+
+		boolean dynamicSearchDateState = stateContainsSearchForDateMenu(state);
+
+		for(Widget w : state) {
+			// Ignore dynamic search for date menu
+			if(dynamicSearchDateState) {
+				String widgetAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(w, Tags.Role, Tags.Path);
+				w.set(Tags.AbstractIDCustom, widgetAbstractId);
+			}
+			// Ignore dates and hours dynamic titles
+			if(checkDatePattern(w.get(Tags.Title, "")) || checkHourPattern(w.get(Tags.Title, ""))) {
+				String widgetAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(w, Tags.Role, Tags.Path);
+				w.set(Tags.AbstractIDCustom, widgetAbstractId);
+			}
+		}
+
+		// Rebuild state identifier
+		StringBuilder finalStateAbstractIdCustom;
+		finalStateAbstractIdCustom = new StringBuilder();
+		for (Widget w : state){
+			if (!(w instanceof State)) {
+				finalStateAbstractIdCustom.append(w.get(Tags.AbstractIDCustom));
+			}
+		}
+
+		// If the state is a popup menu, the state identifier depends of previous state
+		if(state.childCount()>0 && state.child(0).get(AndroidTags.AndroidBounds).y() > 1.0) {
+			System.out.println("DEBUG: Detected popup menu previousStateIdentifier: " + previousStateIdentifier);
+			finalStateAbstractIdCustom.append(previousStateIdentifier);
+		}
+
+		state.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_STATE + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.lowCollisionID(finalStateAbstractIdCustom.toString()));
+	}
+
+	private boolean checkDatePattern(String input) {
+		// Date pattern: DD/MM/YY
+		String datePattern = "\\d{1,2}/\\d{1,2}/\\d{2}";
+		return input.matches(datePattern);
+	}
+
+	private boolean checkHourPattern(String input) {
+		// Hour pattern: HH:MM AM/PM
+		String hourPattern = "([0-1]?[0-9]|2[0-3]):[0-5][0-9]\\s(?:AM|PM)";
+		return input.matches(hourPattern);
+	}
+
+	private boolean stateContainsSearchForDateMenu(State state) {
+		for(Widget w : state) {
+			if(w.get(AndroidTags.AndroidText, "").equals("Search for date")
+					&& w.get(AndroidTags.AndroidResourceId, "").contains("alertTitle")) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -76,6 +162,23 @@ public class Protocol_android_myexpenses extends AndroidProtocol {
 	}
 
 	@Override
+	protected boolean isClickable(Widget w) {
+		// Ignore clicking the "Tell a friend" widget
+		// It looks ugly but it works and ugly people have the rights to exist
+		if(w.childCount() > 0 && 
+				w.child(0).childCount() > 0 && 
+				w.child(0).child(0).get(Tags.Title, "").toLowerCase().contains("friend")) {
+			return false;
+		}
+		// We ignore dates and hours dynamic titles in the abstraction
+		// But also filter interaction with them because they lead to other dynamic states
+		if(checkDatePattern(w.get(Tags.Title, "")) || checkHourPattern(w.get(Tags.Title, ""))) {
+			return false;
+		}
+		return super.isClickable(w);
+	}
+
+	@Override
 	protected Action selectAction(State state, Set<Action> actions){
 		Action retAction = stateModelManager.getAbstractActionToExecute(actions);
 		if(retAction==null) {
@@ -88,6 +191,7 @@ public class Protocol_android_myexpenses extends AndroidProtocol {
 
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action) {
+		previousStateIdentifier = state.get(Tags.AbstractIDCustom);
 		return super.executeAction(system, state, action);
 	}
 

@@ -5,6 +5,6 @@
   "automationName" : "UiAutomator2",
   "allowTestPackages": true,
   "newCommandTimeout": 500000,
-  "appWaitActivity": "org.totschnig.myexpenses",
+  "appWaitActivity": "org.totschnig.myexpenses.activity.OnboardingActivity",
   "autoGrantPermissions": true
 }
