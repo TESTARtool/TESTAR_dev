@@ -117,7 +117,7 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 	{
 		super.initialize(settings);
 
-		strategyRandom = (settings.get(ConfigTags.StrategyFile).equals("")) ? true : false;
+		strategyRandom = settings.get(ConfigTags.StrategyFile).isEmpty();
 		if(!strategyRandom) parseUtil = new ParseUtil(settings.get(ConfigTags.StrategyFile));
 		
 		for(OperatingSystems OS : NativeLinker.getPLATFORM_OS())
@@ -466,7 +466,7 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 
 		Set<String> clickSet = new HashSet<>(clickableClasses);
 		clickSet.retainAll(element.cssClasses);
-		return clickSet.size() > 0;
+		return !clickSet.isEmpty();
 	}
 
 	@Override

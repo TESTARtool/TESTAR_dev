@@ -172,7 +172,7 @@ ProtocolSpecificSetting_5 =
 # Strategy settings
 #################################################################
 
-StrategyFile = settings/webdriver_generic_strategy/human_strategy.txt
+StrategyFile = settings/webdriver_parabank_strategy/human_strategy.txt
 
 #################################################################
 # Other more advanced settings

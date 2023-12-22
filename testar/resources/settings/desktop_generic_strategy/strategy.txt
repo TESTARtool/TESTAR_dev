@@ -8,6 +8,6 @@
 5 IF any-exist unvisited
 	THEN 5 select-previous
 	ELSE IF any-exist
-		THEN 4 select-random unvisited
+		THEN 4 select-random visited-over 2
 		ELSE 6 select-previous
 		2 select-random least-visited

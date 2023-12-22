@@ -506,7 +506,7 @@ public class Protocol_webdriver_generic_strategy extends WebdriverProtocol
         ArrayList<Integer> actionUsages = new ArrayList<Integer>();
         for (String actionID : actionsExecuted.keySet())
             actionUsages.add((Integer) actionsExecuted.get(actionID).get(0));
-        int totalUses = Collections.max(actionUsages);
+        int totalUses = (actionUsages.isEmpty()) ? 0 : Collections.max(actionUsages);
     
     
         csvFormatUtil.addNewField("url", "URL", url);
