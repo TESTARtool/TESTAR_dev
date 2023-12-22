@@ -56,6 +56,9 @@ public class Protocol_android_myexpenses extends AndroidProtocol {
 	protected SUT startSystem() throws SystemStartException {
 		SUT system =  super.startSystem();
 
+		// Reset in each new sequence
+		previousStateIdentifier = "";
+
 		// Move forward the initial states to start the expenses main state
 		Util.pause(2);
 		AndroidAppiumFramework.getDriver().findElement(By.xpath("//*[@text='" + "Next" + "']")).click();
@@ -63,6 +66,8 @@ public class Protocol_android_myexpenses extends AndroidProtocol {
 		AndroidAppiumFramework.getDriver().findElement(By.xpath("//*[@text='" + "Next" + "']")).click();
 		Util.pause(2);
 		AndroidAppiumFramework.getDriver().findElement(By.xpath("//*[@text='" + "Get started" + "']")).click();
+		Util.pause(2);
+		AndroidAppiumFramework.getDriver().findElement(By.xpath("//*[@text='" + "Manage accounts" + "']")).click();
 		Util.pause(2);
 
 		return system;
@@ -201,6 +206,11 @@ public class Protocol_android_myexpenses extends AndroidProtocol {
 		}
 		if(w.get(AndroidTags.AndroidClassName, "").contains("view.View") 
 				&& w.childCount() > 0 && w.child(0).get(AndroidTags.AndroidText, "").equals("Budget Book")) {
+			w.set(AndroidTags.AndroidClickable, false);
+			return false;
+		}
+		if(w.get(AndroidTags.AndroidClassName, "").contains("FrameLayout") 
+				&& w.childCount() > 0 && w.child(0).get(AndroidTags.AndroidText, "").equals("Manage accounts")) {
 			w.set(AndroidTags.AndroidClickable, false);
 			return false;
 		}

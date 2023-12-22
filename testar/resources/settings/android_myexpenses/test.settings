@@ -31,7 +31,7 @@ SUTConnectorValue = ./settings/android_myexpenses/DesiredCapabilities.json
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 500
+Sequences = 200
 SequenceLength = 3
 
 #################################################################
