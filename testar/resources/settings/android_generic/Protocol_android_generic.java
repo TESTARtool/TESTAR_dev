@@ -221,12 +221,7 @@ public class Protocol_android_generic extends AndroidProtocol {
 
 			// left clicks, but ignore links outside domain
 			if (isClickable(widget) && notBanned(widget)/* && (whiteListed(widget) || isUnfiltered(widget))*/) {
-				actions.add(
-						new AndroidActionClick(state, widget,
-							widget.get(AndroidTags.AndroidText,""),
-							widget.get(AndroidTags.AndroidAccessibilityId,""),
-							widget.get(AndroidTags.AndroidClassName, ""))
-						);
+				actions.add(new AndroidActionClick(state, widget));
 			}
 
 			// Scroll action

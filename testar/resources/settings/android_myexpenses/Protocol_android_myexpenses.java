@@ -71,7 +71,23 @@ public class Protocol_android_myexpenses extends AndroidProtocol {
 	@Override
 	protected State getState(SUT system) throws StateBuildException {
 		State state = super.getState(system);
+
+		// If state contains snackbar popup text, wait to avoid a high number of combinatorial states
+		if(stateContainsSnackbarText(state)) {
+			Util.pause(10);
+			state = super.getState(system);
+		}
+
 		return state;
+	}
+
+	private boolean stateContainsSnackbarText(State state) {
+		for(Widget w : state) {
+			if(w.get(AndroidTags.AndroidResourceId, "").contains("snackbar_text")) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -148,12 +164,7 @@ public class Protocol_android_myexpenses extends AndroidProtocol {
 		for (Widget widget : state) {
 			// left clicks, but ignore links outside domain
 			if (isClickable(widget)) {
-				actions.add(
-						new AndroidActionClick(state, widget,
-								widget.get(AndroidTags.AndroidText,""),
-								widget.get(AndroidTags.AndroidAccessibilityId,""),
-								widget.get(AndroidTags.AndroidClassName, ""))
-						);
+				actions.add(new AndroidActionClick(state, widget));
 			}
 
 		}
@@ -168,11 +179,29 @@ public class Protocol_android_myexpenses extends AndroidProtocol {
 		if(w.childCount() > 0 && 
 				w.child(0).childCount() > 0 && 
 				w.child(0).child(0).get(Tags.Title, "").toLowerCase().contains("friend")) {
+			w.set(AndroidTags.AndroidClickable, false);
 			return false;
 		}
 		// We ignore dates and hours dynamic titles in the abstraction
 		// But also filter interaction with them because they lead to other dynamic states
 		if(checkDatePattern(w.get(Tags.Title, "")) || checkHourPattern(w.get(Tags.Title, ""))) {
+			w.set(AndroidTags.AndroidClickable, false);
+			return false;
+		}
+		// Filter initial state action that increase the state model search space due to dealing with non-determinism
+		if(w.get(AndroidTags.AndroidClassName, "").contains("TextView") 
+				&& w.get(AndroidTags.AndroidText, "").toLowerCase().contains("cash account")) {
+			w.set(AndroidTags.AndroidClickable, false);
+			return false;
+		}
+		if(w.get(AndroidTags.AndroidClassName, "").contains("view.View") 
+				&& w.childCount() > 0 && w.child(0).get(AndroidTags.AndroidAccessibilityId, "").equals("Collapse")) {
+			w.set(AndroidTags.AndroidClickable, false);
+			return false;
+		}
+		if(w.get(AndroidTags.AndroidClassName, "").contains("view.View") 
+				&& w.childCount() > 0 && w.child(0).get(AndroidTags.AndroidText, "").equals("Budget Book")) {
+			w.set(AndroidTags.AndroidClickable, false);
 			return false;
 		}
 		return super.isClickable(w);

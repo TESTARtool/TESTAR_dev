@@ -41,18 +41,20 @@ public class AndroidActionClick extends TaggableBase implements Action {
 	private static final long serialVersionUID = 6663144395605910140L;
 
 	private String text;
-	private String accessibilityID;
+	private String accessibilityId;
+	private String resourceId;
 	private Widget widget;
 	private String widgetClass;
 	private String xpath;
 
-	public AndroidActionClick(State state, Widget w, String text, String accessibilityID, String className) {
+	public AndroidActionClick(State state, Widget w) {
 	    this.set(Tags.Role, AndroidRoles.AndroidWidget);
 	    this.set(Tags.OriginWidget, w);
-	    this.text = text;
-	    this.accessibilityID = accessibilityID;
+	    this.text = w.get(AndroidTags.AndroidText, "");
+	    this.accessibilityId = w.get(AndroidTags.AndroidAccessibilityId, "");
+	    this.resourceId = w.get(AndroidTags.AndroidResourceId, "");
 	    this.widget = w;
-	    this.widgetClass = w.get(AndroidTags.AndroidClassName);
+	    this.widgetClass = w.get(AndroidTags.AndroidClassName, "");
 	    this.xpath = w.get(AndroidTags.AndroidXpath);
 		this.set(Tags.Desc, toShortString());
 	}
@@ -60,9 +62,9 @@ public class AndroidActionClick extends TaggableBase implements Action {
 	@Override
 	public void run(SUT system, State state, double duration) throws ActionFailedException {
 		try {
-		    AndroidAppiumFramework.clickElementById(this.accessibilityID, this.widget);
+		    AndroidAppiumFramework.clickElementById(accessibilityId, widget);
 		} catch(Exception e) {
-			System.out.println("Exception trying to click Element By Id : " + this.accessibilityID);
+			System.out.println("Exception trying to click Element By Id : " + accessibilityId);
 			System.out.println(e.getMessage());
 			throw new ActionFailedException(toShortString());
 		}
@@ -70,7 +72,8 @@ public class AndroidActionClick extends TaggableBase implements Action {
 
 	@Override
 	public String toShortString() {
-		return "Execute Android click on Widget of type: '" + this.widgetClass + "', with text: '" + text + "', with Id: '" + accessibilityID + "', with xPath: " + xpath;
+		// return "Execute Android click on Widget of type: '" + this.widgetClass + "', with text: '" + text + "', with Id: '" + accessibilityId + "', with xPath: " + xpath;
+		return "Android click on widget of type: '" + widgetClass + "', with text: '" + text + "', with accessibilityId: '" + accessibilityId + "', with resourceId: '" + resourceId + "'";
 	}
 
 	@Override
