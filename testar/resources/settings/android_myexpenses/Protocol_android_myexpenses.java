@@ -50,14 +50,9 @@ import java.util.Set;
 
 public class Protocol_android_myexpenses extends AndroidProtocol {
 
-	private String previousStateIdentifier = "";
-
 	@Override
 	protected SUT startSystem() throws SystemStartException {
 		SUT system =  super.startSystem();
-
-		// Reset in each new sequence
-		previousStateIdentifier = "";
 
 		// Move forward the initial states to start the expenses main state
 		Util.pause(2);
@@ -100,11 +95,27 @@ public class Protocol_android_myexpenses extends AndroidProtocol {
 		super.buildStateIdentifiers(state);
 
 		boolean dynamicSearchDateState = stateContainsSearchForDateMenu(state);
+		boolean statesWithCheckOptions = stateContainsMenuWithTitle(state, List.of("Sort by", "Grouping"));
 
 		for(Widget w : state) {
 			// Ignore dynamic search for date menu
 			if(dynamicSearchDateState) {
 				String widgetAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(w, Tags.Role, Tags.Path);
+				w.set(Tags.AbstractIDCustom, widgetAbstractId);
+			}
+			// Ignore dynamic calculator content
+			if(isSonOfCalculator(w)) {
+				String widgetAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(w, Tags.Role, Tags.Path);
+				w.set(Tags.AbstractIDCustom, widgetAbstractId);
+			}
+			// Ignore dynamic spinner text content
+			if(w.get(AndroidTags.AndroidResourceId, "").contains("id/text1") && isSonOfSpinner(w)) {
+				String widgetAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(w, Tags.Role, Tags.Path);
+				w.set(Tags.AbstractIDCustom, widgetAbstractId);
+			}
+			// Use checked property if check widget is son of sort by menu to avoid non-determinism
+			if(w.get(AndroidTags.AndroidClassName, "").contains("CheckedTextView") && statesWithCheckOptions) {
+				String widgetAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(w, Tags.Role, Tags.Path, Tags.Title, AndroidTags.AndroidChecked);
 				w.set(Tags.AbstractIDCustom, widgetAbstractId);
 			}
 			// Ignore dates and hours dynamic titles
@@ -123,13 +134,40 @@ public class Protocol_android_myexpenses extends AndroidProtocol {
 			}
 		}
 
-		// If the state is a popup menu, the state identifier depends of previous state
-		if(state.childCount()>0 && state.child(0).get(AndroidTags.AndroidBounds).y() > 1.0) {
-			System.out.println("DEBUG: Detected popup menu previousStateIdentifier: " + previousStateIdentifier);
-			finalStateAbstractIdCustom.append(previousStateIdentifier);
+		state.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_STATE + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.lowCollisionID(finalStateAbstractIdCustom.toString()));
+	}
+
+	private boolean stateContainsSearchForDateMenu(State state) {
+		for(Widget w : state) {
+			if(w.get(AndroidTags.AndroidText, "").equals("Search for date")
+					&& w.get(AndroidTags.AndroidResourceId, "").contains("alertTitle")) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean stateContainsMenuWithTitle(State state, List<String> menuTitles) {
+		for (Widget w : state) {
+			if(menuTitles.contains(w.get(AndroidTags.AndroidText, "nothing"))
+					&& w.get(AndroidTags.AndroidResourceId, "").contains("alertTitle")) {
+				return true;
+			}
 		}
 
-		state.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_STATE + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.lowCollisionID(finalStateAbstractIdCustom.toString()));
+		return false;
+	}
+
+	private boolean isSonOfCalculator(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(AndroidTags.AndroidResourceId, "").contains("id/Calculator")) return true;
+		else return isSonOfCalculator(widget.parent());
+	}
+
+	private boolean isSonOfSpinner(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(AndroidTags.AndroidClassName, "").contains("widget.Spinner")) return true;
+		else return isSonOfSpinner(widget.parent());
 	}
 
 	private boolean checkDatePattern(String input) {
@@ -142,16 +180,6 @@ public class Protocol_android_myexpenses extends AndroidProtocol {
 		// Hour pattern: HH:MM AM/PM
 		String hourPattern = "([0-1]?[0-9]|2[0-3]):[0-5][0-9]\\s(?:AM|PM)";
 		return input.matches(hourPattern);
-	}
-
-	private boolean stateContainsSearchForDateMenu(State state) {
-		for(Widget w : state) {
-			if(w.get(AndroidTags.AndroidText, "").equals("Search for date")
-					&& w.get(AndroidTags.AndroidResourceId, "").contains("alertTitle")) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	@Override
@@ -193,6 +221,11 @@ public class Protocol_android_myexpenses extends AndroidProtocol {
 			w.set(AndroidTags.AndroidClickable, false);
 			return false;
 		}
+		// Switch actions increase the combination and state space, we need to avoid click or custom an abstraction
+		if(w.get(AndroidTags.AndroidClassName, "").contains("widget.Switch")) {
+			w.set(AndroidTags.AndroidClickable, false);
+			return false;
+		}
 		// Filter initial state action that increase the state model search space due to dealing with non-determinism
 		if(w.get(AndroidTags.AndroidClassName, "").contains("TextView") 
 				&& w.get(AndroidTags.AndroidText, "").toLowerCase().contains("cash account")) {
@@ -230,7 +263,6 @@ public class Protocol_android_myexpenses extends AndroidProtocol {
 
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action) {
-		previousStateIdentifier = state.get(Tags.AbstractIDCustom);
 		return super.executeAction(system, state, action);
 	}
 
