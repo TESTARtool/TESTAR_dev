@@ -19,9 +19,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.testar.monkey.Pair;
-import org.testar.monkey.Settings;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Verdict;
+import org.testar.settings.Settings;
 
 public class TestLogOracles {
 

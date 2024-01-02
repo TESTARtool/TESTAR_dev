@@ -180,6 +180,12 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(Password, ""));
 		 */
 
+		// Settings for LogOracle
+		defaults.add(Pair.from(LogOracleEnabled, false));
+		defaults.add(Pair.from(LogOracleRegex, ".*([Ee]xception|[Ee]rror).*"));
+		defaults.add(Pair.from(LogOracleCommands, new ArrayList<String>()));
+		defaults.add(Pair.from(LogOracleFiles, new ArrayList<String>()));
+
 		return defaults;
 	}
 

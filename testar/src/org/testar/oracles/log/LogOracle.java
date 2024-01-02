@@ -34,10 +34,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Settings;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.oracles.Oracle;
+import org.testar.settings.Settings;
 
 /**
  *  This oracle checks messages in a file or command output for suspicious messages.
