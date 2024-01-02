@@ -137,6 +137,12 @@ ProtocolSpecificSetting_4 =
 ProtocolSpecificSetting_5 = 
 
 #################################################################
+# Set the types of reports to create
+#################################################################
+ReportInHTML = true
+ReportInPlainText = true
+
+#################################################################
 # Other more advanced settings
 #################################################################
 CreateWidgetInfoJsonFile = true

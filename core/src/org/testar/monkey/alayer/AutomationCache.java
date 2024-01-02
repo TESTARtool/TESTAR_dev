@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2017 - 2023 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -27,8 +28,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-
 package org.testar.monkey.alayer;
 
 import java.util.HashMap;
@@ -37,9 +36,6 @@ import java.util.Map;
 /**
  * SUT UI soft automation caching.
  * Provides capability to Delay release of cached UI automation elements. 
- * 
- * @author Urko Rueda Molina (alias: urueda)
- *
  */
 public abstract class AutomationCache {
 
@@ -75,7 +71,7 @@ public abstract class AutomationCache {
 		try {
 			String propertyValue = System.getProperty("SCRSHOT_SIMILARITY_THRESHOLD");
 			if (propertyValue != null)
-				SCRSHOT_SIMILARITY_THRESHOLD = new Float(propertyValue).floatValue();
+				SCRSHOT_SIMILARITY_THRESHOLD = Float.parseFloat(propertyValue);
 		} catch (Exception e){
 			System.out.println("Automation cache caught exception <" + e.getMessage() + ">");
 		}
@@ -121,7 +117,7 @@ public abstract class AutomationCache {
 		}
 		try {
 			AWTCanvas scrshot = AWTCanvas.fromScreenshot(hwndRect, hwnd, AWTCanvas.StorageFormat.PNG, 1);
-			CachedAutomationElement ac = automationCache.get(new Long(hwnd));
+			CachedAutomationElement ac = automationCache.get(hwnd);
 			if (ac != null){
 				if (ac.getHwndShape().equals(hwndRect) && scrshot.compareImage(ac.getScrshot()) >= SCRSHOT_SIMILARITY_THRESHOLD){
 					this.cacheHits++;
@@ -133,7 +129,7 @@ public abstract class AutomationCache {
 			long r = nativeGetAutomationElementFromHandleBuildCache(pAutomation, hwnd, pCacheRequest);
 			if (r != 0){ // do not cache if element request failed (r == 0)
 				CachedAutomationElement caching = new CachedAutomationElement(hwnd, r, hwndRect, scrshot);
-				automationCache.put(new Long(hwnd),caching);
+				automationCache.put(hwnd, caching);
 			}
 			this.cacheMisses++;
 			return r;
@@ -160,7 +156,7 @@ public abstract class AutomationCache {
 	 * @param cachedElement
 	 */
 	public void releaseCachedAutomationElement(CachedAutomationElement cachedElement){
-		automationCache.remove(new Long(cachedElement.getHwnd()));
+		automationCache.remove(cachedElement.getHwnd());
 		nativeReleaseAutomationElement(cachedElement.getCachedElement());
 	}
 	
@@ -184,7 +180,7 @@ public abstract class AutomationCache {
 	 * @param automationPtr
 	 * @param hwndPtr
 	 */
-	public abstract long nativeGetAutomationElementFromHandle(long automationPtr, long hwndPtr);;
+	public abstract long nativeGetAutomationElementFromHandle(long automationPtr, long hwndPtr);
 		
 	/**
 	 * 

@@ -41,8 +41,8 @@ import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.plugin.NativeLinker;
 import org.testar.monkey.Pair;
-import org.testar.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
+import org.testar.settings.Settings;
 
 import java.util.*;
 import java.util.stream.Collectors;

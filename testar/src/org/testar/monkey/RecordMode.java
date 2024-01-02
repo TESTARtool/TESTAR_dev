@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2022 Open Universiteit - www.ou.nl
- * Copyright (c) 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2022 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2022 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,26 +30,20 @@
 
 package org.testar.monkey;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
 import org.testar.ActionStatus;
 import org.testar.OutputStructure;
 import org.testar.SutVisualization;
 import org.testar.monkey.RuntimeControlsProtocol.Modes;
-import org.testar.monkey.alayer.Action;
-import org.testar.monkey.alayer.Finder;
-import org.testar.monkey.alayer.SUT;
-import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Tags;
-import org.testar.monkey.alayer.Verdict;
-import org.testar.monkey.alayer.Widget;
+import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.devices.MouseButtons;
 import org.testar.monkey.alayer.exceptions.WidgetNotFoundException;
 import org.testar.serialisation.LogSerialiser;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 public class RecordMode {
 
@@ -67,7 +61,7 @@ public class RecordMode {
 		}
 
 		//empty method in defaultProtocol - allowing implementation in application specific protocols
-		//HTML report is created here in Desktop and Webdriver protocols
+		//HTML report is created here in DefaultProtocol
 		protocol.preSequencePreparations();
 
 		//reset the faulty variable because we started a new execution

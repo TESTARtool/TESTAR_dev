@@ -31,10 +31,10 @@
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import org.testar.monkey.Main;
-import org.testar.monkey.Settings;
+import org.testar.settings.Settings;
 import org.testar.monkey.Util;
 import org.testar.protocols.DesktopProtocol;
-import org.testar.settingsdialog.SettingsDialog;
+import org.testar.settings.dialog.SettingsDialog;
 
 /**
  * This protocol is used to test TESTAR by executing a gradle CI workflow. 

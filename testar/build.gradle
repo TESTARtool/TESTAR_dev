@@ -48,14 +48,6 @@ task runTestar(type: Exec) {
 	}
 }
 
-/*  There's error on Linux, crashing the JVM on unregistering the NativeHook
-    For now, use the old version, 2.1.1 should fix the issue
-    https://github.com/kwhat/jnativehook/issues/168
- */
-def jnativehook = System.getProperty("os.name").toLowerCase() == "linux"
-        ? 'com.1stleg:jnativehook:2.0.2'
-        : 'com.1stleg:jnativehook:2.1.0'
-
 task customZipDistribution(type: Zip) {
 	doFirst{
 		new File("${project.buildDir}/install/testar/bin/settings","desktop_generic.sse").text=""
@@ -66,8 +58,8 @@ task customZipDistribution(type: Zip) {
     include '*'
    	include '*/**' //include subdirectories
 
-   	archiveName 'testarDistribution.zip'
-   	destinationDir(file('target/install'))
+   	archiveFileName.set 'testarDistribution.zip'
+   	getDestinationDirectory().set(file('target/install'))
 }
 
 /**
@@ -81,7 +73,7 @@ task debuggingDistribution(type: Exec, dependsOn:'debugFiles') {
     commandLine 'cmd', '/c', 'dir'
 }
 
-task debugFiles(type: Copy) {
+task debugFiles(type: Copy, dependsOn:'build') {
     from 'target/scripts/.'
     into '.'
 }
@@ -113,7 +105,8 @@ dependencies {
     implementation project(':android')
     implementation files('./lib/jsyntaxpane-1.1.5.jar')
     implementation files('./lib/eye2.jar')
-    implementation jnativehook
+    // https://mvnrepository.com/artifact/com.github.kwhat/jnativehook
+    implementation group: 'com.github.kwhat', name: 'jnativehook', version: '2.2.2'
     implementation 'com.google.guava:guava:26.0-jre'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
     implementation group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.30.v20200611'

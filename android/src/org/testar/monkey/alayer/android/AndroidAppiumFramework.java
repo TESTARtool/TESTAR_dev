@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -78,7 +78,8 @@ public class AndroidAppiumFramework extends SUTBase {
 
 	private static AndroidDriver driver = null;
 
-	//TODO: Appium v2 will not use /wd/hub suffix anymore
+	// Appium v2 do not use /wd/hub suffix anymore
+	// It can be enabled using the "--base-path /wd/hub" command when launching the Appium server
 	public static String androidAppiumURL = "http://0.0.0.0:4723/wd/hub";
 
 	public AndroidAppiumFramework(DesiredCapabilities cap) {
@@ -161,7 +162,7 @@ public class AndroidAppiumFramework extends SUTBase {
 	 * Uses unique accessibility ID if present, otherwise uses xpath. 
 	 * 
 	 * @param id
-	 * @param value
+	 * @param text
 	 * @param w
 	 */
 	public static void sendKeysTextTextElementById(String id, String text, Widget w){
@@ -368,10 +369,6 @@ public class AndroidAppiumFramework extends SUTBase {
 		return driver.getTitle();
 	}
 
-	public static void resetApp(){
-		driver.resetApp();
-	}
-
 	public static void runAppInBackground(Duration duration){
 		driver.runAppInBackground(duration);
 	}
@@ -515,7 +512,7 @@ public class AndroidAppiumFramework extends SUTBase {
 
 	@Override
 	public void stop() throws SystemStopException {
-		driver.closeApp();
+		driver.quit();
 		driver = null;
 	}
 
@@ -583,6 +580,8 @@ public class AndroidAppiumFramework extends SUTBase {
 					&& jsonObject.get("ipAddressAppium") != null
 					&& jsonObject.get("isEmulatorDocker").getAsBoolean()) {
 				cap.setCapability("app", appPath);
+				// Docker container (budtmo/docker-android) + Appium v2 do not use /wd/hub suffix anymore
+				// It can be enabled using the APPIUM_ADDITIONAL_ARGS "--base-path /wd/hub" command
 				androidAppiumURL = "http://" + jsonObject.get("ipAddressAppium").getAsString() + ":4723/wd/hub";
 			} 
 			// Else, obtain the local directory that contains the APK file

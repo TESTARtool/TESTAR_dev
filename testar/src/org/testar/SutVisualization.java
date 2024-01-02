@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -35,7 +35,7 @@ import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.devices.Mouse;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Settings;
+import org.testar.settings.Settings;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -222,7 +222,7 @@ public class SutVisualization {
         for(Action a : actions){
             //a.get(Visualizer, Util.NullVisualizer).run(state, canvas, Pen.PEN_IGNORE);
             zindex = getTargetZindex(state,a);
-            zindexes.put(a, new Integer(zindex));
+            zindexes.put(a, Integer.valueOf(zindex));
             if (zindex < minz)
                 minz = zindex;
             if (zindex > maxz)

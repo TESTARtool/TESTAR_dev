@@ -219,7 +219,7 @@ task createDatabaseOrientDB(type: Exec, dependsOn: downloadAndUnzipOrientDB){
         String output = standardOutput.toString()
         
         // If error creating database because already exists is ok
-        if (execResult.getExitValue()==1 && errorOutput.toString().contains("Cannot create new database 'testar' because it already exists")) {
+        if (errorOutput.toString().contains("Cannot create new database 'testar' because it already exists")) {
             println "\n${output} \ntestar OrientDB database already exists"
         }
         // Check if testar database created sucessfully
@@ -280,21 +280,59 @@ task runTestDesktopGenericStateModelCustomAbstraction(type: Exec, dependsOn: cre
     }
 }
 
+// Windows OS
 // Verify that TESTAR correctly executes chromedriver
-// To be sure, connect to ou.nl and detect Onderwijs suspicious tag ValuePattern
+// To be sure, connect to para.testar.org and detect .*[fF]orums.* suspicious tag ValuePattern
 task runTestWebdriverSuspiciousTag(type: Exec) {
 	// Read command line output
     standardOutput = new ByteArrayOutputStream()
     group = 'test_testar_workflow'
     description ='runTestWebdriverSuspiciousTag'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_generic AlwaysCompile=true ApplicationName="webdriver_and_suspicious" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[oO]nderwijs.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_generic AlwaysCompile=true ApplicationName="webdriver_and_suspicious" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[fF]orums.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
     doLast {
         String output = standardOutput.toString()
 
-		// Use Onderwijs
-        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'ValuePattern' : 'https://www.ou.nl/onderwijs")}) {
-            println "\n${output} \nTESTAR has successfully connect with WEB_DRIVER and detected Onderwijs Suspicious Tag! "
+        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'ValuePattern' : 'http://forums.parasoft.com/")}) {
+            println "\n${output} \nTESTAR has successfully connect with WEB_DRIVER and detected .*[fF]orums.* Suspicious Tag! "
+        } else {
+            throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with WEB_DRIVER")
+        }
+    }
+}
+
+// Linux OS
+task runTestWebdriverSuspiciousTagUbuntu(type: Exec) {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestWebdriverSuspiciousTagUbuntu'
+    workingDir 'target/install/testar/bin'
+    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_webdriver_generic SUTConnectorValue=" ""/usr/local/share/chromedriver-linux64/chromedriver"" ""https://para.testar.org/parabank/cookies.htm"" " FlashFeedback=false AlwaysCompile=true ApplicationName="webdriver_and_suspicious" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[fF]orums.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
+    doLast {
+        String output = standardOutput.toString()
+
+        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'ValuePattern' : 'http://forums.parasoft.com/")}) {
+            println "\n${output} \nTESTAR has successfully connect with WEB_DRIVER and detected .*[fF]orums.* Suspicious Tag! "
+        } else {
+            throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with WEB_DRIVER")
+        }
+    }
+}
+
+// macOS: Verify that TESTAR correctly executes chromedriver
+task runTestWebdriverSuspiciousTagMacOS(type: Exec) {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestWebdriverSuspiciousTagMacOS'
+    workingDir 'target/install/testar/bin'
+    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_webdriver_generic SUTConnectorValue=" ""/usr/local/share/chromedriver-mac-x64/chromedriver"" ""https://para.testar.org/parabank/cookies.htm"" " FlashFeedback=false AlwaysCompile=true ApplicationName="webdriver_and_suspicious" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[fF]orums.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
+    doLast {
+        String output = standardOutput.toString()
+
+        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'ValuePattern' : 'http://forums.parasoft.com/")}) {
+            println "\n${output} \nTESTAR has successfully connect with WEB_DRIVER and detected .*[fF]orums.* Suspicious Tag! "
         } else {
             throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with WEB_DRIVER")
         }
@@ -341,6 +379,26 @@ task runTestWebdriverParabankFormFilling(type: Exec) {
     }
 }
 
+// Interact with para.testar.org executing webdriver remote actions
+task runTestWebdriverParabankRemoteActions(type: Exec) {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestWebdriverParabankRemoteActions'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_remote_parabank AlwaysCompile=true ApplicationName="webdriver_remote_actions" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=1 ProtocolSpecificSetting_1=john ProtocolSpecificSetting_2=demo TagsToFilter=WebHref ClickFilter="^(?!(.*sitemap.*)$).*$"'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Check that output detects the browser console error message
+        if(output.readLines().any{line->line.contains("No problem detected.")}) {
+            println "\n${output} \nTESTAR webdriver remote acitons were executed sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Executing TESTAR")
+        }
+    }
+}
+
 // Verify that TESTAR correctly replays a sequence
 task runTestWebdriverCorrectReplay(type: Exec) {
     // Read command line output
@@ -348,7 +406,7 @@ task runTestWebdriverCorrectReplay(type: Exec) {
     group = 'test_testar_workflow'
     description ='runTestWebdriverCorrectReplay'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_replay" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""C:\\\\SeleniumWebDrivers\\\\ChromeDriver\\\\chromedriver.exe"" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_replayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/t_jone_p_ptwo_p.testar'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_replay" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""C:\\\\SeleniumWebDrivers\\\\ChromeDriver\\\\chromedriver.exe"" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_replayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/paris_parisone.testar'
     doLast {
         String output = standardOutput.toString()
 
@@ -368,12 +426,12 @@ task runTestWebdriverUnreplayable(type: Exec) {
     group = 'test_testar_workflow'
     description ='runTestWebdriverUnreplayable'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_unreplayable" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""C:\\\\SeleniumWebDrivers\\\\ChromeDriver\\\\chromedriver.exe"" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_unreplayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/t_jone_p_ptwo_p.testar'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_unreplayable" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""C:\\\\SeleniumWebDrivers\\\\ChromeDriver\\\\chromedriver.exe"" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_unreplayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/paris_parisone.testar'
     doLast {
         String output = standardOutput.toString()
 
         // Check that TESTAR detects not replayable button
-        if(output.readLines().any{line->line.contains("Left Click at 'ParisTwo' of the replayed sequence can not been replayed")}) {
+        if(output.readLines().any{line->line.contains("Left Click at 'ParisOne' of the replayed sequence can not been replayed")}) {
             println "\n${output} \nTESTAR has sucessfully detected a not replayable sequence"
         } else {
             throw new GradleException("\n${output} \nERROR: Detecting not replayable button with TESTAR Replay mode")
