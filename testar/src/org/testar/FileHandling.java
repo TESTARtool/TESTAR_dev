@@ -99,6 +99,8 @@ public class FileHandling {
             targetFolder = "sequences_warning";
         else if (sev == Verdict.SEVERITY_SUSPICIOUS_TAG)
             targetFolder = "sequences_suspicious_tag";
+        else if (sev == Verdict.SEVERITY_SUSPICIOUS_LOG)
+            targetFolder = "sequences_suspicious_log";
         else if (sev == Verdict.SEVERITY_NOT_RESPONDING)
             targetFolder = "sequences_unresponsive";
         else if (sev == Verdict.SEVERITY_UNEXPECTEDCLOSE)

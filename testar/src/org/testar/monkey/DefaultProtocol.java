@@ -54,6 +54,8 @@ import org.testar.monkey.alayer.ios.IOSProtocolUtil;
 import org.testar.monkey.alayer.visualizers.ShapeVisualizer;
 import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
 import org.testar.monkey.alayer.windows.WinApiException;
+import org.testar.oracles.Oracle;
+import org.testar.oracles.log.LogOracle;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
 import org.testar.reporting.ReportManager;
@@ -78,6 +80,8 @@ import static org.testar.monkey.alayer.Tags.*;
 public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	public static boolean faultySequence;
+	protected boolean logOracleEnabled;
+	protected Oracle logOracle;
 	private State stateForClickFilterLayerProtocol;
 
 	protected ReportManager reportManager;
@@ -101,7 +105,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected ProcessListener processListener = new ProcessListener();
 	boolean enabledProcessListener = false;
 	public static Verdict processVerdict = Verdict.OK;
-	
+
 	private Verdict replayVerdict;
 
 	public Verdict getReplayVerdict() {
@@ -151,7 +155,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected Pattern              suspiciousTitlesPattern = null;
 	protected Map<String, Matcher> suspiciousTitlesMatchers = new WeakHashMap<String, Matcher>();
 	private StateBuilder builder;
-	
+
 	protected int escAttempts = 0;
 
 	protected StateModelManager stateModelManager;
@@ -203,7 +207,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		//initialize TESTAR with the given settings:
-		logger.trace("TESTAR initializing with the given protocol settings");
+		logger.info("TESTAR initializing with the given protocol settings");
 		initialize(settings);
 
 		try {
@@ -273,7 +277,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     		}
 		}catch (IllegalStateException e) {
 			if (e.getMessage()!=null && e.getMessage().contains("driver executable does not exist")) {
-				
+
 				String msg = "Exception: Check whether chromedriver.exe path: \n"
 				+settings.get(ConfigTags.SUTConnectorValue)
 				+"\n exists and is correctly defined";
@@ -313,6 +317,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				settings.get(ConfigTags.AccessBridgeEnabled),
 				settings.get(ConfigTags.SUTProcesses)
 				);
+
+		logOracleEnabled = settings.get(ConfigTags.LogOracleEnabled, false);
 
 		if ( mode() == Modes.Generate || /*mode() == Modes.Record ||*/ mode() == Modes.Replay ) {
 			//Create the output folders
@@ -688,6 +694,19 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected void preSequencePreparations() {
 		if(settings.get(ConfigTags.Mode) != Modes.Spy)
 			reportManager = new ReportManager((mode() == Modes.Replay), settings());
+		if (logOracleEnabled) {
+			logOracle = createLogOracle(settings);
+			logOracle.initialize();
+		}
+	}
+
+	/**
+	 * Method for creating the LogOracle. Can optionally be overridden in subclasses.
+	 * @param settings
+	 * @return
+	 */
+	public Oracle createLogOracle (Settings settings) {
+		return new LogOracle(settings);
 	}
 
 	protected Canvas buildCanvas() {
@@ -836,6 +855,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		if(state.get(Tags.NotResponding, false)){
 			return new Verdict(Verdict.SEVERITY_NOT_RESPONDING, "System is unresponsive! I assume something is wrong!");
 		}
+
 		//------------------------
 		// ORACLES ALMOST FOR FREE
 		//------------------------
@@ -852,10 +872,17 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 		}
 
+		if ( logOracleEnabled ) {
+			Verdict logVerdict = logOracle.getVerdict(state);
+			if ( logVerdict.severity() == Verdict.SEVERITY_SUSPICIOUS_LOG ) {
+				return logVerdict;
+			}
+		}
+
 		// if everything was OK ...
 		return Verdict.OK;
 	}
-	
+
 	private Verdict suspiciousStringValueMatcher(Widget w) {
 		Matcher m;
 
@@ -1030,7 +1057,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			return false;
 		}
 	}
-	
+
 	protected boolean replayAction(SUT system, State state, Action action, double actionWaitTime, double actionDuration){
 
 	    // adding the action that is replayed into report:
@@ -1184,10 +1211,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	/**
-	 * Use CodingManager to create the Widget and State identifiers: 
-	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom, 
-	 * Abstract_R_ID, Abstract_R_T_ID, Abstract_R_T_P_ID 
-	 * 
+	 * Use CodingManager to create the Widget and State identifiers:
+	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom,
+	 * Abstract_R_ID, Abstract_R_T_ID, Abstract_R_T_P_ID
+	 *
 	 * @param state
 	 */
 	protected void buildStateIdentifiers(State state) {
@@ -1195,9 +1222,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	/**
-	 * Use CodingManager to create the Actions identifiers: 
-	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom 
-	 * 
+	 * Use CodingManager to create the Actions identifiers:
+	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom
+	 *
 	 * @param state
 	 * @param actions
 	 */
@@ -1209,9 +1236,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	/**
-	 * Use CodingManager to create the specific environment Action identifiers: 
-	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom 
-	 * 
+	 * Use CodingManager to create the specific environment Action identifiers:
+	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom
+	 *
 	 * @param state
 	 * @param action
 	 */
