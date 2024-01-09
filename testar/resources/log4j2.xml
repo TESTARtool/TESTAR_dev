@@ -3,6 +3,10 @@
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{yyyy-MM-dd-HH:mm:ss.SSS} %msg%n"/>
+			<Filters>
+                <!-- Allow only messages with level DEBUG and above to be printed to the console -->
+                <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
         </Console>
         <RollingFile name="RollingFile" fileName="index.log" filePattern="../logs/index-%d{MM-dd-yyyy}.log.gz"
                      ignoreExceptions="false">
@@ -14,14 +18,6 @@
         </RollingFile>
     </Appenders>
     <Loggers>
-        <Logger name="org.testar.monkey.AbstractProtocol" level="DEBUG" additivity="false">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="RollingFile"/>
-        </Logger>
-        <Logger name="nl.ou.testar" level="DEBUG" additivity="false">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="RollingFile"/>
-        </Logger>
 		<Logger name="io.netty" level="off"/> <!-- Ignore ugly warning https://github.com/netty/netty/issues/7817 -->
         <Root level="ALL">
             <AppenderRef ref="Console"/>

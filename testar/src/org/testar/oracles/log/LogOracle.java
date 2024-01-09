@@ -56,7 +56,7 @@ public class LogOracle implements Oracle {
         List<String> files = settings.get(ConfigTags.LogOracleFiles);
         List<String> commands = settings.get(ConfigTags.LogOracleCommands);
         LogErrorDetector detector = new RegexLogErrorDetector(settings.get(ConfigTags.LogOracleRegex));
-        this.checker = new PlainLinebasedLogChecker(commands, files, detector);
+        checker = new PlainLinebasedLogChecker(commands, files, detector);
     }
 
     public void initialize() {
@@ -69,7 +69,6 @@ public class LogOracle implements Oracle {
             return new Verdict(Verdict.SEVERITY_OK, "OK");
         }
         else {
-            System.out.println("LogOracle verdict ERROR " + String.join(";", errorsList) );
             return new Verdict(Verdict.SEVERITY_SUSPICIOUS_LOG, String.join(";", errorsList));
         }
     }

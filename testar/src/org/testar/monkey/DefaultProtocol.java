@@ -80,8 +80,8 @@ import static org.testar.monkey.alayer.Tags.*;
 public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	public static boolean faultySequence;
-	public boolean logOracleEnabled;
-	public Oracle logOracle;
+	protected boolean logOracleEnabled;
+	protected Oracle logOracle;
 	private State stateForClickFilterLayerProtocol;
 
 	protected ReportManager reportManager;
@@ -207,7 +207,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		//initialize TESTAR with the given settings:
-		logger.trace("TESTAR initializing with the given protocol settings");
+		logger.info("TESTAR initializing with the given protocol settings");
 		initialize(settings);
 
 		try {
@@ -318,11 +318,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				settings.get(ConfigTags.SUTProcesses)
 				);
 
-		logOracleEnabled = settings.get(ConfigTags.LogOracleEnabled);
-		if ( logOracleEnabled ) {
-			logOracle = createLogOracle(settings);
-			logOracle.initialize();
-		}
+		logOracleEnabled = settings.get(ConfigTags.LogOracleEnabled, false);
 
 		if ( mode() == Modes.Generate || /*mode() == Modes.Record ||*/ mode() == Modes.Replay ) {
 			//Create the output folders
@@ -342,15 +338,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		NativeHookManager.registerNativeHook(eventHandler);
 
 		LogSerialiser.log("'" + mode() + "' mode active.\n", LogSerialiser.LogLevel.Info);
-	}
-
-	/**
- 	*  Method for creating the LogOracle. Can optionally be overridden in subclasses.
- 	* @param settings
- 	* @return
- 	*/
-	public Oracle createLogOracle (Settings settings) {
-		return new LogOracle(settings);
 	}
 
 	/**
@@ -707,6 +694,19 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected void preSequencePreparations() {
 		if(settings.get(ConfigTags.Mode) != Modes.Spy)
 			reportManager = new ReportManager((mode() == Modes.Replay), settings());
+		if (logOracleEnabled) {
+			logOracle = createLogOracle(settings);
+			logOracle.initialize();
+		}
+	}
+
+	/**
+	 * Method for creating the LogOracle. Can optionally be overridden in subclasses.
+	 * @param settings
+	 * @return
+	 */
+	public Oracle createLogOracle (Settings settings) {
+		return new LogOracle(settings);
 	}
 
 	protected Canvas buildCanvas() {

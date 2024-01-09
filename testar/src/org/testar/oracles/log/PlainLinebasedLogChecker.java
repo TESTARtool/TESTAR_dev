@@ -37,6 +37,9 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  *  This is the standard implementation of LogChecker for the LogOracle. It
  *  checks files and/or command output for new lines that have been appended.
@@ -49,6 +52,8 @@ class PlainLinebasedLogChecker extends LogChecker {
     protected Map<String,Long> logCommandPtr, logFilePtr;
     protected int numberEntries;
     protected LogErrorDetector detector;
+
+    private static final Logger logger = LogManager.getLogger();
 
     /**
      * Create a new PlainLinebasedLogChecker.
@@ -84,19 +89,19 @@ class PlainLinebasedLogChecker extends LogChecker {
     public void initialRead() {
         for ( String command : commands) {
             try {
-                List<String> out = readNewLines(getCommandBufferedReader(command), this.logCommandPtr, command);
+                readNewLines(getCommandBufferedReader(command), this.logCommandPtr, command);
             }
-            catch ( IOException e) {
-                System.out.println("Warning: LogChecker could not run command " + command + ":" + e.toString());
+            catch (IOException e) {
+                logger.warn("LogChecker could not run command " + command + ":" + e.toString());
             }
         }
 
         for ( String file : files) {
             try {
-                List<String> out = readNewLines(getFileBufferedReader(file), this.logFilePtr, file);
+                readNewLines(getFileBufferedReader(file), this.logFilePtr, file);
             }
-            catch ( IOException e ) {
-                System.out.println("Warning: LogChecker could not read file " + file + ":" + e.toString());
+            catch (IOException e) {
+                logger.warn("LogChecker could not read file " + file + ":" + e.toString());
             }
         }
     }
@@ -127,7 +132,7 @@ class PlainLinebasedLogChecker extends LogChecker {
 
             }
             catch (IOException e) {
-                System.out.println("Warning: LogChecker could not run command " + command + ":" + e.toString());
+                logger.trace("LogChecker could not run command " + command + ":" + e.toString());
             }
         }
 
@@ -151,8 +156,8 @@ class PlainLinebasedLogChecker extends LogChecker {
                 }
 
             }
-            catch ( IOException e ) {
-                System.out.println("Warning: LogChecker could not read file " + file + ":" + e.toString());
+            catch (IOException e) {
+                logger.trace("LogChecker could not read file " + file + ":" + e.toString());
             }
         }
 
@@ -183,7 +188,7 @@ class PlainLinebasedLogChecker extends LogChecker {
         }
 
         if ( currentLine + 1 < startLine ) {
-            System.out.println("Warning log file / log command returned fewer lines than before. LogChecker is resetting counter. ");
+            logger.trace("log file / log command returned fewer lines than before. LogChecker is resetting counter. ");
         }
 
         startLineMap.put(startLineId, currentLine + 1);
