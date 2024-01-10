@@ -206,7 +206,7 @@ public class Protocol_android_myexpenses extends AndroidProtocol {
 	@Override
 	protected boolean isClickable(Widget w) {
 		// Ignore clicking the "Tell a friend" widget
-		// It looks ugly but it works and ugly people have the rights to exist
+		// This checking can maybe be improved using other android properties
 		if(w.childCount() > 0 && 
 				w.child(0).childCount() > 0 && 
 				w.child(0).child(0).get(Tags.Title, "").toLowerCase().contains("friend")) {
@@ -267,6 +267,8 @@ public class Protocol_android_myexpenses extends AndroidProtocol {
 			nopAction.set(Tags.ConcreteIDCustom, state.get(Tags.ConcreteIDCustom) + "_NOP");
 			return new HashSet<>(Collections.singletonList(nopAction));
 		}
+
+		return actions;
 	}
 
 	@Override
