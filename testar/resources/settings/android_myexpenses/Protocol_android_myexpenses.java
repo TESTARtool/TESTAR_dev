@@ -34,17 +34,15 @@ import org.testar.RandomActionSelector;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.NOP;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.*;
-import org.testar.monkey.alayer.webdriver.WdDriver;
-import org.testar.monkey.alayer.windows.UIARoles;
-import org.testar.monkey.alayer.windows.UIATags;
 import org.testar.monkey.alayer.android.AndroidAppiumFramework;
 import org.testar.monkey.alayer.android.actions.*;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 import org.testar.protocols.AndroidProtocol;
-
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -226,6 +224,10 @@ public class Protocol_android_myexpenses extends AndroidProtocol {
 			w.set(AndroidTags.AndroidClickable, false);
 			return false;
 		}
+		// Filter actions in the calculator
+		if(isSonOfCalculator(w)) {
+			return false;
+		}
 		// Filter initial state action that increase the state model search space due to dealing with non-determinism
 		if(w.get(AndroidTags.AndroidClassName, "").contains("TextView") 
 				&& w.get(AndroidTags.AndroidText, "").toLowerCase().contains("cash account")) {
@@ -248,6 +250,23 @@ public class Protocol_android_myexpenses extends AndroidProtocol {
 			return false;
 		}
 		return super.isClickable(w);
+	}
+
+	protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions){
+		// If actions is empty because we decided not to derive actions
+		// just execute NOP actions because the deep of sequences is 3
+		if (actions.isEmpty()){
+			System.out.println("DEBUG: Forcing NOP action in preActionSelection");
+			Action nopAction = new NOP();
+			nopAction.set(Tags.OriginWidget, state);
+			nopAction.set(Tags.Desc, "No Operation");
+			nopAction.set(Tags.Role, Roles.System);
+			nopAction.set(Tags.AbstractID, state.get(Tags.AbstractID) + "_NOP");
+			nopAction.set(Tags.ConcreteID, state.get(Tags.ConcreteID) + "_NOP");
+			nopAction.set(Tags.AbstractIDCustom, state.get(Tags.AbstractIDCustom) + "_NOP");
+			nopAction.set(Tags.ConcreteIDCustom, state.get(Tags.ConcreteIDCustom) + "_NOP");
+			return new HashSet<>(Collections.singletonList(nopAction));
+		}
 	}
 
 	@Override
