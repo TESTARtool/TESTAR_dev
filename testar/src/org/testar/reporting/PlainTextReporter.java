@@ -73,15 +73,15 @@ public class PlainTextReporter implements Reporting
     @Override
     public void addState(State state)
     {
-        String imagePath = prepareScreenshotImagePath(state.get(Tags.ScreenshotPath));
+        String imagePath = prepareScreenshotImagePath(state.get(Tags.ScreenshotPath, "NoScreenshotPathAvailable"));
         String concreteIDCustom = state.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable");
         String abstractIDCustom = state.get(Tags.AbstractIDCustom, "NoAbstractIdCustomAvailable");
         
         plainTextReportUtil.addHeading(3, "State " + innerLoopCounter);
-        plainTextReportUtil.addHeading(5, "ConcreteIDCustom="+concreteIDCustom);
-        plainTextReportUtil.addHeading(5, "AbstractIDCustom="+abstractIDCustom);
+        plainTextReportUtil.addHeading(5, "ConcreteIDCustom=" + concreteIDCustom);
+        plainTextReportUtil.addHeading(5, "AbstractIDCustom=" + abstractIDCustom);
         
-        String altText = "screenshot: state=" + innerLoopCounter + ", ConcreteIDCustom="+concreteIDCustom+", AbstractIDCustom="+abstractIDCustom;
+        String altText = "screenshot: state=" + innerLoopCounter + ", ConcreteIDCustom=" + concreteIDCustom+", AbstractIDCustom=" + abstractIDCustom;
         plainTextReportUtil.addParagraph("Image: " + imagePath + "\n" + altText);
         
         innerLoopCounter++;
@@ -104,16 +104,14 @@ public class PlainTextReporter implements Reporting
     {
         StringJoiner joiner = new StringJoiner(" || ");
         
-        if(action.get(Tags.Desc)!=null)
+        if(action.get(Tags.Desc) != null)
         {
             String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
             joiner.add(escaped);
         }
         joiner.add(StringEscapeUtils.escapeHtml(action.toString()));
         joiner.add("ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable"));
-        
-        if(action.get(Tags.AbstractIDCustom)!=null)
-            joiner.add("AbstractIDCustom="+action.get(Tags.AbstractIDCustom));
+        joiner.add("AbstractIDCustom="+action.get(Tags.AbstractIDCustom, "NoAbstractIdCustomAvailable"));
         
         return joiner.toString();
     }
