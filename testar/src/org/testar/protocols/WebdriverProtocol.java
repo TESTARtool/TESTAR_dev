@@ -70,7 +70,6 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     //Attributes for adding slide actions
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
-    protected State latestState;
     
     protected static Set<String> existingCssClasses = new HashSet<>();
 
