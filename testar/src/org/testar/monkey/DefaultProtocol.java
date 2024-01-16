@@ -146,6 +146,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected static final Logger INDEXLOG = LogManager.getLogger();
 	protected double passSeverity = Verdict.SEVERITY_OK;
 
+	protected State latestState;
 	public static Action lastExecutedAction = null;
 
 	protected EventHandler eventHandler;
@@ -815,6 +816,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		reportManager.addState(state);
+		latestState = state;
 
 		return state;
 	}
