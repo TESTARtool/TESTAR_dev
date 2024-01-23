@@ -273,9 +273,9 @@ task runTestDesktopGenericStateModelCustomAbstraction(type: Exec, dependsOn: cre
 
 		// Check that output contains 0 unvisited actions left
         if(output.contains("0 unvisited actions left")) {
-            println "\n${output} \nTESTAR Action AbstractIDCustom has been customized sucessfully"
+            println "\n${output} \nTESTAR Action AbstractID has been customized sucessfully"
         } else {
-            throw new GradleException("\n${output} \nERROR: with Action AbstractIDCustom custom identifier")
+            throw new GradleException("\n${output} \nERROR: with Action AbstractID custom identifier")
         }
     }
 }

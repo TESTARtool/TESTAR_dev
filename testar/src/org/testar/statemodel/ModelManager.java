@@ -1,3 +1,33 @@
+/***************************************************************************************************
+ *
+ * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************************************/
+
 package org.testar.statemodel;
 
 import org.testar.statemodel.actionselector.ActionSelector;
@@ -93,7 +123,7 @@ public class ModelManager implements StateModelManager {
     @Override
     public void notifyNewStateReached(State newState, Set<Action> actions) {
         // check if we are dealing with a new state or an existing one
-        String abstractStateId = newState.get(Tags.AbstractIDCustom);
+        String abstractStateId = newState.get(Tags.AbstractID);
         AbstractState newAbstractState;
 
         // fetch or create an abstract state
@@ -112,7 +142,7 @@ public class ModelManager implements StateModelManager {
         }
 
         // add the concrete state id to the abstract state
-        newAbstractState.addConcreteStateId(newState.get(Tags.ConcreteIDCustom));
+        newAbstractState.addConcreteStateId(newState.get(Tags.ConcreteID));
 
         // check if an action was executed
         if (actionUnderExecution == null) {
@@ -190,12 +220,12 @@ public class ModelManager implements StateModelManager {
         // the action that is executed should always be traceable to an action on the current abstract state
         // in other words, we should be able to find the action on the current abstract state
         try {
-            actionUnderExecution = currentAbstractState.getAction(action.get(Tags.AbstractIDCustom));
+            actionUnderExecution = currentAbstractState.getAction(action.get(Tags.AbstractID));
         }
         catch (ActionNotFoundException ex) {
             System.out.println("Action not found in state model");
-            errorMessages.add("Action with id: " + action.get(Tags.AbstractIDCustom) + " was not found in the model.");
-            actionUnderExecution = new AbstractAction(action.get(Tags.AbstractIDCustom));
+            errorMessages.add("Action with id: " + action.get(Tags.AbstractID) + " was not found in the model.");
+            actionUnderExecution = new AbstractAction(action.get(Tags.AbstractID));
             currentAbstractState.addNewAction(actionUnderExecution);
         }
         concreteActionUnderExecution = ConcreteActionFactory.createConcreteAction(action, actionUnderExecution);
@@ -229,7 +259,7 @@ public class ModelManager implements StateModelManager {
             System.out.println("Finding action with abstractIdCustom : " + abstractIdCustom);
             for(Action action : actions) {
             	try {
-                    if (action.get(Tags.AbstractIDCustom).equals(abstractIdCustom)) {
+                    if (action.get(Tags.AbstractID).equals(abstractIdCustom)) {
                         return action;
                     }
             	} catch (NoSuchTagException e) {

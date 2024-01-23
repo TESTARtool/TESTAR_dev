@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2024 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -175,8 +175,8 @@ public class HtmlSequenceReport implements Reporting{
     		}
     		write("<div id='block' style='display:flex;flex-direction:column'>"); // Open state block container
     		write("<h2>State "+innerLoopCounter+"</h2>");
-    		write("<h4>ConcreteIDCustom="+state.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable")+"</h4>");
-    		write("<h4>AbstractIDCustom="+state.get(Tags.AbstractIDCustom, "NoAbstractIdCustomAvailable")+"</h4>");
+    		write("<h4>ConcreteID="+state.get(Tags.ConcreteID, "NoConcreteIdAvailable")+"</h4>");
+    		write("<h4>AbstractID="+state.get(Tags.AbstractID, "NoAbstractIdAvailable")+"</h4>");
     		write("<p><img src=\""+imagePath+"\"></p>");
     		write("</div>"); // Close state block container
     	}catch(NullPointerException | NoSuchTagException e) {
@@ -202,8 +202,8 @@ public class HtmlSequenceReport implements Reporting{
             }
 
             write(StringEscapeUtils.escapeHtml(action.toString()));
-            write(" || ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable"));
-            try{if(action.get(Tags.AbstractIDCustom)!=null) write(" || AbstractIDCustom="+action.get(Tags.AbstractIDCustom));}catch(NullPointerException | NoSuchTagException e){e.printStackTrace();}
+            write(" || ConcreteID="+action.get(Tags.ConcreteID, "NoConcreteIdAvailable"));
+            try{if(action.get(Tags.AbstractID)!=null) write(" || AbstractID="+action.get(Tags.AbstractID));}catch(NullPointerException | NoSuchTagException e){e.printStackTrace();}
             write("</li>");
         }
         write("</ul>");
@@ -225,7 +225,7 @@ public class HtmlSequenceReport implements Reporting{
                 	}
                 }catch(NullPointerException | NoSuchTagException e){}
 
-                write(" || ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable")
+                write(" || ConcreteID="+action.get(Tags.ConcreteID, "NoConcreteIdAvailable")
                 + " || " + StringEscapeUtils.escapeHtml(action.toString()));
                 
                 write("</li>");
@@ -245,7 +245,7 @@ public class HtmlSequenceReport implements Reporting{
             		}
             	}catch(NullPointerException | NoSuchTagException e){}
 
-            	write(" || ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable")
+            	write(" || ConcreteID="+action.get(Tags.ConcreteID, "NoConcreteIdAvailable")
             	+ " || " + StringEscapeUtils.escapeHtml(action.toString()));
 
             	write("</li>");
@@ -256,7 +256,7 @@ public class HtmlSequenceReport implements Reporting{
         	write("<div id='block' style='display:flex;flex-direction:column'>"); // Open derived actions block container
             write("<h4>"+concreteIdsOfUnvisitedActions.size()+" out of "+actions.size()+" actions have not been visited yet:</h4><ul>");
             for(Action action:actions){
-            	if(concreteIdsOfUnvisitedActions.contains(action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable"))){
+            	if(concreteIdsOfUnvisitedActions.contains(action.get(Tags.ConcreteID, "NoConcreteIdAvailable"))){
             		//action is unvisited -> showing:
             		write("<li>");
 
@@ -267,7 +267,7 @@ public class HtmlSequenceReport implements Reporting{
             			}
             		}catch(NullPointerException | NoSuchTagException e){}
 
-            		write(" || ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable")
+            		write(" || ConcreteID="+action.get(Tags.ConcreteID, "NoConcreteIdAvailable")
             		+ " || " + StringEscapeUtils.escapeHtml(action.toString()));
 
             		write("</li>");
@@ -291,11 +291,11 @@ public class HtmlSequenceReport implements Reporting{
         String actionPath = screenshotDir + File.separator 
         		+ OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname
         		+ "_sequence_" + OutputStructure.sequenceInnerLoopCount 
-        		+ File.separator + state.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable") + "_" + action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable") + ".png";
+        		+ File.separator + state.get(Tags.ConcreteID, "NoConcreteIdAvailable") + "_" + action.get(Tags.ConcreteID, "NoConcreteIdAvailable") + ".png";
 
         write("<div id='block' style='display:flex;flex-direction:column'>"); // Open executed action block container
         write("<h2>Selected Action "+innerLoopCounter+" leading to State "+innerLoopCounter+"\"</h2>");
-        write("<h4>ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable"));
+        write("<h4>ConcreteID="+action.get(Tags.ConcreteID, "NoConcreteIdAvailable"));
 
         try{
         	if(action.get(Tags.Desc)!=null) {
