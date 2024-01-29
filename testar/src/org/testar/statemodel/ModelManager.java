@@ -255,11 +255,11 @@ public class ModelManager implements StateModelManager {
             return null;
         }
         try {
-            String abstractIdCustom = actionSelector.selectAction(currentAbstractState, abstractStateModel).getActionId();
-            System.out.println("Finding action with abstractIdCustom : " + abstractIdCustom);
+            String abstractId= actionSelector.selectAction(currentAbstractState, abstractStateModel).getActionId();
+            System.out.println("Finding action with abstractId : " + abstractId);
             for(Action action : actions) {
             	try {
-                    if (action.get(Tags.AbstractID).equals(abstractIdCustom)) {
+                    if (action.get(Tags.AbstractID).equals(abstractId)) {
                         return action;
                     }
             	} catch (NoSuchTagException e) {
@@ -268,8 +268,8 @@ public class ModelManager implements StateModelManager {
                     errorMessages.add(message);
                 }
             }
-            System.out.println("Could not find action with abstractIdCustom : " +abstractIdCustom);
-            errorMessages.add("The actions selector returned the action with abstractIdCustom: " + abstractIdCustom + " . However, TESTAR was " +
+            System.out.println("Could not find action with abstractId : " +abstractId);
+            errorMessages.add("The actions selector returned the action with abstractId: " + abstractId + " . However, TESTAR was " +
                     "unable to find the action in its executable actions");
         } catch (ActionNotFoundException e) {
             System.out.println("Could not find an action to execute for abstract state id : " + currentAbstractState.getStateId());
