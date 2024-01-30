@@ -12,7 +12,6 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -36,8 +35,10 @@ public class TestReportManager {
 	private static Action selectedAction;
 	private static Verdict finalVerdict = Verdict.OK;
 
-	@BeforeClass
-	public static void setup() {
+	@Before
+	public void setUp() throws IOException {
+		tempFolder.newFolder();
+
 		state = new StateStub();
 		state.set(Tags.AbstractIDCustom, "stateAbstractIDCustom");
 		state.set(Tags.ConcreteIDCustom, "stateConcreteIDCustom");
@@ -56,11 +57,6 @@ public class TestReportManager {
 		pasteAction.set(Tags.ConcreteIDCustom, "pasteActionConcreteIDCustom");
 		pasteAction.set(Tags.Desc, "pasteActionDescription");
 		derivedActions.add(pasteAction);
-	}
-
-	@Before
-	public void setUp() throws IOException {
-		tempFolder.newFolder();
 	}
 
 	@Test
@@ -159,6 +155,39 @@ public class TestReportManager {
 		Assert.assertTrue(fileContains("ConcreteIDCustom=typeActionConcreteIDCustom || typeActionDescription", txtReportFile));
 		// Verify verdict information
 		Assert.assertTrue(fileContains("Test verdict for this sequence: No problem detected.", txtReportFile));
+	}
+
+	@Test
+	public void testHtmlReportWithoutStateScreenshot() {
+		// Prepare settings to only create an HTML report
+		List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
+		tags.add(Pair.from(ConfigTags.ReportInHTML, true));
+		tags.add(Pair.from(ConfigTags.ReportInPlainText, false));
+		Settings settings = new Settings(tags, new Properties());
+
+		// Create a state without IDs and without ScreenshotPath
+		state = new StateStub();
+
+		// Prepare a custom output directory to create the HTML report
+		OutputStructure.screenshotsOutputDir = "screenshots";
+		OutputStructure.htmlOutputDir = tempFolder.getRoot().getAbsolutePath();
+		OutputStructure.startInnerLoopDateString = "Date";
+		OutputStructure.executedSUTname = "testHtmlReportWithoutScreenshot";
+		OutputStructure.sequenceInnerLoopCount = 1;
+
+		ReportManager reportManager = createReportManager(settings);
+
+		// Verify the html report file was created with the state and actions information
+		File htmlReportFile = new File(reportManager.getReportFileName().concat("_OK.html"));
+		System.out.println("testHtmlReportWithoutScreenshot: " + htmlReportFile.getPath());
+		Assert.assertTrue(htmlReportFile.exists());
+
+		// Verify state information
+		Assert.assertTrue(fileContains("<title>TESTAR execution sequence report</title>", htmlReportFile));
+		Assert.assertTrue(fileContains("<h1>TESTAR execution sequence report for sequence 1</h1>", htmlReportFile));
+		Assert.assertTrue(fileContains("<h4>AbstractIDCustom=NoAbstractIdCustomAvailable</h4>", htmlReportFile));
+		Assert.assertTrue(fileContains("<h4>ConcreteIDCustom=NoConcreteIdCustomAvailable</h4>", htmlReportFile));
+		Assert.assertTrue(fileContains("<img src=\"NoScreenshotPathAvailable", htmlReportFile));
 	}
 
 	private ReportManager createReportManager(Settings settings) {

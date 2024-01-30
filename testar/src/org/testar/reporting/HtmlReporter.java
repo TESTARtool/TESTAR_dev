@@ -87,16 +87,16 @@ public class HtmlReporter implements Reporting
     @Override
     public void addState(State state)
     {
-        String imagePath = prepareScreenshotImagePath(state.get(Tags.ScreenshotPath));
+        String imagePath = prepareScreenshotImagePath(state.get(Tags.ScreenshotPath, "NoScreenshotPathAvailable"));
         String concreteIDCustom = state.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable");
         String abstractIDCustom = state.get(Tags.AbstractIDCustom, "NoAbstractIdCustomAvailable");
 
         htmlReportUtil.addContent(openBlockContainer); // Open state block container
         htmlReportUtil.addHeading(2, "State " + innerLoopCounter);
-        htmlReportUtil.addHeading(4, "ConcreteIDCustom="+concreteIDCustom);
-        htmlReportUtil.addHeading(4, "AbstractIDCustom="+abstractIDCustom);
+        htmlReportUtil.addHeading(4, "ConcreteIDCustom=" + concreteIDCustom);
+        htmlReportUtil.addHeading(4, "AbstractIDCustom=" + abstractIDCustom);
 
-        String altText = "screenshot: state=" + innerLoopCounter + ", ConcreteIDCustom="+concreteIDCustom+", AbstractIDCustom="+abstractIDCustom;
+        String altText = "screenshot: state=" + innerLoopCounter + ", ConcreteIDCustom=" + concreteIDCustom+", AbstractIDCustom=" + abstractIDCustom;
         htmlReportUtil.addParagraph("<img src=\"" + imagePath + "\" alt=\"" + altText + "\">");
         htmlReportUtil.addContent(closeBlockContainer); // Close state block container
         
@@ -120,16 +120,14 @@ public class HtmlReporter implements Reporting
     {
         StringJoiner joiner = new StringJoiner(" || ");
         
-        if(action.get(Tags.Desc)!=null)
+        if(action.get(Tags.Desc) != null)
         {
             String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
             joiner.add("<b>"+ escaped +"</b>");
         }
         joiner.add(StringEscapeUtils.escapeHtml(action.toString()));
-        joiner.add("ConcreteIDCustom="+action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable"));
-        
-        if(action.get(Tags.AbstractIDCustom)!=null)
-            joiner.add("AbstractIDCustom="+action.get(Tags.AbstractIDCustom));
+        joiner.add("ConcreteIDCustom=" + action.get(Tags.ConcreteIDCustom, "NoConcreteIdCustomAvailable"));
+        joiner.add("AbstractIDCustom=" + action.get(Tags.AbstractIDCustom, "NoAbstractIdCustomAvailable"));
         
         return joiner.toString();
     }
@@ -202,7 +200,7 @@ public class HtmlReporter implements Reporting
         htmlReportUtil.addContent(openBlockContainer); // Open executed action block container
         htmlReportUtil.addHeading(2, "Selected Action "+innerLoopCounter+" leading to State "+innerLoopCounter);
     
-        String stateString = "ConcreteIDCustom="+actionConcreteIDCustom;
+        String stateString = "ConcreteIDCustom=" + actionConcreteIDCustom;
         if(action.get(Tags.Desc) != null)
         {
             String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
@@ -218,7 +216,7 @@ public class HtmlReporter implements Reporting
 
         String altText = "screenshot: action, ConcreteIDCustom="+actionConcreteIDCustom;
     
-        htmlReportUtil.addParagraph("<img src=\""+actionPath+"\" alt=\"" + altText + "\">");
+        htmlReportUtil.addParagraph("<img src=\"" + actionPath + "\" alt=\"" + altText + "\">");
         htmlReportUtil.addContent(closeBlockContainer); // Close executed action block container
     
         htmlReportUtil.writeToFile();
