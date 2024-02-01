@@ -22,7 +22,25 @@
 
 <div class="topbar">
     <img src="img/testar-logo.png" class="logo">
-    <div class="layout">
+	<div class="row">
+        <label class="legend-text">Class Name: <select id="select-className">
+            <option value="abstractState">AbstractState</option>
+            <option value="abstractAction">AbstractAction</option>
+            <option value="concreteState">ConcreteState</option>
+            <option value="concreteAction">ConcreteAction</option>
+            <option value="unvisitedAbstractAction">UnvisitedAbstractAction</option>
+        </select></label>
+
+        <label for="property" class="legend-text">Property:</label>
+        <input type="text" id="classProperty" placeholder="Enter property name">
+
+        <label for="value" class="legend-text">Value(includes):</label>
+        <input type="text" id="classValue" placeholder="Enter property value">
+
+        <button onclick="queryModel()">Query Model</button>
+        <button onclick="resetQuery()">Reset Query</button>
+	</div>
+	<div class="layout">
         <div class="column">
             <div><label for="layout-control">Layout: <select name="layout-control" id="layout-control">
                 <option selected disabled></option>
@@ -1202,6 +1220,44 @@
 
     });
 
+    function queryModel() {
+        var selectedClass = document.getElementById('select-className');
+        var classText = '.' + selectedClass.options[selectedClass.selectedIndex].text;
+        var property = document.getElementById('classProperty').value;
+        var value = document.getElementById('classValue').value;
+
+        cy.$(classText).forEach((classObject) => {
+            var objectProperties = classObject.data();
+            if(String(objectProperties[property]).includes(value)){
+                // Store the original color and highlight the element with a yellow color
+                if(classObject.isNode()){
+                    classObject.data('originalColor', classObject.style('background-color'));
+                    classObject.style('background-color', 'yellow');
+                }
+                if(classObject.isEdge()){
+                    classObject.data('originalColor', classObject.style('line-color'));
+                    classObject.style('line-color', 'yellow');
+                }
+            }
+        });
+    }
+
+    function resetQuery() {
+        // Reset the background color to the original state
+        // Probably, there is a better way to implement this behavior :)
+        cy.elements().forEach(function(element) {
+            var originalColor = element.data('originalColor');
+
+            if (originalColor !== undefined) {
+                if(element.isNode()){
+                    element.style('background-color', originalColor);
+                }
+                if(element.isEdge()){
+                    element.style('line-color', originalColor);
+                }
+            }
+        });
+    }
 
 </script>
 </body>
