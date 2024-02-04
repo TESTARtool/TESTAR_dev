@@ -214,29 +214,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		try {
 
 			if (mode() == Modes.View) {
-				if(isHtmlFile() || isLogFile()) {
-					try {
-						File file = new File(settings.get(ConfigTags.PathToReplaySequence)).getCanonicalFile();
-						Desktop.getDesktop().browse(file.toURI());
-					} catch (IOException e) {
-						popupMessage("Exception: Check the path of the file, something is wrong");
-						System.out.println("Exception: Check the path of the file, something is wrong");
-					} catch (NoSuchTagException e) {
-						popupMessage("Exception: ConfigTags.PathToReplaySequence is missing");
-						System.out.println("Exception: ConfigTags.PathToReplaySequence is missing");
-					}
-				} else if (!findHTMLreport().contains("error")) {
-					try {
-						File htmlFile = new File(findHTMLreport());
-						Desktop.getDesktop().browse(htmlFile.toURI());
-					} catch (IOException e) {
-						popupMessage("Exception: Select a log or html file to visualize the TESTAR results");
-						System.out.println("Exception: Select a log or html file to visualize the TESTAR results");
-					}
-				} else {
-					popupMessage("Please select a file.html (output/reports) to use in the View mode");
-					System.out.println("Exception: Please select a file.html (output/reports) to use in the View mode");
-				}
+				new ViewServer(settings().get(ConfigTags.OutputDir)).runViewServer();
 			} else if (mode() == Modes.Replay && isValidFile()) {
 				new ReplayMode().runReplayLoop(this);
 			} else if (mode() == Modes.Spy) {
@@ -367,48 +345,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Check if the selected file to View is a html file
-	 */
-	private boolean isHtmlFile() {
-		if(settings.get(ConfigTags.PathToReplaySequence).contains(".html"))
-			return true;
-
-		return false;
-	}
-
-	/**
-	 * Check if the selected file to View is a log file
-	 */
-	private boolean isLogFile() {
-		if(settings.get(ConfigTags.PathToReplaySequence).contains(".log"))
-			return true;
-
-		return false;
-	}
-
-	/**
-	 * If the user selects a .testar object file to use the View mode, try to find the corresponding html file
-	 */
-	private String findHTMLreport() {
-		String foundedHTML = "error";
-		String path = settings.get(ConfigTags.PathToReplaySequence);
-		if(path.contains(".testar")) {
-			path = path.replace(".testar", ".html");
-
-			int startIndex = path.indexOf(File.separator + "sequences");
-			int endIndex = path.indexOf(File.separator, startIndex+2);
-
-			String replace = path.substring(startIndex, endIndex+1);
-
-			path = path.replace(replace, File.separator + "reports" + File.separator);
-			if (new File(path).exists())
-				foundedHTML = path;
-		}
-
-		return foundedHTML;
 	}
 
 	/**

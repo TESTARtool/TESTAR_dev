@@ -403,15 +403,7 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   private void btnViewActionPerformed(ActionEvent evt) {
-    JFileChooser fd = new JFileChooser();
-    fd.setFileSelectionMode(JFileChooser.FILES_ONLY);
-    fd.setCurrentDirectory(new File(settings.get(ConfigTags.PathToReplaySequence)).getParentFile());
-
-    if (fd.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-      String file = fd.getSelectedFile().getAbsolutePath();
-      settings.set(ConfigTags.PathToReplaySequence, file);
-      start(RuntimeControlsProtocol.Modes.View);
-    }
+    start(RuntimeControlsProtocol.Modes.View);
   }
 
   private JButton getBtnModel() throws IOException {

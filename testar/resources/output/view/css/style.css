@@ -1,0 +1,40 @@
+.row_title{
+	display: flex;
+	justify-content: center;
+}
+.resultListTitle {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+.resultListContainer {
+    border: 2px solid #000;
+    padding: 10px;
+    margin-top: 20px;
+	margin-bottom: 10px;
+}
+.folderItem {
+    margin-bottom: 5px;
+}
+.content {
+	padding: 0 18px;
+	display: none;
+	overflow: hidden;
+	background-color: #f1f1f1;
+}
+.collapsible {
+    color: black;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 20px;
+}
+.collapsible[data-file*="OK.html"] {
+    background-color: #00ff00;
+}
+.collapsible:not([data-file*="OK.html"]) {
+    background-color: #ff0000;
+}
