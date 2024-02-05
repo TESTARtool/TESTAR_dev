@@ -122,6 +122,8 @@ dependencies {
     implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.1'
     implementation group: 'com.orientechnologies', name: 'orientdb-graphdb', version: '3.0.34'
     implementation group: 'com.sikulix', name: 'sikulixapi', version: '2.0.5'
+    // https://mvnrepository.com/artifact/org.jsoup/jsoup
+    implementation group: 'org.jsoup', name: 'jsoup', version: '1.17.2'
 }
 
 task prepareSettings(type: Copy) {

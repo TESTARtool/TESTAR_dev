@@ -50,7 +50,6 @@ public class HtmlFormatUtil extends BaseFormatUtil
     
     public void addContent(String text, String tag)
     {
-        
         if(text.contains("\n"))
         {
             content.add("<" + tag + ">");
@@ -59,6 +58,18 @@ public class HtmlFormatUtil extends BaseFormatUtil
         }
         else
             content.add("<"+tag+">"+text+"</"+tag+">");
+    }
+    
+    public void addContent(String text, String id, String tag)
+    {
+        if(text.contains("\n"))
+        {
+            content.add("<" + tag + " id='" + id + "' >");
+            Collections.addAll(content, splitStringAtNewline(text));
+            content.add("</" + tag + ">");
+        }
+        else
+            content.add("<"+tag+" id='"+id+"' >"+text+"</"+tag+">");
     }
     
     public void addHeader(String title)
@@ -88,12 +99,18 @@ public class HtmlFormatUtil extends BaseFormatUtil
         content.add("</html>");
     }
     
-    
     public void addHeading(int level, String text)
     {
         Assert.isTrue(level >= 1 && level <= 6, "Invalid HTML heading level");
         Assert.notNull(text);
         addContent(text, "h" + level);
+    }
+    
+    public void addHeading(int level, String id, String text)
+    {
+        Assert.isTrue(level >= 1 && level <= 6, "Invalid HTML heading level");
+        Assert.notNull(text);
+        addContent(text, id, "h" + level);
     }
     
     public void addParagraph(String text) {

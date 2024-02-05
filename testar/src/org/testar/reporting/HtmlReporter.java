@@ -230,7 +230,7 @@ public class HtmlReporter implements Reporting
             verdictInfo = verdictInfo.replace(Verdict.OK.info(), "").replace("\n", "");
 
         htmlReportUtil.addContent(openBlockContainer); // Open verdict block container
-        htmlReportUtil.addHeading(2, "Test verdict for this sequence: " + verdictInfo);
+        htmlReportUtil.addHeading(2, "final-verdict", "Test verdict for this sequence: " + verdictInfo);
         htmlReportUtil.addHeading(4, "Severity: " + verdict.severity());
         htmlReportUtil.addContent(closeBlockContainer); // Close verdict block container
 

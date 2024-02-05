@@ -34,6 +34,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -41,20 +47,80 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 public class ViewServerSummary extends HttpServlet {
 
 	private static final long serialVersionUID = 3123000517851562890L;
 
 	private String outputViewDir;
+	private List<String> htmlReportsList;
 
 	public ViewServerSummary(String outputViewDir) {
 		this.outputViewDir = outputViewDir;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// Track all the selected htmlReportsList the user wants to summarize
+		if(request.getAttribute("htmlReportsList") != null && request.getAttribute("htmlReportsList") instanceof List<?>) {
+			htmlReportsList = (List<String>) request.getAttribute("htmlReportsList");
+		}
+
+		// Perform the filter duplicates of erroneous sequence feature
+		String filterDuplicatesParam = request.getParameter("filter-duplicates");
+		if(filterDuplicatesParam != null && Boolean.parseBoolean(filterDuplicatesParam)){
+			List<String> duplicatedReports = getDuplicatedReports();
+
+			// Write the duplicatedReports as a response
+			response.setContentType("text/plain");
+			response.setCharacterEncoding("UTF-8");
+
+			try (PrintWriter out = response.getWriter()) {
+				for (String report : duplicatedReports) {
+					out.println(report);
+				}
+			}
+		}
+
 		RequestDispatcher dispatcher = request.getRequestDispatcher("/viewSummary.jsp");
 		dispatcher.forward(request, response);
+	}
+
+	private List<String> getDuplicatedReports() {
+		List<String> htmlErroneousReportsList = htmlReportsList.stream()
+				.filter(report -> !report.endsWith("OK.html"))
+				.collect(Collectors.toList());
+
+		Set<String> uniqueVerdictTexts = new HashSet<>();
+		List<String> uniqueHtmlErroneousReportsList = htmlErroneousReportsList.stream()
+				.filter(report -> isNotDuplicated(report, uniqueVerdictTexts))
+				.collect(Collectors.toList());
+
+		return uniqueHtmlErroneousReportsList;
+	}
+
+	private boolean isNotDuplicated(String htmlReport, Set<String> uniqueVerdictTexts) {
+		try {
+			Document document = Jsoup.parse(new File(htmlReport));
+			Element finalVerdictElement = document.getElementById("final-verdict");
+
+			// The content of the "h2" element is the criteria for duplication
+			String verdictText = finalVerdictElement.text();
+
+			// Check if the verdict text is encountered for the first time
+			if (uniqueVerdictTexts.add(verdictText)) {
+				return true; // The report is not duplicated
+			} else {
+				return false; // The report is duplicated
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.err.println("Exception parsing HTML Report file: " + htmlReport);
+			return false;
+		}
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -80,11 +146,8 @@ public class ViewServerSummary extends HttpServlet {
 			deleteContents(scrshotsServerDir);
 		}
 
-		// Obtain the sibling directory dynamically
-		File scrshotsOriginalDir = getScreenshotsDirectory(filePath); //C:/Users/Fernando/Documents/GitHub/TESTAR_dev/testar/target/install/testar/bin/output/2024-02-04_16h48m31s_notepad/reports
-
-		System.out.println("scrshotsOriginalDir: " + scrshotsOriginalDir);
-
+		// Prepare the server screenshots
+		File scrshotsOriginalDir = getScreenshotsDirectory(filePath);
 		FileUtils.copyDirectory(scrshotsOriginalDir, scrshotsServerDir);
 	}
 
