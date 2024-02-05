@@ -28,10 +28,7 @@
                         String folder = iterator.next();
             %>
                             <div class="folderItem">
-                                <label>
-                                    <input type="checkbox" name="selectedFolders" value="<%= folder %>" checked>
-                                    <%= folder %>
-                                </label>
+                                <label class="custom-checkbox"> <%= folder %> <input type="checkbox" name="selectedFolders" value="<%= folder %>" checked><span class="checkmark"></span></label>
                             </div>
             <%
                     }

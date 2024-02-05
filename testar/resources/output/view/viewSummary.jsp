@@ -13,8 +13,8 @@
         <img src="img/testar-view.png" class="logo" alt="Testar Logo">
     </div>
     <div class="resultListTitle">TESTAR HTML Results Summary</div>
-	<label><input type="checkbox" id="filter-ok">Filter OK Sequences</label><br>
-	<label><input type="checkbox" id="filter-duplicates">Filter Duplicated Erroneous Sequences</label><br>
+	<label class="custom-checkbox">Filter OK Sequences<input type="checkbox" id="filter-ok"><span class="checkmark"></span></label><br>
+	<label class="custom-checkbox">Filter Duplicated Erroneous Sequences<input type="checkbox" id="filter-duplicates"><span class="checkmark"></span></label><br>
 	<div>
             <%
                 List<String> htmlFiles = (List<String>) request.getAttribute("htmlReportsList");
@@ -154,6 +154,9 @@
             var dataFile = collapsible.getAttribute('data-file');
             if (!dataFile.includes('OK.html') && !uniqueReports.includes(dataFile)) {
                 collapsible.style.display = 'none';
+                // hide the corresponding content as well
+                collapsible.nextElementSibling.style.display = 'none';
+                clearHtmlContent(collapsible);
             }
         });
     }
