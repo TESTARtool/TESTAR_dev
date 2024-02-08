@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="transaction" type="transaction"/>
+
+  <xs:complexType name="transaction">
+    <xs:sequence>
+      <xs:element name="id" type="xs:int"/>
+      <xs:element name="accountId" type="xs:int"/>
+      <xs:element name="type" type="transactionType" minOccurs="0"/>
+      <xs:element name="date" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="amount" type="xs:decimal" minOccurs="0"/>
+      <xs:element name="description" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="transactionType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Credit"/>
+      <xs:enumeration value="Debit"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+

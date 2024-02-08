@@ -1,0 +1,495 @@
+#%RAML 0.8
+title: parabank
+baseUri: services/bank
+schemas:
+  - account-xml: !include schemas/account-xml-schema.xsd
+  - account: !include schemas/account-schema.json
+  - customer-xml: !include schemas/customer-xml-schema.xsd
+  - customer: !include schemas/customer-schema.json
+  - loanResponse-xml: !include schemas/loanResponse-xml-schema.xsd
+  - loanResponse: !include schemas/loanResponse-schema.json
+  - position-xml: !include schemas/position-xml-schema.xsd
+  - position: !include schemas/position-schema.json
+  - transaction-xml: !include schemas/transaction-xml-schema.xsd
+  - transaction: !include schemas/transaction-schema.json
+  - string: !include schemas/string-schema.json
+  - position-collection: !include schemas/position-collection-schema.json
+  - account-collection: !include schemas/account-collection-schema.json
+  - historyPoint-collection: !include schemas/historyPoint-collection-schema.json
+  - transaction-collection: !include schemas/transaction-collection-schema.json
+/createAccount: 
+  description: Java interface for ParaBank web service
+  post: 
+    description: Create a new account
+    queryParameters: 
+      customerId: 
+        description: "Customer's id"
+        type: integer
+        required: true
+      newAccountType: 
+        description: Account type (CHECKING, SAVINGS, LOAN)
+        type: integer
+        required: true
+      fromAccountId: 
+        description: Customer funds source account
+        type: integer
+        required: true
+    responses: 
+      200: 
+        body: 
+          application/xml: 
+            schema: account-xml
+            example: !include examples/account-example.xml
+          application/json: 
+            schema: account
+            example: !include examples/account-example.json
+/accounts/{accountId}: 
+  description: Java interface for ParaBank web service
+  uriParameters: 
+    accountId: 
+      description: Account id
+      type: integer
+      required: true
+  get: 
+    description: Return account information for a given account number
+    responses: 
+      200: 
+        description: the account
+        body: 
+          application/xml: 
+            schema: account-xml
+            example: !include examples/account-example.xml
+          application/json: 
+            schema: account
+            example: !include examples/account-example.json
+  /transactions: 
+    get: 
+      description: Return a list of transactions for a given account
+      responses: 
+        200: 
+          description: list of account transactions
+          body: 
+            application/xml: 
+            application/json: 
+              schema: transaction-collection
+              example: !include examples/transaction-collection-example.json
+    /amount/{amount}: 
+      uriParameters: 
+        amount: 
+          description: Amount
+          required: true
+      get: 
+        description: Create transactions by amount for account
+        responses: 
+          200: 
+            body: 
+              application/xml: 
+              application/json: 
+                schema: transaction-collection
+                example: !include examples/transaction-collection-example.json
+    /month/{month}/type/{type}: 
+      uriParameters: 
+        month: 
+          description: Month to use for the search range
+          required: true
+        type: 
+          description: Transaction type (CREDIT, DEBIT)
+          required: true
+      get: 
+        description: Fetch transactions by month and type for account
+        responses: 
+          200: 
+            body: 
+              application/xml: 
+              application/json: 
+                schema: transaction-collection
+                example: !include examples/transaction-collection-example.json
+    /fromDate/{fromDate}/toDate/{toDate}: 
+      uriParameters: 
+        fromDate: 
+          description: Search starting date
+          required: true
+        toDate: 
+          description: Search ending date
+          required: true
+      get: 
+        description: Fetch transactions for date range for account
+        responses: 
+          200: 
+            body: 
+              application/xml: 
+              application/json: 
+                schema: transaction-collection
+                example: !include examples/transaction-collection-example.json
+    /onDate/{onDate}: 
+      uriParameters: 
+        onDate: 
+          description: Search specific date
+          required: true
+      get: 
+        description: Fetch transactions for a specific date for account
+        responses: 
+          200: 
+            body: 
+              application/xml: 
+              application/json: 
+                schema: transaction-collection
+                example: !include examples/transaction-collection-example.json
+/customers/{customerId}: 
+  description: Java interface for ParaBank web service
+  uriParameters: 
+    customerId: 
+      description: "Customer's id"
+      type: integer
+      required: true
+  get: 
+    description: Return customer information for the given customer number
+    responses: 
+      200: 
+        description: the customer
+        body: 
+          application/xml: 
+            schema: customer-xml
+            example: !include examples/customer-example.xml
+          application/json: 
+            schema: customer
+            example: !include examples/customer-example.json
+  /buyPosition: 
+    post: 
+      description: Buy a position
+      queryParameters: 
+        accountId: 
+          description: Customer funds source account
+          type: integer
+          required: true
+        name: 
+          description: "Instrument's Name"
+          required: true
+        symbol: 
+          description: "Instrument's exchange symbol"
+          required: true
+        shares: 
+          description: number of shares
+          type: integer
+          required: true
+        pricePerShare: 
+          description: Price of each share
+          required: true
+      responses: 
+        200: 
+          description: a list of positions for the customer
+          body: 
+            application/xml: 
+            application/json: 
+              schema: position-collection
+              example: !include examples/position-collection-example.json
+  /accounts: 
+    get: 
+      description: Return a list of accounts for a given customer
+      responses: 
+        200: 
+          description: list of customer accounts
+          body: 
+            application/xml: 
+            application/json: 
+              schema: account-collection
+              example: !include examples/account-collection-example.json
+  /positions: 
+    get: 
+      description: Return a list of positions for a given customer
+      responses: 
+        200: 
+          description: list of positions
+          body: 
+            application/xml: 
+            application/json: 
+              schema: position-collection
+              example: !include examples/position-collection-example.json
+  /sellPosition: 
+    post: 
+      description: Sell a position
+      queryParameters: 
+        accountId: 
+          description: Customer funds target account
+          type: integer
+          required: true
+        positionId: 
+          description: Unique identifier for the position
+          type: integer
+          required: true
+        shares: 
+          description: number of shares
+          type: integer
+          required: true
+        pricePerShare: 
+          description: Price of each share
+          required: true
+      responses: 
+        200: 
+          description: a list of positions for the customer
+          body: 
+            application/xml: 
+            application/json: 
+              schema: position-collection
+              example: !include examples/position-collection-example.json
+/login/{username}/{password}: 
+  description: Java interface for ParaBank web service
+  uriParameters: 
+    username: 
+      description: "Customer's user name"
+      required: true
+    password: 
+      description: "Customer's password"
+      required: true
+  get: 
+    description: Return the customer id for the given username and password
+    responses: 
+      200: 
+        description: the customer id
+        body: 
+          application/xml: 
+            schema: customer-xml
+            example: !include examples/customer-example.xml
+          application/json: 
+            schema: customer
+            example: !include examples/customer-example.json
+/requestLoan: 
+  description: Java interface for ParaBank web service
+  post: 
+    description: Request a loan
+    queryParameters: 
+      customerId: 
+        description: "Customer's id"
+        type: integer
+        required: true
+      amount: 
+        description: Amount
+        required: true
+      downPayment: 
+        description: Downpayment for the loan
+        required: true
+      fromAccountId: 
+        description: Customer funds source account
+        type: integer
+        required: true
+    responses: 
+      200: 
+        description: response the result of the loan request
+        body: 
+          application/xml: 
+            schema: loanResponse-xml
+            example: !include examples/loanResponse-example.xml
+          application/json: 
+            schema: loanResponse
+            example: !include examples/loanResponse-example.json
+/positions/{positionId}: 
+  description: Java interface for ParaBank web service
+  uriParameters: 
+    positionId: 
+      description: Unique identifier for the position
+      type: integer
+      required: true
+  get: 
+    description: Return a position for a given position number
+    responses: 
+      200: 
+        description: the position
+        body: 
+          application/xml: 
+            schema: position-xml
+            example: !include examples/position-example.xml
+          application/json: 
+            schema: position
+            example: !include examples/position-example.json
+  /{startDate}/{endDate}: 
+    uriParameters: 
+      startDate: 
+        description: Search starting date
+        required: true
+      endDate: 
+        description: Search ending date
+        required: true
+    get: 
+      description: Return position history for a given position id and date range
+      responses: 
+        200: 
+          description: a list of history points
+          body: 
+            application/xml: 
+            application/json: 
+              schema: historyPoint-collection
+              example: !include examples/historyPoint-collection-example.json
+/transactions/{transactionId}: 
+  description: Java interface for ParaBank web service
+  uriParameters: 
+    transactionId: 
+      description: Unique identifier for the transaction
+      type: integer
+      required: true
+  get: 
+    description: Return transaction information for a given transaction id
+    responses: 
+      200: 
+        description: the transaction
+        body: 
+          application/xml: 
+            schema: transaction-xml
+            example: !include examples/transaction-example.xml
+          application/json: 
+            schema: transaction
+            example: !include examples/transaction-example.json
+/deposit: 
+  description: Java interface for ParaBank web service
+  post: 
+    description: Deposit funds into the given account
+    queryParameters: 
+      accountId: 
+        description: Customer funds target account
+        type: integer
+        required: true
+      amount: 
+        description: Amount
+        required: true
+    responses: 
+      200: 
+        description: status message of result
+        body: 
+          application/xml: 
+          application/json: 
+/transfer: 
+  description: Java interface for ParaBank web service
+  post: 
+    description: Transfer funds between two accounts
+    queryParameters: 
+      fromAccountId: 
+        description: Customer funds source account
+        type: integer
+        required: true
+      toAccountId: 
+        description: Customer funds target account
+        type: integer
+        required: true
+      amount: 
+        description: Amount
+        required: true
+    responses: 
+      200: 
+        description: status message of result
+        body: 
+          application/xml: 
+          application/json: 
+/customers/update/{customerId}: 
+  description: Java interface for ParaBank web service
+  uriParameters: 
+    customerId: 
+      description: "Customer's id"
+      type: integer
+      required: true
+  post: 
+    description: Update customer information
+    queryParameters: 
+      firstName: 
+        description: "Customer's given (first) name"
+        required: true
+      lastName: 
+        description: "Customer's surname (last name)"
+        required: true
+      street: 
+        description: Street Address including bilding number and apartment (if any)
+        required: true
+      city: 
+        description: City
+        required: true
+      state: 
+        description: US state or Region name
+        required: true
+      zipCode: 
+        description: ZIP code or province id
+        required: true
+      phoneNumber: 
+        description: Contact Phone Number
+        required: true
+      ssn: 
+        description: Social Security Number
+        required: true
+      username: 
+        description: "Customer's user name"
+        required: true
+      password: 
+        description: "Customer's password"
+        required: true
+    responses: 
+      200: 
+        body: 
+          application/xml: 
+          application/json: 
+/withdraw: 
+  description: Java interface for ParaBank web service
+  post: 
+    description: Withdraw funds out of the given account
+    queryParameters: 
+      accountId: 
+        description: Customer funds source account
+        type: integer
+        required: true
+      amount: 
+        description: Amount
+        required: true
+    responses: 
+      200: 
+        description: status message of result
+        body: 
+          application/xml: 
+          application/json: 
+/cleanDB: 
+  description: Java interface for ParaBank web service
+  post: 
+    description: Reset database contents to a minimal state
+    responses: 
+      200: 
+        body: 
+          application/xml: 
+          application/json: 
+/initializeDB: 
+  description: Java interface for ParaBank web service
+  post: 
+    description: Reset database contents to a populated state
+    responses: 
+      200: 
+        body: 
+          application/xml: 
+          application/json: 
+/setParameter/{name}/{value}: 
+  description: Java interface for ParaBank web service
+  uriParameters: 
+    name: 
+      description: Parameter Name
+      required: true
+    value: 
+      description: Parameter Value
+      required: true
+  post: 
+    description: Sets the value of a given configuration parameter
+    responses: 
+      200: 
+        body: 
+          application/xml: 
+          application/json: 
+/shutdownJmsListener: 
+  description: Java interface for ParaBank web service
+  post: 
+    description: Disable JMS message listener
+    responses: 
+      200: 
+        body: 
+          application/xml: 
+          application/json: 
+/startupJmsListener: 
+  description: Java interface for ParaBank web service
+  post: 
+    description: Enable JMS message listener
+    responses: 
+      200: 
+        body: 
+          application/xml: 
+          application/json: 

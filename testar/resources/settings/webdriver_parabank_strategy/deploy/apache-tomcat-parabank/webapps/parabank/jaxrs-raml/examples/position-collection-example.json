@@ -1,0 +1,11 @@
+[
+  {
+    "CustomerId" : 123 ,
+    "PositionId" : 123 ,
+    "Shares" : 123
+  } , {
+    "CustomerId" : 123 ,
+    "PositionId" : 123 ,
+    "Shares" : 123
+  }
+]

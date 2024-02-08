@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="position" type="position"/>
+
+  <xs:complexType name="position">
+    <xs:sequence>
+      <xs:element name="positionId" type="xs:int"/>
+      <xs:element name="customerId" type="xs:int"/>
+      <xs:element name="name" type="xs:string" minOccurs="0"/>
+      <xs:element name="symbol" type="xs:string" minOccurs="0"/>
+      <xs:element name="shares" type="xs:int"/>
+      <xs:element name="purchasePrice" type="xs:decimal" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+

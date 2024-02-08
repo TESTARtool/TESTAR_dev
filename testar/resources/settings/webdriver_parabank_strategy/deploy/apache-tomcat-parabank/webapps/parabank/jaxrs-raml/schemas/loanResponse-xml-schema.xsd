@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" targetNamespace="http://service.parabank.parasoft.com/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:import schemaLocation="loanResponse-xml-schema.xsd"/>
+
+  <xs:element name="loanResponse" type="loanResponse"/>
+
+</xs:schema>
+

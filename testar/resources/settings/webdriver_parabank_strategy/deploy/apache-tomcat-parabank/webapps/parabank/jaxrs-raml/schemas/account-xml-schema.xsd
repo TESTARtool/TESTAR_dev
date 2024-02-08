@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="account" type="account"/>
+
+  <xs:complexType name="account">
+    <xs:sequence>
+      <xs:element name="id" type="xs:int"/>
+      <xs:element name="customerId" type="xs:int"/>
+      <xs:element name="type" type="accountType" minOccurs="0"/>
+      <xs:element name="balance" type="xs:decimal" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="accountType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CHECKING"/>
+      <xs:enumeration value="SAVINGS"/>
+      <xs:enumeration value="LOAN"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+

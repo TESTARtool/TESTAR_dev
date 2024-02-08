@@ -1,0 +1,24 @@
+More information: fernando@testar.org
+
+This Apache Tomcat server contains two new bat files:
+- bin/testar_catalina.bat
+- bin/testar_setclasspath.bat
+
+- bin/testar_catalina.sh
+- bin/testar_setclasspath.sh
+
+And the jacoco agent
+- bin/jacoco/lib/jacocoagent.jar
+
+If we execute:
+testar_catalina.bat start
+or
+testar_catalina.bat run
+
+We are going to inject the jacoco agent bin\jacoco\lib\jacocoagent.jar
+enabling the feature jmx with the port 5000
+this basically means that we can dump the jacoco coverage of the Apache Tomcat server using the jmx feature
+Example with port 9999 : https://github.com/jacoco/jacoco/blob/master/org.jacoco.examples/src/org/jacoco/examples/MBeanClient.java
+
+By default, also a jacoco.exec file with be created when the Apache Tomcat server stops
+bin\jacoco.exec

@@ -1,0 +1,19 @@
+{
+  "$schema" : "http://json-schema.org/draft-03/schema" ,
+  "type" : "object" ,
+  "required" : true ,
+  "properties" : {
+    "CustomerId" : {
+      "required" : false ,
+      "type" : "number"
+    } ,
+    "PositionId" : {
+      "required" : false ,
+      "type" : "number"
+    } ,
+    "Shares" : {
+      "required" : false ,
+      "type" : "number"
+    }
+  }
+}

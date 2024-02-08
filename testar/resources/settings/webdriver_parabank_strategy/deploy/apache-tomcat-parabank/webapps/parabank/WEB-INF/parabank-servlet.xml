@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+       http://www.springframework.org/schema/mvc
+       http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-4.3.xsd
+       http://www.springframework.org/schema/util
+       http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+
+	<mvc:annotation-driven>
+		<mvc:argument-resolvers>
+			<bean  class="com.parasoft.parabank.util.SessionParamArgumentResolver" lazy-init="false" />
+		</mvc:argument-resolvers>
+	</mvc:annotation-driven>
+	<context:component-scan base-package="com.parasoft.parabank,com.parasoft.bookstore,com.parasoft.bookstore2" />
+
+	<!-- ========================= WEB FRONT-END LIBRARY PROVIDER ========================= -->
+	<mvc:resources mapping="/webjars/**" location="/webjars/"/>
+
+	<!-- ========================= VIEW CONTROLLERS ========================= -->
+
+	<mvc:view-controller path="/about.htm" view-name="about" />
+	<mvc:view-controller path="/services.htm" view-name="services" />
+	<mvc:view-controller path="/loginForm.htm" view-name="loginform" />
+	<mvc:view-controller path="/sitemap.htm" view-name="sitemap" />
+
+	<!-- ========================= VIEW RESOLVER ========================= -->
+
+	<bean id="viewResolver" class="com.parasoft.parabank.web.TemplateViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"></property>
+		<property name="prefix" value="/WEB-INF/jsp/"></property>
+		<property name="suffix" value=".jsp"></property>
+	</bean>
+
+
+	<!-- ========================= LOCALIZED MESSAGES DEFINITION ========================= -->
+
+	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename" value="messages" />
+	</bean>
+
+	<!-- ========================= ENUM TYPE CONVERTER ========================= -->
+
+	<bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
+		<property name="converters">
+			<list>
+				<bean class="com.parasoft.parabank.web.AccountTypeConverter" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- ========================= DATE EDITOR ========================= -->
+
+	<bean id="customDateEditor" class="org.springframework.beans.propertyeditors.CustomDateEditor">
+		<constructor-arg>
+			<bean class="java.text.SimpleDateFormat">
+				<constructor-arg>
+					<value>MM/dd/yyyy</value>
+				</constructor-arg>
+			</bean>
+		</constructor-arg>
+		<constructor-arg>
+			<value>true</value>
+		</constructor-arg>
+	</bean>
+
+	<!-- ========================= VIEW NAMES ========================= -->
+	<util:constant id="about" static-field="com.parasoft.parabank.util.Constants.ABOUT" />
+	<util:constant id="activity" static-field="com.parasoft.parabank.util.Constants.ACTIVITY" />
+	<util:constant id="admin" static-field="com.parasoft.parabank.util.Constants.ADMIN" />
+	<util:constant id="contact" static-field="com.parasoft.parabank.util.Constants.CONTACT" />
+	<util:constant id="findtrans" static-field="com.parasoft.parabank.util.Constants.FINDTRANS" />
+	<util:constant id="index" static-field="com.parasoft.parabank.util.Constants.INDEX" />
+	<util:constant id="loginform" static-field="com.parasoft.parabank.util.Constants.LOGINFORM" />
+	<util:constant id="lookup" static-field="com.parasoft.parabank.util.Constants.LOOKUP" />
+	<util:constant id="openaccount" static-field="com.parasoft.parabank.util.Constants.OPENACCOUNT" />
+	<util:constant id="register" static-field="com.parasoft.parabank.util.Constants.REGISTER" />
+	<util:constant id="requestloan" static-field="com.parasoft.parabank.util.Constants.REQUESTLOAN" />
+	<util:constant id="services" static-field="com.parasoft.parabank.util.Constants.SERVICES" />
+	<util:constant id="sitemap" static-field="com.parasoft.parabank.util.Constants.SITEMAP" />
+	<util:constant id="transfer" static-field="com.parasoft.parabank.util.Constants.TRANSFER" />
+	<util:constant id="transaction" static-field="com.parasoft.parabank.util.Constants.TRANSACTION" />
+	<util:constant id="updateprofile" static-field="com.parasoft.parabank.util.Constants.UPDATEPROFILE" />
+
+	<!-- ========================= COMMAND CLASS NAMES ========================= -->
+	<util:constant id="classAdminForm" static-field="com.parasoft.parabank.util.Constants.CLASS_ADMINFORM" />
+	<util:constant id="classContactForm" static-field="com.parasoft.parabank.util.Constants.CLASS_CONTACTFORM" />
+	<util:constant id="classLookupForm" static-field="com.parasoft.parabank.util.Constants.CLASS_LOOKUPFORM" />
+	<util:constant id="classCustomerForm" static-field="com.parasoft.parabank.util.Constants.CLASS_CUSTOMERFORM" />
+	<util:constant id="classTransactionCriteria" static-field="com.parasoft.parabank.util.Constants.CLASS_TRANSACTIONCRITERIA" />
+	<util:constant id="classFindTransactionForm" static-field="com.parasoft.parabank.util.Constants.CLASS_FINDTRANSACTIONFORM" />
+	<util:constant id="classOpenAccountForm" static-field="com.parasoft.parabank.util.Constants.CLASS_OPENACCOUNTFORM" />
+	<util:constant id="classRequestLoanForm" static-field="com.parasoft.parabank.util.Constants.CLASS_REQUESTLOANFORM" />
+	<util:constant id="classTransferForm" static-field="com.parasoft.parabank.util.Constants.CLASS_TRANSFERFORM" />
+	<util:constant id="classCustomerForm" static-field="com.parasoft.parabank.util.Constants.CLASS_CUSTOMERFORM" />
+
+	<!-- ========================= COMMAND NAMES ========================= -->
+	<util:constant id="adminForm" static-field="com.parasoft.parabank.util.Constants.ADMINFORM" />
+	<util:constant id="contactForm" static-field="com.parasoft.parabank.util.Constants.CONTACTFORM" />
+	<util:constant id="lookupForm" static-field="com.parasoft.parabank.util.Constants.LOOKUPFORM" />
+	<util:constant id="customerForm" static-field="com.parasoft.parabank.util.Constants.CUSTOMERFORM" />
+	<util:constant id="customerFormUpdate" static-field="com.parasoft.parabank.util.Constants.CUSTOMERFORMUPDATE" />
+	<util:constant id="transactionCriteria" static-field="com.parasoft.parabank.util.Constants.TRANSACTIONCRITERIA" />
+	<util:constant id="findTransactionForm" static-field="com.parasoft.parabank.util.Constants.FINDTRANSACTIONFORM" />
+	<util:constant id="openAccountForm" static-field="com.parasoft.parabank.util.Constants.OPENACCOUNTFORM" />
+	<util:constant id="requestLoanForm" static-field="com.parasoft.parabank.util.Constants.REQUESTLOANFORM" />
+	<util:constant id="transferForm" static-field="com.parasoft.parabank.util.Constants.TRANSFERFORM" />
+
+	<!-- ========================= CONTROLLERS FOR PUBLIC PAGES ========================= -->
+	<bean id="defaultHandlerMapping" class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping" />
+
+	<!-- ========================= CONTROLLERS FOR PROTECTED PAGES ========================= -->
+
+	<bean id="secureHandlerMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property name="interceptors">
+			<list>
+				<ref bean="loginInterceptor" />
+			</list>
+		</property>
+		<property name="urlMap">
+			<map>
+				<entry key="/activity.htm" value-ref="secure_activity" />
+				<entry key="/billpay.htm" value-ref="secure_billpay" />
+				<entry key="/findtrans.htm" value-ref="secure_findtrans" />
+				<entry key="/requestloan.htm" value-ref="secure_requestloan" />
+				<entry key="/openaccount.htm" value-ref="secure_openaccount" />
+				<entry key="/overview.htm" value-ref="secure_overview" />
+				<entry key="/transaction.htm" value-ref="secure_transaction" />
+				<entry key="/transfer.htm" value-ref="secure_transfer" />
+				<entry key="/updateprofile.htm" value-ref="secure_updateprofile" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="loginInterceptor" class="com.parasoft.parabank.web.LoginInterceptor" />
+
+</beans>
