@@ -71,6 +71,15 @@ SuspiciousProcessOutput =
 ProcessLogs = .*.*
 
 #################################################################
+# Oracles based on suspicious titles in SUT output files
+#################################################################
+
+LogOracleEnabled = false
+LogOracleRegex = .*([Ee]xception|[Ee]rror).*
+LogOracleCommands = 
+LogOracleFiles = test_print_exception.log;../../testar/bin/test_print_error.log
+
+#################################################################
 # Actionfilter
 #
 # Regular expression and Tags to apply them.
