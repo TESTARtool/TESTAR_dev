@@ -30,13 +30,13 @@
 
 import java.util.Set;
 
-import org.fruit.alayer.*;
-import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.StateBuildException;
-import es.upv.staq.testar.NativeLinker;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.exceptions.StateBuildException;
+import org.testar.plugin.NativeLinker;
+import org.testar.monkey.ConfigTags;
 import org.testar.protocols.DesktopProtocol;
+import org.testar.settings.Settings;
 
 /**
  * This protocol is using the default Windows accessibility API (Windows UI Automation API) to test Web applications.

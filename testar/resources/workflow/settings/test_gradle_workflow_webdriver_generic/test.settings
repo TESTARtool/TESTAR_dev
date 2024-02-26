@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "chromedriver.exe" "1920x900+0+0" "https://www.ou.nl"
+SUTConnectorValue = "C:\\SeleniumWebDrivers\\ChromeDriver\\chromedriver.exe" "1920x900+0+0" "https://para.testar.org/parabank/cookies.htm"
 
 #################################################################
 # Sequences
@@ -39,12 +39,12 @@ Sequences = 1
 SequenceLength = 2
 
 #################################################################
-# Oracles based on suspicious titles
+# Oracles based on suspicious tag values
 #
 # Regular expression
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+SuspiciousTags = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -89,7 +89,7 @@ ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]ri
 # but that you do not want to test.
 #################################################################
 
-SUTProcesses =
+ProcessesToKillDuringTest =
 
 #################################################################
 # Protocolclass
@@ -111,11 +111,20 @@ AbstractStateAttributes = WebWidgetId
 # WebDriver features
 #################################################################
 ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
+TypeableClasses = custom-type-input
 DeniedExtensions = pdf;jpg;png
-DomainsAllowed = mijn.awo.ou.nl;login.awo.ou.nl
+DomainsAllowed = testar.org
 FollowLinks = true
 BrowserFullScreen = true
 SwitchNewTabs = true
+
+#################################################################
+# WebDriver Browser Console Oracles
+#################################################################
+WebConsoleErrorOracle = false
+WebConsoleErrorPattern = .*.*
+WebConsoleWarningOracle = false
+WebConsoleWarningPattern = .*.*
 
 #################################################################
 # Override display scale
@@ -133,19 +142,22 @@ SwitchNewTabs = true
 OverrideWebDriverDisplayScale = 
 
 #################################################################
+# Set the types of reports to create
+#################################################################
+ReportInHTML = true
+ReportInPlainText = true
+
+#################################################################
 # Other more advanced settings
 #################################################################
 
-ProcessesToKillDuringTest =
 OutputDir = ./output
 PathToReplaySequence = ./output/temp
 TempDir = ./output/temp
 UseRecordedActionDurationAndWaitTimeDuringReplay = false
 ForceForeground = true
 LogLevel = 1
-ExecuteActions = true
 FaultThreshold = 1.0E-9
-DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
 ActionDuration = 0.1
@@ -153,16 +165,12 @@ ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
-ShowSettingsAfterTest = true
 TimeToWaitAfterAction = 0.1
 StartupTime = 2.0
-DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true
 CopyFromTo =
 VisualizeActions = false
-VisualizeSelectedAction = true
-TestGenerator = random
 MaxReward = 9999999
 Discount = .95
 RefreshSpyCanvas = 1.0

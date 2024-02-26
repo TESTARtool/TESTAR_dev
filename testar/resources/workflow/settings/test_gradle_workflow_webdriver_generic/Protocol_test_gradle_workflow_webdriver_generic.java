@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2021 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2021 - 2023 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,33 +28,29 @@
  *
  */
 
-import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
-
 import org.apache.commons.io.FileUtils;
-import org.fruit.Assert;
-import org.fruit.Pair;
-import org.fruit.alayer.*;
-import org.fruit.alayer.actions.*;
-import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
-import org.fruit.alayer.webdriver.*;
-import org.fruit.alayer.webdriver.enums.WdRoles;
-import org.fruit.alayer.webdriver.enums.WdTags;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Main;
-import org.fruit.monkey.Settings;
+import org.testar.monkey.Assert;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.StdActionCompiler;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.exceptions.SystemStartException;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Main;
+import org.testar.settings.Settings;
 import org.testar.OutputStructure;
+import org.testar.managers.InputDataManager;
 import org.testar.protocols.WebdriverProtocol;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.*;
 
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
-import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
-import static org.fruit.alayer.webdriver.Constants.scrollThick;
+import static org.testar.monkey.alayer.Tags.Blocked;
+import static org.testar.monkey.alayer.Tags.Enabled;
+import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
+import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 /**
  * This protocol is used to test TESTAR by executing a gradle CI workflow.
@@ -62,6 +58,9 @@ import static org.fruit.alayer.webdriver.Constants.scrollThick;
  * ".github/workflows/gradle.yml"
  */
 public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverProtocol {
+
+	private String cookieAccept = "accept-cookies";
+	private String cookieReject = "reject-cookies";
 
     /**
      * Called once during the life time of TESTAR
@@ -77,17 +76,24 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
          *  WebDriver settings and features verification
          */
         // We want to test WebdriverProtocol.ensureDomainsAllowed (startSystem method)
-        // Then we don't include ou.nl domain by default
-        Assert.collectionNotContains(settings.get(ConfigTags.DomainsAllowed), "www.ou.nl");
-        Assert.collectionNotContains(domainsAllowed, "www.ou.nl");
+        // Then we don't include para.testar.org domain by default
+        Assert.collectionNotContains(settings.get(ConfigTags.DomainsAllowed), "para.testar.org");
+        Assert.collectionNotContains(domainsAllowed, "para.testar.org");
 
         // Check that WebDriver settings are correctly assigned to Webdriver features
-        Assert.collectionContains(settings.get(ConfigTags.DomainsAllowed), "mijn.awo.ou.nl");
-        Assert.collectionContains(settings.get(ConfigTags.DomainsAllowed), "login.awo.ou.nl");
-        Assert.collectionContains(domainsAllowed, "mijn.awo.ou.nl");
-        Assert.collectionContains(domainsAllowed, "login.awo.ou.nl");
+        Assert.collectionContains(settings.get(ConfigTags.DomainsAllowed), "testar.org");
+        Assert.collectionContains(domainsAllowed, "testar.org");
         Assert.collectionSize(settings.get(ConfigTags.DeniedExtensions), 3);
         Assert.collectionSize(deniedExtensions, 3);
+        Assert.collectionContains(settings.get(ConfigTags.ClickableClasses), "v-menubar-menuitem");
+        Assert.collectionContains(settings.get(ConfigTags.ClickableClasses), "v-menubar-menuitem-caption");
+        Assert.collectionContains(settings.get(ConfigTags.TypeableClasses), "custom-type-input");
+
+        // Add a force click action for policy attributes
+        policyAttributes.put("id", "bad");
+        policyAttributes.put("id", cookieAccept);
+        policyAttributes.put("id", cookieReject);
+        policyAttributes.put("id", "nothing");
     }
 
     @Override
@@ -95,14 +101,13 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
         SUT sut = super.startSystem();
 
         // Check if WebdriverProtocol.ensureDomainsAllowed feature works
-        Assert.collectionContains(domainsAllowed, "www.ou.nl");
+        Assert.collectionContains(domainsAllowed, "para.testar.org");
 
         return sut;
     }
 
     @Override
-    protected Set<Action> deriveActions(SUT system, State state)
-            throws ActionBuildException {
+    protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
         // Kill unwanted processes, force SUT to foreground
         Set<Action> actions = super.deriveActions(system, state);
 
@@ -112,6 +117,15 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
 
         // Check if forced actions are needed to stay within allowed domains
         Set<Action> forcedActions = detectForcedActions(state, ac);
+
+        if(actionCount() == 1) {
+        	//Assert that the first action is executed in one of the two policy buttons
+        	Assert.isTrue(forcedActions.size() == 2);
+        	Assert.isTrue(forcedActions.iterator().next().get(Tags.OriginWidget, null) != null);
+        	String policyClickWidgetId = forcedActions.iterator().next().get(Tags.OriginWidget).get(WdTags.WebId, "");
+        	Assert.isTrue(policyClickWidgetId.equals(cookieAccept) || policyClickWidgetId.equals(cookieReject));
+        }
+
         if (forcedActions != null && forcedActions.size() > 0) {
             return forcedActions;
         }
@@ -133,7 +147,7 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
 
             // type into text boxes
             if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-                actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+                actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
             }
 
             // left clicks, but ignore links outside domain
@@ -148,40 +162,40 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
     }
 
     @Override
-    protected boolean isClickable(Widget widget) {
-        Role role = widget.get(Tags.Role, Roles.Widget);
-        if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
-            // Input type are special...
-            if (role.equals(WdRoles.WdINPUT)) {
-                String type = ((WdWidget) widget).element.type;
-                return WdRoles.clickableInputTypes().contains(type);
-            }
-            return true;
-        }
+    protected void postSequenceProcessing() {
+    	super.postSequenceProcessing(); // Finish Reports
 
-        WdElement element = ((WdWidget) widget).element;
-        if (element.isClickable) {
-            return true;
-        }
+    	// Verify html and txt report files were created
+    	File htmlReportFile = new File(reportManager.getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".html"));
+    	File txtReportFile = new File(reportManager.getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".txt"));
+    	System.out.println("htmlReportFile: " + htmlReportFile.getPath());
+    	System.out.println("txtReportFile: " + txtReportFile.getPath());
+    	Assert.isTrue(htmlReportFile.exists());
+    	Assert.isTrue(txtReportFile.exists());
 
-        Set<String> clickSet = new HashSet<>(clickableClasses);
-        clickSet.retainAll(element.cssClasses);
-        return clickSet.size() > 0;
+    	// Verify report information
+    	Assert.isTrue(fileContains("<h1>TESTAR execution sequence report for sequence 1</h1>", htmlReportFile));
+    	Assert.isTrue(fileContains("TESTAR execution sequence report for sequence 1", txtReportFile));
+
+    	Assert.isTrue(fileContains("<h2>Test verdict for this sequence:", htmlReportFile));
+    	Assert.isTrue(fileContains("Test verdict for this sequence:", txtReportFile));
     }
 
-    @Override
-    protected boolean isTypeable(Widget widget) {
-        Role role = widget.get(Tags.Role, Roles.Widget);
-        if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
-            // Input type are special...
-            if (role.equals(WdRoles.WdINPUT)) {
-                String type = ((WdWidget) widget).element.type;
-                return WdRoles.typeableInputTypes().contains(type);
-            }
-            return true;
-        }
+    private boolean fileContains(String searchText, File file) {
+    	try (Scanner scanner = new Scanner(file)) {
+    		// Read the content of the file line by line
+    		while (scanner.hasNextLine()) {
+    			String line = scanner.nextLine();
 
-        return false;
+    			// Check if the line contains the specific text
+    			if (line.contains(searchText)) {
+    				return true;
+    			}
+    		}
+    	} catch (FileNotFoundException e) {
+    		e.printStackTrace();
+    	}
+    	return false;
     }
 
     @Override

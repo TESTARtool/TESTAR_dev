@@ -35,12 +35,12 @@ Sequences = 8
 SequenceLength = 10
 
 #################################################################
-# Oracles based on suspicious titles
+# Oracles based on suspicious tag values
 #
 # Regular expression
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+SuspiciousTags = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -85,7 +85,7 @@ ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir
 # but that you do not want to test.
 #################################################################
 
-SUTProcesses =
+ProcessesToKillDuringTest =
 
 #################################################################
 # Protocolclass
@@ -104,19 +104,22 @@ ProtocolClass = test_gradle_workflow_desktop_generic/Protocol_test_gradle_workfl
 AbstractStateAttributes = WidgetControlType
 
 #################################################################
+# Set the types of reports to create
+#################################################################
+ReportInHTML = true
+ReportInPlainText = true
+
+#################################################################
 # Other more advanced settings
 #################################################################
-
-ProcessesToKillDuringTest =
+CreateWidgetInfoJsonFile = true
 OutputDir = ./output
 PathToReplaySequence = ./output/temp
 TempDir = ./output/temp
 UseRecordedActionDurationAndWaitTimeDuringReplay = false
 ForceForeground = true
 LogLevel = 1
-ExecuteActions = true
 FaultThreshold = 0.000000001
-DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
 ActionDuration = 0.1
@@ -124,15 +127,11 @@ ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
-ShowSettingsAfterTest = true
 TimeToWaitAfterAction = 0.1
 StartupTime = 10.0
-DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true
 CopyFromTo =
 VisualizeActions = false
-VisualizeSelectedAction = true
-TestGenerator = random
 MaxReward = 9999999
 Discount = .95

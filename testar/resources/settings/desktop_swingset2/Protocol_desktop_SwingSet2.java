@@ -29,17 +29,19 @@
  *******************************************************************************************************/
 
 import java.util.Set;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Widget;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.Tags;
+
+import org.testar.managers.InputDataManager;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Widget;
+import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.StdActionCompiler;
+import org.testar.monkey.alayer.Tags;
 import org.testar.protocols.DesktopProtocol;
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
+import static org.testar.monkey.alayer.Tags.Blocked;
+import static org.testar.monkey.alayer.Tags.Enabled;
 
 //TODO Fernando: create a higher level SwingProtocol and document this one after that
 /**
@@ -85,7 +87,7 @@ public class Protocol_desktop_SwingSet2 extends DesktopProtocol {
 
                     // type into text boxes
                     if((isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) && !isSourceCodeEditWidget(w)) {
-                        actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+                        actions.add(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
                     }
 
                     //Force actions on some widgets with a wrong accessibility

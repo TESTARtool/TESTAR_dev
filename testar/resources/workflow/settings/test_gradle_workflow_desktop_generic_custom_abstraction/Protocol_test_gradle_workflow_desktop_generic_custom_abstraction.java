@@ -34,15 +34,15 @@ import java.util.Set;
 import java.util.zip.CRC32;
 
 import org.apache.commons.io.FileUtils;
-import org.fruit.alayer.*;
-import org.fruit.alayer.exceptions.*;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Main;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Main;
 import org.testar.OutputStructure;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.protocols.DesktopProtocol;
 
-import es.upv.staq.testar.CodingManager;
-import nl.ou.testar.RandomActionSelector;
+import org.testar.CodingManager;
+import org.testar.RandomActionSelector;
 
 /**
  * This protocol is used to test TESTAR by executing a gradle CI workflow.
@@ -126,7 +126,7 @@ public class Protocol_test_gradle_workflow_desktop_generic_custom_abstraction ex
     }
 
     @Override
-    protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+    protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 
         //The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
         //the foreground. You should add all other actions here yourself.
@@ -151,21 +151,9 @@ public class Protocol_test_gradle_workflow_desktop_generic_custom_abstraction ex
 
     @Override
     protected Action selectAction(State state, Set<Action> actions){
-
-        //Call the preSelectAction method from the AbstractProtocol so that, if necessary,
-        //unwanted processes are killed and SUT is put into foreground.
-        Action retAction = preSelectAction(state, actions);
-        if (retAction== null) {
-            //if no preSelected actions are needed, then implement your own action selection strategy
-            //using the action selector of the state model:
-            retAction = stateModelManager.getAbstractActionToExecute(actions);
-        }
-        if(retAction==null) {
-            System.out.println("State model based action selection did not find an action. Using random action selection.");
-            // if state model fails, use random (default would call preSelectAction() again, causing double actions HTML report):
-            retAction = RandomActionSelector.selectAction(actions);
-        }
-        return retAction;
+    	//The default select action mechanism tries to use the state model action selector. 
+    	//If the state model is not enabled, it returns a random action.
+    	return super.selectAction(state, actions);
     }
 
     @Override

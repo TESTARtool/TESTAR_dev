@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,15 +30,25 @@
 
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Scanner;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
-import org.fruit.alayer.*;
-import org.fruit.alayer.exceptions.*;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Main;
+import org.testar.monkey.Assert;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Main;
 import org.testar.OutputStructure;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.protocols.DesktopProtocol;
+import org.testar.screenshotjson.JsonUtils;
 
 /**
  * This protocol is used to test TESTAR by executing a gradle CI workflow.
@@ -47,9 +57,17 @@ import org.testar.protocols.DesktopProtocol;
  */
 public class Protocol_test_gradle_workflow_desktop_generic extends DesktopProtocol {
 
+	// The JsonUtils should create this state JSON file by default
+	// But if TESTAR loads a state without children, this file will not be created
+	boolean jsonCreated = true;
+
 	@Override
-	protected State getState(SUT system) throws StateBuildException{
+	protected State getState(SUT system) throws StateBuildException {
 		State state = super.getState(system);
+
+		// Creating a JSON file with information about widgets and their location on the screenshot:
+		if(settings.get(ConfigTags.Mode) == Modes.Generate && settings.get(ConfigTags.CreateWidgetInfoJsonFile))
+			jsonCreated = JsonUtils.createWidgetInfoJsonFile(state);
 
 		// DEBUG: That widgets have screen bounds in the GUI of the remote server
 		for(Widget w : state) {
@@ -64,7 +82,7 @@ public class Protocol_test_gradle_workflow_desktop_generic extends DesktopProtoc
 	}
 
 	@Override
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.
@@ -85,6 +103,94 @@ public class Protocol_test_gradle_workflow_desktop_generic extends DesktopProtoc
 
 		//return the set of derived actions
 		return actions;
+	}
+
+	/**
+	 * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
+	 *
+	 * super.postSequenceProcessing() is adding test verdict into the HTML sequence report
+	 */
+	@Override
+	protected void postSequenceProcessing() {
+		// Verify that OnlySaveFaultySequences works correctly with OK and failure sequences
+		File outputSequencesFolder = null;
+		try {
+			outputSequencesFolder = new File(OutputStructure.sequencesOutputDir).getCanonicalFile();
+		} catch(IOException e) { e.printStackTrace(); }
+
+		// If OnlySaveFaultySequences enabled and sequence verdict is OK, sequence folder must be empty
+		if(settings().get(ConfigTags.OnlySaveFaultySequences) && (getFinalVerdict()).severity() == Verdict.OK.severity()) {
+			Assert.isTrue(folderIsEmpty(outputSequencesFolder.toPath()), "TESTAR output sequences is empty because verdict is OK and OnlySaveFaultySequences is enabled");
+		}
+		// Else, if OnlySaveFaultySequences enabled and sequence verdict is a failure,
+		// Or if OnlySaveFaultySequences disabled,
+		// sequence folder must contains a .testar file
+		else {
+			Assert.isTrue(!folderIsEmpty(outputSequencesFolder.toPath()), "TESTAR output sequences is not empty");
+		}
+
+		// Verify the JsonUtils created a JSON State file
+		if(jsonCreated) {
+			File screenshotsFolder = null;
+			try {
+				screenshotsFolder = new File(OutputStructure.screenshotsOutputDir).getCanonicalFile();
+				File[] subdirectories = screenshotsFolder.listFiles(File::isDirectory);
+				Assert.isTrue(subdirectories.length > 0, "TESTAR screenshotsFolder did not contains a screenshot sequence directory");
+
+				File[] jsonFileList = subdirectories[0].listFiles((dir, name) -> name.endsWith(".json"));
+				if (jsonFileList != null) {
+					Arrays.stream(jsonFileList).forEach(file -> System.out.println(file.getName()));
+				}
+				Assert.isTrue(jsonFileList.length > 0, "TESTAR screenshotsFolder did not create a JSON file using JsonUtils feature");
+			} catch(IOException e) {
+				Assert.isTrue(screenshotsFolder != null, "TESTAR screenshotsFolder did not exists");
+			}
+		}
+
+		super.postSequenceProcessing(); // Finish Reports
+
+		// Verify html and txt report files were created
+		File htmlReportFile = new File(reportManager.getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".html"));
+		File txtReportFile = new File(reportManager.getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".txt"));
+		System.out.println("htmlReportFile: " + htmlReportFile.getPath());
+		System.out.println("txtReportFile: " + txtReportFile.getPath());
+		Assert.isTrue(htmlReportFile.exists());
+		Assert.isTrue(txtReportFile.exists());
+
+		// Verify report information
+		Assert.isTrue(fileContains("<h1>TESTAR execution sequence report for sequence 1</h1>", htmlReportFile));
+		Assert.isTrue(fileContains("TESTAR execution sequence report for sequence 1", txtReportFile));
+
+		Assert.isTrue(fileContains("<h2>Test verdict for this sequence:", htmlReportFile));
+		Assert.isTrue(fileContains("Test verdict for this sequence:", txtReportFile));
+	}
+
+	private boolean folderIsEmpty(Path path) {
+		if (Files.isDirectory(path)) {
+			try (DirectoryStream<Path> directory = Files.newDirectoryStream(path)) {
+				return !directory.iterator().hasNext();
+			} catch (IOException e) {
+				return false;
+			}
+		}
+		return false;
+	}
+
+	private boolean fileContains(String searchText, File file) {
+		try (Scanner scanner = new Scanner(file)) {
+			// Read the content of the file line by line
+			while (scanner.hasNextLine()) {
+				String line = scanner.nextLine();
+
+				// Check if the line contains the specific text
+				if (line.contains(searchText)) {
+					return true;
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2021 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2021 - 2023 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,28 +28,28 @@
  *
  */
 
-import es.upv.staq.testar.NativeLinker;
 import org.apache.commons.io.FileUtils;
-import org.fruit.Assert;
-import org.fruit.alayer.*;
-import org.fruit.alayer.actions.*;
-import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.webdriver.*;
-import org.fruit.alayer.webdriver.enums.WdRoles;
-import org.fruit.alayer.webdriver.enums.WdTags;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Main;
-import org.fruit.monkey.Settings;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.StdActionCompiler;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.monkey.Assert;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Main;
+import org.testar.settings.Settings;
 import org.testar.OutputStructure;
+import org.testar.managers.InputDataManager;
 import org.testar.protocols.WebdriverProtocol;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.*;
 
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
-import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
-import static org.fruit.alayer.webdriver.Constants.scrollThick;
+import static org.testar.monkey.alayer.Tags.Blocked;
+import static org.testar.monkey.alayer.Tags.Enabled;
+import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
+import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 /**
  * This protocol is used to test TESTAR by executing a gradle CI workflow.
@@ -110,7 +110,7 @@ public class Protocol_test_gradle_workflow_webdriver_replay extends WebdriverPro
 
             // type into text boxes
             if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-                actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+                actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
             }
 
             // left clicks, but ignore links outside domain
@@ -125,40 +125,40 @@ public class Protocol_test_gradle_workflow_webdriver_replay extends WebdriverPro
     }
 
     @Override
-    protected boolean isClickable(Widget widget) {
-        Role role = widget.get(Tags.Role, Roles.Widget);
-        if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
-            // Input type are special...
-            if (role.equals(WdRoles.WdINPUT)) {
-                String type = ((WdWidget) widget).element.type;
-                return WdRoles.clickableInputTypes().contains(type);
-            }
-            return true;
-        }
+    protected void postSequenceProcessing() {
+    	super.postSequenceProcessing(); // Finish Reports
 
-        WdElement element = ((WdWidget) widget).element;
-        if (element.isClickable) {
-            return true;
-        }
+    	// Verify html and txt report files were created
+    	File htmlReportFile = new File(reportManager.getReportFileName().concat("_" + getReplayVerdict().verdictSeverityTitle() + ".html"));
+    	File txtReportFile = new File(reportManager.getReportFileName().concat("_" + getReplayVerdict().verdictSeverityTitle() + ".txt"));
+    	System.out.println("htmlReportFile: " + htmlReportFile.getPath());
+    	System.out.println("txtReportFile: " + txtReportFile.getPath());
+    	Assert.isTrue(htmlReportFile.exists());
+    	Assert.isTrue(txtReportFile.exists());
 
-        Set<String> clickSet = new HashSet<>(clickableClasses);
-        clickSet.retainAll(element.cssClasses);
-        return clickSet.size() > 0;
+    	// Verify report information
+    	Assert.isTrue(fileContains("<h1>TESTAR replay sequence report", htmlReportFile));
+    	Assert.isTrue(fileContains("TESTAR replay sequence report", txtReportFile));
+
+    	Assert.isTrue(fileContains("<h2>Test verdict for this sequence:", htmlReportFile));
+    	Assert.isTrue(fileContains("Test verdict for this sequence:", txtReportFile));
     }
 
-    @Override
-    protected boolean isTypeable(Widget widget) {
-        Role role = widget.get(Tags.Role, Roles.Widget);
-        if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
-            // Input type are special...
-            if (role.equals(WdRoles.WdINPUT)) {
-                String type = ((WdWidget) widget).element.type;
-                return WdRoles.typeableInputTypes().contains(type);
-            }
-            return true;
-        }
+    private boolean fileContains(String searchText, File file) {
+    	try (Scanner scanner = new Scanner(file)) {
+    		// Read the content of the file line by line
+    		while (scanner.hasNextLine()) {
+    			String line = scanner.nextLine();
 
-        return false;
+    			// Check if the line contains the specific text
+    			if (line.contains(searchText)) {
+    				return true;
+    			}
+    		}
+    	} catch (FileNotFoundException e) {
+    		e.printStackTrace();
+    	}
+    	return false;
     }
 
     @Override

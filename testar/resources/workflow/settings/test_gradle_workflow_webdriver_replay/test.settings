@@ -27,7 +27,7 @@ Mode = Replay
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "chromedriver.exe" "https://www.ou.nl"
+SUTConnectorValue = "C:\\SeleniumWebDrivers\\ChromeDriver\\chromedriver.exe" "https://www.ou.nl"
 
 #################################################################
 # Sequences
@@ -39,12 +39,12 @@ Sequences = 1
 SequenceLength = 1
 
 #################################################################
-# Oracles based on suspicious titles
+# Oracles based on suspicious tag values
 #
 # Regular expression
 #################################################################
 
-SuspiciousTitles = 
+SuspiciousTags = 
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -89,7 +89,7 @@ ClickFilter =
 # but that you do not want to test.
 #################################################################
 
-SUTProcesses =
+ProcessesToKillDuringTest =
 
 #################################################################
 # Protocolclass
@@ -111,11 +111,20 @@ AbstractStateAttributes = WebWidgetId
 # WebDriver features
 #################################################################
 ClickableClasses = 
+TypeableClasses = 
 DeniedExtensions = pdf;jpg;png
 DomainsAllowed = 
 FollowLinks = false
 BrowserFullScreen = true
 SwitchNewTabs = false
+
+#################################################################
+# WebDriver Browser Console Oracles
+#################################################################
+WebConsoleErrorOracle = false
+WebConsoleErrorPattern = .*.*
+WebConsoleWarningOracle = false
+WebConsoleWarningPattern = .*.*
 
 #################################################################
 # Override display scale
@@ -133,19 +142,22 @@ SwitchNewTabs = false
 OverrideWebDriverDisplayScale = 
 
 #################################################################
+# Set the types of reports to create
+#################################################################
+ReportInHTML = true
+ReportInPlainText = true
+
+#################################################################
 # Other more advanced settings
 #################################################################
 
-ProcessesToKillDuringTest =
 OutputDir = ./output
 PathToReplaySequence = ./output/temp
 TempDir = ./output/temp
 UseRecordedActionDurationAndWaitTimeDuringReplay = false
 ForceForeground = true
 LogLevel = 1
-ExecuteActions = true
 FaultThreshold = 1.0E-9
-DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
 ActionDuration = 0.5
@@ -153,16 +165,12 @@ ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
-ShowSettingsAfterTest = true
 TimeToWaitAfterAction = 0.5
 StartupTime = 2.0
-DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true
 CopyFromTo =
 VisualizeActions = false
-VisualizeSelectedAction = true
-TestGenerator = random
 MaxReward = 9999999
 Discount = .95
 RefreshSpyCanvas = 1.0

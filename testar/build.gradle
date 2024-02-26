@@ -3,6 +3,7 @@ plugins {
 }
 
 apply plugin: 'application'
+apply from: 'workflow.gradle'
 
 sourceSets {
     main {
@@ -47,14 +48,6 @@ task runTestar(type: Exec) {
 	}
 }
 
-/*  There's error on Linux, crashing the JVM on unregistering the NativeHook
-    For now, use the old version, 2.1.1 should fix the issue
-    https://github.com/kwhat/jnativehook/issues/168
- */
-def jnativehook = System.getProperty("os.name").toLowerCase() == "linux"
-        ? 'com.1stleg:jnativehook:2.0.2'
-        : 'com.1stleg:jnativehook:2.1.0'
-
 task customZipDistribution(type: Zip) {
 	doFirst{
 		new File("${project.buildDir}/install/testar/bin/settings","desktop_generic.sse").text=""
@@ -65,24 +58,56 @@ task customZipDistribution(type: Zip) {
     include '*'
    	include '*/**' //include subdirectories
 
-   	archiveName 'testarDistribution.zip'
-   	destinationDir(file('target/install'))
+   	archiveFileName.set 'testarDistribution.zip'
+   	getDestinationDirectory().set(file('target/install'))
+}
+
+/**
+ * Prepare folder structure to run debugging mode from IDE
+ */
+task debuggingDistribution(type: Exec, dependsOn:'debugFiles') {
+    group = 'custom_testar'
+    description ='debuggingDistribution'
+
+    workingDir '.'
+    commandLine 'cmd', '/c', 'dir'
+}
+
+task debugFiles(type: Copy, dependsOn:'build') {
+    from 'target/scripts/.'
+    into '.'
+}
+
+task cleanDebugging(type: Exec, dependsOn:'deleteDebugging') {
+    group = 'custom_testar'
+    description ='cleanDebugging'
+
+    workingDir '.'
+    commandLine 'cmd', '/c', 'dir'
+}
+
+task deleteDebugging(type: Delete){
+    delete 'settings'
+    delete 'suts'
+    delete 'output'
+    delete 'testar'
+    delete 'testar.bat'
+    delete 'windows.dll'
+    delete 'index.log'
 }
 
 dependencies {
     implementation project(':core')
-    implementation project(':native')
-    implementation project(':graphdb')
     implementation project(':webdriver')
     implementation project(':windows')
+    implementation project(':linux')
+    implementation project(':ios')
+    implementation project(':android')
     implementation files('./lib/jsyntaxpane-1.1.5.jar')
-    implementation files('./lib/sikulixapi.jar')
     implementation files('./lib/eye2.jar')
-    implementation files('./lib/gson-2.8.5.jar')
-    implementation jnativehook
+    // https://mvnrepository.com/artifact/com.github.kwhat/jnativehook
+    implementation group: 'com.github.kwhat', name: 'jnativehook', version: '2.2.2'
     implementation 'com.google.guava:guava:26.0-jre'
-    implementation group: 'com.jgoodies', name: 'jgoodies-common', version: '1.8.1'
-    implementation group: 'com.jgoodies', name: 'jgoodies-forms', version: '1.9.0'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
     implementation group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.30.v20200611'
     implementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.30.v20200611'
@@ -90,13 +115,13 @@ dependencies {
     implementation group: 'org.eclipse.jetty', name: 'jetty-annotations', version: '9.4.30.v20200611'
     implementation group: 'org.eclipse.jetty', name: 'apache-jsp', version: '9.4.30.v20200611'
     implementation group: 'org.eclipse.jetty', name: 'apache-jstl', version: '9.4.30.v20200611'
-    implementation group: 'commons-io', name: 'commons-io', version: '2.7'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.15.0'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.15.0'
-    implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.14.0'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
     implementation 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
+    // Use jaxb 2.3.1 to fix a Java17 issue with the version 2.3.0 included in the orientdb server dependencies
+    implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+    implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.1'
     implementation group: 'com.orientechnologies', name: 'orientdb-graphdb', version: '3.0.34'
+    implementation group: 'com.sikulix', name: 'sikulixapi', version: '2.0.5'
 }
 
 task prepareSettings(type: Copy) {
@@ -173,6 +198,7 @@ startScripts.dependsOn {
 //running testar requires the distribution to be installed.
 runTestar.dependsOn(installDist)
 customZipDistribution.dependsOn(installDist)
+debuggingDistribution.dependsOn(build)
 
 /**
  * Build TESTAR using Visual Studio Tools to create a windows.dll
@@ -195,353 +221,4 @@ task buildWindows(type: Exec) {
 }
 buildWindows.dependsOn classes
 
-mainClassName='org.fruit.monkey.Main'
-
-
-/**
- * Tasks to test TESTAR using gradle
- */
- 
-task init_workflow_test(type: Copy) {
-    group = 'test_testar_workflow'
-    description ='init_workflow_test'
-    from 'resources/workflow/settings'
-    into 'target/scripts/settings'
-}
-
-// Default COMMAND_LINE execution to run Notepad, execute 2 actions and verdict should be OK
-task runTestDesktopGenericCommandLineOk(type: Exec, dependsOn:'installDist') {
-	// Read command line output
-    standardOutput = new ByteArrayOutputStream()
-    group = 'test_testar_workflow'
-    description ='runTestDesktopGenericCommandLineOk'
-    workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_ok" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2'
-    doLast {
-        String output = standardOutput.toString()
-
-		// Check that output contains No problem detected. message to verify the correct execution
-        if(output.readLines().any{line->line.contains("No problem detected.")}) {
-            println "\n${output} \nTESTAR has been executed sucessfully"
-        } else {
-            throw new GradleException("\n${output} \nERROR: Executing TESTAR")
-        }
-    }
-}
-
-// Default COMMAND_LINE execution to run Notepad
-// Test TagsForSuspiciousOracle feature using the UIATags.UIAAutomationId
-// Force TESTAR to find a Suspicious Title (MenuBar widget)
-// And verify it reading output command line
-task runTestDesktopGenericCommandLineSuspiciousTitle(type: Exec, dependsOn:'installDist') {
-	// Read command line output
-    standardOutput = new ByteArrayOutputStream()
-    group = 'test_testar_workflow'
-    description ='runTestDesktopGenericCommandLineSuspiciousTitle'
-    workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_command_and_suspicious" TagsForSuspiciousOracle="NotExist;UIAAutomationId" SuspiciousTitles=".*MenuBar.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2'
-    doLast {
-        String output = standardOutput.toString()
-
-		// Verify MenuBar UIAAutomationId has been detected
-        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'UIAAutomationId' : 'MenuBar")}) {
-            println "\n${output} \nTESTAR has successfully detected MenuBar Suspicious Title using TagsForSuspiciousOracle UIAAutomationId! "
-        } else {
-            throw new GradleException("\n${output} \nERROR: TESTAR didnt detect MenuBar Suspicious Title using TagsForSuspiciousOracle UIAAutomationId")
-        }
-    }
-}
-
-// Default COMMAND_LINE execution to run Notepad
-// Test TagsToFilter feature using the Tag.Desc
-// Then force TESTAR to navigate and find a Suspicious Title Error (Script text)
-// And verify it reading output command line
-task runTestDesktopGenericCommandLineSettingsFilterSuspiciousTitle(type: Exec, dependsOn:'installDist') {
-	// Read command line output
-    standardOutput = new ByteArrayOutputStream()
-    group = 'test_testar_workflow'
-    description ='runTestDesktopGenericCommandLineSettingsFilterSuspiciousTitle'
-    workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_command_settings_filter_and_suspicious" TagsToFilter="NotExist;Desc" ClickFilter=".*[sS]ystem.*|.*[cC]lose.*|.*[mM]inimize.*|.*[mM]aximize.*|Text Editor|File|Edit|View|Help|Word Wrap" SuspiciousTitles=".*[sS]cript.*" TimeToWaitAfterAction=2.0 ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2'
-    doLast {
-        String output = standardOutput.toString()
-
-		// Verify Script title has been detected
-        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'Title' : 'Script")}) {
-            println "\n${output} \nTESTAR has successfully filtered using TagsToFilter Desc and detected Script Suspicious Title! "
-        } else {
-            throw new GradleException("\n${output} \nERROR: TESTAR didnt filter using TagsToFilter Desc")
-        }
-    }
-}
-
-// Help task to run Notepad before start TESTAR (to connect with process or title)
-task runNotepad {
-    group = 'test_testar_workflow'
-    description ='runNotepad'
-    doFirst{
-        ext.process = new ProcessBuilder().command('cmd', '/c', 'C:\\Windows\\System32\\notepad.exe').start()
-    }
-}
-
-// Verify that TESTAR correctly connects using process name
-// To be sure, connect to process and detect Format suspicious title
-task runTestDesktopGenericProcessNameSuspiciousTitle(type: Exec, dependsOn:['installDist','runNotepad']) {
-	// Read command line output
-    standardOutput = new ByteArrayOutputStream()
-    group = 'test_testar_workflow'
-    description ='runTestDesktopGenericProcessNameSuspiciousTitle'
-    workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_process_and_suspicious" SuspiciousTitles=".*[fF]ormat.*|.*[fF]ormato.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=SUT_PROCESS_NAME SUTConnectorValue="notepad.exe" Sequences=1 SequenceLength=2'
-    doLast {
-        String output = standardOutput.toString()
-
-		// Use Format (for English and Spanish)
-        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'Title' : 'Format")}) {
-            println "\n${output} \nTESTAR has successfully connect with SUT_PROCESS_NAME and detected Format Suspicious Title! "
-            // kill notepad process
-            ext.process = new ProcessBuilder().command('cmd', '/c', 'taskkill /IM notepad.exe').start()
-        } else {
-            // kill notepad process
-            ext.process = new ProcessBuilder().command('cmd', '/c', 'taskkill /IM notepad.exe').start()
-            throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with SUT_PROCESS_NAME")
-        }
-    }
-}
-
-// Verify that TESTAR correctly connects using windows title
-// To be sure, connect with windows title and detect Format suspicious title
-task runTestDesktopGenericTitleNameSuspiciousTitle(type: Exec, dependsOn:['installDist','runNotepad']) {
-	// Read command line output
-    standardOutput = new ByteArrayOutputStream()
-    group = 'test_testar_workflow'
-    description ='runTestDesktopGenericTitleNameSuspiciousTitle'
-    workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_title_and_suspicious" SuspiciousTitles=".*[fF]ormat.*|.*[fF]ormato.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=SUT_WINDOW_TITLE SUTConnectorValue="Notepad" Sequences=1 SequenceLength=2'
-    doLast {
-        String output = standardOutput.toString()
-
-		// Use Format (for English and Spanish)
-        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'Title' : 'Format")}) {
-            println "\n${output} \nTESTAR has successfully connect with SUT_WINDOW_TITLE and detected Format Suspicious Title! "
-            // kill notepad process
-            ext.process = new ProcessBuilder().command('cmd', '/c', 'taskkill /IM notepad.exe').start()
-        } else {
-            // kill notepad process
-            ext.process = new ProcessBuilder().command('cmd', '/c', 'taskkill /IM notepad.exe').start()
-            throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with SUT_WINDOW_TITLE")
-        }
-    }
-}
-
-// Download OrientDB 3.0.34 from the official wep page
-task downloadOrientDB(type: Download, dependsOn: installDist) {
-    src 'https://s3.us-east-2.amazonaws.com/orientdb3/releases/3.0.34/orientdb-3.0.34.zip'
-    dest 'target/install/testar/bin'
-    overwrite false
-}
-// Verify that we downloaded the correct OrientDB file
-task verifyOrientDB(type: Verify, dependsOn: downloadOrientDB) {
-    src new File(downloadOrientDB.dest, 'orientdb-3.0.34.zip')
-    algorithm 'MD5'
-    checksum 'a0619e5522e7d849d4f1067bf08e3857'
-}
-// Extract OrientDB binary files
-task downloadAndUnzipOrientDB(type: Copy, dependsOn: verifyOrientDB) {
-    group = 'test_testar_workflow'
-    description ='downloadAndUnzipOrientDB'
-    
-    // Disable for non-Windows environments (Linux, osx)
-    if (!System.getProperty('os.name').toLowerCase().contains('windows')) {
-        return;
-    }
-    
-    from zipTree(new File(downloadOrientDB.dest, 'orientdb-3.0.34.zip'))
-    into downloadOrientDB.dest
-}
-// Execute a command line to create a testar OrientDB database with admin admin credentials
-task createDatabaseOrientDB(type: Exec, dependsOn: downloadAndUnzipOrientDB){
-    group = 'test_testar_workflow'
-    description ='createDatabaseOrientDB'
-    
-    // Disable for non-Windows environments (Linux, osx)
-    if (!System.getProperty('os.name').toLowerCase().contains('windows')) {
-        return;
-    }
-    // Read command line output
-    standardOutput = new ByteArrayOutputStream()
-    errorOutput = new ByteArrayOutputStream()
-    workingDir 'target/install/testar/bin/orientdb-3.0.34/bin'
-    commandLine 'cmd', '/c', 'console.bat CREATE DATABASE plocal:../databases/testar admin admin'
-    // Ignore errors creating the database because we check the output buffer message
-    ignoreExitValue true
-    doLast {
-        String output = standardOutput.toString()
-        
-        // If error creating database because already exists is ok
-        if (execResult.getExitValue()==1 && errorOutput.toString().contains("Cannot create new database 'testar' because it already exists")) {
-            println "\n${output} \ntestar OrientDB database already exists"
-        }
-        // Check if testar database created sucessfully
-        else if(output.readLines().any{line->line.contains("Database created successfully.")}) {
-            println "\n${output} \ntestar OrientDB database created successfully"
-        } else {
-            throw new GradleException("\n${output} \nERROR: Creating testar OrientDB database")
-        }
-    }
-}
-// Verify that TESTAR infers a State Model with Notepad
-// Filter lot of actions and detect Font action inference
-task runTestDesktopGenericStateModel(type: Exec, dependsOn: createDatabaseOrientDB) {
-    // Read command line output
-    standardOutput = new ByteArrayOutputStream()
-    group = 'test_testar_workflow'
-    description ='runTestDesktopGenericStateModel'
-    workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic_statemodel AlwaysCompile=true ApplicationName="notepad_state_model" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2 TimeToWaitAfterAction=2.0 ClickFilter=".*[sS]ystem.*|.*[cC]lose.*|.*[mM]inimize.*|.*[mM]aximize.*|Text Editor|File|Edit|View|Help|Word Wrap" StateModelEnabled=true DataStoreDB=testar DataStoreUser=admin DataStorePassword=admin'
-    doLast {
-        String output = standardOutput.toString()
-
-        // Check that output contains 3 abstract states in the State Model inference
-        if(output.readLines().any{line->line.contains("3 abstract states in the model")}) {
-            println "\n${output} \nTESTAR State Model has been inferred sucessfully"
-        } else {
-            throw new GradleException("\n${output} \nERROR: Inferring TESTAR State Model")
-        }
-    }
-}
-
-// Verify that TESTAR can custom the widget and actions identifiers 
-// Infer a State Model modifying the state and action identifiers
-task runTestDesktopGenericStateModelCustomAbstraction(type: Exec, dependsOn: createDatabaseOrientDB) {
-    // Read command line output
-    standardOutput = new ByteArrayOutputStream()
-    group = 'test_testar_workflow'
-    description ='runTestDesktopGenericStateModelCustomAbstraction'
-    workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic_custom_abstraction AlwaysCompile=true ApplicationName="notepad_state_model_custom" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=1'
-    doLast {
-        String output = standardOutput.toString()
-
-		// Check that output contains 0 unvisited actions left
-        if(output.contains("0 unvisited actions left")) {
-            println "\n${output} \nTESTAR Action AbstractIDCustom has been customized sucessfully"
-        } else {
-            throw new GradleException("\n${output} \nERROR: with Action AbstractIDCustom custom identifier")
-        }
-    }
-}
-
-// Download last win32 chromedriver 
-task downloadChromedriver(type: Download, dependsOn: installDist) {
-    group = 'test_testar_workflow'
-    description ='downloadChromedriver'
-    
-    // Disable for non-Windows environments (Linux, osx)
-    if (!System.getProperty('os.name').toLowerCase().contains('windows')) {
-        return;
-    }
-    
-    ProcessBuilder builder = new ProcessBuilder().command('cmd', '/c', 'curl https://chromedriver.storage.googleapis.com/LATEST_RELEASE');
-    Process process = builder.start();
-    process.waitFor()
-    
-    src 'https://chromedriver.storage.googleapis.com/' + process.text + '/chromedriver_win32.zip'
-    dest 'target/install/testar/bin'
-    overwrite false
-}
-
-// Extract Chromedriver from downloaded file
-task downloadAndUnzipChromedriver(type: Copy, dependsOn: downloadChromedriver) {
-    group = 'test_testar_workflow'
-    description ='downloadAndUnzipChromedriver'
-    
-    // Disable for non-Windows environments (Linux, osx)
-    if (!System.getProperty('os.name').toLowerCase().contains('windows')) {
-        return;
-    }
-    
-    from zipTree(new File(downloadChromedriver.dest, 'chromedriver_win32.zip'))
-    into downloadChromedriver.dest
-}
-
-// Verify that TESTAR correctly executes chromedriver
-// To be sure, connect to ou.nl and detect Onderwijs suspicious title
-task runTestWebdriverSuspiciousTitle(type: Exec, dependsOn: downloadAndUnzipChromedriver) {
-	// Read command line output
-    standardOutput = new ByteArrayOutputStream()
-    group = 'test_testar_workflow'
-    description ='runTestWebdriverSuspiciousTitle'
-    workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_generic AlwaysCompile=true ApplicationName="webdriver_and_suspicious" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTitles=".*[oO]nderwijs.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
-    doLast {
-        String output = standardOutput.toString()
-
-		// Use Onderwijs
-        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'ValuePattern' : 'https://www.ou.nl/onderwijs")}) {
-            println "\n${output} \nTESTAR has successfully connect with WEB_DRIVER and detected Onderwijs Suspicious Title! "
-        } else {
-            throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with WEB_DRIVER")
-        }
-    }
-}
-
-// Connect to para.testar.org and make a login
-task runTestWebdriverParabankLogin(type: Exec, dependsOn: downloadAndUnzipChromedriver) {
-	// Read command line output
-    standardOutput = new ByteArrayOutputStream()
-    group = 'test_testar_workflow'
-    description ='runTestWebdriverParabankLogin'
-    workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_parabank AlwaysCompile=true ApplicationName="webdriver_login" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=1 ProtocolSpecificSetting_1=john ProtocolSpecificSetting_2=demo'
-    doLast {
-        String output = standardOutput.toString()
-
-		// Check that output contains No problem detected. message to verify the correct execution
-        if(output.readLines().any{line->line.contains("No problem detected.")}) {
-            println "\n${output} \nTESTAR has been executed sucessfully"
-        } else {
-            throw new GradleException("\n${output} \nERROR: Executing TESTAR")
-        }
-    }
-}
-
-// Verify that TESTAR correctly replays a sequence
-task runTestWebdriverCorrectReplay(type: Exec, dependsOn: downloadAndUnzipChromedriver) {
-    // Read command line output
-    standardOutput = new ByteArrayOutputStream()
-    group = 'test_testar_workflow'
-    description ='runTestWebdriverCorrectReplay'
-    workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_replay" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""chromedriver.exe"" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_replayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/p_p_ptwo_ptwo_pthree.testar'
-    doLast {
-        String output = standardOutput.toString()
-
-        // Check that output contains Sequence successfully replayed message to verify the correct replay execution
-        if(output.readLines().any{line->line.contains("Sequence successfully replayed")}) {
-            println "\n${output} \nTESTAR sequence has been sucessfully replayed"
-        } else {
-            throw new GradleException("\n${output} \nERROR: Executing TESTAR Replay mode")
-        }
-    }
-}
-
-// Verify that TESTAR correctly detects a not replayable sequence
-task runTestWebdriverUnreplayable(type: Exec, dependsOn: downloadAndUnzipChromedriver) {
-    // Read command line output
-    standardOutput = new ByteArrayOutputStream()
-    group = 'test_testar_workflow'
-    description ='runTestWebdriverUnreplayable'
-    workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_unreplayable" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""chromedriver.exe"" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_unreplayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/p_p_ptwo_ptwo_pthree.testar'
-    doLast {
-        String output = standardOutput.toString()
-
-        // Check that TESTAR detects not replayable button
-        if(output.readLines().any{line->line.contains("Left Click at 'ParisThree' of the replayed sequence can not been replayed")}) {
-            println "\n${output} \nTESTAR has sucessfully detected a not replayable sequence"
-        } else {
-            throw new GradleException("\n${output} \nERROR: Detecting not replayable button with TESTAR Replay mode")
-        }
-    }
-}
+mainClassName='org.testar.monkey.Main'

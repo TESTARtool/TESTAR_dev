@@ -35,12 +35,12 @@ Sequences = 1
 SequenceLength = 2
 
 #################################################################
-# Oracles based on suspicious titles
+# Oracles based on suspicious tag values
 #
 # Regular expression
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+SuspiciousTags = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -85,7 +85,7 @@ ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir
 # but that you do not want to test.
 #################################################################
 
-SUTProcesses =
+ProcessesToKillDuringTest =
 
 #################################################################
 # Protocolclass
@@ -102,7 +102,7 @@ StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer = localhost
-DataStoreDirectory = orientdb-3.0.34\\databases
+DataStoreDirectory = orientdb-community-3.0.34\\databases
 DataStoreDB = testar
 DataStoreUser = admin
 DataStorePassword = admin
@@ -124,16 +124,13 @@ AbstractStateAttributes = WidgetControlType
 # Other more advanced settings
 #################################################################
 
-ProcessesToKillDuringTest =
 OutputDir = ./output
 PathToReplaySequence = ./output/temp
 TempDir = ./output/temp
 UseRecordedActionDurationAndWaitTimeDuringReplay = false
 ForceForeground = true
 LogLevel = 1
-ExecuteActions = true
 FaultThreshold = 0.000000001
-DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
 ActionDuration = 0.5
@@ -141,15 +138,11 @@ ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
-ShowSettingsAfterTest = true
 TimeToWaitAfterAction = 0.5
 StartupTime = 20.0
-DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true
 CopyFromTo =
 VisualizeActions = false
-VisualizeSelectedAction = true
-TestGenerator = random
 MaxReward = 9999999
 Discount = .95

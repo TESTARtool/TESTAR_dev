@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,42 +28,28 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-
 package org.testar.protocols;
 
-import nl.ou.testar.DerivedActions;
-import nl.ou.testar.HtmlReporting.Reporting;
-import nl.ou.testar.RandomActionSelector;
-import org.fruit.Drag;
-import org.fruit.Environment;
-import org.fruit.alayer.*;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.monkey.ConfigTags;
-import org.testar.OutputStructure;
-import java.io.File;
+import org.testar.DerivedActions;
+import org.testar.managers.InputDataManager;
+import org.testar.monkey.Drag;
+import org.testar.monkey.Environment;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.StdActionCompiler;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.exceptions.StateBuildException;
+
 import java.util.HashSet;
 import java.util.Set;
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
+
+import static org.testar.monkey.alayer.Tags.Blocked;
+import static org.testar.monkey.alayer.Tags.Enabled;
 
 public class DesktopProtocol extends GenericUtilsProtocol {
     //Attributes for adding slide actions
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
-    protected Reporting htmlReport;
-    protected State latestState;
-
-    /**
-     * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
-     */
-    @Override
-    protected void preSequencePreparations() {
-        //initializing the HTML sequence report:
-        htmlReport = getReporter();
-    }
     
     /**
      * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
@@ -90,14 +76,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
      */
     @Override
     protected State getState(SUT system) throws StateBuildException {
-        //Spy mode didn't use the html report
-    	if(settings.get(ConfigTags.Mode) == Modes.Spy)
-        	return super.getState(system);
-    	
-    	latestState = super.getState(system);
-        //adding state to the HTML sequence report:
-        htmlReport.addState(latestState);
-        return latestState;
+    	return super.getState(system);
     }
 
     /**
@@ -117,97 +96,6 @@ public class DesktopProtocol extends GenericUtilsProtocol {
         //the foreground. You should add all other actions here yourself.
         // These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
         return super.deriveActions(system,state);
-    }
-
-    /**
-     * Overwriting to add HTML report writing into it
-     *
-     * @param state
-     * @param actions
-     * @return
-     */
-    @Override
-    protected Action preSelectAction(State state, Set<Action> actions){
-        // adding available actions into the HTML report:
-        htmlReport.addActions(actions);
-        return(super.preSelectAction(state, actions));
-    }
-
-    /**
-     * Select one of the available actions (e.g. at random)
-     * @param state the SUT's current state
-     * @param actions the set of derived actions
-     * @return  the selected action (non-null!)
-     */
-    @Override
-    protected Action selectAction(State state, Set<Action> actions){
-        //Call the preSelectAction method from the DefaultProtocol so that, if necessary,
-        //unwanted processes are killed and SUT is put into foreground.
-        Action retAction = preSelectAction(state, actions);
-        if (retAction == null) {
-            //if no preSelected actions are needed, then implement your own strategy
-            retAction = RandomActionSelector.selectAction(actions);
-        }
-        return retAction;
-    }
-
-    /**
-     * Execute the selected action.
-     * @param system the SUT
-     * @param state the SUT's current state
-     * @param action the action to execute
-     * @return whether or not the execution succeeded
-     */
-    @Override
-    protected boolean executeAction(SUT system, State state, Action action){
-        // adding the action that is going to be executed into HTML report:
-        htmlReport.addSelectedAction(state, action);
-        return super.executeAction(system, state, action);
-    }
-    
-    /**
-     * Replay the saved action
-     */
-    @Override
-    protected boolean replayAction(SUT system, State state, Action action, double actionWaitTime, double actionDuration){
-        // adding the action that is going to be executed into HTML report:
-        htmlReport.addSelectedAction(state, action);
-        return super.replayAction(system, state, action, actionWaitTime, actionDuration);
-    }
-
-    /**
-     * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
-     */
-    @Override
-    protected void postSequenceProcessing() {
-        String status = "";
-        String statusInfo = "";
-
-        if(mode() == Modes.Replay) {
-            htmlReport.addTestVerdict(getReplayVerdict().join(processVerdict));
-            status = (getReplayVerdict().join(processVerdict)).verdictSeverityTitle();
-            statusInfo = (getReplayVerdict().join(processVerdict)).info();
-        }
-        else {
-            htmlReport.addTestVerdict(getVerdict(latestState).join(processVerdict));
-            status = (getVerdict(latestState).join(processVerdict)).verdictSeverityTitle();
-            statusInfo = (getVerdict(latestState).join(processVerdict)).info();
-        }
-
-        String sequencesPath = getGeneratedSequenceName();
-        try {
-            sequencesPath = new File(getGeneratedSequenceName()).getCanonicalPath();
-        }catch (Exception e) {}
-
-        statusInfo = statusInfo.replace("\n"+Verdict.OK.info(), "");
-
-        //Timestamp(generated by logger) SUTname Mode SequenceFileObject Status "StatusInfo"
-        INDEXLOG.info(OutputStructure.executedSUTname
-                + " " + settings.get(ConfigTags.Mode, mode())
-                + " " + sequencesPath
-                + " " + status + " \"" + statusInfo + "\"" );
-
-        htmlReport.close();
     }
 
     /**
@@ -282,7 +170,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
             //CAPS_LOCK + SHIFT + Click clickfilter functionality.
             if (blackListed(w)) {
             	if(isTypeable(w)) {
-            		derived.addFilteredAction(ac.clickTypeInto(w, this.getRandomText(w), true));
+            		derived.addFilteredAction(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
             	} else {
             		derived.addFilteredAction(ac.leftClickAt(w));
             	}
@@ -298,11 +186,11 @@ public class DesktopProtocol extends GenericUtilsProtocol {
                 if(isTypeable(w)){
                     if(isUnfiltered(w) || whiteListed(w)) {
                         //Create a type action with the Action Compiler, and add it to the set of derived actions
-                        derived.addAvailableAction(ac.clickTypeInto(w, this.getRandomText(w), true));
+                        derived.addAvailableAction(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
                         return derived;
                     }else{
                         // Filtered and not white listed:
-                        derived.addFilteredAction(ac.clickTypeInto(w, this.getRandomText(w), true));
+                        derived.addFilteredAction(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
                         return derived;
                     }
                 }
@@ -366,7 +254,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
             //CAPS_LOCK + SHIFT + Click clickfilter functionality.
             if (blackListed(w)) {
             	if(isTypeable(w)) {
-            		derived.addFilteredAction(ac.clickTypeInto(w, this.getRandomText(w), true));
+            		derived.addFilteredAction(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
             	} else {
             		derived.addFilteredAction(ac.leftClickAt(w));
             	}
@@ -382,10 +270,10 @@ public class DesktopProtocol extends GenericUtilsProtocol {
                 if(isTypeable(w)){
                     if(isUnfiltered(w) || whiteListed(w)) {
                         //Create a type action with the Action Compiler, and add it to the set of derived actions
-                        derived.addAvailableAction(ac.clickTypeInto(w, this.getRandomText(w), true));
+                        derived.addAvailableAction(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
                     }else{
                         // Filtered and not white listed:
-                        derived.addFilteredAction(ac.clickTypeInto(w, this.getRandomText(w), true));
+                        derived.addFilteredAction(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
                     }
                 }
 
@@ -465,7 +353,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
                     // We want to create actions that consist of typing into them
                     if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
                         //Create a type action with the Action Compiler, and add it to the set of derived actions
-                        actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+                        actions.add(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
                     }
                     //Add sliding actions (like scroll, drag and drop) to the derived actions
                     //method defined below.
@@ -524,7 +412,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
                     // We want to create actions that consist of typing into them
                     if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
                         //Create a type action with the Action Compiler, and add it to the set of derived actions
-                        actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+                        actions.add(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
                     }
                     //Add sliding actions (like scroll, drag and drop) to the derived actions
                     //method defined below.
