@@ -98,7 +98,7 @@ jobs:
         name: runTestDesktopGenericStateModel-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_state_model
     
-    - name: Run desktop_generic doing a customization in the AbstractIDCustom identifer
+    - name: Run desktop_generic doing a customization in the AbstractID identifer
       run: ./gradlew runTestDesktopGenericStateModelCustomAbstraction
     - name: Save runTestDesktopGenericStateModelCustomAbstraction HTML report artifact
       uses: actions/upload-artifact@v2.2.4
@@ -201,7 +201,7 @@ jobs:
     - name: Run desktop_generic with OrientDB to infer a TESTAR State Model
       run: ./gradlew runTestDesktopGenericStateModel
     
-    - name: Run desktop_generic doing a customization in the AbstractIDCustom identifer
+    - name: Run desktop_generic doing a customization in the AbstractID identifer
       run: ./gradlew runTestDesktopGenericStateModelCustomAbstraction
     
     - name: Run webdriver protocol and detect SuspiciousTag
@@ -269,7 +269,7 @@ jobs:
     - name: Run desktop_generic with OrientDB to infer a TESTAR State Model
       run: ./gradlew runTestDesktopGenericStateModel
     
-    - name: Run desktop_generic doing a customization in the AbstractIDCustom identifer
+    - name: Run desktop_generic doing a customization in the AbstractID identifer
       run: ./gradlew runTestDesktopGenericStateModelCustomAbstraction
     
     - name: Run webdriver protocol and detect SuspiciousTag

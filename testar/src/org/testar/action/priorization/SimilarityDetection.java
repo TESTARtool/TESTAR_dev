@@ -43,7 +43,7 @@ import org.testar.monkey.alayer.Tags;
  * Sample class that tries to detect similar Actions between previous and current State,
  * to decrease the possibilities to select a static widget and previous executed Action.
  * 
- * Actions have an OriginWidget associated, and Widgets have an AbtractIDCustom property
+ * Actions have an OriginWidget associated, and Widgets have an AbtractID property
  * that allows TESTAR to identify web elements based on Abstract Properties.
  * Example: WebWidgetId (test.settings -> AbstractStateAttributes)
  * 
@@ -75,7 +75,7 @@ public class SimilarityDetection implements IActionSelector, IActionExecutor {
 
 	@Override
 	public Action selectAction(State state, Set<Action> actions) {
-		// Given the current set of Actions of the State take the OriginWidget AbstractCustomID,
+		// Given the current set of Actions of the State take the OriginWidget AbstractID,
 		// and compare with the previous existing Actions/OriginWidget to increase the similarity value.
 		// Minimal similarity value 1, Maximal similarity is given in the constructor. 
 		// Higher similarity value means that Action/OriginWidget remains more time static in the State.
@@ -91,7 +91,7 @@ public class SimilarityDetection implements IActionSelector, IActionExecutor {
 	}
 
 	/**
-	 * Given the current set of Actions of the State take the OriginWidget AbstractCustomID,
+	 * Given the current set of Actions of the State take the OriginWidget AbstractID,
 	 * and compare with the previous existing Actions/OriginWidget to increase the similarity value.
 	 * Minimal similarity value 1, Maximal similarity is given in the constructor.
 	 * 
