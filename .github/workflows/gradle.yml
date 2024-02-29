@@ -1,7 +1,7 @@
 # This workflow will build a Java project with Gradle
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
 
-name: TESTAR CI - build with Gradle
+name: Gradle CI tests
 
 on:
   push:
@@ -37,9 +37,9 @@ jobs:
       run: ./gradlew build
 
     - name: Save JUnit test results
-      uses: actions/upload-artifact@v2.2.4
+      uses: actions/upload-artifact@v4
       with:
-        name: saveJunitTests-artifact
+        name: Java${{ matrix.java }}-saveJunitTests-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/reports/tests
 
     - name: Prepare installed distribution of TESTAR with Gradle
@@ -51,7 +51,7 @@ jobs:
     - name: Run desktop_generic protocol with TESTAR using COMMAND_LINE
       run: ./gradlew runTestDesktopGenericCommandLineOk
     - name: Save runTestDesktopGenericCommandLineOk HTML report artifact
-      uses: actions/upload-artifact@v2.2.4
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: Java${{ matrix.java }}-runTestDesktopGenericCommandLineOk-artifact
@@ -60,7 +60,7 @@ jobs:
     - name: Run desktop_generic protocol with TESTAR to test waitAndLeftClickWidgetWithMatchingTags feature
       run: ./gradlew runTestDesktopGenericMultiTags
     - name: Save runTestDesktopGenericMultiTags HTML report artifact
-      uses: actions/upload-artifact@v2.2.4
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: Java${{ matrix.java }}-runTestDesktopGenericMultiTags-artifact
@@ -69,7 +69,7 @@ jobs:
     - name: Run desktop_generic protocol that contains SuspiciousTag with TESTAR
       run: ./gradlew runTestDesktopGenericCommandLineSuspiciousTag
     - name: Save runTestDesktopGenericCommandLineSuspiciousTag HTML report artifact
-      uses: actions/upload-artifact@v2.2.4
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: Java${{ matrix.java }}-runTestDesktopGenericCommandLineSuspiciousTag-artifact
@@ -78,7 +78,7 @@ jobs:
     - name: Run desktop_generic protocol using specific filtering and detect a SuspiciousTag with TESTAR
       run: ./gradlew runTestDesktopGenericCommandLineSettingsFilterSuspiciousTag
     - name: Save runTestDesktopGenericCommandLineSettingsFilterSuspiciousTag HTML report artifact
-      uses: actions/upload-artifact@v2.2.4
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: Java${{ matrix.java }}-runTestDesktopGenericCommandLineSettingsFilterSuspiciousTag-artifact
@@ -87,7 +87,7 @@ jobs:
     - name: Run desktop_generic protocol but connect using SUT_PROCESS_NAME and detect SuspiciousTag
       run: ./gradlew runTestDesktopGenericProcessNameSuspiciousTag
     - name: Save runTestDesktopGenericProcessNameSuspiciousTag HTML report artifact
-      uses: actions/upload-artifact@v2.2.4
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: Java${{ matrix.java }}-runTestDesktopGenericProcessNameSuspiciousTag-artifact
@@ -96,7 +96,7 @@ jobs:
     - name: Run desktop_generic protocol but connect using SUT_WINDOW_TITLE and detect SuspiciousTag
       run: ./gradlew runTestDesktopGenericTitleNameSuspiciousTag
     - name: Save runTestDesktopGenericTitleNameSuspiciousTag HTML report artifact
-      uses: actions/upload-artifact@v2.2.4
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: Java${{ matrix.java }}-runTestDesktopGenericTitleNameSuspiciousTag-artifact
@@ -105,7 +105,7 @@ jobs:
     - name: Run desktop_generic with OrientDB to infer a TESTAR State Model
       run: ./gradlew runTestDesktopGenericStateModel
     - name: Save runTestDesktopGenericStateModel HTML report artifact
-      uses: actions/upload-artifact@v2.2.4
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: Java${{ matrix.java }}-runTestDesktopGenericStateModel-artifact
@@ -114,7 +114,7 @@ jobs:
     - name: Run desktop_generic doing a customization in the AbstractIDCustom identifer
       run: ./gradlew runTestDesktopGenericStateModelCustomAbstraction
     - name: Save runTestDesktopGenericStateModelCustomAbstraction HTML report artifact
-      uses: actions/upload-artifact@v2.2.4
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: Java${{ matrix.java }}-runTestDesktopGenericStateModelCustomAbstraction-artifact
@@ -123,7 +123,7 @@ jobs:
     - name: Run webdriver protocol and detect SuspiciousTag
       run: ./gradlew runTestWebdriverSuspiciousTag
     - name: Save runTestWebdriverSuspiciousTag HTML report artifact
-      uses: actions/upload-artifact@v2.2.4
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: Java${{ matrix.java }}-runTestWebdriverSuspiciousTag-artifact
@@ -132,7 +132,7 @@ jobs:
     - name: Run webdriver to login in parabank and detect browser console error
       run: ./gradlew runTestWebdriverParabankLoginAndConsoleError
     - name: Save runTestWebdriverParabankLoginAndConsoleError HTML report artifact
-      uses: actions/upload-artifact@v2.2.4
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: Java${{ matrix.java }}-runTestWebdriverParabankLoginAndConsoleError-artifact
@@ -141,7 +141,7 @@ jobs:
     - name: Run webdriver to login in parabank using form filling
       run: ./gradlew runTestWebdriverParabankFormFilling
     - name: Save runTestWebdriverParabankFormFilling HTML report artifact
-      uses: actions/upload-artifact@v2.2.4
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: Java${{ matrix.java }}-runTestWebdriverParabankFormFilling-artifact
@@ -150,7 +150,7 @@ jobs:
     - name: Run webdriver to login in parabank and execute webdriver remote actions
       run: ./gradlew runTestWebdriverParabankRemoteActions
     - name: Save runTestWebdriverParabankRemoteActions HTML report artifact
-      uses: actions/upload-artifact@v2.2.4
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: Java${{ matrix.java }}-runTestWebdriverParabankRemoteActions-artifact
@@ -159,7 +159,7 @@ jobs:
     - name: Run TESTAR Replay mode with a web page to check that replayed correctly
       run: ./gradlew runTestWebdriverCorrectReplay
     - name: Save runTestWebdriverCorrectReplay HTML report artifact
-      uses: actions/upload-artifact@v2.2.4
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: Java${{ matrix.java }}-runTestWebdriverCorrectReplay-artifact
@@ -168,7 +168,7 @@ jobs:
     - name: Run TESTAR Replay mode to detect a not replayable button
       run: ./gradlew runTestWebdriverUnreplayable
     - name: Save runTestWebdriverUnreplayable HTML report artifact
-      uses: actions/upload-artifact@v2.2.4
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: Java${{ matrix.java }}-runTestWebdriverUnreplayable-artifact
