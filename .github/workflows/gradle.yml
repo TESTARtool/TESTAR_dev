@@ -10,16 +10,22 @@ on:
     branches: [ master ]
 
 jobs:
-  windows_java_11:
+  windows:
     runs-on: windows-latest
     timeout-minutes: 15
 
+    strategy:
+      fail-fast: false
+      matrix:
+        java: [ '11', '17', '21' ]
+
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 11
-      uses: actions/setup-java@v1
+    - uses: actions/checkout@v4
+    - name: Set up Java ${{ matrix.java }}
+      uses: actions/setup-java@v4
       with:
-        java-version: 11
+        distribution: 'corretto'
+        java-version: ${{ matrix.java }}
     
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
@@ -46,260 +52,144 @@ jobs:
       run: ./gradlew runTestDesktopGenericCommandLineOk
     - name: Save runTestDesktopGenericCommandLineOk HTML report artifact
       uses: actions/upload-artifact@v2.2.4
+      if: always()
       with:
-        name: runTestDesktopGenericCommandLineOk-artifact
+        name: Java${{ matrix.java }}-runTestDesktopGenericCommandLineOk-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_ok
 
     - name: Run desktop_generic protocol with TESTAR to test waitAndLeftClickWidgetWithMatchingTags feature
       run: ./gradlew runTestDesktopGenericMultiTags
     - name: Save runTestDesktopGenericMultiTags HTML report artifact
       uses: actions/upload-artifact@v2.2.4
+      if: always()
       with:
-        name: runTestDesktopGenericMultiTags-artifact
+        name: Java${{ matrix.java }}-runTestDesktopGenericMultiTags-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_multitags
 
     - name: Run desktop_generic protocol that contains SuspiciousTag with TESTAR
       run: ./gradlew runTestDesktopGenericCommandLineSuspiciousTag
     - name: Save runTestDesktopGenericCommandLineSuspiciousTag HTML report artifact
       uses: actions/upload-artifact@v2.2.4
+      if: always()
       with:
-        name: runTestDesktopGenericCommandLineSuspiciousTag-artifact
+        name: Java${{ matrix.java }}-runTestDesktopGenericCommandLineSuspiciousTag-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_command_and_suspicious
     
     - name: Run desktop_generic protocol using specific filtering and detect a SuspiciousTag with TESTAR
       run: ./gradlew runTestDesktopGenericCommandLineSettingsFilterSuspiciousTag
     - name: Save runTestDesktopGenericCommandLineSettingsFilterSuspiciousTag HTML report artifact
       uses: actions/upload-artifact@v2.2.4
+      if: always()
       with:
-        name: runTestDesktopGenericCommandLineSettingsFilterSuspiciousTag-artifact
+        name: Java${{ matrix.java }}-runTestDesktopGenericCommandLineSettingsFilterSuspiciousTag-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_command_settings_filter_and_suspicious
     
     - name: Run desktop_generic protocol but connect using SUT_PROCESS_NAME and detect SuspiciousTag
       run: ./gradlew runTestDesktopGenericProcessNameSuspiciousTag
     - name: Save runTestDesktopGenericProcessNameSuspiciousTag HTML report artifact
       uses: actions/upload-artifact@v2.2.4
+      if: always()
       with:
-        name: runTestDesktopGenericProcessNameSuspiciousTag-artifact
+        name: Java${{ matrix.java }}-runTestDesktopGenericProcessNameSuspiciousTag-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_process_and_suspicious
     
     - name: Run desktop_generic protocol but connect using SUT_WINDOW_TITLE and detect SuspiciousTag
       run: ./gradlew runTestDesktopGenericTitleNameSuspiciousTag
     - name: Save runTestDesktopGenericTitleNameSuspiciousTag HTML report artifact
       uses: actions/upload-artifact@v2.2.4
+      if: always()
       with:
-        name: runTestDesktopGenericTitleNameSuspiciousTag-artifact
+        name: Java${{ matrix.java }}-runTestDesktopGenericTitleNameSuspiciousTag-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_title_and_suspicious
     
     - name: Run desktop_generic with OrientDB to infer a TESTAR State Model
       run: ./gradlew runTestDesktopGenericStateModel
     - name: Save runTestDesktopGenericStateModel HTML report artifact
       uses: actions/upload-artifact@v2.2.4
+      if: always()
       with:
-        name: runTestDesktopGenericStateModel-artifact
+        name: Java${{ matrix.java }}-runTestDesktopGenericStateModel-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_state_model
     
     - name: Run desktop_generic doing a customization in the AbstractIDCustom identifer
       run: ./gradlew runTestDesktopGenericStateModelCustomAbstraction
     - name: Save runTestDesktopGenericStateModelCustomAbstraction HTML report artifact
       uses: actions/upload-artifact@v2.2.4
+      if: always()
       with:
-        name: runTestDesktopGenericStateModelCustomAbstraction-artifact
+        name: Java${{ matrix.java }}-runTestDesktopGenericStateModelCustomAbstraction-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_state_model_custom
     
     - name: Run webdriver protocol and detect SuspiciousTag
       run: ./gradlew runTestWebdriverSuspiciousTag
     - name: Save runTestWebdriverSuspiciousTag HTML report artifact
       uses: actions/upload-artifact@v2.2.4
+      if: always()
       with:
-        name: runTestWebdriverSuspiciousTag-artifact
+        name: Java${{ matrix.java }}-runTestWebdriverSuspiciousTag-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_and_suspicious
     
     - name: Run webdriver to login in parabank and detect browser console error
       run: ./gradlew runTestWebdriverParabankLoginAndConsoleError
     - name: Save runTestWebdriverParabankLoginAndConsoleError HTML report artifact
       uses: actions/upload-artifact@v2.2.4
+      if: always()
       with:
-        name: runTestWebdriverParabankLoginAndConsoleError-artifact
+        name: Java${{ matrix.java }}-runTestWebdriverParabankLoginAndConsoleError-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_login_console_error
     
     - name: Run webdriver to login in parabank using form filling
       run: ./gradlew runTestWebdriverParabankFormFilling
     - name: Save runTestWebdriverParabankFormFilling HTML report artifact
       uses: actions/upload-artifact@v2.2.4
+      if: always()
       with:
-        name: runTestWebdriverParabankFormFilling-artifact
+        name: Java${{ matrix.java }}-runTestWebdriverParabankFormFilling-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_form_filling
     
     - name: Run webdriver to login in parabank and execute webdriver remote actions
       run: ./gradlew runTestWebdriverParabankRemoteActions
     - name: Save runTestWebdriverParabankRemoteActions HTML report artifact
       uses: actions/upload-artifact@v2.2.4
+      if: always()
       with:
-        name: runTestWebdriverParabankRemoteActions-artifact
+        name: Java${{ matrix.java }}-runTestWebdriverParabankRemoteActions-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_remote_actions
     
     - name: Run TESTAR Replay mode with a web page to check that replayed correctly
       run: ./gradlew runTestWebdriverCorrectReplay
     - name: Save runTestWebdriverCorrectReplay HTML report artifact
       uses: actions/upload-artifact@v2.2.4
+      if: always()
       with:
-        name: runTestWebdriverCorrectReplay-artifact
+        name: Java${{ matrix.java }}-runTestWebdriverCorrectReplay-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_replay
     
     - name: Run TESTAR Replay mode to detect a not replayable button
       run: ./gradlew runTestWebdriverUnreplayable
     - name: Save runTestWebdriverUnreplayable HTML report artifact
       uses: actions/upload-artifact@v2.2.4
+      if: always()
       with:
-        name: runTestWebdriverUnreplayable-artifact
+        name: Java${{ matrix.java }}-runTestWebdriverUnreplayable-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_unreplayable
-
-  windows_java_17:
-    runs-on: windows-latest
-    timeout-minutes: 15
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Java 17
-      uses: actions/setup-java@v1
-      with:
-        java-version: 17
-    
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    
-    - name: Prepare TESTAR protocols
-      run: ./gradlew init_workflow_test
-    
-    - name: Build TESTAR with Gradle
-      run: ./gradlew build
-    
-    - name: Prepare installed distribution of TESTAR with Gradle
-      run: ./gradlew installDist
-
-    - name: Run TESTAR dialog
-      run: ./gradlew runTestRunGUI
-
-    - name: Run desktop_generic protocol with TESTAR using COMMAND_LINE
-      run: ./gradlew runTestDesktopGenericCommandLineOk
-
-    - name: Run desktop_generic protocol with TESTAR to test waitAndLeftClickWidgetWithMatchingTags feature
-      run: ./gradlew runTestDesktopGenericMultiTags
-
-    - name: Run desktop_generic protocol that contains SuspiciousTag with TESTAR
-      run: ./gradlew runTestDesktopGenericCommandLineSuspiciousTag
-    
-    - name: Run desktop_generic protocol using specific filtering and detect a SuspiciousTag with TESTAR
-      run: ./gradlew runTestDesktopGenericCommandLineSettingsFilterSuspiciousTag
-    
-    - name: Run desktop_generic protocol but connect using SUT_PROCESS_NAME and detect SuspiciousTag
-      run: ./gradlew runTestDesktopGenericProcessNameSuspiciousTag
-    
-    - name: Run desktop_generic protocol but connect using SUT_WINDOW_TITLE and detect SuspiciousTag
-      run: ./gradlew runTestDesktopGenericTitleNameSuspiciousTag
-    
-    - name: Run desktop_generic with OrientDB to infer a TESTAR State Model
-      run: ./gradlew runTestDesktopGenericStateModel
-    
-    - name: Run desktop_generic doing a customization in the AbstractIDCustom identifer
-      run: ./gradlew runTestDesktopGenericStateModelCustomAbstraction
-    
-    - name: Run webdriver protocol and detect SuspiciousTag
-      run: ./gradlew runTestWebdriverSuspiciousTag
-    
-    - name: Run webdriver to login in parabank and detect browser console error
-      run: ./gradlew runTestWebdriverParabankLoginAndConsoleError
-    
-    - name: Run webdriver to login in parabank using form filling
-      run: ./gradlew runTestWebdriverParabankFormFilling
-    
-    - name: Run webdriver to login in parabank and execute webdriver remote actions
-      run: ./gradlew runTestWebdriverParabankRemoteActions
-    
-    - name: Run TESTAR Replay mode with a web page to check that replayed correctly
-      run: ./gradlew runTestWebdriverCorrectReplay
-    
-    - name: Run TESTAR Replay mode to detect a not replayable button
-      run: ./gradlew runTestWebdriverUnreplayable
-
-  windows_java_21:
-    runs-on: windows-latest
-    timeout-minutes: 15
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Java 21
-      uses: actions/setup-java@v1
-      with:
-        java-version: 21
-    
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    
-    - name: Prepare TESTAR protocols
-      run: ./gradlew init_workflow_test
-    
-    - name: Build TESTAR with Gradle
-      run: ./gradlew build
-    
-    - name: Prepare installed distribution of TESTAR with Gradle
-      run: ./gradlew installDist
-
-    - name: Run TESTAR dialog
-      run: ./gradlew runTestRunGUI
-
-    - name: Run desktop_generic protocol with TESTAR using COMMAND_LINE
-      run: ./gradlew runTestDesktopGenericCommandLineOk
-
-    - name: Run desktop_generic protocol with TESTAR to test waitAndLeftClickWidgetWithMatchingTags feature
-      run: ./gradlew runTestDesktopGenericMultiTags
-
-    - name: Run desktop_generic protocol that contains SuspiciousTag with TESTAR
-      run: ./gradlew runTestDesktopGenericCommandLineSuspiciousTag
-    
-    - name: Run desktop_generic protocol using specific filtering and detect a SuspiciousTag with TESTAR
-      run: ./gradlew runTestDesktopGenericCommandLineSettingsFilterSuspiciousTag
-    
-    - name: Run desktop_generic protocol but connect using SUT_PROCESS_NAME and detect SuspiciousTag
-      run: ./gradlew runTestDesktopGenericProcessNameSuspiciousTag
-    
-    - name: Run desktop_generic protocol but connect using SUT_WINDOW_TITLE and detect SuspiciousTag
-      run: ./gradlew runTestDesktopGenericTitleNameSuspiciousTag
-    
-    - name: Run desktop_generic with OrientDB to infer a TESTAR State Model
-      run: ./gradlew runTestDesktopGenericStateModel
-    
-    - name: Run desktop_generic doing a customization in the AbstractIDCustom identifer
-      run: ./gradlew runTestDesktopGenericStateModelCustomAbstraction
-    
-    - name: Run webdriver protocol and detect SuspiciousTag
-      run: ./gradlew runTestWebdriverSuspiciousTag
-    
-    - name: Run webdriver to login in parabank and detect browser console error
-      run: ./gradlew runTestWebdriverParabankLoginAndConsoleError
-    
-    - name: Run webdriver to login in parabank using form filling
-      run: ./gradlew runTestWebdriverParabankFormFilling
-    
-    - name: Run webdriver to login in parabank and execute webdriver remote actions
-      run: ./gradlew runTestWebdriverParabankRemoteActions
-    
-    - name: Run TESTAR Replay mode with a web page to check that replayed correctly
-      run: ./gradlew runTestWebdriverCorrectReplay
-    
-    - name: Run TESTAR Replay mode to detect a not replayable button
-      run: ./gradlew runTestWebdriverUnreplayable
 
   linux:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
+    strategy:
+      fail-fast: false
+      matrix:
+        java: [ '11', '17', '21' ]
+
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 11
-      uses: actions/setup-java@v1
+    - uses: actions/checkout@v4
+    - name: Set up Java ${{ matrix.java }}
+      uses: actions/setup-java@v4
       with:
-        java-version: 11
+        distribution: 'corretto'
+        java-version: ${{ matrix.java }}
     
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
@@ -325,13 +215,19 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 10
 
+    strategy:
+      fail-fast: false
+      matrix:
+        java: [ '11', '17', '21' ]
+
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 11
-      uses: actions/setup-java@v1
+    - uses: actions/checkout@v4
+    - name: Set up Java ${{ matrix.java }}
+      uses: actions/setup-java@v4
       with:
-        java-version: 11
-    
+        distribution: 'corretto'
+        java-version: ${{ matrix.java }}
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     
