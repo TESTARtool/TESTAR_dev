@@ -10,16 +10,20 @@ on:
     branches: [ master ]
 
 jobs:
-  windows_java_11:
+  windows:
     runs-on: windows-latest
     timeout-minutes: 15
 
+    strategy:
+      matrix:
+        java: [ '11', '17', '21' ]
+
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 11
-      uses: actions/setup-java@v1
+    - uses: actions/checkout@v4
+    - name: Set up Java ${{ matrix.java }}
+      uses: actions/setup-java@v4
       with:
-        java-version: 11
+        java-version: ${{ matrix.java }}
     
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
@@ -154,152 +158,20 @@ jobs:
         name: runTestWebdriverUnreplayable-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_unreplayable
 
-  windows_java_17:
-    runs-on: windows-latest
-    timeout-minutes: 15
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Java 17
-      uses: actions/setup-java@v1
-      with:
-        java-version: 17
-    
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    
-    - name: Prepare TESTAR protocols
-      run: ./gradlew init_workflow_test
-    
-    - name: Build TESTAR with Gradle
-      run: ./gradlew build
-    
-    - name: Prepare installed distribution of TESTAR with Gradle
-      run: ./gradlew installDist
-
-    - name: Run TESTAR dialog
-      run: ./gradlew runTestRunGUI
-
-    - name: Run desktop_generic protocol with TESTAR using COMMAND_LINE
-      run: ./gradlew runTestDesktopGenericCommandLineOk
-
-    - name: Run desktop_generic protocol with TESTAR to test waitAndLeftClickWidgetWithMatchingTags feature
-      run: ./gradlew runTestDesktopGenericMultiTags
-
-    - name: Run desktop_generic protocol that contains SuspiciousTag with TESTAR
-      run: ./gradlew runTestDesktopGenericCommandLineSuspiciousTag
-    
-    - name: Run desktop_generic protocol using specific filtering and detect a SuspiciousTag with TESTAR
-      run: ./gradlew runTestDesktopGenericCommandLineSettingsFilterSuspiciousTag
-    
-    - name: Run desktop_generic protocol but connect using SUT_PROCESS_NAME and detect SuspiciousTag
-      run: ./gradlew runTestDesktopGenericProcessNameSuspiciousTag
-    
-    - name: Run desktop_generic protocol but connect using SUT_WINDOW_TITLE and detect SuspiciousTag
-      run: ./gradlew runTestDesktopGenericTitleNameSuspiciousTag
-    
-    - name: Run desktop_generic with OrientDB to infer a TESTAR State Model
-      run: ./gradlew runTestDesktopGenericStateModel
-    
-    - name: Run desktop_generic doing a customization in the AbstractIDCustom identifer
-      run: ./gradlew runTestDesktopGenericStateModelCustomAbstraction
-    
-    - name: Run webdriver protocol and detect SuspiciousTag
-      run: ./gradlew runTestWebdriverSuspiciousTag
-    
-    - name: Run webdriver to login in parabank and detect browser console error
-      run: ./gradlew runTestWebdriverParabankLoginAndConsoleError
-    
-    - name: Run webdriver to login in parabank using form filling
-      run: ./gradlew runTestWebdriverParabankFormFilling
-    
-    - name: Run webdriver to login in parabank and execute webdriver remote actions
-      run: ./gradlew runTestWebdriverParabankRemoteActions
-    
-    - name: Run TESTAR Replay mode with a web page to check that replayed correctly
-      run: ./gradlew runTestWebdriverCorrectReplay
-    
-    - name: Run TESTAR Replay mode to detect a not replayable button
-      run: ./gradlew runTestWebdriverUnreplayable
-
-  windows_java_21:
-    runs-on: windows-latest
-    timeout-minutes: 15
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Java 21
-      uses: actions/setup-java@v1
-      with:
-        java-version: 21
-    
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    
-    - name: Prepare TESTAR protocols
-      run: ./gradlew init_workflow_test
-    
-    - name: Build TESTAR with Gradle
-      run: ./gradlew build
-    
-    - name: Prepare installed distribution of TESTAR with Gradle
-      run: ./gradlew installDist
-
-    - name: Run TESTAR dialog
-      run: ./gradlew runTestRunGUI
-
-    - name: Run desktop_generic protocol with TESTAR using COMMAND_LINE
-      run: ./gradlew runTestDesktopGenericCommandLineOk
-
-    - name: Run desktop_generic protocol with TESTAR to test waitAndLeftClickWidgetWithMatchingTags feature
-      run: ./gradlew runTestDesktopGenericMultiTags
-
-    - name: Run desktop_generic protocol that contains SuspiciousTag with TESTAR
-      run: ./gradlew runTestDesktopGenericCommandLineSuspiciousTag
-    
-    - name: Run desktop_generic protocol using specific filtering and detect a SuspiciousTag with TESTAR
-      run: ./gradlew runTestDesktopGenericCommandLineSettingsFilterSuspiciousTag
-    
-    - name: Run desktop_generic protocol but connect using SUT_PROCESS_NAME and detect SuspiciousTag
-      run: ./gradlew runTestDesktopGenericProcessNameSuspiciousTag
-    
-    - name: Run desktop_generic protocol but connect using SUT_WINDOW_TITLE and detect SuspiciousTag
-      run: ./gradlew runTestDesktopGenericTitleNameSuspiciousTag
-    
-    - name: Run desktop_generic with OrientDB to infer a TESTAR State Model
-      run: ./gradlew runTestDesktopGenericStateModel
-    
-    - name: Run desktop_generic doing a customization in the AbstractIDCustom identifer
-      run: ./gradlew runTestDesktopGenericStateModelCustomAbstraction
-    
-    - name: Run webdriver protocol and detect SuspiciousTag
-      run: ./gradlew runTestWebdriverSuspiciousTag
-    
-    - name: Run webdriver to login in parabank and detect browser console error
-      run: ./gradlew runTestWebdriverParabankLoginAndConsoleError
-    
-    - name: Run webdriver to login in parabank using form filling
-      run: ./gradlew runTestWebdriverParabankFormFilling
-    
-    - name: Run webdriver to login in parabank and execute webdriver remote actions
-      run: ./gradlew runTestWebdriverParabankRemoteActions
-    
-    - name: Run TESTAR Replay mode with a web page to check that replayed correctly
-      run: ./gradlew runTestWebdriverCorrectReplay
-    
-    - name: Run TESTAR Replay mode to detect a not replayable button
-      run: ./gradlew runTestWebdriverUnreplayable
-
   linux:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
+    strategy:
+      matrix:
+        java: [ '11', '17', '21' ]
+
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 11
-      uses: actions/setup-java@v1
+    - uses: actions/checkout@v4
+    - name: Set up Java ${{ matrix.java }}
+      uses: actions/setup-java@v4
       with:
-        java-version: 11
+        java-version: ${{ matrix.java }}
     
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
@@ -325,13 +197,17 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 10
 
+    strategy:
+      matrix:
+        java: [ '11', '17', '21' ]
+
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 11
-      uses: actions/setup-java@v1
+    - uses: actions/checkout@v4
+    - name: Set up Java ${{ matrix.java }}
+      uses: actions/setup-java@v4
       with:
-        java-version: 11
-    
+        java-version: ${{ matrix.java }}
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     
