@@ -23,6 +23,7 @@ jobs:
     - name: Set up Java ${{ matrix.java }}
       uses: actions/setup-java@v4
       with:
+        distribution: 'corretto'
         java-version: ${{ matrix.java }}
     
     - name: Grant execute permission for gradlew
@@ -171,6 +172,7 @@ jobs:
     - name: Set up Java ${{ matrix.java }}
       uses: actions/setup-java@v4
       with:
+        distribution: 'corretto'
         java-version: ${{ matrix.java }}
     
     - name: Grant execute permission for gradlew
@@ -206,6 +208,7 @@ jobs:
     - name: Set up Java ${{ matrix.java }}
       uses: actions/setup-java@v4
       with:
+        distribution: 'corretto'
         java-version: ${{ matrix.java }}
 
     - name: Grant execute permission for gradlew
