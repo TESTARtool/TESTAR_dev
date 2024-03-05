@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2024 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -130,12 +130,10 @@ public final class Tags extends TagsBase {
 	
 	public static final Tag<String> Path = from("Path", String.class);
 	public static final Tag<String> ConcreteID = from(CodingManager.CONCRETE_ID, String.class);
-	public static final Tag<String> AbstractID = from("AbstractID", String.class);
+	public static final Tag<String> AbstractID = from(CodingManager.ABSTRACT_ID, String.class);
 	public static final Tag<String> Abstract_R_ID = from(CodingManager.ABSTRACT_R_ID, String.class);
 	public static final Tag<String> Abstract_R_T_ID = from(CodingManager.ABSTRACT_R_T_ID, String.class);
 	public static final Tag<String> Abstract_R_T_P_ID = from(CodingManager.ABSTRACT_R_T_P_ID, String.class);
-	public static final Tag<String> ConcreteIDCustom = from(CodingManager.CONCRETE_ID_CUSTOM, String.class);
-	public static final Tag<String> AbstractIDCustom = from(CodingManager.ABSTRACT_ID_CUSTOM, String. class);
 	
 	@SuppressWarnings("unchecked")
 	public static final Tag<UnFunc<SUT, String>> DynDesc = from("DynDesc", (Class<UnFunc<SUT, String>>)(Class<?>)UnFunc.class);

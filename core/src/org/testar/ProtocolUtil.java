@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2016 - 2020 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2019 - 2020 Open Universiteit - www.ou.nl
+* Copyright (c) 2016 - 2024 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2019 - 2024 Open Universiteit - www.ou.nl
 * 
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -27,7 +27,6 @@
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
-
 
 package org.testar;
 
@@ -235,7 +234,7 @@ public class ProtocolUtil {
 	// #####################
 	
 	public static String getStateshot(State state){
-		return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), getStateshotBinary(state));
+		return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), getStateshotBinary(state));
 	}
 
 	/**
@@ -278,7 +277,7 @@ public class ProtocolUtil {
 				return null;
 			AWTCanvas scrshot = AWTCanvas.fromScreenshot(Rect.from(actionArea.x, actionArea.y, actionArea.width, actionArea.height), getRootWindowHandle(state),
 														 AWTCanvas.StorageFormat.PNG, 1);
-			return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), scrshot);
+			return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), action.get(Tags.ConcreteID, "NoConcreteIdAvailable"), scrshot);
 		}
 		return null;
 	}	

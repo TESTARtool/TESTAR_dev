@@ -75,8 +75,8 @@ public class TestEnvironmentActions extends DefaultProtocol {
 		// Then build the action identifier
 		buildStateActionsIdentifiers(state, actions);
 		// To check that Action identifiers were built
-		Assert.notNull(actions.iterator().next().get(Tags.AbstractIDCustom));
-		Assert.notNull(actions.iterator().next().get(Tags.ConcreteIDCustom));
+		Assert.notNull(actions.iterator().next().get(Tags.AbstractID));
+		Assert.notNull(actions.iterator().next().get(Tags.ConcreteID));
 		// Check that the OriginWidget, Description, and Role are not null
 		Assert.notNull(actions.iterator().next().get(Tags.OriginWidget));
 		Assert.notNull(actions.iterator().next().get(Tags.Desc));
@@ -135,8 +135,8 @@ public class TestEnvironmentActions extends DefaultProtocol {
 		Assert.isTrue(state.get(Tags.ActionSet).iterator().next().get(Tags.Desc, "").contains("Hit Key"));
 
 		// To check that Action identifiers were built
-		Assert.notNull(preActions.iterator().next().get(Tags.AbstractIDCustom));
-		Assert.notNull(preActions.iterator().next().get(Tags.ConcreteIDCustom));
+		Assert.notNull(preActions.iterator().next().get(Tags.AbstractID));
+		Assert.notNull(preActions.iterator().next().get(Tags.ConcreteID));
 		// Check that the OriginWidget, Description, and Role are not null
 		Assert.notNull(preActions.iterator().next().get(Tags.OriginWidget));
 		Assert.notNull(preActions.iterator().next().get(Tags.Desc));
