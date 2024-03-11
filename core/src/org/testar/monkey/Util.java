@@ -397,9 +397,19 @@ public final class Util {
 	public static String widgetDesc(Widget widget, Tag<?>... tags) {
 		Assert.notNull(widget, tags);
 		StringBuilder sb = new StringBuilder();
-		for (Tag<?> t : tags) {
-			sb.append(widget.get(t, null)).append(", ");
+		int length = tags.length;
+
+		for (int i = 0; i < length; i++) {
+			Object tagValue = widget.get(tags[i], null);
+
+			if (tagValue != null) {
+				sb.append(tagValue);
+				if (i < length - 1) {
+					sb.append(",");
+				}
+			}
 		}
+
 		return sb.toString();
 	}
 
