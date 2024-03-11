@@ -52,7 +52,8 @@ jobs:
       run: ./gradlew runTestDesktopGenericCommandLineOk
     - name: Save runTestDesktopGenericCommandLineOk HTML report artifact
       uses: actions/upload-artifact@v4
-      if: always()
+      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
+      if: failure()
       with:
         name: Java${{ matrix.java }}-runTestDesktopGenericCommandLineOk-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_ok
@@ -61,7 +62,8 @@ jobs:
       run: ./gradlew runTestDesktopGenericMultiTags
     - name: Save runTestDesktopGenericMultiTags HTML report artifact
       uses: actions/upload-artifact@v4
-      if: always()
+      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
+      if: failure()
       with:
         name: Java${{ matrix.java }}-runTestDesktopGenericMultiTags-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_multitags
@@ -70,7 +72,8 @@ jobs:
       run: ./gradlew runTestDesktopGenericCommandLineSuspiciousTag
     - name: Save runTestDesktopGenericCommandLineSuspiciousTag HTML report artifact
       uses: actions/upload-artifact@v4
-      if: always()
+      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
+      if: failure()
       with:
         name: Java${{ matrix.java }}-runTestDesktopGenericCommandLineSuspiciousTag-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_command_and_suspicious
@@ -79,7 +82,8 @@ jobs:
       run: ./gradlew runTestDesktopGenericCommandLineSettingsFilterSuspiciousTag
     - name: Save runTestDesktopGenericCommandLineSettingsFilterSuspiciousTag HTML report artifact
       uses: actions/upload-artifact@v4
-      if: always()
+      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
+      if: failure()
       with:
         name: Java${{ matrix.java }}-runTestDesktopGenericCommandLineSettingsFilterSuspiciousTag-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_command_settings_filter_and_suspicious
@@ -88,7 +92,8 @@ jobs:
       run: ./gradlew runTestDesktopGenericProcessNameSuspiciousTag
     - name: Save runTestDesktopGenericProcessNameSuspiciousTag HTML report artifact
       uses: actions/upload-artifact@v4
-      if: always()
+      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
+      if: failure()
       with:
         name: Java${{ matrix.java }}-runTestDesktopGenericProcessNameSuspiciousTag-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_process_and_suspicious
@@ -97,7 +102,8 @@ jobs:
       run: ./gradlew runTestDesktopGenericTitleNameSuspiciousTag
     - name: Save runTestDesktopGenericTitleNameSuspiciousTag HTML report artifact
       uses: actions/upload-artifact@v4
-      if: always()
+      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
+      if: failure()
       with:
         name: Java${{ matrix.java }}-runTestDesktopGenericTitleNameSuspiciousTag-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_title_and_suspicious
@@ -106,16 +112,18 @@ jobs:
       run: ./gradlew runTestDesktopGenericStateModel
     - name: Save runTestDesktopGenericStateModel HTML report artifact
       uses: actions/upload-artifact@v4
-      if: always()
+      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
+      if: failure()
       with:
         name: Java${{ matrix.java }}-runTestDesktopGenericStateModel-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_state_model
     
-    - name: Run desktop_generic doing a customization in the AbstractIDCustom identifer
+    - name: Run desktop_generic doing a customization in the AbstractID identifer
       run: ./gradlew runTestDesktopGenericStateModelCustomAbstraction
     - name: Save runTestDesktopGenericStateModelCustomAbstraction HTML report artifact
       uses: actions/upload-artifact@v4
-      if: always()
+      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
+      if: failure()
       with:
         name: Java${{ matrix.java }}-runTestDesktopGenericStateModelCustomAbstraction-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_state_model_custom
@@ -124,7 +132,8 @@ jobs:
       run: ./gradlew runTestWebdriverSuspiciousTag
     - name: Save runTestWebdriverSuspiciousTag HTML report artifact
       uses: actions/upload-artifact@v4
-      if: always()
+      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
+      if: failure()
       with:
         name: Java${{ matrix.java }}-runTestWebdriverSuspiciousTag-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_and_suspicious
@@ -133,7 +142,8 @@ jobs:
       run: ./gradlew runTestWebdriverParabankLoginAndConsoleError
     - name: Save runTestWebdriverParabankLoginAndConsoleError HTML report artifact
       uses: actions/upload-artifact@v4
-      if: always()
+      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
+      if: failure()
       with:
         name: Java${{ matrix.java }}-runTestWebdriverParabankLoginAndConsoleError-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_login_console_error
@@ -142,7 +152,8 @@ jobs:
       run: ./gradlew runTestWebdriverParabankFormFilling
     - name: Save runTestWebdriverParabankFormFilling HTML report artifact
       uses: actions/upload-artifact@v4
-      if: always()
+      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
+      if: failure()
       with:
         name: Java${{ matrix.java }}-runTestWebdriverParabankFormFilling-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_form_filling
@@ -151,7 +162,8 @@ jobs:
       run: ./gradlew runTestWebdriverParabankRemoteActions
     - name: Save runTestWebdriverParabankRemoteActions HTML report artifact
       uses: actions/upload-artifact@v4
-      if: always()
+      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
+      if: failure()
       with:
         name: Java${{ matrix.java }}-runTestWebdriverParabankRemoteActions-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_remote_actions
@@ -160,7 +172,8 @@ jobs:
       run: ./gradlew runTestWebdriverCorrectReplay
     - name: Save runTestWebdriverCorrectReplay HTML report artifact
       uses: actions/upload-artifact@v4
-      if: always()
+      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
+      if: failure()
       with:
         name: Java${{ matrix.java }}-runTestWebdriverCorrectReplay-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_replay
@@ -169,7 +182,8 @@ jobs:
       run: ./gradlew runTestWebdriverUnreplayable
     - name: Save runTestWebdriverUnreplayable HTML report artifact
       uses: actions/upload-artifact@v4
-      if: always()
+      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
+      if: failure()
       with:
         name: Java${{ matrix.java }}-runTestWebdriverUnreplayable-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_unreplayable

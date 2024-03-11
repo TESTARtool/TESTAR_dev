@@ -136,7 +136,7 @@ public class Protocol_desktop_widget_recognition extends DesktopProtocol {
 		// HTML is not having the unvisited actions by default, so
 		// adding actions and unvisited actions to the HTML sequence report:
 		try {
-			reportManager.addActionsAndUnvisitedActions(actions, stateGraphWithVisitedActions.getAbstractCustomIdsOfUnvisitedActions(state));
+			reportManager.addActionsAndUnvisitedActions(actions, stateGraphWithVisitedActions.getAbstractIdsOfUnvisitedActions(state));
 		}catch(Exception e){
 			// catching null for the first state or any new state, when unvisited actions is still null,
 			// not adding the unvisited actions on those cases:
