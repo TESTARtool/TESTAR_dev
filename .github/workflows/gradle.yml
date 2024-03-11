@@ -38,6 +38,8 @@ jobs:
 
     - name: Save JUnit test results
       uses: actions/upload-artifact@v4
+      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
+      if: failure()
       with:
         name: Java${{ matrix.java }}-saveJunitTests-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/reports/tests
