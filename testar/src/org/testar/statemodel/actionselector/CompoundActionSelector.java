@@ -22,6 +22,9 @@ public class CompoundActionSelector implements ActionSelector{
 
     @Override
     public AbstractAction selectAction(AbstractState currentState, AbstractStateModel abstractStateModel) throws ActionNotFoundException {
+        // Iterating through the available action selectors - if the current one throws exception,
+        // then the next action selector will be tried
+        // If all of them fail, then throw an exception
         for(ActionSelector selector:selectors) {
             try {
                 return selector.selectAction(currentState, abstractStateModel);

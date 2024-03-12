@@ -102,7 +102,7 @@ task runTestDesktopGenericCommandLineSettingsFilterSuspiciousTag(type: Exec, dep
     group = 'test_testar_workflow'
     description ='runTestDesktopGenericCommandLineSettingsFilterSuspiciousTag'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_command_settings_filter_and_suspicious" TagsToFilter="NotExist;Desc" ClickFilter=".*[sS]ystem.*|.*[cC]lose.*|.*[mM]inimize.*|.*[mM]aximize.*|Text Editor|File|Edit|View|Help|Word Wrap" SuspiciousTags=".*[sS]cript.*" TimeToWaitAfterAction=2.0 ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_command_settings_filter_and_suspicious" TagsToFilter="NotExist;Desc" ClickFilter=".*[sS]ystem.*|.*[cC]lose.*|.*[mM]inimize.*|.*[mM]aximize.*|Text Editor|File|Edit|View|Help|Word Wrap" SuspiciousTags=".*[sS]cript.*" TimeToWaitAfterAction=9.9 ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2'
     doLast {
         String output = standardOutput.toString()
 
@@ -238,7 +238,7 @@ task runTestDesktopGenericStateModel(type: Exec, dependsOn: createDatabaseOrient
     group = 'test_testar_workflow'
     description ='runTestDesktopGenericStateModel'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic_statemodel AlwaysCompile=true ApplicationName="notepad_state_model" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2 TimeToWaitAfterAction=2.0 ClickFilter=".*[sS]ystem.*|.*[cC]lose.*|.*[mM]inimize.*|.*[mM]aximize.*|Text Editor|File|Edit|View|Help|Word Wrap" StateModelEnabled=true DataStoreDB=testar DataStoreUser=admin DataStorePassword=admin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic_statemodel AlwaysCompile=true ApplicationName="notepad_state_model" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2 ClickFilter=".*[sS]ystem.*|.*[cC]lose.*|.*[mM]inimize.*|.*[mM]aximize.*|Text Editor|File|Edit|View|Help|Word Wrap" StateModelEnabled=true DataStoreDB=testar DataStoreUser=admin DataStorePassword=admin'
     doLast {
         String output = standardOutput.toString()
 

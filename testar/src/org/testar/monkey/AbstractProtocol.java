@@ -38,9 +38,6 @@ import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 
-import org.testar.reporting_depricated.HtmlSequenceReport;
-import org.testar.reporting_depricated.Reporting;
-import org.testar.reporting_depricated.XMLSequenceReport;
 import org.testar.settings.Settings;
 
 import java.util.Set;
@@ -72,23 +69,6 @@ public abstract class AbstractProtocol implements UnProc<Settings>	{
 	protected Settings settings;
 	protected Settings settings(){ return settings; }
 
-	// todo: delete after reimplementing XMLSequenceReport?
-//	protected Reporting getReporter()
-//	{
-//	    // Replay mode only works with the specific HTML replay report
-//	    if(settings.get(ConfigTags.Mode).equals(RuntimeControlsProtocol.Modes.Replay)) {
-//	        return new HtmlSequenceReport(settings.get(ConfigTags.PathToReplaySequence));
-//	    }
-//
-//		switch (settings().get(ConfigTags.ReportingClass))
-//		{
-//			case "NUNIT 3.0 Reporting": return new XMLSequenceReport();
-//			case "HTML Reporting": return new HtmlSequenceReport();
-//		}
-//		// In case not specified
-//		return new HtmlSequenceReport();
-//	}
-	
 	/**
 	 * Initialize is run as the first thing to initialize TESTAR with the given settings
 	 *
