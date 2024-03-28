@@ -239,15 +239,16 @@ public class Protocol_yoho extends WebdriverProtocol {
 		//disconnectRDP();
 
 		//Create Abstract Model with Reinforcement Learning Implementation
-		settings.set(ConfigTags.StateModelReinforcementLearningEnabled, "sarsaModelManager");
+//		settings.set(ConfigTags.StateModelReinforcementLearningEnabled, "sarsaModelManager");
 
 		// Extended settings framework, set ConfigTags settings with XML framework values
 		// test.setting -> ExtendedSettingsFile
-		ReinforcementLearningSettings rlXmlSetting = ExtendedSettingsFactory.createReinforcementLearningSettings();
-		settings = rlXmlSetting.updateXMLSettings(settings);
+//		ReinforcementLearningSettings rlXmlSetting = ExtendedSettingsFactory.createReinforcementLearningSettings();
+//		settings = rlXmlSetting.updateXMLSettings(settings);
 
-		policy = PolicyFactory.getPolicy(settings);
-		actionSelector = new ReinforcementLearningActionSelector(policy);
+//		policy = PolicyFactory.getPolicy(settings);
+//		actionSelector = new ReinforcementLearningActionSelector(policy);
+//		actionSelector = (ActionSelector) randomActionSelector;
 
 		super.initialize(settings);
 
@@ -563,13 +564,14 @@ public class Protocol_yoho extends WebdriverProtocol {
 		if (preSelectedAction != null) {
 			return preSelectedAction;
 		}
-		Action modelAction = stateModelManager.getAbstractActionToExecute(actions);
-		if(modelAction==null) {
-			System.out.println("State model based action selection did not find an action. Using random action selection.");
+//		Action modelAction = stateModelManager.getAbstractActionToExecute(actions);
+
+//		if(modelAction==null) {
+//			System.out.println("State model based action selection did not find an action. Using random action selection.");
 			// if state model fails, use random (default would call preSelectAction() again, causing double actions HTML report):
-			return randomActionSelector.selectAction(state, actions);
-		}
-		return modelAction;
+		return randomActionSelector.selectAction(state, actions);
+//		}
+//		return modelAction;
 	}
 
 	protected Action getProtocolAction(final State state){

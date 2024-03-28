@@ -401,11 +401,11 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
         }
         catch (IOException e){}
         delegate.updateStatus("Preparing a report", 0);
-        this.testReport.saveReport(
-                this.settings().get(ConfigTags.SequenceLength),
-                this.settings().get(ConfigTags.Sequences),
-                this.firstNonNullUrl // FIXME: Use less if statements to find the first URL
-        );
+//        this.testReport.saveReport(
+//                this.settings().get(ConfigTags.SequenceLength),
+//                this.settings().get(ConfigTags.Sequences),
+//                this.firstNonNullUrl // FIXME: Use less if statements to find the first URL
+//        );
 
         if (dataAccess != null) {
             final boolean dbEnabled = settings.get(ConfigTags.ReportType).equals(Settings.SUT_REPORT_DATABASE);

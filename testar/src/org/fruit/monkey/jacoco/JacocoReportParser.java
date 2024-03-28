@@ -36,7 +36,11 @@ public class JacocoReportParser {
 
         var documentBuilderFactory = DocumentBuilderFactory.newInstance();
 
+        System.out.println(filePath);
+
         var reportFile = new File(filePath);
+        System.out.println(reportFile.getAbsolutePath());
+
 
         try (var reportInputStream = new FileInputStream(reportFile)) {
             documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);

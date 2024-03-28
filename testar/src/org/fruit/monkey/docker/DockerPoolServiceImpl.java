@@ -226,6 +226,7 @@ public class DockerPoolServiceImpl implements DockerPoolService {
           final CreateContainerCmd cmd = dockerClient.createContainerCmd(imageId)
             .withName(fullName)
             .withHostName(fullName)
+            .withEnv("COMPOSE_CONVERT_WINDOWS_PATHS", "0")
             .withHostConfig(hostConfig);
           final CreateContainerResponse containerResponse =
             (env == null ? cmd.exec() : cmd.withEnv(env).exec());
@@ -233,6 +234,8 @@ public class DockerPoolServiceImpl implements DockerPoolService {
 
           containerIds.put(fullName, containerId);
           dockerClient.connectToNetworkCmd().withContainerId(containerId).withNetworkId(networkId).exec();
+            System.out.println("Container:" + containerId );
+          System.out.println("Network:" + networkId );
           dockerClient.startContainerCmd(containerId).exec();
         }
 

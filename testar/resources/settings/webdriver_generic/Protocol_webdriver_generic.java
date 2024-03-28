@@ -29,6 +29,10 @@
  */
 
 import org.fruit.monkey.btrace.BtraceApiClient;
+import org.fruit.monkey.btrace.BtraceFinishRecordingResponse;
+import org.fruit.monkey.btrace.MethodInvocation;
+import org.fruit.monkey.mysql.DBConnection;
+import org.fruit.monkey.mysql.SerializationUtil;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.SutVisualization;
@@ -48,6 +52,11 @@ import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.plugin.NativeLinker;
 import org.testar.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.*;
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
@@ -162,6 +171,67 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 		return state;
 	}
 
+	protected void saveAction(MethodInvocation method, PreparedStatement pstmt) throws SQLException {
+		// Assuming sequence_number and action_number are managed by your application logic
+		int sequenceNumber = this.sequenceCount(); // Set this based on your application's logic
+		int actionNumber = this.actionCount(); // Set this based on your application's logic
+
+		String className = method.className;
+		String methodName = method.methodName;
+		// Convert parameters to a format suitable for BLOB storage, if necessary
+		byte[] params = SerializationUtil.serializeList(method.getParameterTypes());
+
+		pstmt.setInt(1, sequenceNumber);
+		pstmt.setInt(2, actionNumber);
+		pstmt.setString(3, className);
+		pstmt.setString(4, methodName);
+		pstmt.setBytes(5, params);
+		pstmt.addBatch();
+	}
+
+	protected void saveActions(List<MethodInvocation> recordedMethods){
+		Connection connection = null;
+
+		try {
+
+			connection = DBConnection.getConnection("33306", "testar", "testar", "testar");
+			connection.setAutoCommit(false); // Disable auto-commit mode
+			String insertSQL = "INSERT INTO ActionMethods (sequence_number, action_number, class_name, method_name, parameters) VALUES (?, ?, ?, ?, ?);";
+
+			try (PreparedStatement pstmt = connection.prepareStatement(insertSQL)) {
+
+				for (MethodInvocation method : recordedMethods) {
+					saveAction(method, pstmt);
+				}
+				pstmt.executeBatch();
+			}
+
+			connection.commit();  // Commit transaction once all inserts are done
+
+		} catch (SQLException e) {
+			// If there is any error, rollback the transaction
+			try {
+				if (connection != null) {
+					connection.rollback();
+				}
+			} catch (SQLException excep) {
+				// Handle potential rollback error
+			}
+			// Handle or log the original error
+			e.printStackTrace();
+		} finally {
+			// Remember to set auto-commit back to true
+			try {
+				if (connection != null) {
+					connection.setAutoCommit(true);
+				}
+			} catch (SQLException excep) {
+				// Handle or log error
+			}
+		}
+
+	}
+
 	/**
 	 * This is a helper method used by the default implementation of <code>buildState()</code>
 	 * It examines the SUT's current state and returns an oracle verdict.
@@ -175,6 +245,8 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 			var recordedMethods = btrace.finishRecordingMethodInvocation();
 			System.out.println("RECEIVED RECORDED METHODS: " + recordedMethods);
 			flag=false;
+			saveActions(recordedMethods);
+
 		}
 
 		Verdict verdict = super.getVerdict(state);
@@ -217,11 +289,17 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 		for (Widget widget : state) {
 			// only consider enabled and non-tabu widgets
 			if (!widget.get(Enabled, true)) {
+				if(widget.get(WdTags.WebTextContent, "").contains("users to the team")){
+					System.out.println("!enabled");
+				}
 				continue;
 			}
 			// The blackListed widgets are those that have been filtered during the SPY mode with the
 			//CAPS_LOCK + SHIFT + Click clickfilter functionality.
 			if(blackListed(widget)){
+				if(widget.get(WdTags.WebTextContent, "").contains("users to the team")){
+					System.out.println("blacklisted");
+				}
 				if(isTypeable(widget)){
 					filteredActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
 				} else {
@@ -235,6 +313,10 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 
 			// If the element is blocked, Testar can't click on or type in the widget
 			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
+
+				if(widget.get(WdTags.WebTextContent, "").contains("users to the team")){
+					System.out.println("blocked");
+				}
 				continue;
 			}
 

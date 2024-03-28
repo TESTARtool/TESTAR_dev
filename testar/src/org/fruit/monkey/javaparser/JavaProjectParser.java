@@ -49,11 +49,15 @@ public class JavaProjectParser {
     }
 
     private void parseClass(TypeDeclaration<?> declaration, String fileLocation) {
+        var unitRange = declaration.getRange().orElse(new Range(new Position(0, 0), new Position(0, 0)));
         var javaUnit = new JavaUnit(declaration.getFullyQualifiedName().orElse(""),
                                     fileLocation,
                                     declaration.getMethods().stream()
                                                .map(this::parseMethod)
-                                               .collect(Collectors.toList()));
+                                               .collect(Collectors.toList()),
+                                    unitRange.begin.line,
+                                    unitRange.end.line
+                );
 
         declaration.getMembers().forEach(member -> {
             if (member.isClassOrInterfaceDeclaration()) {

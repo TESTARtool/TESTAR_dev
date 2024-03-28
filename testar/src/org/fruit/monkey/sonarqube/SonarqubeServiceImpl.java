@@ -23,6 +23,8 @@ import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.fruit.monkey.TestarServiceException;
+import org.fruit.monkey.btrace.ClassStaticAnalysisResolver;
+import org.fruit.monkey.btrace.DBStaticAnalysisRepository;
 import org.fruit.monkey.docker.DockerPoolService;
 import org.fruit.monkey.docker.DockerPoolServiceImpl;
 import org.fruit.monkey.jacoco.JacocoReportParser;
@@ -200,16 +202,24 @@ public class SonarqubeServiceImpl implements SonarqubeService {
                         if (delegate != null) {
                             delegate.onComplete(issuesReport);
                         }
+                        File sonarqubeOutputDir = new File(Main.sonarqubeOutputDir);
+                        if(!sonarqubeOutputDir.exists()){
+                            sonarqubeOutputDir.mkdirs();
+                        }
                         var jacocoPath = Paths.get(Main.sonarqubeOutputDir, "jacoco.xml").toString();
                         System.out.println("JACOCO: " + jacocoPath);
-                        var staticAnalysisResolver = new StaticAnalysisResolver(
+                        var staticAnalysisResolver = new ClassStaticAnalysisResolver(
                                 new SonarqubeApiClient("http://localhost:9000", token),
-                                new JacocoReportParser(jacocoPath),
-                                new JavaProjectParser(projectSourceDir)
+                                new JavaProjectParser("D:\\Marviq\\yoho\\yoho-dev\\yoho-be-api"),
+                                new DBStaticAnalysisRepository()
                         );
+                        System.out.println("Before analysis " + projectSourceDir);
+                        staticAnalysisResolver.performStaticAnalysis();
+//                        var classEntries = staticAnalysisResolver.resolveClassEntries(staticInfo.getKey(), staticInfo.getValue());
+//                        var methodEntries = staticAnalysisResolver.resolveMethodEntries(staticInfo.getKey(), classEntries);
 
-                        var repository = new FileAnalysedMethodEntryRepository();
-                        repository.saveAll(staticAnalysisResolver.resolveMethodEntries());
+//                        var repository = new FileAnalysedMethodEntryRepository();
+//                        repository.saveAll(staticAnalysisResolver.resolveMethodEntries());
                     } catch (Exception e) {
                         e.printStackTrace();
                         System.out.println("No report available: " + e.getLocalizedMessage());
@@ -308,15 +318,21 @@ public class SonarqubeServiceImpl implements SonarqubeService {
         projectStream.write(("sonar.projectKey=" + projectKey + "\n").getBytes(StandardCharsets.UTF_8));
         projectStream.write(("sonar.projectName=" + projectName + "\n").getBytes(StandardCharsets.UTF_8));
         projectStream.write(("sonar.sourceEncoding=UTF-8\n").getBytes(StandardCharsets.UTF_8));
-        projectStream.write(("sonar.java.binaries=/testar-api\n").getBytes(StandardCharsets.UTF_8));
+        projectStream.write(("sonar.java.binaries=yoho-be-api\n").getBytes(StandardCharsets.UTF_8));
+        projectStream.write(("sonar.java.libraries=yoho-api\n").getBytes(StandardCharsets.UTF_8));
+        projectStream.write(("sonar.java.sources=yoho-be-api\n").getBytes(StandardCharsets.UTF_8));
+        projectStream.write(("sonar.exclusions=Dockerfile\n").getBytes(StandardCharsets.UTF_8));
+
 
         projectStream.flush();
         projectStream.close();
 
         final String outputDir = new File(Main.sonarqubeOutputDir).getAbsolutePath();
         final HostConfig hostConfig = HostConfig.newHostConfig()
+//                                                .withPortBindings(PortBinding.parse("9000:9000"))
                                                 .withBinds(new Bind(outputDir, new Volume("/output")))
-                                                .withBinds(new Bind(new File("D:\\Testar\\TESTAR_dev\\testar\\resources\\testar-api").getAbsolutePath(), new Volume("/testar-api")))
+//                                                .withBinds(new Bind(new File("D:\\Marviq\\yoho\\yoho-api").getAbsolutePath(), new Volume("/yoho-api")))
+//                                                .withBinds(new Bind(new File("D:\\Testar\\TESTAR_dev\\testar\\resources\\testar-api").getAbsolutePath(), new Volume("/testar-api")))
                                                 .withCpuCount(4L);
         final String dockerfileContent =
                 "FROM sonarsource/sonar-scanner-cli:latest AS sonarqube_scan\n" +
@@ -324,14 +340,15 @@ public class SonarqubeServiceImpl implements SonarqubeService {
                         "ENV SONAR_HOST_URL http://testar-sonarqube:9000\n" +
                         "ENV SONAR_TOKEN " + token + "\n" +
                         "ENV SRC_PATH /usr/src/" + projectSubdir + "\n" +
-                        "ENV SONAR_JAVA_BINARIES " + "/testar-api" + "\n" +
 //                "ENV MAVEN_OPTS -javaagent:/usr/jacoco/org.jacoco.agent-0.8.8-runtime.jar=destfile=/usr/src/report/jacoco.exec,includes=*,jmx=true,dumponexit=true\n" +
 //                "RUN mkdir /usr/jacoco\n" +
                         "RUN apk add maven openjdk11\n" +
+//                        "ADD ../yoho-api /yoho-api\n" +
 
 //                "RUN wget https://repo1.maven.org/maven2/org/jacoco/org.jacoco.agent/0.8.8/org.jacoco.agent-0.8.8-runtime.jar -P /usr/jacoco\n" +
 //                "RUN mkdir /usr/src/report\n" +
                         "WORKDIR /usr/src/" + projectSubdir + "\n" ;
+//                        "CMD sonar-scanner -Dsonar.projectKey="+ projectKey +" -Dsonar.sources=. -Dsonar.host.url=http://sonarqube:9000  -Dsonar.token="+token;
                         //"RUN if [ -f \"./pom.xml\" ] || [ -f \"gradlew\" ]; then apk add maven openjdk11; fi\n" +
                         //"RUN apk add maven openjdk11\n" +
                         //"CMD mvn org.jacoco:jacoco-maven-plugin:0.8.8:prepare-agent verify " +

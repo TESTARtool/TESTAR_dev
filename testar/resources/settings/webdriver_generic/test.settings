@@ -123,7 +123,7 @@ AbstractStateAttributes = WebWidgetId
 #################################################################
 ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
 DeniedExtensions = pdf;jpg;png
-DomainsAllowed = www.ou.nl;mijn.awo.ou.nl;login.awo.ou.nl
+DomainsAllowed = www.ou.nl;mijn.awo.ou.nl;login.awo.ou.nl;orangehrmlive.com
 FollowLinks = true
 BrowserFullScreen = true
 SwitchNewTabs = true

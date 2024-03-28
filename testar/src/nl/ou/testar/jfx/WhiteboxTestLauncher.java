@@ -58,20 +58,22 @@ public class WhiteboxTestLauncher implements /*ProgressMonitor, */SonarqubeServi
         return dashboardDelegate;
     }
 
+
     public void start(Stage stage, Settings settings) throws IOException {
         progressMonitor.start(stage);
 
+
         // Clone GIT repository
 
-        final GitService gitService = new GitServiceImpl();
-        final String repositoryUrl = settings.get(ConfigTags.GitUrl);
+//        final GitService gitService = new GitServiceImpl();
+//        final String repositoryUrl = settings.get(ConfigTags.GitUrl);
 
         String path = settings.get(ConfigTags.OutputDir);
         if (!path.substring(path.length() - 1).equals(File.separator)) {
             path += File.separator;
         }
 
-        final String branchName = settings.get(ConfigTags.GitBranch, null);
+//        final String branchName = settings.get(ConfigTags.GitBranch, null);
 
         final String sonarqubeConfPath = path + "sonarqube" + File.separator;
         final String sonarqubeClientConfPath = path + "sonarqube_client" + File.separator;
@@ -79,9 +81,9 @@ public class WhiteboxTestLauncher implements /*ProgressMonitor, */SonarqubeServi
         projectName = settings.get(ConfigTags.SonarProjectName, "Demo");
         projectKey = settings.get(ConfigTags.SonarProjectKey, "demo");
 
-        if (settings.get(ConfigTags.GitAuthRequired, false)) {
-            gitCredentials = new GitCredentials(settings.get(ConfigTags.GitUsername), settings.get(ConfigTags.GitToken));
-        }
+//        if (settings.get(ConfigTags.GitAuthRequired, false)) {
+//            gitCredentials = new GitCredentials(settings.get(ConfigTags.GitUsername), settings.get(ConfigTags.GitToken));
+//        }
 
         progressMonitor.updateStage("Cloning repository");
         new Thread(() -> {
@@ -92,7 +94,7 @@ public class WhiteboxTestLauncher implements /*ProgressMonitor, */SonarqubeServi
 //              } else {
 //                repositoryPath = gitService.cloneRepository(repositoryUrl, gitCredentials, progressMonitor, branchName);
 //              }
-                repositoryPath = FileSystems.getDefault().getPath("D:\\Marviq\\yoho\\yoho-be-api");
+                repositoryPath = FileSystems.getDefault().getPath("D:\\Marviq\\yoho\\yoho-dev");
 //            }
 //            catch (GitAPIException | JGitInternalException e) {
 //              System.out.println("Cannot get source code: " + e.getMessage());

@@ -176,6 +176,7 @@ public final class ConfigTags {
   public static final Tag<String> ReportApiUrl = Tag.from("ReportApiUrl", String.class);
   public static final Tag<String> GitUsername = Tag.from("GitUsername", String.class);
   public static final Tag<String> GitToken = Tag.from("GitToken", String.class);
+  public static final Tag<String> RepositoryPath = Tag.from("RepositoryPath", String.class);
   public static final Tag<String> GitBranch = Tag.from("GitBranch", String.class);
   public static final Tag<Boolean> GitAuthRequired = Tag.from("GitAuthRequired", Boolean.class);
 

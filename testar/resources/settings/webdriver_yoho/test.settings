@@ -105,7 +105,7 @@ ProtocolClass = webdriver_yoho/Protocol_yoho
 #################################################################\n"
 # State model inference settings
 #################################################################\n"
-StateModelEnabled = true
+StateModelEnabled = false
 DataStore = OrientDB
 DataStoreType = remote
 DataStoreServer = localhost
@@ -153,7 +153,7 @@ OverrideWebDriverDisplayScale =
 
 # TODO
 ReportServicePort = 8000
-ReportType = DATABASE
+ReportType = STATIC_HTML
 SQLReporting = testar
 SQLReportingType = remote
 SQLReportingUser = testar
@@ -207,6 +207,7 @@ GitBranch = feature/testar-bug
 GitAuthRequired = true
 GitUsername = michael.tikhonenko
 GitToken = put_password_here
+RepositoryPass = D:/Marviq/yoho/yoho-dev
 
 ApplicationName = yoho
 ApplicationVersion = 1.0
