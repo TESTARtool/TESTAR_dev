@@ -58,7 +58,7 @@ public class ToolTipTexts {
   // TTTs for the general tab
   public static String sutConnectorTTT = "How does TESTAR connect to the SUT";
   public static String sutPathTTT = "Write the argument for the selected SUT connector";
-  public static String sutProcessesTTT = "The regex process names that conform to a multi-process SUT";
+  public static String sutProcessesTTT = "The regex process names that conform to a Desktop SUT multi-processes";
   public static String nofSequencesTTT = "<html>\nNumber of sequences to generate.\n</html>";
   public static String sequencesActionsTTT = "<html>\nSequence length:<br>\n" +
       "After having executed the given amount of<br>\n" +
