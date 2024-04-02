@@ -81,8 +81,8 @@ public class DesktopProtocol extends GenericUtilsProtocol {
 
     	// For Qt applications, block elements outside the modal window
     	if(state.childCount() > 0 && state.child(0).get(UIATags.UIAFrameworkId, "").equals("Qt")) {
-    		// Obtain the modal element
-    		Widget modalWindow = null;
+    		// Obtain the modal element. By default the main window
+    		Widget modalWindow = state.child(0);
     		for(Widget w : state) {
     			if (w.get(UIATags.UIAIsWindowModal, false)) {
     				modalWindow = w;
@@ -93,7 +93,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     		// If the modal element exists, mark elements outside modal as blocked
     		if(modalWindow != null) {
     			for(Widget w : state) {
-    				if (!isElementVisibleOnModalScreen(w, modalWindow)) {
+    				if (!isQtElementVisibleOnModalScreen(w, modalWindow)) {
     					w.set(Tags.Blocked, true);
     				}
     			}
@@ -103,7 +103,7 @@ public class DesktopProtocol extends GenericUtilsProtocol {
     	return state;
     }
 
-    private boolean isElementVisibleOnModalScreen(Widget w, Widget modalWidget) {
+    private boolean isQtElementVisibleOnModalScreen(Widget w, Widget modalWidget) {
     	Rect elementRect = (Rect) w.get(Tags.Shape, Rect.from(0,0,0,0));
     	Rect modalRect = (Rect) modalWidget.get(Tags.Shape, Rect.from(0,0,0,0));
 

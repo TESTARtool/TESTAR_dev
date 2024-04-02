@@ -51,7 +51,6 @@ public class GeneralPanel extends SettingsPanel implements Observer {
   private Settings settings;
   private JComboBox<String> cboxSUTconnector;
   private JTextArea txtSutPath;
-
   private JSpinner spnNumSequences;
   private JSpinner spnSequenceLength;
   //private JCheckBox checkStopOnFault;
