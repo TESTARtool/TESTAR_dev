@@ -510,9 +510,13 @@ public class StateFetcher implements Callable<UIAState>{
 	}
 
 	private boolean isElementBlocked(UIAElement uiaElement) {
-		// Qt applications are always started in the running state.
-		// Without this dedicated check TESTAR can't find any actions for the Qt application.
+		// WindowInteractionState is not always a supported property
+		// Windows applications like Notepad indicate that the main window is ready for user interaction (WindowInteractionState_ReadyForUserInteraction = 2)
+		// However, other applications, like Qt, do not support this property [Not supported]
 		if (Objects.equals(uiaElement.frameworkId, "Qt")) {
+			// For Qt applications, we try to check if the main window is ready for user interaction
+			// If this property is not supported, we check the default value from the TESTAR "main_w10.cpp" file
+			// The default value hardcoded in TESTAR, NOT from UIAutomation, is WindowInteractionState_Running = 0
 			return !(uiaElement.wndInteractionState == Windows.WindowInteractionState_ReadyForUserInteraction ||
 					uiaElement.wndInteractionState == Windows.WindowInteractionState_Running);
 		} else {

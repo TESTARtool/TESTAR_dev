@@ -39,6 +39,7 @@ import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
+import org.testar.monkey.alayer.windows.UIATags;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -76,7 +77,46 @@ public class DesktopProtocol extends GenericUtilsProtocol {
      */
     @Override
     protected State getState(SUT system) throws StateBuildException {
-    	return super.getState(system);
+    	State state = super.getState(system);
+
+    	// For Qt applications, block elements outside the modal window
+    	if(state.childCount() > 0 && state.child(0).get(UIATags.UIAFrameworkId, "").equals("Qt")) {
+    		// Obtain the modal element
+    		Widget modalWindow = null;
+    		for(Widget w : state) {
+    			if (w.get(UIATags.UIAIsWindowModal, false)) {
+    				modalWindow = w;
+    				break; // exit loop once modal is found
+    			}
+    		}
+
+    		// If the modal element exists, mark elements outside modal as blocked
+    		if(modalWindow != null) {
+    			for(Widget w : state) {
+    				if (!isElementVisibleOnModalScreen(w, modalWindow)) {
+    					w.set(Tags.Blocked, true);
+    				}
+    			}
+    		}
+    	}
+
+    	return state;
+    }
+
+    private boolean isElementVisibleOnModalScreen(Widget w, Widget modalWidget) {
+    	Rect elementRect = (Rect) w.get(Tags.Shape, Rect.from(0,0,0,0));
+    	Rect modalRect = (Rect) modalWidget.get(Tags.Shape, Rect.from(0,0,0,0));
+
+    	double elementRight = elementRect.x() + elementRect.width();
+    	double elementBottom = elementRect.y() + elementRect.height();
+    	double modalRight = modalRect.x() + modalRect.width();
+    	double modalBottom = modalRect.y() + modalRect.height();
+
+    	// Check if element is completely visible inside the modal
+    	return elementRect.x() >= modalRect.x() && 
+    			elementRight <= modalRight &&
+    			elementRect.y() >= modalRect.y() && 
+    			elementBottom <= modalBottom;
     }
 
     /**
