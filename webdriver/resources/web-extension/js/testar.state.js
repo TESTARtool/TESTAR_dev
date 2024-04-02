@@ -169,6 +169,8 @@ function wrapElementTestar(element, xOffset, yOffset) {
         checked: element.checked,
         selected: element.selected,
         display: computedStyle.getPropertyValue('display'),
+        innerHTML: element.innerHTML,
+        outerHTML: element.outerHTML,
 
         zIndex: getZIndexTestar(element),
         rect: getRectTestar(element, xOffset, yOffset),

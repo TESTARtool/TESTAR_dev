@@ -37,7 +37,7 @@ public class TestImprovedUnvisitedActionSelector {
 		// reset the action selector for each test
 		actionSelector = new ImprovedUnvisitedActionSelector();
 		// reset the abstract state model for each test
-		abstractStateModel = new AbstractStateModel("firstModel", "", "", Collections.singleton(Tags.AbstractIDCustom));
+		abstractStateModel = new AbstractStateModel("firstModel", "", "", Collections.singleton(Tags.AbstractID));
 		// reset the model manager for each test
 		modelManager = new ModelManager(abstractStateModel, actionSelector, new DummyManager(), null, new SequenceManager(new HashSet<>(), "firstModel"), false);
 	}

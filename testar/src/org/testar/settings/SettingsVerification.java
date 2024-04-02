@@ -121,6 +121,7 @@ public class SettingsVerification {
 				ConfigTags.SuspiciousTags,
 				ConfigTags.SuspiciousProcessOutput,
 				ConfigTags.ProcessLogs,
+				ConfigTags.LogOracleRegex,
 				ConfigTags.WebConsoleErrorPattern,
 				ConfigTags.WebConsoleWarningPattern
 				);

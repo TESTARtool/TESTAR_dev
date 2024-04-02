@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -258,7 +258,7 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 * This method allow users to customize the Widget and State identifiers.
 	 *
 	 * By default TESTAR uses the CodingManager to create the Widget and State identifiers:
-	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom,
+	 * ConcreteID, AbstractID,
 	 * Abstract_R_ID, Abstract_R_T_ID, Abstract_R_T_P_ID
 	 *
 	 * @param state
@@ -272,7 +272,7 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 * This method allow users to customize the Actions identifiers.
 	 *
 	 * By default TESTAR uses the CodingManager to create the Actions identifiers:
-	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom
+	 * ConcreteID, AbstractID
 	 *
 	 * @param state
 	 * @param actions
@@ -285,7 +285,7 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 * These are Actions not related to a Widget (ForceToForeground, Keyboard, KillProcess, etc...)
 	 *
 	 * By default TESTAR uses the CodingManager to create the specific environment Action identifiers:
-	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom
+	 * ConcreteID, AbstractID
 	 *
 	 * @param state
 	 * @param action

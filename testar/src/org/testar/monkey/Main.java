@@ -32,31 +32,33 @@ package org.testar.monkey;
 
 import org.testar.CodingManager;
 import org.testar.StateManagementTags;
+import org.testar.managers.NativeHookManager;
+import org.testar.monkey.alayer.Tag;
+import org.testar.monkey.alayer.windows.Windows10;
+import org.testar.plugin.NativeLinker;
+import org.testar.plugin.OperatingSystems;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.serialisation.ScreenshotSerialiser;
 import org.testar.serialisation.TestSerialiser;
 import org.testar.settings.Settings;
 import org.testar.settings.dialog.SettingsDialog;
-import org.testar.monkey.alayer.Tag;
 
 import javax.swing.*;
-import java.io.*;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
-import org.testar.monkey.alayer.windows.Windows10;
-import org.testar.plugin.NativeLinker;
-import org.testar.plugin.OperatingSystems;
-import org.testar.managers.NativeHookManager;
 
-import static org.testar.monkey.Util.compileProtocol;
 import static org.testar.monkey.ConfigTags.*;
+import static org.testar.monkey.Util.compileProtocol;
 
 public class Main {
 
-	public static final String TESTAR_VERSION = "2.6.7 (10-Oct-2023)";
+	public static final String TESTAR_VERSION = "2.6.11 (2-Apr-2024)";
 
 	//public static final String TESTAR_DIR_PROPERTY = "DIRNAME"; //Use the OS environment to obtain TESTAR directory
 	public static final String SETTINGS_FILE = "test.settings";
@@ -444,7 +446,6 @@ public class Main {
 
 		}
 	}
-
 	// Check if sse protocol exist
 	private static boolean existsSSE(String sseName) {
 		for (File f : new File(settingsDir).listFiles()) {

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2024 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -162,7 +162,7 @@ public class AndroidAppiumFramework extends SUTBase {
 	 * Uses unique accessibility ID if present, otherwise uses xpath. 
 	 * 
 	 * @param id
-	 * @param value
+	 * @param text
 	 * @param w
 	 */
 	public static void sendKeysTextTextElementById(String id, String text, Widget w){
@@ -369,10 +369,6 @@ public class AndroidAppiumFramework extends SUTBase {
 		return driver.getTitle();
 	}
 
-	public static void resetApp(){
-		driver.resetApp();
-	}
-
 	public static void runAppInBackground(Duration duration){
 		driver.runAppInBackground(duration);
 	}
@@ -402,7 +398,7 @@ public class AndroidAppiumFramework extends SUTBase {
 		byte[] byteImage = driver.getScreenshotAs(OutputType.BYTES);
 		InputStream is = new ByteArrayInputStream(byteImage);
 		AWTCanvas canvas = AWTCanvas.fromInputStream(is);
-		return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), canvas);
+		return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), canvas);
 	}
 
 	public static String getScreenshotAction(State state, Action action) throws IOException {
@@ -434,7 +430,7 @@ public class AndroidAppiumFramework extends SUTBase {
 		InputStream is2 = new ByteArrayInputStream(os.toByteArray());
 
 		AWTCanvas canvas = AWTCanvas.fromInputStream(is2);
-		return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), canvas);
+		return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), action.get(Tags.ConcreteID, "NoConcreteIdAvailable"), canvas);
 	}
 
 	// Note that besides obtaining a screenshot of the SUT it also highlights which action was clicked!
@@ -516,7 +512,7 @@ public class AndroidAppiumFramework extends SUTBase {
 
 	@Override
 	public void stop() throws SystemStopException {
-		driver.closeApp();
+		driver.quit();
 		driver = null;
 	}
 

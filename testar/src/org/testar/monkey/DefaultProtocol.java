@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,76 +30,61 @@
 
 package org.testar.monkey;
 
-import static org.testar.monkey.alayer.Tags.ActionDelay;
-import static org.testar.monkey.alayer.Tags.ActionDuration;
-import static org.testar.monkey.alayer.Tags.ActionSet;
-import static org.testar.monkey.alayer.Tags.ExecutedAction;
-import static org.testar.monkey.alayer.Tags.IsRunning;
-import static org.testar.monkey.alayer.Tags.OracleVerdict;
-import static org.testar.monkey.alayer.Tags.SystemState;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.SessionNotCreatedException;
+import org.testar.*;
+import org.testar.managers.NativeHookManager;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.Canvas;
+import org.testar.monkey.alayer.Color;
+import org.testar.monkey.alayer.Shape;
+import org.testar.monkey.alayer.Visualizer;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.actions.ActivateSystem;
+import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.KillProcess;
+import org.testar.monkey.alayer.android.AndroidProtocolUtil;
+import org.testar.monkey.alayer.devices.AWTMouse;
+import org.testar.monkey.alayer.devices.DummyMouse;
+import org.testar.monkey.alayer.devices.KBKeys;
+import org.testar.monkey.alayer.devices.Mouse;
+import org.testar.monkey.alayer.exceptions.*;
+import org.testar.monkey.alayer.ios.IOSProtocolUtil;
+import org.testar.monkey.alayer.visualizers.ShapeVisualizer;
+import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
+import org.testar.monkey.alayer.windows.WinApiException;
+import org.testar.oracles.Oracle;
+import org.testar.oracles.log.LogOracle;
+import org.testar.plugin.NativeLinker;
+import org.testar.plugin.OperatingSystems;
+import org.testar.reporting.ReportManager;
+import org.testar.serialisation.LogSerialiser;
+import org.testar.serialisation.ScreenshotSerialiser;
+import org.testar.serialisation.TestSerialiser;
+import org.testar.settings.Settings;
+import org.testar.statemodel.StateModelManager;
+import org.testar.statemodel.StateModelManagerFactory;
 
-import java.awt.Desktop;
-import java.awt.GraphicsEnvironment;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintStream;
+import javax.swing.*;
+import java.awt.*;
+import java.io.*;
+import java.util.List;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-
-import org.testar.*;
-import org.testar.managers.NativeHookManager;
-import org.testar.reporting.Reporting;
-import org.testar.statemodel.StateModelManager;
-import org.testar.statemodel.StateModelManagerFactory;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.testar.monkey.alayer.*;
-import org.testar.monkey.alayer.actions.ActivateSystem;
-import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
-import org.testar.monkey.alayer.actions.KillProcess;
-import org.testar.monkey.alayer.devices.AWTMouse;
-import org.testar.monkey.alayer.devices.DummyMouse;
-import org.testar.monkey.alayer.devices.KBKeys;
-import org.testar.monkey.alayer.devices.Mouse;
-import org.testar.monkey.alayer.exceptions.ActionBuildException;
-import org.testar.monkey.alayer.exceptions.ActionFailedException;
-import org.testar.monkey.alayer.exceptions.NoSuchTagException;
-import org.testar.monkey.alayer.exceptions.StateBuildException;
-import org.testar.monkey.alayer.exceptions.SystemStartException;
-import org.testar.monkey.alayer.visualizers.ShapeVisualizer;
-import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
-import org.testar.monkey.alayer.windows.WinApiException;
-import org.testar.plugin.NativeLinker;
-import org.testar.plugin.OperatingSystems;
-import org.testar.serialisation.LogSerialiser;
-import org.testar.serialisation.ScreenshotSerialiser;
-import org.testar.serialisation.TestSerialiser;
-import org.testar.settings.Settings;
-import org.openqa.selenium.SessionNotCreatedException;
-import org.testar.monkey.alayer.android.AndroidProtocolUtil;
-import org.testar.monkey.alayer.ios.IOSProtocolUtil;
+import static org.testar.monkey.alayer.Tags.*;
 
 public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	public static boolean faultySequence;
+	protected boolean logOracleEnabled;
+	protected Oracle logOracle;
 	private State stateForClickFilterLayerProtocol;
 
-	protected Reporting htmlReport;
+	protected ReportManager reportManager;
 	public State getStateForClickFilterLayerProtocol() {
 		return stateForClickFilterLayerProtocol;
 	}
@@ -120,7 +105,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected ProcessListener processListener = new ProcessListener();
 	boolean enabledProcessListener = false;
 	public static Verdict processVerdict = Verdict.OK;
-	
+
 	private Verdict replayVerdict;
 
 	public Verdict getReplayVerdict() {
@@ -157,24 +142,25 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	protected List<ProcessInfo> contextRunningProcesses = null;
-	protected static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+	protected static final String            DATE_FORMAT             = "yyyy-MM-dd HH:mm:ss";
 	protected static final Logger INDEXLOG = LogManager.getLogger();
 	protected double passSeverity = Verdict.SEVERITY_OK;
 
+	protected State latestState;
 	public static Action lastExecutedAction = null;
 
 	protected EventHandler eventHandler;
-	protected Canvas cv;
-	protected Pattern clickFilterPattern = null;
-	protected Map<String, Matcher> clickFilterMatchers = new WeakHashMap<String, Matcher>();
-	protected Pattern suspiciousTitlesPattern = null;
+	protected Canvas               cv;
+	protected Pattern              clickFilterPattern      = null;
+	protected Map<String, Matcher> clickFilterMatchers     = new WeakHashMap<String, Matcher>();
+	protected Pattern              suspiciousTitlesPattern = null;
 	protected Map<String, Matcher> suspiciousTitlesMatchers = new WeakHashMap<String, Matcher>();
 	private StateBuilder builder;
-	
+
 	protected int escAttempts = 0;
 
 	protected StateModelManager stateModelManager;
-	private String startOfSutDateString; //value set when SUT started, used for calculating the duration of test
+	private   String            startOfSutDateString; //value set when SUT started, used for calculating the duration of test
 
 	// Creating a logger with log4j library:
 	private static Logger logger = LogManager.getLogger();
@@ -222,7 +208,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		//initialize TESTAR with the given settings:
-		logger.trace("TESTAR initializing with the given protocol settings");
+		logger.info("TESTAR initializing with the given protocol settings");
 		initialize(settings);
 
 		try {
@@ -248,8 +234,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 						System.out.println("Exception: Select a log or html file to visualize the TESTAR results");
 					}
 				} else {
-					popupMessage("Please select a file.html (output/HTMLreports) to use in the View mode");
-					System.out.println("Exception: Please select a file.html (output/HTMLreports) to use in the View mode");
+					popupMessage("Please select a file.html (output/reports) to use in the View mode");
+					System.out.println("Exception: Please select a file.html (output/reports) to use in the View mode");
 				}
 			} else if (mode() == Modes.Replay && isValidFile()) {
 				new ReplayMode().runReplayLoop(this);
@@ -292,7 +278,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     		}
 		}catch (IllegalStateException e) {
 			if (e.getMessage()!=null && e.getMessage().contains("driver executable does not exist")) {
-				
+
 				String msg = "Exception: Check whether chromedriver.exe path: \n"
 				+settings.get(ConfigTags.SUTConnectorValue)
 				+"\n exists and is correctly defined";
@@ -333,6 +319,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				settings.get(ConfigTags.SUTProcesses)
 				);
 
+		logOracleEnabled = settings.get(ConfigTags.LogOracleEnabled, false);
+
 		if ( mode() == Modes.Generate || /*mode() == Modes.Record ||*/ mode() == Modes.Replay ) {
 			//Create the output folders
 			OutputStructure.calculateOuterLoopDateString();
@@ -362,9 +350,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			File seqFile = new File(settings.get(ConfigTags.PathToReplaySequence));
 
-			FileInputStream fis = new FileInputStream(seqFile);
+			FileInputStream     fis = new FileInputStream(seqFile);
 			BufferedInputStream bis = new BufferedInputStream(fis);
-			GZIPInputStream gis = new GZIPInputStream(bis);
+			GZIPInputStream   gis = new GZIPInputStream(bis);
 			ObjectInputStream ois = new ObjectInputStream(gis);
 
 			ois.readObject();
@@ -415,7 +403,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			String replace = path.substring(startIndex, endIndex+1);
 
-			path = path.replace(replace, File.separator + "HTMLreports" + File.separator);
+			path = path.replace(replace, File.separator + "reports" + File.separator);
 			if (new File(path).exists())
 				foundedHTML = path;
 		}
@@ -516,7 +504,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	/**
 	 * This method calls the startSystem() and starts the LogSerialiser. 
 	 *
-	 * @param system
 	 * @return SUT system
 	 */
 	SUT startSUTandLogger() {
@@ -680,15 +667,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//Output/logs folder
 		LogSerialiser.log(String.format(actionMode+" [%d]: %s\n%s",
 				actionCount,
-				"\n @Action ConcreteID = " + action.get(Tags.ConcreteID,"ConcreteID not available") +
-				" AbstractID = " + action.get(Tags.AbstractID,"AbstractID not available") +"\n"+
-				" ConcreteID CUSTOM = " +  action.get(Tags.ConcreteIDCustom,"ConcreteID CUSTOM not available")+
-				" AbstractID CUSTOM = " +  action.get(Tags.AbstractIDCustom,"AbstractID CUSTOM not available")+"\n"+
+				"\n @Action ConcreteID = " + action.get(Tags.ConcreteID, "ConcreteID not available") +
+				" AbstractID = " + action.get(Tags.AbstractID, "AbstractID not available") +"\n"+
 
-				" @State ConcreteID = " + state.get(Tags.ConcreteID,"ConcreteID not available") +
-				" AbstractID = " + state.get(Tags.Abstract_R_ID,"Abstract_R_ID not available") +"\n"+
-				" ConcreteID CUSTOM = "+ state.get(Tags.ConcreteIDCustom,"ConcreteID CUSTOM not available")+
-				" AbstractID CUSTOM = "+state.get(Tags.AbstractIDCustom,"AbstractID CUSTOM not available")+"\n",
+				" @State ConcreteID = " + state.get(Tags.ConcreteID, "ConcreteID not available") +
+				" AbstractID = " + state.get(Tags.AbstractID, "AbstractID not available") +"\n",
 				actionRepresentation[0]) + "\n",
 				LogSerialiser.LogLevel.Info);
 	}
@@ -706,7 +689,21 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	@Override
 	protected void preSequencePreparations() {
+		if(settings.get(ConfigTags.Mode) != Modes.Spy)
+			reportManager = new ReportManager((mode() == Modes.Replay), settings());
+		if (logOracleEnabled) {
+			logOracle = createLogOracle(settings);
+			logOracle.initialize();
+		}
+	}
 
+	/**
+	 * Method for creating the LogOracle. Can optionally be overridden in subclasses.
+	 * @param settings
+	 * @return
+	 */
+	public Oracle createLogOracle (Settings settings) {
+		return new LogOracle(settings);
 	}
 
 	protected Canvas buildCanvas() {
@@ -785,31 +782,38 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		buildStateIdentifiers(state);
 		state = ProtocolUtil.calculateZIndices(state);
-		
+
 		setStateForClickFilterLayerProtocol(state);
 
 		if(settings.get(ConfigTags.Mode) == Modes.Spy)
 			return state;
-		
+
 		Verdict verdict = getVerdict(state);
 		state.set(Tags.OracleVerdict, verdict);
 
 		setStateScreenshot(state);
 
-		if (mode() != Modes.Spy && verdict.severity() >= settings().get(ConfigTags.FaultThreshold)){
+		if(mode() != Modes.Spy && verdict.severity() >= settings().get(ConfigTags.FaultThreshold))
+		{
 			faultySequence = true;
 			LogSerialiser.log("Detected fault: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
 			// this was added to kill the SUT if it is frozen:
-			if(verdict.severity()==Verdict.SEVERITY_NOT_RESPONDING){
+			if(verdict.severity() == Verdict.SEVERITY_NOT_RESPONDING)
+			{
 				//if the SUT is frozen, we should kill it!
 				LogSerialiser.log("SUT frozen, trying to kill it!\n", LogSerialiser.LogLevel.Critical);
 				SystemProcessHandling.killRunningProcesses(system, 100);
 			}
-		} else if (verdict.severity() != Verdict.SEVERITY_OK && verdict.severity() > passSeverity){
+		}
+		else if(verdict.severity() != Verdict.SEVERITY_OK && verdict.severity() > passSeverity)
+		{
 			passSeverity = verdict.severity();
 			LogSerialiser.log("Detected warning: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
 		}
-		
+
+		reportManager.addState(state);
+		latestState = state;
+
 		return state;
 	}
 
@@ -849,6 +853,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		if(state.get(Tags.NotResponding, false)){
 			return new Verdict(Verdict.SEVERITY_NOT_RESPONDING, "System is unresponsive! I assume something is wrong!");
 		}
+
 		//------------------------
 		// ORACLES ALMOST FOR FREE
 		//------------------------
@@ -865,10 +870,17 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 		}
 
+		if ( logOracleEnabled ) {
+			Verdict logVerdict = logOracle.getVerdict(state);
+			if ( logVerdict.severity() == Verdict.SEVERITY_SUSPICIOUS_LOG ) {
+				return logVerdict;
+			}
+		}
+
 		// if everything was OK ...
 		return Verdict.OK;
 	}
-	
+
 	private Verdict suspiciousStringValueMatcher(Widget w) {
 		Matcher m;
 
@@ -942,7 +954,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					LogSerialiser.log("Forcing kill-process <" + forceKillProcess + "> action\n", LogSerialiser.LogLevel.Info);
 					Action killProcessAction = KillProcess.byName(forceKillProcess, 0);
 					killProcessAction.set(Tags.Desc, "Kill Process with name '" + forceKillProcess + "'");
-					killProcessAction.set(Tags.OriginWidget, state);
+					killProcessAction.mapActionToWidget(state);
 					return new HashSet<>(Collections.singletonList(killProcessAction));
 				}
 			}
@@ -955,7 +967,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			LogSerialiser.log("Forcing SUT activation (bring to foreground) action\n", LogSerialiser.LogLevel.Info);
 			Action foregroundAction = new ActivateSystem();
 			foregroundAction.set(Tags.Desc, "Bring the system to the foreground.");
-			foregroundAction.set(Tags.OriginWidget, state);
+			foregroundAction.mapActionToWidget(state);
 			foregroundAction.set(Tags.Role, Roles.System);
 			return new HashSet<>(Collections.singletonList(foregroundAction));
 		}
@@ -982,8 +994,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println("DEBUG: Forcing ESC action in preActionSelection : Actions derivation seems to be EMPTY !");
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
 			Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
-			escAction.set(Tags.OriginWidget, state);
+			escAction.mapActionToWidget(state);
 			buildEnvironmentActionIdentifiers(state, escAction);
+			reportManager.addActions(Collections.singleton(escAction));
 			return new HashSet<>(Collections.singletonList(escAction));
 		}
 
@@ -993,8 +1006,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				.findAny().orElse(null);
 		if (forceForegroungAction != null) {
 			System.out.println("DEBUG: Forcing the System to be in the foreground !");
+			reportManager.addActions(Collections.singleton(forceForegroungAction));
 			return new HashSet<>(Collections.singletonList(forceForegroungAction));
 		}
+
+		reportManager.addActions(actions);
 
 		return actions;
 	}
@@ -1004,6 +1020,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	//TODO check how well the CPU usage based waiting works
 	protected boolean executeAction(SUT system, State state, Action action){
 
+		// adding the action that is going to be executed into report:
+		reportManager.addSelectedAction(state, action);
+
 		if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
 			//System.out.println("DEBUG: Using WebDriver specific action shot.");
 			WdProtocolUtil.getActionshot(state,action);
@@ -1011,7 +1030,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			//System.out.println("DEBUG: normal action shot");
 			ProtocolUtil.getActionshot(state,action);
 		}
-		
+
 		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction);
 
 		try{
@@ -1036,8 +1055,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			return false;
 		}
 	}
-	
+
 	protected boolean replayAction(SUT system, State state, Action action, double actionWaitTime, double actionDuration){
+
+	    // adding the action that is replayed into report:
+	    reportManager.addSelectedAction(state, action);
+
 	    // Get an action screenshot based on the NativeLinker platform
 	    if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
 	        WdProtocolUtil.getActionshot(state,action);
@@ -1134,10 +1157,43 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			system.stop();
 		}
 	}
-
+	
+	/**
+	 * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
+	 */
 	@Override
 	protected void postSequenceProcessing() {
 
+		String status = "";
+		String statusInfo = "";
+
+		if(mode() == Modes.Replay) {
+			reportManager.addTestVerdict(getReplayVerdict().join(processVerdict));
+			status = (getReplayVerdict().join(processVerdict)).verdictSeverityTitle();
+			statusInfo = (getReplayVerdict().join(processVerdict)).info();
+		}
+		else {
+			reportManager.addTestVerdict(getFinalVerdict());
+			status = (getFinalVerdict()).verdictSeverityTitle();
+			statusInfo = (getFinalVerdict()).info();
+		}
+
+		String sequencesPath = getGeneratedSequenceName();
+		try {
+			sequencesPath = new File(getGeneratedSequenceName()).getCanonicalPath();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		statusInfo = statusInfo.replace("\n"+Verdict.OK.info(), "");
+
+		//Timestamp(generated by logger) SUTname Mode SequenceFileObject Status "StatusInfo"
+		INDEXLOG.info(OutputStructure.executedSUTname
+					  + " " + settings.get(ConfigTags.Mode, mode())
+					  + " " + sequencesPath
+					  + " " + status + " \"" + statusInfo + "\"" );
+
+		reportManager.finishReport();
 	}
 
 	/**
@@ -1153,10 +1209,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	/**
-	 * Use CodingManager to create the Widget and State identifiers: 
-	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom, 
-	 * Abstract_R_ID, Abstract_R_T_ID, Abstract_R_T_P_ID 
-	 * 
+	 * Use CodingManager to create the Widget and State identifiers:
+	 * ConcreteID, AbstractID,
+	 * Abstract_R_ID, Abstract_R_T_ID, Abstract_R_T_P_ID
+	 *
 	 * @param state
 	 */
 	protected void buildStateIdentifiers(State state) {
@@ -1164,23 +1220,23 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	/**
-	 * Use CodingManager to create the Actions identifiers: 
-	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom 
-	 * 
+	 * Use CodingManager to create the Actions identifiers:
+	 * ConcreteID, AbstractID
+	 *
 	 * @param state
 	 * @param actions
 	 */
 	protected void buildStateActionsIdentifiers(State state, Set<Action> actions) {
 	    CodingManager.buildIDs(state, actions);
 	    for(Action a : actions)
-	    	if(a.get(Tags.AbstractIDCustom, null) == null)
+	    	if(a.get(Tags.AbstractID, null) == null)
 	    		buildEnvironmentActionIdentifiers(state, a);
 	}
 
 	/**
-	 * Use CodingManager to create the specific environment Action identifiers: 
-	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom 
-	 * 
+	 * Use CodingManager to create the specific environment Action identifiers:
+	 * ConcreteID, AbstractID
+	 *
 	 * @param state
 	 * @param action
 	 */

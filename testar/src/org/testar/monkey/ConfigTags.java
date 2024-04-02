@@ -72,6 +72,20 @@ public final class ConfigTags {
 	public static final Tag<String> ProcessLogs = Tag.from("ProcessLogs", String.class, 
 			"Regular expressions to store execution logs coming from the processes");
 
+	public static final Tag<Boolean> LogOracleEnabled = Tag.from("LogOracleEnabled", Boolean.class, 
+			"Enable the Oracle for detecting suspicious messages in log files and standard output of commands");
+
+	public static final Tag<String> LogOracleRegex = Tag.from("LogOracleRegex", String.class, 
+			"Regular expressions ORACLE to find suspicious messages in the logs");
+
+	@SuppressWarnings("unchecked")
+	public static final Tag<List<String>> LogOracleCommands = Tag.from("LogOracleCommands", (Class<List<String>>) (Class<?>) List.class, 
+			"A list of commands of which standard output should be monitored");
+
+	@SuppressWarnings("unchecked")
+	public static final Tag<List<String>> LogOracleFiles = Tag.from("LogOracleFiles", (Class<List<String>>) (Class<?>) List.class, 
+			"A list of paths of log files to monitor");
+
 	public static final Tag<String> ClickFilter = Tag.from("ClickFilter", String.class, 
 			"Regular expressions to FILTER GUI widgets");
 
@@ -283,9 +297,12 @@ public final class ConfigTags {
 
 	public static final Tag<String> TempDir = Tag.from("TempDir", String.class, 
 			"The relative path to temporarily  save TESTAR files");
-
-	public static final Tag<String> ReportingClass = Tag.from("ReportingClass", String.class, 
-			"Sets whether create a HTML or NUNIT report");
+	
+	public static final Tag<Boolean> ReportInHTML = Tag.from("ReportInHTML", Boolean.class,
+			 "Sets whether to create a HTML report");
+	
+	public static final Tag<Boolean> ReportInPlainText = Tag.from("ReportInPlainText", Boolean.class,
+			 "Sets whether to create a plain text report");
 
 	/**
 	 * Other settings

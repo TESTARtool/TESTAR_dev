@@ -30,11 +30,13 @@
 
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Scanner;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -145,7 +147,22 @@ public class Protocol_test_gradle_workflow_desktop_generic extends DesktopProtoc
 			}
 		}
 
-		super.postSequenceProcessing();
+		super.postSequenceProcessing(); // Finish Reports
+
+		// Verify html and txt report files were created
+		File htmlReportFile = new File(reportManager.getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".html"));
+		File txtReportFile = new File(reportManager.getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".txt"));
+		System.out.println("htmlReportFile: " + htmlReportFile.getPath());
+		System.out.println("txtReportFile: " + txtReportFile.getPath());
+		Assert.isTrue(htmlReportFile.exists());
+		Assert.isTrue(txtReportFile.exists());
+
+		// Verify report information
+		Assert.isTrue(fileContains("<h1>TESTAR execution sequence report for sequence 1</h1>", htmlReportFile));
+		Assert.isTrue(fileContains("TESTAR execution sequence report for sequence 1", txtReportFile));
+
+		Assert.isTrue(fileContains("<h2>Test verdict for this sequence:", htmlReportFile));
+		Assert.isTrue(fileContains("Test verdict for this sequence:", txtReportFile));
 	}
 
 	private boolean folderIsEmpty(Path path) {
@@ -155,6 +172,23 @@ public class Protocol_test_gradle_workflow_desktop_generic extends DesktopProtoc
 			} catch (IOException e) {
 				return false;
 			}
+		}
+		return false;
+	}
+
+	private boolean fileContains(String searchText, File file) {
+		try (Scanner scanner = new Scanner(file)) {
+			// Read the content of the file line by line
+			while (scanner.hasNextLine()) {
+				String line = scanner.nextLine();
+
+				// Check if the line contains the specific text
+				if (line.contains(searchText)) {
+					return true;
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 		}
 		return false;
 	}
