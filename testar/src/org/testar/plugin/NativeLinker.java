@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,7 +27,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
-
 
 package org.testar.plugin;
 
@@ -186,7 +185,7 @@ public class NativeLinker {
 	 * @param executableCommand The application/ process/ command that will be run.
 	 * @return A handle to the process in a SUT object.
 	 */
-	public static SUT getNativeSUT(String executableCommand, boolean ProcessListenerEnabled) {
+	public static SUT getNativeSUT(String executableCommand, boolean ProcessListenerEnabled, String SUTProcesses) {
 		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
 			return WdDriver.fromExecutable(executableCommand);
 		}
@@ -198,11 +197,11 @@ public class NativeLinker {
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7)) {
-				return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled);
+				return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled, SUTProcesses);
 			}
 			else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_10)) {
 				if (executableCommand.toLowerCase().contains(".exe") || executableCommand.contains(".jar")) {
-					return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled);
+					return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled, SUTProcesses);
 				}
 				else {
 					return WinProcess.fromExecutableUwp(executableCommand);
@@ -210,7 +209,7 @@ public class NativeLinker {
 			}
 			else {
 				System.out.println("TESTAR detected OS: " + osName + " and this is not yet full supported.");
-				return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled);
+				return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled, SUTProcesses);
 			}
 		}
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {

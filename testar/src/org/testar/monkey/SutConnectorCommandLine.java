@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2024 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -41,31 +41,33 @@ import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.windows.WinApiException;
 import org.testar.plugin.NativeLinker;
+import org.testar.settings.Settings;
 
 public class SutConnectorCommandLine implements SutConnector {
 
-    private String SUTConnectorValue;
+    private String SUTConnectorValue; // The main executable or URL of the SUT
     private boolean processListenerEnabled;
     private double startupTime;
     private long maxEngageTime;
     private StateBuilder builder;
     private boolean tryToKillIfRunning = true; //set to false after 1st re-try
     private boolean flashFeedback;
+    private String SUTProcesses; // Optional regex expression for multi-processes SUTs
     private static final Logger logger = LogManager.getLogger();
 
-    public SutConnectorCommandLine(String SUTConnectorValue, boolean processListenerEnabled, double startupTime, long maxEngageTime, StateBuilder builder, boolean flashFeedback) {
-        this.SUTConnectorValue = SUTConnectorValue;
-        this.processListenerEnabled = processListenerEnabled;
-        this.startupTime = startupTime;
-        this.maxEngageTime = maxEngageTime;
-        this.builder = builder;
-        this.flashFeedback = flashFeedback;
+    public SutConnectorCommandLine(StateBuilder builder, boolean processListenerEnabled, Settings settings) {
+    	this.builder = builder;
+    	this.processListenerEnabled = processListenerEnabled;
+    	this.SUTConnectorValue = settings.get(ConfigTags.SUTConnectorValue);
+        this.startupTime = settings.get(ConfigTags.StartupTime)*1000;
+        this.maxEngageTime = Math.round(settings.get(ConfigTags.StartupTime).doubleValue() * 1000.0);
+        this.flashFeedback = settings.get(ConfigTags.FlashFeedback);
+        this.SUTProcesses = settings.get(ConfigTags.SUTProcesses);
     }
 
     @Override
     public SUT startOrConnectSut() {
-
-        SUT sut = NativeLinker.getNativeSUT(SUTConnectorValue, processListenerEnabled);
+        SUT sut = NativeLinker.getNativeSUT(SUTConnectorValue, processListenerEnabled, SUTProcesses);
         //Print info to the user to know that TESTAR is NOT READY for its use :-(
         String printSutInfo = "Waiting for the SUT to be accessible ...";
         int timeFlash = (int)startupTime;
