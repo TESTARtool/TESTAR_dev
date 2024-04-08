@@ -41,9 +41,11 @@ import org.testar.monkey.Util;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.ActionFailedException;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
+import org.testar.monkey.alayer.exceptions.WidgetNotFoundException;
 import org.testar.protocols.DesktopProtocol;
 import org.testar.settings.Settings;
 import org.testar.simplestategraph.GuiStateGraphWithVisitedActions;
@@ -169,8 +171,12 @@ public class Protocol_desktop_widget_recognition extends DesktopProtocol {
 		reportManager.addSelectedAction(state, action);
 		double waitTime = settings().get(ConfigTags.TimeToWaitAfterAction);
 		double halfWait = waitTime == 0 ? 0.01 : waitTime / 2.0;
+		Util.pause(halfWait); // help for a better match of the state' actions visualization
 
 		try {
+			// Resetting the visualization before taking the action screenshot
+			// This avoids taking action screenshots with painted dots that provoke image recognition issues
+			Util.clear(cv); cv.end();
 
 			String widgetScreenshotPath = ProtocolUtil.getActionshot(state, action);
 			System.out.println("widgetScreenshotPath " + widgetScreenshotPath);
@@ -181,6 +187,8 @@ public class Protocol_desktop_widget_recognition extends DesktopProtocol {
 				return detectSikuliScreenWidget(action, widgetScreenshotPath, halfWait);
 			}
 		}catch(ActionFailedException afe){
+			return false;
+		}catch(WidgetNotFoundException wnfe){
 			return false;
 		}catch (NoSuchTagException e) {
 			e.printStackTrace();
@@ -228,11 +236,23 @@ public class Protocol_desktop_widget_recognition extends DesktopProtocol {
 	}
 
 	protected String getTextToType(Action action){
-		return action.toShortString().substring(action.toShortString().indexOf("("), action.toShortString().indexOf(")"));
+		return action.get(Tags.Desc).substring(nthIndexOf(action.get(Tags.Desc), "'", 1) + 1, nthIndexOf(action.get(Tags.Desc), "'", 2));
 	}
 
-	protected void waitForScreenshotFile(String widgetScreenshotPath, double waitTime){
+	private int nthIndexOf(String input, String substring, int nth) {
+		if (nth == 1) {
+			return input.indexOf(substring);
+		} else {
+			return input.indexOf(substring, nthIndexOf(input, substring, nth - 1) + substring.length());
+		}
+	}
+
+	protected void waitForScreenshotFile(String widgetScreenshotPath, double waitTime) throws FindFailed {
 		//System.out.println("DEBUG: sikuli clicking ");
+		if(widgetScreenshotPath == null) {
+			// This situation can occur with sliding actions because TESTAR does not take action screenshots for them
+			throw new FindFailed("TESTAR action screenthot not found! This approach only works with click and type actions");
+		}
 		while(!new File(widgetScreenshotPath).exists()){
 			//System.out.println("Waiting for image file to exist");
 			Util.pause(waitTime);
