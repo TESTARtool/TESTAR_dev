@@ -53,7 +53,7 @@ import org.testar.settings.Settings;
 public class Protocol_desktop_generic extends DesktopProtocol {
 
 	String modelIdentifier = "";
-¡
+	
 	/**
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work

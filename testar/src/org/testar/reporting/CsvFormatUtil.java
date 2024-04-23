@@ -38,7 +38,7 @@ public class CsvFormatUtil extends BaseFormatUtil
 {
     private String               delimiter;
     private Map<Integer, Field>  fields; //the fields and their data
-    private Map<String, Integer> fieldsIndex; //the lookup that insures a fixed order
+    private Map<String, Integer> fieldsIndex; //the lookup that ensures a fixed order
     private boolean              fieldsLocked = false;
     
     public CsvFormatUtil(String filePath, String delimiter)
