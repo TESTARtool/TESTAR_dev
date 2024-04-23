@@ -4,9 +4,14 @@ import org.testar.statemodel.actionselector.ActionSelector;
 import org.testar.statemodel.exceptions.ActionNotFoundException;
 import org.testar.statemodel.exceptions.StateModelException;
 import org.testar.statemodel.persistence.PersistenceManager;
+import org.testar.statemodel.persistence.orientdb.entity.EntityManager;
 import org.testar.statemodel.sequence.SequenceError;
 import org.testar.statemodel.sequence.SequenceManager;
 import org.testar.statemodel.util.AbstractStateService;
+
+import com.orientechnologies.orient.core.sql.executor.OResult;
+import com.orientechnologies.orient.core.sql.executor.OResultSet;
+
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tag;
@@ -270,6 +275,17 @@ public class ModelManager implements StateModelManager {
     @Override
     public void notifyTestSequenceInterruptedBySystem(String message) {
         sequenceManager.notifyInterruptionBySystem(message);
+    }
+
+    @Override
+    public String queryStateModel(String query) {
+    	EntityManager manager = persistenceManager.getEntityManager();
+    	OResultSet resultSet = manager.getConnection().getDatabaseSession().query(query);
+    	while(resultSet.hasNext()) {
+    		OResult result = resultSet.next();
+    		return result.toString();
+    	}
+    	return "Empty";
     }
 
 }

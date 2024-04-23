@@ -52,6 +52,8 @@ import org.testar.settings.Settings;
  */
 public class Protocol_desktop_generic extends DesktopProtocol {
 
+	String modelIdentifier = "";
+¡
 	/**
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
@@ -59,7 +61,12 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings){
+		// This is initializing the new model
 		super.initialize(settings);
+
+		String query = "SELECT modelIdentifier FROM AbstractStateModel";
+		modelIdentifier = stateModelManager.queryStateModel(query);
+		System.out.println("modelIdentifier: " + modelIdentifier);
 	}
 
 	/**
@@ -116,6 +123,10 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 		if(settings.get(ConfigTags.Mode) == Modes.Generate && settings.get(ConfigTags.CreateWidgetInfoJsonFile))
 			JsonUtils.createWidgetInfoJsonFile(state);
 
+		String query = "select * from SequenceNode";
+		String result = stateModelManager.queryStateModel(query);
+		System.out.println("Query Result: " + result);
+		
 		return state;
 	}
 

@@ -3,6 +3,7 @@ package org.testar.statemodel.persistence;
 
 import org.testar.statemodel.event.StateModelEvent;
 import org.testar.statemodel.event.StateModelEventListener;
+import org.testar.statemodel.persistence.orientdb.entity.EntityManager;
 import org.testar.statemodel.sequence.Sequence;
 import org.testar.statemodel.sequence.SequenceManager;
 import org.testar.statemodel.sequence.SequenceNode;
@@ -87,5 +88,10 @@ public class DummyManager implements PersistenceManager, StateModelEventListener
     @Override
     public int getNrOfNondeterministicActions(AbstractStateModel abstractStateModel) {
         return 0;
+    }
+
+    @Override
+    public EntityManager getEntityManager() {
+    	return null;
     }
 }
