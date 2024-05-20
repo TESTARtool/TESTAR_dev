@@ -34,10 +34,7 @@ public class BuildAndroidActions {
 
 	@Test
 	public void buildAndroidActionClick() {
-		Action androidClick = new AndroidActionClick(state, widget,
-				widget.get(AndroidTags.AndroidText,""),
-				widget.get(AndroidTags.AndroidAccessibilityId,""),
-				widget.get(AndroidTags.AndroidClassName, ""));
+		Action androidClick = new AndroidActionClick(state, widget);
 		// Verify Action <-> Widget mapping
 		Assert.notNull(androidClick.get(Tags.OriginWidget));
 		Assert.isTrue(androidClick.get(Tags.OriginWidget).get(AndroidTags.AndroidXpath).equals(pathTest));

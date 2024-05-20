@@ -102,25 +102,25 @@ public class Protocol_desktop_generic_notepad_plus extends DesktopProtocol {
 		List<Role> list = Arrays.asList(new Role[]{UIARoles.UIAMenuItem, UIARoles.UIAListItem});
 		for(Widget w : state) {
 			if(list.contains(w.get(Tags.Role, Roles.Widget))) {
-				String titleAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(w, Tags.Title, Tags.Role, Tags.Path);
-				w.set(Tags.AbstractIDCustom, titleAbstractId);
+				String titleAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT + CodingManager.codify(w, Tags.Title, Tags.Role, Tags.Path);
+				w.set(Tags.AbstractID, titleAbstractId);
 			}
 			// ScrollBar widgets can appear dynamically when lot of text appear
 			// Ignore these widgets due we are ignoring if notepad has text or not
 			if(isSonOfScrollBarWidgets(w)) {
-				w.set(Tags.AbstractIDCustom, "");
+				w.set(Tags.AbstractID, "");
 			}
 
 			// Thumb widgets also appear dynamically when lot of text appear (vertical + horizontal scrollbars)
 			// It is better to also ignore them
 			if(w.get(Tags.Role, Roles.Widget).equals(UIARoles.UIAThumb)) {
-				w.set(Tags.AbstractIDCustom, "");
+				w.set(Tags.AbstractID, "");
 			}
 
 			// Ignore tool tip messages that appear when the mouse position is over a widget
 			// This is probably not needed anymore due to the getState checking that moves the mouse
 			if(w.get(Tags.Role, Roles.Widget).equals(UIARoles.UIAToolTip)) {
-				w.set(Tags.AbstractIDCustom, "");
+				w.set(Tags.AbstractID, "");
 			}
 		}
 
@@ -129,10 +129,10 @@ public class Protocol_desktop_generic_notepad_plus extends DesktopProtocol {
 		finalStateAbstractIdCustom = new StringBuilder();
 		for (Widget w : state){
 			if (!(w instanceof State)) {
-				finalStateAbstractIdCustom.append(w.get(Tags.AbstractIDCustom));
+				finalStateAbstractIdCustom.append(w.get(Tags.AbstractID));
 			}
 		}
-		state.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_STATE + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.lowCollisionID(finalStateAbstractIdCustom.toString()));
+		state.set(Tags.AbstractID, CodingManager.ID_PREFIX_STATE + CodingManager.ID_PREFIX_ABSTRACT + CodingManager.lowCollisionID(finalStateAbstractIdCustom.toString()));
 	}
 
 	private boolean isSonOfScrollBarWidgets(Widget w) {

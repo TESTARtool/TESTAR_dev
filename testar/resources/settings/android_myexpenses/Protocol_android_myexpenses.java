@@ -98,28 +98,28 @@ public class Protocol_android_myexpenses extends AndroidProtocol {
 		for(Widget w : state) {
 			// Ignore dynamic search for date menu
 			if(dynamicSearchDateState) {
-				String widgetAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(w, Tags.Role, Tags.Path);
-				w.set(Tags.AbstractIDCustom, widgetAbstractId);
+				String widgetAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT + CodingManager.codify(w, Tags.Role, Tags.Path);
+				w.set(Tags.AbstractID, widgetAbstractId);
 			}
 			// Ignore dynamic calculator content
 			if(isSonOfCalculator(w)) {
-				String widgetAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(w, Tags.Role, Tags.Path);
-				w.set(Tags.AbstractIDCustom, widgetAbstractId);
+				String widgetAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT + CodingManager.codify(w, Tags.Role, Tags.Path);
+				w.set(Tags.AbstractID, widgetAbstractId);
 			}
 			// Ignore dynamic spinner text content
 			if(w.get(AndroidTags.AndroidResourceId, "").contains("id/text1") && isSonOfSpinner(w)) {
-				String widgetAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(w, Tags.Role, Tags.Path);
-				w.set(Tags.AbstractIDCustom, widgetAbstractId);
+				String widgetAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT + CodingManager.codify(w, Tags.Role, Tags.Path);
+				w.set(Tags.AbstractID, widgetAbstractId);
 			}
 			// Use checked property if check widget is son of sort by menu to avoid non-determinism
 			if(w.get(AndroidTags.AndroidClassName, "").contains("CheckedTextView") && statesWithCheckOptions) {
-				String widgetAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(w, Tags.Role, Tags.Path, Tags.Title, AndroidTags.AndroidChecked);
-				w.set(Tags.AbstractIDCustom, widgetAbstractId);
+				String widgetAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT + CodingManager.codify(w, Tags.Role, Tags.Path, Tags.Title, AndroidTags.AndroidChecked);
+				w.set(Tags.AbstractID, widgetAbstractId);
 			}
 			// Ignore dates and hours dynamic titles
 			if(checkDatePattern(w.get(Tags.Title, "")) || checkHourPattern(w.get(Tags.Title, ""))) {
-				String widgetAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(w, Tags.Role, Tags.Path);
-				w.set(Tags.AbstractIDCustom, widgetAbstractId);
+				String widgetAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT + CodingManager.codify(w, Tags.Role, Tags.Path);
+				w.set(Tags.AbstractID, widgetAbstractId);
 			}
 		}
 
@@ -128,11 +128,11 @@ public class Protocol_android_myexpenses extends AndroidProtocol {
 		finalStateAbstractIdCustom = new StringBuilder();
 		for (Widget w : state){
 			if (!(w instanceof State)) {
-				finalStateAbstractIdCustom.append(w.get(Tags.AbstractIDCustom));
+				finalStateAbstractIdCustom.append(w.get(Tags.AbstractID));
 			}
 		}
 
-		state.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_STATE + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.lowCollisionID(finalStateAbstractIdCustom.toString()));
+		state.set(Tags.AbstractID, CodingManager.ID_PREFIX_STATE + CodingManager.ID_PREFIX_ABSTRACT + CodingManager.lowCollisionID(finalStateAbstractIdCustom.toString()));
 	}
 
 	private boolean stateContainsSearchForDateMenu(State state) {
@@ -263,8 +263,6 @@ public class Protocol_android_myexpenses extends AndroidProtocol {
 			nopAction.set(Tags.Role, Roles.System);
 			nopAction.set(Tags.AbstractID, state.get(Tags.AbstractID) + "_NOP");
 			nopAction.set(Tags.ConcreteID, state.get(Tags.ConcreteID) + "_NOP");
-			nopAction.set(Tags.AbstractIDCustom, state.get(Tags.AbstractIDCustom) + "_NOP");
-			nopAction.set(Tags.ConcreteIDCustom, state.get(Tags.ConcreteIDCustom) + "_NOP");
 			return new HashSet<>(Collections.singletonList(nopAction));
 		}
 

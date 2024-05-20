@@ -168,24 +168,24 @@ public class Protocol_desktop_generic_obs extends DesktopProtocol {
 		for(Widget w : state) {
 			// Ignore StatusBar widgets since these are different and dynamic
 			if(isSonOfStatusBarWidget(w)) {
-				w.set(Tags.AbstractIDCustom, "");
+				w.set(Tags.AbstractID, "");
 			}
 
 			// Ignore all properties of widget sons of the stats window since these are different and dynamic
 			if(isSonOfStatsWindow(w)) {
-				w.set(Tags.AbstractIDCustom, "");
+				w.set(Tags.AbstractID, "");
 			}
 
 			// Ignore tool tip messages that appear when the mouse position is over a widget
 			// However, this in not enough because tool tip messages affects all widget paths
 			// This is probably not needed anymore due to the getState checking that moves the mouse
 			if(w.get(UIATags.UIAAutomationId, "").contains("qtooltip_label")) {
-				w.set(Tags.AbstractIDCustom, "");
+				w.set(Tags.AbstractID, "");
 			}
 
 			if(list.contains(w.get(Tags.Role, Roles.Widget))) {
-				String titleAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(w, Tags.Title, Tags.Role, Tags.Path);
-				w.set(Tags.AbstractIDCustom, titleAbstractId);
+				String titleAbstractId = CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT + CodingManager.codify(w, Tags.Title, Tags.Role, Tags.Path);
+				w.set(Tags.AbstractID, titleAbstractId);
 			}
 		}
 
@@ -194,10 +194,10 @@ public class Protocol_desktop_generic_obs extends DesktopProtocol {
 		finalStateAbstractIdCustom = new StringBuilder();
 		for (Widget w : state){
 			if (!(w instanceof State)) {
-				finalStateAbstractIdCustom.append(w.get(Tags.AbstractIDCustom));
+				finalStateAbstractIdCustom.append(w.get(Tags.AbstractID));
 			}
 		}
-		state.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_STATE + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.lowCollisionID(finalStateAbstractIdCustom.toString()));
+		state.set(Tags.AbstractID, CodingManager.ID_PREFIX_STATE + CodingManager.ID_PREFIX_ABSTRACT + CodingManager.lowCollisionID(finalStateAbstractIdCustom.toString()));
 
 		// When some widget opens the file explorer or browser,
 		// TESTAR will kill the process but the detected state abstract id is the same than the initial state
@@ -206,7 +206,7 @@ public class Protocol_desktop_generic_obs extends DesktopProtocol {
 		// To avoid this similar abstract state id for future change detection issues, 
 		// we can modify the state abstract id manually
 		if(!state.get(Tags.Foreground, true)) {
-			state.set(Tags.AbstractIDCustom, (state.get(Tags.AbstractIDCustom) + "background"));
+			state.set(Tags.AbstractID, (state.get(Tags.AbstractID) + "background"));
 		}
 	}
 
