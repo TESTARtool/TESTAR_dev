@@ -102,7 +102,7 @@ task runTestDesktopGenericCommandLineSettingsFilterSuspiciousTag(type: Exec, dep
     group = 'test_testar_workflow'
     description ='runTestDesktopGenericCommandLineSettingsFilterSuspiciousTag'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_command_settings_filter_and_suspicious" TagsToFilter="NotExist;Desc" ClickFilter=".*[sS]ystem.*|.*[cC]lose.*|.*[mM]inimize.*|.*[mM]aximize.*|Text Editor|File|Edit|View|Help|Word Wrap" SuspiciousTags=".*[sS]cript.*" TimeToWaitAfterAction=2.0 ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic AlwaysCompile=true ApplicationName="notepad_command_settings_filter_and_suspicious" TagsToFilter="NotExist;Desc" ClickFilter=".*[sS]ystem.*|.*[cC]lose.*|.*[mM]inimize.*|.*[mM]aximize.*|Text Editor|File|Edit|View|Help|Word Wrap" SuspiciousTags=".*[sS]cript.*" TimeToWaitAfterAction=9.9 ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2'
     doLast {
         String output = standardOutput.toString()
 
@@ -238,7 +238,7 @@ task runTestDesktopGenericStateModel(type: Exec, dependsOn: createDatabaseOrient
     group = 'test_testar_workflow'
     description ='runTestDesktopGenericStateModel'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic_statemodel AlwaysCompile=true ApplicationName="notepad_state_model" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2 TimeToWaitAfterAction=2.0 ClickFilter=".*[sS]ystem.*|.*[cC]lose.*|.*[mM]inimize.*|.*[mM]aximize.*|Text Editor|File|Edit|View|Help|Word Wrap" StateModelEnabled=true DataStoreDB=testar DataStoreUser=admin DataStorePassword=admin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic_statemodel AlwaysCompile=true ApplicationName="notepad_state_model" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2 ClickFilter=".*[sS]ystem.*|.*[cC]lose.*|.*[mM]inimize.*|.*[mM]aximize.*|Text Editor|File|Edit|View|Help|Word Wrap" StateModelEnabled=true DataStoreDB=testar DataStoreUser=admin DataStorePassword=admin'
     doLast {
         String output = standardOutput.toString()
 
@@ -273,9 +273,9 @@ task runTestDesktopGenericStateModelCustomAbstraction(type: Exec, dependsOn: cre
 
 		// Check that output contains 0 unvisited actions left
         if(output.contains("0 unvisited actions left")) {
-            println "\n${output} \nTESTAR Action AbstractIDCustom has been customized sucessfully"
+            println "\n${output} \nTESTAR Action AbstractID has been customized sucessfully"
         } else {
-            throw new GradleException("\n${output} \nERROR: with Action AbstractIDCustom custom identifier")
+            throw new GradleException("\n${output} \nERROR: with Action AbstractID custom identifier")
         }
     }
 }
@@ -327,7 +327,7 @@ task runTestWebdriverSuspiciousTagMacOS(type: Exec) {
     group = 'test_testar_workflow'
     description ='runTestWebdriverSuspiciousTagMacOS'
     workingDir 'target/install/testar/bin'
-    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_webdriver_generic SUTConnectorValue=" ""/usr/local/share/chromedriver-mac-x64/chromedriver"" ""https://para.testar.org/parabank/cookies.htm"" " FlashFeedback=false AlwaysCompile=true ApplicationName="webdriver_and_suspicious" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[fF]orums.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
+    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_webdriver_generic SUTConnectorValue=" ""/usr/local/share/chromedriver-mac-arm64/chromedriver"" ""https://para.testar.org/parabank/cookies.htm"" " FlashFeedback=false AlwaysCompile=true ApplicationName="webdriver_and_suspicious" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[fF]orums.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
     doLast {
         String output = standardOutput.toString()
 
@@ -406,7 +406,7 @@ task runTestWebdriverCorrectReplay(type: Exec) {
     group = 'test_testar_workflow'
     description ='runTestWebdriverCorrectReplay'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_replay" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""C:\\\\SeleniumWebDrivers\\\\ChromeDriver\\\\chromedriver.exe"" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_replayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/t_jone_p_ptwo_p.testar'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_replay" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""C:\\\\SeleniumWebDrivers\\\\ChromeDriver\\\\chromedriver.exe"" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_replayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/paris_parisone.testar'
     doLast {
         String output = standardOutput.toString()
 
@@ -426,12 +426,12 @@ task runTestWebdriverUnreplayable(type: Exec) {
     group = 'test_testar_workflow'
     description ='runTestWebdriverUnreplayable'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_unreplayable" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""C:\\\\SeleniumWebDrivers\\\\ChromeDriver\\\\chromedriver.exe"" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_unreplayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/t_jone_p_ptwo_p.testar'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_unreplayable" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""C:\\\\SeleniumWebDrivers\\\\ChromeDriver\\\\chromedriver.exe"" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_unreplayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/paris_parisone.testar'
     doLast {
         String output = standardOutput.toString()
 
         // Check that TESTAR detects not replayable button
-        if(output.readLines().any{line->line.contains("Left Click at 'ParisTwo' of the replayed sequence can not been replayed")}) {
+        if(output.readLines().any{line->line.contains("Left Click at 'ParisOne' of the replayed sequence can not been replayed")}) {
             println "\n${output} \nTESTAR has sucessfully detected a not replayable sequence"
         } else {
             throw new GradleException("\n${output} \nERROR: Detecting not replayable button with TESTAR Replay mode")

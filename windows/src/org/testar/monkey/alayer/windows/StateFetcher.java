@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -546,8 +546,8 @@ public class StateFetcher implements Callable<UIAState>{
 
 				Rect rect = null;
 				try {
-					rect = Rect.from(new Double(x).doubleValue(), new Double(y).doubleValue(),
-									 new Double(width).doubleValue(), new Double(height).doubleValue());
+					rect = Rect.from(Double.valueOf(x).doubleValue(), Double.valueOf(y).doubleValue(),
+									 Double.valueOf(width).doubleValue(), Double.valueOf(height).doubleValue());
 					//if (parent.parent == null)
 					//	parent.rect = el.rect; // fix UI actions at root widget
 				} catch (Exception e){
@@ -586,7 +586,7 @@ public class StateFetcher implements Callable<UIAState>{
 					}*/
 					
 						long childAC;
-						int c = new Integer(childrenCount).intValue();
+						int c = Integer.valueOf(childrenCount).intValue();
 						el.children = new ArrayList<UIAElement>(c);
 						for (int i=0; i<c; i++){
 							childAC =  Windows.GetAccessibleChildFromContext(vmidAC[0],vmidAC[1],i);

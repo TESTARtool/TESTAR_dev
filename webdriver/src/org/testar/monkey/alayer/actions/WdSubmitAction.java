@@ -35,6 +35,8 @@ import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.*;
 
 public class WdSubmitAction extends TaggableBase implements Action {
+    private static final long serialVersionUID = 9102753249877445289L;
+
     private String formId;
 
     public WdSubmitAction(String formId) {

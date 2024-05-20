@@ -1,4 +1,9 @@
-## README
+## TESTAR Scriptless testing tool
+
+[![Gradle CI tests](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/gradle.yml/badge.svg)](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/gradle.yml)
+[![Docker Build](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/docker.yml/badge.svg)](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/docker.yml)
+[![Release](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/release.yml/badge.svg)](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/release.yml)
+[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
 This is the github development root folder for TESTAR development.  
 The software can be build with gradle.
@@ -193,8 +198,8 @@ If you encounter any errors, please create an issue and provide details about yo
 
 ### macOS (For Web systems under test)
 
-- macOS Monterey (version 12) operating system is used in the GitHub Action to run the chromedriver package of TESTAR for testing web applications.  
-``NOTE:`` The host architecture of tested macOS Monterey is an AMD64. The ARM architecture may require at least different software components, such as seleniarm docker images and chromedriver arm versions.   
+- macOS Monterey-ADM64 (version 12) and Sonoma-ARM (version 14) operating systems have been used in the GitHub Action to run the chromedriver package of TESTAR for testing web applications.  
+``NOTE:`` The ADM64 and ARM architectures require different software components, such as seleniarm docker images and chromedriver arm versions.   
 
 ### Android
 

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2022 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2022 - 2023 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,19 +28,41 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.oracles.log;
 
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
-import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Widget;
-import org.testar.monkey.alayer.WidgetIterator;
+/**
+ *  The standard implementation of a LogDetector. It matches every log message with a regular
+ *  expression to detect errors.
+ */
 
-public class StateStub extends WidgetStub implements State {
-	private static final long serialVersionUID = -2972642849689796355L;
+class RegexLogErrorDetector implements LogErrorDetector {
+    protected String regex;
 
-	@Override
-	public Iterator<Widget> iterator() {
-		return new WidgetIterator(this);
-	}
+    /**
+     *  Create a new RegexLogErrorDetector
+     *  @param regex Regular expression in Java 8 format to match error messages
+     */
+    public RegexLogErrorDetector (String regex) {
+        this.regex = regex;
+    }
+
+    /**
+     *  Detect errors in a list of log messages. This method would normally be called by the LogChecker.
+     *
+     * @param input List of log messages
+     * @return List of error messages in an arbitrary format - one item for each error.
+     */
+    public List<String> detectErrors (List<String> messages) {
+        List<String> result = new ArrayList<String>();
+        for ( String message : messages) {
+            if ( Pattern.matches (regex, message) ) {
+                result.add("The following log message contained errors: \"" + message + "\"");
+            }
+        }
+        return result;
+    }
 }

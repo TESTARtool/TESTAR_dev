@@ -124,15 +124,15 @@ public class Protocol_test_gradle_workflow_webdriver_parabank extends WebdriverP
 
         Assert.isTrue(screenshotsFolder.exists());
 
-        // Get all PNG files in the folder that contain "_ACC"
+        // Get all PNG files in the folder that contain "_AC"
         File[] pngFiles = screenshotsFolder.listFiles(new FilenameFilter() {
         	@Override
         	public boolean accept(File dir, String name) {
-        		return name.toLowerCase().endsWith(".png") && name.contains("_ACC");
+        		return name.toLowerCase().endsWith(".png") && name.contains("_AC");
         	}
         });
 
-        // Verify if there are at least 3 PNG files with "_ACC"
+        // Verify if there are at least 3 PNG files with "_AC"
         Assert.isTrue(pngFiles != null && pngFiles.length >= 3);
     }
 

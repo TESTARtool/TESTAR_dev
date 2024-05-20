@@ -37,7 +37,7 @@ import org.testar.monkey.Util;
 
 /**
  * A Verdict is the outcome of a test oracle. It determines whether an <code>SUT</code>'s state is erroneous and if so
- * provides a short explanation and a visualization of what is wrong. 
+ * provides a short explanation and a visualization of what is wrong.
  */
 public final class Verdict implements Serializable {
 	private static final long serialVersionUID = 3517681535425699094L;
@@ -50,13 +50,14 @@ public final class Verdict implements Serializable {
 	// FAIL
 	public static final double SEVERITY_WARNING = 		   0.7; // custom verdict
 	public static final double SEVERITY_SUSPICIOUS_TAG = 0.8; // suspicious tag
+	public static final double SEVERITY_SUSPICIOUS_LOG = 0.89; // suspicious message in log file or command output (LogOracle)
 	public static final double SEVERITY_NOT_RESPONDING =   0.99999990; // unresponsive
 	public static final double SEVERITY_UNEXPECTEDCLOSE =	   0.99999999; // crash? unexpected close?
 	public static final double SEVERITY_MAX = 1.0;
 
 	public static final double SEVERITY_OK = 			   SEVERITY_MIN;
 	public static final double SEVERITY_FAIL =	   		   SEVERITY_MAX;
-	
+
 	public static final double SEVERITY_UNREPLAYABLE = 0.1;
 
 	public static final Verdict OK = new Verdict(SEVERITY_OK, "No problem detected.", Util.NullVisualizer);
@@ -112,7 +113,7 @@ public final class Verdict implements Serializable {
 	/**
 	 * This visualizer should visualize the part of the state where the problem occurred.
 	 * For example: If there is a suspicious control element, like f.e. a critical message box
-	 * than this should be framed or pointed to with a big red arrow. 
+	 * than this should be framed or pointed to with a big red arrow.
 	 * @return the visualizer which is guaranteed to be non-null
 	 */
 	public Visualizer visualizer(){ return visualizer; }
@@ -124,11 +125,11 @@ public final class Verdict implements Serializable {
 	 * @param verdict A verdict to join with current verdict.
 	 * @return A new verdict that is the result of joining the current verdict with the provided verdict.
 	 */
-	public Verdict join(Verdict verdict){		
+	public Verdict join(Verdict verdict){
 		return new Verdict(Math.max(this.severity, verdict.severity()),
 				(this.info.contains(verdict.info) ? this.info :
-					(this.severity == SEVERITY_OK ? "" : this.info + "\n") + verdict.info())												
-				);		
+					(this.severity == SEVERITY_OK ? "" : this.info + "\n") + verdict.info())
+				);
 	}
 
 	@Override

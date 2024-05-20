@@ -144,8 +144,8 @@ public class FilteringManager
       this.idType = idType;
       this.role = role;
       this.parentRole = parentRole;
-      this.title = new Integer(title.hashCode()).toString();
-      this.parentTitle = new Integer(parentTitle.hashCode()).toString();
+      this.title = Integer.toString(title.hashCode());
+      this.parentTitle = Integer.toString(parentTitle.hashCode());
       this.treeDepth = treeDepth;
       this.children = children;
       this.filterCode = filterCode;
@@ -240,14 +240,14 @@ public class FilteringManager
             filterCodeS = element.getAttribute(XML_TAG_UI_FILTERING);
             if (filterCodeS != null && filterCodeS.length() > 0) {
               wi = new WidgetInfo(
-                  element.getAttribute(XML_ATTRIBUTE_CODING_TYPE), // id type
-                  element.getAttribute(XML_ATTRIBUTE_ROLE), // role
-                  element.getAttribute(XML_ATTRIBUTE_PARENT_ROLE), // parent role
-                  element.getAttribute(XML_ATTRIBUTE_TITLE), // title
-                  element.getAttribute(XML_ATTRIBUTE_PARENT_TITLE), // parent title
-                  depthS == null || depthS == "" ? new Integer(-1) : new Integer(depthS), // tree depth
-                  childrenS == null || childrenS == "" ? new Integer(-1) : new Integer(childrenS), // children count
-                  new Integer(filterCodeS)); // filter code
+                      element.getAttribute(XML_ATTRIBUTE_CODING_TYPE), // id type
+                      element.getAttribute(XML_ATTRIBUTE_ROLE), // role
+                      element.getAttribute(XML_ATTRIBUTE_PARENT_ROLE), // parent role
+                      element.getAttribute(XML_ATTRIBUTE_TITLE), // title
+                      element.getAttribute(XML_ATTRIBUTE_PARENT_TITLE), // parent title
+                  depthS == null || depthS == "" ? Integer.valueOf(-1) : Integer.valueOf(depthS), // tree depth
+                  childrenS == null || childrenS == "" ? Integer.valueOf(-1) : Integer.valueOf(childrenS), // children count
+                      Integer.valueOf(filterCodeS)); // filter code
               widgetsFilterList.put(element.getAttribute("wid"), wi);
             }
             else {
@@ -288,9 +288,9 @@ public class FilteringManager
         parentRole, // parent role
         w.get(Tags.Title, "null"), // title
         parentTitle, // parent title
-        new Integer(Util.depth(w)), // tree depth
-        new Integer(w.childCount()), // children count
-        new Integer(widgetFilter)); // filter code
+        Integer.valueOf(Util.depth(w)), // tree depth
+        Integer.valueOf(w.childCount()), // children count
+        Integer.valueOf(widgetFilter)); // filter code
     String widgetID = null;
     switch (idType) {
       case CodingManager.ABSTRACT_R_ID:

@@ -159,6 +159,15 @@ public class SettingsFileStructure {
 				, ConfigTags.ProcessLogs.name() + " = "
 				, ""
 				, "#################################################################"
+				, "# Oracles based on suspicious titles in SUT output files"
+				, "#################################################################"
+				, ""
+				, ConfigTags.LogOracleEnabled.name() + " = "
+				, ConfigTags.LogOracleRegex.name() + " = "
+				, ConfigTags.LogOracleCommands.name() + " = "
+				, ConfigTags.LogOracleFiles.name() + " = "
+				, ""
+				, "#################################################################"
 				, "# Time configurations"
 				, "#"
 				, "# ActionDuration: " + ConfigTags.ActionDuration.getDescription()
@@ -282,6 +291,13 @@ public class SettingsFileStructure {
 				, ""
 				, ConfigTags.ExtendedSettingsFile.name() + " = "
 				, ""
+				, "#################################################################"
+				, "# Set the types of reports to create"
+				, "#################################################################"
+				, ""
+				, ConfigTags.ReportInHTML.name() + " = "
+				, ConfigTags.ReportInPlainText.name() + " = "
+				, ""
 				);
 
 		// Second, create a list of secondary configuration tags settings
@@ -309,7 +325,6 @@ public class SettingsFileStructure {
 		secondarySettingsList.add(ConfigTags.ProtocolCompileDirectory);
 		secondarySettingsList.add(ConfigTags.OutputDir);
 		secondarySettingsList.add(ConfigTags.TempDir);
-		secondarySettingsList.add(ConfigTags.ReportingClass);
 
 		StringJoiner secondaryString = new StringJoiner(System.getProperty("line.separator"));
 		for(Tag<?> set : secondarySettingsList) {

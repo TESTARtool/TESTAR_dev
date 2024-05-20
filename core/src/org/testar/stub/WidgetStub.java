@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2023 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,7 +30,7 @@
 
 package org.testar.stub;
 
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 import org.testar.monkey.Assert;
 import org.testar.monkey.Drag;
 import org.testar.monkey.Util;
@@ -39,9 +39,6 @@ import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.TaggableBase;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
-import org.testar.monkey.alayer.webdriver.enums.WdTags;
-import org.testar.monkey.alayer.windows.UIATags;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -84,17 +81,17 @@ public class WidgetStub extends TaggableBase implements Widget {
 
 	@Override
 	public void remove() {
-		throw new NotImplementedException();
+		throw new NotImplementedException("NotImplementedException");
 	}
 
 	@Override
 	public void moveTo(Widget p, int idx) {
-		throw new NotImplementedException();
+		throw new NotImplementedException("NotImplementedException");
 	}
 
 	@Override
 	public Widget addChild() {
-		throw new NotImplementedException();
+		throw new NotImplementedException("NotImplementedException");
 	}
 
 	public Widget addChild(Widget widget) {
@@ -104,7 +101,7 @@ public class WidgetStub extends TaggableBase implements Widget {
 
 	@Override
 	public Drag[] scrollDrags(double scrollArrowSize, double scrollThick) {
-		throw new NotImplementedException();
+		throw new NotImplementedException("NotImplementedException");
 	}
 
 	@Override
@@ -119,12 +116,12 @@ public class WidgetStub extends TaggableBase implements Widget {
 
 	@Override
 	public String toString(Tag<?>... tags){
-		return Util.treeDesc(this, 2, tags);
+		return Util.widgetDesc(this, tags);
 	}
 
 	@Override
 	public void remove(Tag<?> tag) {
-		throw new NotImplementedException();
+		throw new NotImplementedException("NotImplementedException");
 	}
 
 	Iterable<Tag<?>> tags(final Widget w) {
@@ -133,8 +130,6 @@ public class WidgetStub extends TaggableBase implements Widget {
 		final Set<Tag<?>> queryTags = new HashSet<Tag<?>>();
 		queryTags.addAll(tags.keySet());
 		queryTags.addAll(Tags.tagSet());
-		queryTags.addAll(UIATags.tagSet());
-		queryTags.addAll(WdTags.tagSet());
 
 		Iterable<Tag<?>> ret = new Iterable<Tag<?>>() {
 			public Iterator<Tag<?>> iterator() {

@@ -115,7 +115,7 @@ public class AndroidWidget implements Widget, Serializable {
 	@Override
 	//TODO: Extend this such that when I log I get some more useful information.
 	public String toString(Tag<?>... tags) {
-		return Util.treeDesc(this, 2, tags);
+		return Util.widgetDesc(this, tags);
 	}
 
 	@Override

@@ -30,15 +30,15 @@
 
 package org.testar.settings;
 
-import static org.testar.monkey.ConfigTags.*;
+import org.testar.monkey.Main;
+import org.testar.monkey.Pair;
+import org.testar.monkey.RuntimeControlsProtocol;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.testar.monkey.Main;
-import org.testar.monkey.Pair;
-import org.testar.monkey.RuntimeControlsProtocol;
+import static org.testar.monkey.ConfigTags.*;
 
 public class SettingsDefaults {
 
@@ -104,6 +104,8 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(OverrideWebDriverDisplayScale, ""));
 		defaults.add(Pair.from(CreateWidgetInfoJsonFile, false));
 		defaults.add(Pair.from(FormFillingAction, false));
+		defaults.add(Pair.from(ReportInHTML, true));
+		defaults.add(Pair.from(ReportInPlainText, false));
 
 		// Oracles for webdriver browser console
 		defaults.add(Pair.from(WebConsoleErrorOracle, false));
@@ -118,7 +120,6 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(ProtocolSpecificSetting_5, ""));
 		defaults.add(Pair.from(FlashFeedback, true));
 		defaults.add(Pair.from(ProtocolCompileDirectory, "./settings"));
-		defaults.add(Pair.from(ReportingClass,"HTML Reporting"));
 
 		defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
 			{
@@ -178,6 +179,12 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(Username, ""));
 		defaults.add(Pair.from(Password, ""));
 		 */
+
+		// Settings for LogOracle
+		defaults.add(Pair.from(LogOracleEnabled, false));
+		defaults.add(Pair.from(LogOracleRegex, ".*([Ee]xception|[Ee]rror).*"));
+		defaults.add(Pair.from(LogOracleCommands, new ArrayList<String>()));
+		defaults.add(Pair.from(LogOracleFiles, new ArrayList<String>()));
 
 		return defaults;
 	}

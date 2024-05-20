@@ -50,7 +50,7 @@ public class WdSelectListAction extends TaggableBase implements Action {
         this.value = value;
         this.set(Tags.Role, WdActionRoles.SelectListAction);
         this.set(Tags.Desc, "Set Webdriver select list script to set into " + elementId + " : " + value);
-        this.set(Tags.OriginWidget, widget);
+        this.mapActionToWidget(widget);
     }
 
     @Override

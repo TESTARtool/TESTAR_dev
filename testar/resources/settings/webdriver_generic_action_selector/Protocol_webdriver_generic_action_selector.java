@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2024 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -65,7 +65,7 @@ public class Protocol_webdriver_generic_action_selector extends WebdriverProtoco
 		/**
 		 * Detect and reduce the selection similar actions between previous and current state. 
 		 * The executed action additional increases the counter in 1. 
-		 * This selector uses the action origin widget AbstractIDCustom to match the similarity. 
+		 * This selector uses the action origin widget AbstractID to match the similarity. 
 		 * 
 		 * 5 is the default maximum numeric weight. 
 		 * As this value increases, there is less probability % of selecting a "similar" action. 
