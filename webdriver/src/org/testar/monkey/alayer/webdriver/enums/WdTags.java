@@ -32,6 +32,7 @@ package org.testar.monkey.alayer.webdriver.enums;
 
 import java.util.Map;
 
+import org.openqa.selenium.WebElement;
 import org.testar.monkey.alayer.Rect;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.TagsBase;
@@ -251,6 +252,21 @@ public class WdTags extends TagsBase {
    */
   public static final Tag<Integer> WebMaxLength = from("WebMaxLength", Integer.class);
 
+  /**
+   * Represents the inner HTML content of a web widget-element as a string.
+   */
+  public static final Tag<String> WebInnerHTML = from("WebInnerHTML", String.class);
+
+  /**
+   * Represents the entire HTML markup of a web widget-element, including its opening and closing tags, as a string.
+   */
+  public static final Tag<String> WebOuterHTML = from("WebOuterHTML", String.class);
+
+  /**
+   * Represents the remote web element object obtained with Selenium framework
+   */
+  public static final Tag<WebElement> WebElementSelenium = from("WebElementSelenium", WebElement.class);
+  
   /**
    * The attribute map we obtain through the JavaScript plugin.
    */

@@ -46,7 +46,7 @@ public class TestActionSelector {
 	@BeforeClass
 	public static void setup() {
 		state = new StateStub();
-		state.set(Tags.AbstractIDCustom, "stateAbstractIDCustom");
+		state.set(Tags.AbstractID, "stateAbstractID");
 		originalActions = new HashSet<>();
 
 		// First action-widget
@@ -59,15 +59,11 @@ public class TestActionSelector {
 		firstWidget.set(Tags.Path, "[0,0,1]");
 		firstWidget.set(Tags.Desc, "firstWidget");
 		firstWidget.set(Tags.ConcreteID, "firstWidgetConcreteID");
-		firstWidget.set(Tags.ConcreteIDCustom, "firstWidgetConcreteIDCustom");
 		firstWidget.set(Tags.AbstractID, "firstWidgetAbstractID");
-		firstWidget.set(Tags.AbstractIDCustom, "firstWidgetAbstractIDCustom");
 
 		Action firstAction = ac.leftClickAt(firstWidget);
 		firstAction.set(Tags.ConcreteID, "firstActionConcreteID");
-		firstAction.set(Tags.ConcreteIDCustom, "firstActionConcreteIDCustom");
 		firstAction.set(Tags.AbstractID, "firstActionAbstractID");
-		firstAction.set(Tags.AbstractIDCustom, "firstActionAbstractIDCustom");
 		originalActions.add(firstAction);
 
 		// Second action-widget
@@ -80,15 +76,11 @@ public class TestActionSelector {
 		secondWidget.set(Tags.Path, "[0,0,2]");
 		secondWidget.set(Tags.Desc, "secondWidget");
 		secondWidget.set(Tags.ConcreteID, "secondWidgetConcreteID");
-		secondWidget.set(Tags.ConcreteIDCustom, "secondWidgetConcreteIDCustom");
 		secondWidget.set(Tags.AbstractID, "secondWidgetAbstractID");
-		secondWidget.set(Tags.AbstractIDCustom, "secondWidgetAbstractIDCustom");
 
 		Action secondAction = ac.leftClickAt(secondWidget);
 		secondAction.set(Tags.ConcreteID, "secondActionConcreteID");
-		secondAction.set(Tags.ConcreteIDCustom, "secondActionConcreteIDCustom");
 		secondAction.set(Tags.AbstractID, "secondActionAbstractID");
-		secondAction.set(Tags.AbstractIDCustom, "secondActionAbstractIDCustom");
 		originalActions.add(secondAction);
 	}
 

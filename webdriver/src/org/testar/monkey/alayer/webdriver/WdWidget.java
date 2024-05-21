@@ -35,9 +35,11 @@ import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +48,7 @@ public class WdWidget implements Widget, Serializable {
 
   WdState root;
   WdWidget parent;
-  Map<Tag<?>, Object> tags = new HashMap<>();
+  Map<Tag<?>, Object> tags = Util.newHashMap();
   List<WdWidget> children = new ArrayList<>();
   public WdElement element;
 
@@ -244,6 +246,45 @@ public class WdWidget implements Widget, Serializable {
 
   @Override
   public String toString(Tag<?>... tags) {
-    return Util.treeDesc(this, 2, tags);
+    return Util.widgetDesc(this, tags);
+  }
+
+  private void writeObject(ObjectOutputStream out) throws IOException {
+	  // I'm having issues serializing some webdriver Tags...
+	  Map<Tag<?>, Object> serializableTags = Util.newHashMap();
+	  for (Map.Entry<Tag<?>, Object> entry : tags.entrySet()) {
+		  if (entry.getKey() instanceof Serializable && entry.getValue() instanceof Serializable) {
+			  serializableTags.put(entry.getKey(), entry.getValue());
+		  }
+	  }
+	  // Serialize fields one by one
+	  try {
+		  out.writeObject(root);
+		  out.writeObject(parent);
+		  out.writeObject(serializableTags);
+		  out.writeObject(children);
+		  out.writeObject(element);
+	  } catch (IOException e) {
+		  // Handle or propagate the exception as needed
+		  throw e;
+	  }
+  }
+
+  @SuppressWarnings("unchecked")
+  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+	  try {
+		  // Read fields one by one
+		  root = (WdState) in.readObject();
+		  parent = (WdWidget) in.readObject();
+
+		  Map<Tag<?>, Object> serializableTags = (Map<Tag<?>, Object>) in.readObject();
+		  tags = serializableTags;
+
+		  children = (List<WdWidget>) in.readObject();
+		  element = (WdElement) in.readObject();
+	  } catch (IOException | ClassNotFoundException e) {
+		  // Handle or propagate the exception as needed
+		  throw e;
+	  }
   }
 }

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2024 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -43,7 +43,7 @@ import org.testar.monkey.alayer.Tags;
  * Sample class that tries to detect similar Actions between previous and current State,
  * to decrease the possibilities to select a static widget and previous executed Action.
  * 
- * Actions have an OriginWidget associated, and Widgets have an AbtractIDCustom property
+ * Actions have an OriginWidget associated, and Widgets have an AbtractID property
  * that allows TESTAR to identify web elements based on Abstract Properties.
  * Example: WebWidgetId (test.settings -> AbstractStateAttributes)
  * 
@@ -75,7 +75,7 @@ public class SimilarityDetection implements IActionSelector, IActionExecutor {
 
 	@Override
 	public Action selectAction(State state, Set<Action> actions) {
-		// Given the current set of Actions of the State take the OriginWidget AbstractCustomID,
+		// Given the current set of Actions of the State take the OriginWidget AbstractID,
 		// and compare with the previous existing Actions/OriginWidget to increase the similarity value.
 		// Minimal similarity value 1, Maximal similarity is given in the constructor. 
 		// Higher similarity value means that Action/OriginWidget remains more time static in the State.
@@ -91,7 +91,7 @@ public class SimilarityDetection implements IActionSelector, IActionExecutor {
 	}
 
 	/**
-	 * Given the current set of Actions of the State take the OriginWidget AbstractCustomID,
+	 * Given the current set of Actions of the State take the OriginWidget AbstractID,
 	 * and compare with the previous existing Actions/OriginWidget to increase the similarity value.
 	 * Minimal similarity value 1, Maximal similarity is given in the constructor.
 	 * 
@@ -127,7 +127,7 @@ public class SimilarityDetection implements IActionSelector, IActionExecutor {
 	}
 
 	/**
-	 * Given two Actions, compare the AbstractIDCustom of the OriginWidget,
+	 * Given two Actions, compare the AbstractID of the OriginWidget,
 	 * and determine if the OriginWidget is the same from the Abstract point of view.
 	 * 
 	 * @param newAction
@@ -135,9 +135,9 @@ public class SimilarityDetection implements IActionSelector, IActionExecutor {
 	 * @return true or false
 	 */
 	private boolean originWidgetAbstractIdCoincidence(Action newAction, Action oldAction) {
-		// Compare OriginWidget AbstractIDCustom to check coincidences
-		String newAbstractID = newAction.get(Tags.OriginWidget).get(Tags.AbstractIDCustom,"NopeNew");
-		String oldAbstractID = oldAction.get(Tags.OriginWidget).get(Tags.AbstractIDCustom,"NopeOld");
+		// Compare OriginWidget AbstractID to check coincidences
+		String newAbstractID = newAction.get(Tags.OriginWidget).get(Tags.AbstractID, "NopeNew");
+		String oldAbstractID = oldAction.get(Tags.OriginWidget).get(Tags.AbstractID, "NopeOld");
 		return newAbstractID.equals(oldAbstractID);
 	}
 
@@ -195,12 +195,12 @@ public class SimilarityDetection implements IActionSelector, IActionExecutor {
 	 * @param executedAction
 	 */
 	private void increaseSpecificExecutedAction(Action executedAction) {
-		String executedID = executedAction.get(Tags.OriginWidget).get(Tags.AbstractIDCustom, "NopeExecuted");
+		String executedID = executedAction.get(Tags.OriginWidget).get(Tags.AbstractID, "NopeExecuted");
 
 		System.out.println("====================== DEBUG EXECUTED ACTION ======================");
 
 		for(Action savedAction : similarityActions) {
-			String savedID = savedAction.get(Tags.OriginWidget).get(Tags.AbstractIDCustom, "NopeSaved");
+			String savedID = savedAction.get(Tags.OriginWidget).get(Tags.AbstractID, "NopeSaved");
 
 			if(savedID.equals(executedID)) {
 				savedAction.set(ActionTags.SimilarityValue, increaseSimilarityValue(savedAction));

@@ -1,7 +1,7 @@
 package org.testar.statemodel.actionselector;
 
 import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Settings;
+import org.testar.settings.Settings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +10,7 @@ public class CompoundFactory {
 
     public static CompoundActionSelector getCompoundActionSelector(Settings settings) {
         // this is hardcoded for now, but can be configurable in the future.
+        // TODO add action selectors into configuration
         List<ActionSelector> selectors = new ArrayList<>();
         if (settings.get(ConfigTags.ActionSelectionAlgorithm).equals("unvisited")) {
             selectors.add(new ImprovedUnvisitedActionSelector());

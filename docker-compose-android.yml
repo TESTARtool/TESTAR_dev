@@ -40,7 +40,7 @@ services:
     image: testar
     build:
       context: ./
-      dockerfile: ./DockerfileAndroid
+      dockerfile: ./Dockerfile.android
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - type: bind

@@ -58,8 +58,8 @@ task customZipDistribution(type: Zip) {
     include '*'
    	include '*/**' //include subdirectories
 
-   	archiveName 'testarDistribution.zip'
-   	destinationDir(file('target/install'))
+   	archiveFileName.set 'testarDistribution.zip'
+   	getDestinationDirectory().set(file('target/install'))
 }
 
 /**
@@ -73,7 +73,7 @@ task debuggingDistribution(type: Exec, dependsOn:'debugFiles') {
     commandLine 'cmd', '/c', 'dir'
 }
 
-task debugFiles(type: Copy) {
+task debugFiles(type: Copy, dependsOn:'build') {
     from 'target/scripts/.'
     into '.'
 }

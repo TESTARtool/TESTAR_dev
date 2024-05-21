@@ -43,7 +43,7 @@ import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
-import org.testar.monkey.Settings;
+import org.testar.settings.Settings;
 import org.testar.OutputStructure;
 import org.testar.protocols.WebdriverProtocol;
 
@@ -131,15 +131,15 @@ public class Protocol_test_gradle_workflow_webdriver_remote_parabank extends Web
 
 		Assert.isTrue(screenshotsFolder.exists());
 
-		// Get all PNG files in the folder that contain "_ACC"
+		// Get all PNG files in the folder that contain "_AC"
 		File[] pngFiles = screenshotsFolder.listFiles(new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
-				return name.toLowerCase().endsWith(".png") && name.contains("_ACC");
+				return name.toLowerCase().endsWith(".png") && name.contains("_AC");
 			}
 		});
 
-		// Verify if there are at least 4 PNG files with "_ACC"
+		// Verify if there are at least 4 PNG files with "_AC"
 		Assert.isTrue(pngFiles != null && pngFiles.length >= 4);
 	}
 

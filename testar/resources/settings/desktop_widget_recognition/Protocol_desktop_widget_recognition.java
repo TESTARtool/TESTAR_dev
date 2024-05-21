@@ -29,12 +29,14 @@
  *******************************************************************************************************/
 
 
+import eye.Eye;
 import eye.Match;
+import org.sikuli.script.FindFailed;
+import org.sikuli.script.Screen;
 import org.testar.DerivedActions;
 import org.testar.ProtocolUtil;
 import org.testar.SutVisualization;
 import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Settings;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;
@@ -43,14 +45,12 @@ import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.ActionFailedException;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 import org.testar.protocols.DesktopProtocol;
+import org.testar.settings.Settings;
 import org.testar.simplestategraph.GuiStateGraphWithVisitedActions;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Set;
-import eye.Eye;
-import org.sikuli.script.FindFailed;
-import org.sikuli.script.Screen;
 
 /**
  * This protocol shows how to integrate visual recognition software, such as Eye or Sikuli, 
@@ -136,11 +136,11 @@ public class Protocol_desktop_widget_recognition extends DesktopProtocol {
 		// HTML is not having the unvisited actions by default, so
 		// adding actions and unvisited actions to the HTML sequence report:
 		try {
-			htmlReport.addActionsAndUnvisitedActions(actions, stateGraphWithVisitedActions.getAbstractCustomIdsOfUnvisitedActions(state));
+			reportManager.addActionsAndUnvisitedActions(actions, stateGraphWithVisitedActions.getAbstractIdsOfUnvisitedActions(state));
 		}catch(Exception e){
 			// catching null for the first state or any new state, when unvisited actions is still null,
 			// not adding the unvisited actions on those cases:
-			htmlReport.addActions(actions);
+			reportManager.addActions(actions);
 		}
 		//Call the preSelectAction method from the DefaultProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
@@ -166,7 +166,7 @@ public class Protocol_desktop_widget_recognition extends DesktopProtocol {
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
 		// adding the action that is going to be executed into HTML report:
-		htmlReport.addSelectedAction(state, action);
+		reportManager.addSelectedAction(state, action);
 		double waitTime = settings().get(ConfigTags.TimeToWaitAfterAction);
 		double halfWait = waitTime == 0 ? 0.01 : waitTime / 2.0;
 

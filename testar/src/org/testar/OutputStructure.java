@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -36,7 +36,7 @@ import java.io.File;
 import org.testar.monkey.Util;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
-import org.testar.monkey.Settings;
+import org.testar.settings.Settings;
 
 public class OutputStructure {
 
@@ -145,7 +145,7 @@ public class OutputStructure {
 		if(!scrnDir.exists())
 			scrnDir.mkdirs();
 
-		htmlOutputDir = outerLoopOutputDir + File.separator + "HTMLreports";
+		htmlOutputDir = outerLoopOutputDir + File.separator + "reports";
 		File htmlDir = new File(htmlOutputDir);
 		if(!htmlDir.exists())
 			htmlDir.mkdirs();

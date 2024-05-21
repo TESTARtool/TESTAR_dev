@@ -175,8 +175,8 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 		if ((mode() == Modes.Record || mode() == Modes.Listening) && userEvent == null){
 			userEvent = new Object[]{
 					btn,
-					new Double(x),
-					new Double(y)
+					Double.valueOf(x),
+					Double.valueOf(y)
 			};
 		}
 	}
