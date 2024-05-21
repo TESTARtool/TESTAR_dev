@@ -44,7 +44,7 @@ public class ModelManagerListeningMode extends ModelManager implements StateMode
 	public void notifyConcurrenceStateReached(State newState, Set<Action> actions, Action unknown) {
 
 		// If we the surface State still being the Model State, no concurrence occurred, just end this
-		if(currentAbstractState.getId().equals(newState.get(Tags.AbstractIDCustom)))
+		if(currentAbstractState.getId().equals(newState.get(Tags.AbstractID)))
 			return;
 
 		// surface SUT state changes due to concurrence but no action was executed
@@ -54,7 +54,7 @@ public class ModelManagerListeningMode extends ModelManager implements StateMode
 		notifyActionExecution(unknown);
 
 		// check if we are dealing with a new state or an existing one
-		String abstractStateId = newState.get(Tags.AbstractIDCustom);
+		String abstractStateId = newState.get(Tags.AbstractID);
 		AbstractState newAbstractState;
 
 		// fetch or create an abstract state
@@ -73,7 +73,7 @@ public class ModelManagerListeningMode extends ModelManager implements StateMode
 		}
 
 		// add the concrete state id to the abstract state
-		newAbstractState.addConcreteStateId(newState.get(Tags.ConcreteIDCustom));
+		newAbstractState.addConcreteStateId(newState.get(Tags.ConcreteID));
 
 		try {
 			abstractStateModel.addState(newAbstractState);
@@ -142,12 +142,12 @@ public class ModelManagerListeningMode extends ModelManager implements StateMode
 	@Override
 	public void notifyListenedAction(Action action) {
 		try {
-			actionUnderExecution = currentAbstractState.getAction(action.get(Tags.AbstractIDCustom));
+			actionUnderExecution = currentAbstractState.getAction(action.get(Tags.AbstractID));
 		}
 		catch (ActionNotFoundException ex) {
 			System.out.println("Action not found in state model");
-			errorMessages.add("Action with id: " + action.get(Tags.AbstractIDCustom) + " was not found in the model.");
-			actionUnderExecution = new AbstractAction(action.get(Tags.AbstractIDCustom));
+			errorMessages.add("Action with id: " + action.get(Tags.AbstractID) + " was not found in the model.");
+			actionUnderExecution = new AbstractAction(action.get(Tags.AbstractID));
 			currentAbstractState.addNewAction(actionUnderExecution);
 		}
 		concreteActionUnderExecution = ConcreteActionFactory.createConcreteAction(action, actionUnderExecution);
@@ -183,7 +183,7 @@ public class ModelManagerListeningMode extends ModelManager implements StateMode
 	public Set<Action> getInterestingActions(Set<Action> actions) {
 
 		HashMap<String, Action> surfaceActions = new HashMap<>();
-		actions.forEach(a -> surfaceActions.put(a.get(Tags.AbstractIDCustom), a));
+		actions.forEach(a -> surfaceActions.put(a.get(Tags.AbstractID), a));
 		//actions.forEach(a -> surfaceActions.put(a.get(Tags.ConcreteID), a));
 
 		Set<Action> interestingActions = new HashSet<>();

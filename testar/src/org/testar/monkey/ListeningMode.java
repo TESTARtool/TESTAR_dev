@@ -141,7 +141,7 @@ public class ListeningMode {
 						}
 					}
 				} else {
-					// Search MapEventUser action on previous builded actions (To match AbstractIDCustom)
+					// Search MapEventUser action on previous builded actions (To match AbstractID)
 					for(Action a : actions) {
 						if(a.get(Tags.Desc, "Nothing").equals(listenedAction.get(Tags.Desc, "None"))) {
 							listenedAction = a;
@@ -150,11 +150,11 @@ public class ListeningMode {
 					}
 				}
 
-				// If something went wrong trying to find the action, we need to create the AbstractIDCustom
-				if(listenedAction.get(Tags.AbstractIDCustom, null) == null) {
-					System.out.println("Listened Action has not AbstractIDCustom, creating...");
+				// If something went wrong trying to find the action, we need to create the AbstractID
+				if(listenedAction.get(Tags.AbstractID, null) == null) {
+					System.out.println("Listened Action has not AbstractID, creating...");
 					CodingManager.buildIDs(state, Sets.newHashSet(listenedAction));
-					System.out.println(listenedAction.get(Tags.AbstractIDCustom));
+					System.out.println(listenedAction.get(Tags.AbstractID));
 				}
 
 				//notify the state model manager of the listened action
