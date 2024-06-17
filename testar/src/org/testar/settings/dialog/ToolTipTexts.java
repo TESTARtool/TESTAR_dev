@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2024 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -58,6 +58,7 @@ public class ToolTipTexts {
   // TTTs for the general tab
   public static String sutConnectorTTT = "How does TESTAR connect to the SUT";
   public static String sutPathTTT = "Write the argument for the selected SUT connector";
+  public static String sutProcessesTTT = "The regex process names that conform to a Desktop SUT multi-processes";
   public static String nofSequencesTTT = "<html>\nNumber of sequences to generate.\n</html>";
   public static String sequencesActionsTTT = "<html>\nSequence length:<br>\n" +
       "After having executed the given amount of<br>\n" +

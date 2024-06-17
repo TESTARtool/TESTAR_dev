@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2023 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2023 - 2024 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -71,6 +71,14 @@ public class SettingsFileStructure {
 				, ""
 				, ConfigTags.SUTConnector.name() + " = "
 				, ConfigTags.SUTConnectorValue.name() + " = "
+				, ""
+				, "#################################################################"
+				, "# Regular expressions that indicates which processes conform the SUT"
+				, "#"
+				, "# This regex expression can be used to attach TESTAR to a multi-processes SUT"
+				, "#################################################################"
+				, ""
+				, ConfigTags.SUTProcesses.name() + " = "
 				, ""
 				, "#################################################################"
 				, "# Java Swing applications & Access Bridge Enabled"
@@ -307,7 +315,6 @@ public class SettingsFileStructure {
 		secondarySettingsList.add(ConfigTags.ForceForeground);
 		secondarySettingsList.add(ConfigTags.VisualizeActions);
 		secondarySettingsList.add(ConfigTags.FormFillingAction);
-		secondarySettingsList.add(ConfigTags.SUTProcesses);
 		secondarySettingsList.add(ConfigTags.LogLevel);
 		secondarySettingsList.add(ConfigTags.OnlySaveFaultySequences);
 		secondarySettingsList.add(ConfigTags.ReplayRetryTime);
