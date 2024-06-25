@@ -50,9 +50,8 @@ public class SecurityOracleOrchestratorTest {
 
 	@BeforeClass
 	public static void setup() {
-		// Mock DevTools listener to do nothing
+		// Mock DevTools
 		mockDevTools = Mockito.mock(DevTools.class);
-		Mockito.doNothing().when(mockDevTools).addListener(null, null);
 	}
 
 	@Test
