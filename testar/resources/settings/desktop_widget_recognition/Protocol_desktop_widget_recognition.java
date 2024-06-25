@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -56,7 +56,7 @@ import java.util.Set;
 
 /**
  * This protocol shows how to integrate visual recognition software, such as Eye or Sikuli, 
- * to recognize the widgets of the SUT. 
+ * to recognize the widgets of the SUT and execute the action interaction. 
  */
 public class Protocol_desktop_widget_recognition extends DesktopProtocol {
 
@@ -176,6 +176,7 @@ public class Protocol_desktop_widget_recognition extends DesktopProtocol {
 		try {
 			// Resetting the visualization before taking the action screenshot
 			// This avoids taking action screenshots with painted dots that provoke image recognition issues
+			// You can increase the ActionDuration settings time for visual debugging
 			Util.clear(cv); cv.end();
 
 			String widgetScreenshotPath = ProtocolUtil.getActionshot(state, action);
