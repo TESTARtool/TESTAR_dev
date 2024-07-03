@@ -337,7 +337,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 
                 } else {
                     String msg = "********** ERROR starting Selenium WebDriver ********";
-                    delegate.popupMessage(msg);
+//                    delegate.popupMessage(msg);
 
                     System.out.println(msg);
                     System.out.println(e.getMessage());

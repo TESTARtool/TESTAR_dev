@@ -201,6 +201,7 @@ public final class ConfigTags {
   public static final Tag<String> ForcedLoginPassword = Tag.from("ForcedLoginPassword", String.class);
 
   public static final Tag<String> BtraceServiceHost = Tag.from("BtraceServiceHost", String.class);
+  public static final Tag<String> DockerHost = Tag.from("DockerHost", String.class);
 
   public static final Tag<Boolean> QLearningEnabled = Tag.from("QLearningEnabled", Boolean.class);
   public static final Tag<Double> QLearningAlpha = Tag.from("QLearningAlpha", Double.class);

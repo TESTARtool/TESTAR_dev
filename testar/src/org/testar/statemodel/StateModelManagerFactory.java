@@ -34,6 +34,8 @@ public class StateModelManagerFactory {
 
     public static StateModelManager getStateModelManager(Settings settings) {
         // first check if the state model module is enabled
+        System.out.println("settings.get(ConfigTags.StateModelEnabled)");
+        System.out.println(settings.get(ConfigTags.StateModelEnabled));
         if(!settings.get(ConfigTags.StateModelEnabled)) {
             return new DummyModelManager();
         }
@@ -62,6 +64,8 @@ public class StateModelManagerFactory {
         // get the abstraction level identifier that uniquely identifies the state model we are testing against.
         String modelIdentifier = CodingManager.getAbstractStateModelHash(settings.get(ConfigTags.ApplicationName),
                 settings.get(ConfigTags.ApplicationVersion));
+        System.out.println(modelIdentifier);
+        System.out.println(settings.get(ConfigTags.DataStore).toUpperCase());
 
         // we need a sequence manager to record the sequences
         Set<StateModelEventListener> eventListeners = new HashSet<>();
@@ -107,7 +111,7 @@ public class StateModelManagerFactory {
                     tag);
         }
         ActionSelector actionSelector = CompoundFactory.getCompoundActionSelector(settings);
-
+        System.out.println("State model with modelManager selected");
         logger.info("State model with modelManager selected");
         return new ModelManager(abstractStateModel,
                 actionSelector,

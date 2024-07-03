@@ -30,6 +30,7 @@
 
 package org.testar.monkey;
 
+import com.sun.javafx.application.ParametersImpl;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Parent;
@@ -117,6 +118,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 
 	private UnProc<Settings> protocol;
 	private String protocolClass;
+	private static String[] mainArgs;
 
 	/**
 	 * This method scans the settings directory of TESTAR for a file that end with
@@ -151,6 +153,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 	 */
 
 	public static void main(String[] args) {
+		mainArgs = args;
 		launch();
 	}
 
@@ -169,17 +172,18 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 
 		verifyTestarInitialDirectory();
 
-		initTestarSSE(getParameters(), null);
+		initTestarSSE(getParameters(), List.of(mainArgs));
 
 		String testSettingsFileName = getTestSettingsFile();
 		System.out.println("Test settings is <" + testSettingsFileName + ">");
-
-		Settings settings = loadTestarSettings(getParameters().getRaw(), testSettingsFileName);
+		System.out.println(getParameters().getRaw());
+		Settings settings = loadTestarSettings(List.of(mainArgs), testSettingsFileName);
 
 		// Continuous Integration: If GUI is disabled TESTAR was executed from command
 		// line.
 		// We only want to execute TESTAR one time with the selected settings.
 		if (!settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
+			System.out.println("ShowVisualSettingsDialogOnStartup");
 			setTestarDirectory(settings);
 			initCodingManager(settings);
 			initOperatingSystem();
@@ -287,13 +291,13 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 		// Get the files with SUT_SETTINGS_EXT extension and check whether it is not
 		// empty
 		// and that there is exactly one.
-
+		System.out.println(rawParameters);
 		// Allow users to use command line to choose a protocol modifying sse file
 		if (rawParameters == null) {
 			rawParameters = parameters.getRaw();
 		}
 		for (String sett : rawParameters) {
-			if (sett.toString().contains("sse="))
+			if (sett.toString().contains("sse=")) {
 				try {
 					protocolFromCmd(sett);
 				} catch (Exception e) {
@@ -301,6 +305,7 @@ public class Main extends Application implements DashboardDelegate, ProtocolDele
 					System.out.println(errorMessage);
 					popupMessage(errorMessage);
 				}
+			}
 		}
 
 		String[] files = getSSE();

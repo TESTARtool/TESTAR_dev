@@ -22,7 +22,7 @@ public class DBStaticAnalysisRepository {
 
     public DBStaticAnalysisRepository(){
         try {
-            connection = DBConnection.getConnection("33306", "testar", "testar", "testar");
+            connection = DBConnection.getConnection("127.0.0.1","33306", "testar", "testar", "testar");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

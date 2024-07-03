@@ -97,6 +97,7 @@ public class AnalysisManager {
         ArrayList<AbstractStateModel> abstractStateModels = new ArrayList<>();
         try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
             OResultSet resultSet = db.query("SELECT FROM AbstractStateModel");
+            System.out.println("SELECT FROM AbstractStateModel");
             while (resultSet.hasNext()) {
                 OResult result = resultSet.next();
                 // we're expecting a vertex

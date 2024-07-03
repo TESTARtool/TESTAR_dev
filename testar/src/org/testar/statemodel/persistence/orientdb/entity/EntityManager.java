@@ -35,6 +35,7 @@ public class EntityManager {
     public EntityManager(Config config) {
         String connectionString = (config.getConnectionType().equals("plocal") ? "plocal" : "remote") + ":" + (config.getConnectionType().equals("remote") || config.getConnectionType().equals("docker") ?
                 config.getServer() : config.getDatabaseDirectory()) + "/";
+        System.out.println("connectionString " + connectionString);
         OrientDB orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
         connection = new Connection(orientDB, config);
         init();

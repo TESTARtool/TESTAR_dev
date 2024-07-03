@@ -59,18 +59,18 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
     @Override
     public void shutdown() {
         // TODO: port queue visualizer
-//        if (!queue.isEmpty()) {
+        if (!queue.isEmpty()) {
 //            int nrOfItemsProcessed = 0;
-//            int totalNrOfItems = queue.size();
+            int totalNrOfItems = queue.size();
 //            QueueVisualizer visualizer = new QueueVisualizer("Processing persistence queue");
 //            visualizer.updateMessage("Processing persistence queue : " + nrOfItemsProcessed + " / " + totalNrOfItems + " processed");
-//            while (!queue.isEmpty()) {
-//                queue.remove().run();
+            while (!queue.isEmpty()) {
+                queue.remove().run();
 //                nrOfItemsProcessed++;
 //                visualizer.updateMessage("Processing persistence queue : " + nrOfItemsProcessed + " / " + totalNrOfItems + " processed");
-//            }
+            }
 //            visualizer.stop();
-//        }
+        }
         delegateManager.shutdown();
     }
 

@@ -1,5 +1,7 @@
 package nl.ou.testar.jfx.settings.child;
 
+import com.orientechnologies.orient.core.exception.ODatabaseException;
+import com.orientechnologies.orient.core.exception.OSecurityAccessException;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -8,18 +10,27 @@ import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 import nl.ou.testar.jfx.settings.bindings.ConfigBinding;
 import org.testar.monkey.ConfigTags;
+import org.testar.monkey.RuntimeControlsProtocol;
 import org.testar.monkey.Settings;
+import org.testar.statemodel.analysis.AnalysisManager;
+import org.testar.statemodel.analysis.webserver.JettyServer;
+import org.testar.statemodel.persistence.orientdb.entity.Config;
 
 import java.io.File;
 import java.io.IOException;
 
+
 public class StateSettingsController extends SettingsEditController {
 
     private Button selectDir;
+    public TextField dataStoreDB;
+    public ComboBox<String> dataStoreType;
 
+    private String outputDir;
     public StateSettingsController(Settings settings, String settingsPath) {
         super("", settings, settingsPath);
     }
+
 
     @Override
     public void viewDidLoad(Parent view) {
@@ -32,8 +43,8 @@ public class StateSettingsController extends SettingsEditController {
         }
 
         TextField dataStore = (TextField) view.lookup("#dataStore");
-        TextField dataStoreDB = (TextField) view.lookup("#dataStoreDB");
-        ComboBox<String> dataStoreType = (ComboBox<String>) view.lookup("#dataStoreType");
+        dataStoreDB = (TextField) view.lookup("#dataStoreDB");
+        dataStoreType = (ComboBox<String>) view.lookup("#dataStoreType");
         TextField dataStoreUser = (TextField) view.lookup("#dataStoreUser");
         TextField dataStoreServer = (TextField) view.lookup("#dataStoreServer");
         TextField dataStorePassword = (TextField) view.lookup("#dataStorePassword");
@@ -61,6 +72,13 @@ public class StateSettingsController extends SettingsEditController {
 
         ConfigBinding<String> dataStoreDirectoryBinding = addBinding(dataStoreDirectory, ConfigTags.DataStoreDirectory, ConfigBinding.GenericType.FIELD_STRING);
 
+        outputDir = settings.get(ConfigTags.OutputDir);
+        // check if the output directory has a trailing line separator
+        if (!outputDir.substring(outputDir.length() - 1).equals(File.separator)) {
+            outputDir += File.separator;
+        }
+        outputDir = outputDir + "graphs" + File.separator;
+
         selectDir.setOnAction(event -> {
             String path = dataStoreDirectory.getText();
             DirectoryChooser chooser = new DirectoryChooser();
@@ -75,5 +93,88 @@ public class StateSettingsController extends SettingsEditController {
                 dataStoreDirectoryBinding.setValue(newDir.getAbsolutePath());
             }
         });
+
+        Button btnAnalysis = (Button) view.lookup("#btnAnalysis");
+        btnAnalysis.setOnAction(event -> {
+            startAnalysis();
+        });
     }
+
+    public void startAnalysis(){
+        System.out.println("START ANALYSIS");
+        openServer();
+    }
+
+    // this helper method will start a jetty integrated server and show the model listings page
+    public void openServer() {
+        try {
+//            // create a config object for the orientdb database connection info
+            Config config = new Config();
+            config.setConnectionType(settings.get(ConfigTags.DataStoreType));
+            config.setServer(settings.get(ConfigTags.DataStoreServer));
+            config.setDatabase(settings.get(ConfigTags.DataStoreDB));
+            config.setUser(settings.get(ConfigTags.DataStoreUser));
+            config.setPassword(settings.get(ConfigTags.DataStorePassword));
+            config.setDatabaseDirectory(settings.get(ConfigTags.DataStoreDirectory));
+            System.out.println(settings.get(ConfigTags.DataStoreType));
+            System.out.println(settings.get(ConfigTags.DataStoreServer));
+            System.out.println(settings.get(ConfigTags.DataStoreDB));
+            System.out.println(settings.get(ConfigTags.DataStoreUser));
+            System.out.println(settings.get(ConfigTags.DataStorePassword));
+            System.out.println(settings.get(ConfigTags.DataStoreDirectory));
+            System.out.println(outputDir);
+            AnalysisManager analysisManager = new AnalysisManager(config, outputDir);
+            System.out.println("SERVER");
+            JettyServer jettyServer = new JettyServer();
+            jettyServer.start(outputDir, analysisManager);
+        } catch (ODatabaseException de) {
+            // There it can be a root cause that indicates that the IP address or server is not running
+            if(de.getCause() != null && de.getCause().getMessage() != null && de.getCause().getMessage().contains("Cannot create a connection")) {
+                System.out.println(de.getCause().getMessage());
+                return;
+            }
+            // If the database does not exists
+            else if(de.getMessage() != null && de.getMessage().contains("Cannot open database")) {
+                System.out.println(de.getMessage());
+                return;
+            }
+            // Not expected exception, throw trace in the console
+            else {
+                de.printStackTrace();
+                return;
+            }
+        } catch (OSecurityAccessException se) {
+            // If the user credential are wrong
+            if(se.getMessage() != null && se.getMessage().contains("User or password not valid")) {
+                System.out.println(se.getMessage());
+                return;
+            }
+            // Not expected exception, throw trace in the console
+            else {
+                se.printStackTrace();
+                return;
+            }
+        } catch (IOException e) {
+            // If the exception is because the server is already running, just catch and connect
+            if(e.getCause() != null && e.getCause().getMessage() != null && e.getCause().getMessage().contains("Address already in use")) {
+                System.out.println(e.getCause().getMessage());
+                // Continue and try to open the browser to the running server
+            } else {
+//                label14.setText("Please check your connection credentials.");
+                e.printStackTrace();
+                // Something wrong with the database connection, return because we don't want to open the browser
+                return;
+            }
+        } catch (Exception e) {
+            // the plain Exception is coming from 3rd party code
+//            label14.setText("Please check your connection credentials.");
+            e.printStackTrace();
+            // Something wrong with the database connection, return because we don't want to open the browser
+            return;
+        }
+        System.out.println("DONE");
+//
+//        openBrowser();
+    }
+
 }

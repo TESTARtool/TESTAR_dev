@@ -28,6 +28,13 @@
  *
  */
 
+import com.orientechnologies.orient.core.command.OCommandOutputListener;
+import com.orientechnologies.orient.core.db.ODatabaseDocumentInternal;
+import com.orientechnologies.orient.core.db.ODatabaseSession;
+import com.orientechnologies.orient.core.db.OrientDB;
+import com.orientechnologies.orient.core.db.OrientDBConfig;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.db.tool.ODatabaseExport;
 import org.fruit.monkey.btrace.BtraceApiClient;
 import org.fruit.monkey.btrace.BtraceFinishRecordingResponse;
 import org.fruit.monkey.btrace.MethodInvocation;
@@ -38,8 +45,10 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.SutVisualization;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Pair;
+import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.CompoundAction;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
@@ -53,10 +62,15 @@ import org.testar.plugin.NativeLinker;
 import org.testar.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
 
+import java.io.BufferedReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.sql.*;
 import java.util.*;
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
@@ -69,6 +83,10 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	private BtraceApiClient btrace;
 	Boolean flag = false;
 
+	String yoho_docker_host =  "";
+	String jacococli = "org.jacoco.cli-0.8.6-nodeps.jar";
+	String coverage_dir = "yoho-dev";
+
 	/**
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
@@ -78,6 +96,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	@Override
 	protected void initialize(Settings settings) {
 		super.initialize(settings);
+		yoho_docker_host = settings.get(ConfigTags.DockerHost, "");
 
 		/*
 		These settings are initialized in WebdriverProtocol:
@@ -134,8 +153,103 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	 */
 	@Override
 	protected SUT startSystem() throws SystemStartException {
+
 		return super.startSystem();
 	}
+
+	@Override
+	protected void initTestSession() {
+		super.initTestSession();
+		System.out.println("PreTestingPreparation \n\n\n");
+		HttpClient client = HttpClient.newHttpClient();
+		HttpRequest request = HttpRequest.newBuilder()
+				.uri(URI.create("http://" + yoho_docker_host + ":9000/hooks/reset-db2"))
+				.header("Authorization", "Yohohookspassword")  // Set the header
+				.POST(HttpRequest.BodyPublishers.noBody())  // POST request with no body
+				.build();
+
+		try {
+			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+			System.out.println("Response status code: " + response.statusCode());
+			System.out.println("Response headers: " + response.headers());
+			System.out.println("Response body: ");
+			System.out.println(response.body());
+			if(!response.body().contains("DONE")){
+				this.mode = Modes.Quit;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			this.mode = Modes.Quit;
+		}
+	}
+
+	@Override
+	protected void preSequencePreparations() {
+		System.out.println("PreSequencePreparation \n\n\n");
+		HttpClient client = HttpClient.newHttpClient();
+		HttpRequest request = HttpRequest.newBuilder()
+				.uri(URI.create("http://" + yoho_docker_host + ":9000/hooks/reset-db"))
+				.header("Authorization", "")  // Set the header
+				.POST(HttpRequest.BodyPublishers.noBody())  // POST request with no body
+				.build();
+
+		try {
+			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+			System.out.println("Response status code: " + response.statusCode());
+			System.out.println("Response headers: " + response.headers());
+			System.out.println("Response body: ");
+			System.out.println(response.body());
+			if(!response.body().contains("DONE")){
+				this.mode = Modes.Quit;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			this.mode = Modes.Quit;
+		}
+		super.preSequencePreparations();
+	}
+
+	protected void generateCoverage(){
+		String jarPath = jacococli;
+		String command = "java";
+		String[] command_and_args = new String[]{"java",
+				"-jar", jarPath,
+				"dump", "--address", yoho_docker_host,
+				"--port", "6300",
+				"--destfile", coverage_dir + "\\coverage" + this.sequenceCount + ".exec", "--reset"
+		};
+
+		// Use ProcessBuilder to run the command
+		ProcessBuilder processBuilder = new ProcessBuilder();
+		processBuilder.command(command_and_args); // Add all the command and arguments
+		processBuilder.redirectErrorStream(true); // Redirect error stream to the output stream
+
+		try {
+			System.out.println("Extracting coverage exec file");
+			Process process = processBuilder.start(); // Start the process
+
+			// Read the output from the command
+			java.io.InputStream is = process.getInputStream();
+			java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(is));
+
+			String line;
+			while ((line = reader.readLine()) != null) {
+				System.out.println(line);
+			}
+
+			// Wait for the process to terminate and check the exit value
+			int exitCode = process.waitFor();
+			System.out.println("Exited with code " + exitCode);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt(); // Restore interrupted state
+			e.printStackTrace();
+		}
+	}
+
+
 
 	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
@@ -153,6 +267,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 		waitLeftClickAndPasteIntoWidgetWithMatchingTag(WdTags.WebGenericTitle, "Phone Number", "+48500000005", state, system, 3, 1);
 		waitLeftClickAndPasteIntoWidgetWithMatchingTag(WdTags.WebGenericTitle, "Password", "password", state, system, 3, 1);
 		waitAndLeftClickWidgetWithMatchingTag(WdTags.Desc, "Log In", state, system, 3, 1);
+
 	}
 
 	/**
@@ -194,7 +309,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 
 		try {
 
-			connection = DBConnection.getConnection("33306", "testar", "testar", "testar");
+			connection = DBConnection.getConnection(yoho_docker_host,"33306", "", "", "");
 			connection.setAutoCommit(false); // Disable auto-commit mode
 			String insertSQL = "INSERT INTO ActionMethods (sequence_number, action_number, class_name, method_name, parameters) VALUES (?, ?, ?, ?, ?);";
 
@@ -261,6 +376,15 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 		return verdict;
 	}
 
+	@Override
+	protected boolean isTypeable(Widget widget) {
+		if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdINPUT) && (widget.get(Tags.Title).contains("Add User") || widget.get(WdTags.WebCssClasses,"").contains("mat-input-element") ) ){
+			return true;
+		}
+		return super.isTypeable(widget);
+	}
+
+
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
 	 * You can use the SUT's current state, analyze the widgets and their properties to create
@@ -288,18 +412,14 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 		// iterate through all widgets
 		for (Widget widget : state) {
 			// only consider enabled and non-tabu widgets
+
 			if (!widget.get(Enabled, true)) {
-				if(widget.get(WdTags.WebTextContent, "").contains("users to the team")){
-					System.out.println("!enabled");
-				}
 				continue;
 			}
+
 			// The blackListed widgets are those that have been filtered during the SPY mode with the
 			//CAPS_LOCK + SHIFT + Click clickfilter functionality.
-			if(blackListed(widget)){
-				if(widget.get(WdTags.WebTextContent, "").contains("users to the team")){
-					System.out.println("blacklisted");
-				}
+			if(blackListed(widget) || widget.get(WdTags.WebCssClasses, "").contains("mat-chip,")){
 				if(isTypeable(widget)){
 					filteredActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
 				} else {
@@ -313,17 +433,15 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 
 			// If the element is blocked, Testar can't click on or type in the widget
 			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
-
-				if(widget.get(WdTags.WebTextContent, "").contains("users to the team")){
-					System.out.println("blocked");
-				}
 				continue;
 			}
+
 
 			// type into text boxes
 			if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
 				if(whiteListed(widget) || isUnfiltered(widget)){
 					actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+
 				}else{
 					// filtered and not white listed:
 					filteredActions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
@@ -363,7 +481,42 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	}
 
 	@Override
+	protected boolean isUnfiltered(Widget w){
+		if(w.get(WdTags.WebSrc,"").contains("plus-icon.svg") )
+		{
+			return true;
+		}
+		return super.isUnfiltered(w);
+	}
+
+	@Override
 	protected boolean isClickable(Widget widget) {
+		if(widget.get(WdTags.WebSrc,"").contains("plus-icon.svg") ||
+				widget.get(WdTags.WebSrc,"").contains("new-task-icon.svg") ||
+				widget.get(WdTags.WebTextContent, "").contains("To do") ||
+				widget.get(WdTags.WebTextContent, "").contains("In progress") ||
+				widget.get(WdTags.WebTextContent, "").contains("Completed")||
+				widget.get(WdTags.WebTextContent, "").contains("Show results")||
+				widget.get(WdTags.WebTextContent, "").contains("keyboard_arrow_down")||
+				widget.get(WdTags.WebTextContent, "").equals("notifications") ||
+				widget.get(WdTags.WebTextContent, "").equals("more_vert") ||
+				widget.get(WdTags.Desc, "").equals("Add users to the team")||
+				widget.get(WdTags.WebTextContent, "").equals("person_add")||
+				widget.get(WdTags.Desc, "").equals("arrow_drop_down")||
+				widget.get(WdTags.WebTextContent, "").equals("send")||
+				widget.get(WdTags.WebTextContent, "").equals("New Post")||
+				widget.get(WdTags.WebTextContent, "").equals("Add due date")||
+				widget.get(WdTags.Desc, "").equals("date_range")||
+				widget.get(WdTags.Desc, "").equals("Add new task")||
+				widget.get(WdTags.Desc, "").equals("New task")
+		){
+			return true;
+		}
+
+		if(WdDriver.getCurrentUrl().contains("teams-and-users/teams") && widget.get(WdTags.WebCssClasses, "").contains("ng-tns-")){
+			return true;
+		}
+
 		Role role = widget.get(Tags.Role, Roles.Widget);
 		if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
 			// Input type are special...
@@ -409,7 +562,9 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	protected boolean executeAction(SUT system, State state, Action action) {
 		btrace.startRecordingMethodInvocation();
 		flag=true;
-		return super.executeAction(system, state, action);
+		boolean actionExecuted = super.executeAction(system, state, action);
+		extractStateModelMetrics();
+		return actionExecuted;
 	}
 
 	/**
@@ -430,6 +585,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	@Override
 	protected void finishSequence() {
 		super.finishSequence();
+		generateCoverage();
 	}
 
 	/**
@@ -442,5 +598,72 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	@Override
 	public boolean moreSequences() {
 		return super.moreSequences();
+	}
+
+	@Override
+	protected void closeTestSession() {
+		super.closeTestSession();
+		exportActions();
+		String connectionType = settings.get(ConfigTags.DataStoreType);
+		String connectionString = (connectionType.equals("plocal") ? "plocal" : "remote") + ":" + (connectionType.equals("remote") || connectionType.equals("docker") ?
+				settings.get(ConfigTags.DataStoreServer) : settings.get(ConfigTags.DataStoreDirectory)) + "/";
+		System.out.println("connectionString " + connectionString);
+		OrientDB orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
+		ODatabaseDocumentInternal db = (ODatabaseDocumentInternal) orientDB.open(settings.get(ConfigTags.DataStoreDB), settings.get(ConfigTags.DataStoreUser), settings.get(ConfigTags.DataStorePassword));
+
+		try {
+			String exportFilePath = "database_export.json";
+			// Use ODatabaseExport to export the entire database
+			// Create a command output listener
+			OCommandOutputListener listener = new OCommandOutputListener() {
+				@Override
+				public void onMessage(String message) {
+					System.out.println(message);
+				}
+			};
+
+			// Use ODatabaseExport to export the entire database
+//			ODatabaseDocumentInternal dbInternal = db.
+
+			ODatabaseExport export = new ODatabaseExport(db, exportFilePath, listener);
+			export.exportDatabase();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			// Close the database session and connection
+			db.close();
+			orientDB.close();
+		}
+	}
+
+	protected void exportActions(){
+//		connection = DBConnection.getConnection("33306", "testar", "testar", "testar");
+
+		String command = "mysqldump -h " + yoho_docker_host + " -P 33306 -u  -p   ActionMethods > action_methods.sql";
+
+		// Execute the command within a shell
+		String[] cmd = { "cmd.exe", "/c", command };
+
+		try {
+			Process p = Runtime.getRuntime().exec(cmd);
+			// Read any errors from the attempted command
+			BufferedReader errorReader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+			String line;
+			while ((line = errorReader.readLine()) != null) {
+				System.err.println(line);
+			}
+
+			// Wait for the process to complete
+			int exitCode = p.waitFor();
+			if (exitCode == 0) {
+				System.out.println("Database table dumped successfully to action_methods.sql");
+			} else {
+				System.out.println("Error occurred during database table dump. Exit code: " + exitCode);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 }

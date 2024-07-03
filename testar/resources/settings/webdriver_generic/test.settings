@@ -12,7 +12,16 @@ Mode = Spy
 # Only applicable for StateGraph, StatdModel and QLearning
 #################################################################
 
-StateModelEnabled = false
+StateModelEnabled = true
+DataStore = OrientDB
+DataStoreType = plocal
+DataStoreServer = localhost
+DataStoreDB = testar
+DataStoreUser = testar
+DataStorePassword = testar
+DataStoreMode = instant
+DataStoreDirectory = D:\\Testar\\orientdb-3.0.34\\databases
+
 
 #################################################################
 # Connect to the System Under Test (SUT)
@@ -90,8 +99,8 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
-TagsToFilter = Title;WebName;WebTagName
+ClickFilter = .*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*|mat-chip|.*add_a_photo.*|WdIMG|.*app-icons.*|.*Logout.*
+TagsToFilter = Title;WebName;WebTagName;WebSrc;WebRole
 
 #################################################################
 # Processfilter
@@ -116,12 +125,12 @@ ProtocolClass = webdriver_generic/Protocol_webdriver_generic
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WebWidgetId
+AbstractStateAttributes = WebWidgetId,WebWidgetName,WebWidgetTextContent,WidgetControlType
 
 #################################################################
 # WebDriver features
 #################################################################
-ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
+ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption;example-element-row;mat-button;plus-button;mat-button-wrapper;mat-option-text;mat-checkbox;mat-calendar-body-cell-content;mat-pseudo-checkbox;assignee-chart-container;mat-expansion-panel-header-title;button-with-icon;mat-input-element;mat-select-arrow
 DeniedExtensions = pdf;jpg;png
 DomainsAllowed = www.ou.nl;mijn.awo.ou.nl;login.awo.ou.nl;orangehrmlive.com
 FollowLinks = true
@@ -176,17 +185,17 @@ FaultThreshold = 1.0E-9
 DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
-ActionDuration = 0.1
+ActionDuration = 0.5
 ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
-TimeToWaitAfterAction = 0.1
+TimeToWaitAfterAction = 0.8
 StartupTime = 2.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
-StopGenerationOnFault = true
+StopGenerationOnFault = false
 CopyFromTo =
 VisualizeActions = false
 VisualizeSelectedAction = true
@@ -212,6 +221,7 @@ ForcedLoginPasswordInputName = mat-input-1
 ForcedLoginPassword = password
 
 BtraceServiceHost = http://localhost:8088
+DockerHost = localhost
 
 SonarDockerize = true
 SonarProjectName = Demo

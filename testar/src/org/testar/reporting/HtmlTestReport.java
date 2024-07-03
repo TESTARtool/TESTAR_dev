@@ -425,8 +425,9 @@ public class HtmlTestReport implements TestReport {
             this.nonSevereIssues++;
             this.curNonSevereIssues++;
         }
-
-        this.addAction(action, state); // Last action is not provided to addSelectedAction
+        if(action!=null) {
+            this.addAction(action, state); // Last action is not provided to addSelectedAction
+        }
         this.iterations.add(
                 new TestIteration(
                         this.curNonSevereIssues,

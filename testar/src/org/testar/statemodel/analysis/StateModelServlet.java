@@ -28,20 +28,25 @@ public class StateModelServlet extends HttpServlet {
 
         try {
         	List<AbstractStateModel> models = analysisManager.fetchModels();
+            System.out.println("models " + models.size());
         	request.setAttribute("models", models);
         	RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/models.jsp");
         	dispatcher.forward(request, response);
         } catch (ServletException e) {
+            System.out.println("ServletException");
         	e.printStackTrace();
         } catch (IOException e) {
+            System.out.println("IOException");
         	e.printStackTrace();
         } catch (OCommandExecutionException e) {
+            System.out.println("OCommandExecutionException");
         	// If user tried to analyze an OrientDB database without models, launch an info web page
         	if(e.getMessage() != null && e.getMessage().contains("Class not found: AbstractStateModel")) {
         		System.out.println("Database does not contain any model to visualize");
         		RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/warning.jsp");
         		dispatcher.forward(request, response);
         	} else {
+                System.out.println("else");
         		e.printStackTrace();
         	}
         }
