@@ -29,22 +29,40 @@
  */
 
 import com.google.common.collect.ArrayListMultimap;
+import com.orientechnologies.orient.core.command.OCommandOutputListener;
+import com.orientechnologies.orient.core.db.ODatabaseDocumentInternal;
+import com.orientechnologies.orient.core.db.OrientDB;
+import com.orientechnologies.orient.core.db.OrientDBConfig;
+import com.orientechnologies.orient.core.db.tool.ODatabaseExport;
 import org.testar.SutVisualization;
+import org.testar.btrace.BtraceApiClient;
+import org.testar.btrace.MethodInvocation;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Pair;
+import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
-import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
-import org.testar.monkey.alayer.actions.NOP;
-import org.testar.monkey.alayer.actions.StdActionCompiler;
-import org.testar.monkey.alayer.actions.WdFillFormAction;
+import org.testar.monkey.alayer.actions.*;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
+import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.mysql.DBConnection;
+import org.testar.mysql.SerializationUtil;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.settings.Settings;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.*;
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
@@ -53,6 +71,13 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 
 public class Protocol_webdriver_generic extends WebdriverProtocol {
+
+	private BtraceApiClient btrace;
+	Boolean flag = false;
+
+	String yoho_docker_host =  "";
+	String jacococli = "C:\\Users\\worker\\Desktop\\org.jacoco.cli-0.8.6-nodeps.jar";
+	String coverage_dir = "output";
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -64,18 +89,11 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	protected void initialize(Settings settings) {
 		super.initialize(settings);
 
-		// URL + form name, username input id + value, password input id + value
-		// Set login to null to disable this feature
-		// TODO: getting from the settings file, not sure if this works:
-		login = Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
-		username = Pair.from("username", "");
-		password = Pair.from("password", "");
+		yoho_docker_host = settings.get(ConfigTags.DockerHost, "");
+		policyAttributes.put("class", "lfr-btn-label");
 
-		// List of attributes to identify and close policy popups
-		// Set to null to disable this feature
-		//TODO put into settings file
-		policyAttributes = ArrayListMultimap.create();
-		policyAttributes.put("id", "_cookieDisplay_WAR_corpcookieportlet_necessaryCookiesButton");
+		btrace = new BtraceApiClient(settings.get(ConfigTags.BtraceServiceHost));
+
 	}
 
 	/**
@@ -104,7 +122,108 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	@Override
 	protected void beginSequence(SUT system, State state) {
 		super.beginSequence(system, state);
+		Util.pause(3);
+
+		waitLeftClickAndPasteIntoWidgetWithMatchingTag(WdTags.WebGenericTitle, "Phone Number", "+48500000005", state, system, 3, 2);
+		Util.pause(1);
+		waitLeftClickAndPasteIntoWidgetWithMatchingTag(WdTags.WebGenericTitle, "Password", "password", state, system, 3, 2);
+		waitAndLeftClickWidgetWithMatchingTag(WdTags.Desc, "Log In", state, system, 3, 2);
+		Util.pause(3);
 	}
+
+	@Override
+	protected void initTestSession() {
+		super.initTestSession();
+		System.out.println("PreTestingPreparation \n\n\n");
+		HttpClient client = HttpClient.newHttpClient();
+		HttpRequest request = HttpRequest.newBuilder()
+				.uri(URI.create("http://" + yoho_docker_host + ":9000/hooks/reset-db2"))
+				.header("Authorization", "Yohohookspassword")  // Set the header
+				.POST(HttpRequest.BodyPublishers.noBody())  // POST request with no body
+				.build();
+
+		try {
+			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+			System.out.println("Response status code: " + response.statusCode());
+			System.out.println("Response headers: " + response.headers());
+			System.out.println("Response body: ");
+			System.out.println(response.body());
+			if(!response.body().contains("DONE")){
+				this.mode = Modes.Quit;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			this.mode = Modes.Quit;
+		}
+	}
+
+
+	@Override
+	protected void preSequencePreparations() {
+		System.out.println("PreSequencePreparation \n\n\n");
+		HttpClient client = HttpClient.newHttpClient();
+		HttpRequest request = HttpRequest.newBuilder()
+				.uri(URI.create("http://" + yoho_docker_host + ":9000/hooks/reset-db"))
+				.header("Authorization", "Yohohookspassword")  // Set the header
+				.POST(HttpRequest.BodyPublishers.noBody())  // POST request with no body
+				.build();
+
+		try {
+			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+			System.out.println("Response status code: " + response.statusCode());
+			System.out.println("Response headers: " + response.headers());
+			System.out.println("Response body: ");
+			System.out.println(response.body());
+			if(!response.body().contains("DONE")){
+				this.mode = Modes.Quit;
+			}
+		} catch (Exception e) {
+			System.out.println("Error presequence");
+			e.printStackTrace();
+			this.mode = Modes.Quit;
+		}
+		super.preSequencePreparations();
+	}
+	protected void generateCoverage(){
+		String jarPath = jacococli;
+		String command = "java";
+		String[] command_and_args = new String[]{"java",
+				"-jar", jarPath,
+				"dump", "--address", yoho_docker_host,
+				"--port", "6300",
+				"--destfile", coverage_dir + "\\coverage" + this.sequenceCount + ".exec", "--reset"
+		};
+
+		// Use ProcessBuilder to run the command
+		ProcessBuilder processBuilder = new ProcessBuilder();
+		processBuilder.command(command_and_args); // Add all the command and arguments
+		processBuilder.redirectErrorStream(true); // Redirect error stream to the output stream
+
+		try {
+			System.out.println("Extracting coverage exec file");
+			Process process = processBuilder.start(); // Start the process
+
+			// Read the output from the command
+			java.io.InputStream is = process.getInputStream();
+			java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(is));
+
+			String line;
+			while ((line = reader.readLine()) != null) {
+				System.out.println(line);
+			}
+
+			// Wait for the process to terminate and check the exit value
+			int exitCode = process.waitFor();
+			System.out.println("Exited with code " + exitCode);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt(); // Restore interrupted state
+			e.printStackTrace();
+		}
+	}
+
 
 	/**
 	 * This method is called when TESTAR requests the state of the SUT.
@@ -122,6 +241,68 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 		return state;
 	}
 
+	protected void saveAction(MethodInvocation method, PreparedStatement pstmt) throws SQLException {
+		// Assuming sequence_number and action_number are managed by your application logic
+		int sequenceNumber = this.sequenceCount(); // Set this based on your application's logic
+		int actionNumber = this.actionCount(); // Set this based on your application's logic
+
+		String className = method.className;
+		String methodName = method.methodName;
+		// Convert parameters to a format suitable for BLOB storage, if necessary
+		byte[] params = SerializationUtil.serializeList(method.getParameterTypes());
+
+		pstmt.setInt(1, sequenceNumber);
+		pstmt.setInt(2, actionNumber);
+		pstmt.setString(3, className);
+		pstmt.setString(4, methodName);
+		pstmt.setBytes(5, params);
+		pstmt.addBatch();
+	}
+
+	protected void saveActions(List<MethodInvocation> recordedMethods){
+		Connection connection = null;
+
+		try {
+
+			connection = DBConnection.getConnection(yoho_docker_host,"33306", "testar", "testar", "testar");
+			connection.setAutoCommit(false); // Disable auto-commit mode
+			String insertSQL = "INSERT INTO ActionMethods (sequence_number, action_number, class_name, method_name, parameters) VALUES (?, ?, ?, ?, ?);";
+
+			try (PreparedStatement pstmt = connection.prepareStatement(insertSQL)) {
+
+				for (MethodInvocation method : recordedMethods) {
+					saveAction(method, pstmt);
+				}
+				pstmt.executeBatch();
+			}
+
+			connection.commit();  // Commit transaction once all inserts are done
+
+		} catch (SQLException e) {
+			// If there is any error, rollback the transaction
+			try {
+				if (connection != null) {
+					connection.rollback();
+				}
+			} catch (SQLException excep) {
+				// Handle potential rollback error
+			}
+			// Handle or log the original error
+			e.printStackTrace();
+		} finally {
+			// Remember to set auto-commit back to true
+			try {
+				if (connection != null) {
+					connection.setAutoCommit(true);
+				}
+			} catch (SQLException excep) {
+				// Handle or log error
+				System.out.println(excep.getMessage());
+			}
+		}
+
+	}
+
 	/**
 	 * This is a helper method used by the default implementation of <code>buildState()</code>
 	 * It examines the SUT's current state and returns an oracle verdict.
@@ -130,7 +311,14 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	 */
 	@Override
 	protected Verdict getVerdict(State state) {
+		if(flag) {
+			System.out.println("TRUE");
+			var recordedMethods = btrace.finishRecordingMethodInvocation();
+			System.out.println("RECEIVED RECORDED METHODS: " + recordedMethods);
+			flag=false;
+			saveActions(recordedMethods);
 
+		}
 		Verdict verdict = super.getVerdict(state);
 		// system crashes, non-responsiveness and suspicious tags automatically detected!
 
@@ -157,6 +345,21 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 		// Kill unwanted processes, force SUT to foreground
+
+		if ( WdDriver.getCurrentUrl().contains("/login")){
+			StdActionCompiler ac = new AnnotatingActionCompiler();
+			CompoundAction.Builder multiAction = new CompoundAction.Builder();
+			Widget phone = getWidgetWithMatchingTag(WdTags.WebGenericTitle, "Phone Number", state);
+			Widget pass = getWidgetWithMatchingTag(WdTags.WebGenericTitle, "Password", state);
+			Widget login = getWidgetWithMatchingTag(WdTags.Desc, "Log In", state);
+			if(phone!=null && pass!=null && login!=null){
+				multiAction.add(ac.pasteTextInto(phone, "+48500000005", true), 5.0);
+				multiAction.add(ac.pasteTextInto(pass, "password", true), 5.0);
+				multiAction.add(ac.leftClickAt(login), 5.0);
+				return Collections.singleton(multiAction.build());
+			}
+		}
+
 		Set<Action> actions = super.deriveActions(system, state);
 		Set<Action> filteredActions = new HashSet<>();
 
@@ -186,7 +389,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 			}
 			// The blackListed widgets are those that have been filtered during the SPY mode with the
 			//CAPS_LOCK + SHIFT + Click clickfilter functionality.
-			if(blackListed(widget)){
+			if(blackListed(widget) || widget.get(WdTags.WebCssClasses, "").contains("mat-chip,")){
 				if(isTypeable(widget)){
 					filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
 				} else {
@@ -264,6 +467,8 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action) {
+		btrace.startRecordingMethodInvocation();
+		flag=true;
 		return super.executeAction(system, state, action);
 	}
 
@@ -285,6 +490,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	@Override
 	protected void finishSequence() {
 		super.finishSequence();
+		generateCoverage();
 	}
 
 	/**
@@ -298,4 +504,67 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	protected boolean moreSequences() {
 		return super.moreSequences();
 	}
+
+	@Override
+	protected void closeTestSession() {
+		exportActions();
+		String connectionType = settings.get(ConfigTags.DataStoreType);
+		String connectionString = (connectionType.equals("plocal") ? "plocal" : "remote") + ":" + (connectionType.equals("remote") || connectionType.equals("docker") ?
+				settings.get(ConfigTags.DataStoreServer) : settings.get(ConfigTags.DataStoreDirectory)) + "/";
+		System.out.println("connectionString " + connectionString);
+
+		try (OrientDB orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig()); ODatabaseDocumentInternal db = (ODatabaseDocumentInternal) orientDB.open(settings.get(ConfigTags.DataStoreDB), settings.get(ConfigTags.DataStoreUser), settings.get(ConfigTags.DataStorePassword))) {
+			String exportFilePath = "database_export.json";
+			// Use ODatabaseExport to export the entire database
+			// Create a command output listener
+			OCommandOutputListener listener = new OCommandOutputListener() {
+				@Override
+				public void onMessage(String message) {
+					System.out.println(message);
+				}
+			};
+
+			// Use ODatabaseExport to export the entire database
+//			ODatabaseDocumentInternal dbInternal = db.
+
+			ODatabaseExport export = new ODatabaseExport(db, exportFilePath, listener);
+			export.exportDatabase();
+			export.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			// Close the database session and connection
+			super.closeTestSession();
+		}
+	}
+
+	protected void exportActions(){
+		String command = "mysqldump -h " + yoho_docker_host + " -P 33306 -u testar --password=testar testar ActionMethods > action_methods.sql";
+
+		System.out.println("Export actions " + command);
+
+		// Execute the command within a shell
+		String[] cmd = { "cmd.exe", "/c",  command };
+
+		try {
+			Process p = Runtime.getRuntime().exec(cmd);
+			// Read any errors from the attempted command
+			BufferedReader errorReader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+			String line;
+			while ((line = errorReader.readLine()) != null) {
+				System.err.println(line);
+			}
+
+			// Wait for the process to complete
+			int exitCode = p.waitFor();
+			if (exitCode == 0) {
+				System.out.println("Database table dumped successfully to action_methods.sql");
+			} else {
+				System.out.println("Error occurred during database table dump. Exit code: " + exitCode);
+			}
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
 }
