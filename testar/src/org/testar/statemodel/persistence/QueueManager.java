@@ -17,17 +17,17 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
     /**
      * A queue holding the commands to execute
      */
-    private ArrayDeque<Runnable> queue;
+    protected ArrayDeque<Runnable> queue;
 
     /**
      * Composite persistencemanager that will do the actual work for us.
      */
-    private PersistenceManager delegateManager;
+    protected PersistenceManager delegateManager;
 
     /**
      * Helper class for dealing with events
      */
-    private EventHelper eventHelper;
+    protected EventHelper eventHelper;
 
     /**
      * Is the event listener processing events?
@@ -46,7 +46,7 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
         this.hybridMode = hybridMode;
     }
 
-    private void processRequest(Runnable runnable, Persistable persistable) {
+    protected void processRequest(Runnable runnable, Persistable persistable) {
         if (!hybridMode || persistable.canBeDelayed()) {
             queue.add(runnable);
         }
@@ -60,6 +60,7 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
         if (!queue.isEmpty()) {
             int nrOfItemsProcessed = 0;
             int totalNrOfItems = queue.size();
+            System.out.println("QUEUE contains " + totalNrOfItems);
             QueueVisualizer visualizer = new QueueVisualizer("Processing persistence queue");
             visualizer.updateMessage("Processing persistence queue : " + nrOfItemsProcessed + " / " + totalNrOfItems + " processed");
             while (!queue.isEmpty()) {

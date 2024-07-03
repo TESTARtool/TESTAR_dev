@@ -15,6 +15,8 @@ public interface PersistenceManager {
     String DATA_STORE_MODE_DELAYED = "delayed";
 
     // some data will be stored instantly and some will be stored after the sequence has finished
+    String DATA_STORE_MODE_THRESHOLD = "threshold";
+    // the data will be stored when the number of pending requests reaches certain limit
     String DATA_STORE_MODE_HYBRID = "hybrid";
 
     // sometimes we do not want to persist data

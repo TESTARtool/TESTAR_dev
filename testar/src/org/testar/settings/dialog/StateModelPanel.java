@@ -85,7 +85,7 @@ public class StateModelPanel extends SettingsPanel {
     private JTextField dataStoreUserTextfield = new JTextField();
     private JPasswordField dataStorePasswordfield = new JPasswordField();
     private JCheckBox resetDatabaseCheckbox = new JCheckBox();
-    private JComboBox<String> dataStoreModeBox = new JComboBox<>(new String[]{"none", "instant", "delayed", "hybrid"});
+    private JComboBox<String> dataStoreModeBox = new JComboBox<>(new String[]{"none", "instant", "delayed", "hybrid", "threshold"});
     private JComboBox<String> actionSelectionBox = new JComboBox<>(new String[]{"Random selection", "Unvisited actions first"});
     private JComboBox<String> dataStoreTypeBox = new JComboBox<>(new String[]{"remote", "plocal"});
     private Set<JComponent> components;

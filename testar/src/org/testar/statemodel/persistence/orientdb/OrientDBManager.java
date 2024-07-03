@@ -406,9 +406,10 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         // different target states
         String query = "SELECT FROM (SELECT stateId, actionId, COUNT(*) as nrOfActions FROM (select @rid as stateId, oute(\"abstractaction\").actionId as actionId from abstractstate UNWIND actionId) group by stateId, actionId) WHERE nrOfActions > 1";
         try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
-            OResultSet resultSet = db.query(query);
-            boolean isDeterministic = !resultSet.hasNext(); // no states were found where the same action occurs twice
-            resultSet.close();
+            boolean isDeterministic;
+            try (OResultSet resultSet = db.query(query)) {
+                isDeterministic = !resultSet.hasNext(); // no states were found where the same action occurs twice
+            }
             return isDeterministic;
         }
     }
@@ -418,7 +419,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         // different target states
         String query = "SELECT SUM(nrOfActions) as totalActionNr FROM (SELECT FROM (SELECT stateId, actionId, COUNT(*) as nrOfActions FROM (select @rid as stateId, oute(\"abstractaction\").actionId as actionId from abstractstate UNWIND actionId) group by stateId, actionId) WHERE nrOfActions > 1)";
         try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
-            OResultSet resultSet = db.query(query);
+            try(OResultSet resultSet = db.query(query)) {
             if (!resultSet.hasNext()) {
                 resultSet.close();
                 return 0;
@@ -426,8 +427,8 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
             OResult result = resultSet.next();
             long nrOfActions = result.getProperty("totalActionNr");
-            resultSet.close();
             return (int)nrOfActions;
+            }
         }
     }
 

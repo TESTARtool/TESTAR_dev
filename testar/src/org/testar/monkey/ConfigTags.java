@@ -209,6 +209,9 @@ public final class ConfigTags {
 	public static final Tag<String> ProtocolSpecificSetting_5 = Tag.from("ProtocolSpecificSetting_5", String.class, 
 			"Settings (string) that can be used for user specified protocols");
 
+	public static final Tag<String> BtraceServiceHost = Tag.from("BtraceServiceHost", String.class);
+	public static final Tag<String> DockerHost = Tag.from("DockerHost", String.class);
+
 	/**
 	 * Additional settings with descriptions
 	 */

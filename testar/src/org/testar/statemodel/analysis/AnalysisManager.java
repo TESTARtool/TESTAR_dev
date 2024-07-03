@@ -96,29 +96,29 @@ public class AnalysisManager {
         startUp();
         ArrayList<AbstractStateModel> abstractStateModels = new ArrayList<>();
         try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
-            OResultSet resultSet = db.query("SELECT FROM AbstractStateModel");
-            while (resultSet.hasNext()) {
-                OResult result = resultSet.next();
-                // we're expecting a vertex
-                if (result.isVertex()) {
-                    Optional<OVertex> op = result.getVertex();
-                    if (!op.isPresent()) continue;
-                    OVertex modelVertex = op.get();
+            try(OResultSet resultSet = db.query("SELECT FROM AbstractStateModel")){
+                while (resultSet.hasNext()) {
+                    OResult result = resultSet.next();
+                    // we're expecting a vertex
+                    if (result.isVertex()) {
+                        Optional<OVertex> op = result.getVertex();
+                        if (!op.isPresent()) continue;
+                        OVertex modelVertex = op.get();
 
-                    String applicationName = (String)getConvertedValue(OType.STRING, modelVertex.getProperty("applicationName"));
-                    String applicationVersion = (String)getConvertedValue(OType.STRING, modelVertex.getProperty("applicationVersion"));
-                    String modelIdentifier = (String)getConvertedValue(OType.STRING, modelVertex.getProperty("modelIdentifier"));
-                    Set abstractionAttributes = (Set)getConvertedValue(OType.EMBEDDEDSET, modelVertex.getProperty("abstractionAttributes"));
-                    // fetch the test sequences
-                    List<TestSequence> sequenceList = fetchTestSequences(modelIdentifier, db);
+                        String applicationName = (String)getConvertedValue(OType.STRING, modelVertex.getProperty("applicationName"));
+                        String applicationVersion = (String)getConvertedValue(OType.STRING, modelVertex.getProperty("applicationVersion"));
+                        String modelIdentifier = (String)getConvertedValue(OType.STRING, modelVertex.getProperty("modelIdentifier"));
+                        Set abstractionAttributes = (Set)getConvertedValue(OType.EMBEDDEDSET, modelVertex.getProperty("abstractionAttributes"));
+                        // fetch the test sequences
+                        List<TestSequence> sequenceList = fetchTestSequences(modelIdentifier, db);
 
-                    AbstractStateModel abstractStateModel = new AbstractStateModel(
-                            applicationName, applicationVersion, modelIdentifier, abstractionAttributes, sequenceList
-                    );
-                    abstractStateModels.add(abstractStateModel);
+                        AbstractStateModel abstractStateModel = new AbstractStateModel(
+                                applicationName, applicationVersion, modelIdentifier, abstractionAttributes, sequenceList
+                        );
+                        abstractStateModels.add(abstractStateModel);
+                    }
                 }
-            }
-            resultSet.close();
+        }
         } finally {
         	checkShutDown();
         }

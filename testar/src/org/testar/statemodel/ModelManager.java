@@ -108,7 +108,7 @@ public class ModelManager implements StateModelManager {
     private void init() {
         // check if the model is deterministic
         boolean modelIsDeterministic = persistenceManager.modelIsDeterministic(abstractStateModel);
-        System.out.println("Model is deterministic: " + persistenceManager.modelIsDeterministic(abstractStateModel));
+        System.out.println("Model is deterministic: " + modelIsDeterministic);
         if (!modelIsDeterministic) {
             nrOfNonDeterministicActions = persistenceManager.getNrOfNondeterministicActions(abstractStateModel);
         }

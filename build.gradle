@@ -34,6 +34,7 @@ subprojects {
         implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.21.0'
         // https://mvnrepository.com/artifact/io.appium/java-client
         implementation group: 'io.appium', name: 'java-client', version: '9.0.0'
+        implementation group: 'com.github.docker-java', name: 'docker-java-transport-httpclient5', version: '3.2.14'
     }
 
     buildDir = new File('./target')

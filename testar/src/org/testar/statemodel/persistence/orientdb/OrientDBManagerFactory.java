@@ -1,5 +1,6 @@
 package org.testar.statemodel.persistence.orientdb;
 
+import org.testar.statemodel.persistence.ThresholdQueueManager;
 import org.testar.statemodel.persistence.orientdb.entity.Config;
 import org.testar.statemodel.persistence.orientdb.entity.EntityManager;
 import org.testar.statemodel.persistence.PersistenceManager;
@@ -35,6 +36,10 @@ public class OrientDBManagerFactory implements PersistenceManagerFactory {
 
             case PersistenceManager.DATA_STORE_MODE_HYBRID:
                 persistenceManager = new QueueManager(new OrientDBManager(eventHelper, entityManager), new EventHelper(), true);
+                break;
+
+            case PersistenceManager.DATA_STORE_MODE_THRESHOLD:
+                persistenceManager = new ThresholdQueueManager(new OrientDBManager(eventHelper, entityManager), new EventHelper(), true);
                 break;
 
             case PersistenceManager.DATA_STORE_MODE_INSTANT:
