@@ -1,5 +1,6 @@
 package org.testar.statemodel.persistence;
 
+import org.testar.statemodel.persistence.orientdb.entity.EntityManager;
 import org.testar.statemodel.sequence.Sequence;
 import org.testar.statemodel.sequence.SequenceManager;
 import org.testar.statemodel.sequence.SequenceNode;
@@ -102,4 +103,5 @@ public interface PersistenceManager {
      */
     public int getNrOfNondeterministicActions(AbstractStateModel abstractStateModel);
 
+    EntityManager getEntityManager();
 }

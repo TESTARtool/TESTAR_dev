@@ -1,5 +1,6 @@
 package org.testar.statemodel;
 
+import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 
@@ -21,4 +22,5 @@ public interface StateModelManager {
     void notifyTestSequenceInterruptedByUser();
 
     void notifyTestSequenceInterruptedBySystem(String message);
+    OResultSet queryStateModel(String query);
 }

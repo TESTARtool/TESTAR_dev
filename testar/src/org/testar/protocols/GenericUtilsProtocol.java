@@ -32,6 +32,7 @@
 package org.testar.protocols;
 
 import org.testar.DerivedActions;
+import org.testar.OutputStructure;
 import org.testar.monkey.Drag;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
@@ -42,6 +43,8 @@ import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
 import org.testar.monkey.ConfigTags;
+import org.testar.protocols.experiments.WriterExperiments;
+import org.testar.protocols.experiments.WriterExperimentsParams;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -684,6 +687,30 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     	}
     	return super.preSelectAction(system, state, actions);
     }
+
+	/**
+	 * Execute a State Model query to extract information about number of states and actions.
+	 */
+	protected void extractStateModelMetrics() {
+	    String resultAbstractStates = "AbstractStates " + stateModelManager.queryStateModel("select count(*) from AbstractState");
+	    String resultAbstractActions = "AbstractActions " + stateModelManager.queryStateModel("select count(*) from AbstractAction");
+	    String resultUnvisitedActions = "UnvisitedActions " + stateModelManager.queryStateModel("select count(*) from UnvisitedAbstractAction");
+	    String resultConcreteStates = "ConcreteStates " + stateModelManager.queryStateModel("select count(*) from ConcreteState");
+	    String resultConcreteActions = "ConcreteActions " + stateModelManager.queryStateModel("select count(*) from ConcreteAction");
+
+	    // Prepare and write the state model metrics information
+	    String information = "SequenceTotal | " + OutputStructure.sequenceInnerLoopCount +
+	            " | actionnr | " + actionCount +
+	            " | " + resultAbstractStates +
+	            " | " + resultAbstractActions +
+	            " | " + resultUnvisitedActions +
+	            " | " + resultConcreteStates +
+	            " | " + resultConcreteActions;
+		WriterExperiments.writeMetrics(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
+				.setFilename("stateModelMetrics")
+				.setInformation(information)
+				.build());
+	}
 
     /**
      * If SUT is slow rendering the GUI elements, this retry method may help to

@@ -34,6 +34,7 @@ import com.orientechnologies.orient.core.db.ODatabaseDocumentInternal;
 import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
 import com.orientechnologies.orient.core.db.tool.ODatabaseExport;
+import org.testar.OutputStructure;
 import org.testar.SutVisualization;
 import org.testar.btrace.BtraceApiClient;
 import org.testar.btrace.MethodInvocation;
@@ -191,7 +192,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 				"-jar", jarPath,
 				"dump", "--address", yoho_docker_host,
 				"--port", "6300",
-				"--destfile", coverage_dir + "\\coverage" + this.sequenceCount + ".exec", "--reset"
+				"--destfile", coverage_dir + "\\coverage" + this.sequenceCount + "_" + this.actionCount + ".exec", "--reset"
 		};
 
 		// Use ProcessBuilder to run the command
@@ -469,7 +470,9 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	protected boolean executeAction(SUT system, State state, Action action) {
 		btrace.startRecordingMethodInvocation();
 		flag=true;
-		return super.executeAction(system, state, action);
+		boolean executed = super.executeAction(system, state, action);
+		extractStateModelMetrics();
+		return executed;
 	}
 
 	/**

@@ -30,10 +30,12 @@
 
 package org.testar.statemodel;
 
+import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import org.testar.statemodel.actionselector.ActionSelector;
 import org.testar.statemodel.exceptions.ActionNotFoundException;
 import org.testar.statemodel.exceptions.StateModelException;
 import org.testar.statemodel.persistence.PersistenceManager;
+import org.testar.statemodel.persistence.orientdb.entity.EntityManager;
 import org.testar.statemodel.sequence.SequenceError;
 import org.testar.statemodel.sequence.SequenceManager;
 import org.testar.statemodel.util.AbstractStateService;
@@ -300,6 +302,12 @@ public class ModelManager implements StateModelManager {
     @Override
     public void notifyTestSequenceInterruptedBySystem(String message) {
         sequenceManager.notifyInterruptionBySystem(message);
+    }
+
+    @Override
+    public OResultSet queryStateModel(String query) {
+        EntityManager manager = persistenceManager.getEntityManager();
+        return manager.getConnection().getDatabaseSession().query(query);
     }
 
 }
