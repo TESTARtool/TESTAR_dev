@@ -114,7 +114,7 @@ DataStoreServer = localhost
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
-DataStoreMode = threshold
+DataStoreMode = instant
 DataStoreDirectory = D:\\Testar\\orientdb-3.0.34\\databases
 
 #################################################################

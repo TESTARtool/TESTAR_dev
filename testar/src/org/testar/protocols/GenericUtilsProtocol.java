@@ -30,7 +30,7 @@
 
 
 package org.testar.protocols;
-
+import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import org.testar.DerivedActions;
 import org.testar.OutputStructure;
 import org.testar.monkey.Drag;
@@ -692,24 +692,36 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 	 * Execute a State Model query to extract information about number of states and actions.
 	 */
 	protected void extractStateModelMetrics() {
-	    String resultAbstractStates = "AbstractStates " + stateModelManager.queryStateModel("select count(*) from AbstractState");
-	    String resultAbstractActions = "AbstractActions " + stateModelManager.queryStateModel("select count(*) from AbstractAction");
-	    String resultUnvisitedActions = "UnvisitedActions " + stateModelManager.queryStateModel("select count(*) from UnvisitedAbstractAction");
-	    String resultConcreteStates = "ConcreteStates " + stateModelManager.queryStateModel("select count(*) from ConcreteState");
-	    String resultConcreteActions = "ConcreteActions " + stateModelManager.queryStateModel("select count(*) from ConcreteAction");
+        try(OResultSet resultAbstractStatesQuery = stateModelManager.queryStateModel("select count(*) from AbstractState");
+            OResultSet resultAbstractActionsQuery = stateModelManager.queryStateModel("select count(*) from AbstractAction");
+            OResultSet resultUnvisitedActionsQuery = stateModelManager.queryStateModel("select count(*) from UnvisitedAbstractAction");
+            OResultSet resultConcreteStatesQuery = stateModelManager.queryStateModel("select count(*) from ConcreteState");
+            OResultSet resultConcreteActionsQuery = stateModelManager.queryStateModel("select count(*) from ConcreteAction");
+        ) {
 
-	    // Prepare and write the state model metrics information
-	    String information = "SequenceTotal | " + OutputStructure.sequenceInnerLoopCount +
-	            " | actionnr | " + actionCount +
-	            " | " + resultAbstractStates +
-	            " | " + resultAbstractActions +
-	            " | " + resultUnvisitedActions +
-	            " | " + resultConcreteStates +
-	            " | " + resultConcreteActions;
-		WriterExperiments.writeMetrics(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
-				.setFilename("stateModelMetrics")
-				.setInformation(information)
-				.build());
+
+            String resultAbstractStates = "AbstractStates " + (resultAbstractStatesQuery.hasNext() ? resultAbstractStatesQuery.next().getProperty("count(*)") : 0);
+            String resultAbstractActions = "AbstractActions " + (resultAbstractActionsQuery.hasNext() ? resultAbstractActionsQuery.next().getProperty("count(*)") : 0);
+            String resultUnvisitedActions = "UnvisitedActions " + (resultUnvisitedActionsQuery.hasNext() ? resultUnvisitedActionsQuery.next().getProperty("count(*)") : 0);
+            String resultConcreteStates = "ConcreteStates " + (resultConcreteStatesQuery.hasNext() ? resultConcreteStatesQuery.next().getProperty("count(*)") : 0);
+            String resultConcreteActions = "ConcreteActions " + (resultConcreteActionsQuery.hasNext() ? resultConcreteActionsQuery.next().getProperty("count(*)") : 0);
+
+            // Prepare and write the state model metrics information
+            String information = "SequenceTotal | " + OutputStructure.sequenceInnerLoopCount +
+                    " | actionnr | " + actionCount +
+                    " | " + resultAbstractStates +
+                    " | " + resultAbstractActions +
+                    " | " + resultUnvisitedActions +
+                    " | " + resultConcreteStates +
+                    " | " + resultConcreteActions;
+            WriterExperiments.writeMetrics(new WriterExperimentsParams.WriterExperimentsParamsBuilder()
+                    .setFilename("stateModelMetrics")
+                    .setInformation(information)
+                    .build());
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
 	}
 
     /**

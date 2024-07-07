@@ -64,6 +64,8 @@ import java.net.http.HttpResponse;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
@@ -187,12 +189,20 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	}
 	protected void generateCoverage(){
 		String jarPath = jacococli;
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+
+		// Get the current date and time
+		String currentDateTime = LocalDateTime.now().format(formatter);
+
+		// Define the path to save the coverage file
+		String coverageFilePath = coverage_dir + "\\coverage_" + currentDateTime+ "_" + this.sequenceCount + "_" + this.actionCount + ".exec";
+
 		String command = "java";
 		String[] command_and_args = new String[]{"java",
 				"-jar", jarPath,
 				"dump", "--address", yoho_docker_host,
 				"--port", "6300",
-				"--destfile", coverage_dir + "\\coverage" + this.sequenceCount + "_" + this.actionCount + ".exec", "--reset"
+				"--destfile", coverageFilePath, "--reset"
 		};
 
 		// Use ProcessBuilder to run the command
@@ -472,6 +482,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 		flag=true;
 		boolean executed = super.executeAction(system, state, action);
 		extractStateModelMetrics();
+		generateCoverage();
 		return executed;
 	}
 
@@ -493,7 +504,6 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 	@Override
 	protected void finishSequence() {
 		super.finishSequence();
-		generateCoverage();
 	}
 
 	/**
