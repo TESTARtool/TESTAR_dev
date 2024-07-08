@@ -180,7 +180,7 @@ public class WdDriver extends SUTBase {
 
     // Workaround to fix https://github.com/SeleniumHQ/selenium/issues/11750
     options.addArguments("--remote-allow-origins=*");
-
+    options.addArguments("--js-flags=--max_old_space_size=8192");
     return new ChromeDriver(service, options);
   }
 
