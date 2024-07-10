@@ -186,6 +186,11 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(LogOracleCommands, new ArrayList<String>()));
 		defaults.add(Pair.from(LogOracleFiles, new ArrayList<String>()));
 
+		// Settings for Coverage
+		defaults.add(Pair.from(JacocoCoverage, false));
+		defaults.add(Pair.from(JacocoCoveragePort, 5000));
+		defaults.add(Pair.from(JacocoCoverageClasses, "path/to/SUT/classes"));
+
 		return defaults;
 	}
 

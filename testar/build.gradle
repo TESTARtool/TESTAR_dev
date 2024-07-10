@@ -122,6 +122,12 @@ dependencies {
     implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.1'
     implementation group: 'com.orientechnologies', name: 'orientdb-graphdb', version: '3.0.34'
     implementation group: 'com.sikulix', name: 'sikulixapi', version: '2.0.5'
+    // jacoco and maven dependencies for jacoco coverage
+    implementation group: 'org.apache.maven', name: 'maven-core', version: '3.9.8'
+    implementation group: 'org.apache.maven.reporting', name: 'maven-reporting-api', version: '3.1.1'
+    implementation group: 'org.jacoco', name: 'jacoco-maven-plugin', version: '0.8.12'
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-csv
+    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.11.0'
 }
 
 task prepareSettings(type: Copy) {
