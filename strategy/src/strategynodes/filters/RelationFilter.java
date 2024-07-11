@@ -50,10 +50,10 @@ public class RelationFilter
         return filteredActions;
     }
     private boolean widgetIsChild(Widget parent, Widget child)
-    { return (child.parent().get(Tags.AbstractIDCustom).equals(parent.get(Tags.AbstractIDCustom))); }
+    { return (child.parent().get(Tags.AbstractID).equals(parent.get(Tags.AbstractID))); }
 
     private boolean widgetIsSibling(Widget widget1, Widget widget2)
-    { return widget1.parent().get(Tags.AbstractIDCustom).equals(widget2.parent().get(Tags.AbstractIDCustom)); }
+    { return widget1.parent().get(Tags.AbstractID).equals(widget2.parent().get(Tags.AbstractID)); }
 
     @Override
     public String toString()

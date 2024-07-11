@@ -22,7 +22,7 @@ public abstract class BaseNode
         String key = (String) keys[new Random().nextInt(keys.length)];
         for(Action action : actions)
         {
-            if(key.equals(action.get(Tags.AbstractIDCustom, null))) //return the action selected
+            if(key.equals(action.get(Tags.AbstractID, null))) //return the action selected
                 return action;
         }
         return null; //shouldn't ever happen

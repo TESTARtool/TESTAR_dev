@@ -43,7 +43,7 @@ public class ActionTypeFilter
         {
             for (Action action : actions)
             {
-                String actionID = action.get(Tags.AbstractIDCustom);
+                String actionID = action.get(Tags.AbstractID);
                 if (actionsExecuted.containsKey(actionID))
                     availableActions.add(actionID);
             }

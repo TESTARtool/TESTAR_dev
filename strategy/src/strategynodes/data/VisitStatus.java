@@ -25,7 +25,7 @@ public class VisitStatus
     { return VISIT_TYPE; }
     public Boolean actionMatchesVisitStatus(Action action, MultiMap<String, Object> actionsExecuted)
     {
-        String actionID = action.get(Tags.AbstractIDCustom);
+        String actionID = action.get(Tags.AbstractID);
         return actionMatchesVisitStatus(actionID, actionsExecuted);
     }
 

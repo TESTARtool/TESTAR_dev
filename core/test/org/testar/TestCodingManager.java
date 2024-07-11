@@ -9,6 +9,7 @@ import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Roles;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.actions.ActionRoles;
 import org.testar.monkey.alayer.actions.PasteText;
 import org.testar.stub.StateStub;
 import org.testar.stub.WidgetStub;
@@ -66,10 +67,11 @@ public class TestCodingManager {
 	public void testActionCodingIDs() {
 		Action action = new PasteText("paste");
 		action.set(Tags.OriginWidget, widget);
+		action.set(Tags.Role, ActionRoles.PasteTextInto);
 
 		// Build and check IDs for the action are set correctly
 		CodingManager.buildIDs(state, Collections.singleton(action));
-		Assert.assertEquals(action.get(Tags.AbstractID), "AA1sahtjg1c4157641605");
+		Assert.assertEquals(action.get(Tags.AbstractID), "AA2xbwj8292979945383");
 		Assert.assertEquals(action.get(Tags.ConcreteID), "ACd7vwql27266850918");
 	}
 }

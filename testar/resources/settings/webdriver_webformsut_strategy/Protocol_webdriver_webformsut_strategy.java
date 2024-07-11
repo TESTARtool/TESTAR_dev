@@ -95,15 +95,15 @@ public class Protocol_webdriver_webformsut_strategy extends WebdriverProtocol
                 Widget widget = action.get(Tags.OriginWidget);
                 String widgetWebName = widget.get(WdTags.WebName, "");
 
-                String collisionId = CodingManager.lowCollisionID(state.get(Tags.AbstractIDCustom)
+                String collisionId = CodingManager.lowCollisionID(state.get(Tags.AbstractID)
                         + widgetWebName
                         + action.get(Tags.Role));
 
                 String radioActionAbstractId = CodingManager.ID_PREFIX_ACTION
-                        + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM
+                        + CodingManager.ID_PREFIX_ABSTRACT
                         + collisionId;
 
-                action.set(Tags.AbstractIDCustom, radioActionAbstractId);
+                action.set(Tags.AbstractID, radioActionAbstractId);
             }
             // For other elements, use the widget abstract identifier to identify independent actions
             // The widget abstract identifier relies on the AbstractStateAttributes (WebWidgetId)
@@ -111,15 +111,15 @@ public class Protocol_webdriver_webformsut_strategy extends WebdriverProtocol
             {
                 Widget widget = action.get(Tags.OriginWidget);
 
-                String collisionId = CodingManager.lowCollisionID(state.get(Tags.AbstractIDCustom)
-                        + widget.get(Tags.AbstractIDCustom)
+                String collisionId = CodingManager.lowCollisionID(state.get(Tags.AbstractID)
+                        + widget.get(Tags.AbstractID)
                         + action.get(Tags.Role));
 
                 String elementActionAbstractId = CodingManager.ID_PREFIX_ACTION
-                        + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM
+                        + CodingManager.ID_PREFIX_ABSTRACT
                         + collisionId;
 
-                action.set(Tags.AbstractIDCustom, elementActionAbstractId);
+                action.set(Tags.AbstractID, elementActionAbstractId);
             }
         }
     }
@@ -156,8 +156,8 @@ public class Protocol_webdriver_webformsut_strategy extends WebdriverProtocol
             state.set(Tags.StateChanged, true);
         else
         {
-            String previousStateID = latestState.get(Tags.AbstractIDCustom);
-            boolean stateChanged = ! previousStateID.equals(state.get(Tags.AbstractIDCustom));
+            String previousStateID = latestState.get(Tags.AbstractID);
+            boolean stateChanged = ! previousStateID.equals(state.get(Tags.AbstractID));
             state.set(Tags.StateChanged, stateChanged);
         }
         
@@ -305,14 +305,14 @@ public class Protocol_webdriver_webformsut_strategy extends WebdriverProtocol
         if(DefaultProtocol.lastExecutedAction != null)
         {
             state.set(Tags.PreviousAction, DefaultProtocol.lastExecutedAction);
-            state.set(Tags.PreviousActionID, DefaultProtocol.lastExecutedAction.get(Tags.AbstractIDCustom, null));
+            state.set(Tags.PreviousActionID, DefaultProtocol.lastExecutedAction.get(Tags.AbstractID, null));
         }
 
         Action selectedAction = (useRandom) ?
                 selector.selectAction(state, actions):
                 parseUtil.selectAction(state, actions, actionsExecuted, operatingSystems);
 
-        String actionID = selectedAction.get(Tags.AbstractIDCustom);
+        String actionID = selectedAction.get(Tags.AbstractID);
 
         //get the use count for the action
         List<Object> entry = actionsExecuted.getOrDefault(actionID, null);

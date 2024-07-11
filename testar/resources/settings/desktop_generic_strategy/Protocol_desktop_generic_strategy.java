@@ -88,8 +88,8 @@ public class Protocol_desktop_generic_strategy extends DesktopProtocol
 			state.set(Tags.StateChanged, true);
 		else
 		{
-			String previousStateID = latestState.get(Tags.AbstractIDCustom);
-			boolean stateChanged = ! previousStateID.equals(state.get(Tags.AbstractIDCustom));
+			String previousStateID = latestState.get(Tags.AbstractID);
+			boolean stateChanged = ! previousStateID.equals(state.get(Tags.AbstractID));
 			state.set(Tags.StateChanged, stateChanged);
 		}
 		
@@ -119,14 +119,14 @@ public class Protocol_desktop_generic_strategy extends DesktopProtocol
 		if(DefaultProtocol.lastExecutedAction != null)
 		{
 			state.set(Tags.PreviousAction, DefaultProtocol.lastExecutedAction);
-			state.set(Tags.PreviousActionID, DefaultProtocol.lastExecutedAction.get(Tags.AbstractIDCustom, null));
+			state.set(Tags.PreviousActionID, DefaultProtocol.lastExecutedAction.get(Tags.AbstractID, null));
 		}
 		
 		Action selectedAction = (useRandom) ?
 				selector.selectAction(state, actions):
 				parseUtil.selectAction(state, actions, actionsExecuted, operatingSystems);
 
-		String actionID = selectedAction.get(Tags.AbstractIDCustom);
+		String actionID = selectedAction.get(Tags.AbstractID);
 
 		//get the use count for the action
 		List<Object> entry = actionsExecuted.getOrDefault(actionID, null);

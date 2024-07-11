@@ -99,15 +99,15 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 
 				Widget widget = action.get(Tags.OriginWidget);
 
-				String collisionId = CodingManager.lowCollisionID(state.get(Tags.AbstractIDCustom)
-						+ widget.get(Tags.AbstractIDCustom)
+				String collisionId = CodingManager.lowCollisionID(state.get(Tags.AbstractID)
+						+ widget.get(Tags.AbstractID)
 						+ action.get(Tags.Role));
 
 				String actionAbstractId = CodingManager.ID_PREFIX_ACTION 
-						+ CodingManager.ID_PREFIX_ABSTRACT_CUSTOM 
+						+ CodingManager.ID_PREFIX_ABSTRACT 
 						+ collisionId;
 
-				action.set(Tags.AbstractIDCustom, actionAbstractId);
+				action.set(Tags.AbstractID, actionAbstractId);
 			}
 		}
 	}
@@ -229,8 +229,8 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		}
 		else
 		{
-			String previousStateID = latestState.get(Tags.AbstractIDCustom);
-			boolean stateChanged = ! previousStateID.equals(state.get(Tags.AbstractIDCustom));
+			String previousStateID = latestState.get(Tags.AbstractID);
+			boolean stateChanged = ! previousStateID.equals(state.get(Tags.AbstractID));
 			state.set(Tags.StateChanged, stateChanged);
 		}
 
@@ -596,7 +596,7 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		if(DefaultProtocol.lastExecutedAction != null)
 		{
 			state.set(Tags.PreviousAction, DefaultProtocol.lastExecutedAction);
-			state.set(Tags.PreviousActionID, DefaultProtocol.lastExecutedAction.get(Tags.AbstractIDCustom, null));
+			state.set(Tags.PreviousActionID, DefaultProtocol.lastExecutedAction.get(Tags.AbstractID, null));
 		}
 
 		// If we are in form filling mode and the strategy is not random,
@@ -605,7 +605,7 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 				parseUtil.selectAction(state, actions, strategyActionsExecuted, operatingSystems):
 					RandomActionSelector.selectRandomAction(actions);
 
-		String actionID = selectedAction.get(Tags.AbstractIDCustom);
+		String actionID = selectedAction.get(Tags.AbstractID);
 
 		//get the use count for the action
 		List<Object> entry = strategyActionsExecuted.getOrDefault(actionID, null);

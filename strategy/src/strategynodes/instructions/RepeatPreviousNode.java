@@ -25,7 +25,7 @@ public class RepeatPreviousNode extends BaseNode implements ActionNode
         {
             for(Action action : actions)
             {
-                if(action.get(Tags.AbstractIDCustom).equals(previousAction.get(Tags.AbstractIDCustom)))
+                if(action.get(Tags.AbstractID).equals(previousAction.get(Tags.AbstractID)))
                     return action;
             }
         }

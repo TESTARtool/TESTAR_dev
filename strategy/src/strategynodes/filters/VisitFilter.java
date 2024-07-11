@@ -44,7 +44,7 @@ public class VisitFilter
         int targetCount = 0;
         for(Action action : actions)
         {
-            String actionID = action.get(Tags.AbstractIDCustom);
+            String actionID = action.get(Tags.AbstractID);
 
             //get usage count of action
             List<Object> entry = actionsExecuted.get(actionID); //should return empty collection if nonexistent
@@ -67,7 +67,7 @@ public class VisitFilter
         int targetCount = Integer.MAX_VALUE;
         for(Action action : actions)
         {
-            String actionID = action.get(Tags.AbstractIDCustom);
+            String actionID = action.get(Tags.AbstractID);
 
             //get usage count of action
             List<Object> entry = actionsExecuted.get(actionID); //should return empty collection if nonexistent
@@ -195,7 +195,7 @@ public class VisitFilter
     {
         for (Action action : actions)
         {
-            String actionID = action.get(Tags.AbstractIDCustom);
+            String actionID = action.get(Tags.AbstractID);
             if(actionID.equals(pastActionID))
                 return true;
         }
