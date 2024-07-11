@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2023 Open Universiteit - www.ou.nl
- * Copyright (c) 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2023 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2023 - 2024 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -37,7 +37,12 @@ import javax.swing.*;
 
 public class AdvancedPanel extends SettingsPanel {
 
+	private static final long serialVersionUID = -7748826272325778421L;
+
 	private JCheckBox keyBoardListenCheck;
+
+	private JLabel labelSutProcesses = new JLabel("Desktop SUT Multi-Processes");
+	private JTextField sutProcessesField = new JTextField();
 
 	public AdvancedPanel() {
 		setLayout(null);
@@ -45,10 +50,18 @@ public class AdvancedPanel extends SettingsPanel {
 		keyBoardListenCheck = new JCheckBox("Listen to Keyboard shortcuts");
 		keyBoardListenCheck.setBounds(10, 12, 192, 21);
 		add(keyBoardListenCheck);
+
+		labelSutProcesses.setBounds(10, 40, 180, 27);
+		labelSutProcesses.setToolTipText(ToolTipTexts.sutProcessesTTT);
+		add(labelSutProcesses);
+		sutProcessesField.setBounds(190, 40, 420, 27);
+		sutProcessesField.setToolTipText(ToolTipTexts.sutProcessesTTT);
+		add(sutProcessesField);
 	}
 
 	public void populateFrom(final Settings settings) {
 		keyBoardListenCheck.setSelected(settings.get(ConfigTags.KeyBoardListener));
+		sutProcessesField.setText(settings.get(ConfigTags.SUTProcesses));
 	}
 
 	/**
@@ -58,6 +71,7 @@ public class AdvancedPanel extends SettingsPanel {
 	@Override
 	public void extractInformation(final Settings settings) {
 		settings.set(ConfigTags.KeyBoardListener, keyBoardListenCheck.isSelected());
+		settings.set(ConfigTags.SUTProcesses, sutProcessesField.getText());
 	}
 
 }

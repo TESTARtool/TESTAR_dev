@@ -10,6 +10,7 @@ public class CompoundFactory {
 
     public static CompoundActionSelector getCompoundActionSelector(Settings settings) {
         // this is hardcoded for now, but can be configurable in the future.
+        // TODO add action selectors into configuration
         List<ActionSelector> selectors = new ArrayList<>();
         if (settings.get(ConfigTags.ActionSelectionAlgorithm).equals("unvisited")) {
             selectors.add(new ImprovedUnvisitedActionSelector());

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2024 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -36,21 +36,22 @@ import org.testar.monkey.alayer.Tags;
 import java.util.*;
 
 public class QlearningGuiState {
-    protected String abstractCustomStateId;
+    protected String abstractStateId;
     //TODO use QlearningValues instead and only 1 hash map
-    protected HashMap<String, Double> abstractCustomActionIdsAndRewards;
-    protected HashMap<String, Double> abstractCustomActionIdsAndQValues;
-    protected HashMap<String, Integer> abstractCustomActionIdsAndExecutionCounters;
+    protected HashMap<String, Double> abstractActionIdsAndRewards;
+    protected HashMap<String, Double> abstractActionIdsAndQValues;
+    protected HashMap<String, Integer> abstractActionIdsAndExecutionCounters;
     protected Set<GuiStateTransition> stateTransitions;
 
-    public QlearningGuiState(String abstractCustomStateId, HashMap<String, Double> abstractCustomActionIdsAndRewards) {
-        this.abstractCustomStateId = abstractCustomStateId;
-        this.abstractCustomActionIdsAndRewards = abstractCustomActionIdsAndRewards;
-        this.abstractCustomActionIdsAndQValues = abstractCustomActionIdsAndRewards; // all Q values are the same as R Max in the beginning
+    public QlearningGuiState(String abstractStateId, HashMap<String, Double> abstractActionIdsAndRewards) {
+        this.abstractStateId = abstractStateId;
+        this.abstractActionIdsAndRewards = abstractActionIdsAndRewards;
+        // all Q values are the same as R Max in the beginning
+        this.abstractActionIdsAndQValues = abstractActionIdsAndRewards;
         //creating execution counters for each action:
-        abstractCustomActionIdsAndExecutionCounters = new HashMap<String, Integer>();
-        for(String id:abstractCustomActionIdsAndRewards.keySet()){
-            abstractCustomActionIdsAndExecutionCounters.put(id,0);
+        abstractActionIdsAndExecutionCounters = new HashMap<String, Integer>();
+        for(String id:abstractActionIdsAndRewards.keySet()){
+            abstractActionIdsAndExecutionCounters.put(id,0);
         }
         stateTransitions = new HashSet<GuiStateTransition>();
     }
@@ -62,10 +63,10 @@ public class QlearningGuiState {
      */
     public double getMaxQValueOfTheState(Set<Action> actions){
         double qValue = 0;
-        for(Map.Entry<String, Double> entry:abstractCustomActionIdsAndQValues.entrySet()){
+        for(Map.Entry<String, Double> entry:abstractActionIdsAndQValues.entrySet()){
             if(entry.getValue()>qValue){
                 for(Action action:actions){
-                    if(action.get(Tags.AbstractIDCustom).equals(entry.getKey())){
+                    if(action.get(Tags.AbstractID).equals(entry.getKey())){
                         qValue = entry.getValue();
                     }
                 }
@@ -77,11 +78,11 @@ public class QlearningGuiState {
     public ArrayList<String> getActionsIdsWithMaxQvalue(Set<Action> actions){
         ArrayList<String> actionIdsWithMaxQvalue = new ArrayList<String>();
         double maxQValue = getMaxQValueOfTheState(actions);
-        for(String actionId:abstractCustomActionIdsAndQValues.keySet()){
-            if(abstractCustomActionIdsAndQValues.get(actionId).equals(maxQValue)){
+        for(String actionId:abstractActionIdsAndQValues.keySet()){
+            if(abstractActionIdsAndQValues.get(actionId).equals(maxQValue)){
                 //checking that the actionID from the model is also in the list of available actions of the state:
                 for(Action action:actions){
-                    if(action.get(Tags.AbstractIDCustom).equals(actionId)){
+                    if(action.get(Tags.AbstractID).equals(actionId)){
                         actionIdsWithMaxQvalue.add(actionId);
                     }
                 }
@@ -92,33 +93,33 @@ public class QlearningGuiState {
     }
 
     /**
-     * For some reason, the actionIDs are changing even if the AbstractIDCustom is the same
+     * For some reason, the actionIDs are changing even if the AbstractID is the same
      * So updating the actionIDs
      *
      */
     public void updateActionIdsOfTheStateIntoModel(Set<Action> actions, double R_MAX){
         for(Action action:actions){
-            if(abstractCustomActionIdsAndQValues.containsKey(action.get(Tags.AbstractIDCustom))){
+            if(abstractActionIdsAndQValues.containsKey(action.get(Tags.AbstractID))){
                 // model contains the action ID
             }else{
-                abstractCustomActionIdsAndQValues.put(action.get(Tags.AbstractIDCustom),R_MAX);
-                abstractCustomActionIdsAndRewards.put(action.get(Tags.AbstractIDCustom),R_MAX);
-                abstractCustomActionIdsAndExecutionCounters.put(action.get(Tags.AbstractIDCustom),0);
+                abstractActionIdsAndQValues.put(action.get(Tags.AbstractID),R_MAX);
+                abstractActionIdsAndRewards.put(action.get(Tags.AbstractID),R_MAX);
+                abstractActionIdsAndExecutionCounters.put(action.get(Tags.AbstractID),0);
             }
         }
     }
 
     public void addStateTransition(GuiStateTransition newTransition, double gammaDiscount, double maxRMaxOfTheNewState){
         //updating reward and Q value for the executed action:
-        updateRMaxAndQValues(newTransition.getActionAbstractCustomId(), gammaDiscount, maxRMaxOfTheNewState);
+        updateRMaxAndQValues(newTransition.getActionAbstractId(), gammaDiscount, maxRMaxOfTheNewState);
         if(stateTransitions.size()>0){
             //if existing transitions, checking for identical ones:
             for(GuiStateTransition guiStateTransition:stateTransitions){
-                if(guiStateTransition.getSourceStateAbstractCustomId().equals(newTransition.getSourceStateAbstractCustomId())){
+                if(guiStateTransition.getSourceStateAbstractId().equals(newTransition.getSourceStateAbstractId())){
                     // the same source state, as it should be:
-                    if(guiStateTransition.getActionAbstractCustomId().equals(newTransition.getActionAbstractCustomId())){
+                    if(guiStateTransition.getActionAbstractId().equals(newTransition.getActionAbstractId())){
                         // also the action is the same:
-                        if(guiStateTransition.getTargetStateAbstractCustomId().equals(newTransition.getTargetStateAbstractCustomId())){
+                        if(guiStateTransition.getTargetStateAbstractId().equals(newTransition.getTargetStateAbstractId())){
                             // also the target state is the same -> identical transition
                             System.out.println(this.getClass()+": addStateTransition: identical transition found - no need to save again");
                             return;
@@ -137,17 +138,17 @@ public class QlearningGuiState {
         stateTransitions.add(newTransition);
     }
 
-    private void updateRMaxAndQValues(String actionAbstractCustomId, double gammaDiscount, double maxQValueOfTheNewState){
-        int executionCounter = abstractCustomActionIdsAndExecutionCounters.get(actionAbstractCustomId);
+    private void updateRMaxAndQValues(String actionAbstractId, double gammaDiscount, double maxQValueOfTheNewState){
+        int executionCounter = abstractActionIdsAndExecutionCounters.get(actionAbstractId);
         executionCounter++;
-        System.out.println("DEBUG: execution counter for action "+actionAbstractCustomId+" is now "+executionCounter);
-        abstractCustomActionIdsAndExecutionCounters.put(actionAbstractCustomId,executionCounter);
+        System.out.println("DEBUG: execution counter for action "+actionAbstractId+" is now "+executionCounter);
+        abstractActionIdsAndExecutionCounters.put(actionAbstractId,executionCounter);
         double reward = calculateReward(executionCounter);
-        System.out.println("DEBUG: new reward for action "+actionAbstractCustomId+" is "+reward);
-        abstractCustomActionIdsAndRewards.put(actionAbstractCustomId,reward);
+        System.out.println("DEBUG: new reward for action "+actionAbstractId+" is "+reward);
+        abstractActionIdsAndRewards.put(actionAbstractId,reward);
         double qValue = calculateQValue(reward,gammaDiscount,maxQValueOfTheNewState);
-        System.out.println("DEBUG: new Q value for action "+actionAbstractCustomId+" is "+qValue);
-        abstractCustomActionIdsAndQValues.put(actionAbstractCustomId,qValue);
+        System.out.println("DEBUG: new Q value for action "+actionAbstractId+" is "+qValue);
+        abstractActionIdsAndQValues.put(actionAbstractId,qValue);
     }
 
     private double calculateReward(int executionCounter){
@@ -171,19 +172,19 @@ public class QlearningGuiState {
         return stateTransitions;
     }
 
-    public String getAbstractCustomStateId() {
-        return abstractCustomStateId;
+    public String getAbstractStateId() {
+        return abstractStateId;
     }
 
-    public void setAbstractCustomStateId(String abstractCustomStateId) {
-        this.abstractCustomStateId = abstractCustomStateId;
+    public void setAbstractStateId(String abstractStateId) {
+        this.abstractStateId = abstractStateId;
     }
 
-    public HashMap<String, Double>  getAbstractCustomActionIdsAndRewards() {
-        return abstractCustomActionIdsAndRewards;
+    public HashMap<String, Double>  getAbstractActionIdsAndRewards() {
+        return abstractActionIdsAndRewards;
     }
 
-    public void setAbstractCustomActionIdsAndRewards(HashMap<String, Double>  abstractCustomActionIdsAndRewards) {
-        this.abstractCustomActionIdsAndRewards = abstractCustomActionIdsAndRewards;
+    public void setAbstractActionIdsAndRewards(HashMap<String, Double>  abstractActionIdsAndRewards) {
+        this.abstractActionIdsAndRewards = abstractActionIdsAndRewards;
     }
 }

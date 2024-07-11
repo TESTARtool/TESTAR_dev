@@ -397,6 +397,25 @@ public final class Util {
 		return size(iter.iterator());
 	}
 
+	public static String widgetDesc(Widget widget, Tag<?>... tags) {
+		Assert.notNull(widget, tags);
+		StringBuilder sb = new StringBuilder();
+		int length = tags.length;
+
+		for (int i = 0; i < length; i++) {
+			Object tagValue = widget.get(tags[i], null);
+
+			if (tagValue != null) {
+				sb.append(tagValue);
+				if (i < length - 1) {
+					sb.append(",");
+				}
+			}
+		}
+
+		return sb.toString();
+	}
+
 	public static String treeDesc(Widget root, int indent, Tag<?>... tags) {
 		Assert.notNull(root, tags);
 		StringBuilder sb = new StringBuilder();

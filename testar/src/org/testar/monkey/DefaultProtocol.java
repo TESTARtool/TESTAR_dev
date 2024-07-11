@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -668,17 +668,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//Output/logs folder
 		LogSerialiser.log(String.format(actionMode+" [%d]: %s\n%s",
 				actionCount,
-				"\n @Action ConcreteID = " + action.get(Tags.ConcreteID,"ConcreteID not available") +
-				" AbstractID = " + action.get(Tags.AbstractID,"AbstractID not available") +"\n"+
-				" ConcreteID CUSTOM = " +  action.get(Tags.ConcreteIDCustom,"ConcreteID CUSTOM not available")+
-				" AbstractID CUSTOM = " +  action.get(Tags.AbstractIDCustom,"AbstractID CUSTOM not available")+"\n"+
+				"\n @Action ConcreteID = " + action.get(Tags.ConcreteID, "ConcreteID not available") +
+				" AbstractID = " + action.get(Tags.AbstractID, "AbstractID not available") +"\n"+
 
 				" @State ConcreteID = " + state.get(Tags.ConcreteID,"ConcreteID not available") +
-				" AbstractID = " + state.get(Tags.Abstract_R_ID,"Abstract_R_ID not available") +"\n"+
-				" ConcreteID CUSTOM = "+ state.get(Tags.ConcreteIDCustom,"ConcreteID CUSTOM not available")+
-				" AbstractID CUSTOM = "+state.get(Tags.AbstractIDCustom,"AbstractID CUSTOM not available")+"\n",
+				" AbstractID = " + state.get(Tags.AbstractID,"AbstractID not available") +"\n",
 				actionRepresentation[0]) +
-						  "Timestamp: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(action.get(Tags.TimeStamp, (long)-1)) + "\n\n",
+				"Timestamp: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(action.get(Tags.TimeStamp, (long)-1)) + "\n\n",
 				LogSerialiser.LogLevel.Info);
 	}
 
@@ -765,8 +761,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 
 			// for most windows applications and most jar files, this is where the SUT gets created!
-			SutConnectorCommandLine sutConnector = new SutConnectorCommandLine(settings.get(ConfigTags.SUTConnectorValue),
-					enabledProcessListener, settings().get(ConfigTags.StartupTime)*1000, Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), builder, settings.get(ConfigTags.FlashFeedback));
+			SutConnectorCommandLine sutConnector = new SutConnectorCommandLine(builder, enabledProcessListener, settings);
 			//TODO startupTime and maxEngageTime seems to be the same, except one is double and the other is long?
 			return sutConnector.startOrConnectSut();
 		}
@@ -1217,7 +1212,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	/**
 	 * Use CodingManager to create the Widget and State identifiers:
-	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom,
+	 * ConcreteID, AbstractID,
 	 * Abstract_R_ID, Abstract_R_T_ID, Abstract_R_T_P_ID
 	 *
 	 * @param state
@@ -1228,7 +1223,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	/**
 	 * Use CodingManager to create the Actions identifiers:
-	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom
+	 * ConcreteID, AbstractID
 	 *
 	 * @param state
 	 * @param actions
@@ -1236,13 +1231,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected void buildStateActionsIdentifiers(State state, Set<Action> actions) {
 	    CodingManager.buildIDs(state, actions);
 	    for(Action a : actions)
-	    	if(a.get(Tags.AbstractIDCustom, null) == null)
+	    	if(a.get(Tags.AbstractID, null) == null)
 	    		buildEnvironmentActionIdentifiers(state, a);
 	}
 
 	/**
 	 * Use CodingManager to create the specific environment Action identifiers:
-	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom
+	 * ConcreteID, AbstractID
 	 *
 	 * @param state
 	 * @param action

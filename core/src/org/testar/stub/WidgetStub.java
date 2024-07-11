@@ -116,7 +116,7 @@ public class WidgetStub extends TaggableBase implements Widget {
 
 	@Override
 	public String toString(Tag<?>... tags){
-		return Util.treeDesc(this, 2, tags);
+		return Util.widgetDesc(this, tags);
 	}
 
 	@Override

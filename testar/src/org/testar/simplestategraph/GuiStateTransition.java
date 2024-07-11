@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2024 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,25 +31,25 @@
 package org.testar.simplestategraph;
 
 public class GuiStateTransition {
-    private String sourceStateAbstractCustomId;
-    private String targetStateAbstractCustomId;
-    private String actionAbstractCustomId;
+    private String sourceStateAbstractId;
+    private String targetStateAbstractId;
+    private String actionAbstractId;
 
-    public GuiStateTransition(String sourceStateAbstractCustomId, String targetStateAbstractCustomId, String actionAbstractCustomId) {
-        this.sourceStateAbstractCustomId = sourceStateAbstractCustomId;
-        this.targetStateAbstractCustomId = targetStateAbstractCustomId;
-        this.actionAbstractCustomId = actionAbstractCustomId;
+    public GuiStateTransition(String sourceStateAbstractId, String targetStateAbstractId, String actionAbstractId) {
+        this.sourceStateAbstractId = sourceStateAbstractId;
+        this.targetStateAbstractId = targetStateAbstractId;
+        this.actionAbstractId = actionAbstractId;
     }
 
-    public String getSourceStateAbstractCustomId() {
-        return sourceStateAbstractCustomId;
+    public String getSourceStateAbstractId() {
+        return sourceStateAbstractId;
     }
 
-    public String getTargetStateAbstractCustomId() {
-        return targetStateAbstractCustomId;
+    public String getTargetStateAbstractId() {
+        return targetStateAbstractId;
     }
 
-    public String getActionAbstractCustomId() {
-        return actionAbstractCustomId;
+    public String getActionAbstractId() {
+        return actionAbstractId;
     }
 }

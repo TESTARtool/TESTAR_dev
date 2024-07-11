@@ -215,10 +215,9 @@ class UIAWidget implements Widget, Serializable {
 		return repr.toString();
 	}
 	
-	// by urueda
 	@Override
 	public String toString(Tag<?>... tags){
-		return Util.treeDesc(this, 2, tags);
+		return Util.widgetDesc(this, tags);
 	}
 		
 }
