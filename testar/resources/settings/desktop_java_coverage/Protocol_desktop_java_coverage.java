@@ -55,6 +55,7 @@ public class Protocol_desktop_java_coverage extends DesktopProtocol {
 	@Override
 	protected void initialize(Settings settings){
 		super.initialize(settings);
+		// Initialize the code coverage extractor using the test settings values
 		codeCoverageManager = new CodeCoverageManager(settings);
 	}
 
@@ -81,6 +82,8 @@ public class Protocol_desktop_java_coverage extends DesktopProtocol {
 	 */
 	@Override
 	protected void beginSequence(SUT system, State state){
+		// Before executing the first SUT action, extract the initial coverage
+		codeCoverageManager.getActionCoverage("0");
 		super.beginSequence(system, state);
 	}
 
@@ -183,7 +186,7 @@ public class Protocol_desktop_java_coverage extends DesktopProtocol {
 	protected boolean executeAction(SUT system, State state, Action action){
 		boolean executed = super.executeAction(system, state, action);
 		// After executing the SUT action, extract the action coverage
-		codeCoverageManager.getActionCoverage(actionCount);
+		codeCoverageManager.getActionCoverage(String.valueOf(actionCount));
 		return executed;
 	}
 

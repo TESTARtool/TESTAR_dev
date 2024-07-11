@@ -33,6 +33,6 @@ package org.testar.coverage;
 public interface CodeCoverage {
 
 	public void getSequenceCoverage();
-	public void getActionCoverage(int actionCount);
+	public void getActionCoverage(String actionCount);
 
 }

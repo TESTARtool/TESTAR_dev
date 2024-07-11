@@ -63,7 +63,7 @@ public class CodeCoverageManager implements CodeCoverage {
 	}
 
 	@Override
-	public void getActionCoverage(int actionCount) {
+	public void getActionCoverage(String actionCount) {
 		for(CodeCoverage coverageExtractor : coverageExtractors)
 			coverageExtractor.getActionCoverage(actionCount);
 	}

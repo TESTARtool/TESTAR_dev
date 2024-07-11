@@ -71,7 +71,7 @@ public class JacocoCoverage implements CodeCoverage {
 	}
 
 	@Override
-	public void getActionCoverage(int actionCount) {
+	public void getActionCoverage(String actionCount) {
 		// Create the default SUT + sequence name to extract the jacoco coverage exec file
 		String destJacocoFileName = outputJacocoCoveragePath + File.separator 
 				+ OutputStructure.startOuterLoopDateString + "_" + OutputStructure.executedSUTname 
