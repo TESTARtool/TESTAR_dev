@@ -516,7 +516,7 @@ public class AccessBridgeControlTypes {
 		put(AccessBridgeControlTypes.ACCESSIBLE_DIRECTORY_PANE, Long.valueOf(Windows.UIA_PaneControlTypeId));
 		put(AccessBridgeControlTypes.ACCESSIBLE_EDITBAR, Long.valueOf(Windows.UIA_ToolBarControlTypeId));
 		put(AccessBridgeControlTypes.ACCESSIBLE_FILE_CHOOSER, Long.valueOf(Windows.UIA_WindowControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_FILLER, Long.valueOf(Windows.UIA_CheckBoxControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_FILLER, Long.valueOf(Windows.UIA_SeparatorControlTypeId));
 		put(AccessBridgeControlTypes.ACCESSIBLE_FONT_CHOOSER, Long.valueOf(Windows.UIA_CustomControlTypeId));
 		put(AccessBridgeControlTypes.ACCESSIBLE_FOOTER, Long.valueOf(Windows.UIA_CustomControlTypeId));
 		put(AccessBridgeControlTypes.ACCESSIBLE_FRAME, Long.valueOf(Windows.UIA_WindowControlTypeId));
@@ -561,7 +561,7 @@ public class AccessBridgeControlTypes {
 		put(AccessBridgeControlTypes.ACCESSIBLE_TOOL_TIP, Long.valueOf(Windows.UIA_ToolTipControlTypeId));
 		put(AccessBridgeControlTypes.ACCESSIBLE_TREE, Long.valueOf(Windows.UIA_TreeControlTypeId));
 		put(AccessBridgeControlTypes.ACCESSIBLE_UNKNOWN, Long.valueOf(Windows.UIA_CustomControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_VIEWPORT, Long.valueOf(Windows.UIA_ScrollBarControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_VIEWPORT, Long.valueOf(Windows.UIA_PaneControlTypeId));
 		put(AccessBridgeControlTypes.ACCESSIBLE_WINDOW, Long.valueOf(Windows.UIA_WindowControlTypeId));
 	}};
 	
@@ -572,7 +572,6 @@ public class AccessBridgeControlTypes {
 	 */
 	public static long toUIA(String accessibleRole){
 		if (accessibleRole == null || accessibleRole.isEmpty()){
-			System.out.println("WARNING - null/empty accessible role <" + accessibleRole + ">");
 			return MISSING_UIA;
 		}
 		
@@ -580,7 +579,6 @@ public class AccessBridgeControlTypes {
 		if (uia != null)
 			return uia.longValue();
 
-		System.out.println("WARNING - missed accessible role <" + accessibleRole + ">");
 		return MISSING_UIA;		
 	}
 
