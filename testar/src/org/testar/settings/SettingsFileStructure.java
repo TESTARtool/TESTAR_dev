@@ -312,6 +312,14 @@ public class SettingsFileStructure {
 				, ConfigTags.ReportInHTML.name() + " = "
 				, ConfigTags.ReportInPlainText.name() + " = "
 				, ""
+				, "#################################################################"
+				, "# Settings to configure code coverage features"
+				, "#################################################################"
+				, ""
+				, ConfigTags.JacocoCoverage.name() + " = "
+				, ConfigTags.JacocoCoveragePort.name() + " = "
+				, ConfigTags.JacocoCoverageClasses.name() + " = "
+				, ""
 				);
 
 		// Second, create a list of secondary configuration tags settings
