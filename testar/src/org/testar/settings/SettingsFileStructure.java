@@ -311,6 +311,7 @@ public class SettingsFileStructure {
 				, "#################################################################"
 				, ""
 				, ConfigTags.JacocoCoverage.name() + " = "
+				, ConfigTags.JacocoCoverageIpAddress.name() + " = "
 				, ConfigTags.JacocoCoveragePort.name() + " = "
 				, ConfigTags.JacocoCoverageClasses.name() + " = "
 				, ""

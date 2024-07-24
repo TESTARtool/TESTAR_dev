@@ -197,6 +197,7 @@ VisualizeActions = false
 #################################################################
 
 JacocoCoverage = true
+JacocoCoverageIpAddress = localhost
 JacocoCoveragePort = 5000
 JacocoCoverageClasses = suts/PrintLogFile
 

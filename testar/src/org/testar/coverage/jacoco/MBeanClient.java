@@ -34,9 +34,9 @@ public final class MBeanClient {
 
 	private String service_url;
 
-	public MBeanClient(int service_port) {
+	public MBeanClient(String service_ip_address, int service_port) {
 		// Initialize the JMX service to connect with the Jacoco Agent
-		service_url = "service:jmx:rmi:///jndi/rmi://localhost:" + service_port + "/jmxrmi";
+		service_url = "service:jmx:rmi:///jndi/rmi://" + service_ip_address + ":" + service_port + "/jmxrmi";
 	}
 
 	public interface IProxy {

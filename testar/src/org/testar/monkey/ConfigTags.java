@@ -216,6 +216,9 @@ public final class ConfigTags {
 	public static final Tag<Boolean> JacocoCoverage = Tag.from("JacocoCoverage", Boolean.class,
 			"Sets whether to extract Jacoco Coverage");
 
+	public static final Tag<String> JacocoCoverageIpAddress = Tag.from("JacocoCoverageIpAddress", String.class, 
+			"The JMX IP Address on which the Jacoco Agent is running");
+
 	public static final Tag<Integer> JacocoCoveragePort = Tag.from("JacocoCoveragePort", Integer.class, 
 			"The JMX port on which the Jacoco Agent is running");
 

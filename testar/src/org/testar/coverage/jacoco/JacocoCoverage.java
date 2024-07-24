@@ -51,7 +51,7 @@ public class JacocoCoverage implements CodeCoverage {
 			outputJacocoCoverageDir.mkdirs();
 
 		// Initialize the MBeanClient that connects to the Jacoco agent port to extract coverage
-		mbeanClient = new MBeanClient(settings.get(ConfigTags.JacocoCoveragePort));
+		mbeanClient = new MBeanClient(settings.get(ConfigTags.JacocoCoverageIpAddress), settings.get(ConfigTags.JacocoCoveragePort));
 
 		// Initialize the CSV reporter
 		jacocoReportCSV = new JacocoReportCSV(settings);
