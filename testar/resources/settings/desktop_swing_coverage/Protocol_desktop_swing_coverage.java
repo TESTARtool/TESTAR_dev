@@ -28,10 +28,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.testar.coverage.CodeCoverageManager;
 import org.testar.managers.InputDataManager;
+import org.testar.monkey.ConfigTags;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.SUT;
@@ -40,8 +43,12 @@ import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.exceptions.StateBuildException;
+import org.testar.plugin.NativeLinker;
+import org.testar.plugin.OperatingSystems;
 import org.testar.protocols.DesktopProtocol;
 import org.testar.settings.Settings;
+import parsing.StrategyManager;
 
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
@@ -49,6 +56,7 @@ import static org.testar.monkey.alayer.Tags.Enabled;
 public class Protocol_desktop_swing_coverage extends DesktopProtocol {
 
 	private CodeCoverageManager codeCoverageManager;
+	private StrategyManager strategyManager;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -60,6 +68,10 @@ public class Protocol_desktop_swing_coverage extends DesktopProtocol {
 		super.initialize(settings);
 		// Initialize the code coverage extractor using the test settings values
 		codeCoverageManager = new CodeCoverageManager(settings);
+
+		ArrayList<String> operatingSystems = new ArrayList<>();
+		NativeLinker.getPLATFORM_OS().forEach(OS -> operatingSystems.add(OS.toString()));
+		strategyManager = new StrategyManager(settings.get(ConfigTags.StrategyFile),operatingSystems);
 	}
 
 	/**
@@ -73,6 +85,14 @@ public class Protocol_desktop_swing_coverage extends DesktopProtocol {
 		// Before executing the first SUT action, extract the initial coverage
 		codeCoverageManager.getActionCoverage("0");
 		super.beginSequence(system, state);
+		strategyManager.beginSequence(state);
+	}
+
+	@Override
+	protected State getState(SUT system) throws StateBuildException
+	{
+		State state = super.getState(system);
+		return strategyManager.getState(state, latestState);
 	}
 
 	/**
@@ -155,6 +175,12 @@ public class Protocol_desktop_swing_coverage extends DesktopProtocol {
 		}
 	}
 
+	@Override
+	protected Action selectAction(State state, Set<Action> actions)
+	{
+		return strategyManager.selectAction(state, actions);
+	}
+
 	/**
 	 * Execute the selected action.
 	 *
@@ -170,6 +196,7 @@ public class Protocol_desktop_swing_coverage extends DesktopProtocol {
 		boolean executed = super.executeAction(system, state, action);
 		// After executing the SUT action, extract the action coverage
 		codeCoverageManager.getActionCoverage(String.valueOf(actionCount));
+		strategyManager.recordSelectedAction(state, action);
 		return executed;
 	}
 

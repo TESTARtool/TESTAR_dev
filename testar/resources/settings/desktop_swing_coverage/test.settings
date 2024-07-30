@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = java -jar -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -javaagent:../lib/org.jacoco.agent-0.8.12-runtime.jar=output=none,jmx=true "suts/SwingSet2.jar"
+SUTConnectorValue = java -jar -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -javaagent:../lib/org.jacoco.agent-0.8.12-runtime.jar=output=none,jmx=true "suts/rachota_24.jar"
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
@@ -43,7 +43,7 @@ AccessBridgeEnabled = true
 #################################################################
 
 Sequences = 1
-SequenceLength = 100
+SequenceLength = 10
 
 #################################################################
 # Oracles based on suspicious tag values
@@ -145,7 +145,7 @@ DataStoreDB =
 DataStoreUser = 
 DataStorePassword = 
 DataStoreMode = none
-ApplicationName = SwingSet2
+ApplicationName = Rachota
 ApplicationVersion = 
 ActionSelectionAlgorithm = random
 StateModelStoreWidgets = true
@@ -157,7 +157,13 @@ ResetDataStore = false
 
 JacocoCoverage = true
 JacocoCoveragePort = 5000
-JacocoCoverageClasses = suts/SwingSet2
+JacocoCoverageClasses = suts/rachota_24
+
+#################################################################
+# Strategy settings
+#################################################################
+
+StrategyFile = settings/desktop_swing_coverage/main_strategy.txt
 
 #################################################################
 # Other more advanced settings
