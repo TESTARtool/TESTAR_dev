@@ -28,21 +28,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
+import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.testar.coverage.CodeCoverageManager;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.ConfigTags;
-import org.testar.monkey.alayer.Action;
+import org.testar.monkey.Util;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.actions.*;
+import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
-import org.testar.monkey.alayer.SUT;
-import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Widget;
-import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
-import org.testar.monkey.alayer.actions.StdActionCompiler;
-import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
@@ -75,6 +75,31 @@ public class Protocol_desktop_swing_coverage extends DesktopProtocol {
 	}
 
 	/**
+	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
+	 */
+	@Override
+	protected void preSequencePreparations() {
+		super.preSequencePreparations();
+		deleteRachotaConfig();
+		try {
+			// Create rachota settings configuration file, and disable detectInactivity feature
+			File rachotaFile = new File("C:\\Users\\" + System.getProperty("user.name") + "\\.rachota");
+			if(!rachotaFile.exists()) {
+				rachotaFile.mkdirs();
+			}
+			File rachotaSettings = new File("C:\\Users\\" + System.getProperty("user.name") + "\\.rachota\\settings.cfg");
+			if(rachotaSettings.createNewFile() || rachotaFile.exists()) {
+				FileWriter settingsWriter = new FileWriter("C:\\Users\\" + System.getProperty("user.name") + "\\.rachota\\settings.cfg");
+				settingsWriter.write("detectInactivity = false");
+				settingsWriter.close();
+			}
+		} catch (Exception e) {
+			System.out.println("ERROR trying to disable detectInactivity configuration feature");
+		}
+	}
+
+
+	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
 	 * This can be used for example for bypassing a login screen by filling the username and password
 	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
@@ -85,6 +110,25 @@ public class Protocol_desktop_swing_coverage extends DesktopProtocol {
 		// Before executing the first SUT action, extract the initial coverage
 		codeCoverageManager.getActionCoverage("0");
 		super.beginSequence(system, state);
+
+		// rachota: predefined action to deal with initial pop-up question
+		// If stopSystem configuration works (delete rachota folder) we will not need this
+		for(Widget w : state) {
+			if(w.get(Tags.Title,"").contains("Rachota is already running or it was not")) {
+				waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "Yes", state, system, 5, 1);
+				// Wait and update the state
+				Util.pause(10);
+				state = super.getState(system);
+			}
+			// Dutch
+			if(w.get(Tags.Title,"").contains("was de vorige keer niet normaal afgesloten")) {
+				waitAndLeftClickWidgetWithMatchingTag(Tags.Title, "Ja", state, system, 5, 1);
+				// Wait and update the state
+				Util.pause(10);
+				state = super.getState(system);
+			}
+		}
+
 		strategyManager.beginSequence(state);
 	}
 
@@ -130,6 +174,11 @@ public class Protocol_desktop_swing_coverage extends DesktopProtocol {
 						actions.add(ac.leftClickAt(w));
 					}
 
+					// rachota: use spinboxes
+					if(isSpinBoxWidget(w) && (isUnfiltered(w) || whiteListed(w))) {
+						addIncreaseDecreaseActions(w, actions, ac);
+					}
+
 					// type into text boxes
 					if((isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) && !isSourceCodeEditWidget(w)) {
 						actions.add(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
@@ -154,6 +203,43 @@ public class Protocol_desktop_swing_coverage extends DesktopProtocol {
 		return actions;
 
 	}
+
+	/**
+	 * Rachota + Swing:
+	 * Check if it is a Spinner widget
+	 */
+	private boolean isSpinBoxWidget(Widget w) {
+		return w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIASpinner");
+	}
+
+	/**
+	 * Rachota + Swing:
+	 * SpinBox widgets buttons seems that do not exist as unique element,
+	 * derive click + keyboard action to increase or decrease
+	 */
+	private void addIncreaseDecreaseActions(Widget w, Set<Action> actions, StdActionCompiler ac) {
+		Action increase = new CompoundAction.Builder()
+				.add(ac.leftClickAt(w), 0.5) // Click for focus
+				.add(new KeyDown(KBKeys.VK_UP),0.5) // Press Up Arrow keyboard
+				.add(new KeyUp(KBKeys.VK_UP),0.5).build(); // Release Keyboard
+
+		increase.set(Tags.Role, Roles.Button);
+		increase.set(Tags.OriginWidget, w);
+		increase.set(Tags.Desc, "Increase Spinner");
+
+		Action decrease = new CompoundAction.Builder()
+				.add(ac.leftClickAt(w), 0.5) // Click for focus
+				.add(new KeyDown(KBKeys.VK_DOWN),0.5) // Press Down Arrow keyboard
+				.add(new KeyUp(KBKeys.VK_DOWN),0.5).build(); // Release Keyboard
+
+		decrease.set(Tags.Role, Roles.Button);
+		decrease.set(Tags.OriginWidget, w);
+		decrease.set(Tags.Desc, "Decrease Spinner");
+
+		actions.add(increase);
+		actions.add(decrease);
+	}
+
 
 	/**
 	 * SwingSet2 application contains a TabElement called "SourceCode"
@@ -208,5 +294,29 @@ public class Protocol_desktop_swing_coverage extends DesktopProtocol {
 		// Before finishing the sequence and closing the SUT, extract the sequence coverage
 		codeCoverageManager.getSequenceCoverage();
 		super.finishSequence();
+	}
+
+	/**
+	 * This methods stops the SUT
+	 *
+	 * @param system
+	 */
+	@Override
+	protected void stopSystem(SUT system) {
+		super.stopSystem(system);
+		deleteRachotaConfig();
+	}
+
+	/**
+	 * Delete rachota files to have same initial state without tasks
+	 */
+	private void deleteRachotaConfig() {
+		String rachotaPath = "C:\\Users\\" + System.getProperty("user.name") + "\\.rachota";
+
+		if(new File(rachotaPath).exists()) {
+			try {
+				FileUtils.deleteDirectory(new File(rachotaPath));
+			} catch(Exception e) {System.out.println("ERROR deleting rachota folder");}
+		}
 	}
 }
