@@ -15,28 +15,31 @@ Besides the current and past TESTAR development team, we want to mention:
 	- The PERTEST project
 	  -Testing of data persistence and user perspective for new paradigms- (TIN2013-46928-C3-1-R).
 
--> Tanja E.J. Vos
-   as FITTEST project coordinator and FRUIT/TESTAR projects director.
+	- The TESTOMAT project
+	  -The Next Level of Test Automation - ITEA3, 16032 (2017-2020)
 
--> Sebastian Bauersfeld
-   who developed the initial version of the tool in the FITTEST project
-   -FRUIT: Fully Automatic GUI Testing-
-   https://github.com/SebastianBauersfeld/fruit
+	- The DECODER project
+	  -DEveloper COmpanion for Documented and annotatEd code Reference - H2020, 824231 (2019-2021)
 
--> Urko Rueda Molina
-   who developed and managed, from June 2015 to September 2017, the first releases of the continuing FRUIT project
-   -TESTAR first public release, TESTAR v1.1a, TESTAR v1.2 and TESTAR v1.3-
-   https://github.com/STaQ-PROS-UPV/TESTAR/releases
-   and who provided the technical support to the TESTAR team; worths mention:
+	- The IV4XR project
+	  -Intelligent Verification/Validation for Extended Reality Based Systems - H2020, 856716 (2019-2022)
 
-	- Anna Isabel Esparcia (since v1.1a)
-	  who directed the research of the evolutionary algorithms for action selection.
+	- The IVVES project
+	  -Industrial-grade Verification and Validation of Evolving Systems - ITEA3, 18022 (2019-2023)
 
-	- Francisco Almenar Pedros and Mirella-Oreto Martinez Murillo (since v1.1a until September 2016)
-	  who worked with industry partners to transfer TESTAR technology.
+	- The TAILOR project
+	  -Foundations of Trustworthy AI - Integrating Reasoning, Learning and Optimization - H2020, 952215 (2020-2024)
 
-	- Wouter Cox and Jean Marc (v1.3)
-	  who developed Linux and Windows 10 platforms support for TESTAR.
+	- The ENACTEST project
+	  -European Innovation Alliance for Testing Education - Erasmus+, 101055874 (2022-2025)
 
-	- Fernando Pastor Ricos (v1.3)
-	  who worked on the Java/Swing technology support.
+	- The AUTOLINK project
+	  -Automated Unobtrusive Techniques for LINKing requirements and testing in agile software development -  NWO OTP project, 19521 (2023-202X)
+
+-> TESTAR project contributors (listed in alphabetical order):
+
+Pekka Aho, Sami Ahonen, Abdurrahman Akin, Francisco Almenar Pedrós, Alessandra Bagnato, Salmi Baharom, Sebastian Bauersfeld, Axel Bons, Robin Bouwmeester, Etienne Brosse, Aaron van der Brugge, Govert Buijs, Ernesto Calas Blasco, Hatim Chahim, Nelly Condori, Wouter Cox, Robbert van Dalen, Joseph Davidson, Borja Davo, Martin Deiman, Niels Doorn, Mark Dourlein, Mehmet Duran, Anna Esparcia-Alcazar, Josep Ferrandis, Joan Fons i Cors, Floren de Gier, Stijn de Gouw, Marion de Groot, Conny Hageluken, Mark Harman, Jeroen Hoebert, Karel Hovorka, Lianne Hufkens, Thorn Jansen, Davy Kager, Parsa Karimi, Eddy Kivits, Peter Kruse, Melvin van der Kuijl, Yvan Labiche, Yaping Luo, Jean-Marc Maas, Jean Marc, Beatriz Marin, Hector Martinez Martinez, Tycho Menting, Perttu Moilanen, Ad Mulders, Rick Neeft, Joona Oikarinen, Sven Ordelman, Mirella Oreto Martínez Murillo, Carlos Ortega, Matvey Pashkovskiy, Fernando Pastor Ricos, Sorin Patrasoiu, Mauro Pezze, Dietmar Pfahl, Tomi Piirainen, Wishnu Prasetya, Enrique Reverón, Olivia Rodriguez-Valdes, Antonio de Rojas, Urko Rueda, Carlo Sengers, Serafettin Senturk, Arend Slomp, Sietse Snel, Guy Thieuws, Michael Tikhonenko, Ismael Torres Boigues, Kevin van der Vlist, Tanja E. J. Vos, Ramón de Vries, Joachim Wegener, Adri Weijling
+
+
+
+
