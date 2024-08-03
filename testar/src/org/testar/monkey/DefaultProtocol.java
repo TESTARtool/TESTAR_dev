@@ -250,11 +250,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 
 		}catch(WinApiException we) {
-			String msg = "Exception: Check whether current SUTs path: "+settings.get(ConfigTags.SUTConnectorValue)
-			+" is correctly defined";
+			if(we.getMessage() != null) {
+				popupMessage(we.getMessage());
+				System.out.println(we.getMessage());
+			}
 
-			popupMessage(msg);
-			System.out.println(msg);
 			we.printStackTrace();
 
 			this.mode = Modes.Quit;
