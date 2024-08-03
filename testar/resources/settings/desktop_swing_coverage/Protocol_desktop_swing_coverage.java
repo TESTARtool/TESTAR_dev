@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.testar.OutputStructure;
 import org.testar.coverage.CodeCoverageManager;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.ConfigTags;
@@ -163,7 +164,16 @@ public class Protocol_desktop_swing_coverage extends DesktopProtocol {
 		//----------------------
 
 		// iterate through all widgets
-		for(Widget w : state){
+		//for(Widget w : state){
+
+		// iterate through the top widgets of the state (used for menu items)
+		for(Widget w : getTopWidgets(state)){
+
+			// rachota: add filename report
+			if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")
+					&& w.get(Tags.Title,"").contains("Filename:")) {
+				addFilenameReportAction(w, actions, ac);
+			}
 
 			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
 
@@ -179,8 +189,18 @@ public class Protocol_desktop_swing_coverage extends DesktopProtocol {
 						addIncreaseDecreaseActions(w, actions, ac);
 					}
 
+					// rachota: left clicks on calendar number widgets
+					if(isCalendarTextWidget(w) && (isUnfiltered(w) || whiteListed(w))) {
+						actions.add(ac.leftClickAt(w));
+					}
+
+					// rachota: left clicks on edit widgets with tool tip indications
+					if(isEditToClickWidget(w) && (isUnfiltered(w) || whiteListed(w))) {
+						actions.add(ac.leftClickAt(w));
+					}
+
 					// type into text boxes
-					if((isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) && !isSourceCodeEditWidget(w)) {
+					if((isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) && isEditableWidget(w)) {
 						actions.add(ac.clickTypeInto(w, InputDataManager.getRandomTextInputData(w), true));
 					}
 
@@ -213,6 +233,53 @@ public class Protocol_desktop_swing_coverage extends DesktopProtocol {
 	}
 
 	/**
+	 * Rachota:
+	 * Tricky way to check if current text widgets is a potential calendar number
+	 */
+	private boolean isCalendarTextWidget(Widget w) {
+		if(w.parent() != null && w.parent().get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAPane")) {
+			int calendarDay = getNumericInt(w.get(Tags.Title, ""));
+			if(0 < calendarDay && calendarDay <= 31){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Rachota:
+	 * Some Edit widgets allow click actions (indicated in the tool tip text)
+	 */
+	private boolean isEditToClickWidget(Widget w) {
+		if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")){
+			return w.get(Tags.ToolTipText,"").contains("Mouse click");
+		}
+		return false;
+	}
+
+	private int getNumericInt(String strNum) {
+		if (strNum == null) {
+			return -1;
+		}
+		try {
+			return Integer.parseInt(strNum);
+		} catch (NumberFormatException nfe) {
+			return -1;
+		}
+	}
+
+	/**
+	 * Rachota:
+	 * Seems that interactive Edit elements have tool type text with instructions
+	 * Then if ToolTipText exists, the widget is interactive
+	 */
+	private boolean isEditableWidget(Widget w) {
+		String toolTipText = w.get(Tags.ToolTipText,"");
+		return !toolTipText.trim().isEmpty() && !toolTipText.contains("text/plain") 
+				&& !toolTipText.contains("Mouse click");
+	}
+
+	/**
 	 * Rachota + Swing:
 	 * SpinBox widgets buttons seems that do not exist as unique element,
 	 * derive click + keyboard action to increase or decrease
@@ -240,6 +307,35 @@ public class Protocol_desktop_swing_coverage extends DesktopProtocol {
 		actions.add(decrease);
 	}
 
+	/**
+	 * Rachota:
+	 * This SUT have the functionality of create invoices and reports
+	 * Create an action that prepares a filename to create this report
+	 */
+	private void addFilenameReportAction(Widget filenameWidget, Set<Action> actions, StdActionCompiler ac) {
+
+		// Get Next widget
+		Widget nextButton = filenameWidget;
+		for(Widget checkWidget: filenameWidget.root()) { 
+			if(checkWidget.get(Tags.Title,"").contains("Next")) {
+				nextButton = checkWidget;
+			}
+		}
+
+		// type filename, use tab to complete the path, and click next
+		Action typeDate = ac.clickTypeInto(filenameWidget, Util.dateString(OutputStructure.DATE_FORMAT), true);
+		Action addFilename = new CompoundAction.Builder()   
+				.add(typeDate, 0.5) // Click and type
+				.add(new KeyDown(KBKeys.VK_TAB),0.5) // Press TAB keyboard
+				.add(new KeyUp(KBKeys.VK_TAB),0.5) // Release Keyboard
+				.add(ac.leftClickAt(nextButton), 0.5).build(); //Click next
+
+		addFilename.set(Tags.Role, Roles.Button);
+		addFilename.set(Tags.OriginWidget, filenameWidget);
+		addFilename.set(Tags.Desc, "Add Filename Report");
+		addFilename.set(Tags.Visualizer, typeDate.get(Tags.Visualizer));
+		actions.add(addFilename);
+	}
 
 	/**
 	 * SwingSet2 application contains a TabElement called "SourceCode"
