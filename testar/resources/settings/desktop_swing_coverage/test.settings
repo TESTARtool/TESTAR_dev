@@ -51,7 +51,7 @@ SequenceLength = 10
 # Regular expression and Tags to apply them
 #################################################################
 
-SuspiciousTags = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+SuspiciousTags =
 TagsForSuspiciousOracle = Title
 
 #################################################################
@@ -89,7 +89,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[eE]xit.*|.*Close.*|.*[sS]ave.*|.*Minimize.*
+ClickFilter = .*[eE]xit.*|.*Close.*|.*[sS]ave.*|.*Minimize.*|About.*|FAQs.*|Documentation.*|Browse.*|Help.*
 TagsToFilter = Title
 
 #################################################################

@@ -59,6 +59,9 @@ public class Protocol_desktop_swing_coverage extends DesktopProtocol {
 	private CodeCoverageManager codeCoverageManager;
 	private StrategyManager strategyManager;
 
+	// rachota: sometimes SUT stop responding, we need this empty actions countdown
+	protected int countEmptyStateTimes = 0;
+
 	/**
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
@@ -108,6 +111,9 @@ public class Protocol_desktop_swing_coverage extends DesktopProtocol {
 	 */
 	@Override
 	protected void beginSequence(SUT system, State state){
+		// reset value
+		countEmptyStateTimes = 0;
+
 		// Before executing the first SUT action, extract the initial coverage
 		codeCoverageManager.getActionCoverage("0");
 		super.beginSequence(system, state);
@@ -138,6 +144,23 @@ public class Protocol_desktop_swing_coverage extends DesktopProtocol {
 	{
 		State state = super.getState(system);
 		return strategyManager.getState(state, latestState);
+	}
+
+	/**
+	 * The getVerdict methods implements the online state oracles that
+	 * examine the SUT's current state and returns an oracle verdict.
+	 * @return oracle verdict, which determines whether the state is erroneous and why.
+	 */
+	@Override
+	protected Verdict getVerdict(State state){
+		Verdict verdict = super.getVerdict(state);
+
+		if(countEmptyStateTimes > 2) {
+			System.out.println("Seems that rachota SUT is not responding");
+			return new Verdict(Verdict.SEVERITY_NOT_RESPONDING, "Seems that rachota SUT is not responding");
+		}
+
+		return verdict;
 	}
 
 	/**
@@ -213,12 +236,20 @@ public class Protocol_desktop_swing_coverage extends DesktopProtocol {
 						widgetTree(w, actions);
 					}
 					//End of Force action
-
 				}
-
 			}
-
 		}
+
+		// rachota: sometimes rachota freezes, TESTAR detects the SUT
+		// but cannot extract anything at JavaAccessBridge level
+		// Use this count for Verdict
+		if(actions.isEmpty())
+		{
+			System.out.println("Empty Actions on State!");
+			countEmptyStateTimes++;
+		}
+		else
+			countEmptyStateTimes = 0;
 
 		return actions;
 
