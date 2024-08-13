@@ -31,7 +31,7 @@ public class NrOfActionsNode extends BaseNode implements IntegerNode
     @Override
     public Integer getResult(State state, Set<Action> actions, MultiMap<String, Object> actionsExecuted, ArrayList<String> operatingSystems)
     {
-        filteredActions.clear();
+        filteredActions = new ArrayList<>(actions); // copy the actions list
 
         if(visitFilter != null)
             filteredActions = visitFilter.filter(filteredActions, actionsExecuted);

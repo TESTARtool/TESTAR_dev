@@ -49,7 +49,7 @@ public class SelectRandomNode extends BaseNode implements ActionNode
         if(actions.size() == 1) //if there's only one action, pick that one
             return new ArrayList<>(actions).get(0);
 
-        filteredActions.clear();
+        filteredActions = new ArrayList<>(actions); // copy the actions list
 
         if(visitFilter != null)
             filteredActions = visitFilter.filter(filteredActions, actionsExecuted);

@@ -45,6 +45,7 @@ import org.testar.monkey.alayer.actions.*;
 import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
+import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
 import org.testar.protocols.DesktopProtocol;
@@ -102,6 +103,13 @@ public class Protocol_desktop_swing_coverage extends DesktopProtocol {
 		}
 	}
 
+	@Override
+	protected SUT startSystem() throws SystemStartException
+	{
+		SUT system = super.startSystem();
+		Util.pause(10);
+        return system;
+    }
 
 	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.

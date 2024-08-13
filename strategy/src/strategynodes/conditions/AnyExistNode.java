@@ -49,7 +49,7 @@ public class AnyExistNode extends BaseNode implements BooleanNode
         else if (visitFilter == null && actionTypeFilter == null)
             return true; //if there are no filters to apply, any action is valid
 
-        filteredActions = new ArrayList<>(actions);
+        filteredActions = new ArrayList<>(actions); // copy the actions list
 
         if(visitFilter != null)
             filteredActions = visitFilter.filter(filteredActions, actionsExecuted);
