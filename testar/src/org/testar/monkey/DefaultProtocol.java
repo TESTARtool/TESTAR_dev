@@ -720,6 +720,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	@Override
 	protected void finishSequence(){
+		// TODO: Consider moving kill test launched processes to stop system
 		SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
 	}
 
