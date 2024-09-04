@@ -2,6 +2,7 @@ package org.testar.action.priorization.llm;
 
 import org.testar.monkey.Pair;
 import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.Tags;
 
 import java.util.ArrayList;
 
@@ -23,16 +24,24 @@ public class ActionHistory {
             actions.remove(0);
         }
 
-        actions.add(new Pair<Action, String>(action, parameters));
+        actions.add(new Pair<>(action, parameters));
     }
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(String.format("These were the last %d actions taken: ", actions.size()));
+        builder.append(String.format("Last %d actions taken (higher is newer): ", actions.size()));
 
-        // TODO: Finish
+        int i = 1;
+        for (var pair : actions) {
+            Action action = pair.left();
+            String title = action.get(Tags.Title);
+            String role = action.get(Tags.Role).name();
+            String parameters = pair.right();
+            builder.append(String.format("%d: (%s,%s,%s). ", i, title, role, parameters));
+            i++;
+        }
 
-        return super.toString();
+        return builder.toString();
     }
 }
