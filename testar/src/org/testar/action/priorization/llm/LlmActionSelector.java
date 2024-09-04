@@ -163,15 +163,13 @@ public class LlmActionSelector implements IActionSelector {
 
         int i = 0;
         for (Action action : actions) {
-            if(action.get(Tags.Enabled)) {
-                builder.append(", ");
-                String title = action.get(Tags.Title);
-                String role = action.get(Tags.Role).name();
-                String description = action.get(Tags.Desc);
+            builder.append(", ");
+            String title = action.get(Tags.Title, "Untitled");
+            String role = action.get(Tags.Role).name();
+            String description = action.get(Tags.Desc);
 
-                builder.append(String.format("(%d,%s,%s,%s)", i, role, title, description));
-                i++;
-            }
+            builder.append(String.format("(%d,%s,%s,%s)", i, role, title, description));
+            i++;
         }
         builder.append(". ");
         builder.append(actionHistory.toString());
