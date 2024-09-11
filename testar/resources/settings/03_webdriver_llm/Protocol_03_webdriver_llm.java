@@ -59,7 +59,10 @@ public class Protocol_03_webdriver_llm extends WebdriverProtocol {
 	private List<String> listOfDetectedErroneousVerdicts = new ArrayList<>();
 
 	// Set test goal here.
-	private LlmActionSelector llmActionSelector = new LlmActionSelector("");
+	private LlmActionSelector llmActionSelector = new LlmActionSelector(
+			"Log in with the username 'John' and the password 'Demo'.",
+			"http://192.168.108.242",
+			1234);
 
 	/**
 	 * Called once during the life time of TESTAR

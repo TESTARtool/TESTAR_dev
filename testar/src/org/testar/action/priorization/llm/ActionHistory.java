@@ -3,6 +3,7 @@ package org.testar.action.priorization.llm;
 import org.testar.monkey.Pair;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.Widget;
 
 import java.util.ArrayList;
 
@@ -35,10 +36,12 @@ public class ActionHistory {
         int i = 1;
         for (var pair : actions) {
             Action action = pair.left();
-            String title = action.get(Tags.Title);
-            String role = action.get(Tags.Role).name();
+            Widget widget = action.get(Tags.OriginWidget);
+
+            String type = action.get(Tags.Role).name();
+            String description = widget.get(Tags.Desc);
             String parameters = pair.right();
-            builder.append(String.format("%d: (%s,%s,%s). ", i, title, role, parameters));
+            builder.append(String.format("%d: (%s,%s,%s). ", i, type, description, parameters));
             i++;
         }
 

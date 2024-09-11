@@ -9,6 +9,7 @@ import org.testar.IActionSelector;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.actions.WdRemoteTypeAction;
 
 import java.io.BufferedReader;
@@ -19,6 +20,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -103,8 +105,10 @@ public class LlmActionSelector implements IActionSelector {
     private Action getVerdictFromLlm(ArrayList<Action> actions) {
         HttpClient httpClient = HttpClient.newHttpClient();
         URI uri = URI.create(this.host + ":" + this.port + "/v1/chat/completions");
+        logger.log(Level.DEBUG, uri.toString());
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
+                .timeout(Duration.ofSeconds(300))
                 .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(conversation)))
                 .build();
 
@@ -163,12 +167,14 @@ public class LlmActionSelector implements IActionSelector {
 
         int i = 0;
         for (Action action : actions) {
-            builder.append(", ");
-            String title = action.get(Tags.Title, "Untitled");
-            String role = action.get(Tags.Role).name();
-            String description = action.get(Tags.Desc);
+            Widget widget = action.get(Tags.OriginWidget);
 
-            builder.append(String.format("(%d,%s,%s,%s)", i, role, title, description));
+            builder.append(", ");
+            // String title = widget.get(Tags.Title, "Untitled");
+            String type = action.get(Tags.Role).name();
+            String description = widget.get(Tags.Desc, "No description");
+
+            builder.append(String.format("(%d,%s,%s)", i, type, description));
             i++;
         }
         builder.append(". ");
