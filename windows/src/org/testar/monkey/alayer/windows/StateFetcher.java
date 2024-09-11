@@ -520,22 +520,26 @@ public class StateFetcher implements Callable<UIAState>{
 		if (vmidAC != null){			
 			Object[] props = Windows.GetAccessibleContextProperties(vmidAC[0],vmidAC[1]);
 			if (props != null){
-				String role 		 = (String) props[0],
-					   name 		 = (String) props[1],
-					   description 	 = (String) props[2],
-					   x 			 = (String) props[3],
-					   y 			 = (String) props[4],
-					   width 		 = (String) props[5],
-					   height 		 = (String) props[6],
-					   indexInParent = (String) props[7],
-					   childrenCount = (String) props[8];
+				String name = (String) props[0];
+				String description = (String) props[1];
+				String role = (String) props[2];
+				String accesibleStateSet = (String) props[3];
+				String indexInParent = (String) props[4];
+				int childrenCount = Integer.parseInt((String) props[5]);
+				String x = (String) props[6];
+				String y = (String) props[7];
+				String width = (String) props[8];
+				String height = (String) props[9];
+				String accessibleComponent = (String) props[10];
+				String accessibleAction = (String) props[11];
+				String accessibleSelection = (String) props[12];
+				String accessibleText = (String) props[13];
+				String accessibleInterfaces = (String) props[14];
 
 				Rect rect = null;
 				try {
 					rect = Rect.from(Double.valueOf(x).doubleValue(), Double.valueOf(y).doubleValue(),
-									 Double.valueOf(width).doubleValue(), Double.valueOf(height).doubleValue());
-					//if (parent.parent == null)
-					//	parent.rect = el.rect; // fix UI actions at root widget
+							Double.valueOf(width).doubleValue(), Double.valueOf(height).doubleValue());
 				} catch (Exception e){
 					return null;
 				}
@@ -548,46 +552,69 @@ public class StateFetcher implements Callable<UIAState>{
 				//el.windowHandle = Windows.GetHWNDFromAccessibleContext(vmidAC[0],vmidAC[1]);
 				el.windowHandle = Windows.IUIAutomationElement_get_NativeWindowHandle(uiaCachePointer, true);
 
-				if (role.equals(AccessBridgeControlTypes.ACCESSIBLE_DIALOG)){
+				if(isJavaSwingTopLevelContainer(role, el)) {
 					el.isTopLevelContainer = true;
 					modalElement = el;
 				}
+
 				el.ctrlId = AccessBridgeControlTypes.toUIA(role);				
 				if (el.ctrlId == Windows.UIA_MenuControlTypeId) // || el.ctrlId == Windows.UIA_WindowControlTypeId)
 					el.isTopLevelContainer = true;
 				else if (el.ctrlId == Windows.UIA_EditControlTypeId)
 					el.isKeyboardFocusable = true;
+
 				el.name = name;				
 				el.helpText = description;
-				// el.enabled = true;
+				el.automationId = role;
+				el.enabled = accesibleStateSet.contains("enabled");
+				el.blocked = !accesibleStateSet.contains("showing");
+
 				parent.root.windowHandleMap.put(el.windowHandle, el);
-				
-				
-				//MenuItems are duplicate with AccessBridge when we open one Menu or combo box
-				if(!role.equals("menu") && !role.equals("combo box")
-					&& childrenCount != null && !childrenCount.isEmpty() && !childrenCount.equals("null")){
-					/*int cc = Windows.GetVisibleChildrenCount(vmidAC[0], vmidAC[1]);					
-					if (cc > 0){
-						el.children = new ArrayList<UIAElement>(cc);
-						long[] children = Windows.GetVisibleChildren(vmidAC[0],vmidAC[1]);
-						for (int i=0; i<children.length; i++)
-							abDescend(windowHandle,el,vmidAC[0],children[i]);
-					}*/
-					
-						long childAC;
-						int c = Integer.valueOf(childrenCount).intValue();
-						el.children = new ArrayList<UIAElement>(c);
-						for (int i=0; i<c; i++){
-							childAC =  Windows.GetAccessibleChildFromContext(vmidAC[0],vmidAC[1],i);
-							abDescend(hwnd,uiaCachePointer,el,vmidAC[0],childAC);
-						}
+
+				// Detect duplicated menu item and combo box panels to ignore them
+				if(isNonDesiredMenuItem(role, el)) {
+					parent.parent.ignore = true;
+				}
+
+				long childAC;
+				el.children = new ArrayList<UIAElement>(childrenCount);
+				for (int i=0; i<childrenCount; i++){
+					childAC =  Windows.GetAccessibleChildFromContext(vmidAC[0],vmidAC[1],i);
+					abDescend(hwnd,uiaCachePointer,el,vmidAC[0],childAC);
 				}
 
 			}
 		}
-				
+
 		return modalElement;
-		
+
+	}
+
+	/**
+	 * Check the role of the Java Swing element to determine if it is a top level container
+	 */
+	private boolean isJavaSwingTopLevelContainer(String role, UIAElement el) {
+		// JDialog are by default top level containers
+		if (role.equals(AccessBridgeControlTypes.ACCESSIBLE_DIALOG)){
+			return true;
+		}
+		// Usually the JFrame element that descend directly from the root process
+		// are also top level containers
+		if(role.equals(AccessBridgeControlTypes.ACCESSIBLE_FRAME) 
+				&& el.parent != null && (el.parent instanceof UIARootElement)) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Check MenuItems because these are duplicate with AccessBridge when we open one Menu or combo box
+	 */
+	private boolean isNonDesiredMenuItem(String role, UIAElement el) {
+		UIAElement parent = el.parent;
+		return (role.equals("menu item") || role.equals("radio button") || role.equals("check box"))
+				&& parent != null && parent.parent != null 
+				&& parent.automationId.equals("popup menu") && parent.parent.automationId.equals("panel");
 	}
 
 	// (mark a proper widget as modal)
