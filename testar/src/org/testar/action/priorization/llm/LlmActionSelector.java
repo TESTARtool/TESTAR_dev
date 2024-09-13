@@ -6,21 +6,18 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.IActionSelector;
+import org.testar.monkey.Main;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.actions.WdRemoteTypeAction;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -103,49 +100,71 @@ public class LlmActionSelector implements IActionSelector {
     }
 
     private Action getVerdictFromLlm(ArrayList<Action> actions) {
-        HttpClient httpClient = HttpClient.newHttpClient();
+        String testarVer = Main.TESTAR_VERSION.substring(0, Main.TESTAR_VERSION.indexOf(" "));
         URI uri = URI.create(this.host + ":" + this.port + "/v1/chat/completions");
-        logger.log(Level.DEBUG, uri.toString());
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(uri)
-                .timeout(Duration.ofSeconds(300))
-                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(conversation)))
-                .build();
+
+        logger.log(Level.DEBUG, "Using endpoint: " + uri);
+
+        String conversationJson = gson.toJson(conversation);
 
         try {
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if(response.statusCode() == 200) {
-                LlmResponse llmResponse = gson.fromJson(response.body(), LlmResponse.class);
-                String responseContent = llmResponse.getChoices().get(0).getMessage().getContent();
+            URL url = new URL(this.host + ":" + this.port + "/v1/chat/completions");
+            HttpURLConnection con = (HttpURLConnection)url.openConnection();
 
-                if(StringUtils.isNumeric(responseContent)) {
-                    int actionToTake = Integer.parseInt(responseContent);
-                    if(actionToTake >= actions.size()) {
-                        return actions.get(actionToTake);
-                    } else {
-                        throw new ArrayIndexOutOfBoundsException("Index requested by LLM is out of bounds.");
-                    }
-                } else {
-                    String[] responseParts = responseContent.split(",");
-                    if(responseParts.length == 2) {
-                        if(StringUtils.isNumeric(responseContent)) {
-                            int actionToTake = Integer.parseInt(responseParts[0]);
-                            String parameters = responseParts[1];
-                            return setActionParameters(actions.get(actionToTake), parameters);
-                        } else {
-                            throw new Exception("LLM output is invalid: " + llmResponse);
-                        }
-                    } else {
-                        throw new Exception("LLM output is invalid: " + llmResponse);
-                    }
-                }
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Content-Type", "application/json");
+            con.setRequestProperty("Accept", "application/json");
+            con.setRequestProperty("User-Agent", "testar/" + testarVer);
+            con.setDoInput(true);
+            con.setDoOutput(true);
+            con.setConnectTimeout(10000);
 
-            } else {
-                throw new Exception("Server returned " + response.statusCode() + " status code.");
+            try(OutputStream os = con.getOutputStream()) {
+                byte[] input = conversationJson.getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
             }
 
-        } catch (Exception e) {
-            logger.log(Level.ERROR, "Unable to select action with LLM!");
+            try(BufferedReader br = new BufferedReader(
+                    new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
+                StringBuilder response = new StringBuilder();
+                String responseLine = null;
+                while ((responseLine = br.readLine()) != null) {
+                    response.append(responseLine.trim());
+                }
+
+                LlmResponse modelResponse = gson.fromJson(response.toString(), LlmResponse.class);
+                // TODO: Trim response to exclude initial prompt.
+                String responseContent = modelResponse.getChoices().get(0).getMessage().getContent();
+
+                if(con.getResponseCode() == 200) {
+                    if(StringUtils.isNumeric(responseContent)) {
+                        int actionToTake = Integer.parseInt(responseContent);
+                        if(actionToTake >= actions.size()) {
+                            return actions.get(actionToTake);
+                        } else {
+                            throw new ArrayIndexOutOfBoundsException("Index requested by LLM is out of bounds.");
+                        }
+                    } else {
+                        String[] responseParts = responseContent.split(",");
+                        if(responseParts.length == 2) {
+                            if(StringUtils.isNumeric(responseContent)) {
+                                int actionToTake = Integer.parseInt(responseParts[0]);
+                                String parameters = responseParts[1];
+                                return setActionParameters(actions.get(actionToTake), parameters);
+                            } else {
+                                throw new Exception("LLM output is invalid: " + responseContent);
+                            }
+                        } else {
+                            throw new Exception("LLM output is invalid: " + responseContent);
+                        }
+                    }
+
+                } else {
+                    throw new Exception("Server returned " + con.getResponseCode() + " status code.");
+                }
+            }
+        } catch(Exception e) {
+            logger.log(Level.ERROR, "Unable to select action with the LLM");
             e.printStackTrace();
             return null;
         }
@@ -170,7 +189,7 @@ public class LlmActionSelector implements IActionSelector {
             Widget widget = action.get(Tags.OriginWidget);
 
             builder.append(", ");
-            // String title = widget.get(Tags.Title, "Untitled");
+
             String type = action.get(Tags.Role).name();
             String description = widget.get(Tags.Desc, "No description");
 
