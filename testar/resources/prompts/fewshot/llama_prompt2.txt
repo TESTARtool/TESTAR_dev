@@ -1,0 +1,3 @@
+Objective: Log in with username Test and password Star.
+Available actions: (0, Button, Register), (1, Button, Log in), (2, TextField, Password), (3, TextField, Username).
+Last 0 actions taken (higher is newer):

@@ -56,9 +56,22 @@ public class LlmActionSelector implements IActionSelector {
         conversation = new LlmConversation();
 
         // TODO: Make configurable
-        String systemMessageLocation = "prompts/llama_test.txt";
+        try {
+            conversation.addMessage("system", getTextResource("prompts/fewshot/llama_prompt1.txt"));
+            conversation.addMessage("user", getTextResource("prompts/fewshot/llama_prompt2.txt"));
+            conversation.addMessage("assistant", getTextResource("prompts/fewshot/llama_prompt3.txt"));
+            conversation.addMessage("user", getTextResource("prompts/fewshot/llama_prompt4.txt"));
+            conversation.addMessage("assistant", getTextResource("prompts/fewshot/llama_prompt5.txt"));
+            conversation.addMessage("user", getTextResource("prompts/fewshot/llama_prompt6.txt"));
+            conversation.addMessage("assistant", getTextResource("prompts/fewshot/llama_prompt7.txt"));
+        } catch(Exception e) {
+            logger.log(Level.ERROR, "Failed to initialize conversation, LLM quality may be degraded.");
+        }
+    }
+
+    private String getTextResource(String resourceLocation) throws Exception {
         ClassLoader classLoader = LlmActionSelector.class.getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream(systemMessageLocation);
+        InputStream inputStream = classLoader.getResourceAsStream(resourceLocation);
 
         if (inputStream != null) {
             StringBuilder stringBuilder = new StringBuilder();
@@ -67,15 +80,17 @@ public class LlmActionSelector implements IActionSelector {
                 while ((line = reader.readLine()) != null) {
                     stringBuilder.append(line).append("\n");
                 }
-                conversation.addMessage("system", stringBuilder.toString());
+                return stringBuilder.toString();
             } catch (IOException e) {
-                logger.log(Level.ERROR, "Unable to read system prompt file");
+                logger.log(Level.ERROR, "Unable to read resource " + resourceLocation);
                 e.printStackTrace();
             }
 
         } else {
-            logger.log(Level.ERROR, "Unable to find system prompt file " + systemMessageLocation);
+            logger.log(Level.ERROR, "Unable to load resource " + resourceLocation);
         }
+        
+        throw new Exception("Failed to load text resource, double check the resource location.");
     }
 
     private Action selectActionWithLlm(State state, Set<Action> actions) {
@@ -133,7 +148,7 @@ public class LlmActionSelector implements IActionSelector {
                 }
 
                 LlmResponse modelResponse = gson.fromJson(response.toString(), LlmResponse.class);
-                // TODO: Trim response to exclude initial prompt.
+
                 String responseContent = modelResponse.getChoices().get(0).getMessage().getContent();
 
                 if(con.getResponseCode() == 200) {
