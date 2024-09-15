@@ -162,7 +162,7 @@ public class LlmActionSelector implements IActionSelector {
                     } else {
                         String[] responseParts = responseContent.split(",");
                         if(responseParts.length == 2) {
-                            if(StringUtils.isNumeric(responseContent)) {
+                            if(StringUtils.isNumeric(responseParts[0])) {
                                 int actionToTake = Integer.parseInt(responseParts[0]);
                                 String parameters = responseParts[1];
                                 return setActionParameters(actions.get(actionToTake), parameters);
