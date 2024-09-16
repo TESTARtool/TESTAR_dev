@@ -11,7 +11,10 @@ import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
+import org.testar.monkey.alayer.actions.WdRemoteClickAction;
 import org.testar.monkey.alayer.actions.WdRemoteTypeAction;
+import org.testar.monkey.alayer.exceptions.NoSuchTagException;
+import org.testar.monkey.alayer.webdriver.WdWidget;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -157,7 +160,7 @@ public class LlmActionSelector implements IActionSelector {
                         if(actionToTake >= actions.size()) {
                             throw new ArrayIndexOutOfBoundsException("Index requested by LLM is out of bounds.");
                         } else {
-                            return actions.get(actionToTake);
+                            return convertCompoundAction(actions.get(actionToTake), "");
                         }
                     } else {
                         String[] responseParts = responseContent.split(",");
@@ -165,7 +168,7 @@ public class LlmActionSelector implements IActionSelector {
                             if(StringUtils.isNumeric(responseParts[0])) {
                                 int actionToTake = Integer.parseInt(responseParts[0]);
                                 String parameters = responseParts[1];
-                                return setActionParameters(actions.get(actionToTake), parameters);
+                                return convertCompoundAction(actions.get(actionToTake), parameters);
                             } else {
                                 throw new Exception("LLM output is invalid: " + responseContent);
                             }
@@ -185,15 +188,24 @@ public class LlmActionSelector implements IActionSelector {
         }
     }
 
-    private Action setActionParameters(Action action, String parameters) {
-        logger.log(Level.INFO, String.format("Action %s", action.getClass().getName()));
+    // TODO: Create single actions in protocol so this is unnecessary?
+    private Action convertCompoundAction(Action action, String parameters) {
+        String type = action.get(Tags.Role).name();
+        logger.log(Level.INFO, String.format("Action %s - %s", action.getClass().getName(), type));
 
-        if(action instanceof WdRemoteTypeAction) {
-            ((WdRemoteTypeAction) action).setKeys(parameters);
-            return action;
+        Widget widget = action.get(Tags.OriginWidget);
+
+        switch(type) {
+            case "ClickTypeInto":
+                // Actions for typing into a widget.
+                // TESTAR by default creates compound actions for typing multiple random strings.
+                // We convert this to a single action that types in the text the LLM requested.
+                return new WdRemoteTypeAction((WdWidget) widget, parameters);
+            case "LeftClickAt":
+                return new WdRemoteClickAction((WdWidget) widget);
+            default:
+                return action;
         }
-
-        return action;
     }
 
     private String generatePrompt(Set<Action> actions) {
@@ -203,15 +215,20 @@ public class LlmActionSelector implements IActionSelector {
 
         int i = 0;
         for (Action action : actions) {
-            Widget widget = action.get(Tags.OriginWidget);
+            try {
+                Widget widget = action.get(Tags.OriginWidget);
 
-            builder.append(", ");
+                builder.append(", ");
 
-            String type = action.get(Tags.Role).name();
-            String description = widget.get(Tags.Desc, "No description");
+                String type = action.get(Tags.Role).name();
+                String description = widget.get(Tags.Desc, "No description");
 
-            builder.append(String.format("(%d,%s,%s)", i, type, description));
-            i++;
+                builder.append(String.format("(%d,%s,%s)", i, type, description));
+                i++;
+            } catch(NoSuchTagException e) {
+                // This usually happens when OriginWidget is unknown, so we skip these.
+                logger.log(Level.WARN, "Action is missing critical tags, skipping.");
+            }
         }
         builder.append(". ");
         builder.append(actionHistory.toString());
