@@ -94,12 +94,6 @@ public class LlmActionSelector implements IActionSelector {
     }
 
     private Action selectActionWithLlm(State state, Set<Action> actions) {
-        // For debugging
-        logger.log(Level.DEBUG, "Available actions: ");
-        for (Action action : actions) {
-            logger.log(Level.DEBUG, action.toShortString());
-        }
-
         String prompt = generatePrompt(actions);
         logger.log(Level.DEBUG, "Generated prompt: " + prompt);
         conversation.addMessage("user", prompt);
@@ -150,14 +144,20 @@ public class LlmActionSelector implements IActionSelector {
                 LlmResponse modelResponse = gson.fromJson(response.toString(), LlmResponse.class);
 
                 String responseContent = modelResponse.getChoices().get(0).getMessage().getContent();
+                // From testing, response often includes newlines and spaces at the end.
+                // We strip this here to so we can parse the result easier.
+                responseContent = responseContent.replace("\n", "").replace("\r", "");
+                responseContent = responseContent.replaceFirst("\\s++$", "");
+
+                logger.log(Level.INFO, String.format("LLM Response: [%s]", responseContent));
 
                 if(con.getResponseCode() == 200) {
                     if(StringUtils.isNumeric(responseContent)) {
                         int actionToTake = Integer.parseInt(responseContent);
                         if(actionToTake >= actions.size()) {
-                            return actions.get(actionToTake);
-                        } else {
                             throw new ArrayIndexOutOfBoundsException("Index requested by LLM is out of bounds.");
+                        } else {
+                            return actions.get(actionToTake);
                         }
                     } else {
                         String[] responseParts = responseContent.split(",");
@@ -186,6 +186,8 @@ public class LlmActionSelector implements IActionSelector {
     }
 
     private Action setActionParameters(Action action, String parameters) {
+        logger.log(Level.INFO, String.format("Action %s", action.getClass().getName()));
+
         if(action instanceof WdRemoteTypeAction) {
             ((WdRemoteTypeAction) action).setKeys(parameters);
             return action;
