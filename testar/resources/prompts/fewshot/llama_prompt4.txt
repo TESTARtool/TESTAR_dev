@@ -1,3 +1,7 @@
-Objective: Log in with username Test and password Star.
-Available actions: (0, Button, Register), (1, Button, Log in), (2, TextField, Password), (3, TextField, Username).
-Last 1 actions taken (higher is newer): 1: (TextField, Username, Test)
+The answer you gave was not formatted correctly.
+Please try again and only return the ID of the action to take for click actions,
+or the ID of the action to take followed by a comma followed by the text to input for text input actions.
+
+Example desired outputs:
+5
+3,Hello World

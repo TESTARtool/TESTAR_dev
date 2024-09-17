@@ -67,6 +67,8 @@ public class LlmActionSelector implements IActionSelector {
             conversation.addMessage("assistant", getTextResource("prompts/fewshot/llama_prompt5.txt"));
             conversation.addMessage("user", getTextResource("prompts/fewshot/llama_prompt6.txt"));
             conversation.addMessage("assistant", getTextResource("prompts/fewshot/llama_prompt7.txt"));
+            conversation.addMessage("user", getTextResource("prompts/fewshot/llama_prompt8.txt"));
+            conversation.addMessage("assistant", getTextResource("prompts/fewshot/llama_prompt9.txt"));
         } catch(Exception e) {
             logger.log(Level.ERROR, "Failed to initialize conversation, LLM quality may be degraded.");
         }
@@ -106,7 +108,6 @@ public class LlmActionSelector implements IActionSelector {
 
         // Remove message to prevent hitting token limit, message will be regenerated each time.
         conversation.getMessages().remove(conversation.getMessages().size() - 1);
-        actionHistory.addToHistory(actionToTake, "");
 
         return actionToTake;
     }
@@ -160,7 +161,9 @@ public class LlmActionSelector implements IActionSelector {
                         if(actionToTake >= actions.size()) {
                             throw new ArrayIndexOutOfBoundsException("Index requested by LLM is out of bounds.");
                         } else {
-                            return convertCompoundAction(actions.get(actionToTake), "");
+                            Action convertedAction = convertCompoundAction(actions.get(actionToTake), "");
+                            actionHistory.addToHistory(convertedAction, "");
+                            return convertedAction;
                         }
                     } else {
                         String[] responseParts = responseContent.split(",");
@@ -168,7 +171,9 @@ public class LlmActionSelector implements IActionSelector {
                             if(StringUtils.isNumeric(responseParts[0])) {
                                 int actionToTake = Integer.parseInt(responseParts[0]);
                                 String parameters = responseParts[1];
-                                return convertCompoundAction(actions.get(actionToTake), parameters);
+                                Action convertedAction = convertCompoundAction(actions.get(actionToTake), parameters);
+                                actionHistory.addToHistory(convertedAction, parameters);
+                                return convertedAction;
                             } else {
                                 throw new Exception("LLM output is invalid: " + responseContent);
                             }
