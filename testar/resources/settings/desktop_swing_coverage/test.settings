@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = java -jar -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -javaagent:../lib/org.jacoco.agent-0.8.12-runtime.jar=output=none,jmx=true "suts/rachota_24.jar"
+SUTConnectorValue = java -jar -Xms1024m -Xmx1024m -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -javaagent:../lib/org.jacoco.agent-0.8.12-runtime.jar=output=none,jmx=true "suts/rachota_24.jar"
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled

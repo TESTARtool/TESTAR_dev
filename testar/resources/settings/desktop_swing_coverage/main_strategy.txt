@@ -1,1 +1,2 @@
-select-random
+select-random visited-over 1 of-type click-action
+select-random sibling
