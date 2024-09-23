@@ -193,7 +193,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 	@Override
 	public Action pasteAndReplaceText(final Position position, final String text){
 		Action ret = super.pasteAndReplaceText(position, text);
-		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate("pasted text", DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
+		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
 		ret.set(Tags.Role, ActionRoles.PasteTextInto);
 		ret.set(Tags.Desc, "Paste Text: " + StringEscapeUtils.escapeHtml4(text));
 		return ret;
@@ -202,7 +202,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 	@Override
 	public Action pasteAndAppendText(final Position position, final String text){
 		Action ret = super.pasteAndAppendText(position, text);
-		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate("pasted text", DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
+		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
 		ret.set(Tags.Role, ActionRoles.PasteTextInto);
 		ret.set(Tags.Desc, "Append Paste Text: " + StringEscapeUtils.escapeHtml4(text));
 		return ret;
