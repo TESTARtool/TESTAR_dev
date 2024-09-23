@@ -23,6 +23,9 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * https://github.com/jacoco/jacoco/blob/master/org.jacoco.examples/src/org/jacoco/examples/MBeanClient.java
  * 
@@ -31,6 +34,7 @@ import javax.management.remote.JMXServiceURL;
  * dumped to a local file.
  */
 public final class MBeanClient {
+	private static final Logger logger = LogManager.getLogger();
 
 	private String service_url;
 
@@ -78,13 +82,13 @@ public final class MBeanClient {
 			localFile.write(data);
 			localFile.close();
 
-			System.out.println("MBeanClient extracted a jacoco report exec file: " + destJacocoFileName);
+			logger.trace("MBeanClient extracted a jacoco report exec file: " + destJacocoFileName);
 
 			// Close connection:
 			jmxc.close();
 
 		} catch(Exception e) {
-			System.err.println("MBeanClient was not able to dump the jacoco exec file " + destJacocoFileName);
+			logger.error("MBeanClient was not able to dump the jacoco exec file " + destJacocoFileName);
 			// return an empty string to indicate we didn't create any jacoco.exec report
 			return "";
 		}

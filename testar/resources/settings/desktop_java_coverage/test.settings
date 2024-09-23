@@ -200,6 +200,7 @@ JacocoCoverage = true
 JacocoCoverageIpAddress = localhost
 JacocoCoveragePort = 5000
 JacocoCoverageClasses = suts/PrintLogFile
+JacocoCoverageAccumulate = false
 
 #################################################################
 # Other more advanced settings

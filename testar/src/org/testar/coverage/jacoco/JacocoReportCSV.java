@@ -41,6 +41,8 @@ import java.util.zip.ZipFile;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jacoco.core.analysis.Analyzer;
 import org.jacoco.core.analysis.CoverageBuilder;
 import org.jacoco.core.analysis.IClassCoverage;
@@ -49,6 +51,7 @@ import org.testar.monkey.ConfigTags;
 import org.testar.settings.Settings;
 
 public class JacocoReportCSV {
+	private static final Logger logger = LogManager.getLogger();
 
 	private String jacocoClassesPath;
 
@@ -147,10 +150,10 @@ public class JacocoReportCSV {
 
 			}
 
-			System.out.println("JacocoReportCSV generated the CSV report: " + outputCSV);
+			logger.trace("JacocoReportCSV generated the CSV report: " + outputCSV);
 
 		} catch (IOException e) {
-			System.err.println("JacocoReportCSV was not able to create the CSV report " + jacocoClassesPath + " with the exec file " + jacocoExecFile);
+			logger.error("JacocoReportCSV was not able to create the CSV report " + jacocoClassesPath + " with the exec file " + jacocoExecFile);
 			e.printStackTrace();
 		}
 	}
@@ -176,7 +179,7 @@ public class JacocoReportCSV {
 							}
 						}
 					} catch (Exception e) {
-						System.err.println("Error analyzing file " + file.getPath() + ": " + e.getMessage());
+						logger.error("Error analyzing file " + file.getPath() + ": " + e.getMessage());
 					}
 				}
 			}
@@ -187,7 +190,7 @@ public class JacocoReportCSV {
 		try {
 			analyzer.analyzeClass(zipFile.getInputStream(entry), entry.getName());
 		} catch (IOException e) {
-			System.err.println("Error analyzing zip entry " + entry.getName() + ": " + e.getMessage());
+			logger.error("Error analyzing zip entry " + entry.getName() + ": " + e.getMessage());
 		}
 	}
 

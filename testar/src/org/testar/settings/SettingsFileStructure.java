@@ -314,6 +314,7 @@ public class SettingsFileStructure {
 				, ConfigTags.JacocoCoverageIpAddress.name() + " = "
 				, ConfigTags.JacocoCoveragePort.name() + " = "
 				, ConfigTags.JacocoCoverageClasses.name() + " = "
+				, ConfigTags.JacocoCoverageAccumulate.name() + " = "
 				, ""
 				);
 
