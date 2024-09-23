@@ -180,6 +180,7 @@ public class WdDriver extends SUTBase {
 
     // Workaround to fix https://github.com/SeleniumHQ/selenium/issues/11750
     options.addArguments("--remote-allow-origins=*");
+    options.addArguments("--disable-search-engine-choice-screen");  // Disable search engine selector
 
     return new ChromeDriver(service, options);
   }

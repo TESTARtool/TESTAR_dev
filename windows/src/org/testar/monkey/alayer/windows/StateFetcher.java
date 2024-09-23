@@ -154,7 +154,7 @@ public class StateFetcher implements Callable<UIAState>{
 				uiaRoot.isForeground = uiaRoot.isForeground || WinProcess.isForeground(windowProcessId); // ( SUT as a set of windows/processes )
 				if(!isOwnedWindow){
 					//uiaDescend(uiaCacheWindowTree(windowHandle), uiaRoot);
-					modalElement = this.accessBridgeEnabled ? abDescend(windowHandle, uiaRoot, 0, 0) :
+					modalElement = this.accessBridgeEnabled ? abDescend(windowHandle, uiaCacheWindowTree(windowHandle), uiaRoot, 0, 0) :
 															  uiaDescend(windowHandle, uiaCacheWindowTree(windowHandle), uiaRoot);
 				} else
 					ownedWindows.add(windowHandle);
@@ -167,7 +167,7 @@ public class StateFetcher implements Callable<UIAState>{
 				//uiaDescend(uiaCacheWindowTree(windowHandle), uiaRoot);
 				UIAElement modalE;
 
-				if ((modalE = this.accessBridgeEnabled ? abDescend(windowHandle, uiaRoot, 0, 0) :
+				if ((modalE = this.accessBridgeEnabled ? abDescend(windowHandle, uiaCacheWindowTree(windowHandle), uiaRoot, 0, 0) :
 														 uiaDescend(windowHandle, uiaCacheWindowTree(windowHandle), uiaRoot)) != null)
 					modalElement = modalE;
 
@@ -504,7 +504,10 @@ public class StateFetcher implements Callable<UIAState>{
 	}
 
 	// (through AccessBridge)
-	private UIAElement abDescend(long hwnd, UIAElement parent, long vmid, long ac){
+	private UIAElement abDescend(long hwnd, long uiaCachePointer, UIAElement parent, long vmid, long ac){
+		if(uiaCachePointer == 0)
+			return null;
+		
 		UIAElement modalElement = null;
 
 		parent.set(Tags.HWND, hwnd);
@@ -541,7 +544,10 @@ public class StateFetcher implements Callable<UIAState>{
 				parent.children.add(el);
 				el.rect = rect;
 
-				el.windowHandle = Windows.GetHWNDFromAccessibleContext(vmidAC[0],vmidAC[1]);
+				//TODO: Since JDK > 8 this throws a Java EXCEPTION_ACCESS_VIOLATION
+				//el.windowHandle = Windows.GetHWNDFromAccessibleContext(vmidAC[0],vmidAC[1]);
+				el.windowHandle = Windows.IUIAutomationElement_get_NativeWindowHandle(uiaCachePointer, true);
+
 				if (role.equals(AccessBridgeControlTypes.ACCESSIBLE_DIALOG)){
 					el.isTopLevelContainer = true;
 					modalElement = el;
@@ -573,7 +579,7 @@ public class StateFetcher implements Callable<UIAState>{
 						el.children = new ArrayList<UIAElement>(c);
 						for (int i=0; i<c; i++){
 							childAC =  Windows.GetAccessibleChildFromContext(vmidAC[0],vmidAC[1],i);
-							abDescend(hwnd,el,vmidAC[0],childAC);
+							abDescend(hwnd,uiaCachePointer,el,vmidAC[0],childAC);
 						}
 				}
 

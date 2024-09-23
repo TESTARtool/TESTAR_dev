@@ -174,6 +174,25 @@ task runTestDesktopGenericTitleNameSuspiciousTag(type: Exec, dependsOn:['install
     }
 }
 
+// Verify TESTAR JavaAccessBridge works with SwingSet2 Java Swing app
+task runTestDesktopJavaSwing(type: Exec, dependsOn:'installDist') {
+    // Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestDesktopJavaSwing'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_java_swing AlwaysCompile=true ApplicationName="java_swing_ok" ShowVisualSettingsDialogOnStartup=false AccessBridgeEnabled=true Mode=Generate Sequences=1 SequenceLength=1 OnlySaveFaultySequences=true'
+    doLast {
+        String output = standardOutput.toString()
+        // Check that output contains No problem detected. message to verify the correct execution
+        if(output.readLines().any{line->line.contains("No problem detected.")}) {
+            println "\n${output} \nTESTAR has been executed sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Executing TESTAR")
+        }
+    }
+}
+
 // Download OrientDB 3.0.34 from the official wep page
 task downloadOrientDB(type: Download, dependsOn: installDist) {
     src 'https://repo1.maven.org/maven2/com/orientechnologies/orientdb-community/3.0.34/orientdb-community-3.0.34.zip'
