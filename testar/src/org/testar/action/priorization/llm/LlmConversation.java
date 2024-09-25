@@ -49,6 +49,10 @@ public class LlmConversation {
         messages.add(new Message(role, content));
     }
 
+    public void addMessage(Message message) {
+        messages.add(message);
+    }
+
     public class Message {
         private String role;
         private String content;

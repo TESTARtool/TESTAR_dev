@@ -1,6 +1,7 @@
 package org.testar.action.priorization.llm;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -17,11 +18,13 @@ import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 import org.testar.monkey.alayer.webdriver.WdWidget;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class LlmActionSelector implements IActionSelector {
@@ -60,15 +63,12 @@ public class LlmActionSelector implements IActionSelector {
 
         // TODO: Make configurable
         try {
-            conversation.addMessage("system", getTextResource("prompts/fewshot/llama_prompt1.txt"));
-            conversation.addMessage("user", getTextResource("prompts/fewshot/llama_prompt2.txt"));
-            conversation.addMessage("assistant", getTextResource("prompts/fewshot/llama_prompt3.txt"));
-            conversation.addMessage("user", getTextResource("prompts/fewshot/llama_prompt4.txt"));
-            conversation.addMessage("assistant", getTextResource("prompts/fewshot/llama_prompt5.txt"));
-            conversation.addMessage("user", getTextResource("prompts/fewshot/llama_prompt6.txt"));
-            conversation.addMessage("assistant", getTextResource("prompts/fewshot/llama_prompt7.txt"));
-            conversation.addMessage("user", getTextResource("prompts/fewshot/llama_prompt8.txt"));
-            conversation.addMessage("assistant", getTextResource("prompts/fewshot/llama_prompt9.txt"));
+            String initPromptJson = getTextResource("prompts/fewshot.json");
+            Type type = new TypeToken<List<LlmConversation.Message[]>>() {}.getType();
+            List<LlmConversation.Message> initMessages = gson.fromJson(initPromptJson, type);
+            for(LlmConversation.Message message : initMessages) {
+                conversation.addMessage(message);
+            }
         } catch(Exception e) {
             logger.log(Level.ERROR, "Failed to initialize conversation, LLM quality may be degraded.");
         }
