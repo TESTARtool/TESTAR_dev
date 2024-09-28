@@ -105,6 +105,8 @@ public class ListeningMode {
 
 			Set<Action> actions = protocol.deriveActions(system, state);
 			protocol.buildStateActionsIdentifiers(state, actions);
+			// Add TESTAR derived actions into the report
+			protocol.reportManager.addActions(actions);
 
 			//notify the state model manager of the new state
 			protocol.stateModelManager.notifyNewStateReached(state, actions);
@@ -132,15 +134,8 @@ public class ListeningMode {
 
 				protocol.buildStateActionsIdentifiers(state, Collections.singleton(listenedAction));
 
-				// Map Listened Type Actions with existing action
-				if(listenedAction.get(Tags.Desc, "Nothing").contains("Type")) {
-					for(Action a : actions) {
-						if(a.get(Tags.OriginWidget).get(Tags.Path).equals(listenedAction.get(Tags.OriginWidget).get(Tags.Path))) {
-							listenedAction = a;
-							break;
-						}
-					}
-				} else {
+				// Map Listened Actions, that are not Type, with existing actions
+				if(!listenedAction.get(Tags.Desc, "Nothing").contains("Type")) {
 					// Search MapEventUser action on previous builded actions (To match AbstractID)
 					for(Action a : actions) {
 						if(a.get(Tags.Desc, "Nothing").equals(listenedAction.get(Tags.Desc, "None"))) {
@@ -149,6 +144,9 @@ public class ListeningMode {
 						}
 					}
 				}
+				// Listened Type Actions will have specific input text, 
+				// so mapping with previously random generated Type Actions is not an appropriate solution
+				// The listenedAction will be a new Concrete Action and maybe an existing Abstract Action
 
 				// If something went wrong trying to find the action, we need to create the AbstractID
 				if(listenedAction.get(Tags.AbstractID, null) == null) {
@@ -156,6 +154,10 @@ public class ListeningMode {
 					CodingManager.buildIDs(state, Sets.newHashSet(listenedAction));
 					System.out.println(listenedAction.get(Tags.AbstractID));
 				}
+
+				// Add listened action into the report
+				protocol.reportManager.addSelectedAction(state, listenedAction);
+				System.out.println("DEBUG: Listened Action: " + listenedAction.get(Tags.Desc, "NoDesc"));
 
 				//notify the state model manager of the listened action
 				protocol.stateModelManager.notifyListenedAction(listenedAction);
@@ -311,15 +313,13 @@ public class ListeningMode {
 		} else if (protocol.userEvent[0] instanceof KBKeys) { // key events
 			return (new AnnotatingActionCompiler()).hitKey((KBKeys)protocol.userEvent[0]);
 		} else if (protocol.userEvent[0] instanceof String){ // type events
-			if (DefaultProtocol.lastExecutedAction == null)
-				return null;
-			List<Finder> targets = DefaultProtocol.lastExecutedAction.get(Tags.Targets,null);
-			if (targets == null || targets.size() != 1)
-				return null;
+			// Check the origin widget of last executed action to map the type text with previous clicked widget
 			try {
-				Widget w = targets.get(0).apply(state);
+				Widget w = DefaultProtocol.lastExecutedAction.get(Tags.OriginWidget);
 				return (new AnnotatingActionCompiler()).clickTypeInto(w, (String) protocol.userEvent[0], true);
-			} catch (WidgetNotFoundException we){
+			} catch (NullPointerException npe) {
+				// lastExecutedAction or OriginWidget was null
+				System.out.println("Can not map typed text (" + protocol.userEvent[0] + ") with any clicked widget");
 				return null;
 			}
 		}

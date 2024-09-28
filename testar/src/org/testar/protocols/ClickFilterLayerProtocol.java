@@ -113,6 +113,7 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
     	
 	@Override
 	public void mouseMoved(double x, double y) {
+		super.mouseMoved(x, y);
 		mouseX = x;
 		mouseY = y;
 	}

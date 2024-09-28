@@ -35,8 +35,12 @@ import org.testar.IEventListener;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.devices.MouseButtons;
+
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 public abstract class RuntimeControlsProtocol extends AbstractProtocol implements IEventListener {
@@ -58,6 +62,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 
 	protected Modes mode;
 	private Set<KBKeys> pressed = EnumSet.noneOf(KBKeys.class);
+	private List<KBKeys> listeningEvents = new ArrayList<>();
 
 	public EventHandler initializeEventHandler() {
 		return new EventHandler(this);
@@ -139,6 +144,15 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 				userEvent = new Object[]{key}; // would be ideal to set it up at keyUp
 			}
 
+			// In Listening mode you can press any key except SHIFT to add a user keyboard
+			// This is because SHIFT is used for the TESTAR shortcuts
+			// This is not ideal, because now special characters and capital letters and other events that needs SHIFT
+			// cannot be recorded as an user event in Listening....
+			else if (!pressed.contains(KBKeys.VK_SHIFT) && mode() == Modes.Listening && userEvent == null) {
+				System.out.println("Listening user event key_down! " + key.toString());
+				listeningEvents.add(key);
+			}
+
 			// SHIFT + ALT --> Toggle widget-tree hierarchy display
 			if (pressed.contains(KBKeys.VK_ALT) && pressed.contains(KBKeys.VK_SHIFT)) {
 				markParentWidget = !markParentWidget;
@@ -182,5 +196,15 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 	}
 
 	@Override
-	public void mouseMoved(double x, double y) {}
+	public void mouseMoved(double x, double y) {
+		if(mode() == Modes.Listening && !listeningEvents.isEmpty()) {
+			// Convert each KBKeys element to a string
+			String listenedText = listeningEvents.stream()
+					.map(kbKey -> String.valueOf(kbKey.toChar()))
+					.collect(Collectors.joining());
+			// Then save the complete string and reset the listening list
+			userEvent = new Object[]{listenedText};
+			listeningEvents = new ArrayList<>();
+		}
+	}
 }
