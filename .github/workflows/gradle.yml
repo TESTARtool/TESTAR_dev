@@ -110,6 +110,26 @@ jobs:
         name: Java${{ matrix.java }}-runTestDesktopGenericTitleNameSuspiciousTag-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/notepad_title_and_suspicious
     
+    # Enable Java Access Bridge
+    - name: Enable Java Access Bridge
+      shell: cmd
+      run: jabswitch /enable
+    # Run the Java Swing Test
+    - name: Run desktop_java_swing protocol which uses Java Access Bridge for Java Swing apps
+      run: ./gradlew runTestDesktopJavaSwing
+    - name: Save runTestDesktopJavaSwing HTML report artifact
+      uses: actions/upload-artifact@v4
+      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
+      if: failure()
+      with:
+        name: Java${{ matrix.java }}-runTestDesktopJavaSwing-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/java_swing_ok
+    # Always Disable Java Access Bridge to revert environment changes
+    - name: Disable Java Access Bridge
+      if: always()
+      shell: cmd
+      run: jabswitch /disable
+    
     - name: Run desktop_generic with OrientDB to infer a TESTAR State Model
       run: ./gradlew runTestDesktopGenericStateModel
     - name: Save runTestDesktopGenericStateModel HTML report artifact

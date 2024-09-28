@@ -4,7 +4,7 @@
 # Set the mode you want TESTAR to start in: Spy, Generate, Replay
 #################################################################
 
-Mode = Generate
+Mode = Spy
 
 #################################################################
 # Connect to the System Under Test (SUT)
@@ -23,7 +23,18 @@ Mode = Generate
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = c:\\windows\\system32\\notepad.exe
+SUTConnectorValue = java -jar "suts/SwingSet2.jar"
+
+#################################################################
+# Java Swing applications & Access Bridge Enabled
+#
+# Activate the Java Access Bridge in your Windows System:
+#		(Control Panel / Ease of Access / Ease of Access Center / Make the computer easier to see)
+#
+# Enable the variable Access Bridge Enabled in TESTAR as true
+#################################################################
+
+AccessBridgeEnabled = true
 
 #################################################################
 # Sequences
@@ -31,8 +42,8 @@ SUTConnectorValue = c:\\windows\\system32\\notepad.exe
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 8
-SequenceLength = 10
+Sequences = 1
+SequenceLength = 1
 
 #################################################################
 # Oracles based on suspicious tag values
@@ -78,7 +89,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*
+ClickFilter = .*[eE]xit.*|.*Close.*|.*[sS]ave.*|.*Minimize.*
 TagsToFilter = Title
 
 #################################################################
@@ -96,7 +107,7 @@ ProcessesToKillDuringTest =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_widget_recognition/Protocol_desktop_widget_recognition
+ProtocolClass = test_gradle_workflow_desktop_java_swing/Protocol_test_gradle_workflow_desktop_java_swing
 
 #################################################################
 # State identifier attributes
@@ -109,7 +120,7 @@ AbstractStateAttributes = WidgetControlType
 #################################################################
 # Other more advanced settings
 #################################################################
-CreateWidgetInfoJsonFile = true
+
 OutputDir = ./output
 PathToReplaySequence = ./output/temp
 TempDir = ./output/temp
@@ -124,7 +135,7 @@ ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
-TimeToWaitAfterAction = 0.1
+TimeToWaitAfterAction = 1
 StartupTime = 10.0
 TimeToFreeze = 30.0
 StopGenerationOnFault = true
