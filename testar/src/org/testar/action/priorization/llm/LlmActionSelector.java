@@ -1,6 +1,8 @@
 package org.testar.action.priorization.llm;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Level;
@@ -98,27 +100,37 @@ public class LlmActionSelector implements IActionSelector {
         throw new Exception("Failed to load text resource, double check the resource location.");
     }
 
+    // TODO: Retry mechanism, Trim conversation when exceeding token limit
     private Action selectActionWithLlm(State state, Set<Action> actions) {
         String prompt = generatePrompt(actions);
         logger.log(Level.DEBUG, "Generated prompt: " + prompt);
         conversation.addMessage("user", prompt);
 
-        Action actionToTake = getVerdictFromLlm(new ArrayList<>(actions));
+        String conversationJson = gson.toJson(conversation);
+        String llmResponse = getResponseFromLlm(conversationJson);
+        Action actionToTake = parseLlmResponse(new ArrayList<>(actions), llmResponse);
+
         logger.log(Level.DEBUG, "Selected action: " + actionToTake.toShortString());
 
-        // Remove message to prevent hitting token limit, message will be regenerated each time.
-        conversation.getMessages().remove(conversation.getMessages().size() - 1);
+        if(actionToTake == null) {
+            // TODO: Retry mechanism
 
-        return actionToTake;
+            return null;
+        } else {
+            // Response was valid, add response to conversation and action to history.
+            conversation.addMessage("assistant", llmResponse);
+            // TODO: Reimplement action history
+            //actionHistory.addToHistory(actionToTake);
+
+            return actionToTake;
+        }
     }
 
-    private Action getVerdictFromLlm(ArrayList<Action> actions) {
+    private String getResponseFromLlm(String requestBody) {
         String testarVer = Main.TESTAR_VERSION.substring(0, Main.TESTAR_VERSION.indexOf(" "));
         URI uri = URI.create(this.host + ":" + this.port + "/v1/chat/completions");
 
         logger.log(Level.DEBUG, "Using endpoint: " + uri);
-
-        String conversationJson = gson.toJson(conversation);
 
         try {
             URL url = new URL(this.host + ":" + this.port + "/v1/chat/completions");
@@ -133,7 +145,7 @@ public class LlmActionSelector implements IActionSelector {
             con.setConnectTimeout(10000);
 
             try(OutputStream os = con.getOutputStream()) {
-                byte[] input = conversationJson.getBytes(StandardCharsets.UTF_8);
+                byte[] input = requestBody.getBytes(StandardCharsets.UTF_8);
                 os.write(input, 0, input.length);
             }
 
@@ -156,45 +168,39 @@ public class LlmActionSelector implements IActionSelector {
                 logger.log(Level.INFO, String.format("LLM Response: [%s]", responseContent));
 
                 if(con.getResponseCode() == 200) {
-                    if(StringUtils.isNumeric(responseContent)) {
-                        int actionToTake = Integer.parseInt(responseContent);
-                        if(actionToTake >= actions.size()) {
-                            throw new ArrayIndexOutOfBoundsException("Index requested by LLM is out of bounds.");
-                        } else {
-                            Action convertedAction = convertCompoundAction(actions.get(actionToTake), "");
-                            actionHistory.addToHistory(convertedAction, "");
-                            return convertedAction;
-                        }
-                    } else {
-                        String[] responseParts = responseContent.split(",");
-                        if(responseParts.length == 2) {
-                            if(StringUtils.isNumeric(responseParts[0])) {
-                                int actionToTake = Integer.parseInt(responseParts[0]);
-                                String parameters = responseParts[1];
-                                Action convertedAction = convertCompoundAction(actions.get(actionToTake), parameters);
-                                actionHistory.addToHistory(convertedAction, parameters);
-                                return convertedAction;
-                            } else {
-                                throw new Exception("LLM output is invalid: " + responseContent);
-                            }
-                        } else {
-                            throw new Exception("LLM output is invalid: " + responseContent);
-                        }
-                    }
-
+                    return responseContent;
                 } else {
                     throw new Exception("Server returned " + con.getResponseCode() + " status code.");
                 }
             }
         } catch(Exception e) {
-            logger.log(Level.ERROR, "Unable to select action with the LLM");
+            logger.log(Level.ERROR, "Unable to communicate with the LLM.");
             e.printStackTrace();
             return null;
         }
     }
 
+    private Action parseLlmResponse(ArrayList<Action> actions, String responseContent) {
+        try {
+            LlmSelection selection = gson.fromJson(responseContent, LlmSelection.class);
+            int actionId = selection.getId();
+            String input = selection.getInput();
+
+            if(actionId >= actions.size()) {
+                logger.log(Level.ERROR, String.format("Action %d requested by LLM is out of range!", actionId));
+                return null;
+            } else {
+                Action actionToExecute = actions.get(actionId);
+                return convertCompoundAction(actionToExecute, input);
+            }
+        } catch(JsonParseException e) {
+            logger.log(Level.ERROR, "Unable to parse response from LLM to JSON: " + responseContent);
+            return null;
+        }
+    }
+
     // TODO: Create single actions in protocol so this is unnecessary?
-    private Action convertCompoundAction(Action action, String parameters) {
+    private Action convertCompoundAction(Action action, String input) {
         String type = action.get(Tags.Role).name();
         logger.log(Level.INFO, String.format("Action %s - %s", action.getClass().getName(), type));
 
@@ -205,7 +211,7 @@ public class LlmActionSelector implements IActionSelector {
                 // Actions for typing into a widget.
                 // TESTAR by default creates compound actions for typing multiple random strings.
                 // We convert this to a single action that types in the text the LLM requested.
-                return new WdRemoteTypeAction((WdWidget) widget, parameters);
+                return new WdRemoteTypeAction((WdWidget) widget, input);
             case "LeftClickAt":
                 return new WdRemoteClickAction((WdWidget) widget);
             default:
@@ -215,6 +221,7 @@ public class LlmActionSelector implements IActionSelector {
 
     private String generatePrompt(Set<Action> actions) {
         StringBuilder builder = new StringBuilder();
+        // TODO: Change for new prompt.
         builder.append("Objective: ").append(testGoal).append(". ");
         builder.append("Available actions: ");
 
@@ -228,7 +235,21 @@ public class LlmActionSelector implements IActionSelector {
                 String type = action.get(Tags.Role).name();
                 String description = widget.get(Tags.Desc, "No description");
 
-                builder.append(String.format("(%d,%s,%s)", i, type, description));
+                // Depending on the action, format into something the LLM is more likely to understand.
+                switch(type) {
+                    case "ClickTypeInto":
+                        // TODO: Differentiate between types of input fields (numeric, password, etc.)
+                        builder.append(String.format("%d: Type in TextField '%s'", i, description));
+                        break;
+                    case "LeftClickAt":
+                        builder.append(String.format("%d: Click on '%s'", i, description));
+                        break;
+                    default:
+                        logger.log(Level.WARN, "Unsupported action type for LLM action selection: " + type);
+                        break;
+                }
+
+                // builder.append(String.format("(%d,%s,%s)", i, type, description));
                 i++;
             } catch(NoSuchTagException e) {
                 // This usually happens when OriginWidget is unknown, so we skip these.
@@ -236,7 +257,8 @@ public class LlmActionSelector implements IActionSelector {
             }
         }
         builder.append(". ");
-        builder.append(actionHistory.toString());
+        // TODO: Reimplement action history.
+        // builder.append(actionHistory.toString());
 
         return builder.toString();
     }
