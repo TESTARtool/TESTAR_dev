@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2023 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2023 - 2024 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -33,7 +33,6 @@ package org.testar.monkey;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.testar.ActionStatus;
@@ -42,7 +41,6 @@ import org.testar.OutputStructure;
 import org.testar.SutVisualization;
 import org.testar.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.monkey.alayer.Action;
-import org.testar.monkey.alayer.Finder;
 import org.testar.monkey.alayer.Roles;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
@@ -58,7 +56,7 @@ import org.testar.monkey.alayer.webdriver.CanvasDimensions;
 
 import com.google.common.collect.Sets;
 
-public class ListeningMode {
+public class ListeningModeManual {
 
 	private State lastListenState;
 
@@ -98,7 +96,7 @@ public class ListeningMode {
 		/**
 		 * Start Listening User Action Loop
 		 */
-		while(protocol.mode() == Modes.Listening && system.isRunning()) {
+		while(protocol.mode() == Modes.ListeningManual && system.isRunning()) {
 			State state = protocol.getState(system);
 			protocol.cv.begin();
 			Util.clear(protocol.cv);
@@ -187,6 +185,12 @@ public class ListeningMode {
 		}
 
 		if(protocol.mode() == Modes.Quit){
+			// notify to state model the last state
+			State state = protocol.getState(system);
+			Set<Action> actions = protocol.deriveActions(system, state);
+			protocol.buildStateActionsIdentifiers(state, actions);
+			protocol.stateModelManager.notifyNewStateReached(state, actions);
+
 			// notify the statemodelmanager
 			protocol.stateModelManager.notifyTestSequenceStopped();
 
@@ -210,7 +214,7 @@ public class ListeningMode {
 	 * Waits for an user UI action.
 	 */
 	protected void waitUserActionLoop(DefaultProtocol protocol, SUT system, State state, ActionStatus actionStatus){
-		while (protocol.mode() == Modes.Listening && !actionStatus.isUserEventAction()){
+		while (protocol.mode() == Modes.ListeningManual && !actionStatus.isUserEventAction()){
 
 			if (protocol.userEvent != null){
 				Action mapAction = mapUserEvent(protocol, system, state);

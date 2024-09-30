@@ -77,7 +77,8 @@ public class SettingsDialog extends JFrame implements Observer {
   private JButton btnReplay;
   private JButton btnView;
   private JButton btnModel;
-  private JButton btnListening;
+  private JButton btnListeningManual;
+  private JButton btnListeningScript;
   private StateModelPanel modelPanel;
   //private JButton btnRecord; // Record mode is disabled temporally
 
@@ -253,7 +254,8 @@ public class SettingsDialog extends JFrame implements Observer {
     btnReplay = getBtnReplay();
     btnView = getBtnView();
     btnModel = getBtnModel();
-    btnListening = getBtnListening();
+    btnListeningManual = getBtnListeningManual();
+    btnListeningScript = getBtnListeningScript();
     //btnRecord = getBtnRecord(); // Record mode is disabled temporally
 
     jTabsPane = new JTabbedPane();
@@ -318,7 +320,8 @@ public class SettingsDialog extends JFrame implements Observer {
                             .addComponent(btnReplay, PREFERRED_SIZE, 129, PREFERRED_SIZE)
                             .addComponent(btnView, PREFERRED_SIZE, 129, PREFERRED_SIZE)
                             .addComponent(btnModel, PREFERRED_SIZE, 129, PREFERRED_SIZE)
-                            .addComponent(btnListening, PREFERRED_SIZE, 129, PREFERRED_SIZE)
+                            .addComponent(btnListeningManual, PREFERRED_SIZE, 129, PREFERRED_SIZE)
+                            .addComponent(btnListeningScript, PREFERRED_SIZE, 129, PREFERRED_SIZE)
                             //.addComponent(btnRecord, PREFERRED_SIZE, 129, PREFERRED_SIZE) // Record mode is disabled temporally
                     )
                 .addPreferredGap(RELATED)
@@ -342,7 +345,9 @@ public class SettingsDialog extends JFrame implements Observer {
     group.addGap(2, 2, 2);
     group.addComponent(btnModel, 120, 120, 120);
     group.addGap(2, 2, 2);
-    group.addComponent(btnListening, 120, 120, 120);
+    group.addComponent(btnListeningManual, 120, 120, 120);
+    group.addGap(2, 2, 2);
+    group.addComponent(btnListeningScript, 120, 120, 120);
 
     return group;
   }
@@ -434,17 +439,38 @@ public class SettingsDialog extends JFrame implements Observer {
 	  modelPanel.openServer();
   }
 
-  private JButton getBtnListening() throws IOException {
+  private JButton getBtnListeningManual() throws IOException {
 	  JButton btn = new JButton();
 	  btn.setBackground(new Color(255, 255, 255));
-	  btn.setIcon(new ImageIcon(loadIcon("/icons/button_listening.png")));
+	  btn.setIcon(new ImageIcon(loadIcon("/icons/button_listening_manual.png")));
 	  btn.setFocusPainted(false);
-	  btn.addActionListener(this::btnListeningActionPerformed);
+	  btn.addActionListener(this::btnListeningManualActionPerformed);
 	  return btn;
   }
 
-  private void btnListeningActionPerformed(ActionEvent evt) {
-	  start(RuntimeControlsProtocol.Modes.Listening);
+  private void btnListeningManualActionPerformed(ActionEvent evt) {
+	  start(RuntimeControlsProtocol.Modes.ListeningManual);
+  }
+
+  private JButton getBtnListeningScript() throws IOException {
+	  JButton btn = new JButton();
+	  btn.setBackground(new Color(255, 255, 255));
+	  btn.setIcon(new ImageIcon(loadIcon("/icons/button_listening_script.png")));
+	  btn.setFocusPainted(false);
+	  btn.addActionListener(this::btnListeningScriptActionPerformed);
+	  return btn;
+  }
+
+  private void btnListeningScriptActionPerformed(ActionEvent evt) {
+	  JFileChooser fd = new JFileChooser();
+	  fd.setFileSelectionMode(JFileChooser.FILES_ONLY);
+	  fd.setCurrentDirectory(new File(settings.get(ConfigTags.ListeningScript)).getParentFile());
+
+	  if (fd.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+		  String file = fd.getSelectedFile().getAbsolutePath();
+		  settings.set(ConfigTags.ListeningScript, file);
+		  start(RuntimeControlsProtocol.Modes.ListeningScript);
+	  }
   }
 
 // Record mode is disabled temporally

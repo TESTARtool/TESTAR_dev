@@ -1,0 +1,23 @@
+import com.microsoft.playwright.*;
+import com.microsoft.playwright.options.*;
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+import java.util.*;
+
+public class Example {
+  public static void main(String[] args) {
+    try (Playwright playwright = Playwright.create()) {
+      Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions()
+        .setHeadless(false));
+      BrowserContext context = browser.newContext();
+      Page page = context.newPage();
+      page.navigate("https://para.testar.org/");
+      page.locator("input[name=\"username\"]").fill("john");
+      page.locator("input[name=\"password\"]").fill("demo");
+      page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Log In")).click();
+	  page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("Request Loan")).click();
+      page.locator("#amount").fill("123");
+      page.locator("#downPayment").fill("123");
+      page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Apply Now")).click();
+    }
+  }
+}

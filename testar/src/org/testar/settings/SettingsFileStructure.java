@@ -306,6 +306,12 @@ public class SettingsFileStructure {
 				, ConfigTags.ReportInHTML.name() + " = "
 				, ConfigTags.ReportInPlainText.name() + " = "
 				, ""
+				, "#################################################################"
+				, "# Set the configurations for the Listening mode"
+				, "#################################################################"
+				, ""
+				, ConfigTags.ListeningScript.name() + " = "
+				, ""
 				);
 
 		// Second, create a list of secondary configuration tags settings

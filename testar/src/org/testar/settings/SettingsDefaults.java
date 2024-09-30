@@ -186,6 +186,8 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(LogOracleCommands, new ArrayList<String>()));
 		defaults.add(Pair.from(LogOracleFiles, new ArrayList<String>()));
 
+		defaults.add(Pair.from(ListeningScript, "./settings/script.txt"));
+
 		return defaults;
 	}
 

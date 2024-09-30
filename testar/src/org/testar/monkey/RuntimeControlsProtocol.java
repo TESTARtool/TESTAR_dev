@@ -57,7 +57,8 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 		Quit,
 		View,
 		Replay,
-		Listening;
+		ListeningManual,
+		ListeningScript;
 	}
 
 	protected Modes mode;
@@ -144,11 +145,11 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 				userEvent = new Object[]{key}; // would be ideal to set it up at keyUp
 			}
 
-			// In Listening mode you can press any key except SHIFT to add a user keyboard
+			// In ListeningManual mode you can press any key except SHIFT to add a user keyboard
 			// This is because SHIFT is used for the TESTAR shortcuts
 			// This is not ideal, because now special characters and capital letters and other events that needs SHIFT
-			// cannot be recorded as an user event in Listening....
-			else if (!pressed.contains(KBKeys.VK_SHIFT) && mode() == Modes.Listening && userEvent == null) {
+			// cannot be recorded as an user event in ListeningManual....
+			else if (!pressed.contains(KBKeys.VK_SHIFT) && mode() == Modes.ListeningManual && userEvent == null) {
 				System.out.println("Listening user event key_down! " + key.toString());
 				listeningEvents.add(key);
 			}
@@ -185,8 +186,8 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 	 */
 	@Override
 	public void mouseUp(MouseButtons btn, double x, double y){
-		// In Record or Listening modes the user can add user events by clicking
-		if ((mode() == Modes.Record || mode() == Modes.Listening) && userEvent == null){
+		// In Record or ListeningManual modes the user can add user events by clicking
+		if ((mode() == Modes.Record || mode() == Modes.ListeningManual) && userEvent == null){
 			userEvent = new Object[]{
 					btn,
 					Double.valueOf(x),
@@ -197,7 +198,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 
 	@Override
 	public void mouseMoved(double x, double y) {
-		if(mode() == Modes.Listening && !listeningEvents.isEmpty()) {
+		if(mode() == Modes.ListeningManual && !listeningEvents.isEmpty()) {
 			// Convert each KBKeys element to a string
 			String listenedText = listeningEvents.stream()
 					.map(kbKey -> String.valueOf(kbKey.toChar()))

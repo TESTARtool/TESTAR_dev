@@ -323,4 +323,7 @@ public final class ConfigTags {
 	public static final Tag<Pair<String, String>> Username = Tag.from("Username", (Class<Pair<String, String>>) (Class<?>) Pair.class);
 	public static final Tag<Pair<String, String>> Password = Tag.from("Password", (Class<Pair<String, String>>) (Class<?>) Pair.class);
 	 */
+
+	public static final Tag<String> ListeningScript = Tag.from("ListeningScript", String.class, 
+			"The path of the web script TESTAR requires listening to extract action information");
 }

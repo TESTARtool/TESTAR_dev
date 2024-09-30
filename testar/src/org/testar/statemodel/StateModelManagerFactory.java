@@ -56,7 +56,7 @@ public class StateModelManagerFactory {
         eventListeners.add((StateModelEventListener) persistenceManager);
         SequenceManager sequenceManager = new SequenceManager(eventListeners, modelIdentifier);
 
-        if(settings.get(ConfigTags.Mode) == Modes.Listening) {
+        if(settings.get(ConfigTags.Mode) == Modes.ListeningManual || settings.get(ConfigTags.Mode) == Modes.ListeningScript) {
         	System.out.println("TESTAR State Model enabled with Listening mode... AbstractStateModelListener");
 
         	// create the abstract state model and then the state model manager

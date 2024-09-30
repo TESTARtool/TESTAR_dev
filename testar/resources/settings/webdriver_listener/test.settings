@@ -137,16 +137,16 @@ MaxTime = 3.1536E7
 # ResetDataStore: WARNING: Delete all existing State Models from the selected database before creating a new one
 #################################################################
 
-StateModelEnabled = false
-DataStore = 
+StateModelEnabled = true
+DataStore = OrientDB
 DataStoreType = remote
-DataStoreServer = 
+DataStoreServer = localhost
 DataStoreDirectory = 
-DataStoreDB = 
-DataStoreUser = 
-DataStorePassword = 
-DataStoreMode = none
-ApplicationName = Parabank
+DataStoreDB = testar
+DataStoreUser = testar
+DataStorePassword = testar
+DataStoreMode = instant
+ApplicationName = parabank_listening
 ApplicationVersion = 
 ActionSelectionAlgorithm = random
 StateModelStoreWidgets = true
@@ -235,6 +235,12 @@ ForceForeground = true
 #################################################################
 
 VisualizeActions = false
+
+#################################################################
+# Set the configurations for the Listening mode
+#################################################################
+
+ListeningScript = settings/webdriver_listener/parabank_loan.txt
 
 #################################################################
 # Other more advanced settings
