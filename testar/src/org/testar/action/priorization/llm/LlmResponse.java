@@ -3,6 +3,10 @@ package org.testar.action.priorization.llm;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Response sent by the OpenAI compatible LLM API.
+ * We can extract the generated message by retrieving choice 0.
+ */
 public class LlmResponse {
     private String id;
 

@@ -3,6 +3,10 @@ package org.testar.action.priorization.llm;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Conversation with the LLM.
+ * This gets converted to JSON and sent to the LLM.
+ */
 public class LlmConversation {
     private List<Message> messages;
     private float temperature = 0.7f;
@@ -53,10 +57,18 @@ public class LlmConversation {
         messages.add(message);
     }
 
+    /**
+     * A message inside a conversation with the LLM.
+     */
     public class Message {
         private String role;
         private String content;
 
+        /**
+         * Creates a new Message.
+         * @param role Role of the message. Can be "system", "user", or "assistant".
+         * @param content Content of the message in plaintext.
+         */
         public Message(String role, String content) {
             this.role = role;
             this.content = content;

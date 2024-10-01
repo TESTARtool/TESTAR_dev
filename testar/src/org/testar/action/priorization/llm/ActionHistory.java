@@ -10,12 +10,19 @@ import org.testar.monkey.alayer.actions.WdRemoteTypeAction;
 
 import java.util.ArrayList;
 
+/**
+ * Action history for keeping track of actions that were previously executed.
+ */
 public class ActionHistory {
     protected static final Logger logger = LogManager.getLogger();
 
     private ArrayList<Action> actions;
     private int maxEntries;
 
+    /**
+     * Creates a new ActionHistory.
+     * @param maxEntries Max amount of actions to keep track of.
+     */
     public ActionHistory(int maxEntries) {
         actions = new ArrayList<>();
         this.maxEntries = maxEntries;
@@ -25,6 +32,10 @@ public class ActionHistory {
         return actions;
     }
 
+    /**
+     * Adds an action to the action history. Removes the first entry if maxEntries is exceeded.
+     * @param action Action to add.
+     */
     public void addToHistory(Action action) {
         if(actions.size() == maxEntries) {
             actions.remove(0);
@@ -36,6 +47,7 @@ public class ActionHistory {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
+
         if(actions.size() == 1) {
             builder.append("This is the last action we executed: ");
         } else {
