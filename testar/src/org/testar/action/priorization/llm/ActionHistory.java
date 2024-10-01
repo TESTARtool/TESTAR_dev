@@ -1,13 +1,18 @@
 package org.testar.action.priorization.llm;
 
-import org.testar.monkey.Pair;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
+import org.testar.monkey.alayer.actions.WdRemoteTypeAction;
 
 import java.util.ArrayList;
 
 public class ActionHistory {
+    protected static final Logger logger = LogManager.getLogger();
+
     private ArrayList<Action> actions;
     private int maxEntries;
 
@@ -31,13 +36,34 @@ public class ActionHistory {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(String.format("Last %d actions taken (higher is newer): ", actions.size()));
+        builder.append(String.format("These are the last %d actions we executed: ", actions.size()));
 
         int i = 1;
-        for (var pair : actions) {
-            // TODO: Rework for new prompting.
+        for (var action : actions) {
+            if(i != 1) {
+                builder.append(", ");
+            }
+            String type = action.get(Tags.Role).name();
+            Widget widget = action.get(Tags.OriginWidget);
+            String description = widget.get(Tags.Desc, "Unknown Widget");
+
+            switch(type) {
+                case "ClickTypeInto":
+                    WdRemoteTypeAction typeAction = (WdRemoteTypeAction)action;
+                    String input = typeAction.getKeys().toString();
+                    // TODO: Differentiate between types of input fields (numeric, password, etc.)
+                    builder.append(String.format("%d: Typed '%s' in TextField '%s'", i, input, description));
+                    break;
+                case "LeftClickAt":
+                    builder.append(String.format("%d: Clicked on '%s'", i, description));
+                    break;
+                default:
+                    logger.log(Level.WARN, "Unsupported action type for action history: " + type);
+                    break;
+            }
             i++;
         }
+        builder.append(". ");
 
         return builder.toString();
     }

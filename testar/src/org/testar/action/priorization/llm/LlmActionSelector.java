@@ -35,6 +35,7 @@ public class LlmActionSelector implements IActionSelector {
     // TODO: Make configurable in GUI?
     private final String testGoal;
     private final String host;
+    private final String appName;
     private final int port ;
 
     private ActionHistory actionHistory = new ActionHistory(5);
@@ -48,14 +49,16 @@ public class LlmActionSelector implements IActionSelector {
         // Use defaults
         this.host = "http://127.0.0.1";
         this.port = 1234;
+        this.appName = "Test";
 
         initConversation();
     }
 
-    public LlmActionSelector(String testGoal, String host, int port) {
+    public LlmActionSelector(String testGoal, String host, int port, String appName) {
         this.testGoal = testGoal;
         this.host = host;
         this.port = port;
+        this.appName = appName;
 
         initConversation();
     }
@@ -108,22 +111,30 @@ public class LlmActionSelector implements IActionSelector {
 
         String conversationJson = gson.toJson(conversation);
         String llmResponse = getResponseFromLlm(conversationJson);
-        Action actionToTake = parseLlmResponse(new ArrayList<>(actions), llmResponse);
+        LlmParseResult llmParseResult = parseLlmResponse(new ArrayList<>(actions), llmResponse);
 
-        logger.log(Level.DEBUG, "Selected action: " + actionToTake.toShortString());
+        switch(llmParseResult.getParseResult()) {
+            case SUCCESS -> {
+                Action actionToTake = llmParseResult.getActionToExecute();
 
-        if(actionToTake == null) {
-            // TODO: Retry mechanism
+                logger.log(Level.DEBUG, "Selected action: " + actionToTake.toShortString());
 
-            return null;
-        } else {
-            // Response was valid, add response to conversation and action to history.
-            conversation.addMessage("assistant", llmResponse);
-            // TODO: Reimplement action history
-            //actionHistory.addToHistory(actionToTake);
+                conversation.addMessage("assistant", llmResponse);
+                actionHistory.addToHistory(actionToTake);
 
-            return actionToTake;
+                return actionToTake;
+            }
+            case OUT_OF_RANGE -> {
+                // TODO: Retry mechanism
+                // conversation.addMessage("user", retryOutOfRange);
+            }
+            case PARSE_FAILED -> {
+                // TODO: Retry mechanism
+                // conversation.addMessage("user", retryParseFailed);
+            }
         }
+
+        return null;
     }
 
     private String getResponseFromLlm(String requestBody) {
@@ -180,7 +191,7 @@ public class LlmActionSelector implements IActionSelector {
         }
     }
 
-    private Action parseLlmResponse(ArrayList<Action> actions, String responseContent) {
+    private LlmParseResult parseLlmResponse(ArrayList<Action> actions, String responseContent) {
         try {
             LlmSelection selection = gson.fromJson(responseContent, LlmSelection.class);
             int actionId = selection.getId();
@@ -188,14 +199,15 @@ public class LlmActionSelector implements IActionSelector {
 
             if(actionId >= actions.size()) {
                 logger.log(Level.ERROR, String.format("Action %d requested by LLM is out of range!", actionId));
-                return null;
+                return new LlmParseResult(null, LlmParseResult.ParseResult.OUT_OF_RANGE);
             } else {
                 Action actionToExecute = actions.get(actionId);
-                return convertCompoundAction(actionToExecute, input);
+                Action convertedAction = convertCompoundAction(actionToExecute, input);
+                return new LlmParseResult(convertedAction, LlmParseResult.ParseResult.SUCCESS);
             }
         } catch(JsonParseException e) {
             logger.log(Level.ERROR, "Unable to parse response from LLM to JSON: " + responseContent);
-            return null;
+            return new LlmParseResult(null, LlmParseResult.ParseResult.PARSE_FAILED);
         }
     }
 
@@ -221,16 +233,18 @@ public class LlmActionSelector implements IActionSelector {
 
     private String generatePrompt(Set<Action> actions) {
         StringBuilder builder = new StringBuilder();
-        // TODO: Change for new prompt.
-        builder.append("Objective: ").append(testGoal).append(". ");
-        builder.append("Available actions: ");
+        builder.append(String.format("We are testing the \"%s\" web application. ", appName));
+        builder.append(String.format("The objective of the test is: %s. ", testGoal));
+        builder.append("The following actions are available: ");
 
         int i = 0;
         for (Action action : actions) {
             try {
                 Widget widget = action.get(Tags.OriginWidget);
 
-                builder.append(", ");
+                if(i != 0) {
+                    builder.append(", ");
+                }
 
                 String type = action.get(Tags.Role).name();
                 String description = widget.get(Tags.Desc, "No description");
@@ -249,7 +263,6 @@ public class LlmActionSelector implements IActionSelector {
                         break;
                 }
 
-                // builder.append(String.format("(%d,%s,%s)", i, type, description));
                 i++;
             } catch(NoSuchTagException e) {
                 // This usually happens when OriginWidget is unknown, so we skip these.
@@ -257,8 +270,8 @@ public class LlmActionSelector implements IActionSelector {
             }
         }
         builder.append(". ");
-        // TODO: Reimplement action history.
-        // builder.append(actionHistory.toString());
+        builder.append(actionHistory.toString());
+        builder.append("Which action should be executed to accomplish the test goal?");
 
         return builder.toString();
     }

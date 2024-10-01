@@ -133,7 +133,7 @@ public class WdRemoteTypeAction extends TaggableBase implements Action {
 		return toShortString();
 	}
 
-	public void setKeys(CharSequence keys) {
-		this.keys = keys;
+	public CharSequence getKeys() {
+		return keys;
 	}
 }

@@ -62,7 +62,8 @@ public class Protocol_03_webdriver_llm extends WebdriverProtocol {
 	private LlmActionSelector llmActionSelector = new LlmActionSelector(
 			"Log in with the username John and the password Demo",
 			"http://192.168.108.242",
-			1234);
+			1234,
+			"Parabank");
 
 	/**
 	 * Called once during the life time of TESTAR
