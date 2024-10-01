@@ -1,16 +1,16 @@
 package org.testar.action.priorization.llm;
 
 public class LlmSelection {
-    private int id;
+    private int actionId;
     private String input;
 
-    public LlmSelection(int id, String input) {
-        this.id = id;
+    public LlmSelection(int actionId, String input) {
+        this.actionId = actionId;
         this.input = input;
     }
 
-    public int getId() {
-        return id;
+    public int getActionId() {
+        return actionId;
     }
 
     public String getInput() {

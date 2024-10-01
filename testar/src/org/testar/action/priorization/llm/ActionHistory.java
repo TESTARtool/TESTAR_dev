@@ -36,7 +36,11 @@ public class ActionHistory {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(String.format("These are the last %d actions we executed: ", actions.size()));
+        if(actions.size() == 1) {
+            builder.append("This is the last action we executed: ");
+        } else {
+            builder.append(String.format("These are the last %d actions we executed: ", actions.size()));
+        }
 
         int i = 1;
         for (var action : actions) {
@@ -48,13 +52,13 @@ public class ActionHistory {
             String description = widget.get(Tags.Desc, "Unknown Widget");
 
             switch(type) {
-                case "ClickTypeInto":
+                case "RemoteType":
                     WdRemoteTypeAction typeAction = (WdRemoteTypeAction)action;
                     String input = typeAction.getKeys().toString();
                     // TODO: Differentiate between types of input fields (numeric, password, etc.)
                     builder.append(String.format("%d: Typed '%s' in TextField '%s'", i, input, description));
                     break;
-                case "LeftClickAt":
+                case "RemoteClick":
                     builder.append(String.format("%d: Clicked on '%s'", i, description));
                     break;
                 default:

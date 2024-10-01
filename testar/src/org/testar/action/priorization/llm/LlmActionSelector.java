@@ -2,9 +2,6 @@ package org.testar.action.priorization.llm;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
-import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,13 +17,11 @@ import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 import org.testar.monkey.alayer.webdriver.WdWidget;
 
 import java.io.*;
-import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 public class LlmActionSelector implements IActionSelector {
@@ -69,8 +64,7 @@ public class LlmActionSelector implements IActionSelector {
         // TODO: Make configurable
         try {
             String initPromptJson = getTextResource("prompts/fewshot.json");
-            Type type = new TypeToken<List<LlmConversation.Message[]>>() {}.getType();
-            List<LlmConversation.Message> initMessages = gson.fromJson(initPromptJson, type);
+            LlmConversation.Message[] initMessages = gson.fromJson(initPromptJson, LlmConversation.Message[].class);
             for(LlmConversation.Message message : initMessages) {
                 conversation.addMessage(message);
             }
@@ -194,7 +188,15 @@ public class LlmActionSelector implements IActionSelector {
     private LlmParseResult parseLlmResponse(ArrayList<Action> actions, String responseContent) {
         try {
             LlmSelection selection = gson.fromJson(responseContent, LlmSelection.class);
-            int actionId = selection.getId();
+
+            // If actionId is 0 at this stage, parsing has likely failed (there is never an action 0).
+            if(selection.getActionId() == 0) {
+                logger.log(Level.ERROR, "Action ID is 0, parsing LLM response has likely failed!: " + responseContent);
+                return new LlmParseResult(null, LlmParseResult.ParseResult.PARSE_FAILED);
+            }
+
+            // ArrayList starts at 0, action list in prompt starts at 1.
+            int actionId = selection.getActionId() -1;
             String input = selection.getInput();
 
             if(actionId >= actions.size()) {
@@ -213,6 +215,7 @@ public class LlmActionSelector implements IActionSelector {
 
     // TODO: Create single actions in protocol so this is unnecessary?
     private Action convertCompoundAction(Action action, String input) {
+        // TODO: This will fail if OriginWidget is unavailable, for example WdHistoryBackAction.
         String type = action.get(Tags.Role).name();
         logger.log(Level.INFO, String.format("Action %s - %s", action.getClass().getName(), type));
 
@@ -237,12 +240,12 @@ public class LlmActionSelector implements IActionSelector {
         builder.append(String.format("The objective of the test is: %s. ", testGoal));
         builder.append("The following actions are available: ");
 
-        int i = 0;
+        int i = 1;
         for (Action action : actions) {
             try {
                 Widget widget = action.get(Tags.OriginWidget);
 
-                if(i != 0) {
+                if(i != 1) {
                     builder.append(", ");
                 }
 
@@ -270,7 +273,9 @@ public class LlmActionSelector implements IActionSelector {
             }
         }
         builder.append(". ");
-        builder.append(actionHistory.toString());
+        if(!actionHistory.getActions().isEmpty()) {
+            builder.append(actionHistory.toString());
+        }
         builder.append("Which action should be executed to accomplish the test goal?");
 
         return builder.toString();
