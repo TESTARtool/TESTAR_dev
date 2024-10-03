@@ -41,6 +41,7 @@ public class LlmActionSelector implements IActionSelector {
 
     private ActionHistory actionHistory = new ActionHistory(5);
     private LlmConversation conversation;
+    private int tokens_used;
 
     private Gson gson = new Gson();
 
@@ -233,6 +234,7 @@ public class LlmActionSelector implements IActionSelector {
                 }
 
                 LlmResponse modelResponse = gson.fromJson(response.toString(), LlmResponse.class);
+                this.tokens_used = modelResponse.getUsage().getTotal_tokens();
 
                 String responseContent = modelResponse.getChoices().get(0).getMessage().getContent();
                 // From testing, response often includes newlines and spaces at the end.

@@ -11,10 +11,12 @@ public class LlmResponse {
     private String id;
 
     private List<Choice> choices = new ArrayList<>();
+    private Usage usage;
 
-    public LlmResponse(String id, List<Choice> choices) {
+    public LlmResponse(String id, List<Choice> choices, Usage usage) {
         this.id = id;
         this.choices = choices;
+        this.usage = usage;
     }
 
     public String getId() {
@@ -31,6 +33,50 @@ public class LlmResponse {
 
     public void setChoices(List<Choice> choices) {
         this.choices = choices;
+    }
+
+    public Usage getUsage() {
+        return usage;
+    }
+
+    public void setUsage(Usage usage) {
+        this.usage = usage;
+    }
+
+    public class Usage {
+        private int prompt_tokens;
+        private int completion_tokens;
+        private int total_tokens;
+
+        public Usage(int prompt_tokens, int completion_tokens, int total_tokens) {
+            this.prompt_tokens = prompt_tokens;
+            this.completion_tokens = completion_tokens;
+            this.total_tokens = total_tokens;
+        }
+
+        public int getPrompt_tokens() {
+            return prompt_tokens;
+        }
+
+        public void setPrompt_tokens(int prompt_tokens) {
+            this.prompt_tokens = prompt_tokens;
+        }
+
+        public int getCompletion_tokens() {
+            return completion_tokens;
+        }
+
+        public void setCompletion_tokens(int completion_tokens) {
+            this.completion_tokens = completion_tokens;
+        }
+
+        public int getTotal_tokens() {
+            return total_tokens;
+        }
+
+        public void setTotal_tokens(int total_tokens) {
+            this.total_tokens = total_tokens;
+        }
     }
 
     public class Choice {
