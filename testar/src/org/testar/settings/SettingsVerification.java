@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2023 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2023 - 2024 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,6 +30,7 @@
 
 package org.testar.settings;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -57,6 +58,7 @@ public class SettingsVerification {
 		verifyStateModelSettings(settings);
 		verifyRegularExpressionSettings(settings);
 		escapeSpecialCharactersInFileWritingSettings(settings);
+		verifyJacocoCoverageSettings(settings);
 	}
 
 	/**
@@ -170,4 +172,64 @@ public class SettingsVerification {
 		}
 	}
 
+	/**
+	 * Verify the JaCoCo coverage settings are valid. 
+	 * 
+	 * @param settings
+	 */
+	private static void verifyJacocoCoverageSettings(Settings settings) {
+		if(!settings.get(ConfigTags.JacocoCoverage, false)) {
+			return; // If JaCoCo Coverage is disabled, TESTAR should not use these settings
+		}
+
+		// Get the values from the settings
+		String ipAddress = settings.get(ConfigTags.JacocoCoverageIpAddress);
+		Integer port = settings.get(ConfigTags.JacocoCoveragePort);
+		String pathClasses = settings.get(ConfigTags.JacocoCoverageClasses);
+
+		// Validate IP Address
+		if (!isValidIPAddress(ipAddress)) {
+			System.err.println("*** WARNING: Invalid JacocoCoverageIpAddress: " + ipAddress);
+		}
+
+		// Validate Port
+		if (port == null || port < 1 || port > 65535) {
+			System.err.println("*** WARNING: Invalid JacocoCoveragePort: " + port);
+		}
+
+		// Validate path classes
+		if (!new File(pathClasses).exists()) {
+			System.err.println("*** WARNING: Invalid JacocoCoverageClasses: " + pathClasses);
+		}
+	}
+
+	private static boolean isValidIPAddress(String text) {
+		if (text.isEmpty()) {
+			System.err.println("Warning: Empty JacocoCoverageIpAddress");
+			return true;
+		}
+
+		if (text.equalsIgnoreCase("localhost")) {
+			return true;
+		}
+
+		String[] parts = text.split("\\.");
+
+		// Check if it's a valid partial IP or full IP address
+		if (parts.length > 4) return false;  // Cannot have more than 4 octets
+
+		for (String part : parts) {
+			if (part.isEmpty()) continue;  // Allow partial input (e.g., "192.")
+
+			try {
+				int value = Integer.parseInt(part);
+				if (value < 0 || value > 255) {
+					return false;  // Each octet must be between 0 and 255
+				}
+			} catch (NumberFormatException e) {
+				return false;  // Not a valid integer
+			}
+		}
+		return true;
+	}
 }
