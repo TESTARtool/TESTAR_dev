@@ -40,6 +40,7 @@ import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.monkey.Util;
 import org.testar.OutputStructure;
+import org.testar.coverage.CodeCoverageManager;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
@@ -48,6 +49,7 @@ import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.protocols.DesktopProtocol;
+import org.testar.settings.Settings;
 
 /**
  * This protocol is used to test TESTAR by executing a gradle CI workflow.
@@ -55,6 +57,15 @@ import org.testar.protocols.DesktopProtocol;
  * ".github/workflows/gradle.yml"
  */
 public class Protocol_test_gradle_workflow_desktop_java_swing extends DesktopProtocol {
+
+	private CodeCoverageManager codeCoverageManager;
+
+	@Override
+	protected void initialize(Settings settings){
+		super.initialize(settings);
+		// Initialize the code coverage extractor using the test settings values
+		codeCoverageManager = new CodeCoverageManager(settings);
+	}
 
 	@Override
 	protected SUT startSystem() throws SystemStartException {
@@ -67,6 +78,9 @@ public class Protocol_test_gradle_workflow_desktop_java_swing extends DesktopPro
 
 	@Override
 	protected void beginSequence(SUT system, State state){
+		// Before executing the first SUT action, extract the initial coverage
+		codeCoverageManager.getActionCoverage("0");
+
 		super.beginSequence(system, state);
 
 		// Verify that Themes Java Swing widget is found in the GUI
@@ -164,7 +178,18 @@ public class Protocol_test_gradle_workflow_desktop_java_swing extends DesktopPro
 	}
 
 	@Override
+	protected boolean executeAction(SUT system, State state, Action action){
+		boolean executed = super.executeAction(system, state, action);
+		// After executing the SUT action, extract the action coverage
+		codeCoverageManager.getActionCoverage(String.valueOf(actionCount));
+		return executed;
+	}
+
+	@Override
 	protected void finishSequence(){
+		// Before finishing the sequence and closing the SUT, extract the sequence coverage
+		codeCoverageManager.getSequenceCoverage();
+
 		// Don't use the call SystemProcessHandling.killTestLaunchedProcesses before stopSystem
 		// Invoking a jar app considers the java.exe a test launched process instead the main one
 
@@ -194,6 +219,25 @@ public class Protocol_test_gradle_workflow_desktop_java_swing extends DesktopPro
 	@Override
 	protected void closeTestSession() {
 		super.closeTestSession();
+
+		// Verify the jacoco coverage folder has been created
+		String jacocoDirectory = OutputStructure.outerLoopOutputDir 
+				+ File.separator + "coverage" 
+				+ File.separator + "jacoco";
+		Assert.isTrue(new File(jacocoDirectory).exists());
+
+		// Verify the jacoco coverage files have been created
+		String jacocoFiles = jacocoDirectory + File.separator 
+				+ OutputStructure.startOuterLoopDateString + "_" 
+				+ OutputStructure.executedSUTname;
+
+		Assert.isTrue(new File(jacocoFiles + "_sequence_1.exec").exists());
+		Assert.isTrue(new File(jacocoFiles + "_sequence_1.csv").exists());
+		Assert.isTrue(new File(jacocoFiles + "_sequence_1_action_0.exec").exists());
+		Assert.isTrue(new File(jacocoFiles + "_sequence_1_action_0.csv").exists());
+		Assert.isTrue(new File(jacocoFiles + "_sequence_1_action_1.exec").exists());
+		Assert.isTrue(new File(jacocoFiles + "_sequence_1_action_1.csv").exists());
+
 		try {
 			File originalFolder = new File(OutputStructure.outerLoopOutputDir).getCanonicalFile();
 			File artifactFolder = new File(Main.testarDir + settings.get(ConfigTags.ApplicationName,""));

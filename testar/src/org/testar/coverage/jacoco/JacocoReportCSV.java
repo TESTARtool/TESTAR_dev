@@ -57,20 +57,15 @@ public class JacocoReportCSV {
 
 	public JacocoReportCSV(Settings settings) {
 		jacocoClassesPath = settings.get(ConfigTags.JacocoCoverageClasses);
+		if(!new File(jacocoClassesPath).exists()) {
+			logger.error("JacocoCoverageClasses path does not exist: " + jacocoClassesPath);
+			System.err.println("JacocoCoverageClasses path does not exist: " + jacocoClassesPath);
+		}
 	}
 
 	public void generateCSVresults(String jacocoExecFile, String outputCSV) {
 		try {
-			// Load the jacoco.exec file
-			ExecFileLoader loader = new ExecFileLoader();
-			loader.load(new File(jacocoExecFile));
-
-			// Analyze the coverage data
-			CoverageBuilder coverageBuilder = new CoverageBuilder();
-			Analyzer analyzer = new Analyzer(loader.getExecutionDataStore(), coverageBuilder);
-
-			// Analyze all classes
-			analyzeAllClasses(jacocoClassesPath, analyzer);
+			CoverageBuilder coverageBuilder = loadJacocoAnalysis(jacocoExecFile);
 
 			// Initialize total counters
 			int totalInstructionMissed = 0;
@@ -156,6 +151,21 @@ public class JacocoReportCSV {
 			logger.error("JacocoReportCSV was not able to create the CSV report " + jacocoClassesPath + " with the exec file " + jacocoExecFile);
 			e.printStackTrace();
 		}
+	}
+
+	CoverageBuilder loadJacocoAnalysis(String jacocoExecFile) throws IOException {
+		// Load the jacoco.exec file
+		ExecFileLoader loader = new ExecFileLoader();
+		loader.load(new File(jacocoExecFile));
+
+		// Analyze the coverage data
+		CoverageBuilder coverageBuilder = new CoverageBuilder();
+		Analyzer analyzer = new Analyzer(loader.getExecutionDataStore(), coverageBuilder);
+
+		// Analyze all classes
+		analyzeAllClasses(jacocoClassesPath, analyzer);
+
+		return coverageBuilder;
 	}
 
 	private void analyzeAllClasses(String classesDirPath, Analyzer analyzer) {
