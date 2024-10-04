@@ -32,6 +32,8 @@ import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -237,11 +239,34 @@ public class Protocol_test_gradle_workflow_desktop_java_swing extends DesktopPro
 		Assert.isTrue(new File(jacocoFiles + "_sequence_1_action_0.csv").exists());
 		Assert.isTrue(new File(jacocoFiles + "_sequence_1_action_1.exec").exists());
 		Assert.isTrue(new File(jacocoFiles + "_sequence_1_action_1.csv").exists());
+		Assert.isTrue(new File(jacocoFiles + "_sequence_1_action_1_merged.exec").exists());
+		Assert.isTrue(new File(jacocoFiles + "_sequence_1_action_1_merged.csv").exists());
+
+		Assert.isTrue(fileContains("FileChooserDemo", new File(jacocoFiles + "_sequence_1.csv")));
+		Assert.isTrue(fileContains("SwingSet2", new File(jacocoFiles + "_sequence_1.csv")));
+		Assert.isTrue(fileContains("ProgressBarDemo", new File(jacocoFiles + "_sequence_1.csv")));
 
 		try {
 			File originalFolder = new File(OutputStructure.outerLoopOutputDir).getCanonicalFile();
 			File artifactFolder = new File(Main.testarDir + settings.get(ConfigTags.ApplicationName,""));
 			FileUtils.copyDirectory(originalFolder, artifactFolder);
 		} catch(Exception e) {System.out.println("ERROR: Creating Artifact Folder");}
+	}
+
+	private boolean fileContains(String searchText, File file) {
+		try (Scanner scanner = new Scanner(file)) {
+			// Read the content of the file line by line
+			while (scanner.hasNextLine()) {
+				String line = scanner.nextLine();
+
+				// Check if the line contains the specific text
+				if (line.contains(searchText)) {
+					return true;
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 }
