@@ -3,49 +3,69 @@ package strategynodes.data;
 import org.antlr.v4.runtime.misc.MultiMap;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Tags;
+import parsing.StrategyManager;
 import strategynodes.enums.VisitType;
 
 public class VisitStatus
 {
-    private final VisitType VISIT_TYPE;
+    private final VisitType visitType;
     private final boolean intApplies;
     private final Integer visitInt;
 
     public VisitStatus(VisitType visitType, Integer visitInt)
     {
-        this.VISIT_TYPE = visitType;
+        System.out.println("DEBUG visitstatus init");
+        this.visitType = visitType;
+        System.out.println("DEBUG visitstatus init visittype: " + visitType);
         this.intApplies =
                 (visitType == VisitType.VISITED_N ||
                 visitType == VisitType.VISITED_OVER_N ||
                 visitType == VisitType.VISITED_UNDER_N);
+        System.out.println("DEBUG visitstatus init intapplies: " + intApplies);
         this.visitInt = (intApplies) ? visitInt : null;
+        System.out.println("DEBUG visitstatus init visitInt: " + this.visitInt);
+
     }
 
     public VisitType getVisitType()
-    { return VISIT_TYPE; }
-    public Boolean actionMatchesVisitStatus(Action action, MultiMap<String, Object> actionsExecuted)
+    { return visitType; }
+    public Boolean actionIsAllowed(Action action)
     {
         String actionID = action.get(Tags.AbstractID);
-        return actionMatchesVisitStatus(actionID, actionsExecuted);
+        return actionIsAllowed(actionID);
     }
 
-    public Boolean actionMatchesVisitStatus(String actionID, MultiMap<String, Object> actionsExecuted)
+    public Boolean actionIsAllowed(String actionID)
     {
-        boolean actionVisited = (actionsExecuted.containsKey(actionID));
+        System.out.println("DEBUG visitstatus action is allowed");
+        System.out.println("DEBUG visitstatus visittype: " + visitType);
+        System.out.println("DEBUG visitstatus visitInt: " + visitInt);
 
-        if(!actionVisited && VISIT_TYPE == VisitType.UNVISITED)
+//        boolean actionVisited = (actionsExecuted.containsKey(actionID));
+        boolean actionVisited = StrategyManager.actionsExecutedContainsKey(actionID);
+
+        if(!actionVisited && visitType == VisitType.UNVISITED)
             return true;
 
-        if(VISIT_TYPE == VisitType.LEAST_VISITED)
+        if(visitType == VisitType.LEAST_VISITED)
             return (!actionVisited) ? true : null; //zero times used == least visited, otherwise answer is relative
 
-        if(VISIT_TYPE == VisitType.MOST_VISITED)
+        if(visitType == VisitType.MOST_VISITED)
             return (!actionVisited) ? false : null; //zero times used == NOT most visited, otherwise answer is relative
 
-        //get number of times used
-        int usageCount = (int) actionsExecuted.get(actionID).get(0);
+        System.out.println("DEBUG visitstatus get usageCount");
+        System.out.println("DEBUG visitstatus actionsExecuted size: ");
+        System.out.println(StrategyManager.actionsExecutedSize());
 
-        switch (this.VISIT_TYPE)
+
+        //get number of times used
+//        int usageCount = (int) actionsExecuted.get(actionID).get(0);
+        int usageCount = StrategyManager.getUsageCount(actionID);
+
+        System.out.println("DEBUG visitstatus usageCount: ");
+        System.out.println(usageCount);
+
+        switch (this.visitType)
         {
             case VISITED_N:
                 return (usageCount == visitInt);
@@ -60,9 +80,11 @@ public class VisitStatus
 
     public String toString()
     {
+        System.out.println("DEBUG tostring");
+        System.out.println("DEBUG tostring: " + visitType);
         if (intApplies)
-            return VISIT_TYPE + " " + visitInt;
+            return visitType + " " + visitInt;
         else
-            return VISIT_TYPE.toString();
+            return visitType.toString();
     }
 }

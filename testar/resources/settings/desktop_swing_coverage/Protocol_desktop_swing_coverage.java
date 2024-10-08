@@ -76,7 +76,7 @@ public class Protocol_desktop_swing_coverage extends DesktopProtocol {
 
 		ArrayList<String> operatingSystems = new ArrayList<>();
 		NativeLinker.getPLATFORM_OS().forEach(OS -> operatingSystems.add(OS.toString()));
-		strategyManager = new StrategyManager(settings.get(ConfigTags.StrategyFile),operatingSystems);
+		strategyManager.initialize(settings.get(ConfigTags.StrategyFile),operatingSystems);
 	}
 
 	/**

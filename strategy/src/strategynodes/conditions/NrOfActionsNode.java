@@ -1,43 +1,37 @@
 package strategynodes.conditions;
 
-import org.antlr.v4.runtime.misc.MultiMap;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
+import strategynodes.data.ActionStatus;
 import strategynodes.data.VisitStatus;
 import strategynodes.filters.VisitFilter;
 import strategynodes.BaseNode;
-import strategynodes.enums.ActionType;
-import strategynodes.enums.Filter;
-import strategynodes.enums.VisitType;
 import strategynodes.filters.ActionTypeFilter;
 
 import java.util.*;
 
 public class NrOfActionsNode extends BaseNode implements IntegerNode
 {
-    private VisitFilter visitFilter;
-    private ActionTypeFilter actionTypeFilter;
-    ArrayList<Action> filteredActions;
+    private final VisitStatus visitStatus;
+    private final ActionStatus actionStatus;
+    ArrayList<Action> filteredActions = new ArrayList<>();
     
-    public NrOfActionsNode(VisitStatus visitStatus, Filter filter, ActionType actionType)
+    public NrOfActionsNode(VisitStatus visitStatus, ActionStatus actionStatus)
     {
-        if(visitStatus != null)
-            this.visitFilter = new VisitFilter(visitStatus);
-        if(filter != null && actionType != null)
-            this.actionTypeFilter = new ActionTypeFilter(filter, actionType);
-        filteredActions = new ArrayList<>();
+        this.visitStatus = visitStatus;
+        this.actionStatus = actionStatus;
     }
     
     @Override
-    public Integer getResult(State state, Set<Action> actions, MultiMap<String, Object> actionsExecuted, ArrayList<String> operatingSystems)
+    public Integer getResult(State state, Set<Action> actions)
     {
         filteredActions = new ArrayList<>(actions); // copy the actions list
 
-        if(visitFilter != null)
-            filteredActions = visitFilter.filter(filteredActions, actionsExecuted);
+        if(visitStatus != null)
+            filteredActions = VisitFilter.filterAvailableActions(visitStatus, filteredActions);
 
-        if(actionTypeFilter != null)
-            filteredActions = actionTypeFilter.filter(filteredActions);
+        if(actionStatus != null)
+            filteredActions = ActionTypeFilter.filter(actionStatus, filteredActions);
 
         return filteredActions.size();
     }
@@ -47,10 +41,10 @@ public class NrOfActionsNode extends BaseNode implements IntegerNode
     {
         StringJoiner joiner = new StringJoiner(" ");
         joiner.add("n-actions");
-        if(visitFilter != null)
-            joiner.add(visitFilter.toString());
-        if(actionTypeFilter != null)
-            joiner.add(actionTypeFilter.toString());
+        if(visitStatus != null)
+            joiner.add(visitStatus.toString());
+        if(actionStatus != null)
+            joiner.add(actionStatus.toString());
         return joiner.toString();
     }
 }

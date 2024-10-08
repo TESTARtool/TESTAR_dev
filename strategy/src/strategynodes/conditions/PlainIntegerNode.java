@@ -16,7 +16,7 @@ public class PlainIntegerNode extends BaseNode implements IntegerNode
     {  this.VALUE = Math.max(value, 0); }
 
     @Override
-    public Integer getResult(State state, Set<Action> actions, MultiMap<String, Object> actionsExecuted, ArrayList<String> operatingSystems)
+    public Integer getResult(State state, Set<Action> actions)
     { return VALUE; }
 
     @Override

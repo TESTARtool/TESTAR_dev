@@ -35,12 +35,12 @@ public class IfThenElseNode extends BaseNode implements ActionNode
     }
     
     @Override
-    public Action getResult(State state, Set<Action> actions, MultiMap<String, Object> actionsExecuted, ArrayList<String> operatingSystems)
+    public Action getResult(State state, Set<Action> actions)
     {
-            if (ifChild.getResult(state, actions, actionsExecuted, operatingSystems))
-                return thenChild.getResult(state, actions, actionsExecuted, operatingSystems);
+            if (ifChild.getResult(state, actions))
+                return thenChild.getResult(state, actions);
             else if (elseChild != null)
-                return elseChild.getResult(state, actions, actionsExecuted, operatingSystems);
+                return elseChild.getResult(state, actions);
             else return selectRandomAction(actions);
     }
 

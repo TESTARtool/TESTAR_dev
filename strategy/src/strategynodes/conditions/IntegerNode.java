@@ -10,5 +10,5 @@ import java.util.Set;
 
 public interface IntegerNode extends StrategyNode<Integer>
 {
-    Integer getResult(State state, Set<Action> actions, MultiMap<String, Object> actionsExecuted, ArrayList<String> operatingSystems);
+    Integer getResult(State state, Set<Action> actions);
 }

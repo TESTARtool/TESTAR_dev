@@ -22,7 +22,12 @@ public enum VisitType
     static  //fill lookup with string values
     { Arrays.stream(values()).forEach(e -> STRINGS.put(e.string, e)); }
     
-    public static VisitType toEnum(String plainText) {return STRINGS.get(plainText);}
+    public static VisitType toEnum(String plainText)
+    {
+        if(STRINGS.get(plainText) == null)
+            System.out.println("DEBUG plaintext is null");
+        return STRINGS.get(plainText);
+    }
 
     public String toString() {return this.string;}
 }

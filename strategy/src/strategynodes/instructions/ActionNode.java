@@ -11,5 +11,5 @@ import java.util.Set;
 public interface ActionNode extends StrategyNode<Action>
 {
     int GetWeight();
-    Action getResult(State state, Set<Action> actions, MultiMap<String, Object> actionsExecuted, ArrayList<String> operatingSystems);
+    Action getResult(State state, Set<Action> actions);
 }

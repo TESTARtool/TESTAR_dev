@@ -1,39 +1,41 @@
-package strategynodes.conditions;
+package strategynodes.data;
 
 import org.antlr.v4.runtime.misc.MultiMap;
 import org.testar.monkey.alayer.Action;
-import org.testar.monkey.alayer.State;
-import strategynodes.BaseNode;
-import strategynodes.enums.SutType;
+import org.testar.monkey.alayer.Tags;
 import strategynodes.enums.Filter;
-import java.util.ArrayList;
-import java.util.Set;
+import strategynodes.enums.ActionType;
 import java.util.StringJoiner;
 
-public class SutNode extends BaseNode implements BooleanNode
+public class ActionStatus
 {
     private final boolean include;
-    private final SutType sutType;
-    public SutNode(Filter filter, SutType sutType)
+    private final ActionType actionType;
+
+    public ActionStatus(Filter filter, ActionType actionType)
     {
         include = (filter == Filter.INCLUDE || filter == null); //default to include if not present
-        this.sutType = sutType;
+        this.actionType = actionType;
     }
 
-    @Override
-    public Boolean getResult(State state, Set<Action> actions)
-    { return (include == sutType.sutIsThisType()); }
+    public ActionType getActionType()
+    { return actionType; }
+
+    public Boolean actionIsAllowed(ActionType actionType)
+    {
+        return (include && (this.actionType == actionType)) ||
+                (!include && (this.actionType != actionType));
+    }
 
     @Override
     public String toString()
     {
         StringJoiner joiner = new StringJoiner(" ");
-        joiner.add("sut");
         if(include)
             joiner.add(Filter.INCLUDE.toString());
         else
             joiner.add(Filter.EXCLUDE.toString());
-        joiner.add(sutType.toString());
+        joiner.add(actionType.toString());
         return joiner.toString();
     }
 }

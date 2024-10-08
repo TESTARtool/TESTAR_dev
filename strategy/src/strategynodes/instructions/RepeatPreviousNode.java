@@ -1,6 +1,5 @@
 package strategynodes.instructions;
 
-import org.antlr.v4.runtime.misc.MultiMap;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
@@ -17,7 +16,7 @@ public class RepeatPreviousNode extends BaseNode implements ActionNode
     { this.weight = new Weight(weight); }
     
     @Override
-    public Action getResult(State state, Set<Action> actions, MultiMap<String, Object> actionsExecuted, ArrayList<String> operatingSystems) //todo: check if it works correctly
+    public Action getResult(State state, Set<Action> actions) //todo: check if it works correctly
     {
         Action previousAction = state.get(Tags.PreviousAction, null);
         

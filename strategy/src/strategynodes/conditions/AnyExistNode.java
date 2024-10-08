@@ -1,63 +1,57 @@
 package strategynodes.conditions;
 
-import org.antlr.v4.runtime.misc.MultiMap;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
-import strategynodes.data.VisitStatus;
-import strategynodes.enums.VisitType;
-import strategynodes.filters.VisitFilter;
 import strategynodes.BaseNode;
-import strategynodes.enums.ActionType;
-import strategynodes.enums.Filter;
-import strategynodes.enums.Relation;
+import strategynodes.data.ActionStatus;
+import strategynodes.data.RelationStatus;
+import strategynodes.data.VisitStatus;
 import strategynodes.filters.ActionTypeFilter;
 import strategynodes.filters.RelationFilter;
-
-import java.util.*;
+import strategynodes.filters.VisitFilter;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.StringJoiner;
 
 public class AnyExistNode extends BaseNode implements BooleanNode
 {
-    private VisitFilter visitFilter;
-    private ActionTypeFilter actionTypeFilter;
-    private RelationFilter relationFilter;
-    private ArrayList<Action> filteredActions;
+    private final VisitStatus visitStatus;
+    private final ActionStatus actionStatus;
+    private final RelationStatus relationStatus;
+    private ArrayList<Action> filteredActions = new ArrayList<Action>();
     
-    public AnyExistNode(VisitStatus visitStatus, Filter filter, ActionType actionType)
+    public AnyExistNode(VisitStatus visitStatus, ActionStatus actionStatus)
     {
-        if(visitStatus != null)
-            this.visitFilter = new VisitFilter(visitStatus);
-        if(filter != null && actionType != null)
-            this.actionTypeFilter = new ActionTypeFilter(filter, actionType);
-        filteredActions = new ArrayList<Action>();
+        this.visitStatus = visitStatus;
+        this.actionStatus = actionStatus;
+        this.relationStatus = null;
     }
 
-    public AnyExistNode(VisitStatus visitStatus, Filter filter, Relation relation)
+    public AnyExistNode(VisitStatus visitStatus, RelationStatus relationStatus)
     {
-        if(visitStatus != null)
-            this.visitFilter = new VisitFilter(visitStatus);
-        if(filter != null && relationFilter != null)
-            this.relationFilter = new RelationFilter(filter, relation);
-        filteredActions = new ArrayList<Action>();
+        this.visitStatus = visitStatus;
+        this.actionStatus = null;
+        this.relationStatus = relationStatus;
     }
     
     @Override
-    public Boolean getResult(State state, Set<Action> actions, MultiMap<String, Object> actionsExecuted, ArrayList<String> operatingSystems)
+    public Boolean getResult(State state, Set<Action> actions)
     {
         if (filteredActions.isEmpty()) //and empty list means no possible valid actions
             return false;
-        else if (visitFilter == null && actionTypeFilter == null)
+        else if (visitStatus == null && actionStatus == null)
             return true; //if there are no filters to apply, any action is valid
 
         filteredActions = new ArrayList<>(actions); // copy the actions list
 
-        if(visitFilter != null)
-            filteredActions = visitFilter.filter(filteredActions, actionsExecuted);
+        if(visitStatus != null)
+            filteredActions = VisitFilter.filterAvailableActions(visitStatus, filteredActions);
 
-        if(actionTypeFilter != null)
-            filteredActions = actionTypeFilter.filter(filteredActions);
-        else if(relationFilter != null)
-            filteredActions = relationFilter.filter(state.get(Tags.PreviousAction, null), filteredActions);
+        if(actionStatus != null)
+            filteredActions = ActionTypeFilter.filter(actionStatus, filteredActions);
+        else if(relationStatus != null)
+            filteredActions = RelationFilter.filter(relationStatus, state.get(Tags.PreviousAction, null), filteredActions);
 
         return (!filteredActions.isEmpty());
     }
@@ -67,12 +61,12 @@ public class AnyExistNode extends BaseNode implements BooleanNode
     {
         StringJoiner joiner = new StringJoiner(" ");
         joiner.add("any-exist");
-        if(visitFilter != null)
-            joiner.add(visitFilter.toString());
-        if(actionTypeFilter != null)
-            joiner.add(actionTypeFilter.toString());
-        else if(relationFilter != null)
-            joiner.add(relationFilter.toString());
+        if(visitStatus != null)
+            joiner.add(visitStatus.toString());
+        if(actionStatus != null)
+            joiner.add(actionStatus.toString());
+        else if(relationStatus != null)
+            joiner.add(relationStatus.toString());
         return joiner.toString();
     }
 }

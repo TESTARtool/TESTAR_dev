@@ -3,26 +3,17 @@ package strategynodes.filters;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
-import strategynodes.enums.Filter;
-import strategynodes.enums.Relation;
+import strategynodes.data.RelationStatus;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringJoiner;
 
 public class RelationFilter
 {
-    private final boolean include;
-    private final Relation RELATION;
-    private ArrayList<Action> filteredActions;
+    private static ArrayList<Action> filteredActions = new ArrayList<Action>();
 
-    public RelationFilter(Filter filter, Relation relation)
-    {
-        include = (filter == Filter.INCLUDE || filter == null); //default to include if not present
-        this.RELATION = relation;
-        filteredActions = new ArrayList<Action>();
-    }
-    public ArrayList<Action> filter(Action prevAction, List<Action> actions)
+    private RelationFilter() {}  //ensure it can't be instantiated
+    public static ArrayList<Action> filter(RelationStatus relationStatus, Action prevAction, List<Action> actions)
     {
         filteredActions.clear();
 
@@ -31,7 +22,7 @@ public class RelationFilter
         for(Action action : actions)
         {
             Widget widget = action.get(Tags.OriginWidget);
-            switch(RELATION)
+            switch(relationStatus.getRelationType())
             {
                 case CHILD:
                     if(widgetIsChild(prevWidget, widget))
@@ -49,21 +40,21 @@ public class RelationFilter
         }
         return filteredActions;
     }
-    private boolean widgetIsChild(Widget parent, Widget child)
+    private static boolean widgetIsChild(Widget parent, Widget child)
     { return (child.parent().get(Tags.AbstractID).equals(parent.get(Tags.AbstractID))); }
 
-    private boolean widgetIsSibling(Widget widget1, Widget widget2)
+    private static boolean widgetIsSibling(Widget widget1, Widget widget2)
     { return widget1.parent().get(Tags.AbstractID).equals(widget2.parent().get(Tags.AbstractID)); }
 
-    @Override
-    public String toString()
-    {
-        StringJoiner joiner = new StringJoiner(" ");
-        if(include)
-            joiner.add(Filter.INCLUDE.toString());
-        else
-            joiner.add(Filter.EXCLUDE.toString());
-        joiner.add(RELATION.toString());
-        return joiner.toString();
-    }
+//    @Override
+//    public String toString()
+//    {
+//        StringJoiner joiner = new StringJoiner(" ");
+//        if(include)
+//            joiner.add(Filter.INCLUDE.toString());
+//        else
+//            joiner.add(Filter.EXCLUDE.toString());
+//        joiner.add(RELATION.toString());
+//        return joiner.toString();
+//    }
 }

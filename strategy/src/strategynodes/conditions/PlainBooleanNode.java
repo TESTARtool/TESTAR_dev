@@ -16,7 +16,7 @@ public class PlainBooleanNode extends BaseNode implements BooleanNode
     { this.VALUE = value; }
 
     @Override
-    public Boolean getResult(State state, Set<Action> actions, MultiMap<String, Object> actionsExecuted, ArrayList<String> operatingSystems)
+    public Boolean getResult(State state, Set<Action> actions)
     { return VALUE; }
 
     @Override

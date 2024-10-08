@@ -5,11 +5,15 @@ import antlrfour.StrategyParser;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import strategynodes.BaseNode;
 import strategynodes.conditions.*;
+import strategynodes.data.ActionStatus;
+import strategynodes.data.RelationStatus;
 import strategynodes.data.VisitStatus;
 import strategynodes.enums.*;
 import strategynodes.instructions.*;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ASTBuilder extends StrategyBaseVisitor<BaseNode>
 {
@@ -56,31 +60,28 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseNode>
     @Override
     public SelectPreviousNode visitSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx)
     {
-        int         weight      =   getWeight(ctx.INT());
-        VisitStatus visitStatus =   getVisitStatus(ctx.visit_status());
-        Filter      filter      =   getFilter(ctx.FILTER());
-        ActionType  actionType  =   getActionType(ctx.ACTION_TYPE());
-        return new SelectPreviousNode(weight, visitStatus, filter, actionType);
+        int             weight          =   getWeight(ctx.INT());
+        VisitStatus     visitStatus     =   getVisitStatus(ctx.visit_status());
+        ActionStatus    actionStatus    =   getActionStatus(ctx.FILTER(), ctx.ACTION_TYPE());
+        return new SelectPreviousNode(weight, visitStatus, actionStatus);
     }
 
     @Override
     public SelectRandomNode visitSelectByRelation(StrategyParser.SelectByRelationContext ctx)
     {
-        int         weight      =   getWeight(ctx.INT());
-        VisitStatus visitStatus =   getVisitStatus(ctx.visit_status());
-        Filter      filter      =   getFilter(ctx.FILTER());
-        Relation    relation    =   getRelation(ctx.RELATION());
-        return new SelectRandomNode(weight, visitStatus, filter, relation);
+        int             weight          =   getWeight(ctx.INT());
+        VisitStatus     visitStatus     =   getVisitStatus(ctx.visit_status());
+        RelationStatus  relationStatus  =   getRelationStatus(ctx.FILTER(), ctx.RELATION());
+        return new SelectRandomNode(weight, visitStatus, relationStatus);
     }
 
     @Override
     public SelectRandomNode visitSelectRandomAction(StrategyParser.SelectRandomActionContext ctx)
     {
-        int         weight      =   getWeight(ctx.INT());
-        VisitStatus visitStatus =   getVisitStatus(ctx.visit_status());
-        Filter      filter      =   getFilter(ctx.FILTER());
-        ActionType  actionType  =   getActionType(ctx.ACTION_TYPE());
-        return new SelectRandomNode(weight, visitStatus, filter, actionType);
+        int             weight          =   getWeight(ctx.INT());
+        VisitStatus     visitStatus     =   getVisitStatus(ctx.visit_status());
+        ActionStatus    actionStatus    =   getActionStatus(ctx.FILTER(), ctx.ACTION_TYPE());
+        return new SelectRandomNode(weight, visitStatus, actionStatus);
     }
     
     //////////////
@@ -114,28 +115,25 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseNode>
     @Override
     public AnyExistNode visitAnyExist(StrategyParser.AnyExistContext ctx)
     {
-        VisitStatus visitStatus =   getVisitStatus(ctx.visit_status());
-        Filter      filter      =   getFilter(ctx.FILTER());
-        ActionType  actionType  =   getActionType(ctx.ACTION_TYPE());
-        return new AnyExistNode(visitStatus, filter, actionType);
+        VisitStatus     visitStatus     =   getVisitStatus(ctx.visit_status());
+        ActionStatus    actionStatus    =   getActionStatus(ctx.FILTER(), ctx.ACTION_TYPE());
+        return new AnyExistNode(visitStatus, actionStatus);
     }
     
     @Override
     public AnyExistNode visitAnyExistByRelation(StrategyParser.AnyExistByRelationContext ctx)
     {
-        VisitStatus visitStatus =   getVisitStatus(ctx.visit_status());
-        Filter      filter      =   getFilter(ctx.FILTER());
-        Relation    relation    =   getRelation(ctx.RELATION());
-        return new AnyExistNode(visitStatus, filter, relation);
+        VisitStatus     visitStatus     =   getVisitStatus(ctx.visit_status());
+        RelationStatus  relationStatus    =   getRelationStatus(ctx.FILTER(), ctx.RELATION());
+        return new AnyExistNode(visitStatus, relationStatus);
     }
     
     @Override
     public PreviousExistNode visitPreviousExist(StrategyParser.PreviousExistContext ctx)
     {
-        VisitStatus visitStatus =   getVisitStatus(ctx.visit_status());
-        Filter      filter      =   getFilter(ctx.FILTER());
-        ActionType  actionType  =   getActionType(ctx.ACTION_TYPE());
-        return new PreviousExistNode(visitStatus, filter, actionType);
+        VisitStatus     visitStatus     =   getVisitStatus(ctx.visit_status());
+        ActionStatus    actionStatus    =   getActionStatus(ctx.FILTER(), ctx.ACTION_TYPE());
+        return new PreviousExistNode(visitStatus, actionStatus);
     }
 
     @Override
@@ -175,18 +173,16 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseNode>
     @Override
     public NrOfActionsNode visitNActions(StrategyParser.NActionsContext ctx)
     {
-        VisitStatus visitStatus =   getVisitStatus(ctx.visit_status());
-        Filter      filter      =   getFilter(ctx.FILTER());
-        ActionType  actionType  =   getActionType(ctx.ACTION_TYPE());
-        return new NrOfActionsNode(visitStatus, filter, actionType);
+        VisitStatus     visitStatus     =   getVisitStatus(ctx.visit_status());
+        ActionStatus    actionStatus    =   getActionStatus(ctx.FILTER(), ctx.ACTION_TYPE());
+        return new NrOfActionsNode(visitStatus, actionStatus);
     }
 
     @Override public NrOfPreviousActionsNode visitNPrevious(StrategyParser.NPreviousContext ctx)
     {
         VisitStatus visitStatus =   getVisitStatus(ctx.visit_status());
-        Filter      filter      =   getFilter(ctx.FILTER());
-        ActionType  actionType  =   getActionType(ctx.ACTION_TYPE());
-        return new NrOfPreviousActionsNode(visitStatus, filter, actionType);
+        ActionStatus    actionStatus    =   getActionStatus(ctx.FILTER(), ctx.ACTION_TYPE());
+        return new NrOfPreviousActionsNode(visitStatus, actionStatus);
     }
 
     @Override
@@ -202,26 +198,84 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseNode>
 
     private VisitStatus getVisitStatus(StrategyParser.Visit_statusContext visit_status)
     {
+        System.out.println("DEBUG AST init");
+
         if(visit_status == null)
             return null;
+
         String rawText = visit_status.getText();
-        String visitTypeString = rawText.replaceAll("[^A-Za-z]", "");
-        String visitIntString = rawText.replaceAll("[^0-9]", ""); //might be empty
 
-        VisitType visitType = VisitType.toEnum(visitTypeString);
-        Integer visitInt = (visitIntString.isEmpty()) ? null : Integer.valueOf(visitIntString);
+        System.out.println("DEBUG AST init rawText: " + rawText);
 
-        return new VisitStatus(visitType, visitInt);
+        rawText = rawText.replaceAll("[0-9]", ""); // replace all digits
+
+        System.out.println("DEBUG AST init rawText after replace: "  + rawText);
+
+        VisitType visitType =  (rawText == null) ? null : VisitType.toEnum(rawText);
+        Integer visitInt = (visit_status.INT() == null) ? null : Integer.valueOf(visit_status.INT().getText());
+
+        if(visitType == null)
+            System.out.println("DEBUG AST init visitType is NULL");
+        else
+            System.out.println("DEBUG AST init visitType: " + visitType);
+        if(visitInt == null)
+            System.out.println("DEBUG AST init visitInt is NULL");
+        else
+            System.out.println("DEBUG AST init visitInt: " + visitInt);
+
+        return (visitType == null) ? null : new VisitStatus(visitType, visitInt);
+
+//
+//
+//        System.out.println("DEBUG AST init");
+//
+//        if(visit_status != null)
+//        {
+//            String rawText = visit_status.getText();
+//            System.out.println("DEBUG AST init rawText: " + rawText);
+//
+//            Pattern pattern = Pattern.compile("([a-zA-Z-]+)(\\d*)");
+//            Matcher matcher = pattern.matcher(rawText);
+//            if (matcher.matches())
+//            {
+//                String visitTypeString = matcher.group(1);
+//                String visitIntString = matcher.group(2);
+//
+//                System.out.println("DEBUG AST init visitTypeString: " + visitTypeString);
+//                System.out.println("DEBUG AST init visitIntString: " + visitIntString);
+//
+//                VisitType visitType = VisitType.toEnum(visitTypeString);
+//                Integer visitInt = (visitIntString.isEmpty()) ? null : Integer.valueOf(visitIntString);
+//
+//
+//                return new VisitStatus(visitType, visitInt);
+//            }
+//            System.out.println("DEBUG AST init: no regex match");
+//        }
+//        System.out.println("DEBUG AST init is NULL");
+
+//        String visitTypeString = rawText.replaceAll("[0-9$]+", "");
+//        String visitIntString = rawText.replaceAll("[^A-Za-z-]+", ""); //might be empty
+
+//        return null;
+    }
+
+    private ActionStatus getActionStatus(TerminalNode FILTER, TerminalNode ACTION_TYPE)
+    {
+        Filter      filter      = getFilter(FILTER);
+        ActionType  actionType  = (ACTION_TYPE == null) ? null : ActionType.toEnum(ACTION_TYPE.getText());
+        return (actionType == null) ? null : new ActionStatus(filter, actionType);
+    }
+
+    private RelationStatus getRelationStatus(TerminalNode FILTER, TerminalNode RELATION_TYPE)
+    {
+        Filter          filter          = getFilter(FILTER);
+        RelationType    relationType    = (RELATION_TYPE == null) ? null : RelationType.toEnum(RELATION_TYPE.getText());
+        return (relationType == null) ? null : new RelationStatus(filter, relationType);
     }
 
     private Filter getFilter(TerminalNode FILTER)
     { return (FILTER == null) ? null : Filter.toEnum(FILTER.getText()); }
-
-    private ActionType getActionType(TerminalNode ACTION_TYPE)
-    { return (ACTION_TYPE == null) ? null : ActionType.toEnum(ACTION_TYPE.getText()); }
-
-    private Relation getRelation(TerminalNode RELATION)
-    { return (RELATION == null) ? null : Relation.toEnum(RELATION.getText()); }
 
     private SutType getSutType(TerminalNode SUT_TYPE)
     { return (SUT_TYPE == null) ? null : SutType.toEnum(SUT_TYPE.getText()); }

@@ -9,6 +9,6 @@ import java.util.Set;
 
 public interface StrategyNode<T>
 {
-    T getResult(State state, Set<Action> actions, MultiMap<String, Object> actionsExecuted, ArrayList<String> operatingSystems);
+    T getResult(State state, Set<Action> actions);
     String toString();
 }

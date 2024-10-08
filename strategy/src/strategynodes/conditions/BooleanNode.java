@@ -10,5 +10,5 @@ import java.util.Set;
 
 public interface BooleanNode extends StrategyNode<Boolean>
 {
-    Boolean getResult(State state, Set<Action> actions, MultiMap<String, Object> actionsExecuted, ArrayList<String> operatingSystems);
+    Boolean getResult(State state, Set<Action> actions);
 }

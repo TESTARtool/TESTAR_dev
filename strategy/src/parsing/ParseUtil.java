@@ -49,9 +49,11 @@ public class ParseUtil
         return visitor.visitStrategy_file(tree); //create and return AST tree
     }
     
-    public Action selectAction(State state, Set<Action> actions, MultiMap<String, Object> actionsExecuted, ArrayList<String> operatingSystems)
+    public Action selectAction(State state, Set<Action> actions)
     {
-        return StrategyTree.getResult(state, actions, actionsExecuted, operatingSystems);
+        System.out.println("DEBUG strategy:");
+        printStrategy();
+        return StrategyTree.getResult(state, actions);
     }
     
     public void printStrategy()

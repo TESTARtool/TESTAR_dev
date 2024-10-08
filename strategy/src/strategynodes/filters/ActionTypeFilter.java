@@ -3,64 +3,60 @@ package strategynodes.filters;
 import org.antlr.v4.runtime.misc.MultiMap;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Tags;
+import parsing.StrategyManager;
+import strategynodes.data.ActionStatus;
 import strategynodes.enums.ActionType;
-import strategynodes.enums.Filter;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class ActionTypeFilter
 {
-    private final boolean include;
-    private final ActionType ACTION_TYPE;
-    private ArrayList<Action> filteredActions;
-    private MultiMap<String, Object> filteredPastActions;
-    public ActionTypeFilter(Filter filter, ActionType actionType)
-    {
-        include = (filter == Filter.INCLUDE);
-        this.ACTION_TYPE = actionType;
-        filteredActions = new ArrayList<Action>();
-        filteredPastActions = new MultiMap<>();
-    }
+    private ActionTypeFilter() {} //ensure it can't be instantiated
 
-    public ArrayList<Action> filter(Collection<Action> actions)
+    public static ArrayList<Action> filter(ActionStatus actionStatus, Collection<Action> actions)
     {
-        filteredActions.clear();
+        ArrayList<Action> filteredActions = new ArrayList<>();
         for (Action action : actions)
         {
-            if (include == ACTION_TYPE.actionIsThisType(action))
+            if(actionStatus.getActionType().actionIsThisType(action))
                 filteredActions.add(action);
         }
         return filteredActions;
     }
 
     //todo: test if it works
-    public MultiMap<String, Object> filter(Collection<Action> actions, MultiMap<String, Object> actionsExecuted, boolean filterByAvailability)
+    public static MultiMap<String, Object> filter(ActionStatus actionStatus, Collection<Action> actions, boolean filterByAvailability)
     {
-        filteredPastActions.clear();
-
         ArrayList<String> availableActions = new ArrayList<>();
         if(filterByAvailability)
         {
             for (Action action : actions)
             {
                 String actionID = action.get(Tags.AbstractID);
-                if (actionsExecuted.containsKey(actionID))
+                if(StrategyManager.actionsExecutedContainsKey(actionID))
                     availableActions.add(actionID);
             }
         }
 
-        for (String pastActionID : actionsExecuted.keySet())
+        MultiMap<String, Object> filteredPastActions = new MultiMap<>();
+
+        for (String pastActionID : StrategyManager.getActionsExecutedIDs())
         {
             //only check against list if filtering is needed
             if (!filterByAvailability || availableActions.contains(pastActionID))
             {
-                List<Object> entry = actionsExecuted.get(pastActionID);
-                ActionType actionType = (ActionType) entry.get(1);
-                if (include == (ACTION_TYPE == actionType))
+//                List<Object> entry = actionsExecuted.get(pastActionID);
+                List<Object> entry = StrategyManager.getEntryCopy(pastActionID);
+                ActionType entryActionType = (ActionType) entry.get(1);
+                if(actionStatus.actionIsAllowed(entryActionType))
                 {
-                    ArrayList<Object> copiedEntry = new ArrayList<Object>();
-                    copiedEntry.add(entry.get(0));
-                    copiedEntry.add(actionType);
+//                    ArrayList<Object> copiedEntry = new ArrayList<Object>();
+//                    copiedEntry.add(entry.get(0));
+//                    copiedEntry.add(entryActionType);
+
+                    List<Object> copiedEntry = StrategyManager.getEntryCopy(pastActionID);
+
                     filteredPastActions.put(pastActionID, copiedEntry);
                 }
             }

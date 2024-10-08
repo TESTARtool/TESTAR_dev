@@ -5,37 +5,32 @@ import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import strategynodes.BaseNode;
+import strategynodes.data.ActionStatus;
 import strategynodes.data.VisitStatus;
-import strategynodes.enums.ActionType;
-import strategynodes.enums.Filter;
-import strategynodes.enums.VisitType;
 import strategynodes.filters.ActionTypeFilter;
 import strategynodes.filters.VisitFilter;
 import strategynodes.data.Weight;
 
-import java.util.ArrayList;
 import java.util.Set;
 import java.util.StringJoiner;
 
 public class SelectPreviousNode extends BaseNode implements ActionNode
 {
     private final Weight weight;
-    private VisitFilter visitFilter;
-    private ActionTypeFilter actionTypeFilter;
-    MultiMap<String, Object> filteredPastActions;
+    private final VisitStatus visitStatus;
+    private final ActionStatus actionStatus;
+    MultiMap<String, Object> filteredPastActions = new MultiMap<>();
 
-    public SelectPreviousNode(Integer weight, VisitStatus visitStatus, Filter filter, ActionType actionType)
+    public SelectPreviousNode(Integer weight, VisitStatus visitStatus, ActionStatus actionStatus)
     {
         this.weight = new Weight(weight);
-        if(visitStatus != null)
-            visitFilter = new VisitFilter(visitStatus);
-        if(filter != null && actionType != null)
-            actionTypeFilter = new ActionTypeFilter(filter, actionType);
-        filteredPastActions = new MultiMap<>();
+        this.visitStatus = visitStatus;
+        this.actionStatus = actionStatus;
     }
 
+    //todo: check if it works correctly
     @Override
-    public Action getResult(State state, Set<Action> actions, MultiMap<String, Object> actionsExecuted, ArrayList<String> operatingSystems) //todo: check if it works correctly
+    public Action getResult(State state, Set<Action> actions)
     {
         Action prevAction = state.get(Tags.PreviousAction, null);
 
@@ -44,16 +39,16 @@ public class SelectPreviousNode extends BaseNode implements ActionNode
 
         filteredPastActions.clear();
 
-        if(visitFilter != null)
-            filteredPastActions = visitFilter.filter(actions, actionsExecuted, true);
+        if(visitStatus != null)
+            filteredPastActions = VisitFilter.filterAvailableActions(visitStatus, actions, filteredPastActions, true);
 
-        if(actionTypeFilter != null)
-            filteredPastActions = actionTypeFilter.filter(actions, actionsExecuted, true);
+        if(actionStatus != null)
+            filteredPastActions = ActionTypeFilter.filter(actionStatus, actions, filteredPastActions, true);
 
         if(filteredPastActions.isEmpty()) //if nothing has made it through the filters
             return selectRandomAction(actions); //default to picking randomly
         else
-            return selectRandomPastAction(actions, actionsExecuted);
+            return selectRandomPastAction(actions);
     }
 
     @Override
@@ -68,10 +63,10 @@ public class SelectPreviousNode extends BaseNode implements ActionNode
         StringJoiner joiner = new StringJoiner(" ");
         joiner.add(weight.toString());
         joiner.add("select-previous");
-        if(visitFilter != null)
-            joiner.add(visitFilter.toString());
-        if(actionTypeFilter != null)
-            joiner.add(actionTypeFilter.toString());
+        if(visitStatus != null)
+            joiner.add(visitStatus.toString());
+        if(actionStatus != null)
+            joiner.add(actionStatus.toString());
         return joiner.toString();
     }
 }

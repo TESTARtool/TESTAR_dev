@@ -25,11 +25,11 @@ public class IntOprNode extends BaseNode implements BooleanNode
     }
     
     @Override
-    public Boolean getResult(State state, Set<Action> actions, MultiMap<String, Object> actionsExecuted, ArrayList<String> operatingSystems)
+    public Boolean getResult(State state, Set<Action> actions)
     {
         return operator.getResult
-                (left.getResult(state, actions, actionsExecuted, operatingSystems),
-                right.getResult(state, actions, actionsExecuted, operatingSystems));
+                (left.getResult(state, actions),
+                right.getResult(state, actions));
     }
     
     @Override
