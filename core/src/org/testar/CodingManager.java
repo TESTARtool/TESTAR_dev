@@ -165,41 +165,21 @@ public class CodingManager {
 			widget.set(Tags.Abstract_R_T_P_ID, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT_R_T_P + CodingManager.lowCollisionID(abstractRoleTitlePathId.toString()));
 		}	
 	}
-	
+
 	/**
 	 * Builds IDs (abstract, concrete) for a set of actions.
 	 * @param state Current State of the SUT
 	 * @param actions The actions.
 	 */
 	public static synchronized void buildIDs(State state, Set<Action> actions){
-	    for (Action a : actions) {
-	        a.set(Tags.ConcreteID, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE +
-	                CodingManager.codify(state.get(Tags.ConcreteID), a));
-	    }
-
-		// for the abstract action identifier, we first sort the actions by their path in the widget tree
-		// and then set their ids using incremental counters
-		Map<Role, Integer> roleCounter = new HashMap<>();
-		actions.stream().
-				filter(action -> {
-					try {
-						action.get(Tags.OriginWidget).get(Tags.Path);
-						return true;
-					}
-					catch (NoSuchTagException ex) {
-						System.out.println("Coding Action AbstractID: No origin widget found for action role: " + action.get(Tags.Role));
-						System.out.println("Coding Action AbstractID: " + action.get(Tags.Desc));
-						return false;
-					}
-				}).
-				sorted(Comparator.comparing(action -> action.get(Tags.OriginWidget).get(Tags.Path))).
-				forEach(
-					action -> {
-						updateRoleCounter(action, roleCounter);
-						action.set(Tags.AbstractID, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT +
-							lowCollisionID(state.get(Tags.AbstractID) + getAbstractActionIdentifier(action, roleCounter)));
-				}
-		);
+		for (Action a : actions) {
+			// Create the Abstract Id for the derived actions
+			a.set(Tags.AbstractID, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT +
+					lowCollisionID(state.get(Tags.AbstractID) + a.get(Tags.OriginWidget).get(Tags.AbstractID) + a.get(Tags.Role, ActionRoles.Action)));
+			// Create the Concrete Id for the derived actions
+			a.set(Tags.ConcreteID, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE +
+					lowCollisionID(state.get(Tags.ConcreteID) + a.get(Tags.OriginWidget).get(Tags.ConcreteID) + a.get(Tags.Role, ActionRoles.Action) + a.toString()));
+		}
 	}
 
 	/**

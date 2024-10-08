@@ -31,8 +31,8 @@ SUTConnectorValue = C:/registration-kiosk-path/registration-kiosk.exe
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 1
-SequenceLength = 10
+Sequences = 30
+SequenceLength = 2
 
 #################################################################
 # Oracles based on suspicious tag values
@@ -40,7 +40,7 @@ SequenceLength = 10
 # Regular expression and Tags to apply them
 #################################################################
 
-SuspiciousTags = .*([eE]rror|[eE]xcepti[o?]n|[fF]out|[uU]itzondering|[mM]islukt).*
+SuspiciousTags = 
 TagsForSuspiciousOracle = Title
 
 #################################################################
@@ -53,7 +53,7 @@ TagsForSuspiciousOracle = Title
 # of what is considered to be suspicious output.
 #################################################################
 
-ProcessListenerEnabled = true
+ProcessListenerEnabled = false
 SuspiciousProcessOutput = .*([eE]rror|[eE]xcepti[o?]n|[fF]out|[uU]itzondering|[mM]islukt).*
 
 #################################################################
@@ -106,19 +106,25 @@ ProcessesToKillDuringTest =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_b00_registration_kiosk/Protocol_desktop_b00_registration_kiosk
+ProtocolClass = b00_registration_kiosk_GUI_change/Protocol_b00_registration_kiosk_GUI_change
 
 #################################################################
 # State model inference settings
 #################################################################
-StateModelEnabled = false
+StateModelEnabled = true
 DataStore = OrientDB
-DataStoreType = remote
+DataStoreType = plocal
 DataStoreServer = localhost
+DataStoreDirectory = C:\\Users\\orientdb-3.0.34\\databases
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = instant
+ApplicationName = registration_kiosk
+ApplicationVersion = 1
+ActionSelectionAlgorithm = unvisited
+StateModelStoreWidgets = true
+ResetDataStore = false
 
 #################################################################
 # State identifier attributes
@@ -161,7 +167,7 @@ ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
-TimeToWaitAfterAction = 0.3
+TimeToWaitAfterAction = 1
 StartupTime = 10.0
 TimeToFreeze = 30.0
 StopGenerationOnFault = true
