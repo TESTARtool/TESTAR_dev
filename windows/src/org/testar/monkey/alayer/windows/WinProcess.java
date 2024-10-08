@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013 - 2024 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -38,6 +39,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.testar.monkey.Assert;
 import org.testar.monkey.FruitException;
@@ -123,7 +126,18 @@ public final class WinProcess extends SUTBase {
 		return suts;
 	}
 
-	public static WinProcess fromExecutable(String path, boolean ProcessListenerEnabled) throws SystemStartException{
+	/**
+	 * Execute the indicated SUT path and create a handle to the SUT process. 
+	 * Optionally connect with the SUT output and error buffer if ProcessListenerEnabled is enabled. 
+	 * Optionally indicate a regex expression for multi SUTProcesses. 
+	 * 
+	 * @param path
+	 * @param ProcessListenerEnabled
+	 * @param SUTProcesses
+	 * @return
+	 * @throws SystemStartException
+	 */
+	public static WinProcess fromExecutable(String path, boolean ProcessListenerEnabled, String SUTProcesses) throws SystemStartException{
 		try{
 			Assert.notNull(path);
 
@@ -135,7 +149,7 @@ public final class WinProcess extends SUTBase {
 				long threadHandle = handles[1];
 				Windows.CloseHandle(threadHandle);
 
-				WinProcess ret = new WinProcess(processHandle, true);
+				WinProcess ret = new WinProcess(processHandle, true, SUTProcesses);
 				ret.set(Tags.Desc, path);
 				return ret;
 			}
@@ -311,10 +325,21 @@ public final class WinProcess extends SUTBase {
 	final Mouse mouse = AWTMouse.build();
 	final long pid;
 	transient static long pApplicationActivationManager; // by wcoux
+	String SUTProcesses;
 
 	private WinProcess(long hProcess, boolean stopProcess){
 		this.hProcess = hProcess;
 		this.stopProcess = stopProcess;
+		pid = pid();
+	}
+
+	// Method for multi-processes SUTs
+	// The hProcess corresponds to the main process
+	// And SUTProcesses corresponds to the multi-processes' names
+	private WinProcess(long hProcess, boolean stopProcess, String SUTProcesses){
+		this.hProcess = hProcess;
+		this.stopProcess = stopProcess;
+		this.SUTProcesses = SUTProcesses;
 		pid = pid();
 	}
 
@@ -354,8 +379,27 @@ public final class WinProcess extends SUTBase {
 	}
 
 	public boolean isRunning() {
-		return hProcess != 0 && 
-				Windows.GetExitCodeProcess(hProcess) == Windows.STILL_ACTIVE;
+		return (hProcess != 0 && Windows.GetExitCodeProcess(hProcess) == Windows.STILL_ACTIVE) 
+				|| multiProcessRunning();
+	}
+
+	private boolean multiProcessRunning() {
+		if(SUTProcesses == null || SUTProcesses.isEmpty()) return false;
+
+		for(WinProcHandle wph : runningProcesses()){
+			if(wph.name() != null && !wph.name().isEmpty()) {
+				Pattern pattern = Pattern.compile(SUTProcesses, Pattern.UNICODE_CHARACTER_CLASS);
+				Matcher matcher = pattern.matcher(wph.name());
+
+				// If the process name matches the regex, return true
+				if (matcher.matches()) {
+					return true;
+				}
+			}
+		}
+
+		// If none of the process names matches the regex, return false
+		return false;
 	}
 
 	public String toString(){

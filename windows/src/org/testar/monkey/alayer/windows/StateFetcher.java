@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2024 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -31,17 +31,13 @@
 
 package org.testar.monkey.alayer.windows;
 
-import org.testar.StateManagementTags;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
 
-import java.io.File;
-import java.io.PrintWriter;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -60,12 +56,8 @@ public class StateFetcher implements Callable<UIAState>{
 	private boolean accessBridgeEnabled;
 	
 	private static Pattern sutProcessesMatcher;
-
-	private List<Map<String , String>> mappedValues;
-
 	
-	public StateFetcher(SUT system, long automationPointer, long cacheRequestPointer,
-						boolean accessBridgeEnabled, String SUTProcesses){		
+	public StateFetcher(SUT system, long automationPointer, long cacheRequestPointer, boolean accessBridgeEnabled, String SUTProcesses){
 		this.system = system;
 		this.automationPointer = automationPointer;
 		this.cacheRequestPointer = cacheRequestPointer;
@@ -74,12 +66,10 @@ public class StateFetcher implements Callable<UIAState>{
 			StateFetcher.sutProcessesMatcher = null;
 		else
 			StateFetcher.sutProcessesMatcher = Pattern.compile(SUTProcesses, Pattern.UNICODE_CHARACTER_CLASS);
-
-		mappedValues = new ArrayList<>();
 	}
 	
 	public static UIARootElement buildRoot(SUT system){
-		UIARootElement uiaRoot = new UIARootElement();	
+		UIARootElement uiaRoot = new UIARootElement();
 		uiaRoot.isRunning = system.isRunning();
 
 		long[] coordinates = Windows.GetMonitorInfo(Windows.GetPrimaryMonitorHandle());
@@ -92,13 +82,12 @@ public class StateFetcher implements Callable<UIAState>{
 		return uiaRoot;
 	}
 
-	public UIAState call() throws Exception {				
+	public UIAState call() throws Exception {
 		Windows.CoInitializeEx(0, Windows.COINIT_MULTITHREADED);		
 
 		// first build the UIAElement skeleton.
 		// this means fetching information from the Windows Automation API about all the elements in the Automation Tree
 		UIARootElement uiaRoot = buildSkeleton(system);
-//		writeToCSV(mappedValues);
 
 		// next we use the created Automation tree, with the uiaRoot as its base, to create the Testar widget tree
 		UIAState root = createWidgetTree(uiaRoot);
@@ -165,7 +154,7 @@ public class StateFetcher implements Callable<UIAState>{
 				uiaRoot.isForeground = uiaRoot.isForeground || WinProcess.isForeground(windowProcessId); // ( SUT as a set of windows/processes )
 				if(!isOwnedWindow){
 					//uiaDescend(uiaCacheWindowTree(windowHandle), uiaRoot);
-					modalElement = this.accessBridgeEnabled ? abDescend(windowHandle, uiaRoot, 0, 0) :
+					modalElement = this.accessBridgeEnabled ? abDescend(windowHandle, uiaCacheWindowTree(windowHandle), uiaRoot, 0, 0) :
 															  uiaDescend(windowHandle, uiaCacheWindowTree(windowHandle), uiaRoot);
 				} else
 					ownedWindows.add(windowHandle);
@@ -178,7 +167,7 @@ public class StateFetcher implements Callable<UIAState>{
 				//uiaDescend(uiaCacheWindowTree(windowHandle), uiaRoot);
 				UIAElement modalE;
 
-				if ((modalE = this.accessBridgeEnabled ? abDescend(windowHandle, uiaRoot, 0, 0) :
+				if ((modalE = this.accessBridgeEnabled ? abDescend(windowHandle, uiaCacheWindowTree(windowHandle), uiaRoot, 0, 0) :
 														 uiaDescend(windowHandle, uiaCacheWindowTree(windowHandle), uiaRoot)) != null)
 					modalElement = modalE;
 
@@ -432,13 +421,10 @@ public class StateFetcher implements Callable<UIAState>{
 
 		// new properties, not in attributes yet
 		uiaElement.set(UIATags.UIALocalizedControlType, Windows.IUIAutomationElement_get_LocalizedControlType(uiaCachePointer, true));
-//		System.out.println("Control type: " + uiaElement.get(UIATags.UIALocalizedControlType));
 		uiaElement.set(UIATags.UIAItemType, Windows.IUIAutomationElement_get_ItemType(uiaCachePointer, true));
-//		System.out.println("Item type: " + uiaElement.get(UIATags.UIAItemType));
 		uiaElement.set(UIATags.UIAItemStatus, Windows.IUIAutomationElement_get_ItemStatus(uiaCachePointer, true));
 		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_FullDescriptionPropertyId, true);
 		uiaElement.set(UIATags.UIAFullDescription, obj instanceof String ? (String)obj : "");
-//		System.out.println(uiaElement.get(UIATags.UIAFullDescription));
 		uiaElement.set(UIATags.UIACulture, Windows.IUIAutomationElement_get_Culture(uiaCachePointer, true));
 		uiaElement.set(UIATags.UIAProcessId, Windows.IUIAutomationElement_get_ProcessId(uiaCachePointer, true));
 		uiaElement.set(UIATags.UIAIsOffscreen, Windows.IUIAutomationElement_get_IsOffscreen(uiaCachePointer, true));
@@ -475,10 +461,6 @@ public class StateFetcher implements Callable<UIAState>{
 		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_VisualEffectsPropertyId, true);
 		setObjectValueIfNotNull(UIATags.UIAVisualEffects, obj, uiaElement);
 
-
-
-
-
 		// get the properties for potential child elements
 		long uiaChildrenPointer = Windows.IUIAutomationElement_GetCachedChildren(uiaCachePointer);
 		if (releaseCachedAutomatinElement) {
@@ -503,16 +485,17 @@ public class StateFetcher implements Callable<UIAState>{
 			Windows.IUnknown_Release(uiaChildrenPointer);
 		}
 
-		// add to csv for analysis purposed
-//		mappedValues.add(extractTagsForCsv(uiaElement));
-		
 		return modalElement;
 	}
 
 	private boolean isElementBlocked(UIAElement uiaElement) {
-		// Qt applications are always started in the running state.
-		// Without this dedicated check TESTAR can't find any actions for the Qt application.
+		// WindowInteractionState is not always a supported property
+		// Windows applications like Notepad indicate that the main window is ready for user interaction (WindowInteractionState_ReadyForUserInteraction = 2)
+		// However, other applications, like Qt, do not support this property [Not supported]
 		if (Objects.equals(uiaElement.frameworkId, "Qt")) {
+			// For Qt applications, we try to check if the main window is ready for user interaction
+			// If this property is not supported, we check the default value from the TESTAR "main_w10.cpp" file
+			// The default value hardcoded in TESTAR, NOT from UIAutomation, is WindowInteractionState_Running = 0
 			return !(uiaElement.wndInteractionState == Windows.WindowInteractionState_ReadyForUserInteraction ||
 					uiaElement.wndInteractionState == Windows.WindowInteractionState_Running);
 		} else {
@@ -521,7 +504,10 @@ public class StateFetcher implements Callable<UIAState>{
 	}
 
 	// (through AccessBridge)
-	private UIAElement abDescend(long hwnd, UIAElement parent, long vmid, long ac){
+	private UIAElement abDescend(long hwnd, long uiaCachePointer, UIAElement parent, long vmid, long ac){
+		if(uiaCachePointer == 0)
+			return null;
+		
 		UIAElement modalElement = null;
 
 		parent.set(Tags.HWND, hwnd);
@@ -558,7 +544,10 @@ public class StateFetcher implements Callable<UIAState>{
 				parent.children.add(el);
 				el.rect = rect;
 
-				el.windowHandle = Windows.GetHWNDFromAccessibleContext(vmidAC[0],vmidAC[1]);
+				//TODO: Since JDK > 8 this throws a Java EXCEPTION_ACCESS_VIOLATION
+				//el.windowHandle = Windows.GetHWNDFromAccessibleContext(vmidAC[0],vmidAC[1]);
+				el.windowHandle = Windows.IUIAutomationElement_get_NativeWindowHandle(uiaCachePointer, true);
+
 				if (role.equals(AccessBridgeControlTypes.ACCESSIBLE_DIALOG)){
 					el.isTopLevelContainer = true;
 					modalElement = el;
@@ -590,7 +579,7 @@ public class StateFetcher implements Callable<UIAState>{
 						el.children = new ArrayList<UIAElement>(c);
 						for (int i=0; i<c; i++){
 							childAC =  Windows.GetAccessibleChildFromContext(vmidAC[0],vmidAC[1],i);
-							abDescend(hwnd,el,vmidAC[0],childAC);
+							abDescend(hwnd,uiaCachePointer,el,vmidAC[0],childAC);
 						}
 				}
 
@@ -778,50 +767,4 @@ public class StateFetcher implements Callable<UIAState>{
 		}
 	}
 
-	/*private Map<String, String> extractTagsForCsv(UIAElement uiaElement) {
-		List<Tag<?>> stateTags = StateManagementTags.getAllTags().stream().map(UIAMapping::getMappedStateTag).collect(Collectors.toList());
-		return stateTags.stream().collect(Collectors.toMap(Tag::name, tag -> uiaElement.get(tag, null) != null ? uiaElement.get(tag, null).toString() : "null"));
-	}*/
-
-	public void writeToCSV(List<Map<String, String>> valuesToExport) {
-		List<String> linesToExport = new ArrayList<>();
-
-		// title row:
-		List<Tag<?>> stateTags = StateManagementTags.getAllTags().stream().map(UIAMapping::getMappedStateTag).sorted(Comparator.comparing(Tag::name)).collect(Collectors.toList());
-		String titleRowString = convertToCSV(stateTags.stream().map(Tag::name).toArray(String[]::new));
-		linesToExport.add(titleRowString);
-
-		for(Map<String, String> valueMapping : valuesToExport) {
-			// follow the stateTags list order
-			String[] line = stateTags.stream().map(tag -> valueMapping.getOrDefault(tag.name(),null) == null ? "null" : valueMapping.get(tag.name())).toArray(String[]::new);
-			linesToExport.add(convertToCSV(line));
-		}
-
-		File csvOutputFile = new File("widgetUIAOutput.csv");
-		try {
-			PrintWriter printWriter = new PrintWriter(csvOutputFile);
-			linesToExport.stream().forEach(printWriter::println);
-			printWriter.flush();
-			printWriter.close();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	public String convertToCSV(String[] data) {
-		return Stream.of(data)
-				.map(this::escapeSpecialCharacters)
-				.collect(Collectors.joining(";"));
-	}
-
-	public String escapeSpecialCharacters(String data) {
-		String escapedData = data.replaceAll("\\R", " ");
-		if (data.contains(",") || data.contains("\"") || data.contains("'")) {
-			data = data.replace("\"", "\"\"");
-			escapedData = "\"" + data + "\"";
-		}
-		escapedData = escapedData.replaceAll(";", "^");
-		return escapedData;
-	}
 }

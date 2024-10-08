@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2024 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -275,7 +275,6 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     settings.set(ConfigTags.SUTConnectorValue, txtSutPath.getText());
     //settings.set(ConfigTags.StopGenerationOnFault, checkStopOnFault.isSelected());
     settings.set(ConfigTags.VisualizeActions, checkActionVisualization.isSelected());
-    settings.set(ConfigTags.SUTConnectorValue, txtSutPath.getText());
     settings.set(ConfigTags.Sequences, (Integer) spnNumSequences.getValue());
     settings.set(ConfigTags.SequenceLength, (Integer) spnSequenceLength.getValue());
     settings.set(ConfigTags.AlwaysCompile, compileCheckBox.isSelected());

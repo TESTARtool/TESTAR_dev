@@ -249,11 +249,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 
 		}catch(WinApiException we) {
-			String msg = "Exception: Check whether current SUTs path: "+settings.get(ConfigTags.SUTConnectorValue)
-			+" is correctly defined";
+			if(we.getMessage() != null) {
+				popupMessage(we.getMessage());
+				System.out.println(we.getMessage());
+			}
 
-			popupMessage(msg);
-			System.out.println(msg);
 			we.printStackTrace();
 
 			this.mode = Modes.Quit;
@@ -759,8 +759,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 
 			// for most windows applications and most jar files, this is where the SUT gets created!
-			SutConnectorCommandLine sutConnector = new SutConnectorCommandLine(settings.get(ConfigTags.SUTConnectorValue),
-					enabledProcessListener, settings().get(ConfigTags.StartupTime)*1000, Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), builder, settings.get(ConfigTags.FlashFeedback));
+			SutConnectorCommandLine sutConnector = new SutConnectorCommandLine(builder, enabledProcessListener, settings);
 			//TODO startupTime and maxEngageTime seems to be the same, except one is double and the other is long?
 			return sutConnector.startOrConnectSut();
 		}
