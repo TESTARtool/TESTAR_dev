@@ -10,6 +10,7 @@ import org.testar.statemodel.persistence.PersistenceManagerFactoryBuilder;
 import org.testar.statemodel.sequence.SequenceManager;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.ConfigTags;
+import org.testar.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.settings.Settings;
 
 import java.util.Arrays;
@@ -54,6 +55,24 @@ public class StateModelManagerFactory {
         Set<StateModelEventListener> eventListeners = new HashSet<>();
         eventListeners.add((StateModelEventListener) persistenceManager);
         SequenceManager sequenceManager = new SequenceManager(eventListeners, modelIdentifier);
+
+        if(settings.get(ConfigTags.Mode) == Modes.ListeningManual || settings.get(ConfigTags.Mode) == Modes.ListeningScript) {
+        	System.out.println("TESTAR State Model enabled with Listening mode... AbstractStateModelListener");
+
+        	// create the abstract state model and then the state model manager
+        	AbstractStateModelListener abstractStateModelListener = new AbstractStateModelListener(modelIdentifier,
+        			settings.get(ConfigTags.ApplicationName),
+        			settings.get(ConfigTags.ApplicationVersion),
+        			abstractTags,
+        			persistenceManager instanceof StateModelEventListener ? (StateModelEventListener) persistenceManager : null);
+        	ActionSelector actionSelector = CompoundFactory.getCompoundActionSelector(settings);
+
+        	// should we store widgets?
+        	boolean storeWidgets = settings.get(ConfigTags.StateModelStoreWidgets);
+
+        	return new ModelManagerListeningMode(abstractStateModelListener, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
+
+        }
 
         // create the abstract state model and then the state model manager
         AbstractStateModel abstractStateModel = new AbstractStateModel(modelIdentifier,

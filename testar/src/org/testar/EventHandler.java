@@ -101,7 +101,7 @@ public class EventHandler implements NativeKeyListener, NativeMouseListener, Nat
 	// #########################################
 
 	@Override
-	public void nativeMouseMoved(NativeMouseEvent e) {
+	public final void nativeMouseMoved(NativeMouseEvent e) {
 		eventListener.mouseMoved(e.getX(),e.getY());
 	}
 

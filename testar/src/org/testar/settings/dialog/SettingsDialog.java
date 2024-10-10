@@ -41,6 +41,7 @@ import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -75,8 +76,15 @@ public class SettingsDialog extends JFrame implements Observer {
   private JButton btnGenerate;
   private JButton btnSpy;
   private JButton btnReplay;
+
+  private JButton btnListening;
+  private JButton btnListeningManual;
+  private JButton btnListeningScript;
+
   private JButton btnView;
-  private JButton btnModel;
+  private JButton btnViewReport;
+  private JButton btnViewModel;
+
   private StateModelPanel modelPanel;
   //private JButton btnRecord; // Record mode is disabled temporally
 
@@ -250,8 +258,19 @@ public class SettingsDialog extends JFrame implements Observer {
     btnGenerate = getBtnGenerate();
     btnSpy = getBtnSpy();
     btnReplay = getBtnReplay();
+
+    btnListening = getBtnListening();
+    btnListeningManual = getBtnListeningManual();
+    btnListeningManual.setVisible(false);
+    btnListeningScript = getBtnListeningScript();
+    btnListeningScript.setVisible(false);
+
     btnView = getBtnView();
-    btnModel = getBtnModel();
+    btnViewReport = getBtnViewReport();
+    btnViewReport.setVisible(false);
+    btnViewModel = getBtnViewModel();
+    btnViewModel.setVisible(false);
+
     //btnRecord = getBtnRecord(); // Record mode is disabled temporally
 
     jTabsPane = new JTabbedPane();
@@ -303,21 +322,43 @@ public class SettingsDialog extends JFrame implements Observer {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(Alignment.TRAILING)
                     .addComponent(jTabsPane, PREFERRED_SIZE, 620, PREFERRED_SIZE)
-                    .addGroup(getStartGroup(layout)))
+                    // Main modes buttons
+                    .addGroup(getStartGroup(layout))
+                    // Listening group
+                    .addGroup(layout.createSequentialGroup()
+                            .addComponent(btnListeningManual, 120, 120, 120)
+                            .addGap(2, 2, 2)
+                            .addComponent(btnListeningScript, 120, 120, 120))
+                    // View group
+                    .addGroup(layout.createSequentialGroup()
+                            .addComponent(btnViewReport, 120, 120, 120)
+                            .addGap(2, 2, 2)
+                            .addComponent(btnViewModel, 120, 120, 120))
+                )
                 .addContainerGap(DEFAULT_SIZE, Short.MAX_VALUE))
     );
+
     layout.setVerticalGroup(
         layout.createParallelGroup(Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap(DEFAULT_SIZE, Short.MAX_VALUE)
+                    // Main modes buttons
                     .addGroup(layout.createParallelGroup(Alignment.LEADING)
                             .addComponent(btnGenerate, PREFERRED_SIZE, 129, PREFERRED_SIZE)
                             .addComponent(btnSpy, PREFERRED_SIZE, 129, PREFERRED_SIZE)
                             .addComponent(btnReplay, PREFERRED_SIZE, 129, PREFERRED_SIZE)
+                            .addComponent(btnListening, PREFERRED_SIZE, 129, PREFERRED_SIZE)
                             .addComponent(btnView, PREFERRED_SIZE, 129, PREFERRED_SIZE)
-                            .addComponent(btnModel, PREFERRED_SIZE, 129, PREFERRED_SIZE)
                             //.addComponent(btnRecord, PREFERRED_SIZE, 129, PREFERRED_SIZE) // Record mode is disabled temporally
                     )
+                    // Listening group
+                    .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                    		.addComponent(btnListeningManual, PREFERRED_SIZE, 129, PREFERRED_SIZE)
+                    		.addComponent(btnListeningScript, PREFERRED_SIZE, 129, PREFERRED_SIZE))
+                    // View group
+                    .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                    		.addComponent(btnViewReport, PREFERRED_SIZE, 129, PREFERRED_SIZE)
+                    		.addComponent(btnViewModel, PREFERRED_SIZE, 129, PREFERRED_SIZE))
                 .addPreferredGap(RELATED)
                 .addComponent(jTabsPane, PREFERRED_SIZE, 400, PREFERRED_SIZE)
                 .addContainerGap())
@@ -335,9 +376,9 @@ public class SettingsDialog extends JFrame implements Observer {
     //group.addGap(2, 2, 2);
     group.addComponent(btnReplay, 120, 120, 120);
     group.addGap(2, 2, 2);
-    group.addComponent(btnView, 120, 120, 120);
+    group.addComponent(btnListening, 120, 120, 120);
     group.addGap(2, 2, 2);
-    group.addComponent(btnModel, 120, 120, 120);
+    group.addComponent(btnView, 120, 120, 120);
 
     return group;
   }
@@ -392,17 +433,117 @@ public class SettingsDialog extends JFrame implements Observer {
     }
   }
 
+  /**
+   * Listening modes buttons
+   */
+
+  private JButton getBtnListening() throws IOException {
+	  JButton btn = new JButton();
+	  btn.setBackground(new Color(255, 255, 255));
+	  btn.setIcon(new ImageIcon(loadIcon("/icons/button_listening.png")));
+	  btn.setToolTipText("Shows or hides the listening manual and listening scripts TESTAR modes");
+	  btn.setFocusPainted(false);
+	  btn.addActionListener(new ActionListener() {
+		  @Override
+		  public void actionPerformed(ActionEvent e) {
+			  int height = getHeight();
+
+			  // If Listening button selected, hide view buttons
+			  if(btnViewReport.isVisible()) height = height - 129;
+			  btnViewReport.setVisible(false);
+			  btnViewModel.setVisible(false);
+
+			  // And toggle the visibility of listening buttons
+			  btnListeningManual.setVisible(!btnListeningManual.isVisible());
+			  btnListeningScript.setVisible(!btnListeningScript.isVisible());
+			  if (btnListeningManual.isVisible()) height = height + 129;
+			  else height = height - 129;
+
+			  // Adjust the frame size based on visibility
+			  setSize(getWidth(), height);
+		  }
+	  });
+	  return btn;
+  }
+
+  private JButton getBtnListeningManual() throws IOException {
+	  JButton btn = new JButton();
+	  btn.setBackground(new Color(255, 255, 255));
+	  btn.setIcon(new ImageIcon(loadIcon("/icons/button_listening_manual.png")));
+	  btn.setFocusPainted(false);
+	  btn.addActionListener(this::btnListeningManualActionPerformed);
+	  return btn;
+  }
+
+  private void btnListeningManualActionPerformed(ActionEvent evt) {
+	  start(RuntimeControlsProtocol.Modes.ListeningManual);
+  }
+
+  private JButton getBtnListeningScript() throws IOException {
+	  JButton btn = new JButton();
+	  btn.setBackground(new Color(255, 255, 255));
+	  btn.setIcon(new ImageIcon(loadIcon("/icons/button_listening_script.png")));
+	  btn.setFocusPainted(false);
+	  btn.addActionListener(this::btnListeningScriptActionPerformed);
+	  return btn;
+  }
+
+  private void btnListeningScriptActionPerformed(ActionEvent evt) {
+	  JFileChooser fd = new JFileChooser();
+	  fd.setFileSelectionMode(JFileChooser.FILES_ONLY);
+	  fd.setCurrentDirectory(new File(settings.get(ConfigTags.ListeningScript)).getParentFile());
+
+	  if (fd.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+		  String file = fd.getSelectedFile().getAbsolutePath();
+		  settings.set(ConfigTags.ListeningScript, file);
+		  start(RuntimeControlsProtocol.Modes.ListeningScript);
+	  }
+  }
+
+  /**
+   * View modes buttons
+   */
+
   private JButton getBtnView() throws IOException {
+	  JButton btn = new JButton();
+	  btn.setBackground(new Color(255, 255, 255));
+	  btn.setIcon(new ImageIcon(loadIcon("/icons/button_view.png")));
+	  btn.setToolTipText("Shows or hides the view report and view model TESTAR modes");
+	  btn.setFocusPainted(false);
+	  btn.addActionListener(new ActionListener() {
+		  @Override
+		  public void actionPerformed(ActionEvent e) {
+			  int height = getHeight();
+
+			  // If View button selected, hide listening buttons
+			  if(btnListeningManual.isVisible()) height = height - 129;
+			  btnListeningManual.setVisible(false);
+			  btnListeningScript.setVisible(false);
+
+			  // And toggle the visibility of view buttons
+			  btnViewReport.setVisible(!btnViewReport.isVisible());
+			  btnViewModel.setVisible(!btnViewModel.isVisible());
+			  if (btnViewReport.isVisible()) height = height + 129;
+			  else height = height - 129;
+
+			  // Adjust the frame size based on visibility
+			  setSize(getWidth(), height);
+		  }
+	  });
+	  return btn;
+  }
+
+  private JButton getBtnViewReport() throws IOException {
     JButton btn = new JButton();
     btn.setBackground(new Color(255, 255, 255));
     btn.setIcon(new ImageIcon(loadIcon("/icons/view_report.png")));
     btn.setToolTipText(ToolTipTexts.btnViewTTT);
     btn.setFocusPainted(false);
-    btn.addActionListener(this::btnViewActionPerformed);
+    btn.addActionListener(this::btnViewReportActionPerformed);
     return btn;
   }
 
-  private void btnViewActionPerformed(ActionEvent evt) {
+  private void btnViewReportActionPerformed(ActionEvent evt) {
     JFileChooser fd = new JFileChooser();
     fd.setFileSelectionMode(JFileChooser.FILES_ONLY);
     fd.setCurrentDirectory(new File(settings.get(ConfigTags.PathToReplaySequence)).getParentFile());
@@ -414,17 +555,17 @@ public class SettingsDialog extends JFrame implements Observer {
     }
   }
 
-  private JButton getBtnModel() throws IOException {
+  private JButton getBtnViewModel() throws IOException {
 	  JButton btn = new JButton();
 	  btn.setBackground(new Color(255, 255, 255));
 	  btn.setIcon(new ImageIcon(loadIcon("/icons/view_model.PNG")));
 	  btn.setToolTipText(ToolTipTexts.btnModelTTT);
 	  btn.setFocusPainted(false);
-	  btn.addActionListener(this::btnModelActionPerformed);
+	  btn.addActionListener(this::btnViewModelActionPerformed);
 	  return btn;
   }
 
-  private void btnModelActionPerformed(ActionEvent evt) {
+  private void btnViewModelActionPerformed(ActionEvent evt) {
 	  jTabsPane.setSelectedIndex(MODEL_TAB_INDEX);
 	  modelPanel.openServer();
   }

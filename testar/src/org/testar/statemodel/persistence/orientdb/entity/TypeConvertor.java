@@ -16,6 +16,7 @@ public class TypeConvertor {
         typeMatches.put(String.class, OType.STRING);
         typeMatches.put(Boolean.class, OType.BOOLEAN);
         typeMatches.put(Double.class, OType.DOUBLE);
+        typeMatches.put(Integer.class, OType.INTEGER);
         typeMatches.put(Float.class, OType.FLOAT);
     }
 

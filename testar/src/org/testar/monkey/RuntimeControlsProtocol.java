@@ -35,8 +35,12 @@ import org.testar.IEventListener;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.devices.MouseButtons;
+
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 public abstract class RuntimeControlsProtocol extends AbstractProtocol implements IEventListener {
@@ -52,11 +56,14 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 		Generate,
 		Quit,
 		View,
-		Replay;
+		Replay,
+		ListeningManual,
+		ListeningScript;
 	}
 
 	protected Modes mode;
 	private Set<KBKeys> pressed = EnumSet.noneOf(KBKeys.class);
+	private List<KBKeys> listeningEvents = new ArrayList<>();
 
 	public EventHandler initializeEventHandler() {
 		return new EventHandler(this);
@@ -138,6 +145,15 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 				userEvent = new Object[]{key}; // would be ideal to set it up at keyUp
 			}
 
+			// In ListeningManual mode you can press any key except SHIFT to add a user keyboard
+			// This is because SHIFT is used for the TESTAR shortcuts
+			// This is not ideal, because now special characters and capital letters and other events that needs SHIFT
+			// cannot be recorded as an user event in ListeningManual....
+			else if (!pressed.contains(KBKeys.VK_SHIFT) && mode() == Modes.ListeningManual && userEvent == null) {
+				System.out.println("Listening user event key_down! " + key.toString());
+				listeningEvents.add(key);
+			}
+
 			// SHIFT + ALT --> Toggle widget-tree hierarchy display
 			if (pressed.contains(KBKeys.VK_ALT) && pressed.contains(KBKeys.VK_SHIFT)) {
 				markParentWidget = !markParentWidget;
@@ -163,15 +179,15 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 	public void mouseDown(MouseButtons btn, double x, double y){}
 
 	/**
-	 * In Record mode the user can add user events by clicking and the event is added when releasing the mouse
+	 * In Record or Listening modes the user can add user events by clicking and the event is added when releasing the mouse
 	 * @param btn
 	 * @param x
 	 * @param y
 	 */
 	@Override
 	public void mouseUp(MouseButtons btn, double x, double y){
-		// In GenerateManual the user can add user events by clicking
-		if (mode() == Modes.Record && userEvent == null){
+		// In Record or ListeningManual modes the user can add user events by clicking
+		if ((mode() == Modes.Record || mode() == Modes.ListeningManual) && userEvent == null){
 			userEvent = new Object[]{
 					btn,
 					Double.valueOf(x),
@@ -181,5 +197,15 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 	}
 
 	@Override
-	public void mouseMoved(double x, double y) {}
+	public void mouseMoved(double x, double y) {
+		if(mode() == Modes.ListeningManual && !listeningEvents.isEmpty()) {
+			// Convert each KBKeys element to a string
+			String listenedText = listeningEvents.stream()
+					.map(kbKey -> String.valueOf(kbKey.toChar()))
+					.collect(Collectors.joining());
+			// Then save the complete string and reset the listening list
+			userEvent = new Object[]{listenedText};
+			listeningEvents = new ArrayList<>();
+		}
+	}
 }

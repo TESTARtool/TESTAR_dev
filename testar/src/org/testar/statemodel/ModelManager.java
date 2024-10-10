@@ -48,41 +48,41 @@ import java.util.*;
 public class ModelManager implements StateModelManager {
 
     // the abstract state model that this class is managing
-    private AbstractStateModel abstractStateModel;
+	protected AbstractStateModel abstractStateModel;
 
     // current abstract state of the SUT
-    private AbstractState currentAbstractState;
+	protected AbstractState currentAbstractState;
 
     // the action that is currently being executed, if applicable
-    private AbstractAction actionUnderExecution;
+	protected AbstractAction actionUnderExecution;
 
     // action selector that chooses actions to execute
-    private ActionSelector actionSelector;
+	protected ActionSelector actionSelector;
 
     // persistence manager interface for persisting our model entities
-    private PersistenceManager persistenceManager;
+	protected PersistenceManager persistenceManager;
 
     // tags containing the attributes that were used in creating the concrete state ID
-    private Set<Tag<?>> concreteStateTags;
+	protected Set<Tag<?>> concreteStateTags;
 
     // current concrete state
-    private ConcreteState currentConcreteState;
+	protected ConcreteState currentConcreteState;
 
     // the concrete action that is being executed.
-    private ConcreteAction concreteActionUnderExecution;
+	protected ConcreteAction concreteActionUnderExecution;
 
     // manager that is responsible for recording test sequences as they are executed
-    private SequenceManager sequenceManager;
+	protected SequenceManager sequenceManager;
 
     // if there any irregularities that occur during runs, they should be appended here
-    private StringJoiner errorMessages;
+	protected StringJoiner errorMessages;
 
     // the number of actions in the model that end in more than one unique state
     // use this to monitor non-determinism in the model
-    private int nrOfNonDeterministicActions;
+	protected int nrOfNonDeterministicActions;
 
     // should the widgets of concrete states be stored in the model?
-    boolean storeWidgets;
+	protected boolean storeWidgets;
 
     /**
      * Constructor
@@ -211,6 +211,11 @@ public class ModelManager implements StateModelManager {
         System.out.println();
     }
 
+    @Override
+    public void notifyConcurrenceStateReached(State newState, Set<Action> actions, Action unknown) {
+
+    }
+
     /**
      * This method should be called when an action is about to be executed.
      * @param action
@@ -238,6 +243,11 @@ public class ModelManager implements StateModelManager {
             sequenceManager.notifyErrorInCurrentState(errorMessages.toString());
             errorMessages = new StringJoiner(", ");
         }
+    }
+
+    @Override
+    public void notifyListenedAction(Action action) {
+
     }
 
     @Override
@@ -275,6 +285,11 @@ public class ModelManager implements StateModelManager {
             System.out.println("Could not find an action to execute for abstract state id : " + currentAbstractState.getStateId());
         }
         return null;
+    }
+
+    @Override
+    public Set<Action> getInterestingActions(Set<Action> actions) {
+    	return Collections.<Action>emptySet();
     }
 
     @Override

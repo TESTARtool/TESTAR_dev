@@ -79,6 +79,7 @@ public class WdDriver extends SUTBase {
   public static boolean fullScreen = false;
   public static boolean forceActivateTab = true;
   public static boolean disableSecurity = false;
+  public static boolean remoteDebugging = false;
 
   private final Keyboard kbd = AWTKeyboard.build();
   private final Mouse mouse = WdMouse.build();
@@ -181,6 +182,11 @@ public class WdDriver extends SUTBase {
     // Workaround to fix https://github.com/SeleniumHQ/selenium/issues/11750
     options.addArguments("--remote-allow-origins=*");
     options.addArguments("--disable-search-engine-choice-screen");  // Disable search engine selector
+
+    // Enable remote debugging port
+    if(remoteDebugging) {
+    	options.addArguments("--remote-debugging-port=9222");
+    }
 
     return new ChromeDriver(service, options);
   }

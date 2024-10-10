@@ -231,4 +231,9 @@ public enum KBKeys
       return false;
     }
   }
+
+  // Convert the keyCode (ASCII value) to its corresponding char
+  public char toChar() {
+	  return (char) keyCode;
+  }
 }

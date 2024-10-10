@@ -1,0 +1,24 @@
+TestCompass
+Project - Parabank
+Test Model - Login Parabank
+Date - 2024-03-15
+
+Test Coverage - 100% (Path Coverage)
+
+Rule: Registered users must be able to login
+
+Background: URL for loging page is available
+
+Scenario Outline: Login Parabank - TC1
+  Given I want to log in
+  And fill in Username (YES)
+  And fill in correct <username> (YES)
+  And fill in password (YES)
+  And fill in correct <password> (YES)
+  When login
+  Then Overview page is shown
+  And Accounts Overview is shown
+
+  Examples:
+    |Username| |Password|
+    |john| |demo|

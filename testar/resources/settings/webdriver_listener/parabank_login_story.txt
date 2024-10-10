@@ -1,0 +1,17 @@
+User Story (US602):
+  As a user, I want to access my account by logging into the Para Bank website and perform my bank transactions. I need to confirm whether logging into the site is successful or unsuccessful by testing my login process with valid and invalid user information. So I can be sure that I have accessed the site safely.
+
+Preconditions:
+  - The user should be able to access https://para.testar.org.
+
+Test Data:
+  - Username: john
+  - Password: demo
+
+Scenarios:
+  Case 1: Login with valid user information:
+    - The user navigates to the ParaBank website.
+    - On the home page, click "Sign In" or "Login" link.
+    - Login with a valid user name and password combination.
+    - The user confirms that it has successfully entered.
+    - The user switches the session with "Log Out" option.

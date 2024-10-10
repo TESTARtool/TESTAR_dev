@@ -16,8 +16,11 @@ import com.orientechnologies.orient.core.record.OVertex;
 import com.orientechnologies.orient.core.record.impl.OBlob;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
+
+import org.testar.statemodel.StateModelTags;
 import org.testar.statemodel.exceptions.EntityNotFoundException;
 import org.testar.statemodel.persistence.orientdb.util.DependencyHelper;
+import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Visualizer;
 
 import java.util.*;
@@ -374,15 +377,20 @@ public class EntityManager {
         // first we check if the edge already exists..this saves a lot of overhead.
         OEdge edge;
         try {
-            edge = retrieveEdge(entity, db);
-            // the edge exists. Check if we have to update properties
-            if (entity.updateEnabled()) {
-                for (String propertyName : entity.getPropertyNames()) {
-                    setProperty(edge, propertyName, entity.getPropertyValue(propertyName).getValue(), db);
-                }
-            }
-            // that's all we need to do. An edge has a unique identifier, no need to continue processing.
-            return;
+        	edge = retrieveEdge(entity, db);
+        	// the edge exists. Check if we have to update properties
+        	if (entity.updateEnabled()) {
+        		for (String propertyName : entity.getPropertyNames()) {
+        			setProperty(edge, propertyName, entity.getPropertyValue(propertyName).getValue(), db);
+        		}
+        		//We need to update in the database the dynamic State Model Tag Value
+        		if(entity.getEntityClass().getClassName().equals("AbstractAction")) {
+        			updateAbstractActionEntity(edge, entity, db);
+        		}
+        	}
+
+        	// that's all we need to do. An edge has a unique identifier, no need to continue processing.
+        	return;
 
         } catch (EntityNotFoundException e) {
             // we don't do anything here. If the edge does not exist, we just want to continue with method execution
@@ -472,6 +480,19 @@ public class EntityManager {
         }
 
         edge.save();
+    }
+
+    private void updateAbstractActionEntity(OEdge edge, DocumentEntity entity, ODatabaseSession db) {
+    	for (String propertyName : entity.getPropertyNames()) {
+    		if(entity.getPropertyValue(propertyName) != null) {
+    			for(Tag<?> t : StateModelTags.getStateModelTags()) {
+    				if(t.name().contains(propertyName)){
+    					setProperty(edge, propertyName, entity.getPropertyValue(propertyName).getValue(), db);
+    				}
+    			}
+    			edge.save();
+    		}
+    	}
     }
 
     public void deleteEntity(DocumentEntity entity) {
@@ -588,25 +609,37 @@ public class EntityManager {
      * @return
      */
     private Object getConvertedValue(OType oType, Object valueToConvert) {
-        Object convertedValue = null;
-        switch (oType) {
-            case BOOLEAN:
-                convertedValue = OType.convert(valueToConvert, Boolean.class);
-                break;
+    	Object convertedValue = null;
+    	switch (oType) {
+    	case BOOLEAN:
+    		convertedValue = OType.convert(valueToConvert, Boolean.class);
+    		break;
 
-            case STRING:
-                convertedValue = OType.convert(valueToConvert, String.class);
-                break;
+    	case STRING:
+    		convertedValue = OType.convert(valueToConvert, String.class);
+    		break;
 
-            case LINKBAG:
-                // we don't process these as a separate attribute
-                break;
+    	case DOUBLE:
+    		convertedValue = OType.convert(valueToConvert, Double.class);
+    		break;
 
-            case EMBEDDEDSET:
-                convertedValue = OType.convert(valueToConvert, Set.class);
-                break;
-        }
-        return  convertedValue;
+    	case INTEGER:
+    		convertedValue = OType.convert(valueToConvert, Integer.class);
+    		break;
+
+    	case FLOAT:
+    		convertedValue = OType.convert(valueToConvert, Float.class);
+    		break;
+
+    	case LINKBAG:
+    		// we don't process these as a separate attribute
+    		break;
+
+    	case EMBEDDEDSET:
+    		convertedValue = OType.convert(valueToConvert, Set.class);
+    		break;
+    	}
+    	return  convertedValue;
     }
 
     /**

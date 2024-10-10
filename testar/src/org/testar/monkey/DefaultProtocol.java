@@ -237,6 +237,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					popupMessage("Please select a file.html (output/reports) to use in the View mode");
 					System.out.println("Exception: Please select a file.html (output/reports) to use in the View mode");
 				}
+			} else if (mode() == Modes.ListeningManual) {
+				new ListeningModeManual().runListeningLoop(this);
+			} else if (mode() == Modes.ListeningScript) {
+				new ListeningModeScript().runListeningLoop(this);
 			} else if (mode() == Modes.Replay && isValidFile()) {
 				new ReplayMode().runReplayLoop(this);
 			} else if (mode() == Modes.Spy) {
@@ -321,7 +325,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		logOracleEnabled = settings.get(ConfigTags.LogOracleEnabled, false);
 
-		if ( mode() == Modes.Generate || /*mode() == Modes.Record ||*/ mode() == Modes.Replay ) {
+		if ( mode() == Modes.Generate || /*mode() == Modes.Record ||*/ mode() == Modes.Replay 
+				|| mode() == Modes.ListeningManual || mode() == Modes.ListeningScript) {
 			//Create the output folders
 			OutputStructure.calculateOuterLoopDateString();
 			OutputStructure.sequenceInnerLoopCount = 0;
