@@ -11,10 +11,12 @@ import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
+import org.testar.monkey.alayer.actions.NOP;
 import org.testar.monkey.alayer.actions.WdRemoteClickAction;
 import org.testar.monkey.alayer.actions.WdRemoteTypeAction;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 import org.testar.monkey.alayer.webdriver.WdWidget;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -106,7 +108,7 @@ public class LlmActionSelector implements IActionSelector {
      * 1. The prompt is generated.
      * 2. The prompt is sent to the LLM.
      * 3. The response from the LLM is parsed.
-     * TODO: Retry mechanism, Trim conversation when exceeding token limit
+     * TODO: Trim conversation when exceeding token limit?
      * @param state The current state of the SUT.
      * @param actions Set of actions in the current state.
      * @return The action to execute or null if failed.
@@ -131,17 +133,29 @@ public class LlmActionSelector implements IActionSelector {
 
                 return actionToTake;
             }
+            // Failures return no operation (NOP) actions to prevent crashing.
+            // We do not add these to the action history.
             case OUT_OF_RANGE -> {
-                // TODO: Retry mechanism
-                // conversation.addMessage("user", retryOutOfRange);
+                conversation.addMessage("user", "The actionId provided was invalid.");
+                return new NOP();
             }
             case PARSE_FAILED -> {
-                // TODO: Retry mechanism
-                // conversation.addMessage("user", retryParseFailed);
+                conversation.addMessage("user", """
+                        The output you provided was not formatted correctly. \
+                        Please use the following format: \
+                        
+                        {
+                        "actionId": 1,
+                        "input": "Text"
+                        }
+                        """);
+                return new NOP();
+            }
+            default -> {
+                logger.log(Level.ERROR, "ParseResult was null, this should never happen!");
+                return new NOP();
             }
         }
-
-        return null;
     }
 
     /**
@@ -172,6 +186,7 @@ public class LlmActionSelector implements IActionSelector {
                 switch(type) {
                     case "ClickTypeInto":
                         // TODO: Differentiate between types of input fields (numeric, password, etc.)
+                        // widget.get(WdTags.WebType)
                         builder.append(String.format("%d: Type in TextField '%s'", i, description));
                         break;
                     case "LeftClickAt":
