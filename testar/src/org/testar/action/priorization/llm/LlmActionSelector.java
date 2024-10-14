@@ -2,15 +2,13 @@ package org.testar.action.priorization.llm;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.IActionSelector;
 import org.testar.monkey.Main;
-import org.testar.monkey.alayer.Action;
-import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Tags;
-import org.testar.monkey.alayer.Widget;
+import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.NOP;
 import org.testar.monkey.alayer.actions.WdRemoteClickAction;
 import org.testar.monkey.alayer.actions.WdRemoteTypeAction;
@@ -185,9 +183,9 @@ public class LlmActionSelector implements IActionSelector {
                 // Depending on the action, format into something the LLM is more likely to understand.
                 switch(type) {
                     case "ClickTypeInto":
-                        // TODO: Differentiate between types of input fields (numeric, password, etc.)
-                        // widget.get(WdTags.WebType)
-                        builder.append(String.format("%d: Type in TextField '%s'", i, description));
+                        // Differentiate between types of input fields. Example: password -> Password Field
+                        String fieldType = StringUtils.capitalize(widget.get(WdTags.WebType, "text"));
+                        builder.append(String.format("%d: Type in %sField '%s'", i, fieldType, description));
                         break;
                     case "LeftClickAt":
                         builder.append(String.format("%d: Click on '%s'", i, description));
