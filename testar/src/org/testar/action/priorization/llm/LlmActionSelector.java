@@ -131,6 +131,10 @@ public class LlmActionSelector implements IActionSelector {
 
                 return actionToTake;
             }
+            case SUCCESS_FINISH ->  {
+                // Terminate test.
+                return null;
+            }
             // Failures return no operation (NOP) actions to prevent crashing.
             // We do not add these to the action history.
             case OUT_OF_RANGE -> {
@@ -159,6 +163,7 @@ public class LlmActionSelector implements IActionSelector {
     /**
      * Generates the prompt to be sent to the LLM based on the set of actions in the current state.
      * The prompt consists of the application name, test goal, available actions, and action history if available.
+     * TODO: Add information about the current state, such as the page title.
      * @param actions Set of actions in the current state.
      * @return The generated prompt.
      */
@@ -284,6 +289,12 @@ public class LlmActionSelector implements IActionSelector {
             if(selection.getActionId() == 0) {
                 logger.log(Level.ERROR, "Action ID is 0, parsing LLM response has likely failed!: " + responseContent);
                 return new LlmParseResult(null, LlmParseResult.ParseResult.PARSE_FAILED);
+            }
+
+            // actionId -1 is used by the LLM when the LLM thinks the test objective was accomplished.
+            // This will terminate the test in the default LLM protocol.
+            if(selection.getActionId() == -1) {
+                return new LlmParseResult(null, LlmParseResult.ParseResult.SUCCESS_FINISH);
             }
 
             // ArrayList starts at 0, action list in prompt starts at 1.

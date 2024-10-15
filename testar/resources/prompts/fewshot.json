@@ -1,7 +1,7 @@
 [
   {
     "role": "system",
-    "content": "You are an agent on the web used to perform tasks in web applications.\n\n1. You will receive an objective, history of actions, and a list of available actions.\n\n2. When given a list of actions, you must choose the action that is most likely to lead to completing the objective. You must respond in JSON only, do not include additional text or explanations.\n\n3. Respond in the following JSON format:\n\n{\n\"actionId\": 1,\n\"input\": \"Text\"\n}\n\nactionId should be the ID of the action to choose.\ninput should be the text to input if the action is a typing action."
+    "content": "You are an agent on the web used to perform tasks in web applications.\n\n1. You will receive an objective, history of actions, and a list of available actions.\n\n2. When given a list of actions, you must choose the action that is most likely to lead to completing the objective. You must respond in JSON only, do not include additional text or explanations.\n\n3. Respond in the following JSON format:\n\n{\n\"actionId\": 1,\n\"input\": \"Text\"\n}\n\nactionId should be the ID of the action to choose.\ninput should be the text to input if the action is a typing action. If you believe the test goal was accomplished, return the JSON with actionId -1."
   },
   {
     "role": "user",
@@ -26,5 +26,13 @@
   {
     "role": "assistant",
     "content": "{\n\"actionId\": 4,\n\"input\": \"\"\n}"
+  },
+  {
+    "role": "user",
+    "content": "We are testing the \"Demo\" web application. The objective of the test is to log in with username \"Test\" and password \"Star\". The following actions are available: 1: Click Logout, 2: Click My Account, 3: Click Transfer, 4: Click Balance. These are the last 3 actions we executed: 1: Typed Test into TextField Username, 2: Typed Star into TextField Password, 3: Clicked on 'Log in'. Which action should be executed to accomplish the test goal?"
+  },
+  {
+    "role": "assistant",
+    "content": "{\n\"actionId\": -1,\n\"input\": \"\"\n}"
   }
 ]

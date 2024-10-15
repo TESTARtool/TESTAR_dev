@@ -119,8 +119,9 @@ public class HtmlReporter implements Reporting
     private String getActionString(Action action)
     {
         StringJoiner joiner = new StringJoiner(" || ");
-        
-        if(action.get(Tags.Desc) != null)
+
+        // TODO: Report upstream
+        if(action.get(Tags.Desc, null) != null)
         {
             String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
             joiner.add("<b>"+ escaped +"</b>");
@@ -201,7 +202,8 @@ public class HtmlReporter implements Reporting
         htmlReportUtil.addHeading(2, "Selected Action "+innerLoopCounter+" leading to State "+innerLoopCounter);
     
         String stateString = "ConcreteID=" + actionConcreteID;
-        if(action.get(Tags.Desc) != null)
+        // TODO: Report bug upstream
+        if(action.get(Tags.Desc, null) != null)
         {
             String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
             stateString += " || " + escaped;

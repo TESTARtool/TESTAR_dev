@@ -54,6 +54,7 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 public class Protocol_03_webdriver_llm extends WebdriverProtocol {
+	private boolean testGoalAccomplished = false;
 
 	// This list tracks the detected erroneous verdicts to avoid duplicates
 	private List<String> listOfDetectedErroneousVerdicts = new ArrayList<>();
@@ -136,11 +137,13 @@ public class Protocol_03_webdriver_llm extends WebdriverProtocol {
 	 */
 	@Override
 	protected Verdict getVerdict(State state) {
-
 		// System crashes, non-responsiveness and suspicious tags automatically detected!
 		// For web applications, web browser errors and warnings can also be enabled via settings
 		Verdict verdict = super.getVerdict(state);
-
+		if(testGoalAccomplished) {
+			verdict = new Verdict(Verdict.SEVERITY_FAIL, "LLM believes test goal was accomplished, " +
+					"test completed. This is not an error.");
+		}
 		// If the Verdict is not OK but was already detected in a previous sequence
 		// Consider as OK to avoid duplicates and continue testing
 		if (verdict != Verdict.OK && containsVerdictInfo(listOfDetectedErroneousVerdicts, verdict.info())) {
@@ -496,7 +499,15 @@ public class Protocol_03_webdriver_llm extends WebdriverProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions) {
-		return llmActionSelector.selectAction(state, actions);
+		Action toExecute = llmActionSelector.selectAction(state, actions);
+		// Null is returned when the LLM wants to terminate the test (if the test goal is believed to be accomplished)
+		// If there is a problem with action selection, a NOP action will be executed.
+		if(toExecute == null) {
+			// LLM thinks test goal is accomplished, perform no action and set flag for getVerdict to terminate test.
+			testGoalAccomplished = true;
+			return new NOP();
+		}
+		return toExecute;
 	}
 
 	/**
