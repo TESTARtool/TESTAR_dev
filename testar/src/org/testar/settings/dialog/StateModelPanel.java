@@ -138,9 +138,9 @@ public class StateModelPanel extends SettingsPanel {
 
         // add the components to the panel
         setLayout(null);
-        label1.setBounds(10,14,150,27);
+        label1.setBounds(10, 14, 150, 27);
         add(label1);
-        stateModelEnabledChkBox.setBounds(160,14,50,27);
+        stateModelEnabledChkBox.setBounds(160, 14, 50, 27);
         stateModelEnabledChkBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -153,14 +153,14 @@ public class StateModelPanel extends SettingsPanel {
         });
         add(stateModelEnabledChkBox);
 
-        label2.setBounds(10,52,150,27);
+        label2.setBounds(10, 52, 150, 27);
         add(label2);
-        dataStoreTextfield.setBounds(160,52,125,27);
+        dataStoreTextfield.setBounds(160, 52, 125, 27);
         add(dataStoreTextfield);
 
-        label3.setBounds(10,90,150,27);
+        label3.setBounds(10, 90, 150, 27);
         add(label3);
-        dataStoreTypeBox.setBounds(160,90,125,27);
+        dataStoreTypeBox.setBounds(160, 90, 125, 27);
         dataStoreTypeBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -169,14 +169,14 @@ public class StateModelPanel extends SettingsPanel {
         });
         add(dataStoreTypeBox);
 
-        label4.setBounds(10,128,150,27);
+        label4.setBounds(10, 128, 150, 27);
         add(label4);
-        dataStoreServerTextfield.setBounds(160,128,125,27);
+        dataStoreServerTextfield.setBounds(160, 128, 125, 27);
         add(dataStoreServerTextfield);
 
-        label13.setBounds(10,166,150,27);
+        label13.setBounds(10, 166, 150, 27);
         add(label13);
-        dataStoreDirectoryField.setBounds(160,166,125,27);
+        dataStoreDirectoryField.setBounds(160, 166, 125, 27);
         dataStoreDirectoryField.setEditable(false);
         add(dataStoreDirectoryField);
 
@@ -185,24 +185,24 @@ public class StateModelPanel extends SettingsPanel {
         dirButton.setToolTipText("Select the 'databases' folder in your orientdb installation. Make sure the OrientDB server is not running.");
         add(dirButton);
 
-        label5.setBounds(10,204,150,27);
+        label5.setBounds(10, 204, 150, 27);
         add(label5);
-        dataStoreDBTextfield.setBounds(160,204,125,27);
+        dataStoreDBTextfield.setBounds(160, 204, 125, 27);
         add(dataStoreDBTextfield);
 
-        label6.setBounds(10,242,150,27);
+        label6.setBounds(10, 242, 150, 27);
         add(label6);
-        dataStoreUserTextfield.setBounds(160,242,125,27);
+        dataStoreUserTextfield.setBounds(160, 242, 125, 27);
         add(dataStoreUserTextfield);
 
-        label7.setBounds(10,280,150,27);
+        label7.setBounds(10, 280, 150, 27);
         add(label7);
-        dataStorePasswordfield.setBounds(160,280,125,27);
+        dataStorePasswordfield.setBounds(160, 280, 125, 27);
         add(dataStorePasswordfield);
 
-        label8.setBounds(10,318,150,27);
+        label8.setBounds(10, 318, 150, 27);
         add(label8);
-        dataStoreModeBox.setBounds(160,318,125,27);
+        dataStoreModeBox.setBounds(160, 318, 125, 27);
         add(dataStoreModeBox);
 
         // NEW COLUMN
@@ -211,13 +211,13 @@ public class StateModelPanel extends SettingsPanel {
         stateModelWidgetStoreChkBox.setBounds(480, 52, 50, 27);
         add(stateModelWidgetStoreChkBox);
 
-        label9.setBounds(330,128,150,27);
+        label9.setBounds(330,90,150,27);
         add(label9);
-        resetDatabaseCheckbox.setBounds(480, 128, 50, 27);
+        resetDatabaseCheckbox.setBounds(480, 90, 50, 27);
         resetDatabaseCheckbox.setToolTipText("This will reset the database. All stored information will be lost.");
         add(resetDatabaseCheckbox);
 
-        analysisButton.setBounds(330, 166, 150, 27);
+        analysisButton.setBounds(330, 128, 150, 27);
         analysisButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -227,7 +227,7 @@ public class StateModelPanel extends SettingsPanel {
         });
         add(analysisButton);
 
-        stateTagsButton.setBounds(330, 204, 150, 27);
+        stateTagsButton.setBounds(330, 166, 150, 27);
         stateTagsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -236,12 +236,12 @@ public class StateModelPanel extends SettingsPanel {
         });
         add(stateTagsButton);
 
-        label15.setBounds(330,242,100,27);
+        label15.setBounds(330, 204, 100, 27);
         add(label15);
-        actionSelectionBox.setBounds(430, 242,175,27);
+        actionSelectionBox.setBounds(430, 204, 175, 27);
         add(actionSelectionBox);
 
-        label14.setBounds(330, 280, 300, 27);
+        label14.setBounds(330, 242, 300, 27);
         add(label14);
 
     }

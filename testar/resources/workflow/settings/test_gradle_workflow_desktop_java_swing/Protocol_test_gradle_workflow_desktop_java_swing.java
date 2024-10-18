@@ -32,6 +32,8 @@ import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -40,6 +42,7 @@ import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.monkey.Util;
 import org.testar.OutputStructure;
+import org.testar.coverage.CodeCoverageManager;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
@@ -48,6 +51,7 @@ import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.protocols.DesktopProtocol;
+import org.testar.settings.Settings;
 
 /**
  * This protocol is used to test TESTAR by executing a gradle CI workflow.
@@ -55,6 +59,15 @@ import org.testar.protocols.DesktopProtocol;
  * ".github/workflows/gradle.yml"
  */
 public class Protocol_test_gradle_workflow_desktop_java_swing extends DesktopProtocol {
+
+	private CodeCoverageManager codeCoverageManager;
+
+	@Override
+	protected void initialize(Settings settings){
+		super.initialize(settings);
+		// Initialize the code coverage extractor using the test settings values
+		codeCoverageManager = new CodeCoverageManager(settings);
+	}
 
 	@Override
 	protected SUT startSystem() throws SystemStartException {
@@ -67,6 +80,9 @@ public class Protocol_test_gradle_workflow_desktop_java_swing extends DesktopPro
 
 	@Override
 	protected void beginSequence(SUT system, State state){
+		// Before executing the first SUT action, extract the initial coverage
+		codeCoverageManager.getActionCoverage("0");
+
 		super.beginSequence(system, state);
 
 		// Verify that Themes Java Swing widget is found in the GUI
@@ -83,8 +99,8 @@ public class Protocol_test_gradle_workflow_desktop_java_swing extends DesktopPro
 	protected State getState(SUT system) throws StateBuildException {
 		State state = super.getState(system);
 
-		// DEBUG: That widgets have screen bounds in the GUI of the remote server
-		for(Widget w : state) {
+		// DEBUG: Top widgets that have screen bounds in the GUI of the remote server
+		for(Widget w : getTopWidgets(state)) {
 			String debug = String.format("Widget: '%s' ", w.get(Tags.Title, ""));
 			if(w.get(Tags.Shape, null) != null) {
 				debug = debug.concat(String.format("with Shape: %s", w.get(Tags.Shape, null)));
@@ -107,8 +123,8 @@ public class Protocol_test_gradle_workflow_desktop_java_swing extends DesktopPro
 		// BUILD CUSTOM ACTIONS
 		//----------------------
 
-		// iterate through all widgets
-		for(Widget w : state){
+		// iterate through the top widgets of the state (used for menu items)
+		for(Widget w : getTopWidgets(state)){
 
 			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
 
@@ -164,12 +180,93 @@ public class Protocol_test_gradle_workflow_desktop_java_swing extends DesktopPro
 	}
 
 	@Override
+	protected boolean executeAction(SUT system, State state, Action action){
+		boolean executed = super.executeAction(system, state, action);
+		// After executing the SUT action, extract the action coverage
+		codeCoverageManager.getActionCoverage(String.valueOf(actionCount));
+		return executed;
+	}
+
+	@Override
+	protected void finishSequence(){
+		// Before finishing the sequence and closing the SUT, extract the sequence coverage
+		codeCoverageManager.getSequenceCoverage();
+
+		// Don't use the call SystemProcessHandling.killTestLaunchedProcesses before stopSystem
+		// Invoking a jar app considers the java.exe a test launched process instead the main one
+
+		// In fact, finishSequence is maybe the wrong moment to invoke killTestLaunchedProcesses
+	}
+
+	@Override
+	protected void stopSystem(SUT system) {
+		State state = super.getState(system);
+
+		// Verify that the top Java Swing widget Open Menu Item is found
+		Widget openMenuItemWidget = null;
+		for(Widget w : getTopWidgets(state)) {
+			if(w.get(Tags.Title, "").contains("Open")) {
+				System.out.println("Found: " + w.get(Tags.Title) + ", enabled? " + w.get(Tags.Enabled));
+				openMenuItemWidget = w;
+			}
+		}
+
+		Assert.notNull(openMenuItemWidget); // Widget was found
+		Assert.isTrue(!(openMenuItemWidget.get(Tags.Enabled))); // And Is Disabled by default
+
+		super.finishSequence(); // call SystemProcessHandling.killTestLaunchedProcesses
+		super.stopSystem(system);
+	}
+
+	@Override
 	protected void closeTestSession() {
 		super.closeTestSession();
+
+		// Verify the jacoco coverage folder has been created
+		String jacocoDirectory = OutputStructure.outerLoopOutputDir 
+				+ File.separator + "coverage" 
+				+ File.separator + "jacoco";
+		Assert.isTrue(new File(jacocoDirectory).exists());
+
+		// Verify the jacoco coverage files have been created
+		String jacocoFiles = jacocoDirectory + File.separator 
+				+ OutputStructure.startOuterLoopDateString + "_" 
+				+ OutputStructure.executedSUTname;
+
+		Assert.isTrue(new File(jacocoFiles + "_sequence_1.exec").exists());
+		Assert.isTrue(new File(jacocoFiles + "_sequence_1.csv").exists());
+		Assert.isTrue(new File(jacocoFiles + "_sequence_1_action_0.exec").exists());
+		Assert.isTrue(new File(jacocoFiles + "_sequence_1_action_0.csv").exists());
+		Assert.isTrue(new File(jacocoFiles + "_sequence_1_action_1.exec").exists());
+		Assert.isTrue(new File(jacocoFiles + "_sequence_1_action_1.csv").exists());
+		Assert.isTrue(new File(jacocoFiles + "_sequence_1_action_1_merged.exec").exists());
+		Assert.isTrue(new File(jacocoFiles + "_sequence_1_action_1_merged.csv").exists());
+
+		Assert.isTrue(fileContains("FileChooserDemo", new File(jacocoFiles + "_sequence_1.csv")));
+		Assert.isTrue(fileContains("SwingSet2", new File(jacocoFiles + "_sequence_1.csv")));
+		Assert.isTrue(fileContains("ProgressBarDemo", new File(jacocoFiles + "_sequence_1.csv")));
+
 		try {
 			File originalFolder = new File(OutputStructure.outerLoopOutputDir).getCanonicalFile();
 			File artifactFolder = new File(Main.testarDir + settings.get(ConfigTags.ApplicationName,""));
 			FileUtils.copyDirectory(originalFolder, artifactFolder);
 		} catch(Exception e) {System.out.println("ERROR: Creating Artifact Folder");}
+	}
+
+	private boolean fileContains(String searchText, File file) {
+		try (Scanner scanner = new Scanner(file)) {
+			// Read the content of the file line by line
+			while (scanner.hasNextLine()) {
+				String line = scanner.nextLine();
+
+				// Check if the line contains the specific text
+				if (line.contains(searchText)) {
+					return true;
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 }

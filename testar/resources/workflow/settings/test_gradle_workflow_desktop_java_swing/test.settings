@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = java -jar "suts/SwingSet2.jar"
+SUTConnectorValue = java -jar -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -javaagent:../lib/org.jacoco.agent-0.8.12-runtime.jar=output=none,jmx=true "suts/SwingSet2.jar"
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
@@ -116,6 +116,16 @@ ProtocolClass = test_gradle_workflow_desktop_java_swing/Protocol_test_gradle_wor
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
 AbstractStateAttributes = WidgetControlType
+
+#################################################################
+# Settings to configure code coverage features
+#################################################################
+
+JacocoCoverage = true
+JacocoCoverageIpAddress = localhost
+JacocoCoveragePort = 5000
+JacocoCoverageClasses = suts/SwingSet2
+JacocoCoverageAccumulate = true
 
 #################################################################
 # Other more advanced settings

@@ -220,4 +220,21 @@ public class BuildActionsIdentifiers {
 		Assert.notNull(pasteReplaceAction.get(Tags.AbstractID));
 		Assert.notNull(pasteReplaceAction.get(Tags.ConcreteID));
 	}
+
+	@Test
+	public void buildNoOperationalStateAction() {
+		// Create the NOP action and Assert that the state is set as the OriginWidget Tag 
+		Action NOPAction = ac.noOperationalState(state);
+		// Verify Action <-> Widget mapping
+		Assert.notNull(NOPAction.get(Tags.OriginWidget));
+		Assert.notNull(state.get(Tags.ActionSet));
+		Assert.isTrue(state.get(Tags.ActionSet).size() == 1);
+		Assert.notNull(state.get(Tags.ActionSet).iterator().next().get(Tags.Desc));
+		Assert.isTrue(state.get(Tags.ActionSet).iterator().next().get(Tags.Desc, "").contains("No Operation"));
+		// Then build the action identifiers
+		defaultProtocol.buildStateActionsIdentifiers(state, new HashSet<>(Collections.singletonList(NOPAction)));
+		// To check that Action identifiers were built
+		Assert.notNull(NOPAction.get(Tags.AbstractID));
+		Assert.notNull(NOPAction.get(Tags.ConcreteID));
+	}
 }

@@ -103,12 +103,9 @@ public class PlainTextReporter implements Reporting
     private String getActionString(Action action)
     {
         StringJoiner joiner = new StringJoiner(" || ");
-        
-        if(action.get(Tags.Desc) != null)
-        {
-            String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
-            joiner.add(escaped);
-        }
+
+        String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc, "NoActionDescriptionAvailable"));
+        joiner.add(escaped);
         joiner.add(StringEscapeUtils.escapeHtml(action.toString()));
         joiner.add("ConcreteID="+action.get(Tags.ConcreteID, "NoConcreteIdAvailable"));
         joiner.add("AbstractID="+action.get(Tags.AbstractID, "NoAbstractIdAvailable"));
@@ -179,11 +176,8 @@ public class PlainTextReporter implements Reporting
         plainTextReportUtil.addHeading(3, "Selected Action "+innerLoopCounter+" leading to State "+innerLoopCounter);
         
         String stateString = "ConcreteID=" + actionConcreteID;
-        if(action.get(Tags.Desc) != null)
-        {
-            String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc));
-            stateString += " || " + escaped;
-        }
+        String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc, "NoActionDescriptionAvailable"));
+        stateString += " || " + escaped;
         plainTextReportUtil.addHeading(5, stateString);
         
         
