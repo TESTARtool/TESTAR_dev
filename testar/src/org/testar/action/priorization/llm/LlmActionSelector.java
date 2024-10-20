@@ -121,7 +121,7 @@ public class LlmActionSelector implements IActionSelector {
         LlmParseResult llmParseResult = parseLlmResponse(new ArrayList<>(actions), llmResponse);
 
         switch(llmParseResult.getParseResult()) {
-            case SUCCESS -> {
+            case SUCCESS: {
                 Action actionToTake = llmParseResult.getActionToExecute();
 
                 logger.log(Level.DEBUG, "Selected action: " + actionToTake.toShortString());
@@ -131,29 +131,27 @@ public class LlmActionSelector implements IActionSelector {
 
                 return actionToTake;
             }
-            case SUCCESS_FINISH ->  {
+            case SUCCESS_FINISH:  {
                 // Terminate test.
                 return null;
             }
             // Failures return no operation (NOP) actions to prevent crashing.
             // We do not add these to the action history.
-            case OUT_OF_RANGE -> {
+            case OUT_OF_RANGE: {
                 conversation.addMessage("user", "The actionId provided was invalid.");
                 return new NOP();
             }
-            case PARSE_FAILED -> {
-                conversation.addMessage("user", """
-                        The output you provided was not formatted correctly. \
-                        Please use the following format: \
-                        
-                        {
-                        "actionId": 1,
-                        "input": "Text"
-                        }
-                        """);
+            case PARSE_FAILED: {
+                conversation.addMessage("user", 
+                        "The output you provided was not formatted correctly. "
+                        + "Please use the following format: \n\n"
+                        + "{\n"
+                        + "\"actionId\": 1,\n"
+                        + "\"input\": \"Text\"\n"
+                        + "}");
                 return new NOP();
             }
-            default -> {
+            default: {
                 logger.log(Level.ERROR, "ParseResult was null, this should never happen!");
                 return new NOP();
             }
