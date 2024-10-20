@@ -210,6 +210,25 @@ public final class ConfigTags {
 			"Settings (string) that can be used for user specified protocols");
 
 	/**
+	 * Coverage settings
+	 */
+
+	public static final Tag<Boolean> JacocoCoverage = Tag.from("JacocoCoverage", Boolean.class,
+			"Sets whether to extract Jacoco Coverage");
+
+	public static final Tag<String> JacocoCoverageIpAddress = Tag.from("JacocoCoverageIpAddress", String.class, 
+			"The JMX IP Address on which the Jacoco Agent is running");
+
+	public static final Tag<Integer> JacocoCoveragePort = Tag.from("JacocoCoveragePort", Integer.class, 
+			"The JMX port on which the Jacoco Agent is running");
+
+	public static final Tag<String> JacocoCoverageClasses = Tag.from("JacocoCoverageClasses", String.class, 
+			"The SUT class files that Jacoco uses to create the CSV report");
+
+	public static final Tag<Boolean> JacocoCoverageAccumulate = Tag.from("JacocoCoverageAccumulate", Boolean.class,
+			"Sets whether Jacoco coverage will be accumulated across the run sequences");
+
+	/**
 	 * Additional settings with descriptions
 	 */
 

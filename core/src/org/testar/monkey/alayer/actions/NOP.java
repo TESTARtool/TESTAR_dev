@@ -48,7 +48,12 @@ public class NOP extends TaggableBase implements Action {
 	private static final long serialVersionUID = 8622084462407313716L;
 	
 	public static final String NOP_ID = "No Operation"; // by urueda
-	
+
+	public NOP() {
+		this.set(Tags.Desc, NOP_ID);
+		this.set(Tags.Role, ActionRoles.NOPAction);
+	}
+
 	public void run(SUT system, State state, double duration){ Util.pause(duration); }
 	
 	public String toString(){ return NOP_ID; }
