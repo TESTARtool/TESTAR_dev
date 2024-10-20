@@ -150,6 +150,22 @@ public final class ConfigTags {
 			"Specify the widget attributes that you wish to use in constructing the widget and state hash strings. Use a comma separated list.");
 
 	/**
+	 * Large Language Models settings 
+	 */
+
+	public static final Tag<String> LlmHostAddress = Tag.from("LlmHostAddress", String.class,
+			"The Host Address on which the LLM agent is running");
+
+	public static final Tag<Integer> LlmHostPort = Tag.from("LlmHostPort", Integer.class, 
+			"The Host Port on which the LLM agent is listening");
+
+	public static final Tag<String> LlmTestGoalDescription = Tag.from("LlmTestGoalDescription", String.class,
+			"The objective of the test for the LLM agent");
+
+	public static final Tag<String> LlmFewshotFile = Tag.from("LlmFewshotFile", String.class,
+			"The location of the fewshot file that contains the prompt instructions");
+
+	/**
 	 * WebDriver settings 
 	 */
 

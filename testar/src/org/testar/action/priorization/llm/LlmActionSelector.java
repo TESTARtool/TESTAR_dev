@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.IActionSelector;
+import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.NOP;
@@ -15,6 +16,7 @@ import org.testar.monkey.alayer.actions.WdRemoteTypeAction;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.settings.Settings;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -33,11 +35,11 @@ import java.util.Set;
 public class LlmActionSelector implements IActionSelector {
     protected static final Logger logger = LogManager.getLogger();
 
-    // TODO: Make configurable in GUI?
-    private final String testGoal;
     private final String host;
+    private final int port;
+    private final String testGoal;
+    private final String fewshotFile;
     private final String appName;
-    private final int port ;
 
     private ActionHistory actionHistory = new ActionHistory(5);
     private LlmConversation conversation;
@@ -46,34 +48,20 @@ public class LlmActionSelector implements IActionSelector {
     private Gson gson = new Gson();
 
     /**
-     * Creates a new LlmActionSelector. Uses the default host and port for running LMStudio locally.
-     * @param testGoal The objective of the test. Ex: Log in with username john and password demo.
-     * @param appName The name of the SUT.
-     */
-    public LlmActionSelector(String testGoal, String appName) {
-        this.testGoal = testGoal;
-
-        // Use defaults
-        this.host = "http://127.0.0.1";
-        this.port = 1234;
-        this.appName = appName;
-
-        initConversation();
-    }
-
-    /**
      * Creates a new LlmActionSelector.
-     * @param testGoal The objective of the test. Ex: Log in with username john and password demo.
-     * @param host The host of the OpenAI compatible LLM API. Ex: http://127.0.0.1.
-     * @param port The port of the API.
-     * @param appName The name of the SUT.
+     * @param settings with contains:
+     * 1. LlmHostAddress for the host of the OpenAI compatible LLM API. Ex: http://127.0.0.1.
+     * 2. LlmHostPort for the port of the API.
+     * 3. LlmTestGoalDescription for the objective of the test. Ex: Log in with username john and password demo.
+     * 4. LlmFewshotFile for the fewshot file that contains the prompt instructions.
+     * 5. ApplicationName for the name of the SUT.
      */
-    public LlmActionSelector(String testGoal, String host, int port, String appName) {
-        this.testGoal = testGoal;
-        this.host = host;
-        this.port = port;
-        // TODO: Can we extract this from within the protocol?
-        this.appName = appName;
+    public LlmActionSelector(Settings settings) {
+    	this.host = settings.get(ConfigTags.LlmHostAddress);
+    	this.port = settings.get(ConfigTags.LlmHostPort);
+    	this.testGoal = settings.get(ConfigTags.LlmTestGoalDescription);
+    	this.fewshotFile = settings.get(ConfigTags.LlmFewshotFile);
+    	this.appName = settings.get(ConfigTags.ApplicationName);
 
         initConversation();
     }
@@ -91,7 +79,7 @@ public class LlmActionSelector implements IActionSelector {
         conversation = new LlmConversation();
 
         try {
-            String initPromptJson = getTextResource("prompts/fewshot.json");
+            String initPromptJson = getTextResource(this.fewshotFile);
             LlmConversation.Message[] initMessages = gson.fromJson(initPromptJson, LlmConversation.Message[].class);
             for(LlmConversation.Message message : initMessages) {
                 conversation.addMessage(message);
