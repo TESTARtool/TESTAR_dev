@@ -6,15 +6,15 @@ package org.testar.action.priorization.llm;
  * input refers to the characters to enter into the widget if applicable.
  */
 public class LlmSelection {
-    private int actionId;
+    private String actionId;
     private String input;
 
-    public LlmSelection(int actionId, String input) {
+    public LlmSelection(String actionId, String input) {
         this.actionId = actionId;
         this.input = input;
     }
 
-    public int getActionId() {
+    public String getActionId() {
         return actionId;
     }
 

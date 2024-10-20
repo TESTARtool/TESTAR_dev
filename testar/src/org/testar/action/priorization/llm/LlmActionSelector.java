@@ -10,11 +10,11 @@ import org.testar.IActionSelector;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.actions.CompoundAction;
 import org.testar.monkey.alayer.actions.NOP;
-import org.testar.monkey.alayer.actions.WdRemoteClickAction;
-import org.testar.monkey.alayer.actions.WdRemoteTypeAction;
+import org.testar.monkey.alayer.actions.PasteText;
+import org.testar.monkey.alayer.actions.Type;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
-import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.settings.Settings;
 
@@ -23,7 +23,6 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Set;
 
 /**
@@ -106,7 +105,7 @@ public class LlmActionSelector implements IActionSelector {
 
         String conversationJson = gson.toJson(conversation);
         String llmResponse = getResponseFromLlm(conversationJson);
-        LlmParseResult llmParseResult = parseLlmResponse(new ArrayList<>(actions), llmResponse);
+        LlmParseResult llmParseResult = parseLlmResponse(actions, llmResponse);
 
         switch(llmParseResult.getParseResult()) {
             case SUCCESS: {
@@ -159,16 +158,11 @@ public class LlmActionSelector implements IActionSelector {
         builder.append(String.format("The objective of the test is: %s. ", testGoal));
         builder.append("The following actions are available: ");
 
-        int i = 1;
         for (Action action : actions) {
             try {
                 Widget widget = action.get(Tags.OriginWidget);
-
-                if(i != 1) {
-                    builder.append(", ");
-                }
-
                 String type = action.get(Tags.Role).name();
+                String actionId = action.get(Tags.ConcreteID, "Unknown ActionId");
                 String description = widget.get(Tags.Desc, "No description");
 
                 // Depending on the action, format into something the LLM is more likely to understand.
@@ -176,26 +170,30 @@ public class LlmActionSelector implements IActionSelector {
                     case "ClickTypeInto":
                         // Differentiate between types of input fields. Example: password -> Password Field
                         String fieldType = StringUtils.capitalize(widget.get(WdTags.WebType, "text"));
-                        builder.append(String.format("%d: Type in %sField '%s'", i, fieldType, description));
+                        builder.append(String.format("%s: Type in %sField '%s'", actionId, fieldType, description));
                         break;
                     case "LeftClickAt":
-                        builder.append(String.format("%d: Click on '%s'", i, description));
+                        builder.append(String.format("%s: Click on '%s'", actionId, description));
                         break;
                     default:
                         logger.log(Level.WARN, "Unsupported action type for LLM action selection: " + type);
                         break;
                 }
 
-                i++;
             } catch(NoSuchTagException e) {
                 // This usually happens when OriginWidget is unknown, so we skip these.
                 logger.log(Level.WARN, "Action is missing critical tags, skipping.");
             }
+
+            builder.append(", ");
         }
+
         builder.append(". ");
+
         if(!actionHistory.getActions().isEmpty()) {
             builder.append(actionHistory.toString());
         }
+
         builder.append("Which action should be executed to accomplish the test goal?");
 
         return builder.toString();
@@ -263,68 +261,77 @@ public class LlmActionSelector implements IActionSelector {
 
     /**
      * Parses the response sent by the LLM and selects an action if the response was valid.
-     * @param actions ArrayList of actions in the current state.
+     * @param actions Set of actions in the current state.
      * @param responseContent The response of the LLM in plaintext.
      * @return LlmParseResult containing the result of the parse and the action to execute if parsing was successful.
      */
-    private LlmParseResult parseLlmResponse(ArrayList<Action> actions, String responseContent) {
+    private LlmParseResult parseLlmResponse(Set<Action> actions, String responseContent) {
         try {
             LlmSelection selection = gson.fromJson(responseContent, LlmSelection.class);
 
-            // If actionId is 0 at this stage, parsing has likely failed (there is never an action 0).
-            if(selection.getActionId() == 0) {
-                logger.log(Level.ERROR, "Action ID is 0, parsing LLM response has likely failed!: " + responseContent);
-                return new LlmParseResult(null, LlmParseResult.ParseResult.PARSE_FAILED);
-            }
-
-            // actionId -1 is used by the LLM when the LLM thinks the test objective was accomplished.
+            // actionId 'complete' is used by the LLM when the LLM thinks the test objective was accomplished.
             // This will terminate the test in the default LLM protocol.
-            if(selection.getActionId() == -1) {
+            if(selection.getActionId().toLowerCase().contains("complete")) {
                 return new LlmParseResult(null, LlmParseResult.ParseResult.SUCCESS_FINISH);
             }
 
-            // ArrayList starts at 0, action list in prompt starts at 1.
-            int actionId = selection.getActionId() -1;
-            String input = selection.getInput();
+            Action selectedAction = getActionByIdentifier(actions, selection.getActionId());
 
-            if(actionId >= actions.size()) {
-                logger.log(Level.ERROR, String.format("Action %d requested by LLM is out of range!", actionId));
-                return new LlmParseResult(null, LlmParseResult.ParseResult.OUT_OF_RANGE);
-            } else {
-                Action actionToExecute = actions.get(actionId);
-                Action convertedAction = convertCompoundAction(actionToExecute, input);
-                return new LlmParseResult(convertedAction, LlmParseResult.ParseResult.SUCCESS);
+            // If the selectedAction is a NOP action at this stage, parsing has likely failed.
+            if(selectedAction instanceof NOP) {
+                logger.log(Level.ERROR, "Action ConcreteID not found, parsing LLM response has likely failed!: " + responseContent);
+                return new LlmParseResult(null, LlmParseResult.ParseResult.PARSE_FAILED);
             }
+
+            String inputText = selection.getInput();
+
+            setCompoundActionInputText(selectedAction, inputText);
+
+            return new LlmParseResult(selectedAction, LlmParseResult.ParseResult.SUCCESS);
+
         } catch(JsonParseException e) {
             logger.log(Level.ERROR, "Unable to parse response from LLM to JSON: " + responseContent);
             return new LlmParseResult(null, LlmParseResult.ParseResult.PARSE_FAILED);
         }
     }
 
+    private Action getActionByIdentifier(Set<Action> actions, String actionId) {
+    	for(Action action : actions) {
+    		if(action.get(Tags.ConcreteID, "").equals(actionId)) {
+    			return action;
+    		}
+    	}
+    	return new NOP();
+    }
+
     /**
-     * Converts TESTAR compound actions into single actions.
-     * TESTAR by default creates compound actions. For example: typing multiple random strings into a field.
-     * We convert this to a single action. For example: A single action that types in the text the LLM requested.
-     * TODO: Create single actions in protocol so this is not necessary?
-     * @param action CompoundAction to convert.
+     * Sets TESTAR input text of compound Type and PasteText actions.
+     * @param action CompoundAction to change.
      * @param input The characters to enter into the input field. Can be left empty if not applicable.
-     * @return Converted action in the form of a WdXAction.
+     * @return if input text changed.
      */
-    private Action convertCompoundAction(Action action, String input) {
-        // TODO: This will fail if OriginWidget is unavailable, for example WdHistoryBackAction.
-        String type = action.get(Tags.Role).name();
-        logger.log(Level.INFO, String.format("Action %s - %s", action.getClass().getName(), type));
+    private boolean setCompoundActionInputText(Action action, String inputText) {
+    	//TODO: Create single actions in protocol so this is not necessary?
+    	if(action instanceof CompoundAction) {
+    		for(Action innerAction : ((CompoundAction)action).getActions()) {
 
-        Widget widget = action.get(Tags.OriginWidget);
+    			if(innerAction instanceof Type) {
+    				((Type)innerAction).set(Tags.InputText, inputText);
+    				action.set(Tags.Desc, "Type '" + ((Type)innerAction).get(Tags.InputText) 
+    						+ "' into '" + action.get(Tags.OriginWidget).get(Tags.Desc, "<no description>" + "'"));
+    				return true;
+    			}
 
-        switch(type) {
-            case "ClickTypeInto":
-                return new WdRemoteTypeAction((WdWidget) widget, input);
-            case "LeftClickAt":
-                return new WdRemoteClickAction((WdWidget) widget);
-            default:
-                return action;
-        }
+    			if(innerAction instanceof PasteText) {
+    				((PasteText)innerAction).set(Tags.InputText, inputText);
+    				action.set(Tags.Desc, "PasteText '" + ((PasteText)innerAction).get(Tags.InputText) 
+    						+ "' into '" + action.get(Tags.OriginWidget).get(Tags.Desc, "<no description>" + "'"));
+    				return true;
+    			}
+    		}
+    	}
+
+    	return false;
     }
 
     /**
