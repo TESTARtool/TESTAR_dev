@@ -153,10 +153,13 @@ public final class ConfigTags {
 	 * Large Language Models settings 
 	 */
 
+	public static final Tag<String> LlmPlatform = Tag.from("LlmPlatform", String.class,
+			"The platform that hosts the LLM agent");
+
 	public static final Tag<String> LlmHostAddress = Tag.from("LlmHostAddress", String.class,
 			"The Host Address on which the LLM agent is running");
 
-	public static final Tag<Integer> LlmHostPort = Tag.from("LlmHostPort", Integer.class, 
+	public static final Tag<String> LlmHostPort = Tag.from("LlmHostPort", String.class, 
 			"The Host Port on which the LLM agent is listening");
 
 	public static final Tag<String> LlmTestGoalDescription = Tag.from("LlmTestGoalDescription", String.class,

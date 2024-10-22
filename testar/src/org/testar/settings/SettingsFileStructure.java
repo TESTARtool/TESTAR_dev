@@ -239,6 +239,7 @@ public class SettingsFileStructure {
 				, "# the prompt configurations to guide the LLM agent in accomplishing a test goal."
 				, "#################################################################"
 				, ""
+				, ConfigTags.LlmPlatform.name() + " = "
 				, ConfigTags.LlmHostAddress.name() + " = "
 				, ConfigTags.LlmHostPort.name() + " = "
 				, ConfigTags.LlmTestGoalDescription.name() + " = "

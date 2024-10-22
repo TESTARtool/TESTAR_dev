@@ -34,8 +34,9 @@ import java.util.Set;
 public class LlmActionSelector implements IActionSelector {
     protected static final Logger logger = LogManager.getLogger();
 
+    private final String platform;
     private final String host;
-    private final int port;
+    private final String port;
     private final String testGoal;
     private final String fewshotFile;
     private final String appName;
@@ -56,36 +57,20 @@ public class LlmActionSelector implements IActionSelector {
      * 5. ApplicationName for the name of the SUT.
      */
     public LlmActionSelector(Settings settings) {
-    	this.host = settings.get(ConfigTags.LlmHostAddress);
-    	this.port = settings.get(ConfigTags.LlmHostPort);
-    	this.testGoal = settings.get(ConfigTags.LlmTestGoalDescription);
-    	this.fewshotFile = settings.get(ConfigTags.LlmFewshotFile);
-    	this.appName = settings.get(ConfigTags.ApplicationName);
+        this.platform = settings.get(ConfigTags.LlmPlatform);
+        this.host = settings.get(ConfigTags.LlmHostAddress);
+        this.port = settings.get(ConfigTags.LlmHostPort);
+        this.testGoal = settings.get(ConfigTags.LlmTestGoalDescription);
+        this.fewshotFile = settings.get(ConfigTags.LlmFewshotFile);
+        this.appName = settings.get(ConfigTags.ApplicationName);
 
-        initConversation();
+        conversation = LlmFactory.createLlmConversation(this.platform);
+        conversation.initConversation(this.fewshotFile);
     }
 
     @Override
     public Action selectAction(State state, Set<Action> actions) {
         return selectActionWithLlm(state, actions);
-    }
-
-    /**
-     * Initializes the conversation with the LLM using the messages provided in JSON format.
-     * TODO: Make configurable
-     */
-    private void initConversation() {
-        conversation = new LlmConversation();
-
-        try {
-            String initPromptJson = getTextResource(this.fewshotFile);
-            LlmConversation.Message[] initMessages = gson.fromJson(initPromptJson, LlmConversation.Message[].class);
-            for(LlmConversation.Message message : initMessages) {
-                conversation.addMessage(message);
-            }
-        } catch(Exception e) {
-            logger.log(Level.ERROR, "Failed to initialize conversation, LLM quality may be degraded.");
-        }
     }
 
     /**
@@ -113,7 +98,7 @@ public class LlmActionSelector implements IActionSelector {
 
                 logger.log(Level.DEBUG, "Selected action: " + actionToTake.toShortString());
 
-                conversation.addMessage("assistant", llmResponse);
+                conversation.addMessage("user", llmResponse);
                 actionHistory.addToHistory(actionToTake);
 
                 return actionToTake;
@@ -133,7 +118,7 @@ public class LlmActionSelector implements IActionSelector {
                         "The output you provided was not formatted correctly. "
                         + "Please use the following format: \n\n"
                         + "{\n"
-                        + "\"actionId\": 1,\n"
+                        + "\"actionId\": \"ACT0K4\",\n"
                         + "\"input\": \"Text\"\n"
                         + "}");
                 return new NOP();
@@ -206,12 +191,13 @@ public class LlmActionSelector implements IActionSelector {
      */
     private String getResponseFromLlm(String requestBody) {
         String testarVer = Main.TESTAR_VERSION.substring(0, Main.TESTAR_VERSION.indexOf(" "));
-        URI uri = URI.create(this.host + ":" + this.port + "/v1/chat/completions");
+        URI uri = URI.create(replaceApiKeyPlaceholder(this.host + ":" + this.port));
 
         logger.log(Level.DEBUG, "Using endpoint: " + uri);
+        logger.log(Level.DEBUG, "Request Body: " + requestBody);
 
         try {
-            URL url = new URL(this.host + ":" + this.port + "/v1/chat/completions");
+            URL url = uri.toURL();
             HttpURLConnection con = (HttpURLConnection)url.openConnection();
 
             con.setRequestMethod("POST");
@@ -227,28 +213,39 @@ public class LlmActionSelector implements IActionSelector {
                 os.write(input, 0, input.length);
             }
 
-            try(BufferedReader br = new BufferedReader(
-                    new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
-                StringBuilder response = new StringBuilder();
-                String responseLine = null;
-                while ((responseLine = br.readLine()) != null) {
-                    response.append(responseLine.trim());
-                }
+            if(con.getResponseCode() == 200) {
+                try(BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
+                    StringBuilder response = new StringBuilder();
+                    String responseLine = null;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
 
-                LlmResponse modelResponse = gson.fromJson(response.toString(), LlmResponse.class);
-                this.tokens_used = modelResponse.getUsage().getTotal_tokens();
+                    LlmResponse llmResponse = LlmFactory.createResponse(this.platform, response);
+                    this.tokens_used = llmResponse.getUsageTokens();
+                    logger.log(Level.INFO, String.format("LLM tokens_used: [%s]", this.tokens_used));
 
-                String responseContent = modelResponse.getChoices().get(0).getMessage().getContent();
-                // From testing, response often includes newlines and spaces at the end.
-                // We strip this here to so we can parse the result easier.
-                responseContent = responseContent.replace("\n", "").replace("\r", "");
-                responseContent = responseContent.replaceFirst("\\s++$", "");
+                    String responseContent = llmResponse.getResponse();
+                    // From testing, response often includes newlines and spaces at the end.
+                    // We strip this here to so we can parse the result easier.
+                    responseContent = responseContent.replace("\n", "").replace("\r", "");
+                    responseContent = responseContent.replaceFirst("\\s++$", "");
 
-                logger.log(Level.INFO, String.format("LLM Response: [%s]", responseContent));
+                    logger.log(Level.INFO, String.format("LLM Response: [%s]", responseContent));
 
-                if(con.getResponseCode() == 200) {
                     return responseContent;
-                } else {
+                }
+            } else {
+                // If response is not 200 OK, debug the error message
+                try(BufferedReader br = new BufferedReader(new InputStreamReader(con.getErrorStream(), StandardCharsets.UTF_8))) {
+                    StringBuilder errorResponse = new StringBuilder();
+                    String responseLine = null;
+                    while ((responseLine = br.readLine()) != null) {
+                        errorResponse.append(responseLine.trim());
+                    }
+
+                    logger.log(Level.ERROR, String.format("LLM error code %d response: %s", con.getResponseCode(), errorResponse));
+
                     throw new Exception("Server returned " + con.getResponseCode() + " status code.");
                 }
             }
@@ -257,6 +254,37 @@ public class LlmActionSelector implements IActionSelector {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private String replaceApiKeyPlaceholder(String url) {
+        String apiKeyPlaceholder = extractPlaceholder(url);
+
+        if (apiKeyPlaceholder.isEmpty()) {
+            // Return the original URL if no placeholder is found
+            return url;
+        }
+
+        String apiKey = System.getenv(apiKeyPlaceholder);
+        if (apiKey == null) {
+            // Return the original URL if the API key is not found in the system
+            return url;
+        }
+
+        // Return the final URL with the placeholder replaced by the actual API key
+        return url.replace("%" + apiKeyPlaceholder + "%", apiKey);
+    }
+
+    private String extractPlaceholder(String str) {
+        int start = str.indexOf('%') + 1;
+        int end = str.indexOf('%', start);
+
+        if (start == 0 || end == -1) {
+            // No valid placeholder found, return empty string
+            return "";
+        }
+
+        // Return the placeholder between the '%' symbols
+        return str.substring(start, end);
     }
 
     /**
@@ -296,12 +324,12 @@ public class LlmActionSelector implements IActionSelector {
     }
 
     private Action getActionByIdentifier(Set<Action> actions, String actionId) {
-    	for(Action action : actions) {
-    		if(action.get(Tags.ConcreteID, "").equals(actionId)) {
-    			return action;
-    		}
-    	}
-    	return new NOP();
+        for(Action action : actions) {
+            if(action.get(Tags.ConcreteID, "").equals(actionId)) {
+                return action;
+            }
+        }
+        return new NOP();
     }
 
     /**
@@ -311,56 +339,26 @@ public class LlmActionSelector implements IActionSelector {
      * @return if input text changed.
      */
     private boolean setCompoundActionInputText(Action action, String inputText) {
-    	//TODO: Create single actions in protocol so this is not necessary?
-    	if(action instanceof CompoundAction) {
-    		for(Action innerAction : ((CompoundAction)action).getActions()) {
+        //TODO: Create single actions in protocol so this is not necessary?
+        if(action instanceof CompoundAction) {
+            for(Action innerAction : ((CompoundAction)action).getActions()) {
 
-    			if(innerAction instanceof Type) {
-    				((Type)innerAction).set(Tags.InputText, inputText);
-    				action.set(Tags.Desc, "Type '" + ((Type)innerAction).get(Tags.InputText) 
-    						+ "' into '" + action.get(Tags.OriginWidget).get(Tags.Desc, "<no description>" + "'"));
-    				return true;
-    			}
-
-    			if(innerAction instanceof PasteText) {
-    				((PasteText)innerAction).set(Tags.InputText, inputText);
-    				action.set(Tags.Desc, "PasteText '" + ((PasteText)innerAction).get(Tags.InputText) 
-    						+ "' into '" + action.get(Tags.OriginWidget).get(Tags.Desc, "<no description>" + "'"));
-    				return true;
-    			}
-    		}
-    	}
-
-    	return false;
-    }
-
-    /**
-     * Loads a resource from the resources folder as plain text.
-     * @param resourceLocation Location of the resource to load.
-     * @return The resource as string.
-     * @throws Exception When the resource failed to load or does not exist.
-     */
-    private String getTextResource(String resourceLocation) throws Exception {
-        ClassLoader classLoader = LlmActionSelector.class.getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream(resourceLocation);
-
-        if (inputStream != null) {
-            StringBuilder stringBuilder = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    stringBuilder.append(line).append("\n");
+                if(innerAction instanceof Type) {
+                    ((Type)innerAction).set(Tags.InputText, inputText);
+                    action.set(Tags.Desc, "Type '" + ((Type)innerAction).get(Tags.InputText) 
+                            + "' into '" + action.get(Tags.OriginWidget).get(Tags.Desc, "<no description>" + "'"));
+                    return true;
                 }
-                return stringBuilder.toString();
-            } catch (IOException e) {
-                logger.log(Level.ERROR, "Unable to read resource " + resourceLocation);
-                e.printStackTrace();
-            }
 
-        } else {
-            logger.log(Level.ERROR, "Unable to load resource " + resourceLocation);
+                if(innerAction instanceof PasteText) {
+                    ((PasteText)innerAction).set(Tags.InputText, inputText);
+                    action.set(Tags.Desc, "PasteText '" + ((PasteText)innerAction).get(Tags.InputText) 
+                            + "' into '" + action.get(Tags.OriginWidget).get(Tags.Desc, "<no description>" + "'"));
+                    return true;
+                }
+            }
         }
 
-        throw new Exception("Failed to load text resource, double check the resource location.");
+        return false;
     }
 }
