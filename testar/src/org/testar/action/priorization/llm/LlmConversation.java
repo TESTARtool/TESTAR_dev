@@ -9,11 +9,12 @@ import java.util.List;
  */
 public class LlmConversation {
     private List<Message> messages;
-    private float temperature = 0.7f;
+    private float temperature = 0.3f;
     private int max_tokens = -1;
     private boolean stream = false;
 
-    public LlmConversation() {
+    public LlmConversation(float temperature) {
+        this.temperature = temperature;
         messages = new ArrayList<>();
     }
 

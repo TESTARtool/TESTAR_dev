@@ -38,6 +38,8 @@ public class LlmActionSelector implements IActionSelector {
     private final String host;
     private final String appName;
     private final int port ;
+    // Between 0 and 2f
+    private final float temperature;
 
     private ActionHistory actionHistory = new ActionHistory(5);
     private LlmConversation conversation;
@@ -57,6 +59,7 @@ public class LlmActionSelector implements IActionSelector {
         this.host = "http://127.0.0.1";
         this.port = 1234;
         this.appName = appName;
+        this.temperature = 0.3f;
 
         initConversation();
     }
@@ -68,12 +71,13 @@ public class LlmActionSelector implements IActionSelector {
      * @param port The port of the API.
      * @param appName The name of the SUT.
      */
-    public LlmActionSelector(String testGoal, String host, int port, String appName) {
+    public LlmActionSelector(String testGoal, String host, int port, String appName, float temperature) {
         this.testGoal = testGoal;
         this.host = host;
         this.port = port;
         // TODO: Can we extract this from within the protocol?
         this.appName = appName;
+        this.temperature = temperature;
 
         initConversation();
     }
@@ -88,7 +92,7 @@ public class LlmActionSelector implements IActionSelector {
      * TODO: Make configurable
      */
     private void initConversation() {
-        conversation = new LlmConversation();
+        conversation = new LlmConversation(temperature);
 
         try {
             String initPromptJson = getTextResource("prompts/fewshot.json");
@@ -115,7 +119,6 @@ public class LlmActionSelector implements IActionSelector {
         String prompt = generatePrompt(actions);
         logger.log(Level.DEBUG, "Generated prompt: " + prompt);
         conversation.addMessage("user", prompt);
-
         String conversationJson = gson.toJson(conversation);
         String llmResponse = getResponseFromLlm(conversationJson);
         LlmParseResult llmParseResult = parseLlmResponse(new ArrayList<>(actions), llmResponse);
@@ -139,7 +142,9 @@ public class LlmActionSelector implements IActionSelector {
             // We do not add these to the action history.
             case OUT_OF_RANGE -> {
                 conversation.addMessage("user", "The actionId provided was invalid.");
-                return new NOP();
+                NOP nop = new NOP();
+                nop.set(Tags.Desc, "Invalid actionId");
+                return nop;
             }
             case PARSE_FAILED -> {
                 conversation.addMessage("user", """
@@ -151,11 +156,15 @@ public class LlmActionSelector implements IActionSelector {
                         "input": "Text"
                         }
                         """);
-                return new NOP();
+                NOP nop = new NOP();
+                nop.set(Tags.Desc, "Failed to parse LLM response");
+                return nop;
             }
             default -> {
                 logger.log(Level.ERROR, "ParseResult was null, this should never happen!");
-                return new NOP();
+                NOP nop = new NOP();
+                nop.set(Tags.Desc, "Invalid ParseResult");
+                return nop;
             }
         }
     }

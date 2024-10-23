@@ -64,7 +64,8 @@ public class Protocol_03_webdriver_llm extends WebdriverProtocol {
 			"Log in with the username john and the password demo",
 			"http://192.168.108.242",
 			1234,
-			"Parabank");
+			"Parabank",
+			0.2f);
 
 	/**
 	 * Called once during the life time of TESTAR
