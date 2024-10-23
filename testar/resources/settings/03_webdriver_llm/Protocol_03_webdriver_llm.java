@@ -59,13 +59,8 @@ public class Protocol_03_webdriver_llm extends WebdriverProtocol {
 	// This list tracks the detected erroneous verdicts to avoid duplicates
 	private List<String> listOfDetectedErroneousVerdicts = new ArrayList<>();
 
-	// Set test goal here.
-	private LlmActionSelector llmActionSelector = new LlmActionSelector(
-			"Log in with the username john and the password demo",
-			"http://192.168.108.242",
-			1234,
-			"Parabank",
-			0.2f);
+	// The LLM Action selector needs to be initialize with the settings
+	private LlmActionSelector llmActionSelector;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -76,6 +71,9 @@ public class Protocol_03_webdriver_llm extends WebdriverProtocol {
 	@Override
 	protected void initialize(Settings settings) {
 		super.initialize(settings);
+
+		// Initialize the LlmActionSelector using the LLM settings
+		llmActionSelector = new LlmActionSelector(settings);
 
 		// List of atributes to identify and close policy popups
 		// Set to null to disable this feature

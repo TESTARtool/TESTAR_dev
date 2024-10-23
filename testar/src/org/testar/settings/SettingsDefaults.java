@@ -186,6 +186,20 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(LogOracleCommands, new ArrayList<String>()));
 		defaults.add(Pair.from(LogOracleFiles, new ArrayList<String>()));
 
+		// Settings for Coverage
+		defaults.add(Pair.from(JacocoCoverage, false));
+		defaults.add(Pair.from(JacocoCoverageIpAddress, "localhost"));
+		defaults.add(Pair.from(JacocoCoveragePort, 5000));
+		defaults.add(Pair.from(JacocoCoverageClasses, "path/to/SUT/classes"));
+		defaults.add(Pair.from(JacocoCoverageAccumulate, false));
+
+		// Settings for LLM agents
+		defaults.add(Pair.from(LlmPlatform, "OpenAI"));
+		defaults.add(Pair.from(LlmHostAddress, "http://192.168.108.242"));
+		defaults.add(Pair.from(LlmHostPort, "1234/v1/chat/completions"));
+		defaults.add(Pair.from(LlmTestGoalDescription, "Log in with username john and password demo"));
+		defaults.add(Pair.from(LlmFewshotFile, "prompts/fewshot_login_openai.json"));
+
 		return defaults;
 	}
 

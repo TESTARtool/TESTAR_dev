@@ -6,7 +6,9 @@ import org.apache.logging.log4j.Logger;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
-import org.testar.monkey.alayer.actions.WdRemoteTypeAction;
+import org.testar.monkey.alayer.actions.CompoundAction;
+import org.testar.monkey.alayer.actions.PasteText;
+import org.testar.monkey.alayer.actions.Type;
 
 import java.util.ArrayList;
 
@@ -54,33 +56,49 @@ public class ActionHistory {
             builder.append(String.format("These are the last %d actions we executed: ", actions.size()));
         }
 
-        int i = 1;
         for (var action : actions) {
-            if(i != 1) {
-                builder.append(", ");
-            }
-            String type = action.get(Tags.Role).name();
             Widget widget = action.get(Tags.OriginWidget);
+            String type = action.get(Tags.Role).name();
+            String actionId = action.get(Tags.ConcreteID, "Unknown ActionId");
             String description = widget.get(Tags.Desc, "Unknown Widget");
 
             switch(type) {
-                case "RemoteType":
-                    WdRemoteTypeAction typeAction = (WdRemoteTypeAction)action;
-                    String input = typeAction.getKeys().toString();
+                case "ClickTypeInto":
+                    String input = getCompoundActionInputText(action);
                     // TODO: Differentiate between types of input fields (numeric, password, etc.)
-                    builder.append(String.format("%d: Typed '%s' in TextField '%s'", i, input, description));
+                    builder.append(String.format("%s: Typed '%s' in TextField '%s'", actionId, input, description));
                     break;
-                case "RemoteClick":
-                    builder.append(String.format("%d: Clicked on '%s'", i, description));
+                case "LeftClickAt":
+                    builder.append(String.format("%s: Clicked on '%s'", actionId, description));
                     break;
                 default:
                     logger.log(Level.WARN, "Unsupported action type for action history: " + type);
                     break;
             }
-            i++;
+
+            builder.append(", ");
         }
+
         builder.append(". ");
 
         return builder.toString();
+    }
+
+    private String getCompoundActionInputText(Action action) {
+    	//TODO: Create single actions in protocol so this is not necessary?
+    	if(action instanceof CompoundAction) {
+    		for(Action innerAction : ((CompoundAction)action).getActions()) {
+
+    			if(innerAction instanceof Type) {
+    				return ((Type)innerAction).get(Tags.InputText, "Unknown Input");
+    			}
+
+    			if(innerAction instanceof PasteText) {
+    				return ((PasteText)innerAction).get(Tags.InputText, "Unknown Input");
+    			}
+    		}
+    	}
+
+    	return "Unknown Input";
     }
 }

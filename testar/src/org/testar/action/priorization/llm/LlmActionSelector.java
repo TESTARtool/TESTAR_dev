@@ -7,21 +7,22 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.IActionSelector;
+import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.actions.CompoundAction;
 import org.testar.monkey.alayer.actions.NOP;
-import org.testar.monkey.alayer.actions.WdRemoteClickAction;
-import org.testar.monkey.alayer.actions.WdRemoteTypeAction;
+import org.testar.monkey.alayer.actions.PasteText;
+import org.testar.monkey.alayer.actions.Type;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
-import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.settings.Settings;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Set;
 
 /**
@@ -33,13 +34,12 @@ import java.util.Set;
 public class LlmActionSelector implements IActionSelector {
     protected static final Logger logger = LogManager.getLogger();
 
-    // TODO: Make configurable in GUI?
-    private final String testGoal;
+    private final String platform;
     private final String host;
+    private final String port;
+    private final String testGoal;
+    private final String fewshotFile;
     private final String appName;
-    private final int port ;
-    // Between 0 and 2f
-    private final float temperature;
 
     private ActionHistory actionHistory = new ActionHistory(5);
     private LlmConversation conversation;
@@ -48,61 +48,29 @@ public class LlmActionSelector implements IActionSelector {
     private Gson gson = new Gson();
 
     /**
-     * Creates a new LlmActionSelector. Uses the default host and port for running LMStudio locally.
-     * @param testGoal The objective of the test. Ex: Log in with username john and password demo.
-     * @param appName The name of the SUT.
-     */
-    public LlmActionSelector(String testGoal, String appName) {
-        this.testGoal = testGoal;
-
-        // Use defaults
-        this.host = "http://127.0.0.1";
-        this.port = 1234;
-        this.appName = appName;
-        this.temperature = 0.3f;
-
-        initConversation();
-    }
-
-    /**
      * Creates a new LlmActionSelector.
-     * @param testGoal The objective of the test. Ex: Log in with username john and password demo.
-     * @param host The host of the OpenAI compatible LLM API. Ex: http://127.0.0.1.
-     * @param port The port of the API.
-     * @param appName The name of the SUT.
+     * @param settings with contains:
+     * 1. LlmHostAddress for the host of the OpenAI compatible LLM API. Ex: http://127.0.0.1.
+     * 2. LlmHostPort for the port of the API.
+     * 3. LlmTestGoalDescription for the objective of the test. Ex: Log in with username john and password demo.
+     * 4. LlmFewshotFile for the fewshot file that contains the prompt instructions.
+     * 5. ApplicationName for the name of the SUT.
      */
-    public LlmActionSelector(String testGoal, String host, int port, String appName, float temperature) {
-        this.testGoal = testGoal;
-        this.host = host;
-        this.port = port;
-        // TODO: Can we extract this from within the protocol?
-        this.appName = appName;
-        this.temperature = temperature;
+    public LlmActionSelector(Settings settings) {
+        this.platform = settings.get(ConfigTags.LlmPlatform);
+        this.host = settings.get(ConfigTags.LlmHostAddress);
+        this.port = settings.get(ConfigTags.LlmHostPort);
+        this.testGoal = settings.get(ConfigTags.LlmTestGoalDescription);
+        this.fewshotFile = settings.get(ConfigTags.LlmFewshotFile);
+        this.appName = settings.get(ConfigTags.ApplicationName);
 
-        initConversation();
+        conversation = LlmFactory.createLlmConversation(this.platform);
+        conversation.initConversation(this.fewshotFile);
     }
 
     @Override
     public Action selectAction(State state, Set<Action> actions) {
         return selectActionWithLlm(state, actions);
-    }
-
-    /**
-     * Initializes the conversation with the LLM using the messages provided in JSON format.
-     * TODO: Make configurable
-     */
-    private void initConversation() {
-        conversation = new LlmConversation(temperature);
-
-        try {
-            String initPromptJson = getTextResource("prompts/fewshot.json");
-            LlmConversation.Message[] initMessages = gson.fromJson(initPromptJson, LlmConversation.Message[].class);
-            for(LlmConversation.Message message : initMessages) {
-                conversation.addMessage(message);
-            }
-        } catch(Exception e) {
-            logger.log(Level.ERROR, "Failed to initialize conversation, LLM quality may be degraded.");
-        }
     }
 
     /**
@@ -119,48 +87,47 @@ public class LlmActionSelector implements IActionSelector {
         String prompt = generatePrompt(actions);
         logger.log(Level.DEBUG, "Generated prompt: " + prompt);
         conversation.addMessage("user", prompt);
+
         String conversationJson = gson.toJson(conversation);
         String llmResponse = getResponseFromLlm(conversationJson);
-        LlmParseResult llmParseResult = parseLlmResponse(new ArrayList<>(actions), llmResponse);
+        LlmParseResult llmParseResult = parseLlmResponse(actions, llmResponse);
 
         switch(llmParseResult.getParseResult()) {
-            case SUCCESS -> {
+            case SUCCESS: {
                 Action actionToTake = llmParseResult.getActionToExecute();
 
                 logger.log(Level.DEBUG, "Selected action: " + actionToTake.toShortString());
 
-                conversation.addMessage("assistant", llmResponse);
+                conversation.addMessage("user", llmResponse);
                 actionHistory.addToHistory(actionToTake);
 
                 return actionToTake;
             }
-            case SUCCESS_FINISH ->  {
+            case SUCCESS_FINISH:  {
                 // Terminate test.
                 return null;
             }
             // Failures return no operation (NOP) actions to prevent crashing.
             // We do not add these to the action history.
-            case OUT_OF_RANGE -> {
+            case OUT_OF_RANGE: {
                 conversation.addMessage("user", "The actionId provided was invalid.");
                 NOP nop = new NOP();
                 nop.set(Tags.Desc, "Invalid actionId");
                 return nop;
             }
-            case PARSE_FAILED -> {
-                conversation.addMessage("user", """
-                        The output you provided was not formatted correctly. \
-                        Please use the following format: \
-                        
-                        {
-                        "actionId": 1,
-                        "input": "Text"
-                        }
-                        """);
+            case PARSE_FAILED: {
+                conversation.addMessage("user",
+                        "The output you provided was not formatted correctly. "
+                        + "Please use the following format: \n\n"
+                        + "{\n"
+                        + "\"actionId\": \"ACT0K4\",\n"
+                        + "\"input\": \"Text\"\n"
+                        + "}");
                 NOP nop = new NOP();
                 nop.set(Tags.Desc, "Failed to parse LLM response");
                 return nop;
             }
-            default -> {
+            default: {
                 logger.log(Level.ERROR, "ParseResult was null, this should never happen!");
                 NOP nop = new NOP();
                 nop.set(Tags.Desc, "Invalid ParseResult");
@@ -182,16 +149,11 @@ public class LlmActionSelector implements IActionSelector {
         builder.append(String.format("The objective of the test is: %s. ", testGoal));
         builder.append("The following actions are available: ");
 
-        int i = 1;
         for (Action action : actions) {
             try {
                 Widget widget = action.get(Tags.OriginWidget);
-
-                if(i != 1) {
-                    builder.append(", ");
-                }
-
                 String type = action.get(Tags.Role).name();
+                String actionId = action.get(Tags.ConcreteID, "Unknown ActionId");
                 String description = widget.get(Tags.Desc, "No description");
 
                 // Depending on the action, format into something the LLM is more likely to understand.
@@ -199,26 +161,30 @@ public class LlmActionSelector implements IActionSelector {
                     case "ClickTypeInto":
                         // Differentiate between types of input fields. Example: password -> Password Field
                         String fieldType = StringUtils.capitalize(widget.get(WdTags.WebType, "text"));
-                        builder.append(String.format("%d: Type in %sField '%s'", i, fieldType, description));
+                        builder.append(String.format("%s: Type in %sField '%s'", actionId, fieldType, description));
                         break;
                     case "LeftClickAt":
-                        builder.append(String.format("%d: Click on '%s'", i, description));
+                        builder.append(String.format("%s: Click on '%s'", actionId, description));
                         break;
                     default:
                         logger.log(Level.WARN, "Unsupported action type for LLM action selection: " + type);
                         break;
                 }
 
-                i++;
             } catch(NoSuchTagException e) {
                 // This usually happens when OriginWidget is unknown, so we skip these.
                 logger.log(Level.WARN, "Action is missing critical tags, skipping.");
             }
+
+            builder.append(", ");
         }
+
         builder.append(". ");
+
         if(!actionHistory.getActions().isEmpty()) {
             builder.append(actionHistory.toString());
         }
+
         builder.append("Which action should be executed to accomplish the test goal?");
 
         return builder.toString();
@@ -231,12 +197,13 @@ public class LlmActionSelector implements IActionSelector {
      */
     private String getResponseFromLlm(String requestBody) {
         String testarVer = Main.TESTAR_VERSION.substring(0, Main.TESTAR_VERSION.indexOf(" "));
-        URI uri = URI.create(this.host + ":" + this.port + "/v1/chat/completions");
+        URI uri = URI.create(replaceApiKeyPlaceholder(this.host + ":" + this.port));
 
         logger.log(Level.DEBUG, "Using endpoint: " + uri);
+        logger.log(Level.DEBUG, "Request Body: " + requestBody);
 
         try {
-            URL url = new URL(this.host + ":" + this.port + "/v1/chat/completions");
+            URL url = uri.toURL();
             HttpURLConnection con = (HttpURLConnection)url.openConnection();
 
             con.setRequestMethod("POST");
@@ -252,28 +219,39 @@ public class LlmActionSelector implements IActionSelector {
                 os.write(input, 0, input.length);
             }
 
-            try(BufferedReader br = new BufferedReader(
-                    new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
-                StringBuilder response = new StringBuilder();
-                String responseLine = null;
-                while ((responseLine = br.readLine()) != null) {
-                    response.append(responseLine.trim());
-                }
+            if(con.getResponseCode() == 200) {
+                try(BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
+                    StringBuilder response = new StringBuilder();
+                    String responseLine = null;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
 
-                LlmResponse modelResponse = gson.fromJson(response.toString(), LlmResponse.class);
-                this.tokens_used = modelResponse.getUsage().getTotal_tokens();
+                    LlmResponse llmResponse = LlmFactory.createResponse(this.platform, response);
+                    this.tokens_used = llmResponse.getUsageTokens();
+                    logger.log(Level.INFO, String.format("LLM tokens_used: [%s]", this.tokens_used));
 
-                String responseContent = modelResponse.getChoices().get(0).getMessage().getContent();
-                // From testing, response often includes newlines and spaces at the end.
-                // We strip this here to so we can parse the result easier.
-                responseContent = responseContent.replace("\n", "").replace("\r", "");
-                responseContent = responseContent.replaceFirst("\\s++$", "");
+                    String responseContent = llmResponse.getResponse();
+                    // From testing, response often includes newlines and spaces at the end.
+                    // We strip this here to so we can parse the result easier.
+                    responseContent = responseContent.replace("\n", "").replace("\r", "");
+                    responseContent = responseContent.replaceFirst("\\s++$", "");
 
-                logger.log(Level.INFO, String.format("LLM Response: [%s]", responseContent));
+                    logger.log(Level.INFO, String.format("LLM Response: [%s]", responseContent));
 
-                if(con.getResponseCode() == 200) {
                     return responseContent;
-                } else {
+                }
+            } else {
+                // If response is not 200 OK, debug the error message
+                try(BufferedReader br = new BufferedReader(new InputStreamReader(con.getErrorStream(), StandardCharsets.UTF_8))) {
+                    StringBuilder errorResponse = new StringBuilder();
+                    String responseLine = null;
+                    while ((responseLine = br.readLine()) != null) {
+                        errorResponse.append(responseLine.trim());
+                    }
+
+                    logger.log(Level.ERROR, String.format("LLM error code %d response: %s", con.getResponseCode(), errorResponse));
+
                     throw new Exception("Server returned " + con.getResponseCode() + " status code.");
                 }
             }
@@ -284,99 +262,109 @@ public class LlmActionSelector implements IActionSelector {
         }
     }
 
+    private String replaceApiKeyPlaceholder(String url) {
+        String apiKeyPlaceholder = extractPlaceholder(url);
+
+        if (apiKeyPlaceholder.isEmpty()) {
+            // Return the original URL if no placeholder is found
+            return url;
+        }
+
+        String apiKey = System.getenv(apiKeyPlaceholder);
+        if (apiKey == null) {
+            // Return the original URL if the API key is not found in the system
+            return url;
+        }
+
+        // Return the final URL with the placeholder replaced by the actual API key
+        return url.replace("%" + apiKeyPlaceholder + "%", apiKey);
+    }
+
+    private String extractPlaceholder(String str) {
+        int start = str.indexOf('%') + 1;
+        int end = str.indexOf('%', start);
+
+        if (start == 0 || end == -1) {
+            // No valid placeholder found, return empty string
+            return "";
+        }
+
+        // Return the placeholder between the '%' symbols
+        return str.substring(start, end);
+    }
+
     /**
      * Parses the response sent by the LLM and selects an action if the response was valid.
-     * @param actions ArrayList of actions in the current state.
+     * @param actions Set of actions in the current state.
      * @param responseContent The response of the LLM in plaintext.
      * @return LlmParseResult containing the result of the parse and the action to execute if parsing was successful.
      */
-    private LlmParseResult parseLlmResponse(ArrayList<Action> actions, String responseContent) {
+    private LlmParseResult parseLlmResponse(Set<Action> actions, String responseContent) {
         try {
             LlmSelection selection = gson.fromJson(responseContent, LlmSelection.class);
 
-            // If actionId is 0 at this stage, parsing has likely failed (there is never an action 0).
-            if(selection.getActionId() == 0) {
-                logger.log(Level.ERROR, "Action ID is 0, parsing LLM response has likely failed!: " + responseContent);
-                return new LlmParseResult(null, LlmParseResult.ParseResult.PARSE_FAILED);
-            }
-
-            // actionId -1 is used by the LLM when the LLM thinks the test objective was accomplished.
+            // actionId 'complete' is used by the LLM when the LLM thinks the test objective was accomplished.
             // This will terminate the test in the default LLM protocol.
-            if(selection.getActionId() == -1) {
+            if(selection.getActionId().toLowerCase().contains("complete")) {
                 return new LlmParseResult(null, LlmParseResult.ParseResult.SUCCESS_FINISH);
             }
 
-            // ArrayList starts at 0, action list in prompt starts at 1.
-            int actionId = selection.getActionId() -1;
-            String input = selection.getInput();
+            Action selectedAction = getActionByIdentifier(actions, selection.getActionId());
 
-            if(actionId >= actions.size()) {
-                logger.log(Level.ERROR, String.format("Action %d requested by LLM is out of range!", actionId));
-                return new LlmParseResult(null, LlmParseResult.ParseResult.OUT_OF_RANGE);
-            } else {
-                Action actionToExecute = actions.get(actionId);
-                Action convertedAction = convertCompoundAction(actionToExecute, input);
-                return new LlmParseResult(convertedAction, LlmParseResult.ParseResult.SUCCESS);
+            // If the selectedAction is a NOP action at this stage, parsing has likely failed.
+            if(selectedAction instanceof NOP) {
+                logger.log(Level.ERROR, "Action ConcreteID not found, parsing LLM response has likely failed!: " + responseContent);
+                return new LlmParseResult(null, LlmParseResult.ParseResult.PARSE_FAILED);
             }
+
+            String inputText = selection.getInput();
+
+            setCompoundActionInputText(selectedAction, inputText);
+
+            return new LlmParseResult(selectedAction, LlmParseResult.ParseResult.SUCCESS);
+
         } catch(JsonParseException e) {
             logger.log(Level.ERROR, "Unable to parse response from LLM to JSON: " + responseContent);
             return new LlmParseResult(null, LlmParseResult.ParseResult.PARSE_FAILED);
         }
     }
 
-    /**
-     * Converts TESTAR compound actions into single actions.
-     * TESTAR by default creates compound actions. For example: typing multiple random strings into a field.
-     * We convert this to a single action. For example: A single action that types in the text the LLM requested.
-     * TODO: Create single actions in protocol so this is not necessary?
-     * @param action CompoundAction to convert.
-     * @param input The characters to enter into the input field. Can be left empty if not applicable.
-     * @return Converted action in the form of a WdXAction.
-     */
-    private Action convertCompoundAction(Action action, String input) {
-        // TODO: This will fail if OriginWidget is unavailable, for example WdHistoryBackAction.
-        String type = action.get(Tags.Role).name();
-        logger.log(Level.INFO, String.format("Action %s - %s", action.getClass().getName(), type));
-
-        Widget widget = action.get(Tags.OriginWidget);
-
-        switch(type) {
-            case "ClickTypeInto":
-                return new WdRemoteTypeAction((WdWidget) widget, input);
-            case "LeftClickAt":
-                return new WdRemoteClickAction((WdWidget) widget);
-            default:
+    private Action getActionByIdentifier(Set<Action> actions, String actionId) {
+        for(Action action : actions) {
+            if(action.get(Tags.ConcreteID, "").equals(actionId)) {
                 return action;
+            }
         }
+        return new NOP();
     }
 
     /**
-     * Loads a resource from the resources folder as plain text.
-     * @param resourceLocation Location of the resource to load.
-     * @return The resource as string.
-     * @throws Exception When the resource failed to load or does not exist.
+     * Sets TESTAR input text of compound Type and PasteText actions.
+     * @param action CompoundAction to change.
+     * @param inputText The characters to enter into the input field. Can be left empty if not applicable.
+     * @return if input text changed.
      */
-    private String getTextResource(String resourceLocation) throws Exception {
-        ClassLoader classLoader = LlmActionSelector.class.getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream(resourceLocation);
+    private boolean setCompoundActionInputText(Action action, String inputText) {
+        //TODO: Create single actions in protocol so this is not necessary?
+        if(action instanceof CompoundAction) {
+            for(Action innerAction : ((CompoundAction)action).getActions()) {
 
-        if (inputStream != null) {
-            StringBuilder stringBuilder = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    stringBuilder.append(line).append("\n");
+                if(innerAction instanceof Type) {
+                    ((Type)innerAction).set(Tags.InputText, inputText);
+                    action.set(Tags.Desc, "Type '" + ((Type)innerAction).get(Tags.InputText)
+                            + "' into '" + action.get(Tags.OriginWidget).get(Tags.Desc, "<no description>" + "'"));
+                    return true;
                 }
-                return stringBuilder.toString();
-            } catch (IOException e) {
-                logger.log(Level.ERROR, "Unable to read resource " + resourceLocation);
-                e.printStackTrace();
-            }
 
-        } else {
-            logger.log(Level.ERROR, "Unable to load resource " + resourceLocation);
+                if(innerAction instanceof PasteText) {
+                    ((PasteText)innerAction).set(Tags.InputText, inputText);
+                    action.set(Tags.Desc, "PasteText '" + ((PasteText)innerAction).get(Tags.InputText)
+                            + "' into '" + action.get(Tags.OriginWidget).get(Tags.Desc, "<no description>" + "'"));
+                    return true;
+                }
+            }
         }
 
-        throw new Exception("Failed to load text resource, double check the resource location.");
+        return false;
     }
 }

@@ -1,94 +1,47 @@
 package org.testar.action.priorization.llm;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
-/**
- * Conversation with the LLM.
- * This gets converted to JSON and sent to the LLM.
- */
-public class LlmConversation {
-    private List<Message> messages;
-    private float temperature = 0.3f;
-    private int max_tokens = -1;
-    private boolean stream = false;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-    public LlmConversation(float temperature) {
-        this.temperature = temperature;
-        messages = new ArrayList<>();
-    }
+public interface LlmConversation {
+    static final Logger logger = LogManager.getLogger();
 
-    public List<Message> getMessages() {
-        return messages;
-    }
-
-    public void setMessages(List<Message> messages) {
-        this.messages = messages;
-    }
-
-    public float getTemperature() {
-        return temperature;
-    }
-
-    public void setTemperature(float temperature) {
-        this.temperature = temperature;
-    }
-
-    public float getMax_tokens() {
-        return max_tokens;
-    }
-
-    public void setMax_tokens(int max_tokens) {
-        this.max_tokens = max_tokens;
-    }
-
-    public boolean isStream() {
-        return stream;
-    }
-
-    public void setStream(boolean stream) {
-        this.stream = stream;
-    }
-
-    public void addMessage(String role, String content) {
-        messages.add(new Message(role, content));
-    }
-
-    public void addMessage(Message message) {
-        messages.add(message);
-    }
+    public void initConversation(String fewshotFile);
+    public void addMessage(String role, String content);
 
     /**
-     * A message inside a conversation with the LLM.
+     * Loads a resource from the resources folder as plain text.
+     * @param resourceLocation Location of the resource to load.
+     * @return The resource as string.
+     * @throws Exception When the resource failed to load or does not exist.
      */
-    public class Message {
-        private String role;
-        private String content;
+    default String getTextResource(String resourceLocation) throws Exception {
+        ClassLoader classLoader = LlmConversation.class.getClassLoader();
+        InputStream inputStream = classLoader.getResourceAsStream(resourceLocation);
 
-        /**
-         * Creates a new Message.
-         * @param role Role of the message. Can be "system", "user", or "assistant".
-         * @param content Content of the message in plaintext.
-         */
-        public Message(String role, String content) {
-            this.role = role;
-            this.content = content;
+        if (inputStream != null) {
+            StringBuilder stringBuilder = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    stringBuilder.append(line).append("\n");
+                }
+                return stringBuilder.toString();
+            } catch (IOException e) {
+                logger.log(Level.ERROR, "Unable to read resource " + resourceLocation);
+                e.printStackTrace();
+            }
+
+        } else {
+            logger.log(Level.ERROR, "Unable to load resource " + resourceLocation);
         }
 
-        public String getRole() {
-            return role;
-        }
-
-        public void setRole(String role) {
-            this.role = role;
-        }
-
-        public String getContent() {
-            return content;
-        }
-
-        public void setContent(String content) {
-            this.content = content;
-        }
+        throw new Exception("Failed to load text resource, double check the resource location.");
     }
 }

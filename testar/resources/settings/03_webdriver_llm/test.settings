@@ -161,6 +161,19 @@ ResetDataStore = false
 AbstractStateAttributes = WebWidgetId
 
 #################################################################
+# LLM agents settings
+#
+# Specify the settings to connect with an LLM server and
+# the prompt configurations to guide the LLM agent in accomplishing a test goal.
+#################################################################
+
+LlmPlatform = OpenAI
+LlmHostAddress = http://192.168.108.242
+LlmHostPort = 1234/v1/chat/completions
+LlmTestGoalDescription = Log in with the username john and the password demo
+LlmFewshotFile = prompts/fewshot_login_openai.json
+
+#################################################################
 # WebDriver features
 #
 # ClickableClasses: Indicate which web CSS classes need to be considered clickable

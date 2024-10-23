@@ -150,6 +150,25 @@ public final class ConfigTags {
 			"Specify the widget attributes that you wish to use in constructing the widget and state hash strings. Use a comma separated list.");
 
 	/**
+	 * Large Language Models settings 
+	 */
+
+	public static final Tag<String> LlmPlatform = Tag.from("LlmPlatform", String.class,
+			"The platform that hosts the LLM agent");
+
+	public static final Tag<String> LlmHostAddress = Tag.from("LlmHostAddress", String.class,
+			"The Host Address on which the LLM agent is running");
+
+	public static final Tag<String> LlmHostPort = Tag.from("LlmHostPort", String.class, 
+			"The Host Port on which the LLM agent is listening");
+
+	public static final Tag<String> LlmTestGoalDescription = Tag.from("LlmTestGoalDescription", String.class,
+			"The objective of the test for the LLM agent");
+
+	public static final Tag<String> LlmFewshotFile = Tag.from("LlmFewshotFile", String.class,
+			"The location of the fewshot file that contains the prompt instructions");
+
+	/**
 	 * WebDriver settings 
 	 */
 
@@ -208,6 +227,25 @@ public final class ConfigTags {
 			"Settings (string) that can be used for user specified protocols");
 	public static final Tag<String> ProtocolSpecificSetting_5 = Tag.from("ProtocolSpecificSetting_5", String.class, 
 			"Settings (string) that can be used for user specified protocols");
+
+	/**
+	 * Coverage settings
+	 */
+
+	public static final Tag<Boolean> JacocoCoverage = Tag.from("JacocoCoverage", Boolean.class,
+			"Sets whether to extract Jacoco Coverage");
+
+	public static final Tag<String> JacocoCoverageIpAddress = Tag.from("JacocoCoverageIpAddress", String.class, 
+			"The JMX IP Address on which the Jacoco Agent is running");
+
+	public static final Tag<Integer> JacocoCoveragePort = Tag.from("JacocoCoveragePort", Integer.class, 
+			"The JMX port on which the Jacoco Agent is running");
+
+	public static final Tag<String> JacocoCoverageClasses = Tag.from("JacocoCoverageClasses", String.class, 
+			"The SUT class files that Jacoco uses to create the CSV report");
+
+	public static final Tag<Boolean> JacocoCoverageAccumulate = Tag.from("JacocoCoverageAccumulate", Boolean.class,
+			"Sets whether Jacoco coverage will be accumulated across the run sequences");
 
 	/**
 	 * Additional settings with descriptions
