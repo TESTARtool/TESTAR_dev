@@ -199,6 +199,7 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(LlmHostPort, "1234/v1/chat/completions"));
 		defaults.add(Pair.from(LlmTestGoalDescription, "Log in with username john and password demo"));
 		defaults.add(Pair.from(LlmFewshotFile, "prompts/fewshot_login_openai.json"));
+		defaults.add(Pair.from(LlmTemperature, 0.2f));
 
 		return defaults;
 	}

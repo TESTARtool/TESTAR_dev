@@ -172,6 +172,7 @@ LlmHostAddress = http://192.168.108.242
 LlmHostPort = 1234/v1/chat/completions
 LlmTestGoalDescription = Log in with the username john and the password demo
 LlmFewshotFile = prompts/fewshot_login_openai.json
+LlmTemperature = 0.2
 
 #################################################################
 # WebDriver features

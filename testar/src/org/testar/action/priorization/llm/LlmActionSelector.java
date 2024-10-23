@@ -40,6 +40,7 @@ public class LlmActionSelector implements IActionSelector {
     private final String testGoal;
     private final String fewshotFile;
     private final String appName;
+    private final float temperature;
 
     private ActionHistory actionHistory = new ActionHistory(5);
     private LlmConversation conversation;
@@ -63,8 +64,9 @@ public class LlmActionSelector implements IActionSelector {
         this.testGoal = settings.get(ConfigTags.LlmTestGoalDescription);
         this.fewshotFile = settings.get(ConfigTags.LlmFewshotFile);
         this.appName = settings.get(ConfigTags.ApplicationName);
+        this.temperature = settings.get(ConfigTags.LlmTemperature);
 
-        conversation = LlmFactory.createLlmConversation(this.platform);
+        conversation = LlmFactory.createLlmConversation(this.platform, this.temperature);
         conversation.initConversation(this.fewshotFile);
     }
 
@@ -200,7 +202,7 @@ public class LlmActionSelector implements IActionSelector {
         URI uri = URI.create(replaceApiKeyPlaceholder(this.host + ":" + this.port));
 
         logger.log(Level.DEBUG, "Using endpoint: " + uri);
-        logger.log(Level.DEBUG, "Request Body: " + requestBody);
+        // logger.log(Level.DEBUG, "Request Body: " + requestBody);
 
         try {
             URL url = uri.toURL();

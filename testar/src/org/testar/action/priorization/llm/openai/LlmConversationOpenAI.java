@@ -18,12 +18,13 @@ public class LlmConversationOpenAI implements LlmConversation {
     protected static final Logger logger = LogManager.getLogger();
 
     private List<Message> messages;
-    private float temperature = 0.7f;
+    private float temperature = 0.2f;
     private int max_tokens = -1;
     private boolean stream = false;
 
-    public LlmConversationOpenAI() {
+    public LlmConversationOpenAI(float temperature) {
         messages = new ArrayList<>();
+        this.temperature = temperature;
     }
 
     public List<Message> getMessages() {

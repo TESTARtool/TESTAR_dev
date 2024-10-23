@@ -168,6 +168,9 @@ public final class ConfigTags {
 	public static final Tag<String> LlmFewshotFile = Tag.from("LlmFewshotFile", String.class,
 			"The location of the fewshot file that contains the prompt instructions");
 
+	public static final Tag<Float> LlmTemperature = Tag.from("LlmTemperature", Float.class,
+			"Controls the randomness of the LLM output. Value between 0 and 2.");
+
 	/**
 	 * WebDriver settings 
 	 */

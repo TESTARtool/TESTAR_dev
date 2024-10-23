@@ -65,6 +65,9 @@ public class LlmPanel extends SettingsPanel {
 	private JTextField fieldLlmFewshotFile  = new JTextField();
 	private JButton dirLlmButton = new JButton("..");
 
+	private JLabel labelLlmTemperature = new JLabel("LLM Temperature");
+	private JTextField fieldLlmTemperature = new JTextField();
+
 	public LlmPanel() {
 		setLayout(null);
 
@@ -83,11 +86,13 @@ public class LlmPanel extends SettingsPanel {
 					fieldLlmHostAddress.setText("http://192.168.108.242");
 					fieldLlmHostPort.setText("1234/v1/chat/completions");
 					fieldLlmFewshotFile.setText("prompts/fewshot_login_openai.json");
+					fieldLlmTemperature.setText("0.2");
 					break;
 				case "Gemini":
 					fieldLlmHostAddress.setText("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest");
 					fieldLlmHostPort.setText("generateContent?key=%GEMINI_API_KEY%");
 					fieldLlmFewshotFile.setText("prompts/fewshot_login_gemini.json");
+					fieldLlmTemperature.setText("0.2");
 					break;
 
 				default:
@@ -131,6 +136,13 @@ public class LlmPanel extends SettingsPanel {
 		dirLlmButton.setBounds(350, 190, 20, 27);
 		dirLlmButton.addActionListener(this::chooseFileActionPerformed);
 		add(dirLlmButton);
+
+		labelLlmTemperature.setBounds(10, 220, 180, 27);
+		labelLlmTemperature.setToolTipText(ConfigTags.LlmTemperature.getDescription());
+		add(labelLlmTemperature);
+		fieldLlmTemperature.setBounds(160, 220, 400, 27);
+		fieldLlmTemperature.setToolTipText(ConfigTags.LlmTemperature.getDescription());
+		add(fieldLlmTemperature);
 	}
 
 	// show a file dialog to choose the LLM Fewshot File
@@ -165,6 +177,7 @@ public class LlmPanel extends SettingsPanel {
 		fieldLlmHostPort.setText(settings.get(ConfigTags.LlmHostPort));
 		txtLlmTestGoalDescription.setText(settings.get(ConfigTags.LlmTestGoalDescription));
 		fieldLlmFewshotFile.setText(settings.get(ConfigTags.LlmFewshotFile));
+		fieldLlmTemperature.setText(settings.get(ConfigTags.LlmTemperature).toString());
 	}
 
 	@Override
@@ -182,6 +195,8 @@ public class LlmPanel extends SettingsPanel {
 		settings.set(ConfigTags.LlmHostPort, fieldLlmHostPort.getText());
 		settings.set(ConfigTags.LlmTestGoalDescription, txtLlmTestGoalDescription.getText());
 		settings.set(ConfigTags.LlmFewshotFile, fieldLlmFewshotFile.getText());
+		float temperature = Float.parseFloat(fieldLlmTemperature.getText());
+		settings.set(ConfigTags.LlmTemperature, temperature);
 	}
 
 }
