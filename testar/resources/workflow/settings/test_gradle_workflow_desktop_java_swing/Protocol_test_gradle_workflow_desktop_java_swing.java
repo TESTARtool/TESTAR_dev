@@ -83,8 +83,8 @@ public class Protocol_test_gradle_workflow_desktop_java_swing extends DesktopPro
 	protected State getState(SUT system) throws StateBuildException {
 		State state = super.getState(system);
 
-		// DEBUG: That widgets have screen bounds in the GUI of the remote server
-		for(Widget w : state) {
+		// DEBUG: Top widgets that have screen bounds in the GUI of the remote server
+		for(Widget w : getTopWidgets(state)) {
 			String debug = String.format("Widget: '%s' ", w.get(Tags.Title, ""));
 			if(w.get(Tags.Shape, null) != null) {
 				debug = debug.concat(String.format("with Shape: %s", w.get(Tags.Shape, null)));
@@ -107,8 +107,8 @@ public class Protocol_test_gradle_workflow_desktop_java_swing extends DesktopPro
 		// BUILD CUSTOM ACTIONS
 		//----------------------
 
-		// iterate through all widgets
-		for(Widget w : state){
+		// iterate through the top widgets of the state (used for menu items)
+		for(Widget w : getTopWidgets(state)){
 
 			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
 
@@ -161,6 +161,34 @@ public class Protocol_test_gradle_workflow_desktop_java_swing extends DesktopPro
 		for(int i = 0; i<w.childCount(); i++) {
 			widgetTree(w.child(i), actions);
 		}
+	}
+
+	@Override
+	protected void finishSequence(){
+		// Don't use the call SystemProcessHandling.killTestLaunchedProcesses before stopSystem
+		// Invoking a jar app considers the java.exe a test launched process instead the main one
+
+		// In fact, finishSequence is maybe the wrong moment to invoke killTestLaunchedProcesses
+	}
+
+	@Override
+	protected void stopSystem(SUT system) {
+		State state = super.getState(system);
+
+		// Verify that the top Java Swing widget Open Menu Item is found
+		Widget openMenuItemWidget = null;
+		for(Widget w : getTopWidgets(state)) {
+			if(w.get(Tags.Title, "").contains("Open")) {
+				System.out.println("Found: " + w.get(Tags.Title) + ", enabled? " + w.get(Tags.Enabled));
+				openMenuItemWidget = w;
+			}
+		}
+
+		Assert.notNull(openMenuItemWidget); // Widget was found
+		Assert.isTrue(!(openMenuItemWidget.get(Tags.Enabled))); // And Is Disabled by default
+
+		super.finishSequence(); // call SystemProcessHandling.killTestLaunchedProcesses
+		super.stopSystem(system);
 	}
 
 	@Override
