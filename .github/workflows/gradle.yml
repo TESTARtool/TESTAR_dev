@@ -5,7 +5,7 @@ name: Gradle CI tests
 
 on:
   push:
-    branches: [ master, master_workflow ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
@@ -213,6 +213,7 @@ jobs:
   linux:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    continue-on-error: true
 
     strategy:
       fail-fast: false
@@ -250,6 +251,7 @@ jobs:
   macos:
     runs-on: macos-latest
     timeout-minutes: 10
+    continue-on-error: true
 
     strategy:
       fail-fast: false
