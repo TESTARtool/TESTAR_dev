@@ -33,6 +33,7 @@ package org.testar.settings.dialog;
 import org.testar.monkey.ConfigTags;
 import org.testar.settings.Settings;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -41,6 +42,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -55,6 +57,7 @@ public class AdvancedPanel extends SettingsPanel {
 	private JLabel labelSutProcesses = new JLabel("Desktop SUT Multi-Processes");
 	private JTextField sutProcessesField = new JTextField();
 
+	private JPanel coveragePanel = new JPanel();
 	private Set<JComponent> jacocoCoverageComponents;
 	private JCheckBox enableJacocoCoverage = new JCheckBox("Enable JaCoCo Coverage");
 	private JLabel labelIpJacocoCoverage = new JLabel("IP address JaCoCo agent");
@@ -84,6 +87,18 @@ public class AdvancedPanel extends SettingsPanel {
 		sutProcessesField.setToolTipText(ToolTipTexts.sutProcessesTTT);
 		add(sutProcessesField);
 
+		coveragePanel.setLayout(null);
+		coveragePanel.setBounds(5, 100, 610, 170);
+		coveragePanel.setBorder(BorderFactory.createTitledBorder(
+				BorderFactory.createLineBorder(Color.GRAY, 1), 
+				"JaCoCo Coverage Settings", 
+				TitledBorder.LEFT, 
+				TitledBorder.TOP));
+		coveragePanel(); // Prepare coverage components
+		add(coveragePanel);
+	}
+
+	private void coveragePanel() {
 		// The group of settings coverage components
 		jacocoCoverageComponents = new HashSet<>();
 		jacocoCoverageComponents.add(labelIpJacocoCoverage);
@@ -95,7 +110,7 @@ public class AdvancedPanel extends SettingsPanel {
 		jacocoCoverageComponents.add(dirButton);
 		jacocoCoverageComponents.add(enableAccumulativeJacocoCoverage);
 
-		enableJacocoCoverage.setBounds(10, 100, 180, 27);
+		enableJacocoCoverage.setBounds(10, 20, 180, 27);
 		enableJacocoCoverage.setToolTipText(ConfigTags.JacocoCoverage.getDescription());
 		enableJacocoCoverage.addItemListener(new ItemListener() {
 			@Override
@@ -103,37 +118,37 @@ public class AdvancedPanel extends SettingsPanel {
 				jacocoCoverageComponents.forEach((component) -> component.setEnabled(enableJacocoCoverage.isSelected()));
 			}
 		});
-		add(enableJacocoCoverage);
+		coveragePanel.add(enableJacocoCoverage);
 
-		labelIpJacocoCoverage.setBounds(10, 130, 180, 27);
+		labelIpJacocoCoverage.setBounds(10, 50, 180, 27);
 		labelIpJacocoCoverage.setToolTipText(ConfigTags.JacocoCoverageIpAddress.getDescription());
-		add(labelIpJacocoCoverage);
-		fieldIpJacocoCoverage.setBounds(160, 130, 180, 27);
+		coveragePanel.add(labelIpJacocoCoverage);
+		fieldIpJacocoCoverage.setBounds(160, 50, 180, 27);
 		fieldIpJacocoCoverage.setToolTipText(ConfigTags.JacocoCoverageIpAddress.getDescription());
-		add(fieldIpJacocoCoverage);
+		coveragePanel.add(fieldIpJacocoCoverage);
 
-		labelPortJacocoCoverage.setBounds(10, 160, 180, 27);
+		labelPortJacocoCoverage.setBounds(10, 80, 180, 27);
 		labelPortJacocoCoverage.setToolTipText(ConfigTags.JacocoCoveragePort.getDescription());
-		add(labelPortJacocoCoverage);
-		fieldPortJacocoCoverage.setBounds(160, 160, 180, 27);
+		coveragePanel.add(labelPortJacocoCoverage);
+		fieldPortJacocoCoverage.setBounds(160, 80, 180, 27);
 		fieldPortJacocoCoverage.setToolTipText(ConfigTags.JacocoCoveragePort.getDescription());
 		((AbstractDocument) fieldPortJacocoCoverage.getDocument()).setDocumentFilter(new PortNumberFilter());
-		add(fieldPortJacocoCoverage);
+		coveragePanel.add(fieldPortJacocoCoverage);
 
-		labelClassesJacocoCoverage.setBounds(10, 190, 180, 27);
+		labelClassesJacocoCoverage.setBounds(10, 110, 180, 27);
 		labelClassesJacocoCoverage.setToolTipText(ConfigTags.JacocoCoverageClasses.getDescription());
-		add(labelClassesJacocoCoverage);
-		fieldClassesJacocoCoverage.setBounds(160, 190, 180, 27);
+		coveragePanel.add(labelClassesJacocoCoverage);
+		fieldClassesJacocoCoverage.setBounds(160, 110, 180, 27);
 		fieldClassesJacocoCoverage.setToolTipText(ConfigTags.JacocoCoverageClasses.getDescription());
 		fieldClassesJacocoCoverage.setEditable(false);
-		add(fieldClassesJacocoCoverage);
-		dirButton.setBounds(350, 190, 20, 27);
+		coveragePanel.add(fieldClassesJacocoCoverage);
+		dirButton.setBounds(350, 110, 20, 27);
 		dirButton.addActionListener(this::chooseFileActionPerformed);
-		add(dirButton);
+		coveragePanel.add(dirButton);
 
-		enableAccumulativeJacocoCoverage.setBounds(10, 220, 200, 27);
+		enableAccumulativeJacocoCoverage.setBounds(10, 140, 200, 27);
 		enableAccumulativeJacocoCoverage.setToolTipText(ConfigTags.JacocoCoverageAccumulate.getDescription());
-		add(enableAccumulativeJacocoCoverage);
+		coveragePanel.add(enableAccumulativeJacocoCoverage);
 	}
 
 	// show a file dialog to choose the directory where the JaCoCo classes are located

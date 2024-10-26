@@ -47,6 +47,7 @@ import org.jacoco.core.analysis.Analyzer;
 import org.jacoco.core.analysis.CoverageBuilder;
 import org.jacoco.core.analysis.IClassCoverage;
 import org.jacoco.core.tools.ExecFileLoader;
+import org.testar.OutputStructure;
 import org.testar.monkey.ConfigTags;
 import org.testar.settings.Settings;
 
@@ -54,9 +55,11 @@ public class JacocoReportCSV {
 	private static final Logger logger = LogManager.getLogger();
 
 	private String jacocoClassesPath;
+	private StringBuilder coverageRatioResults;
 
 	public JacocoReportCSV(Settings settings) {
 		jacocoClassesPath = settings.get(ConfigTags.JacocoCoverageClasses);
+		coverageRatioResults = new StringBuilder();
 		if(!new File(jacocoClassesPath).exists()) {
 			logger.error("JacocoCoverageClasses path does not exist: " + jacocoClassesPath);
 			System.err.println("JacocoCoverageClasses path does not exist: " + jacocoClassesPath);
@@ -125,24 +128,28 @@ public class JacocoReportCSV {
 					totalMethodCovered += cc.getMethodCounter().getCoveredCount();
 				}
 
-				// Print totals
+				String totalInstructionRatio = formatPercentage((double)totalInstructionCovered / (double)(totalInstructionMissed + totalInstructionCovered));
+				String totalBranchRatio = formatPercentage((double)totalBranchCovered / (double)(totalBranchMissed + totalBranchCovered));
+				String totalLineRatio = formatPercentage((double)totalLineCovered / (double)(totalLineMissed + totalLineCovered));
+				String totalComplexityRatio = formatPercentage((double)totalComplexityCovered / (double)(totalComplexityMissed + totalComplexityCovered));
+				String totalMethodRatio = formatPercentage((double)totalMethodCovered / (double)(totalMethodMissed + totalMethodCovered));
+
+				// Print CSV totals
 				printer.printRecord("TOTAL",
-						totalInstructionMissed, totalInstructionCovered,
-						formatPercentage((double)totalInstructionCovered / (double)(totalInstructionMissed + totalInstructionCovered)),
+						totalInstructionMissed, totalInstructionCovered, totalInstructionRatio, 
+						totalBranchMissed, totalBranchCovered, totalBranchRatio, 
+						totalLineMissed, totalLineCovered, totalLineRatio, 
+						totalComplexityMissed, totalComplexityCovered, totalComplexityRatio, 
+						totalMethodMissed, totalMethodCovered, totalMethodRatio);
 
-						totalBranchMissed, totalBranchCovered,
-						formatPercentage((double)totalBranchCovered / (double)(totalBranchMissed + totalBranchCovered)),
+				coverageRatioResults = new StringBuilder();
 
-						totalLineMissed, totalLineCovered,
-						formatPercentage((double)totalLineCovered / (double)(totalLineMissed + totalLineCovered)),
-
-						totalComplexityMissed, totalComplexityCovered,
-						formatPercentage((double)totalComplexityCovered / (double)(totalComplexityMissed + totalComplexityCovered)),
-
-						totalMethodMissed, totalMethodCovered, 
-						formatPercentage((double)totalMethodCovered / (double)(totalMethodMissed + totalMethodCovered))
-						);
-
+				coverageRatioResults
+				.append("InstructionCoverage").append(" | ").append(totalInstructionRatio).append(" | ")
+				.append("BranchCoverage").append(" | ").append(totalBranchRatio).append(" | ")
+				.append("LineCoverage").append(" | ").append(totalLineRatio).append(" | ")
+				.append("ComplexityCoverage").append(" | ").append(totalComplexityRatio).append(" | ")
+				.append("MethodCoverage").append(" | ").append(totalMethodRatio);
 			}
 
 			logger.trace("JacocoReportCSV generated the CSV report: " + outputCSV);
@@ -150,6 +157,22 @@ public class JacocoReportCSV {
 		} catch (IOException e) {
 			logger.error("JacocoReportCSV was not able to create the CSV report " + jacocoClassesPath + " with the exec file " + jacocoExecFile);
 			e.printStackTrace();
+		}
+	}
+
+	public void writeAccumulativeCoverage(String outputJacocoCoveragePath, String actionCount) {
+		String accumulativeCoverageFile = outputJacocoCoveragePath + File.separator 
+				+ OutputStructure.startOuterLoopDateString + "_" + OutputStructure.executedSUTname 
+				+ "_accumulative_ratio_coverage.txt";
+
+		try (FileWriter myWriter = new FileWriter(accumulativeCoverageFile, true)) {
+			myWriter.write("Sequence | " + OutputStructure.sequenceInnerLoopCount 
+					+ " | Action | " + actionCount + " | " 
+					+ coverageRatioResults.toString()
+					+ System.lineSeparator());
+		} catch (IOException e) {
+			logger.error("An error occurred while writing to the accumulative coverage file: " + e.getMessage());
+			System.err.println("An error occurred while writing to the accumulative coverage file: " + e.getMessage());
 		}
 	}
 
@@ -208,7 +231,7 @@ public class JacocoReportCSV {
 		DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(Locale.getDefault());
 		symbols.setDecimalSeparator('.');
 		DecimalFormat df = new DecimalFormat("0.00", symbols);
-		return df.format(value * 100.0) + "%";
+		return df.format(value * 100.0);
 	}
 
 }

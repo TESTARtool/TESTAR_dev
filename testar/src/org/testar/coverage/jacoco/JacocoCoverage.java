@@ -92,7 +92,8 @@ public class JacocoCoverage implements CodeCoverage {
 		// Compute the accumulative Jacoco coverage if enabled by user
 		if(mergeJacocoFiles != null) {
 			mergeJacocoFiles.testarExecuteMojo(jacocoReportCSV, jacocoExecActionCoverage);
+			// Write an additional accumulative ratio coverage file
+			jacocoReportCSV.writeAccumulativeCoverage(outputJacocoCoveragePath, actionCount);
 		}
-
 	}
 }
