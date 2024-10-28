@@ -46,6 +46,10 @@ public class ActionHistory {
         actions.add(action);
     }
 
+    public void clear() {
+        actions.clear();
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -56,10 +60,14 @@ public class ActionHistory {
             builder.append(String.format("These are the last %d actions we executed: ", actions.size()));
         }
 
+        int i = 1;
         for (var action : actions) {
             Widget widget = action.get(Tags.OriginWidget);
             String type = action.get(Tags.Role).name();
-            String actionId = action.get(Tags.ConcreteID, "Unknown ActionId");
+            // String actionId = action.get(Tags.ConcreteID, "Unknown ActionId");
+            // Using TESTAR's actionId for action history results in some LLMs mistaking historical actions
+            // for available actions.
+            String actionId = String.valueOf(i);
             String description = widget.get(Tags.Desc, "Unknown Widget");
 
             switch(type) {
@@ -76,6 +84,7 @@ public class ActionHistory {
                     break;
             }
 
+            i++;
             builder.append(", ");
         }
 

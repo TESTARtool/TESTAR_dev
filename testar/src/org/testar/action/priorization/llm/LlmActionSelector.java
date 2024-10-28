@@ -52,6 +52,7 @@ public class LlmActionSelector implements IActionSelector {
     private Gson gson = new Gson();
 
     private List<String> testGoalQueue = new ArrayList<>();
+    private String previousTestGoal = "";
     private int currentTestGoal = 0;
 
     /**
@@ -126,6 +127,8 @@ public class LlmActionSelector implements IActionSelector {
                     // Reset conversation
                     conversation = LlmFactory.createLlmConversation(this.platform, this.temperature);
                     conversation.initConversation(this.fewshotFile);
+                    actionHistory.clear();
+                    previousTestGoal = testGoalQueue.get(currentTestGoal - 1);
                     return nop;
                 }
             }
@@ -168,7 +171,14 @@ public class LlmActionSelector implements IActionSelector {
     private String generatePrompt(Set<Action> actions) {
         StringBuilder builder = new StringBuilder();
         builder.append(String.format("We are testing the \"%s\" web application. ", appName));
-        builder.append(String.format("The objective of the test is: %s. ", testGoalQueue.get(currentTestGoal)));
+
+        if(StringUtils.isEmpty(previousTestGoal)) {
+            builder.append(String.format("The objective of the test is: %s. ", testGoalQueue.get(currentTestGoal)));
+        } else {
+            builder.append(String.format("The following objective was previously achieved: %s. ", previousTestGoal));
+            builder.append(String.format("The current objective of the test is: %s. ", testGoalQueue.get(currentTestGoal)));
+        }
+
         builder.append("The following actions are available: ");
 
         for (Action action : actions) {
