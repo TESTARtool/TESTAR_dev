@@ -152,6 +152,13 @@ public class LlmActionSelector implements IActionSelector {
                 nop.set(Tags.Desc, "Failed to parse LLM response");
                 return nop;
             }
+            case INVALID_ACTION: {
+                conversation.addMessage("user", "The actionId you provided is incorrect or does not exist. " +
+                        "Please only select from actions provided to you in the current message");
+                NOP nop = new NOP();
+                nop.set(Tags.Desc, "Invalid actionId from LLM");
+                return nop;
+            }
             default: {
                 logger.log(Level.ERROR, "ParseResult was null, this should never happen!");
                 NOP nop = new NOP();
@@ -344,9 +351,10 @@ public class LlmActionSelector implements IActionSelector {
             Action selectedAction = getActionByIdentifier(actions, selection.getActionId());
 
             // If the selectedAction is a NOP action at this stage, parsing has likely failed.
+            // Observed to happen when the LLM selects an actionId that does not exist.
             if(selectedAction instanceof NOP) {
                 logger.log(Level.ERROR, "Action ConcreteID not found, parsing LLM response has likely failed!: " + responseContent);
-                return new LlmParseResult(null, LlmParseResult.ParseResult.PARSE_FAILED);
+                return new LlmParseResult(null, LlmParseResult.ParseResult.INVALID_ACTION);
             }
 
             String inputText = selection.getInput();

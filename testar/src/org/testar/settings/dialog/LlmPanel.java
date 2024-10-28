@@ -120,27 +120,27 @@ public class LlmPanel extends SettingsPanel {
 		add(labelLlmTestGoalDescription);
 		txtLlmTestGoalDescription.setLineWrap(true);
 		JScrollPane llmTestGoalDescriptionPane = new JScrollPane(txtLlmTestGoalDescription);
-		llmTestGoalDescriptionPane.setBounds(10, 130, 600, 50);
+		llmTestGoalDescriptionPane.setBounds(10, 130, 600, 100);
 		llmTestGoalDescriptionPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 		llmTestGoalDescriptionPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		llmTestGoalDescriptionPane.setToolTipText(ConfigTags.LlmTestGoalDescription.getDescription());
 		add(llmTestGoalDescriptionPane);
 
-		labelLlmFewshotFile.setBounds(10, 190, 180, 27);
+		labelLlmFewshotFile.setBounds(10, 240, 180, 27);
 		labelLlmFewshotFile.setToolTipText(ConfigTags.LlmFewshotFile.getDescription());
 		add(labelLlmFewshotFile);
-		fieldLlmFewshotFile.setBounds(160, 190, 180, 27);
+		fieldLlmFewshotFile.setBounds(160, 240, 180, 27);
 		fieldLlmFewshotFile.setToolTipText(ConfigTags.LlmFewshotFile.getDescription());
 		fieldLlmFewshotFile.setEditable(false);
 		add(fieldLlmFewshotFile);
-		dirLlmButton.setBounds(350, 190, 20, 27);
+		dirLlmButton.setBounds(350, 240, 20, 27);
 		dirLlmButton.addActionListener(this::chooseFileActionPerformed);
 		add(dirLlmButton);
 
-		labelLlmTemperature.setBounds(10, 220, 180, 27);
+		labelLlmTemperature.setBounds(10, 270, 180, 27);
 		labelLlmTemperature.setToolTipText(ConfigTags.LlmTemperature.getDescription());
 		add(labelLlmTemperature);
-		fieldLlmTemperature.setBounds(160, 220, 400, 27);
+		fieldLlmTemperature.setBounds(160, 270, 400, 27);
 		fieldLlmTemperature.setToolTipText(ConfigTags.LlmTemperature.getDescription());
 		add(fieldLlmTemperature);
 	}
