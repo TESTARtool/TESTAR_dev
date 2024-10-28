@@ -23,6 +23,9 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -48,6 +51,9 @@ public class LlmActionSelector implements IActionSelector {
 
     private Gson gson = new Gson();
 
+    private List<String> testGoalQueue = new ArrayList<>();
+    private int currentTestGoal = 0;
+
     /**
      * Creates a new LlmActionSelector.
      * @param settings with contains:
@@ -62,6 +68,10 @@ public class LlmActionSelector implements IActionSelector {
         this.host = settings.get(ConfigTags.LlmHostAddress);
         this.port = settings.get(ConfigTags.LlmHostPort);
         this.testGoal = settings.get(ConfigTags.LlmTestGoalDescription);
+
+        this.testGoalQueue = Arrays.stream(testGoal.split(",")).toList();
+        logger.log(Level.INFO, String.format("Detected %d test goals.", testGoalQueue.size()));
+
         this.fewshotFile = settings.get(ConfigTags.LlmFewshotFile);
         this.appName = settings.get(ConfigTags.ApplicationName);
         this.temperature = settings.get(ConfigTags.LlmTemperature);
@@ -106,8 +116,18 @@ public class LlmActionSelector implements IActionSelector {
                 return actionToTake;
             }
             case SUCCESS_FINISH:  {
-                // Terminate test.
-                return null;
+                currentTestGoal++;
+                if(currentTestGoal + 1 > testGoalQueue.size()) {
+                    // Nothing left in queue, terminate test
+                    return null;
+                } else {
+                    NOP nop = new NOP();
+                    nop.set(Tags.Desc, "Test goal complete, moving to next test goal");
+                    // Reset conversation
+                    conversation = LlmFactory.createLlmConversation(this.platform, this.temperature);
+                    conversation.initConversation(this.fewshotFile);
+                    return nop;
+                }
             }
             // Failures return no operation (NOP) actions to prevent crashing.
             // We do not add these to the action history.
@@ -148,7 +168,7 @@ public class LlmActionSelector implements IActionSelector {
     private String generatePrompt(Set<Action> actions) {
         StringBuilder builder = new StringBuilder();
         builder.append(String.format("We are testing the \"%s\" web application. ", appName));
-        builder.append(String.format("The objective of the test is: %s. ", testGoal));
+        builder.append(String.format("The objective of the test is: %s. ", testGoalQueue.get(currentTestGoal)));
         builder.append("The following actions are available: ");
 
         for (Action action : actions) {
