@@ -240,6 +240,7 @@ public class SettingsFileStructure {
 				, "#################################################################"
 				, ""
 				, ConfigTags.LlmPlatform.name() + " = "
+				, ConfigTags.LlmModel.name() + " = "
 				, ConfigTags.LlmHostAddress.name() + " = "
 				, ConfigTags.LlmHostPort.name() + " = "
 				, ConfigTags.LlmTestGoalDescription.name() + " = "

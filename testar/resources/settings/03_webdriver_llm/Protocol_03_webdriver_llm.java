@@ -140,8 +140,7 @@ public class Protocol_03_webdriver_llm extends WebdriverProtocol {
 		// For web applications, web browser errors and warnings can also be enabled via settings
 		Verdict verdict = super.getVerdict(state);
 		if(testGoalAccomplished) {
-			verdict = new Verdict(Verdict.SEVERITY_FAIL, "LLM believes test goal was accomplished, " +
-					"test completed. This is not an error.");
+			verdict = new Verdict(Verdict.SEVERITY_LLM_COMPLETE, "LLM believes test goal was accomplished.");
 		}
 		// If the Verdict is not OK but was already detected in a previous sequence
 		// Consider as OK to avoid duplicates and continue testing

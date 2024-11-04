@@ -156,6 +156,9 @@ public final class ConfigTags {
 	public static final Tag<String> LlmPlatform = Tag.from("LlmPlatform", String.class,
 			"The platform that hosts the LLM agent");
 
+	public static final Tag<String> LlmModel = Tag.from("LlmModel", String.class,
+			"The model used by the LLM agent");
+
 	public static final Tag<String> LlmHostAddress = Tag.from("LlmHostAddress", String.class,
 			"The Host Address on which the LLM agent is running");
 

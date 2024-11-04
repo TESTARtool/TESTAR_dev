@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -23,7 +25,12 @@ public interface LlmConversation {
      */
     default String getTextResource(String resourceLocation) throws Exception {
         ClassLoader classLoader = LlmConversation.class.getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream(resourceLocation);
+        // Try to find the file from the resource stream of system file path
+        InputStream inputStream = classLoader.getResourceAsStream(resourceLocation) != null 
+        		? classLoader.getResourceAsStream(resourceLocation) 
+        				: Files.exists(Paths.get(resourceLocation)) 
+        				? Files.newInputStream(Paths.get(resourceLocation)) 
+        						: null;
 
         if (inputStream != null) {
             StringBuilder stringBuilder = new StringBuilder();

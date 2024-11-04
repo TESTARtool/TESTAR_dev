@@ -35,6 +35,7 @@ public class LlmActionSelector implements IActionSelector {
     protected static final Logger logger = LogManager.getLogger();
 
     private final String platform;
+    private final String model;
     private final String host;
     private final String port;
     private final String testGoal;
@@ -59,6 +60,7 @@ public class LlmActionSelector implements IActionSelector {
      */
     public LlmActionSelector(Settings settings) {
         this.platform = settings.get(ConfigTags.LlmPlatform);
+        this.model = settings.get(ConfigTags.LlmModel);
         this.host = settings.get(ConfigTags.LlmHostAddress);
         this.port = settings.get(ConfigTags.LlmHostPort);
         this.testGoal = settings.get(ConfigTags.LlmTestGoalDescription);
@@ -66,7 +68,7 @@ public class LlmActionSelector implements IActionSelector {
         this.appName = settings.get(ConfigTags.ApplicationName);
         this.temperature = settings.get(ConfigTags.LlmTemperature);
 
-        conversation = LlmFactory.createLlmConversation(this.platform, this.temperature);
+        conversation = LlmFactory.createLlmConversation(this.platform, this.model, this.temperature);
         conversation.initConversation(this.fewshotFile);
     }
 
@@ -201,7 +203,7 @@ public class LlmActionSelector implements IActionSelector {
         String testarVer = Main.TESTAR_VERSION.substring(0, Main.TESTAR_VERSION.indexOf(" "));
         URI uri = URI.create(replaceApiKeyPlaceholder(this.host + ":" + this.port));
 
-        logger.log(Level.DEBUG, "Using endpoint: " + uri);
+        // logger.log(Level.DEBUG, "Using endpoint: " + uri);
         // logger.log(Level.DEBUG, "Request Body: " + requestBody);
 
         try {

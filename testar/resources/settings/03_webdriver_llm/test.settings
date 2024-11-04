@@ -82,7 +82,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*admin.htm.*|.*logout.htm.*
+ClickFilter = .*admin.htm.*|.*logout.htm.*|.*wsdl.*|.*wadl.*
 TagsToFilter = Title;WebName;WebTagName;WebHref
 
 #################################################################
@@ -113,8 +113,8 @@ AlwaysCompile = true
 # MaxTime: Sets a time, in seconds, after which the test run is finished (e.g. stop after an hour)
 #################################################################
 
-ActionDuration = 0.1
-TimeToWaitAfterAction = 0.1
+ActionDuration = 0.3
+TimeToWaitAfterAction = 0.3
 StartupTime = 2.0
 MaxTime = 3.1536E7
 
@@ -168,6 +168,7 @@ AbstractStateAttributes = WebWidgetId
 #################################################################
 
 LlmPlatform = OpenAI
+LlmModel = 
 LlmHostAddress = http://192.168.108.242
 LlmHostPort = 1234/v1/chat/completions
 LlmTestGoalDescription = Log in with the username john and the password demo

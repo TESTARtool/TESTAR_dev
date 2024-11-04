@@ -32,17 +32,22 @@ package org.testar.settings.dialog;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Main;
 import org.testar.settings.Settings;
 
 public class LlmPanel extends SettingsPanel {
@@ -52,14 +57,14 @@ public class LlmPanel extends SettingsPanel {
 	private JLabel labelLlmPlatform = new JLabel("LLM Platform");
 	private JComboBox<String> llmPlatformBox = new JComboBox<>(new String[]{"OpenAI", "Gemini"});
 
+	private JLabel labelLlmModel = new JLabel("LLM Model");
+	private JTextField fieldLlmModel = new JTextField();
+
 	private JLabel labelLlmHostAddress = new JLabel("LLM Host Address");
 	private JTextField fieldLlmHostAddress = new JTextField();
 
 	private JLabel labelLlmHostPort = new JLabel("LLM Host Port");
 	private JTextField fieldLlmHostPort = new JTextField();
-
-	private JLabel labelLlmTestGoalDescription = new JLabel("LLM Test Goal Description");
-	private JTextArea txtLlmTestGoalDescription = new JTextArea();
 
 	private JLabel labelLlmFewshotFile = new JLabel("LLM Fewshot File");
 	private JTextField fieldLlmFewshotFile  = new JTextField();
@@ -68,13 +73,17 @@ public class LlmPanel extends SettingsPanel {
 	private JLabel labelLlmTemperature = new JLabel("LLM Temperature");
 	private JTextField fieldLlmTemperature = new JTextField();
 
+	private JLabel labelLlmTestGoalDescription = new JLabel("LLM Test Goal Description (User story, Gherkin structure, Playwright script, or other)");
+	private JButton dirLlmTestGoalLoad = new JButton("Load Goal");
+	private JTextArea txtLlmTestGoalDescription = new JTextArea();
+
 	public LlmPanel() {
 		setLayout(null);
 
-		labelLlmPlatform.setBounds(10, 12, 180, 27);
+		labelLlmPlatform.setBounds(10, 12, 120, 27);
 		labelLlmPlatform.setToolTipText(ConfigTags.LlmPlatform.getDescription());
 		add(labelLlmPlatform);
-		llmPlatformBox.setBounds(160, 12, 180, 27);
+		llmPlatformBox.setBounds(150, 12, 150, 27);
 		llmPlatformBox.setToolTipText(ConfigTags.LlmPlatform.getDescription());
 		add(llmPlatformBox);
 		// Add an ActionListener to change the settings based on the selected platform
@@ -101,61 +110,97 @@ public class LlmPanel extends SettingsPanel {
 			}
 		});
 
-		labelLlmHostAddress.setBounds(10, 40, 180, 27);
+		labelLlmModel.setBounds(330, 12, 70, 27);
+		labelLlmModel.setToolTipText(ConfigTags.LlmModel.getDescription());
+		add(labelLlmModel);
+		fieldLlmModel.setBounds(400, 12, 150, 27);
+		fieldLlmModel.setToolTipText(ConfigTags.LlmModel.getDescription());
+		add(fieldLlmModel);
+
+		labelLlmHostAddress.setBounds(10, 40, 120, 27);
 		labelLlmHostAddress.setToolTipText(ConfigTags.LlmHostAddress.getDescription());
 		add(labelLlmHostAddress);
-		fieldLlmHostAddress.setBounds(160, 40, 400, 27);
+		fieldLlmHostAddress.setBounds(150, 40, 400, 27);
 		fieldLlmHostAddress.setToolTipText(ConfigTags.LlmHostAddress.getDescription());
 		add(fieldLlmHostAddress);
 
-		labelLlmHostPort.setBounds(10, 70, 180, 27);
+		labelLlmHostPort.setBounds(10, 70, 120, 27);
 		labelLlmHostPort.setToolTipText(ConfigTags.LlmHostPort.getDescription());
 		add(labelLlmHostPort);
-		fieldLlmHostPort.setBounds(160, 70, 400, 27);
+		fieldLlmHostPort.setBounds(150, 70, 400, 27);
 		fieldLlmHostPort.setToolTipText(ConfigTags.LlmHostPort.getDescription());
 		add(fieldLlmHostPort);
 
-		labelLlmTestGoalDescription.setBounds(10, 100, 600, 27);
+		labelLlmFewshotFile.setBounds(10, 100, 120, 27);
+		labelLlmFewshotFile.setToolTipText(ConfigTags.LlmFewshotFile.getDescription());
+		add(labelLlmFewshotFile);
+		fieldLlmFewshotFile.setBounds(150, 100, 400, 27);
+		fieldLlmFewshotFile.setToolTipText(ConfigTags.LlmFewshotFile.getDescription());
+		fieldLlmFewshotFile.setEditable(false);
+		add(fieldLlmFewshotFile);
+		dirLlmButton.setBounds(550, 100, 20, 27);
+		dirLlmButton.addActionListener(this::chooseFewshotFileFileActionPerformed);
+		add(dirLlmButton);
+
+		labelLlmTemperature.setBounds(10, 130, 120, 27);
+		labelLlmTemperature.setToolTipText(ConfigTags.LlmTemperature.getDescription());
+		add(labelLlmTemperature);
+		fieldLlmTemperature.setBounds(150, 130, 400, 27);
+		fieldLlmTemperature.setToolTipText(ConfigTags.LlmTemperature.getDescription());
+		add(fieldLlmTemperature);
+
+		labelLlmTestGoalDescription.setBounds(10, 160, 460, 27);
 		labelLlmTestGoalDescription.setToolTipText(ConfigTags.LlmTestGoalDescription.getDescription());
 		add(labelLlmTestGoalDescription);
+		dirLlmTestGoalLoad.setBounds(510, 160, 100, 27);
+		dirLlmTestGoalLoad.addActionListener(this::chooseTestGoalFileFileActionPerformed);
+		add(dirLlmTestGoalLoad);
 		txtLlmTestGoalDescription.setLineWrap(true);
 		JScrollPane llmTestGoalDescriptionPane = new JScrollPane(txtLlmTestGoalDescription);
-		llmTestGoalDescriptionPane.setBounds(10, 130, 600, 50);
+		llmTestGoalDescriptionPane.setBounds(10, 190, 600, 150);
 		llmTestGoalDescriptionPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 		llmTestGoalDescriptionPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		llmTestGoalDescriptionPane.setToolTipText(ConfigTags.LlmTestGoalDescription.getDescription());
 		add(llmTestGoalDescriptionPane);
 
-		labelLlmFewshotFile.setBounds(10, 190, 180, 27);
-		labelLlmFewshotFile.setToolTipText(ConfigTags.LlmFewshotFile.getDescription());
-		add(labelLlmFewshotFile);
-		fieldLlmFewshotFile.setBounds(160, 190, 180, 27);
-		fieldLlmFewshotFile.setToolTipText(ConfigTags.LlmFewshotFile.getDescription());
-		fieldLlmFewshotFile.setEditable(false);
-		add(fieldLlmFewshotFile);
-		dirLlmButton.setBounds(350, 190, 20, 27);
-		dirLlmButton.addActionListener(this::chooseFileActionPerformed);
-		add(dirLlmButton);
-
-		labelLlmTemperature.setBounds(10, 220, 180, 27);
-		labelLlmTemperature.setToolTipText(ConfigTags.LlmTemperature.getDescription());
-		add(labelLlmTemperature);
-		fieldLlmTemperature.setBounds(160, 220, 400, 27);
-		fieldLlmTemperature.setToolTipText(ConfigTags.LlmTemperature.getDescription());
-		add(fieldLlmTemperature);
 	}
 
 	// show a file dialog to choose the LLM Fewshot File
-	private void chooseFileActionPerformed(ActionEvent evt) {
+	private void chooseFewshotFileFileActionPerformed(ActionEvent evt) {
 		JFileChooser fd = new JFileChooser();
 		fd.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		fd.setCurrentDirectory(new File(fieldLlmFewshotFile.getText()).getParentFile());
+		fd.setCurrentDirectory(new File(Main.testarDir));
 
 		if (fd.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			String file = fd.getSelectedFile().getAbsolutePath();
 
 			// Set the text from settings in txtSutPath
 			fieldLlmFewshotFile.setText(file);
+		}
+	}
+
+	// show a file dialog to choose the test goal file content
+	private void chooseTestGoalFileFileActionPerformed(ActionEvent evt) {
+		JFileChooser fd = new JFileChooser();
+		fd.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		fd.setCurrentDirectory(new File(Main.testarDir));
+
+		if (fd.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+			File selectedFile = fd.getSelectedFile();
+
+			try (BufferedReader reader = new BufferedReader(new FileReader(selectedFile))) {
+				StringBuilder content = new StringBuilder();
+				String line;
+
+				while ((line = reader.readLine()) != null) {
+					content.append(line).append("\n");
+				}
+
+				// Set the content of the selected file
+				txtLlmTestGoalDescription.setText(content.toString());
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(this, "Error reading file: " + e.getMessage(), "File Error", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 
@@ -173,11 +218,12 @@ public class LlmPanel extends SettingsPanel {
 			}
 		}
 
+		fieldLlmModel.setText(settings.get(ConfigTags.LlmModel));
 		fieldLlmHostAddress.setText(settings.get(ConfigTags.LlmHostAddress));
 		fieldLlmHostPort.setText(settings.get(ConfigTags.LlmHostPort));
-		txtLlmTestGoalDescription.setText(settings.get(ConfigTags.LlmTestGoalDescription));
 		fieldLlmFewshotFile.setText(settings.get(ConfigTags.LlmFewshotFile));
 		fieldLlmTemperature.setText(settings.get(ConfigTags.LlmTemperature).toString());
+		txtLlmTestGoalDescription.setText(settings.get(ConfigTags.LlmTestGoalDescription).replace("\\n", "\n"));
 	}
 
 	@Override
@@ -191,12 +237,12 @@ public class LlmPanel extends SettingsPanel {
 			settings.set(ConfigTags.LlmPlatform, "OpenAI");
 		}
 
+		settings.set(ConfigTags.LlmModel, fieldLlmModel.getText());
 		settings.set(ConfigTags.LlmHostAddress, fieldLlmHostAddress.getText());
 		settings.set(ConfigTags.LlmHostPort, fieldLlmHostPort.getText());
-		settings.set(ConfigTags.LlmTestGoalDescription, txtLlmTestGoalDescription.getText());
 		settings.set(ConfigTags.LlmFewshotFile, fieldLlmFewshotFile.getText());
-		float temperature = Float.parseFloat(fieldLlmTemperature.getText());
-		settings.set(ConfigTags.LlmTemperature, temperature);
+		settings.set(ConfigTags.LlmTemperature, Float.parseFloat(fieldLlmTemperature.getText()));
+		settings.set(ConfigTags.LlmTestGoalDescription, txtLlmTestGoalDescription.getText().replace("\n", "\\n").replace("\r", ""));
 	}
 
 }

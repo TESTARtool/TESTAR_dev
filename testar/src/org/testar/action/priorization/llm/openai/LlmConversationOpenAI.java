@@ -17,16 +17,26 @@ import com.google.gson.Gson;
 public class LlmConversationOpenAI implements LlmConversation {
     protected static final Logger logger = LogManager.getLogger();
 
+    private String model;
     private List<Message> messages;
     private float temperature = 0.2f;
     private int max_tokens = -1;
     private boolean stream = false;
 
-    public LlmConversationOpenAI(float temperature) {
-        messages = new ArrayList<>();
+    public LlmConversationOpenAI(String model, float temperature) {
+        this.model = model;
+        this.messages = new ArrayList<>();
         this.temperature = temperature;
     }
 
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+    
     public List<Message> getMessages() {
         return messages;
     }
