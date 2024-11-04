@@ -12,6 +12,7 @@ import org.testar.monkey.Main;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
+import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.settings.Settings;
@@ -104,7 +105,7 @@ public class LlmActionSelector implements IActionSelector {
      * @return The action to execute or null if failed.
      */
     private Action selectActionWithLlm(State state, Set<Action> actions) {
-        String prompt = generatePrompt(actions);
+        String prompt = generatePrompt(actions, state);
         logger.log(Level.DEBUG, "Generated prompt: " + prompt);
         conversation.addMessage("user", prompt);
 
@@ -183,7 +184,7 @@ public class LlmActionSelector implements IActionSelector {
      * @param actions Set of actions in the current state.
      * @return The generated prompt.
      */
-    private String generatePrompt(Set<Action> actions) {
+    private String generatePrompt(Set<Action> actions, State state) {
         StringBuilder builder = new StringBuilder();
         builder.append(String.format("We are testing the \"%s\" web application. ", appName));
 
@@ -206,7 +207,7 @@ public class LlmActionSelector implements IActionSelector {
                 // Depending on the action, format into something the LLM is more likely to understand.
                 if(Objects.equals(widget.get(WdTags.WebTagName, ""), "select")) {
                     // Workaround for comboboxes
-                    List<String> choices = getComboBoxChoices(widget);
+                    List<String> choices = getComboBoxChoices(widget, state);
                     builder.append(String.format("%s: Set ComboBox '%s' to one of the following values: [",
                             actionId, description));
                     for(String choice : choices) {
@@ -248,11 +249,14 @@ public class LlmActionSelector implements IActionSelector {
         return builder.toString();
     }
 
-    private List<String> getComboBoxChoices(Widget combobox) {
-        // Assumes there is a set of <choice> objects
-        // TODO: Seems to be empty?
+    private List<String> getComboBoxChoices(Widget combobox, State state) {
+        // TODO: Temporary hack, <select> element in HTML seems to be missing <option> unless we re-retrieve the HTML.
+        // Could this be a timing issue? (HTML is retrieved before options are available)
+        WdDriver.getRemoteWebDriver().getPageSource();
+
         String innerHtml = combobox.get(WdTags.WebInnerHTML);
-        // logger.log(Level.INFO, "INNERHTML " + innerHtml);
+
+        // Assumes there is a set of <choice> objects
         Pattern choicePattern = Pattern.compile("<option[^>]*>(.*?)</option>");
         Matcher matcher = choicePattern.matcher(innerHtml);
         List<String> choices = new ArrayList<>();
@@ -416,7 +420,6 @@ public class LlmActionSelector implements IActionSelector {
             }
 
             setCompoundActionInputText(selectedAction, input);
-
             return new LlmParseResult(selectedAction, LlmParseResult.ParseResult.SUCCESS);
 
         } catch(JsonParseException e) {
