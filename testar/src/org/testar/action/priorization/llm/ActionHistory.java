@@ -9,6 +9,7 @@ import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.actions.CompoundAction;
 import org.testar.monkey.alayer.actions.PasteText;
 import org.testar.monkey.alayer.actions.Type;
+import org.testar.monkey.alayer.actions.WdSelectListAction;
 
 import java.util.ArrayList;
 
@@ -78,6 +79,11 @@ public class ActionHistory {
                     break;
                 case "LeftClickAt":
                     builder.append(String.format("%s: Clicked on '%s'", actionId, description));
+                    break;
+                case "SelectListAction":
+                    WdSelectListAction selectListAction = (WdSelectListAction) action;
+                    String val = selectListAction.getValue();
+                    builder.append(String.format("%s: Set value of ComboBox '%s' to '%s'", actionId, description, val));
                     break;
                 default:
                     logger.log(Level.WARN, "Unsupported action type for action history: " + type);

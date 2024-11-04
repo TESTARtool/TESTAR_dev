@@ -53,9 +53,6 @@ public class LlmActionSelector implements IActionSelector {
     private String previousTestGoal = "";
     private int currentTestGoal = 0;
 
-    private boolean isSelecting = false;
-    private String comboboxSelection = "";
-
     /**
      * Creates a new LlmActionSelector.
      * @param settings with contains:
@@ -84,14 +81,7 @@ public class LlmActionSelector implements IActionSelector {
 
     @Override
     public Action selectAction(State state, Set<Action> actions) {
-        if(isSelecting) {
-            Action action = createComboBoxAction(actions);
-            isSelecting = false;
-            comboboxSelection = "";
-            return action;
-        } else {
-            return selectActionWithLlm(state, actions);
-        }
+        return selectActionWithLlm(state, actions);
     }
 
     /**
@@ -266,19 +256,23 @@ public class LlmActionSelector implements IActionSelector {
         return choices;
     }
 
-    private Action createComboBoxAction(Set<Action> actions) {
+    private Action createComboBoxAction(Set<Action> actions, String actionId, String value) {
+        Widget target = null;
+
+        // Get the target widget
         for(Action action : actions) {
-            Widget widget = action.get(Tags.OriginWidget);
-            if(Objects.equals(widget.get(WdTags.WebTagName, ""), "option")) {
-                if(Objects.equals(widget.get(WdTags.WebTextContent), comboboxSelection)) {
-                    // Found the option we want to select
-                    return new WdRemoteClickAction((WdWidget)widget);
-                }
+            if(Objects.equals(action.get(Tags.ConcreteID), actionId)) {
+                target = action.get(Tags.OriginWidget);
             }
         }
 
-        logger.log(Level.ERROR, "Unable to find combobox selection widget!");
-        return null;
+        if(target == null) {
+            logger.log(Level.ERROR, "Unable to find combobox selection widget!");
+            return null;
+        } else {
+            String elementId = target.get(WdTags.WebId);
+            return new WdSelectListAction(elementId, value, target);
+        }
     }
 
     /**
@@ -409,14 +403,13 @@ public class LlmActionSelector implements IActionSelector {
                 return new LlmParseResult(null, LlmParseResult.ParseResult.INVALID_ACTION);
             }
 
+            String actionId = selection.getActionId();
             String input = selection.getInput();
             Widget widget = selectedAction.get(Tags.OriginWidget);
 
             if(Objects.equals(widget.get(WdTags.WebTagName, ""), "select")) {
-                // Hacky workaround for combobox
-                comboboxSelection = input;
-                isSelecting = true;
-                return new LlmParseResult(new WdRemoteClickAction((WdWidget)widget), LlmParseResult.ParseResult.SUCCESS);
+                return new LlmParseResult(
+                        createComboBoxAction(actions, actionId, input),LlmParseResult.ParseResult.SUCCESS);
             }
 
             setCompoundActionInputText(selectedAction, input);
