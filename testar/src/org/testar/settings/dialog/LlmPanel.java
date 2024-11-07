@@ -60,11 +60,11 @@ public class LlmPanel extends SettingsPanel {
 	private JLabel labelLlmModel = new JLabel("LLM Model");
 	private JTextField fieldLlmModel = new JTextField();
 
-	private JLabel labelLlmHostAddress = new JLabel("LLM Host Address");
-	private JTextField fieldLlmHostAddress = new JTextField();
+	private JLabel labelLlmHostUrl = new JLabel("LLM Host Url");
+	private JTextField fieldLlmHostUrl = new JTextField();
 
-	private JLabel labelLlmHostPort = new JLabel("LLM Host Port");
-	private JTextField fieldLlmHostPort = new JTextField();
+	private JLabel labelLlmAuthorizationHeader= new JLabel("LLM Auth Header");
+	private JTextField fieldLlmAuthorizationHeader = new JTextField();
 
 	private JLabel labelLlmFewshotFile = new JLabel("LLM Fewshot File");
 	private JTextField fieldLlmFewshotFile  = new JTextField();
@@ -92,14 +92,12 @@ public class LlmPanel extends SettingsPanel {
 			public void actionPerformed(ActionEvent e) {
 				switch ((String) llmPlatformBox.getSelectedItem()) {
 				case "OpenAI":
-					fieldLlmHostAddress.setText("http://192.168.108.242");
-					fieldLlmHostPort.setText("1234/v1/chat/completions");
+					fieldLlmHostUrl.setText("http://192.168.108.242:1234/v1/chat/completions");
 					fieldLlmFewshotFile.setText("prompts/fewshot_login_openai.json");
 					fieldLlmTemperature.setText("0.2");
 					break;
 				case "Gemini":
-					fieldLlmHostAddress.setText("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest");
-					fieldLlmHostPort.setText("generateContent?key=%GEMINI_API_KEY%");
+					fieldLlmHostUrl.setText("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=%GEMINI_API_KEY%");
 					fieldLlmFewshotFile.setText("prompts/fewshot_login_gemini.json");
 					fieldLlmTemperature.setText("0.2");
 					break;
@@ -117,19 +115,19 @@ public class LlmPanel extends SettingsPanel {
 		fieldLlmModel.setToolTipText(ConfigTags.LlmModel.getDescription());
 		add(fieldLlmModel);
 
-		labelLlmHostAddress.setBounds(10, 40, 120, 27);
-		labelLlmHostAddress.setToolTipText(ConfigTags.LlmHostAddress.getDescription());
-		add(labelLlmHostAddress);
-		fieldLlmHostAddress.setBounds(150, 40, 400, 27);
-		fieldLlmHostAddress.setToolTipText(ConfigTags.LlmHostAddress.getDescription());
-		add(fieldLlmHostAddress);
+		labelLlmHostUrl.setBounds(10, 40, 120, 27);
+		labelLlmHostUrl.setToolTipText(ConfigTags.LlmHostUrl.getDescription());
+		add(labelLlmHostUrl);
+		fieldLlmHostUrl.setBounds(150, 40, 400, 27);
+		fieldLlmHostUrl.setToolTipText(ConfigTags.LlmHostUrl.getDescription());
+		add(fieldLlmHostUrl);
 
-		labelLlmHostPort.setBounds(10, 70, 120, 27);
-		labelLlmHostPort.setToolTipText(ConfigTags.LlmHostPort.getDescription());
-		add(labelLlmHostPort);
-		fieldLlmHostPort.setBounds(150, 70, 400, 27);
-		fieldLlmHostPort.setToolTipText(ConfigTags.LlmHostPort.getDescription());
-		add(fieldLlmHostPort);
+		labelLlmAuthorizationHeader.setBounds(10, 70, 120, 27);
+		labelLlmAuthorizationHeader.setToolTipText(ConfigTags.LlmAuthorizationHeader.getDescription());
+		add(labelLlmAuthorizationHeader);
+		fieldLlmAuthorizationHeader.setBounds(150, 70, 400, 27);
+		fieldLlmAuthorizationHeader.setToolTipText(ConfigTags.LlmAuthorizationHeader.getDescription());
+		add(fieldLlmAuthorizationHeader);
 
 		labelLlmFewshotFile.setBounds(10, 100, 120, 27);
 		labelLlmFewshotFile.setToolTipText(ConfigTags.LlmFewshotFile.getDescription());
@@ -219,8 +217,8 @@ public class LlmPanel extends SettingsPanel {
 		}
 
 		fieldLlmModel.setText(settings.get(ConfigTags.LlmModel));
-		fieldLlmHostAddress.setText(settings.get(ConfigTags.LlmHostAddress));
-		fieldLlmHostPort.setText(settings.get(ConfigTags.LlmHostPort));
+		fieldLlmHostUrl.setText(settings.get(ConfigTags.LlmHostUrl));
+		fieldLlmAuthorizationHeader.setText(settings.get(ConfigTags.LlmAuthorizationHeader));
 		fieldLlmFewshotFile.setText(settings.get(ConfigTags.LlmFewshotFile));
 		fieldLlmTemperature.setText(settings.get(ConfigTags.LlmTemperature).toString());
 		txtLlmTestGoalDescription.setText(settings.get(ConfigTags.LlmTestGoalDescription).replace("\\n", "\n"));
@@ -238,8 +236,8 @@ public class LlmPanel extends SettingsPanel {
 		}
 
 		settings.set(ConfigTags.LlmModel, fieldLlmModel.getText());
-		settings.set(ConfigTags.LlmHostAddress, fieldLlmHostAddress.getText());
-		settings.set(ConfigTags.LlmHostPort, fieldLlmHostPort.getText());
+		settings.set(ConfigTags.LlmHostUrl, fieldLlmHostUrl.getText());
+		settings.set(ConfigTags.LlmAuthorizationHeader, fieldLlmAuthorizationHeader.getText());
 		settings.set(ConfigTags.LlmFewshotFile, fieldLlmFewshotFile.getText());
 		settings.set(ConfigTags.LlmTemperature, Float.parseFloat(fieldLlmTemperature.getText()));
 		settings.set(ConfigTags.LlmTestGoalDescription, txtLlmTestGoalDescription.getText().replace("\n", "\\n").replace("\r", ""));

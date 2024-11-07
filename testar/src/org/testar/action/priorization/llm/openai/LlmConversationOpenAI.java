@@ -20,7 +20,7 @@ public class LlmConversationOpenAI implements LlmConversation {
     private String model;
     private List<Message> messages;
     private float temperature = 0.2f;
-    private int max_tokens = -1;
+    private Integer max_tokens = null;
     private boolean stream = false;
 
     public LlmConversationOpenAI(String model, float temperature) {
@@ -53,7 +53,7 @@ public class LlmConversationOpenAI implements LlmConversation {
         this.temperature = temperature;
     }
 
-    public float getMax_tokens() {
+    public Integer getMax_tokens() {
         return max_tokens;
     }
 

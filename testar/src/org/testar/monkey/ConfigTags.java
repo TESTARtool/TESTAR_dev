@@ -159,11 +159,11 @@ public final class ConfigTags {
 	public static final Tag<String> LlmModel = Tag.from("LlmModel", String.class,
 			"The model used by the LLM agent");
 
-	public static final Tag<String> LlmHostAddress = Tag.from("LlmHostAddress", String.class,
-			"The Host Address on which the LLM agent is running");
+	public static final Tag<String> LlmHostUrl = Tag.from("LlmHostUrl", String.class,
+			"The Host URL on which the LLM agent is running");
 
-	public static final Tag<String> LlmHostPort = Tag.from("LlmHostPort", String.class, 
-			"The Host Port on which the LLM agent is listening");
+	public static final Tag<String> LlmAuthorizationHeader = Tag.from("LlmAuthorizationHeader", String.class, 
+			"The Authorization Header required by some LLM agents");
 
 	public static final Tag<String> LlmTestGoalDescription = Tag.from("LlmTestGoalDescription", String.class,
 			"The objective of the test for the LLM agent");

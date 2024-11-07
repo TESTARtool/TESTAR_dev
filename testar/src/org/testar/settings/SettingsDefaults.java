@@ -196,8 +196,8 @@ public class SettingsDefaults {
 		// Settings for LLM agents
 		defaults.add(Pair.from(LlmPlatform, "OpenAI"));
 		defaults.add(Pair.from(LlmModel, ""));
-		defaults.add(Pair.from(LlmHostAddress, "http://192.168.108.242"));
-		defaults.add(Pair.from(LlmHostPort, "1234/v1/chat/completions"));
+		defaults.add(Pair.from(LlmHostUrl, "http://192.168.108.242:1234/v1/chat/completions"));
+		defaults.add(Pair.from(LlmAuthorizationHeader, ""));
 		defaults.add(Pair.from(LlmTestGoalDescription, "Log in with username john and password demo"));
 		defaults.add(Pair.from(LlmFewshotFile, "prompts/fewshot_login_openai.json"));
 		defaults.add(Pair.from(LlmTemperature, 0.2f));

@@ -169,8 +169,8 @@ AbstractStateAttributes = WebWidgetId
 
 LlmPlatform = OpenAI
 LlmModel = 
-LlmHostAddress = http://192.168.108.242
-LlmHostPort = 1234/v1/chat/completions
+LlmHostUrl = http://192.168.108.242:1234/v1/chat/completions
+LlmAuthorizationHeader = 
 LlmTestGoalDescription = Log in with the username john and the password demo
 LlmFewshotFile = prompts/fewshot_login_openai.json
 LlmTemperature = 0.2
