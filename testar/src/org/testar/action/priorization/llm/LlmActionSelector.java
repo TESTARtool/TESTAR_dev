@@ -15,6 +15,7 @@ import org.testar.monkey.alayer.actions.NOP;
 import org.testar.monkey.alayer.actions.PasteText;
 import org.testar.monkey.alayer.actions.Type;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
+import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.settings.Settings;
 
@@ -185,6 +186,9 @@ public class LlmActionSelector implements IActionSelector {
             builder.append(String.format("The following objective was previously achieved: %s. ", previousTestGoal));
             builder.append(String.format("The current objective of the test is: %s. ", testGoalQueue.get(currentTestGoal)));
         }
+
+        String pageTitle = WdDriver.getRemoteWebDriver().getTitle();
+        builder.append(String.format("We are currently on the following page: %s. ", pageTitle));
 
         builder.append("The following actions are available: ");
 
