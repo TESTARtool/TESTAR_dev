@@ -152,6 +152,15 @@ public class WdDriver extends SUTBase {
     remoteWebDriver.get(url);
     try { Thread.sleep(5000); } catch (Exception e){ System.err.println(e.getMessage()); }
     System.out.println("Page Title: " + remoteWebDriver.getTitle());
+	System.out.println("Page Source: " + remoteWebDriver.getPageSource());
+	
+	String userAgent = (String) ((JavascriptExecutor) remoteWebDriver).executeScript("return navigator.userAgent;");
+	System.out.println("User Agent: " + userAgent);
+	if (userAgent.contains("HeadlessChrome")) {
+		System.out.println("Chrome is running in headless mode.");
+	} else {
+		System.out.println("Chrome is running with a GUI.");
+	}
 
     CanvasDimensions.startThread();
 
