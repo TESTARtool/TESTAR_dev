@@ -46,7 +46,7 @@ public class LlmActionSelector implements IActionSelector {
     private final String appName;
     private final float temperature;
 
-    private ActionHistory actionHistory = new ActionHistory(5);
+    private ActionHistory actionHistory;
     private LlmConversation conversation;
     private int tokens_used;
 
@@ -77,6 +77,7 @@ public class LlmActionSelector implements IActionSelector {
         this.fewshotFile = settings.get(ConfigTags.LlmFewshotFile);
         this.appName = settings.get(ConfigTags.ApplicationName);
         this.temperature = settings.get(ConfigTags.LlmTemperature);
+        actionHistory = new ActionHistory(settings.get(ConfigTags.LlmHistorySize));
 
         conversation = LlmFactory.createLlmConversation(this.platform, this.temperature);
         conversation.initConversation(this.fewshotFile);

@@ -68,6 +68,9 @@ public class LlmPanel extends SettingsPanel {
 	private JLabel labelLlmTemperature = new JLabel("LLM Temperature");
 	private JTextField fieldLlmTemperature = new JTextField();
 
+	private JLabel labelLlmHistorySize = new JLabel("Action History Size");
+	private JTextField fieldLlmHistorySize = new JTextField();
+
 	public LlmPanel() {
 		setLayout(null);
 
@@ -143,6 +146,13 @@ public class LlmPanel extends SettingsPanel {
 		fieldLlmTemperature.setBounds(160, 270, 400, 27);
 		fieldLlmTemperature.setToolTipText(ConfigTags.LlmTemperature.getDescription());
 		add(fieldLlmTemperature);
+
+		labelLlmHistorySize.setBounds(10, 300, 180, 27);
+		labelLlmHistorySize.setToolTipText(ConfigTags.LlmHistorySize.getDescription());
+		add(labelLlmHistorySize);
+		fieldLlmHistorySize.setBounds(160, 300, 400, 27);
+		fieldLlmHistorySize.setToolTipText(ConfigTags.LlmHistorySize.getDescription());
+		add(fieldLlmHistorySize);
 	}
 
 	// show a file dialog to choose the LLM Fewshot File
@@ -178,6 +188,7 @@ public class LlmPanel extends SettingsPanel {
 		txtLlmTestGoalDescription.setText(settings.get(ConfigTags.LlmTestGoalDescription));
 		fieldLlmFewshotFile.setText(settings.get(ConfigTags.LlmFewshotFile));
 		fieldLlmTemperature.setText(settings.get(ConfigTags.LlmTemperature).toString());
+		fieldLlmHistorySize.setText(settings.get(ConfigTags.LlmHistorySize).toString());
 	}
 
 	@Override
@@ -197,6 +208,8 @@ public class LlmPanel extends SettingsPanel {
 		settings.set(ConfigTags.LlmFewshotFile, fieldLlmFewshotFile.getText());
 		float temperature = Float.parseFloat(fieldLlmTemperature.getText());
 		settings.set(ConfigTags.LlmTemperature, temperature);
+		int historySize = Integer.parseInt(fieldLlmHistorySize.getText());
+		settings.set(ConfigTags.LlmHistorySize, historySize);
 	}
 
 }

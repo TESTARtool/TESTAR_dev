@@ -171,6 +171,9 @@ public final class ConfigTags {
 	public static final Tag<Float> LlmTemperature = Tag.from("LlmTemperature", Float.class,
 			"Controls the randomness of the LLM output. Value between 0 and 2.");
 
+	public static final Tag<Integer> LlmHistorySize = Tag.from("LlmHistorySize", Integer.class,
+			"Controls how many historical actions are kept track of and sent to the LLM.");
+
 	/**
 	 * WebDriver settings 
 	 */
