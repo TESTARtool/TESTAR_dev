@@ -5,7 +5,7 @@ name: Gradle CI tests
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, workflow_test_macos ]
   pull_request:
     branches: [ master ]
 
