@@ -150,6 +150,8 @@ public class WdDriver extends SUTBase {
     }
 
     remoteWebDriver.get(url);
+    try { Thread.sleep(5000); } catch (Exception e){ System.err.println(e.getMessage()); }
+    System.out.println("Page Title: " + remoteWebDriver.getTitle());
 
     CanvasDimensions.startThread();
 
