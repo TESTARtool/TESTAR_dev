@@ -1,0 +1,30 @@
+import com.microsoft.playwright.*;
+import com.microsoft.playwright.options.*;
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+import java.util.*;
+
+public class Example {
+  public static void main(String[] args) {
+    try (Playwright playwright = Playwright.create()) {
+      Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions()
+        .setHeadless(false));
+      BrowserContext context = browser.newContext();
+      Page page = context.newPage();
+      page.navigate("https://para.testar.org/");
+      page.locator("input[name=\"username\"]").fill("john");
+      page.locator("input[name=\"password\"]").fill("demo");
+      page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Log In")).click();
+      page.getByRole(AriaRole.LINK, new Page.GetByRoleOptions().setName("Bill Pay")).click();
+      page.locator("input[name=\"payee\\.name\"]").fill("testar");
+      page.locator("input[name=\"payee\\.address\\.street\"]").fill("cami de vera");
+      page.locator("input[name=\"payee\\.address\\.city\"]").fill("valencia");
+      page.locator("input[name=\"payee\\.address\\.state\"]").fill("valencia");
+      page.locator("input[name=\"payee\\.address\\.zipCode\"]").fill("46022");
+      page.locator("input[name=\"payee\\.phoneNumber\"]").fill("111-222-333");
+      page.locator("input[name=\"payee\\.accountNumber\"]").fill("12345");
+      page.locator("input[name=\"verifyAccount\"]").fill("12345");
+      page.locator("input[name=\"amount\"]").fill("100");
+      page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Send Payment")).click();
+    }
+  }
+}

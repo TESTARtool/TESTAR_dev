@@ -39,8 +39,9 @@ public class LlmActionSelector implements IActionSelector {
     protected static final Logger logger = LogManager.getLogger();
 
     private final String platform;
-    private final String host;
-    private final String port;
+    private final String model;
+    private final String hostUrl;
+    private final String authorizationHeader;
     private final String testGoal;
     private final String fewshotFile;
     private final String appName;
@@ -67,8 +68,9 @@ public class LlmActionSelector implements IActionSelector {
      */
     public LlmActionSelector(Settings settings) {
         this.platform = settings.get(ConfigTags.LlmPlatform);
-        this.host = settings.get(ConfigTags.LlmHostAddress);
-        this.port = settings.get(ConfigTags.LlmHostPort);
+        this.model = settings.get(ConfigTags.LlmModel);
+        this.hostUrl = settings.get(ConfigTags.LlmHostUrl);
+        this.authorizationHeader = settings.get(ConfigTags.LlmAuthorizationHeader);
         this.testGoal = settings.get(ConfigTags.LlmTestGoalDescription);
 
         this.testGoalQueue = Arrays.stream(testGoal.split(",")).toList();
@@ -79,7 +81,7 @@ public class LlmActionSelector implements IActionSelector {
         this.temperature = settings.get(ConfigTags.LlmTemperature);
         actionHistory = new ActionHistory(settings.get(ConfigTags.LlmHistorySize));
 
-        conversation = LlmFactory.createLlmConversation(this.platform, this.temperature);
+        conversation = LlmFactory.createLlmConversation(this.platform, this.model, this.temperature);
         conversation.initConversation(this.fewshotFile);
     }
 
@@ -127,7 +129,7 @@ public class LlmActionSelector implements IActionSelector {
                     NOP nop = new NOP();
                     nop.set(Tags.Desc, "Test goal complete, moving to next test goal");
                     // Reset conversation
-                    conversation = LlmFactory.createLlmConversation(this.platform, this.temperature);
+                    conversation = LlmFactory.createLlmConversation(this.platform, this.model, this.temperature);
                     conversation.initConversation(this.fewshotFile);
                     actionHistory.clear();
                     previousTestGoal = testGoalQueue.get(currentTestGoal - 1);
@@ -241,9 +243,9 @@ public class LlmActionSelector implements IActionSelector {
      */
     private String getResponseFromLlm(String requestBody) {
         String testarVer = Main.TESTAR_VERSION.substring(0, Main.TESTAR_VERSION.indexOf(" "));
-        URI uri = URI.create(replaceApiKeyPlaceholder(this.host + ":" + this.port));
+        URI uri = URI.create(replaceApiKeyPlaceholder(this.hostUrl));
 
-        logger.log(Level.DEBUG, "Using endpoint: " + uri);
+        // logger.log(Level.DEBUG, "Using endpoint: " + uri);
         // logger.log(Level.DEBUG, "Request Body: " + requestBody);
 
         try {
@@ -254,6 +256,12 @@ public class LlmActionSelector implements IActionSelector {
             con.setRequestProperty("Content-Type", "application/json");
             con.setRequestProperty("Accept", "application/json");
             con.setRequestProperty("User-Agent", "testar/" + testarVer);
+
+            // Check optional Authorization Header parameter
+            if (this.authorizationHeader != null && !this.authorizationHeader.isEmpty()) {
+            	con.setRequestProperty("Authorization", replaceApiKeyPlaceholder(this.authorizationHeader));
+            }
+
             con.setDoInput(true);
             con.setDoOutput(true);
             con.setConnectTimeout(10000);

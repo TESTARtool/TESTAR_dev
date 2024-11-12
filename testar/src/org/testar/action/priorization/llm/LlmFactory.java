@@ -10,10 +10,10 @@ import com.google.gson.Gson;
 public class LlmFactory {
     private static final Gson GSON = new Gson(); 
 
-    public static LlmConversation createLlmConversation(String platform, float temperature) {
+    public static LlmConversation createLlmConversation(String platform, String model, float temperature) {
         switch (platform) {
         case "OpenAI":
-            return new LlmConversationOpenAI(temperature);
+            return new LlmConversationOpenAI(model, temperature);
         case "Gemini":
             return new LlmConversationGemini();
         default:
