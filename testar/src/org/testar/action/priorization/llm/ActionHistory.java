@@ -9,6 +9,7 @@ import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.actions.CompoundAction;
 import org.testar.monkey.alayer.actions.PasteText;
 import org.testar.monkey.alayer.actions.Type;
+import org.testar.monkey.alayer.actions.WdSelectListAction;
 
 import java.util.ArrayList;
 

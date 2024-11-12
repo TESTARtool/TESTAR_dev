@@ -72,4 +72,8 @@ public class WdSelectListAction extends TaggableBase implements Action {
     public String toString(Role... discardParameters) {
         return toShortString();
     }
+
+    public String getValue() {
+        return value;
+    }
 }

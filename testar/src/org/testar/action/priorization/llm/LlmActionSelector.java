@@ -10,10 +10,7 @@ import org.testar.IActionSelector;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.monkey.alayer.*;
-import org.testar.monkey.alayer.actions.CompoundAction;
-import org.testar.monkey.alayer.actions.NOP;
-import org.testar.monkey.alayer.actions.PasteText;
-import org.testar.monkey.alayer.actions.Type;
+import org.testar.monkey.alayer.actions.*;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
@@ -24,10 +21,9 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Protocol for selecting actions using a large language model (LLM).
@@ -101,7 +97,7 @@ public class LlmActionSelector implements IActionSelector {
      * @return The action to execute or null if failed.
      */
     private Action selectActionWithLlm(State state, Set<Action> actions) {
-        String prompt = generatePrompt(actions);
+        String prompt = generatePrompt(actions, state);
         logger.log(Level.DEBUG, "Generated prompt: " + prompt);
         conversation.addMessage("user", prompt);
 
@@ -179,7 +175,7 @@ public class LlmActionSelector implements IActionSelector {
      * @param actions Set of actions in the current state.
      * @return The generated prompt.
      */
-    private String generatePrompt(Set<Action> actions) {
+    private String generatePrompt(Set<Action> actions, State state) {
         StringBuilder builder = new StringBuilder();
         builder.append(String.format("We are testing the \"%s\" web application. ", appName));
 
@@ -203,18 +199,29 @@ public class LlmActionSelector implements IActionSelector {
                 String description = widget.get(Tags.Desc, "No description");
 
                 // Depending on the action, format into something the LLM is more likely to understand.
-                switch(type) {
-                    case "ClickTypeInto":
-                        // Differentiate between types of input fields. Example: password -> Password Field
-                        String fieldType = StringUtils.capitalize(widget.get(WdTags.WebType, "text"));
-                        builder.append(String.format("%s: Type in %sField '%s'", actionId, fieldType, description));
-                        break;
-                    case "LeftClickAt":
-                        builder.append(String.format("%s: Click on '%s'", actionId, description));
-                        break;
-                    default:
-                        logger.log(Level.WARN, "Unsupported action type for LLM action selection: " + type);
-                        break;
+                if(Objects.equals(widget.get(WdTags.WebTagName, ""), "select")) {
+                    // Workaround for comboboxes
+                    List<String> choices = getComboBoxChoices(widget, state);
+                    builder.append(String.format("%s: Set ComboBox '%s' to one of the following values: [",
+                            actionId, description));
+                    for(String choice : choices) {
+                        builder.append(String.format("%s,", choice));
+                    }
+                    builder.append("] ");
+                } else {
+                    switch (type) {
+                        case "ClickTypeInto":
+                            // Differentiate between types of input fields. Example: password -> Password Field
+                            String fieldType = StringUtils.capitalize(widget.get(WdTags.WebType, "text"));
+                            builder.append(String.format("%s: Type in %sField '%s' ", actionId, fieldType, description));
+                            break;
+                        case "LeftClickAt":
+                            builder.append(String.format("%s: Click on '%s' ", actionId, description));
+                            break;
+                        default:
+                            logger.log(Level.WARN, "Unsupported action type for LLM action selection: " + type);
+                            break;
+                    }
                 }
 
             } catch(NoSuchTagException e) {
@@ -234,6 +241,42 @@ public class LlmActionSelector implements IActionSelector {
         builder.append("Which action should be executed to accomplish the test goal?");
 
         return builder.toString();
+    }
+
+    private List<String> getComboBoxChoices(Widget combobox, State state) {
+        // TODO: Temporary hack, <select> element in HTML seems to be missing <option> unless we re-retrieve the HTML.
+        // Could this be a timing issue? (HTML is retrieved before options are available)
+        WdDriver.getRemoteWebDriver().getPageSource();
+
+        String innerHtml = combobox.get(WdTags.WebInnerHTML);
+
+        // Assumes there is a set of <choice> objects
+        Pattern choicePattern = Pattern.compile("<option[^>]*>(.*?)</option>");
+        Matcher matcher = choicePattern.matcher(innerHtml);
+        List<String> choices = new ArrayList<>();
+        while (matcher.find()) {
+            choices.add(matcher.group(1));
+        }
+        return choices;
+    }
+
+    private Action createComboBoxAction(Set<Action> actions, String actionId, String value) {
+        Widget target = null;
+
+        // Get the target widget
+        for(Action action : actions) {
+            if(Objects.equals(action.get(Tags.ConcreteID), actionId)) {
+                target = action.get(Tags.OriginWidget);
+            }
+        }
+
+        if(target == null) {
+            logger.log(Level.ERROR, "Unable to find combobox selection widget!");
+            return null;
+        } else {
+            String elementId = target.get(WdTags.WebId);
+            return new WdSelectListAction(elementId, value, target);
+        }
     }
 
     /**
@@ -370,10 +413,16 @@ public class LlmActionSelector implements IActionSelector {
                 return new LlmParseResult(null, LlmParseResult.ParseResult.INVALID_ACTION);
             }
 
-            String inputText = selection.getInput();
+            String actionId = selection.getActionId();
+            String input = selection.getInput();
+            Widget widget = selectedAction.get(Tags.OriginWidget);
 
-            setCompoundActionInputText(selectedAction, inputText);
+            if(Objects.equals(widget.get(WdTags.WebTagName, ""), "select")) {
+                return new LlmParseResult(
+                        createComboBoxAction(actions, actionId, input),LlmParseResult.ParseResult.SUCCESS);
+            }
 
+            setCompoundActionInputText(selectedAction, input);
             return new LlmParseResult(selectedAction, LlmParseResult.ParseResult.SUCCESS);
 
         } catch(JsonParseException e) {
