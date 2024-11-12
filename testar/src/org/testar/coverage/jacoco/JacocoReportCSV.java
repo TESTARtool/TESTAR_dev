@@ -128,11 +128,11 @@ public class JacocoReportCSV {
 					totalMethodCovered += cc.getMethodCounter().getCoveredCount();
 				}
 
-				String totalInstructionRatio = formatPercentage((double)totalInstructionCovered / (double)(totalInstructionMissed + totalInstructionCovered));
-				String totalBranchRatio = formatPercentage((double)totalBranchCovered / (double)(totalBranchMissed + totalBranchCovered));
-				String totalLineRatio = formatPercentage((double)totalLineCovered / (double)(totalLineMissed + totalLineCovered));
-				String totalComplexityRatio = formatPercentage((double)totalComplexityCovered / (double)(totalComplexityMissed + totalComplexityCovered));
-				String totalMethodRatio = formatPercentage((double)totalMethodCovered / (double)(totalMethodMissed + totalMethodCovered));
+				String totalInstructionRatio = totalRatio((double)totalInstructionCovered, (double)totalInstructionMissed);
+				String totalBranchRatio = totalRatio((double)totalBranchCovered, (double)totalBranchMissed);
+				String totalLineRatio = totalRatio((double)totalLineCovered, (double)totalLineMissed);
+				String totalComplexityRatio = totalRatio((double)totalComplexityCovered, (double)totalComplexityMissed);
+				String totalMethodRatio = totalRatio((double)totalMethodCovered, (double)totalMethodMissed);
 
 				// Print CSV totals
 				printer.printRecord("TOTAL",
@@ -225,6 +225,13 @@ public class JacocoReportCSV {
 		} catch (IOException e) {
 			logger.error("Error analyzing zip entry " + entry.getName() + ": " + e.getMessage());
 		}
+	}
+
+	private String totalRatio(double covered, double missed) {
+		if (covered == 0.0 && missed == 0.0) {
+			return "0.00";
+		}
+		return formatPercentage(covered / (covered + missed));
 	}
 
 	private String formatPercentage(double value) {
