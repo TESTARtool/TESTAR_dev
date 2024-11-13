@@ -24,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Protocol for selecting actions using a large language model (LLM).
@@ -69,7 +70,7 @@ public class LlmActionSelector implements IActionSelector {
         this.authorizationHeader = settings.get(ConfigTags.LlmAuthorizationHeader);
         this.testGoal = settings.get(ConfigTags.LlmTestGoalDescription);
 
-        this.testGoalQueue = Arrays.stream(testGoal.split(",")).toList();
+        this.testGoalQueue = Arrays.stream(testGoal.split(",")).collect(Collectors.toList());
         logger.log(Level.INFO, String.format("Detected %d test goals.", testGoalQueue.size()));
 
         this.fewshotFile = settings.get(ConfigTags.LlmFewshotFile);
