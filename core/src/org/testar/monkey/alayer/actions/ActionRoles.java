@@ -42,6 +42,7 @@ public final class ActionRoles {
 	public static final Role
 
 	Action = Role.from("Action"),
+	NOPAction = Role.from("NOPAction", Action),
 	MouseAction = Role.from("MouseAction", Action),
 	KeyboardAction = Role.from("KeyboardAction", Action),
 	CompoundAction = Role.from("CompoundAction", Action),

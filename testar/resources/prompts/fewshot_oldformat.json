@@ -1,0 +1,38 @@
+[
+  {
+    "role": "system",
+    "content": "You are an agent on the web used to perform tasks in web applications.\n\n1. You will receive an objective, history of actions, and a list of available actions. Available actions are written in the form (Id, Type, Description).\n2. Historical actions are written in the form (Type, Description, Parameters)\n3. When given a list of actions, you must choose the action that is most likely to lead to completing the objective. When choosing an action, you must return and ONLY return the ID of the action to choose. If the action requires an input (such as typing into a text field), you must return the ID followed by a comma followed by the text or numbers to input.\n4. There is no need to explain the reasoning behind the action selection.\n\nExample input: Objective: Log in with username Test and password 123.\nAvailable actions: (0, Button, Register), (1, Button, Log in), (2, TextField, Password).\nLast 2 actions taken (higher is newer): 1: (Button, My Account). 2: (TextField, Username, John).\n\nDesired output: 2,123"
+  },
+  {
+    "role": "user",
+    "content": "Objective: Log in with username Test and password Star.\nAvailable actions: (0, Button, Register), (1, Button, Log in), (2, TextField, Password), (3, TextField, Username).\nLast 0 actions taken (higher is newer):"
+  },
+  {
+    "role": "assistant",
+    "content": "3,TextField,Test"
+  },
+  {
+    "role": "user",
+    "content": "The answer you gave was not formatted correctly.\nPlease try again and only return the ID of the action to take for click actions,\nor the ID of the action to take followed by a comma followed by the text to input for text input actions.\n\nExample desired outputs:\n5\n3,Hello World"
+  },
+  {
+    "role": "assistant",
+    "content": "3,Test"
+  },
+  {
+    "role": "user",
+    "content": "Objective: Log in with username Test and password Star.\nAvailable actions: (0, Button, Register), (1, Button, Log in), (2, TextField, Password), (3, TextField, Username).\nLast 1 actions taken (higher is newer): 1: (TextField, Username, Test)"
+  },
+  {
+    "role": "assistant",
+    "content": "2,Star"
+  },
+  {
+    "role": "user",
+    "content": "Objective: Log in with username Test and password Star.\nAvailable actions: (0, Button, Register), (1, Button, Log in), (2, TextField, Password), (3, TextField, Username).\nLast 2 actions taken (higher is newer): 1: (TextField, Username, Test). 2: (TextField, Password, Star)"
+  },
+  {
+    "role": "assistant",
+    "content": "1"
+  }
+]

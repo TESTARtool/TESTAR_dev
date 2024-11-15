@@ -64,7 +64,11 @@ public final class PasteText extends TaggableBase implements Action {
 		Assert.isTrue(duration >= 0);
 		Assert.notNull(system);
 
-		StringSelection selection = new StringSelection(text);
+		//TODO: Refactor this hacky way of changing the final text of Type actions
+		//TODO: This is necessary for LLMs decisions but may alter the actions abstraction
+		String inputText = this.get(Tags.InputText, this.text);
+
+		StringSelection selection = new StringSelection(inputText);
 
 		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 		clipboard.setContents(selection, null);
@@ -77,7 +81,7 @@ public final class PasteText extends TaggableBase implements Action {
 			throw new IllegalArgumentException("This string is not an UTF-32 string!");
 	}
 
-	public String toString(){ return "Pasted text '" + StringEscapeUtils.escapeHtml4(text) + "'"; }
+	public String toString(){ return "Pasted text '" + StringEscapeUtils.escapeHtml4(this.get(Tags.InputText, this.text)) + "'"; }
 
 	@Override
 	public String toString(Role... discardParameters) {
@@ -99,7 +103,7 @@ public final class PasteText extends TaggableBase implements Action {
 
 	@Override
 	public String toParametersString() {
-		return "(" + text + ")";
+		return "(" + this.get(Tags.InputText, this.text) + ")";
 	}
 
 }

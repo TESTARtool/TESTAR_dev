@@ -94,7 +94,8 @@ public class SettingsDialog extends JFrame implements Observer {
   private static final int TIMES_TAB_INDEX = 4;
   //private static final int MISC_TAB_INDEX = 5;
   private static final int MODEL_TAB_INDEX = 5;
-  private static final int ADVANCED_TAB_INDEX = 6;
+  private static final int LLM_TAB_INDEX = 6;
+  private static final int ADVANCED_TAB_INDEX = 7;
   private final Map<Integer, Pair<String, SettingsPanel>> settingPanels = new HashMap<>();
 
   /**
@@ -281,6 +282,7 @@ public class SettingsDialog extends JFrame implements Observer {
     settingPanels.put(TIMES_TAB_INDEX, new Pair<>("Time Settings", new TimingPanel()));
     //settingPanels.put(MISC_TAB_INDEX, new Pair<>("Misc", new MiscPanel())); // TODO: Misc panel is disabled temporally from the GUI
     settingPanels.put(MODEL_TAB_INDEX, new Pair<>("State Model", modelPanel = StateModelPanel.createStateModelPanel()));
+    settingPanels.put(LLM_TAB_INDEX, new Pair<>("LLMs", new LlmPanel()));
     settingPanels.put(ADVANCED_TAB_INDEX, new Pair<>("Advanced Options", new AdvancedPanel()));
 
     settingPanels.forEach((k,v) -> jTabsPane.add(v.left(),v.right()));

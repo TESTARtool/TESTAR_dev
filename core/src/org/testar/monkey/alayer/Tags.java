@@ -213,5 +213,10 @@ public final class Tags extends TagsBase {
 	 * The original widget that can be attached to things like actions
 	 */
 	public static final Tag<Widget> OriginWidget = from("OriginWidget", Widget.class);
-	
+
+	/**
+	 * The input text for a type or paste action
+	 */
+	public static final Tag<String> InputText = from("InputText", String.class);
+
 }

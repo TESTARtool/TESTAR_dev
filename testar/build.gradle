@@ -124,6 +124,12 @@ dependencies {
     implementation group: 'com.sikulix', name: 'sikulixapi', version: '2.0.5'
     // https://mvnrepository.com/artifact/com.microsoft.playwright/playwright
     implementation group: 'com.microsoft.playwright', name: 'playwright', version: '1.47.0'
+    // jacoco and maven dependencies for jacoco coverage
+    implementation group: 'org.apache.maven', name: 'maven-core', version: '3.9.8'
+    implementation group: 'org.apache.maven.reporting', name: 'maven-reporting-api', version: '3.1.1'
+    implementation group: 'org.jacoco', name: 'jacoco-maven-plugin', version: '0.8.12'
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-csv
+    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.11.0'
 }
 
 task prepareSettings(type: Copy) {

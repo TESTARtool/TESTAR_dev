@@ -175,13 +175,22 @@ task runTestDesktopGenericTitleNameSuspiciousTag(type: Exec, dependsOn:['install
 }
 
 // Verify TESTAR JavaAccessBridge works with SwingSet2 Java Swing app
-task runTestDesktopJavaSwing(type: Exec, dependsOn:'installDist') {
+task unzipSwingSet2Jar(type: Copy) {
+    dependsOn installDist
+
+    def jarFile = file('target/install/testar/bin/suts/SwingSet2.jar')
+    def outputDir = file('target/install/testar/bin/suts/SwingSet2')
+
+    from zipTree(jarFile)
+    into outputDir
+}
+task runTestDesktopJavaSwing(type: Exec, dependsOn: ['installDist', 'unzipSwingSet2Jar']) {
     // Read command line output
     standardOutput = new ByteArrayOutputStream()
     group = 'test_testar_workflow'
     description ='runTestDesktopJavaSwing'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_java_swing AlwaysCompile=true ApplicationName="java_swing_ok" ShowVisualSettingsDialogOnStartup=false AccessBridgeEnabled=true Mode=Generate Sequences=1 SequenceLength=1 OnlySaveFaultySequences=true'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_java_swing AlwaysCompile=true ApplicationName="java_swing_ok" ShowVisualSettingsDialogOnStartup=false AccessBridgeEnabled=true Mode=Generate Sequences=1 SequenceLength=1 OnlySaveFaultySequences=true TagsToFilter="Title;ToolTipText;UIAAutomationId" ClickFilter="^(?!(.*[mM]enu.*|.*[fF]ile.*)$).*$"'
     doLast {
         String output = standardOutput.toString()
         // Check that output contains No problem detected. message to verify the correct execution
