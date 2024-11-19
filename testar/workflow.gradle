@@ -175,7 +175,16 @@ task runTestDesktopGenericTitleNameSuspiciousTag(type: Exec, dependsOn:['install
 }
 
 // Verify TESTAR JavaAccessBridge works with SwingSet2 Java Swing app
-task runTestDesktopJavaSwing(type: Exec, dependsOn:'installDist') {
+task unzipSwingSet2Jar(type: Copy) {
+    dependsOn installDist
+
+    def jarFile = file('target/install/testar/bin/suts/SwingSet2.jar')
+    def outputDir = file('target/install/testar/bin/suts/SwingSet2')
+
+    from zipTree(jarFile)
+    into outputDir
+}
+task runTestDesktopJavaSwing(type: Exec, dependsOn: ['installDist', 'unzipSwingSet2Jar']) {
     // Read command line output
     standardOutput = new ByteArrayOutputStream()
     group = 'test_testar_workflow'
