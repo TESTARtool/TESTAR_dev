@@ -57,6 +57,9 @@ public class TestReportManager {
 		pasteAction.set(Tags.ConcreteID, "pasteActionConcreteID");
 		pasteAction.set(Tags.Desc, "pasteActionDescription");
 		derivedActions.add(pasteAction);
+
+		Action emptyTagsAction = new Type("emptyTagsAction");
+		derivedActions.add(emptyTagsAction);
 	}
 
 	@Test
@@ -106,6 +109,7 @@ public class TestReportManager {
 		Assert.assertTrue(fileContains("<h4>Set of actions:</h4>", htmlReportFile));
 		Assert.assertTrue(fileContains("<b>typeActionDescription</b>", htmlReportFile));
 		Assert.assertTrue(fileContains("<b>pasteActionDescription</b>", htmlReportFile));
+		Assert.assertTrue(fileContains("<b>NoActionDescriptionAvailable</b>", htmlReportFile));
 		// Verify selected action information
 		Assert.assertTrue(fileContains("<h4>ConcreteID=typeActionConcreteID || typeActionDescription</h4>", htmlReportFile));
 		// Verify verdict information
@@ -151,6 +155,7 @@ public class TestReportManager {
 		Assert.assertTrue(fileContains("Set of actions:", txtReportFile));
 		Assert.assertTrue(fileContains("typeActionDescription", txtReportFile));
 		Assert.assertTrue(fileContains("pasteActionDescription", txtReportFile));
+		Assert.assertTrue(fileContains("NoActionDescriptionAvailable", txtReportFile));
 		// Verify selected action information
 		Assert.assertTrue(fileContains("ConcreteID=typeActionConcreteID || typeActionDescription", txtReportFile));
 		// Verify verdict information
