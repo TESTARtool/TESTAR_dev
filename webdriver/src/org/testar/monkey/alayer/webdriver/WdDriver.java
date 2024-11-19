@@ -151,9 +151,11 @@ public class WdDriver extends SUTBase {
 
     remoteWebDriver.get(url);
     try { Thread.sleep(5000); } catch (Exception e){ System.err.println(e.getMessage()); }
+    System.out.println("Browser Size: " + remoteWebDriver.manage().window().getSize());
+    System.out.println("Browser Position: " + remoteWebDriver.manage().window().getPosition());
     System.out.println("Page Title: " + remoteWebDriver.getTitle());
 	System.out.println("Page Source: " + remoteWebDriver.getPageSource());
-	
+
 	String userAgent = (String) ((JavascriptExecutor) remoteWebDriver).executeScript("return navigator.userAgent;");
 	System.out.println("User Agent: " + userAgent);
 	if (userAgent.contains("HeadlessChrome")) {
@@ -174,13 +176,13 @@ public class WdDriver extends SUTBase {
         .usingAnyFreePort()
         .build();
     ChromeOptions options = new ChromeOptions();
-    options.addArguments("load-extension=" + extensionPath);
-    options.addArguments("disable-infobars");
+    options.addArguments("--load-extension=" + extensionPath);
+    options.addArguments("--disable-infobars");
     if(fullScreen) {
     	options.addArguments("--start-maximized");
     }
     if(disableSecurity) {
-        options.addArguments("ignore-certificate-errors");
+        options.addArguments("--ignore-certificate-errors");
     	options.addArguments("--disable-web-security");
     	options.addArguments("--allow-running-insecure-content");
     }

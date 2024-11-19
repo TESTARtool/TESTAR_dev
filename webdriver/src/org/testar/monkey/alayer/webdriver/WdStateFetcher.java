@@ -54,6 +54,9 @@ public class WdStateFetcher implements Callable<WdState> {
     Object result = WdDriver.executeScript(
         "return getStateTreeTestar(arguments[0])", Constants.ignoredTags);
 
+    System.out.println("DEBUG JavaScript extension: " + result.getClass().getName());
+    //System.out.println("DEBUG JavaScript extension (getStateTreeTestar(arguments[0])): " + result.toString());
+
     // TODO As Edge limits its recursion to 20, we need to flatten the tree in JS
     // And unflatten the list here into a nested Map (as produced by Chrome / FF)
     // https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/18531786/
@@ -65,8 +68,11 @@ public class WdStateFetcher implements Callable<WdState> {
       packedBody = (Map<String, Object>) result;
     }
     else {
+    	System.out.println("DEBUG JavaScript extension: packedBody is neither List or Map");
     	return emptyRootState(system);
     }
+
+    System.out.println("DEBUG JavaScript extension (packedBody size): " + packedBody.size());
 
     WdRootElement wdRoot = new WdRootElement(packedBody);
     wdRoot.isRunning = system.isRunning();
