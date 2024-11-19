@@ -176,6 +176,9 @@ public class WdDriver extends SUTBase {
         .usingAnyFreePort()
         .build();
     ChromeOptions options = new ChromeOptions();
+    
+    System.out.println("--load-extension=" + extensionPath);
+    
     options.addArguments("--load-extension=" + extensionPath);
     options.addArguments("--disable-infobars");
     if(fullScreen) {
