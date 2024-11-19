@@ -176,10 +176,10 @@ public class WdDriver extends SUTBase {
         .usingAnyFreePort()
         .build();
     ChromeOptions options = new ChromeOptions();
-    
-    System.out.println("--load-extension=" + extensionPath);
-    
-    options.addArguments("--load-extension=" + extensionPath);
+
+    System.out.println("EXTENSION: " + extensionPath + "/web-extension.crx");
+
+    options.addExtensions(new File(extensionPath + "/web-extension.crx"));
     options.addArguments("--disable-infobars");
     if(fullScreen) {
     	options.addArguments("--start-maximized");

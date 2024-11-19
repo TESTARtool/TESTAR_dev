@@ -162,9 +162,6 @@ public class WdElement extends TaggableBase implements Serializable {
 
     List<Map<String, Object>> wrappedChildren =
         (List<Map<String, Object>>) packedElement.get("wrappedChildren");
- 
-    System.out.println("DEBUG wrappedChildren: " + wrappedChildren.size());
-
     for (Map<String, Object> wrappedChild : wrappedChildren) {
       WdElement child = new WdElement(wrappedChild, root, this);
       if (!Constants.hiddenTags.contains(child.tagName) &&
