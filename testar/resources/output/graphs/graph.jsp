@@ -39,6 +39,8 @@
 
         <button onclick="queryModel()">Query Model</button>
         <button onclick="resetQuery()">Reset Query</button>
+
+        <button onclick="generateJSON()">Generate JSON</button>
 	</div>
 	<div class="layout">
         <div class="column">
@@ -1258,6 +1260,65 @@
             }
         });
     }
+
+	function generateJSON() {
+		let concreteStates = [];
+		let concreteActions = [];
+		let concreteTransitions = [];
+
+		// Iterate over each ConcreteState element in the graph
+		// Extract AbstractID and WebTitle from the ConcreteState's data
+		cy.$(".ConcreteState").forEach((ele) => {
+			const abstractID = ele.data("AbstractID");
+			const webTitle = ele.data("WebTitle");
+			concreteStates.push({
+				AbstractID: abstractID,
+				WebTitle: webTitle,
+			});
+		});
+
+		// Iterate over each ConcreteAction element in the graph
+		// Extract AbstractID, Desc, and WebHref from the ConcreteAction's data
+		cy.$(".ConcreteAction").forEach((ele) => {
+			const abstractID = ele.data("AbstractID");
+			const desc = ele.data("Desc");
+			const webHref = ele.data("WebHref");
+			concreteActions.push({
+				AbstractID: abstractID,
+				Desc: desc,
+				WebHref: webHref,
+			});
+		});
+
+		// Iterate over each ConcreteAction element in the graph
+		// Extract the transition information (source and target nodes)
+		cy.$(".ConcreteAction").forEach((ele) => {
+			// Get the source and target nodes of the edge
+			const sourceNode = ele.source();
+			const targetNode = ele.target();
+
+			// Ensure the source and target nodes are valid
+			if (sourceNode && targetNode) {
+				concreteTransitions.push({
+					Source: sourceNode.data("AbstractID"),
+					Target: targetNode.data("AbstractID"),
+					Action: ele.data("AbstractID"),
+				});
+			}
+		});
+
+		// Construct the final JSON object
+		const jsonResult = {
+			ConcreteState: concreteStates,
+			ConcreteAction: concreteActions,
+			ConcreteTransitions: concreteTransitions,
+		};
+
+		// Convert the JSON object to a string if needed for output
+		console.log(JSON.stringify(jsonResult, null, 2));
+
+		return jsonResult;
+	}
 
 </script>
 </body>

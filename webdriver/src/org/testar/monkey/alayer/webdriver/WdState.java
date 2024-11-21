@@ -49,6 +49,7 @@ public final class WdState extends WdWidget implements State {
 	public WdState(WdElement root) {
 		super(null, null, root);
 		this.root = this;
+		this.set(WdTags.WebTitle, WdDriver.getRemoteWebDriver().getTitle());
 	}
 
 	public Iterator<Widget> iterator() {
