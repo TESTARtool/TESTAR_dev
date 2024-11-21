@@ -45,6 +45,8 @@ import org.testar.monkey.Util;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.settings.Settings;
 import org.testar.statemodel.StateModelManagerFactory;
+import org.testar.statemodel.analysis.IMetricsCollector;
+import org.testar.statemodel.analysis.StateModelMetricsCollector;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -67,6 +69,7 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 
 	// The LLM Action selector needs to be initialize with the settings
 	private LlmActionSelector llmActionSelector;
+	private IMetricsCollector metricsCollector;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -83,6 +86,9 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 
 		// Initialize the LlmActionSelector using the LLM settings
 		llmActionSelector = new LlmActionSelector(settings);
+
+		// Initialize the metrics collector to analyze the state model
+		metricsCollector = new StateModelMetricsCollector(stateModelManager, "Welcome");
 	}
 
 	private void setupOrientDB() {
@@ -471,19 +477,7 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 	@Override
 	protected void finishSequence() {
 		String modelIdentifier = stateModelManager.getModelIdentifier();
-		String searchMessage = "Welcome";
-
-		StringBuilder queryBuilder = new StringBuilder();
-		queryBuilder.append("SELECT COUNT(*) ");
-		queryBuilder.append("FROM ConcreteState ");
-		queryBuilder.append("WHERE uid LIKE '" + modelIdentifier + "%'");
-		queryBuilder.append("AND WebInnerHTML LIKE '%" + searchMessage + "%'");
-
-		String query = queryBuilder.toString();
-		String result = stateModelManager.queryStateModel(query);
-		System.out.println("Query: " + query);
-		System.out.println("Query Result: " + result);
-		System.out.println("Message Found: " + result.contains("COUNT(*): 1"));
+		metricsCollector.addMetrics(modelIdentifier);
 
 		super.finishSequence();
 	}
