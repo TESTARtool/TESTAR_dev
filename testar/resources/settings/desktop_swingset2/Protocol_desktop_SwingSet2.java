@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2017 - 2021 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2017 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2024 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -43,7 +43,7 @@ import org.testar.protocols.DesktopProtocol;
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
 
-//TODO Fernando: create a higher level SwingProtocol and document this one after that
+//TODO: create a higher level SwingProtocol and document this one after that
 /**
  * Protocol specifically for testing Java Swing applications.
  */
@@ -74,9 +74,12 @@ public class Protocol_desktop_SwingSet2 extends DesktopProtocol {
         //----------------------
 
         // iterate through all widgets
+        //for(Widget w : state){
+
+        // iterate through the top widgets of the state (used for menu items)
         for(Widget w : getTopWidgets(state)){
 
-            if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
+        	if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
 
                 if (!blackListed(w)){  // do not build actions for tabu widgets  
 

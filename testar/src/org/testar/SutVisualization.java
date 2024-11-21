@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -89,8 +89,8 @@ public class SutVisualization {
                 cwShape.paint(canvas, Pen.PEN_MARK_BORDER);
                 if (!showExtendedWidgetInfo){
                 	// Widget properties we are going to show in Spy mode when the information is not extended
-                	String rootText = "StateID: " + rootW.get(Tags.AbstractIDCustom, "");
-                	String widgetText = "WidgetID: " + cursorWidget.get(Tags.AbstractIDCustom, "");
+                	String rootText = "StateID: " + rootW.get(Tags.AbstractID, "");
+                	String widgetText = "WidgetID: " + cursorWidget.get(Tags.AbstractID, "");
                 	String titleText = "Title: " + cursorWidget.get(Tags.Title, "");
                 	String roleText = "Role: " + cursorWidget.get(Role, Roles.Widget).toString();
                 	String enabledText = "Enabled: " + cursorWidget.get(Tags.Enabled, false);

@@ -40,23 +40,26 @@ public class TestReportManager {
 		tempFolder.newFolder();
 
 		state = new StateStub();
-		state.set(Tags.AbstractIDCustom, "stateAbstractIDCustom");
-		state.set(Tags.ConcreteIDCustom, "stateConcreteIDCustom");
+		state.set(Tags.AbstractID, "stateAbstractID");
+		state.set(Tags.ConcreteID, "stateConcreteID");
 		state.set(Tags.ScreenshotPath, "imgPath");
 		derivedActions = new HashSet<>();
 
 		Action typeAction = new Type("typeAction");
-		typeAction.set(Tags.AbstractIDCustom, "typeActionAbstractIDCustom");
-		typeAction.set(Tags.ConcreteIDCustom, "typeActionConcreteIDCustom");
+		typeAction.set(Tags.AbstractID, "typeActionAbstractID");
+		typeAction.set(Tags.ConcreteID, "typeActionConcreteID");
 		typeAction.set(Tags.Desc, "typeActionDescription");
 		derivedActions.add(typeAction);
 		selectedAction = typeAction;
 
 		Action pasteAction = new Type("pasteAction");
-		pasteAction.set(Tags.AbstractIDCustom, "pasteActionAbstractIDCustom");
-		pasteAction.set(Tags.ConcreteIDCustom, "pasteActionConcreteIDCustom");
+		pasteAction.set(Tags.AbstractID, "pasteActionAbstractID");
+		pasteAction.set(Tags.ConcreteID, "pasteActionConcreteID");
 		pasteAction.set(Tags.Desc, "pasteActionDescription");
 		derivedActions.add(pasteAction);
+
+		Action emptyTagsAction = new Type("emptyTagsAction");
+		derivedActions.add(emptyTagsAction);
 	}
 
 	@Test
@@ -100,14 +103,15 @@ public class TestReportManager {
 		// Verify state information
 		Assert.assertTrue(fileContains("<title>TESTAR execution sequence report</title>", htmlReportFile));
 		Assert.assertTrue(fileContains("<h1>TESTAR execution sequence report for sequence 1</h1>", htmlReportFile));
-		Assert.assertTrue(fileContains("<h4>AbstractIDCustom=stateAbstractIDCustom</h4>", htmlReportFile));
-		Assert.assertTrue(fileContains("<h4>ConcreteIDCustom=stateConcreteIDCustom</h4>", htmlReportFile));
+		Assert.assertTrue(fileContains("<h4>AbstractID=stateAbstractID</h4>", htmlReportFile));
+		Assert.assertTrue(fileContains("<h4>ConcreteID=stateConcreteID</h4>", htmlReportFile));
 		// Verify derived actions information
 		Assert.assertTrue(fileContains("<h4>Set of actions:</h4>", htmlReportFile));
 		Assert.assertTrue(fileContains("<b>typeActionDescription</b>", htmlReportFile));
 		Assert.assertTrue(fileContains("<b>pasteActionDescription</b>", htmlReportFile));
+		Assert.assertTrue(fileContains("<b>NoActionDescriptionAvailable</b>", htmlReportFile));
 		// Verify selected action information
-		Assert.assertTrue(fileContains("<h4>ConcreteIDCustom=typeActionConcreteIDCustom || typeActionDescription</h4>", htmlReportFile));
+		Assert.assertTrue(fileContains("<h4>ConcreteID=typeActionConcreteID || typeActionDescription</h4>", htmlReportFile));
 		// Verify verdict information
 		Assert.assertTrue(fileContains("<h2>Test verdict for this sequence: No problem detected.</h2>", htmlReportFile));
 
@@ -145,14 +149,15 @@ public class TestReportManager {
 		// Verify state information
 		Assert.assertTrue(fileContains("TESTAR execution sequence report", txtReportFile));
 		Assert.assertTrue(fileContains("TESTAR execution sequence report for sequence 1", txtReportFile));
-		Assert.assertTrue(fileContains("AbstractIDCustom=stateAbstractIDCustom", txtReportFile));
-		Assert.assertTrue(fileContains("ConcreteIDCustom=stateConcreteIDCustom", txtReportFile));
+		Assert.assertTrue(fileContains("AbstractID=stateAbstractID", txtReportFile));
+		Assert.assertTrue(fileContains("ConcreteID=stateConcreteID", txtReportFile));
 		// Verify derived actions information
 		Assert.assertTrue(fileContains("Set of actions:", txtReportFile));
 		Assert.assertTrue(fileContains("typeActionDescription", txtReportFile));
 		Assert.assertTrue(fileContains("pasteActionDescription", txtReportFile));
+		Assert.assertTrue(fileContains("NoActionDescriptionAvailable", txtReportFile));
 		// Verify selected action information
-		Assert.assertTrue(fileContains("ConcreteIDCustom=typeActionConcreteIDCustom || typeActionDescription", txtReportFile));
+		Assert.assertTrue(fileContains("ConcreteID=typeActionConcreteID || typeActionDescription", txtReportFile));
 		// Verify verdict information
 		Assert.assertTrue(fileContains("Test verdict for this sequence: No problem detected.", txtReportFile));
 	}
@@ -185,8 +190,8 @@ public class TestReportManager {
 		// Verify state information
 		Assert.assertTrue(fileContains("<title>TESTAR execution sequence report</title>", htmlReportFile));
 		Assert.assertTrue(fileContains("<h1>TESTAR execution sequence report for sequence 1</h1>", htmlReportFile));
-		Assert.assertTrue(fileContains("<h4>AbstractIDCustom=NoAbstractIdCustomAvailable</h4>", htmlReportFile));
-		Assert.assertTrue(fileContains("<h4>ConcreteIDCustom=NoConcreteIdCustomAvailable</h4>", htmlReportFile));
+		Assert.assertTrue(fileContains("<h4>AbstractID=NoAbstractIdAvailable</h4>", htmlReportFile));
+		Assert.assertTrue(fileContains("<h4>ConcreteID=NoConcreteIdAvailable</h4>", htmlReportFile));
 		Assert.assertTrue(fileContains("<img src=\"NoScreenshotPathAvailable", htmlReportFile));
 	}
 

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2024 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,21 +28,44 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.reporting_depricated;
+package org.testar.coverage;
 
-import org.testar.monkey.alayer.Action;
-import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Verdict;
+import java.io.File;
+import java.util.ArrayList;
 
-import java.util.Set;
+import org.testar.OutputStructure;
+import org.testar.coverage.jacoco.JacocoCoverage;
+import org.testar.monkey.ConfigTags;
+import org.testar.settings.Settings;
 
-@Deprecated
-public interface Reporting {
-    public void addSequenceStep(State state, String actionImagePath);
-    public void addState(State state);
-    public void addActions(Set<Action> actions);
-    public void addActionsAndUnvisitedActions(Set<Action> actions, Set<String> concreteIdsOfUnvisitedActions);
-    public void addSelectedAction(State state, Action action);
-    public void addTestVerdict(Verdict verdict);
-    public void close();
+public class CodeCoverageManager implements CodeCoverage {
+
+	private ArrayList<CodeCoverage> coverageExtractors;
+
+	public CodeCoverageManager(Settings settings) {
+		// Create a file directory to store the coverage file results
+		String outputCoveragePath = OutputStructure.outerLoopOutputDir + File.separator + "coverage";
+		File outputCoverageDir = new File(outputCoveragePath);
+		if(!outputCoverageDir.exists())
+			outputCoverageDir.mkdirs();
+
+		coverageExtractors = new ArrayList<>();
+
+		if(settings.get(ConfigTags.JacocoCoverage, false)) {
+			coverageExtractors.add(new JacocoCoverage(settings, outputCoveragePath));
+		}
+	}
+
+	@Override
+	public void getSequenceCoverage() {
+		for(CodeCoverage coverageExtractor : coverageExtractors)
+			coverageExtractor.getSequenceCoverage();
+	}
+
+	@Override
+	public void getActionCoverage(String actionCount) {
+		for(CodeCoverage coverageExtractor : coverageExtractors)
+			coverageExtractor.getActionCoverage(actionCount);
+	}
+
 }

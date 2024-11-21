@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2024 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -43,16 +43,16 @@ import java.util.Set;
 
 public class GuiStateGraphWithVisitedActions implements IActionSelector {
     protected Set<IdBasedGuiState> idBasedGuiStates;
-    protected String startingStateAbstractCustomId;
-    protected String previousStateAbstractCustomId;
-    protected String previousActionAbstractCustomId;
+    protected String startingStateAbstractId;
+    protected String previousStateAbstractId;
+    protected String previousActionAbstractId;
 
     public GuiStateGraphWithVisitedActions() {
         idBasedGuiStates = new HashSet<IdBasedGuiState>();
     }
 
-    public Set<String> getAbstractCustomIdsOfUnvisitedActions(State state){
-        return getIdBasedGuiState(state.get(Tags.AbstractIDCustom)).getUnvisitedActionIds();
+    public Set<String> getAbstractIdsOfUnvisitedActions(State state){
+        return getIdBasedGuiState(state.get(Tags.AbstractID)).getUnvisitedActionIds();
     }
 
     //TODO move into a new action selector:
@@ -60,27 +60,25 @@ public class GuiStateGraphWithVisitedActions implements IActionSelector {
     public Action selectAction(State state, Set<Action> actions){
         System.out.println("---------------------------------------------------------");
         // saving the starting node of the graph:
-        if(startingStateAbstractCustomId==null){
-            startingStateAbstractCustomId=state.get(Tags.AbstractIDCustom);
+        if(startingStateAbstractId==null){
+            startingStateAbstractId=state.get(Tags.AbstractID);
         }
         // adding state transition to the graph: previous state + previous action = current state
-        if(previousStateAbstractCustomId!=null && previousActionAbstractCustomId != null){
-            IdBasedGuiState previousState = getIdBasedGuiState(previousStateAbstractCustomId);
+        if(previousStateAbstractId!=null && previousActionAbstractId != null){
+            IdBasedGuiState previousState = getIdBasedGuiState(previousStateAbstractId);
             if(previousState==null){
                 System.out.println(this.getClass()+": ERROR: GuiStateGraphWithVisitedActions did not find previous state!");
             }else{
                 idBasedGuiStates.remove(previousState);
-//                System.out.println(this.getClass()+": new state transition: previousStateId="+previousStateAbstractCustomId+", targetStateId="+state.get(Tags.AbstractIDCustom)+", previousActionAbstractCustomId="+previousActionAbstractCustomId);
-                previousState.addStateTransition(new GuiStateTransition(previousStateAbstractCustomId,state.get(Tags.AbstractIDCustom),previousActionAbstractCustomId));
+                previousState.addStateTransition(new GuiStateTransition(previousStateAbstractId,state.get(Tags.AbstractID),previousActionAbstractId));
                 idBasedGuiStates.add(previousState);
             }
         }
         Action returnAction = null;
-        IdBasedGuiState currentIdBasedGuiState = getIdBasedGuiState(state.get(Tags.AbstractIDCustom));
+        IdBasedGuiState currentIdBasedGuiState = getIdBasedGuiState(state.get(Tags.AbstractID));
 
         if(currentIdBasedGuiState==null) { // did not contain the state ID -> a new state
             // new state:
-//            System.out.println(this.getClass()+": selectAction(): new state");
             currentIdBasedGuiState = createIdBasedGuiState(state, actions);
         }
 
@@ -96,16 +94,15 @@ public class GuiStateGraphWithVisitedActions implements IActionSelector {
             // already visited state
             if(currentIdBasedGuiState.getUnvisitedActionIds().size()==0){
                 System.out.println(this.getClass()+":  all actions visited! Finding the action leading to a state with most unvisited actions");
-                String actionId = getAbstractCustomIdOfActionLeadingToStateWithMostUnvisitedActions(currentIdBasedGuiState.getAbstractCustomStateId());
-                returnAction =getActionWithAbstractCustomId(actions, actionId);
+                String actionId = getAbstractIdOfActionLeadingToStateWithMostUnvisitedActions(currentIdBasedGuiState.getAbstractStateId());
+                returnAction =getActionWithAbstractId(actions, actionId);
             }else{
-                System.out.println(this.getClass()+": selectAction(): existing state, ID="+currentIdBasedGuiState.getAbstractCustomStateId()+", available action count="+actions.size()+",unvisited action count="+currentIdBasedGuiState.getUnvisitedActionIds().size());
+                System.out.println(this.getClass()+": selectAction(): existing state, ID="+currentIdBasedGuiState.getAbstractStateId()+", available action count="+actions.size()+",unvisited action count="+currentIdBasedGuiState.getUnvisitedActionIds().size());
                 long graphTime = System.currentTimeMillis();
                 Random rnd = new Random(graphTime);
                 ArrayList<String> unvisitedActions = new ArrayList<String>(currentIdBasedGuiState.getUnvisitedActionIds());
-                String abstractCustomIdOfRandomUnvisitedAction = unvisitedActions.get(rnd.nextInt(unvisitedActions.size()));
-//                System.out.println(this.getClass()+": unvisitedAction.size="+unvisitedActions.size()+", random Id="+abstractCustomIdOfRandomUnvisitedAction);
-                returnAction = getActionWithAbstractCustomId(actions, abstractCustomIdOfRandomUnvisitedAction);
+                String abstractIdOfRandomUnvisitedAction = unvisitedActions.get(rnd.nextInt(unvisitedActions.size()));
+                returnAction = getActionWithAbstractId(actions, abstractIdOfRandomUnvisitedAction);
             }
         }
         if(returnAction==null){
@@ -115,11 +112,11 @@ public class GuiStateGraphWithVisitedActions implements IActionSelector {
         }
         //updating the list of states:
         idBasedGuiStates.remove(currentIdBasedGuiState); // should not be a problem if state not there (new state)?
-        currentIdBasedGuiState.addVisitedAction(returnAction.get(Tags.AbstractIDCustom));
+        currentIdBasedGuiState.addVisitedAction(returnAction.get(Tags.AbstractID));
         idBasedGuiStates.add(currentIdBasedGuiState);
         // saving the state and action for state transition after knowing the target state:
-        previousActionAbstractCustomId = returnAction.get(Tags.AbstractIDCustom);
-        previousStateAbstractCustomId = state.get(Tags.AbstractIDCustom);
+        previousActionAbstractId = returnAction.get(Tags.AbstractID);
+        previousStateAbstractId = state.get(Tags.AbstractID);
         System.out.println(this.getClass() + ": return selected action = " + returnAction.get(Tags.Desc, "NoDescAvailable"));
         return returnAction;
     }
@@ -128,20 +125,20 @@ public class GuiStateGraphWithVisitedActions implements IActionSelector {
      * returns null if action with given ID is not found
      *
      * @param actions
-     * @param abstractCustomActionId
+     * @param abstractActionId
      * @return
      */
-    protected Action getActionWithAbstractCustomId(Set<Action> actions, String abstractCustomActionId){
+    protected Action getActionWithAbstractId(Set<Action> actions, String abstractActionId){
         for(Action action:actions){
-            // find the action with abstractCustomId:
-            if(action.get(Tags.AbstractIDCustom).equals(abstractCustomActionId)){
+            // find the action with abstractId:
+            if(action.get(Tags.AbstractID).equals(abstractActionId)){
                 return action;
             }
         }
         return null;
     }
 
-    protected String getAbstractCustomIdOfActionLeadingToStateWithMostUnvisitedActions(String currentStateId){
+    protected String getAbstractIdOfActionLeadingToStateWithMostUnvisitedActions(String currentStateId){
         IdBasedGuiState currentState = getIdBasedGuiState(currentStateId);
         if(currentState==null || currentState.getUnvisitedActionIds()==null){
             System.out.println(this.getClass()+": ERROR, current state or transitions is null!");
@@ -149,26 +146,26 @@ public class GuiStateGraphWithVisitedActions implements IActionSelector {
         int numberOfMostUnvisitedActions = 0;
         String returnActionId = null;
         for(GuiStateTransition transition:currentState.getStateTransitions()){
-            if(transition==null || transition.getSourceStateAbstractCustomId()==null){
+            if(transition==null || transition.getSourceStateAbstractId()==null){
                 System.out.println(this.getClass()+": ERROR, transition or source state id is null!");
             }
-            if(transition.getSourceStateAbstractCustomId().equals(currentStateId)){
+            if(transition.getSourceStateAbstractId().equals(currentStateId)){
                 //source state is the same as current id, as it should be if no errors
-                if(transition.getTargetStateAbstractCustomId()==null){
+                if(transition.getTargetStateAbstractId()==null){
                     System.out.println(this.getClass()+": ERROR, target state ID is null!");
                 }
-                if(currentState.equals(transition.getTargetStateAbstractCustomId())){
+                if(currentState.getAbstractStateId().equals(transition.getTargetStateAbstractId())){
                     // source state id == target state id -> no actual state transition with this action
                     System.out.println(this.getClass()+": not actually a state transition.");
                 }else{
-                    IdBasedGuiState targetState = getIdBasedGuiState(transition.getTargetStateAbstractCustomId());
+                    IdBasedGuiState targetState = getIdBasedGuiState(transition.getTargetStateAbstractId());
                     if(targetState==null){
                         System.out.println(this.getClass()+": ERROR, target state is null!");
                     }
                     if(targetState.getUnvisitedActionIds().size()>numberOfMostUnvisitedActions){
                         numberOfMostUnvisitedActions = targetState.getUnvisitedActionIds().size();
                         System.out.println(this.getClass()+": unvisited actions = "+numberOfMostUnvisitedActions);
-                        returnActionId = transition.getActionAbstractCustomId();
+                        returnActionId = transition.getActionAbstractId();
                     }
                 }
             }else{
@@ -186,12 +183,12 @@ public class GuiStateGraphWithVisitedActions implements IActionSelector {
     /**
      * Returns null if not found
      *
-     * @param abstractCustomStateId
+     * @param abstractStateId
      * @return
      */
-    protected IdBasedGuiState getIdBasedGuiState(String abstractCustomStateId){
+    protected IdBasedGuiState getIdBasedGuiState(String abstractStateId){
         for(IdBasedGuiState state:idBasedGuiStates){
-            if(state.getAbstractCustomStateId().equals(abstractCustomStateId)){
+            if(state.getAbstractStateId().equals(abstractStateId)){
                 return state;
             }
         }
@@ -201,14 +198,14 @@ public class GuiStateGraphWithVisitedActions implements IActionSelector {
     protected IdBasedGuiState createIdBasedGuiState(State state, Set<Action> actions){
         Set<String> actionIds = new HashSet<>();
         for(Action action:actions){
-            actionIds.add(action.get(Tags.AbstractIDCustom));
+            actionIds.add(action.get(Tags.AbstractID));
         }
-        return new IdBasedGuiState(state.get(Tags.AbstractIDCustom),actionIds);
+        return new IdBasedGuiState(state.get(Tags.AbstractID),actionIds);
     }
 
     protected boolean containsStateId(String stateId){
         for(IdBasedGuiState state:idBasedGuiStates){
-            if(state.getAbstractCustomStateId().equals(stateId)){
+            if(state.getAbstractStateId().equals(stateId)){
                 return true;
             }
         }

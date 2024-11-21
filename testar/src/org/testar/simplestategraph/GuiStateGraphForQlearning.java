@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2024 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -38,9 +38,9 @@ import java.util.*;
 
 public class GuiStateGraphForQlearning {
     protected Set<QlearningGuiState> qlearningGuiStates;
-    protected String startingStateAbstractCustomId;
-    protected String previousStateAbstractCustomId;
-    protected String previousActionAbstractCustomId;
+    protected String startingStateAbstractId;
+    protected String previousStateAbstractId;
+    protected String previousActionAbstractId;
     private double R_MAX;
     private double gammaDiscount;
 
@@ -55,24 +55,21 @@ public class GuiStateGraphForQlearning {
      * Resetting the last action and last state to null for a new test sequence
      */
     public void startANewTestSequence(){
-        previousActionAbstractCustomId=null;
-        previousStateAbstractCustomId=null;
+        previousActionAbstractId=null;
+        previousStateAbstractId=null;
     }
 
     /**
      * returns null if action with given ID is not found
      *
      * @param actions
-     * @param abstractCustomActionId
+     * @param abstractActionId
      * @return
      */
-    protected Action getActionWithAbstractCustomId(Set<Action> actions, String abstractCustomActionId){
-        //System.out.println("DEBUG: trying to find action with a matching ID:");
+    protected Action getActionWithAbstractId(Set<Action> actions, String abstractActionId){
         for(Action action:actions){
-            //System.out.println("DEBUG: action.AbstractIDCustom="+action.get(Tags.AbstractIDCustom)+", idToMatch="+abstractCustomActionId);
-            // find the action with abstractCustomId:
-            if(action.get(Tags.AbstractIDCustom).equals(abstractCustomActionId)){
-                //System.out.println("DEBUG: match found!");
+            // find the action with abstractId:
+            if(action.get(Tags.AbstractID).equals(abstractActionId)){
                 return action;
             }
         }
@@ -83,30 +80,29 @@ public class GuiStateGraphForQlearning {
     /**
      * Returns null if not found
      *
-     * @param abstractCustomStateId
+     * @param abstractStateId
      * @return
      */
-    protected QlearningGuiState getStateByAbstractCustomId(String abstractCustomStateId){
+    protected QlearningGuiState getStateByAbstractId(String abstractStateId){
         for(QlearningGuiState state: qlearningGuiStates){
-            if(state.getAbstractCustomStateId().equals(abstractCustomStateId)){
+            if(state.getAbstractStateId().equals(abstractStateId)){
                 return state;
             }
         }
-        //System.out.println("DEBUG: state with ID="+abstractCustomStateId+" was not found - a new state.");
         return null;
     }
 
     protected QlearningGuiState createQlearningGuiState(State state, Set<Action> actions){
         HashMap<String, Double> actionIds = new HashMap<String, Double>();
         for(Action action:actions){
-            actionIds.put(action.get(Tags.AbstractIDCustom), R_MAX);
+            actionIds.put(action.get(Tags.AbstractID), R_MAX);
         }
-        return new QlearningGuiState(state.get(Tags.AbstractIDCustom),actionIds);
+        return new QlearningGuiState(state.get(Tags.AbstractID),actionIds);
     }
 
     protected boolean containsStateId(String stateId){
         for(QlearningGuiState state: qlearningGuiStates){
-            if(state.getAbstractCustomStateId().equals(stateId)){
+            if(state.getAbstractStateId().equals(stateId)){
                 return true;
             }
         }

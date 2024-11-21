@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2024 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -53,7 +53,7 @@ public class WdProtocolUtil extends ProtocolUtil {
         state.get(WdTags.WebHorizontallyScrollable) ? scrollThick : 0);
     Rect rect = Rect.from(0, 0, width, height);
     AWTCanvas screenshot = WdScreenshot.fromScreenshot(rect, state.get(Tags.HWND, (long)0));
-    return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom), screenshot);
+    return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID), screenshot);
   }
 
   public static String getActionshot(State state, Action action) {
@@ -86,7 +86,7 @@ public class WdProtocolUtil extends ProtocolUtil {
 
     Rect rect = Rect.from(actionArea.x, actionArea.y, actionArea.width + 1, actionArea.height + 1);
     AWTCanvas scrshot = WdScreenshot.fromScreenshot(rect, state.get(Tags.HWND, (long)0));
-    return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), scrshot);
+    return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), action.get(Tags.ConcreteID, "NoConcreteIdAvailable"), scrshot);
   }
   
   private static String getRemoteActionshot(State state, Action action) {
@@ -108,7 +108,7 @@ public class WdProtocolUtil extends ProtocolUtil {
 
       Rect rect = Rect.from(actionArea.x, actionArea.y, actionArea.width + 1, actionArea.height + 1);
       AWTCanvas scrshot = WdScreenshot.fromScreenshot(rect, state.get(Tags.HWND, (long)0));
-      return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), scrshot);
+      return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), action.get(Tags.ConcreteID, "NoConcreteIdAvailable"), scrshot);
   }
   
   public static AWTCanvas getStateshotBinary(State state) {

@@ -64,8 +64,8 @@ public class BuildActionsIdentifiers {
 		// Then build the action identifiers
 		defaultProtocol.buildStateActionsIdentifiers(state, new HashSet<>(Collections.singletonList(leftClickAction)));
 		// To check that Action identifiers were built
-		Assert.notNull(leftClickAction.get(Tags.AbstractIDCustom));
-		Assert.notNull(leftClickAction.get(Tags.ConcreteIDCustom));
+		Assert.notNull(leftClickAction.get(Tags.AbstractID));
+		Assert.notNull(leftClickAction.get(Tags.ConcreteID));
 	}
 
 	@Test
@@ -81,8 +81,8 @@ public class BuildActionsIdentifiers {
 		// Then build the action identifiers
 		defaultProtocol.buildStateActionsIdentifiers(state, new HashSet<>(Collections.singletonList(rightClickAction)));
 		// To check that Action identifiers were built
-		Assert.notNull(rightClickAction.get(Tags.AbstractIDCustom));
-		Assert.notNull(rightClickAction.get(Tags.ConcreteIDCustom));
+		Assert.notNull(rightClickAction.get(Tags.AbstractID));
+		Assert.notNull(rightClickAction.get(Tags.ConcreteID));
 	}
 
 	@Test
@@ -98,8 +98,8 @@ public class BuildActionsIdentifiers {
 		// Then build the action identifiers
 		defaultProtocol.buildStateActionsIdentifiers(state, new HashSet<>(Collections.singletonList(leftDoubleClickAction)));
 		// To check that Action identifiers were built
-		Assert.notNull(leftDoubleClickAction.get(Tags.AbstractIDCustom));
-		Assert.notNull(leftDoubleClickAction.get(Tags.ConcreteIDCustom));
+		Assert.notNull(leftDoubleClickAction.get(Tags.AbstractID));
+		Assert.notNull(leftDoubleClickAction.get(Tags.ConcreteID));
 	}
 
 	@Test
@@ -115,8 +115,8 @@ public class BuildActionsIdentifiers {
 		// Then build the action identifiers
 		defaultProtocol.buildStateActionsIdentifiers(state, new HashSet<>(Collections.singletonList(dropdownAction)));
 		// To check that Action identifiers were built
-		Assert.notNull(dropdownAction.get(Tags.AbstractIDCustom));
-		Assert.notNull(dropdownAction.get(Tags.ConcreteIDCustom));
+		Assert.notNull(dropdownAction.get(Tags.AbstractID));
+		Assert.notNull(dropdownAction.get(Tags.ConcreteID));
 	}
 
 	@Test
@@ -132,8 +132,8 @@ public class BuildActionsIdentifiers {
 		// Then build the action identifiers
 		defaultProtocol.buildStateActionsIdentifiers(state, new HashSet<>(Collections.singletonList(dragAction)));
 		// To check that Action identifiers were built
-		Assert.notNull(dragAction.get(Tags.AbstractIDCustom));
-		Assert.notNull(dragAction.get(Tags.ConcreteIDCustom));
+		Assert.notNull(dragAction.get(Tags.AbstractID));
+		Assert.notNull(dragAction.get(Tags.ConcreteID));
 	}
 
 	@Test
@@ -149,8 +149,8 @@ public class BuildActionsIdentifiers {
 		// Then build the action identifiers
 		defaultProtocol.buildStateActionsIdentifiers(state, new HashSet<>(Collections.singletonList(slideAction)));
 		// To check that Action identifiers were built
-		Assert.notNull(slideAction.get(Tags.AbstractIDCustom));
-		Assert.notNull(slideAction.get(Tags.ConcreteIDCustom));
+		Assert.notNull(slideAction.get(Tags.AbstractID));
+		Assert.notNull(slideAction.get(Tags.ConcreteID));
 	}
 
 	@Test
@@ -166,8 +166,8 @@ public class BuildActionsIdentifiers {
 		// Then build the action identifiers
 		defaultProtocol.buildStateActionsIdentifiers(state, new HashSet<>(Collections.singletonList(clickTypeAction)));
 		// To check that Action identifiers were built
-		Assert.notNull(clickTypeAction.get(Tags.AbstractIDCustom));
-		Assert.notNull(clickTypeAction.get(Tags.ConcreteIDCustom));
+		Assert.notNull(clickTypeAction.get(Tags.AbstractID));
+		Assert.notNull(clickTypeAction.get(Tags.ConcreteID));
 	}
 
 	@Test
@@ -183,8 +183,8 @@ public class BuildActionsIdentifiers {
 		// Then build the action identifiers
 		defaultProtocol.buildStateActionsIdentifiers(state, new HashSet<>(Collections.singletonList(clickTypeReplaceAction)));
 		// To check that Action identifiers were built
-		Assert.notNull(clickTypeReplaceAction.get(Tags.AbstractIDCustom));
-		Assert.notNull(clickTypeReplaceAction.get(Tags.ConcreteIDCustom));
+		Assert.notNull(clickTypeReplaceAction.get(Tags.AbstractID));
+		Assert.notNull(clickTypeReplaceAction.get(Tags.ConcreteID));
 	}
 
 	@Test
@@ -200,8 +200,8 @@ public class BuildActionsIdentifiers {
 		// Then build the action identifiers
 		defaultProtocol.buildStateActionsIdentifiers(state, new HashSet<>(Collections.singletonList(pasteAction)));
 		// To check that Action identifiers were built
-		Assert.notNull(pasteAction.get(Tags.AbstractIDCustom));
-		Assert.notNull(pasteAction.get(Tags.ConcreteIDCustom));
+		Assert.notNull(pasteAction.get(Tags.AbstractID));
+		Assert.notNull(pasteAction.get(Tags.ConcreteID));
 	}
 
 	@Test
@@ -217,7 +217,24 @@ public class BuildActionsIdentifiers {
 		// Then build the action identifiers
 		defaultProtocol.buildStateActionsIdentifiers(state, new HashSet<>(Collections.singletonList(pasteReplaceAction)));
 		// To check that Action identifiers were built
-		Assert.notNull(pasteReplaceAction.get(Tags.AbstractIDCustom));
-		Assert.notNull(pasteReplaceAction.get(Tags.ConcreteIDCustom));
+		Assert.notNull(pasteReplaceAction.get(Tags.AbstractID));
+		Assert.notNull(pasteReplaceAction.get(Tags.ConcreteID));
+	}
+
+	@Test
+	public void buildNoOperationalStateAction() {
+		// Create the NOP action and Assert that the state is set as the OriginWidget Tag 
+		Action NOPAction = ac.noOperationalState(state);
+		// Verify Action <-> Widget mapping
+		Assert.notNull(NOPAction.get(Tags.OriginWidget));
+		Assert.notNull(state.get(Tags.ActionSet));
+		Assert.isTrue(state.get(Tags.ActionSet).size() == 1);
+		Assert.notNull(state.get(Tags.ActionSet).iterator().next().get(Tags.Desc));
+		Assert.isTrue(state.get(Tags.ActionSet).iterator().next().get(Tags.Desc, "").contains("No Operation"));
+		// Then build the action identifiers
+		defaultProtocol.buildStateActionsIdentifiers(state, new HashSet<>(Collections.singletonList(NOPAction)));
+		// To check that Action identifiers were built
+		Assert.notNull(NOPAction.get(Tags.AbstractID));
+		Assert.notNull(NOPAction.get(Tags.ConcreteID));
 	}
 }

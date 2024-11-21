@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2024 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -34,15 +34,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class IdBasedGuiState {
-    protected String abstractCustomStateId;
-    protected Set<String> abstractCustomActionIds;
+    protected String abstractStateId;
+    protected Set<String> abstractActionIds;
     protected Set<String> unvisitedActionIds;
     protected Set<GuiStateTransition> stateTransitions;
 
-    public IdBasedGuiState(String abstractCustomStateId, Set<String> abstractCustomActionIds) {
-        this.abstractCustomStateId = abstractCustomStateId;
-        this.abstractCustomActionIds = abstractCustomActionIds;
-        this.unvisitedActionIds = abstractCustomActionIds; // all are unvisited when creating
+    public IdBasedGuiState(String abstractStateId, Set<String> abstractActionIds) {
+        this.abstractStateId = abstractStateId;
+        this.abstractActionIds = abstractActionIds;
+        this.unvisitedActionIds = abstractActionIds; // all are unvisited when creating
         stateTransitions = new HashSet<GuiStateTransition>();
     }
 
@@ -50,11 +50,11 @@ public class IdBasedGuiState {
         if(stateTransitions.size()>0){
             //if existing transitions, checking for identical ones:
             for(GuiStateTransition guiStateTransition:stateTransitions){
-                if(guiStateTransition.getSourceStateAbstractCustomId().equals(newTransition.getSourceStateAbstractCustomId())){
+                if(guiStateTransition.getSourceStateAbstractId().equals(newTransition.getSourceStateAbstractId())){
                     // the same source state, as it should be:
-                    if(guiStateTransition.getActionAbstractCustomId().equals(newTransition.getActionAbstractCustomId())){
+                    if(guiStateTransition.getActionAbstractId().equals(newTransition.getActionAbstractId())){
                         // also the action is the same:
-                        if(guiStateTransition.getTargetStateAbstractCustomId().equals(newTransition.getTargetStateAbstractCustomId())){
+                        if(guiStateTransition.getTargetStateAbstractId().equals(newTransition.getTargetStateAbstractId())){
                             // also the target state is the same -> identical transition
                             System.out.println(this.getClass()+": addStateTransition: identical transition found - no need to save again");
                             return;
@@ -69,14 +69,13 @@ public class IdBasedGuiState {
             }
         }
         // otherwise adding the new state transition:
-//        System.out.println(this.getClass()+": addStateTransition: adding the new state transition");
         stateTransitions.add(newTransition);
     }
 
-    public void addVisitedAction(String abstractCustomActionId){
-        if(unvisitedActionIds.contains(abstractCustomActionId)){
+    public void addVisitedAction(String abstractActionId){
+        if(unvisitedActionIds.contains(abstractActionId)){
             System.out.println(this.getClass()+": addVisitedAction: action removed from the unvisited actions");
-            unvisitedActionIds.remove(abstractCustomActionId);
+            unvisitedActionIds.remove(abstractActionId);
         }else{
             System.out.println(this.getClass()+": addVisitedAction: action not found from the unvisited actions");
         }
@@ -86,20 +85,20 @@ public class IdBasedGuiState {
         return stateTransitions;
     }
 
-    public String getAbstractCustomStateId() {
-        return abstractCustomStateId;
+    public String getAbstractStateId() {
+        return abstractStateId;
     }
 
-    public void setAbstractCustomStateId(String abstractCustomStateId) {
-        this.abstractCustomStateId = abstractCustomStateId;
+    public void setAbstractStateId(String abstractStateId) {
+        this.abstractStateId = abstractStateId;
     }
 
-    public Set<String> getAbstractCustomActionIds() {
-        return abstractCustomActionIds;
+    public Set<String> getAbstractActionIds() {
+        return abstractActionIds;
     }
 
-    public void setAbstractCustomActionIds(Set<String> abstractCustomActionIds) {
-        this.abstractCustomActionIds = abstractCustomActionIds;
+    public void setAbstractActionIds(Set<String> abstractActionIds) {
+        this.abstractActionIds = abstractActionIds;
     }
 
     public Set<String> getUnvisitedActionIds() {

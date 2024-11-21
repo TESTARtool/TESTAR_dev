@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 - 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2024 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -39,6 +39,7 @@ import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
+import org.testar.monkey.alayer.windows.UIATags;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -76,7 +77,46 @@ public class DesktopProtocol extends GenericUtilsProtocol {
      */
     @Override
     protected State getState(SUT system) throws StateBuildException {
-    	return super.getState(system);
+    	State state = super.getState(system);
+
+    	// For Qt applications, block elements outside the modal window
+    	if(state.childCount() > 0 && state.child(0).get(UIATags.UIAFrameworkId, "").equals("Qt")) {
+    		// Obtain the modal element. By default the main window
+    		Widget modalWindow = state.child(0);
+    		for(Widget w : state) {
+    			if (w.get(UIATags.UIAIsWindowModal, false)) {
+    				modalWindow = w;
+    				break; // exit loop once modal is found
+    			}
+    		}
+
+    		// If the modal element exists, mark elements outside modal as blocked
+    		if(modalWindow != null) {
+    			for(Widget w : state) {
+    				if (!isQtElementVisibleOnModalScreen(w, modalWindow)) {
+    					w.set(Tags.Blocked, true);
+    				}
+    			}
+    		}
+    	}
+
+    	return state;
+    }
+
+    private boolean isQtElementVisibleOnModalScreen(Widget w, Widget modalWidget) {
+    	Rect elementRect = (Rect) w.get(Tags.Shape, Rect.from(0,0,0,0));
+    	Rect modalRect = (Rect) modalWidget.get(Tags.Shape, Rect.from(0,0,0,0));
+
+    	double elementRight = elementRect.x() + elementRect.width();
+    	double elementBottom = elementRect.y() + elementRect.height();
+    	double modalRight = modalRect.x() + modalRect.width();
+    	double modalBottom = modalRect.y() + modalRect.height();
+
+    	// Check if element is completely visible inside the modal
+    	return elementRect.x() >= modalRect.x() && 
+    			elementRight <= modalRight &&
+    			elementRect.y() >= modalRect.y() && 
+    			elementBottom <= modalBottom;
     }
 
     /**

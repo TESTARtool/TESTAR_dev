@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2024 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -41,31 +41,35 @@ import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.windows.WinApiException;
 import org.testar.plugin.NativeLinker;
+import org.testar.settings.Settings;
 
 public class SutConnectorCommandLine implements SutConnector {
 
-    private String SUTConnectorValue;
+    private String SUTConnectorValue; // The main executable or URL of the SUT
     private boolean processListenerEnabled;
     private double startupTime;
     private long maxEngageTime;
     private StateBuilder builder;
     private boolean tryToKillIfRunning = true; //set to false after 1st re-try
     private boolean flashFeedback;
+    private String SUTProcesses; // Optional regex expression for multi-processes SUTs
+    private boolean accessBridgeEnabled;
     private static final Logger logger = LogManager.getLogger();
 
-    public SutConnectorCommandLine(String SUTConnectorValue, boolean processListenerEnabled, double startupTime, long maxEngageTime, StateBuilder builder, boolean flashFeedback) {
-        this.SUTConnectorValue = SUTConnectorValue;
-        this.processListenerEnabled = processListenerEnabled;
-        this.startupTime = startupTime;
-        this.maxEngageTime = maxEngageTime;
-        this.builder = builder;
-        this.flashFeedback = flashFeedback;
+    public SutConnectorCommandLine(StateBuilder builder, boolean processListenerEnabled, Settings settings) {
+    	this.builder = builder;
+    	this.processListenerEnabled = processListenerEnabled;
+    	this.SUTConnectorValue = settings.get(ConfigTags.SUTConnectorValue);
+        this.startupTime = settings.get(ConfigTags.StartupTime)*1000;
+        this.maxEngageTime = Math.round(settings.get(ConfigTags.StartupTime).doubleValue() * 1000.0);
+        this.flashFeedback = settings.get(ConfigTags.FlashFeedback);
+        this.SUTProcesses = settings.get(ConfigTags.SUTProcesses);
+        this.accessBridgeEnabled = settings.get(ConfigTags.AccessBridgeEnabled);
     }
 
     @Override
     public SUT startOrConnectSut() {
-
-        SUT sut = NativeLinker.getNativeSUT(SUTConnectorValue, processListenerEnabled);
+        SUT sut = NativeLinker.getNativeSUT(SUTConnectorValue, processListenerEnabled, SUTProcesses);
         //Print info to the user to know that TESTAR is NOT READY for its use :-(
         String printSutInfo = "Waiting for the SUT to be accessible ...";
         int timeFlash = (int)startupTime;
@@ -98,10 +102,18 @@ public class SutConnectorCommandLine implements SutConnector {
                 }else if(state == null){
                     logger.debug("state == null");
                 }else if(state.childCount()==0){
-                    logger.debug("state.childCount() == 0");
-                    logger.fatal("TESTAR failed to detect any widgets in the SUT process - maybe the SUT starts multiple processes and another one is for the GUI." +
-                            "You can try using SUT_PROCESS_NAME or SUT_WINDOW_TITLE to connect to the process that handles the GUI of the SUT. " +
-                            "For example, Windows 10 Calculator uses ApplicationFrameHost.exe for the GUI.");
+                	logger.debug("state.childCount() == 0");
+                	// Display a message indicating the possible issue with respect to TESTAR detecting an empty state
+                	if (accessBridgeEnabled) {
+                		logger.fatal("Java Access Bridge is not enabled in the host systems.\n" +
+                				"For more information, visit: https://docs.oracle.com/en/java/javase/11/access/enabling-and-testing-java-access-bridge.html");
+                	} else {
+                		logger.fatal("TESTAR failed to detect any widgets in the SUT process.\n" +
+                				"Maybe the SUT starts multiple processes and another one is for the GUI.\n" +
+                				"1. You can try using SUT_PROCESS_NAME or SUT_WINDOW_TITLE to connect to the process that handles the GUI of the SUT.\n" +
+                				"2. Or use the SUTProcesses setting regex for multi-processes.\n" + 
+                				"For example, Windows 10 Calculator uses ApplicationFrameHost.exe for the GUI.");
+                	}
                 }
             }else {
                 //Print info to the user to know that TESTAR is NOT READY for its use :-(
@@ -115,8 +127,16 @@ public class SutConnectorCommandLine implements SutConnector {
         if (sut.isRunning())
             sut.stop();
 
-        if(SUTConnectorValue.contains("java -jar"))
-            throw new WinApiException("JAVA SUT PATH EXCEPTION");
+        if(SUTConnectorValue.contains("java -jar")) {
+        	String msg = "Exception trying to launch: " + SUTConnectorValue + "\n"
+        			+ "1. Check whether current SUTs path is correctly defined \n";
+
+        	if(accessBridgeEnabled) {
+        		msg = msg.concat("2. Check if Java Access Bridge is enabled in the host systems");
+        	}
+
+        	throw new WinApiException(msg);
+        }
 
         // issue starting the SUT
         if (tryToKillIfRunning){

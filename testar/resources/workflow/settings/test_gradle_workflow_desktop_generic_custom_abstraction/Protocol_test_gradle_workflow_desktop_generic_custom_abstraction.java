@@ -55,21 +55,21 @@ public class Protocol_test_gradle_workflow_desktop_generic_custom_abstraction ex
     protected void buildStateIdentifiers(State state) {
         CodingManager.buildIDs(state);
 
-        // Reset widgets AbstractIDCustom identifier values to empty
-        resetAbstractIDCustom(state);
-        // Custom the State AbstractIDCustom identifier to ignore Format menu bar widgets
-        customBuildAbstractIDCustom(state);
+        // Reset widgets AbstractID identifier values to empty
+        resetAbstractID(state);
+        // Custom the State AbstractID identifier to ignore Format menu bar widgets
+        customBuildAbstractID(state);
 
-        System.out.println("*DEBUG* buildStateIdentifiers: " + state.get(Tags.AbstractIDCustom, "StateHasNoAbstractIDCustom"));
+        System.out.println("*DEBUG* buildStateIdentifiers: " + state.get(Tags.AbstractID, "StateHasNoAbstractID"));
     }
 
-    private synchronized void resetAbstractIDCustom(State state) {
+    private synchronized void resetAbstractID(State state) {
         for(Widget w : state) {
-            w.set(Tags.AbstractIDCustom, "");
+            w.set(Tags.AbstractID, "");
         }
     }
 
-    private synchronized void customBuildAbstractIDCustom(Widget widget){
+    private synchronized void customBuildAbstractID(Widget widget){
         if (widget.parent() != null) {
             // Skip Format UIAMenu from the state abstraction
             if(widget.get(Tags.Role, Roles.Invalid).toString().equals("UIAMenu")) {
@@ -88,17 +88,17 @@ public class Protocol_test_gradle_workflow_desktop_generic_custom_abstraction ex
                     return;
                 }
             }
-            widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + lowCollisionID(widget.get(Tags.Title, "NoTitle")));
+            widget.set(Tags.AbstractID, CodingManager.ID_PREFIX_WIDGET + CodingManager.ID_PREFIX_ABSTRACT + lowCollisionID(widget.get(Tags.Title, "NoTitle")));
         } else if (widget instanceof State) {
             StringBuilder abstractIdCustom;
             abstractIdCustom = new StringBuilder();
             for (Widget childWidget : (State) widget) {
                 if (childWidget != widget) {
-                    customBuildAbstractIDCustom(childWidget);
-                    abstractIdCustom.append(childWidget.get(Tags.AbstractIDCustom));
+                    customBuildAbstractID(childWidget);
+                    abstractIdCustom.append(childWidget.get(Tags.AbstractID));
                 }
             }
-            widget.set(Tags.AbstractIDCustom, CodingManager.ID_PREFIX_STATE + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + lowCollisionID(abstractIdCustom.toString()));
+            widget.set(Tags.AbstractID, CodingManager.ID_PREFIX_STATE + CodingManager.ID_PREFIX_ABSTRACT + lowCollisionID(abstractIdCustom.toString()));
         }
     }
 
@@ -106,14 +106,14 @@ public class Protocol_test_gradle_workflow_desktop_generic_custom_abstraction ex
     protected void buildStateActionsIdentifiers(State state, Set<Action> actions) {
         CodingManager.buildIDs(state, actions);
 
-        // Custom the Action AbstractIDCustom identifier
+        // Custom the Action AbstractID identifier
         for(Action a : actions) {
             // Action Custom Identifier based on OriginWidget Title (ignoring State)
             // This means that an action that opens/closes a menubar will be consider the same in both states
-            String customIdentifier = CodingManager.ID_PREFIX_ACTION + CodingManager.ID_PREFIX_ABSTRACT_CUSTOM + lowCollisionID(a.get(Tags.OriginWidget).get(Tags.Title));
-            a.set(Tags.AbstractIDCustom, customIdentifier);
+            String customIdentifier = CodingManager.ID_PREFIX_ACTION + CodingManager.ID_PREFIX_ABSTRACT + lowCollisionID(a.get(Tags.OriginWidget).get(Tags.Title));
+            a.set(Tags.AbstractID, customIdentifier);
 
-            System.out.println("*DEBUG* Available action: " + a.get(Tags.Desc, "No description") + ", AbstractIDCustom: " + a.get(Tags.AbstractIDCustom, "NoAbstractIDCustom"));
+            System.out.println("*DEBUG* Available action: " + a.get(Tags.Desc, "No description") + ", AbstractID: " + a.get(Tags.AbstractID, "NoAbstractID"));
         }
     }
 

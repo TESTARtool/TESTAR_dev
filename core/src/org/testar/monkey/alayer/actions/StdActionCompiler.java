@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -40,6 +40,7 @@ import org.testar.monkey.alayer.Abstractor;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Finder;
 import org.testar.monkey.alayer.Position;
+import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.StdAbstractor;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
@@ -375,7 +376,13 @@ public class StdActionCompiler {
 		builder.add(NOP, 1.0);
 		return builder.build();
 	}
-	
+
+	public Action noOperationalState(State state) {
+		Action ret = new NOP();
+		ret.mapActionToWidget(state);
+		return ret;
+	}
+
 	public Action killProcessByPID(long pid){ return killProcessByPID(pid, 0); }
 	public Action killProcessByName(String name){ return killProcessByName(name, 0); }
 	public Action killProcessByPID(long pid, double timeToWaitBeforeKilling){ return KillProcess.byPID(pid, timeToWaitBeforeKilling); }
