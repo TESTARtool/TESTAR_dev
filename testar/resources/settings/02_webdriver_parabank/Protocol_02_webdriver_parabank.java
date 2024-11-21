@@ -471,18 +471,18 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 			}
 
 			// type into text boxes
-			if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
-				if(whiteListed(widget) || isUnfiltered(widget)){
-					// Type a random Number, Alphabetic, URL, Date or Email input
-					actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
-					// Paste a random input from a customizable input data file
-					// Check testar/bin/settings/custom_input_data.txt
-					//actions.add(ac.pasteTextInto(widget, InputDataManager.getRandomTextFromCustomInputDataFile(System.getProperty("user.dir") + "/settings/custom_input_data.txt"), true));
-				}else{
-					// filtered and not white listed:
-					filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
-				}
-			}
+//			if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
+//				if(whiteListed(widget) || isUnfiltered(widget)){
+//					// Type a random Number, Alphabetic, URL, Date or Email input
+//					actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
+//					// Paste a random input from a customizable input data file
+//					// Check testar/bin/settings/custom_input_data.txt
+//					//actions.add(ac.pasteTextInto(widget, InputDataManager.getRandomTextFromCustomInputDataFile(System.getProperty("user.dir") + "/settings/custom_input_data.txt"), true));
+//				}else{
+//					// filtered and not white listed:
+//					filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
+//				}
+//			}
 
 			// left clicks, but ignore links outside domain
 			if (isAtBrowserCanvas(widget) && isClickable(widget)) {
@@ -510,6 +510,12 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 		if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
 
 		return actions;
+	}
+
+	@Override
+	protected boolean isClickable(Widget widget) {
+		Role role = widget.get(Tags.Role, Roles.Widget);
+		return role.equals(WdRoles.WdA);
 	}
 
 	@Override

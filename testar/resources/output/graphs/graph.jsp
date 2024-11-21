@@ -1262,53 +1262,78 @@
     }
 
 	function generateJSON() {
+		// Extract the information of the initial abstract state
+		let initialNodes = cy.$(".AbstractState").filter((ele) => ele.data("isInitial") === "true");
+		let initialAbstractId = initialNodes[0].data("stateId");
+
+		let initialUrl = "";
+		let initialPage = "";
 		let concreteStates = [];
 		let concreteActions = [];
 		let concreteTransitions = [];
 
 		// Iterate over each ConcreteState element in the graph
-		// Extract AbstractID and WebTitle from the ConcreteState's data
 		cy.$(".ConcreteState").forEach((ele) => {
 			const abstractID = ele.data("AbstractID");
 			const webTitle = ele.data("WebTitle");
-			concreteStates.push({
-				AbstractID: abstractID,
-				WebTitle: webTitle,
-			});
+
+			// Check if the state already exists in concreteStates
+			if (!concreteStates.some(state => state.AbstractID === abstractID)) {
+				concreteStates.push({
+					AbstractID: abstractID,
+					WebTitle: webTitle,
+				});
+			}
+
+			// If this concrete state is the initial state, save initial data
+			if (abstractID === initialAbstractId) {
+				initialUrl = ele.data("WebHref");
+				initialPage = ele.data("WebTitle");
+			}
 		});
 
 		// Iterate over each ConcreteAction element in the graph
-		// Extract AbstractID, Desc, and WebHref from the ConcreteAction's data
 		cy.$(".ConcreteAction").forEach((ele) => {
 			const abstractID = ele.data("AbstractID");
 			const desc = ele.data("Desc");
 			const webHref = ele.data("WebHref");
-			concreteActions.push({
-				AbstractID: abstractID,
-				Desc: desc,
-				WebHref: webHref,
-			});
+
+			// Check if the action already exists in concreteActions
+			if (!concreteActions.some(action => action.AbstractID === abstractID)) {
+				concreteActions.push({
+					AbstractID: abstractID,
+					Desc: desc,
+					WebHref: webHref,
+				});
+			}
 		});
 
-		// Iterate over each ConcreteAction element in the graph
-		// Extract the transition information (source and target nodes)
+		// Iterate over each ConcreteAction element to handle transitions
 		cy.$(".ConcreteAction").forEach((ele) => {
-			// Get the source and target nodes of the edge
 			const sourceNode = ele.source();
 			const targetNode = ele.target();
 
-			// Ensure the source and target nodes are valid
 			if (sourceNode && targetNode) {
-				concreteTransitions.push({
+				const transition = {
 					Source: sourceNode.data("AbstractID"),
 					Target: targetNode.data("AbstractID"),
 					Action: ele.data("AbstractID"),
-				});
+				};
+
+				// Check if the transition already exists
+				if (!concreteTransitions.some(t => 
+					t.Source === transition.Source && 
+					t.Target === transition.Target && 
+					t.Action === transition.Action)) {
+					concreteTransitions.push(transition);
+				}
 			}
 		});
 
 		// Construct the final JSON object
 		const jsonResult = {
+			InitialUrl: initialUrl,
+			InitialPage: initialPage,
 			ConcreteState: concreteStates,
 			ConcreteAction: concreteActions,
 			ConcreteTransitions: concreteTransitions,
