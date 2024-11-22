@@ -92,7 +92,7 @@ public class StateModelMetricsCollector implements IMetricsCollector {
         queryBuilder.append("SELECT COUNT(*) ");
         queryBuilder.append("AS abstractStates ");
         queryBuilder.append("FROM AbstractState ");
-        queryBuilder.append("WHERE uid like '" + modelIdentifier + "%'");
+        queryBuilder.append("WHERE modelIdentifier like '" + modelIdentifier + "%'");
 
         String query = queryBuilder.toString();
         String output = stateModelManager.queryStateModel(query);
