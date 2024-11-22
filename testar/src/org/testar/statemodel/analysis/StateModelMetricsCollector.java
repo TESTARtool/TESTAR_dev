@@ -1,5 +1,6 @@
 package org.testar.statemodel.analysis;
 
+import com.google.gson.Gson;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,6 +14,7 @@ import java.util.regex.Pattern;
 
 public class StateModelMetricsCollector implements IMetricsCollector {
     protected static final Logger logger = LogManager.getLogger();
+    private Gson gson;
 
     private String searchMessage = "";
 
@@ -23,6 +25,7 @@ public class StateModelMetricsCollector implements IMetricsCollector {
 
     public StateModelMetricsCollector(String searchMessage) {
         this.searchMessage = searchMessage;
+        gson = new Gson();
     }
 
     // SELECT COUNT(*) AS uniqueStates FROM ConcreteState WHERE uid like X
@@ -150,10 +153,8 @@ public class StateModelMetricsCollector implements IMetricsCollector {
 
         metrics.add(newMetrics);
 
-        logger.log(Level.DEBUG, String.format("US %d - TA %d - UA %d - IA %d - AS %d - TG %b - TM %d"),
-                newMetrics.getUniqueStates(), newMetrics.getTotalActions(), newMetrics.getUniqueActions(),
-                newMetrics.getInvalidActions(), newMetrics.getAbstractStates(), newMetrics.isTestGoalAccomplished(),
-                metrics.size());
+        logger.log(Level.INFO, gson.toJson(newMetrics));
+        logger.log(Level.INFO, "Metrics: " + metrics.size());
     }
 
     @Override

@@ -13,6 +13,10 @@ public class StateModelMetrics {
         this.modelIdentifier = modelIdentifier;
     }
 
+    public StateModelMetrics() {
+
+    }
+
     public String getModelIdentifier() {
         return modelIdentifier;
     }
