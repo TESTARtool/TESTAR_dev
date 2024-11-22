@@ -88,7 +88,7 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 		llmActionSelector = new LlmActionSelector(settings);
 
 		// Initialize the metrics collector to analyze the state model
-		metricsCollector = new StateModelMetricsCollector(stateModelManager, "Welcome");
+		metricsCollector = new StateModelMetricsCollector("Welcome");
 	}
 
 	private void setupOrientDB() {
@@ -477,7 +477,7 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 	@Override
 	protected void finishSequence() {
 		String modelIdentifier = stateModelManager.getModelIdentifier();
-		metricsCollector.addMetrics(modelIdentifier);
+		metricsCollector.addMetrics(modelIdentifier, stateModelManager);
 
 		super.finishSequence();
 	}

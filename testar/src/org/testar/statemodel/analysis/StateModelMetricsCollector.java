@@ -14,22 +14,19 @@ import java.util.regex.Pattern;
 public class StateModelMetricsCollector implements IMetricsCollector {
     protected static final Logger logger = LogManager.getLogger();
 
-    private StateModelManager stateModelManager;
     private String searchMessage = "";
 
     private List<StateModelMetrics> metrics = new ArrayList<>();
 
-    public StateModelMetricsCollector(StateModelManager manager) {
-        this.stateModelManager = manager;
+    public StateModelMetricsCollector() {
     }
 
-    public StateModelMetricsCollector(StateModelManager manager, String searchMessage) {
-        this.stateModelManager = manager;
+    public StateModelMetricsCollector(String searchMessage) {
         this.searchMessage = searchMessage;
     }
 
     // SELECT COUNT(*) AS uniqueStates FROM ConcreteState WHERE uid like X
-    private int getUniqueStates(String modelIdentifier) {
+    private int getUniqueStates(String modelIdentifier, StateModelManager stateModelManager) {
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append("SELECT COUNT(*) ");
         queryBuilder.append("AS uniqueStates ");
@@ -43,7 +40,7 @@ public class StateModelMetricsCollector implements IMetricsCollector {
     }
 
     // SELECT COUNT(*) AS totalActions FROM ConcreteAction WHERE NOT (`Desc` LIKE '%Invalid%') AND uid like X
-    private int getTotalActions(String modelIdentifier) {
+    private int getTotalActions(String modelIdentifier, StateModelManager stateModelManager) {
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append("SELECT COUNT(*) ");
         queryBuilder.append("AS totalActions ");
@@ -59,7 +56,7 @@ public class StateModelMetricsCollector implements IMetricsCollector {
 
     // SELECT 'uniqueActions' AS type, COUNT(*) AS count FROM (
     // SELECT DISTINCT Role, `Desc` FROM ConcreteAction WHERE NOT (`Desc` LIKE '%Invalid%') AND uid like X)
-    private int getUniqueActions(String modelIdentifier) {
+    private int getUniqueActions(String modelIdentifier, StateModelManager stateModelManager) {
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append("SELECT 'uniqueActions' AS type, ");
         queryBuilder.append("COUNT(*) AS count FROM ( ");
@@ -75,7 +72,7 @@ public class StateModelMetricsCollector implements IMetricsCollector {
     }
 
     // SELECT COUNT(*) AS invalidActions FROM Action WHERE `Desc` LIKE '%Invalid%' AND uid like
-    private int getInvalidActions(String modelIdentifier) {
+    private int getInvalidActions(String modelIdentifier, StateModelManager stateModelManager) {
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append("SELECT COUNT(*) ");
         queryBuilder.append("AS invalidActions ");
@@ -90,7 +87,7 @@ public class StateModelMetricsCollector implements IMetricsCollector {
     }
 
     // SELECT COUNT(*) AS abstractStates FROM AbstractState AND uid like
-    private int getAbstractStates(String modelIdentifier) {
+    private int getAbstractStates(String modelIdentifier, StateModelManager stateModelManager) {
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append("SELECT COUNT(*) ");
         queryBuilder.append("AS abstractStates ");
@@ -103,7 +100,8 @@ public class StateModelMetricsCollector implements IMetricsCollector {
         return parseQueryResponse(output, "abstractStates");
     }
 
-    private boolean getTestGoalAccomplished(String modelIdentifier, String searchMessage) {
+    private boolean getTestGoalAccomplished(String modelIdentifier, StateModelManager stateModelManager,
+                                            String searchMessage) {
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append("SELECT COUNT(*) ");
         queryBuilder.append("FROM ConcreteState ");
@@ -137,23 +135,25 @@ public class StateModelMetricsCollector implements IMetricsCollector {
     }
 
     @Override
-    public void addMetrics(String modelIdentifier) {
+    public void addMetrics(String modelIdentifier, StateModelManager stateModelManager) {
         StateModelMetrics newMetrics = new StateModelMetrics(modelIdentifier);
-        newMetrics.setUniqueStates(getUniqueStates(modelIdentifier));
-        newMetrics.setTotalActions(getTotalActions(modelIdentifier));
-        newMetrics.setUniqueActions(getUniqueActions(modelIdentifier));
-        newMetrics.setInvalidActions(getInvalidActions(modelIdentifier));
-        newMetrics.setAbstractStates(getAbstractStates(modelIdentifier));
+        newMetrics.setUniqueStates(getUniqueStates(modelIdentifier, stateModelManager));
+        newMetrics.setTotalActions(getTotalActions(modelIdentifier, stateModelManager));
+        newMetrics.setUniqueActions(getUniqueActions(modelIdentifier, stateModelManager));
+        newMetrics.setInvalidActions(getInvalidActions(modelIdentifier, stateModelManager));
+        newMetrics.setAbstractStates(getAbstractStates(modelIdentifier, stateModelManager));
 
         if(!Objects.equals(searchMessage, "")) {
-            newMetrics.setTestGoalAccomplished(getTestGoalAccomplished(modelIdentifier, searchMessage));
+            newMetrics.setTestGoalAccomplished(
+                    getTestGoalAccomplished(modelIdentifier, stateModelManager, searchMessage));
         }
 
-        logger.log(Level.DEBUG, String.format("US %d - TA %d - UA %d - IA %d - AS %d - TG %b"),
-                newMetrics.getUniqueStates(), newMetrics.getTotalActions(), newMetrics.getUniqueActions(),
-                newMetrics.getInvalidActions(), newMetrics.getAbstractStates(), newMetrics.isTestGoalAccomplished());
-
         metrics.add(newMetrics);
+
+        logger.log(Level.DEBUG, String.format("US %d - TA %d - UA %d - IA %d - AS %d - TG %b - TM %d"),
+                newMetrics.getUniqueStates(), newMetrics.getTotalActions(), newMetrics.getUniqueActions(),
+                newMetrics.getInvalidActions(), newMetrics.getAbstractStates(), newMetrics.isTestGoalAccomplished(),
+                metrics.size());
     }
 
     @Override
