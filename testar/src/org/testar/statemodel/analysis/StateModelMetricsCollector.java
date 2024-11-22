@@ -46,7 +46,7 @@ public class StateModelMetricsCollector implements IMetricsCollector {
         queryBuilder.append("AS totalActions ");
         queryBuilder.append("FROM ConcreteAction ");
         queryBuilder.append("WHERE NOT (`Desc` LIKE '%Invalid%') ");
-        queryBuilder.append("AND uid like '" + modelIdentifier + "%'");
+        queryBuilder.append("AND in.uid like '" + modelIdentifier + "%'");
 
         String query = queryBuilder.toString();
         String output = stateModelManager.queryStateModel(query);
@@ -63,7 +63,7 @@ public class StateModelMetricsCollector implements IMetricsCollector {
         queryBuilder.append("SELECT DISTINCT Role, `Desc` ");
         queryBuilder.append("FROM ConcreteAction ");
         queryBuilder.append("WHERE NOT (`Desc` LIKE '%Invalid%') ");
-        queryBuilder.append("AND uid like '" + modelIdentifier + "%' )");
+        queryBuilder.append("AND in.uid like '" + modelIdentifier + "%' )");
 
         String query = queryBuilder.toString();
         String output = stateModelManager.queryStateModel(query);
@@ -78,7 +78,7 @@ public class StateModelMetricsCollector implements IMetricsCollector {
         queryBuilder.append("AS invalidActions ");
         queryBuilder.append("FROM ConcreteAction ");
         queryBuilder.append("WHERE `Desc` LIKE '%Invalid%' ");
-        queryBuilder.append("AND uid like '" + modelIdentifier + "%'");
+        queryBuilder.append("AND in.uid like '" + modelIdentifier + "%'");
 
         String query = queryBuilder.toString();
         String output = stateModelManager.queryStateModel(query);
