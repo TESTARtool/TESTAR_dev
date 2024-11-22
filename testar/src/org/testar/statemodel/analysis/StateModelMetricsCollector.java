@@ -61,9 +61,9 @@ public class StateModelMetricsCollector implements IMetricsCollector {
         queryBuilder.append("SELECT 'uniqueActions' AS type, ");
         queryBuilder.append("COUNT(*) AS count FROM ( ");
         queryBuilder.append("SELECT DISTINCT Role, `Desc` ");
-        queryBuilder.append("FROM ConcreteAction ') ");
+        queryBuilder.append("FROM ConcreteAction ");
         queryBuilder.append("WHERE NOT (`Desc` LIKE '%Invalid%') ");
-        queryBuilder.append("AND uid like '" + modelIdentifier + "%'");
+        queryBuilder.append("AND uid like '" + modelIdentifier + "%' )");
 
         String query = queryBuilder.toString();
         String output = stateModelManager.queryStateModel(query);
