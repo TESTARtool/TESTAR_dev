@@ -71,7 +71,7 @@ public class StateModelMetricsCollector implements IMetricsCollector {
         String query = queryBuilder.toString();
         String output = stateModelManager.queryStateModel(query);
 
-        return parseQueryResponse(output, "uniqueActions");
+        return parseQueryResponse(output, "count");
     }
 
     // SELECT COUNT(*) AS invalidActions FROM Action WHERE `Desc` LIKE '%Invalid%' AND uid like
