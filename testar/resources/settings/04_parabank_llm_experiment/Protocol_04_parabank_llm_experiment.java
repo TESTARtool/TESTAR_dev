@@ -46,7 +46,7 @@ import org.testar.protocols.WebdriverProtocol;
 import org.testar.settings.Settings;
 import org.testar.statemodel.StateModelManagerFactory;
 import org.testar.statemodel.analysis.IMetricsCollector;
-import org.testar.statemodel.analysis.StateModelMetricsCollector;
+import org.testar.statemodel.analysis.LlmMetricsCollector;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -88,7 +88,7 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 		llmActionSelector = new LlmActionSelector(settings);
 
 		// Initialize the metrics collector to analyze the state model
-		metricsCollector = new StateModelMetricsCollector("Welcome");
+		metricsCollector = new LlmMetricsCollector("Welcome");
 	}
 
 	private void setupOrientDB() {
@@ -477,7 +477,7 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 	@Override
 	protected void finishSequence() {
 		String modelIdentifier = stateModelManager.getModelIdentifier();
-		metricsCollector.addMetrics(modelIdentifier, stateModelManager);
+		metricsCollector.addMetrics(modelIdentifier, stateModelManager, llmActionSelector.getInvalidActions());
 
 		super.finishSequence();
 	}

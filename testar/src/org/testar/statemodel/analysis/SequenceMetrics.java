@@ -1,6 +1,6 @@
 package org.testar.statemodel.analysis;
 
-public class StateModelMetrics {
+public class SequenceMetrics {
     private String modelIdentifier;
     private int uniqueStates;
     private int uniqueActions;
@@ -9,11 +9,11 @@ public class StateModelMetrics {
     private int abstractStates;
     private boolean testGoalAccomplished;
 
-    public StateModelMetrics(String modelIdentifier) {
+    public SequenceMetrics(String modelIdentifier) {
         this.modelIdentifier = modelIdentifier;
     }
 
-    public StateModelMetrics() {
+    public SequenceMetrics() {
 
     }
 

@@ -47,6 +47,7 @@ public class LlmActionSelector implements IActionSelector {
     private ActionHistory actionHistory;
     private LlmConversation conversation;
     private int tokens_used;
+    private int invalidActions;
 
     private Gson gson = new Gson();
 
@@ -139,6 +140,7 @@ public class LlmActionSelector implements IActionSelector {
                 conversation.addMessage("user", "The actionId provided was invalid.");
                 NOP nop = new NOP();
                 nop.set(Tags.Desc, "Invalid actionId");
+                invalidActions++;
                 return nop;
             }
             case PARSE_FAILED: {
@@ -151,6 +153,7 @@ public class LlmActionSelector implements IActionSelector {
                         + "}");
                 NOP nop = new NOP();
                 nop.set(Tags.Desc, "Failed to parse LLM response");
+                invalidActions++;
                 return nop;
             }
             case INVALID_ACTION: {
@@ -158,12 +161,14 @@ public class LlmActionSelector implements IActionSelector {
                         "Please only select from actions provided to you in the current message");
                 NOP nop = new NOP();
                 nop.set(Tags.Desc, "Invalid actionId from LLM");
+                invalidActions++;
                 return nop;
             }
             default: {
                 logger.log(Level.ERROR, "ParseResult was null, this should never happen!");
                 NOP nop = new NOP();
                 nop.set(Tags.Desc, "Invalid ParseResult");
+                invalidActions++;
                 return nop;
             }
         }
@@ -469,5 +474,9 @@ public class LlmActionSelector implements IActionSelector {
         }
 
         return false;
+    }
+
+    public int getInvalidActions() {
+        return invalidActions;
     }
 }

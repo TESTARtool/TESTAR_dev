@@ -12,18 +12,18 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class StateModelMetricsCollector implements IMetricsCollector {
+public class LlmMetricsCollector implements IMetricsCollector {
     protected static final Logger logger = LogManager.getLogger();
     private Gson gson;
 
     private String searchMessage = "";
 
-    private List<StateModelMetrics> metrics = new ArrayList<>();
+    private List<SequenceMetrics> metrics = new ArrayList<>();
 
-    public StateModelMetricsCollector() {
+    public LlmMetricsCollector() {
     }
 
-    public StateModelMetricsCollector(String searchMessage) {
+    public LlmMetricsCollector(String searchMessage) {
         this.searchMessage = searchMessage;
         gson = new Gson();
     }
@@ -75,7 +75,7 @@ public class StateModelMetricsCollector implements IMetricsCollector {
     }
 
     // SELECT COUNT(*) AS invalidActions FROM Action WHERE `Desc` LIKE '%Invalid%' AND uid like
-    private int getInvalidActions(String modelIdentifier, StateModelManager stateModelManager) {
+    /*private int getInvalidActions(int totalActions, Settings settings) {
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append("SELECT COUNT(*) ");
         queryBuilder.append("AS invalidActions ");
@@ -87,7 +87,7 @@ public class StateModelMetricsCollector implements IMetricsCollector {
         String output = stateModelManager.queryStateModel(query);
 
         return parseQueryResponse(output, "invalidActions");
-    }
+    }*/
 
     // SELECT COUNT(*) AS abstractStates FROM AbstractState AND uid like
     private int getAbstractStates(String modelIdentifier, StateModelManager stateModelManager) {
@@ -138,13 +138,16 @@ public class StateModelMetricsCollector implements IMetricsCollector {
     }
 
     @Override
-    public void addMetrics(String modelIdentifier, StateModelManager stateModelManager) {
-        StateModelMetrics newMetrics = new StateModelMetrics(modelIdentifier);
+    public void addMetrics(String modelIdentifier, StateModelManager stateModelManager, int invalidActions) {
+        SequenceMetrics newMetrics = new SequenceMetrics(modelIdentifier);
         newMetrics.setUniqueStates(getUniqueStates(modelIdentifier, stateModelManager));
         newMetrics.setTotalActions(getTotalActions(modelIdentifier, stateModelManager));
         newMetrics.setUniqueActions(getUniqueActions(modelIdentifier, stateModelManager));
-        newMetrics.setInvalidActions(getInvalidActions(modelIdentifier, stateModelManager));
         newMetrics.setAbstractStates(getAbstractStates(modelIdentifier, stateModelManager));
+
+        // Invalid actions are not always properly recorded in the state model (since they don't change the state?)
+        // The easiest method for now is to manually keep track of invalidActions (see LlmActionSelector)
+        newMetrics.setInvalidActions(invalidActions);
 
         if(!Objects.equals(searchMessage, "")) {
             newMetrics.setTestGoalAccomplished(
