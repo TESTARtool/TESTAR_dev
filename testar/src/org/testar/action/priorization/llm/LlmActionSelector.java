@@ -43,6 +43,7 @@ public class LlmActionSelector implements IActionSelector {
     private final String fewshotFile;
     private final String appName;
     private final float temperature;
+    private final int historySize;
 
     private ActionHistory actionHistory;
     private LlmConversation conversation;
@@ -70,6 +71,7 @@ public class LlmActionSelector implements IActionSelector {
         this.hostUrl = settings.get(ConfigTags.LlmHostUrl);
         this.authorizationHeader = settings.get(ConfigTags.LlmAuthorizationHeader);
         this.testGoal = settings.get(ConfigTags.LlmTestGoalDescription);
+        this.historySize = settings.get(ConfigTags.LlmHistorySize);
 
         this.testGoalQueue = Arrays.stream(testGoal.split(",")).collect(Collectors.toList());
         logger.log(Level.INFO, String.format("Detected %d test goals.", testGoalQueue.size()));
@@ -77,8 +79,27 @@ public class LlmActionSelector implements IActionSelector {
         this.fewshotFile = settings.get(ConfigTags.LlmFewshotFile);
         this.appName = settings.get(ConfigTags.ApplicationName);
         this.temperature = settings.get(ConfigTags.LlmTemperature);
-        actionHistory = new ActionHistory(settings.get(ConfigTags.LlmHistorySize));
+        actionHistory = new ActionHistory(historySize);
 
+        conversation = LlmFactory.createLlmConversation(this.platform, this.model, this.temperature);
+        conversation.initConversation(this.fewshotFile);
+    }
+
+    /**
+     * Resets the LLM Action Selector with the same settings creating a new conversation and action history.
+     */
+    public void reset() {
+        // Reset variables
+        tokens_used = 0;
+        invalidActions = 0;
+        previousTestGoal = "";
+        currentTestGoal = 0;
+
+        // Reset queue and action history
+        this.testGoalQueue = Arrays.stream(testGoal.split(",")).collect(Collectors.toList());
+        actionHistory.clear();
+
+        // Reset conversation
         conversation = LlmFactory.createLlmConversation(this.platform, this.model, this.temperature);
         conversation.initConversation(this.fewshotFile);
     }

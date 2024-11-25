@@ -166,6 +166,9 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 	protected void preSequencePreparations() {
 		super.preSequencePreparations();
 
+		// Reset llm action selector
+		llmActionSelector.reset();
+
 		// Use sequence count to iteratively create a new state model
 		String appVersion = settings.get(ConfigTags.ApplicationVersion, "");
 		appVersion = appVersion.replaceFirst("_\\d+$", "_" + sequenceCount);

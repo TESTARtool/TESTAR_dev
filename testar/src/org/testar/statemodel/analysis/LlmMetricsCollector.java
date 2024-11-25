@@ -107,6 +107,7 @@ public class LlmMetricsCollector implements IMetricsCollector {
                                             String searchMessage) {
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append("SELECT COUNT(*) ");
+        queryBuilder.append("AS found ");
         queryBuilder.append("FROM ConcreteState ");
         queryBuilder.append("WHERE uid LIKE '" + modelIdentifier + "%' ");
         queryBuilder.append("AND WebInnerHTML LIKE '%" + searchMessage + "%'");
@@ -114,8 +115,10 @@ public class LlmMetricsCollector implements IMetricsCollector {
         String query = queryBuilder.toString();
         String result = stateModelManager.queryStateModel(query);
 
-        // Return true if the search message was found.
-        return result.contains("COUNT(*): 1");
+        int matches = parseQueryResponse(result, "found");
+
+        // Test goal is complete if one or more matches are found.
+        return matches > 0;
     }
 
     private int parseQueryResponse(String output, String field) {
