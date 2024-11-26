@@ -45,6 +45,9 @@ import org.testar.monkey.Util;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.settings.Settings;
 import org.testar.statemodel.StateModelManagerFactory;
+import org.testar.statemodel.analysis.condition.BasicConditionEvaluator;
+import org.testar.statemodel.analysis.condition.StateCondition;
+import org.testar.statemodel.analysis.condition.TestCondition;
 import org.testar.statemodel.analysis.metric.LlmMetricsCollector;
 import org.testar.statemodel.analysis.metric.MetricsManager;
 
@@ -70,6 +73,7 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 	// The LLM Action selector needs to be initialize with the settings
 	private LlmActionSelector llmActionSelector;
 	private MetricsManager metricsManager;
+	private BasicConditionEvaluator conditionEvaluator;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -89,6 +93,11 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 
 		// Initialize the metrics collector to analyze the state model
 		metricsManager = new MetricsManager(new LlmMetricsCollector("Welcome"));
+
+		conditionEvaluator = new BasicConditionEvaluator();
+		// Search WebInnerHTML for Welcome string in any state.
+		conditionEvaluator.addCondition(
+				new StateCondition("WebInnerHTML", "Welcome", TestCondition.ConditionComparator.GREATER_THAN, 0));
 	}
 
 	private void setupOrientDB() {
@@ -303,8 +312,14 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 		// For web applications, web browser errors and warnings can also be enabled via settings
 		Verdict verdict = super.getVerdict(state);
 
+		String modelIdentifier = stateModelManager.getModelIdentifier();
+
+		if(conditionEvaluator.evaluateConditions(modelIdentifier, stateModelManager)) {
+			return new Verdict(Verdict.SEVERITY_TESTGOAL_COMPLETE, "Test goal complete, all conditions met.");
+		}
+
 		if(testGoalAccomplished) {
-			verdict = new Verdict(Verdict.SEVERITY_LLM_COMPLETE, "LLM believes test goal was accomplished.");
+			return new Verdict(Verdict.SEVERITY_LLM_COMPLETE, "LLM believes test goal was accomplished.");
 		}
 
 		return verdict;

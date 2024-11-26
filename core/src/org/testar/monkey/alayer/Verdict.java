@@ -47,6 +47,7 @@ public final class Verdict implements Serializable {
 	// Verdict severities
 	// PASS
 	public static final double SEVERITY_MIN = 0.0;
+	public static final double SEVERITY_TESTGOAL_COMPLETE = 0.05; // Test goal complete based on conditions
 	public static final double SEVERITY_LLM_COMPLETE = 0.05; // LLM believes test goal has been accomplished
 	// FAIL
 	public static final double SEVERITY_WARNING = 		   0.7; // custom verdict
