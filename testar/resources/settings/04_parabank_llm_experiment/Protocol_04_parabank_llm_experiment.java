@@ -45,8 +45,8 @@ import org.testar.monkey.Util;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.settings.Settings;
 import org.testar.statemodel.StateModelManagerFactory;
-import org.testar.statemodel.analysis.IMetricsCollector;
-import org.testar.statemodel.analysis.LlmMetricsCollector;
+import org.testar.statemodel.analysis.metric.LlmMetricsCollector;
+import org.testar.statemodel.analysis.metric.MetricsManager;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -69,7 +69,7 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 
 	// The LLM Action selector needs to be initialize with the settings
 	private LlmActionSelector llmActionSelector;
-	private IMetricsCollector metricsCollector;
+	private MetricsManager metricsManager;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -88,7 +88,7 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 		llmActionSelector = new LlmActionSelector(settings);
 
 		// Initialize the metrics collector to analyze the state model
-		metricsCollector = new LlmMetricsCollector("Welcome");
+		metricsManager = new MetricsManager(new LlmMetricsCollector("Welcome"));
 	}
 
 	private void setupOrientDB() {
@@ -480,7 +480,12 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 	@Override
 	protected void finishSequence() {
 		String modelIdentifier = stateModelManager.getModelIdentifier();
-		metricsCollector.addMetrics(modelIdentifier, stateModelManager, llmActionSelector.getInvalidActions());
+		metricsManager.collect(modelIdentifier, stateModelManager, llmActionSelector.getInvalidActions());
+
+		// Finished final sequence
+		if(sequenceCount == settings.get(ConfigTags.Sequences)) {
+			metricsManager.finish();
+		}
 
 		super.finishSequence();
 	}
