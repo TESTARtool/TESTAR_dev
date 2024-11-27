@@ -19,6 +19,9 @@ public class LlmSelection {
     }
 
     public String getInput() {
+        if(input == null) {
+            return "";
+        }
         return input;
     }
 }
