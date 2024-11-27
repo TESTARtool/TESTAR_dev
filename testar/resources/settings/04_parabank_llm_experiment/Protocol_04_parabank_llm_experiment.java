@@ -102,7 +102,6 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 		metricsManager = new MetricsManager(new LlmMetricsCollector("<td id=\"loanStatus\">Denied</td>"));
 
 		conditionEvaluator = new BasicConditionEvaluator();
-		conditionEvaluator.addConditions(currentTestGoal.getCompletionConditions());
 	}
 
 	// TODO: Add GUI support so this is no longer needed.
@@ -207,6 +206,8 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 		testGoalQueue = new LinkedList<>();
 		testGoalQueue.addAll(testGoals);
 		currentTestGoal = testGoalQueue.poll();
+		conditionEvaluator.clear();
+		conditionEvaluator.addConditions(currentTestGoal.getCompletionConditions());
 
 		// Reset llm action selector
 		llmActionSelector.reset(currentTestGoal.getTestGoal(), false);

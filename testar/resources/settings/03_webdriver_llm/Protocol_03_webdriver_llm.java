@@ -81,7 +81,7 @@ public class Protocol_03_webdriver_llm extends WebdriverProtocol {
 
 		// Initialize the LlmActionSelector using the LLM settings
 		llmActionSelector = new LlmActionSelector(settings, new StandardPromptGenerator(),
-				"Log in with username 'John' and password 'demo'.");
+				"Log in with username 'john' and password 'demo'.");
 
 		// Test goal is considered complete when the welcome string is found in the HTML of the state model.
 		conditionEvaluator = new BasicConditionEvaluator();
