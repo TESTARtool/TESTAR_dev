@@ -41,24 +41,18 @@ public class StateCondition extends TestCondition {
         int threshold = getThreshold();
 
         switch(getComparator()) {
-            case EQUAL -> {
+            case EQUAL:
                 return matches == threshold;
-            }
-            case LESS_THAN -> {
+            case LESS_THAN:
                 return matches < threshold;
-            }
-            case GREATER_THAN -> {
+            case GREATER_THAN:
                 return matches > threshold;
-            }
-            case LESS_THAN_EQUALS -> {
+            case LESS_THAN_EQUALS:
                 return matches <= threshold;
-            }
-            case GREATER_THAN_EQUALS -> {
+            case GREATER_THAN_EQUALS:
                 return matches >= threshold;
-            }
-            default -> {
+            default:
                 throw new InvalidArgumentException("Invalid comparator for condition!");
-            }
         }
     }
 
