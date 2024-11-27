@@ -99,8 +99,8 @@ public class TestJacocoReportCSV {
 		File outputCVSFile = new File(outputCSVpath);
 		Assert.assertTrue(outputCVSFile.exists());
 		Assert.assertTrue(fileContains("CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,INSTRUCTION_COVERED_RATIO,BRANCH_MISSED,BRANCH_COVERED,BRANCH_COVERED_RATIO,LINE_MISSED,LINE_COVERED,LINE_COVERED_RATIO,COMPLEXITY_MISSED,COMPLEXITY_COVERED,COMPLEXITY_COVERED_RATIO,METHOD_MISSED,METHOD_COVERED,METHOD_COVERED_RATIO", outputCVSFile));
-		Assert.assertTrue(fileContains("MockClass,10,90,90.00%,5,50,91.00%,7,93,93.00%,2,98,98.00%,1,99,99.00%", outputCVSFile));
-		Assert.assertTrue(fileContains("TOTAL,10,90,90.00%,5,50,90.91%,7,93,93.00%,2,98,98.00%,1,99,99.00%", outputCVSFile));
+		Assert.assertTrue(fileContains("MockClass,10,90,90.00,5,50,91.00,7,93,93.00,2,98,98.00,1,99,99.00", outputCVSFile));
+		Assert.assertTrue(fileContains("TOTAL,10,90,90.00,5,50,90.91,7,93,93.00,2,98,98.00,1,99,99.00", outputCVSFile));
 	}
 
 	private boolean fileContains(String searchText, File file) {
