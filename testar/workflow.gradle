@@ -466,3 +466,23 @@ task runTestWebdriverUnreplayable(type: Exec) {
         }
     }
 }
+
+// Run an Android test (inside an Ubuntu environment), execute 1 action and verdict should be OK
+task runTestAndroidGenericOk(type: Exec, dependsOn:'installDist') {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestAndroidGenericOk'
+    workingDir 'target/install/testar/bin'
+    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_android_generic FlashFeedback=false AlwaysCompile=true ApplicationName="android_ok" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=1'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Check that output contains No problem detected. Message to verify the correct execution
+        if(output.readLines().any{line->line.contains("No problem detected.")}) {
+            println "\n${output} \nTESTAR has been executed sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Executing TESTAR Android")
+        }
+    }
+}
