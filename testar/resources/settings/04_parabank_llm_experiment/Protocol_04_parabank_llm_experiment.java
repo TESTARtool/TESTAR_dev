@@ -116,7 +116,7 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 		tg1conditions.add(tg1cond1);
 
 		String testGoal2 = "Apply for a loan by navigating to the \n" +
-				"\"Transfer Funds\" page and entering 999999 as the loan amount and 190000 \n" +
+				"\"Request Loan\" page and entering 999999 as the loan amount and 190000 \n" +
 				"for the down payment.";
 		List<TestCondition> tg2conditions = new ArrayList<>();
 		StateCondition tg2cond1 = new StateCondition("WebInnerHTML", "<td id=\"loanStatus\">Denied</td>",
@@ -350,9 +350,9 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 
 		if(conditionEvaluator.evaluateConditions(modelIdentifier, stateModelManager)) {
 			// Test goal was completed, retrieve next test goal from queue.
-			currentTestGoal = testGoalQueue.peek();
+			currentTestGoal = testGoalQueue.poll();
 
-			// Peek returns null if there are no more items remaining in the queue.
+			// Poll returns null if there are no more items remaining in the queue.
 			if(currentTestGoal == null) {
 				// No more test goals remaining, terminate sequence.
 				return new Verdict(Verdict.SEVERITY_TESTGOAL_COMPLETE, "All test goals completed.");
