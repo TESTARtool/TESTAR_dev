@@ -31,6 +31,7 @@
 import org.testar.CodingManager;
 import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
+import org.testar.action.priorization.llm.LlmTestGoal;
 import org.testar.action.priorization.llm.prompt.StandardPromptGenerator;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.alayer.*;
@@ -69,12 +70,14 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
-	private boolean testGoalAccomplished = false;
-
 	// The LLM Action selector needs to be initialize with the settings
 	private LlmActionSelector llmActionSelector;
 	private MetricsManager metricsManager;
 	private BasicConditionEvaluator conditionEvaluator;
+
+	private List<LlmTestGoal> testGoals;
+	private Queue<LlmTestGoal> testGoalQueue;
+	private LlmTestGoal currentTestGoal;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -89,16 +92,40 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 
 		super.initialize(settings);
 
+		// Configure the test goals
+		setupTestGoals();
+
 		// Initialize the LlmActionSelector using the LLM settings
-		llmActionSelector = new LlmActionSelector(settings, new StandardPromptGenerator());
+		llmActionSelector = new LlmActionSelector(settings, new StandardPromptGenerator(), "");
 
 		// Initialize the metrics collector to analyze the state model
-		metricsManager = new MetricsManager(new LlmMetricsCollector("Welcome"));
+		metricsManager = new MetricsManager(new LlmMetricsCollector("<td id=\"loanStatus\">Denied</td>"));
 
 		conditionEvaluator = new BasicConditionEvaluator();
-		// Search WebInnerHTML for Welcome string in any state.
-		conditionEvaluator.addCondition(
-				new StateCondition("WebInnerHTML", "Welcome", TestCondition.ConditionComparator.GREATER_THAN, 0));
+		conditionEvaluator.addConditions(currentTestGoal.getCompletionConditions());
+	}
+
+	// TODO: Add GUI support so this is no longer needed.
+	private void setupTestGoals() {
+		testGoals = new ArrayList<>();
+
+		String testGoal1 = "Log in by entering the username \"john\" and the password \"demo\" and \n" +
+				"clicking the \"log in\" button";
+		List<TestCondition> tg1conditions = new ArrayList<>();
+		StateCondition tg1cond1 = new StateCondition("WebInnerHTML", "<b>Welcome</b> John Smith</p>",
+				TestCondition.ConditionComparator.GREATER_THAN, 0);
+		tg1conditions.add(tg1cond1);
+
+		String testGoal2 = "Apply for a loan by navigating to the \n" +
+				"\"Transfer Funds\" page and entering 999999 as the loan amount and 190000 \n" +
+				"for the down payment.";
+		List<TestCondition> tg2conditions = new ArrayList<>();
+		StateCondition tg2cond1 = new StateCondition("WebInnerHTML", "<td id=\"loanStatus\">Denied</td>",
+				TestCondition.ConditionComparator.GREATER_THAN, 0);
+		tg2conditions.add(tg2cond1);
+
+		testGoals.add(new LlmTestGoal(testGoal1, tg1conditions));
+		testGoals.add(new LlmTestGoal(testGoal2, tg2conditions));
 	}
 
 	private void setupOrientDB() {
@@ -176,8 +203,13 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 	protected void preSequencePreparations() {
 		super.preSequencePreparations();
 
+		// Setup test goal queue
+		testGoalQueue = new LinkedList<>();
+		testGoalQueue.addAll(testGoals);
+		currentTestGoal = testGoalQueue.poll();
+
 		// Reset llm action selector
-		llmActionSelector.reset();
+		llmActionSelector.reset(currentTestGoal.getTestGoal(), false);
 
 		// Use sequence count to iteratively create a new state model
 		String appVersion = settings.get(ConfigTags.ApplicationVersion, "");
@@ -316,11 +348,19 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 		String modelIdentifier = stateModelManager.getModelIdentifier();
 
 		if(conditionEvaluator.evaluateConditions(modelIdentifier, stateModelManager)) {
-			return new Verdict(Verdict.SEVERITY_TESTGOAL_COMPLETE, "Test goal complete, all conditions met.");
-		}
+			// Test goal was completed, retrieve next test goal from queue.
+			currentTestGoal = testGoalQueue.peek();
 
-		if(testGoalAccomplished) {
-			return new Verdict(Verdict.SEVERITY_LLM_COMPLETE, "LLM believes test goal was accomplished.");
+			// Peek returns null if there are no more items remaining in the queue.
+			if(currentTestGoal == null) {
+				// No more test goals remaining, terminate sequence.
+				return new Verdict(Verdict.SEVERITY_TESTGOAL_COMPLETE, "All test goals completed.");
+			} else {
+				System.out.println("Test goal completed, moving to next test goal.");
+				llmActionSelector.reset(currentTestGoal.getTestGoal(), true);
+				conditionEvaluator.clear();
+				conditionEvaluator.addConditions(currentTestGoal.getCompletionConditions());
+			}
 		}
 
 		return verdict;
@@ -443,14 +483,6 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 	@Override
 	protected Action selectAction(State state, Set<Action> actions) {
 		Action toExecute = llmActionSelector.selectAction(state, actions);
-
-		// Null is returned when the LLM wants to terminate the test (if the test goal is believed to be accomplished)
-		// If there is a problem with action selection, a NOP action will be executed.
-		if(toExecute == null) {
-			// LLM thinks test goal is accomplished, perform no action and set flag for getVerdict to terminate test.
-			testGoalAccomplished = true;
-			toExecute = new NOP();
-		}
 
 		// We need to set a state to NOP actions
 		if(toExecute instanceof NOP) {

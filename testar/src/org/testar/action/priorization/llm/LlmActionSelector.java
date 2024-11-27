@@ -36,7 +36,6 @@ public class LlmActionSelector implements IActionSelector {
     private final String model;
     private final String hostUrl;
     private final String authorizationHeader;
-    private final String testGoal;
     private final String fewshotFile;
     private final String appName;
     private final float temperature;
@@ -48,10 +47,8 @@ public class LlmActionSelector implements IActionSelector {
     private int invalidActions;
 
     private Gson gson = new Gson();
-
-    private List<String> testGoalQueue = new ArrayList<>();
     private String previousTestGoal = "";
-    private int currentTestGoal = 0;
+    private String currentTestGoal;
 
     /**
      * Creates a new LlmActionSelector.
@@ -62,18 +59,18 @@ public class LlmActionSelector implements IActionSelector {
      * 4. LlmFewshotFile for the fewshot file that contains the prompt instructions.
      * 5. ApplicationName for the name of the SUT.
      */
-    public LlmActionSelector(Settings settings, IPromptGenerator generator) {
+    public LlmActionSelector(Settings settings, IPromptGenerator generator, String testGoal) {
         this.promptGenerator = generator;
 
         this.platform = settings.get(ConfigTags.LlmPlatform);
         this.model = settings.get(ConfigTags.LlmModel);
         this.hostUrl = settings.get(ConfigTags.LlmHostUrl);
         this.authorizationHeader = settings.get(ConfigTags.LlmAuthorizationHeader);
-        this.testGoal = settings.get(ConfigTags.LlmTestGoalDescription);
+        // TODO: Bring back GUI support when GUI is updated
+        // this.testGoal = settings.get(ConfigTags.LlmTestGoalDescription);
         this.historySize = settings.get(ConfigTags.LlmHistorySize);
 
-        this.testGoalQueue = Arrays.stream(testGoal.split(",")).collect(Collectors.toList());
-        logger.log(Level.INFO, String.format("Detected %d test goals.", testGoalQueue.size()));
+        this.currentTestGoal = testGoal;
 
         this.fewshotFile = settings.get(ConfigTags.LlmFewshotFile);
         this.appName = settings.get(ConfigTags.ApplicationName);
@@ -95,17 +92,22 @@ public class LlmActionSelector implements IActionSelector {
 
     /**
      * Resets the LLM Action Selector with the same settings creating a new conversation and action history.
+     * @param newTestGoal The new test goal.
+     * @param appendPreviousTestGoal If true, adds the previous test goal to the prompt ("We just accomplished X")
      */
-    public void reset() {
+    public void reset(String newTestGoal, boolean appendPreviousTestGoal) {
         // Reset variables
         tokens_used = 0;
         invalidActions = 0;
-        previousTestGoal = "";
-        currentTestGoal = 0;
-
-        // Reset queue and action history
-        this.testGoalQueue = Arrays.stream(testGoal.split(",")).collect(Collectors.toList());
         actionHistory.clear();
+
+        if(appendPreviousTestGoal) {
+            previousTestGoal = currentTestGoal;
+        } else {
+            previousTestGoal = "";
+        }
+
+        currentTestGoal = newTestGoal;
 
         // Reset conversation
         conversation = LlmFactory.createLlmConversation(this.platform, this.model, this.temperature);
@@ -128,9 +130,8 @@ public class LlmActionSelector implements IActionSelector {
      * @return The action to execute or null if failed.
      */
     private Action selectActionWithLlm(State state, Set<Action> actions) {
-        String testGoal = testGoalQueue.get(currentTestGoal);
         String prompt = promptGenerator.generatePrompt(
-                actions, state, actionHistory, appName, testGoal, previousTestGoal);
+                actions, state, actionHistory, appName, currentTestGoal, previousTestGoal);
 
         logger.log(Level.DEBUG, "Generated prompt: " + prompt);
         conversation.addMessage("user", prompt);
@@ -149,22 +150,6 @@ public class LlmActionSelector implements IActionSelector {
                 actionHistory.addToHistory(actionToTake);
 
                 return actionToTake;
-            }
-            case SUCCESS_FINISH:  {
-                currentTestGoal++;
-                if(currentTestGoal + 1 > testGoalQueue.size()) {
-                    // Nothing left in queue, terminate test
-                    return null;
-                } else {
-                    NOP nop = new NOP();
-                    nop.set(Tags.Desc, "Test goal complete, moving to next test goal");
-                    // Reset conversation
-                    conversation = LlmFactory.createLlmConversation(this.platform, this.model, this.temperature);
-                    conversation.initConversation(this.fewshotFile);
-                    actionHistory.clear();
-                    previousTestGoal = testGoalQueue.get(currentTestGoal - 1);
-                    return nop;
-                }
             }
             // Failures return no operation (NOP) actions to prevent crashing.
             // We do not add these to the action history.
@@ -345,12 +330,6 @@ public class LlmActionSelector implements IActionSelector {
     private LlmParseResult parseLlmResponse(Set<Action> actions, String responseContent) {
         try {
             LlmSelection selection = gson.fromJson(responseContent, LlmSelection.class);
-
-            // actionId 'complete' is used by the LLM when the LLM thinks the test objective was accomplished.
-            // This will terminate the test in the default LLM protocol.
-            if(selection.getActionId().toLowerCase().contains("complete")) {
-                return new LlmParseResult(null, LlmParseResult.ParseResult.SUCCESS_FINISH);
-            }
 
             Action selectedAction = getActionByIdentifier(actions, selection.getActionId());
 
