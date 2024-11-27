@@ -2,29 +2,50 @@ package org.testar.statemodel.analysis.condition;
 
 import org.openqa.selenium.InvalidArgumentException;
 import org.testar.statemodel.StateModelManager;
+import org.testar.statemodel.util.QueryHelper;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-// Condition that searches for a string in a state.
+/**
+ * Simple condition that searches for a string in all states.
+ */
 public class StateCondition extends TestCondition {
     private String field;
     private String searchMessage;
 
+    /**
+     * Creates a new StateCondition.
+     * @param field The field in the state model to serach. Example: WebInnerHTML.
+     * @param searchMessage The string to search for.
+     * @param comparator The result of the query is compared to the threshold value using the selected operator.
+     * @param threshold The result of the query is compared to this value.
+     */
     public StateCondition(String field, String searchMessage, ConditionComparator comparator, int threshold) {
         super(comparator, threshold);
         this.field = field;
         this.searchMessage = searchMessage;
     }
 
+    /**
+     * Returns the field in the table of the state model to select.
+     * @return Selected field.
+     */
     public String getField() {
         return field;
     }
 
+    /**
+     * Returns the string to search in the set field.
+     * @return Selected search message.
+     */
     public String getSearchMessage() {
         return searchMessage;
     }
 
+    /**
+     * Evaluates whether this condition is true.
+     * @param modelIdentifier modelIdentifier of the current test sequence.
+     * @param stateModelManager stateModelManager of the current test sequence.
+     * @return True if condition is met.
+     */
     @Override
     public boolean evaluate(String modelIdentifier, StateModelManager stateModelManager) {
         StringBuilder queryBuilder = new StringBuilder();
@@ -37,7 +58,7 @@ public class StateCondition extends TestCondition {
         String query = queryBuilder.toString();
         String result = stateModelManager.queryStateModel(query);
 
-        int matches = parseQueryResponse(result, "found");
+        int matches = QueryHelper.parseCountQueryResponse(result, "found");
         int threshold = getThreshold();
 
         switch(getComparator()) {
@@ -53,20 +74,6 @@ public class StateCondition extends TestCondition {
                 return matches >= threshold;
             default:
                 throw new InvalidArgumentException("Invalid comparator for condition!");
-        }
-    }
-
-    // TODO: Move to util class, duplicate
-    private int parseQueryResponse(String output, String field) {
-        String regex = field + ":\\s*(\\d+)";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(output);
-
-        if (matcher.find()) {
-            // Parse the matched group as an integer
-            return Integer.parseInt(matcher.group(1));
-        } else {
-            return -1;
         }
     }
 }

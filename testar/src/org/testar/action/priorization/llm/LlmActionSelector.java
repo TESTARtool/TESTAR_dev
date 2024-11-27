@@ -199,6 +199,7 @@ public class LlmActionSelector implements IActionSelector {
      * Generates the prompt to be sent to the LLM based on the set of actions in the current state.
      * The prompt consists of the application name, test goal, available actions, and action history if available.
      * TODO: Add information about the current state, such as the page title.
+     * TODO: Add abstraction, move prompt generation outside action selector
      * @param actions Set of actions in the current state.
      * @return The generated prompt.
      */
@@ -270,6 +271,12 @@ public class LlmActionSelector implements IActionSelector {
         return builder.toString();
     }
 
+    /**
+     * Parses a given 'combobox' widget ('select' HTML tag) and returns the list of possible options.
+     * @param combobox The combobox widget to parse.
+     * @param state The SUT's current state.
+     * @return List of options.
+     */
     private List<String> getComboBoxChoices(Widget combobox, State state) {
         // TODO: Temporary hack, <select> element in HTML seems to be missing <option> unless we re-retrieve the HTML.
         // Could this be a timing issue? (HTML is retrieved before options are available)
@@ -287,15 +294,20 @@ public class LlmActionSelector implements IActionSelector {
         return choices;
     }
 
+    /**
+     * TODO: Can be removed if we always create WdSelectListActions when a widget has the select tag.
+     * Creates an action to change the active value of a combobox.
+     * @param actions Set of actions in the current state.
+     * @param actionId ID of the action chosen by the Llm.
+     * @param value The value to set.
+     * @return New action in the form of WdSelectListAction.
+     */
     private Action createComboBoxAction(Set<Action> actions, String actionId, String value) {
         Widget target = null;
 
         // Get the target widget
-        for(Action action : actions) {
-            if(Objects.equals(action.get(Tags.ConcreteID), actionId)) {
-                target = action.get(Tags.OriginWidget);
-            }
-        }
+        Action action = getActionByIdentifier(actions, actionId);
+        target = action.get(Tags.OriginWidget);
 
         if(target == null) {
             logger.log(Level.ERROR, "Unable to find combobox selection widget!");
@@ -458,6 +470,12 @@ public class LlmActionSelector implements IActionSelector {
         }
     }
 
+    /**
+     * Retrieves an action with given actionId.
+     * @param actions Set of actions to search.
+     * @param actionId ActionId to search for.
+     * @return Requested action if found, NOP Action if not found.
+     */
     private Action getActionByIdentifier(Set<Action> actions, String actionId) {
         for(Action action : actions) {
             if(action.get(Tags.ConcreteID, "").equals(actionId)) {
@@ -497,6 +515,10 @@ public class LlmActionSelector implements IActionSelector {
         return false;
     }
 
+    /**
+     * Returns the amount of invalid actions (incorrect actionId, unable to parse llm response, etc.)
+     * @return Amount of invalid actions.
+     */
     public int getInvalidActions() {
         return invalidActions;
     }

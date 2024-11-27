@@ -1,5 +1,8 @@
 package org.testar.statemodel.analysis.metric;
 
+/**
+ * Extended metrics used to gauge effectiveness of llm powered testing.
+ */
 public class LlmMetrics extends BasicMetrics {
     public LlmMetrics() {
         super();

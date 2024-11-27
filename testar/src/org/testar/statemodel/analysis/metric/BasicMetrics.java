@@ -3,6 +3,9 @@ package org.testar.statemodel.analysis.metric;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Set of basic metrics that can be measured during testing.
+ */
 public abstract class BasicMetrics {
     private List<SequenceMetrics> sequenceMetrics;
 
@@ -10,6 +13,10 @@ public abstract class BasicMetrics {
         this.sequenceMetrics = new ArrayList<>();
     }
 
+    /**
+     * Adds new metrics to the sequenceMetrics.
+     * @param metrics Metrics of the new test sequence.
+     */
     public void addSequenceMetrics(SequenceMetrics metrics) {
         this.sequenceMetrics.add(metrics);
     }
@@ -22,6 +29,9 @@ public abstract class BasicMetrics {
         this.sequenceMetrics = sequenceMetrics;
     }
 
+    /**
+     * Holds basic metrics observed in a single test sequence.
+     */
     public static class SequenceMetrics {
         private String modelIdentifier = "";
         private int uniqueStates = -1;

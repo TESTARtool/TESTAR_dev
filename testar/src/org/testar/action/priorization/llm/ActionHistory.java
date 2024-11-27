@@ -9,7 +9,6 @@ import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.actions.CompoundAction;
 import org.testar.monkey.alayer.actions.PasteText;
 import org.testar.monkey.alayer.actions.Type;
-import org.testar.monkey.alayer.actions.WdSelectListAction;
 
 import java.util.ArrayList;
 
@@ -47,6 +46,9 @@ public class ActionHistory {
         actions.add(action);
     }
 
+    /**
+     * Clears the action history.
+     */
     public void clear() {
         actions.clear();
     }
@@ -71,6 +73,7 @@ public class ActionHistory {
             String actionId = String.valueOf(i);
             String description = widget.get(Tags.Desc, "Unknown Widget");
 
+            // TODO: Select list/combobox actions
             switch(type) {
                 case "ClickTypeInto":
                     String input = getCompoundActionInputText(action);
@@ -94,6 +97,12 @@ public class ActionHistory {
         return builder.toString();
     }
 
+    /**
+     * Temporary hack to get the text input from input actions (such as text fields).
+     * Actions derived by Testar are in the form of CompoundActions
+     * @param action CompoundAction.
+     * @return Input text of the compound action.
+     */
     private String getCompoundActionInputText(Action action) {
     	//TODO: Create single actions in protocol so this is not necessary?
     	if(action instanceof CompoundAction) {

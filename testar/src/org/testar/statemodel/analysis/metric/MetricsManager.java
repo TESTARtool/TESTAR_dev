@@ -2,9 +2,16 @@ package org.testar.statemodel.analysis.metric;
 
 import org.testar.statemodel.StateModelManager;
 
+/**
+ * Class used to collect and manage metrics using the strategy pattern.
+ */
 public class MetricsManager {
     private IMetricsCollector metricsCollector;
 
+    /**
+     * Creates a new MetricsManager with the selected metrics collector.
+     * @param metricsCollector The IMetricsCollector implementation to use.
+     */
     public MetricsManager(IMetricsCollector metricsCollector) {
         this.metricsCollector = metricsCollector;
     }

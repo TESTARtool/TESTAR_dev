@@ -5,13 +5,15 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.statemodel.StateModelManager;
+import org.testar.statemodel.util.QueryHelper;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * Metrics collector used to retrieve metrics for tests using llm agents.
+ */
 public class LlmMetricsCollector implements IMetricsCollector {
     protected static final Logger logger = LogManager.getLogger();
     private Gson gson;
@@ -23,6 +25,11 @@ public class LlmMetricsCollector implements IMetricsCollector {
     public LlmMetricsCollector() {
     }
 
+    /**
+     * Creates a new LlmMetricsCollector
+     * TODO: Remove search message and use ConditionEvaluators instead.
+     * @param searchMessage String to search for in the HTML to test if a test goal was met.
+     */
     public LlmMetricsCollector(String searchMessage) {
         this.searchMessage = searchMessage;
         gson = new Gson();
@@ -180,7 +187,7 @@ public class LlmMetricsCollector implements IMetricsCollector {
         String query = queryBuilder.toString();
         String output = stateModelManager.queryStateModel(query);
 
-        return parseQueryResponse(output, "uniqueStates");
+        return QueryHelper.parseCountQueryResponse(output, "uniqueStates");
     }
 
     // SELECT COUNT(*) AS totalActions FROM ConcreteAction WHERE NOT (`Desc` LIKE '%Invalid%') AND uid like X
@@ -195,7 +202,7 @@ public class LlmMetricsCollector implements IMetricsCollector {
         String query = queryBuilder.toString();
         String output = stateModelManager.queryStateModel(query);
 
-        return parseQueryResponse(output, "totalActions");
+        return QueryHelper.parseCountQueryResponse(output, "totalActions");
     }
 
     // SELECT 'uniqueActions' AS type, COUNT(*) AS count FROM (
@@ -212,7 +219,7 @@ public class LlmMetricsCollector implements IMetricsCollector {
         String query = queryBuilder.toString();
         String output = stateModelManager.queryStateModel(query);
 
-        return parseQueryResponse(output, "count");
+        return QueryHelper.parseCountQueryResponse(output, "count");
     }
 
     // Does not work since NOP actions are usually not recorded in the state model since they don't affect the state.
@@ -242,9 +249,10 @@ public class LlmMetricsCollector implements IMetricsCollector {
         String query = queryBuilder.toString();
         String output = stateModelManager.queryStateModel(query);
 
-        return parseQueryResponse(output, "abstractStates");
+        return QueryHelper.parseCountQueryResponse(output, "abstractStates");
     }
 
+    // TODO: This could be replaced by the condition evaluator.
     private boolean getTestGoalAccomplished(String modelIdentifier, StateModelManager stateModelManager,
                                             String searchMessage) {
         StringBuilder queryBuilder = new StringBuilder();
@@ -257,28 +265,9 @@ public class LlmMetricsCollector implements IMetricsCollector {
         String query = queryBuilder.toString();
         String result = stateModelManager.queryStateModel(query);
 
-        int matches = parseQueryResponse(result, "found");
+        int matches = QueryHelper.parseCountQueryResponse(result, "found");
 
         // Test goal is complete if one or more matches are found.
         return matches > 0;
-    }
-
-    private int parseQueryResponse(String output, String field) {
-        // The output I received looks like the following:
-        // {
-        // result: 0
-        // }
-        // This looks like JSON but is not valid JSON due to missing quotation marks so we use regex.
-
-        String regex = field + ":\\s*(\\d+)";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(output);
-
-        if (matcher.find()) {
-            // Parse the matched group as an integer
-            return Integer.parseInt(matcher.group(1));
-        } else {
-            return -1;
-        }
     }
 }
