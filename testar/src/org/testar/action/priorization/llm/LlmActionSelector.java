@@ -2,17 +2,15 @@ package org.testar.action.priorization.llm;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.IActionSelector;
+import org.testar.action.priorization.llm.prompt.IPromptGenerator;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
-import org.testar.monkey.alayer.exceptions.NoSuchTagException;
-import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.settings.Settings;
 
@@ -22,8 +20,6 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -34,6 +30,7 @@ import java.util.stream.Collectors;
  */
 public class LlmActionSelector implements IActionSelector {
     protected static final Logger logger = LogManager.getLogger();
+    private IPromptGenerator promptGenerator;
 
     private final String platform;
     private final String model;
@@ -65,7 +62,9 @@ public class LlmActionSelector implements IActionSelector {
      * 4. LlmFewshotFile for the fewshot file that contains the prompt instructions.
      * 5. ApplicationName for the name of the SUT.
      */
-    public LlmActionSelector(Settings settings) {
+    public LlmActionSelector(Settings settings, IPromptGenerator generator) {
+        this.promptGenerator = generator;
+
         this.platform = settings.get(ConfigTags.LlmPlatform);
         this.model = settings.get(ConfigTags.LlmModel);
         this.hostUrl = settings.get(ConfigTags.LlmHostUrl);
@@ -83,6 +82,15 @@ public class LlmActionSelector implements IActionSelector {
 
         conversation = LlmFactory.createLlmConversation(this.platform, this.model, this.temperature);
         conversation.initConversation(this.fewshotFile);
+    }
+
+    /**
+     * Changes the active prompt generator.
+     * The next time selectAction is called the new prompt generator will be used.
+     * @param generator The new prompt generator to use.
+     */
+    public void setPromptGenerator(IPromptGenerator generator) {
+        this.promptGenerator = generator;
     }
 
     /**
@@ -120,7 +128,10 @@ public class LlmActionSelector implements IActionSelector {
      * @return The action to execute or null if failed.
      */
     private Action selectActionWithLlm(State state, Set<Action> actions) {
-        String prompt = generatePrompt(actions, state);
+        String testGoal = testGoalQueue.get(currentTestGoal);
+        String prompt = promptGenerator.generatePrompt(
+                actions, state, actionHistory, appName, testGoal, previousTestGoal);
+
         logger.log(Level.DEBUG, "Generated prompt: " + prompt);
         conversation.addMessage("user", prompt);
 
@@ -196,105 +207,6 @@ public class LlmActionSelector implements IActionSelector {
     }
 
     /**
-     * Generates the prompt to be sent to the LLM based on the set of actions in the current state.
-     * The prompt consists of the application name, test goal, available actions, and action history if available.
-     * TODO: Add information about the current state, such as the page title.
-     * TODO: Add abstraction, move prompt generation outside action selector
-     * @param actions Set of actions in the current state.
-     * @return The generated prompt.
-     */
-    private String generatePrompt(Set<Action> actions, State state) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(String.format("We are testing the \"%s\" web application. ", appName));
-
-        if(StringUtils.isEmpty(previousTestGoal)) {
-            builder.append(String.format("The objective of the test is: %s. ", testGoalQueue.get(currentTestGoal)));
-        } else {
-            builder.append(String.format("The following objective was previously achieved: %s. ", previousTestGoal));
-            builder.append(String.format("The current objective of the test is: %s. ", testGoalQueue.get(currentTestGoal)));
-        }
-
-        String pageTitle = WdDriver.getRemoteWebDriver().getTitle();
-        builder.append(String.format("We are currently on the following page: %s. ", pageTitle));
-
-        builder.append("The following actions are available: ");
-
-        for (Action action : actions) {
-            try {
-                Widget widget = action.get(Tags.OriginWidget);
-                String type = action.get(Tags.Role).name();
-                String actionId = action.get(Tags.ConcreteID, "Unknown ActionId");
-                String description = widget.get(Tags.Desc, "No description");
-
-                // Depending on the action, format into something the LLM is more likely to understand.
-                if(Objects.equals(widget.get(WdTags.WebTagName, ""), "select")) {
-                    // Workaround for comboboxes
-                    List<String> choices = getComboBoxChoices(widget, state);
-                    builder.append(String.format("%s: Set ComboBox '%s' to one of the following values: [",
-                            actionId, description));
-                    for(String choice : choices) {
-                        builder.append(String.format("%s,", choice));
-                    }
-                    builder.append("] ");
-                } else {
-                    switch (type) {
-                        case "ClickTypeInto":
-                            // Differentiate between types of input fields. Example: password -> Password Field
-                            String fieldType = StringUtils.capitalize(widget.get(WdTags.WebType, "text"));
-                            builder.append(String.format("%s: Type in %sField '%s' ", actionId, fieldType, description));
-                            break;
-                        case "LeftClickAt":
-                            builder.append(String.format("%s: Click on '%s' ", actionId, description));
-                            break;
-                        default:
-                            logger.log(Level.WARN, "Unsupported action type for LLM action selection: " + type);
-                            break;
-                    }
-                }
-
-            } catch(NoSuchTagException e) {
-                // This usually happens when OriginWidget is unknown, so we skip these.
-                logger.log(Level.WARN, "Action is missing critical tags, skipping.");
-            }
-
-            builder.append(", ");
-        }
-
-        builder.append(". ");
-
-        if(!actionHistory.getActions().isEmpty()) {
-            builder.append(actionHistory.toString());
-        }
-
-        builder.append("Which action should be executed to accomplish the test goal?");
-
-        return builder.toString();
-    }
-
-    /**
-     * Parses a given 'combobox' widget ('select' HTML tag) and returns the list of possible options.
-     * @param combobox The combobox widget to parse.
-     * @param state The SUT's current state.
-     * @return List of options.
-     */
-    private List<String> getComboBoxChoices(Widget combobox, State state) {
-        // TODO: Temporary hack, <select> element in HTML seems to be missing <option> unless we re-retrieve the HTML.
-        // Could this be a timing issue? (HTML is retrieved before options are available)
-        WdDriver.getRemoteWebDriver().getPageSource();
-
-        String innerHtml = combobox.get(WdTags.WebInnerHTML);
-
-        // Assumes there is a set of <choice> objects
-        Pattern choicePattern = Pattern.compile("<option[^>]*>(.*?)</option>");
-        Matcher matcher = choicePattern.matcher(innerHtml);
-        List<String> choices = new ArrayList<>();
-        while (matcher.find()) {
-            choices.add(matcher.group(1));
-        }
-        return choices;
-    }
-
-    /**
      * TODO: Can be removed if we always create WdSelectListActions when a widget has the select tag.
      * Creates an action to change the active value of a combobox.
      * @param actions Set of actions in the current state.
@@ -326,9 +238,6 @@ public class LlmActionSelector implements IActionSelector {
     private String getResponseFromLlm(String requestBody) {
         String testarVer = Main.TESTAR_VERSION.substring(0, Main.TESTAR_VERSION.indexOf(" "));
         URI uri = URI.create(replaceApiKeyPlaceholder(this.hostUrl));
-
-        // logger.log(Level.DEBUG, "Using endpoint: " + uri);
-        // logger.log(Level.DEBUG, "Request Body: " + requestBody);
 
         try {
             URL url = uri.toURL();

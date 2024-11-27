@@ -31,6 +31,7 @@
 import org.testar.CodingManager;
 import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
+import org.testar.action.priorization.llm.prompt.StandardPromptGenerator;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
@@ -89,7 +90,7 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 		super.initialize(settings);
 
 		// Initialize the LlmActionSelector using the LLM settings
-		llmActionSelector = new LlmActionSelector(settings);
+		llmActionSelector = new LlmActionSelector(settings, new StandardPromptGenerator());
 
 		// Initialize the metrics collector to analyze the state model
 		metricsManager = new MetricsManager(new LlmMetricsCollector("Welcome"));
