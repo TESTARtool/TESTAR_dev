@@ -486,3 +486,23 @@ task runTestAndroidGenericOk(type: Exec, dependsOn:'installDist') {
         }
     }
 }
+
+// Run an Android test (inside an Ubuntu environment) to detect a suspicious message
+task runTestAndroidGenericSuspiciousTag(type: Exec, dependsOn:'installDist') {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestAndroidGenericSuspiciousTag'
+    workingDir 'target/install/testar/bin'
+    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_android_generic FlashFeedback=false AlwaysCompile=true ApplicationName="android_suspicious" TagsForSuspiciousOracle="NotExist;UIAAutomationId;Title" SuspiciousTags=".*NFC.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=1'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Check that output contains No problem detected. Message to verify the correct execution
+        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'Title' : 'NFC")}) {
+            println "\n${output} \nTESTAR has successfully detected NFC Suspicious Tag using TagsForSuspiciousOracle Title! "
+        } else {
+            throw new GradleException("\n${output} \nERROR: TESTAR didnt detect NFC Suspicious Tag using TagsForSuspiciousOracle Title")
+        }
+    }
+}
