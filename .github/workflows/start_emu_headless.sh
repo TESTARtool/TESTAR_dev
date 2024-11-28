@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# https://github.com/amrsa1/android-emulator-workflow
+
 BL='\033[0;34m'
 G='\033[0;32m'
 RED='\033[0;31m'

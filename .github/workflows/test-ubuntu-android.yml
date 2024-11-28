@@ -1,8 +1,8 @@
-name: Android CI test
+name: Ubuntu TESTAR Android CI tests
 
 on:
   push:
-    branches: [ master, master_appium ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
@@ -18,7 +18,7 @@ env:
 jobs:
   android:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
 
     strategy:
       matrix:
@@ -74,10 +74,20 @@ jobs:
 
     - name: Test Appium Connection
       run: |
-        # Wait for Appium to be fully up and running
-        sleep 30
-        # Test the connection to the Appium server by hitting the WebDriver endpoint
-        curl --silent --output /dev/null --write-out "HTTP Response Code: %{http_code}" http://127.0.0.1:4723/wd/hub/status
+        MAX_WAIT=30
+        INTERVAL=1
+        echo "Waiting for Appium to be fully up and running..."
+        
+        for i in $(seq 1 $MAX_WAIT); do
+          if [ "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:4723/wd/hub/status)" -eq 200 ]; then
+            echo "Appium is up and running."
+            exit 0
+          fi
+          sleep $INTERVAL
+        done
+        
+        echo "Appium did not start within $MAX_WAIT seconds."
+        exit 1
 
     # Build and run TESTAR
     - name: Grant execute permission for gradlew
