@@ -99,7 +99,7 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 		llmActionSelector = new LlmActionSelector(settings, new StandardPromptGenerator(), "");
 
 		// Initialize the metrics collector to analyze the state model
-		metricsManager = new MetricsManager(new LlmMetricsCollector("<td id=\"loanStatus\">Denied</td>"));
+		metricsManager = new MetricsManager(new LlmMetricsCollector("Denied"));
 
 		conditionEvaluator = new BasicConditionEvaluator();
 	}
@@ -111,13 +111,13 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 		String testGoal1 = "Log in by entering the username \"john\" and the password \"demo\" and \n" +
 				"clicking the \"log in\" button";
 		List<TestCondition> tg1conditions = new ArrayList<>();
-		StateCondition tg1cond1 = new StateCondition("WebInnerHTML", "<b>Welcome</b> John Smith</p>",
+		StateCondition tg1cond1 = new StateCondition("WebInnerHTML", "Denied",
 				TestCondition.ConditionComparator.GREATER_THAN, 0);
 		tg1conditions.add(tg1cond1);
 
 		String testGoal2 = "Apply for a loan by navigating to the \n" +
 				"\"Request Loan\" page and entering 999999 as the loan amount and 190000 \n" +
-				"for the down payment.";
+				"for the down payment. Then click the \"Apply Now\" button.";
 		List<TestCondition> tg2conditions = new ArrayList<>();
 		StateCondition tg2cond1 = new StateCondition("WebInnerHTML", "<td id=\"loanStatus\">Denied</td>",
 				TestCondition.ConditionComparator.GREATER_THAN, 0);
