@@ -1,7 +1,9 @@
 package org.testar.action.priorization.llm.gemini;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -20,9 +22,13 @@ public class LlmConversationGemini implements LlmConversation {
     protected static final Logger logger = LogManager.getLogger();
 
     private List<Content> contents;
+    private Map<String, String> generationConfig;
 
     public LlmConversationGemini() {
         contents = new ArrayList<>();
+        // TESTAR expects the LLM response to be formatted as JSON
+        generationConfig = new HashMap<>();
+        generationConfig.put("response_mime_type", "application/json");
     }
 
     public List<Content> getContents() {
