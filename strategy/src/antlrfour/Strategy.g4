@@ -34,7 +34,7 @@ state_boolean:  'state-changed'                                                 
 |               'sut-is'                                FILTER? SUT_TYPE        #sutType
 |               'any-exist'        visit_status?        FILTER? RELATION        #anyExistByRelation
 |               'any-exist'        visit_status?        (FILTER? ACTION_TYPE)?  #anyExist
-|               'previous-exist'   visit_status?        (FILTER? ACTION_TYPE)?  #previousExist
+|               'previous-exist'   visit_status?        (FILTER? ACTION_TYPE)?  #previousExist  //check if present in previously executed actions
 ;
 
 int_expr:       'n-actions'        visit_status?        (FILTER? ACTION_TYPE)?   #nActions

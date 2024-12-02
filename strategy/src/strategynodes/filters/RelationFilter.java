@@ -45,16 +45,4 @@ public class RelationFilter
 
     private static boolean widgetIsSibling(Widget widget1, Widget widget2)
     { return widget1.parent().get(Tags.AbstractID).equals(widget2.parent().get(Tags.AbstractID)); }
-
-//    @Override
-//    public String toString()
-//    {
-//        StringJoiner joiner = new StringJoiner(" ");
-//        if(include)
-//            joiner.add(Filter.INCLUDE.toString());
-//        else
-//            joiner.add(Filter.EXCLUDE.toString());
-//        joiner.add(RELATION.toString());
-//        return joiner.toString();
-//    }
 }

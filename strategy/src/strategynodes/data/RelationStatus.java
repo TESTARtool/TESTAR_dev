@@ -1,8 +1,8 @@
 package strategynodes.data;
 
-import strategynodes.enums.ActionType;
 import strategynodes.enums.Filter;
 import strategynodes.enums.RelationType;
+
 import java.util.StringJoiner;
 
 public class RelationStatus

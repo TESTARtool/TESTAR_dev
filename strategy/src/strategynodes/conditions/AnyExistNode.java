@@ -46,7 +46,7 @@ public class AnyExistNode extends BaseNode implements BooleanNode
         filteredActions = new ArrayList<>(actions); // copy the actions list
 
         if(visitStatus != null)
-            filteredActions = VisitFilter.filterAvailableActions(visitStatus, filteredActions);
+            filteredActions = VisitFilter.filter(visitStatus, filteredActions);
 
         if(actionStatus != null)
             filteredActions = ActionTypeFilter.filter(actionStatus, filteredActions);

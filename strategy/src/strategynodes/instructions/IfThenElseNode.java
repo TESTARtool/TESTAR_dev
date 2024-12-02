@@ -1,13 +1,11 @@
 package strategynodes.instructions;
 
-import org.antlr.v4.runtime.misc.MultiMap;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import strategynodes.BaseNode;
-import strategynodes.data.Weight;
 import strategynodes.conditions.BooleanNode;
+import strategynodes.data.Weight;
 
-import java.util.ArrayList;
 import java.util.Set;
 import java.util.StringJoiner;
 

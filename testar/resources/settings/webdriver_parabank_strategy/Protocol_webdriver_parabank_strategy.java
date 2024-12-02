@@ -602,7 +602,7 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 		// If we are in form filling mode and the strategy is not random,
 		// Use the strategy to fill the form as a human
 		Action selectedAction = (formFillingWidget != null && !strategyRandom) ?
-				parseUtil.selectAction(state, actions, strategyActionsExecuted, operatingSystems):
+				parseUtil.selectAction(state, actions):
 					RandomActionSelector.selectRandomAction(actions);
 
 		String actionID = selectedAction.get(Tags.AbstractID);

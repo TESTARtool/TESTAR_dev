@@ -1,10 +1,8 @@
 package strategynodes.data;
 
-import org.antlr.v4.runtime.misc.MultiMap;
-import org.testar.monkey.alayer.Action;
-import org.testar.monkey.alayer.Tags;
-import strategynodes.enums.Filter;
 import strategynodes.enums.ActionType;
+import strategynodes.enums.Filter;
+
 import java.util.StringJoiner;
 
 public class ActionStatus

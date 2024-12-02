@@ -2,7 +2,6 @@ package strategynodes.enums;
 
 import parsing.StrategyManager;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 

@@ -124,7 +124,7 @@ public class Protocol_desktop_generic_strategy extends DesktopProtocol
 		
 		Action selectedAction = (useRandom) ?
 				selector.selectAction(state, actions):
-				parseUtil.selectAction(state, actions, actionsExecuted, operatingSystems);
+				parseUtil.selectAction(state, actions);
 
 		String actionID = selectedAction.get(Tags.AbstractID);
 

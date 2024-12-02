@@ -1,6 +1,5 @@
 package strategynodes.data;
 
-import org.antlr.v4.runtime.misc.MultiMap;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Tags;
 import parsing.StrategyManager;
@@ -14,17 +13,12 @@ public class VisitStatus
 
     public VisitStatus(VisitType visitType, Integer visitInt)
     {
-        System.out.println("DEBUG visitstatus init");
         this.visitType = visitType;
-        System.out.println("DEBUG visitstatus init visittype: " + visitType);
         this.intApplies =
                 (visitType == VisitType.VISITED_N ||
                 visitType == VisitType.VISITED_OVER_N ||
                 visitType == VisitType.VISITED_UNDER_N);
-        System.out.println("DEBUG visitstatus init intapplies: " + intApplies);
         this.visitInt = (intApplies) ? visitInt : null;
-        System.out.println("DEBUG visitstatus init visitInt: " + this.visitInt);
-
     }
 
     public VisitType getVisitType()
@@ -37,12 +31,8 @@ public class VisitStatus
 
     public Boolean actionIsAllowed(String actionID)
     {
-        System.out.println("DEBUG visitstatus action is allowed");
-        System.out.println("DEBUG visitstatus visittype: " + visitType);
-        System.out.println("DEBUG visitstatus visitInt: " + visitInt);
-
-//        boolean actionVisited = (actionsExecuted.containsKey(actionID));
-        boolean actionVisited = StrategyManager.actionsExecutedContainsKey(actionID);
+        // if this action is the first to be executed, it will always be new
+        boolean actionVisited = !StrategyManager.actionsExecutedIsEmpty() && StrategyManager.actionsExecutedContainsKey(actionID);
 
         if(!actionVisited && visitType == VisitType.UNVISITED)
             return true;
@@ -53,17 +43,8 @@ public class VisitStatus
         if(visitType == VisitType.MOST_VISITED)
             return (!actionVisited) ? false : null; //zero times used == NOT most visited, otherwise answer is relative
 
-        System.out.println("DEBUG visitstatus get usageCount");
-        System.out.println("DEBUG visitstatus actionsExecuted size: ");
-        System.out.println(StrategyManager.actionsExecutedSize());
-
-
         //get number of times used
-//        int usageCount = (int) actionsExecuted.get(actionID).get(0);
         int usageCount = StrategyManager.getUsageCount(actionID);
-
-        System.out.println("DEBUG visitstatus usageCount: ");
-        System.out.println(usageCount);
 
         switch (this.visitType)
         {
@@ -80,8 +61,6 @@ public class VisitStatus
 
     public String toString()
     {
-        System.out.println("DEBUG tostring");
-        System.out.println("DEBUG tostring: " + visitType);
         if (intApplies)
             return visitType + " " + visitInt;
         else

@@ -12,8 +12,6 @@ import strategynodes.enums.*;
 import strategynodes.instructions.*;
 
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ASTBuilder extends StrategyBaseVisitor<BaseNode>
 {
@@ -198,66 +196,17 @@ public class ASTBuilder extends StrategyBaseVisitor<BaseNode>
 
     private VisitStatus getVisitStatus(StrategyParser.Visit_statusContext visit_status)
     {
-        System.out.println("DEBUG AST init");
-
         if(visit_status == null)
             return null;
 
         String rawText = visit_status.getText();
 
-        System.out.println("DEBUG AST init rawText: " + rawText);
-
         rawText = rawText.replaceAll("[0-9]", ""); // replace all digits
 
-        System.out.println("DEBUG AST init rawText after replace: "  + rawText);
-
-        VisitType visitType =  (rawText == null) ? null : VisitType.toEnum(rawText);
+        VisitType visitType =  (rawText.isEmpty()) ? null : VisitType.toEnum(rawText);
         Integer visitInt = (visit_status.INT() == null) ? null : Integer.valueOf(visit_status.INT().getText());
 
-        if(visitType == null)
-            System.out.println("DEBUG AST init visitType is NULL");
-        else
-            System.out.println("DEBUG AST init visitType: " + visitType);
-        if(visitInt == null)
-            System.out.println("DEBUG AST init visitInt is NULL");
-        else
-            System.out.println("DEBUG AST init visitInt: " + visitInt);
-
         return (visitType == null) ? null : new VisitStatus(visitType, visitInt);
-
-//
-//
-//        System.out.println("DEBUG AST init");
-//
-//        if(visit_status != null)
-//        {
-//            String rawText = visit_status.getText();
-//            System.out.println("DEBUG AST init rawText: " + rawText);
-//
-//            Pattern pattern = Pattern.compile("([a-zA-Z-]+)(\\d*)");
-//            Matcher matcher = pattern.matcher(rawText);
-//            if (matcher.matches())
-//            {
-//                String visitTypeString = matcher.group(1);
-//                String visitIntString = matcher.group(2);
-//
-//                System.out.println("DEBUG AST init visitTypeString: " + visitTypeString);
-//                System.out.println("DEBUG AST init visitIntString: " + visitIntString);
-//
-//                VisitType visitType = VisitType.toEnum(visitTypeString);
-//                Integer visitInt = (visitIntString.isEmpty()) ? null : Integer.valueOf(visitIntString);
-//
-//
-//                return new VisitStatus(visitType, visitInt);
-//            }
-//            System.out.println("DEBUG AST init: no regex match");
-//        }
-//        System.out.println("DEBUG AST init is NULL");
-
-//        String visitTypeString = rawText.replaceAll("[0-9$]+", "");
-//        String visitIntString = rawText.replaceAll("[^A-Za-z-]+", ""); //might be empty
-
-//        return null;
     }
 
     private ActionStatus getActionStatus(TerminalNode FILTER, TerminalNode ACTION_TYPE)

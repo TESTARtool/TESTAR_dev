@@ -310,7 +310,7 @@ public class Protocol_webdriver_webformsut_strategy extends WebdriverProtocol
 
         Action selectedAction = (useRandom) ?
                 selector.selectAction(state, actions):
-                parseUtil.selectAction(state, actions, actionsExecuted, operatingSystems);
+                parseUtil.selectAction(state, actions);
 
         String actionID = selectedAction.get(Tags.AbstractID);
 

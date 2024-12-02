@@ -5,13 +5,11 @@ import antlrfour.StrategyParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.misc.MultiMap;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import strategynodes.instructions.ListNode;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Set;
 
 public class ParseUtil

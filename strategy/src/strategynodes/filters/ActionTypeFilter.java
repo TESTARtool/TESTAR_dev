@@ -25,6 +25,7 @@ public class ActionTypeFilter
         return filteredActions;
     }
 
+
     //todo: test if it works
     public static MultiMap<String, Object> filter(ActionStatus actionStatus, Collection<Action> actions, boolean filterByAvailability)
     {
@@ -46,17 +47,11 @@ public class ActionTypeFilter
             //only check against list if filtering is needed
             if (!filterByAvailability || availableActions.contains(pastActionID))
             {
-//                List<Object> entry = actionsExecuted.get(pastActionID);
                 List<Object> entry = StrategyManager.getEntryCopy(pastActionID);
                 ActionType entryActionType = (ActionType) entry.get(1);
                 if(actionStatus.actionIsAllowed(entryActionType))
                 {
-//                    ArrayList<Object> copiedEntry = new ArrayList<Object>();
-//                    copiedEntry.add(entry.get(0));
-//                    copiedEntry.add(entryActionType);
-
                     List<Object> copiedEntry = StrategyManager.getEntryCopy(pastActionID);
-
                     filteredPastActions.put(pastActionID, copiedEntry);
                 }
             }

@@ -1,31 +1,28 @@
 package strategynodes;
 
-import org.antlr.v4.runtime.misc.MultiMap;
 import org.testar.monkey.alayer.Action;
-import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
+import parsing.StrategyManager;
 
 import java.util.*;
 
 public abstract class BaseNode
 {
-//    public abstract T getResult(State state, Set<Action> actions, MultiMap<String, Object> actionsExecuted, ArrayList<String> operatingSystems);
-
     protected Action selectRandomAction(Collection<Action> actions)
     {
         return (Action) actions.toArray()[new Random().nextInt(actions.size())]; //return a random action
     }
 
-    protected Action selectRandomPastAction(Set<Action> actions, MultiMap<String, Object> pastActions)
+    public static Collection<Action> filterActionsByExecution(Set<Action> actions)
     {
-        Object[] keys = pastActions.keySet().toArray();
-        String key = (String) keys[new Random().nextInt(keys.length)];
+        Collection<Action> filteredActions = new ArrayList<>();
         for(Action action : actions)
         {
-            if(key.equals(action.get(Tags.AbstractID, null))) //return the action selected
-                return action;
+            String actionID = action.get(Tags.AbstractID);
+            if(StrategyManager.actionIsExecuted(actionID)) //action is in executedActions list
+                filteredActions.add(action);
         }
-        return null; //shouldn't ever happen
+        return filteredActions;
     }
 
     @Override

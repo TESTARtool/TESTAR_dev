@@ -1,25 +1,22 @@
 package strategynodes.instructions;
 
-import org.antlr.v4.runtime.misc.MultiMap;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import strategynodes.BaseNode;
 import strategynodes.data.ActionStatus;
 import strategynodes.data.VisitStatus;
+import strategynodes.data.Weight;
 import strategynodes.filters.ActionTypeFilter;
 import strategynodes.filters.VisitFilter;
-import strategynodes.data.Weight;
 
-import java.util.Set;
-import java.util.StringJoiner;
+import java.util.*;
 
 public class SelectPreviousNode extends BaseNode implements ActionNode
 {
     private final Weight weight;
     private final VisitStatus visitStatus;
     private final ActionStatus actionStatus;
-    MultiMap<String, Object> filteredPastActions = new MultiMap<>();
 
     public SelectPreviousNode(Integer weight, VisitStatus visitStatus, ActionStatus actionStatus)
     {
@@ -28,7 +25,6 @@ public class SelectPreviousNode extends BaseNode implements ActionNode
         this.actionStatus = actionStatus;
     }
 
-    //todo: check if it works correctly
     @Override
     public Action getResult(State state, Set<Action> actions)
     {
@@ -37,18 +33,20 @@ public class SelectPreviousNode extends BaseNode implements ActionNode
         if(prevAction == null)
             return selectRandomAction(actions);
 
-        filteredPastActions.clear();
+        Collection<Action> filteredActions = filterActionsByExecution(actions); //only keep actions that are present in the executedActions list
+        if(filteredActions.isEmpty()) //if nothing has made it through the filters
+            return selectRandomAction(actions); //default to picking randomly
 
         if(visitStatus != null)
-            filteredPastActions = VisitFilter.filterAvailableActions(visitStatus, actions, filteredPastActions, true);
+            filteredActions = VisitFilter.filter(visitStatus, filteredActions);
 
         if(actionStatus != null)
-            filteredPastActions = ActionTypeFilter.filter(actionStatus, actions, filteredPastActions, true);
+            filteredActions = ActionTypeFilter.filter(actionStatus, filteredActions);
 
-        if(filteredPastActions.isEmpty()) //if nothing has made it through the filters
-            return selectRandomAction(actions); //default to picking randomly
+        if(filteredActions.isEmpty()) //if nothing has made it through the filters
+            return selectRandomAction(filterActionsByExecution(actions)); //default to picking a random past action
         else
-            return selectRandomPastAction(actions);
+            return selectRandomAction(filteredActions); //everything is okay, pick from the list of options
     }
 
     @Override

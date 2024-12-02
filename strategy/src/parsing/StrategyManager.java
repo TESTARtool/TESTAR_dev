@@ -7,7 +7,6 @@ import org.testar.monkey.alayer.Tags;
 import strategynodes.data.ActionStatus;
 import strategynodes.data.VisitStatus;
 import strategynodes.enums.ActionType;
-import strategynodes.enums.SutType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,14 +43,13 @@ public class StrategyManager
         return state;
     }
 
-    public static State recordSelectedAction(State state, Action selectedAction)
+    public static void recordSelectedAction(State state, Action selectedAction)
     {
         if (selectedAction != null)
         {
             state.set(Tags.PreviousAction, selectedAction);
             state.set(Tags.PreviousActionID, selectedAction.get(Tags.AbstractID, null));
         }
-        return state;
     }
 
     public static Action selectAction(State state, Set<Action> actions)
@@ -61,19 +59,9 @@ public class StrategyManager
 
         List<Object> entry = getEntry(actionID);
         if(!entry.isEmpty()) // is there's an entry to update
-        {
-            ArrayList<Object> updatedEntry = new ArrayList<>();
-            updatedEntry.add(getUsageCount(entry) + 1);
-            updatedEntry.add(entry.get(1));
-            actionsExecuted.replace(actionID, updatedEntry); //replace or create entry
-        }
+            addOrUpdateEntry(actionID, (int) entry.get(0) + 1, (ActionType) entry.get(1));
         else
-        {
-            ArrayList<Object> newEntry = new ArrayList<>();
-            newEntry.add(1);
-            newEntry.add(ActionType.getActionType(selectedAction));
-            actionsExecuted.replace(actionID, newEntry);
-        }
+            addOrUpdateEntry(actionID, 1, ActionType.getActionType(selectedAction));
 
         return selectedAction;
     }
@@ -82,10 +70,13 @@ public class StrategyManager
     {
         return actionsExecuted.getOrDefault(actionID, new ArrayList<>()); //create empty entry if not present
     }
-    private static int getUsageCount(List<Object> entry)
+
+    private static void addOrUpdateEntry(String actionID, int usageCount, ActionType actionType)
     {
-        //get the use count from the entry
-        return (entry == null) ? 0 : (Integer) entry.get(0); //default to zero if null
+        ArrayList<Object> updatedEntry = new ArrayList<>();
+        updatedEntry.add(usageCount);
+        updatedEntry.add(actionType);
+        actionsExecuted.replace(actionID, updatedEntry); //replace or create entry
     }
 
     public static List<Object> getEntryCopy(String actionID)
@@ -95,8 +86,10 @@ public class StrategyManager
 
     public static int getUsageCount(String actionID)
     {
+        List<Object> entry = getEntry(actionID);
+
         //get the use count from the entry
-        return getUsageCount(getEntry(actionID));
+        return (entry.isEmpty()) ? 0 : (Integer) entry.get(0); //default to zero if empty
     }
     public static ActionType getActionType(String actionID)
     {
@@ -128,5 +121,77 @@ public class StrategyManager
     {
         return operatingSystem;
     }
-    
+
+    public static boolean actionIsExecuted(String actionID)
+    {
+        return actionsExecuted.containsKey(actionID);
+    }
+
+//  (visitStatus == null && actionStatus == null) ||    //if neither aspect is filtered on
+//  (visit && actionStatus == null) ||                  //if only filter on visit status
+//  (visitStatus == null && actionType) ||              //if only filter on action type
+//  (visit && actionType)                               //if both aspects are filtered on
+
+    public static List<Action> filterActionsByAppearanceInExecutedList(Set<Action> actions)
+    {
+        ArrayList<Action> filteredActions = new ArrayList<>();
+        for(Action action : actions)
+        {
+            String actionID = action.get(Tags.AbstractID);
+            if(actionsExecuted.containsKey(actionID))
+                filteredActions.add(action);
+        }
+        return filteredActions;
+    }
+
+    public static int countExecutedActionsOfCorrectStatus(VisitStatus visitStatus, ActionStatus actionStatus)
+    {
+        int numActionsRejected = 0;
+        for (String pastActionID : actionsExecuted.keySet())
+        {
+            boolean visitRejected = false;
+            boolean actionTypeRejected = false;
+
+            if(visitStatus != null)
+            {
+                if(!visitStatus.actionIsAllowed(pastActionID))
+                    visitRejected = true;
+            }
+
+            if(!visitRejected && actionStatus != null) //if visit is already rejected, skip this part
+            {
+                if (!actionStatus.actionIsAllowed(getActionType(pastActionID))) //action is not of the correct type
+                    actionTypeRejected = true;
+            }
+
+            if(visitRejected || actionTypeRejected) //if either or both are true, count the action as rejected
+                numActionsRejected++;
+        }
+        return actionsExecuted.size() - numActionsRejected; //return number of actions not rejected
+    }
+
+    public static boolean thisExecutedActionExists(VisitStatus visitStatus, ActionStatus actionStatus)
+    {
+        for (String pastActionID : actionsExecuted.keySet())
+        {
+            boolean visitRejected = false;
+            boolean actionTypeRejected = false;
+
+            if(visitStatus != null)
+            {
+                if(!visitStatus.actionIsAllowed(pastActionID))
+                    visitRejected = true;
+            }
+
+            if(!visitRejected && actionStatus != null) //if visit is already rejected, skip this part
+            {
+                if (!actionStatus.actionIsAllowed(getActionType(pastActionID))) //action is not of the correct type
+                    actionTypeRejected = true;
+            }
+
+            if(!visitRejected && !actionTypeRejected) //if both are accepted, stop the loop and return true
+                return true;
+        }
+        return false;
+    }
 }
