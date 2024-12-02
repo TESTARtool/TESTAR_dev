@@ -46,6 +46,13 @@ public class ActionHistory {
         actions.add(action);
     }
 
+    /**
+     * Clears the action history.
+     */
+    public void clear() {
+        actions.clear();
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -56,12 +63,17 @@ public class ActionHistory {
             builder.append(String.format("These are the last %d actions we executed: ", actions.size()));
         }
 
+        int i = 1;
         for (var action : actions) {
             Widget widget = action.get(Tags.OriginWidget);
             String type = action.get(Tags.Role).name();
-            String actionId = action.get(Tags.ConcreteID, "Unknown ActionId");
+            // String actionId = action.get(Tags.ConcreteID, "Unknown ActionId");
+            // Using TESTAR's actionId for action history results in some LLMs mistaking historical actions
+            // for available actions.
+            String actionId = String.valueOf(i);
             String description = widget.get(Tags.Desc, "Unknown Widget");
 
+            // TODO: Select list/combobox actions
             switch(type) {
                 case "ClickTypeInto":
                     String input = getCompoundActionInputText(action);
@@ -76,6 +88,7 @@ public class ActionHistory {
                     break;
             }
 
+            i++;
             builder.append(", ");
         }
 
@@ -84,6 +97,12 @@ public class ActionHistory {
         return builder.toString();
     }
 
+    /**
+     * Temporary hack to get the text input from input actions (such as text fields).
+     * Actions derived by Testar are in the form of CompoundActions
+     * @param action CompoundAction.
+     * @return Input text of the compound action.
+     */
     private String getCompoundActionInputText(Action action) {
     	//TODO: Create single actions in protocol so this is not necessary?
     	if(action instanceof CompoundAction) {

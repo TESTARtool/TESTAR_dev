@@ -201,6 +201,7 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(LlmTestGoalDescription, "Log in with username john and password demo"));
 		defaults.add(Pair.from(LlmFewshotFile, "prompts/fewshot_login_openai.json"));
 		defaults.add(Pair.from(LlmTemperature, 0.2f));
+		defaults.add(Pair.from(LlmHistorySize, 5));
 
 		return defaults;
 	}
