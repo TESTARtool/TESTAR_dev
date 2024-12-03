@@ -80,7 +80,7 @@ public class AndroidAppiumFramework extends SUTBase {
 
 	// Appium v2 do not use /wd/hub suffix anymore
 	// It can be enabled using the "--base-path /wd/hub" command when launching the Appium server
-	public static String androidAppiumURL = "http://0.0.0.0:4723/wd/hub";
+	public static String androidAppiumURL = "http://127.0.0.1:4723/wd/hub";
 
 	public AndroidAppiumFramework(DesiredCapabilities cap) {
 		try {
@@ -565,13 +565,17 @@ public class AndroidAppiumFramework extends SUTBase {
 
 			JsonObject jsonObject = new JsonParser().parse(reader).getAsJsonObject();
 
-			cap.setCapability("deviceName", jsonObject.get("deviceName").getAsString());
+			// https://appium.io/docs/en/2.0/guides/caps/
 			cap.setCapability("platformName", jsonObject.get("platformName").getAsString());
-			cap.setCapability("automationName", jsonObject.get("automationName").getAsString());
-			cap.setCapability("allowTestPackages", true);
-			cap.setCapability("newCommandTimeout", jsonObject.get("newCommandTimeout").getAsInt());
-			cap.setCapability("appWaitActivity", jsonObject.get("appWaitActivity").getAsString());
-			cap.setCapability("autoGrantPermissions", jsonObject.get("autoGrantPermissions").getAsBoolean());
+
+			cap.setCapability("appium:deviceName", jsonObject.get("deviceName").getAsString());
+			cap.setCapability("appium:automationName", jsonObject.get("automationName").getAsString());
+			cap.setCapability("appium:newCommandTimeout", jsonObject.get("newCommandTimeout").getAsInt());
+
+			// TODO: Check and test next capabilities
+			// cap.setCapability("allowTestPackages", true);
+			// cap.setCapability("appWaitActivity", jsonObject.get("appWaitActivity").getAsString());
+			// cap.setCapability("autoGrantPermissions", jsonObject.get("autoGrantPermissions").getAsBoolean());
 
 			String appPath = jsonObject.get("app").getAsString();
 
@@ -579,14 +583,16 @@ public class AndroidAppiumFramework extends SUTBase {
 			if(jsonObject.get("isEmulatorDocker") != null 
 					&& jsonObject.get("ipAddressAppium") != null
 					&& jsonObject.get("isEmulatorDocker").getAsBoolean()) {
-				cap.setCapability("app", appPath);
+
+				cap.setCapability("appium:app", appPath);
+
 				// Docker container (budtmo/docker-android) + Appium v2 do not use /wd/hub suffix anymore
 				// It can be enabled using the APPIUM_ADDITIONAL_ARGS "--base-path /wd/hub" command
 				androidAppiumURL = "http://" + jsonObject.get("ipAddressAppium").getAsString() + ":4723/wd/hub";
 			} 
 			// Else, obtain the local directory that contains the APK file
 			else {
-				cap.setCapability("app", new File(appPath).getCanonicalPath());
+				cap.setCapability("appium:app", new File(appPath).getCanonicalPath());
 			}
 
 		} catch (IOException | NullPointerException e) {
