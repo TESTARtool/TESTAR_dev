@@ -387,7 +387,7 @@ public class LlmActionSelector implements IActionSelector {
      */
     private Action getActionByIdentifier(Set<Action> actions, String actionId) {
         for(Action action : actions) {
-            if(action.get(Tags.ConcreteID, "").equals(actionId)) {
+            if(action.get(Tags.ConcreteID, "").equalsIgnoreCase(actionId)) {
                 return action;
             }
         }

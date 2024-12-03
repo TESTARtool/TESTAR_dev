@@ -47,6 +47,7 @@ import org.testar.protocols.WebdriverProtocol;
 import org.testar.settings.Settings;
 import org.testar.statemodel.StateModelManagerFactory;
 import org.testar.statemodel.analysis.condition.BasicConditionEvaluator;
+import org.testar.statemodel.analysis.condition.ConditionEvaluator;
 import org.testar.statemodel.analysis.condition.StateCondition;
 import org.testar.statemodel.analysis.condition.TestCondition;
 import org.testar.statemodel.analysis.metric.LlmMetricsCollector;
@@ -74,7 +75,7 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 	// The LLM Action selector needs to be initialize with the settings
 	private LlmActionSelector llmActionSelector;
 	private MetricsManager metricsManager;
-	private BasicConditionEvaluator conditionEvaluator;
+	private ConditionEvaluator conditionEvaluator;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -178,6 +179,9 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 
 		// Reset llm action selector
 		llmActionSelector.reset();
+
+		// Reset the goal accomplished flag
+		testGoalAccomplished = false;
 
 		// Use sequence count to iteratively create a new state model
 		String appVersion = settings.get(ConfigTags.ApplicationVersion, "");
