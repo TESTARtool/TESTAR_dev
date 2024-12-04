@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2023 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2023 - 2024 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -187,6 +187,13 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(LogOracleFiles, new ArrayList<String>()));
 
 		defaults.add(Pair.from(ListeningScript, "./settings/script.txt"));
+
+		// Settings for Coverage
+		defaults.add(Pair.from(JacocoCoverage, false));
+		defaults.add(Pair.from(JacocoCoverageIpAddress, "localhost"));
+		defaults.add(Pair.from(JacocoCoveragePort, 5000));
+		defaults.add(Pair.from(JacocoCoverageClasses, "path/to/SUT/classes"));
+		defaults.add(Pair.from(JacocoCoverageAccumulate, false));
 
 		return defaults;
 	}

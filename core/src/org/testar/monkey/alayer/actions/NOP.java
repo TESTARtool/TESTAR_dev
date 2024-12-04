@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013 - 2024 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -27,10 +28,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.testar.monkey.alayer.actions;
 
 import org.testar.monkey.Util;
@@ -47,19 +44,22 @@ import org.testar.monkey.alayer.Tags;
 public class NOP extends TaggableBase implements Action {
 	private static final long serialVersionUID = 8622084462407313716L;
 	
-	public static final String NOP_ID = "No Operation"; // by urueda
-	
+	public static final String NOP_ID = "No Operation";
+
+	public NOP() {
+		this.set(Tags.Desc, NOP_ID);
+		this.set(Tags.Role, ActionRoles.NOPAction);
+	}
+
 	public void run(SUT system, State state, double duration){ Util.pause(duration); }
 	
 	public String toString(){ return NOP_ID; }
 
-	// by urueda
 	@Override
 	public String toString(Role... discardParameters) {
 		return toString();
 	}
 
-	// by urueda
 	@Override
 	public String toShortString() {
 		Role r = get(Tags.Role, null);
@@ -69,7 +69,6 @@ public class NOP extends TaggableBase implements Action {
 			return toString();
 	}
 
-	// by urueda
 	@Override
 	public String toParametersString() {
 		return "";
