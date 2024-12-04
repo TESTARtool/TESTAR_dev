@@ -1,0 +1,33 @@
+name: TESTAR-AUTOLINK Windows build test
+
+on:
+  push:
+    branches: [ autolink ]
+
+jobs:
+  linux:
+    runs-on: windows-latest
+    timeout-minutes: 5
+    continue-on-error: true
+
+    strategy:
+      fail-fast: false
+      matrix:
+        java: [ '11', '17', '21' ]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Java ${{ matrix.java }}
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'corretto'
+        java-version: ${{ matrix.java }}
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Clean TESTAR-AUTOLINK with Gradle
+      run: ./gradlew clean
+
+    - name: Build TESTAR-AUTOLINK with Gradle
+      run: ./gradlew build
