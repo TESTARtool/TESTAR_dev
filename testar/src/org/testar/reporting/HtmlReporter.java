@@ -187,7 +187,6 @@ public class HtmlReporter implements Reporting
         String screenshotDir = prepareScreenshotImagePath(OutputStructure.screenshotsOutputDir);
         String stateConcreteID = state.get(Tags.ConcreteID, "NoConcreteIdAvailable");
         String actionConcreteID = action.get(Tags.ConcreteID, "NoConcreteIdAvailable");
-        String actionAbstractID = action.get(Tags.AbstractID, "NoAbstractIdAvailable");
 
         String actionPath = screenshotDir + "/"
                             + OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname
@@ -198,7 +197,7 @@ public class HtmlReporter implements Reporting
         htmlReportUtil.addContent(openBlockContainer); // Open executed action block container
         htmlReportUtil.addHeading(2, "Selected Action "+innerLoopCounter+" leading to State "+innerLoopCounter);
     
-        String stateString = "ConcreteID=" + actionConcreteID + " || AbstractID=" + actionAbstractID;
+        String stateString = "ConcreteID=" + actionConcreteID;
         String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc, "NoActionDescriptionAvailable"));
         stateString += " || " + escaped;
         htmlReportUtil.addHeading(4, stateString);

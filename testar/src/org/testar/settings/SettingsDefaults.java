@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2023 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2023 - 2024 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -203,6 +203,7 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(LlmTestGoalDescription, "Log in with username john and password demo"));
 		defaults.add(Pair.from(LlmFewshotFile, "prompts/fewshot_login_openai.json"));
 		defaults.add(Pair.from(LlmTemperature, 0.2f));
+		defaults.add(Pair.from(LlmHistorySize, 5));
 
 		return defaults;
 	}

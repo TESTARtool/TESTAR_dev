@@ -77,6 +77,9 @@ public class LlmPanel extends SettingsPanel {
 	private JButton dirLlmTestGoalLoad = new JButton("Load Goal");
 	private JTextArea txtLlmTestGoalDescription = new JTextArea();
 
+    private JLabel labelLlmHistorySize = new JLabel("Action History Size");
+    private JTextField fieldLlmHistorySize = new JTextField();
+
 	public LlmPanel() {
 		setLayout(null);
 
@@ -147,20 +150,26 @@ public class LlmPanel extends SettingsPanel {
 		fieldLlmTemperature.setToolTipText(ConfigTags.LlmTemperature.getDescription());
 		add(fieldLlmTemperature);
 
-		labelLlmTestGoalDescription.setBounds(10, 160, 460, 27);
+		labelLlmHistorySize.setBounds(10, 160, 180, 27);
+		labelLlmHistorySize.setToolTipText(ConfigTags.LlmHistorySize.getDescription());
+		add(labelLlmHistorySize);
+		fieldLlmHistorySize.setBounds(150, 160, 400, 27);
+		fieldLlmHistorySize.setToolTipText(ConfigTags.LlmHistorySize.getDescription());
+		add(fieldLlmHistorySize);
+
+		labelLlmTestGoalDescription.setBounds(10, 190, 460, 27);
 		labelLlmTestGoalDescription.setToolTipText(ConfigTags.LlmTestGoalDescription.getDescription());
 		add(labelLlmTestGoalDescription);
-		dirLlmTestGoalLoad.setBounds(510, 160, 100, 27);
+		dirLlmTestGoalLoad.setBounds(510, 190, 100, 27);
 		dirLlmTestGoalLoad.addActionListener(this::chooseTestGoalFileFileActionPerformed);
 		add(dirLlmTestGoalLoad);
 		txtLlmTestGoalDescription.setLineWrap(true);
 		JScrollPane llmTestGoalDescriptionPane = new JScrollPane(txtLlmTestGoalDescription);
-		llmTestGoalDescriptionPane.setBounds(10, 190, 600, 150);
+		llmTestGoalDescriptionPane.setBounds(10, 220, 600, 150);
 		llmTestGoalDescriptionPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 		llmTestGoalDescriptionPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		llmTestGoalDescriptionPane.setToolTipText(ConfigTags.LlmTestGoalDescription.getDescription());
 		add(llmTestGoalDescriptionPane);
-
 	}
 
 	// show a file dialog to choose the LLM Fewshot File
@@ -221,6 +230,7 @@ public class LlmPanel extends SettingsPanel {
 		fieldLlmAuthorizationHeader.setText(settings.get(ConfigTags.LlmAuthorizationHeader));
 		fieldLlmFewshotFile.setText(settings.get(ConfigTags.LlmFewshotFile));
 		fieldLlmTemperature.setText(settings.get(ConfigTags.LlmTemperature).toString());
+		fieldLlmHistorySize.setText(settings.get(ConfigTags.LlmHistorySize).toString());
 		txtLlmTestGoalDescription.setText(settings.get(ConfigTags.LlmTestGoalDescription).replace("\\n", "\n"));
 	}
 
@@ -240,6 +250,7 @@ public class LlmPanel extends SettingsPanel {
 		settings.set(ConfigTags.LlmAuthorizationHeader, fieldLlmAuthorizationHeader.getText());
 		settings.set(ConfigTags.LlmFewshotFile, fieldLlmFewshotFile.getText());
 		settings.set(ConfigTags.LlmTemperature, Float.parseFloat(fieldLlmTemperature.getText()));
+		settings.set(ConfigTags.LlmHistorySize, Integer.parseInt(fieldLlmHistorySize.getText()));
 		settings.set(ConfigTags.LlmTestGoalDescription, txtLlmTestGoalDescription.getText().replace("\n", "\\n").replace("\r", ""));
 	}
 

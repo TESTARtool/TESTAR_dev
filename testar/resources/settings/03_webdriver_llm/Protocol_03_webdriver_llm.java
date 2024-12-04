@@ -31,6 +31,7 @@
 import com.google.common.collect.ArrayListMultimap;
 import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
+import org.testar.action.priorization.llm.prompt.StandardPromptGenerator;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
@@ -73,7 +74,7 @@ public class Protocol_03_webdriver_llm extends WebdriverProtocol {
 		super.initialize(settings);
 
 		// Initialize the LlmActionSelector using the LLM settings
-		llmActionSelector = new LlmActionSelector(settings);
+		llmActionSelector = new LlmActionSelector(settings, new StandardPromptGenerator());
 
 		// List of atributes to identify and close policy popups
 		// Set to null to disable this feature

@@ -1,0 +1,6 @@
+Scenario Outline: Login Parabank
+  Given I want to log in
+  And fill in username 'john'
+  And fill in password 'demo'
+  When login
+  Then Welcome John Smith is shown

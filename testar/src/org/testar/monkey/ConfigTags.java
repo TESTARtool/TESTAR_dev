@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -173,6 +173,9 @@ public final class ConfigTags {
 
 	public static final Tag<Float> LlmTemperature = Tag.from("LlmTemperature", Float.class,
 			"Controls the randomness of the LLM output. Value between 0 and 2.");
+
+	public static final Tag<Integer> LlmHistorySize = Tag.from("LlmHistorySize", Integer.class,
+			"Controls how many historical actions are kept track of and sent to the LLM.");
 
 	/**
 	 * WebDriver settings 

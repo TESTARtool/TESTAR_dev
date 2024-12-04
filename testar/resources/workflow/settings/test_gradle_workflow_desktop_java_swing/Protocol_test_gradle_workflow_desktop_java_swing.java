@@ -233,6 +233,7 @@ public class Protocol_test_gradle_workflow_desktop_java_swing extends DesktopPro
 				+ OutputStructure.startOuterLoopDateString + "_" 
 				+ OutputStructure.executedSUTname;
 
+		Assert.isTrue(new File(jacocoFiles + "_accumulative_ratio_coverage.txt").exists());
 		Assert.isTrue(new File(jacocoFiles + "_sequence_1.exec").exists());
 		Assert.isTrue(new File(jacocoFiles + "_sequence_1.csv").exists());
 		Assert.isTrue(new File(jacocoFiles + "_sequence_1_action_0.exec").exists());

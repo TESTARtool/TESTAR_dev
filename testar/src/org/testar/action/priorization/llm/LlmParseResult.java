@@ -11,7 +11,8 @@ public class LlmParseResult {
         SUCCESS, // Parsing was successful.
         SUCCESS_FINISH, // Parsing was successful, LLM wants to terminate test.
         OUT_OF_RANGE, // Action chosen by LLM is out of range.
-        PARSE_FAILED // Failed to parse JSON or response was not JSON.
+        PARSE_FAILED, // Failed to parse JSON or response was not JSON.
+        INVALID_ACTION // Action chosen by LLM does not exist
     }
 
     private final Action actionToExecute;
