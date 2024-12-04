@@ -111,7 +111,7 @@ public class TestReportManager {
 		Assert.assertTrue(fileContains("<b>pasteActionDescription</b>", htmlReportFile));
 		Assert.assertTrue(fileContains("<b>NoActionDescriptionAvailable</b>", htmlReportFile));
 		// Verify selected action information
-		Assert.assertTrue(fileContains("<h4>ConcreteID=typeActionConcreteID || AbstractID=typeActionAbstractID || typeActionDescription</h4>", htmlReportFile));
+		Assert.assertTrue(fileContains("<h4>ConcreteID=typeActionConcreteID || typeActionDescription</h4>", htmlReportFile));
 		// Verify verdict information
 		Assert.assertTrue(fileContains("<h2>Test verdict for this sequence: No problem detected.</h2>", htmlReportFile));
 
