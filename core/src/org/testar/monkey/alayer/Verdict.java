@@ -47,6 +47,8 @@ public final class Verdict implements Serializable {
 	// Verdict severities
 	// PASS
 	public static final double SEVERITY_MIN = 0.0;
+	public static final double SEVERITY_TESTGOAL_COMPLETE = 0.05; // Test goal complete based on conditions
+	public static final double SEVERITY_LLM_COMPLETE = 0.05; // LLM believes test goal has been accomplished
 	// FAIL
 	public static final double SEVERITY_WARNING = 		   0.7; // custom verdict
 	public static final double SEVERITY_SUSPICIOUS_TAG = 0.8; // suspicious tag
@@ -96,6 +98,8 @@ public final class Verdict implements Serializable {
 	public String verdictSeverityTitle() {
 		if(severity == Verdict.SEVERITY_MIN)
 			return "OK";
+		if(severity == Verdict.SEVERITY_LLM_COMPLETE)
+			return "LLM_COMPLETE";
 		if(severity == Verdict.SEVERITY_WARNING)
 			return "WARNING";
 		if(severity == Verdict.SEVERITY_SUSPICIOUS_TAG)

@@ -65,16 +65,20 @@ public final class Type extends TaggableBase implements Action {
 	public void run(SUT system, State state, double duration) throws ActionFailedException {
 		Assert.isTrue(duration >= 0);
 		Assert.notNull(system);
-		
-		double d = duration / text.length();
+
+		//TODO: Refactor this hacky way of changing the final text of Type actions
+		//TODO: This is necessary for LLMs decisions but may alter the actions abstraction
+		String inputText = this.get(Tags.InputText, this.text);
+
+		double d = duration / inputText.length();
 		Action shiftDown = new KeyDown(KBKeys.VK_SHIFT);
 		Action shiftUp = new KeyUp(KBKeys.VK_SHIFT);
 
-		for(int i = 0; i < text.length(); i++){
+		for(int i = 0; i < inputText.length(); i++){
 
 			try {
 
-				char c = text.charAt(i);
+				char c = inputText.charAt(i);
 				boolean shift = false;
 
 				if(Character.isLetter(c)){
@@ -116,7 +120,7 @@ public final class Type extends TaggableBase implements Action {
         throw new IllegalArgumentException("Unable to find the corresponding keycode for character '" + c + "(" + ((int)c) +  ")'!");
     }
 	
-	public String toString(){ return "Type text '" + text + "'"; }
+	public String toString(){ return "Type text '" + this.get(Tags.InputText, this.text) + "'"; }
 	
 	// by urueda
 	@Override
@@ -141,7 +145,7 @@ public final class Type extends TaggableBase implements Action {
 	// by urueda
 	@Override
 	public String toParametersString() {
-		return "(" + text + ")";
+		return "(" + this.get(Tags.InputText, this.text) + ")";
 	}
 	
 }

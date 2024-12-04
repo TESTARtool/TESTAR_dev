@@ -1,0 +1,8 @@
+Scenario Outline: Send Contact Message Parabank
+  Given I want to contact parabank
+  When fill in name 'testar'
+  And fill in email 'testar.org'
+  And fill in phone '111-222'
+  And fill in message 'llm gherking agent sending a message'
+  And Send to Customer Care
+  Then A Customer Care Representative will be contacting you
