@@ -111,7 +111,7 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 		String testGoal1 = "Log in by entering the username \"john\" and the password \"demo\" and \n" +
 				"clicking the \"log in\" button";
 		List<TestCondition> tg1conditions = new ArrayList<>();
-		StateCondition tg1cond1 = new StateCondition("WebInnerHTML", "Welcome John Smith",
+		StateCondition tg1cond1 = new StateCondition("WebInnerHTML", "<b>Welcome</b> John Smith</p>",
 				TestCondition.ConditionComparator.GREATER_THAN, 0);
 		tg1conditions.add(tg1cond1);
 
