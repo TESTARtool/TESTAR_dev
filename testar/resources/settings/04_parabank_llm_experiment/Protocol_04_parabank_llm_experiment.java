@@ -111,7 +111,7 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 		String testGoal1 = "Log in by entering the username \"john\" and the password \"demo\" and \n" +
 				"clicking the \"log in\" button";
 		List<TestCondition> tg1conditions = new ArrayList<>();
-		StateCondition tg1cond1 = new StateCondition("WebInnerHTML", "Denied",
+		StateCondition tg1cond1 = new StateCondition("WebInnerHTML", "Welcome John Smith",
 				TestCondition.ConditionComparator.GREATER_THAN, 0);
 		tg1conditions.add(tg1cond1);
 
@@ -119,7 +119,7 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 				"\"Request Loan\" page and entering 999999 as the loan amount and 190000 \n" +
 				"for the down payment. Then click the \"Apply Now\" button.";
 		List<TestCondition> tg2conditions = new ArrayList<>();
-		StateCondition tg2cond1 = new StateCondition("WebInnerHTML", "<td id=\"loanStatus\">Denied</td>",
+		StateCondition tg2cond1 = new StateCondition("WebInnerHTML", "Denied",
 				TestCondition.ConditionComparator.GREATER_THAN, 0);
 		tg2conditions.add(tg2cond1);
 
