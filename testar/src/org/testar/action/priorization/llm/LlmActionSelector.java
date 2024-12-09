@@ -181,6 +181,19 @@ public class LlmActionSelector implements IActionSelector {
                 invalidActions++;
                 return nop;
             }
+            case SL_MISSING_INPUT: {
+                conversation.addMessage("user", "You selected an action to set the value of a combobox " +
+                        "but did not provide a value, please try again. \nFor example: To run action 'ACtest' to set" +
+                        " the value of combobox 'X' to '12345', return the following: \n" +
+                        "{\n" +
+                        "\"actionId\": \"ACtest\",\n" +
+                        "\"input\": \"12345\"\n" +
+                        "}");
+                NOP nop = new NOP();
+                nop.set(Tags.Desc, "Invalid select list action (no value given)");
+                invalidActions++;
+                return nop;
+            }
             default: {
                 logger.log(Level.ERROR, "ParseResult was null, this should never happen!");
                 NOP nop = new NOP();
@@ -345,8 +358,12 @@ public class LlmActionSelector implements IActionSelector {
             Widget widget = selectedAction.get(Tags.OriginWidget);
 
             if(Objects.equals(widget.get(WdTags.WebTagName, ""), "select")) {
-                return new LlmParseResult(
-                        createComboBoxAction(actions, actionId, input),LlmParseResult.ParseResult.SUCCESS);
+                if(Objects.equals(input, "")) {
+                    return new LlmParseResult(null, LlmParseResult.ParseResult.SL_MISSING_INPUT);
+                } else {
+                    return new LlmParseResult(
+                            createComboBoxAction(actions, actionId, input),LlmParseResult.ParseResult.SUCCESS);
+                }
             }
 
             setCompoundActionInputText(selectedAction, input);
