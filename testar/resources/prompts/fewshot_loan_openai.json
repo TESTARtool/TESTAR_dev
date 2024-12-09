@@ -26,7 +26,7 @@
   {
     "role": "assistant",
     "content": "{\n\"actionId\": \"AC78TY\",\n\"input\": \"\"\n}"
-  }
+  },
   {
     "role": "user",
     "content": "We are testing the \"Demo\" web application. The following objective was previously achieved: Log in with username \"Test\" and password \"Star\". The current test goal is: Apply for a loan of 400000 with a down payment of 100000. The following actions are available: ACB12A: Click Logout, ACF034: Click Request Loan, ACW304: Click Accounts Overview. Which action should be executed to accomplish the test goal?"
