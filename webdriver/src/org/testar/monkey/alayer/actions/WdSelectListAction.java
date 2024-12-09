@@ -76,4 +76,8 @@ public class WdSelectListAction extends TaggableBase implements Action {
     public String getValue() {
         return value;
     }
+
+    public String getElementId() {
+        return elementId;
+    }
 }
