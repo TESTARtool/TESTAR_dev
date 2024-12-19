@@ -129,7 +129,15 @@ public class WdElement extends TaggableBase implements Serializable {
     alt = attributeMap.getOrDefault("alt", "");
     type = attributeMap.getOrDefault("type", "");
     src = attributeMap.getOrDefault("src", "");
-    maxLength = Integer.valueOf(attributeMap.getOrDefault("maxlength", "-1"));
+
+    try {
+    	maxLength = Integer.valueOf(attributeMap.getOrDefault("maxlength", "-1"));
+    } catch (NumberFormatException e) {
+    	// This can happen if maxLength is defined without value or with incorrect content "2 2"
+    	// Maybe this is a test oracle :)
+    	maxLength = -1;
+    }
+
     innerHTML = (String) packedElement.getOrDefault("innerHTML", "");
     outerHTML = (String) packedElement.getOrDefault("outerHTML", "");
 
