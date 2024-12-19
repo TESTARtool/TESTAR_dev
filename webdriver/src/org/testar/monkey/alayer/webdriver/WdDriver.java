@@ -177,18 +177,14 @@ public class WdDriver extends SUTBase {
         .build();
     ChromeOptions options = new ChromeOptions();
 
-    System.out.println("EXTENSION: " + extensionPath + "/web-extension.crx");
-
-    options.addExtensions(new File(extensionPath + "/web-extension.crx"));
+    options.addArguments("--load-extension=" + extensionPath);
     options.addArguments("--disable-infobars");
-    if(fullScreen) {
-    	options.addArguments("--start-maximized");
-    }
-    if(disableSecurity) {
-        options.addArguments("--ignore-certificate-errors");
-    	options.addArguments("--disable-web-security");
-    	options.addArguments("--allow-running-insecure-content");
-    }
+
+    options.addArguments("--start-maximized");
+
+    options.addArguments("--ignore-certificate-errors");
+    options.addArguments("--disable-web-security");
+    options.addArguments("--allow-running-insecure-content");
 
     Map<String, Object> prefs = new HashMap<>();
     prefs.put("profile.default_content_setting_values.notifications", 1);
