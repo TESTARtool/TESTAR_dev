@@ -30,9 +30,21 @@
 
 package org.testar.monkey;
 
+import java.awt.AWTException;
+import java.awt.Rectangle;
+import java.awt.Robot;
+import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Base64;
+
+import javax.imageio.ImageIO;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.FlashFeedback;
+import org.testar.OutputStructure;
 import org.testar.SystemProcessHandling;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
@@ -102,6 +114,27 @@ public class SutConnectorCommandLine implements SutConnector {
                 }else if(state == null){
                     logger.debug("state == null");
                 }else if(state.childCount()==0){
+                	
+                    try {
+                        // Capture the full screen
+                        Robot robot = new Robot();
+                        Rectangle screenRect = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+                        BufferedImage screenCapture = robot.createScreenCapture(screenRect);
+
+                        // Convert the BufferedImage to a byte array
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        ImageIO.write(screenCapture, "png", baos);
+                        byte[] imageBytes = baos.toByteArray();
+
+                        // Encode the byte array to Base64
+                        String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+                        logger.debug(base64Image);
+                    } catch (AWTException e) {
+                        System.err.println("Error capturing the screen: " + e.getMessage());
+                    } catch (IOException e) {
+                        System.err.println("Error processing the image: " + e.getMessage());
+                    }
+                	
                 	logger.debug("state.childCount() == 0");
                 	// Display a message indicating the possible issue with respect to TESTAR detecting an empty state
                 	if (accessBridgeEnabled) {
