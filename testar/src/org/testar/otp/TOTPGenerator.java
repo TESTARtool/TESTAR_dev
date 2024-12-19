@@ -1,4 +1,4 @@
-package org.testar.otp.authenticator;
+package org.testar.otp;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -13,12 +13,10 @@ public class TOTPGenerator {
 	private final int TIME_STEP = 30;
 
 	/**
-	 * Constructs a TOTPGenerator instance using a secret key retrieved from an environment variable.
-	 * 
-	 * @param javaEnvSecretKey the name of the environment variable that stores the TOTP secret key.
+	 * Constructs a TOTPGenerator instance using a secret key
 	 */
-	public TOTPGenerator(String javaEnvSecretKey) {
-		this.secretKey = System.getenv(javaEnvSecretKey).toCharArray();
+	public TOTPGenerator(char[] secretKey) {
+		this.secretKey = secretKey;
 	}
 
 	public String generateTOTP() {

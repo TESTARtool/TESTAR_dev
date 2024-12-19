@@ -1,4 +1,4 @@
-package org.testar.otp.email;
+package org.testar.otp;
 
 import java.io.IOException;
 import java.util.Date;

@@ -1,4 +1,4 @@
-package org.testar.otp.email;
+package org.testar.otp;
 
 import org.junit.Before;
 import org.junit.Ignore;
