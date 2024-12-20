@@ -187,8 +187,11 @@ public class WdDriver extends SUTBase {
     options.addArguments("--allow-running-insecure-content");
 
     Map<String, Object> prefs = new HashMap<>();
-    prefs.put("profile.default_content_setting_values.notifications", 1);
+    prefs.put("profile.default_content_setting_values.notifications", 2);
     options.setExperimentalOption("prefs", prefs);
+
+    options.addArguments("--disable-notifications");
+    options.addArguments("--disable-extensions");
 
     // Workaround to fix https://github.com/SeleniumHQ/selenium/issues/11750
     options.addArguments("--remote-allow-origins=*");
