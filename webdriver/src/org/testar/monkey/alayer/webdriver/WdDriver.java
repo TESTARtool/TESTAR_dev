@@ -190,9 +190,6 @@ public class WdDriver extends SUTBase {
     prefs.put("profile.default_content_setting_values.notifications", 2);
     options.setExperimentalOption("prefs", prefs);
 
-    options.addArguments("--disable-notifications");
-    options.addArguments("--disable-extensions");
-
     // Workaround to fix https://github.com/SeleniumHQ/selenium/issues/11750
     options.addArguments("--remote-allow-origins=*");
     options.addArguments("--disable-search-engine-choice-screen");  // Disable search engine selector

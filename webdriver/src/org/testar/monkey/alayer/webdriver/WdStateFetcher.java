@@ -30,6 +30,10 @@
 
 package org.testar.monkey.alayer.webdriver;
 
+import org.openqa.selenium.logging.LogEntries;
+import org.openqa.selenium.logging.LogEntry;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.Roles;
 import org.testar.monkey.alayer.SUT;
@@ -66,6 +70,13 @@ public class WdStateFetcher implements Callable<WdState> {
     }
     else {
     	System.out.println("DEBUG JavaScript extension: packedBody is null or neither List or Map");
+
+    	RemoteWebDriver driver = WdDriver.getRemoteWebDriver();
+    	LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
+    	for(LogEntry logEntry : logEntries) {
+    		System.out.println("logEntry: " + logEntry.getMessage());
+    	}
+
     	return emptyRootState(system);
     }
 
