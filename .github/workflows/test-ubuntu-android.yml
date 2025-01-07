@@ -1,6 +1,8 @@
 name: Ubuntu TESTAR Android CI tests
 
 on:
+  push:
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
