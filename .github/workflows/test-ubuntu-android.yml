@@ -22,7 +22,7 @@ jobs:
 
     strategy:
       matrix:
-        java: [ '11' ]
+        java: [ '17' ]
 
     steps:
     - name: Checkout Code
@@ -51,9 +51,24 @@ jobs:
         yes Y | sdkmanager --licenses
         sdkmanager --install ${ANDROID_SDK_PACKAGES}
 
+    - name: Verify Installed SDK Packages
+      run: sdkmanager --list | grep "system-images"
+
     - name: Build emulator
       run: |
         echo "no" | avdmanager --verbose create avd --force -n $EMULATOR_NAME --abi "${ANDROID_TARGET}/${ANDROID_ARCH}" -k "system-images;android-${API_LEVEL};${ANDROID_TARGET};${ANDROID_ARCH}"
+
+    - name: List Available AVDs
+      run: avdmanager list avd
+
+    - name: Detect AVD Home
+      run: |
+        if [ -d "$HOME/.config/.android/avd" ]; then
+          export ANDROID_AVD_HOME="$HOME/.config/.android/avd"
+        else
+          export ANDROID_AVD_HOME="$HOME/.android/avd"
+        fi
+        echo "ANDROID_AVD_HOME=$ANDROID_AVD_HOME" >> $GITHUB_ENV
 
     - name: Launch emulator
       run: |
