@@ -11,3 +11,4 @@ updates:
       interval: "weekly"
     allow:
       - dependency-name: "org.seleniumhq.selenium:selenium-java"
+      - dependency-name: "io.appium:java-client"
