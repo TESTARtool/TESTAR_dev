@@ -72,9 +72,9 @@ public class IOSAppiumFramework extends SUTBase {
 	public IOSAppiumFramework(DesiredCapabilities cap) {
 
 		try {
-			driver = new IOSDriver(new URL("http://0.0.0.0:4723/wd/hub"), cap);
+			driver = new IOSDriver(new URL("http://127.0.0.1:4723/wd/hub"), cap);
 		} catch (MalformedURLException e) {
-			System.err.println("ERROR: Exception with IOS Driver URL: http://0.0.0.0:4723/wd/hub");
+			System.err.println("ERROR: Exception with IOS Driver URL: http://127.0.0.1:4723/wd/hub");
 			e.printStackTrace();
 		}
 	}
@@ -425,15 +425,17 @@ public class IOSAppiumFramework extends SUTBase {
 
 			JsonObject jsonObject = new JsonParser().parse(reader).getAsJsonObject();
 
-			cap.setCapability("deviceName", jsonObject.get("deviceName").getAsString());
+			// https://appium.io/docs/en/2.0/guides/caps/
 			cap.setCapability("platformName", jsonObject.get("platformName").getAsString());
-			cap.setCapability("automationName", jsonObject.get("automationName").getAsString());
+
+			cap.setCapability("appium:deviceName", jsonObject.get("deviceName").getAsString());
+			cap.setCapability("appium:automationName", jsonObject.get("automationName").getAsString());
 
 			String appPath = jsonObject.get("app").getAsString();
 
 			//TODO modify this to a more generic app path!!!
 			String appLocation = appPath;
-			cap.setCapability("app", appLocation);
+			cap.setCapability("appium:app", appLocation);
 
 		} catch (IOException | NullPointerException e) {
 			System.err.println("ERROR: Exception reading Appium Desired Capabilities from JSON file: " + capabilitesJsonFile);
