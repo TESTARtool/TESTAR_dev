@@ -359,6 +359,15 @@ function getIsBlockedTestar(element, xOffset, yOffset) {
         return false;
     }
 
+    // Ignore blocking clickable elements that are obscured by child elements
+    if (
+        isClickableTestar(element) &&
+        ["BUTTON", "A", "DATALIST", "INPUT", "SELECT"].includes(element.tagName) &&
+        element.contains(elem)
+    ) {
+        return false;
+    }
+
     // return whether obscured element has same parent node
     // (will also return false if element === elem)
     return elem.parentNode !== element.parentNode;
