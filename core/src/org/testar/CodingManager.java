@@ -174,11 +174,19 @@ public class CodingManager {
 	public static synchronized void buildIDs(State state, Set<Action> actions){
 		for (Action a : actions) {
 			// Create the Abstract Id for the derived actions
-			a.set(Tags.AbstractID, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT +
-					lowCollisionID(state.get(Tags.AbstractID) + a.get(Tags.OriginWidget).get(Tags.AbstractID) + a.get(Tags.Role, ActionRoles.Action)));
+			try {
+				a.set(Tags.AbstractID, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT +
+						lowCollisionID(state.get(Tags.AbstractID) + a.get(Tags.OriginWidget).get(Tags.AbstractID) + a.get(Tags.Role, ActionRoles.Action)));
+			} catch (NoSuchTagException ex) {
+				System.err.println("Exception Coding Action " + a.get(Tags.Desc, "") + " AbstractID: " + ex.getMessage());
+			}
 			// Create the Concrete Id for the derived actions
-			a.set(Tags.ConcreteID, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE +
-					lowCollisionID(state.get(Tags.ConcreteID) + a.get(Tags.OriginWidget).get(Tags.ConcreteID) + a.get(Tags.Role, ActionRoles.Action) + a.toString()));
+			try {
+				a.set(Tags.ConcreteID, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE +
+						lowCollisionID(state.get(Tags.ConcreteID) + a.get(Tags.OriginWidget).get(Tags.ConcreteID) + a.get(Tags.Role, ActionRoles.Action) + a.toString()));
+			} catch (NoSuchTagException ex) {
+				System.err.println("Exception Coding Action " + a.get(Tags.Desc, "") + "ConcreteID: " + ex.getMessage());
+			}
 		}
 	}
 
