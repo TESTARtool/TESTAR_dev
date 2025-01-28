@@ -9,6 +9,7 @@ import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.actions.CompoundAction;
 import org.testar.monkey.alayer.actions.PasteText;
 import org.testar.monkey.alayer.actions.Type;
+import org.testar.monkey.alayer.actions.WdSelectListAction;
 
 import java.util.ArrayList;
 
@@ -73,19 +74,26 @@ public class ActionHistory {
             String actionId = String.valueOf(i);
             String description = widget.get(Tags.Desc, "Unknown Widget");
 
-            // TODO: Select list/combobox actions
-            switch(type) {
-                case "ClickTypeInto":
-                    String input = getCompoundActionInputText(action);
-                    // TODO: Differentiate between types of input fields (numeric, password, etc.)
-                    builder.append(String.format("%s: Typed '%s' in TextField '%s'", actionId, input, description));
-                    break;
-                case "LeftClickAt":
-                    builder.append(String.format("%s: Clicked on '%s'", actionId, description));
-                    break;
-                default:
-                    logger.log(Level.WARN, "Unsupported action type for action history: " + type);
-                    break;
+            if(action instanceof WdSelectListAction) {
+                // Special case for combobox/select list actions
+                WdSelectListAction selectListAction = (WdSelectListAction) action;
+                String selectWidget = selectListAction.getElementId();
+                String value = selectListAction.getValue();
+                builder.append(String.format("%s: Set value of ComboBox '%s' to '%s'", actionId, selectWidget, value));
+            } else {
+                switch(type) {
+                    case "ClickTypeInto":
+                        String input = getCompoundActionInputText(action);
+                        // TODO: Differentiate between types of input fields (numeric, password, etc.)
+                        builder.append(String.format("%s: Typed '%s' in TextField '%s'", actionId, input, description));
+                        break;
+                    case "LeftClickAt":
+                        builder.append(String.format("%s: Clicked on '%s'", actionId, description));
+                        break;
+                    default:
+                        logger.log(Level.WARN, "Unsupported action type for action history: " + type);
+                        break;
+                }
             }
 
             i++;

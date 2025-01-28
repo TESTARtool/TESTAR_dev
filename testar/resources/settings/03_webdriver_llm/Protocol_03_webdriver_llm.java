@@ -29,6 +29,8 @@
  */
 
 import com.google.common.collect.ArrayListMultimap;
+
+import org.testar.CodingManager;
 import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
 import org.testar.action.priorization.llm.prompt.StandardPromptGenerator;
@@ -45,6 +47,10 @@ import org.testar.plugin.NativeLinker;
 import org.testar.monkey.Pair;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.settings.Settings;
+import org.testar.statemodel.analysis.condition.BasicConditionEvaluator;
+import org.testar.statemodel.analysis.condition.ConditionEvaluator;
+import org.testar.statemodel.analysis.condition.StateCondition;
+import org.testar.statemodel.analysis.condition.TestCondition;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -55,13 +61,14 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 public class Protocol_03_webdriver_llm extends WebdriverProtocol {
-	private boolean testGoalAccomplished = false;
 
 	// This list tracks the detected erroneous verdicts to avoid duplicates
 	private List<String> listOfDetectedErroneousVerdicts = new ArrayList<>();
 
 	// The LLM Action selector needs to be initialize with the settings
 	private LlmActionSelector llmActionSelector;
+
+	private ConditionEvaluator conditionEvaluator;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -74,7 +81,14 @@ public class Protocol_03_webdriver_llm extends WebdriverProtocol {
 		super.initialize(settings);
 
 		// Initialize the LlmActionSelector using the LLM settings
-		llmActionSelector = new LlmActionSelector(settings, new StandardPromptGenerator());
+		llmActionSelector = new LlmActionSelector(settings, new StandardPromptGenerator(),
+				"Log in with username 'john' and password 'demo'.");
+
+		// Test goal is considered complete when the welcome string is found in the HTML of the state model.
+		conditionEvaluator = new BasicConditionEvaluator();
+		StateCondition condition = new StateCondition("WebInnerHTML", "<b>Welcome</b> John Smith</p>",
+				TestCondition.ConditionComparator.GREATER_THAN, 0);
+		conditionEvaluator.addCondition(condition);
 
 		// List of atributes to identify and close policy popups
 		// Set to null to disable this feature
@@ -140,8 +154,12 @@ public class Protocol_03_webdriver_llm extends WebdriverProtocol {
 		// System crashes, non-responsiveness and suspicious tags automatically detected!
 		// For web applications, web browser errors and warnings can also be enabled via settings
 		Verdict verdict = super.getVerdict(state);
-		if(testGoalAccomplished) {
-			verdict = new Verdict(Verdict.SEVERITY_LLM_COMPLETE, "LLM believes test goal was accomplished.");
+
+		String modelIdentifier = stateModelManager.getModelIdentifier();
+
+		// Test goal complete, terminate.
+		if(conditionEvaluator.evaluateConditions(modelIdentifier, stateModelManager)) {
+			return new Verdict(Verdict.SEVERITY_TESTGOAL_COMPLETE, "Test goal complete.");
 		}
 		// If the Verdict is not OK but was already detected in a previous sequence
 		// Consider as OK to avoid duplicates and continue testing
@@ -499,13 +517,17 @@ public class Protocol_03_webdriver_llm extends WebdriverProtocol {
 	@Override
 	protected Action selectAction(State state, Set<Action> actions) {
 		Action toExecute = llmActionSelector.selectAction(state, actions);
-		// Null is returned when the LLM wants to terminate the test (if the test goal is believed to be accomplished)
-		// If there is a problem with action selection, a NOP action will be executed.
-		if(toExecute == null) {
-			// LLM thinks test goal is accomplished, perform no action and set flag for getVerdict to terminate test.
-			testGoalAccomplished = true;
-			return new NOP();
+
+		// We need to set a state to NOP actions
+		if(toExecute instanceof NOP) {
+			toExecute.set(Tags.OriginWidget, state);
 		}
+
+		// We need the AbstractID for the state model
+		if(toExecute.get(Tags.AbstractID, null) == null) {
+			CodingManager.buildIDs(state, Collections.singleton(toExecute));
+		}
+
 		return toExecute;
 	}
 
