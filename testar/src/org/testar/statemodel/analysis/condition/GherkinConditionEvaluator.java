@@ -14,7 +14,7 @@ public class GherkinConditionEvaluator extends BasicConditionEvaluator {
 
     public GherkinConditionEvaluator(Tag<?> evaluatorTag, String gherkinContent, ConditionComparator comparator, int threshold) {
         // Replace line breaks and split the Gherkin content into lines (case-insensitive splitting)
-        String[] lines = gherkinContent.replaceAll("(\\r|\\n|\\\\n)", "").split("(?i)(?=\\b(Scenario|Given|When|Then|And)\\b)");
+        String[] lines = gherkinContent.replaceAll("(\\r|\\n|\\\\n)", "\n").split("(?i)(?=\\b(Scenario|Given|When|Then|And)\\b)");
 
         // Add the Gherkin 'Then' statements as evaluator conditions
         for (String lineStatement : lines) {

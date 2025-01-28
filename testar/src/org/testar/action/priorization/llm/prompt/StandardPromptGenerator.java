@@ -71,7 +71,7 @@ public class StandardPromptGenerator implements IPromptGenerator {
             try {
                 Widget widget = action.get(Tags.OriginWidget);
                 String type = action.get(Tags.Role).name();
-                String actionId = action.get(Tags.ConcreteID, "Unknown ActionId");
+                String actionId = action.get(Tags.AbstractID, "Unknown ActionId");
                 String description = widget.get(Tags.Desc, "No description");
 
                 // Depending on the action, format into something the LLM is more likely to understand.

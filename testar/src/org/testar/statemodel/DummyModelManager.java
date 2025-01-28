@@ -68,7 +68,7 @@ public class DummyModelManager implements StateModelManager{
     }
 
     @Override
-    public String queryStateModel(String query) {
+    public String queryStateModel(String query, Object... params) {
     	return "";
     }
 }

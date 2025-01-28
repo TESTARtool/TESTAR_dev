@@ -64,14 +64,10 @@ public class ActionHistory {
             builder.append(String.format("These are the last %d actions we executed: ", actions.size()));
         }
 
-        int i = 1;
         for (var action : actions) {
             Widget widget = action.get(Tags.OriginWidget);
             String type = action.get(Tags.Role).name();
-            // String actionId = action.get(Tags.ConcreteID, "Unknown ActionId");
-            // Using TESTAR's actionId for action history results in some LLMs mistaking historical actions
-            // for available actions.
-            String actionId = String.valueOf(i);
+            String actionId = action.get(Tags.AbstractID, "Unknown ActionId");
             String description = widget.get(Tags.Desc, "Unknown Widget");
 
             if(action instanceof WdSelectListAction) {
@@ -96,7 +92,6 @@ public class ActionHistory {
                 }
             }
 
-            i++;
             builder.append(", ");
         }
 

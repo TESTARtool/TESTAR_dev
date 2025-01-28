@@ -328,13 +328,18 @@ public class ModelManager implements StateModelManager {
     }
 
     @Override
-    public String queryStateModel(String query) {
+    public String queryStateModel(String query, Object... params) {
     	EntityManager manager = persistenceManager.getEntityManager();
-    	OResultSet resultSet = manager.getConnection().getDatabaseSession().query(query);
-    	while(resultSet.hasNext()) {
-    		OResult result = resultSet.next();
-    		return result.toString();
+
+    	try (OResultSet resultSet = manager.getConnection().getDatabaseSession().query(query, params)) {
+    		if (resultSet.hasNext()) {
+    			OResult result = resultSet.next();
+    			return result.toString();
+    		}
+    	} catch (Exception e) {
+    		e.printStackTrace();
     	}
+
     	return "Empty";
     }
 
