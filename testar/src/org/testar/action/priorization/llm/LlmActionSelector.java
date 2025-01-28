@@ -349,7 +349,7 @@ public class LlmActionSelector implements IActionSelector {
             // If the selectedAction is a NOP action at this stage, parsing has likely failed.
             // Observed to happen when the LLM selects an actionId that does not exist.
             if(selectedAction instanceof NOP) {
-                logger.log(Level.ERROR, "Action ConcreteID not found, parsing LLM response has likely failed!: " + responseContent);
+                logger.log(Level.ERROR, "Action AbstractID not found, parsing LLM response has likely failed!: " + responseContent);
                 return new LlmParseResult(null, LlmParseResult.ParseResult.INVALID_ACTION);
             }
 
@@ -383,7 +383,7 @@ public class LlmActionSelector implements IActionSelector {
      */
     private Action getActionByIdentifier(Set<Action> actions, String actionId) {
         for(Action action : actions) {
-            if(action.get(Tags.ConcreteID, "").equalsIgnoreCase(actionId)) {
+            if(action.get(Tags.AbstractID, "").equalsIgnoreCase(actionId)) {
                 return action;
             }
         }
