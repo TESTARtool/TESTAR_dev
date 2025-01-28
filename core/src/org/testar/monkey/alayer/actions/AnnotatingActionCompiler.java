@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -193,7 +193,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 	@Override
 	public Action pasteAndReplaceText(final Position position, final String text){
 		Action ret = super.pasteAndReplaceText(position, text);
-		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate("pasted text", DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
+		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
 		ret.set(Tags.Role, ActionRoles.PasteTextInto);
 		ret.set(Tags.Desc, "Paste Text: " + StringEscapeUtils.escapeHtml4(text));
 		return ret;
@@ -202,7 +202,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 	@Override
 	public Action pasteAndAppendText(final Position position, final String text){
 		Action ret = super.pasteAndAppendText(position, text);
-		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate("pasted text", DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
+		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
 		ret.set(Tags.Role, ActionRoles.PasteTextInto);
 		ret.set(Tags.Desc, "Append Paste Text: " + StringEscapeUtils.escapeHtml4(text));
 		return ret;

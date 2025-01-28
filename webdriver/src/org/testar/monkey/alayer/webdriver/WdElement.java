@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -129,7 +129,15 @@ public class WdElement extends TaggableBase implements Serializable {
     alt = attributeMap.getOrDefault("alt", "");
     type = attributeMap.getOrDefault("type", "");
     src = attributeMap.getOrDefault("src", "");
-    maxLength = Integer.valueOf(attributeMap.getOrDefault("maxlength", "-1"));
+
+    try {
+    	maxLength = Integer.valueOf(attributeMap.getOrDefault("maxlength", "-1"));
+    } catch (NumberFormatException e) {
+    	// This can happen if maxLength is defined without value or with incorrect content "2 2"
+    	// Maybe this is a test oracle :)
+    	maxLength = -1;
+    }
+
     innerHTML = (String) packedElement.getOrDefault("innerHTML", "");
     outerHTML = (String) packedElement.getOrDefault("outerHTML", "");
 
