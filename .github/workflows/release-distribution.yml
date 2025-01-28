@@ -1,4 +1,4 @@
-name: TESTAR release
+name: TESTAR distribution release
 
 on:
   push:
