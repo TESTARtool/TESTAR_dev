@@ -1,0 +1,4 @@
+Registered user will log into the application and based on the login name the user will be recognized either as a student or a teacher
+
+Credentials blue/pass
+Then Student's View
