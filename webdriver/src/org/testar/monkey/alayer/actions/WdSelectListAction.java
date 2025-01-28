@@ -55,7 +55,9 @@ public class WdSelectListAction extends TaggableBase implements Action {
 
     @Override
     public void run(SUT system, State state, double duration) {
-        WdDriver.executeScript(String.format("document.getElementById('%s').value='%s'", elementId, value));
+        WdDriver.executeScript(String.format("const field = document.getElementById('%s');" +
+                " field.value = '%s'; const event = new Event('change', { bubbles: true }); " +
+                "field.dispatchEvent(event);", elementId, value));
     }
 
     @Override
@@ -75,5 +77,9 @@ public class WdSelectListAction extends TaggableBase implements Action {
 
     public String getValue() {
         return value;
+    }
+
+    public String getElementId() {
+        return elementId;
     }
 }

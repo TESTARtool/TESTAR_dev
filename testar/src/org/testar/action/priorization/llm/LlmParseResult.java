@@ -9,10 +9,10 @@ public class LlmParseResult {
 
     public enum ParseResult {
         SUCCESS, // Parsing was successful.
-        SUCCESS_FINISH, // Parsing was successful, LLM wants to terminate test.
         OUT_OF_RANGE, // Action chosen by LLM is out of range.
         PARSE_FAILED, // Failed to parse JSON or response was not JSON.
-        INVALID_ACTION // Action chosen by LLM does not exist
+        INVALID_ACTION, // Action chosen by LLM does not exist.
+        SL_MISSING_INPUT // SelectListAction was selected, but no value was given.
     }
 
     private final Action actionToExecute;
