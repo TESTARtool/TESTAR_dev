@@ -32,15 +32,14 @@ public class GherkinStateCondition extends StateCondition {
 
         // Iterate through each search word and perform the query
         for (String word : searchWords) {
-            StringBuilder queryBuilder = new StringBuilder();
-            queryBuilder.append("SELECT min(1, count(*)) AS found ");
-            queryBuilder.append("FROM ConcreteState ");
-            queryBuilder.append("WHERE uid LIKE '" + modelIdentifier + "%' ");
-            queryBuilder.append("AND " + getField() + ".toLowerCase() LIKE '%" + word.toLowerCase() + "%'");
+            String query = "SELECT min(1, count(*)) AS found " +
+                    "FROM ConcreteState " +
+                    "WHERE uid LIKE ? " +
+                    "AND " + getField() + ".toLowerCase() LIKE ?";
 
-            String query = queryBuilder.toString();
-
-            String result = stateModelManager.queryStateModel(query);
+            String result = stateModelManager.queryStateModel(query, 
+                    modelIdentifier + "%",
+                    "%" + word.toLowerCase() + "%");
 
             // Parse the count of matched entries for this word
             int wordMatch = QueryHelper.parseCountQueryResponse(result, "found");
