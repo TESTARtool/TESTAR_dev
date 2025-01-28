@@ -3,6 +3,7 @@ package org.testar.statemodel.analysis.condition;
 import org.testar.statemodel.StateModelManager;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -22,6 +23,21 @@ public abstract class ConditionEvaluator {
      */
     public void addCondition(TestCondition condition) {
         conditions.add(condition);
+    }
+
+    /**
+     * Adds multiple conditions that will be evaluated when evaluateConditions is called.
+     * @param newConditions New conditions to add.
+     */
+    public void addConditions(Collection<TestCondition> newConditions) {
+        conditions.addAll(newConditions);
+    }
+
+    /**
+     * Removes all conditions.
+     */
+    public void clear() {
+        conditions.clear();
     }
 
     /**

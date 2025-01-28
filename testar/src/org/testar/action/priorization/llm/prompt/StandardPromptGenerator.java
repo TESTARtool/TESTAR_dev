@@ -78,12 +78,12 @@ public class StandardPromptGenerator implements IPromptGenerator {
                 if(Objects.equals(widget.get(WdTags.WebTagName, ""), "select")) {
                     // Workaround for comboboxes
                     List<String> choices = getComboBoxChoices(widget, state);
-                    builder.append(String.format("%s: Set ComboBox '%s' to one of the following values: [",
+                    builder.append(String.format("%s: Set ComboBox '%s' to one of the following values: ",
                             actionId, description));
                     for(String choice : choices) {
                         builder.append(String.format("%s,", choice));
                     }
-                    builder.append("] ");
+                    builder.append(" ");
                 } else {
                     switch (type) {
                         case "ClickTypeInto":

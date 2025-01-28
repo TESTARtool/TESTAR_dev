@@ -74,8 +74,6 @@ public class Protocol_webdriver_llm_gherkin extends WebdriverProtocol {
 	private LlmActionSelector llmActionSelector;
 	// The Gherkin evaluator used in the State Model to check Gherkin conditions are met
 	private ConditionEvaluator conditionEvaluator;
-	// The goal accomplished flag used by the LLM to finish the sequence
-	private boolean testGoalAccomplished = false;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -91,7 +89,7 @@ public class Protocol_webdriver_llm_gherkin extends WebdriverProtocol {
 		super.initialize(settings);
 
 		// Initialize the LlmActionSelector using the LLM settings
-		llmActionSelector = new LlmActionSelector(settings, new StandardPromptGenerator());
+		llmActionSelector = new LlmActionSelector(settings, new StandardPromptGenerator(), settings.get(ConfigTags.LlmTestGoalDescription));
 
 		conditionEvaluator = new GherkinConditionEvaluator(WdTags.WebInnerHTML, settings.get(ConfigTags.LlmTestGoalDescription));
 	}
@@ -104,10 +102,7 @@ public class Protocol_webdriver_llm_gherkin extends WebdriverProtocol {
 		super.preSequencePreparations();
 
 		// Reset llm action selector
-		llmActionSelector.reset();
-
-		// Reset the goal accomplished flag
-		testGoalAccomplished = false;
+		llmActionSelector.reset(settings.get(ConfigTags.LlmTestGoalDescription), false);
 
 		// Use sequence count to iteratively create a new state model
 		String appVersion = settings.get(ConfigTags.ApplicationVersion, "");
@@ -184,10 +179,6 @@ public class Protocol_webdriver_llm_gherkin extends WebdriverProtocol {
 
 		if(conditionEvaluator.evaluateConditions(modelIdentifier, stateModelManager)) {
 			return new Verdict(Verdict.SEVERITY_TESTGOAL_COMPLETE, "Test goal complete, all conditions met.");
-		}
-
-		if(testGoalAccomplished) {
-			return new Verdict(Verdict.SEVERITY_LLM_COMPLETE, "LLM believes test goal was accomplished.");
 		}
 
 		return verdict;
@@ -310,14 +301,6 @@ public class Protocol_webdriver_llm_gherkin extends WebdriverProtocol {
 	@Override
 	protected Action selectAction(State state, Set<Action> actions) {
 		Action toExecute = llmActionSelector.selectAction(state, actions);
-
-		// Null is returned when the LLM wants to terminate the test (if the test goal is believed to be accomplished)
-		// If there is a problem with action selection, a NOP action will be executed.
-		if(toExecute == null) {
-			// LLM thinks test goal is accomplished, perform no action and set flag for getVerdict to terminate test.
-			testGoalAccomplished = true;
-			toExecute = new NOP();
-		}
 
 		// We need to set a state to NOP actions
 		if(toExecute instanceof NOP) {
