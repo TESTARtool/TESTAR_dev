@@ -213,9 +213,6 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 		// Reset llm action selector
 		llmActionSelector.reset(currentTestGoal.getTestGoal(), false);
 
-		// Reset the goal accomplished flag
-		testGoalAccomplished = false;
-
 		// Use sequence count to iteratively create a new state model
 		String appVersion = settings.get(ConfigTags.ApplicationVersion, "");
 		appVersion = appVersion.replaceFirst("_\\d+$", "_" + sequenceCount);

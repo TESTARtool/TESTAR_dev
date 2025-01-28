@@ -29,6 +29,8 @@
  */
 
 import com.google.common.collect.ArrayListMultimap;
+
+import org.testar.CodingManager;
 import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
 import org.testar.action.priorization.llm.prompt.StandardPromptGenerator;
@@ -59,7 +61,6 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 public class Protocol_03_webdriver_llm extends WebdriverProtocol {
-	private boolean testGoalAccomplished = false;
 
 	// This list tracks the detected erroneous verdicts to avoid duplicates
 	private List<String> listOfDetectedErroneousVerdicts = new ArrayList<>();
@@ -516,13 +517,17 @@ public class Protocol_03_webdriver_llm extends WebdriverProtocol {
 	@Override
 	protected Action selectAction(State state, Set<Action> actions) {
 		Action toExecute = llmActionSelector.selectAction(state, actions);
-		// Null is returned when the LLM wants to terminate the test (if the test goal is believed to be accomplished)
-		// If there is a problem with action selection, a NOP action will be executed.
-		if(toExecute == null) {
-			// LLM thinks test goal is accomplished, perform no action and set flag for getVerdict to terminate test.
-			testGoalAccomplished = true;
-			return new NOP();
+
+		// We need to set a state to NOP actions
+		if(toExecute instanceof NOP) {
+			toExecute.set(Tags.OriginWidget, state);
 		}
+
+		// We need the AbstractID for the state model
+		if(toExecute.get(Tags.AbstractID, null) == null) {
+			CodingManager.buildIDs(state, Collections.singleton(toExecute));
+		}
+
 		return toExecute;
 	}
 

@@ -54,21 +54,5 @@
         "text": "{\n\"actionId\": \"AC78TY\",\n\"input\": \"\"\n}"
       }
     ]
-  },
-  {
-    "role": "user",
-    "parts": [
-      {
-        "text": "We are testing the \"Demo\" web application. The objective of the test is to log in with username \"Test\" and password \"Star\". The following actions are available: ACR12R: Click Logout, ACOP8P: Click My Account, ACFF23: Click Transfer, AC6HWQ: Click Balance. These are the last 3 actions we executed: ACKO87: Typed Test into TextField Username, AC3B4T: Typed Star into TextField Password, AC78TY: Clicked on 'Log in'. Which action should be executed to accomplish the test goal?"
-      }
-    ]
-  },
-  {
-    "role": "model",
-    "parts": [
-      {
-        "text": "{\n\"actionId\": \"ACOMPLETE\",\n\"input\": \"\"\n}"
-      }
-    ]
   }
 ]

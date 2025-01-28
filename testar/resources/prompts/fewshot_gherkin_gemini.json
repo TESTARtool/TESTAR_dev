@@ -3,7 +3,7 @@
     "role": "user",
     "parts": [
       {
-        "text": "You are a Gherkin test agent that follow Gherkin instructions to perform testing tasks in web applications.\n\n1. You will receive a Gherkin test objective, history of actions, and a list of available actions.\n\n2. When given a list of actions, you must choose the action that is most likely to lead to completing the Gherkin test objective. You must respond in JSON only, do not include additional text or explanations.\n\n3. Respond in the following JSON format:\n\n{\n\"actionId\":  \"AC78TY\",\n\"input\": \"Text\"\n}\n\nactionId should be the ID of the action to choose.\ninput should be the text to input if the action is a typing action. If you believe the Gherkin test goal was accomplished, return the JSON with actionId ACOMPLETE."
+        "text": "You are a Gherkin test agent that follow Gherkin instructions to perform testing tasks in web applications.\n\n1. You will receive a Gherkin test objective, history of actions, and a list of available actions.\n\n2. When given a list of actions, you must choose the action that is most likely to lead to completing the Gherkin test objective. You must respond in JSON only, do not include additional text or explanations.\n\n3. Respond in the following JSON format:\n\n{\n\"actionId\":  \"AC78TY\",\n\"input\": \"Text\"\n}\n\nactionId should be the ID of the action to choose.\ninput should be the text to input if the action is a typing action."
       }
     ]
   },
@@ -52,22 +52,6 @@
     "parts": [
       {
         "text": "{\n\"actionId\": \"AC78TY\",\n\"input\": \"\"\n}"
-      }
-    ]
-  },
-  {
-    "role": "user",
-    "parts": [
-      {
-        "text": "We are testing the \"Demo\" web application. The objective of the test is to log in with username \"Test\" and password \"Star\". The following actions are available: ACR12R: Click Logout, ACOP8P: Click My Account, ACFF23: Click Transfer, AC6HWQ: Click Balance. These are the last 3 actions we executed: ACKO87: Typed Test into TextField Username, AC3B4T: Typed Star into TextField Password, AC78TY: Clicked on 'Log in'. Which action should be executed to accomplish the test goal?"
-      }
-    ]
-  },
-  {
-    "role": "model",
-    "parts": [
-      {
-        "text": "{\n\"actionId\": \"ACOMPLETE\",\n\"input\": \"\"\n}"
       }
     ]
   }
