@@ -58,7 +58,7 @@ import static org.testar.monkey.Util.compileProtocol;
 
 public class Main {
 
-	public static final String TESTAR_VERSION = "2.6.29 (28-Jan-2025)";
+	public static final String TESTAR_VERSION = "2.6.30 (29-Jan-2025)";
 
 	//public static final String TESTAR_DIR_PROPERTY = "DIRNAME"; //Use the OS environment to obtain TESTAR directory
 	public static final String SETTINGS_FILE = "test.settings";
