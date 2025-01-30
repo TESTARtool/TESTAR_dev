@@ -128,6 +128,8 @@ dependencies {
     implementation group: 'org.jacoco', name: 'jacoco-maven-plugin', version: '0.8.12'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-csv
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.11.0'
+    // https://mvnrepository.com/artifact/org.eclipse.angus/jakarta.mail
+    implementation group: 'org.eclipse.angus', name: 'jakarta.mail', version: '2.0.3'
 }
 
 task prepareSettings(type: Copy) {
