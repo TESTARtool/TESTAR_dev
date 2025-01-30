@@ -329,7 +329,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			OutputStructure.createOutputFolders();
 
 			// new state model manager
-			stateModelManager = StateModelManagerFactory.getStateModelManager(settings);
+			stateModelManager = StateModelManagerFactory.getStateModelManager(
+					settings.get(ConfigTags.ApplicationName),
+					settings.get(ConfigTags.ApplicationVersion),
+					settings);
 		}
 
 		//EventHandler is implemented in RuntimeControlsProtocol (super class):
