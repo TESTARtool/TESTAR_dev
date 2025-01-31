@@ -1,5 +1,5 @@
 // Generated from E:/lianne_dev/strategy/src/antlrfour/strategy/Strategy.g4 by ANTLR 4.13.1
-package strategy;
+package antlrfour.strategy;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;

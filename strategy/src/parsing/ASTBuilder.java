@@ -1,7 +1,7 @@
 package parsing;
 
-import antlrfour.StrategyBaseVisitor;
-import antlrfour.StrategyParser;
+import antlrfour.strategy.StrategyBaseVisitor;
+import antlrfour.strategy.StrategyParser;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import strategynodes.BaseNode;
 import strategynodes.conditions.*;

@@ -1,5 +1,5 @@
 // Generated from E:/lianne_dev/strategy/src/antlrfour/oracles/Oracles.g4 by ANTLR 4.13.1
-package oracles;
+package antlrfour.oracles;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
 /**
