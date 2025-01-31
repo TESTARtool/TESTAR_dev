@@ -30,6 +30,7 @@ bool_expr:                        NOT                               expr=bool_ex
 |   LP                      state_boolean                                               RP      #stateBool
 |                           BOOL                                                                #plainBool
 ;
+
 state_boolean:  'state-changed'                                                 #stateChanged
 |               'sut-is'                                FILTER? SUT_TYPE        #sutType
 |               'any-exist'        visit_status?        FILTER? RELATION        #anyExistByRelation

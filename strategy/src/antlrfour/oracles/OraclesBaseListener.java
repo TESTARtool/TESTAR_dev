@@ -1,269 +1,257 @@
-// Generated from C:/Users/testar/Desktop/TESTAR_dev/strategy/src/antlrfour/Strategy.g4 by ANTLR 4.13.1
-package antlrfour;
+// Generated from E:/lianne_dev/strategy/src/antlrfour/oracles/Oracles.g4 by ANTLR 4.13.1
+package oracles;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 /**
- * This class provides an empty implementation of {@link StrategyListener},
+ * This class provides an empty implementation of {@link OraclesListener},
  * which can be extended to create a listener which only needs to handle a subset
  * of the available methods.
  */
 @SuppressWarnings("CheckReturnValue")
-public class StrategyBaseListener implements StrategyListener {
+public class OraclesBaseListener implements OraclesListener {
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterStrategy_file(StrategyParser.Strategy_fileContext ctx) { }
+	@Override public void enterOracles_file(OraclesParser.Oracles_fileContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitStrategy_file(StrategyParser.Strategy_fileContext ctx) { }
+	@Override public void exitOracles_file(OraclesParser.Oracles_fileContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterStrategy(StrategyParser.StrategyContext ctx) { }
+	@Override public void enterOracle(OraclesParser.OracleContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitStrategy(StrategyParser.StrategyContext ctx) { }
+	@Override public void exitOracle(OraclesParser.OracleContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterIfThenElse(StrategyParser.IfThenElseContext ctx) { }
+	@Override public void enterOracle_block(OraclesParser.Oracle_blockContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitIfThenElse(StrategyParser.IfThenElseContext ctx) { }
+	@Override public void exitOracle_block(OraclesParser.Oracle_blockContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterRepeatPreviousAction(StrategyParser.RepeatPreviousActionContext ctx) { }
+	@Override public void enterSelect_block(OraclesParser.Select_blockContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitRepeatPreviousAction(StrategyParser.RepeatPreviousActionContext ctx) { }
+	@Override public void exitSelect_block(OraclesParser.Select_blockContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx) { }
+	@Override public void enterCheck_block(OraclesParser.Check_blockContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSelectPreviousAction(StrategyParser.SelectPreviousActionContext ctx) { }
+	@Override public void exitCheck_block(OraclesParser.Check_blockContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSelectByRelation(StrategyParser.SelectByRelationContext ctx) { }
+	@Override public void enterTrigger_block(OraclesParser.Trigger_blockContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSelectByRelation(StrategyParser.SelectByRelationContext ctx) { }
+	@Override public void exitTrigger_block(OraclesParser.Trigger_blockContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSelectRandomAction(StrategyParser.SelectRandomActionContext ctx) { }
+	@Override public void enterProperty_block(OraclesParser.Property_blockContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSelectRandomAction(StrategyParser.SelectRandomActionContext ctx) { }
+	@Override public void exitProperty_block(OraclesParser.Property_blockContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterPlainBool(StrategyParser.PlainBoolContext ctx) { }
+	@Override public void enterPlainBool(OraclesParser.PlainBoolContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitPlainBool(StrategyParser.PlainBoolContext ctx) { }
+	@Override public void exitPlainBool(OraclesParser.PlainBoolContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNotExpr(StrategyParser.NotExprContext ctx) { }
+	@Override public void enterNotExpr(OraclesParser.NotExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNotExpr(StrategyParser.NotExprContext ctx) { }
+	@Override public void exitNotExpr(OraclesParser.NotExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterIntOprExpr(StrategyParser.IntOprExprContext ctx) { }
+	@Override public void enterParenExpr(OraclesParser.ParenExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitIntOprExpr(StrategyParser.IntOprExprContext ctx) { }
+	@Override public void exitParenExpr(OraclesParser.ParenExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterStateBool(StrategyParser.StateBoolContext ctx) { }
+	@Override public void enterBoolOprExpr(OraclesParser.BoolOprExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitStateBool(StrategyParser.StateBoolContext ctx) { }
+	@Override public void exitBoolOprExpr(OraclesParser.BoolOprExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterBoolOprExpr(StrategyParser.BoolOprExprContext ctx) { }
+	@Override public void enterPropertyBool(OraclesParser.PropertyBoolContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitBoolOprExpr(StrategyParser.BoolOprExprContext ctx) { }
+	@Override public void exitPropertyBool(OraclesParser.PropertyBoolContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterStateChanged(StrategyParser.StateChangedContext ctx) { }
+	@Override public void enterProperty_line(OraclesParser.Property_lineContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitStateChanged(StrategyParser.StateChangedContext ctx) { }
+	@Override public void exitProperty_line(OraclesParser.Property_lineContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSutType(StrategyParser.SutTypeContext ctx) { }
+	@Override public void enterString(OraclesParser.StringContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSutType(StrategyParser.SutTypeContext ctx) { }
+	@Override public void exitString(OraclesParser.StringContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterAnyExistByRelation(StrategyParser.AnyExistByRelationContext ctx) { }
+	@Override public void enterRegex_string(OraclesParser.Regex_stringContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitAnyExistByRelation(StrategyParser.AnyExistByRelationContext ctx) { }
+	@Override public void exitRegex_string(OraclesParser.Regex_stringContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterAnyExist(StrategyParser.AnyExistContext ctx) { }
+	@Override public void enterProperty_string(OraclesParser.Property_stringContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitAnyExist(StrategyParser.AnyExistContext ctx) { }
+	@Override public void exitProperty_string(OraclesParser.Property_stringContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterPreviousExist(StrategyParser.PreviousExistContext ctx) { }
+	@Override public void enterRaw_string(OraclesParser.Raw_stringContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitPreviousExist(StrategyParser.PreviousExistContext ctx) { }
+	@Override public void exitRaw_string(OraclesParser.Raw_stringContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNActions(StrategyParser.NActionsContext ctx) { }
+	@Override public void enterBasic_string(OraclesParser.Basic_stringContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNActions(StrategyParser.NActionsContext ctx) { }
+	@Override public void exitBasic_string(OraclesParser.Basic_stringContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNPrevious(StrategyParser.NPreviousContext ctx) { }
+	@Override public void enterOracle_name(OraclesParser.Oracle_nameContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNPrevious(StrategyParser.NPreviousContext ctx) { }
+	@Override public void exitOracle_name(OraclesParser.Oracle_nameContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterPlainInt(StrategyParser.PlainIntContext ctx) { }
+	@Override public void enterList(OraclesParser.ListContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitPlainInt(StrategyParser.PlainIntContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterVisit_status(StrategyParser.Visit_statusContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitVisit_status(StrategyParser.Visit_statusContext ctx) { }
+	@Override public void exitList(OraclesParser.ListContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

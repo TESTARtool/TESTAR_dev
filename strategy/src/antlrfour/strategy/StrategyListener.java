@@ -1,5 +1,5 @@
-// Generated from C:/Users/testar/Desktop/TESTAR_dev/strategy/src/antlrfour/Strategy.g4 by ANTLR 4.13.1
-package antlrfour;
+// Generated from E:/lianne_dev/strategy/src/antlrfour/strategy/Strategy.g4 by ANTLR 4.13.1
+package strategy;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
