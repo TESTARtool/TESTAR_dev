@@ -21,4 +21,8 @@ public interface IMetricsCollector {
      * Prints the metrics into a readable format to the console.
      */
     void printMetrics();
+    /**
+     * Saves the metrics to a file.
+     */
+    void saveMetrics(String fileLocation);
 }

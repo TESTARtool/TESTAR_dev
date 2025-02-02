@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.testar.statemodel.StateModelManager;
 import org.testar.statemodel.util.QueryHelper;
 
+import java.io.File;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -141,6 +142,11 @@ public class LlmMetricsCollector implements IMetricsCollector {
     @Override
     public void printMetrics() {
         logger.log(Level.INFO, toString());
+    }
+
+    @Override
+    public void saveMetrics(String fileLocation) {
+        // NYI
     }
 
     @Override

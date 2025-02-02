@@ -20,6 +20,8 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -342,7 +344,15 @@ public class LlmActionSelector implements IActionSelector {
      */
     private LlmParseResult parseLlmResponse(Set<Action> actions, String responseContent) {
         try {
-            LlmSelection selection = gson.fromJson(responseContent, LlmSelection.class);
+            LlmSelection selection;
+            try {
+                selection = gson.fromJson(responseContent, LlmSelection.class);
+            } catch(JsonParseException e) {
+                // Message is not JSON or syntax is incorrect, let's try to extract JSON from the string.
+                // Required for models like DeepSeek that include thinking steps.
+                String extractedJson = extractJson(responseContent);
+                selection = gson.fromJson(extractedJson, LlmSelection.class);
+            }
 
             Action selectedAction = getActionByIdentifier(actions, selection.getActionId());
 
@@ -418,6 +428,22 @@ public class LlmActionSelector implements IActionSelector {
         }
 
         return false;
+    }
+
+    /**
+     * Attempts to extract JSON from a given string.
+     * @param input String to extract.
+     * @return JSON string if found, null if not found.
+     */
+    private String extractJson(String input) {
+        Pattern pattern = Pattern.compile("\\{[^}]*}");
+        Matcher matcher = pattern.matcher(input);
+
+        if (matcher.find()) {
+            return matcher.group();
+        }
+
+        return null;
     }
 
     /**
