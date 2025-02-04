@@ -1,0 +1,4 @@
+Logged in user is logging out of the Application
+
+Credentials blue/pass
+Then You have been successfully logged out.

@@ -1,0 +1,10 @@
+Teacher announces a new exam date for his/her subject
+
+Credentials keen/pass
+Condition New term can only be announced for a subject the teacher teaches
+Condition Single subject can have maximum of 3 exam dates announced by a single teacher
+Condition Number of possible participants cannot be lower than 1 and higher than 10
+Condition The exam date cannot be announced for a date that has already passed
+Condition The time between the last exam date and newly announced exam date has to be at least 24 hours
+Condition The exam date must be written down in yyyy-MM-dd HH:mm format
+Then New exam date has been successfully created!

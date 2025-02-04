@@ -45,7 +45,7 @@ SequenceLength = 10
 #################################################################
 
 SuspiciousTags = 
-TagsForSuspiciousOracle = Title;WebTextContent
+TagsForSuspiciousOracle = 
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -172,7 +172,8 @@ LlmModel =
 LlmHostUrl = https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=%GEMINI_API_KEY%
 LlmAuthorizationHeader = 
 LlmTestGoalDescription = Registered user will log into the application and based on the login name the user will be recognized either as a student or a teacher\\n\\nCredentials blue/pass\\nThen Student's View
-LlmFewshotFile = prompts/zeroshot_gemini.json
+LlmActionFewshotFile = prompts/fewshot_gemini_action.json
+LlmOracleFewshotFile = prompts/fewshot_gemini_oracle.json
 LlmTemperature = 0.2
 
 #################################################################

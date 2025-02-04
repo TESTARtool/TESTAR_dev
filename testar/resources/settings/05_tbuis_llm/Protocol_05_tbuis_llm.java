@@ -31,7 +31,8 @@
 import org.testar.CodingManager;
 import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
-import org.testar.action.priorization.llm.prompt.StandardPromptGenerator;
+import org.testar.llm.prompt.OraclePromptGenerator;
+import org.testar.llm.prompt.StandardPromptActionGenerator;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
@@ -39,6 +40,7 @@ import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.oracles.llm.LlmOracle;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.protocols.WebdriverProtocol;
@@ -65,6 +67,8 @@ public class Protocol_05_tbuis_llm extends WebdriverProtocol {
 	// The LLM Action selector needs to be initialize with the settings
 	private LlmActionSelector llmActionSelector;
 	private ConditionEvaluator conditionEvaluator;
+	// The LLM Oracle needs to be initialize with the settings
+	private LlmOracle llmOracle;
 
 	@Override
 	protected void buildStateActionsIdentifiers(State state, Set<Action> actions) {
@@ -95,10 +99,13 @@ public class Protocol_05_tbuis_llm extends WebdriverProtocol {
 		super.initialize(settings);
 
 		// Initialize the LlmActionSelector using the LLM settings
-		llmActionSelector = new LlmActionSelector(settings, new StandardPromptGenerator(), settings.get(ConfigTags.LlmTestGoalDescription));
+		llmActionSelector = new LlmActionSelector(settings, new StandardPromptActionGenerator(WdTags.WebTitle), settings.get(ConfigTags.LlmTestGoalDescription));
 
 		// Test goal is considered complete when the Then statement is found in the HTML of the state model.
 		conditionEvaluator = new GherkinConditionEvaluator(WdTags.WebInnerHTML, settings.get(ConfigTags.LlmTestGoalDescription));
+
+		// Initialize the LlmOracle using the LLM settings
+		llmOracle = new LlmOracle(settings, new OraclePromptGenerator(new HashSet<>(Arrays.asList(WdTags.WebTitle))), settings.get(ConfigTags.LlmTestGoalDescription));
 	}
 
 	/**
@@ -110,6 +117,8 @@ public class Protocol_05_tbuis_llm extends WebdriverProtocol {
 
 		// Reset llm action selector
 		llmActionSelector.reset(settings.get(ConfigTags.LlmTestGoalDescription), false);
+		// Reset llm oracle
+		llmOracle.reset(settings.get(ConfigTags.LlmTestGoalDescription), false);
 
 		// Use sequence count to iteratively create a new state model
 		String appVersion = settings.get(ConfigTags.ApplicationVersion, "");
@@ -187,6 +196,9 @@ public class Protocol_05_tbuis_llm extends WebdriverProtocol {
 		if(conditionEvaluator.evaluateConditions(modelIdentifier, stateModelManager)) {
 			return new Verdict(Verdict.SEVERITY_TESTGOAL_COMPLETE, "Test goal complete, all conditions met.");
 		}
+
+		// Use the LLM as an Oracle to determine if the test goal has been completed
+		verdict = verdict.join(llmOracle.getVerdict(state));
 
 		return verdict;
 	}

@@ -1,0 +1,4 @@
+Student registers a new exam date for the selected subject
+
+Credentials blue/pass
+Then Exam date has been successfully registered!

@@ -1,0 +1,5 @@
+Logged in user can change his/her first name
+
+Credentials blue/pass
+Condition Change data in the First name entry with least 2 and not more than 30 characters
+Then User has been successfully updated!

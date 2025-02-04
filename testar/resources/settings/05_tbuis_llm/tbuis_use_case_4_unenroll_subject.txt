@@ -1,0 +1,4 @@
+Student cancels the registration to a subject he/she previously enrolled
+
+Credentials blue/pass
+Then Subject has been successfully removed!

@@ -1,0 +1,4 @@
+Student unregisters his/her exam date for the selected subject
+
+Credentials brown/pass
+Then Exam date has been successfully unregistered!

@@ -1,0 +1,4 @@
+Teacher cancels the exam date for his/her subject
+
+Credentials keen/pass
+Then Exam date has been successfully canceled!
