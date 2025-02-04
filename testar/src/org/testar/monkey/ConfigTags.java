@@ -168,8 +168,11 @@ public final class ConfigTags {
 	public static final Tag<String> LlmTestGoalDescription = Tag.from("LlmTestGoalDescription", String.class,
 			"The objective of the test for the LLM agent");
 
-	public static final Tag<String> LlmFewshotFile = Tag.from("LlmFewshotFile", String.class,
-			"The location of the fewshot file that contains the prompt instructions");
+	public static final Tag<String> LlmActionFewshotFile = Tag.from("LlmActionFewshotFile", String.class,
+			"The location of the action fewshot file that contains the prompt instructions");
+
+	public static final Tag<String> LlmOracleFewshotFile = Tag.from("LlmOracleFewshotFile", String.class,
+			"The location of the oracle fewshot file that contains the prompt instructions");
 
 	public static final Tag<Float> LlmTemperature = Tag.from("LlmTemperature", Float.class,
 			"Controls the randomness of the LLM output. Value between 0 and 2.");

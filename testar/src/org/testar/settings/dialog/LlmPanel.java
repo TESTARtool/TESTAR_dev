@@ -66,9 +66,13 @@ public class LlmPanel extends SettingsPanel {
 	private JLabel labelLlmAuthorizationHeader= new JLabel("LLM Auth Header");
 	private JTextField fieldLlmAuthorizationHeader = new JTextField();
 
-	private JLabel labelLlmFewshotFile = new JLabel("LLM Fewshot File");
-	private JTextField fieldLlmFewshotFile  = new JTextField();
-	private JButton dirLlmButton = new JButton("..");
+	private JLabel labelLlmActionFewshot = new JLabel("LLM Action Fewshot");
+	private JTextField fieldLlmActionFewshot  = new JTextField();
+	private JButton dirLlmActionFewshotButton = new JButton("..");
+
+	private JLabel labelLlmOracleFewshot = new JLabel("LLM Oracle Fewshot");
+	private JTextField fieldLlmOracleFewshot  = new JTextField();
+	private JButton dirLlmOracleFewshotButton = new JButton("..");
 
 	private JLabel labelLlmTemperature = new JLabel("LLM Temperature");
 	private JTextField fieldLlmTemperature = new JTextField();
@@ -77,8 +81,8 @@ public class LlmPanel extends SettingsPanel {
 	private JButton dirLlmTestGoalLoad = new JButton("Load Goal");
 	private JTextArea txtLlmTestGoalDescription = new JTextArea();
 
-    private JLabel labelLlmHistorySize = new JLabel("Action History Size");
-    private JTextField fieldLlmHistorySize = new JTextField();
+	private JLabel labelLlmHistorySize = new JLabel("Action History Size");
+	private JTextField fieldLlmHistorySize = new JTextField();
 
 	public LlmPanel() {
 		setLayout(null);
@@ -96,12 +100,14 @@ public class LlmPanel extends SettingsPanel {
 				switch ((String) llmPlatformBox.getSelectedItem()) {
 				case "OpenAI":
 					fieldLlmHostUrl.setText("http://192.168.108.242:1234/v1/chat/completions");
-					fieldLlmFewshotFile.setText("prompts/fewshot_login_openai.json");
+					fieldLlmActionFewshot.setText("prompts/fewshot_openai_action.json");
+					fieldLlmOracleFewshot.setText("prompts/fewshot_openai_oracle.json");
 					fieldLlmTemperature.setText("0.2");
 					break;
 				case "Gemini":
 					fieldLlmHostUrl.setText("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=%GEMINI_API_KEY%");
-					fieldLlmFewshotFile.setText("prompts/fewshot_login_gemini.json");
+					fieldLlmActionFewshot.setText("prompts/fewshot_gemini_action.json");
+					fieldLlmOracleFewshot.setText("prompts/fewshot_gemini_oracle.json");
 					fieldLlmTemperature.setText("0.2");
 					break;
 
@@ -111,10 +117,10 @@ public class LlmPanel extends SettingsPanel {
 			}
 		});
 
-		labelLlmModel.setBounds(330, 12, 70, 27);
+		labelLlmModel.setBounds(330, 12, 100, 27);
 		labelLlmModel.setToolTipText(ConfigTags.LlmModel.getDescription());
 		add(labelLlmModel);
-		fieldLlmModel.setBounds(400, 12, 150, 27);
+		fieldLlmModel.setBounds(440, 12, 110, 27);
 		fieldLlmModel.setToolTipText(ConfigTags.LlmModel.getDescription());
 		add(fieldLlmModel);
 
@@ -132,28 +138,39 @@ public class LlmPanel extends SettingsPanel {
 		fieldLlmAuthorizationHeader.setToolTipText(ConfigTags.LlmAuthorizationHeader.getDescription());
 		add(fieldLlmAuthorizationHeader);
 
-		labelLlmFewshotFile.setBounds(10, 100, 120, 27);
-		labelLlmFewshotFile.setToolTipText(ConfigTags.LlmFewshotFile.getDescription());
-		add(labelLlmFewshotFile);
-		fieldLlmFewshotFile.setBounds(150, 100, 400, 27);
-		fieldLlmFewshotFile.setToolTipText(ConfigTags.LlmFewshotFile.getDescription());
-		fieldLlmFewshotFile.setEditable(false);
-		add(fieldLlmFewshotFile);
-		dirLlmButton.setBounds(550, 100, 20, 27);
-		dirLlmButton.addActionListener(this::chooseFewshotFileFileActionPerformed);
-		add(dirLlmButton);
+		labelLlmActionFewshot.setBounds(10, 100, 120, 27);
+		labelLlmActionFewshot.setToolTipText(ConfigTags.LlmActionFewshotFile.getDescription());
+		add(labelLlmActionFewshot);
+		fieldLlmActionFewshot.setBounds(150, 100, 400, 27);
+		fieldLlmActionFewshot.setToolTipText(ConfigTags.LlmActionFewshotFile.getDescription());
+		fieldLlmActionFewshot.setEditable(false);
+		add(fieldLlmActionFewshot);
+		dirLlmActionFewshotButton.setBounds(550, 100, 20, 27);
+		dirLlmActionFewshotButton.addActionListener(evt -> chooseFewshotFileFileActionPerformed(evt, fieldLlmActionFewshot));
+		add(dirLlmActionFewshotButton);
 
-		labelLlmTemperature.setBounds(10, 130, 120, 27);
+		labelLlmOracleFewshot.setBounds(10, 130, 120, 27);
+		labelLlmOracleFewshot.setToolTipText(ConfigTags.LlmOracleFewshotFile.getDescription());
+		add(labelLlmOracleFewshot);
+		fieldLlmOracleFewshot.setBounds(150, 130, 400, 27);
+		fieldLlmOracleFewshot.setToolTipText(ConfigTags.LlmOracleFewshotFile.getDescription());
+		fieldLlmOracleFewshot.setEditable(false);
+		add(fieldLlmOracleFewshot);
+		dirLlmOracleFewshotButton.setBounds(550, 130, 20, 27);
+		dirLlmOracleFewshotButton.addActionListener(evt -> chooseFewshotFileFileActionPerformed(evt, fieldLlmOracleFewshot));
+		add(dirLlmOracleFewshotButton);
+
+		labelLlmTemperature.setBounds(10, 160, 120, 27);
 		labelLlmTemperature.setToolTipText(ConfigTags.LlmTemperature.getDescription());
 		add(labelLlmTemperature);
-		fieldLlmTemperature.setBounds(150, 130, 400, 27);
+		fieldLlmTemperature.setBounds(150, 160, 150, 27);
 		fieldLlmTemperature.setToolTipText(ConfigTags.LlmTemperature.getDescription());
 		add(fieldLlmTemperature);
 
-		labelLlmHistorySize.setBounds(10, 160, 180, 27);
+		labelLlmHistorySize.setBounds(330, 160, 100, 27);
 		labelLlmHistorySize.setToolTipText(ConfigTags.LlmHistorySize.getDescription());
 		add(labelLlmHistorySize);
-		fieldLlmHistorySize.setBounds(150, 160, 400, 27);
+		fieldLlmHistorySize.setBounds(440, 160, 110, 27);
 		fieldLlmHistorySize.setToolTipText(ConfigTags.LlmHistorySize.getDescription());
 		add(fieldLlmHistorySize);
 
@@ -173,7 +190,7 @@ public class LlmPanel extends SettingsPanel {
 	}
 
 	// show a file dialog to choose the LLM Fewshot File
-	private void chooseFewshotFileFileActionPerformed(ActionEvent evt) {
+	private void chooseFewshotFileFileActionPerformed(ActionEvent evt, JTextField textField) {
 		JFileChooser fd = new JFileChooser();
 		fd.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fd.setCurrentDirectory(new File(Main.testarDir));
@@ -182,7 +199,7 @@ public class LlmPanel extends SettingsPanel {
 			String file = fd.getSelectedFile().getAbsolutePath();
 
 			// Set the text from settings in txtSutPath
-			fieldLlmFewshotFile.setText(file);
+			textField.setText(file);
 		}
 	}
 
@@ -228,7 +245,8 @@ public class LlmPanel extends SettingsPanel {
 		fieldLlmModel.setText(settings.get(ConfigTags.LlmModel));
 		fieldLlmHostUrl.setText(settings.get(ConfigTags.LlmHostUrl));
 		fieldLlmAuthorizationHeader.setText(settings.get(ConfigTags.LlmAuthorizationHeader));
-		fieldLlmFewshotFile.setText(settings.get(ConfigTags.LlmFewshotFile));
+		fieldLlmActionFewshot.setText(settings.get(ConfigTags.LlmActionFewshotFile));
+		fieldLlmOracleFewshot.setText(settings.get(ConfigTags.LlmOracleFewshotFile));
 		fieldLlmTemperature.setText(settings.get(ConfigTags.LlmTemperature).toString());
 		fieldLlmHistorySize.setText(settings.get(ConfigTags.LlmHistorySize).toString());
 		txtLlmTestGoalDescription.setText(settings.get(ConfigTags.LlmTestGoalDescription).replace("\\n", "\n"));
@@ -248,7 +266,8 @@ public class LlmPanel extends SettingsPanel {
 		settings.set(ConfigTags.LlmModel, fieldLlmModel.getText());
 		settings.set(ConfigTags.LlmHostUrl, fieldLlmHostUrl.getText());
 		settings.set(ConfigTags.LlmAuthorizationHeader, fieldLlmAuthorizationHeader.getText());
-		settings.set(ConfigTags.LlmFewshotFile, fieldLlmFewshotFile.getText());
+		settings.set(ConfigTags.LlmActionFewshotFile, fieldLlmActionFewshot.getText());
+		settings.set(ConfigTags.LlmOracleFewshotFile, fieldLlmOracleFewshot.getText());
 		settings.set(ConfigTags.LlmTemperature, Float.parseFloat(fieldLlmTemperature.getText()));
 		settings.set(ConfigTags.LlmHistorySize, Integer.parseInt(fieldLlmHistorySize.getText()));
 		settings.set(ConfigTags.LlmTestGoalDescription, txtLlmTestGoalDescription.getText().replace("\n", "\\n").replace("\r", ""));
