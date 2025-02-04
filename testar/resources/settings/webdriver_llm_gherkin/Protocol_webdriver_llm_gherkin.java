@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -33,7 +33,7 @@ import com.google.common.collect.ArrayListMultimap;
 import org.testar.CodingManager;
 import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
-import org.testar.action.priorization.llm.prompt.StandardPromptGenerator;
+import org.testar.llm.prompt.StandardPromptActionGenerator;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
@@ -89,7 +89,7 @@ public class Protocol_webdriver_llm_gherkin extends WebdriverProtocol {
 		super.initialize(settings);
 
 		// Initialize the LlmActionSelector using the LLM settings
-		llmActionSelector = new LlmActionSelector(settings, new StandardPromptGenerator(), settings.get(ConfigTags.LlmTestGoalDescription));
+		llmActionSelector = new LlmActionSelector(settings, new StandardPromptActionGenerator(), settings.get(ConfigTags.LlmTestGoalDescription));
 
 		conditionEvaluator = new GherkinConditionEvaluator(WdTags.WebInnerHTML, settings.get(ConfigTags.LlmTestGoalDescription));
 	}
