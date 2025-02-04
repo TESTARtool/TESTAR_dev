@@ -30,5 +30,5 @@ public interface StateModelManager {
 
     String getModelIdentifier();
 
-    String queryStateModel(String query);
+    String queryStateModel(String query, Object... params);
 }

@@ -171,7 +171,8 @@ LlmPlatform = Gemini
 LlmModel = 
 LlmHostUrl = https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=%GEMINI_API_KEY%
 LlmAuthorizationHeader = 
-LlmFewshotFile = prompts/fewshot_gherkin_gemini.json
+LlmActionFewshotFile = prompts/fewshot_gherkin_gemini.json
+LlmOracleFewshotFile = prompts/fewshot_gemini_oracle.json
 LlmTemperature = 0.2
 LlmHistorySize = 5
 LlmTestGoalDescription = Scenario Outline: Login Parabank\\n  Given I want to log in\\n  And fill in username 'john'\\n  And fill in password 'demo'\\n  When login\\n  Then Welcome John Smith is shown\\n

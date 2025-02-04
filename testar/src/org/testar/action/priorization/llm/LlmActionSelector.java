@@ -1,3 +1,33 @@
+/***************************************************************************************************
+ *
+ * Copyright (c) 2024 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2024 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************************************/
+
 package org.testar.action.priorization.llm;
 
 import com.google.gson.Gson;
@@ -6,7 +36,10 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.IActionSelector;
-import org.testar.action.priorization.llm.prompt.IPromptGenerator;
+import org.testar.llm.prompt.IPromptActionGenerator;
+import org.testar.llm.LlmConversation;
+import org.testar.llm.LlmFactory;
+import org.testar.llm.LlmResponse;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.monkey.alayer.*;
@@ -20,7 +53,6 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Protocol for selecting actions using a large language model (LLM).
@@ -30,13 +62,13 @@ import java.util.stream.Collectors;
  */
 public class LlmActionSelector implements IActionSelector {
     protected static final Logger logger = LogManager.getLogger();
-    private IPromptGenerator promptGenerator;
+    private IPromptActionGenerator promptGenerator;
 
     private final String platform;
     private final String model;
     private final String hostUrl;
     private final String authorizationHeader;
-    private final String fewshotFile;
+    private final String actionFewshotFile;
     private final String appName;
     private final float temperature;
     private final int historySize;
@@ -56,10 +88,10 @@ public class LlmActionSelector implements IActionSelector {
      * 1. LlmHostAddress for the host of the OpenAI compatible LLM API. Ex: http://127.0.0.1.
      * 2. LlmHostPort for the port of the API.
      * 3. LlmTestGoalDescription for the objective of the test. Ex: Log in with username john and password demo.
-     * 4. LlmFewshotFile for the fewshot file that contains the prompt instructions.
-     * 5. ApplicationName for the name of the SUT.
+     * 4. LlmActionFewshotFile for the fewshot file that contains the prompt instructions.
+     * 5. ApplicationName for the name of the SUT. 
      */
-    public LlmActionSelector(Settings settings, IPromptGenerator generator, String testGoal) {
+    public LlmActionSelector(Settings settings, IPromptActionGenerator generator, String testGoal) {
         this.promptGenerator = generator;
 
         this.platform = settings.get(ConfigTags.LlmPlatform);
@@ -72,13 +104,13 @@ public class LlmActionSelector implements IActionSelector {
 
         this.currentTestGoal = testGoal;
 
-        this.fewshotFile = settings.get(ConfigTags.LlmFewshotFile);
+        this.actionFewshotFile = settings.get(ConfigTags.LlmActionFewshotFile);
         this.appName = settings.get(ConfigTags.ApplicationName);
         this.temperature = settings.get(ConfigTags.LlmTemperature);
         actionHistory = new ActionHistory(historySize);
 
         conversation = LlmFactory.createLlmConversation(this.platform, this.model, this.temperature);
-        conversation.initConversation(this.fewshotFile);
+        conversation.initConversation(this.actionFewshotFile);
     }
 
     /**
@@ -86,7 +118,7 @@ public class LlmActionSelector implements IActionSelector {
      * The next time selectAction is called the new prompt generator will be used.
      * @param generator The new prompt generator to use.
      */
-    public void setPromptGenerator(IPromptGenerator generator) {
+    public void setPromptGenerator(IPromptActionGenerator generator) {
         this.promptGenerator = generator;
     }
 
@@ -111,7 +143,7 @@ public class LlmActionSelector implements IActionSelector {
 
         // Reset conversation
         conversation = LlmFactory.createLlmConversation(this.platform, this.model, this.temperature);
-        conversation.initConversation(this.fewshotFile);
+        conversation.initConversation(this.actionFewshotFile);
     }
 
     @Override
@@ -130,7 +162,7 @@ public class LlmActionSelector implements IActionSelector {
      * @return The action to execute or null if failed.
      */
     private Action selectActionWithLlm(State state, Set<Action> actions) {
-        String prompt = promptGenerator.generatePrompt(
+        String prompt = promptGenerator.generateActionSelectionPrompt(
                 actions, state, actionHistory, appName, currentTestGoal, previousTestGoal);
 
         logger.log(Level.DEBUG, "Generated prompt: " + prompt);
@@ -138,7 +170,7 @@ public class LlmActionSelector implements IActionSelector {
 
         String conversationJson = gson.toJson(conversation);
         String llmResponse = getResponseFromLlm(conversationJson);
-        LlmParseResult llmParseResult = parseLlmResponse(actions, llmResponse);
+        LlmParseActionResult llmParseResult = parseLlmResponse(actions, llmResponse);
 
         switch(llmParseResult.getParseResult()) {
             case SUCCESS: {
@@ -338,40 +370,40 @@ public class LlmActionSelector implements IActionSelector {
      * Parses the response sent by the LLM and selects an action if the response was valid.
      * @param actions Set of actions in the current state.
      * @param responseContent The response of the LLM in plaintext.
-     * @return LlmParseResult containing the result of the parse and the action to execute if parsing was successful.
+     * @return LlmParseActionResult containing the result of the parse and the action to execute if parsing was successful.
      */
-    private LlmParseResult parseLlmResponse(Set<Action> actions, String responseContent) {
+    private LlmParseActionResult parseLlmResponse(Set<Action> actions, String responseContent) {
         try {
-            LlmSelection selection = gson.fromJson(responseContent, LlmSelection.class);
+        	LlmSelectedAction llmSelectedAction = gson.fromJson(responseContent, LlmSelectedAction.class);
 
-            Action selectedAction = getActionByIdentifier(actions, selection.getActionId());
+            Action selectedAction = getActionByIdentifier(actions, llmSelectedAction.getActionId());
 
             // If the selectedAction is a NOP action at this stage, parsing has likely failed.
             // Observed to happen when the LLM selects an actionId that does not exist.
             if(selectedAction instanceof NOP) {
-                logger.log(Level.ERROR, "Action ConcreteID not found, parsing LLM response has likely failed!: " + responseContent);
-                return new LlmParseResult(null, LlmParseResult.ParseResult.INVALID_ACTION);
+                logger.log(Level.ERROR, "Action AbstractID not found, parsing LLM response has likely failed!: " + responseContent);
+                return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.INVALID_ACTION);
             }
 
-            String actionId = selection.getActionId();
-            String input = selection.getInput();
+            String actionId = llmSelectedAction.getActionId();
+            String input = llmSelectedAction.getInput();
             Widget widget = selectedAction.get(Tags.OriginWidget);
 
             if(Objects.equals(widget.get(WdTags.WebTagName, ""), "select")) {
                 if(Objects.equals(input, "")) {
-                    return new LlmParseResult(null, LlmParseResult.ParseResult.SL_MISSING_INPUT);
+                    return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.SL_MISSING_INPUT);
                 } else {
-                    return new LlmParseResult(
-                            createComboBoxAction(actions, actionId, input),LlmParseResult.ParseResult.SUCCESS);
+                    return new LlmParseActionResult(
+                            createComboBoxAction(actions, actionId, input),LlmParseActionResult.ParseResult.SUCCESS);
                 }
             }
 
             setCompoundActionInputText(selectedAction, input);
-            return new LlmParseResult(selectedAction, LlmParseResult.ParseResult.SUCCESS);
+            return new LlmParseActionResult(selectedAction, LlmParseActionResult.ParseResult.SUCCESS);
 
         } catch(JsonParseException e) {
             logger.log(Level.ERROR, "Unable to parse response from LLM to JSON: " + responseContent);
-            return new LlmParseResult(null, LlmParseResult.ParseResult.PARSE_FAILED);
+            return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.PARSE_FAILED);
         }
     }
 
@@ -383,7 +415,7 @@ public class LlmActionSelector implements IActionSelector {
      */
     private Action getActionByIdentifier(Set<Action> actions, String actionId) {
         for(Action action : actions) {
-            if(action.get(Tags.ConcreteID, "").equalsIgnoreCase(actionId)) {
+            if(action.get(Tags.AbstractID, "").equalsIgnoreCase(actionId)) {
                 return action;
             }
         }

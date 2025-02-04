@@ -33,7 +33,7 @@ import com.google.common.collect.ArrayListMultimap;
 import org.testar.CodingManager;
 import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
-import org.testar.action.priorization.llm.prompt.StandardPromptGenerator;
+import org.testar.llm.prompt.StandardPromptActionGenerator;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
@@ -81,7 +81,7 @@ public class Protocol_03_webdriver_llm extends WebdriverProtocol {
 		super.initialize(settings);
 
 		// Initialize the LlmActionSelector using the LLM settings
-		llmActionSelector = new LlmActionSelector(settings, new StandardPromptGenerator(),
+		llmActionSelector = new LlmActionSelector(settings, new StandardPromptActionGenerator(),
 				"Log in with username 'john' and password 'demo'.");
 
 		// Test goal is considered complete when the welcome string is found in the HTML of the state model.
