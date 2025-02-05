@@ -1,23 +1,17 @@
 package org.testar.statemodel.analysis.condition;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.InvalidArgumentException;
 import org.testar.statemodel.StateModelManager;
 import org.testar.statemodel.util.QueryHelper;
 
-public class GherkinStateCondition extends StateCondition {
+public class WordsStateCondition extends StateCondition {
 
-    protected static final Logger logger = LogManager.getLogger();
-
-    public GherkinStateCondition(String field, String searchMessage, ConditionComparator comparator, int threshold) {
+    public WordsStateCondition(String field, String searchMessage, ConditionComparator comparator, int threshold) {
         super(field, searchMessage, comparator, threshold);
-        logger.log(Level.INFO, String.format("GherkinStateCondition: %s", searchMessage));
     }
 
     /**
-     * Evaluates whether a Gherkin 'Then' condition is true.
+     * Evaluates whether half of the words of a message exists.
      * @param modelIdentifier modelIdentifier of the current test sequence.
      * @param stateModelManager stateModelManager of the current test sequence.
      * @return True if condition is met.

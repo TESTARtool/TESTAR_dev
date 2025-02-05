@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,11 +28,11 @@
  *
  */
 
-import com.google.common.collect.ArrayListMultimap;
-
 import org.testar.CodingManager;
 import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
+import org.testar.llm.LlmTestGoal;
+import org.testar.llm.prompt.OraclePromptGenerator;
 import org.testar.llm.prompt.StandardPromptActionGenerator;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.alayer.*;
@@ -40,20 +40,14 @@ import org.testar.monkey.alayer.actions.*;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
-import org.testar.monkey.alayer.webdriver.WdDriver;
-import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.oracles.llm.LlmOracle;
 import org.testar.plugin.NativeLinker;
-import org.testar.monkey.Pair;
+import org.testar.monkey.ConfigTags;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.settings.Settings;
 import org.testar.statemodel.analysis.condition.BasicConditionEvaluator;
-import org.testar.statemodel.analysis.condition.ConditionEvaluator;
-import org.testar.statemodel.analysis.condition.StateCondition;
-import org.testar.statemodel.analysis.condition.TestCondition;
-
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
@@ -62,13 +56,14 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 public class Protocol_03_webdriver_llm extends WebdriverProtocol {
 
-	// This list tracks the detected erroneous verdicts to avoid duplicates
-	private List<String> listOfDetectedErroneousVerdicts = new ArrayList<>();
-
 	// The LLM Action selector needs to be initialize with the settings
 	private LlmActionSelector llmActionSelector;
+	private List<LlmTestGoal> testGoals = new ArrayList<>();
+	private Queue<LlmTestGoal> testGoalQueue;
+	private LlmTestGoal currentTestGoal;
 
-	private ConditionEvaluator conditionEvaluator;
+	// The LLM Oracle needs to be initialize with the settings
+	private LlmOracle llmOracle;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -80,23 +75,39 @@ public class Protocol_03_webdriver_llm extends WebdriverProtocol {
 	protected void initialize(Settings settings) {
 		super.initialize(settings);
 
+		// Configure the test goals
+		setupTestGoals(settings.get(ConfigTags.LlmTestGoals));
+
 		// Initialize the LlmActionSelector using the LLM settings
-		llmActionSelector = new LlmActionSelector(settings, new StandardPromptActionGenerator(),
-				"Log in with username 'john' and password 'demo'.");
+		llmActionSelector = new LlmActionSelector(settings, new StandardPromptActionGenerator());
 
-		// Test goal is considered complete when the welcome string is found in the HTML of the state model.
-		conditionEvaluator = new BasicConditionEvaluator();
-		StateCondition condition = new StateCondition("WebInnerHTML", "<b>Welcome</b> John Smith</p>",
-				TestCondition.ConditionComparator.GREATER_THAN, 0);
-		conditionEvaluator.addCondition(condition);
+		// Initialize the LlmOracle using the LLM settings
+		llmOracle = new LlmOracle(settings, new OraclePromptGenerator(new HashSet<>(Arrays.asList(WdTags.WebTextContent))));
+	}
 
-		// List of atributes to identify and close policy popups
-		// Set to null to disable this feature
-		policyAttributes = ArrayListMultimap.create();
-		policyAttributes.put("class", "lfr-btn-label");
+	/**
+	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
+	 */
+	@Override
+	protected void preSequencePreparations() {
+		super.preSequencePreparations();
 
-		// Reset the list when we start a new TESTAR run with multiple sequences
-		listOfDetectedErroneousVerdicts = new ArrayList<>();
+		// Setup test goal queue
+		testGoalQueue = new LinkedList<>();
+		testGoalQueue.addAll(testGoals);
+		currentTestGoal = testGoalQueue.poll();
+
+		// Reset llm action selector
+		llmActionSelector.reset(currentTestGoal, false);
+		// Reset llm oracle
+		llmOracle.reset(currentTestGoal, false);
+	}
+
+	private void setupTestGoals(List<String> testGoalsList) {
+		for(String testGoal : testGoalsList) {
+			// Empty BasicConditionEvaluator because the test goal decision is based on an LLM
+			testGoals.add(new LlmTestGoal(testGoal, new BasicConditionEvaluator().getConditions()));
+		}
 	}
 
 	/**
@@ -155,202 +166,26 @@ public class Protocol_03_webdriver_llm extends WebdriverProtocol {
 		// For web applications, web browser errors and warnings can also be enabled via settings
 		Verdict verdict = super.getVerdict(state);
 
-		String modelIdentifier = stateModelManager.getModelIdentifier();
+		// Use the LLM as an Oracle to determine if the test goal has been completed
+		Verdict llmVerdict = llmOracle.getVerdict(state);
 
-		// Test goal complete, terminate.
-		if(conditionEvaluator.evaluateConditions(modelIdentifier, stateModelManager)) {
-			return new Verdict(Verdict.SEVERITY_TESTGOAL_COMPLETE, "Test goal complete.");
-		}
-		// If the Verdict is not OK but was already detected in a previous sequence
-		// Consider as OK to avoid duplicates and continue testing
-		if (verdict != Verdict.OK && containsVerdictInfo(listOfDetectedErroneousVerdicts, verdict.info())) {
-			// Consider as OK to continue testing
-			verdict = Verdict.OK;
-			webConsoleVerdict = Verdict.OK;
-		} 
-		// If the Verdict is not OK and was not duplicated...
-		// We found an issue we need to report
-		else if (verdict.severity() != Verdict.OK.severity()) {
-			return verdict;
-		}
+		if(llmVerdict.severity() == Verdict.SEVERITY_LLM_COMPLETE) {
+			// Test goal was completed, retrieve next test goal from queue.
+			currentTestGoal = testGoalQueue.poll();
 
-		//-----------------------------------------------------------------------------
-		// MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
-		//-----------------------------------------------------------------------------
-
-		// ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
-
-		Verdict customVerdict = Verdict.OK;
-
-		return customVerdict;
-	}
-
-	private boolean containsVerdictInfo(List<String> listOfDetectedErroneousVerdicts, String currentVerdictInfo) {
-		return listOfDetectedErroneousVerdicts.stream().anyMatch(verdictInfo -> verdictInfo.contains(currentVerdictInfo.replace("\n", " ")));
-	}
-
-	public Verdict detectNumberWithLotOfDecimals(State state, int maxDecimals) {
-		for(Widget w : state) {
-			// If the widget contains a web text that is a double number
-			if(!w.get(WdTags.WebTextContent, "").isEmpty() && isNumeric(w.get(WdTags.WebTextContent))) {
-				// Count the decimal places of the text number
-				String number = w.get(WdTags.WebTextContent).replace(",", ".");
-				int decimalPlaces = number.length() - number.indexOf('.') - 1;
-
-				if(number.contains(".") && decimalPlaces > maxDecimals) {
-					String verdictMsg = String.format("Widget with more than %s decimals! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
-							maxDecimals, w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
-
-					return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg);
-				}
+			// Poll returns null if there are no more items remaining in the queue.
+			if(currentTestGoal == null) {
+				// No more test goals remaining, terminate sequence.
+				System.out.println("Test goal completed, but no more test goals.");
+				return llmVerdict;
+			} else {
+				System.out.println("Test goal completed, moving to next test goal.");
+				llmActionSelector.reset(currentTestGoal, true);
+				llmOracle.reset(currentTestGoal, true);
 			}
 		}
 
-		return Verdict.OK;
-	}
-
-	private boolean isNumeric(String strNum) {
-		if (strNum == null) {
-			return false;
-		}
-		strNum = strNum.trim().replace("\u0024", "").replace("\u20AC", "");
-		try {
-			Double.parseDouble(strNum);
-		} catch (NumberFormatException nfe) {
-			return false;
-		}
-		return true;
-	}
-
-	// Detect dropdown select elements that does not contains values, or only one of them
-	public Verdict detectEmptySelectItems(State state) {
-		for(Widget w : state) {
-			// For the web select elements with an Id property
-			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) && !w.get(WdTags.WebId, "").isEmpty()) {
-				try {
-					String elementId = w.get(WdTags.WebId, "");
-					String query = String.format("return document.getElementById('%s').length", elementId);
-					Long selectItemsLength = (Long) WdDriver.executeScript(query);
-					// Verify that contains at least one item element
-					if (selectItemsLength.intValue() <= 1) {
-						String verdictMsg = String.format("Empty or Unique Select element detected! Role: %s , Path: %s , Desc: %s", 
-								w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
-
-						return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg);
-					} 
-				}catch (Exception e) {}
-			}
-		}
-
-		return Verdict.OK;
-	}
-
-	// Detect duplicated items in a Select (dropdown list/listbox)
-	public Verdict detectDuplicateSelectItems(State state) {
-		for(Widget w : state) {
-			// For the web select elements with an Id property
-			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) && !w.get(WdTags.WebId, "").isEmpty()) {
-				try {
-					String elementId = w.get(WdTags.WebId, "");
-					String querylength = String.format("return ((document.getElementById('%s') != null) ? document.getElementById('%s').length : 0)", elementId, elementId);
-					Long selectItemsLength = (Long) WdDriver.executeScript(querylength);
-
-					if (selectItemsLength > 1) { 
-						String queryTexts = String.format("return [...document.getElementById('%s').options].map(o => o.text)", elementId);
-						@SuppressWarnings("unchecked")
-						ArrayList<String> selectOptionsTextsList = (ArrayList<String>) WdDriver.executeScript(queryTexts);
-
-						Set<String> duplicatesTexts = selectOptionsTextsList.stream()
-								.filter(s -> Collections.frequency(selectOptionsTextsList, s) > 1)
-								.collect(Collectors.toSet());
-
-						// Now that we have collected all the duplicates in a list verify that there are no duplicates
-						if(duplicatesTexts.size() > 0)
-						{
-							String verdictMsg = String.format("Detected a Select web element with duplicate display value elements! Role: %s , Path: %s , WebId: %s , Duplicate item(s): %s", 
-									w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), String.join(",", duplicatesTexts));
-
-							return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg);
-						}
-					}
-				}catch (Exception e) {}
-			}
-		}
-
-		return Verdict.OK;
-	}
-
-	public Verdict detectTextAreaWithoutLength(State state, List<Role> roles) {
-		for(Widget w : state) {
-			if(roles.contains(w.get(Tags.Role, Roles.Widget)) && w.get(WdTags.WebMaxLength) == 0) {
-
-				String verdictMsg = String.format("TextArea Widget with 0 Length detected! Role: %s , Path: %s , WebId: %s", 
-						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""));
-
-				return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg);
-			}
-		}
-
-		return Verdict.OK;
-	}
-
-	// Detect duplicated rows in a table by concatenating all visible values with an _ underscore
-	public Verdict detectDuplicatedRowsInTable(State state) {
-		for(Widget w : state) {
-			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdTABLE)) {
-				List<Pair<Widget, String>> rowElementsDescription = new ArrayList<>();
-				extractAllRowDescriptionsFromTable(w, rowElementsDescription);
-
-				List<Pair<Widget, String>> duplicatedDescriptions = 
-						rowElementsDescription.stream()
-						.collect(Collectors.groupingBy(Pair::right))
-						.entrySet().stream()
-						.filter(e -> e.getValue().size() > 1)
-						.flatMap(e -> e.getValue().stream())
-						.collect(Collectors.toList());
-
-				// If the list of duplicated descriptions contains a matching prepare the verdict
-				if(!duplicatedDescriptions.isEmpty()) {
-					for(Pair<Widget, String> duplicatedWidget : duplicatedDescriptions) {
-						// Ignore empty rows
-						if (!duplicatedWidget.right().replaceAll("_","").isEmpty()) {
-							String verdictMsg = String.format("Detected a duplicated rows in a Table! Role: %s , WebId: %s, Description: %s", 
-									duplicatedWidget.left().get(Tags.Role), duplicatedWidget.left().get(WdTags.WebId, ""), duplicatedWidget.right());
-
-							return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg);
-						}
-					}
-				}
-
-			}
-		}
-
-		return Verdict.OK;
-	}
-
-	private void extractAllRowDescriptionsFromTable(Widget w, List<Pair<Widget, String>> rowElementsDescription) {
-		if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdTR)) {
-			rowElementsDescription.add(new Pair<Widget, String>(w, obtainWidgetTreeDescription(w)));
-		}
-
-		// Iterate through the form element widgets
-		for(int i = 0; i < w.childCount(); i++) {
-			// If the children of the table are not sub-tables
-			if(!w.child(i).get(Tags.Role, Roles.Widget).equals(WdRoles.WdTABLE)) {
-				extractAllRowDescriptionsFromTable(w.child(i), rowElementsDescription);
-			}
-		}
-	}
-
-	private String obtainWidgetTreeDescription(Widget w) {
-		String widgetDesc = w.get(WdTags.WebTextContent, "");
-
-		// Iterate through the form element widgets
-		for(int i = 0; i < w.childCount(); i++) {
-			widgetDesc = widgetDesc + "_" + obtainWidgetTreeDescription(w.child(i));
-		}
-
-		return widgetDesc;
+		return verdict;
 	}
 
 	/**
@@ -376,53 +211,6 @@ public class Protocol_03_webdriver_llm extends WebdriverProtocol {
 
 		// Check if forced actions are needed to stay within allowed domains
 		Set<Action> forcedActions = detectForcedActions(state, ac);
-
-		/*
-		// Check if the update profile element is found:
-		Widget nameWidget = getWidgetWithMatchingTag(
-				"id", "customer.firstName", state);
-
-		if(nameWidget != null){
-			// Update profile found, create and return the triggered action:
-			// Create a compound action to include multiple actions as one:
-			CompoundAction.Builder multiAction = new CompoundAction.Builder();
-
-			// Action to type text into the Name field:
-			multiAction.add(ac.clickTypeInto(
-					nameWidget, "Triggered Name", true), 1.0);
-
-			// Action to type text into id="customer.lastName":
-			Widget lastNameWidget = getWidgetWithMatchingTag(
-					"id", "customer.lastName", state);
-			multiAction.add(ac.clickTypeInto(
-					lastNameWidget, "Triggered Last Name", true), 1.0);
-
-			// Action to type text into id="customer.address.street":
-			Widget streetWidget = getWidgetWithMatchingTag(
-					"id", "customer.address.street", state);
-			multiAction.add(ac.clickTypeInto(
-					streetWidget, "Triggered Street", true), 1.0);
-
-			// Action to type text into id="customer.address.city":
-			Widget cityWidget = getWidgetWithMatchingTag(
-					"id", "customer.address.city", state);
-			multiAction.add(ac.clickTypeInto(
-					cityWidget, "Triggered City", true), 1.0);
-
-			// You can add here more form widgets
-
-			// Action on Update Profile button, value="Update Profile"
-			Widget submitWidget = getWidgetWithMatchingTag(
-					"value", "Update Profile", state);
-			multiAction.add(ac.leftClickAt(submitWidget), 1.0);
-
-			// Build the update profile compound action
-			Action updateProfileAction = multiAction.build();
-
-			// Returning a list of actions having only the updateProfileAction
-			return new HashSet<>(Collections.singletonList(updateProfileAction));
-		}
-		 */
 
 		// iterate through all widgets
 		for (Widget widget : state) {
@@ -562,12 +350,6 @@ public class Protocol_03_webdriver_llm extends WebdriverProtocol {
 	@Override
 	protected void finishSequence() {
 		super.finishSequence();
-		// If the final Verdict is not OK and the verdict is not saved in the list
-		// This is a new run fail verdict
-		Verdict finalVerdict = getVerdict(latestState);
-		if(finalVerdict.severity() > Verdict.SEVERITY_OK && !listOfDetectedErroneousVerdicts.contains(finalVerdict.info().replace("\n", " "))) {
-			listOfDetectedErroneousVerdicts.add(finalVerdict.info().replace("\n", " "));
-		}
 	}
 
 	/**

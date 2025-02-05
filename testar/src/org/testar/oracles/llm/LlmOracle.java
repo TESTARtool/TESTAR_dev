@@ -45,6 +45,7 @@ import org.testar.llm.prompt.OraclePromptGenerator;
 import org.testar.llm.LlmConversation;
 import org.testar.llm.LlmFactory;
 import org.testar.llm.LlmResponse;
+import org.testar.llm.LlmTestGoal;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.monkey.alayer.State;
@@ -73,20 +74,15 @@ public class LlmOracle implements Oracle {
 
 	private Gson gson = new Gson();
 	private String previousTestGoal = "";
-	private String currentTestGoal;
+	private LlmTestGoal currentTestGoal;
 
-	public LlmOracle(Settings settings, OraclePromptGenerator oracleGenerator, String testGoal) {
+	public LlmOracle(Settings settings, OraclePromptGenerator oracleGenerator) {
 		this.promptGenerator = oracleGenerator;
 
 		this.platform = settings.get(ConfigTags.LlmPlatform);
 		this.model = settings.get(ConfigTags.LlmModel);
 		this.hostUrl = settings.get(ConfigTags.LlmHostUrl);
 		this.authorizationHeader = settings.get(ConfigTags.LlmAuthorizationHeader);
-		// TODO: Bring back GUI support when GUI is updated
-		// this.testGoal = settings.get(ConfigTags.LlmTestGoalDescription);
-
-		this.currentTestGoal = testGoal;
-
 		this.fewshotOracleFile = settings.get(ConfigTags.LlmOracleFewshotFile);
 		this.appName = settings.get(ConfigTags.ApplicationName);
 		this.temperature = settings.get(ConfigTags.LlmTemperature);
@@ -94,12 +90,12 @@ public class LlmOracle implements Oracle {
 		initialize();
 	}
 
-	public void reset(String newTestGoal, boolean appendPreviousTestGoal) {
+	public void reset(LlmTestGoal newTestGoal, boolean appendPreviousTestGoal) {
 		// Reset variables
 		tokens_used = 0;
 
 		if(appendPreviousTestGoal) {
-			previousTestGoal = currentTestGoal;
+			previousTestGoal = currentTestGoal.getTestGoal();
 		} else {
 			previousTestGoal = "";
 		}
@@ -123,7 +119,7 @@ public class LlmOracle implements Oracle {
 	}
 
 	private Verdict getVerdictWithLlm(State state) {
-		String prompt = promptGenerator.generateOraclePrompt(state, appName, currentTestGoal, previousTestGoal);
+		String prompt = promptGenerator.generateOraclePrompt(state, appName, currentTestGoal.getTestGoal(), previousTestGoal);
 
 		logger.log(Level.DEBUG, "Generated oracle prompt: " + prompt);
 		conversation.addMessage("user", prompt);

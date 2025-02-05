@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -49,8 +49,7 @@ import org.testar.settings.Settings;
 import org.testar.statemodel.StateModelManagerFactory;
 import org.testar.statemodel.analysis.condition.BasicConditionEvaluator;
 import org.testar.statemodel.analysis.condition.ConditionEvaluator;
-import org.testar.statemodel.analysis.condition.StateCondition;
-import org.testar.statemodel.analysis.condition.TestCondition;
+import org.testar.statemodel.analysis.condition.GherkinConditionEvaluator;
 import org.testar.statemodel.analysis.metric.LlmMetricsCollector;
 import org.testar.statemodel.analysis.metric.MetricsManager;
 
@@ -76,7 +75,7 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 	private MetricsManager metricsManager;
 	private ConditionEvaluator conditionEvaluator;
 
-	private List<LlmTestGoal> testGoals;
+	private List<LlmTestGoal> testGoals = new ArrayList<>();
 	private Queue<LlmTestGoal> testGoalQueue;
 	private LlmTestGoal currentTestGoal;
 
@@ -94,10 +93,10 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 		super.initialize(settings);
 
 		// Configure the test goals
-		setupTestGoals();
+		setupTestGoals(settings.get(ConfigTags.LlmTestGoals));
 
 		// Initialize the LlmActionSelector using the LLM settings
-		llmActionSelector = new LlmActionSelector(settings, new StandardPromptActionGenerator(), "");
+		llmActionSelector = new LlmActionSelector(settings, new StandardPromptActionGenerator());
 
 		// Initialize the metrics collector to analyze the state model
 		metricsManager = new MetricsManager(new LlmMetricsCollector("Denied"));
@@ -105,27 +104,11 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 		conditionEvaluator = new BasicConditionEvaluator();
 	}
 
-	// TODO: Add GUI support so this is no longer needed.
-	private void setupTestGoals() {
-		testGoals = new ArrayList<>();
-
-		String testGoal1 = "Log in by entering the username \"john\" and the password \"demo\" and \n" +
-				"clicking the \"log in\" button";
-		List<TestCondition> tg1conditions = new ArrayList<>();
-		StateCondition tg1cond1 = new StateCondition("WebInnerHTML", "<b>Welcome</b> John Smith</p>",
-				TestCondition.ConditionComparator.GREATER_THAN, 0);
-		tg1conditions.add(tg1cond1);
-
-		String testGoal2 = "Apply for a loan by navigating to the \n" +
-				"\"Request Loan\" page and entering 999999 as the loan amount and 190000 \n" +
-				"for the down payment. Then click the \"Apply Now\" button.";
-		List<TestCondition> tg2conditions = new ArrayList<>();
-		StateCondition tg2cond1 = new StateCondition("WebInnerHTML", "Denied",
-				TestCondition.ConditionComparator.GREATER_THAN, 0);
-		tg2conditions.add(tg2cond1);
-
-		testGoals.add(new LlmTestGoal(testGoal1, tg1conditions));
-		testGoals.add(new LlmTestGoal(testGoal2, tg2conditions));
+	private void setupTestGoals(List<String> testGoalsList) {
+		for(String testGoal : testGoalsList) {
+			GherkinConditionEvaluator gherkinEvaluator = new GherkinConditionEvaluator(WdTags.WebInnerHTML, testGoal);
+			testGoals.add(new LlmTestGoal(testGoal, gherkinEvaluator.getConditions()));
+		}
 	}
 
 	private void setupOrientDB() {
@@ -211,7 +194,7 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 		conditionEvaluator.addConditions(currentTestGoal.getCompletionConditions());
 
 		// Reset llm action selector
-		llmActionSelector.reset(currentTestGoal.getTestGoal(), false);
+		llmActionSelector.reset(currentTestGoal, false);
 
 		// Use sequence count to iteratively create a new state model
 		String appVersion = settings.get(ConfigTags.ApplicationVersion, "");
@@ -356,10 +339,11 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 			// Poll returns null if there are no more items remaining in the queue.
 			if(currentTestGoal == null) {
 				// No more test goals remaining, terminate sequence.
+				System.out.println("Test goal completed, but no more test goals.");
 				return new Verdict(Verdict.SEVERITY_TESTGOAL_COMPLETE, "All test goals completed.");
 			} else {
 				System.out.println("Test goal completed, moving to next test goal.");
-				llmActionSelector.reset(currentTestGoal.getTestGoal(), true);
+				llmActionSelector.reset(currentTestGoal, true);
 				conditionEvaluator.clear();
 				conditionEvaluator.addConditions(currentTestGoal.getCompletionConditions());
 			}
