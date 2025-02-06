@@ -37,6 +37,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.BoxLayout;
@@ -272,9 +273,21 @@ public class LlmPanel extends SettingsPanel {
 					content.append(line).append("\n");
 				}
 
-				// Create a new text area with the file content
-				addTestGoalTextArea(null);
-				testGoalTextAreas.get(testGoalTextAreas.size() - 1).setText(content.toString());
+				// Refill the text area with the file content
+				testGoalTextAreas.clear();
+				testGoalContainer.removeAll();
+				List<String> goals = Arrays.asList(content.toString().split(";", -1));
+				for (String goal : goals) {
+					addTestGoalTextArea(null);
+					testGoalTextAreas.get(testGoalTextAreas.size() - 1).setText(goal);
+				}
+				// Remove extra empty lines
+				for (JTextArea textArea : testGoalTextAreas) {
+					String cleanedText = textArea.getText().replaceAll("(?m)^\\s*$\n?", "").trim();
+					textArea.setText(cleanedText);
+				}
+				testGoalContainer.revalidate();
+				testGoalContainer.repaint();
 
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(this, "Error reading file: " + e.getMessage(), "File Error", JOptionPane.ERROR_MESSAGE);
