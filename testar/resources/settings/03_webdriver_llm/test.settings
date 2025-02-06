@@ -35,8 +35,8 @@ SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "https://para.testar.org/"
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 5
-SequenceLength = 20
+Sequences = 1
+SequenceLength = 10
 
 #################################################################
 # Oracles based on suspicious tag values
@@ -146,8 +146,8 @@ DataStoreDB =
 DataStoreUser = 
 DataStorePassword = 
 DataStoreMode = none
-ApplicationName = Parabank
-ApplicationVersion = 
+ApplicationName = parabank
+ApplicationVersion = activity
 ActionSelectionAlgorithm = random
 StateModelStoreWidgets = true
 ResetDataStore = false
@@ -171,9 +171,10 @@ LlmPlatform = OpenAI
 LlmModel = 
 LlmHostUrl = http://192.168.108.242:1234/v1/chat/completions
 LlmAuthorizationHeader = 
-LlmTestGoalDescription = Log in with the username john and the password demo
-LlmActionFewshotFile = prompts/fewshot_login_openai.json
+LlmActionFewshotFile = prompts/fewshot_openai_action.json
 LlmTemperature = 0.2
+LlmHistorySize = 5
+LlmTestGoals = Log in with the username john and the password demo to see the accounts overview;Select the account 12345 to see the account activity
 
 #################################################################
 # WebDriver features

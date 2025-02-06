@@ -165,7 +165,8 @@ public final class ConfigTags {
 	public static final Tag<String> LlmAuthorizationHeader = Tag.from("LlmAuthorizationHeader", String.class, 
 			"The Authorization Header required by some LLM agents");
 
-	public static final Tag<String> LlmTestGoalDescription = Tag.from("LlmTestGoalDescription", String.class,
+	@SuppressWarnings("unchecked")
+	public static final Tag<List<String>> LlmTestGoals = Tag.from("LlmTestGoals", (Class<List<String>>) (Class<?>) List.class,
 			"The objective of the test for the LLM agent");
 
 	public static final Tag<String> LlmActionFewshotFile = Tag.from("LlmActionFewshotFile", String.class,

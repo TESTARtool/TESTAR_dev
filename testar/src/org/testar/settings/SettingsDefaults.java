@@ -200,7 +200,7 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(LlmModel, ""));
 		defaults.add(Pair.from(LlmHostUrl, "http://192.168.108.242:1234/v1/chat/completions"));
 		defaults.add(Pair.from(LlmAuthorizationHeader, ""));
-		defaults.add(Pair.from(LlmTestGoalDescription, "Log in with username john and password demo"));
+		defaults.add(Pair.from(LlmTestGoals, Arrays.asList("Log in with the username john and the password demo\\nThen John Smith")));
 		defaults.add(Pair.from(LlmActionFewshotFile, "prompts/fewshot_openai_action.json"));
 		defaults.add(Pair.from(LlmOracleFewshotFile, "prompts/fewshot_openai_oracle.json"));
 		defaults.add(Pair.from(LlmTemperature, 0.2f));

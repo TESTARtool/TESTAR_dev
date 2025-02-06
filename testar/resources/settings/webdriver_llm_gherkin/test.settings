@@ -36,7 +36,7 @@ SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "https://para.testar.org/"
 #################################################################
 
 Sequences = 1
-SequenceLength = 10
+SequenceLength = 15
 
 #################################################################
 # Oracles based on suspicious tag values
@@ -147,7 +147,7 @@ DataStoreUser = admin
 DataStorePassword = admin
 DataStoreMode = instant
 ApplicationName = parabank_gherkin
-ApplicationVersion = login
+ApplicationVersion = message
 ActionSelectionAlgorithm = random
 StateModelStoreWidgets = true
 ResetDataStore = false
@@ -175,7 +175,7 @@ LlmActionFewshotFile = prompts/fewshot_gherkin_gemini.json
 LlmOracleFewshotFile = prompts/fewshot_gemini_oracle.json
 LlmTemperature = 0.2
 LlmHistorySize = 5
-LlmTestGoalDescription = Scenario Outline: Login Parabank\\n  Given I want to log in\\n  And fill in username 'john'\\n  And fill in password 'demo'\\n  When login\\n  Then Welcome John Smith is shown\\n
+LlmTestGoals = Scenario Outline: Login Parabank\\n  Given I want to log in\\n  And fill in username 'john'\\n  And fill in password 'demo'\\n  When login\\n  Then John Smith;Scenario Outline: Send Contact Message Parabank\\n  Given I want to contact parabank\\n  When fill in name 'testar'\\n  And fill in email 'testar.org'\\n  And fill in phone '111-222'\\n  And fill in message 'llm gherking agent sending a message'\\n  And Send to Customer Care\\n  Then A Customer Care Representative will be contacting you
 
 #################################################################
 # WebDriver features

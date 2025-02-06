@@ -40,6 +40,7 @@ import org.testar.llm.prompt.IPromptActionGenerator;
 import org.testar.llm.LlmConversation;
 import org.testar.llm.LlmFactory;
 import org.testar.llm.LlmResponse;
+import org.testar.llm.LlmTestGoal;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.monkey.alayer.*;
@@ -80,30 +81,25 @@ public class LlmActionSelector implements IActionSelector {
 
     private Gson gson = new Gson();
     private String previousTestGoal = "";
-    private String currentTestGoal;
+    private LlmTestGoal currentTestGoal;
 
     /**
      * Creates a new LlmActionSelector.
      * @param settings with contains:
      * 1. LlmHostAddress for the host of the OpenAI compatible LLM API. Ex: http://127.0.0.1.
      * 2. LlmHostPort for the port of the API.
-     * 3. LlmTestGoalDescription for the objective of the test. Ex: Log in with username john and password demo.
+     * 3. LlmTestGoals for the objective of the test. Ex: Log in with username john and password demo.
      * 4. LlmActionFewshotFile for the fewshot file that contains the prompt instructions.
      * 5. ApplicationName for the name of the SUT. 
      */
-    public LlmActionSelector(Settings settings, IPromptActionGenerator generator, String testGoal) {
+    public LlmActionSelector(Settings settings, IPromptActionGenerator generator) {
         this.promptGenerator = generator;
 
         this.platform = settings.get(ConfigTags.LlmPlatform);
         this.model = settings.get(ConfigTags.LlmModel);
         this.hostUrl = settings.get(ConfigTags.LlmHostUrl);
         this.authorizationHeader = settings.get(ConfigTags.LlmAuthorizationHeader);
-        // TODO: Bring back GUI support when GUI is updated
-        // this.testGoal = settings.get(ConfigTags.LlmTestGoalDescription);
         this.historySize = settings.get(ConfigTags.LlmHistorySize);
-
-        this.currentTestGoal = testGoal;
-
         this.actionFewshotFile = settings.get(ConfigTags.LlmActionFewshotFile);
         this.appName = settings.get(ConfigTags.ApplicationName);
         this.temperature = settings.get(ConfigTags.LlmTemperature);
@@ -127,14 +123,14 @@ public class LlmActionSelector implements IActionSelector {
      * @param newTestGoal The new test goal.
      * @param appendPreviousTestGoal If true, adds the previous test goal to the prompt ("We just accomplished X")
      */
-    public void reset(String newTestGoal, boolean appendPreviousTestGoal) {
+    public void reset(LlmTestGoal newTestGoal, boolean appendPreviousTestGoal) {
         // Reset variables
         tokens_used = 0;
         invalidActions = 0;
         actionHistory.clear();
 
         if(appendPreviousTestGoal) {
-            previousTestGoal = currentTestGoal;
+            previousTestGoal = currentTestGoal.getTestGoal();
         } else {
             previousTestGoal = "";
         }
@@ -163,7 +159,7 @@ public class LlmActionSelector implements IActionSelector {
      */
     private Action selectActionWithLlm(State state, Set<Action> actions) {
         String prompt = promptGenerator.generateActionSelectionPrompt(
-                actions, state, actionHistory, appName, currentTestGoal, previousTestGoal);
+                actions, state, actionHistory, appName, currentTestGoal.getTestGoal(), previousTestGoal);
 
         logger.log(Level.DEBUG, "Generated prompt: " + prompt);
         conversation.addMessage("user", prompt);

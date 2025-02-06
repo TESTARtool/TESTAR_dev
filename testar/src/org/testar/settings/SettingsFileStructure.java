@@ -247,7 +247,7 @@ public class SettingsFileStructure {
 				, ConfigTags.LlmOracleFewshotFile.name() + " = "
 				, ConfigTags.LlmTemperature.name() + " = "
 				, ConfigTags.LlmHistorySize.name() + " = "
-				, ConfigTags.LlmTestGoalDescription.name() + " = "
+				, ConfigTags.LlmTestGoals.name() + " = "
 				, ""
 				, "#################################################################"
 				, "# WebDriver features"

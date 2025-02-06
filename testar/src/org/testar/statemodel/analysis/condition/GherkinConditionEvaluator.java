@@ -1,5 +1,8 @@
 package org.testar.statemodel.analysis.condition;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testar.monkey.alayer.Tag;
 import org.testar.statemodel.analysis.condition.TestCondition.ConditionComparator;
 
@@ -8,8 +11,10 @@ import org.testar.statemodel.analysis.condition.TestCondition.ConditionComparato
  */
 public class GherkinConditionEvaluator extends BasicConditionEvaluator {
 
+    protected static final Logger logger = LogManager.getLogger();
+
     public GherkinConditionEvaluator(Tag<?> evaluatorTag, String gherkinContent) {
-        this(evaluatorTag, gherkinContent, TestCondition.ConditionComparator.GREATER_THAN, 1);
+        this(evaluatorTag, gherkinContent, TestCondition.ConditionComparator.GREATER_THAN, 0);
     }
 
     public GherkinConditionEvaluator(Tag<?> evaluatorTag, String gherkinContent, ConditionComparator comparator, int threshold) {
@@ -26,7 +31,8 @@ public class GherkinConditionEvaluator extends BasicConditionEvaluator {
                 // Remove the "Then" keyword and trim the remaining line
                 String searchStatement = strippedStatement.substring(4).strip();
                 // Add the condition to the evaluator
-                addCondition(new GherkinStateCondition(evaluatorTag.name(), searchStatement, comparator, threshold));
+                logger.log(Level.INFO, String.format("GherkinConditionEvaluator: %s", searchStatement));
+                addCondition(new StateCondition(evaluatorTag.name(), searchStatement, comparator, threshold));
             }
         }
     }
