@@ -1,0 +1,9 @@
+Teacher logs in
+Credentials pedant/pass
+Then Teacher is logged in to the UIS
+;
+Teacher locate My Subjects page
+Then Teacher is on the page My Subjects
+;
+Teacher clicks on the button Remove
+Then Message confirming a successful execution will appear

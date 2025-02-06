@@ -1,5 +1,6 @@
-Logged in user can change his/her first name
-
+Logged in user can change his/her first name and/or last name and/or email
 Credentials blue/pass
-Condition Change data in the First name entry with least 2 and not more than 30 characters
+Condition First name must have at least 2 and not more than 30 characters
+Condition Last name must have at least 2 and not more than 30 characters
+Condition Email must have at least 8 and not more than 40 characters
 Then User has been successfully updated!

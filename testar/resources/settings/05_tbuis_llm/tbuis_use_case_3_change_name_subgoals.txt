@@ -1,0 +1,7 @@
+Logged in user
+Credentials blue/pass
+Then User is already logged in to the UIS
+;
+User can change his/her first name
+Condition First name must have at least 2 and not more than 30 characters
+Then Changes appear on the upper bar

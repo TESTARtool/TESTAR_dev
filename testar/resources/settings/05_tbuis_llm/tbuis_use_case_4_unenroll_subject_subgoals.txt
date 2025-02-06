@@ -1,0 +1,12 @@
+Student logs in
+Credentials blue/pass
+Then Student is logged in to the UIS
+;
+User locate My Subjects page
+Then User is located on the My Subjects page
+;
+Student will click on the X button located in the row of the subject
+Then Modal window Unenroll subject will appear
+;
+Student will click on the Unenroll subject button
+Then Message confirming successful execution will appear

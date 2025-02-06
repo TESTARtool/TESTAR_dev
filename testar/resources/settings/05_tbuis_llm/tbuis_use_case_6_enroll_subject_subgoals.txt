@@ -1,0 +1,9 @@
+Student logs in
+Credentials blue/pass
+Then Student is logged in to the UIS
+;
+User locate Other Subjects page
+Then Student is on the page Other Subjects
+;
+Student clicks on the Enroll button
+Then Message confirming a successful execution will appear

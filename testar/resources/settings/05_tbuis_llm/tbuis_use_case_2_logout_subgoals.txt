@@ -1,0 +1,6 @@
+User is logged in
+Credentials blue/pass
+Then the right side of the upper bar displays the Logout option
+;
+Logging out of the Application
+Then Login Page will appear

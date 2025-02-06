@@ -1,0 +1,9 @@
+Teacher logs in
+Credentials keen/pass
+Then Teacher is logged in to the UIS
+;
+Teacher locate My Exam Dates page
+Then Teacher is on the page My Exam Dates
+;
+Teacher clicks participants button
+Then Modal window Exam Date Participants is displayed

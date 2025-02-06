@@ -82,8 +82,8 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = 
-TagsToFilter = Title;WebName;WebTagName;WebHref
+ClickFilter = WdSELECT
+TagsToFilter = Role
 
 #################################################################
 # Processfilter

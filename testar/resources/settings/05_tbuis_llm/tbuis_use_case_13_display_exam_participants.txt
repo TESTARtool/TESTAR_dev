@@ -1,4 +1,3 @@
 An overview of all students registered for the date of an examination for a specific subject ("participants")
-
 Credentials keen/pass
 Then Exam Date Participants

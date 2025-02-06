@@ -1,4 +1,3 @@
 Teacher cancels a subject he/she teaches
-
 Credentials keen/pass
 Then Subject has been successfully removed!
