@@ -125,9 +125,10 @@ public class LlmOracle implements Oracle {
 		conversation.addMessage("user", prompt);
 
 		String conversationJson = gson.toJson(conversation);
-		String llmResponse = getResponseFromLlm(conversationJson);
 
 		try {
+
+			String llmResponse = getResponseFromLlm(conversationJson);
 
 			LlmVerdict llmVerdict = gson.fromJson(llmResponse, LlmVerdict.class);
 

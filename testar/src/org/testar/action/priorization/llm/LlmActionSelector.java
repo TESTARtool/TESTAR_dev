@@ -222,6 +222,13 @@ public class LlmActionSelector implements IActionSelector {
                 invalidActions++;
                 return nop;
             }
+            case COMMUNICATION_FAILURE: {
+            	logger.log(Level.ERROR, "Communication failure with the LLM");
+            	NOP nop = new NOP();
+            	nop.set(Tags.Desc, "Communication Failure");
+            	invalidActions++;
+            	return nop;
+            }
             default: {
                 logger.log(Level.ERROR, "ParseResult was null, this should never happen!");
                 NOP nop = new NOP();
@@ -400,6 +407,12 @@ public class LlmActionSelector implements IActionSelector {
         } catch(JsonParseException e) {
             logger.log(Level.ERROR, "Unable to parse response from LLM to JSON: " + responseContent);
             return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.PARSE_FAILED);
+        } catch(NullPointerException e) {
+            logger.log(Level.ERROR, "Null exception due to LLM parse response error");
+            return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.COMMUNICATION_FAILURE);
+        } catch(Exception e) {
+            logger.log(Level.ERROR, "Exception parsing LLM response");
+            return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.COMMUNICATION_FAILURE);
         }
     }
 
