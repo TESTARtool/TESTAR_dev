@@ -2,9 +2,7 @@ grammar Oracles;
 
 oracles_file: (oracle | COMMENT)* EOF;
 
-oracle: oracle_name LB oracle_block RB;
-
-oracle_block: select_block* check_block trigger_block*;
+oracle: oracle_name LB select_block* check_block trigger_block* RB;
 
 select_block: FOR_ALL WIDGET BASE_STRING? property_block;
 check_block: CHECK property_block;
@@ -61,7 +59,7 @@ property_string:    PROP    BASE_STRING;
 raw_string:         RAW     BASE_STRING; //no interpretation
 basic_string:               BASE_STRING; //interpretation of escaped characters (\t\n,etc.)
 
-oracle_name:        ORACLE  BASE_STRING?;
+oracle_name:        ORACLE  BASE_STRING;
 
 
 ////////////////////////

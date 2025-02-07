@@ -23,12 +23,6 @@ public interface OraclesVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitOracle(OraclesParser.OracleContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link OraclesParser#oracle_block}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitOracle_block(OraclesParser.Oracle_blockContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link OraclesParser#select_block}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

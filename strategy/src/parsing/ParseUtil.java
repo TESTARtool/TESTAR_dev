@@ -18,11 +18,11 @@ public class ParseUtil
     
     public ParseUtil(String filePath)
     {
-        CharStream chars  = PathToCharstream(filePath);
+        CharStream chars  = pathToCharstream(filePath);
         StrategyTree = BuildAST(chars);
     }
     
-    private CharStream PathToCharstream(String filePath)
+    private CharStream pathToCharstream(String filePath)
     {
         CharStream chars  = null;
         try

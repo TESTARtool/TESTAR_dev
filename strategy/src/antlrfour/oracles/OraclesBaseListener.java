@@ -41,18 +41,6 @@ public class OraclesBaseListener implements OraclesListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterOracle_block(OraclesParser.Oracle_blockContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitOracle_block(OraclesParser.Oracle_blockContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterSelect_block(OraclesParser.Select_blockContext ctx) { }
 	/**
 	 * {@inheritDoc}

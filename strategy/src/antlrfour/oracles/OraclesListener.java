@@ -28,16 +28,6 @@ public interface OraclesListener extends ParseTreeListener {
 	 */
 	void exitOracle(OraclesParser.OracleContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link OraclesParser#oracle_block}.
-	 * @param ctx the parse tree
-	 */
-	void enterOracle_block(OraclesParser.Oracle_blockContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link OraclesParser#oracle_block}.
-	 * @param ctx the parse tree
-	 */
-	void exitOracle_block(OraclesParser.Oracle_blockContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link OraclesParser#select_block}.
 	 * @param ctx the parse tree
 	 */
