@@ -73,7 +73,8 @@ public class Protocol_test_gradle_workflow_webdriver_remote_parabank extends Web
 		super.initialize(settings);
 
 		//WebDriver settings and features verification
-		Assert.collectionContains(domainsAllowed, "para.testar.org");
+		Assert.collectionContains(webDomainsAllowed, "para.testar.org");
+		Assert.isTrue(webPathsAllowed.contains("index.htm"));
 		Assert.collectionSize(deniedExtensions, 5);
 		Assert.isTrue(settings.get(ConfigTags.ClickableClasses).isEmpty());
 		Assert.isTrue(settings.get(ConfigTags.TypeableClasses).isEmpty());
