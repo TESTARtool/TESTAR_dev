@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.settings.dialog;
+package org.testar.settings.dialog.components;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;

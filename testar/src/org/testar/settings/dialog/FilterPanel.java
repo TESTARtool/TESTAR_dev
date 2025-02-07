@@ -33,6 +33,8 @@ package org.testar.settings.dialog;
 import org.apache.commons.lang3.StringUtils;
 import org.testar.monkey.ConfigTags;
 import org.testar.settings.Settings;
+import org.testar.settings.dialog.components.RegexButton;
+import org.testar.settings.dialog.components.UndoTextArea;
 
 import javax.swing.*;
 
@@ -46,9 +48,9 @@ public class FilterPanel extends SettingsPanel {
     private JLabel filterTags = new JLabel("Tags to apply the filters (semicolon to customize multiple Tags)");
     private JLabel killProcessLabel = new JLabel("Kill processes by name (regular expression):");
 
-    private JTextArea txtClickFilter = new JTextArea();
-    private JTextArea txtTagsToFilter = new JTextArea();
-    private JTextArea txtProcessFilter = new JTextArea();
+    private UndoTextArea txtClickFilter = new UndoTextArea();
+    private UndoTextArea txtTagsToFilter = new UndoTextArea();
+    private UndoTextArea txtProcessFilter = new UndoTextArea();
     
     private RegexButton regexButtonClickFilter = new RegexButton(txtClickFilter);
     private RegexButton regexButtonProcFilter = new RegexButton(txtProcessFilter);
@@ -101,9 +103,9 @@ public class FilterPanel extends SettingsPanel {
      */
     @Override
     public void populateFrom(final Settings settings) {
-        txtClickFilter.setText(settings.get(ConfigTags.ClickFilter));
-        txtTagsToFilter.setText(StringUtils.join(settings.get(ConfigTags.TagsToFilter), ";"));
-        txtProcessFilter.setText(settings.get(ConfigTags.ProcessesToKillDuringTest));
+        txtClickFilter.setInitialText(settings.get(ConfigTags.ClickFilter));
+        txtTagsToFilter.setInitialText(StringUtils.join(settings.get(ConfigTags.TagsToFilter), ";"));
+        txtProcessFilter.setInitialText(settings.get(ConfigTags.ProcessesToKillDuringTest));
     }
 
     /**
