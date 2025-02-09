@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2023 Open Universiteit - www.ou.nl
- * Copyright (c) 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2023 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2023 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -60,28 +60,39 @@ public class HtmlFormatUtil extends BaseFormatUtil
         else
             content.add("<"+tag+">"+text+"</"+tag+">");
     }
-    
+
     public void addHeader(String title)
     {
-        addHeader(title, "");
+        addHeader(title, "", "");
     }
-    
+
     public void addHeader(String title, String script)
     {
-        Assert.notNull(script);
+        addHeader(title, script, "");
+    }
+
+    public void addHeader(String title, String script, String style)
+    {
         Assert.notNull(title);
-    
+        Assert.notNull(script);
+        Assert.notNull(style);
+
         content.add("<!DOCTYPE html>");
         content.add("<html lang=\"en\">");
         content.add("<head>");
-        if(!script.equals(""))
+
+        if (!script.isEmpty()) 
             addContent(script, "script");
+
+        if (!style.isEmpty()) 
+            addContent(style, "style");
+
         content.add("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
         addContent(title, "title");
         content.add("</head>");
         content.add("<body>");
     }
-    
+
     public void addFooter()
     {
         content.add("</body>");
@@ -120,5 +131,10 @@ public class HtmlFormatUtil extends BaseFormatUtil
             content.add("</ol>");
         else //unordered
             content.add("</ul>");
+    }
+
+    public void addButton(String buttonClass, String buttonText)
+    {
+        content.add("<button type='button' class='" + buttonClass + "'>" + buttonText + "</button>");
     }
 }

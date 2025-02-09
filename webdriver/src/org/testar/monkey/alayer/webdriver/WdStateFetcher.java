@@ -36,6 +36,7 @@ import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
 
 import java.util.HashMap;
 import java.util.List;
@@ -129,6 +130,7 @@ public class WdStateFetcher implements Callable<WdState> {
     WdState root = createWidgetTree(rootElement);
     root.set(Tags.Role, Roles.Process);
     root.set(Tags.NotResponding, false);
+    root.set(WdTags.WebHref, WdDriver.getCurrentUrl());
 
     for (Widget w : root) {
       w.set(Tags.Path, Util.indexString(w));
