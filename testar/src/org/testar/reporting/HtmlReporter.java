@@ -95,6 +95,12 @@ public class HtmlReporter implements Reporting
         String stateIDs = "AbstractID=" + abstractID +  " || " + "ConcreteID=" + concreteID;
         htmlReportUtil.addHeading(4, stateIDs);
 
+        // Add state render time if available
+        if(state.get(Tags.StateRenderTime, null) != null) {
+            String stateRenderTime = "State Render Time: " + state.get(Tags.StateRenderTime) + " ms";
+            htmlReportUtil.addHeading(4, stateRenderTime);
+        }
+
         // Add state URL if exists
         if(!state.get(WdTags.WebHref, "").isEmpty()) {
             String stateURL = state.get(WdTags.WebHref, "");

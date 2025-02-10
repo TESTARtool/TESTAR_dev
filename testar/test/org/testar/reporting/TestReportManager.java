@@ -45,6 +45,7 @@ public class TestReportManager {
 		state.set(Tags.ConcreteID, "stateConcreteID");
 		state.set(WdTags.WebHref, "https://testar.org");
 		state.set(Tags.ScreenshotPath, "imgPath");
+		state.set(Tags.StateRenderTime, 1.2);
 		derivedActions = new HashSet<>();
 
 		Action typeAction = new Type("typeAction");
@@ -106,6 +107,7 @@ public class TestReportManager {
 		Assert.assertTrue(fileContains("<title>TESTAR execution sequence report</title>", htmlReportFile));
 		Assert.assertTrue(fileContains("<h1>TESTAR execution sequence report for sequence 1</h1>", htmlReportFile));
 		Assert.assertTrue(fileContains("<h4>AbstractID=stateAbstractID || ConcreteID=stateConcreteID</h4>", htmlReportFile));
+		Assert.assertTrue(fileContains("<h4>State Render Time: 1.2 ms</h4>", htmlReportFile));
 		Assert.assertTrue(fileContains("<a href='https://testar.org' target='_blank'>https://testar.org</a>", htmlReportFile));
 		// Verify derived actions information
 		Assert.assertTrue(fileContains("<button type='button' class='collapsible'>Open to view the set of derived actions:</button>", htmlReportFile));

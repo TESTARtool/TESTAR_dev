@@ -41,6 +41,7 @@ public class WdRootElement extends WdElement {
   public boolean isForeground;
   public boolean hasStandardMouse;
   public boolean hasStandardKeyboard;
+  public double largestContentfulPaint;
   public String documentTitle;
 
   public WdRootElement() {
@@ -59,6 +60,13 @@ public class WdRootElement extends WdElement {
     isForeground = (Boolean) packedbody.get("documentHasFocus");
     documentTitle = (String) packedbody.get("documentTitle");
     blocked = false;
+
+    Object lcpTime = packedbody.get("largestContentfulPaint");
+    if (lcpTime instanceof Number) {
+    	largestContentfulPaint = ((Number) lcpTime).doubleValue();
+    } else {
+    	largestContentfulPaint = -1.0;
+    }
   }
 
   public WdElement at(double x, double y) {
