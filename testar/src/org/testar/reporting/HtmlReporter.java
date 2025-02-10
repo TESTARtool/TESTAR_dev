@@ -98,7 +98,7 @@ public class HtmlReporter implements Reporting
         // Add state URL if exists
         if(!state.get(WdTags.WebHref, "").isEmpty()) {
             String stateURL = state.get(WdTags.WebHref, "");
-            String htmlStateURL = "<a href='" + stateURL + "'target='_blank'>" + stateURL + "</a>";
+            String htmlStateURL = "<a href='" + stateURL + "' target='_blank'>" + stateURL + "</a>";
             htmlReportUtil.addContent(htmlStateURL);
         }
 
