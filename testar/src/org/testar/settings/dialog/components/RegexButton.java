@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2023 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2023 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -51,7 +51,12 @@ public class RegexButton extends JButton implements ActionListener {
 	public RegexButton(JTextArea textAreaRegex) {
 		this.textAreaRegex = textAreaRegex;
 		this.setText("Check Regex");
+		setSize(105, 27);
 		addActionListener(this);
+	}
+
+	public void setPosition(int x, int y) {
+		setLocation(x, y);
 	}
 
 	@Override

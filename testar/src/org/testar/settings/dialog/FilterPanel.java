@@ -63,7 +63,7 @@ public class FilterPanel extends SettingsPanel {
         filterLabel.setBounds(10, 5, 400, 27);
         add(filterLabel);
 
-        regexButtonClickFilter.setBounds(500, 5, 110, 27);
+        regexButtonClickFilter.setPosition(505, 5);
         add(regexButtonClickFilter);
 
         txtClickFilter.setLineWrap(true);
@@ -86,7 +86,7 @@ public class FilterPanel extends SettingsPanel {
         killProcessLabel.setBounds(10, 210, 400, 27);
         add(killProcessLabel);
         
-        regexButtonProcFilter.setBounds(500, 210, 110, 27);
+        regexButtonProcFilter.setPosition(505, 210);
         add(regexButtonProcFilter);
 
         txtProcessFilter.setLineWrap(true);

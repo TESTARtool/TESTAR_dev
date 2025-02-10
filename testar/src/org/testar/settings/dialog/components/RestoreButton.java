@@ -44,7 +44,12 @@ public class RestoreButton extends JButton implements ActionListener {
 	public RestoreButton(JTextArea textAreaRegex) {
 		this.textAreaRegex = textAreaRegex;
 		this.setText("Restore");
+		setSize(75, 27);
 		addActionListener(this);
+	}
+
+	public void setPosition(int x, int y) {
+		setLocation(x, y);
 	}
 
 	@Override
