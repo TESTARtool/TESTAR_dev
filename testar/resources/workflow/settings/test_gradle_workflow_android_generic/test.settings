@@ -99,6 +99,23 @@ ProcessesToKillDuringTest =
 ProtocolClass = test_gradle_workflow_android_generic/Protocol_test_gradle_workflow_android_generic
 
 #################################################################
+# State model inference settings
+#################################################################
+StateModelEnabled = true
+DataStore = OrientDB
+DataStoreType = plocal
+DataStoreServer = localhost
+DataStoreDirectory = orientdb-community-3.0.34/databases
+DataStoreDB = testar
+DataStoreUser = admin
+DataStorePassword = admin
+DataStoreMode = instant
+ApplicationName = android
+ApplicationVersion = 1
+ActionSelectionAlgorithm = unvisited
+StateModelStoreWidgets = true
+
+#################################################################
 # State identifier attributes
 #
 # Specify the widget attributes that you wish to use in constructing

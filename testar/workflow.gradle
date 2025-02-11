@@ -219,11 +219,6 @@ task downloadAndUnzipOrientDB(type: Copy, dependsOn: verifyOrientDB) {
     group = 'test_testar_workflow'
     description ='downloadAndUnzipOrientDB'
     
-    // Disable for non-Windows environments (Linux, osx)
-    if (!System.getProperty('os.name').toLowerCase().contains('windows')) {
-        return;
-    }
-    
     from zipTree(new File(downloadOrientDB.dest, 'orientdb-community-3.0.34.zip'))
     into downloadOrientDB.dest
 }
@@ -232,15 +227,17 @@ task createDatabaseOrientDB(type: Exec, dependsOn: downloadAndUnzipOrientDB){
     group = 'test_testar_workflow'
     description ='createDatabaseOrientDB'
     
-    // Disable for non-Windows environments (Linux, osx)
-    if (!System.getProperty('os.name').toLowerCase().contains('windows')) {
-        return;
-    }
     // Read command line output
     standardOutput = new ByteArrayOutputStream()
     errorOutput = new ByteArrayOutputStream()
     workingDir 'target/install/testar/bin/orientdb-community-3.0.34/bin'
-    commandLine 'cmd', '/c', 'console.bat CREATE DATABASE plocal:../databases/testar admin admin'
+    
+    if (System.getProperty('os.name').toLowerCase().contains('windows')) {
+        commandLine 'cmd', '/c', 'console.bat CREATE DATABASE plocal:../databases/testar admin admin'
+    } else {
+        commandLine 'bash', '-c', './console.sh CREATE DATABASE plocal:../databases/testar admin admin'
+    }
+
     // Ignore errors creating the database because we check the output buffer message
     ignoreExitValue true
     doLast {
@@ -311,13 +308,14 @@ task runTestDesktopGenericStateModelCustomAbstraction(type: Exec, dependsOn: cre
 // Windows OS
 // Verify that TESTAR correctly executes chromedriver
 // To be sure, connect to para.testar.org and detect .*[fF]orums.* suspicious tag ValuePattern
-task runTestWebdriverSuspiciousTag(type: Exec) {
+// Also, test the state model for web applications
+task runTestWebdriverSuspiciousTagStateModel(type: Exec, dependsOn: createDatabaseOrientDB) {
 	// Read command line output
     standardOutput = new ByteArrayOutputStream()
     group = 'test_testar_workflow'
-    description ='runTestWebdriverSuspiciousTag'
+    description ='runTestWebdriverSuspiciousTagStateModel'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_generic AlwaysCompile=true ApplicationName="webdriver_and_suspicious" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[fF]orums.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_generic AlwaysCompile=true ApplicationName="webdriver_suspicious_state_model" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[fF]orums.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
     doLast {
         String output = standardOutput.toString()
 
@@ -326,17 +324,25 @@ task runTestWebdriverSuspiciousTag(type: Exec) {
         } else {
             throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with WEB_DRIVER")
         }
+        
+        // Check that output contains abstract states in the State Model inference
+        if(output.readLines().any{line->line.contains("abstract states in the model")}) {
+            println "\n${output} \nTESTAR State Model has been inferred sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Inferring TESTAR State Model")
+        }
     }
 }
 
-// Linux OS
-task runTestWebdriverSuspiciousTagUbuntu(type: Exec) {
+// Linux OS: Verify that TESTAR correctly executes chromedriver
+// Also, test the state model for web applications
+task runTestWebdriverSuspiciousTagStateModelUbuntu(type: Exec, dependsOn: createDatabaseOrientDB) {
 	// Read command line output
     standardOutput = new ByteArrayOutputStream()
     group = 'test_testar_workflow'
-    description ='runTestWebdriverSuspiciousTagUbuntu'
+    description ='runTestWebdriverSuspiciousTagStateModelUbuntu'
     workingDir 'target/install/testar/bin'
-    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_webdriver_generic SUTConnectorValue=" ""/usr/local/share/chromedriver-linux64/chromedriver"" ""https://para.testar.org/parabank/cookies.htm"" " FlashFeedback=false AlwaysCompile=true ApplicationName="webdriver_and_suspicious" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[fF]orums.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
+    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_webdriver_generic SUTConnectorValue=" ""/usr/local/share/chromedriver-linux64/chromedriver"" ""https://para.testar.org/parabank/cookies.htm"" " FlashFeedback=false AlwaysCompile=true ApplicationName="webdriver_suspicious_state_model" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[fF]orums.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
     doLast {
         String output = standardOutput.toString()
 
@@ -344,18 +350,26 @@ task runTestWebdriverSuspiciousTagUbuntu(type: Exec) {
             println "\n${output} \nTESTAR has successfully connect with WEB_DRIVER and detected .*[fF]orums.* Suspicious Tag! "
         } else {
             throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with WEB_DRIVER")
+        }
+        
+        // Check that output contains abstract states in the State Model inference
+        if(output.readLines().any{line->line.contains("abstract states in the model")}) {
+            println "\n${output} \nTESTAR State Model has been inferred sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Inferring TESTAR State Model")
         }
     }
 }
 
 // macOS: Verify that TESTAR correctly executes chromedriver
-task runTestWebdriverSuspiciousTagMacOS(type: Exec) {
+// Also, test the state model for web applications
+task runTestWebdriverSuspiciousTagStateModelMacOS(type: Exec, dependsOn: createDatabaseOrientDB) {
 	// Read command line output
     standardOutput = new ByteArrayOutputStream()
     group = 'test_testar_workflow'
-    description ='runTestWebdriverSuspiciousTagMacOS'
+    description ='runTestWebdriverSuspiciousTagStateModelMacOS'
     workingDir 'target/install/testar/bin'
-    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_webdriver_generic SUTConnectorValue=" ""/usr/local/share/chromedriver-mac-arm64/chromedriver"" ""https://para.testar.org/parabank/cookies.htm"" " FlashFeedback=false AlwaysCompile=true ApplicationName="webdriver_and_suspicious" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[fF]orums.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
+    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_webdriver_generic SUTConnectorValue=" ""/usr/local/share/chromedriver-mac-arm64/chromedriver"" ""https://para.testar.org/parabank/cookies.htm"" " FlashFeedback=false AlwaysCompile=true ApplicationName="webdriver_suspicious_state_model" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[fF]orums.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
     doLast {
         String output = standardOutput.toString()
 
@@ -363,6 +377,13 @@ task runTestWebdriverSuspiciousTagMacOS(type: Exec) {
             println "\n${output} \nTESTAR has successfully connect with WEB_DRIVER and detected .*[fF]orums.* Suspicious Tag! "
         } else {
             throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with WEB_DRIVER")
+        }
+        
+        // Check that output contains abstract states in the State Model inference
+        if(output.readLines().any{line->line.contains("abstract states in the model")}) {
+            println "\n${output} \nTESTAR State Model has been inferred sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Inferring TESTAR State Model")
         }
     }
 }
@@ -488,13 +509,14 @@ task runTestAndroidGenericOk(type: Exec, dependsOn:'installDist') {
 }
 
 // Run an Android test (inside an Ubuntu environment) to detect a suspicious message
-task runTestAndroidGenericSuspiciousTag(type: Exec, dependsOn:'installDist') {
+// Also, test the state model for web applications
+task runTestAndroidGenericSuspiciousTagStateModel(type: Exec, dependsOn: createDatabaseOrientDB) {
 	// Read command line output
     standardOutput = new ByteArrayOutputStream()
     group = 'test_testar_workflow'
     description ='runTestAndroidGenericSuspiciousTag'
     workingDir 'target/install/testar/bin'
-    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_android_generic FlashFeedback=false AlwaysCompile=true ApplicationName="android_suspicious" TagsForSuspiciousOracle="NotExist;UIAAutomationId;Title" SuspiciousTags=".*NFC.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=1'
+    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_android_generic FlashFeedback=false AlwaysCompile=true ApplicationName="android_suspicious_state_model" TagsForSuspiciousOracle="NotExist;UIAAutomationId;Title" SuspiciousTags=".*NFC.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=1'
     doLast {
         String output = standardOutput.toString()
 
@@ -503,6 +525,13 @@ task runTestAndroidGenericSuspiciousTag(type: Exec, dependsOn:'installDist') {
             println "\n${output} \nTESTAR has successfully detected NFC Suspicious Tag using TagsForSuspiciousOracle Title! "
         } else {
             throw new GradleException("\n${output} \nERROR: TESTAR didnt detect NFC Suspicious Tag using TagsForSuspiciousOracle Title")
+        }
+        
+        // Check that output contains abstract states in the State Model inference
+        if(output.readLines().any{line->line.contains("abstract states in the model")}) {
+            println "\n${output} \nTESTAR State Model has been inferred sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Inferring TESTAR State Model")
         }
     }
 }
