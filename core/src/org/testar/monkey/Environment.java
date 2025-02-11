@@ -43,10 +43,10 @@ public class Environment {
 
     /**
      * Get the environment interface.
-     * @return The environment interface.
+     * @return The environment interface or UnknownEnvironment.
      */
     public static IEnvironment getInstance() {
-        return instance;
+    	return (instance != null) ? instance : new UnknownEnvironment();
     }
 
     /**

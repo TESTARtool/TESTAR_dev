@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2017 - 2024 Open Universiteit - www.ou.nl
-* Copyright (c) 2017 - 2024 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2017 - 2025 Open Universiteit - www.ou.nl
+* Copyright (c) 2017 - 2025 Universitat Politecnica de Valencia - www.upv.es
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -33,6 +33,8 @@ package org.testar.settings.dialog;
 
 import org.testar.CodingManager;
 import org.testar.StateManagementTags;
+
+import org.testar.statemodel.StateModelTags;
 import org.testar.statemodel.analysis.AnalysisManager;
 import org.testar.statemodel.analysis.webserver.JettyServer;
 import org.testar.statemodel.persistence.orientdb.entity.Config;
@@ -251,22 +253,22 @@ public class StateModelPanel extends SettingsPanel {
      * @param settings The settings to load.
      */
     public void populateFrom(final Settings settings) {
-        stateModelEnabledChkBox.setSelected(settings.get(ConfigTags.StateModelEnabled));
-        stateModelWidgetStoreChkBox.setSelected(settings.get(ConfigTags.StateModelStoreWidgets));
-        dataStoreTextfield.setText(settings.get(ConfigTags.DataStore));
-        dataStoreServerTextfield.setText(settings.get(ConfigTags.DataStoreServer));
-        dataStoreDirectoryField.setText(settings.get(ConfigTags.DataStoreDirectory));
-        dataStoreDBTextfield.setText(settings.get(ConfigTags.DataStoreDB));
-        dataStoreUserTextfield.setText(settings.get(ConfigTags.DataStoreUser));
-        dataStorePasswordfield.setText(settings.get(ConfigTags.DataStorePassword));
+        stateModelEnabledChkBox.setSelected(settings.get(StateModelTags.StateModelEnabled));
+        stateModelWidgetStoreChkBox.setSelected(settings.get(StateModelTags.StateModelStoreWidgets));
+        dataStoreTextfield.setText(settings.get(StateModelTags.DataStore));
+        dataStoreServerTextfield.setText(settings.get(StateModelTags.DataStoreServer));
+        dataStoreDirectoryField.setText(settings.get(StateModelTags.DataStoreDirectory));
+        dataStoreDBTextfield.setText(settings.get(StateModelTags.DataStoreDB));
+        dataStoreUserTextfield.setText(settings.get(StateModelTags.DataStoreUser));
+        dataStorePasswordfield.setText(settings.get(StateModelTags.DataStorePassword));
         for (int i =0; i < dataStoreModeBox.getItemCount(); i++) {
-            if (dataStoreModeBox.getItemAt(i).equals(settings.get(ConfigTags.DataStoreMode))) {
+            if (dataStoreModeBox.getItemAt(i).equals(settings.get(StateModelTags.DataStoreMode))) {
                 dataStoreModeBox.setSelectedIndex(i);
                 break;
             }
         }
         for (int i=0; i < dataStoreTypeBox.getItemCount(); i++) {
-            if (dataStoreTypeBox.getItemAt(i).equals(settings.get(ConfigTags.DataStoreType))) {
+            if (dataStoreTypeBox.getItemAt(i).equals(settings.get(StateModelTags.DataStoreType))) {
                 dataStoreTypeBox.setSelectedIndex(i);
             }
         }
@@ -291,7 +293,7 @@ public class StateModelPanel extends SettingsPanel {
         }
 
         // for now, only two options, so we'll do this the quick and easy way, without creating a list model
-        String currentAlgorithm = settings.get(ConfigTags.ActionSelectionAlgorithm);
+        String currentAlgorithm = settings.get(StateModelTags.ActionSelectionAlgorithm);
         for (int i =0; i < actionSelectionBox.getItemCount(); i++) {
             if (actionSelectionBox.getItemAt(i).equals("Random selection") && currentAlgorithm.equals("random")) {
                 actionSelectionBox.setSelectedIndex(i);
@@ -310,25 +312,25 @@ public class StateModelPanel extends SettingsPanel {
      * @param settings reference to the object where the settings will be stored.
      */
     public void extractInformation(final Settings settings) {
-        settings.set(ConfigTags.StateModelEnabled, stateModelEnabledChkBox.isSelected());
-        settings.set(ConfigTags.StateModelStoreWidgets, stateModelWidgetStoreChkBox.isSelected());
-        settings.set(ConfigTags.DataStore, dataStoreTextfield.getText());
-        settings.set(ConfigTags.DataStoreServer, dataStoreServerTextfield.getText());
-        settings.set(ConfigTags.DataStoreDirectory, dataStoreDirectoryField.getText());
-        settings.set(ConfigTags.DataStoreDB, dataStoreDBTextfield.getText());
-        settings.set(ConfigTags.DataStoreUser, dataStoreUserTextfield.getText());
-        settings.set(ConfigTags.DataStorePassword, getPassword());
-        settings.set(ConfigTags.DataStoreMode, (String)dataStoreModeBox.getSelectedItem());
-        settings.set(ConfigTags.DataStoreType, (String)dataStoreTypeBox.getSelectedItem());
-        settings.set(ConfigTags.ResetDataStore, resetDatabaseCheckbox.isSelected());
+        settings.set(StateModelTags.StateModelEnabled, stateModelEnabledChkBox.isSelected());
+        settings.set(StateModelTags.StateModelStoreWidgets, stateModelWidgetStoreChkBox.isSelected());
+        settings.set(StateModelTags.DataStore, dataStoreTextfield.getText());
+        settings.set(StateModelTags.DataStoreServer, dataStoreServerTextfield.getText());
+        settings.set(StateModelTags.DataStoreDirectory, dataStoreDirectoryField.getText());
+        settings.set(StateModelTags.DataStoreDB, dataStoreDBTextfield.getText());
+        settings.set(StateModelTags.DataStoreUser, dataStoreUserTextfield.getText());
+        settings.set(StateModelTags.DataStorePassword, getPassword());
+        settings.set(StateModelTags.DataStoreMode, (String)dataStoreModeBox.getSelectedItem());
+        settings.set(StateModelTags.DataStoreType, (String)dataStoreTypeBox.getSelectedItem());
+        settings.set(StateModelTags.ResetDataStore, resetDatabaseCheckbox.isSelected());
         settings.set(ConfigTags.AbstractStateAttributes, Arrays.stream(selectedStateManagementTags).map(StateManagementTags::getSettingsStringFromTag).collect(Collectors.toList()));
         switch ((String) actionSelectionBox.getSelectedItem()) {
             case "Unvisited actions first":
-                settings.set(ConfigTags.ActionSelectionAlgorithm, "unvisited");
+                settings.set(StateModelTags.ActionSelectionAlgorithm, "unvisited");
                 break;
 
             default:
-                settings.set(ConfigTags.ActionSelectionAlgorithm, "random");
+                settings.set(StateModelTags.ActionSelectionAlgorithm, "random");
         }
     }
 
