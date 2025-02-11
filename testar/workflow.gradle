@@ -495,7 +495,7 @@ task runTestAndroidGenericOk(type: Exec, dependsOn:'installDist') {
     group = 'test_testar_workflow'
     description ='runTestAndroidGenericOk'
     workingDir 'target/install/testar/bin'
-    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_android_generic FlashFeedback=false AlwaysCompile=true ApplicationName="android_ok" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=1'
+    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_android_generic FlashFeedback=false AlwaysCompile=true ApplicationName="android_ok" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=1 StateModelEnabled=false'
     doLast {
         String output = standardOutput.toString()
 
@@ -516,7 +516,7 @@ task runTestAndroidGenericSuspiciousTagStateModel(type: Exec, dependsOn: createD
     group = 'test_testar_workflow'
     description ='runTestAndroidGenericSuspiciousTag'
     workingDir 'target/install/testar/bin'
-    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_android_generic FlashFeedback=false AlwaysCompile=true ApplicationName="android_suspicious_state_model" TagsForSuspiciousOracle="NotExist;UIAAutomationId;Title" SuspiciousTags=".*NFC.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=1'
+    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_android_generic FlashFeedback=false AlwaysCompile=true ApplicationName="android_suspicious_state_model" TagsForSuspiciousOracle="NotExist;UIAAutomationId;Title" SuspiciousTags=".*NFC.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=1 StateModelEnabled=true'
     doLast {
         String output = standardOutput.toString()
 
