@@ -61,7 +61,7 @@ public abstract class ConcreteStateFactory {
         // get a screenshot for this concrete state
         ByteArrayOutputStream screenshotBytes = new ByteArrayOutputStream();
 
-        AWTCanvas screenshot = ProtocolUtil.getStateshotBinary(newState);
+        AWTCanvas screenshot = newState.get(Tags.ScreenshotImage, ProtocolUtil.getStateshotBinary(newState));
 
         try {
             screenshot.saveAsPng(screenshotBytes);

@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2016 - 2024 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2019 - 2024 Open Universiteit - www.ou.nl
+* Copyright (c) 2016 - 2025 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2019 - 2025 Open Universiteit - www.ou.nl
 * 
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -250,21 +250,29 @@ public class ProtocolUtil {
 				viewPort = null;
 		}
 
-		//If the state Shape is not properly obtained, or the State has an error, use full monitor screen
+		// If the state Shape is not properly obtained, or the State has an error, use full monitor screen
 		if (viewPort == null || (state.get(Tags.OracleVerdict, Verdict.OK).severity() > Verdict.SEVERITY_OK))
 			viewPort = state.get(Tags.Shape, null); // get the SUT process canvas (usually, full monitor screen)
 
 		// Validate viewport dimensions before taking the screenshot
-		if (viewPort == null || viewPort.width() <= 0 || viewPort.height() <= 0)
-			return null;
-
-		// Capture and return the screenshot
-		return AWTCanvas.fromScreenshot(
-				Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height()),
-				getRootWindowHandle(state),
-				AWTCanvas.StorageFormat.PNG,
-				1
-				);
+		if (viewPort == null || viewPort.width() <= 0 || viewPort.height() <= 0) {
+			// If viewport is still null, get a screenshot of all the screen
+			Rectangle screenRect = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+			return AWTCanvas.fromScreenshot(
+					Rect.from(screenRect.x, screenRect.y, screenRect.width, screenRect.height),
+					getRootWindowHandle(state),
+					AWTCanvas.StorageFormat.PNG,
+					1
+					);
+		} else {
+			// Capture and return the viewport screenshot
+			return AWTCanvas.fromScreenshot(
+					Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height()),
+					getRootWindowHandle(state),
+					AWTCanvas.StorageFormat.PNG,
+					1
+					);
+		}
 	}
 
 	public static String getActionshot(State state, Action action){
