@@ -822,24 +822,27 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * Take a Screenshot of the State and associate the path into state tag
 	 */
 	private void setStateScreenshot(State state) {
-		AWTCanvas screenshot = null;
-		if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
-			screenshot = WdProtocolUtil.getStateshotBinary(state);
-		}
-		else if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
-			screenshot = AndroidProtocolUtil.getStateshotBinary(state);
-		}
-		else if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
-			screenshot = IOSProtocolUtil.getStateshotBinary(state);
-		}
-		else {
-			screenshot = ProtocolUtil.getStateshotBinary(state);
-		}
+		// If the environment is not headless, take a screenshot
+		if (!GraphicsEnvironment.isHeadless()) {
+			AWTCanvas screenshot = null;
+			if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
+				screenshot = WdProtocolUtil.getStateshotBinary(state);
+			}
+			else if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
+				screenshot = AndroidProtocolUtil.getStateshotBinary(state);
+			}
+			else if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
+				screenshot = IOSProtocolUtil.getStateshotBinary(state);
+			}
+			else {
+				screenshot = ProtocolUtil.getStateshotBinary(state);
+			}
 
-		if(screenshot != null) {
-			String screenshotPath = ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), screenshot);
-			state.set(Tags.ScreenshotImage, screenshot);
-			state.set(Tags.ScreenshotPath, screenshotPath);
+			if(screenshot != null) {
+				String screenshotPath = ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), screenshot);
+				state.set(Tags.ScreenshotImage, screenshot);
+				state.set(Tags.ScreenshotPath, screenshotPath);
+			}
 		}
 	}
 

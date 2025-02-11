@@ -30,7 +30,6 @@
 
 package org.testar.statemodel;
 
-import org.testar.ProtocolUtil;
 import org.testar.monkey.alayer.AWTCanvas;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tag;
@@ -59,16 +58,17 @@ public abstract class ConcreteStateFactory {
         }
 
         // get a screenshot for this concrete state
-        ByteArrayOutputStream screenshotBytes = new ByteArrayOutputStream();
-
-        AWTCanvas screenshot = newState.get(Tags.ScreenshotImage, ProtocolUtil.getStateshotBinary(newState));
-
-        try {
-            screenshot.saveAsPng(screenshotBytes);
-        } catch (IOException e) {
-            e.printStackTrace();
+        // in a headless environment, there may not be screenshots
+        if(newState.get(Tags.ScreenshotImage, null) != null) {
+        	ByteArrayOutputStream screenshotBytes = new ByteArrayOutputStream();
+        	AWTCanvas screenshot = newState.get(Tags.ScreenshotImage);
+        	try {
+        		screenshot.saveAsPng(screenshotBytes);
+        	} catch (IOException e) {
+        		e.printStackTrace();
+        	}
+        	concreteState.setScreenshot(screenshotBytes.toByteArray());
         }
-        concreteState.setScreenshot(screenshotBytes.toByteArray());
 
         return concreteState;
     }
