@@ -110,7 +110,7 @@ public class TestReportManager {
 		Assert.assertTrue(fileContains("<h4>State Render Time: 1.2 ms</h4>", htmlReportFile));
 		Assert.assertTrue(fileContains("<a href='https://testar.org' target='_blank'>https://testar.org</a>", htmlReportFile));
 		// Verify derived actions information
-		Assert.assertTrue(fileContains("<button type='button' class='collapsible'>Open to view the set of derived actions:</button>", htmlReportFile));
+		Assert.assertTrue(fileContains("<button type='button' class='collapsible'>Click to view the set of derived actions:</button>", htmlReportFile));
 		Assert.assertTrue(fileContains("<b>typeActionDescription</b>", htmlReportFile));
 		Assert.assertTrue(fileContains("<b>pasteActionDescription</b>", htmlReportFile));
 		Assert.assertTrue(fileContains("<b>NoActionDescriptionAvailable</b>", htmlReportFile));
