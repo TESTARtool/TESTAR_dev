@@ -39,6 +39,8 @@ import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -95,6 +97,10 @@ public class HtmlReporter implements Reporting
         String stateIDs = "AbstractID=" + abstractID +  " || " + "ConcreteID=" + concreteID;
         htmlReportUtil.addHeading(4, stateIDs);
 
+        // Add the timestamp this state was discover
+        String formattedTimestamp = DateTimeFormatter.ISO_INSTANT.format(Instant.ofEpochMilli(state.get(Tags.TimeStamp, 0L)));
+        htmlReportUtil.addHeading(4, "TimeStamp: " + formattedTimestamp);
+
         // Add state render time if available
         if(state.get(Tags.StateRenderTime, null) != null) {
             String stateRenderTime = "State Render Time: " + state.get(Tags.StateRenderTime) + " ms";
@@ -148,7 +154,7 @@ public class HtmlReporter implements Reporting
     public void addActions(Set<Action> actions)
     {
         htmlReportUtil.addContent(openBlockContainer); // Open derived actions block container
-        htmlReportUtil.addButton("collapsible", "Open to view the set of derived actions:");
+        htmlReportUtil.addButton("collapsible", "Click to view the set of derived actions:");
         htmlReportUtil.addContent(openCollapsibleContainer); // Open actions collapsible container
 
         ArrayList<String> actionStrings = new ArrayList<>();

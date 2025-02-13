@@ -47,9 +47,14 @@ public class HtmlHelper {
         // Collapsible function
         scriptJoiner.add("function toggleCollapsible(){");
         scriptJoiner.add("document.querySelectorAll('.collapsible').forEach(btn => {");
-        scriptJoiner.add("btn.addEventListener('click', function() {");
+        scriptJoiner.add("btn.addEventListener('click', function() {"); // Click event listener
+        scriptJoiner.add("this.classList.toggle('active');"); // Toogle the triangle dropdown icon
         scriptJoiner.add("let content = this.nextElementSibling;");
-        scriptJoiner.add("content.style.display = (content.style.display === 'block') ? 'none' : 'block';");
+        scriptJoiner.add("if (content.style.maxHeight) {");
+        scriptJoiner.add("content.style.maxHeight = null;");
+        scriptJoiner.add("} else {");
+        scriptJoiner.add("content.style.maxHeight = content.scrollHeight + 'px';");
+        scriptJoiner.add("}");  
         scriptJoiner.add("}); }); }");
         scriptJoiner.add("document.addEventListener('DOMContentLoaded', toggleCollapsible);");
 
@@ -100,11 +105,25 @@ public class HtmlHelper {
 
         styleJoiner.add(".active, .collapsible:hover {}");
 
+        styleJoiner.add(".collapsible:after {");
+        styleJoiner.add("content: '\\25B6';");
+        styleJoiner.add("color: black;");
+        styleJoiner.add("font-weight: bold;");
+        styleJoiner.add("float: left;");
+        styleJoiner.add("margin-left: 2px;");
+        styleJoiner.add("margin-right: 10px;");
+        styleJoiner.add("}");
+
+        styleJoiner.add(".collapsible.active:after {");
+        styleJoiner.add("content: '\\25BC';");
+        styleJoiner.add("}");
+
         styleJoiner.add(".collapsibleContent {");
         styleJoiner.add("padding: 0 15px;");
-        styleJoiner.add("display: none;");
+        styleJoiner.add("max-height: 0;");
         styleJoiner.add("overflow: hidden;");
         styleJoiner.add("border-radius: 4px;");
+        styleJoiner.add("transition: max-height 0.3s ease-out;");
         styleJoiner.add("}");
 
         return styleJoiner.toString();
