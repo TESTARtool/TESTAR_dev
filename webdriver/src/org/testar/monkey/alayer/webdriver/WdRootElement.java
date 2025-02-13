@@ -30,6 +30,8 @@
 
 package org.testar.monkey.alayer.webdriver;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Map;
 
 public class WdRootElement extends WdElement {
@@ -64,6 +66,9 @@ public class WdRootElement extends WdElement {
     Object lcpTime = packedbody.get("largestContentfulPaint");
     if (lcpTime instanceof Number) {
     	largestContentfulPaint = ((Number) lcpTime).doubleValue();
+    	largestContentfulPaint = BigDecimal.valueOf(largestContentfulPaint)
+    			.setScale(3, RoundingMode.HALF_UP)
+    			.doubleValue();
     } else {
     	largestContentfulPaint = -1.0;
     }
