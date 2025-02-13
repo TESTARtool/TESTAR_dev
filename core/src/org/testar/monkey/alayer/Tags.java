@@ -213,5 +213,11 @@ public final class Tags extends TagsBase {
 	 * The original widget that can be attached to things like actions
 	 */
 	public static final Tag<Widget> OriginWidget = from("OriginWidget", Widget.class);
-	
+
+	/**
+	 * Provides timing information about the state rendering process, 
+	 * measuring when the main content becomes visible or ready for interaction. 
+	 */
+	public static final Tag<Double> StateRenderTime = from("StateRenderTime", Double.class);
+
 }

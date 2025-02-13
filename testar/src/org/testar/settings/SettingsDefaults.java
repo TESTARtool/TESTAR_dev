@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2023 - 2024 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2023 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2023 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2023 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -144,13 +144,13 @@ public class SettingsDefaults {
 			}
 		}));
 
-		defaults.add(Pair.from(DomainsAllowed, new ArrayList<String>() {
+		defaults.add(Pair.from(WebDomainsAllowed, new ArrayList<String>() {
 			{
 				add("www.ou.nl");
-				add("mijn.awo.ou.nl");
-				add("login.awo.ou.nl");
 			}
 		}));
+
+		defaults.add(Pair.from(WebPathsAllowed, ".*home.*|.*onderwijs.*|.*onderzoek.*"));
 
 		defaults.add(Pair.from(TagsToFilter, new ArrayList<String>() {
 			{

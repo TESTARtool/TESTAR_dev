@@ -33,6 +33,7 @@ package org.testar.settings.dialog;
 
 import org.testar.monkey.*;
 import org.testar.settings.Settings;
+import org.testar.settings.dialog.components.UndoTextArea;
 
 import javax.swing.*;
 import java.awt.*;
@@ -50,7 +51,7 @@ public class GeneralPanel extends SettingsPanel implements Observer {
 
   private Settings settings;
   private JComboBox<String> cboxSUTconnector;
-  private JTextArea txtSutPath;
+  private UndoTextArea txtSutPath = new UndoTextArea();
   private JSpinner spnNumSequences;
   private JSpinner spnSequenceLength;
   //private JCheckBox checkStopOnFault;
@@ -88,7 +89,6 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     cboxSUTconnector.setMaximumRowCount(3);
     add(cboxSUTconnector);
 
-    txtSutPath = new JTextArea();
     txtSutPath.setLineWrap(true);
     txtSutPath.setToolTipText(ToolTipTexts.sutPathTTT);
 
@@ -254,7 +254,7 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     cboxSUTconnector.setSelectedItem(settings.get(ConfigTags.SUTConnector));
     //checkStopOnFault.setSelected(settings.get(ConfigTags.StopGenerationOnFault));
     checkActionVisualization.setSelected(settings.get(ConfigTags.VisualizeActions));
-    txtSutPath.setText(settings.get(ConfigTags.SUTConnectorValue));
+    txtSutPath.setInitialText(settings.get(ConfigTags.SUTConnectorValue));
     comboBoxProtocol.setSelectedItem(settings.get(ConfigTags.ProtocolClass).split("/")[0]);
     spnNumSequences.setValue(settings.get(ConfigTags.Sequences));
     spnSequenceLength.setValue(settings.get(ConfigTags.SequenceLength));

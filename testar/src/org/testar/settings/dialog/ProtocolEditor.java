@@ -56,7 +56,15 @@ public class ProtocolEditor extends javax.swing.JDialog {
 		enableDefaultSyntaxKit();
 		initComponents();
 		codeEditor.setContentType("text/java");
-		codeEditor.setText(Util.readFile(getProtocolFile()));
+		File protocolFile = getProtocolFile();
+		if(!protocolFile.exists()) {
+			String msg = "No protocol java files found in '" + protocolClass + "'"
+					+ System.getProperty("line.separator")
+					+ "Please, edit the test.settings file and update the ProtocolClass setting adequately";
+			System.err.println(msg);
+		} else {
+			codeEditor.setText(Util.readFile(protocolFile));
+		}
 	}
 
 	/**
@@ -166,14 +174,12 @@ public class ProtocolEditor extends javax.swing.JDialog {
 	}
 
 	private File getProtocolFile() {
-		File protocolFile ;
 		if (Paths.get(protocolClass).isAbsolute()) {
-			protocolFile = new File(protocolClass + ".java");
+			return new File(protocolClass + ".java");
 		}
 		else {
-			protocolFile = new File(settingsDir + protocolClass + ".java");
+			return new File(settingsDir + protocolClass + ".java");
 		}
-		return protocolFile;
 	}
 
 	private void btnCompileActionPerformed(java.awt.event.ActionEvent evt) {

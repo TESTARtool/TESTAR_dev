@@ -238,7 +238,8 @@ public class SettingsFileStructure {
 				, "# ClickableClasses: " + ConfigTags.ClickableClasses.getDescription()
 				, "# TypeableClasses: " + ConfigTags.TypeableClasses.getDescription()
 				, "# DeniedExtensions: " + ConfigTags.DeniedExtensions.getDescription()
-				, "# DomainsAllowed: " + ConfigTags.DomainsAllowed.getDescription()
+				, "# WebDomainsAllowed: " + ConfigTags.WebDomainsAllowed.getDescription()
+				, "# WebPathsAllowed: " + ConfigTags.WebPathsAllowed.getDescription()
 				, "# FollowLinks: " + ConfigTags.FollowLinks.getDescription()
 				, "# BrowserFullScreen: " + ConfigTags.BrowserFullScreen.getDescription()
 				, "# SwitchNewTabs: " + ConfigTags.SwitchNewTabs.getDescription()
@@ -247,7 +248,8 @@ public class SettingsFileStructure {
 				, ConfigTags.ClickableClasses.name() + " = "
 				, ConfigTags.TypeableClasses.name() + " = "
 				, ConfigTags.DeniedExtensions.name() + " = "
-				, ConfigTags.DomainsAllowed.name() + " = "
+				, ConfigTags.WebDomainsAllowed.name() + " = "
+				, ConfigTags.WebPathsAllowed.name() + " = "
 				, ConfigTags.FollowLinks.name() + " = "
 				, ConfigTags.BrowserFullScreen.name() + " = "
 				, ConfigTags.SwitchNewTabs.name() + " = "
