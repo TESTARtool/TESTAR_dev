@@ -12,11 +12,5 @@ repositories {
 dependencies {
     implementation project(':core')
     implementation project(':webdriver')
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
     antlr "org.antlr:antlr4:4.13.1"
-}
-
-test {
-    useJUnitPlatform()
 }
