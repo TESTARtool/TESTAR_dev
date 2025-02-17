@@ -92,6 +92,42 @@ public interface OraclesListener extends ParseTreeListener {
 	 */
 	void exitNotExpr(OraclesParser.NotExprContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code orOprExpr}
+	 * labeled alternative in {@link OraclesParser#bool_expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterOrOprExpr(OraclesParser.OrOprExprContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code orOprExpr}
+	 * labeled alternative in {@link OraclesParser#bool_expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitOrOprExpr(OraclesParser.OrOprExprContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code xorOprExpr}
+	 * labeled alternative in {@link OraclesParser#bool_expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterXorOprExpr(OraclesParser.XorOprExprContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code xorOprExpr}
+	 * labeled alternative in {@link OraclesParser#bool_expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitXorOprExpr(OraclesParser.XorOprExprContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code andOprExpr}
+	 * labeled alternative in {@link OraclesParser#bool_expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterAndOprExpr(OraclesParser.AndOprExprContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code andOprExpr}
+	 * labeled alternative in {@link OraclesParser#bool_expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitAndOprExpr(OraclesParser.AndOprExprContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code parenExpr}
 	 * labeled alternative in {@link OraclesParser#bool_expr}.
 	 * @param ctx the parse tree
@@ -128,15 +164,65 @@ public interface OraclesListener extends ParseTreeListener {
 	 */
 	void exitPropertyBool(OraclesParser.PropertyBoolContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link OraclesParser#property_line}.
+	 * Enter a parse tree produced by the {@code hasProperty}
+	 * labeled alternative in {@link OraclesParser#property_line}.
 	 * @param ctx the parse tree
 	 */
-	void enterProperty_line(OraclesParser.Property_lineContext ctx);
+	void enterHasProperty(OraclesParser.HasPropertyContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link OraclesParser#property_line}.
+	 * Exit a parse tree produced by the {@code hasProperty}
+	 * labeled alternative in {@link OraclesParser#property_line}.
 	 * @param ctx the parse tree
 	 */
-	void exitProperty_line(OraclesParser.Property_lineContext ctx);
+	void exitHasProperty(OraclesParser.HasPropertyContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code propIs}
+	 * labeled alternative in {@link OraclesParser#property_line}.
+	 * @param ctx the parse tree
+	 */
+	void enterPropIs(OraclesParser.PropIsContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code propIs}
+	 * labeled alternative in {@link OraclesParser#property_line}.
+	 * @param ctx the parse tree
+	 */
+	void exitPropIs(OraclesParser.PropIsContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code propContains}
+	 * labeled alternative in {@link OraclesParser#property_line}.
+	 * @param ctx the parse tree
+	 */
+	void enterPropContains(OraclesParser.PropContainsContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code propContains}
+	 * labeled alternative in {@link OraclesParser#property_line}.
+	 * @param ctx the parse tree
+	 */
+	void exitPropContains(OraclesParser.PropContainsContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code propIsInList}
+	 * labeled alternative in {@link OraclesParser#property_line}.
+	 * @param ctx the parse tree
+	 */
+	void enterPropIsInList(OraclesParser.PropIsInListContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code propIsInList}
+	 * labeled alternative in {@link OraclesParser#property_line}.
+	 * @param ctx the parse tree
+	 */
+	void exitPropIsInList(OraclesParser.PropIsInListContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code widgetIsWidget}
+	 * labeled alternative in {@link OraclesParser#property_line}.
+	 * @param ctx the parse tree
+	 */
+	void enterWidgetIsWidget(OraclesParser.WidgetIsWidgetContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code widgetIsWidget}
+	 * labeled alternative in {@link OraclesParser#property_line}.
+	 * @param ctx the parse tree
+	 */
+	void exitWidgetIsWidget(OraclesParser.WidgetIsWidgetContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link OraclesParser#string}.
 	 * @param ctx the parse tree

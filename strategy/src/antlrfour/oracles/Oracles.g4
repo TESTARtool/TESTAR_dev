@@ -15,18 +15,21 @@ trigger_block: TRIGGER BOOL basic_string;
 
 property_block: bool_expr;
 
-bool_expr:           LP bool_expr RP                                    #parenExpr
-|                       NOT bool_expr                                   #notExpr
-| left=bool_expr  opr=( AND | COMMA | XOR | OR | IS ) right=bool_expr   #boolOprExpr
-|                       BOOL                                            #plainBool
-|                       property_line                                   #propertyBool
+bool_expr:          LP  bool_expr   RP                      #parenExpr
+|                   NOT bool_expr                           #notExpr
+| left=bool_expr    opr=( AND | COMMA ) right=bool_expr     #andOprExpr
+| left=bool_expr    opr=XOR             right=bool_expr     #xorOprExpr
+| left=bool_expr    opr=OR              right=bool_expr     #orOprExpr
+| left=bool_expr    opr=IS              right=bool_expr     #boolOprExpr
+|                       BOOL                                #plainBool
+|                       property_line                       #propertyBool
 ;
 
-property_line:    HAS property_string
-| property_string IS ( BASE_STRING | BOOL )
-| property_string CONTAINS BASE_STRING
-| property_string IN list
-| WIDGET BASE_STRING ('='|'==') WIDGET BASE_STRING
+property_line:    HAS property_string                   #hasProperty
+| property_string IS ( BASE_STRING | BOOL )             #propIs
+| property_string CONTAINS BASE_STRING                  #propContains
+| property_string IS IN list                            #propIsInList
+| WIDGET BASE_STRING ('='|'==') WIDGET BASE_STRING      #widgetIsWidget
 ;
 
 

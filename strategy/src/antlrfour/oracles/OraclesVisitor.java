@@ -61,6 +61,27 @@ public interface OraclesVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitNotExpr(OraclesParser.NotExprContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code orOprExpr}
+	 * labeled alternative in {@link OraclesParser#bool_expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOrOprExpr(OraclesParser.OrOprExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code xorOprExpr}
+	 * labeled alternative in {@link OraclesParser#bool_expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitXorOprExpr(OraclesParser.XorOprExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code andOprExpr}
+	 * labeled alternative in {@link OraclesParser#bool_expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAndOprExpr(OraclesParser.AndOprExprContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code parenExpr}
 	 * labeled alternative in {@link OraclesParser#bool_expr}.
 	 * @param ctx the parse tree
@@ -82,11 +103,40 @@ public interface OraclesVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitPropertyBool(OraclesParser.PropertyBoolContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link OraclesParser#property_line}.
+	 * Visit a parse tree produced by the {@code hasProperty}
+	 * labeled alternative in {@link OraclesParser#property_line}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitProperty_line(OraclesParser.Property_lineContext ctx);
+	T visitHasProperty(OraclesParser.HasPropertyContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code propIs}
+	 * labeled alternative in {@link OraclesParser#property_line}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPropIs(OraclesParser.PropIsContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code propContains}
+	 * labeled alternative in {@link OraclesParser#property_line}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPropContains(OraclesParser.PropContainsContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code propIsInList}
+	 * labeled alternative in {@link OraclesParser#property_line}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPropIsInList(OraclesParser.PropIsInListContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code widgetIsWidget}
+	 * labeled alternative in {@link OraclesParser#property_line}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitWidgetIsWidget(OraclesParser.WidgetIsWidgetContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link OraclesParser#string}.
 	 * @param ctx the parse tree
