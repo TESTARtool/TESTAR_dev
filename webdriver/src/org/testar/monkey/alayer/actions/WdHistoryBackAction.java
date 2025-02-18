@@ -42,6 +42,11 @@ public class WdHistoryBackAction extends TaggableBase implements Action {
 	  this.set(Tags.Desc, "Execute Webdriver script to load the previous URL in the history list");
   }
 
+  public WdHistoryBackAction(State state) {
+	  this();
+	  this.set(Tags.OriginWidget, state);
+  }
+
   @Override
   public void run(SUT system, State state, double duration)
       throws ActionFailedException {
