@@ -182,7 +182,8 @@ LlmTestGoals = Log in with the username john and the password demo to see the ac
 # ClickableClasses: Indicate which web CSS classes need to be considered clickable
 # TypeableClasses: Indicate which web CSS classes need to be considered typeable
 # DeniedExtensions: Indicate which web URL extensions need to be ignored when testing
-# DomainsAllowed: Indicate which web URL domains need to be ignored when testing
+# WebDomainsAllowed: Indicate which web URL domains are allowed to explore when testing
+# WebPathsAllowed: Regular expressions to indicate which web URL paths are allowed to explore when testing
 # FollowLinks: Indicate if allowing to follow links opened in new tabs
 # BrowserFullScreen: Indicate if perform the web testing with the browser in full screen
 # SwitchNewTabs: Indicate if switch to a new web tab if opened
@@ -191,7 +192,8 @@ LlmTestGoals = Log in with the username john and the password demo to see the ac
 ClickableClasses = 
 TypeableClasses = 
 DeniedExtensions = pdf;jpg;png;pfx;xml
-DomainsAllowed = para.testar.org
+WebDomainsAllowed = para.testar.org
+WebPathsAllowed = null
 FollowLinks = false
 BrowserFullScreen = true
 SwitchNewTabs = true
