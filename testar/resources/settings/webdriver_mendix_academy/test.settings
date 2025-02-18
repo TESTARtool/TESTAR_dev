@@ -125,10 +125,11 @@ AbstractStateAttributes = WebWidgetId
 #################################################################
 # WebDriver features
 #################################################################
-ClickableClasses = customGroupBoxHeaderContent
+ClickableClasses = mx-groupbox-collapse-icon
 TypeableClasses = 
 DeniedExtensions = pdf;jpg;png
-DomainsAllowed = home.mendix.com;academy.mendix.com
+WebDomainsAllowed = academy.mendix.com;partners.home.mendix.com
+WebPathsAllowed = null
 FollowLinks = true
 BrowserFullScreen = true
 SwitchNewTabs = true
