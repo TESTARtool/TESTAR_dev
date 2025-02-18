@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -37,7 +37,10 @@ import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
 
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -46,44 +49,38 @@ public class HtmlReporter implements Reporting
 {
     private HtmlFormatUtil htmlReportUtil;
     private int innerLoopCounter = 0;
-    
+
     private final String openBlockContainer = "<div class='block' style='display:flex;flex-direction:column'>";
-    private final String closeBlockContainer = "</div>";
-    
+    private final String openBackgroundContainer = "<div class='background'>";
+    private final String openCollapsibleContainer = "<div class='collapsibleContent'>";
+    private final String closeContainer = "</div>";
+
     public HtmlReporter(String fileName, boolean replay) //replay or generate mode
     {
         htmlReportUtil = new HtmlFormatUtil(fileName);
-        
-        startReport();
+
+        // Start the header, scripts, and styles of the HTML report
+        String headerTitle = "TESTAR execution sequence report";
+        htmlReportUtil.addHeader(headerTitle, HtmlHelper.getHtmlScript(), HtmlHelper.getHtmlStyle());
+
         if(replay)  addReplayHeading();
         else        addGenerateHeading();
     }
-    
-    private void startReport()
-    {
-        StringJoiner joiner = new StringJoiner("\n");
-        joiner.add("function reverse(){");
-        joiner.add("let direction = document.getElementById('main').style.flexDirection;");
-        joiner.add("if(direction === 'column') document.getElementById('main').style.flexDirection = " + "'column-reverse';");
-        joiner.add("else document.getElementById('main').style.flexDirection = 'column';}");
-        
-        htmlReportUtil.addHeader("TESTAR execution sequence report", joiner.toString());
-    }
-    
+
     private void addReplayHeading()
     {
         htmlReportUtil.addHeading(1, "TESTAR replay sequence report for file " + ConfigTags.PathToReplaySequence);
     }
-    
+
     private void addGenerateHeading()
     {
-            htmlReportUtil.addHeading(1, "TESTAR execution sequence report for sequence " + OutputStructure.sequenceInnerLoopCount);
-            // HTML button to invoke reverse function
-            htmlReportUtil.addContent("<button id='reverseButton' onclick='reverse()'>Reverse order</button>");
-            // Initialize the main div container to apply the reverse order
-            htmlReportUtil.addContent("<div id='main' style='display:flex;flex-direction:column'>");
+        htmlReportUtil.addHeading(1, "TESTAR execution sequence report for sequence " + OutputStructure.sequenceInnerLoopCount);
+        // HTML button to invoke reverse function
+        htmlReportUtil.addContent("<button id='reverseButton' onclick='reverse()'>Reverse order</button>");
+        // Initialize the main div container to apply the reverse order
+        htmlReportUtil.addContent("<div id='main' style='display:flex;flex-direction:column'>");
     }
-    
+
     @Override
     public void addState(State state)
     {
@@ -92,14 +89,38 @@ public class HtmlReporter implements Reporting
         String abstractID = state.get(Tags.AbstractID, "NoAbstractIdAvailable");
 
         htmlReportUtil.addContent(openBlockContainer); // Open state block container
-        htmlReportUtil.addHeading(2, "State " + innerLoopCounter);
-        htmlReportUtil.addHeading(4, "ConcreteID=" + concreteID);
-        htmlReportUtil.addHeading(4, "AbstractID=" + abstractID);
+        htmlReportUtil.addContent(openBackgroundContainer); // Open background container
 
+        htmlReportUtil.addHeading(2, "State " + innerLoopCounter);
+
+        // Add state identifiers
+        String stateIDs = "AbstractID=" + abstractID +  " || " + "ConcreteID=" + concreteID;
+        htmlReportUtil.addHeading(4, stateIDs);
+
+        // Add the timestamp this state was discover
+        String formattedTimestamp = DateTimeFormatter.ISO_INSTANT.format(Instant.ofEpochMilli(state.get(Tags.TimeStamp, 0L)));
+        htmlReportUtil.addHeading(4, "TimeStamp: " + formattedTimestamp);
+
+        // Add state render time if available
+        if(state.get(Tags.StateRenderTime, null) != null) {
+            String stateRenderTime = "State Render Time: " + state.get(Tags.StateRenderTime) + " ms";
+            htmlReportUtil.addHeading(4, stateRenderTime);
+        }
+
+        // Add state URL if exists
+        if(!state.get(WdTags.WebHref, "").isEmpty()) {
+            String stateURL = state.get(WdTags.WebHref, "");
+            String htmlStateURL = "<a href='" + stateURL + "' target='_blank'>" + stateURL + "</a>";
+            htmlReportUtil.addContent(htmlStateURL);
+        }
+
+        // Add state screenshot
         String altText = "screenshot: state=" + innerLoopCounter + ", ConcreteID=" + concreteID+", AbstractID=" + abstractID;
         htmlReportUtil.addParagraph("<img src=\"" + imagePath + "\" alt=\"" + altText + "\">");
-        htmlReportUtil.addContent(closeBlockContainer); // Close state block container
-        
+
+        htmlReportUtil.addContent(closeContainer); // Close background container
+        htmlReportUtil.addContent(closeContainer); // Close state block container
+
         innerLoopCounter++;
         htmlReportUtil.writeToFile();
     }
@@ -115,7 +136,7 @@ public class HtmlReporter implements Reporting
         }
         return path.replace("\\", "/"); // ensure forward slashes
     }
-    
+
     private String getActionString(Action action)
     {
         StringJoiner joiner = new StringJoiner(" || ");
@@ -125,31 +146,34 @@ public class HtmlReporter implements Reporting
         joiner.add(StringEscapeUtils.escapeHtml(action.toString()));
         joiner.add("ConcreteID=" + action.get(Tags.ConcreteID, "NoConcreteIdAvailable"));
         joiner.add("AbstractID=" + action.get(Tags.AbstractID, "NoAbstractIdAvailable"));
-        
+
         return joiner.toString();
     }
-    
+
     @Override
     public void addActions(Set<Action> actions)
     {
         htmlReportUtil.addContent(openBlockContainer); // Open derived actions block container
-        htmlReportUtil.addHeading(4, "Set of actions:");
-    
+        htmlReportUtil.addButton("collapsible", "Click to view the set of derived actions:");
+        htmlReportUtil.addContent(openCollapsibleContainer); // Open actions collapsible container
+
         ArrayList<String> actionStrings = new ArrayList<>();
         for(Action action:actions)
             actionStrings.add(getActionString(action));
-        
+
         htmlReportUtil.addList(false, actionStrings);
-        htmlReportUtil.addContent(closeBlockContainer); // Close derived actions block container
-    
+
+        htmlReportUtil.addContent(closeContainer); // Close actions collapsible container
+        htmlReportUtil.addContent(closeContainer); // Close derived actions block container
+
         htmlReportUtil.writeToFile();
     }
-    
+
     @Override
     public void addActionsAndUnvisitedActions(Set<Action> actions, Set<String> concreteIdsOfUnvisitedActions)
     {
         htmlReportUtil.addContent(openBlockContainer); // Open derived actions block container
-        
+
         ArrayList<String> actionStrings = new ArrayList<>();
         if(actions.size()==concreteIdsOfUnvisitedActions.size())
         {
@@ -176,46 +200,50 @@ public class HtmlReporter implements Reporting
             }
         }
         htmlReportUtil.addList(false, actionStrings);
-        htmlReportUtil.addContent(closeBlockContainer); // Close derived actions block container
-    
+        htmlReportUtil.addContent(closeContainer); // Close derived actions block container
+
         htmlReportUtil.writeToFile();
     }
-    
+
     @Override
     public void addSelectedAction(State state, Action action)
     {
         String screenshotDir = prepareScreenshotImagePath(OutputStructure.screenshotsOutputDir);
         String stateConcreteID = state.get(Tags.ConcreteID, "NoConcreteIdAvailable");
+        String actionAbstractID = action.get(Tags.AbstractID, "NoAbstractIdAvailable");
         String actionConcreteID = action.get(Tags.ConcreteID, "NoConcreteIdAvailable");
 
         String actionPath = screenshotDir + "/"
-                            + OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname
-                            + "_sequence_" + OutputStructure.sequenceInnerLoopCount
-                            + "/" + stateConcreteID
-                            + "_" + actionConcreteID + ".png";
-    
+                + OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname
+                + "_sequence_" + OutputStructure.sequenceInnerLoopCount
+                + "/" + stateConcreteID
+                + "_" + actionConcreteID + ".png";
+
         htmlReportUtil.addContent(openBlockContainer); // Open executed action block container
+        htmlReportUtil.addContent(openBackgroundContainer); // Open background container
+
         htmlReportUtil.addHeading(2, "Selected Action "+innerLoopCounter+" leading to State "+innerLoopCounter);
-    
-        String stateString = "ConcreteID=" + actionConcreteID;
+
+        String actionIDs = "AbstractID=" + actionAbstractID +  " || " + "ConcreteID=" + actionConcreteID;
         String escaped = StringEscapeUtils.escapeHtml(action.get(Tags.Desc, "NoActionDescriptionAvailable"));
-        stateString += " || " + escaped;
-        htmlReportUtil.addHeading(4, stateString);
-    
-    
+        actionIDs += " || " + escaped;
+        htmlReportUtil.addHeading(4, actionIDs);
+
         if(actionPath.contains("./output"))
             actionPath = actionPath.replace("./output","..");
 
         actionPath = actionPath.replace("\\", "/");
 
         String altText = "screenshot: action, ConcreteID=" + actionConcreteID;
-    
+
         htmlReportUtil.addParagraph("<img src=\"" + actionPath + "\" alt=\"" + altText + "\">");
-        htmlReportUtil.addContent(closeBlockContainer); // Close executed action block container
-    
+
+        htmlReportUtil.addContent(closeContainer); // Close background container
+        htmlReportUtil.addContent(closeContainer); // Close executed action block container
+
         htmlReportUtil.writeToFile();
     }
-    
+
     @Override
     public void addTestVerdict(Verdict verdict)
     {
@@ -226,18 +254,18 @@ public class HtmlReporter implements Reporting
         htmlReportUtil.addContent(openBlockContainer); // Open verdict block container
         htmlReportUtil.addHeading(2, "Test verdict for this sequence: " + verdictInfo);
         htmlReportUtil.addHeading(4, "Severity: " + verdict.severity());
-        htmlReportUtil.addContent(closeBlockContainer); // Close verdict block container
+        htmlReportUtil.addContent(closeContainer); // Close verdict block container
 
         htmlReportUtil.appendToFileName("_" + verdict.verdictSeverityTitle());
         htmlReportUtil.writeToFile();
     }
-    
+
     @Override
     public void finishReport()
     {
         htmlReportUtil.addContent("</div>"); // Close the main div container
         htmlReportUtil.addFooter();
-    
+
         htmlReportUtil.writeToFile();
     }
 }
