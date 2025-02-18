@@ -1,0 +1,5 @@
+A student decides to study the Agile Awareness course
+Then the first Introduction lesson is available
+;
+A student starts the first Welcome module of the Introduction  lesson
+Then can read the Welcome to Agile Awareness lesson

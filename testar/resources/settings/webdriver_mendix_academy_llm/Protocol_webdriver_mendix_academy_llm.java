@@ -32,9 +32,15 @@ import com.google.common.collect.ArrayListMultimap;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testar.CodingManager;
 import org.testar.SutVisualization;
+import org.testar.action.priorization.llm.LlmActionSelector;
+import org.testar.llm.LlmTestGoal;
+import org.testar.llm.prompt.OraclePromptGenerator;
+import org.testar.llm.prompt.StandardPromptActionGenerator;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Main;
 import org.testar.monkey.Pair;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
@@ -47,23 +53,43 @@ import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.webdriver.Constants;
 import org.testar.monkey.alayer.webdriver.WdDriver;
+import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.oracles.llm.LlmOracle;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.settings.Settings;
+import org.testar.statemodel.StateModelManagerFactory;
+import org.testar.statemodel.analysis.condition.BasicConditionEvaluator;
+import org.testar.statemodel.analysis.condition.ConditionEvaluator;
+import org.testar.statemodel.analysis.condition.GherkinConditionEvaluator;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 
-public class Protocol_webdriver_mendix_academy extends WebdriverProtocol {
+public class Protocol_webdriver_mendix_academy_llm extends WebdriverProtocol {
 
-	// This list tracks the detected erroneous verdicts to avoid duplicates
-	private List<String> listOfDetectedErroneousVerdicts = new ArrayList<>();
+	// The LLM Action selector needs to be initialize with the settings
+	private LlmActionSelector llmActionSelector;
+	private ConditionEvaluator conditionEvaluator;
 
-	private String inputDataFile = System.getProperty("user.dir") + "/settings/custom_input_data.txt";
+	private List<LlmTestGoal> testGoals = new ArrayList<>();
+	private Queue<LlmTestGoal> testGoalQueue;
+	private LlmTestGoal currentTestGoal;
+
+	// The LLM Oracle needs to be initialize with the settings
+	private LlmOracle llmOracle;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -73,14 +99,57 @@ public class Protocol_webdriver_mendix_academy extends WebdriverProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings) {
+		// Download OrientDB and initialize a testar (admin:admin) database
+		setupOrientDB();
+
 		super.initialize(settings);
 
 		// For the academy web page ignore iframes
 		Constants.ignoredTags = Arrays.asList(
 				"script", "noscript", "head", "meta", "style", "link", "svg", "canvas", "iframe");
 
-		// Reset the list when we start a new TESTAR run with multiple sequences
-		listOfDetectedErroneousVerdicts = new ArrayList<>();
+		// Configure the test goals
+		setupTestGoals(settings.get(ConfigTags.LlmTestGoals));
+
+		// Initialize the LlmActionSelector using the LLM settings
+		llmActionSelector = new LlmActionSelector(settings, new StandardPromptActionGenerator(Tags.Desc));
+
+		// Test goal is considered complete when the Then statement is found in the HTML of the state model.
+		conditionEvaluator = new BasicConditionEvaluator();
+
+		// Initialize the LlmOracle using the LLM settings
+		llmOracle = new LlmOracle(settings, new OraclePromptGenerator(new HashSet<>(Arrays.asList(WdTags.WebTextContent))));
+	}
+
+	private void setupTestGoals(List<String> testGoalsList) {
+		for(String testGoal : testGoalsList) {
+			GherkinConditionEvaluator gherkinEvaluator = new GherkinConditionEvaluator(WdTags.WebInnerHTML, testGoal);
+			testGoals.add(new LlmTestGoal(testGoal, gherkinEvaluator.getConditions()));
+		}
+	}
+
+	/**
+	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
+	 */
+	@Override
+	protected void preSequencePreparations() {
+		super.preSequencePreparations();
+
+		// Setup test goal queue
+		testGoalQueue = new LinkedList<>();
+		testGoalQueue.addAll(testGoals);
+		currentTestGoal = testGoalQueue.poll();
+		conditionEvaluator.clear();
+		conditionEvaluator.addConditions(currentTestGoal.getCompletionConditions());
+
+		// Reset llm action selector
+		llmActionSelector.reset(currentTestGoal, false);
+		// Reset llm oracle
+		llmOracle.reset(currentTestGoal, false);
+
+		// stop and start a new state model manager
+		stateModelManager.notifyTestingEnded();
+		stateModelManager = StateModelManagerFactory.getStateModelManager(settings);
 	}
 
 	/**
@@ -153,15 +222,52 @@ public class Protocol_webdriver_mendix_academy extends WebdriverProtocol {
 	 */
 	@Override
 	protected Verdict getVerdict(State state) {
-
+		// System crashes, non-responsiveness and suspicious tags automatically detected!
+		// For web applications, web browser errors and warnings can also be enabled via settings
 		Verdict verdict = super.getVerdict(state);
-		// system crashes, non-responsiveness and suspicious tags automatically detected!
 
-		//-----------------------------------------------------------------------------
-		// MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
-		//-----------------------------------------------------------------------------
+		// Prioritize the technical condition evaluator to determine if the goal has been achieved
+		String modelIdentifier = stateModelManager.getModelIdentifier();
+		if(conditionEvaluator.evaluateConditions(modelIdentifier, stateModelManager)) {
+			// Test goal was completed, retrieve next test goal from queue.
+			currentTestGoal = testGoalQueue.poll();
 
-		// ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
+			// Poll returns null if there are no more items remaining in the queue.
+			if(currentTestGoal == null) {
+				// No more test goals remaining, terminate sequence.
+				System.out.println("Test goal completed, but no more test goals.");
+				return new Verdict(Verdict.SEVERITY_TESTGOAL_COMPLETE, "All test goals completed.");
+			} else {
+				System.out.println("Test goal completed, moving to next test goal.");
+				llmActionSelector.reset(currentTestGoal, true);
+				llmOracle.reset(currentTestGoal, true);
+				conditionEvaluator.clear();
+				conditionEvaluator.addConditions(currentTestGoal.getCompletionConditions());
+			}
+		} 
+		/*
+		else if (actionCount > 1) {
+			// If the technical condition evaluator determines the goal has not been achieved
+			// Use the LLM as an Oracle to determine if the test goal has been completed
+			Verdict llmVerdict = llmOracle.getVerdict(state);
+
+			if(llmVerdict.severity() == Verdict.SEVERITY_LLM_COMPLETE) {
+				// Test goal was completed, retrieve next test goal from queue.
+				currentTestGoal = testGoalQueue.poll();
+
+				// Poll returns null if there are no more items remaining in the queue.
+				if(currentTestGoal == null) {
+					// No more test goals remaining, terminate sequence.
+					System.out.println("Test goal completed, but no more test goals.");
+					return llmVerdict;
+				} else {
+					System.out.println("Test goal completed, moving to next test goal.");
+					llmActionSelector.reset(currentTestGoal, true);
+					llmOracle.reset(currentTestGoal, true);
+				}
+			}
+		}
+		*/
 
 		return verdict;
 	}
@@ -200,7 +306,7 @@ public class Protocol_webdriver_mendix_academy extends WebdriverProtocol {
 			//CAPS_LOCK + SHIFT + Click clickfilter functionality.
 			if(blackListed(widget)){
 				if(isTypeable(widget)){
-					filteredActions.add(ac.pasteTextInto(widget, InputDataManager.getRandomTextFromCustomInputDataFile(inputDataFile), true));
+					filteredActions.add(ac.pasteTextInto(widget, InputDataManager.getRandomTextInputData(), true));
 				} else {
 					filteredActions.add(ac.leftClickAt(widget));
 				}
@@ -218,10 +324,10 @@ public class Protocol_webdriver_mendix_academy extends WebdriverProtocol {
 			// type into text boxes
 			if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
 				if(whiteListed(widget) || isUnfiltered(widget)){
-					actions.add(ac.pasteTextInto(widget, InputDataManager.getRandomTextFromCustomInputDataFile(inputDataFile), true));
+					actions.add(ac.pasteTextInto(widget, InputDataManager.getRandomTextInputData(), true));
 				}else{
 					// filtered and not white listed:
-					filteredActions.add(ac.pasteTextInto(widget, InputDataManager.getRandomTextFromCustomInputDataFile(inputDataFile), true));
+					filteredActions.add(ac.pasteTextInto(widget, InputDataManager.getRandomTextInputData(), true));
 				}
 			}
 
@@ -255,12 +361,21 @@ public class Protocol_webdriver_mendix_academy extends WebdriverProtocol {
 
 	@Override
 	protected boolean isClickable(Widget widget) {
-		// The img widgets with role presentation will be detected as clickable
-		if(widget.get(WdTags.WebAttributeMap).toString().contains("role=presentation")) {
+		// Some header classes can be clickable
+		// These are interesting widgets because contain action description information
+		if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdH2)
+				&& widget.get(WdTags.WebCssClasses).contains("pds-heading")
+				&& isSonOfList(widget)){
 			return true;
 		}
 
 		return super.isClickable(widget);
+	}
+
+	private boolean isSonOfList(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(Tags.Role, Roles.Widget).equals(WdRoles.WdLI)) return true;
+		else return isSonOfList(widget.parent());
 	}
 
 	/**
@@ -272,7 +387,19 @@ public class Protocol_webdriver_mendix_academy extends WebdriverProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions) {
-		return super.selectAction(state, actions);
+		Action toExecute = llmActionSelector.selectAction(state, actions);
+
+		// We need to set a state to NOP actions
+		if(toExecute instanceof NOP) {
+			toExecute.set(Tags.OriginWidget, state);
+		}
+
+		// We need the AbstractID for the state model
+		if(toExecute.get(Tags.AbstractID, null) == null) {
+			CodingManager.buildIDs(state, Collections.singleton(toExecute));
+		}
+
+		return toExecute;
 	}
 
 	/**
@@ -306,13 +433,8 @@ public class Protocol_webdriver_mendix_academy extends WebdriverProtocol {
 	@Override
 	protected void finishSequence() {
 		super.finishSequence();
-		// If the final Verdict is not OK and the verdict is not saved in the list
-		// This is a new run fail verdict
-		Verdict finalVerdict = getVerdict(latestState);
-		if(finalVerdict.severity() > Verdict.SEVERITY_OK && !listOfDetectedErroneousVerdicts.contains(finalVerdict.info().replace("\n", " "))) {
-			listOfDetectedErroneousVerdicts.add(finalVerdict.info().replace("\n", " "));
-		}
 	}
+
 	/**
 	 * TESTAR uses this method to determine when to stop the entire test.
 	 * You could stop the test after a given amount of generated sequences or
@@ -323,5 +445,73 @@ public class Protocol_webdriver_mendix_academy extends WebdriverProtocol {
 	@Override
 	protected boolean moreSequences() {
 		return super.moreSequences();
+	}
+
+	private void setupOrientDB() {
+		String directoryPath = Main.settingsDir + File.separator + "webdriver_mendix_academy_llm";
+		String downloadUrl = "https://repo1.maven.org/maven2/com/orientechnologies/orientdb-community/3.0.34/orientdb-community-3.0.34.zip";
+		String zipFilePath = directoryPath + "/orientdb-community-3.0.34.zip";
+		String extractDir = directoryPath + "/orientdb-community-3.0.34";
+
+		// If OrientDB already exists, we dont need to download anything
+		if(new File(extractDir).exists()) return;
+
+		try {
+			// Create the directory if it doesn't exist
+			File directory = new File(directoryPath);
+			if (!directory.exists()) {
+				directory.mkdirs();
+			}
+
+			// Download the zip file
+			try (InputStream in = new URL(downloadUrl).openStream();
+					FileOutputStream out = new FileOutputStream(zipFilePath)) {
+				byte[] buffer = new byte[4096];
+				int bytesRead;
+				while ((bytesRead = in.read(buffer)) != -1) {
+					out.write(buffer, 0, bytesRead);
+				}
+			}
+
+			// Extract the zip file
+			try (ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath))) {
+				ZipEntry entry;
+				while ((entry = zipIn.getNextEntry()) != null) {
+					File filePath = new File(directoryPath, entry.getName());
+					if (entry.isDirectory()) {
+						filePath.mkdirs();
+					} else {
+						// Ensure parent directories exist
+						File parentDir = filePath.getParentFile();
+						if (!parentDir.exists()) {
+							parentDir.mkdirs();
+						}
+						try (FileOutputStream out = new FileOutputStream(filePath)) {
+							byte[] buffer = new byte[4096];
+							int len;
+							while ((len = zipIn.read(buffer)) > 0) {
+								out.write(buffer, 0, len);
+							}
+						}
+					}
+					zipIn.closeEntry();
+				}
+			}
+
+			// Change to the bin directory and execute the command
+			ProcessBuilder processBuilder = new ProcessBuilder("cmd", "/c", "console.bat", "CREATE", "DATABASE", "plocal:../databases/testar", "admin", "admin");
+			processBuilder.directory(new File(extractDir + "/bin"));
+			processBuilder.inheritIO();
+			Process process = processBuilder.start();
+
+			// Wait for the command to complete
+			int exitCode = process.waitFor();
+			if (exitCode != 0) {
+				throw new RuntimeException("Command execution failed with exit code " + exitCode);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
