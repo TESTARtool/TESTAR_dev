@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2024 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -198,8 +198,11 @@ public final class ConfigTags {
 			"Indicate which web URL extensions need to be ignored when testing");
 
 	@SuppressWarnings("unchecked")
-	public static final Tag<List<String>> DomainsAllowed = Tag.from("DomainsAllowed", (Class<List<String>>) (Class<?>) List.class, 
-			"Indicate which web URL domains need to be ignored when testing");
+	public static final Tag<List<String>> WebDomainsAllowed = Tag.from("WebDomainsAllowed", (Class<List<String>>) (Class<?>) List.class, 
+			"Indicate which web URL domains are allowed to explore when testing");
+
+	public static final Tag<String> WebPathsAllowed = Tag.from("WebPathsAllowed", String.class, 
+			"Regular expressions to indicate which web URL paths are allowed to explore when testing");
 
 	public static final Tag<Boolean> FollowLinks = Tag.from("FollowLinks", Boolean.class, 
 			"Indicate if allowing to follow links opened in new tabs");
