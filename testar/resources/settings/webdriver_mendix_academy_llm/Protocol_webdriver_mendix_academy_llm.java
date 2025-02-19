@@ -36,7 +36,7 @@ import org.testar.CodingManager;
 import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
 import org.testar.llm.LlmTestGoal;
-import org.testar.llm.prompt.OraclePromptGenerator;
+import org.testar.llm.prompt.OracleWebPromptGenerator;
 import org.testar.llm.prompt.StandardPromptActionGenerator;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.ConfigTags;
@@ -118,7 +118,7 @@ public class Protocol_webdriver_mendix_academy_llm extends WebdriverProtocol {
 		conditionEvaluator = new BasicConditionEvaluator();
 
 		// Initialize the LlmOracle using the LLM settings
-		llmOracle = new LlmOracle(settings, new OraclePromptGenerator(new HashSet<>(Arrays.asList(WdTags.WebTextContent))));
+		llmOracle = new LlmOracle(settings, new OracleWebPromptGenerator());
 	}
 
 	private void setupTestGoals(List<String> testGoalsList) {
