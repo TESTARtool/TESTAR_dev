@@ -1,0 +1,5 @@
+As a user, I want to log in with the credentials john/demo
+Then a Request Loan link is shown
+;
+As a user, I want to request a loan with amount '9' and downPayment '1'
+Then the loan is approved

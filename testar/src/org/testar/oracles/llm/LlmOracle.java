@@ -41,7 +41,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.llm.prompt.IPromptOracleGenerator;
-import org.testar.llm.prompt.OraclePromptGenerator;
 import org.testar.llm.LlmConversation;
 import org.testar.llm.LlmFactory;
 import org.testar.llm.LlmResponse;
@@ -76,7 +75,7 @@ public class LlmOracle implements Oracle {
 	private String previousTestGoal = "";
 	private LlmTestGoal currentTestGoal;
 
-	public LlmOracle(Settings settings, OraclePromptGenerator oracleGenerator) {
+	public LlmOracle(Settings settings, IPromptOracleGenerator oracleGenerator) {
 		this.promptGenerator = oracleGenerator;
 
 		this.platform = settings.get(ConfigTags.LlmPlatform);
