@@ -44,7 +44,7 @@ SequenceLength = 10
 # Regular expression and Tags to apply them
 #################################################################
 
-SuspiciousTags = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+SuspiciousTags = 
 TagsForSuspiciousOracle = Title;WebTextContent
 
 #################################################################
@@ -158,7 +158,7 @@ ResetDataStore = false
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WebWidgetId
+AbstractStateAttributes = WebWidgetId,WebWidgetName
 
 #################################################################
 # LLM agents settings

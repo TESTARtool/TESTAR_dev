@@ -40,29 +40,29 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tag;
-import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 import org.testar.monkey.alayer.webdriver.WdDriver;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
 
-public class OraclePromptGenerator implements IPromptOracleGenerator {
+public class OracleWebPromptGenerator implements IPromptOracleGenerator {
 
 	protected static final Logger logger = LogManager.getLogger();
 
 	private final Set<Tag<String>> oracleTags;
 
 	/**
-	 * Creates a new oracle prompt generator.
+	 * Creates a new oracle prompt generator for web applications.
 	 */
-	public OraclePromptGenerator() {
-		this(new HashSet<>(Arrays.asList(Tags.Title))); // Tags.Title is the default title Tag
+	public OracleWebPromptGenerator() {
+		this(new HashSet<>(Arrays.asList(WdTags.WebTextContent))); // WdTags.WebTextContent is the default widget context
 	}
 
 	/**
-	 * Creates a new oracle prompt generator with a set of oracleTags
+	 * Creates a new oracle prompt generator for web applications with a set of oracleTags. 
 	 * @param oracleTags Are the tags to be used for applying the oracle.
 	 */
-	public OraclePromptGenerator(Set<Tag<String>> oracleTags) {
+	public OracleWebPromptGenerator(Set<Tag<String>> oracleTags) {
 		this.oracleTags = oracleTags;
 	}
 
@@ -85,21 +85,25 @@ public class OraclePromptGenerator implements IPromptOracleGenerator {
 		builder.append("The current state of the application contains the widgets: ");
 
 		for (Widget widget : state) {
-			try {
-				// Iterate trough the indicated widget Tags to create the widget content
-				String widgetContent = "";
+			// Only create the prompt oracle with the information of visible widgets
+			// Some widgets may exist at the DOM level but are not visible in the GUI
+			if(widget.get(WdTags.WebIsFullOnScreen, false)) {
+				try {
+					// Iterate trough the indicated widget Tags to create the widget content
+					String widgetContent = "";
 
-				for(Tag<String> tag : oracleTags) {
-					widgetContent = widgetContent.concat(widget.get(tag, "") + " ");
+					for(Tag<String> tag : oracleTags) {
+						widgetContent = widgetContent.concat(widget.get(tag, "") + " ");
+					}
+
+					// If the widget content is not empty, add it to the Oracle conversation
+					if(!widgetContent.trim().isEmpty()) {
+						builder.append(String.format("Widget: %s, ", widgetContent));
+					}
+
+				} catch(NoSuchTagException e) {
+					logger.log(Level.WARN, "Widget Tag is missing, skipping.");
 				}
-
-				// If the widget content is not empty, add it to the Oracle conversation
-				if(!widgetContent.trim().isEmpty()) {
-					builder.append(String.format("Widget: %s, ", widgetContent));
-				}
-
-			} catch(NoSuchTagException e) {
-				logger.log(Level.WARN, "Widget Tag is missing, skipping.");
 			}
 		}
 
