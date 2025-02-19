@@ -1,3 +1,3 @@
 Student enrolls to one of the so far not enrolled subjects
 Credentials blue/pass
-Then Subject has been successfully added!
+Then Message confirming a successful execution will appear

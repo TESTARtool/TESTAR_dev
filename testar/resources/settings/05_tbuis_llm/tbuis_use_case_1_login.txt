@@ -1,3 +1,3 @@
-Registered user will log into the application and based on the login name the user will be recognized either as a student or a teacher
+User will log into the application
 Credentials blue/pass
-Then Student's View
+Then Logout option appears
