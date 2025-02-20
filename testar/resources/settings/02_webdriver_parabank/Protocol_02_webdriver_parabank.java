@@ -220,7 +220,7 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 					String verdictMsg = String.format("Widget with more than %s decimals! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
 							maxDecimals, w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
 
-					return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg);
+					return new Verdict(Verdict.Severity.WARNING, verdictMsg);
 				}
 			}
 		}
@@ -255,7 +255,7 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 						String verdictMsg = String.format("Empty or Unique Select element detected! Role: %s , Path: %s , Desc: %s", 
 								w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
 
-						return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg);
+						return new Verdict(Verdict.Severity.WARNING, verdictMsg);
 					} 
 				}catch (Exception e) {}
 			}
@@ -289,7 +289,7 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 							String verdictMsg = String.format("Detected a Select web element with duplicate display value elements! Role: %s , Path: %s , WebId: %s , Duplicate item(s): %s", 
 									w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), String.join(",", duplicatesTexts));
 
-							return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg);
+							return new Verdict(Verdict.Severity.WARNING, verdictMsg);
 						}
 					}
 				}catch (Exception e) {}
@@ -306,7 +306,7 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 				String verdictMsg = String.format("TextArea Widget with 0 Length detected! Role: %s , Path: %s , WebId: %s", 
 						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""));
 
-				return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg);
+				return new Verdict(Verdict.Severity.WARNING, verdictMsg);
 			}
 		}
 
@@ -336,7 +336,7 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 							String verdictMsg = String.format("Detected a duplicated rows in a Table! Role: %s , WebId: %s, Description: %s", 
 									duplicatedWidget.left().get(Tags.Role), duplicatedWidget.left().get(WdTags.WebId, ""), duplicatedWidget.right());
 
-							return new Verdict(Verdict.SEVERITY_WARNING, verdictMsg);
+							return new Verdict(Verdict.Severity.WARNING, verdictMsg);
 						}
 					}
 				}
@@ -572,7 +572,7 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 		// If the final Verdict is not OK and the verdict is not saved in the list
 		// This is a new run fail verdict
 		Verdict finalVerdict = getVerdict(latestState);
-		if(finalVerdict.severity() > Verdict.SEVERITY_OK && !listOfDetectedErroneousVerdicts.contains(finalVerdict.info().replace("\n", " "))) {
+		if(finalVerdict.severity() > Verdict.Severity.OK.getValue() && !listOfDetectedErroneousVerdicts.contains(finalVerdict.info().replace("\n", " "))) {
 			listOfDetectedErroneousVerdicts.add(finalVerdict.info().replace("\n", " "));
 		}
 	}

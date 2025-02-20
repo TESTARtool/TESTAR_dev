@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -89,42 +89,43 @@ public class FileHandling {
         saveReportPage(reportPages[3], new File(outputDir + File.separator + "logs" + File.separator + generatedSequence + "_" + "stats" + ".log"), logLevel);
     }
 
+    public static void copyClassifiedSequence(String generatedSequence, File currentSeq, Verdict verdict) {
+        // Generate target folder name based on severity title
+        String targetFolder = "sequences_" + verdict.verdictSeverityTitle().toLowerCase();
 
-    public static void copyClassifiedSequence(String generatedSequence, File currentSeq, Verdict verdict){
-        String targetFolder = "";
-        final double sev = verdict.severity();
-        if (sev == Verdict.SEVERITY_OK)
-            targetFolder = "sequences_ok";
-        else if (sev == Verdict.SEVERITY_WARNING)
-            targetFolder = "sequences_warning";
-        else if (sev == Verdict.SEVERITY_SUSPICIOUS_TAG)
-            targetFolder = "sequences_suspicious_tag";
-        else if (sev == Verdict.SEVERITY_SUSPICIOUS_LOG)
-            targetFolder = "sequences_suspicious_log";
-        else if (sev == Verdict.SEVERITY_NOT_RESPONDING)
-            targetFolder = "sequences_unresponsive";
-        else if (sev == Verdict.SEVERITY_UNEXPECTEDCLOSE)
-            targetFolder = "sequences_unexpectedclose";
-        else if (sev == Verdict.SEVERITY_FAIL)
-            targetFolder = "sequences_fail";
-        else if (sev == Verdict.SEVERITY_UNREPLAYABLE)
-            targetFolder = "sequences_unreplayable";
-        else
-            targetFolder = "sequences_other";
-        LogSerialiser.log("Copying classified sequence (\"" + generatedSequence + "\") to " + targetFolder + " folder...\n", LogSerialiser.LogLevel.Info);
+        LogSerialiser.log(
+                String.format("Copying classified sequence (\"%s\") to %s folder...\n", generatedSequence, targetFolder),
+                LogSerialiser.LogLevel.Info
+                );
+
         try {
-        	
-        	Util.copyToDirectory(currentSeq.getCanonicalPath(),
-            		OutputStructure.outerLoopOutputDir + File.separator + "sequences", true);
-        	
-        	Util.copyToDirectory(currentSeq.getCanonicalPath(),
-            		OutputStructure.outerLoopOutputDir + File.separator + targetFolder, true);
-            
-        } catch (NoSuchTagException e) {
-            LogSerialiser.log("No such tag exception copying classified test sequence\n", LogSerialiser.LogLevel.Critical);
-        } catch (IOException e) {
-            LogSerialiser.log("I/O exception copying classified test sequence\n", LogSerialiser.LogLevel.Critical);
+            // Copy to general "sequences" folder
+            copyToOutputDir(currentSeq, "sequences");
+            // Copy to specific classification folder
+            copyToOutputDir(currentSeq, targetFolder);
+        } catch (NoSuchTagException | IOException e) {
+            LogSerialiser.log("Error copying classified test sequence: " + e.getMessage() + "\n", LogSerialiser.LogLevel.Critical);
         }
-        LogSerialiser.log("Copied classified sequence to output <" + targetFolder + "> directory!\n", LogSerialiser.LogLevel.Debug);
+
+        LogSerialiser.log(
+                String.format("Copied classified sequence to output <%s> directory!\n", targetFolder),
+                LogSerialiser.LogLevel.Debug
+                );
+    }
+
+    /**
+     * Helper method to copy the sequence file to the specified output directory.
+     *
+     * @param file The sequence file to copy.
+     * @param folderName The target folder name.
+     * @throws IOException If an I/O error occurs.
+     * @throws NoSuchTagException If the specified tag does not exist.
+     */
+    private static void copyToOutputDir(File file, String folderName) throws IOException, NoSuchTagException {
+        Util.copyToDirectory(
+                file.getCanonicalPath(),
+                OutputStructure.outerLoopOutputDir + File.separator + folderName,
+                true
+                );
     }
 }

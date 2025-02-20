@@ -62,13 +62,13 @@ public class ConcreteStateHydrator implements EntityHydrator<VertexEntity>{
         Verdict verdict = attributes.get(Tags.OracleVerdict, null);
         int oracleVerdictCode = 4; // default value
         if (verdict != null) {
-            if (verdict.severity() == Verdict.SEVERITY_MIN) {
+            if (verdict.severity() == Verdict.Severity.OK.getValue()) {
                 oracleVerdictCode = 1;
             }
-            else if (verdict.severity() == Verdict.SEVERITY_MAX) {
+            else if (verdict.severity() == Verdict.Severity.FAIL.getValue()) {
                 oracleVerdictCode = 2;
             }
-            else if (verdict.severity() > Verdict.SEVERITY_MIN && verdict.severity() < Verdict.SEVERITY_MAX) {
+            else if (verdict.severity() > Verdict.Severity.OK.getValue() && verdict.severity() < Verdict.Severity.FAIL.getValue()) {
                 oracleVerdictCode = 3;
             }
         }

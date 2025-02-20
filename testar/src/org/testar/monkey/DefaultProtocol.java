@@ -144,7 +144,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected List<ProcessInfo> contextRunningProcesses = null;
 	protected static final String            DATE_FORMAT             = "yyyy-MM-dd HH:mm:ss";
 	protected static final Logger INDEXLOG = LogManager.getLogger();
-	protected double passSeverity = Verdict.SEVERITY_OK;
+	protected double passSeverity = Verdict.Severity.OK.getValue();
 
 	protected State latestState;
 	public static Action lastExecutedAction = null;
@@ -532,7 +532,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	void startTestSequence(SUT system) {
 		actionCount = 1;
 		lastSequenceActionNumber = settings().get(ConfigTags.SequenceLength) + actionCount - 1;
-		passSeverity = Verdict.SEVERITY_OK;
+		passSeverity = Verdict.Severity.OK.getValue();
 		processVerdict = Verdict.OK;
 		this.cv = buildCanvas();
 	}
@@ -798,14 +798,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			faultySequence = true;
 			LogSerialiser.log("Detected fault: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
 			// this was added to kill the SUT if it is frozen:
-			if(verdict.severity() == Verdict.SEVERITY_NOT_RESPONDING)
+			if(verdict.severity() == Verdict.Severity.NOT_RESPONDING.getValue())
 			{
 				//if the SUT is frozen, we should kill it!
 				LogSerialiser.log("SUT frozen, trying to kill it!\n", LogSerialiser.LogLevel.Critical);
 				SystemProcessHandling.killRunningProcesses(system, 100);
 			}
 		}
-		else if(verdict.severity() != Verdict.SEVERITY_OK && verdict.severity() > passSeverity)
+		else if(verdict.severity() != Verdict.Severity.OK.getValue() && verdict.severity() > passSeverity)
 		{
 			passSeverity = verdict.severity();
 			LogSerialiser.log("Detected warning: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
@@ -847,11 +847,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		// if the SUT is not running and closed unexpectedly, we assume it crashed
 		if(!state.get(IsRunning, false))
-			return new Verdict(Verdict.SEVERITY_UNEXPECTEDCLOSE, "System is offline! Closed Unexpectedly! I assume it crashed!");
+			return new Verdict(Verdict.Severity.UNEXPECTEDCLOSE, "System is offline! Closed Unexpectedly! I assume it crashed!");
 
 		// if the SUT does not respond within a given amount of time, we assume it crashed
 		if(state.get(Tags.NotResponding, false)){
-			return new Verdict(Verdict.SEVERITY_NOT_RESPONDING, "System is unresponsive! I assume something is wrong!");
+			return new Verdict(Verdict.Severity.NOT_RESPONDING, "System is unresponsive! I assume something is wrong!");
 		}
 
 		//------------------------
@@ -865,14 +865,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		Verdict suspiciousValueVerdict = Verdict.OK;
 		for(Widget w : state) {
 			suspiciousValueVerdict = suspiciousStringValueMatcher(w);
-			if(suspiciousValueVerdict.severity() == Verdict.SEVERITY_SUSPICIOUS_TAG) {
+			if(suspiciousValueVerdict.severity() == Verdict.Severity.SUSPICIOUS_TAG.getValue()) {
 				return suspiciousValueVerdict;
 			}
 		}
 
 		if ( logOracleEnabled ) {
 			Verdict logVerdict = logOracle.getVerdict(state);
-			if ( logVerdict.severity() == Verdict.SEVERITY_SUSPICIOUS_LOG ) {
+			if ( logVerdict.severity() == Verdict.Severity.SUSPICIOUS_LOG.getValue() ) {
 				return logVerdict;
 			}
 		}
@@ -917,7 +917,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				// visualize the problematic widget, by marking it with a red box
 				if(w.get(Tags.Shape, null) != null)
 					visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Tag", 0.5, 0.5);
-				return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TAG,
+				return new Verdict(Verdict.Severity.SUSPICIOUS_TAG,
 						"Discovered suspicious widget '" + tagForSuspiciousOracle + "' : '" + tagValue + "'.", visualizer);
 			}
 		}

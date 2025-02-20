@@ -251,7 +251,7 @@ public class ProtocolUtil {
 		}
 		
 		//If the state Shape is not properly obtained, or the State has an error, use full monitor screen
-		if (viewPort == null || (state.get(Tags.OracleVerdict, Verdict.OK).severity() > Verdict.SEVERITY_OK))
+		if (viewPort == null || (state.get(Tags.OracleVerdict, Verdict.OK).severity() > Verdict.Severity.OK.getValue()))
 			viewPort = state.get(Tags.Shape, null); // get the SUT process canvas (usually, full monitor screen)
 		
 		if (viewPort.width() <= 0 || viewPort.height() <= 0)

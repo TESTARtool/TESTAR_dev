@@ -66,10 +66,10 @@ public class LogOracle implements Oracle {
     public Verdict getVerdict(State state) {
         errorsList.addAll(checker.readAndCheck());
         if ( errorsList.size() == 0  ) {
-            return new Verdict(Verdict.SEVERITY_OK, "OK");
+            return Verdict.OK;
         }
         else {
-            return new Verdict(Verdict.SEVERITY_SUSPICIOUS_LOG, String.join(";", errorsList));
+            return new Verdict(Verdict.Severity.SUSPICIOUS_LOG, String.join(";", errorsList));
         }
     }
 

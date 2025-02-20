@@ -131,14 +131,14 @@ public class ReplayMode {
 					} else {
 						success = false;
 						String msg = "Exception " + ioe.getMessage() + " reading TESTAR replayableFragment: " + seqFile;
-						protocol.setReplayVerdict(new Verdict(Verdict.SEVERITY_UNREPLAYABLE, msg));
+						protocol.setReplayVerdict(new Verdict(Verdict.Severity.UNREPLAYABLE, msg));
 						protocol.stateModelManager.notifyTestSequenceInterruptedBySystem(ioe.toString());
 						break;
 					}
 				} catch(NullPointerException npe) {
 					success = false;
 					String msg = "Null exception replaying TESTAR action";
-					protocol.setReplayVerdict(new Verdict(Verdict.SEVERITY_UNREPLAYABLE, msg));
+					protocol.setReplayVerdict(new Verdict(Verdict.Severity.UNREPLAYABLE, msg));
 					protocol.stateModelManager.notifyTestSequenceInterruptedBySystem(npe.toString());
 					break;
 				}
@@ -195,7 +195,7 @@ public class ReplayMode {
 						+ " of the replayed sequence can not been replayed into "
 						+ " the State " + state.get(Tags.ConcreteID, state.toString());
 
-						protocol.setReplayVerdict(new Verdict(Verdict.SEVERITY_UNREPLAYABLE, msg));
+						protocol.setReplayVerdict(new Verdict(Verdict.Severity.UNREPLAYABLE, msg));
 
 						break;
 					}
@@ -289,7 +289,7 @@ public class ReplayMode {
 			System.out.println(msg);
 			LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);
 
-		}else if(protocol.getReplayVerdict().severity() == Verdict.SEVERITY_UNREPLAYABLE){
+		}else if(protocol.getReplayVerdict().severity() == Verdict.Severity.UNREPLAYABLE.getValue()){
 			System.out.println(protocol.getReplayVerdict().info());
 			LogSerialiser.log(protocol.getReplayVerdict().info(), LogSerialiser.LogLevel.Critical);
 
