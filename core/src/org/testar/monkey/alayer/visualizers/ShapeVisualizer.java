@@ -56,6 +56,11 @@ public final class ShapeVisualizer implements Visualizer {
 		this.labelY = labelY;
 	}
 
+	@Override
+	public Shape getShape() {
+		return this.shape;
+	}
+
 	public void run(State state, Canvas c, Pen pen) {
 		Assert.notNull(state, c, pen);
 		pen = Pen.merge(pen, this.pen);

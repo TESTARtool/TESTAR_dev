@@ -102,13 +102,9 @@ public final class Verdict implements Serializable {
 	}
 
 	public Verdict(Severity severity, String info, Visualizer visualizer) {
-		this(severity.getValue(), info, visualizer);
-	}
-
-	public Verdict(double severity, String info, Visualizer visualizer) {
-		Assert.isTrue(severity >= Severity.OK.getValue() && severity <= Severity.FAIL.getValue());
+		Assert.isTrue(severity.getValue() >= Severity.OK.getValue() && severity.getValue() <= Severity.FAIL.getValue());
 		Assert.notNull(info, visualizer);
-		this.severity = severity;
+		this.severity = severity.getValue();
 		this.info = info;
 		this.visualizer = visualizer;
 	}
@@ -172,7 +168,9 @@ public final class Verdict implements Serializable {
 		String joinedInfo = this.info.contains(verdict.info()) ? this.info
 				: (this.severity == Severity.OK.getValue() ? "" : this.info + "\n") + verdict.info();
 
-		return new Verdict(joinedSeverity, joinedInfo);
+		Visualizer joinedVisualizer = (this.severity >= verdict.severity()) ? this.visualizer() : verdict.visualizer();
+
+		return new Verdict(joinedSeverity, joinedInfo, joinedVisualizer);
 	}
 
 	/**

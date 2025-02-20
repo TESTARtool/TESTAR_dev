@@ -37,4 +37,8 @@ import java.io.Serializable;
 
 public interface Visualizer extends Serializable {
 	void run(State state, Canvas canvas, Pen pen);
+
+	default Shape getShape() {
+		return Rect.from(0, 0, 0, 0);
+	}
 }

@@ -32,7 +32,6 @@ package org.testar.monkey.alayer;
 
 import static org.junit.Assert.*;
 
-import org.testar.monkey.Util;
 import org.junit.Test;
 
 public class VerdictTest {
@@ -41,6 +40,11 @@ public class VerdictTest {
 
 	private final Visualizer dummyVisualizer = new Visualizer(){
 		private static final long serialVersionUID = -7830649624698071090L;
+		public void run(State s, Canvas c, Pen pen) {}	
+	};
+
+	private final Visualizer failVisualizer = new Visualizer(){
+		private static final long serialVersionUID = -2732461936562344367L;
 		public void run(State s, Canvas c, Pen pen) {}	
 	};
 
@@ -54,7 +58,7 @@ public class VerdictTest {
 	@Test
 	public void testJoin() {
 		Verdict v1 = new Verdict(Verdict.Severity.OK, "Foo Bar");
-		Verdict v2 = new Verdict(Verdict.Severity.FAIL, "Bar");
+		Verdict v2 = new Verdict(Verdict.Severity.FAIL, "Bar", failVisualizer);
 		Verdict v3 = new Verdict(Verdict.Severity.OK, "Baz", dummyVisualizer);
 
 		assertTrue("Joining two Verdicts shall create a new Verdict", 
@@ -75,8 +79,11 @@ public class VerdictTest {
 				"then both infos shall be included separated by a line break",
 				"Bar\nBaz", v2.join(v3).info());
 
-		assertTrue("Joining two Verdicts shall reset the Visualizer to the NullVisualizer",
-				v3.join(v1).visualizer() == Util.NullVisualizer);
+		assertTrue("Joining two Verdicts shall use the Visualizer of the Verdict with high severity",
+				v2.join(v1).visualizer() == failVisualizer);
+
+		assertTrue("Joining two Verdicts shall use the Visualizer of the Verdict with high severity",
+				v1.join(v2).visualizer() == failVisualizer);
 	}
 
 	@Test
