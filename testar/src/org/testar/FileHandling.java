@@ -33,61 +33,12 @@ package org.testar;
 
 import org.testar.serialisation.LogSerialiser;
 import org.testar.monkey.Util;
-import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Taggable;
-import org.testar.monkey.alayer.TaggableBase;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 
 import java.io.*;
 
-import static org.testar.monkey.alayer.Tags.SystemState;
-
 public class FileHandling {
-
-
-    //TODO move away from abstract, to helper class, call from Default protocol with a setting to turn on/off
-    /**
-     * Creates a file out of the given state.
-     * could be more interesting as XML instead of Java Serialisation
-     * @param state
-     */
-    public static void saveStateSnapshot(final State state, File file){
-        try{
-                Taggable taggable = new TaggableBase();
-                taggable.set(SystemState, state);
-                LogSerialiser.log("Saving state snapshot...\n", LogSerialiser.LogLevel.Debug);
-                ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
-                oos.writeObject(taggable);
-                oos.close();
-                LogSerialiser.log("Saved state snapshot to " + file.getAbsolutePath() + "\n", LogSerialiser.LogLevel.Info);
-        }catch(IOException ioe){
-            throw new RuntimeException(ioe);
-        }
-    }
-
-    /**
-     * Making a log file of a sequence
-     *
-     */
-    public static void saveReportPage(String page, File outputFile, int logLevel){
-        try {
-            LogSerialiser.start(new PrintStream(new BufferedOutputStream(new FileOutputStream(outputFile))),logLevel);
-        } catch (NoSuchTagException e3) {
-            e3.printStackTrace();
-        } catch (FileNotFoundException e3) {
-            e3.printStackTrace();
-        }
-        LogSerialiser.log(page, LogSerialiser.LogLevel.Critical);
-        LogSerialiser.flush(); LogSerialiser.finish(); LogSerialiser.exit();
-    }
-
-    public static void saveReport(String[] reportPages, String generatedSequence, String outputDir, int logLevel){
-        saveReportPage(reportPages[0], new File(outputDir + File.separator + "logs" + File.separator + generatedSequence + "_" + "clusters" + ".log"), logLevel);
-        saveReportPage(reportPages[1], new File(outputDir + File.separator + "logs" + File.separator + generatedSequence + "_" + "testable" + ".log"), logLevel);
-        saveReportPage(reportPages[2], new File(outputDir + File.separator + "logs" + File.separator + generatedSequence + "_" + "curve" + ".log"), logLevel);
-        saveReportPage(reportPages[3], new File(outputDir + File.separator + "logs" + File.separator + generatedSequence + "_" + "stats" + ".log"), logLevel);
-    }
 
     public static void copyClassifiedSequence(String generatedSequence, File currentSeq, Verdict verdict) {
         // Generate target folder name based on severity title
