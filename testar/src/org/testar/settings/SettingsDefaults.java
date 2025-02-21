@@ -150,7 +150,7 @@ public class SettingsDefaults {
 			}
 		}));
 
-		defaults.add(Pair.from(WebPathsAllowed, ".*home.*|.*onderwijs.*|.*onderzoek.*"));
+		defaults.add(Pair.from(WebPathsAllowed, ""));
 
 		defaults.add(Pair.from(TagsToFilter, new ArrayList<String>() {
 			{
