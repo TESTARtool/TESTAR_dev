@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2022 - 2023 Open Universiteit - www.ou.nl
- * Copyright (c) 2022 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2023 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2023 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,42 +28,55 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.oracles;
+package org.testar.oracles.generic.visual;
 
-import org.testar.monkey.alayer.Color;
-import org.testar.monkey.alayer.FillPattern;
-import org.testar.monkey.alayer.Pen;
+import java.util.ArrayList;
+
+import org.testar.monkey.alayer.Shape;
 import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.StrokePattern;
 import org.testar.monkey.alayer.Verdict;
+import org.testar.monkey.alayer.Visualizer;
+import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
+import org.testar.oracles.Oracle;
 
 /**
- * This is the interface for oracles - modules that determine whether the
- * an error or problem has occurred in the SUT.
+ * Calculates an aesthetic value between 0.00 (bad) and 100.0 (perfect) for the alignment of widgets,
+ * and gives a warning if the threshold is breached.
+ * Based on the work of "Towards an evaluation of graphical user interfaces aesthetics based on metrics" by
+ * Zen, Mathieu ; Vanderdonckt, Jean.
+ * 
+ * The default threshold value is 50.0.
  */
+public class AlignmentMetricOracle implements Oracle {
 
-public interface Oracle {
+	private final double thresholdValue;
 
-    /**
-     * Initialize the Oracle
-     */
-    public abstract void initialize();
+	public AlignmentMetricOracle() {
+		this(50.0);
+	}
 
-    /**
-     * Request that the Oracle determine a verdict about the current state of the SUT.
-     * This method would usually be called by the getVerdict method in the protocol.
-     *
-     * @param state
-     * @return verdict
-     */
-    public abstract Verdict getVerdict(State state);
+	public AlignmentMetricOracle(double thresholdValue) {
+		this.thresholdValue = thresholdValue;
+	}
 
-    default Pen getRedPen() {
-        return Pen.newPen()
-                .setColor(Color.Red)
-                .setFillPattern(FillPattern.None)
-                .setStrokePattern(StrokePattern.Solid)
-                .build();
-    }
+	@Override
+	public void initialize() {
+		// Nothing to initialize
+	}
+
+	@Override
+	public Verdict getVerdict(State state) {
+		ArrayList<Shape> regions = MetricsHelper.getRegions(state);
+
+		double alignmentMetric = MetricsHelper.calculateAlignmentMetric(regions);
+
+		if (alignmentMetric < thresholdValue) {
+			String verdictMsg = String.format("Alignment metric with value %f is below threshold value %f!", alignmentMetric, thresholdValue);
+			Visualizer visualizer = new RegionsVisualizer(getRedPen(), regions, "Alignment Metric Warning", 0.5, 0.5);
+			return new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, visualizer);
+		}
+
+		return Verdict.OK;
+	}
 
 }

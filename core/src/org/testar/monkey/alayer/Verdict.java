@@ -49,13 +49,20 @@ public final class Verdict implements Serializable {
 	public enum Severity {
 		// PASS
 		OK(0.0, "OK"),
+
+		// WARNING
+		WARNING(0.00000001, "WARNING"), // Custom warning verdict
+
+		// WARNING GROUP: UI
+		WARNING_UI_VISUAL_OR_RENDERING_FAULT(0.00000017, "UI_VISUAL_OR_RENDERING_FAULT"),
+
 		// FAIL
-		WARNING(0.7, "WARNING"), // Custom warning verdict
 		SUSPICIOUS_TAG(0.8, "SUSPICIOUS_TAG"), // Suspicious tag
 		SUSPICIOUS_LOG(0.89, "SUSPICIOUS_LOG"), // Suspicious message in log file or command output (LogOracle)
 		NOT_RESPONDING(0.99999990, "NOT_RESPONDING"), // Unresponsive
 		UNEXPECTEDCLOSE(0.99999999, "UNEXPECTEDCLOSE"), // Crash? Unexpected close?
 		UNREPLAYABLE(0.1, "UNREPLAYABLE"), // Sequence not replayable
+
 		FAIL(1.0, "FAIL");
 
 		private final double value;
