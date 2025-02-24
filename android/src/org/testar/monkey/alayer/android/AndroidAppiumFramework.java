@@ -571,11 +571,11 @@ public class AndroidAppiumFramework extends SUTBase {
 			cap.setCapability("appium:deviceName", jsonObject.get("deviceName").getAsString());
 			cap.setCapability("appium:automationName", jsonObject.get("automationName").getAsString());
 			cap.setCapability("appium:newCommandTimeout", jsonObject.get("newCommandTimeout").getAsInt());
+			cap.setCapability("appium:autoGrantPermissions", jsonObject.get("autoGrantPermissions").getAsBoolean());
 
 			// TODO: Check and test next capabilities
 			// cap.setCapability("allowTestPackages", true);
 			// cap.setCapability("appWaitActivity", jsonObject.get("appWaitActivity").getAsString());
-			// cap.setCapability("autoGrantPermissions", jsonObject.get("autoGrantPermissions").getAsBoolean());
 
 			String appPath = jsonObject.get("app").getAsString();
 
