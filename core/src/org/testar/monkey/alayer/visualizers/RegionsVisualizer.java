@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,16 +28,47 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.monkey.alayer;
+package org.testar.monkey.alayer.visualizers;
 
-import java.io.Serializable;
-import java.util.Arrays;
 import java.util.List;
 
-public interface Visualizer extends Serializable {
-	void run(State state, Canvas canvas, Pen pen);
+import org.testar.monkey.Assert;
+import org.testar.monkey.alayer.Canvas;
+import org.testar.monkey.alayer.Pen;
+import org.testar.monkey.alayer.Shape;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Visualizer;
 
-	default List<Shape> getShapes() {
-		return Arrays.asList(Rect.from(0, 0, 0, 0));
-	}
+public final class RegionsVisualizer implements Visualizer {
+    private static final long serialVersionUID = 1L;
+    private final List<Shape> shapes;
+    private final String label;
+    private final double labelX, labelY;
+    private final Pen pen;
+
+    public RegionsVisualizer(Pen pen, List<Shape> shapes, String label, double labelX, double labelY) {
+        Assert.notNull(shapes, pen);
+        this.shapes = shapes;
+        this.pen = pen;
+        this.label = label;
+        this.labelX = labelX;
+        this.labelY = labelY;
+    }
+
+    @Override
+    public List<Shape> getShapes() {
+        return this.shapes;
+    }
+
+    public void run(State state, Canvas c, Pen pen) {
+        Assert.notNull(state, c, pen);
+        pen = Pen.merge(pen, this.pen);
+        
+        for (Shape shape : shapes) {
+            shape.paint(c, pen);
+            if (label != null) {
+                c.text(pen, shape.x() + shape.width() * labelX, shape.y() + shape.height() * labelY, 0, label);
+            }
+        }
+    }
 }
