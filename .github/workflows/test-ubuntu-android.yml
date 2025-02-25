@@ -119,20 +119,6 @@ jobs:
 
     - name: Run TESTAR android generic protocol
       run: ./gradlew runTestAndroidGenericOk
-    - name: Save runTestAndroidGenericOk HTML report artifact
-      uses: actions/upload-artifact@v4
-      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
-      #if: failure()
-      with:
-        name: Java${{ matrix.java }}-runTestAndroidGenericOk-artifact
-        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/android_ok
 
     - name: Run TESTAR android generic protocol with suspicious message
-      run: ./gradlew runTestAndroidGenericSuspiciousTag
-    - name: Save runTestAndroidGenericSuspiciousTag HTML report artifact
-      uses: actions/upload-artifact@v4
-      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
-      #if: failure()
-      with:
-        name: Java${{ matrix.java }}-runTestAndroidGenericSuspiciousTag-artifact
-        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/android_suspicious
+      run: ./gradlew runTestAndroidGenericSuspiciousTagStateModel

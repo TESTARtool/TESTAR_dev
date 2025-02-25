@@ -1,8 +1,8 @@
 ## TESTAR Scriptless testing tool
 
-[![Gradle CI tests](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/gradle.yml/badge.svg)](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/gradle.yml)
-[![Docker Build](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/docker.yml/badge.svg)](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/docker.yml)
-[![Release](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/release.yml/badge.svg)](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/release.yml)
+[![Gradle CI tests](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/test-windows.yml/badge.svg)](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/test-windows.yml)
+[![Docker Build](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/release-docker.yml/badge.svg)](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/release-docker.yml)
+[![Release](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/release-distribution.yml/badge.svg)](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/release-distribution.yml)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
 This is the github development root folder for TESTAR development.  
