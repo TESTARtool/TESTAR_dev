@@ -49,6 +49,14 @@ import java.util.stream.Collectors;
 public class StateModelManagerFactory {
 
     public static StateModelManager getStateModelManager(String applicationName, String applicationVersion, TaggableBase configTags) {
+        return createStateModelManager(applicationName, applicationVersion, configTags, false);
+    }
+
+    public static StateModelManager getStateModelManager(String applicationName, String applicationVersion, TaggableBase configTags, boolean listeningMode) {
+        return createStateModelManager(applicationName, applicationVersion, configTags, listeningMode);
+    }
+
+    public static StateModelManager createStateModelManager(String applicationName, String applicationVersion, TaggableBase configTags, boolean listeningMode) {
         // first check if the state model module is enabled
         if(!configTags.get(StateModelTags.StateModelEnabled)) {
             return new DummyModelManager();
@@ -83,10 +91,28 @@ public class StateModelManagerFactory {
         eventListeners.add((StateModelEventListener) persistenceManager);
         SequenceManager sequenceManager = new SequenceManager(eventListeners, modelIdentifier);
 
+        if(listeningMode) {
+            System.out.println("TESTAR State Model enabled with Listening mode... AbstractStateModelListener");
+
+            // create the abstract state model and then the state model manager
+            AbstractStateModelListener abstractStateModelListener = new AbstractStateModelListener(modelIdentifier,
+                    applicationName,
+                    applicationVersion,
+                    abstractTags,
+                    persistenceManager instanceof StateModelEventListener ? (StateModelEventListener) persistenceManager : null);
+            ActionSelector actionSelector = CompoundFactory.getCompoundActionSelector(configTags);
+
+            // should we store widgets?
+            boolean storeWidgets = configTags.get(StateModelTags.StateModelStoreWidgets);
+
+            return new ModelManagerListeningMode(abstractStateModelListener, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
+
+        }
+
         // create the abstract state model and then the state model manager
         AbstractStateModel abstractStateModel = new AbstractStateModel(modelIdentifier,
-        		applicationName,
-        		applicationVersion,
+                applicationName,
+                applicationVersion,
                 abstractTags,
                 persistenceManager instanceof StateModelEventListener ? (StateModelEventListener) persistenceManager : null);
         ActionSelector actionSelector = CompoundFactory.getCompoundActionSelector(configTags);

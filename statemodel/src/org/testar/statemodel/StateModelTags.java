@@ -30,6 +30,9 @@
 
 package org.testar.statemodel;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.TaggableBase;
 
@@ -78,5 +81,22 @@ public class StateModelTags extends TaggableBase  {
 
 	public static final Tag<Boolean> ResetDataStore = Tag.from("ResetDataStore", Boolean.class, 
 			"WARNING: Delete all existing State Models from the selected database before creating a new one");
+
+	/**
+	 * Listening mode interest value
+	 */
+
+	public static final Tag<Integer> UserInterest = Tag.from("UserInterest", Integer.class, 
+			"The interest that user has to execute an action");
+
+	private static Set<Tag<?>> stateModelInterestTags = new HashSet<Tag<?>>() {
+		{
+			add(UserInterest);
+		}
+	};
+
+	public static Set<Tag<?>> getStateModelInterestTags() {
+		return stateModelInterestTags;
+	}
 
 }

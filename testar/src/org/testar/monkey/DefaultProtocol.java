@@ -335,7 +335,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			stateModelManager = StateModelManagerFactory.getStateModelManager(
 					settings.get(ConfigTags.ApplicationName),
 					settings.get(ConfigTags.ApplicationVersion),
-					settings);
+					settings,
+					(mode() == Modes.ListeningManual || mode() == Modes.ListeningScript));
 		}
 
 		//EventHandler is implemented in RuntimeControlsProtocol (super class):

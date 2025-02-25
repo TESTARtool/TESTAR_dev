@@ -82,7 +82,7 @@ public class AbstractActionExtractor implements EntityExtractor<AbstractAction> 
         }
 
         // get existing State Model Tags
-        for(Tag<?> t : StateModelTags.getStateModelTags()) {
+        for(Tag<?> t : StateModelTags.getStateModelInterestTags()) {
 
         	PropertyValue valueRL = entity.getPropertyValue(t.name());
 

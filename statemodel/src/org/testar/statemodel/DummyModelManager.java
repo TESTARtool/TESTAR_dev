@@ -43,7 +43,17 @@ public class DummyModelManager implements StateModelManager{
     }
 
     @Override
+    public void notifyConcurrenceStateReached(State newState, Set<Action> actions, Action unknown) {
+
+    }
+
+    @Override
     public void notifyActionExecution(Action action) {
+
+    }
+
+    @Override
+    public void notifyListenedAction(Action action) {
 
     }
 
@@ -55,6 +65,11 @@ public class DummyModelManager implements StateModelManager{
     @Override
     public Action getAbstractActionToExecute(Set<Action> actions) {
         return null;
+    }
+
+    @Override
+    public Set<Action> getInterestingActions(Set<Action> actions) {
+        return java.util.Collections.<Action>emptySet();
     }
 
     @Override

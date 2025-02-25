@@ -39,11 +39,17 @@ public interface StateModelManager {
 
     void notifyNewStateReached(State newState, Set<Action> actions);
 
+    void notifyConcurrenceStateReached(State newState, Set<Action> actions, Action unknown);
+
     void notifyActionExecution(Action action);
+
+    void notifyListenedAction(Action action);
 
     void notifyTestingEnded();
 
     Action getAbstractActionToExecute(Set<Action> actions);
+
+    Set<Action> getInterestingActions(Set<Action> actions);
 
     void notifyTestSequencedStarted();
 

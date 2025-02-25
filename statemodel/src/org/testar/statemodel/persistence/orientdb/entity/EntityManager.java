@@ -515,7 +515,7 @@ public class EntityManager {
     private void updateAbstractActionEntity(OEdge edge, DocumentEntity entity, ODatabaseSession db) {
     	for (String propertyName : entity.getPropertyNames()) {
     		if(entity.getPropertyValue(propertyName) != null) {
-    			for(Tag<?> t : StateModelTags.getStateModelTags()) {
+    			for(Tag<?> t : StateModelTags.getStateModelInterestTags()) {
     				if(t.name().contains(propertyName)){
     					setProperty(edge, propertyName, entity.getPropertyValue(propertyName).getValue(), db);
     				}
