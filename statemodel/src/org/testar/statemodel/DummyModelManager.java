@@ -76,4 +76,14 @@ public class DummyModelManager implements StateModelManager{
     public void notifyTestSequenceInterruptedBySystem(String message) {
 
     }
+
+    @Override
+    public String getModelIdentifier() {
+        return "";
+    }
+
+    @Override
+    public String queryStateModel(String query, Object... params) {
+        return "";
+    }
 }
