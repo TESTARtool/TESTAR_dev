@@ -149,7 +149,10 @@ public class Protocol_webdriver_mendix_academy_llm extends WebdriverProtocol {
 
 		// stop and start a new state model manager
 		stateModelManager.notifyTestingEnded();
-		stateModelManager = StateModelManagerFactory.getStateModelManager(settings);
+		stateModelManager = StateModelManagerFactory.getStateModelManager(
+				settings.get(ConfigTags.ApplicationName),
+				settings.get(ConfigTags.ApplicationVersion),
+				settings);
 	}
 
 	/**
