@@ -30,6 +30,8 @@
 
 package org.testar.monkey.alayer.webdriver;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Map;
 
 public class WdRootElement extends WdElement {
@@ -41,6 +43,7 @@ public class WdRootElement extends WdElement {
   public boolean isForeground;
   public boolean hasStandardMouse;
   public boolean hasStandardKeyboard;
+  public double largestContentfulPaint;
   public String documentTitle;
 
   public WdRootElement() {
@@ -59,6 +62,16 @@ public class WdRootElement extends WdElement {
     isForeground = (Boolean) packedbody.get("documentHasFocus");
     documentTitle = (String) packedbody.get("documentTitle");
     blocked = false;
+
+    Object lcpTime = packedbody.get("largestContentfulPaint");
+    if (lcpTime instanceof Number) {
+    	largestContentfulPaint = ((Number) lcpTime).doubleValue();
+    	largestContentfulPaint = BigDecimal.valueOf(largestContentfulPaint)
+    			.setScale(3, RoundingMode.HALF_UP)
+    			.doubleValue();
+    } else {
+    	largestContentfulPaint = -1.0;
+    }
   }
 
   public WdElement at(double x, double y) {

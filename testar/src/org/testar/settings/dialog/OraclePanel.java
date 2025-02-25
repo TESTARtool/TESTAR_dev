@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -33,6 +33,9 @@ package org.testar.settings.dialog;
 
 import org.testar.monkey.ConfigTags;
 import org.testar.settings.Settings;
+import org.testar.settings.dialog.components.RegexButton;
+import org.testar.settings.dialog.components.RestoreButton;
+import org.testar.settings.dialog.components.UndoTextArea;
 import org.testar.settings.extended.ExtendedSettingsFactory;
 import org.testar.visualvalidation.VisualValidationSettings;
 
@@ -48,18 +51,19 @@ public class OraclePanel extends SettingsPanel {
 
     private JLabel suspiciousTagsRegexLabel = new JLabel("Suspicious Tags values (regular expression)");
     private JLabel applySuspiciousTagsLabel = new JLabel("Tags to apply the Suspicious Tags values (semicolon to customize multiple Tags)");
-    private JLabel suspiciousProcessRegexLabel = new JLabel("Suspicious Process Output (regular expression)");
     private JLabel freezeTimeLabel = new JLabel("Freeze Time:");
     private JLabel secondsLabel = new JLabel("seconds");
 
-    private JTextArea txtSuspTagsRegex = new JTextArea();
-    private JTextArea txtApplySuspTags = new JTextArea();
-    private JTextArea txtSuspProccesRegex = new JTextArea();
+    private UndoTextArea txtSuspTagsRegex = new UndoTextArea();
+    private UndoTextArea txtApplySuspTags = new UndoTextArea();
+    private UndoTextArea txtSuspProccesRegex = new UndoTextArea();
 
+    private RestoreButton restoreButtonSuspTags = new RestoreButton(txtSuspTagsRegex);
     private RegexButton regexButtonSuspTags = new RegexButton(txtSuspTagsRegex);
+    private RestoreButton restoreButtonSuspProcces= new RestoreButton(txtSuspProccesRegex);
     private RegexButton regexButtonSuspProcces = new RegexButton(txtSuspProccesRegex);
 
-    private JCheckBox processCheckBox;
+    private JCheckBox suspiciousProcessCheckBox = new JCheckBox("Enable Suspicious Process Output (regular expression)");
     private JSpinner spnFreezeTime;
 
     private JCheckBox enableWebConsoleErrorOracle;
@@ -72,11 +76,14 @@ public class OraclePanel extends SettingsPanel {
     public OraclePanel() {
         setLayout(null);
 
-        suspiciousTagsRegexLabel.setBounds(10, 5, 450, 27);
+        suspiciousTagsRegexLabel.setBounds(10, 5, 260, 27);
         suspiciousTagsRegexLabel.setToolTipText(ToolTipTexts.suspiciousTagsTTT);
         add(suspiciousTagsRegexLabel);
 
-        regexButtonSuspTags.setBounds(500, 5, 110, 27);
+        restoreButtonSuspTags.setPosition(430, 5);
+        restoreButtonSuspTags.setToolTipText("Restore default suspicious regex if the text area is empty");
+        add(restoreButtonSuspTags);
+        regexButtonSuspTags.setPosition(505, 5);
         add(regexButtonSuspTags);
 
         txtSuspTagsRegex.setLineWrap(true);
@@ -96,14 +103,14 @@ public class OraclePanel extends SettingsPanel {
         tagsApplySuspTagsPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         add(tagsApplySuspTagsPane);
 
-        suspiciousProcessRegexLabel.setBounds(10, 220, 280, 27);
-        add(suspiciousProcessRegexLabel);
+        suspiciousProcessCheckBox.setBounds(10, 220, 350, 27);
+        suspiciousProcessCheckBox.setToolTipText("Enable the process listener feature, which uses regular expression in the output and error buffer");
+        add(suspiciousProcessCheckBox);
 
-        processCheckBox = new JCheckBox("Enable Process Listener");
-        processCheckBox.setBounds(300, 220, 200, 27);
-        add(processCheckBox);
-        
-        regexButtonSuspProcces.setBounds(500, 220, 110, 27);
+        restoreButtonSuspProcces.setPosition(430, 220);
+        restoreButtonSuspProcces.setToolTipText("Restore default suspicious regex if the text area is empty");
+        add(restoreButtonSuspProcces);
+        regexButtonSuspProcces.setPosition(505, 220);
         add(regexButtonSuspProcces);
 
         txtSuspProccesRegex.setLineWrap(true);
@@ -145,10 +152,10 @@ public class OraclePanel extends SettingsPanel {
      */
     @Override
     public void populateFrom(final Settings settings) {
-    	txtSuspTagsRegex.setText(settings.get(ConfigTags.SuspiciousTags));
-        txtApplySuspTags.setText(StringUtils.join(settings.get(ConfigTags.TagsForSuspiciousOracle), ";"));
-        processCheckBox.setSelected(settings.get(ConfigTags.ProcessListenerEnabled));
-        txtSuspProccesRegex.setText(settings.get(ConfigTags.SuspiciousProcessOutput));
+    	txtSuspTagsRegex.setInitialText(settings.get(ConfigTags.SuspiciousTags));
+        txtApplySuspTags.setInitialText(StringUtils.join(settings.get(ConfigTags.TagsForSuspiciousOracle), ";"));
+        suspiciousProcessCheckBox.setSelected(settings.get(ConfigTags.ProcessListenerEnabled));
+        txtSuspProccesRegex.setInitialText(settings.get(ConfigTags.SuspiciousProcessOutput));
         spnFreezeTime.setValue(settings.get(ConfigTags.TimeToFreeze));
         // Web Browser Console Oracles elements
         enableWebConsoleErrorOracle.setSelected(settings.get(ConfigTags.WebConsoleErrorOracle));
@@ -169,7 +176,7 @@ public class OraclePanel extends SettingsPanel {
     public void extractInformation(final Settings settings) {
         settings.set(ConfigTags.SuspiciousTags, txtSuspTagsRegex.getText());
         settings.set(ConfigTags.TagsForSuspiciousOracle, Arrays.asList(txtApplySuspTags.getText().split(";")));
-        settings.set(ConfigTags.ProcessListenerEnabled, processCheckBox.isSelected());
+        settings.set(ConfigTags.ProcessListenerEnabled, suspiciousProcessCheckBox.isSelected());
         settings.set(ConfigTags.SuspiciousProcessOutput, txtSuspProccesRegex.getText());
         settings.set(ConfigTags.TimeToFreeze, (Double) spnFreezeTime.getValue());
         // Web Browser Console Oracles elements

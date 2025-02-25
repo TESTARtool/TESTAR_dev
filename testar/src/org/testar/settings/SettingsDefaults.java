@@ -133,13 +133,13 @@ public class SettingsDefaults {
 			}
 		}));
 
-		defaults.add(Pair.from(DomainsAllowed, new ArrayList<String>() {
+		defaults.add(Pair.from(WebDomainsAllowed, new ArrayList<String>() {
 			{
 				add("www.ou.nl");
-				add("mijn.awo.ou.nl");
-				add("login.awo.ou.nl");
 			}
 		}));
+
+		defaults.add(Pair.from(WebPathsAllowed, ""));
 
 		defaults.add(Pair.from(TagsToFilter, new ArrayList<String>() {
 			{
