@@ -55,6 +55,7 @@ import org.testar.serialisation.LogSerialiser;
 import org.testar.settings.Settings;
 
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -627,8 +628,12 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			// Create a regex pattern from the allowed paths
 			Pattern pattern = Pattern.compile(webPathsAllowed);
 
+			// When checking the allowed paths, 
+			// we need to transform possible relative urls to absolute urls
+			String absoluteUrl = resolveRelativeUrl(linkUrl, WdDriver.getCurrentUrl());
+
 			// If the path does not match the allowed regex pattern, web link is denied
-			if (!pattern.matcher(linkUrl).find()) {
+			if (!pattern.matcher(absoluteUrl).find()) {
 				return true;
 			}
 		}
@@ -662,6 +667,18 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			return new URL(url).getPath();
 		} catch (Exception e) {
 			return "";
+		}
+	}
+
+	// Helper method to resolve relative URLs
+	private String resolveRelativeUrl(String relativeUrl, String baseUrl) {
+		try {
+			URL base = new URL(baseUrl);
+			URL absolute = new URL(base, relativeUrl);
+			return absolute.toString();
+		} catch (MalformedURLException e) {
+			// If resolving fails, return the original link
+			return relativeUrl;
 		}
 	}
 
