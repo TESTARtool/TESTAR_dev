@@ -36,12 +36,17 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -77,12 +82,16 @@ public class LlmPanel extends SettingsPanel {
 	private JLabel labelLlmTemperature = new JLabel("LLM Temperature");
 	private JTextField fieldLlmTemperature = new JTextField();
 
-	private JLabel labelLlmTestGoalDescription = new JLabel("LLM Test Goal Description (User story, Gherkin structure, Playwright script, or other)");
-	private JButton dirLlmTestGoalLoad = new JButton("Load Goal");
-	private JTextArea txtLlmTestGoalDescription = new JTextArea();
-
 	private JLabel labelLlmHistorySize = new JLabel("Action History Size");
 	private JTextField fieldLlmHistorySize = new JTextField();
+
+	private JLabel labelLlmTestGoalDescription = new JLabel("LLM Test Goal Description (User story, Gherkin structure, Playwright script, or other)");
+	private JButton dirLlmTestGoalLoad = new JButton("Load Goal");
+	private JPanel testGoalContainer = new JPanel();
+	private List<JScrollPane> testGoalScrollPanes = new ArrayList<>();
+	private List<JTextArea> testGoalTextAreas = new ArrayList<>();
+	private JButton addLlmTestGoalButton = new JButton("Add");
+	private JButton removeLlmTestGoalButton = new JButton("Remove");
 
 	public LlmPanel() {
 		setLayout(null);
@@ -175,18 +184,26 @@ public class LlmPanel extends SettingsPanel {
 		add(fieldLlmHistorySize);
 
 		labelLlmTestGoalDescription.setBounds(10, 190, 460, 27);
-		labelLlmTestGoalDescription.setToolTipText(ConfigTags.LlmTestGoalDescription.getDescription());
+		labelLlmTestGoalDescription.setToolTipText(ConfigTags.LlmTestGoals.getDescription());
 		add(labelLlmTestGoalDescription);
 		dirLlmTestGoalLoad.setBounds(510, 190, 100, 27);
-		dirLlmTestGoalLoad.addActionListener(this::chooseTestGoalFileFileActionPerformed);
+		dirLlmTestGoalLoad.addActionListener(this::chooseTestGoalFileActionPerformed);
 		add(dirLlmTestGoalLoad);
-		txtLlmTestGoalDescription.setLineWrap(true);
-		JScrollPane llmTestGoalDescriptionPane = new JScrollPane(txtLlmTestGoalDescription);
-		llmTestGoalDescriptionPane.setBounds(10, 220, 600, 150);
-		llmTestGoalDescriptionPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-		llmTestGoalDescriptionPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		llmTestGoalDescriptionPane.setToolTipText(ConfigTags.LlmTestGoalDescription.getDescription());
-		add(llmTestGoalDescriptionPane);
+
+		// Dynamic JTextArea Container
+		testGoalContainer.setLayout(new BoxLayout(testGoalContainer, BoxLayout.Y_AXIS));
+		JScrollPane scrollPane = new JScrollPane(testGoalContainer);
+		scrollPane.setBounds(10, 220, 500, 150);
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+		add(scrollPane);
+
+		// Add & Remove Buttons
+		addLlmTestGoalButton.setBounds(520, 260, 80, 27);
+		addLlmTestGoalButton.addActionListener(this::addTestGoalTextArea);
+		add(addLlmTestGoalButton);
+		removeLlmTestGoalButton.setBounds(520, 300, 80, 27);
+		removeLlmTestGoalButton.addActionListener(this::removeLastTestGoalTextArea);
+		add(removeLlmTestGoalButton);
 	}
 
 	// show a file dialog to choose the LLM Fewshot File
@@ -203,8 +220,44 @@ public class LlmPanel extends SettingsPanel {
 		}
 	}
 
-	// show a file dialog to choose the test goal file content
-	private void chooseTestGoalFileFileActionPerformed(ActionEvent evt) {
+	// Add a new JTextArea dynamically
+	private void addTestGoalTextArea(ActionEvent evt) {
+		JTextArea newTextArea = new JTextArea(3, 40);
+		newTextArea.setLineWrap(true);
+		newTextArea.setWrapStyleWord(true);
+
+		JScrollPane textAreaScrollPane = new JScrollPane(newTextArea);
+		testGoalScrollPanes.add(textAreaScrollPane);
+		testGoalTextAreas.add(newTextArea);
+
+		testGoalContainer.add(textAreaScrollPane);
+		testGoalContainer.revalidate();
+		testGoalContainer.repaint();
+	}
+
+	// Remove the last JTextArea
+	private void removeLastTestGoalTextArea(ActionEvent evt) {
+		if (!testGoalTextAreas.isEmpty()) {
+			int lastIndex = testGoalTextAreas.size() - 1;
+			JTextArea lastTextArea = testGoalTextAreas.get(lastIndex);
+
+			// Only remove if the text area is empty
+			if (lastTextArea.getText().trim().isEmpty()) {
+				JScrollPane lastScrollPane = testGoalScrollPanes.remove(lastIndex);
+				testGoalTextAreas.remove(lastIndex);
+
+				testGoalContainer.remove(lastScrollPane);
+				testGoalContainer.revalidate();
+				testGoalContainer.repaint();
+			} else {
+				JOptionPane.showMessageDialog(this, "Cannot remove a non-empty test goal. Please clear the content first.", 
+						"Warning", JOptionPane.WARNING_MESSAGE);
+			}
+		}
+	}
+
+	// Load a file and populate a new JTextArea
+	private void chooseTestGoalFileActionPerformed(ActionEvent evt) {
 		JFileChooser fd = new JFileChooser();
 		fd.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fd.setCurrentDirectory(new File(Main.testarDir));
@@ -220,8 +273,22 @@ public class LlmPanel extends SettingsPanel {
 					content.append(line).append("\n");
 				}
 
-				// Set the content of the selected file
-				txtLlmTestGoalDescription.setText(content.toString());
+				// Refill the text area with the file content
+				testGoalTextAreas.clear();
+				testGoalContainer.removeAll();
+				List<String> goals = Arrays.asList(content.toString().split(";", -1));
+				for (String goal : goals) {
+					addTestGoalTextArea(null);
+					testGoalTextAreas.get(testGoalTextAreas.size() - 1).setText(goal);
+				}
+				// Remove extra empty lines
+				for (JTextArea textArea : testGoalTextAreas) {
+					String cleanedText = textArea.getText().replaceAll("(?m)^\\s*$\n?", "").trim();
+					textArea.setText(cleanedText);
+				}
+				testGoalContainer.revalidate();
+				testGoalContainer.repaint();
+
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(this, "Error reading file: " + e.getMessage(), "File Error", JOptionPane.ERROR_MESSAGE);
 			}
@@ -249,7 +316,16 @@ public class LlmPanel extends SettingsPanel {
 		fieldLlmOracleFewshot.setText(settings.get(ConfigTags.LlmOracleFewshotFile));
 		fieldLlmTemperature.setText(settings.get(ConfigTags.LlmTemperature).toString());
 		fieldLlmHistorySize.setText(settings.get(ConfigTags.LlmHistorySize).toString());
-		txtLlmTestGoalDescription.setText(settings.get(ConfigTags.LlmTestGoalDescription).replace("\\n", "\n"));
+
+		testGoalTextAreas.clear();
+		testGoalContainer.removeAll();
+		List<String> goals = settings.get(ConfigTags.LlmTestGoals);
+		for (String goal : goals) {
+			addTestGoalTextArea(null);
+			testGoalTextAreas.get(testGoalTextAreas.size() - 1).setText(goal.replace("\\n", "\n"));
+		}
+		testGoalContainer.revalidate();
+		testGoalContainer.repaint();
 	}
 
 	@Override
@@ -270,7 +346,12 @@ public class LlmPanel extends SettingsPanel {
 		settings.set(ConfigTags.LlmOracleFewshotFile, fieldLlmOracleFewshot.getText());
 		settings.set(ConfigTags.LlmTemperature, Float.parseFloat(fieldLlmTemperature.getText()));
 		settings.set(ConfigTags.LlmHistorySize, Integer.parseInt(fieldLlmHistorySize.getText()));
-		settings.set(ConfigTags.LlmTestGoalDescription, txtLlmTestGoalDescription.getText().replace("\n", "\\n").replace("\r", ""));
+
+		List<String> goals = new ArrayList<>();
+		for (JTextArea textArea : testGoalTextAreas) {
+			goals.add(textArea.getText().replace("\n", "\\n").replace("\r", ""));
+		}
+		settings.set(ConfigTags.LlmTestGoals, goals);
 	}
 
 }

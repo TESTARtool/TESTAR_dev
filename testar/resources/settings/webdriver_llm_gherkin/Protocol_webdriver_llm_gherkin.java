@@ -33,6 +33,7 @@ import com.google.common.collect.ArrayListMultimap;
 import org.testar.CodingManager;
 import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
+import org.testar.llm.LlmTestGoal;
 import org.testar.llm.prompt.StandardPromptActionGenerator;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.alayer.*;
@@ -50,8 +51,11 @@ import org.testar.monkey.Pair;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.settings.Settings;
 import org.testar.statemodel.StateModelManagerFactory;
+import org.testar.statemodel.analysis.condition.BasicConditionEvaluator;
 import org.testar.statemodel.analysis.condition.ConditionEvaluator;
 import org.testar.statemodel.analysis.condition.GherkinConditionEvaluator;
+import org.testar.statemodel.analysis.metric.LlmMetricsCollector;
+import org.testar.statemodel.analysis.metric.MetricsManager;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -75,6 +79,10 @@ public class Protocol_webdriver_llm_gherkin extends WebdriverProtocol {
 	// The Gherkin evaluator used in the State Model to check Gherkin conditions are met
 	private ConditionEvaluator conditionEvaluator;
 
+	private List<LlmTestGoal> testGoals = new ArrayList<>();
+	private Queue<LlmTestGoal> testGoalQueue;
+	private LlmTestGoal currentTestGoal;
+
 	/**
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
@@ -88,10 +96,20 @@ public class Protocol_webdriver_llm_gherkin extends WebdriverProtocol {
 
 		super.initialize(settings);
 
-		// Initialize the LlmActionSelector using the LLM settings
-		llmActionSelector = new LlmActionSelector(settings, new StandardPromptActionGenerator(), settings.get(ConfigTags.LlmTestGoalDescription));
+		// Configure the test goals
+		setupTestGoals(settings.get(ConfigTags.LlmTestGoals));
 
-		conditionEvaluator = new GherkinConditionEvaluator(WdTags.WebInnerHTML, settings.get(ConfigTags.LlmTestGoalDescription));
+		// Initialize the LlmActionSelector using the LLM settings
+		llmActionSelector = new LlmActionSelector(settings, new StandardPromptActionGenerator());
+
+		conditionEvaluator = new BasicConditionEvaluator();
+	}
+
+	private void setupTestGoals(List<String> testGoalsList) {
+		for(String testGoal : testGoalsList) {
+			GherkinConditionEvaluator gherkinEvaluator = new GherkinConditionEvaluator(WdTags.WebInnerHTML, testGoal);
+			testGoals.add(new LlmTestGoal(testGoal, gherkinEvaluator.getConditions()));
+		}
 	}
 
 	/**
@@ -101,8 +119,15 @@ public class Protocol_webdriver_llm_gherkin extends WebdriverProtocol {
 	protected void preSequencePreparations() {
 		super.preSequencePreparations();
 
+		// Setup test goal queue
+		testGoalQueue = new LinkedList<>();
+		testGoalQueue.addAll(testGoals);
+		currentTestGoal = testGoalQueue.poll();
+		conditionEvaluator.clear();
+		conditionEvaluator.addConditions(currentTestGoal.getCompletionConditions());
+
 		// Reset llm action selector
-		llmActionSelector.reset(settings.get(ConfigTags.LlmTestGoalDescription), false);
+		llmActionSelector.reset(currentTestGoal, false);
 
 		// Use sequence count to iteratively create a new state model
 		String appVersion = settings.get(ConfigTags.ApplicationVersion, "");
@@ -116,7 +141,10 @@ public class Protocol_webdriver_llm_gherkin extends WebdriverProtocol {
 
 		// stop and start a new state model manager
 		stateModelManager.notifyTestingEnded();
-		stateModelManager = StateModelManagerFactory.getStateModelManager(settings);
+		stateModelManager = StateModelManagerFactory.getStateModelManager(
+				settings.get(ConfigTags.ApplicationName),
+				settings.get(ConfigTags.ApplicationVersion),
+				settings);
 	}
 
 	/**
@@ -178,7 +206,20 @@ public class Protocol_webdriver_llm_gherkin extends WebdriverProtocol {
 		String modelIdentifier = stateModelManager.getModelIdentifier();
 
 		if(conditionEvaluator.evaluateConditions(modelIdentifier, stateModelManager)) {
-			return new Verdict(Verdict.SEVERITY_TESTGOAL_COMPLETE, "Test goal complete, all conditions met.");
+			// Test goal was completed, retrieve next test goal from queue.
+			currentTestGoal = testGoalQueue.poll();
+
+			// Poll returns null if there are no more items remaining in the queue.
+			if(currentTestGoal == null) {
+				// No more test goals remaining, terminate sequence.
+				System.out.println("Test goal completed, but no more test goals.");
+				return new Verdict(Verdict.SEVERITY_TESTGOAL_COMPLETE, "All test goals completed.");
+			} else {
+				System.out.println("Test goal completed, moving to next test goal.");
+				llmActionSelector.reset(currentTestGoal, true);
+				conditionEvaluator.clear();
+				conditionEvaluator.addConditions(currentTestGoal.getCompletionConditions());
+			}
 		}
 
 		return verdict;

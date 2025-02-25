@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2024 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -58,7 +58,7 @@ import static org.testar.monkey.Util.compileProtocol;
 
 public class Main {
 
-	public static final String TESTAR_VERSION = "2.6.31 (30-Jan-2025)";
+	public static final String TESTAR_VERSION = "2.6.34 (4-Mar-2025)";
 
 	//public static final String TESTAR_DIR_PROPERTY = "DIRNAME"; //Use the OS environment to obtain TESTAR directory
 	public static final String SETTINGS_FILE = "test.settings";
@@ -328,27 +328,25 @@ public class Main {
 	 * @param settings
 	 */
 	private static void startTestar(Settings settings) {
-
-		// Compile the Java protocols if AlwaysCompile setting is true
-		if (settings.get(ConfigTags.AlwaysCompile)) {
-			compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass), settings.get(ConfigTags.ProtocolCompileDirectory));			
-		}
-
 		URLClassLoader loader = null;
 
+		String pc = settings.get(ProtocolClass);
+		String protocolClass = pc.substring(pc.lastIndexOf('/')+1, pc.length());
+
 		try {
+			// Compile the Java protocols if AlwaysCompile setting is true
+			if (settings.get(ConfigTags.AlwaysCompile)) {
+				compileProtocol(Main.settingsDir, pc, settings.get(ConfigTags.ProtocolCompileDirectory));			
+			}
+
 		    List<String> cp = new ArrayList<>(settings.get(MyClassPath));
 			cp.add(settings.get(ConfigTags.ProtocolCompileDirectory));
 			URL[] classPath = new URL[cp.size()];
 			for (int i = 0; i < cp.size(); i++) {
-
 				classPath[i] = new File(cp.get(i)).toURI().toURL();
 			}
 
 			loader = new URLClassLoader(classPath);
-
-			String pc = settings.get(ProtocolClass);
-			String protocolClass = pc.substring(pc.lastIndexOf('/')+1, pc.length());
 
 			LogSerialiser.log("Trying to load TESTAR protocol in class '" +protocolClass +
 					"' with class path '" + Util.toString(cp) + "'\n", LogSerialiser.LogLevel.Debug);
@@ -382,7 +380,19 @@ public class Main {
 			e.printStackTrace();
 			e.printStackTrace(LogSerialiser.getLogStream());
 			LogSerialiser.log("An unexpected error occurred: " + e + "\n", LogSerialiser.LogLevel.Critical);
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+			LogSerialiser.log("An unexpected error occurred: " + e + "\n", LogSerialiser.LogLevel.Critical);
 		} catch (ClassNotFoundException e) {
+			// Invalid TESTAR protocol class configuration
+			String protocolMsg = String.format("The protocol '%s' from the selected ProtocolClass setting '%s' does not exist" 
+					+ System.getProperty("line.separator")
+					+ "Please, edit the test.settings file and update the ProtocolClass setting adequately",
+					protocolClass, pc);
+
+			System.err.println(protocolMsg);
+			LogSerialiser.log(protocolMsg + "\n", LogSerialiser.LogLevel.Critical);
+
 			e.printStackTrace();
 			e.printStackTrace(LogSerialiser.getLogStream());
 			LogSerialiser.log("An unexpected error occurred: " + e + "\n", LogSerialiser.LogLevel.Critical);

@@ -37,5 +37,5 @@ jobs:
     - name: Prepare installed distribution of TESTAR with Gradle
       run: ./gradlew installDist
 
-    - name: Run webdriver protocol and detect SuspiciousTag
-      run: ./gradlew runTestWebdriverSuspiciousTagMacOS
+    - name: Run webdriver protocol and detect SuspiciousTag while using the State Model
+      run: ./gradlew runTestWebdriverSuspiciousTagStateModelMacOS

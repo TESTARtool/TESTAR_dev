@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2023 - 2024 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2023 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2023 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2023 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -36,6 +36,7 @@ import java.util.StringJoiner;
 
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.alayer.Tag;
+import org.testar.statemodel.StateModelTags;
 
 public class SettingsFileStructure {
 
@@ -190,38 +191,44 @@ public class SettingsFileStructure {
 				, ConfigTags.MaxTime.name() + " = "
 				, ""
 				, "#################################################################"
-				, "# State model inference settings"
+				, "# System Under Test (SUT) identification"
 				, "#"
-				, "# StateModelEnabled: " + ConfigTags.StateModelEnabled.getDescription()
-				, "# DataStore: " + ConfigTags.DataStore.getDescription()
-				, "# DataStoreType: " + ConfigTags.DataStoreType.getDescription()
-				, "# DataStoreServer: " + ConfigTags.DataStoreServer.getDescription()
-				, "# DataStoreDirectory: " + ConfigTags.DataStoreDirectory.getDescription()
-				, "# DataStoreDB: " + ConfigTags.DataStoreDB.getDescription()
-				, "# DataStoreUser: " + ConfigTags.DataStoreUser.getDescription()
-				, "# DataStorePassword: " + ConfigTags.DataStorePassword.getDescription()
-				, "# DataStoreMode: " + ConfigTags.DataStoreMode.getDescription()
 				, "# ApplicationName: " + ConfigTags.ApplicationName.getDescription()
 				, "# ApplicationVersion: " + ConfigTags.ApplicationVersion.getDescription()
-				, "# ActionSelectionAlgorithm: " + ConfigTags.ActionSelectionAlgorithm.getDescription()
-				, "# StateModelStoreWidgets: " + ConfigTags.StateModelStoreWidgets.getDescription()
-				, "# ResetDataStore: " + ConfigTags.ResetDataStore.getDescription()
 				, "#################################################################"
 				, ""
-				, ConfigTags.StateModelEnabled.name() + " = "
-				, ConfigTags.DataStore.name() + " = "
-				, ConfigTags.DataStoreType.name() + " = "
-				, ConfigTags.DataStoreServer.name() + " = "
-				, ConfigTags.DataStoreDirectory.name() + " = "
-				, ConfigTags.DataStoreDB.name() + " = "
-				, ConfigTags.DataStoreUser.name() + " = "
-				, ConfigTags.DataStorePassword.name() + " = "
-				, ConfigTags.DataStoreMode.name() + " = "
 				, ConfigTags.ApplicationName.name() + " = "
 				, ConfigTags.ApplicationVersion.name() + " = "
-				, ConfigTags.ActionSelectionAlgorithm.name() + " = "
-				, ConfigTags.StateModelStoreWidgets.name() + " = "
-				, ConfigTags.ResetDataStore.name() + " = "
+				, ""
+				, "#################################################################"
+				, "# State model inference settings"
+				, "#"
+				, "# StateModelEnabled: " + StateModelTags.StateModelEnabled.getDescription()
+				, "# DataStore: " + StateModelTags.DataStore.getDescription()
+				, "# DataStoreType: " + StateModelTags.DataStoreType.getDescription()
+				, "# DataStoreServer: " + StateModelTags.DataStoreServer.getDescription()
+				, "# DataStoreDirectory: " + StateModelTags.DataStoreDirectory.getDescription()
+				, "# DataStoreDB: " + StateModelTags.DataStoreDB.getDescription()
+				, "# DataStoreUser: " + StateModelTags.DataStoreUser.getDescription()
+				, "# DataStorePassword: " + StateModelTags.DataStorePassword.getDescription()
+				, "# DataStoreMode: " + StateModelTags.DataStoreMode.getDescription()
+				, "# ActionSelectionAlgorithm: " + StateModelTags.ActionSelectionAlgorithm.getDescription()
+				, "# StateModelStoreWidgets: " + StateModelTags.StateModelStoreWidgets.getDescription()
+				, "# ResetDataStore: " + StateModelTags.ResetDataStore.getDescription()
+				, "#################################################################"
+				, ""
+				, StateModelTags.StateModelEnabled.name() + " = "
+				, StateModelTags.DataStore.name() + " = "
+				, StateModelTags.DataStoreType.name() + " = "
+				, StateModelTags.DataStoreServer.name() + " = "
+				, StateModelTags.DataStoreDirectory.name() + " = "
+				, StateModelTags.DataStoreDB.name() + " = "
+				, StateModelTags.DataStoreUser.name() + " = "
+				, StateModelTags.DataStorePassword.name() + " = "
+				, StateModelTags.DataStoreMode.name() + " = "
+				, StateModelTags.ActionSelectionAlgorithm.name() + " = "
+				, StateModelTags.StateModelStoreWidgets.name() + " = "
+				, StateModelTags.ResetDataStore.name() + " = "
 				, ""
 				, "#################################################################"
 				, "# State identifier attributes"
@@ -247,7 +254,7 @@ public class SettingsFileStructure {
 				, ConfigTags.LlmOracleFewshotFile.name() + " = "
 				, ConfigTags.LlmTemperature.name() + " = "
 				, ConfigTags.LlmHistorySize.name() + " = "
-				, ConfigTags.LlmTestGoalDescription.name() + " = "
+				, ConfigTags.LlmTestGoals.name() + " = "
 				, ""
 				, "#################################################################"
 				, "# WebDriver features"
@@ -255,7 +262,8 @@ public class SettingsFileStructure {
 				, "# ClickableClasses: " + ConfigTags.ClickableClasses.getDescription()
 				, "# TypeableClasses: " + ConfigTags.TypeableClasses.getDescription()
 				, "# DeniedExtensions: " + ConfigTags.DeniedExtensions.getDescription()
-				, "# DomainsAllowed: " + ConfigTags.DomainsAllowed.getDescription()
+				, "# WebDomainsAllowed: " + ConfigTags.WebDomainsAllowed.getDescription()
+				, "# WebPathsAllowed: " + ConfigTags.WebPathsAllowed.getDescription()
 				, "# FollowLinks: " + ConfigTags.FollowLinks.getDescription()
 				, "# BrowserFullScreen: " + ConfigTags.BrowserFullScreen.getDescription()
 				, "# SwitchNewTabs: " + ConfigTags.SwitchNewTabs.getDescription()
@@ -264,7 +272,8 @@ public class SettingsFileStructure {
 				, ConfigTags.ClickableClasses.name() + " = "
 				, ConfigTags.TypeableClasses.name() + " = "
 				, ConfigTags.DeniedExtensions.name() + " = "
-				, ConfigTags.DomainsAllowed.name() + " = "
+				, ConfigTags.WebDomainsAllowed.name() + " = "
+				, ConfigTags.WebPathsAllowed.name() + " = "
 				, ConfigTags.FollowLinks.name() + " = "
 				, ConfigTags.BrowserFullScreen.name() + " = "
 				, ConfigTags.SwitchNewTabs.name() + " = "

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2023 - 2024 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2023 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2023 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2023 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -33,6 +33,7 @@ package org.testar.settings;
 import org.testar.monkey.Main;
 import org.testar.monkey.Pair;
 import org.testar.monkey.RuntimeControlsProtocol;
+import org.testar.statemodel.StateModelTags;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,20 +84,8 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(Discount, .95));
 		defaults.add(Pair.from(AccessBridgeEnabled, false));
 		defaults.add(Pair.from(SUTProcesses, ""));
-		defaults.add(Pair.from(StateModelEnabled, false));
-		defaults.add(Pair.from(DataStore, ""));
-		defaults.add(Pair.from(DataStoreType, ""));
-		defaults.add(Pair.from(DataStoreServer, ""));
-		defaults.add(Pair.from(DataStoreDirectory, ""));
-		defaults.add(Pair.from(DataStoreDB, ""));
-		defaults.add(Pair.from(DataStoreUser, ""));
-		defaults.add(Pair.from(DataStorePassword, ""));
-		defaults.add(Pair.from(DataStoreMode, ""));
-		defaults.add(Pair.from(ResetDataStore, false));
 		defaults.add(Pair.from(ApplicationName, ""));
 		defaults.add(Pair.from(ApplicationVersion, ""));
-		defaults.add(Pair.from(ActionSelectionAlgorithm, "random"));
-		defaults.add(Pair.from(StateModelStoreWidgets, true));
 		defaults.add(Pair.from(AlwaysCompile, true));
 		defaults.add(Pair.from(ProcessListenerEnabled, false));
 		defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
@@ -144,13 +133,13 @@ public class SettingsDefaults {
 			}
 		}));
 
-		defaults.add(Pair.from(DomainsAllowed, new ArrayList<String>() {
+		defaults.add(Pair.from(WebDomainsAllowed, new ArrayList<String>() {
 			{
 				add("www.ou.nl");
-				add("mijn.awo.ou.nl");
-				add("login.awo.ou.nl");
 			}
 		}));
+
+		defaults.add(Pair.from(WebPathsAllowed, ""));
 
 		defaults.add(Pair.from(TagsToFilter, new ArrayList<String>() {
 			{
@@ -195,12 +184,26 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(JacocoCoverageClasses, "path/to/SUT/classes"));
 		defaults.add(Pair.from(JacocoCoverageAccumulate, false));
 
+		// State Model settings defaults
+		defaults.add(Pair.from(StateModelTags.StateModelEnabled, false));
+		defaults.add(Pair.from(StateModelTags.DataStore, ""));
+		defaults.add(Pair.from(StateModelTags.DataStoreType, ""));
+		defaults.add(Pair.from(StateModelTags.DataStoreServer, ""));
+		defaults.add(Pair.from(StateModelTags.DataStoreDirectory, ""));
+		defaults.add(Pair.from(StateModelTags.DataStoreDB, ""));
+		defaults.add(Pair.from(StateModelTags.DataStoreUser, ""));
+		defaults.add(Pair.from(StateModelTags.DataStorePassword, ""));
+		defaults.add(Pair.from(StateModelTags.DataStoreMode, ""));
+		defaults.add(Pair.from(StateModelTags.ResetDataStore, false));
+		defaults.add(Pair.from(StateModelTags.ActionSelectionAlgorithm, "random"));
+		defaults.add(Pair.from(StateModelTags.StateModelStoreWidgets, true));
+
 		// Settings for LLM agents
 		defaults.add(Pair.from(LlmPlatform, "OpenAI"));
 		defaults.add(Pair.from(LlmModel, ""));
 		defaults.add(Pair.from(LlmHostUrl, "http://192.168.108.242:1234/v1/chat/completions"));
 		defaults.add(Pair.from(LlmAuthorizationHeader, ""));
-		defaults.add(Pair.from(LlmTestGoalDescription, "Log in with username john and password demo"));
+		defaults.add(Pair.from(LlmTestGoals, Arrays.asList("Log in with the username john and the password demo\\nThen John Smith")));
 		defaults.add(Pair.from(LlmActionFewshotFile, "prompts/fewshot_openai_action.json"));
 		defaults.add(Pair.from(LlmOracleFewshotFile, "prompts/fewshot_openai_oracle.json"));
 		defaults.add(Pair.from(LlmTemperature, 0.2f));

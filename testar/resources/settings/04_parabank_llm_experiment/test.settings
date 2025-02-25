@@ -36,7 +36,7 @@ SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "http://localhost:8080/parab
 #################################################################
 
 Sequences = 3
-SequenceLength = 5
+SequenceLength = 15
 
 #################################################################
 # Oracles based on suspicious tag values
@@ -147,7 +147,7 @@ DataStoreUser = admin
 DataStorePassword = admin
 DataStoreMode = instant
 ApplicationName = parabank_llama3.2
-ApplicationVersion = login
+ApplicationVersion = loan_denied
 ActionSelectionAlgorithm = random
 StateModelStoreWidgets = true
 ResetDataStore = false
@@ -171,9 +171,10 @@ LlmPlatform = OpenAI
 LlmModel = llama3.2
 LlmHostUrl = http://10.102.0.41:11434/v1/chat/completions
 LlmAuthorizationHeader = 
-LlmTestGoalDescription = Log in with the username john and the password demo
-LlmActionFewshotFile = prompts/fewshot_login_openai.json
+LlmActionFewshotFile = prompts/fewshot_openai_action.json
 LlmTemperature = 0.2
+LlmHistorySize = 5
+LlmTestGoals = Log in with the username john and the password demo\\nThen John Smith;Apply for a loan of 999999 with a down payment of 190000\\nThen You do not have sufficient funds
 
 #################################################################
 # WebDriver features
@@ -181,7 +182,8 @@ LlmTemperature = 0.2
 # ClickableClasses: Indicate which web CSS classes need to be considered clickable
 # TypeableClasses: Indicate which web CSS classes need to be considered typeable
 # DeniedExtensions: Indicate which web URL extensions need to be ignored when testing
-# DomainsAllowed: Indicate which web URL domains need to be ignored when testing
+# WebDomainsAllowed: Indicate which web URL domains are allowed to explore when testing
+# WebPathsAllowed: Regular expressions to indicate which web URL paths are allowed to explore when testing
 # FollowLinks: Indicate if allowing to follow links opened in new tabs
 # BrowserFullScreen: Indicate if perform the web testing with the browser in full screen
 # SwitchNewTabs: Indicate if switch to a new web tab if opened
@@ -190,7 +192,8 @@ LlmTemperature = 0.2
 ClickableClasses = 
 TypeableClasses = 
 DeniedExtensions = pdf;jpg;png;pfx;xml
-DomainsAllowed = 
+WebDomainsAllowed = 
+WebPathsAllowed = null
 FollowLinks = false
 BrowserFullScreen = true
 SwitchNewTabs = true
