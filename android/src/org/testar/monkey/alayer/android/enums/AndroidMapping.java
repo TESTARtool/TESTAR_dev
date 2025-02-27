@@ -43,6 +43,7 @@ public class AndroidMapping {
     {
         {
             put(WidgetTitle, AndroidTags.AndroidText);
+            put(WidgetHelpText, AndroidTags.AndroidHint);
             put(WidgetControlType, AndroidTags.AndroidClassName);
             put(WidgetClassName, AndroidTags.AndroidClassName);
             put(WidgetAutomationId, AndroidTags.AndroidAccessibilityId);

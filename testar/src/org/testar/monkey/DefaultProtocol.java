@@ -1038,10 +1038,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		reportManager.addSelectedAction(state, action);
 
 		if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
-			//System.out.println("DEBUG: Using WebDriver specific action shot.");
 			WdProtocolUtil.getActionshot(state,action);
+		}else if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)){
+			AndroidProtocolUtil.getActionshot(state,action);
 		}else{
-			//System.out.println("DEBUG: normal action shot");
 			ProtocolUtil.getActionshot(state,action);
 		}
 

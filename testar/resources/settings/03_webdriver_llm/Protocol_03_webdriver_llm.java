@@ -33,7 +33,7 @@ import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
 import org.testar.llm.LlmTestGoal;
 import org.testar.llm.prompt.OracleWebPromptGenerator;
-import org.testar.llm.prompt.StandardPromptActionGenerator;
+import org.testar.llm.prompt.ActionWebPromptGenerator;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
@@ -79,7 +79,7 @@ public class Protocol_03_webdriver_llm extends WebdriverProtocol {
 		setupTestGoals(settings.get(ConfigTags.LlmTestGoals));
 
 		// Initialize the LlmActionSelector using the LLM settings
-		llmActionSelector = new LlmActionSelector(settings, new StandardPromptActionGenerator());
+		llmActionSelector = new LlmActionSelector(settings, new ActionWebPromptGenerator());
 
 		// Initialize the LlmOracle using the LLM settings
 		llmOracle = new LlmOracle(settings, new OracleWebPromptGenerator());

@@ -32,7 +32,7 @@ import org.testar.CodingManager;
 import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
 import org.testar.llm.LlmTestGoal;
-import org.testar.llm.prompt.StandardPromptActionGenerator;
+import org.testar.llm.prompt.ActionWebPromptGenerator;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
@@ -96,7 +96,7 @@ public class Protocol_04_parabank_llm_experiment extends WebdriverProtocol {
 		setupTestGoals(settings.get(ConfigTags.LlmTestGoals));
 
 		// Initialize the LlmActionSelector using the LLM settings
-		llmActionSelector = new LlmActionSelector(settings, new StandardPromptActionGenerator());
+		llmActionSelector = new LlmActionSelector(settings, new ActionWebPromptGenerator());
 
 		// Initialize the metrics collector to analyze the state model
 		metricsManager = new MetricsManager(new LlmMetricsCollector("Denied"));
