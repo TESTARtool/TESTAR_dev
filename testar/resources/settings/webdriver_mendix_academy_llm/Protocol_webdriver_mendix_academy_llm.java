@@ -37,7 +37,7 @@ import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
 import org.testar.llm.LlmTestGoal;
 import org.testar.llm.prompt.OracleWebPromptGenerator;
-import org.testar.llm.prompt.StandardPromptActionGenerator;
+import org.testar.llm.prompt.ActionWebPromptGenerator;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
@@ -112,7 +112,7 @@ public class Protocol_webdriver_mendix_academy_llm extends WebdriverProtocol {
 		setupTestGoals(settings.get(ConfigTags.LlmTestGoals));
 
 		// Initialize the LlmActionSelector using the LLM settings
-		llmActionSelector = new LlmActionSelector(settings, new StandardPromptActionGenerator(Tags.Desc));
+		llmActionSelector = new LlmActionSelector(settings, new ActionWebPromptGenerator(Tags.Desc));
 
 		// Test goal is considered complete when the Then statement is found in the HTML of the state model.
 		conditionEvaluator = new BasicConditionEvaluator();
@@ -247,9 +247,7 @@ public class Protocol_webdriver_mendix_academy_llm extends WebdriverProtocol {
 				conditionEvaluator.clear();
 				conditionEvaluator.addConditions(currentTestGoal.getCompletionConditions());
 			}
-		} 
-		/*
-		else if (actionCount > 1) {
+		} else if (actionCount > 1) {
 			// If the technical condition evaluator determines the goal has not been achieved
 			// Use the LLM as an Oracle to determine if the test goal has been completed
 			Verdict llmVerdict = llmOracle.getVerdict(state);
@@ -270,7 +268,6 @@ public class Protocol_webdriver_mendix_academy_llm extends WebdriverProtocol {
 				}
 			}
 		}
-		*/
 
 		return verdict;
 	}
@@ -309,7 +306,7 @@ public class Protocol_webdriver_mendix_academy_llm extends WebdriverProtocol {
 			//CAPS_LOCK + SHIFT + Click clickfilter functionality.
 			if(blackListed(widget)){
 				if(isTypeable(widget)){
-					filteredActions.add(ac.pasteTextInto(widget, InputDataManager.getRandomTextInputData(), true));
+					filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(), true));
 				} else {
 					filteredActions.add(ac.leftClickAt(widget));
 				}
@@ -327,10 +324,10 @@ public class Protocol_webdriver_mendix_academy_llm extends WebdriverProtocol {
 			// type into text boxes
 			if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
 				if(whiteListed(widget) || isUnfiltered(widget)){
-					actions.add(ac.pasteTextInto(widget, InputDataManager.getRandomTextInputData(), true));
+					actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(), true));
 				}else{
 					// filtered and not white listed:
-					filteredActions.add(ac.pasteTextInto(widget, InputDataManager.getRandomTextInputData(), true));
+					filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(), true));
 				}
 			}
 

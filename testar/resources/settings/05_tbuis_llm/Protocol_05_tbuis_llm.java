@@ -33,7 +33,7 @@ import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
 import org.testar.llm.LlmTestGoal;
 import org.testar.llm.prompt.OracleWebPromptGenerator;
-import org.testar.llm.prompt.StandardPromptActionGenerator;
+import org.testar.llm.prompt.ActionWebPromptGenerator;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
@@ -109,7 +109,7 @@ public class Protocol_05_tbuis_llm extends WebdriverProtocol {
 		setupTestGoals(settings.get(ConfigTags.LlmTestGoals));
 
 		// Initialize the LlmActionSelector using the LLM settings
-		llmActionSelector = new LlmActionSelector(settings, new StandardPromptActionGenerator(WdTags.WebTitle));
+		llmActionSelector = new LlmActionSelector(settings, new ActionWebPromptGenerator(WdTags.WebTitle));
 
 		// Test goal is considered complete when the Then statement is found in the HTML of the state model.
 		conditionEvaluator = new BasicConditionEvaluator();

@@ -1,5 +1,5 @@
-A student decides to study the Agile Awareness course
-Then 1. Introduction
+As a user, I want to access to the learning paths to study the Agile Awareness course
+Then experience how Mendix has embedded it in the Application Development Lifecycle
 ;
-A student starts the first Welcome module of the Introduction  lesson
+As a user, I want to start the first Welcome module of the Introduction lesson
 Then Welcome to Agile Awareness

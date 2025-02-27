@@ -1,5 +1,5 @@
-A student decides to study the Agile Awareness course
-Then the first Introduction lesson is available
+As a user, I want to access to the instructor-led trainings courses
+Then a Mendix rapid developer certification will be shown
 ;
-A student starts the first Welcome module of the Introduction  lesson
-Then can read the Welcome to Agile Awareness lesson
+As a user, I want to access to the Mendix rapid developer certification
+Then the objectives of the rapid developer certification will be shown

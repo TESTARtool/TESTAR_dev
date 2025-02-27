@@ -47,6 +47,7 @@ import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.webdriver.Constants;
 import org.testar.monkey.alayer.webdriver.WdDriver;
+import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.settings.Settings;
@@ -154,8 +155,22 @@ public class Protocol_webdriver_mendix_academy extends WebdriverProtocol {
 	@Override
 	protected Verdict getVerdict(State state) {
 
+		// System crashes, non-responsiveness and suspicious tags automatically detected!
+		// For web applications, web browser errors and warnings can also be enabled via settings
 		Verdict verdict = super.getVerdict(state);
-		// system crashes, non-responsiveness and suspicious tags automatically detected!
+
+		// If the Verdict is not OK but was already detected in a previous sequence
+		// Consider as OK to avoid duplicates and continue testing
+		if (verdict != Verdict.OK && containsVerdictInfo(listOfDetectedErroneousVerdicts, verdict.info())) {
+			// Consider as OK to continue testing
+			verdict = Verdict.OK;
+			webConsoleVerdict = Verdict.OK;
+		} 
+		// If the Verdict is not OK and was not duplicated...
+		// We found an issue we need to report
+		else if (verdict.severity() != Verdict.OK.severity()) {
+			return verdict;
+		}
 
 		//-----------------------------------------------------------------------------
 		// MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
@@ -163,7 +178,24 @@ public class Protocol_webdriver_mendix_academy extends WebdriverProtocol {
 
 		// ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
 
-		return verdict;
+		Verdict customVerdict = Verdict.OK;
+		/*
+
+		customVerdict = customVerdict.join(customVerdictImplementation(state));
+
+		// If the Custom Verdict is not OK but was already detected in a previous sequence
+		// Consider as OK to avoid duplicates
+		if (customVerdict != Verdict.OK && containsVerdictInfo(listOfDetectedErroneousVerdicts, customVerdict.info())) {
+			customVerdict = Verdict.OK;
+		}
+
+		 */
+
+		return customVerdict;
+	}
+
+	private boolean containsVerdictInfo(List<String> listOfDetectedErroneousVerdicts, String currentVerdictInfo) {
+		return listOfDetectedErroneousVerdicts.stream().anyMatch(verdictInfo -> verdictInfo.contains(currentVerdictInfo.replace("\n", " ")));
 	}
 
 	/**
@@ -255,12 +287,21 @@ public class Protocol_webdriver_mendix_academy extends WebdriverProtocol {
 
 	@Override
 	protected boolean isClickable(Widget widget) {
-		// The img widgets with role presentation will be detected as clickable
-		if(widget.get(WdTags.WebAttributeMap).toString().contains("role=presentation")) {
+		// Some header classes can be clickable
+		// These are interesting widgets because contain action description information
+		if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdH2)
+				&& widget.get(WdTags.WebCssClasses).contains("pds-heading")
+				&& isSonOfList(widget)){
 			return true;
 		}
 
 		return super.isClickable(widget);
+	}
+
+	private boolean isSonOfList(Widget widget) {
+		if(widget.parent() == null) return false;
+		else if (widget.parent().get(Tags.Role, Roles.Widget).equals(WdRoles.WdLI)) return true;
+		else return isSonOfList(widget.parent());
 	}
 
 	/**
