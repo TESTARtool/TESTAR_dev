@@ -1,0 +1,9 @@
+{
+  "deviceName": "Android Emulator",
+  "platformName": "Android",
+  "app": "suts/spark.apk",
+  "automationName" : "UiAutomator2",
+  "allowTestPackages": true,
+  "newCommandTimeout": 500000,
+  "autoGrantPermissions": true
+}
