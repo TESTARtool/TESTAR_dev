@@ -32,6 +32,7 @@ package org.testar.monkey.alayer.android.actions;
 
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.actions.ActionRoles;
 import org.testar.monkey.alayer.exceptions.ActionFailedException;
 import org.testar.monkey.alayer.visualizers.TextVisualizer;
 import org.testar.monkey.alayer.android.AndroidAppiumFramework;
@@ -53,7 +54,7 @@ public class AndroidActionType extends TaggableBase implements Action {
 	private final int DISPLAY_TEXT_MAX_LENGTH = 16;
 
 	public AndroidActionType(State state, Widget w, String type, String accessibilityId, String text, String className) {
-		this.set(Tags.Role, AndroidRoles.AndroidWidget);
+		this.set(Tags.Role, ActionRoles.ClickTypeInto);
 		this.mapActionToWidget(w);
 		this.type = type;
 		this.accessibilityId = accessibilityId;
