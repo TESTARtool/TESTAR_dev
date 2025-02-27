@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2024 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -38,8 +38,6 @@ import org.testar.managers.NativeHookManager;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Canvas;
 import org.testar.monkey.alayer.Color;
-import org.testar.monkey.alayer.Shape;
-import org.testar.monkey.alayer.Visualizer;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.ActivateSystem;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
@@ -329,7 +327,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			OutputStructure.createOutputFolders();
 
 			// new state model manager
-			stateModelManager = StateModelManagerFactory.getStateModelManager(settings);
+			stateModelManager = StateModelManagerFactory.getStateModelManager(
+					settings.get(ConfigTags.ApplicationName),
+					settings.get(ConfigTags.ApplicationVersion),
+					settings);
 		}
 
 		//EventHandler is implemented in RuntimeControlsProtocol (super class):
@@ -821,19 +822,26 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * Take a Screenshot of the State and associate the path into state tag
 	 */
 	private void setStateScreenshot(State state) {
-		Shape viewPort = state.get(Tags.Shape, null);
-		if(viewPort != null){
+		// If the environment is not headless, take a screenshot
+		if (!GraphicsEnvironment.isHeadless()) {
+			AWTCanvas screenshot = null;
 			if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
-				state.set(Tags.ScreenshotPath, WdProtocolUtil.getStateshot(state));
+				screenshot = WdProtocolUtil.getStateshotBinary(state);
 			}
-			else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
-				state.set(Tags.ScreenshotPath, AndroidProtocolUtil.getStateshot(state));
+			else if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
+				screenshot = AndroidProtocolUtil.getStateshotBinary(state);
 			}
-			else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
-				state.set(Tags.ScreenshotPath, IOSProtocolUtil.getStateshot(state));
+			else if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
+				screenshot = IOSProtocolUtil.getStateshotBinary(state);
 			}
-			else{
-				state.set(Tags.ScreenshotPath, ProtocolUtil.getStateshot(state));
+			else {
+				screenshot = ProtocolUtil.getStateshotBinary(state);
+			}
+
+			if(screenshot != null) {
+				String screenshotPath = ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), screenshot);
+				state.set(Tags.ScreenshotImage, screenshot);
+				state.set(Tags.ScreenshotPath, screenshotPath);
 			}
 		}
 	}
