@@ -34,7 +34,7 @@ import org.testar.CodingManager;
 import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
 import org.testar.llm.LlmTestGoal;
-import org.testar.llm.prompt.StandardPromptActionGenerator;
+import org.testar.llm.prompt.ActionWebPromptGenerator;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
@@ -100,7 +100,7 @@ public class Protocol_webdriver_llm_gherkin extends WebdriverProtocol {
 		setupTestGoals(settings.get(ConfigTags.LlmTestGoals));
 
 		// Initialize the LlmActionSelector using the LLM settings
-		llmActionSelector = new LlmActionSelector(settings, new StandardPromptActionGenerator());
+		llmActionSelector = new LlmActionSelector(settings, new ActionWebPromptGenerator());
 
 		conditionEvaluator = new BasicConditionEvaluator();
 	}

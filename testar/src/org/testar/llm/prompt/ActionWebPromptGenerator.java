@@ -60,7 +60,7 @@ import java.util.regex.Pattern;
  * 4. The list of available actions.
  * 5. Action history.
  */
-public class StandardPromptActionGenerator implements IPromptActionGenerator {
+public class ActionWebPromptGenerator implements IPromptActionGenerator {
     protected static final Logger logger = LogManager.getLogger();
 
     private final Tag<String> descriptionTag;
@@ -68,16 +68,16 @@ public class StandardPromptActionGenerator implements IPromptActionGenerator {
     /**
      * Creates a new standard prompt generator.
      */
-    public StandardPromptActionGenerator() {
-    	this(Tags.Desc); // Tags.Desc is the default description Tag
+    public ActionWebPromptGenerator() {
+        this(Tags.Desc); // Tags.Desc is the default description Tag
     }
 
     /**
      * Creates a new standard prompt generator with a specific descriptionTag
      * @param descriptionTag The tag to be used for obtaining the action/widget description.
      */
-    public StandardPromptActionGenerator(Tag<String> descriptionTag) {
-    	this.descriptionTag = descriptionTag;
+    public ActionWebPromptGenerator(Tag<String> descriptionTag) {
+        this.descriptionTag = descriptionTag;
     }
 
     /**
