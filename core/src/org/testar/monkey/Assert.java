@@ -47,6 +47,11 @@ public final class Assert {
 		if(!expression)
 			throw new IllegalArgumentException("You passed illegal parameters!");
 	}
+	
+	public static void isFalse(boolean expression){
+		if(expression)
+			throw new IllegalArgumentException("You passed illegal parameters!");
+	}
 		
 	public static void notNull(Object object, String text){
 		if(object == null)

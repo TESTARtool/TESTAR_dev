@@ -2,26 +2,25 @@ package oracle_objects;
 
 import org.testar.monkey.alayer.State;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 public class GrammarPredicate implements Predicate<State>
 {
     final PredicateFunction predicateFunction;
-    final String            arg1;
-    final String            arg2;
+    final List<String>            args;
 //    final String            description;
-    public GrammarPredicate(PredicateFunction predicateFunction, String arg1, String arg2)
+    public GrammarPredicate(PredicateFunction predicateFunction, List<String> args)
     {
         this.predicateFunction = predicateFunction;
-        this.arg1 = arg1;
-        this.arg2 = arg2;
+        this.args = args;
 //        this.description = description;
     }
     
     @Override
     public boolean test(State state)
     {
-        return predicateFunction.test(state, arg1, arg2);
+        return predicateFunction.test(state, args);
     }
 
 //    public Predicate<Boolean> getGrammarPredicate() { return predicate; }

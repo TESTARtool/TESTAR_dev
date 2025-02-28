@@ -41,13 +41,25 @@ public class OraclesBaseListener implements OraclesListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSelect_block(OraclesParser.Select_blockContext ctx) { }
+	@Override public void enterGiven_block(OraclesParser.Given_blockContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSelect_block(OraclesParser.Select_blockContext ctx) { }
+	@Override public void exitGiven_block(OraclesParser.Given_blockContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterGroup_block(OraclesParser.Group_blockContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitGroup_block(OraclesParser.Group_blockContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -125,6 +137,18 @@ public class OraclesBaseListener implements OraclesListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterIsOprExpr(OraclesParser.IsOprExprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitIsOprExpr(OraclesParser.IsOprExprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterXorOprExpr(OraclesParser.XorOprExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -161,18 +185,6 @@ public class OraclesBaseListener implements OraclesListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterBoolOprExpr(OraclesParser.BoolOprExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitBoolOprExpr(OraclesParser.BoolOprExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterPropertyBool(OraclesParser.PropertyBoolContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -185,37 +197,61 @@ public class OraclesBaseListener implements OraclesListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterHasProperty(OraclesParser.HasPropertyContext ctx) { }
+	@Override public void enterPropKeyValue(OraclesParser.PropKeyValueContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitHasProperty(OraclesParser.HasPropertyContext ctx) { }
+	@Override public void exitPropKeyValue(OraclesParser.PropKeyValueContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterPropIs(OraclesParser.PropIsContext ctx) { }
+	@Override public void enterPropKey(OraclesParser.PropKeyContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitPropIs(OraclesParser.PropIsContext ctx) { }
+	@Override public void exitPropKey(OraclesParser.PropKeyContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterPropContains(OraclesParser.PropContainsContext ctx) { }
+	@Override public void enterPropValue(OraclesParser.PropValueContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitPropContains(OraclesParser.PropContainsContext ctx) { }
+	@Override public void exitPropValue(OraclesParser.PropValueContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterPropAny(OraclesParser.PropAnyContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPropAny(OraclesParser.PropAnyContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterPropIsBool(OraclesParser.PropIsBoolContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPropIsBool(OraclesParser.PropIsBoolContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -233,25 +269,73 @@ public class OraclesBaseListener implements OraclesListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterWidgetIsWidget(OraclesParser.WidgetIsWidgetContext ctx) { }
+	@Override public void enterList(OraclesParser.ListContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitWidgetIsWidget(OraclesParser.WidgetIsWidgetContext ctx) { }
+	@Override public void exitList(OraclesParser.ListContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterString(OraclesParser.StringContext ctx) { }
+	@Override public void enterComparator_is(OraclesParser.Comparator_isContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitString(OraclesParser.StringContext ctx) { }
+	@Override public void exitComparator_is(OraclesParser.Comparator_isContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterComparator_matches(OraclesParser.Comparator_matchesContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitComparator_matches(OraclesParser.Comparator_matchesContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterComparator_contains(OraclesParser.Comparator_containsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitComparator_contains(OraclesParser.Comparator_containsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterComparator_startsWith(OraclesParser.Comparator_startsWithContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitComparator_startsWith(OraclesParser.Comparator_startsWithContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterComparator_endsWith(OraclesParser.Comparator_endsWithContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitComparator_endsWith(OraclesParser.Comparator_endsWithContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -264,18 +348,6 @@ public class OraclesBaseListener implements OraclesListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitRegex_string(OraclesParser.Regex_stringContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterProperty_string(OraclesParser.Property_stringContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitProperty_string(OraclesParser.Property_stringContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -300,30 +372,6 @@ public class OraclesBaseListener implements OraclesListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitBasic_string(OraclesParser.Basic_stringContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterOracle_name(OraclesParser.Oracle_nameContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitOracle_name(OraclesParser.Oracle_nameContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterList(OraclesParser.ListContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitList(OraclesParser.ListContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

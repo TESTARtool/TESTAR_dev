@@ -19,7 +19,7 @@ public class ParseUtil
     public ParseUtil(String filePath)
     {
         CharStream chars  = pathToCharstream(filePath);
-        StrategyTree = BuildAST(chars);
+        StrategyTree = buildAST(chars);
     }
     
     private CharStream pathToCharstream(String filePath)
@@ -36,14 +36,14 @@ public class ParseUtil
         return chars;
     }
     
-    private ListNode BuildAST(CharStream chars)
+    private ListNode buildAST(CharStream chars)
     {
         StrategyLexer     lexer  = new StrategyLexer(chars);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         StrategyParser                      parser = new StrategyParser(tokens);
         StrategyParser.Strategy_fileContext tree   = parser.strategy_file();
         
-        ASTBuilder   visitor = new ASTBuilder();
+        StrategyBuilder visitor = new StrategyBuilder();
         return visitor.visitStrategy_file(tree); //create and return AST tree
     }
     

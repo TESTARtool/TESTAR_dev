@@ -13,7 +13,7 @@ import strategynodes.instructions.*;
 
 import java.util.ArrayList;
 
-public class ASTBuilder extends StrategyBaseVisitor<BaseNode>
+public class StrategyBuilder extends StrategyBaseVisitor<BaseNode>
 {
     /////////////////////
     // top-level nodes //
