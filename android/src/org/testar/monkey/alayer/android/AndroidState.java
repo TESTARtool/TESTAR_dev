@@ -185,6 +185,9 @@ public class AndroidState extends AndroidWidget implements State {
 		else if (t.equals(AndroidTags.AndroidText)) {
 			ret = w.element.text;
 		}
+		else if (t.equals(AndroidTags.AndroidHint)) {
+			ret = w.element.hint;
+		}
 		else if (t.equals(AndroidTags.AndroidResourceId)) {
 			ret = w.element.resourceId;
 		}

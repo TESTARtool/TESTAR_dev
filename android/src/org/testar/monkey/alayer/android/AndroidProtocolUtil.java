@@ -75,10 +75,10 @@ public class AndroidProtocolUtil extends ProtocolUtil {
 	 * @param state
 	 * @return
 	 */
-	public static AWTCanvas getStateshotBinary(State state, Widget widget) {
+	public static AWTCanvas getStateshotBinary(State state) {
 		// Obtain the binary screenshotfile through the appium driver.
 		try {
-			return AndroidAppiumFramework.getScreenshotBinary(state, widget);
+			return AndroidAppiumFramework.getScreenshotBinary(state);
 		} catch (IOException e) {
 			System.err.println("Exception occured when trying to take a binary screenshot of the Android emulator: " + e);
 		}
