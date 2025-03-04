@@ -18,6 +18,7 @@ public class TestRegularExpressionSettings {
 			ConfigTags.SuspiciousProcessOutput,
 			ConfigTags.ProcessLogs,
 			ConfigTags.LogOracleRegex,
+			ConfigTags.WebPathsAllowed,
 			ConfigTags.WebConsoleErrorPattern,
 			ConfigTags.WebConsoleWarningPattern
 			);

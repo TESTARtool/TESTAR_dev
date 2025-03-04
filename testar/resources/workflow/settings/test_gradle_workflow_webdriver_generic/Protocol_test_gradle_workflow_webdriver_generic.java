@@ -75,14 +75,16 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
         /**
          *  WebDriver settings and features verification
          */
-        // We want to test WebdriverProtocol.ensureDomainsAllowed (startSystem method)
+        // We want to test WebdriverProtocol.ensureWebDomainsAllowed (startSystem method)
         // Then we don't include para.testar.org domain by default
-        Assert.collectionNotContains(settings.get(ConfigTags.DomainsAllowed), "para.testar.org");
-        Assert.collectionNotContains(domainsAllowed, "para.testar.org");
+        Assert.collectionNotContains(settings.get(ConfigTags.WebDomainsAllowed), "para.testar.org");
+        Assert.collectionNotContains(webDomainsAllowed, "para.testar.org");
 
         // Check that WebDriver settings are correctly assigned to Webdriver features
-        Assert.collectionContains(settings.get(ConfigTags.DomainsAllowed), "testar.org");
-        Assert.collectionContains(domainsAllowed, "testar.org");
+        Assert.collectionContains(settings.get(ConfigTags.WebDomainsAllowed), "testar.org");
+        Assert.collectionContains(webDomainsAllowed, "testar.org");
+        Assert.isTrue(settings.get(ConfigTags.WebPathsAllowed).contains("index.htm"));
+        Assert.isTrue(webPathsAllowed.contains("index.htm"));
         Assert.collectionSize(settings.get(ConfigTags.DeniedExtensions), 3);
         Assert.collectionSize(deniedExtensions, 3);
         Assert.collectionContains(settings.get(ConfigTags.ClickableClasses), "v-menubar-menuitem");
@@ -100,8 +102,8 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
     protected SUT startSystem() throws SystemStartException {        
         SUT sut = super.startSystem();
 
-        // Check if WebdriverProtocol.ensureDomainsAllowed feature works
-        Assert.collectionContains(domainsAllowed, "para.testar.org");
+        // Check if WebdriverProtocol.ensureWebDomainsAllowed feature works
+        Assert.collectionContains(webDomainsAllowed, "para.testar.org");
 
         return sut;
     }
