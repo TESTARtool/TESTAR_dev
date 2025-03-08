@@ -125,6 +125,11 @@ public class WdTags extends TagsBase {
   public static final Tag<String> WebDisplay = from("WebDisplay", String.class);
   
   /**
+   * Web computed font size of a widget.
+   */
+  public static final Tag<String> WebComputedFontSize = from("WebComputedFontSize", String.class);
+
+  /**
    * Web type of input of a widget.
    */
   public static final Tag<String> WebType = from("WebType", String.class);
