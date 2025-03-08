@@ -33,6 +33,9 @@ package org.testar.oracles;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
+import org.reflections8.Reflections;
 
 public class OracleSelection {
 
@@ -40,6 +43,23 @@ public class OracleSelection {
 			"org.testar.oracles.generic.visual",
 			"org.testar.oracles.web.accessibility",
 	};
+
+	public static List<String> getAvailableOracles() {
+		List<String> oracleNames = new ArrayList<>();
+		for (String pkg : oraclePackages) {
+			try {
+				Reflections reflections = new Reflections(pkg);
+				Set<Class<? extends Oracle>> oracleClasses = reflections.getSubTypesOf(Oracle.class);
+
+				for (Class<? extends Oracle> oracleClass : oracleClasses) {
+					oracleNames.add(oracleClass.getSimpleName());
+				}
+			} catch (Exception e) {
+				System.out.println("Error loading package: " + pkg);
+			}
+		}
+		return oracleNames;
+	}
 
 	public static List<Oracle> loadExtendedOracles(String selectedOracles) {
 		List<Oracle> oraclesList = new ArrayList<>();
