@@ -39,7 +39,10 @@ import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.oracles.Oracle;
+import org.testar.oracles.OracleSelection;
 import org.testar.plugin.NativeLinker;
+import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Pair;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.settings.Settings;
@@ -56,6 +59,8 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 
 	// This list tracks the detected erroneous verdicts to avoid duplicates
 	private List<String> listOfDetectedErroneousVerdicts = new ArrayList<>();
+
+	private List<Oracle> extendedOraclesList = new ArrayList<>();
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -74,6 +79,18 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 
 		// Reset the list when we start a new TESTAR run with multiple sequences
 		listOfDetectedErroneousVerdicts = new ArrayList<>();
+	}
+
+	/**
+	 * This methods is called before each test sequence, before startSystem(),
+	 * allowing for example using external profiling software on the SUT
+	 *
+	 * HTML sequence report will be initialized in the super.preSequencePreparations() for each sequence
+	 */
+	@Override
+	protected void preSequencePreparations() {
+		super.preSequencePreparations();
+		extendedOraclesList = OracleSelection.loadExtendedOracles(settings.get(ConfigTags.ExtendedOracles));
 	}
 
 	/**
@@ -175,6 +192,18 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 		// We found an issue we need to report
 		else if (verdict.severity() != Verdict.OK.severity()) {
 			return verdict;
+		}
+
+		// ExtendedOracles offered by TESTAR
+		for(Oracle extendedOracle : extendedOraclesList) {
+			Verdict extendedVerdict = extendedOracle.getVerdict(state);
+
+			// If the Custom Verdict is not OK and was not detected in a previous sequence
+			// return verdict with failure state
+			if (extendedVerdict != Verdict.OK && !containsVerdictInfo(listOfDetectedErroneousVerdicts, extendedVerdict.info())) {
+				return extendedVerdict;
+			}
+
 		}
 
 		//-----------------------------------------------------------------------------
