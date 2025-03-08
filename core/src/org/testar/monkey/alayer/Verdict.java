@@ -56,6 +56,9 @@ public final class Verdict implements Serializable {
 		// WARNING GROUP: UI
 		WARNING_UI_VISUAL_OR_RENDERING_FAULT(0.00000017, "UI_VISUAL_OR_RENDERING_FAULT"),
 
+		// ACCESSIBILITY GROUP:
+		WARNING_ACCESSIBILITY_FAULT(0.00000101, "WARNING_ACCESSIBILITY_FAULT"),
+
 		// FAIL
 		SUSPICIOUS_TAG(0.8, "SUSPICIOUS_TAG"), // Suspicious tag
 		SUSPICIOUS_LOG(0.89, "SUSPICIOUS_LOG"), // Suspicious message in log file or command output (LogOracle)
