@@ -41,6 +41,8 @@ import java.io.*;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -557,10 +559,11 @@ public final class Util {
 		}
 	}
 
-	public static String readFile(File path) {
-		try (Scanner scanner = new Scanner(path, "UTF-8").useDelimiter("\\A")) {
-			return scanner.hasNext() ? scanner.next() : "";
-		} catch (FileNotFoundException ex) {
+	public static String readFile(File file) {
+		try {
+			return Files.readString(file.toPath(), Charset.forName("ISO-8859-1"));
+		} catch (IOException ex) {
+			ex.printStackTrace();
 			return null;
 		}
 	}

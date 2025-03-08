@@ -97,9 +97,12 @@ public class HtmlReporter implements Reporting
         String stateIDs = "AbstractID=" + abstractID +  " || " + "ConcreteID=" + concreteID;
         htmlReportUtil.addHeading(4, stateIDs);
 
-        // Add the timestamp this state was discover
-        String formattedTimestamp = DateTimeFormatter.ISO_INSTANT.format(Instant.ofEpochMilli(state.get(Tags.TimeStamp, 0L)));
-        htmlReportUtil.addHeading(4, "TimeStamp: " + formattedTimestamp);
+        // Add the timestamp this state was discovered
+        Long stateTimeStamp = state.get(Tags.TimeStamp, 0L);
+        Instant epochTimeStamp = Instant.ofEpochMilli(stateTimeStamp);
+        String formattedTimestamp = DateTimeFormatter.ISO_INSTANT.format(epochTimeStamp);
+        long epochMillis = epochTimeStamp.toEpochMilli();
+        htmlReportUtil.addHeading(4, "TimeStamp: " + formattedTimestamp + " || Epoch: " + epochMillis);
 
         // Add state render time if available
         if(state.get(Tags.StateRenderTime, null) != null) {
