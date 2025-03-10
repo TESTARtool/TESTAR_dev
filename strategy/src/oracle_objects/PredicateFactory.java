@@ -69,7 +69,7 @@ public class PredicateFactory
     
     private static boolean tagMatchesString(Tag<?> tag, String string)
     {
-        return tag.name().equals(string);
+        return tag.name().equals(string.replace("'", ""));
     }
     
     private static boolean widgetHasTagWithThisValue(Widget widget, Tag<?> tag, String value)
@@ -115,7 +115,9 @@ public class PredicateFactory
         {
             for(Tag<?> tag : widget.tags())
             {
-                if(widgetHasTag(widget, tag) && tag.name().equals(tagName) && widget.get(tag).equals(value))
+            	if(widget.get(tag, null) != null
+            			&& tag.name().equals(tagName.replace("'", "")) 
+            			&& widget.get(tag).equals(value.replace("'", "")))
                     return true;
             }
         }

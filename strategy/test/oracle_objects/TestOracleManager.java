@@ -86,13 +86,8 @@ public class TestOracleManager
         System.out.println(fileContent);
     }
     
-    /**
-     * ORACLE
-     *     	PROP 'WebId' IS 'formButton',
-     *     	PROP 'WebTitle' IS 'Send payment'
-     */
     @Test
-    public void test_oracle_manager()
+    public void test_oracle_manager_prop_key()
     {
         StateStub  state  = new StateStub();
         WidgetStub widget = new WidgetStub();
@@ -109,7 +104,51 @@ public class TestOracleManager
         
         OracleManager manager = new OracleManager(grammarOracleFile);
         
-        Assert.isFalse(manager.runOracles(state)); //todo: fix so it checks for true
+        Assert.isTrue(manager.runOracles(state));
     }
-    
+
+    @Test
+    public void test_oracle_manager_prop_pair_true()
+    {
+        StateStub  state  = new StateStub();
+        WidgetStub widget = new WidgetStub();
+        state.addChild(widget);
+        widget.setParent(state);
+
+        widget.set(Tags.Role, Roles.Button);
+        widget.set(WdTags.WebId, "formButton");
+        widget.set(WdTags.WebTitle, "Send payment");
+
+        String instruction = "ORACLE 'basic oracle' { CHECK PROP (KEY,VALUE) IS ('WebId','formButton') }";
+
+        addTextToFile(instruction);
+
+        OracleManager manager = new OracleManager(grammarOracleFile);
+
+        Assert.isTrue(manager.runOracles(state));
+    }
+
+    @Test
+    public void test_oracle_manager_prop_pair_false()
+    {
+        StateStub  state  = new StateStub();
+        WidgetStub widget = new WidgetStub();
+        state.addChild(widget);
+        widget.setParent(state);
+
+        widget.set(Tags.Role, Roles.Button);
+        widget.set(WdTags.WebId, "formButton");
+        widget.set(WdTags.WebTitle, "Send payment");
+
+        String incorrectTypo = "ORACLE 'basic oracle' { CHECK PROP (KEY,VALUE) IS ('WebId','formBtton') }";
+        String notExistingTag = "ORACLE 'basic oracle' { CHECK PROP (KEY,VALUE) IS ('WebName','formButton') }";
+
+        // Add two oracles that do not match
+        addTextToFile(incorrectTypo.concat(notExistingTag));
+
+        OracleManager manager = new OracleManager(grammarOracleFile);
+
+        Assert.isFalse(manager.runOracles(state));
+    }
+
 }
