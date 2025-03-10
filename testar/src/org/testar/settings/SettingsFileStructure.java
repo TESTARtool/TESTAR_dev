@@ -286,6 +286,7 @@ public class SettingsFileStructure {
 				, "#################################################################"
 				, ""
 				, ConfigTags.StrategyFile.name() +  " = "
+				, ConfigTags.GrammarOracleFile.name() +  " = "
 				, ""
 				, "#################################################################"
 				, "# Settings (string) that can be used for user specified protocols"
