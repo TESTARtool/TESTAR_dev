@@ -33,6 +33,7 @@ package org.testar.settings.dialog;
 
 import org.testar.monkey.*;
 import org.testar.settings.Settings;
+import org.testar.settings.dialog.components.RegexButton;
 import org.testar.settings.dialog.components.UndoTextArea;
 
 import javax.swing.*;
@@ -67,6 +68,11 @@ public class GeneralPanel extends SettingsPanel implements Observer {
   private JLabel labelOverrideWebDriverDisplayScale = new JLabel("Override display scale");
   private JTextField overrideWebDriverDisplayScaleField = new JTextField();
 
+  private JLabel labelWebPaths = new JLabel("Web Paths Allowed");
+  private UndoTextArea txtWebPaths = new UndoTextArea();
+  private JScrollPane paneWebPaths = new JScrollPane(txtWebPaths);
+  private RegexButton regexButtonWebPaths = new RegexButton(txtWebPaths);
+ 
   public GeneralPanel(SettingsDialog settingsDialog) {
     setLayout(null);
 
@@ -157,11 +163,26 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     overrideWebDriverDisplayScaleField.setBounds(480, 320, 125, 27);
     overrideWebDriverDisplayScaleField.setToolTipText(ToolTipTexts.overrideWebDriverDisplayScaleTTT);
     add(overrideWebDriverDisplayScaleField);
+    
+    labelWebPaths.setBounds(15, 280, 120, 27);
+    labelWebPaths.setToolTipText(ConfigTags.WebPathsAllowed.getDescription());
+    add(labelWebPaths);
+    regexButtonWebPaths.setPosition(150, 280);
+    add(regexButtonWebPaths);
+    txtWebPaths.setLineWrap(true);
+    paneWebPaths.setBounds(10, 310, 250, 50);
+    paneWebPaths.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+    paneWebPaths.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+    add(paneWebPaths);
   }
 
   private void setOverrideWebDriverDisplayScaleVisibility(boolean isVisible){
     labelOverrideWebDriverDisplayScale.setVisible(isVisible);
     overrideWebDriverDisplayScaleField.setVisible(isVisible);
+    labelWebPaths.setVisible(isVisible);
+    regexButtonWebPaths.setVisible(isVisible);
+    txtWebPaths.setVisible(isVisible);
+    paneWebPaths.setVisible(isVisible);
   }
 
   @Override
@@ -262,6 +283,7 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     applicationNameField.setText(settings.get(ConfigTags.ApplicationName));
     applicationVersionField.setText(settings.get(ConfigTags.ApplicationVersion));
     overrideWebDriverDisplayScaleField.setText(settings.get(ConfigTags.OverrideWebDriverDisplayScale));
+    txtWebPaths.setInitialText(settings.get(ConfigTags.WebPathsAllowed));
   }
 
   /**
@@ -281,6 +303,7 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     settings.set(ConfigTags.ApplicationName, applicationNameField.getText());
     settings.set(ConfigTags.ApplicationVersion, applicationVersionField.getText());
     settings.set(ConfigTags.OverrideWebDriverDisplayScale, overrideWebDriverDisplayScaleField.getText());
+    settings.set(ConfigTags.WebPathsAllowed, txtWebPaths.getText());
   }
 
   public class MyItemListener extends Observable implements ItemListener {
