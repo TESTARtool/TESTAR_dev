@@ -222,8 +222,6 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 
 		customVerdict = customVerdict.join(detectTextAreaWithoutLength(state, Arrays.asList(WdRoles.WdTEXTAREA)));
 
-		customVerdict = customVerdict.join(detectDuplicatedRowsInTable(state));
-
 		// If the Custom Verdict is not OK but was already detected in a previous sequence
 		// Consider as OK to avoid duplicates
 		if (customVerdict != Verdict.OK && containsVerdictInfo(listOfDetectedErroneousVerdicts, customVerdict.info())) {
@@ -340,65 +338,6 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 		}
 
 		return Verdict.OK;
-	}
-
-	// Detect duplicated rows in a table by concatenating all visible values with an _ underscore
-	public Verdict detectDuplicatedRowsInTable(State state) {
-		for(Widget w : state) {
-			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdTABLE)) {
-				List<Pair<Widget, String>> rowElementsDescription = new ArrayList<>();
-				extractAllRowDescriptionsFromTable(w, rowElementsDescription);
-
-				List<Pair<Widget, String>> duplicatedDescriptions = 
-						rowElementsDescription.stream()
-						.collect(Collectors.groupingBy(Pair::right))
-						.entrySet().stream()
-						.filter(e -> e.getValue().size() > 1)
-						.flatMap(e -> e.getValue().stream())
-						.collect(Collectors.toList());
-
-				// If the list of duplicated descriptions contains a matching prepare the verdict
-				if(!duplicatedDescriptions.isEmpty()) {
-					for(Pair<Widget, String> duplicatedWidget : duplicatedDescriptions) {
-						// Ignore empty rows
-						if (!duplicatedWidget.right().replaceAll("_","").isEmpty()) {
-							String verdictMsg = String.format("Detected a duplicated rows in a Table! Role: %s , WebId: %s, Description: %s", 
-									duplicatedWidget.left().get(Tags.Role), duplicatedWidget.left().get(WdTags.WebId, ""), duplicatedWidget.right());
-
-							return new Verdict(Verdict.Severity.WARNING, verdictMsg);
-						}
-					}
-				}
-
-			}
-		}
-
-		return Verdict.OK;
-	}
-
-	private void extractAllRowDescriptionsFromTable(Widget w, List<Pair<Widget, String>> rowElementsDescription) {
-		if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdTR)) {
-			rowElementsDescription.add(new Pair<Widget, String>(w, obtainWidgetTreeDescription(w)));
-		}
-
-		// Iterate through the form element widgets
-		for(int i = 0; i < w.childCount(); i++) {
-			// If the children of the table are not sub-tables
-			if(!w.child(i).get(Tags.Role, Roles.Widget).equals(WdRoles.WdTABLE)) {
-				extractAllRowDescriptionsFromTable(w.child(i), rowElementsDescription);
-			}
-		}
-	}
-
-	private String obtainWidgetTreeDescription(Widget w) {
-		String widgetDesc = w.get(WdTags.WebTextContent, "");
-
-		// Iterate through the form element widgets
-		for(int i = 0; i < w.childCount(); i++) {
-			widgetDesc = widgetDesc + "_" + obtainWidgetTreeDescription(w.child(i));
-		}
-
-		return widgetDesc;
 	}
 
 	/**
