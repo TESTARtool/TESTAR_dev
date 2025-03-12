@@ -4,8 +4,8 @@ import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Widget;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -19,22 +19,20 @@ public class PredicateFactory
         predicateMap.put("value", PredicateFactory::stateHasWidgetWithValue);
         predicateMap.put("any", PredicateFactory::stateHasWidgetWithTagOrValue);
         predicateMap.put("pair", PredicateFactory::stateHasWidgetWithTagAndValue);
-        predicateMap.put("list", PredicateFactory::stateHasWidgetWithTagAndValue);
+        predicateMap.put("list", PredicateFactory::stateHasWidgetWithStringFromList);
     }
     
     private PredicateFactory() {}
     
-    public static GrammarPredicate createPredicate(String name, List<String> args)
+    public static GrammarPredicate createPredicate(String name, Map<String, String> args)
     {
         if(args.isEmpty())
-        {
             throw new IllegalArgumentException("Argument list of predicate " + name + " is empty");
-        }
+        
         PredicateFunction function = predicateMap.get(name);
-        if (function == null)
-        {
+        if(function == null)
             throw new IllegalArgumentException("Unknown predicate function: " + name);
-        }
+        
         return new GrammarPredicate(function, args);
     }
     
@@ -42,10 +40,12 @@ public class PredicateFactory
     {
         return left.and(right);
     }
+    
     public static Predicate<State> orPredicates(Predicate<State> left, Predicate<State> right)
     {
         return left.or(right);
     }
+    
     public static Predicate<State> xorPredicates(Predicate<State> left, Predicate<State> right)
     {
         return left.and(right.negate()).or(left.negate().and(right));
@@ -61,104 +61,129 @@ public class PredicateFactory
         return predicate.negate();
     }
     
+    // helper methods
     
-    private static boolean widgetHasTag(Widget widget, Tag<?> tag)
+    private static boolean widgetHasTag(Widget widget, String tagName)
     {
-        return widget.get(tag, null) != null;
-    }
-    
-    private static boolean tagMatchesString(Tag<?> tag, String string)
-    {
-        return tag.name().equals(string.replace("'", ""));
-    }
-    
-    private static boolean widgetHasTagWithThisValue(Widget widget, Tag<?> tag, String value)
-    {
-        return widget.get(tag).equals(value);
-    }
-    
-    
-    private static Boolean stateHasWidgetWithTag(State state, List<String> args)
-    {
-        String tagName = args.get(0);
-        for(Widget widget : state)
+        for(Tag<?> tag : widget.tags())
         {
-            for(Tag<?> tag : widget.tags())
-            {
-                if(widgetHasTag(widget, tag) && tagMatchesString(tag, tagName))
-                    return true;
+            if(tagNameMatchesString(tag, tagName))
+                return true;
+        }
+        return false;
+    }
+    
+    private static boolean widgetHasValue(Widget widget, String value)
+    {
+        for(Tag<?> tag : widget.tags())
+        {
+            if(widget.get(tag, null).equals(value))
+                return true;
+        }
+        return false;
+    }
+    
+    private static boolean tagNameMatchesString(Tag<?> tag, String string)
+    {
+        return tag.name().equals(string);
+    }
+    
+    private static boolean widgetHasTagValuePair(Widget widget, String tagName, String value)
+    {
+        for(Tag<?> tag : widget.tags())
+        {
+            if(tagNameMatchesString(tag, tagName) && widget.get(tag).equals(value))
+                return true;
+        }
+        return false;
+    }
+    
+    // predicate methods
+    
+    private static Boolean stateHasWidgetWithTag(State state, Map<String, String> args)
+    {
+        String tagName = args.getOrDefault("key", null);
+        if(tagName == null)
+            throw new IllegalArgumentException();
         
-            }
+        for(Widget widget : state)
+        {
+            if(widgetHasTag(widget, tagName))
+                return true;
         }
         return false;
     }
     
-    private static Boolean stateHasWidgetWithValue(State state, List<String> args)
+    private static Boolean stateHasWidgetWithValue(State state, Map<String, String> args)
     {
-        String value = args.get(0);
+        String value = args.getOrDefault("value", null);
+        if(value == null)
+            throw new IllegalArgumentException();
+        
         for(Widget widget : state)
         {
             for(Tag<?> tag : widget.tags())
             {
-                if(widgetHasTag(widget, tag) && widgetHasTagWithThisValue(widget, tag, value))
+                if(widget.get(tag).equals(value))
                     return true;
             }
         }
         return false;
     }
     
-    private static Boolean stateHasWidgetWithTagAndValue(State state, List<String> args)
+    private static Boolean stateHasWidgetWithTagAndValue(State state, Map<String, String> args)
     {
-        String tagName = args.get(0);
-        String value = args.get(1);
+        String tagName = args.getOrDefault("key", null);
+        String value   = args.getOrDefault("value", null);
+        
+        if(tagName == null || value == null)
+            throw new IllegalArgumentException();
+    
         for(Widget widget : state)
         {
-            for(Tag<?> tag : widget.tags())
+            if(widgetHasTagValuePair(widget, tagName, value))
+                return true;
+        }
+        return false;
+    }
+    
+    private static Boolean stateHasWidgetWithTagOrValue(State state, Map<String, String> args)
+    {
+        String string = args.getOrDefault("any", null);
+    
+        if(string == null)
+            throw new IllegalArgumentException();
+    
+        for(Widget widget : state)
+        {
+            if(widgetHasTag(widget, string) || widgetHasValue(widget, string))
+                return true;
+        }
+        return false;
+    }
+    
+    private static Boolean stateHasWidgetWithStringFromList(State state, Map<String,String> args)
+    {
+        String            type      = args.getOrDefault("list", null); // key, value, or any
+        ArrayList<String> options   = new ArrayList<>(args.values());
+    
+        if(type == null || args.size() <= 1)
+            throw new IllegalArgumentException();
+    
+        options.remove(type); // remove the keyword as an option
+    
+        for(Widget widget : state)
+        {
+            for(String option : options)
             {
-            	if(widget.get(tag, null) != null
-            			&& tag.name().equals(tagName.replace("'", "")) 
-            			&& widget.get(tag).equals(value.replace("'", "")))
+                if(
+                        (type.equals("key") && widgetHasTag(widget, option)) ||
+                        (type.equals("value") && widgetHasValue(widget, option)) ||
+                        (type.equals("any") && (widgetHasTag(widget, option) || widgetHasValue(widget, option)))
+                )
                     return true;
             }
         }
         return false;
     }
-    
-    private static Boolean stateHasWidgetWithTagOrValue(State state, List<String> args)
-    {
-        String string = args.get(0);
-        for(Widget widget : state)
-        {
-            for(Tag<?> tag : widget.tags())
-            {
-                if((tag.name().equals(string) && widget.get(tag, null) != null) ||
-                   (widget.get(tag, null) != null && widget.get(tag).equals(string)))
-                    return true;
-            }
-        }
-        return false;
-    }
-    
-//    private static Boolean stateHasWidgetWithStringFromList(State state, List<String> args)
-//    {
-//        String type = args.get(0);
-//        for(Widget widget : state)
-//        {
-//            for(Tag<?> tag : widget.tags())
-//            {
-//                switch(type)
-//                {
-//                    case "key":
-//                        return widgetHasTag(widget, tag);
-//                    case "value":
-//                        return widgetHasValue(widget, args.get(1));
-//                    case "any":
-//                    default: return false;
-//                }
-//                if((tag.name().equals(string) && widget.get(tag, null) != null) ||
-//                   (widget.get(tag, null) != null && widget.get(tag).equals(string)))
-//            }
-//        }
-//    }
 }
-

@@ -82,8 +82,8 @@ public class TestOracleManager
     {
         String instruction = "ORACLE 'basic oracle' { CHECK PROP KEY IS 'WebId' }";
         addTextToFile(instruction);
-        String fileContent = fileContent();
-        System.out.println(fileContent);
+//        String fileContent = fileContent();
+//        System.out.println(fileContent);
     }
     
     @Test
@@ -100,6 +100,27 @@ public class TestOracleManager
         
         String instruction = "ORACLE 'basic oracle' { CHECK PROP KEY IS 'WebId' }";
     
+        addTextToFile(instruction);
+        
+        OracleManager manager = new OracleManager(grammarOracleFile);
+        
+        Assert.isTrue(manager.runOracles(state));
+    }
+    
+    @Test
+    public void test_oracle_manager_prop_value()
+    {
+        StateStub  state  = new StateStub();
+        WidgetStub widget = new WidgetStub();
+        state.addChild(widget);
+        widget.setParent(state);
+        
+        widget.set(Tags.Role, Roles.Button);
+        widget.set(WdTags.WebId, "formButton");
+        widget.set(WdTags.WebTitle, "Send payment");
+        
+        String instruction = "ORACLE 'basic oracle' { CHECK PROP VALUE IS 'formButton' }";
+        
         addTextToFile(instruction);
         
         OracleManager manager = new OracleManager(grammarOracleFile);
@@ -150,5 +171,46 @@ public class TestOracleManager
 
         Assert.isFalse(manager.runOracles(state));
     }
-
+    
+    @Test
+    public void test_oracle_manager_prop_any()
+    {
+        StateStub  state  = new StateStub();
+        WidgetStub widget = new WidgetStub();
+        state.addChild(widget);
+        widget.setParent(state);
+        
+        widget.set(Tags.Role, Roles.Button);
+        widget.set(WdTags.WebId, "formButton");
+        widget.set(WdTags.WebTitle, "Send payment");
+        
+        String instruction = "ORACLE 'basic oracle' { CHECK PROP ANY IS 'formButton', PROP ANY IS 'WebTitle' }";
+        
+        addTextToFile(instruction);
+        
+        OracleManager manager = new OracleManager(grammarOracleFile);
+        
+        Assert.isTrue(manager.runOracles(state));
+    }
+    
+    @Test
+    public void test_oracle_manager_prop_list()
+    {
+        StateStub  state  = new StateStub();
+        WidgetStub widget = new WidgetStub();
+        state.addChild(widget);
+        widget.setParent(state);
+        
+        widget.set(Tags.Role, Roles.Button);
+        widget.set(WdTags.WebId, "formButton");
+        widget.set(WdTags.WebTitle, "Send payment");
+        
+        String instruction = "ORACLE 'basic oracle' { CHECK PROP ANY IS IN LIST('Button', 'WebTitle', 'Role') }";
+        
+        addTextToFile(instruction);
+        
+        OracleManager manager = new OracleManager(grammarOracleFile);
+        
+        Assert.isTrue(manager.runOracles(state));
+    }
 }

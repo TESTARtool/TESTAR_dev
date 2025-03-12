@@ -28,28 +28,25 @@
  *
  */
 
-import com.google.common.collect.ArrayListMultimap;
-
 import oracle_objects.OracleManager;
-
 import org.testar.SutVisualization;
 import org.testar.managers.InputDataManager;
+import org.testar.monkey.ConfigTags;
 import org.testar.monkey.alayer.*;
-import org.testar.monkey.alayer.actions.*;
+import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
-import org.testar.monkey.alayer.webdriver.WdDriver;
-import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.plugin.NativeLinker;
-import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Pair;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.settings.Settings;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
@@ -161,7 +158,14 @@ public class Protocol_webdriver_parabank_grammar_oracle extends WebdriverProtoco
 		// GRAMMAR-BASED ORACLES
 		//-----------------------------------------------------------------------------
 
-		if(oracleManager.runOracles(state)) {
+//		if(!oracleManager.runOracles(state)) {
+//			Verdict grammarOracleVerdict = new Verdict(Verdict.SEVERITY_WARNING, "Grammar-based Oracle found a matching failure!");
+//			if (!containsVerdictInfo(listOfDetectedErroneousVerdicts, grammarOracleVerdict.info())) {
+//				return grammarOracleVerdict;
+//			}
+//		}
+		
+		if(!oracleManager.runOracles(state)) {
 			Verdict grammarOracleVerdict = new Verdict(Verdict.SEVERITY_WARNING, "Grammar-based Oracle found a matching failure!");
 			if (!containsVerdictInfo(listOfDetectedErroneousVerdicts, grammarOracleVerdict.info())) {
 				return grammarOracleVerdict;

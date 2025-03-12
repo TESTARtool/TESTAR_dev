@@ -8,18 +8,16 @@ import java.util.function.Predicate;
 
 public class GrammarOracle
 {
-    private final int id;
     private final String oracleName;
     
     private List<Predicate<State>> givenLogic = new ArrayList<>();
     private List<Predicate<State>> groupLogic = new ArrayList<>();
     private Predicate<State>       checkLogic;
-    private String                 TriggerTrue;
-    private String                 TriggerFalse;
+    private String                 triggerTrue;
+    private String                 triggerFalse;
     
-    public GrammarOracle(int id, String oracleName)
+    public GrammarOracle(String oracleName)
     {
-        this.id = id;
         this.oracleName = oracleName;
     }
     
@@ -39,17 +37,24 @@ public class GrammarOracle
     
     public void setTriggerTrue(String message)
     {
-        this.TriggerTrue = message;
+        this.triggerTrue = message;
     }
     
     public void setTriggerFalse(String message)
     {
-        this.TriggerFalse = message;
+        this.triggerFalse = message;
     }
     
-    public boolean verdict(State state)
+//    public Verdict getVerdict(State state)
+//    {
+//        if(checkLogic.test(state))
+//            return new Verdict(Verdict.SEVERITY_MIN, triggerTrue); // OK
+//        else
+//            return new Verdict(Verdict.SEVERITY_WARNING, triggerFalse);
+//    }
+    
+    public boolean getVerdict(State state)
     {
-        System.out.println("Predicate says " + checkLogic.test(state));
         return checkLogic.test(state);
     }
 }

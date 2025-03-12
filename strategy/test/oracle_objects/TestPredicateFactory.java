@@ -1,6 +1,5 @@
 package oracle_objects;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.testar.monkey.Assert;
 import org.testar.monkey.alayer.Roles;
@@ -10,8 +9,8 @@ import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.stub.StateStub;
 import org.testar.stub.WidgetStub;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Predicate;
 
 public class TestPredicateFactory {
@@ -29,8 +28,8 @@ public class TestPredicateFactory {
 		widget.set(Tags.Role, Roles.Button);
 		widget.set(WdTags.WebId, "formButton");
         
-        List<String> args = new ArrayList<>();
-        args.add("WebId");
+        Map<String, String> args = new HashMap<>();
+        args.put("key", "WebId");
 
 		GrammarPredicate predicate = PredicateFactory.createPredicate("key", args);
 		Assert.isTrue(predicate.test(state));
@@ -44,9 +43,9 @@ public class TestPredicateFactory {
 
 		widget.set(Tags.Role, Roles.Button);
 		widget.set(WdTags.WebId, "formButton");
-        
-        List<String> args = new ArrayList<>();
-        args.add("WeId"); //misspelled
+		
+		Map<String, String> args = new HashMap<>();
+		args.put("key", "WeId"); //misspelled
 
 		GrammarPredicate predicate = PredicateFactory.createPredicate("key", args);
 		Assert.isFalse(predicate.test(state));
@@ -65,9 +64,9 @@ public class TestPredicateFactory {
 
 		widget.set(Tags.Role, Roles.Button);
 		widget.set(WdTags.WebId, "formButton");
-        
-        List<String> args = new ArrayList<>();
-        args.add("formButton");
+		
+		Map<String, String> args = new HashMap<>();
+		args.put("value", "formButton");
         
 		GrammarPredicate predicate = PredicateFactory.createPredicate("value", args);
 		Assert.isTrue(predicate.test(state));
@@ -81,9 +80,9 @@ public class TestPredicateFactory {
 
 		widget.set(Tags.Role, Roles.Button);
 		widget.set(WdTags.WebId, "formButton");
-        
-        List<String> args = new ArrayList<>();
-        args.add("formBtton");//misspelled
+		
+		Map<String, String> args = new HashMap<>();
+		args.put("value", "formBtton");//misspelled
         
         GrammarPredicate predicate = PredicateFactory.createPredicate("value", args);
 		Assert.isFalse(predicate.test(state));
@@ -94,7 +93,7 @@ public class TestPredicateFactory {
 	 *     PROP (KEY,VALUE) IS ('WebId','formButton'),
 	 *     PROP (KEY,VALUE) IS ('WebTitle','Send payment')
 	 */
-	@Ignore @Test
+	@Test
 	public void test_joint_property_values() {
 		StateStub state = new StateStub();
 		WidgetStub widget = new WidgetStub();
@@ -104,20 +103,20 @@ public class TestPredicateFactory {
 		widget.set(Tags.Role, Roles.Button);
 		widget.set(WdTags.WebId, "formButton");
 		widget.set(WdTags.WebTitle, "Send payment");
-        
-        List<String> args1 = new ArrayList<>();
-        args1.add("WebId");
-        args1.add("formButton");
-        List<String> args2 = new ArrayList<>();
-        args2.add("WebTitle");
-        args2.add("Send payment");
+		
+		Map<String, String> args1 = new HashMap<>();
+        args1.put("key", "WebId");
+        args1.put("value", "formButton");
+		Map<String, String> args2 = new HashMap<>();
+        args2.put("key", "WebTitle");
+        args2.put("value", "Send payment");
 
 		GrammarPredicate isFormButtonPredicate = PredicateFactory.createPredicate("pair", args1);
 		GrammarPredicate isSendPaymentPredicate = PredicateFactory.createPredicate("pair", args2);
 
 		Predicate<State> isJointPredicate = PredicateFactory.andPredicates(isFormButtonPredicate, isSendPaymentPredicate);
 
-		Assert.isTrue(isJointPredicate.test(state)); //todo: fix function
+		Assert.isTrue(isJointPredicate.test(state));
 	}
 
 	/**
@@ -135,11 +134,11 @@ public class TestPredicateFactory {
 		widget.set(Tags.Role, Roles.Button);
 		widget.set(WdTags.WebId, "formButton");
 		widget.set(WdTags.WebTitle, "Send payment");
-        
-        List<String> args1 = new ArrayList<>();
-        args1.add("formButton");
-        List<String> args2 = new ArrayList<>();
-        args2.add("Send payment");
+		
+		Map<String, String> args1 = new HashMap<>();
+        args1.put("value", "formButton");
+		Map<String, String> args2 = new HashMap<>();
+        args2.put("value", "Send payment");
         
 		GrammarPredicate isFormButtonPredicate = PredicateFactory.createPredicate("value", args1);
 		GrammarPredicate isSendPaymentPredicate = PredicateFactory.createPredicate("value", args2);
@@ -165,15 +164,15 @@ public class TestPredicateFactory {
 		widget.set(Tags.Role, Roles.Button);
 		widget.set(WdTags.WebId, "formButton");
 		widget.set(WdTags.WebTitle, "Send payment");
-        
-        List<String> args1 = new ArrayList<>();
-        args1.add("WebId");
-        args1.add("formButton");
-        List<String> args2 = new ArrayList<>();
-        args2.add("WebTitle");
-        args2.add("Send payment");
+		
+		Map<String, String> args1 = new HashMap<>();
+        args1.put("key", "WebId");
+        args1.put("value", "formButton");
+		Map<String, String> args2 = new HashMap<>();
+        args2.put("key", "WebTitle");
+        args2.put("value", "Send payment");
 
-		GrammarOracle oracle = new GrammarOracle(1, "test oracle");
+		GrammarOracle oracle = new GrammarOracle( "test oracle");
         
         GrammarPredicate isFormButtonPredicate = PredicateFactory.createPredicate("pair", args1);
         GrammarPredicate isSendPaymentPredicate = PredicateFactory.createPredicate("pair", args2);
@@ -181,7 +180,7 @@ public class TestPredicateFactory {
 		Predicate<State> jointPredicate = PredicateFactory.andPredicates(isFormButtonPredicate, isSendPaymentPredicate);
 		oracle.setCheckLogic(jointPredicate);
 
-		Assert.isTrue(oracle.verdict(state));
+		Assert.isTrue(oracle.getVerdict(state));
 	}
 
 }

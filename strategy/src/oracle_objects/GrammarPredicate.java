@@ -2,15 +2,15 @@ package oracle_objects;
 
 import org.testar.monkey.alayer.State;
 
-import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 public class GrammarPredicate implements Predicate<State>
 {
-    final PredicateFunction predicateFunction;
-    final List<String>            args;
+    final PredicateFunction   predicateFunction;
+    final Map<String, String> args;
 //    final String            description;
-    public GrammarPredicate(PredicateFunction predicateFunction, List<String> args)
+    public GrammarPredicate(PredicateFunction predicateFunction, Map<String, String> args)
     {
         this.predicateFunction = predicateFunction;
         this.args = args;

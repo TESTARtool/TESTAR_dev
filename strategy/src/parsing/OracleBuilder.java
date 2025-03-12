@@ -8,16 +8,16 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.testar.monkey.alayer.State;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 public class OracleBuilder extends OraclesBaseVisitor<Predicate<State>>
 {
-    private       int           oracleCounter = 1;
     
     public List<GrammarOracle> parseOracleInstructions(OraclesParser.Oracles_fileContext ctx)
     {
-        System.out.println("number of oracles in instructions: " + ctx.oracle().size());
         List<GrammarOracle> grammarOracles = new ArrayList<>();
         for(int i = 0; i < ctx.oracle().size(); i++)
         {
@@ -28,10 +28,9 @@ public class OracleBuilder extends OraclesBaseVisitor<Predicate<State>>
     
     private GrammarOracle createOracle(OraclesParser.OracleContext ctx)
     {
-        oracleCounter += 1;
-        String name = String.valueOf(ctx.STRING());
+        String name = stripOuterQuotes(String.valueOf(ctx.STRING()));
     
-        GrammarOracle oracle = new GrammarOracle(oracleCounter, name);
+        GrammarOracle oracle = new GrammarOracle(name);
     
         List<Predicate<State>> groupBlocks = new ArrayList<>();
         for(int j = 0; j < ctx.group_block().size(); j++)
@@ -43,9 +42,9 @@ public class OracleBuilder extends OraclesBaseVisitor<Predicate<State>>
         for(OraclesParser.Trigger_blockContext triggerBlock : ctx.trigger_block())
         {
             if(triggerBlock.BOOL().getText().equals("TRUE"))
-                oracle.setTriggerTrue(triggerBlock.STRING().getText());
+                oracle.setTriggerTrue(stripOuterQuotes(triggerBlock.STRING().getText()));
             if(triggerBlock.BOOL().getText().equals("FALSE"))
-                oracle.setTriggerFalse(triggerBlock.STRING().getText());
+                oracle.setTriggerFalse(stripOuterQuotes(triggerBlock.STRING().getText()));
         }
         
         return oracle;
@@ -99,42 +98,56 @@ public class OracleBuilder extends OraclesBaseVisitor<Predicate<State>>
     
     @Override public Predicate<State> visitPropKey(OraclesParser.PropKeyContext ctx)
     {
-        List<String> args = new ArrayList<>();
-        args.add(ctx.STRING().getText());
+        Map<String,String> args = new HashMap<>();
+        args.put("key", stripOuterQuotes(ctx.STRING().getText()));
         return PredicateFactory.createPredicate("key", args);
     }
     
     @Override public Predicate<State> visitPropValue(OraclesParser.PropValueContext ctx)
     {
-        List<String> args = new ArrayList<>();
-        args.add(ctx.STRING().getText());
+        Map<String,String> args = new HashMap<>();
+        args.put("value", stripOuterQuotes(ctx.STRING().getText()));
         return PredicateFactory.createPredicate("value", args);
     }
     
     @Override public Predicate<State> visitPropAny(OraclesParser.PropAnyContext ctx)
     {
-        List<String> args = new ArrayList<>();
-        args.add(ctx.STRING().getText());
+        Map<String,String> args = new HashMap<>();
+        args.put("any", stripOuterQuotes(ctx.STRING().getText()));
         return PredicateFactory.createPredicate("any", args);
     }
     
     @Override public Predicate<State> visitPropKeyValue(OraclesParser.PropKeyValueContext ctx)
     {
-        List<String> args = new ArrayList<>();
-        args.add(ctx.key.getText());
-        args.add(ctx.value.getText());
+        Map<String,String> args = new HashMap<>();
+        args.put("key", stripOuterQuotes(ctx.key.getText()));
+        args.put("value", stripOuterQuotes(ctx.value.getText()));
         return PredicateFactory.createPredicate("pair", args);
     }
     
     @Override public Predicate<State> visitPropIsInList(OraclesParser.PropIsInListContext ctx)
     {
-        List<String> args = new ArrayList<>();
-        args.add(ctx.type.getText()); //KEY, VALUE, or ANY
+        Map<String,String> args = new HashMap<>();
+        args.put("list", ctx.type.getText().toLowerCase()); //KEY, VALUE, or ANY
         
+        int itemCounter = 0;
         for(TerminalNode item : ctx.list().STRING())
         {
-            args.add(item.getText());
+            args.put(String.valueOf(itemCounter), stripOuterQuotes(item.getText()));
+            itemCounter++;
         }
+        
         return PredicateFactory.createPredicate("list", args);
+    }
+    
+    // only strips one set of outside quotes if it has them, leaves other quotes untouched
+    // todo: add triple quotes once they're relevant
+    private String stripOuterQuotes(String inputString)
+    {
+        if (inputString.length() >= 2 &&
+            ((inputString.startsWith("\"") && inputString.endsWith("\"")) ||
+            (inputString.startsWith("'") && inputString.endsWith("'"))))
+            return inputString.substring(1, inputString.length() - 1);
+        return inputString;
     }
 }
