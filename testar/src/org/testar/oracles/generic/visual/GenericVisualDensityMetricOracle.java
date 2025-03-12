@@ -42,23 +42,25 @@ import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
 import org.testar.oracles.Oracle;
 
 /**
- * Calculates an aesthetic value between 0.00 (bad) and 100.0 (perfect) for the balance of widgets,
+ * Calculates an aesthetic value between 0.00 (bad) and 100.0 (perfect) for the density of widgets,
  * and gives a warning if the threshold is breached.
  * Based on the work of "Towards an evaluation of graphical user interfaces aesthetics based on metrics" by
  * Zen, Mathieu ; Vanderdonckt, Jean.
  * 
- * The default threshold value is 50.0.
+ * The default threshold values are 25.0 (minimum) and 75.0 (maximum).
  */
-public class BalanceMetricOracle implements Oracle {
+public class GenericVisualDensityMetricOracle implements Oracle {
 
-	private final double thresholdValue;
+	private final double thresholdMinValue;
+	private final double thresholdMaxValue;
 
-	public BalanceMetricOracle() {
-		this(50.0);
+	public GenericVisualDensityMetricOracle() {
+		this(25.0, 75.0);
 	}
 
-	public BalanceMetricOracle(double thresholdValue) {
-		this.thresholdValue = thresholdValue;
+	public GenericVisualDensityMetricOracle(double thresholdMinValue, double thresholdMaxValue) {
+		this.thresholdMinValue = thresholdMinValue;
+		this.thresholdMaxValue = thresholdMaxValue;
 	}
 
 	@Override
@@ -84,15 +86,26 @@ public class BalanceMetricOracle implements Oracle {
 
 		ArrayList<Shape> regions = MetricsHelper.getRegions(state);
 
-		double balanceMetric = MetricsHelper.calculateBalanceMetric(regions, sutRect.width(), sutRect.height());
+		double densityMetric = MetricsHelper.calculateDensity(regions, sutRect.width(), sutRect.height());
 
-		if (balanceMetric < thresholdValue) {
-			String verdictMsg = String.format("Balance metric with value %f is below treshold value %f!", balanceMetric, thresholdValue);
-			Visualizer visualizer = new RegionsVisualizer(getRedPen(), regions, "Balance Metric Warning", 0.5, 0.5);
-			return new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, visualizer);
+		Verdict widgetDensityVerdict = Verdict.OK;
+
+		if (densityMetric < thresholdMinValue) {
+			String verdictMsg = String.format("Density metric with value %f is below threshold minimum value %f! Design too simple.", densityMetric, thresholdMinValue);
+
+			Visualizer visualizer = new RegionsVisualizer(getRedPen(), regions, "Density Warning - Too Simple", 0.5, 0.5);
+			Verdict verdict = new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, visualizer);
+			widgetDensityVerdict = widgetDensityVerdict.join(verdict);
 		}
 
-		return Verdict.OK;
+		if (densityMetric > thresholdMaxValue) {
+			String verdictMsg = String.format("Density metric with value %f is higher than threshold maximum value %f! Design too complex.", densityMetric, thresholdMaxValue);
+			Visualizer visualizer = new RegionsVisualizer(getRedPen(), regions, "Density Warning - Too Complex", 0.5, 0.5);
+			Verdict verdict = new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, visualizer);
+			widgetDensityVerdict = widgetDensityVerdict.join(verdict);
+		}
+
+		return widgetDensityVerdict;
 	}
 
 }

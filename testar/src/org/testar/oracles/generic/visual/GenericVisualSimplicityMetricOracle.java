@@ -42,25 +42,23 @@ import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
 import org.testar.oracles.Oracle;
 
 /**
- * Calculates an aesthetic value between 0.00 (bad) and 100.0 (perfect) for the density of widgets,
+ * Calculates an aesthetic value between 0.00 (complex) and 100.0 (simple) for the simplicity of widgets,
  * and gives a warning if the threshold is breached.
  * Based on the work of "Towards an evaluation of graphical user interfaces aesthetics based on metrics" by
  * Zen, Mathieu ; Vanderdonckt, Jean.
  * 
- * The default threshold values are 25.0 (minimum) and 75.0 (maximum).
+ * The default threshold value is 50.0.
  */
-public class DensityMetricOracle implements Oracle {
+public class GenericVisualSimplicityMetricOracle implements Oracle {
 
-	private final double thresholdMinValue;
-	private final double thresholdMaxValue;
+	private final double thresholdValue;
 
-	public DensityMetricOracle() {
-		this(25.0, 75.0);
+	public GenericVisualSimplicityMetricOracle() {
+		this(50.0);
 	}
 
-	public DensityMetricOracle(double thresholdMinValue, double thresholdMaxValue) {
-		this.thresholdMinValue = thresholdMinValue;
-		this.thresholdMaxValue = thresholdMaxValue;
+	public GenericVisualSimplicityMetricOracle(double thresholdValue) {
+		this.thresholdValue = thresholdValue;
 	}
 
 	@Override
@@ -86,26 +84,15 @@ public class DensityMetricOracle implements Oracle {
 
 		ArrayList<Shape> regions = MetricsHelper.getRegions(state);
 
-		double densityMetric = MetricsHelper.calculateDensity(regions, sutRect.width(), sutRect.height());
+		double simplicityMetric = MetricsHelper.calculateSimplicity(regions, sutRect.width(), sutRect.height());
 
-		Verdict widgetDensityVerdict = Verdict.OK;
-
-		if (densityMetric < thresholdMinValue) {
-			String verdictMsg = String.format("Density metric with value %f is below threshold minimum value %f! Design too simple.", densityMetric, thresholdMinValue);
-
-			Visualizer visualizer = new RegionsVisualizer(getRedPen(), regions, "Density Warning - Too Simple", 0.5, 0.5);
-			Verdict verdict = new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, visualizer);
-			widgetDensityVerdict = widgetDensityVerdict.join(verdict);
+		if (simplicityMetric < thresholdValue) {
+			String verdictMsg = String.format("Simplicity metric with value %f is below threshold value %f!", simplicityMetric, thresholdValue);
+			Visualizer visualizer = new RegionsVisualizer(getRedPen(), regions, "Simplicity Warning", 0.5, 0.5);
+			return new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, visualizer);
 		}
 
-		if (densityMetric > thresholdMaxValue) {
-			String verdictMsg = String.format("Density metric with value %f is higher than threshold maximum value %f! Design too complex.", densityMetric, thresholdMaxValue);
-			Visualizer visualizer = new RegionsVisualizer(getRedPen(), regions, "Density Warning - Too Complex", 0.5, 0.5);
-			Verdict verdict = new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, visualizer);
-			widgetDensityVerdict = widgetDensityVerdict.join(verdict);
-		}
-
-		return widgetDensityVerdict;
+		return Verdict.OK;
 	}
 
 }

@@ -32,30 +32,32 @@ package org.testar.oracles.generic.visual;
 
 import java.util.ArrayList;
 
+import org.testar.monkey.alayer.Rect;
 import org.testar.monkey.alayer.Shape;
 import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.Visualizer;
 import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
 import org.testar.oracles.Oracle;
 
 /**
- * Calculates an aesthetic value between 0.00 (bad) and 100.0 (perfect) for the alignment of widgets,
+ * Calculates an aesthetic value between 0.00 (bad) and 100.0 (perfect) for the concentricity of widgets,
  * and gives a warning if the threshold is breached.
  * Based on the work of "Towards an evaluation of graphical user interfaces aesthetics based on metrics" by
  * Zen, Mathieu ; Vanderdonckt, Jean.
  * 
  * The default threshold value is 50.0.
  */
-public class AlignmentMetricOracle implements Oracle {
+public class GenericVisualConcentricityMetricOracle implements Oracle {
 
 	private final double thresholdValue;
 
-	public AlignmentMetricOracle() {
+	public GenericVisualConcentricityMetricOracle() {
 		this(50.0);
 	}
 
-	public AlignmentMetricOracle(double thresholdValue) {
+	public GenericVisualConcentricityMetricOracle(double thresholdValue) {
 		this.thresholdValue = thresholdValue;
 	}
 
@@ -66,13 +68,27 @@ public class AlignmentMetricOracle implements Oracle {
 
 	@Override
 	public Verdict getVerdict(State state) {
+		if (state.childCount() == 0) {
+			return Verdict.OK; // State has no children, no need for balance metric evaluation
+		}
+
+		Shape sutShape = state.child(0).get(Tags.Shape, null);
+		if (sutShape == null) {
+			return Verdict.OK; // SUT has no shape, no need for balance metric evaluation
+		}
+
+		Rect sutRect = (Rect) sutShape;
+		if (sutRect.width() <= 0 || sutRect.height() <= 0) {
+			return Verdict.OK; // Invalid shape dimensions, skip evaluation
+		}
+
 		ArrayList<Shape> regions = MetricsHelper.getRegions(state);
 
-		double alignmentMetric = MetricsHelper.calculateAlignmentMetric(regions);
+		double concentricityMetric = MetricsHelper.calculateConcentricity(regions, sutRect.width(), sutRect.height());
 
-		if (alignmentMetric < thresholdValue) {
-			String verdictMsg = String.format("Alignment metric with value %f is below threshold value %f!", alignmentMetric, thresholdValue);
-			Visualizer visualizer = new RegionsVisualizer(getRedPen(), regions, "Alignment Metric Warning", 0.5, 0.5);
+		if (concentricityMetric < thresholdValue) {
+			String verdictMsg = String.format("Concentricity metric with value %f is below threshold value %f!", concentricityMetric, thresholdValue);
+			Visualizer visualizer = new RegionsVisualizer(getRedPen(), regions, "Concentricity Metric Warning", 0.5, 0.5);
 			return new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, visualizer);
 		}
 

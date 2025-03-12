@@ -52,16 +52,16 @@ import org.testar.oracles.Oracle;
  * minimum touch target size of pixels. Small clickable elements can be difficult to 
  * interact with, especially for users with motor impairments or on touch devices.
  */
-public class WebClickableSizeOracle implements Oracle {
+public class WebAccessibilityClickableSizeOracle implements Oracle {
 
 	// Minimum recommended clickable size (W3C Web Content Accessibility Guidelines)
 	private final int minClickableThreshold;
 
-	public WebClickableSizeOracle() {
+	public WebAccessibilityClickableSizeOracle() {
 		this(24);
 	}
 
-	public WebClickableSizeOracle(int minClickableThreshold) {
+	public WebAccessibilityClickableSizeOracle(int minClickableThreshold) {
 		this.minClickableThreshold = minClickableThreshold;
 	}
 

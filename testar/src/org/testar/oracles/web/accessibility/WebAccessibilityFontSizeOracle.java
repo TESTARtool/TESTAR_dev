@@ -46,16 +46,16 @@ import org.testar.oracles.Oracle;
  * This oracle checks for text web elements that are smaller than the W3C recommended 
  * minimum font size of pixels. 
  */
-public class WebFontSizeOracle implements Oracle {
+public class WebAccessibilityFontSizeOracle implements Oracle {
 
 	// Minimum font size that can be considered a severe fault
 	private final int minFontSizeThreshold;
 
-	public WebFontSizeOracle() {
+	public WebAccessibilityFontSizeOracle() {
 		this(12);
 	}
 
-	public WebFontSizeOracle(int minFontSizeThreshold) {
+	public WebAccessibilityFontSizeOracle(int minFontSizeThreshold) {
 		this.minFontSizeThreshold = minFontSizeThreshold;
 	}
 

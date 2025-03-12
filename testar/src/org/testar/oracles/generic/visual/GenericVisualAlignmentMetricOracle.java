@@ -40,43 +40,43 @@ import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
 import org.testar.oracles.Oracle;
 
 /**
- * Calculates an aesthetic value between 0.00 (bad) and 100.0 (perfect) for the center alignment of widgets,
+ * Calculates an aesthetic value between 0.00 (bad) and 100.0 (perfect) for the alignment of widgets,
  * and gives a warning if the threshold is breached.
  * Based on the work of "Towards an evaluation of graphical user interfaces aesthetics based on metrics" by
  * Zen, Mathieu ; Vanderdonckt, Jean.
  * 
  * The default threshold value is 50.0.
  */
-public class CenterAlignmentMetricOracle implements Oracle {
+public class GenericVisualAlignmentMetricOracle implements Oracle {
 
-    private final double thresholdValue;
+	private final double thresholdValue;
 
-    public CenterAlignmentMetricOracle() {
-        this(50.0);
-    }
+	public GenericVisualAlignmentMetricOracle() {
+		this(50.0);
+	}
 
-    public CenterAlignmentMetricOracle(double thresholdValue) {
-        this.thresholdValue = thresholdValue;
-    }
+	public GenericVisualAlignmentMetricOracle(double thresholdValue) {
+		this.thresholdValue = thresholdValue;
+	}
 
-    @Override
-    public void initialize() {
-        // Nothing to initialize
-    }
+	@Override
+	public void initialize() {
+		// Nothing to initialize
+	}
 
-    @Override
-    public Verdict getVerdict(State state) {
-        ArrayList<Shape> regions = MetricsHelper.getRegions(state);
+	@Override
+	public Verdict getVerdict(State state) {
+		ArrayList<Shape> regions = MetricsHelper.getRegions(state);
 
-        double centerAlignmentMetric = MetricsHelper.calculateCenterAlignment(regions);
+		double alignmentMetric = MetricsHelper.calculateAlignmentMetric(regions);
 
-        if (centerAlignmentMetric < thresholdValue) {
-            String verdictMsg = String.format("Center alignment metric with value %f is below threshold value %f!", centerAlignmentMetric, thresholdValue);
-            Visualizer visualizer = new RegionsVisualizer(getRedPen(), regions, "Center Alignment Metric Warning", 0.5, 0.5);
-            return new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, visualizer);
-        }
+		if (alignmentMetric < thresholdValue) {
+			String verdictMsg = String.format("Alignment metric with value %f is below threshold value %f!", alignmentMetric, thresholdValue);
+			Visualizer visualizer = new RegionsVisualizer(getRedPen(), regions, "Alignment Metric Warning", 0.5, 0.5);
+			return new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, visualizer);
+		}
 
-        return Verdict.OK;
-    }
+		return Verdict.OK;
+	}
 
 }

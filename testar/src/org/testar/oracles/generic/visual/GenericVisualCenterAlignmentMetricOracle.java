@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2023 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2023 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,66 +28,55 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.oracles.web.accessibility;
+package org.testar.oracles.generic.visual;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import org.testar.monkey.alayer.Roles;
+import org.testar.monkey.alayer.Shape;
 import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.Visualizer;
-import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
-import org.testar.monkey.alayer.webdriver.enums.WdRoles;
-import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.oracles.Oracle;
 
 /**
- * Test Oracle that checks for web image elements (<img>) that do not have alternative text. 
- * Missing alternative text can make content inaccessible for users relying on screen readers. 
+ * Calculates an aesthetic value between 0.00 (bad) and 100.0 (perfect) for the center alignment of widgets,
+ * and gives a warning if the threshold is breached.
+ * Based on the work of "Towards an evaluation of graphical user interfaces aesthetics based on metrics" by
+ * Zen, Mathieu ; Vanderdonckt, Jean.
+ * 
+ * The default threshold value is 50.0.
  */
-public class WebImagesAltOracle implements Oracle {
+public class GenericVisualCenterAlignmentMetricOracle implements Oracle {
 
-	public WebImagesAltOracle() {}
+    private final double thresholdValue;
 
-	@Override
-	public void initialize() {
-		// Nothing to initialize
-	}
+    public GenericVisualCenterAlignmentMetricOracle() {
+        this(50.0);
+    }
 
-	@Override
-	public Verdict getVerdict(State state) {
-		List<Widget> incorrectWidgets = new ArrayList<>();
+    public GenericVisualCenterAlignmentMetricOracle(double thresholdValue) {
+        this.thresholdValue = thresholdValue;
+    }
 
-		// Check if some widget of the state
-		for(Widget widget : state) {
-			//  Is a widget image (<img>) and if it lacks alternative text
-			if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdIMG)
-					&& (widget.get(WdTags.WebAlt, null) == null || widget.get(WdTags.WebAlt, "").isBlank())) {
-				// If so, save it as incorrect widget
-				incorrectWidgets.add(widget);
-			}
-		}
+    @Override
+    public void initialize() {
+        // Nothing to initialize
+    }
 
-		// If exists one or more incorrect widgets
-		if(!incorrectWidgets.isEmpty()) {
-			// Create and return a WARNING_ACCESSIBILITY_FAULT verdict
-			String verdictMsg = String.format(
-					"Detected web image widgets '%s' without alternative text!", 
-					getDescriptionOfWidgets(incorrectWidgets, WdTags.WebOuterHTML)
-					);
-			Visualizer visualizer = new RegionsVisualizer(
-					getRedPen(), 
-					getWidgetRegions(incorrectWidgets), 
-					"Accessibility Fault", 
-					0.5, 0.5);
-			return new Verdict(Verdict.Severity.WARNING_ACCESSIBILITY_FAULT, verdictMsg, visualizer);
-		} else {
-			return Verdict.OK;
-		}
+    @Override
+    public Verdict getVerdict(State state) {
+        ArrayList<Shape> regions = MetricsHelper.getRegions(state);
 
-	}
+        double centerAlignmentMetric = MetricsHelper.calculateCenterAlignment(regions);
+
+        if (centerAlignmentMetric < thresholdValue) {
+            String verdictMsg = String.format("Center alignment metric with value %f is below threshold value %f!", centerAlignmentMetric, thresholdValue);
+            Visualizer visualizer = new RegionsVisualizer(getRedPen(), regions, "Center Alignment Metric Warning", 0.5, 0.5);
+            return new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, visualizer);
+        }
+
+        return Verdict.OK;
+    }
 
 }
