@@ -156,7 +156,7 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     add(applicationVersionField);
 
     // Hide the override webdriver display scale fields by default, only show them when a webdriver protocol is selected.
-    setOverrideWebDriverDisplayScaleVisibility(false);
+    //setWebDriverVisibility(false); // Disabling the default visualization is not good when only one protocol exists
     labelOverrideWebDriverDisplayScale.setBounds(330, 320, 150, 27);
     labelOverrideWebDriverDisplayScale.setToolTipText(ToolTipTexts.overrideWebDriverDisplayScaleTTT);
     add(labelOverrideWebDriverDisplayScale);
@@ -176,7 +176,7 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     add(paneWebPaths);
   }
 
-  private void setOverrideWebDriverDisplayScaleVisibility(boolean isVisible){
+  private void setWebDriverVisibility(boolean isVisible){
     labelOverrideWebDriverDisplayScale.setVisible(isVisible);
     overrideWebDriverDisplayScaleField.setVisible(isVisible);
     labelWebPaths.setVisible(isVisible);
@@ -188,7 +188,7 @@ public class GeneralPanel extends SettingsPanel implements Observer {
   @Override
   public void update(Observable o, Object arg) {
     boolean showWidgets = arg.toString().contains("webdriver");
-    setOverrideWebDriverDisplayScaleVisibility(showWidgets);
+    setWebDriverVisibility(showWidgets);
   }
 
   private void addGeneralControlsLocal() {
