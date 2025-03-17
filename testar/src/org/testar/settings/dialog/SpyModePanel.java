@@ -1,9 +1,8 @@
 package org.testar.settings.dialog;
 
-import org.testar.settings.dialog.TagsVisualization.DefaultTagFilter;
-import org.testar.settings.dialog.TagsVisualization.TagFilter;
+import org.testar.settings.dialog.tagsvisualization.DefaultTagFilter;
+import org.testar.settings.dialog.tagsvisualization.TagFilter;
 import org.testar.settings.Settings;
-import org.testar.settings.dialog.TreeSetListModel;
 
 import javax.swing.*;
 import java.awt.*;

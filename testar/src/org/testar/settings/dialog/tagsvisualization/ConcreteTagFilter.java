@@ -1,4 +1,4 @@
-package org.testar.settings.dialog.TagsVisualization;
+package org.testar.settings.dialog.tagsvisualization;
 
 import org.testar.monkey.alayer.Tag;
 

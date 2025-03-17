@@ -1,7 +1,6 @@
-package org.testar.settings.dialog.TagsVisualization;
+package org.testar.settings.dialog.tagsvisualization;
 
 import org.testar.StateManagementTags;
-import org.testar.monkey.alayer.windows.UIATags;
 import org.testar.settings.dialog.TagsExtractor;
 
 import java.util.Collections;
