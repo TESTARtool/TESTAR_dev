@@ -36,6 +36,8 @@ import org.testar.monkey.alayer.webdriver.WdDriver;
 
 /** Enables TESTAR to navigate to a new URL **/
 public class WdSecurityUrlInjectionAction extends TaggableBase implements Action {
+    private static final long serialVersionUID = 3391295084409798793L;
+
     private String text;
 
     public WdSecurityUrlInjectionAction(String text)

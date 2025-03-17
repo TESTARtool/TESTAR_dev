@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2024 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -60,12 +60,12 @@ public class QLearningActionSelector implements IActionSelector {
     public Action selectAction(State state, Set<Action> actions) {
         System.out.println("---------------------------------------------------------");
         // saving the starting node of the graph:
-        if(graph.startingStateAbstractCustomId==null){
-            graph.startingStateAbstractCustomId=state.get(Tags.AbstractIDCustom);
+        if(graph.startingStateAbstractId==null){
+            graph.startingStateAbstractId=state.get(Tags.AbstractID);
         }
 
         // Finding the current state from the previous states:
-        QlearningGuiState currentQlearningGuiState = graph.getStateByAbstractCustomId(state.get(Tags.AbstractIDCustom));
+        QlearningGuiState currentQlearningGuiState = graph.getStateByAbstractId(state.get(Tags.AbstractID));
 
         // If it's a new state:
         if(currentQlearningGuiState==null) { // did not contain the state ID -> a new state
@@ -76,19 +76,14 @@ public class QLearningActionSelector implements IActionSelector {
             currentQlearningGuiState.updateActionIdsOfTheStateIntoModel(actions, R_MAX);
         }
 
-//        System.out.println("DEBUG: state ID from model="+currentQlearningGuiState.getAbstractCustomStateId());
-//        for(String id:currentQlearningGuiState.abstractCustomActionIdsAndQValues.keySet()){
-//        	System.out.println("DEBUG: id="+id+", Q-value="+currentQlearningGuiState.abstractCustomActionIdsAndQValues.get(id));
-//        }
-
         // adding state transition to the graph: previous state + previous action = current state
-        if(graph.previousStateAbstractCustomId!=null && graph.previousActionAbstractCustomId != null){ //else the first action and there is no transition yet
-            QlearningGuiState previousState = graph.getStateByAbstractCustomId(graph.previousStateAbstractCustomId);
+        if(graph.previousStateAbstractId!=null && graph.previousActionAbstractId != null){ //else the first action and there is no transition yet
+            QlearningGuiState previousState = graph.getStateByAbstractId(graph.previousStateAbstractId);
             if(previousState==null){
                 System.out.println(this.getClass()+": ERROR: GuiStateGraphWithVisitedActions did not find previous state!");
             }else{
                 graph.qlearningGuiStates.remove(previousState);//removing the old version of the state
-                previousState.addStateTransition(new GuiStateTransition(graph.previousStateAbstractCustomId,state.get(Tags.AbstractIDCustom),graph.previousActionAbstractCustomId),gammaDiscount,currentQlearningGuiState.getMaxQValueOfTheState(actions));
+                previousState.addStateTransition(new GuiStateTransition(graph.previousStateAbstractId,state.get(Tags.AbstractID),graph.previousActionAbstractId),gammaDiscount,currentQlearningGuiState.getMaxQValueOfTheState(actions));
                 graph.qlearningGuiStates.add(previousState);//adding the updated version of the state
             }
         }
@@ -100,16 +95,11 @@ public class QLearningActionSelector implements IActionSelector {
             returnAction = RandomActionSelector.selectRandomAction(actions);
         }else{
             //selecting randomly of the actionIDs that have max Q value:
-//        	System.out.println("DEBUG: IDs of actions with max Q value:");
-//        	for(String id:actionIdsWithMaxQvalue){
-//        		System.out.println("DEBUG: id="+id);
-//        	}
-
             Random rnd = new Random();
-            String abstractCustomIdOfRandomAction = actionIdsWithMaxQvalue.get(rnd.nextInt(actionIdsWithMaxQvalue.size()));
-            System.out.println("DEBUG: randomly chosen id="+abstractCustomIdOfRandomAction);
-            System.out.println("DEBUG: stateID from state="+state.get(Tags.AbstractIDCustom));
-            returnAction = graph.getActionWithAbstractCustomId(actions, abstractCustomIdOfRandomAction);
+            String abstractIdOfRandomAction = actionIdsWithMaxQvalue.get(rnd.nextInt(actionIdsWithMaxQvalue.size()));
+            System.out.println("DEBUG: randomly chosen id="+abstractIdOfRandomAction);
+            System.out.println("DEBUG: stateID from state="+state.get(Tags.AbstractID));
+            returnAction = graph.getActionWithAbstractId(actions, abstractIdOfRandomAction);
         }
 
         if(returnAction==null){
@@ -121,8 +111,8 @@ public class QLearningActionSelector implements IActionSelector {
         graph.qlearningGuiStates.remove(currentQlearningGuiState); // should not be a problem if state not there (new state)?
         graph.qlearningGuiStates.add(currentQlearningGuiState);
         // saving the state and action for state transition after knowing the target state:
-        graph.previousActionAbstractCustomId = returnAction.get(Tags.AbstractIDCustom);
-        graph.previousStateAbstractCustomId = state.get(Tags.AbstractIDCustom);
+        graph.previousActionAbstractId = returnAction.get(Tags.AbstractID);
+        graph.previousStateAbstractId = state.get(Tags.AbstractID);
         System.out.println("DEBUG: return selected action = " + returnAction.get(Tags.Desc, "NoDescAvailable"));
         return returnAction;
     }
@@ -136,8 +126,8 @@ public class QLearningActionSelector implements IActionSelector {
         int numberOfExecutedActions = 0;
         int numberOfExecutionsSum = 0;
         for(QlearningGuiState state:graph.qlearningGuiStates){
-            numberOfActions = numberOfActions+state.abstractCustomActionIdsAndExecutionCounters.size();
-            for(int executionCounter:state.abstractCustomActionIdsAndExecutionCounters.values()){
+            numberOfActions = numberOfActions+state.abstractActionIdsAndExecutionCounters.size();
+            for(int executionCounter:state.abstractActionIdsAndExecutionCounters.values()){
                 if(executionCounter>0){
                     numberOfExecutedActions++;
                 }

@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -63,6 +63,7 @@ public class WdElement extends TaggableBase implements Serializable {
   public String id, name, genericTitle, tagName, textContent, helpText, title;
   public List<String> cssClasses = new ArrayList<>();
   public String display, type;
+  public String innerHTML, outerHTML;
   public int maxLength;
 
   boolean enabled, ignore;
@@ -90,7 +91,7 @@ public class WdElement extends TaggableBase implements Serializable {
   public long scrollLeft, scrollTop;
   private long borderWidth, borderHeight;
 
-  public RemoteWebElement remoteWebElement;   // Reference to the remote Web Element
+  public transient RemoteWebElement remoteWebElement; // Reference to the remote Web Element
 
   public transient Map<String, String> attributeMap;
 
@@ -100,8 +101,7 @@ public class WdElement extends TaggableBase implements Serializable {
   }
 
   @SuppressWarnings("unchecked")
-  public WdElement(Map<String, Object> packedElement,
-		  			WdRootElement root, WdElement parent) {
+  public WdElement(Map<String, Object> packedElement, WdRootElement root, WdElement parent) {
     this.root = root;
     this.parent = parent;
 
@@ -118,7 +118,7 @@ public class WdElement extends TaggableBase implements Serializable {
 
     id = attributeMap.getOrDefault("id", "");
     name = attributeMap.getOrDefault("name", "");
-    genericTitle = (String) packedElement.get("name");
+    genericTitle = (String) packedElement.getOrDefault("name", "");
     tagName = (String) packedElement.get("tagName");
     textContent = ((String) packedElement.get("textContent")).replaceAll("\\s+", " ").trim();
     title = attributeMap.getOrDefault("title","");
@@ -129,7 +129,17 @@ public class WdElement extends TaggableBase implements Serializable {
     alt = attributeMap.getOrDefault("alt", "");
     type = attributeMap.getOrDefault("type", "");
     src = attributeMap.getOrDefault("src", "");
-    maxLength = Integer.valueOf(attributeMap.getOrDefault("maxlength", "-1"));
+
+    try {
+    	maxLength = Integer.valueOf(attributeMap.getOrDefault("maxlength", "-1"));
+    } catch (NumberFormatException e) {
+    	// This can happen if maxLength is defined without value or with incorrect content "2 2"
+    	// Maybe this is a test oracle :)
+    	maxLength = -1;
+    }
+
+    innerHTML = (String) packedElement.getOrDefault("innerHTML", "");
+    outerHTML = (String) packedElement.getOrDefault("outerHTML", "");
 
     remoteWebElement = (RemoteWebElement)packedElement.get("element");
     checked = asBool(packedElement.getOrDefault("checked", false));
@@ -190,8 +200,7 @@ public class WdElement extends TaggableBase implements Serializable {
     oos.defaultWriteObject();
   }
 
-  private void readObject(ObjectInputStream ois)
-      throws IOException, ClassNotFoundException {
+  private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
     ois.defaultReadObject();
   }
   

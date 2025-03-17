@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2022 Open Universiteit - www.ou.nl
- * Copyright (c) 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2022 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2022 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,10 +30,6 @@
 
 package org.testar.monkey;
 
-import java.util.Arrays;
-import java.util.Set;
-import java.util.StringJoiner;
-
 import org.testar.OutputStructure;
 import org.testar.SutVisualization;
 import org.testar.monkey.RuntimeControlsProtocol.Modes;
@@ -43,6 +39,10 @@ import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.serialisation.LogSerialiser;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.StringJoiner;
+
 public class GenerateMode {
 
 	private boolean exceptionThrown = false;
@@ -50,7 +50,7 @@ public class GenerateMode {
 	/**
 	 * Method to run TESTAR on Generate mode
 	 *
-	 * @param system
+	 * @param protocol
 	 */
 	public void runGenerateOuterLoop(DefaultProtocol protocol) {
 
@@ -73,7 +73,7 @@ public class GenerateMode {
 			}
 
 			//empty method in defaultProtocol - allowing implementation in application specific protocols
-			//HTML report is created here in Desktop and Webdriver protocols
+			//HTML report is created here in DefaultProtocol
 			protocol.preSequencePreparations();
 
 			//reset the faulty variable because we started a new sequence
@@ -221,11 +221,11 @@ public class GenerateMode {
 			Util.clear(protocol.cv);
 			protocol.cv.end();
 
-			// fetch the new state
-			state = protocol.getState(system);
-
 			//Saving the actions and the executed action into replayable test sequence:
 			protocol.saveActionIntoFragmentForReplayableSequence(action, state, actions);
+
+			// fetch the new state
+			state = protocol.getState(system);
 		}
 
 		// notify to state model the last state

@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2017 - 2023 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -35,9 +36,6 @@ import java.util.Map;
 /**
  * Maps the AccessBridge Accessible Roles from AccessBridgePackages.h
  * to UIA Automation control types.
- * 
- * @author Urko Rueda Molina (alias: urueda)
- *
  */
 public class AccessBridgeControlTypes {
 
@@ -504,67 +502,67 @@ public class AccessBridgeControlTypes {
 	private final static Map<String,Long> MAP_2_UIA = new HashMap<String,Long>(){
 		private static final long serialVersionUID = 617334006202177665L;
 	{
-		put(AccessBridgeControlTypes.ACCESSIBLE_ALERT, new Long(Windows.UIA_ControlTypePropertyId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_AWT_COMPONENT, new Long(Windows.UIA_CustomControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_CANVAS, new Long(Windows.UIA_PaneControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_CHECK_BOX, new Long(Windows.UIA_CheckBoxControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_COLOR_CHOOSER, new Long(Windows.UIA_CustomControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_COLUMN_HEADER, new Long(Windows.UIA_HeaderControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_COMBO_BOX, new Long(Windows.UIA_ComboBoxControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_DATE_EDITOR, new Long(Windows.UIA_CustomControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_DESKTOP_ICON, new Long(Windows.UIA_ImageControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_DESKTOP_PANE, new Long(Windows.UIA_PaneControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_DIALOG, new Long(Windows.UIA_WindowControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_DIRECTORY_PANE, new Long(Windows.UIA_PaneControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_EDITBAR, new Long(Windows.UIA_ToolBarControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_FILE_CHOOSER, new Long(Windows.UIA_WindowControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_FILLER, new Long(Windows.UIA_CheckBoxControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_FONT_CHOOSER, new Long(Windows.UIA_CustomControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_FOOTER, new Long(Windows.UIA_CustomControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_FRAME, new Long(Windows.UIA_WindowControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_GLASS_PANE, new Long(Windows.UIA_PaneControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_GROUP_BOX, new Long(Windows.UIA_GroupControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_HEADER, new Long(Windows.UIA_HeaderControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_HYPERLINK, new Long(Windows.UIA_HyperlinkControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_ICON, new Long(Windows.UIA_ImageControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_INTERNAL_FRAME, new Long(Windows.UIA_WindowControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_LABEL, new Long(Windows.UIA_TextControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_LAYERED_PANE, new Long(Windows.UIA_PaneControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_LIST, new Long(Windows.UIA_ListControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_LIST_ITEM, new Long(Windows.UIA_ListItemControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_MENU, new Long(Windows.UIA_MenuControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_MENU_BAR, new Long(Windows.UIA_MenuBarControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_MENU_ITEM, new Long(Windows.UIA_MenuItemControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_OPTION_PANE, new Long(Windows.UIA_PaneControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_PAGE_TAB, new Long(Windows.UIA_TabItemControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_PAGE_TAB_LIST, new Long(Windows.UIA_TabControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_PANEL, new Long(Windows.UIA_PaneControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_PARAGRAPH, new Long(Windows.UIA_TextControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_PASSWORD_TEXT, new Long(Windows.UIA_EditControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_POPUP_MENU, new Long(Windows.UIA_MenuControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_PROGRESS_BAR, new Long(Windows.UIA_ProgressBarControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_PUSH_BUTTON, new Long(Windows.UIA_ButtonControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_RADIO_BUTTON, new Long(Windows.UIA_RadioButtonControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_ROOT_PANE, new Long(Windows.UIA_PaneControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_ROW_HEADER, new Long(Windows.UIA_HeaderControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_RULER, new Long(Windows.UIA_CustomControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_SCROLL_BAR, new Long(Windows.UIA_ScrollBarControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_SCROLL_PANE, new Long(Windows.UIA_PaneControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_SEPARATOR, new Long(Windows.UIA_SeparatorControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_SLIDER, new Long(Windows.UIA_SliderControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_SPIN_BOX, new Long(Windows.UIA_SpinnerControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_SPLIT_PANE, new Long(Windows.UIA_SplitButtonControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_STATUS_BAR, new Long(Windows.UIA_StatusBarControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_SWING_COMPONENT, new Long(Windows.UIA_CustomControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_TABLE, new Long(Windows.UIA_TableControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_TEXT, new Long(Windows.UIA_EditControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_TOGGLE_BUTTON, new Long(Windows.UIA_ButtonControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_TOOL_BAR, new Long(Windows.UIA_ToolBarControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_TOOL_TIP, new Long(Windows.UIA_ToolTipControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_TREE, new Long(Windows.UIA_TreeControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_UNKNOWN, new Long(Windows.UIA_CustomControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_VIEWPORT, new Long(Windows.UIA_ScrollBarControlTypeId));
-		put(AccessBridgeControlTypes.ACCESSIBLE_WINDOW, new Long(Windows.UIA_WindowControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_ALERT, Long.valueOf(Windows.UIA_ControlTypePropertyId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_AWT_COMPONENT, Long.valueOf(Windows.UIA_CustomControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_CANVAS, Long.valueOf(Windows.UIA_PaneControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_CHECK_BOX, Long.valueOf(Windows.UIA_CheckBoxControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_COLOR_CHOOSER, Long.valueOf(Windows.UIA_CustomControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_COLUMN_HEADER, Long.valueOf(Windows.UIA_HeaderControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_COMBO_BOX, Long.valueOf(Windows.UIA_ComboBoxControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_DATE_EDITOR, Long.valueOf(Windows.UIA_CustomControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_DESKTOP_ICON, Long.valueOf(Windows.UIA_ImageControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_DESKTOP_PANE, Long.valueOf(Windows.UIA_PaneControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_DIALOG, Long.valueOf(Windows.UIA_WindowControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_DIRECTORY_PANE, Long.valueOf(Windows.UIA_PaneControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_EDITBAR, Long.valueOf(Windows.UIA_ToolBarControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_FILE_CHOOSER, Long.valueOf(Windows.UIA_WindowControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_FILLER, Long.valueOf(Windows.UIA_SeparatorControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_FONT_CHOOSER, Long.valueOf(Windows.UIA_CustomControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_FOOTER, Long.valueOf(Windows.UIA_CustomControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_FRAME, Long.valueOf(Windows.UIA_WindowControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_GLASS_PANE, Long.valueOf(Windows.UIA_PaneControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_GROUP_BOX, Long.valueOf(Windows.UIA_GroupControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_HEADER, Long.valueOf(Windows.UIA_HeaderControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_HYPERLINK, Long.valueOf(Windows.UIA_HyperlinkControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_ICON, Long.valueOf(Windows.UIA_ImageControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_INTERNAL_FRAME, Long.valueOf(Windows.UIA_WindowControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_LABEL, Long.valueOf(Windows.UIA_TextControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_LAYERED_PANE, Long.valueOf(Windows.UIA_PaneControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_LIST, Long.valueOf(Windows.UIA_ListControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_LIST_ITEM, Long.valueOf(Windows.UIA_ListItemControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_MENU, Long.valueOf(Windows.UIA_MenuControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_MENU_BAR, Long.valueOf(Windows.UIA_MenuBarControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_MENU_ITEM, Long.valueOf(Windows.UIA_MenuItemControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_OPTION_PANE, Long.valueOf(Windows.UIA_PaneControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_PAGE_TAB, Long.valueOf(Windows.UIA_TabItemControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_PAGE_TAB_LIST, Long.valueOf(Windows.UIA_TabControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_PANEL, Long.valueOf(Windows.UIA_PaneControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_PARAGRAPH, Long.valueOf(Windows.UIA_TextControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_PASSWORD_TEXT, Long.valueOf(Windows.UIA_EditControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_POPUP_MENU, Long.valueOf(Windows.UIA_MenuControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_PROGRESS_BAR, Long.valueOf(Windows.UIA_ProgressBarControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_PUSH_BUTTON, Long.valueOf(Windows.UIA_ButtonControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_RADIO_BUTTON, Long.valueOf(Windows.UIA_RadioButtonControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_ROOT_PANE, Long.valueOf(Windows.UIA_PaneControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_ROW_HEADER, Long.valueOf(Windows.UIA_HeaderControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_RULER, Long.valueOf(Windows.UIA_CustomControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_SCROLL_BAR, Long.valueOf(Windows.UIA_ScrollBarControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_SCROLL_PANE, Long.valueOf(Windows.UIA_PaneControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_SEPARATOR, Long.valueOf(Windows.UIA_SeparatorControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_SLIDER, Long.valueOf(Windows.UIA_SliderControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_SPIN_BOX, Long.valueOf(Windows.UIA_SpinnerControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_SPLIT_PANE, Long.valueOf(Windows.UIA_SplitButtonControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_STATUS_BAR, Long.valueOf(Windows.UIA_StatusBarControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_SWING_COMPONENT, Long.valueOf(Windows.UIA_CustomControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_TABLE, Long.valueOf(Windows.UIA_TableControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_TEXT, Long.valueOf(Windows.UIA_EditControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_TOGGLE_BUTTON, Long.valueOf(Windows.UIA_ButtonControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_TOOL_BAR, Long.valueOf(Windows.UIA_ToolBarControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_TOOL_TIP, Long.valueOf(Windows.UIA_ToolTipControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_TREE, Long.valueOf(Windows.UIA_TreeControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_UNKNOWN, Long.valueOf(Windows.UIA_CustomControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_VIEWPORT, Long.valueOf(Windows.UIA_PaneControlTypeId));
+		put(AccessBridgeControlTypes.ACCESSIBLE_WINDOW, Long.valueOf(Windows.UIA_WindowControlTypeId));
 	}};
 	
 	/**
@@ -574,7 +572,6 @@ public class AccessBridgeControlTypes {
 	 */
 	public static long toUIA(String accessibleRole){
 		if (accessibleRole == null || accessibleRole.isEmpty()){
-			System.out.println("WARNING - null/empty accessible role <" + accessibleRole + ">");
 			return MISSING_UIA;
 		}
 		
@@ -582,7 +579,6 @@ public class AccessBridgeControlTypes {
 		if (uia != null)
 			return uia.longValue();
 
-		System.out.println("WARNING - missed accessible role <" + accessibleRole + ">");
 		return MISSING_UIA;		
 	}
 

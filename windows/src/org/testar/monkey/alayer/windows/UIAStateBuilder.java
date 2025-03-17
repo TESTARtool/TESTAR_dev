@@ -181,8 +181,7 @@ public final class UIAStateBuilder implements StateBuilder {
 
 	public UIAState apply(SUT system) throws StateBuildException {
 		try {
-			Future<UIAState> future = executor.submit(new StateFetcher(system, automationPointer, cacheRequestPointer,
-																	   this.accessBridgeEnabled, this.SUTProcesses));
+			Future<UIAState> future = executor.submit(new StateFetcher(system, automationPointer, cacheRequestPointer, this.accessBridgeEnabled, this.SUTProcesses));
 			return future.get((long)(timeOut * 1000.0), TimeUnit.MILLISECONDS);
 		} catch (InterruptedException e) {
 			throw new StateBuildException(e);

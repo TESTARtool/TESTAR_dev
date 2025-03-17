@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -68,13 +68,14 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.*;
 
 
 public class WdDriver extends SUTBase {
   private static WdDriver wdDriver = null;
   private static RemoteWebDriver remoteWebDriver = null;
-  private static List<String> windowHandles = Collections.synchronizedList(new ArrayList<>());
+  private static CopyOnWriteArrayList<String> windowHandles = new CopyOnWriteArrayList<>();
   public static boolean followLinks = true;
   public static boolean fullScreen = false;
   public static boolean forceActivateTab = true;
@@ -90,6 +91,8 @@ public class WdDriver extends SUTBase {
     String driverPath = parts[0].replace("\"", "");
 
     String osName = System.getProperty("os.name");
+    //TODO: Check what is this condition aim to change in the SUTConnectorValue
+    //TODO: If not sure just remove and refactor because this can provoke IndexOutOfBoundsException 
     if(!driverPath.contains(".exe") && osName.contains("Windows")) {
     	driverPath = sutConnector.substring(0, sutConnector.indexOf(".exe")+4);
     	driverPath = driverPath.replace("\"", "");
@@ -178,6 +181,7 @@ public class WdDriver extends SUTBase {
 
     // Workaround to fix https://github.com/SeleniumHQ/selenium/issues/11750
     options.addArguments("--remote-allow-origins=*");
+    options.addArguments("--disable-search-engine-choice-screen");  // Disable search engine selector
 
     return new ChromeDriver(service, options);
   }
@@ -395,7 +399,7 @@ public class WdDriver extends SUTBase {
    * Update the list of handles with added handles (new tabs)
    * Remove handles from closed tabs
    */
-  private synchronized static void updateHandlesList() {
+  private static void updateHandlesList() {
     Set<String> currentHandles = remoteWebDriver.getWindowHandles();
 
     // Remove handles not present anymore (closed tabs)

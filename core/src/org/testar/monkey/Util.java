@@ -41,6 +41,8 @@ import java.io.*;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -394,6 +396,25 @@ public final class Util {
 		return size(iter.iterator());
 	}
 
+	public static String widgetDesc(Widget widget, Tag<?>... tags) {
+		Assert.notNull(widget, tags);
+		StringBuilder sb = new StringBuilder();
+		int length = tags.length;
+
+		for (int i = 0; i < length; i++) {
+			Object tagValue = widget.get(tags[i], null);
+
+			if (tagValue != null) {
+				sb.append(tagValue);
+				if (i < length - 1) {
+					sb.append(",");
+				}
+			}
+		}
+
+		return sb.toString();
+	}
+
 	public static String treeDesc(Widget root, int indent, Tag<?>... tags) {
 		Assert.notNull(root, tags);
 		StringBuilder sb = new StringBuilder();
@@ -514,7 +535,9 @@ public final class Util {
 	public static List<File> getAllFiles(List<File> dirs, String extension) {
 		List<File> files = Util.newArrayList();
 		for (File f : dirs) {
-			files.addAll(getAllFiles(f, extension));
+			if(f.listFiles() != null) {
+				files.addAll(getAllFiles(f, extension));
+			}
 		}
 		return files;
 	}
@@ -536,10 +559,11 @@ public final class Util {
 		}
 	}
 
-	public static String readFile(File path) {
+	public static String readFile(File file) {
 		try {
-			return new Scanner(path, "UTF-8").useDelimiter("\\A").next();
-		} catch (FileNotFoundException ex) {
+			return Files.readString(file.toPath(), Charset.forName("ISO-8859-1"));
+		} catch (IOException ex) {
+			ex.printStackTrace();
 			return null;
 		}
 	}
@@ -767,6 +791,15 @@ public final class Util {
 		List<File> dir = Collections.singletonList(compileDir);
 		System.out.println("Used directory compileProtocol settingsDir = " + settingsDir + " compileDir = " + compileDir.getAbsolutePath());
 
+		List<File> allFiles = getAllFiles(dir, ".java");
+
+		if(allFiles == null || allFiles.isEmpty()) {
+			String msg = "No protocol java files found in '" + protocolClass + "'"
+					+ System.getProperty("line.separator")
+					+ "Please, edit the test.settings file and update the ProtocolClass setting adequately";
+			throw new IllegalArgumentException(msg);
+		}
+
 		try {
 			JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 			if (compiler == null) {
@@ -777,7 +810,7 @@ public final class Util {
 					compiler.getStandardFileManager(diagnostics, null, null);
 			try {
 				Iterable<? extends JavaFileObject> compilationUnits =
-						fileManager.getJavaFileObjectsFromFiles(getAllFiles(dir, ".java"));
+						fileManager.getJavaFileObjectsFromFiles(allFiles);
 
 				ArrayList<String> options = new ArrayList<>();
 				options.add("-classpath");

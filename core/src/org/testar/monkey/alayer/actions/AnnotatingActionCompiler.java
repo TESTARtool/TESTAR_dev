@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -83,7 +83,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		Action ret = super.mouseMove(w);
 		ret.set(Tags.Desc, "Mouse move at '" + w.get(Tags.Desc, "<no description>") + "'");
 		ret.set(Tags.Role, ActionRoles.MouseMove);
-		ret.set(Tags.OriginWidget, w);
+		ret.mapActionToWidget(w);
 		return ret;
 	}
 	
@@ -91,7 +91,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 	public Action mouseMove(Widget w, Position position){
 		Action ret = super.mouseMove(w,position);
 		ret.set(Tags.Visualizer, new EllipseVisualizer(position, MovePen, 10, 10));
-		ret.set(Tags.OriginWidget, w);
+		ret.mapActionToWidget(w);
 		return ret;
 	}
 
@@ -125,7 +125,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		Action ret = super.leftClickAt(widget, relX, relY); // by urueda
 		ret.set(Tags.Desc, "Left Click at '" + widget.get(Tags.Desc, "<no description>") + "'");
 		//ret.set(Tags.Targets, Util.newArrayList(wf));
-        ret.set(Tags.OriginWidget, widget);
+		ret.mapActionToWidget(widget);
 		return ret;
 	}
 
@@ -164,7 +164,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		Action ret = super.clickTypeInto(widget, relX, relY, text, replaceText);
 		//ret.set(Tags.Desc, "Type '" + Util.abbreviate(text, 5, "...") + "' into '" + widget.get(Tags.Desc, "<no description>" + "'"));
 		ret.set(Tags.Desc, "Type '" + Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "...") + "' into '" + widget.get(Tags.Desc, "<no description>" + "'")); // by urueda
-		ret.set(Tags.OriginWidget, widget);
+		ret.mapActionToWidget(widget);
         return ret;
 	}
 
@@ -193,7 +193,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 	@Override
 	public Action pasteAndReplaceText(final Position position, final String text){
 		Action ret = super.pasteAndReplaceText(position, text);
-		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate("pasted text", DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
+		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
 		ret.set(Tags.Role, ActionRoles.PasteTextInto);
 		ret.set(Tags.Desc, "Paste Text: " + StringEscapeUtils.escapeHtml4(text));
 		return ret;
@@ -202,7 +202,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 	@Override
 	public Action pasteAndAppendText(final Position position, final String text){
 		Action ret = super.pasteAndAppendText(position, text);
-		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate("pasted text", DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
+		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
 		ret.set(Tags.Role, ActionRoles.PasteTextInto);
 		ret.set(Tags.Desc, "Append Paste Text: " + StringEscapeUtils.escapeHtml4(text));
 		return ret;

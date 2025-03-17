@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,15 +29,14 @@
  *******************************************************************************************************/
 
 import java.util.Set;
-
 import org.testar.*;
 import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Settings;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.protocols.DesktopProtocol;
+import org.testar.settings.Settings;
 import org.testar.simplestategraph.GuiStateGraphWithVisitedActions;
 import org.testar.simplestategraph.QLearningActionSelector;
 
@@ -65,13 +64,13 @@ public class Protocol_desktop_generic_action_selector extends DesktopProtocol {
 
 		/**
 		 *  Initialize a simple GUI state graph for Q-learning. 
-		 *  This implementation uses AbstractIDCustom abstraction to identify states and actions. 
+		 *  This implementation uses AbstractID abstraction to identify states and actions. 
 		 */
 		// selector = new ActionSelectorProxy(new QLearningActionSelector(settings.get(ConfigTags.MaxReward), settings.get(ConfigTags.Discount)));
 
 		/**
 		 * Initialize a simple in-memory state model to prioritize the unvisited actions along the run. 
-		 * This implementation uses AbstractIDCustom abstraction to identify states and actions. 
+		 * This implementation uses AbstractID abstraction to identify states and actions. 
 		 */
 		selector = new ActionSelectorProxy(new GuiStateGraphWithVisitedActions());
 	}

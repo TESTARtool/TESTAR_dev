@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,32 +29,34 @@
  *******************************************************************************************************/
 
 
+import eye.Eye;
 import eye.Match;
+import org.sikuli.script.FindFailed;
+import org.sikuli.script.Screen;
 import org.testar.DerivedActions;
 import org.testar.ProtocolUtil;
 import org.testar.SutVisualization;
 import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Settings;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.ActionFailedException;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
+import org.testar.monkey.alayer.exceptions.WidgetNotFoundException;
 import org.testar.protocols.DesktopProtocol;
+import org.testar.settings.Settings;
 import org.testar.simplestategraph.GuiStateGraphWithVisitedActions;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Set;
-import eye.Eye;
-import org.sikuli.script.FindFailed;
-import org.sikuli.script.Screen;
 
 /**
  * This protocol shows how to integrate visual recognition software, such as Eye or Sikuli, 
- * to recognize the widgets of the SUT. 
+ * to recognize the widgets of the SUT and execute the action interaction. 
  */
 public class Protocol_desktop_widget_recognition extends DesktopProtocol {
 
@@ -136,11 +138,11 @@ public class Protocol_desktop_widget_recognition extends DesktopProtocol {
 		// HTML is not having the unvisited actions by default, so
 		// adding actions and unvisited actions to the HTML sequence report:
 		try {
-			htmlReport.addActionsAndUnvisitedActions(actions, stateGraphWithVisitedActions.getAbstractCustomIdsOfUnvisitedActions(state));
+			reportManager.addActionsAndUnvisitedActions(actions, stateGraphWithVisitedActions.getAbstractIdsOfUnvisitedActions(state));
 		}catch(Exception e){
 			// catching null for the first state or any new state, when unvisited actions is still null,
 			// not adding the unvisited actions on those cases:
-			htmlReport.addActions(actions);
+			reportManager.addActions(actions);
 		}
 		//Call the preSelectAction method from the DefaultProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
@@ -166,11 +168,16 @@ public class Protocol_desktop_widget_recognition extends DesktopProtocol {
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
 		// adding the action that is going to be executed into HTML report:
-		htmlReport.addSelectedAction(state, action);
+		reportManager.addSelectedAction(state, action);
 		double waitTime = settings().get(ConfigTags.TimeToWaitAfterAction);
 		double halfWait = waitTime == 0 ? 0.01 : waitTime / 2.0;
+		Util.pause(halfWait); // help for a better match of the state' actions visualization
 
 		try {
+			// Resetting the visualization before taking the action screenshot
+			// This avoids taking action screenshots with painted dots that provoke image recognition issues
+			// You can increase the ActionDuration settings time for visual debugging
+			Util.clear(cv); cv.end();
 
 			String widgetScreenshotPath = ProtocolUtil.getActionshot(state, action);
 			System.out.println("widgetScreenshotPath " + widgetScreenshotPath);
@@ -181,6 +188,8 @@ public class Protocol_desktop_widget_recognition extends DesktopProtocol {
 				return detectSikuliScreenWidget(action, widgetScreenshotPath, halfWait);
 			}
 		}catch(ActionFailedException afe){
+			return false;
+		}catch(WidgetNotFoundException wnfe){
 			return false;
 		}catch (NoSuchTagException e) {
 			e.printStackTrace();
@@ -228,11 +237,23 @@ public class Protocol_desktop_widget_recognition extends DesktopProtocol {
 	}
 
 	protected String getTextToType(Action action){
-		return action.toShortString().substring(action.toShortString().indexOf("("), action.toShortString().indexOf(")"));
+		return action.get(Tags.Desc).substring(nthIndexOf(action.get(Tags.Desc), "'", 1) + 1, nthIndexOf(action.get(Tags.Desc), "'", 2));
 	}
 
-	protected void waitForScreenshotFile(String widgetScreenshotPath, double waitTime){
+	private int nthIndexOf(String input, String substring, int nth) {
+		if (nth == 1) {
+			return input.indexOf(substring);
+		} else {
+			return input.indexOf(substring, nthIndexOf(input, substring, nth - 1) + substring.length());
+		}
+	}
+
+	protected void waitForScreenshotFile(String widgetScreenshotPath, double waitTime) throws FindFailed {
 		//System.out.println("DEBUG: sikuli clicking ");
+		if(widgetScreenshotPath == null) {
+			// This situation can occur with sliding actions because TESTAR does not take action screenshots for them
+			throw new FindFailed("TESTAR action screenthot not found! This approach only works with click and type actions");
+		}
 		while(!new File(widgetScreenshotPath).exists()){
 			//System.out.println("Waiting for image file to exist");
 			Util.pause(waitTime);

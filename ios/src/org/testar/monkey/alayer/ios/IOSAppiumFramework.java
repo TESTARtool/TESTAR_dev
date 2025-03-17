@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2024 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -72,9 +72,9 @@ public class IOSAppiumFramework extends SUTBase {
 	public IOSAppiumFramework(DesiredCapabilities cap) {
 
 		try {
-			driver = new IOSDriver(new URL("http://0.0.0.0:4723/wd/hub"), cap);
+			driver = new IOSDriver(new URL("http://127.0.0.1:4723/wd/hub"), cap);
 		} catch (MalformedURLException e) {
-			System.err.println("ERROR: Exception with IOS Driver URL: http://0.0.0.0:4723/wd/hub");
+			System.err.println("ERROR: Exception with IOS Driver URL: http://127.0.0.1:4723/wd/hub");
 			e.printStackTrace();
 		}
 	}
@@ -213,10 +213,6 @@ public class IOSAppiumFramework extends SUTBase {
 		return driver.getTitle();
 	}
 
-	public static void resetApp(){
-		driver.resetApp();
-	}
-
 	public static void runAppInBackground(Duration duration){
 		driver.runAppInBackground(duration);
 	}
@@ -259,7 +255,7 @@ public class IOSAppiumFramework extends SUTBase {
 		byte[] byteImage = driver.getScreenshotAs(OutputType.BYTES);
 		InputStream is = new ByteArrayInputStream(byteImage);
 		AWTCanvas canvas = AWTCanvas.fromInputStream(is);
-		return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), canvas);
+		return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), canvas);
 	}
 
 	public static String getScreenshotAction(State state, Action action) throws IOException {
@@ -309,7 +305,7 @@ public class IOSAppiumFramework extends SUTBase {
 		InputStream is2 = new ByteArrayInputStream(os.toByteArray());
 
 		AWTCanvas canvas = AWTCanvas.fromInputStream(is2);
-		return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), canvas);
+		return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), action.get(Tags.ConcreteID, "NoConcreteIdAvailable"), canvas);
 	}
 
 	// Note that besides obtaining a screenshot of the SUT it also highlights which action was clicked!
@@ -382,7 +378,7 @@ public class IOSAppiumFramework extends SUTBase {
 
 	@Override
 	public void stop() throws SystemStopException {
-		driver.closeApp();
+		driver.quit();
 		driver = null;
 	}
 
@@ -429,15 +425,17 @@ public class IOSAppiumFramework extends SUTBase {
 
 			JsonObject jsonObject = new JsonParser().parse(reader).getAsJsonObject();
 
-			cap.setCapability("deviceName", jsonObject.get("deviceName").getAsString());
+			// https://appium.io/docs/en/2.0/guides/caps/
 			cap.setCapability("platformName", jsonObject.get("platformName").getAsString());
-			cap.setCapability("automationName", jsonObject.get("automationName").getAsString());
+
+			cap.setCapability("appium:deviceName", jsonObject.get("deviceName").getAsString());
+			cap.setCapability("appium:automationName", jsonObject.get("automationName").getAsString());
 
 			String appPath = jsonObject.get("app").getAsString();
 
 			//TODO modify this to a more generic app path!!!
 			String appLocation = appPath;
-			cap.setCapability("app", appLocation);
+			cap.setCapability("appium:app", appLocation);
 
 		} catch (IOException | NullPointerException e) {
 			System.err.println("ERROR: Exception reading Appium Desired Capabilities from JSON file: " + capabilitesJsonFile);

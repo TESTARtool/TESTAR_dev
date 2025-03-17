@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -72,6 +72,20 @@ public final class ConfigTags {
 	public static final Tag<String> ProcessLogs = Tag.from("ProcessLogs", String.class, 
 			"Regular expressions to store execution logs coming from the processes");
 
+	public static final Tag<Boolean> LogOracleEnabled = Tag.from("LogOracleEnabled", Boolean.class, 
+			"Enable the Oracle for detecting suspicious messages in log files and standard output of commands");
+
+	public static final Tag<String> LogOracleRegex = Tag.from("LogOracleRegex", String.class, 
+			"Regular expressions ORACLE to find suspicious messages in the logs");
+
+	@SuppressWarnings("unchecked")
+	public static final Tag<List<String>> LogOracleCommands = Tag.from("LogOracleCommands", (Class<List<String>>) (Class<?>) List.class, 
+			"A list of commands of which standard output should be monitored");
+
+	@SuppressWarnings("unchecked")
+	public static final Tag<List<String>> LogOracleFiles = Tag.from("LogOracleFiles", (Class<List<String>>) (Class<?>) List.class, 
+			"A list of paths of log files to monitor");
+
 	public static final Tag<String> ClickFilter = Tag.from("ClickFilter", String.class, 
 			"Regular expressions to FILTER GUI widgets");
 
@@ -85,51 +99,11 @@ public final class ConfigTags {
 	public static final Tag<String> ProtocolClass = Tag.from("ProtocolClass", String.class, 
 			"Indicate the location of the protocol class for your specific SUT");
 
-	/**
-	 * State Model settings 
-	 */
-
 	public static final Tag<String> ApplicationName = Tag.from("ApplicationName", String.class, 
-			"Name to identify the SUT. Especially important to identify a State Model");
+			"Name to identify the SUT.");
 
 	public static final Tag<String> ApplicationVersion = Tag.from("ApplicationVersion", String.class, 
-			"Version to identify the SUT. Especially important to identify a State Model");
-
-	public static final Tag<Boolean> StateModelEnabled = Tag.from("StateModelEnabled", Boolean.class, 
-			"Enable or disable the State Model feature");
-
-	public static final Tag<String> DataStore = Tag.from("DataStore", String.class, 
-			"The graph database we use to store the State Model: OrientDB");
-
-	public static final Tag<String> DataStoreType = Tag.from("DataStoreType", String.class, 
-			"The mode we use to connect to the database: remote or plocal");
-
-	public static final Tag<String> DataStoreServer = Tag.from("DataStoreServer", String.class, 
-			"IP address to connect if we desired to use remote mode");
-
-	public static final Tag<String> DataStoreDirectory = Tag.from("DataStoreDirectory", String.class, 
-			"Path of the directory on which local OrientDB exists, if we use plocal mode");
-
-	public static final Tag<String> DataStoreDB = Tag.from("DataStoreDB", String.class, 
-			"The name of the desired database on which we want to store the State Model.");
-
-	public static final Tag<String> DataStoreUser = Tag.from("DataStoreUser", String.class, 
-			"User credential to authenticate TESTAR in OrientDB");
-
-	public static final Tag<String> DataStorePassword = Tag.from("DataStorePassword", String.class, 
-			"Password credential to authenticate TESTAR in OrientDB");
-
-	public static final Tag<String> DataStoreMode = Tag.from("DataStoreMode", String.class, 
-			"Indicate how TESTAR should store the model objects in the database: instant, delayed, hybrid, none");
-
-	public static final Tag<String> ActionSelectionAlgorithm = Tag.from("ActionSelectionAlgorithm", String.class, 
-			"State Model Action Selection mechanism to explore the SUT: random or unvisited");
-
-	public static final Tag<Boolean> StateModelStoreWidgets = Tag.from("StateModelStoreWidgets", Boolean.class, 
-			"Save all widget tree information in the State Model every time TESTAR discovers a new Concrete State");
-
-	public static final Tag<Boolean> ResetDataStore = Tag.from("ResetDataStore", Boolean.class, 
-			"WARNING: Delete all existing State Models from the selected database before creating a new one");
+			"Version to identify the SUT.");
 
 	@SuppressWarnings("unchecked")
 	public static final Tag<List<String>> AbstractStateAttributes = Tag.from("AbstractStateAttributes", (Class<List<String>>) (Class<?>) List.class, 
@@ -152,8 +126,11 @@ public final class ConfigTags {
 			"Indicate which web URL extensions need to be ignored when testing");
 
 	@SuppressWarnings("unchecked")
-	public static final Tag<List<String>> DomainsAllowed = Tag.from("DomainsAllowed", (Class<List<String>>) (Class<?>) List.class, 
-			"Indicate which web URL domains need to be ignored when testing");
+	public static final Tag<List<String>> WebDomainsAllowed = Tag.from("WebDomainsAllowed", (Class<List<String>>) (Class<?>) List.class, 
+			"Indicate which web URL domains are allowed to explore when testing");
+
+	public static final Tag<String> WebPathsAllowed = Tag.from("WebPathsAllowed", String.class, 
+			"Regular expressions to indicate which web URL paths are allowed to explore when testing");
 
 	public static final Tag<Boolean> FollowLinks = Tag.from("FollowLinks", Boolean.class, 
 			"Indicate if allowing to follow links opened in new tabs");
@@ -194,6 +171,25 @@ public final class ConfigTags {
 			"Settings (string) that can be used for user specified protocols");
 	public static final Tag<String> ProtocolSpecificSetting_5 = Tag.from("ProtocolSpecificSetting_5", String.class, 
 			"Settings (string) that can be used for user specified protocols");
+
+	/**
+	 * Coverage settings
+	 */
+
+	public static final Tag<Boolean> JacocoCoverage = Tag.from("JacocoCoverage", Boolean.class,
+			"Sets whether to extract Jacoco Coverage");
+
+	public static final Tag<String> JacocoCoverageIpAddress = Tag.from("JacocoCoverageIpAddress", String.class, 
+			"The JMX IP Address on which the Jacoco Agent is running");
+
+	public static final Tag<Integer> JacocoCoveragePort = Tag.from("JacocoCoveragePort", Integer.class, 
+			"The JMX port on which the Jacoco Agent is running");
+
+	public static final Tag<String> JacocoCoverageClasses = Tag.from("JacocoCoverageClasses", String.class, 
+			"The SUT class files that Jacoco uses to create the CSV report");
+
+	public static final Tag<Boolean> JacocoCoverageAccumulate = Tag.from("JacocoCoverageAccumulate", Boolean.class,
+			"Sets whether Jacoco coverage will be accumulated across the run sequences");
 
 	/**
 	 * Additional settings with descriptions
@@ -244,6 +240,9 @@ public final class ConfigTags {
 	public static final Tag<Boolean> VisualizeActions = Tag.from("VisualizeActions", Boolean.class, 
 			"Sets whether to display overlay information, inside the SPY mode, for all the UI actions derived from the test set up");
 
+	public static final Tag<Boolean> KeyBoardListener = Tag.from("KeyBoardListener", Boolean.class, 
+			"Sets whether to listen to keyboard shortcuts during the exceution");
+
 	public static final Tag<Boolean> UseSystemActions = Tag.from("UseSystemActions", Boolean.class, 
 			"ANDROID: Indicate if add system calls");
 
@@ -280,9 +279,12 @@ public final class ConfigTags {
 
 	public static final Tag<String> TempDir = Tag.from("TempDir", String.class, 
 			"The relative path to temporarily  save TESTAR files");
-
-	public static final Tag<String> ReportingClass = Tag.from("ReportingClass", String.class, 
-			"Sets whether create a HTML or NUNIT report");
+	
+	public static final Tag<Boolean> ReportInHTML = Tag.from("ReportInHTML", Boolean.class,
+			 "Sets whether to create a HTML report");
+	
+	public static final Tag<Boolean> ReportInPlainText = Tag.from("ReportInPlainText", Boolean.class,
+			 "Sets whether to create a plain text report");
 
 	/**
 	 * Other settings

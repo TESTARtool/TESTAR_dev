@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2016 - 2020 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2019 - 2020 Open Universiteit - www.ou.nl
+* Copyright (c) 2016 - 2025 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2019 - 2025 Open Universiteit - www.ou.nl
 * 
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -27,7 +27,6 @@
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
-
 
 package org.testar;
 
@@ -235,7 +234,7 @@ public class ProtocolUtil {
 	// #####################
 	
 	public static String getStateshot(State state){
-		return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), getStateshotBinary(state));
+		return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), getStateshotBinary(state));
 	}
 
 	/**
@@ -250,17 +249,32 @@ public class ProtocolUtil {
 			if (viewPort != null && (viewPort.width() * viewPort.height() < 1))
 				viewPort = null;
 		}
-		
-		//If the state Shape is not properly obtained, or the State has an error, use full monitor screen
+
+		// If the state Shape is not properly obtained, or the State has an error, use full monitor screen
 		if (viewPort == null || (state.get(Tags.OracleVerdict, Verdict.OK).severity() > Verdict.SEVERITY_OK))
 			viewPort = state.get(Tags.Shape, null); // get the SUT process canvas (usually, full monitor screen)
-		
-		if (viewPort.width() <= 0 || viewPort.height() <= 0)
-			return null;
-		AWTCanvas scrshot = AWTCanvas.fromScreenshot(Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height()), getRootWindowHandle(state), AWTCanvas.StorageFormat.PNG, 1);
-		return scrshot;
+
+		// Validate viewport dimensions before taking the screenshot
+		if (viewPort == null || viewPort.width() <= 0 || viewPort.height() <= 0) {
+			// If viewport is still null, get a screenshot of all the screen
+			Rectangle screenRect = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+			return AWTCanvas.fromScreenshot(
+					Rect.from(screenRect.x, screenRect.y, screenRect.width, screenRect.height),
+					getRootWindowHandle(state),
+					AWTCanvas.StorageFormat.PNG,
+					1
+					);
+		} else {
+			// Capture and return the viewport screenshot
+			return AWTCanvas.fromScreenshot(
+					Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height()),
+					getRootWindowHandle(state),
+					AWTCanvas.StorageFormat.PNG,
+					1
+					);
+		}
 	}
-	
+
 	public static String getActionshot(State state, Action action){
 		List<Finder> targets = action.get(Tags.Targets, null);
 		if (targets != null){
@@ -268,17 +282,30 @@ public class ProtocolUtil {
 			Shape s;
 			Rectangle r;
 			Rectangle actionArea = new Rectangle(Integer.MAX_VALUE,Integer.MAX_VALUE,Integer.MIN_VALUE,Integer.MIN_VALUE);
+
 			for (Finder f : targets){
 				w = f.apply(state);
-				s = w.get(Tags.Shape);
+				s = w.get(Tags.Shape, null);
+				if(s == null) continue;
+
 				r = new Rectangle((int)s.x(), (int)s.y(), (int)s.width(), (int)s.height());
 				actionArea = actionArea.union(r);
 			}
-			if (actionArea.isEmpty())
-				return null;
-			AWTCanvas scrshot = AWTCanvas.fromScreenshot(Rect.from(actionArea.x, actionArea.y, actionArea.width, actionArea.height), getRootWindowHandle(state),
-														 AWTCanvas.StorageFormat.PNG, 1);
-			return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), scrshot);
+
+			if (actionArea.isEmpty()) return null;
+
+			AWTCanvas scrshot = AWTCanvas.fromScreenshot(
+					Rect.from(actionArea.x, actionArea.y, actionArea.width, actionArea.height),
+					getRootWindowHandle(state),
+					AWTCanvas.StorageFormat.PNG,
+					1
+					);
+
+			return ScreenshotSerialiser.saveActionshot(
+					state.get(Tags.ConcreteID, "NoConcreteIdAvailable"),
+					action.get(Tags.ConcreteID, "NoConcreteIdAvailable"),
+					scrshot
+					);
 		}
 		return null;
 	}	
@@ -286,7 +313,7 @@ public class ProtocolUtil {
 	private static long getRootWindowHandle(State state) {
 		long windowHandle = 0;
 		if (state.childCount() > 0) {
-			windowHandle = state.child(0).get(Tags.HWND);
+			windowHandle = state.child(0).get(Tags.HWND, 0L);
 		}
 		return windowHandle;
 	}

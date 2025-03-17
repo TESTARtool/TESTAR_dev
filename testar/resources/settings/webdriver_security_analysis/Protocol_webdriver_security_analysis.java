@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2024 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -33,12 +33,11 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.HasDevTools;
-import org.openqa.selenium.devtools.v113.network.Network;
+import org.openqa.selenium.devtools.v133.network.Network;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.SutVisualization;
 import org.testar.managers.InputDataManager;
-import org.testar.monkey.Settings;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
@@ -51,6 +50,7 @@ import org.testar.securityanalysis.helpers.SecurityOracleOrchestrator;
 import org.testar.securityanalysis.oracles.ActiveSecurityOracle;
 import org.testar.securityanalysis.oracles.SqlInjectionSecurityOracle;
 import org.testar.securityanalysis.oracles.XssSecurityOracle;
+import org.testar.settings.Settings;
 
 import com.google.common.collect.Sets;
 

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2023 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,17 +31,13 @@
 package org.testar.protocols;
 
 import org.testar.plugin.NativeLinker;
-import org.testar.reporting.HtmlSequenceReport;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
-import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Settings;
-import org.testar.OutputStructure;
+import org.testar.settings.Settings;
 import org.testar.monkey.alayer.android.actions.AndroidBackAction;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -50,8 +46,6 @@ public class AndroidProtocol extends GenericUtilsProtocol {
     //Attributes for adding slide actions
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
-    protected HtmlSequenceReport htmlReport;
-    protected State latestState;
 
     /**
      * Called once during the life time of TESTAR
@@ -65,15 +59,6 @@ public class AndroidProtocol extends GenericUtilsProtocol {
     }
 
     /**
-     * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
-     */
-    @Override
-    protected void preSequencePreparations() {
-        //initializing the HTML sequence report:
-        htmlReport = new HtmlSequenceReport();
-    }
-
-    /**
      * This method is called when the TESTAR requests the state of the SUT.
      * Here you can add additional information to the SUT's state or write your
      * own state fetching routine. The state should have attached an oracle
@@ -83,16 +68,7 @@ public class AndroidProtocol extends GenericUtilsProtocol {
      */
     @Override
     protected State getState(SUT system) throws StateBuildException {
-        //Spy mode didn't use the html report
-        if(settings.get(ConfigTags.Mode) == Modes.Spy) {
-            return super.getState(system);
-        }
-
-        latestState = super.getState(system);
-
-        //adding state to the HTML sequence report:
-        htmlReport.addState(latestState);
-        return latestState;
+        return super.getState(system);
     }
 
     /**
@@ -138,27 +114,24 @@ public class AndroidProtocol extends GenericUtilsProtocol {
     }
 
     /**
-     * Overwriting to add HTML report writing into it
+     * Overwriting to add action information
      *
      * @param state
      * @param actions
      * @return
      */
     @Override
-    protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions){
-
-        Widget topWidget = state.root().child(0);
-
-        if (actions.size() == 0) {
+    protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions) {
+        
+        Set<Action> actionsToReturn = super.preSelectAction(system, state, actions); //super must be executed
+        
+        if (actions.isEmpty()) {
+            Widget topWidget = state.root().child(0);
             Action backAction = new AndroidBackAction(state, topWidget);
             buildStateActionsIdentifiers(state, Collections.singleton(backAction));
-            htmlReport.addActions(actions);
-            return new HashSet<>(Collections.singletonList(backAction));
+            actionsToReturn = new HashSet<>(Collections.singletonList(backAction));
         }
-
-        // adding available actions into the HTML report:
-        htmlReport.addActions(actions);
-        return(super.preSelectAction(system, state, actions));
+        return actionsToReturn;
     }
 
     /**
@@ -170,47 +143,6 @@ public class AndroidProtocol extends GenericUtilsProtocol {
     @Override
     protected Action selectAction(State state, Set<Action> actions){
         return super.selectAction(state, actions);
-    }
-
-    /**
-     * Execute the selected action.
-     * @param system the SUT
-     * @param state the SUT's current state
-     * @param action the action to execute
-     * @return whether or not the execution succeeded
-     */
-    @Override
-    protected boolean executeAction(SUT system, State state, Action action){
-        // Calls the super.executeAction where the specific behavior is defined on what to do when Android is the environment
-        // adding the action that is going to be executed into HTML report:
-        htmlReport.addSelectedAction(state, action);
-        return super.executeAction(system, state, action);
-    }
-
-    /**
-     * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
-     */
-    @Override
-    protected void postSequenceProcessing() {
-        htmlReport.addTestVerdict(getFinalVerdict());
-
-        String sequencesPath = getGeneratedSequenceName();
-        try {
-            sequencesPath = new File(getGeneratedSequenceName()).getCanonicalPath();
-        }catch (Exception e) {}
-
-        String status = (getFinalVerdict()).verdictSeverityTitle();
-        String statusInfo = (getFinalVerdict()).info();
-
-        statusInfo = statusInfo.replace("\n"+Verdict.OK.info(), "");
-
-        //Timestamp(generated by logger) SUTname Mode SequenceFileObject Status "StatusInfo"
-        INDEXLOG.info(OutputStructure.executedSUTname
-                + " " + settings.get(ConfigTags.Mode, mode())
-                + " " + sequencesPath
-                + " " + status + " \"" + statusInfo + "\"" );
-
-        htmlReport.close();
     }
 
     @Override

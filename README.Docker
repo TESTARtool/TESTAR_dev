@@ -8,8 +8,7 @@ Take care of setting ShowVisualSettingsDialog to False in the settings file as w
 Take care of the following settings in the used settings file:
 - Mode should be Generate
 - SUTConnectorValue should contain the reference "/usr/bin/chromedriver" (the internal chromedriver of the Docker container)
-- ShowSettingsAfterTest should be false
-- VisualizeSelectedAction should be false
+- VisualizeActions should be false
 - ShowVisualSettingsDialogOnStartup should be false
 - FlashFeedback should be false
 - ProtocolCompileDirectory should be set to a directory local to the image e.g. /tmp (this is where the compiled java files are written to)

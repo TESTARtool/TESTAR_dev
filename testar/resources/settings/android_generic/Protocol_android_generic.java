@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2024 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,13 +32,13 @@ import org.testar.CodingManager;
 import org.testar.RandomActionSelector;
 import org.testar.managers.InputDataManager;
 import org.testar.screenshotjson.JsonUtils;
+import org.testar.settings.Settings;
 import org.testar.simplestategraph.QLearningActionSelector;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.*;
 import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Settings;
 import org.testar.monkey.alayer.android.actions.*;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 import org.testar.protocols.AndroidProtocol;
@@ -79,7 +79,7 @@ public class Protocol_android_generic extends AndroidProtocol {
 
 	/**
 	 * Use CodingManager to create the Widget and State identifiers:
-	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom,
+	 * ConcreteID, AbstractID,
 	 * Abstract_R_ID, Abstract_R_T_ID, Abstract_R_T_P_ID
 	 *
 	 * @param state
@@ -93,7 +93,7 @@ public class Protocol_android_generic extends AndroidProtocol {
 
 	/**
 	 * Use CodingManager to create the Actions identifiers:
-	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom
+	 * ConcreteID, AbstractID
 	 *
 	 * @param state
 	 * @param actions
@@ -107,7 +107,7 @@ public class Protocol_android_generic extends AndroidProtocol {
 
 	/**
 	 * Use CodingManager to create the specific environment Action identifiers:
-	 * ConcreteID, ConcreteIDCustom, AbstractID, AbstractIDCustom
+	 * ConcreteID, AbstractID
 	 *
 	 * @param state
 	 * @param action

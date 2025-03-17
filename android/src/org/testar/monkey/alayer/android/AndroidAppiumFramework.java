@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2024 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -78,8 +78,9 @@ public class AndroidAppiumFramework extends SUTBase {
 
 	private static AndroidDriver driver = null;
 
-	//TODO: Appium v2 will not use /wd/hub suffix anymore
-	public static String androidAppiumURL = "http://0.0.0.0:4723/wd/hub";
+	// Appium v2 do not use /wd/hub suffix anymore
+	// It can be enabled using the "--base-path /wd/hub" command when launching the Appium server
+	public static String androidAppiumURL = "http://127.0.0.1:4723/wd/hub";
 
 	public AndroidAppiumFramework(DesiredCapabilities cap) {
 		try {
@@ -161,7 +162,7 @@ public class AndroidAppiumFramework extends SUTBase {
 	 * Uses unique accessibility ID if present, otherwise uses xpath. 
 	 * 
 	 * @param id
-	 * @param value
+	 * @param text
 	 * @param w
 	 */
 	public static void sendKeysTextTextElementById(String id, String text, Widget w){
@@ -368,10 +369,6 @@ public class AndroidAppiumFramework extends SUTBase {
 		return driver.getTitle();
 	}
 
-	public static void resetApp(){
-		driver.resetApp();
-	}
-
 	public static void runAppInBackground(Duration duration){
 		driver.runAppInBackground(duration);
 	}
@@ -401,7 +398,7 @@ public class AndroidAppiumFramework extends SUTBase {
 		byte[] byteImage = driver.getScreenshotAs(OutputType.BYTES);
 		InputStream is = new ByteArrayInputStream(byteImage);
 		AWTCanvas canvas = AWTCanvas.fromInputStream(is);
-		return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), canvas);
+		return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), canvas);
 	}
 
 	public static String getScreenshotAction(State state, Action action) throws IOException {
@@ -433,7 +430,7 @@ public class AndroidAppiumFramework extends SUTBase {
 		InputStream is2 = new ByteArrayInputStream(os.toByteArray());
 
 		AWTCanvas canvas = AWTCanvas.fromInputStream(is2);
-		return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), action.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"), canvas);
+		return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), action.get(Tags.ConcreteID, "NoConcreteIdAvailable"), canvas);
 	}
 
 	// Note that besides obtaining a screenshot of the SUT it also highlights which action was clicked!
@@ -515,7 +512,7 @@ public class AndroidAppiumFramework extends SUTBase {
 
 	@Override
 	public void stop() throws SystemStopException {
-		driver.closeApp();
+		driver.quit();
 		driver = null;
 	}
 
@@ -568,13 +565,17 @@ public class AndroidAppiumFramework extends SUTBase {
 
 			JsonObject jsonObject = new JsonParser().parse(reader).getAsJsonObject();
 
-			cap.setCapability("deviceName", jsonObject.get("deviceName").getAsString());
+			// https://appium.io/docs/en/2.0/guides/caps/
 			cap.setCapability("platformName", jsonObject.get("platformName").getAsString());
-			cap.setCapability("automationName", jsonObject.get("automationName").getAsString());
-			cap.setCapability("allowTestPackages", true);
-			cap.setCapability("newCommandTimeout", jsonObject.get("newCommandTimeout").getAsInt());
-			cap.setCapability("appWaitActivity", jsonObject.get("appWaitActivity").getAsString());
-			cap.setCapability("autoGrantPermissions", jsonObject.get("autoGrantPermissions").getAsBoolean());
+
+			cap.setCapability("appium:deviceName", jsonObject.get("deviceName").getAsString());
+			cap.setCapability("appium:automationName", jsonObject.get("automationName").getAsString());
+			cap.setCapability("appium:newCommandTimeout", jsonObject.get("newCommandTimeout").getAsInt());
+
+			// TODO: Check and test next capabilities
+			// cap.setCapability("allowTestPackages", true);
+			// cap.setCapability("appWaitActivity", jsonObject.get("appWaitActivity").getAsString());
+			// cap.setCapability("autoGrantPermissions", jsonObject.get("autoGrantPermissions").getAsBoolean());
 
 			String appPath = jsonObject.get("app").getAsString();
 
@@ -582,12 +583,16 @@ public class AndroidAppiumFramework extends SUTBase {
 			if(jsonObject.get("isEmulatorDocker") != null 
 					&& jsonObject.get("ipAddressAppium") != null
 					&& jsonObject.get("isEmulatorDocker").getAsBoolean()) {
-				cap.setCapability("app", appPath);
+
+				cap.setCapability("appium:app", appPath);
+
+				// Docker container (budtmo/docker-android) + Appium v2 do not use /wd/hub suffix anymore
+				// It can be enabled using the APPIUM_ADDITIONAL_ARGS "--base-path /wd/hub" command
 				androidAppiumURL = "http://" + jsonObject.get("ipAddressAppium").getAsString() + ":4723/wd/hub";
 			} 
 			// Else, obtain the local directory that contains the APK file
 			else {
-				cap.setCapability("app", new File(appPath).getCanonicalPath());
+				cap.setCapability("appium:app", new File(appPath).getCanonicalPath());
 			}
 
 		} catch (IOException | NullPointerException e) {

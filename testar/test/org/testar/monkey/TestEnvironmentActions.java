@@ -17,6 +17,8 @@ import org.testar.monkey.alayer.actions.ActivateSystem;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.windows.WinProcessActivator;
+import org.testar.reporting.ReportManager;
+import org.testar.settings.Settings;
 import org.testar.stub.StateStub;
 import org.testar.stub.WidgetStub;
 
@@ -25,6 +27,8 @@ public class TestEnvironmentActions extends DefaultProtocol {
 	private static StateStub state;
 	private static WidgetStub widget;
 	private static StdActionCompiler ac = new AnnotatingActionCompiler();
+
+	private static String pathTest = "[0,0,1]";
 
 	@BeforeClass
 	public static void setup() {
@@ -42,7 +46,7 @@ public class TestEnvironmentActions extends DefaultProtocol {
 
 		widget.set(Tags.Shape, Rect.fromCoordinates(0, 0, 100, 100));
 		widget.set(Tags.Role, Roles.Button);
-		widget.set(Tags.Path, "[0,0,1]");
+		widget.set(Tags.Path, pathTest);
 
 		// Build widget and state identifiers
 		buildStateIdentifiers(state);
@@ -64,11 +68,15 @@ public class TestEnvironmentActions extends DefaultProtocol {
 		Assert.isTrue(actions.iterator().next().getClass().getName().equals(ActivateSystem.class.getName()));
 		Assert.notNull(actions.iterator().next().get(Tags.OriginWidget));
 
+		Assert.notNull(state.get(Tags.ActionSet));
+		Assert.isTrue(state.get(Tags.ActionSet).size() == 1);
+		Assert.isTrue(state.get(Tags.ActionSet).iterator().next().getClass().getName().equals(ActivateSystem.class.getName()));
+
 		// Then build the action identifier
 		buildStateActionsIdentifiers(state, actions);
 		// To check that Action identifiers were built
-		Assert.notNull(actions.iterator().next().get(Tags.AbstractIDCustom));
-		Assert.notNull(actions.iterator().next().get(Tags.ConcreteIDCustom));
+		Assert.notNull(actions.iterator().next().get(Tags.AbstractID));
+		Assert.notNull(actions.iterator().next().get(Tags.ConcreteID));
 		// Check that the OriginWidget, Description, and Role are not null
 		Assert.notNull(actions.iterator().next().get(Tags.OriginWidget));
 		Assert.notNull(actions.iterator().next().get(Tags.Desc));
@@ -93,8 +101,14 @@ public class TestEnvironmentActions extends DefaultProtocol {
 		// We must have the leftClick and the ActivateSystem actions
 		Assert.isTrue(defaultActions.size() == 2);
 
+		// The state only must have the ActivateSystem action
+		Assert.notNull(state.get(Tags.ActionSet));
+		Assert.isTrue(state.get(Tags.ActionSet).size() == 1);
+		Assert.isTrue(state.get(Tags.ActionSet).iterator().next().getClass().getName().equals(ActivateSystem.class.getName()));
+
 		// Because there exists an ActivateSystem action
 		// preSelectAction must force to return it
+		reportManager = Mockito.mock(ReportManager.class);
 		Set<Action> preSelectedActions = preSelectAction(system, state, defaultActions);
 		Assert.isTrue(preSelectedActions.size() == 1);
 		Action forcedAction = preSelectedActions.iterator().next();
@@ -111,12 +125,18 @@ public class TestEnvironmentActions extends DefaultProtocol {
 
 		// Because there are no actions, this method returns a Set with one ESC key action
 		// This method already builds the environment action identifier
+		reportManager = Mockito.mock(ReportManager.class);
 		Set<Action> preActions = preSelectAction(system, state, initialActions);
 		Assert.isTrue(preActions.size() == 1);
 
+		// The state only must have the ActivateSystem action
+		Assert.notNull(state.get(Tags.ActionSet));
+		Assert.isTrue(state.get(Tags.ActionSet).size() == 1);
+		Assert.isTrue(state.get(Tags.ActionSet).iterator().next().get(Tags.Desc, "").contains("Hit Key"));
+
 		// To check that Action identifiers were built
-		Assert.notNull(preActions.iterator().next().get(Tags.AbstractIDCustom));
-		Assert.notNull(preActions.iterator().next().get(Tags.ConcreteIDCustom));
+		Assert.notNull(preActions.iterator().next().get(Tags.AbstractID));
+		Assert.notNull(preActions.iterator().next().get(Tags.ConcreteID));
 		// Check that the OriginWidget, Description, and Role are not null
 		Assert.notNull(preActions.iterator().next().get(Tags.OriginWidget));
 		Assert.notNull(preActions.iterator().next().get(Tags.Desc));

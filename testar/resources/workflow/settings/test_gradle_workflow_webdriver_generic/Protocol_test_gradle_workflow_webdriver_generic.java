@@ -38,12 +38,13 @@ import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
-import org.testar.monkey.Settings;
+import org.testar.settings.Settings;
 import org.testar.OutputStructure;
 import org.testar.managers.InputDataManager;
 import org.testar.protocols.WebdriverProtocol;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.*;
 
 import static org.testar.monkey.alayer.Tags.Blocked;
@@ -58,8 +59,8 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
  */
 public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverProtocol {
 
-	private String cookieNecessaryIdValue = "_cookieDisplay_WAR_corpcookieportlet_necessaryCookiesButton";
-	private String cookieAllIdValue = "_cookieDisplay_WAR_corpcookieportlet_allCookiesButton";
+	private String cookieAccept = "accept-cookies";
+	private String cookieReject = "reject-cookies";
 
     /**
      * Called once during the life time of TESTAR
@@ -74,16 +75,16 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
         /**
          *  WebDriver settings and features verification
          */
-        // We want to test WebdriverProtocol.ensureDomainsAllowed (startSystem method)
-        // Then we don't include ou.nl domain by default
-        Assert.collectionNotContains(settings.get(ConfigTags.DomainsAllowed), "www.ou.nl");
-        Assert.collectionNotContains(domainsAllowed, "www.ou.nl");
+        // We want to test WebdriverProtocol.ensureWebDomainsAllowed (startSystem method)
+        // Then we don't include para.testar.org domain by default
+        Assert.collectionNotContains(settings.get(ConfigTags.WebDomainsAllowed), "para.testar.org");
+        Assert.collectionNotContains(webDomainsAllowed, "para.testar.org");
 
         // Check that WebDriver settings are correctly assigned to Webdriver features
-        Assert.collectionContains(settings.get(ConfigTags.DomainsAllowed), "mijn.awo.ou.nl");
-        Assert.collectionContains(settings.get(ConfigTags.DomainsAllowed), "login.awo.ou.nl");
-        Assert.collectionContains(domainsAllowed, "mijn.awo.ou.nl");
-        Assert.collectionContains(domainsAllowed, "login.awo.ou.nl");
+        Assert.collectionContains(settings.get(ConfigTags.WebDomainsAllowed), "testar.org");
+        Assert.collectionContains(webDomainsAllowed, "testar.org");
+        Assert.isTrue(settings.get(ConfigTags.WebPathsAllowed).contains("index.htm"));
+        Assert.isTrue(webPathsAllowed.contains("index.htm"));
         Assert.collectionSize(settings.get(ConfigTags.DeniedExtensions), 3);
         Assert.collectionSize(deniedExtensions, 3);
         Assert.collectionContains(settings.get(ConfigTags.ClickableClasses), "v-menubar-menuitem");
@@ -92,8 +93,8 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
 
         // Add a force click action for policy attributes
         policyAttributes.put("id", "bad");
-        policyAttributes.put("id", cookieNecessaryIdValue);
-        policyAttributes.put("id", cookieAllIdValue);
+        policyAttributes.put("id", cookieAccept);
+        policyAttributes.put("id", cookieReject);
         policyAttributes.put("id", "nothing");
     }
 
@@ -101,8 +102,8 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
     protected SUT startSystem() throws SystemStartException {        
         SUT sut = super.startSystem();
 
-        // Check if WebdriverProtocol.ensureDomainsAllowed feature works
-        Assert.collectionContains(domainsAllowed, "www.ou.nl");
+        // Check if WebdriverProtocol.ensureWebDomainsAllowed feature works
+        Assert.collectionContains(webDomainsAllowed, "para.testar.org");
 
         return sut;
     }
@@ -124,7 +125,7 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
         	Assert.isTrue(forcedActions.size() == 2);
         	Assert.isTrue(forcedActions.iterator().next().get(Tags.OriginWidget, null) != null);
         	String policyClickWidgetId = forcedActions.iterator().next().get(Tags.OriginWidget).get(WdTags.WebId, "");
-        	Assert.isTrue(policyClickWidgetId.equals(cookieNecessaryIdValue) || policyClickWidgetId.equals(cookieAllIdValue));
+        	Assert.isTrue(policyClickWidgetId.equals(cookieAccept) || policyClickWidgetId.equals(cookieReject));
         }
 
         if (forcedActions != null && forcedActions.size() > 0) {
@@ -160,6 +161,43 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
         }
 
         return actions;
+    }
+
+    @Override
+    protected void postSequenceProcessing() {
+    	super.postSequenceProcessing(); // Finish Reports
+
+    	// Verify html and txt report files were created
+    	File htmlReportFile = new File(reportManager.getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".html"));
+    	File txtReportFile = new File(reportManager.getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".txt"));
+    	System.out.println("htmlReportFile: " + htmlReportFile.getPath());
+    	System.out.println("txtReportFile: " + txtReportFile.getPath());
+    	Assert.isTrue(htmlReportFile.exists());
+    	Assert.isTrue(txtReportFile.exists());
+
+    	// Verify report information
+    	Assert.isTrue(fileContains("<h1>TESTAR execution sequence report for sequence 1</h1>", htmlReportFile));
+    	Assert.isTrue(fileContains("TESTAR execution sequence report for sequence 1", txtReportFile));
+
+    	Assert.isTrue(fileContains("<h2>Test verdict for this sequence:", htmlReportFile));
+    	Assert.isTrue(fileContains("Test verdict for this sequence:", txtReportFile));
+    }
+
+    private boolean fileContains(String searchText, File file) {
+    	try (Scanner scanner = new Scanner(file)) {
+    		// Read the content of the file line by line
+    		while (scanner.hasNextLine()) {
+    			String line = scanner.nextLine();
+
+    			// Check if the line contains the specific text
+    			if (line.contains(searchText)) {
+    				return true;
+    			}
+    		}
+    	} catch (FileNotFoundException e) {
+    		e.printStackTrace();
+    	}
+    	return false;
     }
 
     @Override

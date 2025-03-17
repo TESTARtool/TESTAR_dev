@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\SeleniumWebDrivers\\ChromeDriver\\chromedriver.exe" "1920x900+0+0" "https://www.ou.nl"
+SUTConnectorValue = "C:\\SeleniumWebDrivers\\ChromeDriver\\chromedriver.exe" "1920x900+0+0" "https://para.testar.org/parabank/cookies.htm"
 
 #################################################################
 # Sequences
@@ -100,6 +100,23 @@ ProcessesToKillDuringTest =
 ProtocolClass = test_gradle_workflow_webdriver_generic/Protocol_test_gradle_workflow_webdriver_generic
 
 #################################################################
+# State model inference settings
+#################################################################
+StateModelEnabled = true
+DataStore = OrientDB
+DataStoreType = plocal
+DataStoreServer = localhost
+DataStoreDirectory = orientdb-community-3.0.34/databases
+DataStoreDB = testar
+DataStoreUser = admin
+DataStorePassword = admin
+DataStoreMode = instant
+ApplicationName = parabank
+ApplicationVersion = 1
+ActionSelectionAlgorithm = unvisited
+StateModelStoreWidgets = true
+
+#################################################################
 # State identifier attributes
 #
 # Specify the widget attributes that you wish to use in constructing
@@ -113,7 +130,8 @@ AbstractStateAttributes = WebWidgetId
 ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption
 TypeableClasses = custom-type-input
 DeniedExtensions = pdf;jpg;png
-DomainsAllowed = mijn.awo.ou.nl;login.awo.ou.nl
+WebDomainsAllowed = testar.org
+WebPathsAllowed = .*cookies.htm.*|.*index.htm.*|.*overview.*|.*activity.*
 FollowLinks = true
 BrowserFullScreen = true
 SwitchNewTabs = true
@@ -142,6 +160,12 @@ WebConsoleWarningPattern = .*.*
 OverrideWebDriverDisplayScale = 
 
 #################################################################
+# Set the types of reports to create
+#################################################################
+ReportInHTML = true
+ReportInPlainText = true
+
+#################################################################
 # Other more advanced settings
 #################################################################
 
@@ -159,7 +183,7 @@ ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
-TimeToWaitAfterAction = 0.1
+TimeToWaitAfterAction = 2.0
 StartupTime = 2.0
 TimeToFreeze = 30.0
 StopGenerationOnFault = true

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2024 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -62,7 +62,7 @@ public class IOSProtocolUtil extends ProtocolUtil {
 
 	public static String getStateshotSpyMode(State state) {
 		try {
-			return IOSAppiumFramework.getScreenshotSpyMode(state.get(Tags.ConcreteIDCustom, "NoConcreteIdAvailable"));
+			return IOSAppiumFramework.getScreenshotSpyMode(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"));
 		} catch(Exception e) {
 			System.err.println("Exception occured when trying to take a screenshot of the iOS emulator: " + e);
 		}

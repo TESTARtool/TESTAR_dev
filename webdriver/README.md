@@ -46,7 +46,7 @@ While the webdriver tries to find all clickable elements on the page via the _on
 
 Because the webdriver is dependent on the use of the (Javascript) web extension, it fails when the browser encounters PDFs or images. With the _deniedExtensions_ option the testar can deny these URLs.
 
-While testing web applications, it is desirable to keep the testing on the same domain. Many applications have links pointing to domains outside the scope. When the browser reaches a domain not defined in _domainsAllowed_ it will try to go back to the last allowed page. Related to this is the _followLinks_ option to follow links opened in new tabs or stay with the original tab. 
+While testing web applications, it is desirable to keep the testing on the same domain. Many applications have links pointing to domains outside the scope. When the browser reaches a domain not defined in _webDomainsAllowed_ it will try to go back to the last allowed page. Related to this is the _followLinks_ option to follow links opened in new tabs or stay with the original tab. 
 
 The _login_, _username_ and _password_ pairs allow TESTAR to automatically login on websites that need authentication. The first pair consists of the URL with the login and the id of the FORM. The next 2 items should contain the ids of the input fields with their credential values.
 
