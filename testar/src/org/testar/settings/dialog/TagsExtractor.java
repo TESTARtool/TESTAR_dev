@@ -35,13 +35,23 @@ import java.util.HashSet;
 import java.util.Set;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.windows.UIATags;
 
 public class TagsExtractor {
+
     public static Set<Tag<?>> getAllTags() {
+        return getAllTags(Tags.class);
+    }
+
+    public static Set<Tag<?>> getAllUIATags() {
+        return getAllTags(UIATags.class);
+    }
+
+    public static Set<Tag<?>> getAllTags(Class tagsClass) {
         Set<Tag<?>> tagSet = new HashSet<>();
 
         // Get all declared fields of the Tags class
-        Field[] fields = Tags.class.getDeclaredFields();
+        Field[] fields = tagsClass.getDeclaredFields();
 
         for (Field field : fields) {
             // Check if the field is a static final Tag<>

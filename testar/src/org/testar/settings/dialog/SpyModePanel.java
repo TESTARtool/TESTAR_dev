@@ -3,7 +3,7 @@ package org.testar.settings.dialog;
 import org.testar.settings.dialog.TagsVisualization.DefaultTagFilter;
 import org.testar.settings.dialog.TagsVisualization.TagFilter;
 import org.testar.settings.Settings;
-import org.testar.settingsdialog.dialog.TreeSetListModel;
+import org.testar.settings.dialog.TreeSetListModel;
 
 import javax.swing.*;
 import java.awt.*;

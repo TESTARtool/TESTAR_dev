@@ -14,7 +14,7 @@ public class DefaultTagFilter {
     static{
         // Fill the list with all the available tags.
         Set<String> tmpList = new HashSet<>();
-        UIATags.getAllTags().forEach(t -> tmpList.add(t.name()));
+        TagsExtractor.getAllUIATags().forEach(t -> tmpList.add(t.name()));
         TagsExtractor.getAllTags().forEach(t -> tmpList.add(t.name()));
         StateManagementTags.getAllTags().forEach(t -> tmpList.add(t.name()));
         allAvailableTags = Collections.unmodifiableSet(tmpList);
