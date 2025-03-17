@@ -30,7 +30,7 @@
 
 package org.testar;
 
-import org.testar.settingsdialog.TagVisualization.TagFilter;
+import org.testar.settings.dialog.TagsVisualization.TagFilter;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.devices.Mouse;

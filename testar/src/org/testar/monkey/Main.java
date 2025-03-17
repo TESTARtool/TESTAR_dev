@@ -42,9 +42,8 @@ import org.testar.serialisation.ScreenshotSerialiser;
 import org.testar.serialisation.TestSerialiser;
 import org.testar.settings.Settings;
 import org.testar.settings.dialog.SettingsDialog;
-import org.testar.monkey.alayer.Tag;
-import org.testar.settingsdialog.TagVisualization.ConcreteTagFilter;
-import org.testar.settingsdialog.TagVisualization.TagFilter;
+import org.testar.settings.dialog.TagsVisualization.ConcreteTagFilter;
+import org.testar.settings.dialog.TagsVisualization.TagFilter;
 
 import javax.swing.*;
 import java.io.File;

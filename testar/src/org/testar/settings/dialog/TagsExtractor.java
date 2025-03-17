@@ -1,7 +1,8 @@
+package org.testar.settings.dialog;
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2017 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2017 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,28 +29,39 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.monkey;
 
-import javax.swing.*;
+import java.lang.reflect.Field;
+import java.util.HashSet;
+import java.util.Set;
+import org.testar.monkey.alayer.Tag;
+import org.testar.monkey.alayer.Tags;
 
-/**
- * @brief Abstract class for all common functionality for a SettingsPanel.
- */
-public abstract class SettingsPanel extends JPanel {
-    /**
-     * Populate the fields from Settings structure.
-     * @param settings The settings to load.
-     */
-    public abstract void populateFrom(final Settings settings);
+public class TagsExtractor {
+    public static Set<Tag<?>> getAllTags() {
+        Set<Tag<?>> tagSet = new HashSet<>();
 
-    /**
-     * Retrieve information from the GUI.
-     * @param settings reference to the object where the settings will be stored.
-     */
-    public abstract void extractInformation(final Settings settings);
+        // Get all declared fields of the Tags class
+        Field[] fields = Tags.class.getDeclaredFields();
 
-    /**
-     * Validate that the settings are valid.
-     */
-    public void checkSettings() {};
+        for (Field field : fields) {
+            // Check if the field is a static final Tag<>
+            if (Tag.class.isAssignableFrom(field.getType())) {
+                try {
+                    Tag<?> tag = (Tag<?>) field.get(null); // Retrieve the static field value
+                    tagSet.add(tag);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return tagSet;
+    }
+
+    public static Set<Tag<?>> getBaseTags() {
+        Set<Tag<?>> tagSet = new HashSet<>();
+        tagSet.add(Tags.Title);
+        tagSet.add(Tags.ValuePattern);
+        return tagSet;
+    }
 }
