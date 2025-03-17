@@ -44,7 +44,6 @@ import org.testar.monkey.alayer.devices.ProcessHandle;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -221,16 +220,5 @@ public final class Tags extends TagsBase {
 	 * measuring when the main content becomes visible or ready for interaction.
 	 */
 	public static final Tag<Double> StateRenderTime = from("StateRenderTime", Double.class);
-
-    private static Set<Tag<String>> generalStringVerdictTags;
-    static {
-    	generalStringVerdictTags = new HashSet<Tag<String>>();
-    	generalStringVerdictTags.add(Title);
-    	generalStringVerdictTags.add(ValuePattern);
-    }
-
-    public static Set<Tag<String>> getGeneralStringVerdictTags() {
-    	return generalStringVerdictTags;
-    }
 
 }
