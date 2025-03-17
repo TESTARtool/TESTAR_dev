@@ -304,7 +304,7 @@ public class SettingsDialog extends JFrame implements Observer {
         layout.createParallelGroup(Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(Alignment.TRAILING)
-                    .addComponent(jTabsPane, PREFERRED_SIZE, 620, PREFERRED_SIZE)
+                    .addComponent(jTabsPane, PREFERRED_SIZE, 642, PREFERRED_SIZE)
                     .addGroup(getStartGroup(layout)))
                 .addContainerGap(DEFAULT_SIZE, Short.MAX_VALUE))
     );
@@ -340,6 +340,7 @@ public class SettingsDialog extends JFrame implements Observer {
     group.addComponent(btnView, 120, 120, 120);
     group.addGap(2, 2, 2);
     group.addComponent(btnModel, 120, 120, 120);
+    group.addGap(11, 11, 11);
 
     return group;
   }
