@@ -92,7 +92,7 @@ public class SpyModePanel extends SettingsPanel {
         right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
         right.add(new JLabel("Include:"));
 
-        DefaultTagFilter.getList().forEach(i -> includeTags.add(i));
+
         includeList.setSelectionMode(
                 ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         includeList.setModel(includeTags);
@@ -107,8 +107,14 @@ public class SpyModePanel extends SettingsPanel {
 
     @Override
     public void extractInformation(final Settings settings) {
+        // TODO store the information in the settings file.
+    }
+
+    @Override
+    public void populateFrom(final Settings settings) {
         // TODO read the information from the settings file.
 
+        DefaultTagFilter.getList().forEach(i -> includeTags.add(i));
         // Create and set the new tag filter.
         Set<String> filter = new HashSet<>();
         int size = includeTags.getSize();
@@ -116,10 +122,5 @@ public class SpyModePanel extends SettingsPanel {
             filter.add(includeTags.getElementAt(i));
         }
         TagFilter.getInstance().setFilter(filter);
-    }
-
-    @Override
-    public void populateFrom(final Settings settings) {
-        // TODO store the information in the settings file.
     }
 }

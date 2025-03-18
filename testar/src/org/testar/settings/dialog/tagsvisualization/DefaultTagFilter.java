@@ -1,7 +1,8 @@
 package org.testar.settings.dialog.tagsvisualization;
 
 import org.testar.StateManagementTags;
-import org.testar.settings.dialog.TagsExtractor;
+import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.windows.UIATags;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -13,8 +14,8 @@ public class DefaultTagFilter {
     static{
         // Fill the list with all the available tags.
         Set<String> tmpList = new HashSet<>();
-        TagsExtractor.getAllUIATags().forEach(t -> tmpList.add(t.name()));
-        TagsExtractor.getAllTags().forEach(t -> tmpList.add(t.name()));
+        UIATags.tagSet().forEach(t -> tmpList.add(t.name()));
+        Tags.tagSet().forEach(t -> tmpList.add(t.name()));
         StateManagementTags.getAllTags().forEach(t -> tmpList.add(t.name()));
         allAvailableTags = Collections.unmodifiableSet(tmpList);
     }
