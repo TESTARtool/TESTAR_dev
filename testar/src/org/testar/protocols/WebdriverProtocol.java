@@ -422,7 +422,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 * Check the state if we need to force an action
 	 */
 	protected Set<Action> detectForcedActions(State state, StdActionCompiler ac) {
-		Set<Action> actions = detectForcedDeniedUrl();
+		Set<Action> actions = detectForcedDeniedUrl(state);
 		if (actions != null && actions.size() > 0) {
 			return actions;
 		}
@@ -515,18 +515,18 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	/*
 	 * Force back action due to disallowed domain or extension
 	 */
-	protected Set<Action> detectForcedDeniedUrl() {
+	protected Set<Action> detectForcedDeniedUrl(State state) {
 		String currentUrl = WdDriver.getCurrentUrl();
 
 		// Don't get caught in PDFs etc. and non-whitelisted domains
 		if (isUrlDenied(currentUrl) || isExtensionDenied(currentUrl)) {
 			// If opened in new tab, close it
 			if (WdDriver.getWindowHandles().size() > 1) {
-				return new HashSet<>(Collections.singletonList(new WdCloseTabAction()));
+				return new HashSet<>(Collections.singletonList(new WdCloseTabAction(state)));
 			}
 			// Single tab, go back to previous page
 			else {
-				return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
+				return new HashSet<>(Collections.singletonList(new WdHistoryBackAction(state)));
 			}
 		}
 

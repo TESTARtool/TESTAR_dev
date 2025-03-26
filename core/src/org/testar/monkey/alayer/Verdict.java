@@ -59,6 +59,10 @@ public final class Verdict implements Serializable {
 		// ACCESSIBILITY GROUP:
 		WARNING_ACCESSIBILITY_FAULT(0.00000101, "WARNING_ACCESSIBILITY_FAULT"),
 
+		// TEST GOAL
+		LLM_COMPLETE(0.7, "LLM_COMPLETE"), // LLM determines the test goal has been completed
+		TESTGOAL_COMPLETE(0.71, "TESTGOAL_COMPLETE"), // Technically check the test goal has been completed
+
 		// FAIL
 		SUSPICIOUS_TAG(0.8, "SUSPICIOUS_TAG"), // Suspicious tag
 		SUSPICIOUS_LOG(0.89, "SUSPICIOUS_LOG"), // Suspicious message in log file or command output (LogOracle)

@@ -1,0 +1,58 @@
+[
+  {
+    "role": "user",
+    "parts": [
+      {
+        "text": "You are a Gherkin test agent that follow Gherkin instructions to perform testing tasks in web applications.\n\n1. You will receive a Gherkin test objective, history of actions, and a list of available actions.\n\n2. When given a list of actions, you must choose the action that is most likely to lead to completing the Gherkin test objective. You must respond in JSON only, do not include additional text or explanations.\n\n3. Respond in the following JSON format:\n\n{\n\"actionId\":  \"AC78TY\",\n\"input\": \"Text\"\n}\n\nactionId should be the ID of the action to choose.\ninput should be the text to input if the action is a typing action."
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "text": "We are testing the \"Demo\" web application. The objective of the test is to log in with username \"Test\" and password \"Star\". The following actions are available: ACF6HU: Click Home, ACKO87: Type into TextField Username, AC3B4T: Type into TextField Password, AC78TY: Click Log In, ACR11L: Click Register. Which action should be executed to accomplish the test goal?"
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "text": "{\n\"actionId\": \"ACKO87\",\n\"input\": \"Test\"\n}"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "text": "We are testing the \"Demo\" web application. The objective of the test is to log in with username \"Test\" and password \"Star\". The following actions are available: ACF6HU: Click Home, ACKO87: Type into TextField Username, AC3B4T: Type into TextField Password, AC78TY: Click Log In, ACR11L: Click Register. This is the last action we executed: ACKO87: Typed Test into TextField Username. Which action should be executed to accomplish the test goal?"
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "text": "{\n\"actionId\": \"AC3B4T\",\n\"input\": \"Star\"\n}"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "parts": [
+      {
+        "text": "We are testing the \"Demo\" web application. The objective of the test is to log in with username \"Test\" and password \"Star\". The following actions are available: ACF6HU: Click Home, ACKO87: Type into TextField Username, AC3B4T: Type into TextField Password, AC78TY: Click Log In, ACR11L: Click Register. These are the last 2 actions we executed: ACKO87: Typed Test into TextField Username, AC3B4T: Typed Star into TextField Password. Which action should be executed to accomplish the test goal?"
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "text": "{\n\"actionId\": \"AC78TY\",\n\"input\": \"\"\n}"
+      }
+    ]
+  }
+]
