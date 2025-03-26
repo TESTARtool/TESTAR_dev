@@ -131,7 +131,7 @@ public class LlmOracle implements Oracle {
 
 			LlmVerdict llmVerdict = gson.fromJson(llmResponse, LlmVerdict.class);
 
-			if(llmVerdict.match()) return new Verdict(Verdict.SEVERITY_LLM_COMPLETE, llmVerdict.getInfo());
+			if(llmVerdict.match()) return new Verdict(Verdict.Severity.LLM_COMPLETE, llmVerdict.getInfo());
 
 		} catch(Exception e) {
 			logger.log(Level.ERROR, "Error obtaining the verdict with the LLM");

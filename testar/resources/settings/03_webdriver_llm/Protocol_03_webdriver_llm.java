@@ -169,7 +169,7 @@ public class Protocol_03_webdriver_llm extends WebdriverProtocol {
 		// Use the LLM as an Oracle to determine if the test goal has been completed
 		Verdict llmVerdict = llmOracle.getVerdict(state);
 
-		if(llmVerdict.severity() == Verdict.SEVERITY_LLM_COMPLETE) {
+		if(llmVerdict.severity() == Verdict.Severity.LLM_COMPLETE.getValue()) {
 			// Test goal was completed, retrieve next test goal from queue.
 			currentTestGoal = testGoalQueue.poll();
 
