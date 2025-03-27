@@ -282,8 +282,22 @@ public class WdElement extends TaggableBase implements Serializable {
   }
   
   private boolean isFullVisibleAtCanvasBrowser() {
-	  return rect.x() >= 0 && rect.x() + rect.width() <= CanvasDimensions.getCanvasWidth() &&
-	           rect.y() >= 0 && rect.y() + rect.height() <= CanvasDimensions.getInnerHeight();
+	  if (rect == null) return false;
+
+	  boolean isVisibleAtCanvas = rect.x() >= 0 && rect.x() + rect.width() <= CanvasDimensions.getCanvasWidth() 
+			  && rect.y() >= 0 && rect.y() + rect.height() <= CanvasDimensions.getInnerHeight();
+
+	  // If the web element is a <select><option>, check the selected option visibility
+	  if (tagName != null && tagName.equalsIgnoreCase("option") && outerHTML != null) {
+		  if (outerHTML.contains("<option") && (outerHTML.contains("selected>") || outerHTML.contains("selected="))) {
+			  return isVisibleAtCanvas;
+		  } else {
+			  return false;
+		  }
+	  }
+
+	  // For other web elements, only check if fully visible in the canvas
+	  return isVisibleAtCanvas;
   }
 
   @SuppressWarnings("unchecked")
