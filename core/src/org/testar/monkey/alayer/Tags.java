@@ -221,4 +221,8 @@ public final class Tags extends TagsBase {
 	 */
 	public static final Tag<Double> StateRenderTime = from("StateRenderTime", Double.class);
 
+	public static Set<Tag<?>> getAllTags() {
+		return tagSet;
+	}
+
 }
