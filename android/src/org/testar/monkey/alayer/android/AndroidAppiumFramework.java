@@ -433,31 +433,9 @@ public class AndroidAppiumFramework extends SUTBase {
 		return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), action.get(Tags.ConcreteID, "NoConcreteIdAvailable"), canvas);
 	}
 
-	// Note that besides obtaining a screenshot of the SUT it also highlights which action was clicked!
-	public static AWTCanvas getScreenshotBinary(State state, Widget widget) throws IOException {
-
+	public static AWTCanvas getScreenshotBinary(State state) throws IOException {
 		byte[] byteImage = driver.getScreenshotAs(OutputType.BYTES);
 		InputStream is = new ByteArrayInputStream(byteImage);
-		/*
-		BufferedImage newBi = ImageIO.read(is);
-		// get the Graphics context for this single BufferedImage object
-		Graphics g = newBi.getGraphics();
-
-		Rect bounds = widget.get(AndroidTags.AndroidBounds);
-		int xLocation = (int)(bounds.x() + (bounds.width()/2.0));
-		int yLocation = (int)(bounds.y() + (bounds.height()/2.0));
-
-		g.setColor(new Color(255, 0, 0, 130));
-		g.drawOval(xLocation, yLocation, 20, 20);
-		g.setColor(new Color(255, 0, 0, 130));
-		g.fillOval(xLocation, yLocation, 20, 20);
-		g.dispose();  // get rid of the Graphics context to save resources
-
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		ImageIO.write(newBi, "jpeg", os);
-		InputStream is2 = new ByteArrayInputStream(os.toByteArray());
-		 */
-
 		return AWTCanvas.fromInputStream(is);
 	}
 
@@ -571,11 +549,11 @@ public class AndroidAppiumFramework extends SUTBase {
 			cap.setCapability("appium:deviceName", jsonObject.get("deviceName").getAsString());
 			cap.setCapability("appium:automationName", jsonObject.get("automationName").getAsString());
 			cap.setCapability("appium:newCommandTimeout", jsonObject.get("newCommandTimeout").getAsInt());
+			cap.setCapability("appium:autoGrantPermissions", jsonObject.get("autoGrantPermissions").getAsBoolean());
 
 			// TODO: Check and test next capabilities
 			// cap.setCapability("allowTestPackages", true);
 			// cap.setCapability("appWaitActivity", jsonObject.get("appWaitActivity").getAsString());
-			// cap.setCapability("autoGrantPermissions", jsonObject.get("autoGrantPermissions").getAsBoolean());
 
 			String appPath = jsonObject.get("app").getAsString();
 
