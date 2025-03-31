@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.testar.monkey.Pair;
-import org.testar.monkey.alayer.Role;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Widget;
 
@@ -23,10 +22,10 @@ public class GrammarHelperWidget {
 		for(Tag<?> tag : widget.tags()) {
 			if(widget.get(tag, null) != null) {
 				// TODO: This cast to String needs to be improved
-				if(widget.get(tag) instanceof Role) {
-					widgetTagValues.add(widget.get(tag).toString());
-				} else {
+				try {
 					widgetTagValues.add((String) widget.get(tag));
+				} catch (ClassCastException e) {
+					widgetTagValues.add(widget.get(tag).toString());
 				}
 			}
 		}
@@ -39,10 +38,10 @@ public class GrammarHelperWidget {
 			Pair<String, String> tagValuePair = new Pair<>(tag.name(), "");
 			if(widget.get(tag, null) != null){
 				// TODO: This cast to String needs to be improved
-				if(widget.get(tag) instanceof Role) {
-					tagValuePair = new Pair<>(tag.name(), widget.get(tag).toString());
-				} else {
+				try {
 					tagValuePair = new Pair<>(tag.name(), (String) widget.get(tag));
+				} catch (ClassCastException e) {
+					tagValuePair = new Pair<>(tag.name(), widget.get(tag).toString());
 				}
 			}
 			widgetTagValuePairs.add(tagValuePair);
