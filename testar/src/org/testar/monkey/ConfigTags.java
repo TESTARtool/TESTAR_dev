@@ -300,7 +300,7 @@ public final class ConfigTags {
 	public static final Tag<List<Pair<String, String>>> CopyFromTo = Tag.from("CopyFromTo", (Class<List<Pair<String, String>>>) (Class<?>) List.class);
 
 	public static final Tag<List<String>> SpyTagAttributes = Tag.from("SpyTagAttributes", (Class<List<String>>) (Class<?>) List.class,
-			"Specify the widget attributes that you wish to visualize during Spy Mode. Use a comma separated list.");
+			"Specify the widget attributes that you wish to visualize during Spy Mode. Use a semicolon separated list.");
 
 	/*
 	//TODO web driver settings for login feature
