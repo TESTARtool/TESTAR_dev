@@ -216,7 +216,7 @@ public class SutVisualization {
      * @param cursorWidget The widget pointed by the cursor.
      * @return The number of tags we need to show.
      */
-    private static int calculateNumberOfTagsToShow(Widget cursorWidget) {
+    public static int calculateNumberOfTagsToShow(Widget cursorWidget) {
         int tagsToShow = 0;
         for (Tag<?> t : cursorWidget.tags()) {
             // Only add show the tags which have been set in the filter.
