@@ -44,8 +44,8 @@ import java.util.stream.Collectors;
 
 public class SpyModePanel extends SettingsPanel {
 
-    private TreeSetListModel<Tag<?>> excludeTags = new TreeSetListModel<>(Comparator.comparing(Tag::name));
-    private TreeSetListModel<Tag<?>> includeTags = new TreeSetListModel<>(Comparator.comparing(Tag::name));
+    public TreeSetListModel<Tag<?>> excludeTags = new TreeSetListModel<>(Comparator.comparing(Tag::name));
+    public TreeSetListModel<Tag<?>> includeTags = new TreeSetListModel<>(Comparator.comparing(Tag::name));
 
     private final JList<Tag<?>> includeList = new JList<>(includeTags);
     private final JList<Tag<?>> excludeList = new JList<>(excludeTags);
@@ -78,35 +78,23 @@ public class SpyModePanel extends SettingsPanel {
         allInclude.addActionListener(e -> {
             includeTags.addAll(excludeTags.asSet());
             excludeTags.clear();
+            excludeList.updateUI();
         });
         middle.add(allInclude);
 
         JButton selectedInclude = new JButton(">");
-        selectedInclude.addActionListener(e -> {
-                    excludeList.getSelectedValuesList().forEach(i ->{
-                        includeTags.add(i);
-                        excludeTags.remove(i);
-                    });
-                    excludeList.clearSelection();
-                }
-        );
+        selectedInclude.addActionListener(e -> { moveSelected(excludeList, excludeTags, includeTags);});
         middle.add(selectedInclude);
 
         JButton selectedExclude = new JButton("<");
-        selectedExclude.addActionListener(e -> {
-                    includeList.getSelectedValuesList().forEach(i -> {
-                        excludeTags.add(i);
-                        includeTags.remove(i);
-                    });
-                    includeList.clearSelection();
-                }
-        );
+        selectedExclude.addActionListener(e -> { moveSelected(includeList, includeTags, excludeTags);});
         middle.add(selectedExclude);
 
         JButton allExclude = new JButton("<<");
         allExclude.addActionListener(e -> {
             excludeTags.addAll(includeTags.asSet());
             includeTags.clear();
+            includeList.updateUI();
         });
         middle.add(allExclude);
 
@@ -126,6 +114,15 @@ public class SpyModePanel extends SettingsPanel {
         add(middle);
         add(right);
     }
+
+    private void moveSelected(JList<Tag<?>> source, TreeSetListModel<Tag<?>> sourceModel, TreeSetListModel<Tag<?>> targetModel) {
+        for (Tag<?> tag : source.getSelectedValuesList()) {
+            sourceModel.remove(tag);
+            targetModel.add(tag);
+        }
+        source.clearSelection();
+    }
+
 
     @Override
     public void extractInformation(final Settings settings) {

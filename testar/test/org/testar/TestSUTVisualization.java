@@ -2,14 +2,12 @@ package org.testar;
 
 
 import org.junit.Test;
-import org.testar.monkey.*;
+import org.junit.Assert;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Widget;
-import org.testar.settings.dialog.tagsvisualization.ConcreteTagFilter;
 import org.testar.settings.dialog.tagsvisualization.ITagFilter;
 import org.testar.settings.dialog.tagsvisualization.TagFilter;
 
-import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,7 +37,7 @@ public class TestSUTVisualization {
 
         int result = SutVisualization.calculateNumberOfTagsToShow(widgetMock);
 
-        Assert.isEquals(1, result, "Only one tag should be visualized based on the mock setup.");
+        Assert.assertEquals("Only one tag should be visualized based on the mock setup.", 1, result);
     }
 
 }

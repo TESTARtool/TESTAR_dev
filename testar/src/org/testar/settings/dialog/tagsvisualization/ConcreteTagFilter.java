@@ -43,6 +43,9 @@ public class ConcreteTagFilter implements ITagFilter {
 
     public boolean visualizeTag(Tag<?> t)
     {
+        if(filter==null){
+            return false;
+        }
         return filter.contains(t);
     }
 }
