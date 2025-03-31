@@ -221,6 +221,10 @@ public final class Tags extends TagsBase {
 	 */
 	public static final Tag<Double> StateRenderTime = from("StateRenderTime", Double.class);
 
+	/**
+	 * This method will return all the static tags that are available for use.
+	 * @return
+	 */
 	public static Set<Tag<?>> getAllTags() {
 		return tagSet;
 	}

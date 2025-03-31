@@ -848,7 +848,7 @@ public class StateManagementTags {
     }
 
     /**
-     * This method will return all the tags that are available for use in state management.
+     * This method will return all the tags that are available for use in state management with a defined settings name.
      * @return
      */
     public static Set<Tag<?>> getAllSettingsTags() {
