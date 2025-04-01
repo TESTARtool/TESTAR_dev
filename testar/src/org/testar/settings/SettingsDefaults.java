@@ -201,10 +201,14 @@ public class SettingsDefaults {
 
 		defaults.add(Pair.from(SpyTagAttributes,  new ArrayList<String>() {
 			{
-				add("Title");
+				add("AbstractID");
+				add("ConcreteID");
 				add("Desc");
-				add("WebWidgetName");
-				add("WebWidgetTagName");
+				add("Title");
+				add("Role");
+				add("Enabled");
+				add("Shape");
+				add("Path");
 			}
 		}));
 
