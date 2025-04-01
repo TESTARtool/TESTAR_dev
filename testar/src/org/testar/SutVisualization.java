@@ -30,7 +30,6 @@
 
 package org.testar;
 
-import org.testar.settings.dialog.tagsvisualization.ConcreteTagFilter;
 import org.testar.settings.dialog.tagsvisualization.TagFilter;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;

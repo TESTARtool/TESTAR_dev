@@ -33,15 +33,10 @@ package org.testar.settings;
 import org.testar.monkey.Main;
 import org.testar.monkey.Pair;
 import org.testar.monkey.RuntimeControlsProtocol;
-import org.testar.monkey.alayer.Tag;
 import org.testar.statemodel.StateModelTags;
-import org.testar.settings.dialog.tagsvisualization.DefaultTagFilter;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-
 import static org.testar.monkey.ConfigTags.*;
 
 public class SettingsDefaults {

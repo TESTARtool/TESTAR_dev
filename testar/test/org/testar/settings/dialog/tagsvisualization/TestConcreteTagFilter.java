@@ -4,8 +4,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.testar.monkey.alayer.Tag;
-import org.testar.settings.dialog.tagsvisualization.ConcreteTagFilter;
-
 import java.util.Set;
 
 

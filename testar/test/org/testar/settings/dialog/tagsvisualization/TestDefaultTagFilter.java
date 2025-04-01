@@ -3,9 +3,6 @@ package org.testar.settings.dialog.tagsvisualization;
 import org.junit.Assert;
 import org.junit.Test;
 import org.testar.monkey.alayer.Tag;
-import org.testar.settings.dialog.tagsvisualization.DefaultTagFilter;
-
-import java.util.List;
 
 public class TestDefaultTagFilter {
 
