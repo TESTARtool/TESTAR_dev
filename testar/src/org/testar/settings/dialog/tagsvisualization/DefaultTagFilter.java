@@ -33,6 +33,7 @@ package org.testar.settings.dialog.tagsvisualization;
 import org.testar.StateManagementTags;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.monkey.alayer.windows.UIATags;
 
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ public class DefaultTagFilter {
         List<Tag<?>> tmpList = new ArrayList<>(UIATags.getAllTags());
         tmpList.addAll(Tags.getAllTags());
         tmpList.addAll(StateManagementTags.getAllSettingsTags());
+        tmpList.addAll(WdTags.getAllTags());
         allAvailableTags = Collections.unmodifiableList(tmpList);
     }
     public static List<Tag<?>> getSet() {
@@ -68,6 +70,9 @@ public class DefaultTagFilter {
         }
         if (tag == null) {
             tag = findTagByName(name, UIATags.getAllTags());
+        }
+        if (tag == null) {
+            tag = findTagByName(name, WdTags.getAllTags());
         }
         return tag;
     }
