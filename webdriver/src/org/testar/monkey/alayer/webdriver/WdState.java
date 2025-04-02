@@ -315,6 +315,9 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(WdTags.WebOuterHTML)) {
 			ret = w.element.outerHTML;
 		}
+		else if (t.equals(WdTags.WebPlaceholder)) {
+			ret = w.element.placeholder;
+		}
 		else if (t.equals(WdTags.WebElementSelenium)) {
 			ret = w.element.remoteWebElement;
 		}
