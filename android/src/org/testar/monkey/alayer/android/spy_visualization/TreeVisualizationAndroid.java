@@ -239,6 +239,7 @@ public class TreeVisualizationAndroid extends JPanel implements TreeSelectionLis
         if (nodeWidget != null) {
             String classWidget = nodeWidget.get(AndroidTags.AndroidClassName);
             String textWidget = nodeWidget.get(AndroidTags.AndroidText);
+            String hintWidget = nodeWidget.get(AndroidTags.AndroidHint);
             String accessibilityIdWidget = nodeWidget.get(AndroidTags.AndroidAccessibilityId);
             boolean clickableWidget = nodeWidget.get(AndroidTags.AndroidClickable);
             int indexWidget = nodeWidget.get(AndroidTags.AndroidNodeIndex);
@@ -270,6 +271,13 @@ public class TreeVisualizationAndroid extends JPanel implements TreeSelectionLis
                 infoPaneRight.add(new JLabel(" ")).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
             } else {
                 infoPaneRight.add(new JLabel(textWidget)).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
+            }
+
+            infoPaneLeft.add(new JLabel("Hint content: ")).setFont(new Font("SansSerif", Font.BOLD, fontSize));
+            if (hintWidget.equals("")) {
+            	infoPaneRight.add(new JLabel(" ")).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
+            } else {
+            	infoPaneRight.add(new JLabel(hintWidget)).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
             }
 
             infoPaneLeft.add(new JLabel("Access ID: ")).setFont(new Font("SansSerif", Font.BOLD, fontSize));
