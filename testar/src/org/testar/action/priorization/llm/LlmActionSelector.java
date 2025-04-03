@@ -223,11 +223,11 @@ public class LlmActionSelector implements IActionSelector {
                 return nop;
             }
             case COMMUNICATION_FAILURE: {
-            	logger.log(Level.ERROR, "Communication failure with the LLM");
-            	NOP nop = new NOP();
-            	nop.set(Tags.Desc, "Communication Failure");
-            	invalidActions++;
-            	return nop;
+                logger.log(Level.ERROR, "Communication failure with the LLM");
+                NOP nop = new NOP();
+                nop.set(Tags.Desc, "Communication Failure");
+                invalidActions++;
+                return nop;
             }
             default: {
                 logger.log(Level.ERROR, "ParseResult was null, this should never happen!");
@@ -236,30 +236,6 @@ public class LlmActionSelector implements IActionSelector {
                 invalidActions++;
                 return nop;
             }
-        }
-    }
-
-    /**
-     * TODO: Can be removed if we always create WdSelectListActions when a widget has the select tag.
-     * Creates an action to change the active value of a combobox.
-     * @param actions Set of actions in the current state.
-     * @param actionId ID of the action chosen by the Llm.
-     * @param value The value to set.
-     * @return New action in the form of WdSelectListAction.
-     */
-    private Action createComboBoxAction(Set<Action> actions, String actionId, String value) {
-        Widget target = null;
-
-        // Get the target widget
-        Action action = getActionByIdentifier(actions, actionId);
-        target = action.get(Tags.OriginWidget);
-
-        if(target == null) {
-            logger.log(Level.ERROR, "Unable to find combobox selection widget!");
-            return null;
-        } else {
-            String elementId = target.get(WdTags.WebId);
-            return new WdSelectListAction(elementId, value, target);
         }
     }
 
@@ -283,7 +259,7 @@ public class LlmActionSelector implements IActionSelector {
 
             // Check optional Authorization Header parameter
             if (this.authorizationHeader != null && !this.authorizationHeader.isEmpty()) {
-            	con.setRequestProperty("Authorization", replaceApiKeyPlaceholder(this.authorizationHeader));
+                con.setRequestProperty("Authorization", replaceApiKeyPlaceholder(this.authorizationHeader));
             }
 
             con.setDoInput(true);
@@ -377,7 +353,7 @@ public class LlmActionSelector implements IActionSelector {
      */
     private LlmParseActionResult parseLlmResponse(Set<Action> actions, String responseContent) {
         try {
-        	LlmSelectedAction llmSelectedAction = gson.fromJson(responseContent, LlmSelectedAction.class);
+            LlmSelectedAction llmSelectedAction = gson.fromJson(responseContent, LlmSelectedAction.class);
 
             Action selectedAction = getActionByIdentifier(actions, llmSelectedAction.getActionId());
 
@@ -388,17 +364,28 @@ public class LlmActionSelector implements IActionSelector {
                 return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.INVALID_ACTION);
             }
 
-            String actionId = llmSelectedAction.getActionId();
             String input = llmSelectedAction.getInput();
             Widget widget = selectedAction.get(Tags.OriginWidget);
 
+            // For interacting with select combobox web widgets
+            // A WdSelectListAction is created to change the active value of the combobox
             if(Objects.equals(widget.get(WdTags.WebTagName, ""), "select")) {
                 if(Objects.equals(input, "")) {
                     return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.SL_MISSING_INPUT);
-                } else {
-                    return new LlmParseActionResult(
-                            createComboBoxAction(actions, actionId, input),LlmParseActionResult.ParseResult.SUCCESS);
                 }
+
+                String target = widget.get(WdTags.WebId, "");
+                WdSelectListAction.JsTargetMethod method;
+                if (target.isEmpty()) {
+                    logger.warn("elementId is empty for select widget! Using name target method.");
+                    target = widget.get(WdTags.WebName, "");
+                    method = WdSelectListAction.JsTargetMethod.NAME;
+                } else {
+                    method = WdSelectListAction.JsTargetMethod.ID;
+                }
+
+                return new LlmParseActionResult(new WdSelectListAction(target, input, widget, method), 
+                        LlmParseActionResult.ParseResult.SUCCESS);
             }
 
             setCompoundActionInputText(selectedAction, input);
@@ -466,6 +453,6 @@ public class LlmActionSelector implements IActionSelector {
      * @return Amount of invalid actions.
      */
     public int getInvalidActions() {
-    	return invalidActions != null ? invalidActions : 0;
+        return invalidActions != null ? invalidActions : 0;
     }
 }

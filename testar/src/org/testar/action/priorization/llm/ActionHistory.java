@@ -103,7 +103,7 @@ public class ActionHistory {
             if(action instanceof WdSelectListAction) {
                 // Special case for combobox/select list actions
                 WdSelectListAction selectListAction = (WdSelectListAction) action;
-                String selectWidget = selectListAction.getElementId();
+                String selectWidget = selectListAction.getTarget();
                 String value = selectListAction.getValue();
                 builder.append(String.format("%s: Set value of ComboBox '%s' to '%s'", actionId, selectWidget, value));
             } else {
