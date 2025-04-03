@@ -207,30 +207,6 @@ public class LlmActionSelector implements IActionSelector {
     }
 
     /**
-     * TODO: Can be removed if we always create WdSelectListActions when a widget has the select tag.
-     * Creates an action to change the active value of a combobox.
-     * @param actions Set of actions in the current state.
-     * @param actionId ID of the action chosen by the Llm.
-     * @param value The value to set.
-     * @return New action in the form of WdSelectListAction.
-     */
-    private Action createComboBoxAction(Set<Action> actions, String actionId, String value) {
-        Widget target = null;
-
-        // Get the target widget
-        Action action = getActionByIdentifier(actions, actionId);
-        target = action.get(Tags.OriginWidget);
-
-        if(target == null) {
-            logger.log(Level.ERROR, "Unable to find combobox selection widget!");
-            return null;
-        } else {
-            String elementId = target.get(WdTags.WebId);
-            return new WdSelectListAction(elementId, value, target);
-        }
-    }
-
-    /**
      * Sends a POST request to the LLM's API and returns the response as a string.
      * @param requestBody Request body of the POST request.
      * @return Response content or null if failed.
@@ -363,7 +339,6 @@ public class LlmActionSelector implements IActionSelector {
                 return new LlmParseResult(null, LlmParseResult.ParseResult.INVALID_ACTION);
             }
 
-            String actionId = selection.getActionId();
             String input = selection.getInput();
             Widget widget = selectedAction.get(Tags.OriginWidget);
 
@@ -371,8 +346,18 @@ public class LlmActionSelector implements IActionSelector {
                 if(Objects.equals(input, "")) {
                     return new LlmParseResult(null, LlmParseResult.ParseResult.SL_MISSING_INPUT);
                 } else {
-                    return new LlmParseResult(
-                            createComboBoxAction(actions, actionId, input),LlmParseResult.ParseResult.SUCCESS);
+                    String target = widget.get(WdTags.WebId);
+                    if(target.isEmpty()) {
+                        logger.warn("elementId is empty! using name target method.");
+
+                        target = widget.get(WdTags.WebName);
+
+                        return new LlmParseResult(
+                                new WdSelectListAction(target, input, widget, WdSelectListAction.JsTargetMethod.NAME),LlmParseResult.ParseResult.SUCCESS);
+                    } else {
+                        return new LlmParseResult(
+                                new WdSelectListAction(target, input, widget, WdSelectListAction.JsTargetMethod.ID),LlmParseResult.ParseResult.SUCCESS);
+                    }
                 }
             }
 

@@ -42,27 +42,46 @@ import org.testar.monkey.alayer.webdriver.WdDriver;
 public class WdSelectListAction extends TaggableBase implements Action {
     private static final long serialVersionUID = -5522966388178892530L;
 
-    private String elementId;
+    private String target;
     private String value;
+    private JsTargetMethod targetMethod;
 
-    public WdSelectListAction(String elementId, String value, Widget widget) {
-        this.elementId = elementId;
+    public enum JsTargetMethod {
+        ID,
+        NAME
+    }
+
+    public WdSelectListAction(String target, String value, Widget widget, JsTargetMethod targetMethod) {
+        this.target = target;
         this.value = value;
+        this.targetMethod = targetMethod;
         this.set(Tags.Role, WdActionRoles.SelectListAction);
-        this.set(Tags.Desc, "Set Webdriver select list script to set into " + elementId + " : " + value);
+        this.set(Tags.Desc, "Set Webdriver select list script to set into " + targetMethod.toString() + " " + target + " : " + value);
         this.mapActionToWidget(widget);
     }
 
     @Override
     public void run(SUT system, State state, double duration) {
-        WdDriver.executeScript(String.format("const field = document.getElementById('%s');" +
-                " field.value = '%s'; const event = new Event('change', { bubbles: true }); " +
-                "field.dispatchEvent(event);", elementId, value));
+        switch(targetMethod) {
+            case ID:
+                WdDriver.executeScript(String.format("const field = document.getElementById('%s');" +
+                        " field.value = '%s'; const event = new Event('change', { bubbles: true }); " +
+                        "field.dispatchEvent(event);", target, value));
+                break;
+            case NAME:
+                // Problematic if multiple widgets match the same name, should only be used as last resort.
+                WdDriver.executeScript(String.format("const field = document.getElementsByName('%s')[0];" +
+                        " field.value = '%s'; const event = new Event('change', { bubbles: true }); " +
+                        "field.dispatchEvent(event);", target, value));
+                break;
+            default:
+                throw new RuntimeException("targetMethod is null!");
+        }
     }
 
     @Override
     public String toShortString() {
-        return "Set select list on id '" + elementId + "' to '" + value + "'";
+        return "Set select list on '" + target + "' to '" + value + "'";
     }
 
     @Override
@@ -79,7 +98,7 @@ public class WdSelectListAction extends TaggableBase implements Action {
         return value;
     }
 
-    public String getElementId() {
-        return elementId;
+    public String getTarget() {
+        return target;
     }
 }
