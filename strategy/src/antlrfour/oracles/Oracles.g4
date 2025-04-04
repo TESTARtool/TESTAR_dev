@@ -32,26 +32,30 @@ bool_expr:          LP  bool_expr   RP                          #parenExpr
 |                       property_line                           #propertyBool
 ;
 
-property_line:
-    'PROP' LP 'KEY' ',' 'VALUE' RP  comparator LP   key=STRING ',' value=STRING RP    #propKeyValue
-|   'PROP'    'KEY'                 comparator          STRING                        #propKey
-|   'PROP'    'VALUE'               comparator          STRING                        #propValue
-|   'PROP'    'ANY'                 comparator          STRING                        #propAny
-|   'PROP'    'VALUE'               'IS'                BOOL                          #propIsBool
-|   'PROP'    type=('KEY'|'VALUE'|'ANY')          'IS'  'IN'      list                #propIsInList
-;
-
 //WIDGET BASE_STRING ('='|'==') WIDGET BASE_STRING        #widgetIsWidget
 
-list: 'LIST' LP STRING (',' STRING)* RP;
+property_line:
+    'PROP' LP 'KEY' ',' 'VALUE' RP  comparator LP   key=STRING ',' value=STRING RP    #propKeyValue
+|   'PROP'    'VALUE'               'IS'                BOOL                          #propIsBool
+|   'PROP'    location              'IS'                'IN'             list         #propIsInList
+|   'PROP'    'VALUE'               'IS'                'IN'             range        #propIsInRange
+|   'PROP'    location              comparator          STRING                        #propStandard
+;
 
-comparator: 'IS'                #comparator_is
+list:   'LIST'  LP      STRING (','      STRING)* RP;
+range:  'RANGE' LP  low=INT     ',' high=INT      RP;
+
+location:   'KEY'   #keyLocation
+|           'VALUE' #valueLocation
+|           'ANY'   #anyLocation
+;
+
+comparator: 'EQUALS'            #comparator_equals
 |           'MATCHES'           #comparator_matches
 |           'CONTAINS'          #comparator_contains
 |           'STARTS_WITH'       #comparator_startsWith
 |           'ENDS_WITH'         #comparator_endsWith
 ;
-
 
 /////////////////////////
 // string parser rules //

@@ -1,11 +1,12 @@
 package oracle_objects;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.testar.monkey.Pair;
+import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Widget;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GrammarHelperWidget {
 
@@ -55,6 +56,14 @@ public class GrammarHelperWidget {
 			widgetChildren.add(widget.child(i));
 		}
 		return widgetChildren;
+	}
+	
+	public static List<Widget> getWidgetsOfState(State state){
+		List<Widget> widgetsOfState = new ArrayList<>();
+		for(Widget widget : state) {
+			widgetsOfState.add(widget);
+		}
+		return widgetsOfState;
 	}
 
 }

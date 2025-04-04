@@ -49,45 +49,52 @@ public class TestOracleManager
         }
     }
     
-    private void addTextToFile(String text) {
-        try (FileOutputStream fos = new FileOutputStream(grammarOracleFile, true)) {
+    private void addTextToFile(String text)
+    {
+        try (FileOutputStream fos = new FileOutputStream(grammarOracleFile, true))
+        {
             // Convert the text to bytes
             byte[] bytes = text.getBytes();
             
             // Write the bytes to the file and add a new line
             fos.write(bytes);
             fos.write(System.lineSeparator().getBytes());
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             e.printStackTrace();
         }
     }
     
     private String fileContent() {
         String content = "";
-        try (BufferedReader br = new BufferedReader(new FileReader(grammarOracleFile))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(grammarOracleFile)))
+        {
             String line;
-            while ((line = br.readLine()) != null) {
+            while ((line = br.readLine()) != null)
+            {
                 content = content + line;
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
         return content;
     }
     
     @Test
     public void test_temp_file()
     {
-        String instruction = "ORACLE 'basic oracle' { CHECK PROP KEY IS 'WebId' }";
+        String instruction = "ORACLE 'basic oracle' { CHECK PROP KEY EQUALS 'WebId' }";
         addTextToFile(instruction);
 //        String fileContent = fileContent();
 //        System.out.println(fileContent);
     }
     
     @Test
-    public void test_oracle_manager_prop_key()
+    public void true_test_oracle_manager_key_equals_string()
     {
         StateStub  state  = new StateStub();
         WidgetStub widget = new WidgetStub();
@@ -98,7 +105,7 @@ public class TestOracleManager
         widget.set(WdTags.WebId, "formButton");
         widget.set(WdTags.WebTitle, "Send payment");
         
-        String instruction = "ORACLE 'basic oracle' { CHECK PROP KEY IS 'WebId' }";
+        String instruction = "ORACLE 'basic oracle' { CHECK PROP KEY EQUALS 'WebId' }";
     
         addTextToFile(instruction);
         
@@ -106,9 +113,29 @@ public class TestOracleManager
         
         Assert.isTrue(manager.runOracles(state));
     }
+    @Test
+    public void false_test_oracle_manager_key_equals_string()
+    {
+        StateStub  state  = new StateStub();
+        WidgetStub widget = new WidgetStub();
+        state.addChild(widget);
+        widget.setParent(state);
+        
+        widget.set(Tags.Role, Roles.Button);
+        widget.set(WdTags.WebId, "formButton");
+        widget.set(WdTags.WebTitle, "Send payment");
+        
+        String instruction = "ORACLE 'basic oracle' { CHECK PROP KEY EQUALS 'WeId' }"; // misspelled
+        
+        addTextToFile(instruction);
+        
+        OracleManager manager = new OracleManager(grammarOracleFile);
+        
+        Assert.isFalse(manager.runOracles(state));
+    }
     
     @Test
-    public void test_oracle_manager_prop_value()
+    public void true_test_oracle_manager_value_equals_string()
     {
         StateStub  state  = new StateStub();
         WidgetStub widget = new WidgetStub();
@@ -119,7 +146,7 @@ public class TestOracleManager
         widget.set(WdTags.WebId, "formButton");
         widget.set(WdTags.WebTitle, "Send payment");
         
-        String instruction = "ORACLE 'basic oracle' { CHECK PROP VALUE IS 'formButton' }";
+        String instruction = "ORACLE 'basic oracle' { CHECK PROP VALUE EQUALS 'formButton' }";
         
         addTextToFile(instruction);
         
@@ -129,7 +156,7 @@ public class TestOracleManager
     }
 
     @Test
-    public void test_oracle_manager_prop_pair_true()
+    public void true_test_oracle_manager_prop_pair_true()
     {
         StateStub  state  = new StateStub();
         WidgetStub widget = new WidgetStub();
@@ -140,7 +167,7 @@ public class TestOracleManager
         widget.set(WdTags.WebId, "formButton");
         widget.set(WdTags.WebTitle, "Send payment");
 
-        String instruction = "ORACLE 'basic oracle' { CHECK PROP (KEY,VALUE) IS ('WebId','formButton') }";
+        String instruction = "ORACLE 'basic oracle' { CHECK PROP (KEY,VALUE) EQUALS ('WebId','formButton') }";
 
         addTextToFile(instruction);
 
@@ -150,7 +177,7 @@ public class TestOracleManager
     }
 
     @Test
-    public void test_oracle_manager_prop_pair_false()
+    public void false_test_oracle_manager_prop_pair_false()
     {
         StateStub  state  = new StateStub();
         WidgetStub widget = new WidgetStub();
@@ -161,8 +188,8 @@ public class TestOracleManager
         widget.set(WdTags.WebId, "formButton");
         widget.set(WdTags.WebTitle, "Send payment");
 
-        String incorrectTypo = "ORACLE 'basic oracle' { CHECK PROP (KEY,VALUE) IS ('WebId','formBtton') }";
-        String notExistingTag = "ORACLE 'basic oracle' { CHECK PROP (KEY,VALUE) IS ('WebName','formButton') }";
+        String incorrectTypo = "ORACLE 'basic oracle' { CHECK PROP (KEY,VALUE) EQUALS ('WebId','formBtton') }"; // typo
+        String notExistingTag = "ORACLE 'basic oracle' { CHECK PROP (KEY,VALUE) EQUALS ('WebName','formButton') }";
 
         // Add two oracles that do not match
         addTextToFile(incorrectTypo.concat(notExistingTag));
@@ -173,7 +200,7 @@ public class TestOracleManager
     }
     
     @Test
-    public void test_oracle_manager_prop_any()
+    public void true_test_oracle_manager_prop_any()
     {
         StateStub  state  = new StateStub();
         WidgetStub widget = new WidgetStub();
@@ -184,7 +211,7 @@ public class TestOracleManager
         widget.set(WdTags.WebId, "formButton");
         widget.set(WdTags.WebTitle, "Send payment");
         
-        String instruction = "ORACLE 'basic oracle' { CHECK PROP ANY IS 'formButton', PROP ANY IS 'WebTitle' }";
+        String instruction = "ORACLE 'basic oracle' { CHECK PROP ANY EQUALS 'formButton', PROP ANY EQUALS 'WebTitle' }";
         
         addTextToFile(instruction);
         
@@ -194,7 +221,7 @@ public class TestOracleManager
     }
     
     @Test
-    public void test_oracle_manager_prop_list()
+    public void true_test_oracle_manager_prop_list()
     {
         StateStub  state  = new StateStub();
         WidgetStub widget = new WidgetStub();
@@ -205,7 +232,7 @@ public class TestOracleManager
         widget.set(WdTags.WebId, "formButton");
         widget.set(WdTags.WebTitle, "Send payment");
         
-        String instruction = "ORACLE 'basic oracle' { CHECK PROP ANY IS IN LIST('Button', 'WebTitle', 'Role') }";
+        String instruction = "ORACLE 'basic oracle' { CHECK PROP ANY IS IN LIST('Button', 'Title', 'Role') }"; // Role should match
         
         addTextToFile(instruction);
         

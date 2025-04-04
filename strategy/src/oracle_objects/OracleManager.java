@@ -5,6 +5,7 @@ import antlrfour.oracles.OraclesParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.Token;
 import org.testar.monkey.alayer.State;
 import parsing.OracleBuilder;
 
@@ -26,10 +27,7 @@ public class OracleManager
         OraclesParser                       parser = new OraclesParser(tokens);
         OraclesParser.Oracles_fileContext   tree   = parser.oracles_file();
     
-//        tokens.fill();
-//        for (Token token : tokens.getTokens()) {
-//            System.out.println("TOKEN: " + token.getText() + " -> " + lexer.getVocabulary().getSymbolicName(token.getType()));
-//        }
+//        printParserInput(tokens, lexer);
     
         OracleBuilder visitor = new OracleBuilder();
         oracles = visitor.parseOracleInstructions(tree);
@@ -74,4 +72,13 @@ public class OracleManager
 //
 //        return verdicts;
 //    }
+    
+    private void printParserInput(CommonTokenStream tokens, OraclesLexer lexer) //for debugging purposes
+    {
+        tokens.fill();
+        for (Token token : tokens.getTokens())
+        {
+            System.out.println("TOKEN: " + token.getText() + " -> " + lexer.getVocabulary().getSymbolicName(token.getType()));
+        }
+    }
 }

@@ -116,27 +116,6 @@ public interface OraclesVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitPropKeyValue(OraclesParser.PropKeyValueContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code propKey}
-	 * labeled alternative in {@link OraclesParser#property_line}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitPropKey(OraclesParser.PropKeyContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code propValue}
-	 * labeled alternative in {@link OraclesParser#property_line}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitPropValue(OraclesParser.PropValueContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code propAny}
-	 * labeled alternative in {@link OraclesParser#property_line}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitPropAny(OraclesParser.PropAnyContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code propIsBool}
 	 * labeled alternative in {@link OraclesParser#property_line}.
 	 * @param ctx the parse tree
@@ -151,18 +130,59 @@ public interface OraclesVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitPropIsInList(OraclesParser.PropIsInListContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code propIsInRange}
+	 * labeled alternative in {@link OraclesParser#property_line}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPropIsInRange(OraclesParser.PropIsInRangeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code propStandard}
+	 * labeled alternative in {@link OraclesParser#property_line}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPropStandard(OraclesParser.PropStandardContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link OraclesParser#list}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitList(OraclesParser.ListContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code comparator_is}
+	 * Visit a parse tree produced by {@link OraclesParser#range}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRange(OraclesParser.RangeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code keyLocation}
+	 * labeled alternative in {@link OraclesParser#location}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitKeyLocation(OraclesParser.KeyLocationContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code valueLocation}
+	 * labeled alternative in {@link OraclesParser#location}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitValueLocation(OraclesParser.ValueLocationContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code anyLocation}
+	 * labeled alternative in {@link OraclesParser#location}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAnyLocation(OraclesParser.AnyLocationContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code comparator_equals}
 	 * labeled alternative in {@link OraclesParser#comparator}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitComparator_is(OraclesParser.Comparator_isContext ctx);
+	T visitComparator_equals(OraclesParser.Comparator_equalsContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code comparator_matches}
 	 * labeled alternative in {@link OraclesParser#comparator}.

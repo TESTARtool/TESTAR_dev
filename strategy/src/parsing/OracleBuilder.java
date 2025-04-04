@@ -2,15 +2,12 @@ package parsing;
 
 import antlrfour.oracles.OraclesBaseVisitor;
 import antlrfour.oracles.OraclesParser;
-import oracle_objects.GrammarOracle;
-import oracle_objects.PredicateFactory;
+import oracle_objects.*;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.testar.monkey.alayer.State;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
 
 public class OracleBuilder extends OraclesBaseVisitor<Predicate<State>>
@@ -46,10 +43,8 @@ public class OracleBuilder extends OraclesBaseVisitor<Predicate<State>>
             if(triggerBlock.BOOL().getText().equals("FALSE"))
                 oracle.setTriggerFalse(stripOuterQuotes(triggerBlock.STRING().getText()));
         }
-        
         return oracle;
     }
-    
     
     @Override public Predicate<State> visitGroup_block(OraclesParser.Group_blockContext ctx)
     {
@@ -63,27 +58,32 @@ public class OracleBuilder extends OraclesBaseVisitor<Predicate<State>>
     
     @Override public Predicate<State> visitNotExpr(OraclesParser.NotExprContext ctx)
     {
-        return PredicateFactory.negatePredicate(visitChildren(ctx));
+        return visitChildren(ctx).negate();
     }
     
     @Override public Predicate<State> visitAndOprExpr(OraclesParser.AndOprExprContext ctx)
     {
-        return PredicateFactory.andPredicates(visit(ctx.left), visit(ctx.right));
+        return visit(ctx.left).and(visit(ctx.right));
     }
     
     @Override public Predicate<State> visitOrOprExpr(OraclesParser.OrOprExprContext ctx)
     {
-        return PredicateFactory.orPredicates(visit(ctx.left), visit(ctx.right));
+        return visit(ctx.left).or(visit(ctx.right));
     }
     
     @Override public Predicate<State> visitXorOprExpr(OraclesParser.XorOprExprContext ctx)
     {
-        return PredicateFactory.xorPredicates(visit(ctx.left), visit(ctx.right));
+        Predicate<State> left = visit(ctx.left);
+        Predicate<State> right = visit(ctx.right);
+        return left.and(right.negate()).or(left.negate().and(right));
     }
     
     @Override public Predicate<State> visitIsOprExpr(OraclesParser.IsOprExprContext ctx)
     {
-        return PredicateFactory.equalPredicates(visit(ctx.left), visit(ctx.right));
+        Predicate<State> left = visit(ctx.left);
+        Predicate<State> right = visit(ctx.right);
+        return (left.and(right.negate()).or(left.negate().and(right))).negate(); // same as XOR, but negated
+        // if both are true or both are false, return true
     }
     
     @Override public Predicate<State> visitPlainBool(OraclesParser.PlainBoolContext ctx)
@@ -96,49 +96,61 @@ public class OracleBuilder extends OraclesBaseVisitor<Predicate<State>>
         return boolPredicate;
     }
     
-    @Override public Predicate<State> visitPropKey(OraclesParser.PropKeyContext ctx)
-    {
-        Map<String,String> args = new HashMap<>();
-        args.put("key", stripOuterQuotes(ctx.STRING().getText()));
-        return PredicateFactory.createPredicate("key", args);
-    }
-    
-    @Override public Predicate<State> visitPropValue(OraclesParser.PropValueContext ctx)
-    {
-        Map<String,String> args = new HashMap<>();
-        args.put("value", stripOuterQuotes(ctx.STRING().getText()));
-        return PredicateFactory.createPredicate("value", args);
-    }
-    
-    @Override public Predicate<State> visitPropAny(OraclesParser.PropAnyContext ctx)
-    {
-        Map<String,String> args = new HashMap<>();
-        args.put("any", stripOuterQuotes(ctx.STRING().getText()));
-        return PredicateFactory.createPredicate("any", args);
-    }
-    
     @Override public Predicate<State> visitPropKeyValue(OraclesParser.PropKeyValueContext ctx)
     {
-        Map<String,String> args = new HashMap<>();
-        args.put("key", stripOuterQuotes(ctx.key.getText()));
-        args.put("value", stripOuterQuotes(ctx.value.getText()));
-        return PredicateFactory.createPredicate("pair", args);
+        SearchTerm searchTerm = SearchTerm.pair
+                (stripOuterQuotes(ctx.key.getText()),
+                 stripOuterQuotes(ctx.value.getText()));
+    
+        return FunctionFactory.createPredicate
+                (SearchLocation.PAIR,
+                 getSearchComparator(ctx.comparator()),
+                 searchTerm);
+    }
+    
+    @Override public  Predicate<State> visitPropIsBool(OraclesParser.PropIsBoolContext ctx)
+    {
+        SearchTerm searchTerm = SearchTerm.singleBoolean(ctx.BOOL().getText());
+    
+        return FunctionFactory.createPredicate
+                (SearchLocation.VALUE,
+                 SearchComparator.IS,
+                 searchTerm);
     }
     
     @Override public Predicate<State> visitPropIsInList(OraclesParser.PropIsInListContext ctx)
     {
-        Map<String,String> args = new HashMap<>();
-        args.put("list", ctx.type.getText().toLowerCase()); //KEY, VALUE, or ANY
-        
-        int itemCounter = 0;
+        ArrayList<String> list = new ArrayList<>();
         for(TerminalNode item : ctx.list().STRING())
-        {
-            args.put(String.valueOf(itemCounter), stripOuterQuotes(item.getText()));
-            itemCounter++;
-        }
+            list.add(stripOuterQuotes(item.getText()));
+        SearchTerm searchTerm = SearchTerm.list(list);
         
-        return PredicateFactory.createPredicate("list", args);
+        return FunctionFactory.createPredicate
+                (getSearchLocation(ctx.location()),
+                 SearchComparator.IS,
+                 searchTerm);
     }
+    
+    @Override public Predicate<State> visitPropIsInRange(OraclesParser.PropIsInRangeContext ctx)
+    {
+        return FunctionFactory.createPredicate
+                (SearchLocation.VALUE,
+                 SearchComparator.IS,
+                 SearchTerm.range(ctx.range().low.getText(), ctx.range().high.getText()));
+    }
+    
+    @Override public Predicate<State> visitPropStandard(OraclesParser.PropStandardContext ctx)
+    {
+        return FunctionFactory.createPredicate
+                (getSearchLocation(ctx.location()),
+                 getSearchComparator(ctx.comparator()),
+                 SearchTerm.single(stripOuterQuotes(ctx.STRING().getText())));
+    }
+    
+    //////////////////////
+    // helper functions //
+    //////////////////////
+    
     
     // only strips one set of outside quotes if it has them, leaves other quotes untouched
     // todo: add triple quotes once they're relevant
@@ -150,4 +162,27 @@ public class OracleBuilder extends OraclesBaseVisitor<Predicate<State>>
             return inputString.substring(1, inputString.length() - 1);
         return inputString;
     }
+    
+    private SearchLocation getSearchLocation(OraclesParser.LocationContext ctx)
+    {
+        SearchLocation location = SearchLocation.PAIR; //should be overwritten in most cases
+        if(ctx instanceof OraclesParser.KeyLocationContext) location = SearchLocation.KEY;
+        else if(ctx instanceof OraclesParser.ValueLocationContext) location = SearchLocation.VALUE;
+        else if(ctx instanceof OraclesParser.AnyLocationContext) location = SearchLocation.ANY;
+    
+        return location;
+    }
+    private SearchComparator getSearchComparator(OraclesParser.ComparatorContext ctx)
+    {
+        SearchComparator comparator = SearchComparator.IS; //should be overwritten in most cases
+        if (ctx instanceof OraclesParser.Comparator_equalsContext) comparator = SearchComparator.EQUALS;
+        else if (ctx instanceof OraclesParser.Comparator_matchesContext) comparator = SearchComparator.MATCHES;
+        else if (ctx instanceof OraclesParser.Comparator_containsContext) comparator = SearchComparator.CONTAINS;
+        else if (ctx instanceof OraclesParser.Comparator_startsWithContext) comparator = SearchComparator.STARTS_WITH;
+        else if (ctx instanceof OraclesParser.Comparator_endsWithContext) comparator = SearchComparator.ENDS_WITH;
+        
+        return comparator;
+    }
+    
+    
 }
