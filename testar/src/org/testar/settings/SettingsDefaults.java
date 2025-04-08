@@ -34,11 +34,9 @@ import org.testar.monkey.Main;
 import org.testar.monkey.Pair;
 import org.testar.monkey.RuntimeControlsProtocol;
 import org.testar.statemodel.StateModelTags;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import static org.testar.monkey.ConfigTags.*;
 
 public class SettingsDefaults {
@@ -195,6 +193,19 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(StateModelTags.ResetDataStore, false));
 		defaults.add(Pair.from(StateModelTags.ActionSelectionAlgorithm, "random"));
 		defaults.add(Pair.from(StateModelTags.StateModelStoreWidgets, true));
+
+		defaults.add(Pair.from(SpyTagAttributes,  new ArrayList<String>() {
+			{
+				add("AbstractID");
+				add("ConcreteID");
+				add("Desc");
+				add("Title");
+				add("Role");
+				add("Enabled");
+				add("Shape");
+				add("Path");
+			}
+		}));
 
 		return defaults;
 	}

@@ -392,12 +392,12 @@ public class StateModelPanel extends SettingsPanel {
         	if(de.getCause() != null && de.getCause().getMessage() != null && de.getCause().getMessage().contains("Cannot create a connection")) {
         		popupMessage(de.getCause().getMessage());
         		return;
-        	} 
+        	}
         	// If the database does not exists
         	else if(de.getMessage() != null && de.getMessage().contains("Cannot open database")) {
         		popupMessage(de.getMessage());
         		return;
-        	} 
+        	}
         	// Not expected exception, throw trace in the console
         	else {
         		de.printStackTrace();
@@ -408,7 +408,7 @@ public class StateModelPanel extends SettingsPanel {
         	if(se.getMessage() != null && se.getMessage().contains("User or password not valid")) {
         		popupMessage(se.getMessage());
         		return;
-        	} 
+        	}
         	// Not expected exception, throw trace in the console
         	else {
         		se.printStackTrace();

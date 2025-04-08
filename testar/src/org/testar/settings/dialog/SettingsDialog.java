@@ -86,7 +86,8 @@ public class SettingsDialog extends JFrame implements Observer {
   private static final int TIMES_TAB_INDEX = 4;
   //private static final int MISC_TAB_INDEX = 5;
   private static final int MODEL_TAB_INDEX = 5;
-  private static final int ADVANCED_TAB_INDEX = 6;
+  private static final int Spy_TAB_INDEX = 6;
+  private static final int ADVANCED_TAB_INDEX = 7;
   private final Map<Integer, Pair<String, SettingsPanel>> settingPanels = new HashMap<>();
 
   /**
@@ -262,6 +263,7 @@ public class SettingsDialog extends JFrame implements Observer {
     settingPanels.put(TIMES_TAB_INDEX, new Pair<>("Time Settings", new TimingPanel()));
     //settingPanels.put(MISC_TAB_INDEX, new Pair<>("Misc", new MiscPanel())); // TODO: Misc panel is disabled temporally from the GUI
     settingPanels.put(MODEL_TAB_INDEX, new Pair<>("State Model", modelPanel = StateModelPanel.createStateModelPanel()));
+    settingPanels.put(Spy_TAB_INDEX, new Pair("Spy mode", new SpyModePanel()));
     settingPanels.put(ADVANCED_TAB_INDEX, new Pair<>("Advanced Options", new AdvancedPanel()));
 
     settingPanels.forEach((k,v) -> jTabsPane.add(v.left(),v.right()));
@@ -302,7 +304,7 @@ public class SettingsDialog extends JFrame implements Observer {
         layout.createParallelGroup(Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(Alignment.TRAILING)
-                    .addComponent(jTabsPane, PREFERRED_SIZE, 620, PREFERRED_SIZE)
+                    .addComponent(jTabsPane, PREFERRED_SIZE, 642, PREFERRED_SIZE)
                     .addGroup(getStartGroup(layout)))
                 .addContainerGap(DEFAULT_SIZE, Short.MAX_VALUE))
     );
@@ -338,6 +340,7 @@ public class SettingsDialog extends JFrame implements Observer {
     group.addComponent(btnView, 120, 120, 120);
     group.addGap(2, 2, 2);
     group.addComponent(btnModel, 120, 120, 120);
+    group.addGap(11, 11, 11);
 
     return group;
   }
