@@ -47,6 +47,16 @@ public final class Assert {
 		if(!expression)
 			throw new IllegalArgumentException("You passed illegal parameters!");
 	}
+
+	public static void isEquals(Object expected, Object actual){
+		if(!expected.equals(actual))
+			throw new IllegalArgumentException(expected + " != " + actual);
+	}
+
+	public static void isEquals(Object expected, Object actual, String text){
+		if(!expected.equals(actual))
+			throw new IllegalArgumentException(text);
+	}
 		
 	public static void notNull(Object object, String text){
 		if(object == null)
