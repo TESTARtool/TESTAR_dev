@@ -1,0 +1,22 @@
+[
+  {
+    "role": "system",
+    "content": "You are a web test agent. You will receive a Gherkin test objective and a list of the widgets that conform the state of the application. When given a list of widgets, you must determine if the Then statement of the Gherkin test objective has been accomplished and shortly describe your decision. You must respond in JSON only. Respond in the following JSON format: {\"match\":\"true\",\"info\":\"The state indicates Welcome John Smith\"} match should be a boolean value. info should be your short decision."
+  },
+  {
+    "role": "user",
+    "content": " We are testing the 'parabank' web application. The objective of the test is: Background: The user first logs in Parabank with john/demo credentials\n\n  Scenario: Request_Loan_Parabank - TC7\n    Given I want to request a loan\n    When the user navigates to the Request Loan page\n    And fill in a value <amount> (YES)\n    And fill in a numeric <amount> (YES)\n    And fill an <amount> > 0 (YES)\n    And fill an <amount> < 99999 (YES)\n    And fill in a value <downPayment> (YES)\n    And fill in a numeric <downPayment> (YES)\n    And fill an <downPayment> > 0 (YES)\n    And <amount> > <downPayment> (YES)\n    Then the requested loan is approved. We are currently on the following page: ParaBank | Accounts Overview. The current state of the application contains the widgets: Widget: Experience the difference. , Widget: Solutions , Widget: John Smith , Widget: Account Services , Widget: | , Widget: | , Widget: | , Widget: | , Widget: | , Widget: | , Widget: | , Widget: Visit us at: , Widget: About Us , Widget: Services , Widget: Products , Widget: Locations , Widget: Admin Page , Widget: home , Widget: about , Widget: contact , Widget: Welcome , Widget: Home , Widget: About Us , Widget: Services , Widget: Products , Widget: Locations , Widget: Forum , Widget: Site Map , Widget: Contact Us , Widget: www.parasoft.com , Widget: Open New Account , Widget: Accounts Overview , Widget: Transfer Funds , Widget: Bill Pay , Widget: Find Transactions , Widget: Update Contact Info , Widget: Request Loan , Widget: Log Out , Widget: Accounts Overview , Widget: Account , Widget: Balance* , Widget: Available Amount , Widget: -$2300.00 , Widget: Total , Widget: $1692.67 , . Is the test objective met in this state?"
+  },
+  {
+    "role": "assistant",
+    "content": "{\"match\":\"false\",\"info\":\"The Gherkin Then statement is not met because no loan has been approved\"}"
+  },
+  {
+    "role": "user",
+    "content": " We are testing the 'parabank' web application. The objective of the test is: Background: The user first logs in Parabank with john/demo credentials\n\n  Scenario: Request_Loan_Parabank - TC7\n    Given I want to request a loan\n    When the user navigates to the Request Loan page\n    And fill in a value <amount> (YES)\n    And fill in a numeric <amount> (YES)\n    And fill an <amount> > 0 (YES)\n    And fill an <amount> < 99999 (YES)\n    And fill in a value <downPayment> (YES)\n    And fill in a numeric <downPayment> (YES)\n    And fill an <downPayment> > 0 (YES)\n    And <amount> > <downPayment> (YES)\n    Then the requested loan is approved. We are currently on the following page: ParaBank | Accounts Overview. The current state of the application contains the widgets: Widget: Experience the difference. , Widget: Solutions , Widget: John Smith , Widget: Account Services , Widget: | , Widget: | , Widget: | , Widget: | , Widget: | , Widget: | , Widget: | , Widget: Visit us at: , Widget: About Us , Widget: Services , Widget: Products , Widget: Locations , Widget: Admin Page , Widget: home , Widget: about , Widget: contact , Widget: Welcome , Widget: Home , Widget: About Us , Widget: Services , Widget: Products , Widget: Locations , Widget: Forum , Widget: Site Map , Widget: Contact Us , Widget: www.parasoft.com , Widget: Open New Account , Widget: Accounts Overview , Widget: Transfer Funds , Widget: Bill Pay , Widget: Find Transactions , Widget: Update Contact Info , Widget: Request Loan , Widget: Log Out , Widget: Accounts Overview , Widget: Account , Widget: Congratulations, your loan has been approved. , Widget: Status:	Approved, Widget: Your new account number: 13566, . Is the test objective met in this state?"
+  },
+  {
+    "role": "assistant",
+    "content": "{\"match\":\"true\",\"info\":\"The Gherkin Then statement is met because a loan has been approved\"}"
+  }
+]
