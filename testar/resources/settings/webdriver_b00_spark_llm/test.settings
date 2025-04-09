@@ -143,7 +143,7 @@ LlmActionFewshotFile = prompts/fewshot_openai_action.json
 LlmOracleFewshotFile = prompts/fewshot_openai_oracle.json
 LlmTemperature = 0.2
 LlmHistorySize = 5
-LlmTestGoals = As a user, I want to verify that the Question sets of the Clinical project contains an Odontologist survey
+LlmTestGoals = As a user, I want to verify that the Question sets of the Odontologist project contains a Customer satisfaction survey;As a user, I want to check that the Customer satisfaction survey contains no questions;As a user, I want to successfully create and save a new Time question with the id 'art1' that asks the user the arrival time\\nWhile 'Save question set' widget exists, this test objective is NOT meet because the form is not saved
 
 #################################################################
 # WebDriver features

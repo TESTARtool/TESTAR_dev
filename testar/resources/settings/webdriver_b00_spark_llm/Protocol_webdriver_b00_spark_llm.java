@@ -67,6 +67,9 @@ public class Protocol_webdriver_b00_spark_llm extends WebdriverProtocol {
 	// The LLM Oracle needs to be initialize with the settings
 	private LlmOracle llmOracle;
 
+	// Track last verdict
+	private Verdict lastLlmVerdict;
+
 	/**
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
@@ -86,6 +89,9 @@ public class Protocol_webdriver_b00_spark_llm extends WebdriverProtocol {
 
 		// Initialize the LlmOracle using the LLM settings
 		llmOracle = new LlmOracle(settings, new OracleWebPromptGenerator());
+
+		// Initialize track verdict
+		lastLlmVerdict = Verdict.OK;
 	}
 
 	private void setupTestGoals(List<String> testGoalsList) {
@@ -111,6 +117,8 @@ public class Protocol_webdriver_b00_spark_llm extends WebdriverProtocol {
 		llmActionSelector.reset(currentTestGoal, false);
 		// Reset llm oracle
 		llmOracle.reset(currentTestGoal, false);
+		// Reset track verdict
+		lastLlmVerdict = Verdict.OK;
 	}
 
 	/**
@@ -180,7 +188,14 @@ public class Protocol_webdriver_b00_spark_llm extends WebdriverProtocol {
 		// Use the LLM as an Oracle to determine if the test goal has been completed
 		Verdict llmVerdict = llmOracle.getVerdict(state);
 
-		if(llmVerdict.severity() == Verdict.SEVERITY_LLM_COMPLETE) {
+		// First match makes an update to the verdict
+		if(lastLlmVerdict == Verdict.OK 
+				&& llmVerdict.severity() == Verdict.SEVERITY_LLM_COMPLETE) {
+			lastLlmVerdict = llmVerdict;
+		} 
+		// Second match is the multi-agent assessment
+		else if(lastLlmVerdict.severity() == Verdict.SEVERITY_LLM_COMPLETE 
+				&& llmVerdict.severity() == Verdict.SEVERITY_LLM_COMPLETE) {
 			// Test goal was completed, retrieve next test goal from queue.
 			currentTestGoal = testGoalQueue.poll();
 
@@ -194,6 +209,9 @@ public class Protocol_webdriver_b00_spark_llm extends WebdriverProtocol {
 				llmActionSelector.reset(currentTestGoal, true);
 				llmOracle.reset(currentTestGoal, true);
 			}
+		} else {
+			// Reset track verdict
+			lastLlmVerdict = Verdict.OK;
 		}
 
 		return verdict;
