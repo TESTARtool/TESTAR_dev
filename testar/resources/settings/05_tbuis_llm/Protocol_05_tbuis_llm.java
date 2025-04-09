@@ -40,6 +40,8 @@ import org.testar.monkey.alayer.actions.*;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
+import org.testar.monkey.alayer.webdriver.WdDriver;
+import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.oracles.llm.LlmOracle;
 import org.testar.monkey.ConfigTags;
@@ -66,10 +68,9 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 public class Protocol_05_tbuis_llm extends WebdriverProtocol {
+
 	// The LLM Action selector needs to be initialize with the settings
 	private LlmActionSelector llmActionSelector;
-	private ConditionEvaluator conditionEvaluator;
-
 	private List<LlmTestGoal> testGoals = new ArrayList<>();
 	private Queue<LlmTestGoal> testGoalQueue;
 	private LlmTestGoal currentTestGoal;
@@ -100,8 +101,6 @@ public class Protocol_05_tbuis_llm extends WebdriverProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings) {
-		// Download OrientDB and initialize a testar (admin:admin) database
-		setupOrientDB();
 
 		super.initialize(settings);
 
@@ -111,17 +110,14 @@ public class Protocol_05_tbuis_llm extends WebdriverProtocol {
 		// Initialize the LlmActionSelector using the LLM settings
 		llmActionSelector = new LlmActionSelector(settings, new ActionWebPromptGenerator(WdTags.WebTitle));
 
-		// Test goal is considered complete when the Then statement is found in the HTML of the state model.
-		conditionEvaluator = new BasicConditionEvaluator();
-
 		// Initialize the LlmOracle using the LLM settings
 		llmOracle = new LlmOracle(settings, new OracleWebPromptGenerator(new HashSet<>(Arrays.asList(WdTags.WebTitle, WdTags.WebTextContent))));
 	}
 
 	private void setupTestGoals(List<String> testGoalsList) {
 		for(String testGoal : testGoalsList) {
-			GherkinConditionEvaluator gherkinEvaluator = new GherkinConditionEvaluator(WdTags.WebInnerHTML, testGoal);
-			testGoals.add(new LlmTestGoal(testGoal, gherkinEvaluator.getConditions()));
+			// Empty BasicConditionEvaluator because the test goal decision is based on an LLM
+			testGoals.add(new LlmTestGoal(testGoal, new BasicConditionEvaluator().getConditions()));
 		}
 	}
 
@@ -136,20 +132,11 @@ public class Protocol_05_tbuis_llm extends WebdriverProtocol {
 		testGoalQueue = new LinkedList<>();
 		testGoalQueue.addAll(testGoals);
 		currentTestGoal = testGoalQueue.poll();
-		conditionEvaluator.clear();
-		conditionEvaluator.addConditions(currentTestGoal.getCompletionConditions());
 
 		// Reset llm action selector
 		llmActionSelector.reset(currentTestGoal, false);
 		// Reset llm oracle
 		llmOracle.reset(currentTestGoal, false);
-
-		// stop and start a new state model manager
-		stateModelManager.notifyTestingEnded();
-		stateModelManager = StateModelManagerFactory.getStateModelManager(
-				settings.get(ConfigTags.ApplicationName),
-				settings.get(ConfigTags.ApplicationVersion),
-				settings);
 	}
 
 	/**
@@ -208,9 +195,10 @@ public class Protocol_05_tbuis_llm extends WebdriverProtocol {
 		// For web applications, web browser errors and warnings can also be enabled via settings
 		Verdict verdict = super.getVerdict(state);
 
-		// Prioritize the technical condition evaluator to determine if the goal has been achieved
-		String modelIdentifier = stateModelManager.getModelIdentifier();
-		if(conditionEvaluator.evaluateConditions(modelIdentifier, stateModelManager)) {
+		// Use the LLM as an Oracle to determine if the test goal has been completed
+		Verdict llmVerdict = llmOracle.getVerdict(state);
+
+		if(llmVerdict.severity() == Verdict.SEVERITY_LLM_COMPLETE) {
 			// Test goal was completed, retrieve next test goal from queue.
 			currentTestGoal = testGoalQueue.poll();
 
@@ -218,33 +206,11 @@ public class Protocol_05_tbuis_llm extends WebdriverProtocol {
 			if(currentTestGoal == null) {
 				// No more test goals remaining, terminate sequence.
 				System.out.println("Test goal completed, but no more test goals.");
-				return new Verdict(Verdict.SEVERITY_TESTGOAL_COMPLETE, "All test goals completed.");
+				return llmVerdict;
 			} else {
 				System.out.println("Test goal completed, moving to next test goal.");
 				llmActionSelector.reset(currentTestGoal, true);
 				llmOracle.reset(currentTestGoal, true);
-				conditionEvaluator.clear();
-				conditionEvaluator.addConditions(currentTestGoal.getCompletionConditions());
-			}
-		} else {
-			// If the technical condition evaluator determines the goal has not been achieved
-			// Use the LLM as an Oracle to determine if the test goal has been completed
-			Verdict llmVerdict = llmOracle.getVerdict(state);
-
-			if(llmVerdict.severity() == Verdict.SEVERITY_LLM_COMPLETE) {
-				// Test goal was completed, retrieve next test goal from queue.
-				currentTestGoal = testGoalQueue.poll();
-
-				// Poll returns null if there are no more items remaining in the queue.
-				if(currentTestGoal == null) {
-					// No more test goals remaining, terminate sequence.
-					System.out.println("Test goal completed, but no more test goals.");
-					return llmVerdict;
-				} else {
-					System.out.println("Test goal completed, moving to next test goal.");
-					llmActionSelector.reset(currentTestGoal, true);
-					llmOracle.reset(currentTestGoal, true);
-				}
 			}
 		}
 
@@ -295,7 +261,7 @@ public class Protocol_05_tbuis_llm extends WebdriverProtocol {
 			}
 
 			// slides can happen, even though the widget might be blocked
-			addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
+			//addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
 
 			// If the element is blocked, Testar can't click on or type in the widget
 			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
@@ -344,6 +310,26 @@ public class Protocol_05_tbuis_llm extends WebdriverProtocol {
 		return actions;
 	}
 
+	@Override
+	protected boolean isClickable(Widget widget) {
+	    //TODO: Move this disabled logic to WdElement
+		String webId = widget.get(WdTags.WebId, "");
+	    if (!webId.isEmpty()) {
+	        // JavaScript: check if element exists, then return its 'disabled' status
+	        Object result = WdDriver.executeScript(
+	            "var el = document.getElementById(arguments[0]); return el ? el.disabled : null;", webId
+	        );
+
+	        // Handle the case where the element is not found or not disabled
+	        if (result instanceof Boolean) {
+	            Boolean disabled = (Boolean) result;
+	            return !disabled && super.isClickable(widget);
+	        }
+	    }
+
+	    return super.isClickable(widget);
+	}
+	
 	/**
 	 * Select one of the possible actions (e.g. at random)
 	 *
@@ -411,74 +397,6 @@ public class Protocol_05_tbuis_llm extends WebdriverProtocol {
 	@Override
 	protected boolean moreSequences() {
 		return super.moreSequences();
-	}
-
-	private void setupOrientDB() {
-		String directoryPath = Main.settingsDir + File.separator + "05_tbuis_llm";
-		String downloadUrl = "https://repo1.maven.org/maven2/com/orientechnologies/orientdb-community/3.0.34/orientdb-community-3.0.34.zip";
-		String zipFilePath = directoryPath + "/orientdb-community-3.0.34.zip";
-		String extractDir = directoryPath + "/orientdb-community-3.0.34";
-
-		// If OrientDB already exists, we dont need to download anything
-		if(new File(extractDir).exists()) return;
-
-		try {
-			// Create the directory if it doesn't exist
-			File directory = new File(directoryPath);
-			if (!directory.exists()) {
-				directory.mkdirs();
-			}
-
-			// Download the zip file
-			try (InputStream in = new URL(downloadUrl).openStream();
-					FileOutputStream out = new FileOutputStream(zipFilePath)) {
-				byte[] buffer = new byte[4096];
-				int bytesRead;
-				while ((bytesRead = in.read(buffer)) != -1) {
-					out.write(buffer, 0, bytesRead);
-				}
-			}
-
-			// Extract the zip file
-			try (ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath))) {
-				ZipEntry entry;
-				while ((entry = zipIn.getNextEntry()) != null) {
-					File filePath = new File(directoryPath, entry.getName());
-					if (entry.isDirectory()) {
-						filePath.mkdirs();
-					} else {
-						// Ensure parent directories exist
-						File parentDir = filePath.getParentFile();
-						if (!parentDir.exists()) {
-							parentDir.mkdirs();
-						}
-						try (FileOutputStream out = new FileOutputStream(filePath)) {
-							byte[] buffer = new byte[4096];
-							int len;
-							while ((len = zipIn.read(buffer)) > 0) {
-								out.write(buffer, 0, len);
-							}
-						}
-					}
-					zipIn.closeEntry();
-				}
-			}
-
-			// Change to the bin directory and execute the command
-			ProcessBuilder processBuilder = new ProcessBuilder("cmd", "/c", "console.bat", "CREATE", "DATABASE", "plocal:../databases/testar", "admin", "admin");
-			processBuilder.directory(new File(extractDir + "/bin"));
-			processBuilder.inheritIO();
-			Process process = processBuilder.start();
-
-			// Wait for the command to complete
-			int exitCode = process.waitFor();
-			if (exitCode != 0) {
-				throw new RuntimeException("Command execution failed with exit code " + exitCode);
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 }

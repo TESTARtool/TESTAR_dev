@@ -137,7 +137,7 @@ MaxTime = 3.1536E7
 # ResetDataStore: WARNING: Delete all existing State Models from the selected database before creating a new one
 #################################################################
 
-StateModelEnabled = true
+StateModelEnabled = false
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer = 
@@ -167,14 +167,15 @@ AbstractStateAttributes = WebWidgetId
 # the prompt configurations to guide the LLM agent in accomplishing a test goal.
 #################################################################
 
-LlmPlatform = Gemini
-LlmModel = 
-LlmHostUrl = https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=%GEMINI_API_KEY%
-LlmAuthorizationHeader = 
-LlmTestGoalDescription = Registered user will log into the application and based on the login name the user will be recognized either as a student or a teacher\\n\\nCredentials blue/pass\\nThen Student's View
-LlmActionFewshotFile = prompts/fewshot_gemini_action.json
-LlmOracleFewshotFile = prompts/fewshot_gemini_oracle.json
+LlmPlatform = OpenAI
+LlmModel = gpt-4o-mini
+LlmHostUrl = https://api.openai.com/v1/chat/completions
+LlmAuthorizationHeader = Bearer %OPENAI_API%
+LlmActionFewshotFile = prompts/fewshot_openai_action.json
+LlmOracleFewshotFile = prompts/fewshot_openai_oracle.json
 LlmTemperature = 0.2
+LlmHistorySize = 5
+LlmTestGoals = Registered user will log into the application and based on the login name the user will be recognized either as a student or a teacher\\n\\nCredentials blue/pass\\nThen Student's View
 
 #################################################################
 # WebDriver features

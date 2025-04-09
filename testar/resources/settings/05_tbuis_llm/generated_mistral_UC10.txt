@@ -1,0 +1,10 @@
+Given the teacher uses the credentials pedant/pass for log in the UIS
+Then the teacher is already logged in to the UIS
+;
+Given the teacher is already logged in to the UIS,
+When the teacher navigates to the "My Subjects" page,
+Then the "My Subjects" page should be displayed.
+;
+Given the teacher is on the "My Subjects" page,
+When the teacher clicks the "Remove" button in the row of the subject they want to cancel,
+Then the subject should be removed from the teacher's subject list.

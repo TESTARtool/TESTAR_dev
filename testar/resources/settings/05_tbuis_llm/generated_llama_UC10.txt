@@ -1,0 +1,7 @@
+Given the teacher uses the credentials pedant/pass for log in the UIS
+Then the teacher is already logged in to the UIS
+;
+Given the teacher is already logged in to the UIS, the teacher is on the page My Subjects
+When the teacher clicks on the button "Remove" located in the row of the subject intended for cancellation
+Then the UIS will remove the subject from the teacher's subject list
+Then a message confirming a successful execution will appear
