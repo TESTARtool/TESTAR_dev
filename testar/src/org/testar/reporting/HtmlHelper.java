@@ -91,6 +91,8 @@ public class HtmlHelper {
         scriptJoiner.add("// Loop through all matches to create rectangle elements");
         scriptJoiner.add("matches.forEach(match => {");
         scriptJoiner.add("const [x, y, width, height] = match.slice(1, 5).map(parseFloat);");
+        scriptJoiner.add("// Prevent to highlight elements outside screen boundaries");
+        scriptJoiner.add("if (x > img.naturalWidth || y > img.naturalHeight || (x + width) < 0 || (y + height) < 0) return;");
         scriptJoiner.add("if (width === 0 && height === 0) return;");
         scriptJoiner.add("const rectangleDiv = document.createElement('div');");
         scriptJoiner.add("rectangleDiv.classList.add('rectangle');");
