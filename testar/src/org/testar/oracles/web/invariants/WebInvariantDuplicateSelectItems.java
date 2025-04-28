@@ -32,9 +32,11 @@ package org.testar.oracles.web.invariants;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
-import org.testar.monkey.Pair;
+import org.testar.monkey.alayer.Role;
 import org.testar.monkey.alayer.Roles;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
@@ -42,16 +44,22 @@ import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.Visualizer;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
+import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.oracles.Oracle;
 
-/**
- * Test Oracle that checks duplicated rows in a table by concatenating all visible values with an _ underscore. 
- */
-public class WebInvariantDuplicatedRowsInTable implements Oracle {
+public class WebInvariantDuplicateSelectItems implements Oracle {
 
-	public WebInvariantDuplicatedRowsInTable() {}
+	private final List<Role> roles;
+
+	public WebInvariantDuplicateSelectItems() {
+		this(List.of(WdRoles.WdSELECT));
+	}
+
+	public WebInvariantDuplicateSelectItems(List<Role> roles) {
+		this.roles = roles;
+	}
 
 	@Override
 	public void initialize() {
@@ -60,73 +68,53 @@ public class WebInvariantDuplicatedRowsInTable implements Oracle {
 
 	@Override
 	public Verdict getVerdict(State state) {
-		List<Widget> incorrectWidgets = new ArrayList<>();
+		List<Widget> selectWidgetsWithDuplicates = new ArrayList<>();
 
 		for (Widget w : state) {
-			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdTABLE)) {
-				List<Pair<Widget, String>> rowElementsDescription = new ArrayList<>();
-				extractAllRowDescriptionsFromTable(w, rowElementsDescription);
+			if (roles.contains(w.get(Tags.Role, Roles.Widget)) && !w.get(WdTags.WebId, "").isEmpty()) {
+				try {
+					String elementId = w.get(WdTags.WebId);
+					String query = String.format(
+							"var el = document.getElementById('%s');" +
+									"if (el && el.options && el.options.length > 1) {" +
+									"    return [...el.options].map(o => o.text);" +
+									"} else { return null; }", 
+									elementId);
+					@SuppressWarnings("unchecked")
+					ArrayList<String> selectOptionsTextsList = (ArrayList<String>) WdDriver.executeScript(query);
 
-				List<Pair<Widget, String>> duplicatedDescriptions = 
-						rowElementsDescription.stream()
-						.collect(Collectors.groupingBy(Pair::right))
-						.entrySet().stream()
-						.filter(e -> e.getValue().size() > 1)
-						.flatMap(e -> e.getValue().stream())
-						.collect(Collectors.toList());
+					if (selectOptionsTextsList != null) {
+						Set<String> duplicatesTexts = selectOptionsTextsList.stream()
+								.filter(s -> Collections.frequency(selectOptionsTextsList, s) > 1)
+								.collect(Collectors.toSet());
 
-				// If the list of duplicated descriptions contains a matching prepare the verdict
-				if(!duplicatedDescriptions.isEmpty()) {
-					for (Pair<Widget, String> duplicatedWidget : duplicatedDescriptions) {
-						// Ignore empty rows
-						if (!duplicatedWidget.right().replaceAll("_","").isEmpty()) {
-
-							String verdictMsg = String.format(
-									"Detected a duplicated rows in a Table! Role: %s , WebId: %s, Description: %s", 
-									duplicatedWidget.left().get(Tags.Role), 
-									duplicatedWidget.left().get(WdTags.WebId, ""), 
-									duplicatedWidget.right()
-									);
-
-							Visualizer visualizer = new RegionsVisualizer(
-									getRedPen(), 
-									getWidgetRegions(incorrectWidgets), 
-									"Invariant Fault", 
-									0.5, 0.5);
-
-							return new Verdict(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT, verdictMsg, visualizer);
+						if (!duplicatesTexts.isEmpty()) {
+							selectWidgetsWithDuplicates.add(w);
 						}
 					}
+				} catch (Exception e) {
+					// Ignore webdriver execute script errors
 				}
 			}
 		}
 
+		// If exists one or more incorrect widgets
+		if (!selectWidgetsWithDuplicates.isEmpty()) {
+
+			String verdictMsg = String.format(
+					"Detected Select widgets %s with duplicate values!",
+					getDescriptionOfWidgets(selectWidgetsWithDuplicates, WdTags.WebId)
+					);
+
+			Visualizer visualizer = new RegionsVisualizer(
+					getRedPen(),
+					getWidgetRegions(selectWidgetsWithDuplicates),
+					"Invariant Fault",
+					0.5, 0.5);
+
+			return new Verdict(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT, verdictMsg, visualizer);
+		}
+
 		return Verdict.OK;
 	}
-
-	private void extractAllRowDescriptionsFromTable(Widget w, List<Pair<Widget, String>> rowElementsDescription) {
-		if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdTR)) {
-			rowElementsDescription.add(new Pair<Widget, String>(w, obtainWidgetTreeDescription(w)));
-		}
-
-		// Iterate through the form element widgets
-		for (int i = 0; i < w.childCount(); i++) {
-			// If the children of the table are not sub-tables
-			if(!w.child(i).get(Tags.Role, Roles.Widget).equals(WdRoles.WdTABLE)) {
-				extractAllRowDescriptionsFromTable(w.child(i), rowElementsDescription);
-			}
-		}
-	}
-
-	private String obtainWidgetTreeDescription(Widget w) {
-		String widgetDesc = w.get(WdTags.WebTextContent, "");
-
-		// Iterate through the form element widgets
-		for (int i = 0; i < w.childCount(); i++) {
-			widgetDesc = widgetDesc + "_" + obtainWidgetTreeDescription(w.child(i));
-		}
-
-		return widgetDesc;
-	}
-
 }
