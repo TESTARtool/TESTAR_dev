@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,6 +31,7 @@
 package org.testar.monkey.alayer.webdriver.enums;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.openqa.selenium.WebElement;
 import org.testar.monkey.alayer.Rect;
@@ -277,4 +278,9 @@ public class WdTags extends TagsBase {
    */
   @SuppressWarnings("unchecked")
   public static final Tag<Map<String, String>> WebAttributeMap = from("WebAttributeMap", (Class<Map<String, String>>) (Class<?>) Map.class);
+
+  public static Set<Tag<?>> getAllTags() {
+	  return tagSet;
+  }
+
 }

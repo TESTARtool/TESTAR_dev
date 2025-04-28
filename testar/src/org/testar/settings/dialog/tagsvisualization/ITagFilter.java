@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,72 +28,22 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.monkey.alayer.android;
+package org.testar.settings.dialog.tagsvisualization;
 
-import org.testar.monkey.alayer.Rect;
-import org.testar.monkey.alayer.TaggableBase;
+import org.testar.monkey.alayer.Tag;
+import java.util.Set;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+public interface ITagFilter {
+    /**
+     * Set the new filter containing the tags we are allowed to visualize.
+     * @param newFilter The new filter.
+     */
+    void setFilter(Set<Tag<?>> newFilter);
 
-public class AndroidElement extends TaggableBase implements Serializable {
-	private static final long serialVersionUID = -2910535746470588590L;
-	
-	List<AndroidElement> children = new ArrayList<>();
-	AndroidElement parent;
-	AndroidRootElement root;
-	AndroidWidget backRef;
-	
-	boolean enabled;
-	boolean ignore;
-	boolean blocked;
-	boolean isTopLevelContainer;
-
-	double zindex;
-	
-	Rect rect;
-	Rect bounds;
-	
-	int nodeIndex;
-	String text;
-	String hint;
-	String resourceId;
-	String className;
-	String packageName;
-	String accessibilityID;
-	String xPath;
-	String abstractActionId;
-	String activity;
-	
-	boolean checkable;
-	boolean checked;
-	boolean clickable; 
-	boolean focusable;
-	boolean focused;
-	boolean scrollable;
-	boolean longclicklable;
-	boolean password;
-	boolean selected;
-	
-	public AndroidElement(){ this(null); }
-
-	public AndroidElement(AndroidElement parent){
-		this.parent = parent;
-		if(parent != null) {
-			root = parent.root;
-		}
-		enabled = true;
-	}
-
-	private void writeObject(ObjectOutputStream oos) throws IOException{
-		oos.defaultWriteObject();
-	}
-
-	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
-		ois.defaultReadObject();
-	}
+    /**
+     * Check if we may visualize the tag.
+     * @param tag The tag we want to visualize.
+     * @return True if it's allowed to visualize the tag.
+     */
+    boolean visualizeTag(Tag<?> tag);
 }
