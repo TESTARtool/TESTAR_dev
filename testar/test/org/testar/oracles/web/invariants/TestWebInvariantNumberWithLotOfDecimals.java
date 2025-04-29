@@ -38,7 +38,7 @@ public class TestWebInvariantNumberWithLotOfDecimals {
 		state.addChild(widget);
 		widget.setParent(state);
 
-		widget.set(WdTags.WebTextContent, "30.123€");
+		widget.set(WdTags.WebTextContent, "30.123\u20AC");
 
 		// Assert the oracle is correctly loaded
 		Assert.isTrue(extendedOraclesList.size() == 1);
@@ -57,7 +57,7 @@ public class TestWebInvariantNumberWithLotOfDecimals {
 		state.addChild(widget);
 		widget.setParent(state);
 
-		widget.set(WdTags.WebTextContent, "30.12€");
+		widget.set(WdTags.WebTextContent, "30.12\u20AC");
 
 		// Assert the oracle is correctly loaded
 		Assert.isTrue(extendedOraclesList.size() == 1);
