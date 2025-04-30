@@ -34,11 +34,9 @@ import org.testar.monkey.Main;
 import org.testar.monkey.Pair;
 import org.testar.monkey.RuntimeControlsProtocol;
 import org.testar.statemodel.StateModelTags;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import static org.testar.monkey.ConfigTags.*;
 
 public class SettingsDefaults {
@@ -206,6 +204,20 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(LlmOracleFewshotFile, "prompts/fewshot_openai_oracle.json"));
 		defaults.add(Pair.from(LlmTemperature, 0.2f));
 		defaults.add(Pair.from(LlmHistorySize, 5));
+
+		// Settings for Spy Mode Tag Attributes configuration
+		defaults.add(Pair.from(SpyTagAttributes,  new ArrayList<String>() {
+			{
+				add("AbstractID");
+				add("ConcreteID");
+				add("Desc");
+				add("Title");
+				add("Role");
+				add("Enabled");
+				add("Shape");
+				add("Path");
+			}
+		}));
 
 		return defaults;
 	}
