@@ -133,6 +133,8 @@ dependencies {
     // https://mvnrepository.com/artifact/org.languagetool/language-all
     implementation group: 'org.languagetool', name: 'language-all', version: '5.8'
     implementation group: 'com.sikulix', name: 'sikulixapi', version: '2.0.5'
+    // https://mvnrepository.com/artifact/org.checkerframework/checker
+    implementation("org.checkerframework:checker:3.49.1")
 }
 
 task prepareSettings(type: Copy) {
