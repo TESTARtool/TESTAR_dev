@@ -318,6 +318,9 @@ public final class ConfigTags {
 	public static final Tag<Boolean> ReportInPlainText = Tag.from("ReportInPlainText", Boolean.class,
 			 "Sets whether to create a plain text report");
 
+	public static final Tag<String> ExtendedOracles = Tag.from("ExtendedOracles", String.class,
+			"Select extended oracles to be applied during runtime for testing");
+
 	/**
 	 * Other settings
 	 */

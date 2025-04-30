@@ -43,6 +43,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Arrays;
 
 public class OraclePanel extends SettingsPanel {
@@ -71,6 +75,10 @@ public class OraclePanel extends SettingsPanel {
     private JCheckBox enableWebConsoleWarningOracle;
     private JTextArea txtWebConsoleWarningPattern = new JTextArea();
 
+    private String extendedOracles = "";
+    private JButton extendedOraclesButton = new JButton("ExtendedOracles");
+    private ExtendedOraclesDialog extendedOraclesDialog;
+
     private JCheckBox enableVisualValidationCheckBox;
 
     public OraclePanel() {
@@ -88,45 +96,45 @@ public class OraclePanel extends SettingsPanel {
 
         txtSuspTagsRegex.setLineWrap(true);
         JScrollPane suspTagsRegexPane = new JScrollPane(txtSuspTagsRegex);
-        suspTagsRegexPane.setBounds(10, 35, 600, 100);
+        suspTagsRegexPane.setBounds(10, 35, 600, 65);
         suspTagsRegexPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         suspTagsRegexPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         add(suspTagsRegexPane);
 
-        applySuspiciousTagsLabel.setBounds(10, 130, 600, 27);
+        applySuspiciousTagsLabel.setBounds(10, 100, 600, 27);
         add(applySuspiciousTagsLabel);
 
         txtApplySuspTags.setLineWrap(true);
         JScrollPane tagsApplySuspTagsPane = new JScrollPane(txtApplySuspTags);
-        tagsApplySuspTagsPane.setBounds(10, 160, 600, 50);
+        tagsApplySuspTagsPane.setBounds(10, 130, 600, 50);
         tagsApplySuspTagsPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         tagsApplySuspTagsPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         add(tagsApplySuspTagsPane);
 
-        suspiciousProcessCheckBox.setBounds(10, 220, 350, 27);
+        suspiciousProcessCheckBox.setBounds(10, 180, 350, 27);
         suspiciousProcessCheckBox.setToolTipText("Enable the process listener feature, which uses regular expression in the output and error buffer");
         add(suspiciousProcessCheckBox);
 
-        restoreButtonSuspProcces.setPosition(430, 220);
+        restoreButtonSuspProcces.setPosition(430, 180);
         restoreButtonSuspProcces.setToolTipText("Restore default suspicious regex if the text area is empty");
         add(restoreButtonSuspProcces);
-        regexButtonSuspProcces.setPosition(505, 220);
+        regexButtonSuspProcces.setPosition(505, 180);
         add(regexButtonSuspProcces);
 
         txtSuspProccesRegex.setLineWrap(true);
         JScrollPane suspProcessRegexPane = new JScrollPane(txtSuspProccesRegex);
-        suspProcessRegexPane.setBounds(10, 250, 600, 50);
+        suspProcessRegexPane.setBounds(10, 210, 600, 50);
         suspProcessRegexPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         suspProcessRegexPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         add(suspProcessRegexPane);
 
         enableWebConsoleErrorOracle = new JCheckBox("Enable Web Console Error Oracle");
-        enableWebConsoleErrorOracle.setBounds(10, 300, 300, 27);
+        enableWebConsoleErrorOracle.setBounds(10, 260, 300, 27);
         enableWebConsoleErrorOracle.setToolTipText("Enable Web Console Error Oracle");
         add(enableWebConsoleErrorOracle);
 
         enableWebConsoleWarningOracle = new JCheckBox("Enable Web Console Warning Oracle");
-        enableWebConsoleWarningOracle.setBounds(10, 330, 300, 27);
+        enableWebConsoleWarningOracle.setBounds(10, 290, 300, 27);
         enableWebConsoleWarningOracle.setToolTipText("Enable Web Console Warning Oracle");
         add(enableWebConsoleWarningOracle);
 
@@ -136,14 +144,35 @@ public class OraclePanel extends SettingsPanel {
         //enableVisualValidationCheckBox.setToolTipText(ToolTipTexts.enableVisualValidationTTT);
         //add(enableVisualValidationCheckBox);
 
-        freezeTimeLabel.setBounds(300, 330, 80, 27);
+        freezeTimeLabel.setBounds(350, 275, 80, 27);
         add(freezeTimeLabel);
         spnFreezeTime = new JSpinner();
         spnFreezeTime.setModel(new SpinnerNumberModel(1.0d, 1.0d, null, 1.0d));
-        spnFreezeTime.setBounds(390, 330, 50, 27);
+        spnFreezeTime.setBounds(440, 275, 50, 27);
         add(spnFreezeTime);
-        secondsLabel.setBounds(450, 330, 50, 27);
+        secondsLabel.setBounds(500, 275, 50, 27);
         add(secondsLabel);
+
+        extendedOraclesButton.setBounds(210, 330, 150, 27);
+        extendedOraclesButton.setToolTipText("Open Extended Oracles dialog");
+        extendedOraclesButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	openExtendedOraclesDialog();
+            }
+        });
+        add(extendedOraclesButton);
+    }
+
+    private void openExtendedOraclesDialog() {
+    	extendedOraclesDialog = new ExtendedOraclesDialog(extendedOracles);
+    	extendedOraclesDialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                // tell the manager to shut down its connection
+            	extendedOracles = extendedOraclesDialog.getSavedExtendedOracles();
+            }
+        });
     }
 
     /**
@@ -162,6 +191,8 @@ public class OraclePanel extends SettingsPanel {
         txtWebConsoleErrorPattern.setText(settings.get(ConfigTags.WebConsoleErrorPattern));
         enableWebConsoleWarningOracle.setSelected(settings.get(ConfigTags.WebConsoleWarningOracle));
         txtWebConsoleWarningPattern.setText(settings.get(ConfigTags.WebConsoleWarningPattern));
+        // ExtendedOracles
+        extendedOracles = settings.get(ConfigTags.ExtendedOracles);
         // Visual validation elements
         VisualValidationSettings visualSetting = ExtendedSettingsFactory.createVisualValidationSettings();
         // Disable the visualization until the implementation is ready
@@ -184,6 +215,8 @@ public class OraclePanel extends SettingsPanel {
         settings.set(ConfigTags.WebConsoleErrorPattern, txtWebConsoleErrorPattern.getText());
         settings.set(ConfigTags.WebConsoleWarningOracle, enableWebConsoleWarningOracle.isSelected());
         settings.set(ConfigTags.WebConsoleWarningPattern, txtWebConsoleWarningPattern.getText());
+        // ExtendedOracles
+        settings.set(ConfigTags.ExtendedOracles, extendedOracles);
         // Visual validation elements
         VisualValidationSettings visualSetting = ExtendedSettingsFactory.createVisualValidationSettings();
         // Disable the visualization until the implementation is ready

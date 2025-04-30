@@ -72,7 +72,7 @@ public class TestLogOracles {
 		Verdict logVerdict = logOracle.getVerdict(state);
 
 		// Verify that the logVerdict is OK
-		Assert.assertTrue(logVerdict.severity() == Verdict.SEVERITY_OK);
+		Assert.assertTrue(logVerdict.severity() == Verdict.Severity.OK.getValue());
 	}
 
 	@SuppressWarnings("serial")
@@ -102,7 +102,7 @@ public class TestLogOracles {
 		System.out.println("initialSuspiciousLogOracleErrorMessage logVerdict: " + logVerdict.info());
 
 		// Verify that the logVerdict is OK
-		Assert.assertTrue(logVerdict.severity() == Verdict.SEVERITY_OK);
+		Assert.assertTrue(logVerdict.severity() == Verdict.Severity.OK.getValue());
 	}
 
 	@SuppressWarnings("serial")
@@ -132,7 +132,7 @@ public class TestLogOracles {
 		System.out.println("runtimeValidLogOracleFile logVerdict: " + logVerdict.info());
 
 		// Verify that the logVerdict is OK
-		Assert.assertTrue(logVerdict.severity() == Verdict.SEVERITY_OK);
+		Assert.assertTrue(logVerdict.severity() == Verdict.Severity.OK.getValue());
 	}
 
 	@SuppressWarnings("serial")
@@ -162,7 +162,7 @@ public class TestLogOracles {
 		System.out.println("runtimeSuspiciousLogOracleErrorMessage logVerdict: " + logVerdict.info());
 
 		// Verify that the logVerdict detected the suspiciousMessage
-		Assert.assertTrue(logVerdict.severity() == Verdict.SEVERITY_SUSPICIOUS_LOG);
+		Assert.assertTrue(logVerdict.severity() == Verdict.Severity.SUSPICIOUS_LOG.getValue());
 		Assert.assertTrue(logVerdict.info().contains(suspiciousMessage));
 	}
 

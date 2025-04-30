@@ -282,6 +282,9 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(WdTags.WebDisplay)) {
 			ret = w.element.display;
 		}
+		else if (t.equals(WdTags.WebComputedFontSize)) {
+			ret = w.element.computedFontSize;
+		}
 		else if (t.equals(WdTags.WebType)) {
 			ret = w.element.type;
 		}
