@@ -101,7 +101,7 @@ ProcessesToKillDuringTest =
 # AlwaysCompile: Compile the protocol before launching the selected TESTAR mode
 #################################################################
 
-ProtocolClass = 03_webdriver_llm/Protocol_03_webdriver_llm
+ProtocolClass = webdriver_llm_condition_metrics/Protocol_webdriver_llm_condition_metrics
 AlwaysCompile = true
 
 #################################################################
@@ -137,17 +137,17 @@ MaxTime = 3.1536E7
 # ResetDataStore: WARNING: Delete all existing State Models from the selected database before creating a new one
 #################################################################
 
-StateModelEnabled = false
-DataStore = 
-DataStoreType = remote
+StateModelEnabled = true
+DataStore = OrientDB
+DataStoreType = plocal
 DataStoreServer = 
-DataStoreDirectory = 
-DataStoreDB = 
-DataStoreUser = 
-DataStorePassword = 
-DataStoreMode = none
+DataStoreDirectory = settings/webdriver_llm_condition_metrics/orientdb-community-3.0.34/databases
+DataStoreDB = testar
+DataStoreUser = admin
+DataStorePassword = admin
+DataStoreMode = instant
 ApplicationName = parabank
-ApplicationVersion = activity
+ApplicationVersion = loan_denied
 ActionSelectionAlgorithm = random
 StateModelStoreWidgets = true
 ResetDataStore = false
@@ -158,7 +158,7 @@ ResetDataStore = false
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WebWidgetId,WebWidgetName
+AbstractStateAttributes = WebWidgetId,WebWidgetName,WebWidgetStyle
 
 #################################################################
 # LLM agents settings
@@ -168,14 +168,14 @@ AbstractStateAttributes = WebWidgetId,WebWidgetName
 #################################################################
 
 LlmPlatform = OpenAI
-LlmModel = 
-LlmHostUrl = http://192.168.108.242:1234/v1/chat/completions
-LlmAuthorizationHeader = 
+LlmModel = gpt-4o-mini
+LlmHostUrl = https://api.openai.com/v1/chat/completions
+LlmAuthorizationHeader = Bearer %OPENAI_API%
 LlmActionFewshotFile = prompts/fewshot_openai_action.json
+LlmOracleFewshotFile = 
 LlmTemperature = 0.2
 LlmHistorySize = 5
-LlmTestGoals = Log in with the username john and the password demo to see the accounts overview;Select the account 12345 to see the account activity
-
+LlmTestGoals = Log in with the username john and the password demo\\nCheck: John Smith;Apply for a loan of 999999 with a down payment of 100\\nCheck: <p class="error">We cannot grant a loan in that amount with your available funds.</p>
 #################################################################
 # WebDriver features
 #
@@ -192,7 +192,7 @@ LlmTestGoals = Log in with the username john and the password demo to see the ac
 ClickableClasses = 
 TypeableClasses = 
 DeniedExtensions = pdf;jpg;png;pfx;xml
-WebDomainsAllowed = para.testar.org
+WebDomainsAllowed = 
 WebPathsAllowed = null
 FollowLinks = false
 BrowserFullScreen = true
@@ -268,7 +268,7 @@ MyClassPath = ./settings
 OnlySaveFaultySequences = false
 ReplayRetryTime = 30.0
 Delete =
-TimeToFreeze = 30.0
+TimeToFreeze = 10.0
 StopGenerationOnFault = true
 CopyFromTo =
 MaxReward = 9999999

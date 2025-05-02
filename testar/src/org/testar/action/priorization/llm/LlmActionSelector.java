@@ -77,7 +77,7 @@ public class LlmActionSelector implements IActionSelector {
     private ActionHistory actionHistory;
     private LlmConversation conversation;
     private int tokens_used;
-    private int invalidActions;
+    private Integer invalidActions;
 
     private Gson gson = new Gson();
     private String previousTestGoal = "";
@@ -466,6 +466,6 @@ public class LlmActionSelector implements IActionSelector {
      * @return Amount of invalid actions.
      */
     public int getInvalidActions() {
-        return invalidActions;
+    	return invalidActions != null ? invalidActions : 0;
     }
 }

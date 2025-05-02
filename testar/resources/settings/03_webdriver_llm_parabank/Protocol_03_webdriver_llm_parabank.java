@@ -28,12 +28,11 @@
  *
  */
 
-import com.google.common.collect.ArrayListMultimap;
-
 import org.testar.CodingManager;
 import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
 import org.testar.llm.LlmTestGoal;
+import org.testar.llm.prompt.OracleWebPromptGenerator;
 import org.testar.llm.prompt.ActionWebPromptGenerator;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.alayer.*;
@@ -41,47 +40,30 @@ import org.testar.monkey.alayer.actions.*;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
-import org.testar.monkey.alayer.webdriver.WdDriver;
-import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.oracles.llm.LlmOracle;
 import org.testar.plugin.NativeLinker;
 import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Main;
-import org.testar.monkey.Pair;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.settings.Settings;
-import org.testar.statemodel.StateModelManagerFactory;
 import org.testar.statemodel.analysis.condition.BasicConditionEvaluator;
-import org.testar.statemodel.analysis.condition.ConditionEvaluator;
-import org.testar.statemodel.analysis.condition.GherkinConditionEvaluator;
-import org.testar.statemodel.analysis.metric.LlmMetricsCollector;
-import org.testar.statemodel.analysis.metric.MetricsManager;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
-public class Protocol_webdriver_llm_gherkin extends WebdriverProtocol {
+public class Protocol_03_webdriver_llm_parabank extends WebdriverProtocol {
 
 	// The LLM Action selector needs to be initialize with the settings
 	private LlmActionSelector llmActionSelector;
-	// The Gherkin evaluator used in the State Model to check Gherkin conditions are met
-	private ConditionEvaluator conditionEvaluator;
-
 	private List<LlmTestGoal> testGoals = new ArrayList<>();
 	private Queue<LlmTestGoal> testGoalQueue;
 	private LlmTestGoal currentTestGoal;
+
+	// The LLM Oracle needs to be initialize with the settings
+	private LlmOracle llmOracle;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -91,9 +73,6 @@ public class Protocol_webdriver_llm_gherkin extends WebdriverProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings) {
-		// Download OrientDB and initialize a testar (admin:admin) database
-		setupOrientDB();
-
 		super.initialize(settings);
 
 		// Configure the test goals
@@ -102,14 +81,8 @@ public class Protocol_webdriver_llm_gherkin extends WebdriverProtocol {
 		// Initialize the LlmActionSelector using the LLM settings
 		llmActionSelector = new LlmActionSelector(settings, new ActionWebPromptGenerator());
 
-		conditionEvaluator = new BasicConditionEvaluator();
-	}
-
-	private void setupTestGoals(List<String> testGoalsList) {
-		for(String testGoal : testGoalsList) {
-			GherkinConditionEvaluator gherkinEvaluator = new GherkinConditionEvaluator(WdTags.WebInnerHTML, testGoal);
-			testGoals.add(new LlmTestGoal(testGoal, gherkinEvaluator.getConditions()));
-		}
+		// Initialize the LlmOracle using the LLM settings
+		llmOracle = new LlmOracle(settings, new OracleWebPromptGenerator());
 	}
 
 	/**
@@ -123,28 +96,18 @@ public class Protocol_webdriver_llm_gherkin extends WebdriverProtocol {
 		testGoalQueue = new LinkedList<>();
 		testGoalQueue.addAll(testGoals);
 		currentTestGoal = testGoalQueue.poll();
-		conditionEvaluator.clear();
-		conditionEvaluator.addConditions(currentTestGoal.getCompletionConditions());
 
 		// Reset llm action selector
 		llmActionSelector.reset(currentTestGoal, false);
+		// Reset llm oracle
+		llmOracle.reset(currentTestGoal, false);
+	}
 
-		// Use sequence count to iteratively create a new state model
-		String appVersion = settings.get(ConfigTags.ApplicationVersion, "");
-		appVersion = appVersion.replaceFirst("_\\d+$", "_" + sequenceCount);
-		if (appVersion.matches(".*_\\d+$")) {
-			appVersion = appVersion.replaceFirst("_\\d+$", "_" + sequenceCount);
-		} else {
-			appVersion = appVersion + "_" + sequenceCount;
+	private void setupTestGoals(List<String> testGoalsList) {
+		for(String testGoal : testGoalsList) {
+			// Empty BasicConditionEvaluator because the test goal decision is based on an LLM
+			testGoals.add(new LlmTestGoal(testGoal, new BasicConditionEvaluator().getConditions()));
 		}
-		settings.set(ConfigTags.ApplicationVersion, appVersion);
-
-		// stop and start a new state model manager
-		stateModelManager.notifyTestingEnded();
-		stateModelManager = StateModelManagerFactory.getStateModelManager(
-				settings.get(ConfigTags.ApplicationName),
-				settings.get(ConfigTags.ApplicationVersion),
-				settings);
 	}
 
 	/**
@@ -203,9 +166,10 @@ public class Protocol_webdriver_llm_gherkin extends WebdriverProtocol {
 		// For web applications, web browser errors and warnings can also be enabled via settings
 		Verdict verdict = super.getVerdict(state);
 
-		String modelIdentifier = stateModelManager.getModelIdentifier();
+		// Use the LLM as an Oracle to determine if the test goal has been completed
+		Verdict llmVerdict = llmOracle.getVerdict(state);
 
-		if(conditionEvaluator.evaluateConditions(modelIdentifier, stateModelManager)) {
+		if(llmVerdict.severity() == Verdict.Severity.LLM_COMPLETE.getValue()) {
 			// Test goal was completed, retrieve next test goal from queue.
 			currentTestGoal = testGoalQueue.poll();
 
@@ -213,12 +177,11 @@ public class Protocol_webdriver_llm_gherkin extends WebdriverProtocol {
 			if(currentTestGoal == null) {
 				// No more test goals remaining, terminate sequence.
 				System.out.println("Test goal completed, but no more test goals.");
-				return new Verdict(Verdict.Severity.TESTGOAL_COMPLETE, "All test goals completed.");
+				return llmVerdict;
 			} else {
 				System.out.println("Test goal completed, moving to next test goal.");
 				llmActionSelector.reset(currentTestGoal, true);
-				conditionEvaluator.clear();
-				conditionEvaluator.addConditions(currentTestGoal.getCompletionConditions());
+				llmOracle.reset(currentTestGoal, true);
 			}
 		}
 
@@ -269,7 +232,7 @@ public class Protocol_webdriver_llm_gherkin extends WebdriverProtocol {
 			}
 
 			// slides can happen, even though the widget might be blocked
-			addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
+			//addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
 
 			// If the element is blocked, Testar can't click on or type in the widget
 			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
@@ -280,10 +243,8 @@ public class Protocol_webdriver_llm_gherkin extends WebdriverProtocol {
 			if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
 				if(whiteListed(widget) || isUnfiltered(widget)){
 					// Type a random Number, Alphabetic, URL, Date or Email input
+					// If the LLM agent is enabled, this input will be changed
 					actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
-					// Paste a random input from a customizable input data file
-					// Check testar/bin/settings/custom_input_data.txt
-					//actions.add(ac.pasteTextInto(widget, InputDataManager.getRandomTextFromCustomInputDataFile(System.getProperty("user.dir") + "/settings/custom_input_data.txt"), true));
 				}else{
 					// filtered and not white listed:
 					filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(widget), true));
@@ -399,73 +360,5 @@ public class Protocol_webdriver_llm_gherkin extends WebdriverProtocol {
 	@Override
 	protected boolean moreSequences() {
 		return super.moreSequences();
-	}
-
-	private void setupOrientDB() {
-		String directoryPath = Main.settingsDir + File.separator + "webdriver_llm_gherkin";
-		String downloadUrl = "https://repo1.maven.org/maven2/com/orientechnologies/orientdb-community/3.0.34/orientdb-community-3.0.34.zip";
-		String zipFilePath = directoryPath + "/orientdb-community-3.0.34.zip";
-		String extractDir = directoryPath + "/orientdb-community-3.0.34";
-
-		// If OrientDB already exists, we dont need to download anything
-		if(new File(extractDir).exists()) return;
-
-		try {
-			// Create the directory if it doesn't exist
-			File directory = new File(directoryPath);
-			if (!directory.exists()) {
-				directory.mkdirs();
-			}
-
-			// Download the zip file
-			try (InputStream in = new URL(downloadUrl).openStream();
-					FileOutputStream out = new FileOutputStream(zipFilePath)) {
-				byte[] buffer = new byte[4096];
-				int bytesRead;
-				while ((bytesRead = in.read(buffer)) != -1) {
-					out.write(buffer, 0, bytesRead);
-				}
-			}
-
-			// Extract the zip file
-			try (ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath))) {
-				ZipEntry entry;
-				while ((entry = zipIn.getNextEntry()) != null) {
-					File filePath = new File(directoryPath, entry.getName());
-					if (entry.isDirectory()) {
-						filePath.mkdirs();
-					} else {
-						// Ensure parent directories exist
-						File parentDir = filePath.getParentFile();
-						if (!parentDir.exists()) {
-							parentDir.mkdirs();
-						}
-						try (FileOutputStream out = new FileOutputStream(filePath)) {
-							byte[] buffer = new byte[4096];
-							int len;
-							while ((len = zipIn.read(buffer)) > 0) {
-								out.write(buffer, 0, len);
-							}
-						}
-					}
-					zipIn.closeEntry();
-				}
-			}
-
-			// Change to the bin directory and execute the command
-			ProcessBuilder processBuilder = new ProcessBuilder("cmd", "/c", "console.bat", "CREATE", "DATABASE", "plocal:../databases/testar", "admin", "admin");
-			processBuilder.directory(new File(extractDir + "/bin"));
-			processBuilder.inheritIO();
-			Process process = processBuilder.start();
-
-			// Wait for the command to complete
-			int exitCode = process.waitFor();
-			if (exitCode != 0) {
-				throw new RuntimeException("Command execution failed with exit code " + exitCode);
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 }

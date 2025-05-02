@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "http://localhost:8080/parabank/"
+SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "https://para.testar.org/"
 
 #################################################################
 # Sequences
@@ -35,8 +35,8 @@ SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "http://localhost:8080/parab
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 3
-SequenceLength = 15
+Sequences = 1
+SequenceLength = 10
 
 #################################################################
 # Oracles based on suspicious tag values
@@ -101,7 +101,7 @@ ProcessesToKillDuringTest =
 # AlwaysCompile: Compile the protocol before launching the selected TESTAR mode
 #################################################################
 
-ProtocolClass = 04_parabank_llm_experiment/Protocol_04_parabank_llm_experiment
+ProtocolClass = 03_webdriver_llm_parabank/Protocol_03_webdriver_llm_parabank
 AlwaysCompile = true
 
 #################################################################
@@ -137,16 +137,16 @@ MaxTime = 3.1536E7
 # ResetDataStore: WARNING: Delete all existing State Models from the selected database before creating a new one
 #################################################################
 
-StateModelEnabled = true
-DataStore = OrientDB
-DataStoreType = plocal
+StateModelEnabled = false
+DataStore = 
+DataStoreType = remote
 DataStoreServer = 
-DataStoreDirectory = settings/04_parabank_llm_experiment/orientdb-community-3.0.34/databases
-DataStoreDB = testar
-DataStoreUser = admin
-DataStorePassword = admin
-DataStoreMode = instant
-ApplicationName = parabank_llama3.2
+DataStoreDirectory = 
+DataStoreDB = 
+DataStoreUser = 
+DataStorePassword = 
+DataStoreMode = none
+ApplicationName = parabank
 ApplicationVersion = loan_denied
 ActionSelectionAlgorithm = random
 StateModelStoreWidgets = true
@@ -168,13 +168,14 @@ AbstractStateAttributes = WebWidgetId,WebWidgetName
 #################################################################
 
 LlmPlatform = OpenAI
-LlmModel = llama3.2
-LlmHostUrl = http://10.102.0.41:11434/v1/chat/completions
-LlmAuthorizationHeader = 
+LlmModel = gpt-4o-mini
+LlmHostUrl = https://api.openai.com/v1/chat/completions
+LlmAuthorizationHeader = Bearer %OPENAI_API%
 LlmActionFewshotFile = prompts/fewshot_openai_action.json
+LlmOracleFewshotFile = prompts/fewshot_openai_oracle.json
 LlmTemperature = 0.2
 LlmHistorySize = 5
-LlmTestGoals = Log in with the username john and the password demo\\nThen John Smith;Apply for a loan of 999999 with a down payment of 190000\\nThen You do not have sufficient funds
+LlmTestGoals = As a user, I want to log in with the credentials john/demo\\nThen a Request Loan link is shown;As a user, I want to request a loan with an amount '99999' and a down payment of '100'\\nThen the loan is denied due to insufficient funds
 
 #################################################################
 # WebDriver features
@@ -192,7 +193,7 @@ LlmTestGoals = Log in with the username john and the password demo\\nThen John S
 ClickableClasses = 
 TypeableClasses = 
 DeniedExtensions = pdf;jpg;png;pfx;xml
-WebDomainsAllowed = 
+WebDomainsAllowed = para.testar.org
 WebPathsAllowed = null
 FollowLinks = false
 BrowserFullScreen = true
@@ -268,7 +269,7 @@ MyClassPath = ./settings
 OnlySaveFaultySequences = false
 ReplayRetryTime = 30.0
 Delete =
-TimeToFreeze = 10.0
+TimeToFreeze = 30.0
 StopGenerationOnFault = true
 CopyFromTo =
 MaxReward = 9999999
