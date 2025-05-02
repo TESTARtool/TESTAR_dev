@@ -54,7 +54,7 @@ public final class Verdict implements Serializable {
 		// LLM believes test goal has been accomplished
 		LLM_COMPLETE(0.04, "LLM_COMPLETE"),
 		// Test goal complete based on conditions
-		TESTGOAL_COMPLETE(0.05, "TESTGOAL_COMPLETE"),
+		CONDITION_COMPLETE(0.05, "CONDITION_COMPLETE"),
 
 		/** WARNING (0.1 - 0.499) **/
 

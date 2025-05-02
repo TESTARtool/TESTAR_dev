@@ -100,7 +100,7 @@ public class Protocol_webdriver_llm_condition_metrics extends WebdriverProtocol 
 		llmActionSelector = new LlmActionSelector(settings, new ActionWebPromptGenerator());
 
 		// Initialize the metrics collector to analyze the state model
-		metricsManager = new MetricsManager(new LlmMetricsCollector("Denied"));
+		metricsManager = new MetricsManager(new LlmMetricsCollector(testGoals));
 
 		conditionEvaluator = new BasicConditionEvaluator();
 	}
@@ -206,7 +206,7 @@ public class Protocol_webdriver_llm_condition_metrics extends WebdriverProtocol 
 			if(currentTestGoal == null) {
 				// No more test goals remaining, terminate sequence.
 				System.out.println("Test goal completed, but no more test goals.");
-				return new Verdict(Verdict.Severity.TESTGOAL_COMPLETE, "All test goals completed.");
+				return new Verdict(Verdict.Severity.CONDITION_COMPLETE, "All test goal conditions completed.");
 			} else {
 				System.out.println("Test goal completed, moving to next test goal.");
 				llmActionSelector.reset(currentTestGoal, true);
