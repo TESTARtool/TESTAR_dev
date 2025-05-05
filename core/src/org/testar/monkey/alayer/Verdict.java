@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,6 +31,7 @@
 package org.testar.monkey.alayer;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 import org.testar.monkey.Assert;
 import org.testar.monkey.Util;
@@ -42,107 +43,163 @@ import org.testar.monkey.Util;
 public final class Verdict implements Serializable {
 	private static final long serialVersionUID = 3517681535425699094L;
 
-	//public static final Verdict OK = new Verdict(0.0, "No problem detected.", Util.NullVisualizer);
+	/**
+	 * Enum representing different levels of severity for a test verdict.
+	 */
+	public enum Severity {
+		// PASS
+		OK(0.0, "OK"),
 
-	// Verdict severities
-	// PASS
-	public static final double SEVERITY_MIN = 0.0;
-	// FAIL
-	public static final double SEVERITY_WARNING = 		   0.7; // custom verdict
-	public static final double SEVERITY_SUSPICIOUS_TAG = 0.8; // suspicious tag
-	public static final double SEVERITY_SUSPICIOUS_LOG = 0.89; // suspicious message in log file or command output (LogOracle)
-	public static final double SEVERITY_NOT_RESPONDING =   0.99999990; // unresponsive
-	public static final double SEVERITY_UNEXPECTEDCLOSE =	   0.99999999; // crash? unexpected close?
-	public static final double SEVERITY_MAX = 1.0;
+		// WARNING
+		WARNING(0.00000001, "WARNING"), // Custom warning verdict
 
-	public static final double SEVERITY_OK = 			   SEVERITY_MIN;
-	public static final double SEVERITY_FAIL =	   		   SEVERITY_MAX;
+		// WARNING GROUP: WEB INVARIANT
+		WARNING_WEB_INVARIANT_FAULT(0.00000016, "WARNING_WEB_INVARIANT_FAULT"),
 
-	public static final double SEVERITY_UNREPLAYABLE = 0.1;
+		// WARNING GROUP: UI
+		WARNING_UI_VISUAL_OR_RENDERING_FAULT(0.00000017, "WARNING_UI_VISUAL_OR_RENDERING_FAULT"),
 
-	public static final Verdict OK = new Verdict(SEVERITY_OK, "No problem detected.", Util.NullVisualizer);
-	public static final Verdict FAIL = new Verdict(SEVERITY_FAIL, "SUT failed.", Util.NullVisualizer);
+		// WARNING GROUP: ACCESSIBILITY
+		WARNING_ACCESSIBILITY_FAULT(0.00000101, "WARNING_ACCESSIBILITY_FAULT"),
 
+		// FAIL
+		SUSPICIOUS_TAG(0.8, "SUSPICIOUS_TAG"), // Suspicious tag
+		SUSPICIOUS_LOG(0.89, "SUSPICIOUS_LOG"), // Suspicious message in log file or command output (LogOracle)
+		NOT_RESPONDING(0.99999990, "NOT_RESPONDING"), // Unresponsive
+		UNEXPECTEDCLOSE(0.99999999, "UNEXPECTEDCLOSE"), // Crash? Unexpected close?
+		UNREPLAYABLE(0.1, "UNREPLAYABLE"), // Sequence not replayable
+
+		FAIL(1.0, "FAIL");
+
+		private final double value;
+		private final String title;
+
+		Severity(double value, String title) {
+			this.value = value;
+			this.title = title;
+		}
+
+		public double getValue() {
+			return value;
+		}
+
+		public String getTitle() {
+			return title;
+		}
+
+		/**
+		 * Retrieves the title corresponding to a given severity value.
+		 * If the severity does not match any predefined values, "FAILURE" is returned.
+		 *
+		 * @param severity The severity value to look up.
+		 * @return The corresponding title for the given severity.
+		 */
+		public static String getTitleBySeverity(double severity) {
+			return Arrays.stream(values())
+					.filter(s -> s.value == severity)
+					.map(Severity::getTitle)
+					.findFirst()
+					.orElse("FAILURE");
+		}
+	}
 
 	private final String info;
 	private final double severity;
 	private final Visualizer visualizer;
 
-	public Verdict(double severity, String info){
+	public static final Verdict OK = new Verdict(Severity.OK, "No problem detected.", Util.NullVisualizer);
+	public static final Verdict FAIL = new Verdict(Severity.FAIL, "SUT failed.", Util.NullVisualizer);
+
+	public Verdict(Severity severity, String info) {
 		this(severity, info, Util.NullVisualizer);
 	}
 
-	public Verdict(double severity, String info, Visualizer visualizer){
-		//Assert.isTrue(severity >= 0 && severity <= 1.0);
-		Assert.isTrue(severity >= SEVERITY_MIN && severity <= SEVERITY_MAX);
+	public Verdict(Severity severity, String info, Visualizer visualizer) {
+		Assert.isTrue(severity.getValue() >= Severity.OK.getValue() && severity.getValue() <= Severity.FAIL.getValue());
 		Assert.notNull(info, visualizer);
-		this.severity = severity;
+		this.severity = severity.getValue();
 		this.info = info;
 		this.visualizer = visualizer;
 	}
 
 	/**
-	 * returns the likelihood of the state to be erroneous (value within interval [0, 1])
-	 * @return value within [0, 1]
+	 * Returns the likelihood of the state being erroneous (value within interval [0, 1]).
+	 *
+	 * @return A value within [0, 1] representing the error likelihood.
 	 */
-	public double severity(){ return severity; }
+	public double severity() {
+		return severity;
+	}
 
 	/**
-	 * returns a short description about whether the state is erroneous and if so, what part of it
-	 * @return
+	 * Returns a short description about whether the state is erroneous and, if so, what part of it.
+	 *
+	 * @return A string description of the issue, or an empty string if no issue is found.
 	 */
-	public String info(){ return info; }
+	public String info() {
+		return info;
+	}
 
+	/**
+	 * Retrieves the title associated with this verdict's severity.
+	 * The title represents a human-readable categorization of the severity.
+	 *
+	 * @return The title corresponding to this verdict's severity.
+	 */
 	public String verdictSeverityTitle() {
-		if(severity == Verdict.SEVERITY_MIN)
-			return "OK";
-		if(severity == Verdict.SEVERITY_WARNING)
-			return "WARNING";
-		if(severity == Verdict.SEVERITY_SUSPICIOUS_TAG)
-			return "SUSPICIOUS_TAG";
-		if(severity == Verdict.SEVERITY_NOT_RESPONDING)
-			return "NOT_RESPONDING";
-		if(severity == Verdict.SEVERITY_UNEXPECTEDCLOSE)
-			return "UNEXPECTEDCLOSE";
-		if(severity == Verdict.SEVERITY_UNREPLAYABLE)
-			return "NOT_REPLAYABLE";
-
-		return "ERROR";
+		return Severity.getTitleBySeverity(severity);
 	}
 
 	/**
 	 * This visualizer should visualize the part of the state where the problem occurred.
 	 * For example: If there is a suspicious control element, like f.e. a critical message box
 	 * than this should be framed or pointed to with a big red arrow.
+	 * 
 	 * @return the visualizer which is guaranteed to be non-null
 	 */
-	public Visualizer visualizer(){ return visualizer; }
+	public Visualizer visualizer() {
+		return visualizer;
+	}
 
-	public String toString(){ return "severity: " + severity + " info: " + info; }
+	@Override
+	public String toString() {
+		return "severity: " + severity + " info: " + info;
+	}
 
 	/**
 	 * Retrieves the verdict result of joining two verdicts.
 	 * @param verdict A verdict to join with current verdict.
+	 * 
 	 * @return A new verdict that is the result of joining the current verdict with the provided verdict.
 	 */
-	public Verdict join(Verdict verdict){
-		return new Verdict(Math.max(this.severity, verdict.severity()),
-				(this.info.contains(verdict.info) ? this.info :
-					(this.severity == SEVERITY_OK ? "" : this.info + "\n") + verdict.info())
-				);
+	public Verdict join(Verdict verdict) {
+		Severity joinedSeverity = Arrays.stream(Severity.values())
+				.filter(s -> s.getValue() == Math.max(this.severity, verdict.severity()))
+				.findFirst()
+				.orElse(Severity.FAIL);
+
+		String joinedInfo = this.info.contains(verdict.info()) ? this.info
+				: (this.severity == Severity.OK.getValue() ? "" : this.info + "\n") + verdict.info();
+
+		Visualizer joinedVisualizer = (this.severity >= verdict.severity()) ? this.visualizer() : verdict.visualizer();
+
+		return new Verdict(joinedSeverity, joinedInfo, joinedVisualizer);
 	}
 
+	/**
+	 * Determines if two Verdict objects are equal.
+	 *
+	 * @param o The object to compare with.
+	 * @return True if both verdicts have the same severity, info, and visualizer.
+	 */
 	@Override
 	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (o instanceof Verdict) {
-			Verdict other = (Verdict)o;
-			return this.severity == other.severity
-					&& this.info.equals(other.info)
-					&& this.visualizer.equals(other.visualizer);
-		}
-		return false;
+		if (this == o) return true;
+		if (!(o instanceof Verdict)) return false;
+		Verdict other = (Verdict) o;
+		return this.severity == other.severity
+				&& this.info.equals(other.info)
+				&& this.visualizer.equals(other.visualizer);
 	}
 
 }

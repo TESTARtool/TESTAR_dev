@@ -83,6 +83,9 @@ public class WdElement extends TaggableBase implements Serializable {
 
   boolean checked, selected;
 
+  // ComputedStyle properties
+  String computedFontSize;
+
   // Keep these here for fillScrollValues
   protected String overflowX, overflowY;
   protected long clientWidth, clientHeight;
@@ -150,6 +153,7 @@ public class WdElement extends TaggableBase implements Serializable {
       cssClasses = Arrays.asList(classesString.split(" "));
     }
     display = (String) packedElement.get("display");
+    computedFontSize = (String) packedElement.getOrDefault("computedFontSize", "");
 
     zindex = (double) (long) packedElement.get("zIndex");
     fillRect(packedElement);
