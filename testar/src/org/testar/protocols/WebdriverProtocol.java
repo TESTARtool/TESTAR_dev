@@ -358,7 +358,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     		System.out.println(String.format("** URL: %s", WdDriver.getCurrentUrl()));
     		System.out.println("** Please try to navigate with SPY mode and configure clickableClasses inside Java protocol");
     		// Create and build the id of the HistoryBackAction
-    		Action histBackAction = new WdHistoryBackAction();
+    		Action histBackAction = new WdHistoryBackAction(state);
     		buildEnvironmentActionIdentifiers(state, histBackAction);
     		actions = new HashSet<>(Collections.singletonList(histBackAction));
     	}

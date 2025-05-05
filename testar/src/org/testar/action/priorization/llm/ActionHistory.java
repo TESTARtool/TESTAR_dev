@@ -34,6 +34,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.actions.CompoundAction;
@@ -51,14 +52,25 @@ public class ActionHistory {
 
     private ArrayList<Action> actions;
     private int maxEntries;
+    private final Tag<String> descriptionTag;
 
     /**
      * Creates a new ActionHistory.
      * @param maxEntries Max amount of actions to keep track of.
      */
     public ActionHistory(int maxEntries) {
+        this(maxEntries, Tags.Desc);
+    }
+
+    /**
+     * Creates a new ActionHistory.
+     * @param maxEntries Max amount of actions to keep track of.
+     * @param descriptionTag The tag to be used for obtaining the action/widget description.
+     */
+    public ActionHistory(int maxEntries, Tag<String> descriptionTag) {
         actions = new ArrayList<>();
         this.maxEntries = maxEntries;
+        this.descriptionTag = descriptionTag;
     }
 
     public ArrayList<Action> getActions() {
@@ -98,7 +110,7 @@ public class ActionHistory {
             Widget widget = action.get(Tags.OriginWidget);
             String type = action.get(Tags.Role).name();
             String actionId = action.get(Tags.AbstractID, "Unknown ActionId");
-            String description = widget.get(Tags.Desc, "Unknown Widget");
+            String description = widget.get(descriptionTag, "Unknown Widget");
 
             if(action instanceof WdSelectListAction) {
                 // Special case for combobox/select list actions
@@ -115,6 +127,14 @@ public class ActionHistory {
                         break;
                     case "LeftClickAt":
                         builder.append(String.format("%s: Clicked on '%s'", actionId, description));
+                        break;
+                    case "HistoryBackScript":
+                        // TODO: Decide if it makes sense to rely on the LLM to make this control decision
+                        builder.append(String.format("%s: Go History back in the browser", actionId));
+                        break;
+                    case "CloseTabScript":
+                        // TODO: Decide if it makes sense to rely on the LLM to make this control decision
+                        builder.append(String.format("%s: Close current browser tab", actionId));
                         break;
                     default:
                         logger.log(Level.WARN, "Unsupported action type for action history: " + type);
@@ -137,20 +157,20 @@ public class ActionHistory {
      * @return Input text of the compound action.
      */
     private String getCompoundActionInputText(Action action) {
-    	//TODO: Create single actions in protocol so this is not necessary?
-    	if(action instanceof CompoundAction) {
-    		for(Action innerAction : ((CompoundAction)action).getActions()) {
+        //TODO: Create single actions in protocol so this is not necessary?
+        if(action instanceof CompoundAction) {
+            for(Action innerAction : ((CompoundAction)action).getActions()) {
 
-    			if(innerAction instanceof Type) {
-    				return ((Type)innerAction).get(Tags.InputText, "Unknown Input");
-    			}
+                if(innerAction instanceof Type) {
+                    return ((Type)innerAction).get(Tags.InputText, "Unknown Input");
+                }
 
-    			if(innerAction instanceof PasteText) {
-    				return ((PasteText)innerAction).get(Tags.InputText, "Unknown Input");
-    			}
-    		}
-    	}
+                if(innerAction instanceof PasteText) {
+                    return ((PasteText)innerAction).get(Tags.InputText, "Unknown Input");
+                }
+            }
+        }
 
-    	return "Unknown Input";
+        return "Unknown Input";
     }
 }

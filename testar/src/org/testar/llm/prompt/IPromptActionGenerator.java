@@ -33,6 +33,7 @@ package org.testar.llm.prompt;
 import org.testar.action.priorization.llm.ActionHistory;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Tag;
 
 import java.util.Set;
 
@@ -40,6 +41,8 @@ import java.util.Set;
  * Interface for prompt generators for action selection with llms.
  */
 public interface IPromptActionGenerator {
+
+	Tag<String> getDescriptionTag();
 
     /**
      * Generates a prompt for action selection with large language models.

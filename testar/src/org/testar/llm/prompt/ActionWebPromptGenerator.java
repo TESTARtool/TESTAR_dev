@@ -41,7 +41,6 @@ import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
-import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 
 import java.util.ArrayList;
@@ -80,6 +79,11 @@ public class ActionWebPromptGenerator implements IPromptActionGenerator {
         this.descriptionTag = descriptionTag;
     }
 
+    @Override
+    public Tag<String> getDescriptionTag() {
+        return this.descriptionTag;
+    }
+
     /**
      * Generates a standard prompt for use with large language models.
      * @param actions Available actions in the current state.
@@ -103,7 +107,7 @@ public class ActionWebPromptGenerator implements IPromptActionGenerator {
             builder.append(String.format("The current objective of the test is: %s. ", currentTestGoal));
         }
 
-        String pageTitle = WdDriver.getRemoteWebDriver().getTitle();
+        String pageTitle = state.get(WdTags.WebTitle, "");
         builder.append(String.format("We are currently on the following page: %s. ", pageTitle));
 
         builder.append("The following actions are available: ");
@@ -134,6 +138,14 @@ public class ActionWebPromptGenerator implements IPromptActionGenerator {
                             break;
                         case "LeftClickAt":
                             builder.append(String.format("%s: Click on '%s' ", actionId, description));
+                            break;
+                        case "HistoryBackScript":
+                            // TODO: Decide if it makes sense to rely on the LLM to make this control decision
+                            builder.append(String.format("%s: Go History back in the browser", actionId));
+                            break;
+                        case "CloseTabScript":
+                            // TODO: Decide if it makes sense to rely on the LLM to make this control decision
+                            builder.append(String.format("%s: Close current browser tab", actionId));
                             break;
                         default:
                             logger.log(Level.WARN, "Unsupported action type for LLM action selection: " + type);
@@ -167,11 +179,7 @@ public class ActionWebPromptGenerator implements IPromptActionGenerator {
      * @return List of options.
      */
     private List<String> getComboBoxChoices(Widget combobox, State state) {
-        // TODO: Temporary hack, <select> element in HTML seems to be missing <option> unless we re-retrieve the HTML.
-        // Could this be a timing issue? (HTML is retrieved before options are available)
-        WdDriver.getRemoteWebDriver().getPageSource();
-
-        String innerHtml = combobox.get(WdTags.WebInnerHTML);
+        String innerHtml = combobox.get(WdTags.WebInnerHTML, "");
 
         // Assumes there is a set of <choice> objects
         Pattern choicePattern = Pattern.compile("<option[^>]*>(.*?)</option>");

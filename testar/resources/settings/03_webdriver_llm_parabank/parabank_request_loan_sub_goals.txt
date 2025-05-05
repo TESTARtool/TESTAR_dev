@@ -1,5 +1,5 @@
 As a user, I want to log in with the credentials john/demo
 Then a Request Loan link is shown
 ;
-As a user, I want to request a loan with an amount '99999' and a down payment of '100'
+As a user, I want to request a loan with an amount '999999', a down payment of '100', for the account '54321'
 Then the loan is denied due to insufficient funds
