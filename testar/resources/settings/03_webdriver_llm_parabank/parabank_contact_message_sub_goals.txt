@@ -2,7 +2,7 @@ Given I want to log in
 And fill in username 'john'
 And fill in password 'demo'
 When login
-Then contact link is shown
+Then the Welcome John Smith message is shown
 ;
 When fill in name 'testar'
 And fill in email 'testar.org'

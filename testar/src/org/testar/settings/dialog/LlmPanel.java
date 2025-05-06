@@ -329,20 +329,21 @@ public class LlmPanel extends SettingsPanel {
 
 	// Remove the last JTextArea
 	private void removeLastTestGoalTextArea(ActionEvent evt) {
-		if (!testGoalTextAreas.isEmpty()) {
-			int lastIndex = testGoalTextAreas.size() - 1;
-			JTextArea lastTextArea = testGoalTextAreas.get(lastIndex);
+		int size = testGoalTextAreas.size();
+		if (size > 0) {
+			JTextArea lastTextArea = testGoalTextAreas.get(size - 1);
 
 			// Only remove if the text area is empty
-			if (lastTextArea.getText().trim().isEmpty()) {
-				JScrollPane lastScrollPane = testGoalScrollPanes.remove(lastIndex);
-				testGoalTextAreas.remove(lastIndex);
+			if (lastTextArea.getDocument().getLength() == 0) {
+				JScrollPane lastScrollPane = testGoalScrollPanes.get(size - 1);
 
+				testGoalTextAreas.remove(size - 1);
+				testGoalScrollPanes.remove(size - 1);
 				testGoalContainer.remove(lastScrollPane);
 				testGoalContainer.revalidate();
 				testGoalContainer.repaint();
 			} else {
-				JOptionPane.showMessageDialog(this, "Cannot remove a non-empty test goal. Please clear the content first.", 
+				JOptionPane.showMessageDialog(this, "Cannot remove a non-empty test goal. Please clear the content first.",
 						"Warning", JOptionPane.WARNING_MESSAGE);
 			}
 		}
