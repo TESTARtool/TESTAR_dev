@@ -205,8 +205,12 @@ public class LlmOracle implements Oracle {
 				}
 			}
 		} catch(Exception e) {
-			logger.log(Level.ERROR, "Unable to communicate with the LLM.");
-			e.printStackTrace();
+			logger.log(Level.ERROR, "Unable to communicate with the LLM due to the cause:");
+			if(e.getMessage() != null && !e.getMessage().isEmpty()) {
+				logger.log(Level.ERROR, e.getMessage());
+			} else {
+				e.printStackTrace();
+			}
 			return null;
 		}
 	}
