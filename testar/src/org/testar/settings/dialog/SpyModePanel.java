@@ -129,7 +129,7 @@ public class SpyModePanel extends SettingsPanel {
         // TODO store the information in the settings file.
 
         List<String> filter = includeTags.asSet().stream()
-                .map(DefaultTagFilter::getSettingsStringFromTag)
+                .map(tag -> tag.name())
                 .collect(Collectors.toList());
         settings.set(ConfigTags.SpyTagAttributes, filter);
 
