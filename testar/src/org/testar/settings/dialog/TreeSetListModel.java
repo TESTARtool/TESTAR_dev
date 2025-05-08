@@ -34,7 +34,7 @@ import javax.swing.*;
 import java.util.*;
 
 public class TreeSetListModel<T> extends AbstractListModel<T> {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 5179138078302927167L;
     private TreeSet<T> treeSet;
 
     public TreeSetListModel(Comparator<? super T> comparator) {
@@ -89,7 +89,7 @@ public class TreeSetListModel<T> extends AbstractListModel<T> {
     public int getIndexOf(T t) {
         int index = 0;
         for (T treeItem : treeSet) {
-            if (treeItem.equals(treeItem)) {
+            if (treeItem.equals(t)) {
                 return index;
             }
             index++;
