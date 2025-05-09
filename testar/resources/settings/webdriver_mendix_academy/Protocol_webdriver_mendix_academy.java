@@ -350,10 +350,12 @@ public class Protocol_webdriver_mendix_academy extends WebdriverProtocol {
 		// If the final Verdict is not OK and the verdict is not saved in the list
 		// This is a new run fail verdict
 		Verdict finalVerdict = getVerdict(latestState);
-		if(finalVerdict.severity() > Verdict.SEVERITY_OK && !listOfDetectedErroneousVerdicts.contains(finalVerdict.info().replace("\n", " "))) {
+		if(finalVerdict.severity() > Verdict.Severity.OK.getValue() 
+				&& !listOfDetectedErroneousVerdicts.contains(finalVerdict.info().replace("\n", " "))) {
 			listOfDetectedErroneousVerdicts.add(finalVerdict.info().replace("\n", " "));
 		}
 	}
+
 	/**
 	 * TESTAR uses this method to determine when to stop the entire test.
 	 * You could stop the test after a given amount of generated sequences or

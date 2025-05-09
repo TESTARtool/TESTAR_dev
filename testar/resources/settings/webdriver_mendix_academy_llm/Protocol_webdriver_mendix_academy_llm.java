@@ -239,7 +239,7 @@ public class Protocol_webdriver_mendix_academy_llm extends WebdriverProtocol {
 			if(currentTestGoal == null) {
 				// No more test goals remaining, terminate sequence.
 				System.out.println("Test goal completed, but no more test goals.");
-				return new Verdict(Verdict.SEVERITY_TESTGOAL_COMPLETE, "All test goals completed.");
+				return new Verdict(Verdict.Severity.CONDITION_COMPLETE, "All test goals completed.");
 			} else {
 				System.out.println("Test goal completed, moving to next test goal.");
 				llmActionSelector.reset(currentTestGoal, true);
@@ -252,7 +252,7 @@ public class Protocol_webdriver_mendix_academy_llm extends WebdriverProtocol {
 			// Use the LLM as an Oracle to determine if the test goal has been completed
 			Verdict llmVerdict = llmOracle.getVerdict(state);
 
-			if(llmVerdict.severity() == Verdict.SEVERITY_LLM_COMPLETE) {
+			if(llmVerdict.severity() == Verdict.Severity.LLM_COMPLETE.getValue()) {
 				// Test goal was completed, retrieve next test goal from queue.
 				currentTestGoal = testGoalQueue.poll();
 

@@ -190,12 +190,12 @@ public class Protocol_webdriver_b00_spark_llm extends WebdriverProtocol {
 
 		// First match makes an update to the verdict
 		if(lastLlmVerdict == Verdict.OK 
-				&& llmVerdict.severity() == Verdict.SEVERITY_LLM_COMPLETE) {
+				&& llmVerdict.severity() == Verdict.Severity.LLM_COMPLETE.getValue()) {
 			lastLlmVerdict = llmVerdict;
 		} 
 		// Second match is the multi-agent assessment
-		else if(lastLlmVerdict.severity() == Verdict.SEVERITY_LLM_COMPLETE 
-				&& llmVerdict.severity() == Verdict.SEVERITY_LLM_COMPLETE) {
+		else if(lastLlmVerdict.severity() == Verdict.Severity.LLM_COMPLETE.getValue() 
+				&& llmVerdict.severity() == Verdict.Severity.LLM_COMPLETE.getValue()) {
 			// Test goal was completed, retrieve next test goal from queue.
 			currentTestGoal = testGoalQueue.poll();
 
