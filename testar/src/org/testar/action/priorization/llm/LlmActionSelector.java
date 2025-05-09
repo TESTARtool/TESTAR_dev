@@ -41,6 +41,7 @@ import org.testar.llm.LlmConversation;
 import org.testar.llm.LlmFactory;
 import org.testar.llm.LlmResponse;
 import org.testar.llm.LlmTestGoal;
+import org.testar.llm.LlmUtils;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.monkey.alayer.*;
@@ -225,7 +226,7 @@ public class LlmActionSelector implements IActionSelector {
             case COMMUNICATION_FAILURE: {
                 logger.log(Level.ERROR, "Communication failure with the LLM");
                 NOP nop = new NOP();
-                nop.set(Tags.Desc, "Communication Failure");
+                nop.set(Tags.Desc, "NOP action due to LLM communication Failure");
                 invalidActions++;
                 return nop;
             }
@@ -246,7 +247,7 @@ public class LlmActionSelector implements IActionSelector {
      */
     private String getResponseFromLlm(String requestBody) {
         String testarVer = Main.TESTAR_VERSION.substring(0, Main.TESTAR_VERSION.indexOf(" "));
-        URI uri = URI.create(replaceApiKeyPlaceholder(this.hostUrl));
+        URI uri = URI.create(LlmUtils.replaceApiKeyPlaceholder(this.hostUrl));
 
         try {
             URL url = uri.toURL();
@@ -259,7 +260,7 @@ public class LlmActionSelector implements IActionSelector {
 
             // Check optional Authorization Header parameter
             if (this.authorizationHeader != null && !this.authorizationHeader.isEmpty()) {
-                con.setRequestProperty("Authorization", replaceApiKeyPlaceholder(this.authorizationHeader));
+                con.setRequestProperty("Authorization", LlmUtils.replaceApiKeyPlaceholder(this.authorizationHeader));
             }
 
             con.setDoInput(true);
@@ -308,41 +309,14 @@ public class LlmActionSelector implements IActionSelector {
                 }
             }
         } catch(Exception e) {
-            logger.log(Level.ERROR, "Unable to communicate with the LLM.");
-            e.printStackTrace();
+            logger.log(Level.ERROR, "Unable to communicate with the LLM due to the cause:");
+            if(e.getMessage() != null && !e.getMessage().isEmpty()) {
+                logger.log(Level.ERROR, e.getMessage());
+            } else {
+                e.printStackTrace();
+            }
             return null;
         }
-    }
-
-    private String replaceApiKeyPlaceholder(String url) {
-        String apiKeyPlaceholder = extractPlaceholder(url);
-
-        if (apiKeyPlaceholder.isEmpty()) {
-            // Return the original URL if no placeholder is found
-            return url;
-        }
-
-        String apiKey = System.getenv(apiKeyPlaceholder);
-        if (apiKey == null) {
-            // Return the original URL if the API key is not found in the system
-            return url;
-        }
-
-        // Return the final URL with the placeholder replaced by the actual API key
-        return url.replace("%" + apiKeyPlaceholder + "%", apiKey);
-    }
-
-    private String extractPlaceholder(String str) {
-        int start = str.indexOf('%') + 1;
-        int end = str.indexOf('%', start);
-
-        if (start == 0 || end == -1) {
-            // No valid placeholder found, return empty string
-            return "";
-        }
-
-        // Return the placeholder between the '%' symbols
-        return str.substring(start, end);
     }
 
     /**
@@ -395,7 +369,7 @@ public class LlmActionSelector implements IActionSelector {
             logger.log(Level.ERROR, "Unable to parse response from LLM to JSON: " + responseContent);
             return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.PARSE_FAILED);
         } catch(NullPointerException e) {
-            logger.log(Level.ERROR, "Null exception due to LLM parse response error");
+            logger.log(Level.ERROR, "Null response due to LLM parse response error");
             return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.COMMUNICATION_FAILURE);
         } catch(Exception e) {
             logger.log(Level.ERROR, "Exception parsing LLM response");
