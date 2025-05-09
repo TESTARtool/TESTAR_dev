@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019, 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019, 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -62,6 +62,7 @@ public class WdMapping {
 			put(WebWidgetDisplay, WdTags.WebDisplay);
 			put(WebWidgetIsOffScreen, WdTags.WebIsOffScreen);
 			put(WebWidgetSrc, WdTags.WebSrc);
+			put(WebWidgetPlaceholder, WdTags.WebPlaceholder);
 
 			// Generic
 			put(WidgetControlType, WdTags.WebTagName);

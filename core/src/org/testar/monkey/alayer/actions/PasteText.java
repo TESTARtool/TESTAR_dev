@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -64,7 +64,11 @@ public final class PasteText extends TaggableBase implements Action {
 		Assert.isTrue(duration >= 0);
 		Assert.notNull(system);
 
-		StringSelection selection = new StringSelection(text);
+		// Tag used to change the final text of PasteText actions
+		// This is necessary for LLMs decisions but may alter the actions abstraction
+		String inputText = this.get(Tags.InputText, this.text);
+
+		StringSelection selection = new StringSelection(inputText);
 
 		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 		clipboard.setContents(selection, null);
@@ -77,7 +81,7 @@ public final class PasteText extends TaggableBase implements Action {
 			throw new IllegalArgumentException("This string is not an UTF-32 string!");
 	}
 
-	public String toString(){ return "Pasted text '" + StringEscapeUtils.escapeHtml4(text) + "'"; }
+	public String toString(){ return "Pasted text '" + StringEscapeUtils.escapeHtml4(this.get(Tags.InputText, this.text)) + "'"; }
 
 	@Override
 	public String toString(Role... discardParameters) {
@@ -99,7 +103,7 @@ public final class PasteText extends TaggableBase implements Action {
 
 	@Override
 	public String toParametersString() {
-		return "(" + text + ")";
+		return "(" + this.get(Tags.InputText, this.text) + ")";
 	}
 
 }

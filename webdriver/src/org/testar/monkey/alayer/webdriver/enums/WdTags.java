@@ -273,6 +273,11 @@ public class WdTags extends TagsBase {
   public static final Tag<String> WebOuterHTML = from("WebOuterHTML", String.class);
 
   /**
+   * Represents the placeholder text in an <input> or <textarea> element.
+   */
+  public static final Tag<String> WebPlaceholder = from("WebPlaceholder", String.class);
+
+  /**
    * Represents the remote web element object obtained with Selenium framework
    */
   public static final Tag<WebElement> WebElementSelenium = from("WebElementSelenium", WebElement.class);
