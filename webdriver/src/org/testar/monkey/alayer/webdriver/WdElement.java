@@ -83,6 +83,9 @@ public class WdElement extends TaggableBase implements Serializable {
 
   boolean checked, selected;
 
+  // ComputedStyle properties
+  String computedFontSize;
+
   // Keep these here for fillScrollValues
   protected String overflowX, overflowY;
   protected long clientWidth, clientHeight;
@@ -151,6 +154,7 @@ public class WdElement extends TaggableBase implements Serializable {
       cssClasses = Arrays.asList(classesString.split(" "));
     }
     display = (String) packedElement.get("display");
+    computedFontSize = (String) packedElement.getOrDefault("computedFontSize", "");
 
     zindex = (double) (long) packedElement.get("zIndex");
     fillRect(packedElement);
@@ -286,8 +290,22 @@ public class WdElement extends TaggableBase implements Serializable {
   }
   
   private boolean isFullVisibleAtCanvasBrowser() {
-	  return rect.x() >= 0 && rect.x() + rect.width() <= CanvasDimensions.getCanvasWidth() &&
-	           rect.y() >= 0 && rect.y() + rect.height() <= CanvasDimensions.getInnerHeight();
+	  if (rect == null) return false;
+
+	  boolean isVisibleAtCanvas = rect.x() >= 0 && rect.x() + rect.width() <= CanvasDimensions.getCanvasWidth() 
+			  && rect.y() >= 0 && rect.y() + rect.height() <= CanvasDimensions.getInnerHeight();
+
+	  // If the web element is a <select><option>, check the selected option visibility
+	  if (tagName != null && tagName.equalsIgnoreCase("option") && outerHTML != null) {
+		  if (outerHTML.contains("<option") && (outerHTML.contains("selected>") || outerHTML.contains("selected="))) {
+			  return isVisibleAtCanvas;
+		  } else {
+			  return false;
+		  }
+	  }
+
+	  // For other web elements, only check if fully visible in the canvas
+	  return isVisibleAtCanvas;
   }
 
   @SuppressWarnings("unchecked")

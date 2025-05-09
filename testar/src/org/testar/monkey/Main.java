@@ -42,6 +42,8 @@ import org.testar.serialisation.ScreenshotSerialiser;
 import org.testar.serialisation.TestSerialiser;
 import org.testar.settings.Settings;
 import org.testar.settings.dialog.SettingsDialog;
+import org.testar.settings.dialog.tagsvisualization.ConcreteTagFilter;
+import org.testar.settings.dialog.tagsvisualization.TagFilter;
 
 import javax.swing.*;
 import java.io.File;
@@ -58,7 +60,7 @@ import static org.testar.monkey.Util.compileProtocol;
 
 public class Main {
 
-	public static final String TESTAR_VERSION = "2.6.34 (4-Mar-2025)";
+	public static final String TESTAR_VERSION = "2.6.39 (6-May-2025)";
 
 	//public static final String TESTAR_DIR_PROPERTY = "DIRNAME"; //Use the OS environment to obtain TESTAR directory
 	public static final String SETTINGS_FILE = "test.settings";
@@ -105,6 +107,8 @@ public class Main {
 		isValidJavaEnvironment();
 
 		verifyTestarInitialDirectory();
+
+		initTagVisualization();
 
 		initTestarSSE(args);
 
@@ -336,7 +340,7 @@ public class Main {
 		try {
 			// Compile the Java protocols if AlwaysCompile setting is true
 			if (settings.get(ConfigTags.AlwaysCompile)) {
-				compileProtocol(Main.settingsDir, pc, settings.get(ConfigTags.ProtocolCompileDirectory));			
+				compileProtocol(Main.settingsDir, pc, settings.get(ConfigTags.ProtocolCompileDirectory));
 			}
 
 		    List<String> cp = new ArrayList<>(settings.get(MyClassPath));
@@ -385,7 +389,7 @@ public class Main {
 			LogSerialiser.log("An unexpected error occurred: " + e + "\n", LogSerialiser.LogLevel.Critical);
 		} catch (ClassNotFoundException e) {
 			// Invalid TESTAR protocol class configuration
-			String protocolMsg = String.format("The protocol '%s' from the selected ProtocolClass setting '%s' does not exist" 
+			String protocolMsg = String.format("The protocol '%s' from the selected ProtocolClass setting '%s' does not exist"
 					+ System.getProperty("line.separator")
 					+ "Please, edit the test.settings file and update the ProtocolClass setting adequately",
 					protocolClass, pc);
@@ -500,5 +504,9 @@ public class Main {
 			Environment.setInstance(new UnknownEnvironment());
 		}
 	}
+
+    private static void initTagVisualization() {
+        TagFilter.setInstance(new ConcreteTagFilter());
+    }
 
 }

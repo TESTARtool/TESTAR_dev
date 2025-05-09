@@ -34,11 +34,9 @@ import org.testar.monkey.Main;
 import org.testar.monkey.Pair;
 import org.testar.monkey.RuntimeControlsProtocol;
 import org.testar.statemodel.StateModelTags;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import static org.testar.monkey.ConfigTags.*;
 
 public class SettingsDefaults {
@@ -95,6 +93,7 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(FormFillingAction, false));
 		defaults.add(Pair.from(ReportInHTML, true));
 		defaults.add(Pair.from(ReportInPlainText, false));
+		defaults.add(Pair.from(ExtendedOracles, ""));
 
 		// Oracles for webdriver browser console
 		defaults.add(Pair.from(WebConsoleErrorOracle, false));
@@ -203,11 +202,25 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(LlmModel, ""));
 		defaults.add(Pair.from(LlmHostUrl, "http://192.168.108.242:1234/v1/chat/completions"));
 		defaults.add(Pair.from(LlmAuthorizationHeader, ""));
-		defaults.add(Pair.from(LlmTestGoals, Arrays.asList("Log in with the username john and the password demo\\nThen John Smith")));
+		defaults.add(Pair.from(LlmTestGoals, Arrays.asList("Log in with the username john and the password demo\\nThen the message Welcome John Smith is shown")));
 		defaults.add(Pair.from(LlmActionFewshotFile, "prompts/fewshot_openai_action.json"));
 		defaults.add(Pair.from(LlmOracleFewshotFile, "prompts/fewshot_openai_oracle.json"));
 		defaults.add(Pair.from(LlmTemperature, 0.2f));
 		defaults.add(Pair.from(LlmHistorySize, 5));
+
+		// Settings for Spy Mode Tag Attributes configuration
+		defaults.add(Pair.from(SpyTagAttributes,  new ArrayList<String>() {
+			{
+				add("AbstractID");
+				add("ConcreteID");
+				add("Desc");
+				add("Title");
+				add("Role");
+				add("Enabled");
+				add("Shape");
+				add("Path");
+			}
+		}));
 
 		return defaults;
 	}

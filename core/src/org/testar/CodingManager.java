@@ -268,7 +268,7 @@ public class CodingManager {
 	//  IDS CODING
 	// ############
 
-	public static String lowCollisionID(String text){ // reduce ID collision probability
+	private static String lowCollisionID(String text){ // reduce ID collision probability
 		CRC32 crc32 = new CRC32();
 		crc32.update(text.getBytes());
 		return Integer.toUnsignedString(text.hashCode(), Character.MAX_RADIX) +

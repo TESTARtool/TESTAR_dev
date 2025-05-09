@@ -1,14 +1,44 @@
+/***************************************************************************************************
+ *
+ * Copyright (c) 2024 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2024 - 2025 Open Universiteit - www.ou.nl
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************************************/
+
 package org.testar.statemodel.analysis.metric;
 
 import com.google.gson.Gson;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.testar.llm.LlmTestGoal;
 import org.testar.statemodel.StateModelManager;
 import org.testar.statemodel.util.QueryHelper;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -18,20 +48,16 @@ public class LlmMetricsCollector implements IMetricsCollector {
     protected static final Logger logger = LogManager.getLogger();
     private Gson gson;
 
-    private String searchMessage = "";
+    private final List<LlmTestGoal> testGoals;
 
     private LlmMetrics metrics = new LlmMetrics();
 
-    public LlmMetricsCollector() {
-    }
-
     /**
      * Creates a new LlmMetricsCollector
-     * TODO: Remove search message and use ConditionEvaluators instead.
-     * @param searchMessage String to search for in the HTML to test if a test goal was met.
+     * @param testGoals List<LlmTestGoal> to determine if test goals were met.
      */
-    public LlmMetricsCollector(String searchMessage) {
-        this.searchMessage = searchMessage;
+    public LlmMetricsCollector(List<LlmTestGoal> testGoals) {
+        this.testGoals = testGoals;
         gson = new Gson();
     }
 
@@ -47,10 +73,12 @@ public class LlmMetricsCollector implements IMetricsCollector {
         // The easiest method for now is to manually keep track of invalidActions (see LlmActionSelector)
         newMetrics.setInvalidActions(invalidActions);
 
-        if(!Objects.equals(searchMessage, "")) {
-            newMetrics.setTestGoalAccomplished(
-                    getTestGoalAccomplished(modelIdentifier, stateModelManager, searchMessage));
-        }
+        // Use the TestCondition evaluator of  to determine if the LlmTestGoals have been achieved
+        boolean allGoalsAccomplished = testGoals.stream()
+        		.flatMap(goal -> goal.getCompletionConditions().stream())
+        		.allMatch(condition -> condition.evaluate(modelIdentifier, stateModelManager));
+
+        newMetrics.setTestGoalAccomplished(allGoalsAccomplished);
 
         metrics.addSequenceMetrics(newMetrics);
 
@@ -152,7 +180,7 @@ public class LlmMetricsCollector implements IMetricsCollector {
         sb.append("--------------------\n");
         sb.append("LLM Metrics Report - " + sequences + " sequences\n");
         sb.append("--------------------\n");
-        sb.append("Times test goal completed: " + metrics.getTgCompleteCount() + "\n");
+        sb.append("Times all test goals completed: " + metrics.getTgCompleteCount() + "\n");
         sb.append("--------------------\n");
         sb.append("For sequences that completed the test goal: \n\n");
         sb.append("Min concrete states: " + metrics.getMinConcreteStatesComplete() + "\n");
@@ -250,24 +278,5 @@ public class LlmMetricsCollector implements IMetricsCollector {
         String output = stateModelManager.queryStateModel(query);
 
         return QueryHelper.parseCountQueryResponse(output, "abstractStates");
-    }
-
-    // TODO: This could be replaced by the condition evaluator.
-    private boolean getTestGoalAccomplished(String modelIdentifier, StateModelManager stateModelManager,
-                                            String searchMessage) {
-        StringBuilder queryBuilder = new StringBuilder();
-        queryBuilder.append("SELECT COUNT(*) ");
-        queryBuilder.append("AS found ");
-        queryBuilder.append("FROM ConcreteState ");
-        queryBuilder.append("WHERE uid LIKE '" + modelIdentifier + "%' ");
-        queryBuilder.append("AND WebInnerHTML LIKE '%" + searchMessage + "%'");
-
-        String query = queryBuilder.toString();
-        String result = stateModelManager.queryStateModel(query);
-
-        int matches = QueryHelper.parseCountQueryResponse(result, "found");
-
-        // Test goal is complete if one or more matches are found.
-        return matches > 0;
     }
 }

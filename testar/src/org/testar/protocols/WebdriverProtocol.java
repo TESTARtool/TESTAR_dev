@@ -311,7 +311,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     				String consoleErrorMsg = logEntry.getMessage();
     				Matcher matcherError = errorPattern.matcher(consoleErrorMsg);
     				if(matcherError.matches()) {
-    					webConsoleVerdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TAG, "Web Browser Console Error: " + consoleErrorMsg);
+    					webConsoleVerdict = new Verdict(Verdict.Severity.SUSPICIOUS_TAG, "Web Browser Console Error: " + consoleErrorMsg);
     				}
     			}
     		}
@@ -332,7 +332,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     				String consoleWarningMsg = logEntry.getMessage();
     				Matcher matcherWarning = warningPattern.matcher(consoleWarningMsg);
     				if(matcherWarning.matches()) {
-    					webConsoleVerdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TAG, "Web Browser Console Warning: " + consoleWarningMsg);
+    					webConsoleVerdict = new Verdict(Verdict.Severity.SUSPICIOUS_TAG, "Web Browser Console Warning: " + consoleWarningMsg);
     				}
     			}
     		}
@@ -358,7 +358,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     		System.out.println(String.format("** URL: %s", WdDriver.getCurrentUrl()));
     		System.out.println("** Please try to navigate with SPY mode and configure clickableClasses inside Java protocol");
     		// Create and build the id of the HistoryBackAction
-    		Action histBackAction = new WdHistoryBackAction();
+    		Action histBackAction = new WdHistoryBackAction(state);
     		buildEnvironmentActionIdentifiers(state, histBackAction);
     		actions = new HashSet<>(Collections.singletonList(histBackAction));
     	}

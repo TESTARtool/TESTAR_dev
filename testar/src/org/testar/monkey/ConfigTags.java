@@ -318,6 +318,9 @@ public final class ConfigTags {
 	public static final Tag<Boolean> ReportInPlainText = Tag.from("ReportInPlainText", Boolean.class,
 			 "Sets whether to create a plain text report");
 
+	public static final Tag<String> ExtendedOracles = Tag.from("ExtendedOracles", String.class,
+			"Select extended oracles to be applied during runtime for testing");
+
 	/**
 	 * Other settings
 	 */
@@ -329,6 +332,9 @@ public final class ConfigTags {
 
 	@SuppressWarnings("unchecked")
 	public static final Tag<List<Pair<String, String>>> CopyFromTo = Tag.from("CopyFromTo", (Class<List<Pair<String, String>>>) (Class<?>) List.class);
+
+	public static final Tag<List<String>> SpyTagAttributes = Tag.from("SpyTagAttributes", (Class<List<String>>) (Class<?>) List.class,
+			"Specify the widget attributes that you wish to visualize during Spy Mode. Use a semicolon separated list.");
 
 	/*
 	//TODO web driver settings for login feature

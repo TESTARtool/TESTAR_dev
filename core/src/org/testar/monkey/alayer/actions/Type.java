@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -28,9 +29,6 @@
 *******************************************************************************************************/
 
 
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.testar.monkey.alayer.actions;
 
 import java.nio.charset.Charset;
@@ -66,8 +64,8 @@ public final class Type extends TaggableBase implements Action {
 		Assert.isTrue(duration >= 0);
 		Assert.notNull(system);
 
-		//TODO: Refactor this hacky way of changing the final text of Type actions
-		//TODO: This is necessary for LLMs decisions but may alter the actions abstraction
+		// Tag used to change the final text of Type actions
+		// This is necessary for LLMs decisions but may alter the actions abstraction
 		String inputText = this.get(Tags.InputText, this.text);
 
 		double d = duration / inputText.length();
@@ -121,8 +119,7 @@ public final class Type extends TaggableBase implements Action {
     }
 	
 	public String toString(){ return "Type text '" + this.get(Tags.InputText, this.text) + "'"; }
-	
-	// by urueda
+
 	@Override
 	public String toString(Role... discardParameters) {
 		for (Role r : discardParameters){
@@ -132,7 +129,6 @@ public final class Type extends TaggableBase implements Action {
 		return toString();
 	}	
 
-	// by urueda
 	@Override
 	public String toShortString() {
 		Role r = get(Tags.Role, null);
@@ -142,7 +138,6 @@ public final class Type extends TaggableBase implements Action {
 			return toString();
 	}
 
-	// by urueda
 	@Override
 	public String toParametersString() {
 		return "(" + this.get(Tags.InputText, this.text) + ")";

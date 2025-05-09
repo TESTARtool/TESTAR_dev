@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2024 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2024 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2024 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,12 +30,19 @@
 
 package org.testar.settings.dialog;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,19 +58,32 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.testar.llm.LlmConversation;
+import org.testar.llm.LlmFactory;
+import org.testar.llm.LlmUtils;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.settings.Settings;
 
+import com.google.gson.Gson;
+
 public class LlmPanel extends SettingsPanel {
 
 	private static final long serialVersionUID = -5556840958014020780L;
+
+	protected static final Logger logger = LogManager.getLogger();
 
 	private JLabel labelLlmPlatform = new JLabel("LLM Platform");
 	private JComboBox<String> llmPlatformBox = new JComboBox<>(new String[]{"OpenAI", "Gemini"});
 
 	private JLabel labelLlmModel = new JLabel("LLM Model");
 	private JTextField fieldLlmModel = new JTextField();
+
+	private JButton buttonLlmConnection = new JButton("Check Connection");
 
 	private JLabel labelLlmHostUrl = new JLabel("LLM Host Url");
 	private JTextField fieldLlmHostUrl = new JTextField();
@@ -99,7 +119,7 @@ public class LlmPanel extends SettingsPanel {
 		labelLlmPlatform.setBounds(10, 12, 120, 27);
 		labelLlmPlatform.setToolTipText(ConfigTags.LlmPlatform.getDescription());
 		add(labelLlmPlatform);
-		llmPlatformBox.setBounds(150, 12, 150, 27);
+		llmPlatformBox.setBounds(150, 12, 100, 27);
 		llmPlatformBox.setToolTipText(ConfigTags.LlmPlatform.getDescription());
 		add(llmPlatformBox);
 		// Add an ActionListener to change the settings based on the selected platform
@@ -108,16 +128,20 @@ public class LlmPanel extends SettingsPanel {
 			public void actionPerformed(ActionEvent e) {
 				switch ((String) llmPlatformBox.getSelectedItem()) {
 				case "OpenAI":
-					fieldLlmHostUrl.setText("http://192.168.108.242:1234/v1/chat/completions");
+					fieldLlmHostUrl.setText("https://api.openai.com/v1/chat/completions");
+					fieldLlmModel.setText("gpt-4o-mini");
+					buttonLlmConnection.setBackground(null);
+					fieldLlmAuthorizationHeader.setText("Bearer %OPENAI_API%");
 					fieldLlmActionFewshot.setText("prompts/fewshot_openai_action.json");
 					fieldLlmOracleFewshot.setText("prompts/fewshot_openai_oracle.json");
-					fieldLlmTemperature.setText("0.2");
 					break;
 				case "Gemini":
-					fieldLlmHostUrl.setText("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=%GEMINI_API_KEY%");
+					fieldLlmHostUrl.setText("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=%GEMINI_API_KEY%");
+					fieldLlmModel.setText("");
+					buttonLlmConnection.setBackground(null);
+					fieldLlmAuthorizationHeader.setText("");
 					fieldLlmActionFewshot.setText("prompts/fewshot_gemini_action.json");
 					fieldLlmOracleFewshot.setText("prompts/fewshot_gemini_oracle.json");
-					fieldLlmTemperature.setText("0.2");
 					break;
 
 				default:
@@ -126,12 +150,17 @@ public class LlmPanel extends SettingsPanel {
 			}
 		});
 
-		labelLlmModel.setBounds(330, 12, 100, 27);
+		labelLlmModel.setBounds(270, 12, 70, 27);
 		labelLlmModel.setToolTipText(ConfigTags.LlmModel.getDescription());
 		add(labelLlmModel);
-		fieldLlmModel.setBounds(440, 12, 110, 27);
+		fieldLlmModel.setBounds(350, 12, 120, 27);
 		fieldLlmModel.setToolTipText(ConfigTags.LlmModel.getDescription());
 		add(fieldLlmModel);
+
+		buttonLlmConnection.setBounds(490, 12, 140, 27);
+		buttonLlmConnection.setToolTipText("Check the LLM connection returns 200 OK");
+		buttonLlmConnection.addActionListener(this::checkLlmConnection);
+		add(buttonLlmConnection);
 
 		labelLlmHostUrl.setBounds(10, 40, 120, 27);
 		labelLlmHostUrl.setToolTipText(ConfigTags.LlmHostUrl.getDescription());
@@ -206,6 +235,69 @@ public class LlmPanel extends SettingsPanel {
 		add(removeLlmTestGoalButton);
 	}
 
+	// Send a hello world message to the llm to check the llm settings are correct
+	private void checkLlmConnection(ActionEvent evt) {
+		try {
+			LlmConversation conversation = LlmFactory.createLlmConversation(
+					(String) llmPlatformBox.getSelectedItem(), 
+					fieldLlmModel.getText(), 
+					Float.parseFloat(fieldLlmTemperature.getText()));
+
+			conversation.addMessage("user", "Hello world!");
+
+			String conversationJson = new Gson().toJson(conversation);
+
+			String testarVer = Main.TESTAR_VERSION.substring(0, Main.TESTAR_VERSION.indexOf(" "));
+
+			URI uri = URI.create(LlmUtils.replaceApiKeyPlaceholder(fieldLlmHostUrl.getText()));
+			URL url = uri.toURL();
+			HttpURLConnection con = (HttpURLConnection)url.openConnection();
+
+			con.setRequestMethod("POST");
+			con.setRequestProperty("Content-Type", "application/json");
+			con.setRequestProperty("Accept", "application/json");
+			con.setRequestProperty("User-Agent", "testar/" + testarVer);
+
+			// Check optional Authorization Header parameter
+			if (fieldLlmAuthorizationHeader.getText() != null && !this.fieldLlmAuthorizationHeader.getText().isEmpty()) {
+				con.setRequestProperty("Authorization", LlmUtils.replaceApiKeyPlaceholder(fieldLlmAuthorizationHeader.getText()));
+			}
+
+			con.setDoInput(true);
+			con.setDoOutput(true);
+			con.setConnectTimeout(10000);
+
+			try(OutputStream os = con.getOutputStream()) {
+				byte[] input = conversationJson.getBytes(StandardCharsets.UTF_8);
+				os.write(input, 0, input.length);
+			}
+
+			if(con.getResponseCode() == 200) {
+				buttonLlmConnection.setBackground(Color.GREEN);
+			} else {
+				buttonLlmConnection.setBackground(Color.RED);
+				// If response is not 200 OK, debug the error message
+				try(BufferedReader br = new BufferedReader(new InputStreamReader(con.getErrorStream(), StandardCharsets.UTF_8))) {
+					StringBuilder errorResponse = new StringBuilder();
+					String responseLine = null;
+					while ((responseLine = br.readLine()) != null) {
+						errorResponse.append(responseLine.trim());
+					}
+
+					logger.log(Level.ERROR, String.format("LLM connection error code %d response: %s", con.getResponseCode(), errorResponse));
+
+					throw new Exception("Server returned " + con.getResponseCode() + " status code.");
+				}
+			}
+
+		} catch (Exception e) {
+			buttonLlmConnection.setBackground(Color.RED);
+			if(e.getMessage() != null && !e.getMessage().isEmpty()) {
+				logger.log(Level.ERROR, String.format("LLM connection exception %s", e.getMessage()));
+			}
+		}
+	}
+
 	// show a file dialog to choose the LLM Fewshot File
 	private void chooseFewshotFileFileActionPerformed(ActionEvent evt, JTextField textField) {
 		JFileChooser fd = new JFileChooser();
@@ -237,20 +329,21 @@ public class LlmPanel extends SettingsPanel {
 
 	// Remove the last JTextArea
 	private void removeLastTestGoalTextArea(ActionEvent evt) {
-		if (!testGoalTextAreas.isEmpty()) {
-			int lastIndex = testGoalTextAreas.size() - 1;
-			JTextArea lastTextArea = testGoalTextAreas.get(lastIndex);
+		int size = testGoalTextAreas.size();
+		if (size > 0) {
+			JTextArea lastTextArea = testGoalTextAreas.get(size - 1);
 
 			// Only remove if the text area is empty
-			if (lastTextArea.getText().trim().isEmpty()) {
-				JScrollPane lastScrollPane = testGoalScrollPanes.remove(lastIndex);
-				testGoalTextAreas.remove(lastIndex);
+			if (lastTextArea.getDocument().getLength() == 0) {
+				JScrollPane lastScrollPane = testGoalScrollPanes.get(size - 1);
 
+				testGoalTextAreas.remove(size - 1);
+				testGoalScrollPanes.remove(size - 1);
 				testGoalContainer.remove(lastScrollPane);
 				testGoalContainer.revalidate();
 				testGoalContainer.repaint();
 			} else {
-				JOptionPane.showMessageDialog(this, "Cannot remove a non-empty test goal. Please clear the content first.", 
+				JOptionPane.showMessageDialog(this, "Cannot remove a non-empty test goal. Please clear the content first.",
 						"Warning", JOptionPane.WARNING_MESSAGE);
 			}
 		}

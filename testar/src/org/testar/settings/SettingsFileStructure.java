@@ -339,6 +339,12 @@ public class SettingsFileStructure {
 				, ConfigTags.ListeningScript.name() + " = "
 				, ""
 				, "#################################################################"
+				, "# Extended test oracles"
+				, "#################################################################"
+				, ""
+				, ConfigTags.ExtendedOracles.name() + " = "
+				, ""
+				, "#################################################################"
 				, "# Settings to configure code coverage features"
 				, "#################################################################"
 				, ""
@@ -355,6 +361,7 @@ public class SettingsFileStructure {
 		List<Tag<?>> secondarySettingsList = new ArrayList<>();
 		secondarySettingsList.add(ConfigTags.ShowVisualSettingsDialogOnStartup);
 		secondarySettingsList.add(ConfigTags.ForceForeground);
+		secondarySettingsList.add(ConfigTags.SpyTagAttributes);
 		secondarySettingsList.add(ConfigTags.VisualizeActions);
 		secondarySettingsList.add(ConfigTags.FormFillingAction);
 		secondarySettingsList.add(ConfigTags.LogLevel);

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -64,8 +64,8 @@ public final class PasteText extends TaggableBase implements Action {
 		Assert.isTrue(duration >= 0);
 		Assert.notNull(system);
 
-		//TODO: Refactor this hacky way of changing the final text of Type actions
-		//TODO: This is necessary for LLMs decisions but may alter the actions abstraction
+		// Tag used to change the final text of PasteText actions
+		// This is necessary for LLMs decisions but may alter the actions abstraction
 		String inputText = this.get(Tags.InputText, this.text);
 
 		StringSelection selection = new StringSelection(inputText);

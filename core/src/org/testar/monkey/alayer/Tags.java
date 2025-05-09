@@ -221,9 +221,17 @@ public final class Tags extends TagsBase {
 	public static final Tag<String> InputText = from("InputText", String.class);
 
 	/**
-	 * Provides timing information about the state rendering process, 
-	 * measuring when the main content becomes visible or ready for interaction. 
+	 * Provides timing information about the state rendering process,
+	 * measuring when the main content becomes visible or ready for interaction.
 	 */
 	public static final Tag<Double> StateRenderTime = from("StateRenderTime", Double.class);
+
+	/**
+	 * This method will return all the static tags that are available for use.
+	 * @return
+	 */
+	public static Set<Tag<?>> getAllTags() {
+		return tagSet;
+	}
 
 }

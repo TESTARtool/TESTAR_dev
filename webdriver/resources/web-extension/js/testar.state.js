@@ -170,6 +170,7 @@ function wrapElementTestar(element, xOffset, yOffset) {
         checked: element.checked,
         selected: element.selected,
         display: computedStyle.getPropertyValue('display'),
+        computedFontSize: window.getComputedStyle(element).fontSize,
         innerHTML: element.innerHTML,
         outerHTML: element.outerHTML,
 

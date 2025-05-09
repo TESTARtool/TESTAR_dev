@@ -73,6 +73,11 @@ public class ActionStandardPromptGenerator implements IPromptActionGenerator {
         this.descriptionTag = descriptionTag;
     }
 
+    @Override
+    public Tag<String> getDescriptionTag() {
+        return this.descriptionTag;
+    }
+
     /**
      * Generates a standard prompt for use with large language models.
      * @param actions Available actions in the current state.

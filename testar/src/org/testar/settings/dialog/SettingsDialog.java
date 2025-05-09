@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -86,16 +86,15 @@ public class SettingsDialog extends JFrame implements Observer {
   private JButton btnViewModel;
 
   private StateModelPanel modelPanel;
-  //private JButton btnRecord; // Record mode is disabled temporally
 
   private static final int GENERAL_TAB_INDEX = 1;
   private static final int FILTER_TAB_INDEX = 2;
   private static final int ORACLES_TAB_INDEX = 3;
   private static final int TIMES_TAB_INDEX = 4;
-  //private static final int MISC_TAB_INDEX = 5;
   private static final int MODEL_TAB_INDEX = 5;
   private static final int LLM_TAB_INDEX = 6;
-  private static final int ADVANCED_TAB_INDEX = 7;
+  private static final int SPY_TAB_INDEX = 7;
+  private static final int ADVANCED_TAB_INDEX = 8;
   private final Map<Integer, Pair<String, SettingsPanel>> settingPanels = new HashMap<>();
 
   /**
@@ -267,12 +266,11 @@ public class SettingsDialog extends JFrame implements Observer {
     btnListeningScript.setVisible(false);
 
     btnView = getBtnView();
+
     btnViewReport = getBtnViewReport();
     btnViewReport.setVisible(false);
     btnViewModel = getBtnViewModel();
     btnViewModel.setVisible(false);
-
-    //btnRecord = getBtnRecord(); // Record mode is disabled temporally
 
     jTabsPane = new JTabbedPane();
     jTabsPane.addTab("About", new AboutPanel());
@@ -280,9 +278,9 @@ public class SettingsDialog extends JFrame implements Observer {
     settingPanels.put(FILTER_TAB_INDEX, new Pair<>("Filters", new FilterPanel()));
     settingPanels.put(ORACLES_TAB_INDEX, new Pair<>("Oracles", new OraclePanel()));
     settingPanels.put(TIMES_TAB_INDEX, new Pair<>("Time Settings", new TimingPanel()));
-    //settingPanels.put(MISC_TAB_INDEX, new Pair<>("Misc", new MiscPanel())); // TODO: Misc panel is disabled temporally from the GUI
     settingPanels.put(MODEL_TAB_INDEX, new Pair<>("State Model", modelPanel = StateModelPanel.createStateModelPanel()));
     settingPanels.put(LLM_TAB_INDEX, new Pair<>("LLMs", new LlmPanel()));
+    settingPanels.put(SPY_TAB_INDEX, new Pair<>("Spy mode", new SpyModePanel()));
     settingPanels.put(ADVANCED_TAB_INDEX, new Pair<>("Advanced Options", new AdvancedPanel()));
 
     settingPanels.forEach((k,v) -> jTabsPane.add(v.left(),v.right()));
@@ -351,7 +349,6 @@ public class SettingsDialog extends JFrame implements Observer {
                             .addComponent(btnReplay, PREFERRED_SIZE, 129, PREFERRED_SIZE)
                             .addComponent(btnListening, PREFERRED_SIZE, 129, PREFERRED_SIZE)
                             .addComponent(btnView, PREFERRED_SIZE, 129, PREFERRED_SIZE)
-                            //.addComponent(btnRecord, PREFERRED_SIZE, 129, PREFERRED_SIZE) // Record mode is disabled temporally
                     )
                     // Listening group
                     .addGroup(layout.createParallelGroup(Alignment.LEADING)
@@ -362,7 +359,7 @@ public class SettingsDialog extends JFrame implements Observer {
                     		.addComponent(btnViewReport, PREFERRED_SIZE, 129, PREFERRED_SIZE)
                     		.addComponent(btnViewModel, PREFERRED_SIZE, 129, PREFERRED_SIZE))
                 .addPreferredGap(RELATED)
-                .addComponent(jTabsPane, PREFERRED_SIZE, 400, PREFERRED_SIZE)
+                .addComponent(jTabsPane, PREFERRED_SIZE, 430, PREFERRED_SIZE)
                 .addContainerGap())
     );
   }
@@ -374,8 +371,6 @@ public class SettingsDialog extends JFrame implements Observer {
     group.addGap(2, 2, 2);
     group.addComponent(btnGenerate, 120, 120, 120);
     group.addGap(2, 2, 2);
-    //group.addComponent(btnRecord, 120, 120, 120); // Record mode is disabled temporally
-    //group.addGap(2, 2, 2);
     group.addComponent(btnReplay, 120, 120, 120);
     group.addGap(2, 2, 2);
     group.addComponent(btnListening, 120, 120, 120);
@@ -571,21 +566,6 @@ public class SettingsDialog extends JFrame implements Observer {
 	  jTabsPane.setSelectedIndex(MODEL_TAB_INDEX);
 	  modelPanel.openServer();
   }
-
-// Record mode is disabled temporally
-//  private JButton getBtnRecord() throws IOException {
-//	  JButton btn = new JButton();
-//	  btn.setBackground(new Color(255, 255, 255));
-//	  btn.setIcon(new ImageIcon(loadIcon("/icons/button_record.png")));
-//	  btn.setToolTipText(ToolTipTexts.btnRecordTTT);
-//	  btn.setFocusPainted(false);
-//	  btn.addActionListener(this::btnRecordActionPerformed);
-//	  return btn;
-//  }
-//
-//  private void btnRecordActionPerformed(ActionEvent evt) {
-//	  start(RuntimeControlsProtocol.Modes.Record);
-//  }
 
   @Override
   public void update(Observable o, Object arg) {

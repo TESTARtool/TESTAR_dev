@@ -127,6 +127,8 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.11.0'
     // https://mvnrepository.com/artifact/org.eclipse.angus/jakarta.mail
     implementation group: 'org.eclipse.angus', name: 'jakarta.mail', version: '2.0.3'
+    // https://mvnrepository.com/artifact/org.checkerframework/checker
+    implementation("org.checkerframework:checker:3.49.1")
 }
 
 task prepareSettings(type: Copy) {
