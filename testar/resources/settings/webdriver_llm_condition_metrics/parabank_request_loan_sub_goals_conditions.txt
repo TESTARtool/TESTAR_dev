@@ -1,0 +1,5 @@
+As a user, I want to log in with the credentials john/demo
+Check: John Smith
+;
+As a user, I want to request a loan with an amount '999999' and a down payment of '100'
+Check: <p class="error">We cannot grant a loan in that amount with your available funds.</p>

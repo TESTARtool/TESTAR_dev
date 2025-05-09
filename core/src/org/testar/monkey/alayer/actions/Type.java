@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -28,9 +29,6 @@
 *******************************************************************************************************/
 
 
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.testar.monkey.alayer.actions;
 
 import java.nio.charset.Charset;
@@ -65,16 +63,20 @@ public final class Type extends TaggableBase implements Action {
 	public void run(SUT system, State state, double duration) throws ActionFailedException {
 		Assert.isTrue(duration >= 0);
 		Assert.notNull(system);
-		
-		double d = duration / text.length();
+
+		// Tag used to change the final text of Type actions
+		// This is necessary for LLMs decisions but may alter the actions abstraction
+		String inputText = this.get(Tags.InputText, this.text);
+
+		double d = duration / inputText.length();
 		Action shiftDown = new KeyDown(KBKeys.VK_SHIFT);
 		Action shiftUp = new KeyUp(KBKeys.VK_SHIFT);
 
-		for(int i = 0; i < text.length(); i++){
+		for(int i = 0; i < inputText.length(); i++){
 
 			try {
 
-				char c = text.charAt(i);
+				char c = inputText.charAt(i);
 				boolean shift = false;
 
 				if(Character.isLetter(c)){
@@ -116,9 +118,8 @@ public final class Type extends TaggableBase implements Action {
         throw new IllegalArgumentException("Unable to find the corresponding keycode for character '" + c + "(" + ((int)c) +  ")'!");
     }
 	
-	public String toString(){ return "Type text '" + text + "'"; }
-	
-	// by urueda
+	public String toString(){ return "Type text '" + this.get(Tags.InputText, this.text) + "'"; }
+
 	@Override
 	public String toString(Role... discardParameters) {
 		for (Role r : discardParameters){
@@ -128,7 +129,6 @@ public final class Type extends TaggableBase implements Action {
 		return toString();
 	}	
 
-	// by urueda
 	@Override
 	public String toShortString() {
 		Role r = get(Tags.Role, null);
@@ -138,10 +138,9 @@ public final class Type extends TaggableBase implements Action {
 			return toString();
 	}
 
-	// by urueda
 	@Override
 	public String toParametersString() {
-		return "(" + text + ")";
+		return "(" + this.get(Tags.InputText, this.text) + ")";
 	}
 	
 }

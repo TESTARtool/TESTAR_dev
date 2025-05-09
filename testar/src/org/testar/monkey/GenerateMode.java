@@ -141,6 +141,7 @@ public class GenerateMode {
 				protocol.sequenceCount++;
 
 			} catch (Exception e) { //TODO figure out what kind of exceptions can happen here
+				e.printStackTrace();
 				String message = "Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", TESTAR throws exception";
 				System.out.println(message);
 				StringJoiner stackTrace = new StringJoiner(System.lineSeparator());
@@ -148,7 +149,6 @@ public class GenerateMode {
 				Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).forEach(stackTrace::add);
 				protocol.stateModelManager.notifyTestSequenceInterruptedBySystem(stackTrace.toString());
 				exceptionThrown = true;
-				e.printStackTrace();
 				protocol.emergencyTerminateTestSequence(system, e);
 			}
 		}
@@ -176,25 +176,26 @@ public class GenerateMode {
 	 * @param system
 	 */
 	private Verdict runGenerateInnerLoop(DefaultProtocol protocol, SUT system, State state) {
+
+		//Deriving actions from the state:
+		Set<Action> actions = protocol.deriveActions(system, state);
+		protocol.buildStateActionsIdentifiers(state, actions);
+
+		// First check if we have some pre select action to execute (retryDeriveAction or ESC)
+		actions = protocol.preSelectAction(system, state, actions);
+
+		// notify to state model the current state
+		protocol.stateModelManager.notifyNewStateReached(state, actions);
+
 		/*
 		 ***** INNER LOOP:
 		 */
-		while (protocol.mode() != Modes.Quit && protocol.moreActions(state)) {
+		while (protocol.mode() != Modes.Quit && protocol.moreActions(protocol.getState(system))) {
 
 			// getState() including getVerdict() that is saved into the state:
 			LogSerialiser.log("Obtained system state in inner loop of TESTAR...\n", LogSerialiser.LogLevel.Debug);
 			protocol.cv.begin();
 			Util.clear(protocol.cv);
-
-			//Deriving actions from the state:
-			Set<Action> actions = protocol.deriveActions(system, state);
-			protocol.buildStateActionsIdentifiers(state, actions);
-
-			// First check if we have some pre select action to execute (retryDeriveAction or ESC)
-			actions = protocol.preSelectAction(system, state, actions);
-
-			// notify to state model the current state
-			protocol.stateModelManager.notifyNewStateReached(state, actions);
 
 			//Showing the green dots if visualization is on:
 			if(protocol.visualizationOn) {
@@ -226,13 +227,17 @@ public class GenerateMode {
 
 			// fetch the new state
 			state = protocol.getState(system);
+
+			//Deriving actions from the state:
+			actions = protocol.deriveActions(system, state);
+			protocol.buildStateActionsIdentifiers(state, actions);
+
+			// First check if we have some pre select action to execute (retryDeriveAction or ESC)
+			actions = protocol.preSelectAction(system, state, actions);
+
+			// notify to state model the current state
+			protocol.stateModelManager.notifyNewStateReached(state, actions);
 		}
-
-		// notify to state model the last state
-		Set<Action> actions = protocol.deriveActions(system, state);
-		protocol.buildStateActionsIdentifiers(state, actions);
-
-		protocol.stateModelManager.notifyNewStateReached(state, actions);
 
 		return protocol.getVerdict(state);
 	}

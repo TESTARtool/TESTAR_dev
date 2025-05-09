@@ -110,6 +110,38 @@ public final class ConfigTags {
 			"Specify the widget attributes that you wish to use in constructing the widget and state hash strings. Use a comma separated list.");
 
 	/**
+	 * Large Language Models settings 
+	 */
+
+	public static final Tag<String> LlmPlatform = Tag.from("LlmPlatform", String.class,
+			"The platform that hosts the LLM agent");
+
+	public static final Tag<String> LlmModel = Tag.from("LlmModel", String.class,
+			"The model used by the LLM agent");
+
+	public static final Tag<String> LlmHostUrl = Tag.from("LlmHostUrl", String.class,
+			"The Host URL on which the LLM agent is running");
+
+	public static final Tag<String> LlmAuthorizationHeader = Tag.from("LlmAuthorizationHeader", String.class, 
+			"The Authorization Header required by some LLM agents");
+
+	@SuppressWarnings("unchecked")
+	public static final Tag<List<String>> LlmTestGoals = Tag.from("LlmTestGoals", (Class<List<String>>) (Class<?>) List.class,
+			"The objective of the test for the LLM agent");
+
+	public static final Tag<String> LlmActionFewshotFile = Tag.from("LlmActionFewshotFile", String.class,
+			"The location of the action fewshot file that contains the prompt instructions");
+
+	public static final Tag<String> LlmOracleFewshotFile = Tag.from("LlmOracleFewshotFile", String.class,
+			"The location of the oracle fewshot file that contains the prompt instructions");
+
+	public static final Tag<Float> LlmTemperature = Tag.from("LlmTemperature", Float.class,
+			"Controls the randomness of the LLM output. Value between 0 and 2.");
+
+	public static final Tag<Integer> LlmHistorySize = Tag.from("LlmHistorySize", Integer.class,
+			"Controls how many historical actions are kept track of and sent to the LLM.");
+
+	/**
 	 * WebDriver settings 
 	 */
 
