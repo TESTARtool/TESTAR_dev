@@ -105,6 +105,10 @@ public class SpyModePanel extends SettingsPanel {
         });
         middle.add(allExclude);
 
+        // This should not be in the main branch, just a quick visual change
+        middle.add(new JLabel(" "));
+        middle.add(new JLabel(" "));
+
         JButton restoreTags = new JButton("Defaults");
         restoreTags.addActionListener(e -> { setDefaults(excludeTags, includeTags);});
         middle.add(restoreTags);    
