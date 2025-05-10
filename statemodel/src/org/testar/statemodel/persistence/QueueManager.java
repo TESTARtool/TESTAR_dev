@@ -33,6 +33,7 @@ package org.testar.statemodel.persistence;
 import org.testar.statemodel.event.StateModelEvent;
 import org.testar.statemodel.event.StateModelEventListener;
 import org.testar.statemodel.exceptions.InvalidEventException;
+import org.testar.statemodel.persistence.orientdb.entity.EntityManager;
 import org.testar.statemodel.sequence.Sequence;
 import org.testar.statemodel.sequence.SequenceManager;
 import org.testar.statemodel.sequence.SequenceNode;
@@ -212,5 +213,10 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
     @Override
     public void setListening(boolean listening) {
         this.listening = listening;
+    }
+
+    @Override
+    public EntityManager getEntityManager() {
+    	return null;
     }
 }

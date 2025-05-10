@@ -30,6 +30,8 @@
 
 package org.testar.monkey.alayer.webdriver.enums;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,6 +45,8 @@ import org.testar.monkey.alayer.TagsBase;
  */
 public class WdTags extends TagsBase {
 
+  protected static final Set<Tag<?>> wdTags = new HashSet<>();
+	
   private WdTags() {
   }
 
@@ -125,6 +129,11 @@ public class WdTags extends TagsBase {
    */
   public static final Tag<String> WebDisplay = from("WebDisplay", String.class);
   
+  /**
+   * Web computed font size of a widget.
+   */
+  public static final Tag<String> WebComputedFontSize = from("WebComputedFontSize", String.class);
+
   /**
    * Web type of input of a widget.
    */
@@ -264,6 +273,11 @@ public class WdTags extends TagsBase {
   public static final Tag<String> WebOuterHTML = from("WebOuterHTML", String.class);
 
   /**
+   * Represents the placeholder text in an <input> or <textarea> element.
+   */
+  public static final Tag<String> WebPlaceholder = from("WebPlaceholder", String.class);
+
+  /**
    * Represents the remote web element object obtained with Selenium framework
    */
   public static final Tag<WebElement> WebElementSelenium = from("WebElementSelenium", WebElement.class);
@@ -278,4 +292,13 @@ public class WdTags extends TagsBase {
 	  return tagSet;
   }
 
+  protected static <T> Tag<T> from(String name, Class<T> valueType) {
+    Tag<T> tag = TagsBase.from(name, valueType);
+    wdTags.add(tag);
+    return tag;
+  }
+
+  public static Set<Tag<?>> getWdTags() {
+    return Collections.unmodifiableSet(wdTags);
+  }
 }

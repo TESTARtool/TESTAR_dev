@@ -216,6 +216,11 @@ public final class Tags extends TagsBase {
 	public static final Tag<Widget> OriginWidget = from("OriginWidget", Widget.class);
 
 	/**
+	 * The input text for a type or paste action
+	 */
+	public static final Tag<String> InputText = from("InputText", String.class);
+
+	/**
 	 * Provides timing information about the state rendering process,
 	 * measuring when the main content becomes visible or ready for interaction.
 	 */

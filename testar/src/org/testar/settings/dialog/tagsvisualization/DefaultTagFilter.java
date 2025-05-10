@@ -30,7 +30,6 @@
 
 package org.testar.settings.dialog.tagsvisualization;
 
-import org.testar.StateManagementTags;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
@@ -48,7 +47,6 @@ public class DefaultTagFilter {
         // Fill the list with all the available tags.
         List<Tag<?>> tmpList = new ArrayList<>(UIATags.getAllTags());
         tmpList.addAll(Tags.getAllTags());
-        tmpList.addAll(StateManagementTags.getAllSettingsTags());
         tmpList.addAll(WdTags.getAllTags());
         allAvailableTags = Collections.unmodifiableList(tmpList);
     }
@@ -64,25 +62,14 @@ public class DefaultTagFilter {
     }
 
     public static Tag<?> findTagByName(String name) {
-        Tag<?> tag = StateManagementTags.getTagFromSettingsString(name);
+        Tag<?> tag = findTagByName(name, UIATags.getAllTags());
         if (tag == null) {
             tag = findTagByName(name, Tags.getAllTags());
-        }
-        if (tag == null) {
-            tag = findTagByName(name, UIATags.getAllTags());
         }
         if (tag == null) {
             tag = findTagByName(name, WdTags.getAllTags());
         }
         return tag;
-    }
-
-    public static String getSettingsStringFromTag(Tag<?> tag) {
-        String tagSettingsName = StateManagementTags.getSettingsStringFromTag(tag);
-        if (tagSettingsName == null) {
-            tagSettingsName = tag.name();
-        }
-        return tagSettingsName;
     }
 
 }

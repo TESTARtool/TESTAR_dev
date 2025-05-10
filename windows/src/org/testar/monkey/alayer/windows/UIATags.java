@@ -39,6 +39,7 @@ import org.testar.monkey.alayer.Rect;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.TagsBase;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -46,7 +47,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public final class UIATags extends TagsBase {
-	
+
+	protected static final Set<Tag<?>> uiaTags = new HashSet<>();
+
 	private UIATags() {}
 
 
@@ -1176,4 +1179,13 @@ public final class UIATags extends TagsBase {
 		return tagActiveMapping.getOrDefault(tag, false);
 	}
 
+	protected static <T> Tag<T> from(String name, Class<T> valueType) {
+		Tag<T> tag = TagsBase.from(name, valueType);
+		uiaTags.add(tag);
+		return tag;
+	}
+
+	public static Set<Tag<?>> getUIATags() {
+		return Collections.unmodifiableSet(uiaTags);
+	}
 }

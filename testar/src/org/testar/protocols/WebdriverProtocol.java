@@ -311,7 +311,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     				String consoleErrorMsg = logEntry.getMessage();
     				Matcher matcherError = errorPattern.matcher(consoleErrorMsg);
     				if(matcherError.matches()) {
-    					webConsoleVerdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TAG, "Web Browser Console Error: " + consoleErrorMsg);
+    					webConsoleVerdict = new Verdict(Verdict.Severity.SUSPICIOUS_TAG, "Web Browser Console Error: " + consoleErrorMsg);
     				}
     			}
     		}
@@ -332,7 +332,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     				String consoleWarningMsg = logEntry.getMessage();
     				Matcher matcherWarning = warningPattern.matcher(consoleWarningMsg);
     				if(matcherWarning.matches()) {
-    					webConsoleVerdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TAG, "Web Browser Console Warning: " + consoleWarningMsg);
+    					webConsoleVerdict = new Verdict(Verdict.Severity.SUSPICIOUS_TAG, "Web Browser Console Warning: " + consoleWarningMsg);
     				}
     			}
     		}
@@ -358,7 +358,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     		System.out.println(String.format("** URL: %s", WdDriver.getCurrentUrl()));
     		System.out.println("** Please try to navigate with SPY mode and configure clickableClasses inside Java protocol");
     		// Create and build the id of the HistoryBackAction
-    		Action histBackAction = new WdHistoryBackAction();
+    		Action histBackAction = new WdHistoryBackAction(state);
     		buildEnvironmentActionIdentifiers(state, histBackAction);
     		actions = new HashSet<>(Collections.singletonList(histBackAction));
     	}
@@ -422,7 +422,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 * Check the state if we need to force an action
 	 */
 	protected Set<Action> detectForcedActions(State state, StdActionCompiler ac) {
-		Set<Action> actions = detectForcedDeniedUrl();
+		Set<Action> actions = detectForcedDeniedUrl(state);
 		if (actions != null && actions.size() > 0) {
 			return actions;
 		}
@@ -515,18 +515,18 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	/*
 	 * Force back action due to disallowed domain or extension
 	 */
-	protected Set<Action> detectForcedDeniedUrl() {
+	protected Set<Action> detectForcedDeniedUrl(State state) {
 		String currentUrl = WdDriver.getCurrentUrl();
 
 		// Don't get caught in PDFs etc. and non-whitelisted domains
 		if (isUrlDenied(currentUrl) || isExtensionDenied(currentUrl)) {
 			// If opened in new tab, close it
 			if (WdDriver.getWindowHandles().size() > 1) {
-				return new HashSet<>(Collections.singletonList(new WdCloseTabAction()));
+				return new HashSet<>(Collections.singletonList(new WdCloseTabAction(state)));
 			}
 			// Single tab, go back to previous page
 			else {
-				return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
+				return new HashSet<>(Collections.singletonList(new WdHistoryBackAction(state)));
 			}
 		}
 
