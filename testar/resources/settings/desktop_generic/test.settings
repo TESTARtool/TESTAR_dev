@@ -108,6 +108,16 @@ ProcessesToKillDuringTest =
 ProtocolClass = desktop_generic/Protocol_desktop_generic
 
 #################################################################
+# System Under Test (SUT) identification
+#
+# ApplicationName: Name to identify the SUT.
+# ApplicationVersion: Version to identify the SUT.
+#################################################################
+
+ApplicationName = Notepad
+ApplicationVersion = 1.0
+
+#################################################################
 # State model inference settings
 #################################################################
 StateModelEnabled = false

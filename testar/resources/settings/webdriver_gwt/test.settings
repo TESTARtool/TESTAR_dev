@@ -103,6 +103,16 @@ ProcessesToKillDuringTest =
 ProtocolClass = webdriver_gwt/Protocol_webdriver_gwt
 
 #################################################################
+# System Under Test (SUT) identification
+#
+# ApplicationName: Name to identify the SUT.
+# ApplicationVersion: Version to identify the SUT.
+#################################################################
+
+ApplicationName = gwt
+ApplicationVersion = 1.0
+
+#################################################################
 # State identifier attributes
 #
 # Specify the widget attributes that you wish to use in constructing
