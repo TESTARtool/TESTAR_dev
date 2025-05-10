@@ -113,7 +113,7 @@ AbstractStateAttributes = WebWidgetId
 #################################################################
 # WebDriver features
 #################################################################
-ClickableClasses = selectItemLiteText;etreeCell;etreeCellSelected;etreeCellSelectedOver;checkboxFalse;checkboxFalseOver;checkboxTrue;checkboxTrueOver;showcaseTileIcon;vScrollStart;vScrollEnd
+ClickableClasses = selectItemLiteText;etreeCell;etreeCellSelected;etreeCellSelectedOver;showcaseTileIcon;vScrollStart;vScrollEnd;sampleTypeLabelAnchor
 TypeableClasses = 
 DeniedExtensions = pdf;jpg;png;jsp
 WebDomainsAllowed = www.smartclient.com
