@@ -37,6 +37,7 @@ import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
+import org.testar.monkey.alayer.visualizers.ShapeVisualizer;
 import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
@@ -72,11 +73,6 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 	@Override
 	protected void initialize(Settings settings) {
 		super.initialize(settings);
-
-		// List of atributes to identify and close policy popups
-		// Set to null to disable this feature
-		policyAttributes = ArrayListMultimap.create();
-		policyAttributes.put("class", "lfr-btn-label");
 
 		// Reset the list when we start a new TESTAR run with multiple sequences
 		listOfDetectedErroneousVerdicts = new ArrayList<>();
@@ -128,28 +124,6 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 		waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","password", "demo", state, system, 5,1.0);
 
 		waitAndLeftClickWidgetWithMatchingTag("value", "Log In", state, system, 5, 1.0);
-		 */
-
-		/*
-		 * If you have issues typing special characters
-		 * 
-		 * Try to use Paste Action with method:
-		 * waitLeftClickAndPasteIntoWidgetWithMatchingTag
-		 */
-		// waitLeftClickAndPasteIntoWidgetWithMatchingTag("name", "username", "john", state, system, 5,1.0);
-
-
-		/*
-		 * You can also use multiple Tags to find the correct widget. 
-		 * This is because some widgets have common Tags Values.  
-		 */
-		/*
-		Map<String, String> mapParabank = new HashMap<String, String>();
-		mapParabank.put("Href", "about.htm");
-		mapParabank.put("TextContent", "About Us");
-		mapParabank.put("Display", "inline");
-
-		waitAndLeftClickWidgetWithMatchingTags(mapParabank, state, system, 5, 1.0);
 		 */
 	}
 
@@ -214,14 +188,15 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 
 		// ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
 
-		Verdict leafWidgetsOverlappingVerdict = leafWidgetsOverlapping(state);
-
 		// If the Custom Verdict is not OK but was already detected in a previous sequence
 		// Consider as OK to avoid duplicates
-		if (leafWidgetsOverlappingVerdict != Verdict.OK 
-				&& !containsVerdictInfo(listOfDetectedErroneousVerdicts, leafWidgetsOverlappingVerdict.info())) {
-			return leafWidgetsOverlappingVerdict;
+		/*
+		Verdict widgetImageWithoutAlternativeTextVerdict = widgetImageWithoutAlternativeText(state);
+		if (widgetImageWithoutAlternativeTextVerdict != Verdict.OK 
+				&& !containsVerdictInfo(listOfDetectedErroneousVerdicts, widgetImageWithoutAlternativeTextVerdict.info())) {
+			return widgetImageWithoutAlternativeTextVerdict;
 		}
+		*/
 
 		return Verdict.OK;
 	}
@@ -230,41 +205,25 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 		return listOfDetectedErroneousVerdicts.stream().anyMatch(verdictInfo -> verdictInfo.contains(currentVerdictInfo.replace("\n", " ")));
 	}
 
-	public Verdict leafWidgetsOverlapping(State state) {
-		// Prepare a list that contains all the Rectangles from the leaf widgets
-		List<Pair<Widget, Rect>> leafWidgetsRects = new ArrayList<>();
-		for (Widget w : state) {
-			if (w.get(WdTags.WebIsFullOnScreen, false) 
-					&& w.childCount() < 1 
-					&& w.get(Tags.Shape, null) != null) {
-				leafWidgetsRects.add(new Pair<Widget, Rect>(w, (Rect)w.get(Tags.Shape)));
-			}
-		}
-		// Detect if the Rectangles of two leaf widgets are overlapping in an intersection
-		for (int i = 0; i < leafWidgetsRects.size(); i++) {
-			for (int j = i + 1; j < leafWidgetsRects.size(); j++) {
-				Rect rectOne = leafWidgetsRects.get(i).right();
-				Rect rectTwo = leafWidgetsRects.get(j).right();
+	public Verdict widgetImageWithoutAlternativeText(State state) {
+		// Check if some widget of the state
+		for(Widget widget : state) {
+			//  Is a widget image (<img>) and if it lacks alternative text
+			if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdIMG)
+					&& (widget.get(WdTags.WebAlt, null) == null || widget.get(WdTags.WebAlt, "").isBlank())) {
 
-				if (Rect.intersect(rectOne, rectTwo)) {
+				String verdictMsg = String.format(
+						"Detected web image widgets '%s' without alternative text!", 
+						widget.get(WdTags.WebTitle, "")
+						);
 
-					Widget firstWidget = leafWidgetsRects.get(i).left();
-					Widget secondWidget = leafWidgetsRects.get(j).left();
+				Visualizer visualizer = new ShapeVisualizer(
+						getRedPen(), 
+						widget.get(Tags.Shape, Rect.from(0, 0, 0, 0)), 
+						"Accessibility Fault", 
+						0.5, 0.5);
 
-					String verdictMsg = String.format(
-							"Two leaf widgets are overlapping. First: %s, Second: %s",
-							firstWidget.get(WdTags.WebTextContent, ""),
-							secondWidget.get(WdTags.WebTextContent, "")
-							);
-
-					Visualizer visualizer = new RegionsVisualizer(
-							getRedPen(),
-							getWidgetRegions(Arrays.asList(firstWidget, secondWidget)),
-							"Invariant Fault",
-							0.5, 0.5);
-
-					return new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, visualizer);
-				}
+				return new Verdict(Verdict.Severity.WARNING_ACCESSIBILITY_FAULT, verdictMsg, visualizer);
 			}
 		}
 
@@ -277,18 +236,6 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 				.setFillPattern(FillPattern.None)
 				.setStrokePattern(StrokePattern.Solid)
 				.build();
-	}
-
-	private List<Shape> getWidgetRegions(List<Widget> widgets) {
-		if (widgets == null || widgets.isEmpty()) {
-			return new ArrayList<>();
-		}
-
-		return widgets.stream()
-				.map(widget -> widget.get(Tags.Shape, null))
-				.filter(shape -> shape != null)
-				.filter(shape -> shape instanceof Rect)
-				.collect(Collectors.toList());
 	}
 
 	/**

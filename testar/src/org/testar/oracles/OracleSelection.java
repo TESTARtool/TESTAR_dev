@@ -40,7 +40,6 @@ import org.reflections8.Reflections;
 public class OracleSelection {
 
 	private static String[] oraclePackages = {
-			"org.testar.oracles.generic.visual",
 			"org.testar.oracles.web.accessibility",
 			"org.testar.oracles.web.invariants",
 	};
