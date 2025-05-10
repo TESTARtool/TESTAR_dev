@@ -188,8 +188,6 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 
 		// ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
 
-		// If the Custom Verdict is not OK but was already detected in a previous sequence
-		// Consider as OK to avoid duplicates
 		/*
 		Verdict widgetImageWithoutAlternativeTextVerdict = widgetImageWithoutAlternativeText(state);
 		if (widgetImageWithoutAlternativeTextVerdict != Verdict.OK 
