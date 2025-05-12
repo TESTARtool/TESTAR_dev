@@ -172,10 +172,10 @@ LlmModel = gpt-4o-mini
 LlmHostUrl = https://api.openai.com/v1/chat/completions
 LlmAuthorizationHeader = Bearer %OPENAI_API%
 LlmActionFewshotFile = prompts/fewshot_openai_action.json
-LlmOracleFewshotFile = prompts/fewshot_openai_oracle.json
+LlmOracleFewshotFile = 
 LlmTemperature = 0.2
 LlmHistorySize = 5
-LlmTestGoals = As a user, I want to log in with the credentials john/demo\\nThen a Request Loan link is shown;As a user, I want to request a loan with an amount '999999', a down payment of '100', for the account '54321'\\nThen the loan is denied due to insufficient funds
+LlmTestGoals = Use the username 'john' and the password 'demo' to log in the application\\nCheck: Welcome John Smith
 
 #################################################################
 # WebDriver features

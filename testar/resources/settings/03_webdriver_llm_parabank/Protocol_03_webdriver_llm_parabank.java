@@ -32,7 +32,6 @@ import org.testar.CodingManager;
 import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
 import org.testar.llm.LlmTestGoal;
-import org.testar.llm.prompt.OracleWebPromptGenerator;
 import org.testar.llm.prompt.ActionWebPromptGenerator;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.alayer.*;
@@ -41,12 +40,14 @@ import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
-import org.testar.oracles.llm.LlmOracle;
 import org.testar.plugin.NativeLinker;
 import org.testar.monkey.ConfigTags;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.settings.Settings;
 import org.testar.statemodel.analysis.condition.BasicConditionEvaluator;
+import org.testar.statemodel.analysis.condition.CheckStateCondition;
+import org.testar.statemodel.analysis.condition.ConditionEvaluator;
+
 import java.util.*;
 
 import static org.testar.monkey.alayer.Tags.Blocked;
@@ -58,12 +59,11 @@ public class Protocol_03_webdriver_llm_parabank extends WebdriverProtocol {
 
 	// The LLM Action selector needs to be initialize with the settings
 	private LlmActionSelector llmActionSelector;
+	private ConditionEvaluator conditionEvaluator;
+
 	private List<LlmTestGoal> testGoals = new ArrayList<>();
 	private Queue<LlmTestGoal> testGoalQueue;
 	private LlmTestGoal currentTestGoal;
-
-	// The LLM Oracle needs to be initialize with the settings
-	private LlmOracle llmOracle;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -81,8 +81,14 @@ public class Protocol_03_webdriver_llm_parabank extends WebdriverProtocol {
 		// Initialize the LlmActionSelector using the LLM settings
 		llmActionSelector = new LlmActionSelector(settings, new ActionWebPromptGenerator());
 
-		// Initialize the LlmOracle using the LLM settings
-		llmOracle = new LlmOracle(settings, new OracleWebPromptGenerator());
+		conditionEvaluator = new BasicConditionEvaluator();
+	}
+
+	private void setupTestGoals(List<String> testGoalsList) {
+		for(String testGoal : testGoalsList) {
+			CheckStateCondition stateEvaluator = new CheckStateCondition(WdTags.WebTextContent, testGoal);
+			testGoals.add(new LlmTestGoal(testGoal, stateEvaluator.getConditions()));
+		}
 	}
 
 	/**
@@ -96,18 +102,11 @@ public class Protocol_03_webdriver_llm_parabank extends WebdriverProtocol {
 		testGoalQueue = new LinkedList<>();
 		testGoalQueue.addAll(testGoals);
 		currentTestGoal = testGoalQueue.poll();
+		conditionEvaluator.clear();
+		conditionEvaluator.addConditions(currentTestGoal.getCompletionConditions());
 
 		// Reset llm action selector
 		llmActionSelector.reset(currentTestGoal, false);
-		// Reset llm oracle
-		llmOracle.reset(currentTestGoal, false);
-	}
-
-	private void setupTestGoals(List<String> testGoalsList) {
-		for(String testGoal : testGoalsList) {
-			// Empty BasicConditionEvaluator because the test goal decision is based on an LLM
-			testGoals.add(new LlmTestGoal(testGoal, new BasicConditionEvaluator().getConditions()));
-		}
 	}
 
 	/**
@@ -166,22 +165,20 @@ public class Protocol_03_webdriver_llm_parabank extends WebdriverProtocol {
 		// For web applications, web browser errors and warnings can also be enabled via settings
 		Verdict verdict = super.getVerdict(state);
 
-		// Use the LLM as an Oracle to determine if the test goal has been completed
-		Verdict llmVerdict = llmOracle.getVerdict(state);
-
-		if(llmVerdict.severity() == Verdict.Severity.LLM_COMPLETE.getValue()) {
+		// Apply state conditions to check if the test goal has been completed
+		if(conditionEvaluator.evaluateConditions(state)) {
 			// Test goal was completed, retrieve next test goal from queue.
 			currentTestGoal = testGoalQueue.poll();
 
 			// Poll returns null if there are no more items remaining in the queue.
 			if(currentTestGoal == null) {
 				// No more test goals remaining, terminate sequence.
-				System.out.println("Test goal completed, but no more test goals.");
-				return llmVerdict;
+				return new Verdict(Verdict.Severity.CONDITION_COMPLETE, "All test goal conditions completed.");
 			} else {
-				System.out.println("Test goal completed, moving to next test goal.");
 				llmActionSelector.reset(currentTestGoal, true);
-				llmOracle.reset(currentTestGoal, true);
+				conditionEvaluator.clear();
+				conditionEvaluator.addConditions(currentTestGoal.getCompletionConditions());
+				System.out.println("Test goal completed, moving to next test goal: " + currentTestGoal.getTestGoal());
 			}
 		}
 
