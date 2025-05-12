@@ -31,6 +31,10 @@
 package org.testar.statemodel.analysis.condition;
 
 import org.openqa.selenium.InvalidArgumentException;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Tag;
+import org.testar.monkey.alayer.Widget;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.statemodel.StateModelManager;
 import org.testar.statemodel.util.QueryHelper;
 
@@ -105,5 +109,28 @@ public class StateCondition extends TestCondition {
             default:
                 throw new InvalidArgumentException("Invalid comparator for condition!");
         }
+    }
+
+    @Override
+    public boolean evaluate(State state) {
+    	for(Widget widget : state) {
+    		// For web apps check the widget is visible
+    		if(widget.get(WdTags.WebIsFullOnScreen, true)) {
+    	    	for(Tag<?> tag : widget.tags()){
+    	    		if(tag.name().equals(getField()) && widget.get(tag, null) != null){
+    	    			try {
+    	    				String tagValue = widget.get(tag).toString();
+    	    				if(tagValue.contains(searchMessage)) {
+    	    					return true;
+    	    				}
+    	    			} catch (Exception e) {
+    	    				// Continue with next tag
+    	    			}
+    	    		}
+    	    	}
+    		}
+    	}
+
+    	return false;
     }
 }
