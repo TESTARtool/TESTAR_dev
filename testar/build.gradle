@@ -90,6 +90,7 @@ task deleteDebugging(type: Delete){
     delete 'settings'
     delete 'suts'
     delete 'output'
+    delete 'prompts'
     delete 'testar'
     delete 'testar.bat'
     delete 'windows.dll'
@@ -147,6 +148,11 @@ task prepareOracles(type: Copy) {
 task prepareOutputFolder(type: Copy) {
     from 'resources/output'
     into 'target/scripts/output'
+}
+
+task preparePrompts(type: Copy) {
+    from 'resources/prompts'
+    into 'target/scripts/prompts'
 }
 
 /**

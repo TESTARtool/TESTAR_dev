@@ -133,7 +133,6 @@ public class LlmPanel extends SettingsPanel {
 					buttonLlmConnection.setBackground(null);
 					fieldLlmAuthorizationHeader.setText("Bearer %OPENAI_API%");
 					fieldLlmActionFewshot.setText("prompts/fewshot_openai_action.json");
-					fieldLlmOracleFewshot.setText("prompts/fewshot_openai_oracle.json");
 					break;
 				case "Gemini":
 					fieldLlmHostUrl.setText("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=%GEMINI_API_KEY%");
@@ -141,7 +140,6 @@ public class LlmPanel extends SettingsPanel {
 					buttonLlmConnection.setBackground(null);
 					fieldLlmAuthorizationHeader.setText("");
 					fieldLlmActionFewshot.setText("prompts/fewshot_gemini_action.json");
-					fieldLlmOracleFewshot.setText("prompts/fewshot_gemini_oracle.json");
 					break;
 
 				default:
