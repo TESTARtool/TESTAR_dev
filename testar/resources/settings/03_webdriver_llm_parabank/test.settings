@@ -119,6 +119,16 @@ StartupTime = 2.0
 MaxTime = 3.1536E7
 
 #################################################################
+# System Under Test (SUT) identification
+#
+# ApplicationName: Name to identify the SUT.
+# ApplicationVersion: Version to identify the SUT.
+#################################################################
+
+ApplicationName = parabank
+ApplicationVersion = login
+
+#################################################################
 # State model inference settings
 #
 # StateModelEnabled: Enable or disable the State Model feature
@@ -146,8 +156,6 @@ DataStoreDB =
 DataStoreUser = 
 DataStorePassword = 
 DataStoreMode = none
-ApplicationName = parabank
-ApplicationVersion = loan_denied
 ActionSelectionAlgorithm = random
 StateModelStoreWidgets = true
 ResetDataStore = false
