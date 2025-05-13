@@ -356,6 +356,27 @@ public class LlmPanel extends SettingsPanel {
 		if (fd.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			File selectedFile = fd.getSelectedFile();
 
+			// Only allow files with .goal extension
+			if (!selectedFile.getName().toLowerCase().endsWith(".goal")) {
+				JOptionPane.showMessageDialog(this,
+						"Only files with the '.goal' extension are allowed.",
+						"Invalid File Type",
+						JOptionPane.WARNING_MESSAGE);
+				return;
+			}
+
+			// Show warning for goal files with long characters size
+			if (selectedFile.length() > 500) {
+				int choice = JOptionPane.showConfirmDialog(this,
+						"Loading long '.goal' files may provoke undesired behaviour. Do you want to continue?",
+						"Large File Warning",
+						JOptionPane.YES_NO_OPTION,
+						JOptionPane.WARNING_MESSAGE);
+				if (choice != JOptionPane.YES_OPTION) {
+					return;
+				}
+			}
+
 			try (BufferedReader reader = new BufferedReader(new FileReader(selectedFile))) {
 				StringBuilder content = new StringBuilder();
 				String line;
@@ -366,20 +387,23 @@ public class LlmPanel extends SettingsPanel {
 
 				// Refill the text area with the file content
 				testGoalTextAreas.clear();
+				testGoalScrollPanes.clear();
 				testGoalContainer.removeAll();
+
 				List<String> goals = Arrays.asList(content.toString().split(";", -1));
 				for (String goal : goals) {
 					addTestGoalTextArea(null);
 					testGoalTextAreas.get(testGoalTextAreas.size() - 1).setText(goal);
 				}
-				// Remove extra empty lines
+
+				// Remove empty lines
 				for (JTextArea textArea : testGoalTextAreas) {
 					String cleanedText = textArea.getText().replaceAll("(?m)^\\s*$\n?", "").trim();
 					textArea.setText(cleanedText);
 				}
+
 				testGoalContainer.revalidate();
 				testGoalContainer.repaint();
-
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(this, "Error reading file: " + e.getMessage(), "File Error", JOptionPane.ERROR_MESSAGE);
 			}
@@ -409,6 +433,7 @@ public class LlmPanel extends SettingsPanel {
 		fieldLlmHistorySize.setText(settings.get(ConfigTags.LlmHistorySize).toString());
 
 		testGoalTextAreas.clear();
+		testGoalScrollPanes.clear();
 		testGoalContainer.removeAll();
 		List<String> goals = settings.get(ConfigTags.LlmTestGoals);
 		for (String goal : goals) {
