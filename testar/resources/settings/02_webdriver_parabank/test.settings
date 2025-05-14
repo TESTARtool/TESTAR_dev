@@ -119,6 +119,16 @@ StartupTime = 2.0
 MaxTime = 3.1536E7
 
 #################################################################
+# System Under Test (SUT) identification
+#
+# ApplicationName: Name to identify the SUT.
+# ApplicationVersion: Version to identify the SUT.
+#################################################################
+
+ApplicationName = parabank
+ApplicationVersion = 1.0
+
+#################################################################
 # State model inference settings
 #
 # StateModelEnabled: Enable or disable the State Model feature
@@ -130,25 +140,21 @@ MaxTime = 3.1536E7
 # DataStoreUser: User credential to authenticate TESTAR in OrientDB
 # DataStorePassword: Password credential to authenticate TESTAR in OrientDB
 # DataStoreMode: Indicate how TESTAR should store the model objects in the database: instant, delayed, hybrid, none
-# ApplicationName: Name to identify the SUT. Especially important to identify a State Model
-# ApplicationVersion: Version to identify the SUT. Especially important to identify a State Model
 # ActionSelectionAlgorithm: State Model Action Selection mechanism to explore the SUT: random or unvisited
 # StateModelStoreWidgets: Save all widget tree information in the State Model every time TESTAR discovers a new Concrete State
 # ResetDataStore: WARNING: Delete all existing State Models from the selected database before creating a new one
 #################################################################
 
 StateModelEnabled = false
-DataStore = 
-DataStoreType = remote
+DataStore = OrientDB
+DataStoreType = plocal
 DataStoreServer = 
-DataStoreDirectory = 
-DataStoreDB = 
-DataStoreUser = 
-DataStorePassword = 
-DataStoreMode = none
-ApplicationName = Parabank
-ApplicationVersion = 1.0
-ActionSelectionAlgorithm = random
+DataStoreDirectory = C:\\orientdb-3.0.34\\databases
+DataStoreDB = testar
+DataStoreUser = testar
+DataStorePassword = testar
+DataStoreMode = instant
+ActionSelectionAlgorithm = unvisited
 StateModelStoreWidgets = true
 ResetDataStore = false
 
@@ -158,7 +164,8 @@ ResetDataStore = false
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WebWidgetId
+
+AbstractStateAttributes = WebWidgetId,WebWidgetName
 
 #################################################################
 # WebDriver features

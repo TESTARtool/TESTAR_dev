@@ -31,7 +31,7 @@ SUTConnectorValue = c:\\windows\\system32\\notepad.exe
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 8
+Sequences = 2
 SequenceLength = 10
 
 #################################################################
@@ -165,7 +165,7 @@ LogLevel = 1
 FaultThreshold = 0.000000001
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
-ActionDuration = 0.1
+ActionDuration = 0.0
 ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
