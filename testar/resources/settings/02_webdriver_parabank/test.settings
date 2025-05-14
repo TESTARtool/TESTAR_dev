@@ -113,7 +113,7 @@ AlwaysCompile = true
 # MaxTime: Sets a time, in seconds, after which the test run is finished (e.g. stop after an hour)
 #################################################################
 
-ActionDuration = 0.1
+ActionDuration = 0.0
 TimeToWaitAfterAction = 0.1
 StartupTime = 2.0
 MaxTime = 3.1536E7

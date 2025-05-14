@@ -130,8 +130,8 @@ MaxTime = 3.1536E7
 # ApplicationVersion: Version to identify the SUT.
 #################################################################
 
-ApplicationName = Calculator
-ApplicationVersion = 1.0
+ApplicationName = 
+ApplicationVersion = 
 
 #################################################################
 # State identifier attributes
