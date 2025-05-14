@@ -36,6 +36,7 @@ import org.testar.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.serialisation.LogSerialiser;
 
@@ -190,7 +191,7 @@ public class GenerateMode {
 		/*
 		 ***** INNER LOOP:
 		 */
-		while (protocol.mode() != Modes.Quit && protocol.moreActions(protocol.getState(system))) {
+		while (protocol.mode() != Modes.Quit && protocol.moreActions(state)) {
 
 			// getState() including getVerdict() that is saved into the state:
 			LogSerialiser.log("Obtained system state in inner loop of TESTAR...\n", LogSerialiser.LogLevel.Debug);
@@ -239,6 +240,6 @@ public class GenerateMode {
 			protocol.stateModelManager.notifyNewStateReached(state, actions);
 		}
 
-		return protocol.getVerdict(state);
+		return state.get(Tags.OracleVerdict, Verdict.OK);
 	}
 }

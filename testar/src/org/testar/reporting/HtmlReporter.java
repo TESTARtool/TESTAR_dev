@@ -50,7 +50,11 @@ public class HtmlReporter implements Reporting
     private HtmlFormatUtil htmlReportUtil;
     private int innerLoopCounter = 0;
 
-    private final String openBlockContainer = "<div class='block' style='display:flex;flex-direction:column'>";
+    private final String openStateBlockContainer = "<div class='stateBlock' style='display:flex;flex-direction:column'>";
+    private final String openDerivedBlockContainer = "<div class='derivedBlock' style='display:flex;flex-direction:column'>";
+    private final String openSelectedBlockContainer = "<div class='selectedBlock' style='display:flex;flex-direction:column'>";
+    private final String openVerdictBlockContainer = "<div class='verdictBlock' style='display:flex;flex-direction:column'>";
+    
     private final String openBackgroundContainer = "<div class='background'>";
     private final String openCollapsibleContainer = "<div class='collapsibleContent'>";
     private final String closeContainer = "</div>";
@@ -88,7 +92,7 @@ public class HtmlReporter implements Reporting
         String concreteID = state.get(Tags.ConcreteID, "NoConcreteIdAvailable");
         String abstractID = state.get(Tags.AbstractID, "NoAbstractIdAvailable");
 
-        htmlReportUtil.addContent(openBlockContainer); // Open state block container
+        htmlReportUtil.addContent(openStateBlockContainer); // Open state block container
         htmlReportUtil.addContent(openBackgroundContainer); // Open background container
 
         htmlReportUtil.addHeading(2, "State " + innerLoopCounter);
@@ -156,7 +160,7 @@ public class HtmlReporter implements Reporting
     @Override
     public void addActions(Set<Action> actions)
     {
-        htmlReportUtil.addContent(openBlockContainer); // Open derived actions block container
+        htmlReportUtil.addContent(openDerivedBlockContainer); // Open derived actions block container
         htmlReportUtil.addButton("collapsible", "Click to view the set of derived actions:");
         htmlReportUtil.addContent(openCollapsibleContainer); // Open actions collapsible container
 
@@ -175,7 +179,7 @@ public class HtmlReporter implements Reporting
     @Override
     public void addActionsAndUnvisitedActions(Set<Action> actions, Set<String> concreteIdsOfUnvisitedActions)
     {
-        htmlReportUtil.addContent(openBlockContainer); // Open derived actions block container
+        htmlReportUtil.addContent(openDerivedBlockContainer); // Open derived actions block container
 
         ArrayList<String> actionStrings = new ArrayList<>();
         if(actions.size()==concreteIdsOfUnvisitedActions.size())
@@ -222,7 +226,7 @@ public class HtmlReporter implements Reporting
                 + "/" + stateConcreteID
                 + "_" + actionConcreteID + ".png";
 
-        htmlReportUtil.addContent(openBlockContainer); // Open executed action block container
+        htmlReportUtil.addContent(openSelectedBlockContainer); // Open selected action block container
         htmlReportUtil.addContent(openBackgroundContainer); // Open background container
 
         htmlReportUtil.addHeading(2, "Selected Action "+innerLoopCounter+" leading to State "+innerLoopCounter);
@@ -254,7 +258,7 @@ public class HtmlReporter implements Reporting
         if(verdict.severity() > Verdict.OK.severity())
             verdictInfo = verdictInfo.replace(Verdict.OK.info(), "").replace("\n", "");
 
-        htmlReportUtil.addContent(openBlockContainer); // Open verdict block container
+        htmlReportUtil.addContent(openVerdictBlockContainer); // Open verdict block container
         htmlReportUtil.addHeading(2, "Test verdict for this sequence: " + verdictInfo);
         htmlReportUtil.addHeading(4, "Severity: " + verdict.severity());
         htmlReportUtil.addContent("<h4 id='visualizer-rect' style='display: none;'>Visualizer: " + verdict.visualizer().getShapes() + "</h4>");
