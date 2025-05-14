@@ -358,6 +358,15 @@ public class LlmPanel extends SettingsPanel {
 		if (fd.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			File selectedFile = fd.getSelectedFile();
 
+			// Only allow files with .goal extension
+			if (!selectedFile.getName().toLowerCase().endsWith(".goal")) {
+				JOptionPane.showMessageDialog(this,
+						"Only files with the '.goal' extension are allowed.",
+						"Invalid File Type",
+						JOptionPane.WARNING_MESSAGE);
+				return;
+			}
+
 			try (BufferedReader reader = new BufferedReader(new FileReader(selectedFile))) {
 				StringBuilder content = new StringBuilder();
 				String line;
@@ -368,6 +377,7 @@ public class LlmPanel extends SettingsPanel {
 
 				// Refill the text area with the file content
 				testGoalTextAreas.clear();
+				testGoalScrollPanes.clear();
 				testGoalContainer.removeAll();
 				List<String> goals = Arrays.asList(content.toString().split(";", -1));
 				for (String goal : goals) {
@@ -411,6 +421,7 @@ public class LlmPanel extends SettingsPanel {
 		fieldLlmHistorySize.setText(settings.get(ConfigTags.LlmHistorySize).toString());
 
 		testGoalTextAreas.clear();
+		testGoalScrollPanes.clear();
 		testGoalContainer.removeAll();
 		List<String> goals = settings.get(ConfigTags.LlmTestGoals);
 		for (String goal : goals) {
