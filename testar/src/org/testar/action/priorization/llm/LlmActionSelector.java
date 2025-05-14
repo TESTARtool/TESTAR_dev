@@ -145,6 +145,9 @@ public class LlmActionSelector implements IActionSelector {
 
     @Override
     public Action selectAction(State state, Set<Action> actions) {
+        // Reset conversation
+        conversation = LlmFactory.createLlmConversation(this.platform, this.model, this.temperature);
+        conversation.initConversation(this.actionFewshotFile);
         return selectActionWithLlm(state, actions);
     }
 
