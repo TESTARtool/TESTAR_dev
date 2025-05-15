@@ -74,6 +74,7 @@ public class LlmActionSelector implements IActionSelector {
     private final String appName;
     private final float temperature;
     private final int historySize;
+    private final boolean stateless;
 
     private ActionHistory actionHistory;
     private LlmConversation conversation;
@@ -105,7 +106,12 @@ public class LlmActionSelector implements IActionSelector {
         this.appName = settings.get(ConfigTags.ApplicationName);
         this.temperature = settings.get(ConfigTags.LlmTemperature);
         actionHistory = new ActionHistory(historySize, generator.getDescriptionTag());
+        this.stateless = settings.get(ConfigTags.LlmStateless);
 
+        initializeConversation();
+    }
+
+    private void initializeConversation() {
         conversation = LlmFactory.createLlmConversation(this.platform, this.model, this.temperature);
         conversation.initConversation(this.actionFewshotFile);
     }
@@ -138,13 +144,15 @@ public class LlmActionSelector implements IActionSelector {
 
         currentTestGoal = newTestGoal;
 
-        // Reset conversation
-        conversation = LlmFactory.createLlmConversation(this.platform, this.model, this.temperature);
-        conversation.initConversation(this.actionFewshotFile);
+        // When a new goal is attached, always re-initialize a new conversation
+        initializeConversation();
     }
 
     @Override
     public Action selectAction(State state, Set<Action> actions) {
+        // If the stateless option is enabled, initialize a new prompt to reduce tokens usage
+        if(this.stateless) initializeConversation();
+
         return selectActionWithLlm(state, actions);
     }
 
@@ -282,7 +290,7 @@ public class LlmActionSelector implements IActionSelector {
 
                     LlmResponse llmResponse = LlmFactory.createResponse(this.platform, response);
                     this.tokens_used = llmResponse.getUsageTokens();
-                    logger.log(Level.INFO, String.format("LLM tokens_used: [%s]", this.tokens_used));
+                    logger.log(Level.INFO, String.format("LLM tokens_used for action selection: [%s]", this.tokens_used));
 
                     String responseContent = llmResponse.getResponse();
                     // From testing, response often includes newlines and spaces at the end.

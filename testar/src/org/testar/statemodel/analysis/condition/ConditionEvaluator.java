@@ -30,6 +30,7 @@
 
 package org.testar.statemodel.analysis.condition;
 
+import org.testar.monkey.alayer.State;
 import org.testar.statemodel.StateModelManager;
 
 import java.util.ArrayList;
@@ -77,6 +78,13 @@ public abstract class ConditionEvaluator {
      * @return True if all conditions evaluate to true.
      */
     public abstract boolean evaluateConditions(String modelIdentifier, StateModelManager stateModelManager);
+
+    /**
+     * Evaluates all conditions added to the ConditionEvaluator based on the state.
+     * @param state The current state.
+     * @return True if all conditions evaluate to true.
+     */
+    public abstract boolean evaluateConditions(State state);
 
     public List<TestCondition> getConditions() {
         return conditions;

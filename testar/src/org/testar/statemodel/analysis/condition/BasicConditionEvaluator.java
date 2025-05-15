@@ -30,6 +30,7 @@
 
 package org.testar.statemodel.analysis.condition;
 
+import org.testar.monkey.alayer.State;
 import org.testar.statemodel.StateModelManager;
 
 /**
@@ -46,6 +47,24 @@ public class BasicConditionEvaluator extends ConditionEvaluator {
     public boolean evaluateConditions(String modelIdentifier, StateModelManager stateModelManager) {
         for(TestCondition condition : getConditions()) {
             boolean evaluation = condition.evaluate(modelIdentifier, stateModelManager);
+
+            if(!evaluation) {
+                return false;
+            }
+        }
+
+        // All conditions are true
+        return true;
+    }
+
+    /**
+     * Evaluates all conditions added to the ConditionEvaluator based on the state.
+     * @param state The current state.
+     * @return True if all conditions evaluate to true.
+     */
+    public boolean evaluateConditions(State state) {
+        for(TestCondition condition : getConditions()) {
+            boolean evaluation = condition.evaluate(state);
 
             if(!evaluation) {
                 return false;

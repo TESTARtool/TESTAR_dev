@@ -175,7 +175,9 @@ LlmActionFewshotFile = prompts/fewshot_openai_action.json
 LlmOracleFewshotFile = 
 LlmTemperature = 0.2
 LlmHistorySize = 5
+LlmStateless = true
 LlmTestGoals = Log in with the username john and the password demo\\nCheck: John Smith;Apply for a loan of 999999 with a down payment of 100\\nCheck: <p class="error">We cannot grant a loan in that amount with your available funds.</p>
+
 #################################################################
 # WebDriver features
 #

@@ -141,6 +141,9 @@ public final class ConfigTags {
 	public static final Tag<Integer> LlmHistorySize = Tag.from("LlmHistorySize", Integer.class,
 			"Controls how many historical actions are kept track of and sent to the LLM.");
 
+	public static final Tag<Boolean> LlmStateless = Tag.from("LlmStateless", Boolean.class,
+			"Generates individual prompts for each action and oracle LLM conversation.");
+
 	/**
 	 * WebDriver settings 
 	 */

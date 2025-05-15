@@ -68,6 +68,7 @@ public class LlmOracle implements Oracle {
 	private final String fewshotOracleFile;
 	private final String appName;
 	private final float temperature;
+	private final boolean stateless;
 
 	private LlmConversation conversation;
 	private int tokens_used;
@@ -86,6 +87,7 @@ public class LlmOracle implements Oracle {
 		this.fewshotOracleFile = settings.get(ConfigTags.LlmOracleFewshotFile);
 		this.appName = settings.get(ConfigTags.ApplicationName);
 		this.temperature = settings.get(ConfigTags.LlmTemperature);
+		this.stateless = settings.get(ConfigTags.LlmStateless);
 
 		initialize();
 	}
@@ -102,9 +104,8 @@ public class LlmOracle implements Oracle {
 
 		currentTestGoal = newTestGoal;
 
-		// Reset conversation
-		conversation = LlmFactory.createLlmConversation(this.platform, this.model, this.temperature);
-		conversation.initConversation(this.fewshotOracleFile);
+		// When a new goal is attached, always re-initialize a new conversation
+		initialize();
 	}
 
 	@Override
@@ -115,6 +116,9 @@ public class LlmOracle implements Oracle {
 
 	@Override
 	public Verdict getVerdict(State state) {
+		// If the stateless option is enabled, initialize a new prompt to reduce tokens usage
+		if(this.stateless) initialize();
+
 		return getVerdictWithLlm(state);
 	}
 
@@ -178,7 +182,7 @@ public class LlmOracle implements Oracle {
 
 					LlmResponse llmResponse = LlmFactory.createResponse(this.platform, response);
 					this.tokens_used = llmResponse.getUsageTokens();
-					logger.log(Level.INFO, String.format("LLM tokens_used: [%s]", this.tokens_used));
+					logger.log(Level.INFO, String.format("LLM tokens_used for oracle: [%s]", this.tokens_used));
 
 					String responseContent = llmResponse.getResponse();
 					// From testing, response often includes newlines and spaces at the end.

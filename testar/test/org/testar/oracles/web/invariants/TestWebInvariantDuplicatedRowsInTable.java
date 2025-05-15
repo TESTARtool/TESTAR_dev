@@ -77,7 +77,7 @@ public class TestWebInvariantDuplicatedRowsInTable {
 		// Assert the oracle verdict is WARNING_WEB_INVARIANT_FAULT
 		Verdict verdict = extendedOraclesList.get(0).getVerdict(state);
 		Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT.getTitle()));
-		Assert.isTrue(verdict.info().equals("Detected a duplicated rows in a Table! Role: WdTR , WebId: , Description: _header_content_data_content"));
+		Assert.isTrue(verdict.info().contains("Detected a duplicated rows in a Table for the widgets: [_header_content_data_content, _header_content_data_content]"));
 	}
 
 	@Test

@@ -254,6 +254,7 @@ public class SettingsFileStructure {
 				, ConfigTags.LlmOracleFewshotFile.name() + " = "
 				, ConfigTags.LlmTemperature.name() + " = "
 				, ConfigTags.LlmHistorySize.name() + " = "
+				, ConfigTags.LlmStateless.name() + " = "
 				, ConfigTags.LlmTestGoals.name() + " = "
 				, ""
 				, "#################################################################"
