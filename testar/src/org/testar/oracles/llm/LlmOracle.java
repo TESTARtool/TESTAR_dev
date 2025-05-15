@@ -115,6 +115,9 @@ public class LlmOracle implements Oracle {
 
 	@Override
 	public Verdict getVerdict(State state) {
+		// Reset conversation
+		conversation = LlmFactory.createLlmConversation(this.platform, this.model, this.temperature);
+		conversation.initConversation(this.fewshotOracleFile);
 		return getVerdictWithLlm(state);
 	}
 
