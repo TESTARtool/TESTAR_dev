@@ -37,6 +37,7 @@ import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.managers.InputDataManager;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.settings.Settings;
+import org.testar.monkey.alayer.webdriver.Constants;
 
 import java.util.*;
 
@@ -55,6 +56,9 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
 	@Override
 	protected void initialize(Settings settings) {
 		super.initialize(settings);
+
+		// For the gwt web page ignore iframes
+		Constants.ignoredTags = Arrays.asList("script", "noscript", "head", "meta", "style", "link", "svg", "canvas", "iframe");
 
 		// List of attributes to identify and close policy popups
 		// Set to null to disable this feature

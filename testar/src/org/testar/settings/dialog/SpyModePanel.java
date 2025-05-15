@@ -31,12 +31,19 @@
 package org.testar.settings.dialog;
 
 import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Pair;
 import org.testar.monkey.alayer.Tag;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.monkey.alayer.windows.UIATags;
 import org.testar.settings.dialog.tagsvisualization.DefaultTagFilter;
 import org.testar.settings.dialog.tagsvisualization.TagFilter;
 import org.testar.settings.Settings;
+import org.testar.settings.SettingsDefaults;
 
 import javax.swing.*;
+
+import static org.testar.monkey.ConfigTags.SpyTagAttributes;
+
 import java.awt.*;
 import java.util.*;
 import java.util.List;
@@ -98,6 +105,18 @@ public class SpyModePanel extends SettingsPanel {
         });
         middle.add(allExclude);
 
+        JButton restoreTags = new JButton("Defaults");
+        restoreTags.addActionListener(e -> { setDefaults(excludeTags, includeTags);});
+        middle.add(restoreTags);    
+
+        JButton uiaTags = new JButton("UIATags");
+        uiaTags.addActionListener(e -> { setAllSystemTags(UIATags.getUIATags(), excludeTags, includeTags);});
+        middle.add(uiaTags);  
+
+        JButton webTags = new JButton("WdTags");
+        webTags.addActionListener(e -> { setAllSystemTags(WdTags.getWdTags(), excludeTags, includeTags);});
+        middle.add(webTags);  
+
         // Right Panel
         JPanel right = new JPanel();
         right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
@@ -123,13 +142,62 @@ public class SpyModePanel extends SettingsPanel {
         source.clearSelection();
     }
 
+    @SuppressWarnings("unchecked")
+    private void setDefaults(TreeSetListModel<Tag<?>> excludeModel, TreeSetListModel<Tag<?>> includeModel) {
+        // Use the SettingsDefaults configuration
+        Set<String> defaultTagNames = new HashSet<>();
+        for (Pair<?, ?> pair : SettingsDefaults.getSettingsDefaults()) {
+            if (pair.left().equals(SpyTagAttributes)) {
+                defaultTagNames.addAll((List<String>) pair.right());
+                break;
+            }
+        }
+
+        // Combine both include and exclude tags into a working set
+        Set<Tag<?>> allTags = new HashSet<>();
+        allTags.addAll(includeModel.asSet());
+        allTags.addAll(excludeModel.asSet());
+
+        // Clear, re-add tags based on the default list, and update the UI
+        includeModel.clear();
+        excludeModel.clear();
+
+        for (Tag<?> tag : allTags) {
+            if (defaultTagNames.contains(tag.name())) {
+                includeModel.add(tag);
+            } else {
+                excludeModel.add(tag);
+            }
+        }
+
+        includeList.updateUI();
+        excludeList.updateUI();
+    }
+
+    private void setAllSystemTags(Set<Tag<?>> tags, TreeSetListModel<Tag<?>> excludeModel, TreeSetListModel<Tag<?>> includeModel) {
+        // First, clear lists and add the defaults
+        setDefaults(excludeTags, includeTags);
+
+        // Second, add all selected system Tags
+        for (Tag<?> tag : tags) {
+            if (excludeModel.contains(tag)) {
+                excludeModel.remove(tag);
+            }
+            if (!includeModel.contains(tag)) {
+                includeModel.add(tag);
+            }
+        }
+
+        includeList.updateUI();
+        excludeList.updateUI();
+    }
 
     @Override
     public void extractInformation(final Settings settings) {
         // TODO store the information in the settings file.
 
         List<String> filter = includeTags.asSet().stream()
-                .map(DefaultTagFilter::getSettingsStringFromTag)
+                .map(tag -> tag.name())
                 .collect(Collectors.toList());
         settings.set(ConfigTags.SpyTagAttributes, filter);
 

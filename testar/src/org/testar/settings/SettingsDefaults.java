@@ -215,6 +215,7 @@ public class SettingsDefaults {
 				add("Title");
 				add("Role");
 				add("Enabled");
+				add("Blocked");
 				add("Shape");
 				add("Path");
 			}

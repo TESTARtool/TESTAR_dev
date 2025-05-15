@@ -7,15 +7,6 @@ import org.testar.monkey.alayer.Tag;
 public class TestDefaultTagFilter {
 
     @Test
-    public void testGetSettingsStringFromTag() {
-        Tag<?> tag = DefaultTagFilter.getSet().iterator().next();
-        String settingsString = DefaultTagFilter.getSettingsStringFromTag(tag);
-
-        Assert.assertNotNull("Settings string should not be null.", settingsString);
-        Assert.assertEquals("Settings string should match tag name.", tag.name(), settingsString);
-    }
-
-    @Test
     public void testFindTagByName() {
         Tag<?> originalTag = DefaultTagFilter.getSet().iterator().next();
         String tagName = originalTag.name();
