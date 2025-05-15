@@ -65,7 +65,8 @@ public class WdSelectListAction extends TaggableBase implements Action {
 
     @Override
     public void run(SUT system, State state, double duration) {
-        switch(targetMethod) {
+        try {
+            switch(targetMethod) {
             case ID:
                 WdDriver.executeScript(String.format("const field = document.getElementById('%s');" +
                         " field.value = '%s'; const event = new Event('change', { bubbles: true }); " +
@@ -79,6 +80,9 @@ public class WdSelectListAction extends TaggableBase implements Action {
                 break;
             default:
                 logger.warn("WdSelectListAction targetMethod is null!");
+            }
+        } catch (Exception e) {
+            logger.warn("WdSelectListAction was not executed!");
         }
     }
 
