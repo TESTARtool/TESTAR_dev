@@ -255,37 +255,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			we.printStackTrace();
 
 			this.mode = Modes.Quit;
-		}catch(SessionNotCreatedException e) {
-    		if(e.getMessage()!=null && e.getMessage().contains("Chrome version")) {
-
-    			String msg = "*** Unsupported versions exception: Chrome browser and Selenium WebDriver versions *** \n"
-    					+ "Please verify your Chrome browser version: chrome://settings/help \n"
-    					+ "And download the appropriate ChromeDriver version: https://chromedriver.chromium.org/downloads \n"
-    					+ "\n"
-						//TODO check when implementing other webdriver than chromedriver
-						//TODO remove when automatically killing webdriver process when creating the session fails
-    					+ "As a result of this error, there is probably a \"chromedriver.exe\" process running. \n"
-    					+ "Please use Windows Task Manager to stop that process.";
-
-    			popupMessage(msg);
-    			System.out.println(msg);
-    			System.out.println(e.getMessage());
-    		}else {
-    			System.out.println("ERROR starting Selenium WebDriver");
-    			e.printStackTrace();
-    		}
-		}catch (IllegalStateException e) {
-			if (e.getMessage()!=null && e.getMessage().contains("driver executable does not exist")) {
-
-				String msg = "Exception: Check whether chromedriver.exe path: \n"
-				+settings.get(ConfigTags.SUTConnectorValue)
-				+"\n exists and is correctly defined";
-
-				popupMessage(msg);
-				System.out.println(msg);
-			}else {
-				e.printStackTrace();
-			}
 		}catch(SystemStartException SystemStartException) {
 			SystemStartException.printStackTrace();
 			this.mode = Modes.Quit;

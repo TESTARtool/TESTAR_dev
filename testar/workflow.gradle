@@ -306,7 +306,7 @@ task runTestDesktopGenericStateModelCustomAbstraction(type: Exec, dependsOn: cre
 }
 
 // Windows OS
-// Verify that TESTAR correctly executes chromedriver
+// Verify that TESTAR correctly executes webdriver
 // To be sure, connect to para.testar.org and detect .*[fF]orums.* suspicious tag ValuePattern
 // Also, test the state model for web applications
 task runTestWebdriverSuspiciousTagStateModel(type: Exec, dependsOn: createDatabaseOrientDB) {
@@ -334,7 +334,7 @@ task runTestWebdriverSuspiciousTagStateModel(type: Exec, dependsOn: createDataba
     }
 }
 
-// Linux OS: Verify that TESTAR correctly executes chromedriver
+// Linux OS: Verify that TESTAR correctly executes webdriver
 // Also, test the state model for web applications
 task runTestWebdriverSuspiciousTagStateModelUbuntu(type: Exec, dependsOn: createDatabaseOrientDB) {
 	// Read command line output
@@ -342,7 +342,7 @@ task runTestWebdriverSuspiciousTagStateModelUbuntu(type: Exec, dependsOn: create
     group = 'test_testar_workflow'
     description ='runTestWebdriverSuspiciousTagStateModelUbuntu'
     workingDir 'target/install/testar/bin'
-    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_webdriver_generic SUTConnectorValue=" ""/usr/local/share/chromedriver-linux64/chromedriver"" ""https://para.testar.org/parabank/cookies.htm"" " FlashFeedback=false AlwaysCompile=true ApplicationName="webdriver_suspicious_state_model" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[fF]orums.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
+    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_webdriver_generic SUTConnectorValue=" ""https://para.testar.org/parabank/cookies.htm"" " FlashFeedback=false AlwaysCompile=true ApplicationName="webdriver_suspicious_state_model" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[fF]orums.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
     doLast {
         String output = standardOutput.toString()
 
@@ -361,7 +361,7 @@ task runTestWebdriverSuspiciousTagStateModelUbuntu(type: Exec, dependsOn: create
     }
 }
 
-// macOS: Verify that TESTAR correctly executes chromedriver
+// macOS: Verify that TESTAR correctly executes webdriver
 // Also, test the state model for web applications
 task runTestWebdriverSuspiciousTagStateModelMacOS(type: Exec, dependsOn: createDatabaseOrientDB) {
 	// Read command line output
@@ -369,7 +369,7 @@ task runTestWebdriverSuspiciousTagStateModelMacOS(type: Exec, dependsOn: createD
     group = 'test_testar_workflow'
     description ='runTestWebdriverSuspiciousTagStateModelMacOS'
     workingDir 'target/install/testar/bin'
-    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_webdriver_generic SUTConnectorValue=" ""/usr/local/share/chromedriver-mac-arm64/chromedriver"" ""https://para.testar.org/parabank/cookies.htm"" " FlashFeedback=false AlwaysCompile=true ApplicationName="webdriver_suspicious_state_model" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[fF]orums.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
+    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_webdriver_generic SUTConnectorValue=" ""https://para.testar.org/parabank/cookies.htm"" " FlashFeedback=false AlwaysCompile=true ApplicationName="webdriver_suspicious_state_model" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[fF]orums.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
     doLast {
         String output = standardOutput.toString()
 
@@ -455,7 +455,7 @@ task runTestWebdriverCorrectReplay(type: Exec) {
     group = 'test_testar_workflow'
     description ='runTestWebdriverCorrectReplay'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_replay" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""C:\\\\SeleniumWebDrivers\\\\ChromeDriver\\\\chromedriver.exe"" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_replayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/paris_parisone.testar'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_replay" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_replayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/paris_parisone.testar'
     doLast {
         String output = standardOutput.toString()
 
@@ -475,7 +475,7 @@ task runTestWebdriverUnreplayable(type: Exec) {
     group = 'test_testar_workflow'
     description ='runTestWebdriverUnreplayable'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_unreplayable" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""C:\\\\SeleniumWebDrivers\\\\ChromeDriver\\\\chromedriver.exe"" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_unreplayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/paris_parisone.testar'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_unreplayable" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_unreplayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/paris_parisone.testar'
     doLast {
         String output = standardOutput.toString()
 

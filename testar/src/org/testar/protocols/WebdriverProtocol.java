@@ -688,9 +688,16 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	protected void ensureWebDomainsAllowed() {
 		try{
 			// Adding default domain from SUTConnectorValue if is not included in the webDomainsAllowed list
-			//TODO try-catch for nullpointer if sut connector missing
-			String[] parts = settings().get(ConfigTags.SUTConnectorValue).split(" ");
-			String sutConnectorUrl = parts[parts.length - 1].replace("\"", "");
+			String[] parts = settings().get(ConfigTags.SUTConnectorValue, "").split(" ");
+			String sutConnectorUrl = "";
+
+			for (String raw : parts) {
+				String part = raw.replace("\"", "");
+
+				if (part.matches("^(?:[a-zA-Z][a-zA-Z0-9+.-]*):.*")) {
+					sutConnectorUrl = part;
+				}
+			}
 
 			if(webDomainsAllowed != null && !webDomainsAllowed.contains(getDomain(sutConnectorUrl))) {
 				System.out.println(String.format("WEBDRIVER INFO: Automatically adding %s SUT Connector domain to webDomainsAllowed List", getDomain(sutConnectorUrl)));
@@ -708,7 +715,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				webDomainsAllowed = Arrays.asList(ArrayUtils.insert(newWebDomainsAllowed.length, newWebDomainsAllowed, getDomain(initialUrl)));
 				System.out.println(String.format("webDomainsAllowed: %s", String.join(",", webDomainsAllowed)));
 			}
-		} catch(Exception e) { //TODO check what kind of exception can happen
+		} catch(Exception e) {
 			System.out.println("WEBDRIVER ERROR: Trying to add the startup domain to webDomainsAllowed List");
 			System.out.println("Please review webDomainsAllowed List inside Webdriver Java Protocol");
 		}

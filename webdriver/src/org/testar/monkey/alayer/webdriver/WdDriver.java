@@ -30,42 +30,28 @@
 
 package org.testar.monkey.alayer.webdriver;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testar.monkey.alayer.devices.AWTKeyboard;
 import org.testar.monkey.alayer.devices.Keyboard;
 import org.testar.monkey.alayer.devices.Mouse;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.exceptions.SystemStopException;
+
+import io.github.bonigarcia.wdm.WebDriverManager;
+
 import org.openqa.selenium.*;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.edge.EdgeDriver;
-import org.openqa.selenium.edge.EdgeDriverService;
-import org.openqa.selenium.edge.EdgeOptions;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.firefox.GeckoDriverService;
-import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testar.monkey.alayer.*;
 
-import java.awt.*;
-import java.awt.event.InputEvent;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -73,6 +59,8 @@ import java.util.*;
 
 
 public class WdDriver extends SUTBase {
+  protected static final Logger logger = LogManager.getLogger();
+
   private static WdDriver wdDriver = null;
   private static RemoteWebDriver remoteWebDriver = null;
   private static CopyOnWriteArrayList<String> windowHandles = new CopyOnWriteArrayList<>();
@@ -84,234 +72,136 @@ public class WdDriver extends SUTBase {
   private final Keyboard kbd = AWTKeyboard.build();
   private final Mouse mouse = WdMouse.build();
 
-  private WdDriver(String sutConnector) {
-	
-    String[] parts = sutConnector.split(" ");
-    
-    String driverPath = parts[0].replace("\"", "");
+  public WdDriver(String sutConnector) {
+	  String[] parts = sutConnector.split(" ");
+	  String chromePathCandidate = "";
+	  String url = "";
+	  String screenGeometryRaw = "";
 
-    String osName = System.getProperty("os.name");
-    //TODO: Check what is this condition aim to change in the SUTConnectorValue
-    //TODO: If not sure just remove and refactor because this can provoke IndexOutOfBoundsException 
-    if(!driverPath.contains(".exe") && osName.contains("Windows")) {
-    	driverPath = sutConnector.substring(0, sutConnector.indexOf(".exe")+4);
-    	driverPath = driverPath.replace("\"", "");
-    	parts = sutConnector.substring(sutConnector.indexOf(".exe")).split(" ");
-    	parts[0] = driverPath;
-    }
-    
-    String url = parts[parts.length - 1].replace("\"", "");
-    Dimension screenDimensions = null;
-    Point screenPosition = null;
-    if (parts.length == 3 && !fullScreen) {
-      String tmp = parts[1].replace("\"", "").toLowerCase();
-      String[] dims = tmp.split("\\+")[0].split("x");
-      screenDimensions =
-          new Dimension(Integer.parseInt(dims[0]), Integer.parseInt(dims[1]));
-      try {
-        screenPosition = new Point(Integer.parseInt(tmp.split("\\+")[1]),
-            Integer.parseInt(tmp.split("\\+")[2]));
-      }
-      catch (ArrayIndexOutOfBoundsException aioobe) {
+	  // Identify and classify the WebDriver SUT Connector parts
+	  for (String raw : parts) {
+		  String part = raw.replace("\"", "");
 
-      }
-    }
-    String path = System.getProperty("user.dir");
-    String extensionPath = path.substring(0, path.length() - 3) + "web-extension";
+		  if (part.endsWith(".exe") || new File(part).exists()) {
+			  chromePathCandidate = part;
+		  } else if (part.matches("^(?:[a-zA-Z][a-zA-Z0-9+.-]*):.*")) {
+			  url = part;
+		  } else if (part.matches("^\\d+x\\d+\\+\\d+\\+\\d+$")) {
+			  screenGeometryRaw = part;
+		  } else {
+			  logger.log(Level.WARN, "Invalid WebDriver SUT Connector part: " + part);
+		  }
+	  }
 
-    if (driverPath.toLowerCase().contains("chrome")) {
-    	remoteWebDriver = startChromeDriver(driverPath, extensionPath);
-    }
-    else if (driverPath.toLowerCase().contains("gecko")) {
-    	remoteWebDriver = startGeckoDriver(driverPath, extensionPath);
-    }
-    else if (driverPath.toLowerCase().contains("microsoft")) {
-    	remoteWebDriver = startEdgeDriver(driverPath, extensionPath);
-    }
-    else {
-		String msg = " \n ******** Not a valid webdriver Exception ********"
-				+ "\n Something looks wrong with the webdriver path: \n "
-				+ sutConnector
-				+ "\n Allowed webdrivers: chromedriver.exe"
-				+ "\n Readed path: " + driverPath
-				+ "\n Verify if it exists or if the path is a correct definition. "
-				+ "\n Please follow this structure (spaces, quotes, characters...):"
-				+ "\n \"C:\\Windows\\chromedriver.exe\" \"1920x900+0+0\" \"https://www.testar.org\" \n";
+	  if (url.isEmpty()) {
+		  throw new IllegalArgumentException("No valid URL provided in sutConnector.");
+	  }
 
-		System.out.println(msg);
-    	
-      throw new SystemStartException("Not a valid webdriver");
-    }
+	  String chromeForTestingPath = resolveChromeForTestingPath(chromePathCandidate);
+	  if (chromeForTestingPath == null || chromeForTestingPath.isEmpty()) {
+		  throw new RuntimeException("Unable to resolve Chrome for Testing path.");
+	  }
 
-    if (screenDimensions != null) {
-    	remoteWebDriver.manage().window().setSize(screenDimensions);
-    }
-    if (screenPosition != null) {
-    	remoteWebDriver.manage().window().setPosition(screenPosition);
-    }
+	  Dimension screenDimensions = null;
+	  Point screenPosition = null;
 
-    remoteWebDriver.get(url);
+	  if (!screenGeometryRaw.isEmpty() && !fullScreen) {
+		  try {
+			  String[] dims = screenGeometryRaw.split("\\+")[0].split("x");
+			  screenDimensions = new Dimension(Integer.parseInt(dims[0]), Integer.parseInt(dims[1]));
+			  String[] pos = screenGeometryRaw.split("\\+");
+			  screenPosition = new Point(Integer.parseInt(pos[1]), Integer.parseInt(pos[2]));
+		  } catch (Exception e) {
+			  logger.log(Level.WARN, "Invalid screen geometry format: " + screenGeometryRaw, e);
+		  }
+	  }
 
-    CanvasDimensions.startThread();
+	  String path = System.getProperty("user.dir");
+	  String extensionPath = path.substring(0, path.length() - 3) + "web-extension";
 
-    wdDriver = this;
+	  remoteWebDriver = startChromeDriver(chromeForTestingPath, extensionPath);
+
+	  if (screenDimensions != null) {
+		  remoteWebDriver.manage().window().setSize(screenDimensions);
+	  }
+	  if (screenPosition != null) {
+		  remoteWebDriver.manage().window().setPosition(screenPosition);
+	  }
+
+	  remoteWebDriver.get(url);
+
+	  CanvasDimensions.startThread();
+
+	  wdDriver = this;
   }
 
-  private static RemoteWebDriver startChromeDriver(String chromeDriverPath,
-                                                   String extensionPath) {
-    ChromeDriverService service = new ChromeDriverService.Builder()
-        .usingDriverExecutable(new File(chromeDriverPath))
-        .usingAnyFreePort()
-        .build();
-    ChromeOptions options = new ChromeOptions();
-    options.addArguments("load-extension=" + extensionPath);
-    options.addArguments("disable-infobars");
-    if(fullScreen) {
-    	options.addArguments("--start-maximized");
-    }
-    if(disableSecurity) {
-        options.addArguments("ignore-certificate-errors");
-    	options.addArguments("--disable-web-security");
-    	options.addArguments("--allow-running-insecure-content");
-    }
-
-    Map<String, Object> prefs = new HashMap<>();
-    prefs.put("profile.default_content_setting_values.notifications", 1);
-    options.setExperimentalOption("prefs", prefs);
-
-    // Workaround to fix https://github.com/SeleniumHQ/selenium/issues/11750
-    options.addArguments("--remote-allow-origins=*");
-    options.addArguments("--disable-search-engine-choice-screen");  // Disable search engine selector
-
-    return new ChromeDriver(service, options);
+  private String resolveChromeForTestingPath(String chromePathCandidate) {
+	  File file = new File(chromePathCandidate);
+	  if (file.exists() && file.getName().endsWith(".exe")) {
+		  logger.log(Level.INFO, String.format("User indicated Chrome for testing path: %s", chromePathCandidate));
+		  return file.getAbsolutePath();
+	  } else {
+		  if(!chromePathCandidate.isEmpty()) logger.log(Level.WARN, String.format("Invalid Chrome for testing path: %s", chromePathCandidate));
+		  logger.log(Level.INFO, "Downloading Chrome for testing...");
+		  return ChromeDownloader.downloadChromeForTesting();
+	  }
   }
 
-  private static RemoteWebDriver startGeckoDriver(String geckoDriverPath,
-                                                  String extensionPath) {
-    String nullPath = "/dev/null";
-    if (System.getProperty("os.name").toLowerCase().contains("windows")) {
-      nullPath = "NUL";
-    }
+  private RemoteWebDriver startChromeDriver(String chromeForTestingPath, String extensionPath) {
+	  String chromeVersion = getChromeMajorVersion(chromeForTestingPath);
+	  if(!chromeVersion.isEmpty()) {
+		  logger.log(Level.INFO, String.format("Detected Chrome Version: %s", chromeVersion));
+		  WebDriverManager.chromedriver().driverVersion(chromeVersion).setup();
+	  }
+	  else {
+		  logger.log(Level.WARN, "Chrome version not detected, the default WebDriverManager driver version will be used");
+		  WebDriverManager.chromedriver().setup();
+	  }
 
-    GeckoDriverService service = new GeckoDriverService.Builder()
-        .usingDriverExecutable(new File(geckoDriverPath))
-        .withLogFile(new File(nullPath))
-        .usingAnyFreePort()
-        .build();
+	  ChromeOptions options = new ChromeOptions();
+	  options.setBinary(chromeForTestingPath);
 
-    FirefoxProfile profile = new FirefoxProfile();
-    profile.setPreference("dom.webnotifications.enabled", false);
-    FirefoxOptions options = new FirefoxOptions();
-    options.setProfile(profile);
+	  options.addArguments("--load-extension=" + extensionPath);
 
-    RemoteWebDriver webDriver = new FirefoxDriver(service, options);
-    loadGeckoExtension(webDriver, extensionPath);
+	  options.addArguments("disable-infobars");
 
-    return webDriver;
+	  // Workaround to fix https://github.com/SeleniumHQ/selenium/issues/11750
+	  options.addArguments("--remote-allow-origins=*");
+
+	  // Disable search engine selector
+	  options.addArguments("--disable-search-engine-choice-screen");  
+
+	  if(fullScreen) {
+		  options.addArguments("--start-maximized");
+	  }
+	  if(disableSecurity) {
+		  options.addArguments("ignore-certificate-errors");
+		  options.addArguments("--disable-web-security");
+		  options.addArguments("--allow-running-insecure-content");
+	  }
+
+	  Map<String, Object> prefs = new HashMap<>();
+	  prefs.put("profile.default_content_setting_values.notifications", 1);
+	  options.setExperimentalOption("prefs", prefs);
+
+	  return new ChromeDriver(options);
   }
 
-  private static void loadGeckoExtension(RemoteWebDriver webDriver,
-                                         String extensionPath) {
-    // Create payload
-    String payload = "{" +
-                     "\"path\": \"" + extensionPath.replace("\\", "\\\\") + "\", " +
-                     "\"temporary\": true }";
-    StringEntity entity = new StringEntity(payload,
-        ContentType.APPLICATION_FORM_URLENCODED);
+  private String getChromeMajorVersion(String chromePath) {
+	  File chromeDir = new File(chromePath).getParentFile();
+	  File[] files = chromeDir.listFiles();
 
-    // Determine the endpoint
-    HttpCommandExecutor ce = (HttpCommandExecutor) webDriver.getCommandExecutor();
-    SessionId sessionId = webDriver.getSessionId();
-    String urlString = String.format(
-        "http://localhost:%s/session/%s/moz/addon/install",
-        ce.getAddressOfRemoteServer().getPort(), sessionId);
+	  if (files != null) {
+		  for (File file : files) {
+			  String name = file.getName();
+			  if (name.matches("\\d+\\.\\d+\\.\\d+\\.\\d+\\.manifest")) {
+				  // Example: "137.0.7151.40.manifest" to "137"
+				  return name.split("\\.")[0];
+			  }
+		  }
+	  }
 
-    // POST payload to the endpoint
-    HttpClient httpClient = HttpClientBuilder.create().build();
-    HttpPost request = new HttpPost(urlString);
-    request.setEntity(entity);
-    try {
-      httpClient.execute(request);
-    }
-    catch (IOException ioe) {
-      throw new SystemStartException(ioe);
-    }
-  }
-
-  private static RemoteWebDriver startEdgeDriver(
-      String edgeDriverPath, String extensionPath) {
-    // Edge can only load extensions from a system path
-    String edgeSideLoadPath = copyExtension(extensionPath);
-
-    EdgeDriverService service = new EdgeDriverService.Builder()
-        .usingDriverExecutable(new File(edgeDriverPath))
-        .usingAnyFreePort()
-        .build();
-
-    EdgeOptions options = new EdgeOptions();
-    options.setCapability("extensionPaths", new String[]{edgeSideLoadPath});
-    RemoteWebDriver webDriver = new EdgeDriver(service, options);
-
-    closeDialog(webDriver);
-
-    return webDriver;
-  }
-
-  private static String copyExtension(String extensionPath) {
-    String appDataDir = System.getenv("LOCALAPPDATA");
-    String extensionDir = new File(extensionPath).getName();
-    String subDirs = "Packages\\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\\LocalState";
-    String edgeSideLoadPath = String.format("%s\\%s\\%s", appDataDir, subDirs, extensionDir);
-
-    File sourceFolder = new File(extensionPath);
-    File targetFolder = new File(edgeSideLoadPath);
-    try {
-      copyFolder(sourceFolder, targetFolder);
-    }
-    catch (IOException ioe) {
-      throw new SystemStartException(ioe);
-    }
-
-    return edgeSideLoadPath;
-  }
-
-  private static void copyFolder(File sourceFolder, File targetFolder) throws IOException {
-    if (sourceFolder.isDirectory()) {
-      if (!targetFolder.exists()) {
-        targetFolder.mkdir();
-      }
-
-      for (String file : sourceFolder.list()) {
-        File sourceFile = new File(sourceFolder, file);
-        File targetFile = new File(targetFolder, file);
-        copyFolder(sourceFile, targetFile);
-      }
-    }
-    else {
-      Files.copy(sourceFolder.toPath(), targetFolder.toPath(), StandardCopyOption.REPLACE_EXISTING);
-    }
-  }
-
-  /**
-   * Edge has an annoying bug during the loading of the extension
-   * This method closes the dialog without user action
-   */
-  private static void closeDialog(RemoteWebDriver webDriver) {
-    // Fix window size/position, so we don't have to look for the button
-    Dimension screenDimensions = new Dimension(800, 400);
-    webDriver.manage().window().setSize(screenDimensions);
-    Point screenPosition = new Point(0, 0);
-    webDriver.manage().window().setPosition(screenPosition);
-
-    try {
-      Robot robot = new Robot();
-      robot.mouseMove(745, 365);
-      robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-      robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-    }
-    catch (AWTException awte) {
-      awte.printStackTrace();
-    }
+	  return "";
   }
 
   @Override

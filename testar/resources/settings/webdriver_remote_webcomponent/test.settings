@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "https://para.testar.org/"
+SUTConnectorValue = "https://para.testar.org/"
 
 #################################################################
 # Sequences
