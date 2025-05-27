@@ -1,6 +1,6 @@
 # Seleniarm docker image for ARM architectures
 # https://github.com/TESTARtool/TESTAR_dev/issues/374
-# This seleniarm docker image already contains chromedriver and xvfb
+# This seleniarm docker image already contains webdriver and xvfb
 FROM seleniarm/standalone-chromium
 
 # Update image dependencies and java
