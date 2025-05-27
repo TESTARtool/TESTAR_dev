@@ -85,13 +85,24 @@ public class WdDriver extends SUTBase {
 	  for (String raw : parts) {
 		  String part = raw.replace("\"", "");
 
-		  if (part.endsWith(".exe") || new File(part).exists()) {
-			  chromePathCandidate = part;
-		  } else if (part.matches("^(?:[a-zA-Z][a-zA-Z0-9+.-]*):.*")) {
+		  // Explicit URL (http, https, file, etc.)
+		  if (part.matches("^(?:[a-zA-Z][a-zA-Z0-9+.-]*):.*")) {
 			  url = part;
-		  } else if (part.matches("^\\d+x\\d+\\+\\d+\\+\\d+$")) {
+		  } 
+		  // Local HTML file treated as URL
+		  else if (new File(part).exists() && part.toLowerCase().endsWith(".html")) {
+			  url = new File(part).toURI().toString();
+		  } 
+		  // Chrome executable (local file path)
+		  else if (part.endsWith(".exe") || new File(part).exists()) {
+			  chromePathCandidate = part;
+		  } 
+		  // Screen size
+		  else if (part.matches("^\\d+x\\d+\\+\\d+\\+\\d+$")) {
 			  screenGeometryRaw = part;
-		  } else {
+		  } 
+		  // Invalid part
+		  else {
 			  logger.log(Level.WARN, "Invalid WebDriver SUT Connector part: " + part);
 		  }
 	  }
