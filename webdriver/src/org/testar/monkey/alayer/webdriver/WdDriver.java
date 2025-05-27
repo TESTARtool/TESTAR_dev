@@ -51,7 +51,10 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testar.monkey.alayer.*;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -199,6 +202,21 @@ public class WdDriver extends SUTBase {
 				  return name.split("\\.")[0];
 			  }
 		  }
+	  }
+
+	  // If no .manifest file found, fall back to using --version
+	  try {
+		  Process process = new ProcessBuilder(chromePath, "--version").start();
+		  try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+			  // Example: "Google Chrome 137.0.7151.40.manifest" to "137"
+			  String line = reader.readLine();
+			  if (line != null && line.matches(".*\\d+\\.\\d+\\.\\d+\\.\\d+.*")) {
+				  String version = line.replaceAll("[^\\d.]", "");
+				  return version.split("\\.")[0];
+			  }
+		  }
+	  } catch (IOException e) {
+		  logger.log(Level.WARN, "Failed to get Chrome version from binary", e);
 	  }
 
 	  return "";

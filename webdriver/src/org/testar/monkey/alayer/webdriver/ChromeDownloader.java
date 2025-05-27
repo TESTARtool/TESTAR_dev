@@ -87,6 +87,25 @@ public class ChromeDownloader {
 				throw new FileNotFoundException("Chrome binary not found after extraction: " + chromeBinaryPath);
 			}
 
+			// On Unix-like systems, set executable permissions on all potential binaries
+			if (!System.getProperty("os.name").toLowerCase().contains("win")) {
+				File[] files = new File(extractPath).listFiles();
+				if (files != null) {
+					for (File file : files) {
+						String name = file.getName();
+						if (file.isFile() && (name.equals("chrome") || name.equals("chrome_crashpad_handler"))) {
+							if (!file.setExecutable(true)) {
+								logger.log(Level.WARN, "Failed to set executable permission on: " + file.getAbsolutePath());
+							} else {
+								logger.log(Level.INFO, "Set executable permission on: " + file.getAbsolutePath());
+							}
+						}
+					}
+				} else {
+					logger.log(Level.WARN, "No files found in: " + extractPath);
+				}
+			}
+
 			return chromeBinaryPath;
 
 		} catch (Exception e) {
