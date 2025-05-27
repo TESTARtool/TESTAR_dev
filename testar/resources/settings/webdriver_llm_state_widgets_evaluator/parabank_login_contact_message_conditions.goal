@@ -1,0 +1,12 @@
+Given I want to log in
+And fill in username 'john'
+And fill in password 'demo'
+When login
+Check: John Smith
+;
+When fill in name 'testar'
+And fill in email 'testar.org'
+And fill in phone '111-222'
+And fill in message 'llm gherking agent sending a message'
+And Send to Customer Care
+Check: A Customer Care Representative will be contacting you

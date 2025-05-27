@@ -30,6 +30,7 @@
 
 package org.testar.statemodel.analysis.condition;
 
+import org.testar.monkey.alayer.State;
 import org.testar.statemodel.StateModelManager;
 
 /**
@@ -84,4 +85,11 @@ public abstract class TestCondition {
      * @return True if condition is met.
      */
     public abstract boolean evaluate(String modelIdentifier, StateModelManager stateModelManager);
+
+    /**
+     * Evaluates whether this condition is true.
+     * @param state the current state.
+     * @return True if condition is met.
+     */
+    public abstract boolean evaluate(State state);
 }
