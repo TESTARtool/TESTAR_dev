@@ -298,13 +298,14 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected Verdict getVerdict(State state) {
     	Verdict stateVerdict = super.getVerdict(state);
 
+    	RemoteWebDriver driver = WdDriver.getRemoteWebDriver();
+    	LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
+
     	// If Web Console Error Oracle is enabled and we have some pattern to match
     	if(settings.get(ConfigTags.WebConsoleErrorOracle, false) && !settings.get(ConfigTags.WebConsoleErrorPattern, "").isEmpty()) {
     		// Load the web console error pattern
     		Pattern errorPattern = Pattern.compile(settings.get(ConfigTags.WebConsoleErrorPattern), Pattern.UNICODE_CHARACTER_CLASS);
     		// Check Severe messages in the WebDriver logs
-    		RemoteWebDriver driver = WdDriver.getRemoteWebDriver();
-    		LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
     		for(LogEntry logEntry : logEntries) {
     			if(logEntry.getLevel().equals(Level.SEVERE)) {
     				// Check if the severe error message matches with the web console error pattern
@@ -324,8 +325,6 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     		// Load the web console warning pattern
     		Pattern warningPattern = Pattern.compile(settings.get(ConfigTags.WebConsoleWarningPattern), Pattern.UNICODE_CHARACTER_CLASS);
     		// Check Warning messages in the WebDriver logs
-    		RemoteWebDriver driver = WdDriver.getRemoteWebDriver();
-    		LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
     		for(LogEntry logEntry : logEntries) {
     			if(logEntry.getLevel().equals(Level.WARNING)) {
     				// Check if the warning message matches with the web console error pattern

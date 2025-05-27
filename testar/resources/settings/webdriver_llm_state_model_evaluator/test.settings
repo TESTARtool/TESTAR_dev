@@ -101,7 +101,7 @@ ProcessesToKillDuringTest =
 # AlwaysCompile: Compile the protocol before launching the selected TESTAR mode
 #################################################################
 
-ProtocolClass = webdriver_llm_condition_metrics/Protocol_webdriver_llm_condition_metrics
+ProtocolClass = webdriver_llm_state_model_evaluator/Protocol_webdriver_llm_state_model_evaluator
 AlwaysCompile = true
 
 #################################################################
@@ -113,10 +113,20 @@ AlwaysCompile = true
 # MaxTime: Sets a time, in seconds, after which the test run is finished (e.g. stop after an hour)
 #################################################################
 
-ActionDuration = 0.3
+ActionDuration = 0.0
 TimeToWaitAfterAction = 0.3
 StartupTime = 2.0
 MaxTime = 3.1536E7
+
+#################################################################
+# System Under Test (SUT) identification
+#
+# ApplicationName: Name to identify the SUT.
+# ApplicationVersion: Version to identify the SUT.
+#################################################################
+
+ApplicationName = parabank
+ApplicationVersion = loan_denied
 
 #################################################################
 # State model inference settings
@@ -141,13 +151,11 @@ StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer = 
-DataStoreDirectory = settings/webdriver_llm_condition_metrics/orientdb-community-3.0.34/databases
+DataStoreDirectory = settings/webdriver_llm_state_model_evaluator/orientdb-community-3.0.34/databases
 DataStoreDB = testar
 DataStoreUser = admin
 DataStorePassword = admin
 DataStoreMode = instant
-ApplicationName = parabank
-ApplicationVersion = loan_denied
 ActionSelectionAlgorithm = random
 StateModelStoreWidgets = true
 ResetDataStore = false
@@ -175,7 +183,9 @@ LlmActionFewshotFile = prompts/fewshot_openai_action.json
 LlmOracleFewshotFile = 
 LlmTemperature = 0.2
 LlmHistorySize = 5
+LlmStateless = true
 LlmTestGoals = Log in with the username john and the password demo\\nCheck: John Smith;Apply for a loan of 999999 with a down payment of 100\\nCheck: <p class="error">We cannot grant a loan in that amount with your available funds.</p>
+
 #################################################################
 # WebDriver features
 #

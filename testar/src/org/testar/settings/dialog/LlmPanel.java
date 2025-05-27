@@ -49,6 +49,7 @@ import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -104,6 +105,8 @@ public class LlmPanel extends SettingsPanel {
 
 	private JLabel labelLlmHistorySize = new JLabel("Action History Size");
 	private JTextField fieldLlmHistorySize = new JTextField();
+
+	private JCheckBox checkboxStateless = new JCheckBox("Stateless prompt");
 
 	private JLabel labelLlmTestGoalDescription = new JLabel("LLM Test Goal Description (User story, Gherkin structure, Playwright script, or other)");
 	private JButton dirLlmTestGoalLoad = new JButton("Load Goal");
@@ -201,21 +204,25 @@ public class LlmPanel extends SettingsPanel {
 		labelLlmTemperature.setBounds(10, 160, 120, 27);
 		labelLlmTemperature.setToolTipText(ConfigTags.LlmTemperature.getDescription());
 		add(labelLlmTemperature);
-		fieldLlmTemperature.setBounds(150, 160, 150, 27);
+		fieldLlmTemperature.setBounds(150, 160, 50, 27);
 		fieldLlmTemperature.setToolTipText(ConfigTags.LlmTemperature.getDescription());
 		add(fieldLlmTemperature);
 
-		labelLlmHistorySize.setBounds(330, 160, 100, 27);
+		labelLlmHistorySize.setBounds(230, 160, 100, 27);
 		labelLlmHistorySize.setToolTipText(ConfigTags.LlmHistorySize.getDescription());
 		add(labelLlmHistorySize);
-		fieldLlmHistorySize.setBounds(440, 160, 110, 27);
+		fieldLlmHistorySize.setBounds(350, 160, 50, 27);
 		fieldLlmHistorySize.setToolTipText(ConfigTags.LlmHistorySize.getDescription());
 		add(fieldLlmHistorySize);
 
+		checkboxStateless.setBounds(450, 160, 120, 27);
+		checkboxStateless.setToolTipText(ConfigTags.LlmStateless.getDescription());
+		add(checkboxStateless);
+		
 		labelLlmTestGoalDescription.setBounds(10, 190, 460, 27);
 		labelLlmTestGoalDescription.setToolTipText(ConfigTags.LlmTestGoals.getDescription());
 		add(labelLlmTestGoalDescription);
-		dirLlmTestGoalLoad.setBounds(510, 190, 100, 27);
+		dirLlmTestGoalLoad.setBounds(520, 220, 100, 27);
 		dirLlmTestGoalLoad.addActionListener(this::chooseTestGoalFileActionPerformed);
 		add(dirLlmTestGoalLoad);
 
@@ -227,10 +234,10 @@ public class LlmPanel extends SettingsPanel {
 		add(scrollPane);
 
 		// Add & Remove Buttons
-		addLlmTestGoalButton.setBounds(520, 260, 80, 27);
+		addLlmTestGoalButton.setBounds(530, 270, 80, 27);
 		addLlmTestGoalButton.addActionListener(this::addTestGoalTextArea);
 		add(addLlmTestGoalButton);
-		removeLlmTestGoalButton.setBounds(520, 300, 80, 27);
+		removeLlmTestGoalButton.setBounds(530, 310, 80, 27);
 		removeLlmTestGoalButton.addActionListener(this::removeLastTestGoalTextArea);
 		add(removeLlmTestGoalButton);
 	}
@@ -358,6 +365,15 @@ public class LlmPanel extends SettingsPanel {
 		if (fd.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			File selectedFile = fd.getSelectedFile();
 
+			// Only allow files with .goal extension
+			if (!selectedFile.getName().toLowerCase().endsWith(".goal")) {
+				JOptionPane.showMessageDialog(this,
+						"Only files with the '.goal' extension are allowed.",
+						"Invalid File Type",
+						JOptionPane.WARNING_MESSAGE);
+				return;
+			}
+
 			try (BufferedReader reader = new BufferedReader(new FileReader(selectedFile))) {
 				StringBuilder content = new StringBuilder();
 				String line;
@@ -368,6 +384,7 @@ public class LlmPanel extends SettingsPanel {
 
 				// Refill the text area with the file content
 				testGoalTextAreas.clear();
+				testGoalScrollPanes.clear();
 				testGoalContainer.removeAll();
 				List<String> goals = Arrays.asList(content.toString().split(";", -1));
 				for (String goal : goals) {
@@ -409,8 +426,10 @@ public class LlmPanel extends SettingsPanel {
 		fieldLlmOracleFewshot.setText(settings.get(ConfigTags.LlmOracleFewshotFile));
 		fieldLlmTemperature.setText(settings.get(ConfigTags.LlmTemperature).toString());
 		fieldLlmHistorySize.setText(settings.get(ConfigTags.LlmHistorySize).toString());
+		checkboxStateless.setSelected(settings.get(ConfigTags.LlmStateless));
 
 		testGoalTextAreas.clear();
+		testGoalScrollPanes.clear();
 		testGoalContainer.removeAll();
 		List<String> goals = settings.get(ConfigTags.LlmTestGoals);
 		for (String goal : goals) {
@@ -439,6 +458,7 @@ public class LlmPanel extends SettingsPanel {
 		settings.set(ConfigTags.LlmOracleFewshotFile, fieldLlmOracleFewshot.getText());
 		settings.set(ConfigTags.LlmTemperature, Float.parseFloat(fieldLlmTemperature.getText()));
 		settings.set(ConfigTags.LlmHistorySize, Integer.parseInt(fieldLlmHistorySize.getText()));
+		settings.set(ConfigTags.LlmStateless, checkboxStateless.isSelected());
 
 		List<String> goals = new ArrayList<>();
 		for (JTextArea textArea : testGoalTextAreas) {
