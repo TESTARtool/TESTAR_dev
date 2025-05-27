@@ -235,7 +235,7 @@ task createDatabaseOrientDB(type: Exec, dependsOn: downloadAndUnzipOrientDB){
     if (System.getProperty('os.name').toLowerCase().contains('windows')) {
         commandLine 'cmd', '/c', 'console.bat CREATE DATABASE plocal:../databases/testar admin admin'
     } else {
-        commandLine 'bash', '-c', 'chmod +x console.sh && ./console.sh CREATE DATABASE plocal:../databases/testar admin admin'
+        commandLine 'bash', '-c', './console.sh CREATE DATABASE plocal:../databases/testar admin admin'
     }
 
     // Ignore errors creating the database because we check the output buffer message
