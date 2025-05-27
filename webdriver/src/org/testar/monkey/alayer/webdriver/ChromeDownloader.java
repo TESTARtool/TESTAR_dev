@@ -45,7 +45,7 @@ public class ChromeDownloader {
 
 	private static final String CHROME_DOWNLOAD_URL = "https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_STABLE";
 	private static final String BASE_DOWNLOAD_URL = "https://storage.googleapis.com/chrome-for-testing-public/";
-	private static final String DOWNLOAD_DIR = System.getProperty("user.home") + File.separator + "downloads" + File.separator + "testar";
+	private static final String DOWNLOAD_DIR = "."; // local testar/bin folder
 
 	public static String downloadChromeForTesting() {
 		try {
