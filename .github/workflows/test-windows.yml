@@ -2,7 +2,7 @@ name: Windows TESTAR CI tests
 
 on:
   push:
-    branches: [ master, master_webdriver ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 

@@ -2,7 +2,7 @@ name: Ubuntu TESTAR Chromedriver CI tests
 
 on:
   push:
-    branches: [ master, master_webdriver ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
