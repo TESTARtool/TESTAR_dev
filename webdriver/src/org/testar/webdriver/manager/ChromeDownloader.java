@@ -28,7 +28,7 @@
  *
  */
 
-package org.testar.monkey.alayer.webdriver;
+package org.testar.webdriver.manager;
 
 import java.io.*;
 import java.net.HttpURLConnection;

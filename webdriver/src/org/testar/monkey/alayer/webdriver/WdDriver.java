@@ -30,7 +30,6 @@
 
 package org.testar.monkey.alayer.webdriver;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.monkey.alayer.devices.AWTKeyboard;
@@ -38,28 +37,25 @@ import org.testar.monkey.alayer.devices.Keyboard;
 import org.testar.monkey.alayer.devices.Mouse;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.exceptions.SystemStopException;
-
-import io.github.bonigarcia.wdm.WebDriverManager;
+import org.testar.webdriver.manager.WdChromeManager;
+import org.testar.webdriver.manager.WdFirefoxManager;
+import org.testar.webdriver.SutConnectorParser;
+import org.testar.webdriver.manager.WdBrowserManager;
 
 import org.openqa.selenium.*;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.logging.LogEntries;
+import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testar.monkey.alayer.*;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.*;
-
 
 public class WdDriver extends SUTBase {
   protected static final Logger logger = LogManager.getLogger();
@@ -76,64 +72,29 @@ public class WdDriver extends SUTBase {
   private final Mouse mouse = WdMouse.build();
 
   public WdDriver(String sutConnector) {
-	  String[] parts = sutConnector.split(" ");
-	  String chromePathCandidate = "";
-	  String url = "";
-	  String screenGeometryRaw = "";
+	  SutConnectorParser parser = new SutConnectorParser(sutConnector);
 
-	  // Identify and classify the WebDriver SUT Connector parts
-	  for (String raw : parts) {
-		  String part = raw.replace("\"", "");
-
-		  // Explicit URL (http, https, file, etc.)
-		  if (part.matches("^(?:[a-zA-Z][a-zA-Z0-9+.-]*):.*")) {
-			  url = part;
-		  } 
-		  // Local HTML file treated as URL
-		  else if (new File(part).exists() && part.toLowerCase().endsWith(".html")) {
-			  url = new File(part).toURI().toString();
-		  } 
-		  // Chrome executable (local file path)
-		  else if (part.endsWith(".exe") || new File(part).exists()) {
-			  chromePathCandidate = part;
-		  } 
-		  // Screen size
-		  else if (part.matches("^\\d+x\\d+\\+\\d+\\+\\d+$")) {
-			  screenGeometryRaw = part;
-		  } 
-		  // Invalid part
-		  else {
-			  logger.log(Level.WARN, "Invalid WebDriver SUT Connector part: " + part);
-		  }
-	  }
-
+	  String url = parser.getUrl();
 	  if (url.isEmpty()) {
 		  throw new IllegalArgumentException("No valid URL provided in sutConnector.");
 	  }
 
-	  String chromeForTestingPath = resolveChromeForTestingPath(chromePathCandidate);
-	  if (chromeForTestingPath == null || chromeForTestingPath.isEmpty()) {
-		  throw new RuntimeException("Unable to resolve Chrome for Testing path.");
-	  }
+	  Dimension screenDimensions = !fullScreen ? parser.getScreenDimensions() : null;
+	  Point screenPosition = !fullScreen ? parser.getScreenPosition() : null;
 
-	  Dimension screenDimensions = null;
-	  Point screenPosition = null;
-
-	  if (!screenGeometryRaw.isEmpty() && !fullScreen) {
-		  try {
-			  String[] dims = screenGeometryRaw.split("\\+")[0].split("x");
-			  screenDimensions = new Dimension(Integer.parseInt(dims[0]), Integer.parseInt(dims[1]));
-			  String[] pos = screenGeometryRaw.split("\\+");
-			  screenPosition = new Point(Integer.parseInt(pos[1]), Integer.parseInt(pos[2]));
-		  } catch (Exception e) {
-			  logger.log(Level.WARN, "Invalid screen geometry format: " + screenGeometryRaw, e);
-		  }
-	  }
-
+	  String browserPath = parser.getBrowserPath();
 	  String path = System.getProperty("user.dir");
 	  String extensionPath = path.substring(0, path.length() - 3) + "web-extension";
 
-	  remoteWebDriver = startChromeDriver(chromeForTestingPath, extensionPath);
+	  WdBrowserManager wdManager;
+	  if (browserPath.toLowerCase().contains("firefox")) {
+		  wdManager = new WdFirefoxManager();
+	  } else {
+		  wdManager = new WdChromeManager();
+	  }
+
+	  String browserBinary = wdManager.resolveBinary(browserPath);
+	  remoteWebDriver = wdManager.createWebDriver(browserBinary, extensionPath);
 
 	  if (screenDimensions != null) {
 		  remoteWebDriver.manage().window().setSize(screenDimensions);
@@ -149,88 +110,13 @@ public class WdDriver extends SUTBase {
 	  wdDriver = this;
   }
 
-  private String resolveChromeForTestingPath(String chromePathCandidate) {
-	  File file = new File(chromePathCandidate);
-	  if (file.exists() && file.getName().endsWith(".exe")) {
-		  logger.log(Level.INFO, String.format("User indicated Chrome for testing path: %s", chromePathCandidate));
-		  return file.getAbsolutePath();
-	  } else {
-		  if(!chromePathCandidate.isEmpty()) logger.log(Level.WARN, String.format("Invalid Chrome for testing path: %s", chromePathCandidate));
-		  logger.log(Level.INFO, "Downloading Chrome for testing...");
-		  return ChromeDownloader.downloadChromeForTesting();
-	  }
-  }
-
-  private RemoteWebDriver startChromeDriver(String chromeForTestingPath, String extensionPath) {
-	  String chromeVersion = getChromeMajorVersion(chromeForTestingPath);
-	  if(!chromeVersion.isEmpty()) {
-		  logger.log(Level.INFO, String.format("Detected Chrome Version: %s", chromeVersion));
-		  WebDriverManager.chromedriver().driverVersion(chromeVersion).setup();
-	  }
-	  else {
-		  logger.log(Level.WARN, "Chrome version not detected, the default WebDriverManager driver version will be used");
-		  WebDriverManager.chromedriver().setup();
-	  }
-
-	  ChromeOptions options = new ChromeOptions();
-	  options.setBinary(chromeForTestingPath);
-
-	  options.addArguments("--load-extension=" + extensionPath);
-
-	  options.addArguments("disable-infobars");
-
-	  // Workaround to fix https://github.com/SeleniumHQ/selenium/issues/11750
-	  options.addArguments("--remote-allow-origins=*");
-
-	  // Disable search engine selector
-	  options.addArguments("--disable-search-engine-choice-screen");  
-
-	  if(fullScreen) {
-		  options.addArguments("--start-maximized");
-	  }
-	  if(disableSecurity) {
-		  options.addArguments("ignore-certificate-errors");
-		  options.addArguments("--disable-web-security");
-		  options.addArguments("--allow-running-insecure-content");
-	  }
-
-	  Map<String, Object> prefs = new HashMap<>();
-	  prefs.put("profile.default_content_setting_values.notifications", 1);
-	  options.setExperimentalOption("prefs", prefs);
-
-	  return new ChromeDriver(options);
-  }
-
-  private String getChromeMajorVersion(String chromePath) {
-	  File chromeDir = new File(chromePath).getParentFile();
-	  File[] files = chromeDir.listFiles();
-
-	  if (files != null) {
-		  for (File file : files) {
-			  String name = file.getName();
-			  if (name.matches("\\d+\\.\\d+\\.\\d+\\.\\d+\\.manifest")) {
-				  // Example: "137.0.7151.40.manifest" to "137"
-				  return name.split("\\.")[0];
-			  }
-		  }
-	  }
-
-	  // If no .manifest file found, fall back to using --version
+  public static LogEntries getBrowserLogs() {
 	  try {
-		  Process process = new ProcessBuilder(chromePath, "--version").start();
-		  try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-			  // Example: "Google Chrome 137.0.7151.40.manifest" to "137"
-			  String line = reader.readLine();
-			  if (line != null && line.matches(".*\\d+\\.\\d+\\.\\d+\\.\\d+.*")) {
-				  String version = line.replaceAll("[^\\d.]", "");
-				  return version.split("\\.")[0];
-			  }
-		  }
-	  } catch (IOException e) {
-		  logger.log(Level.WARN, "Failed to get Chrome version from binary", e);
+		  return remoteWebDriver.manage().logs().get(LogType.BROWSER);
+	  } catch (UnsupportedCommandException e) {
+		  // Firefox does not support retrieving browser logs
+		  return new LogEntries(new ArrayList<>());
 	  }
-
-	  return "";
   }
 
   @Override

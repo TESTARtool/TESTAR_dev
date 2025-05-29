@@ -35,8 +35,6 @@ import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
-import org.openqa.selenium.logging.LogType;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.monkey.*;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
@@ -298,8 +296,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected Verdict getVerdict(State state) {
     	Verdict stateVerdict = super.getVerdict(state);
 
-    	RemoteWebDriver driver = WdDriver.getRemoteWebDriver();
-    	LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
+    	LogEntries logEntries = WdDriver.getBrowserLogs();
 
     	// If Web Console Error Oracle is enabled and we have some pattern to match
     	if(settings.get(ConfigTags.WebConsoleErrorOracle, false) && !settings.get(ConfigTags.WebConsoleErrorPattern, "").isEmpty()) {

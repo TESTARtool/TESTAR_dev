@@ -178,6 +178,10 @@ applicationDistribution.from("../webdriver/resources/web-extension") {
     into "web-extension"
 }
 
+applicationDistribution.from("../webdriver/resources/web-extension.xpi") {
+    into "/"
+}
+
 prepareOracles.dependsOn(oracleClasses)
 
 /**
