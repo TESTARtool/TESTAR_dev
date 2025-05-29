@@ -193,8 +193,11 @@ If you encounter any errors, please create an issue and provide details about yo
 
 ### Ubuntu (For Web systems under test)
 
-- Ubuntu 20 and 22 LTS are operating system versions that have been used to run the webdriver package of TESTAR for testing web applications.  
-``NOTE:`` It is important to use an environment with Graphical User Interface or to install and enable the Xvfb (X virtual framebuffer) server.  
+- Ubuntu 22 LTS are operating system versions that have been used to run the webdriver package of TESTAR for testing web applications.  
+``GUI testing NOTE:`` It is important to use an environment with Graphical User Interface or to install and enable the Xvfb (X virtual framebuffer) server.  
+``Chrome NOTE2`` Chrome for testing requires additional runtime libraries, such as`libasound2` library.  
+
+- Ubuntu 24 LTS introduces updated libraries, and `libasound2` is now replaced by `libasound2t64`. Be sure to install this newer package to ensure Chrome runs correctly. 
 
 ### macOS (For Web systems under test)
 
