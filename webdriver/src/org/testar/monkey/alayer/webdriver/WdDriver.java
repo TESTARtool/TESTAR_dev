@@ -38,6 +38,7 @@ import org.testar.monkey.alayer.devices.Mouse;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.exceptions.SystemStopException;
 import org.testar.webdriver.manager.WdChromeManager;
+import org.testar.webdriver.manager.WdEdgeManager;
 import org.testar.webdriver.manager.WdFirefoxManager;
 import org.testar.webdriver.SutConnectorParser;
 import org.testar.webdriver.manager.WdBrowserManager;
@@ -89,6 +90,8 @@ public class WdDriver extends SUTBase {
 	  WdBrowserManager wdManager;
 	  if (browserPath.toLowerCase().contains("firefox")) {
 		  wdManager = new WdFirefoxManager();
+	  } else if (browserPath.toLowerCase().contains("msedge")) {
+		  wdManager = new WdEdgeManager();
 	  } else {
 		  wdManager = new WdChromeManager();
 	  }
