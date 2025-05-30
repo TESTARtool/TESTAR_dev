@@ -199,7 +199,7 @@ If you encounter any errors, please create an issue and provide details about yo
 
 - Ubuntu 24 LTS introduces updated libraries, and `libasound2` is now replaced by `libasound2t64`. Be sure to install this newer package to ensure Chrome runs correctly. 
 
-### macOS (For Web systems under test)
+### Temporally unsupported: macOS (For Web systems under test)
 
 - macOS Monterey-ADM64 (version 12) and Sonoma-ARM (version 14) operating systems have been used in the GitHub Action to run the webdriver package of TESTAR for testing web applications.  
 ``NOTE:`` The ADM64 and ARM architectures require different software components, such as seleniarm docker images and webdriver arm versions.   
