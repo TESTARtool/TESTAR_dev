@@ -116,7 +116,7 @@ public class WdDriver extends SUTBase {
   public static LogEntries getBrowserLogs() {
 	  try {
 		  return remoteWebDriver.manage().logs().get(LogType.BROWSER);
-	  } catch (UnsupportedCommandException e) {
+	  } catch (Exception e) {
 		  // Firefox does not support retrieving browser logs
 		  return new LogEntries(new ArrayList<>());
 	  }

@@ -3,7 +3,13 @@ plugins {
 }
 
 apply plugin: 'application'
-apply from: 'workflow.gradle'
+
+apply from: 'workflow_utils.gradle'
+apply from: 'workflow_windows_desktop.gradle'
+apply from: 'workflow_windows_webdriver.gradle'
+apply from: 'workflow_ubuntu_webdriver.gradle'
+apply from: 'workflow_ubuntu_android.gradle'
+apply from: 'workflow_macos_webdriver.gradle'
 
 sourceSets {
     main {
