@@ -127,7 +127,7 @@ public class ListeningModeScript {
 		// notify the statemodelmanager
 		protocol.stateModelManager.notifyTestSequencedStarted();
 
-		//Once the SUT and chromedriver is launched
+		//Once the SUT and chrome with webdriver is launched
 		//Initialize the script listener and the Playwright Page
 		Playwright playwright = Playwright.create();
 		Browser browser = playwright.chromium().connectOverCDP("http://localhost:9222");
