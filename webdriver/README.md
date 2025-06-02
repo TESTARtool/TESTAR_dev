@@ -14,7 +14,7 @@ That said, using Chrome seems to be the most performant option.
 
 Make sure the conditions to run the desktop version of TESTAR are met, i.e. Java and Gradle are installed.
 Next, download a webdriver for the browser to use, the browser itself also needs to be installed.
-- Chrome/Chromium : http://chromedriver.chromium.org/downloads
+- Chrome/Chromium : https://googlechromelabs.github.io/chrome-for-testing/
 - Firefox : https://github.com/mozilla/geckodriver/releases
 - Edge : https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/  
   Make sure the downloaded version matches the installed Edge version.

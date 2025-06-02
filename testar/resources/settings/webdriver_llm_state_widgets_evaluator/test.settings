@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "https://para.testar.org/"
+SUTConnectorValue = "https://para.testar.org/"
 
 #################################################################
 # Sequences
@@ -101,7 +101,7 @@ ProcessesToKillDuringTest =
 # AlwaysCompile: Compile the protocol before launching the selected TESTAR mode
 #################################################################
 
-ProtocolClass = webdriver_llm_condition_metrics/Protocol_webdriver_llm_condition_metrics
+ProtocolClass = webdriver_llm_state_widgets_evaluator/Protocol_webdriver_llm_state_widgets_evaluator
 AlwaysCompile = true
 
 #################################################################
@@ -113,10 +113,20 @@ AlwaysCompile = true
 # MaxTime: Sets a time, in seconds, after which the test run is finished (e.g. stop after an hour)
 #################################################################
 
-ActionDuration = 0.3
+ActionDuration = 0.0
 TimeToWaitAfterAction = 0.3
 StartupTime = 2.0
 MaxTime = 3.1536E7
+
+#################################################################
+# System Under Test (SUT) identification
+#
+# ApplicationName: Name to identify the SUT.
+# ApplicationVersion: Version to identify the SUT.
+#################################################################
+
+ApplicationName = parabank
+ApplicationVersion = login
 
 #################################################################
 # State model inference settings
@@ -137,17 +147,15 @@ MaxTime = 3.1536E7
 # ResetDataStore: WARNING: Delete all existing State Models from the selected database before creating a new one
 #################################################################
 
-StateModelEnabled = true
-DataStore = OrientDB
-DataStoreType = plocal
+StateModelEnabled = false
+DataStore = 
+DataStoreType = remote
 DataStoreServer = 
-DataStoreDirectory = settings/webdriver_llm_condition_metrics/orientdb-community-3.0.34/databases
-DataStoreDB = testar
-DataStoreUser = admin
-DataStorePassword = admin
-DataStoreMode = instant
-ApplicationName = parabank
-ApplicationVersion = loan_denied
+DataStoreDirectory = 
+DataStoreDB = 
+DataStoreUser = 
+DataStorePassword = 
+DataStoreMode = none
 ActionSelectionAlgorithm = random
 StateModelStoreWidgets = true
 ResetDataStore = false
@@ -158,7 +166,7 @@ ResetDataStore = false
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WebWidgetId,WebWidgetName,WebWidgetStyle
+AbstractStateAttributes = WebWidgetId,WebWidgetName
 
 #################################################################
 # LLM agents settings
@@ -176,7 +184,7 @@ LlmOracleFewshotFile =
 LlmTemperature = 0.2
 LlmHistorySize = 5
 LlmStateless = true
-LlmTestGoals = Log in with the username john and the password demo\\nCheck: John Smith;Apply for a loan of 999999 with a down payment of 100\\nCheck: <p class="error">We cannot grant a loan in that amount with your available funds.</p>
+LlmTestGoals = Use the username 'john' and the password 'demo' to log in the application\\nCheck: Welcome John Smith
 
 #################################################################
 # WebDriver features

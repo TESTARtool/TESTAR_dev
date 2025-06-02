@@ -7,7 +7,7 @@ Mount /testar/bin/settings to a certal location to have the settings configurati
 Take care of setting ShowVisualSettingsDialog to False in the settings file as well.
 Take care of the following settings in the used settings file:
 - Mode should be Generate
-- SUTConnectorValue should contain the reference "/usr/bin/chromedriver" (the internal chromedriver of the Docker container)
+- SUTConnectorValue should indicate the web URL to test (TESTAR will automatically download chrome for testing)
 - VisualizeActions should be false
 - ShowVisualSettingsDialogOnStartup should be false
 - FlashFeedback should be false
