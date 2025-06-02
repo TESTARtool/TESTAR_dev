@@ -169,6 +169,7 @@ function wrapElementTestar(element, xOffset, yOffset) {
         value: element.value,
         checked: element.checked,
         selected: element.selected,
+        disabled: element.disabled,
         display: computedStyle.getPropertyValue('display'),
         computedFontSize: window.getComputedStyle(element).fontSize,
         innerHTML: element.innerHTML,

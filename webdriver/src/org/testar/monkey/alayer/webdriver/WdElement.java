@@ -81,7 +81,7 @@ public class WdElement extends TaggableBase implements Serializable {
   public double hScrollViewSize, vScrollViewSize, hScrollPercent, vScrollPercent;
   boolean isFullVisibleOnScreen;
 
-  boolean checked, selected;
+  boolean checked, selected, disabled;
 
   // ComputedStyle properties
   String computedFontSize;
@@ -148,6 +148,7 @@ public class WdElement extends TaggableBase implements Serializable {
     remoteWebElement = (RemoteWebElement)packedElement.get("element");
     checked = asBool(packedElement.getOrDefault("checked", false));
     selected = asBool(packedElement.getOrDefault("selected", false));
+    disabled = asBool(packedElement.getOrDefault("disabled", false));
 
     String classesString = attributeMap.getOrDefault("class", "");
     if (classesString != null) {

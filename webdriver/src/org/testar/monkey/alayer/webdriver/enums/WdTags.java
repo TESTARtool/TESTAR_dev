@@ -278,6 +278,21 @@ public class WdTags extends TagsBase {
   public static final Tag<String> WebPlaceholder = from("WebPlaceholder", String.class);
 
   /**
+   * Represents if an option is selected in a <select> element.
+   */
+  public static final Tag<Boolean> WebIsSelected = from("WebIsSelected", Boolean.class);
+
+  /**
+   * Represents if an <input> element is checked.
+   */
+  public static final Tag<Boolean> WebIsChecked = from("WebIsChecked", Boolean.class);
+
+  /**
+   * Represents if an element is disabled.
+   */
+  public static final Tag<Boolean> WebIsDisabled = from("WebIsDisabled", Boolean.class);
+
+  /**
    * Represents the remote web element object obtained with Selenium framework
    */
   public static final Tag<WebElement> WebElementSelenium = from("WebElementSelenium", WebElement.class);
