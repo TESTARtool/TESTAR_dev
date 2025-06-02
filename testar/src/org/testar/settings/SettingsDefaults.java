@@ -207,6 +207,7 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(LlmOracleFewshotFile, "prompts/fewshot_openai_oracle.json"));
 		defaults.add(Pair.from(LlmTemperature, 0.2f));
 		defaults.add(Pair.from(LlmHistorySize, 5));
+		defaults.add(Pair.from(LlmStateless, true));
 
 		// Settings for Spy Mode Tag Attributes configuration
 		defaults.add(Pair.from(SpyTagAttributes,  new ArrayList<String>() {
@@ -217,6 +218,7 @@ public class SettingsDefaults {
 				add("Title");
 				add("Role");
 				add("Enabled");
+				add("Blocked");
 				add("Shape");
 				add("Path");
 			}

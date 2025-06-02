@@ -95,7 +95,7 @@ public class XssSecurityOracle extends ActiveSecurityOracle {
     @Override
     public Verdict getVerdict()
     {
-        LogEntries logs = webDriver.manage().logs().get(LogType.BROWSER);
+        LogEntries logs = WdDriver.getBrowserLogs();
         for (LogEntry entry : logs) {
             if (entry.getMessage().contains("XSS"))
                 securityResultWriter.WriteResult(WdDriver.getCurrentUrl(), "79", "XSS detected");

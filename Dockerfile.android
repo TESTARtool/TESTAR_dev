@@ -1,4 +1,4 @@
-# This docker image already contains chromedriver and xvfb
+# This docker image already contains webdriver and xvfb
 FROM selenium/standalone-chrome
 
 # Update image dependencies and java

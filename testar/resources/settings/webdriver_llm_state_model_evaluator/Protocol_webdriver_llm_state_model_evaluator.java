@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2024 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2024 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -70,7 +70,7 @@ import static org.testar.monkey.alayer.Tags.Enabled;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
-public class Protocol_webdriver_llm_condition_metrics extends WebdriverProtocol {
+public class Protocol_webdriver_llm_state_model_evaluator extends WebdriverProtocol {
 	// The LLM Action selector needs to be initialize with the settings
 	private LlmActionSelector llmActionSelector;
 	private MetricsManager metricsManager;
@@ -107,8 +107,8 @@ public class Protocol_webdriver_llm_condition_metrics extends WebdriverProtocol 
 
 	private void setupTestGoals(List<String> testGoalsList) {
 		for(String testGoal : testGoalsList) {
-			CheckConditionEvaluator gherkinEvaluator = new CheckConditionEvaluator(WdTags.WebInnerHTML, testGoal);
-			testGoals.add(new LlmTestGoal(testGoal, gherkinEvaluator.getConditions()));
+			CheckConditionEvaluator checkEvaluator = new CheckConditionEvaluator(WdTags.WebInnerHTML, testGoal);
+			testGoals.add(new LlmTestGoal(testGoal, checkEvaluator.getConditions()));
 		}
 	}
 
@@ -401,7 +401,7 @@ public class Protocol_webdriver_llm_condition_metrics extends WebdriverProtocol 
 	}
 
 	private void setupOrientDB() {
-		String directoryPath = Main.settingsDir + File.separator + "webdriver_llm_condition_metrics";
+		String directoryPath = Main.settingsDir + File.separator + "webdriver_llm_state_model_evaluator";
 		String downloadUrl = "https://repo1.maven.org/maven2/com/orientechnologies/orientdb-community/3.0.34/orientdb-community-3.0.34.zip";
 		String zipFilePath = directoryPath + "/orientdb-community-3.0.34.zip";
 		String extractDir = directoryPath + "/orientdb-community-3.0.34";
