@@ -6,22 +6,30 @@ TESTAR webdriver tries to remedy this by looking at the DOM and adding a (JS) we
 An additional advantage is the fact that it is safe to run the webdriver version 'natively',
 i.e. it is not necessary to run TESTAR webdriver in a VM.
 
-The webdriver version of TESTAR is tested on 3 mayor platforms : Windows 10, OS X and Linux.
-It has been tested with Chrome/Chromium, Firefox and Edge (Windows).
-That said, using Chrome seems to be the most performant option.
+The webdriver version of TESTAR is tested on 3 mayor platforms : Windows (10 and 11), OS X and Linux.
+It has been tested with Chrome for Testing, Firefox and Edge (Windows).
+That said, using Chrome for Testing seems to be the most performant option.
 
-#### Prerequisites
+#### Browser Prerequisites
 
 Make sure the conditions to run the desktop version of TESTAR are met, i.e. Java and Gradle are installed.
-Next, download a webdriver for the browser to use, the browser itself also needs to be installed.
-- Chrome/Chromium : https://googlechromelabs.github.io/chrome-for-testing/
-- Firefox : https://github.com/mozilla/geckodriver/releases
-- Edge : https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/  
-  Make sure the downloaded version matches the installed Edge version.
+Next, download the browser to use:
+- Chrome for Testing : https://googlechromelabs.github.io/chrome-for-testing/
+- Firefox Browser: https://github.com/mozilla-firefox/firefox
+- Edge Browser: https://github.com/MicrosoftEdge/MSEdge
 
-Place the driver in an accessible location.
-This location needs to be first argument in the SUTConnectorValue, either via the test.settings file,
-or edited via the TESTAR GUI. Adjust the other settings if needed, window size comes to mind.
+#### WebDriverManager
+
+TESTAR makes use of the WebDriverManager open-source Java library: https://github.com/bonigarcia/webdrivermanager  
+to automatically download and make use of the driver dependencies.  
+
+#### Select browser in the SUTConnectorValue
+
+TESTAR users have multiple options to select the browser to test:  
+1. `"https://para.testar.org/"` : Indicating only the web URL to test will automatically download the lastest Chrome for Testing stable release
+2. `"C:\Program Files\chrome-win64\chrome.exe" "https://para.testar.org/"` : Users can indicate the specific Chrome for Testing browser
+3. `"C:\Program Files\Mozilla Firefox\firefox.exe" "https://para.testar.org/"` : Users can indicate the specific Mozilla Firefox browser
+4. `"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" "https://para.testar.org/"` : Users can indicate the specific Microsoft Edge browser
 
 #### Running
 

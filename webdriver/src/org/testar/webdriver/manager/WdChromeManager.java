@@ -97,6 +97,9 @@ public class WdChromeManager implements WdBrowserManager {
 			options.addArguments("--disable-web-security");
 			options.addArguments("--allow-running-insecure-content");
 		}
+		if(WdDriver.remoteDebugging) {
+			options.addArguments("--remote-debugging-port=9222");
+		}
 
 		Map<String, Object> prefs = new HashMap<>();
 		prefs.put("profile.default_content_setting_values.notifications", 1);
