@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fake Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    form {
+      max-width: 400px;
+      margin: auto;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    button {
+      padding: 10px 15px;
+    }
+  </style>
+</head>
+<body>
+  <form>
+    <div class="form-group">
+      <label for="name">Name:</label><br />
+      <input type="text" id="name" name="name" />
+    </div>
+
+    <div class="form-group">
+      <input type="checkbox" id="checkbox-terms" />
+      <label for="checkbox-terms">I accept the terms and conditions</label>
+    </div>
+
+    <div class="form-group">
+      <button type="submit" id="submitBtn" disabled>Submit</button>
+    </div>
+  </form>
+
+  <script>
+    const checkbox = document.getElementById("checkbox-terms");
+    const submitBtn = document.getElementById("submitBtn");
+
+    checkbox.addEventListener("change", function () {
+      submitBtn.disabled = !checkbox.checked;
+    });
+  </script>
+</body>
+</html>
