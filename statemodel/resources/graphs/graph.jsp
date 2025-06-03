@@ -1288,12 +1288,14 @@
 			const abstractID = ele.data("AbstractID");
 			const desc = ele.data("Desc");
 			const webCssSelector = ele.data("WebCssSelector");
+			const inputText = ele.data("InputText");
 			// Check if the action already exists in concreteActions
 			if (!concreteActions.some(action => action.AbstractID === abstractID)) {
 				concreteActions.push({
 					AbstractID: abstractID,
 					Desc: desc,
 					WebCssSelector: webCssSelector,
+					InputText: inputText,
 				});
 			}
 		});

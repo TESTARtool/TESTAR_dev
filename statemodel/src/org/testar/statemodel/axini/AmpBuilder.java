@@ -35,18 +35,30 @@ public class AmpBuilder {
 
 			String selector = action.getSelector();
 
-			String functionName = generateFunctionName(selector, target.getTitle());
+			boolean isType = action.getInputText() != null && !action.getInputText().isBlank();
+			String functionName = generateFunctionName(selector, target.getTitle(), isType);
 			actionToFunctionName.put(actionId, functionName);
 
 			// If this is a new function, create it
 			if (!createdFunctions.contains(functionName)) {
+
+				List<Constraint> receiveConstraints = new ArrayList<>();
+				receiveConstraints.add(new Constraint("selector", "\"" + selector + "\""));
+
+				String stimulus = "click_link";
+				if (isType) {
+					stimulus = "fill_in"; 
+					receiveConstraints.add(new Constraint("value", "\"" + action.getInputText() + "\""));
+				}
+
 				ActionDefinition def = new ActionDefinition(
 						functionName,
-						"click_link",
-						List.of(new Constraint("selector", "\"" + selector + "\"")),
+						stimulus,
+						receiveConstraints,
 						"page_title",
 						List.of(new Constraint("_title", "\"" + target.getTitle() + "\""))
 						);
+
 				process.addAction(def);
 				createdFunctions.add(functionName);
 			}
@@ -74,10 +86,11 @@ public class AmpBuilder {
 		return process;
 	}
 
-	private static String generateFunctionName(String selector, String targetTitle) {
-		String s = sanitize(selector);
-		String t = sanitize(targetTitle);
-		return "Click_" + s + "_to_" + t;
+	private static String generateFunctionName(String selector, String targetTitle, boolean isTypeAction) {
+		String prefix = isTypeAction ? "Type" : "Click";
+		String sanitizedSelector = sanitize(selector);
+		String sanitizedTarget = sanitize(targetTitle);
+		return prefix + "_" + sanitizedSelector + "_to_" + sanitizedTarget;
 	}
 
 	private static String sanitize(String input) {

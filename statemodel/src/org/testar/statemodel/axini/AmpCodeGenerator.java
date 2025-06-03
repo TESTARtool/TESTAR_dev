@@ -24,6 +24,7 @@ public class AmpCodeGenerator {
 		sb.append("  channel('extern') {\n")
 		.append("    stimulus 'visit', '_url' => :string\n")
 		.append("    stimulus 'click_link', 'selector' => :string\n")
+		.append("    stimulus 'fill_in', 'selector' => :string, 'value' => :string\n")
 		.append("    response 'page_title', '_title' => :string, '_url' => :string\n")
 		.append("  }\n\n");
 

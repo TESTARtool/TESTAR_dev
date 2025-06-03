@@ -13,6 +13,9 @@ public class GuiAction {
 	@JsonProperty("WebCssSelector")
 	private String selector;
 
+	@JsonProperty("InputText")
+	private String inputText; // null if it's a click action
+
 	public String getId() {
 		return id;
 	}
@@ -35,5 +38,13 @@ public class GuiAction {
 
 	public void setSelector(String selector) {
 		this.selector = selector;
+	}
+
+	public String getInputText() {
+		return inputText;
+	}
+
+	public void setInputText(String inputText) {
+		this.inputText = inputText;
 	}
 }

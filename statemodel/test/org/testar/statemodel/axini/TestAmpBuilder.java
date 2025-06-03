@@ -16,10 +16,12 @@ public class TestAmpBuilder {
 				"    { \"AbstractID\": \"s2\", \"WebTitle\": \"ParaBank | Site Map\" }",
 				"  ],",
 				"  \"ConcreteAction\": [",
-				"    { \"AbstractID\": \"a1\", \"Desc\": \"Click Site Map\", \"WebCssSelector\": \"a[href*='sitemap.htm']\" }",
+				"    { \"AbstractID\": \"a1\", \"Desc\": \"Click Site Map\", \"WebCssSelector\": \"a[href*='sitemap.htm']\" },",
+				"    { \"AbstractID\": \"a2\", \"Desc\": \"Type testar_text\", \"WebCssSelector\": \"[type='text']\", \"InputText\": \"testar_text\" }",
 				"  ],",
 				"  \"ConcreteTransitions\": [",
-				"    { \"Source\": \"s1\", \"Action\": \"a1\", \"Target\": \"s2\" }",
+				"    { \"Source\": \"s1\", \"Action\": \"a1\", \"Target\": \"s2\" },",
+				"    { \"Source\": \"s1\", \"Action\": \"a2\", \"Target\": \"s1\" }",
 				"  ]",
 				"}"
 				);
@@ -28,7 +30,7 @@ public class TestAmpBuilder {
 		ProcessDefinition process = AmpBuilder.buildFrom(guiModel);
 
 		Assert.isEquals("testar", process.getName());
-		Assert.isEquals(1, process.getActions().size());
+		Assert.isEquals(2, process.getActions().size());
 		Assert.isEquals(1, process.getBehaviors().size());
 	}
 
