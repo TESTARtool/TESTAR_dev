@@ -1,0 +1,51 @@
+/**
+ * Tasks to test TESTAR Ubuntu android using gradle
+ */
+
+// Run an Android test (inside an Ubuntu environment), execute 1 action and verdict should be OK
+task runTestAndroidGenericOk(type: Exec, dependsOn:'installDist') {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestAndroidGenericOk'
+    workingDir 'target/install/testar/bin'
+    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_android_generic FlashFeedback=false AlwaysCompile=true ApplicationName="android_ok" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=1 StateModelEnabled=false'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Check that output contains No problem detected. Message to verify the correct execution
+        if(output.readLines().any{line->line.contains("No problem detected.")}) {
+            println "\n${output} \nTESTAR has been executed sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Executing TESTAR Android")
+        }
+    }
+}
+
+// Run an Android test (inside an Ubuntu environment) to detect a suspicious message
+// Also, test the state model for web applications
+task runTestAndroidGenericSuspiciousTagStateModel(type: Exec, dependsOn: createDatabaseOrientDB) {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestAndroidGenericSuspiciousTag'
+    workingDir 'target/install/testar/bin'
+    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_android_generic FlashFeedback=false AlwaysCompile=true ApplicationName="android_suspicious_state_model" TagsForSuspiciousOracle="NotExist;UIAAutomationId;Title" SuspiciousTags=".*NFC.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=1 StateModelEnabled=true'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Check that output contains No problem detected. Message to verify the correct execution
+        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'Title' : 'NFC")}) {
+            println "\n${output} \nTESTAR has successfully detected NFC Suspicious Tag using TagsForSuspiciousOracle Title! "
+        } else {
+            throw new GradleException("\n${output} \nERROR: TESTAR didnt detect NFC Suspicious Tag using TagsForSuspiciousOracle Title")
+        }
+        
+        // Check that output contains abstract states in the State Model inference
+        if(output.readLines().any{line->line.contains("abstract states in the model")}) {
+            println "\n${output} \nTESTAR State Model has been inferred sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Inferring TESTAR State Model")
+        }
+    }
+}

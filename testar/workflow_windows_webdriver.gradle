@@ -1,0 +1,189 @@
+/**
+ * Tasks to test TESTAR Windows webdriver using gradle
+ */
+
+// Verify that TESTAR correctly executes webdriver
+// To be sure, connect to para.testar.org and detect .*[fF]orums.* suspicious tag ValuePattern
+// Also, test the state model for web applications
+task runTestWebdriverSuspiciousTagStateModel(type: Exec, dependsOn: createDatabaseOrientDB) {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestWebdriverSuspiciousTagStateModel'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_generic AlwaysCompile=true ApplicationName="webdriver_suspicious_state_model" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[fF]orums.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
+    doLast {
+        String output = standardOutput.toString()
+
+        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'ValuePattern' : 'http://forums.parasoft.com/")}) {
+            println "\n${output} \nTESTAR has successfully connect with WEB_DRIVER and detected .*[fF]orums.* Suspicious Tag! "
+        } else {
+            throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with WEB_DRIVER")
+        }
+        
+        // Check that output contains abstract states in the State Model inference
+        if(output.readLines().any{line->line.contains("abstract states in the model")}) {
+            println "\n${output} \nTESTAR State Model has been inferred sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Inferring TESTAR State Model")
+        }
+    }
+}
+
+// Connect to para.testar.org, make a login and detect the browser console error message
+task runTestWebdriverParabankLoginAndConsoleError(type: Exec) {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestWebdriverParabankLoginAndConsoleError'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_parabank AlwaysCompile=true ApplicationName="webdriver_login_console_error" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=1 ProtocolSpecificSetting_1=john ProtocolSpecificSetting_2=demo WebConsoleErrorOracle=true'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Check that output detects the browser console error message
+        if(output.readLines().any{line->line.contains("Failed to load resource: the server responded with a status of 404")}) {
+            println "\n${output} \nTESTAR login and browser console error detection has been executed sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Executing TESTAR")
+        }
+    }
+}
+
+// Connect to para.testar.org and use form filling to login
+task runTestWebdriverParabankFormFilling(type: Exec) {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestWebdriverParabankFormFilling'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_form_filling AlwaysCompile=true ApplicationName="webdriver_form_filling" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=1'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Check that output contains No problem detected. message to verify the correct execution
+        if(output.readLines().any{line->line.contains("No problem detected.")}) {
+            println "\n${output} \nTESTAR form filling login has been executed sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Executing TESTAR")
+        }
+    }
+}
+
+// Interact with para.testar.org executing webdriver remote actions
+task runTestWebdriverParabankRemoteActions(type: Exec) {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestWebdriverParabankRemoteActions'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_remote_parabank AlwaysCompile=true ApplicationName="webdriver_remote_actions" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=1 ProtocolSpecificSetting_1=john ProtocolSpecificSetting_2=demo TagsToFilter=WebHref ClickFilter="^(?!(.*sitemap.*)$).*$"'
+    doLast {
+        String output = standardOutput.toString()
+
+		// Check that output detects the browser console error message
+        if(output.readLines().any{line->line.contains("No problem detected.")}) {
+            println "\n${output} \nTESTAR webdriver remote acitons were executed sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Executing TESTAR")
+        }
+    }
+}
+
+// Verify that TESTAR correctly replays a sequence
+task runTestWebdriverCorrectReplay(type: Exec) {
+    // Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestWebdriverCorrectReplay'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_replay" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_replayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/paris_parisone.testar'
+    doLast {
+        String output = standardOutput.toString()
+
+        // Check that output contains Sequence successfully replayed message to verify the correct replay execution
+        if(output.readLines().any{line->line.contains("Sequence successfully replayed")}) {
+            println "\n${output} \nTESTAR sequence has been sucessfully replayed"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Executing TESTAR Replay mode")
+        }
+    }
+}
+
+// Verify that TESTAR correctly detects a not replayable sequence
+task runTestWebdriverUnreplayable(type: Exec) {
+    // Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestWebdriverUnreplayable'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_replay AlwaysCompile=true ApplicationName="webdriver_unreplayable" ShowVisualSettingsDialogOnStartup=false Mode=Replay SUTConnectorValue=" ""settings/test_gradle_workflow_webdriver_replay/similar_menu_unreplayable.html"" " PathToReplaySequence=./settings/test_gradle_workflow_webdriver_replay/paris_parisone.testar'
+    doLast {
+        String output = standardOutput.toString()
+
+        // Check that TESTAR detects not replayable button
+        if(output.readLines().any{line->line.contains("Left Click at 'ParisOne' of the replayed sequence can not been replayed")}) {
+            println "\n${output} \nTESTAR has sucessfully detected a not replayable sequence"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Detecting not replayable button with TESTAR Replay mode")
+        }
+    }
+}
+
+// Using Firefox
+// Verify that TESTAR correctly executes webdriver
+// To be sure, connect to para.testar.org and detect .*[fF]orums.* suspicious tag ValuePattern
+// Also, test the state model for web applications
+task runTestFirefoxWebdriverSuspiciousTagStateModel(type: Exec, dependsOn: createDatabaseOrientDB) {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestFirefoxWebdriverSuspiciousTagStateModel'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_generic SUTConnectorValue=" ""C:\\\\Program Files\\\\Mozilla Firefox\\\\firefox.exe"" ""https://para.testar.org/parabank/cookies.htm"" " AlwaysCompile=true ApplicationName="firefox_webdriver_suspicious_state_model" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[fF]orums.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
+    doLast {
+        String output = standardOutput.toString()
+
+        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'ValuePattern' : 'http://forums.parasoft.com/")}) {
+            println "\n${output} \nTESTAR has successfully connect with WEB_DRIVER and detected .*[fF]orums.* Suspicious Tag! "
+        } else {
+            throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with WEB_DRIVER")
+        }
+        
+        // Check that output contains abstract states in the State Model inference
+        if(output.readLines().any{line->line.contains("abstract states in the model")}) {
+            println "\n${output} \nTESTAR State Model has been inferred sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Inferring TESTAR State Model")
+        }
+    }
+}
+
+// Using Edge
+// Verify that TESTAR correctly executes webdriver
+// To be sure, connect to para.testar.org and detect .*[fF]orums.* suspicious tag ValuePattern
+// Also, test the state model for web applications
+task runTestEdgeWebdriverSuspiciousTagStateModel(type: Exec, dependsOn: createDatabaseOrientDB) {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestEdgeWebdriverSuspiciousTagStateModel'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_generic SUTConnectorValue=" ""C:\\\\Program Files (x86)\\\\Microsoft\\\\Edge\\\\Application\\\\msedge.exe"" ""https://para.testar.org/parabank/cookies.htm"" " AlwaysCompile=true ApplicationName="edge_webdriver_suspicious_state_model" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[fF]orums.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
+    doLast {
+        String output = standardOutput.toString()
+
+        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'ValuePattern' : 'http://forums.parasoft.com/")}) {
+            println "\n${output} \nTESTAR has successfully connect with WEB_DRIVER and detected .*[fF]orums.* Suspicious Tag! "
+        } else {
+            throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with WEB_DRIVER")
+        }
+        
+        // Check that output contains abstract states in the State Model inference
+        if(output.readLines().any{line->line.contains("abstract states in the model")}) {
+            println "\n${output} \nTESTAR State Model has been inferred sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Inferring TESTAR State Model")
+        }
+    }
+}
