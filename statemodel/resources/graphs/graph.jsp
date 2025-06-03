@@ -40,7 +40,7 @@
         <button onclick="queryModel()">Query Model</button>
         <button onclick="resetQuery()">Reset Query</button>
 
-        <button onclick="generateJSON()">Generate JSON</button>
+        <button onclick="generateAMP()">Export AMP</button>
 	</div>
 	<div class="layout">
         <div class="column">
@@ -1257,7 +1257,7 @@
             }
         });
     }
-	function generateJSON() {
+	function generateAMP() {
 		// Extract the information of the initial abstract state
 		let initialNodes = cy.$(".AbstractState").filter((ele) => ele.data("isInitial") === "true");
 		let initialAbstractId = initialNodes[0].data("stateId");
@@ -1324,11 +1324,30 @@
 			ConcreteAction: concreteActions,
 			ConcreteTransitions: concreteTransitions,
 		};
-		// Convert the JSON object to a string if needed for output
-		console.log(JSON.stringify(jsonResult, null, 2));
-		return jsonResult;
+		// Invoke the TESTAR-AXINI transformer
+		fetch("http://localhost:8090/generate-amp", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(jsonResult)
+		})
+		.then(res => res.text())
+		.then(ampCode => {
+			console.log("Generated AMP code:", ampCode);
+			downloadAmpFile(ampCode);
+		})
+		.catch(err => console.error("AMP generation failed:", err));
 	}
-
+	function downloadAmpFile(content, filename = "model.amp") {
+		const blob = new Blob([content], { type: "text/plain" });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement("a");
+		a.href = url;
+		a.download = filename;
+		a.click();
+		URL.revokeObjectURL(url);
+	}
 </script>
 </body>
 </html>

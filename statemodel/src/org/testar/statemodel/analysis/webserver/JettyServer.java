@@ -33,6 +33,7 @@ package org.testar.statemodel.analysis.webserver;
 import org.testar.statemodel.analysis.AnalysisManager;
 import org.testar.statemodel.analysis.GraphServlet;
 import org.testar.statemodel.analysis.StateModelServlet;
+import org.testar.statemodel.axini.AmpGenerationServlet;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -69,6 +70,7 @@ public class JettyServer {
         webAppContext.setResourceBase(resourceBase);
         webAppContext.addServlet(new ServletHolder(new StateModelServlet()), "/models");
         webAppContext.addServlet(new ServletHolder(new GraphServlet()), "/graph");
+        webAppContext.addServlet(new ServletHolder(new AmpGenerationServlet()), "/generate-amp");
         webAppContext.setAttribute("analysisManager", analysisManager);
 
         Configuration.ClassList classlist = Configuration.ClassList
