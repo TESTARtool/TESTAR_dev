@@ -69,6 +69,7 @@ public class WdDriver extends SUTBase {
   public static boolean forceActivateTab = true;
   public static boolean disableSecurity = false;
   public static boolean remoteDebugging = false;
+  public static boolean disableGPU = true;
 
   private final Keyboard kbd = AWTKeyboard.build();
   private final Mouse mouse = WdMouse.build();

@@ -100,6 +100,9 @@ public class WdChromeManager implements WdBrowserManager {
 		if(WdDriver.remoteDebugging) {
 			options.addArguments("--remote-debugging-port=9222");
 		}
+		if(WdDriver.disableGPU) {
+			options.addArguments("--disable-gpu");
+		}
 
 		Map<String, Object> prefs = new HashMap<>();
 		prefs.put("profile.default_content_setting_values.notifications", 1);
