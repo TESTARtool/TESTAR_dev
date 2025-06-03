@@ -90,6 +90,9 @@ public class GenerateMode {
 			//initializing TESTAR and the protocol canvas for a new sequence:
 			protocol.startTestSequence(system);
 
+			// notify the statemodelmanager
+			protocol.stateModelManager.notifyTestSequencedStarted();
+
 			try {
 				// getState() called before beginSequence:
 				LogSerialiser.log("Obtaining system state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
@@ -102,9 +105,6 @@ public class GenerateMode {
 
 				//update state after begin sequence SUT modification
 				state = protocol.getState(system);
-
-				// notify the statemodelmanager
-				protocol.stateModelManager.notifyTestSequencedStarted();
 
 				/*
 				 ***** starting the INNER LOOP:
