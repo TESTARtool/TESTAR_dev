@@ -321,7 +321,7 @@ public class SettingsDialog extends JFrame implements Observer {
         layout.createParallelGroup(Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(Alignment.TRAILING)
-                    .addComponent(jTabsPane, PREFERRED_SIZE, 620, PREFERRED_SIZE)
+                    .addComponent(jTabsPane, PREFERRED_SIZE, 642, PREFERRED_SIZE)
                     // Main modes buttons
                     .addGroup(getStartGroup(layout))
                     // Listening group
