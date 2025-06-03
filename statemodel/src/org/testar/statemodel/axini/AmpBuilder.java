@@ -33,29 +33,28 @@ public class AmpBuilder {
 
 			if (source == null || target == null || action == null) continue;
 
-			String selector = (action.getSelector() != null) ?
-					action.getSelector() : inferSelectorFromHref(action.getWebHref());
+			String selector = action.getSelector();
 
-					String functionName = generateFunctionName(selector, target.getTitle());
-					actionToFunctionName.put(actionId, functionName);
+			String functionName = generateFunctionName(selector, target.getTitle());
+			actionToFunctionName.put(actionId, functionName);
 
-					// If this is a new function, create it
-					if (!createdFunctions.contains(functionName)) {
-						ActionDefinition def = new ActionDefinition(
-								functionName,
-								"click_link",
-								List.of(new Constraint("selector", "\"" + selector + "\"")),
-								"page_title",
-								List.of(new Constraint("_title", "\"" + target.getTitle() + "\""))
-								);
-						process.addAction(def);
-						createdFunctions.add(functionName);
-					}
+			// If this is a new function, create it
+			if (!createdFunctions.contains(functionName)) {
+				ActionDefinition def = new ActionDefinition(
+						functionName,
+						"click_link",
+						List.of(new Constraint("selector", "\"" + selector + "\"")),
+						"page_title",
+						List.of(new Constraint("_title", "\"" + target.getTitle() + "\""))
+						);
+				process.addAction(def);
+				createdFunctions.add(functionName);
+			}
 
-					// Add operation to the corresponding source state behavior
-					behaviorOps
-					.computeIfAbsent(source.getTitle(), k -> new LinkedHashSet<>())
-					.add(new BehaviorOperation(functionName + "()", target.getTitle()));
+			// Add operation to the corresponding source state behavior
+			behaviorOps
+			.computeIfAbsent(source.getTitle(), k -> new LinkedHashSet<>())
+			.add(new BehaviorOperation(functionName + "()", target.getTitle()));
 		}
 
 		// Build BehaviorDefinitions from operations
@@ -89,7 +88,4 @@ public class AmpBuilder {
 				.replaceAll("_+$", "");              // remove trailing underscores
 	}
 
-	private static String inferSelectorFromHref(String href) {
-		return "a[href*='" + href + "']";
-	}
 }

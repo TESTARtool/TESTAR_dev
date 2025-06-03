@@ -1287,13 +1287,13 @@
 		cy.$(".ConcreteAction").forEach((ele) => {
 			const abstractID = ele.data("AbstractID");
 			const desc = ele.data("Desc");
-			const webHref = ele.data("WebHref");
+			const webCssSelector = ele.data("WebCssSelector");
 			// Check if the action already exists in concreteActions
 			if (!concreteActions.some(action => action.AbstractID === abstractID)) {
 				concreteActions.push({
 					AbstractID: abstractID,
 					Desc: desc,
-					WebHref: webHref,
+					WebCssSelector: webCssSelector,
 				});
 			}
 		});

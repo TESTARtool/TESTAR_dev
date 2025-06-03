@@ -10,10 +10,7 @@ public class GuiAction {
 	@JsonProperty("Desc")
 	private String desc;
 
-	@JsonProperty("WebHref")
-	private String webHref;
-
-	@JsonProperty("WebSelector")
+	@JsonProperty("WebCssSelector")
 	private String selector;
 
 	public String getId() {
@@ -30,14 +27,6 @@ public class GuiAction {
 
 	public void setDesc(String desc) {
 		this.desc = desc;
-	}
-
-	public String getWebHref() {
-		return webHref;
-	}
-
-	public void setWebHref(String webHref) {
-		this.webHref = webHref;
 	}
 
 	public String getSelector() {
