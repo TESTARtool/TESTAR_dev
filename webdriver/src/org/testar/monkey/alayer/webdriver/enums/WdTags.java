@@ -278,6 +278,11 @@ public class WdTags extends TagsBase {
   public static final Tag<String> WebPlaceholder = from("WebPlaceholder", String.class);
 
   /**
+   * Represents a css selector to identify an element.
+   */
+  public static final Tag<String> WebCssSelector = from("WebCssSelector", String.class);
+
+  /**
    * Represents the remote web element object obtained with Selenium framework
    */
   public static final Tag<WebElement> WebElementSelenium = from("WebElementSelenium", WebElement.class);

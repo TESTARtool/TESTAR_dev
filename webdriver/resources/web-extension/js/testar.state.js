@@ -3,6 +3,13 @@
  */
 var labelMap;
 
+const cssSelectorScript  = document.createElement('script');
+cssSelectorScript.src = 'https://cdn.jsdelivr.net/npm/css-selector-generator@3.6.9/build/index.min.js';
+cssSelectorScript .onload = () => {
+  console.log('css-selector-generator loaded!');
+};
+document.head.appendChild(cssSelectorScript );
+
 /*
  * Get the widget tree (Chrome, Firefox) or flattened tree (Edge)
  * @param {Array} array of tags that can be skipped, like <style>, <script> etc.
@@ -184,7 +191,11 @@ function wrapElementTestar(element, xOffset, yOffset) {
 
         wrappedChildren: [],
         xOffset: xOffset,
-        yOffset: yOffset
+        yOffset: yOffset,
+
+        cssSelector: typeof CssSelectorGenerator !== 'undefined'
+            ? CssSelectorGenerator.getCssSelector(element)
+            : ""
     };
 }
 

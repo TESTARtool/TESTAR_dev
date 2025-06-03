@@ -86,6 +86,8 @@ public class WdElement extends TaggableBase implements Serializable {
   // ComputedStyle properties
   String computedFontSize;
 
+  String cssSelector;
+
   // Keep these here for fillScrollValues
   protected String overflowX, overflowY;
   protected long clientWidth, clientHeight;
@@ -172,6 +174,8 @@ public class WdElement extends TaggableBase implements Serializable {
     if (display != null && display.toLowerCase().equals("none")) {
       enabled = false;
     }
+
+    cssSelector = (String) packedElement.get("cssSelector");
 
     List<Map<String, Object>> wrappedChildren =
         (List<Map<String, Object>>) packedElement.get("wrappedChildren");
