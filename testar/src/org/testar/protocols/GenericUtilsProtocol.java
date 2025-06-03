@@ -109,8 +109,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
                 // Create the triggered action, build the identifier, and execute it.
                 Action triggeredAction = triggeredClickAction(state, widget);
                 buildStateActionsIdentifiers(state, Collections.singleton(triggeredAction));
-                executeAction(system, state, triggeredAction);
-                return true;
+                return executeTriggeredAction(system, state, triggeredAction);
             }
             else {
                 Util.pause(waitBetween);
@@ -144,9 +143,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
                 // Create the triggered action, build the identifier, and execute it.
                 Action triggeredAction = triggeredClickAction(state, widget);
                 buildStateActionsIdentifiers(state, Collections.singleton(triggeredAction));
-                executeAction(system, state, triggeredAction);
-                // is waiting needed after the action has been executed?
-                return true;
+                return executeTriggeredAction(system, state, triggeredAction);
             }
             else{
                 Util.pause(waitBetween);
@@ -215,8 +212,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
                 // Create the triggered action, build the identifier, and execute it.
                 Action triggeredAction = triggeredTypeAction(state, widget, textToType, true);
                 buildStateActionsIdentifiers(state, Collections.singleton(triggeredAction));
-                executeAction(system, state, triggeredAction);
-                return true;
+                return executeTriggeredAction(system, state, triggeredAction);
             }
             else {
                 Util.pause(waitBetween);
@@ -251,9 +247,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
                 // Create the triggered action, build the identifier, and execute it.
                 Action triggeredAction = triggeredTypeAction(state, widget, textToType, true);
                 buildStateActionsIdentifiers(state, Collections.singleton(triggeredAction));
-                executeAction(system, state, triggeredAction);
-                // is waiting needed after the action has been executed?
-                return true;
+                return executeTriggeredAction(system, state, triggeredAction);
             }
             else{
                 Util.pause(waitBetween);
@@ -323,8 +317,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
                 // Create the triggered action, build the identifier, and execute it.
                 Action triggeredAction = triggeredPasteAction(state, widget, textToPaste, true);
                 buildStateActionsIdentifiers(state, Collections.singleton(triggeredAction));
-                executeAction(system, state, triggeredAction);
-                return true;
+                return executeTriggeredAction(system, state, triggeredAction);
             }
             else {
                 Util.pause(waitBetween);
@@ -359,9 +352,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
                 // Create the triggered action, build the identifier, and execute it.
                 Action triggeredAction = triggeredPasteAction(state, widget, textToPaste, true);
                 buildStateActionsIdentifiers(state, Collections.singleton(triggeredAction));
-                executeAction(system, state, triggeredAction);
-                // is waiting needed after the action has been executed?
-                return true;
+                return executeTriggeredAction(system, state, triggeredAction);
             }
             else{
                 Util.pause(waitBetween);
@@ -708,6 +699,18 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
     		}
     	}
     	return new HashSet<>();
+    }
+
+    /**
+     * Execute the selected triggered action. 
+     * 
+     * @param system
+     * @param state
+     * @param triggeredAction
+     * @return
+     */
+    protected boolean executeTriggeredAction(SUT system, State state, Action triggeredAction) {
+    	return executeAction(system, state, triggeredAction);
     }
 
     /**
