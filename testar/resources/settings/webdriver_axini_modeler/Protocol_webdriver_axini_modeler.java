@@ -56,14 +56,27 @@ public class Protocol_webdriver_axini_modeler extends WebdriverProtocol {
 		super.beginSequence(system, state);
 
 		// Add your login sequence here
-		/*
+
 		waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","username", "john", state, system, 5,1.0);
 
 		waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","password", "demo", state, system, 5,1.0);
 
 		waitAndLeftClickWidgetWithMatchingTag("value", "Log In", state, system, 5, 1.0);
-		 */
 
+	}
+
+	@Override
+	protected boolean executeTriggeredAction(SUT system, State state, Action triggeredAction) {
+		// Save the state information in the model
+		stateModelManager.notifyNewStateReached(state, new HashSet<>(Collections.singletonList(triggeredAction)));
+
+		// Execute the desired triggeredAction
+		boolean executed = super.executeTriggeredAction(system, state, triggeredAction);
+
+		// Save the triggeredAction information in the model
+		stateModelManager.notifyActionExecution(triggeredAction);
+
+		return executed;
 	}
 
 	/**
@@ -184,8 +197,7 @@ public class Protocol_webdriver_axini_modeler extends WebdriverProtocol {
 
 	@Override
 	protected boolean isClickable(Widget widget) {
-		Role role = widget.get(Tags.Role, Roles.Widget);
-		return role.equals(WdRoles.WdA);
+		return (super.isClickable(widget) && !widget.get(WdTags.WebCssSelector, "").isEmpty());
 	}
 
 	@Override

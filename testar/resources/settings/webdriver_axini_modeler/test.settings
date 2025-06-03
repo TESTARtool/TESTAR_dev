@@ -36,7 +36,7 @@ SUTConnectorValue = "https://para.testar.org/"
 #################################################################
 
 Sequences = 1
-SequenceLength = 100
+SequenceLength = 10
 
 #################################################################
 # Oracles based on suspicious tag values
@@ -82,7 +82,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = ^(?!(.*index.htm.*|.*sitemap.htm.*|.*register.htm.*|.*lookup.htm.*|.*about.htm.*|.*contact.htm.*|.*services.htm.*)$).*$
+ClickFilter = 
 TagsToFilter = WebHref
 
 #################################################################
@@ -149,7 +149,7 @@ DataStoreMode = instant
 ApplicationName = parabank_axini
 ApplicationVersion = 1
 ActionSelectionAlgorithm = unvisited
-StateModelStoreWidgets = true
+StateModelStoreWidgets = false
 ResetDataStore = false
 
 #################################################################
