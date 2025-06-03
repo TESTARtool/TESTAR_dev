@@ -50,6 +50,11 @@ public class ConcreteActionFactory {
         if(action.get(Tags.Desc, null) != null)
         	setSpecificAttribute(concreteAction, Tags.Desc, action.get(Tags.Desc));
 
+        // check if the action as attached an InputText
+        // if so, set this InputText to the current ConcreteAction
+        if(action.get(Tags.InputText, null) != null)
+        	setSpecificAttribute(concreteAction, Tags.InputText, action.get(Tags.InputText));
+
         return concreteAction;
     }
 

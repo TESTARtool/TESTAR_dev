@@ -164,6 +164,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		Action ret = super.clickTypeInto(widget, relX, relY, text, replaceText);
 		//ret.set(Tags.Desc, "Type '" + Util.abbreviate(text, 5, "...") + "' into '" + widget.get(Tags.Desc, "<no description>" + "'"));
 		ret.set(Tags.Desc, "Type '" + Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "...") + "' into '" + widget.get(Tags.Desc, "<no description>" + "'")); // by urueda
+		ret.set(Tags.InputText, text);
 		ret.mapActionToWidget(widget);
         return ret;
 	}
@@ -175,6 +176,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
 		//ret.set(Tags.Desc, "Type '" + Util.abbreviate(text, 5, "...") + "' into '" + position.toString() + "'");
 		ret.set(Tags.Desc, "Replace '" + Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "...") + "' into '" + position.toString() + "'");
+		ret.set(Tags.InputText, text);
 		ret.set(Tags.Role, ActionRoles.ClickTypeInto);		
 		return ret;
 	}
@@ -186,6 +188,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
 		//ret.set(Tags.Desc, "Type '" + Util.abbreviate(text, 5, "...") + "' into '" + position.toString() + "'");
 		ret.set(Tags.Desc, "Append '" + Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "...") + "' into '" + position.toString() + "'");
+		ret.set(Tags.InputText, text);
 		ret.set(Tags.Role, ActionRoles.ClickTypeInto);
 		return ret;
 	}
@@ -196,6 +199,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
 		ret.set(Tags.Role, ActionRoles.PasteTextInto);
 		ret.set(Tags.Desc, "Paste Text: " + StringEscapeUtils.escapeHtml4(text));
+		ret.set(Tags.InputText, text);
 		return ret;
 	}
 
@@ -205,6 +209,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
 		ret.set(Tags.Role, ActionRoles.PasteTextInto);
 		ret.set(Tags.Desc, "Append Paste Text: " + StringEscapeUtils.escapeHtml4(text));
+		ret.set(Tags.InputText, text);
 		return ret;
 	}
 
