@@ -53,8 +53,8 @@ task createDatabaseOrientDB(type: Exec, dependsOn: downloadAndUnzipOrientDB){
     doLast {
         String output = standardOutput.toString()
         
-        // If error creating database because already exists is ok
-        if (errorOutput.toString().contains("Cannot create new database 'testar' because it already exists")) {
+        // If an error is printed when creating the database because it already exists, it's ok
+        if (output.readLines().any{line->line.contains("Cannot create new database 'testar' because it already exists")}) {
             println "\n${output} \ntestar OrientDB database already exists"
         }
         // Check if testar database created sucessfully
