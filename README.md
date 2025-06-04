@@ -133,11 +133,9 @@ The State Model consists on Widgets and States obtained from getState() method t
 
 The protocols ``desktop_generic_statemodel`` and ``webdriver_statemodel`` contain the default settings implementation which shows how TESTAR State Model could be used.
 
-### Download OrientDB 3.0.34 GA Community Edition (August 31st, 2020)
+### Download OrientDB 3.2.39 GA Community Edition
 https://www.orientdb.org/download  
-https://repo1.maven.org/maven2/com/orientechnologies/orientdb-community/3.0.34/orientdb-community-3.0.34.zip  
-
-``Warning: Since August 2020 there is version 3.1.X of OrientDB, however TESTAR currently requires the use of versions 3.0.X``
+https://repo1.maven.org/maven2/com/orientechnologies/orientdb-community/3.2.39/orientdb-community-3.2.39.zip  
 
 ### Install and configure OrientDB Server
 In order to use the graphdb feature it's advised to install a graph database on your machine or in a remote server.
@@ -172,7 +170,7 @@ Also is possible to connect at file level without deploy the OrientDB locally:
 		StateModelEnabled = true
 		DataStore = OrientDB
 		DataStoreType = plocal
-		DataStoreDirectory = C:\\Users\\testar\\Desktop\\orientdb-community-3.0.34\\databases
+		DataStoreDirectory = C:\\Users\\testar\\Desktop\\orientdb-community-3.2.39\\databases
 		DataStoreDB = testar
 		DataStoreUser = testar
 		DataStorePassword = testar

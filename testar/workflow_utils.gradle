@@ -9,18 +9,18 @@ task init_workflow_test(type: Copy) {
     into 'target/scripts/settings'
 }
 
-// Download OrientDB 3.0.34 from the official wep page
+// Download OrientDB 3.2.39 from the official wep page
 task downloadOrientDB(type: Download, dependsOn: installDist) {
-    src 'https://repo1.maven.org/maven2/com/orientechnologies/orientdb-community/3.0.34/orientdb-community-3.0.34.zip'
+    src 'https://repo1.maven.org/maven2/com/orientechnologies/orientdb-community/3.2.39/orientdb-community-3.2.39.zip'
     dest 'target/install/testar/bin'
     overwrite false
 }
 
 // Verify that we downloaded the correct OrientDB file
 task verifyOrientDB(type: Verify, dependsOn: downloadOrientDB) {
-    src new File(downloadOrientDB.dest, 'orientdb-community-3.0.34.zip')
+    src new File(downloadOrientDB.dest, 'orientdb-community-3.2.39.zip')
     algorithm 'MD5'
-    checksum '37a87c9c8b3ed3778f6103b15c7e184b'
+    checksum '45cd4ab0812980dbea5658bf8384f1ad'
 }
 
 // Extract OrientDB binary files
@@ -28,7 +28,7 @@ task downloadAndUnzipOrientDB(type: Copy, dependsOn: verifyOrientDB) {
     group = 'test_testar_workflow'
     description ='downloadAndUnzipOrientDB'
     
-    from zipTree(new File(downloadOrientDB.dest, 'orientdb-community-3.0.34.zip'))
+    from zipTree(new File(downloadOrientDB.dest, 'orientdb-community-3.2.39.zip'))
     into downloadOrientDB.dest
 }
 
@@ -40,7 +40,7 @@ task createDatabaseOrientDB(type: Exec, dependsOn: downloadAndUnzipOrientDB){
     // Read command line output
     standardOutput = new ByteArrayOutputStream()
     errorOutput = new ByteArrayOutputStream()
-    workingDir 'target/install/testar/bin/orientdb-community-3.0.34/bin'
+    workingDir 'target/install/testar/bin/orientdb-community-3.2.39/bin'
     
     if (System.getProperty('os.name').toLowerCase().contains('windows')) {
         commandLine 'cmd', '/c', 'console.bat CREATE DATABASE plocal:../databases/testar admin admin'
