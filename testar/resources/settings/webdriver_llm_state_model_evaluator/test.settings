@@ -157,7 +157,7 @@ DataStoreUser = admin
 DataStorePassword = admin
 DataStoreMode = instant
 ActionSelectionAlgorithm = random
-StateModelStoreWidgets = true
+StateModelStoreWidgets = false
 ResetDataStore = false
 
 #################################################################

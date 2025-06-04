@@ -114,7 +114,7 @@ DataStoreMode = instant
 ApplicationName = parabank
 ApplicationVersion = 1
 ActionSelectionAlgorithm = unvisited
-StateModelStoreWidgets = true
+StateModelStoreWidgets = false
 
 #################################################################
 # State identifier attributes
