@@ -1,4 +1,4 @@
-name: Windows webdriver TESTAR CI tests
+name: Windows webdriver CI
 
 on:
   push:

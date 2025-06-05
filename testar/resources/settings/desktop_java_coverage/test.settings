@@ -154,7 +154,7 @@ DataStoreMode = none
 ApplicationName = printerLogger
 ApplicationVersion = 
 ActionSelectionAlgorithm = random
-StateModelStoreWidgets = true
+StateModelStoreWidgets = false
 ResetDataStore = false
 
 #################################################################

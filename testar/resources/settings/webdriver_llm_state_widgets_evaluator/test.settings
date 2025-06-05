@@ -157,7 +157,7 @@ DataStoreUser =
 DataStorePassword = 
 DataStoreMode = none
 ActionSelectionAlgorithm = random
-StateModelStoreWidgets = true
+StateModelStoreWidgets = false
 ResetDataStore = false
 
 #################################################################

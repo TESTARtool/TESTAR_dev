@@ -193,7 +193,7 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(StateModelTags.DataStoreMode, ""));
 		defaults.add(Pair.from(StateModelTags.ResetDataStore, false));
 		defaults.add(Pair.from(StateModelTags.ActionSelectionAlgorithm, "random"));
-		defaults.add(Pair.from(StateModelTags.StateModelStoreWidgets, true));
+		defaults.add(Pair.from(StateModelTags.StateModelStoreWidgets, false));
 
 		// Settings for LLM agents
 		defaults.add(Pair.from(LlmPlatform, "OpenAI"));
