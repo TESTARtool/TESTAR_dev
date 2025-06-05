@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2024 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,6 +30,7 @@
 
 package org.testar;
 
+import org.testar.settings.dialog.tagsvisualization.TagFilter;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.devices.Mouse;
@@ -161,11 +162,9 @@ public class SutVisualization {
                 }
 
                 int MAX_ANCESTORS_PERLINE = 6;
-                double widgetInfoW = canvas.width()/2; //550;
-                double widgetInfoH = (1 + Util.size(cursorWidget.tags()) +
-                        Util.size(Util.ancestors(cursorWidget)) / MAX_ANCESTORS_PERLINE)
-                        * 20;
-                cwShape = ProtocolUtil.calculateWidgetInfoShape(canvas,cwShape, widgetInfoW, widgetInfoH);
+                double widgetInfoW = canvas.width() / 2;
+                double widgetInfoH = (1 + calculateNumberOfTagsToShow(cursorWidget) + Util.size(Util.ancestors(cursorWidget)) / MAX_ANCESTORS_PERLINE) * 20;
+                cwShape = ProtocolUtil.calculateWidgetInfoShape(canvas, cwShape, widgetInfoW, widgetInfoH);
 
                 if(showExtendedWidgetInfo){
                     //canvas.rect(wpen, cwShape.x(), cwShape.y() - 20, 550, Util.size(cursorWidget.tags()) * 25);
@@ -198,15 +197,33 @@ public class SutVisualization {
                         canvas.text(Pen.PEN_BLACK, cwShape.x(), cwShape.y() + (pos+=20), 0, sb.toString());
                     }
 
-                    for(Tag<?> t : cursorWidget.tags()){
-                    	if(cursorWidget.get(t,null) != null && !cursorWidget.get(t).toString().isEmpty()) {
-                    		canvas.text((t.isOneOf(Tags.Role,Tags.Title,Tags.Shape,Tags.Enabled,Tags.Path,Tags.ConcreteID)) ? Pen.PEN_RED : Pen.PEN_BLACK,
-                    				cwShape.x(), cwShape.y() + (pos+=20), 0, t.name() + ":   " + Util.abbreviate(Util.toString(cursorWidget.get(t)), 50, "..."));
-                    	}
+                    for (Tag<?> t : cursorWidget.tags()) {
+                        // Only add show the tags which have been set in the filter.
+                        if (TagFilter.getInstance().visualizeTag(t)) {
+                            canvas.text((t.isOneOf(Tags.Role, Tags.Title, Tags.Shape, Tags.Enabled, Tags.Path,
+                                    Tags.ConcreteID)) ? Pen.PEN_RED : Pen.PEN_BLACK, cwShape.x(), cwShape.y() + (pos += 20),
+                                    0, t.name() + ":   " + Util.abbreviate(Util.toString(cursorWidget.get(t)), 50, "..."));
+                        }
                     }
                 }
             }
         }
+    }
+
+    /**
+     * Calculate how many tags we need to show .
+     * @param cursorWidget The widget pointed by the cursor.
+     * @return The number of tags we need to show.
+     */
+    public static int calculateNumberOfTagsToShow(Widget cursorWidget) {
+        int tagsToShow = 0;
+        for (Tag<?> t : cursorWidget.tags()) {
+            // Only add show the tags which have been set in the filter.
+            if (TagFilter.getInstance().visualizeTag(t)) {
+                tagsToShow++;
+            }
+        }
+        return tagsToShow;
     }
 
     /**

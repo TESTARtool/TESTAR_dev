@@ -141,6 +141,9 @@ public final class ConfigTags {
 	public static final Tag<Integer> LlmHistorySize = Tag.from("LlmHistorySize", Integer.class,
 			"Controls how many historical actions are kept track of and sent to the LLM.");
 
+	public static final Tag<Boolean> LlmStateless = Tag.from("LlmStateless", Boolean.class,
+			"Generates individual prompts for each action and oracle LLM conversation.");
+
 	/**
 	 * WebDriver settings 
 	 */
@@ -332,6 +335,9 @@ public final class ConfigTags {
 
 	@SuppressWarnings("unchecked")
 	public static final Tag<List<Pair<String, String>>> CopyFromTo = Tag.from("CopyFromTo", (Class<List<Pair<String, String>>>) (Class<?>) List.class);
+
+	public static final Tag<List<String>> SpyTagAttributes = Tag.from("SpyTagAttributes", (Class<List<String>>) (Class<?>) List.class,
+			"Specify the widget attributes that you wish to visualize during Spy Mode. Use a semicolon separated list.");
 
 	/*
 	//TODO web driver settings for login feature

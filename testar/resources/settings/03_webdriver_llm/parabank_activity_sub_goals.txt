@@ -1,3 +1,0 @@
-Log in with the username john and the password demo to see the accounts overview
-;
-Select the account 12345 to see the account activity

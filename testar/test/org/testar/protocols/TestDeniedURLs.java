@@ -34,7 +34,7 @@ public class TestDeniedURLs extends WebdriverProtocol {
 		webPathsAllowed = "";
 
 		// The ensureWebDomainsAllowed feature adds the default url as allowed domain
-		String SUTConnectorValue = " \"C:\\Windows\\chromedriver.exe\" \"https://para.testar.org\" ";
+		String SUTConnectorValue = " \"C:\\Windows\\chrome\\chrome.exe\" \"https://para.testar.org\" \"1920x900+0+0\" ";
 		settings.set(ConfigTags.SUTConnectorValue, SUTConnectorValue);
 
 		ensureWebDomainsAllowed();
@@ -51,7 +51,7 @@ public class TestDeniedURLs extends WebdriverProtocol {
 		webPathsAllowed = "";
 
 		// The ensureWebDomainsAllowed feature adds the default url as allowed domain
-		String SUTConnectorValue = " \"C:\\Windows\\chromedriver.exe\" \"https://para.testar.org\" ";
+		String SUTConnectorValue = " \"C:\\Windows\\chrome\\chrome.exe\" \"https://para.testar.org\" \"1920x900+0+0\" ";
 		settings.set(ConfigTags.SUTConnectorValue, SUTConnectorValue);
 
 		ensureWebDomainsAllowed();

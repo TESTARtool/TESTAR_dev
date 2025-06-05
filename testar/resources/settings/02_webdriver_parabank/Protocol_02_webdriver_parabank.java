@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -33,9 +33,11 @@ import org.testar.SutVisualization;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
+import org.testar.monkey.alayer.actions.WdSelectListAction.JsTargetMethod;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
+import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
 import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
@@ -71,11 +73,6 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 	@Override
 	protected void initialize(Settings settings) {
 		super.initialize(settings);
-
-		// List of atributes to identify and close policy popups
-		// Set to null to disable this feature
-		policyAttributes = ArrayListMultimap.create();
-		policyAttributes.put("class", "lfr-btn-label");
 
 		// Reset the list when we start a new TESTAR run with multiple sequences
 		listOfDetectedErroneousVerdicts = new ArrayList<>();
@@ -194,13 +191,14 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 			return verdict;
 		}
 
-		// ExtendedOracles offered by TESTAR
-		for(Oracle extendedOracle : extendedOraclesList) {
+		// "ExtendedOracles" offered by TESTAR in the test.settings or Oracles GUI dialog
+		for (Oracle extendedOracle : extendedOraclesList) {
 			Verdict extendedVerdict = extendedOracle.getVerdict(state);
 
 			// If the Custom Verdict is not OK and was not detected in a previous sequence
 			// return verdict with failure state
-			if (extendedVerdict != Verdict.OK && !containsVerdictInfo(listOfDetectedErroneousVerdicts, extendedVerdict.info())) {
+			if (extendedVerdict != Verdict.OK 
+					&& !containsVerdictInfo(listOfDetectedErroneousVerdicts, extendedVerdict.info())) {
 				return extendedVerdict;
 			}
 
@@ -212,42 +210,56 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 
 		// ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
 
-		Verdict customVerdict = Verdict.OK;
-		/*
-		customVerdict = customVerdict.join(detectNumberWithLotOfDecimals(state, 2));
-
-		customVerdict = customVerdict.join(detectEmptySelectItems(state));
-
-		customVerdict = customVerdict.join(detectDuplicateSelectItems(state));
-
-		customVerdict = customVerdict.join(detectTextAreaWithoutLength(state, Arrays.asList(WdRoles.WdTEXTAREA)));
+		Verdict leafWidgetsOverlappingVerdict = leafWidgetsOverlapping(state);
 
 		// If the Custom Verdict is not OK but was already detected in a previous sequence
 		// Consider as OK to avoid duplicates
-		if (customVerdict != Verdict.OK && containsVerdictInfo(listOfDetectedErroneousVerdicts, customVerdict.info())) {
-			customVerdict = Verdict.OK;
+		if (leafWidgetsOverlappingVerdict != Verdict.OK 
+				&& !containsVerdictInfo(listOfDetectedErroneousVerdicts, leafWidgetsOverlappingVerdict.info())) {
+			return leafWidgetsOverlappingVerdict;
 		}
-		 */
-		return customVerdict;
+
+		return Verdict.OK;
 	}
 
 	private boolean containsVerdictInfo(List<String> listOfDetectedErroneousVerdicts, String currentVerdictInfo) {
 		return listOfDetectedErroneousVerdicts.stream().anyMatch(verdictInfo -> verdictInfo.contains(currentVerdictInfo.replace("\n", " ")));
 	}
 
-	public Verdict detectNumberWithLotOfDecimals(State state, int maxDecimals) {
-		for(Widget w : state) {
-			// If the widget contains a web text that is a double number
-			if(!w.get(WdTags.WebTextContent, "").isEmpty() && isNumeric(w.get(WdTags.WebTextContent))) {
-				// Count the decimal places of the text number
-				String number = w.get(WdTags.WebTextContent).replace(",", ".");
-				int decimalPlaces = number.length() - number.indexOf('.') - 1;
+	public Verdict leafWidgetsOverlapping(State state) {
+		// Prepare a list that contains all the Rectangles from the leaf widgets
+		List<Pair<Widget, Rect>> leafWidgetsRects = new ArrayList<>();
+		for (Widget w : state) {
+			if (w.get(WdTags.WebIsFullOnScreen, false) 
+					&& w.childCount() < 1 
+					&& w.get(Tags.Shape, null) != null) {
+				leafWidgetsRects.add(new Pair<Widget, Rect>(w, (Rect)w.get(Tags.Shape)));
+			}
+		}
+		// Detect if the Rectangles of two leaf widgets are overlapping in an intersection
+		for (int i = 0; i < leafWidgetsRects.size(); i++) {
+			for (int j = i + 1; j < leafWidgetsRects.size(); j++) {
+				Rect rectOne = leafWidgetsRects.get(i).right();
+				Rect rectTwo = leafWidgetsRects.get(j).right();
 
-				if(number.contains(".") && decimalPlaces > maxDecimals) {
-					String verdictMsg = String.format("Widget with more than %s decimals! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
-							maxDecimals, w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
+				if (Rect.intersect(rectOne, rectTwo)) {
 
-					return new Verdict(Verdict.Severity.WARNING, verdictMsg);
+					Widget firstWidget = leafWidgetsRects.get(i).left();
+					Widget secondWidget = leafWidgetsRects.get(j).left();
+
+					String verdictMsg = String.format(
+							"Two leaf widgets are overlapping. First: %s, Second: %s",
+							firstWidget.get(WdTags.WebTextContent, ""),
+							secondWidget.get(WdTags.WebTextContent, "")
+							);
+
+					Visualizer visualizer = new RegionsVisualizer(
+							getRedPen(),
+							getWidgetRegions(Arrays.asList(firstWidget, secondWidget)),
+							"Invariant Fault",
+							0.5, 0.5);
+
+					return new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, visualizer);
 				}
 			}
 		}
@@ -255,89 +267,24 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 		return Verdict.OK;
 	}
 
-	private boolean isNumeric(String strNum) {
-		if (strNum == null) {
-			return false;
-		}
-		strNum = strNum.trim().replace("\u0024", "").replace("\u20AC", "");
-		try {
-			Double.parseDouble(strNum);
-		} catch (NumberFormatException nfe) {
-			return false;
-		}
-		return true;
+	private Pen getRedPen() {
+		return Pen.newPen()
+				.setColor(Color.Red)
+				.setFillPattern(FillPattern.None)
+				.setStrokePattern(StrokePattern.Solid)
+				.build();
 	}
 
-	// Detect dropdown select elements that does not contains values, or only one of them
-	public Verdict detectEmptySelectItems(State state) {
-		for(Widget w : state) {
-			// For the web select elements with an Id property
-			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) && !w.get(WdTags.WebId, "").isEmpty()) {
-				try {
-					String elementId = w.get(WdTags.WebId, "");
-					String query = String.format("return document.getElementById('%s').length", elementId);
-					Long selectItemsLength = (Long) WdDriver.executeScript(query);
-					// Verify that contains at least one item element
-					if (selectItemsLength.intValue() <= 1) {
-						String verdictMsg = String.format("Empty or Unique Select element detected! Role: %s , Path: %s , Desc: %s", 
-								w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
-
-						return new Verdict(Verdict.Severity.WARNING, verdictMsg);
-					} 
-				}catch (Exception e) {}
-			}
+	private List<Shape> getWidgetRegions(List<Widget> widgets) {
+		if (widgets == null || widgets.isEmpty()) {
+			return new ArrayList<>();
 		}
 
-		return Verdict.OK;
-	}
-
-	// Detect duplicated items in a Select (dropdown list/listbox)
-	public Verdict detectDuplicateSelectItems(State state) {
-		for(Widget w : state) {
-			// For the web select elements with an Id property
-			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) && !w.get(WdTags.WebId, "").isEmpty()) {
-				try {
-					String elementId = w.get(WdTags.WebId, "");
-					String querylength = String.format("return ((document.getElementById('%s') != null) ? document.getElementById('%s').length : 0)", elementId, elementId);
-					Long selectItemsLength = (Long) WdDriver.executeScript(querylength);
-
-					if (selectItemsLength > 1) { 
-						String queryTexts = String.format("return [...document.getElementById('%s').options].map(o => o.text)", elementId);
-						@SuppressWarnings("unchecked")
-						ArrayList<String> selectOptionsTextsList = (ArrayList<String>) WdDriver.executeScript(queryTexts);
-
-						Set<String> duplicatesTexts = selectOptionsTextsList.stream()
-								.filter(s -> Collections.frequency(selectOptionsTextsList, s) > 1)
-								.collect(Collectors.toSet());
-
-						// Now that we have collected all the duplicates in a list verify that there are no duplicates
-						if(duplicatesTexts.size() > 0)
-						{
-							String verdictMsg = String.format("Detected a Select web element with duplicate display value elements! Role: %s , Path: %s , WebId: %s , Duplicate item(s): %s", 
-									w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), String.join(",", duplicatesTexts));
-
-							return new Verdict(Verdict.Severity.WARNING, verdictMsg);
-						}
-					}
-				}catch (Exception e) {}
-			}
-		}
-
-		return Verdict.OK;
-	}
-
-	public Verdict detectTextAreaWithoutLength(State state, List<Role> roles) {
-		for(Widget w : state) {
-			if(roles.contains(w.get(Tags.Role, Roles.Widget)) && w.get(WdTags.WebMaxLength) == 0) {
-
-				String verdictMsg = String.format("TextArea Widget with 0 Length detected! Role: %s , Path: %s , WebId: %s", 
-						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""));
-
-				return new Verdict(Verdict.Severity.WARNING, verdictMsg);
-			}
-		}
-
-		return Verdict.OK;
+		return widgets.stream()
+				.map(widget -> widget.get(Tags.Shape, null))
+				.filter(shape -> shape != null)
+				.filter(shape -> shape instanceof Rect)
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -456,7 +403,11 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 			if (isAtBrowserCanvas(widget) && isClickable(widget)) {
 				if(whiteListed(widget) || isUnfiltered(widget)){
 					if (!isLinkDenied(widget)) {
-						actions.add(ac.leftClickAt(widget));
+						if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)) {
+							actions.add(randomFromSelectList(widget));
+						} else {
+							actions.add(ac.leftClickAt(widget));
+						}
 					}else{
 						// link denied:
 						filteredActions.add(ac.leftClickAt(widget));
@@ -492,6 +443,62 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 		}
 
 		return super.isTypeable(widget);
+	}
+
+	private Action randomFromSelectList(Widget w) {
+		String elementId = w.get(WdTags.WebId, "");
+		String elementName = w.get(WdTags.WebName, "");
+
+		if (!elementId.isEmpty()) {
+			return selectRandomValue(elementId, JsTargetMethod.ID, w);
+		} else if (!elementName.isEmpty()) {
+			return selectRandomValue(elementName, JsTargetMethod.NAME, w);
+		}
+
+		return new AnnotatingActionCompiler().leftClickAt(w);
+	}
+
+	private Action selectRandomValue(String identifier, JsTargetMethod targetMethod, Widget w) {
+		try {
+			String lengthQuery;
+			String valueQuery;
+
+			switch (targetMethod) {
+			case ID:
+				lengthQuery = String.format("return document.getElementById('%s').options.length;", identifier);
+				break;
+			case NAME:
+				lengthQuery = String.format("return document.getElementsByName('%s')[0].options.length;", identifier);
+				break;
+			default:
+				return new AnnotatingActionCompiler().leftClickAt(w);
+			}
+
+			Object lengthResponse = WdDriver.executeScript(lengthQuery);
+			int selectLength = (lengthResponse != null) ? Integer.parseInt(lengthResponse.toString()) : 1;
+
+			int randomIndex = new Random().nextInt(selectLength);
+
+			switch (targetMethod) {
+			case ID:
+				valueQuery = String.format("return document.getElementById('%s').options[%d].value;", identifier, randomIndex);
+				break;
+			case NAME:
+				valueQuery = String.format("return document.getElementsByName('%s')[0].options[%d].value;", identifier, randomIndex);
+				break;
+			default:
+				return new AnnotatingActionCompiler().leftClickAt(w);
+			}
+
+			Object valueResponse = WdDriver.executeScript(valueQuery);
+
+			return (valueResponse != null)
+					? new WdSelectListAction(identifier, valueResponse.toString(), w, targetMethod)
+							: new AnnotatingActionCompiler().leftClickAt(w);
+
+		} catch (Exception e) {
+			return new AnnotatingActionCompiler().leftClickAt(w);
+		}
 	}
 
 	/**

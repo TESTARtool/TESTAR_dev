@@ -47,29 +47,33 @@ public final class Verdict implements Serializable {
 	 * Enum representing different levels of severity for a test verdict.
 	 */
 	public enum Severity {
-		// PASS
+		/** PASS (0.0 - 0.099) **/
+
+		// Test sequence completed without other PASS, WARNING, or FAIL, severity
 		OK(0.0, "OK"),
+		// LLM believes test goal has been accomplished
+		LLM_COMPLETE(0.04, "LLM_COMPLETE"),
+		// Test goal complete based on conditions
+		CONDITION_COMPLETE(0.05, "CONDITION_COMPLETE"),
 
-		// WARNING
-		WARNING(0.00000001, "WARNING"), // Custom warning verdict
+		/** WARNING (0.1 - 0.499) **/
 
+		// Default WARNING verdict
+		WARNING(0.1, "WARNING"),
+		// WARNING GROUP: WEB INVARIANT
+		WARNING_WEB_INVARIANT_FAULT(0.2, "WARNING_WEB_INVARIANT_FAULT"),
 		// WARNING GROUP: UI
-		WARNING_UI_VISUAL_OR_RENDERING_FAULT(0.00000017, "UI_VISUAL_OR_RENDERING_FAULT"),
+		WARNING_UI_VISUAL_OR_RENDERING_FAULT(0.3, "WARNING_UI_VISUAL_OR_RENDERING_FAULT"),
+		// WARNING GROUP: ACCESSIBILITY
+		WARNING_ACCESSIBILITY_FAULT(0.4, "WARNING_ACCESSIBILITY_FAULT"),
 
-		// ACCESSIBILITY GROUP:
-		WARNING_ACCESSIBILITY_FAULT(0.00000101, "WARNING_ACCESSIBILITY_FAULT"),
+		/** FAIL (0.5 - 1.0) **/
 
-		// TEST GOAL
-		LLM_COMPLETE(0.7, "LLM_COMPLETE"), // LLM determines the test goal has been completed
-		TESTGOAL_COMPLETE(0.71, "TESTGOAL_COMPLETE"), // Technically check the test goal has been completed
-
-		// FAIL
+		UNREPLAYABLE(0.5, "UNREPLAYABLE"), // Sequence not replayable
 		SUSPICIOUS_TAG(0.8, "SUSPICIOUS_TAG"), // Suspicious tag
 		SUSPICIOUS_LOG(0.89, "SUSPICIOUS_LOG"), // Suspicious message in log file or command output (LogOracle)
 		NOT_RESPONDING(0.99999990, "NOT_RESPONDING"), // Unresponsive
 		UNEXPECTEDCLOSE(0.99999999, "UNEXPECTEDCLOSE"), // Crash? Unexpected close?
-		UNREPLAYABLE(0.1, "UNREPLAYABLE"), // Sequence not replayable
-
 		FAIL(1.0, "FAIL");
 
 		private final double value;

@@ -61,8 +61,9 @@ public class WebInvariantDuplicatedRowsInTable implements Oracle {
 	@Override
 	public Verdict getVerdict(State state) {
 		List<Widget> incorrectWidgets = new ArrayList<>();
+		List<String> incorrectWidgetDescriptions = new ArrayList<>();
 
-		for(Widget w : state) {
+		for (Widget w : state) {
 			if(w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdTABLE)) {
 				List<Pair<Widget, String>> rowElementsDescription = new ArrayList<>();
 				extractAllRowDescriptionsFromTable(w, rowElementsDescription);
@@ -77,25 +78,26 @@ public class WebInvariantDuplicatedRowsInTable implements Oracle {
 
 				// If the list of duplicated descriptions contains a matching prepare the verdict
 				if(!duplicatedDescriptions.isEmpty()) {
-					for(Pair<Widget, String> duplicatedWidget : duplicatedDescriptions) {
+					for (Pair<Widget, String> duplicatedWidget : duplicatedDescriptions) {
 						// Ignore empty rows
 						if (!duplicatedWidget.right().replaceAll("_","").isEmpty()) {
-
-							String verdictMsg = String.format(
-									"Detected a duplicated rows in a Table! Role: %s , WebId: %s, Description: %s", 
-									duplicatedWidget.left().get(Tags.Role), 
-									duplicatedWidget.left().get(WdTags.WebId, ""), 
-									duplicatedWidget.right()
-									);
-							Visualizer visualizer = new RegionsVisualizer(
-									getRedPen(), 
-									getWidgetRegions(incorrectWidgets), 
-									"Invariant Fault", 
-									0.5, 0.5);
-
-							return new Verdict(Verdict.Severity.WARNING, verdictMsg, visualizer);
+							incorrectWidgets.add(duplicatedWidget.left());
+							incorrectWidgetDescriptions.add(duplicatedWidget.right());
 						}
 					}
+
+					String verdictMsg = String.format(
+							"Detected a duplicated rows in a Table for the widgets: %s ", 
+							incorrectWidgetDescriptions
+							);
+
+					Visualizer visualizer = new RegionsVisualizer(
+							getRedPen(), 
+							getWidgetRegions(incorrectWidgets), 
+							"Invariant Fault", 
+							0.5, 0.5);
+
+					return new Verdict(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT, verdictMsg, visualizer);
 				}
 			}
 		}
@@ -109,7 +111,7 @@ public class WebInvariantDuplicatedRowsInTable implements Oracle {
 		}
 
 		// Iterate through the form element widgets
-		for(int i = 0; i < w.childCount(); i++) {
+		for (int i = 0; i < w.childCount(); i++) {
 			// If the children of the table are not sub-tables
 			if(!w.child(i).get(Tags.Role, Roles.Widget).equals(WdRoles.WdTABLE)) {
 				extractAllRowDescriptionsFromTable(w.child(i), rowElementsDescription);
@@ -121,7 +123,7 @@ public class WebInvariantDuplicatedRowsInTable implements Oracle {
 		String widgetDesc = w.get(WdTags.WebTextContent, "");
 
 		// Iterate through the form element widgets
-		for(int i = 0; i < w.childCount(); i++) {
+		for (int i = 0; i < w.childCount(); i++) {
 			widgetDesc = widgetDesc + "_" + obtainWidgetTreeDescription(w.child(i));
 		}
 

@@ -161,7 +161,7 @@ public class AndroidState extends AndroidWidget implements State {
 			ret = true;
 		}
 		else if (t.equals(Tags.TimeStamp)) {
-			//ret = w == this ? ((AndroidRootElement) element).timeStamp : null;
+			ret = w == this ? ((AndroidRootElement) element).timeStamp : 0L;
 		}
 		else if (t.equals(Tags.Foreground)) {
 			ret = true;

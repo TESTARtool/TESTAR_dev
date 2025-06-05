@@ -35,8 +35,6 @@ import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
-import org.openqa.selenium.logging.LogType;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.monkey.*;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
@@ -298,13 +296,13 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected Verdict getVerdict(State state) {
     	Verdict stateVerdict = super.getVerdict(state);
 
+    	LogEntries logEntries = WdDriver.getBrowserLogs();
+
     	// If Web Console Error Oracle is enabled and we have some pattern to match
     	if(settings.get(ConfigTags.WebConsoleErrorOracle, false) && !settings.get(ConfigTags.WebConsoleErrorPattern, "").isEmpty()) {
     		// Load the web console error pattern
     		Pattern errorPattern = Pattern.compile(settings.get(ConfigTags.WebConsoleErrorPattern), Pattern.UNICODE_CHARACTER_CLASS);
     		// Check Severe messages in the WebDriver logs
-    		RemoteWebDriver driver = WdDriver.getRemoteWebDriver();
-    		LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
     		for(LogEntry logEntry : logEntries) {
     			if(logEntry.getLevel().equals(Level.SEVERE)) {
     				// Check if the severe error message matches with the web console error pattern
@@ -324,8 +322,6 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     		// Load the web console warning pattern
     		Pattern warningPattern = Pattern.compile(settings.get(ConfigTags.WebConsoleWarningPattern), Pattern.UNICODE_CHARACTER_CLASS);
     		// Check Warning messages in the WebDriver logs
-    		RemoteWebDriver driver = WdDriver.getRemoteWebDriver();
-    		LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
     		for(LogEntry logEntry : logEntries) {
     			if(logEntry.getLevel().equals(Level.WARNING)) {
     				// Check if the warning message matches with the web console error pattern
@@ -358,7 +354,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     		System.out.println(String.format("** URL: %s", WdDriver.getCurrentUrl()));
     		System.out.println("** Please try to navigate with SPY mode and configure clickableClasses inside Java protocol");
     		// Create and build the id of the HistoryBackAction
-    		Action histBackAction = new WdHistoryBackAction();
+    		Action histBackAction = new WdHistoryBackAction(state);
     		buildEnvironmentActionIdentifiers(state, histBackAction);
     		actions = new HashSet<>(Collections.singletonList(histBackAction));
     	}
@@ -688,9 +684,16 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	protected void ensureWebDomainsAllowed() {
 		try{
 			// Adding default domain from SUTConnectorValue if is not included in the webDomainsAllowed list
-			//TODO try-catch for nullpointer if sut connector missing
-			String[] parts = settings().get(ConfigTags.SUTConnectorValue).split(" ");
-			String sutConnectorUrl = parts[parts.length - 1].replace("\"", "");
+			String[] parts = settings().get(ConfigTags.SUTConnectorValue, "").split(" ");
+			String sutConnectorUrl = "";
+
+			for (String raw : parts) {
+				String part = raw.replace("\"", "");
+
+				if (part.matches("^(?:[a-zA-Z][a-zA-Z0-9+.-]*):.*")) {
+					sutConnectorUrl = part;
+				}
+			}
 
 			if(webDomainsAllowed != null && !webDomainsAllowed.contains(getDomain(sutConnectorUrl))) {
 				System.out.println(String.format("WEBDRIVER INFO: Automatically adding %s SUT Connector domain to webDomainsAllowed List", getDomain(sutConnectorUrl)));
@@ -708,7 +711,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 				webDomainsAllowed = Arrays.asList(ArrayUtils.insert(newWebDomainsAllowed.length, newWebDomainsAllowed, getDomain(initialUrl)));
 				System.out.println(String.format("webDomainsAllowed: %s", String.join(",", webDomainsAllowed)));
 			}
-		} catch(Exception e) { //TODO check what kind of exception can happen
+		} catch(Exception e) {
 			System.out.println("WEBDRIVER ERROR: Trying to add the startup domain to webDomainsAllowed List");
 			System.out.println("Please review webDomainsAllowed List inside Webdriver Java Protocol");
 		}

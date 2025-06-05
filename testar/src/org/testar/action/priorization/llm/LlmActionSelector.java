@@ -41,6 +41,7 @@ import org.testar.llm.LlmConversation;
 import org.testar.llm.LlmFactory;
 import org.testar.llm.LlmResponse;
 import org.testar.llm.LlmTestGoal;
+import org.testar.llm.LlmUtils;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.monkey.alayer.*;
@@ -73,11 +74,12 @@ public class LlmActionSelector implements IActionSelector {
     private final String appName;
     private final float temperature;
     private final int historySize;
+    private final boolean stateless;
 
     private ActionHistory actionHistory;
     private LlmConversation conversation;
     private int tokens_used;
-    private int invalidActions;
+    private Integer invalidActions;
 
     private Gson gson = new Gson();
     private String previousTestGoal = "";
@@ -103,8 +105,13 @@ public class LlmActionSelector implements IActionSelector {
         this.actionFewshotFile = settings.get(ConfigTags.LlmActionFewshotFile);
         this.appName = settings.get(ConfigTags.ApplicationName);
         this.temperature = settings.get(ConfigTags.LlmTemperature);
-        actionHistory = new ActionHistory(historySize);
+        actionHistory = new ActionHistory(historySize, generator.getDescriptionTag());
+        this.stateless = settings.get(ConfigTags.LlmStateless);
 
+        initializeConversation();
+    }
+
+    private void initializeConversation() {
         conversation = LlmFactory.createLlmConversation(this.platform, this.model, this.temperature);
         conversation.initConversation(this.actionFewshotFile);
     }
@@ -137,13 +144,15 @@ public class LlmActionSelector implements IActionSelector {
 
         currentTestGoal = newTestGoal;
 
-        // Reset conversation
-        conversation = LlmFactory.createLlmConversation(this.platform, this.model, this.temperature);
-        conversation.initConversation(this.actionFewshotFile);
+        // When a new goal is attached, always re-initialize a new conversation
+        initializeConversation();
     }
 
     @Override
     public Action selectAction(State state, Set<Action> actions) {
+        // If the stateless option is enabled, initialize a new prompt to reduce tokens usage
+        if(this.stateless) initializeConversation();
+
         return selectActionWithLlm(state, actions);
     }
 
@@ -223,11 +232,11 @@ public class LlmActionSelector implements IActionSelector {
                 return nop;
             }
             case COMMUNICATION_FAILURE: {
-            	logger.log(Level.ERROR, "Communication failure with the LLM");
-            	NOP nop = new NOP();
-            	nop.set(Tags.Desc, "Communication Failure");
-            	invalidActions++;
-            	return nop;
+                logger.log(Level.ERROR, "Communication failure with the LLM");
+                NOP nop = new NOP();
+                nop.set(Tags.Desc, "NOP action due to LLM communication Failure");
+                invalidActions++;
+                return nop;
             }
             default: {
                 logger.log(Level.ERROR, "ParseResult was null, this should never happen!");
@@ -240,37 +249,13 @@ public class LlmActionSelector implements IActionSelector {
     }
 
     /**
-     * TODO: Can be removed if we always create WdSelectListActions when a widget has the select tag.
-     * Creates an action to change the active value of a combobox.
-     * @param actions Set of actions in the current state.
-     * @param actionId ID of the action chosen by the Llm.
-     * @param value The value to set.
-     * @return New action in the form of WdSelectListAction.
-     */
-    private Action createComboBoxAction(Set<Action> actions, String actionId, String value) {
-        Widget target = null;
-
-        // Get the target widget
-        Action action = getActionByIdentifier(actions, actionId);
-        target = action.get(Tags.OriginWidget);
-
-        if(target == null) {
-            logger.log(Level.ERROR, "Unable to find combobox selection widget!");
-            return null;
-        } else {
-            String elementId = target.get(WdTags.WebId);
-            return new WdSelectListAction(elementId, value, target);
-        }
-    }
-
-    /**
      * Sends a POST request to the LLM's API and returns the response as a string.
      * @param requestBody Request body of the POST request.
      * @return Response content or null if failed.
      */
     private String getResponseFromLlm(String requestBody) {
         String testarVer = Main.TESTAR_VERSION.substring(0, Main.TESTAR_VERSION.indexOf(" "));
-        URI uri = URI.create(replaceApiKeyPlaceholder(this.hostUrl));
+        URI uri = URI.create(LlmUtils.replaceApiKeyPlaceholder(this.hostUrl));
 
         try {
             URL url = uri.toURL();
@@ -283,7 +268,7 @@ public class LlmActionSelector implements IActionSelector {
 
             // Check optional Authorization Header parameter
             if (this.authorizationHeader != null && !this.authorizationHeader.isEmpty()) {
-            	con.setRequestProperty("Authorization", replaceApiKeyPlaceholder(this.authorizationHeader));
+                con.setRequestProperty("Authorization", LlmUtils.replaceApiKeyPlaceholder(this.authorizationHeader));
             }
 
             con.setDoInput(true);
@@ -305,7 +290,7 @@ public class LlmActionSelector implements IActionSelector {
 
                     LlmResponse llmResponse = LlmFactory.createResponse(this.platform, response);
                     this.tokens_used = llmResponse.getUsageTokens();
-                    logger.log(Level.INFO, String.format("LLM tokens_used: [%s]", this.tokens_used));
+                    logger.log(Level.INFO, String.format("LLM tokens_used for action selection: [%s]", this.tokens_used));
 
                     String responseContent = llmResponse.getResponse();
                     // From testing, response often includes newlines and spaces at the end.
@@ -332,41 +317,14 @@ public class LlmActionSelector implements IActionSelector {
                 }
             }
         } catch(Exception e) {
-            logger.log(Level.ERROR, "Unable to communicate with the LLM.");
-            e.printStackTrace();
+            logger.log(Level.ERROR, "Unable to communicate with the LLM due to the cause:");
+            if(e.getMessage() != null && !e.getMessage().isEmpty()) {
+                logger.log(Level.ERROR, e.getMessage());
+            } else {
+                e.printStackTrace();
+            }
             return null;
         }
-    }
-
-    private String replaceApiKeyPlaceholder(String url) {
-        String apiKeyPlaceholder = extractPlaceholder(url);
-
-        if (apiKeyPlaceholder.isEmpty()) {
-            // Return the original URL if no placeholder is found
-            return url;
-        }
-
-        String apiKey = System.getenv(apiKeyPlaceholder);
-        if (apiKey == null) {
-            // Return the original URL if the API key is not found in the system
-            return url;
-        }
-
-        // Return the final URL with the placeholder replaced by the actual API key
-        return url.replace("%" + apiKeyPlaceholder + "%", apiKey);
-    }
-
-    private String extractPlaceholder(String str) {
-        int start = str.indexOf('%') + 1;
-        int end = str.indexOf('%', start);
-
-        if (start == 0 || end == -1) {
-            // No valid placeholder found, return empty string
-            return "";
-        }
-
-        // Return the placeholder between the '%' symbols
-        return str.substring(start, end);
     }
 
     /**
@@ -377,7 +335,7 @@ public class LlmActionSelector implements IActionSelector {
      */
     private LlmParseActionResult parseLlmResponse(Set<Action> actions, String responseContent) {
         try {
-        	LlmSelectedAction llmSelectedAction = gson.fromJson(responseContent, LlmSelectedAction.class);
+            LlmSelectedAction llmSelectedAction = gson.fromJson(responseContent, LlmSelectedAction.class);
 
             Action selectedAction = getActionByIdentifier(actions, llmSelectedAction.getActionId());
 
@@ -388,17 +346,28 @@ public class LlmActionSelector implements IActionSelector {
                 return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.INVALID_ACTION);
             }
 
-            String actionId = llmSelectedAction.getActionId();
             String input = llmSelectedAction.getInput();
             Widget widget = selectedAction.get(Tags.OriginWidget);
 
+            // For interacting with select combobox web widgets
+            // A WdSelectListAction is created to change the active value of the combobox
             if(Objects.equals(widget.get(WdTags.WebTagName, ""), "select")) {
                 if(Objects.equals(input, "")) {
                     return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.SL_MISSING_INPUT);
-                } else {
-                    return new LlmParseActionResult(
-                            createComboBoxAction(actions, actionId, input),LlmParseActionResult.ParseResult.SUCCESS);
                 }
+
+                String target = widget.get(WdTags.WebId, "");
+                WdSelectListAction.JsTargetMethod method;
+                if (target.isEmpty()) {
+                    logger.warn("elementId is empty for select widget! Using name target method.");
+                    target = widget.get(WdTags.WebName, "");
+                    method = WdSelectListAction.JsTargetMethod.NAME;
+                } else {
+                    method = WdSelectListAction.JsTargetMethod.ID;
+                }
+
+                return new LlmParseActionResult(new WdSelectListAction(target, input, widget, method), 
+                        LlmParseActionResult.ParseResult.SUCCESS);
             }
 
             setCompoundActionInputText(selectedAction, input);
@@ -408,7 +377,7 @@ public class LlmActionSelector implements IActionSelector {
             logger.log(Level.ERROR, "Unable to parse response from LLM to JSON: " + responseContent);
             return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.PARSE_FAILED);
         } catch(NullPointerException e) {
-            logger.log(Level.ERROR, "Null exception due to LLM parse response error");
+            logger.log(Level.ERROR, "Null response due to LLM parse response error");
             return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.COMMUNICATION_FAILURE);
         } catch(Exception e) {
             logger.log(Level.ERROR, "Exception parsing LLM response");
@@ -466,6 +435,6 @@ public class LlmActionSelector implements IActionSelector {
      * @return Amount of invalid actions.
      */
     public int getInvalidActions() {
-        return invalidActions;
+        return invalidActions != null ? invalidActions : 0;
     }
 }

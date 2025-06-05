@@ -1,0 +1,131 @@
+name: Windows webdriver TESTAR CI tests
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 10
+
+    strategy:
+      fail-fast: false
+      matrix:
+        java: [ '11', '17', '21' ]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Java ${{ matrix.java }}
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'corretto'
+        java-version: ${{ matrix.java }}
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Prepare TESTAR protocols
+      run: ./gradlew init_workflow_test
+
+    - name: Build TESTAR with Gradle
+      run: ./gradlew build
+
+    - name: Prepare installed distribution of TESTAR with Gradle
+      run: ./gradlew installDist
+
+    - name: Run webdriver protocol and detect SuspiciousTag while using the State Model
+      run: ./gradlew runTestWebdriverSuspiciousTagStateModel
+    - name: Save runTestWebdriverSuspiciousTagStateModel HTML report artifact
+      uses: actions/upload-artifact@v4
+      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
+      if: failure()
+      with:
+        name: Java${{ matrix.java }}-runTestWebdriverSuspiciousTagStateModel-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_and_suspicious
+
+    - name: Run webdriver to login in parabank and detect browser console error
+      run: ./gradlew runTestWebdriverParabankLoginAndConsoleError
+    - name: Save runTestWebdriverParabankLoginAndConsoleError HTML report artifact
+      uses: actions/upload-artifact@v4
+      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
+      if: failure()
+      with:
+        name: Java${{ matrix.java }}-runTestWebdriverParabankLoginAndConsoleError-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_login_console_error
+
+    - name: Run webdriver to login in parabank using form filling
+      run: ./gradlew runTestWebdriverParabankFormFilling
+    - name: Save runTestWebdriverParabankFormFilling HTML report artifact
+      uses: actions/upload-artifact@v4
+      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
+      if: failure()
+      with:
+        name: Java${{ matrix.java }}-runTestWebdriverParabankFormFilling-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_form_filling
+
+    - name: Run webdriver to login in parabank and execute webdriver remote actions
+      run: ./gradlew runTestWebdriverParabankRemoteActions
+    - name: Save runTestWebdriverParabankRemoteActions HTML report artifact
+      uses: actions/upload-artifact@v4
+      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
+      if: failure()
+      with:
+        name: Java${{ matrix.java }}-runTestWebdriverParabankRemoteActions-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_remote_actions
+
+    - name: Run TESTAR Replay mode with a web page to check that replayed correctly
+      run: ./gradlew runTestWebdriverCorrectReplay
+    - name: Save runTestWebdriverCorrectReplay HTML report artifact
+      uses: actions/upload-artifact@v4
+      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
+      if: failure()
+      with:
+        name: Java${{ matrix.java }}-runTestWebdriverCorrectReplay-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_replay
+
+    - name: Run TESTAR Replay mode to detect a not replayable button
+      run: ./gradlew runTestWebdriverUnreplayable
+    - name: Save runTestWebdriverUnreplayable HTML report artifact
+      uses: actions/upload-artifact@v4
+      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
+      if: failure()
+      with:
+        name: Java${{ matrix.java }}-runTestWebdriverUnreplayable-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_unreplayable
+
+    - name: Check Firefox and Edge browsers paths
+      run: |
+        if (Test-Path "C:\Program Files\Mozilla Firefox\firefox.exe") {
+          Write-Output "Firefox browser found!"
+        } else {
+          Write-Output "Firefox browser not found..."
+        }
+        if (Test-Path "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe") {
+          Write-Output "Edge browser found!"
+        } else {
+          Write-Output "Edge browser not found..."
+        }
+      shell: pwsh
+ 
+    - name: Run firefox and webdriver to detect a suspicious message
+      run: ./gradlew runTestFirefoxWebdriverSuspiciousTagStateModel
+    - name: Save runTestFirefoxWebdriverSuspiciousTagStateModel HTML report artifact
+      uses: actions/upload-artifact@v4
+      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
+      if: failure()
+      with:
+        name: Java${{ matrix.java }}-runTestFirefoxWebdriverSuspiciousTagStateModel-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/firefox_webdriver_suspicious_state_model
+
+    - name: Run edge and webdriver to detect a suspicious message
+      run: ./gradlew runTestEdgeWebdriverSuspiciousTagStateModel
+    - name: Save runTestEdgeWebdriverSuspiciousTagStateModel HTML report artifact
+      uses: actions/upload-artifact@v4
+      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
+      if: failure()
+      with:
+        name: Java${{ matrix.java }}-runTestEdgeWebdriverSuspiciousTagStateModel-artifact
+        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/edge_webdriver_suspicious_state_model

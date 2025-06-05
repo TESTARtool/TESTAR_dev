@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "https://para.testar.org/"
+SUTConnectorValue = "https://para.testar.org/"
 
 #################################################################
 # Sequences
@@ -224,7 +224,7 @@ ProtocolSpecificSetting_5 =
 # Extended test oracles
 #################################################################
 
-ExtendedOracles = WebAccessibilityFontSizeOracle,WebAccessibilityImagesAltOracle
+ExtendedOracles = WebAccessibilityFontSizeOracle,WebAccessibilityImagesAltOracle,WebInvariantDuplicateMenuItems,WebInvariantDuplicateSelectItems,WebInvariantDuplicatedRowsInTable,WebInvariantEmptySelectItems,WebInvariantManySelectItems,WebInvariantNumberWithLotOfDecimals,WebInvariantTextAreaWithoutLength,WebInvariantUnsortedSelectItems
 
 #################################################################
 # Sets whether to display TESTAR dialog. If false is used, then TESTAR will run in the mode of the Mode property

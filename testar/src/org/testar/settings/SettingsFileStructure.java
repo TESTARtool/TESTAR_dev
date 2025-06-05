@@ -254,6 +254,7 @@ public class SettingsFileStructure {
 				, ConfigTags.LlmOracleFewshotFile.name() + " = "
 				, ConfigTags.LlmTemperature.name() + " = "
 				, ConfigTags.LlmHistorySize.name() + " = "
+				, ConfigTags.LlmStateless.name() + " = "
 				, ConfigTags.LlmTestGoals.name() + " = "
 				, ""
 				, "#################################################################"
@@ -355,6 +356,7 @@ public class SettingsFileStructure {
 		List<Tag<?>> secondarySettingsList = new ArrayList<>();
 		secondarySettingsList.add(ConfigTags.ShowVisualSettingsDialogOnStartup);
 		secondarySettingsList.add(ConfigTags.ForceForeground);
+		secondarySettingsList.add(ConfigTags.SpyTagAttributes);
 		secondarySettingsList.add(ConfigTags.VisualizeActions);
 		secondarySettingsList.add(ConfigTags.FormFillingAction);
 		secondarySettingsList.add(ConfigTags.LogLevel);
