@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+<h2>Web elements</h2>
+
+<p>Hello User</p>
+
+<!-- START LEFT ELEMENTS -->
+<div style="float: left;">
+
+<h3>Textarea elements</h3>
+<textarea id="textarea_0length" rows="2" cols="20" maxlength="0"></textarea>
+
+<h3>Textbox</h3>
+<input name="txtSearchbox" type="text" id="txtSearchbox" accesskey="1" class="characterMap" autocomplete="off" " placeholder="Search in TESTAR" style="width:300px;" ischaractermapped="true">
+
+<h3>Number elements</h3>
+<label id="number_integer">1234</label>
+<br>
+<label id="number_2decimals">12.34</label>
+<br>
+<label id="number_3decimals">1.234</label>
+<br>
+<label id="number_3_decimals_comma">1,234</label>
+
+<h3>Repeating labels elements</h3>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+.tg .tg-0pky{border-color:inherit;text-align:left;vertical-align:top}
+</style>
+<table class="tg">
+<thead>
+  <tr>
+    <th class="tg-0lax">text</th>
+    <th class="tg-0lax">should match or no match</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-0lax">somebody@somewhere.com; somebody@somewhere.com</td>
+    <td class="tg-0lax">match</td>
+  </tr>
+    <tr>
+    <td class="tg-0lax">persid_12;persid_12</td>
+    <td class="tg-0lax">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">persid_13;persid_133</td>
+    <td class="tg-0lax">no match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">The quick brown fox jumps over the lazy dogThe quick brown fox jumps over the lazy dog</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">E-mail inkomend / uitgaand</td>
+    <td class="tg-0pky">no match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">SharePoint - InkomendDocument</td>
+    <td class="tg-0pky">no match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">(Maak een keuze...)</td>
+    <td class="tg-0pky">no match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">Notificatie Offertetraject &gt; 25000 Euro</td>
+    <td class="tg-0pky">no match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">ApplesApplesApples</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">Apples Apples Apples</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">IBM AT Computer</td>
+    <td class="tg-0pky">no match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">Lamp ShadeLamp Shade</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">OrangesOranges</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">I am a Potato</td>
+    <td class="tg-0pky">no match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">i am i am i am a potato</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">bert Bakkerbert</td>
+    <td class="tg-0pky">no match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">1212</td>
+    <td class="tg-0pky">no match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">22</td>
+    <td class="tg-0pky">no match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">aaaa</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">de aller aller beste</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">het het beste idee idee</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">21 21</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">22 22</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">11 11</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">2222</td>
+    <td class="tg-0pky">no match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">de dansende dansende</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">a Feedback afronden, Feedback afronden, Feedback afronden</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">Geachte heer, mevrouw, Geachte heer, mevrouw,</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">Geachte heer mevrouw Geachte heer mevrouw</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">This is some text. This is some text in between. This is some text.</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">Companyname -&gt; Contactperson; Companyname -&gt; Contactperson</td>
+    <td class="tg-0pky">match</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+  </tr>
+</tbody>
+</table>
+<h3>HTML element in labels</h3>
+<label id="htmltagsintext1_notok">The%20%3Cb%3Equick%3C%2Fb%3E%20brown%20fox%20jumps%20%3Ci%3Eover%20the%20lazy%3C%2Fi%3E%20dog</label><br/>
+<label id="htmltagsintext1_notok">The &lt;b&gt;quick&lt;/b&gt; brown fox jumps &lt;i&gt;over the lazy&lt;/i&gt; dog</label><br/>
+<label id="htmltagsintext1_ok">The <b>quick</b> brown fox jumps <i>over the lazy</i> dog</label>
+
+<h3>Dropdown</h3>
+<label>functional select</label>
+<select id="functional_select">
+  <option id="One" value="One">1</option>
+  <option id="Two" value="Two">2</option>
+  <option id="Three" value="Three">3</option>	
+</select><br/>
+<label>empty select</label>
+<select id="empty_select">
+</select><br/>
+<label>one item select</label>
+<select id="one_item_select">
+  <option id="One">One</option>
+</select><br/>
+<label>many item select</label>
+<select id="toomany_item_select">
+  <option id="One">01</option>
+  <option id="Two">02</option>
+  <option id="Three">03</option>	
+  <option id="Four">04</option>	
+  <option id="Five">05</option>	
+  <option id="Six">06</option>	
+  <option id="Seven">07</option>	
+  <option id="Eight">08</option>	
+  <option id="Nine">09</option>		
+  <option id="Ten">10</option>		
+</select><br/>
+<label>duplicate in display value item select</label>
+<select id="duplicate_display_value_item_select">
+  <option value="1">1</option>
+  <option value="2">3</option>
+  <option value="3">3</option>	
+  <option value="4">4</option>	
+  <option value="5">5</option>	
+</select><br/>
+<label>duplicate in underlying value item select</label>
+<select id="duplicate_underlying_value_item_select">
+  <option value="1">1</option>
+  <option value="3">2</option>
+  <option value="3">3</option>	
+  <option value="4">4</option>	
+  <option value="5">5</option>	
+</select><br/>
+<label>unsorted items in select</label>
+<select id="unsorted_items_in_select">
+  <option id="id5" value="5">E</option>
+  <option id="id4" value="4">D</option>
+  <option id="id3" value="3">A</option>
+  <option id="id2" value="2">B</option>
+  <option id="id1" value="1">C</option>
+</select><br/>
+<label>Readonly empty item select (should be ignored)</label>
+<select id="readonly_empty_item_select" readonly>	
+</select><br/>
+<label>disabled empty item select (should be ignored)</label>
+<select id="disabled_empty_item_select" disabled>	
+</select><br/>
+<label>disabled one item select (should be ignored)</label>
+<select id="disabled_one_item_select" disabled>	
+  <option id="One">One</option>
+</select><br/>
+
+<h3>Empty form</h3>
+<form id="someEmptyForm" ></form>
+
+<h3>Empty div</h3>
+<div id="someEmptyDiv"></div>
+
+</div>
+<!-- END LEFT ELEMENTS -->
+
+
+<!-- START RIGHT ELEMENTS -->
+<div style="float: right;">
+
+<h3>Radio buttons </h3>
+<!-- note that radiobuttons in a form with the same name form one group -->
+<form>
+  <p>Please select your favorite testing tool:</p>
+  <input type="radio" id="testar" name="fav_testing" value="TESTAR"><label for="testar">TESTAR</label>
+</form>
+<form>
+  <p>Please select your favorite pet:</p>
+  <input type="radio" id="monkey" name="fav_testing" value="Monkey"><label for="Monkey">Monkey</label>
+  <input type="checkbox" id="dog" name="fav_testing" value="Dog"><label for="Dog">Dog</label>
+</form>
+<form>
+  <p>Please select your favorite Web language:</p>
+  <input type="radio" id="html" name="fav_language" value="HTML"><label for="html">HTML</label><br>
+  <input type="radio" id="css" name="fav_language" value="CSS"><label for="css">CSS</label><br>
+  <input type="radio" id="javascript" name="fav_language" value="JavaScript"><label for="javascript">JavaScript</label>
+
+</form>
+<form>
+	<p>Please select And or Or:</p>
+	<table id="ChooseAndOr" cellspacing="0" cellpadding="0" border="0" style="border-collapse: collapse;">
+		<tr>
+			<td><input id="radioAnd" type="radio" name="ChooseAndOr" value="AND" checked="checked"><label for="radioAnd">And</label></td>
+			<td><input id="radioOr"  type="radio" name="ChooseAndOr" value="OR"><label for="radioOr">Or</label></td>
+		</tr>
+	</table>
+</form>
+
+<h3>Buttons</h3>
+<div id="buttons" class="tabcontent">
+  <button id="functional_button" onclick="changeText()">FunctionalButton</button>
+  <button id="dummy_button">DummyButton</button>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+function changeText() {
+    if ($("p").is(':contains(Hello)')) {
+        $("p:contains(Hello)").text("This is a TESTAR web example");
+    } else {
+        $("p:contains(TESTAR)").text("Hello user");
+    }
+}
+</script>
+
+<h3>Checkboxes</h3>
+<form>
+  <p>Please sign the agreement:</p>
+  <input type="checkbox" id="IAgreeUsingTestar" name="IAgreeUsingTestar" value="IAgreeUsingTestar">I agree using TESTAR</input>
+</form>
+
+<h3>Alert Buttons</h3>
+<div id="buttonsAlert" class="tabcontent">
+  <button id="good_alert" onclick="alertGoodMessage()">GoodAlert</button>
+  <button id="suspicious_alert" onclick="alertSuspiciousMessage()">SuspiciousAlert</button>
+</div>
+<script>
+function alertGoodMessage() {
+  prompt("Hello, are you having a good day?");
+}
+function alertSuspiciousMessage() {
+  prompt("Add your credentials in this Login field...");
+}
+</script>
+
+<h3>Table with duplicate data</h3>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-568a{background-color:#D9E1F2;font-weight:bold;text-align:left;vertical-align:top}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+</style>
+<table class="tg">
+<thead>
+  <tr>
+    <th class="tg-568a">Nr</th>
+    <th class="tg-568a">Description</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-0lax">1</td>
+    <td class="tg-0lax">Testar</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">2</td>
+    <td class="tg-0lax">DigiOffice</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">2</td>
+    <td class="tg-0lax">DigiOffice</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">1</td>
+    <td class="tg-0lax">Testar</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">3</td>
+    <td class="tg-0lax">Word</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">4</td>
+    <td class="tg-0lax">Excel</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">5</td>
+    <td class="tg-0lax">PowerPoint</td>
+  </tr>
+</tbody>
+</table>
+
+
+
+</div>
+<!-- END RIGHT ELEMENTS -->
+   
+</body>
+</html> 
