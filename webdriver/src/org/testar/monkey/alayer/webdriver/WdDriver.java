@@ -51,6 +51,7 @@ import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
 
 import java.time.Duration;
@@ -71,6 +72,8 @@ public class WdDriver extends SUTBase {
   public static boolean remoteDebugging = false;
   public static boolean disableGPU = true;
 
+  public static String alertMessage = "";
+  
   private final Keyboard kbd = AWTKeyboard.build();
   private final Mouse mouse = WdMouse.build();
 
@@ -108,8 +111,26 @@ public class WdDriver extends SUTBase {
 		  remoteWebDriver.manage().window().setPosition(screenPosition);
 	  }
 
+	  remoteWebDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+	  
 	  remoteWebDriver.get(url);
 
+	    // Working with https connections in chromedriver, sometimes we can find that:
+	    // A webpage is temporarily down or moved permanently to a new web address. 
+	    // Try to detect this issue and refresh the webpage.  
+	    String tempDownMsg = "might be temporarily down or it may have moved permanently to a new web address";
+	    int tries = 3;
+	    while(remoteWebDriver.getPageSource().contains(tempDownMsg) && tries > 0) {
+	    	System.out.println("Refresh browser because detected: " + tempDownMsg);
+	    	Util.pause(1);
+	    	remoteWebDriver.navigate().refresh();
+	    	Util.pause(5);
+	    	tries = tries - 1;
+	    }
+	    if(remoteWebDriver.getPageSource().contains(tempDownMsg)) {
+	    	System.err.println("ISSUE trying to connect to the desired webpage: " + tempDownMsg);
+	    }
+	  
 	  CanvasDimensions.startThread();
 
 	  wdDriver = this;
@@ -230,7 +251,8 @@ public class WdDriver extends SUTBase {
    * Make sure the last tab has focus
    */
   public static void activate() {
-    updateHandlesList();
+	  checkAlertMessages();
+	  updateHandlesList();
 
     // Nothing to activate, or user doesn't want to use this activate feature
     if (windowHandles.size() < 1 || !forceActivateTab) {
@@ -244,6 +266,19 @@ public class WdDriver extends SUTBase {
     catch (NullPointerException | WebDriverException ignored) {
     	remoteWebDriver = null;
     }
+  }
+
+  /**
+   * If an alert is detected save the content of the text message.
+   */
+  private static void checkAlertMessages() {
+	  try {
+		  if(remoteWebDriver.switchTo().alert() != null && !remoteWebDriver.switchTo().alert().getText().isEmpty()) {
+			  alertMessage = remoteWebDriver.switchTo().alert().getText();
+			  remoteWebDriver.switchTo().alert().accept();
+			  System.out.println("Webdriver alert message detected: " + alertMessage);
+		  }
+	  } catch(Exception e) {}
   }
 
   public static Set<String> getWindowHandles() {
@@ -281,16 +316,26 @@ public class WdDriver extends SUTBase {
         throw ignored;
       }
       return null;
+    } catch (IllegalArgumentException iae) {
+    	if (remoteWebDriver == null) {
+    		logger.trace("remoteWebDriver is null, executeScript is not executed");
+    		return null;
+    	} else {
+    		logger.error(iae);
+    		return null;
+    	}
     }
   }
 
   public static void waitDocumentReady() {
-    WebDriverWait wait = new WebDriverWait((WebDriver)remoteWebDriver, Duration.ofSeconds(60));
-    ExpectedCondition<Boolean> documentReady = (WebDriver driver) -> {
-      Object result = remoteWebDriver.executeScript("return document.readyState");
-      return result != null && result.equals("complete");
-    };
-    wait.until(documentReady);
+	  if(remoteWebDriver != null) {
+		  WebDriverWait wait = new WebDriverWait((WebDriver)remoteWebDriver, Duration.ofSeconds(60));
+		  ExpectedCondition<Boolean> documentReady = (WebDriver driver) -> {
+			  Object result = remoteWebDriver.executeScript("return document.readyState");
+			  return result != null && result.equals("complete");
+		  };
+		  wait.until(documentReady);
+	  }
   }
 
   public static void executeCanvasScript(String script, Object... args) {
@@ -302,9 +347,25 @@ public class WdDriver extends SUTBase {
       remoteWebDriver.executeScript("addCanvasTestar()");
 
       remoteWebDriver.executeScript(script, args);
-    }
-    catch (NullPointerException | WebDriverException ignored) {
+    } catch (NullPointerException | WebDriverException ignored) {
 
+    } catch (IllegalArgumentException iae) {
+    	if(remoteWebDriver == null) {
+    		logger.trace("remoteWebDriver is null, executeCanvasScript is not executed");
+    	} else {
+    		logger.error(iae);
+    	}
     }
+  }
+
+  public static boolean webdriverElementIsDisplayed(String elementXPath) {
+	  if(remoteWebDriver != null) {
+		  try {
+			  return remoteWebDriver.findElement(By.xpath(elementXPath)).isDisplayed();
+		  } catch (Exception e) {
+			  return false;
+		  }
+	  }
+	  return false;
   }
 }
