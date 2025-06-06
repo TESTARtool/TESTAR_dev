@@ -1,0 +1,226 @@
+#################################################################
+# TESTAR mode
+#
+# Set the mode you want TESTAR to start in: Spy, Generate, Replay
+#################################################################
+
+Mode = Generate
+
+#################################################################
+# Connect to the System Under Test (SUT)
+#
+# Indicate how you want to connect to the SUT:
+#
+# SUTCONNECTOR = COMMAND_LINE, SUTConnectorValue property must be a command line that
+# starts the SUT.
+# It should work from a Command Prompt terminal window (e.g. java - jar SUTs/calc.jar ).
+# For web applications, follow the next format: web_browser_path SUT_URL.
+#
+# SUTCONNECTOR = SUT_WINDOW_TITLE, then SUTConnectorValue property must be the title displayed
+# in the SUT main window. The SUT must be manually started and closed.
+#
+# SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.
+# The SUT must be manually started and closed.
+#################################################################
+SUTConnector = WEB_DRIVER
+SUTConnectorValue = "1520x700+0+0" "https://dev1-digioffice.dodev.nl"
+
+#################################################################
+# Java Swing applications & Access Bridge Enabled
+#
+# Activate the Java Access Bridge in your Windows System:
+#		(Control Panel / Ease of Access / Ease of Access Center / Make the computer easier to see)
+#
+# Enable the variable Access Bridge Enabled in TESTAR as true
+#################################################################
+
+AccessBridgeEnabled = false
+
+#################################################################
+# Sequences
+#
+# Number of sequences and the length of these sequences
+#################################################################
+
+Sequences = 150
+SequenceLength = 300
+
+#################################################################
+# Oracles based on suspicious titles
+#
+# Regular expression and Tags to apply them
+#################################################################
+
+SuspiciousTags = ^(?=.*[eE]rror.*|.*[eE]xcepti[o?]n.*|.*[Ee]xceptie.*|.*[fF]out.*|.*[pP]robleem.*)(?!.*[vV]alidatiefout.*|Fout bij synchronisatie|ctl00\\$cphDetail\\$ctl00\\$dbcExportQueue\\$txtFoutmelding|ctl00_cphDetail_ctl00_dbcPowerShellValidatieScript_fcFoutmelding_pnlTextBox|ctl00\\$cphDetail\\$ctl00\\$dbcPowerShellValidatieScript\\$fcFoutmelding\\$txtVertaling|ctl00_cphDetail_ctl00_dbcPowerShellValidatieScript_fcFoutmelding_lblVertaling|Foutmelding|DocumentenMetFoutcode|ctl00\\$cphDetail\\$ctl00\\$ddlExceptionProcesID|Documents with errorcode|Documenten met foutcode|.*console\\.error.*|DigiOffice - Documenten met foutcode|PermissiesetFout|.*Stoppen ?[bB]ij ?[eE]xceptie|Aantal[ ]fout|Fout|Productwijzigingen, prijs-, typ- en rekenfouten voorbehouden\\.|ctl00_cphDetail_ctl00_lblExceptionProcesID|ctl00_cphDetail_ctl00_dbcPowerShellValidatieScript_fcFoutmelding_txtVertalingRequiredValidator|ctl00_cphDetail_ctl00_dbcPowerShellValidatieScript_fcFoutmelding_pnlTextBox|ctl00_cphDetail_ctl00_dbcExportQueue_lblFoutmelding|Taak voltooid met fouten|.*console.error.*|.*Alle haakjes kloppen.Expressie.*|ctl00_cphDetail_ctl00_dbcDocGenTaak_lbltBoxAantalFout|ctl00_cphDetail_ctl00_dbcPowerShellValidatieScript_fcFoutmelding_faIcon|ctl00_cphDetail_ctl00_dbcPowerShellValidatieScript_fcFoutmelding_pnlLabel|ctl00_cphDetail_ctl00_dbcPowerShellValidatieScript_fcFoutmelding_pnlWrapper|Alleen wanneer taak foutief is|0 fouten gevonden|PostcodeError|.*new InvalidOperationException.*|.*zonder foutmelding.*|.*Deze is nodig voor het goed functioneren van DigiOffice.*).*
+TagsForSuspiciousOracle = Title;WebName;WebTagName;Desc
+
+#################################################################
+# Oracles based on Suspicious Outputs detected by Process Listeners
+#
+# Requires ProcessListenerEnabled
+# (Only available for desktop applications through COMMAND_LINE)
+#
+# Regular expression SuspiciousProcessOutput contains the specification
+# of what is considered to be suspicious output.
+#################################################################
+
+ProcessListenerEnabled = false
+SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
+
+#################################################################
+# Process Logs
+#
+# Required ProcessListenerEnabled
+# (Only available for desktop applications through COMMAND_LINE)
+#
+# Allow TESTAR to store execution logs coming from the processes.
+# You can use the regular expression ProcessLogs below to filter
+# the logs. Use .*.* if you want to store all the outputs of the 
+# process.
+#################################################################
+
+ProcessLogs = .*.*
+
+#################################################################
+# Actionfilter
+#
+# Regular expression and Tags to apply them.
+# More filters can be added in Spy mode,
+# these will be added to the protocol_filter.xml file.
+#################################################################
+
+ClickFilter = .*[uU]pload.*|[sS]howPreviewInNewWindow|.*[sS]ave.*|View page source|View frame source|Print.*|Inspect|.*Google.*|.*incognito.*|Fout bij synchronisatie|Informatie\\.\\.\\.|Open|i|Entiteit importeren uit Excel|Afbeelding toevoegen|Stringtemplates|Script tools|Systeemfuncties|Afdrukken|Verwijderlog|E-mail wachtrij|Tabelinstellingen|Vertalingen
+TagsToFilter = Title;WebName;WebTagName
+
+#################################################################
+# Protocolclass
+#
+# Indicate the location of the protocol class for your specific SUT.
+#################################################################
+
+ProtocolClass = webdriver_functional_digioffice/Protocol_webdriver_functional_digioffice
+
+#################################################################
+# State model inference settings
+#################################################################
+StateModelEnabled = false
+DataStore = 
+DataStoreType = remote
+DataStoreServer = 
+DataStoreDirectory = 
+DataStoreDB = 
+DataStoreUser = 
+DataStorePassword = 
+DataStoreMode = none
+ApplicationName = DigiOfficeDev1
+ApplicationVersion = 20231
+ActionSelectionAlgorithm = random
+StateModelStoreWidgets = true
+
+#################################################################
+# State identifier attributes
+#
+# Specify the widget attributes that you wish to use in constructing
+# the widget and state hash strings. Use a comma separated list.
+#################################################################
+AbstractStateAttributes = WebWidgetTextContent,WebWidgetId
+
+#################################################################
+# WebDriver features
+#################################################################
+
+ClickableClasses = v-menubar-menuitem;v-menubar-menuitem-caption;t;fas;workspace-title;workspace;workspace-toggler;item ufa;fa-fw;werkruimtetaken;fa-tasks;fa-fw werkruimtebeheer fas fa-wrench
+DeniedExtensions = pdf;jpg;png
+WebDomainsAllowed = www.ou.nl;mijn.awo.ou.nl;login.awo.ou.nl
+WebPathsAllowed = null
+FollowLinks = true
+BrowserFullScreen = true
+SwitchNewTabs = true
+
+#################################################################
+# WebDriver Browser Console Oracles
+#################################################################
+WebConsoleErrorOracle = true
+WebConsoleErrorPattern = .*.*
+WebConsoleWarningOracle = true
+WebConsoleWarningPattern = .*.*
+
+#################################################################
+# Override display scale
+#
+# Overrides the displayscale obtained from the system.
+# Can solve problems when the mouse clicks are not aligned with
+# the elements on the screen. This can easily be detected when
+# running the spy mode. For example hover over a text element and
+# the popup window should appear with information about the
+# element, if the popup window is not shown or when the mouse is
+# located somewhere else you can try to override the displayscale
+# Values should be provided as doubles (1.5).
+#################################################################
+
+OverrideWebDriverDisplayScale = 
+
+#################################################################
+# Settings (string) that can be used for user specified protocols
+#################################################################
+
+ProtocolSpecificSetting_1 = 
+ProtocolSpecificSetting_2 = 
+ProtocolSpecificSetting_3 = 
+ProtocolSpecificSetting_4 = 
+ProtocolSpecificSetting_5 = 
+
+#################################################################
+# Extended settings file
+#
+# Relative path to extended settings file.
+#################################################################
+ExtendedSettingsFile = .\\settings\\webdriver_functional_digioffice\\ExtendedSettings.xml
+
+#################################################################
+# Other more advanced settings
+#################################################################
+TypingTextsForExecutedAction = 10
+ReportingClass = HTML Reporting
+RefreshSpyCanvas = 1.0
+Discount = 0.95
+TempDir = ./output/temp
+MaxTime = 3.1536E7
+StopGenerationOnFault = true
+ExecuteActions = true
+DrawWidgetTree = false
+UseRecordedActionDurationAndWaitTimeDuringReplay = false
+ForceForeground = true
+AlgorithmFormsFilling = false
+FaultThreshold = 1.0E-9
+DrawWidgetInfo = false
+MaxReward = 9999999.0
+LogLevel = 1
+VisualizeSelectedAction = true
+Delete = 
+MyClassPath = ./settings
+ReplayRetryTime = 30.0
+ProcessesToKillDuringTest = 
+ShowSettingsAfterTest = true
+ForceToSequenceLength = true
+OutputDir = ./output
+UnattendedTests = false
+TestGenerator = random
+StartupTime = 40.0
+ActionDuration = 0.1
+NonReactingUIThreshold = 100
+ProtocolCompileDirectory = ./settings
+CopyFromTo = 
+TimeToFreeze = 30.0
+StateScreenshotSimilarityThreshold = 1.4E-45
+ShowVisualSettingsDialogOnStartup = true
+ResetDataStore = false
+TimeToWaitAfterAction = 0.1
+DrawWidgetUnderCursor = true
+FlashFeedback = true
+AlwaysCompile = true
+PathToReplaySequence = C:\\TESTAR\\bin\\output\\2023-03-28_22h33m08s_DigiOfficeDev1_20231\\HTMLreports\\2023-03-28_22h33m08s_DigiOfficeDev1_20231_sequence_1_WARNING_UI_ITEM_VISIBILITY_FAULT.html
+VisualizeActions = false
+ExplorationSampleInterval = 1
+OnlySaveFaultySequences = true
+OfflineGraphConversion = true
