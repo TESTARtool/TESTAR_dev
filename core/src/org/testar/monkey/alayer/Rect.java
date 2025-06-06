@@ -38,6 +38,7 @@ import org.testar.monkey.Assert;
 public final class Rect implements Shape {
 	private static final long serialVersionUID = 678389946638512272L;
 	private final double x, y, width, height;
+	private java.awt.Color color = java.awt.Color.RED;
 
 	public static boolean intersect(Rect r1, Rect r2) {
 		Assert.notNull(r1, r2);
@@ -87,6 +88,8 @@ public final class Rect implements Shape {
 	public double y() { return this.y; }
 	public double width() { return this.width; }
 	public double height() { return this.height; }
+	public java.awt.Color getColor() { return color; }
+	public void setColor(java.awt.Color color) { this.color = color; }
 
 	public boolean contains(double x, double y) {
 		if(x < this.x || y < this.y) return false;

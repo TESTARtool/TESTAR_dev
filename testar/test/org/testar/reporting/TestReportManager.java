@@ -204,7 +204,7 @@ public class TestReportManager {
 		reportManager.addState(state);
 		reportManager.addActions(derivedActions);
 		reportManager.addSelectedAction(state, selectedAction);
-		reportManager.addTestVerdict(finalVerdict);
+		reportManager.addTestVerdict(state, finalVerdict);
 		reportManager.finishReport();
 		return reportManager;
 	}

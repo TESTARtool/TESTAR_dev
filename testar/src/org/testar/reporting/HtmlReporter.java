@@ -33,17 +33,28 @@ package org.testar.reporting;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.testar.OutputStructure;
 import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Main;
+import org.testar.monkey.Util;
 import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.Rect;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 
+import java.awt.BasicStroke;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.StringJoiner;
+
+import javax.imageio.ImageIO;
 
 public class HtmlReporter implements Reporting
 {
@@ -61,7 +72,8 @@ public class HtmlReporter implements Reporting
 
     public HtmlReporter(String fileName, boolean replay) //replay or generate mode
     {
-        htmlReportUtil = new HtmlFormatUtil(fileName);
+    	copyCentralHTML();
+    	htmlReportUtil = new HtmlFormatUtil(fileName);
 
         // Start the header, scripts, and styles of the HTML report
         String headerTitle = "TESTAR execution sequence report";
@@ -71,6 +83,14 @@ public class HtmlReporter implements Reporting
         else        addGenerateHeading();
     }
 
+    private void copyCentralHTML() {
+    	File sourceFile = new File(Main.outputDir + File.separator + "graphs" + File.separator + "!Directory_summarized.html");
+    	File destFile = new File(OutputStructure.htmlOutputDir + File.separator + "!Directory_summarized.html");
+    	try {
+    		Files.copy(sourceFile.toPath(), destFile.toPath());
+    	} catch (IOException e) { }
+    }
+    
     private void addReplayHeading()
     {
         htmlReportUtil.addHeading(1, "TESTAR replay sequence report for file " + ConfigTags.PathToReplaySequence);
@@ -252,9 +272,13 @@ public class HtmlReporter implements Reporting
     }
 
     @Override
-    public void addTestVerdict(Verdict verdict)
+    public void addTestVerdict(State state, Verdict verdict)
     {
-        String verdictInfo = verdict.info();
+    	if(!verdict.getVisualtHighlights().isEmpty()) {
+    		highlightVerdictState(state, verdict);
+    	}
+    	
+    	String verdictInfo = verdict.info();
         if(verdict.severity() > Verdict.OK.severity())
             verdictInfo = verdictInfo.replace(Verdict.OK.info(), "").replace("\n", "");
 
@@ -266,6 +290,76 @@ public class HtmlReporter implements Reporting
 
         htmlReportUtil.appendToFileName("_" + verdict.verdictSeverityTitle());
         htmlReportUtil.writeToFile();
+    }
+
+    private void makeGrayScaleImg(BufferedImage image)
+    {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        for(int i=0; i<height; i++) {
+
+           for(int j=0; j<width; j++) {
+
+        	  java.awt.Color c = new java.awt.Color(image.getRGB(j, i));
+              int red = (int)(c.getRed() * 0.299);
+              int green = (int)(c.getGreen() * 0.587);
+              int blue = (int)(c.getBlue() *0.114);
+              java.awt.Color newColor = new java.awt.Color(red+green+blue,red+green+blue,red+green+blue);
+
+              image.setRGB(j,i,newColor.getRGB());
+           }
+        }
+    }
+
+    /**
+     * If a verdict highlight was defined, paint it in the last state screenshot.
+     * 
+     * @param state
+     */
+    private void highlightVerdictState(State state, Verdict verdict) {
+    	// Load the image path that exists in the output directory
+    	String imagePath = state.get(Tags.ScreenshotPath);
+    	File imageFile = new File(imagePath);
+
+    	while(!imageFile.exists()) {
+    		Util.pause(1);
+    	}
+
+    	try {
+    		// Draw in top of the state screenshot to highlight the erroneous widget
+            BufferedImage img = ImageIO.read(imageFile);
+            Graphics2D g2d = img.createGraphics();
+
+           // Check if transparant color is used, then make screenshot gray
+            for(Rect r : verdict.getVisualtHighlights()) {
+    			// If the color is not opaque, fill a Rect with the color
+    			if(r.getColor().getAlpha() > 1 && r.getColor().getAlpha() < 255) {
+    				makeGrayScaleImg(img);
+    				break;
+    			}
+            }
+
+    		g2d.setStroke(new BasicStroke(3));
+    		for(Rect r : verdict.getVisualtHighlights()) {
+    			g2d.setColor(r.getColor());
+    			// If the color is not opaque, fill a Rect with the color
+    			if(r.getColor().getAlpha() > 1 && r.getColor().getAlpha() < 255) {
+    				g2d.drawRect((int)r.x(), (int)r.y(), (int)r.width(), (int)r.height());
+    				g2d.setColor(new java.awt.Color(r.getColor().getRed(), r.getColor().getGreen(), r.getColor().getBlue(), r.getColor().getAlpha() / 2));
+    				g2d.fillRect((int)r.x(), (int)r.y(), (int)r.width(), (int)r.height());
+    			} 
+    			// Else (is opaque), draw a Rect with the color
+    			else {
+    				g2d.drawRect((int)r.x(), (int)r.y(), (int)r.width(), (int)r.height());
+    			}
+    		}
+    		g2d.dispose();
+    		// Save the new image
+    		ImageIO.write(img, "png", imageFile);
+    	} catch(Exception e) {
+    		e.printStackTrace();
+    	}
     }
 
     @Override

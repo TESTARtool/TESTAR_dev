@@ -31,7 +31,9 @@
 package org.testar.monkey.alayer;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.testar.monkey.Assert;
 import org.testar.monkey.Util;
@@ -141,16 +143,38 @@ public final class Verdict implements Serializable {
 	public static final Verdict OK = new Verdict(Severity.OK, "No problem detected.", Util.NullVisualizer);
 	public static final Verdict FAIL = new Verdict(Severity.FAIL, "SUT failed.", Util.NullVisualizer);
 
+	private final List<Rect> visualtHighlights;
+	public List<Rect> getVisualtHighlights(){
+		return visualtHighlights;
+	}
+
+	private String description = "";
+	public void addDescription(String description) {
+		this.description = this.description + description;
+	}
+	public String getDescription() {
+		return this.description;
+	}
+
 	public Verdict(Severity severity, String info) {
-		this(severity, info, Util.NullVisualizer);
+		this(severity, info, Util.NullVisualizer, new ArrayList<>());
 	}
 
 	public Verdict(Severity severity, String info, Visualizer visualizer) {
+		this(severity, info, visualizer, new ArrayList<>());
+	}
+
+	public Verdict(Severity severity, String info, List<Rect> visualtHighlights){
+		this(severity, info, Util.NullVisualizer, visualtHighlights);
+	}
+
+	public Verdict(Severity severity, String info, Visualizer visualizer, List<Rect> visualtHighlights){
 		Assert.isTrue(severity.getValue() >= Severity.OK.getValue() && severity.getValue() <= Severity.FAIL.getValue());
-		Assert.notNull(info, visualizer);
+		Assert.notNull(info, visualizer, visualtHighlights);
 		this.severity = severity.getValue();
 		this.info = info;
 		this.visualizer = visualizer;
+		this.visualtHighlights = visualtHighlights;
 	}
 
 	/**
@@ -204,6 +228,10 @@ public final class Verdict implements Serializable {
 	 * @return A new verdict that is the result of joining the current verdict with the provided verdict.
 	 */
 	public Verdict join(Verdict verdict) {
+		List<Rect> jointHighlights = new ArrayList<>();
+		jointHighlights.addAll(this.visualtHighlights);
+		jointHighlights.addAll(verdict.getVisualtHighlights());
+
 		Severity joinedSeverity = Arrays.stream(Severity.values())
 				.filter(s -> s.getValue() == Math.max(this.severity, verdict.severity()))
 				.findFirst()
@@ -214,7 +242,7 @@ public final class Verdict implements Serializable {
 
 		Visualizer joinedVisualizer = (this.severity >= verdict.severity()) ? this.visualizer() : verdict.visualizer();
 
-		return new Verdict(joinedSeverity, joinedInfo, joinedVisualizer);
+		return new Verdict(joinedSeverity, joinedInfo, joinedVisualizer, jointHighlights);
 	}
 
 	/**

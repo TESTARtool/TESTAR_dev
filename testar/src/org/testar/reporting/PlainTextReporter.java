@@ -195,7 +195,7 @@ public class PlainTextReporter implements Reporting
     }
     
     @Override
-    public void addTestVerdict(Verdict verdict)
+    public void addTestVerdict(State state, Verdict verdict)
     {
         String verdictInfo = verdict.info();
         if(verdict.severity() > Verdict.OK.severity())

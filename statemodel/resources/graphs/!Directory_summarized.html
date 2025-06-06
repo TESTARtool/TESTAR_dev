@@ -1,0 +1,120 @@
+<html>
+<head>
+	<title>Central report</title>
+	<style>
+		.collapsible {
+		  background-color: #bbb;
+		  color: black;
+		  cursor: pointer;
+		  padding: 18px;
+		  width: 100%;
+		  border: none;
+		  text-align: left;
+		  outline: none;
+		  font-size: 20px;
+		}
+		.content {
+		  padding: 0 18px;
+		  display: none;
+		  overflow: hidden;
+		  background-color: #f1f1f1;
+		}
+	</style>
+</head>
+<body>
+	<h2>Select the directory that contains all HTML reports</h2>
+	<input type="file" id="directorypicker" name="fileList" webkitdirectory multiple />
+	<div id="central"></div>
+</body>
+<script>
+	document.getElementById('directorypicker').addEventListener('change', function() {
+		var files = filterFiles(this.files);
+		for (var i = 0; i < files.length; i++) {
+			var reader = new FileReader();
+			reader.fileName = files[i].name;
+			reader.onload = function(e) {
+				var temp = document.createElement('div');
+				temp.innerHTML = e.target.result;
+
+				// Attempt to extract blocks from old format (using #block)
+				var divBlocks = Array.from(temp.querySelectorAll('#block'));
+				
+				let verdictElement, stateElement;
+
+				if (divBlocks.length >= 2) {
+					// Old format: get the last two blocks
+					verdictElement = divBlocks[divBlocks.length - 1].cloneNode(true);
+					stateElement = divBlocks[divBlocks.length - 2].cloneNode(true);
+				} else {
+					// New format fallback
+					// Get verdict from .verdictBlock
+					verdictElement = temp.querySelector('.verdictBlock')?.cloneNode(true);
+					
+					// Get the latest state from the last .stateBlock
+					let stateBlocks = temp.querySelectorAll('.stateBlock');
+					if (stateBlocks.length > 0) {
+						stateElement = stateBlocks[stateBlocks.length - 1].cloneNode(true);
+					}
+				}
+
+				// Only proceed if both elements were found
+				if (verdictElement && stateElement) {
+					// Create a div to hold all three elements
+					var containerButton = document.createElement('button');
+					containerButton.classList.add('collapsible');
+					var container = document.createElement('div');
+					container.classList.add('content');
+
+					// Prepare filename URL
+					var filenameLink = document.createElement('a');
+					filenameLink.textContent = e.target.fileName;
+					filenameLink.href = e.target.fileName;
+
+					// Add blank space
+					container.appendChild(document.createElement('br'));
+
+					// Add URL to the container
+					container.appendChild(filenameLink);
+					// Also add the filename to the container button
+					containerButton.innerText = e.target.fileName;
+
+					// Add verdict to container
+					container.appendChild(verdictElement);
+
+					// Add latest State with erroneous verdict to container
+					container.appendChild(stateElement);
+
+					// Add container to containerButton
+					containerButton.appendChild(container);
+
+					// Add containerButton to #central div element
+					document.getElementById('central').appendChild(document.createElement('br'));
+					document.getElementById('central').appendChild(document.createElement('br'));
+					document.getElementById('central').appendChild(containerButton);
+
+					// Now prepare the collapse visualization
+					containerButton.addEventListener("click", function() {
+						if (container.style.display === "block") {
+							container.style.display = "none";
+						} else {
+							container.style.display = "block";
+						}
+					});
+				}
+			};
+			reader.readAsText(files[i]);
+		}
+	});
+
+	function filterFiles(files) {
+		var filteredFiles = [];
+		for (var i = 0; i < files.length; i++) {
+			var filename = files[i].name;
+			if (!filename.includes('OK.html')) {
+				filteredFiles.push(files[i]);
+			}
+		}
+		return filteredFiles;
+	}
+</script>
+</html>

@@ -138,10 +138,10 @@ public class ReportManager implements Reporting
                 reporter.addSelectedAction(state, action);
     }
     
-    public void addTestVerdict(Verdict verdict)
+    public void addTestVerdict(State state, Verdict verdict)
     {
         if(reportingEnabled)
             for(Reporting reporter : reporters)
-                reporter.addTestVerdict(verdict);
+                reporter.addTestVerdict(state, verdict);
     }
 }

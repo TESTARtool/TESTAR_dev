@@ -500,6 +500,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	void startTestSequence(SUT system) {
 		actionCount = 1;
+		lastExecutedAction = null;
 		lastSequenceActionNumber = settings().get(ConfigTags.SequenceLength) + actionCount - 1;
 		processVerdict = Verdict.OK;
 		this.cv = buildCanvas();
@@ -1138,12 +1139,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		String statusInfo = "";
 
 		if(mode() == Modes.Replay) {
-			reportManager.addTestVerdict(getReplayVerdict().join(processVerdict));
+			reportManager.addTestVerdict(latestState, getReplayVerdict().join(processVerdict));
 			status = (getReplayVerdict().join(processVerdict)).verdictSeverityTitle();
 			statusInfo = (getReplayVerdict().join(processVerdict)).info();
 		}
 		else {
-			reportManager.addTestVerdict(getFinalVerdict());
+			reportManager.addTestVerdict(latestState, getFinalVerdict());
 			status = (getFinalVerdict()).verdictSeverityTitle();
 			statusInfo = (getFinalVerdict()).info();
 		}
