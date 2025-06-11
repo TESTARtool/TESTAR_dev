@@ -67,6 +67,11 @@ public class GenericVisualConcentricityMetricOracle implements Oracle {
 	}
 
 	@Override
+	public String getMessage() {
+		return "";
+	}
+
+	@Override
 	public Verdict getVerdict(State state) {
 		if (state.childCount() == 0) {
 			return Verdict.OK; // State has no children, no need for balance metric evaluation

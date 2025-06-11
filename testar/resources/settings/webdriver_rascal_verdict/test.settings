@@ -44,7 +44,7 @@ SequenceLength = 2
 # Regular expression and Tags to apply them
 #################################################################
 
-SuspiciousTags = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+SuspiciousTags = 
 TagsForSuspiciousOracle = Title;WebName;WebTagName
 
 #################################################################
@@ -165,6 +165,12 @@ ProtocolSpecificSetting_2 =
 ProtocolSpecificSetting_3 = 
 ProtocolSpecificSetting_4 = 
 ProtocolSpecificSetting_5 = 
+
+#################################################################
+# Extended test oracles
+#################################################################
+
+ExtendedOracles = ButtonSubmitMustBeEnabled
 
 #################################################################
 # Specify the widget attributes that you wish to visualize during Spy Mode. Use a semicolon separated list.

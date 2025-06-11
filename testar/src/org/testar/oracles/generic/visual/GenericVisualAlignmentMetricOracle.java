@@ -65,6 +65,11 @@ public class GenericVisualAlignmentMetricOracle implements Oracle {
 	}
 
 	@Override
+	public String getMessage() {
+		return "";
+	}
+
+	@Override
 	public Verdict getVerdict(State state) {
 		ArrayList<Shape> regions = MetricsHelper.getRegions(state);
 

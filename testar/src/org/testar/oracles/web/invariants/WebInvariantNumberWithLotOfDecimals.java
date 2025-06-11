@@ -59,6 +59,11 @@ public class WebInvariantNumberWithLotOfDecimals implements Oracle {
 	}
 
 	@Override
+	public String getMessage() {
+		return "";
+	}
+
+	@Override
 	public Verdict getVerdict(State state) {
 		List<Widget> incorrectDecimalWidgets = new ArrayList<>();
 

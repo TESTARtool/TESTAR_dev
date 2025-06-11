@@ -59,6 +59,11 @@ public class WebInvariantDuplicatedRowsInTable implements Oracle {
 	}
 
 	@Override
+	public String getMessage() {
+		return "";
+	}
+
+	@Override
 	public Verdict getVerdict(State state) {
 		List<Widget> incorrectWidgets = new ArrayList<>();
 		List<String> incorrectWidgetDescriptions = new ArrayList<>();

@@ -43,6 +43,8 @@ import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.oracles.Oracle;
+import org.testar.oracles.OracleSelection;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.settings.Settings;
 
@@ -52,8 +54,38 @@ import static org.testar.monkey.alayer.Tags.Enabled;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
-
 public class Protocol_webdriver_rascal_verdict extends WebdriverProtocol {
+
+	// This list tracks the detected erroneous verdicts to avoid duplicates
+	private List<String> listOfDetectedErroneousVerdicts = new ArrayList<>();
+
+	private List<Oracle> extendedOraclesList = new ArrayList<>();
+
+	/**
+	 * Called once during the life time of TESTAR
+	 * This method can be used to perform initial setup work
+	 *
+	 * @param settings the current TESTAR settings as specified by the user.
+	 */
+	@Override
+	protected void initialize(Settings settings) {
+		super.initialize(settings);
+
+		// Reset the list when we start a new TESTAR run with multiple sequences
+		listOfDetectedErroneousVerdicts = new ArrayList<>();
+	}
+
+	/**
+	 * This methods is called before each test sequence, before startSystem(),
+	 * allowing for example using external profiling software on the SUT
+	 *
+	 * HTML sequence report will be initialized in the super.preSequencePreparations() for each sequence
+	 */
+	@Override
+	protected void preSequencePreparations() {
+		super.preSequencePreparations();
+		extendedOraclesList = OracleSelection.loadExtendedOracles(settings.get(ConfigTags.ExtendedOracles));
+	}
 
 	/**
 	 * This is a helper method used by the default implementation of <code>buildState()</code>
@@ -73,68 +105,23 @@ public class Protocol_webdriver_rascal_verdict extends WebdriverProtocol {
 
 		// ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
 
-		Verdict rascalButtonVerdict = getButtonVerdict(state);
-		if(rascalButtonVerdict != Verdict.OK) return rascalButtonVerdict;
+		// "ExtendedOracles" offered by TESTAR in the test.settings or Oracles GUI dialog
+		for (Oracle extendedOracle : extendedOraclesList) {
+			Verdict extendedVerdict = extendedOracle.getVerdict(state);
 
-		Verdict rascalCheckBoxVerdict = getCheckBoxVerdict(state);
-		if(rascalCheckBoxVerdict != Verdict.OK) return rascalCheckBoxVerdict;
+			// If the Custom Verdict is not OK and was not detected in a previous sequence
+			// return verdict with failure state
+			if (extendedVerdict != Verdict.OK && !containsVerdictInfo(listOfDetectedErroneousVerdicts, extendedVerdict.info())) {
+				return extendedVerdict;
+			}
+
+		}
 
 		return verdict;
 	}
 
-	public Verdict getButtonVerdict(State state) {
-		Verdict verdict = Verdict.OK;   
-
-		Widget w_Submit = helperMethods.getWidget(state, "button", "Submit");
-
-		if (w_Submit == null)
-			return new Verdict(Verdict.Severity.WARNING, "Could not find button 'Submit'");
-
-		Boolean is_enabled= helperMethods.evaluate_isStatus(w_Submit, "enabled");
-
-		if (is_enabled == null)
-			return new Verdict(Verdict.Severity.WARNING, "Could not find status 'enabled'");
-		if (!is_enabled){
-			return new Verdict(Verdict.Severity.FAIL, "button Submit must be enabled");
-		}
-		else verdict = Verdict.OK;
-
-		return verdict;
-	}
-
-	public Verdict getCheckBoxVerdict(State state) {
-		Verdict verdict = Verdict.OK;   
-
-		Widget w_Accept_Terms = helperMethods.getWidget(state, "checkbox", "Accept Terms");
-
-		if (w_Accept_Terms == null)
-			return new Verdict(Verdict.Severity.WARNING, "Could not find 'checkbox' 'Accept Terms'");
-
-		Boolean is_selected= helperMethods.evaluate_isStatus(w_Accept_Terms, "selected");
-
-		if (is_selected == null)
-			return new Verdict(Verdict.Severity.WARNING, "Could not status 'selected'");
-
-		if (!is_selected){
-			verdict = Verdict.OK;
-		}
-		else verdict = null;
-
-		Widget w_Submit = helperMethods.getWidget(state, "button", "Submit");
-
-		if (w_Submit == null)
-			return new Verdict(Verdict.Severity.WARNING, "Could not find button 'Submit'");
-
-		Boolean is_enabled= helperMethods.evaluate_isStatus(w_Submit, "enabled");
-
-		if (is_enabled == null)
-			return new Verdict(Verdict.Severity.WARNING, "Could not find status 'enabled'");
-		if (!is_enabled){
-			return new Verdict(Verdict.Severity.FAIL, "submit only enabled when terms accepted");
-		}
-		else verdict = Verdict.OK;
-
-		return verdict;
+	private boolean containsVerdictInfo(List<String> listOfDetectedErroneousVerdicts, String currentVerdictInfo) {
+		return listOfDetectedErroneousVerdicts.stream().anyMatch(verdictInfo -> verdictInfo.contains(currentVerdictInfo.replace("\n", " ")));
 	}
 
 	/**
@@ -225,142 +212,18 @@ public class Protocol_webdriver_rascal_verdict extends WebdriverProtocol {
 		return actions;
 	}
 
-}
-
-class helperMethods {
-
-	public static Widget getWidget(State state, String elementType, String selector) {
-		Role elementRole = element2Role.get(elementType);
-		List<Tag<?>> tagPriority = selectorString2Tags.get(elementType);
-
-		for (Widget w : state) {
-			Role widgetRole = w.get(Tags.Role, Roles.Widget);
-			if (!elementRole.equals(widgetRole)) {
-				continue;
-			}
-
-			for (Tag<?> tag : tagPriority) {
-				Object tagValue = w.get(tag, null);
-				if (tagValue instanceof String && selector.equals(tagValue)) {
-					return w;
-				}
-			}
+	/**
+	 * This method is invoked each time after TESTAR finished the generation of a sequence.
+	 */
+	@Override
+	protected void finishSequence() {
+		super.finishSequence();
+		// If the final Verdict is not OK and the verdict is not saved in the list
+		// This is a new run fail verdict
+		Verdict finalVerdict = getVerdict(latestState);
+		if(finalVerdict.severity() > Verdict.Severity.OK.getValue() && !listOfDetectedErroneousVerdicts.contains(finalVerdict.info().replace("\n", " "))) {
+			listOfDetectedErroneousVerdicts.add(finalVerdict.info().replace("\n", " "));
 		}
-		return null;
 	}
-
-	public static Boolean evaluate_isStatus(Widget w, String status) {
-		List<Tag<?>> tagPriority = statusTags.get(status);
-
-		for (Tag<?> tag : tagPriority) {
-			Object value = w.get(tag, null);
-
-			// Special cases first
-			if (status.equals("empty")) {
-				if (value instanceof String && ((String) value).isEmpty()) {
-					return true;
-				}
-			} else if (status.equals("filled")) {
-				if (value instanceof String && !((String) value).isEmpty()) {
-					return true;
-				}
-			} else if (status.equals("readonly")) {
-				if (value instanceof Boolean && !((Boolean) value)) {
-					return true; // readonly = not focusable
-				}
-			} else {
-				// The rest is gewoon boolean case (e.g. visible, enabled, selected...)
-				if (value instanceof Boolean) {
-					return (Boolean) value;
-				}
-			}
-		}
-
-		// None of the tags confirmed the status
-		return null;
-	}
-
-	public static boolean evaluate_hasAttribute(Widget w, String attr) {
-		List<Tag<?>> tagPriority = attributeTags.get(attr);
-
-		for (Tag<?> tag : tagPriority) {
-			Object value = w.get(tag, null);
-
-			if (value instanceof String && !((String) value).isEmpty()) {
-				return true; //it has the attribute and it is not empty
-			}
-		}
-
-		// Attribute was not found
-		return false; 
-	}
-
-
-	public static final Map<String, Set<String>> validStatusPerElement = Map.ofEntries(
-			Map.entry("button", Set.of("visible", "enabled", "focused", "clickable")),
-			Map.entry("input_text", Set.of("visible", "enabled", "empty", "filled", "focused", "readonly")),
-			Map.entry("checkbox", Set.of("visible", "enabled", "checked", "selected")),
-			Map.entry("radio", Set.of("visible", "enabled", "checked", "selected")),
-			Map.entry("dropdown", Set.of("visible", "enabled", "empty", "filled", "selected")),
-			Map.entry("label", Set.of("visible")),
-			Map.entry("image", Set.of("visible", "offscreen", "onscreen")),
-			Map.entry("link", Set.of("visible", "clickable")),
-			Map.entry("alert", Set.of("visible")),
-			Map.entry("element", Set.of("visible", "enabled", "focused", "offscreen", "onscreen"))
-			);
-
-	public static final Map<String, Role> element2Role = Map.of(
-			"button", WdRoles.WdBUTTON,
-			"input_text", Roles.Text,
-			"static_text", WdRoles.WdLABEL,
-			//"alert", Roles.Alert,
-			"dropdown", WdRoles.WdSELECT,
-			"checkbox", WdRoles.WdINPUT,
-			"radio", WdRoles.WdINPUT,
-			"image", WdRoles.WdIMG,
-			"link", WdRoles.WdLINK,
-			"label", WdRoles.WdLABEL,
-			"element", Roles.Widget
-			);
-
-	public static final Map<String, List<Tag<?>>> selectorString2Tags = Map.ofEntries(
-			Map.entry("button", List.of(Tags.Title, WdTags.WebGenericTitle, WdTags.WebTextContent)),
-			Map.entry("input_text", List.of(Tags.Title, WdTags.WebName, WdTags.WebGenericTitle)),
-			Map.entry("static_text", List.of(Tags.Title, WdTags.WebTextContent, WdTags.WebGenericTitle)),
-			Map.entry("alert", List.of(Tags.Title, WdTags.WebGenericTitle)),
-			Map.entry("dropdown", List.of(Tags.Title, WdTags.WebGenericTitle)),
-			Map.entry("checkbox", List.of(Tags.Title, WdTags.WebGenericTitle)),
-			Map.entry("radio", List.of(Tags.Title, WdTags.WebGenericTitle)),
-			Map.entry("image", List.of(WdTags.WebAlt, Tags.Desc, WdTags.WebTitle, WdTags.WebGenericTitle)),
-			Map.entry("link", List.of(Tags.Title, WdTags.WebHref, WdTags.WebGenericTitle)),
-			Map.entry("label", List.of(Tags.Title, WdTags.WebGenericTitle)),
-			Map.entry("element", List.of(Tags.Title, WdTags.WebGenericTitle))
-			);
-
-	public static final Map<String, List<Tag<?>>> statusTags = Map.ofEntries(
-			Map.entry("visible", List.of(WdTags.WebIsFullOnScreen)),
-			Map.entry("offscreen", List.of(WdTags.WebIsOffScreen)),
-			Map.entry("onscreen", List.of(WdTags.WebIsFullOnScreen)),
-
-			Map.entry("enabled", List.of(WdTags.WebIsEnabled)),
-			Map.entry("disabled", List.of(WdTags.WebIsDisabled)),
-			Map.entry("clickable", List.of(WdTags.WebIsClickable)),
-			Map.entry("focused", List.of(WdTags.WebHasKeyboardFocus)),
-			Map.entry("readonly", List.of(WdTags.WebIsKeyboardFocusable)),
-
-			Map.entry("selected", List.of(WdTags.WebIsSelected)),
-			Map.entry("checked", List.of(WdTags.WebIsChecked)),
-
-			Map.entry("empty", List.of(WdTags.WebValue)),
-			Map.entry("filled", List.of(WdTags.WebValue))
-			);
-
-	public static final Map<String, List<Tag<?>>> attributeTags = Map.ofEntries(
-			Map.entry("label", List.of(Tags.Title, WdTags.WebGenericTitle)),
-			Map.entry("alttext", List.of(WdTags.WebAlt)),
-			Map.entry("role", List.of(Tags.Role)),
-			Map.entry("placeholder", List.of(WdTags.WebPlaceholder)),
-			Map.entry("tooltip", List.of(Tags.Desc, WdTags.WebTextContent))
-			);
 
 }

@@ -63,6 +63,11 @@ public class LogOracle implements Oracle {
         checker.initialRead();
     }
 
+    @Override
+    public String getMessage() {
+    	return "";
+    }
+
     public Verdict getVerdict(State state) {
         errorsList.addAll(checker.readAndCheck());
         if ( errorsList.size() == 0  ) {

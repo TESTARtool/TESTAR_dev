@@ -43,6 +43,7 @@ public class OracleSelection {
 			"org.testar.oracles.generic.visual",
 			"org.testar.oracles.web.accessibility",
 			"org.testar.oracles.web.invariants",
+			"org.testar.oracles.dsl",
 	};
 
 	public static List<String> getAvailableOracles() {

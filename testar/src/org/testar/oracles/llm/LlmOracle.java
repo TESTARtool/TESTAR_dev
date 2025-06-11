@@ -115,6 +115,11 @@ public class LlmOracle implements Oracle {
 	}
 
 	@Override
+	public String getMessage() {
+		return "";
+	}
+
+	@Override
 	public Verdict getVerdict(State state) {
 		// If the stateless option is enabled, initialize a new prompt to reduce tokens usage
 		if(this.stateless) initialize();
