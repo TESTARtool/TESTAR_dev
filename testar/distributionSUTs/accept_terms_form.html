@@ -34,7 +34,7 @@
 
     <div class="form-group">
       <input type="checkbox" id="checkbox-terms" />
-      <label for="checkbox-terms">I accept the terms and conditions</label>
+      <label for="checkbox-terms">Accept Terms</label>
     </div>
 
     <div class="form-group">
@@ -47,7 +47,8 @@
     const submitBtn = document.getElementById("submitBtn");
 
     checkbox.addEventListener("change", function () {
-      submitBtn.disabled = !checkbox.checked;
+      // Do not enable when checked to fake an issue
+      //submitBtn.disabled = !checkbox.checked;
     });
   </script>
 </body>

@@ -36,7 +36,7 @@ SUTConnectorValue = "suts/accept_terms_form.html"
 #################################################################
 
 Sequences = 1
-SequenceLength = 2
+SequenceLength = 5
 
 #################################################################
 # Oracles based on suspicious tag values
@@ -170,7 +170,7 @@ ProtocolSpecificSetting_5 =
 # Extended test oracles
 #################################################################
 
-ExtendedOracles = ButtonSubmitMustBeEnabled
+ExtendedOracles = SubmitMustBeEnabledWhenAcceptTermsIsChecked
 
 #################################################################
 # Specify the widget attributes that you wish to visualize during Spy Mode. Use a semicolon separated list.
