@@ -35,6 +35,7 @@ import java.util.Arrays;
 
 import org.testar.monkey.Assert;
 import org.testar.monkey.Util;
+import org.testar.monkey.alayer.visualizers.ShapeVisualizer;
 
 /**
  * A Verdict is the outcome of a test oracle. It determines whether an <code>SUT</code>'s state is erroneous and if so
@@ -125,6 +126,24 @@ public final class Verdict implements Serializable {
 		this.severity = severity.getValue();
 		this.info = info;
 		this.visualizer = visualizer;
+	}
+
+	public Verdict(Severity severity, String info, Widget w) {
+		this(
+				severity,
+				info,
+				new ShapeVisualizer(
+						Pen.newPen()
+						.setColor(Color.Red)
+						.setFillPattern(FillPattern.None)
+						.setStrokePattern(StrokePattern.Solid)
+						.build(),
+						w.get(Tags.Shape, Rect.from(0, 0, 0, 0)),
+						info,
+						0.5,
+						0.5
+						)
+				);
 	}
 
 	/**

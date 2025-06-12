@@ -20,8 +20,8 @@ public class DollarValuesMustHaveTwoDecimals implements Oracle {
      Verdict verdict = Verdict.OK;
      for (Widget $it: getWidgets("table_data", state)) {
        
-       boolean cond$32 = evaluateMatches($it, "\\$(?:\\d+\\.(?!\\d{2}\\b)\\d+|\\d+)(?!\\.)\\b");
-       verdict = (cond$32 && verdict == Verdict.OK) ? Verdict.OK : new Verdict(Verdict.Severity.FAIL, getMessage());
+       boolean cond$32 = !(evaluateMatches($it, "\\$(?:\\d+\\.(?!\\d{2}\\b)\\d+|\\d+)(?!\\.)\\b"));
+       verdict = (cond$32 && verdict == Verdict.OK) ? Verdict.OK : new Verdict(Verdict.Severity.FAIL, getMessage(), $it);
      }
      return verdict;
   }

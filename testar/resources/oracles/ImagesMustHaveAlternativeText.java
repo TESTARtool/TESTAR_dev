@@ -1,3 +1,4 @@
+
 import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Widget;
@@ -20,7 +21,7 @@ public class ImagesMustHaveAlternativeText implements Oracle {
      for (Widget $it: getWidgets("image", state)) {
        
        boolean cond$24 = evaluateHasAttribute($it, "alttext");
-       verdict = (cond$24 && verdict == Verdict.OK) ? Verdict.OK : new Verdict(Verdict.Severity.FAIL, getMessage());
+       verdict = (cond$24 && verdict == Verdict.OK) ? Verdict.OK : new Verdict(Verdict.Severity.FAIL, getMessage(), $it);
      }
      return verdict;
   }

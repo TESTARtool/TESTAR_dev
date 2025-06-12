@@ -1,3 +1,4 @@
+
 import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Widget;
@@ -5,6 +6,7 @@ import org.testar.oracles.Oracle;
 
 
 public class ButtonSubmitMustBeEnabled implements Oracle {
+
   @Override
   public void initialize() { }
 
@@ -21,7 +23,7 @@ public class ButtonSubmitMustBeEnabled implements Oracle {
        return new Verdict(Verdict.Severity.WARNING, "Could not find button: " + "Submit");
      }
      boolean cond$23 = evaluateIsStatus(widget$14, "enabled");
-     verdict = (cond$23 && verdict == Verdict.OK) ? Verdict.OK : new Verdict(Verdict.Severity.FAIL, getMessage());
+     verdict = (cond$23 && verdict == Verdict.OK) ? Verdict.OK : new Verdict(Verdict.Severity.FAIL, getMessage(), widget$14);
      return verdict;
   }
 }
