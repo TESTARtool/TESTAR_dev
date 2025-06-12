@@ -34,6 +34,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.testar.monkey.alayer.Role;
 import org.testar.monkey.alayer.Roles;
@@ -123,6 +126,46 @@ public interface OracleWidgetsMapping {
 		return false; 
 	}
 
+	default boolean evaluateContains(Widget w, String contain) {
+		if (w == null || contain == null || contain.isEmpty() || w.tags() == null) {
+			return false;
+		}
+
+		for (Tag<?> tag : w.tags()) {
+			Object value = w.get(tag);
+			if (value instanceof String && ((String) value).contains(contain)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	default boolean evaluateMatches(Widget w, String regex) {
+		if (w == null || regex == null || regex.isEmpty() || w.tags() == null) {
+			return false;
+		}
+
+		Pattern pattern;
+		try {
+			pattern = Pattern.compile(regex);
+		} catch (PatternSyntaxException e) {
+			return false;
+		}
+
+		for (Tag<?> tag : w.tags()) {
+			Object value = w.get(tag);
+			if (value instanceof String) {
+				Matcher matcher = pattern.matcher((String) value);
+				if (matcher.find()) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
 	Map<String, Set<String>> validStatusPerElement = Map.ofEntries(
 			Map.entry("button", Set.of("visible", "enabled", "focused", "clickable")),
 			Map.entry("input_text", Set.of("visible", "enabled", "empty", "filled", "focused", "readonly")),
@@ -133,21 +176,23 @@ public interface OracleWidgetsMapping {
 			Map.entry("image", Set.of("visible", "offscreen", "onscreen")),
 			Map.entry("link", Set.of("visible", "clickable")),
 			Map.entry("alert", Set.of("visible")),
+			Map.entry("table_data", Set.of("visible")),
 			Map.entry("element", Set.of("visible", "enabled", "focused", "offscreen", "onscreen"))
 			);
 
-	Map<String, Role> element2Role = Map.of(
-			"button", WdRoles.WdBUTTON,
-			"input_text", Roles.Text,
-			"static_text", WdRoles.WdLABEL,
-			//"alert", Roles.Alert,
-			"dropdown", WdRoles.WdSELECT,
-			"checkbox", WdRoles.WdINPUT,
-			"radio", WdRoles.WdINPUT,
-			"image", WdRoles.WdIMG,
-			"link", WdRoles.WdA,
-			"label", WdRoles.WdLABEL,
-			"element", Roles.Widget
+	Map<String, Role> element2Role = Map.ofEntries(
+			Map.entry("button", WdRoles.WdBUTTON),
+			Map.entry("input_text", Roles.Text),
+			Map.entry("static_text", WdRoles.WdLABEL),
+			// Map.entry("alert", Roles.Alert),
+			Map.entry("dropdown", WdRoles.WdSELECT),
+			Map.entry("checkbox", WdRoles.WdINPUT),
+			Map.entry("radio", WdRoles.WdINPUT),
+			Map.entry("image", WdRoles.WdIMG),
+			Map.entry("link", WdRoles.WdA),
+			Map.entry("label", WdRoles.WdLABEL),
+			Map.entry("table_data", WdRoles.WdTD),
+			Map.entry("element", Roles.Widget)
 			);
 
 	Map<String, List<Tag<?>>> selectorString2Tags = Map.ofEntries(
@@ -161,6 +206,7 @@ public interface OracleWidgetsMapping {
 			Map.entry("image", List.of(WdTags.WebAlt, Tags.Desc, WdTags.WebTitle, WdTags.WebGenericTitle)),
 			Map.entry("link", List.of(Tags.Title, WdTags.WebHref, WdTags.WebGenericTitle)),
 			Map.entry("label", List.of(Tags.Title, WdTags.WebGenericTitle)),
+			Map.entry("table_data", List.of(Tags.Title, WdTags.WebGenericTitle, WdTags.WebTextContent)),
 			Map.entry("element", List.of(Tags.Title, WdTags.WebGenericTitle))
 			);
 
