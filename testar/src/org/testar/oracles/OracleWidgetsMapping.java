@@ -108,7 +108,7 @@ public interface OracleWidgetsMapping {
 	//where attr can be one of "label", "alttext", "role", "placeholder", "tooltip"
 	//found possible with the mapping in attributeTags
 
-	default boolean evaluate_hasAttribute(Widget w, String attr) {
+	default boolean evaluateHasAttribute(Widget w, String attr) {
 		List<Tag<?>> tagPriority = attributeTags.get(attr);
 
 		for (Tag<?> tag : tagPriority) {
