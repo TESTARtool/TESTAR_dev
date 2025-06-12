@@ -47,46 +47,47 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
+import org.testar.monkey.Main;
 import org.testar.oracles.OracleSelection;
 
-public class ExtendedOraclesDialog extends JDialog {
+public class ExternalOraclesDialog extends JDialog {
 	private static final long serialVersionUID = 8181334482682809135L;
 
 	private JTable table;
 	private DefaultTableModel tableModel;
 
-	private String savedSelectedExtendedOracles;
+	private String savedSelectedExternalOracles;
 
 	Window window = SwingUtilities.getWindowAncestor(this);
 
-	public ExtendedOraclesDialog(String selectedExtendedOracles) {
-		this.savedSelectedExtendedOracles = selectedExtendedOracles;
+	public ExternalOraclesDialog(String selectedExternalOracles) {
+		this.savedSelectedExternalOracles = selectedExternalOracles;
 
 		setSize(500, 400);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setLayout(new BorderLayout());
 
-		init(selectedExtendedOracles);
+		init(selectedExternalOracles);
 
 		setVisible(true);
 	}
 
-	private void init(String selectedExtendedOracles) {
-		JLabel label = new JLabel("Enable or disable the extended oracles");
+	private void init(String selectedExternalOracles) {
+		JLabel label = new JLabel("Enable or disable the external oracles");
 		label.setFont(new Font("Arial", Font.BOLD, 14));
 		label.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		add(label, BorderLayout.NORTH);
 
-		// Load available oracles dynamically and sort alphabetically
-		List<String> availableOracles = OracleSelection.getAvailableExtendedOracles();
+		// Load external oracles from the testar/bin/oracles path
+		List<String> availableOracles = OracleSelection.getExternalOracleFileNames();
 		Collections.sort(availableOracles);
 
 		// Load activated oracles from settings
-		List<String> activatedOracles = List.of(selectedExtendedOracles.split(","));
+		List<String> activatedOracles = List.of(selectedExternalOracles.split(","));
 
-		// Table Model with Enabled Extended Oracles
-		String[] columnNames = {"Extended Oracle Name", "Enabled"};
+		// Table Model with Enabled External Oracles
+		String[] columnNames = {"External Oracle Name", "Enabled"};
 		Object[][] data = new Object[availableOracles.size()][2];
 
 		for (int i = 0; i < availableOracles.size(); i++) {
@@ -120,18 +121,18 @@ public class ExtendedOraclesDialog extends JDialog {
 		add(scrollPane, BorderLayout.CENTER);
 
 		JButton saveButton = new JButton("Save and Close");
-		saveButton.addActionListener(e -> saveExtendedOracles());
+		saveButton.addActionListener(e -> saveExternalOracles());
 
 		JPanel bottomPanel = new JPanel();
 		bottomPanel.add(saveButton);
 		add(bottomPanel, BorderLayout.SOUTH);
 	}
 
-	public String getSavedExtendedOracles() {
-		return savedSelectedExtendedOracles;
+	public String getSavedExternalOracles() {
+		return savedSelectedExternalOracles;
 	}
 
-	private void saveExtendedOracles() {
+	private void saveExternalOracles() {
 		StringBuilder selectedOracles = new StringBuilder();
 		for (int i = 0; i < tableModel.getRowCount(); i++) {
 			boolean isSelected = (boolean) tableModel.getValueAt(i, 1);
@@ -143,7 +144,7 @@ public class ExtendedOraclesDialog extends JDialog {
 				selectedOracles.append(oracleName);
 			}
 		}
-		savedSelectedExtendedOracles = selectedOracles.toString();
+		savedSelectedExternalOracles = selectedOracles.toString();
 		dispatchEvent(new WindowEvent(window ,WindowEvent.WINDOW_CLOSING));
 		dispose();
 	}

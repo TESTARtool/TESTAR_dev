@@ -60,6 +60,7 @@ public class Protocol_webdriver_rascal_verdict extends WebdriverProtocol {
 	private List<String> listOfDetectedErroneousVerdicts = new ArrayList<>();
 
 	private List<Oracle> extendedOraclesList = new ArrayList<>();
+	private List<Oracle> externalOraclesList = new ArrayList<>();
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -85,6 +86,7 @@ public class Protocol_webdriver_rascal_verdict extends WebdriverProtocol {
 	protected void preSequencePreparations() {
 		super.preSequencePreparations();
 		extendedOraclesList = OracleSelection.loadExtendedOracles(settings.get(ConfigTags.ExtendedOracles));
+		externalOraclesList = OracleSelection.loadExternalJavaOracles(settings.get(ConfigTags.ExternalOracles));
 	}
 
 	/**
@@ -113,6 +115,18 @@ public class Protocol_webdriver_rascal_verdict extends WebdriverProtocol {
 			// return verdict with failure state
 			if (extendedVerdict != Verdict.OK && !containsVerdictInfo(listOfDetectedErroneousVerdicts, extendedVerdict.info())) {
 				return extendedVerdict;
+			}
+
+		}
+
+		// "ExternalOracles" customized by the user and enabled in the test.settings or Oracles GUI dialog
+		for (Oracle externalOracle : externalOraclesList) {
+			Verdict externalVerdict = externalOracle.getVerdict(state);
+
+			// If the Custom Verdict is not OK and was not detected in a previous sequence
+			// return verdict with failure state
+			if (externalVerdict != Verdict.OK && !containsVerdictInfo(listOfDetectedErroneousVerdicts, externalVerdict.info())) {
+				return externalVerdict;
 			}
 
 		}

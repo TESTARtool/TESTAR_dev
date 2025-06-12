@@ -167,10 +167,11 @@ ProtocolSpecificSetting_4 =
 ProtocolSpecificSetting_5 = 
 
 #################################################################
-# Extended test oracles
+# Advanced test oracles
 #################################################################
 
-ExtendedOracles = SubmitMustBeEnabledWhenAcceptTermsIsChecked
+ExtendedOracles =
+ExternalOracles = SubmitMustBeEnabledWhenAcceptTermsIsChecked
 
 #################################################################
 # Specify the widget attributes that you wish to visualize during Spy Mode. Use a semicolon separated list.

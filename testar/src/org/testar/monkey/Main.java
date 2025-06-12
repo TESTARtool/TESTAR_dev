@@ -70,6 +70,7 @@ public class Main {
 	//Default paths
 	public static String testarDir = "." + File.separator;
 	public static String settingsDir = testarDir + "settings" + File.separator;
+	public static String oraclesDir = testarDir + "oracles" + File.separator;
 	public static String outputDir = testarDir + "output" + File.separator;
 	public static String tempDir = outputDir + "temp" + File.separator;
 

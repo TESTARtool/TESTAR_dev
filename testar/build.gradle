@@ -146,8 +146,8 @@ task prepareSUTs(type: Copy) {
 }
 
 task prepareOracles(type: Copy) {
-    from 'target/classes/java/oracle'
-    into 'target/scripts/settings'
+    from 'resources/oracles'
+    into 'target/scripts/oracles'
 }
 
 task prepareOutputFolder(type: Copy) {

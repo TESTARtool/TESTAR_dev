@@ -79,6 +79,10 @@ public class OraclePanel extends SettingsPanel {
     private JButton extendedOraclesButton = new JButton("ExtendedOracles");
     private ExtendedOraclesDialog extendedOraclesDialog;
 
+    private String externalOracles = "";
+    private JButton externalOraclesButton = new JButton("ExternalOracles");
+    private ExternalOraclesDialog externalOraclesDialog;
+
     private JCheckBox enableVisualValidationCheckBox;
 
     public OraclePanel() {
@@ -153,7 +157,7 @@ public class OraclePanel extends SettingsPanel {
         secondsLabel.setBounds(500, 275, 50, 27);
         add(secondsLabel);
 
-        extendedOraclesButton.setBounds(210, 330, 150, 27);
+        extendedOraclesButton.setBounds(150, 330, 150, 27);
         extendedOraclesButton.setToolTipText("Open Extended Oracles dialog");
         extendedOraclesButton.addActionListener(new ActionListener() {
             @Override
@@ -162,6 +166,16 @@ public class OraclePanel extends SettingsPanel {
             }
         });
         add(extendedOraclesButton);
+
+        externalOraclesButton.setBounds(350, 330, 150, 27);
+        externalOraclesButton.setToolTipText("Open External Oracles dialog");
+        externalOraclesButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	openExternalOraclesDialog();
+            }
+        });
+        add(externalOraclesButton);
     }
 
     private void openExtendedOraclesDialog() {
@@ -171,6 +185,17 @@ public class OraclePanel extends SettingsPanel {
             public void windowClosing(WindowEvent e) {
                 // tell the manager to shut down its connection
             	extendedOracles = extendedOraclesDialog.getSavedExtendedOracles();
+            }
+        });
+    }
+
+    private void openExternalOraclesDialog() {
+    	externalOraclesDialog = new ExternalOraclesDialog(externalOracles);
+    	externalOraclesDialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                // tell the manager to shut down its connection
+            	externalOracles = externalOraclesDialog.getSavedExternalOracles();
             }
         });
     }
@@ -191,8 +216,9 @@ public class OraclePanel extends SettingsPanel {
         txtWebConsoleErrorPattern.setText(settings.get(ConfigTags.WebConsoleErrorPattern));
         enableWebConsoleWarningOracle.setSelected(settings.get(ConfigTags.WebConsoleWarningOracle));
         txtWebConsoleWarningPattern.setText(settings.get(ConfigTags.WebConsoleWarningPattern));
-        // ExtendedOracles
+        // Advanced Oracles
         extendedOracles = settings.get(ConfigTags.ExtendedOracles);
+        externalOracles = settings.get(ConfigTags.ExternalOracles);
         // Visual validation elements
         VisualValidationSettings visualSetting = ExtendedSettingsFactory.createVisualValidationSettings();
         // Disable the visualization until the implementation is ready
@@ -215,8 +241,9 @@ public class OraclePanel extends SettingsPanel {
         settings.set(ConfigTags.WebConsoleErrorPattern, txtWebConsoleErrorPattern.getText());
         settings.set(ConfigTags.WebConsoleWarningOracle, enableWebConsoleWarningOracle.isSelected());
         settings.set(ConfigTags.WebConsoleWarningPattern, txtWebConsoleWarningPattern.getText());
-        // ExtendedOracles
+        // Advanced Oracles
         settings.set(ConfigTags.ExtendedOracles, extendedOracles);
+        settings.set(ConfigTags.ExternalOracles, externalOracles);
         // Visual validation elements
         VisualValidationSettings visualSetting = ExtendedSettingsFactory.createVisualValidationSettings();
         // Disable the visualization until the implementation is ready

@@ -94,6 +94,7 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(ReportInHTML, true));
 		defaults.add(Pair.from(ReportInPlainText, false));
 		defaults.add(Pair.from(ExtendedOracles, ""));
+		defaults.add(Pair.from(ExternalOracles, ""));
 
 		// Oracles for webdriver browser console
 		defaults.add(Pair.from(WebConsoleErrorOracle, false));

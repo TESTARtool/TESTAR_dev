@@ -30,23 +30,38 @@
 
 package org.testar.oracles;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
 
 import org.reflections8.Reflections;
+import org.testar.monkey.Main;
 
 public class OracleSelection {
+
+	/** Extended Internal Oracles **/
 
 	private static String[] oraclePackages = {
 			"org.testar.oracles.generic.visual",
 			"org.testar.oracles.web.accessibility",
 			"org.testar.oracles.web.invariants",
-			"org.testar.oracles.dsl",
 	};
 
-	public static List<String> getAvailableOracles() {
+	public static List<String> getAvailableExtendedOracles() {
 		List<String> oracleNames = new ArrayList<>();
 		for (String pkg : oraclePackages) {
 			try {
@@ -99,4 +114,116 @@ public class OracleSelection {
 		return oraclesList;
 	}
 
+	/** External Oracles **/	
+
+	public static List<String> getExternalOracleFileNames() {
+		String oraclesPath = Main.oraclesDir;
+		List<String> oracleNames = new ArrayList<>();
+		File dir = new File(oraclesPath);
+
+		if (!dir.exists() || !dir.isDirectory()) {
+			System.err.println("External oracle directory not found: " + oraclesPath);
+			return oracleNames;
+		}
+
+		File[] javaFiles = dir.listFiles((d, name) -> name.endsWith(".java"));
+		if (javaFiles == null) return oracleNames;
+
+		for (File javaFile : javaFiles) {
+			String fileName = javaFile.getName();
+			if (fileName.endsWith(".java")) {
+				String className = fileName.substring(0, fileName.length() - 5);
+				oracleNames.add(className);
+			}
+		}
+
+		return oracleNames;
+	}
+
+	public static List<Oracle> loadExternalJavaOracles(String selectedOracles) {
+		File javaDir = new File(Main.oraclesDir);
+		if (!javaDir.exists() || !javaDir.isDirectory()) {
+			System.out.println("Oracle directory not found: " + javaDir.getAbsolutePath());
+			return List.of();
+		}
+
+		// Split and clean the selected oracle names
+		Set<String> selectedNames = Arrays.stream(selectedOracles.split(","))
+				.map(String::trim)
+				.collect(Collectors.toSet());
+
+		// Filter .java files based on selected class names
+		File[] javaFiles = javaDir.listFiles((dir, name) -> {
+			if (!name.endsWith(".java")) return false;
+			String className = name.substring(0, name.length() - 5); // strip ".java"
+			return selectedNames.contains(className);
+		});
+
+		if (javaFiles == null || javaFiles.length == 0) {
+			System.out.println("No matching Java files found for selected oracles.");
+			return List.of();
+		}
+
+		File outputDir = new File(javaDir, "compiled");
+		outputDir.mkdirs();
+
+		if (compileJavaFiles(javaFiles, outputDir)) {
+			return loadCompiledOracles(outputDir, selectedNames);
+		}
+
+		return List.of();
+	}
+
+
+	private static boolean compileJavaFiles(File[] javaFiles, File outputDir) {
+		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+		if (compiler == null) {
+			System.out.println("No Java compiler available. Are you running a JDK?");
+			return false;
+		}
+
+		try (StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null)) {
+			Iterable<? extends JavaFileObject> compilationUnits =
+					fileManager.getJavaFileObjects(javaFiles);
+			List<String> options = List.of("-d", outputDir.getAbsolutePath());
+
+			JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, null, options, null, compilationUnits);
+			return task.call();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public static List<Oracle> loadCompiledOracles(File outputDir, Set<String> selectedNames) {
+		List<Oracle> oracles = new ArrayList<>();
+		try (URLClassLoader classLoader = new URLClassLoader(new URL[]{outputDir.toURI().toURL()})) {
+			Files.walk(outputDir.toPath())
+			.filter(p -> p.toString().endsWith(".class"))
+			.forEach(classPath -> {
+				try {
+					String className = getClassName(outputDir.toPath(), classPath);
+					String simpleName = className.substring(className.lastIndexOf('.') + 1);
+					if (!selectedNames.contains(simpleName)) return;
+
+					Class<?> clazz = classLoader.loadClass(className);
+					if (Oracle.class.isAssignableFrom(clazz)) {
+						Oracle oracle = (Oracle) clazz.getDeclaredConstructor().newInstance();
+						oracles.add(oracle);
+					}
+				} catch (Exception e) {
+					System.out.println("Failed to load compiled oracle: " + e.getMessage());
+				}
+			});
+		} catch (IOException e) {
+			System.out.println("Error loading compiled oracles: " + e.getMessage());
+		}
+
+		return oracles;
+	}
+
+	private static String getClassName(Path base, Path classFile) {
+		String relative = base.relativize(classFile).toString();
+		return relative.replace(File.separator, ".").replaceAll("\\.class$", "");
+	}
 }
