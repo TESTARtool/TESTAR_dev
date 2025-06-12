@@ -63,6 +63,7 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 	private List<String> listOfDetectedErroneousVerdicts = new ArrayList<>();
 
 	private List<Oracle> extendedOraclesList = new ArrayList<>();
+	private List<Oracle> externalOraclesList = new ArrayList<>();
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -88,6 +89,7 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 	protected void preSequencePreparations() {
 		super.preSequencePreparations();
 		extendedOraclesList = OracleSelection.loadExtendedOracles(settings.get(ConfigTags.ExtendedOracles));
+		externalOraclesList = OracleSelection.loadExternalJavaOracles(settings.get(ConfigTags.ExternalOracles));
 	}
 
 	/**
@@ -204,87 +206,29 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 
 		}
 
+		// "ExternalOracles" customized by the user and enabled in the test.settings or Oracles GUI dialog
+		for (Oracle externalOracle : externalOraclesList) {
+			Verdict externalVerdict = externalOracle.getVerdict(state);
+
+			// If the Custom Verdict is not OK and was not detected in a previous sequence
+			// return verdict with failure state
+			if (externalVerdict != Verdict.OK && !containsVerdictInfo(listOfDetectedErroneousVerdicts, externalVerdict.info())) {
+				return externalVerdict;
+			}
+
+		}
+
 		//-----------------------------------------------------------------------------
 		// MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
 		//-----------------------------------------------------------------------------
 
 		// ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
 
-		Verdict leafWidgetsOverlappingVerdict = leafWidgetsOverlapping(state);
-
-		// If the Custom Verdict is not OK but was already detected in a previous sequence
-		// Consider as OK to avoid duplicates
-		if (leafWidgetsOverlappingVerdict != Verdict.OK 
-				&& !containsVerdictInfo(listOfDetectedErroneousVerdicts, leafWidgetsOverlappingVerdict.info())) {
-			return leafWidgetsOverlappingVerdict;
-		}
-
 		return Verdict.OK;
 	}
 
 	private boolean containsVerdictInfo(List<String> listOfDetectedErroneousVerdicts, String currentVerdictInfo) {
 		return listOfDetectedErroneousVerdicts.stream().anyMatch(verdictInfo -> verdictInfo.contains(currentVerdictInfo.replace("\n", " ")));
-	}
-
-	public Verdict leafWidgetsOverlapping(State state) {
-		// Prepare a list that contains all the Rectangles from the leaf widgets
-		List<Pair<Widget, Rect>> leafWidgetsRects = new ArrayList<>();
-		for (Widget w : state) {
-			if (w.get(WdTags.WebIsFullOnScreen, false) 
-					&& w.childCount() < 1 
-					&& w.get(Tags.Shape, null) != null) {
-				leafWidgetsRects.add(new Pair<Widget, Rect>(w, (Rect)w.get(Tags.Shape)));
-			}
-		}
-		// Detect if the Rectangles of two leaf widgets are overlapping in an intersection
-		for (int i = 0; i < leafWidgetsRects.size(); i++) {
-			for (int j = i + 1; j < leafWidgetsRects.size(); j++) {
-				Rect rectOne = leafWidgetsRects.get(i).right();
-				Rect rectTwo = leafWidgetsRects.get(j).right();
-
-				if (Rect.intersect(rectOne, rectTwo)) {
-
-					Widget firstWidget = leafWidgetsRects.get(i).left();
-					Widget secondWidget = leafWidgetsRects.get(j).left();
-
-					String verdictMsg = String.format(
-							"Two leaf widgets are overlapping. First: %s, Second: %s",
-							firstWidget.get(WdTags.WebTextContent, ""),
-							secondWidget.get(WdTags.WebTextContent, "")
-							);
-
-					Visualizer visualizer = new RegionsVisualizer(
-							getRedPen(),
-							getWidgetRegions(Arrays.asList(firstWidget, secondWidget)),
-							"Invariant Fault",
-							0.5, 0.5);
-
-					return new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, visualizer);
-				}
-			}
-		}
-
-		return Verdict.OK;
-	}
-
-	private Pen getRedPen() {
-		return Pen.newPen()
-				.setColor(Color.Red)
-				.setFillPattern(FillPattern.None)
-				.setStrokePattern(StrokePattern.Solid)
-				.build();
-	}
-
-	private List<Shape> getWidgetRegions(List<Widget> widgets) {
-		if (widgets == null || widgets.isEmpty()) {
-			return new ArrayList<>();
-		}
-
-		return widgets.stream()
-				.map(widget -> widget.get(Tags.Shape, null))
-				.filter(shape -> shape != null)
-				.filter(shape -> shape instanceof Rect)
-				.collect(Collectors.toList());
 	}
 
 	/**
