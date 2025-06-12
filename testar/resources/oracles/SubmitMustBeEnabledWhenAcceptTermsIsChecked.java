@@ -1,6 +1,3 @@
-
-package org.testar.oracles.dsl;
-
 import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Widget;
