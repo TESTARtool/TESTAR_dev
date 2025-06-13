@@ -51,10 +51,10 @@ public interface OracleWidgetsMapping {
 
 	default List<Widget> getWidgets(String elementType, State state) {
 		List<Widget> lst = new ArrayList<>();
-		Role elementRole = element2Role.get(elementType);
+		List<Role> elementRoles = element2Role.get(elementType);
 		for (Widget w : state) {
 			Role widgetRole = w.get(Tags.Role, Roles.Invalid);
-			if (elementRole.equals(widgetRole)) {
+			if (elementRoles.contains(widgetRole)) {
 				lst.add(w);
 			}
 		}
@@ -180,19 +180,20 @@ public interface OracleWidgetsMapping {
 			Map.entry("element", Set.of("visible", "enabled", "focused", "offscreen", "onscreen"))
 			);
 
-	Map<String, Role> element2Role = Map.ofEntries(
-			Map.entry("button", WdRoles.WdBUTTON),
-			Map.entry("input_text", Roles.Text),
-			Map.entry("static_text", WdRoles.WdLABEL),
-			// Map.entry("alert", Roles.Alert),
-			Map.entry("dropdown", WdRoles.WdSELECT),
-			Map.entry("checkbox", WdRoles.WdINPUT),
-			Map.entry("radio", WdRoles.WdINPUT),
-			Map.entry("image", WdRoles.WdIMG),
-			Map.entry("link", WdRoles.WdA),
-			Map.entry("label", WdRoles.WdLABEL),
-			Map.entry("table_data", WdRoles.WdTD),
-			Map.entry("element", Roles.Widget)
+	Map<String, List<Role>> element2Role = Map.ofEntries(
+			Map.entry("button", List.of(WdRoles.WdBUTTON)),
+			Map.entry("input_text", List.of(Roles.Text)),
+			Map.entry("static_text", List.of(WdRoles.WdLABEL)),
+			// Map.entry("alert", List.of(Roles.Alert)),
+			Map.entry("dropdown", List.of(WdRoles.WdSELECT)),
+			Map.entry("checkbox", List.of(WdRoles.WdINPUT)),
+			Map.entry("radio", List.of(WdRoles.WdINPUT)),
+			Map.entry("image", List.of(WdRoles.WdIMG)),
+			Map.entry("link", List.of(WdRoles.WdA)),
+			Map.entry("label", List.of(WdRoles.WdLABEL)),
+			Map.entry("table_data", List.of(WdRoles.WdTD)),
+			Map.entry("menu", List.of(WdRoles.WdMENU, WdRoles.WdUL)),
+			Map.entry("menu_item", List.of(WdRoles.WdLI))
 			);
 
 	Map<String, List<Tag<?>>> selectorString2Tags = Map.ofEntries(
