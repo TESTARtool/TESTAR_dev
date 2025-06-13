@@ -177,6 +177,8 @@ public interface OracleWidgetsMapping {
 			Map.entry("link", Set.of("visible", "clickable")),
 			Map.entry("alert", Set.of("visible")),
 			Map.entry("table_data", Set.of("visible")),
+			Map.entry("menu", Set.of("visible", "enabled", "clickable")),
+			Map.entry("menu_item", Set.of("visible", "enabled", "clickable")),
 			Map.entry("element", Set.of("visible", "enabled", "focused", "offscreen", "onscreen"))
 			);
 
@@ -193,7 +195,8 @@ public interface OracleWidgetsMapping {
 			Map.entry("label", List.of(WdRoles.WdLABEL)),
 			Map.entry("table_data", List.of(WdRoles.WdTD)),
 			Map.entry("menu", List.of(WdRoles.WdMENU, WdRoles.WdUL)),
-			Map.entry("menu_item", List.of(WdRoles.WdLI))
+			Map.entry("menu_item", List.of(WdRoles.WdLI)),
+			Map.entry("element", List.of(Roles.Widget))
 			);
 
 	Map<String, List<Tag<?>>> selectorString2Tags = Map.ofEntries(
@@ -208,6 +211,8 @@ public interface OracleWidgetsMapping {
 			Map.entry("link", List.of(Tags.Title, WdTags.WebHref, WdTags.WebGenericTitle)),
 			Map.entry("label", List.of(Tags.Title, WdTags.WebGenericTitle)),
 			Map.entry("table_data", List.of(Tags.Title, WdTags.WebGenericTitle, WdTags.WebTextContent)),
+			Map.entry("menu", List.of(Tags.Title, WdTags.WebGenericTitle, WdTags.WebTextContent)),
+			Map.entry("menu_item", List.of(Tags.Title, WdTags.WebGenericTitle, WdTags.WebTextContent)),
 			Map.entry("element", List.of(Tags.Title, WdTags.WebGenericTitle))
 			);
 
