@@ -32,9 +32,12 @@ package org.testar.monkey.alayer;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.testar.monkey.Assert;
 import org.testar.monkey.Util;
+import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
 import org.testar.monkey.alayer.visualizers.ShapeVisualizer;
 
 /**
@@ -205,7 +208,18 @@ public final class Verdict implements Serializable {
 		String joinedInfo = this.info.contains(verdict.info()) ? this.info
 				: (this.severity == Severity.OK.getValue() ? "" : this.info + "\n") + verdict.info();
 
-		Visualizer joinedVisualizer = (this.severity >= verdict.severity()) ? this.visualizer() : verdict.visualizer();
+		Visualizer joinedVisualizer = new RegionsVisualizer(
+				Pen.newPen()
+				.setColor(Color.Red)
+				.setFillPattern(FillPattern.None)
+				.setStrokePattern(StrokePattern.Solid)
+				.build(),
+				Stream.concat(
+						this.visualizer().getShapes().stream(), 
+						verdict.visualizer().getShapes().stream()
+						).collect(Collectors.toList()),
+				joinedInfo,
+				0.5, 0.5);
 
 		return new Verdict(joinedSeverity, joinedInfo, joinedVisualizer);
 	}
