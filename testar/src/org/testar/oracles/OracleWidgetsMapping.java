@@ -75,6 +75,24 @@ public interface OracleWidgetsMapping {
 		return null;
 	}
 
+	default Object getProperty(Widget w, String property) {
+		List<Tag<?>> tagPriority = attributeTags.get(property);
+
+		for (Tag<?> tag : tagPriority) {
+			Object value = w.get(tag, null);
+
+			if (value instanceof String) {
+				if (!((String) value).isEmpty()) {
+					return value;
+				}
+			} else if (value != null) {
+				return value;
+			}
+		}
+
+		return null;
+	}
+
 	default Boolean evaluateIsStatus(Widget w, String status) {
 		List<Tag<?>> tagPriority = statusTags.get(status);
 
@@ -117,13 +135,29 @@ public interface OracleWidgetsMapping {
 		for (Tag<?> tag : tagPriority) {
 			Object value = w.get(tag, null);
 
-			if (value instanceof String && !((String) value).isEmpty()) {
+			if (value instanceof String 
+					&& !((String) value).isEmpty()) {
 				return true; //it has the attribute and it is not empty
 			}
 		}
 
 		// Attribute was not found
 		return false; 
+	}
+
+	default boolean evaluateContains(Object obj, String contain) {
+		// User wants to evaluate if the widget contains a string
+		if (obj instanceof Widget) {
+			return evaluateContains(((Widget)obj), contain);
+		}
+		// User wants to evaluate a String Tag
+		else if (obj instanceof String 
+				&& !((String) obj).isEmpty()
+				&& ((String) obj).contains(contain)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	default boolean evaluateContains(Widget w, String contain) {
@@ -133,9 +167,53 @@ public interface OracleWidgetsMapping {
 
 		for (Tag<?> tag : w.tags()) {
 			Object value = w.get(tag);
-			if (value instanceof String && ((String) value).contains(contain)) {
+			if (value instanceof String 
+					&& !((String) value).isEmpty()
+					&& ((String) value).contains(contain)) {
 				return true;
 			}
+		}
+
+		return false;
+	}
+
+	//	default boolean evaluateAttributeContains(Widget w, String attr, String contain) {
+	//		List<Tag<?>> tagPriority = attributeTags.get(attr);
+	//
+	//		for (Tag<?> tag : tagPriority) {
+	//			Object value = w.get(tag, null);
+	//
+	//			if (value instanceof String 
+	//					&& !((String) value).isEmpty()
+	//					&& ((String) value).contains(contain)) {
+	//				return true;
+	//			}
+	//		}
+	//
+	//		return false; 
+	//	}
+
+	default boolean evaluateMatches(Object obj, String regex) {
+		// User wants to evaluate if the widget matches a regex
+		if (obj instanceof Widget) {
+			return evaluateMatches(((Widget)obj), regex);
+		}
+		// User wants to evaluate a String Tag
+		else if (obj instanceof String 
+				&& !((String) obj).isEmpty()) {
+
+			Pattern pattern;
+			try {
+				pattern = Pattern.compile(regex);
+			} catch (PatternSyntaxException e) {
+				return false;
+			}
+
+			Matcher matcher = pattern.matcher((String) obj);
+			if (matcher.find()) {
+				return true;
+			}
+
 		}
 
 		return false;
@@ -155,7 +233,8 @@ public interface OracleWidgetsMapping {
 
 		for (Tag<?> tag : w.tags()) {
 			Object value = w.get(tag);
-			if (value instanceof String) {
+			if (value instanceof String 
+					&& !((String) value).isEmpty()) {
 				Matcher matcher = pattern.matcher((String) value);
 				if (matcher.find()) {
 					return true;
@@ -165,6 +244,31 @@ public interface OracleWidgetsMapping {
 
 		return false;
 	}
+
+	//	default boolean evaluateAttributeMatches(Widget w, String attr, String regex) {
+	//		List<Tag<?>> tagPriority = attributeTags.get(attr);
+	//
+	//		Pattern pattern;
+	//		try {
+	//			pattern = Pattern.compile(regex);
+	//		} catch (PatternSyntaxException e) {
+	//			return false;
+	//		}
+	//
+	//		for (Tag<?> tag : tagPriority) {
+	//			Object value = w.get(tag, null);
+	//
+	//			if (value instanceof String 
+	//					&& !((String) value).isEmpty()) {
+	//				Matcher matcher = pattern.matcher((String) value);
+	//				if (matcher.find()) {
+	//					return true;
+	//				}
+	//			}
+	//		}
+	//
+	//		return false; 
+	//	}
 
 	Map<String, Set<String>> validStatusPerElement = Map.ofEntries(
 			Map.entry("button", Set.of("visible", "enabled", "focused", "clickable")),
@@ -230,6 +334,9 @@ public interface OracleWidgetsMapping {
 			Map.entry("selected", List.of(WdTags.WebIsSelected)),
 			Map.entry("checked", List.of(WdTags.WebIsChecked)),
 
+			// TODO: Create WdTag with this labeled boolean logic
+			// Map.entry("labeled", List.of(WdTags))
+
 			Map.entry("empty", List.of(WdTags.WebValue)),
 			Map.entry("filled", List.of(WdTags.WebValue))
 			);
@@ -239,6 +346,7 @@ public interface OracleWidgetsMapping {
 			Map.entry("alttext", List.of(WdTags.WebAlt)),
 			Map.entry("role", List.of(Tags.Role)),
 			Map.entry("placeholder", List.of(WdTags.WebPlaceholder)),
+			Map.entry("text", List.of(WdTags.WebTextContent, WdTags.WebValue, Tags.Title)),
 			Map.entry("tooltip", List.of(Tags.Desc, WdTags.WebTextContent))
 			);
 
