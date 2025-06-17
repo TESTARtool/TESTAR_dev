@@ -166,7 +166,7 @@ public class Protocol_webdriver_parabank_grammar_oracle extends WebdriverProtoco
 //		}
 		
 		if(!oracleManager.runOracles(state)) {
-			Verdict grammarOracleVerdict = new Verdict(Verdict.SEVERITY_WARNING, "Grammar-based Oracle found a matching failure!");
+			Verdict grammarOracleVerdict = new Verdict(Verdict.Severity.WARNING, "Grammar-based Oracle found a matching failure!");
 			if (!containsVerdictInfo(listOfDetectedErroneousVerdicts, grammarOracleVerdict.info())) {
 				return grammarOracleVerdict;
 			}
@@ -338,7 +338,7 @@ public class Protocol_webdriver_parabank_grammar_oracle extends WebdriverProtoco
 		// If the final Verdict is not OK and the verdict is not saved in the list
 		// This is a new run fail verdict
 		Verdict finalVerdict = getVerdict(latestState);
-		if(finalVerdict.severity() > Verdict.SEVERITY_OK && !listOfDetectedErroneousVerdicts.contains(finalVerdict.info().replace("\n", " "))) {
+		if(finalVerdict.severity() > Verdict.Severity.OK.getValue() && !listOfDetectedErroneousVerdicts.contains(finalVerdict.info().replace("\n", " "))) {
 			listOfDetectedErroneousVerdicts.add(finalVerdict.info().replace("\n", " "));
 		}
 	}

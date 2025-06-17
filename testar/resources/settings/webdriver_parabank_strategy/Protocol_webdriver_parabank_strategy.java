@@ -38,6 +38,7 @@ import org.testar.monkey.alayer.actions.ActionRoles;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.actions.WdSelectListAction;
+import org.testar.monkey.alayer.actions.WdSelectListAction.JsTargetMethod;
 import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
@@ -545,49 +546,60 @@ public class Protocol_webdriver_parabank_strategy extends WebdriverProtocol
 	 * @param w
 	 * @return
 	 */
-	private Action randomFromSelectList(Widget w)
-	{
-		int selectLength = 1;
-
+	private Action randomFromSelectList(Widget w) {
 		String elementId = w.get(WdTags.WebId, "");
-		if(!elementId.isEmpty())
-		{
-			// Get the number of elements of the specific select list item
-			try
-			{
-				String query = String.format("return document.getElementById('%s').length", elementId);
-				Object response = WdDriver.executeScript(query);
-				selectLength = ( response != null ? Integer.parseInt(response.toString()) : 1 );
-				selectLength = new Random().nextInt(selectLength);
-			}
-			catch (Exception e)
-			{
-				System.out.println("*** ACTION WARNING: problems trying to obtain select list length: " + elementId);
-			}
-
-			return new WdSelectListAction(elementId, "", Integer.toString(selectLength), w);
-		}
-
 		String elementName = w.get(WdTags.WebName, "");
-		if(!elementName.isEmpty())
-		{
-			// Get the number of elements of the specific select list item
-			try
-			{
-				String query = String.format("return document.getElementsByName('%s')[0].length", elementName);
-				Object response = WdDriver.executeScript(query);
-				selectLength = ( response != null ? Integer.parseInt(response.toString()) : 1 );
-				selectLength = new Random().nextInt(selectLength);
-			}
-			catch (Exception e)
-			{
-				System.out.println("*** ACTION WARNING: problems trying to obtain select list length: " + elementName);
-			}
 
-			return new WdSelectListAction("", elementName, Integer.toString(selectLength), w);
+		if (!elementId.isEmpty()) {
+			return selectRandomValue(elementId, JsTargetMethod.ID, w);
+		} else if (!elementName.isEmpty()) {
+			return selectRandomValue(elementName, JsTargetMethod.NAME, w);
 		}
 
 		return new AnnotatingActionCompiler().leftClickAt(w);
+	}
+
+	private Action selectRandomValue(String identifier, JsTargetMethod targetMethod, Widget w) {
+		try {
+			String lengthQuery;
+			String valueQuery;
+
+			switch (targetMethod) {
+			case ID:
+				lengthQuery = String.format("return document.getElementById('%s').options.length;", identifier);
+				break;
+			case NAME:
+				lengthQuery = String.format("return document.getElementsByName('%s')[0].options.length;", identifier);
+				break;
+			default:
+				return new AnnotatingActionCompiler().leftClickAt(w);
+			}
+
+			Object lengthResponse = WdDriver.executeScript(lengthQuery);
+			int selectLength = (lengthResponse != null) ? Integer.parseInt(lengthResponse.toString()) : 1;
+
+			int randomIndex = new Random().nextInt(selectLength);
+
+			switch (targetMethod) {
+			case ID:
+				valueQuery = String.format("return document.getElementById('%s').options[%d].value;", identifier, randomIndex);
+				break;
+			case NAME:
+				valueQuery = String.format("return document.getElementsByName('%s')[0].options[%d].value;", identifier, randomIndex);
+				break;
+			default:
+				return new AnnotatingActionCompiler().leftClickAt(w);
+			}
+
+			Object valueResponse = WdDriver.executeScript(valueQuery);
+
+			return (valueResponse != null)
+					? new WdSelectListAction(identifier, valueResponse.toString(), w, targetMethod)
+							: new AnnotatingActionCompiler().leftClickAt(w);
+
+		} catch (Exception e) {
+			return new AnnotatingActionCompiler().leftClickAt(w);
+		}
 	}
 
 	@Override
