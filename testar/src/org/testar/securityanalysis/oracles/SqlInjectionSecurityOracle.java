@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2022 - 2024 Open Universiteit - www.ou.nl
- * Copyright (c) 2022 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2022 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2022 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,7 +31,7 @@
 package org.testar.securityanalysis.oracles;
 
 import org.openqa.selenium.devtools.DevTools;
-import org.openqa.selenium.devtools.v125.network.Network;
+import org.openqa.selenium.devtools.v137.network.Network;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.WdSecurityInjectionAction;

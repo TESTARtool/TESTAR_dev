@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -317,6 +317,7 @@ public class StateManagementTags {
     public static final Tag<String> WebWidgetDisplay = Tag.from("Web Widget display", String.class);
     public static final Tag<Boolean> WebWidgetIsOffScreen = Tag.from("Web Widget Is Off Screen", Boolean.class);
     public static final Tag<String> WebWidgetSrc = Tag.from("Web Widget src", String.class);
+    public static final Tag<String> WebWidgetPlaceholder= Tag.from("Web Widget placeholder", String.class);
     
     
     // a set containing the tags that are available for state management
@@ -405,6 +406,7 @@ public class StateManagementTags {
             add(WebWidgetDisplay);
             add(WebWidgetIsOffScreen);
             add(WebWidgetSrc);
+            add(WebWidgetPlaceholder);
         }
     };
 
@@ -499,6 +501,7 @@ public class StateManagementTags {
         settingsMap.put(WebWidgetDisplay, "WebWidgetDisplay");
         settingsMap.put(WebWidgetIsOffScreen, "WebWidgetIsOffScreen");
         settingsMap.put(WebWidgetSrc, "WebWidgetSrc");
+        settingsMap.put(WebWidgetPlaceholder, "WebWidgetPlaceholder");
     }
 
     // a mapping of a tag to its group
@@ -583,6 +586,7 @@ public class StateManagementTags {
             put(WebWidgetDisplay, Group.WebDriver);
             put(WebWidgetIsOffScreen, Group.WebDriver);
             put(WebWidgetSrc, Group.WebDriver);
+            put(WebWidgetPlaceholder, Group.WebDriver);
         }
     };
 
@@ -845,6 +849,14 @@ public class StateManagementTags {
      */
     public static Set<Tag<?>> getAllTags() {
         return stateManagementTags;
+    }
+
+    /**
+     * This method will return all the tags that are available for use in state management with a defined settings name.
+     * @return
+     */
+    public static Set<Tag<?>> getAllSettingsTags() {
+        return settingsMap.keySet();
     }
 
     /**

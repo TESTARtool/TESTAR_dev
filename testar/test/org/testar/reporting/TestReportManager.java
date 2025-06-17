@@ -22,6 +22,7 @@ import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.actions.Type;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.settings.Settings;
 import org.testar.stub.StateStub;
 
@@ -42,7 +43,9 @@ public class TestReportManager {
 		state = new StateStub();
 		state.set(Tags.AbstractID, "stateAbstractID");
 		state.set(Tags.ConcreteID, "stateConcreteID");
+		state.set(WdTags.WebHref, "https://testar.org");
 		state.set(Tags.ScreenshotPath, "imgPath");
+		state.set(Tags.StateRenderTime, 1.2);
 		derivedActions = new HashSet<>();
 
 		Action typeAction = new Type("typeAction");
@@ -57,6 +60,9 @@ public class TestReportManager {
 		pasteAction.set(Tags.ConcreteID, "pasteActionConcreteID");
 		pasteAction.set(Tags.Desc, "pasteActionDescription");
 		derivedActions.add(pasteAction);
+
+		Action emptyTagsAction = new Type("emptyTagsAction");
+		derivedActions.add(emptyTagsAction);
 	}
 
 	@Test
@@ -100,14 +106,16 @@ public class TestReportManager {
 		// Verify state information
 		Assert.assertTrue(fileContains("<title>TESTAR execution sequence report</title>", htmlReportFile));
 		Assert.assertTrue(fileContains("<h1>TESTAR execution sequence report for sequence 1</h1>", htmlReportFile));
-		Assert.assertTrue(fileContains("<h4>AbstractID=stateAbstractID</h4>", htmlReportFile));
-		Assert.assertTrue(fileContains("<h4>ConcreteID=stateConcreteID</h4>", htmlReportFile));
+		Assert.assertTrue(fileContains("<h4>AbstractID=stateAbstractID || ConcreteID=stateConcreteID</h4>", htmlReportFile));
+		Assert.assertTrue(fileContains("<h4>State Render Time: 1.2 ms</h4>", htmlReportFile));
+		Assert.assertTrue(fileContains("<a href='https://testar.org' target='_blank'>https://testar.org</a>", htmlReportFile));
 		// Verify derived actions information
-		Assert.assertTrue(fileContains("<h4>Set of actions:</h4>", htmlReportFile));
+		Assert.assertTrue(fileContains("<button type='button' class='collapsible'>Click to view the set of derived actions:</button>", htmlReportFile));
 		Assert.assertTrue(fileContains("<b>typeActionDescription</b>", htmlReportFile));
 		Assert.assertTrue(fileContains("<b>pasteActionDescription</b>", htmlReportFile));
+		Assert.assertTrue(fileContains("<b>NoActionDescriptionAvailable</b>", htmlReportFile));
 		// Verify selected action information
-		Assert.assertTrue(fileContains("<h4>ConcreteID=typeActionConcreteID || typeActionDescription</h4>", htmlReportFile));
+		Assert.assertTrue(fileContains("<h4>AbstractID=typeActionAbstractID || ConcreteID=typeActionConcreteID || typeActionDescription</h4>", htmlReportFile));
 		// Verify verdict information
 		Assert.assertTrue(fileContains("<h2>Test verdict for this sequence: No problem detected.</h2>", htmlReportFile));
 
@@ -151,6 +159,7 @@ public class TestReportManager {
 		Assert.assertTrue(fileContains("Set of actions:", txtReportFile));
 		Assert.assertTrue(fileContains("typeActionDescription", txtReportFile));
 		Assert.assertTrue(fileContains("pasteActionDescription", txtReportFile));
+		Assert.assertTrue(fileContains("NoActionDescriptionAvailable", txtReportFile));
 		// Verify selected action information
 		Assert.assertTrue(fileContains("ConcreteID=typeActionConcreteID || typeActionDescription", txtReportFile));
 		// Verify verdict information
@@ -165,7 +174,7 @@ public class TestReportManager {
 		tags.add(Pair.from(ConfigTags.ReportInPlainText, false));
 		Settings settings = new Settings(tags, new Properties());
 
-		// Create a state without IDs and without ScreenshotPath
+		// Create a state without IDs, without web URL, and without ScreenshotPath
 		state = new StateStub();
 
 		// Prepare a custom output directory to create the HTML report
@@ -185,8 +194,8 @@ public class TestReportManager {
 		// Verify state information
 		Assert.assertTrue(fileContains("<title>TESTAR execution sequence report</title>", htmlReportFile));
 		Assert.assertTrue(fileContains("<h1>TESTAR execution sequence report for sequence 1</h1>", htmlReportFile));
-		Assert.assertTrue(fileContains("<h4>AbstractID=NoAbstractIdAvailable</h4>", htmlReportFile));
-		Assert.assertTrue(fileContains("<h4>ConcreteID=NoConcreteIdAvailable</h4>", htmlReportFile));
+		Assert.assertTrue(fileContains("<h4>AbstractID=NoAbstractIdAvailable || ConcreteID=NoConcreteIdAvailable</h4>", htmlReportFile));
+		Assert.assertFalse(fileContains("<a href='https://testar.org' target='_blank'>https://testar.org</a>", htmlReportFile));
 		Assert.assertTrue(fileContains("<img src=\"NoScreenshotPathAvailable", htmlReportFile));
 	}
 

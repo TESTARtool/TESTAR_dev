@@ -1,0 +1,46 @@
+name: Ubuntu TESTAR Chromedriver CI tests
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  linux:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    continue-on-error: true
+
+    strategy:
+      fail-fast: false
+      matrix:
+        java: [ '11', '17', '21' ]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Java ${{ matrix.java }}
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'corretto'
+        java-version: ${{ matrix.java }}
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Prepare TESTAR protocols
+      run: ./gradlew init_workflow_test
+
+    - name: Build TESTAR with Gradle
+      run: ./gradlew build
+
+    - name: Prepare installed distribution of TESTAR with Gradle
+      run: ./gradlew installDist
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo DEBIAN_FRONTEND=noninteractive apt install -yq xvfb x11-utils libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xfixes0 xdotool libxdamage1 libxrandr2 libgbm1 libasound2 libatk-bridge2.0-0 libgtk-3-0 libnss3 libxss1 libxcomposite1 libxshmfence1 libxfixes3 libxext6 libx11-xcb1 libxtst6 libcups2 libdrm2 libpci3
+
+    - name: Run webdriver protocol and detect SuspiciousTag while using the State Model
+      run: xvfb-run ./gradlew runTestWebdriverSuspiciousTagStateModelUbuntu

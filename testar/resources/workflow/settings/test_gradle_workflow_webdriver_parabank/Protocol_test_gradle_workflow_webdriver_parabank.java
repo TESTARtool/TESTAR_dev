@@ -71,7 +71,8 @@ public class Protocol_test_gradle_workflow_webdriver_parabank extends WebdriverP
         super.initialize(settings);
 
         //WebDriver settings and features verification
-        Assert.collectionContains(domainsAllowed, "para.testar.org");
+        Assert.collectionContains(webDomainsAllowed, "para.testar.org");
+        Assert.isTrue(webPathsAllowed.contains("index.htm"));
         Assert.collectionSize(deniedExtensions, 5);
         Assert.isTrue(settings.get(ConfigTags.ClickableClasses).isEmpty());
         Assert.isTrue(settings.get(ConfigTags.TypeableClasses).isEmpty());
@@ -103,7 +104,7 @@ public class Protocol_test_gradle_workflow_webdriver_parabank extends WebdriverP
         State stateAfterLogin = getState(system);
         boolean loggedUser = false;
         for(Widget widget : stateAfterLogin) {
-            if(widget.get(WdTags.WebTextContent, "").trim().equals("Welcome")) {
+            if(widget.get(WdTags.WebOuterHTML, "").contains("<p class=\"smallText\">Welcome")) {
                 loggedUser = true;
             }
         }

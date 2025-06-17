@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,6 +30,8 @@
 
 package org.testar.monkey.alayer.actions;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Role;
 import org.testar.monkey.alayer.SUT;
@@ -41,37 +43,48 @@ import org.testar.monkey.alayer.webdriver.WdDriver;
 
 public class WdSelectListAction extends TaggableBase implements Action {
     private static final long serialVersionUID = -5522966388178892530L;
+    protected static final Logger logger = LogManager.getLogger();
 
-    private String elementId;
-    private String uniqueName;
+    private String target;
     private String value;
+    private JsTargetMethod targetMethod;
 
-    public WdSelectListAction(String elementId, String uniqueName, String value, Widget widget) {
-        this.elementId = elementId;
-        this.uniqueName = uniqueName;
+    public enum JsTargetMethod {
+        ID,
+        NAME
+    }
+
+    public WdSelectListAction(String target, String value, Widget widget, JsTargetMethod targetMethod) {
+        this.target = target;
         this.value = value;
+        this.targetMethod = targetMethod;
         this.set(Tags.Role, WdActionRoles.SelectListAction);
-        this.set(Tags.Desc, "Set Webdriver select list script to set into " + elementId + " : " + value);
+        this.set(Tags.Desc, "Set Webdriver select list script to set into " + targetMethod.toString() + " " + target + " : " + value);
         this.mapActionToWidget(widget);
     }
 
     @Override
     public void run(SUT system, State state, double duration) {
-    	try {
-    		if(!elementId.isEmpty()) {
-    			WdDriver.executeScript(String.format("document.getElementById('%s').options[%s].selected = true", elementId, value));
-    		}
-    		else if(!uniqueName.isEmpty()) {
-    			WdDriver.executeScript(String.format("document.getElementsByName('%s')[0].options[%s].selected = true", uniqueName, value));
-    		}
-    	} catch (Exception e) {
-    		System.err.println("ERROR: Executing WdSelectListAction: " + this.get(Tags.Desc, ""));
-    	}
+        switch(targetMethod) {
+            case ID:
+                WdDriver.executeScript(String.format("const field = document.getElementById('%s');" +
+                        " field.value = '%s'; const event = new Event('change', { bubbles: true }); " +
+                        "field.dispatchEvent(event);", target, value));
+                break;
+            case NAME:
+                // Problematic if multiple widgets match the same name, should only be used as last resort.
+                WdDriver.executeScript(String.format("const field = document.getElementsByName('%s')[0];" +
+                        " field.value = '%s'; const event = new Event('change', { bubbles: true }); " +
+                        "field.dispatchEvent(event);", target, value));
+                break;
+            default:
+                logger.warn("WdSelectListAction targetMethod is null!");
+        }
     }
 
     @Override
     public String toShortString() {
-        return "Set select list on id '" + elementId + "' or name '" + uniqueName + "' to '" + value + "'";
+        return "Set select list on '" + target + "' to '" + value + "'";
     }
 
     @Override
@@ -82,5 +95,13 @@ public class WdSelectListAction extends TaggableBase implements Action {
     @Override
     public String toString(Role... discardParameters) {
         return toShortString();
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public String getTarget() {
+        return target;
     }
 }

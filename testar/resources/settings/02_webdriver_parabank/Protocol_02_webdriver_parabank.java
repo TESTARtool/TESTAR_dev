@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,25 +28,38 @@
  *
  */
 
-import org.testar.SutVisualization;
-import org.testar.managers.InputDataManager;
-import org.testar.monkey.alayer.*;
-import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
-import org.testar.monkey.alayer.actions.StdActionCompiler;
-import org.testar.monkey.alayer.exceptions.ActionBuildException;
-import org.testar.monkey.alayer.webdriver.enums.WdTags;
-import org.testar.plugin.NativeLinker;
-import org.testar.protocols.WebdriverProtocol;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.testar.SutVisualization;
+import org.testar.managers.InputDataManager;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.Role;
+import org.testar.monkey.alayer.Roles;
+import org.testar.monkey.alayer.SUT;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Tag;
+import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.Verdict;
+import org.testar.monkey.alayer.Widget;
+import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.StdActionCompiler;
+import org.testar.monkey.alayer.actions.WdSelectListAction;
+import org.testar.monkey.alayer.actions.WdSelectListAction.JsTargetMethod;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.webdriver.WdDriver;
+import org.testar.monkey.alayer.webdriver.enums.WdRoles;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.plugin.NativeLinker;
+import org.testar.protocols.WebdriverProtocol;
 
 public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 	
@@ -107,7 +120,7 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 				new GrammarPredicate(predicateWidgetIsChildOfParent, "'openaccount.htm' CHILD OF 'leftPanel'")
 																			 ));
 		if (validateConditions(grammarPredicates)) {
-			verdict = verdict.join(new Verdict(Verdict.SEVERITY_FAIL, "All GrammarPredicate conditions are met: " + String.join(", ",
+			verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, "All GrammarPredicate conditions are met: " + String.join(", ",
 																																grammarPredicates.stream().map(GrammarPredicate::toString).collect(Collectors.toList()))));
 		}
 		
@@ -301,7 +314,11 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 			if (isAtBrowserCanvas(widget) && isClickable(widget)) {
 				if(whiteListed(widget) || isUnfiltered(widget)){
 					if (!isLinkDenied(widget)) {
-						actions.add(ac.leftClickAt(widget));
+						if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)) {
+							actions.add(randomFromSelectList(widget));
+						} else {
+							actions.add(ac.leftClickAt(widget));
+						}
 					}else{
 						// link denied:
 						filteredActions.add(ac.leftClickAt(widget));
@@ -337,6 +354,62 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 		}
 		
 		return super.isTypeable(widget);
+	}
+	
+	private Action randomFromSelectList(Widget w) {
+		String elementId = w.get(WdTags.WebId, "");
+		String elementName = w.get(WdTags.WebName, "");
+
+		if (!elementId.isEmpty()) {
+			return selectRandomValue(elementId, JsTargetMethod.ID, w);
+		} else if (!elementName.isEmpty()) {
+			return selectRandomValue(elementName, JsTargetMethod.NAME, w);
+		}
+
+		return new AnnotatingActionCompiler().leftClickAt(w);
+	}
+
+	private Action selectRandomValue(String identifier, JsTargetMethod targetMethod, Widget w) {
+		try {
+			String lengthQuery;
+			String valueQuery;
+
+			switch (targetMethod) {
+			case ID:
+				lengthQuery = String.format("return document.getElementById('%s').options.length;", identifier);
+				break;
+			case NAME:
+				lengthQuery = String.format("return document.getElementsByName('%s')[0].options.length;", identifier);
+				break;
+			default:
+				return new AnnotatingActionCompiler().leftClickAt(w);
+			}
+
+			Object lengthResponse = WdDriver.executeScript(lengthQuery);
+			int selectLength = (lengthResponse != null) ? Integer.parseInt(lengthResponse.toString()) : 1;
+
+			int randomIndex = new Random().nextInt(selectLength);
+
+			switch (targetMethod) {
+			case ID:
+				valueQuery = String.format("return document.getElementById('%s').options[%d].value;", identifier, randomIndex);
+				break;
+			case NAME:
+				valueQuery = String.format("return document.getElementsByName('%s')[0].options[%d].value;", identifier, randomIndex);
+				break;
+			default:
+				return new AnnotatingActionCompiler().leftClickAt(w);
+			}
+
+			Object valueResponse = WdDriver.executeScript(valueQuery);
+
+			return (valueResponse != null)
+					? new WdSelectListAction(identifier, valueResponse.toString(), w, targetMethod)
+							: new AnnotatingActionCompiler().leftClickAt(w);
+
+		} catch (Exception e) {
+			return new AnnotatingActionCompiler().leftClickAt(w);
+		}
 	}
 	
 }

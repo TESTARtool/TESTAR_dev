@@ -13,6 +13,7 @@ var getStateTreeTestar = function (ignoredTags) {
     var bodyWrapped = wrapElementTestar(body, 0, 0);
     bodyWrapped['documentHasFocus'] = document.hasFocus();
     bodyWrapped['documentTitle'] = document.title;
+    bodyWrapped['largestContentfulPaint'] = latestLCP;
 
     // Find all labels on the page
     getLabelMapTestar();
@@ -169,6 +170,7 @@ function wrapElementTestar(element, xOffset, yOffset) {
         checked: element.checked,
         selected: element.selected,
         display: computedStyle.getPropertyValue('display'),
+        computedFontSize: window.getComputedStyle(element).fontSize,
         innerHTML: element.innerHTML,
         outerHTML: element.outerHTML,
 
@@ -408,3 +410,14 @@ function getAttributeMapTestar(element) {
         return map;
     }, {});
 }
+
+// Performance Observer for LCP
+let latestLCP = null;
+const observer = new PerformanceObserver((list) => {
+    const entries = list.getEntries();
+    const lastEntry = entries[entries.length - 1];
+    if (lastEntry) {
+        latestLCP = lastEntry.startTime;
+    }
+});
+observer.observe({ type: "largest-contentful-paint", buffered: true });

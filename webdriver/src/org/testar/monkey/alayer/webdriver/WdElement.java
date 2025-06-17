@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2021 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -60,7 +60,7 @@ public class WdElement extends TaggableBase implements Serializable {
   //long culture = 0L;
   boolean isModal = false; // i.c.w. access key
 
-  public String id, name, genericTitle, tagName, textContent, helpText, title;
+  public String id, name, genericTitle, tagName, textContent, helpText, title, placeholder;
   public List<String> cssClasses = new ArrayList<>();
   public String display, type;
   public String innerHTML, outerHTML;
@@ -82,6 +82,9 @@ public class WdElement extends TaggableBase implements Serializable {
   boolean isFullVisibleOnScreen;
 
   boolean checked, selected;
+
+  // ComputedStyle properties
+  String computedFontSize;
 
   // Keep these here for fillScrollValues
   protected String overflowX, overflowY;
@@ -129,7 +132,16 @@ public class WdElement extends TaggableBase implements Serializable {
     alt = attributeMap.getOrDefault("alt", "");
     type = attributeMap.getOrDefault("type", "");
     src = attributeMap.getOrDefault("src", "");
-    maxLength = Integer.valueOf(attributeMap.getOrDefault("maxlength", "-1"));
+    placeholder = attributeMap.getOrDefault("placeholder", "");
+
+    try {
+    	maxLength = Integer.valueOf(attributeMap.getOrDefault("maxlength", "-1"));
+    } catch (NumberFormatException e) {
+    	// This can happen if maxLength is defined without value or with incorrect content "2 2"
+    	// Maybe this is a test oracle :)
+    	maxLength = -1;
+    }
+
     innerHTML = (String) packedElement.getOrDefault("innerHTML", "");
     outerHTML = (String) packedElement.getOrDefault("outerHTML", "");
 
@@ -142,6 +154,7 @@ public class WdElement extends TaggableBase implements Serializable {
       cssClasses = Arrays.asList(classesString.split(" "));
     }
     display = (String) packedElement.get("display");
+    computedFontSize = (String) packedElement.getOrDefault("computedFontSize", "");
 
     zindex = (double) (long) packedElement.get("zIndex");
     fillRect(packedElement);
@@ -209,6 +222,9 @@ public class WdElement extends TaggableBase implements Serializable {
 	  else if(id != null && !id.isEmpty()) {
 		  return id;
 	  }
+	  else if(placeholder != null && !placeholder.isEmpty()) {
+		  return placeholder;
+	  }
 	  else if(value != null) {
 		  return value.toString();
 	  }
@@ -274,8 +290,22 @@ public class WdElement extends TaggableBase implements Serializable {
   }
   
   private boolean isFullVisibleAtCanvasBrowser() {
-	  return rect.x() >= 0 && rect.x() + rect.width() <= CanvasDimensions.getCanvasWidth() &&
-	           rect.y() >= 0 && rect.y() + rect.height() <= CanvasDimensions.getInnerHeight();
+	  if (rect == null) return false;
+
+	  boolean isVisibleAtCanvas = rect.x() >= 0 && rect.x() + rect.width() <= CanvasDimensions.getCanvasWidth() 
+			  && rect.y() >= 0 && rect.y() + rect.height() <= CanvasDimensions.getInnerHeight();
+
+	  // If the web element is a <select><option>, check the selected option visibility
+	  if (tagName != null && tagName.equalsIgnoreCase("option") && outerHTML != null) {
+		  if (outerHTML.contains("<option") && (outerHTML.contains("selected>") || outerHTML.contains("selected="))) {
+			  return isVisibleAtCanvas;
+		  } else {
+			  return false;
+		  }
+	  }
+
+	  // For other web elements, only check if fully visible in the canvas
+	  return isVisibleAtCanvas;
   }
 
   @SuppressWarnings("unchecked")

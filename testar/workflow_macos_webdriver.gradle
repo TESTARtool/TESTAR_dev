@@ -1,0 +1,30 @@
+/**
+ * Tasks to test TESTAR macOS webdriver using gradle
+ */
+ 
+// Verify that TESTAR correctly executes webdriver
+// Also, test the state model for web applications
+task runTestWebdriverSuspiciousTagStateModelMacOS(type: Exec, dependsOn: createDatabaseOrientDB) {
+	// Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestWebdriverSuspiciousTagStateModelMacOS'
+    workingDir 'target/install/testar/bin'
+    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_webdriver_generic SUTConnectorValue=" ""https://para.testar.org/parabank/cookies.htm"" " FlashFeedback=false AlwaysCompile=true ApplicationName="webdriver_suspicious_state_model" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[fF]orums.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
+    doLast {
+        String output = standardOutput.toString()
+
+        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'ValuePattern' : 'http://forums.parasoft.com/")}) {
+            println "\n${output} \nTESTAR has successfully connect with WEB_DRIVER and detected .*[fF]orums.* Suspicious Tag! "
+        } else {
+            throw new GradleException("\n${output} \nERROR: TESTAR didnt connect with WEB_DRIVER")
+        }
+        
+        // Check that output contains abstract states in the State Model inference
+        if(output.readLines().any{line->line.contains("abstract states in the model")}) {
+            println "\n${output} \nTESTAR State Model has been inferred sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Inferring TESTAR State Model")
+        }
+    }
+}

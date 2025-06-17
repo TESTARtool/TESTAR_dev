@@ -31,6 +31,7 @@
 package org.testar.monkey.alayer.android.actions;
 
 import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.actions.ActionRoles;
 import org.testar.monkey.alayer.android.AndroidAppiumFramework;
 import org.testar.monkey.alayer.android.enums.AndroidRoles;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
@@ -47,7 +48,7 @@ public class AndroidActionClick extends TaggableBase implements Action {
 	private String xpath;
 
 	public AndroidActionClick(State state, Widget w, String text, String accessibilityID, String className) {
-	    this.set(Tags.Role, AndroidRoles.AndroidWidget);
+	    this.set(Tags.Role, ActionRoles.LeftClickAt);
 	    this.mapActionToWidget(w);
 	    this.text = text;
 	    this.accessibilityID = accessibilityID;
