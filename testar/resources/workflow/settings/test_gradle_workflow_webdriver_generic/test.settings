@@ -106,7 +106,7 @@ StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer = localhost
-DataStoreDirectory = orientdb-community-3.0.34/databases
+DataStoreDirectory = orientdb-community-3.2.38/databases
 DataStoreDB = testar
 DataStoreUser = admin
 DataStorePassword = admin
@@ -114,7 +114,7 @@ DataStoreMode = instant
 ApplicationName = parabank
 ApplicationVersion = 1
 ActionSelectionAlgorithm = unvisited
-StateModelStoreWidgets = true
+StateModelStoreWidgets = false
 
 #################################################################
 # State identifier attributes

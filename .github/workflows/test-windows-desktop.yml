@@ -1,4 +1,4 @@
-name: Windows desktop TESTAR CI tests
+name: Windows desktop CI
 
 on:
   push:
