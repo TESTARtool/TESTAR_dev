@@ -93,6 +93,16 @@ public interface OracleWidgetsMapping {
 		return null;
 	}
 
+	default Boolean evaluateIsStatus(Object obj, String status) {
+		// User wants to evaluate the status if a widget
+		if (obj instanceof Widget) {
+			return evaluateIsStatus(((Widget)obj), status);
+		}
+		// TODO: Think if there are other non-widget objects status
+
+		return false;
+	}
+
 	default Boolean evaluateIsStatus(Widget w, String status) {
 		List<Tag<?>> tagPriority = statusTags.get(status);
 
@@ -101,7 +111,9 @@ public interface OracleWidgetsMapping {
 
 			// Special cases first
 			if (status.equals("empty")) {
-				if (value instanceof String && ((String) value).isEmpty()) {
+				if (value instanceof Integer && value.equals(0)) {
+					return true;
+				} else if (value instanceof String && ((String) value).isEmpty()) {
 					return true;
 				}
 			} else if (status.equals("filled")) {
@@ -337,7 +349,7 @@ public interface OracleWidgetsMapping {
 			// TODO: Create WdTag with this labeled boolean logic
 			// Map.entry("labeled", List.of(WdTags))
 
-			Map.entry("empty", List.of(WdTags.WebValue)),
+			Map.entry("empty", List.of(WdTags.WebLength, WdTags.WebValue)),
 			Map.entry("filled", List.of(WdTags.WebValue))
 			);
 
