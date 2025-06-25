@@ -347,7 +347,8 @@ public interface OracleWidgetsMapping {
 			Map.entry("role", List.of(Tags.Role)),
 			Map.entry("placeholder", List.of(WdTags.WebPlaceholder)),
 			Map.entry("text", List.of(WdTags.WebTextContent, WdTags.WebValue, Tags.Title)),
-			Map.entry("tooltip", List.of(Tags.Desc, WdTags.WebTextContent))
+			Map.entry("tooltip", List.of(Tags.Desc, WdTags.WebTextContent)),
+			Map.entry("size", List.of(WdTags.WebComputedFontSize))
 			);
 
 }

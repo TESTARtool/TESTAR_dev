@@ -35,7 +35,7 @@ SUTConnectorValue = "suts/accept_terms_form.html"
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 1
+Sequences = 5
 SequenceLength = 5
 
 #################################################################
@@ -171,7 +171,7 @@ ProtocolSpecificSetting_5 =
 #################################################################
 
 ExtendedOracles =
-ExternalOracles = SubmitMustBeEnabledWhenAcceptTermsIsChecked,DollarValuesMustHaveTwoDecimals
+ExternalOracles = SubmitMustBeEnabledWhenAcceptTermsIsChecked,DollarValuesMustHaveTwoDecimals,TextSizeMustBeBiggerThan9Pixels,ImagesMustHaveAlternativeText
 
 #################################################################
 # Specify the widget attributes that you wish to visualize during Spy Mode. Use a semicolon separated list.

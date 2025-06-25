@@ -24,12 +24,12 @@ public class DollarValuesMustHaveTwoDecimals implements Oracle {
      Verdict verdict = Verdict.OK;
      for (Widget $it: getWidgets("table_data", state)) {
        
-       Object widget$71$7 = getProperty($it, "text");
-       boolean cond$79 = evaluateContains(widget$71$7, "$");
+       Object property$71$7 = getProperty($it, "text");
+       boolean cond$79 = evaluateContains(property$71$7, "$");
        if (cond$79) {
          
-         Object widget$29$7 = getProperty($it, "text");
-         boolean cond$37 = !(evaluateMatches(widget$29$7, "\\d+\\.\\d{2}$"));
+         Object property$29$7 = getProperty($it, "text");
+         boolean cond$37 = !(evaluateMatches(property$29$7, "\\d+\\.\\d{2}$"));
          if (cond$37) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), $it)); }
        
        }
