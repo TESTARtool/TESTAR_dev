@@ -263,6 +263,11 @@ public class WdTags extends TagsBase {
   public static final Tag<Integer> WebMaxLength = from("WebMaxLength", Integer.class);
 
   /**
+   * The length of a web widget, such as a select or form.
+   */
+  public static final Tag<Integer> WebLength = from("WebLength", Integer.class);
+
+  /**
    * Represents the inner HTML content of a web widget-element as a string.
    */
   public static final Tag<String> WebInnerHTML = from("WebInnerHTML", String.class);

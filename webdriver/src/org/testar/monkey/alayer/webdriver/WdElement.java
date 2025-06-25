@@ -64,7 +64,7 @@ public class WdElement extends TaggableBase implements Serializable {
   public List<String> cssClasses = new ArrayList<>();
   public String display, type;
   public String innerHTML, outerHTML;
-  public int maxLength;
+  public int length, maxLength;
 
   boolean enabled, ignore;
   public boolean isClickable;
@@ -141,6 +141,8 @@ public class WdElement extends TaggableBase implements Serializable {
     	// Maybe this is a test oracle :)
     	maxLength = -1;
     }
+
+    length = ((Number) packedElement.getOrDefault("length", -1)).intValue();
 
     innerHTML = (String) packedElement.getOrDefault("innerHTML", "");
     outerHTML = (String) packedElement.getOrDefault("outerHTML", "");

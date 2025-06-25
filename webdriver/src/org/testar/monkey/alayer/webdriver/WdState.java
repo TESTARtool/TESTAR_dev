@@ -312,6 +312,9 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(WdTags.WebMaxLength)) {
 			ret = w.element.maxLength;
 		}
+		else if (t.equals(WdTags.WebLength)) {
+			ret = w.element.length;
+		}
 		else if (t.equals(WdTags.WebInnerHTML)) {
 			ret = w.element.innerHTML;
 		}

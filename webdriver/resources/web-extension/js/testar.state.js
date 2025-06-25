@@ -175,6 +175,7 @@ function wrapElementTestar(element, xOffset, yOffset) {
         innerHTML: element.innerHTML,
         outerHTML: element.outerHTML,
 
+        length: getElementLength(element),
         zIndex: getZIndexTestar(element),
         rect: getRectTestar(element, xOffset, yOffset),
         dimensions: getDimensionsTestar(element),
@@ -398,6 +399,10 @@ function getLabelMapTestar() {
             labelMap[item.getAttribute("for")] = item.textContent;
         }
     }
+}
+
+function getElementLength(element) {
+    return typeof element.length === 'number' ? element.length : -1;
 }
 
 /*
