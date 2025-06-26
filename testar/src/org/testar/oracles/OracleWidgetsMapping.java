@@ -300,6 +300,7 @@ public interface OracleWidgetsMapping {
 			Map.entry("table_data", Set.of("visible")),
 			Map.entry("menu", Set.of("visible", "enabled", "clickable")),
 			Map.entry("menu_item", Set.of("visible", "enabled", "clickable")),
+			Map.entry("form", Set.of("visible")),
 			Map.entry("element", Set.of("visible", "enabled", "focused", "offscreen", "onscreen"))
 			);
 
@@ -317,6 +318,7 @@ public interface OracleWidgetsMapping {
 			Map.entry("table_data", List.of(WdRoles.WdTD)),
 			Map.entry("menu", List.of(WdRoles.WdMENU, WdRoles.WdUL)),
 			Map.entry("menu_item", List.of(WdRoles.WdLI)),
+			Map.entry("form", List.of(WdRoles.WdFORM)),
 			Map.entry("element", List.of(Roles.Widget))
 			);
 
@@ -334,6 +336,7 @@ public interface OracleWidgetsMapping {
 			Map.entry("table_data", List.of(Tags.Title, WdTags.WebGenericTitle, WdTags.WebTextContent)),
 			Map.entry("menu", List.of(Tags.Title, WdTags.WebGenericTitle, WdTags.WebTextContent)),
 			Map.entry("menu_item", List.of(Tags.Title, WdTags.WebGenericTitle, WdTags.WebTextContent)),
+			Map.entry("form", List.of(Tags.Title, WdTags.WebGenericTitle, WdTags.WebAriaLabel, WdTags.WebAriaLabelledBy)),
 			Map.entry("element", List.of(Tags.Title, WdTags.WebGenericTitle))
 			);
 
@@ -366,7 +369,8 @@ public interface OracleWidgetsMapping {
 			Map.entry("text", List.of(WdTags.WebTextContent, WdTags.WebValue, Tags.Title)),
 			Map.entry("tooltip", List.of(Tags.Desc, WdTags.WebTextContent)),
 			Map.entry("size", List.of(WdTags.WebComputedFontSize)),
-			Map.entry("length", List.of(WdTags.WebLength))
+			Map.entry("length", List.of(WdTags.WebLength)),
+			Map.entry("title", List.of(WdTags.WebAriaLabel, WdTags.WebAriaLabelledBy, Tags.Title))
 			);
 
 }

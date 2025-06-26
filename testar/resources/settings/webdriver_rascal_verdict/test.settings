@@ -171,13 +171,13 @@ ProtocolSpecificSetting_5 =
 #################################################################
 
 ExtendedOracles =
-ExternalOracles = SubmitMustBeEnabledWhenAcceptTermsIsChecked,DollarValuesMustHaveTwoDecimals,TextSizeMustBeBiggerThan9Pixels,ImagesMustHaveAlternativeText,DropdownOptionsMustNotBeEmpty,DropdownOptionsMustNotHaveAUniqueValue
+ExternalOracles = SubmitMustBeEnabledWhenAcceptTermsIsChecked,DollarValuesMustHaveTwoDecimals,TextSizeMustBeBiggerThan9Pixels,ImagesMustHaveAlternativeText,DropdownOptionsMustNotBeEmpty,DropdownOptionsMustNotHaveAUniqueValue;FormsMustHaveAccessibilityTitle
 
 #################################################################
 # Specify the widget attributes that you wish to visualize during Spy Mode. Use a semicolon separated list.
 #################################################################
 
-SpyTagAttributes = AbstractID;Blocked;ConcreteID;Desc;Enabled;Path;Role;Shape;Title;WebHref;WebId;WebIsChecked;WebIsFullOnScreen;WebIsSelected;WebName;WebTagName;WebTextContent;WebTitle;WebType;WebValue;WebIsDisabled;WebIsEnabled;WebLength
+SpyTagAttributes = AbstractID;Blocked;ConcreteID;Desc;Enabled;Path;Role;Shape;Title;WebHref;WebId;WebIsChecked;WebIsFullOnScreen;WebIsSelected;WebName;WebTagName;WebTextContent;WebTitle;WebType;WebValue;WebIsDisabled;WebIsEnabled;WebLength;WebAriaLabel;WebAriaLabelledBy
 
 #################################################################
 # Other more advanced settings
