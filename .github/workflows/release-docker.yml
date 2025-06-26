@@ -1,4 +1,4 @@
-name: TESTAR Docker release
+name: Docker release
 
 on:
   push:
