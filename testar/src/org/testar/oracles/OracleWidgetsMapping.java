@@ -30,21 +30,12 @@
 
 package org.testar.oracles;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.testar.monkey.alayer.Role;
-import org.testar.monkey.alayer.Roles;
-import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Tag;
-import org.testar.monkey.alayer.Tags;
-import org.testar.monkey.alayer.Widget;
+import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 
@@ -372,5 +363,47 @@ public interface OracleWidgetsMapping {
 			Map.entry("length", List.of(WdTags.WebLength)),
 			Map.entry("title", List.of(WdTags.WebAriaLabel, WdTags.WebAriaLabelledBy, Tags.Title))
 			);
-
+	
+	default List<Widget> runWidgetSelector(State state, String roleString, String rawString)
+	{
+		List<Tag<?>> tagPrioList  = selectorString2Tags.get(roleString);
+		List<Widget> foundWidgets = new ArrayList<>();
+		// get widgets with the correct role
+		List<Widget> widgets = getWidgets(roleString, state);
+		// prepare string for search
+		String searchString = rawString.toLowerCase(Locale.ROOT).strip(); // lower case, and remove trailing and leading spaces
+		
+		
+		for(int mode = 0; mode < 3; mode++) // matching modes: exact, starts with, partial (contains)
+		{
+			for(Tag<?> tag : tagPrioList) //run a round of search per tag in priority list
+			{
+				for(Widget widget : widgets)
+				{
+					Object tagValue = widget.get(tag, null);
+					if(!foundWidgets.contains(widget) && tagValue instanceof String)
+					{
+						switch(mode) // apply the correct matching mode
+						{
+							case 0: // exact
+								if(((String) tagValue).strip().equalsIgnoreCase(searchString))
+									foundWidgets.add(widget);
+								break;
+							case 1: // starts with
+								if(((String) tagValue).toLowerCase(Locale.ROOT).strip().startsWith(searchString))
+									foundWidgets.add(widget);
+								break;
+							default: // partial (contains)
+								if(((String) tagValue).toLowerCase(Locale.ROOT).strip().contains(searchString))
+									foundWidgets.add(widget);
+						}
+					}
+				}
+				if(!foundWidgets.isEmpty())
+					break; // is at least one widget is found during this round, stop the search
+			}
+		}
+		
+		return foundWidgets;
+	}
 }

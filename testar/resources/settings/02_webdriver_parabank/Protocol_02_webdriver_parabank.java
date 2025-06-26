@@ -28,29 +28,27 @@
  *
  */
 
-import com.google.common.collect.ArrayListMultimap;
 import org.testar.SutVisualization;
 import org.testar.managers.InputDataManager;
+import org.testar.monkey.ConfigTags;
 import org.testar.monkey.alayer.*;
-import org.testar.monkey.alayer.actions.*;
+import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.StdActionCompiler;
+import org.testar.monkey.alayer.actions.WdSelectListAction;
 import org.testar.monkey.alayer.actions.WdSelectListAction.JsTargetMethod;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
-import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
 import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.oracles.Oracle;
 import org.testar.oracles.OracleSelection;
 import org.testar.plugin.NativeLinker;
-import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Pair;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.settings.Settings;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
@@ -120,13 +118,13 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 		super.beginSequence(system, state);
 
 		// Add your login sequence here
-		/*
+		
 		waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","username", "john", state, system, 5,1.0);
 
 		waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","password", "demo", state, system, 5,1.0);
 
 		waitAndLeftClickWidgetWithMatchingTag("value", "Log In", state, system, 5, 1.0);
-		 */
+		
 
 		/*
 		 * If you have issues typing special characters

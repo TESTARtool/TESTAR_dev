@@ -35,8 +35,8 @@ SUTConnectorValue = "https://para.testar.org/"
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 5
-SequenceLength = 20
+Sequences = 1
+SequenceLength = 10
 
 #################################################################
 # Oracles based on suspicious tag values
@@ -44,7 +44,7 @@ SequenceLength = 20
 # Regular expression and Tags to apply them
 #################################################################
 
-SuspiciousTags = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+SuspiciousTags =
 TagsForSuspiciousOracle = Title;WebTextContent
 
 #################################################################
@@ -224,8 +224,8 @@ ProtocolSpecificSetting_5 =
 # Advanced test oracles
 #################################################################
 
-ExtendedOracles = WebAccessibilityFontSizeOracle,WebAccessibilityImagesAltOracle,WebInvariantDuplicateMenuItems,WebInvariantDuplicateSelectItems,WebInvariantDuplicatedRowsInTable,WebInvariantEmptySelectItems,WebInvariantManySelectItems,WebInvariantNumberWithLotOfDecimals,WebInvariantTextAreaWithoutLength,WebInvariantUnsortedSelectItems
-ExternalOracles = 
+ExtendedOracles =
+ExternalOracles = DebugWidgetSelector
 
 #################################################################
 # Sets whether to display TESTAR dialog. If false is used, then TESTAR will run in the mode of the Mode property
