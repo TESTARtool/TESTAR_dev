@@ -31,6 +31,7 @@
 package org.testar.oracles;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -109,12 +110,12 @@ public interface OracleWidgetsMapping {
 					return ((String) value).isEmpty();
 				}
 			} else if (status.equals("filled")) {
-				if (value instanceof String && !((String) value).isEmpty()) {
-					return true;
+				if (value instanceof String) {
+					return !((String) value).isEmpty();
 				}
 			} else if (status.equals("readonly")) {
-				if (value instanceof Boolean && !((Boolean) value)) {
-					return true; // readonly = not focusable
+				if (value instanceof Boolean) {
+					return !((Boolean) value);
 				}
 			} else {
 				// The rest is gewoon boolean case (e.g. visible, enabled, selected...)
@@ -253,6 +254,10 @@ public interface OracleWidgetsMapping {
 		return Objects.equals(obj, compare);
 	}
 
+	default boolean evaluateIsEqualTo(Object obj, Supplier<Object> compareSupplier) {
+		return Objects.equals(obj, compareSupplier.get());
+	}
+
 	//	default boolean evaluateAttributeMatches(Widget w, String attr, String regex) {
 	//		List<Tag<?>> tagPriority = attributeTags.get(attr);
 	//
@@ -281,6 +286,7 @@ public interface OracleWidgetsMapping {
 	Map<String, Set<String>> validStatusPerElement = Map.ofEntries(
 			Map.entry("button", Set.of("visible", "enabled", "focused", "clickable")),
 			Map.entry("input_text", Set.of("visible", "enabled", "empty", "filled", "focused", "readonly")),
+			Map.entry("input_numeric", Set.of("visible", "enabled", "empty", "filled", "focused", "readonly")),
 			Map.entry("checkbox", Set.of("visible", "enabled", "checked", "selected")),
 			Map.entry("radio", Set.of("visible", "enabled", "checked", "selected")),
 			Map.entry("dropdown", Set.of("visible", "enabled", "empty", "filled", "selected")),
@@ -297,7 +303,8 @@ public interface OracleWidgetsMapping {
 
 	Map<String, List<Role>> element2Role = Map.ofEntries(
 			Map.entry("button", List.of(WdRoles.WdBUTTON)),
-			Map.entry("input_text", List.of(Roles.Text)),
+			Map.entry("input_text", List.of(WdRoles.WdINPUT, Roles.Text)),
+			Map.entry("input_numeric", List.of(WdRoles.WdINPUT, Roles.Text)),
 			Map.entry("static_text", List.of(WdRoles.WdLABEL)),
 			// Map.entry("alert", List.of(Roles.Alert)),
 			Map.entry("dropdown", List.of(WdRoles.WdSELECT)),
@@ -316,6 +323,7 @@ public interface OracleWidgetsMapping {
 	Map<String, List<Tag<?>>> selectorString2Tags = Map.ofEntries(
 			Map.entry("button", List.of(Tags.Title, WdTags.WebGenericTitle, WdTags.WebTextContent)),
 			Map.entry("input_text", List.of(Tags.Title, WdTags.WebName, WdTags.WebGenericTitle)),
+			Map.entry("input_numeric", List.of(Tags.Title, WdTags.WebName, WdTags.WebGenericTitle)),
 			Map.entry("static_text", List.of(Tags.Title, WdTags.WebTextContent, WdTags.WebGenericTitle)),
 			Map.entry("alert", List.of(Tags.Title, WdTags.WebGenericTitle)),
 			Map.entry("dropdown", List.of(Tags.Title, WdTags.WebGenericTitle)),

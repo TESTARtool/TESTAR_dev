@@ -204,7 +204,8 @@ public class OracleSelection {
 				try {
 					String className = getClassName(outputDir.toPath(), classPath);
 					String simpleName = className.substring(className.lastIndexOf('.') + 1);
-					if (!selectedNames.contains(simpleName)) return;
+					String baseName = simpleName.split("\\$")[0];
+					if (!selectedNames.contains(baseName)) return;
 
 					Class<?> clazz = classLoader.loadClass(className);
 					if (Oracle.class.isAssignableFrom(clazz)) {

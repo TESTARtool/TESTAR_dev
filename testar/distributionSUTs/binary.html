@@ -1,0 +1,122 @@
+<html>
+    <head>
+        <link href="https://cdn.simplecss.org/simple.min.css" rel="stylesheet">
+        <script src="binary.js"></script>
+        <script>document.addEventListener("DOMContentLoaded", function() { $update(); });</script>
+        <title>Binary search</title>
+    </head>
+    <body>
+        <h2>Binary search</h2>
+        <div id="x_1_10_div_25">
+            <label>Is the number between 1 and 10</label><input onclick="$update('x_1_10', event.target.checked);" type="checkbox" id="x_1_10_widget_25">
+        </div>
+        <div id="x_1_5_div_95">
+            <label>Is the number between 1 and 5</label><input onclick="$update('x_1_5', event.target.checked);" type="checkbox" id="x_1_5_widget_95">
+        </div>
+        <div id="x_1_3_div_166">
+            <label>Is the number between 1 and 3</label><input onclick="$update('x_1_3', event.target.checked);" type="checkbox" id="x_1_3_widget_166">
+        </div>
+        <div id="x_1_2_div_241">
+            <label>Is the number between 1 and 2</label><input onclick="$update('x_1_2', event.target.checked);" type="checkbox" id="x_1_2_widget_241">
+        </div>
+        <div id="answer_1_2_div_320">
+            <label>The answer is</label><input type="number" id="answer_1_2_widget_320" disabled="true">
+        </div>
+        <div id="answer_2_3_div_397">
+            <label>The answer is</label><input type="number" id="answer_2_3_widget_397" disabled="true">
+        </div>
+        <div id="x_3_4_div_479">
+            <label>Is the number between 3 and 4</label><input onclick="$update('x_3_4', event.target.checked);" type="checkbox" id="x_3_4_widget_479">
+        </div>
+        <div id="answer_3_4_div_558">
+            <label>The answer is</label><input type="number" id="answer_3_4_widget_558" disabled="true">
+        </div>
+        <div id="answer_4_5_div_636">
+            <label>The answer is</label><input type="number" id="answer_4_5_widget_636" disabled="true">
+        </div>
+        <div id="x_5_7_div_720">
+            <label>Is the number between 5 and 7</label><input onclick="$update('x_5_7', event.target.checked);" type="checkbox" id="x_5_7_widget_720">
+        </div>
+        <div id="x_5_6_div_795">
+            <label>Is the number between 5 and 6</label><input onclick="$update('x_5_6', event.target.checked);" type="checkbox" id="x_5_6_widget_795">
+        </div>
+        <div id="answer_5_6_div_874">
+            <label>The answer is</label><input type="number" id="answer_5_6_widget_874" disabled="true">
+        </div>
+        <div id="answer_6_7_div_952">
+            <label>The answer is</label><input type="number" id="answer_6_7_widget_952" disabled="true">
+        </div>
+        <div id="x_7_8_div_1034">
+            <label>Is the number between 7 and 8</label><input onclick="$update('x_7_8', event.target.checked);" type="checkbox" id="x_7_8_widget_1034">
+        </div>
+        <div id="answer_7_8_div_1113">
+            <label>The answer is</label><input type="number" id="answer_7_8_widget_1113" disabled="true">
+        </div>
+        <div id="x_8_9_div_1191">
+            <label>Is the number between 8 and 9</label><input onclick="$update('x_8_9', event.target.checked);" type="checkbox" id="x_8_9_widget_1191">
+        </div>
+        <div id="answer_8_9_div_1274">
+            <label>The answer is</label><input type="number" id="answer_8_9_widget_1274" disabled="true">
+        </div>
+        <div id="answer_9_10_div_1358">
+            <label>The answer is</label><input type="number" id="answer_9_10_widget_1358" disabled="true">
+        </div>
+        <div id="x_10_15_div_1455">
+            <label>Is the number between 10 and 15</label><input onclick="$update('x_10_15', event.target.checked);" type="checkbox" id="x_10_15_widget_1455">
+        </div>
+        <div id="x_10_12_div_1532">
+            <label>Is the number between 10 and 12</label><input onclick="$update('x_10_12', event.target.checked);" type="checkbox" id="x_10_12_widget_1532">
+        </div>
+        <div id="x_10_11_div_1613">
+            <label>Is the number between 10 and 11</label><input onclick="$update('x_10_11', event.target.checked);" type="checkbox" id="x_10_11_widget_1613">
+        </div>
+        <div id="answer_10_11_div_1698">
+            <label>The answer is</label><input type="number" id="answer_10_11_widget_1698" disabled="true">
+        </div>
+        <div id="answer_11_12_div_1779">
+            <label>The answer is</label><input type="number" id="answer_11_12_widget_1779" disabled="true">
+        </div>
+        <div id="x_12_13_div_1864">
+            <label>Is the number between 12 and 13</label><input onclick="$update('x_12_13', event.target.checked);" type="checkbox" id="x_12_13_widget_1864">
+        </div>
+        <div id="answer_12_13_div_1949">
+            <label>The answer is</label><input type="number" id="answer_12_13_widget_1949" disabled="true">
+        </div>
+        <div id="x_13_14_div_2030">
+            <label>Is the number between 13 and 14</label><input onclick="$update('x_13_14', event.target.checked);" type="checkbox" id="x_13_14_widget_2030">
+        </div>
+        <div id="answer_13_14_div_2119">
+            <label>The answer is</label><input type="number" id="answer_13_14_widget_2119" disabled="true">
+        </div>
+        <div id="answer_14_15_div_2206">
+            <label>The answer is</label><input type="number" id="answer_14_15_widget_2206" disabled="true">
+        </div>
+        <div id="x_15_17_div_2305">
+            <label>Is the number between 15 and 17</label><input onclick="$update('x_15_17', event.target.checked);" type="checkbox" id="x_15_17_widget_2305">
+        </div>
+        <div id="x_15_16_div_2386">
+            <label>Is the number between 15 and 16</label><input onclick="$update('x_15_16', event.target.checked);" type="checkbox" id="x_15_16_widget_2386">
+        </div>
+        <div id="answer_15_16_div_2471">
+            <label>The answer is</label><input type="number" id="answer_15_16_widget_2471" disabled="true">
+        </div>
+        <div id="answer_16_17_div_2552">
+            <label>The answer is</label><input type="number" id="answer_16_17_widget_2552" disabled="true">
+        </div>
+        <div id="x_17_18_div_2637">
+            <label>Is the number between 17 and 18</label><input onclick="$update('x_17_18', event.target.checked);" type="checkbox" id="x_17_18_widget_2637">
+        </div>
+        <div id="answer_17_18_div_2722">
+            <label>The answer is</label><input type="number" id="answer_17_18_widget_2722" disabled="true">
+        </div>
+        <div id="x_18_19_div_2803">
+            <label>Is the number between 18 and 19</label><input onclick="$update('x_18_19', event.target.checked);" type="checkbox" id="x_18_19_widget_2803">
+        </div>
+        <div id="answer_18_19_div_2892">
+            <label>The answer is</label><input type="number" id="answer_18_19_widget_2892" disabled="true">
+        </div>
+        <div id="answer_19_20_div_2979">
+            <label>The answer is</label><input type="number" id="answer_19_20_widget_2979" disabled="true">
+        </div>
+    </body>
+</html>
