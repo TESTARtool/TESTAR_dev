@@ -171,7 +171,7 @@ ProtocolSpecificSetting_5 =
 #################################################################
 
 ExtendedOracles =
-ExternalOracles = SubmitMustBeEnabledWhenAcceptTermsIsChecked,DollarValuesMustHaveTwoDecimals,TextSizeMustBeBiggerThan9Pixels,ImagesMustHaveAlternativeText,DropdownOptionsMustNotBeEmpty
+ExternalOracles = SubmitMustBeEnabledWhenAcceptTermsIsChecked,DollarValuesMustHaveTwoDecimals,TextSizeMustBeBiggerThan9Pixels,ImagesMustHaveAlternativeText,DropdownOptionsMustNotBeEmpty,DropdownOptionsMustNotHaveAUniqueValue
 
 #################################################################
 # Specify the widget attributes that you wish to visualize during Spy Mode. Use a semicolon separated list.

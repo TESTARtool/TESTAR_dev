@@ -33,6 +33,7 @@ package org.testar.oracles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -257,6 +258,10 @@ public interface OracleWidgetsMapping {
 		return false;
 	}
 
+	default boolean evaluateIsEqualTo(Object obj, Object compare) {
+		return Objects.equals(obj, compare);
+	}
+
 	//	default boolean evaluateAttributeMatches(Widget w, String attr, String regex) {
 	//		List<Tag<?>> tagPriority = attributeTags.get(attr);
 	//
@@ -360,7 +365,8 @@ public interface OracleWidgetsMapping {
 			Map.entry("placeholder", List.of(WdTags.WebPlaceholder)),
 			Map.entry("text", List.of(WdTags.WebTextContent, WdTags.WebValue, Tags.Title)),
 			Map.entry("tooltip", List.of(Tags.Desc, WdTags.WebTextContent)),
-			Map.entry("size", List.of(WdTags.WebComputedFontSize))
+			Map.entry("size", List.of(WdTags.WebComputedFontSize)),
+			Map.entry("length", List.of(WdTags.WebLength))
 			);
 
 }
