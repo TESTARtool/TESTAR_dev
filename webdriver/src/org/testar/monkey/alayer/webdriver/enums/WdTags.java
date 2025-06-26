@@ -298,6 +298,21 @@ public class WdTags extends TagsBase {
   public static final Tag<Boolean> WebIsDisabled = from("WebIsDisabled", Boolean.class);
 
   /**
+   * Represents the accessible name for an element, used by assistive technologies 
+   * such as screen readers. Maps to the HTML 'aria-label' attribute.
+   * This value should provide a concise, human-readable label for the element 
+   * when a visible label is not present.
+   */
+  public static final Tag<String> WebAriaLabel = from("WebAriaLabel", String.class);
+
+  /**
+   * Identifies the element(s) that label the current element, used by assistive 
+   * technologies to provide contextual naming. Maps to the HTML 'aria-labelledby' attribute.
+   * This should reference the ID(s) of one or more elements that serve as the accessible name.
+   */
+  public static final Tag<String> WebAriaLabelledBy = from("WebAriaLabelledBy", String.class);
+
+  /**
    * Represents the remote web element object obtained with Selenium framework
    */
   public static final Tag<WebElement> WebElementSelenium = from("WebElementSelenium", WebElement.class);

@@ -333,6 +333,12 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(WdTags.WebIsDisabled)) {
 			ret = w.element.disabled;
 		}
+		else if (t.equals(WdTags.WebAriaLabel)) {
+			ret = w.element.ariaLabel;
+		}
+		else if (t.equals(WdTags.WebAriaLabelledBy)) {
+			ret = w.element.ariaLabelledBy;
+		}
 		else if (t.equals(WdTags.WebElementSelenium)) {
 			ret = w.element.remoteWebElement;
 		}

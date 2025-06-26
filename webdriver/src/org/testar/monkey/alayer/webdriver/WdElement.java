@@ -94,6 +94,9 @@ public class WdElement extends TaggableBase implements Serializable {
   public long scrollLeft, scrollTop;
   private long borderWidth, borderHeight;
 
+  // Aria properties
+  String ariaLabel, ariaLabelledBy;
+
   public transient RemoteWebElement remoteWebElement; // Reference to the remote Web Element
 
   public transient Map<String, String> attributeMap;
@@ -175,6 +178,9 @@ public class WdElement extends TaggableBase implements Serializable {
     if (display != null && display.toLowerCase().equals("none")) {
       enabled = false;
     }
+
+    ariaLabel = attributeMap.getOrDefault("aria-label", "");
+    ariaLabelledBy = attributeMap.getOrDefault("aria-labelledby", "");
 
     List<Map<String, Object>> wrappedChildren =
         (List<Map<String, Object>>) packedElement.get("wrappedChildren");
