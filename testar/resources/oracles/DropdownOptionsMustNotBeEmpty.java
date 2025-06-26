@@ -7,7 +7,7 @@ import org.testar.oracles.Oracle;
 
 /*
  assert for all dropdown
-   it is empty
+   it not is empty
    "Dropdown options must not be empty".
 */
 public class DropdownOptionsMustNotBeEmpty implements Oracle {
@@ -25,8 +25,8 @@ public class DropdownOptionsMustNotBeEmpty implements Oracle {
      Verdict verdict = Verdict.OK;
      for (Widget $it: getWidgets("dropdown", state)) {
        
-       boolean cond$30 = evaluateIsStatus($it, "empty");
-       if (cond$30) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), $it)); }
+       boolean cond$30 = !(evaluateIsStatus($it, "empty"));
+       if (!cond$30) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), $it)); }
      
      }
      return verdict;

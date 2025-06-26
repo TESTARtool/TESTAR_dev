@@ -6,7 +6,9 @@ import org.testar.oracles.Oracle;
 
 
 /*
- assert for all image it not has nonempty alttext "images must have alternative text".
+ assert for all image 
+   it has nonempty alttext 
+   "Images must have alternative text".
 */
 public class ImagesMustHaveAlternativeText implements Oracle {
 
@@ -15,7 +17,7 @@ public class ImagesMustHaveAlternativeText implements Oracle {
 
   @Override
   public String getMessage() {
-    return "images must have alternative text";
+    return "Images must have alternative text";
   }
 
   @Override
@@ -23,8 +25,8 @@ public class ImagesMustHaveAlternativeText implements Oracle {
      Verdict verdict = Verdict.OK;
      for (Widget $it: getWidgets("image", state)) {
        
-       boolean cond$24 = !(evaluateHasAttribute($it, "alttext"));
-       if (cond$24) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), $it)); }
+       boolean cond$28 = evaluateHasAttribute($it, "alttext");
+       if (!cond$28) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), $it)); }
      
      }
      return verdict;
