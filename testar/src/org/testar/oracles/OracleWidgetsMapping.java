@@ -112,10 +112,10 @@ public interface OracleWidgetsMapping {
 
 			// Special cases first
 			if (status.equals("empty")) {
-				if (value instanceof Integer && value.equals(0)) {
-					return true;
-				} else if (value instanceof String && ((String) value).isEmpty()) {
-					return true;
+				if (value instanceof Integer) {
+					return value.equals(0);
+				} else if (value instanceof String) {
+					return ((String) value).isEmpty();
 				}
 			} else if (status.equals("filled")) {
 				if (value instanceof String && !((String) value).isEmpty()) {
