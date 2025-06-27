@@ -157,20 +157,12 @@ public class Protocol_webdriver_parabank_grammar_oracle extends WebdriverProtoco
 		//-----------------------------------------------------------------------------
 		// GRAMMAR-BASED ORACLES
 		//-----------------------------------------------------------------------------
-
-//		if(!oracleManager.runOracles(state)) {
-//			Verdict grammarOracleVerdict = new Verdict(Verdict.SEVERITY_WARNING, "Grammar-based Oracle found a matching failure!");
-//			if (!containsVerdictInfo(listOfDetectedErroneousVerdicts, grammarOracleVerdict.info())) {
-//				return grammarOracleVerdict;
-//			}
-//		}
 		
-		if(!oracleManager.runOracles(state)) {
-			Verdict grammarOracleVerdict = new Verdict(Verdict.SEVERITY_WARNING, "Grammar-based Oracle found a matching failure!");
-			if (!containsVerdictInfo(listOfDetectedErroneousVerdicts, grammarOracleVerdict.info())) {
-				return grammarOracleVerdict;
-			}
-		}
+		
+		Verdict grammarVerdict = oracleManager.runOracles(state);
+		if(grammarVerdict != Verdict.OK && !containsVerdictInfo(listOfDetectedErroneousVerdicts, grammarVerdict.info()))
+			return grammarVerdict;
+		
 
 		//-----------------------------------------------------------------------------
 		// MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)

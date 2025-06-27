@@ -68,6 +68,30 @@ public interface OraclesListener extends ParseTreeListener {
 	 */
 	void exitTrigger_block(OraclesParser.Trigger_blockContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code pass}
+	 * labeled alternative in {@link OraclesParser#check_type}.
+	 * @param ctx the parse tree
+	 */
+	void enterPass(OraclesParser.PassContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code pass}
+	 * labeled alternative in {@link OraclesParser#check_type}.
+	 * @param ctx the parse tree
+	 */
+	void exitPass(OraclesParser.PassContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code fail}
+	 * labeled alternative in {@link OraclesParser#check_type}.
+	 * @param ctx the parse tree
+	 */
+	void enterFail(OraclesParser.FailContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code fail}
+	 * labeled alternative in {@link OraclesParser#check_type}.
+	 * @param ctx the parse tree
+	 */
+	void exitFail(OraclesParser.FailContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link OraclesParser#property_block}.
 	 * @param ctx the parse tree
 	 */
@@ -77,18 +101,6 @@ public interface OraclesListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitProperty_block(OraclesParser.Property_blockContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code plainBool}
-	 * labeled alternative in {@link OraclesParser#bool_expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterPlainBool(OraclesParser.PlainBoolContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code plainBool}
-	 * labeled alternative in {@link OraclesParser#bool_expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitPlainBool(OraclesParser.PlainBoolContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code notExpr}
 	 * labeled alternative in {@link OraclesParser#bool_expr}.
@@ -102,53 +114,29 @@ public interface OraclesListener extends ParseTreeListener {
 	 */
 	void exitNotExpr(OraclesParser.NotExprContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code orOprExpr}
+	 * Enter a parse tree produced by the {@code operatorExpr}
 	 * labeled alternative in {@link OraclesParser#bool_expr}.
 	 * @param ctx the parse tree
 	 */
-	void enterOrOprExpr(OraclesParser.OrOprExprContext ctx);
+	void enterOperatorExpr(OraclesParser.OperatorExprContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code orOprExpr}
+	 * Exit a parse tree produced by the {@code operatorExpr}
 	 * labeled alternative in {@link OraclesParser#bool_expr}.
 	 * @param ctx the parse tree
 	 */
-	void exitOrOprExpr(OraclesParser.OrOprExprContext ctx);
+	void exitOperatorExpr(OraclesParser.OperatorExprContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code isOprExpr}
+	 * Enter a parse tree produced by the {@code plainBoolExpr}
 	 * labeled alternative in {@link OraclesParser#bool_expr}.
 	 * @param ctx the parse tree
 	 */
-	void enterIsOprExpr(OraclesParser.IsOprExprContext ctx);
+	void enterPlainBoolExpr(OraclesParser.PlainBoolExprContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code isOprExpr}
+	 * Exit a parse tree produced by the {@code plainBoolExpr}
 	 * labeled alternative in {@link OraclesParser#bool_expr}.
 	 * @param ctx the parse tree
 	 */
-	void exitIsOprExpr(OraclesParser.IsOprExprContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code xorOprExpr}
-	 * labeled alternative in {@link OraclesParser#bool_expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterXorOprExpr(OraclesParser.XorOprExprContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code xorOprExpr}
-	 * labeled alternative in {@link OraclesParser#bool_expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitXorOprExpr(OraclesParser.XorOprExprContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code andOprExpr}
-	 * labeled alternative in {@link OraclesParser#bool_expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterAndOprExpr(OraclesParser.AndOprExprContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code andOprExpr}
-	 * labeled alternative in {@link OraclesParser#bool_expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitAndOprExpr(OraclesParser.AndOprExprContext ctx);
+	void exitPlainBoolExpr(OraclesParser.PlainBoolExprContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code parenExpr}
 	 * labeled alternative in {@link OraclesParser#bool_expr}.
@@ -173,6 +161,54 @@ public interface OraclesListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitPropertyBool(OraclesParser.PropertyBoolContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code operator_and}
+	 * labeled alternative in {@link OraclesParser#operator}.
+	 * @param ctx the parse tree
+	 */
+	void enterOperator_and(OraclesParser.Operator_andContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code operator_and}
+	 * labeled alternative in {@link OraclesParser#operator}.
+	 * @param ctx the parse tree
+	 */
+	void exitOperator_and(OraclesParser.Operator_andContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code operator_xor}
+	 * labeled alternative in {@link OraclesParser#operator}.
+	 * @param ctx the parse tree
+	 */
+	void enterOperator_xor(OraclesParser.Operator_xorContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code operator_xor}
+	 * labeled alternative in {@link OraclesParser#operator}.
+	 * @param ctx the parse tree
+	 */
+	void exitOperator_xor(OraclesParser.Operator_xorContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code operator_or}
+	 * labeled alternative in {@link OraclesParser#operator}.
+	 * @param ctx the parse tree
+	 */
+	void enterOperator_or(OraclesParser.Operator_orContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code operator_or}
+	 * labeled alternative in {@link OraclesParser#operator}.
+	 * @param ctx the parse tree
+	 */
+	void exitOperator_or(OraclesParser.Operator_orContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code operator_equals}
+	 * labeled alternative in {@link OraclesParser#operator}.
+	 * @param ctx the parse tree
+	 */
+	void enterOperator_equals(OraclesParser.Operator_equalsContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code operator_equals}
+	 * labeled alternative in {@link OraclesParser#operator}.
+	 * @param ctx the parse tree
+	 */
+	void exitOperator_equals(OraclesParser.Operator_equalsContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code propKeyValue}
 	 * labeled alternative in {@link OraclesParser#property_line}.

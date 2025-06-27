@@ -7,6 +7,7 @@ import org.testar.monkey.Assert;
 import org.testar.monkey.alayer.Roles;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.stub.StateStub;
 import org.testar.stub.WidgetStub;
@@ -43,9 +44,9 @@ public class TestGrammarOracles
         GrammarOracle oracle = new GrammarOracle( "test oracle");
 
         Predicate<State> jointPredicate = isFormButtonPredicate.and(isSendPaymentPredicate);
-        oracle.setCheckLogic(jointPredicate);
+        oracle.setCheckLogic(false, jointPredicate);
         
-        Assert.isTrue(oracle.getVerdict(state));
+        Assert.isTrue(oracle.getVerdict(state).severity() == Verdict.SEVERITY_OK);
     }
     @Test
     public void false_test_basic_oracle_property_values()
@@ -67,8 +68,8 @@ public class TestGrammarOracles
         GrammarOracle oracle = new GrammarOracle( "test oracle");
         
         Predicate<State> jointPredicate = isFormButtonPredicate.and(isSendPaymentPredicate);
-        oracle.setCheckLogic(jointPredicate);
+        oracle.setCheckLogic(false, jointPredicate);
         
-        Assert.isFalse(oracle.getVerdict(state));
+        Assert.isFalse(oracle.getVerdict(state).severity() == Verdict.SEVERITY_OK);
     }
 }

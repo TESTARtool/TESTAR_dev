@@ -3,18 +3,20 @@ grammar Oracles;
 
 oracles_file: (oracle | COMMENT)+ EOF;
 
-oracle: 'ORACLE' STRING LB given_block* group_block* check_block trigger_block* RB;
+oracle: IGNORE? ORACLE STRING LB given_block* group_block* check_block trigger_block? RB;
 
-
-given_block: 'GIVEN' 'STATE' 'IN' STRING
-|            'GIVEN' 'LAST_ACTION' property_block
+given_block: GIVEN STATE IN STRING
+|            GIVEN LAST_ACTION COLON property_block
 ;
 
-group_block:    'GROUP'   'WIDGET' STRING property_block;
-check_block:    'CHECK'   property_block;
-trigger_block:  'TRIGGER' BOOL STRING;
+group_block:    GROUP       WIDGET      STRING   COLON                   property_block;
+check_block:    CHECK       check_type  COLON   (APPLY_TO STRING COLON)? property_block;
+trigger_block:  TRIGGER     STRING; //maybe change to MESSAGE?
 
 
+check_type: PASS_IF #pass
+|           FAIL_IF #fail
+;
 
 ////////////////////////
 // logic parser rules //
@@ -22,47 +24,63 @@ trigger_block:  'TRIGGER' BOOL STRING;
 
 property_block: bool_expr;
 
-bool_expr:          LP  bool_expr   RP                          #parenExpr
-|                   'NOT' bool_expr                             #notExpr
-| left=bool_expr    ( 'AND' | ',' )         right=bool_expr     #andOprExpr
-| left=bool_expr    ( 'XOR' | '^' )         right=bool_expr     #xorOprExpr
-| left=bool_expr    ( 'OR'  | '|' )         right=bool_expr     #orOprExpr
-| left=bool_expr    ( 'IS'  | 'EQUALS' )    right=bool_expr     #isOprExpr
-|                       BOOL                                    #plainBool
-|                       property_line                           #propertyBool
+bool_expr:  LP          bool_expr       RP          #parenExpr
+|           NOT         bool_expr                   #notExpr
+|      left=bool_expr   operator  right=bool_expr   #operatorExpr
+|           bool_expr   IS              BOOL        #plainBoolExpr
+|                       property_line               #propertyBool
+;
+
+operator:   ( AND | COMMA )     #operator_and
+|           ( XOR | '^' )       #operator_xor
+|           ( OR  | '|' )       #operator_or
+|             EQUALS            #operator_equals
 ;
 
 //WIDGET BASE_STRING ('='|'==') WIDGET BASE_STRING        #widgetIsWidget
 
 property_line:
-    'PROP' LP 'KEY' ',' 'VALUE' RP  comparator LP   key=STRING ',' value=STRING RP    #propKeyValue
-|   'PROP'    'VALUE'               'IS'                BOOL                          #propIsBool
-|   'PROP'    location              'IS'                'IN'             list         #propIsInList
-|   'PROP'    'VALUE'               'IS'                'IN'             range        #propIsInRange
-|   'PROP'    location              comparator          STRING                        #propStandard
+    PROP      PAIR      key=STRING      WITH        value=STRING    #propKeyValue
+|   PROP      VALUE     IS              BOOL                        #propIsBool
+|   PROP      VALUE     IS              IN          range           #propIsInRange
+|   PROP      location  comparator      list                        #propIsInList
+|   PROP      location  comparator      STRING                      #propStandard
 ;
 
-list:   'LIST'  LP      STRING (','      STRING)* RP;
-range:  'RANGE' LP  low=INT     ',' high=INT      RP;
+list:    list_access    LP      STRING (COMMA   STRING)* RP;
+range:   RANGE  LP  low=INT     COMMA high=INT  RP;
 
-location:   'KEY'   #keyLocation
-|           'VALUE' #valueLocation
-|           'ANY'   #anyLocation
+list_access:
+    ALL     #access_all
+|   ANY     #access_any
+|   NONE    #access_none
+|   SOME    #access_some
 ;
 
-comparator: 'EQUALS'            #comparator_equals
-|           'MATCHES'           #comparator_matches
-|           'CONTAINS'          #comparator_contains
-|           'STARTS_WITH'       #comparator_startsWith
-|           'ENDS_WITH'         #comparator_endsWith
+
+location:    KEY    #location_key
+|            VALUE  #location_value
+|            ANY    #location_any
+;
+
+comparator:  REGEX          #comparator_regex
+|            IS             #comparator_is
+|            CONTAINS       #comparator_contains
+|            STARTS_WITH    #comparator_startsWith
+|            ENDS_WITH      #comparator_endsWith
+;
+
+special_value:  NULL        #value_null
+|               EMPTY       #value_empty
+|               NOT_EMPTY   #value_not_empty
 ;
 
 /////////////////////////
 // string parser rules //
 /////////////////////////
 
-regex_string:       'REGEX'   STRING;
-raw_string:         'RAW'     STRING; //no interpretation
+regex_string:        REGEX    STRING;
+raw_string:          RAW      STRING; //no interpretation
 basic_string:                 STRING; //interpretation of escaped characters (\t\n,etc.)
 
 
@@ -86,44 +104,58 @@ INT: [0-9]+;
 // keyword lexer rules //
 /////////////////////////
 
-//ANY:            'ANY';
-//CHECK:          'CHECK';
-//CONTAINS:       'CONTAINS';
-//ENDS_WITH:      'ENDS_WITH';
-//GIVEN:          'GIVEN';
-//GROUP:          'GROUP';
-//KEY:            'KEY';
-//LAST_ACTION:    'LAST_ACTION';
+ALL:            'ALL';
+AND:            'AND';
+ANY:            'ANY';
+APPLY_TO:       'APPLY_TO';
+CHECK:          'CHECK';
+CONTAINS:       'CONTAINS';
+EMPTY:          'EMPTY';
+ENDS_WITH:      'ENDS_WITH';
+EQUALS:         'EQUALS';
+EXIST:          'EXIST';
+FAIL_IF:        'FAIL_IF';
+GIVEN:          'GIVEN';
+GROUP:          'GROUP';
+IGNORE:         'IGNORE';
+IN:             'IN';
+IS:             'IS';
+KEY:            'KEY';
+LAST_ACTION:    'LAST_ACTION';
 //LIST:           'LIST';
-//MATCHES:        'MATCHES';
-//ORACLE:         'ORACLE';
-//PROP:           'PROP' | 'PROPERTY';
-//RAW:            'RAW';
-//REGEX:          'REGEX';
-//STARTS_WITH:    'STARTS_WITH';
-//STATE:          'STATE';
-//TRIGGER:        'TRIGGER';
-//VALUE:          'VALUE';
-//WIDGET:         'WIDGET';
+MATCHES:        'MATCHES';
+NONE:           'NONE';
+NOT_EMPTY:      'NOT_EMPTY';
+NOT:            'NOT';
+NULL:           'NULL';
+OR:             'OR';
+ORACLE:         'ORACLE';
+PAIR:           'PAIR';
+PASS_IF:        'PASS_IF';
+PROP:           'PROP' | 'PROPERTY';
+RANGE:          'RANGE';
+RAW:            'RAW';
+REGEX:          'REGEX';
+SOME:           'SOME';
+STARTS_WITH:    'STARTS_WITH';
+STATE:          'STATE';
+TRIGGER:        'TRIGGER';
+VALUE:          'VALUE';
+WIDGET:         'WIDGET';
+WITH:           'WITH';
+XOR:            'XOR';
 
-///////////////////////
-// logic lexer rules //
-///////////////////////
-
-BOOL: TRUE | FALSE;
-//COMMA:      ',';
-
-//in:         'IN';
-//is:         'IS';
-//not:        '!' | '~' | 'NOT';
-//and:        'AND'; //comma provided by a different rule
-//or:         '|' | 'OR';
-//xor:        '^' | 'XOR';
 
 
 ///////////////////////////////
 // miscellaneous lexer rules //
 ///////////////////////////////
+
+BOOL: TRUE | FALSE;
+
+// must be after any STRING rule, or it'll snap up occurances that should go into string
+COMMA:      ',';
+COLON:      ':';
 
 LB: '{';
 RB: '}';
@@ -138,8 +170,8 @@ WHITESPACE:     (' ' | '\t' | '\r' | '\n')+     -> skip;
 // lexer fragments //
 /////////////////////
 
-fragment TRUE:      'TRUE';
-fragment FALSE:     'FALSE';
+fragment TRUE:      T R U E; // 'TRUE'
+fragment FALSE:     F A L S E; // 'FALSE'
 
 fragment A : [aA];
 fragment B : [bB];

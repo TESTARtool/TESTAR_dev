@@ -21,7 +21,7 @@ public class SearchTerm
     private SearchTerm(Type type,
                        String singleStringValue,
                        Integer singleIntegerValue,
-                       Boolean singleBoolanValue,
+                       Boolean singleBooleanValue,
                        Collection<String> valueList,
                        String key, String value,
                        Integer lowerBound, Integer upperBound)
@@ -29,7 +29,7 @@ public class SearchTerm
         this.type            = type;
         this.singleStrValue  = singleStringValue;
         this.singleIntValue  = singleIntegerValue;
-        this.singleBoolValue = singleBoolanValue;
+        this.singleBoolValue = singleBooleanValue;
         this.valueList       = valueList;
         this.key             = key;
         this.value           = value;

@@ -89,6 +89,30 @@ public class OraclesBaseListener implements OraclesListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterPass(OraclesParser.PassContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPass(OraclesParser.PassContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterFail(OraclesParser.FailContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFail(OraclesParser.FailContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterProperty_block(OraclesParser.Property_blockContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -96,18 +120,6 @@ public class OraclesBaseListener implements OraclesListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitProperty_block(OraclesParser.Property_blockContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterPlainBool(OraclesParser.PlainBoolContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitPlainBool(OraclesParser.PlainBoolContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -125,49 +137,25 @@ public class OraclesBaseListener implements OraclesListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterOrOprExpr(OraclesParser.OrOprExprContext ctx) { }
+	@Override public void enterOperatorExpr(OraclesParser.OperatorExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitOrOprExpr(OraclesParser.OrOprExprContext ctx) { }
+	@Override public void exitOperatorExpr(OraclesParser.OperatorExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterIsOprExpr(OraclesParser.IsOprExprContext ctx) { }
+	@Override public void enterPlainBoolExpr(OraclesParser.PlainBoolExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitIsOprExpr(OraclesParser.IsOprExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterXorOprExpr(OraclesParser.XorOprExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitXorOprExpr(OraclesParser.XorOprExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterAndOprExpr(OraclesParser.AndOprExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitAndOprExpr(OraclesParser.AndOprExprContext ctx) { }
+	@Override public void exitPlainBoolExpr(OraclesParser.PlainBoolExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -192,6 +180,54 @@ public class OraclesBaseListener implements OraclesListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitPropertyBool(OraclesParser.PropertyBoolContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterOperator_and(OraclesParser.Operator_andContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitOperator_and(OraclesParser.Operator_andContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterOperator_xor(OraclesParser.Operator_xorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitOperator_xor(OraclesParser.Operator_xorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterOperator_or(OraclesParser.Operator_orContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitOperator_or(OraclesParser.Operator_orContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterOperator_equals(OraclesParser.Operator_equalsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitOperator_equals(OraclesParser.Operator_equalsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

@@ -1,6 +1,7 @@
 package oracle_objects;
 
 import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Verdict;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,18 +9,28 @@ import java.util.function.Predicate;
 
 public class GrammarOracle
 {
+    private final boolean ignored;
     private final String oracleName;
     
     private List<Predicate<State>> givenLogic = new ArrayList<>();
     private List<Predicate<State>> groupLogic = new ArrayList<>();
+    private boolean failEquals;
     private Predicate<State>       checkLogic;
-    private String                 triggerTrue;
-    private String                 triggerFalse;
+    private String trigger = "";
+    private String grammar;
     
     public GrammarOracle(String oracleName)
     {
+        this.ignored = false;
         this.oracleName = oracleName;
     }
+    public GrammarOracle(boolean ignored, String oracleName)
+    {
+        this.ignored = ignored;
+        this.oracleName = oracleName;
+    }
+    
+    public boolean isIgnored() { return ignored; }
     
     public void setGivenLogic(List<Predicate<State>> givenLogic)
     {
@@ -30,31 +41,39 @@ public class GrammarOracle
         this.groupLogic.addAll(groupLogic);
     }
     
-    public void setCheckLogic(Predicate<State> checkLogic)
+    public void setCheckLogic(boolean failEquals, Predicate<State> checkLogic)
     {
+        this.failEquals = failEquals; // set which outcome equals fail
         this.checkLogic = checkLogic;
     }
     
-    public void setTriggerTrue(String message)
+    public void setTrigger(String message)
     {
-        this.triggerTrue = message;
+        this.trigger = message;
     }
     
-    public void setTriggerFalse(String message)
+    public void setGrammar(String grammar) {this.grammar = grammar;}
+    
+    public Verdict getVerdict(State state)
     {
-        this.triggerFalse = message;
+        boolean result = checkLogic.test(state);
+        if(failEquals == result) // if result is a fail value
+            return new Verdict(Verdict.SEVERITY_GRAMMAR_DETECTED_ISSUE, buildMessage());
+        else
+            return new Verdict(Verdict.SEVERITY_OK, "");
     }
     
-//    public Verdict getVerdict(State state)
-//    {
-//        if(checkLogic.test(state))
-//            return new Verdict(Verdict.SEVERITY_MIN, triggerTrue); // OK
-//        else
-//            return new Verdict(Verdict.SEVERITY_WARNING, triggerFalse);
-//    }
-    
-    public boolean getVerdict(State state)
+    private String buildMessage()
     {
-        return checkLogic.test(state);
+        String preString = "Oracle " + oracleName;
+        if(trigger.isBlank())
+            return preString;
+        else return preString + ": " + trigger;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return grammar;
     }
 }

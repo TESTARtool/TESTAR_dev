@@ -47,18 +47,25 @@ public interface OraclesVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitTrigger_block(OraclesParser.Trigger_blockContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code pass}
+	 * labeled alternative in {@link OraclesParser#check_type}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPass(OraclesParser.PassContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code fail}
+	 * labeled alternative in {@link OraclesParser#check_type}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFail(OraclesParser.FailContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link OraclesParser#property_block}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitProperty_block(OraclesParser.Property_blockContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code plainBool}
-	 * labeled alternative in {@link OraclesParser#bool_expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitPlainBool(OraclesParser.PlainBoolContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code notExpr}
 	 * labeled alternative in {@link OraclesParser#bool_expr}.
@@ -67,33 +74,19 @@ public interface OraclesVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitNotExpr(OraclesParser.NotExprContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code orOprExpr}
+	 * Visit a parse tree produced by the {@code operatorExpr}
 	 * labeled alternative in {@link OraclesParser#bool_expr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitOrOprExpr(OraclesParser.OrOprExprContext ctx);
+	T visitOperatorExpr(OraclesParser.OperatorExprContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code isOprExpr}
+	 * Visit a parse tree produced by the {@code plainBoolExpr}
 	 * labeled alternative in {@link OraclesParser#bool_expr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitIsOprExpr(OraclesParser.IsOprExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code xorOprExpr}
-	 * labeled alternative in {@link OraclesParser#bool_expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitXorOprExpr(OraclesParser.XorOprExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code andOprExpr}
-	 * labeled alternative in {@link OraclesParser#bool_expr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAndOprExpr(OraclesParser.AndOprExprContext ctx);
+	T visitPlainBoolExpr(OraclesParser.PlainBoolExprContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code parenExpr}
 	 * labeled alternative in {@link OraclesParser#bool_expr}.
@@ -108,6 +101,34 @@ public interface OraclesVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitPropertyBool(OraclesParser.PropertyBoolContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code operator_and}
+	 * labeled alternative in {@link OraclesParser#operator}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOperator_and(OraclesParser.Operator_andContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code operator_xor}
+	 * labeled alternative in {@link OraclesParser#operator}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOperator_xor(OraclesParser.Operator_xorContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code operator_or}
+	 * labeled alternative in {@link OraclesParser#operator}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOperator_or(OraclesParser.Operator_orContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code operator_equals}
+	 * labeled alternative in {@link OraclesParser#operator}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOperator_equals(OraclesParser.Operator_equalsContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code propKeyValue}
 	 * labeled alternative in {@link OraclesParser#property_line}.

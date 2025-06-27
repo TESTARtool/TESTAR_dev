@@ -30,10 +30,10 @@
 
 package org.testar.monkey.alayer;
 
-import java.io.Serializable;
-
 import org.testar.monkey.Assert;
 import org.testar.monkey.Util;
+
+import java.io.Serializable;
 
 /**
  * A Verdict is the outcome of a test oracle. It determines whether an <code>SUT</code>'s state is erroneous and if so
@@ -49,6 +49,7 @@ public final class Verdict implements Serializable {
 	public static final double SEVERITY_MIN = 0.0;
 	// FAIL
 	public static final double SEVERITY_WARNING = 		   0.7; // custom verdict
+	public static final double SEVERITY_GRAMMAR_DETECTED_ISSUE =  0.71; // custom verdict
 	public static final double SEVERITY_SUSPICIOUS_TAG = 0.8; // suspicious tag
 	public static final double SEVERITY_SUSPICIOUS_LOG = 0.89; // suspicious message in log file or command output (LogOracle)
 	public static final double SEVERITY_NOT_RESPONDING =   0.99999990; // unresponsive
@@ -98,6 +99,8 @@ public final class Verdict implements Serializable {
 			return "OK";
 		if(severity == Verdict.SEVERITY_WARNING)
 			return "WARNING";
+		if(severity == Verdict.SEVERITY_GRAMMAR_DETECTED_ISSUE)
+			return "GRAMMAR_DETECTED_ISSUE";
 		if(severity == Verdict.SEVERITY_SUSPICIOUS_TAG)
 			return "SUSPICIOUS_TAG";
 		if(severity == Verdict.SEVERITY_NOT_RESPONDING)

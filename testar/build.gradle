@@ -130,6 +130,8 @@ dependencies {
     implementation group: 'org.jacoco', name: 'jacoco-maven-plugin', version: '0.8.12'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-csv
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.11.0'
+    // https://mvnrepository.com/artifact/org.checkerframework/checker
+    implementation("org.checkerframework:checker:3.49.1")
 }
 
 task prepareSettings(type: Copy) {

@@ -17,44 +17,47 @@ public class OraclesParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9, 
-		T__9=10, T__10=11, T__11=12, T__12=13, T__13=14, T__14=15, T__15=16, T__16=17, 
-		T__17=18, T__18=19, T__19=20, T__20=21, T__21=22, T__22=23, T__23=24, 
-		T__24=25, T__25=26, T__26=27, T__27=28, T__28=29, T__29=30, STRING=31, 
-		INT=32, BOOL=33, LB=34, RB=35, LP=36, RP=37, COMMENT=38, WHITESPACE=39, 
-		ANY_CHARACTERS=40;
+		T__0=1, T__1=2, STRING=3, INT=4, AND=5, ANY=6, APPLY_TO=7, CHECK=8, CONTAINS=9, 
+		ENDS_WITH=10, EQUALS=11, FAIL_IF=12, GIVEN=13, GROUP=14, IGNORE=15, IN=16, 
+		IS=17, KEY=18, LAST_ACTION=19, LIST=20, MATCHES=21, NOT=22, OR=23, ORACLE=24, 
+		PASS_IF=25, PROP=26, RANGE=27, RAW=28, REGEX=29, STARTS_WITH=30, STATE=31, 
+		TRIGGER=32, VALUE=33, WIDGET=34, XOR=35, BOOL=36, COMMA=37, COLON=38, 
+		LB=39, RB=40, LP=41, RP=42, COMMENT=43, WHITESPACE=44, ANY_CHARACTERS=45;
 	public static final int
 		RULE_oracles_file = 0, RULE_oracle = 1, RULE_given_block = 2, RULE_group_block = 3, 
-		RULE_check_block = 4, RULE_trigger_block = 5, RULE_property_block = 6, 
-		RULE_bool_expr = 7, RULE_property_line = 8, RULE_list = 9, RULE_range = 10, 
-		RULE_location = 11, RULE_comparator = 12, RULE_regex_string = 13, RULE_raw_string = 14, 
-		RULE_basic_string = 15;
+		RULE_check_block = 4, RULE_trigger_block = 5, RULE_check_type = 6, RULE_property_block = 7, 
+		RULE_bool_expr = 8, RULE_operator = 9, RULE_property_line = 10, RULE_list = 11, 
+		RULE_range = 12, RULE_location = 13, RULE_comparator = 14, RULE_regex_string = 15, 
+		RULE_raw_string = 16, RULE_basic_string = 17;
 	private static String[] makeRuleNames() {
 		return new String[] {
 			"oracles_file", "oracle", "given_block", "group_block", "check_block", 
-			"trigger_block", "property_block", "bool_expr", "property_line", "list", 
-			"range", "location", "comparator", "regex_string", "raw_string", "basic_string"
+			"trigger_block", "check_type", "property_block", "bool_expr", "operator", 
+			"property_line", "list", "range", "location", "comparator", "regex_string", 
+			"raw_string", "basic_string"
 		};
 	}
 	public static final String[] ruleNames = makeRuleNames();
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, "'ORACLE'", "'GIVEN'", "'STATE'", "'IN'", "'LAST_ACTION'", "'GROUP'", 
-			"'WIDGET'", "'CHECK'", "'TRIGGER'", "'NOT'", "'AND'", "','", "'XOR'", 
-			"'^'", "'OR'", "'|'", "'IS'", "'EQUALS'", "'PROP'", "'KEY'", "'VALUE'", 
-			"'LIST'", "'RANGE'", "'ANY'", "'MATCHES'", "'CONTAINS'", "'STARTS_WITH'", 
-			"'ENDS_WITH'", "'REGEX'", "'RAW'", null, null, null, "'{'", "'}'", "'('", 
-			"')'"
+			null, "'^'", "'|'", null, null, "'AND'", "'ANY'", "'APPLY_TO'", "'CHECK'", 
+			"'CONTAINS'", "'ENDS_WITH'", "'EQUALS'", "'FAIL_IF'", "'GIVEN'", "'GROUP'", 
+			"'IGNORE'", "'IN'", "'IS'", "'KEY'", "'LAST_ACTION'", "'LIST'", "'MATCHES'", 
+			"'NOT'", "'OR'", "'ORACLE'", "'PASS_IF'", null, "'RANGE'", "'RAW'", "'REGEX'", 
+			"'STARTS_WITH'", "'STATE'", "'TRIGGER'", "'VALUE'", "'WIDGET'", "'XOR'", 
+			null, "','", "':'", "'{'", "'}'", "'('", "')'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
-			null, null, null, null, null, null, null, null, null, null, null, null, 
-			null, null, null, null, null, null, null, null, null, null, null, null, 
-			null, null, null, null, null, null, null, "STRING", "INT", "BOOL", "LB", 
-			"RB", "LP", "RP", "COMMENT", "WHITESPACE", "ANY_CHARACTERS"
+			null, null, null, "STRING", "INT", "AND", "ANY", "APPLY_TO", "CHECK", 
+			"CONTAINS", "ENDS_WITH", "EQUALS", "FAIL_IF", "GIVEN", "GROUP", "IGNORE", 
+			"IN", "IS", "KEY", "LAST_ACTION", "LIST", "MATCHES", "NOT", "OR", "ORACLE", 
+			"PASS_IF", "PROP", "RANGE", "RAW", "REGEX", "STARTS_WITH", "STATE", "TRIGGER", 
+			"VALUE", "WIDGET", "XOR", "BOOL", "COMMA", "COLON", "LB", "RB", "LP", 
+			"RP", "COMMENT", "WHITESPACE", "ANY_CHARACTERS"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -147,23 +150,24 @@ public class OraclesParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(34); 
+			setState(38); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
-				setState(34);
+				setState(38);
 				_errHandler.sync(this);
 				switch (_input.LA(1)) {
-				case T__0:
+				case IGNORE:
+				case ORACLE:
 					{
-					setState(32);
+					setState(36);
 					oracle();
 					}
 					break;
 				case COMMENT:
 					{
-					setState(33);
+					setState(37);
 					match(COMMENT);
 					}
 					break;
@@ -171,11 +175,11 @@ public class OraclesParser extends Parser {
 					throw new NoViableAltException(this);
 				}
 				}
-				setState(36); 
+				setState(40); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-			} while ( _la==T__0 || _la==COMMENT );
-			setState(38);
+			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & 8796109832192L) != 0) );
+			setState(42);
 			match(EOF);
 			}
 		}
@@ -192,12 +196,14 @@ public class OraclesParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class OracleContext extends ParserRuleContext {
+		public TerminalNode ORACLE() { return getToken(OraclesParser.ORACLE, 0); }
 		public TerminalNode STRING() { return getToken(OraclesParser.STRING, 0); }
 		public TerminalNode LB() { return getToken(OraclesParser.LB, 0); }
 		public Check_blockContext check_block() {
 			return getRuleContext(Check_blockContext.class,0);
 		}
 		public TerminalNode RB() { return getToken(OraclesParser.RB, 0); }
+		public TerminalNode IGNORE() { return getToken(OraclesParser.IGNORE, 0); }
 		public List<Given_blockContext> given_block() {
 			return getRuleContexts(Given_blockContext.class);
 		}
@@ -210,11 +216,8 @@ public class OraclesParser extends Parser {
 		public Group_blockContext group_block(int i) {
 			return getRuleContext(Group_blockContext.class,i);
 		}
-		public List<Trigger_blockContext> trigger_block() {
-			return getRuleContexts(Trigger_blockContext.class);
-		}
-		public Trigger_blockContext trigger_block(int i) {
-			return getRuleContext(Trigger_blockContext.class,i);
+		public Trigger_blockContext trigger_block() {
+			return getRuleContext(Trigger_blockContext.class,0);
 		}
 		public OracleContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -242,50 +245,44 @@ public class OraclesParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(40);
-			match(T__0);
-			setState(41);
-			match(STRING);
-			setState(42);
-			match(LB);
-			setState(46);
+			setState(45);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while (_la==T__1) {
+			if (_la==IGNORE) {
+				{
+				setState(44);
+				match(IGNORE);
+				}
+			}
+
+			setState(47);
+			match(ORACLE);
+			setState(48);
+			match(STRING);
+			setState(49);
+			match(LB);
+			setState(53);
+			_errHandler.sync(this);
+			_la = _input.LA(1);
+			while (_la==GIVEN) {
 				{
 				{
-				setState(43);
+				setState(50);
 				given_block();
 				}
 				}
-				setState(48);
+				setState(55);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(52);
-			_errHandler.sync(this);
-			_la = _input.LA(1);
-			while (_la==T__5) {
-				{
-				{
-				setState(49);
-				group_block();
-				}
-				}
-				setState(54);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
-			}
-			setState(55);
-			check_block();
 			setState(59);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while (_la==T__8) {
+			while (_la==GROUP) {
 				{
 				{
 				setState(56);
-				trigger_block();
+				group_block();
 				}
 				}
 				setState(61);
@@ -293,6 +290,18 @@ public class OraclesParser extends Parser {
 				_la = _input.LA(1);
 			}
 			setState(62);
+			check_block();
+			setState(64);
+			_errHandler.sync(this);
+			_la = _input.LA(1);
+			if (_la==TRIGGER) {
+				{
+				setState(63);
+				trigger_block();
+				}
+			}
+
+			setState(66);
 			match(RB);
 			}
 		}
@@ -309,7 +318,12 @@ public class OraclesParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class Given_blockContext extends ParserRuleContext {
+		public TerminalNode GIVEN() { return getToken(OraclesParser.GIVEN, 0); }
+		public TerminalNode STATE() { return getToken(OraclesParser.STATE, 0); }
+		public TerminalNode IN() { return getToken(OraclesParser.IN, 0); }
 		public TerminalNode STRING() { return getToken(OraclesParser.STRING, 0); }
+		public TerminalNode LAST_ACTION() { return getToken(OraclesParser.LAST_ACTION, 0); }
+		public TerminalNode COLON() { return getToken(OraclesParser.COLON, 0); }
 		public Property_blockContext property_block() {
 			return getRuleContext(Property_blockContext.class,0);
 		}
@@ -336,30 +350,32 @@ public class OraclesParser extends Parser {
 		Given_blockContext _localctx = new Given_blockContext(_ctx, getState());
 		enterRule(_localctx, 4, RULE_given_block);
 		try {
-			setState(71);
+			setState(76);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,5,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,6,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(64);
-				match(T__1);
-				setState(65);
-				match(T__2);
-				setState(66);
-				match(T__3);
-				setState(67);
+				setState(68);
+				match(GIVEN);
+				setState(69);
+				match(STATE);
+				setState(70);
+				match(IN);
+				setState(71);
 				match(STRING);
 				}
 				break;
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(68);
-				match(T__1);
-				setState(69);
-				match(T__4);
-				setState(70);
+				setState(72);
+				match(GIVEN);
+				setState(73);
+				match(LAST_ACTION);
+				setState(74);
+				match(COLON);
+				setState(75);
 				property_block();
 				}
 				break;
@@ -378,7 +394,10 @@ public class OraclesParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class Group_blockContext extends ParserRuleContext {
+		public TerminalNode GROUP() { return getToken(OraclesParser.GROUP, 0); }
+		public TerminalNode WIDGET() { return getToken(OraclesParser.WIDGET, 0); }
 		public TerminalNode STRING() { return getToken(OraclesParser.STRING, 0); }
+		public TerminalNode COLON() { return getToken(OraclesParser.COLON, 0); }
 		public Property_blockContext property_block() {
 			return getRuleContext(Property_blockContext.class,0);
 		}
@@ -407,13 +426,15 @@ public class OraclesParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(73);
-			match(T__5);
-			setState(74);
-			match(T__6);
-			setState(75);
+			setState(78);
+			match(GROUP);
+			setState(79);
+			match(WIDGET);
+			setState(80);
 			match(STRING);
-			setState(76);
+			setState(81);
+			match(COLON);
+			setState(82);
 			property_block();
 			}
 		}
@@ -430,9 +451,19 @@ public class OraclesParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class Check_blockContext extends ParserRuleContext {
+		public TerminalNode CHECK() { return getToken(OraclesParser.CHECK, 0); }
+		public Check_typeContext check_type() {
+			return getRuleContext(Check_typeContext.class,0);
+		}
+		public List<TerminalNode> COLON() { return getTokens(OraclesParser.COLON); }
+		public TerminalNode COLON(int i) {
+			return getToken(OraclesParser.COLON, i);
+		}
 		public Property_blockContext property_block() {
 			return getRuleContext(Property_blockContext.class,0);
 		}
+		public TerminalNode APPLY_TO() { return getToken(OraclesParser.APPLY_TO, 0); }
+		public TerminalNode STRING() { return getToken(OraclesParser.STRING, 0); }
 		public Check_blockContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -455,12 +486,31 @@ public class OraclesParser extends Parser {
 	public final Check_blockContext check_block() throws RecognitionException {
 		Check_blockContext _localctx = new Check_blockContext(_ctx, getState());
 		enterRule(_localctx, 8, RULE_check_block);
+		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(78);
-			match(T__7);
-			setState(79);
+			setState(84);
+			match(CHECK);
+			setState(85);
+			check_type();
+			setState(86);
+			match(COLON);
+			setState(90);
+			_errHandler.sync(this);
+			_la = _input.LA(1);
+			if (_la==APPLY_TO) {
+				{
+				setState(87);
+				match(APPLY_TO);
+				setState(88);
+				match(STRING);
+				setState(89);
+				match(COLON);
+				}
+			}
+
+			setState(92);
 			property_block();
 			}
 		}
@@ -477,7 +527,7 @@ public class OraclesParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class Trigger_blockContext extends ParserRuleContext {
-		public TerminalNode BOOL() { return getToken(OraclesParser.BOOL, 0); }
+		public TerminalNode TRIGGER() { return getToken(OraclesParser.TRIGGER, 0); }
 		public TerminalNode STRING() { return getToken(OraclesParser.STRING, 0); }
 		public Trigger_blockContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -504,12 +554,97 @@ public class OraclesParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(81);
-			match(T__8);
-			setState(82);
-			match(BOOL);
-			setState(83);
+			setState(94);
+			match(TRIGGER);
+			setState(95);
 			match(STRING);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	@SuppressWarnings("CheckReturnValue")
+	public static class Check_typeContext extends ParserRuleContext {
+		public Check_typeContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_check_type; }
+	 
+		public Check_typeContext() { }
+		public void copyFrom(Check_typeContext ctx) {
+			super.copyFrom(ctx);
+		}
+	}
+	@SuppressWarnings("CheckReturnValue")
+	public static class FailContext extends Check_typeContext {
+		public TerminalNode FAIL_IF() { return getToken(OraclesParser.FAIL_IF, 0); }
+		public FailContext(Check_typeContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).enterFail(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).exitFail(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof OraclesVisitor ) return ((OraclesVisitor<? extends T>)visitor).visitFail(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	@SuppressWarnings("CheckReturnValue")
+	public static class PassContext extends Check_typeContext {
+		public TerminalNode PASS_IF() { return getToken(OraclesParser.PASS_IF, 0); }
+		public PassContext(Check_typeContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).enterPass(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).exitPass(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof OraclesVisitor ) return ((OraclesVisitor<? extends T>)visitor).visitPass(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final Check_typeContext check_type() throws RecognitionException {
+		Check_typeContext _localctx = new Check_typeContext(_ctx, getState());
+		enterRule(_localctx, 12, RULE_check_type);
+		try {
+			setState(99);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case PASS_IF:
+				_localctx = new PassContext(_localctx);
+				enterOuterAlt(_localctx, 1);
+				{
+				setState(97);
+				match(PASS_IF);
+				}
+				break;
+			case FAIL_IF:
+				_localctx = new FailContext(_localctx);
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(98);
+				match(FAIL_IF);
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
 			}
 		}
 		catch (RecognitionException re) {
@@ -549,11 +684,11 @@ public class OraclesParser extends Parser {
 
 	public final Property_blockContext property_block() throws RecognitionException {
 		Property_blockContext _localctx = new Property_blockContext(_ctx, getState());
-		enterRule(_localctx, 12, RULE_property_block);
+		enterRule(_localctx, 14, RULE_property_block);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(85);
+			setState(101);
 			bool_expr(0);
 			}
 		}
@@ -581,25 +716,8 @@ public class OraclesParser extends Parser {
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
-	public static class PlainBoolContext extends Bool_exprContext {
-		public TerminalNode BOOL() { return getToken(OraclesParser.BOOL, 0); }
-		public PlainBoolContext(Bool_exprContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).enterPlainBool(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).exitPlainBool(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof OraclesVisitor ) return ((OraclesVisitor<? extends T>)visitor).visitPlainBool(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	@SuppressWarnings("CheckReturnValue")
 	public static class NotExprContext extends Bool_exprContext {
+		public TerminalNode NOT() { return getToken(OraclesParser.NOT, 0); }
 		public Bool_exprContext bool_expr() {
 			return getRuleContext(Bool_exprContext.class,0);
 		}
@@ -619,102 +737,52 @@ public class OraclesParser extends Parser {
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
-	public static class OrOprExprContext extends Bool_exprContext {
+	public static class OperatorExprContext extends Bool_exprContext {
 		public Bool_exprContext left;
 		public Bool_exprContext right;
+		public OperatorContext operator() {
+			return getRuleContext(OperatorContext.class,0);
+		}
 		public List<Bool_exprContext> bool_expr() {
 			return getRuleContexts(Bool_exprContext.class);
 		}
 		public Bool_exprContext bool_expr(int i) {
 			return getRuleContext(Bool_exprContext.class,i);
 		}
-		public OrOprExprContext(Bool_exprContext ctx) { copyFrom(ctx); }
+		public OperatorExprContext(Bool_exprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).enterOrOprExpr(this);
+			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).enterOperatorExpr(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).exitOrOprExpr(this);
+			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).exitOperatorExpr(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof OraclesVisitor ) return ((OraclesVisitor<? extends T>)visitor).visitOrOprExpr(this);
+			if ( visitor instanceof OraclesVisitor ) return ((OraclesVisitor<? extends T>)visitor).visitOperatorExpr(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
-	public static class IsOprExprContext extends Bool_exprContext {
-		public Bool_exprContext left;
-		public Bool_exprContext right;
-		public List<Bool_exprContext> bool_expr() {
-			return getRuleContexts(Bool_exprContext.class);
+	public static class PlainBoolExprContext extends Bool_exprContext {
+		public Bool_exprContext bool_expr() {
+			return getRuleContext(Bool_exprContext.class,0);
 		}
-		public Bool_exprContext bool_expr(int i) {
-			return getRuleContext(Bool_exprContext.class,i);
-		}
-		public IsOprExprContext(Bool_exprContext ctx) { copyFrom(ctx); }
+		public TerminalNode IS() { return getToken(OraclesParser.IS, 0); }
+		public TerminalNode BOOL() { return getToken(OraclesParser.BOOL, 0); }
+		public PlainBoolExprContext(Bool_exprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).enterIsOprExpr(this);
+			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).enterPlainBoolExpr(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).exitIsOprExpr(this);
+			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).exitPlainBoolExpr(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof OraclesVisitor ) return ((OraclesVisitor<? extends T>)visitor).visitIsOprExpr(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	@SuppressWarnings("CheckReturnValue")
-	public static class XorOprExprContext extends Bool_exprContext {
-		public Bool_exprContext left;
-		public Bool_exprContext right;
-		public List<Bool_exprContext> bool_expr() {
-			return getRuleContexts(Bool_exprContext.class);
-		}
-		public Bool_exprContext bool_expr(int i) {
-			return getRuleContext(Bool_exprContext.class,i);
-		}
-		public XorOprExprContext(Bool_exprContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).enterXorOprExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).exitXorOprExpr(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof OraclesVisitor ) return ((OraclesVisitor<? extends T>)visitor).visitXorOprExpr(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	@SuppressWarnings("CheckReturnValue")
-	public static class AndOprExprContext extends Bool_exprContext {
-		public Bool_exprContext left;
-		public Bool_exprContext right;
-		public List<Bool_exprContext> bool_expr() {
-			return getRuleContexts(Bool_exprContext.class);
-		}
-		public Bool_exprContext bool_expr(int i) {
-			return getRuleContext(Bool_exprContext.class,i);
-		}
-		public AndOprExprContext(Bool_exprContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).enterAndOprExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).exitAndOprExpr(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof OraclesVisitor ) return ((OraclesVisitor<? extends T>)visitor).visitAndOprExpr(this);
+			if ( visitor instanceof OraclesVisitor ) return ((OraclesVisitor<? extends T>)visitor).visitPlainBoolExpr(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -770,14 +838,13 @@ public class OraclesParser extends Parser {
 		int _parentState = getState();
 		Bool_exprContext _localctx = new Bool_exprContext(_ctx, _parentState);
 		Bool_exprContext _prevctx = _localctx;
-		int _startState = 14;
-		enterRecursionRule(_localctx, 14, RULE_bool_expr, _p);
-		int _la;
+		int _startState = 16;
+		enterRecursionRule(_localctx, 16, RULE_bool_expr, _p);
 		try {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(96);
+			setState(111);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case LP:
@@ -786,40 +853,31 @@ public class OraclesParser extends Parser {
 				_ctx = _localctx;
 				_prevctx = _localctx;
 
-				setState(88);
+				setState(104);
 				match(LP);
-				setState(89);
+				setState(105);
 				bool_expr(0);
-				setState(90);
+				setState(106);
 				match(RP);
 				}
 				break;
-			case T__9:
+			case NOT:
 				{
 				_localctx = new NotExprContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(92);
-				match(T__9);
-				setState(93);
-				bool_expr(7);
+				setState(108);
+				match(NOT);
+				setState(109);
+				bool_expr(4);
 				}
 				break;
-			case BOOL:
-				{
-				_localctx = new PlainBoolContext(_localctx);
-				_ctx = _localctx;
-				_prevctx = _localctx;
-				setState(94);
-				match(BOOL);
-				}
-				break;
-			case T__18:
+			case PROP:
 				{
 				_localctx = new PropertyBoolContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(95);
+				setState(110);
 				property_line();
 				}
 				break;
@@ -827,107 +885,48 @@ public class OraclesParser extends Parser {
 				throw new NoViableAltException(this);
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(112);
+			setState(122);
 			_errHandler.sync(this);
-			_alt = getInterpreter().adaptivePredict(_input,8,_ctx);
+			_alt = getInterpreter().adaptivePredict(_input,11,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
 					_prevctx = _localctx;
 					{
-					setState(110);
+					setState(120);
 					_errHandler.sync(this);
-					switch ( getInterpreter().adaptivePredict(_input,7,_ctx) ) {
+					switch ( getInterpreter().adaptivePredict(_input,10,_ctx) ) {
 					case 1:
 						{
-						_localctx = new AndOprExprContext(new Bool_exprContext(_parentctx, _parentState));
-						((AndOprExprContext)_localctx).left = _prevctx;
+						_localctx = new OperatorExprContext(new Bool_exprContext(_parentctx, _parentState));
+						((OperatorExprContext)_localctx).left = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_bool_expr);
-						setState(98);
-						if (!(precpred(_ctx, 6))) throw new FailedPredicateException(this, "precpred(_ctx, 6)");
-						setState(99);
-						_la = _input.LA(1);
-						if ( !(_la==T__10 || _la==T__11) ) {
-						_errHandler.recoverInline(this);
-						}
-						else {
-							if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
-							_errHandler.reportMatch(this);
-							consume();
-						}
-						setState(100);
-						((AndOprExprContext)_localctx).right = bool_expr(7);
+						setState(113);
+						if (!(precpred(_ctx, 3))) throw new FailedPredicateException(this, "precpred(_ctx, 3)");
+						setState(114);
+						operator();
+						setState(115);
+						((OperatorExprContext)_localctx).right = bool_expr(4);
 						}
 						break;
 					case 2:
 						{
-						_localctx = new XorOprExprContext(new Bool_exprContext(_parentctx, _parentState));
-						((XorOprExprContext)_localctx).left = _prevctx;
+						_localctx = new PlainBoolExprContext(new Bool_exprContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_bool_expr);
-						setState(101);
-						if (!(precpred(_ctx, 5))) throw new FailedPredicateException(this, "precpred(_ctx, 5)");
-						setState(102);
-						_la = _input.LA(1);
-						if ( !(_la==T__12 || _la==T__13) ) {
-						_errHandler.recoverInline(this);
-						}
-						else {
-							if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
-							_errHandler.reportMatch(this);
-							consume();
-						}
-						setState(103);
-						((XorOprExprContext)_localctx).right = bool_expr(6);
-						}
-						break;
-					case 3:
-						{
-						_localctx = new OrOprExprContext(new Bool_exprContext(_parentctx, _parentState));
-						((OrOprExprContext)_localctx).left = _prevctx;
-						pushNewRecursionContext(_localctx, _startState, RULE_bool_expr);
-						setState(104);
-						if (!(precpred(_ctx, 4))) throw new FailedPredicateException(this, "precpred(_ctx, 4)");
-						setState(105);
-						_la = _input.LA(1);
-						if ( !(_la==T__14 || _la==T__15) ) {
-						_errHandler.recoverInline(this);
-						}
-						else {
-							if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
-							_errHandler.reportMatch(this);
-							consume();
-						}
-						setState(106);
-						((OrOprExprContext)_localctx).right = bool_expr(5);
-						}
-						break;
-					case 4:
-						{
-						_localctx = new IsOprExprContext(new Bool_exprContext(_parentctx, _parentState));
-						((IsOprExprContext)_localctx).left = _prevctx;
-						pushNewRecursionContext(_localctx, _startState, RULE_bool_expr);
-						setState(107);
-						if (!(precpred(_ctx, 3))) throw new FailedPredicateException(this, "precpred(_ctx, 3)");
-						setState(108);
-						_la = _input.LA(1);
-						if ( !(_la==T__16 || _la==T__17) ) {
-						_errHandler.recoverInline(this);
-						}
-						else {
-							if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
-							_errHandler.reportMatch(this);
-							consume();
-						}
-						setState(109);
-						((IsOprExprContext)_localctx).right = bool_expr(4);
+						setState(117);
+						if (!(precpred(_ctx, 2))) throw new FailedPredicateException(this, "precpred(_ctx, 2)");
+						setState(118);
+						match(IS);
+						setState(119);
+						match(BOOL);
 						}
 						break;
 					}
 					} 
 				}
-				setState(114);
+				setState(124);
 				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,8,_ctx);
+				_alt = getInterpreter().adaptivePredict(_input,11,_ctx);
 			}
 			}
 		}
@@ -938,6 +937,174 @@ public class OraclesParser extends Parser {
 		}
 		finally {
 			unrollRecursionContexts(_parentctx);
+		}
+		return _localctx;
+	}
+
+	@SuppressWarnings("CheckReturnValue")
+	public static class OperatorContext extends ParserRuleContext {
+		public OperatorContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_operator; }
+	 
+		public OperatorContext() { }
+		public void copyFrom(OperatorContext ctx) {
+			super.copyFrom(ctx);
+		}
+	}
+	@SuppressWarnings("CheckReturnValue")
+	public static class Operator_andContext extends OperatorContext {
+		public TerminalNode AND() { return getToken(OraclesParser.AND, 0); }
+		public TerminalNode COMMA() { return getToken(OraclesParser.COMMA, 0); }
+		public Operator_andContext(OperatorContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).enterOperator_and(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).exitOperator_and(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof OraclesVisitor ) return ((OraclesVisitor<? extends T>)visitor).visitOperator_and(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	@SuppressWarnings("CheckReturnValue")
+	public static class Operator_equalsContext extends OperatorContext {
+		public TerminalNode EQUALS() { return getToken(OraclesParser.EQUALS, 0); }
+		public Operator_equalsContext(OperatorContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).enterOperator_equals(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).exitOperator_equals(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof OraclesVisitor ) return ((OraclesVisitor<? extends T>)visitor).visitOperator_equals(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	@SuppressWarnings("CheckReturnValue")
+	public static class Operator_xorContext extends OperatorContext {
+		public TerminalNode XOR() { return getToken(OraclesParser.XOR, 0); }
+		public Operator_xorContext(OperatorContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).enterOperator_xor(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).exitOperator_xor(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof OraclesVisitor ) return ((OraclesVisitor<? extends T>)visitor).visitOperator_xor(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	@SuppressWarnings("CheckReturnValue")
+	public static class Operator_orContext extends OperatorContext {
+		public TerminalNode OR() { return getToken(OraclesParser.OR, 0); }
+		public Operator_orContext(OperatorContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).enterOperator_or(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof OraclesListener ) ((OraclesListener)listener).exitOperator_or(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof OraclesVisitor ) return ((OraclesVisitor<? extends T>)visitor).visitOperator_or(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final OperatorContext operator() throws RecognitionException {
+		OperatorContext _localctx = new OperatorContext(_ctx, getState());
+		enterRule(_localctx, 18, RULE_operator);
+		int _la;
+		try {
+			setState(129);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case AND:
+			case COMMA:
+				_localctx = new Operator_andContext(_localctx);
+				enterOuterAlt(_localctx, 1);
+				{
+				setState(125);
+				_la = _input.LA(1);
+				if ( !(_la==AND || _la==COMMA) ) {
+				_errHandler.recoverInline(this);
+				}
+				else {
+					if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+					_errHandler.reportMatch(this);
+					consume();
+				}
+				}
+				break;
+			case T__0:
+			case XOR:
+				_localctx = new Operator_xorContext(_localctx);
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(126);
+				_la = _input.LA(1);
+				if ( !(_la==T__0 || _la==XOR) ) {
+				_errHandler.recoverInline(this);
+				}
+				else {
+					if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+					_errHandler.reportMatch(this);
+					consume();
+				}
+				}
+				break;
+			case T__1:
+			case OR:
+				_localctx = new Operator_orContext(_localctx);
+				enterOuterAlt(_localctx, 3);
+				{
+				setState(127);
+				_la = _input.LA(1);
+				if ( !(_la==T__1 || _la==OR) ) {
+				_errHandler.recoverInline(this);
+				}
+				else {
+					if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+					_errHandler.reportMatch(this);
+					consume();
+				}
+				}
+				break;
+			case EQUALS:
+				_localctx = new Operator_equalsContext(_localctx);
+				enterOuterAlt(_localctx, 4);
+				{
+				setState(128);
+				match(EQUALS);
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
 		}
 		return _localctx;
 	}
@@ -956,6 +1123,7 @@ public class OraclesParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class PropStandardContext extends Property_lineContext {
+		public TerminalNode PROP() { return getToken(OraclesParser.PROP, 0); }
 		public LocationContext location() {
 			return getRuleContext(LocationContext.class,0);
 		}
@@ -980,6 +1148,9 @@ public class OraclesParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class PropIsBoolContext extends Property_lineContext {
+		public TerminalNode PROP() { return getToken(OraclesParser.PROP, 0); }
+		public TerminalNode VALUE() { return getToken(OraclesParser.VALUE, 0); }
+		public TerminalNode IS() { return getToken(OraclesParser.IS, 0); }
 		public TerminalNode BOOL() { return getToken(OraclesParser.BOOL, 0); }
 		public PropIsBoolContext(Property_lineContext ctx) { copyFrom(ctx); }
 		@Override
@@ -998,6 +1169,10 @@ public class OraclesParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class PropIsInRangeContext extends Property_lineContext {
+		public TerminalNode PROP() { return getToken(OraclesParser.PROP, 0); }
+		public TerminalNode VALUE() { return getToken(OraclesParser.VALUE, 0); }
+		public TerminalNode IS() { return getToken(OraclesParser.IS, 0); }
+		public TerminalNode IN() { return getToken(OraclesParser.IN, 0); }
 		public RangeContext range() {
 			return getRuleContext(RangeContext.class,0);
 		}
@@ -1018,9 +1193,12 @@ public class OraclesParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class PropIsInListContext extends Property_lineContext {
+		public TerminalNode PROP() { return getToken(OraclesParser.PROP, 0); }
 		public LocationContext location() {
 			return getRuleContext(LocationContext.class,0);
 		}
+		public TerminalNode IS() { return getToken(OraclesParser.IS, 0); }
+		public TerminalNode IN() { return getToken(OraclesParser.IN, 0); }
 		public ListContext list() {
 			return getRuleContext(ListContext.class,0);
 		}
@@ -1043,10 +1221,17 @@ public class OraclesParser extends Parser {
 	public static class PropKeyValueContext extends Property_lineContext {
 		public Token key;
 		public Token value;
+		public TerminalNode PROP() { return getToken(OraclesParser.PROP, 0); }
 		public List<TerminalNode> LP() { return getTokens(OraclesParser.LP); }
 		public TerminalNode LP(int i) {
 			return getToken(OraclesParser.LP, i);
 		}
+		public TerminalNode KEY() { return getToken(OraclesParser.KEY, 0); }
+		public List<TerminalNode> COMMA() { return getTokens(OraclesParser.COMMA); }
+		public TerminalNode COMMA(int i) {
+			return getToken(OraclesParser.COMMA, i);
+		}
+		public TerminalNode VALUE() { return getToken(OraclesParser.VALUE, 0); }
 		public List<TerminalNode> RP() { return getTokens(OraclesParser.RP); }
 		public TerminalNode RP(int i) {
 			return getToken(OraclesParser.RP, i);
@@ -1076,38 +1261,38 @@ public class OraclesParser extends Parser {
 
 	public final Property_lineContext property_line() throws RecognitionException {
 		Property_lineContext _localctx = new Property_lineContext(_ctx, getState());
-		enterRule(_localctx, 16, RULE_property_line);
+		enterRule(_localctx, 20, RULE_property_line);
 		try {
-			setState(148);
+			setState(164);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,9,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,13,_ctx) ) {
 			case 1:
 				_localctx = new PropKeyValueContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(115);
-				match(T__18);
-				setState(116);
+				setState(131);
+				match(PROP);
+				setState(132);
 				match(LP);
-				setState(117);
-				match(T__19);
-				setState(118);
-				match(T__11);
-				setState(119);
-				match(T__20);
-				setState(120);
+				setState(133);
+				match(KEY);
+				setState(134);
+				match(COMMA);
+				setState(135);
+				match(VALUE);
+				setState(136);
 				match(RP);
-				setState(121);
+				setState(137);
 				comparator();
-				setState(122);
+				setState(138);
 				match(LP);
-				setState(123);
+				setState(139);
 				((PropKeyValueContext)_localctx).key = match(STRING);
-				setState(124);
-				match(T__11);
-				setState(125);
+				setState(140);
+				match(COMMA);
+				setState(141);
 				((PropKeyValueContext)_localctx).value = match(STRING);
-				setState(126);
+				setState(142);
 				match(RP);
 				}
 				break;
@@ -1115,13 +1300,13 @@ public class OraclesParser extends Parser {
 				_localctx = new PropIsBoolContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(128);
-				match(T__18);
-				setState(129);
-				match(T__20);
-				setState(130);
-				match(T__16);
-				setState(131);
+				setState(144);
+				match(PROP);
+				setState(145);
+				match(VALUE);
+				setState(146);
+				match(IS);
+				setState(147);
 				match(BOOL);
 				}
 				break;
@@ -1129,15 +1314,15 @@ public class OraclesParser extends Parser {
 				_localctx = new PropIsInListContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(132);
-				match(T__18);
-				setState(133);
+				setState(148);
+				match(PROP);
+				setState(149);
 				location();
-				setState(134);
-				match(T__16);
-				setState(135);
-				match(T__3);
-				setState(136);
+				setState(150);
+				match(IS);
+				setState(151);
+				match(IN);
+				setState(152);
 				list();
 				}
 				break;
@@ -1145,15 +1330,15 @@ public class OraclesParser extends Parser {
 				_localctx = new PropIsInRangeContext(_localctx);
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(138);
-				match(T__18);
-				setState(139);
-				match(T__20);
-				setState(140);
-				match(T__16);
-				setState(141);
-				match(T__3);
-				setState(142);
+				setState(154);
+				match(PROP);
+				setState(155);
+				match(VALUE);
+				setState(156);
+				match(IS);
+				setState(157);
+				match(IN);
+				setState(158);
 				range();
 				}
 				break;
@@ -1161,13 +1346,13 @@ public class OraclesParser extends Parser {
 				_localctx = new PropStandardContext(_localctx);
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(143);
-				match(T__18);
-				setState(144);
+				setState(159);
+				match(PROP);
+				setState(160);
 				location();
-				setState(145);
+				setState(161);
 				comparator();
-				setState(146);
+				setState(162);
 				match(STRING);
 				}
 				break;
@@ -1186,12 +1371,17 @@ public class OraclesParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class ListContext extends ParserRuleContext {
+		public TerminalNode LIST() { return getToken(OraclesParser.LIST, 0); }
 		public TerminalNode LP() { return getToken(OraclesParser.LP, 0); }
 		public List<TerminalNode> STRING() { return getTokens(OraclesParser.STRING); }
 		public TerminalNode STRING(int i) {
 			return getToken(OraclesParser.STRING, i);
 		}
 		public TerminalNode RP() { return getToken(OraclesParser.RP, 0); }
+		public List<TerminalNode> COMMA() { return getTokens(OraclesParser.COMMA); }
+		public TerminalNode COMMA(int i) {
+			return getToken(OraclesParser.COMMA, i);
+		}
 		public ListContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -1213,34 +1403,34 @@ public class OraclesParser extends Parser {
 
 	public final ListContext list() throws RecognitionException {
 		ListContext _localctx = new ListContext(_ctx, getState());
-		enterRule(_localctx, 18, RULE_list);
+		enterRule(_localctx, 22, RULE_list);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(150);
-			match(T__21);
-			setState(151);
+			setState(166);
+			match(LIST);
+			setState(167);
 			match(LP);
-			setState(152);
+			setState(168);
 			match(STRING);
-			setState(157);
+			setState(173);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while (_la==T__11) {
+			while (_la==COMMA) {
 				{
 				{
-				setState(153);
-				match(T__11);
-				setState(154);
+				setState(169);
+				match(COMMA);
+				setState(170);
 				match(STRING);
 				}
 				}
-				setState(159);
+				setState(175);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(160);
+			setState(176);
 			match(RP);
 			}
 		}
@@ -1259,7 +1449,9 @@ public class OraclesParser extends Parser {
 	public static class RangeContext extends ParserRuleContext {
 		public Token low;
 		public Token high;
+		public TerminalNode RANGE() { return getToken(OraclesParser.RANGE, 0); }
 		public TerminalNode LP() { return getToken(OraclesParser.LP, 0); }
+		public TerminalNode COMMA() { return getToken(OraclesParser.COMMA, 0); }
 		public TerminalNode RP() { return getToken(OraclesParser.RP, 0); }
 		public List<TerminalNode> INT() { return getTokens(OraclesParser.INT); }
 		public TerminalNode INT(int i) {
@@ -1286,21 +1478,21 @@ public class OraclesParser extends Parser {
 
 	public final RangeContext range() throws RecognitionException {
 		RangeContext _localctx = new RangeContext(_ctx, getState());
-		enterRule(_localctx, 20, RULE_range);
+		enterRule(_localctx, 24, RULE_range);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(162);
-			match(T__22);
-			setState(163);
+			setState(178);
+			match(RANGE);
+			setState(179);
 			match(LP);
-			setState(164);
+			setState(180);
 			((RangeContext)_localctx).low = match(INT);
-			setState(165);
-			match(T__11);
-			setState(166);
+			setState(181);
+			match(COMMA);
+			setState(182);
 			((RangeContext)_localctx).high = match(INT);
-			setState(167);
+			setState(183);
 			match(RP);
 			}
 		}
@@ -1329,6 +1521,7 @@ public class OraclesParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class KeyLocationContext extends LocationContext {
+		public TerminalNode KEY() { return getToken(OraclesParser.KEY, 0); }
 		public KeyLocationContext(LocationContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -1346,6 +1539,7 @@ public class OraclesParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class AnyLocationContext extends LocationContext {
+		public TerminalNode ANY() { return getToken(OraclesParser.ANY, 0); }
 		public AnyLocationContext(LocationContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -1363,6 +1557,7 @@ public class OraclesParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ValueLocationContext extends LocationContext {
+		public TerminalNode VALUE() { return getToken(OraclesParser.VALUE, 0); }
 		public ValueLocationContext(LocationContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -1381,33 +1576,33 @@ public class OraclesParser extends Parser {
 
 	public final LocationContext location() throws RecognitionException {
 		LocationContext _localctx = new LocationContext(_ctx, getState());
-		enterRule(_localctx, 22, RULE_location);
+		enterRule(_localctx, 26, RULE_location);
 		try {
-			setState(172);
+			setState(188);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
-			case T__19:
+			case KEY:
 				_localctx = new KeyLocationContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(169);
-				match(T__19);
+				setState(185);
+				match(KEY);
 				}
 				break;
-			case T__20:
+			case VALUE:
 				_localctx = new ValueLocationContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(170);
-				match(T__20);
+				setState(186);
+				match(VALUE);
 				}
 				break;
-			case T__23:
+			case ANY:
 				_localctx = new AnyLocationContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(171);
-				match(T__23);
+				setState(187);
+				match(ANY);
 				}
 				break;
 			default:
@@ -1439,6 +1634,7 @@ public class OraclesParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class Comparator_matchesContext extends ComparatorContext {
+		public TerminalNode MATCHES() { return getToken(OraclesParser.MATCHES, 0); }
 		public Comparator_matchesContext(ComparatorContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -1456,6 +1652,7 @@ public class OraclesParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class Comparator_equalsContext extends ComparatorContext {
+		public TerminalNode EQUALS() { return getToken(OraclesParser.EQUALS, 0); }
 		public Comparator_equalsContext(ComparatorContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -1473,6 +1670,7 @@ public class OraclesParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class Comparator_startsWithContext extends ComparatorContext {
+		public TerminalNode STARTS_WITH() { return getToken(OraclesParser.STARTS_WITH, 0); }
 		public Comparator_startsWithContext(ComparatorContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -1490,6 +1688,7 @@ public class OraclesParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class Comparator_endsWithContext extends ComparatorContext {
+		public TerminalNode ENDS_WITH() { return getToken(OraclesParser.ENDS_WITH, 0); }
 		public Comparator_endsWithContext(ComparatorContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -1507,6 +1706,7 @@ public class OraclesParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class Comparator_containsContext extends ComparatorContext {
+		public TerminalNode CONTAINS() { return getToken(OraclesParser.CONTAINS, 0); }
 		public Comparator_containsContext(ComparatorContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -1525,49 +1725,49 @@ public class OraclesParser extends Parser {
 
 	public final ComparatorContext comparator() throws RecognitionException {
 		ComparatorContext _localctx = new ComparatorContext(_ctx, getState());
-		enterRule(_localctx, 24, RULE_comparator);
+		enterRule(_localctx, 28, RULE_comparator);
 		try {
-			setState(179);
+			setState(195);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
-			case T__17:
+			case EQUALS:
 				_localctx = new Comparator_equalsContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(174);
-				match(T__17);
+				setState(190);
+				match(EQUALS);
 				}
 				break;
-			case T__24:
+			case MATCHES:
 				_localctx = new Comparator_matchesContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(175);
-				match(T__24);
+				setState(191);
+				match(MATCHES);
 				}
 				break;
-			case T__25:
+			case CONTAINS:
 				_localctx = new Comparator_containsContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(176);
-				match(T__25);
+				setState(192);
+				match(CONTAINS);
 				}
 				break;
-			case T__26:
+			case STARTS_WITH:
 				_localctx = new Comparator_startsWithContext(_localctx);
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(177);
-				match(T__26);
+				setState(193);
+				match(STARTS_WITH);
 				}
 				break;
-			case T__27:
+			case ENDS_WITH:
 				_localctx = new Comparator_endsWithContext(_localctx);
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(178);
-				match(T__27);
+				setState(194);
+				match(ENDS_WITH);
 				}
 				break;
 			default:
@@ -1587,6 +1787,7 @@ public class OraclesParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class Regex_stringContext extends ParserRuleContext {
+		public TerminalNode REGEX() { return getToken(OraclesParser.REGEX, 0); }
 		public TerminalNode STRING() { return getToken(OraclesParser.STRING, 0); }
 		public Regex_stringContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -1609,13 +1810,13 @@ public class OraclesParser extends Parser {
 
 	public final Regex_stringContext regex_string() throws RecognitionException {
 		Regex_stringContext _localctx = new Regex_stringContext(_ctx, getState());
-		enterRule(_localctx, 26, RULE_regex_string);
+		enterRule(_localctx, 30, RULE_regex_string);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(181);
-			match(T__28);
-			setState(182);
+			setState(197);
+			match(REGEX);
+			setState(198);
 			match(STRING);
 			}
 		}
@@ -1632,6 +1833,7 @@ public class OraclesParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class Raw_stringContext extends ParserRuleContext {
+		public TerminalNode RAW() { return getToken(OraclesParser.RAW, 0); }
 		public TerminalNode STRING() { return getToken(OraclesParser.STRING, 0); }
 		public Raw_stringContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -1654,13 +1856,13 @@ public class OraclesParser extends Parser {
 
 	public final Raw_stringContext raw_string() throws RecognitionException {
 		Raw_stringContext _localctx = new Raw_stringContext(_ctx, getState());
-		enterRule(_localctx, 28, RULE_raw_string);
+		enterRule(_localctx, 32, RULE_raw_string);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(184);
-			match(T__29);
-			setState(185);
+			setState(200);
+			match(RAW);
+			setState(201);
 			match(STRING);
 			}
 		}
@@ -1699,11 +1901,11 @@ public class OraclesParser extends Parser {
 
 	public final Basic_stringContext basic_string() throws RecognitionException {
 		Basic_stringContext _localctx = new Basic_stringContext(_ctx, getState());
-		enterRule(_localctx, 30, RULE_basic_string);
+		enterRule(_localctx, 34, RULE_basic_string);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(187);
+			setState(203);
 			match(STRING);
 			}
 		}
@@ -1720,7 +1922,7 @@ public class OraclesParser extends Parser {
 
 	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 		switch (ruleIndex) {
-		case 7:
+		case 8:
 			return bool_expr_sempred((Bool_exprContext)_localctx, predIndex);
 		}
 		return true;
@@ -1728,130 +1930,136 @@ public class OraclesParser extends Parser {
 	private boolean bool_expr_sempred(Bool_exprContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 0:
-			return precpred(_ctx, 6);
-		case 1:
-			return precpred(_ctx, 5);
-		case 2:
-			return precpred(_ctx, 4);
-		case 3:
 			return precpred(_ctx, 3);
+		case 1:
+			return precpred(_ctx, 2);
 		}
 		return true;
 	}
 
 	public static final String _serializedATN =
-		"\u0004\u0001(\u00be\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001\u0002"+
+		"\u0004\u0001-\u00ce\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001\u0002"+
 		"\u0002\u0007\u0002\u0002\u0003\u0007\u0003\u0002\u0004\u0007\u0004\u0002"+
 		"\u0005\u0007\u0005\u0002\u0006\u0007\u0006\u0002\u0007\u0007\u0007\u0002"+
 		"\b\u0007\b\u0002\t\u0007\t\u0002\n\u0007\n\u0002\u000b\u0007\u000b\u0002"+
 		"\f\u0007\f\u0002\r\u0007\r\u0002\u000e\u0007\u000e\u0002\u000f\u0007\u000f"+
-		"\u0001\u0000\u0001\u0000\u0004\u0000#\b\u0000\u000b\u0000\f\u0000$\u0001"+
-		"\u0000\u0001\u0000\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0005"+
-		"\u0001-\b\u0001\n\u0001\f\u00010\t\u0001\u0001\u0001\u0005\u00013\b\u0001"+
-		"\n\u0001\f\u00016\t\u0001\u0001\u0001\u0001\u0001\u0005\u0001:\b\u0001"+
-		"\n\u0001\f\u0001=\t\u0001\u0001\u0001\u0001\u0001\u0001\u0002\u0001\u0002"+
-		"\u0001\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0003\u0002"+
-		"H\b\u0002\u0001\u0003\u0001\u0003\u0001\u0003\u0001\u0003\u0001\u0003"+
-		"\u0001\u0004\u0001\u0004\u0001\u0004\u0001\u0005\u0001\u0005\u0001\u0005"+
-		"\u0001\u0005\u0001\u0006\u0001\u0006\u0001\u0007\u0001\u0007\u0001\u0007"+
-		"\u0001\u0007\u0001\u0007\u0001\u0007\u0001\u0007\u0001\u0007\u0001\u0007"+
-		"\u0003\u0007a\b\u0007\u0001\u0007\u0001\u0007\u0001\u0007\u0001\u0007"+
-		"\u0001\u0007\u0001\u0007\u0001\u0007\u0001\u0007\u0001\u0007\u0001\u0007"+
-		"\u0001\u0007\u0001\u0007\u0005\u0007o\b\u0007\n\u0007\f\u0007r\t\u0007"+
-		"\u0001\b\u0001\b\u0001\b\u0001\b\u0001\b\u0001\b\u0001\b\u0001\b\u0001"+
-		"\b\u0001\b\u0001\b\u0001\b\u0001\b\u0001\b\u0001\b\u0001\b\u0001\b\u0001"+
-		"\b\u0001\b\u0001\b\u0001\b\u0001\b\u0001\b\u0001\b\u0001\b\u0001\b\u0001"+
-		"\b\u0001\b\u0001\b\u0001\b\u0001\b\u0001\b\u0001\b\u0003\b\u0095\b\b\u0001"+
-		"\t\u0001\t\u0001\t\u0001\t\u0001\t\u0005\t\u009c\b\t\n\t\f\t\u009f\t\t"+
-		"\u0001\t\u0001\t\u0001\n\u0001\n\u0001\n\u0001\n\u0001\n\u0001\n\u0001"+
-		"\n\u0001\u000b\u0001\u000b\u0001\u000b\u0003\u000b\u00ad\b\u000b\u0001"+
-		"\f\u0001\f\u0001\f\u0001\f\u0001\f\u0003\f\u00b4\b\f\u0001\r\u0001\r\u0001"+
-		"\r\u0001\u000e\u0001\u000e\u0001\u000e\u0001\u000f\u0001\u000f\u0001\u000f"+
-		"\u0000\u0001\u000e\u0010\u0000\u0002\u0004\u0006\b\n\f\u000e\u0010\u0012"+
-		"\u0014\u0016\u0018\u001a\u001c\u001e\u0000\u0004\u0001\u0000\u000b\f\u0001"+
-		"\u0000\r\u000e\u0001\u0000\u000f\u0010\u0001\u0000\u0011\u0012\u00c5\u0000"+
-		"\"\u0001\u0000\u0000\u0000\u0002(\u0001\u0000\u0000\u0000\u0004G\u0001"+
-		"\u0000\u0000\u0000\u0006I\u0001\u0000\u0000\u0000\bN\u0001\u0000\u0000"+
-		"\u0000\nQ\u0001\u0000\u0000\u0000\fU\u0001\u0000\u0000\u0000\u000e`\u0001"+
-		"\u0000\u0000\u0000\u0010\u0094\u0001\u0000\u0000\u0000\u0012\u0096\u0001"+
-		"\u0000\u0000\u0000\u0014\u00a2\u0001\u0000\u0000\u0000\u0016\u00ac\u0001"+
-		"\u0000\u0000\u0000\u0018\u00b3\u0001\u0000\u0000\u0000\u001a\u00b5\u0001"+
-		"\u0000\u0000\u0000\u001c\u00b8\u0001\u0000\u0000\u0000\u001e\u00bb\u0001"+
-		"\u0000\u0000\u0000 #\u0003\u0002\u0001\u0000!#\u0005&\u0000\u0000\" \u0001"+
-		"\u0000\u0000\u0000\"!\u0001\u0000\u0000\u0000#$\u0001\u0000\u0000\u0000"+
-		"$\"\u0001\u0000\u0000\u0000$%\u0001\u0000\u0000\u0000%&\u0001\u0000\u0000"+
-		"\u0000&\'\u0005\u0000\u0000\u0001\'\u0001\u0001\u0000\u0000\u0000()\u0005"+
-		"\u0001\u0000\u0000)*\u0005\u001f\u0000\u0000*.\u0005\"\u0000\u0000+-\u0003"+
-		"\u0004\u0002\u0000,+\u0001\u0000\u0000\u0000-0\u0001\u0000\u0000\u0000"+
-		".,\u0001\u0000\u0000\u0000./\u0001\u0000\u0000\u0000/4\u0001\u0000\u0000"+
-		"\u00000.\u0001\u0000\u0000\u000013\u0003\u0006\u0003\u000021\u0001\u0000"+
-		"\u0000\u000036\u0001\u0000\u0000\u000042\u0001\u0000\u0000\u000045\u0001"+
-		"\u0000\u0000\u000057\u0001\u0000\u0000\u000064\u0001\u0000\u0000\u0000"+
-		"7;\u0003\b\u0004\u00008:\u0003\n\u0005\u000098\u0001\u0000\u0000\u0000"+
-		":=\u0001\u0000\u0000\u0000;9\u0001\u0000\u0000\u0000;<\u0001\u0000\u0000"+
-		"\u0000<>\u0001\u0000\u0000\u0000=;\u0001\u0000\u0000\u0000>?\u0005#\u0000"+
-		"\u0000?\u0003\u0001\u0000\u0000\u0000@A\u0005\u0002\u0000\u0000AB\u0005"+
-		"\u0003\u0000\u0000BC\u0005\u0004\u0000\u0000CH\u0005\u001f\u0000\u0000"+
-		"DE\u0005\u0002\u0000\u0000EF\u0005\u0005\u0000\u0000FH\u0003\f\u0006\u0000"+
-		"G@\u0001\u0000\u0000\u0000GD\u0001\u0000\u0000\u0000H\u0005\u0001\u0000"+
-		"\u0000\u0000IJ\u0005\u0006\u0000\u0000JK\u0005\u0007\u0000\u0000KL\u0005"+
-		"\u001f\u0000\u0000LM\u0003\f\u0006\u0000M\u0007\u0001\u0000\u0000\u0000"+
-		"NO\u0005\b\u0000\u0000OP\u0003\f\u0006\u0000P\t\u0001\u0000\u0000\u0000"+
-		"QR\u0005\t\u0000\u0000RS\u0005!\u0000\u0000ST\u0005\u001f\u0000\u0000"+
-		"T\u000b\u0001\u0000\u0000\u0000UV\u0003\u000e\u0007\u0000V\r\u0001\u0000"+
-		"\u0000\u0000WX\u0006\u0007\uffff\uffff\u0000XY\u0005$\u0000\u0000YZ\u0003"+
-		"\u000e\u0007\u0000Z[\u0005%\u0000\u0000[a\u0001\u0000\u0000\u0000\\]\u0005"+
-		"\n\u0000\u0000]a\u0003\u000e\u0007\u0007^a\u0005!\u0000\u0000_a\u0003"+
-		"\u0010\b\u0000`W\u0001\u0000\u0000\u0000`\\\u0001\u0000\u0000\u0000`^"+
-		"\u0001\u0000\u0000\u0000`_\u0001\u0000\u0000\u0000ap\u0001\u0000\u0000"+
-		"\u0000bc\n\u0006\u0000\u0000cd\u0007\u0000\u0000\u0000do\u0003\u000e\u0007"+
-		"\u0007ef\n\u0005\u0000\u0000fg\u0007\u0001\u0000\u0000go\u0003\u000e\u0007"+
-		"\u0006hi\n\u0004\u0000\u0000ij\u0007\u0002\u0000\u0000jo\u0003\u000e\u0007"+
-		"\u0005kl\n\u0003\u0000\u0000lm\u0007\u0003\u0000\u0000mo\u0003\u000e\u0007"+
-		"\u0004nb\u0001\u0000\u0000\u0000ne\u0001\u0000\u0000\u0000nh\u0001\u0000"+
-		"\u0000\u0000nk\u0001\u0000\u0000\u0000or\u0001\u0000\u0000\u0000pn\u0001"+
-		"\u0000\u0000\u0000pq\u0001\u0000\u0000\u0000q\u000f\u0001\u0000\u0000"+
-		"\u0000rp\u0001\u0000\u0000\u0000st\u0005\u0013\u0000\u0000tu\u0005$\u0000"+
-		"\u0000uv\u0005\u0014\u0000\u0000vw\u0005\f\u0000\u0000wx\u0005\u0015\u0000"+
-		"\u0000xy\u0005%\u0000\u0000yz\u0003\u0018\f\u0000z{\u0005$\u0000\u0000"+
-		"{|\u0005\u001f\u0000\u0000|}\u0005\f\u0000\u0000}~\u0005\u001f\u0000\u0000"+
-		"~\u007f\u0005%\u0000\u0000\u007f\u0095\u0001\u0000\u0000\u0000\u0080\u0081"+
-		"\u0005\u0013\u0000\u0000\u0081\u0082\u0005\u0015\u0000\u0000\u0082\u0083"+
-		"\u0005\u0011\u0000\u0000\u0083\u0095\u0005!\u0000\u0000\u0084\u0085\u0005"+
-		"\u0013\u0000\u0000\u0085\u0086\u0003\u0016\u000b\u0000\u0086\u0087\u0005"+
-		"\u0011\u0000\u0000\u0087\u0088\u0005\u0004\u0000\u0000\u0088\u0089\u0003"+
-		"\u0012\t\u0000\u0089\u0095\u0001\u0000\u0000\u0000\u008a\u008b\u0005\u0013"+
-		"\u0000\u0000\u008b\u008c\u0005\u0015\u0000\u0000\u008c\u008d\u0005\u0011"+
-		"\u0000\u0000\u008d\u008e\u0005\u0004\u0000\u0000\u008e\u0095\u0003\u0014"+
-		"\n\u0000\u008f\u0090\u0005\u0013\u0000\u0000\u0090\u0091\u0003\u0016\u000b"+
-		"\u0000\u0091\u0092\u0003\u0018\f\u0000\u0092\u0093\u0005\u001f\u0000\u0000"+
-		"\u0093\u0095\u0001\u0000\u0000\u0000\u0094s\u0001\u0000\u0000\u0000\u0094"+
-		"\u0080\u0001\u0000\u0000\u0000\u0094\u0084\u0001\u0000\u0000\u0000\u0094"+
-		"\u008a\u0001\u0000\u0000\u0000\u0094\u008f\u0001\u0000\u0000\u0000\u0095"+
-		"\u0011\u0001\u0000\u0000\u0000\u0096\u0097\u0005\u0016\u0000\u0000\u0097"+
-		"\u0098\u0005$\u0000\u0000\u0098\u009d\u0005\u001f\u0000\u0000\u0099\u009a"+
-		"\u0005\f\u0000\u0000\u009a\u009c\u0005\u001f\u0000\u0000\u009b\u0099\u0001"+
-		"\u0000\u0000\u0000\u009c\u009f\u0001\u0000\u0000\u0000\u009d\u009b\u0001"+
-		"\u0000\u0000\u0000\u009d\u009e\u0001\u0000\u0000\u0000\u009e\u00a0\u0001"+
-		"\u0000\u0000\u0000\u009f\u009d\u0001\u0000\u0000\u0000\u00a0\u00a1\u0005"+
-		"%\u0000\u0000\u00a1\u0013\u0001\u0000\u0000\u0000\u00a2\u00a3\u0005\u0017"+
-		"\u0000\u0000\u00a3\u00a4\u0005$\u0000\u0000\u00a4\u00a5\u0005 \u0000\u0000"+
-		"\u00a5\u00a6\u0005\f\u0000\u0000\u00a6\u00a7\u0005 \u0000\u0000\u00a7"+
-		"\u00a8\u0005%\u0000\u0000\u00a8\u0015\u0001\u0000\u0000\u0000\u00a9\u00ad"+
-		"\u0005\u0014\u0000\u0000\u00aa\u00ad\u0005\u0015\u0000\u0000\u00ab\u00ad"+
-		"\u0005\u0018\u0000\u0000\u00ac\u00a9\u0001\u0000\u0000\u0000\u00ac\u00aa"+
-		"\u0001\u0000\u0000\u0000\u00ac\u00ab\u0001\u0000\u0000\u0000\u00ad\u0017"+
-		"\u0001\u0000\u0000\u0000\u00ae\u00b4\u0005\u0012\u0000\u0000\u00af\u00b4"+
-		"\u0005\u0019\u0000\u0000\u00b0\u00b4\u0005\u001a\u0000\u0000\u00b1\u00b4"+
-		"\u0005\u001b\u0000\u0000\u00b2\u00b4\u0005\u001c\u0000\u0000\u00b3\u00ae"+
-		"\u0001\u0000\u0000\u0000\u00b3\u00af\u0001\u0000\u0000\u0000\u00b3\u00b0"+
-		"\u0001\u0000\u0000\u0000\u00b3\u00b1\u0001\u0000\u0000\u0000\u00b3\u00b2"+
-		"\u0001\u0000\u0000\u0000\u00b4\u0019\u0001\u0000\u0000\u0000\u00b5\u00b6"+
-		"\u0005\u001d\u0000\u0000\u00b6\u00b7\u0005\u001f\u0000\u0000\u00b7\u001b"+
-		"\u0001\u0000\u0000\u0000\u00b8\u00b9\u0005\u001e\u0000\u0000\u00b9\u00ba"+
-		"\u0005\u001f\u0000\u0000\u00ba\u001d\u0001\u0000\u0000\u0000\u00bb\u00bc"+
-		"\u0005\u001f\u0000\u0000\u00bc\u001f\u0001\u0000\u0000\u0000\r\"$.4;G"+
-		"`np\u0094\u009d\u00ac\u00b3";
+		"\u0002\u0010\u0007\u0010\u0002\u0011\u0007\u0011\u0001\u0000\u0001\u0000"+
+		"\u0004\u0000\'\b\u0000\u000b\u0000\f\u0000(\u0001\u0000\u0001\u0000\u0001"+
+		"\u0001\u0003\u0001.\b\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001"+
+		"\u0001\u0005\u00014\b\u0001\n\u0001\f\u00017\t\u0001\u0001\u0001\u0005"+
+		"\u0001:\b\u0001\n\u0001\f\u0001=\t\u0001\u0001\u0001\u0001\u0001\u0003"+
+		"\u0001A\b\u0001\u0001\u0001\u0001\u0001\u0001\u0002\u0001\u0002\u0001"+
+		"\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0003"+
+		"\u0002M\b\u0002\u0001\u0003\u0001\u0003\u0001\u0003\u0001\u0003\u0001"+
+		"\u0003\u0001\u0003\u0001\u0004\u0001\u0004\u0001\u0004\u0001\u0004\u0001"+
+		"\u0004\u0001\u0004\u0003\u0004[\b\u0004\u0001\u0004\u0001\u0004\u0001"+
+		"\u0005\u0001\u0005\u0001\u0005\u0001\u0006\u0001\u0006\u0003\u0006d\b"+
+		"\u0006\u0001\u0007\u0001\u0007\u0001\b\u0001\b\u0001\b\u0001\b\u0001\b"+
+		"\u0001\b\u0001\b\u0001\b\u0003\bp\b\b\u0001\b\u0001\b\u0001\b\u0001\b"+
+		"\u0001\b\u0001\b\u0001\b\u0005\by\b\b\n\b\f\b|\t\b\u0001\t\u0001\t\u0001"+
+		"\t\u0001\t\u0003\t\u0082\b\t\u0001\n\u0001\n\u0001\n\u0001\n\u0001\n\u0001"+
+		"\n\u0001\n\u0001\n\u0001\n\u0001\n\u0001\n\u0001\n\u0001\n\u0001\n\u0001"+
+		"\n\u0001\n\u0001\n\u0001\n\u0001\n\u0001\n\u0001\n\u0001\n\u0001\n\u0001"+
+		"\n\u0001\n\u0001\n\u0001\n\u0001\n\u0001\n\u0001\n\u0001\n\u0001\n\u0001"+
+		"\n\u0003\n\u00a5\b\n\u0001\u000b\u0001\u000b\u0001\u000b\u0001\u000b\u0001"+
+		"\u000b\u0005\u000b\u00ac\b\u000b\n\u000b\f\u000b\u00af\t\u000b\u0001\u000b"+
+		"\u0001\u000b\u0001\f\u0001\f\u0001\f\u0001\f\u0001\f\u0001\f\u0001\f\u0001"+
+		"\r\u0001\r\u0001\r\u0003\r\u00bd\b\r\u0001\u000e\u0001\u000e\u0001\u000e"+
+		"\u0001\u000e\u0001\u000e\u0003\u000e\u00c4\b\u000e\u0001\u000f\u0001\u000f"+
+		"\u0001\u000f\u0001\u0010\u0001\u0010\u0001\u0010\u0001\u0011\u0001\u0011"+
+		"\u0001\u0011\u0000\u0001\u0010\u0012\u0000\u0002\u0004\u0006\b\n\f\u000e"+
+		"\u0010\u0012\u0014\u0016\u0018\u001a\u001c\u001e \"\u0000\u0003\u0002"+
+		"\u0000\u0005\u0005%%\u0002\u0000\u0001\u0001##\u0002\u0000\u0002\u0002"+
+		"\u0017\u0017\u00d6\u0000&\u0001\u0000\u0000\u0000\u0002-\u0001\u0000\u0000"+
+		"\u0000\u0004L\u0001\u0000\u0000\u0000\u0006N\u0001\u0000\u0000\u0000\b"+
+		"T\u0001\u0000\u0000\u0000\n^\u0001\u0000\u0000\u0000\fc\u0001\u0000\u0000"+
+		"\u0000\u000ee\u0001\u0000\u0000\u0000\u0010o\u0001\u0000\u0000\u0000\u0012"+
+		"\u0081\u0001\u0000\u0000\u0000\u0014\u00a4\u0001\u0000\u0000\u0000\u0016"+
+		"\u00a6\u0001\u0000\u0000\u0000\u0018\u00b2\u0001\u0000\u0000\u0000\u001a"+
+		"\u00bc\u0001\u0000\u0000\u0000\u001c\u00c3\u0001\u0000\u0000\u0000\u001e"+
+		"\u00c5\u0001\u0000\u0000\u0000 \u00c8\u0001\u0000\u0000\u0000\"\u00cb"+
+		"\u0001\u0000\u0000\u0000$\'\u0003\u0002\u0001\u0000%\'\u0005+\u0000\u0000"+
+		"&$\u0001\u0000\u0000\u0000&%\u0001\u0000\u0000\u0000\'(\u0001\u0000\u0000"+
+		"\u0000(&\u0001\u0000\u0000\u0000()\u0001\u0000\u0000\u0000)*\u0001\u0000"+
+		"\u0000\u0000*+\u0005\u0000\u0000\u0001+\u0001\u0001\u0000\u0000\u0000"+
+		",.\u0005\u000f\u0000\u0000-,\u0001\u0000\u0000\u0000-.\u0001\u0000\u0000"+
+		"\u0000./\u0001\u0000\u0000\u0000/0\u0005\u0018\u0000\u000001\u0005\u0003"+
+		"\u0000\u000015\u0005\'\u0000\u000024\u0003\u0004\u0002\u000032\u0001\u0000"+
+		"\u0000\u000047\u0001\u0000\u0000\u000053\u0001\u0000\u0000\u000056\u0001"+
+		"\u0000\u0000\u00006;\u0001\u0000\u0000\u000075\u0001\u0000\u0000\u0000"+
+		"8:\u0003\u0006\u0003\u000098\u0001\u0000\u0000\u0000:=\u0001\u0000\u0000"+
+		"\u0000;9\u0001\u0000\u0000\u0000;<\u0001\u0000\u0000\u0000<>\u0001\u0000"+
+		"\u0000\u0000=;\u0001\u0000\u0000\u0000>@\u0003\b\u0004\u0000?A\u0003\n"+
+		"\u0005\u0000@?\u0001\u0000\u0000\u0000@A\u0001\u0000\u0000\u0000AB\u0001"+
+		"\u0000\u0000\u0000BC\u0005(\u0000\u0000C\u0003\u0001\u0000\u0000\u0000"+
+		"DE\u0005\r\u0000\u0000EF\u0005\u001f\u0000\u0000FG\u0005\u0010\u0000\u0000"+
+		"GM\u0005\u0003\u0000\u0000HI\u0005\r\u0000\u0000IJ\u0005\u0013\u0000\u0000"+
+		"JK\u0005&\u0000\u0000KM\u0003\u000e\u0007\u0000LD\u0001\u0000\u0000\u0000"+
+		"LH\u0001\u0000\u0000\u0000M\u0005\u0001\u0000\u0000\u0000NO\u0005\u000e"+
+		"\u0000\u0000OP\u0005\"\u0000\u0000PQ\u0005\u0003\u0000\u0000QR\u0005&"+
+		"\u0000\u0000RS\u0003\u000e\u0007\u0000S\u0007\u0001\u0000\u0000\u0000"+
+		"TU\u0005\b\u0000\u0000UV\u0003\f\u0006\u0000VZ\u0005&\u0000\u0000WX\u0005"+
+		"\u0007\u0000\u0000XY\u0005\u0003\u0000\u0000Y[\u0005&\u0000\u0000ZW\u0001"+
+		"\u0000\u0000\u0000Z[\u0001\u0000\u0000\u0000[\\\u0001\u0000\u0000\u0000"+
+		"\\]\u0003\u000e\u0007\u0000]\t\u0001\u0000\u0000\u0000^_\u0005 \u0000"+
+		"\u0000_`\u0005\u0003\u0000\u0000`\u000b\u0001\u0000\u0000\u0000ad\u0005"+
+		"\u0019\u0000\u0000bd\u0005\f\u0000\u0000ca\u0001\u0000\u0000\u0000cb\u0001"+
+		"\u0000\u0000\u0000d\r\u0001\u0000\u0000\u0000ef\u0003\u0010\b\u0000f\u000f"+
+		"\u0001\u0000\u0000\u0000gh\u0006\b\uffff\uffff\u0000hi\u0005)\u0000\u0000"+
+		"ij\u0003\u0010\b\u0000jk\u0005*\u0000\u0000kp\u0001\u0000\u0000\u0000"+
+		"lm\u0005\u0016\u0000\u0000mp\u0003\u0010\b\u0004np\u0003\u0014\n\u0000"+
+		"og\u0001\u0000\u0000\u0000ol\u0001\u0000\u0000\u0000on\u0001\u0000\u0000"+
+		"\u0000pz\u0001\u0000\u0000\u0000qr\n\u0003\u0000\u0000rs\u0003\u0012\t"+
+		"\u0000st\u0003\u0010\b\u0004ty\u0001\u0000\u0000\u0000uv\n\u0002\u0000"+
+		"\u0000vw\u0005\u0011\u0000\u0000wy\u0005$\u0000\u0000xq\u0001\u0000\u0000"+
+		"\u0000xu\u0001\u0000\u0000\u0000y|\u0001\u0000\u0000\u0000zx\u0001\u0000"+
+		"\u0000\u0000z{\u0001\u0000\u0000\u0000{\u0011\u0001\u0000\u0000\u0000"+
+		"|z\u0001\u0000\u0000\u0000}\u0082\u0007\u0000\u0000\u0000~\u0082\u0007"+
+		"\u0001\u0000\u0000\u007f\u0082\u0007\u0002\u0000\u0000\u0080\u0082\u0005"+
+		"\u000b\u0000\u0000\u0081}\u0001\u0000\u0000\u0000\u0081~\u0001\u0000\u0000"+
+		"\u0000\u0081\u007f\u0001\u0000\u0000\u0000\u0081\u0080\u0001\u0000\u0000"+
+		"\u0000\u0082\u0013\u0001\u0000\u0000\u0000\u0083\u0084\u0005\u001a\u0000"+
+		"\u0000\u0084\u0085\u0005)\u0000\u0000\u0085\u0086\u0005\u0012\u0000\u0000"+
+		"\u0086\u0087\u0005%\u0000\u0000\u0087\u0088\u0005!\u0000\u0000\u0088\u0089"+
+		"\u0005*\u0000\u0000\u0089\u008a\u0003\u001c\u000e\u0000\u008a\u008b\u0005"+
+		")\u0000\u0000\u008b\u008c\u0005\u0003\u0000\u0000\u008c\u008d\u0005%\u0000"+
+		"\u0000\u008d\u008e\u0005\u0003\u0000\u0000\u008e\u008f\u0005*\u0000\u0000"+
+		"\u008f\u00a5\u0001\u0000\u0000\u0000\u0090\u0091\u0005\u001a\u0000\u0000"+
+		"\u0091\u0092\u0005!\u0000\u0000\u0092\u0093\u0005\u0011\u0000\u0000\u0093"+
+		"\u00a5\u0005$\u0000\u0000\u0094\u0095\u0005\u001a\u0000\u0000\u0095\u0096"+
+		"\u0003\u001a\r\u0000\u0096\u0097\u0005\u0011\u0000\u0000\u0097\u0098\u0005"+
+		"\u0010\u0000\u0000\u0098\u0099\u0003\u0016\u000b\u0000\u0099\u00a5\u0001"+
+		"\u0000\u0000\u0000\u009a\u009b\u0005\u001a\u0000\u0000\u009b\u009c\u0005"+
+		"!\u0000\u0000\u009c\u009d\u0005\u0011\u0000\u0000\u009d\u009e\u0005\u0010"+
+		"\u0000\u0000\u009e\u00a5\u0003\u0018\f\u0000\u009f\u00a0\u0005\u001a\u0000"+
+		"\u0000\u00a0\u00a1\u0003\u001a\r\u0000\u00a1\u00a2\u0003\u001c\u000e\u0000"+
+		"\u00a2\u00a3\u0005\u0003\u0000\u0000\u00a3\u00a5\u0001\u0000\u0000\u0000"+
+		"\u00a4\u0083\u0001\u0000\u0000\u0000\u00a4\u0090\u0001\u0000\u0000\u0000"+
+		"\u00a4\u0094\u0001\u0000\u0000\u0000\u00a4\u009a\u0001\u0000\u0000\u0000"+
+		"\u00a4\u009f\u0001\u0000\u0000\u0000\u00a5\u0015\u0001\u0000\u0000\u0000"+
+		"\u00a6\u00a7\u0005\u0014\u0000\u0000\u00a7\u00a8\u0005)\u0000\u0000\u00a8"+
+		"\u00ad\u0005\u0003\u0000\u0000\u00a9\u00aa\u0005%\u0000\u0000\u00aa\u00ac"+
+		"\u0005\u0003\u0000\u0000\u00ab\u00a9\u0001\u0000\u0000\u0000\u00ac\u00af"+
+		"\u0001\u0000\u0000\u0000\u00ad\u00ab\u0001\u0000\u0000\u0000\u00ad\u00ae"+
+		"\u0001\u0000\u0000\u0000\u00ae\u00b0\u0001\u0000\u0000\u0000\u00af\u00ad"+
+		"\u0001\u0000\u0000\u0000\u00b0\u00b1\u0005*\u0000\u0000\u00b1\u0017\u0001"+
+		"\u0000\u0000\u0000\u00b2\u00b3\u0005\u001b\u0000\u0000\u00b3\u00b4\u0005"+
+		")\u0000\u0000\u00b4\u00b5\u0005\u0004\u0000\u0000\u00b5\u00b6\u0005%\u0000"+
+		"\u0000\u00b6\u00b7\u0005\u0004\u0000\u0000\u00b7\u00b8\u0005*\u0000\u0000"+
+		"\u00b8\u0019\u0001\u0000\u0000\u0000\u00b9\u00bd\u0005\u0012\u0000\u0000"+
+		"\u00ba\u00bd\u0005!\u0000\u0000\u00bb\u00bd\u0005\u0006\u0000\u0000\u00bc"+
+		"\u00b9\u0001\u0000\u0000\u0000\u00bc\u00ba\u0001\u0000\u0000\u0000\u00bc"+
+		"\u00bb\u0001\u0000\u0000\u0000\u00bd\u001b\u0001\u0000\u0000\u0000\u00be"+
+		"\u00c4\u0005\u000b\u0000\u0000\u00bf\u00c4\u0005\u0015\u0000\u0000\u00c0"+
+		"\u00c4\u0005\t\u0000\u0000\u00c1\u00c4\u0005\u001e\u0000\u0000\u00c2\u00c4"+
+		"\u0005\n\u0000\u0000\u00c3\u00be\u0001\u0000\u0000\u0000\u00c3\u00bf\u0001"+
+		"\u0000\u0000\u0000\u00c3\u00c0\u0001\u0000\u0000\u0000\u00c3\u00c1\u0001"+
+		"\u0000\u0000\u0000\u00c3\u00c2\u0001\u0000\u0000\u0000\u00c4\u001d\u0001"+
+		"\u0000\u0000\u0000\u00c5\u00c6\u0005\u001d\u0000\u0000\u00c6\u00c7\u0005"+
+		"\u0003\u0000\u0000\u00c7\u001f\u0001\u0000\u0000\u0000\u00c8\u00c9\u0005"+
+		"\u001c\u0000\u0000\u00c9\u00ca\u0005\u0003\u0000\u0000\u00ca!\u0001\u0000"+
+		"\u0000\u0000\u00cb\u00cc\u0005\u0003\u0000\u0000\u00cc#\u0001\u0000\u0000"+
+		"\u0000\u0011&(-5;@LZcoxz\u0081\u00a4\u00ad\u00bc\u00c3";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

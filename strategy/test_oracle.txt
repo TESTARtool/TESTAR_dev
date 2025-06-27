@@ -1,0 +1,1 @@
+ORACLE 'basic oracle' { CHECK PASS_IF: PROP KEY EQUALS 'WebId' }

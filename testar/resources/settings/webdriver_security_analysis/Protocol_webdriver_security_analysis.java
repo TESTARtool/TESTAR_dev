@@ -33,28 +33,34 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.HasDevTools;
-import org.openqa.selenium.devtools.v125.network.Network;
+import org.openqa.selenium.devtools.v134.network.Network;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.SutVisualization;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.alayer.*;
-import org.testar.monkey.alayer.actions.*;
+import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.NOP;
+import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.protocols.WebdriverProtocol;
-import org.testar.securityanalysis.*;
+import org.testar.securityanalysis.JsonSecurityResultWriter;
+import org.testar.securityanalysis.NavigationHelper;
+import org.testar.securityanalysis.SecurityConfiguration;
+import org.testar.securityanalysis.SecurityResultWriter;
 import org.testar.securityanalysis.helpers.SecurityOracleOrchestrator;
 import org.testar.securityanalysis.oracles.ActiveSecurityOracle;
 import org.testar.securityanalysis.oracles.SqlInjectionSecurityOracle;
 import org.testar.securityanalysis.oracles.XssSecurityOracle;
 import org.testar.settings.Settings;
 
-import com.google.common.collect.Sets;
-
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * We recommend running this example of security analysis protocol with the OWASP benchmark SUT. 

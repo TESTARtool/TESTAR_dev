@@ -12,37 +12,26 @@ import java.util.function.Predicate;
 
 public class OracleBuilder extends OraclesBaseVisitor<Predicate<State>>
 {
-    
-    public List<GrammarOracle> parseOracleInstructions(OraclesParser.Oracles_fileContext ctx)
-    {
-        List<GrammarOracle> grammarOracles = new ArrayList<>();
-        for(int i = 0; i < ctx.oracle().size(); i++)
-        {
-            grammarOracles.add(createOracle(ctx.oracle(i)));
-        }
-        return grammarOracles;
-    }
-    
-    private GrammarOracle createOracle(OraclesParser.OracleContext ctx)
+    public GrammarOracle buildOracle(OraclesParser.OracleContext ctx, String originalText)
     {
         String name = stripOuterQuotes(String.valueOf(ctx.STRING()));
     
-        GrammarOracle oracle = new GrammarOracle(name);
+        GrammarOracle oracle = new GrammarOracle(ctx.IGNORE() != null, name);
     
         List<Predicate<State>> groupBlocks = new ArrayList<>();
         for(int j = 0; j < ctx.group_block().size(); j++)
         { groupBlocks.set(j, visit(ctx.group_block(j))); }
         oracle.setGroupLogic(groupBlocks);
     
-        oracle.setCheckLogic(visit(ctx.check_block()));
-   
-        for(OraclesParser.Trigger_blockContext triggerBlock : ctx.trigger_block())
-        {
-            if(triggerBlock.BOOL().getText().equals("TRUE"))
-                oracle.setTriggerTrue(stripOuterQuotes(triggerBlock.STRING().getText()));
-            if(triggerBlock.BOOL().getText().equals("FALSE"))
-                oracle.setTriggerFalse(stripOuterQuotes(triggerBlock.STRING().getText()));
-        }
+        // set false if pass, otherwise set true for fail
+        boolean failValue = !(ctx.check_block().check_type() instanceof OraclesParser.PassContext);
+        oracle.setCheckLogic(failValue, visit(ctx.check_block()));
+        
+        String triggerText = (ctx.trigger_block() == null) ? "" : ctx.trigger_block().STRING().getText();
+        oracle.setTrigger(stripOuterQuotes(triggerText));
+        
+        oracle.setGrammar(originalText);
+        
         return oracle;
     }
     
@@ -61,39 +50,30 @@ public class OracleBuilder extends OraclesBaseVisitor<Predicate<State>>
         return visitChildren(ctx).negate();
     }
     
-    @Override public Predicate<State> visitAndOprExpr(OraclesParser.AndOprExprContext ctx)
-    {
-        return visit(ctx.left).and(visit(ctx.right));
-    }
-    
-    @Override public Predicate<State> visitOrOprExpr(OraclesParser.OrOprExprContext ctx)
-    {
-        return visit(ctx.left).or(visit(ctx.right));
-    }
-    
-    @Override public Predicate<State> visitXorOprExpr(OraclesParser.XorOprExprContext ctx)
+    @Override public Predicate<State> visitOperatorExpr(OraclesParser.OperatorExprContext ctx)
     {
         Predicate<State> left = visit(ctx.left);
         Predicate<State> right = visit(ctx.right);
-        return left.and(right.negate()).or(left.negate().and(right));
+        
+        if(ctx.operator() instanceof OraclesParser.Operator_andContext)
+            return left.and(right);
+        else if(ctx.operator() instanceof OraclesParser.Operator_xorContext)
+            return xor(left, right);
+        else if(ctx.operator() instanceof OraclesParser.Operator_orContext)
+            return left.or(right);
+        else if(ctx.operator() instanceof OraclesParser.Operator_equalsContext)
+            return valueEquals(left, right);
+        else return null; //shouldn't ever happen
     }
     
-    @Override public Predicate<State> visitIsOprExpr(OraclesParser.IsOprExprContext ctx)
-    {
-        Predicate<State> left = visit(ctx.left);
-        Predicate<State> right = visit(ctx.right);
-        return (left.and(right.negate()).or(left.negate().and(right))).negate(); // same as XOR, but negated
-        // if both are true or both are false, return true
-    }
-    
-    @Override public Predicate<State> visitPlainBool(OraclesParser.PlainBoolContext ctx)
+    @Override public Predicate<State> visitPlainBoolExpr(OraclesParser.PlainBoolExprContext ctx)
     {
         Predicate<State> boolPredicate;
         if(ctx.BOOL().getText().equalsIgnoreCase("true"))
             boolPredicate = state -> true;
         else
             boolPredicate = state -> false;
-        return boolPredicate;
+        return valueEquals(visit(ctx.bool_expr()), boolPredicate);
     }
     
     @Override public Predicate<State> visitPropKeyValue(OraclesParser.PropKeyValueContext ctx)
@@ -184,5 +164,14 @@ public class OracleBuilder extends OraclesBaseVisitor<Predicate<State>>
         return comparator;
     }
     
+    public static <T> Predicate<T> xor(Predicate<T> a, Predicate<T> b) // xor for Predicate classes
+    { // left.and(right.negate()).or(left.negate().and(right));
+        return t -> a.test(t) ^ b.test(t);
+    }
     
+    // returns true if both sides are true or both sides are false
+    public static <T> Predicate<T> valueEquals(Predicate<T> a, Predicate<T> b)
+    {
+        return xor(a, b).negate();
+    }
 }
