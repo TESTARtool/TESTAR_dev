@@ -80,7 +80,7 @@ public class ExternalOraclesDialog extends JDialog {
 		add(label, BorderLayout.NORTH);
 
 		// Load external oracles from the testar/bin/oracles path
-		List<String> availableOracles = OracleSelection.getExternalOracleFileNames();
+		List<String> availableOracles = OracleSelection.getAvailableOracleNames();
 		Collections.sort(availableOracles);
 
 		// Load activated oracles from settings
