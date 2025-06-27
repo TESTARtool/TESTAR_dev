@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "suts/binary.html"
+SUTConnectorValue = "suts/Archief/binary.html"
 
 #################################################################
 # Sequences
@@ -100,7 +100,7 @@ ProcessesToKillDuringTest =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = webdriver_rascal_binary/Protocol_webdriver_rascal_binary
+ProtocolClass = webdriver_rascal_archief/Protocol_webdriver_rascal_archief
 
 #################################################################
 # State model inference settings

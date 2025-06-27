@@ -54,7 +54,7 @@ import static org.testar.monkey.alayer.Tags.Enabled;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
-public class Protocol_webdriver_rascal_binary extends WebdriverProtocol {
+public class Protocol_webdriver_rascal_archief extends WebdriverProtocol {
 
 	// This list tracks the detected erroneous verdicts to avoid duplicates
 	private List<String> listOfDetectedErroneousVerdicts = new ArrayList<>();

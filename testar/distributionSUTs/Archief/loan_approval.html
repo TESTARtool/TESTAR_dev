@@ -1,0 +1,101 @@
+<html>
+    <head>
+        <link href="https://cdn.simplecss.org/simple.min.css" rel="stylesheet">
+        <script src="loan_approval.js"></script>
+        <script>document.addEventListener("DOMContentLoaded", function() { $update(); });</script>
+        <title>Loan Approval</title>
+    </head>
+    <body>
+        <h2>Loan Approval</h2>
+        <div id="fullName_div_25">
+            <label>What is your full name?</label><input onchange="$update('fullName', event.target.value);" type="text" id="fullName_widget_25">
+        </div>
+        <div id="age_div_70">
+            <label>How old are you?</label><input onchange="$update('age', Math.floor(Number(event.target.value)));" type="number" id="age_widget_70">
+        </div>
+        <div id="hasLicense_div_104">
+            <label>Do you have a driver's license?</label><input onclick="$update('hasLicense', event.target.checked);" type="checkbox" id="hasLicense_widget_104">
+        </div>
+        <div id="inSchool_div_183">
+            <label>Are you currently in school?</label><input onclick="$update('inSchool', event.target.checked);" type="checkbox" id="inSchool_widget_183">
+        </div>
+        <div id="grade_div_258">
+            <label>What is your current grade?</label><input onchange="$update('grade', Math.floor(Number(event.target.value)));" type="number" id="grade_widget_258">
+        </div>
+        <div id="employed_div_360">
+            <label>Are you currently employed?</label><input onclick="$update('employed', event.target.checked);" type="checkbox" id="employed_widget_360">
+        </div>
+        <div id="jobTitle_div_445">
+            <label>What is your job title?</label><input onchange="$update('jobTitle', event.target.value);" type="text" id="jobTitle_widget_445">
+        </div>
+        <div id="yearsInJob_div_496">
+            <label>How many years have you worked in your current job?</label><input onchange="$update('yearsInJob', Math.floor(Number(event.target.value)));" type="number" id="yearsInJob_widget_496">
+        </div>
+        <div id="monthlySalary_div_578">
+            <label>What is your monthly salary?</label><input onchange="$update('monthlySalary', Math.floor(Number(event.target.value)));" type="number" id="monthlySalary_widget_578">
+        </div>
+        <div id="monthlyExpenses_div_640">
+            <label>What is your total monthly expenses?</label><input onchange="$update('monthlyExpenses', Math.floor(Number(event.target.value)));" type="number" id="monthlyExpenses_widget_640">
+        </div>
+        <div id="annualSavings_div_713">
+            <label>Your annual savings</label><input type="number" id="annualSavings_widget_713" disabled="true">
+        </div>
+        <div id="lookingForJob_div_822">
+            <label>Are you actively looking for a job?</label><input onclick="$update('lookingForJob', event.target.checked);" type="checkbox" id="lookingForJob_widget_822">
+        </div>
+        <div id="retired_div_910">
+            <label>Are you retired?</label><input onclick="$update('retired', event.target.checked);" type="checkbox" id="retired_widget_910">
+        </div>
+        <div id="yearsRetired_div_975">
+            <label>How long have you been retired?</label><input onchange="$update('yearsRetired', Math.floor(Number(event.target.value)));" type="number" id="yearsRetired_widget_975">
+        </div>
+        <div id="annualPension_div_1039">
+            <label>What is your annual pension?</label><input onchange="$update('annualPension', Math.floor(Number(event.target.value)));" type="number" id="annualPension_widget_1039">
+        </div>
+        <div id="healthcareExpenses_div_1101">
+            <label>What is your annual healthcare expense?</label><input onchange="$update('healthcareExpenses', Math.floor(Number(event.target.value)));" type="number" id="healthcareExpenses_widget_1101">
+        </div>
+        <div id="netPension_div_1180">
+            <label>Net annual pension after healthcare</label><input type="number" id="netPension_widget_1180" disabled="true">
+        </div>
+        <div id="seniorDiscount_div_1296">
+            <label>Are you eligible for a senior citizen discount?</label><input type="checkbox" id="seniorDiscount_widget_1296" disabled="true">
+        </div>
+        <div id="income_div_1398">
+            <label>What is your annual income?</label><input onchange="$update('income', Math.floor(Number(event.target.value)));" type="number" id="income_widget_1398">
+        </div>
+        <div id="monthlyDebts_div_1446">
+            <label>What are your monthly debts?</label><input onchange="$update('monthlyDebts', Math.floor(Number(event.target.value)));" type="number" id="monthlyDebts_widget_1446">
+        </div>
+        <div id="hasCoSigner_div_1501">
+            <label>Do you have a co-signer for loans?</label><input onclick="$update('hasCoSigner', event.target.checked);" type="checkbox" id="hasCoSigner_widget_1501">
+        </div>
+        <div id="loanAmount_div_1564">
+            <label>Desired loan amount</label><input onchange="$update('loanAmount', Math.floor(Number(event.target.value)));" type="number" id="loanAmount_widget_1564">
+        </div>
+        <div id="interestRate_div_1608">
+            <label>Loan interest rate (percentage)</label><input onchange="$update('interestRate', Math.floor(Number(event.target.value)));" type="number" id="interestRate_widget_1608">
+        </div>
+        <div id="loanTerm_div_1666">
+            <label>Loan term (years)</label><input onchange="$update('loanTerm', Math.floor(Number(event.target.value)));" type="number" id="loanTerm_widget_1666">
+        </div>
+        <div id="totalInterest_div_1709">
+            <label>Total interest to be paid</label><input type="number" id="totalInterest_widget_1709" disabled="true">
+        </div>
+        <div id="totalRepayment_div_1809">
+            <label>Total amount to be repaid</label><input type="number" id="totalRepayment_widget_1809" disabled="true">
+        </div>
+        <div id="monthlyPayment_div_1892">
+            <label>Your monthly loan payment</label><input type="number" id="monthlyPayment_widget_1892" disabled="true">
+        </div>
+        <div id="loanApproved_div_1984">
+            <label>Loan approval status</label><input type="checkbox" id="loanApproved_widget_1984" disabled="true">
+        </div>
+        <div id="approvalMessage_div_2114">
+            <label>Congratulations! Your loan has been approved.</label><input type="text" id="approvalMessage_widget_2114" disabled="true">
+        </div>
+        <div id="not_approvalMessage_div_2214">
+            <label>Unfortunately, your loan application was not successful.</label><input type="text" id="not_approvalMessage_widget_2214" disabled="true">
+        </div>
+    </body>
+</html>

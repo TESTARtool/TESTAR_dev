@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <link href="https://cdn.simplecss.org/simple.min.css" rel="stylesheet">
+        <script src="tax.js"></script>
+        <script>document.addEventListener("DOMContentLoaded", function() { $update(); });</script>
+        <title>Tax Office example</title>
+    </head>
+    <body>
+        <h2>Tax Office example</h2>
+        <div id="hasBoughtHouse_div_31">
+            <label>Did you buy a house in 2010?</label><input onclick="$update('hasBoughtHouse', event.target.checked);" type="checkbox" id="hasBoughtHouse_widget_31">
+        </div>
+        <div id="hasMaintLoan_div_95">
+            <label>Did you enter a loan?</label><input onclick="$update('hasMaintLoan', event.target.checked);" type="checkbox" id="hasMaintLoan_widget_95">
+        </div>
+        <div id="hasSoldHouse_div_152">
+            <label>Did you sell a house in 2010?</label><input onclick="$update('hasSoldHouse', event.target.checked);" type="checkbox" id="hasSoldHouse_widget_152">
+        </div>
+        <div id="sellingPrice_div_244">
+            <label>What was the selling price?</label><input onchange="$update('sellingPrice', Math.floor(Number(event.target.value)));" type="number" id="sellingPrice_widget_244">
+        </div>
+        <div id="privateDebt_div_306">
+            <label>Private debts for the sold house:</label><input onchange="$update('privateDebt', Math.floor(Number(event.target.value)));" type="number" id="privateDebt_widget_306">
+        </div>
+        <div id="valueResidue_div_373">
+            <label>Value residue:</label><input type="number" id="valueResidue_widget_373" disabled="true">
+        </div>
+    </body>
+</html>

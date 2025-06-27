@@ -1,0 +1,47 @@
+<html>
+    <head>
+        <link href="https://cdn.simplecss.org/simple.min.css" rel="stylesheet">
+        <script src="widgets.js"></script>
+        <script>document.addEventListener("DOMContentLoaded", function() { $update(); });</script>
+        <title>Widgets</title>
+    </head>
+    <body>
+        <h2>Widgets</h2>
+        <div id="booleanWidget_div_21">
+            <label for="booleanWidget_widget_21">boolean</label><input onclick="$update('booleanWidget', event.target.checked);" type="checkbox" id="booleanWidget_widget_21">
+        </div>
+        <div id="integerWidget_div_58">
+            <label for="integerWidget_widget_58">integer</label><input onchange="$update('integerWidget', Math.floor(Number(event.target.value)));" type="number" id="integerWidget_widget_58">
+        </div>
+        <div id="stringWidget_div_95">
+            <label for="stringWidget_widget_95">string</label><input onchange="$update('stringWidget', event.target.value);" type="text" id="stringWidget_widget_95">
+        </div>
+        <div id="colorWidget_div_130">
+            <label for="colorWidget_widget_130">color</label><input onchange="$update('colorWidget', event.target.value);" type="color" id="colorWidget_widget_130">
+        </div>
+        <div id="dateWidget_div_161">
+            <label for="dateWidget_widget_161">date</label><input onchange="$update('dateWidget', event.target.value);" type="date" id="dateWidget_widget_161">
+        </div>
+        <div id="weekWidget_div_189">
+            <label for="weekWidget_widget_189">week</label><input onchange="$update('weekWidget', event.target.value);" type="week" id="weekWidget_widget_189">
+        </div>
+        <div id="monthWidget_div_217">
+            <label for="monthWidget_widget_217">month</label><input onchange="$update('monthWidget', event.target.value);" type="month" id="monthWidget_widget_217">
+        </div>
+        <div id="timeWidget_div_248">
+            <label for="timeWidget_widget_248">time</label><input onchange="$update('timeWidget', event.target.value);" type="time" id="timeWidget_widget_248">
+        </div>
+        <div id="rangeWidget_div_276">
+            <label for="rangeWidget_widget_276">range</label><input max="100" step="10" onchange="$update('rangeWidget', Math.floor(Number(event.target.value)));" min="1" type="range" id="rangeWidget_widget_276">
+        </div>
+        <div id="oneOfWidget_div_319">
+            <label for="oneOfWidget_widget_319">one-of</label><select onchange="$update('oneOfWidget', event.target.value);" id="oneOfWidget_widget_319"><option value="Blue">Blue</option><option value="Pink">Pink</option><option value="Black">Black</option></select>
+        </div>
+        <div id="moreOfWidget_div_377">
+            <label for="moreOfWidget_widget_377">more-of</label><select onchange="$update('moreOfWidget', event.target.value);" multiple="true" id="moreOfWidget_widget_377"><option value="Volvo">Volvo</option><option value="Saab">Saab</option><option value="Opel">Opel</option><option value="Audi">Audi</option></select>
+        </div>
+        <div id="blue_div_484">
+            <label for="blue_widget_484">Which blue?</label><select onchange="$update('blue', event.target.value);" id="blue_widget_484"><option value="Light">Light</option><option value="Dark">Dark</option><option value="Marine">Marine</option></select>
+        </div>
+    </body>
+</html>

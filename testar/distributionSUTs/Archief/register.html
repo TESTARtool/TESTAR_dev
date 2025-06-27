@@ -1,0 +1,38 @@
+<html>
+    <head>
+        <link href="https://cdn.simplecss.org/simple.min.css" rel="stylesheet">
+        <script src="register.js"></script>
+        <script>document.addEventListener("DOMContentLoaded", function() { $update(); });</script>
+        <title>Registration</title>
+    </head>
+    <body>
+        <h2>Registration</h2>
+        <div id="days_div_27">
+            <label>How many days do you attend?</label><input onchange="$update('days', Math.floor(Number(event.target.value)));" type="number" id="days_widget_27">
+        </div>
+        <div id="acm_div_77">
+            <label>Are you an ACM member?</label><input onclick="$update('acm', event.target.checked);" type="checkbox" id="acm_widget_77">
+        </div>
+        <div id="student_div_119">
+            <label>Are you a student?</label><input onclick="$update('student', event.target.checked);" type="checkbox" id="student_widget_119">
+        </div>
+        <div id="price_div_161">
+            <label>Day price</label><input type="number" id="price_widget_161" disabled="true">
+        </div>
+        <div id="discount_div_228">
+            <label>Discount</label><input type="number" id="discount_widget_228" disabled="true">
+        </div>
+        <div id="discount_div_288">
+            <label>Discount</label><input type="number" id="discount_widget_288" disabled="true">
+        </div>
+        <div id="discount_div_354">
+            <label>Discount</label><input type="number" id="discount_widget_354" disabled="true">
+        </div>
+        <div id="discount_div_406">
+            <label>Discount</label><input type="number" id="discount_widget_406" disabled="true">
+        </div>
+        <div id="pay_div_444">
+            <label>You have to pay:</label><input type="number" id="pay_widget_444" disabled="true">
+        </div>
+    </body>
+</html>

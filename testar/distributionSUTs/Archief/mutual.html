@@ -1,0 +1,20 @@
+<html>
+    <head>
+        <link href="https://cdn.simplecss.org/simple.min.css" rel="stylesheet">
+        <script src="mutual.js"></script>
+        <script>document.addEventListener("DOMContentLoaded", function() { $update(); });</script>
+        <title>Mutual exclusion</title>
+    </head>
+    <body>
+        <h2>Mutual exclusion</h2>
+        <div id="num_div_31">
+            <label>A number</label><input onchange="$update('num', Math.floor(Number(event.target.value)));" type="number" id="num_widget_31">
+        </div>
+        <div id="x_div_84">
+            <label>X</label><input onclick="$update('x', event.target.checked);" type="checkbox" id="x_widget_84">
+        </div>
+        <div id="x_div_134">
+            <label>X</label><input type="checkbox" id="x_widget_134" disabled="true">
+        </div>
+    </body>
+</html>
