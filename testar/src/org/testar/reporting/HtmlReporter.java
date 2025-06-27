@@ -81,6 +81,8 @@ public class HtmlReporter implements Reporting
 
         if(replay)  addReplayHeading();
         else        addGenerateHeading();
+
+        addVideoControls();
     }
 
     private void copyCentralHTML() {
@@ -103,6 +105,40 @@ public class HtmlReporter implements Reporting
         htmlReportUtil.addContent("<button id='reverseButton' onclick='reverse()'>Reverse order</button>");
         // Initialize the main div container to apply the reverse order
         htmlReportUtil.addContent("<div id='main' style='display:flex;flex-direction:column'>");
+    }
+
+    private void addVideoControls()
+    {
+        htmlReportUtil.addContent("<div>");
+        htmlReportUtil.addContent("	<div class='topVerdictBlock'>");
+        htmlReportUtil.addContent("	</div>");
+        htmlReportUtil.addContent("	<div class='controls'>");
+        htmlReportUtil.addContent("	  <button id='playPauseBtn' >Pause</button>");
+        htmlReportUtil.addContent("	  <button id='prevFrameBtn' >&lt; Prev</button>");
+        htmlReportUtil.addContent("	  <button id='nextFrameBtn' >&gt; Next</button>");
+        htmlReportUtil.addContent("	  <label>Speed:");
+        htmlReportUtil.addContent("		<select id='speedControl'>");
+        htmlReportUtil.addContent("		  <option value='2000'>0.5x</option>");
+        htmlReportUtil.addContent("		  <option value='1000' selected>1x</option>");
+        htmlReportUtil.addContent("		  <option value='500'>2x</option>");
+        htmlReportUtil.addContent("		  <option value='250'>4x</option>");
+        htmlReportUtil.addContent("		</select>");
+        htmlReportUtil.addContent("	  </label>");
+        htmlReportUtil.addContent("	  <input type='range' id='frameSlider' min='0' max='0' value='0' />");
+        htmlReportUtil.addContent("	</div>");
+        htmlReportUtil.addContent("");
+        htmlReportUtil.addContent("	<div class='video-block'>");
+        htmlReportUtil.addContent("	  <h2>State</h2>");
+        htmlReportUtil.addContent("	  <canvas id='stateCanvas' width='800' height='600'></canvas>");
+        htmlReportUtil.addContent("	  <div id='stateText'></div>");
+        htmlReportUtil.addContent("	</div>");
+        htmlReportUtil.addContent("	");
+        htmlReportUtil.addContent("	<div class='video-block'>");
+        htmlReportUtil.addContent("	  <h2>Previous action</h2>");
+        htmlReportUtil.addContent("	  <canvas id='prevActionCanvas' width='800' height='600'></canvas>");
+        htmlReportUtil.addContent("	  <div id='prevActionText'></div>");
+        htmlReportUtil.addContent("	</div>");
+        htmlReportUtil.addContent("</div>");
     }
 
     @Override
