@@ -41,6 +41,7 @@ import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
+import org.testar.monkey.alayer.webdriver.Constants;
 import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.WdElement;
 import org.testar.monkey.alayer.webdriver.WdWidget;
@@ -169,6 +170,9 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 //		Util.pause(30);
        }
 		super.initialize(settings);
+
+		// Deal with iframes when obtaining the JS state
+		Constants.ignoredTags = Arrays.asList( "script", "noscript", "head", "meta", "style", "link", "svg", "canvas", "iframe");
 	}
 
 
