@@ -112,7 +112,7 @@ public class HtmlHelper {
         scriptJoiner.add("");
         scriptJoiner.add("		const stateImg = stateFrames[frame];");
         scriptJoiner.add("");
-        scriptJoiner.add("		if (frame > 0)");
+        scriptJoiner.add("		if (frame > 0 && actionFrames.length > (frame-1))");
         scriptJoiner.add("		{");
         scriptJoiner.add("			prevActionImg = actionFrames[frame-1];");
         scriptJoiner.add("			prevActionTextDiv.style = '';");
