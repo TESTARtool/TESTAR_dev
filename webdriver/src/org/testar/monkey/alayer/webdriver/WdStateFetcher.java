@@ -155,10 +155,6 @@ public class WdStateFetcher implements Callable<WdState> {
   }
 
   private void createWidgetTree(WdWidget parent, WdElement element) {
-    if (!element.enabled) {
-      return;
-    }
-
     WdWidget w = parent.root().addChild(parent, element);
     element.backRef = w;
     
