@@ -710,7 +710,7 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      */
     protected Set<Action> retryDeriveAction(SUT system, int maxRetries, int waitingSeconds){
     	for(int i = 0; i < maxRetries; i++) {
-    		System.out.println("DEBUG: retryDeriveAction");
+    		System.out.println("Wait and retry to derive GUI actions...");
     		Util.pause(waitingSeconds);
     		State newState = getState(system);
     		Set<Action> newActions = deriveActions(system, newState);

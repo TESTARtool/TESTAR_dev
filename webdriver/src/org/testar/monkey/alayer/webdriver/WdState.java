@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -282,6 +282,9 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(WdTags.WebDisplay)) {
 			ret = w.element.display;
 		}
+		else if (t.equals(WdTags.WebComputedFontSize)) {
+			ret = w.element.computedFontSize;
+		}
 		else if (t.equals(WdTags.WebType)) {
 			ret = w.element.type;
 		}
@@ -314,6 +317,9 @@ public final class WdState extends WdWidget implements State {
 		}
 		else if (t.equals(WdTags.WebOuterHTML)) {
 			ret = w.element.outerHTML;
+		}
+		else if (t.equals(WdTags.WebPlaceholder)) {
+			ret = w.element.placeholder;
 		}
 		else if (t.equals(WdTags.WebElementSelenium)) {
 			ret = w.element.remoteWebElement;

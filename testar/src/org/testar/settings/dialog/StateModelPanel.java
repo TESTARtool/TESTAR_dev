@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2017 - 2024 Open Universiteit - www.ou.nl
-* Copyright (c) 2017 - 2024 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2017 - 2025 Open Universiteit - www.ou.nl
+* Copyright (c) 2017 - 2025 Universitat Politecnica de Valencia - www.upv.es
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -33,6 +33,8 @@ package org.testar.settings.dialog;
 
 import org.testar.CodingManager;
 import org.testar.StateManagementTags;
+
+import org.testar.statemodel.StateModelTags;
 import org.testar.statemodel.analysis.AnalysisManager;
 import org.testar.statemodel.analysis.webserver.JettyServer;
 import org.testar.statemodel.persistence.orientdb.entity.Config;
@@ -138,9 +140,9 @@ public class StateModelPanel extends SettingsPanel {
 
         // add the components to the panel
         setLayout(null);
-        label1.setBounds(10,14,150,27);
+        label1.setBounds(10, 14, 150, 27);
         add(label1);
-        stateModelEnabledChkBox.setBounds(160,14,50,27);
+        stateModelEnabledChkBox.setBounds(160, 14, 50, 27);
         stateModelEnabledChkBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -153,14 +155,14 @@ public class StateModelPanel extends SettingsPanel {
         });
         add(stateModelEnabledChkBox);
 
-        label2.setBounds(10,52,150,27);
+        label2.setBounds(10, 52, 150, 27);
         add(label2);
-        dataStoreTextfield.setBounds(160,52,125,27);
+        dataStoreTextfield.setBounds(160, 52, 125, 27);
         add(dataStoreTextfield);
 
-        label3.setBounds(10,90,150,27);
+        label3.setBounds(10, 90, 150, 27);
         add(label3);
-        dataStoreTypeBox.setBounds(160,90,125,27);
+        dataStoreTypeBox.setBounds(160, 90, 125, 27);
         dataStoreTypeBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -169,14 +171,14 @@ public class StateModelPanel extends SettingsPanel {
         });
         add(dataStoreTypeBox);
 
-        label4.setBounds(10,128,150,27);
+        label4.setBounds(10, 128, 150, 27);
         add(label4);
-        dataStoreServerTextfield.setBounds(160,128,125,27);
+        dataStoreServerTextfield.setBounds(160, 128, 125, 27);
         add(dataStoreServerTextfield);
 
-        label13.setBounds(10,166,150,27);
+        label13.setBounds(10, 166, 150, 27);
         add(label13);
-        dataStoreDirectoryField.setBounds(160,166,125,27);
+        dataStoreDirectoryField.setBounds(160, 166, 125, 27);
         dataStoreDirectoryField.setEditable(false);
         add(dataStoreDirectoryField);
 
@@ -185,24 +187,24 @@ public class StateModelPanel extends SettingsPanel {
         dirButton.setToolTipText("Select the 'databases' folder in your orientdb installation. Make sure the OrientDB server is not running.");
         add(dirButton);
 
-        label5.setBounds(10,204,150,27);
+        label5.setBounds(10, 204, 150, 27);
         add(label5);
-        dataStoreDBTextfield.setBounds(160,204,125,27);
+        dataStoreDBTextfield.setBounds(160, 204, 125, 27);
         add(dataStoreDBTextfield);
 
-        label6.setBounds(10,242,150,27);
+        label6.setBounds(10, 242, 150, 27);
         add(label6);
-        dataStoreUserTextfield.setBounds(160,242,125,27);
+        dataStoreUserTextfield.setBounds(160, 242, 125, 27);
         add(dataStoreUserTextfield);
 
-        label7.setBounds(10,280,150,27);
+        label7.setBounds(10, 280, 150, 27);
         add(label7);
-        dataStorePasswordfield.setBounds(160,280,125,27);
+        dataStorePasswordfield.setBounds(160, 280, 125, 27);
         add(dataStorePasswordfield);
 
-        label8.setBounds(10,318,150,27);
+        label8.setBounds(10, 318, 150, 27);
         add(label8);
-        dataStoreModeBox.setBounds(160,318,125,27);
+        dataStoreModeBox.setBounds(160, 318, 125, 27);
         add(dataStoreModeBox);
 
         // NEW COLUMN
@@ -211,13 +213,13 @@ public class StateModelPanel extends SettingsPanel {
         stateModelWidgetStoreChkBox.setBounds(480, 52, 50, 27);
         add(stateModelWidgetStoreChkBox);
 
-        label9.setBounds(330,128,150,27);
+        label9.setBounds(330,90,150,27);
         add(label9);
-        resetDatabaseCheckbox.setBounds(480, 128, 50, 27);
+        resetDatabaseCheckbox.setBounds(480, 90, 50, 27);
         resetDatabaseCheckbox.setToolTipText("This will reset the database. All stored information will be lost.");
         add(resetDatabaseCheckbox);
 
-        analysisButton.setBounds(330, 166, 150, 27);
+        analysisButton.setBounds(330, 128, 150, 27);
         analysisButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -227,7 +229,7 @@ public class StateModelPanel extends SettingsPanel {
         });
         add(analysisButton);
 
-        stateTagsButton.setBounds(330, 204, 150, 27);
+        stateTagsButton.setBounds(330, 166, 150, 27);
         stateTagsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -236,12 +238,12 @@ public class StateModelPanel extends SettingsPanel {
         });
         add(stateTagsButton);
 
-        label15.setBounds(330,242,100,27);
+        label15.setBounds(330, 204, 100, 27);
         add(label15);
-        actionSelectionBox.setBounds(430, 242,175,27);
+        actionSelectionBox.setBounds(430, 204, 175, 27);
         add(actionSelectionBox);
 
-        label14.setBounds(330, 280, 300, 27);
+        label14.setBounds(330, 242, 300, 27);
         add(label14);
 
     }
@@ -251,22 +253,22 @@ public class StateModelPanel extends SettingsPanel {
      * @param settings The settings to load.
      */
     public void populateFrom(final Settings settings) {
-        stateModelEnabledChkBox.setSelected(settings.get(ConfigTags.StateModelEnabled));
-        stateModelWidgetStoreChkBox.setSelected(settings.get(ConfigTags.StateModelStoreWidgets));
-        dataStoreTextfield.setText(settings.get(ConfigTags.DataStore));
-        dataStoreServerTextfield.setText(settings.get(ConfigTags.DataStoreServer));
-        dataStoreDirectoryField.setText(settings.get(ConfigTags.DataStoreDirectory));
-        dataStoreDBTextfield.setText(settings.get(ConfigTags.DataStoreDB));
-        dataStoreUserTextfield.setText(settings.get(ConfigTags.DataStoreUser));
-        dataStorePasswordfield.setText(settings.get(ConfigTags.DataStorePassword));
+        stateModelEnabledChkBox.setSelected(settings.get(StateModelTags.StateModelEnabled));
+        stateModelWidgetStoreChkBox.setSelected(settings.get(StateModelTags.StateModelStoreWidgets));
+        dataStoreTextfield.setText(settings.get(StateModelTags.DataStore));
+        dataStoreServerTextfield.setText(settings.get(StateModelTags.DataStoreServer));
+        dataStoreDirectoryField.setText(settings.get(StateModelTags.DataStoreDirectory));
+        dataStoreDBTextfield.setText(settings.get(StateModelTags.DataStoreDB));
+        dataStoreUserTextfield.setText(settings.get(StateModelTags.DataStoreUser));
+        dataStorePasswordfield.setText(settings.get(StateModelTags.DataStorePassword));
         for (int i =0; i < dataStoreModeBox.getItemCount(); i++) {
-            if (dataStoreModeBox.getItemAt(i).equals(settings.get(ConfigTags.DataStoreMode))) {
+            if (dataStoreModeBox.getItemAt(i).equals(settings.get(StateModelTags.DataStoreMode))) {
                 dataStoreModeBox.setSelectedIndex(i);
                 break;
             }
         }
         for (int i=0; i < dataStoreTypeBox.getItemCount(); i++) {
-            if (dataStoreTypeBox.getItemAt(i).equals(settings.get(ConfigTags.DataStoreType))) {
+            if (dataStoreTypeBox.getItemAt(i).equals(settings.get(StateModelTags.DataStoreType))) {
                 dataStoreTypeBox.setSelectedIndex(i);
             }
         }
@@ -291,7 +293,7 @@ public class StateModelPanel extends SettingsPanel {
         }
 
         // for now, only two options, so we'll do this the quick and easy way, without creating a list model
-        String currentAlgorithm = settings.get(ConfigTags.ActionSelectionAlgorithm);
+        String currentAlgorithm = settings.get(StateModelTags.ActionSelectionAlgorithm);
         for (int i =0; i < actionSelectionBox.getItemCount(); i++) {
             if (actionSelectionBox.getItemAt(i).equals("Random selection") && currentAlgorithm.equals("random")) {
                 actionSelectionBox.setSelectedIndex(i);
@@ -310,25 +312,25 @@ public class StateModelPanel extends SettingsPanel {
      * @param settings reference to the object where the settings will be stored.
      */
     public void extractInformation(final Settings settings) {
-        settings.set(ConfigTags.StateModelEnabled, stateModelEnabledChkBox.isSelected());
-        settings.set(ConfigTags.StateModelStoreWidgets, stateModelWidgetStoreChkBox.isSelected());
-        settings.set(ConfigTags.DataStore, dataStoreTextfield.getText());
-        settings.set(ConfigTags.DataStoreServer, dataStoreServerTextfield.getText());
-        settings.set(ConfigTags.DataStoreDirectory, dataStoreDirectoryField.getText());
-        settings.set(ConfigTags.DataStoreDB, dataStoreDBTextfield.getText());
-        settings.set(ConfigTags.DataStoreUser, dataStoreUserTextfield.getText());
-        settings.set(ConfigTags.DataStorePassword, getPassword());
-        settings.set(ConfigTags.DataStoreMode, (String)dataStoreModeBox.getSelectedItem());
-        settings.set(ConfigTags.DataStoreType, (String)dataStoreTypeBox.getSelectedItem());
-        settings.set(ConfigTags.ResetDataStore, resetDatabaseCheckbox.isSelected());
+        settings.set(StateModelTags.StateModelEnabled, stateModelEnabledChkBox.isSelected());
+        settings.set(StateModelTags.StateModelStoreWidgets, stateModelWidgetStoreChkBox.isSelected());
+        settings.set(StateModelTags.DataStore, dataStoreTextfield.getText());
+        settings.set(StateModelTags.DataStoreServer, dataStoreServerTextfield.getText());
+        settings.set(StateModelTags.DataStoreDirectory, dataStoreDirectoryField.getText());
+        settings.set(StateModelTags.DataStoreDB, dataStoreDBTextfield.getText());
+        settings.set(StateModelTags.DataStoreUser, dataStoreUserTextfield.getText());
+        settings.set(StateModelTags.DataStorePassword, getPassword());
+        settings.set(StateModelTags.DataStoreMode, (String)dataStoreModeBox.getSelectedItem());
+        settings.set(StateModelTags.DataStoreType, (String)dataStoreTypeBox.getSelectedItem());
+        settings.set(StateModelTags.ResetDataStore, resetDatabaseCheckbox.isSelected());
         settings.set(ConfigTags.AbstractStateAttributes, Arrays.stream(selectedStateManagementTags).map(StateManagementTags::getSettingsStringFromTag).collect(Collectors.toList()));
         switch ((String) actionSelectionBox.getSelectedItem()) {
             case "Unvisited actions first":
-                settings.set(ConfigTags.ActionSelectionAlgorithm, "unvisited");
+                settings.set(StateModelTags.ActionSelectionAlgorithm, "unvisited");
                 break;
 
             default:
-                settings.set(ConfigTags.ActionSelectionAlgorithm, "random");
+                settings.set(StateModelTags.ActionSelectionAlgorithm, "random");
         }
     }
 
@@ -390,12 +392,12 @@ public class StateModelPanel extends SettingsPanel {
         	if(de.getCause() != null && de.getCause().getMessage() != null && de.getCause().getMessage().contains("Cannot create a connection")) {
         		popupMessage(de.getCause().getMessage());
         		return;
-        	} 
+        	}
         	// If the database does not exists
         	else if(de.getMessage() != null && de.getMessage().contains("Cannot open database")) {
         		popupMessage(de.getMessage());
         		return;
-        	} 
+        	}
         	// Not expected exception, throw trace in the console
         	else {
         		de.printStackTrace();
@@ -406,7 +408,7 @@ public class StateModelPanel extends SettingsPanel {
         	if(se.getMessage() != null && se.getMessage().contains("User or password not valid")) {
         		popupMessage(se.getMessage());
         		return;
-        	} 
+        	}
         	// Not expected exception, throw trace in the console
         	else {
         		se.printStackTrace();

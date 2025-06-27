@@ -1,8 +1,8 @@
 ## TESTAR Scriptless testing tool
 
-[![Gradle CI tests](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/gradle.yml/badge.svg)](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/gradle.yml)
-[![Docker Build](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/docker.yml/badge.svg)](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/docker.yml)
-[![Release](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/release.yml/badge.svg)](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/release.yml)
+[![Gradle CI tests](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/test-windows.yml/badge.svg)](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/test-windows.yml)
+[![Docker Build](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/release-docker.yml/badge.svg)](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/release-docker.yml)
+[![Release](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/release-distribution.yml/badge.svg)](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/release-distribution.yml)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
 This is the github development root folder for TESTAR development.  
@@ -193,13 +193,16 @@ If you encounter any errors, please create an issue and provide details about yo
 
 ### Ubuntu (For Web systems under test)
 
-- Ubuntu 20 and 22 LTS are operating system versions that have been used to run the chromedriver package of TESTAR for testing web applications.  
-``NOTE:`` It is important to use an environment with Graphical User Interface or to install and enable the Xvfb (X virtual framebuffer) server.  
+- Ubuntu 22 LTS are operating system versions that have been used to run the webdriver package of TESTAR for testing web applications.  
+``GUI testing NOTE:`` It is important to use an environment with Graphical User Interface or to install and enable the Xvfb (X virtual framebuffer) server.  
+``Chrome NOTE2`` Chrome for testing requires additional runtime libraries, such as`libasound2` library.  
 
-### macOS (For Web systems under test)
+- Ubuntu 24 LTS introduces updated libraries, and `libasound2` is now replaced by `libasound2t64`. Be sure to install this newer package to ensure Chrome runs correctly. 
 
-- macOS Monterey-ADM64 (version 12) and Sonoma-ARM (version 14) operating systems have been used in the GitHub Action to run the chromedriver package of TESTAR for testing web applications.  
-``NOTE:`` The ADM64 and ARM architectures require different software components, such as seleniarm docker images and chromedriver arm versions.   
+### Temporally unsupported: macOS (For Web systems under test)
+
+- macOS Monterey-ADM64 (version 12) and Sonoma-ARM (version 14) operating systems have been used in the GitHub Action to run the webdriver package of TESTAR for testing web applications.  
+``NOTE:`` The ADM64 and ARM architectures require different software components, such as seleniarm docker images and webdriver arm versions.   
 
 ### Android
 

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2024 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -38,8 +38,6 @@ import org.testar.managers.NativeHookManager;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Canvas;
 import org.testar.monkey.alayer.Color;
-import org.testar.monkey.alayer.Shape;
-import org.testar.monkey.alayer.Visualizer;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.ActivateSystem;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
@@ -145,7 +143,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected List<ProcessInfo> contextRunningProcesses = null;
 	protected static final String            DATE_FORMAT             = "yyyy-MM-dd HH:mm:ss";
 	protected static final Logger INDEXLOG = LogManager.getLogger();
-	protected double passSeverity = Verdict.SEVERITY_OK;
 
 	protected State latestState;
 	public static Action lastExecutedAction = null;
@@ -258,37 +255,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			we.printStackTrace();
 
 			this.mode = Modes.Quit;
-		}catch(SessionNotCreatedException e) {
-    		if(e.getMessage()!=null && e.getMessage().contains("Chrome version")) {
-
-    			String msg = "*** Unsupported versions exception: Chrome browser and Selenium WebDriver versions *** \n"
-    					+ "Please verify your Chrome browser version: chrome://settings/help \n"
-    					+ "And download the appropriate ChromeDriver version: https://chromedriver.chromium.org/downloads \n"
-    					+ "\n"
-						//TODO check when implementing other webdriver than chromedriver
-						//TODO remove when automatically killing webdriver process when creating the session fails
-    					+ "As a result of this error, there is probably a \"chromedriver.exe\" process running. \n"
-    					+ "Please use Windows Task Manager to stop that process.";
-
-    			popupMessage(msg);
-    			System.out.println(msg);
-    			System.out.println(e.getMessage());
-    		}else {
-    			System.out.println("ERROR starting Selenium WebDriver");
-    			e.printStackTrace();
-    		}
-		}catch (IllegalStateException e) {
-			if (e.getMessage()!=null && e.getMessage().contains("driver executable does not exist")) {
-
-				String msg = "Exception: Check whether chromedriver.exe path: \n"
-				+settings.get(ConfigTags.SUTConnectorValue)
-				+"\n exists and is correctly defined";
-
-				popupMessage(msg);
-				System.out.println(msg);
-			}else {
-				e.printStackTrace();
-			}
 		}catch(SystemStartException SystemStartException) {
 			SystemStartException.printStackTrace();
 			this.mode = Modes.Quit;
@@ -330,7 +296,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			OutputStructure.createOutputFolders();
 
 			// new state model manager
-			stateModelManager = StateModelManagerFactory.getStateModelManager(settings);
+			stateModelManager = StateModelManagerFactory.getStateModelManager(
+					settings.get(ConfigTags.ApplicationName),
+					settings.get(ConfigTags.ApplicationVersion),
+					settings);
 		}
 
 		//EventHandler is implemented in RuntimeControlsProtocol (super class):
@@ -533,7 +502,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	void startTestSequence(SUT system) {
 		actionCount = 1;
 		lastSequenceActionNumber = settings().get(ConfigTags.SequenceLength) + actionCount - 1;
-		passSeverity = Verdict.SEVERITY_OK;
 		processVerdict = Verdict.OK;
 		this.cv = buildCanvas();
 	}
@@ -800,17 +768,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			faultySequence = true;
 			LogSerialiser.log("Detected fault: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
 			// this was added to kill the SUT if it is frozen:
-			if(verdict.severity() == Verdict.SEVERITY_NOT_RESPONDING)
+			if(verdict.severity() == Verdict.Severity.NOT_RESPONDING.getValue())
 			{
 				//if the SUT is frozen, we should kill it!
 				LogSerialiser.log("SUT frozen, trying to kill it!\n", LogSerialiser.LogLevel.Critical);
 				SystemProcessHandling.killRunningProcesses(system, 100);
 			}
-		}
-		else if(verdict.severity() != Verdict.SEVERITY_OK && verdict.severity() > passSeverity)
-		{
-			passSeverity = verdict.severity();
-			LogSerialiser.log("Detected warning: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
 		}
 
 		reportManager.addState(state);
@@ -823,19 +786,26 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * Take a Screenshot of the State and associate the path into state tag
 	 */
 	private void setStateScreenshot(State state) {
-		Shape viewPort = state.get(Tags.Shape, null);
-		if(viewPort != null){
+		// If the environment is not headless, take a screenshot
+		if (!GraphicsEnvironment.isHeadless()) {
+			AWTCanvas screenshot = null;
 			if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
-				state.set(Tags.ScreenshotPath, WdProtocolUtil.getStateshot(state));
+				screenshot = WdProtocolUtil.getStateshotBinary(state);
 			}
-			else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
-				state.set(Tags.ScreenshotPath, AndroidProtocolUtil.getStateshot(state));
+			else if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
+				screenshot = AndroidProtocolUtil.getStateshotBinary(state);
 			}
-			else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
-				state.set(Tags.ScreenshotPath, IOSProtocolUtil.getStateshot(state));
+			else if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
+				screenshot = IOSProtocolUtil.getStateshotBinary(state);
 			}
-			else{
-				state.set(Tags.ScreenshotPath, ProtocolUtil.getStateshot(state));
+			else {
+				screenshot = ProtocolUtil.getStateshotBinary(state);
+			}
+
+			if(screenshot != null) {
+				String screenshotPath = ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), screenshot);
+				state.set(Tags.ScreenshotImage, screenshot);
+				state.set(Tags.ScreenshotPath, screenshotPath);
 			}
 		}
 	}
@@ -849,11 +819,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		// if the SUT is not running and closed unexpectedly, we assume it crashed
 		if(!state.get(IsRunning, false))
-			return new Verdict(Verdict.SEVERITY_UNEXPECTEDCLOSE, "System is offline! Closed Unexpectedly! I assume it crashed!");
+			return new Verdict(Verdict.Severity.UNEXPECTEDCLOSE, "System is offline! Closed Unexpectedly! I assume it crashed!");
 
 		// if the SUT does not respond within a given amount of time, we assume it crashed
 		if(state.get(Tags.NotResponding, false)){
-			return new Verdict(Verdict.SEVERITY_NOT_RESPONDING, "System is unresponsive! I assume something is wrong!");
+			return new Verdict(Verdict.Severity.NOT_RESPONDING, "System is unresponsive! I assume something is wrong!");
 		}
 
 		//------------------------
@@ -867,14 +837,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		Verdict suspiciousValueVerdict = Verdict.OK;
 		for(Widget w : state) {
 			suspiciousValueVerdict = suspiciousStringValueMatcher(w);
-			if(suspiciousValueVerdict.severity() == Verdict.SEVERITY_SUSPICIOUS_TAG) {
+			if(suspiciousValueVerdict.severity() == Verdict.Severity.SUSPICIOUS_TAG.getValue()) {
 				return suspiciousValueVerdict;
 			}
 		}
 
 		if ( logOracleEnabled ) {
 			Verdict logVerdict = logOracle.getVerdict(state);
-			if ( logVerdict.severity() == Verdict.SEVERITY_SUSPICIOUS_LOG ) {
+			if ( logVerdict.severity() == Verdict.Severity.SUSPICIOUS_LOG.getValue() ) {
 				return logVerdict;
 			}
 		}
@@ -919,7 +889,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				// visualize the problematic widget, by marking it with a red box
 				if(w.get(Tags.Shape, null) != null)
 					visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Tag", 0.5, 0.5);
-				return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TAG,
+				return new Verdict(Verdict.Severity.SUSPICIOUS_TAG,
 						"Discovered suspicious widget '" + tagForSuspiciousOracle + "' : '" + tagValue + "'.", visualizer);
 			}
 		}
@@ -1026,10 +996,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		reportManager.addSelectedAction(state, action);
 
 		if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
-			//System.out.println("DEBUG: Using WebDriver specific action shot.");
 			WdProtocolUtil.getActionshot(state,action);
+		}else if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)){
+			AndroidProtocolUtil.getActionshot(state,action);
 		}else{
-			//System.out.println("DEBUG: normal action shot");
 			ProtocolUtil.getActionshot(state,action);
 		}
 

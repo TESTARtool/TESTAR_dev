@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2024 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -42,6 +42,7 @@ public final class ActionRoles {
 	public static final Role
 
 	Action = Role.from("Action"),
+	NOPAction = Role.from("NOPAction", Action),
 	MouseAction = Role.from("MouseAction", Action),
 	KeyboardAction = Role.from("KeyboardAction", Action),
 	CompoundAction = Role.from("CompoundAction", Action),

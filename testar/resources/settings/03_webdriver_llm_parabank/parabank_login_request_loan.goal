@@ -1,0 +1,5 @@
+As a user, I want to log in with the credentials john/demo
+Then the Welcome John Smith message is shown
+;
+As a user, I want to request a loan with an amount '999999', a down payment of '100', for the account '54321'
+Then the loan is denied due to insufficient funds

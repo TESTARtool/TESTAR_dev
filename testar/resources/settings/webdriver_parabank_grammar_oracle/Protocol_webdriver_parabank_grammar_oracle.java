@@ -158,11 +158,9 @@ public class Protocol_webdriver_parabank_grammar_oracle extends WebdriverProtoco
 		// GRAMMAR-BASED ORACLES
 		//-----------------------------------------------------------------------------
 		
-		
 		Verdict grammarVerdict = oracleManager.runOracles(state);
 		if(grammarVerdict != Verdict.OK && !containsVerdictInfo(listOfDetectedErroneousVerdicts, grammarVerdict.info()))
 			return grammarVerdict;
-		
 
 		//-----------------------------------------------------------------------------
 		// MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
@@ -330,7 +328,7 @@ public class Protocol_webdriver_parabank_grammar_oracle extends WebdriverProtoco
 		// If the final Verdict is not OK and the verdict is not saved in the list
 		// This is a new run fail verdict
 		Verdict finalVerdict = getVerdict(latestState);
-		if(finalVerdict.severity() > Verdict.SEVERITY_OK && !listOfDetectedErroneousVerdicts.contains(finalVerdict.info().replace("\n", " "))) {
+		if(finalVerdict.severity() > Verdict.Severity.OK.getValue() && !listOfDetectedErroneousVerdicts.contains(finalVerdict.info().replace("\n", " "))) {
 			listOfDetectedErroneousVerdicts.add(finalVerdict.info().replace("\n", " "));
 		}
 	}

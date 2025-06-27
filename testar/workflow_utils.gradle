@@ -1,0 +1,67 @@
+/**
+ * Utils tasks to prepare TESTAR dependencies using gradle
+ */
+ 
+task init_workflow_test(type: Copy) {
+    group = 'test_testar_workflow'
+    description ='init_workflow_test'
+    from 'resources/workflow/settings'
+    into 'target/scripts/settings'
+}
+
+// Download OrientDB 3.0.34 from the official wep page
+task downloadOrientDB(type: Download, dependsOn: installDist) {
+    src 'https://repo1.maven.org/maven2/com/orientechnologies/orientdb-community/3.0.34/orientdb-community-3.0.34.zip'
+    dest 'target/install/testar/bin'
+    overwrite false
+}
+
+// Verify that we downloaded the correct OrientDB file
+task verifyOrientDB(type: Verify, dependsOn: downloadOrientDB) {
+    src new File(downloadOrientDB.dest, 'orientdb-community-3.0.34.zip')
+    algorithm 'MD5'
+    checksum '37a87c9c8b3ed3778f6103b15c7e184b'
+}
+
+// Extract OrientDB binary files
+task downloadAndUnzipOrientDB(type: Copy, dependsOn: verifyOrientDB) {
+    group = 'test_testar_workflow'
+    description ='downloadAndUnzipOrientDB'
+    
+    from zipTree(new File(downloadOrientDB.dest, 'orientdb-community-3.0.34.zip'))
+    into downloadOrientDB.dest
+}
+
+// Execute a command line to create a testar OrientDB database with admin admin credentials
+task createDatabaseOrientDB(type: Exec, dependsOn: downloadAndUnzipOrientDB){
+    group = 'test_testar_workflow'
+    description ='createDatabaseOrientDB'
+    
+    // Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    errorOutput = new ByteArrayOutputStream()
+    workingDir 'target/install/testar/bin/orientdb-community-3.0.34/bin'
+    
+    if (System.getProperty('os.name').toLowerCase().contains('windows')) {
+        commandLine 'cmd', '/c', 'console.bat CREATE DATABASE plocal:../databases/testar admin admin'
+    } else {
+        commandLine 'bash', '-c', './console.sh CREATE DATABASE plocal:../databases/testar admin admin'
+    }
+
+    // Ignore errors creating the database because we check the output buffer message
+    ignoreExitValue true
+    doLast {
+        String output = standardOutput.toString()
+        
+        // If error creating database because already exists is ok
+        if (errorOutput.toString().contains("Cannot create new database 'testar' because it already exists")) {
+            println "\n${output} \ntestar OrientDB database already exists"
+        }
+        // Check if testar database created sucessfully
+        else if(output.readLines().any{line->line.contains("Database created successfully.")}) {
+            println "\n${output} \ntestar OrientDB database created successfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Creating testar OrientDB database")
+        }
+    }
+}

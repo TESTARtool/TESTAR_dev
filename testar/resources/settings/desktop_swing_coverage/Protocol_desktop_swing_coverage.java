@@ -165,7 +165,7 @@ public class Protocol_desktop_swing_coverage extends DesktopProtocol {
 
 		if(countEmptyStateTimes > 2) {
 			System.out.println("Seems that rachota SUT is not responding");
-			return new Verdict(Verdict.SEVERITY_NOT_RESPONDING, "Seems that rachota SUT is not responding");
+			return new Verdict(Verdict.Severity.NOT_RESPONDING, "Seems that rachota SUT is not responding");
 		}
 
 		return verdict;

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -99,55 +99,50 @@ public final class ConfigTags {
 	public static final Tag<String> ProtocolClass = Tag.from("ProtocolClass", String.class, 
 			"Indicate the location of the protocol class for your specific SUT");
 
-	/**
-	 * State Model settings 
-	 */
-
 	public static final Tag<String> ApplicationName = Tag.from("ApplicationName", String.class, 
-			"Name to identify the SUT. Especially important to identify a State Model");
+			"Name to identify the SUT.");
 
 	public static final Tag<String> ApplicationVersion = Tag.from("ApplicationVersion", String.class, 
-			"Version to identify the SUT. Especially important to identify a State Model");
-
-	public static final Tag<Boolean> StateModelEnabled = Tag.from("StateModelEnabled", Boolean.class, 
-			"Enable or disable the State Model feature");
-
-	public static final Tag<String> DataStore = Tag.from("DataStore", String.class, 
-			"The graph database we use to store the State Model: OrientDB");
-
-	public static final Tag<String> DataStoreType = Tag.from("DataStoreType", String.class, 
-			"The mode we use to connect to the database: remote or plocal");
-
-	public static final Tag<String> DataStoreServer = Tag.from("DataStoreServer", String.class, 
-			"IP address to connect if we desired to use remote mode");
-
-	public static final Tag<String> DataStoreDirectory = Tag.from("DataStoreDirectory", String.class, 
-			"Path of the directory on which local OrientDB exists, if we use plocal mode");
-
-	public static final Tag<String> DataStoreDB = Tag.from("DataStoreDB", String.class, 
-			"The name of the desired database on which we want to store the State Model.");
-
-	public static final Tag<String> DataStoreUser = Tag.from("DataStoreUser", String.class, 
-			"User credential to authenticate TESTAR in OrientDB");
-
-	public static final Tag<String> DataStorePassword = Tag.from("DataStorePassword", String.class, 
-			"Password credential to authenticate TESTAR in OrientDB");
-
-	public static final Tag<String> DataStoreMode = Tag.from("DataStoreMode", String.class, 
-			"Indicate how TESTAR should store the model objects in the database: instant, delayed, hybrid, none");
-
-	public static final Tag<String> ActionSelectionAlgorithm = Tag.from("ActionSelectionAlgorithm", String.class, 
-			"State Model Action Selection mechanism to explore the SUT: random or unvisited");
-
-	public static final Tag<Boolean> StateModelStoreWidgets = Tag.from("StateModelStoreWidgets", Boolean.class, 
-			"Save all widget tree information in the State Model every time TESTAR discovers a new Concrete State");
-
-	public static final Tag<Boolean> ResetDataStore = Tag.from("ResetDataStore", Boolean.class, 
-			"WARNING: Delete all existing State Models from the selected database before creating a new one");
+			"Version to identify the SUT.");
 
 	@SuppressWarnings("unchecked")
 	public static final Tag<List<String>> AbstractStateAttributes = Tag.from("AbstractStateAttributes", (Class<List<String>>) (Class<?>) List.class, 
 			"Specify the widget attributes that you wish to use in constructing the widget and state hash strings. Use a comma separated list.");
+
+	/**
+	 * Large Language Models settings 
+	 */
+
+	public static final Tag<String> LlmPlatform = Tag.from("LlmPlatform", String.class,
+			"The platform that hosts the LLM agent");
+
+	public static final Tag<String> LlmModel = Tag.from("LlmModel", String.class,
+			"The model used by the LLM agent");
+
+	public static final Tag<String> LlmHostUrl = Tag.from("LlmHostUrl", String.class,
+			"The Host URL on which the LLM agent is running");
+
+	public static final Tag<String> LlmAuthorizationHeader = Tag.from("LlmAuthorizationHeader", String.class, 
+			"The Authorization Header required by some LLM agents");
+
+	@SuppressWarnings("unchecked")
+	public static final Tag<List<String>> LlmTestGoals = Tag.from("LlmTestGoals", (Class<List<String>>) (Class<?>) List.class,
+			"The objective of the test for the LLM agent");
+
+	public static final Tag<String> LlmActionFewshotFile = Tag.from("LlmActionFewshotFile", String.class,
+			"The location of the action fewshot file that contains the prompt instructions");
+
+	public static final Tag<String> LlmOracleFewshotFile = Tag.from("LlmOracleFewshotFile", String.class,
+			"The location of the oracle fewshot file that contains the prompt instructions");
+
+	public static final Tag<Float> LlmTemperature = Tag.from("LlmTemperature", Float.class,
+			"Controls the randomness of the LLM output. Value between 0 and 2.");
+
+	public static final Tag<Integer> LlmHistorySize = Tag.from("LlmHistorySize", Integer.class,
+			"Controls how many historical actions are kept track of and sent to the LLM.");
+
+	public static final Tag<Boolean> LlmStateless = Tag.from("LlmStateless", Boolean.class,
+			"Generates individual prompts for each action and oracle LLM conversation.");
 
 	/**
 	 * WebDriver settings 
@@ -166,8 +161,11 @@ public final class ConfigTags {
 			"Indicate which web URL extensions need to be ignored when testing");
 
 	@SuppressWarnings("unchecked")
-	public static final Tag<List<String>> DomainsAllowed = Tag.from("DomainsAllowed", (Class<List<String>>) (Class<?>) List.class, 
-			"Indicate which web URL domains need to be ignored when testing");
+	public static final Tag<List<String>> WebDomainsAllowed = Tag.from("WebDomainsAllowed", (Class<List<String>>) (Class<?>) List.class, 
+			"Indicate which web URL domains are allowed to explore when testing");
+
+	public static final Tag<String> WebPathsAllowed = Tag.from("WebPathsAllowed", String.class, 
+			"Regular expressions to indicate which web URL paths are allowed to explore when testing");
 
 	public static final Tag<Boolean> FollowLinks = Tag.from("FollowLinks", Boolean.class, 
 			"Indicate if allowing to follow links opened in new tabs");
@@ -216,11 +214,17 @@ public final class ConfigTags {
 	public static final Tag<Boolean> JacocoCoverage = Tag.from("JacocoCoverage", Boolean.class,
 			"Sets whether to extract Jacoco Coverage");
 
+	public static final Tag<String> JacocoCoverageIpAddress = Tag.from("JacocoCoverageIpAddress", String.class, 
+			"The JMX IP Address on which the Jacoco Agent is running");
+
 	public static final Tag<Integer> JacocoCoveragePort = Tag.from("JacocoCoveragePort", Integer.class, 
 			"The JMX port on which the Jacoco Agent is running");
 
 	public static final Tag<String> JacocoCoverageClasses = Tag.from("JacocoCoverageClasses", String.class, 
 			"The SUT class files that Jacoco uses to create the CSV report");
+
+	public static final Tag<Boolean> JacocoCoverageAccumulate = Tag.from("JacocoCoverageAccumulate", Boolean.class,
+			"Sets whether Jacoco coverage will be accumulated across the run sequences");
 
 	/**
 	 * Additional settings with descriptions
@@ -317,6 +321,9 @@ public final class ConfigTags {
 	public static final Tag<Boolean> ReportInPlainText = Tag.from("ReportInPlainText", Boolean.class,
 			 "Sets whether to create a plain text report");
 
+	public static final Tag<String> ExtendedOracles = Tag.from("ExtendedOracles", String.class,
+			"Select extended oracles to be applied during runtime for testing");
+
 	/**
 	 * Other settings
 	 */
@@ -328,6 +335,9 @@ public final class ConfigTags {
 
 	@SuppressWarnings("unchecked")
 	public static final Tag<List<Pair<String, String>>> CopyFromTo = Tag.from("CopyFromTo", (Class<List<Pair<String, String>>>) (Class<?>) List.class);
+
+	public static final Tag<List<String>> SpyTagAttributes = Tag.from("SpyTagAttributes", (Class<List<String>>) (Class<?>) List.class,
+			"Specify the widget attributes that you wish to visualize during Spy Mode. Use a semicolon separated list.");
 
 	/*
 	//TODO web driver settings for login feature

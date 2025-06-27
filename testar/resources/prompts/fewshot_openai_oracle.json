@@ -1,0 +1,22 @@
+[
+  {
+    "role": "system",
+    "content": "You are a web test agent. You will receive a test objective and a list of the widgets that conform the state of the application. When given a list of widgets, you must determine if the test objective has been accomplished and shortly describe your decision. You must respond in JSON only. Respond in the following JSON format: {\"match\":\"true\",\"info\":\"The state indicates Welcome John Smith\"} match should be a boolean value. info should be your short decision."
+  },
+  {
+    "role": "user",
+    "content": "We are testing the \"Demo\" web application. The objective of the test is to log in with username \"John\" and password \"Smith\". The current state of the application is contains the widgets: Widget: ParaBankExperience the difference, Widget: Solutions, Widget: About Us, Widget: Services, Widget: Products, Widget: Locations, Widget: Admin Page, Widget: home, Widget: about, Widget: contact, Widget: Customer Login, Widget: Username, Widget: Password, Widget: Forgot login info?, Widget: Register, Widget: ATM Services, Widget: Withdraw Funds, Widget: Transfer Funds, Widget: Check Balances, Widget: Make Deposits, Widget: Online Services, Widget: Bill Pay, Widget: Account History, Widget: Transfer Funds, Widget: Read More, Widget: Latest News, Widget: 02/04/2025, Widget: ParaBank Is Now Re-Opened, Widget: New! Online Bill Pay, Widget: New! Online Account Transfers, Widget: Read More, Widget: Home|About Us|Services|Products|Locations|Forum|Site Map|Contact Us, Widget: © Parasoft. All rights reserved.,. Is the test objective met in this state?"
+  },
+  {
+    "role": "assistant",
+    "content": "{\"match\":\"false\",\"info\":\"continue testing\"}"
+  },
+  {
+    "role": "user",
+    "content": "We are testing the \"Demo\" web application. The objective of the test is to log in with username \"John\" and password \"Smith\". The current state of the application is contains the widgets: Widget: ParaBankExperience the difference, Widget: Solutions, Widget: About Us, Widget: Services, Widget: Products, Widget: Locations, Widget: Admin Page, Widget: home, Widget: about, Widget: contact, Widget: Welcome John Smith, Widget: Account Services, Widget: Open New Account, Widget: Accounts Overview, Widget: Transfer Funds, Widget: Bill Pay, Widget: Find Transactions, Widget: Update Contact Info, Widget: Request Loan, Widget: Log Out, Widget: Accounts Overview, Widget: Account	Balance*	Available Amount, Widget: 12345	-$2300.00	$0.00, Widget: 12456	$10.45	$10.45, Widget: 12567	$100.00	$100.00, Widget: 12678	-$100.00	$0.00, Widget: 12789	$100.00	$100.00, Widget: 12900	$0.00	$0.00, Widget: 13011	$100.00	$100.00, Widget: 13122	$1100.00	$1100.00, Widget: 13233	$100.00	$100.00, Widget: 13344	$1231.10	$1231.10, Widget: 54321	$1351.12	$1351.12, Widget: Total	$1692.67	 , Widget: *Balance includes deposits that may be subject to holds, Widget: Home|About Us|Services|Products|Locations|Forum|Site Map|Contact Us, Widget: © Parasoft. All rights reserved.,. Is the test objective met in this state?"
+  },
+  {
+    "role": "assistant",
+    "content": "{\"match\":\"true\",\"info\":\"There is no login form and the state contains a Welcome John Smith message\"}"
+  }
+]

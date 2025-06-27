@@ -35,8 +35,6 @@ import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
-import org.openqa.selenium.logging.LogType;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.monkey.*;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
@@ -55,6 +53,8 @@ import org.testar.serialisation.LogSerialiser;
 import org.testar.settings.Settings;
 
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -74,7 +74,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected static Set<String> existingCssClasses = new HashSet<>();
 
 	// WedDriver settings from file:
-	protected List<String> clickableClasses, typeableClasses, deniedExtensions, domainsAllowed;
+	protected List<String> clickableClasses, typeableClasses, deniedExtensions, webDomainsAllowed;
+	protected String webPathsAllowed;
 
 	// URL + form name, username input id + value, password input id + value
 	// Set login to null to disable this feature
@@ -115,7 +116,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		// Define a whitelist of allowed domains for links and pages
 		// An empty list will be filled with the domain from the sut connector
 		// Set to null to ignore this feature
-		domainsAllowed = settings.get(ConfigTags.DomainsAllowed).contains("null") ? null : settings.get(ConfigTags.DomainsAllowed);
+		webDomainsAllowed = settings.get(ConfigTags.WebDomainsAllowed).contains("null") ? null : settings.get(ConfigTags.WebDomainsAllowed);
+
+		// Regular expression string that indicates a whitelist of allowed web paths
+		webPathsAllowed = settings.get(ConfigTags.WebPathsAllowed).contains("null") ? null : settings.get(ConfigTags.WebPathsAllowed);
 
 		// If true, follow links opened in new tabs
 		// If false, stay with the original (ignore links opened in new tabs)
@@ -155,8 +159,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected SUT startSystem() throws SystemStartException {
     	SUT sut = super.startSystem();
 
-    	// Add the domain from the SUTConnectorValue to domainsAllowed List
-    	ensureDomainsAllowed();
+    	// Add the domain from the SUTConnectorValue to webDomainsAllowed List
+    	ensureWebDomainsAllowed();
 
     	// Check if TESTAR runs in Windows 10 to set webdriver browser handle identifier
     	setWindowHandleForWebdriverBrowser(sut);
@@ -292,20 +296,20 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected Verdict getVerdict(State state) {
     	Verdict stateVerdict = super.getVerdict(state);
 
+    	LogEntries logEntries = WdDriver.getBrowserLogs();
+
     	// If Web Console Error Oracle is enabled and we have some pattern to match
     	if(settings.get(ConfigTags.WebConsoleErrorOracle, false) && !settings.get(ConfigTags.WebConsoleErrorPattern, "").isEmpty()) {
     		// Load the web console error pattern
     		Pattern errorPattern = Pattern.compile(settings.get(ConfigTags.WebConsoleErrorPattern), Pattern.UNICODE_CHARACTER_CLASS);
     		// Check Severe messages in the WebDriver logs
-    		RemoteWebDriver driver = WdDriver.getRemoteWebDriver();
-    		LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
     		for(LogEntry logEntry : logEntries) {
     			if(logEntry.getLevel().equals(Level.SEVERE)) {
     				// Check if the severe error message matches with the web console error pattern
     				String consoleErrorMsg = logEntry.getMessage();
     				Matcher matcherError = errorPattern.matcher(consoleErrorMsg);
     				if(matcherError.matches()) {
-    					webConsoleVerdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TAG, "Web Browser Console Error: " + consoleErrorMsg);
+    					webConsoleVerdict = new Verdict(Verdict.Severity.SUSPICIOUS_TAG, "Web Browser Console Error: " + consoleErrorMsg);
     				}
     			}
     		}
@@ -318,15 +322,13 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     		// Load the web console warning pattern
     		Pattern warningPattern = Pattern.compile(settings.get(ConfigTags.WebConsoleWarningPattern), Pattern.UNICODE_CHARACTER_CLASS);
     		// Check Warning messages in the WebDriver logs
-    		RemoteWebDriver driver = WdDriver.getRemoteWebDriver();
-    		LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
     		for(LogEntry logEntry : logEntries) {
     			if(logEntry.getLevel().equals(Level.WARNING)) {
     				// Check if the warning message matches with the web console error pattern
     				String consoleWarningMsg = logEntry.getMessage();
     				Matcher matcherWarning = warningPattern.matcher(consoleWarningMsg);
     				if(matcherWarning.matches()) {
-    					webConsoleVerdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TAG, "Web Browser Console Warning: " + consoleWarningMsg);
+    					webConsoleVerdict = new Verdict(Verdict.Severity.SUSPICIOUS_TAG, "Web Browser Console Warning: " + consoleWarningMsg);
     				}
     			}
     		}
@@ -352,7 +354,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     		System.out.println(String.format("** URL: %s", WdDriver.getCurrentUrl()));
     		System.out.println("** Please try to navigate with SPY mode and configure clickableClasses inside Java protocol");
     		// Create and build the id of the HistoryBackAction
-    		Action histBackAction = new WdHistoryBackAction();
+    		Action histBackAction = new WdHistoryBackAction(state);
     		buildEnvironmentActionIdentifiers(state, histBackAction);
     		actions = new HashSet<>(Collections.singletonList(histBackAction));
     	}
@@ -416,7 +418,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 * Check the state if we need to force an action
 	 */
 	protected Set<Action> detectForcedActions(State state, StdActionCompiler ac) {
-		Set<Action> actions = detectForcedDeniedUrl();
+		Set<Action> actions = detectForcedDeniedUrl(state);
 		if (actions != null && actions.size() > 0) {
 			return actions;
 		}
@@ -509,18 +511,18 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	/*
 	 * Force back action due to disallowed domain or extension
 	 */
-	protected Set<Action> detectForcedDeniedUrl() {
+	protected Set<Action> detectForcedDeniedUrl(State state) {
 		String currentUrl = WdDriver.getCurrentUrl();
 
 		// Don't get caught in PDFs etc. and non-whitelisted domains
 		if (isUrlDenied(currentUrl) || isExtensionDenied(currentUrl)) {
 			// If opened in new tab, close it
 			if (WdDriver.getWindowHandles().size() > 1) {
-				return new HashSet<>(Collections.singletonList(new WdCloseTabAction()));
+				return new HashSet<>(Collections.singletonList(new WdCloseTabAction(state)));
 			}
 			// Single tab, go back to previous page
 			else {
-				return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
+				return new HashSet<>(Collections.singletonList(new WdHistoryBackAction(state)));
 			}
 		}
 
@@ -559,14 +561,30 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			return false;
 		}
 
-		// User wants to allow all
-		if (domainsAllowed == null) {
-			return false;
+		// Only allow pre-approved web domains
+		if(webDomainsAllowed != null 
+				&& !webDomainsAllowed.contains(getDomain(currentUrl))) {
+			return true;
 		}
 
-		// Only allow pre-approved domains
-		String domain = getDomain(currentUrl);
-		return !domainsAllowed.contains(domain);
+		// Only allow pre-approved web paths
+		if (webPathsAllowed != null 
+				&& !webPathsAllowed.isEmpty() 
+				// Empty web paths or generic / paths are allowed
+				&& !getPath(currentUrl).isEmpty()
+				&& !getPath(currentUrl).equals("/")) {
+
+			// Create a regex pattern from the allowed paths
+			Pattern pattern = Pattern.compile(webPathsAllowed);
+
+			// If the path does not match the allowed regex pattern, web url is denied
+			if (!pattern.matcher(getPath(currentUrl)).find()) {
+				return true;
+			}
+		}
+
+		// If no condition is meet, do not deny the url
+		return false;
 	}
 
 	/*
@@ -590,19 +608,34 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			return true;
 		}
 
-		// Not a web link (or link to the same domain), allow
-		if (!(linkUrl.startsWith("https://") || linkUrl.startsWith("http://"))) {
-			return false;
+		// For web links (e.g., https://para.testar.org/)
+		if ((linkUrl.startsWith("https://") || linkUrl.startsWith("http://"))) {
+			// Only allow pre-approved web domains (e.g., para.testar.org)
+			if(webDomainsAllowed != null 
+					&& !webDomainsAllowed.contains(getDomain(linkUrl))) {
+				return true;
+			}
 		}
 
-		// User wants to allow all
-		if (domainsAllowed == null) {
-			return false;
+		// Check if webPathsAllowed is not empty and valid
+		if (webPathsAllowed != null 
+				&& !webPathsAllowed.isEmpty()
+				&& !linkUrl.isEmpty()) {
+			// Create a regex pattern from the allowed paths
+			Pattern pattern = Pattern.compile(webPathsAllowed);
+
+			// When checking the allowed paths, 
+			// we need to transform possible relative urls to absolute urls
+			String absoluteUrl = resolveRelativeUrl(linkUrl, WdDriver.getCurrentUrl());
+
+			// If the path does not match the allowed regex pattern, web link is denied
+			if (!pattern.matcher(absoluteUrl).find()) {
+				return true;
+			}
 		}
 
-		// Only allow pre-approved domains if
-		String domain = getDomain(linkUrl);
-		return !domainsAllowed.contains(domain);
+		// If no condition is meet, do not deny the link
+		return false;
 	}
 
 	/*
@@ -623,34 +656,64 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	}
 
 	/*
-	 * If domainsAllowed from SUTConnectorValue is not set, include it in the domainsAllowed
+	 * Extracts the path from a URL.
 	 */
-	protected void ensureDomainsAllowed() {
-		try{
-			// Adding default domain from SUTConnectorValue if is not included in the domainsAllowed list
-			//TODO try-catch for nullpointer if sut connector missing
-			String[] parts = settings().get(ConfigTags.SUTConnectorValue).split(" ");
-			String sutConnectorUrl = parts[parts.length - 1].replace("\"", "");
+	protected String getPath(String url) {
+		try {
+			return new URL(url).getPath();
+		} catch (Exception e) {
+			return "";
+		}
+	}
 
-			if(domainsAllowed != null && !domainsAllowed.contains(getDomain(sutConnectorUrl))) {
-				System.out.println(String.format("WEBDRIVER INFO: Automatically adding %s SUT Connector domain to domainsAllowed List", getDomain(sutConnectorUrl)));
-				String[] newDomainsAllowed = domainsAllowed.stream().toArray(String[]::new);
-				domainsAllowed = Arrays.asList(ArrayUtils.insert(newDomainsAllowed.length, newDomainsAllowed, getDomain(sutConnectorUrl)));
-				System.out.println(String.format("domainsAllowed: %s", String.join(",", domainsAllowed)));
+	// Helper method to resolve relative URLs
+	private String resolveRelativeUrl(String relativeUrl, String baseUrl) {
+		try {
+			URL base = new URL(baseUrl);
+			URL absolute = new URL(base, relativeUrl);
+			return absolute.toString();
+		} catch (MalformedURLException e) {
+			// If resolving fails, return the original link
+			return relativeUrl;
+		}
+	}
+
+	/*
+	 * If webDomainsAllowed from SUTConnectorValue is not set, include it in the webDomainsAllowed
+	 */
+	protected void ensureWebDomainsAllowed() {
+		try{
+			// Adding default domain from SUTConnectorValue if is not included in the webDomainsAllowed list
+			String[] parts = settings().get(ConfigTags.SUTConnectorValue, "").split(" ");
+			String sutConnectorUrl = "";
+
+			for (String raw : parts) {
+				String part = raw.replace("\"", "");
+
+				if (part.matches("^(?:[a-zA-Z][a-zA-Z0-9+.-]*):.*")) {
+					sutConnectorUrl = part;
+				}
 			}
 
-			// Also add the default starting domain of the SUT if is not included in the domainsAllowed list
+			if(webDomainsAllowed != null && !webDomainsAllowed.contains(getDomain(sutConnectorUrl))) {
+				System.out.println(String.format("WEBDRIVER INFO: Automatically adding %s SUT Connector domain to webDomainsAllowed List", getDomain(sutConnectorUrl)));
+				String[] newWebDomainsAllowed = webDomainsAllowed.stream().toArray(String[]::new);
+				webDomainsAllowed = Arrays.asList(ArrayUtils.insert(newWebDomainsAllowed.length, newWebDomainsAllowed, getDomain(sutConnectorUrl)));
+				System.out.println(String.format("webDomainsAllowed: %s", String.join(",", webDomainsAllowed)));
+			}
+
+			// Also add the default starting domain of the SUT if is not included in the webDomainsAllowed list
 			String initialUrl = WdDriver.getCurrentUrl();
 
-			if(domainsAllowed != null && !domainsAllowed.contains(getDomain(initialUrl))) {
-				System.out.println(String.format("WEBDRIVER INFO: Automatically adding initial %s Web domain to domainsAllowed List", getDomain(initialUrl)));
-				String[] newDomainsAllowed = domainsAllowed.stream().toArray(String[]::new);
-				domainsAllowed = Arrays.asList(ArrayUtils.insert(newDomainsAllowed.length, newDomainsAllowed, getDomain(initialUrl)));
-				System.out.println(String.format("domainsAllowed: %s", String.join(",", domainsAllowed)));
+			if(webDomainsAllowed != null && !webDomainsAllowed.contains(getDomain(initialUrl))) {
+				System.out.println(String.format("WEBDRIVER INFO: Automatically adding initial %s Web domain to webDomainsAllowed List", getDomain(initialUrl)));
+				String[] newWebDomainsAllowed = webDomainsAllowed.stream().toArray(String[]::new);
+				webDomainsAllowed = Arrays.asList(ArrayUtils.insert(newWebDomainsAllowed.length, newWebDomainsAllowed, getDomain(initialUrl)));
+				System.out.println(String.format("webDomainsAllowed: %s", String.join(",", webDomainsAllowed)));
 			}
-		} catch(Exception e) { //TODO check what kind of exception can happen
-			System.out.println("WEBDRIVER ERROR: Trying to add the startup domain to domainsAllowed List");
-			System.out.println("Please review domainsAllowed List inside Webdriver Java Protocol");
+		} catch(Exception e) {
+			System.out.println("WEBDRIVER ERROR: Trying to add the startup domain to webDomainsAllowed List");
+			System.out.println("Please review webDomainsAllowed List inside Webdriver Java Protocol");
 		}
 	}
 

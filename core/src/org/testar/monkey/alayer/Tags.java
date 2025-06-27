@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013 - 2024 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -164,7 +164,8 @@ public final class Tags extends TagsBase {
 	/** Usually attached to an object of {@link State}. The value is a screenshot of the state. */
 	//public static final Tag<Image> Screenshot = from("Screenshot", Image.class);
 	public static final Tag<String> ScreenshotPath = from("ScreenshotPath", String.class);
-		
+	public static final Tag<AWTCanvas> ScreenshotImage = from("ScreenshotImage", AWTCanvas.class);
+
 	/** Usually attached to a {@link State} object. The value is an outcome of a test oracle for that state. It is
 	 * used to mark states as 'suspicious' or 'erroneous' */
 	public static final Tag<Verdict> OracleVerdict = from("OracleVerdict", Verdict.class);
@@ -215,4 +216,24 @@ public final class Tags extends TagsBase {
 	public static Tag<Boolean> StateChanged = from("StateChanged", Boolean.class);
 	public static Tag<Action> PreviousAction = from("PreviousAction", Action.class);
 	public static Tag<String> PreviousActionID = from("PreviousAction", String.class);
+
+	/**
+	 * The input text for a type or paste action
+	 */
+	public static final Tag<String> InputText = from("InputText", String.class);
+
+	/**
+	 * Provides timing information about the state rendering process,
+	 * measuring when the main content becomes visible or ready for interaction.
+	 */
+	public static final Tag<Double> StateRenderTime = from("StateRenderTime", Double.class);
+
+	/**
+	 * This method will return all the static tags that are available for use.
+	 * @return
+	 */
+	public static Set<Tag<?>> getAllTags() {
+		return tagSet;
+	}
+
 }

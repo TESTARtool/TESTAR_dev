@@ -94,7 +94,7 @@ public class ReportManager implements Reporting
         {
             if(firstStateAdded)
             {
-                if(firstActionsAdded || (state.get(Tags.OracleVerdict, Verdict.OK).severity() > Verdict.SEVERITY_OK))
+                if(firstActionsAdded || (state.get(Tags.OracleVerdict, Verdict.OK).severity() > Verdict.Severity.OK.getValue()))
                 { //if the first state contains a failure, write the same state in case it was a login
                     for(Reporting reporter : reporters)
                         reporter.addState(state);
