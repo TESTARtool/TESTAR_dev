@@ -33,6 +33,7 @@ package org.testar.monkey.alayer;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
 
 public class VerdictTest {
 
@@ -79,11 +80,13 @@ public class VerdictTest {
 				"then both infos shall be included separated by a line break",
 				"Bar\nBaz", v2.join(v3).info());
 
-		assertTrue("Joining two Verdicts shall use the Visualizer of the Verdict with high severity",
-				v2.join(v1).visualizer() == failVisualizer);
+		System.out.println(v2.join(v1).visualizer());
+		
+		assertTrue("Joining two Verdicts creates a combined RegionsVisualizer",
+				v2.join(v1).visualizer() instanceof RegionsVisualizer);
 
-		assertTrue("Joining two Verdicts shall use the Visualizer of the Verdict with high severity",
-				v1.join(v2).visualizer() == failVisualizer);
+		assertTrue("Joining two Verdicts creates a combined RegionsVisualizer",
+				v1.join(v2).visualizer() instanceof RegionsVisualizer);
 	}
 
 	@Test
