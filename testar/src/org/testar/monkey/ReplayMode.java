@@ -113,7 +113,7 @@ public class ReplayMode {
 			double rrt = protocol.settings().get(ConfigTags.ReplayRetryTime);
 
 			while(success 
-					&& protocol.getReplayVerdict().severity() != Verdict.OK.severity() 
+					&& protocol.getReplayVerdict().severity() == Verdict.OK.severity() 
 					&& protocol.mode() == Modes.Replay) {
 
 				//Initialize local fragment and read saved action of PathToReplaySequence File
