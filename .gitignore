@@ -1,6 +1,7 @@
 .idea
 .gradle/
 bin/
+*/build/
 target/
 *.obj
 /windows/native_src/windows.h
