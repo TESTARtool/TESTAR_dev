@@ -39,7 +39,7 @@ subprojects {
         // https://mvnrepository.com/artifact/io.appium/java-client
         implementation group: 'io.appium', name: 'java-client', version: '9.4.0'
         // https://mvnrepository.com/artifact/com.orientechnologies/orientdb-graphdb
-        implementation group: 'com.orientechnologies', name: 'orientdb-graphdb', version: '3.2.39'
+        implementation group: 'com.orientechnologies', name: 'orientdb-graphdb', version: '3.2.38'
         // https://mvnrepository.com/artifact/org.graalvm.sdk/graal-sdk
         implementation group: 'org.graalvm.sdk', name: 'graal-sdk', version: '22.3.2'
         // Use jaxb 2.3.1 to fix a Java17 issue with the version 2.3.0 included in the orientdb server dependencies
