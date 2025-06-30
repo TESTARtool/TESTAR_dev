@@ -56,17 +56,18 @@ subprojects {
         finalizedBy jacocoTestReport
     }
 
+    buildDir = new File('./target')
+
     jacocoTestReport {
         dependsOn test
 
         reports {
             xml.required.set(true)
-            html.required.set(true)
+            html.required.set(false)
             csv.required.set(false)
             html.outputLocation.set(file("${buildDir}/jacocoHtml"))
             xml.outputLocation.set(file("${buildDir}/jacoco.xml"))
         }
     }
 
-    buildDir = new File('./target')
 }
