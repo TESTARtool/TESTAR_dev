@@ -79,6 +79,19 @@ function traverseElementTestar(parentWrapped, rootElement, ignoredTags) {
 			parentWrapped.wrappedChildren.push(childShadowWrapped);
 		}
 	}
+	
+    if (shouldDeleteElementForSerialization(parentWrapped.element)) {
+        delete parentWrapped.element;
+    }
+}
+
+function shouldDeleteElementForSerialization(element) {
+    try {
+        const frameElement = element.ownerDocument.defaultView?.frameElement;
+        return frameElement && frameElement !== element;
+    } catch (e) {
+        return true;
+    }
 }
 
 /*
