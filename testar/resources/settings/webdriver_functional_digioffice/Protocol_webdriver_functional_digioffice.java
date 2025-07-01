@@ -171,8 +171,8 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
        }
 		super.initialize(settings);
 
-		// Deal with iframes when obtaining the JS state
-		Constants.ignoredTags = Arrays.asList( "script", "noscript", "head", "meta", "style", "link", "svg", "canvas", "iframe");
+		// Enable only if iframes do not allow to obtain the TESTAR-JS state
+		//Constants.ignoredTags = Arrays.asList( "script", "noscript", "head", "meta", "style", "link", "svg", "canvas", "iframe");
 	}
 
 
