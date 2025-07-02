@@ -184,7 +184,7 @@ function wrapElementTestar(element, xOffset, yOffset) {
         value: element.value,
         checked: element.checked,
         selected: element.selected,
-        display: computedStyle.getPropertyValue('display'),
+        display: computedStyle.display,
         visibility: computedStyle.visibility,
         styleOverflow: computedStyle.overflow,
         styleOverflowX: computedStyle.overflowX,
@@ -243,6 +243,7 @@ function getNameTestar(element) {
 /*
  * Calculate the z-index of an element
  * @param {node} the HTML element
+ * @param {object} the computed style of the element
  * @return {number} the z-index
  */
 function getZIndexTestar(element, computedStyle) {
@@ -288,6 +289,7 @@ function getRectTestar(element, xOffset, yOffset, clientRect) {
  * Get all appropriate dimensions of the element
  * Used to determine if a scrollbar is present
  * @param {node} element, the parent HTML element
+ * @param {object} the computed style of the element
  * @return {array} array with the dimensions
  */
 function getDimensionsTestar(element, computedStyle) {
