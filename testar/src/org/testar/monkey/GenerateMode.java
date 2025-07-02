@@ -193,17 +193,14 @@ public class GenerateMode {
 			protocol.cv.begin();
 			Util.clear(protocol.cv);
 
-			//Showing the green dots if visualization is on:
-			if(protocol.visualizationOn) {
-				protocol.visualizeActions(protocol.cv, state, actions);
-			}
-
 			//Selecting one of the available actions:
 			Action action = protocol.selectAction(state, actions);
 
-			//Showing the red dot if visualization is on:
+			//Showing the actions if visualization is on:
 			if(protocol.visualizationOn) {
+				protocol.visualizeActions(protocol.cv, state, actions);
 				SutVisualization.visualizeSelectedAction(protocol.settings, protocol.cv, state, action);
+				protocol.cv.paintBatch();
 			}
 
 			//before action execution, pass it to the state model manager
