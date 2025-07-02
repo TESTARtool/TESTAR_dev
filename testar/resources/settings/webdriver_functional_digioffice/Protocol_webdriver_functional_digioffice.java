@@ -31,6 +31,11 @@
 import org.languagetool.language.AmericanEnglish;
 import org.languagetool.language.BritishEnglish;
 import org.languagetool.language.Dutch;
+//import org.apache.commons.lang.NotImplementedException;
+//import org.openqa.selenium.remote.RemoteWebDriver;
+//import org.openqa.selenium.devtools.DevTools;
+//import org.openqa.selenium.devtools.HasDevTools;
+//import org.openqa.selenium.devtools.v137.network.Network;
 import org.testar.SutVisualization;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.Pair;
@@ -41,7 +46,7 @@ import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
-import org.testar.monkey.alayer.webdriver.Constants;
+//import org.testar.monkey.alayer.webdriver.Constants;
 import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.WdElement;
 import org.testar.monkey.alayer.webdriver.WdWidget;
@@ -149,25 +154,25 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 
        if (settings.get(org.testar.monkey.ConfigTags.AlwaysCompile))
        {
-//		try {
-//			// bat file that uses tscon.exe to disconnect without stop GUI session
-//			File disconnectBatFile = new File(Main.settingsDir + File.separator + "webdriver_functional_digioffice" + File.separator + "disconnectRDP.bat").getCanonicalFile();
-//
-//			// Launch and disconnect from RDP session
-//			// This will prompt the UAC permission window if enabled in the System
-//			if(disconnectBatFile.exists()) {
-//				System.out.println("Running: " + disconnectBatFile);
-//				Runtime.getRuntime().exec("cmd /c start \"\" " + disconnectBatFile);
-//			} else {
-//				System.out.println("THIS BAT DOES NOT EXIST: " + disconnectBatFile);
-//			}
-//
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//
-//		// Wait because disconnect from system modifies internal Screen resolution
-//		Util.pause(30);
+		try {
+			// bat file that uses tscon.exe to disconnect without stop GUI session
+			File disconnectBatFile = new File(Main.settingsDir + File.separator + "webdriver_functional_digioffice" + File.separator + "disconnectRDP.bat").getCanonicalFile();
+
+			// Launch and disconnect from RDP session
+			// This will prompt the UAC permission window if enabled in the System
+			if(disconnectBatFile.exists()) {
+				System.out.println("Running: " + disconnectBatFile);
+				Runtime.getRuntime().exec("cmd /c start \"\" " + disconnectBatFile);
+			} else {
+				System.out.println("THIS BAT DOES NOT EXIST: " + disconnectBatFile);
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// Wait because disconnect from system modifies internal Screen resolution
+		Util.pause(30);
        }
 		super.initialize(settings);
 
@@ -844,6 +849,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 	 * @return
 	 */
 	private Verdict getUniqueFunctionalVerdict(Verdict verdict, State state) {
+    
 		// Check the functional Verdict that detects the spell checking.
 		// Instead of stop the sequence and report a warning verdict,
 		// report the information in a specific HTML report
@@ -1037,7 +1043,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		verdict = detectUntranslatedText(state);
 		if (shouldReturnVerdict(verdict)) return verdict;
         
-		// Check The replacement character � (often displayed as a black rhombus with a white question mark) is a symbol found in the Unicode standard at code point U+FFFD in the Specials table. It is used to indicate problems when a system is unable to render a stream of data to correct symbols
+		// Check The replacement character ? (often displayed as a black rhombus with a white question mark) is a symbol found in the Unicode standard at code point U+FFFD in the Specials table. It is used to indicate problems when a system is unable to render a stream of data to correct symbols
 		verdict = GenericVerdict.UnicodeReplacementCharacter(state, WdTags.WebTextContent);
 		if (shouldReturnVerdict(verdict)) return verdict;
 
