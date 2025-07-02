@@ -307,7 +307,7 @@ public final class WdState extends WdWidget implements State {
 			ret = w.element.xpath;
 		}
 		else if (t.equals(WdTags.WebIsDisplayed)) {
-			ret = WdDriver.webdriverElementIsDisplayed(w.element.xpath);
+			ret = w.element.isDisplayed();
 		}
 		else if (t.equals(WdTags.WebComputedFontSize)) {
 			ret = w.element.computedFontSize;
