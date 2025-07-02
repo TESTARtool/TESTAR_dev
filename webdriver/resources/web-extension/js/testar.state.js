@@ -190,13 +190,13 @@ function wrapElementTestar(element, xOffset, yOffset) {
         styleOverflowY: computedStyle.overflowY,
         stylePosition: computedStyle.position,
         styleOpacity: computedStyle.opacity,
-        computedFontSize: window.getComputedStyle(element).fontSize,
+        computedFontSize: computedStyle.fontSize,
         innerHTML: element.innerHTML,
         outerHTML: element.outerHTML,
 
-        zIndex: getZIndexTestar(element),
+        zIndex: getZIndexTestar(element, computedStyle),
         rect: getRectTestar(element, xOffset, yOffset),
-        dimensions: getDimensionsTestar(element),
+        dimensions: getDimensionsTestar(element, computedStyle),
         naturalWidth: (element.naturalWidth !== undefined) ? element.naturalWidth : 0,
         naturalHeight: (element.naturalHeight !== undefined) ? element.naturalHeight : 0,
         displayedWidth: (element.width !== undefined) ? parseInt(element.width) : 0,
@@ -244,7 +244,7 @@ function getNameTestar(element) {
  * @param {node} the HTML element
  * @return {number} the z-index
  */
-function getZIndexTestar(element) {
+function getZIndexTestar(element, computedStyle) {
     if (element === document.body) {
         return 0;
     }
@@ -252,12 +252,12 @@ function getZIndexTestar(element) {
     if (element === null || element === undefined) {
         return 0;
     } else if (element.nodeType !== 1) {
-        return getZIndexTestar(element.parentNode) + 1;
+        return getZIndexTestar(element.parentNode, computedStyle) + 1;
     }
 
-    var zIndex = getComputedStyle(element).getPropertyValue('z-index');
+    var zIndex = computedStyle.getPropertyValue('z-index');
     if (isNaN(zIndex)) {
-        return getZIndexTestar(element.parentNode) + 1;
+        return getZIndexTestar(element.parentNode, computedStyle) + 1;
     }
     return zIndex * 1;
 }
@@ -289,7 +289,7 @@ function getRectTestar(element, xOffset, yOffset) {
  * @param {node} element, the parent HTML element
  * @return {array} array with the dimensions
  */
-function getDimensionsTestar(element) {
+function getDimensionsTestar(element, computedStyle) {
     if (element === document.body) {
         scrollLeft = Math.max(document.documentElement.scrollLeft, document.body.scrollLeft);
         scrollTop = Math.max(document.documentElement.scrollTop, document.body.scrollTop);
@@ -298,11 +298,9 @@ function getDimensionsTestar(element) {
         scrollTop = element.scrollTop;
     }
 
-    var style = window.getComputedStyle(element);
-
     return {
-        overflowX: style.getPropertyValue('overflow-x'),
-        overflowY: style.getPropertyValue('overflow-y'),
+        overflowX: computedStyle.getPropertyValue('overflow-x'),
+        overflowY: computedStyle.getPropertyValue('overflow-y'),
         clientWidth: element.clientWidth,
         clientHeight: element.clientHeight,
         offsetWidth: element.offsetWidth || 0,
@@ -311,8 +309,8 @@ function getDimensionsTestar(element) {
         scrollHeight: element.scrollHeight,
         scrollLeft: scrollLeft,
         scrollTop: scrollTop,
-        borderWidth: parseInt(style.borderLeftWidth, 10) + parseInt(style.borderRightWidth, 10),
-        borderHeight: parseInt(style.borderTopWidth, 10) + parseInt(style.borderBottomWidth, 10)
+        borderWidth: parseInt(computedStyle.borderLeftWidth, 10) + parseInt(computedStyle.borderRightWidth, 10),
+        borderHeight: parseInt(computedStyle.borderTopWidth, 10) + parseInt(computedStyle.borderBottomWidth, 10)
     };
 }
 
