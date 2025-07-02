@@ -165,7 +165,8 @@ function getChildNodesTestar(parentWrapped) {
  */
 function wrapElementTestar(element, xOffset, yOffset) {
     var computedStyle = getComputedStyle(element);
-	
+    var clientRect = element.getBoundingClientRect();
+
 	var shadowElement = false;
 	if(element.shadowRoot !== null){
 		shadowElement = true;
@@ -195,13 +196,13 @@ function wrapElementTestar(element, xOffset, yOffset) {
         outerHTML: element.outerHTML,
 
         zIndex: getZIndexTestar(element, computedStyle),
-        rect: getRectTestar(element, xOffset, yOffset),
+        rect: getRectTestar(element, xOffset, yOffset, clientRect),
         dimensions: getDimensionsTestar(element, computedStyle),
         naturalWidth: (element.naturalWidth !== undefined) ? element.naturalWidth : 0,
         naturalHeight: (element.naturalHeight !== undefined) ? element.naturalHeight : 0,
         displayedWidth: (element.width !== undefined) ? parseInt(element.width) : 0,
         displayedHeight: (element.height !== undefined) ? parseInt(element.height) : 0,
-        isBlocked: getIsBlockedTestar(element, xOffset, yOffset),
+        isBlocked: getIsBlockedTestar(element, xOffset, yOffset, clientRect),
         isClickable: isClickableTestar(element, xOffset, yOffset),
         isShadowElement: shadowElement,
         hasKeyboardFocus: document.activeElement === element,
@@ -267,19 +268,19 @@ function getZIndexTestar(element, computedStyle) {
  * @param {node} element, the parent HTML element
  * @param {object} xOffset, offset off the iFrame (if applicable)
  * @param {object} yOffset, offset off the iFrame (if applicable)
+ * @param {object} clientRect, the bounding client rect
  * @return {array} array with the position and dimensions
  */
-function getRectTestar(element, xOffset, yOffset) {
-    var rect = element.getBoundingClientRect();
+function getRectTestar(element, xOffset, yOffset, clientRect) {
     if (element === document.body) {
-        rect = document.documentElement.getBoundingClientRect();
+        clientRect = document.documentElement.getBoundingClientRect();
     }
 
     return [
-        parseInt(rect.left) + xOffset,
-        parseInt(rect.top) + yOffset,
-        parseInt(element === document.body ? window.innerWidth : rect.width),
-        parseInt(element === document.body ? window.innerHeight : rect.height)
+        parseInt(clientRect.left) + xOffset,
+        parseInt(clientRect.top) + yOffset,
+        parseInt(element === document.body ? window.innerWidth : clientRect.width),
+        parseInt(element === document.body ? window.innerHeight : clientRect.height)
     ];
 }
 
@@ -333,18 +334,18 @@ function isPageHorizontalScrollable(){
 }
 
 /*
- * Determin if an element is blocked by another element,
+ * Determine if an element is blocked by another element,
  * but does not contain said element (e.g. <img> inside <a>)
  * @param {node} element, the parent HTML element
  * @param {object} xOffset, offset off the iFrame (if applicable)
  * @param {object} yOffset, offset off the iFrame (if applicable)
+ * @param {object} clientRect, the bounding client rect
  * @return {bool} true if the element is blocked by another element
  */
-function getIsBlockedTestar(element, xOffset, yOffset) {
+function getIsBlockedTestar(element, xOffset, yOffset, clientRect) {
     // get element at element's (click) position
-    var rect = element.getBoundingClientRect();
-    var x = rect.left + rect.width / 2 + xOffset;
-    var y = rect.top + rect.height / 2 + yOffset;
+    var x = clientRect.left + clientRect.width / 2 + xOffset;
+    var y = clientRect.top + clientRect.height / 2 + yOffset;
     var elem = document.elementFromPoint(x, y);
 
     // element is inside iframe(s)
