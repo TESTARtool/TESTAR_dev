@@ -327,6 +327,17 @@ public class WdElement extends TaggableBase implements Serializable {
 	  return isVisibleAtCanvas;
   }
 
+  public boolean isDisplayed() {
+	  if (remoteWebElement == null) {
+		  return false;
+	  }
+	  try {
+		  return remoteWebElement.isDisplayed();
+	  } catch (Exception e) {
+		  return false;
+	  }
+  }
+
   @SuppressWarnings("unchecked")
   /*
    * This gets the position relative to the viewport
