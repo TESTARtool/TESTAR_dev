@@ -120,10 +120,6 @@ public class ListeningModeScript {
 		protocol.generatedSequence = protocol.getAndStoreGeneratedSequence();
 		protocol.currentSeq = protocol.getAndStoreSequenceFile();
 
-		//Activate process Listeners if enabled in the test.settings
-		if(protocol.enabledProcessListener)
-			protocol.processListener.startListeners(system, protocol.settings());
-
 		// notify the statemodelmanager
 		protocol.stateModelManager.notifyTestSequencedStarted();
 
