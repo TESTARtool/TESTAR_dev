@@ -229,8 +229,11 @@ public class WdElement extends TaggableBase implements Serializable {
 	  else if(placeholder != null && !placeholder.isEmpty()) {
 		  return placeholder;
 	  }
-	  else if(value != null) {
+	  else if(value != null && !value.toString().isEmpty()) {
 		  return value.toString();
+	  }
+	  else if(type != null && !type.isEmpty()) {
+		  return type;
 	  }
 	  else if(tagName != null && !tagName.isEmpty()) {
 		  return tagName;
