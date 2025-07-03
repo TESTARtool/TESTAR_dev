@@ -98,7 +98,12 @@ public class WdTags extends TagsBase {
    * Web text context of a widget.
    */
   public static final Tag<String> WebTextContent = from("WebTextContent", String.class);
-  
+
+  /**
+   * Web inner text of a widget.
+   */
+  public static final Tag<String> WebInnerText = from("WebInnerText", String.class);
+
   /**
    * Web Hypertext Reference of a widget.
    */
@@ -113,7 +118,32 @@ public class WdTags extends TagsBase {
    * Web style of a widget.
    */
   public static final Tag<String> WebStyle = from("WebStyle", String.class);
-  
+
+  /**
+   * Web style opacity property of a widget.
+   */
+  public static final Tag<Double> WebStyleOpacity = from("WebStyleOpacity", Double.class);
+
+  /**
+   * Web style position property of a widget.
+   */
+  public static final Tag<String> WebStylePosition = from("WebStylePosition", String.class);
+
+  /**
+   * Web style overflow property of a widget.
+   */
+  public static final Tag<String> WebStyleOverflow = from("WebStyleOverflow", String.class);
+
+  /**
+   * Web style overflow-x property of a widget.
+   */
+  public static final Tag<String> WebStyleOverflowX = from("WebStyleOverflowX", String.class);
+
+  /**
+   * Web style overflow-y property of a widget.
+   */
+  public static final Tag<String> WebStyleOverflowY = from("WebStyleOverflowY", String.class);
+
   /**
    * Web target of a widget.
    */
@@ -128,7 +158,22 @@ public class WdTags extends TagsBase {
    * Web display style of a widget.
    */
   public static final Tag<String> WebDisplay = from("WebDisplay", String.class);
-  
+
+  /**
+   * Web element visibility is hidden or collapse.
+   */
+  public static final Tag<Boolean> WebIsHidden = from("WebIsHidden", Boolean.class);
+
+  /**
+   * Web element XPath.
+   */
+  public static final Tag<String> WebXPath = from("WebXPath", String.class);
+
+  /**
+   * Web element is displayed in the screen or not.
+   */
+  public static final Tag<Boolean> WebIsDisplayed = from("WebIsDisplayed", Boolean.class);
+
   /**
    * Web computed font size of a widget.
    */
@@ -148,6 +193,26 @@ public class WdTags extends TagsBase {
    * Web zIndex of a widget
    */
   public static final Tag<Double> WebZIndex = from("WebZIndex", Double.class);
+
+  /**
+   * Web naturalWidth of a widget
+   */
+  public static final Tag<Long> WebNaturalWidth = from("WebNaturalWidth", Long.class);
+
+  /**
+   * Web naturalHeight of a widget
+   */
+  public static final Tag<Long> WebNaturalHeight = from("WebNaturalHeight", Long.class);
+
+  /**
+   * Web Width of a widget
+   */
+  public static final Tag<Long> WebDisplayedWidth = from("WebDisplayedWidth", Long.class);
+
+  /**
+   * Web Height of a widget
+   */
+  public static final Tag<Long> WebDisplayedHeight = from("WebDisplayedHeight", Long.class);
 
   /**
    * Web Control Type Identifier of a widget.
@@ -215,6 +280,11 @@ public class WdTags extends TagsBase {
    * Whether this widget is currently enabled or disabled (e.g. "greyed out")
    */
   public static final Tag<Boolean> WebIsEnabled = from("WebIsEnabled", Boolean.class);
+
+  /**
+   * Whether this widget is disabled (web property "disabled")
+   */
+  public static final Tag<Boolean> WebIsDisabled = from("WebIsDisabled", Boolean.class);
 
   /**
    * Whether this widget is currently blocked.

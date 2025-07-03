@@ -57,9 +57,6 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
 	protected void initialize(Settings settings) {
 		super.initialize(settings);
 
-		// For the gwt web page ignore iframes
-		Constants.ignoredTags = Arrays.asList("script", "noscript", "head", "meta", "style", "link", "svg", "canvas", "iframe");
-
 		// List of attributes to identify and close policy popups
 		// Set to null to disable this feature
 		policyAttributes = ArrayListMultimap.create();

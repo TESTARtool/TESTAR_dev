@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -180,6 +181,7 @@ public final class GDIScreenCanvas implements Canvas {
 	public double y() { return y; }
 	public void begin() { check(); }
 	public Pen defaultPen() { return defaultPen; }
+	public void paintBatch() { /* Not implemented in Windows */}
 
 	public void end() {
 		check();

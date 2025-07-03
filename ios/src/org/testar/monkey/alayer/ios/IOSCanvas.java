@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -136,6 +136,12 @@ public class IOSCanvas implements Canvas {
 	public void release() {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void paintBatch() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

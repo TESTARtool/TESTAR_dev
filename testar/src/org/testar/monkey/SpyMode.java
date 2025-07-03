@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2022 Open Universiteit - www.ou.nl
- * Copyright (c) 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2022 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2022 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -60,44 +60,24 @@ public class SpyMode {
 		MobileVisualizationAndroid mobileVisualizationAndroid = null;
 		MobileVisualizationIOS mobileVisualizationIOS = null;
 
-		if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
-			System.out.println("SPY MODE, CREATING JAVA JFRAME WINDOW Android");
-			State state = protocol.getState(system);
-			mobileVisualizationAndroid = new MobileVisualizationAndroid(AndroidProtocolUtil.getStateshotSpyMode(state), state);
-		} else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
-			System.out.println("SPY MODE, CREATING JAVA JFRAME WINDOW iOS");
-			State state = protocol.getState(system);
-			mobileVisualizationIOS = new MobileVisualizationIOS(IOSProtocolUtil.getStateshotSpyMode(state), state);
+		if (isAndroid()) {
+			mobileVisualizationAndroid = setupAndroidVisualization(protocol, system);
+		} else if (isIOS()) {
+			mobileVisualizationIOS = setupIOSVisualization(protocol, system);
 		}
 
 		while(protocol.mode() == Modes.Spy && system.isRunning()) {
 
 			State state = protocol.getState(system);
 			protocol.cv.begin();
-			Util.clear(protocol.cv);
-
-			Set<Action> actions = protocol.deriveActions(system, state);
-			protocol.buildStateActionsIdentifiers(state, actions);
 
 			//TODO: can we work this into sutvisualization/ canvas?
 			if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
-				assert mobileVisualizationAndroid != null;
-				mobileVisualizationAndroid.updateStateVisualization(state);
+				updateAndroidVisualization(protocol, mobileVisualizationAndroid, system, state);
 			} else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
-				assert mobileVisualizationIOS != null;
-				mobileVisualizationIOS.updateStateVisualization(state);
-			}
-			else {
-				//in Spy-mode, always visualize the widget info under the mouse cursor:
-				SutVisualization.visualizeState(protocol.visualizationOn,
-						protocol.markParentWidget,
-						protocol.mouse,
-						protocol.lastPrintParentsOf,
-						protocol.cv,
-						state);
-
-				//in Spy-mode, always visualize the green dots:
-				protocol.visualizeActions(protocol.cv, state, actions);
+				updateIOSVisualization(protocol, mobileVisualizationIOS, system, state);
+			} else {
+				updateDefaultVisualization(protocol, system, state);
 			}
 
 			protocol.cv.end();
@@ -142,5 +122,65 @@ public class SpyMode {
 
 		//Stop and close the SUT before return to the detectModeLoop
 		protocol.stopSystem(system);
+	}
+
+	private boolean isAndroid() {
+		return NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID);
+	}
+
+	private boolean isIOS() {
+		return NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS);
+	}
+
+	private MobileVisualizationAndroid setupAndroidVisualization(DefaultProtocol protocol, SUT system) {
+		System.out.println("SPY MODE, CREATING JAVA JFRAME WINDOW Android");
+		State state = protocol.getState(system);
+		return new MobileVisualizationAndroid(AndroidProtocolUtil.getStateshotSpyMode(state), state);
+	}
+
+	private MobileVisualizationIOS setupIOSVisualization(DefaultProtocol protocol, SUT system) {
+		System.out.println("SPY MODE, CREATING JAVA JFRAME WINDOW iOS");
+		State state = protocol.getState(system);
+		return new MobileVisualizationIOS(IOSProtocolUtil.getStateshotSpyMode(state), state);
+	}
+
+	private void updateAndroidVisualization(DefaultProtocol protocol, MobileVisualizationAndroid visualization, SUT system, State state) {
+		Util.clear(protocol.cv);
+		if (visualization == null) return;
+		visualization.updateStateVisualization(state);
+		Set<Action> actions = protocol.deriveActions(system, state);
+		protocol.buildStateActionsIdentifiers(state, actions);
+	}
+
+	private void updateIOSVisualization(DefaultProtocol protocol, MobileVisualizationIOS visualization, SUT system, State state) {
+		Util.clear(protocol.cv);
+		if (visualization == null) return;
+		visualization.updateStateVisualization(state);
+		Set<Action> actions = protocol.deriveActions(system, state);
+		protocol.buildStateActionsIdentifiers(state, actions);
+	}
+
+	private void updateDefaultVisualization(DefaultProtocol protocol, SUT system, State state) {
+		Set<Action> actions = protocol.deriveActions(system, state);
+		protocol.buildStateActionsIdentifiers(state, actions);
+
+		// When we have the state and actions, clear and draw new visualizers
+		Util.clear(protocol.cv);
+
+		//in Spy-mode, always visualize the widget info under the mouse cursor:
+		SutVisualization.visualizeState(
+				protocol.visualizationOn,
+				protocol.markParentWidget,
+				protocol.mouse,
+				protocol.lastPrintParentsOf,
+				protocol.cv,
+				state
+				);
+
+		//in Spy-mode, always visualize the green dots:
+		protocol.visualizeActions(protocol.cv, state, actions);
+
+		//in some OS mode like WebDriver, paint all visualizers
+		protocol.cv.paintBatch();
 	}
 }
