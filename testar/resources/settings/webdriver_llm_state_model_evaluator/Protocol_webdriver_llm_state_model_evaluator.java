@@ -402,9 +402,9 @@ public class Protocol_webdriver_llm_state_model_evaluator extends WebdriverProto
 
 	private void setupOrientDB() {
 		String directoryPath = Main.settingsDir + File.separator + "webdriver_llm_state_model_evaluator";
-		String downloadUrl = "https://repo1.maven.org/maven2/com/orientechnologies/orientdb-community/3.0.34/orientdb-community-3.0.34.zip";
-		String zipFilePath = directoryPath + "/orientdb-community-3.0.34.zip";
-		String extractDir = directoryPath + "/orientdb-community-3.0.34";
+		String downloadUrl = "https://repo1.maven.org/maven2/com/orientechnologies/orientdb-community/3.2.38/orientdb-community-3.2.38.zip";
+		String zipFilePath = directoryPath + "/orientdb-community-3.2.38.zip";
+		String extractDir = directoryPath + "/orientdb-community-3.2.38";
 
 		// If OrientDB already exists, we dont need to download anything
 		if(new File(extractDir).exists()) return;
