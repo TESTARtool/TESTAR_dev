@@ -77,9 +77,9 @@ public class StateTransitionCondition extends TestCondition {
 		queryBuilder.append("FROM ConcreteAction ");
 		queryBuilder.append("WHERE `" + this.actionField + "` LIKE '%" + this.actionMessage + "%' ");
 		queryBuilder.append("AND out.uid LIKE '" + modelIdentifier + "%' ");
-		queryBuilder.append("AND out." + this.originStateField +" LIKE '%" + this.originStateMessage + "%' ");
+		queryBuilder.append("AND out." + this.originStateField +" containstext '" + this.originStateMessage + "' ");
 		queryBuilder.append("AND in.uid LIKE '" + modelIdentifier + "%' ");
-		queryBuilder.append("AND in." + this.destStateField + " LIKE '%" + this.destStateMessage + "%'");
+		queryBuilder.append("AND in." + this.destStateField + " containstext '" + this.destStateMessage + "'");
 
 		String query = queryBuilder.toString();
 		String result = stateModelManager.queryStateModel(query);
