@@ -146,8 +146,7 @@ public class WdElement extends TaggableBase implements Serializable {
     naturalHeight = (packedElement.get("naturalHeight") == null) ? 0 : castDimensionsToLong(packedElement.get("naturalHeight"));
     displayedWidth = (packedElement.get("displayedWidth") == null) ? 0 : castDimensionsToLong(packedElement.get("displayedWidth"));
     displayedHeight = (packedElement.get("displayedHeight") == null) ? 0 : castDimensionsToLong(packedElement.get("displayedHeight"));
-    maxLength = Integer.valueOf(attributeMap.getOrDefault("maxlength", "-1"));
-    disabled = attributeMap.containsKey("disabled"); // when attribute disabled is present, then element is disabled (no matter its value). See: https://www.w3schools.com/TAGS/att_disabled.asp
+    disabled = attributeMap.containsKey("disabled");
     visibility = (packedElement.get("visibility") == null) ? "" : (String) packedElement.get("visibility");
     xpath = (packedElement.get("xpath") == null) ? "" : (String) packedElement.get("xpath");
 
