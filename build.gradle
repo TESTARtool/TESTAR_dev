@@ -1,4 +1,5 @@
 apply plugin: 'checkstyle'
+apply from: 'coverage-report.gradle'
 
 subprojects {
     apply plugin: 'java'
@@ -46,5 +47,27 @@ subprojects {
         implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.1'
     }
 
+    jacoco {
+        toolVersion = '0.8.12'
+    }
+
+    test {
+        useJUnit()
+        finalizedBy jacocoTestReport
+    }
+
     buildDir = new File('./target')
+
+    jacocoTestReport {
+        dependsOn test
+
+        reports {
+            xml.required.set(true)
+            html.required.set(false)
+            csv.required.set(false)
+            html.outputLocation.set(file("${buildDir}/jacocoHtml"))
+            xml.outputLocation.set(file("${buildDir}/jacoco.xml"))
+        }
+    }
+
 }
