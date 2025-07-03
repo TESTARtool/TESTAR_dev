@@ -141,7 +141,7 @@ StateModelEnabled = false
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer = 
-DataStoreDirectory = settings/05_tbuis_llm/orientdb-community-3.0.34/databases
+DataStoreDirectory = settings/05_tbuis_llm/orientdb-community-3.2.38/databases
 DataStoreDB = testar
 DataStoreUser = admin
 DataStorePassword = admin
@@ -149,7 +149,7 @@ DataStoreMode = instant
 ApplicationName = tbuis
 ApplicationVersion = login
 ActionSelectionAlgorithm = random
-StateModelStoreWidgets = true
+StateModelStoreWidgets = false
 ResetDataStore = false
 
 #################################################################

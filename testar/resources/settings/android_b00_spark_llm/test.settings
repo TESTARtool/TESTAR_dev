@@ -105,7 +105,7 @@ StateModelEnabled = false
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer = 
-DataStoreDirectory = settings/android_b00_spark_llm/orientdb-community-3.0.34/databases
+DataStoreDirectory = settings/android_b00_spark_llm/orientdb-community-3.2.38/databases
 DataStoreDB = testar
 DataStoreUser = admin
 DataStorePassword = admin
@@ -113,7 +113,7 @@ DataStoreMode = instant
 ApplicationName = spark
 ApplicationVersion = form
 ActionSelectionAlgorithm = random
-StateModelStoreWidgets = true
+StateModelStoreWidgets = false
 ResetDataStore = false
 
 #################################################################

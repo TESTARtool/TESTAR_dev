@@ -113,7 +113,7 @@ DataStoreMode = instant
 ApplicationName = spark
 ApplicationVersion = 1
 ActionSelectionAlgorithm = unvisited
-StateModelStoreWidgets = true
+StateModelStoreWidgets = false
 
 #################################################################
 # State identifier attributes

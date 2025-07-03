@@ -115,7 +115,7 @@ StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer = localhost
-DataStoreDirectory = C:\\Users\\orientdb-3.0.34\\databases
+DataStoreDirectory = C:\\Users\\orientdb-3.2.38\\databases
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
@@ -123,7 +123,7 @@ DataStoreMode = instant
 ApplicationName = registration_kiosk
 ApplicationVersion = 1
 ActionSelectionAlgorithm = unvisited
-StateModelStoreWidgets = true
+StateModelStoreWidgets = false
 ResetDataStore = false
 
 #################################################################

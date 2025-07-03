@@ -109,7 +109,7 @@ StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer = 
-DataStoreDirectory = settings/webdriver_mendix_academy_llm/orientdb-community-3.0.34/databases
+DataStoreDirectory = settings/webdriver_mendix_academy_llm/orientdb-community-3.2.38/databases
 DataStoreDB = testar
 DataStoreUser = admin
 DataStorePassword = admin
@@ -117,7 +117,7 @@ DataStoreMode = instant
 ApplicationName = mendix
 ApplicationVersion = welcome
 ActionSelectionAlgorithm = random
-StateModelStoreWidgets = true
+StateModelStoreWidgets = false
 ResetDataStore = false
 
 #################################################################

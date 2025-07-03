@@ -149,7 +149,7 @@ DataStoreMode = instant
 ApplicationName = parabank_listening
 ApplicationVersion = 
 ActionSelectionAlgorithm = random
-StateModelStoreWidgets = true
+StateModelStoreWidgets = false
 ResetDataStore = false
 
 #################################################################
