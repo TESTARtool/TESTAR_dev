@@ -35,6 +35,7 @@ import org.testar.action.priorization.llm.LlmActionSelector;
 import org.testar.llm.LlmTestGoal;
 import org.testar.llm.prompt.OracleWebPromptGenerator;
 import org.testar.llm.prompt.ActionWebPromptGenerator;
+import org.testar.llm.prompt.OracleImagePromptGenerator;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Util;
@@ -67,9 +68,6 @@ public class Protocol_webdriver_b00_spark_llm extends WebdriverProtocol {
 	// The LLM Oracle needs to be initialize with the settings
 	private LlmOracle llmOracle;
 
-	// Track last verdict
-	private Verdict lastLlmVerdict;
-
 	/**
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
@@ -88,10 +86,7 @@ public class Protocol_webdriver_b00_spark_llm extends WebdriverProtocol {
 		llmActionSelector = new LlmActionSelector(settings, new ActionWebPromptGenerator());
 
 		// Initialize the LlmOracle using the LLM settings
-		llmOracle = new LlmOracle(settings, new OracleWebPromptGenerator());
-
-		// Initialize track verdict
-		lastLlmVerdict = Verdict.OK;
+		llmOracle = new LlmOracle(settings, new OracleImagePromptGenerator());
 	}
 
 	private void setupTestGoals(List<String> testGoalsList) {
@@ -117,8 +112,6 @@ public class Protocol_webdriver_b00_spark_llm extends WebdriverProtocol {
 		llmActionSelector.reset(currentTestGoal, false);
 		// Reset llm oracle
 		llmOracle.reset(currentTestGoal, false);
-		// Reset track verdict
-		lastLlmVerdict = Verdict.OK;
 	}
 
 	/**
@@ -138,10 +131,12 @@ public class Protocol_webdriver_b00_spark_llm extends WebdriverProtocol {
 		SUT system = super.startSystem();
 
 		// Login steps
+		/*
 		WdDriver.getRemoteWebDriver().findElement(By.name("id")).sendKeys("username"); // Replace with real username/email
 		WdDriver.getRemoteWebDriver().findElement(By.name("password")).sendKeys("password"); // Replace with real password
 		WdDriver.executeScript("document.querySelectorAll('input[type=submit]')[0].click();");
 		Util.pause(1);
+		*/
 
 		return system;
 	}
@@ -188,14 +183,7 @@ public class Protocol_webdriver_b00_spark_llm extends WebdriverProtocol {
 		// Use the LLM as an Oracle to determine if the test goal has been completed
 		Verdict llmVerdict = llmOracle.getVerdict(state);
 
-		// First match makes an update to the verdict
-		if(lastLlmVerdict == Verdict.OK 
-				&& llmVerdict.severity() == Verdict.Severity.LLM_COMPLETE.getValue()) {
-			lastLlmVerdict = llmVerdict;
-		} 
-		// Second match is the multi-agent assessment
-		else if(lastLlmVerdict.severity() == Verdict.Severity.LLM_COMPLETE.getValue() 
-				&& llmVerdict.severity() == Verdict.Severity.LLM_COMPLETE.getValue()) {
+		if(llmVerdict.severity() == Verdict.Severity.LLM_COMPLETE.getValue()) {
 			// Test goal was completed, retrieve next test goal from queue.
 			currentTestGoal = testGoalQueue.poll();
 
@@ -209,9 +197,6 @@ public class Protocol_webdriver_b00_spark_llm extends WebdriverProtocol {
 				llmActionSelector.reset(currentTestGoal, true);
 				llmOracle.reset(currentTestGoal, true);
 			}
-		} else {
-			// Reset track verdict
-			lastLlmVerdict = Verdict.OK;
 		}
 
 		return verdict;

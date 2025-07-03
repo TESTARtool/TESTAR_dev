@@ -1,0 +1,12 @@
+Feature: User Invalid Login
+  As a non registered user
+  I should not be able to sign in to the application
+
+  Background:
+    Given the login page is displayed
+
+  Scenario: Unsuccessful login with invalid credentials
+    When I enter a random username value
+    And I enter a random password value
+    And I click the 'Sign In' button
+    Then a message should appear to indicate these are invalid credentials

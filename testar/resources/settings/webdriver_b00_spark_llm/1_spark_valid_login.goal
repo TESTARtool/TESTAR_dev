@@ -1,0 +1,13 @@
+Feature: User Valid Login
+  As a registered user
+  I want to be able to sign in to the application
+  So that I can participate to the open surveys
+
+  Background:
+    Given the login page is displayed
+
+  Scenario: Successful login with valid credentials
+    When I enter the valid username 'user'
+    And I enter the valid password 'pass'
+    And I click the 'Sign In' button
+    Then I should be able to observe the open surveys

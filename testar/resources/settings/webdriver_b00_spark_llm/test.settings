@@ -136,14 +136,14 @@ AbstractStateAttributes = WebWidgetTextContent,WebWidgetPlaceholder
 #################################################################
 
 LlmPlatform = OpenAI
-LlmModel = gpt-4o-mini
+LlmModel = gpt-4.1
 LlmHostUrl = https://api.openai.com/v1/chat/completions
 LlmAuthorizationHeader = Bearer %OPENAI_API%
 LlmActionFewshotFile = prompts/fewshot_openai_action.json
 LlmOracleFewshotFile = prompts/fewshot_openai_oracle.json
 LlmTemperature = 0.2
 LlmHistorySize = 5
-LlmTestGoals = As a user, I want to verify that the Question sets of the Odontologist project contains a Customer satisfaction survey;As a user, I want to check that the Customer satisfaction survey contains no questions;As a user, I want to successfully create and save a new Time question with the id 'art1' that asks the user the arrival time\\nWhile 'Save question set' widget exists, this test objective is NOT meet because the form is not saved
+LlmTestGoals = Feature: User Valid Login\\n  As a registered user\\n  I want to be able to sign in to the application\\n  So that I can participate to the open surveys\\n  Background:\\n    Given the login page is displayed\\n  Scenario: Successful login with valid credentials\\n    When I enter the valid username 'user'\\n    And I enter the valid password 'pass'\\n    And I click the 'Sign In' button\\n    Then I should be able to observe the open surveys
 
 #################################################################
 # WebDriver features
@@ -207,7 +207,7 @@ ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
-TimeToWaitAfterAction = 2
+TimeToWaitAfterAction = 0
 StartupTime = 2.0
 TimeToFreeze = 30.0
 StopGenerationOnFault = true
