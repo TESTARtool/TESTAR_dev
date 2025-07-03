@@ -121,6 +121,7 @@ public class ActionHistory {
             } else {
                 switch(type) {
                     case "ClickTypeInto":
+                    case "PasteTextInto":
                         String input = getCompoundActionInputText(action);
                         // TODO: Differentiate between types of input fields (numeric, password, etc.)
                         builder.append(String.format("%s: Typed '%s' in TextField '%s'", actionId, input, description));

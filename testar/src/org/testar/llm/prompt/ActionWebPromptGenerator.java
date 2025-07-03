@@ -132,6 +132,7 @@ public class ActionWebPromptGenerator implements IPromptActionGenerator {
                 } else {
                     switch (type) {
                         case "ClickTypeInto":
+                        case "PasteTextInto":
                             // Differentiate between types of input fields. Example: password -> Password Field
                             String fieldType = StringUtils.capitalize(widget.get(WdTags.WebType, "text"));
                             builder.append(String.format("%s: Type in %sField '%s' ", actionId, fieldType, description));

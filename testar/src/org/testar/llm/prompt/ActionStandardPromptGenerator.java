@@ -112,6 +112,7 @@ public class ActionStandardPromptGenerator implements IPromptActionGenerator {
 
                 switch (type) {
                 case "ClickTypeInto":
+                case "PasteTextInto":
                     builder.append(String.format("%s: Type in Field '%s' ", actionId, description));
                     break;
                 case "LeftClickAt":
