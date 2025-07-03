@@ -32,7 +32,6 @@ package org.testar.monkey;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.SessionNotCreatedException;
 import org.testar.*;
 import org.testar.managers.NativeHookManager;
 import org.testar.monkey.alayer.Action;
@@ -54,6 +53,7 @@ import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
 import org.testar.monkey.alayer.windows.WinApiException;
 import org.testar.oracles.Oracle;
 import org.testar.oracles.log.LogOracle;
+import org.testar.oracles.log.ProcessListenerOracle;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
 import org.testar.reporting.ReportManager;
@@ -77,9 +77,12 @@ import static org.testar.monkey.alayer.Tags.*;
 
 public class DefaultProtocol extends RuntimeControlsProtocol {
 
-	public static boolean faultySequence;
 	protected boolean logOracleEnabled;
 	protected Oracle logOracle;
+
+	protected boolean processListenerOracleEnabled;
+	protected Oracle processListenerOracle;
+
 	private State stateForClickFilterLayerProtocol;
 
 	protected ReportManager reportManager;
@@ -99,10 +102,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	File currentSeq;
 
 	protected Mouse mouse;
-
-	protected ProcessListener processListener = new ProcessListener();
-	boolean enabledProcessListener = false;
-	public static Verdict processVerdict = Verdict.OK;
 
 	private Verdict replayVerdict;
 
@@ -290,6 +289,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				);
 
 		logOracleEnabled = settings.get(ConfigTags.LogOracleEnabled, false);
+		processListenerOracleEnabled = settings.get(ConfigTags.ProcessListenerEnabled, false);
 
 		if ( mode() == Modes.Generate || /*mode() == Modes.Record ||*/ mode() == Modes.Replay 
 				|| mode() == Modes.ListeningManual || mode() == Modes.ListeningScript) {
@@ -492,9 +492,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		LogSerialiser.log("SUT is running!\n", LogSerialiser.LogLevel.Debug);
 		LogSerialiser.log("Building canvas...\n", LogSerialiser.LogLevel.Debug);
 
-		// Activate process Listeners if enabled in the test.settings
-		if(enabledProcessListener)
-			processListener.startListeners(system, settings);
+		// Activate ProcessListenerOracle if enabled in the test.settings
+		if (processListenerOracleEnabled) {
+			processListenerOracle = new ProcessListenerOracle(system, settings);
+			processListenerOracle.initialize();
+		}
 
 		return system;
 	}
@@ -507,7 +509,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	void startTestSequence(SUT system) {
 		actionCount = 1;
 		lastSequenceActionNumber = settings().get(ConfigTags.SequenceLength) + actionCount - 1;
-		processVerdict = Verdict.OK;
 		this.cv = buildCanvas();
 	}
 
@@ -728,13 +729,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0));
 			return sutConnector.startOrConnectSut();
 		}else{
-			//Read the settings to know if user wants to start the process listener
-			if(settings.get(ConfigTags.ProcessListenerEnabled)) {
-				enabledProcessListener = processListener.enableProcessListeners(settings);
-			}
-
 			// for most windows applications and most jar files, this is where the SUT gets created!
-			SutConnectorCommandLine sutConnector = new SutConnectorCommandLine(builder, enabledProcessListener, settings);
+			SutConnectorCommandLine sutConnector = new SutConnectorCommandLine(builder, processListenerOracleEnabled, settings);
 			//TODO startupTime and maxEngageTime seems to be the same, except one is double and the other is long?
 			return sutConnector.startOrConnectSut();
 		}
@@ -769,7 +765,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		if(mode() != Modes.Spy && verdict.severity() >= settings().get(ConfigTags.FaultThreshold))
 		{
-			faultySequence = true;
 			LogSerialiser.log("Detected fault: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
 			// this was added to kill the SUT if it is frozen:
 			if(verdict.severity() == Verdict.Severity.NOT_RESPONDING.getValue())
@@ -820,6 +815,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//-------------------
 		// ORACLES FOR FREE
 		//-------------------
+
+		if ( processListenerOracleEnabled ) {
+			Verdict processListenerVerdict = processListenerOracle.getVerdict(state);
+			if ( processListenerVerdict.severity() == Verdict.Severity.SUSPICIOUS_PROCESS.getValue() ) {
+				return processListenerVerdict;
+			}
+		}
 
 		// if the SUT is not running and closed unexpectedly, we assume it crashed
 		if(!state.get(IsRunning, false))
@@ -1105,6 +1107,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @return
 	 */
 	protected boolean moreActions(State state) {
+		Verdict stateVerdict = state.get(Tags.OracleVerdict, Verdict.OK);
+		boolean faultySequence = stateVerdict.severity() != Verdict.OK.severity();
 		return (!settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence) &&
 				state.get(Tags.IsRunning, false) && !state.get(Tags.NotResponding, false) &&
 				//actionCount() < settings().get(ConfigTags.SequenceLength) &&
@@ -1144,9 +1148,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		String statusInfo = "";
 
 		if(mode() == Modes.Replay) {
-			reportManager.addTestVerdict(getReplayVerdict().join(processVerdict));
-			status = (getReplayVerdict().join(processVerdict)).verdictSeverityTitle();
-			statusInfo = (getReplayVerdict().join(processVerdict)).info();
+			reportManager.addTestVerdict(getReplayVerdict());
+			status = (getReplayVerdict()).verdictSeverityTitle();
+			statusInfo = (getReplayVerdict()).info();
 		}
 		else {
 			reportManager.addTestVerdict(getFinalVerdict());
