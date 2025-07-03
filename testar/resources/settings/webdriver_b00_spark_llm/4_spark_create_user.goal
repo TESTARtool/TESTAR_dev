@@ -1,0 +1,30 @@
+Feature: User Valid Login
+  As a registered user
+  I want to be able to sign in to the application
+  So that I can access to the user dashboard
+
+  Background:
+    Given the login page is displayed
+
+  Scenario: Successful login with valid credentials
+    When I enter the valid username 'user'
+    And I enter the valid password 'pass'
+    And I click the 'Sign In' button
+    Then I should be able to observe the user dashboard
+;
+Feature: Add a New User
+  As a signed-in user
+  I want to be able to add a new user with a specific role
+  So that they can access the system to create surveys
+
+  Background:
+    Given I am signed in
+    And I can see my dashboard
+
+  Scenario: Successfully adding a new user with the Researcher role
+    When I navigate to the 'Users' menu
+    And I click on the 'Add User' option
+    And I type 'testar-researcher' in the name field
+    And I click the input element to select the role 'Researcher'
+    And I confirm the addition
+    Then 'testar-researcher' should appear in the list of existing users

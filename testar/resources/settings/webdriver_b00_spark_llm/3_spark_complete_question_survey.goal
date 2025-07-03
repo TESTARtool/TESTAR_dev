@@ -1,0 +1,30 @@
+Feature: User Valid Login
+  As a registered user
+  I want to be able to sign in to the application
+  So that I can access to the user dashboard
+
+  Background:
+    Given the login page is displayed
+
+  Scenario: Successful login with valid credentials
+    When I enter the valid username 'user'
+    And I enter the valid password 'pass'
+    And I click the 'Sign In' button
+    Then I should be able to observe the user dashboard
+;
+Feature: Complete a Survey
+  As a signed-in user
+  I want to be able to start and complete a survey
+  So that I can submit my responses
+
+  Background:
+    Given I am signed in
+    And a sample survey is available on my dashboard
+
+  Scenario: Successfully completing a sample survey
+    When I click on the available sample survey
+    And I start the survey
+    And I type 'llm responding survey' into the response text area
+    And I click the 'Next' button
+    And I click the 'Next' button again
+    Then I should see the message 'Thank you for completing the survey!'

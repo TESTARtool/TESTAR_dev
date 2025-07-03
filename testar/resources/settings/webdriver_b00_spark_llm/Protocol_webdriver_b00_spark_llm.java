@@ -43,6 +43,7 @@ import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.NOP;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
+import org.testar.monkey.alayer.actions.WdHistoryBackAction;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
@@ -136,7 +137,7 @@ public class Protocol_webdriver_b00_spark_llm extends WebdriverProtocol {
 		WdDriver.getRemoteWebDriver().findElement(By.name("password")).sendKeys("password"); // Replace with real password
 		WdDriver.executeScript("document.querySelectorAll('input[type=submit]')[0].click();");
 		Util.pause(1);
-		*/
+		 */
 
 		return system;
 	}
@@ -247,17 +248,23 @@ public class Protocol_webdriver_b00_spark_llm extends WebdriverProtocol {
 			// addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
 
 			// If the element is blocked, Testar can't click on or type in the widget
-			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
+			if (widget.get(Blocked, false) && 
+					(
+					!widget.get(WdTags.WebCssClasses, "").contains("MuiFab-label")
+					||
+					!widget.get(WdTags.WebCssClasses, "").contains("MuiSelect-selectMenu")
+					)
+			) {
 				continue;
 			}
 
 			// type into text boxes
 			if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
 				if(whiteListed(widget) || isUnfiltered(widget)){
-					actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(), true));
+					actions.add(ac.pasteTextInto(widget, InputDataManager.getRandomTextInputData(), true));
 				}else{
 					// filtered and not white listed:
-					filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(), true));
+					filteredActions.add(ac.pasteTextInto(widget, InputDataManager.getRandomTextInputData(), true));
 				}
 			}
 
@@ -283,6 +290,10 @@ public class Protocol_webdriver_b00_spark_llm extends WebdriverProtocol {
 			actions = forcedActions;
 		}
 
+		// Always have the option to navigate back in the browser
+		// Because some menus have no close or cancel options
+		actions.add(new WdHistoryBackAction(state));
+
 		//Showing the grey dots for filtered actions if visualization is on:
 		if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
 
@@ -294,6 +305,9 @@ public class Protocol_webdriver_b00_spark_llm extends WebdriverProtocol {
 		// Various web elements which are clickable are no generic interactive widgets
 		if(!widget.get(WdTags.WebTextContent, "").isEmpty()
 				&& !widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdP)) {
+			return true;
+		}
+		if(widget.get(WdTags.WebCssClasses, "").contains("MuiSelect-selectMenu")) {
 			return true;
 		}
 		return super.isClickable(widget);
