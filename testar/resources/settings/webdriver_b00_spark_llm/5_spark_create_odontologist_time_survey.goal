@@ -41,4 +41,4 @@ Feature: Add a New Time Question to an Empty Survey
     And I add a new question with the ID 'art1'
     And I set the question text to 'What is your arrival time?'
     And I save the question set
-    Then the new question is saved successfully
+    Then a message appears indicating the survey activity has been updated

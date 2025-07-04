@@ -290,9 +290,9 @@ public class Protocol_webdriver_b00_spark_llm extends WebdriverProtocol {
 			actions = forcedActions;
 		}
 
-		// Always have the option to navigate back in the browser
+		// Always have the option to hit the ESC key
 		// Because some menus have no close or cancel options
-		actions.add(new WdHistoryBackAction(state));
+		actions.add(ac.hitESC(state));
 
 		//Showing the grey dots for filtered actions if visualization is on:
 		if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
