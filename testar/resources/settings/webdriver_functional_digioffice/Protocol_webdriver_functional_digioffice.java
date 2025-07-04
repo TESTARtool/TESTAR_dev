@@ -178,6 +178,9 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 
 		// Enable only if iframes do not allow to obtain the TESTAR-JS state
 		//Constants.ignoredTags = Arrays.asList( "script", "noscript", "head", "meta", "style", "link", "svg", "canvas", "iframe");
+
+		// Enable if obtaining the state is slow, but some web properties are not obtained
+		//Constants.simpleState = true;
 	}
 
 
