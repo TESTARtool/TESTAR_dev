@@ -137,6 +137,10 @@ public class ActionHistory {
                         // TODO: Decide if it makes sense to rely on the LLM to make this control decision
                         builder.append(String.format("%s: Close current browser tab", actionId));
                         break;
+                    case "HitESC":
+                        // TODO: Decide if it makes sense to rely on the LLM to make this control decision
+                        builder.append(String.format("%s: Hit the ESC key", actionId));
+                        break;
                     default:
                         logger.log(Level.WARN, "Unsupported action type for action history: " + type);
                         break;

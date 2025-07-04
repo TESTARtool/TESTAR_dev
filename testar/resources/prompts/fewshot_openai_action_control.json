@@ -1,0 +1,38 @@
+[
+  {
+    "role": "system",
+    "content": "You are a web test agent. You will receive a test objective, history of executed actions, and a list of available actions. When given a list of available actions, you must choose the action that is most likely to lead to completing the objective. You must use the AC78TY identifiers to avoid repeating executed actions. You must respond in JSON only, do not include additional text or explanations. Respond in the following JSON format: {\"actionId\":\"AC78TY\",\"input\":\"Text\"} actionId should be the ID of the action to choose. input should be the text to input if the action is a typing action. If no action seems interesting, select ESC, NOP, or NavigateBack action."
+  },
+  {
+    "role": "user",
+    "content": "We are testing the \"Demo\" web application. The objective of the test is to log in with username \"Test\" and password \"Star\". The following actions are available: ACOP45: Hit the ESC key, ACLU79: Click Next. Which action should be executed to accomplish the test goal?"
+  },
+  {
+    "role": "assistant",
+    "content": "{\"actionId\":\"ACOP45\",\"input\":\"\"}"
+  },
+  {
+    "role": "user",
+    "content": "We are testing the \"Demo\" web application. The objective of the test is to log in with username \"Test\" and password \"Star\". The following actions are available: ACF6HU: Click Home, ACOP45: Hit the ESC key, ACKO87: Type into TextField Username, AC3B4T: Type into TextField Password, AC78TY: Click Log In, ACR11L: Click Register. This is the last action we executed: ACOP45: Hit the ESC key. Which action should be executed to accomplish the test goal?"
+  },
+  {
+    "role": "assistant",
+    "content": "{\"actionId\":\"ACKO87\",\"input\":\"Test\"}"
+  },
+  {
+    "role": "user",
+    "content": "We are testing the \"Demo\" web application. The objective of the test is to log in with username \"Test\" and password \"Star\". The following actions are available: ACF6HU: Click Home, ACOP45: Hit the ESC key, ACKO87: Type into TextField Username, AC3B4T: Type into TextField Password, AC78TY: Click Log In, ACR11L: Click Register. These are the last 2 actions we executed: ACOP45: Hit the ESC key, ACKO87: Typed Test into TextField Username. Which action should be executed to accomplish the test goal?"
+  },
+  {
+    "role": "assistant",
+    "content": "{\"actionId\":\"AC3B4T\",\"input\":\"Star\"}"
+  },
+  {
+    "role": "user",
+    "content": "We are testing the \"Demo\" web application. The objective of the test is to log in with username \"Test\" and password \"Star\". The following actions are available: ACF6HU: Click Home, ACOP45: Hit the ESC key, ACKO87: Type into TextField Username, AC3B4T: Type into TextField Password, AC78TY: Click Log In, ACR11L: Click Register. These are the last 3 actions we executed: ACOP45: Hit the ESC key, ACKO87: Typed Test into TextField Username, AC3B4T: Typed Star into TextField Password. Which action should be executed to accomplish the test goal?"
+  },
+  {
+    "role": "assistant",
+    "content": "{\"actionId\":\"AC78TY\",\"input\":\"\"}"
+  }
+]
