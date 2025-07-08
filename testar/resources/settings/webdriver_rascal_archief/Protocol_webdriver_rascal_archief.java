@@ -38,9 +38,12 @@ import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.NOP;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.actions.WdFillFormAction;
+import org.testar.monkey.alayer.actions.WdSelectListAction;
+import org.testar.monkey.alayer.actions.WdSelectListAction.JsTargetMethod;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
+import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.oracles.Oracle;
@@ -202,7 +205,11 @@ public class Protocol_webdriver_rascal_archief extends WebdriverProtocol {
 			if (isAtBrowserCanvas(widget) && isClickable(widget)) {
 				if(whiteListed(widget) || isUnfiltered(widget)){
 					if (!isLinkDenied(widget)) {
-						actions.add(ac.leftClickAt(widget));
+						if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)) {
+							actions.add(randomFromSelectList(widget));
+						} else {
+							actions.add(ac.leftClickAt(widget));
+						}
 					}else{
 						// link denied:
 						filteredActions.add(ac.leftClickAt(widget));
@@ -224,6 +231,62 @@ public class Protocol_webdriver_rascal_archief extends WebdriverProtocol {
 		if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
 
 		return actions;
+	}
+
+	private Action randomFromSelectList(Widget w) {
+		String elementId = w.get(WdTags.WebId, "");
+		String elementName = w.get(WdTags.WebName, "");
+
+		if (!elementId.isEmpty()) {
+			return selectRandomValue(elementId, JsTargetMethod.ID, w);
+		} else if (!elementName.isEmpty()) {
+			return selectRandomValue(elementName, JsTargetMethod.NAME, w);
+		}
+
+		return new AnnotatingActionCompiler().leftClickAt(w);
+	}
+
+	private Action selectRandomValue(String identifier, JsTargetMethod targetMethod, Widget w) {
+		try {
+			String lengthQuery;
+			String valueQuery;
+
+			switch (targetMethod) {
+			case ID:
+				lengthQuery = String.format("return document.getElementById('%s').options.length;", identifier);
+				break;
+			case NAME:
+				lengthQuery = String.format("return document.getElementsByName('%s')[0].options.length;", identifier);
+				break;
+			default:
+				return new AnnotatingActionCompiler().leftClickAt(w);
+			}
+
+			Object lengthResponse = WdDriver.executeScript(lengthQuery);
+			int selectLength = (lengthResponse != null) ? Integer.parseInt(lengthResponse.toString()) : 1;
+
+			int randomIndex = new Random().nextInt(selectLength);
+
+			switch (targetMethod) {
+			case ID:
+				valueQuery = String.format("return document.getElementById('%s').options[%d].value;", identifier, randomIndex);
+				break;
+			case NAME:
+				valueQuery = String.format("return document.getElementsByName('%s')[0].options[%d].value;", identifier, randomIndex);
+				break;
+			default:
+				return new AnnotatingActionCompiler().leftClickAt(w);
+			}
+
+			Object valueResponse = WdDriver.executeScript(valueQuery);
+
+			return (valueResponse != null)
+					? new WdSelectListAction(identifier, valueResponse.toString(), w, targetMethod)
+							: new AnnotatingActionCompiler().leftClickAt(w);
+
+		} catch (Exception e) {
+			return new AnnotatingActionCompiler().leftClickAt(w);
+		}
 	}
 
 	/**

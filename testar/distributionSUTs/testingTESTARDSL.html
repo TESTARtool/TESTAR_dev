@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>TESTAR UI Model Example</title>
+  <style>
+    .panel {
+      border: 1px solid #ccc;
+      padding: 1em;
+      margin: 1em 0;
+    }
+    .alert {
+      background-color: #ffe0e0;
+      padding: 0.5em;
+      border: 1px solid red;
+    }
+    .label {
+      color: blue;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>All TESTAR elementTypes</h2>
+
+  <!-- button -->
+  <button id="btn_submit" data-elementtype="button">Submit</button>
+
+  <!-- input_text -->
+  <input type="text" id="input_name" placeholder="Name" data-elementtype="input_text">
+
+  <!-- input_numeric -->
+  <input type="number" id="input_age" placeholder="Age" data-elementtype="input_numeric">
+
+  <!-- checkbox -->
+  <label><input type="checkbox" id="chk_terms" data-elementtype="checkbox"> I accept the terms</label>
+
+  <!-- radiogroup -->
+  <fieldset data-elementtype="radiogroup" id="gender_group">
+    <legend>Gender</legend>
+    <label><input type="radio" name="gender" value="male" data-elementtype="radio"> Male</label>
+    <label><input type="radio" name="gender" value="female" data-elementtype="radio"> Female</label>
+    <label><input type="radio" name="gender" value="other" data-elementtype="radio"> Other</label>
+  </fieldset>
+
+  <!-- dropdown -->
+  <select id="country_select" data-elementtype="dropdown">
+    <option value="">-- select country --</option>
+    <option value="nl">Netherlands</option>
+    <option value="de">Germany</option>
+  </select>
+
+  <!-- multiple dropdown -->
+  <select id="multi_select" multiple data-elementtype="dropdown">
+    <option>Option A</option>
+    <option>Option B</option>
+    <option>Option C</option>
+  </select>
+
+  <!-- static_text -->
+  <p id="static_info" data-elementtype="static_text">Please enter your details below:</p>
+
+  <!-- label (styled span) -->
+  <span id="lbl_status" class="label" data-elementtype="label">Status: Active</span>
+
+  <!-- image -->
+  <img src="https://via.placeholder.com/100" alt="Placeholder image" id="img_logo" data-elementtype="image">
+
+  <!-- link -->
+  <a href="https://example.com" id="lnk_home" data-elementtype="link">Go to homepage</a>
+
+  <!-- alert -->
+  <div class="alert" id="alert_warning" data-elementtype="alert">⚠️ Something went wrong!</div>
+
+  <!-- panel with children -->
+  <div id="panel_main" class="panel" data-elementtype="panel">
+    <h3>Settings</h3>
+    <input type="text" id="child_input" placeholder="Child input" data-elementtype="input_text">
+    <label><input type="checkbox" id="child_chk" data-elementtype="checkbox"> Receive updates</label>
+  </div>
+
+  <!-- generic element -->
+  <div id="generic_element" data-elementtype="element">
+    <p>Generic container with text and input:</p>
+    <input type="text" placeholder="Generic text input">
+  </div>
+
+</body>
+</html>
