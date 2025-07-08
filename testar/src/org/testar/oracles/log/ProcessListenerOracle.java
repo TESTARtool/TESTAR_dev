@@ -109,6 +109,11 @@ public class ProcessListenerOracle implements Oracle {
 	}
 
 	@Override
+	public String getMessage() {
+		return "";
+	}
+
+	@Override
 	public Verdict getVerdict(State state) {
 		if (!processListenerEnabled) {
 			return Verdict.OK;
