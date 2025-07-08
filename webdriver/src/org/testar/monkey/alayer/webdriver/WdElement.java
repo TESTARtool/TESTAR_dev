@@ -34,11 +34,14 @@ import org.openqa.selenium.remote.RemoteWebElement;
 import org.testar.monkey.alayer.Rect;
 import org.testar.monkey.alayer.TaggableBase;
 
+import java.awt.Color;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class WdElement extends TaggableBase implements Serializable {
   private static final long serialVersionUID = 2695983969893321255L;
@@ -86,6 +89,7 @@ public class WdElement extends TaggableBase implements Serializable {
 
   // ComputedStyle properties
   String computedFontSize;
+  Color computedColor, computedBackgroundColor;
 
   // Keep these here for fillScrollValues
   protected String overflowX, overflowY;
@@ -164,6 +168,8 @@ public class WdElement extends TaggableBase implements Serializable {
     }
     display = (String) packedElement.get("display");
     computedFontSize = (String) packedElement.getOrDefault("computedFontSize", "");
+    computedColor = rgbToColor((String) packedElement.getOrDefault("computedColor", ""));
+    computedBackgroundColor = rgbToColor((String) packedElement.getOrDefault("computedBackgroundColor", ""));
 
     zindex = (double) (long) packedElement.get("zIndex");
     fillRect(packedElement);
@@ -363,5 +369,38 @@ public class WdElement extends TaggableBase implements Serializable {
 		  return ((Long) o).longValue();
 	  
 	  return (long)o;
+  }
+
+  /**
+   * Converts an "rgb(r, g, b)" string to a Color object.
+   */
+  public Color rgbToColor(String rgb) {
+	  if (rgb == null || rgb.trim().isEmpty()) {
+		  return null;
+	  }
+
+	  Pattern pattern = Pattern.compile(
+			  "rgba?\\s*\\(\\s*(\\d{1,3})\\s*,\\s*(\\d{1,3})\\s*,\\s*(\\d{1,3})(?:\\s*,\\s*(\\d*(?:\\.\\d+)?))?\\s*\\)",
+			  Pattern.CASE_INSENSITIVE
+			  );
+	  Matcher matcher = pattern.matcher(rgb);
+
+	  if (!matcher.matches()) {
+		  return null;
+	  }
+
+	  try {
+		  int r = Integer.parseInt(matcher.group(1));
+		  int g = Integer.parseInt(matcher.group(2));
+		  int b = Integer.parseInt(matcher.group(3));
+
+		  if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255) {
+			  return null;
+		  }
+
+		  return new Color(r, g, b);
+	  } catch (NumberFormatException e) {
+		  return null;
+	  }
   }
 }

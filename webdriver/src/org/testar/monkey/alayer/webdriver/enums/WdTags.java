@@ -30,6 +30,7 @@
 
 package org.testar.monkey.alayer.webdriver.enums;
 
+import java.awt.Color;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -133,6 +134,16 @@ public class WdTags extends TagsBase {
    * Web computed font size of a widget.
    */
   public static final Tag<String> WebComputedFontSize = from("WebComputedFontSize", String.class);
+
+  /**
+   * Web computed color of a widget.
+   */
+  public static final Tag<Color> WebComputedColor = from("WebComputedColor", Color.class);
+
+  /**
+   * Web computed backgroundColor of a widget.
+   */
+  public static final Tag<Color> WebComputedBackgroundColor = from("WebComputedBackgroundColor", Color.class);
 
   /**
    * Web type of input of a widget.

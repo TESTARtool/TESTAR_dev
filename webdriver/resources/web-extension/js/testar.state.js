@@ -172,7 +172,9 @@ function wrapElementTestar(element, xOffset, yOffset) {
         disabled: element.disabled,
         display: computedStyle.getPropertyValue('display'),
         multiple: element.multiple,
-        computedFontSize: window.getComputedStyle(element).fontSize,
+        computedFontSize: computedStyle.fontSize,
+        computedColor: computedStyle.color,
+        computedBackgroundColor: computedStyle.backgroundColor,
         innerHTML: element.innerHTML,
         outerHTML: element.outerHTML,
 
