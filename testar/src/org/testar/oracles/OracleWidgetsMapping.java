@@ -78,12 +78,27 @@ public interface OracleWidgetsMapping {
 				if (!((String) value).isEmpty()) {
 					return value;
 				}
+			} else if (tag.name().equals(Tags.WidgetChildren.name())) {
+				return getWidgetChildren(w);
 			} else if (value != null) {
 				return value;
 			}
 		}
 
 		return null;
+	}
+
+	default Boolean evaluateAreStatus(List<Object> listObj, String status) {
+		if (listObj == null || listObj.isEmpty()) return false;
+
+		// TODO: The logic of this joint status might be different based on status properties
+		// enabled vs disable
+		// empty vs filled
+		Boolean result = true;
+		for (Object obj : listObj) {
+			result = (result && evaluateIsStatus(obj, status));
+		}
+		return result;
 	}
 
 	default Boolean evaluateIsStatus(Object obj, String status) {
@@ -133,6 +148,29 @@ public interface OracleWidgetsMapping {
 	//  = "has nonempty" Name attr
 	//where attr can be one of "label", "alttext", "role", "placeholder", "tooltip"
 	//found possible with the mapping in attributeTags
+
+	default boolean evaluateHasAttribute(Object obj, String attr) {
+		// User wants to evaluate if a widget has an attribute
+		if (obj instanceof Widget) {
+			return evaluateHasAttribute(((Widget)obj), attr);
+		}
+
+		// User wants to evaluate if in a list of widgets
+		if (obj instanceof List<?>) {
+			List<?> list = (List<?>) obj;
+			for (Object item : list) {
+				if (item instanceof Widget) {
+					if (evaluateHasAttribute((Widget) item, attr)) {
+						return true; // At least one widget has the attribute
+					}
+				}
+			}
+		}
+
+		// TODO: Think other taggable objects like actions
+
+		return false; 
+	}
 
 	default boolean evaluateHasAttribute(Widget w, String attr) {
 		List<Tag<?>> tagPriority = attributeTags.get(attr);
@@ -264,6 +302,14 @@ public interface OracleWidgetsMapping {
 		return Color.White;
 	}
 
+	private List<Widget> getWidgetChildren(Widget w) {
+		List<Widget> children = new ArrayList<>();
+		for(int i = 0; i < w.childCount(); i++) {
+			children.add(w.child(i));
+		}
+		return children;
+	}
+
 	//	default boolean evaluateAttributeMatches(Widget w, String attr, String regex) {
 	//		List<Tag<?>> tagPriority = attributeTags.get(attr);
 	//
@@ -323,7 +369,7 @@ public interface OracleWidgetsMapping {
 			Map.entry("label", List.of(WdRoles.WdLABEL)),
 			Map.entry("panel", List.of(WdRoles.WdDIV, WdRoles.WdSECTION, WdRoles.WdARTICLE, WdRoles.WdFIELDSET)),
 			Map.entry("table_data", List.of(WdRoles.WdTD)),
-			Map.entry("menu", List.of(WdRoles.WdMENU, WdRoles.WdUL)),
+			Map.entry("menu", List.of(WdRoles.WdMENU, WdRoles.WdUL, WdRoles.WdNAV)),
 			Map.entry("menu_item", List.of(WdRoles.WdLI)),
 			Map.entry("form", List.of(WdRoles.WdFORM)),
 			Map.entry("element", List.of(Roles.Widget))
@@ -378,7 +424,8 @@ public interface OracleWidgetsMapping {
 			Map.entry("tooltip", List.of(Tags.Desc, WdTags.WebTextContent)),
 			Map.entry("fontsize", List.of(WdTags.WebComputedFontSize)),
 			Map.entry("length", List.of(WdTags.WebLength)),
-			Map.entry("title", List.of(WdTags.WebAriaLabel, WdTags.WebAriaLabelledBy, Tags.Title))
+			Map.entry("title", List.of(WdTags.WebAriaLabel, WdTags.WebAriaLabelledBy, Tags.Title)),
+			Map.entry("children", List.of(Tags.WidgetChildren)) // This Tag is null but used for DSL mapping
 			);
 	
 	default List<Widget> runWidgetSelector(State state, String roleString, String rawString)

@@ -216,6 +216,12 @@ public final class Tags extends TagsBase {
 	public static final Tag<Widget> OriginWidget = from("OriginWidget", Widget.class);
 
 	/**
+	 * The children of a widget
+	 */
+	@SuppressWarnings("unchecked")
+	public static final Tag<List<Widget>> WidgetChildren = from("WidgetChildren", (Class<List<Widget>>)(Class<?>)List.class);
+	
+	/**
 	 * The input text for a type or paste action
 	 */
 	public static final Tag<String> InputText = from("InputText", String.class);
