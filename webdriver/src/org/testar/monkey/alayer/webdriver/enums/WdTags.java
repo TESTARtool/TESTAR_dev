@@ -298,6 +298,11 @@ public class WdTags extends TagsBase {
   public static final Tag<Boolean> WebIsDisabled = from("WebIsDisabled", Boolean.class);
 
   /**
+   * Represents if an element contains the multiple attribute.
+   */
+  public static final Tag<Boolean> WebIsMultiple = from("WebIsMultiple", Boolean.class);
+
+  /**
    * Represents the accessible name for an element, used by assistive technologies 
    * such as screen readers. Maps to the HTML 'aria-label' attribute.
    * This value should provide a concise, human-readable label for the element 

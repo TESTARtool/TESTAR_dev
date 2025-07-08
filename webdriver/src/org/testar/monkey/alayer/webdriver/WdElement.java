@@ -82,6 +82,7 @@ public class WdElement extends TaggableBase implements Serializable {
   boolean isFullVisibleOnScreen;
 
   boolean checked, selected, disabled;
+  boolean multiple;
 
   // ComputedStyle properties
   String computedFontSize;
@@ -155,6 +156,8 @@ public class WdElement extends TaggableBase implements Serializable {
     selected = asBool(packedElement.getOrDefault("selected", false));
     disabled = asBool(packedElement.getOrDefault("disabled", false));
 
+    multiple = asBool(packedElement.getOrDefault("multiple", false));
+
     String classesString = attributeMap.getOrDefault("class", "");
     if (classesString != null) {
       cssClasses = Arrays.asList(classesString.split(" "));
@@ -207,7 +210,13 @@ public class WdElement extends TaggableBase implements Serializable {
 
   private boolean asBool(Object o) {
     if (o == null) return false;
-    else return (Boolean)o;
+    else if (o instanceof Boolean) {
+      return (Boolean) o;
+    }
+    else if (o instanceof String) {
+      return Boolean.parseBoolean((String) o);
+    }
+    return false;
   }
 
   private void writeObject(ObjectOutputStream oos) throws IOException {
@@ -306,7 +315,11 @@ public class WdElement extends TaggableBase implements Serializable {
 
 	  // If the web element is a <select><option>, check the selected option visibility
 	  if (tagName != null && tagName.equalsIgnoreCase("option") && outerHTML != null) {
-		  if (outerHTML.contains("<option") && (outerHTML.contains("selected>") || outerHTML.contains("selected="))) {
+		  if(parent != null && parent.multiple) {
+			// In multi-selects, visibility is determined only by canvas visibility
+			  return isVisibleAtCanvas;
+		  }
+		  else if (outerHTML.contains("<option") && (outerHTML.contains("selected>") || outerHTML.contains("selected="))) {
 			  return isVisibleAtCanvas;
 		  } else {
 			  return false;
