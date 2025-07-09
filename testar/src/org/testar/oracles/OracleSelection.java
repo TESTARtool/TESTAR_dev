@@ -40,6 +40,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -125,7 +126,7 @@ public class OracleSelection {
 		File javaDir = new File(Main.oraclesDir);
 		File compiledDir = new File(Main.oraclesDir, "compiled");
 
-		// Step 1: Find and compile all .java files
+		// Step 1: Find all .java files
 		File[] javaFiles = javaDir.exists() && javaDir.isDirectory()
 				? javaDir.listFiles((d, name) -> name.endsWith(".java"))
 						: null;
@@ -139,22 +140,17 @@ public class OracleSelection {
 				if (!compiledDir.exists()) {
 					compiledDir.mkdirs();
 				} else {
-					for (File f : compiledDir.listFiles()) {
-						if (f.isFile() && f.getName().endsWith(".class")) {
-							f.delete();
-						}
-					}
+					cleanObsoleteClassFiles(javaDir, compiledDir);
 				}
 
-				// Compile .java files
-				if (!compileJavaFiles(javaFiles, compiledDir)) {
-					System.err.println("Compilation failed. Cannot extract available oracles.");
+				// Step 2: Compile .java files individually
+				Set<String> successfullyCompiled = compileJavaFiles(javaFiles, compiledDir);
+				if (successfullyCompiled.isEmpty()) {
+					System.err.println("No oracles compiled successfully.");
 					return List.of();
 				}
 
-				// Step 2: Load all compiled classes that implement Oracle
-				Set<String> compiledClassNames = new LinkedHashSet<>();
-
+				// Step 3: Load all successfully compiled classes that implement Oracle
 				try (URLClassLoader classLoader = new URLClassLoader(new URL[]{compiledDir.toURI().toURL()})) {
 					Files.walk(compiledDir.toPath())
 					.filter(p -> p.toString().endsWith(".class"))
@@ -163,8 +159,7 @@ public class OracleSelection {
 							String className = getClassName(compiledDir.toPath(), classPath);
 							Class<?> clazz = classLoader.loadClass(className);
 							if (Oracle.class.isAssignableFrom(clazz) && !Modifier.isAbstract(clazz.getModifiers())) {
-								compiledClassNames.add(clazz.getSimpleName());
-								oracleNames.add(clazz.getSimpleName()); // add to final result
+								oracleNames.add(clazz.getSimpleName());
 							}
 						} catch (Exception e) {
 							System.out.println("Skipping class: " + e.getMessage());
@@ -172,14 +167,6 @@ public class OracleSelection {
 					});
 				} catch (IOException e) {
 					System.out.println("Error scanning compiled oracles: " + e.getMessage());
-				}
-
-				// Step 3: Optionally include .java file names **only if they match compiled class names**
-				for (File javaFile : javaFiles) {
-					String baseName = javaFile.getName().replaceAll("\\.java$", "");
-					if (compiledClassNames.contains(baseName)) {
-						oracleNames.add(baseName);
-					}
 				}
 
 				return new ArrayList<>(oracleNames);
@@ -209,46 +196,97 @@ public class OracleSelection {
 					outputDir.mkdirs();
 				} else {
 					// Clean previous compiled .class files
-					for (File f : outputDir.listFiles()) {
-						if (f.isFile() && f.getName().endsWith(".class")) {
-							f.delete();
-						}
-					}
+					cleanObsoleteClassFiles(javaDir, outputDir);
 				}
 
-				if (compileJavaFiles(javaFiles, outputDir)) {
-					return loadCompiledOracles(outputDir, selectedNames);
+				Set<String> compiledNames = compileJavaFiles(javaFiles, outputDir);
+				if (!compiledNames.isEmpty()) {
+					return loadCompiledOracles(outputDir, selectedNames.isEmpty() ? compiledNames : selectedNames);
 				}
-
 				return List.of();
 	}
 
-	private static boolean compileJavaFiles(File[] javaFiles, File outputDir) {
+	private static void cleanObsoleteClassFiles(File javaDir, File outputDir) {
+		if (!outputDir.exists()) return;
+
+		File[] classFiles = outputDir.listFiles((dir, name) -> name.endsWith(".class"));
+		if (classFiles == null) return;
+
+		for (File classFile : classFiles) {
+			String className = classFile.getName().replaceAll("\\.class$", "");
+			String baseName = className.split("\\$")[0]; // Handles inner classes
+
+			File sourceFile = new File(javaDir, baseName + ".java");
+
+			boolean isOrphan = !sourceFile.exists();
+			boolean isStale = sourceFile.exists() && classFile.lastModified() < sourceFile.lastModified();
+
+			if (isOrphan || isStale) {
+				classFile.delete();
+			}
+		}
+	}
+
+	private static Set<String> compileJavaFiles(File[] javaFiles, File outputDir) {
 		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 		if (compiler == null) {
 			System.out.println("No Java compiler available. Are you running a JDK?");
-			return false;
+			return Set.of();
 		}
 
-		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
+		Set<String> successfullyCompiled = new HashSet<>();
 
-		try (StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null)) {
-			Iterable<? extends JavaFileObject> compilationUnits =
-					fileManager.getJavaFileObjects(javaFiles);
-			List<String> options = List.of("-d", outputDir.getAbsolutePath());
+		for (File javaFile : javaFiles) {
+			String baseName = javaFile.getName().replaceAll("\\.java$", "");
+			long javaLastModified = javaFile.lastModified();
 
-			JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, options, null, compilationUnits);
-			boolean success = task.call();
+			boolean needsCompilation = true;
 
-			if (!success) {
-				diagnostics.getDiagnostics().forEach(d -> System.out.println(d.toString()));
+			// Check if any corresponding .class file exists and is up-to-date
+			File[] existingClassFiles = outputDir.listFiles((dir, name) ->
+			name.startsWith(baseName + "$") || name.equals(baseName + ".class")
+					);
+
+			if (existingClassFiles != null && existingClassFiles.length > 0) {
+				needsCompilation = false;
+				for (File classFile : existingClassFiles) {
+					if (classFile.lastModified() < javaLastModified) {
+						needsCompilation = true;
+						break;
+					}
+				}
 			}
 
-			return success;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
+			if (!needsCompilation) {
+				System.out.println("Up-to-date compiled external oracles: " + javaFile.getName());
+				successfullyCompiled.add(baseName); // trust previously compiled .class
+				continue;
+			}
+
+			DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
+
+			try (StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null)) {
+				Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjects(javaFile);
+				List<String> options = List.of("-d", outputDir.getAbsolutePath());
+
+				System.out.println("Compiling added or modified external oracles... " + javaFile.getName());
+
+				JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, options, null, compilationUnits);
+				boolean success = task.call();
+
+				if (success) {
+					successfullyCompiled.add(baseName);
+				} else {
+					System.out.println("Failed to compile: " + javaFile.getName());
+					diagnostics.getDiagnostics().forEach(d -> System.out.println(d.toString()));
+				}
+			} catch (IOException e) {
+				System.out.println("Error compiling file: " + javaFile.getName());
+				e.printStackTrace();
+			}
 		}
+
+		return successfullyCompiled;
 	}
 
 	public static List<Oracle> loadCompiledOracles(File outputDir, Set<String> selectedNames) {
