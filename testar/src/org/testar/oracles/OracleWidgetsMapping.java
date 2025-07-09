@@ -353,7 +353,7 @@ public interface OracleWidgetsMapping {
 			Map.entry("menu", Set.of("visible", "enabled", "focused", "clickable", "empty", "onscreen", "offscreen")),
 			Map.entry("menu_item", Set.of("visible", "enabled", "focused", "clickable", "empty", "onscreen", "offscreen")),
 			Map.entry("form", Set.of("visible", "focused", "empty", "onscreen", "offscreen")),
-			Map.entry("element", Set.of("visible", "enabled", "focused", "empty", "onscreen", "offscreen"))
+			Map.entry("element", Set.of("visible", "enabled", "focused", "empty", "onscreen", "offscreen", "disabled"))
 			);
 
 	Map<String, List<Role>> element2Role = Map.ofEntries(
