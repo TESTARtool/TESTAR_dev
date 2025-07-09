@@ -41,8 +41,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -120,8 +121,8 @@ public class OracleSelection {
 
 	/** External Oracles **/	
 
-	public static List<String> getAvailableOracleNames() {
-		Set<String> oracleNames = new LinkedHashSet<>();
+	public static Map<String, List<String>> getAvailableExternalOracles() {
+		Map<String, List<String>> fileToOraclesMap = new LinkedHashMap<>();
 
 		File javaDir = new File(Main.oraclesDir);
 		File compiledDir = new File(Main.oraclesDir, "compiled");
@@ -133,10 +134,10 @@ public class OracleSelection {
 
 				if (javaFiles == null || javaFiles.length == 0) {
 					System.err.println("No .java files found in: " + javaDir.getAbsolutePath());
-					return List.of();
+					return Map.of();
 				}
 
-				// Clean compiled directory
+				// Create or clean compiled directory
 				if (!compiledDir.exists()) {
 					compiledDir.mkdirs();
 				} else {
@@ -147,29 +148,46 @@ public class OracleSelection {
 				Set<String> successfullyCompiled = compileJavaFiles(javaFiles, compiledDir);
 				if (successfullyCompiled.isEmpty()) {
 					System.err.println("No oracles compiled successfully.");
-					return List.of();
+					return Map.of();
 				}
 
 				// Step 3: Load all successfully compiled classes that implement Oracle
 				try (URLClassLoader classLoader = new URLClassLoader(new URL[]{compiledDir.toURI().toURL()})) {
-					Files.walk(compiledDir.toPath())
-					.filter(p -> p.toString().endsWith(".class"))
-					.forEach(classPath -> {
-						try {
-							String className = getClassName(compiledDir.toPath(), classPath);
-							Class<?> clazz = classLoader.loadClass(className);
-							if (Oracle.class.isAssignableFrom(clazz) && !Modifier.isAbstract(clazz.getModifiers())) {
-								oracleNames.add(clazz.getSimpleName());
+					for (File javaFile : javaFiles) {
+						String fileName = javaFile.getName();
+						List<String> oraclesInFile = new ArrayList<>();
+
+						Files.walk(compiledDir.toPath())
+						.filter(p -> p.toString().endsWith(".class"))
+						.forEach(classPath -> {
+							try {
+								String className = getClassName(compiledDir.toPath(), classPath);
+								Class<?> clazz = classLoader.loadClass(className);
+
+								if (clazz.getProtectionDomain().getCodeSource().getLocation().getFile().endsWith("compiled/") &&
+										Oracle.class.isAssignableFrom(clazz) &&
+										!Modifier.isAbstract(clazz.getModifiers())) {
+
+									if (javaFile.getName().replace(".java", "").equalsIgnoreCase(clazz.getSimpleName()) ||
+											classPath.toString().contains(fileName.replace(".java", ""))) {
+
+										oraclesInFile.add(clazz.getSimpleName());
+									}
+								}
+							} catch (Exception e) {
+								System.out.println("Skipping class: " + e.getMessage());
 							}
-						} catch (Exception e) {
-							System.out.println("Skipping class: " + e.getMessage());
+						});
+
+						if (!oraclesInFile.isEmpty()) {
+							fileToOraclesMap.put(fileName, oraclesInFile);
 						}
-					});
+					}
 				} catch (IOException e) {
 					System.out.println("Error scanning compiled oracles: " + e.getMessage());
 				}
 
-				return new ArrayList<>(oracleNames);
+				return fileToOraclesMap;
 	}
 
 	public static List<Oracle> loadExternalJavaOracles(String selectedOracles) {

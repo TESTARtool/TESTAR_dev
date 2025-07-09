@@ -31,39 +31,42 @@
 package org.testar.settings.dialog;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.WindowEvent;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.SwingUtilities;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumnModel;
 
-import org.testar.monkey.Main;
 import org.testar.oracles.OracleSelection;
 
 public class ExternalOraclesDialog extends JDialog {
 	private static final long serialVersionUID = 8181334482682809135L;
 
-	private JTable table;
-	private DefaultTableModel tableModel;
-
 	private String savedSelectedExternalOracles;
 
 	Window window = SwingUtilities.getWindowAncestor(this);
 
+	private Map<String, List<JCheckBox>> fileToCheckboxes = new LinkedHashMap<>();
+	private Map<String, JCheckBox> fileHeaderCheckboxes = new LinkedHashMap<>();
+
 	public ExternalOraclesDialog(String selectedExternalOracles) {
 		this.savedSelectedExternalOracles = selectedExternalOracles;
 
-		setSize(500, 400);
+		setSize(500, 500);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setLayout(new BorderLayout());
@@ -80,44 +83,76 @@ public class ExternalOraclesDialog extends JDialog {
 		add(label, BorderLayout.NORTH);
 
 		// Load external oracles from the testar/bin/oracles path
-		List<String> availableOracles = OracleSelection.getAvailableOracleNames();
-		Collections.sort(availableOracles);
+		Map<String, List<String>> groupedOracles = OracleSelection.getAvailableExternalOracles();
 
 		// Load activated oracles from settings
 		List<String> activatedOracles = List.of(selectedExternalOracles.split(","));
 
-		// Table Model with Enabled External Oracles
-		String[] columnNames = {"External Oracle Name", "Enabled"};
-		Object[][] data = new Object[availableOracles.size()][2];
+		JPanel mainPanel = new JPanel();
+		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
-		for (int i = 0; i < availableOracles.size(); i++) {
-			String oracle = availableOracles.get(i);
-			data[i][0] = oracle; // Oracle name
-			data[i][1] = activatedOracles.contains(oracle); // Checkbox checked if activated
+		for (Map.Entry<String, List<String>> entry : groupedOracles.entrySet()) {
+			String fileName = entry.getKey();
+			List<String> oracles = entry.getValue();
+
+			JPanel containerPanel = new JPanel();
+			containerPanel.setLayout(new BorderLayout());
+
+			JPanel fileHeader = new JPanel(new BorderLayout());
+			fileHeader.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+			JPanel headerContent = new JPanel(new FlowLayout(FlowLayout.LEFT));
+			JCheckBox selectAllBox = new JCheckBox("Select All");
+			fileHeaderCheckboxes.put(fileName, selectAllBox);
+
+			JButton toggleButton = new JButton("> " + fileName);
+			toggleButton.setMargin(new Insets(0, 5, 0, 5));
+			headerContent.add(toggleButton);
+			headerContent.add(selectAllBox);
+
+			fileHeader.add(headerContent, BorderLayout.CENTER);
+			containerPanel.add(fileHeader, BorderLayout.NORTH);
+
+			JPanel oraclePanel = new JPanel();
+			oraclePanel.setLayout(new BoxLayout(oraclePanel, BoxLayout.Y_AXIS));
+			oraclePanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
+
+			List<JCheckBox> oracleBoxes = new ArrayList<>();
+			for (String oracle : oracles) {
+				JCheckBox box = new JCheckBox(oracle, activatedOracles.contains(oracle));
+				oracleBoxes.add(box);
+				oraclePanel.add(box);
+
+				box.addActionListener(e -> updateFileCheckbox(fileName));
+			}
+
+			selectAllBox.addActionListener(e -> {
+				boolean selected = selectAllBox.isSelected();
+				for (JCheckBox cb : oracleBoxes) {
+					cb.setSelected(selected);
+				}
+			});
+
+			toggleButton.addActionListener(e -> {
+				boolean isVisible = oraclePanel.isVisible();
+				oraclePanel.setVisible(!isVisible);
+				toggleButton.setText(isVisible 
+						? toggleButton.getText().replaceFirst("v", ">") // switch open to close 
+						: toggleButton.getText().replaceFirst(">", "v") // switch close to open 
+						);
+				revalidate();
+				repaint();
+			});
+
+			oraclePanel.setVisible(false); // start collapsed
+
+			fileToCheckboxes.put(fileName, oracleBoxes);
+			containerPanel.add(oraclePanel, BorderLayout.CENTER);
+
+			mainPanel.add(containerPanel);
 		}
 
-		tableModel = new DefaultTableModel(data, columnNames) {
-			private static final long serialVersionUID = 2200448991938484190L;
-
-			@Override
-			public Class<?> getColumnClass(int columnIndex) {
-				return (columnIndex == 1) ? Boolean.class : String.class; // Checkbox in column 1
-			}
-
-			@Override
-			public boolean isCellEditable(int row, int column) {
-				return column == 1; // Only checkbox column is editable
-			}
-		};
-
-		table = new JTable(tableModel);
-		table.setRowHeight(30);
-
-		TableColumnModel columnModel = table.getColumnModel();
-		columnModel.getColumn(0).setPreferredWidth(350);
-		columnModel.getColumn(1).setPreferredWidth(80);
-
-		JScrollPane scrollPane = new JScrollPane(table);
+		JScrollPane scrollPane = new JScrollPane(mainPanel);
 		add(scrollPane, BorderLayout.CENTER);
 
 		JButton saveButton = new JButton("Save and Close");
@@ -132,19 +167,23 @@ public class ExternalOraclesDialog extends JDialog {
 		return savedSelectedExternalOracles;
 	}
 
+	private void updateFileCheckbox(String fileName) {
+		List<JCheckBox> children = fileToCheckboxes.get(fileName);
+		JCheckBox parent = fileHeaderCheckboxes.get(fileName);
+		boolean allSelected = children.stream().allMatch(AbstractButton::isSelected);
+		parent.setSelected(allSelected);
+	}
+
 	private void saveExternalOracles() {
-		StringBuilder selectedOracles = new StringBuilder();
-		for (int i = 0; i < tableModel.getRowCount(); i++) {
-			boolean isSelected = (boolean) tableModel.getValueAt(i, 1);
-			String oracleName = (String) tableModel.getValueAt(i, 0);
-			if (isSelected) {
-				if (selectedOracles.length() > 0) {
-					selectedOracles.append(",");
+		List<String> selectedOracles = new ArrayList<>();
+		for (List<JCheckBox> checkboxes : fileToCheckboxes.values()) {
+			for (JCheckBox cb : checkboxes) {
+				if (cb.isSelected()) {
+					selectedOracles.add(cb.getText());
 				}
-				selectedOracles.append(oracleName);
 			}
 		}
-		savedSelectedExternalOracles = selectedOracles.toString();
+		savedSelectedExternalOracles = String.join(",", selectedOracles);
 		dispatchEvent(new WindowEvent(window ,WindowEvent.WINDOW_CLOSING));
 		dispose();
 	}
