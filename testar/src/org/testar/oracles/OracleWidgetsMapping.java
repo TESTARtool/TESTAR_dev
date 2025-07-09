@@ -336,23 +336,24 @@ public interface OracleWidgetsMapping {
 	//	}
 
 	Map<String, Set<String>> validStatusPerElement = Map.ofEntries(
-			Map.entry("button", Set.of("visible", "enabled", "focused", "clickable", "fullonscreen")),
-			Map.entry("input_text", Set.of("visible", "enabled", "focused", "readonly", "empty", "filled", "fullonscreen")),
-			Map.entry("input_numeric", Set.of("visible", "enabled", "focused", "readonly", "empty", "filled", "fullonscreen")),
-			Map.entry("static_text", Set.of("visible", "enabled", "focused", "readonly", "empty", "fullonscreen")),
-			Map.entry("checkbox", Set.of("visible", "enabled", "focused", "checked", "clickable", "fullonscreen")),
-			Map.entry("radio", Set.of("visible", "enabled", "focused", "selected", "clickable", "fullonscreen")),
-			Map.entry("dropdown", Set.of("visible", "enabled", "focused", "empty", "selected", "clickable", "fullonscreen")),
-			Map.entry("label", Set.of("visible", "focused", "fullonscreen")),
-			Map.entry("image", Set.of("visible", "focused", "fullonscreen")),
-			Map.entry("link", Set.of("visible", "clickable", "focused", "fullonscreen")),
-			Map.entry("alert", Set.of("visible", "focused", "fullonscreen")),
-			Map.entry("panel", Set.of("visible", "focused", "empty", "fullonscreen")),
-			Map.entry("table_data", Set.of("visible", "focused", "empty", "fullonscreen")),
-			Map.entry("menu", Set.of("visible", "enabled", "focused", "clickable", "empty", "fullonscreen")),
-			Map.entry("menu_item", Set.of("visible", "enabled", "focused", "clickable", "empty", "fullonscreen")),
-			Map.entry("form", Set.of("visible", "focused", "empty", "fullonscreen")),
-			Map.entry("element", Set.of("visible", "enabled", "focused", "empty", "fullonscreen"))
+			Map.entry("button", Set.of("visible", "enabled", "focused", "clickable", "onscreen", "offscreen")),
+			Map.entry("input_text", Set.of("visible", "enabled", "focused", "readonly", "empty", "filled", "onscreen", "offscreen")),
+			Map.entry("input_numeric", Set.of("visible", "enabled", "focused", "readonly", "empty", "filled", "onscreen", "offscreen")),
+			Map.entry("static_text", Set.of("visible", "enabled", "focused", "readonly", "empty", "onscreen", "offscreen")),
+			Map.entry("checkbox", Set.of("visible", "enabled", "focused", "checked", "clickable", "onscreen", "offscreen")),
+			Map.entry("radiogroup", Set.of("onscreen", "offscreen")),
+			Map.entry("radio", Set.of("visible", "enabled", "focused", "selected", "clickable", "onscreen", "offscreen")),
+			Map.entry("dropdown", Set.of("visible", "enabled", "focused", "empty", "selected", "clickable", "onscreen", "offscreen")),
+			Map.entry("label", Set.of("visible", "focused", "onscreen", "offscreen")),
+			Map.entry("image", Set.of("visible", "focused", "onscreen", "offscreen")),
+			Map.entry("link", Set.of("visible", "clickable", "focused", "onscreen", "offscreen")),
+			Map.entry("alert", Set.of("visible", "focused", "onscreen", "offscreen")),
+			Map.entry("panel", Set.of("visible", "focused", "empty", "onscreen", "offscreen")),
+			Map.entry("table_data", Set.of("visible", "focused", "empty", "onscreen", "offscreen")),
+			Map.entry("menu", Set.of("visible", "enabled", "focused", "clickable", "empty", "onscreen", "offscreen")),
+			Map.entry("menu_item", Set.of("visible", "enabled", "focused", "clickable", "empty", "onscreen", "offscreen")),
+			Map.entry("form", Set.of("visible", "focused", "empty", "onscreen", "offscreen")),
+			Map.entry("element", Set.of("visible", "enabled", "focused", "empty", "onscreen", "offscreen"))
 			);
 
 	Map<String, List<Role>> element2Role = Map.ofEntries(
@@ -397,7 +398,8 @@ public interface OracleWidgetsMapping {
 
 	Map<String, List<Tag<?>>> statusTags = Map.ofEntries(
 			Map.entry("visible", List.of(WdTags.WebIsFullOnScreen)),
-			Map.entry("fullonscreen", List.of(WdTags.WebIsFullOnScreen)),
+			Map.entry("onscreen", List.of(WdTags.WebIsFullOnScreen)),
+			Map.entry("offscreen", List.of(WdTags.WebIsOffScreen)),
 
 			Map.entry("enabled", List.of(WdTags.WebIsEnabled)),
 			Map.entry("disabled", List.of(WdTags.WebIsDisabled)),
@@ -416,7 +418,6 @@ public interface OracleWidgetsMapping {
 			);
 
 	Map<String, List<Tag<?>>> attributeTags = Map.ofEntries(
-			Map.entry("label", List.of(Tags.Title, WdTags.WebGenericTitle)),
 			Map.entry("alttext", List.of(WdTags.WebAlt)),
 			Map.entry("role", List.of(Tags.Role)),
 			Map.entry("placeholder", List.of(WdTags.WebPlaceholder)),
