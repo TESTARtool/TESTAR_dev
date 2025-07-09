@@ -171,7 +171,7 @@ ProtocolSpecificSetting_5 =
 #################################################################
 
 ExtendedOracles =
-ExternalOracles = CheckboxSTooltipsMustMentionYesAndNo,ComputedQuestionMustHaveAValue,NumericTooltipsMustMentionInteger,PlaceholderAndTooltipMustBeEqual,PromptsMustBeCapitalized,PromptsMustEndIn,PromptsMustNotShout,PromptsMustNotUseAllCaps
+ExternalOracles = CheckboxSTooltipsMustMentionYesAndNo$599,ComputedQuestionMustHaveAValue$479,Discount_div_228WasDisplayedAtSameTimeAsDiscount_div_288$1454,Discount_div_228WasDisplayedAtSameTimeAsDiscount_div_354$1937,Discount_div_228WasDisplayedAtSameTimeAsDiscount_div_406$2420,Discount_div_288WasDisplayedAtSameTimeAsDiscount_div_228$971,Discount_div_288WasDisplayedAtSameTimeAsDiscount_div_354$2098,Discount_div_288WasDisplayedAtSameTimeAsDiscount_div_406$2581,Discount_div_354WasDisplayedAtSameTimeAsDiscount_div_228$1132,Discount_div_354WasDisplayedAtSameTimeAsDiscount_div_288$1615,Discount_div_354WasDisplayedAtSameTimeAsDiscount_div_406$2742,Discount_div_406WasDisplayedAtSameTimeAsDiscount_div_228$1293,Discount_div_406WasDisplayedAtSameTimeAsDiscount_div_288$1776,Discount_div_406WasDisplayedAtSameTimeAsDiscount_div_354$2259,NumericTooltipsMustMentionInteger$718,PlaceholderAndTooltipMustBeEqual$836,PromptsMustBeCapitalized$160,PromptsMustEndIn$74,PromptsMustNotShout$252,PromptsMustNotUseAllCaps$349
 
 #################################################################
 # Specify the widget attributes that you wish to visualize during Spy Mode. Use a semicolon separated list.
