@@ -174,7 +174,7 @@ function wrapElementTestar(element, xOffset, yOffset) {
         multiple: element.multiple,
         computedFontSize: computedStyle.fontSize,
         computedColor: computedStyle.color,
-        computedBackgroundColor: computedStyle.backgroundColor,
+        computedBackgroundColor: getEffectiveBackgroundColor(element),
         innerHTML: element.innerHTML,
         outerHTML: element.outerHTML,
 
@@ -191,6 +191,31 @@ function wrapElementTestar(element, xOffset, yOffset) {
         xOffset: xOffset,
         yOffset: yOffset
     };
+}
+
+function getEffectiveBackgroundColor(el) {
+  while (el) {
+    const bg = window.getComputedStyle(el).backgroundColor;
+
+    // Check if background is NOT fully transparent
+    if (bg && bg !== 'transparent' && !isFullyTransparent(bg)) {
+      return bg;
+    }
+
+    el = el.parentElement;
+  }
+
+  // Fallback: if no background found, assume white (typical default)
+  return 'rgb(255, 255, 255)';
+}
+
+function isFullyTransparent(color) {
+  // Check for 'rgba(0, 0, 0, 0)' or any rgba where alpha = 0
+  const match = color.match(/^rgba?\(\s*(\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d*\.?\d+))?\s*\)$/i);
+  if (!match) return false;
+
+  const alpha = match[4];
+  return typeof alpha !== 'undefined' && parseFloat(alpha) === 0;
 }
 
 /*

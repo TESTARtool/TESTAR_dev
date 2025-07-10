@@ -374,16 +374,17 @@ public class WdElement extends TaggableBase implements Serializable {
   /**
    * Converts an "rgb(r, g, b)" string to a Color object.
    */
-  public Color rgbToColor(String rgb) {
-	  if (rgb == null || rgb.trim().isEmpty()) {
+  public Color rgbToColor(String input) {
+	  if (input == null || input.trim().isEmpty()) {
 		  return null;
 	  }
 
 	  Pattern pattern = Pattern.compile(
-			  "rgba?\\s*\\(\\s*(\\d{1,3})\\s*,\\s*(\\d{1,3})\\s*,\\s*(\\d{1,3})(?:\\s*,\\s*(\\d*(?:\\.\\d+)?))?\\s*\\)",
-			  Pattern.CASE_INSENSITIVE
+			  "rgba?\\s*\\(\\s*(\\d{1,3})\\s*,\\s*(\\d{1,3})\\s*,\\s*(\\d{1,3})" +
+					  "(?:\\s*,\\s*(\\d*(?:\\.\\d+)?))?\\s*\\)",
+					  Pattern.CASE_INSENSITIVE
 			  );
-	  Matcher matcher = pattern.matcher(rgb);
+	  Matcher matcher = pattern.matcher(input.trim());
 
 	  if (!matcher.matches()) {
 		  return null;
@@ -398,7 +399,18 @@ public class WdElement extends TaggableBase implements Serializable {
 			  return null;
 		  }
 
-		  return new Color(r, g, b);
+		  String alphaGroup = matcher.group(4);
+		  int a = 255; // default opaque
+
+		  if (alphaGroup != null && !alphaGroup.isEmpty()) {
+			  float alphaFloat = Float.parseFloat(alphaGroup);
+			  if (alphaFloat < 0f || alphaFloat > 1f) {
+				  return null;
+			  }
+			  a = Math.round(alphaFloat * 255);
+		  }
+
+		  return new Color(r, g, b, a);
 	  } catch (NumberFormatException e) {
 		  return null;
 	  }
