@@ -424,6 +424,8 @@ public interface OracleWidgetsMapping {
 			Map.entry("text", List.of(WdTags.WebTextContent, WdTags.WebValue, Tags.Title)),
 			Map.entry("tooltip", List.of(Tags.Desc, WdTags.WebTextContent)),
 			Map.entry("fontsize", List.of(WdTags.WebComputedFontSize)),
+			Map.entry("color", List.of(WdTags.WebComputedColor)),
+			Map.entry("backgroundColor", List.of(WdTags.WebComputedBackgroundColor)),
 			Map.entry("length", List.of(WdTags.WebLength)),
 			Map.entry("title", List.of(WdTags.WebAriaLabel, WdTags.WebAriaLabelledBy, Tags.Title)),
 			Map.entry("children", List.of(Tags.WidgetChildren)) // This Tag is null but used for DSL mapping

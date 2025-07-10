@@ -277,4 +277,38 @@ public class InvariantAsserts {
 		}
 	}
 
+	public static class ColorAndBackgroundColorMustBeDifferent$1036 implements Oracle {
+		/*
+		      assert for all static_text
+		        it.color not is equal to it.backgroundColor
+		        "Color and BackgroundColor must be different".
+		 */
+
+		@Override
+		public void initialize() { }
+
+		@Override
+		public String getMessage() {
+			return "Color and BackgroundColor must be different";
+		}
+
+		@Override
+		public Verdict getVerdict(State state) {
+			Verdict verdict = Verdict.OK;
+			for (Widget $it: getWidgets("static_text", state)) {
+
+				Object widget$989$8 = getProperty($it, "color");
+				boolean cond$998 = !(evaluateIsEqualTo(widget$989$8, new java.util.function.Supplier<Object>() {
+					public Object get() {
+
+						Object widget$1014$18 = getProperty($it, "backgroundColor");
+						return widget$1014$18; 
+					}  
+				}.get()));
+				if (!cond$998) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), $it)); }
+			}
+			return verdict;
+		}
+	}
+
 }

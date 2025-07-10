@@ -171,13 +171,13 @@ ProtocolSpecificSetting_5 =
 #################################################################
 
 ExtendedOracles =
-ExternalOracles = SubmitMustBeEnabledWhenAcceptTermsIsChecked$80,DollarValuesMustHaveTwoDecimals$112,DropdownOptionsMustNotBeEmpty$737,DropdownOptionsMustNotHaveAUniqueValue$838,FormsMustHaveAccessibilityTitle$647,ImagesMustHaveAlternativeText$555,MenuChildrenMustBeEnabled$390,TextSizeMustBeBiggerThan9Pixels$296
+ExternalOracles = SubmitMustBeEnabledWhenAcceptTermsIsChecked$80,DollarValuesMustHaveTwoDecimals$112,DropdownOptionsMustNotBeEmpty$737,DropdownOptionsMustNotHaveAUniqueValue$838,FormsMustHaveAccessibilityTitle$647,ImagesMustHaveAlternativeText$555,MenuChildrenMustBeEnabled$390,TextSizeMustBeBiggerThan9Pixels$296,ColorAndBackgroundColorMustBeDifferent$1036
 
 #################################################################
 # Specify the widget attributes that you wish to visualize during Spy Mode. Use a semicolon separated list.
 #################################################################
 
-SpyTagAttributes = AbstractID;Blocked;ConcreteID;Desc;Enabled;Path;Role;Shape;Title;WebHref;WebId;WebIsChecked;WebIsFullOnScreen;WebIsSelected;WebName;WebTagName;WebTextContent;WebTitle;WebType;WebValue;WebIsDisabled;WebIsEnabled;WebLength;WebAriaLabel;WebAriaLabelledBy
+SpyTagAttributes = AbstractID;Blocked;ConcreteID;Desc;Enabled;Path;Role;Shape;Title;WebHref;WebId;WebIsChecked;WebIsFullOnScreen;WebIsSelected;WebName;WebTagName;WebTextContent;WebTitle;WebType;WebValue;WebIsDisabled;WebIsEnabled;WebLength;WebAriaLabel;WebAriaLabelledBy;WebComputedColor;WebComputedBackgroundColor
 
 #################################################################
 # Other more advanced settings
