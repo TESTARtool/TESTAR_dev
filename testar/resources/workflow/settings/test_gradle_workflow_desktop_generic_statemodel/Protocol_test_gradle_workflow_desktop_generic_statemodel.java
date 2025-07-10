@@ -83,7 +83,7 @@ public class Protocol_test_gradle_workflow_desktop_generic_statemodel extends De
 		// Use the inferred state model Format -> Font... to validate the
 		// StateCondition feature
 		CheckConditionEvaluator checkEvaluator = new CheckConditionEvaluator(
-				Tags.Title, 
+				Tags.Representation, 
 				"Check: Font..."
 				);
 		boolean stateCondition = checkEvaluator.evaluateConditions(stateModelManager.getModelIdentifier(), stateModelManager);
@@ -91,9 +91,9 @@ public class Protocol_test_gradle_workflow_desktop_generic_statemodel extends De
 
 		// TransitionCondition feature
 		TransitionConditionEvaluator transitionEvaluator = new TransitionConditionEvaluator(
-				Tags.Title, 
+				Tags.Representation, 
 				Tags.Desc, 
-				Tags.Title, 
+				Tags.Representation, 
 				"Origin: Format\\nAction: Format\\nDest: Font..."
 				);
 		boolean transitionCondition = transitionEvaluator.evaluateConditions(stateModelManager.getModelIdentifier(), stateModelManager);
