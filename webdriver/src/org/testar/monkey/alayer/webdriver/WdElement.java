@@ -74,7 +74,7 @@ public class WdElement extends TaggableBase implements Serializable {
   boolean hasKeyboardFocus, isKeyboardFocusable;
   String acceleratorKey, accessKey;
   String valuePattern, href, style, styleOverflow, styleOverflowX, styleOverflowY, stylePosition, target, alt, src, visibility;
-  Object value;
+  String value;
   
   double zindex;
   double styleOpacity;
@@ -131,7 +131,7 @@ public class WdElement extends TaggableBase implements Serializable {
     innerText = (packedElement.get("innerText") == null) ? "" : ((String) packedElement.get("innerText")).replaceAll("\\s+", " ").trim();
     title = attributeMap.getOrDefault("title","");
     href = attributeMap.getOrDefault("href", "");
-    value = attributeMap.getOrDefault("value", "");
+    value = (packedElement.get("value") instanceof String) ? (String) packedElement.get("value") : "";
     style = attributeMap.getOrDefault("style", "");
     styleOverflow = (packedElement.get("styleOverflow") == null) ? "" : (String) packedElement.get("styleOverflow");
     styleOverflowX = (packedElement.get("styleOverflowX") == null) ? "" : (String) packedElement.get("styleOverflowX");
@@ -244,8 +244,8 @@ public class WdElement extends TaggableBase implements Serializable {
 	  else if(placeholder != null && !placeholder.isEmpty()) {
 		  return placeholder;
 	  }
-	  else if(value != null) {
-		  return value.toString();
+	  else if(value != null && !value.isEmpty()) {
+		  return value;
 	  }
 	  else if(tagName != null && !tagName.isEmpty()) {
 		  return tagName;
