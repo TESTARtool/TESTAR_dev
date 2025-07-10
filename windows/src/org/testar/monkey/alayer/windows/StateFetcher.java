@@ -93,7 +93,7 @@ public class StateFetcher implements Callable<UIAState>{
 		UIAState root = createWidgetTree(uiaRoot);
 		root.set(Tags.Role, Roles.Process);
 		root.set(Tags.NotResponding, false);
-		root.set(Tags.Title, generateXmlRepresentation(root, 0));
+		root.set(Tags.Representation, generateXmlRepresentation(root, 0));
 
 		for (Widget w : root)
 			w.set(Tags.Path,Util.indexString(w));
@@ -712,6 +712,7 @@ public class StateFetcher implements Callable<UIAState>{
 			xml.append(" />\n");
 		}
 
+		widget.set(Tags.Representation, xml.toString());
 		return xml.toString();
 	}
 
