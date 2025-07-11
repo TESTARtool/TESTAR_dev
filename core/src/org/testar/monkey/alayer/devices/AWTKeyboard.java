@@ -35,7 +35,7 @@ import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
 
-import org.testar.monkey.FruitException;
+import org.testar.monkey.alayer.exceptions.FruitException;
 
 public final class AWTKeyboard implements Keyboard {
 	public static AWTKeyboard build() throws FruitException{ return new AWTKeyboard(); }

@@ -33,8 +33,6 @@
  */
 package org.testar.monkey.alayer.exceptions; // refactored by urueda
 
-import org.testar.monkey.FruitException;
-
 public class SystemStartException extends FruitException {
 	private static final long serialVersionUID = 1554849408074075595L;
 	public SystemStartException(String message){ this(message, null); }

@@ -31,7 +31,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-package org.testar.monkey;
+package org.testar.monkey.alayer.exceptions;
 
 public class FruitException extends RuntimeException {
 	private static final long serialVersionUID = 8410136592237418299L;

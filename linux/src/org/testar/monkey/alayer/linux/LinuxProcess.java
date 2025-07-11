@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.testar.monkey.Assert;
-import org.testar.monkey.FruitException;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.SUTBase;
@@ -49,6 +48,7 @@ import org.testar.monkey.alayer.devices.AWTKeyboard;
 import org.testar.monkey.alayer.devices.AWTMouse;
 import org.testar.monkey.alayer.devices.Keyboard;
 import org.testar.monkey.alayer.devices.Mouse;
+import org.testar.monkey.alayer.exceptions.FruitException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.exceptions.SystemStopException;
 import org.testar.monkey.alayer.linux.atspi.AtSpiAccessible;
