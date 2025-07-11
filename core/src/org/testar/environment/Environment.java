@@ -28,17 +28,33 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.monkey;
+package org.testar.environment;
 
 /**
- * A default environment implementation. Can be used as fallback option when a OS specific environment implementation
- * is missing.
- * NOTE: This implementation prevents the application from crashing but doesn't guarantee correct behavior.
+ * Provides access to the environment in which the application is running.
+ * This interface should be realized by an operating specific implementation. Since the core module is standalone module
+ * without dependencies towards other modules, we specific the interface in the core module so that we can
+ * use the IEnvironment within the core module. During the initialization phase of the application the realization of
+ * IEnvironment needs to be set. This construction creates an abstraction layer between the logic and the operating
+ * system on which the application is running.
  */
-public class UnknownEnvironment implements IEnvironment {
-    @Override
-    public double getDisplayScale(long windowHandle){
-        System.out.println("WARNING getDisplayScale not implemented for current OS, returning default value");
-        return 1.0;
+public class Environment {
+    private static IEnvironment instance;
+
+    /**
+     * Get the environment interface.
+     * @return The environment interface or UnknownEnvironment.
+     */
+    public static IEnvironment getInstance() {
+    	return (instance != null) ? instance : new UnknownEnvironment();
     }
+
+    /**
+     * Sets the actual implementation of the interface.
+     * @param implementation The concrete implementation of the interface.
+     */
+    public static void setInstance(IEnvironment implementation) {
+        instance = implementation;
+    }
+
 }

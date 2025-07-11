@@ -32,6 +32,8 @@ package org.testar.monkey;
 
 import org.testar.CodingManager;
 import org.testar.StateManagementTags;
+import org.testar.environment.Environment;
+import org.testar.environment.UnknownEnvironment;
 import org.testar.managers.NativeHookManager;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.windows.Windows10;

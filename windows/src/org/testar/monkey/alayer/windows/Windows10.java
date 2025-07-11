@@ -30,7 +30,7 @@
 
 package org.testar.monkey.alayer.windows;
 
-import org.testar.monkey.IEnvironment;
+import org.testar.environment.IEnvironment;
 
 /**
  * A Windows 10 specific environment implementation.
