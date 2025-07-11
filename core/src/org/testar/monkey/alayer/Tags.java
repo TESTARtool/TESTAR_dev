@@ -125,9 +125,6 @@ public final class Tags extends TagsBase {
 
 	public static final Tag<WidgetMap> WidgetMap = from("WidgetMap", WidgetMap.class);
 
-	/** A unique identifier for a widget / actions / system */
-	public static final Tag<UID> UID = from("UID", UID.class);
-	
 	public static final Tag<String> Path = from("Path", String.class);
 	public static final Tag<String> ConcreteID = from(CodingManager.CONCRETE_ID, String.class);
 	public static final Tag<String> AbstractID = from(CodingManager.ABSTRACT_ID, String.class);

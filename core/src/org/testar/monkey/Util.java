@@ -95,22 +95,6 @@ public final class Util {
 		}
 	};
 
-	public static final Searcher NullSearcher = new Searcher() {
-		private static final long serialVersionUID = 7810562741429319061L;
-
-		public SearchFlag apply(Widget widget, UnFunc<Widget, SearchFlag> visitor) {
-			return SearchFlag.OK;
-		}
-	};
-
-	public static final Searcher AllSearcher = new Searcher() {
-		private static final long serialVersionUID = 7410528704889829161L;
-
-		public SearchFlag apply(Widget widget, UnFunc<Widget, SearchFlag> visitor) {
-			return visitor.apply(widget);
-		}
-	};
-
 	public static final HitTester TrueTester = new HitTester() {
 		private static final long serialVersionUID = -7254950185633885998L;
 
