@@ -32,8 +32,8 @@ package org.testar.statemodel.persistence.orientdb.entity;
 
 public class EdgeEntity extends DocumentEntity {
 
-    private VertexEntity sourceEntity;
-    private VertexEntity targetEntity;
+    private final VertexEntity sourceEntity;
+    private final VertexEntity targetEntity;
 
     public EdgeEntity(EntityClass entityClass, VertexEntity sourceEntity, VertexEntity targetEntity) {
         super(entityClass);

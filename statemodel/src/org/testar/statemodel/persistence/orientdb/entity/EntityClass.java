@@ -38,16 +38,16 @@ public class EntityClass {
     public enum EntityType {Vertex, Edge}
 
     // name of the class
-    private String className;
+    private final String className;
 
     // name of the superclass, if any
     private String superClassName;
 
     // is the entity an edge or a vertex?
-    private EntityType entityType;
+    private final EntityType entityType;
 
     // a set of properties to add to the class
-    private Set<Property> properties;
+    private final Set<Property> properties;
 
     /**
      * Consstructor

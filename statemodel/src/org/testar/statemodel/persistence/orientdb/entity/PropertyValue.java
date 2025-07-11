@@ -35,10 +35,10 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 public class PropertyValue {
 
     // the orientdb type of the property
-    OType type;
+    private final OType type;
 
     // the value of the property
-    Object value;
+    private final Object value;
 
     /**
      * Constructor

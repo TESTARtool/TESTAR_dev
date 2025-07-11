@@ -36,10 +36,10 @@ import java.util.Set;
 public class VertexEntity extends DocumentEntity {
 
     // set of this vertex's outgoing edges
-    private Set<EdgeEntity> outgoingEdges;
+    private final Set<EdgeEntity> outgoingEdges;
 
     // set of this vertex's incoming edges
-    private Set<EdgeEntity> incomingEdges;
+    private final Set<EdgeEntity> incomingEdges;
 
     /**
      * Constructor

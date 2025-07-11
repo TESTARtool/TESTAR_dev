@@ -33,7 +33,7 @@ package org.testar.statemodel;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.TaggableBase;
 
-public class TaggableEntity {
+public abstract class TaggableEntity {
 
     // a set of attributes and values
     private final TaggableBase attributes;

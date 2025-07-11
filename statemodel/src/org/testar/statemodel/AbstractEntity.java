@@ -35,7 +35,7 @@ import org.testar.statemodel.event.StateModelEventListener;
 import java.util.HashSet;
 import java.util.Set;
 
-public class AbstractEntity extends TaggableEntity {
+public abstract class AbstractEntity extends TaggableEntity {
 
     // a unique string identifier for this entity
     private final String id;

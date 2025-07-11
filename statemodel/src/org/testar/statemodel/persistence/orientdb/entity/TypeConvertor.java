@@ -37,7 +37,7 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 public class TypeConvertor {
 
     // map connecting Java types to OrientDb Types
-    private BiMap<Class<?>, OType> typeMatches;
+    private final BiMap<Class<?>, OType> typeMatches;
 
     private static TypeConvertor instance;
 
@@ -63,6 +63,5 @@ public class TypeConvertor {
     public Class<?> getClass(OType oType) {
         return typeMatches.inverse().get(oType);
     }
-
 
 }

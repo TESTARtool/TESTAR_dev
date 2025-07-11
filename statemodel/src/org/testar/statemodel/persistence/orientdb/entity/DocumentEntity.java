@@ -39,12 +39,12 @@ public abstract class DocumentEntity {
     /**
      * The entity class this entity `belongs` to.
      */
-    private EntityClass entityClass;
+    private final EntityClass entityClass;
 
     /**
      * A map of properties for this entity.
      */
-    private Map<String, PropertyValue> entityProperties;
+    private final Map<String, PropertyValue> entityProperties;
 
     /**
      * Should the entity be updated if it already exists?
