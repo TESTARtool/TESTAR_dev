@@ -54,6 +54,23 @@ task runTestar(type: Exec) {
 	}
 }
 
+task runTestarDebug(type: JavaExec) {
+    group = 'custom_testar'
+    description = 'Run TESTAR in debug mode'
+
+    main = 'org.testar.monkey.Main'
+
+    classpath = sourceSets.main.runtimeClasspath
+    workingDir = file('target/install/testar/bin')
+
+    def suspendMode = project.hasProperty("debug") && project.debug == 'true' ? 'y' : 'n'
+
+    jvmArgs = [
+          "-agentlib:jdwp=transport=dt_socket,server=y,suspend=${suspendMode},address=*:5005",
+          "-Djava.awt.headless=false"
+    ]
+}
+
 task customZipDistribution(type: Zip) {
 	doFirst{
 		new File("${project.buildDir}/install/testar/bin/settings","desktop_generic.sse").text=""
@@ -66,40 +83,6 @@ task customZipDistribution(type: Zip) {
 
    	archiveFileName.set 'testarDistribution.zip'
    	getDestinationDirectory().set(file('target/install'))
-}
-
-/**
- * Prepare folder structure to run debugging mode from IDE
- */
-task debuggingDistribution(type: Exec, dependsOn:'debugFiles') {
-    group = 'custom_testar'
-    description ='debuggingDistribution'
-
-    workingDir '.'
-    commandLine 'cmd', '/c', 'dir'
-}
-
-task debugFiles(type: Copy, dependsOn:'build') {
-    from 'target/scripts/.'
-    into '.'
-}
-
-task cleanDebugging(type: Exec, dependsOn:'deleteDebugging') {
-    group = 'custom_testar'
-    description ='cleanDebugging'
-
-    workingDir '.'
-    commandLine 'cmd', '/c', 'dir'
-}
-
-task deleteDebugging(type: Delete){
-    delete 'settings'
-    delete 'suts'
-    delete 'output'
-    delete 'testar'
-    delete 'testar.bat'
-    delete 'windows.dll'
-    delete 'index.log'
 }
 
 dependencies {
@@ -212,8 +195,8 @@ startScripts.dependsOn {
 
 //running testar requires the distribution to be installed.
 runTestar.dependsOn(installDist)
+runTestarDebug.dependsOn(installDist)
 customZipDistribution.dependsOn(installDist)
-debuggingDistribution.dependsOn(build)
 
 /**
  * Build TESTAR using Visual Studio Tools to create a windows.dll
