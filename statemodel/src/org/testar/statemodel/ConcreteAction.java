@@ -30,17 +30,17 @@
 
 package org.testar.statemodel;
 
-public class ConcreteAction extends Widget {
+public class ConcreteAction extends ModelWidget {
 
     /**
      * The concrete action id.
      */
-    private String actionId;
+    private final String actionId;
 
     /**
      * The abstract action that abstracts this concrete action.
      */
-    private AbstractAction abstractAction;
+    private final AbstractAction abstractAction;
 
     /**
      * Constructor.

@@ -41,13 +41,13 @@ import java.util.Set;
 public class AbstractState extends AbstractEntity implements Persistable {
 
     // list of possible actions that can be executed from this state
-    private Map<String, AbstractAction> actions;
+    private final Map<String, AbstractAction> actions;
     // list of possible actions that have not yet been executed from this state
-    private Map<String, AbstractAction> unvisitedActions;
+    private final Map<String, AbstractAction> unvisitedActions;
     // a list of actions that have been visited in this state
-    private Map<String, AbstractAction> visitedActions;
+    private final Map<String, AbstractAction> visitedActions;
     // a set of strings containing the concrete state ids that correspond to this abstract state
-    private Set<String> concreteStateIds;
+    private final Set<String> concreteStateIds;
     // is this an initial state?
     private boolean isInitial = false;
 

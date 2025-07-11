@@ -38,7 +38,7 @@ import java.util.Set;
 public class AbstractAction extends AbstractEntity implements Persistable {
 
     // collection of concrete actions that are abstracted by this action
-    private Set<String> concreteActionIds;
+    private final Set<String> concreteActionIds;
 
     /**
      * Constructor

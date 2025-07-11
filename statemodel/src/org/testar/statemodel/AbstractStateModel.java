@@ -46,31 +46,31 @@ import java.util.Set;
 public class AbstractStateModel {
 
     // this should contain a hash to uniquely identify the elements that were `used` in the abstraction level of the model
-    private String modelIdentifier;
+    private final String modelIdentifier;
 
     // the name of the application that is being modelled
-    private String applicationName;
+    private final String applicationName;
 
     // the version of the application that is being modelled
-    private String applicationVersion;
+    private final String applicationVersion;
 
     // a set of tags that was used to `form` the abstract state model
-    private Set<Tag<?>> tags;
+    private final Set<Tag<?>> tags;
 
-    private Set<AbstractStateTransition> stateTransitions;
+    private final Set<AbstractStateTransition> stateTransitions;
     // we store the transitions twice extra, once by the source state and once by the target state for fast bi-directional lookup
     // the extra overhead is minimal
-    private Map<String, Set<AbstractStateTransition>> stateTransitionsBySource;
-    private Map<String, Set<AbstractStateTransition>> stateTransitionsByTarget;
+    private final Map<String, Set<AbstractStateTransition>> stateTransitionsBySource;
+    private final Map<String, Set<AbstractStateTransition>> stateTransitionsByTarget;
 
     // the states in the model
-    private Map<String, AbstractState> states;
+    private final Map<String, AbstractState> states;
 
     // set of initial states
-    private Map<String, AbstractState> initialStates;
+    private final Map<String, AbstractState> initialStates;
 
     // a set of event listeners
-    private Set<StateModelEventListener> eventListeners;
+    private final Set<StateModelEventListener> eventListeners;
 
     // are we emitting events or not?
     private boolean emitEvents = true;

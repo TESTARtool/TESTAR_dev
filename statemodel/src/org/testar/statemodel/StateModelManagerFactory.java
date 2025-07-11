@@ -59,11 +59,6 @@ public class StateModelManagerFactory {
             throw new RuntimeException("No Abstract State Attributes were provided in the settings file");
         }
 
-        Set<Tag<?>> concreteStateTags = Arrays.stream(CodingManager.getCustomTagsForConcreteId()).collect(Collectors.toSet());
-        if (concreteStateTags.isEmpty()) {
-            throw new RuntimeException("No concrete State Attributes were provided in the settings file");
-        }
-
         // get a persistence manager
         PersistenceManagerFactoryBuilder.ManagerType managerType;
         if (configTags.get(StateModelTags.DataStoreMode).equals(PersistenceManager.DATA_STORE_MODE_NONE)) {
@@ -94,7 +89,7 @@ public class StateModelManagerFactory {
         // should we store widgets?
         boolean storeWidgets = configTags.get(StateModelTags.StateModelStoreWidgets);
 
-        return new ModelManager(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
+        return new ModelManager(abstractStateModel, actionSelector, persistenceManager, sequenceManager, storeWidgets);
     }
 
 }

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,41 +28,42 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.statemodel.actionselector;
+package org.testar.statemodel;
 
-import org.testar.statemodel.AbstractAction;
-import org.testar.statemodel.AbstractState;
-import org.testar.statemodel.AbstractStateModel;
-import org.testar.statemodel.exceptions.ActionNotFoundException;
+import org.testar.monkey.alayer.Tag;
+import org.testar.monkey.alayer.TaggableBase;
 
-import java.util.List;
+public class TaggableEntity {
 
-public class CompoundActionSelector implements ActionSelector{
+    // a set of attributes and values
+    private final TaggableBase attributes;
 
-    private final List<ActionSelector> selectors;
-
-    public CompoundActionSelector(List<ActionSelector> selectors) {
-        this.selectors = selectors;
+    /**
+     * TaggableEntity Constructor
+     */
+    public TaggableEntity() {
+        this.attributes = new TaggableBase();
     }
 
-    @Override
-    public void notifyNewSequence() {
-    	selectors.forEach(selector -> selector.notifyNewSequence());
-    }
-
-    @Override
-    public AbstractAction selectAction(AbstractState currentState, AbstractStateModel abstractStateModel) throws ActionNotFoundException {
-        // Iterating through the available action selectors - if the current one throws exception,
-        // then the next action selector will be tried
-        // If all of them fail, then throw an exception
-        for(ActionSelector selector:selectors) {
-            try {
-                return selector.selectAction(currentState, abstractStateModel);
-            }
-            catch (ActionNotFoundException ex) {
-                //@todo maybe some logging here later?
-            }
+    /**
+     * This method adds a custom attribute to the entity in the form of a tag and its value
+     * @param attribute
+     * @param value
+     */
+    public void addAttribute(Tag attribute, Object value) {
+        try {
+            attributes.set(attribute, value);
+        } catch (Exception e) { //TODO check what kind of exceptions can happen
+            System.out.println("Problem adding value for tag " + attribute.name() + " to abstract state");
         }
-        throw new ActionNotFoundException();
     }
+
+    /**
+     * This method returns the 'attributes' that have been added to this entity
+     * @return
+     */
+    public TaggableBase getAttributes() {
+        return attributes;
+    }
+
 }

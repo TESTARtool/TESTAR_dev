@@ -51,7 +51,7 @@ import org.testar.statemodel.sequence.SequenceNode;
 import org.testar.statemodel.sequence.SequenceStep;
 import org.testar.statemodel.util.EventHelper;
 import org.testar.statemodel.util.HydrationHelper;
-import org.testar.statemodel.Widget;
+import org.testar.statemodel.ModelWidget;
 import org.testar.statemodel.*;
 import org.testar.statemodel.persistence.orientdb.entity.*;
 
@@ -278,13 +278,13 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
     /**
      * This method will store a widget tree to the orient database.
-     * @param widget
+     * @param modelWidget
      */
-    private void persistWidgetTree(Widget widget, VertexEntity widgetEntity) {
+    private void persistWidgetTree(ModelWidget modelWidget, VertexEntity widgetEntity) {
         widgetEntity.enableUpdate(false);
         // we assume the root widget of the tree has already been stored, as this will be the concrete state
         // we loop through the child widgets and for each widget, store the widget and then store the needed edges between them
-        for (Widget childWidget : widget.getChildren()) {
+        for (ModelWidget childWidget : modelWidget.getChildren()) {
             VertexEntity childWidgetEntity = persistWidget(childWidget);
             if (childWidgetEntity == null) {
                 System.out.println("Encountered an error persisting the widget with id " + childWidget.getId());
@@ -316,10 +316,10 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
     /**
      * This method will persist a single widget to the OrientDB data store.
-     * @param widget
+     * @param modelWidget
      * @return
      */
-    private VertexEntity persistWidget(Widget widget) {
+    private VertexEntity persistWidget(ModelWidget modelWidget) {
         // create an entity to persist to the database
         EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.Widget);
         VertexEntity vertexEntity = new VertexEntity(entityClass);
@@ -328,7 +328,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         // hydrate the widget entity
         try {
             EntityHydrator hydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_WIDGET);
-            hydrator.hydrate(vertexEntity, widget);
+            hydrator.hydrate(vertexEntity, modelWidget);
         }
         catch (HydrationException e) {
             e.printStackTrace();

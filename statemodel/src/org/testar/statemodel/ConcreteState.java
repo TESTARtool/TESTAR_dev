@@ -31,26 +31,19 @@
 package org.testar.statemodel;
 
 import org.testar.statemodel.persistence.Persistable;
-import org.testar.monkey.alayer.Tag;
 
-import java.util.Set;
-
-public class ConcreteState extends Widget implements Persistable {
-
-    // a set of tags that was used in creating the concrete state id
-    private Set<Tag<?>> tags;
+public class ConcreteState extends ModelWidget implements Persistable {
 
     /**
      * The abstract state that is abstracted from this concrete state.
      */
-    private AbstractState abstractState;
+    private final AbstractState abstractState;
 
     // a byte array holding the screenshot for this state
     private byte[] screenshot;
 
-    public ConcreteState(String id, Set<Tag<?>> tags, AbstractState abstractState) {
+    public ConcreteState(String id, AbstractState abstractState) {
         super(id);
-        this.tags = tags;
         this.setRootWidget(this);
         this.abstractState = abstractState;
     }
@@ -60,7 +53,7 @@ public class ConcreteState extends Widget implements Persistable {
      * @return
      */
     public byte[] getScreenshot() {
-        return screenshot;
+        return screenshot != null ? screenshot : new byte[0];
     }
 
     /**
