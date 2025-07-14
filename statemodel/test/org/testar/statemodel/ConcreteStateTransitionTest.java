@@ -44,6 +44,21 @@ public class ConcreteStateTransitionTest {
         assertEquals("ConcreteAction1", transition.getActionId());
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testConstructorWithNullSourceState() {
+        new ConcreteStateTransition(null, targetState, action);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testConstructorWithNullTargetState() {
+        new ConcreteStateTransition(sourceState, null, action);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testConstructorWithNullAction() {
+        new ConcreteStateTransition(sourceState, targetState, null);
+    }
+
     @Test
     public void testCanBeDelayedIsTrue() {
         assertTrue(transition.canBeDelayed());

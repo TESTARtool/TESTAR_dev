@@ -56,7 +56,7 @@ public class StateModelManagerFactory {
 
         Set<Tag<?>> abstractTags = Arrays.stream(CodingManager.getCustomTagsForAbstractId()).collect(Collectors.toSet());
         if (abstractTags.isEmpty()) {
-            throw new RuntimeException("No Abstract State Attributes were provided in the settings file");
+            throw new IllegalArgumentException("No Abstract State Attributes were provided in the settings file");
         }
 
         // get a persistence manager

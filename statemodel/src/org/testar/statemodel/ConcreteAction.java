@@ -30,6 +30,8 @@
 
 package org.testar.statemodel;
 
+import java.util.Objects;
+
 public class ConcreteAction extends ModelWidget {
 
     /**
@@ -47,9 +49,12 @@ public class ConcreteAction extends ModelWidget {
      * @param actionId
      */
     public ConcreteAction(String actionId, AbstractAction abstractAction) {
-        super(actionId);
+        super(Objects.requireNonNull(actionId, "ConcreteAction ID cannot be null"));
+        if (actionId.trim().isEmpty()) {
+            throw new IllegalArgumentException("ConcreteAction ID cannot be empty or blank");
+        }
         this.actionId = actionId;
-        this.abstractAction = abstractAction;
+        this.abstractAction = Objects.requireNonNull(abstractAction, "AbstractAction cannot be null");
     }
 
     public String getActionId() {

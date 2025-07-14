@@ -98,6 +98,49 @@ public class AbstractStateTest {
         assertTrue(abstractState.getUnvisitedActions().contains(newAction));
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testConstructorWithNullActionInSet() {
+        Set<AbstractAction> actions = new HashSet<>();
+        actions.add(null);
+        new AbstractState("state-with-null-action", actions);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testConstructorWithNullStateId() {
+        new AbstractState(null, new HashSet<>());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithEmptyStateId() {
+        new AbstractState("", new HashSet<>());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithBlankStateId() {
+        new AbstractState("    ", new HashSet<>());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testAddNullConcreteStateId() {
+        abstractState.addConcreteStateId(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testAddNullVisitedAction() {
+        abstractState.addVisitedAction(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testAddNewActionWithNull() {
+        abstractState.addNewAction(null);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void testConcreteStateIdsIsUnmodifiable() {
+        Set<String> ids = abstractState.getConcreteStateIds();
+        ids.add("concrete-action-should-fail");
+    }
+
     @Test
     public void testCanBeDelayedIsFalse() {
         assertFalse(abstractState.canBeDelayed());

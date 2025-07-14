@@ -40,6 +40,8 @@ import org.testar.monkey.alayer.Tag;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -84,10 +86,16 @@ public class AbstractStateModel {
                               String applicationVersion,
                               Set<Tag<?>> tags,
                               StateModelEventListener ...eventListeners) {
-        this.modelIdentifier = modelIdentifier;
-        this.applicationName = applicationName;
-        this.applicationVersion = applicationVersion;
-        this.tags = tags;
+
+        this.modelIdentifier = Objects.requireNonNull(modelIdentifier, "Model identifier cannot be null");
+        if (modelIdentifier.trim().isEmpty()) {
+            throw new IllegalArgumentException("Model identifier cannot be empty or blank");
+        }
+
+        this.applicationName = Objects.requireNonNull(applicationName, "Application name cannot be null");
+        this.applicationVersion = Objects.requireNonNull(applicationVersion, "Application version cannot be null");
+        this.tags = Collections.unmodifiableSet(new HashSet<>(Objects.requireNonNull(tags, "AbstractStateModel Tags set cannot be null")));
+
         // sets are empty when the model is just created
         stateTransitions = new HashSet<>();
         stateTransitionsBySource = new HashMap<>();
@@ -95,8 +103,8 @@ public class AbstractStateModel {
         states = new HashMap<>();
         initialStates = new HashMap<>();
         this.eventListeners = new HashSet<>();
-        for (int i = 0; i < eventListeners.length;i++) {
-            this.eventListeners.add(eventListeners[i]);
+        for (StateModelEventListener listener : eventListeners) {
+            this.eventListeners.add(Objects.requireNonNull(listener, "Event listener cannot be null"));
         }
         initStateModel();
     }
@@ -117,6 +125,10 @@ public class AbstractStateModel {
      * @throws StateModelException
      */
     public void addTransition(AbstractState sourceState, AbstractState targetState, AbstractAction executedAction) throws StateModelException{
+        Objects.requireNonNull(sourceState, "AbstractStateModel source state cannot be null");
+        Objects.requireNonNull(targetState, "AbstractStateModel target state cannot be null");
+        Objects.requireNonNull(executedAction, "AbstractStateModel executed action cannot be null");
+
         checkStateId(sourceState.getStateId());
         checkStateId(targetState.getStateId());
 
@@ -174,7 +186,9 @@ public class AbstractStateModel {
      * @throws StateModelException
      */
     public void addState(AbstractState newState) throws StateModelException {
+        Objects.requireNonNull(newState, "AbstractState cannot be null");
         checkStateId(newState.getStateId());
+
         if (!containsState(newState.getStateId())) {
             // provide the state with this state model's abstract identifier
             newState.setModelIdentifier(modelIdentifier);
@@ -202,6 +216,7 @@ public class AbstractStateModel {
      * @throws StateModelException
      */
     public AbstractState getState(String abstractStateId) throws StateModelException {
+        Objects.requireNonNull(abstractStateId, "AbstractState ID cannot be null");
         if (containsState(abstractStateId)) {
             return states.get(abstractStateId);
         }
@@ -222,6 +237,7 @@ public class AbstractStateModel {
      * @return
      */
     public boolean containsState(String abstractStateId) {
+        Objects.requireNonNull(abstractStateId, "AbstractState ID cannot be null");
         return this.states.containsKey(abstractStateId);
     }
 
@@ -255,7 +271,10 @@ public class AbstractStateModel {
      * @return
      */
     public Set<AbstractStateTransition> getOutgoingTransitionsForState(String stateId) {
-        return stateTransitionsBySource.get(stateId);
+        Objects.requireNonNull(stateId, "AbstractState ID cannot be null");
+        return stateTransitionsBySource.containsKey(stateId)
+                ? stateTransitionsBySource.get(stateId)
+                : Collections.emptySet();
     }
 
     /**
@@ -264,7 +283,10 @@ public class AbstractStateModel {
      * @return
      */
     public Set<AbstractStateTransition> getIncomingTransitionsForState(String stateId) {
-        return stateTransitionsByTarget.get(stateId);
+        Objects.requireNonNull(stateId, "AbstractState ID cannot be null");
+        return stateTransitionsByTarget.containsKey(stateId)
+                ? stateTransitionsByTarget.get(stateId)
+                : Collections.emptySet();
     }
 
     /**
@@ -272,6 +294,7 @@ public class AbstractStateModel {
      * @param eventListener
      */
     public void addEventListener(StateModelEventListener eventListener) {
+        Objects.requireNonNull(eventListener, "StateModelEventListener cannot be null");
         eventListeners.add(eventListener);
     }
 

@@ -30,6 +30,9 @@
 
 package org.testar.statemodel;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 import org.testar.statemodel.persistence.Persistable;
 
 public class ConcreteState extends ModelWidget implements Persistable {
@@ -43,9 +46,12 @@ public class ConcreteState extends ModelWidget implements Persistable {
     private byte[] screenshot;
 
     public ConcreteState(String id, AbstractState abstractState) {
-        super(id);
+        super(Objects.requireNonNull(id, "ConcreteState ID cannot be null"));
+        if (id.trim().isEmpty()) {
+            throw new IllegalArgumentException("ConcreteState ID cannot be empty or blank");
+        }
         this.setRootWidget(this);
-        this.abstractState = abstractState;
+        this.abstractState = Objects.requireNonNull(abstractState, "AbstractState cannot be null");
     }
 
     /**
@@ -53,7 +59,7 @@ public class ConcreteState extends ModelWidget implements Persistable {
      * @return
      */
     public byte[] getScreenshot() {
-        return screenshot != null ? screenshot : new byte[0];
+        return screenshot != null ? Arrays.copyOf(screenshot, screenshot.length) : new byte[0];
     }
 
     /**
@@ -61,7 +67,7 @@ public class ConcreteState extends ModelWidget implements Persistable {
      * @param screenshot
      */
     public void setScreenshot(byte[] screenshot) {
-        this.screenshot = screenshot;
+        this.screenshot = screenshot != null ? Arrays.copyOf(screenshot, screenshot.length) : null;
     }
 
     /**

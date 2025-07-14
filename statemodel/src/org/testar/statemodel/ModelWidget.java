@@ -31,7 +31,9 @@
 package org.testar.statemodel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class ModelWidget extends TaggableEntity {
 
@@ -50,7 +52,10 @@ public class ModelWidget extends TaggableEntity {
 
     public ModelWidget(String id) {
         super();
-        this.id = id;
+        this.id = Objects.requireNonNull(id, "ModelWidget ID cannot be null");
+        if (id.trim().isEmpty()) {
+            throw new IllegalArgumentException("ModelWidget ID cannot be empty or blank");
+        }
         children = new ArrayList<>();
     }
 
@@ -67,6 +72,7 @@ public class ModelWidget extends TaggableEntity {
      * @param child
      */
     public void addChild(ModelWidget child) {
+        Objects.requireNonNull(child, "Child widget cannot be null");
         children.add(child);
         child.setParent(this);
     }
@@ -76,7 +82,7 @@ public class ModelWidget extends TaggableEntity {
      * @return list of child widgets.
      */
     public List<ModelWidget> getChildren() {
-        return children;
+        return Collections.unmodifiableList(children);
     }
 
     /**

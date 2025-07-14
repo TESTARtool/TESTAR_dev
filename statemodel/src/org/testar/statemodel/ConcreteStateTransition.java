@@ -30,6 +30,8 @@
 
 package org.testar.statemodel;
 
+import java.util.Objects;
+
 import org.testar.statemodel.persistence.Persistable;
 
 public class ConcreteStateTransition implements Persistable {
@@ -46,9 +48,9 @@ public class ConcreteStateTransition implements Persistable {
      * @param action
      */
     public ConcreteStateTransition(ConcreteState sourceState, ConcreteState targetState, ConcreteAction action) {
-        this.sourceState = sourceState;
-        this.targetState = targetState;
-        this.action = action;
+        this.sourceState = Objects.requireNonNull(sourceState, "Concrete source state cannot be null");
+        this.targetState = Objects.requireNonNull(targetState, "Concrete target state cannot be null");
+        this.action = Objects.requireNonNull(action, "ConcreteAction cannot be null");
     }
 
     /**

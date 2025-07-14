@@ -48,6 +48,34 @@ public class AbstractActionTest {
     }
 
     @Test
+    public void testAddDuplicateConcreteActionId() {
+        action.addConcreteActionId("concrete-1");
+        action.addConcreteActionId("concrete-1");
+        assertEquals(1, action.getConcreteActionIds().size());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testConstructorWithNullActionId() {
+        new AbstractAction(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithEmptyActionId() {
+        new AbstractAction("");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithBlankActionId() {
+        new AbstractAction("    ");
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void testGetConcreteActionIdsIsUnmodifiable() {
+        Set<String> ids = action.getConcreteActionIds();
+        ids.add("concrete-action-should-fail");
+    }
+
+    @Test
     public void testCanBeDelayedIsFalse() {
         assertFalse(action.canBeDelayed());
     }

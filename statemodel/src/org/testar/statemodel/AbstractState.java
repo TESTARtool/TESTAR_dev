@@ -33,9 +33,11 @@ package org.testar.statemodel;
 import org.testar.statemodel.exceptions.ActionNotFoundException;
 import org.testar.statemodel.persistence.Persistable;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class AbstractState extends AbstractEntity implements Persistable {
@@ -57,12 +59,16 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @param actions
      */
     public AbstractState(String stateId, Set<AbstractAction> actions) {
-        super(stateId);
+        super(Objects.requireNonNull(stateId, "AbstractState ID cannot be null"));
+        if (stateId.trim().isEmpty()) {
+            throw new IllegalArgumentException("AbstractState ID cannot be empty or blank");
+        }
         this.actions = new HashMap<>();
         unvisitedActions = new HashMap<>();
         visitedActions = new HashMap<>();
         if (actions != null) {
-            for(AbstractAction action:actions) {
+            for (AbstractAction action : actions) {
+                Objects.requireNonNull(action, "AbstractAction in actions set cannot be null");
                 this.actions.put(action.getActionId(), action);
                 unvisitedActions.put(action.getActionId(), action);
             }
@@ -75,7 +81,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @param concreteStateId the concrete id to add
      */
     public void addConcreteStateId(String concreteStateId) {
-        this.concreteStateIds.add(concreteStateId);
+        this.concreteStateIds.add(Objects.requireNonNull(concreteStateId, "ConcreteState ID cannot be null"));
     }
 
     /**
@@ -91,6 +97,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @param action the visited action
      */
     public void addVisitedAction(AbstractAction action) {
+        Objects.requireNonNull(action, "Visited AbstractAction cannot be null");
         unvisitedActions.remove(action.getActionId());
         visitedActions.put(action.getActionId(), action);
     }
@@ -129,7 +136,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @return
      */
     public Set<String> getConcreteStateIds() {
-        return concreteStateIds;
+        return Collections.unmodifiableSet(concreteStateIds);
     }
 
     /**
@@ -180,6 +187,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @param action
      */
     public void addNewAction(AbstractAction action) {
+        Objects.requireNonNull(action, "Added AbstractAction cannot be null");
         if (!this.actions.containsKey(action.getActionId())) {
             action.setModelIdentifier(this.getModelIdentifier());
             actions.put(action.getActionId(), action);

@@ -45,6 +45,21 @@ public class AbstractStateTransitionTest {
         assertEquals("AbstractAction1", transition.getActionId());
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testConstructorWithNullSourceState() {
+        new AbstractStateTransition(null, targetState, action);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testConstructorWithNullTargetState() {
+        new AbstractStateTransition(sourceState, null, action);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testConstructorWithNullAction() {
+        new AbstractStateTransition(sourceState, targetState, null);
+    }
+
     @Test
     public void testCanBeDelayedIsFalse() {
         assertFalse(transition.canBeDelayed());

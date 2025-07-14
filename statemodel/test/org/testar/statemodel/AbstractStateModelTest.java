@@ -89,6 +89,97 @@ public class AbstractStateModelTest {
         model.addEventListener(another); // No exception = pass
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testConstructorNullModelIdentifier() {
+        new AbstractStateModel(null, "App", "1.0", new HashSet<>(), listener);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorEmptyModelIdentifier() {
+        new AbstractStateModel("   ", "App", "1.0", new HashSet<>(), listener);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testConstructorNullAppName() {
+        new AbstractStateModel("model", null, "1.0", new HashSet<>(), listener);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testConstructorNullAppVersion() {
+        new AbstractStateModel("model", "App", null, new HashSet<>(), listener);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testConstructorNullTags() {
+        new AbstractStateModel("model", "App", "1.0", null, listener);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testConstructorNullEventListener() {
+        new AbstractStateModel("model", "App", "1.0", new HashSet<>(), (StateModelEventListener[]) null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testAddTransitionNullSource() throws Exception {
+        model.addTransition(null, new AbstractState("S2", Collections.emptySet()), new AbstractAction("A1"));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testAddTransitionNullTarget() throws Exception {
+        model.addTransition(new AbstractState("S1", Collections.emptySet()), null, new AbstractAction("A1"));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testAddTransitionNullAction() throws Exception {
+        model.addTransition(new AbstractState("S1", Collections.emptySet()), new AbstractState("S2", Collections.emptySet()), null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testGetStateWithNullId() throws Exception {
+        model.getState(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testContainsStateWithNullId() {
+        model.containsState(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testGetOutgoingTransitionsNullId() {
+        model.getOutgoingTransitionsForState(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testGetIncomingTransitionsNullId() {
+        model.getIncomingTransitionsForState(null);
+    }
+
+    @Test
+    public void testGetTransitionsForMissingStateReturnsEmptySet() {
+        Set<AbstractStateTransition> out = model.getOutgoingTransitionsForState("unknown");
+        Set<AbstractStateTransition> in = model.getIncomingTransitionsForState("unknown");
+
+        assertNotNull(out);
+        assertNotNull(in);
+        assertTrue(out.isEmpty());
+        assertTrue(in.isEmpty());
+    }
+
+    @Test
+    public void testMultipleListenersReceiveEvents() throws Exception {
+        TestListener extraListener = new TestListener();
+        model.addEventListener(extraListener);
+
+        AbstractState s1 = new AbstractState("X1", Collections.emptySet());
+        AbstractState s2 = new AbstractState("X2", Collections.emptySet());
+        AbstractAction action = new AbstractAction("A1");
+
+        model.addTransition(s1, s2, action);
+
+        assertEquals(StateModelEventType.ABSTRACT_STATE_TRANSITION_ADDED, ((TestListener) listener).lastEventType);
+        assertEquals(StateModelEventType.ABSTRACT_STATE_TRANSITION_ADDED, extraListener.lastEventType);
+    }
+
     class TestListener implements StateModelEventListener {
         public StateModelEventType lastEventType;
         public boolean listening = true;

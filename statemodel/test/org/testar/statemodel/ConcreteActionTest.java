@@ -22,4 +22,24 @@ public class ConcreteActionTest {
         assertEquals(abstractAction, concreteAction.getAbstractAction());
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testConstructorWithNullActionId() {
+        new ConcreteAction(null, abstractAction);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testConstructorWithNullAbstractAction() {
+        new ConcreteAction("concrete-C2", null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithEmptyActionId() {
+        new ConcreteAction("", abstractAction);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithBlankActionId() {
+        new ConcreteAction("   ", abstractAction);
+    }
+
 }

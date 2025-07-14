@@ -11,6 +11,7 @@ import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.actions.PasteText;
 import org.testar.stub.WidgetStub;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -90,9 +91,36 @@ public class ModelWidgetTest {
 
     @Test
     public void testSetAndGetRootWidget() {
-        ConcreteState root = new ConcreteState("root-1", null);
+        AbstractState abstractState = new AbstractState("abstract-root", Collections.emptySet());
+        ConcreteState root = new ConcreteState("root-1", abstractState);
+
         modelWidget.setRootWidget(root);
         assertEquals(root, modelWidget.getRootWidget());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testConstructorWithNullId() {
+        modelWidget = new ModelWidget(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithEmptyId() {
+        modelWidget = new ModelWidget("");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithBlankId() {
+        modelWidget = new ModelWidget("    ");
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testAddNullChild() {
+        modelWidget.addChild(null);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void testChildrenListIsUnmodifiable() {
+        modelWidget.getChildren().add(new ModelWidget("illegal-child"));
     }
 
 }
