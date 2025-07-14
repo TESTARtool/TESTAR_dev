@@ -45,6 +45,8 @@ public interface OracleWidgetsMapping {
 	default List<Widget> getWidgets(String elementType, State state) {
 		List<Widget> lst = new ArrayList<>();
 		List<Role> elementRoles = element2Role.get(elementType);
+		if(elementRoles == null || elementRoles.isEmpty())
+			return lst;
 		for (Widget w : state) {
 			Role widgetRole = w.get(Tags.Role, Roles.Invalid);
 			if (elementRoles.contains(widgetRole)) {
@@ -362,7 +364,7 @@ public interface OracleWidgetsMapping {
 			Map.entry("input_numeric", List.of(WdRoles.WdINPUT, Roles.Text)),
 			Map.entry("static_text", List.of(WdRoles.WdLABEL, WdRoles.WdP, WdRoles.WdSPAN)),
 			Map.entry("alert", List.of(Roles.Widget)), // This is not an element itself
-			Map.entry("dropdown", List.of(WdRoles.WdSELECT)),
+			Map.entry("dropdown", List.of(WdRoles.WdSELECT, WdRoles.WdOPTION)),
 			Map.entry("checkbox", List.of(WdRoles.WdINPUT)),
 			Map.entry("radio", List.of(WdRoles.WdINPUT)),
 			Map.entry("image", List.of(WdRoles.WdIMG)),
@@ -439,8 +441,10 @@ public interface OracleWidgetsMapping {
 		List<Widget> widgets = getWidgets(roleString, state);
 		// prepare string for search
 		String searchString = rawString.toLowerCase(Locale.ROOT).strip(); // lower case, and remove trailing and leading spaces
-		
-		
+
+		if(tagPrioList == null || tagPrioList.isEmpty())
+			return foundWidgets;
+
 		for(int mode = 0; mode < 3; mode++) // matching modes: exact, starts with, partial (contains)
 		{
 			for(Tag<?> tag : tagPrioList) //run a round of search per tag in priority list

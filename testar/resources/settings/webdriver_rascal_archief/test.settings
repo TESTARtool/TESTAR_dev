@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "suts/Archief/binary.html"
+SUTConnectorValue = "suts/testingTESTARDSL.html"
 
 #################################################################
 # Sequences
@@ -35,8 +35,8 @@ SUTConnectorValue = "suts/Archief/binary.html"
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 10
-SequenceLength = 5
+Sequences = 1
+SequenceLength = 1
 
 #################################################################
 # Oracles based on suspicious tag values
