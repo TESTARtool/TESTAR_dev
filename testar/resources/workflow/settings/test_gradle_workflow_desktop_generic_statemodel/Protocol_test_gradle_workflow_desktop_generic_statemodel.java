@@ -33,14 +33,18 @@ import java.io.File;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.testar.monkey.Assert;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.OutputStructure;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.protocols.DesktopProtocol;
+import org.testar.statemodel.analysis.condition.CheckConditionEvaluator;
+import org.testar.statemodel.analysis.condition.TransitionConditionEvaluator;
 
 /**
  * This protocol is used to test TESTAR by executing a gradle CI workflow.
@@ -71,6 +75,29 @@ public class Protocol_test_gradle_workflow_desktop_generic_statemodel extends De
 
 		//return the set of derived actions
 		return actions;
+	}
+
+	@Override
+	protected void finishSequence(){
+		super.finishSequence();
+		// Use the inferred state model Format -> Font... to validate the
+		// StateCondition feature
+		CheckConditionEvaluator checkEvaluator = new CheckConditionEvaluator(
+				Tags.Representation, 
+				"Check: Font..."
+				);
+		boolean stateCondition = checkEvaluator.evaluateConditions(stateModelManager.getModelIdentifier(), stateModelManager);
+		Assert.isTrue(stateCondition, "StateCondition successfully detected a Font... state in the model");
+
+		// TransitionCondition feature
+		TransitionConditionEvaluator transitionEvaluator = new TransitionConditionEvaluator(
+				Tags.Representation, 
+				Tags.Desc, 
+				Tags.Representation, 
+				"Origin: Format\\nAction: Format\\nDest: Font..."
+				);
+		boolean transitionCondition = transitionEvaluator.evaluateConditions(stateModelManager.getModelIdentifier(), stateModelManager);
+		Assert.isTrue(transitionCondition, "TransitionCondition successfully detected a Format -> Font... transition in the model");
 	}
 
 	@Override
