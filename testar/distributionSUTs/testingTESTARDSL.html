@@ -33,14 +33,14 @@
   <input type="number" id="input_age" placeholder="Age" data-elementtype="input_numeric">
 
   <!-- checkbox -->
-  <label><input type="checkbox" id="chk_terms" data-elementtype="checkbox"> I accept the terms</label>
+  <label for="chk_terms"><input type="checkbox" id="chk_terms" data-elementtype="checkbox"> I accept the terms</label>
 
   <!-- radiogroup -->
   <fieldset data-elementtype="radiogroup" id="gender_group">
     <legend>Gender</legend>
-    <label><input type="radio" name="gender" value="male" data-elementtype="radio"> Male</label>
-    <label><input type="radio" name="gender" value="female" data-elementtype="radio"> Female</label>
-    <label><input type="radio" name="gender" value="other" data-elementtype="radio"> Other</label>
+    <label for="male"><input type="radio" name="gender" value="male" id="male" data-elementtype="radio">Male</label>
+    <label for="female"><input type="radio" name="gender" value="female" id="female" data-elementtype="radio">Female</label>
+    <label for="other"><input type="radio" name="gender" value="other" id="other" data-elementtype="radio">Other</label>
   </fieldset>
 
   <!-- dropdown -->
@@ -76,7 +76,7 @@
   <div id="panel_main" class="panel" data-elementtype="panel">
     <h3>Settings</h3>
     <input type="text" id="child_input" placeholder="Child input" data-elementtype="input_text">
-    <label><input type="checkbox" id="child_chk" data-elementtype="checkbox"> Receive updates</label>
+    <label for="child_chk"><input type="checkbox" id="child_chk" data-elementtype="checkbox"> Receive updates</label>
   </div>
 
   <!-- generic element -->
