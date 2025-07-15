@@ -37,16 +37,13 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.testar.monkey.alayer.*;
-import org.testar.monkey.alayer.webdriver.enums.WdRoles;
-import org.testar.monkey.alayer.webdriver.enums.WdTags;
 
 public interface OracleWidgetsMapping {
 
 	default List<Widget> getWidgets(String elementType, State state) {
 		List<Widget> lst = new ArrayList<>();
-		List<Role> elementRoles = element2Role.get(elementType);
-		if(elementRoles == null || elementRoles.isEmpty())
-			return lst;
+		List<Role> elementRoles = OracleMappingModel.element2Role.getOrDefault(elementType, List.of());
+
 		for (Widget w : state) {
 			Role widgetRole = w.get(Tags.Role, Roles.Invalid);
 			if (elementRoles.contains(widgetRole)) {
@@ -57,7 +54,7 @@ public interface OracleWidgetsMapping {
 	}
 
 	default Widget getWidget(String elementType, String selector, State state) {
-		List<Tag<?>> tagPriority = selectorString2Tags.get(elementType);
+		List<Tag<?>> tagPriority = OracleMappingModel.selectorString2Tags.getOrDefault(elementType, List.of());
 
 		for (Widget w : getWidgets(elementType, state)) {
 			for (Tag<?> tag : tagPriority) {
@@ -71,7 +68,7 @@ public interface OracleWidgetsMapping {
 	}
 
 	default Object getProperty(Widget w, String property) {
-		List<Tag<?>> tagPriority = attributeTags.get(property);
+		List<Tag<?>> tagPriority = OracleMappingModel.attributeTags.getOrDefault(property, List.of());
 
 		for (Tag<?> tag : tagPriority) {
 			Object value = w.get(tag, null);
@@ -87,7 +84,7 @@ public interface OracleWidgetsMapping {
 			}
 		}
 
-		return null;
+		return new Object();
 	}
 
 	default Boolean evaluateAreStatus(List<Object> listObj, String status) {
@@ -114,7 +111,7 @@ public interface OracleWidgetsMapping {
 	}
 
 	default Boolean evaluateIsStatus(Widget w, String status) {
-		List<Tag<?>> tagPriority = statusTags.get(status);
+		List<Tag<?>> tagPriority = OracleMappingModel.statusTags.getOrDefault(status, List.of());
 
 		for (Tag<?> tag : tagPriority) {
 			Object value = w.get(tag, null);
@@ -143,7 +140,9 @@ public interface OracleWidgetsMapping {
 		}
 
 		// None of the tags confirmed the status
-		return null;
+		// TODO: Do we want to return null or false?
+		// TODO: Can this affect the logic and return a false positive?
+		return false;
 	}
 
 	//syntax Condition
@@ -175,14 +174,15 @@ public interface OracleWidgetsMapping {
 	}
 
 	default boolean evaluateHasAttribute(Widget w, String attr) {
-		List<Tag<?>> tagPriority = attributeTags.get(attr);
+		List<Tag<?>> tagPriority = OracleMappingModel.attributeTags.getOrDefault(attr, List.of());
 
 		for (Tag<?> tag : tagPriority) {
 			Object value = w.get(tag, null);
 
-			if (value instanceof String 
-					&& !((String) value).isEmpty()) {
-				return true; //it has the attribute and it is not empty
+			if (value instanceof String) {
+				return !((String) value).isEmpty(); //it has the attribute and it is not empty
+			} else {
+			    return Objects.nonNull(value);
 			}
 		}
 
@@ -311,131 +311,10 @@ public interface OracleWidgetsMapping {
 		}
 		return children;
 	}
-
-	//	default boolean evaluateAttributeMatches(Widget w, String attr, String regex) {
-	//		List<Tag<?>> tagPriority = attributeTags.get(attr);
-	//
-	//		Pattern pattern;
-	//		try {
-	//			pattern = Pattern.compile(regex);
-	//		} catch (PatternSyntaxException e) {
-	//			return false;
-	//		}
-	//
-	//		for (Tag<?> tag : tagPriority) {
-	//			Object value = w.get(tag, null);
-	//
-	//			if (value instanceof String 
-	//					&& !((String) value).isEmpty()) {
-	//				Matcher matcher = pattern.matcher((String) value);
-	//				if (matcher.find()) {
-	//					return true;
-	//				}
-	//			}
-	//		}
-	//
-	//		return false; 
-	//	}
-
-	Map<String, Set<String>> validStatusPerElement = Map.ofEntries(
-			Map.entry("button", Set.of("visible", "enabled", "focused", "clickable", "onscreen", "offscreen")),
-			Map.entry("input_text", Set.of("visible", "enabled", "focused", "readonly", "empty", "filled", "onscreen", "offscreen")),
-			Map.entry("input_numeric", Set.of("visible", "enabled", "focused", "readonly", "empty", "filled", "onscreen", "offscreen")),
-			Map.entry("static_text", Set.of("visible", "enabled", "focused", "readonly", "empty", "onscreen", "offscreen")),
-			Map.entry("checkbox", Set.of("visible", "enabled", "focused", "checked", "clickable", "onscreen", "offscreen")),
-			Map.entry("radiogroup", Set.of("onscreen", "offscreen")),
-			Map.entry("radio", Set.of("visible", "enabled", "focused", "selected", "clickable", "onscreen", "offscreen")),
-			Map.entry("dropdown", Set.of("visible", "enabled", "focused", "empty", "selected", "clickable", "onscreen", "offscreen")),
-			Map.entry("label", Set.of("visible", "focused", "onscreen", "offscreen")),
-			Map.entry("image", Set.of("visible", "focused", "onscreen", "offscreen")),
-			Map.entry("link", Set.of("visible", "clickable", "focused", "onscreen", "offscreen")),
-			Map.entry("alert", Set.of("visible", "focused", "onscreen", "offscreen")),
-			Map.entry("panel", Set.of("visible", "focused", "empty", "onscreen", "offscreen")),
-			Map.entry("table_data", Set.of("visible", "focused", "empty", "onscreen", "offscreen")),
-			Map.entry("menu", Set.of("visible", "enabled", "focused", "clickable", "empty", "onscreen", "offscreen")),
-			Map.entry("menu_item", Set.of("visible", "enabled", "focused", "clickable", "empty", "onscreen", "offscreen")),
-			Map.entry("form", Set.of("visible", "focused", "empty", "onscreen", "offscreen")),
-			Map.entry("element", Set.of("visible", "enabled", "focused", "empty", "onscreen", "offscreen", "disabled"))
-			);
-
-	Map<String, List<Role>> element2Role = Map.ofEntries(
-			Map.entry("button", List.of(WdRoles.WdBUTTON)),
-			Map.entry("input_text", List.of(WdRoles.WdINPUT, Roles.Text)),
-			Map.entry("input_numeric", List.of(WdRoles.WdINPUT, Roles.Text)),
-			Map.entry("static_text", List.of(WdRoles.WdLABEL, WdRoles.WdP, WdRoles.WdSPAN)),
-			Map.entry("alert", List.of(Roles.Widget)), // This is not an element itself
-			Map.entry("dropdown", List.of(WdRoles.WdSELECT, WdRoles.WdOPTION)),
-			Map.entry("checkbox", List.of(WdRoles.WdINPUT)),
-			Map.entry("radio", List.of(WdRoles.WdINPUT)),
-			Map.entry("image", List.of(WdRoles.WdIMG)),
-			Map.entry("link", List.of(WdRoles.WdA)),
-			Map.entry("label", List.of(WdRoles.WdLABEL)),
-			Map.entry("panel", List.of(WdRoles.WdDIV, WdRoles.WdSECTION, WdRoles.WdARTICLE, WdRoles.WdFIELDSET)),
-			Map.entry("table_data", List.of(WdRoles.WdTD)),
-			Map.entry("menu", List.of(WdRoles.WdMENU, WdRoles.WdUL, WdRoles.WdNAV)),
-			Map.entry("menu_item", List.of(WdRoles.WdLI)),
-			Map.entry("form", List.of(WdRoles.WdFORM)),
-			Map.entry("element", List.of(Roles.Widget))
-			);
-
-	Map<String, List<Tag<?>>> selectorString2Tags = Map.ofEntries(
-			Map.entry("button", List.of(Tags.Title, WdTags.WebGenericTitle, WdTags.WebTextContent)),
-			Map.entry("input_text", List.of(Tags.Title, WdTags.WebName, WdTags.WebGenericTitle)),
-			Map.entry("input_numeric", List.of(Tags.Title, WdTags.WebName, WdTags.WebGenericTitle)),
-			Map.entry("static_text", List.of(Tags.Title, WdTags.WebTextContent, WdTags.WebGenericTitle)),
-			Map.entry("alert", List.of(Tags.Title, WdTags.WebGenericTitle)),
-			Map.entry("dropdown", List.of(Tags.Title, WdTags.WebGenericTitle)),
-			Map.entry("checkbox", List.of(Tags.Title, WdTags.WebGenericTitle)),
-			Map.entry("radio", List.of(Tags.Title, WdTags.WebGenericTitle)),
-			Map.entry("image", List.of(WdTags.WebAlt, Tags.Desc, WdTags.WebTitle, WdTags.WebGenericTitle)),
-			Map.entry("link", List.of(Tags.Title, WdTags.WebHref, WdTags.WebGenericTitle)),
-			Map.entry("label", List.of(Tags.Title, WdTags.WebGenericTitle)),
-			Map.entry("table_data", List.of(Tags.Title, WdTags.WebGenericTitle, WdTags.WebTextContent)),
-			Map.entry("panel", List.of(Tags.Title, WdTags.WebId)),
-			Map.entry("menu", List.of(Tags.Title, WdTags.WebGenericTitle, WdTags.WebTextContent)),
-			Map.entry("menu_item", List.of(Tags.Title, WdTags.WebGenericTitle, WdTags.WebTextContent)),
-			Map.entry("form", List.of(Tags.Title, WdTags.WebGenericTitle, WdTags.WebAriaLabel, WdTags.WebAriaLabelledBy)),
-			Map.entry("element", List.of(Tags.Title, WdTags.WebGenericTitle))
-			);
-
-	Map<String, List<Tag<?>>> statusTags = Map.ofEntries(
-			Map.entry("visible", List.of(WdTags.WebIsFullOnScreen)),
-			Map.entry("onscreen", List.of(WdTags.WebIsFullOnScreen)),
-			Map.entry("offscreen", List.of(WdTags.WebIsOffScreen)),
-
-			Map.entry("enabled", List.of(WdTags.WebIsEnabled)),
-			Map.entry("disabled", List.of(WdTags.WebIsDisabled)),
-			Map.entry("clickable", List.of(WdTags.WebIsClickable)),
-			Map.entry("focused", List.of(WdTags.WebHasKeyboardFocus)),
-			Map.entry("readonly", List.of(WdTags.WebIsKeyboardFocusable)),
-
-			Map.entry("selected", List.of(WdTags.WebIsSelected)),
-			Map.entry("checked", List.of(WdTags.WebIsChecked)),
-
-			// TODO: Create WdTag with this labeled boolean logic
-			// Map.entry("labeled", List.of(WdTags))
-
-			Map.entry("empty", List.of(WdTags.WebLength, WdTags.WebValue)),
-			Map.entry("filled", List.of(WdTags.WebValue))
-			);
-
-	Map<String, List<Tag<?>>> attributeTags = Map.ofEntries(
-			Map.entry("alttext", List.of(WdTags.WebAlt)),
-			Map.entry("role", List.of(Tags.Role)),
-			Map.entry("placeholder", List.of(WdTags.WebPlaceholder)),
-			Map.entry("text", List.of(WdTags.WebTextContent, WdTags.WebValue, Tags.Title)),
-			Map.entry("tooltip", List.of(Tags.Desc, WdTags.WebTextContent)),
-			Map.entry("fontsize", List.of(WdTags.WebComputedFontSize)),
-			Map.entry("color", List.of(WdTags.WebComputedColor)),
-			Map.entry("backgroundColor", List.of(WdTags.WebComputedBackgroundColor)),
-			Map.entry("length", List.of(WdTags.WebLength)),
-			Map.entry("title", List.of(WdTags.WebAriaLabel, WdTags.WebAriaLabelledBy, Tags.Title)),
-			Map.entry("children", List.of(Tags.WidgetChildren)) // This Tag is null but used for DSL mapping
-			);
 	
 	default List<Widget> runWidgetSelector(State state, String roleString, String rawString)
 	{
-		List<Tag<?>> tagPrioList  = selectorString2Tags.get(roleString);
+		List<Tag<?>> tagPrioList  = OracleMappingModel.selectorString2Tags.getOrDefault(roleString, List.of());
 		List<Widget> foundWidgets = new ArrayList<>();
 		// get widgets with the correct role
 		List<Widget> widgets = getWidgets(roleString, state);
