@@ -87,7 +87,7 @@ public class StateCondition extends TestCondition {
         queryBuilder.append("AS found ");
         queryBuilder.append("FROM ConcreteState ");
         queryBuilder.append("WHERE uid LIKE '" + modelIdentifier + "%' ");
-        queryBuilder.append("AND " + getField() + " LIKE '%" + getSearchMessage() + "%'");
+        queryBuilder.append("AND " + getField() + " containstext '" + getSearchMessage() + "'");
 
         String query = queryBuilder.toString();
         String result = stateModelManager.queryStateModel(query);

@@ -59,11 +59,11 @@ public class WordsStateCondition extends StateCondition {
             String query = "SELECT min(1, count(*)) AS found " +
                     "FROM ConcreteState " +
                     "WHERE uid LIKE ? " +
-                    "AND " + getField() + ".toLowerCase() LIKE ?";
+                    "AND " + getField() + ".toLowerCase() containstext ?";
 
             String result = stateModelManager.queryStateModel(query, 
                     modelIdentifier + "%",
-                    "%" + word.toLowerCase() + "%");
+                    "'" + word.toLowerCase() + "'");
 
             // Parse the count of matched entries for this word
             int wordMatch = QueryHelper.parseCountQueryResponse(result, "found");

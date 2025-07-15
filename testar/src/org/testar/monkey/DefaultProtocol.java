@@ -752,10 +752,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		if(settings.get(ConfigTags.Mode) == Modes.Spy)
 			return state;
 
+		setStateScreenshot(state);
+
 		Verdict verdict = getVerdict(state);
 		state.set(Tags.OracleVerdict, verdict);
-
-		setStateScreenshot(state);
 
 		if(mode() != Modes.Spy && verdict.severity() >= settings().get(ConfigTags.FaultThreshold))
 		{
