@@ -134,4 +134,34 @@ public class TestCheckConditionEvaluator {
 
 		Assert.isTrue(!checkEvaluator.evaluateConditions(state), "The state evaluator must unmatch one of the different multiple check conditions");
 	}
+
+	@Test
+	public void test_empty_test_goal_check_condition() {
+		String testGoal = "";
+		CheckConditionEvaluator checkEvaluator = new CheckConditionEvaluator(Tags.Title, testGoal);
+
+		Assert.isEquals(checkEvaluator.getConditions().size(), 0, "The number of identified check conditions should be zero");
+
+		Assert.isTrue(checkEvaluator.evaluateConditions(new StateStub()), "The state evaluator must be true for empty check conditions");
+	}
+
+	@Test
+	public void test_null_test_goal_check_condition() {
+		String testGoal = null;
+		CheckConditionEvaluator checkEvaluator = new CheckConditionEvaluator(Tags.Title, testGoal);
+
+		Assert.isEquals(checkEvaluator.getConditions().size(), 0, "The number of identified check conditions should be zero");
+
+		Assert.isTrue(checkEvaluator.evaluateConditions(new StateStub()), "The state evaluator must be true for empty check conditions");
+	}
+
+	@Test
+	public void test_null_evaluatorTag_check_condition() {
+		String testGoal = "Perform this action \n Check: this message is shown";
+		CheckConditionEvaluator checkEvaluator = new CheckConditionEvaluator(null, testGoal);
+
+		Assert.isEquals(checkEvaluator.getConditions().size(), 0, "The number of identified check conditions should be zero");
+
+		Assert.isTrue(checkEvaluator.evaluateConditions(new StateStub()), "The state evaluator must be true for empty check conditions");
+	}
 }
