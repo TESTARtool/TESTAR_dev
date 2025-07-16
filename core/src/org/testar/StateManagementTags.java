@@ -141,6 +141,9 @@ public class StateManagementTags {
     // the angle of the widget's rotation
     public static final Tag<Long> WidgetRotation = Tag.from("Widget's rotation (degrees)", Long.class);
 
+    // the textual representation of the widget
+    public static final Tag<String> WidgetRepresentation = Tag.from("Widget representation", String.class);
+
     // widget pattern tags
     public static final Tag<Boolean> WidgetAnnotationPattern = Tag.from("Widget Annotation Pattern", Boolean.class);
     public static final Tag<Boolean> WidgetDockPattern = Tag.from("Widget Dock Pattern", Boolean.class);
@@ -318,6 +321,7 @@ public class StateManagementTags {
     public static final Tag<Boolean> WebWidgetIsOffScreen = Tag.from("Web Widget Is Off Screen", Boolean.class);
     public static final Tag<String> WebWidgetSrc = Tag.from("Web Widget src", String.class);
     public static final Tag<String> WebWidgetPlaceholder= Tag.from("Web Widget placeholder", String.class);
+    public static final Tag<Boolean> WebWidgetIsDisabled = Tag.from("Web Widget Is Disabled", Boolean.class);
     
     
     // a set containing the tags that are available for state management
@@ -355,6 +359,7 @@ public class StateManagementTags {
             add(WidgetSetPosition);
             add(WidgetSetSize);
             add(WidgetRotation);
+            add(WidgetRepresentation);
 
             // patterns
             add(WidgetAnnotationPattern);
@@ -407,6 +412,7 @@ public class StateManagementTags {
             add(WebWidgetIsOffScreen);
             add(WebWidgetSrc);
             add(WebWidgetPlaceholder);
+            add(WebWidgetIsDisabled);
         }
     };
 
@@ -452,6 +458,7 @@ public class StateManagementTags {
         settingsMap.put(WidgetSetPosition, "WidgetSetPosition");
         settingsMap.put(WidgetSetSize, "WidgetSetSize");
         settingsMap.put(WidgetRotation, "WidgetRotation");
+        settingsMap.put(WidgetRepresentation, "WidgetRepresentation");
         settingsMap.put(WidgetAnnotationPattern, "WidgetAnnotationPattern");
         settingsMap.put(WidgetDockPattern, "WidgetDockPattern");
         settingsMap.put(WidgetDragPattern, "WidgetDragPattern");
@@ -502,6 +509,7 @@ public class StateManagementTags {
         settingsMap.put(WebWidgetIsOffScreen, "WebWidgetIsOffScreen");
         settingsMap.put(WebWidgetSrc, "WebWidgetSrc");
         settingsMap.put(WebWidgetPlaceholder, "WebWidgetPlaceholder");
+        settingsMap.put(WebWidgetIsDisabled, "WebWidgetIsDisabled");
     }
 
     // a mapping of a tag to its group
@@ -537,6 +545,7 @@ public class StateManagementTags {
             put(WidgetSetPosition, Group.General);
             put(WidgetSetSize, Group.General);
             put(WidgetRotation, Group.General);
+            put(WidgetRepresentation, Group.General);
             put(WidgetAnnotationPattern, Group.ControlPattern);
             put(WidgetDockPattern, Group.ControlPattern);
             put(WidgetDragPattern, Group.ControlPattern);
@@ -587,6 +596,7 @@ public class StateManagementTags {
             put(WebWidgetIsOffScreen, Group.WebDriver);
             put(WebWidgetSrc, Group.WebDriver);
             put(WebWidgetPlaceholder, Group.WebDriver);
+            put(WebWidgetIsDisabled, Group.WebDriver);
         }
     };
 
@@ -840,6 +850,7 @@ public class StateManagementTags {
             put(WidgetTitle, Tags.Title);
             put(WidgetIsEnabled, Tags.Enabled);
             put(WidgetPath, Tags.Path);
+            put(WidgetRepresentation, Tags.Representation);
         }
     };
 

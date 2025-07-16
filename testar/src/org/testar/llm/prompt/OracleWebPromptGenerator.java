@@ -42,7 +42,6 @@ import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
-import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 
 public class OracleWebPromptGenerator implements IPromptOracleGenerator {
@@ -79,7 +78,7 @@ public class OracleWebPromptGenerator implements IPromptOracleGenerator {
 			builder.append(String.format("The current objective of the test is: %s. ", currentTestGoal));
 		}
 
-		String pageTitle = WdDriver.getRemoteWebDriver().getTitle();
+		String pageTitle = state.get(WdTags.WebTitle, "");
 		builder.append(String.format("We are currently on the following page: %s. ", pageTitle));
 
 		builder.append("The current state of the application contains the widgets: ");

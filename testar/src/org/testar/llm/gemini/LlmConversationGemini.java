@@ -83,10 +83,16 @@ public class LlmConversationGemini implements LlmConversation {
     }
 
     @Override
-    public void addMessage(String role, String text) {
+    public void addMessage(String role, String textContent) {
         Content content = new Content(role);
-        content.addPart(new Part(text));
+        content.addPart(new Part(textContent));
         contents.add(content);
+    }
+
+    @Override
+    public void addMessage(String role, String textContent, String base64ImageData) {
+        // TODO: Implement image base64 communication for Gemini LLMs
+        addMessage(role, textContent);
     }
 
     public class Content {

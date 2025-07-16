@@ -39,6 +39,9 @@ import org.apache.logging.log4j.Logger;
 import org.testar.llm.LlmConversation;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.JsonAdapter;
+import com.google.gson.reflect.TypeToken;
 
 /**
  * Conversation with the OpenAI LLM.
@@ -70,11 +73,11 @@ public class LlmConversationOpenAI implements LlmConversation {
     }
 
     public String getFormat() {
-    	return format;
+        return format;
     }
 
     public void setFormat(String format) {
-    	this.format = format;
+        this.format = format;
     }
 
     public List<Message> getMessages() {
@@ -113,7 +116,12 @@ public class LlmConversationOpenAI implements LlmConversation {
     public void initConversation(String fewshotFile) {
         try {
             String initPromptJson = getTextResource(fewshotFile);
-            LlmConversationOpenAI.Message[] initMessages = new Gson().fromJson(initPromptJson, LlmConversationOpenAI.Message[].class);
+
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(new TypeToken<List<ContentPart>>() {}.getType(), new ContentDeserializerOpenAI())
+                    .create();
+
+            LlmConversationOpenAI.Message[] initMessages = gson.fromJson(initPromptJson, LlmConversationOpenAI.Message[].class);
             for(LlmConversationOpenAI.Message message : initMessages) {
                 addMessage(message);
             }
@@ -127,7 +135,21 @@ public class LlmConversationOpenAI implements LlmConversation {
     }
 
     @Override
-    public void addMessage(String role, String content) {
+    public void addMessage(String role, String textContent) {
+        List<ContentPart> content = new ArrayList<>();
+        content.add(new ContentPart("text", textContent));
+        messages.add(new Message(role, content));
+    }
+
+    @Override
+    public void addMessage(String role, String textContent, String base64ImageData) {
+        List<ContentPart> content = new ArrayList<>();
+        if (base64ImageData != null) {
+            content.add(new ContentPart("image_url", new ImageUrl("data:image/png;base64," + base64ImageData)));
+        }
+        if (textContent != null && !textContent.isEmpty()) {
+            content.add(new ContentPart("text", textContent));
+        }
         messages.add(new Message(role, content));
     }
 
@@ -136,14 +158,16 @@ public class LlmConversationOpenAI implements LlmConversation {
      */
     public class Message {
         private String role;
-        private String content;
+
+        @JsonAdapter(ContentDeserializerOpenAI.class)
+        private List<ContentPart> content;
 
         /**
          * Creates a new Message.
          * @param role Role of the message. Can be "system", "user", or "assistant".
          * @param content Content of the message in plaintext.
          */
-        public Message(String role, String content) {
+        public Message(String role, List<ContentPart> content) {
             this.role = role;
             this.content = content;
         }
@@ -152,16 +176,50 @@ public class LlmConversationOpenAI implements LlmConversation {
             return role;
         }
 
-        public void setRole(String role) {
-            this.role = role;
-        }
-
-        public String getContent() {
+        public List<ContentPart> getContent() {
             return content;
         }
+    }
 
-        public void setContent(String content) {
-            this.content = content;
+    public static class ContentPart {
+        private String type;
+        private String text;
+        private ImageUrl image_url;
+
+        public ContentPart() {}
+
+        public ContentPart(String type, String text) {
+            this.type = type;
+            this.text = text;
+        }
+
+        public ContentPart(String type, ImageUrl image_url) {
+            this.type = type;
+            this.image_url = image_url;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public String getText() {
+            return text;
+        }
+
+        public ImageUrl getImage_url() {
+            return image_url;
+        }
+    }
+
+    public static class ImageUrl {
+        private String url;
+
+        public ImageUrl(String url) {
+            this.url = url;
+        }
+
+        public String getUrl() {
+            return url;
         }
     }
 }
