@@ -141,6 +141,9 @@ public class StateManagementTags {
     // the angle of the widget's rotation
     public static final Tag<Long> WidgetRotation = Tag.from("Widget's rotation (degrees)", Long.class);
 
+    // the textual representation of the widget
+    public static final Tag<String> WidgetRepresentation = Tag.from("Widget representation", String.class);
+
     // widget pattern tags
     public static final Tag<Boolean> WidgetAnnotationPattern = Tag.from("Widget Annotation Pattern", Boolean.class);
     public static final Tag<Boolean> WidgetDockPattern = Tag.from("Widget Dock Pattern", Boolean.class);
@@ -356,6 +359,7 @@ public class StateManagementTags {
             add(WidgetSetPosition);
             add(WidgetSetSize);
             add(WidgetRotation);
+            add(WidgetRepresentation);
 
             // patterns
             add(WidgetAnnotationPattern);
@@ -454,6 +458,7 @@ public class StateManagementTags {
         settingsMap.put(WidgetSetPosition, "WidgetSetPosition");
         settingsMap.put(WidgetSetSize, "WidgetSetSize");
         settingsMap.put(WidgetRotation, "WidgetRotation");
+        settingsMap.put(WidgetRepresentation, "WidgetRepresentation");
         settingsMap.put(WidgetAnnotationPattern, "WidgetAnnotationPattern");
         settingsMap.put(WidgetDockPattern, "WidgetDockPattern");
         settingsMap.put(WidgetDragPattern, "WidgetDragPattern");
@@ -540,6 +545,7 @@ public class StateManagementTags {
             put(WidgetSetPosition, Group.General);
             put(WidgetSetSize, Group.General);
             put(WidgetRotation, Group.General);
+            put(WidgetRepresentation, Group.General);
             put(WidgetAnnotationPattern, Group.ControlPattern);
             put(WidgetDockPattern, Group.ControlPattern);
             put(WidgetDragPattern, Group.ControlPattern);
@@ -844,6 +850,7 @@ public class StateManagementTags {
             put(WidgetTitle, Tags.Title);
             put(WidgetIsEnabled, Tags.Enabled);
             put(WidgetPath, Tags.Path);
+            put(WidgetRepresentation, Tags.Representation);
         }
     };
 

@@ -121,6 +121,7 @@ public class ActionHistory {
             } else {
                 switch(type) {
                     case "ClickTypeInto":
+                    case "PasteTextInto":
                         String input = getCompoundActionInputText(action);
                         // TODO: Differentiate between types of input fields (numeric, password, etc.)
                         builder.append(String.format("%s: Typed '%s' in TextField '%s'", actionId, input, description));
@@ -135,6 +136,10 @@ public class ActionHistory {
                     case "CloseTabScript":
                         // TODO: Decide if it makes sense to rely on the LLM to make this control decision
                         builder.append(String.format("%s: Close current browser tab", actionId));
+                        break;
+                    case "HitESC":
+                        // TODO: Decide if it makes sense to rely on the LLM to make this control decision
+                        builder.append(String.format("%s: Hit the ESC key", actionId));
                         break;
                     default:
                         logger.log(Level.WARN, "Unsupported action type for action history: " + type);

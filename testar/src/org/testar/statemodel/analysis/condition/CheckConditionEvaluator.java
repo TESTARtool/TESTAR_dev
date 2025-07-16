@@ -48,7 +48,7 @@ public class CheckConditionEvaluator extends BasicConditionEvaluator {
 	}
 
 	public CheckConditionEvaluator(Tag<?> evaluatorTag, String checkContent, ConditionComparator comparator, int threshold) {
-		// Replace line breaks and split the 'Check:' content into lines (case-insensitive splitting)
+		// Replace line breaks and split the goal lines (case-insensitive splitting)
 		String[] lines = checkContent.replaceAll("(\\r|\\n|\\\\n)", "\n").split("\n");
 
 		// Add the'Check:' statements as evaluator conditions

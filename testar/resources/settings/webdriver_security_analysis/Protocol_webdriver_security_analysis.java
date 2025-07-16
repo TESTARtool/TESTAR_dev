@@ -33,7 +33,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.HasDevTools;
-import org.openqa.selenium.devtools.v137.network.Network;
+import org.openqa.selenium.devtools.v138.network.Network;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.SutVisualization;
@@ -100,7 +100,7 @@ public class Protocol_webdriver_security_analysis extends WebdriverProtocol {
         webDriver = WdDriver.getRemoteWebDriver();
         DevTools devTools = ((HasDevTools) webDriver).getDevTools();
         devTools.createSession();
-        devTools.send(Network.enable(Optional.empty(), Optional.empty(), Optional.empty()));
+        devTools.send(Network.enable(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()));
         lastSequenceActionNumber = 0;
         oracleOrchestrator = new SecurityOracleOrchestrator(securityResultWriter, securityConfiguration.getOracles(), webDriver, devTools);
 

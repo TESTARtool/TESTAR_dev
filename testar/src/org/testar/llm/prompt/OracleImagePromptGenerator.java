@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2024 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2024 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,40 +30,20 @@
 
 package org.testar.llm.prompt;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Tag;
-import org.testar.monkey.alayer.Widget;
-import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 
-public class OracleWebPromptGenerator implements IPromptOracleGenerator {
+public class OracleImagePromptGenerator implements IPromptOracleGenerator {
 
 	protected static final Logger logger = LogManager.getLogger();
 
-	private final Set<Tag<String>> oracleTags;
-
 	/**
-	 * Creates a new oracle prompt generator for web applications.
+	 * Creates a new oracle prompt generator that uses state images.
 	 */
-	public OracleWebPromptGenerator() {
-		this(new HashSet<>(Arrays.asList(WdTags.WebTextContent))); // WdTags.WebTextContent is the default widget context
-	}
-
-	/**
-	 * Creates a new oracle prompt generator for web applications with a set of oracleTags. 
-	 * @param oracleTags Are the tags to be used for applying the oracle.
-	 */
-	public OracleWebPromptGenerator(Set<Tag<String>> oracleTags) {
-		this.oracleTags = oracleTags;
-	}
+	public OracleImagePromptGenerator() {}
 
 	@Override
 	public String generateOraclePrompt(State state, String appName, String currentTestGoal, String previousTestGoal) {
@@ -81,32 +61,7 @@ public class OracleWebPromptGenerator implements IPromptOracleGenerator {
 		String pageTitle = state.get(WdTags.WebTitle, "");
 		builder.append(String.format("We are currently on the following page: %s. ", pageTitle));
 
-		builder.append("The current state of the application contains the widgets: ");
-
-		for (Widget widget : state) {
-			// Only create the prompt oracle with the information of visible widgets
-			// Some widgets may exist at the DOM level but are not visible in the GUI
-			if(widget.get(WdTags.WebIsFullOnScreen, false)) {
-				try {
-					// Iterate trough the indicated widget Tags to create the widget content
-					String widgetContent = "";
-
-					for(Tag<String> tag : oracleTags) {
-						widgetContent = widgetContent.concat(widget.get(tag, "") + " ");
-					}
-
-					// If the widget content is not empty, add it to the Oracle conversation
-					if(!widgetContent.trim().isEmpty()) {
-						builder.append(String.format("Widget: %s, ", widgetContent));
-					}
-
-				} catch(NoSuchTagException e) {
-					logger.log(Level.WARN, "Widget Tag is missing, skipping.");
-				}
-			}
-		}
-
-		builder.append(". ");
+		builder.append("An image of the current state is attached. ");
 
 		builder.append("Is the test objective met in this state?");
 
