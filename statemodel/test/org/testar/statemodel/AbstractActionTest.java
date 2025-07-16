@@ -75,6 +75,21 @@ public class AbstractActionTest {
         ids.add("concrete-action-should-fail");
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testAddConcreteActionNullId() {
+        action.addConcreteActionId(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddConcreteActionEmptyId() {
+        action.addConcreteActionId("");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddConcreteActionBlankId() {
+        action.addConcreteActionId("    ");
+    }
+
     @Test
     public void testCanBeDelayedIsFalse() {
         assertFalse(action.canBeDelayed());

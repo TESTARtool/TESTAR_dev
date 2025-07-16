@@ -63,6 +63,21 @@ public class AbstractStateTest {
         assertEquals(abstractAction1, result);
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testGetActionByNullId() throws ActionNotFoundException {
+        abstractState.getAction(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetActionByEmptyId() throws ActionNotFoundException {
+        abstractState.getAction("");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetActionByBlankId() throws ActionNotFoundException {
+        abstractState.getAction("    ");
+    }
+
     @Test(expected = ActionNotFoundException.class)
     public void testGetActionByIdThrowsException() throws ActionNotFoundException {
         abstractState.getAction("non-existent");
@@ -125,6 +140,16 @@ public class AbstractStateTest {
         abstractState.addConcreteStateId(null);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddEmptyConcreteStateId() {
+        abstractState.addConcreteStateId("");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddBlankConcreteStateId() {
+        abstractState.addConcreteStateId("    ");
+    }
+
     @Test(expected = NullPointerException.class)
     public void testAddNullVisitedAction() {
         abstractState.addVisitedAction(null);
@@ -139,6 +164,24 @@ public class AbstractStateTest {
     public void testConcreteStateIdsIsUnmodifiable() {
         Set<String> ids = abstractState.getConcreteStateIds();
         ids.add("concrete-action-should-fail");
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void testGetActionsIsUnmodifiable() {
+        Set<AbstractAction> actions = abstractState.getActions();
+        actions.clear();
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void testGetVisitedActionsIsUnmodifiable() {
+        Set<AbstractAction> visited = abstractState.getVisitedActions();
+        visited.clear();
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void testGetUnvisitedActionsIsUnmodifiable() {
+        Set<AbstractAction> unvisited = abstractState.getUnvisitedActions();
+        unvisited.clear();
     }
 
     @Test

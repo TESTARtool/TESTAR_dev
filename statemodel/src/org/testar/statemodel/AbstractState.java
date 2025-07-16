@@ -81,7 +81,11 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @param concreteStateId the concrete id to add
      */
     public void addConcreteStateId(String concreteStateId) {
-        this.concreteStateIds.add(Objects.requireNonNull(concreteStateId, "ConcreteState ID cannot be null"));
+        Objects.requireNonNull(concreteStateId, "ConcreteState ID cannot be null");
+        if (concreteStateId.trim().isEmpty()) {
+            throw new IllegalArgumentException("ConcreteState ID cannot be null or blank");
+        }
+        this.concreteStateIds.add(concreteStateId);
     }
 
     /**
@@ -115,7 +119,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @return
      */
     public Set<AbstractAction> getActions() {
-        return new HashSet<>(actions.values());
+        return Collections.unmodifiableSet(new HashSet<>(actions.values()));
     }
 
     /**
@@ -125,6 +129,10 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @throws ActionNotFoundException
      */
     public AbstractAction getAction(String actionId) throws ActionNotFoundException{
+        Objects.requireNonNull(actionId, "AbstractAction ID cannot be null");
+        if (actionId.trim().isEmpty()) {
+            throw new IllegalArgumentException("AbstractAction ID cannot be null or blank");
+        }
         if (!actions.containsKey(actionId)) {
             throw new ActionNotFoundException();
         }
@@ -144,7 +152,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @return
      */
     public Set<AbstractAction> getUnvisitedActions() {
-        return new HashSet<>(unvisitedActions.values());
+        return Collections.unmodifiableSet(new HashSet<>(unvisitedActions.values()));
     }
 
     /**
@@ -152,7 +160,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @return
      */
     public Set<AbstractAction> getVisitedActions() {
-        return new HashSet<>(visitedActions.values());
+        return Collections.unmodifiableSet(new HashSet<>(visitedActions.values()));
     }
 
     /**

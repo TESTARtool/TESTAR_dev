@@ -67,6 +67,10 @@ public class AbstractAction extends AbstractEntity implements Persistable {
      * @param concreteActionId the concrete action id to add
      */
     public void addConcreteActionId(String concreteActionId) {
+        Objects.requireNonNull(concreteActionId, "ConcreteAction ID cannot be null");
+        if (concreteActionId.trim().isEmpty()) {
+            throw new IllegalArgumentException("ConcreteAction ID cannot be null or blank");
+        }
         concreteActionIds.add(concreteActionId);
     }
 
