@@ -39,7 +39,7 @@ import java.util.List;
 
 public class CompoundActionSelector implements ActionSelector{
 
-    private List<ActionSelector> selectors;
+    private final List<ActionSelector> selectors;
 
     public CompoundActionSelector(List<ActionSelector> selectors) {
         this.selectors = selectors;

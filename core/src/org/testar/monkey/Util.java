@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2021 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2021 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,7 +32,6 @@
 package org.testar.monkey;
 
 import org.testar.monkey.alayer.devices.Mouse;
-import org.testar.monkey.alayer.exceptions.SystemStopException;
 import org.testar.monkey.alayer.exceptions.WidgetNotFoundException;
 import org.testar.monkey.alayer.*;
 
@@ -44,7 +43,6 @@ import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.GZIPOutputStream;
@@ -94,22 +92,6 @@ public final class Util {
 		private static final long serialVersionUID = 95857074998765550L;
 
 		public void run(State s, Canvas c, Pen pen) {
-		}
-	};
-
-	public static final Searcher NullSearcher = new Searcher() {
-		private static final long serialVersionUID = 7810562741429319061L;
-
-		public SearchFlag apply(Widget widget, UnFunc<Widget, SearchFlag> visitor) {
-			return SearchFlag.OK;
-		}
-	};
-
-	public static final Searcher AllSearcher = new Searcher() {
-		private static final long serialVersionUID = 7410528704889829161L;
-
-		public SearchFlag apply(Widget widget, UnFunc<Widget, SearchFlag> visitor) {
-			return visitor.apply(widget);
 		}
 	};
 
@@ -522,16 +504,6 @@ public final class Util {
 		return () -> it;
 	}
 
-	public static List<Widget> targets(State state, Action action) throws WidgetNotFoundException {
-		Assert.notNull(state, action);
-		List<Finder> targetFinders = action.get(Tags.Targets, new ArrayList<Finder>());
-		List<Widget> ret = Util.newArrayList();
-		for (Finder f : targetFinders) {
-			ret.add(f.apply(state));
-		}
-		return ret;
-	}
-
 	public static List<File> getAllFiles(List<File> dirs, String extension) {
 		List<File> files = Util.newArrayList();
 		for (File f : dirs) {
@@ -564,46 +536,6 @@ public final class Util {
 			return Files.readString(file.toPath(), Charset.forName("ISO-8859-1"));
 		} catch (IOException ex) {
 			ex.printStackTrace();
-			return null;
-		}
-	}
-
-	public static File createTempDir() {
-		return createTempDir("org.fruit.", Long.toString(System.nanoTime()));
-	}
-
-	public static File createTempDir(String pref, String suff) {
-		File ret;
-		try {
-			ret = File.createTempFile(pref, suff);
-			if (!ret.delete() || !ret.mkdir()) {
-				return null;
-			}
-			return ret;
-		} catch (IOException e) {
-			return null;
-		}
-	}
-
-	public static File createTempFile() {
-		return createTempFile("org.fruit.", Long.toString(System.nanoTime()), null);
-	}
-
-	public static File createTempFile(String content) {
-		return createTempFile("org.fruit.", Long.toString(System.nanoTime()), content);
-	}
-
-	public static File createTempFile(String pref, String suff, String content) {
-		File dest;
-		try {
-			dest = File.createTempFile(pref, suff);
-			if (content != null) {
-				PrintWriter out = new PrintWriter(dest);
-				out.print(content);
-				out.close();
-			}
-			return dest;
-		} catch (IOException e) {
 			return null;
 		}
 	}
@@ -840,10 +772,6 @@ public final class Util {
 		}
 	}
 
-	public static boolean isMember(State state, Widget widget) {
-		return Assert.notNull(widget.root()) == state;
-	}
-
 	public static double length(double x1, double y1, double x2, double y2) {
 		double a = x1 - x2;
 		double b = y1 - y2;
@@ -886,16 +814,6 @@ public final class Util {
 		}
 	}
 
-	public static File generateUniqueFile(String dir, String prefix) {
-		Assert.notNull(dir, prefix);
-		//int i = 0;
-		int i = 1;
-		File f;
-		while ((f = new File(dir + File.separator + prefix + i)).exists())
-			i++;
-		return f;
-	}
-
 	public static String lineSep() {
 		return lineSep;
 	}
@@ -908,35 +826,6 @@ public final class Util {
 		Assert.notNull(format);
 		DateFormat dateFormat = new SimpleDateFormat(format);
 		return dateFormat.format(new Date());
-	}
-
-	public static String diffDateString(String format, String fromDate, String toDate) {
-		Assert.notNull(format);
-		DateFormat dateFormat = new SimpleDateFormat(format);
-		try {
-			Date from = dateFormat.parse(fromDate),
-					to = dateFormat.parse(toDate);
-			long ms = to.getTime() - from.getTime();
-			return Long.toString(ms / 1000) + " seconds or " +
-					Long.toString(ms / 60000) + " minutes or " +
-					Long.toString(ms / 3600000) + " hours";
-		} catch (ParseException e) {
-			System.out.println("Exception caught calculating time between <" + fromDate + "> and <" + toDate + ">");
-			e.printStackTrace();
-			return e.getMessage();
-		}
-	}
-
-	public static boolean stop(SUT system) {
-		try {
-			if (system == null) {
-				return true;
-			}
-			system.stop();
-			return true;
-		} catch (SystemStopException ste) {
-			return false;
-		}
 	}
 
 	@SafeVarargs

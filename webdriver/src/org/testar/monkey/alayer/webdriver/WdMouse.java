@@ -30,9 +30,9 @@
 
 package org.testar.monkey.alayer.webdriver;
 
-import org.testar.monkey.FruitException;
 import org.testar.monkey.alayer.devices.Mouse;
 import org.testar.monkey.alayer.devices.MouseButtons;
+import org.testar.monkey.alayer.exceptions.FruitException;
 
 import java.awt.*;
 

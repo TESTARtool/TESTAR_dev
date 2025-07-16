@@ -31,6 +31,7 @@
 package org.testar.statemodel.persistence.orientdb.entity;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class EntityClass {
@@ -38,24 +39,29 @@ public class EntityClass {
     public enum EntityType {Vertex, Edge}
 
     // name of the class
-    private String className;
+    private final String className;
 
     // name of the superclass, if any
     private String superClassName;
 
     // is the entity an edge or a vertex?
-    private EntityType entityType;
+    private final EntityType entityType;
 
     // a set of properties to add to the class
-    private Set<Property> properties;
+    private final Set<Property> properties;
 
     /**
-     * Consstructor
+     * Constructor
      * @param classname classname for the orientdb class
      */
     public EntityClass(String classname, EntityType entityType) {
+        Objects.requireNonNull(classname, "classname cannot be null");
+        if (classname.trim().isEmpty()) {
+            throw new IllegalArgumentException("classname cannot be empty or blank");
+        }
         this.className = classname;
-        this.entityType = entityType;
+
+        this.entityType = Objects.requireNonNull(entityType, "EntityType cannot be null");;
         properties = new HashSet<>();
     }
 

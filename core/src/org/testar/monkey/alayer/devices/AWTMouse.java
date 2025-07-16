@@ -38,8 +38,8 @@ import java.awt.MouseInfo;
 import java.awt.PointerInfo;
 import java.awt.Robot;
 
-import org.testar.monkey.FruitException;
 import org.testar.monkey.alayer.Point;
+import org.testar.monkey.alayer.exceptions.FruitException;
 
 public final class AWTMouse implements Mouse {
 	public static AWTMouse build() throws FruitException{ return new AWTMouse(); }

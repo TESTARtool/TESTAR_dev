@@ -39,13 +39,13 @@ public class TestImprovedUnvisitedActionSelector {
 		// reset the abstract state model for each test
 		abstractStateModel = new AbstractStateModel("firstModel", "", "", Collections.singleton(Tags.AbstractID));
 		// reset the model manager for each test
-		modelManager = new ModelManager(abstractStateModel, actionSelector, new DummyManager(), null, new SequenceManager(new HashSet<>(), "firstModel"), false);
+		modelManager = new ModelManager(abstractStateModel, actionSelector, new DummyManager(), new SequenceManager(new HashSet<>(), "firstModel"), false);
 	}
 
 	@Test
 	public void test_new_empty_state_model() {
 		// We are in a new model without transitions
-		// We need to test that firstAction is an Unvisited action and is obtaines with the action selector
+		// We need to test that firstAction is an Unvisited action and is obtains with the action selector
 
 		Assert.assertTrue(firstState.getVisitedActions().isEmpty());
 

@@ -33,8 +33,6 @@
  */
 package org.testar.monkey.alayer.exceptions; // refactored by urueda
 
-import org.testar.monkey.FruitException;
-
 public class TimeOutException extends FruitException {
 	private static final long serialVersionUID = 2546011154169797944L;
 	public TimeOutException(String message){ this(message, null); }

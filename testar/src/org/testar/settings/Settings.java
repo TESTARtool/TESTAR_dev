@@ -42,6 +42,7 @@ import java.util.*;
 import org.testar.monkey.*;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.TaggableBase;
+import org.testar.monkey.alayer.exceptions.FruitException;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 import org.testar.settings.extended.ExtendedSettingFile;
 import org.testar.settings.extended.ExtendedSettingsFactory;

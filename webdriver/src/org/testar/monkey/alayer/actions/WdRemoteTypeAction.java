@@ -40,6 +40,7 @@ import org.testar.monkey.alayer.exceptions.PositionException;
 import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.openqa.selenium.ElementClickInterceptedException;
+import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.remote.RemoteWebElement;
 
@@ -100,13 +101,17 @@ public class WdRemoteTypeAction extends TaggableBase implements Action {
 			org.testar.monkey.Util.pause(0.1);
 			remoteElement.sendKeys(keys);
 		}
-		catch (ElementClickInterceptedException ie) {
+		catch (ElementClickInterceptedException ee) {
 			// This happens when other element obscure the desired element to interact with
-			logger.warn(String.format("%s : %s", this.get(Tags.Desc, ""), ie.getMessage()));
+			logger.warn(String.format("%s : %s", this.get(Tags.Desc, ""), ee.getMessage()));
 		}
 		catch (StaleElementReferenceException se) {
 			// This happens when the state changes between obtaining the widget and executing the action
 			logger.warn(String.format("%s : %s", this.get(Tags.Desc, ""), se.getMessage()));
+		}
+		catch (InvalidElementStateException ie) {
+		    // This happens when trying to execute a type action into a non-editable element
+		    logger.warn(String.format("%s : %s", this.get(Tags.Desc, ""), ie.getMessage()));
 		}
 		catch (Exception e) {
 			logger.warn("Remote type action failed", e);

@@ -32,19 +32,13 @@ package org.testar.statemodel;
 
 import org.testar.statemodel.event.StateModelEvent;
 import org.testar.statemodel.event.StateModelEventListener;
-import org.testar.monkey.alayer.Tag;
-import org.testar.monkey.alayer.TaggableBase;
-
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class AbstractEntity {
-
-    // a set of tags and values, containing those tags that were used in the creation of the abstract entity
-    private TaggableBase attributes;
+public abstract class AbstractEntity extends TaggableEntity {
 
     // a unique string identifier for this entity
-    private String id;
+    private final String id;
 
     // this should contain a hash to uniquely identify the elements that were `used` in the abstraction level of the model
     private String modelIdentifier;
@@ -53,8 +47,8 @@ public abstract class AbstractEntity {
     private Set<StateModelEventListener> eventListeners;
 
     public AbstractEntity(String id) {
+        super();
         this.id = id;
-        attributes = new TaggableBase();
         eventListeners = new HashSet<>();
     }
 
@@ -80,27 +74,6 @@ public abstract class AbstractEntity {
      */
     public void setModelIdentifier(String modelIdentifier) {
         this.modelIdentifier = modelIdentifier;
-    }
-
-    /**
-     * This method adds a custom attribute to the entity in the form of a tag and its value
-     * @param attribute
-     * @param value
-     */
-    public void addAttribute(Tag attribute, Object value) {
-        try {
-            attributes.set(attribute, value);
-        } catch (Exception e) { //TODO check what kind of exceptions can happen
-            System.out.println("Problem adding value for tag " + attribute.name() + " to abstract state");
-        }
-    }
-
-    /**
-     * This method returns the `attributes` that have been added to this abstract state
-     * @return
-     */
-    public TaggableBase getAttributes() {
-        return attributes;
     }
 
     /**

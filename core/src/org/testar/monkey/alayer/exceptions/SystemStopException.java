@@ -33,8 +33,6 @@
  */
 package org.testar.monkey.alayer.exceptions; // refactored by urueda
 
-import org.testar.monkey.FruitException;
-
 public class SystemStopException extends FruitException {
 	private static final long serialVersionUID = -4938584367513438864L;
 	public SystemStopException(String message){ this(message, null); }

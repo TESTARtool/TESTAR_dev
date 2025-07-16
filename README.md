@@ -77,21 +77,18 @@ To debug the application with the runTestar task, provide your onw run configura
 
 #### Debug TESTAR from Gradle
 In order to debug the TESTAR code, you must run;
-1. `.\gradlew -DDEBUG=true runTestar.` 
+1. `.\gradlew -DEBUG=true runTestar.` 
 
 Optionally you can build TESTAR (.\gradlew -DDBEBUG=true distZip ), copy the result to the machine where you want to run TESTAR and run TESTAR on the target machine.  
 This allows the user to debug TESTAR from a different machine.  
 
 #### Debug TESTAR with IntelliJ IDE
-It is possible to add breakpoints and run TESTAR in debugging mode using IntelliJ.  
-For this, it is necessary to replicate the output structure of the TESTAR dependencies.  
+It is possible to add breakpoints and run TESTAR in debugging mode using IntelliJ.   
 
 IntelliJ IDE:
-1. Run from the gradle perspective `gradle debuggingDistribution`
-2. Change the run execution of TESTAR to point to `TESTAR_dev\testar`
-3. Execute `testar/src/org/testar/monkey/Main.java` with IntelliJ debugging mode
-
-After the debugging execution, it is recommended to clean the output files by running `gradle cleanDebugging` from the IntelliJ gradle perspective.  
+1. Add the desired breakpoints  
+2. Select the task `runTestarDebug`  
+3. Execute the IntelliJ debugging mode  
 
 ### How to execute TESTAR distribution
 

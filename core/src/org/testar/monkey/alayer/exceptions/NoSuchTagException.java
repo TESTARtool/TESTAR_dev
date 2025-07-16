@@ -33,7 +33,6 @@
  */
 package org.testar.monkey.alayer.exceptions; // refactored by urueda
 
-import org.testar.monkey.FruitException;
 import org.testar.monkey.alayer.Tag;
 
 public class NoSuchTagException extends FruitException {

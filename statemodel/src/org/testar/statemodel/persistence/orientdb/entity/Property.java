@@ -30,18 +30,20 @@
 
 package org.testar.statemodel.persistence.orientdb.entity;
 
+import java.util.Objects;
+
 import com.orientechnologies.orient.core.metadata.schema.OType;
 
 public class Property {
 
     // name of the property
-    private String propertyName;
+    private final String propertyName;
 
     // orientdb type to use for the property
-    private OType propertyType;
+    private final OType propertyType;
 
     // needed child type in case of embedded list, sets, maps
-    private OType childType;
+    private final OType childType;
 
     private boolean isMandatory = false;
 
@@ -73,17 +75,18 @@ public class Property {
      * @param propertyType
      */
     public Property(String propertyName, OType propertyType, OType childType) {
+        Objects.requireNonNull(propertyName, "propertyName cannot be null");
+        if (propertyName.trim().isEmpty()) {
+            throw new IllegalArgumentException("propertyName cannot be empty or blank");
+        }
         this.propertyName = propertyName;
-        this.propertyType = propertyType;
+
+        this.propertyType = Objects.requireNonNull(propertyType, "propertyType cannot be null");
         this.childType = childType;
     }
 
     public String getPropertyName() {
         return propertyName;
-    }
-
-    public void setPropertyName(String propertyName) {
-        this.propertyName = propertyName;
     }
 
     public OType getPropertyType() {
@@ -92,14 +95,6 @@ public class Property {
 
     public OType getChildType() {
         return childType;
-    }
-
-    public void setChildType(OType childType) {
-        this.childType = childType;
-    }
-
-    public void setPropertyType(OType propertyType) {
-        this.propertyType = propertyType;
     }
 
     public boolean isMandatory() {

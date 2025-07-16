@@ -39,7 +39,7 @@ import org.testar.statemodel.persistence.orientdb.entity.PropertyValue;
 import org.testar.statemodel.persistence.orientdb.entity.TypeConvertor;
 import org.testar.statemodel.persistence.orientdb.entity.VertexEntity;
 import org.testar.statemodel.persistence.orientdb.util.Validation;
-import org.testar.statemodel.Widget;
+import org.testar.statemodel.ModelWidget;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.TaggableBase;
 
@@ -47,7 +47,7 @@ public class WidgetHydrator implements EntityHydrator<VertexEntity> {
 
     @Override
     public void hydrate(VertexEntity target, Object source) throws HydrationException {
-        if (!(source instanceof Widget)) {
+        if (!(source instanceof ModelWidget)) {
             throw new HydrationException("Instance of widget expected, " + source.getClass().toString() + " given.");
         }
 
@@ -58,9 +58,9 @@ public class WidgetHydrator implements EntityHydrator<VertexEntity> {
         }
 
         // fetch the root widget, being the concrete state
-        ConcreteState concreteState = ((Widget) source).getRootWidget();
+        ConcreteState concreteState = ((ModelWidget) source).getRootWidget();
         if (concreteState == null) {
-            throw new HydrationException("Could not find a concrete state root widget for widget with id " + ((Widget) source).getId());
+            throw new HydrationException("Could not find a concrete state root widget for widget with id " + ((ModelWidget) source).getId());
         }
         // then fetch the abstract state, as it has our model identifier
         AbstractState abstractState = concreteState.getAbstractState();
@@ -70,7 +70,7 @@ public class WidgetHydrator implements EntityHydrator<VertexEntity> {
 
         // we are going to combine the identifier for the concrete state and the concrete widget id into one joint identifier.
         String stateId = concreteState.getId();
-        String widgetId = ((Widget) source).getId();
+        String widgetId = ((ModelWidget) source).getId();
         String modelIdentifier = abstractState.getModelIdentifier();
         String uniqueId = modelIdentifier + "-" + stateId + "-" + widgetId;
 
@@ -82,7 +82,7 @@ public class WidgetHydrator implements EntityHydrator<VertexEntity> {
         target.addPropertyValue(identifier.getPropertyName(), new PropertyValue(identifier.getPropertyType(), uniqueId));
 
         // loop through the tagged attributes for this state and add them
-        TaggableBase attributes = ((Widget) source).getAttributes();
+        TaggableBase attributes = ((ModelWidget) source).getAttributes();
         for (Tag<?> tag :attributes.tags()) {
             // we simply add a property for each tag
             target.addPropertyValue(Validation.sanitizeAttributeName(tag.name()), new PropertyValue(TypeConvertor.getInstance().getOrientDBType(attributes.get(tag).getClass()), attributes.get(tag)));

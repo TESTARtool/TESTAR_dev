@@ -32,6 +32,7 @@ package org.testar.statemodel.persistence.orientdb.entity;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public abstract class DocumentEntity {
@@ -39,12 +40,12 @@ public abstract class DocumentEntity {
     /**
      * The entity class this entity `belongs` to.
      */
-    private EntityClass entityClass;
+    private final EntityClass entityClass;
 
     /**
      * A map of properties for this entity.
      */
-    private Map<String, PropertyValue> entityProperties;
+    private final Map<String, PropertyValue> entityProperties;
 
     /**
      * Should the entity be updated if it already exists?
@@ -52,7 +53,7 @@ public abstract class DocumentEntity {
     private boolean updateEnabled = true;
 
     public DocumentEntity(EntityClass entityClass) {
-        this.entityClass = entityClass;
+        this.entityClass = Objects.requireNonNull(entityClass, "EntityClass cannot be null");
         entityProperties = new HashMap<>();
     }
 
