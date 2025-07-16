@@ -50,4 +50,8 @@ public class DocumentEntityTest {
         assertTrue(document.updateEnabled());
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testConstructorWithNullEntityClass() {
+        new DocumentEntity(null) {};
+    }
 }

@@ -30,6 +30,8 @@
 
 package org.testar.statemodel.persistence.orientdb.entity;
 
+import java.util.Objects;
+
 import com.orientechnologies.orient.core.metadata.schema.OType;
 
 public class Property {
@@ -73,8 +75,13 @@ public class Property {
      * @param propertyType
      */
     public Property(String propertyName, OType propertyType, OType childType) {
+        Objects.requireNonNull(propertyName, "propertyName cannot be null");
+        if (propertyName.trim().isEmpty()) {
+            throw new IllegalArgumentException("propertyName cannot be empty or blank");
+        }
         this.propertyName = propertyName;
-        this.propertyType = propertyType;
+
+        this.propertyType = Objects.requireNonNull(propertyType, "propertyType cannot be null");
         this.childType = childType;
     }
 

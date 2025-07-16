@@ -59,4 +59,15 @@ public class PropertyValueTest {
         assertNull(property.getValue());
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testConstructorWithNullOType() {
+        new PropertyValue(null, "test-value");
+    }
+
+    @Test
+    public void testConstructorWithAllowedNullValue() {
+        PropertyValue property = new PropertyValue(OType.STRING, null);
+        assertEquals(OType.STRING, property.getType());
+        assertNull(property.getValue());
+    }
 }

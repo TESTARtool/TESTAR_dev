@@ -31,6 +31,7 @@
 package org.testar.statemodel.persistence.orientdb.entity;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class VertexEntity extends DocumentEntity {
@@ -46,7 +47,7 @@ public class VertexEntity extends DocumentEntity {
      * @param entityClass
      */
     public VertexEntity(EntityClass entityClass) {
-        super(entityClass);
+        super(Objects.requireNonNull(entityClass, "EntityClass cannot be null"));
         outgoingEdges = new HashSet<>();
         incomingEdges = new HashSet<>();
     }
@@ -72,7 +73,7 @@ public class VertexEntity extends DocumentEntity {
      * @param edge
      */
     public void addOutgoingEdge(EdgeEntity edge) {
-        outgoingEdges.add(edge);
+        outgoingEdges.add(Objects.requireNonNull(edge, "OutgoingEdge cannot be null"));
     }
 
     /**
@@ -80,6 +81,6 @@ public class VertexEntity extends DocumentEntity {
      * @param edge
      */
     public void addIncomingEdge(EdgeEntity edge) {
-        incomingEdges.add(edge);
+        incomingEdges.add(Objects.requireNonNull(edge, "IncomingEdge cannot be null"));
     }
 }

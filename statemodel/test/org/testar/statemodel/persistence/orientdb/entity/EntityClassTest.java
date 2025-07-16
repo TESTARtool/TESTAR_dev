@@ -74,4 +74,24 @@ public class EntityClassTest {
         assertFalse(edgeClass.isVertex());
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testConstructorWithNullClassName() {
+        new EntityClass(null, EntityClass.EntityType.Vertex);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithEmptyClassName() {
+        new EntityClass("", EntityClass.EntityType.Vertex);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithBlankClassName() {
+        new EntityClass("    ", EntityClass.EntityType.Vertex);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testConstructorWithNullEntityType() {
+        new EntityClass("MyVertex", null);
+    }
+
 }

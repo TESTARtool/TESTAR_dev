@@ -52,4 +52,24 @@ public class PropertyTest {
         assertTrue(property.isIndexAble());
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testConstructorNullPropertyName() {
+        new Property(null, OType.STRING);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorEmptyPropertyName() {
+        new Property("", OType.STRING);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorBlankPropertyName() {
+        new Property("    ", OType.STRING);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testConstructorNullPropertyType() {
+        new Property("name", null);
+    }
+
 }

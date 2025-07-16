@@ -57,4 +57,19 @@ public class VertexEntityTest {
         assertTrue(vertex.getEntityClass().isVertex());
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testConstructorWithNullEntityClass() {
+        new VertexEntity(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testAddNullOutgoingEdge() {
+        vertex.addOutgoingEdge(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testAddNullIncomingEdge() {
+        vertex.addIncomingEdge(null);
+    }
+
 }

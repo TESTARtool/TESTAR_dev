@@ -56,4 +56,21 @@ public class EdgeEntityTest {
         assertTrue(edge.getPropertyNames().contains("key"));
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testConstructorWithNullEntityClass() {
+        new EdgeEntity(null, source, target);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testConstructorWithNullSourceVertex() {
+        EntityClass edgeClass = new EntityClass("EdgeClass", EntityClass.EntityType.Edge);
+        new EdgeEntity(edgeClass, null, target);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testConstructorWithNullTargetVertex() {
+        EntityClass edgeClass = new EntityClass("EdgeClass", EntityClass.EntityType.Edge);
+        new EdgeEntity(edgeClass, source, null);
+    }
+
 }

@@ -59,7 +59,7 @@ public class AbstractStateModelTest {
         model.addTransition(s1, s2, action);
         assertEquals(StateModelEventType.ABSTRACT_STATE_TRANSITION_ADDED, ((TestListener)listener).lastEventType);
 
-        // Add same transition again – should emit a CHANGED event
+        // Add same transition again it should emit a CHANGED event
         model.addTransition(s1, s2, action);
         assertEquals(StateModelEventType.ABSTRACT_STATE_TRANSITION_CHANGED, ((TestListener)listener).lastEventType);
 
