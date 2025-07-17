@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Web Elements Showcase</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    .panel {
+      background: #fff;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    h2 {
+      margin-top: 0;
+    }
+    .form-group {
+      margin-bottom: 10px;
+    }
+    label {
+      display: block;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="panel">
+    <h2>Form Inputs</h2>
+    <form>
+      <div class="form-group"><label for="text">Text:</label><input type="text" id="text" placeholder="Enter text"></div>
+      <div class="form-group"><label for="password">Password:</label><input type="password" id="password"></div>
+      <div class="form-group"><label for="email">Email:</label><input type="email" id="email"></div>
+      <div class="form-group"><label for="number">Number:</label><input type="number" id="number" value="5"></div>
+      <div class="form-group"><label for="search">Search:</label><input type="search" id="search"></div>
+      <div class="form-group"><label for="tel">Tel:</label><input type="tel" id="tel"></div>
+      <div class="form-group"><label for="url">URL:</label><input type="url" id="url"></div>
+      <div class="form-group"><label for="accept_terms"><input type="checkbox" id="accept_terms"> Accept Terms</label></div>
+      <div class="form-group"><label for="radio_male"><input type="radio" name="gender" id="radio_male" checked> Male</label> <label for="radio_female"><input type="radio" name="gender" id="radio_female"> Female</label></div>
+      <div class="form-group"><label for="range">Range:</label><input type="range" id="range" min="0" max="100"></div>
+      <div class="form-group"><label for="file">File:</label><input type="file" id="file"></div>
+      <div class="form-group"><label for="date">Date:</label><input type="date" id="date"></div>
+      <div class="form-group"><label for="time">Time:</label><input type="time" id="time"></div>
+      <div class="form-group"><label for="color">Color:</label><input type="color" id="color"></div>
+      <div class="form-group"><label for="textarea">Textarea:</label><textarea id="textarea"></textarea></div>
+      <input type="submit" value="Submit">
+      <input type="reset" value="Reset">
+      <input type="button" value="Click Me">
+    </form>
+  </div>
+
+  <div class="panel">
+    <h2>Buttons and Select</h2>
+    <button>Standard Button</button>
+    <select>
+      <optgroup label="Group 1">
+        <option value="1">Option 1</option>
+        <option value="2">Option 2</option>
+      </optgroup>
+      <optgroup label="Group 2">
+        <option value="3">Option 3</option>
+      </optgroup>
+    </select>
+  </div>
+
+  <div class="panel">
+    <h2>Text and Display</h2>
+    <label for="demoInput">Label:</label><input id="demoInput" type="text">
+    <p>This is a paragraph with <strong>bold</strong> and <em>italic</em> text.</p>
+    <span>Span element</span>
+    <div>Div container</div>
+    <h1>Header 1</h1>
+    <h2>Header 2</h2>
+    <pre>Preformatted text</pre>
+    <code>console.log("Hello World");</code>
+    <blockquote>This is a quote.</blockquote>
+    <hr>
+  </div>
+
+  <div class="panel">
+    <h2>Navigation</h2>
+    <nav><a href="#">Home</a> | <a href="#">About</a> | <a href="#">Contact</a></nav>
+    <ul><li>List Item 1</li><li>List Item 2</li></ul>
+    <ol><li>Ordered Item 1</li><li>Ordered Item 2</li></ol>
+  </div>
+
+  <div class="panel">
+    <h2>Tables</h2>
+    <table border="1">
+      <thead><tr><th>Name</th><th>Age</th></tr></thead>
+      <tbody>
+        <tr><td>Alice</td><td>30</td></tr>
+      </tbody>
+      <tfoot><tr><td colspan="2">Footer Info</td></tr></tfoot>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>Semantic Containers</h2>
+    <section>Section content</section>
+    <article>Article content</article>
+    <aside>Sidebar content</aside>
+    <main>Main content</main>
+    <header>Page Header</header>
+    <footer>Page Footer</footer>
+    <figure>
+      <img src="testar_logo.png" alt="Figure">
+      <figcaption>This is a figure caption</figcaption>
+    </figure>
+  </div>
+
+</body>
+</html>
