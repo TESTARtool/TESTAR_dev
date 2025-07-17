@@ -1009,17 +1009,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			ProtocolUtil.getActionshot(state,action);
 		}
 
-		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction);
+		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction, 0.0);
 
 		try{
-			double halfWait = waitTime == 0 ? 0.01 : waitTime / 2.0; // seconds
-			Util.pause(halfWait); // help for a better match of the state' actions visualization
 			action.run(system, state, settings.get(ConfigTags.ActionDuration));
-			int waitCycles = (int) (MAX_ACTION_WAIT_FRAME / halfWait);
+			int waitCycles = (int) (MAX_ACTION_WAIT_FRAME / waitTime);
 			long actionCPU;
 			do {
 				long CPU1[] = NativeLinker.getCPUsage(system);
-				Util.pause(halfWait);
+				Util.pause(waitTime);
 				long CPU2[] = NativeLinker.getCPUsage(system);
 				actionCPU = ( CPU2[0] + CPU2[1] - CPU1[0] - CPU1[1] );
 				waitCycles--;
