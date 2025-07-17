@@ -1,0 +1,32 @@
+Feature: User Valid Login
+  As a registered user
+  I want to sign in to the application
+  So that I can access the user dashboard
+
+  Background:
+    Given the login page is displayed
+
+  Scenario: Successful login with valid credentials
+    When I enter the valid username 'user'
+    And I enter the valid password 'pass'
+    And I click the 'Sign In' button
+    Then I should be able to observe the user dashboard
+;
+Feature: Create Customer Satisfaction Survey
+  As a signed-in user
+  I want to create a new Customer Satisfaction Survey
+  So that users will be able to create questions
+
+  Background:
+    Given I am signed in
+    And I can see my dashboard
+
+  Scenario: Create a new Customer Satisfaction Survey
+    When I navigate to the Odontologist project
+    And I select to add a new question set
+    And I set the survey title to 'Customer Satisfaction Survey'
+    And I set the survey ID to 'satisfaction1'
+    And I set the description to 'This is a Customer Satisfaction Survey'
+    And I click the 'Continue' button
+    Then the 'Customer Satisfaction Survey' should be created
+    And the question set editor should be displayed

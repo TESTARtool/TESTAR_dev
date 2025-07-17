@@ -1,0 +1,42 @@
+Feature: User Valid Login
+  As a registered user
+  I want to sign in to the application
+  So that I can access the user dashboard
+
+  Background:
+    Given the login page is displayed
+
+  Scenario: Successful login with valid credentials
+    When I enter the valid username 'user'
+    And I enter the valid password 'pass'
+    And I click the 'Sign In' button
+    Then I should be able to observe the user dashboard
+;
+Feature: View Decision Tree Builder Creation Option
+  As a signed-in user
+  I want to see the option to create a new decision tree builder
+  So that I can begin designing decision logic for the project
+
+  Background:
+    Given I am signed in
+    And I can see my dashboard
+
+  Scenario: Option to create a new decision tree builder is visible
+    When I navigate to the Odontologist project
+    And I open the Decision Tree Builders section
+    Then I should see an option to create a new decision tree builder
+;
+Feature: Create a New Decision Tree Builder
+  As a signed-in user
+  I want to create a new decision tree builder
+  So that it becomes part of the project
+
+  Background:
+    Given I am signed in
+    And I see an option to create a new decision tree builder
+
+  Scenario: Successfully creating a new decision tree builder
+    When I select to create a new decision tree builder
+    And I set the decision tree title to 'Custom-Decision-Tree'
+    And I set the description to 'This is a custom decision tree'
+    Then a message should appear indicating the decision tree builder has been created

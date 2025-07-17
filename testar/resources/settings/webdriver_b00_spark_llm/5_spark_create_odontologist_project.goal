@@ -12,19 +12,18 @@ Feature: User Valid Login
     And I click the 'Sign In' button
     Then I should be able to observe the user dashboard
 ;
-Feature: Add a New User
+Feature: Create Odontologist Project
   As a signed-in user
-  I want to be able to add a new user with a specific role
-  So that they can access the system to create surveys
+  I want to create a new Odontologist project
+  So that users will be able to create surveys
 
   Background:
     Given I am signed in
     And I can see my dashboard
 
-  Scenario: Successfully adding a new user with the Researcher role
-    When I navigate to the 'Users' menu
-    And I click on the 'Add User' option
-    And I type 'testar-researcher' in the name field
-    And I click the input element to select the role 'Researcher'
-    And I confirm the addition
-    Then 'testar-researcher' should appear in the list of existing users
+  Scenario: Create a new Odontologist Project
+    When I select to add a new project
+    And I set the study title to 'Odontologist project'
+    And I set the description to 'This is an Odontologist project'
+    And I select to continue
+    Then the Odontologist project should appear in the overview dashboard

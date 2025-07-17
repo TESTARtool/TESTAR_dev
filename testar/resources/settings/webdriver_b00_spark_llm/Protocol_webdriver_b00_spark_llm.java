@@ -310,6 +310,9 @@ public class Protocol_webdriver_b00_spark_llm extends WebdriverProtocol {
 		if(widget.get(WdTags.WebCssClasses, "").contains("MuiSelect-selectMenu")) {
 			return true;
 		}
+		if(widget.get(WdTags.WebCssClasses, "").contains("MuiTypography-root")) {
+			return true;
+		}
 		return super.isClickable(widget);
 	}
 

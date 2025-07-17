@@ -1,7 +1,7 @@
 Feature: User Valid Login
   As a registered user
-  I want to be able to sign in to the application
-  So that I can access to the user dashboard
+  I want to sign in to the application
+  So that I can access the user dashboard
 
   Background:
     Given the login page is displayed
