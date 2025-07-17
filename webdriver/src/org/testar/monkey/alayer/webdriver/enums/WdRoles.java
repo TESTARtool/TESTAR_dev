@@ -111,6 +111,7 @@ public class WdRoles {
       WdLI = from("li", "WdLI", WdWidget, Roles.Control),
       WdLINK = from("link", "WdLINK", WdWidget, Roles.Control),
       WdMAP = from("map", "WdMAP", WdWidget, Roles.Control),
+      WdMAIN = from("main", "WdMAIN", WdWidget, Roles.Control),
       WdMARK = from("mark", "WdMARK", WdWidget, Roles.Control),
       WdMENU = from("menu", "WdMENU", WdWidget, Roles.Control),
       WdMETA = from("meta", "WdMETA", WdWidget, Roles.Control),
