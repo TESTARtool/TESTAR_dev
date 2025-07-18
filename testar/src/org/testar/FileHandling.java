@@ -40,7 +40,7 @@ import java.io.*;
 
 public class FileHandling {
 
-    public static void copyClassifiedSequence(String generatedSequence, File currentSeq, Verdict verdict) {
+    public static String copyClassifiedSequence(String generatedSequence, File currentSeq, Verdict verdict) {
         // Generate target folder name based on severity title
         String targetFolder = "sequences_" + verdict.verdictSeverityTitle().toLowerCase();
 
@@ -50,18 +50,20 @@ public class FileHandling {
                 );
 
         try {
-            // Copy to general "sequences" folder
-            copyToOutputDir(currentSeq, "sequences");
             // Copy to specific classification folder
             copyToOutputDir(currentSeq, targetFolder);
         } catch (NoSuchTagException | IOException e) {
             LogSerialiser.log("Error copying classified test sequence: " + e.getMessage() + "\n", LogSerialiser.LogLevel.Critical);
         }
 
+        String targetSequence = targetFolder + File.separator + generatedSequence;
+
         LogSerialiser.log(
-                String.format("Copied classified sequence to output <%s> directory!\n", targetFolder),
-                LogSerialiser.LogLevel.Debug
+                String.format("Copied classified sequence to output <%s> directory!\n", targetSequence),
+                LogSerialiser.LogLevel.Info
                 );
+
+        return targetSequence;
     }
 
     /**

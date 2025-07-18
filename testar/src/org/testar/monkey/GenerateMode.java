@@ -81,8 +81,8 @@ public class GenerateMode {
 			SUT system = protocol.startSUTandLogger();
 
 			//Generating the sequence file that can be replayed:
-			protocol.generatedSequence = protocol.getAndStoreGeneratedSequence();
-			protocol.currentSeq = protocol.getAndStoreSequenceFile();
+			protocol.getAndStoreGeneratedSequence();
+			protocol.getAndStoreSequenceFile();
 
 			//initializing TESTAR and the protocol canvas for a new sequence:
 			protocol.startTestSequence(system);
@@ -120,9 +120,7 @@ public class GenerateMode {
 					LogSerialiser.log("Sequence contained faults!\n", LogSerialiser.LogLevel.Critical);
 
 				//Copy sequence file into proper directory:
-				protocol.classifyAndCopySequenceIntoAppropriateDirectory(protocol.getFinalVerdict(), 
-						protocol.generatedSequence, 
-						protocol.currentSeq);
+				protocol.classifyAndCopySequenceIntoAppropriateDirectory(protocol.getFinalVerdict());
 
 				//calling postSequenceProcessing() to allow resetting test environment after test sequence, etc
 				protocol.postSequenceProcessing();

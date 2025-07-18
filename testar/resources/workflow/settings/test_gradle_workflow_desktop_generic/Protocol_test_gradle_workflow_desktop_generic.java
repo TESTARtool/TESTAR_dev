@@ -32,9 +32,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Scanner;
 import java.util.Set;
@@ -112,21 +109,25 @@ public class Protocol_test_gradle_workflow_desktop_generic extends DesktopProtoc
 	 */
 	@Override
 	protected void postSequenceProcessing() {
-		// Verify that OnlySaveFaultySequences works correctly with OK and failure sequences
-		File outputSequencesFolder = null;
-		try {
-			outputSequencesFolder = new File(OutputStructure.sequencesOutputDir).getCanonicalFile();
-		} catch(IOException e) { e.printStackTrace(); }
+		super.postSequenceProcessing();
 
-		// If OnlySaveFaultySequences enabled and sequence verdict is OK, sequence folder must be empty
+		// If OnlySaveFaultySequences is enabled and the sequence verdict is OK, sequence_ok must not exist
 		if(settings().get(ConfigTags.OnlySaveFaultySequences) && (getFinalVerdict()).severity() == Verdict.OK.severity()) {
-			Assert.isTrue(folderIsEmpty(outputSequencesFolder.toPath()), "TESTAR output sequences is empty because verdict is OK and OnlySaveFaultySequences is enabled");
+			String sequencesOkFolderName = OutputStructure.outerLoopOutputDir + File.separator + "sequences_ok";
+			File sequencesOkFolder = null;
+			try {
+				sequencesOkFolder = new File(sequencesOkFolderName).getCanonicalFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			Assert.isTrue(!sequencesOkFolder.exists());
 		}
 		// Else, if OnlySaveFaultySequences enabled and sequence verdict is a failure,
 		// Or if OnlySaveFaultySequences disabled,
-		// sequence folder must contains a .testar file
+		// sequence must have generated a .testar file
 		else {
-			Assert.isTrue(!folderIsEmpty(outputSequencesFolder.toPath()), "TESTAR output sequences is not empty");
+			Assert.isTrue(getGeneratedSequenceName().endsWith(".testar"));
+			Assert.isTrue(new File(getGeneratedSequenceName()).exists());
 		}
 
 		// Verify the JsonUtils created a JSON State file
@@ -147,8 +148,6 @@ public class Protocol_test_gradle_workflow_desktop_generic extends DesktopProtoc
 			}
 		}
 
-		super.postSequenceProcessing(); // Finish Reports
-
 		// Verify html and txt report files were created
 		File htmlReportFile = new File(reportManager.getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".html"));
 		File txtReportFile = new File(reportManager.getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".txt"));
@@ -163,17 +162,6 @@ public class Protocol_test_gradle_workflow_desktop_generic extends DesktopProtoc
 
 		Assert.isTrue(fileContains("<h2>Test verdict for this sequence:", htmlReportFile));
 		Assert.isTrue(fileContains("Test verdict for this sequence:", txtReportFile));
-	}
-
-	private boolean folderIsEmpty(Path path) {
-		if (Files.isDirectory(path)) {
-			try (DirectoryStream<Path> directory = Files.newDirectoryStream(path)) {
-				return !directory.iterator().hasNext();
-			} catch (IOException e) {
-				return false;
-			}
-		}
-		return false;
 	}
 
 	private boolean fileContains(String searchText, File file) {
