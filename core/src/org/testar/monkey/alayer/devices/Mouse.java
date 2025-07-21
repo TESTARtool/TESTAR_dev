@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013-2020 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2020 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -28,10 +28,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.testar.monkey.alayer.devices;
 
 import org.testar.monkey.alayer.Point;
@@ -39,7 +35,6 @@ import org.testar.monkey.alayer.Point;
 public interface Mouse {
 	void press(MouseButtons k);
 	void release(MouseButtons k);
-	void isPressed(MouseButtons k);
 	void setCursor(double x, double y);
 	Point cursor();
 	void setCursorDisplayScale(double displayScale);

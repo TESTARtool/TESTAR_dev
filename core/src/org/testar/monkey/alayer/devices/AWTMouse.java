@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -68,10 +69,6 @@ public final class AWTMouse implements Mouse {
 	public void release(MouseButtons k) { 
 		robot.mouseRelease(k.code());
 	}	
-	
-	public void isPressed(MouseButtons k) {
-		throw new UnsupportedOperationException("AWT Mouse cannot poll the mouse's state!");
-	}
 
 	public void setCursor(double x, double y) { robot.mouseMove((int)(x*displayScale), (int)(y*displayScale)); }
 

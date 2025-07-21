@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,7 +27,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
-
 
 package org.testar.monkey.alayer.devices;
 
@@ -59,7 +58,4 @@ public final class AWTKeyboard implements Keyboard {
 		robot.keyRelease(KeyEvent.VK_CONTROL);
 	}
 
-	public void isPressed(KBKeys k) {
-		throw new UnsupportedOperationException("Unfortunately AWT Keyboard cannot poll the keyboard's state!");
-	}
 }

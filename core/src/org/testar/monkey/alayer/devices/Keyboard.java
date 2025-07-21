@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,12 +28,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-
 package org.testar.monkey.alayer.devices;
 
 public interface Keyboard {	
 	void press(KBKeys k);
 	void release(KBKeys k);	
-	void isPressed(KBKeys k);
 	void paste();
 }

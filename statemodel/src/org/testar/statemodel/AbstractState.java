@@ -83,7 +83,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
     public void addConcreteStateId(String concreteStateId) {
         Objects.requireNonNull(concreteStateId, "ConcreteState ID cannot be null");
         if (concreteStateId.trim().isEmpty()) {
-            throw new IllegalArgumentException("ConcreteState ID cannot be null or blank");
+            throw new IllegalArgumentException("ConcreteState ID cannot be empty or blank");
         }
         this.concreteStateIds.add(concreteStateId);
     }
@@ -131,7 +131,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
     public AbstractAction getAction(String actionId) throws ActionNotFoundException{
         Objects.requireNonNull(actionId, "AbstractAction ID cannot be null");
         if (actionId.trim().isEmpty()) {
-            throw new IllegalArgumentException("AbstractAction ID cannot be null or blank");
+            throw new IllegalArgumentException("AbstractAction ID cannot be empty or blank");
         }
         if (!actions.containsKey(actionId)) {
             throw new ActionNotFoundException();

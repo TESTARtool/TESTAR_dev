@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -46,7 +46,7 @@ public class Environment {
      * @return The environment interface or UnknownEnvironment.
      */
     public static IEnvironment getInstance() {
-    	return (instance != null) ? instance : new UnknownEnvironment();
+        return (instance != null) ? instance : new UnknownEnvironment();
     }
 
     /**
@@ -54,6 +54,9 @@ public class Environment {
      * @param implementation The concrete implementation of the interface.
      */
     public static void setInstance(IEnvironment implementation) {
+        if (implementation == null) {
+            throw new IllegalArgumentException("Environment implementation cannot be set to null");
+        }
         instance = implementation;
     }
 
