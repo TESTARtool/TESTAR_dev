@@ -66,8 +66,6 @@ public class WdEdgeManager implements WdBrowserManager {
 		String edgeVersion = getEdgeFullVersion(edgeBinaryPath);
 		if(!edgeVersion.isEmpty()) {
 			logger.log(Level.INFO, String.format("Detected Edge Version: %s", edgeVersion));
-			// Temp fix for java.net.UnknownHostException: msedgedriver.azureedge.net
-			System.setProperty("wdm.edgeDriverUrl", "https://msedgedriver.microsoft.com/");
 			WebDriverManager.edgedriver().driverVersion(edgeVersion).setup();
 		}
 		else {
