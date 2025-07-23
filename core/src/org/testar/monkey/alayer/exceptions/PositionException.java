@@ -33,8 +33,6 @@
  */
 package org.testar.monkey.alayer.exceptions; // refactored by urueda
 
-import org.testar.monkey.FruitException;
-
 public class PositionException extends FruitException {
 	private static final long serialVersionUID = -1132646035499653943L;
 	public PositionException(String message){ this(message, null); }

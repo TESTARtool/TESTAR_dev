@@ -42,8 +42,8 @@ import org.testar.statemodel.util.QueryHelper;
  * Simple condition that searches for a string in all states.
  */
 public class StateCondition extends TestCondition {
-    private String field;
-    private String searchMessage;
+    private final String field;
+    private final String searchMessage;
 
     /**
      * Creates a new StateCondition.

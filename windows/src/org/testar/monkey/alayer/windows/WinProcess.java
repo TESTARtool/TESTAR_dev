@@ -43,7 +43,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.testar.monkey.Assert;
-import org.testar.monkey.FruitException;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.AutomationCache;
 import org.testar.monkey.alayer.SUT;
@@ -55,6 +54,7 @@ import org.testar.monkey.alayer.devices.AWTMouse;
 import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.devices.Keyboard;
 import org.testar.monkey.alayer.devices.Mouse;
+import org.testar.monkey.alayer.exceptions.FruitException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.exceptions.SystemStopException;
 

@@ -30,14 +30,16 @@
 
 package org.testar.statemodel;
 
+import java.util.Objects;
+
 import org.testar.statemodel.persistence.Persistable;
 
 public class AbstractStateTransition implements Persistable {
 
     // a transition is a trinity consisting of two states as endpoints and an action to tie these together
-    private AbstractState sourceState;
-    private AbstractState targetState;
-    private AbstractAction action;
+    private final AbstractState sourceState;
+    private final AbstractState targetState;
+    private final AbstractAction action;
 
     /**
      * Constructor
@@ -46,9 +48,9 @@ public class AbstractStateTransition implements Persistable {
      * @param action
      */
     public AbstractStateTransition(AbstractState sourceState, AbstractState targetState, AbstractAction action) {
-        this.sourceState = sourceState;
-        this.targetState = targetState;
-        this.action = action;
+        this.sourceState = Objects.requireNonNull(sourceState, "Abstract source state cannot be null");
+        this.targetState = Objects.requireNonNull(targetState, "Abstract target state cannot be null");
+        this.action = Objects.requireNonNull(action, "AbstractAction cannot be null");
     }
 
     /**
@@ -73,30 +75,6 @@ public class AbstractStateTransition implements Persistable {
      */
     public String getActionId() {
         return action.getActionId();
-    }
-
-    /**
-     * Get the source state for this transition
-     * @param sourceState
-     */
-    public void setSourceState(AbstractState sourceState) {
-        this.sourceState = sourceState;
-    }
-
-    /**
-     * Get the target state for this transition
-     * @param targetState
-     */
-    public void setTargetState(AbstractState targetState) {
-        this.targetState = targetState;
-    }
-
-    /**
-     * Get the action for this transition
-     * @param action
-     */
-    public void setAction(AbstractAction action) {
-        this.action = action;
     }
 
     /**

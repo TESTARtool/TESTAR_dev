@@ -31,9 +31,9 @@
 package org.testar.protocols;
 
 import org.testar.DerivedActions;
+import org.testar.environment.Environment;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.Drag;
-import org.testar.monkey.Environment;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;

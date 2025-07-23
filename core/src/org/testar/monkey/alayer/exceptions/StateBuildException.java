@@ -33,8 +33,6 @@
  */
 package org.testar.monkey.alayer.exceptions; // refactored by urueda
 
-import org.testar.monkey.FruitException;
-
 public class StateBuildException extends FruitException {
 	private static final long serialVersionUID = 5741711528841953961L;
 	public StateBuildException(String message) { super(message); }

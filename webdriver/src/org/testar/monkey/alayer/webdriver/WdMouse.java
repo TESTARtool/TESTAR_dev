@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,9 +30,9 @@
 
 package org.testar.monkey.alayer.webdriver;
 
-import org.testar.monkey.FruitException;
 import org.testar.monkey.alayer.devices.Mouse;
 import org.testar.monkey.alayer.devices.MouseButtons;
+import org.testar.monkey.alayer.exceptions.FruitException;
 
 import java.awt.*;
 
@@ -46,8 +46,6 @@ import java.awt.*;
  * Positions are relative to the viewport.
  */
 public class WdMouse implements Mouse {
-  private static String UNSUPPORTED_MESSAGE =
-      "WD Mouse cannot poll the mouse's state!";
   private static String INFO_MESSAGE =
       "MouseInfo.getPointerInfo() returned null! " + System.lineSeparator() +
       "This seeems to be undocumented Java library behavior... " + System.lineSeparator() +
@@ -85,10 +83,6 @@ public class WdMouse implements Mouse {
 
   public void release(MouseButtons k) {
     robot.mouseRelease(k.code());
-  }
-
-  public void isPressed(MouseButtons k) {
-    throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
   }
 
   public void setCursor(double x, double y) {

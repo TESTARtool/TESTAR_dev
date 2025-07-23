@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,13 +28,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.monkey;
+package org.testar.environment;
 
-public interface IEnvironment {
-    /**
-     * Get the display scale based on the windows handle.
-     * @param windowHandle The handle of the window.
-     * @return The scale of the display which shows the window, when the display could not be resolved 1.0 is returned.
-     */
-    double getDisplayScale(long windowHandle);
+/**
+ * A default environment implementation. Can be used as fallback option when a OS specific environment implementation
+ * is missing.
+ * NOTE: This implementation prevents the application from crashing but doesn't guarantee correct behavior.
+ */
+public class UnknownEnvironment implements IEnvironment {
+    @Override
+    public double getDisplayScale(long windowHandle){
+        System.out.println("WARNING getDisplayScale not implemented for current OS, returning default value");
+        return 1.0;
+    }
 }

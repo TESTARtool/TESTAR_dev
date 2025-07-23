@@ -33,8 +33,6 @@
  */
 package org.testar.monkey.alayer.exceptions; // refactored by urueda
 
-import org.testar.monkey.FruitException;
-
 public class ActionBuildException extends FruitException {
 	private static final long serialVersionUID = -4992879959880705549L;
 	public ActionBuildException(String message){ this(message, null); }

@@ -33,7 +33,7 @@
  */
 package org.testar.monkey.alayer.windows;
 
-import org.testar.monkey.FruitException;
+import org.testar.monkey.alayer.exceptions.FruitException;
 
 public class WinApiException extends FruitException {
 	private static final long serialVersionUID = 4344611676441793933L;

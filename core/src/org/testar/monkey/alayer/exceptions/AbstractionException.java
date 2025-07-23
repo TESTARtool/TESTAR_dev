@@ -33,8 +33,6 @@
  */
 package org.testar.monkey.alayer.exceptions; // refactored by urueda
 
-import org.testar.monkey.FruitException;
-
 public class AbstractionException extends FruitException {
 	private static final long serialVersionUID = -7797424127481093948L;
 	public AbstractionException(String message){ this(message, null); }
