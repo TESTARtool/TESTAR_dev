@@ -1,11 +1,535 @@
-Date format is:
-	YYYY-MM-DD
+#TESTAR v2.7.6 (22-Jul-2025)
+- Update gradle wrapper to 8.5
+- Create runTestarDebug gradle java task to replace the old debuggingDistribution logic that contained bugs when creating and deleting directories
+- Update webdrivermanager based on the dependabot update
+- Refactor some environment and exception classes in the core package
+- Remove old unused classes and util methods from the core package
+- Refactor statemodel classes with fail-fast code checks, remove unused setter, and add JUnit tests
+- Bump io.github.bonigarcia:webdrivermanager from 6.1.0 to 6.2.0 
 
---
 
-Change log has been moved to https://github.com/TESTARtool/TESTAR_dev/wiki/TESTAR-release-notes
+#TESTAR v2.7.5 (15-Jul-2025)
+- Extend LlmConversation to enable sending images. Currently implemented for OpenAI.
+- Add OracleImagePromptGenerator, which is used for LlmOracle
+- Add TransitionConditionEvaluator to technically evaluate test goals by checking model transitions
+- Add webdriver_llm_state_model_transition_evaluator protocol
+- Update search queries conditions for OrientDB 3.2.38
+- Enable the usage of Paste action for the llm conversation
+- Sanitize some possible markdown-style code responses from the llm
+- Enable TextVisualizer for llm input and add TestLlmParseActionResponse
 
---
+
+#TESTAR v2.7.4 (8-Jul-2025)
+- Bump io.appium:java-client from 9.4.0 to 9.5.0 
+- Bump org.seleniumhq.selenium:selenium-java from 4.33.0 to 4.34.0.
+
+
+#TESTAR v2.7.3 (1-Jul-2025)
+- Fix Detecting a faulty sequence in the initial state might affect the generation of test sequences #431 by deleting and refactoring the faultySequence logic
+- Refactor the old ProcessListener class with the new class ProcessListenerOracle implements Oracle arch
+- Create SUSPICIOUS_PROCESS verdict
+- Fix a Chrome issue in Windows that was preventing TESTAR from putting the Chrome browser in the foreground
+- Add coverageReportSummary task
+- Print warning for windows env without 100% res
+
+
+#TESTAR v2.7.2 (10-Jun-2025)
+- Update orient-db to 3.2.38
+- Disable the StateModelStoreWidgets setting by default and add a GUI tooltip warning
+
+
+#TESTAR v2.7.1 (3-Jun-2025)
+- Switching to Chrome for Testing, which still supports the --load-extension flag.
+- Integrating WebDriverManager to automatically manage and install the appropriate version of ChromeDriver.
+- Implementing a new ChromeDownloader class trying to automate this process
+- Included new webdriver classes
+- WdChromeManager to use Chrome for Testing + WebDriverManager
+- WdFirefoxManager to use Firefox browser + WebDriverManager
+- WdEdgeManager to use Edgebrowser + WebDriverManager
+
+
+#TESTAR v2.6.42 (27-May-2025)
+- Remove passSeverity variable that was updated in the DefaultProtocol but never used
+- Improve the WebInvariantDuplicatedRowsInTable oracle to highlight duplicated table rows
+- Create a new CheckStateCondition feature that does not require the State Model but just the State
+- Fix a bug related to loading goals from the dialog
+- Fix a bug that was invoking the getState and getVerdict twice during the Generate mode (this also reduces LLM tokens consumption)
+- Adapt the HtmlReporter to correctly identify the stateBlock to highlight the failures
+- Fix a bug with the webdriver log entries buffer logic
+- Add the LlmStateless setting to allow users to reduce LLM tokens consumption
+
+
+#TESTAR v2.6.41 (10-May-2025)
+- Bumps org.seleniumhq.selenium:selenium-java from 4.31.0 to 4.32.0.
+- Update GWT protocol
+
+
+#TESTAR v2.6.40 (9-May-2025)
+- Extend the features of the configurable spy mode panel
+
+
+#TESTAR v2.6.39 (6-May-2025)
+- Add LLM framework developed by/with @270899colin
+- org.testar.action.priorization.llm contains the LlmActionSelector logic to communicate with the LLM for action selector
+- org.testar.oracles.llm contains the LlmOracle logic to communicate with the LLM to be used as test oracle
+- org.testar.llm.openai contains the structure definition to communicate with OpenAI LLMs in JSON format
+- org.testar.llm.gemini contains the structure definition to communicate with Gemini LLMs in JSON format
+- org.testar.llm.prompt contains the logic for generating prompts for action selection and oracles
+- Add InputText Tag to allow LLMs to change the type and paste input texts for action selection
+- Add queryStateModel in the ModelManager to obtain state model metrics
+- org.testar.statemodel.analysis.condition contains the logic for creating technical conditions that check the State Model to assess the test goals have been met
+- Add queryStateModel in the ModelManager to obtain state model information
+- org.testar.statemodel.analysis.metric contains the logic to retrieve State Model metrics such as number of abstract and concrete state and actions
+- Add the LLM settings in ConfigTags and the LlmPanel in the dialog
+- Add LLM_COMPLETE Verdict to stop the execution when LLM believes the test goal has been accomplished
+- Add the protocol 03_webdriver_llm_parabank, which uses LLMs for action selection and as oracles
+- Add CONDITION_COMPLETE Verdict to stop the execution when the state model conditions have been met
+- Add the protocol webdriver_llm_condition_metrics, which uses LLMs for action selection and state model conditions as oracles
+- Add WebWidgetPlaceholder tag
+- Add AUTOLINK and ENACTEST logos in the AboutPanel
+
+
+#TESTAR v2.6.38 (29-Apr-2025)
+- Small Verdict refactoring to avoid if-else Verdict naming in verdictSeverityTitle()
+- Add a feature to highlight the visualizer of the verdict widget in the HTML report
+- Add RegionVisualizer to highlight the widgets that have a severity Verdict
+- Add WebComputedFontSize to WdTags
+- Add oracles/generic/visual
+- Add oracles/web/accessibility
+- Add oracles/web/invariants
+- Add ExtendedOracles with OracleSelection to the settings and the TESTAR dialog
+- Update parabank protocol
+
+
+#TESTAR v2.6.37 (8-Apr-2025)
+- Bumps org.seleniumhq.selenium:selenium-java from 4.29.0 to 4.30.0.
+- Update chrome manifest v3
+- Fix merge issue with initTagVisualization feature 
+
+
+#TESTAR v2.6.36 (1-Apr-2025)
+- Introduce configurable attributes to customize which widget attributes are visible in Spy Mode. Tag filtering is persisted via settings (SpyTagAttributes)
+- SpyModePanel: a new settings tab to choose which tags to include/exclude
+- TagFilter: a simplified singleton class managing active tag attributes
+- Updated SutVisualization to respect tag filtering on spy mode
+- New setting SpyTagAttributes in ConfigTags, tags are separated by ;
+
+
+#TESTAR v2.6.35 (11-Mar-2025)
+- Add AndroidTags.AndroidHint
+- Enable appium:autoGrantPermissions
+- Fix state and action screenshots with remote emulator
+- Update Android click and type action role
+- Enable timestamp when TESTAR obtains the Android state
+
+
+#TESTAR v2.6.34 (4-Mar-2025)
+- Add WebPathsAllowed regular expression setting
+- Add a restore button and undo feature to the Oracle dialog
+- The HTML has been updated
+- Update verbose of invalid ProtocolClass setting
+- Add StateRenderTime Tag and LCP web metric
+
+
+#TESTAR v2.6.33 (25-Feb-2025)
+- Bumps org.seleniumhq.selenium:selenium-java from 4.28.1 to 4.29.0.
+
+
+#TESTAR v2.6.32 (4-Feb-2025)
+- Extracting the testar package statemodel into a Java project/module
+- Jitpack added to TESTAR_dev
+
+
+#TESTAR v2.6.31 (30-Jan-2025)
+- Update Appium dependencies from 9.3.0 to 9.4.0
+
+
+#TESTAR v2.6.30 (29-Jan-2025)
+- Update Selenium dependencies from 4.28.0 to 4.28.1
+
+
+#TESTAR v2.6.29 (28-Jan-2025)
+- Add an OTP feature in TESTAR to enable reading 6-digit codes for two-factor authentication
+- Fix [Webdriver module hangs when starting a new sequence](https://github.com/TESTARtool/TESTAR_dev/issues/412)
+- Fix a NumberFormatException with invalid maxLength web properties
+
+
+#TESTAR v2.6.28 (22-Jan-2025)
+- Update Selenium dependencies from 4.27.0 to 4.28.0
+
+
+#TESTAR v2.6.27 (10-Dec-2024)
+- Add `io.appium:java-client` dependency to dependabot
+- Updated [Appium Capabilities](https://appium.io/docs/en/2.0/guides/caps/)
+- Create `test-ubuntu-android.yml` to launch an Android emulator, Appium, then TESTAR CI tests
+- Rename release and test workflow files
+- Show pasted text in SPY mode
+
+
+#TESTAR v2.6.26 (3-Dec-2024)
+- Update Selenium dependencies from 4.26.0 to 4.27.0
+
+
+#TESTAR v2.6.25 (19-Nov-2024)
+- Update Selenium dependencies from 4.25.0 to 4.26.0
+
+
+#TESTAR v2.6.24 (29-Oct-2024)
+- Add `testar\coverage` framework
+- Add `testar\coverage\jacoco` implementation
+- Fix [HtmlReporter crashes when action is missing the Desc tag](https://github.com/TESTARtool/TESTAR_dev/issues/407)
+
+
+#TESTAR v2.6.23 (25-Oct-2024)
+- Update Selenium dependencies from 4.24.0 to 4.25.0
+
+
+#TESTAR v2.6.22 (18-Sep-2024)
+- Detect if swing widgets are enabled or disabled
+- Improve the detection of top-level containers for JFrame panel elements
+- Detect top-level actionable widgets by default for Swing apps
+- Update Java Swing CI test to detect disabled widgets in SwingSet2
+
+
+#TESTAR v2.6.21 (10-Sep-2024)
+- Update Selenium dependencies from 4.23.1 to 4.24.0
+
+
+#TESTAR v2.6.20 (14-Aug-2024)
+- Update Selenium dependencies from 4.23.0 to 4.23.1
+
+
+#TESTAR v2.6.19 (2-Aug-2024)
+- Fix Java Swing EXCEPTION_ACCESS_VIOLATION for JDK > 8
+- Move the Access Bridge checkbox option from the StateModel panel to the Advanced panel
+- Create a GitHub Actions CI test to check java swing
+
+
+#TESTAR v2.6.18 (30-Jul-2024)
+- Add Chromedriver flag to disable search engine selector
+
+
+#TESTAR v2.6.17 (24-Jul-2024)
+- Update Selenium dependencies from 4.22.0 to 4.23.0
+- Delete the old KNOWN_ISSUES file (being tracked in GitHub issues)
+
+
+#TESTAR v2.6.16 (8-Jul-2024)
+- Update Selenium dependencies from 4.21.0 to 4.22.0
+
+
+#TESTAR v2.6.15 (25-Jun-2024)
+- Fix issue 129 by updating the protocol desktop_widget_recognition
+- For the image recognition, we clear the green/red dots from the canvas before taking the screenshot 
+
+
+#TESTAR v2.6.14 (18-Jun-2024)
+- Update Selenium dependencies from 4.20.0 to 4.21.0
+
+
+#TESTAR v2.6.13 (21-May-2024)
+- Derive actions in Qt applications
+- Enable SUTProcesses settings for multi-processes
+- Remove old debugging code from the Windows StateFetcher class
+
+
+#TESTAR v2.6.12 (7-May-2024)
+- Update Selenium dependencies from 4.19.1 to 4.20.0
+- Update MacOS chromedriver runner dependency
+
+
+#TESTAR v2.6.11 (2-Apr-2024)
+- Update Selenium dependencies from 4.16.1 to 4.19.1
+
+
+#TESTAR v2.6.10 (19-Mar-2024)
+- Add GitHub dependabot for selenium java dependency
+- Add automatic TESTAR release workflow
+- Refactor [CodingManager state and actions AbstractID and ConcreteID identifiers](https://github.com/TESTARtool/TESTAR_dev/issues/317)
+- Refactor [Widget toString prints all children values instead of the current widget](https://github.com/TESTARtool/TESTAR_dev/issues/384)
+- Remove the deprecated HTML report package and unused batch metrics scripts
+
+
+#TESTAR v2.6.9 (9-Jan-2024)
+- Adding LogOracle implementation that allows detecting suspicious titles in log files and system command outputs using Regex expressions
+- Fix [TESTAR reporting crashes when a ScreenshotPath Tag is not available](https://github.com/TESTARtool/TESTAR_dev/issues/380)
+- Fix [TESTAR latestState is not updated in specific system protocols](https://github.com/TESTARtool/TESTAR_dev/issues/381)
+
+
+#TESTAR v2.6.8 (19-Dec-2023)
+- Implement a reporting framework to manage multiple report formats
+- Add Inner and Outer HTML WdTags
+- Update Action <-> Widget mapping
+- Fix the creation of replayable files for web systems
+- Update Selenium and Appium dependencies
+
+
+#TESTAR v2.6.7 (10-Oct-2023)
+- Updating Gradle to [support Java 21](https://github.com/TESTARtool/TESTAR_dev/issues/373)
+- Official [Java support moved to Java 11, 17, and 21](https://github.com/TESTARtool/TESTAR_dev/issues/315)
+- Add [documentation about supported OS](https://github.com/TESTARtool/TESTAR_dev/issues/264)
+- Refactor Settings class and package
+- If AbstractStateAttributes is Empty, inform the user and assign a default one, but do not block TESTAR execution
+- Add [Dockerfile file to support docker images in ARM architectures](https://github.com/TESTARtool/TESTAR_dev/issues/374)
+
+
+#TESTAR v2.6.6 (15-Sep-2023)
+- Add KeyBoardListener setting to fix [Keyboard Events](https://github.com/TESTARtool/TESTAR_dev/issues/195) 
+- Refactor NativeHookManager
+- Extend TESTAR settings validation
+- Add webdriver CI test for Linux and macOS
+- Fix: If SUTConnectorValue is empty, show a message and finish the main process
+- Fix: Android Spy mode screenshot
+- Update budtmo Android Docker dependencies
+- Update selenium and Dockerfile dependencies
+
+
+#TESTAR v2.6.5 (27-Jun-2023)
+- Update parabank protocol for HandsOn exercises
+- Adding WdRemoteActions to send interaction actions at webdriver level instead of GUI-level
+- Add maxLength to WdTags
+- Check Nashor Enginer in Edit Protocol
+- Fix cast bugs in filtering and suspicious tags features
+
+
+#TESTAR v2.6.4 (16-May-2023)
+- (Edit protocol) Show Java compilation Exception if code is erroneous
+- Update chromedriver plugin
+- Fix model visualization mode exception
+- Build actions identifiers before returning retryDeriveAction
+- Escape possible special characters in ApplicationName and ApplicationVersion to avoid file stream exceptions
+
+
+#TESTAR v2.6.3 (9-May-2023)
+- Add JDK Nashorn check for Edit Protocol launch
+- Fix widget filtering bug 
+- Fix suspiciousStringValueMatcher bug 
+- Fix Sikulix screenshot bug
+- Fix forcing the system to the foreground
+- Include ALT button for SPY filtering
+
+
+#TESTAR v2.6.2 (10-Feb-2023)
+- Refactor action selector protocols to ActionSelectorProxy
+- Refactor DataManager to InputDataManager
+- Clean old ant files
+- Update selenium library dependencies versions
+- Update 01 and 02 HandsOn protocols
+- Update default Spy mode properties
+- Disable dialog Misc panel
+- Add a description for each ConfigTags settings
+- Create TypeableClasses for webdriver
+- Add Check Regex button in the TESTAR dialog
+- Bugs fixing
+
+
+#TESTAR v2.6.1 (4-Jan-2023)
+- Remove the jumping between Generate and Record mode
+- Verify regular expressions in the test settings file
+- Fix ActivateSystem action when Calculator SUT freezes
+
+
+#TESTAR v2.6.0 (5-Dec-2022)
+- Add the new Appium framework that allows TESTAR to connect and test Android and iOS mobile applications.
+
+
+#TESTAR v2.5.3 (11-Oct-2022)
+- Refactor the TESTAR execution modes (moving out of the DefaultProtocol monster)
+
+
+#TESTAR v2.5.2 (27-Sep-2022)
+- Added new security package `testar/src/org/testar/securityanalysis`
+- Added the new protocol `webdriver_security_analysis` with an example that uses OWASP-Benchmark SUT
+- New passive analysis that allows TESTAR to validate the security aspects of the web headers
+- Three active analysis features that allow TESTAR to detect XSS, SQL injection and invalid token
+
+
+#TESTAR v2.5.1 (1-Sep-2022)
+- Move Gradle workflow CI tasks to another file
+- Add form filling, browser console error, and OnlySaveFaultySequences checks in the workflow CI tests
+- If the force to foreground setting is enabled, allow TESTAR to connect to a Desktop app even if running in the background
+- Add the debuggingDistribution task to the build.gradle file to allow running TESTAR easily from the IDE
+- Add Debug TESTAR with IntelliJ IDE and Increase Java memory to the readme file
+- Update the selenium-java plugin version to 4.4.0
+
+
+#TESTAR v2.5.0 (21-Jun-2022)
+- Add Verdicts to detect error and warning messages from the web browser
+- Add the Form filling feature and webdriver_formfilling protocol as an example
+- Refactor the OnlySaveFaultySequences feature and add it to the GUI
+- Add Verdict result to HTML output filename
+- Create a button in the HTML report to reverse the information order
+- Create an empty state if the javascript plugin does not return a widget tree (to fix XML pages issue)
+- Fix the pre-selection of a history back action if we did not derive any action
+- Fix Mouse move actions and visualization
+- Move isTypeable() to WebdriverProtocol
+
+
+#TESTAR v2.4.3 (26-Apr-2022)
+- Replace new line characters in the widget values
+- Allow configuring webdriver clickable CSS classes at runtime with spy mode
+- If OrientDB has no models open a web page with instructions in the Analysis mode
+- Update the java selenium version
+- Remove unused old code and Tags
+- Fix multiple tags functionality bug. Add JUnit tests to test it.
+- Add SUTConnectorValue domain and initial web domain to domains allowed
+
+
+#TESTAR v2.4.2 (12-Apr-2022)
+- Add find widget with multiple tags functionality, and a GitHub Actions CI test
+
+
+#TESTAR v2.4.1 (22-Mar-2022)
+- Added checkstyle plugin
+- Refactor testar packages and classes structure
+- Remove old graphdb and native java projects from the code structure
+- GitHub Actions: Remove chromedriver download task and use internal GitHub chromedriver executable
+- Retry action execution if derived actions are empty (because SUT is still updating but TESTAR tries to obtain the state too fast)
+- Fix webdriver execution without windows.dll
+- If Analysis server is already in use, detect and connect to it instead of printing an error
+
+
+#TESTAR v2.3.5 (11-Dec-2021)
+- gradle wrapper version to 7.1.1
+- remove old Windows UIAutomation windows.dll build instructions from readme (move to wiki for advanced users)
+- Use the AbstractIDCustom tag (instead ConcreteID) to identify actions and states in QLearning and StateGraph algorithms
+- Update Dockerfile java version from openjdk-14-jdk to openjdk-16-jdk
+- Fix canvas exception for Replay mode with GUI actions visualization
+- Fix IllegalStateException null pointer if no message added
+- Fix log4j vulnerability
+- Temporal fix for github actions
+
+
+#TESTAR v2.3.4 (1-Jul-2021)
+- Allow users to programmatically customize the State and Actions identifiers
+
+
+#TESTAR v2.3.3 (17-Jun-2021)
+- Replay mode will create HTML, logs and sequence files
+- TESTAR checks if replay mode can not reproduce the actions
+- Infer the State Model in Replay mode
+- Fix issues writing the replayable fragment
+
+
+#TESTAR v2.3.2 (27-May-2021)
+- Prepare TESTAR for SVT course
+- Added extra functions in GenericUtilsProtocol
+- Added an example of triggered compound action for Parabank protocol
+- Fix minor bugs
+
+
+#TESTAR v2.3.1 (25-May-2021)
+- Added Dockerfile to build a TESTAR Chromedriver Docker image
+- Added github\worflows\docker.yml file to automatically build and push a TESTAR Chromedriver image to Docker Hub
+- Added testar-kubernetes.yaml file to allow the integration of TESTAR in the Kubernetes infrastructure
+- Added new reporting structure
+- Fix minor bugs
+
+
+#TESTAR v2.2.17 (3-May-2021)
+- Added a new setting to detect suspicious titles on multiple tags
+- TagsForSuspiciousOracle
+
+
+#TESTAR v2.2.16 (27-April-2021)
+- Added a setting to filter multiple tags
+- TagsToFilter
+
+
+#TESTAR v2.2.15 (13-April-2021)
+- Extended XML setting framework
+
+
+#TESTAR v2.2.14 (19-Feb-2020)
+- Add WebDriver settings to allow users to customize some features (ClickableClasses, DeniedExtensions, DomainsAllowed, FollowLinks, BrowserFullScreen, SwitchNewTabs) using the cmd or without recompile the protocol
+- Add 5 "wildcard" string settings to offer some flexibility for some features as login
+- Add webdriver workflow tasks
+- Fix minor bugs
+
+
+#TESTAR v2.2.13 (22-Dec-2020)
+- New feature to visualize filtered actions as gray dots or gray text
+- Rename old web generic protocols (Win API + IExplorer)
+
+
+#TESTAR v2.2.12 (26-Nov-2020)
+- Internal code refactoring
+- Added gradle workflow tasks
+- Allow TESTAR to run in Windows environments even if they are not Windows 7 or 10 (Windows Server 2016 & 2019 works with default windows.dll). An output message is printed to inform the user.
+
+
+#TESTAR v2.2.11 (27-Oct-2020)
+General improvements:
+- Remove old graphdb settings
+- Update Readme with the new State Model information
+- Solve issue #239 , launch AlwaysCompile feature before initializing the protocol
+- Update copyright and solve warnings
+- Verify TESTAR initial directory to print a warning message (Main)
+
+Webdriver improvements:
+- Make activate tab configurable to offer a solution to the issue #235
+- Change webdriver widget and actions Desc Tag (if one Tag value is empty check other one). Try to avoid Actions Description with empty content.
+- Automatically add Initial domain to domainsAllowed List if didnt exists.
+- Move and clean generic webdriver configuration (addWdDriverOS, WdProtocolUtil, ensureDomainsAllowed)
+- Allow the possibility of disable chrome web security to detect elements inside iframes from external cross origin
+- If Webdriver selectAction detects an empty state, force back history and print a warning message
+- Added Is not running verdict if selenium chromedriver stops respond
+
+
+#TESTAR v2.2.10 (7-Oct-2020)
+- Small bug fixes to state model protocols related to generated HTML reports
+- Config for visualizing the detected and selected actions
+
+
+#TESTAR v2.2.9 (13-July-2020)
+Improvements to WebDriver support:
+- Add Webdriver StateModel Management Tags (settings and GUI level)
+- Refactor and move "settings/webdriver_protocols" generic utility content. Utility webdriver methods like "detectForcedActions", "detectForcedPopupClick", etc... have been moved to "WebdriverProtocol.java".
+- Shadow Web Elements should be detected now
+- Avoid kill process exception with SPY + Webdriver, do not call killTestLaunchedProcesses
+- Improve scrolling actions comparing document body bounds with window bounds
+
+Create PasteText Action
+- Create "waitLeftClickAndPasteIntoWidget" utility method
+- Update examples: protocol_web_one_drive & protocol_webdriver_parabank
+
+Gradle compilation tasks (more in Readme)
+- gradle build, only compile at Java level
+- gradle installDist and distZip, copy existing windows.dll, not using VisualStudio Tools
+- gradle windowsDistribution, use VisualStudio Tools to compile a new windows distribution
+
+Escape Special Strings in Action Desc and HTML report
+
+Spy Mode Visual Panel will not be created over the y-axis of the screen + Add Refresh Time setting
+
+Solve issue saving ESC actions (Empty State) in the State Model
+
+
+#TESTAR v2.2.8 (29-June-2020)
+- Log4j2 implementation
+
+
+#TESTAR v2.2.7 (2-June-2020)
+- Fix issue: Update State after beginSequence SUT modifications
+- Add new protocols with Action selection prioritization example
+
+
+#TESTAR v2.2.6 (24-Mar-2020)
+- Internal code refactoring
+
+
+#TESTAR v2.2.5 (16-Mar-2020)
+- An issue related with webdriver action coordinates and the Windows System Display Scale option, has different behavior in different environments.
+- This release adds a setting option to override the default Display Scale value in case of environment specific requirements.
+
+
+#TESTAR v2.2.4 (19-Feb-2020)
+- fixing some of the issues with wrong coordinates for actions and screenshots, the cause seems to be Windows display scaling settings
+- providing functions in DefaultProtocol to help defining system specific pre-defined TESTAR behaviour, for example to provide valid input into a login screen: protected boolean waitAndLeftClickWidgetWithMatchingTag(Tag tag, String value, State state, SUT system, int maxNumberOfRetries, double waitBetween) and protected boolean waitLeftClickAndTypeIntoWidgetWithMatchingTag(Tag tag, String value, String textToType, State state, SUT system, int maxNumberOfRetries, double waitBetween)
+- Solve duplicated actions bug (The same actions on widgets were being added twice)
+- Disabled process listener feature in Spy Mode (Exploring the SUT with Spy mode it is not necessary to create new threads intended for listening the out/err buffers)
+- Structure created to Match Suspicious String Values in the SUT. Until now only Tags.Title was checked in the Verdict, ValuePattern property is also checked now. More and customizable properties will be added in the future.
+
 
 #TESTAR v1.3 (2017-04-06)
 ------------------------
