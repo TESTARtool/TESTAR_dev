@@ -1,4 +1,4 @@
-var TestarState = (function () {
+var TestarSimpleState = (function () {
 
 /*
  * Keep a map with all labels client-side
@@ -15,7 +15,7 @@ var getStateTreeTestar = function (ignoredTags) {
     var bodyWrapped = wrapElementTestar(body, 0, 0);
     bodyWrapped['documentHasFocus'] = document.hasFocus();
     bodyWrapped['documentTitle'] = document.title;
-    bodyWrapped['largestContentfulPaint'] = latestLCP;
+    bodyWrapped['largestContentfulPaint'] = 0; // disabled for simple state
 
     // Find all labels on the page
     getLabelMapTestar();
@@ -44,11 +44,6 @@ function traverseElementTestar(parentWrapped, rootElement, ignoredTags) {
         var childElement = childNodes[i];
 
         // Filter ignored tags or non-element nodes
-        if (childElement.nodeType === 3) {
-            parentWrapped.textContent += childElement.textContent;
-            parentWrapped.textContent = parentWrapped.textContent.trim();
-            continue;
-        }
         if (childElement.nodeType !== 1 ||
             ignoredTags.includes(childElement.nodeName.toLowerCase())) {
             continue;
@@ -66,11 +61,6 @@ function traverseElementTestar(parentWrapped, rootElement, ignoredTags) {
 			var childShadowElement = shadowNodes[i];
 			
 			// Filter ignored tags or non-element nodes
-			if (childShadowElement.nodeType === 3) {
-				parentWrapped.textContent += childShadowElement.textContent;
-				parentWrapped.textContent = parentWrapped.textContent.trim();
-				continue;
-			}
 			if (childShadowElement.nodeType !== 1 ||
 				ignoredTags.includes(childShadowElement.nodeName.toLowerCase())) {
 				continue;
@@ -82,18 +72,8 @@ function traverseElementTestar(parentWrapped, rootElement, ignoredTags) {
 		}
 	}
 	
-    if (shouldDeleteElementForSerialization(parentWrapped.element)) {
-        delete parentWrapped.element;
-    }
-}
-
-function shouldDeleteElementForSerialization(element) {
-    try {
-        const frameElement = element.ownerDocument.defaultView?.frameElement;
-        return frameElement && frameElement !== element;
-    } catch (e) {
-        return true;
-    }
+    // always delete element for simple state
+    delete parentWrapped.element;
 }
 
 /*
@@ -115,11 +95,6 @@ function traverseElementArrayTestar(treeArray, parentWrapped, rootElement, paren
         var childElement = childNodes[i];
 
         // Filter ignored tags or non-element nodes
-        if (childElement.nodeType === 3) {
-            parentWrapped.textContent += childElement.textContent;
-            parentWrapped.textContent = parentWrapped.textContent.trim();
-            continue;
-        }
         if (childElement.nodeType !== 1 ||
             ignoredTags.includes(childElement.nodeName.toLowerCase())) {
             continue
@@ -181,15 +156,11 @@ function wrapElementTestar(element, xOffset, yOffset) {
 
         name: getNameTestar(element),
         tagName: element.tagName.toLowerCase(),
-        textContent: "",
-        innerText: element.innerText,
+        textContent: element.textContent, // changed for simple state
+        innerText: "", // disabled for simple state
         value: element.value,
         checked: element.checked,
         selected: element.selected,
-        disabled: element.disabled,
-        multiple: element.multiple,
-        length: getElementLength(element),
-
         display: computedStyle.display,
         visibility: computedStyle.visibility,
         styleOverflow: computedStyle.overflow,
@@ -198,10 +169,8 @@ function wrapElementTestar(element, xOffset, yOffset) {
         stylePosition: computedStyle.position,
         styleOpacity: computedStyle.opacity,
         computedFontSize: computedStyle.fontSize,
-        computedColor: computedStyle.color,
-        computedBackgroundColor: getEffectiveBackgroundColor(element),
-        innerHTML: element.innerHTML,
-        outerHTML: element.outerHTML,
+        innerHTML: "", // disabled for simple state
+        outerHTML: "", // disabled for simple state
 
         zIndex: getZIndexTestar(element, computedStyle),
         rect: getRectTestar(element, xOffset, yOffset, clientRect),
@@ -214,37 +183,12 @@ function wrapElementTestar(element, xOffset, yOffset) {
         isClickable: isClickableTestar(element, xOffset, yOffset),
         isShadowElement: shadowElement,
         hasKeyboardFocus: document.activeElement === element,
-        xpath: getXPath(element),
+        xpath: "", // disabled for simple state
 
         wrappedChildren: [],
         xOffset: xOffset,
         yOffset: yOffset
     };
-}
-
-function getEffectiveBackgroundColor(el) {
-  while (el) {
-    const bg = window.getComputedStyle(el).backgroundColor;
-
-    // Check if background is NOT fully transparent
-    if (bg && bg !== 'transparent' && !isFullyTransparent(bg)) {
-      return bg;
-    }
-
-    el = el.parentElement;
-  }
-
-  // Fallback: if no background found, assume white (typical default)
-  return 'rgb(255, 255, 255)';
-}
-
-function isFullyTransparent(color) {
-  // Check for 'rgba(0, 0, 0, 0)' or any rgba where alpha = 0
-  const match = color.match(/^rgba?\(\s*(\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d*\.?\d+))?\s*\)$/i);
-  if (!match) return false;
-
-  const alpha = match[4];
-  return typeof alpha !== 'undefined' && parseFloat(alpha) === 0;
 }
 
 /*
@@ -458,10 +402,6 @@ function getLabelMapTestar() {
     }
 }
 
-function getElementLength(element) {
-    return typeof element.length === 'number' ? element.length : -1;
-}
-
 /*
  * Get all the attributes for an HTML element
  * @param {node} element, the parent HTML element
@@ -473,55 +413,6 @@ function getAttributeMapTestar(element) {
         return map;
     }, {});
 }
-
-function getXPath(element) {
-  try {
-    // Create an array to store the path
-    var path = [];
-
-    // Iterate through the ancestors of the element
-    while (element && element.nodeType === Node.ELEMENT_NODE) {
-      var index = 1;
-      var sibling = element.previousSibling;
-
-      // Find the index of the element among its siblings
-      while (sibling) {
-        if (sibling.nodeType === Node.ELEMENT_NODE && sibling.nodeName === element.nodeName) {
-          index++;
-        }
-        sibling = sibling.previousSibling;
-      }
-
-      // Build the XPath expression for the element
-      var tagName = element.nodeName.toLowerCase();
-      var pathSegment = tagName + '[' + index + ']';
-      path.unshift(pathSegment);
-
-      // Move up to the parent element
-      element = element.parentNode;
-    }
-
-    // Join the path segments to form the XPath
-    var xpath = path.length ? '/' + path.join('/') : '';
-
-    return xpath;
-  } catch (error) {
-    // Handle any errors and return an empty string
-    console.error('Error occurred while obtaining XPath:', error);
-    return '';
-  }
-}
-
-// Performance Observer for LCP
-let latestLCP = null;
-const observer = new PerformanceObserver((list) => {
-    const entries = list.getEntries();
-    const lastEntry = entries[entries.length - 1];
-    if (lastEntry) {
-        latestLCP = lastEntry.startTime;
-    }
-});
-observer.observe({ type: "largest-contentful-paint", buffered: true });
 
 return {
     getStateTreeTestar: getStateTreeTestar

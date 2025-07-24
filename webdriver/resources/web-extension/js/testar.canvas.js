@@ -155,3 +155,29 @@ function drawRectTestar(args) {
         testarCtx.strokeRect(args[3], args[4], args[5], args[6]);
     }
 }
+
+function drawBatchTestar(batch) {
+    batch.forEach(function(item) {
+        const [type, args] = item;
+
+        switch (type) {
+            case 'rect':
+                drawRectTestar(args);
+                break;
+            case 'ellipse':
+                drawEllipseTestar(args);
+                break;
+            case 'line':
+                drawLineTestar(args);
+                break;
+            case 'text':
+                drawTextTestar(args);
+                break;
+            case 'triangle':
+                drawTriangleTestar(args);
+                break;
+            default:
+                console.warn("Unknown draw type:", type);
+        }
+    });
+}

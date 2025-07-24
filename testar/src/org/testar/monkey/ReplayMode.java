@@ -99,8 +99,8 @@ public class ReplayMode {
 			 */
 
 			//Generating the new sequence file that can be replayed:
-			protocol.generatedSequence = protocol.getAndStoreGeneratedSequence();
-			protocol.currentSeq = protocol.getAndStoreSequenceFile();
+			protocol.getAndStoreGeneratedSequence();
+			protocol.getAndStoreSequenceFile();
 
 			protocol.cv = protocol.buildCanvas();
 			State state = protocol.getState(system);
@@ -308,7 +308,7 @@ public class ReplayMode {
 		protocol.writeAndCloseFragmentForReplayableSequence();
 
 		//Copy sequence file into proper directory:
-		protocol.classifyAndCopySequenceIntoAppropriateDirectory(protocol.getReplayVerdict(), protocol.generatedSequence, protocol.currentSeq);
+		protocol.classifyAndCopySequenceIntoAppropriateDirectory(protocol.getReplayVerdict());
 
 		LogSerialiser.finish();
 

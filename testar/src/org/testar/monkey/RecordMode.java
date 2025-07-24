@@ -70,8 +70,8 @@ public class RecordMode {
 		protocol.actionCount = 1;
 
 		//Generating the sequence file that can be replayed:
-		protocol.generatedSequence = protocol.getAndStoreGeneratedSequence();
-		protocol.currentSeq = protocol.getAndStoreSequenceFile();
+		protocol.getAndStoreGeneratedSequence();
+		protocol.getAndStoreSequenceFile();
 
 		// notify the statemodelmanager
 		protocol.stateModelManager.notifyTestSequencedStarted();
@@ -153,7 +153,7 @@ public class RecordMode {
 			protocol.writeAndCloseFragmentForReplayableSequence();
 
 			//Copy sequence file into proper directory:
-			protocol.classifyAndCopySequenceIntoAppropriateDirectory(Verdict.OK, protocol.generatedSequence, protocol.currentSeq);
+			protocol.classifyAndCopySequenceIntoAppropriateDirectory(Verdict.OK);
 
 			protocol.postSequenceProcessing();
 
