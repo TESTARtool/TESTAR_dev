@@ -69,8 +69,8 @@ import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 
+import org.testar.environment.Environment;
 import org.testar.monkey.Assert;
-import org.testar.monkey.Environment;
 import org.testar.monkey.Pair;
 
 public class AWTCanvas implements Image, Canvas {

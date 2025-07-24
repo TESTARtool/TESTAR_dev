@@ -30,33 +30,32 @@
 
 package org.testar.statemodel;
 
-import org.testar.monkey.alayer.Tag;
-import org.testar.monkey.alayer.TaggableBase;
-
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
-public class Widget {
-
-    // a set of attributes and values
-    private TaggableBase attributes;
+public class ModelWidget extends TaggableEntity {
 
     // a unique string identifier for this widget
-    private String id;
+    private final String id;
 
     // a list of child widgets for this widget
-    List<Widget> children;
+    private final List<ModelWidget> children;
 
     // the widget's parent, if not the root element
-    Widget parent;
+    private ModelWidget parent;
 
     // for performance reasons, we store the root widget, so we do not have to climb up the widget tree
     // each time we need to access it
-    ConcreteState rootWidget;
+    private ConcreteState rootWidget;
 
-    public Widget(String id) {
-        this.id = id;
-        attributes = new TaggableBase();
+    public ModelWidget(String id) {
+        super();
+        this.id = Objects.requireNonNull(id, "ModelWidget ID cannot be null");
+        if (id.trim().isEmpty()) {
+            throw new IllegalArgumentException("ModelWidget ID cannot be empty or blank");
+        }
         children = new ArrayList<>();
     }
 
@@ -69,31 +68,11 @@ public class Widget {
     }
 
     /**
-     * This method adds a custom attribute to the concrete class in the form of a tag and its value
-     * @param attribute
-     * @param value
-     */
-    public void addAttribute(Tag attribute, Object value) {
-        try {
-            attributes.set(attribute, value);
-        } catch (Exception e) {//TODO what kind of exception?
-            System.out.println("Problem adding value for tag " + attribute.name() + " to abstract state");
-        }
-    }
-
-    /**
-     * This method returns the `attributes` that have been added to this concrete state
-     * @return
-     */
-    public TaggableBase getAttributes() {
-        return attributes;
-    }
-
-    /**
      * This method adds a child to this widget
      * @param child
      */
-    public void addChild(Widget child) {
+    public void addChild(ModelWidget child) {
+        Objects.requireNonNull(child, "Child widget cannot be null");
         children.add(child);
         child.setParent(this);
     }
@@ -102,15 +81,15 @@ public class Widget {
      * Returns the list of this widget's children.
      * @return list of child widgets.
      */
-    public List<Widget> getChildren() {
-        return children;
+    public List<ModelWidget> getChildren() {
+        return Collections.unmodifiableList(children);
     }
 
     /**
      * Method returns this widget's parent.
      * @return
      */
-    public Widget getParent() {
+    public ModelWidget getParent() {
         return parent;
     }
 
@@ -118,7 +97,7 @@ public class Widget {
      * Method sets this widget's parent.
      * @param parent
      */
-    public void setParent(Widget parent) {
+    public void setParent(ModelWidget parent) {
         this.parent = parent;
     }
 

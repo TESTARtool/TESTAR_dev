@@ -32,13 +32,15 @@ package org.testar.statemodel.persistence.orientdb.entity;
 
 import com.orientechnologies.orient.core.metadata.schema.OType;
 
+import java.util.Objects;
+
 public class PropertyValue {
 
     // the orientdb type of the property
-    OType type;
+    private final OType type;
 
     // the value of the property
-    Object value;
+    private final Object value;
 
     /**
      * Constructor
@@ -46,7 +48,7 @@ public class PropertyValue {
      * @param value
      */
     public PropertyValue(OType type, Object value) {
-        this.type = type;
+        this.type = Objects.requireNonNull(type, "OType cannot be null");
         this.value = value;
     }
 

@@ -33,21 +33,23 @@ package org.testar.statemodel;
 import org.testar.statemodel.exceptions.ActionNotFoundException;
 import org.testar.statemodel.persistence.Persistable;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class AbstractState extends AbstractEntity implements Persistable {
 
     // list of possible actions that can be executed from this state
-    private Map<String, AbstractAction> actions;
+    private final Map<String, AbstractAction> actions;
     // list of possible actions that have not yet been executed from this state
-    private Map<String, AbstractAction> unvisitedActions;
+    private final Map<String, AbstractAction> unvisitedActions;
     // a list of actions that have been visited in this state
-    private Map<String, AbstractAction> visitedActions;
+    private final Map<String, AbstractAction> visitedActions;
     // a set of strings containing the concrete state ids that correspond to this abstract state
-    private Set<String> concreteStateIds;
+    private final Set<String> concreteStateIds;
     // is this an initial state?
     private boolean isInitial = false;
 
@@ -57,12 +59,16 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @param actions
      */
     public AbstractState(String stateId, Set<AbstractAction> actions) {
-        super(stateId);
+        super(Objects.requireNonNull(stateId, "AbstractState ID cannot be null"));
+        if (stateId.trim().isEmpty()) {
+            throw new IllegalArgumentException("AbstractState ID cannot be empty or blank");
+        }
         this.actions = new HashMap<>();
         unvisitedActions = new HashMap<>();
         visitedActions = new HashMap<>();
         if (actions != null) {
-            for(AbstractAction action:actions) {
+            for (AbstractAction action : actions) {
+                Objects.requireNonNull(action, "AbstractAction in actions set cannot be null");
                 this.actions.put(action.getActionId(), action);
                 unvisitedActions.put(action.getActionId(), action);
             }
@@ -75,6 +81,10 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @param concreteStateId the concrete id to add
      */
     public void addConcreteStateId(String concreteStateId) {
+        Objects.requireNonNull(concreteStateId, "ConcreteState ID cannot be null");
+        if (concreteStateId.trim().isEmpty()) {
+            throw new IllegalArgumentException("ConcreteState ID cannot be empty or blank");
+        }
         this.concreteStateIds.add(concreteStateId);
     }
 
@@ -91,6 +101,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @param action the visited action
      */
     public void addVisitedAction(AbstractAction action) {
+        Objects.requireNonNull(action, "Visited AbstractAction cannot be null");
         unvisitedActions.remove(action.getActionId());
         visitedActions.put(action.getActionId(), action);
     }
@@ -108,7 +119,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @return
      */
     public Set<AbstractAction> getActions() {
-        return new HashSet<>(actions.values());
+        return Collections.unmodifiableSet(new HashSet<>(actions.values()));
     }
 
     /**
@@ -118,6 +129,10 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @throws ActionNotFoundException
      */
     public AbstractAction getAction(String actionId) throws ActionNotFoundException{
+        Objects.requireNonNull(actionId, "AbstractAction ID cannot be null");
+        if (actionId.trim().isEmpty()) {
+            throw new IllegalArgumentException("AbstractAction ID cannot be empty or blank");
+        }
         if (!actions.containsKey(actionId)) {
             throw new ActionNotFoundException();
         }
@@ -129,7 +144,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @return
      */
     public Set<String> getConcreteStateIds() {
-        return concreteStateIds;
+        return Collections.unmodifiableSet(concreteStateIds);
     }
 
     /**
@@ -137,7 +152,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @return
      */
     public Set<AbstractAction> getUnvisitedActions() {
-        return new HashSet<>(unvisitedActions.values());
+        return Collections.unmodifiableSet(new HashSet<>(unvisitedActions.values()));
     }
 
     /**
@@ -145,7 +160,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @return
      */
     public Set<AbstractAction> getVisitedActions() {
-        return new HashSet<>(visitedActions.values());
+        return Collections.unmodifiableSet(new HashSet<>(visitedActions.values()));
     }
 
     /**
@@ -180,6 +195,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @param action
      */
     public void addNewAction(AbstractAction action) {
+        Objects.requireNonNull(action, "Added AbstractAction cannot be null");
         if (!this.actions.containsKey(action.getActionId())) {
             action.setModelIdentifier(this.getModelIdentifier());
             actions.put(action.getActionId(), action);
