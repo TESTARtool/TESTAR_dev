@@ -37,14 +37,14 @@ import org.testar.statemodel.util.QueryHelper;
 
 public class StateTransitionCondition extends TestCondition {
 
-	private String originStateField;
-	private String originStateMessage;
+	private final String originStateField;
+	private final String originStateMessage;
 
-	private String actionField;
-	private String actionMessage;
+	private final String actionField;
+	private final String actionMessage;
 
-	private String destStateField;
-	private String destStateMessage;
+	private final String destStateField;
+	private final String destStateMessage;
 
 	public StateTransitionCondition(String originStateField, String originStateMessage, 
 			String actionField, String actionMessage, 
@@ -55,12 +55,23 @@ public class StateTransitionCondition extends TestCondition {
 		this.originStateField = originStateField;
 		this.originStateMessage = originStateMessage;
 
-
 		this.actionField = actionField;
 		this.actionMessage = actionMessage;
 
 		this.destStateField = destStateField;
 		this.destStateMessage = destStateMessage;
+	}
+
+	public String getOriginStateMessage() {
+		return originStateMessage;
+	}
+
+	public String getActionMessage() {
+		return actionMessage;
+	}
+
+	public String getDestStateMessage() {
+		return destStateMessage;
 	}
 
 	/**

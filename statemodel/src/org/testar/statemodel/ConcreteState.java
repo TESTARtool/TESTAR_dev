@@ -30,29 +30,28 @@
 
 package org.testar.statemodel;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 import org.testar.statemodel.persistence.Persistable;
-import org.testar.monkey.alayer.Tag;
 
-import java.util.Set;
-
-public class ConcreteState extends Widget implements Persistable {
-
-    // a set of tags that was used in creating the concrete state id
-    private Set<Tag<?>> tags;
+public class ConcreteState extends ModelWidget implements Persistable {
 
     /**
      * The abstract state that is abstracted from this concrete state.
      */
-    private AbstractState abstractState;
+    private final AbstractState abstractState;
 
     // a byte array holding the screenshot for this state
     private byte[] screenshot;
 
-    public ConcreteState(String id, Set<Tag<?>> tags, AbstractState abstractState) {
-        super(id);
-        this.tags = tags;
+    public ConcreteState(String id, AbstractState abstractState) {
+        super(Objects.requireNonNull(id, "ConcreteState ID cannot be null"));
+        if (id.trim().isEmpty()) {
+            throw new IllegalArgumentException("ConcreteState ID cannot be empty or blank");
+        }
         this.setRootWidget(this);
-        this.abstractState = abstractState;
+        this.abstractState = Objects.requireNonNull(abstractState, "AbstractState cannot be null");
     }
 
     /**
@@ -60,7 +59,7 @@ public class ConcreteState extends Widget implements Persistable {
      * @return
      */
     public byte[] getScreenshot() {
-        return screenshot;
+        return screenshot != null ? Arrays.copyOf(screenshot, screenshot.length) : new byte[0];
     }
 
     /**
@@ -68,7 +67,7 @@ public class ConcreteState extends Widget implements Persistable {
      * @param screenshot
      */
     public void setScreenshot(byte[] screenshot) {
-        this.screenshot = screenshot;
+        this.screenshot = screenshot != null ? Arrays.copyOf(screenshot, screenshot.length) : null;
     }
 
     /**

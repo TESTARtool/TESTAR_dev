@@ -34,22 +34,21 @@ import org.testar.monkey.alayer.AWTCanvas;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.Widget;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Set;
 
 public abstract class ConcreteStateFactory {
 
     /**
      * This builder method will create a new concrete state class and populate it with the needed data
      * @param newState the testar State to serve as a base
-     * @param tags the tags containing the attributes that were used in the construction of the concrete state id
      * @return the new concrete state
      */
-    public static ConcreteState createConcreteState(State newState, Set<Tag<?>> tags, AbstractState abstractState, boolean storeWidgets) {
+    public static ConcreteState createConcreteState(State newState, AbstractState abstractState, boolean storeWidgets) {
         String concreteStateId = newState.get(Tags.ConcreteID);
-        ConcreteState concreteState = new ConcreteState(concreteStateId, tags, abstractState);
+        ConcreteState concreteState = new ConcreteState(concreteStateId, abstractState);
 
         // next we want to add all the attributes contained in the state, and then do the same thing for the child widgets
         setAttributes(concreteState, newState);
@@ -75,12 +74,12 @@ public abstract class ConcreteStateFactory {
 
     /**
      * Helper method to transfer attribute information from the testar enitities to our own entities.
-     * @param widget
+     * @param modelWidget
      * @param testarWidget
      */
-    private static void setAttributes(Widget widget, org.testar.monkey.alayer.Widget testarWidget) {
+    private static void setAttributes(ModelWidget modelWidget, org.testar.monkey.alayer.Widget testarWidget) {
         for (Tag<?> t : testarWidget.tags()) {
-            widget.addAttribute(t, testarWidget.get(t, null));
+        	modelWidget.addAttribute(t, testarWidget.get(t, null));
         }
     }
 
@@ -90,17 +89,17 @@ public abstract class ConcreteStateFactory {
      * @param stateModelWidget
      * @param rootWidget
      */
-    private static void copyWidgetTreeStructure(org.testar.monkey.alayer.Widget testarWidget, Widget stateModelWidget, ConcreteState rootWidget) {
+    private static void copyWidgetTreeStructure(Widget testarWidget, ModelWidget modelWidget, ConcreteState rootWidget) {
         // we loop through the testar widget's children to copy their attributes into new widgets
         for (int i = 0; i < testarWidget.childCount(); i++) {
-            org.testar.monkey.alayer.Widget testarChildWidget = testarWidget.child(i);
+            Widget testarChildWidget = testarWidget.child(i);
             String widgetId = testarChildWidget.get(Tags.ConcreteID);
-            Widget newStateModelWidget = new Widget(widgetId);
+            ModelWidget newStateModelWidget = new ModelWidget(widgetId);
             newStateModelWidget.setRootWidget(rootWidget);
             // copy the attribute info
             setAttributes(newStateModelWidget, testarChildWidget);
             // then add the new model widget to the tree
-            stateModelWidget.addChild(newStateModelWidget);
+            modelWidget.addChild(newStateModelWidget);
             // recursively deal with the entire widget tree
             copyWidgetTreeStructure(testarChildWidget, newStateModelWidget, rootWidget);
         }
