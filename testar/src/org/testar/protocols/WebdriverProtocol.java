@@ -770,15 +770,6 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 			return true;
 		}
 
-		Role role = widget.get(Tags.Role, Roles.Widget);
-		if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
-			// Input type are special...
-			if (role.equals(WdRoles.WdINPUT)) {
-				String type = element.type;
-				return WdRoles.clickableInputTypes().contains(type);
-			}
-			return true;
-		}
 		return false;
 	}
 

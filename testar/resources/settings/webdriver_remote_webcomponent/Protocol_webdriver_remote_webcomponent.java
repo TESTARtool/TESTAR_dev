@@ -237,16 +237,6 @@ public class Protocol_webdriver_remote_webcomponent extends WebdriverProtocol {
 
 	@Override
 	protected boolean isClickable(Widget widget) {
-		Role role = widget.get(Tags.Role, Roles.Widget);
-		if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
-			// Input type are special...
-			if (role.equals(WdRoles.WdINPUT)) {
-				String type = ((WdWidget) widget).element.type;
-				return WdRoles.clickableInputTypes().contains(type);
-			}
-			return true;
-		}
-
 		WdElement element = ((WdWidget) widget).element;
 		if (element.isClickable) {
 			return true;

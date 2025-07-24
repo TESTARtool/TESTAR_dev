@@ -32,7 +32,9 @@ package org.testar.monkey.alayer.webdriver;
 
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.testar.monkey.alayer.Rect;
+import org.testar.monkey.alayer.Role;
 import org.testar.monkey.alayer.TaggableBase;
+import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 
 import java.awt.Color;
 import java.io.*;
@@ -195,7 +197,7 @@ public class WdElement extends TaggableBase implements Serializable {
     isFullVisibleOnScreen = isFullVisibleAtCanvasBrowser();
 
     blocked = (Boolean) packedElement.get("isBlocked");
-    isClickable = (Boolean) packedElement.get("isClickable");
+    isClickable = isClickable(packedElement);
     isShadow = (parent != null && parent.isShadow) || (Boolean) packedElement.get("isShadowElement");
     isKeyboardFocusable = getIsFocusable();
     hasKeyboardFocus = (Boolean) packedElement.get("hasKeyboardFocus");
@@ -292,6 +294,21 @@ public class WdElement extends TaggableBase implements Serializable {
     if (name == null || name.equals("null") || name.isEmpty()) {
       name = textContent;
     }
+  }
+
+  private boolean isClickable(Map<String, Object> packedElement) {
+      // Check native clickable web elements
+      Role role = WdRoles.fromTypeId(tagName);
+      if (Role.isOneOf(role, WdRoles.nativeClickableRoles())) {
+          // Input type are special...
+          if (role.equals(WdRoles.WdINPUT)) {
+              return WdRoles.clickableInputTypes().contains(type);
+          }
+          return true;
+      }
+
+      // Else, return onclick and event listener events 
+      return (Boolean) packedElement.get("isClickable");
   }
 
   public boolean getIsFocusable() {
