@@ -258,8 +258,23 @@ public class Main {
 		}
 		else {
 			//Use the only file that was found
-			SSE_ACTIVATED = files[0].split(SUT_SETTINGS_EXT)[0];
+			SSE_ACTIVATED = extractSSEName(files[0]);
 		}
+	}
+
+	/**
+	 * Extracts the protocol name from a given .sse filename.
+	 * If the filename ends with the .sse extension, removes it.
+	 * Otherwise returns the original string unchanged.
+	 *
+	 * @param fileName Name of the .sse file
+	 * @return Protocol name without the .sse extension
+	 */
+	private static String extractSSEName(String fileName) {
+	    if (fileName != null && fileName.endsWith(SUT_SETTINGS_EXT)) {
+	        return fileName.substring(0, fileName.length() - SUT_SETTINGS_EXT.length());
+	    }
+	    return fileName;
 	}
 
 	/**
