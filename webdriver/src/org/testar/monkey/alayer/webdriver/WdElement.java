@@ -70,7 +70,7 @@ public class WdElement extends TaggableBase implements Serializable {
   public String innerHTML, outerHTML;
   public int length, maxLength;
 
-  boolean enabled, ignore;
+  boolean enabled, ignore, disabled;
   public boolean isClickable;
   public boolean isShadow;
   boolean isContentElement, isControlElement;
@@ -86,7 +86,7 @@ public class WdElement extends TaggableBase implements Serializable {
   public double hScrollViewSize, vScrollViewSize, hScrollPercent, vScrollPercent;
   boolean isFullVisibleOnScreen;
 
-  boolean checked, selected, disabled;
+  boolean checked, selected;
   boolean multiple;
 
   // ComputedStyle properties
@@ -154,7 +154,6 @@ public class WdElement extends TaggableBase implements Serializable {
     naturalHeight = (packedElement.get("naturalHeight") == null) ? 0 : castDimensionsToLong(packedElement.get("naturalHeight"));
     displayedWidth = (packedElement.get("displayedWidth") == null) ? 0 : castDimensionsToLong(packedElement.get("displayedWidth"));
     displayedHeight = (packedElement.get("displayedHeight") == null) ? 0 : castDimensionsToLong(packedElement.get("displayedHeight"));
-    disabled = attributeMap.containsKey("disabled");
     visibility = (packedElement.get("visibility") == null) ? "" : (String) packedElement.get("visibility");
     xpath = (packedElement.get("xpath") == null) ? "" : (String) packedElement.get("xpath");
 

@@ -374,11 +374,6 @@ public class WdTags extends TagsBase {
   public static final Tag<Boolean> WebIsChecked = from("WebIsChecked", Boolean.class);
 
   /**
-   * Represents if an element is disabled.
-   */
-  public static final Tag<Boolean> WebIsDisabled = from("WebIsDisabled", Boolean.class);
-
-  /**
    * Represents if an element contains the multiple attribute.
    */
   public static final Tag<Boolean> WebIsMultiple = from("WebIsMultiple", Boolean.class);
