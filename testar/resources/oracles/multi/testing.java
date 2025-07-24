@@ -480,33 +480,39 @@ public class testing {
         return verdict;
      }
    }
-   
-   public static class LabelTextMustBeVisible$1559 implements Oracle {
-     /*
-      assert for all label it.color not is equal to background color "label text must be visible".
-     */
-   
-     @Override
-     public void initialize() { }
-   
-     @Override
-     public String getMessage() {
-       return "label text must be visible";
-     }
-   
-     @Override
-     public Verdict getVerdict(State state) {
-        Verdict verdict = Verdict.OK;
-        for (Widget $it: getWidgets("label", state)) {
-          
-          Object widget$1517$8 = getProperty($it, "color");
-          boolean cond$1526 = !(evaluateIsEqualTo(widget$1517$8, getBackgroundColor()));
-          if (!cond$1526) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), $it)); }
-        }
-        return verdict;
-     }
+
+   public static class LabelTextMustBeVisible$1518 implements Oracle {
+       /*
+        assert for all label it.color not is equal to it.backgroundColor "label text must be visible".
+        */
+
+       @Override
+       public void initialize() { }
+
+       @Override
+       public String getMessage() {
+           return "label text must be visible";
+       }
+
+       @Override
+       public Verdict getVerdict(State state) {
+           Verdict verdict = Verdict.OK;
+           for (Widget $it: getWidgets("label", state)) {
+
+               Object widget$1474$8 = getProperty($it, "color");
+               boolean cond$1483 = !(evaluateIsEqualTo(widget$1474$8, new java.util.function.Supplier<Object>() {
+                   public Object get() {
+
+                       Object widget$1499$18 = getProperty($it, "backgroundColor");
+                       return widget$1499$18; 
+                   }  
+               }.get()));
+               if (!cond$1483) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), $it)); }
+           }
+           return verdict;
+       }
    }
-   
+
    public static class ImageMustLackAlttext$1637 implements Oracle {
      /*
       assert for all image it.alttext is equal to "" "image must lack alttext".

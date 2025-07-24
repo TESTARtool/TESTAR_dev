@@ -42,7 +42,7 @@ public interface OracleWidgetsMapping {
 
 	default List<Widget> getWidgets(String elementType, State state) {
 		List<Widget> lst = new ArrayList<>();
-		List<Role> elementRoles = OracleMappingModel.element2Role.getOrDefault(elementType, List.of());
+		List<Role> elementRoles = OracleMappingModel.getElementRoles(elementType);
 
 		for (Widget w : state) {
 			Role widgetRole = w.get(Tags.Role, Roles.Invalid);
@@ -54,7 +54,7 @@ public interface OracleWidgetsMapping {
 	}
 
 	default Widget getWidget(String elementType, String selector, State state) {
-		List<Tag<?>> tagPriority = OracleMappingModel.selectorString2Tags.getOrDefault(elementType, List.of());
+		List<Tag<?>> tagPriority = OracleMappingModel.getSelectorTags(elementType);
 
 		for (Widget w : getWidgets(elementType, state)) {
 			for (Tag<?> tag : tagPriority) {
@@ -68,7 +68,7 @@ public interface OracleWidgetsMapping {
 	}
 
 	default Object getProperty(Widget w, String property) {
-		List<Tag<?>> tagPriority = OracleMappingModel.attributeTags.getOrDefault(property, List.of());
+		List<Tag<?>> tagPriority = OracleMappingModel.getAttributeTags(property);
 
 		for (Tag<?> tag : tagPriority) {
 			Object value = w.get(tag, null);
@@ -111,7 +111,7 @@ public interface OracleWidgetsMapping {
 	}
 
 	default Boolean evaluateIsStatus(Widget w, String status) {
-		List<Tag<?>> tagPriority = OracleMappingModel.statusTags.getOrDefault(status, List.of());
+		List<Tag<?>> tagPriority = OracleMappingModel.getStatusTags(status);
 
 		for (Tag<?> tag : tagPriority) {
 			Object value = w.get(tag, null);
@@ -145,11 +145,6 @@ public interface OracleWidgetsMapping {
 		return false;
 	}
 
-	//syntax Condition
-	//  = "has nonempty" Name attr
-	//where attr can be one of "label", "alttext", "role", "placeholder", "tooltip"
-	//found possible with the mapping in attributeTags
-
 	default boolean evaluateHasAttribute(Object obj, String attr) {
 		// User wants to evaluate if a widget has an attribute
 		if (obj instanceof Widget) {
@@ -174,7 +169,7 @@ public interface OracleWidgetsMapping {
 	}
 
 	default boolean evaluateHasAttribute(Widget w, String attr) {
-		List<Tag<?>> tagPriority = OracleMappingModel.attributeTags.getOrDefault(attr, List.of());
+		List<Tag<?>> tagPriority = OracleMappingModel.getAttributeTags(attr);
 
 		for (Tag<?> tag : tagPriority) {
 			Object value = w.get(tag, null);
@@ -221,22 +216,6 @@ public interface OracleWidgetsMapping {
 
 		return false;
 	}
-
-	//	default boolean evaluateAttributeContains(Widget w, String attr, String contain) {
-	//		List<Tag<?>> tagPriority = attributeTags.get(attr);
-	//
-	//		for (Tag<?> tag : tagPriority) {
-	//			Object value = w.get(tag, null);
-	//
-	//			if (value instanceof String 
-	//					&& !((String) value).isEmpty()
-	//					&& ((String) value).contains(contain)) {
-	//				return true;
-	//			}
-	//		}
-	//
-	//		return false; 
-	//	}
 
 	default boolean evaluateMatches(Object obj, String regex) {
 		// User wants to evaluate if the widget matches a regex
@@ -298,12 +277,6 @@ public interface OracleWidgetsMapping {
 		return Objects.equals(obj, compareSupplier.get());
 	}
 
-	default Color getBackgroundColor() {
-		// This method makes no sense because one state can have a different background color. 
-		// So it is widget-dependent.
-		return Color.White;
-	}
-
 	private List<Widget> getWidgetChildren(Widget w) {
 		List<Widget> children = new ArrayList<>();
 		for(int i = 0; i < w.childCount(); i++) {
@@ -314,7 +287,7 @@ public interface OracleWidgetsMapping {
 	
 	default List<Widget> runWidgetSelector(State state, String roleString, String rawString)
 	{
-		List<Tag<?>> tagPrioList  = OracleMappingModel.selectorString2Tags.getOrDefault(roleString, List.of());
+		List<Tag<?>> tagPrioList  = OracleMappingModel.getSelectorTags(roleString);
 		List<Widget> foundWidgets = new ArrayList<>();
 		// get widgets with the correct role
 		List<Widget> widgets = getWidgets(roleString, state);

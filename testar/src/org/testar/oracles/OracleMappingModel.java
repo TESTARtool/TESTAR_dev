@@ -43,7 +43,7 @@ import org.testar.monkey.alayer.webdriver.enums.WdTags;
 
 public class OracleMappingModel {
 
-    public static final Map<String, Set<String>> validStatusPerElement = Map.ofEntries(
+    private static final Map<String, Set<String>> validStatusPerElement = Map.ofEntries(
             Map.entry("button", Set.of("visible", "enabled", "focused", "clickable", "onscreen", "offscreen")),
             Map.entry("input_text", Set.of("visible", "enabled", "focused", "readonly", "empty", "filled", "onscreen", "offscreen")),
             Map.entry("input_numeric", Set.of("visible", "enabled", "focused", "readonly", "empty", "filled", "onscreen", "offscreen")),
@@ -64,7 +64,7 @@ public class OracleMappingModel {
             Map.entry("element", Set.of("visible", "enabled", "focused", "empty", "onscreen", "offscreen", "disabled"))
             );
 
-    public static final Map<String, List<Role>> element2Role = Map.ofEntries(
+    private static final Map<String, List<Role>> element2Role = Map.ofEntries(
             Map.entry("button", List.of(WdRoles.WdBUTTON, WdRoles.WdINPUT)),
             Map.entry("input_text", List.of(WdRoles.WdINPUT, Roles.Text)),
             Map.entry("input_numeric", List.of(WdRoles.WdINPUT, Roles.Text)),
@@ -90,7 +90,7 @@ public class OracleMappingModel {
             Map.entry("element", List.of(Roles.Widget))
             );
 
-    public static final Map<String, List<Tag<?>>> selectorString2Tags = Map.ofEntries(
+    private static final Map<String, List<Tag<?>>> selectorString2Tags = Map.ofEntries(
             Map.entry("button", List.of(Tags.Title, WdTags.WebGenericTitle, WdTags.WebTextContent, WdTags.WebValue)),
             Map.entry("input_text", List.of(Tags.Title, WdTags.WebName, WdTags.WebGenericTitle, WdTags.WebPlaceholder)),
             Map.entry("input_numeric", List.of(Tags.Title, WdTags.WebName, WdTags.WebGenericTitle, WdTags.WebPlaceholder)),
@@ -111,7 +111,7 @@ public class OracleMappingModel {
             Map.entry("element", List.of(Tags.Title, WdTags.WebGenericTitle))
             );
 
-    public static final Map<String, List<Tag<?>>> statusTags = Map.ofEntries(
+    private static final Map<String, List<Tag<?>>> statusTags = Map.ofEntries(
             Map.entry("visible", List.of(WdTags.WebIsFullOnScreen)),
             Map.entry("onscreen", List.of(WdTags.WebIsFullOnScreen)),
             Map.entry("offscreen", List.of(WdTags.WebIsOffScreen)),
@@ -132,7 +132,7 @@ public class OracleMappingModel {
             Map.entry("filled", List.of(WdTags.WebValue))
             );
 
-    public static final Map<String, List<Tag<?>>> attributeTags = Map.ofEntries(
+    private static final Map<String, List<Tag<?>>> attributeTags = Map.ofEntries(
             Map.entry("alttext", List.of(WdTags.WebAlt)),
             Map.entry("role", List.of(Tags.Role)),
             Map.entry("placeholder", List.of(WdTags.WebPlaceholder)),
@@ -145,5 +145,27 @@ public class OracleMappingModel {
             Map.entry("title", List.of(WdTags.WebAriaLabel, WdTags.WebAriaLabelledBy, Tags.Title)),
             Map.entry("children", List.of(Tags.WidgetChildren)) // This Tag is null but used for DSL mapping
             );
+
+    private OracleMappingModel() { }
+
+    public static Set<String> getValidStatusPerElement(String elementType) {
+        return validStatusPerElement.getOrDefault(elementType, Set.of());
+    }
+
+    public static List<Role> getElementRoles(String elementType) {
+        return element2Role.getOrDefault(elementType, List.of());
+    }
+
+    public static List<Tag<?>> getSelectorTags(String selectorType) {
+        return selectorString2Tags.getOrDefault(selectorType, List.of());
+    }
+
+    public static List<Tag<?>> getStatusTags(String status) {
+        return statusTags.getOrDefault(status, List.of());
+    }
+
+    public static List<Tag<?>> getAttributeTags(String attribute) {
+        return attributeTags .getOrDefault(attribute, List.of());
+    }
 
 }
