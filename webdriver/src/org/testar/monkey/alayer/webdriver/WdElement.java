@@ -352,28 +352,40 @@ public class WdElement extends TaggableBase implements Serializable {
   public boolean visibleAt(double x, double y, boolean obscuredByChildFeature) {
     return visibleAt(x, y);
   }
-  
+
+  private boolean isFullyVisible(Rect rect) {
+      return rect != null &&
+              rect.x() >= 0 &&
+              rect.x() + rect.width() <= CanvasDimensions.getCanvasWidth() &&
+              rect.y() >= 0 &&
+              rect.y() + rect.height() <= CanvasDimensions.getInnerHeight();
+  }
+
   private boolean isFullVisibleAtCanvasBrowser() {
-	  if (rect == null) return false;
+      if (rect == null) return false;
 
-	  boolean isVisibleAtCanvas = rect.x() >= 0 && rect.x() + rect.width() <= CanvasDimensions.getCanvasWidth() 
-			  && rect.y() >= 0 && rect.y() + rect.height() <= CanvasDimensions.getInnerHeight();
+      boolean isVisibleAtCanvas = isFullyVisible(rect);
 
-	  // If the web element is a <select><option>, check the selected option visibility
-	  if (tagName != null && tagName.equalsIgnoreCase("option") && outerHTML != null) {
-		  if(parent != null && parent.multiple) {
-			// In multi-selects, visibility is determined only by canvas visibility
-			  return isVisibleAtCanvas;
-		  }
-		  else if (outerHTML.contains("<option") && (outerHTML.contains("selected>") || outerHTML.contains("selected="))) {
-			  return isVisibleAtCanvas;
-		  } else {
-			  return false;
-		  }
-	  }
+      // If the web element is a <select><option>, check the selected option visibility
+      if (tagName != null && tagName.equalsIgnoreCase("option") && outerHTML != null) {
 
-	  // For other web elements, only check if fully visible in the canvas
-	  return isVisibleAtCanvas;
+          // In multi-selects, visibility is determined only by canvas visibility
+          if(parent != null && parent.multiple) {
+              return isVisibleAtCanvas;
+          }
+
+          boolean isSelected = outerHTML.contains("selected>") || outerHTML.contains("selected=");
+          if (outerHTML.contains("<option") && isSelected) {
+              // Select web elements have empty rect values (0,0,0,0)
+              // We need to check the parent element rect values
+              return parent != null ? isFullyVisible(parent.rect) : isVisibleAtCanvas;
+          } else {
+              return false;
+          }
+      }
+
+      // For other web elements, only check if fully visible in the canvas
+      return isVisibleAtCanvas;
   }
 
   public boolean isDisplayed() {
