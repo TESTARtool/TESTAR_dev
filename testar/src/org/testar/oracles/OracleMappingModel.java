@@ -33,15 +33,39 @@ package org.testar.oracles;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.testar.monkey.alayer.Role;
 import org.testar.monkey.alayer.Roles;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 
 public class OracleMappingModel {
+
+    private OracleMappingModel() { }
+
+    public static Set<String> getValidStatusPerElement(String elementType) {
+        return validStatusPerElement.getOrDefault(elementType, Set.of());
+    }
+
+    public static List<RoleMatcher> getElementRoles(String elementType) {
+        return element2Role.getOrDefault(elementType, List.of());
+    }
+
+    public static List<Tag<?>> getSelectorTags(String selectorType) {
+        return selectorString2Tags.getOrDefault(selectorType, List.of());
+    }
+
+    public static List<Tag<?>> getStatusTags(String status) {
+        return statusTags.getOrDefault(status, List.of());
+    }
+
+    public static List<Tag<?>> getAttributeTags(String attribute) {
+        return attributeTags .getOrDefault(attribute, List.of());
+    }
 
     private static final Map<String, Set<String>> validStatusPerElement = Map.ofEntries(
             Map.entry("button", Set.of("visible", "enabled", "focused", "clickable", "onscreen", "offscreen")),
@@ -64,30 +88,83 @@ public class OracleMappingModel {
             Map.entry("element", Set.of("visible", "enabled", "focused", "empty", "onscreen", "offscreen", "disabled"))
             );
 
-    private static final Map<String, List<Role>> element2Role = Map.ofEntries(
-            Map.entry("button", List.of(WdRoles.WdBUTTON, WdRoles.WdINPUT)),
-            Map.entry("input_text", List.of(WdRoles.WdINPUT, Roles.Text)),
-            Map.entry("input_numeric", List.of(WdRoles.WdINPUT, Roles.Text)),
-            Map.entry("static_text", List.of(WdRoles.WdLABEL, WdRoles.WdP, WdRoles.WdSPAN,
-                    WdRoles.WdPRE, WdRoles.WdCODE, WdRoles.WdBLOCKQUOTE, WdRoles.WdSTRONG, WdRoles.WdEM,
-                    WdRoles.WdH1, WdRoles.WdH2, WdRoles.WdH3, WdRoles.WdH4, WdRoles.WdH5, WdRoles.WdH6,
-                    WdRoles.WdDIV, WdRoles.WdSECTION, WdRoles.WdARTICLE, WdRoles.WdFIELDSET, 
-                    WdRoles.WdASIDE, WdRoles.WdMAIN ,WdRoles.WdHEADER, WdRoles.WdFOOTER, WdRoles.WdFIGCAPTION)),
-            Map.entry("alert", List.of(Roles.Widget)), // This is not an element itself
-            Map.entry("dropdown", List.of(WdRoles.WdSELECT, WdRoles.WdOPTION, WdRoles.WdOPTGROUP)),
-            Map.entry("checkbox", List.of(WdRoles.WdINPUT)),
-            Map.entry("radiogroup", List.of(WdRoles.WdINPUT)),
-            Map.entry("radio", List.of(WdRoles.WdINPUT)),
-            Map.entry("image", List.of(WdRoles.WdIMG)),
-            Map.entry("link", List.of(WdRoles.WdA)),
-            Map.entry("label", List.of(WdRoles.WdLABEL)),
-            Map.entry("panel", List.of(WdRoles.WdDIV, WdRoles.WdSECTION, WdRoles.WdARTICLE, WdRoles.WdFIELDSET, 
-                    WdRoles.WdASIDE, WdRoles.WdMAIN ,WdRoles.WdHEADER, WdRoles.WdFOOTER)),
-            Map.entry("table_data", List.of(WdRoles.WdTH, WdRoles.WdTD)),
-            Map.entry("menu", List.of(WdRoles.WdMENU, WdRoles.WdUL, WdRoles.WdNAV)),
-            Map.entry("menu_item", List.of(WdRoles.WdLI)),
-            Map.entry("form", List.of(WdRoles.WdFORM)),
-            Map.entry("element", List.of(Roles.Widget))
+    private static final Map<String, List<RoleMatcher>> element2Role = Map.ofEntries(
+            Map.entry("button", List.of(
+                    rm(WdRoles.WdBUTTON),
+                    rm(WdRoles.WdINPUT, w -> {
+                        String type = w.get(WdTags.WebType, "");
+                        return Set.of("button", "submit", "reset").contains(type);
+                    })
+                    )),
+            Map.entry("input_text", List.of(
+                    rm(WdRoles.WdTEXTAREA),
+                    rm(WdRoles.WdINPUT, w -> {
+                        String type = w.get(WdTags.WebType, "");
+                        return Set.of("text", "password", "email", "tel", "search", "url").contains(type);
+                    }),
+                    rm(Roles.Text)
+                    )),
+            Map.entry("input_numeric", List.of(
+                    rm(WdRoles.WdINPUT, w -> {
+                        String type = w.get(WdTags.WebType, "");
+                        return Set.of("number", "range").contains(type);
+                    }),
+                    rm(Roles.Text)
+                    )),
+            Map.entry("static_text", List.of(
+                    rm(WdRoles.WdLABEL), rm(WdRoles.WdP), rm(WdRoles.WdSPAN),
+                    rm(WdRoles.WdPRE), rm(WdRoles.WdCODE), rm(WdRoles.WdBLOCKQUOTE),
+                    rm(WdRoles.WdSTRONG), rm(WdRoles.WdEM), rm(WdRoles.WdH1),
+                    rm(WdRoles.WdH2), rm(WdRoles.WdH3), rm(WdRoles.WdH4),
+                    rm(WdRoles.WdH5), rm(WdRoles.WdH6), rm(WdRoles.WdDIV),
+                    rm(WdRoles.WdSECTION), rm(WdRoles.WdARTICLE), rm(WdRoles.WdFIELDSET),
+                    rm(WdRoles.WdASIDE), rm(WdRoles.WdMAIN), rm(WdRoles.WdHEADER),
+                    rm(WdRoles.WdFOOTER), rm(WdRoles.WdFIGCAPTION)
+                    )),
+            Map.entry("alert", List.of(
+                    rm(Roles.Widget)
+                    )),
+            Map.entry("dropdown", List.of(
+                    rm(WdRoles.WdSELECT), rm(WdRoles.WdOPTION), rm(WdRoles.WdOPTGROUP)
+                    )),
+            Map.entry("checkbox", List.of(
+                    rm(WdRoles.WdINPUT, w -> "checkbox".equals(w.get(WdTags.WebType, "")))
+                    )),
+            Map.entry("radiogroup", List.of(
+                    rm(WdRoles.WdINPUT, w -> "radio".equals(w.get(WdTags.WebType, "")))
+                    )),
+            Map.entry("radio", List.of(
+                    rm(WdRoles.WdINPUT, w -> "radio".equals(w.get(WdTags.WebType, "")))
+                    )),
+            Map.entry("image", List.of(
+                    rm(WdRoles.WdIMG)
+                    )),
+            Map.entry("link", List.of(
+                    rm(WdRoles.WdA)
+                    )),
+            Map.entry("label", List.of(
+                    rm(WdRoles.WdLABEL)
+                    )),
+            Map.entry("panel", List.of(
+                    rm(WdRoles.WdDIV), rm(WdRoles.WdSECTION), rm(WdRoles.WdARTICLE),
+                    rm(WdRoles.WdFIELDSET), rm(WdRoles.WdASIDE), rm(WdRoles.WdMAIN),
+                    rm(WdRoles.WdHEADER), rm(WdRoles.WdFOOTER)
+                    )),
+            Map.entry("table_data", List.of(
+                    rm(WdRoles.WdTH), rm(WdRoles.WdTD)
+                    )),
+            Map.entry("menu", List.of(
+                    rm(WdRoles.WdMENU), rm(WdRoles.WdUL), rm(WdRoles.WdNAV)
+                    )),
+            Map.entry("menu_item", List.of(
+                    rm(WdRoles.WdLI)
+                    )),
+            Map.entry("form", List.of(
+                    rm(WdRoles.WdFORM)
+                    )),
+            Map.entry("element", List.of(
+                    rm(Roles.Widget)
+                    ))
             );
 
     private static final Map<String, List<Tag<?>>> selectorString2Tags = Map.ofEntries(
@@ -146,26 +223,25 @@ public class OracleMappingModel {
             Map.entry("children", List.of(Tags.WidgetChildren)) // This Tag is null but used for DSL mapping
             );
 
-    private OracleMappingModel() { }
-
-    public static Set<String> getValidStatusPerElement(String elementType) {
-        return validStatusPerElement.getOrDefault(elementType, Set.of());
+    public static RoleMatcher rm(Role role) {
+        return new RoleMatcher(role, null);
     }
 
-    public static List<Role> getElementRoles(String elementType) {
-        return element2Role.getOrDefault(elementType, List.of());
+    public static RoleMatcher rm(Role role, Predicate<Widget> filter) {
+        return new RoleMatcher(role, filter);
+    }
+}
+
+class RoleMatcher {
+    private final Role role;
+    private final Predicate<Widget> extraFilter;
+
+    public RoleMatcher(Role role, Predicate<Widget> extraFilter) {
+        this.role = role;
+        this.extraFilter = extraFilter != null ? extraFilter : w -> true;
     }
 
-    public static List<Tag<?>> getSelectorTags(String selectorType) {
-        return selectorString2Tags.getOrDefault(selectorType, List.of());
+    public boolean matches(Widget widget) {
+        return role.equals(widget.get(Tags.Role, Roles.Invalid)) && extraFilter.test(widget);
     }
-
-    public static List<Tag<?>> getStatusTags(String status) {
-        return statusTags.getOrDefault(status, List.of());
-    }
-
-    public static List<Tag<?>> getAttributeTags(String attribute) {
-        return attributeTags .getOrDefault(attribute, List.of());
-    }
-
 }

@@ -87,6 +87,17 @@ public class AssertWidgetMapping {
                     new SimpleEntry<>("label", "Color:"),
                     new SimpleEntry<>("label", "Textarea:"),
 
+                    new SimpleEntry<>("input_text", "Text:"),
+                    new SimpleEntry<>("input_text", "Password:"),
+                    new SimpleEntry<>("input_text", "Email:"),
+                    new SimpleEntry<>("input_text", "Search:"),
+                    new SimpleEntry<>("input_text", "Tel:"),
+                    new SimpleEntry<>("input_text", "URL:"),
+                    new SimpleEntry<>("input_text", "Textarea:"),
+
+                    new SimpleEntry<>("input_numeric", "Number:"),
+                    new SimpleEntry<>("input_numeric", "Range:"),
+
                     new SimpleEntry<>("radio", "Male"),
                     new SimpleEntry<>("radio", "Female"),
 

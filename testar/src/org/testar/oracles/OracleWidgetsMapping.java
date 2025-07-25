@@ -41,16 +41,18 @@ import org.testar.monkey.alayer.*;
 public interface OracleWidgetsMapping {
 
 	default List<Widget> getWidgets(String elementType, State state) {
-		List<Widget> lst = new ArrayList<>();
-		List<Role> elementRoles = OracleMappingModel.getElementRoles(elementType);
+		List<Widget> matched = new ArrayList<>();
+		List<RoleMatcher> matchers = OracleMappingModel.getElementRoles(elementType);
 
 		for (Widget w : state) {
-			Role widgetRole = w.get(Tags.Role, Roles.Invalid);
-			if (elementRoles.contains(widgetRole)) {
-				lst.add(w);
+			for (RoleMatcher matcher : matchers) {
+				if (matcher.matches(w)) {
+					matched.add(w);
+					break;
+				}
 			}
 		}
-		return lst;
+		return matched;
 	}
 
 	default Widget getWidget(String elementType, String selector, State state) {
