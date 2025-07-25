@@ -459,7 +459,19 @@ function getLabelMapTestar() {
 }
 
 function getElementLength(element) {
-    return typeof element.length === 'number' ? element.length : -1;
+    if (typeof element.length === 'number') {
+        return element.length;
+    }
+
+    if (typeof element.value === 'string') {
+        return element.value.length;
+    }
+
+    if (typeof element.textContent === 'string') {
+        return element.textContent.trim().length;
+    }
+
+    return -1;
 }
 
 /*
