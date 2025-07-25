@@ -50,7 +50,7 @@ public class OracleMappingModel {
             Map.entry("static_text", Set.of("visible", "enabled", "focused", "readonly", "empty", "onscreen", "offscreen")),
             Map.entry("checkbox", Set.of("visible", "enabled", "focused", "checked", "clickable", "onscreen", "offscreen")),
             Map.entry("radiogroup", Set.of("onscreen", "offscreen")),
-            Map.entry("radio", Set.of("visible", "enabled", "focused", "selected", "clickable", "onscreen", "offscreen")),
+            Map.entry("radio", Set.of("visible", "enabled", "focused", "checked", "clickable", "onscreen", "offscreen")),
             Map.entry("dropdown", Set.of("visible", "enabled", "focused", "empty", "selected", "clickable", "onscreen", "offscreen")),
             Map.entry("label", Set.of("visible", "focused", "onscreen", "offscreen")),
             Map.entry("image", Set.of("visible", "focused", "onscreen", "offscreen")),
@@ -91,28 +91,28 @@ public class OracleMappingModel {
             );
 
     private static final Map<String, List<Tag<?>>> selectorString2Tags = Map.ofEntries(
-            Map.entry("button", List.of(Tags.Title, WdTags.WebGenericTitle, WdTags.WebTextContent, WdTags.WebValue)),
-            Map.entry("input_text", List.of(Tags.Title, WdTags.WebName, WdTags.WebGenericTitle, WdTags.WebPlaceholder)),
-            Map.entry("input_numeric", List.of(Tags.Title, WdTags.WebName, WdTags.WebGenericTitle, WdTags.WebPlaceholder)),
-            Map.entry("static_text", List.of(Tags.Title, WdTags.WebTextContent, WdTags.WebGenericTitle)),
-            Map.entry("alert", List.of(Tags.Title, WdTags.WebGenericTitle)),
-            Map.entry("dropdown", List.of(Tags.Title, WdTags.WebGenericTitle, WdTags.WebTextContent)),
-            Map.entry("checkbox", List.of(Tags.Title, WdTags.WebGenericTitle)),
-            Map.entry("radiogroup", List.of(Tags.Title, WdTags.WebName, WdTags.WebGenericTitle)),
-            Map.entry("radio", List.of(Tags.Title, WdTags.WebGenericTitle)),
-            Map.entry("image", List.of(WdTags.WebAlt, WdTags.WebSrc, Tags.Desc, WdTags.WebTitle, WdTags.WebGenericTitle)),
-            Map.entry("link", List.of(Tags.Title, WdTags.WebHref, WdTags.WebTextContent, WdTags.WebGenericTitle)),
-            Map.entry("label", List.of(Tags.Title, WdTags.WebGenericTitle, WdTags.WebTextContent)),
-            Map.entry("table_data", List.of(Tags.Title, WdTags.WebGenericTitle, WdTags.WebTextContent)),
-            Map.entry("panel", List.of(Tags.Title, WdTags.WebId, WdTags.WebGenericTitle, WdTags.WebTextContent)),
-            Map.entry("menu", List.of(Tags.Title, WdTags.WebGenericTitle, WdTags.WebTextContent)),
-            Map.entry("menu_item", List.of(Tags.Title, WdTags.WebGenericTitle, WdTags.WebTextContent)),
-            Map.entry("form", List.of(Tags.Title, WdTags.WebGenericTitle, WdTags.WebAriaLabel, WdTags.WebAriaLabelledBy)),
-            Map.entry("element", List.of(Tags.Title, WdTags.WebGenericTitle))
+            Map.entry("button", List.of(Tags.Title, WdTags.WebTextContent, WdTags.WebValue)),
+            Map.entry("input_text", List.of(Tags.Title, WdTags.WebName, WdTags.WebPlaceholder)),
+            Map.entry("input_numeric", List.of(Tags.Title, WdTags.WebName, WdTags.WebPlaceholder)),
+            Map.entry("static_text", List.of(Tags.Title, WdTags.WebTextContent)),
+            Map.entry("alert", List.of(Tags.Title)),
+            Map.entry("dropdown", List.of(Tags.Title, WdTags.WebTextContent)),
+            Map.entry("checkbox", List.of(Tags.Title)),
+            Map.entry("radiogroup", List.of(Tags.Title, WdTags.WebName)),
+            Map.entry("radio", List.of(Tags.Title)),
+            Map.entry("image", List.of(WdTags.WebAlt, WdTags.WebSrc, Tags.Desc, WdTags.WebTitle)),
+            Map.entry("link", List.of(Tags.Title, WdTags.WebHref, WdTags.WebTextContent)),
+            Map.entry("label", List.of(Tags.Title, WdTags.WebTextContent)),
+            Map.entry("table_data", List.of(Tags.Title, WdTags.WebTextContent)),
+            Map.entry("panel", List.of(Tags.Title, WdTags.WebId, WdTags.WebTextContent)),
+            Map.entry("menu", List.of(Tags.Title, WdTags.WebTextContent)),
+            Map.entry("menu_item", List.of(Tags.Title, WdTags.WebTextContent)),
+            Map.entry("form", List.of(Tags.Title, WdTags.WebAriaLabel, WdTags.WebAriaLabelledBy)),
+            Map.entry("element", List.of(Tags.Title))
             );
 
     private static final Map<String, List<Tag<?>>> statusTags = Map.ofEntries(
-            Map.entry("visible", List.of(WdTags.WebIsFullOnScreen)),
+            Map.entry("visible", List.of(WdTags.WebIsDisplayed)),
             Map.entry("onscreen", List.of(WdTags.WebIsFullOnScreen)),
             Map.entry("offscreen", List.of(WdTags.WebIsOffScreen)),
 

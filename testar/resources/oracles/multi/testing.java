@@ -722,9 +722,9 @@ public class testing {
      }
    }
    
-   public static class RadioInNestedPanelMustNotBeSelected$2421 implements Oracle {
+   public static class RadioInNestedPanelMustNotBeChecked$2379 implements Oracle {
      /*
-      assert radio "nested_r1" not is selected "radio in nested panel must not be selected".
+      assert radio "nested_r1" not is checked "radio in nested panel must not be checked".
      */
    
      @Override
@@ -732,18 +732,18 @@ public class testing {
    
      @Override
      public String getMessage() {
-       return "radio in nested panel must not be selected";
+       return "radio in nested panel must not be checked";
      }
    
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$2387$17 = getWidget("radio", "nested_r1", state);
-        if (widget$2387$17 == null) {
+        Widget widget$2346$17 = getWidget("radio", "nested_r1", state);
+        if (widget$2346$17 == null) {
           return Verdict.OK;
         }
-        boolean cond$2405 = !(evaluateIsStatus(widget$2387$17, "selected"));
-        if (!cond$2405) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$2387$17)); }
+        boolean cond$2364 = !(evaluateIsStatus(widget$2346$17, "checked"));
+        if (!cond$2364) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$2346$17)); }
         return verdict;
      }
    }

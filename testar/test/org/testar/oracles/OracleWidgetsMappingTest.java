@@ -133,7 +133,7 @@ public class OracleWidgetsMappingTest {
     @Test
     public void testWidgetTrueStatus() {
         WidgetStub home = createWidget(state, WdRoles.WdLI, "Home");
-        home.set(WdTags.WebIsFullOnScreen, true);
+        home.set(WdTags.WebIsDisplayed, true);
 
         assertNotNull(mapping.evaluateIsStatus(home, "visible"));
         assertTrue(mapping.evaluateIsStatus(home, "visible"));
@@ -142,7 +142,7 @@ public class OracleWidgetsMappingTest {
     @Test
     public void testWidgetObjectTrueStatus() {
         WidgetStub home = createWidget(state, WdRoles.WdLI, "Home");
-        home.set(WdTags.WebIsFullOnScreen, true);
+        home.set(WdTags.WebIsDisplayed, true);
 
         assertNotNull(mapping.evaluateIsStatus((Object)home, "visible"));
         assertTrue(mapping.evaluateIsStatus((Object)home, "visible"));

@@ -118,7 +118,7 @@ public interface OracleWidgetsMapping {
 
 			// Special cases first
 			if (status.equals("empty")) {
-				if (value instanceof Integer) {
+				if (value instanceof Integer && !value.equals(-1)) {
 					return value.equals(0);
 				} else if (value instanceof String) {
 					return ((String) value).isEmpty();

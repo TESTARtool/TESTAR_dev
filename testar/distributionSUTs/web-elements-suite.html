@@ -34,6 +34,22 @@
   <div class="panel">
     <h2>Form Inputs</h2>
     <form>
+      <input type="submit" value="Submit">
+      <input type="reset" value="Reset">
+      <input type="button" value="Click Me">
+
+      <!-- Non-displayed input -->
+      <div class="form-group" style="display: none;">
+        <label for="hiddenInput">Hidden Input:</label>
+        <input type="text" id="hiddenInput" value="invisible">
+      </div>
+
+      <!-- Disabled input -->
+      <div class="form-group">
+        <label for="disabledInput">Disabled Input:</label>
+        <input type="text" id="disabledInput" disabled value="can't type">
+      </div>
+
       <div class="form-group"><label for="text">Text:</label><input type="text" id="text" placeholder="Enter text"></div>
       <div class="form-group"><label for="password">Password:</label><input type="password" id="password"></div>
       <div class="form-group"><label for="email">Email:</label><input type="email" id="email"></div>
@@ -41,32 +57,44 @@
       <div class="form-group"><label for="search">Search:</label><input type="search" id="search"></div>
       <div class="form-group"><label for="tel">Tel:</label><input type="tel" id="tel"></div>
       <div class="form-group"><label for="url">URL:</label><input type="url" id="url"></div>
-      <div class="form-group"><label for="accept_terms"><input type="checkbox" id="accept_terms"> Accept Terms</label></div>
-      <div class="form-group"><label for="radio_male"><input type="radio" name="gender" id="radio_male" checked> Male</label> <label for="radio_female"><input type="radio" name="gender" id="radio_female"> Female</label></div>
+      <div class="form-group"><label for="accept_terms"><input type="checkbox" id="accept_terms" checked>Accept Terms</label></div>
+      <div class="form-group"><label for="disagree"><input type="checkbox" id="disagree">Disagree</label></div>
+      <div class="form-group"><label for="radio_male"><input type="radio" name="gender" id="radio_male" checked>Male</label> <label for="radio_female"><input type="radio" name="gender" id="radio_female">Female</label></div>
       <div class="form-group"><label for="range">Range:</label><input type="range" id="range" min="0" max="100"></div>
       <div class="form-group"><label for="file">File:</label><input type="file" id="file"></div>
       <div class="form-group"><label for="date">Date:</label><input type="date" id="date"></div>
       <div class="form-group"><label for="time">Time:</label><input type="time" id="time"></div>
       <div class="form-group"><label for="color">Color:</label><input type="color" id="color"></div>
       <div class="form-group"><label for="textarea">Textarea:</label><textarea id="textarea"></textarea></div>
-      <input type="submit" value="Submit">
-      <input type="reset" value="Reset">
-      <input type="button" value="Click Me">
     </form>
   </div>
 
   <div class="panel">
     <h2>Buttons and Select</h2>
     <button>Standard Button</button>
+    <button disabled>Disabled Button</button>
     <select>
       <optgroup label="Group 1">
         <option value="1">Option 1</option>
         <option value="2">Option 2</option>
       </optgroup>
       <optgroup label="Group 2">
-        <option value="3">Option 3</option>
+        <option value="a">Option A</option>
+        <option value="b">Option B</option>
       </optgroup>
     </select>
+
+    <!-- Selected elements -->
+    <label for="selectTest">Select Test:</label>
+    <select id="selectTest">
+      <option value="alpha">Alpha</option>
+      <option value="beta" selected>Beta (Selected)</option>
+      <option value="gamma">Gamma</option>
+    </select>
+
+    <!-- Empty select elements -->
+    <label for="emptySelect">Empty Select:</label>
+    <select id="emptySelect"></select>
   </div>
 
   <div class="panel">
@@ -86,7 +114,7 @@
   <div class="panel">
     <h2>Navigation</h2>
     <nav><a href="#">Home</a> | <a href="#">About</a> | <a href="#">Contact</a></nav>
-    <ul><li>List Item 1</li><li>List Item 2</li></ul>
+    <ul><li style="cursor: pointer; color: blue;" onclick="alert('Table Data clicked!')">List Item 1</li><li>List Item 2</li></ul>
     <ol><li>Ordered Item 1</li><li>Ordered Item 2</li></ol>
   </div>
 
@@ -103,14 +131,15 @@
 
   <div class="panel">
     <h2>Semantic Containers</h2>
-    <section>Section content</section>
+    <section id="contentPanelSection">Section content</section>
+    <section id="emptyPanelSection">    </section>
     <article>Article content</article>
     <aside>Sidebar content</aside>
     <main>Main content</main>
     <header>Page Header</header>
     <footer>Page Footer</footer>
     <figure>
-      <img src="testar_logo.png" alt="Figure">
+      <img src="testar_logo.png" alt="testar_logo_image">
       <figcaption>This is a figure caption</figcaption>
     </figure>
   </div>
