@@ -161,7 +161,7 @@ public final class Verdict implements Serializable {
 	public Verdict(Severity severity, String info, Widget w) {
 		this(
 				severity,
-				info,
+				info.concat(" (in widget: " + w.get(Tags.Desc, "") + ") "),
 				new ShapeVisualizer(
 						Pen.newPen()
 						.setColor(Color.Red)
