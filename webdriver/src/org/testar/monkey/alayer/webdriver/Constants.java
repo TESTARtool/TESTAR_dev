@@ -41,8 +41,6 @@ public class Constants {
   // Disable the state-canvas
   public static List<String> hiddenTags = Arrays.asList("canvas");
 
-  public static boolean simpleState = false;
-
   // element.offsetWidth - element.clientWidth
   public static double scrollArrowSize = 36;
   public static double scrollThick = 15;

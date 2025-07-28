@@ -1,5 +1,3 @@
-var TestarState = (function () {
-
 /*
  * Keep a map with all labels client-side
  */
@@ -487,8 +485,3 @@ const observer = new PerformanceObserver((list) => {
     }
 });
 observer.observe({ type: "largest-contentful-paint", buffered: true });
-
-return {
-    getStateTreeTestar: getStateTreeTestar
-};
-})();
