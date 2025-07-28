@@ -41,6 +41,10 @@ public class Constants {
   // Disable the state-canvas
   public static List<String> hiddenTags = Arrays.asList("canvas");
 
+  // List of web attributes to ignore when obtaining the getStateTreeTestar
+  // These can be ignored to reduce state high-performance workloads
+  public static List<String> ignoredAttributes = Arrays.asList("xpath");
+
   // element.offsetWidth - element.clientWidth
   public static double scrollArrowSize = 36;
   public static double scrollThick = 15;
