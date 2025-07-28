@@ -7,6 +7,7 @@
 - Fix issue to avoid serializing non-serializable elements (this was provoking issues with iframe elements)
 - Add loadUrlWithRetry to catch selenium timeout exceptions and avoid TESTAR hanging
 - Extend TESTAR webdriver tags
+- Fix bug extracting the protocol name the .sse file
 
 
 #TESTAR v2.7.6 (22-Jul-2025)

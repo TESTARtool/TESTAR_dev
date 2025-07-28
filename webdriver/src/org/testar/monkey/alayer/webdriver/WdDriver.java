@@ -30,6 +30,7 @@
 
 package org.testar.monkey.alayer.webdriver;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.monkey.alayer.devices.AWTKeyboard;
@@ -117,35 +118,31 @@ public class WdDriver extends SUTBase {
   }
 
   private void loadUrlWithRetry(String url) {
-	  try {
-		  remoteWebDriver.get(url);
-	  } catch (WebDriverException wex) {
-		  if (wex instanceof TimeoutException) {
-			  System.err.println("WebDriver TimeoutException for URL: " + url);
-		  } else {
-			  System.err.println("WebDriverException on first attempt for URL: " + url);
-		  }
-		  wex.printStackTrace();
+      try {
+          remoteWebDriver.get(url);
+      } catch (WebDriverException wex) {
+          if (wex instanceof TimeoutException) {
+              logger.log(Level.WARN, "WebDriver TimeoutException for URL: " + url);
+          } else {
+              logger.log(Level.WARN, "WebDriverException on first attempt for URL: " + url);
+          }
 
-		  try {
-			  System.out.println("Waiting and retrying URL load...");
-			  Util.pause(10);
-			  remoteWebDriver.get(url);
-		  } catch (WebDriverException retryWex) {
-			  if (retryWex instanceof TimeoutException) {
-				  System.err.println("Retry WebDriver TimeoutException for URL: " + url);
-			  } else {
-				  System.err.println("Retry WebDriverException for URL: " + url);
-			  }
-			  retryWex.printStackTrace();
-		  } catch (Exception retryOther) {
-			  System.err.println("Unexpected exception during retry for URL: " + url);
-			  retryOther.printStackTrace();
-		  }
-	  } catch (Exception e) {
-		  System.err.println("Unexpected exception for URL: " + url);
-		  e.printStackTrace();
-	  }
+          try {
+              logger.log(Level.INFO, "Waiting and retrying URL load...");
+              Util.pause(10);
+              remoteWebDriver.get(url);
+          } catch (WebDriverException retryWex) {
+              if (retryWex instanceof TimeoutException) {
+                  logger.log(Level.WARN, "Retry WebDriver TimeoutException for URL: " + url);
+              } else {
+                  logger.log(Level.WARN, "Retry WebDriverException for URL: " + url);
+              }
+          } catch (Exception retryOther) {
+              logger.log(Level.ERROR, "Unexpected exception during retry for URL: " + url);
+          }
+      } catch (Exception e) {
+          logger.log(Level.ERROR, "Unexpected exception for URL: " + url);
+      }
   }
 
   public static LogEntries getBrowserLogs() {
