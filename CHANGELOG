@@ -1,3 +1,14 @@
+#TESTAR v2.7.7 (29-Jul-2025)
+- Add paintBatch and drawBatchTestar logic to paint all web elements at once
+- Make the visualization of slide actions optional
+- Add more Verdict warning groups
+- Refactor output files to avoid saving ".testar" sequences twice
+- Add Constants ignoredAttributes list to allow users to ignore JavaScript state attributes that require a high workload
+- Fix issue to avoid serializing non-serializable elements (this was provoking issues with iframe elements)
+- Add loadUrlWithRetry to catch selenium timeout exceptions and avoid TESTAR hanging
+- Extend TESTAR webdriver tags
+
+
 #TESTAR v2.7.6 (22-Jul-2025)
 - Update gradle wrapper to 8.5
 - Create runTestarDebug gradle java task to replace the old debuggingDistribution logic that contained bugs when creating and deleting directories
