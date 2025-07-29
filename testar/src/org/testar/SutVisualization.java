@@ -34,14 +34,36 @@ import org.testar.settings.dialog.tagsvisualization.TagFilter;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.devices.Mouse;
+import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 import org.testar.monkey.ConfigTags;
 import org.testar.settings.Settings;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import static org.testar.monkey.alayer.Tags.Role;
 import static org.testar.monkey.alayer.Tags.Visualizer;
 
 public class SutVisualization {
+
+    /**
+     * Visualizing filtered actions with grey colored dots
+     *
+     * @param canvas
+     * @param state
+     * @param actions
+     */
+    public static void visualizeFilteredActions(Canvas canvas, State state, Set<Action> actions){
+        Pen greyPen = Pen.newPen().setColor(Color.from(128, 128, 128, 96)).setFillPattern(FillPattern.Solid).setStrokeWidth(20).build();
+        try {
+            for(Action a : actions){
+                a.get(Visualizer, Util.NullVisualizer).run(state, canvas, greyPen);
+            }
+        } catch(IllegalStateException ise) {
+            System.out.println("visualizeFilteredActions : canvas visualization not available!");
+            if(ise.getMessage()!=null) { System.out.println(ise.getMessage()); }
+        }
+    }
 
     /**
      *
@@ -211,25 +233,22 @@ public class SutVisualization {
      * @param state
      * @param actions
      */
-    public static void visualizeActions(Canvas canvas, State state, Set<Action> actions) {
-        visualizeActions(canvas, state, actions, true);
-    }
+    public static void visualizeActions(Canvas canvas, State state, Set<Action> actions){
+        int zindex, minz = Integer.MAX_VALUE, maxz = Integer.MIN_VALUE;
+        Map<Action,Integer> zindexes = new HashMap<Action,Integer>();
+        for(Action a : actions){
+            //a.get(Visualizer, Util.NullVisualizer).run(state, canvas, Pen.PEN_IGNORE);
+            zindex = getTargetZindex(state,a);
+            zindexes.put(a, Integer.valueOf(zindex));
+            if (zindex < minz)
+                minz = zindex;
+            if (zindex > maxz)
+                maxz = zindex;
+        }
 
-    /**
-     * Visualizing available actions with colored dots on a canvas on top of SUT
-     *
-     * @param canvas
-     * @param state
-     * @param actions
-     * @param ignoreSliders  if true, slider actions will be skipped
-     */
-    public static void visualizeActions(Canvas canvas, State state, Set<Action> actions, boolean ignoreSliders) {
         try {
             for(Action a : actions){
-                // Optionally ignore slider actions
-                if (ignoreSliders && a.get(Tags.Slider, null) != null) {
-                    continue;
-                }
+                zindex = 1; // default
                 Pen vp = Pen.PEN_IGNORE;
                 a.get(Visualizer, Util.NullVisualizer).run(state, canvas, vp);
             }
@@ -240,39 +259,36 @@ public class SutVisualization {
     }
 
     /**
-     * Visualizing filtered actions with grey colored dots
+     * Getting the Z index of a widget targeted by the given action
      *
-     * @param canvas
+     * used only by visualizeActions()
+     *
      * @param state
-     * @param actions
+     * @param a
+     * @return
      */
-    public static void visualizeFilteredActions(Canvas canvas, State state, Set<Action> actions){
-    	visualizeFilteredActions(canvas, state, actions, true);
+    public static int getTargetZindex(State state, Action a){
+        try{
+            String targetID = a.get(Tags.TargetID);
+            Widget w;
+            if (targetID != null){
+                w = getWidget(state,targetID);
+                if (w != null)
+                    return (int)w.get(Tags.ZIndex).doubleValue();
+            }
+        } catch(NoSuchTagException ex){}
+        return 1; // default
     }
 
-    /**
-     * Visualizing filtered actions with grey colored dots
-     *
-     * @param canvas
-     * @param state
-     * @param actions
-     * @param ignoreSliders  if true, slider actions will be skipped
-     */
-    public static void visualizeFilteredActions(Canvas canvas, State state, Set<Action> actions, boolean ignoreSliders) {
-        Pen greyPen = Pen.newPen().setColor(Color.from(128, 128, 128, 96)).setFillPattern(FillPattern.Solid).setStrokeWidth(20).build();
-        try {
-            for(Action a : actions){
-                // Optionally ignore slider actions
-                if (ignoreSliders && a.get(Tags.Slider, null) != null) {
-                    continue;
-                }
-                a.get(Visualizer, Util.NullVisualizer).run(state, canvas, greyPen);
+    private static Widget getWidget(State state, String concreteID){
+        for (Widget w : state){
+            if (w.get(Tags.ConcreteID).equals(concreteID)){
+                return w;
             }
-        } catch(IllegalStateException ise) {
-            System.out.println("visualizeFilteredActions : canvas visualization not available!");
-            if(ise.getMessage()!=null) { System.out.println(ise.getMessage()); }
         }
+        return null;
     }
+
 
     /**
      * Visualizing the selected action with red colored dot
