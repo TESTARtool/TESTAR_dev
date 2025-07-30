@@ -326,15 +326,16 @@ public class WdElement extends TaggableBase implements Serializable {
 	  return isVisibleAtCanvas;
   }
 
+  public boolean isHidden() {
+      if (visibility == null) return false;
+      String vis = visibility.trim().toLowerCase();
+      return vis.equals("hidden") || vis.equals("collapse");
+  }
+
   public boolean isDisplayed() {
-	  if (remoteWebElement == null) {
-		  return false;
-	  }
-	  try {
-		  return remoteWebElement.isDisplayed();
-	  } catch (Exception e) {
-		  return false;
-	  }
+      if (display == null) return true;
+      String disp = display.trim().toLowerCase();
+      return !disp.contains("none") && !isHidden();
   }
 
   @SuppressWarnings("unchecked")
