@@ -1,6 +1,6 @@
 #TESTAR v2.7.7 (29-Jul-2025)
 - Add paintBatch and drawBatchTestar logic to paint all web elements at once
-- Make the visualization of slide actions optional
+- Fix the derivation and visualization of slide actions in web applications
 - Add more Verdict warning groups
 - Refactor output files to avoid saving ".testar" sequences twice
 - Add Constants ignoredAttributes list to allow users to ignore JavaScript state attributes that require a high workload
