@@ -30,7 +30,7 @@
 
 package org.testar.monkey.alayer.webdriver;
 
-import org.testar.monkey.Environment;
+import org.testar.environment.Environment;
 import org.testar.monkey.alayer.AWTCanvas;
 import org.testar.monkey.alayer.Rect;
 import org.testar.monkey.alayer.exceptions.StateBuildException;

@@ -44,7 +44,6 @@ import com.orientechnologies.orient.core.sql.executor.OResultSet;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 
@@ -53,7 +52,7 @@ import java.util.*;
 public class ModelManager implements StateModelManager {
 
     // the abstract state model that this class is managing
-    private AbstractStateModel abstractStateModel;
+    private final AbstractStateModel abstractStateModel;
 
     // current abstract state of the SUT
     private AbstractState currentAbstractState;
@@ -62,13 +61,10 @@ public class ModelManager implements StateModelManager {
     private AbstractAction actionUnderExecution;
 
     // action selector that chooses actions to execute
-    private ActionSelector actionSelector;
+    private final ActionSelector actionSelector;
 
     // persistence manager interface for persisting our model entities
-    private PersistenceManager persistenceManager;
-
-    // tags containing the attributes that were used in creating the concrete state ID
-    private Set<Tag<?>> concreteStateTags;
+    private final PersistenceManager persistenceManager;
 
     // current concrete state
     private ConcreteState currentConcreteState;
@@ -77,7 +73,7 @@ public class ModelManager implements StateModelManager {
     private ConcreteAction concreteActionUnderExecution;
 
     // manager that is responsible for recording test sequences as they are executed
-    private SequenceManager sequenceManager;
+    private final SequenceManager sequenceManager;
 
     // if there any irregularities that occur during runs, they should be appended here
     private StringJoiner errorMessages;
@@ -87,7 +83,7 @@ public class ModelManager implements StateModelManager {
     private int nrOfNonDeterministicActions;
 
     // should the widgets of concrete states be stored in the model?
-    boolean storeWidgets;
+    private final boolean storeWidgets;
 
     /**
      * Constructor
@@ -95,11 +91,10 @@ public class ModelManager implements StateModelManager {
      * @param actionSelector
      */
     public ModelManager(AbstractStateModel abstractStateModel, ActionSelector actionSelector, PersistenceManager persistenceManager,
-                        Set<Tag<?>> concreteStateTags, SequenceManager sequenceManager, boolean storeWidgets) {
+                        SequenceManager sequenceManager, boolean storeWidgets) {
         this.abstractStateModel = abstractStateModel;
         this.actionSelector = actionSelector;
         this.persistenceManager = persistenceManager;
-        this.concreteStateTags = concreteStateTags;
         this.sequenceManager = sequenceManager;
         errorMessages = new StringJoiner(", ");
         nrOfNonDeterministicActions = 0;
@@ -182,7 +177,7 @@ public class ModelManager implements StateModelManager {
         currentAbstractState = newAbstractState;
 
         // and then we store the concrete state and possibly the action
-        ConcreteState newConcreteState = ConcreteStateFactory.createConcreteState(newState, concreteStateTags, newAbstractState, storeWidgets);
+        ConcreteState newConcreteState = ConcreteStateFactory.createConcreteState(newState, newAbstractState, storeWidgets);
         if (concreteActionUnderExecution == null) {
             persistenceManager.persistConcreteState(newConcreteState);
         }

@@ -30,15 +30,17 @@
 
 package org.testar.statemodel.persistence.orientdb.entity;
 
+import java.util.Objects;
+
 public class EdgeEntity extends DocumentEntity {
 
-    private VertexEntity sourceEntity;
-    private VertexEntity targetEntity;
+    private final VertexEntity sourceEntity;
+    private final VertexEntity targetEntity;
 
     public EdgeEntity(EntityClass entityClass, VertexEntity sourceEntity, VertexEntity targetEntity) {
-        super(entityClass);
-        this.sourceEntity = sourceEntity;
-        this.targetEntity = targetEntity;
+        super(Objects.requireNonNull(entityClass, "EntityClass cannot be null"));
+        this.sourceEntity = Objects.requireNonNull(sourceEntity, "VertexEntity sourceEntity cannot be null");
+        this.targetEntity = Objects.requireNonNull(targetEntity, "VertexEntity targetEntity cannot be null");
     }
 
     /**

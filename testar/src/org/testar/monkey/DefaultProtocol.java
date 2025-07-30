@@ -296,8 +296,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			// new state model manager
 			stateModelManager = StateModelManagerFactory.getStateModelManager(
-					settings.get(ConfigTags.ApplicationName),
-					settings.get(ConfigTags.ApplicationVersion),
+					settings.get(ConfigTags.ApplicationName, ""),
+					settings.get(ConfigTags.ApplicationVersion, ""),
 					settings);
 		}
 

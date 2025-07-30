@@ -33,8 +33,6 @@
  */
 package org.testar.monkey.alayer.exceptions; // refactored by urueda
 
-import org.testar.monkey.FruitException;
-
 public class WidgetNotFoundException extends FruitException {
 	private static final long serialVersionUID = 7813610847340484828L;
 	public WidgetNotFoundException(){ super(""); }

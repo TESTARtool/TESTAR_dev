@@ -30,14 +30,16 @@
 
 package org.testar.statemodel;
 
+import java.util.Objects;
+
 import org.testar.statemodel.persistence.Persistable;
 
 public class ConcreteStateTransition implements Persistable {
 
     // a transition is a trinity consisting of two states as endpoints and an action to tie these together
-    private ConcreteState sourceState;
-    private ConcreteState targetState;
-    private ConcreteAction action;
+    private final ConcreteState sourceState;
+    private final ConcreteState targetState;
+    private final ConcreteAction action;
 
     /**
      * Constructor
@@ -46,9 +48,9 @@ public class ConcreteStateTransition implements Persistable {
      * @param action
      */
     public ConcreteStateTransition(ConcreteState sourceState, ConcreteState targetState, ConcreteAction action) {
-        this.sourceState = sourceState;
-        this.targetState = targetState;
-        this.action = action;
+        this.sourceState = Objects.requireNonNull(sourceState, "Concrete source state cannot be null");
+        this.targetState = Objects.requireNonNull(targetState, "Concrete target state cannot be null");
+        this.action = Objects.requireNonNull(action, "ConcreteAction cannot be null");
     }
 
     /**
@@ -73,30 +75,6 @@ public class ConcreteStateTransition implements Persistable {
      */
     public String getActionId() {
         return action.getActionId();
-    }
-
-    /**
-     * Get the source state for this transition
-     * @param sourceState
-     */
-    public void setSourceState(ConcreteState sourceState) {
-        this.sourceState = sourceState;
-    }
-
-    /**
-     * Get the target state for this transition
-     * @param targetState
-     */
-    public void setTargetState(ConcreteState targetState) {
-        this.targetState = targetState;
-    }
-
-    /**
-     * Get the action for this transition
-     * @param action
-     */
-    public void setAction(ConcreteAction action) {
-        this.action = action;
     }
 
     /**

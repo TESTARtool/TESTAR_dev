@@ -50,6 +50,18 @@ public class TransitionConditionEvaluator extends BasicConditionEvaluator {
 	public TransitionConditionEvaluator(Tag<?> originTag, Tag<?> actionTag, Tag<?> destTag, 
 			String checkContent, ConditionComparator comparator, int threshold) {
 
+		// Null-safe fallback checks
+		if (checkContent == null) {
+			logger.log(Level.WARN, "TransitionConditionEvaluator: Received null test goal, treating as empty test goal.");
+			checkContent = "";
+		}
+		if (originTag == null || actionTag == null || destTag == null) {
+			logger.log(Level.WARN, String.format(
+					"TransitionConditionEvaluator: One or more tags are null. originTag=%s, actionTag=%s, destTag=%s. No condition will be added.",
+					String.valueOf(originTag), String.valueOf(actionTag), String.valueOf(destTag)));
+			return;
+		}
+
 		// Replace line breaks and split the goal lines (case-insensitive splitting)
 		String[] lines = checkContent.replaceAll("(\\r|\\n|\\\\n)", "\n").split("\n");
 
