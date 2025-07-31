@@ -82,7 +82,7 @@ public class HtmlReporter implements Reporting
         // HTML button to invoke reverse function
         htmlReportUtil.addContent("<button id='reverseButton' onclick='reverse()'>Reverse order</button>");
         // Initialize the main div container to apply the reverse order
-        htmlReportUtil.addContent("<div id='main' style='display:flex;flex-direction:column'>");
+        htmlReportUtil.addContent("<div id='main' style='display:flex;flex-direction:column-reverse'>");
     }
 
     @Override
