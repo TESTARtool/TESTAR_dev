@@ -149,7 +149,7 @@ DataStoreMode = none
 ApplicationName = parabank_remote_actions
 ApplicationVersion = 
 ActionSelectionAlgorithm = random
-StateModelStoreWidgets = true
+StateModelStoreWidgets = false
 ResetDataStore = false
 
 #################################################################

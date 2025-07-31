@@ -31,16 +31,21 @@
 package org.testar.oracles.llm;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.llm.prompt.IPromptOracleGenerator;
+import org.testar.llm.prompt.OracleImagePromptGenerator;
 import org.testar.llm.LlmConversation;
 import org.testar.llm.LlmFactory;
 import org.testar.llm.LlmResponse;
@@ -48,7 +53,9 @@ import org.testar.llm.LlmTestGoal;
 import org.testar.llm.LlmUtils;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
+import org.testar.monkey.alayer.AWTCanvas;
 import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.oracles.Oracle;
 import org.testar.settings.Settings;
@@ -124,9 +131,27 @@ public class LlmOracle implements Oracle {
 
 	private Verdict getVerdictWithLlm(State state) {
 		String prompt = promptGenerator.generateOraclePrompt(state, appName, currentTestGoal.getTestGoal(), previousTestGoal);
-
 		logger.log(Level.DEBUG, "Generated oracle prompt: " + prompt);
-		conversation.addMessage("user", prompt);
+
+		if (promptGenerator instanceof OracleImagePromptGenerator &&
+				state.get(Tags.ScreenshotImage, null) != null) {
+
+			ByteArrayOutputStream screenshotBytes = new ByteArrayOutputStream();
+			AWTCanvas screenshot = state.get(Tags.ScreenshotImage);
+
+			try {
+				screenshot.saveAsPng(screenshotBytes);
+				byte[] imageBytes = screenshotBytes.toByteArray();
+				String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+				conversation.addMessage("user", prompt, base64Image);
+			} catch (IOException e) {
+				logger.log(Level.WARN, "OracleImagePromptGenerator: Issue generating base64 image");
+				conversation.addMessage("user", prompt);
+			}
+
+		} else {
+			conversation.addMessage("user", prompt);
+		}
 
 		String conversationJson = gson.toJson(conversation);
 

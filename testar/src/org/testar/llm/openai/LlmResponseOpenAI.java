@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.testar.llm.LlmResponse;
+import org.testar.llm.openai.LlmConversationOpenAI.ContentPart;
+import org.testar.llm.openai.LlmConversationOpenAI.Message;
 
 /**
  * Response sent by the OpenAI compatible LLM API.
@@ -77,7 +79,16 @@ public class LlmResponseOpenAI implements LlmResponse {
 
     @Override
     public String getResponse() {
-        return this.getChoices().get(0).getMessage().getContent();
+        Message message = this.getChoices().get(0).getMessage();
+        StringBuilder result = new StringBuilder();
+
+        for (ContentPart part : message.getContent()) {
+            if ("text".equals(part.getType()) && part.getText() instanceof String) {
+                result.append((String) part.getText());
+            }
+        }
+
+        return result.toString().trim();
     }
 
     @Override

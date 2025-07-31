@@ -151,13 +151,13 @@ StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer = 
-DataStoreDirectory = settings/webdriver_llm_state_model_evaluator/orientdb-community-3.0.34/databases
+DataStoreDirectory = settings/webdriver_llm_state_model_evaluator/orientdb-community-3.2.38/databases
 DataStoreDB = testar
 DataStoreUser = admin
 DataStorePassword = admin
 DataStoreMode = instant
 ActionSelectionAlgorithm = random
-StateModelStoreWidgets = true
+StateModelStoreWidgets = false
 ResetDataStore = false
 
 #################################################################

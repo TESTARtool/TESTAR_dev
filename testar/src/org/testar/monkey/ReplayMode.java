@@ -84,9 +84,6 @@ public class ReplayMode {
 
 		protocol.preSequencePreparations();
 
-		//reset the faulty variable because we started a new execution
-		DefaultProtocol.faultySequence = false;
-
 		SUT system = protocol.startSystem();
 
 		try{
@@ -115,7 +112,9 @@ public class ReplayMode {
 
 			double rrt = protocol.settings().get(ConfigTags.ReplayRetryTime);
 
-			while(success && !DefaultProtocol.faultySequence && protocol.mode() == Modes.Replay){
+			while(success 
+					&& protocol.getReplayVerdict().severity() == Verdict.OK.severity() 
+					&& protocol.mode() == Modes.Replay) {
 
 				//Initialize local fragment and read saved action of PathToReplaySequence File
 				Taggable replayableFragment;
@@ -279,7 +278,7 @@ public class ReplayMode {
 				system.stop();
 		}
 
-		if(DefaultProtocol.faultySequence) {
+		if(protocol.getReplayVerdict().severity() != Verdict.OK.severity()) {
 			String msg = "Replayed Sequence contains Errors: "+ protocol.getReplayVerdict().info();
 			System.out.println(msg);
 			LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);

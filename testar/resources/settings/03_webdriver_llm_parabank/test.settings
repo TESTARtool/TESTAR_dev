@@ -149,7 +149,7 @@ DataStoreMode = none
 ApplicationName = parabank
 ApplicationVersion = loan_denied
 ActionSelectionAlgorithm = random
-StateModelStoreWidgets = true
+StateModelStoreWidgets = false
 ResetDataStore = false
 
 #################################################################

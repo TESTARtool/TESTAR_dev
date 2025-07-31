@@ -208,9 +208,13 @@ public class StateModelPanel extends SettingsPanel {
         add(dataStoreModeBox);
 
         // NEW COLUMN
+        String performanceWarning = "<html><b>Warning:</b> Enabling this feature will save all concrete widgets in the database.<br>"
+        		+ "This can significantly <b>reduce the performance</b> during state model inference.</html>";
         label16.setBounds(330, 52, 150, 27);
+        label16.setToolTipText(performanceWarning);
         add(label16);
         stateModelWidgetStoreChkBox.setBounds(480, 52, 50, 27);
+        stateModelWidgetStoreChkBox.setToolTipText(performanceWarning);
         add(stateModelWidgetStoreChkBox);
 
         label9.setBounds(330,90,150,27);

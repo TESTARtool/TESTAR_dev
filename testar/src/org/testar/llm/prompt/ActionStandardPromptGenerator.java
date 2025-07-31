@@ -112,10 +112,15 @@ public class ActionStandardPromptGenerator implements IPromptActionGenerator {
 
                 switch (type) {
                 case "ClickTypeInto":
+                case "PasteTextInto":
                     builder.append(String.format("%s: Type in Field '%s' ", actionId, description));
                     break;
                 case "LeftClickAt":
                     builder.append(String.format("%s: Click on '%s' ", actionId, description));
+                    break;
+                case "HitESC":
+                    // TODO: Decide if it makes sense to rely on the LLM to make this control decision
+                    builder.append(String.format("%s: Hit the ESC key", actionId));
                     break;
                 default:
                     logger.log(Level.WARN, "Unsupported action type for LLM action selection: " + type);

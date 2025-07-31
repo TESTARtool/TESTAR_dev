@@ -48,7 +48,18 @@ public class CheckConditionEvaluator extends BasicConditionEvaluator {
 	}
 
 	public CheckConditionEvaluator(Tag<?> evaluatorTag, String checkContent, ConditionComparator comparator, int threshold) {
-		// Replace line breaks and split the 'Check:' content into lines (case-insensitive splitting)
+
+		// Null-safe fallback checks
+		if (checkContent == null) {
+			logger.log(Level.WARN, "CheckConditionEvaluator: Received null test goal, treating as empty test goal.");
+			checkContent = "";
+		}
+		if (evaluatorTag == null) {
+			logger.log(Level.WARN, "CheckConditionEvaluator: Received null evaluatorTag. No condition will be added.");
+			return;
+		}
+
+		// Replace line breaks and split the goal lines (case-insensitive splitting)
 		String[] lines = checkContent.replaceAll("(\\r|\\n|\\\\n)", "\n").split("\n");
 
 		// Add the'Check:' statements as evaluator conditions

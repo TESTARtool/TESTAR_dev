@@ -42,8 +42,8 @@ import org.testar.statemodel.util.QueryHelper;
  * Simple condition that searches for a string in all states.
  */
 public class StateCondition extends TestCondition {
-    private String field;
-    private String searchMessage;
+    private final String field;
+    private final String searchMessage;
 
     /**
      * Creates a new StateCondition.
@@ -87,7 +87,7 @@ public class StateCondition extends TestCondition {
         queryBuilder.append("AS found ");
         queryBuilder.append("FROM ConcreteState ");
         queryBuilder.append("WHERE uid LIKE '" + modelIdentifier + "%' ");
-        queryBuilder.append("AND " + getField() + " LIKE '%" + getSearchMessage() + "%'");
+        queryBuilder.append("AND " + getField() + " containstext '" + getSearchMessage() + "'");
 
         String query = queryBuilder.toString();
         String result = stateModelManager.queryStateModel(query);

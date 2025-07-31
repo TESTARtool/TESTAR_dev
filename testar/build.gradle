@@ -54,6 +54,23 @@ task runTestar(type: Exec) {
 	}
 }
 
+task runTestarDebug(type: JavaExec) {
+    group = 'custom_testar'
+    description = 'Run TESTAR in debug mode'
+
+    main = 'org.testar.monkey.Main'
+
+    classpath = sourceSets.main.runtimeClasspath
+    workingDir = file('target/install/testar/bin')
+
+    def suspendMode = project.hasProperty("debug") && project.debug == 'true' ? 'y' : 'n'
+
+    jvmArgs = [
+          "-agentlib:jdwp=transport=dt_socket,server=y,suspend=${suspendMode},address=*:5005",
+          "-Djava.awt.headless=false"
+    ]
+}
+
 task customZipDistribution(type: Zip) {
 	doFirst{
 		new File("${project.buildDir}/install/testar/bin/settings","desktop_generic.sse").text=""
@@ -66,40 +83,6 @@ task customZipDistribution(type: Zip) {
 
    	archiveFileName.set 'testarDistribution.zip'
    	getDestinationDirectory().set(file('target/install'))
-}
-
-/**
- * Prepare folder structure to run debugging mode from IDE
- */
-task debuggingDistribution(type: Exec, dependsOn:'debugFiles') {
-    group = 'custom_testar'
-    description ='debuggingDistribution'
-
-    workingDir '.'
-    commandLine 'cmd', '/c', 'dir'
-}
-
-task debugFiles(type: Copy, dependsOn:'build') {
-    from 'target/scripts/.'
-    into '.'
-}
-
-task cleanDebugging(type: Exec, dependsOn:'deleteDebugging') {
-    group = 'custom_testar'
-    description ='cleanDebugging'
-
-    workingDir '.'
-    commandLine 'cmd', '/c', 'dir'
-}
-
-task deleteDebugging(type: Delete){
-    delete 'settings'
-    delete 'suts'
-    delete 'output'
-    delete 'testar'
-    delete 'testar.bat'
-    delete 'windows.dll'
-    delete 'index.log'
 }
 
 dependencies {
@@ -118,10 +101,6 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
     implementation 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
-    // Use jaxb 2.3.1 to fix a Java17 issue with the version 2.3.0 included in the orientdb server dependencies
-    implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
-    implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.1'
-    implementation group: 'com.orientechnologies', name: 'orientdb-graphdb', version: '3.0.44'
     implementation group: 'com.sikulix', name: 'sikulixapi', version: '2.0.5'
     // jacoco and maven dependencies for jacoco coverage
     implementation group: 'org.apache.maven', name: 'maven-core', version: '3.9.8'
@@ -220,8 +199,8 @@ startScripts.dependsOn {
 
 //running testar requires the distribution to be installed.
 runTestar.dependsOn(installDist)
+runTestarDebug.dependsOn(installDist)
 customZipDistribution.dependsOn(installDist)
-debuggingDistribution.dependsOn(build)
 
 /**
  * Build TESTAR using Visual Studio Tools to create a windows.dll

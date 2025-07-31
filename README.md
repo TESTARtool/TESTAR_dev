@@ -1,8 +1,9 @@
 ## TESTAR Scriptless testing tool
 
-[![Gradle CI tests](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/test-windows.yml/badge.svg)](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/test-windows.yml)
-[![Docker Build](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/release-docker.yml/badge.svg)](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/release-docker.yml)
-[![Release](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/release-distribution.yml/badge.svg)](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/release-distribution.yml)
+[![Windows desktop CI](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/test-windows-desktop.yml/badge.svg)](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/test-windows-desktop.yml)
+[![Windows webdriver CI](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/test-windows-webdriver.yml/badge.svg)](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/test-windows-webdriver.yml)
+[![Docker release](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/release-docker.yml/badge.svg)](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/release-docker.yml)
+[![ZIP release](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/release-distribution.yml/badge.svg)](https://github.com/TESTARtool/TESTAR_dev/actions/workflows/release-distribution.yml)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
 This is the github development root folder for TESTAR development.  
@@ -76,21 +77,18 @@ To debug the application with the runTestar task, provide your onw run configura
 
 #### Debug TESTAR from Gradle
 In order to debug the TESTAR code, you must run;
-1. `.\gradlew -DDEBUG=true runTestar.` 
+1. `.\gradlew -DEBUG=true runTestar.` 
 
 Optionally you can build TESTAR (.\gradlew -DDBEBUG=true distZip ), copy the result to the machine where you want to run TESTAR and run TESTAR on the target machine.  
 This allows the user to debug TESTAR from a different machine.  
 
 #### Debug TESTAR with IntelliJ IDE
-It is possible to add breakpoints and run TESTAR in debugging mode using IntelliJ.  
-For this, it is necessary to replicate the output structure of the TESTAR dependencies.  
+It is possible to add breakpoints and run TESTAR in debugging mode using IntelliJ.   
 
 IntelliJ IDE:
-1. Run from the gradle perspective `gradle debuggingDistribution`
-2. Change the run execution of TESTAR to point to `TESTAR_dev\testar`
-3. Execute `testar/src/org/testar/monkey/Main.java` with IntelliJ debugging mode
-
-After the debugging execution, it is recommended to clean the output files by running `gradle cleanDebugging` from the IntelliJ gradle perspective.  
+1. Add the desired breakpoints  
+2. Select the task `runTestarDebug`  
+3. Execute the IntelliJ debugging mode  
 
 ### How to execute TESTAR distribution
 
@@ -124,64 +122,6 @@ Example:
 
 ``testar sse=desktop_generic ShowVisualSettingsDialogOnStartup=false Sequences=5 SequenceLength=100 Mode=Generate SUTConnectorValue=" ""C:\\Program Files\\VideoLAN\\VLC\\vlc.exe"" " SuspiciousTags=".*[eE]rror.*|.*[eE]xcep[ct]ion.*"``
 
-## State Model / Graph database support
-TESTAR uses orientdb graph database http://orientdb.com , to create TESTAR GUI State Models.  
-Detected Widget's, Actions, States and their respective relations are recorded to this graph database.  
-
-### Use of the State Mode and the graph database
-The State Model consists on Widgets and States obtained from getState() method together with Actions of deriveActions() method. This model is stored in three different layers: Abstract, Concrete and Sequence.
-
-The protocols ``desktop_generic_statemodel`` and ``webdriver_statemodel`` contain the default settings implementation which shows how TESTAR State Model could be used.
-
-### Download OrientDB 3.0.34 GA Community Edition (August 31st, 2020)
-https://www.orientdb.org/download  
-https://repo1.maven.org/maven2/com/orientechnologies/orientdb-community/3.0.34/orientdb-community-3.0.34.zip  
-
-``Warning: Since August 2020 there is version 3.1.X of OrientDB, however TESTAR currently requires the use of versions 3.0.X``
-
-### Install and configure OrientDB Server
-In order to use the graphdb feature it's advised to install a graph database on your machine or in a remote server.
-
-Follow the installation instructions about how to configure TESTAR State Model on slide 28:  
-https://testar.org/images/development/TESTAR_webdriver_state_model.pdf 
-
-Also TESTAR HandsOn (Section 6) contains more information about State Model settings: https://testar.org/images/development/Hands_on_TESTAR_Training_Manual_2020_October_14.pdf
-
-When orientdb is started the first time. The root password needs to be configured. Make sure you remember this password.
-
-In order to use the graphdb feature. A database must be created in OrientDB. To do this follow the following procedure:
-- Start the database server (ORIENTDB_HOME/bin/server.bat)
-- Start orientdb studio in a webbrowser [http://localhost:2480](http://localhost:2480)
-- Choose "New DB" and provide the name, root user and password. (The database will also get a default admin/admin  user/password).
-- Go to Security tab and create a new user (testar/testar) with an active status and the admin role
-
-### Using OrientDB graphdb on the local filesystem
-OrientDB graph database can be used remotely or locally.
-Default TESTAR settings are predefined to connect with remote mode to a local OrientDB server:
-
-		StateModelEnabled = true
-		DataStore = OrientDB
-		DataStoreType = remote
-		DataStoreServer = localhost
-		DataStoreDB = testar
-		DataStoreUser = testar
-		DataStorePassword = testar
-
-Also is possible to connect at file level without deploy the OrientDB locally:
-
-		StateModelEnabled = true
-		DataStore = OrientDB
-		DataStoreType = plocal
-		DataStoreDirectory = C:\\Users\\testar\\Desktop\\orientdb-community-3.0.34\\databases
-		DataStoreDB = testar
-		DataStoreUser = testar
-		DataStorePassword = testar
-		
-## Docker chromedriver image
-https://hub.docker.com/u/testartool
-
-https://hub.docker.com/r/testartool/testar-chromedriver
-
 ## Supported Operative Systems
 If you encounter any errors, please create an issue and provide details about your operating system, Java, and TESTAR version.  
 
@@ -210,10 +150,21 @@ It is possible to prepare an Emulator, Docker container, or Virtual Machine that
 
 ## Supported Java SE versions
 
-TESTAR needs Java Standard Edition (SE) to run and we support the Java SE Long-Term Support (LTS) versions that are currently under Oracle Extended Support  ( https://www.oracle.com/java/technologies/java-se-support-roadmap.html ) . Other versions might work.  
+TESTAR needs Java Standard Edition (SE) to run and we support the Java SE Long-Term Support (LTS) versions that are currently under Oracle Extended Support (https://www.oracle.com/java/technologies/java-se-support-roadmap.html). Other versions might work.  
 
 - Java 8 support has been maintained up until TESTAR v2.6.6. From this point forward, it is important to note that future updates may introduce incompatibility issues with Java 8 due to potential changes in libraries.  
 - Starting from TESTAR v2.6.7, we offer official support for Java 11, 17, and 21, which are the last three LTS versions. If you encounter any errors, please create an issue and provide details about your operating system, Java, and TESTAR version.  
+
+## State Model / Graph database support
+TESTAR uses the [OrientDB graph database](http://orientdb.com), to create TESTAR GUI State Models.  
+Detected Widget's, Actions, States and their respective relations are recorded to this graph database.  
+
+[Follow these instructions to download, install, and launch the State Model feature](https://github.com/TESTARtool/TESTAR_dev/wiki/4-TESTAR-State-Model-with-OrientDB). 
+
+## Docker chromedriver image
+https://hub.docker.com/u/testartool
+
+https://hub.docker.com/r/testartool/testar-chromedriver
 
 ## Increase Java memory
 https://github.com/TESTARtool/TESTAR_dev/wiki/Development:-Increase-Java-memory

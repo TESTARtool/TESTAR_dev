@@ -32,6 +32,8 @@ package org.testar.monkey;
 
 import org.testar.CodingManager;
 import org.testar.StateManagementTags;
+import org.testar.environment.Environment;
+import org.testar.environment.UnknownEnvironment;
 import org.testar.managers.NativeHookManager;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.windows.Windows10;
@@ -60,7 +62,7 @@ import static org.testar.monkey.Util.compileProtocol;
 
 public class Main {
 
-	public static final String TESTAR_VERSION = "2.7.1 (3-Jun-2025)";
+	public static final String TESTAR_VERSION = "2.7.6 (22-Jul-2025)";
 
 	//public static final String TESTAR_DIR_PROPERTY = "DIRNAME"; //Use the OS environment to obtain TESTAR directory
 	public static final String SETTINGS_FILE = "test.settings";

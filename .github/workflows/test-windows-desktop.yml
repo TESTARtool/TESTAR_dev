@@ -1,4 +1,4 @@
-name: Windows desktop TESTAR CI tests
+name: Windows desktop CI
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 jobs:
   windows:
     runs-on: windows-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     strategy:
       fail-fast: false
@@ -32,6 +32,9 @@ jobs:
 
     - name: Build TESTAR with Gradle
       run: ./gradlew build
+
+    - name: Check TESTAR JUnit summary
+      run: ./gradlew coverageReportSummary
 
     - name: Prepare installed distribution of TESTAR with Gradle
       run: ./gradlew installDist

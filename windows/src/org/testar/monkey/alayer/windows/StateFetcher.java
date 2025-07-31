@@ -93,6 +93,7 @@ public class StateFetcher implements Callable<UIAState>{
 		UIAState root = createWidgetTree(uiaRoot);
 		root.set(Tags.Role, Roles.Process);
 		root.set(Tags.NotResponding, false);
+		root.set(Tags.Representation, generateXmlRepresentation(root, 0));
 
 		for (Widget w : root)
 			w.set(Tags.Path,Util.indexString(w));
@@ -677,6 +678,60 @@ public class StateFetcher implements Callable<UIAState>{
 		element.backRef = w;
 		for(UIAElement child : element.children)
 			createWidgetTree(w, child);
+	}
+
+	public String generateXmlRepresentation(Widget widget, int indentLevel) {
+		StringBuilder xml = new StringBuilder();
+		String indent = "    ".repeat(indentLevel);
+
+		String role = widget.get(Tags.Role, Roles.Widget).toString();
+		String tagName = sanitizeTagName(role);
+		String title = sanitize(widget.get(Tags.Title, ""));
+
+		xml.append(indent).append("<").append(tagName);
+		if (!title.isEmpty()) {
+			xml.append(" title=\"").append(escapeXml(title)).append("\"");
+		}
+
+		int childCount = widget.childCount();
+		boolean hasChildren = false;
+		for (int i = 0; i < childCount; i++) {
+			Widget child = widget.child(i);
+			if (child != null) {
+				if (!hasChildren) {
+					xml.append(">\n");
+					hasChildren = true;
+				}
+				xml.append(generateXmlRepresentation(child, indentLevel + 1));
+			}
+		}
+
+		if (hasChildren) {
+			xml.append(indent).append("</").append(tagName).append(">\n");
+		} else {
+			xml.append(" />\n");
+		}
+
+		widget.set(Tags.Representation, xml.toString());
+		return xml.toString();
+	}
+
+	public String escapeXml(String text) {
+		return text.replace("&", "&amp;")
+				.replace("<", "&lt;")
+				.replace(">", "&gt;")
+				.replace("\"", "&quot;")
+				.replace("'", "&apos;");
+	}
+
+	public String sanitize(String input) {
+		return input.replaceAll("[^\\x09\\x0A\\x0D\\x20-\\x7E]", "");
+	}
+
+	public String sanitizeTagName(String role) {
+		if (role == null) return "Widget";
+		String tag = role.replaceAll("[^a-zA-Z0-9_]", "");
+		return tag.isEmpty() ? "Widget" : tag;
 	}
 
 	@SuppressWarnings("unchecked")

@@ -30,7 +30,7 @@
 
 package org.testar.monkey.alayer.windows;
 
-import org.testar.monkey.IEnvironment;
+import org.testar.environment.IEnvironment;
 
 /**
  * A Windows 10 specific environment implementation.
@@ -48,11 +48,18 @@ public final class Windows10 implements IEnvironment {
 			long res[] = Windows.GetScaleFactorForMonitor(monitorHandle);
 			if (res.length == 2 )
 			{
-				return res[1] / 100.0;
+				double scale = res[1] / 100.0;
+				if (scale != 1.0) {
+					System.out.printf("WARNING: DPI scaling is not 100%%. Detected scale: %.2f (on monitor %d)\n", scale, monitorHandle);
+					System.out.println("WARNING: This might affect the coordinates to interact with GUI widgets coordinates");
+				}
+				return scale;
 			}
 			System.out.printf("WARNING Failed to requested scale factor for display:%d res:%d \n",monitorHandle,res[0]);
 		} catch(NoClassDefFoundError nce) {
 			System.out.println("WARNING: TESTAR was not able to obtain Windows10 environment displayScale value");
+		} catch (Exception e) {
+			System.out.println("WARNING: Unexpected error while getting the Windows displayScale value");
 		}
 
 		return result;

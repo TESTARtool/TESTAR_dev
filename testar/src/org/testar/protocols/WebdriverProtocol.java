@@ -35,6 +35,7 @@ import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
+import org.testar.environment.Environment;
 import org.testar.monkey.*;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
@@ -181,7 +182,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
      */
     private void setWindowHandleForWebdriverBrowser(SUT sut) {
     	try {
-    		if(System.getProperty("os.name").contains("Windows 10") && sut.get(Tags.HWND, null) == null) {
+    		if(System.getProperty("os.name").contains("Windows") && sut.get(Tags.HWND, null) == null) {
     			// Note don't place a breakpoint here since the outcome of the function call will result in the IDE pid and
     			// window handle. The running browser needs to be in the foreground when we reach this part.
     			long hwnd = Windows.GetForegroundWindow();
@@ -263,13 +264,14 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     	State state = super.getState(system);
 
     	if(settings.get(ConfigTags.ForceForeground)
-    			&& System.getProperty("os.name").contains("Windows 10")
-    			&& system.get(Tags.IsRunning, false) && !system.get(Tags.NotResponding, false)
+    			&& System.getProperty("os.name").contains("Windows")
+    			&& state.get(Tags.IsRunning, false) 
+    			&& !state.get(Tags.NotResponding, false)
     			&& system.get(Tags.PID, (long)-1) != (long)-1 
     			&& WinProcess.procName(system.get(Tags.PID)).contains("chrome") 
     			&& !WinProcess.isForeground(system.get(Tags.PID))){
     		
-    		WinProcess.politelyToForeground(system.get(Tags.HWND));
+    		WinProcess.toForeground(system.get(Tags.PID), 0.3, 100);
     		LogSerialiser.log("Trying to set Chrome Browser to Foreground... " 
     		+ WinProcess.procName(system.get(Tags.PID)) + "\n");
     		

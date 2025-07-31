@@ -1,9 +1,5 @@
 dependencies {
     implementation project(':core')
-    // Use jaxb 2.3.1 to fix a Java17 issue with the version 2.3.0 included in the orientdb server dependencies
-    implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
-    implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.1'
-    implementation group: 'com.orientechnologies', name: 'orientdb-graphdb', version: '3.0.44'
     // Analysis web servlet 
     implementation group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.30.v20200611'
     implementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.30.v20200611'

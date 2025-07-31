@@ -377,6 +377,10 @@ public class StdActionCompiler {
 		return builder.build();
 	}
 
+	public Action hitESC(State state) {
+		return hitKey(KBKeys.VK_ESCAPE);
+	}
+
 	public Action noOperationalState(State state) {
 		Action ret = new NOP();
 		ret.mapActionToWidget(state);

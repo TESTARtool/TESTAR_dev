@@ -1,0 +1,63 @@
+import groovy.xml.XmlSlurper
+
+task coverageReportSummary {
+    group = 'Verification'
+    description = 'Prints Jacoco coverage summary for all subprojects'
+
+    doLast {
+        def totalCovered = 0
+        def totalMissed = 0
+        def results = []
+
+        println ""
+        println "+---------------------------+---------------------+"
+        println "| Project                   | Branch Coverage (%) |"
+        println "+---------------------------+---------------------+"
+
+        subprojects.each { subproject ->
+            def reportFile = file("${subproject.name}/target/jacoco.xml")
+            if (reportFile.exists()) {
+                def xmlText = reportFile.text.replaceFirst(/<!DOCTYPE[^>]*>\s*/, '')
+                def report = new XmlSlurper().parseText(xmlText)
+                def counter = report.counter.find { it.@type == 'BRANCH' }
+
+                if (counter) {
+                    def missed = counter.@missed.toInteger()
+                    def covered = counter.@covered.toInteger()
+                    def total = missed + covered
+                    def percent = total > 0 ? (covered * 100.0 / total) : 0
+
+                    results << [project: subproject.name, percent: percent]
+
+                    totalCovered += covered
+                    totalMissed += missed
+                } else {
+                    results << [project: subproject.name, percent: null]
+                }
+            } else {
+                results << [project: subproject.name, percent: null]
+            }
+        }
+
+        results.each {
+            def name = it.project.padRight(26)
+            def coverage = it.percent != null ?
+                String.format("%20.2f", it.percent) :
+                "                N/A "
+            println "| ${name}|${coverage} |"
+        }
+
+        println "+---------------------------+---------------------+"
+
+        def grandTotal = totalCovered + totalMissed
+        if (grandTotal > 0) {
+            def totalPercent = totalCovered * 100.0 / grandTotal
+            println "| TOTAL                     |" +
+                    String.format("%20.2f", totalPercent) + " |"
+        } else {
+            println "| TOTAL                     |         N/A         |"
+        }
+
+        println "+---------------------------+---------------------+\n"
+    }
+}

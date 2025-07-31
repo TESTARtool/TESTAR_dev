@@ -45,7 +45,10 @@ public interface LlmConversation {
     static final Logger logger = LogManager.getLogger();
 
     public void initConversation(String fewshotFile);
-    public void addMessage(String role, String content);
+
+    public void addMessage(String role, String textContent);
+
+    public void addMessage(String role, String textContent, String base64ImageData);
 
     /**
      * Loads a resource from the resources folder as plain text.

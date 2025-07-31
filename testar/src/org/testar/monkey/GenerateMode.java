@@ -77,9 +77,6 @@ public class GenerateMode {
 			//HTML report is created here in DefaultProtocol
 			protocol.preSequencePreparations();
 
-			//reset the faulty variable because we started a new sequence
-			DefaultProtocol.faultySequence = false;
-
 			//starting system or connect to a running one
 			SUT system = protocol.startSUTandLogger();
 
@@ -109,9 +106,7 @@ public class GenerateMode {
 				/*
 				 ***** starting the INNER LOOP:
 				 */
-				Verdict stateVerdict = runGenerateInnerLoop(protocol, system, state);
-
-				protocol.finalVerdict = stateVerdict.join(DefaultProtocol.processVerdict);
+				protocol.finalVerdict = runGenerateInnerLoop(protocol, system, state);
 
 				//calling finishSequence() to allow scripting GUI interactions to close the SUT:
 				protocol.finishSequence();
@@ -121,7 +116,7 @@ public class GenerateMode {
 
 				protocol.writeAndCloseFragmentForReplayableSequence();
 
-				if (DefaultProtocol.faultySequence)
+				if (protocol.finalVerdict.severity() != Verdict.OK.severity())
 					LogSerialiser.log("Sequence contained faults!\n", LogSerialiser.LogLevel.Critical);
 
 				//Copy sequence file into proper directory:

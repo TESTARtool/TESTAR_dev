@@ -42,6 +42,7 @@ import org.testar.monkey.alayer.Pen;
 import org.testar.monkey.alayer.Position;
 import org.testar.monkey.alayer.Rect;
 import org.testar.monkey.alayer.Shape;
+import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.StrokeCaps;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
@@ -244,7 +245,16 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		ret.set(Tags.Role, ActionRoles.HitShortcutKey);		
 		return ret;
 	}	
-	
+
+	@Override
+	public Action hitESC(State state) {
+		Action ret = super.hitESC(state);
+		ret.set(Tags.Desc, "Hit ESC Key");
+		ret.set(Tags.Role, ActionRoles.HitESC);
+		ret.mapActionToWidget(state);
+		return ret;
+	}
+
 	@Override
 	public Action killProcessByPID(long pid, double timeToWaitBeforeKilling){
 		Action ret = super.killProcessByPID(pid, timeToWaitBeforeKilling);

@@ -31,7 +31,6 @@
 package org.testar.action.priorization.llm;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,7 +45,6 @@ import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
-import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.settings.Settings;
 
 import java.io.*;
@@ -175,7 +173,8 @@ public class LlmActionSelector implements IActionSelector {
 
         String conversationJson = gson.toJson(conversation);
         String llmResponse = getResponseFromLlm(conversationJson);
-        LlmParseActionResult llmParseResult = parseLlmResponse(actions, llmResponse);
+        LlmParseActionResponse llmParseResponse = new LlmParseActionResponse(gson);
+        LlmParseActionResult llmParseResult = llmParseResponse.parseLlmResponse(actions, llmResponse);
 
         switch(llmParseResult.getParseResult()) {
             case SUCCESS: {
@@ -325,109 +324,6 @@ public class LlmActionSelector implements IActionSelector {
             }
             return null;
         }
-    }
-
-    /**
-     * Parses the response sent by the LLM and selects an action if the response was valid.
-     * @param actions Set of actions in the current state.
-     * @param responseContent The response of the LLM in plaintext.
-     * @return LlmParseActionResult containing the result of the parse and the action to execute if parsing was successful.
-     */
-    private LlmParseActionResult parseLlmResponse(Set<Action> actions, String responseContent) {
-        try {
-            LlmSelectedAction llmSelectedAction = gson.fromJson(responseContent, LlmSelectedAction.class);
-
-            Action selectedAction = getActionByIdentifier(actions, llmSelectedAction.getActionId());
-
-            // If the selectedAction is a NOP action at this stage, parsing has likely failed.
-            // Observed to happen when the LLM selects an actionId that does not exist.
-            if(selectedAction instanceof NOP) {
-                logger.log(Level.ERROR, "Action AbstractID not found, parsing LLM response has likely failed!: " + responseContent);
-                return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.INVALID_ACTION);
-            }
-
-            String input = llmSelectedAction.getInput();
-            Widget widget = selectedAction.get(Tags.OriginWidget);
-
-            // For interacting with select combobox web widgets
-            // A WdSelectListAction is created to change the active value of the combobox
-            if(Objects.equals(widget.get(WdTags.WebTagName, ""), "select")) {
-                if(Objects.equals(input, "")) {
-                    return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.SL_MISSING_INPUT);
-                }
-
-                String target = widget.get(WdTags.WebId, "");
-                WdSelectListAction.JsTargetMethod method;
-                if (target.isEmpty()) {
-                    logger.warn("elementId is empty for select widget! Using name target method.");
-                    target = widget.get(WdTags.WebName, "");
-                    method = WdSelectListAction.JsTargetMethod.NAME;
-                } else {
-                    method = WdSelectListAction.JsTargetMethod.ID;
-                }
-
-                return new LlmParseActionResult(new WdSelectListAction(target, input, widget, method), 
-                        LlmParseActionResult.ParseResult.SUCCESS);
-            }
-
-            setCompoundActionInputText(selectedAction, input);
-            return new LlmParseActionResult(selectedAction, LlmParseActionResult.ParseResult.SUCCESS);
-
-        } catch(JsonParseException e) {
-            logger.log(Level.ERROR, "Unable to parse response from LLM to JSON: " + responseContent);
-            return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.PARSE_FAILED);
-        } catch(NullPointerException e) {
-            logger.log(Level.ERROR, "Null response due to LLM parse response error");
-            return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.COMMUNICATION_FAILURE);
-        } catch(Exception e) {
-            logger.log(Level.ERROR, "Exception parsing LLM response");
-            return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.COMMUNICATION_FAILURE);
-        }
-    }
-
-    /**
-     * Retrieves an action with given actionId.
-     * @param actions Set of actions to search.
-     * @param actionId ActionId to search for.
-     * @return Requested action if found, NOP Action if not found.
-     */
-    private Action getActionByIdentifier(Set<Action> actions, String actionId) {
-        for(Action action : actions) {
-            if(action.get(Tags.AbstractID, "").equalsIgnoreCase(actionId)) {
-                return action;
-            }
-        }
-        return new NOP();
-    }
-
-    /**
-     * Sets TESTAR input text of compound Type and PasteText actions.
-     * @param action CompoundAction to change.
-     * @param inputText The characters to enter into the input field. Can be left empty if not applicable.
-     * @return if input text changed.
-     */
-    private boolean setCompoundActionInputText(Action action, String inputText) {
-        //TODO: Create single actions in protocol so this is not necessary?
-        if(action instanceof CompoundAction) {
-            for(Action innerAction : ((CompoundAction)action).getActions()) {
-
-                if(innerAction instanceof Type) {
-                    ((Type)innerAction).set(Tags.InputText, inputText);
-                    action.set(Tags.Desc, "Type '" + ((Type)innerAction).get(Tags.InputText)
-                            + "' into '" + action.get(Tags.OriginWidget).get(Tags.Desc, "<no description>" + "'"));
-                    return true;
-                }
-
-                if(innerAction instanceof PasteText) {
-                    ((PasteText)innerAction).set(Tags.InputText, inputText);
-                    action.set(Tags.Desc, "PasteText '" + ((PasteText)innerAction).get(Tags.InputText)
-                            + "' into '" + action.get(Tags.OriginWidget).get(Tags.Desc, "<no description>" + "'"));
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     /**
