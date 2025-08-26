@@ -1,3 +1,9 @@
+#TESTAR 2.7.7 (26-Aug-2025)
+- Bump org.seleniumhq.selenium:selenium-java from 4.34.0 to 4.35.0 
+- Bump io.appium:java-client from 9.5.0 to 10.0.0 
+- Refactor action map to origin widget 
+
+
 #TESTAR v2.7.6 (22-Jul-2025)
 - Update gradle wrapper to 8.5
 - Create runTestarDebug gradle java task to replace the old debuggingDistribution logic that contained bugs when creating and deleting directories
