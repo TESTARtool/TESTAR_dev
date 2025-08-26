@@ -55,7 +55,7 @@ public class AndroidActionType extends TaggableBase implements Action {
 
 	public AndroidActionType(State state, Widget w, String type, String accessibilityId, String text, String className) {
 		this.set(Tags.Role, ActionRoles.ClickTypeInto);
-		this.mapActionToWidget(w);
+		this.mapOriginWidget(w);
 		this.type = type;
 		this.accessibilityId = accessibilityId;
 		this.widget = w;
