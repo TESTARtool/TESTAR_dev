@@ -35,10 +35,7 @@
 package org.testar.monkey.alayer;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import org.testar.monkey.alayer.actions.BriefActionRolesMap;
 import org.testar.monkey.alayer.exceptions.ActionFailedException;
 
