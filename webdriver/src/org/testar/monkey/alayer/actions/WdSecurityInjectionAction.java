@@ -51,7 +51,7 @@ public class WdSecurityInjectionAction extends TaggableBase implements Action {
         this.set(Tags.Role, WdActionRoles.FormFillingAction);
         this.set(Tags.Desc, "Inject text that contains special characters");
         this.text = text;
-        this.mapActionToWidget(widget);
+        this.mapOriginWidget(widget);
     }
 
     public String getText() {

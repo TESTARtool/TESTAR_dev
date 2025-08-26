@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -35,10 +35,7 @@
 package org.testar.monkey.alayer;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import org.testar.monkey.alayer.actions.BriefActionRolesMap;
 import org.testar.monkey.alayer.exceptions.ActionFailedException;
 
@@ -159,18 +156,11 @@ public interface Action extends Taggable, Serializable {
 	public abstract String toString(Role... discardParameters);
 
 	/**
-	 * Create the map Action <-> Widget 
-	 * Using Tags ActionSet and OriginWidget
+	 * Map the OriginWidget to the action
 	 * 
-	 * @param action
 	 * @param widget
 	 */
-	default void mapActionToWidget(Widget widget) {
-		// Map the action to the existing action set, or create a new one if do not exists
-		Set<Action> actionSet = widget.get(Tags.ActionSet, new HashSet<>());
-		actionSet.add(this);
-		widget.set(Tags.ActionSet, actionSet);
-		// Map the widget to the action
+	default void mapOriginWidget(Widget widget) {
 		this.set(Tags.OriginWidget, widget);
 	}
 }

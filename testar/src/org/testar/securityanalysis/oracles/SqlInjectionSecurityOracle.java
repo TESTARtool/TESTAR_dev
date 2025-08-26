@@ -31,7 +31,7 @@
 package org.testar.securityanalysis.oracles;
 
 import org.openqa.selenium.devtools.DevTools;
-import org.openqa.selenium.devtools.v138.network.Network;
+import org.openqa.selenium.devtools.v139.network.Network;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.WdSecurityInjectionAction;
