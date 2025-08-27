@@ -44,7 +44,7 @@ public class AndroidSystemActionText extends TaggableBase implements Action {
     public AndroidSystemActionText(State state, Widget widget) {
         this.widget = widget;
         this.set(Tags.Role, AndroidRoles.AndroidWidget);
-        this.mapActionToWidget(widget);
+        this.mapOriginWidget(widget);
         this.set(Tags.Desc, toShortString());
     }
 
