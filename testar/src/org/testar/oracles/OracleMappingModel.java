@@ -81,6 +81,7 @@ public class OracleMappingModel {
             Map.entry("link", Set.of("visible", "clickable", "focused", "onscreen", "offscreen")),
             Map.entry("alert", Set.of("visible", "focused", "onscreen", "offscreen")),
             Map.entry("panel", Set.of("visible", "focused", "empty", "onscreen", "offscreen")),
+            Map.entry("table", Set.of("visible", "focused", "empty", "onscreen", "offscreen")),
             Map.entry("table_data", Set.of("visible", "focused", "empty", "onscreen", "offscreen")),
             Map.entry("menu", Set.of("visible", "enabled", "focused", "clickable", "empty", "onscreen", "offscreen")),
             Map.entry("menu_item", Set.of("visible", "enabled", "focused", "clickable", "empty", "onscreen", "offscreen")),
@@ -150,6 +151,9 @@ public class OracleMappingModel {
                     rm(WdRoles.WdFIELDSET), rm(WdRoles.WdASIDE), rm(WdRoles.WdMAIN),
                     rm(WdRoles.WdHEADER), rm(WdRoles.WdFOOTER)
                     )),
+            Map.entry("table", List.of(
+                    rm(WdRoles.WdTABLE)
+                    )),
             Map.entry("table_data", List.of(
                     rm(WdRoles.WdTH), rm(WdRoles.WdTD)
                     )),
@@ -180,6 +184,7 @@ public class OracleMappingModel {
             Map.entry("image", List.of(WdTags.WebAlt, WdTags.WebSrc, Tags.Desc, WdTags.WebTitle)),
             Map.entry("link", List.of(Tags.Title, WdTags.WebHref, WdTags.WebTextContent)),
             Map.entry("label", List.of(Tags.Title, WdTags.WebTextContent)),
+            Map.entry("table", List.of(Tags.Title, WdTags.WebId, WdTags.WebTextContent)),
             Map.entry("table_data", List.of(Tags.Title, WdTags.WebTextContent)),
             Map.entry("panel", List.of(Tags.Title, WdTags.WebId, WdTags.WebTextContent)),
             Map.entry("menu", List.of(Tags.Title, WdTags.WebTextContent)),
@@ -214,6 +219,7 @@ public class OracleMappingModel {
             Map.entry("role", List.of(Tags.Role)),
             Map.entry("placeholder", List.of(WdTags.WebPlaceholder)),
             Map.entry("text", List.of(WdTags.WebTextContent, WdTags.WebValue, Tags.Title)),
+            Map.entry("headerText", List.of(DSLTags.DSLTableHeaderText)),
             Map.entry("tooltip", List.of(Tags.Desc, WdTags.WebTextContent)),
             Map.entry("fontsize", List.of(WdTags.WebComputedFontSize)),
             Map.entry("color", List.of(WdTags.WebComputedColor)),

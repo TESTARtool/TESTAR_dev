@@ -169,4 +169,31 @@ public class TBuis_oracles {
        }
      }
    
+   public static class TaughtSubjectsTableMustContainTheSubjectTeacherSOrder$1219 implements Oracle {
+       /*
+        assert table "mySubjects".headerText contains "Subject Teacher(s)" "Taught Subjects table must contain the Subject Teacher(s) order".
+       */
+     
+       @Override
+       public void initialize() { }
+     
+       @Override
+       public String getMessage() {
+         return "Taught Subjects table must contain the Subject Teacher(s) order";
+       }
+     
+       @Override
+       public Verdict getVerdict(State state) {
+          Verdict verdict = Verdict.OK;
+          Widget widget$1159$18 = getWidget("table", "mySubjects", state);
+          if (widget$1159$18 == null) {
+            return Verdict.OK;
+          }
+          Object widget$1159$29 = getProperty(widget$1159$18, "headerText");
+          boolean cond$1189 = evaluateContains(widget$1159$29, "Subject Teacher(s)");
+          if (!cond$1189) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$1159$18)); }
+          return verdict;
+       }
+     }
+   
 }

@@ -37,6 +37,8 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.webdriver.enums.WdRoles;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
 
 public interface OracleWidgetsMapping {
 
@@ -93,6 +95,8 @@ public interface OracleWidgetsMapping {
 				}
 			} else if (tag.name().equals(Tags.WidgetChildren.name())) {
 				return getWidgetChildren(w);
+			} else if (tag.name().equals(DSLTags.DSLTableHeaderText.name())) {
+			    return getTableHeaderText(w);
 			} else if (value != null) {
 				return value;
 			}
@@ -298,7 +302,54 @@ public interface OracleWidgetsMapping {
 		}
 		return children;
 	}
-	
+
+	/** Helper methods to extract header text of tables **/
+	private String getTableHeaderText(Widget w) {
+	    if (!WdRoles.WdTABLE.equals(w.get(Tags.Role, Roles.Widget))) return "";
+	    return extractAllHeaderTextFromTable(w);
+	}
+
+	private String extractAllHeaderTextFromTable(Widget table) {
+	    StringBuilder headers = new StringBuilder();
+	    collectHeaderText(table, table, headers);
+	    return headers.toString().replaceAll("\\s+", " ").trim();
+	}
+
+	private void collectHeaderText(Widget node, Widget tableRoot, StringBuilder out) {
+	    Role role = node.get(Tags.Role, Roles.Widget);
+
+	    // If we encounter a table that is not the root, skip its entire subtree
+	    if (node != tableRoot && WdRoles.WdTABLE.equals(role)) {
+	        return;
+	    }
+
+	    // If this node is a header cell, collect all of its text
+	    if (WdRoles.WdTH.equals(role)) {
+	        String text = obtainHeaderTextDescription(node).trim();
+	        if (!text.isEmpty()) {
+	            if (out.length() > 0) out.append(' ');
+	            out.append(text);
+	        }
+	    }
+
+	    // Recurse into children
+	    for (int i = 0; i < node.childCount(); i++) {
+	        collectHeaderText(node.child(i), tableRoot, out);
+	    }
+	}
+
+	private String obtainHeaderTextDescription(Widget w) {
+	    String headerText = w.get(WdTags.WebTextContent, "").trim();
+	    for (int i = 0; i < w.childCount(); i++) {
+	        String childText = obtainHeaderTextDescription(w.child(i)).trim();
+	        if (!childText.isEmpty()) {
+	            if (!headerText.isEmpty()) headerText += " ";
+	            headerText += childText;
+	        }
+	    }
+	    return headerText;
+	}
+
 	default List<Widget> runWidgetSelector(State state, String roleString, String rawString)
 	{
 		List<Tag<?>> tagPrioList  = OracleMappingModel.getSelectorTags(roleString);
