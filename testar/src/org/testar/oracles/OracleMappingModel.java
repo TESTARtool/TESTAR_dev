@@ -171,7 +171,7 @@ public class OracleMappingModel {
             Map.entry("button", List.of(Tags.Title, WdTags.WebTextContent, WdTags.WebValue)),
             Map.entry("input_text", List.of(Tags.Title, WdTags.WebName, WdTags.WebPlaceholder)),
             Map.entry("input_numeric", List.of(Tags.Title, WdTags.WebName, WdTags.WebPlaceholder)),
-            Map.entry("static_text", List.of(Tags.Title, WdTags.WebTextContent)),
+            Map.entry("static_text", List.of(Tags.Title, WdTags.WebTextContent, WdTags.WebId)),
             Map.entry("alert", List.of(Tags.Title)),
             Map.entry("dropdown", List.of(Tags.Title, WdTags.WebTextContent)),
             Map.entry("checkbox", List.of(Tags.Title)),

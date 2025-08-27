@@ -141,5 +141,32 @@ public class TBuis_oracles {
         return verdict;
      }
    }
+   
+   public static class StudentViewTitleMustContainStudentSViewText$795 implements Oracle {
+       /*
+        assert static_text "stu.view.title".text contains "Student's View" "Student view title must contain Student's View text".
+       */
      
+       @Override
+       public void initialize() { }
+     
+       @Override
+       public String getMessage() {
+         return "Student view title must contain Student's View text";
+       }
+     
+       @Override
+       public Verdict getVerdict(State state) {
+          Verdict verdict = Verdict.OK;
+          Widget widget$735$28 = getWidget("static_text", "stu.view.title", state);
+          if (widget$735$28 == null) {
+            return Verdict.OK;
+          }
+          Object widget$735$33 = getProperty(widget$735$28, "text");
+          boolean cond$769 = evaluateContains(widget$735$33, "Student's View");
+          if (!cond$769) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$735$28)); }
+          return verdict;
+       }
+     }
+   
 }
