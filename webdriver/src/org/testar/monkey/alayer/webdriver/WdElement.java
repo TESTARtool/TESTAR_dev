@@ -35,6 +35,7 @@ import org.testar.monkey.alayer.Rect;
 import org.testar.monkey.alayer.Role;
 import org.testar.monkey.alayer.TaggableBase;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
+import org.testar.webdriver.utils.ColorUtils;
 
 import java.awt.Color;
 import java.io.*;
@@ -94,6 +95,7 @@ public class WdElement extends TaggableBase implements Serializable {
   // ComputedStyle properties
   String computedFontSize;
   Color computedColor, computedBackgroundColor;
+  String computedColorName, computedBackgroundColorName;
 
   // Keep these here for fillScrollValues
   protected String overflowX, overflowY;
@@ -185,8 +187,10 @@ public class WdElement extends TaggableBase implements Serializable {
     }
     display = (String) packedElement.get("display");
     computedFontSize = (String) packedElement.getOrDefault("computedFontSize", "");
-    computedColor = rgbToColor((String) packedElement.getOrDefault("computedColor", ""));
-    computedBackgroundColor = rgbToColor((String) packedElement.getOrDefault("computedBackgroundColor", ""));
+    computedColor = ColorUtils.rgbToColor((String) packedElement.getOrDefault("computedColor", ""));
+    computedBackgroundColor = ColorUtils.rgbToColor((String) packedElement.getOrDefault("computedBackgroundColor", ""));
+    computedColorName = ColorUtils.colorToName(computedColor);
+    computedBackgroundColorName = ColorUtils.colorToName(computedBackgroundColor);
 
     styleOpacity = castObjectToDouble(packedElement.get("styleOpacity"),1.0);
 
@@ -440,51 +444,6 @@ public class WdElement extends TaggableBase implements Serializable {
           val = ((Number) o).doubleValue();
       }
       return val;
-  }
-
-  /**
-   * Converts an "rgb(r, g, b)" string to a Color object.
-   */
-  public Color rgbToColor(String input) {
-	  if (input == null || input.trim().isEmpty()) {
-		  return null;
-	  }
-
-	  Pattern pattern = Pattern.compile(
-			  "rgba?\\s*\\(\\s*(\\d{1,3})\\s*,\\s*(\\d{1,3})\\s*,\\s*(\\d{1,3})" +
-					  "(?:\\s*,\\s*(\\d*(?:\\.\\d+)?))?\\s*\\)",
-					  Pattern.CASE_INSENSITIVE
-			  );
-	  Matcher matcher = pattern.matcher(input.trim());
-
-	  if (!matcher.matches()) {
-		  return null;
-	  }
-
-	  try {
-		  int r = Integer.parseInt(matcher.group(1));
-		  int g = Integer.parseInt(matcher.group(2));
-		  int b = Integer.parseInt(matcher.group(3));
-
-		  if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255) {
-			  return null;
-		  }
-
-		  String alphaGroup = matcher.group(4);
-		  int a = 255; // default opaque
-
-		  if (alphaGroup != null && !alphaGroup.isEmpty()) {
-			  float alphaFloat = Float.parseFloat(alphaGroup);
-			  if (alphaFloat < 0f || alphaFloat > 1f) {
-				  return null;
-			  }
-			  a = Math.round(alphaFloat * 255);
-		  }
-
-		  return new Color(r, g, b, a);
-	  } catch (NumberFormatException e) {
-		  return null;
-	  }
   }
 
 }

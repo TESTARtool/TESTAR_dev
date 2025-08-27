@@ -318,6 +318,12 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(WdTags.WebComputedBackgroundColor)) {
 			ret = w.element.computedBackgroundColor;
 		}
+		else if (t.equals(WdTags.WebComputedColorName)) {
+		    ret = w.element.computedColorName;
+		}
+		else if (t.equals(WdTags.WebComputedBackgroundColorName)) {
+		    ret = w.element.computedBackgroundColorName;
+		}
 		else if (t.equals(WdTags.WebType)) {
 			ret = w.element.type;
 		}

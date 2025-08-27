@@ -184,11 +184,13 @@ public class WdTags extends TagsBase {
    * Web computed color of a widget.
    */
   public static final Tag<Color> WebComputedColor = from("WebComputedColor", Color.class);
+  public static final Tag<String> WebComputedColorName = from("WebComputedColorName", String.class);
 
   /**
    * Web computed backgroundColor of a widget.
    */
   public static final Tag<Color> WebComputedBackgroundColor = from("WebComputedBackgroundColor", Color.class);
+  public static final Tag<String> WebComputedBackgroundColorName = from("WebComputedBackgroundColorName", String.class);
 
   /**
    * Web type of input of a widget.
