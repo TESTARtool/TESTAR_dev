@@ -217,7 +217,9 @@ public class OracleMappingModel {
             Map.entry("tooltip", List.of(Tags.Desc, WdTags.WebTextContent)),
             Map.entry("fontsize", List.of(WdTags.WebComputedFontSize)),
             Map.entry("color", List.of(WdTags.WebComputedColor)),
+            Map.entry("colorName", List.of(WdTags.WebComputedColorName)),
             Map.entry("backgroundColor", List.of(WdTags.WebComputedBackgroundColor)),
+            Map.entry("backgroundColorName", List.of(WdTags.WebComputedBackgroundColorName)),
             Map.entry("length", List.of(WdTags.WebLength)),
             Map.entry("title", List.of(WdTags.WebAriaLabel, WdTags.WebAriaLabelledBy, Tags.Title)),
             Map.entry("children", List.of(Tags.WidgetChildren)) // This Tag is null but used for DSL mapping

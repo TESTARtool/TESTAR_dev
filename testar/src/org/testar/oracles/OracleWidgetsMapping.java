@@ -58,6 +58,7 @@ public interface OracleWidgetsMapping {
 	default Widget getWidget(String elementType, String selector, State state) {
 		List<Tag<?>> tagPriority = OracleMappingModel.getSelectorTags(elementType);
 
+		// First do an exact equals search
 		for (Widget w : getWidgets(elementType, state)) {
 			for (Tag<?> tag : tagPriority) {
 				Object tagValue = w.get(tag, null);
@@ -66,6 +67,17 @@ public interface OracleWidgetsMapping {
 				}
 			}
 		}
+
+		// If an exact search does not match, make an approximation search
+		for (Widget w : getWidgets(elementType, state)) {
+			for (Tag<?> tag : tagPriority) {
+				Object tagValue = w.get(tag, null);
+				if (tagValue instanceof String && ((String) tagValue).contains(selector)) {
+					return w;
+				}
+			}
+		}
+
 		return null;
 	}
 
