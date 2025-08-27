@@ -196,4 +196,32 @@ public class TBuis_oracles {
        }
      }
    
+   public static class EnrolledSubjectsTableRowsMustContainFiveDataElements$1443 implements Oracle {
+       /*
+        assert table_row "enrolledTable.subjectRow".data_elements.length is equal to 5 "Enrolled Subjects table rows must contain five data elements".
+       */
+     
+       @Override
+       public void initialize() { }
+     
+       @Override
+       public String getMessage() {
+         return "Enrolled Subjects table rows must contain five data elements";
+       }
+     
+       @Override
+       public Verdict getVerdict(State state) {
+          Verdict verdict = Verdict.OK;
+          Widget widget$1371$36 = getWidget("table_row", "enrolledTable.subjectRow", state);
+          if (widget$1371$36 == null) {
+            return Verdict.OK;
+          }
+          Object widget$1371$50 = getProperty(widget$1371$36, "data_elements");
+          Object widget$1371$57 = getProperty(widget$1371$50, "length");
+          boolean cond$1429 = evaluateIsEqualTo(widget$1371$57, 5);
+          if (!cond$1429) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$1371$36)); }
+          return verdict;
+       }
+     }
+   
 }

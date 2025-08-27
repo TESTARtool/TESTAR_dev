@@ -105,6 +105,14 @@ public interface OracleWidgetsMapping {
 		return new Object();
 	}
 
+	default Object getProperty(Object obj, String property) {
+	    if (property.equals("length") && obj instanceof List<?> && !((List<?>)obj).isEmpty()) {
+	        return ((List<?>)obj).size();
+	    }
+
+	    return null;
+	}
+
 	default Boolean evaluateAreStatus(List<Object> listObj, String status) {
 		if (listObj == null || listObj.isEmpty()) return false;
 

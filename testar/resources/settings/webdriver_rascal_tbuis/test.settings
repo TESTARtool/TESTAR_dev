@@ -171,7 +171,7 @@ ProtocolSpecificSetting_5 =
 #################################################################
 
 ExtendedOracles =
-ExternalOracles = EnrollButtonMustBeAToneOfBlue$202,LoginButtonMustBeAToneOfBlue$103,ParticipantsButtonMustBeAToneOfBlue$605,UnregisterButtonMustBeExactlyRedCrimson$414,UpdateButtonMustBeAToneOfGreen$303,StudentViewTitleMustContainStudentSViewText$795,TaughtSubjectsTableMustContainTheSubjectTeacherSOrder$1219
+ExternalOracles = EnrollButtonMustBeAToneOfBlue$202,LoginButtonMustBeAToneOfBlue$103,ParticipantsButtonMustBeAToneOfBlue$605,UnregisterButtonMustBeExactlyRedCrimson$414,UpdateButtonMustBeAToneOfGreen$303,StudentViewTitleMustContainStudentSViewText$795,TaughtSubjectsTableMustContainTheSubjectTeacherSOrder$1219,EnrolledSubjectsTableRowsMustContainFiveDataElements$1443
 
 #################################################################
 # Specify the widget attributes that you wish to visualize during Spy Mode. Use a semicolon separated list.

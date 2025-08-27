@@ -82,6 +82,7 @@ public class OracleMappingModel {
             Map.entry("alert", Set.of("visible", "focused", "onscreen", "offscreen")),
             Map.entry("panel", Set.of("visible", "focused", "empty", "onscreen", "offscreen")),
             Map.entry("table", Set.of("visible", "focused", "empty", "onscreen", "offscreen")),
+            Map.entry("table_row", Set.of("visible", "focused", "empty", "onscreen", "offscreen")),
             Map.entry("table_data", Set.of("visible", "focused", "empty", "onscreen", "offscreen")),
             Map.entry("menu", Set.of("visible", "enabled", "focused", "clickable", "empty", "onscreen", "offscreen")),
             Map.entry("menu_item", Set.of("visible", "enabled", "focused", "clickable", "empty", "onscreen", "offscreen")),
@@ -154,6 +155,9 @@ public class OracleMappingModel {
             Map.entry("table", List.of(
                     rm(WdRoles.WdTABLE)
                     )),
+            Map.entry("table_row", List.of(
+                    rm(WdRoles.WdTR)
+                    )),
             Map.entry("table_data", List.of(
                     rm(WdRoles.WdTH), rm(WdRoles.WdTD)
                     )),
@@ -185,6 +189,7 @@ public class OracleMappingModel {
             Map.entry("link", List.of(Tags.Title, WdTags.WebHref, WdTags.WebTextContent)),
             Map.entry("label", List.of(Tags.Title, WdTags.WebTextContent)),
             Map.entry("table", List.of(Tags.Title, WdTags.WebId, WdTags.WebTextContent)),
+            Map.entry("table_row", List.of(Tags.Title, WdTags.WebId, WdTags.WebTextContent)),
             Map.entry("table_data", List.of(Tags.Title, WdTags.WebTextContent)),
             Map.entry("panel", List.of(Tags.Title, WdTags.WebId, WdTags.WebTextContent)),
             Map.entry("menu", List.of(Tags.Title, WdTags.WebTextContent)),
@@ -228,7 +233,8 @@ public class OracleMappingModel {
             Map.entry("backgroundColorName", List.of(WdTags.WebComputedBackgroundColorName)),
             Map.entry("length", List.of(WdTags.WebLength)),
             Map.entry("title", List.of(WdTags.WebAriaLabel, WdTags.WebAriaLabelledBy, Tags.Title)),
-            Map.entry("children", List.of(Tags.WidgetChildren)) // This Tag is null but used for DSL mapping
+            Map.entry("children", List.of(Tags.WidgetChildren)), // This Tag is null but used for DSL mapping
+            Map.entry("data_elements", List.of(Tags.WidgetChildren)) // This Tag is null but used for DSL mapping
             );
 
     public static RoleMatcher rm(Role role) {
