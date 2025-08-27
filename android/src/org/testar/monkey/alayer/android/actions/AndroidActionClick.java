@@ -49,7 +49,7 @@ public class AndroidActionClick extends TaggableBase implements Action {
 
 	public AndroidActionClick(State state, Widget w, String text, String accessibilityID, String className) {
 	    this.set(Tags.Role, ActionRoles.LeftClickAt);
-	    this.mapActionToWidget(w);
+	    this.mapOriginWidget(w);
 	    this.text = text;
 	    this.accessibilityID = accessibilityID;
 	    this.widget = w;

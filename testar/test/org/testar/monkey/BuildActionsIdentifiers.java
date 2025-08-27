@@ -58,9 +58,6 @@ public class BuildActionsIdentifiers {
 		// Verify Action <-> Widget mapping
 		Assert.notNull(leftClickAction.get(Tags.OriginWidget));
 		Assert.isTrue(leftClickAction.get(Tags.OriginWidget).get(Tags.Path).equals(pathTest));
-		Assert.notNull(widget.get(Tags.ActionSet));
-		Assert.isTrue(widget.get(Tags.ActionSet).size() == 1);
-		Assert.isTrue(widget.get(Tags.ActionSet).iterator().next().get(Tags.Desc, "").contains("Left"));
 		// Then build the action identifiers
 		defaultProtocol.buildStateActionsIdentifiers(state, new HashSet<>(Collections.singletonList(leftClickAction)));
 		// To check that Action identifiers were built
@@ -75,9 +72,6 @@ public class BuildActionsIdentifiers {
 		// Verify Action <-> Widget mapping
 		Assert.notNull(rightClickAction.get(Tags.OriginWidget));
 		Assert.isTrue(rightClickAction.get(Tags.OriginWidget).get(Tags.Path).equals(pathTest));
-		Assert.notNull(widget.get(Tags.ActionSet));
-		Assert.isTrue(widget.get(Tags.ActionSet).size() == 1);
-		Assert.isTrue(widget.get(Tags.ActionSet).iterator().next().get(Tags.Desc, "").contains("Right"));
 		// Then build the action identifiers
 		defaultProtocol.buildStateActionsIdentifiers(state, new HashSet<>(Collections.singletonList(rightClickAction)));
 		// To check that Action identifiers were built
@@ -92,9 +86,6 @@ public class BuildActionsIdentifiers {
 		// Verify Action <-> Widget mapping
 		Assert.notNull(leftDoubleClickAction.get(Tags.OriginWidget));
 		Assert.isTrue(leftDoubleClickAction.get(Tags.OriginWidget).get(Tags.Path).equals(pathTest));
-		Assert.notNull(widget.get(Tags.ActionSet));
-		Assert.isTrue(widget.get(Tags.ActionSet).size() == 1);
-		Assert.isTrue(widget.get(Tags.ActionSet).iterator().next().get(Tags.Desc, "").contains("Double-Click"));
 		// Then build the action identifiers
 		defaultProtocol.buildStateActionsIdentifiers(state, new HashSet<>(Collections.singletonList(leftDoubleClickAction)));
 		// To check that Action identifiers were built
@@ -109,9 +100,6 @@ public class BuildActionsIdentifiers {
 		// Verify Action <-> Widget mapping
 		Assert.notNull(dropdownAction.get(Tags.OriginWidget));
 		Assert.isTrue(dropdownAction.get(Tags.OriginWidget).get(Tags.Path).equals(pathTest));
-		Assert.notNull(widget.get(Tags.ActionSet));
-		Assert.isTrue(widget.get(Tags.ActionSet).size() == 1);
-		Assert.isTrue(widget.get(Tags.ActionSet).iterator().next().get(Tags.Desc, "").contains("Dropdown"));
 		// Then build the action identifiers
 		defaultProtocol.buildStateActionsIdentifiers(state, new HashSet<>(Collections.singletonList(dropdownAction)));
 		// To check that Action identifiers were built
@@ -126,9 +114,6 @@ public class BuildActionsIdentifiers {
 		// Verify Action <-> Widget mapping
 		Assert.notNull(dragAction.get(Tags.OriginWidget));
 		Assert.isTrue(dragAction.get(Tags.OriginWidget).get(Tags.Path).equals(pathTest));
-		Assert.notNull(widget.get(Tags.ActionSet));
-		Assert.isTrue(widget.get(Tags.ActionSet).size() == 1);
-		Assert.isTrue(widget.get(Tags.ActionSet).iterator().next().get(Tags.Desc, "").contains("Drag"));
 		// Then build the action identifiers
 		defaultProtocol.buildStateActionsIdentifiers(state, new HashSet<>(Collections.singletonList(dragAction)));
 		// To check that Action identifiers were built
@@ -143,9 +128,6 @@ public class BuildActionsIdentifiers {
 		// Verify Action <-> Widget mapping
 		Assert.notNull(slideAction.get(Tags.OriginWidget));
 		Assert.isTrue(slideAction.get(Tags.OriginWidget).get(Tags.Path).equals(pathTest));
-		Assert.notNull(widget.get(Tags.ActionSet));
-		Assert.isTrue(widget.get(Tags.ActionSet).size() == 1);
-		Assert.isTrue(widget.get(Tags.ActionSet).iterator().next().get(Tags.Desc, "").contains("Drag"));
 		// Then build the action identifiers
 		defaultProtocol.buildStateActionsIdentifiers(state, new HashSet<>(Collections.singletonList(slideAction)));
 		// To check that Action identifiers were built
@@ -160,9 +142,6 @@ public class BuildActionsIdentifiers {
 		// Verify Action <-> Widget mapping
 		Assert.notNull(clickTypeAction.get(Tags.OriginWidget));
 		Assert.isTrue(clickTypeAction.get(Tags.OriginWidget).get(Tags.Path).equals(pathTest));
-		Assert.notNull(widget.get(Tags.ActionSet));
-		Assert.isTrue(widget.get(Tags.ActionSet).size() == 1);
-		Assert.isTrue(widget.get(Tags.ActionSet).iterator().next().get(Tags.Desc, "").contains("Type"));
 		// Then build the action identifiers
 		defaultProtocol.buildStateActionsIdentifiers(state, new HashSet<>(Collections.singletonList(clickTypeAction)));
 		// To check that Action identifiers were built
@@ -177,9 +156,6 @@ public class BuildActionsIdentifiers {
 		// Verify Action <-> Widget mapping
 		Assert.notNull(clickTypeReplaceAction.get(Tags.OriginWidget));
 		Assert.isTrue(clickTypeReplaceAction.get(Tags.OriginWidget).get(Tags.Path).equals(pathTest));
-		Assert.notNull(widget.get(Tags.ActionSet));
-		Assert.isTrue(widget.get(Tags.ActionSet).size() == 1);
-		Assert.isTrue(widget.get(Tags.ActionSet).iterator().next().get(Tags.Desc, "").contains("Type"));
 		// Then build the action identifiers
 		defaultProtocol.buildStateActionsIdentifiers(state, new HashSet<>(Collections.singletonList(clickTypeReplaceAction)));
 		// To check that Action identifiers were built
@@ -194,9 +170,6 @@ public class BuildActionsIdentifiers {
 		// Verify Action <-> Widget mapping
 		Assert.notNull(pasteAction.get(Tags.OriginWidget));
 		Assert.isTrue(pasteAction.get(Tags.OriginWidget).get(Tags.Path).equals(pathTest));
-		Assert.notNull(widget.get(Tags.ActionSet));
-		Assert.isTrue(widget.get(Tags.ActionSet).size() == 1);
-		Assert.isTrue(widget.get(Tags.ActionSet).iterator().next().get(Tags.Desc, "").contains("Paste Text"));
 		// Then build the action identifiers
 		defaultProtocol.buildStateActionsIdentifiers(state, new HashSet<>(Collections.singletonList(pasteAction)));
 		// To check that Action identifiers were built
@@ -211,9 +184,6 @@ public class BuildActionsIdentifiers {
 		// Verify Action <-> Widget mapping
 		Assert.notNull(pasteReplaceAction.get(Tags.OriginWidget));
 		Assert.isTrue(pasteReplaceAction.get(Tags.OriginWidget).get(Tags.Path).equals(pathTest));
-		Assert.notNull(widget.get(Tags.ActionSet));
-		Assert.isTrue(widget.get(Tags.ActionSet).size() == 1);
-		Assert.isTrue(widget.get(Tags.ActionSet).iterator().next().get(Tags.Desc, "").contains("Paste Text"));
 		// Then build the action identifiers
 		defaultProtocol.buildStateActionsIdentifiers(state, new HashSet<>(Collections.singletonList(pasteReplaceAction)));
 		// To check that Action identifiers were built
@@ -227,10 +197,6 @@ public class BuildActionsIdentifiers {
 		Action NOPAction = ac.noOperationalState(state);
 		// Verify Action <-> Widget mapping
 		Assert.notNull(NOPAction.get(Tags.OriginWidget));
-		Assert.notNull(state.get(Tags.ActionSet));
-		Assert.isTrue(state.get(Tags.ActionSet).size() == 1);
-		Assert.notNull(state.get(Tags.ActionSet).iterator().next().get(Tags.Desc));
-		Assert.isTrue(state.get(Tags.ActionSet).iterator().next().get(Tags.Desc, "").contains("No Operation"));
 		// Then build the action identifiers
 		defaultProtocol.buildStateActionsIdentifiers(state, new HashSet<>(Collections.singletonList(NOPAction)));
 		// To check that Action identifiers were built

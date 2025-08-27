@@ -38,12 +38,12 @@ public class Connection {
     /**
      * A configuration object
      */
-    private Config config;
+    private final Config config;
 
     /**
      * The orientDB instance that provides access to the orientdb data store
      */
-    private OrientDB orientDB;
+    private final OrientDB orientDB;
 
     public Connection(OrientDB orientDB, Config config) {
         this.orientDB = orientDB;

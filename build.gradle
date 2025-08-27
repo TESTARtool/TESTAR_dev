@@ -33,11 +33,11 @@ subprojects {
         implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.15.0'
         implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.15.0'
         // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
-        implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.34.0'
+        implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.35.0'
         // https://mvnrepository.com/artifact/io.github.bonigarcia/webdrivermanager
-        implementation group: 'io.github.bonigarcia', name: 'webdrivermanager', version: '6.1.0'
+        implementation group: 'io.github.bonigarcia', name: 'webdrivermanager', version: '6.2.0'
         // https://mvnrepository.com/artifact/io.appium/java-client
-        implementation group: 'io.appium', name: 'java-client', version: '9.5.0'
+        implementation group: 'io.appium', name: 'java-client', version: '10.0.0'
         // https://mvnrepository.com/artifact/com.orientechnologies/orientdb-graphdb
         implementation group: 'com.orientechnologies', name: 'orientdb-graphdb', version: '3.2.38'
         // https://mvnrepository.com/artifact/org.graalvm.sdk/graal-sdk

@@ -59,7 +59,7 @@ import java.util.stream.Collectors;
 public class EntityManager {
 
     // the connection object holding the datastore instance and the connection configuration information
-    private Connection connection;
+    private final Connection connection;
 
     /**
      * Constructor
@@ -108,23 +108,6 @@ public class EntityManager {
                 }
             }
         }
-    }
-
-    /**
-     * Method returns true if the vertex is already present in the data store.
-     * @param vertexEntity
-     * @param db
-     * @return
-     */
-    private boolean vertexExists(VertexEntity vertexEntity, ODatabaseSession db) {
-        boolean hasVertex = true;
-        try {
-            retrieveVertex(vertexEntity, db);
-        }
-        catch (EntityNotFoundException e) {
-            hasVertex = false;
-        }
-        return hasVertex;
     }
 
     /**

@@ -58,7 +58,7 @@ public class WdFillFormAction extends TaggableBase implements Action {
         // The desc of the form filling action will be updated with filename later:
         this.set(Tags.Desc, "Fill a form based on XML file.");
         formFillingAction = fillForm(ac, widget);
-        this.mapActionToWidget(widget);
+        this.mapOriginWidget(widget);
     }
 
     public boolean isHiddenForm() {
@@ -206,7 +206,7 @@ public class WdFillFormAction extends TaggableBase implements Action {
             hidden = true;
         }
         logger.debug("Setting OriginWidget for the form action");
-        formAction.mapActionToWidget(widget);
+        formAction.mapOriginWidget(widget);
         return formAction;
     }
 

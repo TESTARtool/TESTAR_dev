@@ -44,7 +44,7 @@ public class AndroidBackAction extends TaggableBase implements Action {
     public AndroidBackAction(State state, Widget widget) {
         this.widget = widget;
         this.set(Tags.Role, AndroidRoles.AndroidWidget);
-        this.mapActionToWidget(widget);
+        this.mapOriginWidget(widget);
         this.set(Tags.Desc, toShortString());
     }
 
