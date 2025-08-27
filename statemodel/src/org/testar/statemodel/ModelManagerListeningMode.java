@@ -9,7 +9,6 @@ import java.util.StringJoiner;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Tags;
 import org.testar.statemodel.actionselector.ActionSelector;
 import org.testar.statemodel.exceptions.ActionNotFoundException;
@@ -27,8 +26,8 @@ public class ModelManagerListeningMode extends ModelManager implements StateMode
 	 * @param actionSelector
 	 */
 	public ModelManagerListeningMode(AbstractStateModel abstractStateModel, ActionSelector actionSelector, PersistenceManager persistenceManager,
-			Set<Tag<?>> concreteStateTags, SequenceManager sequenceManager, boolean storeWidgets) {
-		super(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
+			SequenceManager sequenceManager, boolean storeWidgets) {
+		super(abstractStateModel, actionSelector, persistenceManager, sequenceManager, storeWidgets);
 	}
 
 	/**
@@ -100,7 +99,7 @@ public class ModelManagerListeningMode extends ModelManager implements StateMode
 		currentAbstractState = newAbstractState;
 
 		// and then we store the concrete state and possibly the action
-		ConcreteState newConcreteState = ConcreteStateFactory.createConcreteState(newState, concreteStateTags, newAbstractState, storeWidgets);
+		ConcreteState newConcreteState = ConcreteStateFactory.createConcreteState(newState, newAbstractState, storeWidgets);
 		persistenceManager.persistConcreteState(newConcreteState);
 
 		ConcreteStateTransition concreteStateTransition = new ConcreteStateTransition(currentConcreteState, newConcreteState, concreteActionUnderExecution);

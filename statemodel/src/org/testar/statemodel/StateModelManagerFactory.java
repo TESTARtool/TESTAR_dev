@@ -100,7 +100,7 @@ public class StateModelManagerFactory {
             // should we store widgets?
             boolean storeWidgets = configTags.get(StateModelTags.StateModelStoreWidgets);
 
-            return new ModelManagerListeningMode(abstractStateModelListener, actionSelector, persistenceManager, concreteStateTags, sequenceManager, storeWidgets);
+            return new ModelManagerListeningMode(abstractStateModelListener, actionSelector, persistenceManager, sequenceManager, storeWidgets);
 
         }
 
