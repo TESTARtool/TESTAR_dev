@@ -64,7 +64,7 @@ public class OracleMappingModel {
     }
 
     public static List<Tag<?>> getAttributeTags(String attribute) {
-        return attributeTags .getOrDefault(attribute, List.of());
+        return attributeTags.getOrDefault(attribute, List.of());
     }
 
     private static final Map<String, Set<String>> validStatusPerElement = Map.ofEntries(
@@ -121,7 +121,7 @@ public class OracleMappingModel {
                     rm(WdRoles.WdH5), rm(WdRoles.WdH6), rm(WdRoles.WdDIV),
                     rm(WdRoles.WdSECTION), rm(WdRoles.WdARTICLE), rm(WdRoles.WdFIELDSET),
                     rm(WdRoles.WdASIDE), rm(WdRoles.WdMAIN), rm(WdRoles.WdHEADER),
-                    rm(WdRoles.WdFOOTER), rm(WdRoles.WdFIGCAPTION)
+                    rm(WdRoles.WdFOOTER), rm(WdRoles.WdFIGCAPTION), rm(WdRoles.WdSMALL)
                     )),
             Map.entry("alert", List.of(
                     rm(Roles.Widget)
@@ -181,7 +181,7 @@ public class OracleMappingModel {
             Map.entry("input_numeric", List.of(Tags.Title, WdTags.WebName, WdTags.WebPlaceholder)),
             Map.entry("static_text", List.of(Tags.Title, WdTags.WebTextContent, WdTags.WebId)),
             Map.entry("alert", List.of(Tags.Title)),
-            Map.entry("dropdown", List.of(Tags.Title, WdTags.WebTextContent)),
+            Map.entry("dropdown", List.of(Tags.Title, WdTags.WebTitle, WdTags.WebTextContent)),
             Map.entry("checkbox", List.of(Tags.Title)),
             Map.entry("radiogroup", List.of(Tags.Title, WdTags.WebName)),
             Map.entry("radio", List.of(Tags.Title)),
@@ -223,7 +223,7 @@ public class OracleMappingModel {
             Map.entry("alttext", List.of(WdTags.WebAlt)),
             Map.entry("role", List.of(Tags.Role)),
             Map.entry("placeholder", List.of(WdTags.WebPlaceholder)),
-            Map.entry("text", List.of(WdTags.WebTextContent, WdTags.WebValue, Tags.Title)),
+            Map.entry("text", List.of(WdTags.WebTextContent, WdTags.WebInnerText, WdTags.WebValue, Tags.Title)),
             Map.entry("headerText", List.of(DSLTags.DSLTableHeaderText)),
             Map.entry("tooltip", List.of(Tags.Desc, WdTags.WebTextContent)),
             Map.entry("fontsize", List.of(WdTags.WebComputedFontSize)),

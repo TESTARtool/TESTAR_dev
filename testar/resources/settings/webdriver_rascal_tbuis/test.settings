@@ -171,8 +171,7 @@ ProtocolSpecificSetting_5 =
 #################################################################
 
 ExtendedOracles =
-ExternalOracles = EnrollButtonMustBeAToneOfBlue$202,LoginButtonMustBeAToneOfBlue$103,ParticipantsButtonMustBeAToneOfBlue$605,UnregisterButtonMustBeExactlyRedCrimson$414,UpdateButtonMustBeAToneOfGreen$303,StudentViewTitleMustContainStudentSViewText$795,TaughtSubjectsTableMustContainTheSubjectTeacherSOrder$1219,EnrolledSubjectsTableRowsMustContainFiveDataElements$1443
-
+ExternalOracles = AllExamDateRowsMustContainADateAndTime$5049,EnrollButtonMustBeAToneOfBlue$202,EnrolledSubjectsTableRowsMustContainFiveDataElements$5929,GradeDropdownMustContainALetterGrade$3984,LoginButtonMustBeAToneOfBlue$103,OtherAvailableSubjectsTableMustContainTheTeacherSColumn$5640,ParticipantsButtonMustBeAToneOfBlue$605,ParticipantsButtonMustNotContainANegativeNumber$5359,StudentsMustBeEnrolledToSubjectsThatMustContainFiveDataElements$7425,StudentViewTitleMustContainStudentSViewText$861,TableDataMustNeverContainsTheInvalid2100Date$4663,TableDataMustNeverContainTheNonameText$2432,TaughtSubjectsTableMustContainTheSubjectTeacherSOrder$2007,TeachersListRowsMustContainThreeDataElements$8371,TeachersMustTaughtSubjectsThatMustContainSixDataElements$7907,TotalCreditsTextMustNotContainTwentyCredits$1309,UnregisterButtonMustBeExactlyRedCrimson$414,UpdateButtonMustBeAToneOfGreen$303
 #################################################################
 # Specify the widget attributes that you wish to visualize during Spy Mode. Use a semicolon separated list.
 #################################################################
