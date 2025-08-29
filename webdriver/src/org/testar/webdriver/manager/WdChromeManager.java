@@ -106,6 +106,7 @@ public class WdChromeManager implements WdBrowserManager {
 
 		Map<String, Object> prefs = new HashMap<>();
 		prefs.put("profile.default_content_setting_values.notifications", 1);
+		prefs.put("profile.password_manager_leak_detection", false);
 		options.setExperimentalOption("prefs", prefs);
 
 		return new ChromeDriver(options);

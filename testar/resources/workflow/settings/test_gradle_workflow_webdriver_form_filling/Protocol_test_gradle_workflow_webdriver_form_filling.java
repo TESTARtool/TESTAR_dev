@@ -59,6 +59,12 @@ import java.util.zip.GZIPInputStream;
 public class Protocol_test_gradle_workflow_webdriver_form_filling extends WebdriverProtocol {
 
 	@Override
+	protected Verdict getVerdict(State state) {
+		// For custom CI testing purposes, force these generated sequences be OK
+		return Verdict.OK;
+	}
+
+	@Override
 	protected Set<Action> deriveActions(SUT system, State state)
 			throws ActionBuildException {
 		// Kill unwanted processes, force SUT to foreground
@@ -117,9 +123,10 @@ public class Protocol_test_gradle_workflow_webdriver_form_filling extends Webdri
 
 		// Verify the created sequence is readable
 		try {
-			File sequencesFolder = new File(OutputStructure.sequencesOutputDir).getCanonicalFile();
-			System.out.println("sequencesFolder: " + sequencesFolder);
-			File[] matchingFiles = sequencesFolder.listFiles((dir, name) -> name.endsWith("sequence_1.testar"));
+			String sequencesOkFolderName = OutputStructure.outerLoopOutputDir + File.separator + "sequences_ok";
+			File sequencesOkFolder = new File(sequencesOkFolderName).getCanonicalFile();
+			System.out.println("sequencesFolder: " + sequencesOkFolder);
+			File[] matchingFiles = sequencesOkFolder.listFiles((dir, name) -> name.endsWith("sequence_1.testar"));
 			Assert.isTrue(matchingFiles.length == 1, "One replayable testar file was not created");
 			System.out.println("matchingFiles[0]: " + matchingFiles[0]);
 			Assert.isTrue(isValidReplayFile(matchingFiles[0]), "Replayable testar file was not serialized correctly!");

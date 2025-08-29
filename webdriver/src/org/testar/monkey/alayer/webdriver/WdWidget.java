@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -133,6 +133,29 @@ public class WdWidget implements Widget, Serializable {
                           boolean scrollOrientation,
                           double viewSize, double scrollPercent,
                           double scrollArrowSize, double scrollThick) {
+
+    final int scrollX = CanvasDimensions.getScrollX();
+    final int scrollY = CanvasDimensions.getScrollY();
+    final int innerHeight = CanvasDimensions.getInnerHeight();
+    final int innerWidth = CanvasDimensions.getInnerWidth();
+      
+    boolean shouldRecompute = (scrollPercent <= 0.0 || scrollPercent > 100.0);
+    if (shouldRecompute) {
+      double scrollOffset = scrollOrientation ? scrollX : scrollY;
+      double innerSize    = scrollOrientation ? innerWidth : innerHeight;
+
+      // viewSize = percentage of document visible (0-100), so...
+      double docSize = innerSize * (100.0 / viewSize); // total page height
+      double maxScroll = Math.max(1.0, docSize - innerSize);
+
+      scrollPercent = 100.0 * scrollOffset / maxScroll;
+      scrollPercent = Math.max(0.0, Math.min(100.0, scrollPercent));
+    }
+
+    // Translate shape to page space coordinates
+    final double shapePageX = shape.x() + scrollX;
+    final double shapePageY = shape.y() + scrollY;
+
     // system dependent
     double scrollableSize = (scrollOrientation ? shape.width() : shape.height()) - scrollArrowSize * 2;
     double fromX;
@@ -140,15 +163,15 @@ public class WdWidget implements Widget, Serializable {
 
     // horizontal
     if (scrollOrientation) {
-      fromX = shape.x() + scrollArrowSize +
+      fromX = shapePageX + scrollArrowSize +
               scrollableSize * scrollPercent / 100.0 +
               (scrollPercent < 50.0 ? scrollThick / 2 : -3 * scrollThick / 2);
-      fromY = shape.y() + shape.height() - scrollThick / 2;
+      fromY = shapePageY + shape.height() - scrollThick / 2;
     }
     // vertical
     else {
-      fromX = shape.x() + shape.width() - scrollThick / 2;
-      fromY = shape.y() + scrollArrowSize +
+      fromX = shapePageX + shape.width() - scrollThick / 2;
+      fromY = shapePageY + scrollArrowSize +
               scrollableSize * scrollPercent / 100.0 +
               (scrollPercent < 50.0 ? scrollThick / 2 : -3 * scrollThick / 2);
     }
@@ -157,17 +180,19 @@ public class WdWidget implements Widget, Serializable {
     if (dragC < 1) {
       return null;
     }
-    double[] emptyDragPoints = calculateScrollDragPoints(dragC,
-        scrollOrientation ? fromX - shape.x() : fromY - shape.y(),
+
+    double[] dragPoints = calculateScrollDragPoints(dragC,
+        scrollOrientation ? fromX - shapePageX : fromY - shapePageY,
         scrollableSize / (double) dragC);
 
     Drag[] drags = new Drag[dragC];
     for (int i = 0; i < dragC; i++) {
-      double toX = scrollOrientation ? shape.x() + scrollArrowSize + emptyDragPoints[i] : fromX;
-      double toY = scrollOrientation ? fromY : shape.y() + scrollArrowSize + emptyDragPoints[i];
+      double toX = scrollOrientation ? shapePageX + scrollArrowSize + dragPoints[i] : fromX;
+      double toY = scrollOrientation ? fromY : shapePageY + scrollArrowSize + dragPoints[i];
 
       drags[i] = new Drag(fromX, fromY, toX, toY);
     }
+    
     return drags;
   }
 

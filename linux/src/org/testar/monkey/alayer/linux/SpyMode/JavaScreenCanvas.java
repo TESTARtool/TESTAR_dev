@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2017 - 2023 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+* Copyright (c) 2017 - 2025 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -118,6 +118,10 @@ public class JavaScreenCanvas implements Canvas {
 
     }
 
+    @Override
+    public void paintBatch() {
+        // Not implemented here
+    }
 
     /**
      * Creates a pair of values for a text, most likely: a letter width of 2 and a height of 20.

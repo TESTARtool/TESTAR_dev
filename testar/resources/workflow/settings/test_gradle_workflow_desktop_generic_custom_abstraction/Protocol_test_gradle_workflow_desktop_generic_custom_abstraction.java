@@ -36,13 +36,16 @@ import java.util.zip.CRC32;
 import org.apache.commons.io.FileUtils;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
+import org.testar.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.OutputStructure;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.protocols.DesktopProtocol;
 
 import org.testar.CodingManager;
+import org.testar.DerivedActions;
 import org.testar.RandomActionSelector;
+import org.testar.SutVisualization;
 
 /**
  * This protocol is used to test TESTAR by executing a gradle CI workflow.
@@ -133,17 +136,22 @@ public class Protocol_test_gradle_workflow_desktop_generic_custom_abstraction ex
         // These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
         Set<Action> actions = super.deriveActions(system,state);
 
-
         // Derive left-click actions, click and type actions, and scroll actions from
-        // top level (highest Z-index) widgets of the GUI:
-        actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
+        // top level widgets of the GUI:
+        DerivedActions derived = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, state);
 
-        if(actions.isEmpty()){
+        if(derived.getAvailableActions().isEmpty()){
             // If the top level widgets did not have any executable widgets, try all widgets:
             // Derive left-click actions, click and type actions, and scroll actions from
             // all widgets of the GUI:
-            actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
+            derived = deriveClickTypeScrollActionsFromAllWidgets(actions, state);
         }
+
+        Set<Action> filteredActions = derived.getFilteredActions();
+        actions = derived.getAvailableActions();
+
+        //Showing the grey dots for filtered actions if visualization is on:
+        if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
 
         //return the set of derived actions
         return actions;

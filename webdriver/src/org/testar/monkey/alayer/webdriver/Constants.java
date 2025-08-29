@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -40,6 +40,10 @@ public class Constants {
       "script", "noscript", "head", "meta", "style", "link", "svg", "canvas");
   // Disable the state-canvas
   public static List<String> hiddenTags = Arrays.asList("canvas");
+
+  // List of web attributes to ignore when obtaining the getStateTreeTestar
+  // These can be ignored to reduce state high-performance workloads
+  public static List<String> ignoredAttributes = Arrays.asList("xpath");
 
   // element.offsetWidth - element.clientWidth
   public static double scrollArrowSize = 36;

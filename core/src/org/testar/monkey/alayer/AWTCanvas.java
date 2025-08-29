@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -439,6 +440,7 @@ public class AWTCanvas implements Image, Canvas {
 	}	
 
 	public void release() {}
-	
+	public void paintBatch() {}
+
 	public String toString(){ return "AWTCanvas (width: " + width() + " height: " + height() + ")";	}
 }

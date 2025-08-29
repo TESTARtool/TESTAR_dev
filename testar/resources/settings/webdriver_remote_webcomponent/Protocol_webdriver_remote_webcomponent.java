@@ -190,7 +190,7 @@ public class Protocol_webdriver_remote_webcomponent extends WebdriverProtocol {
 			}
 
 			// slides can happen, even though the widget might be blocked
-			addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
+			addSlidingActions(actions, ac, widget);
 
 			// If the element is blocked, Testar can't click on or type in the widget
 			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {

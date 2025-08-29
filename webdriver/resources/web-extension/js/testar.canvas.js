@@ -53,7 +53,9 @@ function canvasDimensionsTestar() {
         document.documentElement.clientWidth,
         document.documentElement.clientHeight,
         window.innerWidth,
-        window.innerHeight
+        window.innerHeight,
+        window.scrollY,
+        window.scrollX
     ];
 }
 
@@ -93,6 +95,7 @@ function drawTextTestar(args) {
  */
 function drawLineTestar(args) {
     testarCtx.fillStyle = args[0];
+    testarCtx.strokeStyle = args[0];
     testarCtx.lineWidth = args[1];
     testarCtx.beginPath();
     testarCtx.moveTo(args[2], args[3]);
@@ -154,4 +157,30 @@ function drawRectTestar(args) {
     } else if (args[2] === 'strokeRect') {
         testarCtx.strokeRect(args[3], args[4], args[5], args[6]);
     }
+}
+
+function drawBatchTestar(batch) {
+    batch.forEach(function(item) {
+        const [type, args] = item;
+
+        switch (type) {
+            case 'rect':
+                drawRectTestar(args);
+                break;
+            case 'ellipse':
+                drawEllipseTestar(args);
+                break;
+            case 'line':
+                drawLineTestar(args);
+                break;
+            case 'text':
+                drawTextTestar(args);
+                break;
+            case 'triangle':
+                drawTriangleTestar(args);
+                break;
+            default:
+                console.warn("Unknown draw type:", type);
+        }
+    });
 }

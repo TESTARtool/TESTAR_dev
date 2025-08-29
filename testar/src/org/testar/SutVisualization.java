@@ -34,12 +34,9 @@ import org.testar.settings.dialog.tagsvisualization.TagFilter;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.devices.Mouse;
-import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 import org.testar.monkey.ConfigTags;
 import org.testar.settings.Settings;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 import static org.testar.monkey.alayer.Tags.Role;
 import static org.testar.monkey.alayer.Tags.Visualizer;
@@ -234,21 +231,8 @@ public class SutVisualization {
      * @param actions
      */
     public static void visualizeActions(Canvas canvas, State state, Set<Action> actions){
-        int zindex, minz = Integer.MAX_VALUE, maxz = Integer.MIN_VALUE;
-        Map<Action,Integer> zindexes = new HashMap<Action,Integer>();
-        for(Action a : actions){
-            //a.get(Visualizer, Util.NullVisualizer).run(state, canvas, Pen.PEN_IGNORE);
-            zindex = getTargetZindex(state,a);
-            zindexes.put(a, Integer.valueOf(zindex));
-            if (zindex < minz)
-                minz = zindex;
-            if (zindex > maxz)
-                maxz = zindex;
-        }
-
         try {
             for(Action a : actions){
-                zindex = 1; // default
                 Pen vp = Pen.PEN_IGNORE;
                 a.get(Visualizer, Util.NullVisualizer).run(state, canvas, vp);
             }
@@ -257,38 +241,6 @@ public class SutVisualization {
             if(ise.getMessage()!=null) { System.out.println(ise.getMessage()); }
         }
     }
-
-    /**
-     * Getting the Z index of a widget targeted by the given action
-     *
-     * used only by visualizeActions()
-     *
-     * @param state
-     * @param a
-     * @return
-     */
-    public static int getTargetZindex(State state, Action a){
-        try{
-            String targetID = a.get(Tags.TargetID);
-            Widget w;
-            if (targetID != null){
-                w = getWidget(state,targetID);
-                if (w != null)
-                    return (int)w.get(Tags.ZIndex).doubleValue();
-            }
-        } catch(NoSuchTagException ex){}
-        return 1; // default
-    }
-
-    private static Widget getWidget(State state, String concreteID){
-        for (Widget w : state){
-            if (w.get(Tags.ConcreteID).equals(concreteID)){
-                return w;
-            }
-        }
-        return null;
-    }
-
 
     /**
      * Visualizing the selected action with red colored dot

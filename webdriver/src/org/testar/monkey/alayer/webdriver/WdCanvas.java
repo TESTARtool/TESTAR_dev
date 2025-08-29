@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,6 +30,9 @@
 
 package org.testar.monkey.alayer.webdriver;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.testar.monkey.Assert;
 import org.testar.monkey.Pair;
 import org.testar.monkey.alayer.Canvas;
@@ -50,6 +53,8 @@ public class WdCanvas implements Canvas {
   private String font;
   private FillPattern fillPattern;
   private Color color;
+
+  private final List<Object[]> drawBatch = new ArrayList<>();
 
   public WdCanvas(Pen defaultPen) {
     this.defaultPen = defaultPen;
@@ -101,7 +106,8 @@ public class WdCanvas implements Canvas {
 
     Object[] args = new Object[]{cssColor(), Math.round(fontSize), font, text,
         x + textOffsetX, y + textOffsetY};
-    WdDriver.executeCanvasScript("drawTextTestar(arguments)", args);
+
+    drawBatch.add(new Object[]{"text", args});
   }
 
   @Override
@@ -112,13 +118,25 @@ public class WdCanvas implements Canvas {
 
   @Override
   public void line(Pen pen, double x1, double y1, double x2, double y2) {
-    if (!needToDraw(x1, y1, x2, y2)) {
+    final int viewW = CanvasDimensions.getCanvasWidth();
+    final int viewH = CanvasDimensions.getCanvasHeight();
+    
+    // Wrap X when it runs past the right browser canvas edge
+    if (x1 > viewW) x1 = 2 * viewW - x1;
+    if (x2 > viewW) x2 = 2 * viewW - x2;
+    if (x1 < 0) x1 = 0;
+    if (x2 < 0) x2 = 0;
+
+    // Skip only if the whole line is outside vertically
+    if ((y1 < 0 && y2 < 0) || (y1 > viewH && y2 > viewH)) {
       return;
     }
+
     adjustPen(pen);
 
     Object[] args = new Object[]{cssColor(), strokeWidth, x1, y1, x2, y2};
-    WdDriver.executeCanvasScript("drawLineTestar(arguments)", args);
+
+    drawBatch.add(new Object[]{"line", args});
   }
 
   @Override
@@ -128,7 +146,8 @@ public class WdCanvas implements Canvas {
     String fillStroke = fillPattern == FillPattern.Solid ? "fill" : "stroke";
     Object[] args = new Object[]{cssColor(), strokeWidth, fillStroke,
         x1, y1, x2, y2, x3, y3};
-    WdDriver.executeCanvasScript("drawTriangleTestar(arguments)", args);
+
+    drawBatch.add(new Object[]{"triangle", args});
   }
 
   @Override
@@ -144,7 +163,8 @@ public class WdCanvas implements Canvas {
     String fillStroke = fillPattern == FillPattern.Solid ? "fill" : "stroke";
     Object[] args = new Object[]{cssColor(), strokeWidth, fillStroke,
         x + width / 2, y + height / 2, width / 2, height / 2};
-    WdDriver.executeCanvasScript("drawEllipseTestar(arguments)", args);
+
+    drawBatch.add(new Object[]{"ellipse", args});
   }
 
   @Override
@@ -154,7 +174,16 @@ public class WdCanvas implements Canvas {
     String fillStroke = fillPattern == FillPattern.Solid ? "fillRect" : "strokeRect";
     Object[] args = new Object[]{
         cssColor(), strokeWidth, fillStroke, x, y, width, height};
-    WdDriver.executeCanvasScript("drawRectTestar(arguments)", args);
+
+    drawBatch.add(new Object[]{"rect", args});
+  }
+
+  @Override
+  public void paintBatch() {
+	  if (!drawBatch.isEmpty()) {
+		  WdDriver.executeCanvasScript("drawBatchTestar(arguments[0])", drawBatch);
+		  drawBatch.clear();
+	  }
   }
 
   @Override
@@ -183,24 +212,8 @@ public class WdCanvas implements Canvas {
         color.red(), color.green(), color.blue(), color.alpha() / 256.0);
   }
 
-  // Check if we actually need to draw the element, i.e. inside viewport
-  private boolean needToDraw(double x1, double y1, double x2, double y2) {
-    int width = CanvasDimensions.getCanvasWidth();
-    int height = CanvasDimensions.getCanvasHeight();
-
-    if (x1 < 0 || x2 < 0 || x1 > width || x2 > width) {
-      return false;
-    }
-
-    if (y1 < 0 || y2 < 0 || y1 > height || y2 > height) {
-      return false;
-    }
-
-    return true;
+  @Override
+  public String toString() {
+    return "x: " + x() + ", y: " + y() + ", width: " + width() + ", height: " + height() ;
   }
-  
-	@Override
-	public String toString() {
-		return "x: " + x() + ", y: " + y() + ", width: " + width() + ", height: " + height() ;
-	}
 }

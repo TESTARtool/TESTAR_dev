@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -48,6 +48,8 @@ public class CanvasDimensions extends Thread {
   private static int canvasHeight = 0;
   private static int innerWidth = 0;
   private static int innerHeight = 0;
+  private static int scrollY = 0;
+  private static int scrollX = 0;
 
   private static boolean running = false;
 
@@ -91,6 +93,14 @@ public class CanvasDimensions extends Thread {
     return innerHeight;
   }
 
+  public static int getScrollY() {
+    return scrollY;
+  }
+
+  public static int getScrollX() {
+    return scrollX;
+  }
+
   @Override
   public void run() {
     while (running) {
@@ -114,6 +124,8 @@ public class CanvasDimensions extends Thread {
       canvasHeight = Math.toIntExact(screen.get(3));
       innerWidth = Math.toIntExact(screen.get(4));
       innerHeight = Math.toIntExact(screen.get(5));
+      scrollY = Math.toIntExact(screen.get(6));
+      scrollX = Math.toIntExact(screen.get(7));
     }
     catch (WebDriverException ignored) {
 

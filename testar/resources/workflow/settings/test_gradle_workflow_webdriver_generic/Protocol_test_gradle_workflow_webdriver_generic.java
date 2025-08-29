@@ -140,7 +140,7 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
             }
 
             // slides can happen, even though the widget might be blocked
-            addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
+            addSlidingActions(actions, ac, widget);
 
             // If the element is blocked, Testar can't click on or type in the widget
             if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {

@@ -57,9 +57,6 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
 	protected void initialize(Settings settings) {
 		super.initialize(settings);
 
-		// For the gwt web page ignore iframes
-		Constants.ignoredTags = Arrays.asList("script", "noscript", "head", "meta", "style", "link", "svg", "canvas", "iframe");
-
 		// List of attributes to identify and close policy popups
 		// Set to null to disable this feature
 		policyAttributes = ArrayListMultimap.create();
@@ -100,7 +97,7 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
 			}
 
 			// slides can happen, even though the widget might be blocked
-			// addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
+			// addSlidingActions(actions, ac, widget);
 
 			// If the element is blocked, TESTAR can't click on or type in the widget
 			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
