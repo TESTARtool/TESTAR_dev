@@ -791,7 +791,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			if(screenshot != null) {
 				String screenshotPath = ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), screenshot);
-				state.set(Tags.ScreenshotImage, screenshot);
 				state.set(Tags.ScreenshotPath, screenshotPath);
 			}
 		}
