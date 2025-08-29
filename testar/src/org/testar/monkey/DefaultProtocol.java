@@ -920,7 +920,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					LogSerialiser.log("Forcing kill-process <" + forceKillProcess + "> action\n", LogSerialiser.LogLevel.Info);
 					Action killProcessAction = KillProcess.byName(forceKillProcess, 0);
 					killProcessAction.set(Tags.Desc, "Kill Process with name '" + forceKillProcess + "'");
-					killProcessAction.mapActionToWidget(state);
+					killProcessAction.mapOriginWidget(state);
 					return new HashSet<>(Collections.singletonList(killProcessAction));
 				}
 			}
@@ -933,7 +933,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			LogSerialiser.log("Forcing SUT activation (bring to foreground) action\n", LogSerialiser.LogLevel.Info);
 			Action foregroundAction = new ActivateSystem();
 			foregroundAction.set(Tags.Desc, "Bring the system to the foreground.");
-			foregroundAction.mapActionToWidget(state);
+			foregroundAction.mapOriginWidget(state);
 			foregroundAction.set(Tags.Role, Roles.System);
 			return new HashSet<>(Collections.singletonList(foregroundAction));
 		}
@@ -960,7 +960,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println("DEBUG: Forcing ESC action in preActionSelection : Actions derivation seems to be EMPTY !");
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
 			Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
-			escAction.mapActionToWidget(state);
+			escAction.mapOriginWidget(state);
 			buildEnvironmentActionIdentifiers(state, escAction);
 			reportManager.addActions(Collections.singleton(escAction));
 			return new HashSet<>(Collections.singletonList(escAction));

@@ -84,7 +84,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		Action ret = super.mouseMove(w);
 		ret.set(Tags.Desc, "Mouse move at '" + w.get(Tags.Desc, "<no description>") + "'");
 		ret.set(Tags.Role, ActionRoles.MouseMove);
-		ret.mapActionToWidget(w);
+		ret.mapOriginWidget(w);
 		return ret;
 	}
 	
@@ -92,7 +92,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 	public Action mouseMove(Widget w, Position position){
 		Action ret = super.mouseMove(w,position);
 		ret.set(Tags.Visualizer, new EllipseVisualizer(position, MovePen, 10, 10));
-		ret.mapActionToWidget(w);
+		ret.mapOriginWidget(w);
 		return ret;
 	}
 
@@ -126,7 +126,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		Action ret = super.leftClickAt(widget, relX, relY); // by urueda
 		ret.set(Tags.Desc, "Left Click at '" + widget.get(Tags.Desc, "<no description>") + "'");
 		//ret.set(Tags.Targets, Util.newArrayList(wf));
-		ret.mapActionToWidget(widget);
+		ret.mapOriginWidget(widget);
 		return ret;
 	}
 
@@ -165,7 +165,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		Action ret = super.clickTypeInto(widget, relX, relY, text, replaceText);
 		//ret.set(Tags.Desc, "Type '" + Util.abbreviate(text, 5, "...") + "' into '" + widget.get(Tags.Desc, "<no description>" + "'"));
 		ret.set(Tags.Desc, "Type '" + Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "...") + "' into '" + widget.get(Tags.Desc, "<no description>" + "'")); // by urueda
-		ret.mapActionToWidget(widget);
+		ret.mapOriginWidget(widget);
         return ret;
 	}
 
@@ -251,7 +251,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		Action ret = super.hitESC(state);
 		ret.set(Tags.Desc, "Hit ESC Key");
 		ret.set(Tags.Role, ActionRoles.HitESC);
-		ret.mapActionToWidget(state);
+		ret.mapOriginWidget(state);
 		return ret;
 	}
 

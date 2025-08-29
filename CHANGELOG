@@ -1,4 +1,4 @@
-#TESTAR v2.7.7 (29-Jul-2025)
+#TESTAR v2.7.8 (2-Sep-2025)
 - Add paintBatch and drawBatchTestar logic to paint all web elements at once
 - Fix the derivation and visualization of slide actions in web applications
 - Add more Verdict warning groups
@@ -8,6 +8,13 @@
 - Add loadUrlWithRetry to catch selenium timeout exceptions and avoid TESTAR hanging
 - Extend TESTAR webdriver tags
 - Fix bug extracting the protocol name the .sse file
+- Ignore weak password chrome popup
+
+
+#TESTAR 2.7.7 (26-Aug-2025)
+- Bump org.seleniumhq.selenium:selenium-java from 4.34.0 to 4.35.0 
+- Bump io.appium:java-client from 9.5.0 to 10.0.0 
+- Refactor action map to origin widget 
 
 
 #TESTAR v2.7.6 (22-Jul-2025)
