@@ -517,7 +517,7 @@ public class Main {
 		if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WINDOWS_10)) {
 			Environment.setInstance(new Windows10());
 		} else {
-			System.out.printf("WARNING: Current OS %s has no concrete environment implementation, using default environment\n", NativeLinker.getPLATFORM_OS());
+			System.out.printf("WARNING: Current OS %s has no concrete environment implementation, using default environment and default getDisplayScale value\n", NativeLinker.getPLATFORM_OS());
 			Environment.setInstance(new UnknownEnvironment());
 		}
 	}
