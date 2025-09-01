@@ -10,6 +10,7 @@
 - Fix bug extracting the protocol name the .sse file
 - Ignore weak password chrome popup
 - Refactor usage of Tag ScreenshotImage
+- Add settings to configure webdriver constants
 
 
 #TESTAR 2.7.7 (26-Aug-2025)

@@ -186,7 +186,7 @@ public class WdElement extends TaggableBase implements Serializable {
     isKeyboardFocusable = getIsFocusable();
     hasKeyboardFocus = (Boolean) packedElement.get("hasKeyboardFocus");
 
-    enabled = !Constants.hiddenTags.contains(tagName) && !disabled;
+    enabled = !Constants.getHiddenTags().contains(tagName) && !disabled;
     if (display != null && display.toLowerCase().equals("none")) {
       enabled = false;
     }
@@ -195,8 +195,8 @@ public class WdElement extends TaggableBase implements Serializable {
         (List<Map<String, Object>>) packedElement.get("wrappedChildren");
     for (Map<String, Object> wrappedChild : wrappedChildren) {
       WdElement child = new WdElement(wrappedChild, root, this);
-      if (!Constants.hiddenTags.contains(child.tagName) &&
-          !Constants.ignoredTags.contains(child.tagName)) {
+      if (!Constants.getHiddenTags().contains(child.tagName) &&
+          !Constants.getIgnoredTags().contains(child.tagName)) {
         children.add(child);
       }
     }

@@ -160,6 +160,25 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(BrowserFullScreen, true));
 		defaults.add(Pair.from(SwitchNewTabs, true));
 
+		defaults.add(Pair.from(WebIgnoredTags, new ArrayList<String>() {
+		    {
+		        add("script");
+		        add("noscript");
+		        add("head");
+		        add("meta");
+		        add("style");
+		        add("link");
+		        add("svg");
+		        add("canvas");
+		    }
+		}));
+
+		defaults.add(Pair.from(WebIgnoredAttributes, new ArrayList<String>() {
+		    {
+		        add("xpath");
+		    }
+		}));
+
 		/*
 		//TODO web driver settings for login feature
 		defaults.add(Pair.from(Login, null)); // null = feature not enabled

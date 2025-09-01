@@ -280,6 +280,16 @@ public class SettingsFileStructure {
 				, ConfigTags.SwitchNewTabs.name() + " = "
 				, ""
 				, "#################################################################"
+				, "# WebDriver advanced state fetcher configuration"
+				, "#"
+				, "# WebIgnoredTags: " + ConfigTags.WebIgnoredTags.getDescription()
+				, "# WebIgnoredAttributes: " + ConfigTags.WebIgnoredAttributes.getDescription()
+				, "#################################################################"
+				, ""
+				, ConfigTags.WebIgnoredTags.name() + " = "
+				, ConfigTags.WebIgnoredAttributes.name() + " = "
+				, ""
+				, "#################################################################"
 				, "# WebDriver Browser Console Oracles"
 				, "#"
 				, "# WebConsoleErrorOracle: " + ConfigTags.WebConsoleErrorOracle.getDescription()

@@ -176,6 +176,14 @@ public final class ConfigTags {
 	public static final Tag<Boolean> SwitchNewTabs = Tag.from("SwitchNewTabs", Boolean.class, 
 			"Indicate if switch to a new web tab if opened");
 
+	@SuppressWarnings("unchecked")
+	public static final Tag<List<String>> WebIgnoredTags = Tag.from("WebIgnoredTags", (Class<List<String>>) (Class<?>) List.class, 
+	        "List of HTML tags that TESTAR should ignore when obtaining the web state");
+
+	@SuppressWarnings("unchecked")
+	public static final Tag<List<String>> WebIgnoredAttributes = Tag.from("WebIgnoredAttributes", (Class<List<String>>) (Class<?>) List.class, 
+	        "List of web attributes that TESTAR should ignore when obtaining the web state (e.g., to reduce state high-performance workloads)");
+
 	public static final Tag<Boolean> WebConsoleErrorOracle = Tag.from("WebConsoleErrorOracle", Boolean.class, 
 			"Enable or Disable applying ORACLES to the browser error console");
 
