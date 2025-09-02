@@ -211,6 +211,12 @@ LlmStateless = true
 LlmTestGoals = Als gebruiker wil ik een nieuwe relatie invoeren met de naam 'TESTAR' en hieraan een contactpersoon 'Robin Bouwmeester' koppelen.;Als gebruiker wil ik een nieuw documentregistratie maken met registratieprofiel 'Document (overig)' en documentsoort 'Memo'bij project '127 Woningen Woerden Oost' met als onderwerp 'TESTAR ONDERWERP';Als gebruiker wil ik de gebruikersinstelling 'Aantal records per pagina' instellen op 100.
 
 #################################################################
+# WebDriver advanced state fetcher configuration
+#################################################################
+WebIgnoredTags = script;noscript;head;meta;style;link;svg;canvas
+WebIgnoredAttributes = xpath;innerHTML;outerHTML
+
+#################################################################
 # WebDriver features
 #
 # ClickableClasses: Indicate which web CSS classes need to be considered clickable
@@ -437,6 +443,7 @@ TempDir = ./output/temp
 #################################################################
 # Other settings
 #################################################################
+GenerateReplayableSequence = false
 OfflineGraphConversion = true
 StateScreenshotSimilarityThreshold = 1.4E-45
 ExplorationSampleInterval = 1

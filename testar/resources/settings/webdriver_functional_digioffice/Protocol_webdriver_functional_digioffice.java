@@ -175,12 +175,6 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		Util.pause(30);
        }
 		super.initialize(settings);
-
-		// Enable only if iframes do not allow to obtain the TESTAR-JS state
-		//Constants.ignoredTags = Arrays.asList( "script", "noscript", "head", "meta", "style", "link", "svg", "canvas", "iframe");
-
-		// Enable if obtaining the state is slow, but some web properties are not obtained
-		//Constants.simpleState = true;
 	}
 
 
@@ -701,7 +695,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 			}
 
 			// slides can happen, even though the widget might be blocked
-			addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
+			addSlidingActions(actions, ac, widget);
 
 			// If the element is blocked, Testar can't click on or type in the widget
 			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
