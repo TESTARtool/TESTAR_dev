@@ -49,8 +49,6 @@ import java.util.stream.Collectors;
 
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
-import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
-import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 public class Protocol_webdriver_listener extends WebdriverProtocol {
 
@@ -175,7 +173,7 @@ public class Protocol_webdriver_listener extends WebdriverProtocol {
 			}
 
 			// slides can happen, even though the widget might be blocked
-			addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
+			addSlidingActions(actions, ac, widget);
 
 			// If the element is blocked, Testar can't click on or type in the widget
 			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {

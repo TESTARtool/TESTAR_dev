@@ -45,7 +45,6 @@ import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
-import org.testar.monkey.alayer.webdriver.Constants;
 import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
@@ -81,10 +80,6 @@ public class Protocol_webdriver_newspark_drawnames_llm extends WebdriverProtocol
 	protected void initialize(Settings settings) {
 
 		super.initialize(settings);
-
-		// For the academy web page ignore iframes
-		Constants.ignoredTags = Arrays.asList(
-				"script", "noscript", "head", "meta", "style", "link", "svg", "canvas", "iframe");
 
 		// Configure the test goals
 		setupTestGoals(settings.get(ConfigTags.LlmTestGoals));

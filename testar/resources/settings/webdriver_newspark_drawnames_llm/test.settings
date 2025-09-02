@@ -146,6 +146,12 @@ LlmHistorySize = 5
 LlmTestGoals = De klant moet de mogelijkheid krijgen om meerdere filters tegelijkertijd te selecteren in de cadeauzoeker. Binnen de categorie- en winkelfilter moet multi-select ondersteund worden.
 
 #################################################################
+# WebDriver advanced state fetcher configuration
+#################################################################
+WebIgnoredTags = script;noscript;head;meta;style;link;svg;canvas;iframe
+WebIgnoredAttributes = xpath
+
+#################################################################
 # WebDriver features
 #################################################################
 ClickableClasses = 

@@ -49,7 +49,6 @@ import org.testar.monkey.alayer.Roles;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
-import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.UnknownEventAction;
@@ -117,8 +116,8 @@ public class ListeningModeScript {
 		protocol.actionCount = 1;
 
 		//Generating the sequence file that can be replayed:
-		protocol.generatedSequence = protocol.getAndStoreGeneratedSequence();
-		protocol.currentSeq = protocol.getAndStoreSequenceFile();
+		protocol.getAndStoreGeneratedSequence();
+		protocol.getAndStoreSequenceFile();
 
 		// notify the statemodelmanager
 		protocol.stateModelManager.notifyTestSequencedStarted();
@@ -220,7 +219,7 @@ public class ListeningModeScript {
 		protocol.writeAndCloseFragmentForReplayableSequence();
 
 		//Copy sequence file into proper directory:
-		protocol.classifyAndCopySequenceIntoAppropriateDirectory(Verdict.OK, protocol.generatedSequence, protocol.currentSeq);
+		protocol.classifyAndCopySequenceIntoAppropriateDirectory(protocol.getFinalVerdict());
 
 		protocol.postSequenceProcessing();
 

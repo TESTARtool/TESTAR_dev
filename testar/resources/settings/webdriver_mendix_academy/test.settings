@@ -123,6 +123,12 @@ DataStoreMode = instant
 AbstractStateAttributes = WebWidgetId
 
 #################################################################
+# WebDriver advanced state fetcher configuration
+#################################################################
+WebIgnoredTags = script;noscript;head;meta;style;link;svg;canvas;iframe
+WebIgnoredAttributes = xpath
+
+#################################################################
 # WebDriver features
 #################################################################
 ClickableClasses = mx-groupbox-collapse-icon
