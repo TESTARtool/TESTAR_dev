@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "https://www.smartclient.com/smartgwt/showcase/" "1920x900+0+0"
+SUTConnectorValue = "https://www.smartclient.com/smartgwt/showcase/"
 
 #################################################################
 # Sequences
@@ -36,7 +36,7 @@ SUTConnectorValue = "https://www.smartclient.com/smartgwt/showcase/" "1920x900+0
 #################################################################
 
 Sequences = 1
-SequenceLength = 100
+SequenceLength = 10
 
 #################################################################
 # Oracles based on suspicious tag values

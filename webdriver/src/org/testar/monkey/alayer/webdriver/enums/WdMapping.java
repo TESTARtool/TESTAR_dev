@@ -63,6 +63,7 @@ public class WdMapping {
 			put(WebWidgetIsOffScreen, WdTags.WebIsOffScreen);
 			put(WebWidgetSrc, WdTags.WebSrc);
 			put(WebWidgetPlaceholder, WdTags.WebPlaceholder);
+			put(WebWidgetIsDisabled, WdTags.WebIsDisabled);
 
 			// Generic
 			put(WidgetControlType, WdTags.WebTagName);

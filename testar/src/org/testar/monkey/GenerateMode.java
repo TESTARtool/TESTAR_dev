@@ -81,8 +81,8 @@ public class GenerateMode {
 			SUT system = protocol.startSUTandLogger();
 
 			//Generating the sequence file that can be replayed:
-			protocol.generatedSequence = protocol.getAndStoreGeneratedSequence();
-			protocol.currentSeq = protocol.getAndStoreSequenceFile();
+			protocol.getAndStoreGeneratedSequence();
+			protocol.getAndStoreSequenceFile();
 
 			//initializing TESTAR and the protocol canvas for a new sequence:
 			protocol.startTestSequence(system);
@@ -120,9 +120,7 @@ public class GenerateMode {
 					LogSerialiser.log("Sequence contained faults!\n", LogSerialiser.LogLevel.Critical);
 
 				//Copy sequence file into proper directory:
-				protocol.classifyAndCopySequenceIntoAppropriateDirectory(protocol.getFinalVerdict(), 
-						protocol.generatedSequence, 
-						protocol.currentSeq);
+				protocol.classifyAndCopySequenceIntoAppropriateDirectory(protocol.getFinalVerdict());
 
 				//calling postSequenceProcessing() to allow resetting test environment after test sequence, etc
 				protocol.postSequenceProcessing();
@@ -193,17 +191,14 @@ public class GenerateMode {
 			protocol.cv.begin();
 			Util.clear(protocol.cv);
 
-			//Showing the green dots if visualization is on:
-			if(protocol.visualizationOn) {
-				protocol.visualizeActions(protocol.cv, state, actions);
-			}
-
 			//Selecting one of the available actions:
 			Action action = protocol.selectAction(state, actions);
 
-			//Showing the red dot if visualization is on:
+			//Showing the actions if visualization is on:
 			if(protocol.visualizationOn) {
+				protocol.visualizeActions(protocol.cv, state, actions);
 				SutVisualization.visualizeSelectedAction(protocol.settings, protocol.cv, state, action);
+				protocol.cv.paintBatch();
 			}
 
 			//before action execution, pass it to the state model manager

@@ -40,28 +40,53 @@ import java.io.*;
 
 public class FileHandling {
 
-    public static void copyClassifiedSequence(String generatedSequence, File currentSeq, Verdict verdict) {
-        // Generate target folder name based on severity title
+    public static String copyClassifiedSequence(String generatedSequence, File currentSeq, Verdict verdict) {
+        // Generate the target folder names based on the severity title
         String targetFolder = "sequences_" + verdict.verdictSeverityTitle().toLowerCase();
+        String targetSequence = targetFolder + File.separator + generatedSequence;
 
         LogSerialiser.log(
                 String.format("Copying classified sequence (\"%s\") to %s folder...\n", generatedSequence, targetFolder),
                 LogSerialiser.LogLevel.Info
                 );
 
+        // The .testar sequence file might not exist (e.g., GenerateReplayableSequence is disabled)
         try {
-            // Copy to general "sequences" folder
-            copyToOutputDir(currentSeq, "sequences");
-            // Copy to specific classification folder
+            if (!currentSeq.getCanonicalFile().exists()) {
+                LogSerialiser.log(
+                        String.format("No sequence file exists to classify for \"%s\".\n", generatedSequence),
+                        LogSerialiser.LogLevel.Info
+                        );
+
+                LogSerialiser.log(
+                        String.format("No sequence copied to output directory <%s>.\n", targetSequence),
+                        LogSerialiser.LogLevel.Info
+                        );
+
+                return targetSequence;
+            }
+        } catch (IOException ioe) {
+            LogSerialiser.log(
+                    "Error checking whether the sequence file exists: " + ioe.getMessage() + "\n",
+                    LogSerialiser.LogLevel.Critical
+                    );
+        }
+
+        // If it exists, copy to the specific classification folder
+        try {
             copyToOutputDir(currentSeq, targetFolder);
         } catch (NoSuchTagException | IOException e) {
-            LogSerialiser.log("Error copying classified test sequence: " + e.getMessage() + "\n", LogSerialiser.LogLevel.Critical);
+            LogSerialiser.log("Error copying classified test sequence: " + e.getMessage() + "\n", 
+                    LogSerialiser.LogLevel.Critical
+                    );
         }
 
         LogSerialiser.log(
-                String.format("Copied classified sequence to output <%s> directory!\n", targetFolder),
-                LogSerialiser.LogLevel.Debug
+                String.format("Copied classified sequence to output <%s> directory!\n", targetSequence),
+                LogSerialiser.LogLevel.Info
                 );
+
+        return targetSequence;
     }
 
     /**

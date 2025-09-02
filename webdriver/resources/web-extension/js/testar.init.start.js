@@ -3,7 +3,7 @@
  * If this were to be done via a <script> it might be after other
  * scripts or inline declarations
  */
-var actualCode = '(' + function () {
+(function () {
     EventTarget.prototype._addEventListener = EventTarget.prototype.addEventListener;
     EventTarget.prototype.addEventListener = function (a, b, c) {
         if (c === undefined)
@@ -66,13 +66,4 @@ var actualCode = '(' + function () {
     window.confirm = function () {};
     window.print = function () {};
     navigator.geolocation.getCurrentPosition = function () {};
-} + ')();';
-
-// Inject into the document
-var script = document.createElement('script');
-script.textContent = actualCode;
-(document.head || document.documentElement).appendChild(script);
-script.remove();
-
-// https://stackoverflow.com/questions/9515704/
-// https://stackoverflow.com/questions/446892/
+})();

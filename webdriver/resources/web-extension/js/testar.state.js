@@ -6,11 +6,12 @@ var labelMap;
 /*
  * Get the widget tree (Chrome, Firefox) or flattened tree (Edge)
  * @param {Array} array of tags that can be skipped, like <style>, <script> etc.
+ * @param {Array} array of attributes to be skipped, like xpath, innerText etc.
  * @return {(Object | Array)}
  */
-var getStateTreeTestar = function (ignoredTags) {
+var getStateTreeTestar = function (ignoredTags, ignoredAttributes) {
     var body = document.body;
-    var bodyWrapped = wrapElementTestar(body, 0, 0);
+    var bodyWrapped = wrapElementTestar(body, 0, 0, ignoredAttributes);
     bodyWrapped['documentHasFocus'] = document.hasFocus();
     bodyWrapped['documentTitle'] = document.title;
     bodyWrapped['largestContentfulPaint'] = latestLCP;
@@ -21,11 +22,11 @@ var getStateTreeTestar = function (ignoredTags) {
     // For Edge we return a flattened tree (as array), see comment in WdStateFetcher
     if (window.navigator.userAgent.indexOf("Edge") > -1) {
         var treeArray = [];
-        traverseElementArrayTestar(treeArray, bodyWrapped, body, -1, ignoredTags);
+        traverseElementArrayTestar(treeArray, bodyWrapped, body, -1, ignoredTags, ignoredAttributes);
         return treeArray;
     }
     else {
-        traverseElementTestar(bodyWrapped, body, ignoredTags);
+        traverseElementTestar(bodyWrapped, body, ignoredTags, ignoredAttributes);
         return bodyWrapped;
     }
 };
@@ -35,8 +36,9 @@ var getStateTreeTestar = function (ignoredTags) {
  * @param {object} parentWrapped, the (wrapped) parent object
  * @param {node} rootElement, the body element
  * @param {object} ignoredTags, list of tags to skip, <style>, <script> etc.
+ * @param {object} ignoredAttributes, list of attributes to skip, like xpath, innerText etc.
  */
-function traverseElementTestar(parentWrapped, rootElement, ignoredTags) {
+function traverseElementTestar(parentWrapped, rootElement, ignoredTags, ignoredAttributes) {
     var childNodes = getChildNodesTestar(parentWrapped);
     for (var i = 0; i < childNodes.length; i++) {
         var childElement = childNodes[i];
@@ -52,8 +54,8 @@ function traverseElementTestar(parentWrapped, rootElement, ignoredTags) {
             continue;
         }
 
-        var childWrapped = wrapElementTestar(childElement, parentWrapped["xOffset"], parentWrapped["yOffset"]);
-        traverseElementTestar(childWrapped, rootElement, ignoredTags);
+        var childWrapped = wrapElementTestar(childElement, parentWrapped["xOffset"], parentWrapped["yOffset"], ignoredAttributes);
+        traverseElementTestar(childWrapped, rootElement, ignoredTags, ignoredAttributes);
         parentWrapped.wrappedChildren.push(childWrapped);
     }
 	
@@ -74,11 +76,24 @@ function traverseElementTestar(parentWrapped, rootElement, ignoredTags) {
 				continue;
 			}
 			
-			var childShadowWrapped = wrapElementTestar(childShadowElement, parentWrapped["xOffset"], parentWrapped["yOffset"]);
-			traverseElementTestar(childShadowWrapped, rootElement, ignoredTags);
+			var childShadowWrapped = wrapElementTestar(childShadowElement, parentWrapped["xOffset"], parentWrapped["yOffset"], ignoredAttributes);
+			traverseElementTestar(childShadowWrapped, rootElement, ignoredTags, ignoredAttributes);
 			parentWrapped.wrappedChildren.push(childShadowWrapped);
 		}
 	}
+	
+    if (shouldDeleteElementForSerialization(parentWrapped.element)) {
+        delete parentWrapped.element;
+    }
+}
+
+function shouldDeleteElementForSerialization(element) {
+    try {
+        const frameElement = element.ownerDocument.defaultView?.frameElement;
+        return frameElement && frameElement !== element;
+    } catch (e) {
+        return true;
+    }
 }
 
 /*
@@ -88,8 +103,9 @@ function traverseElementTestar(parentWrapped, rootElement, ignoredTags) {
  * @param {node} rootElement, the body element
  * @param {integer} parentId, index of the parent in the flattened array
  * @param {object} ignoredTags, array of tags to skip, <style>, <script> etc.
+ * @param {object} ignoredAttributes, list of attributes to skip, like xpath, innerText etc.
  */
-function traverseElementArrayTestar(treeArray, parentWrapped, rootElement, parentId, ignoredTags) {
+function traverseElementArrayTestar(treeArray, parentWrapped, rootElement, parentId, ignoredTags, ignoredAttributes) {
     parentWrapped['parentId'] = parentId;
     treeArray.push(parentWrapped);
 
@@ -110,8 +126,8 @@ function traverseElementArrayTestar(treeArray, parentWrapped, rootElement, paren
             continue
         }
 
-        var childWrapped = wrapElementTestar(childElement, parentWrapped["xOffset"], parentWrapped["yOffset"]);
-        traverseElementArrayTestar(treeArray, childWrapped, rootElement, parentId, ignoredTags);
+        var childWrapped = wrapElementTestar(childElement, parentWrapped["xOffset"], parentWrapped["yOffset"], ignoredAttributes);
+        traverseElementArrayTestar(treeArray, childWrapped, rootElement, parentId, ignoredTags, ignoredAttributes);
     }
 }
 
@@ -150,9 +166,10 @@ function getChildNodesTestar(parentWrapped) {
  * @param {object} yOffset, offset off the iFrame (if applicable)
  * @return {object} array element and attributes
  */
-function wrapElementTestar(element, xOffset, yOffset) {
+function wrapElementTestar(element, xOffset, yOffset, ignoredAttributes) {
     var computedStyle = getComputedStyle(element);
-	
+    var clientRect = element.getBoundingClientRect();
+
 	var shadowElement = false;
 	if(element.shadowRoot !== null){
 		shadowElement = true;
@@ -166,21 +183,33 @@ function wrapElementTestar(element, xOffset, yOffset) {
         name: getNameTestar(element),
         tagName: element.tagName.toLowerCase(),
         textContent: "",
+        innerText: ignoredAttributes.includes("innerText") ? "" : element.innerText,
         value: element.value,
         checked: element.checked,
         selected: element.selected,
-        display: computedStyle.getPropertyValue('display'),
-        computedFontSize: window.getComputedStyle(element).fontSize,
-        innerHTML: element.innerHTML,
-        outerHTML: element.outerHTML,
+        display: computedStyle.display,
+        visibility: computedStyle.visibility,
+        styleOverflow: computedStyle.overflow,
+        styleOverflowX: computedStyle.overflowX,
+        styleOverflowY: computedStyle.overflowY,
+        stylePosition: computedStyle.position,
+        styleOpacity: computedStyle.opacity,
+        computedFontSize: computedStyle.fontSize,
+        innerHTML: ignoredAttributes.includes("innerHTML") ? "" : element.innerHTML,
+        outerHTML: ignoredAttributes.includes("outerHTML") ? "" : element.outerHTML,
 
-        zIndex: getZIndexTestar(element),
-        rect: getRectTestar(element, xOffset, yOffset),
-        dimensions: getDimensionsTestar(element),
-        isBlocked: getIsBlockedTestar(element, xOffset, yOffset),
+        zIndex: getZIndexTestar(element, computedStyle),
+        rect: getRectTestar(element, xOffset, yOffset, clientRect),
+        dimensions: getDimensionsTestar(element, computedStyle),
+        naturalWidth: (element.naturalWidth !== undefined) ? element.naturalWidth : 0,
+        naturalHeight: (element.naturalHeight !== undefined) ? element.naturalHeight : 0,
+        displayedWidth: (element.width !== undefined) ? parseInt(element.width) : 0,
+        displayedHeight: (element.height !== undefined) ? parseInt(element.height) : 0,
+        isBlocked: getIsBlockedTestar(element, xOffset, yOffset, clientRect),
         isClickable: isClickableTestar(element, xOffset, yOffset),
-		isShadowElement: shadowElement,
+        isShadowElement: shadowElement,
         hasKeyboardFocus: document.activeElement === element,
+        xpath: ignoredAttributes.includes("xpath") ? "" : getXPath(element),
 
         wrappedChildren: [],
         xOffset: xOffset,
@@ -217,9 +246,10 @@ function getNameTestar(element) {
 /*
  * Calculate the z-index of an element
  * @param {node} the HTML element
+ * @param {object} the computed style of the element
  * @return {number} the z-index
  */
-function getZIndexTestar(element) {
+function getZIndexTestar(element, computedStyle) {
     if (element === document.body) {
         return 0;
     }
@@ -227,12 +257,12 @@ function getZIndexTestar(element) {
     if (element === null || element === undefined) {
         return 0;
     } else if (element.nodeType !== 1) {
-        return getZIndexTestar(element.parentNode) + 1;
+        return getZIndexTestar(element.parentNode, computedStyle) + 1;
     }
 
-    var zIndex = getComputedStyle(element).getPropertyValue('z-index');
+    var zIndex = computedStyle.getPropertyValue('z-index');
     if (isNaN(zIndex)) {
-        return getZIndexTestar(element.parentNode) + 1;
+        return getZIndexTestar(element.parentNode, computedStyle) + 1;
     }
     return zIndex * 1;
 }
@@ -242,19 +272,19 @@ function getZIndexTestar(element) {
  * @param {node} element, the parent HTML element
  * @param {object} xOffset, offset off the iFrame (if applicable)
  * @param {object} yOffset, offset off the iFrame (if applicable)
+ * @param {object} clientRect, the bounding client rect
  * @return {array} array with the position and dimensions
  */
-function getRectTestar(element, xOffset, yOffset) {
-    var rect = element.getBoundingClientRect();
+function getRectTestar(element, xOffset, yOffset, clientRect) {
     if (element === document.body) {
-        rect = document.documentElement.getBoundingClientRect();
+        clientRect = document.documentElement.getBoundingClientRect();
     }
 
     return [
-        parseInt(rect.left) + xOffset,
-        parseInt(rect.top) + yOffset,
-        parseInt(element === document.body ? window.innerWidth : rect.width),
-        parseInt(element === document.body ? window.innerHeight : rect.height)
+        parseInt(clientRect.left) + xOffset,
+        parseInt(clientRect.top) + yOffset,
+        parseInt(element === document.body ? window.innerWidth : clientRect.width),
+        parseInt(element === document.body ? window.innerHeight : clientRect.height)
     ];
 }
 
@@ -262,9 +292,10 @@ function getRectTestar(element, xOffset, yOffset) {
  * Get all appropriate dimensions of the element
  * Used to determine if a scrollbar is present
  * @param {node} element, the parent HTML element
+ * @param {object} the computed style of the element
  * @return {array} array with the dimensions
  */
-function getDimensionsTestar(element) {
+function getDimensionsTestar(element, computedStyle) {
     if (element === document.body) {
         scrollLeft = Math.max(document.documentElement.scrollLeft, document.body.scrollLeft);
         scrollTop = Math.max(document.documentElement.scrollTop, document.body.scrollTop);
@@ -273,11 +304,9 @@ function getDimensionsTestar(element) {
         scrollTop = element.scrollTop;
     }
 
-    var style = window.getComputedStyle(element);
-
     return {
-        overflowX: style.getPropertyValue('overflow-x'),
-        overflowY: style.getPropertyValue('overflow-y'),
+        overflowX: computedStyle.getPropertyValue('overflow-x'),
+        overflowY: computedStyle.getPropertyValue('overflow-y'),
         clientWidth: element.clientWidth,
         clientHeight: element.clientHeight,
         offsetWidth: element.offsetWidth || 0,
@@ -286,8 +315,8 @@ function getDimensionsTestar(element) {
         scrollHeight: element.scrollHeight,
         scrollLeft: scrollLeft,
         scrollTop: scrollTop,
-        borderWidth: parseInt(style.borderLeftWidth, 10) + parseInt(style.borderRightWidth, 10),
-        borderHeight: parseInt(style.borderTopWidth, 10) + parseInt(style.borderBottomWidth, 10)
+        borderWidth: parseInt(computedStyle.borderLeftWidth, 10) + parseInt(computedStyle.borderRightWidth, 10),
+        borderHeight: parseInt(computedStyle.borderTopWidth, 10) + parseInt(computedStyle.borderBottomWidth, 10)
     };
 }
 
@@ -310,18 +339,18 @@ function isPageHorizontalScrollable(){
 }
 
 /*
- * Determin if an element is blocked by another element,
+ * Determine if an element is blocked by another element,
  * but does not contain said element (e.g. <img> inside <a>)
  * @param {node} element, the parent HTML element
  * @param {object} xOffset, offset off the iFrame (if applicable)
  * @param {object} yOffset, offset off the iFrame (if applicable)
+ * @param {object} clientRect, the bounding client rect
  * @return {bool} true if the element is blocked by another element
  */
-function getIsBlockedTestar(element, xOffset, yOffset) {
+function getIsBlockedTestar(element, xOffset, yOffset, clientRect) {
     // get element at element's (click) position
-    var rect = element.getBoundingClientRect();
-    var x = rect.left + rect.width / 2 + xOffset;
-    var y = rect.top + rect.height / 2 + yOffset;
+    var x = clientRect.left + clientRect.width / 2 + xOffset;
+    var y = clientRect.top + clientRect.height / 2 + yOffset;
     var elem = document.elementFromPoint(x, y);
 
     // element is inside iframe(s)
@@ -409,6 +438,44 @@ function getAttributeMapTestar(element) {
         map[att.name] = att.nodeValue;
         return map;
     }, {});
+}
+
+function getXPath(element) {
+  try {
+    // Create an array to store the path
+    var path = [];
+
+    // Iterate through the ancestors of the element
+    while (element && element.nodeType === Node.ELEMENT_NODE) {
+      var index = 1;
+      var sibling = element.previousSibling;
+
+      // Find the index of the element among its siblings
+      while (sibling) {
+        if (sibling.nodeType === Node.ELEMENT_NODE && sibling.nodeName === element.nodeName) {
+          index++;
+        }
+        sibling = sibling.previousSibling;
+      }
+
+      // Build the XPath expression for the element
+      var tagName = element.nodeName.toLowerCase();
+      var pathSegment = tagName + '[' + index + ']';
+      path.unshift(pathSegment);
+
+      // Move up to the parent element
+      element = element.parentNode;
+    }
+
+    // Join the path segments to form the XPath
+    var xpath = path.length ? '/' + path.join('/') : '';
+
+    return xpath;
+  } catch (error) {
+    // Handle any errors and return an empty string
+    console.error('Error occurred while obtaining XPath:', error);
+    return '';
+  }
 }
 
 // Performance Observer for LCP

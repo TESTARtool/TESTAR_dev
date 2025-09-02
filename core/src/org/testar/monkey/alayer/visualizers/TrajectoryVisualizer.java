@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -27,11 +28,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-/**
- *  @author Sebastian Bauersfeld
- */
-package org.testar.monkey.alayer.visualizers; // refactored by urueda
+package org.testar.monkey.alayer.visualizers;
 
 import java.util.Iterator;
 
@@ -64,19 +61,19 @@ public class TrajectoryVisualizer implements Visualizer {
 		this.pen = pen;
 	}
 	
-	public void run(State s, Canvas c, Pen pen) {
-		Assert.notNull(s, c, pen);
+	public void run(State state, Canvas canvas, Pen pen) {
+		Assert.notNull(state, canvas, pen);
 		pen = Pen.merge(pen, this.pen);
-		Iterator<Point> iter = trajectory.apply(s).iterator();
+		Iterator<Point> iter = trajectory.apply(state).iterator();
 		Point last = iter.next();
 		
 		while(iter.hasNext()){
 			Point current = iter.next();
 			
 			if(!iter.hasNext() && (pen.strokeCaps() == StrokeCaps._Arrow || pen.strokeCaps() == StrokeCaps.Arrow_))
-				Util.arrow(c, pen, last.x(), last.y(), current.x(), current.y(), 5 * pen.strokeWidth(), 5 * pen.strokeWidth());
+				Util.arrow(canvas, pen, last.x(), last.y(), current.x(), current.y(), 5 * pen.strokeWidth(), 5 * pen.strokeWidth());
 			else
-				c.line(pen, last.x(), last.y(), current.x(), current.y());
+				canvas.line(pen, last.x(), last.y(), current.x(), current.y());
 			
 			last = current;
 		}

@@ -60,22 +60,24 @@ public class WdElement extends TaggableBase implements Serializable {
   //long culture = 0L;
   boolean isModal = false; // i.c.w. access key
 
-  public String id, name, genericTitle, tagName, textContent, helpText, title, placeholder;
+  public String id, name, genericTitle, tagName, textContent, helpText, title, placeholder, innerText;
+  public String xpath = "";
   public List<String> cssClasses = new ArrayList<>();
   public String display, type;
   public String innerHTML, outerHTML;
   public int maxLength;
 
-  boolean enabled, ignore;
+  boolean enabled, ignore, disabled;
   public boolean isClickable;
   public boolean isShadow;
   boolean isContentElement, isControlElement;
   boolean hasKeyboardFocus, isKeyboardFocusable;
   String acceleratorKey, accessKey;
-  String valuePattern, href, style, target, alt, src;
-  Object value;
+  String valuePattern, href, style, styleOverflow, styleOverflowX, styleOverflowY, stylePosition, target, alt, src, visibility;
+  String value;
   
   double zindex;
+  double styleOpacity;
   public Rect rect;
   boolean scrollPattern, hScroll, vScroll;
   public double hScrollViewSize, vScrollViewSize, hScrollPercent, vScrollPercent;
@@ -93,6 +95,8 @@ public class WdElement extends TaggableBase implements Serializable {
   public long scrollWidth, scrollHeight;
   public long scrollLeft, scrollTop;
   private long borderWidth, borderHeight;
+  public long naturalWidth, naturalHeight; 
+  public long displayedWidth, displayedHeight;  
 
   public transient RemoteWebElement remoteWebElement; // Reference to the remote Web Element
 
@@ -124,15 +128,27 @@ public class WdElement extends TaggableBase implements Serializable {
     genericTitle = (String) packedElement.getOrDefault("name", "");
     tagName = (String) packedElement.get("tagName");
     textContent = ((String) packedElement.get("textContent")).replaceAll("\\s+", " ").trim();
+    innerText = (packedElement.get("innerText") == null) ? "" : ((String) packedElement.get("innerText")).replaceAll("\\s+", " ").trim();
     title = attributeMap.getOrDefault("title","");
     href = attributeMap.getOrDefault("href", "");
-    value = attributeMap.getOrDefault("value", "");
+    value = (packedElement.get("value") instanceof String) ? (String) packedElement.get("value") : "";
     style = attributeMap.getOrDefault("style", "");
+    styleOverflow = (packedElement.get("styleOverflow") == null) ? "" : (String) packedElement.get("styleOverflow");
+    styleOverflowX = (packedElement.get("styleOverflowX") == null) ? "" : (String) packedElement.get("styleOverflowX");
+    styleOverflowY = (packedElement.get("styleOverflowY") == null) ? "" : (String) packedElement.get("styleOverflowY");
+    stylePosition = (packedElement.get("stylePosition") == null) ? "" : (String) packedElement.get("stylePosition");
     target = attributeMap.getOrDefault("target", "");
     alt = attributeMap.getOrDefault("alt", "");
     type = attributeMap.getOrDefault("type", "");
     src = attributeMap.getOrDefault("src", "");
     placeholder = attributeMap.getOrDefault("placeholder", "");
+    naturalWidth = (packedElement.get("naturalWidth") == null) ? 0 : castDimensionsToLong(packedElement.get("naturalWidth"));
+    naturalHeight = (packedElement.get("naturalHeight") == null) ? 0 : castDimensionsToLong(packedElement.get("naturalHeight"));
+    displayedWidth = (packedElement.get("displayedWidth") == null) ? 0 : castDimensionsToLong(packedElement.get("displayedWidth"));
+    displayedHeight = (packedElement.get("displayedHeight") == null) ? 0 : castDimensionsToLong(packedElement.get("displayedHeight"));
+    disabled = attributeMap.containsKey("disabled");
+    visibility = (packedElement.get("visibility") == null) ? "" : (String) packedElement.get("visibility");
+    xpath = (packedElement.get("xpath") == null) ? "" : (String) packedElement.get("xpath");
 
     try {
     	maxLength = Integer.valueOf(attributeMap.getOrDefault("maxlength", "-1"));
@@ -156,6 +172,8 @@ public class WdElement extends TaggableBase implements Serializable {
     display = (String) packedElement.get("display");
     computedFontSize = (String) packedElement.getOrDefault("computedFontSize", "");
 
+    styleOpacity = castObjectToDouble(packedElement.get("styleOpacity"),1.0);
+
     zindex = (double) (long) packedElement.get("zIndex");
     fillRect(packedElement);
     fillDimensions(packedElement);
@@ -168,7 +186,7 @@ public class WdElement extends TaggableBase implements Serializable {
     isKeyboardFocusable = getIsFocusable();
     hasKeyboardFocus = (Boolean) packedElement.get("hasKeyboardFocus");
 
-    enabled = !Constants.hiddenTags.contains(tagName);
+    enabled = !Constants.getHiddenTags().contains(tagName) && !disabled;
     if (display != null && display.toLowerCase().equals("none")) {
       enabled = false;
     }
@@ -177,8 +195,8 @@ public class WdElement extends TaggableBase implements Serializable {
         (List<Map<String, Object>>) packedElement.get("wrappedChildren");
     for (Map<String, Object> wrappedChild : wrappedChildren) {
       WdElement child = new WdElement(wrappedChild, root, this);
-      if (!Constants.hiddenTags.contains(child.tagName) &&
-          !Constants.ignoredTags.contains(child.tagName)) {
+      if (!Constants.getHiddenTags().contains(child.tagName) &&
+          !Constants.getIgnoredTags().contains(child.tagName)) {
         children.add(child);
       }
     }
@@ -225,8 +243,8 @@ public class WdElement extends TaggableBase implements Serializable {
 	  else if(placeholder != null && !placeholder.isEmpty()) {
 		  return placeholder;
 	  }
-	  else if(value != null) {
-		  return value.toString();
+	  else if(value != null && !value.isEmpty()) {
+		  return value;
 	  }
 	  else if(tagName != null && !tagName.isEmpty()) {
 		  return tagName;
@@ -308,6 +326,18 @@ public class WdElement extends TaggableBase implements Serializable {
 	  return isVisibleAtCanvas;
   }
 
+  public boolean isHidden() {
+      if (visibility == null) return false;
+      String vis = visibility.trim().toLowerCase();
+      return vis.equals("hidden") || vis.equals("collapse");
+  }
+
+  public boolean isDisplayed() {
+      if (display == null) return true;
+      String disp = display.trim().toLowerCase();
+      return !disp.contains("none") && !isHidden();
+  }
+
   @SuppressWarnings("unchecked")
   /*
    * This gets the position relative to the viewport
@@ -341,5 +371,13 @@ public class WdElement extends TaggableBase implements Serializable {
 		  return ((Long) o).longValue();
 	  
 	  return (long)o;
+  }
+
+  private Double castObjectToDouble(Object o, double defaultValue) {
+	  Double val = defaultValue;
+	  if (o instanceof Number) {
+		  val = ((Number) o).doubleValue();
+	  }
+	  return val;
   }
 }

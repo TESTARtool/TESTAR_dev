@@ -261,6 +261,9 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(WdTags.WebTextContent)) {
 			ret = w.element.textContent;
 		}
+		else if (t.equals(WdTags.WebInnerText)) {
+			ret = w.element.innerText;
+		}
 		else if (t.equals(WdTags.WebTitle)) {
 			ret = w.element.title;
 		}
@@ -273,6 +276,21 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(WdTags.WebStyle)) {
 			ret = w.element.style;
 		}
+		else if (t.equals(WdTags.WebStyleOpacity)) {
+			ret = w.element.styleOpacity;
+		}
+		else if (t.equals(WdTags.WebStyleOverflow)) {
+			ret = w.element.styleOverflow;
+		}
+		else if (t.equals(WdTags.WebStyleOverflowX)) {
+			ret = w.element.styleOverflowX;
+		}
+		else if (t.equals(WdTags.WebStyleOverflowY)) {
+			ret = w.element.styleOverflowY;
+		}
+		else if (t.equals(WdTags.WebStylePosition)) {
+			ret = w.element.stylePosition;
+		}
 		else if (t.equals(WdTags.WebTarget)) {
 			ret = w.element.target;
 		}
@@ -281,6 +299,15 @@ public final class WdState extends WdWidget implements State {
 		}
 		else if (t.equals(WdTags.WebDisplay)) {
 			ret = w.element.display;
+		}
+		else if (t.equals(WdTags.WebIsHidden)) {
+			ret = w.element.isHidden();
+		}
+		else if (t.equals(WdTags.WebXPath)) {
+			ret = w.element.xpath;
+		}
+		else if (t.equals(WdTags.WebIsDisplayed)) {
+			ret = w.element.isDisplayed();
 		}
 		else if (t.equals(WdTags.WebComputedFontSize)) {
 			ret = w.element.computedFontSize;
@@ -291,11 +318,26 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(WdTags.WebSrc)) {
 			ret = w.element.src;
 		}
+		else if (t.equals(WdTags.WebNaturalWidth)) {
+			ret = w.element.naturalWidth;
+		}
+		else if (t.equals(WdTags.WebNaturalHeight)) {
+			ret = w.element.naturalHeight;
+		}
+		else if (t.equals(WdTags.WebDisplayedWidth)) {
+			ret = w.element.displayedWidth;
+		}
+		else if (t.equals(WdTags.WebDisplayedHeight)) {
+			ret = w.element.displayedHeight;
+		}
 		else if (t.equals(WdTags.WebZIndex)) {
 			ret = w.element.zindex;
 		}
 		else if (t.equals(WdTags.WebIsEnabled)) {
 			ret = w.element.enabled;
+		}
+		else if (t.equals(WdTags.WebIsDisabled)) {
+			ret = w.element.disabled;
 		}
 		else if (t.equals(WdTags.WebIsBlocked)) {
 			ret = w.element.blocked;
