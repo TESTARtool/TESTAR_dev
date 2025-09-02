@@ -301,7 +301,7 @@ public final class WdState extends WdWidget implements State {
 			ret = w.element.display;
 		}
 		else if (t.equals(WdTags.WebIsHidden)) {
-			ret = ("hidden".equals(w.element.visibility) || "collapse".equals(w.element.visibility));
+			ret = w.element.isHidden();
 		}
 		else if (t.equals(WdTags.WebXPath)) {
 			ret = w.element.xpath;

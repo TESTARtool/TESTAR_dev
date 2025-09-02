@@ -280,6 +280,16 @@ public class SettingsFileStructure {
 				, ConfigTags.SwitchNewTabs.name() + " = "
 				, ""
 				, "#################################################################"
+				, "# WebDriver advanced state fetcher configuration"
+				, "#"
+				, "# WebIgnoredTags: " + ConfigTags.WebIgnoredTags.getDescription()
+				, "# WebIgnoredAttributes: " + ConfigTags.WebIgnoredAttributes.getDescription()
+				, "#################################################################"
+				, ""
+				, ConfigTags.WebIgnoredTags.name() + " = "
+				, ConfigTags.WebIgnoredAttributes.name() + " = "
+				, ""
+				, "#################################################################"
 				, "# WebDriver Browser Console Oracles"
 				, "#"
 				, "# WebConsoleErrorOracle: " + ConfigTags.WebConsoleErrorOracle.getDescription()
@@ -355,6 +365,19 @@ public class SettingsFileStructure {
 				, ConfigTags.JacocoCoverageClasses.name() + " = "
 				, ConfigTags.JacocoCoverageAccumulate.name() + " = "
 				, ""
+				, "#################################################################"
+				, "# Replay mode features"
+				, "# GenerateReplayableSequence: " + ConfigTags.GenerateReplayableSequence.getDescription()
+				, "# PathToReplaySequence: " + ConfigTags.PathToReplaySequence.getDescription()
+				, "# ReplayRetryTime: " + ConfigTags.ReplayRetryTime.getDescription()
+				, "# UseRecordedActionDurationAndWaitTimeDuringReplay: " + ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay.getDescription()
+				, "#################################################################"
+				, ""
+				, ConfigTags.GenerateReplayableSequence.name() + " = "
+				, ConfigTags.PathToReplaySequence.name() + " = "
+				, ConfigTags.ReplayRetryTime.name() + " = "
+				, ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay.name() + " = "
+				, ""
 				);
 
 		// Second, create a list of secondary configuration tags settings
@@ -367,12 +390,9 @@ public class SettingsFileStructure {
 		secondarySettingsList.add(ConfigTags.FormFillingAction);
 		secondarySettingsList.add(ConfigTags.LogLevel);
 		secondarySettingsList.add(ConfigTags.OnlySaveFaultySequences);
-		secondarySettingsList.add(ConfigTags.ReplayRetryTime);
 		secondarySettingsList.add(ConfigTags.StopGenerationOnFault);
 		secondarySettingsList.add(ConfigTags.TimeToFreeze);
-		secondarySettingsList.add(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay);
 		secondarySettingsList.add(ConfigTags.UseSystemActions);
-		secondarySettingsList.add(ConfigTags.PathToReplaySequence);
 		secondarySettingsList.add(ConfigTags.RefreshSpyCanvas);
 		secondarySettingsList.add(ConfigTags.FlashFeedback);
 		secondarySettingsList.add(ConfigTags.MaxReward);

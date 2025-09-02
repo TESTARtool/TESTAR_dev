@@ -35,6 +35,7 @@ import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.webdriver.Constants;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
@@ -76,6 +77,12 @@ public class Protocol_test_gradle_workflow_webdriver_parabank extends WebdriverP
         Assert.collectionSize(deniedExtensions, 5);
         Assert.isTrue(settings.get(ConfigTags.ClickableClasses).isEmpty());
         Assert.isTrue(settings.get(ConfigTags.TypeableClasses).isEmpty());
+
+        // WebDriver advanced state fetcher configuration verification
+        Assert.isTrue(Constants.getHiddenTags().contains("canvas"));
+        Assert.isTrue(Constants.getIgnoredTags().size() == 9);
+        Assert.isTrue(Constants.getIgnoredTags().contains("iframe"));
+        Assert.isTrue(Constants.getIgnoredAttributes().contains("xpath"));
     }
 
     /**
@@ -160,7 +167,7 @@ public class Protocol_test_gradle_workflow_webdriver_parabank extends WebdriverP
             }
 
             // slides can happen, even though the widget might be blocked
-            addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
+            addSlidingActions(actions, ac, widget);
 
             // If the element is blocked, Testar can't click on or type in the widget
             if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {

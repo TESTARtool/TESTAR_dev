@@ -53,7 +53,9 @@ function canvasDimensionsTestar() {
         document.documentElement.clientWidth,
         document.documentElement.clientHeight,
         window.innerWidth,
-        window.innerHeight
+        window.innerHeight,
+        window.scrollY,
+        window.scrollX
     ];
 }
 
@@ -93,6 +95,7 @@ function drawTextTestar(args) {
  */
 function drawLineTestar(args) {
     testarCtx.fillStyle = args[0];
+    testarCtx.strokeStyle = args[0];
     testarCtx.lineWidth = args[1];
     testarCtx.beginPath();
     testarCtx.moveTo(args[2], args[3]);

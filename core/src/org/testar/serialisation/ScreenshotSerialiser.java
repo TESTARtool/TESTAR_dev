@@ -33,6 +33,10 @@ package org.testar.serialisation;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.LinkedList;
 
 import org.testar.monkey.Assert;
@@ -90,7 +94,7 @@ public class ScreenshotSerialiser extends Thread {
 		while (alive || !scrshotSavingQueue.isEmpty()){
 			while(alive && scrshotSavingQueue.isEmpty()){
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(300);
 				} catch (InterruptedException e1) {}
 			}
 			if (!scrshotSavingQueue.isEmpty()){
@@ -106,9 +110,21 @@ public class ScreenshotSerialiser extends Thread {
 					r = scrshotSavingQueue.removeFirst();
 				}
 				try {
-					r.scrshot.saveAsPng(r.scrshotPath);
+					// Write to a temp file, then atomically move/replace it to the final name.
+					Path finalPath = Paths.get(r.scrshotPath);
+					Path tmpPath = finalPath.resolveSibling(finalPath.getFileName().toString() + ".part");
+					r.scrshot.saveAsPng(tmpPath.toString());
+					try {
+						Files.move(tmpPath, finalPath,
+								StandardCopyOption.ATOMIC_MOVE,
+								StandardCopyOption.REPLACE_EXISTING);
+					} catch (java.nio.file.AtomicMoveNotSupportedException e) {
+						// fall back to a regular replace if ATOMIC_MOVE not available (e.g., some filesystems)
+						Files.move(tmpPath, finalPath, StandardCopyOption.REPLACE_EXISTING);
+					}
 				} catch (IOException e) {
 					LogSerialiser.log("I/O exception saving screenshot <" + r.scrshotPath + ">\n", LogSerialiser.LogLevel.Critical);
+					try { Files.deleteIfExists(Paths.get(r.scrshotPath + ".part")); } catch (IOException ignore) {}
 				}
 			}
 		}

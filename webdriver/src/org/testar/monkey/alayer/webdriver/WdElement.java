@@ -74,7 +74,7 @@ public class WdElement extends TaggableBase implements Serializable {
   boolean hasKeyboardFocus, isKeyboardFocusable;
   String acceleratorKey, accessKey;
   String valuePattern, href, style, styleOverflow, styleOverflowX, styleOverflowY, stylePosition, target, alt, src, visibility;
-  Object value;
+  String value;
   
   double zindex;
   double styleOpacity;
@@ -133,7 +133,7 @@ public class WdElement extends TaggableBase implements Serializable {
     innerText = (packedElement.get("innerText") == null) ? "" : ((String) packedElement.get("innerText")).replaceAll("\\s+", " ").trim();
     title = attributeMap.getOrDefault("title","");
     href = attributeMap.getOrDefault("href", "");
-    value = attributeMap.getOrDefault("value", "");
+    value = (packedElement.get("value") instanceof String) ? (String) packedElement.get("value") : "";
     style = attributeMap.getOrDefault("style", "");
     styleOverflow = (packedElement.get("styleOverflow") == null) ? "" : (String) packedElement.get("styleOverflow");
     styleOverflowX = (packedElement.get("styleOverflowX") == null) ? "" : (String) packedElement.get("styleOverflowX");
@@ -188,7 +188,7 @@ public class WdElement extends TaggableBase implements Serializable {
     isKeyboardFocusable = getIsFocusable();
     hasKeyboardFocus = (Boolean) packedElement.get("hasKeyboardFocus");
 
-    enabled = !Constants.hiddenTags.contains(tagName) && !disabled;
+    enabled = !Constants.getHiddenTags().contains(tagName) && !disabled;
     if (display != null && display.toLowerCase().equals("none")) {
       enabled = false;
     }
@@ -199,8 +199,8 @@ public class WdElement extends TaggableBase implements Serializable {
         (List<Map<String, Object>>) packedElement.get("wrappedChildren");
     for (Map<String, Object> wrappedChild : wrappedChildren) {
       WdElement child = new WdElement(wrappedChild, root, this);
-      if (!Constants.hiddenTags.contains(child.tagName) &&
-          !Constants.ignoredTags.contains(child.tagName)) {
+      if (!Constants.getHiddenTags().contains(child.tagName) &&
+          !Constants.getIgnoredTags().contains(child.tagName)) {
         children.add(child);
       }
     }
@@ -247,8 +247,8 @@ public class WdElement extends TaggableBase implements Serializable {
 	  else if(placeholder != null && !placeholder.isEmpty()) {
 		  return placeholder;
 	  }
-	  else if(value != null && !value.toString().isEmpty()) {
-		  return value.toString();
+	  else if(value != null && !value.isEmpty()) {
+		  return value;
 	  }
 	  else if(type != null && !type.isEmpty()) {
 		  return type;
@@ -333,15 +333,16 @@ public class WdElement extends TaggableBase implements Serializable {
 	  return isVisibleAtCanvas;
   }
 
+  public boolean isHidden() {
+      if (visibility == null) return false;
+      String vis = visibility.trim().toLowerCase();
+      return vis.equals("hidden") || vis.equals("collapse");
+  }
+
   public boolean isDisplayed() {
-	  if (remoteWebElement == null) {
-		  return false;
-	  }
-	  try {
-		  return remoteWebElement.isDisplayed();
-	  } catch (Exception e) {
-		  return false;
-	  }
+      if (display == null) return true;
+      String disp = display.trim().toLowerCase();
+      return !disp.contains("none") && !isHidden();
   }
 
   @SuppressWarnings("unchecked")
