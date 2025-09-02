@@ -56,6 +56,7 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(TempDir, Main.tempDir));
 		defaults.add(Pair.from(OnlySaveFaultySequences, false));
 		defaults.add(Pair.from(PathToReplaySequence, Main.tempDir));
+		defaults.add(Pair.from(GenerateReplayableSequence, true));
 		defaults.add(Pair.from(ActionDuration, 0.1));
 		defaults.add(Pair.from(TimeToWaitAfterAction, 0.1));
 		defaults.add(Pair.from(VisualizeActions, false));
@@ -160,6 +161,25 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(FollowLinks, true));
 		defaults.add(Pair.from(BrowserFullScreen, true));
 		defaults.add(Pair.from(SwitchNewTabs, true));
+
+		defaults.add(Pair.from(WebIgnoredTags, new ArrayList<String>() {
+		    {
+		        add("script");
+		        add("noscript");
+		        add("head");
+		        add("meta");
+		        add("style");
+		        add("link");
+		        add("svg");
+		        add("canvas");
+		    }
+		}));
+
+		defaults.add(Pair.from(WebIgnoredAttributes, new ArrayList<String>() {
+		    {
+		        add("xpath");
+		    }
+		}));
 
 		/*
 		//TODO web driver settings for login feature

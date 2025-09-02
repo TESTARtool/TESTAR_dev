@@ -54,6 +54,7 @@ import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.exceptions.ActionFailedException;
+import org.testar.monkey.alayer.exceptions.WidgetNotFoundException;
 import org.testar.serialisation.LogSerialiser;
 
 public class ReplayMode {
@@ -177,11 +178,16 @@ public class ReplayMode {
 							actionHasWidgetAssociated = true;
 							Widget w;
 							for (Finder f : targets){
-								w = f.apply(state);
-								if (w != null){
-									//Can be this the widget the one that we want to find?
-									if(widgetStringToFind.equals(w.get(Tags.Title, "")))
-										widgetTitleFound = true;
+								try {
+									w = f.apply(state);
+									if (w != null){
+										//Can be this the widget the one that we want to find?
+										if(widgetStringToFind.equals(w.get(Tags.Title, "")))
+											widgetTitleFound = true;
+									}
+								} catch(WidgetNotFoundException e) {
+									LogSerialiser.log("WidgetNotFoundException when trying to replay the widget: " + widgetStringToFind + "\n", 
+											LogSerialiser.LogLevel.Critical);
 								}
 							}
 						}

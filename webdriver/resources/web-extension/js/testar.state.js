@@ -1,5 +1,3 @@
-var TestarState = (function () {
-
 /*
  * Keep a map with all labels client-side
  */
@@ -8,11 +6,12 @@ var labelMap;
 /*
  * Get the widget tree (Chrome, Firefox) or flattened tree (Edge)
  * @param {Array} array of tags that can be skipped, like <style>, <script> etc.
+ * @param {Array} array of attributes to be skipped, like xpath, innerText etc.
  * @return {(Object | Array)}
  */
-var getStateTreeTestar = function (ignoredTags) {
+var getStateTreeTestar = function (ignoredTags, ignoredAttributes) {
     var body = document.body;
-    var bodyWrapped = wrapElementTestar(body, 0, 0);
+    var bodyWrapped = wrapElementTestar(body, 0, 0, ignoredAttributes);
     bodyWrapped['documentHasFocus'] = document.hasFocus();
     bodyWrapped['documentTitle'] = document.title;
     bodyWrapped['largestContentfulPaint'] = latestLCP;
@@ -23,11 +22,11 @@ var getStateTreeTestar = function (ignoredTags) {
     // For Edge we return a flattened tree (as array), see comment in WdStateFetcher
     if (window.navigator.userAgent.indexOf("Edge") > -1) {
         var treeArray = [];
-        traverseElementArrayTestar(treeArray, bodyWrapped, body, -1, ignoredTags);
+        traverseElementArrayTestar(treeArray, bodyWrapped, body, -1, ignoredTags, ignoredAttributes);
         return treeArray;
     }
     else {
-        traverseElementTestar(bodyWrapped, body, ignoredTags);
+        traverseElementTestar(bodyWrapped, body, ignoredTags, ignoredAttributes);
         return bodyWrapped;
     }
 };
@@ -37,8 +36,9 @@ var getStateTreeTestar = function (ignoredTags) {
  * @param {object} parentWrapped, the (wrapped) parent object
  * @param {node} rootElement, the body element
  * @param {object} ignoredTags, list of tags to skip, <style>, <script> etc.
+ * @param {object} ignoredAttributes, list of attributes to skip, like xpath, innerText etc.
  */
-function traverseElementTestar(parentWrapped, rootElement, ignoredTags) {
+function traverseElementTestar(parentWrapped, rootElement, ignoredTags, ignoredAttributes) {
     var childNodes = getChildNodesTestar(parentWrapped);
     for (var i = 0; i < childNodes.length; i++) {
         var childElement = childNodes[i];
@@ -54,8 +54,8 @@ function traverseElementTestar(parentWrapped, rootElement, ignoredTags) {
             continue;
         }
 
-        var childWrapped = wrapElementTestar(childElement, parentWrapped["xOffset"], parentWrapped["yOffset"]);
-        traverseElementTestar(childWrapped, rootElement, ignoredTags);
+        var childWrapped = wrapElementTestar(childElement, parentWrapped["xOffset"], parentWrapped["yOffset"], ignoredAttributes);
+        traverseElementTestar(childWrapped, rootElement, ignoredTags, ignoredAttributes);
         parentWrapped.wrappedChildren.push(childWrapped);
     }
 	
@@ -76,8 +76,8 @@ function traverseElementTestar(parentWrapped, rootElement, ignoredTags) {
 				continue;
 			}
 			
-			var childShadowWrapped = wrapElementTestar(childShadowElement, parentWrapped["xOffset"], parentWrapped["yOffset"]);
-			traverseElementTestar(childShadowWrapped, rootElement, ignoredTags);
+			var childShadowWrapped = wrapElementTestar(childShadowElement, parentWrapped["xOffset"], parentWrapped["yOffset"], ignoredAttributes);
+			traverseElementTestar(childShadowWrapped, rootElement, ignoredTags, ignoredAttributes);
 			parentWrapped.wrappedChildren.push(childShadowWrapped);
 		}
 	}
@@ -103,8 +103,9 @@ function shouldDeleteElementForSerialization(element) {
  * @param {node} rootElement, the body element
  * @param {integer} parentId, index of the parent in the flattened array
  * @param {object} ignoredTags, array of tags to skip, <style>, <script> etc.
+ * @param {object} ignoredAttributes, list of attributes to skip, like xpath, innerText etc.
  */
-function traverseElementArrayTestar(treeArray, parentWrapped, rootElement, parentId, ignoredTags) {
+function traverseElementArrayTestar(treeArray, parentWrapped, rootElement, parentId, ignoredTags, ignoredAttributes) {
     parentWrapped['parentId'] = parentId;
     treeArray.push(parentWrapped);
 
@@ -125,8 +126,8 @@ function traverseElementArrayTestar(treeArray, parentWrapped, rootElement, paren
             continue
         }
 
-        var childWrapped = wrapElementTestar(childElement, parentWrapped["xOffset"], parentWrapped["yOffset"]);
-        traverseElementArrayTestar(treeArray, childWrapped, rootElement, parentId, ignoredTags);
+        var childWrapped = wrapElementTestar(childElement, parentWrapped["xOffset"], parentWrapped["yOffset"], ignoredAttributes);
+        traverseElementArrayTestar(treeArray, childWrapped, rootElement, parentId, ignoredTags, ignoredAttributes);
     }
 }
 
@@ -165,7 +166,7 @@ function getChildNodesTestar(parentWrapped) {
  * @param {object} yOffset, offset off the iFrame (if applicable)
  * @return {object} array element and attributes
  */
-function wrapElementTestar(element, xOffset, yOffset) {
+function wrapElementTestar(element, xOffset, yOffset, ignoredAttributes) {
     var computedStyle = getComputedStyle(element);
     var clientRect = element.getBoundingClientRect();
 
@@ -182,7 +183,7 @@ function wrapElementTestar(element, xOffset, yOffset) {
         name: getNameTestar(element),
         tagName: element.tagName.toLowerCase(),
         textContent: "",
-        innerText: element.innerText,
+        innerText: ignoredAttributes.includes("innerText") ? "" : element.innerText,
         value: element.value,
         checked: element.checked,
         selected: element.selected,
@@ -200,8 +201,8 @@ function wrapElementTestar(element, xOffset, yOffset) {
         computedFontSize: computedStyle.fontSize,
         computedColor: computedStyle.color,
         computedBackgroundColor: getEffectiveBackgroundColor(element),
-        innerHTML: element.innerHTML,
-        outerHTML: element.outerHTML,
+        innerHTML: ignoredAttributes.includes("innerHTML") ? "" : element.innerHTML,
+        outerHTML: ignoredAttributes.includes("outerHTML") ? "" : element.outerHTML,
 
         zIndex: getZIndexTestar(element, computedStyle),
         rect: getRectTestar(element, xOffset, yOffset, clientRect),
@@ -214,7 +215,7 @@ function wrapElementTestar(element, xOffset, yOffset) {
         isClickable: isClickableTestar(element, xOffset, yOffset),
         isShadowElement: shadowElement,
         hasKeyboardFocus: document.activeElement === element,
-        xpath: getXPath(element),
+        xpath: ignoredAttributes.includes("xpath") ? "" : getXPath(element),
 
         wrappedChildren: [],
         xOffset: xOffset,
@@ -534,8 +535,3 @@ const observer = new PerformanceObserver((list) => {
     }
 });
 observer.observe({ type: "largest-contentful-paint", buffered: true });
-
-return {
-    getStateTreeTestar: getStateTreeTestar
-};
-})();

@@ -44,6 +44,25 @@ import static org.testar.monkey.alayer.Tags.Visualizer;
 public class SutVisualization {
 
     /**
+     * Visualizing filtered actions with grey colored dots
+     *
+     * @param canvas
+     * @param state
+     * @param actions
+     */
+    public static void visualizeFilteredActions(Canvas canvas, State state, Set<Action> actions){
+        Pen greyPen = Pen.newPen().setColor(Color.from(128, 128, 128, 96)).setFillPattern(FillPattern.Solid).setStrokeWidth(20).build();
+        try {
+            for(Action a : actions){
+                a.get(Visualizer, Util.NullVisualizer).run(state, canvas, greyPen);
+            }
+        } catch(IllegalStateException ise) {
+            System.out.println("visualizeFilteredActions : canvas visualization not available!");
+            if(ise.getMessage()!=null) { System.out.println(ise.getMessage()); }
+        }
+    }
+
+    /**
      *
      * @param showExtendedWidgetInfo
      * @param markParentWidget
@@ -211,65 +230,14 @@ public class SutVisualization {
      * @param state
      * @param actions
      */
-    public static void visualizeActions(Canvas canvas, State state, Set<Action> actions) {
-        visualizeActions(canvas, state, actions, true);
-    }
-
-    /**
-     * Visualizing available actions with colored dots on a canvas on top of SUT
-     *
-     * @param canvas
-     * @param state
-     * @param actions
-     * @param ignoreSliders  if true, slider actions will be skipped
-     */
-    public static void visualizeActions(Canvas canvas, State state, Set<Action> actions, boolean ignoreSliders) {
+    public static void visualizeActions(Canvas canvas, State state, Set<Action> actions){
         try {
             for(Action a : actions){
-                // Optionally ignore slider actions
-                if (ignoreSliders && a.get(Tags.Slider, null) != null) {
-                    continue;
-                }
                 Pen vp = Pen.PEN_IGNORE;
                 a.get(Visualizer, Util.NullVisualizer).run(state, canvas, vp);
             }
         } catch(IllegalStateException ise) {
             System.out.println("visualizeActions : canvas visualization not available!");
-            if(ise.getMessage()!=null) { System.out.println(ise.getMessage()); }
-        }
-    }
-
-    /**
-     * Visualizing filtered actions with grey colored dots
-     *
-     * @param canvas
-     * @param state
-     * @param actions
-     */
-    public static void visualizeFilteredActions(Canvas canvas, State state, Set<Action> actions){
-    	visualizeFilteredActions(canvas, state, actions, true);
-    }
-
-    /**
-     * Visualizing filtered actions with grey colored dots
-     *
-     * @param canvas
-     * @param state
-     * @param actions
-     * @param ignoreSliders  if true, slider actions will be skipped
-     */
-    public static void visualizeFilteredActions(Canvas canvas, State state, Set<Action> actions, boolean ignoreSliders) {
-        Pen greyPen = Pen.newPen().setColor(Color.from(128, 128, 128, 96)).setFillPattern(FillPattern.Solid).setStrokeWidth(20).build();
-        try {
-            for(Action a : actions){
-                // Optionally ignore slider actions
-                if (ignoreSliders && a.get(Tags.Slider, null) != null) {
-                    continue;
-                }
-                a.get(Visualizer, Util.NullVisualizer).run(state, canvas, greyPen);
-            }
-        } catch(IllegalStateException ise) {
-            System.out.println("visualizeFilteredActions : canvas visualization not available!");
             if(ise.getMessage()!=null) { System.out.println(ise.getMessage()); }
         }
     }

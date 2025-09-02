@@ -62,7 +62,7 @@ import static org.testar.monkey.Util.compileProtocol;
 
 public class Main {
 
-	public static final String TESTAR_VERSION = "2.7.7 (26-Aug-2025)";
+	public static final String TESTAR_VERSION = "v2.7.8 (2-Sep-2025)";
 
 	//public static final String TESTAR_DIR_PROPERTY = "DIRNAME"; //Use the OS environment to obtain TESTAR directory
 	public static final String SETTINGS_FILE = "test.settings";
@@ -518,7 +518,7 @@ public class Main {
 		if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WINDOWS_10)) {
 			Environment.setInstance(new Windows10());
 		} else {
-			System.out.printf("WARNING: Current OS %s has no concrete environment implementation, using default environment\n", NativeLinker.getPLATFORM_OS());
+			System.out.printf("WARNING: Current OS %s has no concrete environment implementation, using default environment and default getDisplayScale value\n", NativeLinker.getPLATFORM_OS());
 			Environment.setInstance(new UnknownEnvironment());
 		}
 	}

@@ -1,3 +1,19 @@
+#TESTAR v2.7.8 (2-Sep-2025)
+- Add paintBatch and drawBatchTestar logic to paint all web elements at once
+- Fix the derivation and visualization of slide actions in web applications
+- Add more Verdict warning groups
+- Refactor output files to avoid saving ".testar" sequences twice
+- Add Constants ignoredAttributes list to allow users to ignore JavaScript state attributes that require a high workload
+- Fix issue to avoid serializing non-serializable elements (this was provoking issues with iframe elements)
+- Add loadUrlWithRetry to catch selenium timeout exceptions and avoid TESTAR hanging
+- Extend TESTAR webdriver tags
+- Fix bug extracting the protocol name the .sse file
+- Ignore weak password chrome popup
+- Refactor usage of Tag ScreenshotImage
+- Add settings to configure webdriver constants
+- Add settings to enable/disable generating replayable files
+
+
 #TESTAR 2.7.7 (26-Aug-2025)
 - Bump org.seleniumhq.selenium:selenium-java from 4.34.0 to 4.35.0 
 - Bump io.appium:java-client from 9.5.0 to 10.0.0 

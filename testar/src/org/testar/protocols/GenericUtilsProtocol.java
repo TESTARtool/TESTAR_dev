@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -55,6 +55,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
+
+    //Attributes for adding slide actions
+    protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
+    protected static double SCROLL_THICK = 16; //scroll thickness
 
     /**
      * Allows using the function with a tag name,
@@ -524,11 +528,10 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
      * @param scrollThick
      * @param widget
      */
-    @Deprecated
-    protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget widget){
+    protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, Widget widget){
         Drag[] drags = null;
         //If there are scroll (drags/drops) actions possible
-        if((drags = widget.scrollDrags(scrollArrowSize,scrollThick)) != null){
+        if((drags = widget.scrollDrags(SCROLL_ARROW_SIZE, SCROLL_THICK)) != null){
             //For each possible drag, create an action and add it to the derived actions
             for (Drag drag : drags){
                 //Create a slide action with the Action Compiler, and add it to the set of derived actions
@@ -540,11 +543,6 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
 
             }
         }
-    }
-
-    @Deprecated
-    protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget widget, State state){
-        addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
     }
 
     /**
