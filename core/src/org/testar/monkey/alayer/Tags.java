@@ -123,8 +123,6 @@ public final class Tags extends TagsBase {
 	/** The pattern value of a web-widget : hyperlink or text in input field */
 	public static final Tag<String> ValuePattern = from("ValuePattern", String.class);
 
-	public static final Tag<WidgetMap> WidgetMap = from("WidgetMap", WidgetMap.class);
-
 	public static final Tag<String> Path = from("Path", String.class);
 	public static final Tag<String> ConcreteID = from(CodingManager.CONCRETE_ID, String.class);
 	public static final Tag<String> AbstractID = from(CodingManager.ABSTRACT_ID, String.class);
