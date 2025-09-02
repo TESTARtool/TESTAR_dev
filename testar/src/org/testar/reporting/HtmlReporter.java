@@ -358,9 +358,15 @@ public class HtmlReporter implements Reporting
     	String imagePath = state.get(Tags.ScreenshotPath);
     	File imageFile = new File(imagePath);
 
-    	while(!imageFile.exists()) {
-    		Util.pause(1);
-    	}
+        // Retry up to 10 times, pausing 1s between attempts
+        for (int i = 0; i < 10 && !imageFile.exists(); i++) {
+            Util.pause(1);
+        }
+
+        // If after retries the file still doesn't exist, stop
+        if (!imageFile.exists()) {
+            return;
+        }
 
     	try {
     		// Draw in top of the state screenshot to highlight the erroneous widget
