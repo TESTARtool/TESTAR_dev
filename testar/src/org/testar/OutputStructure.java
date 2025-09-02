@@ -51,7 +51,6 @@ public class OutputStructure {
 	public static int sequenceInnerLoopCount;
 
 	public static String outerLoopOutputDir;
-	public static String sequencesOutputDir;
 	public static String screenshotsOutputDir;
 	public static String htmlOutputDir;
 	public static String logsOutputDir;
@@ -134,11 +133,6 @@ public class OutputStructure {
 			runDir = new File(Main.outputDir + File.separator + startOuterLoopDateString + "_unknown");
 			runDir.mkdirs();
 		}
-
-		sequencesOutputDir = outerLoopOutputDir + File.separator + "sequences";
-		File seqDir = new File(sequencesOutputDir);
-		if(!seqDir.exists())
-			seqDir.mkdirs();
 
 		screenshotsOutputDir = outerLoopOutputDir + File.separator + "scrshots";
 		File scrnDir = new File(screenshotsOutputDir);

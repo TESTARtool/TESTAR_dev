@@ -30,6 +30,7 @@
 
 package org.testar.monkey.alayer.webdriver;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.monkey.alayer.devices.AWTKeyboard;
@@ -111,8 +112,8 @@ public class WdDriver extends SUTBase {
 		  remoteWebDriver.manage().window().setPosition(screenPosition);
 	  }
 
+	  //loadUrlWithRetry(url);
 	  remoteWebDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-	  
 	  remoteWebDriver.get(url);
 
 	    // Working with https connections in chromedriver, sometimes we can find that:
@@ -134,6 +135,34 @@ public class WdDriver extends SUTBase {
 	  CanvasDimensions.startThread();
 
 	  wdDriver = this;
+  }
+
+  private void loadUrlWithRetry(String url) {
+      try {
+          remoteWebDriver.get(url);
+      } catch (WebDriverException wex) {
+          if (wex instanceof TimeoutException) {
+              logger.log(Level.WARN, "WebDriver TimeoutException for URL: " + url);
+          } else {
+              logger.log(Level.WARN, "WebDriverException on first attempt for URL: " + url);
+          }
+
+          try {
+              logger.log(Level.INFO, "Waiting and retrying URL load...");
+              Util.pause(10);
+              remoteWebDriver.get(url);
+          } catch (WebDriverException retryWex) {
+              if (retryWex instanceof TimeoutException) {
+                  logger.log(Level.WARN, "Retry WebDriver TimeoutException for URL: " + url);
+              } else {
+                  logger.log(Level.WARN, "Retry WebDriverException for URL: " + url);
+              }
+          } catch (Exception retryOther) {
+              logger.log(Level.ERROR, "Unexpected exception during retry for URL: " + url);
+          }
+      } catch (Exception e) {
+          logger.log(Level.ERROR, "Unexpected exception for URL: " + url);
+      }
   }
 
   public static LogEntries getBrowserLogs() {

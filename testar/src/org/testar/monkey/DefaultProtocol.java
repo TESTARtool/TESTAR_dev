@@ -99,7 +99,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return generatedSequence;
 	}
 
-	File currentSeq;
+	private File currentSeq;
 
 	protected Mouse mouse;
 
@@ -415,13 +415,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 *
 	 * @return name of the generated sequence file
 	 */
-	String getAndStoreGeneratedSequence() {
+	void getAndStoreGeneratedSequence() {
 		//TODO refactor replayable sequences with something better (model perhaps?)
 
 		String sequenceCountDir = "_sequence_" + OutputStructure.sequenceInnerLoopCount;
 
-		String generatedSequenceName = OutputStructure.sequencesOutputDir
-				+ File.separator + OutputStructure.startInnerLoopDateString + "_"
+		this.generatedSequence = OutputStructure.startInnerLoopDateString + "_"
 				+ OutputStructure.executedSUTname + sequenceCountDir + ".testar";
 
 		String logFileName = OutputStructure.logsOutputDir
@@ -440,8 +439,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		ScreenshotSerialiser.start(OutputStructure.screenshotsOutputDir, screenshotsDirectory);
-
-		return generatedSequenceName;
 	}
 
 	/**
@@ -450,7 +447,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 *
 	 * @return temporary file for saving the test sequence
 	 */
-	File getAndStoreSequenceFile() {
+	void getAndStoreSequenceFile() {
 		LogSerialiser.log("Creating new sequence file...\n", LogSerialiser.LogLevel.Debug);
 
 		String sequenceObject = settings.get(ConfigTags.TempDir)
@@ -458,16 +455,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				+ OutputStructure.executedSUTname
 				+ "_sequence_" + OutputStructure.sequenceInnerLoopCount + ".testar";
 
-		final File currentSeqObject = new File(sequenceObject);
+		this.currentSeq = new File(sequenceObject);
 
-		try {
-			TestSerialiser.start(new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(currentSeqObject, true))));
-			LogSerialiser.log("Created new sequence file!\n", LogSerialiser.LogLevel.Debug);
-		} catch (IOException e) {
-			LogSerialiser.log("I/O exception creating new sequence file\n", LogSerialiser.LogLevel.Critical);
+		if(settings.get(ConfigTags.GenerateReplayableSequence, false)) {
+			try {
+				TestSerialiser.start(new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(this.currentSeq, true))));
+				LogSerialiser.log("Created new sequence file!\n", LogSerialiser.LogLevel.Info);
+			} catch (IOException e) {
+				LogSerialiser.log("I/O exception creating new sequence file\n", LogSerialiser.LogLevel.Critical);
+			}
+		} else {
+			LogSerialiser.log("Replayable files are not created due to GenerateReplayableSequence setting\n", LogSerialiser.LogLevel.Info);
 		}
-
-		return currentSeqObject;
 	}
 
 	/**
@@ -563,13 +562,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 	}
 
-	void classifyAndCopySequenceIntoAppropriateDirectory(Verdict finalVerdict, String generatedSequence, File currentSeq){
+	void classifyAndCopySequenceIntoAppropriateDirectory(Verdict finalVerdict){
 		// Check if user wants to save or not the sequences without faults
 		if (settings.get(ConfigTags.OnlySaveFaultySequences, false) && finalVerdict.severity() == Verdict.OK.severity()) {
-			LogSerialiser.log("Skipped generated sequence OK (\"" + generatedSequence + "\")\n", LogSerialiser.LogLevel.Info);
+			LogSerialiser.log("Skipped generated sequence OK (\"" + this.generatedSequence + "\")\n", LogSerialiser.LogLevel.Info);
 		} else {
-			LogSerialiser.log("Saved generated sequence (\"" + generatedSequence + "\")\n", LogSerialiser.LogLevel.Info);
-			FileHandling.copyClassifiedSequence(generatedSequence, currentSeq, finalVerdict);
+			this.generatedSequence = FileHandling.copyClassifiedSequence(this.generatedSequence, currentSeq, finalVerdict);
 		}
 	}
 
@@ -579,6 +577,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @param action
 	 */
 	void saveActionIntoFragmentForReplayableSequence(Action action, State state, Set<Action> actions) {
+	    // User decided not to generate replayable files
+	    if(!settings.get(ConfigTags.GenerateReplayableSequence)) {
+	        return;
+	    }
+
 	    // create fragment
 		TaggableBase fragment = new TaggableBase();
 	    fragment.set(ExecutedAction, action);
@@ -798,7 +801,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			if(screenshot != null) {
 				String screenshotPath = ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), screenshot);
-				state.set(Tags.ScreenshotImage, screenshot);
 				state.set(Tags.ScreenshotPath, screenshotPath);
 			}
 		}
@@ -927,7 +929,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					LogSerialiser.log("Forcing kill-process <" + forceKillProcess + "> action\n", LogSerialiser.LogLevel.Info);
 					Action killProcessAction = KillProcess.byName(forceKillProcess, 0);
 					killProcessAction.set(Tags.Desc, "Kill Process with name '" + forceKillProcess + "'");
-					killProcessAction.mapActionToWidget(state);
+					killProcessAction.mapOriginWidget(state);
 					return new HashSet<>(Collections.singletonList(killProcessAction));
 				}
 			}
@@ -940,7 +942,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			LogSerialiser.log("Forcing SUT activation (bring to foreground) action\n", LogSerialiser.LogLevel.Info);
 			Action foregroundAction = new ActivateSystem();
 			foregroundAction.set(Tags.Desc, "Bring the system to the foreground.");
-			foregroundAction.mapActionToWidget(state);
+			foregroundAction.mapOriginWidget(state);
 			foregroundAction.set(Tags.Role, Roles.System);
 			return new HashSet<>(Collections.singletonList(foregroundAction));
 		}
@@ -967,7 +969,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println("DEBUG: Forcing ESC action in preActionSelection : Actions derivation seems to be EMPTY !");
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
 			Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
-			escAction.mapActionToWidget(state);
+			escAction.mapOriginWidget(state);
 			buildEnvironmentActionIdentifiers(state, escAction);
 			reportManager.addActions(Collections.singleton(escAction));
 			return new HashSet<>(Collections.singletonList(escAction));
@@ -1153,11 +1155,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			statusInfo = (getFinalVerdict()).info();
 		}
 
-		String sequencesPath = getGeneratedSequenceName();
+		this.generatedSequence = OutputStructure.outerLoopOutputDir + File.separator + this.generatedSequence;
 		try {
-			sequencesPath = new File(getGeneratedSequenceName()).getCanonicalPath();
+			this.generatedSequence = new File(this.generatedSequence).getCanonicalPath();
 		} catch (IOException e) {
-			e.printStackTrace();
+			LogSerialiser.log("Error generating sequence canonical path for the index logger\n", LogSerialiser.LogLevel.Critical);
 		}
 
 		statusInfo = statusInfo.replace("\n"+Verdict.OK.info(), "");
@@ -1165,7 +1167,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//Timestamp(generated by logger) SUTname Mode SequenceFileObject Status "StatusInfo"
 		INDEXLOG.info(OutputStructure.executedSUTname
 					  + " " + settings.get(ConfigTags.Mode, mode())
-					  + " " + sequencesPath
+					  + " " + this.generatedSequence
 					  + " " + status + " \"" + statusInfo + "\"" );
 
 		reportManager.finishReport();

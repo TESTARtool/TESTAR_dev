@@ -38,7 +38,6 @@ package org.testar.environment;
 public class UnknownEnvironment implements IEnvironment {
     @Override
     public double getDisplayScale(long windowHandle){
-        System.out.println("WARNING getDisplayScale not implemented for current OS, returning default value");
         return 1.0;
     }
 }

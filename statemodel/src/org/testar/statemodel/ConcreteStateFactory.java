@@ -30,16 +30,23 @@
 
 package org.testar.statemodel;
 
-import org.testar.monkey.alayer.AWTCanvas;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.testar.monkey.Util;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public abstract class ConcreteStateFactory {
+
+    protected static final Logger logger = LogManager.getLogger();
 
     /**
      * This builder method will create a new concrete state class and populate it with the needed data
@@ -58,15 +65,25 @@ public abstract class ConcreteStateFactory {
 
         // get a screenshot for this concrete state
         // in a headless environment, there may not be screenshots
-        if(newState.get(Tags.ScreenshotImage, null) != null) {
-        	ByteArrayOutputStream screenshotBytes = new ByteArrayOutputStream();
-        	AWTCanvas screenshot = newState.get(Tags.ScreenshotImage);
-        	try {
-        		screenshot.saveAsPng(screenshotBytes);
-        	} catch (IOException e) {
-        		e.printStackTrace();
-        	}
-        	concreteState.setScreenshot(screenshotBytes.toByteArray());
+        String srcPath = newState.get(Tags.ScreenshotPath, null);
+        if(srcPath != null && !srcPath.isEmpty()) {
+            Path normalizePath = Paths.get(srcPath).normalize();
+
+            // wait for state screenshot to be saved (max ~2s)
+            for (int i = 0; i < 20 && !Files.isRegularFile(normalizePath); i++) {
+                Util.pause(0.1);
+            }
+
+            try {
+                if (Files.isRegularFile(normalizePath)) {
+                    byte[] bytes = Files.readAllBytes(normalizePath);
+                    concreteState.setScreenshot(bytes);
+                } else {
+                    logger.log(Level.WARN, "Screenshot file not found: " + normalizePath.toAbsolutePath());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         return concreteState;

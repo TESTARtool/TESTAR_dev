@@ -86,7 +86,7 @@ public class WdRemoteTypeAction extends TaggableBase implements Action {
 		this.widget = widget;
 		this.keys = keys;
 
-		this.mapActionToWidget(widget);
+		this.mapOriginWidget(widget);
 		this.set(Tags.Desc, "Remote type " + keys + " to widget " 
 				+ widget.element.getElementDescription() + " : " + widget.element.remoteWebElement.getId());
 		this.set(Tags.Role, WdActionRoles.RemoteType);

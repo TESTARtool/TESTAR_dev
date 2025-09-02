@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 - 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -45,6 +45,7 @@ import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.WdElement;
 import org.testar.monkey.alayer.webdriver.WdWidget;
+import org.testar.monkey.alayer.webdriver.Constants;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.monkey.alayer.windows.WinProcess;
@@ -132,6 +133,12 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		//Force webdriver to switch to a new tab if opened
 		//This feature can block the correct display of select dropdown elements 
 		WdDriver.forceActivateTab = settings.get(ConfigTags.SwitchNewTabs);
+
+		// List of HTML tags that TESTAR should ignore when obtaining the web state
+		Constants.setIgnoredTags(settings.get(ConfigTags.WebIgnoredTags));
+
+		// List of web attributes that TESTAR should ignore when obtaining the web state
+		Constants.setIgnoredAttributes(settings.get(ConfigTags.WebIgnoredAttributes));
 	}
 	
 	/**
