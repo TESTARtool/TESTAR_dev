@@ -62,7 +62,7 @@ import static org.testar.monkey.Util.compileProtocol;
 
 public class Main {
 
-	public static final String TESTAR_VERSION = "2.7.6 (22-Jul-2025)";
+	public static final String TESTAR_VERSION = "v2.7.8 (2-Sep-2025)";
 
 	//public static final String TESTAR_DIR_PROPERTY = "DIRNAME"; //Use the OS environment to obtain TESTAR directory
 	public static final String SETTINGS_FILE = "test.settings";
@@ -257,8 +257,23 @@ public class Main {
 		}
 		else {
 			//Use the only file that was found
-			SSE_ACTIVATED = files[0].split(SUT_SETTINGS_EXT)[0];
+			SSE_ACTIVATED = extractSSEName(files[0]);
 		}
+	}
+
+	/**
+	 * Extracts the protocol name from a given .sse filename.
+	 * If the filename ends with the .sse extension, removes it.
+	 * Otherwise returns the original string unchanged.
+	 *
+	 * @param fileName Name of the .sse file
+	 * @return Protocol name without the .sse extension
+	 */
+	private static String extractSSEName(String fileName) {
+	    if (fileName != null && fileName.endsWith(SUT_SETTINGS_EXT)) {
+	        return fileName.substring(0, fileName.length() - SUT_SETTINGS_EXT.length());
+	    }
+	    return fileName;
 	}
 
 	/**
@@ -502,7 +517,7 @@ public class Main {
 		if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WINDOWS_10)) {
 			Environment.setInstance(new Windows10());
 		} else {
-			System.out.printf("WARNING: Current OS %s has no concrete environment implementation, using default environment\n", NativeLinker.getPLATFORM_OS());
+			System.out.printf("WARNING: Current OS %s has no concrete environment implementation, using default environment and default getDisplayScale value\n", NativeLinker.getPLATFORM_OS());
 			Environment.setInstance(new UnknownEnvironment());
 		}
 	}

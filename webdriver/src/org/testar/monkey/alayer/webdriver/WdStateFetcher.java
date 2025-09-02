@@ -52,12 +52,9 @@ public class WdStateFetcher implements Callable<WdState> {
 
   @SuppressWarnings("unchecked")
   public static WdRootElement buildRoot(SUT system) throws StateBuildException {
-    Object result = null;
-    if(Constants.simpleState) {
-	  result = WdDriver.executeScript("return TestarSimpleState.getStateTreeTestar(arguments[0])", Constants.ignoredTags);
-    } else {
-	  result = WdDriver.executeScript("return TestarState.getStateTreeTestar(arguments[0])", Constants.ignoredTags);
-    }
+    Object result = WdDriver.executeScript(
+        "return getStateTreeTestar(arguments[0], arguments[1])", 
+        Constants.getIgnoredTags(), Constants.getIgnoredAttributes());
 
     // TODO As Edge limits its recursion to 20, we need to flatten the tree in JS
     // And unflatten the list here into a nested Map (as produced by Chrome / FF)
@@ -158,10 +155,6 @@ public class WdStateFetcher implements Callable<WdState> {
   }
 
   private void createWidgetTree(WdWidget parent, WdElement element) {
-    if (!element.enabled) {
-      return;
-    }
-
     WdWidget w = parent.root().addChild(parent, element);
     element.backRef = w;
     

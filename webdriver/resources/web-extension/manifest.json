@@ -36,7 +36,6 @@
     {
       "resources": [
         "js/testar.state.js",
-        "js/testar.simple.state.js",
         "js/testar.canvas.js",
         "css/style.css"
       ],

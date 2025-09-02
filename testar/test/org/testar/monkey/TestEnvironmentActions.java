@@ -68,10 +68,6 @@ public class TestEnvironmentActions extends DefaultProtocol {
 		Assert.isTrue(actions.iterator().next().getClass().getName().equals(ActivateSystem.class.getName()));
 		Assert.notNull(actions.iterator().next().get(Tags.OriginWidget));
 
-		Assert.notNull(state.get(Tags.ActionSet));
-		Assert.isTrue(state.get(Tags.ActionSet).size() == 1);
-		Assert.isTrue(state.get(Tags.ActionSet).iterator().next().getClass().getName().equals(ActivateSystem.class.getName()));
-
 		// Then build the action identifier
 		buildStateActionsIdentifiers(state, actions);
 		// To check that Action identifiers were built
@@ -101,11 +97,6 @@ public class TestEnvironmentActions extends DefaultProtocol {
 		// We must have the leftClick and the ActivateSystem actions
 		Assert.isTrue(defaultActions.size() == 2);
 
-		// The state only must have the ActivateSystem action
-		Assert.notNull(state.get(Tags.ActionSet));
-		Assert.isTrue(state.get(Tags.ActionSet).size() == 1);
-		Assert.isTrue(state.get(Tags.ActionSet).iterator().next().getClass().getName().equals(ActivateSystem.class.getName()));
-
 		// Because there exists an ActivateSystem action
 		// preSelectAction must force to return it
 		reportManager = Mockito.mock(ReportManager.class);
@@ -128,11 +119,6 @@ public class TestEnvironmentActions extends DefaultProtocol {
 		reportManager = Mockito.mock(ReportManager.class);
 		Set<Action> preActions = preSelectAction(system, state, initialActions);
 		Assert.isTrue(preActions.size() == 1);
-
-		// The state only must have the ActivateSystem action
-		Assert.notNull(state.get(Tags.ActionSet));
-		Assert.isTrue(state.get(Tags.ActionSet).size() == 1);
-		Assert.isTrue(state.get(Tags.ActionSet).iterator().next().get(Tags.Desc, "").contains("Hit Key"));
 
 		// To check that Action identifiers were built
 		Assert.notNull(preActions.iterator().next().get(Tags.AbstractID));

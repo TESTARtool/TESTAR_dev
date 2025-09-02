@@ -457,11 +457,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		this.currentSeq = new File(sequenceObject);
 
-		try {
-			TestSerialiser.start(new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(this.currentSeq, true))));
-			LogSerialiser.log("Created new sequence file!\n", LogSerialiser.LogLevel.Debug);
-		} catch (IOException e) {
-			LogSerialiser.log("I/O exception creating new sequence file\n", LogSerialiser.LogLevel.Critical);
+		if(settings.get(ConfigTags.GenerateReplayableSequence, false)) {
+			try {
+				TestSerialiser.start(new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(this.currentSeq, true))));
+				LogSerialiser.log("Created new sequence file!\n", LogSerialiser.LogLevel.Info);
+			} catch (IOException e) {
+				LogSerialiser.log("I/O exception creating new sequence file\n", LogSerialiser.LogLevel.Critical);
+			}
+		} else {
+			LogSerialiser.log("Replayable files are not created due to GenerateReplayableSequence setting\n", LogSerialiser.LogLevel.Info);
 		}
 	}
 
@@ -572,6 +576,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @param action
 	 */
 	void saveActionIntoFragmentForReplayableSequence(Action action, State state, Set<Action> actions) {
+	    // User decided not to generate replayable files
+	    if(!settings.get(ConfigTags.GenerateReplayableSequence)) {
+	        return;
+	    }
+
 	    // create fragment
 		TaggableBase fragment = new TaggableBase();
 	    fragment.set(ExecutedAction, action);
@@ -791,7 +800,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			if(screenshot != null) {
 				String screenshotPath = ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), screenshot);
-				state.set(Tags.ScreenshotImage, screenshot);
 				state.set(Tags.ScreenshotPath, screenshotPath);
 			}
 		}
@@ -920,7 +928,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					LogSerialiser.log("Forcing kill-process <" + forceKillProcess + "> action\n", LogSerialiser.LogLevel.Info);
 					Action killProcessAction = KillProcess.byName(forceKillProcess, 0);
 					killProcessAction.set(Tags.Desc, "Kill Process with name '" + forceKillProcess + "'");
-					killProcessAction.mapActionToWidget(state);
+					killProcessAction.mapOriginWidget(state);
 					return new HashSet<>(Collections.singletonList(killProcessAction));
 				}
 			}
@@ -933,7 +941,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			LogSerialiser.log("Forcing SUT activation (bring to foreground) action\n", LogSerialiser.LogLevel.Info);
 			Action foregroundAction = new ActivateSystem();
 			foregroundAction.set(Tags.Desc, "Bring the system to the foreground.");
-			foregroundAction.mapActionToWidget(state);
+			foregroundAction.mapOriginWidget(state);
 			foregroundAction.set(Tags.Role, Roles.System);
 			return new HashSet<>(Collections.singletonList(foregroundAction));
 		}
@@ -960,7 +968,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println("DEBUG: Forcing ESC action in preActionSelection : Actions derivation seems to be EMPTY !");
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
 			Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
-			escAction.mapActionToWidget(state);
+			escAction.mapOriginWidget(state);
 			buildEnvironmentActionIdentifiers(state, escAction);
 			reportManager.addActions(Collections.singleton(escAction));
 			return new HashSet<>(Collections.singletonList(escAction));

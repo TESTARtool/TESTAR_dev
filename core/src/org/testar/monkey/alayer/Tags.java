@@ -123,8 +123,6 @@ public final class Tags extends TagsBase {
 	/** The pattern value of a web-widget : hyperlink or text in input field */
 	public static final Tag<String> ValuePattern = from("ValuePattern", String.class);
 
-	public static final Tag<WidgetMap> WidgetMap = from("WidgetMap", WidgetMap.class);
-
 	public static final Tag<String> Path = from("Path", String.class);
 	public static final Tag<String> ConcreteID = from(CodingManager.CONCRETE_ID, String.class);
 	public static final Tag<String> AbstractID = from(CodingManager.ABSTRACT_ID, String.class);
@@ -161,9 +159,7 @@ public final class Tags extends TagsBase {
 	public static final Tag<Long> TimeStamp = from("TimeStamp", Long.class);
 	
 	/** Usually attached to an object of {@link State}. The value is a screenshot of the state. */
-	//public static final Tag<Image> Screenshot = from("Screenshot", Image.class);
 	public static final Tag<String> ScreenshotPath = from("ScreenshotPath", String.class);
-	public static final Tag<AWTCanvas> ScreenshotImage = from("ScreenshotImage", AWTCanvas.class);
 
 	/** Usually attached to a {@link State} object. The value is an outcome of a test oracle for that state. It is
 	 * used to mark states as 'suspicious' or 'erroneous' */
