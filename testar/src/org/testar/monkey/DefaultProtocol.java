@@ -457,11 +457,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		this.currentSeq = new File(sequenceObject);
 
-		try {
-			TestSerialiser.start(new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(this.currentSeq, true))));
-			LogSerialiser.log("Created new sequence file!\n", LogSerialiser.LogLevel.Debug);
-		} catch (IOException e) {
-			LogSerialiser.log("I/O exception creating new sequence file\n", LogSerialiser.LogLevel.Critical);
+		if(settings.get(ConfigTags.GenerateReplayableSequence, false)) {
+			try {
+				TestSerialiser.start(new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(this.currentSeq, true))));
+				LogSerialiser.log("Created new sequence file!\n", LogSerialiser.LogLevel.Info);
+			} catch (IOException e) {
+				LogSerialiser.log("I/O exception creating new sequence file\n", LogSerialiser.LogLevel.Critical);
+			}
+		} else {
+			LogSerialiser.log("Replayable files are not created due to GenerateReplayableSequence setting\n", LogSerialiser.LogLevel.Info);
 		}
 	}
 
@@ -572,6 +576,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @param action
 	 */
 	void saveActionIntoFragmentForReplayableSequence(Action action, State state, Set<Action> actions) {
+	    // User decided not to generate replayable files
+	    if(!settings.get(ConfigTags.GenerateReplayableSequence)) {
+	        return;
+	    }
+
 	    // create fragment
 		TaggableBase fragment = new TaggableBase();
 	    fragment.set(ExecutedAction, action);

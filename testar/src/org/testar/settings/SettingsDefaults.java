@@ -56,6 +56,7 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(TempDir, Main.tempDir));
 		defaults.add(Pair.from(OnlySaveFaultySequences, false));
 		defaults.add(Pair.from(PathToReplaySequence, Main.tempDir));
+		defaults.add(Pair.from(GenerateReplayableSequence, true));
 		defaults.add(Pair.from(ActionDuration, 0.1));
 		defaults.add(Pair.from(TimeToWaitAfterAction, 0.1));
 		defaults.add(Pair.from(VisualizeActions, false));

@@ -235,6 +235,22 @@ public final class ConfigTags {
 			"Sets whether Jacoco coverage will be accumulated across the run sequences");
 
 	/**
+	 * Replay settings
+	 */
+
+	public static final Tag<Boolean> GenerateReplayableSequence = Tag.from("GenerateReplayableSequence", Boolean.class,
+			"Sets whether TESTAR must create a replayable testar file during Generate mode (this consumes more memory during execution)");
+
+	public static final Tag<Double> ReplayRetryTime = Tag.from("ReplayRetryTime", Double.class, 
+			"Inside the replay mode, establishes the time window in seconds for trying to replay a UI action of a replayed test sequence");
+
+	public static final Tag<Boolean> UseRecordedActionDurationAndWaitTimeDuringReplay = Tag.from("UseRecordedActionDurationAndWaitTimeDuringReplay", Boolean.class, 
+			"Inside the replay mode sets whether to use the action duration (ActionDuration and TimeToWaitAfterAction) as specified in the generated test sequence");
+
+	public static final Tag<String> PathToReplaySequence = Tag.from("PathToReplaySequence", String.class, 
+			"The sequence to REPLAY is the one indicated in this parameter");
+
+	/**
 	 * Additional settings with descriptions
 	 */
 
@@ -268,17 +284,11 @@ public final class ConfigTags {
 	public static final Tag<Boolean> OnlySaveFaultySequences = Tag.from("OnlySaveFaultySequences", Boolean.class, 
 			"Sets whether to save test sequences without failures");
 
-	public static final Tag<Double> ReplayRetryTime = Tag.from("ReplayRetryTime", Double.class, 
-			"Inside the replay mode, establishes the time window in seconds for trying to replay a UI action of a replayed test sequence");
-
 	public static final Tag<Boolean> StopGenerationOnFault = Tag.from("StopGenerationOnFault", Boolean.class, 
 			"Sets whether to finish a test in the presence of a fail (e.g. Suspicious Tag detected)");
 
 	public static final Tag<Double> TimeToFreeze = Tag.from("TimeToFreeze", Double.class, 
 			"Sets the time window, in seconds, for which to wait for a not responding SUT. After that, the test will finish with a fail");
-
-	public static final Tag<Boolean> UseRecordedActionDurationAndWaitTimeDuringReplay = Tag.from("UseRecordedActionDurationAndWaitTimeDuringReplay", Boolean.class, 
-			"Inside the replay mode sets whether to use the action duration (ActionDuration and TimeToWaitAfterAction) as specified in the generated test sequence");
 
 	public static final Tag<Boolean> VisualizeActions = Tag.from("VisualizeActions", Boolean.class, 
 			"Sets whether to display overlay information, inside the SPY mode, for all the UI actions derived from the test set up");
@@ -288,9 +298,6 @@ public final class ConfigTags {
 
 	public static final Tag<Boolean> UseSystemActions = Tag.from("UseSystemActions", Boolean.class, 
 			"ANDROID: Indicate if add system calls");
-
-	public static final Tag<String> PathToReplaySequence = Tag.from("PathToReplaySequence", String.class, 
-			"The sequence to REPLAY is the one indicated in this parameter");
 
 	public static final Tag<Double> RefreshSpyCanvas = Tag.from("RefreshSpyCanvas", Double.class, 
 			"Time in milliseconds that indicates the frequency of refreshing the screen in SPY mode");

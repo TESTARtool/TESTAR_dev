@@ -11,6 +11,7 @@
 - Ignore weak password chrome popup
 - Refactor usage of Tag ScreenshotImage
 - Add settings to configure webdriver constants
+- Add settings to enable/disable generating replayable files
 
 
 #TESTAR 2.7.7 (26-Aug-2025)
