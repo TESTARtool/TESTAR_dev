@@ -170,8 +170,9 @@ ProtocolSpecificSetting_5 =
 # Advanced test oracles
 #################################################################
 
-ExtendedOracles =
-ExternalOracles = AllExamDateRowsMustContainADateAndTime$5049,EnrollButtonMustBeAToneOfBlue$202,EnrolledSubjectsTableRowsMustContainFiveDataElements$5929,GradeDropdownMustContainALetterGrade$3984,LoginButtonMustBeAToneOfBlue$103,OtherAvailableSubjectsTableMustContainTheTeacherSColumn$5640,ParticipantsButtonMustBeAToneOfBlue$605,ParticipantsButtonMustNotContainANegativeNumber$5359,StudentsMustBeEnrolledToSubjectsThatMustContainFiveDataElements$7425,StudentViewTitleMustContainStudentSViewText$861,TableDataMustNeverContainsTheInvalid2100Date$4663,TableDataMustNeverContainTheNonameText$2432,TaughtSubjectsTableMustContainTheSubjectTeacherSOrder$2007,TeachersListRowsMustContainThreeDataElements$8371,TeachersMustTaughtSubjectsThatMustContainSixDataElements$7907,TotalCreditsTextMustNotContainTwentyCredits$1309,UnregisterButtonMustBeExactlyRedCrimson$414,UpdateButtonMustBeAToneOfGreen$303
+ExtendedOracles = 
+ExternalOracles = AllExamDateRowsMustContainADateAndTime$5018,EnrolledSubjectsTableRowsMustContainFiveDataElements$6055,GradeDropdownMustContainALetterGrade$3902,MySubjectsLinkMustBeSelectedWithAToneOfBlueWhenSubjectSuccessfullyRemoveTextIsVisible$1292,OtherAvailableSubjectsTableMustContainTheFiveCorrectColumnsInOrder$5703,ParticipantsButtonMustBeAToneOfBlue$229,ParticipantsButtonMustNotContainANegativeNumber$5389,StudentsMustBeEnrolledToSubjectsThatMustContainFiveDataElements$7602,StudentViewTitleMustContainStudentSViewText$485,TableDataMustNeverContainsTheInvalid2100Date$4594,TableDataMustNeverContainTheNonameText$2361,TaughtSubjectsTableMustContainTheSixCorrectColumnsInOrder$1932,TeachersListRowsMustContainThreeDataElements$8650,TeachersMustTaughtSubjectsThatMustContainSixDataElements$8135,TotalCreditsTextMustNotContainTwentyCredits$919
+
 #################################################################
 # Specify the widget attributes that you wish to visualize during Spy Mode. Use a semicolon separated list.
 #################################################################
