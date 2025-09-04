@@ -233,6 +233,7 @@ public class OracleMappingModel {
             Map.entry("backgroundColorName", List.of(WdTags.WebComputedBackgroundColorName)),
             Map.entry("length", List.of(WdTags.WebLength)),
             Map.entry("title", List.of(WdTags.WebAriaLabel, WdTags.WebAriaLabelledBy, Tags.Title)),
+            Map.entry("identifier", List.of(WdTags.WebId)),
             Map.entry("children", List.of(Tags.WidgetChildren)), // This Tag is null but used for DSL mapping
             Map.entry("data_elements", List.of(Tags.WidgetChildren)) // This Tag is null but used for DSL mapping
             );
