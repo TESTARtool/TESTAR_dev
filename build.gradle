@@ -35,7 +35,7 @@ subprojects {
         // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
         implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.35.0'
         // https://mvnrepository.com/artifact/io.github.bonigarcia/webdrivermanager
-        implementation group: 'io.github.bonigarcia', name: 'webdrivermanager', version: '6.2.0'
+        implementation group: 'io.github.bonigarcia', name: 'webdrivermanager', version: '6.3.1'
         // https://mvnrepository.com/artifact/io.appium/java-client
         implementation group: 'io.appium', name: 'java-client', version: '10.0.0'
         // https://mvnrepository.com/artifact/com.orientechnologies/orientdb-graphdb
