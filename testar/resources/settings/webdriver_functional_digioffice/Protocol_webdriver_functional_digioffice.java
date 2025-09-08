@@ -71,6 +71,7 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.io.PrintWriter;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -130,6 +131,8 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
     Oracle idea 98: detectUntranslatedText
     Oracle idea 99: Added XSS script in custom_input_data.txt which write a console error which will be picked up by Oracle idea 97
  */
+    
+
 
 public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol {
 	private Action functionalAction = null;
@@ -366,6 +369,80 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		}
 	}
 
+
+    public static void writeTextToFile(String path, String content) {
+        try (PrintWriter out = new PrintWriter(path)) {
+            out.println(content);
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void generateObjBox(
+        StringBuilder sb,
+        String objectName,
+        double x, double y, double z,
+        double length, double width, double height,
+        int[] vertexIndexRef) {
+    
+        int i = vertexIndexRef[0];
+    
+        double[][] vertices = new double[][] {
+            {x, y, z},
+            {x + length, y, z},
+            {x + length, y + width, z},
+            {x, y + width, z},
+            {x, y, z + height},
+            {x + length, y, z + height},
+            {x + length, y + width, z + height},
+            {x, y + width, z + height}
+        };
+    
+        sb.append("o ").append(objectName).append("\n");
+    
+        for (double[] v : vertices) {
+            sb.append(String.format("v %.3f %.3f %.3f\n", v[0], v[1], v[2]));
+        }
+    
+        sb.append(String.format("f %d %d %d %d\n", i, i + 1, i + 2, i + 3));
+        sb.append(String.format("f %d %d %d %d\n", i + 4, i + 5, i + 6, i + 7));
+        sb.append(String.format("f %d %d %d %d\n", i, i + 4, i + 7, i + 3));
+        sb.append(String.format("f %d %d %d %d\n", i + 1, i + 5, i + 6, i + 2));
+        sb.append(String.format("f %d %d %d %d\n", i + 3, i + 2, i + 6, i + 7));
+        sb.append(String.format("f %d %d %d %d\n", i, i + 1, i + 5, i + 4));
+    
+        vertexIndexRef[0] += 8;
+    }
+
+
+		public void WidgetTreeExportRecursive(StringBuilder objBuilder, Widget w, double z, int[] vertexIndexRef)
+		{
+            double thickness = 20.0;
+            double spacing = 0.0;
+            Rect rect = (Rect) w.get(Tags.Shape, null);
+            
+		
+            double screenHeight = 1024.0; // TODO, get actual screensize, something like: Screen.PrimaryScreen.Bounds.Height
+			// Flip Y and adjust for height
+			var flippedY = screenHeight - rect.y() - rect.height();
+           
+            generateObjBox(objBuilder, w.get(Tags.AbstractID, ""), rect.x(), flippedY, z + spacing, rect.width(), rect.height() ,thickness, vertexIndexRef);
+
+            for(int i = 0; i<w.childCount(); i++) {
+                WidgetTreeExportRecursive(objBuilder, w.child(i), z + thickness + spacing, vertexIndexRef);
+            }
+            
+            
+		}
+
+    private String obj3DFilePath()
+    {
+        return Main.settingsDir + File.separator + "webdriver_functional_digioffice" + File.separator + "3dobject.obj";
+    }
+    
 	/**
 	 * This is a helper method used by the default implementation of <code>buildState()</code>
 	 * It examines the SUT's current state and returns an oracle verdict.
@@ -397,9 +474,27 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 			verdict = Verdict.OK;
 		}
 
+		// Uncomment when you want to write a 3D OBJ file to the settings directory. https://en.wikipedia.org/wiki/Wavefront_.obj_file
+		// The obj file can be inserted as a 3D model in PowerPoint or can be used in modeling tool such as Blender to animate and give it texture.
+		// Nice to have: It would have been nice to have a hotkey in Spy mode to export the 3D model instead of using it in test loop.
+		// Nice to have: Use it in visual clash detection and color the clashing widgets.
+        //build3DObjectFileFromGuiState(state);
+        
 		return verdict;
 	}
 
+
+    private void build3DObjectFileFromGuiState(State state)
+    {
+        StringBuilder objBuilder = new StringBuilder();
+        int[] vertexIndex = {1};
+        
+        for(Widget w : state) {
+		  WidgetTreeExportRecursive(objBuilder, w, 0, vertexIndex);
+        }
+
+        writeTextToFile(obj3DFilePath(),objBuilder.toString());
+    }
 	/**
 	 * We want to return the verdict if it is not OK, 
 	 * and not on the detected failures list (it's a new failure). 
@@ -948,7 +1043,8 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
                     "submit-bar-wrap", // OK/Cancel button bar in Angular wizard 
                     "reportsTreePanel", // Report radiobutton tree
                     "table-legend-row", // Pager buttons #74843
-                    "paginationColumn" // Crosstable pagination, bug #74650
+                    "paginationColumn", // Crosstable pagination, bug #74650
+                    "TopPanelSearch"
                              ), //ignoredClasses
                 true, // joinVerdicts	
                 false,  // checkOnlyLeafWidgets
