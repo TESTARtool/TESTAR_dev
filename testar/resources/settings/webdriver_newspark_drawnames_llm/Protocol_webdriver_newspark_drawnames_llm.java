@@ -34,6 +34,7 @@ import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
 import org.testar.llm.LlmTestGoal;
 import org.testar.llm.prompt.OracleWebPromptGenerator;
+import org.testar.llm.prompt.OracleImagePromptGenerator;
 import org.testar.llm.prompt.ActionWebPromptGenerator;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.ConfigTags;
@@ -67,9 +68,6 @@ public class Protocol_webdriver_newspark_drawnames_llm extends WebdriverProtocol
 	// The LLM Oracle needs to be initialize with the settings
 	private LlmOracle llmOracle;
 
-	// Track last verdict
-	private Verdict lastLlmVerdict;
-
 	/**
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
@@ -88,10 +86,7 @@ public class Protocol_webdriver_newspark_drawnames_llm extends WebdriverProtocol
 		llmActionSelector = new LlmActionSelector(settings, new ActionWebPromptGenerator());
 
 		// Initialize the LlmOracle using the LLM settings
-		llmOracle = new LlmOracle(settings, new OracleWebPromptGenerator());
-
-		// Initialize track verdict
-		lastLlmVerdict = Verdict.OK;
+		llmOracle = new LlmOracle(settings, new OracleImagePromptGenerator());
 	}
 
 	private void setupTestGoals(List<String> testGoalsList) {
@@ -117,8 +112,6 @@ public class Protocol_webdriver_newspark_drawnames_llm extends WebdriverProtocol
 		llmActionSelector.reset(currentTestGoal, false);
 		// Reset llm oracle
 		llmOracle.reset(currentTestGoal, false);
-		// Reset track verdict
-		lastLlmVerdict = Verdict.OK;
 	}
 
 	/**
@@ -182,14 +175,7 @@ public class Protocol_webdriver_newspark_drawnames_llm extends WebdriverProtocol
 		// Use the LLM as an Oracle to determine if the test goal has been completed
 		Verdict llmVerdict = llmOracle.getVerdict(state);
 
-		// First match makes an update to the verdict
-		if(lastLlmVerdict == Verdict.OK 
-				&& llmVerdict.severity() == Verdict.Severity.LLM_COMPLETE.getValue()) {
-			lastLlmVerdict = llmVerdict;
-		} 
-		// Second match is the multi-agent assessment
-		else if(lastLlmVerdict.severity() == Verdict.Severity.LLM_COMPLETE.getValue() 
-				&& llmVerdict.severity() == Verdict.Severity.LLM_COMPLETE.getValue()) {
+		if(llmVerdict.severity() == Verdict.Severity.LLM_COMPLETE.getValue()) {
 			// Test goal was completed, retrieve next test goal from queue.
 			currentTestGoal = testGoalQueue.poll();
 
@@ -203,9 +189,6 @@ public class Protocol_webdriver_newspark_drawnames_llm extends WebdriverProtocol
 				llmActionSelector.reset(currentTestGoal, true);
 				llmOracle.reset(currentTestGoal, true);
 			}
-		} else {
-			// Reset track verdict
-			lastLlmVerdict = Verdict.OK;
 		}
 
 		return verdict;
@@ -295,17 +278,27 @@ public class Protocol_webdriver_newspark_drawnames_llm extends WebdriverProtocol
 
 	@Override
 	protected boolean isClickable(Widget widget) {
+		// If the element is blocked, Testar can't click on or type in the widget
+		if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
+			return false;
+		}
+
+		// Top right menu button
 		if(widget.get(WdTags.WebCssClasses, "").contains("menu-hamburger-button")) {
 			return true;
 		}
 
-		if(widget.get(WdTags.WebCssClasses, "").contains("[chip]")) {
+		// Category buttons
+		if(widget.get(WdTags.WebCssClasses, "").contains("[chip]")
+				|| widget.get(WdTags.WebCssClasses, "").contains("[chip, active]")) {
 			return true;
 		}
 
-		// If the element is blocked, Testar can't click on or type in the widget
-		if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
-			return false;
+		// span element son of multi-select option div
+		if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSPAN)
+				&& widget.parent() != null
+				&& widget.parent().get(WdTags.WebCssClasses, "").contains("option")) {
+			return true;
 		}
 
 		return super.isClickable(widget);

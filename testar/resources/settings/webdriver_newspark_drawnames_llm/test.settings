@@ -136,20 +136,20 @@ AbstractStateAttributes = WebWidgetCssClasses,WebWidgetId,WebWidgetTextContent
 #################################################################
 
 LlmPlatform = OpenAI
-LlmModel = gpt-4o-mini
+LlmModel = gpt-4.1-mini
 LlmHostUrl = https://api.openai.com/v1/chat/completions
 LlmAuthorizationHeader = Bearer %OPENAI_API%
 LlmActionFewshotFile = prompts/fewshot_openai_action.json
 LlmOracleFewshotFile = prompts/fewshot_openai_oracle.json
 LlmTemperature = 0.2
 LlmHistorySize = 5
-LlmTestGoals = De klant moet de mogelijkheid krijgen om meerdere filters tegelijkertijd te selecteren in de cadeauzoeker. Binnen de categorie- en winkelfilter moet multi-select ondersteund worden.
+LlmTestGoals = 
 
 #################################################################
 # WebDriver advanced state fetcher configuration
 #################################################################
 WebIgnoredTags = script;noscript;head;meta;style;link;svg;canvas;iframe
-WebIgnoredAttributes = xpath
+WebIgnoredAttributes = xpath;innerHTML;outerHTML
 
 #################################################################
 # WebDriver features
@@ -199,6 +199,7 @@ ProtocolSpecificSetting_5 =
 # Other more advanced settings
 #################################################################
 
+GenerateReplayableSequence = false
 OutputDir = ./output
 PathToReplaySequence = ./output/temp
 TempDir = ./output/temp

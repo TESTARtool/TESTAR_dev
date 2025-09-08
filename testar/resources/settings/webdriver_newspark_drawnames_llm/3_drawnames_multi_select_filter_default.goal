@@ -1,0 +1,7 @@
+Multi-select filters
+- Objective
+Customers should be able to select multiple filters simultaneously in the gift finder. Multi-select must be supported within the category and store filters.
+- Task Description
+Within this task, we are building the ability to use multi-select within the category and store filters for the web.
+- Reason
+Based on user research and opinions, it has become clear that there is a need for broader searching using multi-select and the combination of store and category filters.

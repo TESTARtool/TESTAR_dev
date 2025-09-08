@@ -1,0 +1,13 @@
+Feature: Multi-select filters
+  As a customer
+  I want to select multiple filters in the gift finder
+  So that I can discover more relevant and personalized gift options
+
+  Background:
+    Given the Drawnames home page is displayed
+
+  Scenario: Filter results using multiple selections
+    When I navigate to the gift finder
+    And I select multiple categories
+    And I select multiple age groups
+    Then I should see product results that match the selected filters
