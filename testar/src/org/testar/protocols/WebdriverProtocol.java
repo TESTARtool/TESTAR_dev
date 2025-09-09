@@ -57,14 +57,10 @@ import org.testar.settings.Settings;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
-
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
 
@@ -72,8 +68,6 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     //Attributes for adding slide actions
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
-    
-    protected static Set<String> existingCssClasses = new HashSet<>();
 
 	// WedDriver settings from file:
 	protected List<String> clickableClasses, typeableClasses, deniedExtensions, webDomainsAllowed;
@@ -281,14 +275,6 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     		
     	}
 
-    	if(settings.get(ConfigTags.Mode) == Modes.Spy) {
-
-    		for(Widget w : state) {
-    			WdElement element = ((WdWidget) w).element;
-				existingCssClasses.addAll(element.cssClasses);
-    		}
-    	}
-
         return state;
     }
 
@@ -387,33 +373,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
     @Override
     protected void stopSystem(SUT system) {
-        if(settings.get(ConfigTags.Mode) == Modes.Spy) {
-
-            try {
-                if(Settings.getSettingsPath() != null) {
-                    File folder = new File(Settings.getSettingsPath());
-                    File file = new File(folder, "existingCssClasses.txt");
-                    if(!file.exists())
-                        file.createNewFile();
-
-                    Stream<String> stream = Files.lines(Paths.get(file.getCanonicalPath()));
-                    stream.forEach(line -> existingCssClasses.add(line));
-                    stream.close();
-
-                    PrintWriter write = new PrintWriter(new FileWriter(file.getCanonicalPath()));
-                    for(String s : existingCssClasses)
-                        write.println(s);
-                    write.close();
-                }
-
-            } catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
         super.stopSystem(system);
     }
-    
+
     @Override
 	protected void closeTestSession() {
 		super.closeTestSession();
