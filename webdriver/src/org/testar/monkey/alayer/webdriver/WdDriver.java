@@ -198,13 +198,16 @@ public class WdDriver extends SUTBase {
     return Collections.singletonList(wdDriver);
   }
 
-  public static WdDriver fromExecutable(String sutConnector)
-      throws SystemStartException {
-    if (remoteWebDriver != null) {
-    	remoteWebDriver.quit();
-    }
+  public static WdDriver fromExecutable(String sutConnector) throws SystemStartException {
+    if (remoteWebDriver != null) remoteWebDriver.quit();
 
-    return new WdDriver(sutConnector);
+    try {
+      return new WdDriver(sutConnector);
+    } catch (WebDriverException wde) {
+      logger.log(Level.WARN, "WebDriverException trying to initialize the web SUT", wde);
+      if (remoteWebDriver != null) remoteWebDriver.quit();
+      throw new SystemStartException(wde);
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -311,8 +314,12 @@ public class WdDriver extends SUTBase {
       // Choose first or last tab, depending on user prefs
       activate();
 
-      // Wait until document is ready for script
-      waitDocumentReady();
+      // Wait until document is ready; if not, return null (lost session or timeout)
+      if(!waitDocumentReady()) {
+        logger.log(Level.WARN, "WebDriver document is not ready for interaction");
+        logger.log(Level.WARN, "Skipping script execution: " + script);
+        return null;
+      }
 
       return remoteWebDriver.executeScript(script, args);
     }
@@ -326,13 +333,27 @@ public class WdDriver extends SUTBase {
     }
   }
 
-  public static void waitDocumentReady() {
-    WebDriverWait wait = new WebDriverWait((WebDriver)remoteWebDriver, Duration.ofSeconds(60));
-    ExpectedCondition<Boolean> documentReady = (WebDriver driver) -> {
-      Object result = remoteWebDriver.executeScript("return document.readyState");
-      return result != null && result.equals("complete");
+  public static boolean waitDocumentReady() {
+    if (remoteWebDriver == null) {
+      return false;
+    }
+
+    try {
+      WebDriverWait wait = new WebDriverWait(remoteWebDriver, Duration.ofSeconds(60));
+      ExpectedCondition<Boolean> documentReady = driver -> {
+      try {
+        Object result = remoteWebDriver.executeScript("return document.readyState");
+        return result != null && "complete".equals(result.toString());
+      } catch (WebDriverException wde) {
+        logger.log(Level.WARN, "WebDriverException waiting for the document to be ready", wde);
+        return false;
+      }
     };
-    wait.until(documentReady);
+      return wait.until(documentReady);
+    } catch (WebDriverException wde) {
+      logger.log(Level.WARN, "WebDriverException waiting for the document to be ready", wde);
+      return false;
+    }
   }
 
   public static void executeCanvasScript(String script, Object... args) {
