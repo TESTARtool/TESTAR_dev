@@ -44,6 +44,7 @@ public class WdElement extends TaggableBase implements Serializable {
   private static final long serialVersionUID = 2695983969893321255L;
 
   private static final List<String> scrollOn = Arrays.asList("auto", "scroll");
+  private static final List<String> scrollOff = Arrays.asList("visible", "hidden", "clip");
   private static final List<String> scrollableChildren = Arrays.asList(
       "block", "run-in", "flow", "flow-root", "table", "flex", "grid",
       "list-item", "table-row", "table-cell", "table-caption", "inline-block",
@@ -90,6 +91,7 @@ public class WdElement extends TaggableBase implements Serializable {
 
   // Keep these here for fillScrollValues
   protected String overflowX, overflowY;
+  protected String scrollSnapType;
   protected long clientWidth, clientHeight;
   private long offsetWidth, offsetHeight;
   public long scrollWidth, scrollHeight;
@@ -279,16 +281,22 @@ public class WdElement extends TaggableBase implements Serializable {
     // https://stackoverflow.com/a/29956778
 
     boolean hasHorizontalScrollbar = offsetHeight > (clientHeight + borderHeight);
-    hScroll = scrollWidth > clientWidth &&
-              (scrollOn.contains(overflowX) || hasHorizontalScrollbar);
+    if(scrollOff.contains(overflowX) || !scrollSnapType.contains("none")) {
+      hScroll = false;
+    } else {
+      hScroll = scrollWidth > clientWidth && (scrollOn.contains(overflowX) || hasHorizontalScrollbar);
+    }
     if (scrollWidth != clientWidth) {
       hScrollPercent = 100.0 * scrollLeft / (scrollWidth - clientWidth);
     }
     hScrollViewSize = 100.0 * clientWidth / scrollWidth;
 
     boolean hasVerticalScrollbar = offsetWidth > (clientWidth + borderWidth);
-    vScroll = scrollHeight > clientHeight &&
-              (scrollOn.contains(overflowY) || hasVerticalScrollbar);
+    if(scrollOff.contains(overflowY) || !scrollSnapType.contains("none")) {
+      vScroll = false;
+    } else {
+      vScroll = scrollHeight > clientHeight && (scrollOn.contains(overflowY) || hasVerticalScrollbar);
+    }
     if (scrollHeight != clientHeight) {
       vScrollPercent = 100.0 * scrollTop / (scrollHeight - clientHeight);
     }
@@ -352,6 +360,7 @@ public class WdElement extends TaggableBase implements Serializable {
     Map<String, Object> dims = (Map<String, Object>) packedElement.get("dimensions");
     overflowX = String.valueOf(dims.get("overflowX"));
     overflowY = String.valueOf(dims.get("overflowY"));
+    scrollSnapType = String.valueOf(dims.get("scrollSnapType"));
     clientWidth = castDimensionsToLong(dims.get("clientWidth"));
     clientHeight = castDimensionsToLong(dims.get("clientHeight"));
     offsetWidth = castDimensionsToLong(dims.get("offsetWidth"));
