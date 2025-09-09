@@ -398,24 +398,4 @@ public class WdDriver extends SUTBase {
     }
   }
 
-  public static void executeCanvasScript(String script, Object... args) {
-    try {
-      // Choose first or last tab, depending on user prefs
-      activate();
-
-      // Add the canvas if the page doesn't have one
-      remoteWebDriver.executeScript("addCanvasTestar()");
-
-      remoteWebDriver.executeScript(script, args);
-    } catch (NullPointerException | WebDriverException ignored) {
-
-    } catch (IllegalArgumentException iae) {
-    	if(remoteWebDriver == null) {
-    		logger.trace("remoteWebDriver is null, executeCanvasScript is not executed");
-    	} else {
-    		logger.error(iae);
-    	}
-    }
-  }
-
 }

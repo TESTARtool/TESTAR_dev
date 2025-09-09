@@ -32,6 +32,7 @@ package org.testar.monkey.alayer.webdriver;
 
 import org.testar.monkey.Util;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.util.List;
 
@@ -113,11 +114,14 @@ public class CanvasDimensions extends Thread {
   private void updateDimensions() {
     // This assumes no status bars on the left or on the bottom
     try {
-      List<Long> screen = (List<Long>)
-          WdDriver.executeScript("return canvasDimensionsTestar()");
-      if (screen == null) {
-        return;
-      }
+      RemoteWebDriver remoteWebDriver = WdDriver.getRemoteWebDriver();
+
+      if(remoteWebDriver == null) return;
+
+      List<Long> screen = (List<Long>)remoteWebDriver.executeScript("return canvasDimensionsTestar()");
+
+      if (screen == null) return;
+
       canvasX = Math.toIntExact(screen.get(0));
       canvasY = Math.toIntExact(screen.get(1));
       canvasWidth = Math.toIntExact(screen.get(2));
