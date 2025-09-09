@@ -133,7 +133,7 @@ public class WdStateFetcher implements Callable<WdState> {
     root.set(Tags.Role, Roles.Process);
     root.set(Tags.NotResponding, false);
     root.set(WdTags.WebHref, WdDriver.getCurrentUrl());
-    root.set(WdTags.WebTitle, WdDriver.getRemoteWebDriver().getTitle());
+    root.set(WdTags.WebTitle, WdDriver.getTitle());
     root.set(Tags.StateRenderTime, rootElement.largestContentfulPaint);
 
     for (Widget w : root) {

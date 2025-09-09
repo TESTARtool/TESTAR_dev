@@ -312,18 +312,30 @@ public class WdDriver extends SUTBase {
 
   public static Set<String> getWindowHandles() {
     try {
-      return remoteWebDriver.getWindowHandles();
+      return (remoteWebDriver != null) ? remoteWebDriver.getWindowHandles() : new HashSet<>();
     }
-    catch (NullPointerException | WebDriverException ignored) {
+    catch (WebDriverException wde) {
+      logger.log(Level.WARN, "WebDriverException trying to obtain the window handles", wde);
       return new HashSet<>();
     }
   }
 
   public static String getCurrentUrl() {
     try {
-      return remoteWebDriver.getCurrentUrl();
+      return (remoteWebDriver != null) ? remoteWebDriver.getCurrentUrl() : "";
     }
-    catch (NullPointerException | WebDriverException ignored) {
+    catch (WebDriverException wde) {
+      logger.log(Level.WARN, "WebDriverException trying to obtain the current url", wde);
+      return "";
+    }
+  }
+
+  public static String getTitle() {
+    try {
+      return (remoteWebDriver != null) ? remoteWebDriver.getTitle() : "";
+    }
+    catch (WebDriverException wde) {
+      logger.log(Level.WARN, "WebDriverException trying to obtain the page title", wde);
       return "";
     }
   }
