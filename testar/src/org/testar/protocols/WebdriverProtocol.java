@@ -254,15 +254,12 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
      */
     @Override
     protected State getState(SUT system) throws StateBuildException {
-    	
-    	try {
-    		WdDriver.waitDocumentReady();
-    	} catch(org.openqa.selenium.WebDriverException wde) {
+
+    	if(!WdDriver.waitDocumentReady()) {
     		LogSerialiser.log("WEBDRIVER ERROR: Selenium Chromedriver seems not to respond!\n", LogSerialiser.LogLevel.Critical);
     		System.out.println("******************************************************************");
     		System.out.println("** WEBDRIVER ERROR: Selenium Chromedriver seems not to respond! **");
     		System.out.println("******************************************************************");
-    		System.out.println(wde.getMessage());
     		system.set(Tags.IsRunning, false);
     	}
 
