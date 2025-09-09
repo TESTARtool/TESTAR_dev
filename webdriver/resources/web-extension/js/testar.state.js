@@ -307,6 +307,7 @@ function getDimensionsTestar(element, computedStyle) {
     return {
         overflowX: computedStyle.getPropertyValue('overflow-x'),
         overflowY: computedStyle.getPropertyValue('overflow-y'),
+        scrollSnapType: computedStyle.getPropertyValue('scroll-snap-type'),
         clientWidth: element.clientWidth,
         clientHeight: element.clientHeight,
         offsetWidth: element.offsetWidth || 0,
