@@ -33,6 +33,8 @@ package org.testar.protocols;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
 import org.testar.environment.Environment;
@@ -48,6 +50,7 @@ import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.Constants;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.monkey.alayer.windows.WinApiException;
 import org.testar.monkey.alayer.windows.WinProcess;
 import org.testar.monkey.alayer.windows.Windows;
 import org.testar.plugin.NativeLinker;
@@ -65,6 +68,9 @@ import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
 
 public class WebdriverProtocol extends GenericUtilsProtocol {
+
+    protected static final Logger logger = LogManager.getLogger();
+
     //Attributes for adding slide actions
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
@@ -268,11 +274,17 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     			&& system.get(Tags.PID, (long)-1) != (long)-1 
     			&& WinProcess.procName(system.get(Tags.PID)).contains("chrome") 
     			&& !WinProcess.isForeground(system.get(Tags.PID))){
-    		
-    		WinProcess.toForeground(system.get(Tags.PID), 0.3, 100);
-    		LogSerialiser.log("Trying to set Chrome Browser to Foreground... " 
-    		+ WinProcess.procName(system.get(Tags.PID)) + "\n");
-    		
+
+    	    String msg = "Trying to set the browser to Foreground... " + system.get(Tags.PID, -1L);
+    	    logger.log(org.apache.logging.log4j.Level.INFO, msg);
+
+    	    try {
+    	        WinProcess.toForeground(system.get(Tags.PID), 0.3, 100);
+    	    } catch (WinApiException wae) {
+    	        logger.log(org.apache.logging.log4j.Level.WARN, wae);
+    	        Verdict verdict = new Verdict(Verdict.Severity.NOT_RESPONDING, "Unable to bring the browser to foreground!");
+    	        state.set(Tags.OracleVerdict, verdict);
+    	    }
     	}
 
         return state;
