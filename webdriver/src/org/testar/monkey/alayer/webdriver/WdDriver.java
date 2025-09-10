@@ -58,6 +58,8 @@ import org.testar.monkey.alayer.*;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.*;
 
 public class WdDriver extends SUTBase {
@@ -162,6 +164,26 @@ public class WdDriver extends SUTBase {
     }
 
     CanvasDimensions.stopThread();
+    
+    if(this.get(Tags.PID, -1L) != -1L) {
+      stopProcessTree(this.get(Tags.PID));
+    }
+  }
+
+  private void stopProcessTree(long pid) {
+    Optional<ProcessHandle> opt = ProcessHandle.of(pid);
+    if (!opt.isPresent()) return;
+
+    ProcessHandle ph = opt.get();
+    String cmd = ph.info().command().orElse("").toLowerCase();
+
+    if (!cmd.contains("chrome")) return;
+
+    List<ProcessHandle> procs = Stream
+      .concat(ph.descendants(), Stream.of(ph))
+      .collect(Collectors.toList());
+
+    procs.forEach(ProcessHandle::destroy);
   }
 
   @Override
