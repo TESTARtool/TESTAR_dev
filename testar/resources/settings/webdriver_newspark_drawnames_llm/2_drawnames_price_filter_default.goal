@@ -1,0 +1,12 @@
+Price filter from - to / price slider
+- Reason
+Customers are currently limited in filtering by price because they are forced to search only within a limited price range.
+- Goal
+Customers can filter within a range of their choosing and are not stuck with a specific range as is currently the case.
+- Task Description
+Adjust the price filter to:
+1. From - to input field with predefined amounts
+2. Introduce a price slider with the same price options
+- Validation
+Customers can specify a price range using both the from - to input fields and the slider.
+

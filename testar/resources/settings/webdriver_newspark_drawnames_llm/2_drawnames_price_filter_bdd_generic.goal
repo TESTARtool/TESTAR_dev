@@ -1,0 +1,12 @@
+Feature: Price filter with slider
+  As a customer
+  I want to adjust the price filter
+  So that I can filter gifts within a custom price range
+
+  Background:
+    Given the Drawnames home page is displayed
+
+  Scenario: Filter results using a custom price range
+    When I navigate to the gift finder
+    And I set a custom minimum and maximum price
+    Then I should see product results that fall within the selected price range
