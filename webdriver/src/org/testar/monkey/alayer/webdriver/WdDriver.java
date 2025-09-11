@@ -58,6 +58,8 @@ import org.testar.monkey.alayer.*;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.*;
 
 public class WdDriver extends SUTBase {
@@ -162,6 +164,26 @@ public class WdDriver extends SUTBase {
     }
 
     CanvasDimensions.stopThread();
+    
+    if(this.get(Tags.PID, -1L) != -1L) {
+      stopProcessTree(this.get(Tags.PID));
+    }
+  }
+
+  private void stopProcessTree(long pid) {
+    Optional<ProcessHandle> opt = ProcessHandle.of(pid);
+    if (!opt.isPresent()) return;
+
+    ProcessHandle ph = opt.get();
+    String cmd = ph.info().command().orElse("").toLowerCase();
+
+    if (!cmd.contains("chrome")) return;
+
+    List<ProcessHandle> procs = Stream
+      .concat(ph.descendants(), Stream.of(ph))
+      .collect(Collectors.toList());
+
+    procs.forEach(ProcessHandle::destroy);
   }
 
   @Override
@@ -198,13 +220,16 @@ public class WdDriver extends SUTBase {
     return Collections.singletonList(wdDriver);
   }
 
-  public static WdDriver fromExecutable(String sutConnector)
-      throws SystemStartException {
-    if (remoteWebDriver != null) {
-    	remoteWebDriver.quit();
-    }
+  public static WdDriver fromExecutable(String sutConnector) throws SystemStartException {
+    if (remoteWebDriver != null) remoteWebDriver.quit();
 
-    return new WdDriver(sutConnector);
+    try {
+      return new WdDriver(sutConnector);
+    } catch (WebDriverException wde) {
+      logger.log(Level.WARN, "WebDriverException trying to initialize the web SUT", wde);
+      if (remoteWebDriver != null) remoteWebDriver.quit();
+      throw new SystemStartException(wde);
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -278,18 +303,30 @@ public class WdDriver extends SUTBase {
 
   public static Set<String> getWindowHandles() {
     try {
-      return remoteWebDriver.getWindowHandles();
+      return (remoteWebDriver != null) ? remoteWebDriver.getWindowHandles() : new HashSet<>();
     }
-    catch (NullPointerException | WebDriverException ignored) {
+    catch (WebDriverException wde) {
+      logger.log(Level.WARN, "WebDriverException trying to obtain the window handles", wde);
       return new HashSet<>();
     }
   }
 
   public static String getCurrentUrl() {
     try {
-      return remoteWebDriver.getCurrentUrl();
+      return (remoteWebDriver != null) ? remoteWebDriver.getCurrentUrl() : "";
     }
-    catch (NullPointerException | WebDriverException ignored) {
+    catch (WebDriverException wde) {
+      logger.log(Level.WARN, "WebDriverException trying to obtain the current url", wde);
+      return "";
+    }
+  }
+
+  public static String getTitle() {
+    try {
+      return (remoteWebDriver != null) ? remoteWebDriver.getTitle() : "";
+    }
+    catch (WebDriverException wde) {
+      logger.log(Level.WARN, "WebDriverException trying to obtain the page title", wde);
       return "";
     }
   }
@@ -299,8 +336,12 @@ public class WdDriver extends SUTBase {
       // Choose first or last tab, depending on user prefs
       activate();
 
-      // Wait until document is ready for script
-      waitDocumentReady();
+      // Wait until document is ready; if not, return null (lost session or timeout)
+      if(!waitDocumentReady()) {
+        logger.log(Level.WARN, "WebDriver document is not ready for interaction");
+        logger.log(Level.WARN, "Skipping script execution: " + script);
+        return null;
+      }
 
       return remoteWebDriver.executeScript(script, args);
     }
@@ -314,27 +355,26 @@ public class WdDriver extends SUTBase {
     }
   }
 
-  public static void waitDocumentReady() {
-    WebDriverWait wait = new WebDriverWait((WebDriver)remoteWebDriver, Duration.ofSeconds(60));
-    ExpectedCondition<Boolean> documentReady = (WebDriver driver) -> {
-      Object result = remoteWebDriver.executeScript("return document.readyState");
-      return result != null && result.equals("complete");
-    };
-    wait.until(documentReady);
-  }
-
-  public static void executeCanvasScript(String script, Object... args) {
-    try {
-      // Choose first or last tab, depending on user prefs
-      activate();
-
-      // Add the canvas if the page doesn't have one
-      remoteWebDriver.executeScript("addCanvasTestar()");
-
-      remoteWebDriver.executeScript(script, args);
+  public static boolean waitDocumentReady() {
+    if (remoteWebDriver == null) {
+      return false;
     }
-    catch (NullPointerException | WebDriverException ignored) {
 
+    try {
+      WebDriverWait wait = new WebDriverWait(remoteWebDriver, Duration.ofSeconds(60));
+      ExpectedCondition<Boolean> documentReady = driver -> {
+      try {
+        Object result = remoteWebDriver.executeScript("return document.readyState");
+        return result != null && "complete".equals(result.toString());
+      } catch (WebDriverException wde) {
+        logger.log(Level.WARN, "WebDriverException waiting for the document to be ready", wde);
+        return false;
+      }
+    };
+      return wait.until(documentReady);
+    } catch (WebDriverException wde) {
+      logger.log(Level.WARN, "WebDriverException waiting for the document to be ready", wde);
+      return false;
     }
   }
 

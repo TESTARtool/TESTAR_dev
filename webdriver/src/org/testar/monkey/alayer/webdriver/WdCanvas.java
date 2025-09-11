@@ -33,6 +33,10 @@ package org.testar.monkey.alayer.webdriver;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.monkey.Assert;
 import org.testar.monkey.Pair;
 import org.testar.monkey.alayer.Canvas;
@@ -45,6 +49,8 @@ import org.testar.monkey.alayer.Pen;
  * Represents a webdriver canvas on which can be painted.
  */
 public class WdCanvas implements Canvas {
+  protected static final Logger logger = LogManager.getLogger();
+
   private static final int textOffsetX = 5;
   private static final int textOffsetY = 15;
 
@@ -97,7 +103,7 @@ public class WdCanvas implements Canvas {
   @Override
   public void clear(double x, double y, double width, double height) {
     Object[] args = new Object[]{x, y, width, height};
-    WdDriver.executeCanvasScript("clearCanvasTestar(arguments)", args);
+    executeCanvasScript("clearCanvasTestar(arguments)", args);
   }
 
   @Override
@@ -181,7 +187,7 @@ public class WdCanvas implements Canvas {
   @Override
   public void paintBatch() {
 	  if (!drawBatch.isEmpty()) {
-		  WdDriver.executeCanvasScript("drawBatchTestar(arguments[0])", drawBatch);
+		  executeCanvasScript("drawBatchTestar(arguments[0])", drawBatch);
 		  drawBatch.clear();
 	  }
   }
@@ -215,5 +221,20 @@ public class WdCanvas implements Canvas {
   @Override
   public String toString() {
     return "x: " + x() + ", y: " + y() + ", width: " + width() + ", height: " + height() ;
+  }
+  
+  private void executeCanvasScript(String script, Object... args) {
+    try {
+      RemoteWebDriver remoteWebDriver = WdDriver.getRemoteWebDriver();
+
+      if(remoteWebDriver == null) return;
+        
+      // Add the canvas if the page doesn't have one
+      remoteWebDriver.executeScript("addCanvasTestar()");
+
+      remoteWebDriver.executeScript(script, args);
+    } catch (NullPointerException | WebDriverException ignored) {
+
+    }
   }
 }
