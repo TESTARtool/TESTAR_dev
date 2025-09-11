@@ -157,7 +157,31 @@ public class Protocol_webdriver_newspark_drawnames_llm extends WebdriverProtocol
 	protected State getState(SUT system) throws StateBuildException {
 		State state = super.getState(system);
 
+		for (Widget widget : state) {
+		    if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)) {
+		        widget.set(Tags.Desc, widget.get(Tags.Desc).concat(siblingDesc(widget)));
+		    }
+		}
+
 		return state;
+	}
+
+	private String siblingDesc(Widget widget) {
+	    if (widget == null) return "";
+	    Widget parent = widget.parent();
+	    if (parent == null) return "";
+
+	    StringBuilder sb = new StringBuilder();
+	    for (int i = 0; i < parent.childCount(); i++) {
+	        Widget child = parent.child(i);
+	        if (child == null || child == widget) continue;
+
+	        String desc = child.get(Tags.Desc, "");
+	        if (!desc.isEmpty()) {
+	            sb.append(": ").append(desc);
+	        }
+	    }
+	    return sb.toString();
 	}
 
 	/**

@@ -149,7 +149,7 @@ LlmTestGoals =
 # WebDriver advanced state fetcher configuration
 #################################################################
 WebIgnoredTags = script;noscript;head;meta;style;link;svg;canvas;iframe
-WebIgnoredAttributes = xpath;innerHTML;outerHTML
+WebIgnoredAttributes = xpath
 
 #################################################################
 # WebDriver features
