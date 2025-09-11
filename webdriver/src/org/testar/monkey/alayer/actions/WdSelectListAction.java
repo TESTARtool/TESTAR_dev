@@ -51,7 +51,8 @@ public class WdSelectListAction extends TaggableBase implements Action {
 
     public enum JsTargetMethod {
         ID,
-        NAME
+        NAME,
+        CSS
     }
 
     public WdSelectListAction(String target, String value, Widget widget, JsTargetMethod targetMethod) {
@@ -65,20 +66,51 @@ public class WdSelectListAction extends TaggableBase implements Action {
 
     @Override
     public void run(SUT system, State state, double duration) {
+        String selectScript =
+                "(() => {" +
+                "  const field = %s;" +
+                "  if (!field) return false;" +
+                "  const wanted = '%s';" +
+                "  const opts = Array.from(field.options);" +
+                "  const norm = s => (s == null ? '' : ('' + s).trim());" +
+                "  const match = opts.find(o => norm(o.value) === wanted || norm(o.label) === wanted || norm(o.textContent) === wanted);" +
+                "  if (match) {" +
+                "    field.value = match.value;" +
+                "    match.selected = true;" +
+                "  } else {" +
+                "    field.value = wanted;" +
+                "  }" +
+                "  field.dispatchEvent(new Event('input',  { bubbles: true }));" +
+                "  field.dispatchEvent(new Event('change', { bubbles: true }));" +
+                "})();";
+        
         switch(targetMethod) {
-            case ID:
-                WdDriver.executeScript(String.format("const field = document.getElementById('%s');" +
-                        " field.value = '%s'; const event = new Event('change', { bubbles: true }); " +
-                        "field.dispatchEvent(event);", target, value));
-                break;
-            case NAME:
-                // Problematic if multiple widgets match the same name, should only be used as last resort.
-                WdDriver.executeScript(String.format("const field = document.getElementsByName('%s')[0];" +
-                        " field.value = '%s'; const event = new Event('change', { bubbles: true }); " +
-                        "field.dispatchEvent(event);", target, value));
-                break;
-            default:
-                logger.warn("WdSelectListAction targetMethod is null!");
+        case ID:
+            WdDriver.executeScript(String.format(
+                    selectScript,
+                    String.format("document.getElementById('%s')", target),
+                    value
+                    ));
+            break;
+
+        case NAME:
+            WdDriver.executeScript(String.format(
+                    selectScript,
+                    String.format("document.getElementsByName('%s')[0]", target),
+                    value
+                    ));
+            break;
+
+        case CSS:
+            WdDriver.executeScript(String.format(
+                    selectScript,
+                    String.format("document.querySelector('%s')", target),
+                    value
+                    ));
+            break;
+
+        default:
+            logger.warn("WdSelectListAction targetMethod is null!");
         }
     }
 

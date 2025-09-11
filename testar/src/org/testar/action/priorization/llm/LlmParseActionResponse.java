@@ -95,14 +95,24 @@ public class LlmParseActionResponse {
                     return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.SL_MISSING_INPUT);
                 }
 
-                String target = widget.get(WdTags.WebId, "");
+                String id  = widget.get(WdTags.WebId, "");
+                String name = widget.get(WdTags.WebName, "");
+                String css = widget.get(WdTags.WebCssSelector, "");
+
+                String target;
                 WdSelectListAction.JsTargetMethod method;
-                if (target.isEmpty()) {
-                    logger.warn("elementId is empty for select widget! Using name target method.");
-                    target = widget.get(WdTags.WebName, "");
-                    method = WdSelectListAction.JsTargetMethod.NAME;
-                } else {
+
+                if (!id.isEmpty()) {
+                    target = id;
                     method = WdSelectListAction.JsTargetMethod.ID;
+                } else if (!name.isEmpty()) {
+                    target = name;
+                    method = WdSelectListAction.JsTargetMethod.NAME;
+                    logger.debug("WebId empty; using WebName for select widget.");
+                } else {
+                    target = css;
+                    method = WdSelectListAction.JsTargetMethod.CSS;
+                    logger.debug("WebId and WebName empty; using WebCssSelector for select widget.");
                 }
 
                 return new LlmParseActionResult(new WdSelectListAction(target, input, widget, method), 
