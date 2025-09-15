@@ -33,6 +33,8 @@ package org.testar.protocols;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
 import org.testar.environment.Environment;
@@ -48,6 +50,7 @@ import org.testar.monkey.alayer.webdriver.WdWidget;
 import org.testar.monkey.alayer.webdriver.Constants;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.monkey.alayer.windows.WinApiException;
 import org.testar.monkey.alayer.windows.WinProcess;
 import org.testar.monkey.alayer.windows.Windows;
 import org.testar.plugin.NativeLinker;
@@ -57,23 +60,20 @@ import org.testar.settings.Settings;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
-
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
 
 public class WebdriverProtocol extends GenericUtilsProtocol {
+
+    protected static final Logger logger = LogManager.getLogger();
+
     //Attributes for adding slide actions
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
-    
-    protected static Set<String> existingCssClasses = new HashSet<>();
 
 	// WedDriver settings from file:
 	protected List<String> clickableClasses, typeableClasses, deniedExtensions, webDomainsAllowed;
@@ -254,15 +254,12 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
      */
     @Override
     protected State getState(SUT system) throws StateBuildException {
-    	
-    	try {
-    		WdDriver.waitDocumentReady();
-    	} catch(org.openqa.selenium.WebDriverException wde) {
+
+    	if(!WdDriver.waitDocumentReady()) {
     		LogSerialiser.log("WEBDRIVER ERROR: Selenium Chromedriver seems not to respond!\n", LogSerialiser.LogLevel.Critical);
     		System.out.println("******************************************************************");
     		System.out.println("** WEBDRIVER ERROR: Selenium Chromedriver seems not to respond! **");
     		System.out.println("******************************************************************");
-    		System.out.println(wde.getMessage());
     		system.set(Tags.IsRunning, false);
     	}
 
@@ -277,19 +274,17 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     			&& system.get(Tags.PID, (long)-1) != (long)-1 
     			&& WinProcess.procName(system.get(Tags.PID)).contains("chrome") 
     			&& !WinProcess.isForeground(system.get(Tags.PID))){
-    		
-    		WinProcess.toForeground(system.get(Tags.PID), 0.3, 100);
-    		LogSerialiser.log("Trying to set Chrome Browser to Foreground... " 
-    		+ WinProcess.procName(system.get(Tags.PID)) + "\n");
-    		
-    	}
 
-    	if(settings.get(ConfigTags.Mode) == Modes.Spy) {
+    	    String msg = "Trying to set the browser to Foreground... " + system.get(Tags.PID, -1L);
+    	    logger.log(org.apache.logging.log4j.Level.INFO, msg);
 
-    		for(Widget w : state) {
-    			WdElement element = ((WdWidget) w).element;
-				existingCssClasses.addAll(element.cssClasses);
-    		}
+    	    try {
+    	        WinProcess.toForeground(system.get(Tags.PID), 0.3, 100);
+    	    } catch (WinApiException wae) {
+    	        logger.log(org.apache.logging.log4j.Level.WARN, wae);
+    	        Verdict verdict = new Verdict(Verdict.Severity.NOT_RESPONDING, "Unable to bring the browser to foreground!");
+    	        state.set(Tags.OracleVerdict, verdict);
+    	    }
     	}
 
         return state;
@@ -390,33 +385,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
     @Override
     protected void stopSystem(SUT system) {
-        if(settings.get(ConfigTags.Mode) == Modes.Spy) {
-
-            try {
-                if(Settings.getSettingsPath() != null) {
-                    File folder = new File(Settings.getSettingsPath());
-                    File file = new File(folder, "existingCssClasses.txt");
-                    if(!file.exists())
-                        file.createNewFile();
-
-                    Stream<String> stream = Files.lines(Paths.get(file.getCanonicalPath()));
-                    stream.forEach(line -> existingCssClasses.add(line));
-                    stream.close();
-
-                    PrintWriter write = new PrintWriter(new FileWriter(file.getCanonicalPath()));
-                    for(String s : existingCssClasses)
-                        write.println(s);
-                    write.close();
-                }
-
-            } catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
         super.stopSystem(system);
     }
-    
+
     @Override
 	protected void closeTestSession() {
 		super.closeTestSession();
