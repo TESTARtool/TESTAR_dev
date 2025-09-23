@@ -1,3 +1,7 @@
+#TESTAR v2.7.9 (23-Sep-2025)
+- Bump io.github.bonigarcia:webdrivermanager from 6.2.0 to 6.3.2
+- Update Windows GitHub runners environment to Windows Server 2022
+
 #TESTAR v2.7.8 (2-Sep-2025)
 - Add paintBatch and drawBatchTestar logic to paint all web elements at once
 - Fix the derivation and visualization of slide actions in web applications
