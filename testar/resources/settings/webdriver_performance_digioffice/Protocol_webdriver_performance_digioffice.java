@@ -177,7 +177,7 @@ public class Protocol_webdriver_performance_digioffice extends WebdriverProtocol
 
         NetworkSummary networkSummary = monitor.getSummary();
         List<NetworkRecord> networkRecordList = monitor.getCurrentFinishedActionRecords();
-        //monitor.printSummaryAndRequests(); // Print for debugging
+        monitor.logSummaryAndRequests();
         monitor.endMeasurement();
 
         // Oracle for web state performance issues
@@ -192,9 +192,10 @@ public class Protocol_webdriver_performance_digioffice extends WebdriverProtocol
     }
 
     private Verdict statePerformanceVerdict(State state, NetworkSummary networkSummary) {
-        if(networkSummary.maxDurationMs > 5000L) {
+        if(networkSummary.stateDurationMs > 5000L) {
             String stateId = state.get(WdTags.WebHref, state.get(WdTags.WebTitle, state.get(Tags.ConcreteID, "")));
-            String performanceMsg = "Performance issue of '" + networkSummary.maxDurationMs + "'ms in web state '" + stateId + "'";
+            //String performanceMsg = "Performance issue of '" + networkSummary.stateDurationMs + "'ms in web state '" + stateId + "'";
+            String performanceMsg = "Performance issue loading web network items in the web state '" + stateId + "'";
             return new Verdict(Verdict.Severity.WARNING_RESOURCE_PERFORMANCE_ISSUE, performanceMsg);
         } else {
             return Verdict.OK;
@@ -207,7 +208,8 @@ public class Protocol_webdriver_performance_digioffice extends WebdriverProtocol
         // Iterate through all web items because multiple might have performance issues
         for (NetworkRecord r : networkRecordList) {
             if(r.durationMs > 1000L) {
-                String performanceMsg = "Performance issue of '" + r.durationMs + "'ms for web item '" + r.url + "'";
+                //String performanceMsg = "Performance issue of '" + r.durationMs + "'ms for web item '" + r.url + "'";
+                String performanceMsg = "Performance issue loading the web network item '" + r.url + "'";
                 itemPerformanceVerdict = itemPerformanceVerdict.join(new Verdict(Verdict.Severity.WARNING_RESOURCE_PERFORMANCE_ISSUE, performanceMsg));
             }
         }
