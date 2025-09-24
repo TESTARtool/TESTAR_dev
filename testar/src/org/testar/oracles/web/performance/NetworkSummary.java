@@ -1,15 +1,20 @@
 package org.testar.oracles.web.performance;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 public class NetworkSummary {
     public long count;
     public long totalBytes;
-    public long windowDurationMs; // wall-clock: max(endNs) - min(startNs)
-    public long maxDurationMs;    // slowest single resource
+    public long stateDurationMs; // wall-clock: max(endNs) - min(startNs)
+    public long sumDurationsMs;  // sum of per-request durations
+    public long busyTimeMs;      // union/merged time network was busy
+    public long maxDurationMs;   // slowest single resource
     public long failedCount;
     public Map<String, Long> byResourceType = new HashMap<>();
     public Map<String, Long> byFrame = new HashMap<>();
@@ -19,6 +24,9 @@ public class NetworkSummary {
         NetworkSummary s = new NetworkSummary();
         long minStart = Long.MAX_VALUE;
         long maxEnd = 0L;
+
+        // collect intervals for busy-time union
+        List<long[]> intervals = new ArrayList<>();
 
         for (NetworkRecord r : recs) {
             if (r == null) continue;
@@ -30,6 +38,7 @@ public class NetworkSummary {
             if (r.startNs > 0) minStart = Math.min(minStart, r.startNs);
             if (r.endNs > 0)   maxEnd   = Math.max(maxEnd,   r.endNs);
 
+            // Only finished (or failed) requests contribute to network-time metrics
             if (r.durationMs <= 0 && !r.failed) continue;
 
             s.count++;
@@ -40,12 +49,39 @@ public class NetworkSummary {
             if (r.resourceType != null) s.byResourceType.merge(r.resourceType, 1L, Long::sum);
             if (r.frameId != null)      s.byFrame.merge(r.frameId, 1L, Long::sum);
             if (!r.failed && r.status != 0) s.byStatus.merge(r.status, 1L, Long::sum);
+
+            if (r.startNs > 0 && r.endNs > 0) {
+                s.sumDurationsMs += r.durationMs;
+                intervals.add(new long[]{ r.startNs, r.endNs });
+            }
         }
 
+        // wall-clock span (unchanged)
         if (maxEnd > 0 && minStart < Long.MAX_VALUE) {
-            s.windowDurationMs = (maxEnd - minStart) / 1_000_000;
+            s.stateDurationMs = (maxEnd - minStart) / 1_000_000;
         } else {
-            s.windowDurationMs = 0;
+            s.stateDurationMs = 0;
+        }
+
+        // merge intervals to compute busyTimeMs (union)
+        if (!intervals.isEmpty()) {
+            intervals.sort(Comparator.comparingLong(a -> a[0]));
+            long curStart = intervals.get(0)[0];
+            long curEnd   = intervals.get(0)[1];
+            long total = 0L;
+
+            for (int i = 1; i < intervals.size(); i++) {
+                long s0 = intervals.get(i)[0], e0 = intervals.get(i)[1];
+                if (s0 <= curEnd) {
+                    // overlap -> extend
+                    curEnd = Math.max(curEnd, e0);
+                } else {
+                    total += (curEnd - curStart);
+                    curStart = s0; curEnd = e0;
+                }
+            }
+            total += (curEnd - curStart);
+            s.busyTimeMs = total / 1_000_000;
         }
 
         return s;
@@ -56,8 +92,10 @@ public class NetworkSummary {
         sb.append("=========== Network Summary ============\n");
         sb.append("Requests: ").append(count).append('\n');
         sb.append("Bytes:    ").append(totalBytes).append('\n');
-        sb.append("Duration: ").append(windowDurationMs).append(" ms\n");
-        sb.append("Max dur:  ").append(maxDurationMs).append(" ms\n");
+        sb.append("State Duration: ").append(stateDurationMs).append(" ms\n");
+        sb.append("Network Busy:   ").append(busyTimeMs).append(" ms\n");
+        sb.append("Sum of items:   ").append(sumDurationsMs).append(" ms\n");
+        sb.append("Max item dur:  ").append(maxDurationMs).append(" ms\n");
         if (failedCount > 0) sb.append("Failed:   ").append(failedCount).append('\n');
 
         if (!byStatus.isEmpty()) {
@@ -78,7 +116,7 @@ public class NetworkSummary {
             .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
             .forEach(e -> sb.append("  ").append(e.getKey()).append(": ").append(e.getValue()).append('\n'));
         }
-        sb.append("========================================");
+        sb.append("========================================\n");
         return sb.toString();
     }
 }

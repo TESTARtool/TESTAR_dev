@@ -1,5 +1,8 @@
 package org.testar.oracles.web.performance;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Comparator;
@@ -12,6 +15,7 @@ import java.util.stream.Collectors;
 
 import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.v139.network.Network;
+import org.testar.OutputStructure;
 
 public class NetworkMonitor {
     private final DevTools devTools;
@@ -187,7 +191,7 @@ public class NetworkMonitor {
     // === Convenience printer (per-action) ===
     public void printSummaryAndRequests() {
         NetworkSummary s = getSummary();
-        
+
         System.out.println(s.toPrettyString());
 
         System.out.println("=== Loaded resources (slowest first) ===");
@@ -197,5 +201,29 @@ public class NetworkMonitor {
         }
 
         System.out.println("========================================");
+    }
+
+    public void logSummaryAndRequests() {
+        NetworkSummary s = getSummary();
+
+        String logNetworkFileName = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString + "_"
+                + OutputStructure.executedSUTname + "_sequence_" + OutputStructure.sequenceInnerLoopCount 
+                + "_performance_debug.log";
+
+        try (FileWriter fileWriter = new FileWriter(logNetworkFileName, true)) {
+
+            fileWriter.write(s.toPrettyString());
+
+            fileWriter.write("=== Loaded resources (slowest first) ===" + System.lineSeparator());
+
+            for (NetworkRecord r : getCurrentFinishedActionRecords()) {
+                fileWriter.write(r.toLine() + System.lineSeparator());
+            }
+
+            fileWriter.write("========================================" + System.lineSeparator());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
