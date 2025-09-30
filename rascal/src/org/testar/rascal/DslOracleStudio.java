@@ -21,7 +21,7 @@ import java.nio.file.*;
  * Minimal Swing-based DSL mini-IDE for TESTAR oracles (Rascal-backed).
  * - Ato-validate the DSL every 500ms.
  * - See diagnosis errors below (line:col + message).
- * - Generate -> writes to resources/oracles/generated/RuntimeGeneratedOracles.java (package generated).
+ * - Generate -> writes to oracles/generated/RuntimeGeneratedOracles.java (package generated).
  */
 public class DslOracleStudio extends JFrame {
 

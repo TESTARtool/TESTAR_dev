@@ -65,7 +65,7 @@ public class DslOracleHelpers {
 
     public static Path saveGenerated(String javaSource) throws IOException {
         String transformed = forcePackageAndClass(javaSource);
-        Path out = Paths.get("testar", "resources", "oracles", "generated", "RuntimeGeneratedOracles.java")
+        Path out = Paths.get("oracles", "generated", "RuntimeGeneratedOracles.java")
                 .toAbsolutePath().normalize();
         Files.createDirectories(out.getParent());
         Files.writeString(out, transformed);
