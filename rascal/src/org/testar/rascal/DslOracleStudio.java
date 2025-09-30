@@ -166,7 +166,7 @@ public class DslOracleStudio extends JFrame {
                 java.util.List<HlRange> ranges = new java.util.ArrayList<>();
                 try {
 
-                    // Rascal: validateAtWithModel(oracleFile, modelFile) -> list[Diagnostic]
+                    // Rascal: validateAtWithModel(oracleFile, modelFile) -> list[diag]
                     ISourceLocation oracleLoc = DslOracleHelpers.writeDslToTemp(vf, "RuntimeGeneratedOracles", dsl);
                     Path modelPath = Paths.get(dslOracleLoader.getModulePath() + "/lang/testar/testar.model");
                     ISourceLocation modelLoc = vf.sourceLocation(modelPath.toUri());
@@ -202,6 +202,7 @@ public class DslOracleStudio extends JFrame {
                         }
                         diagnostics = sb.toString();
                     }
+
                 } catch (org.rascalmpl.interpreter.staticErrors.SyntaxError se) {
                     // Build a highlight from the exception location
                     io.usethesource.vallang.ISourceLocation loc = se.getLocation();
@@ -215,6 +216,7 @@ public class DslOracleStudio extends JFrame {
                         ranges.add(new HlRange(start, end, ERR_PAINTER));
                     }
                     diagnostics = fmtSyntaxError(se);
+
                 } catch (org.rascalmpl.interpreter.staticErrors.StaticError ste) {
                     io.usethesource.vallang.ISourceLocation loc = ste.getLocation();
                     if (loc != null && loc.hasLineColumn()) {
@@ -227,6 +229,55 @@ public class DslOracleStudio extends JFrame {
                         ranges.add(new HlRange(start, end, ERR_PAINTER));
                     }
                     diagnostics = fmtStaticError(ste);
+
+                } catch (org.rascalmpl.exceptions.Throw th) {
+                    // Handle Rascal-level Throw, e.g., Throw(ParseError(|file|(...)))
+                    io.usethesource.vallang.IValue ex = th.getException();
+                    io.usethesource.vallang.ISourceLocation where = null;
+                    String msg = th.getMessage();
+
+                    try {
+                        if (ex instanceof io.usethesource.vallang.IConstructor) {
+                            io.usethesource.vallang.IConstructor c = (io.usethesource.vallang.IConstructor) ex;
+
+                            // try positional arg 0
+                            if (c.arity() > 0 && c.get(0) instanceof io.usethesource.vallang.ISourceLocation) {
+                                where = (io.usethesource.vallang.ISourceLocation) c.get(0);
+                            }
+                            // try keyword parameter "loc"
+                            if (where == null && c.mayHaveKeywordParameters()) {
+                                @SuppressWarnings("unchecked")
+                                io.usethesource.vallang.IWithKeywordParameters<io.usethesource.vallang.IConstructor> kw =
+                                (io.usethesource.vallang.IWithKeywordParameters<io.usethesource.vallang.IConstructor>) c;
+                                io.usethesource.vallang.IValue kv = kw.getParameter("loc");
+                                if (kv instanceof io.usethesource.vallang.ISourceLocation) {
+                                    where = (io.usethesource.vallang.ISourceLocation) kv;
+                                }
+                            }
+
+                            if (msg == null || msg.isEmpty()) {
+                                msg = c.getName(); // e.g., "ParseError"
+                            }
+                        }
+                    } catch (Throwable ignore) {
+                        // If introspection fails, fall through to generic messaging
+                    }
+
+                    if (where != null && where.hasLineColumn()) {
+                        int[] ls = buildLineStarts(dsl);
+                        int bl = where.getBeginLine(), bc = where.getBeginColumn();
+                        int el = where.getEndLine(),   ec = where.getEndColumn();
+                        int start = safeOffset(dsl, ls, bl, bc);
+                        int end   = safeOffset(dsl, ls, el, ec);
+                        if (end <= start) end = Math.min(dsl.length(), start + 1);
+                        ranges.add(new HlRange(start, end, ERR_PAINTER));
+
+                        diagnostics = "ERROR at " + bl + ":" + bc + " - " + (msg != null ? msg : "Parse error");
+                    } else {
+                        // no loc available; at least show the message
+                        diagnostics = "Error: Throw - " + (msg != null ? msg : ex.toString());
+                    }
+
                 } catch (Throwable t) {
                     diagnostics = "Error: " + t.getClass().getSimpleName() + " - " + t.getMessage();
                 }
