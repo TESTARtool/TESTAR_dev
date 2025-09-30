@@ -93,6 +93,7 @@ dependencies {
     implementation project(':linux')
     implementation project(':ios')
     implementation project(':android')
+    implementation project(':rascal')
     implementation files('./lib/jsyntaxpane-1.1.5.jar')
     implementation files('./lib/eye2.jar')
     // https://mvnrepository.com/artifact/com.github.kwhat/jnativehook
@@ -157,6 +158,10 @@ task prepareWindowsDLL(type: Copy) {
 
 applicationDistribution.from("../statemodel/resources/graphs") {
     into "bin/output/graphs"
+}
+
+applicationDistribution.from("../rascal/testar-oracle") {
+    into "rascal-modules/testar-oracle"
 }
 
 applicationDistribution.from("../webdriver/resources/web-extension") {

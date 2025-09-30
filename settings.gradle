@@ -1,2 +1,2 @@
-include 'core', 'windows', 'testar', 'linux', 'webdriver', 'android', 'ios', 'statemodel'
+include 'core', 'windows', 'testar', 'linux', 'webdriver', 'android', 'ios', 'statemodel', 'rascal'
 

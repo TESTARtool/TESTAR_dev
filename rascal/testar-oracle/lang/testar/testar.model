@@ -1,0 +1,317 @@
+
+
+// this file describes the model that Testar assumes
+// about the structure of the UI; 
+// it is used internally by the type checker to test
+// element access in oracles (asserts).
+
+button {
+    visible: bool
+    enabled: bool
+    focused: bool
+    clickable: bool
+    onscreen: bool
+    offscreen: bool
+
+    color: color
+    colorName: str
+    backgroundColor: color
+    backgroundColorName: str
+
+    text: str  
+    alttext: str
+    role: str
+    tooltip: str
+}
+
+input_text {
+    visible: bool
+    enabled: bool
+    focused: bool
+    readonly: bool
+    empty: bool
+    filled: bool
+    onscreen: bool
+    offscreen: bool
+
+    color: color
+    colorName: str
+    backgroundColor: color
+    backgroundColorName: str
+
+    text: str  
+    alttext: str
+    role: str
+    placeholder: str
+    tooltip: str
+}
+
+input_numeric {
+    visible: bool
+    enabled: bool
+    focused: bool
+    readonly: bool
+    empty: bool
+    filled: bool
+    onscreen: bool
+    offscreen: bool
+
+    color: color
+    colorName: str
+    backgroundColor: color
+    backgroundColorName: str
+
+    text: str  
+    alttext: str
+    role: str
+    placeholder: str
+    tooltip: str
+}
+
+
+static_text {
+    visible: bool
+    enabled: bool
+    focused: bool
+    readonly: bool
+    empty: bool
+    onscreen: bool
+    offscreen: bool
+
+    color: color
+    colorName: str
+    backgroundColor: color
+    backgroundColorName: str
+
+    text: str  
+    alttext: str
+    role: str
+    placeholder: str
+    tooltip: str
+    fontsize: str
+}
+
+checkbox {
+    visible: bool
+    enabled: bool
+    focused: bool
+    checked: bool
+    clickable: bool
+    onscreen: bool
+    offscreen: bool
+
+    color: color
+    colorName: str
+    backgroundColor: color
+    backgroundColorName: str
+
+    text: str  
+    alttext: str
+    role: str
+    tooltip: str
+}
+
+radiogroup {
+    onscreen: bool
+    offscreen: bool
+
+    options: list[radio]
+}
+
+radio {
+    visible: bool
+    enabled: bool
+    focused: bool
+    checked: bool
+    clickable: bool
+    onscreen: bool
+    offscreen: bool
+
+    color: color
+    colorName: str
+    backgroundColor: color
+    backgroundColorName: str
+
+    text: str  
+    alttext: str
+    role: str
+    tooltip: str
+}
+
+dropdown {
+    visible: bool
+    enabled: bool
+    focused: bool
+    empty: bool
+    selected: bool
+    clickable: bool
+    onscreen: bool
+    offscreen: bool
+
+    color: color
+    colorName: str
+    backgroundColor: color
+    backgroundColorName: str
+
+    text: str  
+    alttext: str
+    role: str
+    tooltip: str
+
+    length: int
+
+    options: list[element]
+}
+
+label {
+    visible: bool
+    focused: bool
+    onscreen: bool
+    offscreen: bool
+
+    color: color
+    colorName: str
+    backgroundColor: color
+    backgroundColorName: str
+
+    text: str
+    tooltip: str
+    fontsize: str
+}
+
+image {
+    visible: bool
+    focused: bool
+    onscreen: bool
+    offscreen: bool
+
+    alttext: str
+}
+
+link {
+    visible: bool
+    clickable: bool
+    focused: bool
+    onscreen: bool
+    offscreen: bool
+
+    color: color
+    colorName: str
+    backgroundColor: color
+    backgroundColorName: str
+}
+
+alert {
+    visible: bool
+    focused: bool
+    onscreen: bool
+    offscreen: bool
+}
+
+panel {
+    visible: bool
+    focused: bool
+    empty: bool
+    onscreen: bool
+    offscreen: bool
+
+    children: list[element]
+}
+
+table {
+    visible: bool
+    focused: bool
+    empty: bool
+    onscreen: bool
+    offscreen: bool
+
+    title: str
+    headerText: str
+
+    rows: list[table_rows]
+}
+
+table_row {
+    visible: bool
+    focused: bool
+    empty: bool
+    onscreen: bool
+    offscreen: bool
+
+    text: str
+    identifier: str
+
+    data_elements: list[table_data]
+}
+
+table_data {
+    visible: bool
+    focused: bool
+    empty: bool
+    onscreen: bool
+    offscreen: bool
+
+    color: color
+    colorName: str
+    backgroundColor: color
+    backgroundColorName: str
+
+    text: str
+    fontsize: str
+}
+
+menu {
+    visible: bool
+    enabled: bool
+    focused: bool
+    clickable: bool
+    empty: bool
+    onscreen: bool
+    offscreen: bool
+
+    children: list[menu_item]
+}
+
+menu_item {
+    visible: bool
+    enabled: bool
+    focused: bool
+    clickable: bool
+    empty: bool
+    onscreen: bool
+    offscreen: bool
+
+    color: color
+    colorName: str
+    backgroundColor: color
+    backgroundColorName: str
+
+    fontsize: str
+}
+
+form {
+    visible: bool
+    focused: bool
+    empty: bool
+    onscreen: bool
+    offscreen: bool
+
+    title: str
+}
+
+element {
+    visible: bool
+    enabled: bool
+    focused: bool
+    onscreen: bool
+    offscreen: bool
+    empty: bool
+    disabled: bool
+
+    color: color
+    colorName: str
+    backgroundColor: color
+    backgroundColorName: str
+
+    children: list[element]
+}

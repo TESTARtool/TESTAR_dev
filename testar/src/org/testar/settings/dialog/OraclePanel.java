@@ -32,6 +32,7 @@
 package org.testar.settings.dialog;
 
 import org.testar.monkey.ConfigTags;
+import org.testar.rascal.DslOracleStudio;
 import org.testar.settings.Settings;
 import org.testar.settings.dialog.components.RegexButton;
 import org.testar.settings.dialog.components.RestoreButton;
@@ -83,6 +84,8 @@ public class OraclePanel extends SettingsPanel {
     private JButton externalOraclesButton = new JButton("ExternalOracles");
     private ExternalOraclesDialog externalOraclesDialog;
 
+    private JButton dslOracleStudioButton = new JButton("DslOracleStudio");
+    
     private JCheckBox enableVisualValidationCheckBox;
 
     public OraclePanel() {
@@ -157,7 +160,7 @@ public class OraclePanel extends SettingsPanel {
         secondsLabel.setBounds(500, 275, 50, 27);
         add(secondsLabel);
 
-        extendedOraclesButton.setBounds(150, 330, 150, 27);
+        extendedOraclesButton.setBounds(50, 330, 150, 27);
         extendedOraclesButton.setToolTipText("Open Extended Oracles dialog");
         extendedOraclesButton.addActionListener(new ActionListener() {
             @Override
@@ -167,7 +170,7 @@ public class OraclePanel extends SettingsPanel {
         });
         add(extendedOraclesButton);
 
-        externalOraclesButton.setBounds(350, 330, 150, 27);
+        externalOraclesButton.setBounds(250, 330, 150, 27);
         externalOraclesButton.setToolTipText("Open External Oracles dialog");
         externalOraclesButton.addActionListener(new ActionListener() {
             @Override
@@ -176,6 +179,16 @@ public class OraclePanel extends SettingsPanel {
             }
         });
         add(externalOraclesButton);
+        
+        dslOracleStudioButton.setBounds(450, 330, 150, 27);
+        dslOracleStudioButton.setToolTipText("Open the DSL Oracle studio");
+        dslOracleStudioButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openDslOracleStudio();
+            }
+        });
+        add(dslOracleStudioButton);
     }
 
     private void openExtendedOraclesDialog() {
@@ -198,6 +211,14 @@ public class OraclePanel extends SettingsPanel {
             	externalOracles = externalOraclesDialog.getSavedExternalOracles();
             }
         });
+    }
+
+    private void openDslOracleStudio() {
+        try {
+            DslOracleStudio.loadDslOracleStudio();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
