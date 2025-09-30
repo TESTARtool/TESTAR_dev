@@ -4,8 +4,10 @@ import io.usethesource.vallang.*;
 import org.rascalmpl.interpreter.Evaluator;
 import org.rascalmpl.interpreter.staticErrors.StaticError;
 import org.rascalmpl.interpreter.staticErrors.SyntaxError;
+import org.testar.rascal.studio.DslKeywordHighlighter;
+import org.testar.rascal.studio.DslKeywordService;
+
 import javax.swing.*;
-import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.DefaultHighlighter;
@@ -29,6 +31,10 @@ public class DslOracleStudio extends JFrame {
     private final IValueFactory vf;
     private final Evaluator eval;
 
+    // Syntax-coloring
+    private DslKeywordService keywordService;
+    private DslKeywordHighlighter keywordHighlighter;
+
     public DslOracleStudio() throws Exception {
         super("TESTAR Oracle DSL Studio");
 
@@ -39,11 +45,10 @@ public class DslOracleStudio extends JFrame {
         buildUI();
     }
 
-    private JTextArea editor;
+    private JTextPane editor;
     private JTextArea errorsArea;
     private JLabel status;
     private JFileChooser chooser;
-    private Timer debounce;
 
     private void buildUI() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -51,9 +56,9 @@ public class DslOracleStudio extends JFrame {
         setMinimumSize(new Dimension(900, 700));
 
         // Editor
-        editor = new JTextArea();
-        editor.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
-        editor.setTabSize(2);
+        editor = new JTextPane();
+        editor.setFont(new java.awt.Font("Consolas", java.awt.Font.PLAIN, 14));
+        setTabSize(editor, 2);
         JScrollPane spEditor = new JScrollPane(editor);
         spEditor.setBorder(BorderFactory.createTitledBorder("Oracle DSL"));
 
@@ -65,7 +70,7 @@ public class DslOracleStudio extends JFrame {
         errorsArea.setWrapStyleWord(true);
         JScrollPane spErrors = new JScrollPane(errorsArea);
         spErrors.setBorder(BorderFactory.createTitledBorder("Diagnostics"));
-        spErrors.setPreferredSize(new Dimension(200, 160)); // give it some initial height
+        spErrors.setPreferredSize(new Dimension(200, 160));
 
         // Status bar
         status = new JLabel("Ready");
@@ -88,22 +93,28 @@ public class DslOracleStudio extends JFrame {
         split.setOneTouchExpandable(true);
         split.setResizeWeight(0.75); // editor gets ~75% of space
 
-        // Layout
         add(top, BorderLayout.NORTH);
         add(split, BorderLayout.CENTER);
-        add(status, BorderLayout.SOUTH); // only the status bar at the very bottom
+        add(status, BorderLayout.SOUTH); // the status bar at the very bottom
 
         // File chooser
         chooser = new JFileChooser();
         chooser.setFileFilter(new FileNameExtensionFilter("TESTAR DSL (*.testar)", "testar"));
 
-        // Debounced validation
-        debounce = new Timer(500, e -> validateInBackground(false));
-        debounce.setRepeats(false);
-        editor.getDocument().addDocumentListener(new SimpleDocListener(() -> {
-            status.setText("Typing…");
-            debounce.restart();
-        }));
+        // --- VALIDATION DEBOUNCE (single timer; ignore style-only changes) ---
+        javax.swing.Timer validationTimer = new javax.swing.Timer(500, e -> validateInBackground(false));
+        validationTimer.setRepeats(false);
+        editor.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            private void schedule() {
+                status.setText("Typing...");
+                validationTimer.restart();
+            }
+            @Override public void insertUpdate(javax.swing.event.DocumentEvent e) { schedule(); }
+            @Override public void removeUpdate(javax.swing.event.DocumentEvent e) { schedule(); }
+            @Override public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                // Ignore attribute changes from coloring
+            }
+        });
 
         // Actions
         btnOpen.addActionListener(e -> openDsl());
@@ -114,6 +125,16 @@ public class DslOracleStudio extends JFrame {
         // Seed content (optional)
         editor.setText("assert button \"Submit\" is enabled \"button Submit must be enabled\".");
 
+        // === Syntax coloring (Oracle keywords, strings) ===
+        keywordService = new DslKeywordService(dslOracleLoader.getModulePath());
+        keywordHighlighter = new DslKeywordHighlighter(
+                editor,
+                () -> keywordService.getKeywords(),
+                500,   // debounce for coloring
+                true  // color strings too
+                );
+        keywordHighlighter.start();
+
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
@@ -123,6 +144,29 @@ public class DslOracleStudio extends JFrame {
 
         // First validation
         validateInBackground(false);
+    }
+
+    private static void setTabSize(JTextPane editor, int spacesPerTab) {
+        if (spacesPerTab < 1) spacesPerTab = 1;
+
+        // Compute tab width in pixels based on current font
+        java.awt.FontMetrics fm = editor.getFontMetrics(editor.getFont());
+        int charW = fm.charWidth(' ');
+        int tabW  = Math.max(charW, charW * spacesPerTab);
+
+        // Build a TabSet (enough stops for wide lines)
+        int stops = 50; // adjust if you expect extremely long lines
+        javax.swing.text.TabStop[] tabStops = new javax.swing.text.TabStop[stops];
+        for (int i = 0; i < stops; i++) {
+            tabStops[i] = new javax.swing.text.TabStop((i + 1) * tabW);
+        }
+        javax.swing.text.TabSet tabSet = new javax.swing.text.TabSet(tabStops);
+
+        // Apply as paragraph attribute to the whole doc
+        javax.swing.text.StyledDocument doc = editor.getStyledDocument();
+        javax.swing.text.SimpleAttributeSet attrs = new javax.swing.text.SimpleAttributeSet();
+        javax.swing.text.StyleConstants.setTabSet(attrs, tabSet);
+        doc.setParagraphAttributes(0, doc.getLength(), attrs, false);
     }
 
     // ---- File ops ----
@@ -309,6 +353,8 @@ public class DslOracleStudio extends JFrame {
                         java.awt.Rectangle view = editor.modelToView(caret);
                         if (view != null) editor.scrollRectToVisible(view);
                     }
+                    // ensure syntax colors are visible (they were cleared by removeAllHighlights)
+                    keywordHighlighter.apply();
                 } catch (Exception ignore) {}
             }
         }.execute();
