@@ -214,11 +214,15 @@ public class OraclePanel extends SettingsPanel {
     }
 
     private void openDslOracleStudio() {
-        try {
-            DslOracleStudio.loadDslOracleStudio();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            try {
+                DslOracleStudio studio = new DslOracleStudio();
+                studio.setLocationRelativeTo(SwingUtilities.getWindowAncestor(this));
+                studio.setVisible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     /**

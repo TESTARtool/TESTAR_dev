@@ -36,8 +36,10 @@ public class DslOracleStudio extends JFrame {
     private DslKeywordHighlighter keywordHighlighter;
 
     public DslOracleStudio() throws Exception {
-        super("TESTAR Oracle DSL Studio");
+        super("TESTAR DSL Oracle Studio");
 
+        System.out.println("Loading the TESTAR DSL Oracle Studio...");
+        
         dslOracleLoader = new DslOracleLoader();
         vf = dslOracleLoader.getValueFactory();
         eval = dslOracleLoader.getEvaluator();
@@ -51,7 +53,7 @@ public class DslOracleStudio extends JFrame {
     private JFileChooser chooser;
 
     private void buildUI() {
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
         setMinimumSize(new Dimension(900, 700));
 
@@ -424,15 +426,6 @@ public class DslOracleStudio extends JFrame {
         return ste.getClass().getSimpleName() + " at " + line + ":" + col + " - " + ste.getMessage();
     }
 
-    // ---- minimal document listener wrapper ----
-    private static class SimpleDocListener implements javax.swing.event.DocumentListener {
-        private final Runnable onChange;
-        SimpleDocListener(Runnable r) { this.onChange = r; }
-        @Override public void insertUpdate(javax.swing.event.DocumentEvent e) { onChange.run(); }
-        @Override public void removeUpdate(javax.swing.event.DocumentEvent e) { onChange.run(); }
-        @Override public void changedUpdate(javax.swing.event.DocumentEvent e) { onChange.run(); }
-    }
-
     // painters for highlights
     private final Highlighter.HighlightPainter ERR_PAINTER  =
             new DefaultHighlighter.DefaultHighlightPainter(new Color(255, 0, 0, 96));
@@ -473,15 +466,6 @@ public class DslOracleStudio extends JFrame {
         case "INFO":    return INFO_PAINTER;
         default:        return ERR_PAINTER;
         }
-    }
-
-    // Method for TESTAR installDist release
-    public static void loadDslOracleStudio() throws Exception {
-        // Keep UI on system LAF if available
-        try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception ignore) {}
-        SwingUtilities.invokeLater(() -> {
-            try { new DslOracleStudio(); } catch (Exception e) { e.printStackTrace(); }
-        });
     }
 
     // Main method for IDE development execution
