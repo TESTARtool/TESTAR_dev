@@ -172,7 +172,7 @@ public class GenericVerdict {
             }
         }
 
-        spellCheckerVerdict.addDescription("spell_checking_verdict");
+        spellCheckerVerdict.setDescription("spell_checking_verdict");
         saveSpellingIgnoreListToFile();
         return spellCheckerVerdict;
     }

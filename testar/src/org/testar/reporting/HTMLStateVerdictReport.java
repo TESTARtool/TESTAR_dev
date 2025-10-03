@@ -97,7 +97,7 @@ public class HTMLStateVerdictReport {
 					+ OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname 
 					+ REPORT_FILENAME_SEQ + OutputStructure.sequenceInnerLoopCount
 					+ REPORT_FILENAME_ACT + actionNumber
-					+ "_" + verdict.getDescription()
+					+ "_" + verdict.description()
 					+ "_" + verdict.verdictSeverityTitle() + REPORT_FILENAME_AFT;
 
 			out = new PrintWriter(htmlFilename, "UTF-8");
@@ -115,7 +115,7 @@ public class HTMLStateVerdictReport {
 
 	private static void writeStateIntoReport(int actionNumber, State state, Verdict verdict){
 		try {
-			String screenshotName = state.get(Tags.ConcreteID, "NoConcreteIdAvailable") + "_" + actionNumber + "_" + verdict.getDescription();
+			String screenshotName = state.get(Tags.ConcreteID, "NoConcreteIdAvailable") + "_" + actionNumber + "_" + verdict.description();
 			stateScreenshot = prepareStateScreenshot(state, screenshotName);
 
 			write("<div id='block' style='display:flex;flex-direction:column'>"); // Open state block container
