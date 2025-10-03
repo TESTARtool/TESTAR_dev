@@ -35,9 +35,7 @@ public class TestReportManager {
 	private static Set<Action> derivedActions;
 	private static Action selectedAction;
 
-	private static Verdict fooVerdict = new Verdict(Verdict.Severity.FAIL, "Foo", "This is a Foo verdict description");
-	private static Verdict booVerdict = new Verdict(Verdict.Severity.FAIL, "Boo", "This is a Boo verdict description");
-	private static Verdict finalVerdict = fooVerdict.join(booVerdict);
+	private static Verdict finalVerdict;
 
 	@Before
 	public void setUp() throws IOException {
@@ -66,6 +64,12 @@ public class TestReportManager {
 
 		Action emptyTagsAction = new Type("emptyTagsAction");
 		derivedActions.add(emptyTagsAction);
+
+		Verdict fooVerdict = new Verdict(Verdict.Severity.FAIL, "Foo");
+		fooVerdict.setDescription("This is a Foo verdict description");
+		Verdict booVerdict = new Verdict(Verdict.Severity.FAIL, "Boo");
+		booVerdict.setDescription("This is a Boo verdict description");
+		finalVerdict = fooVerdict.join(booVerdict);
 	}
 
 	@Test

@@ -135,9 +135,10 @@ public final class Verdict implements Serializable {
 	}
 
 	private final String info; // Short Verdict info that can be used as identifier
-	private final String description; // Complete Verdict description with extended context
 	private final double severity;
 	private final Visualizer visualizer;
+
+	private String description = ""; // Optional complete Verdict description with extended context
 
 	public static final Verdict OK = new Verdict(Severity.OK, "No problem detected.", Util.NullVisualizer);
 	public static final Verdict FAIL = new Verdict(Severity.FAIL, "SUT failed.", Util.NullVisualizer);
@@ -146,20 +147,11 @@ public final class Verdict implements Serializable {
 		this(severity, info, Util.NullVisualizer);
 	}
 
-	public Verdict(Severity severity, String info, String description) {
-		this(severity, info, description, Util.NullVisualizer);
-	}
-
 	public Verdict(Severity severity, String info, Visualizer visualizer) {
-		this(severity, info, "", visualizer);
-	}
-
-	public Verdict(Severity severity, String info, String description, Visualizer visualizer) {
 		Assert.isTrue(severity.getValue() >= Severity.OK.getValue() && severity.getValue() <= Severity.FAIL.getValue());
-		Assert.notNull(info, description, visualizer);
+		Assert.notNull(info, visualizer);
 		this.severity = severity.getValue();
 		this.info = info;
-		this.description = description;
 		this.visualizer = visualizer;
 	}
 
@@ -179,6 +171,13 @@ public final class Verdict implements Serializable {
 	 */
 	public String info() {
 		return info;
+	}
+
+	/**
+	 * Set an optional complete description about the context of the state issue.
+	 */
+	public void setDescription(String description) {
+		this.description = (description == null) ? "" : description;
 	}
 
 	/**
@@ -231,11 +230,12 @@ public final class Verdict implements Serializable {
 		String joinedInfo = this.info.contains(verdict.info()) ? this.info
 				: (this.severity == Severity.OK.getValue() ? "" : this.info + "\n") + verdict.info();
 
-		String joinedDescription = concatWithNewline(this.description(), verdict.description());
-
 		Visualizer joinedVisualizer = (this.severity >= verdict.severity()) ? this.visualizer() : verdict.visualizer();
 
-		return new Verdict(joinedSeverity, joinedInfo, joinedDescription, joinedVisualizer);
+		Verdict jointVerdict = new Verdict(joinedSeverity, joinedInfo, joinedVisualizer);
+		jointVerdict.setDescription(concatWithNewline(this.description(), verdict.description()));
+
+		return jointVerdict;
 	}
 
 	private String concatWithNewline(String a, String b) {

@@ -57,8 +57,10 @@ public class VerdictTest {
 
 	@Test
 	public void testJoin() {
-		Verdict v1 = new Verdict(Verdict.Severity.OK, "Foo Bar", "This is a Foor Bar OK");
-		Verdict v2 = new Verdict(Verdict.Severity.FAIL, "Bar", "This is a Bar Fail", failVisualizer);
+		Verdict v1 = new Verdict(Verdict.Severity.OK, "Foo Bar");
+		v1.setDescription("This is a Foor Bar OK");
+		Verdict v2 = new Verdict(Verdict.Severity.FAIL, "Bar", failVisualizer);
+		v2.setDescription("This is a Bar Fail");
 		Verdict v3 = new Verdict(Verdict.Severity.OK, "Baz", dummyVisualizer);
 
 		assertTrue("Joining two Verdicts shall create a new Verdict", 
