@@ -199,10 +199,11 @@ public class PlainTextReporter implements Reporting
     {
         String verdictInfo = verdict.info();
         if(verdict.severity() > Verdict.OK.severity())
-            verdictInfo = verdictInfo.replace(Verdict.OK.info(), "");
+            verdictInfo = verdictInfo.replace(Verdict.OK.info(), "").replace("\n", "");
         
         plainTextReportUtil.addHorizontalLine();
         plainTextReportUtil.addHeading(3, "Test verdict for this sequence: " + verdictInfo);
+        plainTextReportUtil.addContent(verdict.description());
         plainTextReportUtil.addHeading(5, "Severity: " + verdict.severity());
     
         plainTextReportUtil.appendToFileName("_" + verdict.verdictSeverityTitle());

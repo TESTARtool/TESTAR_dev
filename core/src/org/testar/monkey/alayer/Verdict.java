@@ -134,7 +134,8 @@ public final class Verdict implements Serializable {
 		}
 	}
 
-	private final String info;
+	private final String info; // Short Verdict info that can be used as identifier
+	private final String description; // Complete Verdict description with extended context
 	private final double severity;
 	private final Visualizer visualizer;
 
@@ -145,11 +146,20 @@ public final class Verdict implements Serializable {
 		this(severity, info, Util.NullVisualizer);
 	}
 
+	public Verdict(Severity severity, String info, String description) {
+		this(severity, info, description, Util.NullVisualizer);
+	}
+
 	public Verdict(Severity severity, String info, Visualizer visualizer) {
+		this(severity, info, "", visualizer);
+	}
+
+	public Verdict(Severity severity, String info, String description, Visualizer visualizer) {
 		Assert.isTrue(severity.getValue() >= Severity.OK.getValue() && severity.getValue() <= Severity.FAIL.getValue());
-		Assert.notNull(info, visualizer);
+		Assert.notNull(info, description, visualizer);
 		this.severity = severity.getValue();
 		this.info = info;
+		this.description = description;
 		this.visualizer = visualizer;
 	}
 
@@ -163,12 +173,21 @@ public final class Verdict implements Serializable {
 	}
 
 	/**
-	 * Returns a short description about whether the state is erroneous and, if so, what part of it.
+	 * Returns a short informative message about whether the state is erroneous and, if so, what part of it.
 	 *
-	 * @return A string description of the issue, or an empty string if no issue is found.
+	 * @return A short informative message of the issue.
 	 */
 	public String info() {
 		return info;
+	}
+
+	/**
+	 * Returns an optional complete description about the context of the state issue.
+	 *
+	 * @return An optional complete description of the issue, or an empty string if no provided.
+	 */
+	public String description() {
+		return description;
 	}
 
 	/**
@@ -212,9 +231,19 @@ public final class Verdict implements Serializable {
 		String joinedInfo = this.info.contains(verdict.info()) ? this.info
 				: (this.severity == Severity.OK.getValue() ? "" : this.info + "\n") + verdict.info();
 
+		String joinedDescription = concatWithNewline(this.description(), verdict.description());
+
 		Visualizer joinedVisualizer = (this.severity >= verdict.severity()) ? this.visualizer() : verdict.visualizer();
 
-		return new Verdict(joinedSeverity, joinedInfo, joinedVisualizer);
+		return new Verdict(joinedSeverity, joinedInfo, joinedDescription, joinedVisualizer);
+	}
+
+	private String concatWithNewline(String a, String b) {
+		String a1 = a == null ? "" : a.trim();
+		String b1 = b == null ? "" : b.trim();
+		if (a1.isEmpty()) return b1;
+		if (b1.isEmpty()) return a1;
+		return a1 + "\n" + b1;
 	}
 
 	/**
@@ -228,6 +257,8 @@ public final class Verdict implements Serializable {
 		if (this == o) return true;
 		if (!(o instanceof Verdict)) return false;
 		Verdict other = (Verdict) o;
+		// Use the severity, info, and visualizer for Verdict equality comparison
+		// Note: description intentionally NOT part of equality comparison
 		return this.severity == other.severity
 				&& this.info.equals(other.info)
 				&& this.visualizer.equals(other.visualizer);

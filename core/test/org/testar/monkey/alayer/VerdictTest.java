@@ -57,8 +57,8 @@ public class VerdictTest {
 
 	@Test
 	public void testJoin() {
-		Verdict v1 = new Verdict(Verdict.Severity.OK, "Foo Bar");
-		Verdict v2 = new Verdict(Verdict.Severity.FAIL, "Bar", failVisualizer);
+		Verdict v1 = new Verdict(Verdict.Severity.OK, "Foo Bar", "This is a Foor Bar OK");
+		Verdict v2 = new Verdict(Verdict.Severity.FAIL, "Bar", "This is a Bar Fail", failVisualizer);
 		Verdict v3 = new Verdict(Verdict.Severity.OK, "Baz", dummyVisualizer);
 
 		assertTrue("Joining two Verdicts shall create a new Verdict", 
@@ -84,6 +84,12 @@ public class VerdictTest {
 
 		assertTrue("Joining two Verdicts shall use the Visualizer of the Verdict with high severity",
 				v1.join(v2).visualizer() == failVisualizer);
+
+		assertTrue("Joining two Verdicts with descriptions shall join both descriptions",
+				v1.join(v2).description().contains("This is a Foor Bar OK\nThis is a Bar Fail"));
+
+		assertTrue("Joining two Verdicts with only one description shall join only one description",
+				v2.join(v3).description().contains("This is a Bar Fail"));
 	}
 
 	@Test

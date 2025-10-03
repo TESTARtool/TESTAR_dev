@@ -260,6 +260,9 @@ public class HtmlReporter implements Reporting
 
         htmlReportUtil.addContent(openVerdictBlockContainer); // Open verdict block container
         htmlReportUtil.addHeading(2, "Test verdict for this sequence: " + verdictInfo);
+        htmlReportUtil.addContent("<pre>");
+        htmlReportUtil.addContent(verdict.description());
+        htmlReportUtil.addContent("</pre>");
         htmlReportUtil.addHeading(4, "Severity: " + verdict.severity());
         htmlReportUtil.addContent("<h4 id='visualizer-rect' style='display: none;'>Visualizer: " + verdict.visualizer().getShapes() + "</h4>");
         htmlReportUtil.addContent(closeContainer); // Close verdict block container
