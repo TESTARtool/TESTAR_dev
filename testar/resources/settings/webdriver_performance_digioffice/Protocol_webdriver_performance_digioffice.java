@@ -57,8 +57,11 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
 
@@ -180,41 +183,110 @@ public class Protocol_webdriver_performance_digioffice extends WebdriverProtocol
         monitor.logSummaryAndRequests();
         monitor.endMeasurement();
 
-        // Oracle for web state performance issues
-        Verdict statePerformanceVerdict = statePerformanceVerdict(state, networkSummary);
-        if (shouldReturnVerdict(statePerformanceVerdict)) return statePerformanceVerdict;
-
-        // Oracle for web items performance issues
+        // 1 - Oracle for web items performance issues
         Verdict itemPerformanceVerdict = itemPerformanceVerdict(state, networkRecordList);
         if (shouldReturnVerdict(itemPerformanceVerdict)) return itemPerformanceVerdict;
+
+        // 2 - Oracle for duplicated web resources at network level
+        Verdict duplicatedResourceVerdict = duplicatedResourceVerdict(state, networkRecordList);
+        if (shouldReturnVerdict(duplicatedResourceVerdict)) return duplicatedResourceVerdict;
+
+        // 3 - Oracle for high web items size at network level
+
+        // 4 - Oracle for web state performance issues
+        Verdict statePerformanceVerdict = statePerformanceVerdict(state, networkSummary);
+        if (shouldReturnVerdict(statePerformanceVerdict)) return statePerformanceVerdict;
 
         return verdict;
     }
 
-    private Verdict statePerformanceVerdict(State state, NetworkSummary networkSummary) {
-        if(networkSummary.stateDurationMs > 5000L) {
-            String stateId = state.get(WdTags.WebHref, state.get(WdTags.WebTitle, state.get(Tags.ConcreteID, "")));
-            //String performanceMsg = "Performance issue of '" + networkSummary.stateDurationMs + "'ms in web state '" + stateId + "'";
-            String performanceMsg = "Performance issue loading web network items in the web state '" + stateId + "'";
-            return new Verdict(Verdict.Severity.WARNING_RESOURCE_PERFORMANCE_ISSUE, performanceMsg);
-        } else {
-            return Verdict.OK;
-        }
-    }
-
     private Verdict itemPerformanceVerdict(State state, List<NetworkRecord> networkRecordList) {
-        Verdict itemPerformanceVerdict = Verdict.OK;
+        Verdict groupItemsPerformanceVerdict = Verdict.OK;
+        long itemThreshold = 1000L; // 1 second for each web item
 
         // Iterate through all web items because multiple might have performance issues
         for (NetworkRecord r : networkRecordList) {
-            if(r.durationMs > 1000L) {
-                //String performanceMsg = "Performance issue of '" + r.durationMs + "'ms for web item '" + r.url + "'";
+            if(r.durationMs > itemThreshold) {
+                // Create the Verdict and the description for a single item
                 String performanceMsg = "Performance issue loading the web network item '" + r.url + "'";
-                itemPerformanceVerdict = itemPerformanceVerdict.join(new Verdict(Verdict.Severity.WARNING_RESOURCE_PERFORMANCE_ISSUE, performanceMsg));
+                Verdict singleItemVerdict = new Verdict(Verdict.Severity.WARNING_RESOURCE_PERFORMANCE_ISSUE, performanceMsg);
+
+                String itemDescription = "Item load duration " + r.durationMs + "ms above threshold " + itemThreshold + "ms \n";
+                itemDescription = itemDescription.concat(r.toLine() + "\n");
+                singleItemVerdict.setDescription(itemDescription);
+
+                // Join the single item Verdict with the possible group of affected items
+                groupItemsPerformanceVerdict = groupItemsPerformanceVerdict.join(singleItemVerdict);
             }
         }
 
-        return itemPerformanceVerdict;
+        return groupItemsPerformanceVerdict;
+    }
+
+    private Verdict duplicatedResourceVerdict(State state, List<NetworkRecord> networkRecordList) {
+        // Use method + url to detect duplicated network resources
+        Function<NetworkRecord, String> keyFn = r -> (String.valueOf(r.method) + " " + r.url);
+
+        // Count occurrences by (method + url)
+        Map<String, Long> counts = networkRecordList.stream()
+                .filter(r -> r != null && r.url != null)
+                .collect(Collectors.groupingBy(keyFn, Collectors.counting()));
+
+        // Determine duplicates (method + url) in encounter order
+        List<String> duplicatedResourcesOrdered = networkRecordList.stream()
+                .filter(r -> r != null && r.url != null)
+                .map(keyFn)
+                .filter(k -> counts.getOrDefault(k, 0L) > 1)
+                .distinct() // preserves encounter order
+                .collect(Collectors.toList());
+
+        if (duplicatedResourcesOrdered.isEmpty()) {
+            return Verdict.OK;
+        }
+
+        // All records whose (method + url) is duplicated (keep duplicates, preserve order)
+        List<NetworkRecord> duplicatedNetworkItems = networkRecordList.stream()
+                .filter(Objects::nonNull)
+                .filter(r -> r.url != null && counts.getOrDefault(keyFn.apply(r), 0L) > 1)
+                .collect(Collectors.toList());
+
+        // Build verdict message with (method + url) and their counts
+        String stateId = state.get(WdTags.WebHref, state.get(WdTags.WebTitle, state.get(Tags.ConcreteID, "")));
+        String msg = duplicatedResourcesOrdered.stream()
+                //.map(k -> k + " (x" + counts.get(k) + ")") // key (method + url) and count
+                .map(k -> k) // key (method + url)
+                .collect(Collectors.joining(", "));
+
+        Verdict duplicatedResourceVerdict = new Verdict(
+                Verdict.Severity.WARNING_DUPLICATED_RESOURCE_ISSUE,
+                "Web state '" + stateId + "' contains duplicate network resources: " + msg
+                );
+
+        // Description with each duplicated record on its own line
+        StringBuilder duplicatedDescription = new StringBuilder();
+        for (NetworkRecord r : duplicatedNetworkItems) {
+            duplicatedDescription.append(r.toLine()).append("\n");
+        }
+        duplicatedResourceVerdict.setDescription(duplicatedDescription.toString());
+
+        return duplicatedResourceVerdict;
+    }
+
+    private Verdict statePerformanceVerdict(State state, NetworkSummary networkSummary) {
+        long stateThreshold = 5000L; // 5 second for each web item
+        if(networkSummary.stateDurationMs > stateThreshold) {
+            String stateId = state.get(WdTags.WebHref, state.get(WdTags.WebTitle, state.get(Tags.ConcreteID, "")));
+            String performanceMsg = "Performance issue loading web network items in the web state '" + stateId + "'";
+            Verdict statePerformanceVerdict = new Verdict(Verdict.Severity.WARNING_STATE_PERFORMANCE_ISSUE, performanceMsg);
+
+            String stateDescription = "State load duration " + networkSummary.stateDurationMs + "ms above threshold " + stateThreshold + "ms \n";
+            stateDescription = stateDescription.concat(monitor.getSummaryAndRequestsString());
+            statePerformanceVerdict.setDescription(stateDescription);
+
+            return statePerformanceVerdict;
+        } else {
+            return Verdict.OK;
+        }
     }
 
     /**
