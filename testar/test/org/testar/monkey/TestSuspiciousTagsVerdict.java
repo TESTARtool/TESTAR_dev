@@ -115,4 +115,24 @@ public class TestSuspiciousTagsVerdict {
         assertTrue(verdict.severity() == Verdict.OK.severity());
     }
 
+    @Test
+    public void test_ignore_valid_exception_message() {
+        defaultProtocol.settings.set(ConfigTags.IgnoredSuspiciousTags, Arrays.asList("msg.DisplayExceptionMessage", "User fix this error"));
+        widget.set(Tags.Role, Roles.Text);
+        widget.set(Tags.ValuePattern, "Showing msg.DisplayExceptionMessage popup");
+        Verdict verdict = defaultProtocol.getVerdict(state);
+        assertTrue(verdict.equals(Verdict.OK));
+        assertTrue(verdict.severity() == Verdict.OK.severity());
+    }
+
+    @Test
+    public void test_ignore_valid_error_message() {
+        defaultProtocol.settings.set(ConfigTags.IgnoredSuspiciousTags, Arrays.asList("msg.DisplayExceptionMessage", "User fix this error"));
+        widget.set(Tags.Role, Roles.Text);
+        widget.set(Tags.Title, "User fix this error: Add username value");
+        Verdict verdict = defaultProtocol.getVerdict(state);
+        assertTrue(verdict.equals(Verdict.OK));
+        assertTrue(verdict.severity() == Verdict.OK.severity());
+    }
+
 }

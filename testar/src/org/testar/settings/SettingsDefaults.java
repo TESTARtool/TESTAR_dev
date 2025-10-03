@@ -36,6 +36,7 @@ import org.testar.monkey.RuntimeControlsProtocol;
 import org.testar.statemodel.StateModelTags;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import static org.testar.monkey.ConfigTags.*;
 
@@ -70,6 +71,7 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(Delete, new ArrayList<String>()));
 		defaults.add(Pair.from(CopyFromTo, new ArrayList<Pair<String, String>>()));
 		defaults.add(Pair.from(SuspiciousTags, "(?!x)x"));
+		defaults.add(Pair.from(IgnoredSuspiciousTags, Collections.emptyList()));
 		defaults.add(Pair.from(ClickFilter, "(?!x)x"));
 		defaults.add(Pair.from(MyClassPath, Arrays.asList(Main.settingsDir)));
 		defaults.add(Pair.from(ProtocolClass, "org.testar.monkey.DefaultProtocol"));

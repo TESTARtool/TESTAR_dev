@@ -138,6 +138,7 @@ public class SettingsFileStructure {
 				, "#################################################################"
 				, ""
 				, ConfigTags.SuspiciousTags.name() + " = "
+				, ConfigTags.IgnoredSuspiciousTags.name() + " = "
 				, ConfigTags.TagsForSuspiciousOracle.name() + " = "
 				, ""
 				, "#################################################################"

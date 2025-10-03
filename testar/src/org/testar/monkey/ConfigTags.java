@@ -60,6 +60,10 @@ public final class ConfigTags {
 			"Regular expressions ORACLE to find suspicious messages in the GUI Tags");
 
 	@SuppressWarnings("unchecked")
+	public static final Tag<List<String>> IgnoredSuspiciousTags = Tag.from("IgnoredSuspiciousTags", (Class<List<String>>) (Class<?>) List.class, 
+			"List of Strings to IGNORE when finding suspicious messages in the GUI Tags");
+
+	@SuppressWarnings("unchecked")
 	public static final Tag<List<String>> TagsForSuspiciousOracle = Tag.from("TagsForSuspiciousOracle", (Class<List<String>>) (Class<?>) List.class, 
 			"The Tags to apply the SuspiciousTags regex expressions");
 

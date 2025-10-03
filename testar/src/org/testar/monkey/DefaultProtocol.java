@@ -879,6 +879,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			if (tagValue == null || tagValue.isEmpty())
 				continue; //no action
 
+			// Ignore desired text values indicated by users
+			List<String> ignoredValues = settings.get(ConfigTags.IgnoredSuspiciousTags, Collections.emptyList());
+			if (ignoredValues != null) {
+				for (String ignore : ignoredValues) {
+					if (ignore == null || ignore.trim().isEmpty()) continue;
+					if (tagValue.contains(ignore)) return Verdict.OK;
+				}
+			}
+
 			m = this.suspiciousTitlesMatchers.get(tagValue);
 			if (m == null){
 				m = this.suspiciousTitlesPattern.matcher(tagValue);
