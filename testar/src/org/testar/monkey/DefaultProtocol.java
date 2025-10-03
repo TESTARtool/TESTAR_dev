@@ -50,6 +50,7 @@ import org.testar.monkey.alayer.exceptions.*;
 import org.testar.monkey.alayer.ios.IOSProtocolUtil;
 import org.testar.monkey.alayer.visualizers.ShapeVisualizer;
 import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
+import org.testar.monkey.alayer.windows.UIARoles;
 import org.testar.monkey.alayer.windows.WinApiException;
 import org.testar.oracles.Oracle;
 import org.testar.oracles.log.LogOracle;
@@ -863,22 +864,21 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			String tagValue = "";
 			// First finding the Tag that matches the TagsToFilter string, then getting the value of that Tag:
 			for(Tag<?> tag : w.tags()){
+				// Ignore the ValuePattern tag for UIAEdit widgets
+				if(tag.name().equals("ValuePattern") && w.get(Tags.Role, Roles.Widget).equals(UIARoles.UIAEdit)) {
+					continue;
+				}
+
 				if(w.get(tag, null) != null && tag.name().equals(tagForSuspiciousOracle)){
 					// Force the replacement of new line characters to avoid the usage of (?s) regex in the regular expression
 					tagValue = w.get(tag).toString().replace("\n", " ").replace("\r", " ");
 					break;
-					//System.out.println("DEBUG: tag found, "+tagToFilter+"="+tagValue);
 				}
 			}
 
 			//Check whether the Tag value is empty or null
 			if (tagValue == null || tagValue.isEmpty())
 				continue; //no action
-
-			//Ignore value ValuePattern for UIAEdit widgets
-			if(tagValue.equals("ValuePattern") && w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAEdit")) {
-				continue;
-			}
 
 			m = this.suspiciousTitlesMatchers.get(tagValue);
 			if (m == null){

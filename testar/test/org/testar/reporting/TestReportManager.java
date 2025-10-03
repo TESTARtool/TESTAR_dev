@@ -34,7 +34,8 @@ public class TestReportManager {
 	private static StateStub state;
 	private static Set<Action> derivedActions;
 	private static Action selectedAction;
-	private static Verdict finalVerdict = Verdict.OK;
+
+	private static Verdict finalVerdict;
 
 	@Before
 	public void setUp() throws IOException {
@@ -63,6 +64,12 @@ public class TestReportManager {
 
 		Action emptyTagsAction = new Type("emptyTagsAction");
 		derivedActions.add(emptyTagsAction);
+
+		Verdict fooVerdict = new Verdict(Verdict.Severity.FAIL, "Foo");
+		fooVerdict.setDescription("This is a Foo verdict description");
+		Verdict booVerdict = new Verdict(Verdict.Severity.FAIL, "Boo");
+		booVerdict.setDescription("This is a Boo verdict description");
+		finalVerdict = fooVerdict.join(booVerdict);
 	}
 
 	@Test
@@ -99,7 +106,7 @@ public class TestReportManager {
 		ReportManager reportManager = createReportManager(settings);
 
 		// Verify the html report file was created with the state and actions information
-		File htmlReportFile = new File(reportManager.getReportFileName().concat("_OK.html"));
+		File htmlReportFile = new File(reportManager.getReportFileName().concat("_FAIL.html"));
 		System.out.println("testHtmlReport: " + htmlReportFile.getPath());
 		Assert.assertTrue(htmlReportFile.exists());
 
@@ -117,10 +124,12 @@ public class TestReportManager {
 		// Verify selected action information
 		Assert.assertTrue(fileContains("<h4>AbstractID=typeActionAbstractID || ConcreteID=typeActionConcreteID || typeActionDescription</h4>", htmlReportFile));
 		// Verify verdict information
-		Assert.assertTrue(fileContains("<h2>Test verdict for this sequence: No problem detected.</h2>", htmlReportFile));
+		Assert.assertTrue(fileContains("<h2>Test verdict for this sequence: FooBoo</h2>", htmlReportFile));
+		Assert.assertTrue(fileContains("This is a Foo verdict description", htmlReportFile));
+		Assert.assertTrue(fileContains("This is a Boo verdict description", htmlReportFile));
 
 		// Verify the plain txt report was not created
-		File txtReportFile = new File(reportManager.getReportFileName().concat("_OK.txt"));
+		File txtReportFile = new File(reportManager.getReportFileName().concat("_FAIL.txt"));
 		Assert.assertTrue(!txtReportFile.exists());
 	}
 
@@ -142,12 +151,11 @@ public class TestReportManager {
 		ReportManager reportManager = createReportManager(settings);
 
 		// Verify the html report was not created
-		File htmlReportFile = new File(reportManager.getReportFileName().concat("_OK.html"));
+		File htmlReportFile = new File(reportManager.getReportFileName().concat("_FAIL.html"));
 		Assert.assertTrue(!htmlReportFile.exists());
 
 		// Verify the txt report file was created with the state and actions information
-		File txtReportFile = new File(reportManager.getReportFileName().concat("_OK.txt"));
-		System.out.println("testPlainReport: " + txtReportFile.getPath());
+		File txtReportFile = new File(reportManager.getReportFileName().concat("_FAIL.txt"));
 		Assert.assertTrue(txtReportFile.exists());
 
 		// Verify state information
@@ -163,7 +171,9 @@ public class TestReportManager {
 		// Verify selected action information
 		Assert.assertTrue(fileContains("ConcreteID=typeActionConcreteID || typeActionDescription", txtReportFile));
 		// Verify verdict information
-		Assert.assertTrue(fileContains("Test verdict for this sequence: No problem detected.", txtReportFile));
+		Assert.assertTrue(fileContains("Test verdict for this sequence: FooBoo", txtReportFile));
+		Assert.assertTrue(fileContains("This is a Foo verdict description", txtReportFile));
+		Assert.assertTrue(fileContains("This is a Boo verdict description", txtReportFile));
 	}
 
 	@Test
@@ -187,7 +197,7 @@ public class TestReportManager {
 		ReportManager reportManager = createReportManager(settings);
 
 		// Verify the html report file was created with the state and actions information
-		File htmlReportFile = new File(reportManager.getReportFileName().concat("_OK.html"));
+		File htmlReportFile = new File(reportManager.getReportFileName().concat("_FAIL.html"));
 		System.out.println("testHtmlReportWithoutScreenshot: " + htmlReportFile.getPath());
 		Assert.assertTrue(htmlReportFile.exists());
 

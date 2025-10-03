@@ -87,7 +87,6 @@ public final class Verdict implements Serializable {
 
 		// SUSPICIOUS GROUP: EXCEPTION
 		SUSPICIOUS_ALERT(0.19999998, "SUSPICIOUS_ALERT"),
-		SUSPICIOUS_TITLE(0.19999999, "SUSPICIOUS_TITLE"),
 
 		// WARNING GROUP: WEB INVARIANT
 		WARNING_WEB_INVARIANT_FAULT(0.2, "WARNING_WEB_INVARIANT_FAULT"),
@@ -137,9 +136,11 @@ public final class Verdict implements Serializable {
 		}
 	}
 
-	private final String info;
+	private final String info; // Short Verdict info that can be used as identifier
 	private final double severity;
 	private final Visualizer visualizer;
+
+	private String description = ""; // Optional complete Verdict description with extended context
 
 	public static final Verdict OK = new Verdict(Severity.OK, "No problem detected.", Util.NullVisualizer);
 	public static final Verdict FAIL = new Verdict(Severity.FAIL, "SUT failed.", Util.NullVisualizer);
@@ -147,14 +148,6 @@ public final class Verdict implements Serializable {
 	private final List<Rect> visualtHighlights;
 	public List<Rect> getVisualtHighlights(){
 		return visualtHighlights;
-	}
-
-	private String description = "";
-	public void addDescription(String description) {
-		this.description = this.description + description;
-	}
-	public String getDescription() {
-		return this.description;
 	}
 
 	public Verdict(Severity severity, String info) {
@@ -188,12 +181,28 @@ public final class Verdict implements Serializable {
 	}
 
 	/**
-	 * Returns a short description about whether the state is erroneous and, if so, what part of it.
+	 * Returns a short informative message about whether the state is erroneous and, if so, what part of it.
 	 *
-	 * @return A string description of the issue, or an empty string if no issue is found.
+	 * @return A short informative message of the issue.
 	 */
 	public String info() {
 		return info;
+	}
+
+	/**
+	 * Set an optional complete description about the context of the state issue.
+	 */
+	public void setDescription(String description) {
+		this.description = (description == null) ? "" : description;
+	}
+
+	/**
+	 * Returns an optional complete description about the context of the state issue.
+	 *
+	 * @return An optional complete description of the issue, or an empty string if no provided.
+	 */
+	public String description() {
+		return description;
 	}
 
 	/**
@@ -243,7 +252,18 @@ public final class Verdict implements Serializable {
 
 		Visualizer joinedVisualizer = (this.severity >= verdict.severity()) ? this.visualizer() : verdict.visualizer();
 
-		return new Verdict(joinedSeverity, joinedInfo, joinedVisualizer, jointHighlights);
+		Verdict jointVerdict = new Verdict(joinedSeverity, joinedInfo, joinedVisualizer, jointHighlights);
+		jointVerdict.setDescription(concatWithNewline(this.description(), verdict.description()));
+
+		return jointVerdict;
+	}
+
+	private String concatWithNewline(String a, String b) {
+		String a1 = a == null ? "" : a.trim();
+		String b1 = b == null ? "" : b.trim();
+		if (a1.isEmpty()) return b1;
+		if (b1.isEmpty()) return a1;
+		return a1 + "\n" + b1;
 	}
 
 	/**
@@ -257,6 +277,8 @@ public final class Verdict implements Serializable {
 		if (this == o) return true;
 		if (!(o instanceof Verdict)) return false;
 		Verdict other = (Verdict) o;
+		// Use the severity, info, and visualizer for Verdict equality comparison
+		// Note: description intentionally NOT part of equality comparison
 		return this.severity == other.severity
 				&& this.info.equals(other.info)
 				&& this.visualizer.equals(other.visualizer);
