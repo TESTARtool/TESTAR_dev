@@ -190,40 +190,42 @@ public class NetworkMonitor {
 
     // === Convenience printer (per-action) ===
     public void printSummaryAndRequests() {
-        NetworkSummary s = getSummary();
-
-        System.out.println(s.toPrettyString());
-
-        System.out.println("=== Loaded resources (slowest first) ===");
-
-        for (NetworkRecord r : getCurrentFinishedActionRecords()) {
-            System.out.println(r.toLine());
-        }
-
-        System.out.println("========================================");
+        System.out.print(getSummaryAndRequestsString());
     }
 
     public void logSummaryAndRequests() {
-        NetworkSummary s = getSummary();
-
-        String logNetworkFileName = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString + "_"
-                + OutputStructure.executedSUTname + "_sequence_" + OutputStructure.sequenceInnerLoopCount 
+        String logNetworkFileName = OutputStructure.htmlOutputDir + File.separator
+                + OutputStructure.startInnerLoopDateString + "_"
+                + OutputStructure.executedSUTname + "_sequence_"
+                + OutputStructure.sequenceInnerLoopCount
                 + "_performance_debug.log";
 
         try (FileWriter fileWriter = new FileWriter(logNetworkFileName, true)) {
-
-            fileWriter.write(s.toPrettyString());
-
-            fileWriter.write("=== Loaded resources (slowest first) ===" + System.lineSeparator());
-
-            for (NetworkRecord r : getCurrentFinishedActionRecords()) {
-                fileWriter.write(r.toLine() + System.lineSeparator());
-            }
-
-            fileWriter.write("========================================" + System.lineSeparator());
-
+            fileWriter.write(getSummaryAndRequestsString());
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getSummaryAndRequestsString() {
+        NetworkSummary s = getSummary();
+        Iterable<NetworkRecord> records = getCurrentFinishedActionRecords();
+        return buildSummaryAndRequestsString(s, records);
+    }
+
+    private String buildSummaryAndRequestsString(NetworkSummary s, Iterable<NetworkRecord> records) {
+        String ls = System.lineSeparator();
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(s.toPrettyString());
+
+        sb.append("=== Loaded resources (slowest first) ===").append(ls);
+
+        for (NetworkRecord r : records) {
+            sb.append(r.toLine()).append(ls);
+        }
+
+        sb.append("========================================").append(ls);
+        return sb.toString();
     }
 }
