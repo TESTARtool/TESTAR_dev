@@ -71,7 +71,12 @@ public final class PasteText extends TaggableBase implements Action {
 		StringSelection selection = new StringSelection(inputText);
 
 		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-		clipboard.setContents(selection, null);
+
+		try {
+		    clipboard.setContents(selection, null);
+		} catch (IllegalStateException ise) {
+		    throw new ActionFailedException("PasteText action execution failed due to currently unavailable clipboard!", ise);
+		}
 
 		system.get(Tags.StandardKeyboard).paste();
 	}
