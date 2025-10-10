@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.devtools.DevTools;
-import org.openqa.selenium.devtools.v139.network.Network;
+import org.openqa.selenium.devtools.v140.network.Network;
 import org.testar.OutputStructure;
 
 public class NetworkMonitor {

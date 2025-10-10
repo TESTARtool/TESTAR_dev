@@ -1,9 +1,9 @@
 package org.testar.oracles.web.performance;
 
-import org.openqa.selenium.devtools.v139.network.model.RequestWillBeSent;
-import org.openqa.selenium.devtools.v139.network.model.ResponseReceived;
-import org.openqa.selenium.devtools.v139.network.model.DataReceived;
-import org.openqa.selenium.devtools.v139.network.model.LoadingFinished;
+import org.openqa.selenium.devtools.v140.network.model.RequestWillBeSent;
+import org.openqa.selenium.devtools.v140.network.model.ResponseReceived;
+import org.openqa.selenium.devtools.v140.network.model.DataReceived;
+import org.openqa.selenium.devtools.v140.network.model.LoadingFinished;
 
 public class NetworkRecord {
     public String requestId;
