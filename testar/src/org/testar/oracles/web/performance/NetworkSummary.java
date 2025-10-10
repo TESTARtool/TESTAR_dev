@@ -11,10 +11,10 @@ import java.util.Objects;
 public class NetworkSummary {
     public long count;
     public long totalBytes;
-    public long stateDurationMs; // wall-clock: max(endNs) - min(startNs)
-    public long sumDurationsMs;  // sum of per-request durations
-    public long busyTimeMs;      // union/merged time network was busy
-    public long maxDurationMs;   // slowest single resource
+    public long stateDurationMs; // wall-clock (DevTools monotonic): max(endMs) - min(startMs)
+    public long sumDurationsMs;  // sum of per-request durations (ms)
+    public long busyTimeMs;      // union/merged time network was busy (ms)
+    public long maxDurationMs;   // slowest single resource (ms)
     public long failedCount;
     public Map<String, Long> byResourceType = new HashMap<>();
     public Map<String, Long> byFrame = new HashMap<>();
@@ -25,7 +25,7 @@ public class NetworkSummary {
         long minStart = Long.MAX_VALUE;
         long maxEnd = 0L;
 
-        // collect intervals for busy-time union
+        // collect [startMs, endMs] intervals for busy-time union
         List<long[]> intervals = new ArrayList<>();
 
         for (NetworkRecord r : recs) {
@@ -33,12 +33,11 @@ public class NetworkSummary {
             if (seq != null && !Objects.equals(seq, r.sequenceId)) continue;
             if (action != null && !Objects.equals(action, r.actionId)) continue;
 
-            // Consider only finished (or failed) requests for most fields,
-            // but still track minStart/maxEnd if present.
-            if (r.startNs > 0) minStart = Math.min(minStart, r.startNs);
-            if (r.endNs > 0)   maxEnd   = Math.max(maxEnd,   r.endNs);
+            // Track span even for unfinished if timestamps are present
+            if (r.startMs > 0) minStart = Math.min(minStart, r.startMs);
+            if (r.endMs   > 0) maxEnd   = Math.max(maxEnd,   r.endMs);
 
-            // Only finished (or failed) requests contribute to network-time metrics
+            // Only finished (or failed) requests contribute to metrics
             if (r.durationMs <= 0 && !r.failed) continue;
 
             s.count++;
@@ -50,20 +49,20 @@ public class NetworkSummary {
             if (r.frameId != null)      s.byFrame.merge(r.frameId, 1L, Long::sum);
             if (!r.failed && r.status != 0) s.byStatus.merge(r.status, 1L, Long::sum);
 
-            if (r.startNs > 0 && r.endNs > 0) {
+            if (r.startMs > 0 && r.endMs > 0) {
                 s.sumDurationsMs += r.durationMs;
-                intervals.add(new long[]{ r.startNs, r.endNs });
+                intervals.add(new long[]{ r.startMs, r.endMs }); // already ms
             }
         }
 
-        // wall-clock span (unchanged)
+        // wall-clock span in ms
         if (maxEnd > 0 && minStart < Long.MAX_VALUE) {
-            s.stateDurationMs = (maxEnd - minStart) / 1_000_000;
+            s.stateDurationMs = (maxEnd - minStart);
         } else {
             s.stateDurationMs = 0;
         }
 
-        // merge intervals to compute busyTimeMs (union)
+        // merge intervals to compute busyTimeMs (union) in ms
         if (!intervals.isEmpty()) {
             intervals.sort(Comparator.comparingLong(a -> a[0]));
             long curStart = intervals.get(0)[0];
@@ -81,7 +80,7 @@ public class NetworkSummary {
                 }
             }
             total += (curEnd - curStart);
-            s.busyTimeMs = total / 1_000_000;
+            s.busyTimeMs = total;
         }
 
         return s;
@@ -90,13 +89,13 @@ public class NetworkSummary {
     public String toPrettyString() {
         StringBuilder sb = new StringBuilder();
         sb.append("=========== Network Summary ============\n");
-        sb.append("Requests: ").append(count).append('\n');
-        sb.append("Bytes:    ").append(totalBytes).append('\n');
+        sb.append("Requests:       ").append(count).append('\n');
+        sb.append("Bytes:          ").append(totalBytes).append('\n');
         sb.append("State Duration: ").append(stateDurationMs).append(" ms\n");
         sb.append("Network Busy:   ").append(busyTimeMs).append(" ms\n");
         sb.append("Sum of items:   ").append(sumDurationsMs).append(" ms\n");
-        sb.append("Max item dur:  ").append(maxDurationMs).append(" ms\n");
-        if (failedCount > 0) sb.append("Failed:   ").append(failedCount).append('\n');
+        sb.append("Max item dur:   ").append(maxDurationMs).append(" ms\n");
+        if (failedCount > 0) sb.append("Failed:         ").append(failedCount).append('\n');
 
         if (!byStatus.isEmpty()) {
             sb.append("By status:\n");

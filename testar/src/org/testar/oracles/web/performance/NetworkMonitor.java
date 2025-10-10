@@ -20,8 +20,6 @@ import org.testar.OutputStructure;
 public class NetworkMonitor {
     private final DevTools devTools;
 
-    // requestId -> first-seen nanotime (global)
-    private final ConcurrentMap<String, Long> startNs = new ConcurrentHashMap<>();
     // GLOBAL: requestId -> record (kept for run-wide diagnostics if you want them)
     private final ConcurrentMap<String, NetworkRecord> records = new ConcurrentHashMap<>();
 
@@ -34,7 +32,7 @@ public class NetworkMonitor {
     // current measurement windows (sequence/action)
     private volatile String seqId = null;
     private volatile String actionId = null;
-    private volatile long actionStartNs = 0L; // start moment of the current action window
+    private volatile long actionStartMs = 0L; // start moment of the current action window
 
     public NetworkMonitor(DevTools devTools) {
         this.devTools = devTools;
@@ -43,20 +41,18 @@ public class NetworkMonitor {
 
     private void enable() {
         devTools.createSession();
-        devTools.send(Network.enable(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()));
-        devTools.send(Network.setCacheDisabled(true));
 
         devTools.addListener(Network.requestWillBeSent(), evt -> {
             String id = evt.getRequestId().toString();
-            long now = System.nanoTime();
+            long nowMs = nowMonoMs();
 
-            // Global bookkeeping
-            startNs.putIfAbsent(id, now);
             inflight.incrementAndGet();
+
+            // Global record
             records.putIfAbsent(id, NetworkRecord.fromRequest(evt, currentTags()));
 
             // PER-ACTION: only include requests that start while an action is active
-            if (actionId != null && now >= actionStartNs) {
+            if (actionId != null && nowMs >= actionStartMs) {
                 actionRecords.putIfAbsent(id, NetworkRecord.fromRequest(evt, currentTags()));
             }
         });
@@ -64,14 +60,14 @@ public class NetworkMonitor {
         devTools.addListener(Network.responseReceived(), resp -> {
             String id = resp.getRequestId().toString();
 
-            // Update global
+            // Global: if we somehow missed the request event, create a minimal record in ms
             records.compute(id, (k, r) -> {
-                NetworkRecord nr = (r == null) ? new NetworkRecord() : r;
+                NetworkRecord nr = (r != null) ? r : NetworkRecord.minimalFromResponse(resp, currentTags());
                 nr.applyResponse(resp, currentTags());
                 return nr;
             });
 
-            // Update current action ONLY if this request is tracked for the action
+            // Per-action: only if already tracked for the action
             actionRecords.computeIfPresent(id, (k, r) -> {
                 r.applyResponse(resp, currentTags());
                 return r;
@@ -80,17 +76,14 @@ public class NetworkMonitor {
 
         devTools.addListener(Network.loadingFinished(), fin -> {
             String id = fin.getRequestId().toString();
-            long endNs = System.nanoTime();
 
-            // Global
             records.computeIfPresent(id, (k, r) -> {
-                r.markFinished(endNs, (long) fin.getEncodedDataLength());
+                r.applyLoadingFinished(fin);
                 return r;
             });
 
-            // Current action
             actionRecords.computeIfPresent(id, (k, r) -> {
-                r.markFinished(endNs, (long) fin.getEncodedDataLength());
+                r.applyLoadingFinished(fin);
                 return r;
             });
 
@@ -100,14 +93,12 @@ public class NetworkMonitor {
         devTools.addListener(Network.loadingFailed(), fail -> {
             String id = fail.getRequestId().toString();
 
-            // Global
             records.compute(id, (k, r) -> {
                 NetworkRecord nr = (r == null) ? new NetworkRecord() : r;
                 nr.markFailed(fail.getErrorText());
                 return nr;
             });
 
-            // Current action
             actionRecords.computeIfPresent(id, (k, r) -> {
                 r.markFailed(fail.getErrorText());
                 return r;
@@ -115,6 +106,9 @@ public class NetworkMonitor {
 
             inflight.updateAndGet(i -> Math.max(0, i - 1));
         });
+
+        devTools.send(Network.enable(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()));
+        devTools.send(Network.setCacheDisabled(true));
     }
 
     private NetworkTags currentTags() {
@@ -129,8 +123,8 @@ public class NetworkMonitor {
     // ACTION window (per-step measurement)
     public void beginMeasurement(String id) {
         this.actionId = id;
-        this.actionStartNs = System.nanoTime();
-        this.actionRecords.clear(); // << per-action only
+        this.actionStartMs = nowMonoMs();
+        this.actionRecords.clear();
     }
     public String getMeasurementId() { return this.actionId; }
     public void endMeasurement() { this.actionId = null; }
@@ -140,11 +134,10 @@ public class NetworkMonitor {
      * or until 'timeout' elapses. No resource types are ignored.
      */
     public void awaitNetworkIdle(Duration quietFor, Duration timeout) {
-        long deadline = System.nanoTime() + timeout.toNanos();
-        long quietStart = -1L;
+        final long deadlineMs = nowMonoMs() + timeout.toMillis();
+        long quietStartMs = -1L;
 
-        while (System.nanoTime() < deadline) {
-            // Count unfinished requests in the CURRENT ACTION only
+        while (nowMonoMs() < deadlineMs) {
             int active = 0;
             for (NetworkRecord r : actionRecords.values()) {
                 if (r == null) continue;
@@ -153,15 +146,20 @@ public class NetworkMonitor {
             }
 
             if (active == 0) {
-                if (quietStart < 0) quietStart = System.nanoTime();
-                if (System.nanoTime() - quietStart >= quietFor.toNanos()) return;
+                if (quietStartMs < 0) quietStartMs = nowMonoMs();
+                if (nowMonoMs() - quietStartMs >= quietFor.toMillis()) return;
             } else {
-                quietStart = -1L;
+                quietStartMs = -1L;
             }
 
             try { Thread.sleep(50); } catch (InterruptedException ignored) {}
         }
         // Optional: throw new TimeoutException("Network idle (per action) not reached within " + timeout.toMillis() + " ms");
+    }
+
+    // Monotonic ms (derived from nanoTime)
+    private static long nowMonoMs() {
+        return System.nanoTime() / 1_000_000L;
     }
 
     // === READ APIs (per-action) ===

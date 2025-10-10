@@ -2,6 +2,7 @@ package org.testar.oracles.web.performance;
 
 import org.openqa.selenium.devtools.v139.network.model.RequestWillBeSent;
 import org.openqa.selenium.devtools.v139.network.model.ResponseReceived;
+import org.openqa.selenium.devtools.v139.network.model.LoadingFinished;
 
 public class NetworkRecord {
     public String requestId;
@@ -13,10 +14,13 @@ public class NetworkRecord {
     public boolean failed;
     public String errorText;
 
-    public long startNs;
-    public long endNs;
+    public long startMs;
+    public long endMs;
     public long durationMs;
     public long encodedBytes;
+
+    public boolean inferredStart; // true when created from ResponseReceived fallback
+    public boolean complete;      // true after LoadingFinished
 
     public String sequenceId;
     public String actionId;
@@ -32,10 +36,27 @@ public class NetworkRecord {
         r.resourceType = (evt.getType() != null) ? evt.getType().toString() : "Unknown";
         r.method = (evt.getRequest() != null) ? evt.getRequest().getMethod() : "";
 
-        r.startNs = System.nanoTime();
+        // Use DevTools monotonic timestamp as the start time (seconds -> ms)
+        r.startMs = toMillis(evt.getTimestamp().toJson());
+
         r.sequenceId = t.sequenceId;
         r.actionId = t.actionId;
         return r;
+    }
+
+    static NetworkRecord minimalFromResponse(ResponseReceived resp, NetworkTags t) {
+        NetworkRecord r = new NetworkRecord();
+        r.requestId = resp.getRequestId().toString();
+        r.url = (resp.getResponse() != null && resp.getResponse().getUrl() != null)
+                ? resp.getResponse().getUrl() : "";
+                r.frameId = (resp.getFrameId() != null) ? resp.getFrameId().map(Object::toString).orElse("") : "";
+                r.resourceType = (resp.getType() != null) ? resp.getType().toString() : "Unknown";
+                r.method = "";
+                r.startMs = toMillis(resp.getTimestamp().toJson());
+                r.inferredStart = true;
+                r.sequenceId = t.sequenceId;
+                r.actionId = t.actionId;
+                return r;
     }
 
     void applyResponse(ResponseReceived resp, NetworkTags t) {
@@ -46,15 +67,24 @@ public class NetworkRecord {
         this.frameId = (resp.getFrameId() != null) ? resp.getFrameId().map(Object::toString).orElse(this.frameId) : this.frameId;
         this.resourceType = (resp.getType() != null) ? resp.getType().toString() : this.resourceType;
 
+        // Provisional end from ResponseReceived (may be earlier than LoadingFinished)
+        long respMs = toMillis(resp.getTimestamp().toJson());
+        if (respMs > 0) {
+            this.endMs = Math.max(this.endMs, respMs);
+            recomputeDuration();
+        }
+
         // Refresh tags to latest window if they changed mid-flight
         this.sequenceId = (t.sequenceId != null ? t.sequenceId : this.sequenceId);
         this.actionId   = (t.actionId   != null ? t.actionId   : this.actionId);
     }
 
-    void markFinished(long endNs, long encodedBytes) {
-        this.endNs = endNs;
-        this.encodedBytes = encodedBytes;
-        this.durationMs = (this.startNs > 0L) ? (endNs - this.startNs) / 1_000_000 : -1;
+    void applyLoadingFinished(LoadingFinished fin) {
+        long finishMs = toMillis(fin.getTimestamp().toJson());
+        if (finishMs > 0) this.endMs = Math.max(this.endMs, finishMs);
+        if (fin.getEncodedDataLength() != null) this.encodedBytes = fin.getEncodedDataLength().longValue();
+        this.complete = true;
+        recomputeDuration();
     }
 
     void markFailed(String errorText) {
@@ -70,5 +100,13 @@ public class NetworkRecord {
         String m   = (method == null || method.isEmpty()) ? "" : (method + " ");
         return String.format("%5d ms  %-10s  %-3s  frame=%s  %s%s",
                 durationMs, typ, st, frm, m, url);
+    }
+
+    private static long toMillis(Number seconds) {
+        return (seconds == null) ? -1L : Math.round(seconds.doubleValue() * 1000.0);
+    }
+
+    private void recomputeDuration() {
+        this.durationMs = (this.startMs > 0 && this.endMs >= this.startMs) ? (this.endMs - this.startMs) : -1L;
     }
 }
