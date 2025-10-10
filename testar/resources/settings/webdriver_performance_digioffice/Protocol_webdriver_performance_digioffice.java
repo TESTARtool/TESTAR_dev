@@ -224,17 +224,22 @@ public class Protocol_webdriver_performance_digioffice extends WebdriverProtocol
     }
 
     private Verdict duplicatedResourceVerdict(State state, List<NetworkRecord> networkRecordList) {
+        // Prepare a filtering of interesting record candidates
+        List<NetworkRecord> candidates = networkRecordList.stream()
+                .filter(Objects::nonNull)
+                .filter(r -> r.url != null)
+                .filter(r -> r.durationMs > 0) // ignore 0 ms loads (possible memory cache)
+                .collect(Collectors.toList());
+
         // Use method + url to detect duplicated network resources
         Function<NetworkRecord, String> keyFn = r -> (String.valueOf(r.method) + " " + r.url);
 
         // Count occurrences by (method + url)
-        Map<String, Long> counts = networkRecordList.stream()
-                .filter(r -> r != null && r.url != null)
+        Map<String, Long> counts = candidates.stream()
                 .collect(Collectors.groupingBy(keyFn, Collectors.counting()));
 
         // Determine duplicates (method + url) in encounter order
-        List<String> duplicatedResourcesOrdered = networkRecordList.stream()
-                .filter(r -> r != null && r.url != null)
+        List<String> duplicatedResourcesOrdered = candidates.stream()
                 .map(keyFn)
                 .filter(k -> counts.getOrDefault(k, 0L) > 1)
                 .distinct() // preserves encounter order
@@ -245,16 +250,13 @@ public class Protocol_webdriver_performance_digioffice extends WebdriverProtocol
         }
 
         // All records whose (method + url) is duplicated (keep duplicates, preserve order)
-        List<NetworkRecord> duplicatedNetworkItems = networkRecordList.stream()
-                .filter(Objects::nonNull)
-                .filter(r -> r.url != null && counts.getOrDefault(keyFn.apply(r), 0L) > 1)
+        List<NetworkRecord> duplicatedNetworkItems = candidates.stream()
+                .filter(r -> counts.getOrDefault(keyFn.apply(r), 0L) > 1)
                 .collect(Collectors.toList());
 
         // Build verdict message with (method + url) and their counts
         String stateId = state.get(WdTags.WebHref, state.get(WdTags.WebTitle, state.get(Tags.ConcreteID, "")));
         String msg = duplicatedResourcesOrdered.stream()
-                //.map(k -> k + " (x" + counts.get(k) + ")") // key (method + url) and count
-                .map(k -> k) // key (method + url)
                 .collect(Collectors.joining(", "));
 
         Verdict duplicatedResourceVerdict = new Verdict(
