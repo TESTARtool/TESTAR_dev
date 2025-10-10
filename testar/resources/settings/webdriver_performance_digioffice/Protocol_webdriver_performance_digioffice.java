@@ -192,6 +192,8 @@ public class Protocol_webdriver_performance_digioffice extends WebdriverProtocol
         if (shouldReturnVerdict(duplicatedResourceVerdict)) return duplicatedResourceVerdict;
 
         // 3 - Oracle for high web items size at network level
+        Verdict itemSizeVerdict = itemSizeVerdict(state, networkRecordList);
+        if (shouldReturnVerdict(itemSizeVerdict)) return itemSizeVerdict;
 
         // 4 - Oracle for web state performance issues
         Verdict statePerformanceVerdict = statePerformanceVerdict(state, networkSummary);
@@ -221,6 +223,29 @@ public class Protocol_webdriver_performance_digioffice extends WebdriverProtocol
         }
 
         return groupItemsPerformanceVerdict;
+    }
+
+    private Verdict itemSizeVerdict(State state, List<NetworkRecord> networkRecordList) {
+        Verdict groupItemsSizeVerdict = Verdict.OK;
+        long itemBytesThreshold = 102400L; // 100KB = 102400 bytes value
+
+        // Iterate through all web items because multiple might have size issues
+        for (NetworkRecord r : networkRecordList) {
+            if(r.transferBytes > itemBytesThreshold) {
+                // Create the Verdict and the description for a single item
+                String sizeMsg = "Size resource issue with web network item '" + r.url + "'";
+                Verdict singleItemVerdict = new Verdict(Verdict.Severity.WARNING_RESOURCE_SIZE_ISSUE, sizeMsg);
+
+                String itemDescription = "Item size " + r.transferBytes + " in bytes above threshold " + itemBytesThreshold + " bytes \n";
+                itemDescription = itemDescription.concat(r.toLine() + "\n");
+                singleItemVerdict.setDescription(itemDescription);
+
+                // Join the single item Verdict with the possible group of affected items
+                groupItemsSizeVerdict = groupItemsSizeVerdict.join(singleItemVerdict);
+            }
+        }
+
+        return groupItemsSizeVerdict;
     }
 
     private Verdict duplicatedResourceVerdict(State state, List<NetworkRecord> networkRecordList) {
