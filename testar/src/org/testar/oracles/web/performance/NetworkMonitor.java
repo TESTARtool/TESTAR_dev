@@ -107,6 +107,22 @@ public class NetworkMonitor {
             inflight.updateAndGet(i -> Math.max(0, i - 1));
         });
 
+        devTools.addListener(Network.dataReceived(), dr -> {
+            String id = dr.getRequestId().toString();
+
+            // Global
+            records.computeIfPresent(id, (k, r) -> {
+                r.applyDataReceived(dr);
+                return r;
+            });
+
+            // Current action
+            actionRecords.computeIfPresent(id, (k, r) -> {
+                r.applyDataReceived(dr);
+                return r;
+            });
+        });
+
         devTools.send(Network.enable(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()));
         devTools.send(Network.setCacheDisabled(true));
     }

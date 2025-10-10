@@ -2,6 +2,7 @@ package org.testar.oracles.web.performance;
 
 import org.openqa.selenium.devtools.v139.network.model.RequestWillBeSent;
 import org.openqa.selenium.devtools.v139.network.model.ResponseReceived;
+import org.openqa.selenium.devtools.v139.network.model.DataReceived;
 import org.openqa.selenium.devtools.v139.network.model.LoadingFinished;
 
 public class NetworkRecord {
@@ -18,6 +19,11 @@ public class NetworkRecord {
     public long endMs;
     public long durationMs;
     public long encodedBytes;
+
+    public long transferBytes;     // from LoadingFinished.encodedDataLength
+    public long encodedBodyBytes;  // sum of DataReceived.encodedDataLength
+    public long decodedBodyBytes;  // sum of DataReceived.dataLength
+    public long headerBytes = -1;  // estimated; -1 = unknown
 
     public boolean inferredStart; // true when created from ResponseReceived fallback
     public boolean complete;      // true after LoadingFinished
@@ -79,10 +85,30 @@ public class NetworkRecord {
         this.actionId   = (t.actionId   != null ? t.actionId   : this.actionId);
     }
 
+    // accumulate sizes from Network.dataReceived
+    void applyDataReceived(DataReceived dr) {
+        if (dr.getEncodedDataLength() != null) {
+            this.encodedBodyBytes += dr.getEncodedDataLength().longValue();
+        }
+        if (dr.getDataLength() != null) {
+            this.decodedBodyBytes += dr.getDataLength().longValue();
+        }
+    }
+
+    // When finishing, set transfer bytes and estimate header size
     void applyLoadingFinished(LoadingFinished fin) {
         long finishMs = toMillis(fin.getTimestamp().toJson());
         if (finishMs > 0) this.endMs = Math.max(this.endMs, finishMs);
-        if (fin.getEncodedDataLength() != null) this.encodedBytes = fin.getEncodedDataLength().longValue();
+
+        if (fin.getEncodedDataLength() != null) {
+            this.transferBytes = fin.getEncodedDataLength().longValue();
+            // Estimate headers using transfer - encoded body (clamped at 0)
+            if (this.encodedBodyBytes > 0 || this.transferBytes > 0) {
+                long est = this.transferBytes - this.encodedBodyBytes;
+                this.headerBytes = Math.max(0L, est);
+            }
+        }
+
         this.complete = true;
         recomputeDuration();
     }
@@ -98,8 +124,12 @@ public class NetworkRecord {
         String typ = (resourceType == null) ? "" : resourceType;
         String frm = (frameId == null) ? "" : frameId;
         String m   = (method == null || method.isEmpty()) ? "" : (method + " ");
-        return String.format("%5d ms  %-10s  %-3s  frame=%s  %s%s",
-                durationMs, typ, st, frm, m, url);
+
+        //String sizes = String.format(" xfer=%dB enc=%dB dec=%dB", transferBytes, encodedBodyBytes, decodedBodyBytes);
+        String sizes = String.format(" size=%dB", transferBytes);
+
+        return String.format("%5d ms %-10s %-3s frame=%s %s\t%s%s",
+                durationMs, typ, st, frm, sizes, m, url);
     }
 
     private static long toMillis(Number seconds) {

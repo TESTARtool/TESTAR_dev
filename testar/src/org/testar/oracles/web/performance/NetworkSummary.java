@@ -16,6 +16,9 @@ public class NetworkSummary {
     public long busyTimeMs;      // union/merged time network was busy (ms)
     public long maxDurationMs;   // slowest single resource (ms)
     public long failedCount;
+
+    public long totalTransferBytes;   // sum of transferBytes (LoadingFinished)
+
     public Map<String, Long> byResourceType = new HashMap<>();
     public Map<String, Long> byFrame = new HashMap<>();
     public Map<Integer, Long> byStatus = new HashMap<>();
@@ -44,6 +47,8 @@ public class NetworkSummary {
             s.totalBytes += r.encodedBytes;
             s.maxDurationMs = Math.max(s.maxDurationMs, r.durationMs);
             if (r.failed) s.failedCount++;
+
+            s.totalTransferBytes   += r.transferBytes;
 
             if (r.resourceType != null) s.byResourceType.merge(r.resourceType, 1L, Long::sum);
             if (r.frameId != null)      s.byFrame.merge(r.frameId, 1L, Long::sum);
@@ -95,6 +100,7 @@ public class NetworkSummary {
         sb.append("Network Busy:   ").append(busyTimeMs).append(" ms\n");
         sb.append("Sum of items:   ").append(sumDurationsMs).append(" ms\n");
         sb.append("Max item dur:   ").append(maxDurationMs).append(" ms\n");
+        sb.append("Total bytes:    ").append(totalTransferBytes).append('\n');
         if (failedCount > 0) sb.append("Failed:         ").append(failedCount).append('\n');
 
         if (!byStatus.isEmpty()) {
