@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.testar.monkey.alayer.Roles;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
+import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.windows.UIARoles;
 import org.testar.settings.Settings;
 import org.testar.stub.StateStub;
@@ -133,6 +134,27 @@ public class TestSuspiciousTagsVerdict {
         Verdict verdict = defaultProtocol.getVerdict(state);
         assertTrue(verdict.equals(Verdict.OK));
         assertTrue(verdict.severity() == Verdict.OK.severity());
+    }
+
+    @Test
+    public void test_ignore_header_role_error_message() {
+        defaultProtocol.settings.set(ConfigTags.IgnoredSuspiciousRoles, Arrays.asList("WdTD", "WdH4"));
+        widget.set(Tags.Role, WdRoles.WdH4);
+        widget.set(Tags.Title, "errorCode: 0");
+        Verdict verdict = defaultProtocol.getVerdict(state);
+        assertTrue(verdict.equals(Verdict.OK));
+        assertTrue(verdict.severity() == Verdict.OK.severity());
+    }
+
+    @Test
+    public void test_valid_span_role_error_message() {
+        defaultProtocol.settings.set(ConfigTags.IgnoredSuspiciousRoles, Arrays.asList("WdTD", "WdH4"));
+        widget.set(Tags.Role, WdRoles.WdSPAN);
+        widget.set(Tags.Title, "errorCode: 0");
+        Verdict verdict = defaultProtocol.getVerdict(state);
+        assertTrue(verdict.verdictSeverityTitle().equals("SUSPICIOUS_TAG"));
+        assertTrue(verdict.severity() == Verdict.Severity.SUSPICIOUS_TAG.getValue());
+        assertTrue(verdict.info().contains("Discovered suspicious widget 'Title' : 'errorCode: 0'."));
     }
 
 }

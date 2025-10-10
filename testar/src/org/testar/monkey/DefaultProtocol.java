@@ -839,6 +839,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		// search all widgets for suspicious String Values
 		Verdict suspiciousValueVerdict = Verdict.OK;
 		for(Widget w : state) {
+
+			// Ignore applying suspicious regex to widgets that are ignored by the user
+			List<String> ignoredRoles = settings.get(ConfigTags.IgnoredSuspiciousRoles, Collections.emptyList());
+			String role = w.get(Tags.Role, Roles.Invalid).toString();
+			if (ignoredRoles.stream().anyMatch(r -> r.equalsIgnoreCase(role))) continue;
+
 			suspiciousValueVerdict = suspiciousStringValueMatcher(w);
 			if(suspiciousValueVerdict.severity() == Verdict.Severity.SUSPICIOUS_TAG.getValue()) {
 				return suspiciousValueVerdict;

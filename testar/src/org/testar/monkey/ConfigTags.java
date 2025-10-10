@@ -64,6 +64,10 @@ public final class ConfigTags {
 			"List of Strings to IGNORE when finding suspicious messages in the GUI Tags");
 
 	@SuppressWarnings("unchecked")
+	public static final Tag<List<String>> IgnoredSuspiciousRoles = Tag.from("IgnoredSuspiciousRoles", (Class<List<String>>) (Class<?>) List.class, 
+			"List of Roles to IGNORE when finding suspicious messages in the GUI Tags");
+
+	@SuppressWarnings("unchecked")
 	public static final Tag<List<String>> TagsForSuspiciousOracle = Tag.from("TagsForSuspiciousOracle", (Class<List<String>>) (Class<?>) List.class, 
 			"The Tags to apply the SuspiciousTags regex expressions");
 

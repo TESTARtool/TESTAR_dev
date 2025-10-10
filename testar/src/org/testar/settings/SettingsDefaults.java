@@ -72,6 +72,7 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(CopyFromTo, new ArrayList<Pair<String, String>>()));
 		defaults.add(Pair.from(SuspiciousTags, "(?!x)x"));
 		defaults.add(Pair.from(IgnoredSuspiciousTags, Collections.emptyList()));
+		defaults.add(Pair.from(IgnoredSuspiciousRoles, Collections.emptyList()));
 		defaults.add(Pair.from(ClickFilter, "(?!x)x"));
 		defaults.add(Pair.from(MyClassPath, Arrays.asList(Main.settingsDir)));
 		defaults.add(Pair.from(ProtocolClass, "org.testar.monkey.DefaultProtocol"));
