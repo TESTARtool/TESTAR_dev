@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -89,8 +89,9 @@ public class WdRootElement extends WdElement {
     vScrollViewSize = 100.0 * clientHeight / scrollHeight;
 
     // TESTAR script function that compares document body height with browser height
-    if (WdDriver.executeScript("return isPageVerticalScrollable()") instanceof Boolean) {
-      vScroll = (Boolean)WdDriver.executeScript("return isPageVerticalScrollable()");
+    Object _isPageVerticalScrollable = WdDriver.executeScript("return isPageVerticalScrollable()");
+    if (_isPageVerticalScrollable instanceof Boolean) {
+      vScroll = (Boolean)_isPageVerticalScrollable;
       vScrollViewSize = 100.0 * rect.height() / clientHeight;
     }
 
@@ -102,8 +103,9 @@ public class WdRootElement extends WdElement {
     hScrollViewSize = 100.0 * clientWidth / scrollWidth;
 
     // TESTAR script function that compares document body width with browser width
-    if (WdDriver.executeScript("return isPageHorizontalScrollable()") instanceof Boolean) {
-      hScroll = (Boolean) WdDriver.executeScript("return isPageHorizontalScrollable()");
+    Object _isPageHorizontalScrollable = WdDriver.executeScript("return isPageHorizontalScrollable()");
+    if (_isPageHorizontalScrollable instanceof Boolean) {
+      hScroll = (Boolean) _isPageHorizontalScrollable;
       hScrollViewSize = 100.0 * rect.width() / clientWidth;
     }
 

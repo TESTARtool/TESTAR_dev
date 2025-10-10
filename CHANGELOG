@@ -1,3 +1,23 @@
+#TESTAR v2.7.11 (7-Oct-2025)
+- Bump org.seleniumhq.selenium:selenium-java from 4.35.0 to 4.36.0
+- Update devtools dependences to v140
+
+
+#TESTAR v2.7.10 (26-Sep-2025)
+- Use scroll-snap-type to ignore scroll actions in carousels
+- Remove unused creation of existingCssClasses file
+- Catch potential chromedriver not responding test sequences
+- Add WdDriver stopProcessTree logic to kill Chrome SUT if chromedriver hangs
+- Catch potential IllegalStateExceptions opening the system clipboard
+- Fix potential null pointer exception in WdRootElement scroll
+- Refactor executeCanvasScript logic to Canvas web classes
+
+
+#TESTAR v2.7.9 (23-Sep-2025)
+- Bump io.github.bonigarcia:webdrivermanager from 6.2.0 to 6.3.2
+- Update Windows GitHub runners environment to Windows Server 2022
+
+
 #TESTAR v2.7.8 (2-Sep-2025)
 - Add paintBatch and drawBatchTestar logic to paint all web elements at once
 - Fix the derivation and visualization of slide actions in web applications
