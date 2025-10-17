@@ -75,6 +75,7 @@ public class LlmOracle implements Oracle {
 
 	private final String platform;
 	private final String model;
+	private final String reasoning;
 	private final String hostUrl;
 	private final String authorizationHeader;
 	private final String fewshotOracleFile;
@@ -85,7 +86,6 @@ public class LlmOracle implements Oracle {
 	private LlmConversation conversation;
 	private int tokens_used;
 
-	private Gson gson = new Gson();
 	private String previousTestGoal = "";
 	private LlmTestGoal currentTestGoal;
 
@@ -94,6 +94,7 @@ public class LlmOracle implements Oracle {
 
 		this.platform = settings.get(ConfigTags.LlmPlatform);
 		this.model = settings.get(ConfigTags.LlmModel);
+		this.reasoning = settings.get(ConfigTags.LlmReasoning);
 		this.hostUrl = settings.get(ConfigTags.LlmHostUrl);
 		this.authorizationHeader = settings.get(ConfigTags.LlmAuthorizationHeader);
 		this.fewshotOracleFile = settings.get(ConfigTags.LlmOracleFewshotFile);
@@ -122,7 +123,7 @@ public class LlmOracle implements Oracle {
 
 	@Override
 	public void initialize() {
-		conversation = LlmFactory.createLlmConversation(this.platform, this.model, this.temperature);
+		conversation = LlmFactory.createLlmConversation(this.platform, this.model, this.reasoning, this.temperature);
 		conversation.initConversation(this.fewshotOracleFile);
 	}
 
@@ -165,13 +166,13 @@ public class LlmOracle implements Oracle {
 			conversation.addMessage("user", prompt);
 		}
 
-		String conversationJson = gson.toJson(conversation);
+		String conversationJson = conversation.buildRequestBody();
 
 		try {
 
 			String llmResponse = getResponseFromLlm(conversationJson);
 
-			LlmVerdict llmVerdict = gson.fromJson(llmResponse, LlmVerdict.class);
+			LlmVerdict llmVerdict = new Gson().fromJson(llmResponse, LlmVerdict.class);
 
 			if(llmVerdict.match()) return new Verdict(Verdict.Severity.LLM_COMPLETE, llmVerdict.getInfo());
 
