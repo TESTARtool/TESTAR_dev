@@ -41,6 +41,7 @@ import org.apache.logging.log4j.Logger;
 import org.testar.llm.LlmConversation;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 /**
  * Conversation with the Gemini LLM.
@@ -63,6 +64,12 @@ public class LlmConversationGemini implements LlmConversation {
 
     public List<Content> getContents() {
         return contents;
+    }
+
+    @Override
+    public String buildRequestBody() {
+        // Serialization for Gemini
+        return new GsonBuilder().create().toJson(this);
     }
 
     @Override
