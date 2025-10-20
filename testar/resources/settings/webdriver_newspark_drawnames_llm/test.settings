@@ -136,7 +136,8 @@ AbstractStateAttributes = WebWidgetCssClasses,WebWidgetId,WebWidgetTextContent
 #################################################################
 
 LlmPlatform = OpenAI
-LlmModel = gpt-4.1-mini
+LlmModel = gpt-5-mini
+LlmReasoning = minimal
 LlmHostUrl = https://api.openai.com/v1/chat/completions
 LlmAuthorizationHeader = Bearer %OPENAI_API%
 LlmActionFewshotFile = prompts/fewshot_openai_action.json

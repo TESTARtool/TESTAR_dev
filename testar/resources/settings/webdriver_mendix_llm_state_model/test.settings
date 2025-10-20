@@ -100,7 +100,7 @@ ProcessesToKillDuringTest =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = webdriver_mendix_academy_llm/Protocol_webdriver_mendix_academy_llm
+ProtocolClass = webdriver_mendix_llm_state_model/Protocol_webdriver_mendix_llm_state_model
 
 #################################################################
 # State model inference settings
@@ -109,7 +109,7 @@ StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer = 
-DataStoreDirectory = settings/webdriver_mendix_academy_llm/orientdb-community-3.2.38/databases
+DataStoreDirectory = settings/webdriver_mendix_llm_state_model/orientdb-community-3.2.38/databases
 DataStoreDB = testar
 DataStoreUser = admin
 DataStorePassword = admin
@@ -136,14 +136,16 @@ AbstractStateAttributes = WebWidgetId,WebWidgetTextContent,WebWidgetTitle
 #################################################################
 
 LlmPlatform = OpenAI
-LlmModel = gemma2:9b
+LlmModel = gemma3:12b
+LlmReasoning = default
 LlmHostUrl = http://10.102.0.41:11434/v1/chat/completions
 LlmAuthorizationHeader = 
 LlmActionFewshotFile = prompts/fewshot_openai_action.json
-LlmOracleFewshotFile = prompts/fewshot_openai_oracle.json
+LlmOracleFewshotFile = 
 LlmTemperature = 0.2
 LlmHistorySize = 5
-LlmTestGoals = A student decides to study the Agile Awareness course\\nThen 1. Introduction;A student starts the first Welcome module of the Introduction  lesson\\nThen Welcome to Agile Awareness
+LlmStateless = true
+LlmTestGoals = Given that I want to access to the learning paths to become a Rapid Developer\\nWhen I select the Introduction path\\nAnd I select the Welcome lesson\\nCheck: Welcome to the Rapid Developer learning path
 
 #################################################################
 # WebDriver advanced state fetcher configuration

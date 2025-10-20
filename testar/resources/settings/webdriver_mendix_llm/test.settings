@@ -44,7 +44,7 @@ SequenceLength = 10
 # Regular expression and Tags to apply them
 #################################################################
 
-SuspiciousTags = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+SuspiciousTags = 
 TagsForSuspiciousOracle = Title;WebName;WebTagName
 
 #################################################################
@@ -100,19 +100,25 @@ ProcessesToKillDuringTest =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = webdriver_mendix_academy/Protocol_webdriver_mendix_academy
+ProtocolClass = webdriver_mendix_llm/Protocol_webdriver_mendix_llm
 
 #################################################################
 # State model inference settings
 #################################################################
 StateModelEnabled = false
 DataStore = OrientDB
-DataStoreType = remote
-DataStoreServer = localhost
+DataStoreType = plocal
+DataStoreServer = 
+DataStoreDirectory = 
 DataStoreDB = testar
-DataStoreUser = testar
-DataStorePassword = testar
+DataStoreUser = 
+DataStorePassword = 
 DataStoreMode = instant
+ApplicationName = mendix
+ApplicationVersion = welcome
+ActionSelectionAlgorithm = random
+StateModelStoreWidgets = false
+ResetDataStore = false
 
 #################################################################
 # State identifier attributes
@@ -120,7 +126,26 @@ DataStoreMode = instant
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WebWidgetId
+AbstractStateAttributes = WebWidgetId,WebWidgetTextContent,WebWidgetTitle
+
+#################################################################
+# LLM agents settings
+#
+# Specify the settings to connect with an LLM server and
+# the prompt configurations to guide the LLM agent in accomplishing a test goal.
+#################################################################
+
+LlmPlatform = OpenAI
+LlmModel = gpt-5-mini
+LlmReasoning = minimal
+LlmHostUrl = https://api.openai.com/v1/chat/completions
+LlmAuthorizationHeader = Bearer %OPENAI_API%
+LlmActionFewshotFile = prompts/fewshot_openai_action.json
+LlmOracleFewshotFile = prompts/fewshot_openai_oracle.json
+LlmTemperature = 0.2
+LlmHistorySize = 5
+LlmStateless = true
+LlmTestGoals = A student decides to study the Agile Awareness course\\nThen 1. Introduction;A student starts the first Welcome module of the Introduction  lesson\\nThen Welcome to Agile Awareness
 
 #################################################################
 # WebDriver advanced state fetcher configuration
@@ -131,10 +156,10 @@ WebIgnoredAttributes = xpath
 #################################################################
 # WebDriver features
 #################################################################
-ClickableClasses = mx-groupbox-collapse-icon
+ClickableClasses = 
 TypeableClasses = 
 DeniedExtensions = pdf;jpg;png
-WebDomainsAllowed = academy.mendix.com;partners.home.mendix.com
+WebDomainsAllowed = academy.mendix.com
 WebPathsAllowed = null
 FollowLinks = true
 BrowserFullScreen = true

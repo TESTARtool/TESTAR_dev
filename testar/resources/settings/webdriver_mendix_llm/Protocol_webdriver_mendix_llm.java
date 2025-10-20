@@ -28,42 +28,44 @@
  *
  */
 
-import com.google.common.collect.ArrayListMultimap;
-
 import org.openqa.selenium.By;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testar.CodingManager;
 import org.testar.SutVisualization;
+import org.testar.action.priorization.llm.LlmActionSelector;
+import org.testar.llm.LlmTestGoal;
+import org.testar.llm.prompt.ActionWebPromptGenerator;
+import org.testar.llm.prompt.OracleImagePromptGenerator;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Pair;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.NOP;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
-import org.testar.monkey.alayer.actions.WdFillFormAction;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.oracles.llm.LlmOracle;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.settings.Settings;
-
+import org.testar.statemodel.analysis.condition.BasicConditionEvaluator;
 import java.util.*;
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
-import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
-import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
+public class Protocol_webdriver_mendix_llm extends WebdriverProtocol {
 
-public class Protocol_webdriver_mendix_academy extends WebdriverProtocol {
+	// The LLM Action selector needs to be initialize with the settings
+	private LlmActionSelector llmActionSelector;
+	private List<LlmTestGoal> testGoals = new ArrayList<>();
+	private Queue<LlmTestGoal> testGoalQueue;
+	private LlmTestGoal currentTestGoal;
 
-	// This list tracks the detected erroneous verdicts to avoid duplicates
-	private List<String> listOfDetectedErroneousVerdicts = new ArrayList<>();
-
-	private String inputDataFile = System.getProperty("user.dir") + "/settings/custom_input_data.txt";
+	// The LLM Oracle needs to be initialize with the settings
+	private LlmOracle llmOracle;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -75,8 +77,39 @@ public class Protocol_webdriver_mendix_academy extends WebdriverProtocol {
 	protected void initialize(Settings settings) {
 		super.initialize(settings);
 
-		// Reset the list when we start a new TESTAR run with multiple sequences
-		listOfDetectedErroneousVerdicts = new ArrayList<>();
+		// Configure the test goals
+		setupTestGoals(settings.get(ConfigTags.LlmTestGoals));
+
+		// Initialize the LlmActionSelector using the LLM settings
+		llmActionSelector = new LlmActionSelector(settings, new ActionWebPromptGenerator());
+
+		// Initialize the LlmOracle using the LLM settings
+		llmOracle = new LlmOracle(settings, new OracleImagePromptGenerator());
+	}
+
+	/**
+	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
+	 */
+	@Override
+	protected void preSequencePreparations() {
+		super.preSequencePreparations();
+
+		// Setup test goal queue
+		testGoalQueue = new LinkedList<>();
+		testGoalQueue.addAll(testGoals);
+		currentTestGoal = testGoalQueue.poll();
+
+		// Reset llm action selector
+		llmActionSelector.reset(currentTestGoal, false);
+		// Reset llm oracle
+		llmOracle.reset(currentTestGoal, false);
+	}
+
+	private void setupTestGoals(List<String> testGoalsList) {
+		for(String testGoal : testGoalsList) {
+			// Empty BasicConditionEvaluator because the test goal decision is based on an LLM
+			testGoals.add(new LlmTestGoal(testGoal, new BasicConditionEvaluator().getConditions()));
+		}
 	}
 
 	/**
@@ -95,9 +128,13 @@ public class Protocol_webdriver_mendix_academy extends WebdriverProtocol {
 	protected SUT startSystem() throws SystemStartException {
 		SUT system = super.startSystem();
 
+		// Deny cookies
+		WdDriver.executeScript("Array.from(document.querySelector('div#usercentrics-root').shadowRoot.querySelectorAll('button')).find(button => button.textContent.trim() === 'Reject Cookies')?.click();");
+		Util.pause(2);
+
 		// Go to login page
 		WdDriver.executeScript("document.getElementById('mx-dock-login')?.click();");
-		Util.pause(5);
+		Util.pause(3);
 
 		// Script login sequence
 		WdDriver.getRemoteWebDriver().findElement(new By.ById("input-username")).sendKeys(System.getenv("MENDIX_USERNAME"));
@@ -105,10 +142,6 @@ public class Protocol_webdriver_mendix_academy extends WebdriverProtocol {
 		WdDriver.executeScript("document.getElementById('input-password').setAttribute('value','" + System.getenv("MENDIX_PASSWORD") + "');");
 		Util.pause(1);
 		WdDriver.executeScript("document.getElementById('login-button').click();");
-		Util.pause(5);
-
-		// Deny cookies
-		WdDriver.executeScript("Array.from(document.querySelector('div#usercentrics-root').shadowRoot.querySelectorAll('button')).find(button => button.textContent.trim() === 'Deny')?.click();");
 		Util.pause(5);
 
 		return system;
@@ -149,48 +182,30 @@ public class Protocol_webdriver_mendix_academy extends WebdriverProtocol {
 	 */
 	@Override
 	protected Verdict getVerdict(State state) {
-
 		// System crashes, non-responsiveness and suspicious tags automatically detected!
 		// For web applications, web browser errors and warnings can also be enabled via settings
 		Verdict verdict = super.getVerdict(state);
 
-		// If the Verdict is not OK but was already detected in a previous sequence
-		// Consider as OK to avoid duplicates and continue testing
-		if (verdict != Verdict.OK && containsVerdictInfo(listOfDetectedErroneousVerdicts, verdict.info())) {
-			// Consider as OK to continue testing
-			verdict = Verdict.OK;
-			webConsoleVerdict = Verdict.OK;
-		} 
-		// If the Verdict is not OK and was not duplicated...
-		// We found an issue we need to report
-		else if (verdict.severity() != Verdict.OK.severity()) {
-			return verdict;
+		// Use the LLM as an Oracle to determine if the test goal has been completed
+		Verdict llmVerdict = llmOracle.getVerdict(state);
+
+		if(llmVerdict.severity() == Verdict.Severity.LLM_COMPLETE.getValue()) {
+			// Test goal was completed, retrieve next test goal from queue.
+			currentTestGoal = testGoalQueue.poll();
+
+			// Poll returns null if there are no more items remaining in the queue.
+			if(currentTestGoal == null) {
+				// No more test goals remaining, terminate sequence.
+				System.out.println("Test goal completed, but no more test goals.");
+				return llmVerdict;
+			} else {
+				System.out.println("Test goal completed, moving to next test goal.");
+				llmActionSelector.reset(currentTestGoal, true);
+				llmOracle.reset(currentTestGoal, true);
+			}
 		}
 
-		//-----------------------------------------------------------------------------
-		// MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
-		//-----------------------------------------------------------------------------
-
-		// ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
-
-		Verdict customVerdict = Verdict.OK;
-		/*
-
-		customVerdict = customVerdict.join(customVerdictImplementation(state));
-
-		// If the Custom Verdict is not OK but was already detected in a previous sequence
-		// Consider as OK to avoid duplicates
-		if (customVerdict != Verdict.OK && containsVerdictInfo(listOfDetectedErroneousVerdicts, customVerdict.info())) {
-			customVerdict = Verdict.OK;
-		}
-
-		 */
-
-		return customVerdict;
-	}
-
-	private boolean containsVerdictInfo(List<String> listOfDetectedErroneousVerdicts, String currentVerdictInfo) {
-		return listOfDetectedErroneousVerdicts.stream().anyMatch(verdictInfo -> verdictInfo.contains(currentVerdictInfo.replace("\n", " ")));
+		return verdict;
 	}
 
 	/**
@@ -227,7 +242,7 @@ public class Protocol_webdriver_mendix_academy extends WebdriverProtocol {
 			//CAPS_LOCK + SHIFT + Click clickfilter functionality.
 			if(blackListed(widget)){
 				if(isTypeable(widget)){
-					filteredActions.add(ac.pasteTextInto(widget, InputDataManager.getRandomTextFromCustomInputDataFile(inputDataFile), true));
+					filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(), true));
 				} else {
 					filteredActions.add(ac.leftClickAt(widget));
 				}
@@ -245,10 +260,10 @@ public class Protocol_webdriver_mendix_academy extends WebdriverProtocol {
 			// type into text boxes
 			if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
 				if(whiteListed(widget) || isUnfiltered(widget)){
-					actions.add(ac.pasteTextInto(widget, InputDataManager.getRandomTextFromCustomInputDataFile(inputDataFile), true));
+					actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(), true));
 				}else{
 					// filtered and not white listed:
-					filteredActions.add(ac.pasteTextInto(widget, InputDataManager.getRandomTextFromCustomInputDataFile(inputDataFile), true));
+					filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(), true));
 				}
 			}
 
@@ -308,7 +323,19 @@ public class Protocol_webdriver_mendix_academy extends WebdriverProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions) {
-		return super.selectAction(state, actions);
+		Action toExecute = llmActionSelector.selectAction(state, actions);
+
+		// We need to set a state to NOP actions
+		if(toExecute instanceof NOP) {
+			toExecute.set(Tags.OriginWidget, state);
+		}
+
+		// We need the AbstractID for the state model
+		if(toExecute.get(Tags.AbstractID, null) == null) {
+			CodingManager.buildIDs(state, Collections.singleton(toExecute));
+		}
+
+		return toExecute;
 	}
 
 	/**
@@ -342,13 +369,6 @@ public class Protocol_webdriver_mendix_academy extends WebdriverProtocol {
 	@Override
 	protected void finishSequence() {
 		super.finishSequence();
-		// If the final Verdict is not OK and the verdict is not saved in the list
-		// This is a new run fail verdict
-		Verdict finalVerdict = getVerdict(latestState);
-		if(finalVerdict.severity() > Verdict.Severity.OK.getValue() 
-				&& !listOfDetectedErroneousVerdicts.contains(finalVerdict.info().replace("\n", " "))) {
-			listOfDetectedErroneousVerdicts.add(finalVerdict.info().replace("\n", " "));
-		}
 	}
 
 	/**
@@ -362,4 +382,5 @@ public class Protocol_webdriver_mendix_academy extends WebdriverProtocol {
 	protected boolean moreSequences() {
 		return super.moreSequences();
 	}
+
 }

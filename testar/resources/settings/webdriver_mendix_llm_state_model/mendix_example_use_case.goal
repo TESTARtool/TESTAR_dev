@@ -1,0 +1,4 @@
+Given that I want to access to the learning paths to become a Rapid Developer
+When I select the Introduction path
+And I select the Welcome lesson
+Check: Welcome to the Rapid Developer learning path

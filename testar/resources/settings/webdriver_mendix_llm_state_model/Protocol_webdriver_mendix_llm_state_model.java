@@ -59,14 +59,18 @@ import org.testar.protocols.WebdriverProtocol;
 import org.testar.settings.Settings;
 import org.testar.statemodel.StateModelManagerFactory;
 import org.testar.statemodel.analysis.condition.BasicConditionEvaluator;
+import org.testar.statemodel.analysis.condition.CheckConditionEvaluator;
 import org.testar.statemodel.analysis.condition.ConditionEvaluator;
 import org.testar.statemodel.analysis.condition.GherkinConditionEvaluator;
+import org.testar.statemodel.analysis.metric.LlmMetricsCollector;
+import org.testar.statemodel.analysis.metric.MetricsManager;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -77,18 +81,16 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 
-public class Protocol_webdriver_mendix_academy_llm extends WebdriverProtocol {
+public class Protocol_webdriver_mendix_llm_state_model extends WebdriverProtocol {
 
 	// The LLM Action selector needs to be initialize with the settings
 	private LlmActionSelector llmActionSelector;
+	private MetricsManager metricsManager;
 	private ConditionEvaluator conditionEvaluator;
 
 	private List<LlmTestGoal> testGoals = new ArrayList<>();
 	private Queue<LlmTestGoal> testGoalQueue;
 	private LlmTestGoal currentTestGoal;
-
-	// The LLM Oracle needs to be initialize with the settings
-	private LlmOracle llmOracle;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -107,19 +109,18 @@ public class Protocol_webdriver_mendix_academy_llm extends WebdriverProtocol {
 		setupTestGoals(settings.get(ConfigTags.LlmTestGoals));
 
 		// Initialize the LlmActionSelector using the LLM settings
-		llmActionSelector = new LlmActionSelector(settings, new ActionWebPromptGenerator(Tags.Desc));
+		llmActionSelector = new LlmActionSelector(settings, new ActionWebPromptGenerator());
 
-		// Test goal is considered complete when the Then statement is found in the HTML of the state model.
+		// Initialize the metrics collector to analyze the state model
+		metricsManager = new MetricsManager(new LlmMetricsCollector(testGoals));
+
 		conditionEvaluator = new BasicConditionEvaluator();
-
-		// Initialize the LlmOracle using the LLM settings
-		llmOracle = new LlmOracle(settings, new OracleWebPromptGenerator());
 	}
 
 	private void setupTestGoals(List<String> testGoalsList) {
 		for(String testGoal : testGoalsList) {
-			GherkinConditionEvaluator gherkinEvaluator = new GherkinConditionEvaluator(WdTags.WebInnerHTML, testGoal);
-			testGoals.add(new LlmTestGoal(testGoal, gherkinEvaluator.getConditions()));
+			CheckConditionEvaluator checkEvaluator = new CheckConditionEvaluator(WdTags.WebInnerHTML, testGoal);
+			testGoals.add(new LlmTestGoal(testGoal, checkEvaluator.getConditions()));
 		}
 	}
 
@@ -139,15 +140,16 @@ public class Protocol_webdriver_mendix_academy_llm extends WebdriverProtocol {
 
 		// Reset llm action selector
 		llmActionSelector.reset(currentTestGoal, false);
-		// Reset llm oracle
-		llmOracle.reset(currentTestGoal, false);
+
+		// Use timestamp to create a unique new state model
+		String appName = settings.get(ConfigTags.ApplicationName, "");
+		String appVersion = settings.get(ConfigTags.ApplicationVersion, "");
+		String timestamp = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
 
 		// stop and start a new state model manager
 		stateModelManager.notifyTestingEnded();
 		stateModelManager = StateModelManagerFactory.getStateModelManager(
-				settings.get(ConfigTags.ApplicationName),
-				settings.get(ConfigTags.ApplicationVersion),
-				settings);
+				appName, (appVersion + "_" + timestamp), settings);
 	}
 
 	/**
@@ -166,9 +168,13 @@ public class Protocol_webdriver_mendix_academy_llm extends WebdriverProtocol {
 	protected SUT startSystem() throws SystemStartException {
 		SUT system = super.startSystem();
 
+		// Deny cookies
+		WdDriver.executeScript("Array.from(document.querySelector('div#usercentrics-root').shadowRoot.querySelectorAll('button')).find(button => button.textContent.trim() === 'Reject Cookies')?.click();");
+		Util.pause(2);
+
 		// Go to login page
 		WdDriver.executeScript("document.getElementById('mx-dock-login')?.click();");
-		Util.pause(5);
+		Util.pause(3);
 
 		// Script login sequence
 		WdDriver.getRemoteWebDriver().findElement(new By.ById("input-username")).sendKeys(System.getenv("MENDIX_USERNAME"));
@@ -176,10 +182,6 @@ public class Protocol_webdriver_mendix_academy_llm extends WebdriverProtocol {
 		WdDriver.executeScript("document.getElementById('input-password').setAttribute('value','" + System.getenv("MENDIX_PASSWORD") + "');");
 		Util.pause(1);
 		WdDriver.executeScript("document.getElementById('login-button').click();");
-		Util.pause(5);
-
-		// Deny cookies
-		WdDriver.executeScript("Array.from(document.querySelector('div#usercentrics-root').shadowRoot.querySelectorAll('button')).find(button => button.textContent.trim() === 'Deny')?.click();");
 		Util.pause(5);
 
 		return system;
@@ -224,8 +226,8 @@ public class Protocol_webdriver_mendix_academy_llm extends WebdriverProtocol {
 		// For web applications, web browser errors and warnings can also be enabled via settings
 		Verdict verdict = super.getVerdict(state);
 
-		// Prioritize the technical condition evaluator to determine if the goal has been achieved
 		String modelIdentifier = stateModelManager.getModelIdentifier();
+
 		if(conditionEvaluator.evaluateConditions(modelIdentifier, stateModelManager)) {
 			// Test goal was completed, retrieve next test goal from queue.
 			currentTestGoal = testGoalQueue.poll();
@@ -234,38 +236,18 @@ public class Protocol_webdriver_mendix_academy_llm extends WebdriverProtocol {
 			if(currentTestGoal == null) {
 				// No more test goals remaining, terminate sequence.
 				System.out.println("Test goal completed, but no more test goals.");
-				return new Verdict(Verdict.Severity.CONDITION_COMPLETE, "All test goals completed.");
+				return new Verdict(Verdict.Severity.CONDITION_COMPLETE, "All test goal conditions completed.");
 			} else {
 				System.out.println("Test goal completed, moving to next test goal.");
 				llmActionSelector.reset(currentTestGoal, true);
-				llmOracle.reset(currentTestGoal, true);
 				conditionEvaluator.clear();
 				conditionEvaluator.addConditions(currentTestGoal.getCompletionConditions());
-			}
-		} else if (actionCount > 1) {
-			// If the technical condition evaluator determines the goal has not been achieved
-			// Use the LLM as an Oracle to determine if the test goal has been completed
-			Verdict llmVerdict = llmOracle.getVerdict(state);
-
-			if(llmVerdict.severity() == Verdict.Severity.LLM_COMPLETE.getValue()) {
-				// Test goal was completed, retrieve next test goal from queue.
-				currentTestGoal = testGoalQueue.poll();
-
-				// Poll returns null if there are no more items remaining in the queue.
-				if(currentTestGoal == null) {
-					// No more test goals remaining, terminate sequence.
-					System.out.println("Test goal completed, but no more test goals.");
-					return llmVerdict;
-				} else {
-					System.out.println("Test goal completed, moving to next test goal.");
-					llmActionSelector.reset(currentTestGoal, true);
-					llmOracle.reset(currentTestGoal, true);
-				}
 			}
 		}
 
 		return verdict;
 	}
+
 
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
@@ -443,7 +425,7 @@ public class Protocol_webdriver_mendix_academy_llm extends WebdriverProtocol {
 	}
 
 	private void setupOrientDB() {
-		String directoryPath = Main.settingsDir + File.separator + "webdriver_mendix_academy_llm";
+		String directoryPath = Main.settingsDir + File.separator + "webdriver_mendix_llm_state_model";
 		String downloadUrl = "https://repo1.maven.org/maven2/com/orientechnologies/orientdb-community/3.2.38/orientdb-community-3.2.38.zip";
 		String zipFilePath = directoryPath + "/orientdb-community-3.2.38.zip";
 		String extractDir = directoryPath + "/orientdb-community-3.2.38";
