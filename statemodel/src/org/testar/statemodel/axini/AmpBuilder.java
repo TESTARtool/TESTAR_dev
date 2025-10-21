@@ -33,7 +33,7 @@ public class AmpBuilder {
 
 			if (source == null || target == null || action == null) continue;
 
-			String selector = action.getSelector();
+			String css = action.getSelector();
 			String desc = action.getDesc();
 
 			boolean isType = action.getInputText() != null && !action.getInputText().isBlank();
@@ -49,12 +49,12 @@ public class AmpBuilder {
 				if (isType) {
 					stimulus = "fill_in";
 					// %(selector == "[onclick='setCookie\(true\)']")
-					receiveConstraints.add(new Constraint("selector", "\"" + selector + "\""));
+					receiveConstraints.add(new Constraint("selector", "\"" + css + "\""));
 					receiveConstraints.add(new Constraint("value", "\"" + action.getInputText() + "\""));
 				} else {
 					// %(css == "" && text == "Show gifts")
-					receiveConstraints.add(new Constraint("css", "\"" + selector + "\""));
-					receiveConstraints.add(new Constraint("text", "\"" + extractTextFromDesc(desc) + "\""));
+					receiveConstraints.add(new Constraint("css", "\"" + SelectorsHelper.isAppropiatteCssSelector(css) + "\""));
+					receiveConstraints.add(new Constraint("text", "\"" + SelectorsHelper.extractTextFromDesc(desc) + "\""));
 				}
 
 				ActionDefinition def = new ActionDefinition(
@@ -108,18 +108,6 @@ public class AmpBuilder {
 		String sanitizedDesc = sanitize(desc);
 		String sanitizedTarget = sanitize(targetTitle);
 		return sanitizedDesc + "_to_" + sanitizedTarget;
-	}
-
-	public static String extractTextFromDesc(String desc) {
-		if (desc == null) return "";
-
-		int first = desc.indexOf('\'');
-		if (first == -1) return "";
-
-		int last = desc.lastIndexOf('\'');
-		if (last <= first) return "";
-
-		return desc.substring(first + 1, last);
 	}
 
 	private static String generateCssFunctionName(String selector, String targetTitle, boolean isTypeAction) {
