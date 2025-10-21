@@ -2,7 +2,7 @@ package org.testar.statemodel.axini;
 
 public class BehaviorOperation {
 	private String actionCall;   // e.g., "Left_Click_at_Register()"
-	private String nextBehavior; // e.g., "ParaBank | Register for Free Online Account Access"
+	private String nextBehavior; // e.g., "ParaBank | Register - AST3ST4R"
 
 	public BehaviorOperation() {}
 

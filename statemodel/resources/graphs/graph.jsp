@@ -1263,6 +1263,7 @@
 		let initialAbstractId = initialNodes[0].data("stateId");
 		let initialUrl = "";
 		let initialPage = "";
+		let initialIdentifier = "";
 		let concreteStates = [];
 		let concreteActions = [];
 		let concreteTransitions = [];
@@ -1281,6 +1282,7 @@
 			if (abstractID === initialAbstractId) {
 				initialUrl = ele.data("WebHref");
 				initialPage = ele.data("WebTitle");
+				initialIdentifier = initialAbstractId;
 			}
 		});
 		// Iterate over each ConcreteAction element in the graph
@@ -1322,6 +1324,7 @@
 		const jsonResult = {
 			InitialUrl: initialUrl,
 			InitialPage: initialPage,
+			InitialIdentifier: initialIdentifier,
 			ConcreteState: concreteStates,
 			ConcreteAction: concreteActions,
 			ConcreteTransitions: concreteTransitions,
@@ -1336,6 +1339,7 @@
 		})
 		.then(res => res.text())
 		.then(ampCode => {
+			console.log("Original JSON:", JSON.stringify(jsonResult));
 			console.log("Generated AMP code:", ampCode);
 			downloadAmpFile(ampCode);
 		})

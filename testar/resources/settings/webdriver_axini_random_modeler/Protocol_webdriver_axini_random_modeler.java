@@ -43,7 +43,7 @@ import java.util.*;
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
 
-public class Protocol_webdriver_axini_modeler extends WebdriverProtocol {
+public class Protocol_webdriver_axini_random_modeler extends WebdriverProtocol {
 
 	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.

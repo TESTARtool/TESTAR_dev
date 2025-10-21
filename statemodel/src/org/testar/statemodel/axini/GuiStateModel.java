@@ -12,6 +12,9 @@ public class GuiStateModel {
 	@JsonProperty("InitialPage")
 	private String initialPage;
 
+	@JsonProperty("InitialIdentifier")
+	private String initialIdentifier;
+
 	@JsonProperty("ConcreteState")
 	private List<GuiState> states;
 
@@ -35,6 +38,14 @@ public class GuiStateModel {
 
 	public void setInitialPage(String initialPage) {
 		this.initialPage = initialPage;
+	}
+
+	public String getInitialIdentifier() {
+		return initialIdentifier;
+	}
+
+	public void setInitialIdentifier(String initialIdentifier) {
+		this.initialIdentifier = initialIdentifier;
 	}
 
 	public List<GuiState> getStates() {

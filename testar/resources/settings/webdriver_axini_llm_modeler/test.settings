@@ -27,7 +27,7 @@ Mode = Spy
 # Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "https://para.testar.org/"
+SUTConnectorValue = "https://www.drawnames.com/?stayonsite=true"
 
 #################################################################
 # Sequences
@@ -45,7 +45,7 @@ SequenceLength = 10
 #################################################################
 
 SuspiciousTags = 
-TagsForSuspiciousOracle = Title;WebTextContent
+TagsForSuspiciousOracle = Title;WebName;WebTagName
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -82,8 +82,8 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = 
-TagsToFilter = WebHref
+ClickFilter = .*[lL]ogout.*
+TagsToFilter = Title;WebName;WebTagName;WebHref;WebTextContent
 
 #################################################################
 # Processfilter
@@ -101,7 +101,7 @@ ProcessesToKillDuringTest =
 # AlwaysCompile: Compile the protocol before launching the selected TESTAR mode
 #################################################################
 
-ProtocolClass = webdriver_axini_modeler/Protocol_webdriver_axini_modeler
+ProtocolClass = webdriver_axini_llm_modeler/Protocol_webdriver_axini_llm_modeler
 AlwaysCompile = true
 
 #################################################################
@@ -137,17 +137,17 @@ MaxTime = 3.1536E7
 # ResetDataStore: WARNING: Delete all existing State Models from the selected database before creating a new one
 #################################################################
 
-StateModelEnabled = false
+StateModelEnabled = true
 DataStore = OrientDB
-DataStoreType = remote
-DataStoreServer = localhost
-DataStoreDirectory = 
+DataStoreType = plocal
+DataStoreServer = 
+DataStoreDirectory = settings/webdriver_axini_llm_modeler/orientdb-community-3.2.38/databases
 DataStoreDB = testar
-DataStoreUser = testar
-DataStorePassword = testar
+DataStoreUser = admin
+DataStorePassword = admin
 DataStoreMode = instant
-ApplicationName = parabank_axini
-ApplicationVersion = 1
+ApplicationName = drawnames_axini
+ApplicationVersion = llm
 ActionSelectionAlgorithm = unvisited
 StateModelStoreWidgets = false
 ResetDataStore = false
@@ -158,7 +158,31 @@ ResetDataStore = false
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WebWidgetId,WebWidgetName
+AbstractStateAttributes = WebWidgetCssClasses,WebWidgetId,WebWidgetTextContent,WebWidgetStyle
+
+#################################################################
+# LLM agents settings
+#
+# Specify the settings to connect with an LLM server and
+# the prompt configurations to guide the LLM agent in accomplishing a test goal.
+#################################################################
+
+LlmPlatform = OpenAI
+LlmModel = gpt-5-mini
+LlmReasoning = minimal
+LlmHostUrl = https://api.openai.com/v1/chat/completions
+LlmAuthorizationHeader = Bearer %OPENAI_API%
+LlmActionFewshotFile = prompts/fewshot_openai_action.json
+LlmOracleFewshotFile = prompts/fewshot_openai_oracle.json
+LlmTemperature = 0.2
+LlmHistorySize = 5
+LlmTestGoals = 
+
+#################################################################
+# WebDriver advanced state fetcher configuration
+#################################################################
+WebIgnoredTags = script;noscript;head;meta;style;link;svg;canvas;iframe
+WebIgnoredAttributes = xpath
 
 #################################################################
 # WebDriver features

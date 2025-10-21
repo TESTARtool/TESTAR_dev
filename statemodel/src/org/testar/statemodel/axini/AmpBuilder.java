@@ -34,21 +34,27 @@ public class AmpBuilder {
 			if (source == null || target == null || action == null) continue;
 
 			String selector = action.getSelector();
+			String desc = action.getDesc();
 
 			boolean isType = action.getInputText() != null && !action.getInputText().isBlank();
-			String functionName = generateFunctionName(selector, target.getTitle(), isType);
+			String functionName = generateDescFunctionName(desc, target.getTitle());
 			actionToFunctionName.put(actionId, functionName);
 
 			// If this is a new function, create it
 			if (!createdFunctions.contains(functionName)) {
 
 				List<Constraint> receiveConstraints = new ArrayList<>();
-				receiveConstraints.add(new Constraint("selector", "\"" + selector + "\""));
 
-				String stimulus = "click_link";
+				String stimulus = "click";
 				if (isType) {
-					stimulus = "fill_in"; 
+					stimulus = "fill_in";
+					// %(selector == "[onclick='setCookie\(true\)']")
+					receiveConstraints.add(new Constraint("selector", "\"" + selector + "\""));
 					receiveConstraints.add(new Constraint("value", "\"" + action.getInputText() + "\""));
+				} else {
+					// %(css == "" && text == "Show gifts")
+					receiveConstraints.add(new Constraint("css", "\"" + selector + "\""));
+					receiveConstraints.add(new Constraint("text", "\"" + extractTextFromDesc(desc) + "\""));
 				}
 
 				ActionDefinition def = new ActionDefinition(
@@ -63,10 +69,14 @@ public class AmpBuilder {
 				createdFunctions.add(functionName);
 			}
 
+			// Prepare the state behavior abstraction identifier
+			String sourceBehaviorId = source.getTitle() + " - " + source.getId();
+			String targetBehaviorId = target.getTitle() + " - " + target.getId();
+
 			// Add operation to the corresponding source state behavior
 			behaviorOps
-			.computeIfAbsent(source.getTitle(), k -> new LinkedHashSet<>())
-			.add(new BehaviorOperation(functionName + "()", target.getTitle()));
+			.computeIfAbsent(sourceBehaviorId, k -> new LinkedHashSet<>())
+			.add(new BehaviorOperation(functionName + "()", targetBehaviorId));
 		}
 
 		// Build BehaviorDefinitions from operations
@@ -78,15 +88,41 @@ public class AmpBuilder {
 			process.addBehavior(behavior);
 		}
 
+		// Prepare the initial state behavior abstraction identifier
+		String initialBehavior = guiModel.getInitialPage() + " - " + guiModel.getInitialIdentifier();
+
 		// Initial values and entry points
-		process.addInitialVariable(new InitialVariable("initial_url", ":string", "\"" + guiModel.getInitialUrl() + "\""));
+		process.setInitialVariables(new InitialVariable(
+				"initial_url", 
+				":string", 
+				"\"" + guiModel.getInitialUrl() + "\"",
+				guiModel.getInitialPage(), 
+				initialBehavior));
 		process.addEntryCall("call 'launch'");
-		process.addEntryCall("behave_as '" + guiModel.getInitialPage() + "'");
+		process.addEntryCall("behave_as '" + initialBehavior + "'");
 
 		return process;
 	}
 
-	private static String generateFunctionName(String selector, String targetTitle, boolean isTypeAction) {
+	private static String generateDescFunctionName(String desc, String targetTitle) {
+		String sanitizedDesc = sanitize(desc);
+		String sanitizedTarget = sanitize(targetTitle);
+		return sanitizedDesc + "_to_" + sanitizedTarget;
+	}
+
+	public static String extractTextFromDesc(String desc) {
+		if (desc == null) return "";
+
+		int first = desc.indexOf('\'');
+		if (first == -1) return "";
+
+		int last = desc.lastIndexOf('\'');
+		if (last <= first) return "";
+
+		return desc.substring(first + 1, last);
+	}
+
+	private static String generateCssFunctionName(String selector, String targetTitle, boolean isTypeAction) {
 		String prefix = isTypeAction ? "Type" : "Click";
 		String sanitizedSelector = sanitize(selector);
 		String sanitizedTarget = sanitize(targetTitle);

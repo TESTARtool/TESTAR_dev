@@ -7,13 +7,12 @@ public class ProcessDefinition {
 	private String name;
 	private List<ActionDefinition> actions;
 	private List<BehaviorDefinition> behaviors;
-	private List<InitialVariable> initialVariables;
+	private InitialVariable initialVariables;
 	private List<String> entryCalls;
 
 	public ProcessDefinition() {
 		this.actions = new ArrayList<>();
 		this.behaviors = new ArrayList<>();
-		this.initialVariables = new ArrayList<>();
 		this.entryCalls = new ArrayList<>();
 	}
 
@@ -34,7 +33,7 @@ public class ProcessDefinition {
 		return behaviors;
 	}
 
-	public List<InitialVariable> getInitialVariables() {
+	public InitialVariable getInitialVariables() {
 		return initialVariables;
 	}
 
@@ -54,7 +53,7 @@ public class ProcessDefinition {
 		this.behaviors = behaviors;
 	}
 
-	public void setInitialVariables(List<InitialVariable> initialVariables) {
+	public void setInitialVariables(InitialVariable initialVariables) {
 		this.initialVariables = initialVariables;
 	}
 
@@ -68,10 +67,6 @@ public class ProcessDefinition {
 
 	public void addBehavior(BehaviorDefinition behavior) {
 		this.behaviors.add(behavior);
-	}
-
-	public void addInitialVariable(InitialVariable variable) {
-		this.initialVariables.add(variable);
 	}
 
 	public void addEntryCall(String call) {
