@@ -100,7 +100,7 @@ public class Protocol_webdriver_security_analysis extends WebdriverProtocol {
         webDriver = WdDriver.getRemoteWebDriver();
         DevTools devTools = ((HasDevTools) webDriver).getDevTools();
         devTools.createSession();
-        devTools.send(Network.enable(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()));
+        devTools.send(Network.enable(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()));
         lastSequenceActionNumber = 0;
         oracleOrchestrator = new SecurityOracleOrchestrator(securityResultWriter, securityConfiguration.getOracles(), webDriver, devTools);
 
