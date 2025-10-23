@@ -39,6 +39,7 @@ import org.testar.statemodel.sequence.SequenceError;
 import org.testar.statemodel.sequence.SequenceManager;
 import org.testar.statemodel.util.AbstractStateService;
 
+import com.orientechnologies.orient.core.record.OElement;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
 
@@ -324,18 +325,78 @@ public class ModelManager implements StateModelManager {
 
     @Override
     public String queryStateModel(String query, Object... params) {
-    	EntityManager manager = persistenceManager.getEntityManager();
+        EntityManager manager = persistenceManager.getEntityManager();
 
-    	try (OResultSet resultSet = manager.getConnection().getDatabaseSession().query(query, params)) {
-    		if (resultSet.hasNext()) {
-    			OResult result = resultSet.next();
-    			return result.toString();
-    		}
-    	} catch (Exception e) {
-    		e.printStackTrace();
-    	}
+        try (OResultSet rs = manager.getConnection().getDatabaseSession().query(query, params)) {
 
-    	return "Empty";
+            // Empty results
+            if (!rs.hasNext()) {
+                return "Empty";
+            }
+
+            OResult first = rs.next();
+
+            // If only 1 row, return the result as a plain string
+            if (!rs.hasNext()) {
+                return first.toString();
+            }
+
+            // If more than 1 row, then collect ALL rows and return a JSON array
+            List<Map<String, Object>> rows = new ArrayList<>();
+            rows.add(toMap(first));
+            while (rs.hasNext()) {
+                rows.add(toMap(rs.next()));
+            }
+
+            return toJson(rows);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Empty";
+        }
+    }
+
+    private Map<String, Object> toMap(OResult r) {
+        Map<String, Object> out = new LinkedHashMap<>();
+        for (String name : r.getPropertyNames()) {
+            out.put(name, normalize(r.getProperty(name)));
+        }
+        return out;
+    }
+
+    private Object normalize(Object v) {
+        if (v == null) return null;
+
+        if (v instanceof OResult) {
+            return toMap((OResult) v);
+        }
+        if (v instanceof OElement) {
+            // Prefer properties to avoid embedding raw JSON strings
+            OElement el = (OElement) v;
+            Map<String, Object> m = new LinkedHashMap<>();
+            for (String p : el.getPropertyNames()) {
+                m.put(p, normalize(el.getProperty(p)));
+            }
+            return m;
+        }
+        if (v instanceof Iterable<?>) {
+            List<Object> list = new ArrayList<>();
+            for (Object item : (Iterable<?>) v) list.add(normalize(item));
+            return list;
+        }
+        if (v instanceof Map<?, ?>) {
+            Map<String, Object> m = new LinkedHashMap<>();
+            ((Map<?, ?>) v).forEach((k, val) -> m.put(String.valueOf(k), normalize(val)));
+            return m;
+        }
+        return v;
+    }
+
+    private String toJson(Object obj) {
+        try {
+            return new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(obj);
+        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
