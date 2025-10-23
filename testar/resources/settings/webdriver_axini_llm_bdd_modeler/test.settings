@@ -101,7 +101,7 @@ ProcessesToKillDuringTest =
 # AlwaysCompile: Compile the protocol before launching the selected TESTAR mode
 #################################################################
 
-ProtocolClass = webdriver_axini_llm_modeler/Protocol_webdriver_axini_llm_modeler
+ProtocolClass = webdriver_axini_llm_bdd_modeler/Protocol_webdriver_axini_llm_bdd_modeler
 AlwaysCompile = true
 
 #################################################################
@@ -141,7 +141,7 @@ StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer = 
-DataStoreDirectory = settings/webdriver_axini_llm_modeler/orientdb-community-3.2.38/databases
+DataStoreDirectory = settings/webdriver_axini_llm_bdd_modeler/orientdb-community-3.2.38/databases
 DataStoreDB = testar
 DataStoreUser = admin
 DataStorePassword = admin

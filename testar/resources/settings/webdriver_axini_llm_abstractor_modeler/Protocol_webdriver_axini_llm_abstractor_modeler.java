@@ -32,6 +32,7 @@ import org.testar.CodingManager;
 import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
 import org.testar.llm.LlmTestGoal;
+import org.testar.llm.prompt.AbstractionWebPromptGenerator;
 import org.testar.llm.prompt.ActionWebPromptGenerator;
 import org.testar.llm.prompt.OracleImagePromptGenerator;
 import org.testar.managers.InputDataManager;
@@ -50,6 +51,7 @@ import org.testar.plugin.NativeLinker;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.settings.Settings;
 import org.testar.statemodel.analysis.condition.BasicConditionEvaluator;
+import org.testar.statemodel.llm.LlmStateAbstraction;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -63,16 +65,10 @@ import java.util.zip.ZipInputStream;
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
 
-public class Protocol_webdriver_axini_llm_modeler extends WebdriverProtocol {
+public class Protocol_webdriver_axini_llm_abstractor_modeler extends WebdriverProtocol {
 
-    // The LLM Action selector needs to be initialize with the settings
-    private LlmActionSelector llmActionSelector;
-    private List<LlmTestGoal> testGoals = new ArrayList<>();
-    private Queue<LlmTestGoal> testGoalQueue;
-    private LlmTestGoal currentTestGoal;
-
-    // The LLM Oracle needs to be initialize with the settings
-    private LlmOracle llmOracle;
+    // The LLM State Abstraction needs to be initialize with the settings
+    private LlmStateAbstraction llmStateAbstraction;
 
     /**
      * Called once during the life time of TESTAR
@@ -87,39 +83,8 @@ public class Protocol_webdriver_axini_llm_modeler extends WebdriverProtocol {
 
         super.initialize(settings);
 
-        // Configure the test goals
-        setupTestGoals(settings.get(ConfigTags.LlmTestGoals));
-
-        // Initialize the LlmActionSelector using the LLM settings
-        llmActionSelector = new LlmActionSelector(settings, new ActionWebPromptGenerator());
-
-        // Initialize the LlmOracle using the LLM settings
-        llmOracle = new LlmOracle(settings, new OracleImagePromptGenerator());
-    }
-
-    private void setupTestGoals(List<String> testGoalsList) {
-        for(String testGoal : testGoalsList) {
-            // Empty BasicConditionEvaluator because the test goal decision is based on an LLM
-            testGoals.add(new LlmTestGoal(testGoal, new BasicConditionEvaluator().getConditions()));
-        }
-    }
-
-    /**
-     * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
-     */
-    @Override
-    protected void preSequencePreparations() {
-        super.preSequencePreparations();
-
-        // Setup test goal queue
-        testGoalQueue = new LinkedList<>();
-        testGoalQueue.addAll(testGoals);
-        currentTestGoal = testGoalQueue.poll();
-
-        // Reset llm action selector
-        llmActionSelector.reset(currentTestGoal, false);
-        // Reset llm oracle
-        llmOracle.reset(currentTestGoal, false);
+        // Initialize the LlmStateAbstraction using the LLM settings
+        llmStateAbstraction = new LlmStateAbstraction(settings, new AbstractionWebPromptGenerator());
     }
 
     /**
@@ -168,6 +133,53 @@ public class Protocol_webdriver_axini_llm_modeler extends WebdriverProtocol {
     }
 
     /**
+     * This method allow users to customize the Widget and State identifiers.
+     *
+     * By default TESTAR uses the CodingManager to create the Widget and State identifiers:
+     * ConcreteID, AbstractID,
+     * Abstract_R_ID, Abstract_R_T_ID, Abstract_R_T_P_ID
+     *
+     * @param state
+     */
+    @Override
+    protected void buildStateIdentifiers(State state) {
+        super.buildStateIdentifiers(state);
+
+        // Use the LLM to create a human-readable state identifier
+        if(mode() == Modes.Generate && latestState != null && lastExecutedAction != null) {
+            String llmStateIdentifier = llmStateAbstraction.getStateIdUsingTransitions(state, latestState, lastExecutedAction, stateModelManager);
+            if(llmStateIdentifier != null && !llmStateIdentifier.isEmpty()) {
+                state.set(Tags.AbstractID, llmStateIdentifier);
+            }
+        } else if (mode() == Modes.Generate) {
+            String llmStateIdentifier = llmStateAbstraction.getStateId(state);
+            if(llmStateIdentifier != null && !llmStateIdentifier.isEmpty()) {
+                state.set(Tags.AbstractID, llmStateIdentifier);
+            }
+        }
+
+    }
+
+    /**
+     * This method allow users to customize the Actions identifiers.
+     *
+     * By default TESTAR uses the CodingManager to create the Actions identifiers:
+     * ConcreteID, AbstractID
+     *
+     * @param state
+     * @param actions
+     */
+    @Override
+    protected void buildStateActionsIdentifiers(State state, Set<Action> actions) {
+        super.buildStateActionsIdentifiers(state, actions);
+
+        // Use the action description as human-readable action identifier
+        for(Action a : actions) {
+            a.set(Tags.AbstractID, a.get(Tags.Desc));
+        }
+    }
+
+    /**
      * This is a helper method used by the default implementation of <code>buildState()</code>
      * It examines the SUT's current state and returns an oracle verdict.
      *
@@ -178,26 +190,6 @@ public class Protocol_webdriver_axini_llm_modeler extends WebdriverProtocol {
         // System crashes, non-responsiveness and suspicious tags automatically detected!
         // For web applications, web browser errors and warnings can also be enabled via settings
         Verdict verdict = super.getVerdict(state);
-
-        // Use the LLM as an Oracle to determine if the test goal has been completed
-        Verdict llmVerdict = llmOracle.getVerdict(state);
-
-        if(llmVerdict.severity() == Verdict.Severity.LLM_COMPLETE.getValue()) {
-            // Test goal was completed, retrieve next test goal from queue.
-            currentTestGoal = testGoalQueue.poll();
-
-            // Poll returns null if there are no more items remaining in the queue.
-            if(currentTestGoal == null) {
-                // No more test goals remaining, terminate sequence.
-                System.out.println("Test goal completed, but no more test goals.");
-                return llmVerdict;
-            } else {
-                System.out.println("Test goal completed, moving to next test goal.");
-                llmActionSelector.reset(currentTestGoal, true);
-                llmOracle.reset(currentTestGoal, true);
-            }
-        }
-
         return verdict;
     }
 
@@ -240,19 +232,6 @@ public class Protocol_webdriver_axini_llm_modeler extends WebdriverProtocol {
                     filteredActions.add(ac.leftClickAt(widget));
                 }
                 continue;
-            }
-
-            // slides can happen, even though the widget might be blocked
-            // addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
-
-            // type into text boxes
-            if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
-                if(whiteListed(widget) || isUnfiltered(widget)){
-                    actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(), true));
-                }else{
-                    // filtered and not white listed:
-                    filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(), true));
-                }
             }
 
             // left clicks, but ignore links outside domain
@@ -338,23 +317,12 @@ public class Protocol_webdriver_axini_llm_modeler extends WebdriverProtocol {
      */
     @Override
     protected Action selectAction(State state, Set<Action> actions) {
-        Action toExecute = llmActionSelector.selectAction(state, actions);
-
-        // We need to set a state to NOP actions
-        if(toExecute instanceof NOP) {
-            toExecute.set(Tags.OriginWidget, state);
-        }
-
-        // We need the AbstractID for the state model
-        if(toExecute.get(Tags.AbstractID, null) == null) {
-            CodingManager.buildIDs(state, Collections.singleton(toExecute));
-        }
-
+        Action toExecute = super.selectAction(state, actions);
         return toExecute;
     }
 
     private void setupOrientDB() {
-        String directoryPath = Main.settingsDir + File.separator + "webdriver_axini_llm_modeler";
+        String directoryPath = Main.settingsDir + File.separator + "webdriver_axini_llm_abstractor_modeler";
         String downloadUrl = "https://repo1.maven.org/maven2/com/orientechnologies/orientdb-community/3.2.38/orientdb-community-3.2.38.zip";
         String zipFilePath = directoryPath + "/orientdb-community-3.2.38.zip";
         String extractDir = directoryPath + "/orientdb-community-3.2.38";

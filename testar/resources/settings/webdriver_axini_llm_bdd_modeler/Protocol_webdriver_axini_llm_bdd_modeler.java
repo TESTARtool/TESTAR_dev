@@ -1,0 +1,478 @@
+/**
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
+import org.testar.CodingManager;
+import org.testar.SutVisualization;
+import org.testar.action.priorization.llm.LlmActionSelector;
+import org.testar.llm.LlmTestGoal;
+import org.testar.llm.prompt.AbstractionWebPromptGenerator;
+import org.testar.llm.prompt.ActionWebPromptGenerator;
+import org.testar.llm.prompt.OracleImagePromptGenerator;
+import org.testar.managers.InputDataManager;
+import org.testar.monkey.ConfigTags;
+import org.testar.monkey.Main;
+import org.testar.monkey.RuntimeControlsProtocol.Modes;
+import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.actions.*;
+import org.testar.monkey.alayer.exceptions.ActionBuildException;
+import org.testar.monkey.alayer.exceptions.StateBuildException;
+import org.testar.monkey.alayer.webdriver.WdDriver;
+import org.testar.monkey.alayer.webdriver.enums.WdRoles;
+import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.oracles.llm.LlmOracle;
+import org.testar.plugin.NativeLinker;
+import org.testar.protocols.WebdriverProtocol;
+import org.testar.settings.Settings;
+import org.testar.statemodel.analysis.condition.BasicConditionEvaluator;
+import org.testar.statemodel.llm.LlmStateAbstraction;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+import static org.testar.monkey.alayer.Tags.Blocked;
+import static org.testar.monkey.alayer.Tags.Enabled;
+
+public class Protocol_webdriver_axini_llm_bdd_modeler extends WebdriverProtocol {
+
+    // The LLM Action selector needs to be initialize with the settings
+    private LlmActionSelector llmActionSelector;
+    private List<LlmTestGoal> testGoals = new ArrayList<>();
+    private Queue<LlmTestGoal> testGoalQueue;
+    private LlmTestGoal currentTestGoal;
+
+    // The LLM Oracle needs to be initialize with the settings
+    private LlmOracle llmOracle;
+
+    // The LLM State Abstraction needs to be initialize with the settings
+    private LlmStateAbstraction llmStateAbstraction;
+
+    /**
+     * Called once during the life time of TESTAR
+     * This method can be used to perform initial setup work
+     *
+     * @param settings the current TESTAR settings as specified by the user.
+     */
+    @Override
+    protected void initialize(Settings settings) {
+        // Download OrientDB and initialize a testar (admin:admin) database
+        setupOrientDB();
+
+        super.initialize(settings);
+
+        // Configure the test goals
+        setupTestGoals(settings.get(ConfigTags.LlmTestGoals));
+
+        // Initialize the LlmActionSelector using the LLM settings
+        llmActionSelector = new LlmActionSelector(settings, new ActionWebPromptGenerator());
+
+        // Initialize the LlmOracle using the LLM settings
+        llmOracle = new LlmOracle(settings, new OracleImagePromptGenerator());
+
+        // Initialize the LlmStateAbstraction using the LLM settings
+        llmStateAbstraction = new LlmStateAbstraction(settings, new AbstractionWebPromptGenerator());
+    }
+
+    private void setupTestGoals(List<String> testGoalsList) {
+        for(String testGoal : testGoalsList) {
+            // Empty BasicConditionEvaluator because the test goal decision is based on an LLM
+            testGoals.add(new LlmTestGoal(testGoal, new BasicConditionEvaluator().getConditions()));
+        }
+    }
+
+    /**
+     * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
+     */
+    @Override
+    protected void preSequencePreparations() {
+        super.preSequencePreparations();
+
+        // Setup test goal queue
+        testGoalQueue = new LinkedList<>();
+        testGoalQueue.addAll(testGoals);
+        currentTestGoal = testGoalQueue.poll();
+
+        // Reset llm action selector
+        llmActionSelector.reset(currentTestGoal, false);
+        // Reset llm oracle
+        llmOracle.reset(currentTestGoal, false);
+    }
+
+    /**
+     * This method is called when TESTAR requests the state of the SUT.
+     * Here you can add additional information to the SUT's state or write your
+     * own state fetching routine. The state should have attached an oracle
+     * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
+     * state is erroneous and if so why.
+     *
+     * @return the current state of the SUT with attached oracle.
+     */
+    @Override
+    protected State getState(SUT system) throws StateBuildException {
+        State state = super.getState(system);
+
+        // Prepare state information for AXINI models
+        state.set(WdTags.WebTitle, WdDriver.getRemoteWebDriver().getTitle());
+        state.set(WdTags.WebHref, WdDriver.getRemoteWebDriver().getCurrentUrl());
+
+        // Prepare a verbose description for drawnames select options
+        for (Widget widget : state) {
+            if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT)) {
+                widget.set(Tags.Desc, widget.get(Tags.Desc).concat(siblingDesc(widget)));
+            }
+        }
+
+        return state;
+    }
+
+    private String siblingDesc(Widget widget) {
+        if (widget == null) return "";
+        Widget parent = widget.parent();
+        if (parent == null) return "";
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < parent.childCount(); i++) {
+            Widget child = parent.child(i);
+            if (child == null || child == widget) continue;
+
+            String desc = child.get(Tags.Desc, "");
+            if (!desc.isEmpty()) {
+                sb.append(": ").append(desc);
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * This method allow users to customize the Widget and State identifiers.
+     *
+     * By default TESTAR uses the CodingManager to create the Widget and State identifiers:
+     * ConcreteID, AbstractID,
+     * Abstract_R_ID, Abstract_R_T_ID, Abstract_R_T_P_ID
+     *
+     * @param state
+     */
+    @Override
+    protected void buildStateIdentifiers(State state) {
+        super.buildStateIdentifiers(state);
+
+        // Use the LLM to create a human-readable state identifier
+        if(mode() == Modes.Generate && latestState != null && lastExecutedAction != null) {
+            String llmStateIdentifier = llmStateAbstraction.getStateIdUsingTransitions(state, latestState, lastExecutedAction, stateModelManager);
+            if(llmStateIdentifier != null && !llmStateIdentifier.isEmpty()) {
+                state.set(Tags.AbstractID, llmStateIdentifier);
+            }
+        } else if (mode() == Modes.Generate) {
+            String llmStateIdentifier = llmStateAbstraction.getStateId(state);
+            if(llmStateIdentifier != null && !llmStateIdentifier.isEmpty()) {
+                state.set(Tags.AbstractID, llmStateIdentifier);
+            }
+        }
+
+    }
+
+    /**
+     * This method allow users to customize the Actions identifiers.
+     *
+     * By default TESTAR uses the CodingManager to create the Actions identifiers:
+     * ConcreteID, AbstractID
+     *
+     * @param state
+     * @param actions
+     */
+    @Override
+    protected void buildStateActionsIdentifiers(State state, Set<Action> actions) {
+        super.buildStateActionsIdentifiers(state, actions);
+
+        // Use the action description as human-readable action identifier
+        for(Action a : actions) {
+            a.set(Tags.AbstractID, a.get(Tags.Desc));
+        }
+    }
+
+    /**
+     * This is a helper method used by the default implementation of <code>buildState()</code>
+     * It examines the SUT's current state and returns an oracle verdict.
+     *
+     * @return oracle verdict, which determines whether the state is erroneous and why.
+     */
+    @Override
+    protected Verdict getVerdict(State state) {
+        // System crashes, non-responsiveness and suspicious tags automatically detected!
+        // For web applications, web browser errors and warnings can also be enabled via settings
+        Verdict verdict = super.getVerdict(state);
+
+        // Use the LLM as an Oracle to determine if the test goal has been completed
+        Verdict llmVerdict = llmOracle.getVerdict(state);
+
+        if(llmVerdict.severity() == Verdict.Severity.LLM_COMPLETE.getValue()) {
+            // Test goal was completed, retrieve next test goal from queue.
+            currentTestGoal = testGoalQueue.poll();
+
+            // Poll returns null if there are no more items remaining in the queue.
+            if(currentTestGoal == null) {
+                // No more test goals remaining, terminate sequence.
+                System.out.println("Test goal completed, but no more test goals.");
+                return llmVerdict;
+            } else {
+                System.out.println("Test goal completed, moving to next test goal.");
+                llmActionSelector.reset(currentTestGoal, true);
+                llmOracle.reset(currentTestGoal, true);
+            }
+        }
+
+        return verdict;
+    }
+
+    /**
+     * This method is used by TESTAR to determine the set of currently available actions.
+     * You can use the SUT's current state, analyze the widgets and their properties to create
+     * a set of sensible actions, such as: "Click every Button which is enabled" etc.
+     * The return value is supposed to be non-null. If the returned set is empty, TESTAR
+     * will stop generation of the current action and continue with the next one.
+     *
+     * @param system the SUT
+     * @param state  the SUT's current state
+     * @return a set of actions
+     */
+    @Override
+    protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
+        // Kill unwanted processes, force SUT to foreground
+        Set<Action> actions = super.deriveActions(system, state);
+        Set<Action> filteredActions = new HashSet<>();
+
+        // create an action compiler, which helps us create actions
+        // such as clicks, drag&drop, typing ...
+        StdActionCompiler ac = new AnnotatingActionCompiler();
+
+        // Check if forced actions are needed to stay within allowed domains
+        Set<Action> forcedActions = detectForcedActions(state, ac);
+
+        // iterate through all widgets
+        for (Widget widget : state) {
+            // only consider enabled and non-tabu widgets
+            if (!widget.get(Enabled, true)) {
+                continue;
+            }
+            // The blackListed widgets are those that have been filtered during the SPY mode with the
+            //CAPS_LOCK + SHIFT + Click clickfilter functionality.
+            if(blackListed(widget)){
+                if(isTypeable(widget)){
+                    filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(), true));
+                } else {
+                    filteredActions.add(ac.leftClickAt(widget));
+                }
+                continue;
+            }
+
+            // slides can happen, even though the widget might be blocked
+            // addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
+
+            // type into text boxes
+            if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
+                if(whiteListed(widget) || isUnfiltered(widget)){
+                    actions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(), true));
+                }else{
+                    // filtered and not white listed:
+                    filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(), true));
+                }
+            }
+
+            // left clicks, but ignore links outside domain
+            if (isAtBrowserCanvas(widget) && isClickable(widget)) {
+                if(whiteListed(widget) || isUnfiltered(widget)){
+                    if (!isLinkDenied(widget)) {
+                        actions.add(ac.leftClickAt(widget));
+                    }else{
+                        // link denied:
+                        filteredActions.add(ac.leftClickAt(widget));
+                    }
+                }else{
+                    // filtered and not white listed:
+                    filteredActions.add(ac.leftClickAt(widget));
+                }
+            }
+        }
+
+        // If we have forced actions, prioritize and filter the other ones
+        if (forcedActions != null && forcedActions.size() > 0) {
+            filteredActions = actions;
+            actions = forcedActions;
+        }
+
+        //Showing the grey dots for filtered actions if visualization is on:
+        if(visualizationOn || mode() == Modes.Spy) SutVisualization.visualizeFilteredActions(cv, state, filteredActions);
+
+        return actions;
+    }
+
+
+    @Override
+    protected boolean isClickable(Widget widget) {
+        // Required constraint for AXINI models
+        if (widget.get(WdTags.WebCssSelector, "").isEmpty()) {
+            return false;
+        }
+
+        // Next are conditions for drawnames app
+
+        // If the element is blocked, Testar can't click on or type in the widget
+        if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
+            return false;
+        }
+
+        // Top right menu button
+        if(widget.get(WdTags.WebCssClasses, "").contains("menu-hamburger-button")) {
+            return true;
+        }
+
+        // Category buttons
+        if(widget.get(WdTags.WebCssClasses, "").contains("[chip]")
+                || widget.get(WdTags.WebCssClasses, "").contains("[chip, active]")) {
+            return true;
+        }
+
+        // span element son of multi-select option div
+        if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSPAN)
+                && widget.parent() != null
+                && widget.parent().get(WdTags.WebCssClasses, "").contains("option")) {
+            return true;
+        }
+
+        return super.isClickable(widget);
+    }
+
+    @Override
+    protected boolean isTypeable(Widget widget) {
+        // If the element is blocked, Testar can't click on or type in the widget
+        if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
+            return false;
+        }
+
+        return super.isTypeable(widget);
+    }
+
+    /**
+     * Select one of the possible actions (e.g. at random)
+     *
+     * @param state   the SUT's current state
+     * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
+     * @return the selected action (non-null!)
+     */
+    @Override
+    protected Action selectAction(State state, Set<Action> actions) {
+        Action toExecute = llmActionSelector.selectAction(state, actions);
+
+        // We need to set a state to NOP actions
+        if(toExecute instanceof NOP) {
+            toExecute.set(Tags.OriginWidget, state);
+        }
+
+        // We need the AbstractID for the state model
+        if(toExecute.get(Tags.AbstractID, null) == null) {
+            CodingManager.buildIDs(state, Collections.singleton(toExecute));
+        }
+
+        return toExecute;
+    }
+
+    private void setupOrientDB() {
+        String directoryPath = Main.settingsDir + File.separator + "webdriver_axini_llm_bdd_modeler";
+        String downloadUrl = "https://repo1.maven.org/maven2/com/orientechnologies/orientdb-community/3.2.38/orientdb-community-3.2.38.zip";
+        String zipFilePath = directoryPath + "/orientdb-community-3.2.38.zip";
+        String extractDir = directoryPath + "/orientdb-community-3.2.38";
+
+        // If OrientDB already exists, we dont need to download anything
+        if(new File(extractDir).exists()) return;
+
+        try {
+            // Create the directory if it doesn't exist
+            File directory = new File(directoryPath);
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+
+            // Download the zip file
+            try (InputStream in = new URL(downloadUrl).openStream();
+                    FileOutputStream out = new FileOutputStream(zipFilePath)) {
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                while ((bytesRead = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, bytesRead);
+                }
+            }
+
+            // Extract the zip file
+            try (ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath))) {
+                ZipEntry entry;
+                while ((entry = zipIn.getNextEntry()) != null) {
+                    File filePath = new File(directoryPath, entry.getName());
+                    if (entry.isDirectory()) {
+                        filePath.mkdirs();
+                    } else {
+                        // Ensure parent directories exist
+                        File parentDir = filePath.getParentFile();
+                        if (!parentDir.exists()) {
+                            parentDir.mkdirs();
+                        }
+                        try (FileOutputStream out = new FileOutputStream(filePath)) {
+                            byte[] buffer = new byte[4096];
+                            int len;
+                            while ((len = zipIn.read(buffer)) > 0) {
+                                out.write(buffer, 0, len);
+                            }
+                        }
+                    }
+                    zipIn.closeEntry();
+                }
+            }
+
+            // Change to the bin directory and execute the command
+            ProcessBuilder processBuilder = new ProcessBuilder("cmd", "/c", "console.bat", "CREATE", "DATABASE", "plocal:../databases/testar", "admin", "admin");
+            processBuilder.directory(new File(extractDir + "/bin"));
+            processBuilder.inheritIO();
+            Process process = processBuilder.start();
+
+            // Wait for the command to complete
+            int exitCode = process.waitFor();
+            if (exitCode != 0) {
+                throw new RuntimeException("Command execution failed with exit code " + exitCode);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
