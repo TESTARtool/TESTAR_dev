@@ -138,6 +138,9 @@ public final class ConfigTags {
 	public static final Tag<String> LlmOracleFewshotFile = Tag.from("LlmOracleFewshotFile", String.class,
 			"The location of the oracle fewshot file that contains the prompt instructions");
 
+	public static final Tag<String> LlmAbstractionFewshotFile = Tag.from("LlmAbstractionFewshotFile", String.class,
+			"The location of the abstraction fewshot file that contains the prompt instructions");
+
 	public static final Tag<Float> LlmTemperature = Tag.from("LlmTemperature", Float.class,
 			"Controls the randomness of the LLM output. Value between 0 and 2.");
 

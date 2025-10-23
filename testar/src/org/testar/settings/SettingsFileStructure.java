@@ -253,6 +253,7 @@ public class SettingsFileStructure {
 				, ConfigTags.LlmAuthorizationHeader.name() + " = "
 				, ConfigTags.LlmActionFewshotFile.name() + " = "
 				, ConfigTags.LlmOracleFewshotFile.name() + " = "
+				, ConfigTags.LlmAbstractionFewshotFile.name() + " = "
 				, ConfigTags.LlmTemperature.name() + " = "
 				, ConfigTags.LlmHistorySize.name() + " = "
 				, ConfigTags.LlmStateless.name() + " = "

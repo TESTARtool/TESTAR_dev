@@ -226,6 +226,7 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(LlmTestGoals, Arrays.asList("Log in with the username john and the password demo\\nThen the message Welcome John Smith is shown")));
 		defaults.add(Pair.from(LlmActionFewshotFile, "prompts/fewshot_openai_action.json"));
 		defaults.add(Pair.from(LlmOracleFewshotFile, "prompts/fewshot_openai_oracle.json"));
+		defaults.add(Pair.from(LlmAbstractionFewshotFile, "prompts/fewshot_openai_abstraction.json"));
 		defaults.add(Pair.from(LlmTemperature, 0.2f));
 		defaults.add(Pair.from(LlmHistorySize, 5));
 		defaults.add(Pair.from(LlmStateless, true));
