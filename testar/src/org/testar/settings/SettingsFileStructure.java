@@ -250,6 +250,7 @@ public class SettingsFileStructure {
 				, ""
 				, ConfigTags.LlmPlatform.name() + " = "
 				, ConfigTags.LlmModel.name() + " = "
+				, ConfigTags.LlmReasoning.name() + " = "
 				, ConfigTags.LlmHostUrl.name() + " = "
 				, ConfigTags.LlmAuthorizationHeader.name() + " = "
 				, ConfigTags.LlmActionFewshotFile.name() + " = "

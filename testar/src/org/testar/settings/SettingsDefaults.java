@@ -221,6 +221,7 @@ public class SettingsDefaults {
 		// Settings for LLM agents
 		defaults.add(Pair.from(LlmPlatform, "OpenAI"));
 		defaults.add(Pair.from(LlmModel, ""));
+		defaults.add(Pair.from(LlmReasoning, "default"));
 		defaults.add(Pair.from(LlmHostUrl, "http://192.168.108.242:1234/v1/chat/completions"));
 		defaults.add(Pair.from(LlmAuthorizationHeader, ""));
 		defaults.add(Pair.from(LlmTestGoals, Arrays.asList("Log in with the username john and the password demo\\nThen the message Welcome John Smith is shown")));
