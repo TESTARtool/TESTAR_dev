@@ -70,8 +70,6 @@ import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.settings.Settings;
 
-import com.google.gson.Gson;
-
 public class LlmPanel extends SettingsPanel {
 
 	private static final long serialVersionUID = -5556840958014020780L;
@@ -84,7 +82,10 @@ public class LlmPanel extends SettingsPanel {
 	private JLabel labelLlmModel = new JLabel("LLM Model");
 	private JTextField fieldLlmModel = new JTextField();
 
-	private JButton buttonLlmConnection = new JButton("Check Connection");
+	private JLabel labelLlmReasoning = new JLabel("Reasoning");
+	private JComboBox<String> llmReasoningBox = new JComboBox<>(new String[]{"default", "minimal", "low", "medium", "high"});
+
+	private JButton buttonLlmConnection = new JButton("Ping");
 
 	private JLabel labelLlmHostUrl = new JLabel("LLM Host Url");
 	private JTextField fieldLlmHostUrl = new JTextField();
@@ -122,7 +123,7 @@ public class LlmPanel extends SettingsPanel {
 		labelLlmPlatform.setBounds(10, 12, 120, 27);
 		labelLlmPlatform.setToolTipText(ConfigTags.LlmPlatform.getDescription());
 		add(labelLlmPlatform);
-		llmPlatformBox.setBounds(150, 12, 100, 27);
+		llmPlatformBox.setBounds(150, 12, 80, 27);
 		llmPlatformBox.setToolTipText(ConfigTags.LlmPlatform.getDescription());
 		add(llmPlatformBox);
 		// Add an ActionListener to change the settings based on the selected platform
@@ -132,7 +133,8 @@ public class LlmPanel extends SettingsPanel {
 				switch ((String) llmPlatformBox.getSelectedItem()) {
 				case "OpenAI":
 					fieldLlmHostUrl.setText("https://api.openai.com/v1/chat/completions");
-					fieldLlmModel.setText("gpt-4o-mini");
+					fieldLlmModel.setText("gpt-5-mini");
+					llmReasoningBox.setSelectedItem("minimal");
 					buttonLlmConnection.setBackground(null);
 					fieldLlmAuthorizationHeader.setText("Bearer %OPENAI_API%");
 					fieldLlmActionFewshot.setText("prompts/fewshot_openai_action.json");
@@ -141,6 +143,7 @@ public class LlmPanel extends SettingsPanel {
 				case "Gemini":
 					fieldLlmHostUrl.setText("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=%GEMINI_API_KEY%");
 					fieldLlmModel.setText("");
+					llmReasoningBox.setSelectedItem("default");
 					buttonLlmConnection.setBackground(null);
 					fieldLlmAuthorizationHeader.setText("");
 					fieldLlmActionFewshot.setText("prompts/fewshot_gemini_action.json");
@@ -153,14 +156,21 @@ public class LlmPanel extends SettingsPanel {
 			}
 		});
 
-		labelLlmModel.setBounds(270, 12, 70, 27);
+		labelLlmModel.setBounds(240, 12, 65, 27);
 		labelLlmModel.setToolTipText(ConfigTags.LlmModel.getDescription());
 		add(labelLlmModel);
-		fieldLlmModel.setBounds(350, 12, 120, 27);
+		fieldLlmModel.setBounds(310, 12, 80, 27);
 		fieldLlmModel.setToolTipText(ConfigTags.LlmModel.getDescription());
 		add(fieldLlmModel);
 
-		buttonLlmConnection.setBounds(490, 12, 140, 27);
+		labelLlmReasoning.setBounds(395, 12, 65, 27);
+		labelLlmReasoning.setToolTipText(ConfigTags.LlmReasoning.getDescription());
+		add(labelLlmReasoning);
+		llmReasoningBox.setBounds(465, 12, 80, 27);
+		llmReasoningBox.setToolTipText(ConfigTags.LlmReasoning.getDescription());
+		add(llmReasoningBox);
+
+		buttonLlmConnection.setBounds(560, 12, 60, 27);
 		buttonLlmConnection.setToolTipText("Check the LLM connection returns 200 OK");
 		buttonLlmConnection.addActionListener(this::checkLlmConnection);
 		add(buttonLlmConnection);
@@ -218,7 +228,7 @@ public class LlmPanel extends SettingsPanel {
 		checkboxStateless.setBounds(450, 160, 120, 27);
 		checkboxStateless.setToolTipText(ConfigTags.LlmStateless.getDescription());
 		add(checkboxStateless);
-		
+
 		labelLlmTestGoalDescription.setBounds(10, 190, 460, 27);
 		labelLlmTestGoalDescription.setToolTipText(ConfigTags.LlmTestGoals.getDescription());
 		add(labelLlmTestGoalDescription);
@@ -248,11 +258,12 @@ public class LlmPanel extends SettingsPanel {
 			LlmConversation conversation = LlmFactory.createLlmConversation(
 					(String) llmPlatformBox.getSelectedItem(), 
 					fieldLlmModel.getText(), 
+					(String) llmReasoningBox.getSelectedItem(), 
 					Float.parseFloat(fieldLlmTemperature.getText()));
 
-			conversation.addMessage("user", "Hello world!");
+			conversation.addMessage("user", "Hello world! Confirm you can respond in JSON!");
 
-			String conversationJson = new Gson().toJson(conversation);
+			String conversationJson = conversation.buildRequestBody();
 
 			String testarVer = Main.TESTAR_VERSION.substring(0, Main.TESTAR_VERSION.indexOf(" "));
 
@@ -407,17 +418,8 @@ public class LlmPanel extends SettingsPanel {
 
 	@Override
 	public void populateFrom(Settings settings) {
-		String llmPlatform = settings.get(ConfigTags.LlmPlatform);
-		for (int i =0; i < llmPlatformBox.getItemCount(); i++) {
-			if (llmPlatformBox.getItemAt(i).equals("OpenAI") && llmPlatform.equals("OpenAI")) {
-				llmPlatformBox.setSelectedIndex(i);
-				break;
-			}
-			if (llmPlatformBox.getItemAt(i).equals("Gemini") && llmPlatform.equals("Gemini")) {
-				llmPlatformBox.setSelectedIndex(i);
-				break;
-			}
-		}
+		selectComboItem(llmPlatformBox, settings.get(ConfigTags.LlmPlatform));
+		selectComboItem(llmReasoningBox, settings.get(ConfigTags.LlmReasoning)); 
 
 		fieldLlmModel.setText(settings.get(ConfigTags.LlmModel));
 		fieldLlmHostUrl.setText(settings.get(ConfigTags.LlmHostUrl));
@@ -440,16 +442,22 @@ public class LlmPanel extends SettingsPanel {
 		testGoalContainer.repaint();
 	}
 
+	private static void selectComboItem(JComboBox<String> box, String value) {
+		if (box == null || value == null) return;
+		for (int i = 0; i < box.getItemCount(); i++) {
+			String item = box.getItemAt(i);
+			if (item != null && item.equalsIgnoreCase(value)) {
+				box.setSelectedIndex(i);
+				return;
+			}
+		}
+		// If not found, do nothing (keeps existing selection)
+	}
+
 	@Override
 	public void extractInformation(Settings settings) {
-		switch ((String) llmPlatformBox.getSelectedItem()) {
-		case "Gemini":
-			settings.set(ConfigTags.LlmPlatform, "Gemini");
-			break;
-
-		default:
-			settings.set(ConfigTags.LlmPlatform, "OpenAI");
-		}
+		settings.set(ConfigTags.LlmPlatform, selectedOrDefaultFromCombo(llmPlatformBox,  "OpenAI"));
+		settings.set(ConfigTags.LlmReasoning, selectedOrDefaultFromCombo(llmReasoningBox, "default"));
 
 		settings.set(ConfigTags.LlmModel, fieldLlmModel.getText());
 		settings.set(ConfigTags.LlmHostUrl, fieldLlmHostUrl.getText());
@@ -465,6 +473,22 @@ public class LlmPanel extends SettingsPanel {
 			goals.add(textArea.getText().replace("\n", "\\n").replace("\r", ""));
 		}
 		settings.set(ConfigTags.LlmTestGoals, goals);
+	}
+
+	private static String selectedOrDefaultFromCombo(JComboBox<String> box, String defaultValue) {
+		if (box == null) return defaultValue;
+
+		Object sel = box.getSelectedItem();
+		if (sel instanceof String) {
+			String s = ((String) sel).trim();
+			if (!s.isEmpty()) return s;
+		}
+
+		if (box.getItemCount() > 0) {
+			String first = box.getItemAt(0);
+			return first != null ? first : defaultValue;
+		}
+		return defaultValue;
 	}
 
 }

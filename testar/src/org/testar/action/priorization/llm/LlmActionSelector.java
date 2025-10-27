@@ -66,6 +66,7 @@ public class LlmActionSelector implements IActionSelector {
 
     private final String platform;
     private final String model;
+    private final String reasoning;
     private final String hostUrl;
     private final String authorizationHeader;
     private final String actionFewshotFile;
@@ -79,7 +80,6 @@ public class LlmActionSelector implements IActionSelector {
     private int tokens_used;
     private Integer invalidActions;
 
-    private Gson gson = new Gson();
     private String previousTestGoal = "";
     private LlmTestGoal currentTestGoal;
 
@@ -97,6 +97,7 @@ public class LlmActionSelector implements IActionSelector {
 
         this.platform = settings.get(ConfigTags.LlmPlatform);
         this.model = settings.get(ConfigTags.LlmModel);
+        this.reasoning = settings.get(ConfigTags.LlmReasoning);
         this.hostUrl = settings.get(ConfigTags.LlmHostUrl);
         this.authorizationHeader = settings.get(ConfigTags.LlmAuthorizationHeader);
         this.historySize = settings.get(ConfigTags.LlmHistorySize);
@@ -110,7 +111,7 @@ public class LlmActionSelector implements IActionSelector {
     }
 
     private void initializeConversation() {
-        conversation = LlmFactory.createLlmConversation(this.platform, this.model, this.temperature);
+        conversation = LlmFactory.createLlmConversation(this.platform, this.model, this.reasoning, this.temperature);
         conversation.initConversation(this.actionFewshotFile);
     }
 
@@ -171,9 +172,9 @@ public class LlmActionSelector implements IActionSelector {
         logger.log(Level.DEBUG, "Generated prompt: " + prompt);
         conversation.addMessage("user", prompt);
 
-        String conversationJson = gson.toJson(conversation);
+        String conversationJson = conversation.buildRequestBody();
         String llmResponse = getResponseFromLlm(conversationJson);
-        LlmParseActionResponse llmParseResponse = new LlmParseActionResponse(gson);
+        LlmParseActionResponse llmParseResponse = new LlmParseActionResponse(new Gson());
         LlmParseActionResult llmParseResult = llmParseResponse.parseLlmResponse(actions, llmResponse);
 
         switch(llmParseResult.getParseResult()) {
