@@ -35,6 +35,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.IActionSelector;
+import org.testar.ProtocolUtil;
 import org.testar.llm.prompt.IPromptActionGenerator;
 import org.testar.llm.LlmConversation;
 import org.testar.llm.LlmFactory;
@@ -45,6 +46,11 @@ import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
+import org.testar.monkey.alayer.android.AndroidProtocolUtil;
+import org.testar.monkey.alayer.ios.IOSProtocolUtil;
+import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
+import org.testar.plugin.NativeLinker;
+import org.testar.plugin.OperatingSystems;
 import org.testar.settings.Settings;
 
 import java.io.*;
@@ -170,7 +176,31 @@ public class LlmActionSelector implements IActionSelector {
                 actions, state, actionHistory, appName, currentTestGoal.getTestGoal(), previousTestGoal);
 
         logger.log(Level.DEBUG, "Generated prompt: " + prompt);
-        conversation.addMessage("user", prompt);
+        
+        if (promptGenerator.attachImage()) {
+            ByteArrayOutputStream screenshotBytes = new ByteArrayOutputStream();
+            AWTCanvas screenshot;
+            if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
+                screenshot = WdProtocolUtil.getStateshotBinary(state);
+            } else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
+                screenshot = AndroidProtocolUtil.getStateshotBinary(state);
+            } else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
+                screenshot = IOSProtocolUtil.getStateshotBinary(state);
+            }
+            else screenshot = ProtocolUtil.getStateshotBinary(state);
+
+            try {
+                screenshot.saveAsPng(screenshotBytes);
+                byte[] imageBytes = screenshotBytes.toByteArray();
+                String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+                conversation.addMessage("user", prompt, base64Image);
+            } catch (IOException e) {
+                logger.log(Level.WARN, "OracleImagePromptGenerator: Issue generating base64 image");
+                conversation.addMessage("user", prompt);
+            }
+        } else {
+            conversation.addMessage("user", prompt);
+        }
 
         String conversationJson = conversation.buildRequestBody();
         String llmResponse = getResponseFromLlm(conversationJson);

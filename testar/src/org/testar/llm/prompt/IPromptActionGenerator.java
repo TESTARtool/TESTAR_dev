@@ -44,6 +44,8 @@ public interface IPromptActionGenerator {
 
 	Tag<String> getDescriptionTag();
 
+	boolean attachImage();
+
     /**
      * Generates a prompt for action selection with large language models.
      * @param actions Available actions in the current state.

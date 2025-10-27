@@ -49,20 +49,44 @@ public class OracleAndroidPromptGenerator implements IPromptOracleGenerator {
     protected static final Logger logger = LogManager.getLogger();
 
     private final Set<Tag<String>> oracleTags;
+    private final boolean attachImage;
 
     /**
      * Creates a new oracle prompt generator for Android applications.
      */
     public OracleAndroidPromptGenerator() {
-        this(new HashSet<>(Arrays.asList(AndroidTags.AndroidText))); // AndroidTags.AndroidText is the default widget context
+        this(false);
     }
 
     /**
      * Creates a new oracle prompt generator for Android applications with a set of oracleTags. 
-     * @param oracleTags Are the tags to be used for applying the oracle.
+     * @param attachImage Indicate if an image should be attached together with the text prompt. 
+     */
+    public OracleAndroidPromptGenerator(boolean attachImage) {
+        this(new HashSet<>(Arrays.asList(AndroidTags.AndroidText)), attachImage); // AndroidTags.AndroidText is the default widget context
+    }
+
+    /**
+     * Creates a new oracle prompt generator for Android applications with a set of oracleTags. 
+     * @param oracleTags Are the tags to be used for applying the oracle. 
      */
     public OracleAndroidPromptGenerator(Set<Tag<String>> oracleTags) {
+        this(oracleTags, false); // Do not attach an image by default
+    }
+
+    /**
+     * Creates a new oracle prompt generator for Android applications with a set of oracleTags. 
+     * @param oracleTags Are the tags to be used for applying the oracle. 
+     * @param attachImage Indicate if an image should be attached together with the text prompt. 
+     */
+    public OracleAndroidPromptGenerator(Set<Tag<String>> oracleTags, boolean attachImage) {
         this.oracleTags = oracleTags;
+        this.attachImage = attachImage;
+    }
+
+    @Override
+    public boolean attachImage() {
+        return this.attachImage;
     }
 
     @Override
@@ -101,6 +125,10 @@ public class OracleAndroidPromptGenerator implements IPromptOracleGenerator {
         }
 
         builder.append(". ");
+
+        if(attachImage) {
+            builder.append("An image of the current state is attached. ");
+        }
 
         builder.append("Is the test objective met in this state?");
 
