@@ -63,20 +63,39 @@ public class ActionWebPromptGenerator implements IPromptActionGenerator {
     protected static final Logger logger = LogManager.getLogger();
 
     private final Tag<String> descriptionTag;
+    private final boolean attachImage;
 
     /**
-     * Creates a new standard prompt generator.
+     * Creates a new web prompt generator.
      */
     public ActionWebPromptGenerator() {
         this(Tags.Desc); // Tags.Desc is the default description Tag
     }
 
     /**
-     * Creates a new standard prompt generator with a specific descriptionTag
+     * Creates a new web prompt generator.
+     * @param attachImage Indicate if an image should be attached together with the text prompt.
+     */
+    public ActionWebPromptGenerator(boolean attachImage) {
+        this(Tags.Desc, attachImage); // Tags.Desc is the default description Tag
+    }
+
+    /**
+     * Creates a new web prompt generator with a specific descriptionTag
      * @param descriptionTag The tag to be used for obtaining the action/widget description.
      */
     public ActionWebPromptGenerator(Tag<String> descriptionTag) {
+        this(descriptionTag, false); // Do not attach an image by default
+    }
+
+    /**
+     * Creates a new web prompt generator with a specific descriptionTag
+     * @param descriptionTag The tag to be used for obtaining the action/widget description.
+     * @param attachImage Indicate if an image should be attached together with the text prompt.
+     */
+    public ActionWebPromptGenerator(Tag<String> descriptionTag, boolean attachImage) {
         this.descriptionTag = descriptionTag;
+        this.attachImage = attachImage;
     }
 
     @Override
@@ -84,8 +103,13 @@ public class ActionWebPromptGenerator implements IPromptActionGenerator {
         return this.descriptionTag;
     }
 
+    @Override
+    public boolean attachImage() {
+        return this.attachImage;
+    }
+
     /**
-     * Generates a standard prompt for use with large language models.
+     * Generates a web prompt for use with large language models.
      * @param actions Available actions in the current state.
      * @param state The current state.
      * @param history The action history.
@@ -109,6 +133,9 @@ public class ActionWebPromptGenerator implements IPromptActionGenerator {
 
         String pageTitle = state.get(WdTags.WebTitle, "");
         builder.append(String.format("We are currently on the following page: %s. ", pageTitle));
+        if(attachImage) {
+            builder.append("An image of the current state is attached so you can observe what actionable widgets are present and which actions were executed. ");
+        }
 
         builder.append("The following actions are available: ");
 
