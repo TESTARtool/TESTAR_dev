@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Network Oracles Test Page</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root { --gap: 1rem; }
+    body { font-family: system-ui, sans-serif; margin: 2rem; line-height: 1.5; }
+    h1, h2 { margin: 0.2rem 0 0.6rem; }
+    .row { display: flex; gap: var(--gap); align-items: center; margin: 0.5rem 0; flex-wrap: wrap; }
+    code { background: #f6f8fa; padding: 0.2rem 0.4rem; border-radius: 4px; }
+    .pill { display:inline-block; padding:0.15rem 0.5rem; border-radius:999px; font-size:0.8rem; background:#eee; }
+    .btn { appearance: none; border: 1px solid #ccc; background: #fff; padding: 0.45rem 0.8rem; border-radius: 8px; cursor: pointer; }
+    .btn:hover { background:#f3f4f6; }
+    .btn:active { transform: translateY(1px); }
+    .stack { display: grid; gap: 0.5rem; }
+    #dup-container { display:flex; gap: var(--gap); align-items: center; flex-wrap: wrap; }
+    #log { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background:#0b1020; color:#e6edf3; padding: 0.75rem; border-radius: 8px; max-height: 220px; overflow: auto; }
+  </style>
+</head>
+<body>
+  <h1>Network Oracles Test Page</h1>
+  <p>Open DevTools ➜ Network. Click the buttons below to trigger specific patterns.</p>
+
+  <h2>1) Duplicate resource</h2>
+  <div class="row">
+    <span class="pill">duplicate</span>
+    <span>Same image requested twice from <code>https://httpbin.org/image/jpeg</code></span>
+  </div>
+  <div class="row">
+    <button class="btn" id="btn-dup-fetch">Trigger duplicate image (FETCH x2)</button>
+  </div>
+
+  <h2>2) Slow resource (&gt; 2s)</h2>
+  <div class="row">
+    <span class="pill">slow</span>
+    <span>Fetch with ~2s delay via <code>https://httpbin.org/delay/2</code></span>
+  </div>
+  <div class="row">
+    <button class="btn" id="btn-slow">Trigger slow</button>
+  </div>
+
+  <h2>3) Large resource (&gt; 100 KB)</h2>
+  <div class="row">
+    <span class="pill">large</span>
+    <span>Fetch 150 KB via <code>https://httpbin.org/bytes/150000</code></span>
+  </div>
+  <div class="row">
+    <button class="btn" id="btn-large">Trigger large</button>
+  </div>
+
+  <h2>Control</h2>
+  <div class="row">
+    <span class="pill">small</span>
+    <span>Tiny 256-byte fetch via <code>https://httpbin.org/bytes/256</code></span>
+  </div>
+  <div class="row">
+    <button class="btn" id="btn-small">Trigger small</button>
+  </div>
+
+  <h2>Console mirror</h2>
+  <pre id="log" aria-live="polite"></pre>
+
+  <script>
+    // Utility: mirror logs into the on-page <pre> for quick visibility
+    const logEl = document.getElementById('log');
+    function logLine(s) {
+      const ts = new Date().toISOString().split('T')[1].replace('Z','');
+      logEl.textContent += `[${ts}] ${s}\n`;
+      logEl.scrollTop = logEl.scrollHeight;
+      console.log(s);
+    }
+
+    // Generic network fire helper:
+    // - 'no-cache' to avoid stale hits across runs (still allows caches to revalidate)
+    // - 'no-cors' so opaque responses don't trigger CORS errors but still appear in Network
+    function fire(url, opts = {}) {
+      const finalOpts = Object.assign({
+        cache: 'no-cache',
+        mode: 'no-cors'
+      }, opts);
+      const t0 = performance.now();
+      return fetch(url, finalOpts)
+        .then(() => {
+          const dt = Math.round(performance.now() - t0);
+          logLine(`[REQ OK] ${url} (${dt}ms)`);
+        })
+        .catch(err => {
+          const dt = Math.round(performance.now() - t0);
+          logLine(`[REQ ERR] ${url} (${dt}ms): ${err}`);
+        });
+    }
+
+    // --- Buttons wiring ---
+    const URLS = {
+      img: 'https://httpbin.org/image/jpeg',
+      slow: 'https://httpbin.org/delay/2',          // ~2s delay
+      large: 'https://httpbin.org/bytes/150000',    // ~150 KB
+      small: 'https://httpbin.org/bytes/256'
+    };
+
+    // Duplicate via fetch(): request the EXACT same URL twice quickly.
+    // Use cache:'reload' to encourage a conditional revalidation (visible as two requests).
+    document.getElementById('btn-dup-fetch').addEventListener('click', async () => {
+      logLine('[DUP FETCH] firing twice: ' + URLS.img);
+      await fire(URLS.img, { cache: 'reload' });
+      // small gap so they don't get merged in certain views
+      setTimeout(() => fire(URLS.img, { cache: 'reload' }), 120);
+    });
+
+    // 2) Slow
+    document.getElementById('btn-slow').addEventListener('click', () => {
+      fire(URLS.slow);
+    });
+
+    // 3) Large
+    document.getElementById('btn-large').addEventListener('click', () => {
+      fire(URLS.large);
+    });
+
+    // Control: small
+    document.getElementById('btn-small').addEventListener('click', () => {
+      fire(URLS.small);
+    });
+
+    // Initial baseline request (so you have at least one entry when loading the page)
+    fire(URLS.small);
+  </script>
+</body>
+</html>
