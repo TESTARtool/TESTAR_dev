@@ -34,7 +34,6 @@ import org.testar.action.priorization.llm.LlmActionSelector;
 import org.testar.llm.LlmTestGoal;
 import org.testar.llm.prompt.AbstractionWebPromptGenerator;
 import org.testar.llm.prompt.ActionWebPromptGenerator;
-import org.testar.llm.prompt.OracleImagePromptGenerator;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;

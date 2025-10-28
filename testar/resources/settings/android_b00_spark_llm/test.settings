@@ -32,7 +32,7 @@ SUTConnectorValue = ./settings/android_b00_spark_llm/DesiredCapabilities.json
 #################################################################
 
 Sequences = 1
-SequenceLength = 10
+SequenceLength = 20
 
 #################################################################
 # Oracles based on suspicious tag values
@@ -122,7 +122,7 @@ ResetDataStore = false
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WidgetTitle
+AbstractStateAttributes = WidgetTitle,WidgetPath
 
 #################################################################
 # LLM agents settings
@@ -132,9 +132,10 @@ AbstractStateAttributes = WidgetTitle
 #################################################################
 
 LlmPlatform = OpenAI
-LlmModel = gemma2:9b
-LlmHostUrl = http://10.102.0.41:11434/v1/chat/completions
-LlmAuthorizationHeader = 
+LlmModel = gpt-5
+LlmReasoning = low
+LlmHostUrl = https://api.openai.com/v1/chat/completions
+LlmAuthorizationHeader = Bearer %OPENAI_API%
 LlmActionFewshotFile = prompts/fewshot_openai_action.json
 LlmOracleFewshotFile = prompts/fewshot_openai_oracle.json
 LlmTemperature = 0.2

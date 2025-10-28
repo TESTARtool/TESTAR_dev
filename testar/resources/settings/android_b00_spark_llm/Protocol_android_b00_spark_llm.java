@@ -93,10 +93,10 @@ public class Protocol_android_b00_spark_llm extends AndroidProtocol {
 		setupTestGoals(settings.get(ConfigTags.LlmTestGoals));
 
 		// Initialize the LlmActionSelector using the LLM settings
-		llmActionSelector = new LlmActionSelector(settings, new ActionStandardPromptGenerator(AndroidTags.AndroidText));
+		llmActionSelector = new LlmActionSelector(settings, new ActionStandardPromptGenerator(AndroidTags.AndroidText, true));
 
 		// Initialize the LlmOracle using the LLM settings
-		llmOracle = new LlmOracle(settings, new OracleAndroidPromptGenerator());
+		llmOracle = new LlmOracle(settings, new OracleAndroidPromptGenerator(true));
 	}
 
 	private void setupTestGoals(List<String> testGoalsList) {
@@ -199,7 +199,7 @@ public class Protocol_android_b00_spark_llm extends AndroidProtocol {
 		// Type username
 		waitLeftClickAndTypeIntoWidgetWithMatchingTag(AndroidTags.AndroidHint, "username", "testar", state, system, 5, 2);
 		// Type password
-		waitLeftClickAndTypeIntoWidgetWithMatchingTag(AndroidTags.AndroidHint, "•••••••••", "testar", state, system, 5, 2);
+		waitLeftClickAndTypeIntoWidgetWithMatchingTag(AndroidTags.AndroidHint, "••••", "testar", state, system, 5, 2);
 		// Click Sign In
 		waitAndLeftClickWidgetWithMatchingTag(AndroidTags.AndroidText, "Submit", state, system, 5, 2);
 	}
@@ -220,7 +220,6 @@ public class Protocol_android_b00_spark_llm extends AndroidProtocol {
 		Action typeAction = new AndroidActionType(state, widget, 
 				textToType,
 				widget.get(AndroidTags.AndroidAccessibilityId,""),
-				widget.get(AndroidTags.AndroidText,""),
 				widget.get(AndroidTags.AndroidClassName,""));
 		return typeAction;
 	}
@@ -306,7 +305,6 @@ public class Protocol_android_b00_spark_llm extends AndroidProtocol {
 						new AndroidActionType(state, widget,
 								InputDataManager.getRandomTextInputData(widget),
 								widget.get(AndroidTags.AndroidAccessibilityId,""),
-								widget.get(AndroidTags.AndroidText,""),
 								widget.get(AndroidTags.AndroidClassName,""))
 						);
 			}

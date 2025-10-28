@@ -1,0 +1,16 @@
+Feature: Complete the Welcome Survey
+  As a signed-in user
+  I want to complete the Welcome Survey
+  So that my question responses are sent
+
+  Background:
+    Given I am signed in
+    And I can see the Welcome Survey
+
+  Scenario: Complete the Welcome Survey
+    When I start the Welcome Survey
+    And I arrived at 3:15 AM
+    And I dont feel in a good mood today
+    And I plan to come back again tomorrow
+    And I have sent all responses
+    Then the Welcome Survey should be completed

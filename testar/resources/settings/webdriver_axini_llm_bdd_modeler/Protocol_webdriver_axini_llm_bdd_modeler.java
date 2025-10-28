@@ -34,7 +34,7 @@ import org.testar.action.priorization.llm.LlmActionSelector;
 import org.testar.llm.LlmTestGoal;
 import org.testar.llm.prompt.AbstractionWebPromptGenerator;
 import org.testar.llm.prompt.ActionWebPromptGenerator;
-import org.testar.llm.prompt.OracleImagePromptGenerator;
+import org.testar.llm.prompt.OracleWebPromptGenerator;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
@@ -99,7 +99,7 @@ public class Protocol_webdriver_axini_llm_bdd_modeler extends WebdriverProtocol 
         llmActionSelector = new LlmActionSelector(settings, new ActionWebPromptGenerator());
 
         // Initialize the LlmOracle using the LLM settings
-        llmOracle = new LlmOracle(settings, new OracleImagePromptGenerator());
+        llmOracle = new LlmOracle(settings, new OracleWebPromptGenerator(true));
 
         // Initialize the LlmStateAbstraction using the LLM settings
         llmStateAbstraction = new LlmStateAbstraction(settings, new AbstractionWebPromptGenerator());

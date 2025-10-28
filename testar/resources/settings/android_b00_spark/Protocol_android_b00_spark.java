@@ -150,7 +150,6 @@ public class Protocol_android_b00_spark extends AndroidProtocol {
 		Action typeAction = new AndroidActionType(state, widget, 
 				textToType,
 				widget.get(AndroidTags.AndroidAccessibilityId,""),
-				widget.get(AndroidTags.AndroidText,""),
 				widget.get(AndroidTags.AndroidClassName,""));
 		return typeAction;
 	}
@@ -219,7 +218,6 @@ public class Protocol_android_b00_spark extends AndroidProtocol {
 						new AndroidActionType(state, widget,
 								InputDataManager.getRandomTextInputData(widget),
 								widget.get(AndroidTags.AndroidAccessibilityId,""),
-								widget.get(AndroidTags.AndroidText,""),
 								widget.get(AndroidTags.AndroidClassName,""))
 						);
 			}

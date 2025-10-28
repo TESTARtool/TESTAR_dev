@@ -34,7 +34,7 @@ import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
 import org.testar.llm.LlmTestGoal;
 import org.testar.llm.prompt.ActionWebPromptGenerator;
-import org.testar.llm.prompt.OracleImagePromptGenerator;
+import org.testar.llm.prompt.OracleWebPromptGenerator;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Util;
@@ -84,7 +84,7 @@ public class Protocol_webdriver_mendix_llm extends WebdriverProtocol {
 		llmActionSelector = new LlmActionSelector(settings, new ActionWebPromptGenerator());
 
 		// Initialize the LlmOracle using the LLM settings
-		llmOracle = new LlmOracle(settings, new OracleImagePromptGenerator());
+		llmOracle = new LlmOracle(settings, new OracleWebPromptGenerator(true));
 	}
 
 	/**

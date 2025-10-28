@@ -1,0 +1,85 @@
+Feature: Create Welcome Survey
+  As a signed-in user
+  I want to create a new Welcome Survey
+  So that users will be able to create questions
+
+  Background:
+    Given I am signed in
+    And I can see my dashboard
+
+  Scenario: Create a new Welcome Survey
+    When I navigate to the Emotional State Questionnaires
+    And I select to add a new question set
+    And I set the survey title to 'Welcome Survey'
+    And I set the survey ID to 'welcome123'
+    And I set the description to 'This is a Welcome Survey'
+    And I click the 'Continue' button
+    Then the 'Welcome Survey' should be created
+    And the question set editor should be displayed
+;
+Feature: Add a Time Question to the Welcome Survey
+  As a signed-in user
+  I want to create and save a new Time question
+  So that it becomes part of the Welcome survey
+
+  Background:
+    Given I am signed in
+    And I have access to the Welcome survey in the Emotional State Questionnaires
+
+  Scenario: Successful creation of a Time question in the Welcome survey
+    When I navigate to the Welcome survey
+    And I select a new Time question
+    And I add a new question with the ID 'time123'
+    And I set the question text to 'What time did you arrive?'
+    And I save the question set
+    Then a message appears indicating the survey activity has been updated
+;
+Feature: Add a Short Answer Question to the Welcome Survey
+  As a signed-in user
+  I want to create and save a Short Answer new question
+  So that it becomes part of the Welcome survey
+
+  Background:
+    Given I am signed in
+    And I have access to the Welcome survey in the Emotional State Questionnaires
+
+  Scenario: Successful creation of a Short Answer question in the Welcome survey
+    When I navigate to the Welcome survey
+    And I select a new Short Answer question
+    And I add a new question with the ID 'feel123'
+    And I set the question text to 'Describe how do you feel today'
+    And I save the question set
+    Then a message appears indicating the survey activity has been updated
+;
+Feature: Add a Boolean Question to the Welcome Survey
+  As a signed-in user
+  I want to create and save a new Boolean question
+  So that it becomes part of the Welcome survey
+
+  Background:
+    Given I am signed in
+    And I have access to the Welcome survey in the Emotional State Questionnaires
+
+  Scenario: Successful creation of a Boolean question in the Welcome survey
+    When I navigate to the Welcome survey
+    And I select a new Boolean question
+    And I add a new question with the ID 'tomorrow123'
+    And I set the question text to 'Are you coming tomorrow?'
+    And I save the question set
+    Then a message appears indicating the survey activity has been updated
+;
+Feature: Publish the Welcome Survey
+  As a signed-in user
+  I want to publish the Welcome Survey
+  So that users will be able to complete it
+
+  Background:
+    Given I am signed in
+    And I have access to the Welcome survey in the Emotional State Questionnaires
+
+  Scenario: Successful publication of the Welcome survey
+    When I navigate to the Welcome survey
+    And I select to publish the three questions
+    And I observe the new Question Set
+    Then the Welcome Survey appears as Published
+    
