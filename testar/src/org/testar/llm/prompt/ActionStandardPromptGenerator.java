@@ -126,7 +126,7 @@ public class ActionStandardPromptGenerator implements IPromptActionGenerator {
         }
 
         if(attachImage) {
-            builder.append("An image of the current state is attached. ");
+            builder.append("An image of the current state is attached so you can observe what actionable widgets are present and which actions were executed. ");
         }
 
         builder.append("The following actions are available: ");
