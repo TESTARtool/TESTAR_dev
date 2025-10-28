@@ -66,6 +66,7 @@ public class TextVisualizerTest {
         textVisualizer.run(new StateStub(), mockCanvas, updatedPen);
     }
 
+    @Test
     public void test_run_catched_null_position() {
         TextVisualizer textVisualizer = new TextVisualizer(new AbsolutePosition(1, 1), originalText, originalPen);
         Canvas mockCanvas = Mockito.mock(Canvas.class);
