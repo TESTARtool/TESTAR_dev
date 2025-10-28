@@ -184,7 +184,7 @@ public class LlmParseActionResponse {
             }
         }
 
-        return false;
+        return updateTextAction(action, action, inputText);
     }
 
     private boolean updateTextAction(Action action, Action innerAction, String inputText) {
