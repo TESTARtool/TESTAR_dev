@@ -4,17 +4,40 @@ package multi;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Widget;
-import org.testar.oracles.Oracle;
+import org.testar.oracles.DslOracle;
 
 public class testing {
    
-   public static class SubmitButtonMustBeEnabled$57 implements Oracle {
+  public static class WelcomeJohnSmithIsVisible$79 extends DslOracle {
+    /*
+     assert static_text "Welcome John Smith" is visible "Welcome John Smith is visible".
+    */
+    
+    @Override
+    public String getMessage() {
+      return "Welcome John Smith is visible";
+    }
+    
+    @Override
+    public Verdict getVerdict(State state) {
+       Verdict verdict = Verdict.OK;
+       Widget widget$35$32 = getWidget("static_text", "Welcome John Smith", state);
+       if (widget$35$32 == null) {
+         return Verdict.OK;
+       }
+       boolean cond$68 = evaluateIsStatus(widget$35$32, "visible");
+       if (!cond$68) { 
+         verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$35$32)); 
+       }
+       markAsNonVacuous();
+       return verdict;
+    }
+  }
+  
+   public static class SubmitButtonMustBeEnabled$94 extends DslOracle {
      /*
       assert button "btn_submit" is enabled "submit button must be enabled".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -24,23 +47,23 @@ public class testing {
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$26$19 = getWidget("button", "btn_submit", state);
-        if (widget$26$19 == null) {
+        Widget widget$63$19 = getWidget("button", "btn_submit", state);
+        if (widget$63$19 == null) {
           return Verdict.OK;
         }
-        boolean cond$46 = evaluateIsStatus(widget$26$19, "enabled");
-        if (!cond$46) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$26$19)); }
+        boolean cond$83 = evaluateIsStatus(widget$63$19, "enabled");
+        if (!cond$83) { 
+          verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$63$19)); 
+        }
+        markAsNonVacuous();
         return verdict;
      }
    }
    
-   public static class EmailInputMustBeFilled$133 implements Oracle {
+   public static class EmailInputMustBeFilled$170 extends DslOracle {
      /*
       assert input_text "input_email" is filled "email input must be filled".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -50,23 +73,23 @@ public class testing {
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$98$24 = getWidget("input_text", "input_email", state);
-        if (widget$98$24 == null) {
+        Widget widget$135$24 = getWidget("input_text", "input_email", state);
+        if (widget$135$24 == null) {
           return Verdict.OK;
         }
-        boolean cond$123 = evaluateIsStatus(widget$98$24, "filled");
-        if (!cond$123) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$98$24)); }
+        boolean cond$160 = evaluateIsStatus(widget$135$24, "filled");
+        if (!cond$160) { 
+          verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$135$24)); 
+        }
+        markAsNonVacuous();
         return verdict;
      }
    }
    
-   public static class AgeInputMustBeEnabled$208 implements Oracle {
+   public static class AgeInputMustBeEnabled$245 extends DslOracle {
      /*
       assert input_numeric "input_age" is enabled "age input must be enabled".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -76,23 +99,23 @@ public class testing {
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$171$25 = getWidget("input_numeric", "input_age", state);
-        if (widget$171$25 == null) {
+        Widget widget$208$25 = getWidget("input_numeric", "input_age", state);
+        if (widget$208$25 == null) {
           return Verdict.OK;
         }
-        boolean cond$197 = evaluateIsStatus(widget$171$25, "enabled");
-        if (!cond$197) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$171$25)); }
+        boolean cond$234 = evaluateIsStatus(widget$208$25, "enabled");
+        if (!cond$234) { 
+          verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$208$25)); 
+        }
+        markAsNonVacuous();
         return verdict;
      }
    }
    
-   public static class StaticTextMustContainWelcome$290 implements Oracle {
+   public static class StaticTextMustContainWelcome$327 extends DslOracle {
      /*
       assert static_text "static_info" contains "Welcome" "static text must contain welcome".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -102,23 +125,23 @@ public class testing {
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$245$25 = getWidget("static_text", "static_info", state);
-        if (widget$245$25 == null) {
+        Widget widget$282$25 = getWidget("static_text", "static_info", state);
+        if (widget$282$25 == null) {
           return Verdict.OK;
         }
-        boolean cond$271 = evaluateContains(widget$245$25, "Welcome");
-        if (!cond$271) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$245$25)); }
+        boolean cond$308 = evaluateContains(widget$282$25, "Welcome");
+        if (!cond$308) { 
+          verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$282$25)); 
+        }
+        markAsNonVacuous();
         return verdict;
      }
    }
    
-   public static class TermsMustBeAccepted$366 implements Oracle {
+   public static class TermsMustBeAccepted$403 extends DslOracle {
      /*
       assert checkbox "chk_terms" is checked "terms must be accepted".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -128,23 +151,23 @@ public class testing {
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$334$20 = getWidget("checkbox", "chk_terms", state);
-        if (widget$334$20 == null) {
+        Widget widget$371$20 = getWidget("checkbox", "chk_terms", state);
+        if (widget$371$20 == null) {
           return Verdict.OK;
         }
-        boolean cond$355 = evaluateIsStatus(widget$334$20, "checked");
-        if (!cond$355) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$334$20)); }
+        boolean cond$392 = evaluateIsStatus(widget$371$20, "checked");
+        if (!cond$392) { 
+          verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$371$20)); 
+        }
+        markAsNonVacuous();
         return verdict;
      }
    }
    
-   public static class GenderMustHaveOptions$448 implements Oracle {
+   public static class GenderMustHaveOptions$485 extends DslOracle {
      /*
       assert radiogroup "gender_group" has nonempty options "gender must have options".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -154,23 +177,23 @@ public class testing {
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$401$25 = getWidget("radiogroup", "gender_group", state);
-        if (widget$401$25 == null) {
+        Widget widget$438$25 = getWidget("radiogroup", "gender_group", state);
+        if (widget$438$25 == null) {
           return Verdict.OK;
         }
-        boolean cond$427 = evaluateHasAttribute(widget$401$25, "options");
-        if (!cond$427) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$401$25)); }
+        boolean cond$464 = evaluateHasAttribute(widget$438$25, "options");
+        if (!cond$464) { 
+          verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$438$25)); 
+        }
+        markAsNonVacuous();
         return verdict;
      }
    }
    
-   public static class CountrySelectMustHaveItems$531 implements Oracle {
+   public static class CountrySelectMustHaveItems$568 extends DslOracle {
      /*
       assert dropdown "country_select" has nonempty options "country select must have items".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -180,23 +203,23 @@ public class testing {
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$484$25 = getWidget("dropdown", "country_select", state);
-        if (widget$484$25 == null) {
+        Widget widget$521$25 = getWidget("dropdown", "country_select", state);
+        if (widget$521$25 == null) {
           return Verdict.OK;
         }
-        boolean cond$510 = evaluateHasAttribute(widget$484$25, "options");
-        if (!cond$510) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$484$25)); }
+        boolean cond$547 = evaluateHasAttribute(widget$521$25, "options");
+        if (!cond$547) { 
+          verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$521$25)); 
+        }
+        markAsNonVacuous();
         return verdict;
      }
    }
    
-   public static class StatusLabelMustShowActive$626 implements Oracle {
+   public static class StatusLabelMustShowActive$663 extends DslOracle {
      /*
       assert label "lbl_status".text is equal to "Status: Active" "status label must show active".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -206,24 +229,24 @@ public class testing {
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$573$18 = getWidget("label", "lbl_status", state);
-        if (widget$573$18 == null) {
+        Widget widget$610$18 = getWidget("label", "lbl_status", state);
+        if (widget$610$18 == null) {
           return Verdict.OK;
         }
-        Object widget$573$23 = getProperty(widget$573$18, "text");
-        boolean cond$597 = evaluateIsEqualTo(widget$573$23, "Status: Active");
-        if (!cond$597) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$573$18)); }
+        Object widget$610$23 = getProperty(widget$610$18, "text");
+        boolean cond$634 = evaluateIsEqualTo(widget$610$23, "Status: Active");
+        if (!cond$634) { 
+          verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$610$18)); 
+        }
+        markAsNonVacuous();
         return verdict;
      }
    }
    
-   public static class LogoImageMustBeVisible$696 implements Oracle {
+   public static class LogoImageMustBeVisible$733 extends DslOracle {
      /*
       assert image "img_logo" is onscreen "logo image must be visible".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -233,23 +256,23 @@ public class testing {
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$667$16 = getWidget("image", "img_logo", state);
-        if (widget$667$16 == null) {
+        Widget widget$704$16 = getWidget("image", "img_logo", state);
+        if (widget$704$16 == null) {
           return Verdict.OK;
         }
-        boolean cond$684 = evaluateIsStatus(widget$667$16, "onscreen");
-        if (!cond$684) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$667$16)); }
+        boolean cond$721 = evaluateIsStatus(widget$704$16, "onscreen");
+        if (!cond$721) { 
+          verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$704$16)); 
+        }
+        markAsNonVacuous();
         return verdict;
      }
    }
    
-   public static class HomeLinkMustBeClickable$764 implements Oracle {
+   public static class HomeLinkMustBeClickable$801 extends DslOracle {
      /*
       assert link "lnk_home" is clickable "home link must be clickable".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -259,23 +282,23 @@ public class testing {
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$735$15 = getWidget("link", "lnk_home", state);
-        if (widget$735$15 == null) {
+        Widget widget$772$15 = getWidget("link", "lnk_home", state);
+        if (widget$772$15 == null) {
           return Verdict.OK;
         }
-        boolean cond$751 = evaluateIsStatus(widget$735$15, "clickable");
-        if (!cond$751) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$735$15)); }
+        boolean cond$788 = evaluateIsStatus(widget$772$15, "clickable");
+        if (!cond$788) { 
+          verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$772$15)); 
+        }
+        markAsNonVacuous();
         return verdict;
      }
    }
    
-   public static class AlertMustBeVisible$836 implements Oracle {
+   public static class AlertMustBeVisible$873 extends DslOracle {
      /*
       assert alert "alert_warning" is visible "alert must be visible".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -285,50 +308,23 @@ public class testing {
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$803$21 = getWidget("alert", "alert_warning", state);
-        if (widget$803$21 == null) {
+        Widget widget$840$21 = getWidget("alert", "alert_warning", state);
+        if (widget$840$21 == null) {
           return Verdict.OK;
         }
-        boolean cond$825 = evaluateIsStatus(widget$803$21, "visible");
-        if (!cond$825) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$803$21)); }
+        boolean cond$862 = evaluateIsStatus(widget$840$21, "visible");
+        if (!cond$862) { 
+          verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$840$21)); 
+        }
+        markAsNonVacuous();
         return verdict;
      }
    }
    
-   public static class PanelChildrenMustBeEnabled$907 implements Oracle {
-     /*
-      assert menu "menu_main".children are enabled "panel children must be enabled".
-     */
-   
-     @Override
-     public void initialize() { }
-   
-     @Override
-     public String getMessage() {
-       return "panel children must be enabled";
-     }
-   
-     @Override
-     public Verdict getVerdict(State state) {
-        Verdict verdict = Verdict.OK;
-        Widget widget$869$16 = getWidget("menu", "menu_main", state);
-        if (widget$869$16 == null) {
-          return Verdict.OK;
-        }
-        Object widget$869$25 = getProperty(widget$869$16, "children");
-        boolean cond$895 = evaluateAreStatus((java.util.List<Object>)widget$869$25, "enabled");
-        if (!cond$895) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$869$16)); }
-        return verdict;
-     }
-   }
-   
-   public static class GenericElementVisibleIfEnabled$1005 implements Oracle {
+   public static class GenericElementVisibleIfEnabled$962 extends DslOracle {
      /*
       assert element "generic_element" is visible when it is enabled "generic element visible if enabled".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -338,26 +334,26 @@ public class testing {
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$949$25 = getWidget("element", "generic_element", state);
-        if (widget$949$25 == null) {
+        Widget widget$906$25 = getWidget("element", "generic_element", state);
+        if (widget$906$25 == null) {
           return Verdict.OK;
         }
-        boolean cond$994 = evaluateIsStatus(widget$949$25, "enabled");
-        if (cond$994) {
-          boolean cond$975 = evaluateIsStatus(widget$949$25, "visible");
-          if (!cond$975) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$949$25)); }
+        boolean cond$951 = evaluateIsStatus(widget$906$25, "enabled");
+        if (cond$951) {
+          boolean cond$932 = evaluateIsStatus(widget$906$25, "visible");
+          if (!cond$932) { 
+            verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$906$25)); 
+          }
+          markAsNonVacuous();
         }
         return verdict;
      }
    }
    
-   public static class HiddenButtonMustNotBeVisible$1117 implements Oracle {
+   public static class HiddenButtonMustNotBeVisible$1074 extends DslOracle {
      /*
       assert button "btn_hidden" not is visible "hidden button must not be visible".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -367,23 +363,23 @@ public class testing {
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$1082$19 = getWidget("button", "btn_hidden", state);
-        if (widget$1082$19 == null) {
+        Widget widget$1039$19 = getWidget("button", "btn_hidden", state);
+        if (widget$1039$19 == null) {
           return Verdict.OK;
         }
-        boolean cond$1102 = !(evaluateIsStatus(widget$1082$19, "visible"));
-        if (!cond$1102) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$1082$19)); }
+        boolean cond$1059 = !(evaluateIsStatus(widget$1039$19, "visible"));
+        if (!cond$1059) { 
+          verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$1039$19)); 
+        }
+        markAsNonVacuous();
         return verdict;
      }
    }
    
-   public static class OffscreenButtonMustNotBeOnscreen$1201 implements Oracle {
+   public static class OffscreenButtonMustNotBeOnscreen$1158 extends DslOracle {
      /*
       assert button "btn_offscreen" not is onscreen "offscreen button must not be onscreen".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -393,23 +389,23 @@ public class testing {
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$1162$22 = getWidget("button", "btn_offscreen", state);
-        if (widget$1162$22 == null) {
+        Widget widget$1119$22 = getWidget("button", "btn_offscreen", state);
+        if (widget$1119$22 == null) {
           return Verdict.OK;
         }
-        boolean cond$1185 = !(evaluateIsStatus(widget$1162$22, "onscreen"));
-        if (!cond$1185) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$1162$22)); }
+        boolean cond$1142 = !(evaluateIsStatus(widget$1119$22, "onscreen"));
+        if (!cond$1142) { 
+          verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$1119$22)); 
+        }
+        markAsNonVacuous();
         return verdict;
      }
    }
    
-   public static class DisabledButtonMustNotBeEnabled$1287 implements Oracle {
+   public static class DisabledButtonMustNotBeEnabled$1244 extends DslOracle {
      /*
       assert button "btn_disabled" not is enabled "disabled button must not be enabled".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -419,23 +415,23 @@ public class testing {
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$1250$21 = getWidget("button", "btn_disabled", state);
-        if (widget$1250$21 == null) {
+        Widget widget$1207$21 = getWidget("button", "btn_disabled", state);
+        if (widget$1207$21 == null) {
           return Verdict.OK;
         }
-        boolean cond$1272 = !(evaluateIsStatus(widget$1250$21, "enabled"));
-        if (!cond$1272) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$1250$21)); }
+        boolean cond$1229 = !(evaluateIsStatus(widget$1207$21, "enabled"));
+        if (!cond$1229) { 
+          verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$1207$21)); 
+        }
+        markAsNonVacuous();
         return verdict;
      }
    }
    
-   public static class EmptyInputMustNotBeFilled$1373 implements Oracle {
+   public static class EmptyInputMustNotBeFilled$1330 extends DslOracle {
      /*
       assert input_text "input_empty" not is filled "empty input must not be filled".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -445,23 +441,23 @@ public class testing {
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$1334$24 = getWidget("input_text", "input_empty", state);
-        if (widget$1334$24 == null) {
+        Widget widget$1291$24 = getWidget("input_text", "input_empty", state);
+        if (widget$1291$24 == null) {
           return Verdict.OK;
         }
-        boolean cond$1359 = !(evaluateIsStatus(widget$1334$24, "filled"));
-        if (!cond$1359) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$1334$24)); }
+        boolean cond$1316 = !(evaluateIsStatus(widget$1291$24, "filled"));
+        if (!cond$1316) { 
+          verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$1291$24)); 
+        }
+        markAsNonVacuous();
         return verdict;
      }
    }
    
-   public static class DisabledCheckboxMustNotBeEnabled$1454 implements Oracle {
+   public static class DisabledCheckboxMustNotBeEnabled$1411 extends DslOracle {
      /*
       assert checkbox "chk_disabled" not is enabled "disabled checkbox must not be enabled".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -471,55 +467,55 @@ public class testing {
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$1415$23 = getWidget("checkbox", "chk_disabled", state);
-        if (widget$1415$23 == null) {
+        Widget widget$1372$23 = getWidget("checkbox", "chk_disabled", state);
+        if (widget$1372$23 == null) {
           return Verdict.OK;
         }
-        boolean cond$1439 = !(evaluateIsStatus(widget$1415$23, "enabled"));
-        if (!cond$1439) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$1415$23)); }
+        boolean cond$1396 = !(evaluateIsStatus(widget$1372$23, "enabled"));
+        if (!cond$1396) { 
+          verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$1372$23)); 
+        }
+        markAsNonVacuous();
         return verdict;
      }
    }
-
-   public static class LabelTextMustBeVisible$1518 implements Oracle {
-       /*
-        assert for all label it.color not is equal to it.backgroundColor "label text must be visible".
-        */
-
-       @Override
-       public void initialize() { }
-
-       @Override
-       public String getMessage() {
-           return "label text must be visible";
-       }
-
-       @Override
-       public Verdict getVerdict(State state) {
-           Verdict verdict = Verdict.OK;
-           for (Widget $it: getWidgets("label", state)) {
-
-               Object widget$1474$8 = getProperty($it, "color");
-               boolean cond$1483 = !(evaluateIsEqualTo(widget$1474$8, new java.util.function.Supplier<Object>() {
-                   public Object get() {
-
-                       Object widget$1499$18 = getProperty($it, "backgroundColor");
-                       return widget$1499$18; 
-                   }  
-               }.get()));
-               if (!cond$1483) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), $it)); }
-           }
-           return verdict;
-       }
-   }
-
-   public static class ImageMustLackAlttext$1637 implements Oracle {
+   
+   public static class LabelTextMustBeVisible$1518 extends DslOracle {
      /*
-      assert for all image it.alttext is equal to "" "image must lack alttext".
+      assert for all label it.color not is equal to it.backgroundColor "label text must be visible".
      */
    
      @Override
-     public void initialize() { }
+     public String getMessage() {
+       return "label text must be visible";
+     }
+   
+     @Override
+     public Verdict getVerdict(State state) {
+        Verdict verdict = Verdict.OK;
+        for (Widget $it: getWidgets("label", state)) {
+          
+          Object widget$1474$8 = getProperty($it, "color");
+          boolean cond$1483 = !(evaluateIsEqualTo(widget$1474$8, new java.util.function.Supplier<Object>() {
+           public Object get() {
+             
+             Object widget$1499$18 = getProperty($it, "backgroundColor");
+             return widget$1499$18; 
+           }  
+          }.get()));
+          if (!cond$1483) { 
+            verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), $it)); 
+          }
+          markAsNonVacuous();
+        }
+        return verdict;
+     }
+   }
+   
+   public static class ImageMustLackAlttext$1596 extends DslOracle {
+     /*
+      assert for all image it.alttext is equal to "" "image must lack alttext".
+     */
    
      @Override
      public String getMessage() {
@@ -531,21 +527,21 @@ public class testing {
         Verdict verdict = Verdict.OK;
         for (Widget $it: getWidgets("image", state)) {
           
-          Object widget$1611$10 = getProperty($it, "alttext");
-          boolean cond$1622 = evaluateIsEqualTo(widget$1611$10, "");
-          if (!cond$1622) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), $it)); }
+          Object widget$1570$10 = getProperty($it, "alttext");
+          boolean cond$1581 = evaluateIsEqualTo(widget$1570$10, "");
+          if (!cond$1581) { 
+            verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), $it)); 
+          }
+          markAsNonVacuous();
         }
         return verdict;
      }
    }
    
-   public static class AriaLabeledButtonMustBeClickable$1733 implements Oracle {
+   public static class AriaLabeledButtonMustBeClickable$1692 extends DslOracle {
      /*
       assert button "btn_aria" is clickable "aria-labeled button must be clickable".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -555,23 +551,23 @@ public class testing {
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$1702$17 = getWidget("button", "btn_aria", state);
-        if (widget$1702$17 == null) {
+        Widget widget$1661$17 = getWidget("button", "btn_aria", state);
+        if (widget$1661$17 == null) {
           return Verdict.OK;
         }
-        boolean cond$1720 = evaluateIsStatus(widget$1702$17, "clickable");
-        if (!cond$1720) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$1702$17)); }
+        boolean cond$1679 = evaluateIsStatus(widget$1661$17, "clickable");
+        if (!cond$1679) { 
+          verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$1661$17)); 
+        }
+        markAsNonVacuous();
         return verdict;
      }
    }
    
-   public static class AriaAlertMustBeVisible$1812 implements Oracle {
+   public static class AriaAlertMustBeVisible$1771 extends DslOracle {
      /*
       assert alert "aria_alert" is visible "aria alert must be visible".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -581,23 +577,23 @@ public class testing {
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$1782$18 = getWidget("alert", "aria_alert", state);
-        if (widget$1782$18 == null) {
+        Widget widget$1741$18 = getWidget("alert", "aria_alert", state);
+        if (widget$1741$18 == null) {
           return Verdict.OK;
         }
-        boolean cond$1801 = evaluateIsStatus(widget$1782$18, "visible");
-        if (!cond$1801) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$1782$18)); }
+        boolean cond$1760 = evaluateIsStatus(widget$1741$18, "visible");
+        if (!cond$1760) { 
+          verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$1741$18)); 
+        }
+        markAsNonVacuous();
         return verdict;
      }
    }
    
-   public static class RequiredInputMustMatchPattern$1923 implements Oracle {
+   public static class RequiredInputMustMatchPattern$1882 extends DslOracle {
      /*
       assert input_text "input_required" matches "[A-Z]{3}" "required input must match pattern".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -607,23 +603,23 @@ public class testing {
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$1876$27 = getWidget("input_text", "input_required", state);
-        if (widget$1876$27 == null) {
+        Widget widget$1835$27 = getWidget("input_text", "input_required", state);
+        if (widget$1835$27 == null) {
           return Verdict.OK;
         }
-        boolean cond$1904 = evaluateMatches(widget$1876$27, "[A-Z]{3}");
-        if (!cond$1904) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$1876$27)); }
+        boolean cond$1863 = evaluateMatches(widget$1835$27, "[A-Z]{3}");
+        if (!cond$1863) { 
+          verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$1835$27)); 
+        }
+        markAsNonVacuous();
         return verdict;
      }
    }
    
-   public static class AutofocusFieldMustBeFocused$2033 implements Oracle {
+   public static class AutofocusFieldMustBeFocused$1992 extends DslOracle {
      /*
       assert input_text "focus_field" is focused "autofocus field must be focused".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -633,23 +629,23 @@ public class testing {
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$1997$24 = getWidget("input_text", "focus_field", state);
-        if (widget$1997$24 == null) {
+        Widget widget$1956$24 = getWidget("input_text", "focus_field", state);
+        if (widget$1956$24 == null) {
           return Verdict.OK;
         }
-        boolean cond$2022 = evaluateIsStatus(widget$1997$24, "focused");
-        if (!cond$2022) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$1997$24)); }
+        boolean cond$1981 = evaluateIsStatus(widget$1956$24, "focused");
+        if (!cond$1981) { 
+          verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$1956$24)); 
+        }
+        markAsNonVacuous();
         return verdict;
      }
    }
    
-   public static class EmailInputMustMatchFormat$2141 implements Oracle {
+   public static class EmailInputMustMatchFormat$2100 extends DslOracle {
      /*
       assert input_text "input_email2" matches ".+@.+" "email input must match format".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -659,23 +655,23 @@ public class testing {
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$2099$25 = getWidget("input_text", "input_email2", state);
-        if (widget$2099$25 == null) {
+        Widget widget$2058$25 = getWidget("input_text", "input_email2", state);
+        if (widget$2058$25 == null) {
           return Verdict.OK;
         }
-        boolean cond$2125 = evaluateMatches(widget$2099$25, ".+@.+");
-        if (!cond$2125) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$2099$25)); }
+        boolean cond$2084 = evaluateMatches(widget$2058$25, ".+@.+");
+        if (!cond$2084) { 
+          verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$2058$25)); 
+        }
+        markAsNonVacuous();
         return verdict;
      }
    }
    
-   public static class PasswordMustNotBeEmpty$2234 implements Oracle {
+   public static class PasswordMustNotBeEmpty$2193 extends DslOracle {
      /*
       assert input_text "input_password".text not is equal to "" "password must not be empty".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -685,24 +681,24 @@ public class testing {
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$2182$27 = getWidget("input_text", "input_password", state);
-        if (widget$2182$27 == null) {
+        Widget widget$2141$27 = getWidget("input_text", "input_password", state);
+        if (widget$2141$27 == null) {
           return Verdict.OK;
         }
-        Object widget$2182$32 = getProperty(widget$2182$27, "text");
-        boolean cond$2215 = !(evaluateIsEqualTo(widget$2182$32, ""));
-        if (!cond$2215) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$2182$27)); }
+        Object widget$2141$32 = getProperty(widget$2141$27, "text");
+        boolean cond$2174 = !(evaluateIsEqualTo(widget$2141$32, ""));
+        if (!cond$2174) { 
+          verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$2141$27)); 
+        }
+        markAsNonVacuous();
         return verdict;
      }
    }
    
-   public static class NestedDropdownMustNotBeEmpty$2342 implements Oracle {
+   public static class NestedDropdownMustNotBeEmpty$2301 extends DslOracle {
      /*
       assert dropdown "nested_dropdown" has nonempty options "nested dropdown must not be empty".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -712,23 +708,23 @@ public class testing {
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$2294$26 = getWidget("dropdown", "nested_dropdown", state);
-        if (widget$2294$26 == null) {
+        Widget widget$2253$26 = getWidget("dropdown", "nested_dropdown", state);
+        if (widget$2253$26 == null) {
           return Verdict.OK;
         }
-        boolean cond$2321 = evaluateHasAttribute(widget$2294$26, "options");
-        if (!cond$2321) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$2294$26)); }
+        boolean cond$2280 = evaluateHasAttribute(widget$2253$26, "options");
+        if (!cond$2280) { 
+          verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$2253$26)); 
+        }
+        markAsNonVacuous();
         return verdict;
      }
    }
    
-   public static class RadioInNestedPanelMustNotBeChecked$2379 implements Oracle {
+   public static class RadioInNestedPanelMustNotBeChecked$2379 extends DslOracle {
      /*
       assert radio "nested_r1" not is checked "radio in nested panel must not be checked".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -743,18 +739,18 @@ public class testing {
           return Verdict.OK;
         }
         boolean cond$2364 = !(evaluateIsStatus(widget$2346$17, "checked"));
-        if (!cond$2364) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$2346$17)); }
+        if (!cond$2364) { 
+          verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$2346$17)); 
+        }
+        markAsNonVacuous();
         return verdict;
      }
    }
    
-   public static class DelayedElementMustAppearAfterTimeout$2562 implements Oracle {
+   public static class DelayedElementMustAppearAfterTimeout$2519 extends DslOracle {
      /*
       assert element "delayed_element" is visible "delayed element must appear after timeout".
      */
-   
-     @Override
-     public void initialize() { }
    
      @Override
      public String getMessage() {
@@ -764,12 +760,15 @@ public class testing {
      @Override
      public Verdict getVerdict(State state) {
         Verdict verdict = Verdict.OK;
-        Widget widget$2525$25 = getWidget("element", "delayed_element", state);
-        if (widget$2525$25 == null) {
+        Widget widget$2482$25 = getWidget("element", "delayed_element", state);
+        if (widget$2482$25 == null) {
           return Verdict.OK;
         }
-        boolean cond$2551 = evaluateIsStatus(widget$2525$25, "visible");
-        if (!cond$2551) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$2525$25)); }
+        boolean cond$2508 = evaluateIsStatus(widget$2482$25, "visible");
+        if (!cond$2508) { 
+          verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$2482$25)); 
+        }
+        markAsNonVacuous();
         return verdict;
      }
    }

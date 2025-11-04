@@ -5,7 +5,8 @@ import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
-import org.testar.oracles.Oracle;
+import org.testar.oracles.DslOracle;
+
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -17,12 +18,9 @@ import java.util.function.Supplier;
 
 public class AssertWidgetMapping {
 
-    public static class AssertWidgetSelector implements Oracle {
+    public static class AssertWidgetSelector extends DslOracle {
 
         private final List<SimpleEntry<String, String>> allAssertions = new ArrayList<>();
-
-        @Override
-        public void initialize() { }
 
         @Override
         public String getMessage() {
@@ -187,7 +185,7 @@ public class AssertWidgetMapping {
         }
     }
 
-    public static class AssertWidgetContains implements Oracle {
+    public static class AssertWidgetContains extends DslOracle {
 
         private final List<BooleanAssertion> containAssertions = new ArrayList<>();
 
@@ -198,9 +196,6 @@ public class AssertWidgetMapping {
             BooleanAssertion expression = new BooleanAssertion(description, () -> evaluateContains(widget, text), expected);
             containAssertions.add(expression);
         }
-
-        @Override
-        public void initialize() { }
 
         @Override
         public String getMessage() {
@@ -242,7 +237,7 @@ public class AssertWidgetMapping {
         }
     }
 
-    public static class AssertWidgetStatus implements Oracle {
+    public static class AssertWidgetStatus extends DslOracle {
 
         private final List<BooleanAssertion> statusAssertions = new ArrayList<>();
 
@@ -253,9 +248,6 @@ public class AssertWidgetMapping {
             BooleanAssertion expression = new BooleanAssertion(description, () -> evaluateIsStatus(widget, property), expected);
             statusAssertions.add(expression);
         }
-
-        @Override
-        public void initialize() { }
 
         @Override
         public String getMessage() {

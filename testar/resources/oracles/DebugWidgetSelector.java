@@ -3,18 +3,16 @@ import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
-import org.testar.oracles.Oracle;
+import org.testar.oracles.DslOracle;
 import org.testar.oracles.OracleWidgetsMapping;
 
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
 
 
-public class DebugWidgetSelector implements Oracle
+public class DebugWidgetSelector extends DslOracle
 {
     // testingTESTARDSL.html
-    @Override
-    public void initialize() { }
 
     @Override
     public String getMessage()

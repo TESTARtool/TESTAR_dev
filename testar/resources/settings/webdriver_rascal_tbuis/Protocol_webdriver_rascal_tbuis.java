@@ -46,6 +46,7 @@ import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.oracles.DslOracle;
 import org.testar.oracles.Oracle;
 import org.testar.oracles.OracleSelection;
 import org.testar.protocols.WebdriverProtocol;
@@ -62,7 +63,10 @@ public class Protocol_webdriver_rascal_tbuis extends WebdriverProtocol {
     // This list tracks the detected erroneous verdicts to avoid duplicates
     private List<String> listOfDetectedErroneousVerdicts = new ArrayList<>();
 
+    private List<Oracle> extendedOraclesList = new ArrayList<>();
     private List<Oracle> externalOraclesList = new ArrayList<>();
+
+    private Map<Oracle, Boolean> _VACUOUS_PASS = Collections.synchronizedMap(new WeakHashMap<>());
 
     /**
      * Called once during the life time of TESTAR
@@ -87,7 +91,9 @@ public class Protocol_webdriver_rascal_tbuis extends WebdriverProtocol {
     @Override
     protected void preSequencePreparations() {
         super.preSequencePreparations();
+        extendedOraclesList = OracleSelection.loadExtendedOracles(settings.get(ConfigTags.ExtendedOracles));
         externalOraclesList = OracleSelection.loadExternalJavaOracles(settings.get(ConfigTags.ExternalOracles));
+        _VACUOUS_PASS = Collections.synchronizedMap(new WeakHashMap<>());
     }
 
     /**
@@ -127,9 +133,30 @@ public class Protocol_webdriver_rascal_tbuis extends WebdriverProtocol {
 
         // ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
 
+        // "ExtendedOracles" offered by TESTAR in the test.settings or Oracles GUI dialog
+        for (Oracle extendedOracle : extendedOraclesList) {
+            Verdict extendedVerdict = extendedOracle.getVerdict(state);
+
+            // If the Custom Verdict is not OK and was not detected in a previous sequence
+            // return verdict with failure state
+            if (extendedVerdict != Verdict.OK && !containsVerdictInfo(listOfDetectedErroneousVerdicts, extendedVerdict.info())) {
+                return extendedVerdict;
+            }
+
+        }
+
         // "ExternalOracles" customized by the user and enabled in the test.settings or Oracles GUI dialog
         for (Oracle externalOracle : externalOraclesList) {
             Verdict externalVerdict = externalOracle.getVerdict(state);
+
+            // Track Vacuous Pass from external oracles
+            if(externalOracle instanceof DslOracle) {
+                if(((DslOracle) externalOracle).isVacuousPass()) {
+                    _VACUOUS_PASS.putIfAbsent(externalOracle, Boolean.TRUE);
+                } else {
+                    _VACUOUS_PASS.put(externalOracle, Boolean.FALSE);
+                }
+            }
 
             // If the Custom Verdict is not OK and was not detected in a previous sequence
             // return verdict with failure state
@@ -139,7 +166,21 @@ public class Protocol_webdriver_rascal_tbuis extends WebdriverProtocol {
 
         }
 
-        return verdict;
+        // If _VACUOUS_PASS does not contain any true, return the base verdict.
+        if(!_VACUOUS_PASS.values().stream().anyMatch(Boolean::booleanValue)) {
+            return verdict;
+        }
+
+        // Else, create a vacuous verdict joining all vacuous oracles from the map.
+        Verdict vacuousVerdict = new Verdict(Verdict.Severity.VACUOUS_PASS, "Vacuous Pass:");
+        for (Map.Entry<Oracle, Boolean> e : _VACUOUS_PASS.entrySet()) {
+            if (Boolean.TRUE.equals(e.getValue())) {
+                Oracle oracle = e.getKey();
+                vacuousVerdict = vacuousVerdict.join(new Verdict(Verdict.Severity.VACUOUS_PASS, oracle.getMessage()));
+            }
+        }
+
+        return vacuousVerdict;
     }
 
     private boolean containsVerdictInfo(List<String> listOfDetectedErroneousVerdicts, String currentVerdictInfo) {

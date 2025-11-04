@@ -1104,7 +1104,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	protected boolean moreActions(State state) {
 		Verdict stateVerdict = state.get(Tags.OracleVerdict, Verdict.OK);
-		boolean faultySequence = stateVerdict.severity() != Verdict.OK.severity();
+		boolean faultySequence = stateVerdict.severity() > Verdict.OK.severity();
 		return (!settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence) &&
 				state.get(Tags.IsRunning, false) && !state.get(Tags.NotResponding, false) &&
 				//actionCount() < settings().get(ConfigTags.SequenceLength) &&

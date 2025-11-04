@@ -51,6 +51,11 @@ public final class Verdict implements Serializable {
 	 * Enum representing different levels of severity for a test verdict.
 	 */
 	public enum Severity {
+		/** VACUOUS_PASS (< 0.0) **/
+
+		// Assertion or condition passes without actually checking its intended conditions
+		VACUOUS_PASS(-0.1, "VACUOUS_PASS"),
+
 		/** PASS (0.0 - 0.099) **/
 
 		// Test sequence completed without other PASS, WARNING, or FAIL, severity
@@ -151,8 +156,7 @@ public final class Verdict implements Serializable {
 	}
 
 	public Verdict(Severity severity, String info, Visualizer visualizer) {
-		Assert.isTrue(severity.getValue() >= Severity.OK.getValue() && severity.getValue() <= Severity.FAIL.getValue());
-		Assert.notNull(info, visualizer);
+		Assert.notNull(severity, info, visualizer);
 		this.severity = severity.getValue();
 		this.info = info;
 		this.visualizer = visualizer;

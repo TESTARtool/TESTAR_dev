@@ -38,7 +38,7 @@ import org.testar.monkey.alayer.Verdict;
  * an error or problem has occurred in the SUT.
  */
 
-public interface Oracle extends OracleWidgetReporter, OracleWidgetsMapping {
+public interface Oracle extends OracleWidgetReporter {
 
     /**
      * Initialize the Oracle
