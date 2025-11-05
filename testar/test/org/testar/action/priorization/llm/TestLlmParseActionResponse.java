@@ -14,6 +14,9 @@ import org.testar.monkey.alayer.actions.CompoundAction;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.actions.Type;
 import org.testar.monkey.alayer.actions.WdSelectListAction;
+import org.testar.monkey.alayer.android.actions.AndroidActionType;
+import org.testar.monkey.alayer.android.enums.AndroidRoles;
+import org.testar.monkey.alayer.android.enums.AndroidTags;
 import org.testar.monkey.alayer.visualizers.TextVisualizer;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
@@ -81,6 +84,22 @@ public class TestLlmParseActionResponse {
 		select_action.set(Tags.ConcreteID, "CID_select");
 		select_action.set(Tags.AbstractID, "AID_select");
 		derivedActions.add(select_action);
+
+		// Derive an AndroidActionType action
+		WidgetStub android_edit_widget = new WidgetStub();
+		state.addChild(android_edit_widget);
+		android_edit_widget.setParent(state);
+		android_edit_widget.set(Tags.Shape, Rect.fromCoordinates(1, 1, 1, 1));
+		android_edit_widget.set(Tags.Role, AndroidRoles.AndroidWidget);
+		android_edit_widget.set(Tags.Path, "[0,0,1]");
+		android_edit_widget.set(AndroidTags.AndroidXpath, "//path[0]");
+		android_edit_widget.set(Tags.Desc, "android_edit_widget_desc");
+		android_edit_widget.set(Tags.ConcreteID, "CID_android_edit_widget");
+		android_edit_widget.set(Tags.AbstractID, "AID_android_edit_widget");
+		Action android_action_type = new AndroidActionType(state, android_edit_widget, "default", "accessibilityId", "className");
+		android_action_type.set(Tags.ConcreteID, "CID_android_action_type");
+		android_action_type.set(Tags.AbstractID, "AID_android_action_type");
+		derivedActions.add(android_action_type);
 	}
 
 	@Test
@@ -214,6 +233,24 @@ public class TestLlmParseActionResponse {
 		LlmParseActionResult llmParseResult = llmParseResponse.parseLlmResponse(derivedActions, llmResponse);
 
 		Assert.isTrue(llmParseResult.getParseResult().equals(LlmParseActionResult.ParseResult.COMMUNICATION_FAILURE));
+	}
+
+	@Test
+	public void test_llm_selects_android_type_action() {
+		String llmResponse = "{\"actionId\":\"AID_android_action_type\",\"input\":\"testar\"}";
+
+		LlmParseActionResponse llmParseResponse = new LlmParseActionResponse();
+		LlmParseActionResult llmParseResult = llmParseResponse.parseLlmResponse(derivedActions, llmResponse);
+
+		Assert.isTrue(llmParseResult.getParseResult().equals(LlmParseActionResult.ParseResult.SUCCESS));
+		Assert.isTrue(llmParseResult.getActionToExecute().get(Tags.AbstractID).equals("AID_android_action_type"));
+
+		Assert.isTrue(llmParseResult.getActionToExecute().get(Tags.Visualizer, null) != null);
+		Assert.isTrue(llmParseResult.getActionToExecute().get(Tags.Visualizer) instanceof TextVisualizer);
+		Assert.isTrue(((TextVisualizer)llmParseResult.getActionToExecute().get(Tags.Visualizer)).getText().equals("testar"));
+
+		String innerText = llmParseResult.getActionToExecute().get(Tags.InputText, "nothing");
+		Assert.isTrue(innerText.equals("testar"));
 	}
 
 }

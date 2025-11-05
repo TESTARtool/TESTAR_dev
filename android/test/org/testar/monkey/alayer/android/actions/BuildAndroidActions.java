@@ -76,11 +76,11 @@ public class BuildAndroidActions {
 		Action androidType = new AndroidActionType(state, widget,
 				"TextToType",
 				widget.get(AndroidTags.AndroidAccessibilityId,""),
-				widget.get(AndroidTags.AndroidText,""),
 				widget.get(AndroidTags.AndroidClassName, ""));
 		// Verify Action <-> Widget mapping
 		Assert.notNull(androidType.get(Tags.OriginWidget));
 		Assert.isTrue(androidType.get(Tags.OriginWidget).get(AndroidTags.AndroidXpath).equals(pathTest));
+		Assert.isTrue(androidType.get(Tags.InputText).equals("TextToType"));
 	}
 
 	@Test

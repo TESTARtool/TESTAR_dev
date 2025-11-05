@@ -37,6 +37,8 @@ import org.testar.monkey.alayer.State;
  */
 public interface IPromptOracleGenerator {
 
+    boolean attachImage();
+
     /**
      * Generates a prompt for test oracles with large language models.
      * @param state The current state.

@@ -214,7 +214,6 @@ public class Protocol_android_generic extends AndroidProtocol {
 						new AndroidActionType(state, widget,
 							InputDataManager.getRandomTextInputData(widget),
 							widget.get(AndroidTags.AndroidAccessibilityId,""),
-							widget.get(AndroidTags.AndroidText,""),
 							widget.get(AndroidTags.AndroidClassName,""))
 						);
 			}

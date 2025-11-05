@@ -30,6 +30,9 @@
 
 package org.testar.monkey.alayer.visualizers;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testar.monkey.Assert;
 import org.testar.monkey.Pair;
 import org.testar.monkey.alayer.Canvas;
@@ -43,6 +46,9 @@ import org.testar.monkey.alayer.exceptions.PositionException;
 public final class TextVisualizer implements Visualizer {
 
 	private static final long serialVersionUID = 9156304220974950751L;
+
+	protected static final Logger logger = LogManager.getLogger();
+
 	final Position pos;
 	final String text;
 	final Pen pen;
@@ -59,6 +65,7 @@ public final class TextVisualizer implements Visualizer {
 	}
 	
 	public TextVisualizer withText(String newText, Pen newPen) {
+		Assert.notNull(newText, newPen);
 		return new TextVisualizer(this.pos, newText, newPen);
 	}
 
@@ -66,9 +73,13 @@ public final class TextVisualizer implements Visualizer {
 		Assert.notNull(state, cv, pen);
 		pen = Pen.merge(pen, this.pen);
 		try {
-			Point p = pos.apply(state);			
+			Point p = pos.apply(state);
 			Pair<Double, Double> m = cv.textMetrics(pen, text);
 			cv.text(pen, p.x() - m.left() / 2, p.y() - m.right() / 2, 0, text);
-		} catch (PositionException pe) {}			
+		} catch (PositionException pe) {
+			logger.log(Level.ERROR, pe);
+		} catch (NullPointerException ne) {
+			logger.log(Level.ERROR, ne);
+		}
 	}
 }
