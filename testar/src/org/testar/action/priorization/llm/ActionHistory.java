@@ -167,15 +167,15 @@ public class ActionHistory {
             for(Action innerAction : ((CompoundAction)action).getActions()) {
 
                 if(innerAction instanceof Type) {
-                    return ((Type)innerAction).get(Tags.InputText, "Unknown Input");
+                    return ((Type)innerAction).get(Tags.InputText, "Unknown Type Input");
                 }
 
                 if(innerAction instanceof PasteText) {
-                    return ((PasteText)innerAction).get(Tags.InputText, "Unknown Input");
+                    return ((PasteText)innerAction).get(Tags.InputText, "Unknown Paste Input");
                 }
             }
         }
 
-        return "Unknown Input";
+        return action.get(Tags.InputText, "Unknown Action Input");
     }
 }

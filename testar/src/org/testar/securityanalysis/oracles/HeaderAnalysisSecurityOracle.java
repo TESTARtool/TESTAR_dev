@@ -31,8 +31,8 @@
 package org.testar.securityanalysis.oracles;
 
 import org.openqa.selenium.devtools.DevTools;
-import org.openqa.selenium.devtools.v141.network.Network;
-import org.openqa.selenium.devtools.v141.network.model.Headers;
+import org.openqa.selenium.devtools.v142.network.Network;
+import org.openqa.selenium.devtools.v142.network.model.Headers;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.securityanalysis.NetworkCollector;

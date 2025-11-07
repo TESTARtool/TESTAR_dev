@@ -49,12 +49,21 @@ public class OracleWebPromptGenerator implements IPromptOracleGenerator {
 	protected static final Logger logger = LogManager.getLogger();
 
 	private final Set<Tag<String>> oracleTags;
+	private final boolean attachImage;
 
 	/**
 	 * Creates a new oracle prompt generator for web applications.
 	 */
 	public OracleWebPromptGenerator() {
-		this(new HashSet<>(Arrays.asList(WdTags.WebTextContent))); // WdTags.WebTextContent is the default widget context
+		this(false); 
+	}
+
+	/**
+	 * Creates a new oracle prompt generator for web applications with a set of oracleTags.
+	 * @param attachImage Indicate if an image should be attached together with the text prompt.
+	 */
+	public OracleWebPromptGenerator(boolean attachImage) {
+		this(new HashSet<>(Arrays.asList(WdTags.WebTextContent)), attachImage); // WdTags.WebTextContent is the default widget context
 	}
 
 	/**
@@ -62,7 +71,22 @@ public class OracleWebPromptGenerator implements IPromptOracleGenerator {
 	 * @param oracleTags Are the tags to be used for applying the oracle.
 	 */
 	public OracleWebPromptGenerator(Set<Tag<String>> oracleTags) {
+		this(oracleTags, false); // Do not attach an image by default
+	}
+
+	/**
+	 * Creates a new oracle prompt generator for web applications with a set of oracleTags. 
+	 * @param oracleTags Are the tags to be used for applying the oracle.
+	 * @param attachImage Indicate if an image should be attached together with the text prompt.
+	 */
+	public OracleWebPromptGenerator(Set<Tag<String>> oracleTags, boolean attachImage) {
 		this.oracleTags = oracleTags;
+		this.attachImage = attachImage;
+	}
+
+	@Override
+	public boolean attachImage() {
+		return this.attachImage;
 	}
 
 	@Override
@@ -85,8 +109,8 @@ public class OracleWebPromptGenerator implements IPromptOracleGenerator {
 
 		for (Widget widget : state) {
 			// Only create the prompt oracle with the information of visible widgets
-			// Some widgets may exist at the DOM level but are not visible in the GUI
-			if(widget.get(WdTags.WebIsFullOnScreen, false)) {
+			// Some widgets may exist at the DOM level but are not visible/displayed in the GUI
+			if(widget.get(WdTags.WebIsFullOnScreen, false) && widget.get(WdTags.WebIsDisplayed, false)) {
 				try {
 					// Iterate trough the indicated widget Tags to create the widget content
 					String widgetContent = "";
@@ -107,6 +131,10 @@ public class OracleWebPromptGenerator implements IPromptOracleGenerator {
 		}
 
 		builder.append(". ");
+
+		if(attachImage) {
+			builder.append("An image of the current state is attached. ");
+		}
 
 		builder.append("Is the test objective met in this state?");
 
