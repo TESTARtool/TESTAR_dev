@@ -45,7 +45,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.llm.prompt.IPromptOracleGenerator;
-import org.testar.llm.prompt.OracleImagePromptGenerator;
 import org.testar.ProtocolUtil;
 import org.testar.llm.LlmConversation;
 import org.testar.llm.LlmFactory;
@@ -139,7 +138,7 @@ public class LlmOracle implements Oracle {
 		String prompt = promptGenerator.generateOraclePrompt(state, appName, currentTestGoal.getTestGoal(), previousTestGoal);
 		logger.log(Level.DEBUG, "Generated oracle prompt: " + prompt);
 
-		if (promptGenerator instanceof OracleImagePromptGenerator) {
+		if (promptGenerator.attachImage()) {
 
 			ByteArrayOutputStream screenshotBytes = new ByteArrayOutputStream();
 			AWTCanvas screenshot;

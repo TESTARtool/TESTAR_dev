@@ -57,6 +57,7 @@ public class ActionStandardPromptGenerator implements IPromptActionGenerator {
     protected static final Logger logger = LogManager.getLogger();
 
     private final Tag<String> descriptionTag;
+    private final boolean attachImage;
 
     /**
      * Creates a new standard prompt generator.
@@ -66,16 +67,39 @@ public class ActionStandardPromptGenerator implements IPromptActionGenerator {
     }
 
     /**
+     * Creates a new standard prompt generator.
+     * @param attachImage Indicate if an image should be attache together with the text prompt.
+     */
+    public ActionStandardPromptGenerator(boolean attachImage) {
+        this(Tags.Desc, attachImage); // Tags.Desc is the default description Tag
+    }
+
+    /**
      * Creates a new standard prompt generator with a specific descriptionTag
      * @param descriptionTag The tag to be used for obtaining the action/widget description.
      */
     public ActionStandardPromptGenerator(Tag<String> descriptionTag) {
+        this(descriptionTag, false); // Do not attach an image by default
+    }
+
+    /**
+     * Creates a new standard prompt generator with a specific descriptionTag
+     * @param descriptionTag The tag to be used for obtaining the action/widget description.
+     * @param attachImage Indicate if an image should be attache together with the text prompt.
+     */
+    public ActionStandardPromptGenerator(Tag<String> descriptionTag, boolean attachImage) {
         this.descriptionTag = descriptionTag;
+        this.attachImage = attachImage;
     }
 
     @Override
     public Tag<String> getDescriptionTag() {
         return this.descriptionTag;
+    }
+
+    @Override
+    public boolean attachImage() {
+        return this.attachImage;
     }
 
     /**
@@ -99,6 +123,10 @@ public class ActionStandardPromptGenerator implements IPromptActionGenerator {
         } else {
             builder.append(String.format("The following objective was previously achieved: %s. ", previousTestGoal));
             builder.append(String.format("The current objective of the test is: %s. ", currentTestGoal));
+        }
+
+        if(attachImage) {
+            builder.append("An image of the current state is attached so you can observe what actionable widgets are present and which actions were executed. ");
         }
 
         builder.append("The following actions are available: ");
