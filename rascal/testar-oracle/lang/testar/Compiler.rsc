@@ -36,7 +36,7 @@ str compileToJava(start[Oracle] oracle) =
   'import org.testar.monkey.alayer.Verdict;
   'import org.testar.monkey.alayer.State;
   'import org.testar.monkey.alayer.Widget;
-  'import org.testar.oracles.Oracle;
+  'import org.testar.oracles.DslOracle;
   '
   'public class <className> {
   '   <for (Assert a <- desugarUnless(oracle).top.asserts) {>
@@ -54,13 +54,10 @@ str makeClassName(String s) {
 }
 
 str compileAssert(Assert a)
-  = "public static class <makeClassName(a.message)> implements Oracle {
+  = "public static class <makeClassName(a.message)> extends DslOracle {
     '  /*
     '   <a>
     '  */
-    '
-    '  @Override
-    '  public void initialize() { }
     '
     '  @Override
     '  public String getMessage() {
@@ -115,7 +112,10 @@ str offender(Widget w) = widgetVar(leftMostWidget(w));
 str pred2java((Predicate)`<Widget w> <Cond c>`)
   = "<widget2java(w)>
     'boolean <condVar(c)> = <cond2java(c, widgetVar(w))>;
-    'if (!<condVar(c)>) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), <offender(w)>)); }";
+    'if (!<condVar(c)>) { 
+    '  verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), <offender(w)>)); 
+    '}
+    'markAsNonVacuous();";
     // ^^^^^ note that as soon as verdict becomes fail, it stays fail.
 
 // note how w is used as condvar for the when clause 
@@ -125,7 +125,10 @@ str pred2java((Predicate)`<Widget w> <Cond c0> when it <Cond c>`)
     'boolean <condVar(c)> = <cond2java(c, widgetVar(w))>;
     'if (<condVar(c)>) {
     '  boolean <condVar(c0)> = <cond2java(c0, widgetVar(w))>;
-    '  if (!<condVar(c0)>) { verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), <offender(w)>)); }
+    '  if (!<condVar(c0)>) { 
+    '    verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), <offender(w)>)); 
+    '  }
+    '  markAsNonVacuous();
     '}";
 
 // rhs of when should not affect verdict, so don't reuse pred2java
