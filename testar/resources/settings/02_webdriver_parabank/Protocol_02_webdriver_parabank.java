@@ -90,7 +90,9 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 	protected void preSequencePreparations() {
 		super.preSequencePreparations();
 		extendedOraclesList = OracleSelection.loadExtendedOracles(settings.get(ConfigTags.ExtendedOracles));
+		for(Oracle extendedOracle : extendedOraclesList) { extendedOracle.initialize(); }
 		externalOraclesList = OracleSelection.loadExternalJavaOracles(settings.get(ConfigTags.ExternalOracles));
+		for(Oracle externalOracle : externalOraclesList) { externalOracle.initialize(); }
 		_VACUOUS_PASS = Collections.synchronizedMap(new WeakHashMap<>());
 	}
 

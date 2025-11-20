@@ -57,6 +57,37 @@ public interface OracleWidgetsMapping {
 		return matched;
 	}
 
+	default List<Widget> getWidgets(String elementType, Widget constraintWidget) {
+	    List<Widget> matched = new ArrayList<>();
+	    List<RoleMatcher> matchers = OracleMappingModel.getElementRoles(elementType);
+
+	    // DFS using an explicit stack
+	    Deque<Widget> stack = new ArrayDeque<>();
+	    stack.push(constraintWidget);
+
+	    while (!stack.isEmpty()) {
+	        Widget widget = stack.pop();
+
+	        // Check this widget against all matchers
+	        for (RoleMatcher matcher : matchers) {
+	            if (matcher.matches(widget)) {
+	                matched.add(widget);
+	                break; // no need to check other matchers for this widget
+	            }
+	        }
+
+	        // Descend into children using childCount / child(i)
+	        for (int i = 0; i < widget.childCount(); i++) {
+	            Widget child = widget.child(i);
+	            if (child != null) {
+	                stack.push(child);
+	            }
+	        }
+	    }
+
+	    return matched;
+	}
+
 	default Widget getWidget(String elementType, String selector, State state) {
 		List<Tag<?>> tagPriority = OracleMappingModel.getSelectorTags(elementType);
 
@@ -81,6 +112,60 @@ public interface OracleWidgetsMapping {
 		}
 
 		return null;
+	}
+
+	default Widget getWidget(String elementType, String selector, Widget constraintWidget) {
+	    List<Tag<?>> tagPriority = OracleMappingModel.getSelectorTags(elementType);
+	    List<RoleMatcher> matchers = OracleMappingModel.getElementRoles(elementType);
+
+	    Deque<Widget> stack = new ArrayDeque<>();
+	    stack.push(constraintWidget);
+
+	    Widget approximateMatch = null; // first "contains" match, used as fallback
+
+	    while (!stack.isEmpty()) {
+	        Widget widget = stack.pop();
+
+	        // Check if this widget matches the elementType via its role
+	        boolean elementMatches = false;
+	        for (RoleMatcher matcher : matchers) {
+	            if (matcher.matches(widget)) {
+	                elementMatches = true;
+	                break;
+	            }
+	        }
+
+	        if (elementMatches) {
+	            // First look for an exact match on the configured tags
+	            for (Tag<?> tag : tagPriority) {
+	                Object tagValue = widget.get(tag, null);
+	                if (tagValue instanceof String) {
+	                    String value = (String) tagValue;
+
+	                    // If exact match, then return immediately
+	                    if (selector.equals(value)) {
+	                        return widget;
+	                    }
+
+	                    // Approximate match: remember the first "contains" match
+	                    if (approximateMatch == null && value.contains(selector)) {
+	                        approximateMatch = widget;
+	                    }
+	                }
+	            }
+	        }
+
+	        // Descend into children using childCount() / child(i)
+	        for (int i = 0; i < widget.childCount(); i++) {
+	            Widget child = widget.child(i);
+	            if (child != null) {
+	                stack.push(child);
+	            }
+	        }
+	    }
+
+	    // No exact match found; return first approximate match (may be null)
+	    return approximateMatch;
 	}
 
 	default Object getProperty(Widget w, String property) {

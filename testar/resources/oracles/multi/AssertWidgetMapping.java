@@ -183,6 +183,12 @@ public class AssertWidgetMapping {
                     new SimpleEntry<>("panel", "Page Footer")
                     ));
         }
+
+        @Override
+        public void initialize() {
+            // TODO Auto-generated method stub
+            
+        }
     }
 
     public static class AssertWidgetContains extends DslOracle {
@@ -234,6 +240,12 @@ public class AssertWidgetMapping {
             }
 
             return verdict;
+        }
+
+        @Override
+        public void initialize() {
+            // TODO Auto-generated method stub
+            
         }
     }
 
@@ -375,6 +387,12 @@ public class AssertWidgetMapping {
             }
 
             return verdict;
+        }
+
+        @Override
+        public void initialize() {
+            // TODO Auto-generated method stub
+            
         }
     }
 

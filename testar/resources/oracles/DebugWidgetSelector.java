@@ -73,4 +73,10 @@ public class DebugWidgetSelector extends DslOracle
             }
         }
     }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
 }

@@ -7,33 +7,7 @@ import org.testar.monkey.alayer.Widget;
 import org.testar.oracles.DslOracle;
 
 public class testing {
-   
-  public static class WelcomeJohnSmithIsVisible$79 extends DslOracle {
-    /*
-     assert static_text "Welcome John Smith" is visible "Welcome John Smith is visible".
-    */
-    
-    @Override
-    public String getMessage() {
-      return "Welcome John Smith is visible";
-    }
-    
-    @Override
-    public Verdict getVerdict(State state) {
-       Verdict verdict = Verdict.OK;
-       Widget widget$35$32 = getWidget("static_text", "Welcome John Smith", state);
-       if (widget$35$32 == null) {
-         return Verdict.OK;
-       }
-       boolean cond$68 = evaluateIsStatus(widget$35$32, "visible");
-       if (!cond$68) { 
-         verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), widget$35$32)); 
-       }
-       markAsNonVacuous();
-       return verdict;
-    }
-  }
-  
+
    public static class SubmitButtonMustBeEnabled$94 extends DslOracle {
      /*
       assert button "btn_submit" is enabled "submit button must be enabled".
@@ -58,6 +32,13 @@ public class testing {
         markAsNonVacuous();
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
+
    }
    
    public static class EmailInputMustBeFilled$170 extends DslOracle {
@@ -84,6 +65,12 @@ public class testing {
         markAsNonVacuous();
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class AgeInputMustBeEnabled$245 extends DslOracle {
@@ -110,6 +97,12 @@ public class testing {
         markAsNonVacuous();
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class StaticTextMustContainWelcome$327 extends DslOracle {
@@ -136,6 +129,12 @@ public class testing {
         markAsNonVacuous();
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class TermsMustBeAccepted$403 extends DslOracle {
@@ -162,6 +161,12 @@ public class testing {
         markAsNonVacuous();
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class GenderMustHaveOptions$485 extends DslOracle {
@@ -188,6 +193,12 @@ public class testing {
         markAsNonVacuous();
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class CountrySelectMustHaveItems$568 extends DslOracle {
@@ -214,6 +225,12 @@ public class testing {
         markAsNonVacuous();
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class StatusLabelMustShowActive$663 extends DslOracle {
@@ -241,6 +258,12 @@ public class testing {
         markAsNonVacuous();
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class LogoImageMustBeVisible$733 extends DslOracle {
@@ -267,6 +290,12 @@ public class testing {
         markAsNonVacuous();
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class HomeLinkMustBeClickable$801 extends DslOracle {
@@ -293,6 +322,12 @@ public class testing {
         markAsNonVacuous();
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class AlertMustBeVisible$873 extends DslOracle {
@@ -319,6 +354,12 @@ public class testing {
         markAsNonVacuous();
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class GenericElementVisibleIfEnabled$962 extends DslOracle {
@@ -348,6 +389,12 @@ public class testing {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class HiddenButtonMustNotBeVisible$1074 extends DslOracle {
@@ -374,6 +421,12 @@ public class testing {
         markAsNonVacuous();
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class OffscreenButtonMustNotBeOnscreen$1158 extends DslOracle {
@@ -400,6 +453,12 @@ public class testing {
         markAsNonVacuous();
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class DisabledButtonMustNotBeEnabled$1244 extends DslOracle {
@@ -426,6 +485,12 @@ public class testing {
         markAsNonVacuous();
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class EmptyInputMustNotBeFilled$1330 extends DslOracle {
@@ -452,6 +517,12 @@ public class testing {
         markAsNonVacuous();
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class DisabledCheckboxMustNotBeEnabled$1411 extends DslOracle {
@@ -478,6 +549,12 @@ public class testing {
         markAsNonVacuous();
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class LabelTextMustBeVisible$1518 extends DslOracle {
@@ -510,6 +587,12 @@ public class testing {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class ImageMustLackAlttext$1596 extends DslOracle {
@@ -536,6 +619,12 @@ public class testing {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class AriaLabeledButtonMustBeClickable$1692 extends DslOracle {
@@ -562,6 +651,12 @@ public class testing {
         markAsNonVacuous();
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class AriaAlertMustBeVisible$1771 extends DslOracle {
@@ -588,6 +683,12 @@ public class testing {
         markAsNonVacuous();
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class RequiredInputMustMatchPattern$1882 extends DslOracle {
@@ -614,6 +715,12 @@ public class testing {
         markAsNonVacuous();
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class AutofocusFieldMustBeFocused$1992 extends DslOracle {
@@ -640,6 +747,12 @@ public class testing {
         markAsNonVacuous();
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class EmailInputMustMatchFormat$2100 extends DslOracle {
@@ -666,6 +779,12 @@ public class testing {
         markAsNonVacuous();
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class PasswordMustNotBeEmpty$2193 extends DslOracle {
@@ -693,6 +812,12 @@ public class testing {
         markAsNonVacuous();
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class NestedDropdownMustNotBeEmpty$2301 extends DslOracle {
@@ -719,6 +844,12 @@ public class testing {
         markAsNonVacuous();
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class RadioInNestedPanelMustNotBeChecked$2379 extends DslOracle {
@@ -745,6 +876,12 @@ public class testing {
         markAsNonVacuous();
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class DelayedElementMustAppearAfterTimeout$2519 extends DslOracle {
@@ -771,6 +908,12 @@ public class testing {
         markAsNonVacuous();
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
      
 }

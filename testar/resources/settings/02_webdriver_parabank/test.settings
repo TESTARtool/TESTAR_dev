@@ -225,7 +225,7 @@ ProtocolSpecificSetting_5 =
 #################################################################
 
 ExtendedOracles =
-ExternalOracles = WelcomeJohnSmithIsVisible$79
+ExternalOracles = WelcomeJohnSmithIsVisible$237
 
 #################################################################
 # Sets whether to display TESTAR dialog. If false is used, then TESTAR will run in the mode of the Mode property

@@ -88,6 +88,7 @@ public class Protocol_webdriver_rascal_asserts extends WebdriverProtocol {
     protected void preSequencePreparations() {
         super.preSequencePreparations();
         externalOraclesList = OracleSelection.loadExternalJavaOracles(settings.get(ConfigTags.ExternalOracles));
+        for(Oracle externalOracle : externalOraclesList) { externalOracle.initialize(); }
     }
 
     /**

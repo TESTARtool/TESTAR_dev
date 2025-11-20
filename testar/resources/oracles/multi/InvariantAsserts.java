@@ -39,6 +39,12 @@ public class InvariantAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class TextSizeMustBeBiggerThan9Pixels$328 extends DslOracle {
@@ -114,6 +120,12 @@ public class InvariantAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class MenuChildrenMustBeEnabled$422 extends DslOracle {
@@ -141,6 +153,12 @@ public class InvariantAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class SubmitMustBeEnabledWhenAcceptTermsIsChecked$540 extends DslOracle {
@@ -175,6 +193,12 @@ public class InvariantAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class ImagesMustHaveAlternativeText$654 extends DslOracle {
@@ -202,6 +226,12 @@ public class InvariantAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class FormsMustHaveAccessibilityTitle$746 extends DslOracle {
@@ -229,6 +259,12 @@ public class InvariantAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class DropdownOptionsMustNotBeEmpty$836 extends DslOracle {
@@ -256,6 +292,12 @@ public class InvariantAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class DropdownOptionsMustNotHaveAUniqueValue$937 extends DslOracle {
@@ -284,6 +326,12 @@ public class InvariantAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class ColorAndBackgroundColorMustBeDifferent$1068 extends DslOracle {
@@ -318,6 +366,12 @@ public class InvariantAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
      
 }

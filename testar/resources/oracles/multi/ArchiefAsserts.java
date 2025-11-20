@@ -33,6 +33,12 @@ public class ArchiefAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class PromptsMustBeCapitalized$188 extends DslOracle {
@@ -60,6 +66,12 @@ public class ArchiefAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class PromptsMustNotShout$280 extends DslOracle {
@@ -87,6 +99,12 @@ public class ArchiefAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class PromptsMustNotUseAllCaps$377 extends DslOracle {
@@ -114,6 +132,12 @@ public class ArchiefAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class ComputedQuestionMustHaveAValue$507 extends DslOracle {
@@ -155,6 +179,12 @@ public class ArchiefAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class CheckboxSTooltipsMustMentionYesAndNo$627 extends DslOracle {
@@ -183,6 +213,12 @@ public class ArchiefAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class NumericTooltipsMustMentionInteger$746 extends DslOracle {
@@ -211,6 +247,12 @@ public class ArchiefAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class PlaceholderAndTooltipMustBeEqual$868 extends DslOracle {
@@ -245,6 +287,12 @@ public class ArchiefAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class Discount_div_287WasDisplayedAtSameTimeAsDiscount_div_227$1003 extends DslOracle {
@@ -279,6 +327,12 @@ public class ArchiefAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class Discount_div_353WasDisplayedAtSameTimeAsDiscount_div_227$1164 extends DslOracle {
@@ -313,6 +367,12 @@ public class ArchiefAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class Discount_div_405WasDisplayedAtSameTimeAsDiscount_div_227$1325 extends DslOracle {
@@ -347,6 +407,12 @@ public class ArchiefAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class Discount_div_227WasDisplayedAtSameTimeAsDiscount_div_287$1486 extends DslOracle {
@@ -381,6 +447,12 @@ public class ArchiefAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class Discount_div_353WasDisplayedAtSameTimeAsDiscount_div_287$1647 extends DslOracle {
@@ -415,6 +487,12 @@ public class ArchiefAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class Discount_div_405WasDisplayedAtSameTimeAsDiscount_div_287$1808 extends DslOracle {
@@ -449,6 +527,12 @@ public class ArchiefAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class Discount_div_227WasDisplayedAtSameTimeAsDiscount_div_353$1969 extends DslOracle {
@@ -483,6 +567,12 @@ public class ArchiefAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class Discount_div_287WasDisplayedAtSameTimeAsDiscount_div_353$2130 extends DslOracle {
@@ -517,6 +607,12 @@ public class ArchiefAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class Discount_div_405WasDisplayedAtSameTimeAsDiscount_div_353$2291 extends DslOracle {
@@ -551,6 +647,12 @@ public class ArchiefAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class Discount_div_227WasDisplayedAtSameTimeAsDiscount_div_405$2452 extends DslOracle {
@@ -585,6 +687,12 @@ public class ArchiefAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class Discount_div_287WasDisplayedAtSameTimeAsDiscount_div_405$2613 extends DslOracle {
@@ -619,6 +727,12 @@ public class ArchiefAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
    
    public static class Discount_div_353WasDisplayedAtSameTimeAsDiscount_div_405$2774 extends DslOracle {
@@ -653,6 +767,12 @@ public class ArchiefAsserts {
         }
         return verdict;
      }
+
+    @Override
+    public void initialize() {
+        // TODO Auto-generated method stub
+        
+    }
    }
      
 }
