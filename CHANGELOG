@@ -1,3 +1,12 @@
+#TESTAR v2.7.16 (28-Nov-2025)
+- Add AndroidCapabilitiesFactory for creating appium capabilities
+- Implement AndroidRoles
+- Refactor Android click and type actions
+- Add xpath action fallback to sendKeysTextTextElementById
+- Create DummyReportManager to avoid null exceptions
+- Remove unused NativeLinker methods
+
+
 #TESTAR v2.7.15 (3-Nov-2025)
 - Fix WdRootElement parent
 - Improve WdElement isDisplayed logic
