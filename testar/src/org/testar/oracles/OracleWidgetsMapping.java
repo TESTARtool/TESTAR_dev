@@ -380,6 +380,16 @@ public interface OracleWidgetsMapping {
 		return false;
 	}
 
+	default boolean evaluateMatchesWithName(Object obj, String regex, String name) {
+		// TODO: Do we need the regex pattern name for something?
+		return evaluateMatches(obj, regex);
+	}
+
+	default boolean evaluateMatchesWithName(Widget w, String regex, String name) {
+		// TODO: Do we need the regex pattern name for something?
+		return evaluateMatches(w, regex);
+	}
+
 	default boolean evaluateIsEqualTo(Object obj, Object compare) {
 		return Objects.equals(obj, compare);
 	}

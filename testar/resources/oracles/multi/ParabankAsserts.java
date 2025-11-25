@@ -8,6 +8,8 @@ import org.testar.oracles.DslOracle;
 
 public class ParabankAsserts {
    
+   private static String $twoWords_RE = "^\\w+(?:\\s+\\w+){1,1}$";
+   
    
    public static class ImagesMustHaveAlternativeText$101 extends DslOracle {
      /*
@@ -29,7 +31,6 @@ public class ParabankAsserts {
      @Override
      public Verdict getVerdict(State state) {
         Widget constraintWidget = getConstraintWidgetOrState(state);
-        
         Verdict verdict = Verdict.OK;
         for (Widget $it: getWidgets("image", constraintWidget)) {
           
@@ -63,7 +64,6 @@ public class ParabankAsserts {
      @Override
      public Verdict getVerdict(State state) {
         Widget constraintWidget = getConstraintWidgetOrState(state);
-        
         Verdict verdict = Verdict.OK;
         Widget widget$193$32 = getWidget("static_text", "Welcome John Smith", constraintWidget);
         if (widget$193$32 == null) {
@@ -100,7 +100,6 @@ public class ParabankAsserts {
      @Override
      public Verdict getVerdict(State state) {
         Widget constraintWidget = getConstraintWidgetOrState(state);
-        
         Verdict verdict = Verdict.OK;
         for (Widget $it: getWidgets("table_data", constraintWidget)) {
           
@@ -115,6 +114,42 @@ public class ParabankAsserts {
             }
             markAsNonVacuous();
           }
+        }
+        return verdict;
+     }
+   }
+   
+   public static class AccountServicesLinksMustMatchTwoWords$622 extends DslOracle {
+     /*
+      assert for all link
+          it.text matches twoWords
+          "Account Services links must match two words".
+     */
+   
+     @Override
+     public void initialize() {
+        
+        addSectionConstraint(java.util.Arrays.asList("Parabank | .*", "Account Services"));
+        
+     }
+   
+     @Override
+     public String getMessage() {
+       return "Account Services links must match two words";
+     }
+   
+     @Override
+     public Verdict getVerdict(State state) {
+        Widget constraintWidget = getConstraintWidgetOrState(state);
+        Verdict verdict = Verdict.OK;
+        for (Widget $it: getWidgets("link", constraintWidget)) {
+          
+          Object widget$592$7 = getProperty($it, "text");
+          boolean cond$600 = evaluateMatchesWithName(widget$592$7, $twoWords_RE, "twoWords");
+          if (!cond$600) { 
+            verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), $it)); 
+          }
+          markAsNonVacuous();
         }
         return verdict;
      }
