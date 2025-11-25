@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -134,7 +134,7 @@ public class AndroidState extends AndroidWidget implements State {
 			ret = w.element.className;
 		}
 		else if (t.equals(Tags.Role)) {
-			ret = AndroidRoles.AndroidWidget;
+			ret = AndroidRoles.fromTypeId(w.element.className);
 		}
 		else if (t.equals(Tags.HitTester)) {
 			ret = new org.testar.monkey.alayer.android.AndroidHitTester(w.element);

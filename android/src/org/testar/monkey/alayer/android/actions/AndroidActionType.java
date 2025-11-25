@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -51,13 +51,13 @@ public class AndroidActionType extends TaggableBase implements Action {
 			.setFillPattern(FillPattern.None).setStrokeWidth(3).build(); // use default font size
 	private final int DISPLAY_TEXT_MAX_LENGTH = 16;
 
-	public AndroidActionType(State state, Widget w, String typeText, String accessibilityId, String className) {
+	public AndroidActionType(State state, Widget w, String typeText) {
 		this.set(Tags.Role, ActionRoles.ClickTypeInto);
 		this.mapOriginWidget(w);
 		this.set(Tags.InputText, typeText);
-		this.accessibilityId = accessibilityId;
+		this.accessibilityId = w.get(AndroidTags.AndroidAccessibilityId, "");
 		this.widget = w;
-		this.widgetClass = className;
+		this.widgetClass = w.get(AndroidTags.AndroidClassName, "");
 		this.xpath = w.get(AndroidTags.AndroidXpath);
 		double relX = w.get(Tags.Shape).x() + w.get(Tags.Shape).width()/2;
 		double relY = w.get(Tags.Shape).y() + w.get(Tags.Shape).height()/2;

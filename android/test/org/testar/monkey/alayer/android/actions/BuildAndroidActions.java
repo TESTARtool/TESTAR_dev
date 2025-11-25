@@ -34,10 +34,7 @@ public class BuildAndroidActions {
 
 	@Test
 	public void buildAndroidActionClick() {
-		Action androidClick = new AndroidActionClick(state, widget,
-				widget.get(AndroidTags.AndroidText,""),
-				widget.get(AndroidTags.AndroidAccessibilityId,""),
-				widget.get(AndroidTags.AndroidClassName, ""));
+		Action androidClick = new AndroidActionClick(state, widget);
 		// Verify Action <-> Widget mapping
 		Assert.notNull(androidClick.get(Tags.OriginWidget));
 		Assert.isTrue(androidClick.get(Tags.OriginWidget).get(AndroidTags.AndroidXpath).equals(pathTest));
@@ -73,10 +70,7 @@ public class BuildAndroidActions {
 
 	@Test
 	public void buildAndroidActionType() {
-		Action androidType = new AndroidActionType(state, widget,
-				"TextToType",
-				widget.get(AndroidTags.AndroidAccessibilityId,""),
-				widget.get(AndroidTags.AndroidClassName, ""));
+		Action androidType = new AndroidActionType(state, widget, "TextToType");
 		// Verify Action <-> Widget mapping
 		Assert.notNull(androidType.get(Tags.OriginWidget));
 		Assert.isTrue(androidType.get(Tags.OriginWidget).get(AndroidTags.AndroidXpath).equals(pathTest));

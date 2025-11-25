@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2024 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -105,22 +105,13 @@ public class Protocol_test_gradle_workflow_android_generic extends AndroidProtoc
 
 			// type into text boxes
 			if (isTypeable(widget)) {
-				actions.add(
-						new AndroidActionType(state, widget,
-								InputDataManager.getRandomTextInputData(widget),
-								widget.get(AndroidTags.AndroidAccessibilityId,""),
-								widget.get(AndroidTags.AndroidClassName,""))
-						);
+			    String randomInput = InputDataManager.getRandomTextInputData(widget);
+				actions.add(new AndroidActionType(state, widget, randomInput));
 			}
 
 			// left clicks, but ignore links outside domain
 			if (isClickable(widget)) {
-				actions.add(
-						new AndroidActionClick(state, widget,
-								widget.get(AndroidTags.AndroidText,""),
-								widget.get(AndroidTags.AndroidAccessibilityId,""),
-								widget.get(AndroidTags.AndroidClassName, ""))
-						);
+				actions.add(new AndroidActionClick(state, widget));
 			}
 
 			if (isLongClickable(widget)) {
