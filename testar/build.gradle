@@ -113,6 +113,10 @@ dependencies {
     implementation group: 'org.eclipse.angus', name: 'jakarta.mail', version: '2.0.3'
     // https://mvnrepository.com/artifact/org.checkerframework/checker
     implementation("org.checkerframework:checker:3.49.1")
+    // https://mvnrepository.com/artifact/org.languagetool/languagetool-core
+    implementation group: 'org.languagetool', name: 'languagetool-core', version: '5.8'
+    // https://mvnrepository.com/artifact/org.languagetool/language-all
+    implementation group: 'org.languagetool', name: 'language-all', version: '5.8'
 }
 
 task prepareSettings(type: Copy) {

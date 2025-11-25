@@ -154,5 +154,38 @@ public class ParabankAsserts {
         return verdict;
      }
    }
+   
+   public static class SpellCheckingForEnglishTableHeaders$246 extends DslOracle {
+       /*
+        assert for all table
+          it.headerText spell checks in en_GB "Spell checking for English table headers".
+       */
      
+       @Override
+       public void initialize() {
+          
+       }
+     
+       @Override
+       public String getMessage() {
+         return "Spell checking for English table headers";
+       }
+     
+       @Override
+       public Verdict getVerdict(State state) {
+          Widget constraintWidget = getConstraintWidgetOrState(state);
+          Verdict verdict = Verdict.OK;
+          for (Widget $it: getWidgets("table", constraintWidget)) {
+            
+            Object widget$213$13 = getProperty($it, "headerText");
+            boolean cond$227 = evaluateSpellChecks(widget$213$13, "en_GB");
+            if (!cond$227) { 
+              verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), $it)); 
+            }
+            markAsNonVacuous();
+          }
+          return verdict;
+       }
+     }
+   
 }

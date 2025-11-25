@@ -303,4 +303,29 @@ public class OracleWidgetsMappingTest {
 
         assertFalse(mapping.evaluateAreStatus(children, "enabled"));
     }
+
+    /** Evaluate Spell Checks tests **/
+
+    @Test
+    public void testSpellCheckEnglishValid() {
+        WidgetStub header = createWidget(state, WdRoles.WdH1, "Account Services");
+
+        Object result = mapping.getProperty(header, "text");
+        assertNotNull(result);
+        assertTrue(result instanceof String);
+
+        assertTrue(mapping.evaluateSpellChecks(result, "en_GB"));
+    }
+
+    @Test
+    public void testSpellCheckEnglishInvalid() {
+        WidgetStub header = createWidget(state, WdRoles.WdH1, "Acount Servises");
+
+        Object result = mapping.getProperty(header, "text");
+        assertNotNull(result);
+        assertTrue(result instanceof String);
+
+        assertFalse(mapping.evaluateSpellChecks(result, "en_GB"));
+    }
+
 }

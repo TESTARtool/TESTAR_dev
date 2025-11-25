@@ -30,12 +30,16 @@
 
 package org.testar.oracles;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.languagetool.JLanguageTool;
+import org.languagetool.Languages;
+import org.languagetool.rules.RuleMatch;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
@@ -396,6 +400,30 @@ public interface OracleWidgetsMapping {
 
 	default boolean evaluateIsEqualTo(Object obj, Supplier<Object> compareSupplier) {
 		return Objects.equals(obj, compareSupplier.get());
+	}
+
+	default boolean evaluateSpellChecks(Object obj, String locale) {
+		if(obj != null && locale != null && obj instanceof String) {
+			return evaluateSpellChecks((String)obj, locale);
+		}
+		else {
+			return true;
+		}
+	}
+
+	default boolean evaluateSpellChecks(String text, String locale) {
+		if(text != null && locale != null) {
+			try {
+				JLanguageTool langTool = new JLanguageTool(Languages.getLanguageForShortCode(locale.replace("_", "-")));
+				List<RuleMatch> matches = langTool.check(text);
+				return matches.size() <= 0;
+			} catch (Exception e) {
+				e.printStackTrace();
+				return true;
+			}
+		} else {
+			return true;
+		}
 	}
 
 	private List<Widget> getWidgetChildren(Widget w) {
