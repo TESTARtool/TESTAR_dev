@@ -407,9 +407,18 @@ public class WdElement extends TaggableBase implements Serializable {
   }
 
   public boolean isDisplayed() {
-      if (display == null) return true;
-      String disp = display.trim().toLowerCase();
-      return !disp.contains("none") && !isHidden();
+      // If this element (or any ancestor) is hidden or has display:none, 
+      // consider is not displayed
+      for (WdElement n = this; n != null; n = n.parent) {
+          if (n.isHidden()) return false;
+
+          String d = n.display;
+          if (d != null && d.trim().equalsIgnoreCase("none")) {
+              return false;
+          }
+      }
+
+      return true;
   }
 
   @SuppressWarnings("unchecked")

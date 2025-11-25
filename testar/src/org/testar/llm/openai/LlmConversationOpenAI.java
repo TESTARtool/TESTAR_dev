@@ -40,6 +40,8 @@ import org.testar.llm.LlmConversation;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.reflect.TypeToken;
 
@@ -51,15 +53,17 @@ public class LlmConversationOpenAI implements LlmConversation {
     protected static final Logger logger = LogManager.getLogger();
 
     private String model;
-    private String format;
+    private String reasoning_effort;
+    private ResponseFormat response_format;
     private List<Message> messages;
     private float temperature = 0.2f;
     private Integer max_tokens = null;
     private boolean stream = false;
 
-    public LlmConversationOpenAI(String model, float temperature) {
+    public LlmConversationOpenAI(String model, String reasoning_effort, float temperature) {
         this.model = model;
-        this.format = "json";
+        this.reasoning_effort = reasoning_effort;
+        this.response_format = new ResponseFormat("json_object");
         this.messages = new ArrayList<>();
         this.temperature = temperature;
     }
@@ -72,12 +76,20 @@ public class LlmConversationOpenAI implements LlmConversation {
         this.model = model;
     }
 
-    public String getFormat() {
-        return format;
+    public String getReasoningEffort() {
+        return reasoning_effort;
     }
 
-    public void setFormat(String format) {
-        this.format = format;
+    public void setReasoningEffort(String reasoning_effort) {
+        this.reasoning_effort = reasoning_effort;
+    }
+
+    public ResponseFormat getResponseFormat() {
+        return response_format;
+    }
+
+    public void setResponseFormat(ResponseFormat response_format) {
+        this.response_format = response_format;
     }
 
     public List<Message> getMessages() {
@@ -110,6 +122,12 @@ public class LlmConversationOpenAI implements LlmConversation {
 
     public void setStream(boolean stream) {
         this.stream = stream;
+    }
+
+    @Override
+    public String buildRequestBody() {
+        // Serialization for OpenAI
+        return new GsonBuilder().create().toJson(toRequestJson());
     }
 
     @Override
@@ -222,4 +240,77 @@ public class LlmConversationOpenAI implements LlmConversation {
             return url;
         }
     }
+
+    public static class ResponseFormat {
+        private String type;
+        public ResponseFormat(String type) { this.type = type; }
+        public String getType() { return type; }
+    }
+
+    public JsonObject toRequestJson() {
+        JsonObject root = new JsonObject();
+
+        root.addProperty("model", model);
+
+        if (supportsReasoningEffort(model)
+                && reasoning_effort != null
+                && !reasoning_effort.isEmpty()
+                && !"default".equalsIgnoreCase(reasoning_effort)) {
+            root.addProperty("reasoning_effort", reasoning_effort);
+        }
+
+        if (response_format != null && response_format.getType() != null) {
+            JsonObject rf = new JsonObject();
+            rf.addProperty("type", response_format.getType());
+            root.add("response_format", rf);
+        }
+
+        if (!hasFixedTemperature(model)) {
+            root.addProperty("temperature", temperature);
+        }
+
+        if (max_tokens != null) {
+            root.addProperty("max_tokens", max_tokens);
+        }
+
+        root.addProperty("stream", stream);
+
+        JsonArray msgs = new JsonArray();
+        for (Message m : messages) {
+            JsonObject jm = new JsonObject();
+            jm.addProperty("role", m.getRole());
+            JsonArray content = new JsonArray();
+            for (ContentPart p : m.getContent()) {
+                if (p == null || p.getType() == null) continue;
+                JsonObject part = new JsonObject();
+                part.addProperty("type", p.getType());
+                if ("text".equals(p.getType())) {
+                    part.addProperty("text", p.getText() == null ? "" : p.getText());
+                } else if ("image_url".equals(p.getType()) && p.getImage_url() != null) {
+                    JsonObject iu = new JsonObject();
+                    iu.addProperty("url", p.getImage_url().getUrl());
+                    part.add("image_url", iu);
+                }
+                content.add(part);
+            }
+            jm.add("content", content);
+            msgs.add(jm);
+        }
+        root.add("messages", msgs);
+
+        return root;
+    }
+
+    private static boolean supportsReasoningEffort(String model) {
+        if (model == null) return false;
+        String m = model.toLowerCase();
+        return m.startsWith("gpt-5") || m.startsWith("o-") || m.contains("reasoning");
+    }
+
+    private static boolean hasFixedTemperature(String model) {
+        if (model == null) return false;
+        String m = model.toLowerCase();
+        return m.startsWith("gpt-5") || m.startsWith("o-") || m.contains("reasoning");
+    }
+
 }

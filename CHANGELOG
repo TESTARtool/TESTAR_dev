@@ -1,3 +1,26 @@
+#TESTAR v2.7.15 (3-Nov-2025)
+- Fix WdRootElement parent
+- Improve WdElement isDisplayed logic
+- Refactor image prompt generator
+- Update TextVisualizer catching
+- Update Android input text for LLM prompts
+
+
+#TESTAR v2.7.14 (27-Oct-2025)
+- Bump org.seleniumhq.selenium:selenium-java from 4.37.0 to 4.38.0
+- Update devtools dependencies to v142
+
+
+#TESTAR v2.7.13 (24-Oct-2025)
+- Add reasoning effort to OpenAI API
+- Update corresponding llm protocols
+
+
+#TESTAR v2.7.12 (22-Oct-2025)
+- Bump org.seleniumhq.selenium:selenium-java from 4.36.0 to 4.37.0
+- Update devtools dependencies to v141
+
+
 #TESTAR v2.7.11 (7-Oct-2025)
 - Bump org.seleniumhq.selenium:selenium-java from 4.35.0 to 4.36.0
 - Update devtools dependences to v140

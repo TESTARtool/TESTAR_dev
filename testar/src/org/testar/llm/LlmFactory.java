@@ -50,10 +50,10 @@ public class LlmFactory {
      * @param temperature Lower values result in more predictable output, usually between 0-1f.
      * @return LlmConversation for the chosen platform.
      */
-    public static LlmConversation createLlmConversation(String platform, String model, float temperature) {
+    public static LlmConversation createLlmConversation(String platform, String model, String reasoning, float temperature) {
         switch (platform) {
         case "OpenAI":
-            return new LlmConversationOpenAI(model, temperature);
+            return new LlmConversationOpenAI(model, reasoning, temperature);
         case "Gemini":
             return new LlmConversationGemini();
         default:

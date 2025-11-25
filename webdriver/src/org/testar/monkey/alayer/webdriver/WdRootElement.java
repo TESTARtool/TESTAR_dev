@@ -49,7 +49,7 @@ public class WdRootElement extends WdElement {
   public WdRootElement() {
 	  super(null, null);
 	  root = this;
-	  parent = this;
+	  parent = null; // root element has no parent
 	  isForeground = true;
 	  documentTitle = WdDriver.getCurrentUrl();
 	  blocked = false;
@@ -58,7 +58,7 @@ public class WdRootElement extends WdElement {
   public WdRootElement(Map<String, Object> packedbody) {
     super(packedbody, null, null);
     root = this;
-    parent = this;
+    parent = null; // root element has no parent
     isForeground = (Boolean) packedbody.get("documentHasFocus");
     documentTitle = (String) packedbody.get("documentTitle");
     blocked = false;

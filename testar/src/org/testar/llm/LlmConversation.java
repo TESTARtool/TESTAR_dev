@@ -44,6 +44,8 @@ import org.apache.logging.log4j.Logger;
 public interface LlmConversation {
     static final Logger logger = LogManager.getLogger();
 
+    public String buildRequestBody();
+
     public void initConversation(String fewshotFile);
 
     public void addMessage(String role, String textContent);

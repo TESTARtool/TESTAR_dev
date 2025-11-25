@@ -119,6 +119,9 @@ public final class ConfigTags {
 	public static final Tag<String> LlmModel = Tag.from("LlmModel", String.class,
 			"The model used by the LLM agent");
 
+	public static final Tag<String> LlmReasoning = Tag.from("LlmReasoning", String.class,
+			"The reasoning effort of the LLM model");
+
 	public static final Tag<String> LlmHostUrl = Tag.from("LlmHostUrl", String.class,
 			"The Host URL on which the LLM agent is running");
 

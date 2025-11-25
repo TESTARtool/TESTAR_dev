@@ -36,14 +36,12 @@ import org.testar.monkey.alayer.actions.ActionRoles;
 import org.testar.monkey.alayer.exceptions.ActionFailedException;
 import org.testar.monkey.alayer.visualizers.TextVisualizer;
 import org.testar.monkey.alayer.android.AndroidAppiumFramework;
-import org.testar.monkey.alayer.android.enums.AndroidRoles;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 
 public class AndroidActionType extends TaggableBase implements Action {
 
 	private static final long serialVersionUID = 6685918140970666660L;
 
-	private final String type;
 	private final String accessibilityId;
 	private final Widget widget;
 	private final String widgetClass;
@@ -53,10 +51,10 @@ public class AndroidActionType extends TaggableBase implements Action {
 			.setFillPattern(FillPattern.None).setStrokeWidth(3).build(); // use default font size
 	private final int DISPLAY_TEXT_MAX_LENGTH = 16;
 
-	public AndroidActionType(State state, Widget w, String type, String accessibilityId, String text, String className) {
+	public AndroidActionType(State state, Widget w, String typeText, String accessibilityId, String className) {
 		this.set(Tags.Role, ActionRoles.ClickTypeInto);
 		this.mapOriginWidget(w);
-		this.type = type;
+		this.set(Tags.InputText, typeText);
 		this.accessibilityId = accessibilityId;
 		this.widget = w;
 		this.widgetClass = className;
@@ -64,16 +62,17 @@ public class AndroidActionType extends TaggableBase implements Action {
 		double relX = w.get(Tags.Shape).x() + w.get(Tags.Shape).width()/2;
 		double relY = w.get(Tags.Shape).y() + w.get(Tags.Shape).height()/2;
 		Position position = new AbsolutePosition(relX, relY);
-		this.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate(type, DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
+		this.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate(typeText, DISPLAY_TEXT_MAX_LENGTH, "..."), TypePen));
 		this.set(Tags.Desc, toShortString());
 	}
 
 	@Override
 	public void run(SUT system, State state, double duration) throws ActionFailedException {
-		try {
-			AndroidAppiumFramework.sendKeysTextTextElementById(this.accessibilityId, this.type, this.widget);
+	    String typeText = this.get(Tags.InputText, "");
+	    try {
+			AndroidAppiumFramework.sendKeysTextTextElementById(this.accessibilityId, typeText, this.widget);
 		} catch(Exception e) {
-			System.err.println("Exception trying to Type " + this.type + " in the Element with Id : " + this.accessibilityId);
+			System.err.println("Exception trying to Type " + typeText + " in the Element with Id : " + this.accessibilityId);
 			System.err.println(e.getMessage());
 			throw new ActionFailedException(toShortString());
 		}
@@ -81,7 +80,8 @@ public class AndroidActionType extends TaggableBase implements Action {
 
 	@Override
 	public String toShortString() {
-		return "Execute Android type on Widget of type: '" + this.widgetClass + "', with Id: '" + this.accessibilityId + "', with xPath: '" + this.xpath + "', typing text: " + this.type;
+	    String typeText = this.get(Tags.InputText, "");
+		return "Execute Android type on Widget of type: '" + this.widgetClass + "', with Id: '" + this.accessibilityId + "', with xPath: '" + this.xpath + "', typing text: " + typeText;
 	}
 
 	@Override
