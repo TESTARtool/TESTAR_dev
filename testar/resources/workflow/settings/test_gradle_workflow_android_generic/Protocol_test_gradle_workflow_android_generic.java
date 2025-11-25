@@ -41,6 +41,7 @@ import org.testar.monkey.alayer.exceptions.*;
 import org.testar.monkey.alayer.android.actions.*;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 import org.testar.protocols.AndroidProtocol;
+import org.testar.reporting.ReportManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -135,8 +136,9 @@ public class Protocol_test_gradle_workflow_android_generic extends AndroidProtoc
 		super.postSequenceProcessing(); // Finish Reports
 
 		// Verify html and txt report files were created
-		File htmlReportFile = new File(reportManager.getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".html"));
-		File txtReportFile = new File(reportManager.getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".txt"));
+		Assert.isTrue(reportManager instanceof ReportManager);
+		File htmlReportFile = new File(((ReportManager)reportManager).getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".html"));
+		File txtReportFile = new File(((ReportManager)reportManager).getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".txt"));
 		System.out.println("htmlReportFile: " + htmlReportFile.getPath());
 		System.out.println("txtReportFile: " + txtReportFile.getPath());
 		Assert.isTrue(htmlReportFile.exists());
