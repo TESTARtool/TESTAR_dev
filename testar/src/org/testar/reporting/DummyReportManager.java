@@ -59,7 +59,7 @@ public class DummyReportManager implements Reporting {
     }
 
     @Override
-    public void addTestVerdict(State state, Verdict verdict) {
+    public void addTestVerdict(Verdict verdict) {
 
     }
 
