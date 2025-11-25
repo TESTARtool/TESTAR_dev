@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2024 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -166,17 +166,35 @@ public class AndroidAppiumFramework extends SUTBase {
 	 * @param w
 	 */
 	public static void sendKeysTextTextElementById(String id, String text, Widget w){
-		if (!id.equals("")) {
-			WebElement element = driver.findElement(new AppiumBy.ByAccessibilityId(id));
-			element.clear();
-			element.sendKeys(text);
+		// Try by accessibility id only if it's non-null and non-empty
+		if (id != null && !id.isEmpty()) {
+			List<WebElement> elements = driver.findElements(new AppiumBy.ByAccessibilityId(id));
+
+			// Use the ID only if exactly one element is found
+			if (elements.size() == 1) {
+				WebElement element = elements.get(0);
+				element.clear();
+				element.sendKeys(text);
+				return;
+			}
 		}
-		else {
-			String xpathString = w.get(AndroidTags.AndroidXpath);
-			WebElement element = driver.findElement(new By.ByXPath(xpathString));
-			element.clear();
-			element.sendKeys(text);
-		}
+
+		// Fallback using XPath: ID is empty or did not resolve to exactly one element
+		AndroidAppiumFramework.sendKeysTextTextElementByXPath(text, w);
+	}
+
+	/**
+	 * Send Type Action. 
+	 * Uses unique xpath to identify the element. 
+	 * 
+	 * @param text
+	 * @param w
+	 */
+	public static void sendKeysTextTextElementByXPath(String text, Widget w){
+		String xpathString = w.get(AndroidTags.AndroidXpath);
+		WebElement element = driver.findElement(new By.ByXPath(xpathString));
+		element.clear();
+		element.sendKeys(text);
 	}
 
 	public static void scrollElementById(String id, Widget w, int scrollDistance) {
@@ -540,37 +558,60 @@ public class AndroidAppiumFramework extends SUTBase {
 		DesiredCapabilities cap = new DesiredCapabilities();
 
 		try (FileReader reader = new FileReader(capabilitesJsonFile)) {
-
-			JsonObject jsonObject = new JsonParser().parse(reader).getAsJsonObject();
+			JsonObject json = new JsonParser().parse(reader).getAsJsonObject();
 
 			// https://appium.io/docs/en/2.0/guides/caps/
-			cap.setCapability("platformName", jsonObject.get("platformName").getAsString());
+			cap.setCapability("platformName", getString(json, "platformName", "Android"));
 
-			cap.setCapability("appium:deviceName", jsonObject.get("deviceName").getAsString());
-			cap.setCapability("appium:automationName", jsonObject.get("automationName").getAsString());
-			cap.setCapability("appium:newCommandTimeout", jsonObject.get("newCommandTimeout").getAsInt());
-			cap.setCapability("appium:autoGrantPermissions", jsonObject.get("autoGrantPermissions").getAsBoolean());
+			cap.setCapability("appium:deviceName", getString(json, "deviceName", "Android Emulator"));
+			cap.setCapability("appium:automationName", getString(json, "automationName", "UiAutomator2"));
+			cap.setCapability("appium:newCommandTimeout", getInt(json, "newCommandTimeout", 600));
+			cap.setCapability("appium:autoGrantPermissions", getBool(json, "autoGrantPermissions", false));
 
-			// TODO: Check and test next capabilities
-			// cap.setCapability("allowTestPackages", true);
-			// cap.setCapability("appWaitActivity", jsonObject.get("appWaitActivity").getAsString());
+			// If the APK is already installed we use appPackage identifier
+			if (getBool(json, "isApkInstalled", false)) {
+				String appPackage = getString(json, "appPackage", null);
+				String appActivity = getString(json, "appActivity", null);
 
-			String appPath = jsonObject.get("app").getAsString();
+				if (appPackage == null || appPackage.isEmpty()) {
+					throw new IllegalArgumentException("When isApkInstalled=true, 'appPackage' is required.");
+				}
+				if (appActivity == null || appActivity.isEmpty()) {
+					throw new IllegalArgumentException(String.join("\n",
+							"When isApkInstalled=true, 'appActivity' is required (multiple launcher activities can exist).",
+							"",
+							"How to find it on Windows:",
+							"1) Manually open the app on the emulator.",
+							"2) Run:",
+							"   adb shell dumpsys activity activities | findstr /R /C:\"ResumedActivity\" /C:\"topResumedActivity\"",
+							"3) From the output, take the activity after the package name."
+							));
+				}
 
-			// If emulator is running inside a docker use the APK raw URL
-			if(jsonObject.get("isEmulatorDocker") != null 
-					&& jsonObject.get("ipAddressAppium") != null
-					&& jsonObject.get("isEmulatorDocker").getAsBoolean()) {
-
-				cap.setCapability("appium:app", appPath);
-
-				// Docker container (budtmo/docker-android) + Appium v2 do not use /wd/hub suffix anymore
-				// It can be enabled using the APPIUM_ADDITIONAL_ARGS "--base-path /wd/hub" command
-				androidAppiumURL = "http://" + jsonObject.get("ipAddressAppium").getAsString() + ":4723/wd/hub";
+				cap.setCapability("appium:appPackage", appPackage);
+				cap.setCapability("appium:appActivity", appActivity);
 			} 
-			// Else, obtain the local directory that contains the APK file
+			// Else we need to install the APK
 			else {
-				cap.setCapability("appium:app", new File(appPath).getCanonicalPath());
+				String appPath = getString(json, "app", null);
+				if (appPath == null || appPath.isEmpty()) {
+					throw new IllegalArgumentException("When isApkInstalled=false, 'app' (APK path or URL) must be provided.");
+				}
+
+				boolean isEmulatorDocker = getBool(json, "isEmulatorDocker", false);
+				String ipAddressAppium = getString(json, "ipAddressAppium", null);
+
+				// If emulator is running inside a docker use the APK raw URL
+				if (isEmulatorDocker && ipAddressAppium != null && !ipAddressAppium.isEmpty()) {
+					// Docker container (budtmo/docker-android) + Appium v2 do not use /wd/hub suffix anymore
+					// It can be enabled using the APPIUM_ADDITIONAL_ARGS "--base-path /wd/hub" command
+					cap.setCapability("appium:app", appPath);
+					androidAppiumURL = "http://" + ipAddressAppium + ":4723/wd/hub";
+				} 
+				// Else, obtain the local directory that contains the APK file
+				else {
+					cap.setCapability("appium:app", new File(appPath).getCanonicalPath());
+				}
 			}
 
 		} catch (IOException | NullPointerException e) {
@@ -579,6 +620,16 @@ public class AndroidAppiumFramework extends SUTBase {
 		}
 
 		return cap;
+	}
+
+	private static String getString(JsonObject json, String key, String def) {
+		return json.has(key) && !json.get(key).isJsonNull() ? json.get(key).getAsString() : def;
+	}
+	private static boolean getBool(JsonObject json, String key, boolean def) {
+		return json.has(key) && !json.get(key).isJsonNull() ? json.get(key).getAsBoolean() : def;
+	}
+	private static int getInt(JsonObject json, String key, int def) {
+		return json.has(key) && !json.get(key).isJsonNull() ? json.get(key).getAsInt() : def;
 	}
 
 }
