@@ -579,6 +579,39 @@ public class AnalysisManager {
         }
     }
 
+    public String fetchWidgetTreeJson(String concreteStateIdentifier) {
+        startUp();
+        try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
+            ArrayList<Element> elements = new ArrayList<>();
+
+            // convert the concrete state identifier to an internal id if needed
+            String internalId = concreteStateIdentifier.indexOf("n") == 0 ? unformatId(concreteStateIdentifier) : concreteStateIdentifier;
+
+            // 1) all widgets (nodes)
+            String stmt = "SELECT FROM (TRAVERSE IN('isChildOf') FROM (SELECT FROM Widget WHERE @RID = :rid))";
+            Map<String, Object> params = new HashMap<>();
+            params.put("rid", internalId);
+            OResultSet resultSet = db.query(stmt, params);
+            elements.addAll(fetchNodes(resultSet, "Widget", null, concreteStateIdentifier));
+            resultSet.close();
+
+            // 2) all parent/child edges between widgets
+            stmt = "SELECT FROM isChildOf WHERE in IN(SELECT @RID FROM (TRAVERSE in('isChildOf') FROM (SELECT FROM Widget WHERE @RID = :rid)))";
+            resultSet = db.query(stmt, params);
+            elements.addAll(fetchEdges(resultSet, "isChildOf"));
+            resultSet.close();
+
+            checkShutDown();
+
+            // Convert elements list to JSON (SAME ObjectMapper as writeJson)
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.writeValueAsString(elements);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "[]"; // safe fallback
+        }
+    }
+
     /**
      * This method transforms a resultset of nodes into elements.
      * @param resultSet

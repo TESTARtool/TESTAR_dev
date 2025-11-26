@@ -53,6 +53,8 @@ public class GraphServlet extends HttpServlet {
         String modelIdentifier = request.getParameter("modelIdentifier");
         String concreteStateIdentifier = request.getParameter("concrete_state_id");
 
+        String format = request.getParameter("format");
+
         // fetch the analysismanager from the servlet context
         ServletContext servletContext = getServletContext();
         // todo: this needs proper error handling
@@ -80,7 +82,7 @@ public class GraphServlet extends HttpServlet {
                 e.printStackTrace();
             }
         }
-        else if (concreteStateIdentifier != null) {
+        else if (concreteStateIdentifier != null && !"json".equalsIgnoreCase(format)) {
             // this is the controller logic for the widget tree graph.
             // if more parts are added, we should separate this logic into separate controllers
 
@@ -97,6 +99,13 @@ public class GraphServlet extends HttpServlet {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+        else if (concreteStateIdentifier != null && "json".equalsIgnoreCase(format)) {
+            String json = analysisManager.fetchWidgetTreeJson(concreteStateIdentifier);
+
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write(json != null ? json : "[]");
         }
         else {
             response.sendRedirect("/models");

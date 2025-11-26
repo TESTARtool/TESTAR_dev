@@ -41,6 +41,7 @@
         <button onclick="resetQuery()">Reset Query</button>
 
         <button onclick="generateAMP()">Export AMP</button>
+        <button id="export-json" type="button" onclick="generateModelJSON()">Export JSON</button>
 	</div>
 	<div class="layout">
         <div class="column">
@@ -1354,6 +1355,299 @@
 		a.click();
 		URL.revokeObjectURL(url);
 	}
+
+    async function generateModelJSON() {
+		// Extract the information of the initial abstract state
+		let initialNodes = cy.$(".AbstractState").filter((ele) => ele.data("isInitial") === "true");
+		let initialAbstractId = initialNodes[0].data("stateId");
+		let initialUrl = "";
+		let initialPage = "";
+		let concreteStates = [];
+		let concreteActions = [];
+		let concreteTransitions = [];
+		
+		// Iterate over each ConcreteState element in the graph
+
+		// 1) Collect unique states first (no async here)
+		const stateMap = new Map(); // AbstractID -> state data
+
+		cy.$(".ConcreteState").forEach((ele) => {
+		  const abstractID = ele.data("AbstractID");
+		  const webTitle   = ele.data("WebTitle");
+		  const webHref    = ele.data("WebHref");
+
+		  // CLEAN WebInnerHTML (remove svg/path)
+		  //const webInnerHTML = stripSvgAndPath(ele.data("WebInnerHTML"));
+
+		  //const webInnerText = ele.data("WebInnerText");
+
+		  if (!stateMap.has(abstractID)) {
+			stateMap.set(abstractID, {
+			  AbstractID: abstractID,
+			  WebTitle: webTitle,
+			  WebHref: webHref,
+			  //WebInnerHTML: webInnerHTML,
+			  //WebInnerText: webInnerText,
+			  ConcreteStateId: ele.id()
+			});
+		  }
+
+		  // initial state meta
+		  if (abstractID === initialAbstractId) {
+			initialUrl  = webHref;
+			initialPage = webTitle;
+		  }
+		});
+
+		// 2) Resolve widget trees in parallel (async)
+		const resolvedStates = await Promise.all(
+		  [...stateMap.values()].map(async (s) => {
+		    const elements = await getWidgetTreeForState(s.ConcreteStateId);
+		    const tree = buildWidgetTreeFromElements(elements);
+		    return { ...s, WidgetTree: tree };
+		  })
+		);
+
+		// 3) Emit final ConcreteState array (omit ConcreteStateId)
+		for (const s of resolvedStates) {
+		  const { ConcreteStateId, ...clean } = s;
+		  concreteStates.push(clean);
+		}
+
+		// Iterate over each ConcreteAction element in the graph
+		cy.$(".ConcreteAction").forEach((ele) => {
+			const abstractID = ele.data("AbstractID");
+			const webHref = ele.data("WebHref");
+			const webCssClasses= ele.data("WebCssClasses");
+			const webTagName= ele.data("WebTagName");
+			const desc = ele.data("Desc");
+
+			// CLEAN WebOuterHTML (handles inline icons like <button>...<svg/>...</button>)
+			const webOuterHTML = stripSvgAndPath(ele.data("WebOuterHTML"));
+
+			const webCssSelector = ele.data("WebCssSelector");
+			const inputText = ele.data("InputText");
+
+			// Check if the action already exists in concreteActions
+			if (!concreteActions.some(action => action.AbstractID === abstractID)) {
+				concreteActions.push({
+					AbstractID: abstractID,
+					WebHref: webHref,
+					WebCssClasses: webCssClasses,
+					WebTagName: webTagName,
+					Desc: desc,
+					WebOuterHTML: webOuterHTML,
+					WebCssSelector: webCssSelector,
+					InputText: inputText,
+				});
+			}
+		});
+
+		// Iterate over each ConcreteAction element to handle transitions
+		cy.$(".ConcreteAction").forEach((ele) => {
+			const sourceNode = ele.source();
+			const targetNode = ele.target();
+			if (sourceNode && targetNode) {
+				const transition = {
+					Source: sourceNode.data("AbstractID"),
+					Target: targetNode.data("AbstractID"),
+					Action: ele.data("AbstractID"),
+				};
+				// Check if the transition already exists
+				if (!concreteTransitions.some(t => 
+					t.Source === transition.Source && 
+					t.Target === transition.Target && 
+					t.Action === transition.Action)) {
+					concreteTransitions.push(transition);
+				}
+			}
+		});
+
+		// Construct the final JSON object
+		const jsonResult = {
+			InitialUrl: initialUrl,
+			InitialPage: initialPage,
+			ConcreteState: concreteStates,
+			ConcreteAction: concreteActions,
+			ConcreteTransitions: concreteTransitions,
+		};
+
+		// Download the JSON model file
+		downloadJsonFile(jsonResult, "model.json");
+	}
+	
+	// Remove any <svg> and <path> elements from an HTML string
+	function stripSvgAndPath(html) {
+	  if (typeof html !== "string" || !html.trim()) return html ?? "";
+	  const container = document.createElement("div");
+	  container.innerHTML = html;
+
+	  // Remove standalone <svg> and any <path> anywhere (including outside <svg>)
+	  container.querySelectorAll("svg, path").forEach(node => node.remove());
+
+	  // Return the cleaned markup. If the original was an outerHTML of a single node,
+	  // this still returns the same node sans the svg/path children.
+	  return container.innerHTML;
+	}
+
+	// Fetch the server-side widget tree for a concrete state as JSON (POST).
+	async function getWidgetTreeForState(concreteStateId) {
+	  console.debug("[WidgetTree] Requesting tree for concreteStateId:", concreteStateId);
+	
+	  try {
+	    const body = new URLSearchParams();
+	    body.append("concrete_state_id", concreteStateId);
+	
+	    const res = await fetch("graph?format=json", {
+	      method: "POST",
+	      headers: {
+	        "Accept": "application/json"
+	      },
+	      body
+	    });
+	
+	    const contentType = res.headers.get("content-type") || "";
+	
+	    if (!res.ok || !contentType.includes("application/json")) {
+	      const bodyText = await res.text().catch(() => "");
+	      console.warn("[WidgetTree] Unexpected response:", {
+	        status: res.status,
+	        statusText: res.statusText,
+	        bodyPreview: bodyText.slice(0, 300)
+	      });
+	      return [];
+	    }
+	
+	    const serverTree = await res.json();
+	
+	    // Normalize: always an array (never null)
+	    if (serverTree == null) return [];
+	    if (Array.isArray(serverTree)) return serverTree;
+	    if (Array.isArray(serverTree.elements)) return serverTree.elements;
+	    return [serverTree];
+	  } catch (e) {
+	    console.error("[WidgetTree] Fetch to /graph?format=json failed:", e);
+	    return [];
+	  }
+	}
+	
+	function buildWidgetTreeFromElements(elements) {
+	  if (!Array.isArray(elements)) return [];
+	
+	  // Split nodes and edges
+	  const nodeElems = elements.filter(e => e.group === "nodes");
+	  const edgeElems = elements.filter(e => e.group === "edges");
+	
+	  // id -> node object (our tree nodes)
+	  const nodeMap = new Map();
+	
+	  for (const e of nodeElems) {
+	    const d = e.data || {};
+	    const id = d.id;
+	    if (!id) continue;
+	
+	    // Base fields we care about
+	    const node = {
+	      id,
+	      AbstractID: d.AbstractID,
+	      ConcreteID: d.ConcreteID,
+	      WebTagName: d.WebTagName,
+	      WebHref: d.WebHref,
+	      WebTextContent: d.WebTextContent,
+	      WebCssSelector: d.WebCssSelector,
+	      children: [],
+	      // keep raw outerHTML and inject it only for leaves
+	      _WebOuterHTML: d.WebOuterHTML
+	    };
+	
+	    nodeMap.set(id, node);
+	  }
+	
+	  // Track which nodes have a parent
+	  const hasParent = new Set();
+	
+	  // Wire parent-child via edges
+	  for (const e of edgeElems) {
+	    const d = e.data || {};
+	
+	    const parentId = d.target || d.in;  // parent
+	    const childId  = d.source || d.out; // child
+	
+	    if (!parentId || !childId) continue;
+	
+	    const parent = nodeMap.get(parentId);
+	    const child  = nodeMap.get(childId);
+	    if (!parent || !child) continue;
+	
+	    parent.children.push(child);
+	    hasParent.add(childId);
+	  }
+	
+	  // Helper to drop empty fields and add WebOuterHTML only on leaves
+	  function finalizeNode(node) {
+	    const { _WebOuterHTML, children, ...rest } = node;
+	
+	    // Remove empty string / null / undefined fields
+	    const clean = {};
+	    for (const [k, v] of Object.entries(rest)) {
+	      if (v == null) continue;
+	      if (typeof v === "string" && v.trim() === "") continue;
+	      clean[k] = v;
+	    }
+	
+	    // Process children recursively
+	    if (children && children.length) {
+	      clean.children = children.map(finalizeNode);
+	    } else {
+	      // Leaf: include WebOuterHTML if non-empty
+	      if (typeof _WebOuterHTML === "string" && _WebOuterHTML.trim() !== "") {
+	        clean.WebOuterHTML = stripSvgAndPath(_WebOuterHTML);
+	      }
+	    }
+	
+	    return clean;
+	  }
+	
+	  // Roots = nodes that never appear as a child
+	  const roots = [];
+	  for (const node of nodeMap.values()) {
+	    if (!hasParent.has(node.id)) {
+	      roots.push(finalizeNode(node));
+	    }
+	  }
+	
+	  return roots;
+	}
+
+	function nodeAttrs(el) {
+	  const attrs = {};
+	  for (const {name, value} of el.attributes) {
+		attrs[name] = value;
+	  }
+	  // classes: keep if meaningful
+	  if (el.classList.length) {
+		const classes = [...el.classList].filter(c => !/^svg|icon|fa[srlb]?(-.*)?$/.test(c));
+		if (classes.length) attrs.class = classes.join(" ");
+	  }
+	  return attrs;
+	}
+
+	function textSnippet(el, max=256) {
+	  const t = (el.textContent || "").replace(/\s+/g, " ").trim();
+	  return t.length > max ? t.slice(0, max).trim() + "..." : t;
+	}
+	
+	function downloadJsonFile(obj, filename = "model.json") {
+	  const json = JSON.stringify(obj, null, 2); // pretty-print
+	  const blob = new Blob([json], { type: "application/json" });
+	  const url = URL.createObjectURL(blob);
+	  const a = document.createElement("a");
+	  a.href = url;
+	  a.download = filename;
+	  a.click();
+	  URL.revokeObjectURL(url);
+	}
+
 </script>
 </body>
 </html>
