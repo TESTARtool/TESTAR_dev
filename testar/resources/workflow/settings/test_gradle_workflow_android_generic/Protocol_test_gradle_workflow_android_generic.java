@@ -109,7 +109,6 @@ public class Protocol_test_gradle_workflow_android_generic extends AndroidProtoc
 						new AndroidActionType(state, widget,
 								InputDataManager.getRandomTextInputData(widget),
 								widget.get(AndroidTags.AndroidAccessibilityId,""),
-								widget.get(AndroidTags.AndroidText,""),
 								widget.get(AndroidTags.AndroidClassName,""))
 						);
 			}

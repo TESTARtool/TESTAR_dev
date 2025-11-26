@@ -195,7 +195,7 @@ public class LlmActionSelector implements IActionSelector {
                 String base64Image = Base64.getEncoder().encodeToString(imageBytes);
                 conversation.addMessage("user", prompt, base64Image);
             } catch (IOException e) {
-                logger.log(Level.WARN, "OracleImagePromptGenerator: Issue generating base64 image");
+                logger.log(Level.WARN, "LlmActionSelector: Issue generating base64 image");
                 conversation.addMessage("user", prompt);
             }
         } else {
