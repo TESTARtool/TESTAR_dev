@@ -1404,6 +1404,7 @@
 		  [...stateMap.values()].map(async (s) => {
 		    const elements = await getWidgetTreeForState(s.ConcreteStateId);
 		    const tree = buildWidgetTreeFromElements(elements);
+		    //const tree = extractWidgetsWithTextFromElements(elements);
 		    return { ...s, WidgetTree: tree };
 		  })
 		);
@@ -1617,6 +1618,61 @@
 	  }
 	
 	  return roots;
+	}
+
+	// Flat list of widgets that have WebTextContent (user-visible text).
+	function extractWidgetsWithTextFromElements(elements) {
+	  if (!Array.isArray(elements)) return [];
+	
+	  const nodeElems = elements.filter(e => e.group === "nodes");
+	  const edgeElems = elements.filter(e => e.group === "edges");
+	
+	  // Determine which nodes have children (via isChildOf edges)
+	  const hasChildren = new Set();
+	  for (const e of edgeElems) {
+	    const d = e.data || {};
+	
+	    // Use the same direction you fixed earlier for parent/child:
+	    // edge: child -> parent   (so childId = source/out)
+	    const childId = d.source || d.out;
+	    if (childId) {
+	      hasChildren.add(childId);
+	    }
+	  }
+	
+	  const result = [];
+	
+	  for (const e of nodeElems) {
+	    const d = e.data || {};
+	    const id = d.id;
+	    if (!id) continue;
+	
+	    const text = (d.WebTextContent || "").trim();
+	    if (!text) continue; // only widgets users actually see
+	
+	    const widget = {
+	      id,
+	      AbstractID: d.AbstractID,
+	      ConcreteID: d.ConcreteID,
+	      WebTagName: d.WebTagName,
+	      WebHref: d.WebHref,
+	      WebTextContent: text,
+	      WebCssSelector: d.WebCssSelector || undefined,
+	      WebOuterHTML: stripSvgAndPath(d.WebOuterHTML)
+	    };
+	
+	    // Only for leaf widgets: attach WebOuterHTML if non-empty
+	    if (!hasChildren.has(id)) {
+	      const outer = (d.WebOuterHTML || "").trim();
+	      if (outer) {
+	        widget.WebOuterHTML = outer;
+	      }
+	    }
+	
+	    result.push(widget);
+	  }
+	
+	  return result;
 	}
 
 	function nodeAttrs(el) {
