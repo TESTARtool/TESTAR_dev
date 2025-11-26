@@ -5,6 +5,7 @@
 - Add xpath action fallback to sendKeysTextTextElementById
 - Create DummyReportManager to avoid null exceptions
 - Remove unused NativeLinker methods
+- Update verdict info escape in html report
 
 
 #TESTAR v2.7.15 (3-Nov-2025)
