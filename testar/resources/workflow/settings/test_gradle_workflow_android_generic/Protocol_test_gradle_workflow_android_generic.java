@@ -104,9 +104,14 @@ public class Protocol_test_gradle_workflow_android_generic extends AndroidProtoc
 		// iterate through all widgets
 		for (Widget widget : state) {
 
+			// Ignore widgets that are not whitelisted or that are filtred
+			if(!(whiteListed(widget) || isUnfiltered(widget))) {
+				continue;
+			}
+
 			// type into text boxes
 			if (isTypeable(widget)) {
-			    String randomInput = InputDataManager.getRandomTextInputData(widget);
+				String randomInput = InputDataManager.getRandomTextInputData(widget);
 				actions.add(new AndroidActionType(state, widget, randomInput));
 			}
 
@@ -116,10 +121,7 @@ public class Protocol_test_gradle_workflow_android_generic extends AndroidProtoc
 			}
 
 			if (isLongClickable(widget)) {
-				actions.add(
-						new AndroidActionLongClick(state, widget,
-								widget.get(AndroidTags.AndroidAccessibilityId,""))
-						);
+				actions.add(new AndroidActionLongClick(state, widget));
 			}
 		}
 
