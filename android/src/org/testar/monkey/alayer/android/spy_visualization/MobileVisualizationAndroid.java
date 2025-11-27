@@ -30,6 +30,7 @@
 
 package org.testar.monkey.alayer.android.spy_visualization;
 
+import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.android.AndroidProtocolUtil;
 
@@ -38,10 +39,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Set;
+import java.util.function.Function;
 
 public class MobileVisualizationAndroid {
     private State usedState;
     private State newState;
+    private Function<State, Set<Action>> deriveActionsFunction;
     private final JPanel leftside;
     private final JPanel rightside;
     private final int width = 1100;
@@ -55,8 +59,10 @@ public class MobileVisualizationAndroid {
     public boolean closedSpyVisualization = false;
 
     /** Initialization of the android spy mode visualization. */
-    public MobileVisualizationAndroid(String screenshotPath, State state) {
+    public MobileVisualizationAndroid(String screenshotPath, State state, Function<State, Set<Action>> deriveActionsFunction) {
         this.usedState = state;
+        this.deriveActionsFunction = deriveActionsFunction;
+
         frame = new JFrame("Information screen SUT");
 
         frame.addWindowListener(new WindowAdapter() {
@@ -134,7 +140,7 @@ public class MobileVisualizationAndroid {
         // Updates screenshot and overlay
         String screenshotPath = AndroidProtocolUtil.getStateshotSpyMode(usedState);
         System.out.println("SCREENSHOT PATH SPY MODE: " + screenshotPath);
-        imagePanel.updateSc(screenshotPath, treeVizInstance.tree);
+        imagePanel.updateSc(screenshotPath, treeVizInstance.tree, deriveActionsFunction.apply(usedState));
 
         frame.revalidate();
         frame.repaint();
@@ -142,7 +148,7 @@ public class MobileVisualizationAndroid {
 
 
     /** Method called from SPY loop to update the tree and overlay of the MobileVisualizationAndroid. */
-    public void updateStateVisualization(State state) {
+    public void updateVisualization(State state) {
         this.newState = state;
 
         // Updates the tree of android widgets if changes occur in the SUT

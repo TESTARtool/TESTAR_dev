@@ -30,7 +30,9 @@
 
 package org.testar.monkey.alayer.android.spy_visualization;
 
+import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Rect;
+import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 
@@ -42,6 +44,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class OverlayVisualization extends JLayeredPane {
     private final MobileVisualizationAndroid mobileVisualizationAndroid;
@@ -51,6 +56,7 @@ public class OverlayVisualization extends JLayeredPane {
     public ArrayList<OverlayBox> boxTrackSetDisplayed = new ArrayList<>();
     private LinkedList<DefaultMutableTreeNode> queue = new LinkedList<>();
     private ArrayList<DefaultMutableTreeNode> listOfNodes = new ArrayList<>();
+    private Set<Widget> setOfActionableWidgets = Collections.emptySet();
     private int originalHeight;
     private int originalWidth;
     private int width = 440;
@@ -64,7 +70,7 @@ public class OverlayVisualization extends JLayeredPane {
         imageLabel.setBounds(0,0,width,height);
     }
 
-    public void updateSc(String screenshotPath, JTree tree) {
+    public void updateSc(String screenshotPath, JTree tree, Set<Action> derivedActions) {
     	ImageIcon tempImageIcon = new ImageIcon(screenshotPath);
     	originalHeight = tempImageIcon.getIconHeight();
     	originalWidth = tempImageIcon.getIconWidth();
@@ -86,6 +92,11 @@ public class OverlayVisualization extends JLayeredPane {
         boxTrackSetDisplayed = new ArrayList<>();
         listOfNodes = new ArrayList<>();
         queue = new LinkedList<>();
+
+        setOfActionableWidgets = derivedActions.stream()
+                .map(a -> a.get(Tags.OriginWidget, null))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
 
         DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode)tree.getModel().getRoot();
 
@@ -135,7 +146,7 @@ public class OverlayVisualization extends JLayeredPane {
         Collections.reverse(listOfNodes);
         for (DefaultMutableTreeNode node: listOfNodes) {
             try {
-                OverlayBox tempOverlayBox = new OverlayBox();
+                OverlayBox tempOverlayBox = new OverlayBox(setOfActionableWidgets);
                 tempOverlayBox.create(this, node);
                 boxTrackSetNotDisplayed.add(tempOverlayBox);
                 depth++;
@@ -163,6 +174,11 @@ public class OverlayVisualization extends JLayeredPane {
         public DefaultMutableTreeNode node;
         public boolean displayed = false;
         public OverlayBox instanceOverlayBox = this;
+        private Set<Widget> setOfActionableWidgets;
+
+        public OverlayBox(Set<Widget> setOfActionableWidgets) {
+            this.setOfActionableWidgets = setOfActionableWidgets;
+        }
 
         @Override
         public void paintComponent (Graphics g) {
@@ -175,16 +191,17 @@ public class OverlayVisualization extends JLayeredPane {
             //TODO PROBABLY USE HTE CLICKABLE AND WRITABLE FUNCTIONS IN THE GENERIC ANDROID PROTOCOL HERE!
             String className = widget.get(AndroidTags.AndroidClassName);
             Boolean clickable = widget.get(AndroidTags.AndroidClickable) && !(className.equals("android.widget.EditText"));
+            Boolean typeable = className.equals("android.widget.EditText");
+            boolean actionable = setOfActionableWidgets.contains(widget);
 
-            if (className.equals("android.widget.EditText")) {
-                g.setColor(new Color(0, 0, 255, 130));
+            if (clickable || typeable) {
+                Color color = actionable ? (clickable ? Color.GREEN // click
+                        : Color.BLUE) // type
+                        : Color.GRAY; // filtered
+
+                g.setColor(color);
+
                 g.drawOval((int)(getWidth()/2.0),(int)((getHeight()/2.0)-1), 12, 12);
-                g.setColor(new Color(0, 0, 255, 130));
-                g.fillOval((int)(getWidth()/2.0), (int)((getHeight()/2.0)-1), 12, 12);
-            } else if (clickable) {
-                g.setColor(new Color(0, 255, 0, 130));
-                g.drawOval((int)(getWidth()/2.0),(int)((getHeight()/2.0)-1), 12, 12);
-                g.setColor(new Color(0, 255, 0, 130));
                 g.fillOval((int)(getWidth()/2.0), (int)((getHeight()/2.0)-1), 12, 12);
             }
 
