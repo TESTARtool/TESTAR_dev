@@ -80,28 +80,30 @@ public class TreeVisualizationAndroid extends JPanel implements TreeSelectionLis
         //Create the scroll pane and add the tree to it.
         treeView = new JScrollPane(tree);
 
-        //Create the viewing pane for obtaining more detailed information on a widget.
-        JSplitPane infoSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        infoSplitPane.setDividerSize(0);
-        infoSplitPane.setDividerLocation(150);
-
+        // Create the viewing pane for obtaining more detailed information on a widget.
         infoPaneLeft.setLayout(new BoxLayout(infoPaneLeft, BoxLayout.Y_AXIS));
         infoPaneRight.setLayout(new BoxLayout(infoPaneRight, BoxLayout.Y_AXIS));
 
-        infoSplitPane.setLeftComponent(infoPaneLeft);
-        infoSplitPane.setRightComponent(infoPaneRight);
-        JScrollPane infoView = new JScrollPane(infoSplitPane);
-        infoView.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        infoView.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        // Make each side scrollable
+        JScrollPane infoLeftView  = new JScrollPane(infoPaneLeft);
+        JScrollPane infoRightView = new JScrollPane(infoPaneRight);
+        infoLeftView.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        infoRightView.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        infoLeftView.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        infoRightView.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-        //Add the scroll panes to a split pane.
+        // Split pane between left/right scroll panes
+        JSplitPane infoSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, infoLeftView, infoRightView);
+        infoSplitPane.setDividerSize(0);
+        infoSplitPane.setDividerLocation(150);
+
+        // Add the scroll panes to a split pane (tree on top, info at bottom).
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         splitPane.setTopComponent(treeView);
-        splitPane.setBottomComponent(infoView);
+        splitPane.setBottomComponent(infoSplitPane);
 
         Dimension minimumSize = new Dimension(400, 600);
-
-        infoView.setMinimumSize(minimumSize);
+        infoSplitPane.setMinimumSize(minimumSize);
         treeView.setMinimumSize(minimumSize);
         splitPane.setDividerLocation(550);
         splitPane.setDividerSize(0);
