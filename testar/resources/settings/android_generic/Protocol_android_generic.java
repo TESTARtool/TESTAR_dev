@@ -56,15 +56,6 @@ public class Protocol_android_generic extends AndroidProtocol {
 	// Initialization for Qlearning action selector
 	private QLearningActionSelector actionSelector;
 
-	ArrayList<String> toBeFilteredAccessId = new ArrayList<>();
-
-	ArrayList<String> toBeFilteredXpath= new ArrayList<>();
-
-	ArrayList<String> toBeFilteredTextContent = new ArrayList<>();
-
-	ArrayList<String> toBeFilteredResourceId = new ArrayList<>();
-
-
 	/**
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
@@ -118,33 +109,33 @@ public class Protocol_android_generic extends AndroidProtocol {
 		// but here you can change the way we define the identifiers of widgets and actions
 		CodingManager.buildEnvironmentActionIDs(state, action);
 	}
-	
+
 	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
 	 * This can be used for example for bypassing a login screen by filling the username and password
 	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
 	 * the SUT's configuration files etc.)
 	 */
-	 @Override
+	@Override
 	protected void beginSequence(SUT system, State state){
-	 	super.beginSequence(system, state);
+		super.beginSequence(system, state);
 	}
 
-	 /**
-	  * This method is called when the TESTAR requests the state of the SUT.
-	  * Here you can add additional information to the SUT's state or write your
-	  * own state fetching routine. The state should have attached an oracle
-	  * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
-	  * state is erroneous and if so why.
-	  * @return  the current state of the SUT with attached oracle.
-	  */
-	 @Override
-	 protected State getState(SUT system) throws StateBuildException {
-	 	State state = super.getState(system);
+	/**
+	 * This method is called when the TESTAR requests the state of the SUT.
+	 * Here you can add additional information to the SUT's state or write your
+	 * own state fetching routine. The state should have attached an oracle
+	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
+	 * state is erroneous and if so why.
+	 * @return  the current state of the SUT with attached oracle.
+	 */
+	@Override
+	protected State getState(SUT system) throws StateBuildException {
+		State state = super.getState(system);
 
-	 	//TODO: Change to StateId JSON instead of the incremental counter
-	 	// Creates a JSON file that allows debugging the information of the android widgets
-	 	/*
+		//TODO: Change to StateId JSON instead of the incremental counter
+		// Creates a JSON file that allows debugging the information of the android widgets
+		/*
 	 	try {
 	 		counter += 1;
 	 		String debugWidgetTreePath = "output" + File.separator + "android_state_debug";
@@ -154,10 +145,10 @@ public class Protocol_android_generic extends AndroidProtocol {
 	 	} catch (IOException e) {
 	 		e.printStackTrace();
 	 	}
-	 	 */
+		 */
 
-	 	return state;
-	 }
+		return state;
+	}
 
 	/**
 	 * The getVerdict methods implements the online state oracles that
@@ -171,7 +162,7 @@ public class Protocol_android_generic extends AndroidProtocol {
 		// non-responsiveness
 		// suspicious tags
 		Verdict verdict = super.getVerdict(state);
-		
+
 		//--------------------------------------------------------
 		// MORE SOPHISTICATED STATE ORACLES CAN BE PROGRAMMED HERE
 		//--------------------------------------------------------
@@ -208,33 +199,32 @@ public class Protocol_android_generic extends AndroidProtocol {
 
 			//TODO need to find a way to dynamically get the package.
 
+			// Ignore widgets that are not whitelisted or that are filtred
+			if(!(whiteListed(widget) || isUnfiltered(widget))) {
+				continue;
+			}
+
 			// type into text boxes
-			if (isTypeable(widget) && notBanned(widget)/*&& (whiteListed(widget) || isUnfiltered(widget))*/) {
-			    String randomInput = InputDataManager.getRandomTextInputData(widget);
+			if (isTypeable(widget)) {
+				String randomInput = InputDataManager.getRandomTextInputData(widget);
 				actions.add(new AndroidActionType(state, widget, randomInput));
 			}
 
-			// left clicks, but ignore links outside domain
-			if (isClickable(widget) && notBanned(widget)/* && (whiteListed(widget) || isUnfiltered(widget))*/) {
+			// left clicks
+			if (isClickable(widget)) {
 				actions.add(new AndroidActionClick(state, widget));
 			}
 
 			// Scroll action
-			if (oneScroll && notBanned(widget)) {
+			if (oneScroll) {
 				if (isScrollable(widget)) {
-					actions.add(
-							new AndroidActionScroll(state, widget,
-									widget.get(AndroidTags.AndroidAccessibilityId,""))
-					);
+					actions.add(new AndroidActionScroll(state, widget));
 					oneScroll = false;
 				}
 			}
 
-			if (isLongClickable(widget) && notBanned(widget)) {
-				actions.add(
-						new AndroidActionLongClick(state, widget,
-								widget.get(AndroidTags.AndroidAccessibilityId,""))
-				);
+			if (isLongClickable(widget)) {
+				actions.add(new AndroidActionLongClick(state, widget));
 			}
 		}
 
@@ -248,17 +238,17 @@ public class Protocol_android_generic extends AndroidProtocol {
 			actions.add(
 					//System orientation swap
 					new AndroidSystemActionOrientation(state, topWidget)
-			);
+					);
 
 			actions.add(
 					//Receive a call
 					new AndroidSystemActionCall(state, topWidget)
-			);
+					);
 
 			actions.add(
 					//Receive text message
 					new AndroidSystemActionText(state, topWidget)
-			);
+					);
 		}
 
 		return actions;
@@ -276,38 +266,8 @@ public class Protocol_android_generic extends AndroidProtocol {
 		return super.selectAction(state, actions);
 
 		// Uncomment the next line to use the Qlearning action selector
-//			System.out.println("Q-learning action selector");
-//			retAction = actionSelector.selectAction(state,actions);
-
-	}
-
-	private boolean notBanned(Widget w) {
-//		String accessId = w.get(AndroidTags.AndroidAccessibilityId);
-//		for (String el : toBeFilteredAccessId) {
-//			if (accessId.equals(el)) {
-//				return false;
-//			}
-//		}
-//		String xPath = w.get(AndroidTags.AndroidXpath);
-//		for (String el : toBeFilteredXpath) {
-//			if (xPath.equals(el)) {
-//				return false;
-//			}
-//		}
-//		String textContent = w.get(AndroidTags.AndroidText);
-//		for (String el : toBeFilteredTextContent) {
-//			if (textContent.equals(el)) {
-//				return false;
-//			}
-//		}
-//		String resourceId = w.get(AndroidTags.AndroidResourceId);
-//		for (String el : toBeFilteredResourceId) {
-//			if (resourceId.equals(el)) {
-//				return false;
-//			}
-//		}
-
-		return true;
+		//System.out.println("Q-learning action selector");
+		//retAction = actionSelector.selectAction(state,actions);
 	}
 
 }
