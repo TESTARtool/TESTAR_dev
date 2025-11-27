@@ -21,3 +21,4 @@ build.bat
 /testar/testar.bat
 /testar/windows.dll
 /testar/index.log
+/rascal/oracles/generated/*

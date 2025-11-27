@@ -199,6 +199,8 @@ link {
     colorName: str
     backgroundColor: color
     backgroundColorName: str
+
+    text: str
 }
 
 alert {

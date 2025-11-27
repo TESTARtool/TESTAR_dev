@@ -16,10 +16,31 @@ import io.usethesource.vallang.IValueFactory;
 public class DslOracleHelpers {
 
     public static ISourceLocation writeDslToTemp(IValueFactory vf, String pseudoClassName, String dsl) throws IOException {
+        String withPkg = ensureDslContainsPackage(dsl);
         Path dir = Files.createTempDirectory("testar-dsl-");
         Path file = dir.resolve(pseudoClassName + ".testar");
-        Files.writeString(file, dsl);
+        Files.writeString(file, withPkg);
         return vf.sourceLocation(file.toUri());
+    }
+
+    private static String ensureDslContainsPackage(String dsl) {
+        String[] lines = dsl.split("\\R");
+        for (String line : lines) {
+            String t = line.trim();
+            if (t.isEmpty()) {
+                continue;
+            }
+            if (t.startsWith("//") || t.startsWith("/*") || t.startsWith("*")) {
+                continue;
+            }
+            if (t.startsWith("package ") && t.endsWith(";")) {
+                // If DSL assert already has a package, just maintain
+                return dsl;
+            }
+            break;
+        }
+        // If DSL assert does not contain a package, add a default one
+        return "package generated;\n\n" + dsl;
     }
 
     public static String compileAt(Evaluator eval, ISourceLocation loc) {

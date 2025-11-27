@@ -7,9 +7,22 @@ import String;
 import ParseTree;
 
 start syntax Oracle 
-  = Package? pkgOpt Assert* asserts;
+  = Package? pkgOpt Import* imports Decl* decls;
+
 
 syntax Package = "package" {Id "."}+ elts ";" ;
+
+syntax Import = "import" {Id "."}+ elts ";";
+
+
+// !context!flatContext
+// on Decl gives ambiguity in Decl* patterns
+syntax Decl
+   = context: "context" String+ path "{" Decl* decls "}"
+   | flatContext: "context" String+ path 
+   | patternDef: "pattern" Id name "=" String javaRegexp
+   | \assert: Assert
+   ;
 
 syntax Assert 
   = "assert" ForAll? Predicate pred String message ".";
@@ -44,8 +57,13 @@ syntax Cond
   | "are" Name status
   | "has" "nonempty" Name attr
   | "contains" String string
+  | "spell" "checks"
+  | "spell" "checks" "in" Id locale
+  | "starts" "with" String
+  | "ends" "with" String
   | "matches" RegExp regexp // deprecated
   | "matches" String javaRegexp
+  | "matches" Id // from the library
   | "is" "one" "of" "[" {String ","}* strings "]"
   | "is" "equal" "to" Expr
   | bracket "(" Cond ")"

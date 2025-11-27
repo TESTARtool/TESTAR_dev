@@ -2,6 +2,7 @@ module lang::testar::Check
 
 import lang::testar::Oracle;
 import lang::testar::Model;
+import lang::testar::util::Locale;
 
 import ParseTree;
 import Message;
@@ -18,10 +19,94 @@ syntax Type
 // map from variable to type + the model
 alias TEnv = tuple[map[str, Type] env, start[Model] model];
 
-set[Message] check(start[Oracle] oracle, start[Model] model) = check(oracle.top, model);
+str getPackage(start[Oracle] oracle) {
+  if ((Oracle)`package <{Id "."}+ ids>; <Import* _> <Decl* _>` := oracle.top) {
+    return "<ids>";
+  }
+  return "";
+}
+
+loc resolveImport((Import)`import <{Id "."}+ ids>;`, start[Oracle] importer) {
+  loc myLoc = importer.top.src;
+  //println("desugaring imports: <myLoc>");
+  str myPkg = getPackage(importer);
+  str myDir = replaceAll(myPkg, ".", "/");
+  //println("myDir: <myDir> (<myPkg>)");
+  str myRoot = "";
+  if (/^<root:.*>\/<myDir>/ := myLoc.path) {
+    myRoot = root;
+  }
+  //println("myRoot: <myRoot>");
+  str path = myRoot + "/" + intercalate("/", [ "<x>" | Id x <- ids ]) + ".testar";
+  //println("path = <path>");
+  loc l = importer.top.src[path=path].top;
+  return l;
+}
+
+
+set[Message] check(start[Oracle] oracle, start[Model] model) 
+  = check(oracle.top, model) + checkRegexps(oracle)
+  + checkNestedContexts(oracle);
+
+set[Message] checkNestedContexts(start[Oracle] oracle)
+  = { error("cannot nest contexts", d.src) |
+      /Decl ctx := oracle, ctx is context, /Decl d := ctx.decls, d is context || d is flatContext };
+
+
+tuple[lrel[str, String], set[Message]] collectRegexps(start[Oracle] oracle, set[loc] seen = {}) {
+  set[Message] msgs = {};
+  lrel[str, String] res = [ <"<x>", re> | /(Decl)`pattern <Id x> = <String re>` := oracle ];
+  seen += {oracle.src.top};
+
+  for (Import imp <- oracle.top.imports) {
+    loc l = resolveImport(imp, oracle);
+    if (l in seen) {
+      msgs += {error("cyclic import", imp.src)};
+      continue; // skip it
+    }
+    if (!exists(l)) {
+      msgs += {error("cannot find import", imp.src)};
+      continue;
+    }
+    try {
+      start[Oracle] imported = parseOracle(l);
+      <res2, msgs2> = collectRegexps(imported, seen = seen);
+      res += res2;
+      msgs += msgs2;
+    }
+    catch ParseError(value x): {
+      msgs += {error("cannot parse import: <x>", imp.src)};
+    }
+  }
+  return <res, msgs>;
+}
+
+set[Message] checkRegexps(start[Oracle] oracle) {
+  <regexps, msgs> = collectRegexps(oracle);
+  msgs += { error("undefined regexp", x.src) | /(Cond)`matches <Id x>` := oracle, "<x>" notin regexps<0> };
+
+  msgs += { *checkJavaRegex(re) | <_, String re> <- regexps };
+
+  set[str] seen = {};
+  for (<str x, String re> <- regexps) {
+    if (x in seen) {
+      msgs += {error("duplicate pattern definition", re.src)};
+    }
+    seen += {x};
+  }
+  
+  return msgs;
+}
 
 set[Message] check(Oracle oracle, start[Model] model) 
-  = { *check(a, model) | Assert a <- oracle.asserts };
+  = { *check(d, model) | Decl d <- oracle.decls };
+
+set[Message] check((Decl)`<Assert a>`, start[Model] model) = check(a, model);
+
+set[Message] check((Decl)`context <String+ _> {<Decl* ds>}`, start[Model] model) 
+  = { *check(d, model) | Decl d <- ds };
+
+default set[Message] check(Decl _, start[Model] _) = {};
 
 /*
  * Typing widgets
@@ -73,8 +158,11 @@ Type lookup((Type)`<Type t1> & <Type t2>`, Name fld, start[Model] m) = ft1
  */
 
 
-set[Message] emptyMessage(String msg) 
-  = { warning("empty message", msg.src) | (String)`""` := msg };
+bool isEmpty(String s) = (String)`""` := s;
+
+set[Message] checkMessage(String msg) 
+  = { warning("empty message", msg.src) | isEmpty(msg) }
+  + { error("message should start with letter", msg.src) | !isEmpty(msg), /^[a-zA-Z]/ !:= "<msg>"[1..-1] };
 
 set[Message] checkElement((Name)`<Id e>`, start[Model] model) 
   = { builtinErrMsg("element type", elts, e.src) | list[str] elts := getElements(model), "<e>" notin elts };
@@ -88,14 +176,14 @@ Type isect((ForAll)`for all <Id t>, <{Name ","}+ ts>`) = (Type)`<Id t> & <Type t
     Type t2 := isect((ForAll)`for all <{Name ","}+ ts>`);
 
 set[Message] check((Assert)`assert for all <{Name ","}+ ts> <Predicate p> <String msg>.`, start[Model] model) 
-  = check(p, <("it": t), model>) + emptyMessage(msg)
+  = check(p, <("it": t), model>) + checkMessage(msg)
   + { *checkElement(x, model) | Name x <- ts }
   + { warning("widget overrides \'it\'", w.src) | Widget w := leftMostWidget(p), (Widget)`it` !:= w }
   when 
     Type t := isect((ForAll)`for all <{Name ","}+ ts>`);
 
 set[Message] check((Assert)`assert <Predicate p> <String msg>.`, start[Model] model) 
-  = check(p, <(), model>) + emptyMessage(msg);
+  = check(p, <(), model>) + checkMessage(msg);
 
 
 Widget leftMostWidget((Predicate)`<Widget w> <Cond _>`) = leftMostWidget(w);
@@ -189,22 +277,36 @@ set[Message] check(c:(Cond)`matches <RegExp r>`, Type t, TEnv env)
   = { error("expected string or element, not <t>", c.src) | !isStrOrElement(t) }
   + { warning("deprecated regular expression syntax;\nuse the Java notation within \"\"", r.src)};
 
-set[Message] check(c:(Cond)`matches <String re>`, Type t, TEnv env) {
-  set[Message] msgs = { error("expected string or element, not <t>", c.src) | !isStrOrElement(t) };
+set[Message] checkJavaRegex(String re) {
   try {
     str jre = "<re>"[1..-1];
     jre = unescapeJava(jre);
     rexpMatch("", jre); // we try to compile the regexp to check it conforms to java
+    return {};
   }
   catch Java("PatternSyntaxException", str msg): {
-    msgs += error(msg, re.src);
-  }
-  return msgs;
+    return {error(msg, re.src)};
+  }  
 }
 
+set[Message] check(c:(Cond)`matches <String re>`, Type t, TEnv env) 
+  = { error("expected string or element, not <t>", c.src) | !isStrOrElement(t) }
+  + checkJavaRegex(re);
+
+set[Message] check(c:(Cond)`matches <Id _>`, Type t, TEnv env) = {}; 
 
 set[Message] check(c:(Cond)`contains <String _>`, Type t, TEnv env) 
   = { error("expected string or element, not <t>", c.src) | !isStrOrElement(t) };
+
+set[Message] check(c:(Cond)`starts with <String _>`, Type t, TEnv env) = {};
+
+set[Message] check(c:(Cond)`ends with <String _>`, Type t, TEnv env) = {};
+
+set[Message] check(c:(Cond)`spell checks`, Type t, TEnv env) = {};
+
+set[Message] check(c:(Cond)`spell checks in <Id locale>`, Type t, TEnv env) 
+  = {error("unknown locale", locale.src) | "<locale>" notin LANGUAGE_BY_LOCALE };
+
 
 set[Message] check(c:(Cond)`is one of [<{String ","}* ss>]`, Type t, TEnv env) 
   = { warning("empty list of strings", c.src) | [] == [ s | String s <- ss] }
@@ -250,11 +352,16 @@ default Type typeOf(Expr _, TEnv _) = (Type)`*unknown*`;
 test bool smokeTestChecker() {
   start[Model] m = parse(#start[Model], |project://testar-oracle/src/main/rascal/lang/testar/testar.model|);
   for (loc x <- files(|project://testar-oracle/examples_for_testing/|), x.extension == "testar") {
-    start[Oracle] ast = parse(#start[Oracle], x);
-    set[Message] msgs = check(ast, m);
-    if (msgs != {}) {
-      println("errors/warnings for <x>:");
-      iprintln(msgs);
+    try {
+      start[Oracle] ast = parseOracle(x);
+      set[Message] msgs = check(ast, m);
+      if (msgs != {}) {
+        println("errors/warnings for <x>:");
+        iprintln(msgs);
+      }
+    }
+    catch value x: {
+      println("thrown: <x>");
     }
   }
   return true;

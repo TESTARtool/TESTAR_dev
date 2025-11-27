@@ -7,7 +7,36 @@ import IO;
 import ParseTree;
 import String;
 import util::FileSystem;
+import util::Maybe;
 
+
+start[Oracle] desugarFlatContexts(start[Oracle] oracle) {
+  // assumes contexts are not nested
+  bool change = true;
+  bool changed() {
+    change = true;
+    return true;
+  }
+  while (change) {
+    change = false;
+    oracle = visit (oracle) {
+      case (start[Oracle])`<Package pkg> 
+                          '<Decl* ds0>
+                          'context <String+ p> 
+                          '<Decl* ds1>
+                          '<Decl* ds2>`
+        => (start[Oracle])`<Package pkg>
+                          '<Decl* ds0> 
+                          'context <String+ p> {
+                          '  <Decl* ds1>
+                          '}
+                          '<Decl* ds2>`
+      when all(Decl d <- ds1, d is \assert), list[Decl] ds := [ d | Decl d <- ds2 ],
+        ds == [] || ds[0] is flatContext || ds[0] is context, changed()
+    }
+  }
+  return oracle;
+}
 
 start[Oracle] desugarUnless(start[Oracle] oracle) {
   return visit (oracle) {
@@ -16,19 +45,51 @@ start[Oracle] desugarUnless(start[Oracle] oracle) {
   }
 }
 
+start[Oracle] desugarConds(start[Oracle] oracle) {
+  return visit (oracle) {
+    case (Cond)`starts with <String x>` => (Cond)`matches <String re>`
+      when String re := [String]"\"^<"<x>"[1..-1]>\""
+    case (Cond)`ends with <String x>` => (Cond)`matches <String re>`
+      when String re := [String]"\"<"<x>"[1..-1]>$\""
+  }
+}
+
+
+
+
+// assumes no cyclic imports! (Check checks for this)
+start[Oracle] desugarImports(start[Oracle] oracle) {
+  loc myLoc = oracle.src;
+  
+  for (Import imp <- oracle.top.imports) {
+    loc l = resolveImport(imp, oracle);
+    start[Oracle] imported = parseOracle(l);
+    imported = desugarImports(imported);
+    oracle = visit (oracle) {
+      case (Oracle)`package <{Id "."}+ xs>; <Import* _> <Decl* ds>`
+        => (Oracle)`package <{Id "."}+ xs>; 
+                   '<Decl* dimp> 
+                   '<Decl* ds>`
+        when Decl* dimp := imported.top.decls
+      case (Oracle)`<Import* _> <Decl* ds>`
+        => (Oracle)`<Decl* dimp>
+                   '<Decl* ds>`
+        when Decl* dimp := imported.top.decls
+    }
+    oracle.top.src = myLoc; // visit removes it??
+  }
+  
+  return oracle;
+}
+
 void compileToFile(start[Oracle] oracle) {
     loc l = oracle.src.top[extension="java"];
     writeFile(l, compileToJava(oracle));
 }
 
 
-str getPackage(start[Oracle] oracle) {
-  if ((Oracle)`package <{Id "."}+ ids>; <Assert* _>` := oracle.top) {
-    return "<ids>";
-  }
-  return "";
-}
 
+// TODO: load default patterns from file and declare inside class
 str compileToJava(start[Oracle] oracle) =
   "<if (pkg != "") {>
   'package <pkg>;
@@ -39,12 +100,16 @@ str compileToJava(start[Oracle] oracle) =
   'import org.testar.oracles.DslOracle;
   '
   'public class <className> {
-  '   <for (Assert a <- desugarUnless(oracle).top.asserts) {>
-  '   <compileAssert(a)>
+  '   <for ((Decl)`pattern <Id x> = <String re>` <- pt.top.decls) {>
+  '   private static String $<x>_RE = <re>;
+  '   <}>
+  '   <for (Decl d <- pt.top.decls, !(d is patternDef)) {>
+  '   <compileDecl(d)>
   '   <}>  
   '}"
   when /^<className:.*>\.testar$/ := oracle.src.file,
-    str pkg := getPackage(oracle);
+    str pkg := getPackage(oracle),
+    start[Oracle] pt := desugarUnless(desugarConds(desugarFlatContexts(desugarImports(oracle))));
 
 
 str makeClassName(String s) {
@@ -53,11 +118,25 @@ str makeClassName(String s) {
   return intercalate("", [ capitalize(w) | str w <- split(" ", name) ]) + "$<s.src.offset>";
 }
 
-str compileAssert(Assert a)
+str compileDecl((Decl)`<Assert a>`) = compileAssert(a, []);
+
+str compileDecl((Decl)`context <String+ path> {<Decl* ds>}`) 
+  = intercalate("\n", [ compileAssert(a, ctx) | (Decl)`<Assert a>` <- ds ])
+  when 
+    list[String] ctx := [ s | String s <- path ];
+
+str compileAssert(Assert a, list[String] context)
   = "public static class <makeClassName(a.message)> extends DslOracle {
     '  /*
     '   <a>
     '  */
+    '
+    '  @Override
+    '  public void initialize() {
+    '     <if (context != []) {>
+    '     addSectionConstraint(java.util.Arrays.asList(<intercalate(", ", [ "<s>" | String s <- context ])>));
+    '     <}>
+    '  }
     '
     '  @Override
     '  public String getMessage() {
@@ -66,6 +145,7 @@ str compileAssert(Assert a)
     '
     '  @Override
     '  public Verdict getVerdict(State state) {
+    '     Widget constraintWidget = getConstraintWidgetOrState(state);
     '     Verdict verdict = Verdict.OK;
     '     <assert2java(a)>
     '     return verdict;
@@ -81,7 +161,7 @@ str assert2java((Assert) `assert for all <Name elt>, <{Name ","}+ names> <Predic
     '<assert2java((Assert) `assert for all <{Name ","}+ names> <Predicate p> <String msg>.`)>";
 
 str assert2java((Assert) `assert for all <Name elt> <Predicate p> <String msg>.`) 
-  = "for (Widget $it: getWidgets(\"<elt>\", state)) {
+  = "for (Widget $it: getWidgets(\"<elt>\", constraintWidget)) {
     '  <pred2java(p)>
     '}";
 
@@ -98,7 +178,7 @@ str condVar(Cond c) = "cond$<c.src.offset>";
 str widget2java((Widget)`it`) = ""; // no decl when in for loop
 
 str widget2java(w:(Widget)`<Name elementType> <String selector>`) = 
-  "Widget <widgetVar(w)> = getWidget(\"<w.elementType>\", <w.selector>, state);
+  "Widget <widgetVar(w)> = getWidget(\"<w.elementType>\", <w.selector>, constraintWidget);
   'if (<widgetVar(w)> == null) {
   '  return Verdict.OK;
   '}";
@@ -128,7 +208,7 @@ str pred2java((Predicate)`<Widget w> <Cond c0> when it <Cond c>`)
     '  if (!<condVar(c0)>) { 
     '    verdict = verdict.join(new Verdict(Verdict.Severity.FAIL, getMessage(), <offender(w)>)); 
     '  }
-    '  markAsNonVacuous();
+    ' markAsNonVacuous();
     '}";
 
 // rhs of when should not affect verdict, so don't reuse pred2java
@@ -160,10 +240,22 @@ str cond2java((Cond)`matches <RegExp re>`, str w)
 str cond2java((Cond)`matches <String re>`, str w)
   = "evaluateMatches(<w>, <re>)";
 
+str cond2java((Cond)`matches <Id x>`, str w)
+  = "evaluateMatchesWithName(<w>, $<x>_RE, \"<x>\")";
+
 
 
 str cond2java((Cond)`contains <String string>`, str w)
   = "evaluateContains(<w>, <string>)";
+
+
+str cond2java((Cond)`spell checks`, str w)
+  = "evaluateSpellChecks(<w>, null)";
+
+str cond2java((Cond)`spell checks in <Id locale>`, str w)
+  = "evaluateSpellChecks(<w>, \"<locale>\")";
+
+
 
 str cond2java((Cond)`is one of [<{String ","}* ss>]`, str w)
   = "evaluateIsOneOf(<w>, java.util.Arrays.asList(<ss>))";
@@ -215,13 +307,19 @@ test bool smokeTest() {
     , |project://testar-oracle/src/main/rascal/lang/ql/examples/|];
   for (loc d <- dirs, loc x <- files(d), x.extension == "testar") {
     println("smoke testing: <x>");
-    start[Oracle] ast = parse(#start[Oracle], x);
-    set[Message] msgs = check(ast, m);
-    if (Message m <- msgs, m is error) {
-      println("errors for <x>; skipping");
-      iprintln(msgs);
+    try {
+      start[Oracle] ast = parseOracle(x);
+      set[Message] msgs = check(ast, m);
+      if (Message m <- msgs, m is error) {
+        println("errors for <x>; skipping");
+        iprintln(msgs);
+      }
+      else compileToFile(ast);
     }
-    else compileToFile(ast);
+    catch value x: {
+      println("thrown: <x>");
+      continue;
+    }
   }
   return true;
 }
