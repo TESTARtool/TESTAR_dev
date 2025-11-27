@@ -6,6 +6,7 @@
 - Create DummyReportManager to avoid null exceptions
 - Remove unused NativeLinker methods
 - Update verdict info escape in html report
+- Add deriveActionsFunction to android spy mode
 
 
 #TESTAR v2.7.15 (3-Nov-2025)
