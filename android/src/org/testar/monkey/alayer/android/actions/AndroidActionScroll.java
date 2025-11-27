@@ -34,6 +34,7 @@ import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.exceptions.ActionFailedException;
 import org.testar.monkey.alayer.android.AndroidAppiumFramework;
 import org.testar.monkey.alayer.android.enums.AndroidRoles;
+import org.testar.monkey.alayer.android.enums.AndroidTags;
 
 public class AndroidActionScroll extends TaggableBase implements Action {
 
@@ -43,10 +44,10 @@ public class AndroidActionScroll extends TaggableBase implements Action {
     private final String accessibilityId;
     private final Widget widget;
 
-    public AndroidActionScroll(State state, Widget w, String accessibilityID) {
+    public AndroidActionScroll(State state, Widget w) {
         this.set(Tags.Role, AndroidRoles.AndroidWidget);
         this.mapOriginWidget(w);
-        this.accessibilityId = accessibilityID;
+        this.accessibilityId = w.get(AndroidTags.AndroidAccessibilityId, "");
         this.widget = w;
         this.set(Tags.Desc, toShortString());
     }

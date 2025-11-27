@@ -46,10 +46,10 @@ public class AndroidActionLongClick extends TaggableBase implements Action {
     private final String xpath;
     private final String text;
 
-    public AndroidActionLongClick(State state, Widget w, String accessibilityID) {
+    public AndroidActionLongClick(State state, Widget w) {
         this.set(Tags.Role, AndroidRoles.AndroidWidget);
         this.mapOriginWidget(w);
-        this.accessibilityId = accessibilityID;
+        this.accessibilityId = w.get(AndroidTags.AndroidAccessibilityId, "");
         this.widget = w;
         this.widgetClass = w.get(AndroidTags.AndroidClassName);
         this.xpath = w.get(AndroidTags.AndroidXpath);
