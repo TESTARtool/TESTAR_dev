@@ -42,8 +42,7 @@ public class BuildAndroidActions {
 
 	@Test
 	public void buildAndroidActionLongClick() {
-		Action androidLongClick = new AndroidActionLongClick(state, widget,
-				widget.get(AndroidTags.AndroidAccessibilityId,""));
+		Action androidLongClick = new AndroidActionLongClick(state, widget);
 		// Verify Action <-> Widget mapping
 		Assert.notNull(androidLongClick.get(Tags.OriginWidget));
 		Assert.isTrue(androidLongClick.get(Tags.OriginWidget).get(AndroidTags.AndroidXpath).equals(pathTest));
@@ -51,9 +50,7 @@ public class BuildAndroidActions {
 
 	@Test
 	public void buildAndroidActionPinch() {
-		Action androidPinch = new AndroidActionPinch(state, widget,
-				widget.get(AndroidTags.AndroidAccessibilityId,""),
-				false);
+		Action androidPinch = new AndroidActionPinch(state, widget, false);
 		// Verify Action <-> Widget mapping
 		Assert.notNull(androidPinch.get(Tags.OriginWidget));
 		Assert.isTrue(androidPinch.get(Tags.OriginWidget).get(AndroidTags.AndroidXpath).equals(pathTest));
@@ -61,8 +58,7 @@ public class BuildAndroidActions {
 
 	@Test
 	public void buildAndroidActionScroll() {
-		Action androidScroll = new AndroidActionScroll(state, widget,
-				widget.get(AndroidTags.AndroidAccessibilityId,""));
+		Action androidScroll = new AndroidActionScroll(state, widget);
 		// Verify Action <-> Widget mapping
 		Assert.notNull(androidScroll.get(Tags.OriginWidget));
 		Assert.isTrue(androidScroll.get(Tags.OriginWidget).get(AndroidTags.AndroidXpath).equals(pathTest));
