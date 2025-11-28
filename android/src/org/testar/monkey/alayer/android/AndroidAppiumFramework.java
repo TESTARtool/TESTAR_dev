@@ -143,60 +143,38 @@ public class AndroidAppiumFramework extends SUTBase {
 	}
 
 	/**
-	 * Send Click Action. 
-	 * Uses unique accessibility ID if present, otherwise uses xpath. 
+	 * Obtain the widget associated with the (Android) web element.
+	 * Uses unique accessibility ID if present and unique, otherwise uses xpath.
 	 * 
 	 * @param id
 	 * @param w
+	 * @return android web element
 	 */
-	public static void clickElementById(String id, Widget w){
-		if (!id.equals("")) {
-			driver.findElement(new AppiumBy.ByAccessibilityId(id)).click();
-		}
-		else {
-			String xpathString = w.get(AndroidTags.AndroidXpath);
-			driver.findElement(new By.ByXPath(xpathString)).click();
-		}
-	}
-
-	/**
-	 * Send Type Action. 
-	 * Uses unique accessibility ID if present, otherwise uses xpath. 
-	 * 
-	 * @param id
-	 * @param text
-	 * @param w
-	 */
-	public static void sendKeysTextTextElementById(String id, String text, Widget w){
-		// Try by accessibility id only if it's non-null and non-empty
+	public static WebElement resolveElementByIdOrXPath(String id, Widget w) {
 		if (id != null && !id.isEmpty()) {
+			// Try by accessibility id only if non-null and non-empty
 			List<WebElement> elements = driver.findElements(new AppiumBy.ByAccessibilityId(id));
 
 			// Use the ID only if exactly one element is found
 			if (elements.size() == 1) {
-				WebElement element = elements.get(0);
-				element.clear();
-				element.sendKeys(text);
-				return;
+				return elements.get(0);
 			}
 		}
 
 		// Fallback using XPath: ID is empty or did not resolve to exactly one element
-		AndroidAppiumFramework.sendKeysTextTextElementByXPath(text, w);
+		return AndroidAppiumFramework.resolveElementByXPath(w);
 	}
 
 	/**
-	 * Send Type Action. 
-	 * Uses unique xpath to identify the element. 
+	 * Obtain the widget associated with the (Android) web element.
+	 * Uses the xpath.
 	 * 
-	 * @param text
 	 * @param w
+	 * @return android web element
 	 */
-	public static void sendKeysTextTextElementByXPath(String text, Widget w){
+	public static WebElement resolveElementByXPath(Widget w) {
 		String xpathString = w.get(AndroidTags.AndroidXpath);
-		WebElement element = driver.findElement(new By.ByXPath(xpathString));
-		element.clear();
-		element.sendKeys(text);
+		return driver.findElement(new By.ByXPath(xpathString));
 	}
 
 	public static void scrollElementById(String id, Widget w, int scrollDistance) {

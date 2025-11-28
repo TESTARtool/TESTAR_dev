@@ -30,6 +30,7 @@
 
 package org.testar.monkey.alayer.android.actions;
 
+import org.openqa.selenium.WebElement;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.ActionRoles;
 import org.testar.monkey.alayer.android.AndroidAppiumFramework;
@@ -47,20 +48,21 @@ public class AndroidActionClick extends TaggableBase implements Action {
 	private String xpath;
 
 	public AndroidActionClick(State state, Widget w) {
-	    this.set(Tags.Role, ActionRoles.LeftClickAt);
-	    this.mapOriginWidget(w);
-	    this.text = w.get(AndroidTags.AndroidText, "");
-	    this.accessibilityID = w.get(AndroidTags.AndroidAccessibilityId, "");
-	    this.widget = w;
-	    this.widgetClass = w.get(AndroidTags.AndroidClassName);
-	    this.xpath = w.get(AndroidTags.AndroidXpath);
+		this.set(Tags.Role, ActionRoles.LeftClickAt);
+		this.mapOriginWidget(w);
+		this.text = w.get(AndroidTags.AndroidText, "");
+		this.accessibilityID = w.get(AndroidTags.AndroidAccessibilityId, "");
+		this.widget = w;
+		this.widgetClass = w.get(AndroidTags.AndroidClassName);
+		this.xpath = w.get(AndroidTags.AndroidXpath);
 		this.set(Tags.Desc, toShortString());
 	}
 
 	@Override
 	public void run(SUT system, State state, double duration) throws ActionFailedException {
 		try {
-		    AndroidAppiumFramework.clickElementById(this.accessibilityID, this.widget);
+			WebElement element = AndroidAppiumFramework.resolveElementByIdOrXPath(this.accessibilityID, this.widget);
+			element.click();
 		} catch(Exception e) {
 			System.out.println("Exception trying to click Element By Id : " + this.accessibilityID);
 			System.out.println(e.getMessage());
