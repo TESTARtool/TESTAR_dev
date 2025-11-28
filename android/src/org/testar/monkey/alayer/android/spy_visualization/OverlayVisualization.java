@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,7 +30,9 @@
 
 package org.testar.monkey.alayer.android.spy_visualization;
 
+import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Rect;
+import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 
@@ -42,6 +44,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class OverlayVisualization extends JLayeredPane {
     private final MobileVisualizationAndroid mobileVisualizationAndroid;
@@ -51,6 +56,7 @@ public class OverlayVisualization extends JLayeredPane {
     public ArrayList<OverlayBox> boxTrackSetDisplayed = new ArrayList<>();
     private LinkedList<DefaultMutableTreeNode> queue = new LinkedList<>();
     private ArrayList<DefaultMutableTreeNode> listOfNodes = new ArrayList<>();
+    private Set<String> setOfActionableWidgets = Collections.emptySet();
     private int originalHeight;
     private int originalWidth;
     private int width = 440;
@@ -64,7 +70,7 @@ public class OverlayVisualization extends JLayeredPane {
         imageLabel.setBounds(0,0,width,height);
     }
 
-    public void updateSc(String screenshotPath, JTree tree) {
+    public void updateSc(String screenshotPath, JTree tree, Set<Action> derivedActions) {
     	ImageIcon tempImageIcon = new ImageIcon(screenshotPath);
     	originalHeight = tempImageIcon.getIconHeight();
     	originalWidth = tempImageIcon.getIconWidth();
@@ -86,6 +92,14 @@ public class OverlayVisualization extends JLayeredPane {
         boxTrackSetDisplayed = new ArrayList<>();
         listOfNodes = new ArrayList<>();
         queue = new LinkedList<>();
+
+        setOfActionableWidgets = derivedActions.stream()
+                .map(a -> {
+                    Widget widget = a.get(Tags.OriginWidget, null);
+                    return widget == null ? null : widget.get(AndroidTags.AndroidXpath);
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
 
         DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode)tree.getModel().getRoot();
 
@@ -134,10 +148,14 @@ public class OverlayVisualization extends JLayeredPane {
         //Reverse list first
         Collections.reverse(listOfNodes);
         for (DefaultMutableTreeNode node: listOfNodes) {
-            OverlayBox tempOverlayBox = new OverlayBox();
-            tempOverlayBox.create(this, node);
-            boxTrackSetNotDisplayed.add(tempOverlayBox);
-            depth++;
+            try {
+                OverlayBox tempOverlayBox = new OverlayBox(setOfActionableWidgets);
+                tempOverlayBox.create(this, node);
+                boxTrackSetNotDisplayed.add(tempOverlayBox);
+                depth++;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -159,6 +177,11 @@ public class OverlayVisualization extends JLayeredPane {
         public DefaultMutableTreeNode node;
         public boolean displayed = false;
         public OverlayBox instanceOverlayBox = this;
+        private Set<String> setOfActionableWidgets;
+
+        public OverlayBox(Set<String> setOfActionableWidgets) {
+            this.setOfActionableWidgets = setOfActionableWidgets;
+        }
 
         @Override
         public void paintComponent (Graphics g) {
@@ -171,16 +194,17 @@ public class OverlayVisualization extends JLayeredPane {
             //TODO PROBABLY USE HTE CLICKABLE AND WRITABLE FUNCTIONS IN THE GENERIC ANDROID PROTOCOL HERE!
             String className = widget.get(AndroidTags.AndroidClassName);
             Boolean clickable = widget.get(AndroidTags.AndroidClickable) && !(className.equals("android.widget.EditText"));
+            Boolean typeable = className.equals("android.widget.EditText");
+            boolean actionable = setOfActionableWidgets.contains(widget.get(AndroidTags.AndroidXpath));
 
-            if (className.equals("android.widget.EditText")) {
-                g.setColor(new Color(0, 0, 255, 130));
+            if (clickable || typeable) {
+                Color color = actionable ? (clickable ? Color.GREEN // click
+                        : Color.BLUE) // type
+                        : Color.GRAY; // filtered
+
+                g.setColor(color);
+
                 g.drawOval((int)(getWidth()/2.0),(int)((getHeight()/2.0)-1), 12, 12);
-                g.setColor(new Color(0, 0, 255, 130));
-                g.fillOval((int)(getWidth()/2.0), (int)((getHeight()/2.0)-1), 12, 12);
-            } else if (clickable) {
-                g.setColor(new Color(0, 255, 0, 130));
-                g.drawOval((int)(getWidth()/2.0),(int)((getHeight()/2.0)-1), 12, 12);
-                g.setColor(new Color(0, 255, 0, 130));
                 g.fillOval((int)(getWidth()/2.0), (int)((getHeight()/2.0)-1), 12, 12);
             }
 

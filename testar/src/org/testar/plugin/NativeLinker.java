@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2024 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -44,6 +44,7 @@ import org.testar.monkey.alayer.android.AndroidAppiumFramework;
 import org.testar.monkey.alayer.android.AndroidCanvas;
 import org.testar.monkey.alayer.android.AndroidStateBuilder;
 import org.testar.monkey.alayer.android.enums.AndroidRoles;
+import org.testar.monkey.alayer.android.enums.AndroidTags;
 import org.testar.monkey.alayer.ios.IOSAppiumFramework;
 import org.testar.monkey.alayer.ios.IOSCanvas;
 import org.testar.monkey.alayer.ios.IOSStateBuilder;
@@ -360,40 +361,14 @@ public class NativeLinker {
 	}
 
 	/**
-	 * Gets the native Role wrapper for a button.
-	 * @return The native Role wrapper for a button.
-	 */
-	public static Role getNativeRole_Button(){
-		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
-			return WdRoles.WdBUTTON;
-		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
-			return UIARoles.UIAButton;
-		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
-			return AtSpiRolesWrapper.AtSpiPushButton;
-		throw new UnsupportedPlatformException();
-	}
-
-	/**
-	 * Gets the native Role wrapper for a menu item.
-	 * @return The native Role wrapper for a menu item.
-	 */
-	public static Role getNativeRole_Menuitem(){
-		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
-			return WdRoles.WdUnknown;
-		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
-			return UIARoles.UIAMenuItem;
-		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
-			return AtSpiMenuItem;
-		throw new UnsupportedPlatformException();
-	}
-
-	/**
 	 * Get native tags.
 	 * @return Native tags.
 	 */
 	public static Set<Tag<?>> getNativeTags(){
 		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
 			return WdTags.tagSet();
+		if (PLATFORM_OS.contains(OperatingSystems.ANDROID))
+			return AndroidTags.tagSet();
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return UIATags.tagSet();
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
@@ -439,6 +414,8 @@ public class NativeLinker {
 	public static Role[] getNativeClickableRoles(){
 		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
 			return WdRoles.nativeClickableRoles();
+		if (PLATFORM_OS.contains(OperatingSystems.ANDROID))
+			return AndroidRoles.nativeClickableRoles();
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			return new Role[]{UIAMenu, UIAMenuItem, UIAButton, UIACheckBox, UIARadioButton,
 					UIAComboBox, UIAList, UIAListItem,
@@ -460,6 +437,8 @@ public class NativeLinker {
 	public static Role[] getNativeTypeableRoles(){
 		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
 			return WdRoles.nativeTypeableRoles();
+		if (PLATFORM_OS.contains(OperatingSystems.ANDROID))
+			return AndroidRoles.nativeTypeableRoles();
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return new Role[]{UIADocument, UIAEdit, UIAText};
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))

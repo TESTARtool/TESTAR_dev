@@ -1,0 +1,35 @@
+# Original: https://github.com/budtmo/docker-android
+# Original: docker run -d -p 6080:6080 -e EMULATOR_DEVICE="Samsung Galaxy S10" -e WEB_VNC=true --device /dev/kvm --name android-container budtmo/docker-android:emulator_11.0
+# Original: docker exec -it testar_dev_android_container_1 cat device_status
+#
+# Note: It requires docker-compose 1.13.0
+# OS note: Android emultaror requires a Linux Host with KVM enabled
+#
+# Usage:          docker-compose -f docker-compose-android.yml up
+# Usage detach:   docker-compose -f docker-compose-android.yml up -d
+#
+# ISSUE: Restart of container requires root (pro version https://github.com/budtmo/docker-android#pro-version)
+# ISSUE: https://github.com/budtmo/docker-android/issues/364
+# WORKAROUND: you can remove the running container and bring a new one
+version: "3"
+
+services:
+  # This is the docker image that contains the Android emulator + Appium server
+  android-container:
+    image: budtmo/docker-android:emulator_11.0
+    privileged: true
+    scale: 1
+    ports:
+      - 6080:6080
+      - 4723:4723
+      - 5555:5555
+    volumes:
+      - ./video-samsung_11.0:/tmp/video
+    # Available: https://github.com/budtmo/docker-android/blob/master/cli/src/constants/ENV.py
+    environment:
+      - EMULATOR_DEVICE=Samsung Galaxy S6
+      - APPIUM=true
+      - WEB_VNC=true
+      - APPIUM_ADDITIONAL_ARGS=--relaxed-security --base-path /wd/hub
+    devices:
+      - "/dev/kvm"
