@@ -56,7 +56,7 @@ public class OverlayVisualization extends JLayeredPane {
     public ArrayList<OverlayBox> boxTrackSetDisplayed = new ArrayList<>();
     private LinkedList<DefaultMutableTreeNode> queue = new LinkedList<>();
     private ArrayList<DefaultMutableTreeNode> listOfNodes = new ArrayList<>();
-    private Set<Widget> setOfActionableWidgets = Collections.emptySet();
+    private Set<String> setOfActionableWidgets = Collections.emptySet();
     private int originalHeight;
     private int originalWidth;
     private int width = 440;
@@ -94,7 +94,10 @@ public class OverlayVisualization extends JLayeredPane {
         queue = new LinkedList<>();
 
         setOfActionableWidgets = derivedActions.stream()
-                .map(a -> a.get(Tags.OriginWidget, null))
+                .map(a -> {
+                    Widget widget = a.get(Tags.OriginWidget, null);
+                    return widget == null ? null : widget.get(AndroidTags.AndroidXpath);
+                })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
@@ -174,9 +177,9 @@ public class OverlayVisualization extends JLayeredPane {
         public DefaultMutableTreeNode node;
         public boolean displayed = false;
         public OverlayBox instanceOverlayBox = this;
-        private Set<Widget> setOfActionableWidgets;
+        private Set<String> setOfActionableWidgets;
 
-        public OverlayBox(Set<Widget> setOfActionableWidgets) {
+        public OverlayBox(Set<String> setOfActionableWidgets) {
             this.setOfActionableWidgets = setOfActionableWidgets;
         }
 
@@ -192,7 +195,7 @@ public class OverlayVisualization extends JLayeredPane {
             String className = widget.get(AndroidTags.AndroidClassName);
             Boolean clickable = widget.get(AndroidTags.AndroidClickable) && !(className.equals("android.widget.EditText"));
             Boolean typeable = className.equals("android.widget.EditText");
-            boolean actionable = setOfActionableWidgets.contains(widget);
+            boolean actionable = setOfActionableWidgets.contains(widget.get(AndroidTags.AndroidXpath));
 
             if (clickable || typeable) {
                 Color color = actionable ? (clickable ? Color.GREEN // click

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -112,7 +112,7 @@ public class MobileVisualizationAndroid {
         rightside.add(updateButton);
 
         //Sets the initial state tree of the SUT
-        treeVizInstance = new TreeVisualizationAndroid(this, (usedState.root()));
+        treeVizInstance = new TreeVisualizationAndroid(this, usedState);
         treeVisualizationPanel.add(treeVizInstance);
         rightside.add(treeVisualizationPanel);
 
@@ -139,7 +139,6 @@ public class MobileVisualizationAndroid {
     private void updateScreen() {
         // Updates screenshot and overlay
         String screenshotPath = AndroidProtocolUtil.getStateshotSpyMode(usedState);
-        System.out.println("SCREENSHOT PATH SPY MODE: " + screenshotPath);
         imagePanel.updateSc(screenshotPath, treeVizInstance.tree, deriveActionsFunction.apply(usedState));
 
         frame.revalidate();
@@ -152,7 +151,7 @@ public class MobileVisualizationAndroid {
         this.newState = state;
 
         // Updates the tree of android widgets if changes occur in the SUT
-        boolean updated = treeVizInstance.createCompareTree(this.newState.root());
+        boolean updated = treeVizInstance.compareUpdateTree(this.newState);
         if (updated) {
             this.usedState = state;
 
