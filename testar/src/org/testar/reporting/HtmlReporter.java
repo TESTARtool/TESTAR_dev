@@ -254,7 +254,7 @@ public class HtmlReporter implements Reporting
     @Override
     public void addTestVerdict(Verdict verdict)
     {
-        String verdictInfo = verdict.info();
+        String verdictInfo = StringEscapeUtils.escapeHtml(verdict.info());
         if(verdict.severity() > Verdict.OK.severity())
             verdictInfo = verdictInfo.replace(Verdict.OK.info(), "").replace("\n", "");
 

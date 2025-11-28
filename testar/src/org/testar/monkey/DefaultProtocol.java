@@ -57,7 +57,9 @@ import org.testar.oracles.log.LogOracle;
 import org.testar.oracles.log.ProcessListenerOracle;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
+import org.testar.reporting.DummyReportManager;
 import org.testar.reporting.ReportManager;
+import org.testar.reporting.Reporting;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.serialisation.ScreenshotSerialiser;
 import org.testar.serialisation.TestSerialiser;
@@ -86,7 +88,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	private State stateForClickFilterLayerProtocol;
 
-	protected ReportManager reportManager;
+	protected Reporting reportManager = new DummyReportManager();
 	public State getStateForClickFilterLayerProtocol() {
 		return stateForClickFilterLayerProtocol;
 	}

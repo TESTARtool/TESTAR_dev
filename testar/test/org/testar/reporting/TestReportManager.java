@@ -199,6 +199,35 @@ public class TestReportManager {
 		Assert.assertTrue(fileContains("<img src=\"NoScreenshotPathAvailable", htmlReportFile));
 	}
 
+	@Test
+	public void testHtmlReportParsesSpecialCharacters() {
+		// Prepare settings to only create an HTML report
+		List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
+		tags.add(Pair.from(ConfigTags.ReportInHTML, true));
+		tags.add(Pair.from(ConfigTags.ReportInPlainText, false));
+		Settings settings = new Settings(tags, new Properties());
+
+		// Prepare a custom output directory to create the HTML report
+		OutputStructure.screenshotsOutputDir = "screenshots";
+		OutputStructure.htmlOutputDir = tempFolder.getRoot().getAbsolutePath();
+		OutputStructure.startInnerLoopDateString = "Date";
+		OutputStructure.executedSUTname = "testSpecialCharacters";
+		OutputStructure.sequenceInnerLoopCount = 1;
+
+		// Prepare a report only with the final verdict
+		ReportManager reportManager = new ReportManager(false, settings);
+		reportManager.addTestVerdict(new Verdict(Verdict.Severity.FAIL, "Failure is <script>something</script>"));
+		reportManager.finishReport();
+
+		// Verify the html report file was created
+		File htmlReportFile = new File(reportManager.getReportFileName().concat("_FAIL.html"));
+		System.out.println("testSpecialCharacters: " + htmlReportFile.getPath());
+		Assert.assertTrue(htmlReportFile.exists());
+
+		// Verify the special characters have been escaped
+		Assert.assertTrue(fileContains("<h2>Test verdict for this sequence: Failure is &lt;script&gt;something&lt;/script&gt;</h2>", htmlReportFile));
+	}
+
 	private ReportManager createReportManager(Settings settings) {
 		ReportManager reportManager = new ReportManager(false, settings);
 		reportManager.addState(state);

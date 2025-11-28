@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,57 +28,44 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.monkey.alayer.android.actions;
+package org.testar.reporting;
 
-import org.testar.monkey.alayer.*;
-import org.testar.monkey.alayer.exceptions.ActionFailedException;
-import org.testar.monkey.alayer.android.AndroidAppiumFramework;
-import org.testar.monkey.alayer.android.enums.AndroidRoles;
-import org.testar.monkey.alayer.android.enums.AndroidTags;
+import java.util.Set;
 
-public class AndroidActionScroll extends TaggableBase implements Action {
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Verdict;
 
-    private static final long serialVersionUID = 6205133391190145934L;
+public class DummyReportManager implements Reporting {
 
-    private final int scrollDistance = 500;
-    private final String accessibilityId;
-    private final Widget widget;
+    @Override
+    public void addState(State state) {
 
-    public AndroidActionScroll(State state, Widget w) {
-        this.set(Tags.Role, AndroidRoles.AndroidWidget);
-        this.mapOriginWidget(w);
-        this.accessibilityId = w.get(AndroidTags.AndroidAccessibilityId, "");
-        this.widget = w;
-        this.set(Tags.Desc, toShortString());
     }
 
     @Override
-    public void run(SUT system, State state, double duration) throws ActionFailedException {
-        try {
-            AndroidAppiumFramework.scrollElementById(this.accessibilityId, this.widget, this.scrollDistance);
-        } catch(Exception e) {
-            System.out.println("Exception trying to scroll Element By Id : " + this.accessibilityId);
-            System.out.println(e.getMessage());
-            throw new ActionFailedException(toShortString());
-        }
+    public void addActions(Set<Action> actions) {
+
     }
 
     @Override
-    public String toShortString() {
-        return "Execute Android Scroll on the system under test";
+    public void addActionsAndUnvisitedActions(Set<Action> actions, Set<String> concreteIdsOfUnvisitedActions) {
+
     }
 
     @Override
-    public String toParametersString() {
-        return "";
+    public void addSelectedAction(State state, Action action) {
+
     }
 
     @Override
-    public String toString(Role... discardParameters) {
-        return "";
+    public void addTestVerdict(Verdict verdict) {
+
     }
 
-    public Widget getWidget(){
-        return widget;
+    @Override
+    public void finishReport() {
+
     }
+
 }

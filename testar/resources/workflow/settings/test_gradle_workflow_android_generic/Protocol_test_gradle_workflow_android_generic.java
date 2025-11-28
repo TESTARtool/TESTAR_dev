@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2024 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -41,6 +41,7 @@ import org.testar.monkey.alayer.exceptions.*;
 import org.testar.monkey.alayer.android.actions.*;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 import org.testar.protocols.AndroidProtocol;
+import org.testar.reporting.ReportManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -103,31 +104,24 @@ public class Protocol_test_gradle_workflow_android_generic extends AndroidProtoc
 		// iterate through all widgets
 		for (Widget widget : state) {
 
+			// Ignore widgets that are not whitelisted or that are filtred
+			if(!(whiteListed(widget) || isUnfiltered(widget))) {
+				continue;
+			}
+
 			// type into text boxes
 			if (isTypeable(widget)) {
-				actions.add(
-						new AndroidActionType(state, widget,
-								InputDataManager.getRandomTextInputData(widget),
-								widget.get(AndroidTags.AndroidAccessibilityId,""),
-								widget.get(AndroidTags.AndroidClassName,""))
-						);
+				String randomInput = InputDataManager.getRandomTextInputData(widget);
+				actions.add(new AndroidActionType(state, widget, randomInput));
 			}
 
 			// left clicks, but ignore links outside domain
 			if (isClickable(widget)) {
-				actions.add(
-						new AndroidActionClick(state, widget,
-								widget.get(AndroidTags.AndroidText,""),
-								widget.get(AndroidTags.AndroidAccessibilityId,""),
-								widget.get(AndroidTags.AndroidClassName, ""))
-						);
+				actions.add(new AndroidActionClick(state, widget));
 			}
 
 			if (isLongClickable(widget)) {
-				actions.add(
-						new AndroidActionLongClick(state, widget,
-								widget.get(AndroidTags.AndroidAccessibilityId,""))
-						);
+				actions.add(new AndroidActionLongClick(state, widget));
 			}
 		}
 
@@ -144,8 +138,9 @@ public class Protocol_test_gradle_workflow_android_generic extends AndroidProtoc
 		super.postSequenceProcessing(); // Finish Reports
 
 		// Verify html and txt report files were created
-		File htmlReportFile = new File(reportManager.getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".html"));
-		File txtReportFile = new File(reportManager.getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".txt"));
+		Assert.isTrue(reportManager instanceof ReportManager);
+		File htmlReportFile = new File(((ReportManager)reportManager).getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".html"));
+		File txtReportFile = new File(((ReportManager)reportManager).getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".txt"));
 		System.out.println("htmlReportFile: " + htmlReportFile.getPath());
 		System.out.println("txtReportFile: " + txtReportFile.getPath());
 		Assert.isTrue(htmlReportFile.exists());

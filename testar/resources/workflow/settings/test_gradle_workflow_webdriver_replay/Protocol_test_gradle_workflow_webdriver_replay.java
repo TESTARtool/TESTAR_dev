@@ -41,6 +41,7 @@ import org.testar.settings.Settings;
 import org.testar.OutputStructure;
 import org.testar.managers.InputDataManager;
 import org.testar.protocols.WebdriverProtocol;
+import org.testar.reporting.ReportManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -129,8 +130,9 @@ public class Protocol_test_gradle_workflow_webdriver_replay extends WebdriverPro
     	super.postSequenceProcessing(); // Finish Reports
 
     	// Verify html and txt report files were created
-    	File htmlReportFile = new File(reportManager.getReportFileName().concat("_" + getReplayVerdict().verdictSeverityTitle() + ".html"));
-    	File txtReportFile = new File(reportManager.getReportFileName().concat("_" + getReplayVerdict().verdictSeverityTitle() + ".txt"));
+    	Assert.isTrue(reportManager instanceof ReportManager);
+    	File htmlReportFile = new File(((ReportManager)reportManager).getReportFileName().concat("_" + getReplayVerdict().verdictSeverityTitle() + ".html"));
+    	File txtReportFile = new File(((ReportManager)reportManager).getReportFileName().concat("_" + getReplayVerdict().verdictSeverityTitle() + ".txt"));
     	System.out.println("htmlReportFile: " + htmlReportFile.getPath());
     	System.out.println("txtReportFile: " + txtReportFile.getPath());
     	Assert.isTrue(htmlReportFile.exists());
