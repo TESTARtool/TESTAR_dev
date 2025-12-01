@@ -226,7 +226,7 @@ public class TestReportManager {
 
 		// Prepare a report only with the final verdict
 		ReportManager reportManager = new ReportManager(false, settings);
-		reportManager.addTestVerdict(new Verdict(Verdict.Severity.FAIL, "Failure is <script>something</script>"));
+		reportManager.addTestVerdict(state, new Verdict(Verdict.Severity.FAIL, "Failure is <script>something</script>"));
 		reportManager.finishReport();
 
 		// Verify the html report file was created
