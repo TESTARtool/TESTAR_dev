@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -186,6 +186,7 @@ public class AndroidStateFetcher implements Callable<AndroidState> {
 		childElement.password = AndroidNodeParser.getBooleanAttribute(xmlNode, "password");
 		childElement.selected = AndroidNodeParser.getBooleanAttribute(xmlNode, "selected");
 		childElement.accessibilityID = AndroidNodeParser.getStringAttribute(xmlNode, "content-desc");
+		childElement.displayed = AndroidNodeParser.getBooleanAttribute(xmlNode, "displayed");
 
 		childElement.rect = androidBoundsRect(AndroidNodeParser.getStringAttribute(xmlNode, "bounds"));
 		childElement.bounds = androidBoundsRect(AndroidNodeParser.getStringAttribute(xmlNode, "bounds"));
