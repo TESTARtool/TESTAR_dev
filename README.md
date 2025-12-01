@@ -173,7 +173,7 @@ https://github.com/TESTARtool/TESTAR_dev/wiki/Development:-Increase-Java-memory
 https://github.com/TESTARtool/TESTAR_dev/issues
 
 ## Release notes
-https://github.com/TESTARtool/TESTAR_dev/wiki/TESTAR-release-notes
+https://github.com/TESTARtool/TESTAR_dev/blob/master/CHANGELOG
 
 ## Required tools to create a windows.dll to update UIAutomation API
 https://github.com/TESTARtool/TESTAR_dev/wiki/Development:-Update-Windows-UIAutomation-(windows.dll)

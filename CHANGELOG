@@ -1,3 +1,8 @@
+#TESTAR v2.7.17 (5-Dec-2025)
+- Add allowInvisibleElements to appium-android
+- Add AndroidDisplayed Tag property
+
+
 #TESTAR v2.7.16 (28-Nov-2025)
 - Add AndroidCapabilitiesFactory for creating appium capabilities
 - Implement AndroidRoles
