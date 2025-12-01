@@ -30,6 +30,7 @@
 
 package org.testar.monkey.alayer.android.actions;
 
+import org.openqa.selenium.WebElement;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.ActionRoles;
@@ -68,9 +69,11 @@ public class AndroidActionType extends TaggableBase implements Action {
 
 	@Override
 	public void run(SUT system, State state, double duration) throws ActionFailedException {
-	    String typeText = this.get(Tags.InputText, "");
-	    try {
-			AndroidAppiumFramework.sendKeysTextTextElementById(this.accessibilityId, typeText, this.widget);
+		String typeText = this.get(Tags.InputText, "");
+		try {
+			WebElement element = AndroidAppiumFramework.resolveElementByIdOrXPath(this.accessibilityId, this.widget);
+			element.clear();
+			element.sendKeys(typeText);
 		} catch(Exception e) {
 			System.err.println("Exception trying to Type " + typeText + " in the Element with Id : " + this.accessibilityId);
 			System.err.println(e.getMessage());
@@ -80,7 +83,7 @@ public class AndroidActionType extends TaggableBase implements Action {
 
 	@Override
 	public String toShortString() {
-	    String typeText = this.get(Tags.InputText, "");
+		String typeText = this.get(Tags.InputText, "");
 		return "Execute Android type on Widget of type: '" + this.widgetClass + "', with Id: '" + this.accessibilityId + "', with xPath: '" + this.xpath + "', typing text: " + typeText;
 	}
 

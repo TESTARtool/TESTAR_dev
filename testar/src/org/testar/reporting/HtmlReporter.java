@@ -313,8 +313,9 @@ public class HtmlReporter implements Reporting
     	if(!verdict.getVisualtHighlights().isEmpty()) {
     		highlightVerdictState(state, verdict);
     	}
-    	
-    	String verdictInfo = verdict.info();
+
+        String verdictInfo = StringEscapeUtils.escapeHtml(verdict.info());
+
         if(verdict.severity() > Verdict.OK.severity())
             verdictInfo = verdictInfo.replace(Verdict.OK.info(), "").replace("\n", "");
 
