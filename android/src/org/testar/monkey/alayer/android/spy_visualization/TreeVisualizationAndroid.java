@@ -297,6 +297,7 @@ public class TreeVisualizationAndroid extends JPanel implements TreeSelectionLis
             boolean longClickableWidget = nodeWidget.get(AndroidTags.AndroidLongClickable);
             boolean scrollableWidget = nodeWidget.get(AndroidTags.AndroidScrollable);
             boolean selectedWidget = nodeWidget.get(AndroidTags.AndroidSelected);
+            boolean displayedWidget = nodeWidget.get(AndroidTags.AndroidDisplayed);
             String xpathWidget = nodeWidget.get(AndroidTags.AndroidXpath);
             String activityWidget = nodeWidget.get(AndroidTags.AndroidActivity);
 
@@ -385,6 +386,9 @@ public class TreeVisualizationAndroid extends JPanel implements TreeSelectionLis
             infoPaneRight.add(new JLabel(String.valueOf(scrollableWidget))).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
 
             infoPaneLeft.add(new JLabel("Selected: ")).setFont(new Font("SansSerif", Font.BOLD, fontSize));
+            infoPaneRight.add(new JLabel(String.valueOf(selectedWidget))).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
+
+            infoPaneLeft.add(new JLabel("Displayed: ")).setFont(new Font("SansSerif", Font.BOLD, fontSize));
             infoPaneRight.add(new JLabel(String.valueOf(selectedWidget))).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
 
             infoPaneLeft.add(new JLabel("Current Activity: ")).setFont(new Font("SansSerif", Font.BOLD, fontSize));
