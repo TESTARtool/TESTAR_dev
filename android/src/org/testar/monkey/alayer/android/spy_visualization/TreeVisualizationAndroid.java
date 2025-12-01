@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,7 +30,6 @@
 
 package org.testar.monkey.alayer.android.spy_visualization;
 
-import org.testar.monkey.Pair;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 
@@ -41,7 +40,6 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
-import java.util.LinkedList;
 
 public class TreeVisualizationAndroid extends JPanel implements TreeSelectionListener {
     private final JPanel infoPaneLeft = new JPanel();
@@ -54,25 +52,19 @@ public class TreeVisualizationAndroid extends JPanel implements TreeSelectionLis
 
     private String selectedNodePath;
 
-    private LinkedList<Pair<DefaultMutableTreeNode, Integer>> toBeReplacedA = null;
-    private LinkedList<Pair<DefaultMutableTreeNode, Integer>> toBeReplacedWithB = null;
-
-
     /** Initializer for the tree component of the spy mode visualization (right hand side screen). */
-    public TreeVisualizationAndroid(MobileVisualizationAndroid mobileVisualizationAndroid, Widget widget) {
+    public TreeVisualizationAndroid(MobileVisualizationAndroid mobileVisualizationAndroid, State state) {
         super(new GridLayout(1,0));
 
         this.mobileVisualizationAndroid = mobileVisualizationAndroid;
 
         //Create the nodes.
-        DefaultMutableTreeNode top =
-                new DefaultMutableTreeNode(widget.get(Tags.Desc));
-        createNodes(top, widget);
+        DefaultMutableTreeNode top = new DefaultMutableTreeNode(state.get(Tags.Desc));
+        createNodes(top, state);
 
         //Create a tree that allows one selection at a time.
         tree = new JTree(top);
-        tree.getSelectionModel().setSelectionMode
-                (TreeSelectionModel.SINGLE_TREE_SELECTION);
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
         //Listen for when the selection changes.
         tree.addTreeSelectionListener(this);
@@ -80,28 +72,30 @@ public class TreeVisualizationAndroid extends JPanel implements TreeSelectionLis
         //Create the scroll pane and add the tree to it.
         treeView = new JScrollPane(tree);
 
-        //Create the viewing pane for obtaining more detailed information on a widget.
-        JSplitPane infoSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        infoSplitPane.setDividerSize(0);
-        infoSplitPane.setDividerLocation(150);
-
+        // Create the viewing pane for obtaining more detailed information on a widget.
         infoPaneLeft.setLayout(new BoxLayout(infoPaneLeft, BoxLayout.Y_AXIS));
         infoPaneRight.setLayout(new BoxLayout(infoPaneRight, BoxLayout.Y_AXIS));
 
-        infoSplitPane.setLeftComponent(infoPaneLeft);
-        infoSplitPane.setRightComponent(infoPaneRight);
-        JScrollPane infoView = new JScrollPane(infoSplitPane);
-        infoView.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        infoView.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        // Make each side scrollable
+        JScrollPane infoLeftView  = new JScrollPane(infoPaneLeft);
+        JScrollPane infoRightView = new JScrollPane(infoPaneRight);
+        infoLeftView.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        infoRightView.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        infoLeftView.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        infoRightView.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-        //Add the scroll panes to a split pane.
+        // Split pane between left/right scroll panes
+        JSplitPane infoSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, infoLeftView, infoRightView);
+        infoSplitPane.setDividerSize(0);
+        infoSplitPane.setDividerLocation(150);
+
+        // Add the scroll panes to a split pane (tree on top, info at bottom).
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         splitPane.setTopComponent(treeView);
-        splitPane.setBottomComponent(infoView);
+        splitPane.setBottomComponent(infoSplitPane);
 
         Dimension minimumSize = new Dimension(400, 600);
-
-        infoView.setMinimumSize(minimumSize);
+        infoSplitPane.setMinimumSize(minimumSize);
         treeView.setMinimumSize(minimumSize);
         splitPane.setDividerLocation(550);
         splitPane.setDividerSize(0);
@@ -125,8 +119,7 @@ public class TreeVisualizationAndroid extends JPanel implements TreeSelectionLis
      * detailed information of the clicked tree object.
      */
     public void valueChanged(TreeSelectionEvent e) {
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode)
-                tree.getLastSelectedPathComponent();
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
 
         if (tempTreeNode == null) {
             tempTreeNode = node;
@@ -153,84 +146,134 @@ public class TreeVisualizationAndroid extends JPanel implements TreeSelectionLis
         }
     }
 
-
-    /** Creates a new tree based on the newly retrieved state (root node).
-     * Additionally, calls method which determines which nodes need to be replaced (have changed in the new state)
-     * and updates these parts of the tree.
+    /**
+     * Compare the existing tree with a new state and update it.
+     *
+     * @param root Widget root of the *new* state.
+     * @return true if nothing changed; false if any visual or structural change was applied.
      */
-    public boolean createCompareTree(Widget root) {
-        // create tree corresponding to the new state
-        DefaultMutableTreeNode newTop =
-                new DefaultMutableTreeNode(root.get(Tags.Desc));
+    public boolean compareUpdateTree(State root) {
+        DefaultMutableTreeNode newTop = new DefaultMutableTreeNode(root.get(Tags.Desc));
         createNodes(newTop, root);
 
-        toBeReplacedA = new LinkedList<Pair<DefaultMutableTreeNode, Integer>>();
-        toBeReplacedWithB = new LinkedList<Pair<DefaultMutableTreeNode, Integer>>();
+        DefaultTreeModel currentModel = (DefaultTreeModel) tree.getModel();
+        DefaultMutableTreeNode currentRoot = (DefaultMutableTreeNode) currentModel.getRoot();
 
-        boolean identical = identicalTrees((DefaultMutableTreeNode)(tree.getModel().getRoot()),newTop, 0);
-
-        if (!identical) {
-            DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-            for (int i = 0; i < toBeReplacedA.size(); i++) {
-                model.insertNodeInto(toBeReplacedWithB.get(i).left(), (DefaultMutableTreeNode) toBeReplacedA.get(i).left().getParent(),toBeReplacedA.get(i).right());
-                model.removeNodeFromParent(toBeReplacedA.get(i).left());
-            }
-
+        // First time or null root, then just set the model
+        if (currentRoot == null) {
+            tree.setModel(new DefaultTreeModel(newTop));
             return true;
         }
+
+        TreeDiff diff = new TreeDiff();
+        syncTrees(currentRoot, newTop, diff);
+
+        if (diff.structureChanged) {
+            // Something in the hierarchy really changed; rebuild the model.
+            tree.setModel(new DefaultTreeModel(newTop));
+            return true;
+        }
+
+        if (!diff.changedNodes.isEmpty()) {
+            // Only state changes: notify JTree that these nodes changed.
+            for (DefaultMutableTreeNode n : diff.changedNodes) {
+                currentModel.nodeChanged(n);
+            }
+            return true;
+        }
+
+        // No differences at all
         return false;
     }
 
-    public TreePath stringToTreePath(String stringPath) {
-        //Need to use the xPath of the last clicked component to find the representation in the Tree.
-        return null;
-    }
-
-
-    /** Given two trees, return true if they are structurally identical, false otherwise and track at which point in
-     * the tree the sub trees are no longer identical.
+    /**
+     * Recursively compare two subtrees.
+     *
+     * - If structure (child count or widget identity) differs anywhere below, we mark structureChanged = true
+     *   and stop trying to do fine-grained updates.
+     * - If only state differs, we update the existing node's userObject and queue nodeChanged.
      */
-    boolean identicalTrees(DefaultMutableTreeNode a, DefaultMutableTreeNode b, int childNumber) {
-        //1. both subtrees have no childeren
-        if (a.getChildCount() == 0 && b.getChildCount() == 0)
-            return true;
-
-        //2. both non-empty -> compare them, return false if not equal
-        if (a.getChildCount() == b.getChildCount()){
-
-            boolean equality = true;
-            for (int i = 0; i < a.getChildCount(); i++) {
-                Widget aChild = (Widget) ((DefaultMutableTreeNode)a.getChildAt(i)).getUserObject();
-                Widget bChild = (Widget) ((DefaultMutableTreeNode)b.getChildAt(i)).getUserObject();
-                if (!(aChild.get(AndroidTags.AndroidXpath).equals(bChild.get(AndroidTags.AndroidXpath))) ||
-                        !(aChild.get(Tags.Title).equals(bChild.get(Tags.Title))) ||
-                        !(aChild.get(AndroidTags.AndroidBounds).equals(bChild.get(AndroidTags.AndroidBounds))) ||
-                        !(aChild.get(AndroidTags.AndroidChecked).equals(bChild.get(AndroidTags.AndroidChecked))) ||
-                        !(aChild.get(AndroidTags.AndroidSelected).equals(bChild.get(AndroidTags.AndroidSelected)))) {
-
-                    toBeReplacedA.add(new Pair<>((DefaultMutableTreeNode)a.getChildAt(i),i));
-                    toBeReplacedWithB.add(new Pair<>((DefaultMutableTreeNode)b.getChildAt(i),i));
-                    equality = false;
-                } else {
-                    equality = equality && identicalTrees((DefaultMutableTreeNode)a.getChildAt(i), (DefaultMutableTreeNode)b.getChildAt(i), i);
-                    if (!equality) {
-                        if (toBeReplacedA.size() == 0) {
-                            toBeReplacedA.add(new Pair<>((DefaultMutableTreeNode)a.getChildAt(i),childNumber));
-                            toBeReplacedWithB.add(new Pair<>((DefaultMutableTreeNode)b.getChildAt(i),childNumber));
-                            break;
-                        }
-                    }
-                }
-            }
-            return equality;
+    private void syncTrees(DefaultMutableTreeNode existing, DefaultMutableTreeNode updated, TreeDiff diff) {
+        // if we've already decided structure changed, no need to continue
+        if (diff.structureChanged) {
+            return;
         }
 
-        // When childcount of trees are not equal return false.
-        toBeReplacedA.add(new Pair<>(a,childNumber));
-        toBeReplacedWithB.add(new Pair<>(b,childNumber));
-        return false;
+        int existingChildren = existing.getChildCount();
+        int updatedChildren  = updated.getChildCount();
+
+        if (existingChildren != updatedChildren) {
+            diff.structureChanged = true;
+            return;
+        }
+
+        for (int i = 0; i < existingChildren; i++) {
+            DefaultMutableTreeNode existingChild = (DefaultMutableTreeNode) existing.getChildAt(i);
+            DefaultMutableTreeNode updatedChild  = (DefaultMutableTreeNode) updated.getChildAt(i);
+
+            Object existingObj = existingChild.getUserObject();
+            Object updatedObj  = updatedChild.getUserObject();
+
+            // Root has a String Desc; children are Widgets.
+            if (!(existingObj instanceof Widget) || !(updatedObj instanceof Widget)) {
+                // if this happens below the root, treat as structural change
+                if (existing != (DefaultMutableTreeNode) tree.getModel().getRoot()) {
+                    diff.structureChanged = true;
+                    return;
+                }
+                continue;
+            }
+
+            Widget existingWidget = (Widget) existingObj;
+            Widget updatedWidget  = (Widget) updatedObj;
+
+            // Identity changed? Then structure changed
+            if (!sameIdentity(existingWidget, updatedWidget)) {
+                diff.structureChanged = true;
+                return;
+            }
+
+            // Identity same but state changed, then update node in place
+            if (!sameState(existingWidget, updatedWidget)) {
+                existingChild.setUserObject(updatedWidget);
+                diff.changedNodes.add(existingChild);
+            }
+
+            // recurse for children
+            syncTrees(existingChild, updatedChild, diff);
+            if (diff.structureChanged) {
+                return;
+            }
+        }
     }
 
+    private static final class TreeDiff {
+        boolean structureChanged = false;
+        java.util.List<DefaultMutableTreeNode> changedNodes = new java.util.ArrayList<>();
+    }
+
+    private static <T> boolean safeEquals(T a, T b) {
+        return a == b || (a != null && a.equals(b));
+    }
+
+    /**
+     * Checks if two widgets represent the same UI element (identity).
+     * We use AndroidXpath as identity because it encodes the path in the view hierarchy.
+     */
+    private static boolean sameIdentity(Widget a, Widget b) {
+        return safeEquals(a.get(AndroidTags.AndroidXpath), b.get(AndroidTags.AndroidXpath));
+    }
+
+    /**
+     * Checks if the UI state that we care about in the tree has changed.
+     * Adjust this if you want more/less properties to count as "state".
+     */
+    private static boolean sameState(Widget a, Widget b) {
+        return safeEquals(a.get(Tags.Title), b.get(Tags.Title))
+                && safeEquals(a.get(AndroidTags.AndroidBounds), b.get(AndroidTags.AndroidBounds))
+                && safeEquals(a.get(AndroidTags.AndroidChecked), b.get(AndroidTags.AndroidChecked))
+                && safeEquals(a.get(AndroidTags.AndroidSelected), b.get(AndroidTags.AndroidSelected));
+    }
 
     /** Displays the additional info when a widget is clicked in the tree. */
     private void displayWidgetInfo(Widget nodeWidget) {
@@ -275,9 +318,9 @@ public class TreeVisualizationAndroid extends JPanel implements TreeSelectionLis
 
             infoPaneLeft.add(new JLabel("Hint content: ")).setFont(new Font("SansSerif", Font.BOLD, fontSize));
             if (hintWidget.equals("")) {
-            	infoPaneRight.add(new JLabel(" ")).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
+                infoPaneRight.add(new JLabel(" ")).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
             } else {
-            	infoPaneRight.add(new JLabel(hintWidget)).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
+                infoPaneRight.add(new JLabel(hintWidget)).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
             }
 
             infoPaneLeft.add(new JLabel("Access ID: ")).setFont(new Font("SansSerif", Font.BOLD, fontSize));
@@ -286,7 +329,6 @@ public class TreeVisualizationAndroid extends JPanel implements TreeSelectionLis
             } else {
                 infoPaneRight.add(new JLabel(accessibilityIdWidget)).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
             }
-
 
             //TODO: THE XPATH AT STARTUP DOESNT FIT IN THE SCREEN. HOWEVER IF ONE UPDATE IN THE EMULATOR HAS OCCURED
             // SCROLLING IS ADDED. FIGURE OUT WHY SCROLLING IS NOT ENABLED FROM THE START.
@@ -312,14 +354,11 @@ public class TreeVisualizationAndroid extends JPanel implements TreeSelectionLis
                 infoPaneRight.add(new JLabel(resourceIdWidget)).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
             }
 
-
-
             infoPaneLeft.add(new JLabel("Clickable: ")).setFont(new Font("SansSerif", Font.BOLD, fontSize));
             infoPaneRight.add(new JLabel(String.valueOf(clickableWidget))).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
 
             infoPaneLeft.add(new JLabel("Index: ")).setFont(new Font("SansSerif", Font.BOLD, fontSize));
             infoPaneRight.add(new JLabel(String.valueOf(indexWidget))).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
-
 
             infoPaneLeft.add(new JLabel("Bounds: ")).setFont(new Font("SansSerif", Font.BOLD, fontSize));
             infoPaneRight.add(new JLabel(String.valueOf(boundsWidget))).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
@@ -350,7 +389,6 @@ public class TreeVisualizationAndroid extends JPanel implements TreeSelectionLis
 
             infoPaneLeft.add(new JLabel("Current Activity: ")).setFont(new Font("SansSerif", Font.BOLD, fontSize));
             infoPaneRight.add(new JLabel(String.valueOf(activityWidget))).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
-
 
         } else { //null node
             infoPaneLeft.add(new JLabel("nodeinfo:"));

@@ -48,6 +48,7 @@ import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.protocols.DesktopProtocol;
+import org.testar.reporting.ReportManager;
 import org.testar.screenshotjson.JsonUtils;
 
 /**
@@ -157,8 +158,9 @@ public class Protocol_test_gradle_workflow_desktop_generic extends DesktopProtoc
 		}
 
 		// Verify html and txt report files were created
-		File htmlReportFile = new File(reportManager.getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".html"));
-		File txtReportFile = new File(reportManager.getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".txt"));
+		Assert.isTrue(reportManager instanceof ReportManager);
+		File htmlReportFile = new File(((ReportManager)reportManager).getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".html"));
+		File txtReportFile = new File(((ReportManager)reportManager).getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".txt"));
 		System.out.println("htmlReportFile: " + htmlReportFile.getPath());
 		System.out.println("txtReportFile: " + txtReportFile.getPath());
 		Assert.isTrue(htmlReportFile.exists());

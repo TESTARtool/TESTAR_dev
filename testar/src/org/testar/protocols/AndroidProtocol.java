@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -89,28 +89,32 @@ public class AndroidProtocol extends GenericUtilsProtocol {
         return super.deriveActions(system,state);
     }
 
-    // Modified isClickable to look at the clickable attribute passed by Appium.
     @Override
     protected boolean isClickable(Widget w) {
-//        return (w.get(AndroidTags.AndroidClassName, "").equals("android.widget.ImageButton")
-//                || w.get(AndroidTags.AndroidClassName, "").equals("android.widget.Button")
-//                || w.get(AndroidTags.AndroidClassName, "").equals("android.widget.CheckBox")
-//                || w.get(AndroidTags.AndroidClassName, "").equals("android.widget.TextView") &&
-//                w.get(AndroidTags.AndroidClickable, false));
-        return(w.get(AndroidTags.AndroidClickable, false) && !(w.get(AndroidTags.AndroidClassName, "").equals("android.widget.EditText")) && w.get(AndroidTags.AndroidEnabled));
+        Role role = w.get(Tags.Role, Roles.Widget);
+        if (!Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
+            return false;
+        }
+        return w.get(AndroidTags.AndroidClickable, false)
+                && w.get(AndroidTags.AndroidEnabled, false);
     }
 
     @Override
     protected boolean isTypeable(Widget w) {
-        return (w.get(AndroidTags.AndroidClassName, "").equals("android.widget.EditText"));
+        Role role = w.get(Tags.Role, Roles.Widget);
+        if (!Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
+            return false;
+        }
+        return w.get(AndroidTags.AndroidEnabled, false)
+                && w.get(AndroidTags.AndroidFocusable, false);
     }
 
     protected boolean isScrollable(Widget w) {
-        return(w.get(AndroidTags.AndroidScrollable, false));
+        return w.get(AndroidTags.AndroidScrollable, false);
     }
 
     protected boolean isLongClickable(Widget w) {
-        return(w.get(AndroidTags.AndroidLongClickable, false));
+        return w.get(AndroidTags.AndroidLongClickable, false);
     }
 
     /**

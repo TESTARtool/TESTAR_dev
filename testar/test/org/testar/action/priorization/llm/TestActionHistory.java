@@ -98,7 +98,9 @@ public class TestActionHistory {
         android_edit_widget.set(Tags.Desc, "android_edit_widget_desc");
         android_edit_widget.set(Tags.ConcreteID, "CID_android_edit_widget");
         android_edit_widget.set(Tags.AbstractID, "AID_android_edit_widget");
-        android_type_action = new AndroidActionType(state, android_edit_widget, "default", "accessibilityId", "className");
+        android_edit_widget.set(AndroidTags.AndroidAccessibilityId, "accessibilityId");
+        android_edit_widget.set(AndroidTags.AndroidClassName, "className");
+        android_type_action = new AndroidActionType(state, android_edit_widget, "default");
         android_type_action.set(Tags.ConcreteID, "CID_android_action_type");
         android_type_action.set(Tags.AbstractID, "AID_android_action_type");
         android_type_action.set(Tags.InputText, "LLM_text");
