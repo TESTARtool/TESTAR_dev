@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2024 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,8 +31,6 @@
 package org.testar.monkey.alayer.android;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.testar.serialisation.ScreenshotSerialiser;
 
 import io.appium.java_client.AppiumBy;
@@ -127,9 +125,13 @@ public class AndroidAppiumFramework extends SUTBase {
 			androidSUT.stop();
 		}
 
-		DesiredCapabilities cap = createCapabilitiesFromJsonFile(capabilitesJsonFile);
+		AndroidCapabilitiesFactory factory = new AndroidCapabilitiesFactory(androidAppiumURL);
 
-		return new AndroidAppiumFramework(cap);
+		AndroidCapabilitiesFactory.Result result = factory.fromJsonFile(capabilitesJsonFile);
+
+		androidAppiumURL = result.getAppiumServerUrl();
+
+		return new AndroidAppiumFramework(result.getCapabilities());
 	}
 
 	public static AndroidDriver getDriver() {
@@ -141,42 +143,38 @@ public class AndroidAppiumFramework extends SUTBase {
 	}
 
 	/**
-	 * Send Click Action. 
-	 * Uses unique accessibility ID if present, otherwise uses xpath. 
+	 * Obtain the widget associated with the (Android) web element.
+	 * Uses unique accessibility ID if present and unique, otherwise uses xpath.
 	 * 
 	 * @param id
 	 * @param w
+	 * @return android web element
 	 */
-	public static void clickElementById(String id, Widget w){
-		if (!id.equals("")) {
-			driver.findElement(new AppiumBy.ByAccessibilityId(id)).click();
+	public static WebElement resolveElementByIdOrXPath(String id, Widget w) {
+		if (id != null && !id.isEmpty()) {
+			// Try by accessibility id only if non-null and non-empty
+			List<WebElement> elements = driver.findElements(new AppiumBy.ByAccessibilityId(id));
+
+			// Use the ID only if exactly one element is found
+			if (elements.size() == 1) {
+				return elements.get(0);
+			}
 		}
-		else {
-			String xpathString = w.get(AndroidTags.AndroidXpath);
-			driver.findElement(new By.ByXPath(xpathString)).click();
-		}
+
+		// Fallback using XPath: ID is empty or did not resolve to exactly one element
+		return AndroidAppiumFramework.resolveElementByXPath(w);
 	}
 
 	/**
-	 * Send Type Action. 
-	 * Uses unique accessibility ID if present, otherwise uses xpath. 
+	 * Obtain the widget associated with the (Android) web element.
+	 * Uses the xpath.
 	 * 
-	 * @param id
-	 * @param text
 	 * @param w
+	 * @return android web element
 	 */
-	public static void sendKeysTextTextElementById(String id, String text, Widget w){
-		if (!id.equals("")) {
-			WebElement element = driver.findElement(new AppiumBy.ByAccessibilityId(id));
-			element.clear();
-			element.sendKeys(text);
-		}
-		else {
-			String xpathString = w.get(AndroidTags.AndroidXpath);
-			WebElement element = driver.findElement(new By.ByXPath(xpathString));
-			element.clear();
-			element.sendKeys(text);
-		}
+	public static WebElement resolveElementByXPath(Widget w) {
+		String xpathString = w.get(AndroidTags.AndroidXpath);
+		return driver.findElement(new By.ByXPath(xpathString));
 	}
 
 	public static void scrollElementById(String id, Widget w, int scrollDistance) {
@@ -534,51 +532,6 @@ public class AndroidAppiumFramework extends SUTBase {
 		}
 
 		return Collections.singletonList(androidSUT);
-	}
-
-	private static DesiredCapabilities createCapabilitiesFromJsonFile(String capabilitesJsonFile) {
-		DesiredCapabilities cap = new DesiredCapabilities();
-
-		try (FileReader reader = new FileReader(capabilitesJsonFile)) {
-
-			JsonObject jsonObject = new JsonParser().parse(reader).getAsJsonObject();
-
-			// https://appium.io/docs/en/2.0/guides/caps/
-			cap.setCapability("platformName", jsonObject.get("platformName").getAsString());
-
-			cap.setCapability("appium:deviceName", jsonObject.get("deviceName").getAsString());
-			cap.setCapability("appium:automationName", jsonObject.get("automationName").getAsString());
-			cap.setCapability("appium:newCommandTimeout", jsonObject.get("newCommandTimeout").getAsInt());
-			cap.setCapability("appium:autoGrantPermissions", jsonObject.get("autoGrantPermissions").getAsBoolean());
-
-			// TODO: Check and test next capabilities
-			// cap.setCapability("allowTestPackages", true);
-			// cap.setCapability("appWaitActivity", jsonObject.get("appWaitActivity").getAsString());
-
-			String appPath = jsonObject.get("app").getAsString();
-
-			// If emulator is running inside a docker use the APK raw URL
-			if(jsonObject.get("isEmulatorDocker") != null 
-					&& jsonObject.get("ipAddressAppium") != null
-					&& jsonObject.get("isEmulatorDocker").getAsBoolean()) {
-
-				cap.setCapability("appium:app", appPath);
-
-				// Docker container (budtmo/docker-android) + Appium v2 do not use /wd/hub suffix anymore
-				// It can be enabled using the APPIUM_ADDITIONAL_ARGS "--base-path /wd/hub" command
-				androidAppiumURL = "http://" + jsonObject.get("ipAddressAppium").getAsString() + ":4723/wd/hub";
-			} 
-			// Else, obtain the local directory that contains the APK file
-			else {
-				cap.setCapability("appium:app", new File(appPath).getCanonicalPath());
-			}
-
-		} catch (IOException | NullPointerException e) {
-			System.err.println("ERROR: Exception reading Appium Desired Capabilities from JSON file: " + capabilitesJsonFile);
-			e.printStackTrace();
-		}
-
-		return cap;
 	}
 
 }

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -44,10 +44,10 @@ public class AndroidActionPinch extends TaggableBase implements Action {
     private final Widget widget;
     private final boolean zoomIn;
 
-    public AndroidActionPinch(State state, Widget w, String accessibilityID, boolean zoomIn) {
+    public AndroidActionPinch(State state, Widget w, boolean zoomIn) {
         this.set(Tags.Role, AndroidRoles.AndroidWidget);
         this.mapOriginWidget(w);
-        this.accessibilityId = accessibilityID;
+        this.accessibilityId = w.get(AndroidTags.AndroidAccessibilityId, "");
         this.widget = w;
         this.set(Tags.Desc, toShortString());
         this.zoomIn = zoomIn;

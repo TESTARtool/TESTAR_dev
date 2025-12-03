@@ -31,6 +31,7 @@
 package org.testar.monkey;
 
 import java.util.Set;
+import java.util.function.Function;
 
 import org.testar.SutVisualization;
 import org.testar.SystemProcessHandling;
@@ -135,7 +136,8 @@ public class SpyMode {
 	private MobileVisualizationAndroid setupAndroidVisualization(DefaultProtocol protocol, SUT system) {
 		System.out.println("SPY MODE, CREATING JAVA JFRAME WINDOW Android");
 		State state = protocol.getState(system);
-		return new MobileVisualizationAndroid(AndroidProtocolUtil.getStateshotSpyMode(state), state);
+		Function<State, Set<Action>> deriveActionsFunction = s -> protocol.deriveActions(system, s);
+		return new MobileVisualizationAndroid(AndroidProtocolUtil.getStateshotSpyMode(state), state, deriveActionsFunction);
 	}
 
 	private MobileVisualizationIOS setupIOSVisualization(DefaultProtocol protocol, SUT system) {
@@ -147,17 +149,13 @@ public class SpyMode {
 	private void updateAndroidVisualization(DefaultProtocol protocol, MobileVisualizationAndroid visualization, SUT system, State state) {
 		Util.clear(protocol.cv);
 		if (visualization == null) return;
-		visualization.updateStateVisualization(state);
-		Set<Action> actions = protocol.deriveActions(system, state);
-		protocol.buildStateActionsIdentifiers(state, actions);
+		visualization.updateVisualization(state);
 	}
 
 	private void updateIOSVisualization(DefaultProtocol protocol, MobileVisualizationIOS visualization, SUT system, State state) {
 		Util.clear(protocol.cv);
 		if (visualization == null) return;
 		visualization.updateStateVisualization(state);
-		Set<Action> actions = protocol.deriveActions(system, state);
-		protocol.buildStateActionsIdentifiers(state, actions);
 	}
 
 	private void updateDefaultVisualization(DefaultProtocol protocol, SUT system, State state) {

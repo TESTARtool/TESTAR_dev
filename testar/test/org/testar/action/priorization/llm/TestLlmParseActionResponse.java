@@ -96,7 +96,9 @@ public class TestLlmParseActionResponse {
 		android_edit_widget.set(Tags.Desc, "android_edit_widget_desc");
 		android_edit_widget.set(Tags.ConcreteID, "CID_android_edit_widget");
 		android_edit_widget.set(Tags.AbstractID, "AID_android_edit_widget");
-		Action android_action_type = new AndroidActionType(state, android_edit_widget, "default", "accessibilityId", "className");
+		android_edit_widget.set(AndroidTags.AndroidAccessibilityId, "accessibilityId");
+		android_edit_widget.set(AndroidTags.AndroidClassName, "className");
+		Action android_action_type = new AndroidActionType(state, android_edit_widget, "default");
 		android_action_type.set(Tags.ConcreteID, "CID_android_action_type");
 		android_action_type.set(Tags.AbstractID, "AID_android_action_type");
 		derivedActions.add(android_action_type);

@@ -3,9 +3,7 @@
   "platformName": "Android",
   "app": "https://github.com/appium/android-apidemos/releases/download/v3.1.0/ApiDemos-debug.apk",
   "automationName" : "UiAutomator2",
-  "allowTestPackages": true,
-  "newCommandTimeout": 500000,
-  "appWaitActivity": "io.appium.android.apis.ApiDemos",
+  "newCommandTimeout": 600,
   "autoGrantPermissions": true,
   "isEmulatorDocker": true,
   "ipAddressAppium": 10.102.0.198

@@ -3,8 +3,6 @@
   "platformName": "Android",
   "app": "suts/ApiDemos-debug.apk",
   "automationName" : "UiAutomator2",
-  "allowTestPackages": true,
-  "newCommandTimeout": 500000,
-  "appWaitActivity": "io.appium.android.apis.ApiDemos",
+  "newCommandTimeout": 600,
   "autoGrantPermissions": false
 }

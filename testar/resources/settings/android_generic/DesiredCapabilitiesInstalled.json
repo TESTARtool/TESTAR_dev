@@ -1,8 +1,10 @@
 {
   "deviceName": "Android Emulator",
   "platformName": "Android",
-  "app": "suts/ApiDemos-debug.apk",
+  "appPackage": "io.appium.android.apis",
+  "appActivity": ".ApiDemos",
   "automationName" : "UiAutomator2",
   "newCommandTimeout": 600,
-  "autoGrantPermissions": false
+  "autoGrantPermissions": false,
+  "isApkInstalled": true
 }
