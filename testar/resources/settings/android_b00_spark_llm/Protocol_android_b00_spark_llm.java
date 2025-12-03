@@ -207,21 +207,13 @@ public class Protocol_android_b00_spark_llm extends AndroidProtocol {
 	// Override trigger click action logic for Android login
 	@Override
 	protected Action triggeredClickAction(State state, Widget widget) {
-		Action clickAction = new AndroidActionClick(state, widget, 
-				widget.get(AndroidTags.AndroidText,""),
-				widget.get(AndroidTags.AndroidAccessibilityId,""),
-				widget.get(AndroidTags.AndroidClassName,""));
-		return clickAction;
+		return new AndroidActionClick(state, widget);
 	}
 
 	// Override trigger type action logic for Android login
 	@Override
 	protected Action triggeredTypeAction(State state, Widget widget, String textToType, boolean replaceText) {
-		Action typeAction = new AndroidActionType(state, widget, 
-				textToType,
-				widget.get(AndroidTags.AndroidAccessibilityId,""),
-				widget.get(AndroidTags.AndroidClassName,""));
-		return typeAction;
+		return new AndroidActionType(state, widget, textToType);
 	}
 
 	/**
@@ -301,22 +293,13 @@ public class Protocol_android_b00_spark_llm extends AndroidProtocol {
 
 			// type into text boxes
 			if (isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-				actions.add(
-						new AndroidActionType(state, widget,
-								InputDataManager.getRandomTextInputData(widget),
-								widget.get(AndroidTags.AndroidAccessibilityId,""),
-								widget.get(AndroidTags.AndroidClassName,""))
-						);
+				String randomInput = InputDataManager.getRandomTextInputData(widget);
+				actions.add(new AndroidActionType(state, widget, randomInput));
 			}
 
 			// left clicks, but ignore links outside domain
 			if (isClickable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
-				actions.add(
-						new AndroidActionClick(state, widget,
-								widget.get(AndroidTags.AndroidText,""),
-								widget.get(AndroidTags.AndroidAccessibilityId,""),
-								widget.get(AndroidTags.AndroidClassName, ""))
-						);
+				actions.add(new AndroidActionClick(state, widget));
 			}
 		}
 
