@@ -30,6 +30,17 @@
 
 package org.testar.llm;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.testar.monkey.Main;
+
 public final class LlmUtils {
 
 	private LlmUtils() {}
@@ -64,4 +75,75 @@ public final class LlmUtils {
 		// Return the placeholder between the '%' symbols
 		return str.substring(start, end);
 	}
+
+	public static List<String> readTestGoalsFromFile(List<String> testGoalsList) {
+		// Only allow when the user indicates one test.goal file
+		if (testGoalsList == null || testGoalsList.size() != 1) {
+			return testGoalsList;
+		}
+
+		String testGoalFileName = testGoalsList.get(0);
+		if (testGoalFileName == null) {
+			return testGoalsList;
+		}
+
+		// Only allow files with .goal extension
+		if (!testGoalFileName.toLowerCase().endsWith(".goal")) {
+			return testGoalsList;
+		}
+
+		File file = new File(Main.settingsDir, testGoalFileName);
+
+		// Check if the test goal file exists
+		if (!file.exists() || !file.isFile()) {
+			System.out.println("The test.goal file does not exists in the settings folder: " + testGoalFileName);
+			return testGoalsList;
+		}
+
+		StringBuilder content = new StringBuilder();
+
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
+
+			String line;
+			boolean firstLine = true;
+
+			while ((line = reader.readLine()) != null) {
+				if (line.trim().isEmpty()) {
+					continue;
+				}
+				if (!firstLine) {
+					content.append("\\n");
+				}
+				content.append(line);
+				firstLine = false;
+			}
+
+		} catch (IOException e) {
+			System.out.println("Error reading test goal file: " + e.getMessage());
+			return testGoalsList;
+		}
+
+		// Split by ";" to get individual test goals
+		String full = content.toString();
+		String[] parts = full.split(";");
+		List<String> goalsFromFile = new ArrayList<>();
+
+		for (String part : parts) {
+			String trimmed = part.trim();
+			if (!trimmed.isEmpty()) {
+				goalsFromFile.add(trimmed);
+			}
+		}
+
+		// If nothing could be parsed, fall back to the original list
+		if (goalsFromFile.isEmpty()) {
+			return testGoalsList;
+		}
+
+		String msg = String.format("Loaded test goal '%s' to content: %s", testGoalFileName, full);
+		System.out.println(msg);
+
+		return goalsFromFile;
+	}
+
 }

@@ -39,6 +39,8 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.util.*;
+
+import org.testar.llm.LlmUtils;
 import org.testar.monkey.*;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.TaggableBase;
@@ -186,6 +188,9 @@ public class Settings extends TaggableBase implements Serializable {
 		}
 
 		ExtendedSettingsFactory.Initialize(settings.get(ConfigTags.ExtendedSettingsFile));
+
+		List<String> testGoalsList = settings.get(ConfigTags.LlmTestGoals, Collections.emptyList());
+		settings.set(ConfigTags.LlmTestGoals, LlmUtils.readTestGoalsFromFile(testGoalsList));
 
 		return settings;
 	}
