@@ -1,0 +1,5 @@
+Given I want to add a product to the shopping cart
+When I sort the products by price from low to high
+And I choose one of the lowest-priced products
+And I add the product to the shopping cart
+Then the product is added to the cart successfully

@@ -1,0 +1,5 @@
+Given I want to add an Angled Spanner to the shopping cart
+When I sort the products by name starting from A
+And I choose the Angled Spanner product
+And I add the Angled Spanner product to the cart
+Then the Angled Spanner product has been added to the cart successfully
