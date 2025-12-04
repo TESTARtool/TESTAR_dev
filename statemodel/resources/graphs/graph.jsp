@@ -1399,15 +1399,14 @@
 		  }
 		});
 
-		// 2) Resolve widget trees in parallel (async)
-		const resolvedStates = await Promise.all(
-		  [...stateMap.values()].map(async (s) => {
-		    const elements = await getWidgetTreeForState(s.ConcreteStateId);
-		    const tree = buildWidgetTreeFromElements(elements);
-		    //const tree = extractWidgetsWithTextFromElements(elements);
-		    return { ...s, WidgetTree: tree };
-		  })
-		);
+		// 2) Resolve widget trees SEQUENTIALLY (in order)
+		const resolvedStates = [];
+		for (const s of stateMap.values()) {
+		  const elements = await getWidgetTreeForState(s.ConcreteStateId);
+		  const tree = buildWidgetTreeFromElements(elements);
+		  // const tree = extractWidgetsWithTextFromElements(elements);
+		  resolvedStates.push({ ...s, WidgetTree: tree });
+		}
 
 		// 3) Emit final ConcreteState array (omit ConcreteStateId)
 		for (const s of resolvedStates) {
