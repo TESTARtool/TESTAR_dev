@@ -78,6 +78,7 @@ public class AndroidElement extends TaggableBase implements Serializable {
 	boolean longclicklable;
 	boolean password;
 	boolean selected;
+	boolean displayed;
 	
 	public AndroidElement(){ this(null); }
 

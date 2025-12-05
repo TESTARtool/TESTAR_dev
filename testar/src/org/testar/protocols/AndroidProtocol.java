@@ -96,7 +96,8 @@ public class AndroidProtocol extends GenericUtilsProtocol {
             return false;
         }
         return w.get(AndroidTags.AndroidClickable, false)
-                && w.get(AndroidTags.AndroidEnabled, false);
+                && w.get(AndroidTags.AndroidEnabled, false)
+                && w.get(AndroidTags.AndroidDisplayed, false);
     }
 
     @Override
@@ -106,7 +107,8 @@ public class AndroidProtocol extends GenericUtilsProtocol {
             return false;
         }
         return w.get(AndroidTags.AndroidEnabled, false)
-                && w.get(AndroidTags.AndroidFocusable, false);
+                && w.get(AndroidTags.AndroidFocusable, false)
+                && w.get(AndroidTags.AndroidDisplayed, false);
     }
 
     protected boolean isScrollable(Widget w) {

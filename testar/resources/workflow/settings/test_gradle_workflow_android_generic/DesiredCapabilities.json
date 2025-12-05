@@ -4,5 +4,6 @@
   "app": "suts/ApiDemos-debug.apk",
   "automationName" : "UiAutomator2",
   "newCommandTimeout": 600,
-  "autoGrantPermissions": false
+  "autoGrantPermissions": false,
+  "allowInvisibleElements": false
 }
