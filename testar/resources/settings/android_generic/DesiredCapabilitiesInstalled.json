@@ -6,5 +6,6 @@
   "automationName" : "UiAutomator2",
   "newCommandTimeout": 600,
   "autoGrantPermissions": false,
+  "allowInvisibleElements": false,
   "isApkInstalled": true
 }

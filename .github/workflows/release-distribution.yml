@@ -54,7 +54,7 @@ jobs:
           tag_name: v${{ env.GITHUB_MILESTONE }}
           body: |
             Release notes:
-            https://github.com/TESTARtool/TESTAR_dev/wiki/TESTAR-release-notes
+            https://github.com/TESTARtool/TESTAR_dev/blob/master/CHANGELOG
             
             Latest W7 version (2.5.0):
             https://github.com/TESTARtool/TESTAR_dev/releases/download/v2.5.0/testar_w7_2.5.0.zip
