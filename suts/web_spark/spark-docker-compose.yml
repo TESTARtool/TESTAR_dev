@@ -1,0 +1,74 @@
+version: "3.9"
+
+# docker compose -f spark-docker-compose.yml up --build -d
+
+services:
+  mongo:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: test
+    ports:
+      - "27017:27017"
+
+  mongo-express:
+    image: mongo-express
+    environment:
+      ME_CONFIG_MONGODB_URL: "mongodb://root:test@mongo:27017/"
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: test
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongo
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+
+  nats:
+    image: nats
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+
+  backend:
+    build:
+      context: .
+      dockerfile: spark-backend.Dockerfile
+      args:
+        BACKEND_REPO: https://gitlab.com/elsa-lab/spark/spark-server-backend.git
+        BACKEND_BRANCH: mvp
+    environment:
+      DB: "mongodb://root:test@mongo:27017/"
+      REDIS_HOST: "redis"
+      REDIS_PORT: "6379"  
+      NATS_SERVER: "nats://nats:4222"
+      ROOT_KEY: "test0123456789test0123456789test"
+      DB_KEY: "test0123456789test0123456789test"
+      DASHBOARD_URL: "localhost"
+      PORT: "80"
+      HTTPS: "off"
+    depends_on:
+      - mongo
+      - redis
+      - nats
+    ports:
+      - "80:80"   # backend API on http://localhost
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: spark-dashboard.Dockerfile
+      args:
+        CORE_REPO: https://gitlab.com/elsa-lab/spark/spark-core.git
+        CORE_BRANCH: Develop
+        DASHBOARD_REPO: https://gitlab.com/elsa-lab/spark/spark-dashboard.git
+        DASHBOARD_BRANCH: mvp-app
+    environment:
+      SERVER_API_URL: localhost
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"   # dashboard on http://localhost:3000
