@@ -25,7 +25,7 @@ task downloadAndUnzipOrientDB(type: Copy, dependsOn: downloadOrientDB) {
     into downloadOrientDB.dest
 }
 
-// Execute a command line to create a testar OrientDB database with admin admin credentials
+// Execute a command line to create a testar OrientDB database with testar testar credentials
 task createDatabaseOrientDB(type: Exec, dependsOn: downloadAndUnzipOrientDB){
     group = 'test_testar_workflow'
     description ='createDatabaseOrientDB'
@@ -36,9 +36,9 @@ task createDatabaseOrientDB(type: Exec, dependsOn: downloadAndUnzipOrientDB){
     workingDir 'target/install/testar/bin/orientdb-community-3.2.38/bin'
     
     if (System.getProperty('os.name').toLowerCase().contains('windows')) {
-        commandLine 'cmd', '/c', 'console.bat CREATE DATABASE plocal:../databases/testar admin admin'
+        commandLine 'cmd', '/c', 'console.bat CREATE DATABASE plocal:../databases/testar testar testar'
     } else {
-        commandLine 'bash', '-c', './console.sh CREATE DATABASE plocal:../databases/testar admin admin'
+        commandLine 'bash', '-c', './console.sh CREATE DATABASE plocal:../databases/testar testar testar'
     }
 
     // Ignore errors creating the database because we check the output buffer message
