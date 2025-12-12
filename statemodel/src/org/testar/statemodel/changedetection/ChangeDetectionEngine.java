@@ -30,15 +30,9 @@
 
 package org.testar.statemodel.changedetection;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.HashMap;
-import java.util.stream.Collectors;
 
 import org.testar.statemodel.AbstractStateModel;
-import org.testar.statemodel.AbstractState;
 
 /**
  * Entry point to run change detection between two state models.
@@ -46,75 +40,18 @@ import org.testar.statemodel.AbstractState;
 public class ChangeDetectionEngine {
 
     private final ActionDescriptionProvider actionDescriptionProvider;
-    private final StateDifferenceFinder stateDifferenceFinder;
+    private final GraphTraversalComparator comparator;
 
-    public ChangeDetectionEngine(ActionDescriptionProvider actionDescriptionProvider, StateDifferenceFinder stateDifferenceFinder) {
+    public ChangeDetectionEngine(ActionDescriptionProvider actionDescriptionProvider) {
         this.actionDescriptionProvider = Objects.requireNonNull(actionDescriptionProvider, "actionDescriptionProvider cannot be null");
-        this.stateDifferenceFinder = Objects.requireNonNull(stateDifferenceFinder, "stateDifferenceFinder cannot be null");
+        this.comparator = new GraphTraversalComparator(this.actionDescriptionProvider);
     }
 
     public ChangeDetectionResult compare(AbstractStateModel oldModel, AbstractStateModel newModel) {
         Objects.requireNonNull(oldModel, "oldModel cannot be null");
         Objects.requireNonNull(newModel, "newModel cannot be null");
 
-        List<StateSnapshot> oldStateSnapshots = StateSnapshotFactory.from(oldModel);
-        List<StateSnapshot> newStateSnapshots = StateSnapshotFactory.from(newModel);
-
-        List<DeltaState> addedStates = stateDifferenceFinder.findAddedStates(oldStateSnapshots, newStateSnapshots, actionDescriptionProvider);
-        List<DeltaState> removedStates = stateDifferenceFinder.findRemovedStates(oldStateSnapshots, newStateSnapshots, actionDescriptionProvider);
-        Map<String, VertexPropertyDiff> changedStates = computeChangedStates(oldModel, newModel);
-        Map<String, ActionSetDiff> changedActions = computeChangedActions(oldStateSnapshots, newStateSnapshots);
-
-        return new ChangeDetectionResult(oldModel.getModelIdentifier(), newModel.getModelIdentifier(), addedStates, removedStates, changedStates, changedActions);
-    }
-
-    private Map<String, VertexPropertyDiff> computeChangedStates(AbstractStateModel oldModel, AbstractStateModel newModel) {
-        Map<String, VertexPropertyDiff> changed = new HashMap<>();
-
-        Set<String> oldIds = oldModel.getStates().stream().map(AbstractState::getStateId).collect(Collectors.toSet());
-        for (String stateId : oldIds) {
-            if (newModel.containsState(stateId)) {
-                VertexPropertyDiff diff = StatePropertyComparator.compare(
-                        getState(oldModel, stateId),
-                        getState(newModel, stateId));
-                if (!diff.isEmpty()) {
-                    changed.put(stateId, diff);
-                }
-            }
-        }
-        return changed;
-    }
-
-    private static AbstractState getState(AbstractStateModel model, String stateId) {
-        try {
-            return model.getState(stateId);
-        } catch (Exception ex) {
-            throw new IllegalStateException("State with id " + stateId + " not found in model " + model.getModelIdentifier(), ex);
-        }
-    }
-
-    private Map<String, ActionSetDiff> computeChangedActions(List<StateSnapshot> oldStateSnapshots, List<StateSnapshot> newStateSnapshots) {
-        Map<String, StateSnapshot> oldStatesById = indexById(oldStateSnapshots);
-        Map<String, StateSnapshot> newStatesById = indexById(newStateSnapshots);
-
-        Map<String, ActionSetDiff> diffs = new HashMap<>();
-        for (String stateId : oldStatesById.keySet()) {
-            if (newStatesById.containsKey(stateId)) {
-                ActionSetDiff diff = ActionSetComparator.compare(oldStatesById.get(stateId), newStatesById.get(stateId), actionDescriptionProvider);
-                if (!diff.isEmpty()) {
-                    diffs.put(stateId, diff);
-                }
-            }
-        }
-        return diffs;
-    }
-
-    private static Map<String, StateSnapshot> indexById(List<StateSnapshot> stateSnapshots) {
-        Map<String, StateSnapshot> map = new HashMap<>();
-        for (StateSnapshot state : stateSnapshots) {
-            map.put(state.getStateId(), state);
-        }
-        return map;
+        return comparator.compare(oldModel, newModel);
     }
 
 }
