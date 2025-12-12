@@ -42,20 +42,18 @@ import com.orientechnologies.orient.core.sql.executor.OResultSet;
 /**
  * Connects with OrientDB to retrieve an action description (ConcreteAction) for the given actionId.
  * Falls back to returning the abstract action id if no description is found.
- * 
- * This connection class is needed because the model extractor only provides the Abstract layer.
  */
-public class OrientDbActionDescriptionProvider implements ActionDescriptionProvider {
+public class OrientDbActionPrimaryKeyProvider implements ActionPrimaryKeyProvider {
 
     private final Connection connection;
     private final Map<String, String> cache = new ConcurrentHashMap<>();
 
-    public OrientDbActionDescriptionProvider(Connection connection) {
+    public OrientDbActionPrimaryKeyProvider(Connection connection) {
         this.connection = Objects.requireNonNull(connection, "connection cannot be null");
     }
 
     @Override
-    public String getDescription(String abstractActionId) {
+    public String getPrimaryKey(String abstractActionId) {
         String cached = cache.get(abstractActionId);
         if (cached != null) {
             return cached;

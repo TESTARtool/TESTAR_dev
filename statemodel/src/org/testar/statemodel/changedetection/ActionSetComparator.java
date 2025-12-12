@@ -47,7 +47,7 @@ public class ActionSetComparator {
 
     public static ActionSetDiff compare(StateSnapshot oldState,
                                         StateSnapshot newState,
-                                        ActionDescriptionProvider descriptionProvider) {
+                                        ActionPrimaryKeyProvider descriptionProvider) {
         Objects.requireNonNull(oldState, "oldState cannot be null");
         Objects.requireNonNull(newState, "newState cannot be null");
         Objects.requireNonNull(descriptionProvider, "descriptionProvider cannot be null");
@@ -60,12 +60,12 @@ public class ActionSetComparator {
         return new ActionSetDiff(addedIncoming, removedIncoming, addedOutgoing, removedOutgoing);
     }
 
-    private static List<DeltaAction> diff(List<String> primary, List<String> secondary, Direction direction, ActionDescriptionProvider descriptionProvider) {
+    private static List<DeltaAction> diff(List<String> primary, List<String> secondary, Direction direction, ActionPrimaryKeyProvider descriptionProvider) {
         Set<String> secondarySet = new HashSet<>(secondary);
         List<DeltaAction> deltas = new ArrayList<>();
         for (String actionId : primary) {
             if (!secondarySet.contains(actionId)) {
-                deltas.add(new DeltaAction(actionId, descriptionProvider.getDescription(actionId), direction));
+                deltas.add(new DeltaAction(actionId, descriptionProvider.getPrimaryKey(actionId), direction));
             }
         }
         return deltas;

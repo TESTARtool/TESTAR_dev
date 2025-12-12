@@ -51,10 +51,10 @@ import java.util.stream.Collectors;
  */
 class GraphTraversalComparator {
 
-    private final ActionDescriptionProvider descriptionProvider;
+    private final ActionPrimaryKeyProvider primaryKeyProvider;
 
-    GraphTraversalComparator(ActionDescriptionProvider descriptionProvider) {
-        this.descriptionProvider = Objects.requireNonNull(descriptionProvider, "descriptionProvider cannot be null");
+    GraphTraversalComparator(ActionPrimaryKeyProvider primaryKeyProvider) {
+        this.primaryKeyProvider = Objects.requireNonNull(primaryKeyProvider, "primaryKeyProvider cannot be null");
     }
 
     ChangeDetectionResult compare(AbstractStateModel oldModel, AbstractStateModel newModel) {
@@ -224,7 +224,7 @@ class GraphTraversalComparator {
 
     private Edge toEdge(AbstractStateTransition t, Map<String, Node> nodes) {
         String actionId = t.getActionId();
-        String desc = descriptionProvider.getDescription(actionId);
+        String desc = primaryKeyProvider.getPrimaryKey(actionId);
         String key = comparableKey(actionId, desc);
         return new Edge(t.getSourceStateId(), t.getTargetStateId(), actionId, desc, key);
     }

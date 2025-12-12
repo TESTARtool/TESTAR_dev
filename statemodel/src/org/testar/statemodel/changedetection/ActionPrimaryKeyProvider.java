@@ -31,13 +31,11 @@
 package org.testar.statemodel.changedetection;
 
 /**
- * Fallback description provider that returns the action id when no better description is available.
+ * Resolves the primary key for an action comparison. 
+ * The key prioritizes the action description and fall back to the action id.
  */
-public class DefaultActionDescriptionProvider implements ActionDescriptionProvider {
+public interface ActionPrimaryKeyProvider {
 
-    @Override
-    public String getDescription(String abstractActionId) {
-        return abstractActionId;
-    }
+    String getPrimaryKey(String actionId);
 
 }

@@ -12,7 +12,7 @@ public class ChangeDetectionEngineTest {
 
     @Test
     public void testDescriptionProviderConstructor() throws StateModelException {
-        ActionDescriptionProvider descriptionProvider = id -> "desc-" + id;
+        ActionPrimaryKeyProvider descriptionProvider = id -> "desc-" + id;
         ChangeDetectionEngine engine = new ChangeDetectionEngine(descriptionProvider);
 
         AbstractStateModel oldModel = new AbstractStateModel("oldModel", "app", "version", new HashSet<Tag<?>>(Collections.emptySet()));
@@ -27,7 +27,7 @@ public class ChangeDetectionEngineTest {
 
     @Test(expected = NullPointerException.class)
     public void testNullOldModel() throws StateModelException {
-        ActionDescriptionProvider descriptionProvider = id -> "desc-" + id;
+        ActionPrimaryKeyProvider descriptionProvider = id -> "desc-" + id;
         ChangeDetectionEngine engine = new ChangeDetectionEngine(descriptionProvider);
 
         AbstractStateModel newModel = new AbstractStateModel("newModel", "app", "version", new HashSet<Tag<?>>(Collections.emptySet()));
@@ -36,7 +36,7 @@ public class ChangeDetectionEngineTest {
 
     @Test(expected = NullPointerException.class)
     public void testNullNewModel() throws StateModelException {
-        ActionDescriptionProvider descriptionProvider = id -> "desc-" + id;
+        ActionPrimaryKeyProvider descriptionProvider = id -> "desc-" + id;
         ChangeDetectionEngine engine = new ChangeDetectionEngine(descriptionProvider);
 
         AbstractStateModel oldModel = new AbstractStateModel("oldModel", "app", "version", new HashSet<Tag<?>>(Collections.emptySet()));

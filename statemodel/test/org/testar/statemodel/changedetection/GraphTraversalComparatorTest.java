@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
 public class GraphTraversalComparatorTest {
 
     private Map<String, String> descByAction;
-    private ActionDescriptionProvider descriptionProvider;
+    private ActionPrimaryKeyProvider descriptionProvider;
 
     @Before
     public void setup() {

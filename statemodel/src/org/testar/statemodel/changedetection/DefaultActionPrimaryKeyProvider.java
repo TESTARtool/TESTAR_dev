@@ -30,9 +30,14 @@
 
 package org.testar.statemodel.changedetection;
 
-@FunctionalInterface
-public interface ActionDescriptionProvider {
+/**
+ * Default implementation that simply returns the action id as the primary key.
+ */
+public class DefaultActionPrimaryKeyProvider implements ActionPrimaryKeyProvider {
 
-    String getDescription(String abstractActionId);
+    @Override
+    public String getPrimaryKey(String actionId) {
+        return actionId;
+    }
 
 }

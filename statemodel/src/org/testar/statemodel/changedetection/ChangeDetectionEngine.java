@@ -39,12 +39,12 @@ import org.testar.statemodel.AbstractStateModel;
  */
 public class ChangeDetectionEngine {
 
-    private final ActionDescriptionProvider actionDescriptionProvider;
+    private final ActionPrimaryKeyProvider actionPrimaryKeyProvider;
     private final GraphTraversalComparator comparator;
 
-    public ChangeDetectionEngine(ActionDescriptionProvider actionDescriptionProvider) {
-        this.actionDescriptionProvider = Objects.requireNonNull(actionDescriptionProvider, "actionDescriptionProvider cannot be null");
-        this.comparator = new GraphTraversalComparator(this.actionDescriptionProvider);
+    public ChangeDetectionEngine(ActionPrimaryKeyProvider actionPrimaryKeyProvider) {
+        this.actionPrimaryKeyProvider = Objects.requireNonNull(actionPrimaryKeyProvider, "actionPrimaryKeyProvider cannot be null");
+        this.comparator = new GraphTraversalComparator(this.actionPrimaryKeyProvider);
     }
 
     public ChangeDetectionResult compare(AbstractStateModel oldModel, AbstractStateModel newModel) {

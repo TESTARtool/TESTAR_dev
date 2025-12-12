@@ -40,12 +40,12 @@ public class ChangeDetectionEngineFactory {
     private ChangeDetectionEngineFactory() { }
 
     public static ChangeDetectionEngine createWithDefaultDescription() {
-        return new ChangeDetectionEngine(new DefaultActionDescriptionProvider());
+        return new ChangeDetectionEngine(new DefaultActionPrimaryKeyProvider());
     }
 
     public static ChangeDetectionEngine createWithOrientDb(Connection connection) {
         Objects.requireNonNull(connection, "connection cannot be null");
-        return new ChangeDetectionEngine(new OrientDbActionDescriptionProvider(connection));
+        return new ChangeDetectionEngine(new OrientDbActionPrimaryKeyProvider(connection));
     }
 
     public static ChangeDetectionEngine createWithPersistence(PersistenceManager persistenceManager) {
