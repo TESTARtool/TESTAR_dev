@@ -110,6 +110,20 @@ public class AnalysisManager {
     }
 
     /**
+     * Exposes the database configuration.
+     */
+    public Config getDbConfig() {
+        return dbConfig;
+    }
+
+    /**
+     * Exposes the output directory used to store generated graph/json/screenshot files.
+     */
+    public String getOutputDir() {
+        return outputDir;
+    }
+
+    /**
      * Checks whether the connection should be shutdown.
      */
     private void checkShutDown() {
@@ -334,14 +348,9 @@ public class AnalysisManager {
     }
 
     /**
-     * This model generates graph data for a given abstract state model and writes it to a json file.
-     * @param modelIdentifier the abstract state model identifier
-     * @param abstractLayerRequired true if the abstract state layer needs to be exported
-     * @param concreteLayerRequired true if the concrete state layer needs to be exported
-     * @param sequenceLayerRequired true if the sequence layer needs to be exported
-     * @return
+     * Builds the graph elements for a model in memory
      */
-    public String fetchGraphForModel(String modelIdentifier, boolean abstractLayerRequired, boolean concreteLayerRequired, boolean sequenceLayerRequired, boolean showCompoundGraph) {
+    public List<Element> fetchGraphElementsForModel(String modelIdentifier, boolean abstractLayerRequired, boolean concreteLayerRequired, boolean sequenceLayerRequired, boolean showCompoundGraph) {
         startUp();
         ArrayList<Element> elements = new ArrayList<>();
         if (abstractLayerRequired || concreteLayerRequired || sequenceLayerRequired) {
@@ -367,6 +376,20 @@ public class AnalysisManager {
                 }
             }
         }
+        checkShutDown();
+        return elements;
+    }
+
+    /**
+     * This model generates graph data for a given abstract state model and writes it to a json file.
+     * @param modelIdentifier the abstract state model identifier
+     * @param abstractLayerRequired true if the abstract state layer needs to be exported
+     * @param concreteLayerRequired true if the concrete state layer needs to be exported
+     * @param sequenceLayerRequired true if the sequence layer needs to be exported
+     * @return
+     */
+    public String fetchGraphForModel(String modelIdentifier, boolean abstractLayerRequired, boolean concreteLayerRequired, boolean sequenceLayerRequired, boolean showCompoundGraph) {
+        List<Element> elements = fetchGraphElementsForModel(modelIdentifier, abstractLayerRequired, concreteLayerRequired, sequenceLayerRequired, showCompoundGraph);
 
         StringBuilder builder = new StringBuilder(modelIdentifier);
         builder.append("_");
@@ -378,7 +401,7 @@ public class AnalysisManager {
         builder.append("_elements.json");
         String filename = builder.toString();
         checkShutDown();
-        return writeJson(elements, filename, modelIdentifier);
+        return writeJson(new ArrayList<>(elements), filename, modelIdentifier);
     }
 
     /**
