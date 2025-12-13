@@ -35,6 +35,7 @@ import org.testar.statemodel.analysis.changedetection.helpers.ElementUtils;
 import org.testar.statemodel.analysis.changedetection.helpers.GraphElementIndexer;
 import org.testar.statemodel.analysis.changedetection.helpers.MergedGraphFilter;
 import org.testar.statemodel.analysis.changedetection.helpers.ScreenshotAssigner;
+import org.testar.statemodel.analysis.changedetection.helpers.StatusResolver;
 import org.testar.statemodel.changedetection.ActionPrimaryKeyProvider;
 import org.testar.statemodel.changedetection.ChangeDetectionResult;
 
@@ -56,6 +57,7 @@ public class ChangeDetectionGraphBuilder {
     private final ScreenshotAssigner screenshotAssigner = new ScreenshotAssigner();
     private final ActionEdgeJoiner edgeJoiner = new ActionEdgeJoiner();
     private final MergedGraphFilter graphFilter = new MergedGraphFilter();
+    private final StatusResolver statusResolver = new StatusResolver();
 
     public ChangeDetectionGraphBuilder(ActionPrimaryKeyProvider primaryKeyProvider) {
         this.elementIndexer = new GraphElementIndexer(primaryKeyProvider);
@@ -91,21 +93,7 @@ public class ChangeDetectionGraphBuilder {
             }
         }
 
-        Map<String, String> statusByState = new HashMap<String, String>();
-        for (org.testar.statemodel.changedetection.DeltaState s : result.getAddedStates()) {
-            statusByState.put(s.getStateId(), "added");
-        }
-        for (org.testar.statemodel.changedetection.DeltaState s : result.getRemovedStates()) {
-            statusByState.put(s.getStateId(), "removed");
-        }
-        for (String id : result.getChangedStates().keySet()) {
-            statusByState.putIfAbsent(id, "changed");
-        }
-        for (String id : result.getChangedActions().keySet()) {
-            if (result.getChangedActions().get(id) != null && !result.getChangedActions().get(id).isEmpty()) {
-                statusByState.putIfAbsent(id, "changed");
-            }
-        }
+        Map<String, String> statusByState = statusResolver.buildStatusByState(result);
 
         // apply status to nodes and keep screenshots (old/new) when available
         for (Map<String, Object> el : mergedNodes.values()) {
@@ -114,7 +102,7 @@ public class ChangeDetectionGraphBuilder {
                 continue;
             }
             String stateKey = ElementUtils.extractStateId(data);
-            String status = statusByState.containsKey(stateKey) ? statusByState.get(stateKey) : "unchanged";
+            String status = statusByState.containsKey(stateKey) ? statusByState.get(stateKey) : StatusResolver.UNCHANGED;
             data.put("status", status);
         }
 

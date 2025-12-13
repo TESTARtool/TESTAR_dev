@@ -34,10 +34,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.testar.statemodel.analysis.AnalysisManager;
 import org.testar.statemodel.changedetection.ChangeDetectionResult;
-import org.testar.statemodel.persistence.PersistenceManager;
-import org.testar.statemodel.persistence.orientdb.OrientDBManager;
-import org.testar.statemodel.persistence.orientdb.entity.EntityManager;
-import org.testar.statemodel.util.EventHelper;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -82,23 +78,12 @@ public class ChangeDetectionServlet extends HttpServlet {
 
         ServletContext ctx = getServletContext();
         AnalysisManager analysisManager = (AnalysisManager) ctx.getAttribute("analysisManager");
-        PersistenceManager pm = buildPersistenceManager(analysisManager);
-        try {
-            ChangeDetectionAnalysisService service = new ChangeDetectionAnalysisService(pm);
-            ChangeDetectionResult result = service.compare(oldModelId, newModelId);
 
-            resp.setContentType("application/json");
-            resp.getWriter().write(mapper.writeValueAsString(result));
-        } finally {
-            if (pm != null) {
-                pm.shutdown();
-            }
-        }
-    }
+        ChangeDetectionFacade facade = new ChangeDetectionFacade(analysisManager, mapper);
+        ChangeDetectionResult result = facade.compare(oldModelId, newModelId);
 
-    private PersistenceManager buildPersistenceManager(AnalysisManager analysisManager) {
-        EntityManager entityManager = new EntityManager(analysisManager.getDbConfig());
-        return new OrientDBManager(new EventHelper(), entityManager);
+        resp.setContentType("application/json");
+        resp.getWriter().write(mapper.writeValueAsString(result));
     }
 
 }

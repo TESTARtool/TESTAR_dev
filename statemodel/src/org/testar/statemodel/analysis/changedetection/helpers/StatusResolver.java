@@ -28,51 +28,48 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.statemodel.analysis.changedetection;
+package org.testar.statemodel.analysis.changedetection.helpers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.testar.statemodel.changedetection.ChangeDetectionResult;
+import org.testar.statemodel.changedetection.DeltaState;
 
-import org.testar.statemodel.analysis.AnalysisManager;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
- * Builds and returns the merged change-detection graph for the frontend.
+ * Computes node statuses for change detection visualization:
+ * - added/removed dominates everything
+ * - changed applies only if the state is not already added/removed
+ * - otherwise unchanged
  */
-public class ChangeDetectionGraphServlet extends HttpServlet {
+public final class StatusResolver {
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    public static final String ADDED = "added";
+    public static final String REMOVED = "removed";
+    public static final String CHANGED = "changed";
+    public static final String UNCHANGED = "unchanged";
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String oldModelId = req.getParameter("oldModelIdentifier");
-        String newModelId = req.getParameter("newModelIdentifier");
+    public Map<String, String> buildStatusByState(ChangeDetectionResult result) {
+        Objects.requireNonNull(result, "result");
 
-        if (oldModelId == null || newModelId == null || oldModelId.trim().isEmpty() || newModelId.trim().isEmpty()) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().write("Both oldModelIdentifier and newModelIdentifier are required.");
-            return;
+        Map<String, String> statusByState = new HashMap<String, String>();
+        for (DeltaState s : result.getAddedStates()) {
+            statusByState.put(s.getStateId(), ADDED);
+        }
+        for (DeltaState s : result.getRemovedStates()) {
+            statusByState.put(s.getStateId(), REMOVED);
+        }
+        for (String id : result.getChangedStates().keySet()) {
+            statusByState.putIfAbsent(id, CHANGED);
+        }
+        for (String id : result.getChangedActions().keySet()) {
+            if (result.getChangedActions().get(id) != null && !result.getChangedActions().get(id).isEmpty()) {
+                statusByState.putIfAbsent(id, CHANGED);
+            }
         }
 
-        ServletContext ctx = getServletContext();
-        AnalysisManager analysisManager = (AnalysisManager) ctx.getAttribute("analysisManager");
-
-        try {
-            ChangeDetectionFacade facade = new ChangeDetectionFacade(analysisManager, mapper);
-            java.util.List<Map<String, Object>> merged = facade.buildMergedGraph(oldModelId, newModelId);
-            resp.setContentType("application/json");
-            resp.getWriter().write(mapper.writeValueAsString(merged));
-        } catch (Exception ex) {
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            resp.getWriter().write("Failed to build merged graph: " + ex.getMessage());
-            ex.printStackTrace();
-        }
+        return statusByState;
     }
 
 }
