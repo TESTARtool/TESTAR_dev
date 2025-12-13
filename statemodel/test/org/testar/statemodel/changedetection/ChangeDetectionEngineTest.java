@@ -6,6 +6,7 @@ import java.util.HashSet;
 import org.junit.Test;
 import org.testar.monkey.alayer.Tag;
 import org.testar.statemodel.AbstractStateModel;
+import org.testar.statemodel.changedetection.key.ActionPrimaryKeyProvider;
 import org.testar.statemodel.exceptions.StateModelException;
 
 public class ChangeDetectionEngineTest {

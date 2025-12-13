@@ -37,6 +37,10 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Objects;
 
+import org.testar.statemodel.changedetection.delta.ActionSetDiff;
+import org.testar.statemodel.changedetection.delta.DeltaState;
+import org.testar.statemodel.changedetection.property.VertexPropertyDiff;
+
 /**
  * Aggregated result for a change detection run between two state models.
  */

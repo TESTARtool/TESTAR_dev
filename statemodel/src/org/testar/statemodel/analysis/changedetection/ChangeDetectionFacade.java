@@ -34,7 +34,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testar.statemodel.analysis.AnalysisManager;
 import org.testar.statemodel.analysis.jsonformat.Element;
 import org.testar.statemodel.changedetection.ChangeDetectionResult;
-import org.testar.statemodel.changedetection.OrientDbActionPrimaryKeyProvider;
+import org.testar.statemodel.changedetection.key.OrientDbActionPrimaryKeyProvider;
 import org.testar.statemodel.persistence.PersistenceManager;
 import org.testar.statemodel.persistence.orientdb.OrientDBManager;
 import org.testar.statemodel.persistence.orientdb.entity.EntityManager;

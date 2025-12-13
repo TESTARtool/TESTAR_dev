@@ -28,29 +28,38 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.statemodel.changedetection;
+package org.testar.statemodel.changedetection.property;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import org.testar.monkey.alayer.Tag;
 import org.testar.statemodel.AbstractState;
 
 /**
- * Compares two abstract states by extracting their Tag attributes into string properties
- * and delegating to {@link VertexPropertyComparator}.
+ * Utility to extract comparable string properties from an {@link AbstractState}: 
+ *  - stateId
+ *  - all attached Tag attributes converted to string values
  */
-public class StatePropertyComparator {
+public class StatePropertyExtractor {
 
-    private StatePropertyComparator() { }
+    private StatePropertyExtractor() { }
 
-    public static VertexPropertyDiff compare(AbstractState oldState, AbstractState newState) {
-        Objects.requireNonNull(oldState, "oldState cannot be null");
-        Objects.requireNonNull(newState, "newState cannot be null");
+    public static Map<String, String> extract(AbstractState state) {
+        Objects.requireNonNull(state, "state cannot be null");
 
-        Map<String, String> oldProps = StatePropertyExtractor.extract(oldState);
-        Map<String, String> newProps = StatePropertyExtractor.extract(newState);
+        Map<String, String> props = new HashMap<>();
+        props.put("stateId", state.getStateId());
 
-        return VertexPropertyComparator.compare(oldProps, newProps);
+        for (Tag<?> tag : state.getAttributes().tags()) {
+            Object value = state.getAttributes().get(tag, null);
+            if (value != null) {
+                props.put(tag.name(), value.toString());
+            }
+        }
+
+        return props;
     }
 
 }

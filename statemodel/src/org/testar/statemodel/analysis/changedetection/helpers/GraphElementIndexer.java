@@ -30,12 +30,12 @@
 
 package org.testar.statemodel.analysis.changedetection.helpers;
 
-import org.testar.statemodel.changedetection.ActionPrimaryKeyProvider;
-
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import org.testar.statemodel.changedetection.key.ActionPrimaryKeyProvider;
 
 /**
  * Normalizes and indexes Cytoscape graph elements to support stable merging:

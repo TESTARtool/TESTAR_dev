@@ -1,4 +1,4 @@
-package org.testar.statemodel.changedetection;
+package org.testar.statemodel.changedetection.delta;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.Test;
-import org.testar.statemodel.changedetection.DeltaAction.Direction;
+import org.testar.statemodel.changedetection.delta.DeltaAction.Direction;
 
 public class DeltaStateTest {
 

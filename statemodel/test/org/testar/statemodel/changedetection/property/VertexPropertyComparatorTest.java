@@ -1,4 +1,4 @@
-package org.testar.statemodel.changedetection;
+package org.testar.statemodel.changedetection.property;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
+import org.testar.statemodel.changedetection.delta.DiffType;
 
 public class VertexPropertyComparatorTest {
 

@@ -33,6 +33,8 @@ package org.testar.statemodel.changedetection;
 import java.util.Objects;
 
 import org.testar.statemodel.persistence.orientdb.entity.Connection;
+import org.testar.statemodel.changedetection.key.DefaultActionPrimaryKeyProvider;
+import org.testar.statemodel.changedetection.key.OrientDbActionPrimaryKeyProvider;
 import org.testar.statemodel.persistence.PersistenceManager;
 
 public class ChangeDetectionEngineFactory {

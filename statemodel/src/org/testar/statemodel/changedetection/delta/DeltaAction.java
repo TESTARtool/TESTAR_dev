@@ -28,38 +28,59 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.statemodel.changedetection;
+package org.testar.statemodel.changedetection.delta;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
-import org.testar.monkey.alayer.Tag;
-import org.testar.statemodel.AbstractState;
+public class DeltaAction {
 
-/**
- * Utility to extract comparable string properties from an {@link AbstractState}: 
- *  - stateId
- *  - all attached Tag attributes converted to string values
- */
-public class StatePropertyExtractor {
+    public enum Direction {
+        INCOMING,
+        OUTGOING
+    }
 
-    private StatePropertyExtractor() { }
+    private final String actionId;
+    private final String description;
+    private final Direction direction;
 
-    public static Map<String, String> extract(AbstractState state) {
-        Objects.requireNonNull(state, "state cannot be null");
-
-        Map<String, String> props = new HashMap<>();
-        props.put("stateId", state.getStateId());
-
-        for (Tag<?> tag : state.getAttributes().tags()) {
-            Object value = state.getAttributes().get(tag, null);
-            if (value != null) {
-                props.put(tag.name(), value.toString());
-            }
+    public DeltaAction(String actionId, String description, Direction direction) {
+        this.actionId = Objects.requireNonNull(actionId, "actionId cannot be null");
+        if (actionId.trim().isEmpty()) {
+            throw new IllegalArgumentException("actionId cannot be empty or blank");
         }
+        this.description = Objects.requireNonNull(description, "description cannot be null");
+        this.direction = Objects.requireNonNull(direction, "direction cannot be null");
+    }
 
-        return props;
+    public String getActionId() {
+        return actionId;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Direction getDirection() {
+        return direction;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof DeltaAction)) {
+            return false;
+        }
+        DeltaAction other = (DeltaAction) obj;
+        return actionId.equals(other.actionId) &&
+                description.equals(other.description) &&
+                direction == other.direction;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(actionId, description, direction);
     }
 
 }

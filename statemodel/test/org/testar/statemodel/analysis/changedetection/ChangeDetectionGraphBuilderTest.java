@@ -1,14 +1,14 @@
 package org.testar.statemodel.analysis.changedetection;
 
 import org.junit.Test;
-import org.testar.statemodel.changedetection.ActionPrimaryKeyProvider;
-import org.testar.statemodel.changedetection.ActionSetDiff;
 import org.testar.statemodel.changedetection.ChangeDetectionResult;
-import org.testar.statemodel.changedetection.DeltaAction;
-import org.testar.statemodel.changedetection.DeltaState;
-import org.testar.statemodel.changedetection.DiffType;
-import org.testar.statemodel.changedetection.PropertyDiff;
-import org.testar.statemodel.changedetection.VertexPropertyDiff;
+import org.testar.statemodel.changedetection.delta.ActionSetDiff;
+import org.testar.statemodel.changedetection.delta.DeltaAction;
+import org.testar.statemodel.changedetection.delta.DeltaState;
+import org.testar.statemodel.changedetection.delta.DiffType;
+import org.testar.statemodel.changedetection.key.ActionPrimaryKeyProvider;
+import org.testar.statemodel.changedetection.property.PropertyDiff;
+import org.testar.statemodel.changedetection.property.VertexPropertyDiff;
 
 import java.util.ArrayList;
 import java.util.Arrays;

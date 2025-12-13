@@ -34,6 +34,7 @@ import java.util.Objects;
 
 import org.testar.statemodel.AbstractStateModel;
 import org.testar.statemodel.changedetection.algorithm.GraphTraversalComparator;
+import org.testar.statemodel.changedetection.key.ActionPrimaryKeyProvider;
 
 /**
  * Entry point to run change detection between two state models.

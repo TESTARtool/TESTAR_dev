@@ -28,14 +28,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.statemodel.changedetection;
+package org.testar.statemodel.changedetection.key;
 
 /**
- * Resolves the primary key for an action comparison. 
- * The key prioritizes the action description and fall back to the action id.
+ * Default implementation that simply returns the action id as the primary key.
  */
-public interface ActionPrimaryKeyProvider {
+public class DefaultActionPrimaryKeyProvider implements ActionPrimaryKeyProvider {
 
-    String getPrimaryKey(String actionId);
+    @Override
+    public String getPrimaryKey(String actionId) {
+        return actionId;
+    }
 
 }

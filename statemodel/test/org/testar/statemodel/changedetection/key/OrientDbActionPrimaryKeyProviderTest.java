@@ -1,4 +1,4 @@
-package org.testar.statemodel.changedetection;
+package org.testar.statemodel.changedetection.key;
 
 import static org.junit.Assert.assertEquals;
 

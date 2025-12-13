@@ -28,9 +28,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.statemodel.changedetection;
+package org.testar.statemodel.changedetection.property;
 
 import java.util.Objects;
+
+import org.testar.statemodel.changedetection.delta.DiffType;
 
 public class PropertyDiff {
 

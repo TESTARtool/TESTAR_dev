@@ -31,7 +31,7 @@
 package org.testar.statemodel.analysis.changedetection.helpers;
 
 import org.testar.statemodel.changedetection.ChangeDetectionResult;
-import org.testar.statemodel.changedetection.DeltaState;
+import org.testar.statemodel.changedetection.delta.DeltaState;
 
 import java.util.HashMap;
 import java.util.Map;

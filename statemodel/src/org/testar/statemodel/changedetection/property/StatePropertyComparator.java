@@ -28,16 +28,29 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.statemodel.changedetection;
+package org.testar.statemodel.changedetection.property;
+
+import java.util.Map;
+import java.util.Objects;
+
+import org.testar.statemodel.AbstractState;
 
 /**
- * Default implementation that simply returns the action id as the primary key.
+ * Compares two abstract states by extracting their Tag attributes into string properties
+ * and delegating to {@link VertexPropertyComparator}.
  */
-public class DefaultActionPrimaryKeyProvider implements ActionPrimaryKeyProvider {
+public class StatePropertyComparator {
 
-    @Override
-    public String getPrimaryKey(String actionId) {
-        return actionId;
+    private StatePropertyComparator() { }
+
+    public static VertexPropertyDiff compare(AbstractState oldState, AbstractState newState) {
+        Objects.requireNonNull(oldState, "oldState cannot be null");
+        Objects.requireNonNull(newState, "newState cannot be null");
+
+        Map<String, String> oldProps = StatePropertyExtractor.extract(oldState);
+        Map<String, String> newProps = StatePropertyExtractor.extract(newState);
+
+        return VertexPropertyComparator.compare(oldProps, newProps);
     }
 
 }

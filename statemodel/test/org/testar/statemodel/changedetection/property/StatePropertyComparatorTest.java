@@ -1,4 +1,4 @@
-package org.testar.statemodel.changedetection;
+package org.testar.statemodel.changedetection.property;
 
 import static org.junit.Assert.assertEquals;
 import java.util.Collections;

@@ -33,7 +33,7 @@ package org.testar.statemodel.changedetection.algorithm;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.testar.statemodel.changedetection.DeltaAction;
+import org.testar.statemodel.changedetection.delta.DeltaAction;
 
 final class MutableActionDiff {
 

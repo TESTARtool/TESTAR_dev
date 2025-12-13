@@ -36,8 +36,8 @@ import org.testar.statemodel.analysis.changedetection.helpers.GraphElementIndexe
 import org.testar.statemodel.analysis.changedetection.helpers.MergedGraphFilter;
 import org.testar.statemodel.analysis.changedetection.helpers.ScreenshotAssigner;
 import org.testar.statemodel.analysis.changedetection.helpers.StatusResolver;
-import org.testar.statemodel.changedetection.ActionPrimaryKeyProvider;
 import org.testar.statemodel.changedetection.ChangeDetectionResult;
+import org.testar.statemodel.changedetection.key.ActionPrimaryKeyProvider;
 
 import java.util.ArrayList;
 import java.util.HashMap;

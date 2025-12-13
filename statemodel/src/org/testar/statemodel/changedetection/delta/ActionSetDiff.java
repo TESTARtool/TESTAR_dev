@@ -28,49 +28,59 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.statemodel.changedetection;
+package org.testar.statemodel.changedetection.delta;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class VertexPropertyDiff {
+/**
+ * Captures added/removed incoming and outgoing actions for a state that exists in both models.
+ */
+public class ActionSetDiff {
 
-    private final List<PropertyDiff> added;
-    private final List<PropertyDiff> removed;
-    private final List<PropertyDiff> changed;
+    private final List<DeltaAction> addedIncoming;
+    private final List<DeltaAction> removedIncoming;
+    private final List<DeltaAction> addedOutgoing;
+    private final List<DeltaAction> removedOutgoing;
 
-    public VertexPropertyDiff(List<PropertyDiff> added, List<PropertyDiff> removed, List<PropertyDiff> changed) {
-        this.added = safeCopy(added);
-        this.removed = safeCopy(removed);
-        this.changed = safeCopy(changed);
+    public ActionSetDiff(List<DeltaAction> addedIncoming,
+                         List<DeltaAction> removedIncoming,
+                         List<DeltaAction> addedOutgoing,
+                         List<DeltaAction> removedOutgoing) {
+        this.addedIncoming = requireNoNulls(addedIncoming, "addedIncoming");
+        this.removedIncoming = requireNoNulls(removedIncoming, "removedIncoming");
+        this.addedOutgoing = requireNoNulls(addedOutgoing, "addedOutgoing");
+        this.removedOutgoing = requireNoNulls(removedOutgoing, "removedOutgoing");
     }
 
-    private static List<PropertyDiff> safeCopy(List<PropertyDiff> source) {
-        List<PropertyDiff> copy = new ArrayList<>();
-        if (source != null) {
-            for (PropertyDiff diff : source) {
-                copy.add(Objects.requireNonNull(diff, "diff item cannot be null"));
-            }
+    private static List<DeltaAction> requireNoNulls(List<DeltaAction> source, String label) {
+        Objects.requireNonNull(source, label + " cannot be null");
+        for (DeltaAction action : source) {
+            Objects.requireNonNull(action, label + " entry cannot be null");
         }
-        return copy;
+        return source;
     }
 
-    public List<PropertyDiff> getAdded() {
-        return Collections.unmodifiableList(added);
+    public List<DeltaAction> getAddedIncoming() {
+        return Collections.unmodifiableList(addedIncoming);
     }
 
-    public List<PropertyDiff> getRemoved() {
-        return Collections.unmodifiableList(removed);
+    public List<DeltaAction> getRemovedIncoming() {
+        return Collections.unmodifiableList(removedIncoming);
     }
 
-    public List<PropertyDiff> getChanged() {
-        return Collections.unmodifiableList(changed);
+    public List<DeltaAction> getAddedOutgoing() {
+        return Collections.unmodifiableList(addedOutgoing);
+    }
+
+    public List<DeltaAction> getRemovedOutgoing() {
+        return Collections.unmodifiableList(removedOutgoing);
     }
 
     public boolean isEmpty() {
-        return added.isEmpty() && removed.isEmpty() && changed.isEmpty();
+        return addedIncoming.isEmpty() && removedIncoming.isEmpty()
+                && addedOutgoing.isEmpty() && removedOutgoing.isEmpty();
     }
 
 }

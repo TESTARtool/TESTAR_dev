@@ -7,9 +7,9 @@ import org.testar.monkey.alayer.Tags;
 import org.testar.statemodel.AbstractAction;
 import org.testar.statemodel.AbstractState;
 import org.testar.statemodel.AbstractStateModel;
-import org.testar.statemodel.changedetection.ActionPrimaryKeyProvider;
-import org.testar.statemodel.changedetection.ActionSetDiff;
 import org.testar.statemodel.changedetection.ChangeDetectionResult;
+import org.testar.statemodel.changedetection.delta.ActionSetDiff;
+import org.testar.statemodel.changedetection.key.ActionPrimaryKeyProvider;
 import org.testar.statemodel.exceptions.StateModelException;
 
 import java.util.Collections;

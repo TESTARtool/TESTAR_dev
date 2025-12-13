@@ -7,7 +7,9 @@ import static org.junit.Assert.assertTrue;
 import java.util.Collections;
 
 import org.junit.Test;
-import org.testar.statemodel.changedetection.DeltaAction.Direction;
+import org.testar.statemodel.changedetection.delta.DeltaAction;
+import org.testar.statemodel.changedetection.delta.DeltaState;
+import org.testar.statemodel.changedetection.delta.DeltaAction.Direction;
 
 public class ChangeDetectionResultTest {
 

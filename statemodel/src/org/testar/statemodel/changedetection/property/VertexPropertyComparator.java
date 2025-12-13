@@ -28,13 +28,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.statemodel.changedetection;
+package org.testar.statemodel.changedetection.property;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
+
+import org.testar.statemodel.changedetection.delta.DiffType;
 
 /**
  * Compares two sets of vertex properties and classifies their differences.

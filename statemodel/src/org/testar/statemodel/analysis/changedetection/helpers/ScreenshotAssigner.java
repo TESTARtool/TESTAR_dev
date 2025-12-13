@@ -32,8 +32,8 @@ package org.testar.statemodel.analysis.changedetection.helpers;
 
 import org.testar.statemodel.analysis.AnalysisManager;
 import org.testar.statemodel.changedetection.ChangeDetectionResult;
-import org.testar.statemodel.changedetection.PropertyDiff;
-import org.testar.statemodel.changedetection.VertexPropertyDiff;
+import org.testar.statemodel.changedetection.property.PropertyDiff;
+import org.testar.statemodel.changedetection.property.VertexPropertyDiff;
 
 import java.util.HashMap;
 import java.util.Map;

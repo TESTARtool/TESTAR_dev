@@ -28,59 +28,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.statemodel.changedetection;
+package org.testar.statemodel.changedetection.key;
 
-import java.util.Objects;
+/**
+ * Resolves the primary key for an action comparison. 
+ * The key prioritizes the action description and fall back to the action id.
+ */
+public interface ActionPrimaryKeyProvider {
 
-public class DeltaAction {
-
-    public enum Direction {
-        INCOMING,
-        OUTGOING
-    }
-
-    private final String actionId;
-    private final String description;
-    private final Direction direction;
-
-    public DeltaAction(String actionId, String description, Direction direction) {
-        this.actionId = Objects.requireNonNull(actionId, "actionId cannot be null");
-        if (actionId.trim().isEmpty()) {
-            throw new IllegalArgumentException("actionId cannot be empty or blank");
-        }
-        this.description = Objects.requireNonNull(description, "description cannot be null");
-        this.direction = Objects.requireNonNull(direction, "direction cannot be null");
-    }
-
-    public String getActionId() {
-        return actionId;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Direction getDirection() {
-        return direction;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof DeltaAction)) {
-            return false;
-        }
-        DeltaAction other = (DeltaAction) obj;
-        return actionId.equals(other.actionId) &&
-                description.equals(other.description) &&
-                direction == other.direction;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(actionId, description, direction);
-    }
+    String getPrimaryKey(String actionId);
 
 }
