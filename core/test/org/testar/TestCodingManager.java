@@ -69,7 +69,7 @@ public class TestCodingManager {
 
 		// Build and check IDs for the action are set correctly
 		CodingManager.buildIDs(state, Collections.singleton(action));
-		Assert.assertEquals(action.get(Tags.AbstractID), "AA1sahtjg1c4157641605");
-		Assert.assertEquals(action.get(Tags.ConcreteID), "ACd7vwql27266850918");
+		Assert.assertEquals(action.get(Tags.AbstractID), "AA15k44gp2d1871300549");
+		Assert.assertEquals(action.get(Tags.ConcreteID), "AC1dn3okk412646313092");
 	}
 }
