@@ -28,31 +28,33 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.statemodel.changedetection;
+package org.testar.statemodel.changedetection.algorithm;
 
-import java.util.Objects;
+import org.testar.statemodel.AbstractState;
 
-import org.testar.statemodel.AbstractStateModel;
-import org.testar.statemodel.changedetection.algorithm.GraphTraversalComparator;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
- * Entry point to run change detection between two state models.
+ * Node in the traversal graph used by the comparator.
  */
-public class ChangeDetectionEngine {
+final class TraversalNode {
 
-    private final ActionPrimaryKeyProvider actionPrimaryKeyProvider;
-    private final GraphTraversalComparator comparator;
+    final String id;
+    final AbstractState state;
+    final boolean initial;
+    final Set<String> concreteIds;
+    final List<TraversalEdge> outgoing = new ArrayList<>();
+    final List<TraversalEdge> incoming = new ArrayList<>();
+    boolean handled = false;
 
-    public ChangeDetectionEngine(ActionPrimaryKeyProvider actionPrimaryKeyProvider) {
-        this.actionPrimaryKeyProvider = Objects.requireNonNull(actionPrimaryKeyProvider, "actionPrimaryKeyProvider cannot be null");
-        this.comparator = new GraphTraversalComparator(this.actionPrimaryKeyProvider);
-    }
-
-    public ChangeDetectionResult compare(AbstractStateModel oldModel, AbstractStateModel newModel) {
-        Objects.requireNonNull(oldModel, "oldModel cannot be null");
-        Objects.requireNonNull(newModel, "newModel cannot be null");
-
-        return comparator.compare(oldModel, newModel);
+    TraversalNode(AbstractState state) {
+        this.state = state;
+        this.id = state.getStateId();
+        this.initial = state.isInitial();
+        this.concreteIds = new HashSet<>(state.getConcreteStateIds());
     }
 
 }

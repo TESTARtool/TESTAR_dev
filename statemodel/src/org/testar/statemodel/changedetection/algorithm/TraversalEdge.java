@@ -28,31 +28,26 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.statemodel.changedetection;
-
-import java.util.Objects;
-
-import org.testar.statemodel.AbstractStateModel;
-import org.testar.statemodel.changedetection.algorithm.GraphTraversalComparator;
+package org.testar.statemodel.changedetection.algorithm;
 
 /**
- * Entry point to run change detection between two state models.
+ * Directed action edge between two abstract states in the traversal graph.
  */
-public class ChangeDetectionEngine {
+final class TraversalEdge {
 
-    private final ActionPrimaryKeyProvider actionPrimaryKeyProvider;
-    private final GraphTraversalComparator comparator;
+    final String sourceId;
+    final String targetId;
+    final String actionId;
+    final String description;
+    final String comparableKey;
+    boolean handled = false;
 
-    public ChangeDetectionEngine(ActionPrimaryKeyProvider actionPrimaryKeyProvider) {
-        this.actionPrimaryKeyProvider = Objects.requireNonNull(actionPrimaryKeyProvider, "actionPrimaryKeyProvider cannot be null");
-        this.comparator = new GraphTraversalComparator(this.actionPrimaryKeyProvider);
-    }
-
-    public ChangeDetectionResult compare(AbstractStateModel oldModel, AbstractStateModel newModel) {
-        Objects.requireNonNull(oldModel, "oldModel cannot be null");
-        Objects.requireNonNull(newModel, "newModel cannot be null");
-
-        return comparator.compare(oldModel, newModel);
+    TraversalEdge(String sourceId, String targetId, String actionId, String description, String comparableKey) {
+        this.sourceId = sourceId;
+        this.targetId = targetId;
+        this.actionId = actionId;
+        this.description = description;
+        this.comparableKey = comparableKey;
     }
 
 }

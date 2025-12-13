@@ -28,31 +28,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.statemodel.changedetection;
+package org.testar.statemodel.changedetection.algorithm;
 
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.testar.statemodel.AbstractStateModel;
-import org.testar.statemodel.changedetection.algorithm.GraphTraversalComparator;
+import org.testar.statemodel.changedetection.DeltaAction;
 
-/**
- * Entry point to run change detection between two state models.
- */
-public class ChangeDetectionEngine {
+final class MutableActionDiff {
 
-    private final ActionPrimaryKeyProvider actionPrimaryKeyProvider;
-    private final GraphTraversalComparator comparator;
-
-    public ChangeDetectionEngine(ActionPrimaryKeyProvider actionPrimaryKeyProvider) {
-        this.actionPrimaryKeyProvider = Objects.requireNonNull(actionPrimaryKeyProvider, "actionPrimaryKeyProvider cannot be null");
-        this.comparator = new GraphTraversalComparator(this.actionPrimaryKeyProvider);
-    }
-
-    public ChangeDetectionResult compare(AbstractStateModel oldModel, AbstractStateModel newModel) {
-        Objects.requireNonNull(oldModel, "oldModel cannot be null");
-        Objects.requireNonNull(newModel, "newModel cannot be null");
-
-        return comparator.compare(oldModel, newModel);
-    }
+    final List<DeltaAction> addIncoming = new ArrayList<>();
+    final List<DeltaAction> remIncoming = new ArrayList<>();
+    final List<DeltaAction> addOutgoing = new ArrayList<>();
+    final List<DeltaAction> remOutgoing = new ArrayList<>();
 
 }

@@ -28,20 +28,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.statemodel.changedetection;
+package org.testar.statemodel.changedetection.algorithm;
 
 import org.testar.statemodel.AbstractState;
 import org.testar.statemodel.AbstractStateModel;
 import org.testar.statemodel.AbstractStateTransition;
-
+import org.testar.statemodel.changedetection.ActionPrimaryKeyProvider;
+import org.testar.statemodel.changedetection.ActionSetDiff;
+import org.testar.statemodel.changedetection.ChangeDetectionResult;
+import org.testar.statemodel.changedetection.DeltaAction;
+import org.testar.statemodel.changedetection.DeltaState;
+import org.testar.statemodel.changedetection.StatePropertyComparator;
+import org.testar.statemodel.changedetection.VertexPropertyDiff;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -49,22 +53,22 @@ import java.util.stream.Collectors;
  * Connects to the initial abstract state and uses the action descriptions as the matching key (desc or action id), 
  * and tracks handled states/actions to avoid double counting.
  */
-class GraphTraversalComparator {
+public class GraphTraversalComparator {
 
     private final ActionPrimaryKeyProvider primaryKeyProvider;
 
-    GraphTraversalComparator(ActionPrimaryKeyProvider primaryKeyProvider) {
+    public GraphTraversalComparator(ActionPrimaryKeyProvider primaryKeyProvider) {
         this.primaryKeyProvider = Objects.requireNonNull(primaryKeyProvider, "primaryKeyProvider cannot be null");
     }
 
-    ChangeDetectionResult compare(AbstractStateModel oldModel, AbstractStateModel newModel) {
-        Graph oldGraph = buildGraph(oldModel);
-        Graph newGraph = buildGraph(newModel);
+    public ChangeDetectionResult compare(AbstractStateModel oldModel, AbstractStateModel newModel) {
+        TraversalGraph oldGraph = buildGraph(oldModel);
+        TraversalGraph newGraph = buildGraph(newModel);
 
         TraversalContext ctx = new TraversalContext(oldGraph, newGraph);
 
-        Node oldStart = chooseInitialState(oldGraph);
-        Node newStart = chooseInitialState(newGraph);
+        TraversalNode oldStart = chooseInitialState(oldGraph);
+        TraversalNode newStart = chooseInitialState(newGraph);
 
         if (oldStart != null && newStart != null) {
             compareStates(oldStart, newStart, ctx);
@@ -87,7 +91,7 @@ class GraphTraversalComparator {
         );
     }
 
-    private void compareStates(Node oldNode, Node newNode, TraversalContext ctx) {
+    private void compareStates(TraversalNode oldNode, TraversalNode newNode, TraversalContext ctx) {
         if (ctx.isMapped(oldNode.id, newNode.id)) {
             return;
         }
@@ -102,20 +106,20 @@ class GraphTraversalComparator {
         }
 
         // Match outgoing actions by comparable key (description preferred)
-        for (Edge newEdge : newNode.outgoing) {
+        for (TraversalEdge newEdge : newNode.outgoing) {
             if (newEdge.handled) {
                 continue;
             }
-            Edge match = ctx.findMatchingOutgoing(oldNode, newEdge.comparableKey);
+            TraversalEdge match = ctx.findMatchingOutgoing(oldNode, newEdge.comparableKey);
             if (match == null) {
                 ctx.addedEdges.add(newEdge);
             } else {
                 match.handled = true;
                 newEdge.handled = true;
-                ctx.matchedEdges.add(new EdgePair(match, newEdge));
+                ctx.matchedEdges.add(new TraversalEdgePair(match, newEdge));
 
-                Node oldTarget = ctx.oldGraph.nodes.get(match.targetId);
-                Node newTarget = ctx.newGraph.nodes.get(newEdge.targetId);
+                TraversalNode oldTarget = ctx.oldGraph.nodes.get(match.targetId);
+                TraversalNode newTarget = ctx.newGraph.nodes.get(newEdge.targetId);
 
                 if (oldTarget != null && newTarget != null) {
                     // if mapping already exists but points elsewhere, skip recursion
@@ -127,7 +131,7 @@ class GraphTraversalComparator {
         }
 
         // Remaining unhandled outgoing actions on old node are removed
-        for (Edge oldEdge : oldNode.outgoing) {
+        for (TraversalEdge oldEdge : oldNode.outgoing) {
             if (!oldEdge.handled) {
                 ctx.removedEdges.add(oldEdge);
             }
@@ -136,7 +140,7 @@ class GraphTraversalComparator {
 
     private List<DeltaState> computeAddedStates(TraversalContext ctx) {
         List<DeltaState> added = new ArrayList<>();
-        for (Node newNode : ctx.newGraph.nodes.values()) {
+        for (TraversalNode newNode : ctx.newGraph.nodes.values()) {
             if (!ctx.newToOld.containsKey(newNode.id)) {
                 added.add(toDeltaState(newNode, ctx.newGraph));
             }
@@ -146,7 +150,7 @@ class GraphTraversalComparator {
 
     private List<DeltaState> computeRemovedStates(TraversalContext ctx) {
         List<DeltaState> removed = new ArrayList<>();
-        for (Node oldNode : ctx.oldGraph.nodes.values()) {
+        for (TraversalNode oldNode : ctx.oldGraph.nodes.values()) {
             if (!ctx.oldToNew.containsKey(oldNode.id)) {
                 removed.add(toDeltaState(oldNode, ctx.oldGraph));
             }
@@ -157,7 +161,7 @@ class GraphTraversalComparator {
     private Map<String, ActionSetDiff> computeChangedActions(TraversalContext ctx) {
         Map<String, MutableActionDiff> diffByNewState = new HashMap<>();
 
-        for (Edge added : ctx.addedEdges) {
+        for (TraversalEdge added : ctx.addedEdges) {
             // source outgoing
             MutableActionDiff sourceDiff = diffByNewState.computeIfAbsent(added.sourceId, k -> new MutableActionDiff());
             sourceDiff.addOutgoing.add(new DeltaAction(added.actionId, added.description, DeltaAction.Direction.OUTGOING));
@@ -168,7 +172,7 @@ class GraphTraversalComparator {
             ctx.changedStates.putIfAbsent(added.sourceId, new VertexPropertyDiff(new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
         }
 
-        for (Edge removed : ctx.removedEdges) {
+        for (TraversalEdge removed : ctx.removedEdges) {
             String mappedSource = ctx.oldToNew.get(removed.sourceId);
             String mappedTarget = ctx.oldToNew.get(removed.targetId);
             if (mappedSource != null) {
@@ -191,7 +195,7 @@ class GraphTraversalComparator {
         return result;
     }
 
-    private DeltaState toDeltaState(Node node, Graph graph) {
+    private DeltaState toDeltaState(TraversalNode node, TraversalGraph graph) {
         List<DeltaAction> incoming = node.incoming.stream()
                 .map(e -> new DeltaAction(e.actionId, e.description, DeltaAction.Direction.INCOMING))
                 .collect(Collectors.toList());
@@ -201,43 +205,47 @@ class GraphTraversalComparator {
         return new DeltaState(node.id, new ArrayList<>(node.concreteIds), incoming, outgoing);
     }
 
-    private Graph buildGraph(AbstractStateModel model) {
-        Map<String, Node> nodes = new HashMap<>();
-        List<Edge> edges = new ArrayList<>();
+    private TraversalGraph buildGraph(AbstractStateModel model) {
+        Map<String, TraversalNode> nodes = new HashMap<>();
+        List<TraversalEdge> edges = new ArrayList<>();
 
         for (AbstractState s : model.getStates()) {
-            nodes.put(s.getStateId(), new Node(s));
+            nodes.put(s.getStateId(), new TraversalNode(s));
         }
 
-        for (Node n : nodes.values()) {
+        for (TraversalNode n : nodes.values()) {
             Collection<AbstractStateTransition> outgoing = model.getOutgoingTransitionsForState(n.id);
             for (AbstractStateTransition t : outgoing) {
-                Edge e = toEdge(t, nodes);
+                TraversalEdge e = toEdge(t, nodes);
                 n.outgoing.add(e);
                 nodes.get(e.targetId).incoming.add(e);
                 edges.add(e);
             }
         }
 
-        return new Graph(nodes, edges);
+        return new TraversalGraph(nodes, edges);
     }
 
-    private Edge toEdge(AbstractStateTransition t, Map<String, Node> nodes) {
+    private TraversalEdge toEdge(AbstractStateTransition t, Map<String, TraversalNode> nodes) {
         String actionId = t.getActionId();
         String desc = primaryKeyProvider.getPrimaryKey(actionId);
         String key = comparableKey(actionId, desc);
-        return new Edge(t.getSourceStateId(), t.getTargetStateId(), actionId, desc, key);
+        return new TraversalEdge(t.getSourceStateId(), t.getTargetStateId(), actionId, desc, key);
     }
 
     private String comparableKey(String actionId, String description) {
-        if (description == null || description.trim().isEmpty() || description.contains("at ''")) {
+        if (description == null || description.trim().isEmpty()) {
+            return actionId;
+        }
+        // Workaround for actions with empty descriptions
+        if (description.contains("at ''")) {
             return actionId;
         }
         return description;
     }
 
-    private Node chooseInitialState(Graph graph) {
-        for (Node n : graph.nodes.values()) {
+    private TraversalNode chooseInitialState(TraversalGraph graph) {
+        for (TraversalNode n : graph.nodes.values()) {
             if (n.initial) {
                 return n;
             }
@@ -245,103 +253,4 @@ class GraphTraversalComparator {
         return null;
     }
 
-    private static final class TraversalContext {
-        final Graph oldGraph;
-        final Graph newGraph;
-        final Map<String, String> oldToNew = new HashMap<>();
-        final Map<String, String> newToOld = new HashMap<>();
-        final Map<String, VertexPropertyDiff> changedStates = new HashMap<>();
-        final List<Edge> addedEdges = new ArrayList<>();
-        final List<Edge> removedEdges = new ArrayList<>();
-        final List<EdgePair> matchedEdges = new ArrayList<>();
-
-        TraversalContext(Graph oldGraph, Graph newGraph) {
-            this.oldGraph = oldGraph;
-            this.newGraph = newGraph;
-        }
-
-        void mapStates(String oldId, String newId) {
-            oldToNew.put(oldId, newId);
-            newToOld.put(newId, oldId);
-        }
-
-        boolean isMapped(String oldId, String newId) {
-            return newId.equals(oldToNew.get(oldId)) || oldId.equals(newToOld.get(newId));
-        }
-
-        boolean hasConflictingMapping(String oldId, String newId) {
-            String mapped = oldToNew.get(oldId);
-            return mapped != null && !mapped.equals(newId);
-        }
-
-        Edge findMatchingOutgoing(Node oldNode, String comparableKey) {
-            for (Edge e : oldNode.outgoing) {
-                if (!e.handled && e.comparableKey.equals(comparableKey)) {
-                    return e;
-                }
-            }
-            return null;
-        }
-    }
-
-    private static final class Graph {
-        final Map<String, Node> nodes;
-        final List<Edge> edges;
-
-        Graph(Map<String, Node> nodes, List<Edge> edges) {
-            this.nodes = nodes;
-            this.edges = edges;
-        }
-    }
-
-    private static final class Node {
-        final String id;
-        final AbstractState state;
-        final boolean initial;
-        final Set<String> concreteIds;
-        final List<Edge> outgoing = new ArrayList<>();
-        final List<Edge> incoming = new ArrayList<>();
-        boolean handled = false;
-
-        Node(AbstractState state) {
-            this.state = state;
-            this.id = state.getStateId();
-            this.initial = state.isInitial();
-            this.concreteIds = new HashSet<>(state.getConcreteStateIds());
-        }
-    }
-
-    private static final class Edge {
-        final String sourceId;
-        final String targetId;
-        final String actionId;
-        final String description;
-        final String comparableKey;
-        boolean handled = false;
-
-        Edge(String sourceId, String targetId, String actionId, String description, String comparableKey) {
-            this.sourceId = sourceId;
-            this.targetId = targetId;
-            this.actionId = actionId;
-            this.description = description;
-            this.comparableKey = comparableKey;
-        }
-    }
-
-    private static final class EdgePair {
-        final Edge oldEdge;
-        final Edge newEdge;
-
-        EdgePair(Edge oldEdge, Edge newEdge) {
-            this.oldEdge = oldEdge;
-            this.newEdge = newEdge;
-        }
-    }
-
-    private static final class MutableActionDiff {
-        final List<DeltaAction> addIncoming = new ArrayList<>();
-        final List<DeltaAction> remIncoming = new ArrayList<>();
-        final List<DeltaAction> addOutgoing = new ArrayList<>();
-        final List<DeltaAction> remOutgoing = new ArrayList<>();
-    }
 }

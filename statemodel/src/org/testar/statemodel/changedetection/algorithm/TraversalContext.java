@@ -28,31 +28,60 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.statemodel.changedetection;
+package org.testar.statemodel.changedetection.algorithm;
 
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.testar.statemodel.AbstractStateModel;
-import org.testar.statemodel.changedetection.algorithm.GraphTraversalComparator;
+import org.testar.statemodel.changedetection.VertexPropertyDiff;
 
 /**
- * Entry point to run change detection between two state models.
+ * Traversal context used by {@link GraphTraversalComparator}.
+ *
+ * It maintains:
+ * - state mapping old->new (and inverse)
+ * - handled edges/states to avoid infinite traversal loops
+ * - collected added/removed edges and changed states
  */
-public class ChangeDetectionEngine {
+final class TraversalContext {
 
-    private final ActionPrimaryKeyProvider actionPrimaryKeyProvider;
-    private final GraphTraversalComparator comparator;
+    final TraversalGraph oldGraph;
+    final TraversalGraph newGraph;
+    final Map<String, String> oldToNew = new HashMap<>();
+    final Map<String, String> newToOld = new HashMap<>();
+    final Map<String, VertexPropertyDiff> changedStates = new HashMap<>();
+    final List<TraversalEdge> addedEdges = new ArrayList<>();
+    final List<TraversalEdge> removedEdges = new ArrayList<>();
+    final List<TraversalEdgePair> matchedEdges = new ArrayList<>();
 
-    public ChangeDetectionEngine(ActionPrimaryKeyProvider actionPrimaryKeyProvider) {
-        this.actionPrimaryKeyProvider = Objects.requireNonNull(actionPrimaryKeyProvider, "actionPrimaryKeyProvider cannot be null");
-        this.comparator = new GraphTraversalComparator(this.actionPrimaryKeyProvider);
+    TraversalContext(TraversalGraph oldGraph, TraversalGraph newGraph) {
+        this.oldGraph = oldGraph;
+        this.newGraph = newGraph;
     }
 
-    public ChangeDetectionResult compare(AbstractStateModel oldModel, AbstractStateModel newModel) {
-        Objects.requireNonNull(oldModel, "oldModel cannot be null");
-        Objects.requireNonNull(newModel, "newModel cannot be null");
+    void mapStates(String oldId, String newId) {
+        oldToNew.put(oldId, newId);
+        newToOld.put(newId, oldId);
+    }
 
-        return comparator.compare(oldModel, newModel);
+    boolean isMapped(String oldId, String newId) {
+        return newId.equals(oldToNew.get(oldId)) || oldId.equals(newToOld.get(newId));
+    }
+
+    boolean hasConflictingMapping(String oldId, String newId) {
+        String mapped = oldToNew.get(oldId);
+        return mapped != null && !mapped.equals(newId);
+    }
+
+    TraversalEdge findMatchingOutgoing(TraversalNode oldNode, String comparableKey) {
+        for (TraversalEdge e : oldNode.outgoing) {
+            if (!e.handled && e.comparableKey.equals(comparableKey)) {
+                return e;
+            }
+        }
+        return null;
     }
 
 }

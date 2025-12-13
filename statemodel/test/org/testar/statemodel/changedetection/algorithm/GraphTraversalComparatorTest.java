@@ -1,4 +1,4 @@
-package org.testar.statemodel.changedetection;
+package org.testar.statemodel.changedetection.algorithm;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -7,6 +7,9 @@ import org.testar.monkey.alayer.Tags;
 import org.testar.statemodel.AbstractAction;
 import org.testar.statemodel.AbstractState;
 import org.testar.statemodel.AbstractStateModel;
+import org.testar.statemodel.changedetection.ActionPrimaryKeyProvider;
+import org.testar.statemodel.changedetection.ActionSetDiff;
+import org.testar.statemodel.changedetection.ChangeDetectionResult;
 import org.testar.statemodel.exceptions.StateModelException;
 
 import java.util.Collections;
