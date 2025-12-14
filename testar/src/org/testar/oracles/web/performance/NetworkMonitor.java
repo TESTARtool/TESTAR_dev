@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.devtools.DevTools;
-import org.openqa.selenium.devtools.v140.network.Network;
+import org.openqa.selenium.devtools.v143.network.Network;
 import org.testar.OutputStructure;
 
 public class NetworkMonitor {
@@ -26,7 +26,7 @@ public class NetworkMonitor {
     // PER-ACTION: requestId -> record (used for summaries/prints)
     private final ConcurrentMap<String, NetworkRecord> actionRecords = new ConcurrentHashMap<>();
 
-    // rolling counters for “active requests” (global; optional)
+    // rolling counters for active requests (global; optional)
     private final AtomicInteger inflight = new AtomicInteger(0);
 
     // current measurement windows (sequence/action)
@@ -123,7 +123,7 @@ public class NetworkMonitor {
             });
         });
 
-        devTools.send(Network.enable(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()));
+        devTools.send(Network.enable(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()));
         devTools.send(Network.setCacheDisabled(true));
     }
 
