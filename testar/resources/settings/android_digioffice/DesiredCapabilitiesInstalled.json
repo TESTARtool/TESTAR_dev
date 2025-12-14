@@ -1,0 +1,11 @@
+{
+  "deviceName": "DigiOffice_Device",
+  "platformName": "Android",
+  "appPackage": "com.digioffice.app",
+  "appActivity": ".MainActivity",
+  "automationName" : "UiAutomator2",
+  "newCommandTimeout": 600,
+  "autoGrantPermissions": true,
+  "allowInvisibleElements": true,
+  "isApkInstalled": true
+}
