@@ -409,28 +409,6 @@ public class Protocol_android_digioffice extends AndroidProtocol {
             }
         }
 
-        // Add system calls
-        // Workaround to pass a Android widget to the systemActions, otherwise will
-        // complain about not being able to set
-        // Tags. Additionally creating an SystemAction interface will not work as the
-        // returned type must be Action.
-        Widget topWidget = state.root().child(0);
-        Boolean checkAddSystemActions = settings.get(ConfigTags.UseSystemActions, false);
-
-        if (checkAddSystemActions) {
-            actions.add(
-                    // System orientation swap
-                    new AndroidSystemActionOrientation(state, topWidget));
-
-            actions.add(
-                    // Receive a call
-                    new AndroidSystemActionCall(state, topWidget));
-
-            actions.add(
-                    // Receive text message
-                    new AndroidSystemActionText(state, topWidget));
-        }
-
         return actions;
     }
 
