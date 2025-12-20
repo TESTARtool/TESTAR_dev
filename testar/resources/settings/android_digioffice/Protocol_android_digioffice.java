@@ -146,7 +146,9 @@ public class Protocol_android_digioffice extends AndroidProtocol {
             }
         }
 
-        // Click Verbinding button
+        // Click Verbinding button is being enabled
+        Util.pause(2);
+        initialState = getState(system);
         for (Widget w : initialState) {
             // Verbinding Naam
             if (w.get(AndroidTags.AndroidText, "").contains("Voeg verbinding toe")) {
