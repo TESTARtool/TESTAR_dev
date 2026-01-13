@@ -87,7 +87,7 @@ public class Protocol_webdriver_axini_llm_bdd_modeler extends WebdriverProtocol 
      */
     @Override
     protected void initialize(Settings settings) {
-        // Download OrientDB and initialize a testar (admin:admin) database
+        // Download OrientDB and initialize a testar (testar:testar) database
         setupOrientDB();
 
         super.initialize(settings);
@@ -460,7 +460,7 @@ public class Protocol_webdriver_axini_llm_bdd_modeler extends WebdriverProtocol 
             }
 
             // Change to the bin directory and execute the command
-            ProcessBuilder processBuilder = new ProcessBuilder("cmd", "/c", "console.bat", "CREATE", "DATABASE", "plocal:../databases/testar", "admin", "admin");
+            ProcessBuilder processBuilder = new ProcessBuilder("cmd", "/c", "console.bat", "CREATE", "DATABASE", "plocal:../databases/testar", "testar", "testar");
             processBuilder.directory(new File(extractDir + "/bin"));
             processBuilder.inheritIO();
             Process process = processBuilder.start();
