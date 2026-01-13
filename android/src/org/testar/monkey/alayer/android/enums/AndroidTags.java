@@ -74,6 +74,8 @@ public class AndroidTags extends TagsBase {
 
 	public static final Tag<String> AndroidAccessibilityId = from("AndroidAccessibilityId", String.class);
 
+	public static final Tag<Boolean> AndroidDisplayed = from("AndroidDisplayed", Boolean.class);
+	
 	public static final Tag<String> AndroidXpath = from("AndroidXpath", String.class);
 
 	public static final Tag<String> AndroidAbstractActionId = from("AndroidAbstractActionId", String.class);

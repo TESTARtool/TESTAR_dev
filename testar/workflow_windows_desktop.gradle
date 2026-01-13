@@ -203,7 +203,7 @@ task runTestDesktopGenericStateModel(type: Exec, dependsOn: createDatabaseOrient
     group = 'test_testar_workflow'
     description ='runTestDesktopGenericStateModel'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic_statemodel AlwaysCompile=true ApplicationName="notepad_state_model" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2 ClickFilter=".*[sS]ystem.*|.*Sistema.*|.*[cC]lose.*|.*Cerrar.*|.*[mM]inimize.*|.*Minimizar.*|.*[mM]aximize.*|.*Maximizar.*|Text Editor|.*Editor.*|File|.*Archivo.*|Edit|.*Edici.*|View|.*Ver.*|Help|.*Ayuda.*|Word Wrap|.*Ajuste.*" StateModelEnabled=true DataStoreDB=testar DataStoreUser=admin DataStorePassword=admin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_desktop_generic_statemodel AlwaysCompile=true ApplicationName="notepad_state_model" ShowVisualSettingsDialogOnStartup=false Mode=Generate SUTConnector=COMMAND_LINE SUTConnectorValue="C:\\\\Windows\\\\System32\\\\notepad.exe" Sequences=1 SequenceLength=2 ClickFilter=".*[sS]ystem.*|.*Sistema.*|.*[cC]lose.*|.*Cerrar.*|.*[mM]inimize.*|.*Minimizar.*|.*[mM]aximize.*|.*Maximizar.*|Text Editor|.*Editor.*|File|.*Archivo.*|Edit|.*Edici.*|View|.*Ver.*|Help|.*Ayuda.*|Word Wrap|.*Ajuste.*" StateModelEnabled=true DataStoreDB=testar DataStoreUser=testar DataStorePassword=testar'
     doLast {
         String output = standardOutput.toString()
 

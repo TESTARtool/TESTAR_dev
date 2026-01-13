@@ -50,7 +50,7 @@ public class TestAndroidIsTypeable {
     @Parameterized.Parameter
     public Role role;
 
-    private WidgetStub createWidget(Role role, boolean focusable, boolean enabled) {
+    private WidgetStub createWidget(Role role, boolean focusable, boolean enabled, boolean displayed) {
         StateStub state = new StateStub();
         WidgetStub widget = new WidgetStub();
         state.addChild(widget);
@@ -59,40 +59,55 @@ public class TestAndroidIsTypeable {
         widget.set(Tags.Role, role);
         widget.set(AndroidTags.AndroidFocusable, focusable);
         widget.set(AndroidTags.AndroidEnabled, enabled);
+        widget.set(AndroidTags.AndroidDisplayed, displayed);
 
         return widget;
     }
 
     @Test
     public void isTypeableRole() {
-        WidgetStub widget = createWidget(role, true, true);
+        WidgetStub widget = createWidget(role, true, true, true);
         assertTrue("Expected typeable for role: " + role, androidProtocol.isTypeable(widget));
     }
 
     @Test
     public void notTypeableRoleWhenFocusableFalse() {
-        WidgetStub widget = createWidget(role, false, true);
+        WidgetStub widget = createWidget(role, false, true, true);
         assertFalse("Expected NOT typeable when AndroidFocusable=false for role: " + role,
                 androidProtocol.isTypeable(widget));
     }
 
     @Test
     public void notTypeableRoleWhenDisabled() {
-        WidgetStub widget = createWidget(role, true, false);
+        WidgetStub widget = createWidget(role, true, false, true);
         assertFalse("Expected NOT typeable when AndroidEnabled=false for role: " + role,
                 androidProtocol.isTypeable(widget));
     }
 
     @Test
+    public void notTypeableRoleWhenNotDisplayed() {
+        WidgetStub widget = createWidget(role, true, true, false);
+        assertFalse("Expected NOT typeable when AndroidDisplayed=false for role: " + role,
+                androidProtocol.isTypeable(widget));
+    }
+
+    @Test
     public void notTypeableRoleWhenFocusableFalseAndDisabled() {
-        WidgetStub widget = createWidget(role, false, false);
-        assertFalse("Expected NOT typebale when AndroidFocusable=false & AndroidEnabled=false for role: " + role,
+        WidgetStub widget = createWidget(role, false, false, true);
+        assertFalse("Expected NOT typeable when AndroidFocusable=false & AndroidEnabled=false for role: " + role,
+                androidProtocol.isTypeable(widget));
+    }
+
+    @Test
+    public void notTypeableRoleWhenFocusableFalseDisabledAndNotDisplayed() {
+        WidgetStub widget = createWidget(role, false, false, false);
+        assertFalse("Expected NOT typeable when AndroidFocusable=false, AndroidEnabled=false & AndroidDisplayed=false for role: " + role,
                 androidProtocol.isTypeable(widget));
     }
 
     @Test
     public void roleIsNotTypeable() {
-        WidgetStub widget = createWidget(AndroidRoles.AndroidButton, true, true);
+        WidgetStub widget = createWidget(AndroidRoles.AndroidButton, true, true, true);
         assertFalse("Expected NOT typeable for role: " + AndroidRoles.AndroidButton, androidProtocol.isTypeable(widget));
     }
 

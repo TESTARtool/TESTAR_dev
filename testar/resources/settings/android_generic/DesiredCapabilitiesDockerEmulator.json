@@ -5,6 +5,7 @@
   "automationName" : "UiAutomator2",
   "newCommandTimeout": 600,
   "autoGrantPermissions": true,
+  "allowInvisibleElements": false,
   "isEmulatorDocker": true,
   "ipAddressAppium": 10.102.0.198
 }

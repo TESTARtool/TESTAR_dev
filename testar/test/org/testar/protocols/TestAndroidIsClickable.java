@@ -50,7 +50,7 @@ public class TestAndroidIsClickable {
     @Parameterized.Parameter
     public Role role;
 
-    private WidgetStub createWidget(Role role, boolean clickable, boolean enabled) {
+    private WidgetStub createWidget(Role role, boolean clickable, boolean enabled, boolean displayed) {
         StateStub state = new StateStub();
         WidgetStub widget = new WidgetStub();
         state.addChild(widget);
@@ -59,40 +59,55 @@ public class TestAndroidIsClickable {
         widget.set(Tags.Role, role);
         widget.set(AndroidTags.AndroidClickable, clickable);
         widget.set(AndroidTags.AndroidEnabled, enabled);
+        widget.set(AndroidTags.AndroidDisplayed, displayed);
 
         return widget;
     }
 
     @Test
     public void isClickableRole() {
-        WidgetStub widget = createWidget(role, true, true);
+        WidgetStub widget = createWidget(role, true, true, true);
         assertTrue("Expected clickable for role: " + role, androidProtocol.isClickable(widget));
     }
 
     @Test
     public void notClickableRoleWhenClickableFalse() {
-        WidgetStub widget = createWidget(role, false, true);
+        WidgetStub widget = createWidget(role, false, true, true);
         assertFalse("Expected NOT clickable when AndroidClickable=false for role: " + role,
                 androidProtocol.isClickable(widget));
     }
 
     @Test
     public void notClickableRoleWhenDisabled() {
-        WidgetStub widget = createWidget(role, true, false);
+        WidgetStub widget = createWidget(role, true, false, true);
         assertFalse("Expected NOT clickable when AndroidEnabled=false for role: " + role,
                 androidProtocol.isClickable(widget));
     }
 
     @Test
+    public void notClickableRoleWhenNotDisplayed() {
+        WidgetStub widget = createWidget(role, true, true, false);
+        assertFalse("Expected NOT clickable when AndroidDisplayed=false for role: " + role,
+                androidProtocol.isClickable(widget));
+    }
+
+    @Test
     public void notClickableRoleWhenClickableFalseAndDisabled() {
-        WidgetStub widget = createWidget(role, false, false);
+        WidgetStub widget = createWidget(role, false, false, true);
         assertFalse("Expected NOT clickable when AndroidClickable=false & AndroidEnabled=false for role: " + role,
                 androidProtocol.isClickable(widget));
     }
 
     @Test
+    public void notClickableRoleWhenClickableFalseDisabledAndNotDisplayed() {
+        WidgetStub widget = createWidget(role, false, false, false);
+        assertFalse("Expected NOT clickable when AndroidClickable=false, AndroidEnabled=false & AndroidDisplayed=false for role: " + role,
+                androidProtocol.isClickable(widget));
+    }
+
+    @Test
     public void roleIsNotClickable() {
-        WidgetStub widget = createWidget(AndroidRoles.AndroidEditText, true, true);
+        WidgetStub widget = createWidget(AndroidRoles.AndroidEditText, true, true, true);
         assertFalse("Expected NOT clickable for role: " + AndroidRoles.AndroidEditText, androidProtocol.isClickable(widget));
     }
 

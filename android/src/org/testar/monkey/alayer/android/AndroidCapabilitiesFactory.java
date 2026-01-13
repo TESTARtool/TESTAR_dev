@@ -78,6 +78,8 @@ public class AndroidCapabilitiesFactory {
         cap.setCapability("appium:newCommandTimeout", getInt(json, "newCommandTimeout", 600));
         cap.setCapability("appium:autoGrantPermissions", getBool(json, "autoGrantPermissions", false));
 
+        cap.setCapability("appium:settings[allowInvisibleElements]", getBool(json, "allowInvisibleElements", false));
+
         String appiumUrl = defaultAppiumUrl;
 
         // If the APK is already installed we use appPackage identifier
