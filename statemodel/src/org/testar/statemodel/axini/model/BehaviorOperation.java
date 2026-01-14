@@ -1,8 +1,16 @@
-package org.testar.statemodel.axini;
+package org.testar.statemodel.axini.model;
 
+/** 
+ * AMP single behavior operation mapping an action call to a next behavior.
+ * 
+ * stores the Axini model information of e.g.,
+ *
+ * Left_Click_At_AboutUs(); behave_as 'ParaBank | Customer'
+ * 
+ * */
 public class BehaviorOperation {
-	private String actionCall;   // e.g., "Left_Click_at_Register()"
-	private String nextBehavior; // e.g., "ParaBank | Register - AST3ST4R"
+	private String actionCall;   // e.g., Left_Click_At_AboutUs()
+	private String nextBehavior; // e.g., ParaBank | Customer
 
 	public BehaviorOperation() {}
 
@@ -27,6 +35,7 @@ public class BehaviorOperation {
 		this.nextBehavior = nextBehavior;
 	}
 
+	// Debugging string representation, not used for rendering the AMP code
 	@Override
 	public String toString() {
 		return "BehaviorOperation{" +

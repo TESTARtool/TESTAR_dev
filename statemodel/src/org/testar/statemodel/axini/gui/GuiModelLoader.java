@@ -1,10 +1,11 @@
-package org.testar.statemodel.axini;
+package org.testar.statemodel.axini.gui;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
 
+/** Parses TESTAR GUI state model JSON into DTOs. */
 public class GuiModelLoader {
 
 	private static final ObjectMapper objectMapper = new ObjectMapper();

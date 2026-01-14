@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Objects;
 
 import org.junit.Test;
+import org.testar.statemodel.axini.gui.GuiModelLoader;
+import org.testar.statemodel.axini.gui.GuiStateModel;
+import org.testar.statemodel.axini.model.ProcessDefinition;
 
 public class TestAmpCodeGenerator {
 

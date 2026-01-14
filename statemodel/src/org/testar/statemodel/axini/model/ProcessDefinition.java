@@ -1,19 +1,22 @@
-package org.testar.statemodel.axini;
+package org.testar.statemodel.axini.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * AMP process model built from the GUI state model.
+ * */
 public class ProcessDefinition {
 	private String name;
 	private List<ActionDefinition> actions;
 	private List<BehaviorDefinition> behaviors;
 	private InitialVariable initialVariables;
-	private List<String> entryCalls;
+	private String entryCall;
+	private String entryBehave;
 
 	public ProcessDefinition() {
 		this.actions = new ArrayList<>();
 		this.behaviors = new ArrayList<>();
-		this.entryCalls = new ArrayList<>();
 	}
 
 	public ProcessDefinition(String name) {
@@ -37,8 +40,12 @@ public class ProcessDefinition {
 		return initialVariables;
 	}
 
-	public List<String> getEntryCalls() {
-		return entryCalls;
+	public String getEntryCall() {
+		return entryCall;
+	}
+
+	public String getEntryBehave() {
+		return entryBehave;
 	}
 
 	public void setName(String name) {
@@ -57,8 +64,12 @@ public class ProcessDefinition {
 		this.initialVariables = initialVariables;
 	}
 
-	public void setEntryCalls(List<String> entryCalls) {
-		this.entryCalls = entryCalls;
+	public void setEntryCall(String entryCall) {
+		this.entryCall = entryCall;
+	}
+
+	public void setEntryBehave(String entryBehave) {
+		this.entryBehave = entryBehave;
 	}
 
 	public void addAction(ActionDefinition action) {
@@ -69,10 +80,7 @@ public class ProcessDefinition {
 		this.behaviors.add(behavior);
 	}
 
-	public void addEntryCall(String call) {
-		this.entryCalls.add(call);
-	}
-
+	// Debugging string representation, not used for rendering the AMP code
 	@Override
 	public String toString() {
 		return "ProcessDefinition{" +
@@ -80,7 +88,8 @@ public class ProcessDefinition {
 				", actions=" + actions +
 				", behaviors=" + behaviors +
 				", initialVariables=" + initialVariables +
-				", entryCalls=" + entryCalls +
+				", entryCall=" + entryCall +
+				", entryBehave=" + entryBehave +
 				'}';
 	}
 }

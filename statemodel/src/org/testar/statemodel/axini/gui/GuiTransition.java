@@ -1,7 +1,8 @@
-package org.testar.statemodel.axini;
+package org.testar.statemodel.axini.gui;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/** DTO for GUI transition entries in the TESTAR state model JSON. */
 public class GuiTransition {
 
 	@JsonProperty("Source")

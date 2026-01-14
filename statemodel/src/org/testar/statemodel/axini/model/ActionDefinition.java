@@ -1,15 +1,26 @@
-package org.testar.statemodel.axini;
+package org.testar.statemodel.axini.model;
 
 import java.util.List;
 
+/** 
+ * AMP action definition derived from a GUI action. 
+ * 
+ * stores the Axini model information of e.g.,
+ *
+ * def Left_Click_At_AboutUs()
+ *   receive 'click', constraint: %(css == "a[href*='about.htm']" && text == “About Us”)
+ *   send 'page_title', constraint: %(title == "ParaBank | Customer")
+ * end
+ *
+ * */
 public class ActionDefinition {
-	private String name;
+	private String name; // e.g., Left_Click_At_AboutUs
 
-	private String receivedStimulus;
-	private List<Constraint> receiveConstraints;
+	private String receivedStimulus; // e.g., click
+	private List<Constraint> receiveConstraints; // e.g., (css == "a[href*='about.htm']" && text == “About Us”)
 
-	private String sentResponse;
-	private List<Constraint> sendConstraints;
+	private String sentResponse; // e.g., page_title
+	private List<Constraint> sendConstraints; // e.g., (title == "ParaBank | Customer")
 
 	public ActionDefinition() {}
 
@@ -65,6 +76,7 @@ public class ActionDefinition {
 		this.sendConstraints = sendConstraints;
 	}
 
+	// Debugging string representation, not used for rendering the AMP code
 	@Override
 	public String toString() {
 		return "ActionDefinition{" +

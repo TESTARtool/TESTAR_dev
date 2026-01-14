@@ -1,12 +1,24 @@
-package org.testar.statemodel.axini;
+package org.testar.statemodel.axini.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/** 
+ * AMP behavior definition with a list of possible operations. 
+ * 
+ * stores the Axini model information of e.g.,
+ *
+ * behavior('ParaBank | Welcome', :non_terminating) {
+ *   repeat {
+ *     o { Left_Click_At_AboutUs(); behave_as 'ParaBank | Customer'}
+ *   }
+ * }
+ * 
+ * */
 public class BehaviorDefinition {
-	private String name;
-	private boolean nonTerminating;
-	private List<BehaviorOperation> operations;
+	private String name; // e.g., ParaBank | Customer
+	private boolean nonTerminating; // e.g., true to generate :non_terminating
+	private List<BehaviorOperation> operations; // e.g., Left_Click_At_AboutUs(); behave_as 'ParaBank | Customer'
 
 	public BehaviorDefinition() {
 		this.operations = new ArrayList<>();
@@ -46,6 +58,7 @@ public class BehaviorDefinition {
 		this.operations.add(operation);
 	}
 
+	// Debugging string representation, not used for rendering the AMP code
 	@Override
 	public String toString() {
 		return "BehaviorDefinition{" +

@@ -1,5 +1,16 @@
 package org.testar.statemodel.axini;
 
+import org.testar.statemodel.axini.gui.GuiAction;
+import org.testar.statemodel.axini.gui.GuiState;
+import org.testar.statemodel.axini.gui.GuiStateModel;
+import org.testar.statemodel.axini.gui.GuiTransition;
+import org.testar.statemodel.axini.model.ActionDefinition;
+import org.testar.statemodel.axini.model.BehaviorDefinition;
+import org.testar.statemodel.axini.model.BehaviorOperation;
+import org.testar.statemodel.axini.model.Constraint;
+import org.testar.statemodel.axini.model.InitialVariable;
+import org.testar.statemodel.axini.model.ProcessDefinition;
+
 import java.util.*;
 
 public class AmpBuilder {
@@ -93,13 +104,10 @@ public class AmpBuilder {
 
 		// Initial values and entry points
 		process.setInitialVariables(new InitialVariable(
-				"initial_url", 
-				":string", 
 				"\"" + guiModel.getInitialUrl() + "\"",
-				guiModel.getInitialPage(), 
-				initialBehavior));
-		process.addEntryCall("call 'launch'");
-		process.addEntryCall("behave_as '" + initialBehavior + "'");
+				guiModel.getInitialPage()));
+		process.setEntryCall("call 'launch'");
+		process.setEntryBehave("behave_as '" + initialBehavior + "'");
 
 		return process;
 	}
@@ -108,13 +116,6 @@ public class AmpBuilder {
 		String sanitizedDesc = sanitize(desc);
 		String sanitizedTarget = sanitize(targetTitle);
 		return sanitizedDesc + "_to_" + sanitizedTarget;
-	}
-
-	private static String generateCssFunctionName(String selector, String targetTitle, boolean isTypeAction) {
-		String prefix = isTypeAction ? "Type" : "Click";
-		String sanitizedSelector = sanitize(selector);
-		String sanitizedTarget = sanitize(targetTitle);
-		return prefix + "_" + sanitizedSelector + "_to_" + sanitizedTarget;
 	}
 
 	private static String sanitize(String input) {

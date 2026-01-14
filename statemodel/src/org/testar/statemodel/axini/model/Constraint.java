@@ -1,8 +1,17 @@
-package org.testar.statemodel.axini;
+package org.testar.statemodel.axini.model;
 
+/** 
+ * field == expression constraint used in AMP receive/send clauses. 
+ * 
+ * stores the Axini model information of e.g.,
+ * 
+ * css == "a[href*='about.htm']"
+ * text == "About Us"
+ * title == "ParaBank | Customer"
+ * */
 public class Constraint {
-	private String field;
-	private String expression;
+	private String field; // e.g., css
+	private String expression; // e.g., "a[href*='about.htm']"
 
 	public Constraint() {}
 
@@ -27,6 +36,7 @@ public class Constraint {
 		this.expression = expression;
 	}
 
+	// Debugging string representation, not used for rendering the AMP code
 	@Override
 	public String toString() {
 		return field + " == " + expression;

@@ -1,5 +1,9 @@
 package org.testar.statemodel.axini;
 
+import org.testar.statemodel.axini.gui.GuiModelLoader;
+import org.testar.statemodel.axini.gui.GuiStateModel;
+import org.testar.statemodel.axini.model.ProcessDefinition;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
 import java.io.*;

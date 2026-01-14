@@ -1,9 +1,10 @@
-package org.testar.statemodel.axini;
+package org.testar.statemodel.axini.gui;
 
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/** Root DTO for the TESTAR GUI state model JSON payload. */
 public class GuiStateModel {
 
 	@JsonProperty("InitialUrl")
