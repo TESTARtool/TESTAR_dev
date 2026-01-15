@@ -7,7 +7,7 @@ Feature: User Valid Login
     Given the login page is displayed
 
   Scenario: Successful login with valid credentials
-    When I enter the valid username 'user'
-    And I enter the valid password 'pass'
+    When I enter the valid username 'empty-user'
+    And I enter the valid password 'EmptyPass1!'
     And I click the 'Sign In' button
     Then I should be able to observe the user dashboard

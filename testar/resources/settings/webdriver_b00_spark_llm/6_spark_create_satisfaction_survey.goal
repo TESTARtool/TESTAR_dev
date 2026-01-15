@@ -7,8 +7,8 @@ Feature: User Valid Login
     Given the login page is displayed
 
   Scenario: Successful login with valid credentials
-    When I enter the valid username 'user'
-    And I enter the valid password 'pass'
+    When I enter the valid username 'testar-user'
+    And I enter the valid password 'TestarPass1!'
     And I click the 'Sign In' button
     Then I should be able to observe the user dashboard
 ;
@@ -22,7 +22,7 @@ Feature: Create Customer Satisfaction Survey
     And I can see my dashboard
 
   Scenario: Create a new Customer Satisfaction Survey
-    When I navigate to the Odontologist project
+    When I navigate to the Sample project
     And I select to add a new question set
     And I set the survey title to 'Customer Satisfaction Survey'
     And I set the survey ID to 'satisfaction1'
