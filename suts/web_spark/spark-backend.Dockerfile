@@ -7,8 +7,19 @@ RUN apk add --no-cache git
 ARG BACKEND_REPO
 ARG BACKEND_BRANCH
 
+# Bring the docker build context into the image to be able to check for local files
+COPY . /tmp/build-context
+
 # Clone backend repo into spark-server-backend folder
 RUN git clone -b ${BACKEND_BRANCH} ${BACKEND_REPO} spark-server-backend
+
+# Patch Bootstrap.ts from local Bootstrap-testar-autolink.ts, or fail with message
+RUN if [ ! -f /tmp/build-context/Bootstrap-testar-autolink.ts ]; then \
+      echo "ERROR: Bootstrap-testar-autolink.ts not found in the docker build context." >&2; \
+      echo "Place Bootstrap-testar-autolink.ts in the directory you run 'docker build' from (or within that build context) and rebuild." >&2; \
+      exit 1; \
+    fi && \
+    cp /tmp/build-context/Bootstrap-testar-autolink.ts /usr/src/app/spark-server-backend/src/repository/Bootstrap.ts
 
 WORKDIR /usr/src/app/spark-server-backend
 
