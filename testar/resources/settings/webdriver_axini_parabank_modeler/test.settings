@@ -36,7 +36,7 @@ SUTConnectorValue = "https://para.testar.org/"
 #################################################################
 
 Sequences = 1
-SequenceLength = 10
+SequenceLength = 100
 
 #################################################################
 # Oracles based on suspicious tag values
@@ -82,7 +82,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = 
+ClickFilter = ^(?!(.*index.htm.*|.*sitemap.htm.*|.*register.htm.*|.*lookup.htm.*|.*about.htm.*|.*contact.htm.*|.*services.htm.*)$).*$
 TagsToFilter = WebHref
 
 #################################################################
@@ -101,7 +101,7 @@ ProcessesToKillDuringTest =
 # AlwaysCompile: Compile the protocol before launching the selected TESTAR mode
 #################################################################
 
-ProtocolClass = webdriver_axini_random_modeler/Protocol_webdriver_axini_random_modeler
+ProtocolClass = webdriver_axini_parabank_modeler/Protocol_webdriver_axini_parabank_modeler
 AlwaysCompile = true
 
 #################################################################

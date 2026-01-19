@@ -43,7 +43,7 @@ import java.util.*;
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
 
-public class Protocol_webdriver_axini_random_modeler extends WebdriverProtocol {
+public class Protocol_webdriver_axini_parabank_modeler extends WebdriverProtocol {
 
 	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
@@ -55,14 +55,14 @@ public class Protocol_webdriver_axini_random_modeler extends WebdriverProtocol {
 	protected void beginSequence(SUT system, State state) {
 		super.beginSequence(system, state);
 
-		// Add your login sequence here
-
+		// It is possible to trigger a login sequence here
+		/*
 		waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","username", "john", state, system, 5,1.0);
 
 		waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","password", "demo", state, system, 5,1.0);
 
 		waitAndLeftClickWidgetWithMatchingTag("value", "Log In", state, system, 5, 1.0);
-
+		*/
 	}
 
 	@Override
@@ -140,11 +140,6 @@ public class Protocol_webdriver_axini_random_modeler extends WebdriverProtocol {
 				}
 				continue;
 			}
-
-			// slides can happen, even though the widget might be blocked
-			/*
-			addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
-			 */
 
 			// If the element is blocked, Testar can't click on or type in the widget
 			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
