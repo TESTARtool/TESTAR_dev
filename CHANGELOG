@@ -1,3 +1,7 @@
+#TESTAR v2.7.19 (27-Jan-2026)
+- Bump org.seleniumhq.selenium:selenium-java from 4.39.0 to 4.40.0
+- Update devtools dependencies to v144
+
 #TESTAR v2.7.18 (9-Dec-2025)
 - Bump org.seleniumhq.selenium:selenium-java from 4.38.0 to 4.39.0
 - Bump io.github.bonigarcia:webdrivermanager from 6.3.2 to 6.3.3
