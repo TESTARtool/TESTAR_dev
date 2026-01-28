@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013 - 2026 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -27,10 +28,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.testar.monkey.alayer;
 
 import org.testar.monkey.Assert;
@@ -46,6 +43,14 @@ public final class Rect implements Shape {
 				r1.y() + r1.height() < r2.y() ||
 				r2.x() + r2.width() < r1.x() ||
 				r2.y() + r2.height() < r1.y()); 
+	}
+
+	public static boolean overlap(Rect r1, Rect r2) {
+		Assert.notNull(r1, r2);
+		return !(r1.x() + r1.width() <= r2.x() ||
+				r1.y() + r1.height() <= r2.y() ||
+				r2.x() + r2.width() <= r1.x() ||
+				r2.y() + r2.height() <= r1.y());
 	}
 
 	public static boolean contains(Rect r1, Rect r2) {
@@ -105,7 +110,6 @@ public final class Rect implements Shape {
 		canvas.rect(pen, x, y, width, height);
 	}
 	
-	// by urueda
 	@Override
 	public boolean equals(Object o){
 		if (o == this) return true;
