@@ -227,6 +227,8 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 	}
 
 	public Verdict leafWidgetsOverlapping(State state) {
+		Verdict finalVerdict = Verdict.OK;
+
 		// Prepare a list that contains all the Rectangles from the leaf widgets
 		List<Pair<Widget, Rect>> leafWidgetsRects = new ArrayList<>();
 		for (Widget w : state) {
@@ -242,7 +244,7 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 				Rect rectOne = leafWidgetsRects.get(i).right();
 				Rect rectTwo = leafWidgetsRects.get(j).right();
 
-				if (Rect.intersect(rectOne, rectTwo)) {
+				if (Rect.overlap(rectOne, rectTwo)) {
 
 					Widget firstWidget = leafWidgetsRects.get(i).left();
 					Widget secondWidget = leafWidgetsRects.get(j).left();
@@ -259,12 +261,16 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 							"Invariant Fault",
 							0.5, 0.5);
 
-					return new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, visualizer);
+					Verdict clashVerdict = new Verdict(
+						Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, 
+						verdictMsg, 
+						visualizer);
+					finalVerdict = finalVerdict.join(clashVerdict);
 				}
 			}
 		}
 
-		return Verdict.OK;
+		return finalVerdict;
 	}
 
 	private Pen getRedPen() {
