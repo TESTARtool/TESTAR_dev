@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -33,11 +33,20 @@ package org.testar.monkey.alayer;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public interface Visualizer extends Serializable {
 	void run(State state, Canvas canvas, Pen pen);
 
 	default List<Shape> getShapes() {
 		return Arrays.asList(Rect.from(0, 0, 0, 0));
+	}
+
+	static List<Rect> toRects(List<Shape> shapes) {
+		return shapes.stream().map(Visualizer::toRect).collect(Collectors.toList());
+	}
+
+	static Rect toRect(Shape s) {
+		return Rect.from(s.x(), s.y(), s.width(), s.height());
 	}
 }
