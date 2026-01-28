@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = ./settings/android_digioffice/DesiredCapabilitiesInstalled.json
+SUTConnectorValue = ./settings/android_digioffice/DesiredCapabilitiesAPK.json
 
 #################################################################
 # Sequences
@@ -40,8 +40,14 @@ SequenceLength = 10
 # Regular expression and Tags to apply them
 #################################################################
 
-SuspiciousTags = .*[eE]rror.*|.*[eE]xcepti[o?]n.*|.*[fF]ailed.*
-TagsForSuspiciousOracle = AndroidAccessibilityId;AndroidText
+SuspiciousTags = .*[eE]rror.*|.*[eE]xcepti[o?]n.*|.*[fF]ailed.*|.*[iI]nvalid.*|.*[fF]out.*|.*[pP]robleem.*|.*[oO]ngeldig.*|.*[wW]aarschuwing.*|.*[vV]erkeerd.*|.*[gG]efaald.*
+TagsForSuspiciousOracle = AndroidText;AndroidAccessibilityId;AndroidResourceId
+
+#################################################################
+# Extended test oracles
+#################################################################
+
+ExtendedOracles = AndroidClashClickableWidgets,AndroidClickableElementWithoutDescription,AndroidStateWithDuplicatedElementResourceId,GenericUnicodeReplacementCharacter
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -78,8 +84,8 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*Instellingen.*|.*Settings.*
-TagsToFilter = AndroidAccessibilityId;AndroidText
+ClickFilter = .*Instellingen.*|.*Settings.*|.*home-tabs-upload.*|.*detail-(?:address|phone|mobile|email|website).*|.*detail-contact-(?:address|phone|mobile|email|website).*|.*detail-relation-(?:address|phone|mobile|email|website).*
+TagsToFilter = AndroidAccessibilityId;AndroidText;AndroidResourceId
 
 #################################################################
 # Processfilter

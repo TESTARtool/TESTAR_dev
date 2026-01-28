@@ -1,8 +1,8 @@
 
 /***************************************************************************************************
  *
- * Copyright (c) 2025 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2025 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2025 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -45,6 +45,7 @@ import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.oracles.Oracle;
+import org.testar.oracles.OracleSelection;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.monkey.Pair;
@@ -82,6 +83,8 @@ public class Protocol_android_digioffice extends AndroidProtocol {
     private String VERDICT_LIST_FILE = "/android_digioffice_verdict_list.txt";
     private List<String> listErrorVerdictInfo = new ArrayList<>();
 
+    private List<Oracle> extendedOraclesList = new ArrayList<>();
+
     /**
      * Called once during the life time of TESTAR
      * This method can be used to perform initial setup work
@@ -93,6 +96,19 @@ public class Protocol_android_digioffice extends AndroidProtocol {
         super.initialize(settings);
 
         XPATH_FILTER_FILE = Settings.getSettingsPath() + "/android_digioffice_xpath_filter.txt";
+    }
+
+    /**
+     * This methods is called before each test sequence, before startSystem(),
+     * allowing for example using external profiling software on the SUT
+     *
+     * HTML sequence report will be initialized in the
+     * super.preSequencePreparations() for each sequence
+     */
+    @Override
+    protected void preSequencePreparations() {
+        super.preSequencePreparations();
+        extendedOraclesList = OracleSelection.loadExtendedOracles(settings.get(ConfigTags.ExtendedOracles));
     }
 
     @Override
@@ -108,7 +124,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
         // Now the DigiOffice loads the authentication
         // And makes a transition to Microsoft double verification login
         clickMicrosoftPickAccount(system);
-        Util.pause(5); // TODO: Make press enter more reliable and delete this pause
+        Util.pause(5);
         pressEnterToContinueMicrosoftPickAccount(system);
 
         // Finally wait until the DigiOffice state after the login appears
@@ -127,9 +143,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
         for (Widget w : initialState) {
             // Verbinding Naam
             if (w.get(AndroidTags.AndroidAccessibilityId, "").contains("Input Field")
-                    && w.parent() != null
-                    && w.parent().parent() != null
-                    && w.parent().parent().get(AndroidTags.AndroidNodeIndex, -1) == 1) {
+                    && w.get(AndroidTags.AndroidResourceId, "").contains("name-input")) {
                 System.out.println("Typing Verbinding Naam...");
                 Action typeVerbindingNaam = new AndroidActionType(initialState, w, "testar");
                 typeVerbindingNaam.run(system, initialState, 0.1);
@@ -137,9 +151,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
 
             // Verbinding URL
             if (w.get(AndroidTags.AndroidAccessibilityId, "").contains("Input Field")
-                    && w.parent() != null
-                    && w.parent().parent() != null
-                    && w.parent().parent().get(AndroidTags.AndroidNodeIndex, -1) == 2) {
+                    && w.get(AndroidTags.AndroidResourceId, "").contains("endpoint-input")) {
                 System.out.println("Typing Verbinding URL...");
                 Action typeVerbindingUrl = new AndroidActionType(initialState, w, System.getenv("digioffice_endpoint"));
                 typeVerbindingUrl.run(system, initialState, 0.1);
@@ -322,17 +334,86 @@ public class Protocol_android_digioffice extends AndroidProtocol {
         }
 
         // 3) Custom invariant oracle for duplicated elements
-        Oracle duplicatedViewGroupOracle = new AndroidInvariantDuplicatedViewGroup();
+        Oracle duplicatedViewGroupOracle = new AndroidDigiOfficeInvariantDuplicatedViewGroup();
         Verdict duplicatedViewGroupVerdict = duplicatedViewGroupOracle.getVerdict(state);
         if (shouldReturnVerdict(duplicatedViewGroupVerdict)) {
             return duplicatedViewGroupVerdict;
         }
 
-        // 4) Clickable element without any textual description
-        Oracle clickableWithoutDescriptionOracle = new AndroidClickableElementWithoutDescription();
-        Verdict clickableWithoutDescriptionVerdict = clickableWithoutDescriptionOracle.getVerdict(state);
-        if (shouldReturnVerdict(clickableWithoutDescriptionVerdict)) {
-            return clickableWithoutDescriptionVerdict;
+        // 4) Header Is Not Empty Not NA
+        Oracle headerOracle = new AndroidDigiOfficeHeaderIsNotEmptyNotNA();
+        Verdict headerVerdict = headerOracle.getVerdict(state);
+        if (shouldReturnVerdict(headerVerdict)) {
+            return headerVerdict;
+        }
+
+        // 5) Person Name Is Not Empty Not NA
+        Oracle personNameOracle = new AndroidDigiOfficePersonNameIsNotEmptyNotNA();
+        Verdict personNameVerdict = personNameOracle.getVerdict(state);
+        if (shouldReturnVerdict(personNameVerdict)) {
+            return personNameVerdict;
+        }
+
+        // 6) Company Name Is Not Empty Not NA
+        Oracle companyNameOracle = new AndroidDigiOfficeCompanyNameIsNotEmptyNotNA();
+        Verdict companyNameVerdict = companyNameOracle.getVerdict(state);
+        if (shouldReturnVerdict(companyNameVerdict)) {
+            return companyNameVerdict;
+        }
+
+        // 7) Widget Is Not Empty
+        Oracle widgetIsNotEmptyOracle = new AndroidDigiOfficeWidgetIsNotEmpty();
+        Verdict widgetIsNotEmptyVerdict = widgetIsNotEmptyOracle.getVerdict(state);
+        if (shouldReturnVerdict(widgetIsNotEmptyVerdict)) {
+            return widgetIsNotEmptyVerdict;
+        }
+
+        // 8) Phone Text Is Not Valid
+        Oracle phoneOracle = new AndroidDigiOfficePhoneTextIsNotValid();
+        Verdict phoneVerdict = phoneOracle.getVerdict(state);
+        if (shouldReturnVerdict(phoneVerdict)) {
+            return phoneVerdict;
+        }
+
+        // 9) Mobile Text Is Not Valid
+        Oracle mobileOracle = new AndroidDigiOfficeMobileTextIsNotValid();
+        Verdict mobileVerdict = mobileOracle.getVerdict(state);
+        if (shouldReturnVerdict(mobileVerdict)) {
+            return mobileVerdict;
+        }
+
+        // 10) Email Text Is Not Valid
+        Oracle emailOracle = new AndroidDigiOfficeEmailTextIsNotValid();
+        Verdict emailVerdict = emailOracle.getVerdict(state);
+        if (shouldReturnVerdict(emailVerdict)) {
+            return emailVerdict;
+        }
+
+        // 11) Website Text Is Not Valid
+        Oracle websiteOracle = new AndroidDigiOfficeWebsiteTextIsNotValid();
+        Verdict websiteVerdict = websiteOracle.getVerdict(state);
+        if (shouldReturnVerdict(websiteVerdict)) {
+            return websiteVerdict;
+        }
+
+        // 12) Search bar contains clear option
+        Oracle searchClearOracle = new AndroidDigiOfficeSearchBarContainsClear();
+        Verdict searchClearVerdict = searchClearOracle.getVerdict(state);
+        if (shouldReturnVerdict(searchClearVerdict)) {
+            return searchClearVerdict;
+        }
+
+        // "ExtendedOracles" offered by TESTAR in the test.settings or Oracles GUI
+        // dialog
+        for (Oracle extendedOracle : extendedOraclesList) {
+            Verdict extendedVerdict = extendedOracle.getVerdict(state);
+
+            // If the Custom Verdict is not OK and was not detected in a previous sequence
+            // return verdict with failure state
+            if (shouldReturnVerdict(extendedVerdict)) {
+                return extendedVerdict;
+            }
+
         }
 
         return Verdict.OK;
@@ -533,7 +614,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
 
 }
 
-class AndroidInvariantDuplicatedViewGroup implements Oracle {
+class AndroidDigiOfficeInvariantDuplicatedViewGroup implements Oracle {
 
     @Override
     public void initialize() {
@@ -541,6 +622,8 @@ class AndroidInvariantDuplicatedViewGroup implements Oracle {
 
     @Override
     public Verdict getVerdict(State state) {
+        Verdict finalVerdict = Verdict.OK;
+
         // 1) Join clickable AndroidViewGroup with non-empty accessibility id and a
         // parent
         List<Widget> viewGroupList = new ArrayList<>();
@@ -592,15 +675,34 @@ class AndroidInvariantDuplicatedViewGroup implements Oracle {
                     "Invariant Fault",
                     0.5, 0.5);
 
-            return new Verdict(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT, verdictMsg, visualizer);
+            Verdict duplicatedVerdict = new Verdict(
+                    Verdict.Severity.WARNING_DUPLICATED_RESOURCE_ISSUE,
+                    verdictMsg, visualizer);
+            finalVerdict = finalVerdict.join(duplicatedVerdict);
         }
 
-        return Verdict.OK;
+        return finalVerdict;
     }
 
 }
 
-class AndroidClickableElementWithoutDescription implements Oracle {
+class AndroidDigiOfficeHeaderIsNotEmptyNotNA implements Oracle {
+
+    // Matches any resId that ends with:
+    // header-title
+    private static final java.util.regex.Pattern HEADER_WIDGET_ID_PATTERN = java.util.regex.Pattern
+            .compile(".*header-title.*");
+
+    private boolean isInvalidValue(String value) {
+        if (value.trim().isEmpty())
+            return true;
+
+        String upperValue = value.trim().toUpperCase(java.util.Locale.ROOT);
+
+        return upperValue.equals("-")
+                || upperValue.contains("N/A")
+                || upperValue.contains("N\\A");
+    }
 
     @Override
     public void initialize() {
@@ -608,28 +710,515 @@ class AndroidClickableElementWithoutDescription implements Oracle {
 
     @Override
     public Verdict getVerdict(State state) {
+        Verdict finalVerdict = Verdict.OK;
 
         for (Widget w : state) {
-            if (w.get(AndroidTags.AndroidClickable, false)
-                    && w.get(AndroidTags.AndroidDisplayed, false)
-                    && w.get(AndroidTags.AndroidAccessibilityId, "").trim().isEmpty()
-                    && w.get(AndroidTags.AndroidText, "").trim().isEmpty()
-                    && w.get(AndroidTags.AndroidHint, "").trim().isEmpty()) {
+            String resId = w.get(AndroidTags.AndroidResourceId, "");
 
-                String verdictMsg = String.format("Detected Clickable widget without any description: %s",
-                        w.get(AndroidTags.AndroidXpath));
+            if (!HEADER_WIDGET_ID_PATTERN.matcher(resId).matches()) {
+                continue;
+            }
+
+            String value = w.get(AndroidTags.AndroidText, "");
+
+            if (isInvalidValue(value)) {
+                String verdictMsg = String.format(
+                        "Detected Header with invalid content (resId=%s, value='%s') %s",
+                        resId, value, w.get(AndroidTags.AndroidXpath));
 
                 Visualizer visualizer = new RegionsVisualizer(
                         getRedPen(),
-                        getWidgetRegions(Arrays.asList(w)),
-                        "Accessibility Fault",
+                        getWidgetRegions(Collections.singletonList(w)),
+                        "Invariant Fault",
                         0.5, 0.5);
 
-                return new Verdict(Verdict.Severity.WARNING_ACCESSIBILITY_FAULT, verdictMsg, visualizer);
+                Verdict headerVerdict = new Verdict(
+                        Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT,
+                        verdictMsg,
+                        visualizer);
+                finalVerdict = finalVerdict.join(headerVerdict);
             }
         }
 
-        return Verdict.OK;
+        return finalVerdict;
+    }
+}
+
+class AndroidDigiOfficePersonNameIsNotEmptyNotNA implements Oracle {
+
+    // Matches any resId that ends with:
+    // detail-name-text
+    // detail-contact-person-<number>-text
+    private static final java.util.regex.Pattern PERSON_WIDGET_ID_PATTERN = java.util.regex.Pattern
+            .compile(".*detail-(name|contact-person-\\d+)-text.*");
+
+    private boolean isInvalidValue(String value) {
+        if (value.trim().isEmpty())
+            return true;
+
+        String upperValue = value.trim().toUpperCase(java.util.Locale.ROOT);
+
+        return upperValue.equals("-")
+                || upperValue.contains("N/A")
+                || upperValue.contains("N\\A");
     }
 
+    @Override
+    public void initialize() {
+    }
+
+    @Override
+    public Verdict getVerdict(State state) {
+        Verdict finalVerdict = Verdict.OK;
+
+        for (Widget w : state) {
+            String resId = w.get(AndroidTags.AndroidResourceId, "");
+
+            if (!PERSON_WIDGET_ID_PATTERN.matcher(resId).matches()) {
+                continue;
+            }
+
+            String value = w.get(AndroidTags.AndroidAccessibilityId, "");
+
+            if (isInvalidValue(value)) {
+                String verdictMsg = String.format(
+                        "Detected Person name with invalid content (resId=%s, value='%s') %s",
+                        resId, value, w.get(AndroidTags.AndroidXpath));
+
+                Visualizer visualizer = new RegionsVisualizer(
+                        getRedPen(),
+                        getWidgetRegions(Collections.singletonList(w)),
+                        "Invariant Fault",
+                        0.5, 0.5);
+
+                Verdict personNameVerdict = new Verdict(
+                        Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT,
+                        verdictMsg,
+                        visualizer);
+                finalVerdict = finalVerdict.join(personNameVerdict);
+            }
+        }
+
+        return finalVerdict;
+    }
+}
+
+class AndroidDigiOfficeCompanyNameIsNotEmptyNotNA implements Oracle {
+
+    // Matches any resId that ends with:
+    // detail-company-name-text
+    private static final java.util.regex.Pattern COMPANY_WIDGET_ID_PATTERN = java.util.regex.Pattern
+            .compile(".*detail-(company-name)-text.*");
+
+    private boolean isInvalidValue(String value) {
+        if (value.trim().isEmpty())
+            return true;
+
+        String upperValue = value.trim().toUpperCase(java.util.Locale.ROOT);
+
+        return upperValue.equals("-")
+                || upperValue.contains("N/A")
+                || upperValue.contains("N\\A");
+    }
+
+    @Override
+    public void initialize() {
+    }
+
+    @Override
+    public Verdict getVerdict(State state) {
+        Verdict finalVerdict = Verdict.OK;
+
+        for (Widget w : state) {
+            String resId = w.get(AndroidTags.AndroidResourceId, "");
+
+            if (!COMPANY_WIDGET_ID_PATTERN.matcher(resId).matches()) {
+                continue;
+            }
+
+            String value = w.get(AndroidTags.AndroidAccessibilityId, "");
+
+            if (isInvalidValue(value)) {
+                String verdictMsg = String.format(
+                        "Detected Company name with invalid content (resId=%s, value='%s') %s",
+                        resId, value, w.get(AndroidTags.AndroidXpath));
+
+                Visualizer visualizer = new RegionsVisualizer(
+                        getRedPen(),
+                        getWidgetRegions(Collections.singletonList(w)),
+                        "Invariant Fault",
+                        0.5, 0.5);
+
+                Verdict companyNameVerdict = new Verdict(
+                        Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT,
+                        verdictMsg,
+                        visualizer);
+                finalVerdict = finalVerdict.join(companyNameVerdict);
+            }
+        }
+
+        return finalVerdict;
+    }
+}
+
+class AndroidDigiOfficeWidgetIsNotEmpty implements Oracle {
+
+    // Matches any resId that ends with:
+    // person-detail-contact-person-0-secondary-text
+    // person-detail-contact-person-0-tertiary-text
+    // contact-person-detail-function-text
+    private static final java.util.regex.Pattern WIDGET_ID_PATTERN = java.util.regex.Pattern
+            .compile(".*(detail-contact-person-\\d+-(secondary|tertiary)-text|person-detail-function-text).*");
+
+    private boolean isInvalidValue(String value) {
+        if (value.trim().isEmpty())
+            return true;
+        return value.trim().equals("-");
+    }
+
+    @Override
+    public void initialize() {
+    }
+
+    @Override
+    public Verdict getVerdict(State state) {
+        Verdict finalVerdict = Verdict.OK;
+
+        for (Widget w : state) {
+            String resId = w.get(AndroidTags.AndroidResourceId, "");
+
+            if (!WIDGET_ID_PATTERN.matcher(resId).matches()) {
+                continue;
+            }
+
+            String value = w.get(AndroidTags.AndroidAccessibilityId, "");
+
+            if (isInvalidValue(value)) {
+                String verdictMsg = String.format(
+                        "Detected widget with invalid content (resId=%s, value='%s') %s",
+                        resId, value, w.get(AndroidTags.AndroidXpath));
+
+                Visualizer visualizer = new RegionsVisualizer(
+                        getRedPen(),
+                        getWidgetRegions(Collections.singletonList(w)),
+                        "Invariant Fault",
+                        0.5, 0.5);
+
+                Verdict widgetEmptyVerdict = new Verdict(
+                        Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT,
+                        verdictMsg,
+                        visualizer);
+                finalVerdict = finalVerdict.join(widgetEmptyVerdict);
+            }
+        }
+
+        return finalVerdict;
+    }
+}
+
+class AndroidDigiOfficePhoneTextIsNotValid implements Oracle {
+
+    // Matches any resId that ends with:
+    // person-detail-phone-text
+    // relation-detail-phone-text
+    // contact-person-detail-phone-text
+    // contact-person-detail-relation-phone-text
+    private static final java.util.regex.Pattern PHONE_WIDGET_ID_PATTERN = java.util.regex.Pattern
+            .compile(".*(detail|detail-relation)-phone-text.*");
+
+    private boolean isInvalidValue(String value) {
+        if (value.trim().isEmpty())
+            return true; // empty is invalid
+        if (value.trim().equals("-"))
+            return false; // dash char is allowed
+
+        String upperValue = value.trim().toUpperCase(java.util.Locale.ROOT);
+
+        // No alphabetic characters allowed
+        return java.util.regex.Pattern.compile(".*[A-Z].*").matcher(upperValue).matches();
+    }
+
+    @Override
+    public void initialize() {
+    }
+
+    @Override
+    public Verdict getVerdict(State state) {
+        Verdict finalVerdict = Verdict.OK;
+
+        for (Widget w : state) {
+            String resId = w.get(AndroidTags.AndroidResourceId, "");
+
+            if (!PHONE_WIDGET_ID_PATTERN.matcher(resId).matches()) {
+                continue;
+            }
+
+            String value = w.get(AndroidTags.AndroidAccessibilityId, "");
+
+            if (isInvalidValue(value)) {
+                String verdictMsg = String.format(
+                        "Detected Phone text with invalid content (resId=%s, value='%s') %s",
+                        resId, value, w.get(AndroidTags.AndroidXpath));
+
+                Visualizer visualizer = new RegionsVisualizer(
+                        getRedPen(),
+                        getWidgetRegions(Collections.singletonList(w)),
+                        "Invariant Fault",
+                        0.5, 0.5);
+
+                Verdict phoneTextVerdict = new Verdict(
+                        Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT,
+                        verdictMsg,
+                        visualizer);
+                finalVerdict = finalVerdict.join(phoneTextVerdict);
+            }
+        }
+
+        return finalVerdict;
+    }
+}
+
+class AndroidDigiOfficeMobileTextIsNotValid implements Oracle {
+
+    // Matches any resId that ends with:
+    // person-detail-mobile-text
+    // relation-detail-mobile-text
+    // contact-person-detail-mobile-text
+    // contact-person-detail-relation-mobile-text
+    private static final java.util.regex.Pattern MOBILE_WIDGET_ID_PATTERN = java.util.regex.Pattern
+            .compile(".*(detail|detail-relation)-mobile-text.*");
+
+    private boolean isInvalidValue(String value) {
+        if (value.trim().isEmpty())
+            return true; // empty is invalid
+        if (value.trim().equals("-"))
+            return false; // dash char is allowed
+
+        String upperValue = value.trim().toUpperCase(java.util.Locale.ROOT);
+
+        // No alphabetic characters allowed
+        return java.util.regex.Pattern.compile(".*[A-Z].*").matcher(upperValue).matches();
+    }
+
+    @Override
+    public void initialize() {
+    }
+
+    @Override
+    public Verdict getVerdict(State state) {
+        Verdict finalVerdict = Verdict.OK;
+
+        for (Widget w : state) {
+            String resId = w.get(AndroidTags.AndroidResourceId, "");
+
+            if (!MOBILE_WIDGET_ID_PATTERN.matcher(resId).matches()) {
+                continue;
+            }
+
+            String value = w.get(AndroidTags.AndroidAccessibilityId, "");
+
+            if (isInvalidValue(value)) {
+                String verdictMsg = String.format(
+                        "Detected Mobile text with invalid content (resId=%s, value='%s') %s",
+                        resId, value, w.get(AndroidTags.AndroidXpath));
+
+                Visualizer visualizer = new RegionsVisualizer(
+                        getRedPen(),
+                        getWidgetRegions(Collections.singletonList(w)),
+                        "Invariant Fault",
+                        0.5, 0.5);
+
+                Verdict mobileTextVerdict = new Verdict(
+                        Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT,
+                        verdictMsg,
+                        visualizer);
+                finalVerdict = finalVerdict.join(mobileTextVerdict);
+            }
+        }
+
+        return finalVerdict;
+    }
+}
+
+class AndroidDigiOfficeEmailTextIsNotValid implements Oracle {
+
+    // Matches any resId that ends with:
+    // person-detail-email-text
+    // relation-detail-email-text
+    // contact-person-detail-email-text
+    // contact-person-detail-relation-email-text
+    private static final java.util.regex.Pattern EMAIL_WIDGET_ID_PATTERN = java.util.regex.Pattern
+            .compile(".*(detail|detail-relation)-email-text.*");
+
+    private boolean isInvalidValue(String value) {
+        if (value.trim().isEmpty())
+            return true; // empty is invalid
+        if (value.trim().equals("-"))
+            return false; // dash char is allowed
+
+        String upperValue = value.trim().toUpperCase(java.util.Locale.ROOT);
+
+        // Only email format allowed
+        return !(java.util.regex.Pattern.compile(".*[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}.*")
+                .matcher(upperValue).matches());
+    }
+
+    @Override
+    public void initialize() {
+    }
+
+    @Override
+    public Verdict getVerdict(State state) {
+        Verdict finalVerdict = Verdict.OK;
+
+        for (Widget w : state) {
+            String resId = w.get(AndroidTags.AndroidResourceId, "");
+
+            if (!EMAIL_WIDGET_ID_PATTERN.matcher(resId).matches()) {
+                continue;
+            }
+
+            String value = w.get(AndroidTags.AndroidAccessibilityId, "");
+
+            if (isInvalidValue(value)) {
+                String verdictMsg = String.format(
+                        "Detected Email text with invalid content (resId=%s, value='%s') %s",
+                        resId, value, w.get(AndroidTags.AndroidXpath));
+
+                Visualizer visualizer = new RegionsVisualizer(
+                        getRedPen(),
+                        getWidgetRegions(Collections.singletonList(w)),
+                        "Invariant Fault",
+                        0.5, 0.5);
+
+                Verdict emailTextVerdict = new Verdict(
+                        Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT,
+                        verdictMsg,
+                        visualizer);
+                finalVerdict = finalVerdict.join(emailTextVerdict);
+            }
+        }
+
+        return finalVerdict;
+    }
+}
+
+class AndroidDigiOfficeWebsiteTextIsNotValid implements Oracle {
+
+    // Matches any resId that ends with:
+    // person-detail-website-text
+    // relation-detail-website-text
+    // contact-person-detail-website-text
+    // contact-person-detail-relation-website-text
+    private static final java.util.regex.Pattern WEBSITE_WIDGET_ID_PATTERN = java.util.regex.Pattern
+            .compile(".*(detail|detail-relation)-website-text.*");
+
+    private boolean isInvalidValue(String value) {
+        if (value.trim().isEmpty())
+            return true;
+
+        String upperValue = value.trim().toUpperCase(java.util.Locale.ROOT);
+
+        return upperValue.contains("N/A")
+                || upperValue.contains("N\\A");
+    }
+
+    @Override
+    public void initialize() {
+    }
+
+    @Override
+    public Verdict getVerdict(State state) {
+        Verdict finalVerdict = Verdict.OK;
+
+        for (Widget w : state) {
+            String resId = w.get(AndroidTags.AndroidResourceId, "");
+
+            if (!WEBSITE_WIDGET_ID_PATTERN.matcher(resId).matches()) {
+                continue;
+            }
+
+            String value = w.get(AndroidTags.AndroidAccessibilityId, "");
+
+            if (isInvalidValue(value)) {
+                String verdictMsg = String.format(
+                        "Detected Website text with invalid content (resId=%s, value='%s') %s",
+                        resId, value, w.get(AndroidTags.AndroidXpath));
+
+                Visualizer visualizer = new RegionsVisualizer(
+                        getRedPen(),
+                        getWidgetRegions(Collections.singletonList(w)),
+                        "Invariant Fault",
+                        0.5, 0.5);
+
+                Verdict websiteTextVerdict = new Verdict(
+                        Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT,
+                        verdictMsg,
+                        visualizer);
+                finalVerdict = finalVerdict.join(websiteTextVerdict);
+            }
+        }
+
+        return finalVerdict;
+    }
+}
+
+class AndroidDigiOfficeSearchBarContainsClear implements Oracle {
+
+    private static final java.util.regex.Pattern SEARCH_WIDGET_ID_PATTERN = java.util.regex.Pattern
+            .compile(".*list-search$");
+
+    private static final java.util.regex.Pattern CLEAR_WIDGET_ID_PATTERN = java.util.regex.Pattern
+            .compile(".*list-clear.*");
+
+    @Override
+    public void initialize() {
+    }
+
+    @Override
+    public Verdict getVerdict(State state) {
+        Verdict finalVerdict = Verdict.OK;
+
+        for (Widget w : state) {
+            String resId = w.get(AndroidTags.AndroidResourceId, "");
+
+            if (!SEARCH_WIDGET_ID_PATTERN.matcher(resId).matches()) {
+                continue;
+            }
+
+            if (!containsClearRecursive(w, CLEAR_WIDGET_ID_PATTERN)) {
+                String verdictMsg = String.format(
+                        "Detected Search element without clear option (resId=%s) %s",
+                        resId,
+                        w.get(AndroidTags.AndroidXpath, ""));
+
+                Visualizer visualizer = new RegionsVisualizer(
+                        getRedPen(),
+                        getWidgetRegions(java.util.Collections.singletonList(w)),
+                        "Invariant Fault",
+                        0.5, 0.5);
+
+                Verdict searchBarVerdict = new Verdict(
+                        Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT,
+                        verdictMsg,
+                        visualizer);
+                finalVerdict = finalVerdict.join(searchBarVerdict);
+            }
+        }
+
+        return finalVerdict;
+    }
+
+    private boolean containsClearRecursive(Widget w, java.util.regex.Pattern clearPattern) {
+        String id = w.get(AndroidTags.AndroidResourceId, "");
+        if (clearPattern.matcher(id).matches())
+            return true;
+
+        for (int i = 0; i < w.childCount(); i++) {
+            if (containsClearRecursive(w.child(i), clearPattern)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
