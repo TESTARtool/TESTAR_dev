@@ -44,6 +44,8 @@ public class OracleSelection {
 			"org.testar.oracles.generic.invariants",
 			"org.testar.oracles.web.accessibility",
 			"org.testar.oracles.web.invariants",
+			"org.testar.oracles.android.accessibility",
+			"org.testar.oracles.android.invariants",
 	};
 
 	public static List<String> getAvailableOracles() {
