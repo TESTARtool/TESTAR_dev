@@ -389,7 +389,7 @@ public class TreeVisualizationAndroid extends JPanel implements TreeSelectionLis
             infoPaneRight.add(new JLabel(String.valueOf(selectedWidget))).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
 
             infoPaneLeft.add(new JLabel("Displayed: ")).setFont(new Font("SansSerif", Font.BOLD, fontSize));
-            infoPaneRight.add(new JLabel(String.valueOf(selectedWidget))).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
+            infoPaneRight.add(new JLabel(String.valueOf(displayedWidget))).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
 
             infoPaneLeft.add(new JLabel("Current Activity: ")).setFont(new Font("SansSerif", Font.BOLD, fontSize));
             infoPaneRight.add(new JLabel(String.valueOf(activityWidget))).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
