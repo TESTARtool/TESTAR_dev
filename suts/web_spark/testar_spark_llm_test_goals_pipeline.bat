@@ -83,6 +83,11 @@ for %%I in (%GOAL_IDS%) do (
     echo.
     echo Running !NAME! with goal "!GOAL!" output "!OUTDIR!"...
 
+    REM Reset all fixtures between goals (empty -> project -> survey)
+    curl -sS -X POST "http://localhost:80/test/reset" -H "Content-Type: application/json" -d "{\"scenario\":\"empty\"}" >NUL 2>&1
+    curl -sS -X POST "http://localhost:80/test/reset" -H "Content-Type: application/json" -d "{\"scenario\":\"project\"}" >NUL 2>&1
+    curl -sS -X POST "http://localhost:80/test/reset" -H "Content-Type: application/json" -d "{\"scenario\":\"survey\"}" >NUL 2>&1
+
     docker run --rm ^
       -e OPENAI_API="%OPENAI_API%" ^
       -e SUT_URL="http://localhost:3000" ^

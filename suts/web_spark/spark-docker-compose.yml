@@ -50,6 +50,7 @@ services:
       DASHBOARD_URL: "localhost"
       PORT: "80"
       HTTPS: "off"
+      NODE_ENV: "test"
     depends_on:
       - mongo
       - redis

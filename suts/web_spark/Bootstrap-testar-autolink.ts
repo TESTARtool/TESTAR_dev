@@ -881,7 +881,15 @@ export async function Bootstrap(): Promise<void> {
       console.log("SensorSpec database online.")
 
       const emptyOrganizationId = uuid()
-      const testOrganizationId = uuid()
+      const emptyResearcherId = uuid()
+
+      const projectOrganizationId = uuid()
+      const projectResearcherId = uuid()
+      const projectProjectId = uuid()
+
+      const surveyOrganizationId = uuid()
+      const surveyResearcherId = uuid()
+      const surveyProjectId = uuid()
 
       if (!dbs.includes("organization")) {
         console.log("Initializing Organization database...")
@@ -889,7 +897,7 @@ export async function Bootstrap(): Promise<void> {
         const database = MongoClientDB.collection("organization")
         await database.createIndex({ _id: 1 }) // parent = organization_id
 
-        // Creating a TEST ORGANIZATION for TESTAR-AUTOLINK
+        // Creating TEST ORGANIZATIONS for TESTAR-AUTOLINK
         console.dir(`An initial Organization was generated.`)
         try {
 
@@ -902,8 +910,16 @@ export async function Bootstrap(): Promise<void> {
           } as any)
 
           await database.insertOne({
-            _id: testOrganizationId,
-            name: "Test organization",
+            _id: projectOrganizationId,
+            name: "Project organization",
+            language: "en",
+            parent_organization : null,
+            _deleted: false,
+          } as any)
+
+          await database.insertOne({
+            _id: surveyOrganizationId,
+            name: "Survey organization",
             language: "en",
             parent_organization : null,
             _deleted: false,
@@ -914,9 +930,6 @@ export async function Bootstrap(): Promise<void> {
         }
       }
       console.log("Organization database online.")
-      const researcherId1 = uuid()
-      const researcherId2 = uuid()
-      const sampleProjectId = uuid()
       if (!dbs.includes("researcher")) {
         console.log("Initializing Researcher database...")
         await MongoClientDB.createCollection("researcher")
@@ -925,11 +938,11 @@ export async function Bootstrap(): Promise<void> {
         await database.createIndex({ _parent: 1, timestamp: 1 })
         await database.createIndex({ timestamp: 1 })
 
-        // Creating an user with test credentials with empty projects for TESTAR-AUTOLINK project
+        // Creating users for TESTAR-AUTOLINK scenarios
         try {
 
           await database.insertOne({
-            _id: researcherId1,
+            _id: emptyResearcherId,
             name: "EMPTY-User",
             organization_id: emptyOrganizationId,
             role: "admin",
@@ -938,11 +951,20 @@ export async function Bootstrap(): Promise<void> {
           } as any)
 
           await database.insertOne({
-            _id: researcherId2,
-            name: "TESTAR-User",
-            organization_id: testOrganizationId,
+            _id: projectResearcherId,
+            name: "PROJECT-User",
+            organization_id: projectOrganizationId,
             role: "admin",
-            _parent: testOrganizationId,
+            _parent: projectOrganizationId,
+            _deleted: false,
+          } as any)
+
+          await database.insertOne({
+            _id: surveyResearcherId,
+            name: "SURVEY-User",
+            organization_id: surveyOrganizationId,
+            role: "admin",
+            _parent: surveyOrganizationId,
             _deleted: false,
           } as any)
 
@@ -982,16 +1004,25 @@ export async function Bootstrap(): Promise<void> {
         await database.createIndex({ _parent: 1, timestamp: 1 })
         await database.createIndex({ timestamp: 1 })
 
-        // Creating a Sample PROJECT for TESTAR-AUTOLINK
+        // Creating Sample PROJECTS for TESTAR-AUTOLINK
         console.dir(`A Sample Project was generated.`)
         try {
 
           // We do not create any project for the empty organization
 
-          // But we do for the test organization
+          // Project scenario
           await database.insertOne({
-            _id: sampleProjectId,
-            _parent: testOrganizationId,
+            _id: projectProjectId,
+            _parent: projectOrganizationId,
+            name: "Sample Project",
+            joinable: true,
+            _deleted: false,
+          } as any)
+
+          // Survey scenario
+          await database.insertOne({
+            _id: surveyProjectId,
+            _parent: surveyOrganizationId,
             name: "Sample Project",
             joinable: true,
             _deleted: false,
@@ -1026,10 +1057,12 @@ export async function Bootstrap(): Promise<void> {
 
           // We do not create any survey for the empty organization (no project there)
 
-          // But we do for the test organization (with sample project)
+          // We do not create any survey for the project organization
+
+          // We do for the survey organization (with sample project)
           await database.insertOne({
             _id: uuid(),
-            _parent: sampleProjectId,
+            _parent: surveyProjectId,
             timestamp: new Date().getTime(),
             spec: "spark.survey",
             name: "Default Survey",
@@ -1108,20 +1141,30 @@ export async function Bootstrap(): Promise<void> {
           // Creating an empty user for TESTAR-AUTOLINK project
           await database.insertOne({
             _id: new ObjectID(),
-            origin: researcherId1,
+            origin: emptyResearcherId,
             access_key: "empty-user",
             secret_key: Encrypt("EmptyPass1!", "AES256"),
             description: "EMPTY-User",
             _deleted: false,
           } as any)
 
-          // Creating a test user for TESTAR-AUTOLINK project
+          // Creating a project user for TESTAR-AUTOLINK project
           await database.insertOne({
             _id: new ObjectID(),
-            origin: researcherId2,
-            access_key: "testar-user",
-            secret_key: Encrypt("TestarPass1!", "AES256"),
-            description: "TESTAR-User",
+            origin: projectResearcherId,
+            access_key: "project-user",
+            secret_key: Encrypt("ProjectPass1!", "AES256"),
+            description: "PROJECT-User",
+            _deleted: false,
+          } as any)
+
+          // Creating a survey user for TESTAR-AUTOLINK project
+          await database.insertOne({
+            _id: new ObjectID(),
+            origin: surveyResearcherId,
+            access_key: "survey-user",
+            secret_key: Encrypt("SurveyPass1!", "AES256"),
+            description: "SURVEY-User",
             _deleted: false,
           } as any)
 
