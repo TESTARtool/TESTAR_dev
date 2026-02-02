@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,7 +32,11 @@ package org.testar.monkey.alayer;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+
 import org.junit.Test;
+import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
+import org.testar.monkey.alayer.visualizers.ShapeVisualizer;
 
 public class VerdictTest {
 
@@ -43,10 +47,17 @@ public class VerdictTest {
 		public void run(State s, Canvas c, Pen pen) {}	
 	};
 
-	private final Visualizer failVisualizer = new Visualizer(){
-		private static final long serialVersionUID = -2732461936562344367L;
-		public void run(State s, Canvas c, Pen pen) {}	
-	};
+	private final Visualizer failVisualizer = new ShapeVisualizer(
+					Pen.PEN_RED, 
+					Rect.from(0, 0, 10, 10), 
+					"Fail Visualizer", 
+					0.5, 0.5);
+
+	private final Visualizer issueVisualizer = new RegionsVisualizer(
+					Pen.PEN_RED, 
+					Arrays.asList(Rect.from(0, 0, 10, 10)), 
+					"Issue Visualizer", 
+					0.5, 0.5);
 
 	@Test
 	public void testToString() {
@@ -60,6 +71,7 @@ public class VerdictTest {
 		Verdict v1 = new Verdict(Verdict.Severity.OK, "Foo Bar");
 		Verdict v2 = new Verdict(Verdict.Severity.FAIL, "Bar", failVisualizer);
 		Verdict v3 = new Verdict(Verdict.Severity.OK, "Baz", dummyVisualizer);
+		Verdict v4 = new Verdict(Verdict.Severity.FAIL, "Exception", issueVisualizer);
 
 		assertTrue("Joining two Verdicts shall create a new Verdict", 
 				v1 != v1.join(v2));
@@ -79,11 +91,17 @@ public class VerdictTest {
 				"then both infos shall be included separated by a line break",
 				"Bar\nBaz", v2.join(v3).info());
 
-		assertTrue("Joining two Verdicts shall use the Visualizer of the Verdict with high severity",
+		assertTrue("Joining an OK and Fail Verdicts shall use the Visualizer of the Verdict with high severity",
 				v2.join(v1).visualizer() == failVisualizer);
 
-		assertTrue("Joining two Verdicts shall use the Visualizer of the Verdict with high severity",
+		assertTrue("Joining an OK and Fail Verdicts shall use the Visualizer of the Verdict with high severity",
 				v1.join(v2).visualizer() == failVisualizer);
+
+		assertTrue("Joining Fail and Issue Verdicts must contain Fail Shapes",
+				v2.join(v4).visualizer().getShapes().containsAll(failVisualizer.getShapes()));
+
+		assertTrue("Joining Fail and Issue Verdicts must contain Issue Shapes",
+				v2.join(v4).visualizer().getShapes().containsAll(issueVisualizer.getShapes()));
 	}
 
 	@Test
