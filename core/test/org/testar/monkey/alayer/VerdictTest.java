@@ -72,6 +72,7 @@ public class VerdictTest {
 		Verdict v2 = new Verdict(Verdict.Severity.FAIL, "Bar", failVisualizer);
 		Verdict v3 = new Verdict(Verdict.Severity.OK, "Baz", dummyVisualizer);
 		Verdict v4 = new Verdict(Verdict.Severity.FAIL, "Exception", issueVisualizer);
+		Verdict emptyVisualizerVerdict = new Verdict(Verdict.Severity.FAIL, "Empty");
 
 		assertTrue("Joining two Verdicts shall create a new Verdict", 
 				v1 != v1.join(v2));
@@ -100,8 +101,20 @@ public class VerdictTest {
 		assertTrue("Joining Fail and Issue Verdicts must contain Fail Shapes",
 				v2.join(v4).visualizer().getShapes().containsAll(failVisualizer.getShapes()));
 
+		assertTrue("Joining Issue and Fail Verdicts must contain Fail Shapes",
+				v4.join(v2).visualizer().getShapes().containsAll(failVisualizer.getShapes()));
+
 		assertTrue("Joining Fail and Issue Verdicts must contain Issue Shapes",
 				v2.join(v4).visualizer().getShapes().containsAll(issueVisualizer.getShapes()));
+
+		assertTrue("Joining Issue and Fail Verdicts must contain Issue Shapes",
+				v4.join(v2).visualizer().getShapes().containsAll(issueVisualizer.getShapes()));
+
+		assertTrue("Joining Fail and emptyVisualizerVerdict Verdicts must equal Fail visualizer",
+				v2.join(emptyVisualizerVerdict).visualizer() == failVisualizer);
+
+		assertTrue("Joining emptyVisualizerVerdict and Fail Verdicts must equal Fail visualizer",
+				emptyVisualizerVerdict.join(v2).visualizer() == failVisualizer);
 	}
 
 	@Test
