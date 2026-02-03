@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -389,7 +389,7 @@ public class TreeVisualizationAndroid extends JPanel implements TreeSelectionLis
             infoPaneRight.add(new JLabel(String.valueOf(selectedWidget))).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
 
             infoPaneLeft.add(new JLabel("Displayed: ")).setFont(new Font("SansSerif", Font.BOLD, fontSize));
-            infoPaneRight.add(new JLabel(String.valueOf(selectedWidget))).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
+            infoPaneRight.add(new JLabel(String.valueOf(displayedWidget))).setFont(new Font("SansSerif", Font.PLAIN, fontSize));
 
             infoPaneLeft.add(new JLabel("Current Activity: ")).setFont(new Font("SansSerif", Font.BOLD, fontSize));
             infoPaneRight.add(new JLabel(String.valueOf(activityWidget))).setFont(new Font("SansSerif", Font.PLAIN, fontSize));

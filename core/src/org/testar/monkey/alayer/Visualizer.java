@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,13 +31,42 @@
 package org.testar.monkey.alayer;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.testar.monkey.Assert;
+import org.testar.monkey.Util;
 
 public interface Visualizer extends Serializable {
 	void run(State state, Canvas canvas, Pen pen);
 
 	default List<Shape> getShapes() {
 		return Arrays.asList(Rect.from(0, 0, 0, 0));
+	}
+
+	static Visualizer join(Visualizer first, Visualizer second) {
+		if (first == second) return first;
+		if (first == Util.NullVisualizer) return second;
+		if (second == Util.NullVisualizer) return first;
+
+		return new Visualizer() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void run(State state, Canvas canvas, Pen pen) {
+				Assert.notNull(state, canvas, pen);
+				first.run(state, canvas, pen);
+				second.run(state, canvas, pen);
+			}
+
+			@Override
+			public List<Shape> getShapes() {
+				ArrayList<Shape> merged = new ArrayList<>();
+				merged.addAll(first.getShapes());
+				merged.addAll(second.getShapes());
+				return merged;
+			}
+		};
 	}
 }
