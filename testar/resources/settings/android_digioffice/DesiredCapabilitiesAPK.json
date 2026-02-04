@@ -7,5 +7,9 @@
   "automationName" : "UiAutomator2",
   "newCommandTimeout": 600,
   "autoGrantPermissions": true,
-  "allowInvisibleElements": true
+  "allowInvisibleElements": false,
+  "ignoreHiddenApiPolicyError": true,
+  "adbExecTimeout": 120000,
+  "uiautomator2ServerInstallTimeout": 120000,
+  "uiautomator2ServerLaunchTimeout": 120000
 }
