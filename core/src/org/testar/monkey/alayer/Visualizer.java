@@ -31,9 +31,13 @@
 package org.testar.monkey.alayer;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.testar.monkey.Assert;
+import org.testar.monkey.Util;
 
 public interface Visualizer extends Serializable {
 	void run(State state, Canvas canvas, Pen pen);
@@ -48,5 +52,30 @@ public interface Visualizer extends Serializable {
 
 	static Rect toRect(Shape s) {
 		return Rect.from(s.x(), s.y(), s.width(), s.height());
+	}
+
+	static Visualizer join(Visualizer first, Visualizer second) {
+		if (first == second) return first;
+		if (first == Util.NullVisualizer) return second;
+		if (second == Util.NullVisualizer) return first;
+
+		return new Visualizer() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void run(State state, Canvas canvas, Pen pen) {
+				Assert.notNull(state, canvas, pen);
+				first.run(state, canvas, pen);
+				second.run(state, canvas, pen);
+			}
+
+			@Override
+			public List<Shape> getShapes() {
+				ArrayList<Shape> merged = new ArrayList<>();
+				merged.addAll(first.getShapes());
+				merged.addAll(second.getShapes());
+				return merged;
+			}
+		};
 	}
 }

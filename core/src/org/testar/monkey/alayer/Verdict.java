@@ -253,7 +253,7 @@ public final class Verdict implements Serializable {
 		String joinedInfo = this.info.contains(verdict.info()) ? this.info
 				: (this.severity == Severity.OK.getValue() ? "" : this.info + "\n") + verdict.info();
 
-		Visualizer joinedVisualizer = (this.severity >= verdict.severity()) ? this.visualizer() : verdict.visualizer();
+		Visualizer joinedVisualizer = Visualizer.join(this.visualizer(), verdict.visualizer());
 
 		Verdict jointVerdict = new Verdict(joinedSeverity, joinedInfo, joinedVisualizer, jointHighlights);
 		jointVerdict.setDescription(concatWithNewline(this.description(), verdict.description()));
