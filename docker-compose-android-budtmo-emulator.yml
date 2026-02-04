@@ -16,7 +16,7 @@ version: "3"
 services:
   # This is the docker image that contains the Android emulator + Appium server
   android-container:
-    image: budtmo/docker-android:emulator_11.0
+    image: budtmo/docker-android:emulator_14.0
     privileged: true
     scale: 1
     ports:
@@ -24,10 +24,10 @@ services:
       - 4723:4723
       - 5555:5555
     volumes:
-      - ./video-samsung_11.0:/tmp/video
+      - ./video-samsung_14.0:/tmp/video
     # Available: https://github.com/budtmo/docker-android/blob/master/cli/src/constants/ENV.py
     environment:
-      - EMULATOR_DEVICE=Samsung Galaxy S6
+      - EMULATOR_DEVICE=Nexus 5
       - APPIUM=true
       - WEB_VNC=true
       - APPIUM_ADDITIONAL_ARGS=--relaxed-security --base-path /wd/hub
