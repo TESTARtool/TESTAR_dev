@@ -78,6 +78,12 @@ import java.util.stream.Collectors;
 
 public class Protocol_android_digioffice extends AndroidProtocol {
 
+    enum AUTH {
+        CREDENTIALS,
+        PICK_ACCOUNT,
+        INVALID
+    }
+
     private String XPATH_FILTER_FILE = "/android_digioffice_xpath_filter.txt";
 
     private String VERDICT_LIST_FILE = "/android_digioffice_verdict_list.txt";
@@ -113,27 +119,63 @@ public class Protocol_android_digioffice extends AndroidProtocol {
 
     @Override
     protected SUT startSystem() throws SystemStartException {
-        SUT system = super.startSystem();
+        if(!checkDigiOfficeEnvironmentVariables()) {
+            System.err.println("Skipping DigiOffice login: missing env vars.");
+            return super.startSystem();
+        }
 
-        // Courtesy wait seconds, maybe not necessary
-        Util.pause(2);
+        SUT system = super.startSystem();
 
         // Load the DigiOffice name and URL for the account endpoint
         initialLoadEndpoitAccount(system);
 
         // Now the DigiOffice loads the authentication
-        // And makes a transition to Microsoft double verification login
-        clickMicrosoftPickAccount(system);
-        Util.pause(5);
-        pressEnterToContinueMicrosoftPickAccount(system);
+        // Wait until detected the corresponding authentication method
+        AUTH auth =  checkAuthenticationMethodMicrosoft(system);
+
+        if(AUTH.CREDENTIALS.equals(auth)){
+            typekMicrosoftUserCredentials(system);
+            Util.pause(5);
+            typekMicrosofPasswordCredentials(system);
+        } else if(AUTH.PICK_ACCOUNT.equals(auth)){
+            clickMicrosoftPickAccount(system);
+            Util.pause(5);
+            pressEnterToContinueMicrosoftPickAccount(system);
+        } else {
+            System.err.println("Invalid Authentication process");
+            return system;
+        }
 
         // Finally wait until the DigiOffice state after the login appears
         waitDigiOfficeStateAppears(system);
 
-        // Courtesy wait seconds, maybe not necessary
-        Util.pause(2);
-
         return system;
+    }
+
+    private boolean checkDigiOfficeEnvironmentVariables() {
+        try {
+            String endpoint = System.getenv("digioffice_endpoint");
+            String user = System.getenv("digioffice_user");
+            String password = System.getenv("digioffice_password");
+            boolean ok = true;
+
+            if (endpoint == null || endpoint.isBlank()) {
+                System.err.println("The 'digioffice_endpoint' environment variable is not defined (or is blank)");
+                ok = false;
+            }
+            if (user == null || user.isBlank()) {
+                System.err.println("The 'digioffice_user' environment variable is not defined (or is blank)");
+                ok = false;
+            }
+            if (password == null || password.isBlank()) {
+                System.err.println("The 'digioffice_password' environment variable is not defined (or is blank)");
+                ok = false;
+            }
+            return ok;
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            return false;
+        }
     }
 
     private void initialLoadEndpoitAccount(SUT system) {
@@ -171,14 +213,62 @@ public class Protocol_android_digioffice extends AndroidProtocol {
         }
     }
 
-    private void clickMicrosoftPickAccount(SUT system) {
+    private AUTH checkAuthenticationMethodMicrosoft(SUT system) {
         for (int attempt = 0; attempt < 60; attempt++) {
-            System.out.println("Waiting Microsoft 'Pick an account' button... attempt: " + attempt);
+            System.out.println("Waiting Microsoft Sign In method... attempt: " + attempt);
             Util.pause(2);
 
             State state = getState(system);
             for (Widget w : state) {
-                // Click Microsoft Sign In - Pick and account button
+                if (w.get(AndroidTags.AndroidHint, "").contains("Enter your email or phone Sign in")) {
+                    System.out.println("Detected Microsoft credentials Sign In method");
+                    return AUTH.CREDENTIALS;
+                }
+                if (w.get(AndroidTags.AndroidHint, "").contains("Pick an account")) {
+                    System.out.println("Detected Microsoft pick account Sign In method");
+                    return AUTH.PICK_ACCOUNT;
+                }
+            }
+        }
+        return AUTH.INVALID;
+    } 
+
+    private void typekMicrosoftUserCredentials(SUT system) {
+        for (int attempt = 0; attempt < 60; attempt++) {
+            State state = getState(system);
+            for (Widget w : state) {
+                if (w.get(AndroidTags.AndroidHint, "").contains("Enter your email or phone Sign in")) {
+                    System.out.println("Typing in 'Enter your email or phone Sign in' field...");
+                    Action typeMicrosoftUser = new AndroidActionType(state, w, System.getenv("digioffice_user"));
+                    typeMicrosoftUser.run(system, state, 0.1);
+                    Util.pause(2);
+                    AndroidAppiumFramework.pressKeyEvent(new KeyEvent(AndroidKey.ENTER));
+                    return;
+                }
+            }
+        }
+    }
+
+    private void typekMicrosofPasswordCredentials(SUT system) {
+        for (int attempt = 0; attempt < 60; attempt++) {
+            State state = getState(system);
+            for (Widget w : state) {
+                if (w.get(AndroidTags.AndroidHint, "").contains("Enter the password for " + System.getenv("digioffice_user"))) {
+                    System.out.println("Typing in 'Enter the password' field...");
+                    Action typeMicrosoftPassword = new AndroidActionType(state, w, System.getenv("digioffice_password"));
+                    typeMicrosoftPassword.run(system, state, 0.1);
+                    Util.pause(2);
+                    AndroidAppiumFramework.pressKeyEvent(new KeyEvent(AndroidKey.ENTER));
+                    return;
+                }
+            }
+        }
+    }
+
+    private void clickMicrosoftPickAccount(SUT system) {
+        for (int attempt = 0; attempt < 60; attempt++) {
+            State state = getState(system);
+            for (Widget w : state) {
                 if (w.get(AndroidTags.AndroidHint, "").contains("Pick an account")) {
                     System.out.println("Clicking 'Pick an account' button...");
                     Action clickPickAnAccount = new AndroidActionClick(state, w);
@@ -191,12 +281,8 @@ public class Protocol_android_digioffice extends AndroidProtocol {
 
     private void pressEnterToContinueMicrosoftPickAccount(SUT system) {
         for (int attempt = 0; attempt < 60; attempt++) {
-            System.out.println("Waiting to press ENTER to continue... attempt: " + attempt);
-            Util.pause(2);
-
             State state = getState(system);
             for (Widget w : state) {
-                // Microsoft WebKit continue
                 if (w.get(AndroidTags.AndroidClassName, "").contains("webkit.WebView")
                         && w.get(AndroidTags.AndroidText, "").contains("Sign in to your account")) {
                     System.out.println("Press ENTER to continue...");
