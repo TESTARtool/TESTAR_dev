@@ -80,6 +80,13 @@ public class AndroidCapabilitiesFactory {
 
         cap.setCapability("appium:settings[allowInvisibleElements]", getBool(json, "allowInvisibleElements", false));
 
+        cap.setCapability("appium:ignoreHiddenApiPolicyError", getBool(json, "ignoreHiddenApiPolicyError", false));
+
+        // ADB / server timeouts
+        cap.setCapability("appium:adbExecTimeout", getInt(json, "adbExecTimeout", 120000));
+        cap.setCapability("appium:uiautomator2ServerInstallTimeout", getInt(json, "uiautomator2ServerInstallTimeout", 120000));
+        cap.setCapability("appium:uiautomator2ServerLaunchTimeout", getInt(json, "uiautomator2ServerLaunchTimeout", 120000));
+
         String appiumUrl = defaultAppiumUrl;
 
         // If the APK is already installed we use appPackage identifier
