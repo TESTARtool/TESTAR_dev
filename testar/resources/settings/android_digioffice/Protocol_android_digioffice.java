@@ -220,7 +220,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
 
             State state = getState(system);
             for (Widget w : state) {
-                if (w.get(AndroidTags.AndroidHint, "").contains("Enter your email or phone Sign in")) {
+                if (w.get(AndroidTags.AndroidHint, "").contains("Enter your email or phone")) {
                     System.out.println("Detected Microsoft credentials Sign In method");
                     return AUTH.CREDENTIALS;
                 }
@@ -237,7 +237,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
         for (int attempt = 0; attempt < 60; attempt++) {
             State state = getState(system);
             for (Widget w : state) {
-                if (w.get(AndroidTags.AndroidHint, "").contains("Enter your email or phone Sign in")) {
+                if (w.get(AndroidTags.AndroidHint, "").contains("Enter your email or phone")) {
                     System.out.println("Typing in 'Enter your email or phone Sign in' field...");
                     Action typeMicrosoftUser = new AndroidActionType(state, w, System.getenv("digioffice_user"));
                     typeMicrosoftUser.run(system, state, 0.1);
