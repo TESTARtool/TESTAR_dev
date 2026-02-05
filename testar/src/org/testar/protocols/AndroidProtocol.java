@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -132,8 +132,7 @@ public class AndroidProtocol extends GenericUtilsProtocol {
         Set<Action> actionsToReturn = super.preSelectAction(system, state, actions); //super must be executed
         
         if (actions.isEmpty()) {
-            Widget topWidget = state.root().child(0);
-            Action backAction = new AndroidBackAction(state, topWidget);
+            Action backAction = new AndroidBackAction(state);
             buildStateActionsIdentifiers(state, Collections.singleton(backAction));
             actionsToReturn = new HashSet<>(Collections.singletonList(backAction));
         }

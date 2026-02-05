@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -231,23 +231,22 @@ public class Protocol_android_generic extends AndroidProtocol {
 		// Add system calls
 		// Workaround to pass a Android widget to the systemActions, otherwise will complain about not being able to set
 		// Tags. Addtionally creating an SystemAction interface will not work as the returned type must be Action.
-		Widget topWidget = state.root().child(0);
 		Boolean checkAddSystemActions = settings.get(ConfigTags.UseSystemActions, false);
 
 		if (checkAddSystemActions) {
 			actions.add(
 					//System orientation swap
-					new AndroidSystemActionOrientation(state, topWidget)
+					new AndroidSystemActionOrientation(state)
 					);
 
 			actions.add(
 					//Receive a call
-					new AndroidSystemActionCall(state, topWidget)
+					new AndroidSystemActionCall(state)
 					);
 
 			actions.add(
 					//Receive text message
-					new AndroidSystemActionText(state, topWidget)
+					new AndroidSystemActionText(state)
 					);
 		}
 
