@@ -641,8 +641,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
             }
 
             // Second, we force a navigate back action to return to DigiOffice state
-            Widget topWidget = state.root().child(0);
-            Action backAction = new AndroidBackAction(state, topWidget);
+            Action backAction = new AndroidBackAction(state);
             buildStateActionsIdentifiers(state, Collections.singleton(backAction));
             actionsToReturn = new HashSet<>(Collections.singletonList(backAction));
         }
