@@ -97,41 +97,10 @@ public class AndroidStateFetcher implements Callable<AndroidState> {
 			return rootElement;
 
 		rootElement.pid = system.get(Tags.PID, (long)-1);
-		
-		// 1 Option Screen: Screen size as State Rect
-		//Dimension screen = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-		//rootElement.rect = Rect.from(0, 0, screen.getWidth(), screen.getHeight());
-		//rootElement.bounds = Rect.from(0, 0, screen.getWidth(), screen.getHeight());
-		
-
-		// 2 Option FrameLayout: Obtain specific internal Android FrameLayout as State Rect
-		/*try {
-		    MobileElement mainFrame = AppiumFramework.findElements(new By.ByClassName("android.widget.FrameLayout")).get(0);
-
-		    rootElement.rect = Rect.from(
-		            mainFrame.getRect().getX(),
-		            mainFrame.getRect().getY(),
-		            mainFrame.getRect().getWidth(),
-		            mainFrame.getRect().getHeight());
-
-		    rootElement.bounds = Rect.from(
-		            mainFrame.getRect().getX(),
-		            mainFrame.getRect().getY(),
-		            mainFrame.getRect().getWidth(),
-		            mainFrame.getRect().getHeight());
-
-		} catch(Exception e) {
-		    System.out.println("Error: findElements(new By.ByClassName(\"android.widget.FrameLayout\")");
-		}
-		*/
 
 		Document xmlAndroid;
 		if((xmlAndroid = AndroidAppiumFramework.getAndroidPageSource()) != null) {
 		    Node stateNode = xmlAndroid.getDocumentElement();
-
-		    // 3 Option mainNode: state node element seems to have empty bounds
-		    //rootElement.rect = androidBoundsRect(AndroidNodeParser.getStringAttribute(stateNode, "bounds"));
-		    //rootElement.bounds = androidBoundsRect(AndroidNodeParser.getStringAttribute(stateNode, "bounds"));
 
 		    if(stateNode.hasChildNodes()) {
 				int childNum = stateNode.getChildNodes().getLength();
@@ -144,7 +113,7 @@ public class AndroidStateFetcher implements Callable<AndroidState> {
 
 		}
 
-		// 4 Option biggest Rect: after check widget tree, use biggest Rect as State Rect
+		// Biggest Rect: after check widget tree, use biggest Rect as State Rect
 		rootElement.rect = biggestRect;
 		rootElement.bounds = biggestRect;
 
