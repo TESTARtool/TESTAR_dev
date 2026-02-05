@@ -24,7 +24,7 @@ services:
       - 4723:4723
       - 5555:5555
     volumes:
-      - ./video-samsung_14.0:/tmp/video
+      - ./suts:/home/androidusr/suts
     # Available: https://github.com/budtmo/docker-android/blob/master/cli/src/constants/ENV.py
     environment:
       - EMULATOR_DEVICE=Nexus 5
