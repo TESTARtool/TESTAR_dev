@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -39,12 +39,9 @@ public class AndroidBackAction extends TaggableBase implements Action {
 
     private static final long serialVersionUID = 6808185819403073531L;
 
-    public final Widget widget;
-
-    public AndroidBackAction(State state, Widget widget) {
-        this.widget = widget;
+    public AndroidBackAction(State state) {
         this.set(Tags.Role, AndroidRoles.AndroidWidget);
-        this.mapOriginWidget(widget);
+        this.mapOriginWidget(state);
         this.set(Tags.Desc, toShortString());
     }
 

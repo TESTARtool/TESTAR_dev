@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -39,12 +39,9 @@ public class AndroidSystemActionCall extends TaggableBase implements Action {
 
     private static final long serialVersionUID = -6556855399091167635L;
 
-    private final Widget widget;
-
-    public AndroidSystemActionCall(State state, Widget widget) {
-        this.widget = widget;
+    public AndroidSystemActionCall(State state) {
         this.set(Tags.Role, AndroidRoles.AndroidWidget);
-        this.mapOriginWidget(widget);
+        this.mapOriginWidget(state);
         this.set(Tags.Desc, toShortString());
     }
 
@@ -74,8 +71,5 @@ public class AndroidSystemActionCall extends TaggableBase implements Action {
         return "";
     }
 
-    public Widget getWidget(){
-        return widget;
-    }
 }
 
