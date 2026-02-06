@@ -405,18 +405,19 @@ public class Protocol_android_digioffice extends AndroidProtocol {
     @Override
     protected Verdict getVerdict(State state) {
 
-        // 1) If we unexpectedly navigated to the emulator default activity
+        // 1) The super methods implements the implicit online state oracles for
+        // suspicious tags (exception, error messages, logcat suspicious messages)
+        Verdict verdict = super.getVerdict(state);
+        if (shouldReturnVerdict(verdict)) {
+            return verdict;
+        }
+
+        // 2) If we unexpectedly navigated to the emulator default activity
+        // This is executed as second in case the logcat discovers internal crash message
         if (state.get(AndroidTags.AndroidActivity, "").contains("NexusLauncherActivity")) {
             // We assume the DigiOffice app has crashed
             return new Verdict(Verdict.Severity.UNEXPECTEDCLOSE,
                     "Android app offline! Closed Unexpectedly! I assume it crashed!");
-        }
-
-        // 2) The super methods implements the implicit online state oracles for
-        // suspicious tags (exception, error messages)
-        Verdict verdict = super.getVerdict(state);
-        if (shouldReturnVerdict(verdict)) {
-            return verdict;
         }
 
         // 3) Custom invariant oracle for duplicated elements
