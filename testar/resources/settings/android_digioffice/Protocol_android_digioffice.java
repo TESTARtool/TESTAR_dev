@@ -126,28 +126,33 @@ public class Protocol_android_digioffice extends AndroidProtocol {
 
         SUT system = super.startSystem();
 
-        // Load the DigiOffice name and URL for the account endpoint
-        initialLoadEndpoitAccount(system);
+        try {
+            // Load the DigiOffice name and URL for the account endpoint
+            initialLoadEndpoitAccount(system);
 
-        // Now the DigiOffice loads the authentication
-        // Wait until detected the corresponding authentication method
-        AUTH auth =  checkAuthenticationMethodMicrosoft(system);
+            // Now the DigiOffice loads the authentication
+            // Wait until detected the corresponding authentication method
+            AUTH auth =  checkAuthenticationMethodMicrosoft(system);
 
-        if(AUTH.CREDENTIALS.equals(auth)){
-            typekMicrosoftUserCredentials(system);
-            Util.pause(5);
-            typekMicrosofPasswordCredentials(system);
-        } else if(AUTH.PICK_ACCOUNT.equals(auth)){
-            clickMicrosoftPickAccount(system);
-            Util.pause(5);
-            pressEnterToContinueMicrosoftPickAccount(system);
-        } else {
-            System.err.println("Invalid Authentication process");
-            return system;
+            if(AUTH.CREDENTIALS.equals(auth)){
+                typekMicrosoftUserCredentials(system);
+                Util.pause(5);
+                typekMicrosofPasswordCredentials(system);
+            } else if(AUTH.PICK_ACCOUNT.equals(auth)){
+                clickMicrosoftPickAccount(system);
+                Util.pause(5);
+                pressEnterToContinueMicrosoftPickAccount(system);
+            } else {
+                System.err.println("Invalid Authentication process");
+                return system;
+            }
+
+            // Finally wait until the DigiOffice state after the login appears
+            waitDigiOfficeStateAppears(system);
+        } catch (Exception e) {
+            System.err.println("DigiOffice login failed...");
+            e.printStackTrace(System.err);
         }
-
-        // Finally wait until the DigiOffice state after the login appears
-        waitDigiOfficeStateAppears(system);
 
         return system;
     }
