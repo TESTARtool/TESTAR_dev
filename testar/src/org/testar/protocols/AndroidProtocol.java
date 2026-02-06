@@ -34,6 +34,8 @@ import org.testar.plugin.NativeLinker;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
+import org.testar.oracles.Oracle;
+import org.testar.oracles.log.AndroidLogcatOracle;
 import org.testar.settings.Settings;
 import org.testar.monkey.alayer.android.actions.AndroidBackAction;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
@@ -56,6 +58,11 @@ public class AndroidProtocol extends GenericUtilsProtocol {
     protected void initialize(Settings settings){
         NativeLinker.addAndroidOS();
         super.initialize(settings);
+    }
+
+    @Override
+    public Oracle createLogOracle(Settings settings) {
+        return new AndroidLogcatOracle(settings);
     }
 
     /**

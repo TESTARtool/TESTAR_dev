@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -484,6 +484,89 @@ public class AndroidAppiumFramework extends SUTBase {
 
 	public static LogEntries getAppiumLogs() {
 		return driver.manage().logs().get("driver");
+	}
+
+	/**
+	 * Clear all logcat content. 
+	 */
+	public static void clearLogcat() {
+		try {
+			mobileShell("logcat", List.of("-b", "all", "-c"), Duration.ofSeconds(10));
+		} catch (Exception ignored) {}
+	}
+
+	/**
+	 * Execute an Android shell command on the device via Appium ("mobile: shell"). 
+	 */
+	private static void mobileShell(String command, List<String> args, Duration timeout) {
+		Map<String, Object> m = new HashMap<>();
+		m.put("command", command);
+		m.put("args", args);
+		m.put("timeout", (int) timeout.toMillis());
+		driver.executeScript("mobile: shell", m);
+	}
+
+	/**
+	 * Dump logcat output (main + system + crash buffers). 
+	 */
+	public static String dumpLogcatThreadtimeForPackage(String pkg) {
+		if (pkg == null || pkg.isBlank()) return "";
+
+		// 1) get PID
+		String pid = mobileShellStdout("pidof", List.of("-s", pkg), Duration.ofSeconds(5)).trim();
+		if (pid.isEmpty()) return "";
+
+		// 2) dump logcat for that PID
+		return mobileShellStdout(
+			"logcat",
+			List.of("-d", "-v", "threadtime", "--pid", pid, "-b", "main", "-b", "system", "-b", "crash"),
+			Duration.ofSeconds(10)
+		);
+	}
+
+	/**
+	 * Execute an Android shell command on the device via Appium ("mobile: shell") and return stdout. 
+	 */
+	private static String mobileShellStdout(String command, List<String> args, Duration timeout) {
+		Map<String, Object> m = new HashMap<>();
+		m.put("command", command);
+		m.put("args", args);
+		m.put("timeout", (int) timeout.toMillis());
+
+		Object raw = driver.executeScript("mobile: shell", m);
+		if (raw == null) return "";
+		if (raw instanceof String s) return s;
+		if (raw instanceof Map<?, ?> map) {
+			Object out = map.get("stdout");
+			return out == null ? "" : out.toString();
+		}
+		return raw.toString();
+	}
+
+	public static String getAppPackageFromCapabilitiesOrCurrent() {
+		if (driver == null) {
+			return "";
+		}
+
+		try {
+			Object appPackage = driver.getCapabilities().getCapability("appium:appPackage");
+			if (appPackage == null) {
+				appPackage = driver.getCapabilities().getCapability("appPackage");
+			}
+			if (appPackage != null) {
+				String pkg = appPackage.toString().trim();
+				if (!pkg.isEmpty()) {
+					return pkg;
+				}
+			}
+		} catch (Exception ignored) {
+		}
+
+		try {
+			return driver.getCurrentPackage();
+		} catch (Exception ignored) {
+			return "";
+		}
 	}
 
 	@Override
