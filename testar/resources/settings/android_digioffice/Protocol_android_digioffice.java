@@ -366,7 +366,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
     protected State getState(SUT system) throws StateBuildException {
         State state = super.getState(system);
 
-        Widget chooseActionModal = state;
+        Widget modalWidget = state;
 
         for (Widget widget : state) {
             // When allowInvisibleElements setting is enabled, some Android sources might be
@@ -375,13 +375,16 @@ public class Protocol_android_digioffice extends AndroidProtocol {
             widget.set(Tags.HitTester, Util.TrueTester);
 
             if (widget.get(AndroidTags.AndroidAccessibilityId, "").contains("Choose an action")) {
-                chooseActionModal = widget;
+                modalWidget = widget;
+            } else if (widget.get(AndroidTags.AndroidResourceId, "").contains("picker-dialog")
+                    && widget.parent() != null) {
+                modalWidget = widget.parent();
             }
         }
 
-        if (!(chooseActionModal instanceof State)) {
+        if (!(modalWidget instanceof State)) {
             for (Widget widget : state) {
-                if (!isSonOfWidget(chooseActionModal, widget)) {
+                if (!isSonOfWidget(modalWidget, widget)) {
                     // Make hit tester false if a modal exists and the widget is not son of it
                     widget.set(Tags.HitTester, Util.FalseTester);
                 }
