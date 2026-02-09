@@ -353,19 +353,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
         listErrorVerdictInfo = new ArrayList<>();
     }
 
-    /**
-     * This method is called when the TESTAR requests the state of the SUT.
-     * Here you can add additional information to the SUT's state or write your
-     * own state fetching routine. The state should have attached an oracle
-     * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
-     * state is erroneous and if so why.
-     * 
-     * @return the current state of the SUT with attached oracle.
-     */
-    @Override
-    protected State getState(SUT system) throws StateBuildException {
-        State state = super.getState(system);
-
+    private State updateStateModals(State state) {
         Widget modalWidget = state;
 
         for (Widget widget : state) {
@@ -376,9 +364,8 @@ public class Protocol_android_digioffice extends AndroidProtocol {
 
             if (widget.get(AndroidTags.AndroidAccessibilityId, "").contains("Choose an action")) {
                 modalWidget = widget;
-            } else if (widget.get(AndroidTags.AndroidResourceId, "").contains("picker-dialog")
-                    && widget.parent() != null) {
-                modalWidget = widget.parent();
+            } else if (isPickerContentSiblingOfDialog(widget)) {
+                modalWidget = widget;
             }
         }
 
@@ -394,6 +381,26 @@ public class Protocol_android_digioffice extends AndroidProtocol {
         return state;
     }
 
+    private boolean isPickerContentSiblingOfDialog(Widget widget) {
+        if (!widget.get(AndroidTags.AndroidResourceId, "").contains("picker-content")) {
+            return false;
+        }
+        if (widget.parent() == null) {
+            return false;
+        }
+        Widget parent = widget.parent();
+        for (int i = 0; i < parent.childCount(); i++) {
+            Widget sibling = parent.child(i);
+            if (sibling == null || sibling == widget) {
+                continue;
+            }
+            if (sibling.get(AndroidTags.AndroidResourceId, "").contains("picker-dialog")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean isSonOfWidget(Widget parent, Widget widget) {
         if (widget.parent() == null)
             return false;
@@ -401,6 +408,21 @@ public class Protocol_android_digioffice extends AndroidProtocol {
             return true;
         else
             return isSonOfWidget(parent, widget.parent());
+    }
+
+    /**
+     * This method is called when the TESTAR requests the state of the SUT.
+     * Here you can add additional information to the SUT's state or write your
+     * own state fetching routine. The state should have attached an oracle
+     * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
+     * state is erroneous and if so why.
+     * 
+     * @return the current state of the SUT with attached oracle.
+     */
+    @Override
+    protected State getState(SUT system) throws StateBuildException {
+        State state = super.getState(system);
+        return updateStateModals(state);
     }
 
     /**
@@ -412,6 +434,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
      */
     @Override
     protected Verdict getVerdict(State state) {
+        state = updateStateModals(state);
 
         // 1) The super methods implements the implicit online state oracles for
         // suspicious tags (exception, error messages, logcat suspicious messages)
