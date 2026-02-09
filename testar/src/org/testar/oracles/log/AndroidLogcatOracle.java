@@ -48,6 +48,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -123,8 +124,10 @@ public class AndroidLogcatOracle implements Oracle {
         List<String> newLines = relevantLines.subList(processedLineCount, relevantLines.size());
         processedLineCount = relevantLines.size();
 
+        // Save the complete threadtime format in the debug log
         appendToSequenceLog(newLines);
 
+        // Normalize the tag+message without threadtime for suspicious titles
         List<String> matches = detectRegexMatches(newLines, regex);
         if (matches.isEmpty()) {
             AndroidAppiumFramework.clearLogcat();
@@ -159,15 +162,44 @@ public class AndroidLogcatOracle implements Oracle {
         if (lines == null || lines.isEmpty() || regex == null || regex.isEmpty()) {
             return matches;
         }
-        for (String line : lines) {
+
+        Pattern p;
+        try {
+            p = Pattern.compile(regex);
+        } catch (Exception ignored) {
+            return matches;
+        }
+
+        for (String raw : lines) {
+            String normalized = normalizeThreadtimeLine(raw);
             try {
-                if (Pattern.matches(regex, line)) {
-                    matches.add(line);
+                if (p.matcher(normalized).find()) {
+                    matches.add(normalized);
                 }
             } catch (Exception ignored) {
             }
         }
         return matches;
+    }
+
+    // logcat threadtime format:
+    // 02-09 08:59:33.844 17550 17575 E Accessibility exception content...
+    private static final Pattern THREADTIME_PATTERN = Pattern.compile(
+            "^\\d{2}-\\d{2}\\s+\\d{2}:\\d{2}:\\d{2}\\.\\d{3}\\s+\\d+\\s+\\d+\\s+([VDIWEAF])\\s+([^:]+):\\s*(.*)$"
+    );
+
+    private static String normalizeThreadtimeLine(String line) {
+        if (line == null) return "";
+        line = line.trim();
+        Matcher m = THREADTIME_PATTERN.matcher(line);
+        if (!m.matches()) {
+            return line.replaceAll("\\s+", " ");
+        }
+
+        String tag = m.group(2).trim();
+        String msg = m.group(3).trim().replaceAll("\\s+", " ");
+
+        return tag + ": " + msg;
     }
 
 }
