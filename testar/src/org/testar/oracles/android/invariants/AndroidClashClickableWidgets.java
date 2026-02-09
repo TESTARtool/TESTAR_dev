@@ -35,6 +35,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.testar.monkey.Pair;
+import org.testar.monkey.Util;
+import org.testar.monkey.alayer.HitTester;
 import org.testar.monkey.alayer.Rect;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
@@ -57,12 +59,18 @@ public class AndroidClashClickableWidgets implements Oracle {
 
         // Prepare a list that contains all the Rectangles from the clickable (and displayed) widgets
         List<Pair<Widget, Rect>> clickableWidgetsRects = new ArrayList<>();
+
         for (Widget w : state) {
-            if (w.get(AndroidTags.AndroidClickable, false)
-                    && w.get(AndroidTags.AndroidDisplayed, false)
-                    && w.get(Tags.Shape, null) != null) {
-                clickableWidgetsRects.add(new Pair<Widget, Rect>(w, (Rect) w.get(Tags.Shape)));
-            }
+            if (!w.get(AndroidTags.AndroidClickable, false)) continue;
+            if (!w.get(AndroidTags.AndroidDisplayed, false)) continue;
+
+            Object shape = w.get(Tags.Shape, null);
+            if (!(shape instanceof Rect)) continue;
+
+            HitTester hitTester = w.get(Tags.HitTester, Util.TrueTester);
+            if (hitTester == Util.FalseTester) continue;
+
+            clickableWidgetsRects.add(new Pair<>(w, (Rect) shape));
         }
 
         // Detect if the Rectangles of two clickable widgets are overlapping in an intersection
