@@ -535,9 +535,9 @@ public class AndroidAppiumFramework extends SUTBase {
 
 		Object raw = driver.executeScript("mobile: shell", m);
 		if (raw == null) return "";
-		if (raw instanceof String s) return s;
-		if (raw instanceof Map<?, ?> map) {
-			Object out = map.get("stdout");
+		if (raw instanceof String) return (String)raw;
+		if (raw instanceof Map<?, ?>) {
+			Object out = ((Map<?, ?>)raw).get("stdout");
 			return out == null ? "" : out.toString();
 		}
 		return raw.toString();
