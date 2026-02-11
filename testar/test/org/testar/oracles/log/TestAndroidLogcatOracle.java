@@ -19,6 +19,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TestAndroidLogcatOracle {
 
@@ -48,7 +50,11 @@ public class TestAndroidLogcatOracle {
             mocked.verify(AndroidAppiumFramework::clearLogcat, Mockito.times(1));
         }
 
-        List<Path> files = Files.list(tempDir).toList();
+        List<Path> files;
+        try (Stream<Path> stream = Files.list(tempDir)) {
+            files = stream.sorted().collect(Collectors.toList());
+        }
+
         Assert.assertEquals(1, files.size());
         String content = Files.readString(files.get(0), StandardCharsets.UTF_8);
         Assert.assertTrue(content.contains("TESTAR Android logcat"));
