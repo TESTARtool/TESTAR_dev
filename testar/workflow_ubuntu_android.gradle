@@ -22,6 +22,28 @@ task runTestAndroidGenericOk(type: Exec, dependsOn:'installDist') {
     }
 }
 
+// Run an Android test (inside an Ubuntu environment) to detect a suspicious log
+task runTestAndroidGenericSuspiciousLog(type: Exec, dependsOn:'installDist') {
+    // Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestAndroidGenericSuspiciousLog'
+    workingDir 'target/install/testar/bin'
+    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_android_generic FlashFeedback=false AlwaysCompile=true ApplicationName="android_suspicious_log" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=1 StateModelEnabled=false LogOracleEnabled=true LogOracleRegex=".*Failed.*"'
+    doLast {
+        String output = standardOutput.toString()
+
+        // Check that output contains the suspicious Failed logcat message
+        if(output.readLines().any{ line ->
+            line.contains("Suspicious Android logcat line(s) detected") && line.contains("Failed")
+        }) {
+            println "\n${output} \nTESTAR has successfully detected the Logcat Failed suspicious log message"
+        } else {
+            throw new GradleException("\n${output} \nERROR: TESTAR didnt detect the Logcat Failed suspicious log message")
+        }
+    }
+}
+
 // Run an Android test (inside an Ubuntu environment) to detect a suspicious message
 // Also, test the state model for web applications
 task runTestAndroidGenericSuspiciousTagStateModel(type: Exec, dependsOn: createDatabaseOrientDB) {
@@ -34,7 +56,7 @@ task runTestAndroidGenericSuspiciousTagStateModel(type: Exec, dependsOn: createD
     doLast {
         String output = standardOutput.toString()
 
-		// Check that output contains No problem detected. Message to verify the correct execution
+		// Check that output contains the suspicious NFC widget Title
         if(output.readLines().any{line->line.contains("Discovered suspicious widget 'Title' : 'NFC")}) {
             println "\n${output} \nTESTAR has successfully detected NFC Suspicious Tag using TagsForSuspiciousOracle Title! "
         } else {
