@@ -43,7 +43,37 @@
         <button onclick="generateAMP()">Export AMP</button>
         <button id="export-json" type="button" onclick="generateModelJSON()">Export JSON</button>
 	</div>
-	<div class="layout">
+
+    <div class="row">
+    <div style="display:flex; align-items:flex-start;">
+
+    <!-- LEFT: title + buttons -->
+    <div>
+        <div style="font-weight:bold;">Multi query (JSON)</div>
+
+        <div style="display:flex; flex-direction:column;">
+        <button type="button" onclick="queryModelMulti()">Run Multi Query</button>
+        <button type="button" onclick="resetMultiQuery()">Reset Multi Query</button>
+        </div>
+
+        <div id="multiQueryError" style="color:#b00020;"></div>
+    </div>
+
+    <!-- RIGHT: textarea -->
+    <textarea id="multiQueryJson"
+                rows="4"
+                style="
+                flex:1;
+                resize:none; /* not resizable */
+                overflow:auto; /* scrollable */
+                border:1px solid #000;
+                font-family: monospace;
+                "></textarea>
+
+    </div>
+    </div>
+
+	<div class="layout" style="margin-top:0px">
         <div class="column">
             <div><label for="layout-control">Layout: <select name="layout-control" id="layout-control">
                 <option selected disabled></option>
@@ -1222,7 +1252,7 @@
         });
 
     });
-
+    // Query model elements functions
     function queryModel() {
         var selectedClass = document.getElementById('select-className');
         var classText = '.' + selectedClass.options[selectedClass.selectedIndex].text;
@@ -1257,6 +1287,126 @@
                 }
             }
         });
+    }
+    // Multi-query elements functions
+    function storeOriginalColorOnce(ele) {
+        if (ele.isNode()) {
+            if (ele.data("_multiOrigBg") == null) {
+            ele.data("_multiOrigBg", ele.style("background-color"));
+            }
+        } else if (ele.isEdge()) {
+            if (ele.data("_multiOrigLine") == null) {
+            ele.data("_multiOrigLine", ele.style("line-color"));
+            }
+            if (ele.data("_multiOrigArrow") == null) {
+            ele.data("_multiOrigArrow", ele.style("target-arrow-color"));
+            }
+        }
+    }
+    function highlightElementMulti(ele) {
+        storeOriginalColorOnce(ele);
+
+        if (ele.isNode()) {
+            ele.style("background-color", "yellow");
+        } else if (ele.isEdge()) {
+            ele.style("line-color", "yellow");
+            ele.style("target-arrow-color", "yellow");
+        }
+    }
+    function matchesAny(fieldValue, wantedValues) {
+        if (fieldValue === undefined || fieldValue === null) return false;
+
+        const hay = String(fieldValue);
+        for (const w of wantedValues) {
+            if (w == null) continue;
+            const needle = String(w);
+            if (needle.length === 0) continue;
+            if (hay.includes(needle)) return true; 
+        }
+        return false;
+    }
+    function queryModelMulti() {
+        const errBox = document.getElementById("multiQueryError");
+        if (errBox) errBox.textContent = "";
+
+        const raw = document.getElementById("multiQueryJson").value.trim();
+        if (!raw) {
+            if (errBox) errBox.textContent = "Paste a JSON object first.";
+            return;
+        }
+
+        let queryObj;
+        try {
+            queryObj = JSON.parse(raw);
+        } catch (e) {
+            if (errBox) errBox.textContent = "Invalid JSON: " + e.message;
+            return;
+        }
+
+        if (!queryObj || typeof queryObj !== "object" || Array.isArray(queryObj)) {
+            if (errBox) errBox.textContent = "JSON must be an object like { \"Key\": [\"v1\", \"v2\"] }.";
+            return;
+        }
+
+        // Every key must map to an array of values
+        const queries = [];
+        for (const [key, arr] of Object.entries(queryObj)) {
+            if (!Array.isArray(arr)) {
+            if (errBox) errBox.textContent = `Value for "${key}" must be an array of strings.`;
+            return;
+            }
+            const values = arr.map(x => String(x).trim()).filter(Boolean);
+            if (values.length > 0) {
+            queries.push({ key, values });
+            }
+        }
+
+        if (queries.length === 0) {
+            if (errBox) errBox.textContent = "No non-empty arrays found.";
+            return;
+        }
+
+        const elements = cy.$("node, edge");
+
+        let hitCount = 0;
+        elements.forEach(ele => {
+            for (const q of queries) {
+            const fieldVal = ele.data(q.key);
+            if (matchesAny(fieldVal, q.values)) {
+                highlightElementMulti(ele);
+                hitCount++;
+                break;
+            }
+            }
+        });
+
+        if (errBox) errBox.textContent = `Highlighted ${hitCount} element(s).`;
+    }
+    function resetMultiQuery() {
+        cy.elements().forEach(ele => {
+            if (ele.isNode()) {
+            const orig = ele.data("_multiOrigBg");
+            if (orig != null) {
+                ele.style("background-color", orig);
+                ele.removeData("_multiOrigBg");
+            }
+            } else if (ele.isEdge()) {
+            const origLine = ele.data("_multiOrigLine");
+            const origArrow = ele.data("_multiOrigArrow");
+
+            if (origLine != null) {
+                ele.style("line-color", origLine);
+                ele.removeData("_multiOrigLine");
+            }
+            if (origArrow != null) {
+                ele.style("target-arrow-color", origArrow);
+                ele.removeData("_multiOrigArrow");
+            }
+            }
+        });
+
+        const errBox = document.getElementById("multiQueryError");
+        if (errBox) errBox.textContent = "";
     }
 	function generateAMP() {
 		// Extract the information of the initial abstract state
