@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2024 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2024 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2024 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -46,8 +46,9 @@ public class CodeCoverageManager implements CodeCoverage {
 		// Create a file directory to store the coverage file results
 		String outputCoveragePath = OutputStructure.outerLoopOutputDir + File.separator + "coverage";
 		File outputCoverageDir = new File(outputCoveragePath);
-		if(!outputCoverageDir.exists())
-			outputCoverageDir.mkdirs();
+		if(!outputCoverageDir.exists() && !outputCoverageDir.mkdirs()) {
+			System.err.println("ERROR: Failed to create coverage output directory: <" + outputCoverageDir.getAbsolutePath() + ">");
+		}
 
 		coverageExtractors = new ArrayList<>();
 
