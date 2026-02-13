@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 - 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,6 +32,8 @@
 package org.testar;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.testar.monkey.Util;
 import org.testar.monkey.ConfigTags;
@@ -134,30 +136,58 @@ public class OutputStructure {
 			runDir.mkdirs();
 		}
 
+		if(!runDir.exists() || !runDir.isDirectory()) {
+			reportDirectoryCreationFailure("run directory", runDir);
+		}
+
 		screenshotsOutputDir = outerLoopOutputDir + File.separator + "scrshots";
 		File scrnDir = new File(screenshotsOutputDir);
-		if(!scrnDir.exists())
-			scrnDir.mkdirs();
+		if(!scrnDir.exists() && !scrnDir.mkdirs()) {
+			reportDirectoryCreationFailure("screenshots directory", scrnDir);
+		}
 
 		htmlOutputDir = outerLoopOutputDir + File.separator + "reports";
 		File htmlDir = new File(htmlOutputDir);
-		if(!htmlDir.exists())
-			htmlDir.mkdirs();
+		if(!htmlDir.exists() && !htmlDir.mkdirs()) {
+			reportDirectoryCreationFailure("reports directory", htmlDir);
+		}
 
 		logsOutputDir = outerLoopOutputDir + File.separator + "logs";
 		File logsDir = new File(logsOutputDir);
-		if(!logsDir.exists())
-			logsDir.mkdirs();
+		if(!logsDir.exists() && !logsDir.mkdirs()) {
+			reportDirectoryCreationFailure("logs directory", logsDir);
+		}
 
 		debugLogsOutputDir = logsOutputDir + File.separator + "debug";
 		File logsDebugDir = new File(debugLogsOutputDir);
-		if(!logsDebugDir.exists())
-			logsDebugDir.mkdirs();
+		if(!logsDebugDir.exists() && !logsDebugDir.mkdirs()) {
+			reportDirectoryCreationFailure("debug directory", logsDebugDir);
+		}
 
 		processListenerDir = logsOutputDir + File.separator + "processListener";
 		File procListDir = new File(processListenerDir);
-		if(!procListDir.exists())
-			procListDir.mkdirs();
+		if(!procListDir.exists() && !procListDir.mkdirs()) {
+			reportDirectoryCreationFailure("process listener directory", procListDir);
+		}
+	}
+
+	private static void reportDirectoryCreationFailure(String purpose, File directory) {
+		File parent = directory.getParentFile();
+		Path cwd = Paths.get(".").toAbsolutePath().normalize();
+
+		System.err.println("ERROR: Failed to create output directory (" + purpose + ").");
+		System.err.println("ERROR: Directory: <" + directory.getAbsolutePath() + ">"
+				+ " exists=" + directory.exists()
+				+ " isDirectory=" + directory.isDirectory()
+				+ " canWrite=" + directory.canWrite());
+		if(parent != null) {
+			System.err.println("ERROR: Parent: <" + parent.getAbsolutePath() + ">"
+					+ " exists=" + parent.exists()
+					+ " isDirectory=" + parent.isDirectory()
+					+ " canWrite=" + parent.canWrite());
+		}
+		System.err.println("ERROR: Working directory: <" + cwd + ">");
+		System.err.println("ERROR: Config OutputDir: <" + Main.outputDir + ">");
 	}
 
 }
