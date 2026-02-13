@@ -1,6 +1,8 @@
 package org.testar.monkey.alayer.android.spy_visualization;
 
+import org.junit.Assume;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.Rect;
@@ -17,6 +19,11 @@ import javax.swing.tree.DefaultTreeModel;
 import static org.junit.Assert.*;
 
 public class TreeVisualizationAndroidTest {
+
+    @BeforeClass
+    public static void requireNotHeadless() {
+        Assume.assumeFalse("Skipping tests in headless environment", java.awt.GraphicsEnvironment.isHeadless());
+    }
 
     private TreeVisualizationAndroid treeVisualization;
 
