@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2022 - 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2022 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2022 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2022 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -41,6 +41,7 @@ import org.testar.monkey.alayer.Verdict;
 import org.testar.serialisation.LogSerialiser;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Set;
 import java.util.StringJoiner;
 
@@ -86,53 +87,34 @@ public class GenerateMode {
 
 			//initializing TESTAR and the protocol canvas for a new sequence:
 			protocol.startTestSequence(system);
+			LogSerialiser.log("Starting sequence " + protocol.sequenceCount 
+				+ " (output as: " + protocol.generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
 
 			try {
-				// getState() called before beginSequence:
-				LogSerialiser.log("Obtaining system state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
-				State state = protocol.getState(system);
-
-				// beginSequence() - a script to interact with GUI, for example login screen
-				LogSerialiser.log("Starting sequence " + protocol.sequenceCount 
-						+ " (output as: " + protocol.generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
-				protocol.beginSequence(system, state);
-
-				//update state after begin sequence SUT modification
-				state = protocol.getState(system);
-
 				// notify the statemodelmanager
 				protocol.stateModelManager.notifyTestSequencedStarted();
 
-				/*
-				 ***** starting the INNER LOOP:
-				 */
-				protocol.finalVerdict = runGenerateInnerLoop(protocol, system, state);
+				// Initial getState() called before beginSequence:
+				LogSerialiser.log("Obtaining system initial state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
+				State initialState = protocol.getState(system);
+				protocol.finalVerdict = initialState.get(Tags.OracleVerdict, Verdict.OK);
 
-				//calling finishSequence() to allow scripting GUI interactions to close the SUT:
-				protocol.finishSequence();
+				// If the SUT does not contain initial failures, start the inner loop test sequence
+				if(protocol.finalVerdict.severity() == Verdict.OK.severity()) {
+					// beginSequence() - a script to interact with GUI, for example login screen
+					LogSerialiser.log("Invoking begin sequence in the initial state...\n", LogSerialiser.LogLevel.Debug);
+					protocol.beginSequence(system, initialState);
 
-				// notify the state model manager of the sequence end
-				protocol.stateModelManager.notifyTestSequenceStopped();
+					// starting the INNER LOOP with the updated state after SUT modification
+					protocol.finalVerdict = runGenerateInnerLoop(protocol, system, protocol.getState(system));
+				} else {
+					// If failure exists in the initial state
+					// Save initial state information in the state model before finishing
+					protocol.stateModelManager.notifyNewStateReached(initialState, Collections.emptySet());
+				}
 
-				protocol.writeAndCloseFragmentForReplayableSequence();
-
-				if (protocol.finalVerdict.severity() != Verdict.OK.severity())
-					LogSerialiser.log("Sequence contained faults!\n", LogSerialiser.LogLevel.Critical);
-
-				//Copy sequence file into proper directory:
-				protocol.classifyAndCopySequenceIntoAppropriateDirectory(protocol.getFinalVerdict());
-
-				//calling postSequenceProcessing() to allow resetting test environment after test sequence, etc
-				protocol.postSequenceProcessing();
-
-				//Ending test sequence of TESTAR:
-				protocol.endTestSequence();
-
-				LogSerialiser.log("End of test sequence - shutting down the SUT...\n", LogSerialiser.LogLevel.Info);
-				protocol.stopSystem(system);
-				LogSerialiser.log("... SUT has been shut down!\n", LogSerialiser.LogLevel.Debug);
-
-				protocol.sequenceCount++;
+				// Finish the test sequence and state model
+				finishGeneratedSequence(protocol, system);
 
 			} catch (Exception e) { //TODO figure out what kind of exceptions can happen here
 				e.printStackTrace();
@@ -171,7 +153,7 @@ public class GenerateMode {
 	 */
 	private Verdict runGenerateInnerLoop(DefaultProtocol protocol, SUT system, State state) {
 
-		//Deriving actions from the state:
+		// Deriving actions from the state after begin sequence:
 		Set<Action> actions = protocol.deriveActions(system, state);
 		protocol.buildStateActionsIdentifiers(state, actions);
 
@@ -232,4 +214,33 @@ public class GenerateMode {
 
 		return state.get(Tags.OracleVerdict, Verdict.OK);
 	}
+
+	private void finishGeneratedSequence(DefaultProtocol protocol, SUT system) {
+		// Calling finishSequence() to allow scripting GUI interactions to close the SUT:
+		protocol.finishSequence();
+
+		// Notify the state model manager of the sequence end
+		protocol.stateModelManager.notifyTestSequenceStopped();
+
+		protocol.writeAndCloseFragmentForReplayableSequence();
+
+		if (protocol.finalVerdict.severity() != Verdict.OK.severity())
+			LogSerialiser.log("Sequence contained faults!\n", LogSerialiser.LogLevel.Critical);
+
+		// Copy sequence file into proper directory:
+		protocol.classifyAndCopySequenceIntoAppropriateDirectory(protocol.getFinalVerdict());
+
+		// Calling postSequenceProcessing() to allow resetting test environment after test sequence, etc
+		protocol.postSequenceProcessing();
+
+		// Ending test sequence of TESTAR:
+		protocol.endTestSequence();
+
+		LogSerialiser.log("End of test sequence - shutting down the SUT...\n", LogSerialiser.LogLevel.Info);
+		protocol.stopSystem(system);
+		LogSerialiser.log("... SUT has been shut down!\n", LogSerialiser.LogLevel.Debug);
+
+		protocol.sequenceCount++;
+	}
+
 }
