@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -110,9 +110,13 @@ public class ExtendedSettingFile implements Serializable {
      */
 	public ExtendedSettingFile(@NonNull String fileLocation, @NonNull ReentrantReadWriteLock fileAccessMutex) {
         _fileAccessMutex = fileAccessMutex;
-        _absolutePath = System.getProperty("user.dir") +
-                (fileLocation.startsWith(".") ? fileLocation.substring(1) : (fileLocation.startsWith(File.separator)
-                        ? fileLocation : File.separator + fileLocation));
+        if (new File(fileLocation).isAbsolute()) {
+            _absolutePath = fileLocation;
+        } else {
+            _absolutePath = System.getProperty("user.dir") +
+                    (fileLocation.startsWith(".") ? fileLocation.substring(1) : (fileLocation.startsWith(File.separator)
+                            ? fileLocation : File.separator + fileLocation));
+        }
     }
 
     /**
