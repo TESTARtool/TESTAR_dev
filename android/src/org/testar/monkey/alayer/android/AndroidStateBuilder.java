@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -54,8 +54,29 @@ public class AndroidStateBuilder implements StateBuilder {
 	@Override
 	public State apply(SUT system) throws StateBuildException {
 		try {
+			// If the driver became unresponsive during non-state fetcher calls like actions or logact
+			if (AndroidAppiumFramework.isDriverUnresponsive()) {
+				AndroidAppiumFramework.resetDriverUnresponsive();
+				AndroidRootElement rootElement = AndroidStateFetcher.buildRoot(system);
+				AndroidState androidState = new AndroidState(rootElement);
+				androidState.set(Tags.Role, Roles.Process);
+				androidState.set(Tags.NotResponding, true);
+				return androidState;
+			}
+
 			Future<AndroidState> future = executor.submit(new AndroidStateFetcher(system));
 			AndroidState state = future.get((long) (timeOut), TimeUnit.SECONDS);
+
+			// If the driver became unresponsive during state fetch calls
+			if (AndroidAppiumFramework.isDriverUnresponsive()) {
+				AndroidAppiumFramework.resetDriverUnresponsive();
+				AndroidRootElement rootElement = AndroidStateFetcher.buildRoot(system);
+				AndroidState androidState = new AndroidState(rootElement);
+				androidState.set(Tags.Role, Roles.Process);
+				androidState.set(Tags.NotResponding, true);
+				return androidState;
+			}
+
 			return state;
 		}
 		catch (InterruptedException | ExecutionException e) {
