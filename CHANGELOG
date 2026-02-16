@@ -5,6 +5,10 @@
 - Add gitattributes for LF EOL
 - Refactor android system actions to map only the state
 - Add buggy app APK for demos
+- Update testar main default paths
+- Make output directories creation issues verbose
+- Mark android driver timeout as unresponsive
+- Deduplicate and sort AndroidLogcatOracle messages
 - Add and update tests accordingly
 
 
