@@ -82,7 +82,7 @@ public class TestAndroidLogcatOracle {
             Verdict verdict = androidLogcatOracle.getVerdict(state);
 
             Assert.assertEquals(Verdict.Severity.SUSPICIOUS_LOG.getValue(), verdict.severity(), 0.0);
-            Assert.assertEquals(verdict.info(), "Suspicious Android logcat line(s) detected[1] AndroidRuntime: FATAL EXCEPTION: main");
+            Assert.assertEquals(verdict.info(), "Suspicious Android logcat line(s) detected AndroidRuntime: FATAL EXCEPTION: main");
             mocked.verify(AndroidAppiumFramework::clearLogcat, Mockito.times(2));
         }
     }
@@ -113,7 +113,36 @@ public class TestAndroidLogcatOracle {
 
             Verdict second = androidLogcatOracle.getVerdict(state);
             Assert.assertEquals(Verdict.Severity.SUSPICIOUS_LOG.getValue(), second.severity(), 0.0);
-            Assert.assertEquals(second.info(), "Suspicious Android logcat line(s) detected[1] MyTag: Exception happened");
+            Assert.assertEquals(second.info(), "Suspicious Android logcat line(s) detected MyTag: Exception happened");
+        }
+    }
+
+    @Test
+    public void generateModeVerdict_DeduplicatesAndOrdersMatches() {
+        OutputStructure.logsOutputDir = Path.of("target").toString();
+        OutputStructure.startInnerLoopDateString = "YYYY-MM-DD_hh-mm-ss";
+        OutputStructure.executedSUTname = "test-sut";
+
+        Settings settings = buildSettings(RuntimeControlsProtocol.Modes.Generate, "(?i)(.*exception.*)");
+        AndroidLogcatOracle androidLogcatOracle = new AndroidLogcatOracle(settings);
+        State state = Mockito.mock(State.class);
+
+        String lineA = "02-09 08:59:33.844 17550 17575 E ViewRootImpl: Accessibility content change on non-UI thread. Future Android versions will throw an exception.";
+        String lineB = "02-09 08:59:33.845 17550 17575 E ViewRootImpl: android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thread that created a view hierarchy can touch its views.";
+
+        try (MockedStatic<AndroidAppiumFramework> mocked = Mockito.mockStatic(AndroidAppiumFramework.class)) {
+            mocked.when(AndroidAppiumFramework::getAppPackageFromCapabilitiesOrCurrent).thenReturn("org.testar.app");
+            mocked.when(() -> AndroidAppiumFramework.dumpLogcatThreadtimeForPackage("org.testar.app"))
+                    .thenReturn(lineB + "\n" + lineA + "\n" + lineB);
+
+            androidLogcatOracle.initialize();
+            Verdict verdict = androidLogcatOracle.getVerdict(state);
+
+            Assert.assertEquals(Verdict.Severity.SUSPICIOUS_LOG.getValue(), verdict.severity(), 0.0);
+            String expected = "Suspicious Android logcat line(s) detected "
+                    + "ViewRootImpl: Accessibility content change on non-UI thread. Future Android versions will throw an exception."
+                    + " | ViewRootImpl: android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thread that created a view hierarchy can touch its views.";
+            Assert.assertEquals(expected, verdict.info());
         }
     }
 

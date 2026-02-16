@@ -47,6 +47,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -134,11 +136,10 @@ public class AndroidLogcatOracle implements Oracle {
             return Verdict.OK;
         }
 
+        Set<String> uniqueSorted = new TreeSet<>(matches);
         StringBuilder info = new StringBuilder();
-        info.append("Suspicious Android logcat line(s) detected");
-        for (int i = 0; i < matches.size(); i++) {
-            info.append("[").append(i + 1).append("] ").append(matches.get(i)).append(" ");
-        }
+        info.append("Suspicious Android logcat line(s) detected ");
+        info.append(String.join(" | ", uniqueSorted));
 
         AndroidAppiumFramework.clearLogcat();
         return new Verdict(Verdict.Severity.SUSPICIOUS_LOG, info.toString().trim());
