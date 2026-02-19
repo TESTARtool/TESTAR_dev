@@ -55,6 +55,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static org.testar.monkey.ConfigTags.*;
@@ -62,7 +64,7 @@ import static org.testar.monkey.Util.compileProtocol;
 
 public class Main {
 
-	public static final String TESTAR_VERSION = "v2.7.20 (3-Feb-2026)";
+	public static final String TESTAR_VERSION = "v2.7.21 (17-Feb-2026)";
 
 	//public static final String TESTAR_DIR_PROPERTY = "DIRNAME"; //Use the OS environment to obtain TESTAR directory
 	public static final String SETTINGS_FILE = "test.settings";
@@ -70,10 +72,12 @@ public class Main {
 	public static String SSE_ACTIVATED = null;
 
 	//Default paths
-	public static String testarDir = "." + File.separator;
-	public static String settingsDir = testarDir + "settings" + File.separator;
-	public static String outputDir = testarDir + "output" + File.separator;
-	public static String tempDir = outputDir + "temp" + File.separator;
+	private static final Path BASE_DIR = Paths.get(".").toAbsolutePath().normalize();
+
+	public static String testarDir = BASE_DIR.toString() + java.io.File.separator;
+	public static String settingsDir = BASE_DIR.resolve("settings").toString() + java.io.File.separator;
+	public static String outputDir = BASE_DIR.resolve("output").toString() + java.io.File.separator;
+	public static String tempDir = BASE_DIR.resolve("output").resolve("temp").toString() + java.io.File.separator;
 
 	/**
 	 * This method scans the settings directory of TESTAR for a file that end with extension SUT_SETTINGS_EXT

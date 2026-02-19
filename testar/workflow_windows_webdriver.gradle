@@ -22,7 +22,7 @@ task runTestWebdriverSuspiciousTagStateModel(type: Exec, dependsOn: createDataba
         }
         
         // Check that output contains abstract states in the State Model inference
-        if(output.readLines().any{line->line.contains("abstract states in the model")}) {
+        if(output.readLines().any{line->line.contains("1 abstract states in the model")}) {
             println "\n${output} \nTESTAR State Model has been inferred sucessfully"
         } else {
             throw new GradleException("\n${output} \nERROR: Inferring TESTAR State Model")
@@ -30,22 +30,42 @@ task runTestWebdriverSuspiciousTagStateModel(type: Exec, dependsOn: createDataba
     }
 }
 
-// Connect to para.testar.org, make a login and detect the browser console error message
-task runTestWebdriverParabankLoginAndConsoleError(type: Exec) {
-	// Read command line output
+// Connect to para.testar.org to detect the browser console error message
+task runTestWebdriverParabankConsoleError(type: Exec) {
+    // Read command line output
     standardOutput = new ByteArrayOutputStream()
     group = 'test_testar_workflow'
-    description ='runTestWebdriverParabankLoginAndConsoleError'
+    description ='runTestWebdriverParabankConsoleError'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_parabank AlwaysCompile=true ApplicationName="webdriver_login_console_error" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=1 ProtocolSpecificSetting_1=john ProtocolSpecificSetting_2=demo WebConsoleErrorOracle=true'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_parabank AlwaysCompile=true ApplicationName="webdriver_console_error" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=1 WebConsoleErrorOracle=true'
     doLast {
         String output = standardOutput.toString()
 
-		// Check that output detects the browser console error message
+        // Check that output detects the browser console error message
         if(output.readLines().any{line->line.contains("Failed to load resource: the server responded with a status of 404")}) {
             println "\n${output} \nTESTAR login and browser console error detection has been executed sucessfully"
         } else {
             throw new GradleException("\n${output} \nERROR: Executing TESTAR")
+        }
+    }
+}
+
+// Connect to para.testar.org to test the login welcome message
+task runTestWebdriverParabankLoginWelcome(type: Exec) {
+    // Read command line output
+    standardOutput = new ByteArrayOutputStream()
+    group = 'test_testar_workflow'
+    description ='runTestWebdriverParabankLoginWelcome'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_parabank AlwaysCompile=true ApplicationName="webdriver_login_welcome" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=1 ProtocolSpecificSetting_1=john ProtocolSpecificSetting_2=demo TagsForSuspiciousOracle="WebTextContent" SuspiciousTags=".*[wW]elcome.*" '
+    doLast {
+        String output = standardOutput.toString()
+
+        // Check that output detects the Welcome login message
+        if(output.readLines().any{line->line.contains("Discovered suspicious widget 'WebTextContent' : 'Welcome")}) {
+            println "\n${output} \nTESTAR login and browser welcome login message detection has been executed sucessfully"
+        } else {
+            throw new GradleException("\n${output} \nERROR: Executing TESTAR parabank login")
         }
     }
 }
@@ -151,7 +171,7 @@ task runTestFirefoxWebdriverSuspiciousTagStateModel(type: Exec, dependsOn: creat
         }
         
         // Check that output contains abstract states in the State Model inference
-        if(output.readLines().any{line->line.contains("abstract states in the model")}) {
+        if(output.readLines().any{line->line.contains("1 abstract states in the model")}) {
             println "\n${output} \nTESTAR State Model has been inferred sucessfully"
         } else {
             throw new GradleException("\n${output} \nERROR: Inferring TESTAR State Model")
@@ -180,7 +200,7 @@ task runTestEdgeWebdriverSuspiciousTagStateModel(type: Exec, dependsOn: createDa
         }
         
         // Check that output contains abstract states in the State Model inference
-        if(output.readLines().any{line->line.contains("abstract states in the model")}) {
+        if(output.readLines().any{line->line.contains("1 abstract states in the model")}) {
             println "\n${output} \nTESTAR State Model has been inferred sucessfully"
         } else {
             throw new GradleException("\n${output} \nERROR: Inferring TESTAR State Model")

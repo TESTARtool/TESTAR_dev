@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2024 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2024 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2024 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -48,8 +48,9 @@ public class JacocoCoverage implements CodeCoverage {
 		// Create a file directory to store the jacoco coverage file results
 		outputJacocoCoveragePath = outputCoveragePath + File.separator + "jacoco";
 		File outputJacocoCoverageDir = new File(outputJacocoCoveragePath);
-		if(!outputJacocoCoverageDir.exists())
-			outputJacocoCoverageDir.mkdirs();
+		if(!outputJacocoCoverageDir.exists() && !outputJacocoCoverageDir.mkdirs()) {
+			System.err.println("ERROR: Failed to create JaCoCo output directory: <" + outputJacocoCoverageDir.getAbsolutePath() + ">");
+		}
 
 		// Initialize the MBeanClient that connects to the Jacoco agent port to extract coverage
 		mbeanClient = new MBeanClient(settings.get(ConfigTags.JacocoCoverageIpAddress), settings.get(ConfigTags.JacocoCoveragePort));

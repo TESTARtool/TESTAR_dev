@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -75,6 +75,7 @@ public class AndroidAppiumFramework extends SUTBase {
 	public static AndroidAppiumFramework androidSUT = null;
 
 	private static AndroidDriver driver = null;
+	private static volatile boolean driverUnresponsive = false;
 
 	// Appium v2 do not use /wd/hub suffix anymore
 	// It can be enabled using the "--base-path /wd/hub" command when launching the Appium server
@@ -136,6 +137,26 @@ public class AndroidAppiumFramework extends SUTBase {
 
 	public static AndroidDriver getDriver() {
 		return driver;
+	}
+
+	static void markDriverUnresponsive(Throwable t) {
+		driverUnresponsive = true;
+		if (t != null) {
+			if(t.getMessage() != null) {
+				System.err.println("AndroidAppiumFramework: Android driver is unresponsive: " + t.getClass().getSimpleName() + " - " + t.getMessage());
+			} else {
+				System.err.println("AndroidAppiumFramework: Android driver is unresponsive");
+				t.printStackTrace();
+			}
+		}
+	}
+
+	static boolean isDriverUnresponsive() {
+		return driverUnresponsive;
+	}
+
+	static void resetDriverUnresponsive() {
+		driverUnresponsive = false;
 	}
 
 	public static List<WebElement> findElements(By by){
@@ -333,8 +354,12 @@ public class AndroidAppiumFramework extends SUTBase {
 	}
 
 	public static String getCurrentPackage() {
-		String currentPackage = driver.getCurrentPackage();
-		return currentPackage;
+		try {
+			return driver.getCurrentPackage();
+		} catch (WebDriverException wde) {
+			markDriverUnresponsive(wde);
+			return "";
+		}
 	}
 
 	public static void pressKeyEvent(KeyEvent keyEvent){
@@ -380,7 +405,12 @@ public class AndroidAppiumFramework extends SUTBase {
 	}
 
 	public static String getActivity() {
-		return driver.currentActivity();
+		try {
+			return driver.currentActivity();
+		} catch (WebDriverException wde) {
+			markDriverUnresponsive(wde);
+			return "";
+		}
 	}
 
 	public static String getScreenshotSpyMode(String stateID) throws IOException {
@@ -393,15 +423,27 @@ public class AndroidAppiumFramework extends SUTBase {
 	}
 
 	public static String getScreenshotState(State state) throws IOException {
-		byte[] byteImage = driver.getScreenshotAs(OutputType.BYTES);
-		InputStream is = new ByteArrayInputStream(byteImage);
-		AWTCanvas canvas = AWTCanvas.fromInputStream(is);
-		return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), canvas);
+		try {
+			byte[] byteImage = driver.getScreenshotAs(OutputType.BYTES);
+			InputStream is = new ByteArrayInputStream(byteImage);
+			AWTCanvas canvas = AWTCanvas.fromInputStream(is);
+			return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), canvas);
+		} catch (WebDriverException wde) {
+			markDriverUnresponsive(wde);
+			throw new IOException("Exception: AndroidDriver getScreenshotState failed", wde);
+		}
 	}
 
 	public static String getScreenshotAction(State state, Action action) throws IOException {
-		byte[] byteImage = driver.getScreenshotAs(OutputType.BYTES);
-		InputStream is = new ByteArrayInputStream(byteImage);
+		byte[] byteImage;
+		InputStream is;
+		try {
+			byteImage = driver.getScreenshotAs(OutputType.BYTES);
+			is = new ByteArrayInputStream(byteImage);
+		} catch (WebDriverException wde) {
+			markDriverUnresponsive(wde);
+			throw new IOException("Exception: AndroidDriver getScreenshotAction failed", wde);
+		}
 
 		// Highlight the action on the screenshot:
 		BufferedImage newBi = ImageIO.read(is);
@@ -432,9 +474,14 @@ public class AndroidAppiumFramework extends SUTBase {
 	}
 
 	public static AWTCanvas getScreenshotBinary(State state) throws IOException {
-		byte[] byteImage = driver.getScreenshotAs(OutputType.BYTES);
-		InputStream is = new ByteArrayInputStream(byteImage);
-		return AWTCanvas.fromInputStream(is);
+		try {
+			byte[] byteImage = driver.getScreenshotAs(OutputType.BYTES);
+			InputStream is = new ByteArrayInputStream(byteImage);
+			return AWTCanvas.fromInputStream(is);
+		} catch (WebDriverException wde) {
+			markDriverUnresponsive(wde);
+			throw new IOException("Exception: AndroidDriver getScreenshotBinary failed", wde);
+		}
 	}
 
 	public static void terminateApp(String bundleId){
@@ -486,6 +533,98 @@ public class AndroidAppiumFramework extends SUTBase {
 		return driver.manage().logs().get("driver");
 	}
 
+	/**
+	 * Clear all logcat content. 
+	 */
+	public static void clearLogcat() {
+		try {
+			mobileShell("logcat", List.of("-b", "all", "-c"), Duration.ofSeconds(10));
+		} catch (Exception ignored) {}
+	}
+
+	/**
+	 * Execute an Android shell command on the device via Appium ("mobile: shell"). 
+	 */
+	private static void mobileShell(String command, List<String> args, Duration timeout) {
+		Map<String, Object> m = new HashMap<>();
+		m.put("command", command);
+		m.put("args", args);
+		m.put("timeout", (int) timeout.toMillis());
+		driver.executeScript("mobile: shell", m);
+	}
+
+	/**
+	 * Dump logcat output (main + system + crash buffers). 
+	 */
+	public static String dumpLogcatThreadtimeForPackage(String pkg) {
+		if (pkg == null || pkg.isBlank()) return "";
+
+		// 1) get PID
+		String pid = mobileShellStdout("pidof", List.of("-s", pkg), Duration.ofSeconds(5)).trim();
+		if (pid.isEmpty()) return "";
+
+		// 2) dump logcat for that PID
+		return mobileShellStdout(
+			"logcat",
+			List.of("-d", "-v", "threadtime", "--pid", pid, "-b", "main", "-b", "system", "-b", "crash"),
+			Duration.ofSeconds(10)
+		);
+	}
+
+	/**
+	 * Execute an Android shell command on the device via Appium ("mobile: shell") and return stdout. 
+	 */
+	private static String mobileShellStdout(String command, List<String> args, Duration timeout) {
+		Map<String, Object> m = new HashMap<>();
+		m.put("command", command);
+		m.put("args", args);
+		m.put("timeout", (int) timeout.toMillis());
+
+		Object raw;
+		try {
+			raw = driver.executeScript("mobile: shell", m);
+		} catch (WebDriverException wde) {
+			markDriverUnresponsive(wde);
+			return "";
+		}
+		if (raw == null) return "";
+		if (raw instanceof String) return (String)raw;
+		if (raw instanceof Map<?, ?>) {
+			Object out = ((Map<?, ?>)raw).get("stdout");
+			return out == null ? "" : out.toString();
+		}
+		return raw.toString();
+	}
+
+	public static String getAppPackageFromCapabilitiesOrCurrent() {
+		if (driver == null) {
+			return "";
+		}
+
+		try {
+			Object appPackage = driver.getCapabilities().getCapability("appium:appPackage");
+			if (appPackage == null) {
+				appPackage = driver.getCapabilities().getCapability("appPackage");
+			}
+			if (appPackage != null) {
+				String pkg = appPackage.toString().trim();
+				if (!pkg.isEmpty()) {
+					return pkg;
+				}
+			}
+		} catch (Exception ignored) {
+		}
+
+		try {
+			return driver.getCurrentPackage();
+		} catch (WebDriverException wde) {
+			markDriverUnresponsive(wde);
+			return "";
+		} catch (Exception ignored) {
+			return "";
+		}
+	}
+
 	@Override
 	public void stop() throws SystemStopException {
 		driver.quit();
@@ -500,6 +639,10 @@ public class AndroidAppiumFramework extends SUTBase {
 			//driver.queryAppState(appId), equalTo(ApplicationState.RUNNING_IN_FOREGROUND)
 			driver.getCurrentPackage();
 		}
+		catch (WebDriverException wde) {
+			markDriverUnresponsive(wde);
+			return false;
+		}
 		catch (Exception e) {
 			return false;
 		}
@@ -510,11 +653,21 @@ public class AndroidAppiumFramework extends SUTBase {
 	@Override
 	public String getStatus() {
 		//TODO: Check and select proper method to print the status
-		return "Android current package : " + driver.getCurrentPackage();
+		try {
+			return "Android current package : " + driver.getCurrentPackage();
+		} catch (WebDriverException wde) {
+			markDriverUnresponsive(wde);
+			return "Android current package : <unavailable>";
+		}
 	}
 
 	public static ApplicationState getStatus(String appId) {
-		return driver.queryAppState(appId);
+		try {
+			return driver.queryAppState(appId);
+		} catch (WebDriverException wde) {
+			markDriverUnresponsive(wde);
+			return ApplicationState.NOT_RUNNING;
+		}
 	}
 
 	@Override
