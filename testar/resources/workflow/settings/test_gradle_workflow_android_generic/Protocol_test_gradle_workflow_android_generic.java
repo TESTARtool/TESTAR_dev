@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -50,6 +50,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -139,19 +140,25 @@ public class Protocol_test_gradle_workflow_android_generic extends AndroidProtoc
 
 		// Verify html and txt report files were created
 		Assert.isTrue(reportManager instanceof ReportManager);
-		File htmlReportFile = new File(((ReportManager)reportManager).getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".html"));
-		File txtReportFile = new File(((ReportManager)reportManager).getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".txt"));
-		System.out.println("htmlReportFile: " + htmlReportFile.getPath());
-		System.out.println("txtReportFile: " + txtReportFile.getPath());
-		Assert.isTrue(htmlReportFile.exists());
-		Assert.isTrue(txtReportFile.exists());
+		List<Verdict> verdicts = getFinalVerdicts();
+		Assert.isTrue(verdicts.size() > 0);
+		int index = 1;
+		for (Verdict verdict : verdicts) {
+			String suffixName = String.format("_V%03d_%s", index++, verdict.verdictSeverityTitle());
+			File htmlReportFile = new File(((ReportManager)reportManager).getReportFileName().concat(suffixName + ".html"));
+			File txtReportFile = new File(((ReportManager)reportManager).getReportFileName().concat(suffixName + ".txt"));
+			System.out.println("htmlReportFile: " + htmlReportFile.getPath());
+			System.out.println("txtReportFile: " + txtReportFile.getPath());
+			Assert.isTrue(htmlReportFile.exists());
+			Assert.isTrue(txtReportFile.exists());
 
-		// Verify report information
-		Assert.isTrue(fileContains("<h1>TESTAR execution sequence report for sequence 1</h1>", htmlReportFile));
-		Assert.isTrue(fileContains("TESTAR execution sequence report for sequence 1", txtReportFile));
+			// Verify report information
+			Assert.isTrue(fileContains("<h1>TESTAR execution sequence report for sequence 1</h1>", htmlReportFile));
+			Assert.isTrue(fileContains("TESTAR execution sequence report for sequence 1", txtReportFile));
 
-		Assert.isTrue(fileContains("<h2>Test verdict for this sequence:", htmlReportFile));
-		Assert.isTrue(fileContains("Test verdict for this sequence:", txtReportFile));
+			Assert.isTrue(fileContains("<h2>Test verdict for this sequence:", htmlReportFile));
+			Assert.isTrue(fileContains("Test verdict for this sequence:", txtReportFile));
+		}
 	}
 
 	private boolean folderIsEmpty(Path path) {

@@ -79,7 +79,9 @@ public class TestAndroidLogcatOracle {
                     );
 
             androidLogcatOracle.initialize();
-            Verdict verdict = androidLogcatOracle.getVerdict(state);
+            List<Verdict> verdicts = androidLogcatOracle.getVerdicts(state);
+            Assert.assertEquals(1, verdicts.size());
+            Verdict verdict = verdicts.get(0);
 
             Assert.assertEquals(Verdict.Severity.SUSPICIOUS_LOG.getValue(), verdict.severity(), 0.0);
             Assert.assertEquals(verdict.info(), "Suspicious Android logcat line(s) detected AndroidRuntime: FATAL EXCEPTION: main");
@@ -108,12 +110,16 @@ public class TestAndroidLogcatOracle {
 
             androidLogcatOracle.initialize();
 
-            Verdict first = androidLogcatOracle.getVerdict(state);
-            Assert.assertEquals(Verdict.Severity.OK.getValue(), first.severity(), 0.0);
+            List<Verdict> firstInvokationVerdicts = androidLogcatOracle.getVerdicts(state);
+            Assert.assertEquals(1, firstInvokationVerdicts.size());
+            Verdict firstVerdict = firstInvokationVerdicts.get(0);
+            Assert.assertEquals(Verdict.Severity.OK.getValue(), firstVerdict.severity(), 0.0);
 
-            Verdict second = androidLogcatOracle.getVerdict(state);
-            Assert.assertEquals(Verdict.Severity.SUSPICIOUS_LOG.getValue(), second.severity(), 0.0);
-            Assert.assertEquals(second.info(), "Suspicious Android logcat line(s) detected MyTag: Exception happened");
+            List<Verdict> secondInvokationVerdicts = androidLogcatOracle.getVerdicts(state);
+            Assert.assertEquals(1, secondInvokationVerdicts.size());
+            Verdict secondVerdict = secondInvokationVerdicts.get(0);
+            Assert.assertEquals(Verdict.Severity.SUSPICIOUS_LOG.getValue(), secondVerdict.severity(), 0.0);
+            Assert.assertEquals(secondVerdict.info(), "Suspicious Android logcat line(s) detected MyTag: Exception happened");
         }
     }
 
@@ -136,7 +142,9 @@ public class TestAndroidLogcatOracle {
                     .thenReturn(lineB + "\n" + lineA + "\n" + lineB);
 
             androidLogcatOracle.initialize();
-            Verdict verdict = androidLogcatOracle.getVerdict(state);
+            List<Verdict> verdicts = androidLogcatOracle.getVerdicts(state);
+            Assert.assertEquals(1, verdicts.size());
+            Verdict verdict = verdicts.get(0);
 
             Assert.assertEquals(Verdict.Severity.SUSPICIOUS_LOG.getValue(), verdict.severity(), 0.0);
             String expected = "Suspicious Android logcat line(s) detected "

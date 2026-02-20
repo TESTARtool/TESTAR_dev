@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2023 Open Universiteit - www.ou.nl
- * Copyright (c) 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2023 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2023 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -41,6 +41,8 @@ import org.testar.settings.Settings;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 public class ReportManager implements Reporting
@@ -94,7 +96,8 @@ public class ReportManager implements Reporting
         {
             if(firstStateAdded)
             {
-                if(firstActionsAdded || (state.get(Tags.OracleVerdict, Verdict.OK).severity() > Verdict.Severity.OK.getValue()))
+                List<Verdict> verdicts = state.get(Tags.OracleVerdicts, Collections.singletonList(Verdict.OK));
+                if(firstActionsAdded || !Verdict.helperAreAllVerdictsOK(verdicts))
                 { //if the first state contains a failure, write the same state in case it was a login
                     for(Reporting reporter : reporters)
                         reporter.addState(state);
@@ -137,11 +140,11 @@ public class ReportManager implements Reporting
             for(Reporting reporter : reporters)
                 reporter.addSelectedAction(state, action);
     }
-    
-    public void addTestVerdict(Verdict verdict)
+
+    public void addTestVerdicts(List<Verdict> verdicts)
     {
         if(reportingEnabled)
             for(Reporting reporter : reporters)
-                reporter.addTestVerdict(verdict);
+                reporter.addTestVerdicts(verdicts);
     }
 }

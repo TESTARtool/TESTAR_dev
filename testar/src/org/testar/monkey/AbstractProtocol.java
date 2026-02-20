@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -40,6 +40,7 @@ import org.testar.monkey.alayer.exceptions.SystemStartException;
 
 import org.testar.settings.Settings;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -53,7 +54,7 @@ import java.util.Set;
  * 		BeginSequence (starting "script" on the GUI of the SUT, for example login)
  * 		INNER LOOP
  * 			GetState
- * 			GetVerdict
+ * 			GetVerdicts
  * 			StopCriteria (moreActions/moreSequences/time?)
  * 			DeriveActions
  * 			SelectAction
@@ -127,12 +128,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>	{
 	protected abstract State getState(SUT system) throws StateBuildException;
 
 	/**
-	 * The getVerdict methods implements the online state oracles that
-	 * examine the SUT's current state and returns an oracle verdict.
+	 * The getVerdicts methods implements the online state oracles that
+	 * examine the SUT's current state and returns oracle verdicts.
 	 *
-	 * @return oracle verdict, which determines whether the state is erroneous and why.
+	 * @return list of oracle verdicts, which determine whether the state is erroneous and why.
 	 */
-	protected abstract Verdict getVerdict(State state);
+	protected abstract List<Verdict> getVerdicts(State state);
 
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.

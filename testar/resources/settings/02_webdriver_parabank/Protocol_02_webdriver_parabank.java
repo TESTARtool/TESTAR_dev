@@ -59,9 +59,6 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 
-	// This list tracks the detected erroneous verdicts to avoid duplicates
-	private List<String> listOfDetectedErroneousVerdicts = new ArrayList<>();
-
 	private List<Oracle> extendedOraclesList = new ArrayList<>();
 
 	/**
@@ -73,9 +70,6 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 	@Override
 	protected void initialize(Settings settings) {
 		super.initialize(settings);
-
-		// Reset the list when we start a new TESTAR run with multiple sequences
-		listOfDetectedErroneousVerdicts = new ArrayList<>();
 	}
 
 	/**
@@ -172,36 +166,15 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 	 * @return oracle verdict, which determines whether the state is erroneous and why.
 	 */
 	@Override
-	protected Verdict getVerdict(State state) {
-
+	protected List<Verdict> getVerdicts(State state) {
 		// System crashes, non-responsiveness and suspicious tags automatically detected!
 		// For web applications, web browser errors and warnings can also be enabled via settings
-		Verdict verdict = super.getVerdict(state);
-
-		// If the Verdict is not OK but was already detected in a previous sequence
-		// Consider as OK to avoid duplicates and continue testing
-		if (verdict != Verdict.OK && containsVerdictInfo(listOfDetectedErroneousVerdicts, verdict.info())) {
-			// Consider as OK to continue testing
-			verdict = Verdict.OK;
-			webConsoleVerdict = Verdict.OK;
-		} 
-		// If the Verdict is not OK and was not duplicated...
-		// We found an issue we need to report
-		else if (verdict.severity() != Verdict.OK.severity()) {
-			return verdict;
-		}
+		List<Verdict> verdicts = super.getVerdicts(state);
 
 		// "ExtendedOracles" offered by TESTAR in the test.settings or Oracles GUI dialog
 		for (Oracle extendedOracle : extendedOraclesList) {
-			Verdict extendedVerdict = extendedOracle.getVerdict(state);
-
-			// If the Custom Verdict is not OK and was not detected in a previous sequence
-			// return verdict with failure state
-			if (extendedVerdict != Verdict.OK 
-					&& !containsVerdictInfo(listOfDetectedErroneousVerdicts, extendedVerdict.info())) {
-				return extendedVerdict;
-			}
-
+			List<Verdict> extendedVerdicts = extendedOracle.getVerdicts(state);
+			verdicts.addAll(extendedVerdicts);
 		}
 
 		//-----------------------------------------------------------------------------
@@ -210,24 +183,14 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 
 		// ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
 
-		Verdict leafWidgetsOverlappingVerdict = leafWidgetsOverlapping(state);
+		List<Verdict> overlapVerdicts = leafWidgetsOverlapping(state);
+		verdicts.addAll(overlapVerdicts);
 
-		// If the Custom Verdict is not OK but was already detected in a previous sequence
-		// Consider as OK to avoid duplicates
-		if (leafWidgetsOverlappingVerdict != Verdict.OK 
-				&& !containsVerdictInfo(listOfDetectedErroneousVerdicts, leafWidgetsOverlappingVerdict.info())) {
-			return leafWidgetsOverlappingVerdict;
-		}
-
-		return Verdict.OK;
+		return verdicts;
 	}
 
-	private boolean containsVerdictInfo(List<String> listOfDetectedErroneousVerdicts, String currentVerdictInfo) {
-		return listOfDetectedErroneousVerdicts.stream().anyMatch(verdictInfo -> verdictInfo.contains(currentVerdictInfo.replace("\n", " ")));
-	}
-
-	public Verdict leafWidgetsOverlapping(State state) {
-		Verdict finalVerdict = Verdict.OK;
+	public List<Verdict> leafWidgetsOverlapping(State state) {
+		List<Verdict> verdicts = new ArrayList<>();
 
 		// Prepare a list that contains all the Rectangles from the leaf widgets
 		List<Pair<Widget, Rect>> leafWidgetsRects = new ArrayList<>();
@@ -265,12 +228,12 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 						Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, 
 						verdictMsg, 
 						visualizer);
-					finalVerdict = finalVerdict.join(clashVerdict);
+					verdicts.add(clashVerdict);
 				}
 			}
 		}
 
-		return finalVerdict;
+		return verdicts;
 	}
 
 	private Pen getRedPen() {
@@ -550,12 +513,6 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 	@Override
 	protected void finishSequence() {
 		super.finishSequence();
-		// If the final Verdict is not OK and the verdict is not saved in the list
-		// This is a new run fail verdict
-		Verdict finalVerdict = getVerdict(latestState);
-		if(finalVerdict.severity() > Verdict.Severity.OK.getValue() && !listOfDetectedErroneousVerdicts.contains(finalVerdict.info().replace("\n", " "))) {
-			listOfDetectedErroneousVerdicts.add(finalVerdict.info().replace("\n", " "));
-		}
 	}
 
 	/**

@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2021 - 2023 Open Universiteit - www.ou.nl
- * Copyright (c) 2021 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2021 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2021 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -59,9 +59,9 @@ import java.util.zip.GZIPInputStream;
 public class Protocol_test_gradle_workflow_webdriver_form_filling extends WebdriverProtocol {
 
 	@Override
-	protected Verdict getVerdict(State state) {
+	protected List<Verdict> getVerdicts(State state) {
 		// For custom CI testing purposes, force these generated sequences be OK
-		return Verdict.OK;
+		return Collections.singletonList(Verdict.OK);
 	}
 
 	@Override

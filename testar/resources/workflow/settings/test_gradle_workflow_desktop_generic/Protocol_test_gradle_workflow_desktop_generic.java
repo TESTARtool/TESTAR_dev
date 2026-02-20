@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -121,7 +122,7 @@ public class Protocol_test_gradle_workflow_desktop_generic extends DesktopProtoc
 		super.postSequenceProcessing();
 
 		// If OnlySaveFaultySequences is enabled and the sequence verdict is OK, sequence_ok must not exist
-		if(settings().get(ConfigTags.OnlySaveFaultySequences) && (getFinalVerdict()).severity() == Verdict.OK.severity()) {
+		if(settings().get(ConfigTags.OnlySaveFaultySequences) && Verdict.helperAreAllVerdictsOK(getFinalVerdicts())) {
 			String sequencesOkFolderName = OutputStructure.outerLoopOutputDir + File.separator + "sequences_ok";
 			File sequencesOkFolder = null;
 			try {
@@ -159,19 +160,25 @@ public class Protocol_test_gradle_workflow_desktop_generic extends DesktopProtoc
 
 		// Verify html and txt report files were created
 		Assert.isTrue(reportManager instanceof ReportManager);
-		File htmlReportFile = new File(((ReportManager)reportManager).getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".html"));
-		File txtReportFile = new File(((ReportManager)reportManager).getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".txt"));
-		System.out.println("htmlReportFile: " + htmlReportFile.getPath());
-		System.out.println("txtReportFile: " + txtReportFile.getPath());
-		Assert.isTrue(htmlReportFile.exists());
-		Assert.isTrue(txtReportFile.exists());
+		List<Verdict> verdicts = getFinalVerdicts();
+		Assert.isTrue(verdicts.size() > 0);
+		int index = 1;
+		for (Verdict verdict : verdicts) {
+			String suffixName = String.format("_V%03d_%s", index++, verdict.verdictSeverityTitle());
+			File htmlReportFile = new File(((ReportManager)reportManager).getReportFileName().concat(suffixName + ".html"));
+			File txtReportFile = new File(((ReportManager)reportManager).getReportFileName().concat(suffixName + ".txt"));
+			System.out.println("htmlReportFile: " + htmlReportFile.getPath());
+			System.out.println("txtReportFile: " + txtReportFile.getPath());
+			Assert.isTrue(htmlReportFile.exists());
+			Assert.isTrue(txtReportFile.exists());
 
-		// Verify report information
-		Assert.isTrue(fileContains("<h1>TESTAR execution sequence report for sequence 1</h1>", htmlReportFile));
-		Assert.isTrue(fileContains("TESTAR execution sequence report for sequence 1", txtReportFile));
+			// Verify report information
+			Assert.isTrue(fileContains("<h1>TESTAR execution sequence report for sequence 1</h1>", htmlReportFile));
+			Assert.isTrue(fileContains("TESTAR execution sequence report for sequence 1", txtReportFile));
 
-		Assert.isTrue(fileContains("<h2>Test verdict for this sequence:", htmlReportFile));
-		Assert.isTrue(fileContains("Test verdict for this sequence:", txtReportFile));
+			Assert.isTrue(fileContains("<h2>Test verdict for this sequence:", htmlReportFile));
+			Assert.isTrue(fileContains("Test verdict for this sequence:", txtReportFile));
+		}
 	}
 
 	private boolean fileContains(String searchText, File file) {

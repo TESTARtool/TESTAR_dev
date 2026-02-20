@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2026 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -27,10 +27,6 @@
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
-
-/**
- *  @author Sebastian Bauersfeld
- */
 
 package org.testar.monkey.alayer;
 
@@ -161,9 +157,9 @@ public final class Tags extends TagsBase {
 	/** Usually attached to an object of {@link State}. The value is a screenshot of the state. */
 	public static final Tag<String> ScreenshotPath = from("ScreenshotPath", String.class);
 
-	/** Usually attached to a {@link State} object. The value is an outcome of a test oracle for that state. It is
-	 * used to mark states as 'suspicious' or 'erroneous' */
-	public static final Tag<Verdict> OracleVerdict = from("OracleVerdict", Verdict.class);
+	/** Usually attached to a {@link State} object. The value is a list of outcomes of test oracles for that state. */
+	@SuppressWarnings("unchecked")
+	public static final Tag<List<Verdict>> OracleVerdicts = from("OracleVerdicts", (Class<List<Verdict>>)(Class<?>)List.class);
 
 	/** The standard mouse object. Usually attached to systems */
 	public static final Tag<Mouse> StandardMouse = from("StandardMouse", Mouse.class);

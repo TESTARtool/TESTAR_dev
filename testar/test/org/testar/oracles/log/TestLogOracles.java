@@ -69,7 +69,9 @@ public class TestLogOracles {
 		logOracle.initialize();
 
 		State state = Mockito.mock(State.class);
-		Verdict logVerdict = logOracle.getVerdict(state);
+		List<Verdict> verdicts = logOracle.getVerdicts(state);
+		Assert.assertEquals(1, verdicts.size());
+		Verdict logVerdict = verdicts.get(0);
 
 		// Verify that the logVerdict is OK
 		Assert.assertTrue(logVerdict.severity() == Verdict.Severity.OK.getValue());
@@ -98,7 +100,9 @@ public class TestLogOracles {
 		logOracle.initialize();
 
 		State state = Mockito.mock(State.class);
-		Verdict logVerdict = logOracle.getVerdict(state);
+		List<Verdict> verdicts = logOracle.getVerdicts(state);
+		Assert.assertEquals(1, verdicts.size());
+		Verdict logVerdict = verdicts.get(0);
 		System.out.println("initialSuspiciousLogOracleErrorMessage logVerdict: " + logVerdict.info());
 
 		// Verify that the logVerdict is OK
@@ -128,7 +132,9 @@ public class TestLogOracles {
 		Assert.assertTrue(fileContent().contains(validMessage));
 
 		State state = Mockito.mock(State.class);
-		Verdict logVerdict = logOracle.getVerdict(state);
+		List<Verdict> verdicts = logOracle.getVerdicts(state);
+		Assert.assertEquals(1, verdicts.size());
+		Verdict logVerdict = verdicts.get(0);
 		System.out.println("runtimeValidLogOracleFile logVerdict: " + logVerdict.info());
 
 		// Verify that the logVerdict is OK
@@ -158,7 +164,9 @@ public class TestLogOracles {
 		Assert.assertTrue(fileContent().contains(suspiciousMessage));
 
 		State state = Mockito.mock(State.class);
-		Verdict logVerdict = logOracle.getVerdict(state);
+		List<Verdict> verdicts = logOracle.getVerdicts(state);
+		Assert.assertEquals(1, verdicts.size());
+		Verdict logVerdict = verdicts.get(0);
 		System.out.println("runtimeSuspiciousLogOracleErrorMessage logVerdict: " + logVerdict.info());
 
 		// Verify that the logVerdict detected the suspiciousMessage

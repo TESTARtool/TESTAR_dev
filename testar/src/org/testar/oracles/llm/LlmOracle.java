@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2024 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2024 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2024 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2024 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -40,6 +40,8 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -127,11 +129,11 @@ public class LlmOracle implements Oracle {
 	}
 
 	@Override
-	public Verdict getVerdict(State state) {
+	public List<Verdict> getVerdicts(State state) {
 		// If the stateless option is enabled, initialize a new prompt to reduce tokens usage
 		if(this.stateless) initialize();
 
-		return getVerdictWithLlm(state);
+		return Collections.singletonList(getVerdictWithLlm(state));
 	}
 
 	private Verdict getVerdictWithLlm(State state) {

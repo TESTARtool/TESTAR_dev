@@ -42,6 +42,7 @@ import org.testar.serialisation.LogSerialiser;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 
@@ -97,16 +98,16 @@ public class GenerateMode {
 				// Initial getState() called before beginSequence:
 				LogSerialiser.log("Obtaining system initial state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
 				State initialState = protocol.getState(system);
-				protocol.finalVerdict = initialState.get(Tags.OracleVerdict, Verdict.OK);
+				protocol.finalVerdicts = initialState.get(Tags.OracleVerdicts, Collections.singletonList(Verdict.OK));
 
 				// If the SUT does not contain initial failures, start the inner loop test sequence
-				if(protocol.finalVerdict.severity() == Verdict.OK.severity()) {
+				if(Verdict.helperAreAllVerdictsOK(protocol.finalVerdicts)) {
 					// beginSequence() - a script to interact with GUI, for example login screen
 					LogSerialiser.log("Invoking begin sequence in the initial state...\n", LogSerialiser.LogLevel.Debug);
 					protocol.beginSequence(system, initialState);
 
 					// starting the INNER LOOP with the updated state after SUT modification
-					protocol.finalVerdict = runGenerateInnerLoop(protocol, system, protocol.getState(system));
+					protocol.finalVerdicts = runGenerateInnerLoop(protocol, system, protocol.getState(system));
 				} else {
 					// If failure exists in the initial state
 					// Save initial state information in the state model before finishing
@@ -151,7 +152,7 @@ public class GenerateMode {
 	 *
 	 * @param system
 	 */
-	private Verdict runGenerateInnerLoop(DefaultProtocol protocol, SUT system, State state) {
+	private List<Verdict> runGenerateInnerLoop(DefaultProtocol protocol, SUT system, State state) {
 
 		// Deriving actions from the state after begin sequence:
 		Set<Action> actions = protocol.deriveActions(system, state);
@@ -212,7 +213,7 @@ public class GenerateMode {
 			protocol.stateModelManager.notifyNewStateReached(state, actions);
 		}
 
-		return state.get(Tags.OracleVerdict, Verdict.OK);
+		return state.get(Tags.OracleVerdicts, Collections.singletonList(Verdict.OK));
 	}
 
 	private void finishGeneratedSequence(DefaultProtocol protocol, SUT system) {
@@ -224,11 +225,11 @@ public class GenerateMode {
 
 		protocol.writeAndCloseFragmentForReplayableSequence();
 
-		if (protocol.finalVerdict.severity() != Verdict.OK.severity())
+		if (!Verdict.helperAreAllVerdictsOK(protocol.finalVerdicts))
 			LogSerialiser.log("Sequence contained faults!\n", LogSerialiser.LogLevel.Critical);
 
 		// Copy sequence file into proper directory:
-		protocol.classifyAndCopySequenceIntoAppropriateDirectory(protocol.getFinalVerdict());
+		protocol.classifyAndCopySequenceIntoAppropriateDirectory(protocol.getFinalVerdicts());
 
 		// Calling postSequenceProcessing() to allow resetting test environment after test sequence, etc
 		protocol.postSequenceProcessing();
