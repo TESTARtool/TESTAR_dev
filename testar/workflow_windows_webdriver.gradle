@@ -142,7 +142,7 @@ task runTestWebdriverUnreplayable(type: Exec) {
         String output = standardOutput.toString()
 
         // Check that TESTAR detects not replayable button
-        if(output.readLines().any{line->line.contains("Left Click at 'ParisOne' of the replayed sequence can not been replayed")}) {
+        if(output.readLines().any{line->line.contains("unreplayable_sequence_1.testar The Action Left Click at 'ParisOne' of the replayed sequence can not been replayed")}) {
             println "\n${output} \nTESTAR has sucessfully detected a not replayable sequence"
         } else {
             throw new GradleException("\n${output} \nERROR: Detecting not replayable button with TESTAR Replay mode")

@@ -122,7 +122,7 @@ public class Protocol_test_gradle_workflow_desktop_generic extends DesktopProtoc
 		super.postSequenceProcessing();
 
 		// If OnlySaveFaultySequences is enabled and the sequence verdict is OK, sequence_ok must not exist
-		if(settings().get(ConfigTags.OnlySaveFaultySequences) && Verdict.helperAreAllVerdictsOK(getFinalVerdicts())) {
+		if(settings().get(ConfigTags.OnlySaveFaultySequences) && Verdict.helperAreAllVerdictsOK(getSequenceVerdicts())) {
 			String sequencesOkFolderName = OutputStructure.outerLoopOutputDir + File.separator + "sequences_ok";
 			File sequencesOkFolder = null;
 			try {
@@ -136,8 +136,13 @@ public class Protocol_test_gradle_workflow_desktop_generic extends DesktopProtoc
 		// Or if OnlySaveFaultySequences disabled,
 		// sequence must have generated a .testar file
 		else {
-			Assert.isTrue(getGeneratedSequenceName().endsWith(".testar"));
-			Assert.isTrue(new File(getGeneratedSequenceName()).exists());
+			Assert.isTrue(getSequenceVerdicts().size() > 0);
+			for (Verdict verdict : getSequenceVerdicts()) {
+				String sequencesFolderName = OutputStructure.outerLoopOutputDir + File.separator + "sequences_" + verdict.verdictSeverityTitle().toLowerCase();
+				File sequencesFolder = new File(sequencesFolderName);
+				File[] matchingFiles = sequencesFolder.listFiles((dir, name) -> name.contains("sequence_1") && name.endsWith(".testar"));
+				Assert.isTrue(matchingFiles != null && matchingFiles.length > 0);
+			}
 		}
 
 		// Verify the JsonUtils created a JSON State file
@@ -160,10 +165,9 @@ public class Protocol_test_gradle_workflow_desktop_generic extends DesktopProtoc
 
 		// Verify html and txt report files were created
 		Assert.isTrue(reportManager instanceof ReportManager);
-		List<Verdict> verdicts = getFinalVerdicts();
-		Assert.isTrue(verdicts.size() > 0);
+		Assert.isTrue(getSequenceVerdicts().size() > 0);
 		int index = 1;
-		for (Verdict verdict : verdicts) {
+		for (Verdict verdict : getSequenceVerdicts()) {
 			String suffixName = String.format("_V%03d_%s", index++, verdict.verdictSeverityTitle());
 			File htmlReportFile = new File(((ReportManager)reportManager).getReportFileName().concat(suffixName + ".html"));
 			File txtReportFile = new File(((ReportManager)reportManager).getReportFileName().concat(suffixName + ".txt"));

@@ -85,7 +85,6 @@ import java.util.WeakHashMap;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -102,7 +101,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected boolean processListenerOracleEnabled;
 	protected Oracle processListenerOracle;
 
-	private List<Verdict> lastStateVerdicts = Collections.emptyList();
 	private VerdictProcessing verdictProcessing;
 
 	private State stateForClickFilterLayerProtocol;
@@ -117,9 +115,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	String generatedSequence;
-	public String getGeneratedSequenceName() {
-		return generatedSequence;
-	}
 
 	private File currentSeq;
 
@@ -135,15 +130,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		this.replayVerdicts = replayVerdicts;
 	}
 
-	List<Verdict> finalVerdicts = Collections.singletonList(Verdict.OK);
+	private List<Verdict> sequenceVerdicts = Collections.singletonList(Verdict.OK);
 
-	public List<Verdict> getFinalVerdicts() {
-		if (lastStateVerdicts == null || lastStateVerdicts.isEmpty()) {
-			return finalVerdicts == null || finalVerdicts.isEmpty()
-					? Collections.singletonList(Verdict.OK)
-					: finalVerdicts;
-		}
-		return lastStateVerdicts;
+	public List<Verdict> getSequenceVerdicts() {
+		return sequenceVerdicts;
+	}
+
+	protected void updateSequenceVerdicts(List<Verdict> stateVerdicts) {
+		sequenceVerdicts = verdictProcessing.filterDuplicates(stateVerdicts);
 	}
 
 	protected String lastPrintParentsOf = "null-id";
@@ -347,8 +341,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			FileInputStream     fis = new FileInputStream(seqFile);
 			BufferedInputStream bis = new BufferedInputStream(fis);
-			GZIPInputStream   gis = new GZIPInputStream(bis);
-			ObjectInputStream ois = new ObjectInputStream(gis);
+			ObjectInputStream ois = new ObjectInputStream(bis);
 
 			ois.readObject();
 			ois.close();
@@ -632,7 +625,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	    fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
 	    fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
 	    fragment.set(SystemState, state);
-	    fragment.set(OracleVerdicts, getFinalVerdicts());
+	    fragment.set(OracleVerdicts, getSequenceVerdicts());
 
 	    //Find the target widget of the current action, and save the title into the fragment
 	    if (state != null && action.get(Tags.OriginWidget, null) != null){
@@ -728,8 +721,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	@Override
 	protected void beginSequence(SUT system, State state){
-		// Reset the final verdict for the new sequence
-		finalVerdicts = Collections.singletonList(Verdict.OK);
+		// Reset the sequence verdict for the new sequence
+		sequenceVerdicts = Collections.singletonList(Verdict.OK);
 	}
 
 	@Override
@@ -800,15 +793,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			return state;
 
 		List<Verdict> verdicts = getVerdicts(state);
-		lastStateVerdicts = verdictProcessing.filterDuplicates(verdicts);
-		state.set(Tags.OracleVerdicts, lastStateVerdicts);
+		updateSequenceVerdicts(verdictProcessing.filterDuplicates(verdicts));
+		state.set(Tags.OracleVerdicts, sequenceVerdicts);
 
 		// State screenshot is taken after the Verdicts are computed
 		// This might be relevant to determine the viewPort of the screenshot depending on the Verdict (e.g., ProtocolUtil)
 		setStateScreenshot(state);
 
 		if (mode() != Modes.Spy) {
-			for (Verdict verdict : lastStateVerdicts) {
+			for (Verdict verdict : sequenceVerdicts) {
 				// this was added to kill the SUT if it is frozen:
 				if (verdict.severity() == Verdict.Severity.NOT_RESPONDING.getValue()) {
 					//if the SUT is frozen, we should kill it!
@@ -1199,9 +1192,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected void postSequenceProcessing() {
 		String statusInfo = "";
 
-		List<Verdict> verdicts = (lastStateVerdicts == null || lastStateVerdicts.isEmpty())
-				? (mode() == Modes.Replay ? getReplayVerdicts() : getFinalVerdicts())
-				: lastStateVerdicts;
+		List<Verdict> verdicts = (mode() == Modes.Replay)
+				? getReplayVerdicts()
+				: getSequenceVerdicts();
 
 		reportManager.addTestVerdicts(verdicts);
 		statusInfo = buildStatusInfo(verdicts);

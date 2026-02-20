@@ -170,10 +170,9 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
 
     	// Verify html and txt report files were created
     	Assert.isTrue(reportManager instanceof ReportManager);
-    	List<Verdict> verdicts = getFinalVerdicts();
-        Assert.isTrue(verdicts.size() > 0);
+        Assert.isTrue(getSequenceVerdicts().size() > 0);
     	int index = 1;
-    	for (Verdict verdict : verdicts) {
+    	for (Verdict verdict : getSequenceVerdicts()) {
     		String suffixName = String.format("_V%03d_%s", index++, verdict.verdictSeverityTitle());
     		File htmlReportFile = new File(((ReportManager)reportManager).getReportFileName().concat(suffixName + ".html"));
     		File txtReportFile = new File(((ReportManager)reportManager).getReportFileName().concat(suffixName + ".txt"));

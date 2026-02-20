@@ -41,7 +41,6 @@ import java.io.ObjectInputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.zip.GZIPInputStream;
 
 import org.testar.OutputStructure;
 import org.testar.SutVisualization;
@@ -66,10 +65,10 @@ public class ReplayMode {
 	 * Read the replayable file, repeat saved actions and generate new sequences, oracles and logs
 	 */
 	public void runReplayLoop(DefaultProtocol protocol) {
+		VerdictProcessing verdictProcessing = new VerdictProcessing(protocol.settings());
 
 		FileInputStream fis = null;
 		BufferedInputStream bis = null;
-		GZIPInputStream gis = null;
 		ObjectInputStream ois = null;
 
 		protocol.actionCount = 1;
@@ -93,8 +92,7 @@ public class ReplayMode {
 
 			fis = new FileInputStream(seqFile);
 			bis = new BufferedInputStream(fis);
-			gis = new GZIPInputStream(bis);
-			ois = new ObjectInputStream(gis);
+			ois = new ObjectInputStream(bis);
 
 			/**
 			 * Initialize the fragment to create a new sequence and logs
@@ -107,7 +105,7 @@ public class ReplayMode {
 			protocol.cv = protocol.buildCanvas();
 			State state = protocol.getState(system);
 
-			protocol.setReplayVerdicts(protocol.getVerdicts(state));
+			protocol.setReplayVerdicts(verdictProcessing.filterDuplicates(protocol.getVerdicts(state)));
 
 			// notify the statemodelmanager
 			protocol.stateModelManager.notifyTestSequencedStarted();
@@ -250,7 +248,7 @@ public class ReplayMode {
 
 									state = protocol.getState(system);
 
-									protocol.setReplayVerdicts(protocol.getVerdicts(state));
+									protocol.setReplayVerdicts(verdictProcessing.filterDuplicates(protocol.getVerdicts(state)));
 				}
 			}
 
@@ -270,9 +268,6 @@ public class ReplayMode {
 			if (ois != null){
 				try { ois.close(); } catch (IOException e) { e.printStackTrace(); }
 			}
-			if (gis != null){
-				try { gis.close(); } catch (IOException e) { e.printStackTrace(); }
-			}
 			if (bis != null){
 				try { bis.close(); } catch (IOException e) { e.printStackTrace(); }
 			}
@@ -285,7 +280,8 @@ public class ReplayMode {
 				system.stop();
 		}
 
-		List<Verdict> replayVerdicts = protocol.getReplayVerdicts();
+		List<Verdict> replayVerdicts = verdictProcessing.filterDuplicates(protocol.getReplayVerdicts());
+		protocol.setReplayVerdicts(replayVerdicts);
 		if(!Verdict.helperAreAllVerdictsOK(replayVerdicts)) {
 			String msg = "Replayed Sequence contains Errors: " + buildVerdictsInfo(replayVerdicts);
 			System.out.println(msg);
@@ -317,7 +313,7 @@ public class ReplayMode {
 		protocol.writeAndCloseFragmentForReplayableSequence();
 
 		//Copy sequence file into proper directory:
-		protocol.classifyAndCopySequenceIntoAppropriateDirectory(protocol.getReplayVerdicts());
+		protocol.classifyAndCopySequenceIntoAppropriateDirectory(replayVerdicts);
 
 		LogSerialiser.finish();
 
