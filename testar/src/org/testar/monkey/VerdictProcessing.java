@@ -77,29 +77,29 @@ public class VerdictProcessing {
 		if (verdicts == null || verdicts.isEmpty()) {
 			return Collections.singletonList(Verdict.OK);
 		}
+
 		List<Verdict> filtered = new ArrayList<>();
+
 		for (Verdict verdict : verdicts) {
-			boolean shouldIgnore = ignoreDuplicatedVerdicts
-					&& !verdict.isCritical()
-					&& verdict.severity() > Verdict.Severity.OK.getValue()
-					&& isDuplicateVerdictInfo(verdict.info());
-			if (!shouldIgnore) {
-				filtered.add(verdict);
+			if (verdict == null) {
+				continue;
 			}
+
+			if (shouldIgnorePersistedDuplicate(verdict)) {
+				continue;
+			}
+
+			filtered.add(verdict);
 		}
+
 		if (filtered.isEmpty()) {
 			return Collections.singletonList(Verdict.OK);
 		}
-		boolean allVerdictsOk = true;
-		for (Verdict verdict : filtered) {
-			if (verdict.severity() > Verdict.Severity.OK.getValue()) {
-				allVerdictsOk = false;
-				break;
-			}
-		}
-		if (allVerdictsOk) {
+
+		if (areAllVerdictsOk(filtered)) {
 			return Collections.singletonList(Verdict.OK);
 		}
+
 		return clearOkIfFailurePresent(filtered);
 	}
 
@@ -164,6 +164,22 @@ public class VerdictProcessing {
 
 	private String normalizeVerdictInfo(String verdictInfo) {
 		return verdictInfo == null ? "" : verdictInfo.replace("\n", " ").trim();
+	}
+
+	private boolean shouldIgnorePersistedDuplicate(Verdict verdict) {
+		return ignoreDuplicatedVerdicts
+				&& !verdict.isCritical()
+				&& verdict.severity() > Verdict.Severity.OK.getValue()
+				&& isDuplicateVerdictInfo(verdict.info());
+	}
+
+	private boolean areAllVerdictsOk(List<Verdict> verdicts) {
+		for (Verdict verdict : verdicts) {
+			if (verdict.severity() > Verdict.Severity.OK.getValue()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private List<Verdict> clearOkIfFailurePresent(List<Verdict> verdicts) {
