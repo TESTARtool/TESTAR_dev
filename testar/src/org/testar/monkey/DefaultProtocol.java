@@ -265,9 +265,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				new ReplayMode().runReplayLoop(this);
 			} else if (mode() == Modes.Spy) {
 				new SpyMode().runSpyLoop(this);
-			} else if(mode() == Modes.Record) {
-				//new RecordMode().runRecordLoop(this);
-				System.out.println("Dear User, TESTAR Record mode is disabled temporarily.");
 			} else if (mode() == Modes.Generate) {
 				new GenerateMode().runGenerateOuterLoop(this);
 			}
@@ -316,7 +313,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		logOracleEnabled = settings.get(ConfigTags.LogOracleEnabled, false);
 		processListenerOracleEnabled = settings.get(ConfigTags.ProcessListenerEnabled, false);
 
-		if ( mode() == Modes.Generate || /*mode() == Modes.Record ||*/ mode() == Modes.Replay ) {
+		if ( mode() == Modes.Generate || mode() == Modes.Replay ) {
 			//Create the output folders
 			OutputStructure.calculateOuterLoopDateString();
 			OutputStructure.sequenceInnerLoopCount = 0;
