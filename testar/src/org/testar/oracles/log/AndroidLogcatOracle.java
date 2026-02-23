@@ -194,11 +194,11 @@ public class AndroidLogcatOracle implements Oracle {
         line = line.trim();
         Matcher m = THREADTIME_PATTERN.matcher(line);
         if (!m.matches()) {
-            return line.replaceAll("\\s+", " ");
+            return line.replaceAll("\\s+", " ").replaceAll("\\d+", "<num>");
         }
 
         String tag = m.group(2).trim();
-        String msg = m.group(3).trim().replaceAll("\\s+", " ");
+        String msg = m.group(3).trim().replaceAll("\\s+", " ").replaceAll("\\d+", "<num>");
 
         return tag + ": " + msg;
     }
