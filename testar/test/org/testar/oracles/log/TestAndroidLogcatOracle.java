@@ -146,6 +146,34 @@ public class TestAndroidLogcatOracle {
         }
     }
 
+    @Test
+    public void generateModeVerdict_DeduplicatesNumbersInMatches() {
+        OutputStructure.logsOutputDir = Path.of("target").toString();
+        OutputStructure.startInnerLoopDateString = "YYYY-MM-DD_hh-mm-ss";
+        OutputStructure.executedSUTname = "test-sut";
+
+        Settings settings = buildSettings(RuntimeControlsProtocol.Modes.Generate, "(?i)(.*Exception.*)");
+        AndroidLogcatOracle androidLogcatOracle = new AndroidLogcatOracle(settings);
+        State state = Mockito.mock(State.class);
+
+        String line1 = "02-09 08:59:33.844 17550 17575 E ViewRootImpl: Exxception @1:207875, unable to find 3421 viewState";
+        String line2 = "02-09 08:59:33.845 17550 17575 E ViewRootImpl: Exception @1:204868, unable to find 9008 viewState";
+
+        try (MockedStatic<AndroidAppiumFramework> mocked = Mockito.mockStatic(AndroidAppiumFramework.class)) {
+            mocked.when(AndroidAppiumFramework::getAppPackageFromCapabilitiesOrCurrent).thenReturn("org.testar.app");
+            mocked.when(() -> AndroidAppiumFramework.dumpLogcatThreadtimeForPackage("org.testar.app"))
+                    .thenReturn(line1 + "\n" + line2);
+
+            androidLogcatOracle.initialize();
+            Verdict verdict = androidLogcatOracle.getVerdict(state);
+
+            Assert.assertEquals(Verdict.Severity.SUSPICIOUS_LOG.getValue(), verdict.severity(), 0.0);
+            String expected = "Suspicious Android logcat line(s) detected "
+                    + "ViewRootImpl: Exception @<num>:<num>, unable to find <num> viewState";
+            Assert.assertEquals(expected, verdict.info());
+        }
+    }
+
     private Settings buildSettings(RuntimeControlsProtocol.Modes mode, String regex) {
         List<Pair<?, ?>> tags = new ArrayList<>();
         tags.add(Pair.from(ConfigTags.Mode, mode));
