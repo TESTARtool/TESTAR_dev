@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2023 Open Universiteit - www.ou.nl
- * Copyright (c) 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2023 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2023 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -70,15 +70,23 @@ public abstract class BaseFormatUtil
         if (!file.exists())
         {
             File parentDirectory = file.getParentFile();
-            if (parentDirectory != null && !parentDirectory.exists() && (!parentDirectory.mkdirs())) //try to create the needed directories
-                System.out.println("Failed to create the directory structure.");
+            if (parentDirectory != null && !parentDirectory.exists() && (!parentDirectory.mkdirs())) { //try to create the needed directories
+                System.err.println("Failed to create the directory structure.");
+                System.err.println("File: <" + file.getAbsolutePath() + ">");
+                System.err.println("Parent: <" + parentDirectory.getAbsolutePath() + ">"
+                        + " exists=" + parentDirectory.exists()
+                        + " isDirectory=" + parentDirectory.isDirectory()
+                        + " canWrite=" + parentDirectory.canWrite());
+                System.err.println("Working directory: <" + Paths.get(".").toAbsolutePath().normalize() + ">");
+            }
             try
             {
                 file.createNewFile();
             }
             catch (Exception e)
             {
-                System.out.println("Error creating the file: " + e.getMessage());
+                System.err.println("Error creating the file: " + e.getMessage());
+                System.err.println("File: <" + file.getAbsolutePath() + ">");
             }
         }
     }

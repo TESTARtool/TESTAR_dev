@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -245,6 +245,18 @@ public class ExtendedSettingFileTest {
         // THEN The update is stored.
         assertEquals(6, elementTwo.speed);
         assertTrue(fileContains(_workingDir + knownFile, "<value>updated</value>", "<speed>6</speed>"));
+    }
+
+    @Test
+    public void settingFileCreationWithAbsolutePath() {
+        final String absoluteFile = _workingDir + "absolute_path.xml";
+        File testFile = new File(absoluteFile);
+        assertFalse(testFile.exists());
+
+        sut = new ExtendedSettingFile(absoluteFile, fileAccessLock);
+        sut.load(TestSetting.class);
+
+        assertTrue(testFile.exists());
     }
 
     @Test(expected = ClassCastException.class)
