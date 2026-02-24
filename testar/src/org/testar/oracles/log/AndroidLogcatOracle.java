@@ -185,22 +185,52 @@ public class AndroidLogcatOracle implements Oracle {
 
     // logcat threadtime format:
     // 02-09 08:59:33.844 17550 17575 E Accessibility exception content...
-    private static final Pattern THREADTIME_PATTERN = Pattern.compile(
+    private final Pattern THREADTIME_PATTERN = Pattern.compile(
             "^\\d{2}-\\d{2}\\s+\\d{2}:\\d{2}:\\d{2}\\.\\d{3}\\s+\\d+\\s+\\d+\\s+([VDIWEAF])\\s+([^:]+):\\s*(.*)$"
     );
 
-    private static String normalizeThreadtimeLine(String line) {
+    private String normalizeThreadtimeLine(String line) {
         if (line == null) return "";
         line = line.trim();
         Matcher m = THREADTIME_PATTERN.matcher(line);
         if (!m.matches()) {
-            return line.replaceAll("\\s+", " ");
+            return normalizeNumbers(line.replaceAll("\\s+", " "));
         }
 
         String tag = m.group(2).trim();
-        String msg = m.group(3).trim().replaceAll("\\s+", " ");
+        String msg = normalizeNumbers(m.group(3).trim().replaceAll("\\s+", " "));
 
         return tag + ": " + msg;
+    }
+
+    private String normalizeNumbers(String text) {
+        if (text == null || text.isEmpty()) {
+            return "";
+        }
+        Matcher matcher = Pattern.compile("\\d+").matcher(text);
+        StringBuffer sb = new StringBuffer();
+        while (matcher.find()) {
+            String num = matcher.group();
+            if (isHttpFailureStatus(num)) {
+                matcher.appendReplacement(sb, num);
+            } else {
+                matcher.appendReplacement(sb, "<num>");
+            }
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
+    }
+
+    private boolean isHttpFailureStatus(String num) {
+        if (num.length() != 3) {
+            return false;
+        }
+        try {
+            int value = Integer.parseInt(num);
+            return value >= 300 && value <= 599;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
 }
