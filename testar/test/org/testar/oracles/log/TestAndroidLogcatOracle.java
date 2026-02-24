@@ -156,7 +156,7 @@ public class TestAndroidLogcatOracle {
         AndroidLogcatOracle androidLogcatOracle = new AndroidLogcatOracle(settings);
         State state = Mockito.mock(State.class);
 
-        String line1 = "02-09 08:59:33.844 17550 17575 E ViewRootImpl: Exxception @1:207875, unable to find 3421 viewState";
+        String line1 = "02-09 08:59:33.844 17550 17575 E ViewRootImpl: Exception @1:207875, unable to find 3421 viewState";
         String line2 = "02-09 08:59:33.845 17550 17575 E ViewRootImpl: Exception @1:204868, unable to find 9008 viewState";
 
         try (MockedStatic<AndroidAppiumFramework> mocked = Mockito.mockStatic(AndroidAppiumFramework.class)) {
