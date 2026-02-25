@@ -1,3 +1,23 @@
+#TESTAR v2.7.21 (24-Feb-2026)
+- Bump org.seleniumhq.selenium:selenium-java from 4.40.0 to 4.41.0
+- Update devtools dependencies to v145
+- Ignore dynamic numbers when deduplicating AndroidLogcatOracle messages
+
+
+#TESTAR v2.7.21 (17-Feb-2026)
+- Add logic to detect Android logcat suspicious messages
+- Refactor the GenerateMode logic to report initialState issues
+- Add appium capabilities adb timeouts commands
+- Add gitattributes for LF EOL
+- Refactor android system actions to map only the state
+- Add buggy app APK for demos
+- Update testar main default paths
+- Make output directories creation issues verbose
+- Mark android driver timeout as unresponsive
+- Deduplicate and sort AndroidLogcatOracle messages
+- Add and update tests accordingly
+
+
 #TESTAR v2.7.20 (3-Feb-2026)
 - Fix android SPY is displayed property
 - Add Rect overlap method

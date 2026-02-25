@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2025 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2025 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2025 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -79,6 +79,13 @@ public class AndroidCapabilitiesFactory {
         cap.setCapability("appium:autoGrantPermissions", getBool(json, "autoGrantPermissions", false));
 
         cap.setCapability("appium:settings[allowInvisibleElements]", getBool(json, "allowInvisibleElements", false));
+
+        cap.setCapability("appium:ignoreHiddenApiPolicyError", getBool(json, "ignoreHiddenApiPolicyError", false));
+
+        // ADB / server timeouts
+        cap.setCapability("appium:adbExecTimeout", getInt(json, "adbExecTimeout", 120000));
+        cap.setCapability("appium:uiautomator2ServerInstallTimeout", getInt(json, "uiautomator2ServerInstallTimeout", 120000));
+        cap.setCapability("appium:uiautomator2ServerLaunchTimeout", getInt(json, "uiautomator2ServerLaunchTimeout", 120000));
 
         String appiumUrl = defaultAppiumUrl;
 
