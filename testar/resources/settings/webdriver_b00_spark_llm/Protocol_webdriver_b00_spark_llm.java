@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,6 +30,7 @@
 
 import org.openqa.selenium.By;
 import org.testar.CodingManager;
+import org.testar.OutputStructure;
 import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
 import org.testar.llm.LlmTestGoal;
@@ -51,6 +52,7 @@ import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.oracles.llm.LlmOracle;
 import org.testar.protocols.WebdriverProtocol;
+import org.testar.reporting.StaticGraphExporter;
 import org.testar.settings.Settings;
 import org.testar.statemodel.analysis.condition.BasicConditionEvaluator;
 import java.util.*;
@@ -382,6 +384,17 @@ public class Protocol_webdriver_b00_spark_llm extends WebdriverProtocol {
 	@Override
 	protected boolean moreSequences() {
 		return super.moreSequences();
+	}
+
+	/**
+	 * This method is called after the last sequence, to allow for example handling the reporting of the session
+	 */
+	@Override
+	protected void closeTestSession() {
+		super.closeTestSession();
+
+		String runId = OutputStructure.startOuterLoopDateString + "_" + OutputStructure.executedSUTname;
+		StaticGraphExporter.exportStaticSite(settings, stateModelManager, runId);
 	}
 
 }
