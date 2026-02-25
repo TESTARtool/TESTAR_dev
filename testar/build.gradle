@@ -161,6 +161,10 @@ applicationDistribution.from("../statemodel/resources/graphs") {
     into "bin/output/graphs"
 }
 
+applicationDistribution.from("../statemodel/resources/graphs-static") {
+    into "bin/output/graphs-static"
+}
+
 applicationDistribution.from("../webdriver/resources/web-extension") {
     into "web-extension"
 }

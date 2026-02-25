@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>State Model Viewer</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="topbar">
+    <div class="title">State Model</div>
+    <div class="controls">
+      <label class="control">
+        Layout
+        <select id="layout-control">
+          <option value="grid">Grid</option>
+          <option value="cose">Cose</option>
+          <option value="breadthfirst">Breadthfirst</option>
+          <option value="cola">Cola</option>
+          <option value="circle">Circle</option>
+          <option value="concentric">Concentric</option>
+        </select>
+      </label>
+      <label class="control checkbox">
+        Show labels
+        <input type="checkbox" id="show-labels" checked />
+        <span class="checkmark"></span>
+      </label>
+      <button id="fit-graph" type="button">Fit</button>
+    </div>
+
+    <div class="controls">
+      <div class="control">Multi query (JSON)</div>
+      <textarea id="multiQueryJson" rows="3" class="multi-query"></textarea>
+      <button type="button" id="multi-query-run">Run Multi Query</button>
+      <button type="button" id="multi-query-reset">Reset Multi Query</button>
+      <div id="multiQueryError" class="multi-query-error"></div>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><span class="legend-box abstract-state"></span>Abstract state</div>
+      <div class="legend-item"><span class="legend-box concrete-state"></span>Concrete state</div>
+      <div class="legend-item"><span class="legend-box sequence-node"></span>Sequence node</div>
+      <div class="legend-item"><span class="legend-box blackhole"></span>Black hole</div>
+    </div>
+
+    <div class="stats">
+      <div id="stats-abstract-states"></div>
+      <div id="stats-abstract-actions"></div>
+      <div id="stats-concrete-states"></div>
+      <div id="stats-concrete-actions"></div>
+      <div id="stats-sequence-nodes"></div>
+      <div id="stats-sequence-steps"></div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="cy"></div>
+    <div id="info">
+      <div class="info-title">Selection</div>
+      <div id="info-content">Click a node or edge to see data.</div>
+    </div>
+  </div>
+
+  <script src="js/cytoscape.min.js"></script>
+  <script src="js/cola.min.js"></script>
+  <script src="js/cytoscape-cola.js"></script>
+  <script src="model/elements.js"></script>
+  <script src="model/images.js"></script>
+  <script src="js/viewer.js"></script>
+</body>
+</html>
