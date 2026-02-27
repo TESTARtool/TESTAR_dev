@@ -17,6 +17,46 @@
             <img src="img/testar-logo.png" class="logo" alt="Testar Logo">
         </div>
     </div>
+    <div class="row mt-3 mb-3">
+        <div class="col-12">
+            <h5>Compare two models</h5>
+        </div>
+        <div class="col-4">
+            <label for="oldModel">Old model</label>
+            <select id="oldModel" class="form-control">
+                <option value="">Select...</option>
+                <c:forEach var="model" items="${models}">
+                    <option value="${model.modelIdentifier}"
+                            data-appname="${model.applicationName}"
+                            data-appversion="${model.applicationVersion}"
+                            data-abstraction="${model.abstractionAttributes}">
+                        ${model.applicationName} ${model.applicationVersion} (${model.modelIdentifier})
+                    </option>
+                </c:forEach>
+            </select>
+        </div>
+        <div class="col-4">
+            <label for="newModel">New model</label>
+            <select id="newModel" class="form-control">
+                <option value="">Select...</option>
+                <c:forEach var="model" items="${models}">
+                    <option value="${model.modelIdentifier}"
+                            data-appname="${model.applicationName}"
+                            data-appversion="${model.applicationVersion}"
+                            data-abstraction="${model.abstractionAttributes}">
+                        ${model.applicationName} ${model.applicationVersion} (${model.modelIdentifier})
+                    </option>
+                </c:forEach>
+            </select>
+        </div>
+        <div class="col-2 d-flex align-items-end">
+            <form id="compareForm" method="get" action="changedetection" target="_blank" class="w-100">
+                <input type="hidden" name="oldModelIdentifier" id="oldModelHidden">
+                <input type="hidden" name="newModelIdentifier" id="newModelHidden">
+                <button type="submit" id="compareBtn" class="btn btn-primary w-100">Compare</button>
+            </form>
+        </div>
+    </div>
     <div class="row">
         <div class="col-6"><h1>Available Models</h1></div>
     </div>
@@ -161,6 +201,19 @@
                 }
             });
         })
+
+        $('#compareBtn').on('click', function(e) {
+            const oldId = $('#oldModel').val();
+            const newId = $('#newModel').val();
+            if (!oldId || !newId) {
+                e.preventDefault();
+                alert('Please select both models to compare');
+                return false;
+            }
+            $('#oldModelHidden').val(oldId);
+            $('#newModelHidden').val(newId);
+            return true;
+        });
     });
 </script>
 </body>
