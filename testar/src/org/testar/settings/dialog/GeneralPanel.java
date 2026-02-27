@@ -33,6 +33,7 @@ package org.testar.settings.dialog;
 
 import org.testar.monkey.*;
 import org.testar.settings.Settings;
+import org.testar.settings.dialog.components.IgnoredVerdictsDialog;
 import org.testar.settings.dialog.components.UndoTextArea;
 
 import javax.swing.*;
@@ -57,6 +58,7 @@ public class GeneralPanel extends SettingsPanel implements Observer {
   //private JCheckBox checkStopOnFault;
   private JComboBox<String> comboBoxProtocol;
   private JCheckBox compileCheckBox, checkActionVisualization, checkIgnoreDuplicatedVerdict;
+  private JButton btnManageIgnoredVerdicts;
   
   private JLabel labelAppName = new JLabel("Application name");
   private JLabel labelAppVersion = new JLabel("Application version");
@@ -139,6 +141,12 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     checkIgnoreDuplicatedVerdict.setBounds(10, 262, 192, 21);
     checkIgnoreDuplicatedVerdict.setToolTipText(ConfigTags.IgnoreDuplicatedVerdicts.getDescription());
     add(checkIgnoreDuplicatedVerdict);
+
+    btnManageIgnoredVerdicts = new JButton("Manage ignored verdicts");
+    btnManageIgnoredVerdicts.setBounds(10, 286, 192, 25);
+    btnManageIgnoredVerdicts.setToolTipText("Open a modal dialog to check or clear existing ignored verdicts");
+    btnManageIgnoredVerdicts.addActionListener(this::btnManageIgnoredVerdictsActionPerformed);
+    add(btnManageIgnoredVerdicts);
 
     labelAppName.setBounds(330, 242, 150, 27);
     labelAppName.setToolTipText(ToolTipTexts.applicationNameTTT);
@@ -243,6 +251,12 @@ public class GeneralPanel extends SettingsPanel implements Observer {
 
   private void btnEditProtocolActionPerformed(ActionEvent evt) {
     JDialog dialog = new ProtocolEditor(Main.settingsDir, settings.get(ConfigTags.ProtocolClass));
+    dialog.setModalityType(JDialog.ModalityType.APPLICATION_MODAL);
+    dialog.setVisible(true);
+  }
+
+  private void btnManageIgnoredVerdictsActionPerformed(ActionEvent evt) {
+    JDialog dialog = new IgnoredVerdictsDialog();
     dialog.setModalityType(JDialog.ModalityType.APPLICATION_MODAL);
     dialog.setVisible(true);
   }
