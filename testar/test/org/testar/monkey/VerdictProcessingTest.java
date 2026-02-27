@@ -25,6 +25,7 @@ public class VerdictProcessingTest {
 	@After
 	public void tearDown() {
 		Settings.setSettingsPath(null);
+		Main.SSE_ACTIVATED = null;
 	}
 
 	@Test
@@ -79,5 +80,42 @@ public class VerdictProcessingTest {
 		List<Verdict> filtered = processing.filterDuplicates(Collections.singletonList(duplicate));
 		assertEquals(1, filtered.size());
 		assertEquals(Verdict.OK.severity(), filtered.get(0).severity(), 0.0);
+	}
+
+	@Test
+	public void testVerdictIgnoreFile_PrioritizesSSE() throws Exception {
+		File tempSettingsDir = tempFolder.newFolder("tempSettingsDir");
+		String originalSettingsDir = Main.settingsDir;
+		try {
+			Main.settingsDir = tempSettingsDir.getAbsolutePath() + File.separator;
+			Main.SSE_ACTIVATED = "protocol_selected";
+			Settings.setSettingsPath(tempFolder.newFolder("otherProtocol").getAbsolutePath());
+
+			File verdictIgnoreFile = VerdictProcessing.resolveVerdictIgnoreFile();
+			assertEquals(new File(Main.settingsDir + "protocol_selected", "list_of_verdicts_with_failures.txt").getAbsolutePath(),
+					verdictIgnoreFile.getAbsolutePath());
+		} finally {
+			Main.settingsDir = originalSettingsDir; // cleanup to restore static global dir
+		}
+	}
+
+	@Test
+	public void testVerdictIgnoreFile_UsesSettingsPathWhenNoSSE() throws Exception {
+		File tempSettingsDir = tempFolder.newFolder("tempSettingsDir");
+		Main.SSE_ACTIVATED = null;
+		Settings.setSettingsPath(tempSettingsDir.getAbsolutePath());
+
+		File verdictIgnoreFile = VerdictProcessing.resolveVerdictIgnoreFile();
+		assertEquals(new File(tempSettingsDir, "list_of_verdicts_with_failures.txt").getAbsolutePath(),
+				verdictIgnoreFile.getAbsolutePath());
+	}
+
+	@Test
+	public void testVerdictIgnoreFile_IsNullWhenNoContext() {
+		Main.SSE_ACTIVATED = null;
+		Settings.setSettingsPath(null);
+
+		File verdictIgnoreFile = VerdictProcessing.resolveVerdictIgnoreFile();
+		assertEquals(null, verdictIgnoreFile);
 	}
 }

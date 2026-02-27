@@ -112,13 +112,13 @@ public class VerdictProcessing {
 		}
 	}
 
-	private File resolveVerdictIgnoreFile() {
+	public static File resolveVerdictIgnoreFile() {
+		if (Main.SSE_ACTIVATED != null && !Main.SSE_ACTIVATED.isEmpty()) {
+			return new File(Main.settingsDir + Main.SSE_ACTIVATED, LIST_VERDICTS_FAILURES_FILENAME);
+		}
 		String settingsPath = Settings.getSettingsPath();
 		if (settingsPath != null && !settingsPath.isEmpty()) {
 			return new File(settingsPath, LIST_VERDICTS_FAILURES_FILENAME);
-		}
-		if (Main.SSE_ACTIVATED != null && !Main.SSE_ACTIVATED.isEmpty()) {
-			return new File(Main.settingsDir + Main.SSE_ACTIVATED, LIST_VERDICTS_FAILURES_FILENAME);
 		}
 		return null;
 	}
