@@ -49,6 +49,7 @@ import org.testar.monkey.alayer.visualizers.ShapeVisualizer;
 import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
 import org.testar.monkey.alayer.windows.WinApiException;
 import org.testar.oracles.Oracle;
+import org.testar.oracles.OracleSelection;
 import org.testar.oracles.log.LogOracle;
 import org.testar.oracles.log.ProcessListenerOracle;
 import org.testar.plugin.NativeLinker;
@@ -100,6 +101,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	protected boolean processListenerOracleEnabled;
 	protected Oracle processListenerOracle;
+	protected List<Oracle> extendedOraclesList = Collections.emptyList();
 
 	private VerdictProcessing verdictProcessing;
 
@@ -704,6 +706,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			logOracle = createLogOracle(settings);
 			logOracle.initialize();
 		}
+		extendedOraclesList = OracleSelection.loadExtendedOracles(settings.get(ConfigTags.ExtendedOracles, ""));
+		for (Oracle oracle : extendedOraclesList) {
+			oracle.initialize();
+		}
 	}
 
 	/**
@@ -894,6 +900,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			for (Verdict logVerdict : logVerdicts) {
 				if ( logVerdict.severity() == Verdict.Severity.SUSPICIOUS_LOG.getValue() ) {
 					verdicts.add(logVerdict);
+				}
+			}
+		}
+
+		if (extendedOraclesList != null) {
+			for (Oracle extendedOracle : extendedOraclesList) {
+				List<Verdict> extendedVerdicts = extendedOracle.getVerdicts(state);
+				if (extendedVerdicts != null) {
+					verdicts.addAll(extendedVerdicts);
 				}
 			}
 		}

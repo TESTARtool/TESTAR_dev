@@ -41,10 +41,7 @@ import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
 import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
-import org.testar.oracles.Oracle;
-import org.testar.oracles.OracleSelection;
 import org.testar.plugin.NativeLinker;
-import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Pair;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.settings.Settings;
@@ -58,8 +55,6 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
 import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
-
-	private List<Oracle> extendedOraclesList = new ArrayList<>();
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -81,7 +76,6 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 	@Override
 	protected void preSequencePreparations() {
 		super.preSequencePreparations();
-		extendedOraclesList = OracleSelection.loadExtendedOracles(settings.get(ConfigTags.ExtendedOracles));
 	}
 
 	/**
@@ -170,12 +164,6 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 		// System crashes, non-responsiveness and suspicious tags automatically detected!
 		// For web applications, web browser errors and warnings can also be enabled via settings
 		List<Verdict> verdicts = super.getVerdicts(state);
-
-		// "ExtendedOracles" offered by TESTAR in the test.settings or Oracles GUI dialog
-		for (Oracle extendedOracle : extendedOraclesList) {
-			List<Verdict> extendedVerdicts = extendedOracle.getVerdicts(state);
-			verdicts.addAll(extendedVerdicts);
-		}
 
 		//-----------------------------------------------------------------------------
 		// MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
