@@ -31,19 +31,25 @@ task runTestWebdriverSuspiciousTagStateModel(type: Exec, dependsOn: createDataba
 }
 
 // Connect to para.testar.org to detect the browser console error message
-task runTestWebdriverParabankConsoleError(type: Exec) {
+// And also add the extended oracle to detect the accessibility warning of an image without alternative text
+task runTestWebdriverParabankConsoleErrorAndAccessibilityWarning(type: Exec) {
     // Read command line output
     standardOutput = new ByteArrayOutputStream()
     group = 'test_testar_workflow'
-    description ='runTestWebdriverParabankConsoleError'
+    description ='runTestWebdriverParabankConsoleErrorAndAccessibilityWarning'
     workingDir 'target/install/testar/bin'
-    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_parabank AlwaysCompile=true ApplicationName="webdriver_console_error" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=1 WebConsoleErrorOracle=true'
+    commandLine 'cmd', '/c', 'testar sse=test_gradle_workflow_webdriver_parabank AlwaysCompile=true ApplicationName="webdriver_console_error_and_accessibility_warning" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=1 WebConsoleErrorOracle=true ExtendedOracles=WebAccessibilityImagesAltOracle'
     doLast {
         String output = standardOutput.toString()
 
-        // Check that output detects the browser console error message
-        if(output.readLines().any{line->line.contains("Failed to load resource: the server responded with a status of 404")}) {
-            println "\n${output} \nTESTAR login and browser console error detection has been executed sucessfully"
+        def required = [
+            "[WARNING_ACCESSIBILITY_FAULT] Detected web image widget",
+            "[SUSPICIOUS_LOG] Web Browser Console Error"
+        ]
+
+        // Check that output detects both the browser console error message and the accessibility warning
+        if (required.every { s -> output.contains(s) }) {
+            println "\n${output} \nTESTAR browser console error and accessibility warning detection has been executed sucessfully"
         } else {
             throw new GradleException("\n${output} \nERROR: Executing TESTAR")
         }
