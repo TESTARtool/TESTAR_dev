@@ -173,7 +173,9 @@ public class TestAndroidLogcatOracle {
                     .thenReturn(line1 + "\n" + line2);
 
             androidLogcatOracle.initialize();
-            Verdict verdict = androidLogcatOracle.getVerdict(state);
+            List<Verdict> verdicts = androidLogcatOracle.getVerdicts(state);
+            Assert.assertEquals(1, verdicts.size());
+            Verdict verdict = verdicts.get(0);
 
             Assert.assertEquals(Verdict.Severity.SUSPICIOUS_LOG.getValue(), verdict.severity(), 0.0);
             String expected = "Suspicious Android logcat line(s) detected "
@@ -201,7 +203,9 @@ public class TestAndroidLogcatOracle {
                     .thenReturn(line1 + "\n" + line2);
 
             androidLogcatOracle.initialize();
-            Verdict verdict = androidLogcatOracle.getVerdict(state);
+            List<Verdict> verdicts = androidLogcatOracle.getVerdicts(state);
+            Assert.assertEquals(1, verdicts.size());
+            Verdict verdict = verdicts.get(0);
 
             Assert.assertEquals(Verdict.Severity.SUSPICIOUS_LOG.getValue(), verdict.severity(), 0.0);
             String expected = "Suspicious Android logcat line(s) detected "
