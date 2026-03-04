@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2021 - 2023 Open Universiteit - www.ou.nl
- * Copyright (c) 2021 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2021 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2021 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -80,8 +80,7 @@ public class WdRemoteClickAction extends TaggableBase implements Action {
 	public WdRemoteClickAction(WdWidget widget) {
 		this.widget = widget;
 		this.mapOriginWidget(widget);
-		this.set(Tags.Desc, "Remote click " + widget.element.getElementDescription() + " : " 
-				+ widget.element.remoteWebElement.getId());
+		this.set(Tags.Desc, "Remote click " + widget.get(Tags.Desc, widget.element.getElementDescription()));
 		this.set(Tags.Role, WdActionRoles.RemoteClick);
 		Role role = widget.get(Tags.Role, Roles.Widget);
 		if (!role.equals(WdRoles.WdOPTION)) {
