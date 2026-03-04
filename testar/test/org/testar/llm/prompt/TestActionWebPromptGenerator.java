@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.testar.action.priorization.llm.ActionHistory;
 import org.testar.monkey.Assert;
@@ -17,89 +16,26 @@ import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.actions.Type;
 import org.testar.monkey.alayer.actions.WdCloseTabAction;
 import org.testar.monkey.alayer.actions.WdHistoryBackAction;
+import org.testar.monkey.alayer.actions.WdRemoteClickAction;
+import org.testar.monkey.alayer.actions.WdRemoteScrollClickAction;
+import org.testar.monkey.alayer.actions.WdRemoteScrollTypeAction;
+import org.testar.monkey.alayer.actions.WdRemoteTypeAction;
 import org.testar.monkey.alayer.actions.WdSelectListAction;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.monkey.alayer.webdriver.stub.WdWidgetStub;
 import org.testar.stub.StateStub;
 import org.testar.stub.WidgetStub;
 
 public class TestActionWebPromptGenerator {
 
-	private static StateStub state;
-	private static Set<Action> derivedActions;
-	private static ActionHistory actionHistory;
 	private static StdActionCompiler ac = new AnnotatingActionCompiler();
-
-	@BeforeClass
-	public static void setup() {
-		state = new StateStub();
-		state.set(WdTags.WebTitle, "Page Title | State");
-		derivedActions = new HashSet<>();
-		actionHistory = new ActionHistory(1);
-
-		// Derive a click action
-		WidgetStub clickable_widget = new WidgetStub();
-		state.addChild(clickable_widget);
-		clickable_widget.setParent(state);
-		clickable_widget.set(Tags.Shape, Rect.fromCoordinates(1, 1, 1, 1));
-		clickable_widget.set(Tags.Role, WdRoles.WdA);
-		clickable_widget.set(Tags.Path, "[0,0,1]");
-		clickable_widget.set(WdTags.WebId, "clickable_widget_web_id");
-		clickable_widget.set(Tags.Desc, "clickable_widget_desc");
-		clickable_widget.set(Tags.ConcreteID, "CID_clickable_widget");
-		clickable_widget.set(Tags.AbstractID, "AID_clickable_widget");
-		Action click_action = ac.leftClickAt(clickable_widget);
-		click_action.set(Tags.ConcreteID, "CID_click");
-		click_action.set(Tags.AbstractID, "AID_click");
-		derivedActions.add(click_action);
-		actionHistory.addToHistory(click_action);
-
-		// Derive a Type action
-		WidgetStub typeable_widget = new WidgetStub();
-		state.addChild(typeable_widget);
-		typeable_widget.setParent(state);
-		typeable_widget.set(Tags.Shape, Rect.fromCoordinates(1, 1, 1, 1));
-		typeable_widget.set(Tags.Role, WdRoles.WdTEXTAREA);
-		typeable_widget.set(Tags.Path, "[0,0,1]");
-		typeable_widget.set(WdTags.WebId, "typeable_widget_web_id");
-		typeable_widget.set(Tags.Desc, "typeable_widget_desc");
-		typeable_widget.set(Tags.ConcreteID, "CID_typeable_widget");
-		typeable_widget.set(Tags.AbstractID, "AID_typeable_widget");
-		Action type_action = ac.clickTypeInto(typeable_widget, "input_text", false);
-		type_action.set(Tags.ConcreteID, "CID_type");
-		type_action.set(Tags.AbstractID, "AID_type");
-		// Right now, TESTAR creates compound actions which contains Type actions
-		for(Action innerAction : ((CompoundAction)type_action).getActions()) {
-			if(innerAction instanceof Type) {
-				((Type)innerAction).set(Tags.InputText, "LLM_text");
-			}
-		}
-		derivedActions.add(type_action);
-		actionHistory.addToHistory(type_action);
-
-		// Derive a select combobox action
-		WidgetStub combobox_widget = new WidgetStub();
-		state.addChild(combobox_widget);
-		combobox_widget.setParent(state);
-		combobox_widget.set(Tags.Shape, Rect.fromCoordinates(1, 1, 1, 1));
-		combobox_widget.set(Tags.Role, WdRoles.WdSELECT);
-		combobox_widget.set(WdTags.WebTagName, "select");
-		combobox_widget.set(Tags.Path, "[0,0,1]");
-		combobox_widget.set(WdTags.WebId, "combobox_widget_web_id");
-		combobox_widget.set(Tags.Desc, "combobox_widget_desc");
-		combobox_widget.set(WdTags.WebInnerHTML, "<option value=\"volvo\">Volvo</option><option value=\"saab\">Saab</option>");
-		combobox_widget.set(Tags.ConcreteID, "CID_combobox_widget");
-		combobox_widget.set(Tags.AbstractID, "AID_combobox_widget");
-		Action select_action = new WdSelectListAction("combobox_widget_web_id", "Saab", combobox_widget, WdSelectListAction.JsTargetMethod.ID);
-		select_action.set(Tags.ConcreteID, "CID_select");
-		select_action.set(Tags.AbstractID, "AID_select");
-		derivedActions.add(select_action);
-		actionHistory.addToHistory(select_action);
-	}
 
 	@Test
 	public void test_prompt_generator_default_empty_history() {
 		IPromptActionGenerator promptActionGenerator = new ActionWebPromptGenerator();
+		StateStub state = createState();
+		Set<Action> derivedActions = createDefaultDerivedActions(state);
 
 		String prompt = promptActionGenerator.generateActionSelectionPrompt(
 				derivedActions, 
@@ -126,6 +62,9 @@ public class TestActionWebPromptGenerator {
 	@Test
 	public void test_prompt_generator_webid_with_history() {
 		IPromptActionGenerator promptActionGenerator = new ActionWebPromptGenerator(WdTags.WebId);
+		StateStub state = createState();
+		Set<Action> derivedActions = createDefaultDerivedActions(state);
+		ActionHistory actionHistory = createDefaultActionHistory(state);
 
 		String prompt = promptActionGenerator.generateActionSelectionPrompt(
 				derivedActions, 
@@ -152,6 +91,7 @@ public class TestActionWebPromptGenerator {
 	@Test
 	public void test_prompt_generator_history_back() {
 		IPromptActionGenerator promptActionGenerator = new ActionWebPromptGenerator();
+		StateStub state = createState();
 
 		Action actionHistoryBack = new WdHistoryBackAction(state);
 		actionHistoryBack.set(Tags.ConcreteID, "CID_history");
@@ -187,6 +127,7 @@ public class TestActionWebPromptGenerator {
 	@Test
 	public void test_prompt_generator_close_tab() {
 		IPromptActionGenerator promptActionGenerator = new ActionWebPromptGenerator();
+		StateStub state = createState();
 
 		Action actionHistoryBack = new WdHistoryBackAction(state);
 		actionHistoryBack.set(Tags.ConcreteID, "CID_history");
@@ -217,5 +158,148 @@ public class TestActionWebPromptGenerator {
 		Assert.isTrue(prompt.contains("AID_closetab: Close current browser tab"));
 		Assert.isTrue(prompt.contains("This is the last action we executed: AID_history: Go History back in the browser"));
 		Assert.isTrue(prompt.contains("Which action should be executed to accomplish the test goal?"));		
+	}
+
+	@Test
+	public void test_prompt_generator_supports_remote_actions() throws Exception {
+		IPromptActionGenerator promptActionGenerator = new ActionWebPromptGenerator();
+		StateStub state = createState();
+
+		Set<Action> actions = new HashSet<>();
+
+		Action remoteClickAction = createRemoteClickAction("remote_click_widget", "remote_click_id",
+				"CID_remote_click", "AID_remote_click");
+		actions.add(remoteClickAction);
+
+		Action remoteTypeAction = createRemoteTypeAction("remote_type_widget", "remote_type_id",
+				"CID_remote_type", "AID_remote_type", "remote_text");
+		actions.add(remoteTypeAction);
+
+		Action remoteScrollClickAction = createRemoteScrollClickAction("remote_scroll_click_widget", "remote_scroll_click_id",
+				"CID_remote_scroll_click", "AID_remote_scroll_click");
+		actions.add(remoteScrollClickAction);
+
+		Action remoteScrollTypeAction = createRemoteScrollTypeAction("remote_scroll_type_widget", "remote_scroll_type_id",
+				"CID_remote_scroll_type", "AID_remote_scroll_type", "remote_scroll_text");
+		actions.add(remoteScrollTypeAction);
+
+		String prompt = promptActionGenerator.generateActionSelectionPrompt(
+				actions,
+				state,
+				new ActionHistory(5),
+				"GUI_app",
+				"achieve this web goal",
+				""
+		);
+
+		Assert.isTrue(!prompt.isEmpty());
+		Assert.isTrue(prompt.contains("AID_remote_click: Click on 'remote_click_widget'"));
+		Assert.isTrue(prompt.contains("AID_remote_type: Type in TextField 'remote_type_widget'"));
+		Assert.isTrue(prompt.contains("AID_remote_scroll_click: Click on 'remote_scroll_click_widget'"));
+		Assert.isTrue(prompt.contains("AID_remote_scroll_type: Type in TextField 'remote_scroll_type_widget'"));
+	}
+
+	private static StateStub createState() {
+		StateStub createdState = new StateStub();
+		createdState.set(WdTags.WebTitle, "Page Title | State");
+		return createdState;
+	}
+
+	private static Set<Action> createDefaultDerivedActions(StateStub state) {
+		Set<Action> derivedActions = new HashSet<>();
+		derivedActions.add(createClickAction(state, "clickable_widget_desc", "clickable_widget_web_id",
+				"CID_clickable_widget", "AID_clickable_widget", "CID_click", "AID_click"));
+		derivedActions.add(createTypeAction(state, "typeable_widget_desc", "typeable_widget_web_id",
+				"CID_typeable_widget", "AID_typeable_widget", "CID_type", "AID_type", "input_text", "LLM_text"));
+		derivedActions.add(createSelectAction(state, "combobox_widget_desc", "combobox_widget_web_id",
+				"CID_combobox_widget", "AID_combobox_widget", "CID_select", "AID_select", "Saab"));
+		return derivedActions;
+	}
+
+	private static ActionHistory createDefaultActionHistory(StateStub state) {
+		ActionHistory actionHistory = new ActionHistory(1);
+		actionHistory.addToHistory(createClickAction(state, "clickable_widget_desc", "clickable_widget_web_id",
+				"CID_clickable_widget", "AID_clickable_widget", "CID_click", "AID_click"));
+		actionHistory.addToHistory(createTypeAction(state, "typeable_widget_desc", "typeable_widget_web_id",
+				"CID_typeable_widget", "AID_typeable_widget", "CID_type", "AID_type", "input_text", "LLM_text"));
+		actionHistory.addToHistory(createSelectAction(state, "combobox_widget_desc", "combobox_widget_web_id",
+				"CID_combobox_widget", "AID_combobox_widget", "CID_select", "AID_select", "Saab"));
+		return actionHistory;
+	}
+
+	private static WidgetStub createWebWidget(StateStub parentState, org.testar.monkey.alayer.Role role, String description,
+			String webId, String concreteId, String abstractId) {
+		WidgetStub widget = new WidgetStub();
+		parentState.addChild(widget);
+		widget.setParent(parentState);
+		widget.set(Tags.Shape, Rect.fromCoordinates(1, 1, 1, 1));
+		widget.set(Tags.Role, role);
+		widget.set(Tags.Path, "[0,0,1]");
+		widget.set(WdTags.WebId, webId);
+		widget.set(Tags.Desc, description);
+		widget.set(Tags.ConcreteID, concreteId);
+		widget.set(Tags.AbstractID, abstractId);
+		return widget;
+	}
+
+	private static Action createClickAction(StateStub parentState, String description, String webId, String widgetConcreteId,
+			String widgetAbstractId, String actionConcreteId, String actionAbstractId) {
+		Action action = ac.leftClickAt(createWebWidget(parentState, WdRoles.WdA, description, webId, widgetConcreteId, widgetAbstractId));
+		action.set(Tags.ConcreteID, actionConcreteId);
+		action.set(Tags.AbstractID, actionAbstractId);
+		return action;
+	}
+
+	private static Action createTypeAction(StateStub parentState, String description, String webId, String widgetConcreteId,
+			String widgetAbstractId, String actionConcreteId, String actionAbstractId, String inputText, String llmText) {
+		Action action = ac.clickTypeInto(createWebWidget(parentState, WdRoles.WdTEXTAREA, description, webId, widgetConcreteId, widgetAbstractId),
+				inputText, false);
+		action.set(Tags.ConcreteID, actionConcreteId);
+		action.set(Tags.AbstractID, actionAbstractId);
+		for(Action innerAction : ((CompoundAction) action).getActions()) {
+			if(innerAction instanceof Type) {
+				((Type) innerAction).set(Tags.InputText, llmText);
+			}
+		}
+		return action;
+	}
+
+	private static Action createSelectAction(StateStub parentState, String description, String webId, String widgetConcreteId,
+			String widgetAbstractId, String actionConcreteId, String actionAbstractId, String value) {
+		WidgetStub widget = createWebWidget(parentState, WdRoles.WdSELECT, description, webId, widgetConcreteId, widgetAbstractId);
+		widget.set(WdTags.WebTagName, "select");
+		widget.set(WdTags.WebInnerHTML, "<option value=\"volvo\">Volvo</option><option value=\"saab\">Saab</option>");
+		Action action = new WdSelectListAction(webId, value, widget, WdSelectListAction.JsTargetMethod.ID);
+		action.set(Tags.ConcreteID, actionConcreteId);
+		action.set(Tags.AbstractID, actionAbstractId);
+		return action;
+	}
+
+	private static Action createRemoteClickAction(String description, String remoteId, String concreteId, String abstractId) {
+		Action action = new WdRemoteClickAction(new WdWidgetStub(description, remoteId, WdRoles.WdA, "a"));
+		action.set(Tags.ConcreteID, concreteId);
+		action.set(Tags.AbstractID, abstractId);
+		return action;
+	}
+
+	private static Action createRemoteScrollClickAction(String description, String remoteId, String concreteId, String abstractId) {
+		Action action = new WdRemoteScrollClickAction(new WdWidgetStub(description, remoteId, WdRoles.WdA, "a"));
+		action.set(Tags.ConcreteID, concreteId);
+		action.set(Tags.AbstractID, abstractId);
+		return action;
+	}
+
+	private static Action createRemoteTypeAction(String description, String remoteId, String concreteId, String abstractId, String text) {
+		Action action = new WdRemoteTypeAction(new WdWidgetStub(description, remoteId, WdRoles.WdTEXTAREA, "textarea"), text);
+		action.set(Tags.ConcreteID, concreteId);
+		action.set(Tags.AbstractID, abstractId);
+		return action;
+	}
+
+	private static Action createRemoteScrollTypeAction(String description, String remoteId, String concreteId, String abstractId, String text) {
+		Action action = new WdRemoteScrollTypeAction(new WdWidgetStub(description, remoteId, WdRoles.WdTEXTAREA, "textarea"), text);
+		action.set(Tags.ConcreteID, concreteId);
+		action.set(Tags.AbstractID, abstractId);
+		return action;
 	}
 }
