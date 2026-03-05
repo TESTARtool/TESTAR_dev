@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2021 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2021 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2021 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2021 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -84,13 +84,17 @@ public class WdRemoteTypeAction extends TaggableBase implements Action {
 
 	public WdRemoteTypeAction(WdWidget widget, CharSequence keys) {
 		this.widget = widget;
-		this.keys = keys;
-
 		this.mapOriginWidget(widget);
-		this.set(Tags.Desc, "Remote type " + keys + " to widget " 
-				+ widget.element.getElementDescription() + " : " + widget.element.remoteWebElement.getId());
 		this.set(Tags.Role, WdActionRoles.RemoteType);
-		this.set(Tags.Visualizer, new TypeVisualizer(widget.get(WdTags.WebBoundingRectangle), keys.toString(), TypePen));
+		setKeys(keys);
+	}
+
+	public void setKeys(CharSequence keys) {
+		String keyText = keys == null ? "" : keys.toString();
+		this.keys = keyText;
+		this.set(Tags.InputText, keyText);
+		this.set(Tags.Desc, "Remote type " + keyText + " to widget " + widget.get(Tags.Desc, widget.element.getElementDescription()));
+		this.set(Tags.Visualizer, new TypeVisualizer(widget.get(WdTags.WebBoundingRectangle), keyText, TypePen));
 	}
 
 	@Override

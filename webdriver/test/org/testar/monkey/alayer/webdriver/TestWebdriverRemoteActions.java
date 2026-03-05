@@ -26,6 +26,8 @@ public class TestWebdriverRemoteActions {
 	private WdElement childWdElement;
 	private WdWidget childWdWidget;
 
+	private RemoteWebElement remoteWebElement;
+
 	// Before each JUnit test prepare the new objects
 	@Before
 	public void prepareWebdriverElements() {
@@ -34,6 +36,10 @@ public class TestWebdriverRemoteActions {
 
 		childWdElement = new WdElement(rootWdElement, rootWdElement);
 		childWdWidget = new WdWidget(rootWdState, rootWdState, childWdElement);
+
+		remoteWebElement = Mockito.mock(RemoteWebElement.class);
+		Mockito.when(remoteWebElement.getWrappedDriver()).thenReturn(Mockito.mock(RemoteWebDriver.class));
+		childWdElement.remoteWebElement = remoteWebElement;
 	}
 
 	@Test
@@ -42,18 +48,14 @@ public class TestWebdriverRemoteActions {
 		childWdElement.name = "custom_name_value";
 		childWdElement.rect = Rect.from(0, 0, 100, 100);
 		childWdWidget.set(Tags.Role, WdRoles.WdBUTTON);
-
-		// Mock a remoteWebElement with getId
-		RemoteWebElement remoteWebElement = Mockito.mock(RemoteWebElement.class);
-		Mockito.when(remoteWebElement.getId()).thenReturn("remote_id_value");
-		childWdElement.remoteWebElement = remoteWebElement;
+		childWdWidget.set(Tags.Desc, "Widget Description");
 
 		WdRemoteClickAction remoteClickAction = new WdRemoteClickAction(childWdWidget);
 
 		// Verify the action and the Tags were created
 		Assert.isTrue(remoteClickAction.get(Tags.OriginWidget).equals(childWdWidget));
 		Assert.isTrue(remoteClickAction.get(Tags.Role).equals(WdActionRoles.RemoteClick));
-		Assert.isTrue(remoteClickAction.get(Tags.Desc).equals("Remote click " + childWdElement.name + " : " + "remote_id_value"));
+		Assert.isTrue(remoteClickAction.get(Tags.Desc).equals("Remote click " + "Widget Description"));
 		Assert.isTrue(remoteClickAction.toShortString().equals("Remote click " + childWdElement.name));
 		Assert.isTrue(remoteClickAction.toParametersString().equals("Remote click " + childWdElement.name));
 		Assert.isTrue(remoteClickAction.toString(new Role[0]).equals("Remote click " + childWdElement.name));
@@ -70,19 +72,14 @@ public class TestWebdriverRemoteActions {
 		childWdElement.name = "custom_name_value";
 		childWdElement.rect = Rect.from(0, 0, 100, 100);
 		childWdWidget.set(Tags.Role, WdRoles.WdBUTTON);
-
-		// Mock a remoteWebElement with getId and getWrappedDriver
-		RemoteWebElement remoteWebElement = Mockito.mock(RemoteWebElement.class);
-		Mockito.when(remoteWebElement.getId()).thenReturn("remote_id_value");
-		Mockito.when(remoteWebElement.getWrappedDriver()).thenReturn(Mockito.mock(RemoteWebDriver.class));
-		childWdElement.remoteWebElement = remoteWebElement;
+		childWdWidget.set(Tags.Desc, "Widget Description");
 
 		WdRemoteScrollClickAction remoteScrollClickAction = new WdRemoteScrollClickAction(childWdWidget);
 
 		// Verify the action and the Tags were created
 		Assert.isTrue(remoteScrollClickAction.get(Tags.OriginWidget).equals(childWdWidget));
 		Assert.isTrue(remoteScrollClickAction.get(Tags.Role).equals(WdActionRoles.RemoteScrollClick));
-		Assert.isTrue(remoteScrollClickAction.get(Tags.Desc).equals("Remote scroll and click " + childWdElement.name + " : " + "remote_id_value"));
+		Assert.isTrue(remoteScrollClickAction.get(Tags.Desc).equals("Remote scroll and click " + "Widget Description"));
 		Assert.isTrue(remoteScrollClickAction.toShortString().equals("Remote scroll and click " + childWdElement.name));
 		Assert.isTrue(remoteScrollClickAction.toParametersString().equals("Remote scroll and click " + childWdElement.name));
 		Assert.isTrue(remoteScrollClickAction.toString(new Role[0]).equals("Remote scroll and click " + childWdElement.name));
@@ -99,11 +96,7 @@ public class TestWebdriverRemoteActions {
 		childWdElement.name = "custom_name_value";
 		childWdElement.rect = Rect.from(0, 0, 100, 100);
 		childWdWidget.set(Tags.Role, WdRoles.WdBUTTON);
-
-		// Mock a remoteWebElement with getId
-		RemoteWebElement remoteWebElement = Mockito.mock(RemoteWebElement.class);
-		Mockito.when(remoteWebElement.getId()).thenReturn("remote_id_value");
-		childWdElement.remoteWebElement = remoteWebElement;
+		childWdWidget.set(Tags.Desc, "Widget Description");
 
 		String typedText = "input_text";
 		WdRemoteTypeAction remoteTypeAction = new WdRemoteTypeAction(childWdWidget, typedText);
@@ -111,7 +104,7 @@ public class TestWebdriverRemoteActions {
 		// Verify the action and the Tags were created
 		Assert.isTrue(remoteTypeAction.get(Tags.OriginWidget).equals(childWdWidget));
 		Assert.isTrue(remoteTypeAction.get(Tags.Role).equals(WdActionRoles.RemoteType));
-		Assert.isTrue(remoteTypeAction.get(Tags.Desc).equals("Remote type " + typedText + " to widget " + childWdElement.name + " : " + "remote_id_value"));
+		Assert.isTrue(remoteTypeAction.get(Tags.Desc).equals("Remote type " + typedText + " to widget " + "Widget Description"));
 		Assert.isTrue(remoteTypeAction.toShortString().equals("Remote type " + typedText + " " + childWdElement.name));
 		Assert.isTrue(remoteTypeAction.toParametersString().equals("Remote type " + typedText + " " + childWdElement.name));
 		Assert.isTrue(remoteTypeAction.toString(new Role[0]).equals("Remote type " + typedText + " " + childWdElement.name));
@@ -128,12 +121,7 @@ public class TestWebdriverRemoteActions {
 		childWdElement.name = "custom_name_value";
 		childWdElement.rect = Rect.from(0, 0, 100, 100);
 		childWdWidget.set(Tags.Role, WdRoles.WdBUTTON);
-
-		// Mock a remoteWebElement with getId and getWrappedDriver
-		RemoteWebElement remoteWebElement = Mockito.mock(RemoteWebElement.class);
-		Mockito.when(remoteWebElement.getId()).thenReturn("remote_id_value");
-		Mockito.when(remoteWebElement.getWrappedDriver()).thenReturn(Mockito.mock(RemoteWebDriver.class));
-		childWdElement.remoteWebElement = remoteWebElement;
+		childWdWidget.set(Tags.Desc, "Widget Description");
 
 		String typedText = "input_scroll_text";
 		WdRemoteScrollTypeAction remoteScrollTypeAction = new WdRemoteScrollTypeAction(childWdWidget, typedText);
@@ -141,7 +129,7 @@ public class TestWebdriverRemoteActions {
 		// Verify the action and the Tags were created
 		Assert.isTrue(remoteScrollTypeAction.get(Tags.OriginWidget).equals(childWdWidget));
 		Assert.isTrue(remoteScrollTypeAction.get(Tags.Role).equals(WdActionRoles.RemoteScrollType));
-		Assert.isTrue(remoteScrollTypeAction.get(Tags.Desc).equals("Remote scroll and type " + typedText + " to widget " + childWdElement.name + " : " + "remote_id_value"));
+		Assert.isTrue(remoteScrollTypeAction.get(Tags.Desc).equals("Remote scroll and type " + typedText + " to widget " + "Widget Description"));
 		Assert.isTrue(remoteScrollTypeAction.toShortString().equals("Remote scroll and type " + typedText + " " + childWdElement.name));
 		Assert.isTrue(remoteScrollTypeAction.toParametersString().equals("Remote scroll and type " + typedText + " " + childWdElement.name));
 		Assert.isTrue(remoteScrollTypeAction.toString(new Role[0]).equals("Remote scroll and type " + typedText + " " + childWdElement.name));

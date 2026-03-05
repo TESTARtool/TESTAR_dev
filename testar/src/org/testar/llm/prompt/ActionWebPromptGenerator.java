@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2024 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2024 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2024 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2024 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -160,11 +160,15 @@ public class ActionWebPromptGenerator implements IPromptActionGenerator {
                     switch (type) {
                         case "ClickTypeInto":
                         case "PasteTextInto":
+                        case "RemoteType":
+                        case "RemoteScrollType":
                             // Differentiate between types of input fields. Example: password -> Password Field
                             String fieldType = StringUtils.capitalize(widget.get(WdTags.WebType, "text"));
                             builder.append(String.format("%s: Type in %sField '%s' ", actionId, fieldType, description));
                             break;
                         case "LeftClickAt":
+                        case "RemoteClick":
+                        case "RemoteScrollClick":
                             builder.append(String.format("%s: Click on '%s' ", actionId, description));
                             break;
                         case "HistoryBackScript":
