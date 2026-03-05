@@ -1,4 +1,8 @@
-#TESTAR v2.7.21 (24-Feb-2026)
+#TESTAR v2.7.23 (5-Mar-2026)
+- Update webdriver remote actions descriptions
+- Add webdriver remote actions to LLM conversation
+
+#TESTAR v2.7.22 (24-Feb-2026)
 - Bump org.seleniumhq.selenium:selenium-java from 4.40.0 to 4.41.0
 - Update devtools dependencies to v145
 - Ignore dynamic numbers when deduplicating AndroidLogcatOracle messages
