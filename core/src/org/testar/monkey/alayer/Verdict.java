@@ -208,6 +208,10 @@ public final class Verdict implements Serializable {
 		return this.severity() >= Severity.CRITICAL.getValue();
 	}
 
+	public boolean isCompletion() {
+		return this.severity() == Severity.LLM_COMPLETE.getValue() || this.severity() == Severity.CONDITION_COMPLETE.getValue();
+	}
+
 	@Override
 	public String toString() {
 		return "severity: " + severity + " info: " + info;

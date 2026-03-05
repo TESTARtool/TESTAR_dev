@@ -135,6 +135,9 @@ public class VerdictProcessing {
 		if (!ignoreDuplicatedVerdicts || verdict == null) {
 			return;
 		}
+		if (verdict.isCompletion()) {
+			return;
+		}
 		if (verdict.isCritical()) {
 			return;
 		}
@@ -168,6 +171,7 @@ public class VerdictProcessing {
 
 	private boolean shouldIgnorePersistedDuplicate(Verdict verdict) {
 		return ignoreDuplicatedVerdicts
+				&& !verdict.isCompletion()
 				&& !verdict.isCritical()
 				&& verdict.severity() > Verdict.Severity.OK.getValue()
 				&& isDuplicateVerdictInfo(verdict.info());

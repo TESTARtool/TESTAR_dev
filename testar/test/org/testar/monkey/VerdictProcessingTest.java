@@ -83,6 +83,44 @@ public class VerdictProcessingTest {
 	}
 
 	@Test
+	public void testDoesNotIgnoreDuplicateLlmComplete() throws Exception {
+		File settingsDir = tempFolder.newFolder("settings_llm_complete");
+		Settings.setSettingsPath(settingsDir.getAbsolutePath());
+
+		File ignoreFile = new File(settingsDir, "list_of_verdicts_with_failures.txt");
+		Files.write(ignoreFile.toPath(), Collections.singletonList("goal completed by llm"), StandardCharsets.UTF_8);
+
+		Settings settings = new Settings();
+		settings.set(ConfigTags.IgnoreDuplicatedVerdicts, true);
+		VerdictProcessing processing = new VerdictProcessing(settings);
+
+		Verdict llmComplete = new Verdict(Verdict.Severity.LLM_COMPLETE, "goal completed by llm");
+		List<Verdict> filtered = processing.filterDuplicates(Collections.singletonList(llmComplete));
+
+		assertEquals(1, filtered.size());
+		assertEquals(Verdict.Severity.LLM_COMPLETE.getValue(), filtered.get(0).severity(), 0.0);
+	}
+
+	@Test
+	public void testDoesNotIgnoreDuplicateConditionComplete() throws Exception {
+		File settingsDir = tempFolder.newFolder("settings_condition_complete");
+		Settings.setSettingsPath(settingsDir.getAbsolutePath());
+
+		File ignoreFile = new File(settingsDir, "list_of_verdicts_with_failures.txt");
+		Files.write(ignoreFile.toPath(), Collections.singletonList("all conditions completed"), StandardCharsets.UTF_8);
+
+		Settings settings = new Settings();
+		settings.set(ConfigTags.IgnoreDuplicatedVerdicts, true);
+		VerdictProcessing processing = new VerdictProcessing(settings);
+
+		Verdict conditionComplete = new Verdict(Verdict.Severity.CONDITION_COMPLETE, "all conditions completed");
+		List<Verdict> filtered = processing.filterDuplicates(Collections.singletonList(conditionComplete));
+
+		assertEquals(1, filtered.size());
+		assertEquals(Verdict.Severity.CONDITION_COMPLETE.getValue(), filtered.get(0).severity(), 0.0);
+	}
+
+	@Test
 	public void testVerdictIgnoreFile_PrioritizesSSE() throws Exception {
 		File tempSettingsDir = tempFolder.newFolder("tempSettingsDir");
 		String originalSettingsDir = Main.settingsDir;
