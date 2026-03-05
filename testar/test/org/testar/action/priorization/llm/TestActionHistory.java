@@ -2,7 +2,6 @@ package org.testar.action.priorization.llm;
 
 import static org.junit.Assert.assertTrue;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Rect;
@@ -11,12 +10,17 @@ import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.CompoundAction;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.actions.Type;
+import org.testar.monkey.alayer.actions.WdRemoteClickAction;
+import org.testar.monkey.alayer.actions.WdRemoteScrollClickAction;
+import org.testar.monkey.alayer.actions.WdRemoteScrollTypeAction;
+import org.testar.monkey.alayer.actions.WdRemoteTypeAction;
 import org.testar.monkey.alayer.actions.WdSelectListAction;
 import org.testar.monkey.alayer.android.actions.AndroidActionType;
 import org.testar.monkey.alayer.android.enums.AndroidRoles;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.monkey.alayer.webdriver.stub.WdWidgetStub;
 import org.testar.stub.StateStub;
 import org.testar.stub.WidgetStub;
 
@@ -24,90 +28,18 @@ public class TestActionHistory {
 
     private static StdActionCompiler ac = new AnnotatingActionCompiler();
 
-    private static Action web_click_action;
-    private static Action web_type_action;
-    private static Action web_select_action;
-    private static Action android_type_action;
-
-    @BeforeClass
-    public static void setup() {
-        StateStub state = new StateStub();
-        state.set(WdTags.WebTitle, "Page Title | State");
-
-        // Derive a click action
-        WidgetStub clickable_widget = new WidgetStub();
-        state.addChild(clickable_widget);
-        clickable_widget.setParent(state);
-        clickable_widget.set(Tags.Shape, Rect.fromCoordinates(1, 1, 1, 1));
-        clickable_widget.set(Tags.Role, WdRoles.WdA);
-        clickable_widget.set(Tags.Path, "[0,0,1]");
-        clickable_widget.set(WdTags.WebId, "clickable_widget_web_id");
-        clickable_widget.set(Tags.Desc, "clickable_widget_desc");
-        clickable_widget.set(Tags.ConcreteID, "CID_clickable_widget");
-        clickable_widget.set(Tags.AbstractID, "AID_clickable_widget");
-        web_click_action = ac.leftClickAt(clickable_widget);
-        web_click_action.set(Tags.ConcreteID, "CID_click");
-        web_click_action.set(Tags.AbstractID, "AID_click");
-
-        // Derive a Type action
-        WidgetStub typeable_widget = new WidgetStub();
-        state.addChild(typeable_widget);
-        typeable_widget.setParent(state);
-        typeable_widget.set(Tags.Shape, Rect.fromCoordinates(1, 1, 1, 1));
-        typeable_widget.set(Tags.Role, WdRoles.WdTEXTAREA);
-        typeable_widget.set(Tags.Path, "[0,0,1]");
-        typeable_widget.set(WdTags.WebId, "typeable_widget_web_id");
-        typeable_widget.set(Tags.Desc, "typeable_widget_desc");
-        typeable_widget.set(Tags.ConcreteID, "CID_typeable_widget");
-        typeable_widget.set(Tags.AbstractID, "AID_typeable_widget");
-        web_type_action = ac.clickTypeInto(typeable_widget, "input_text", false);
-        web_type_action.set(Tags.ConcreteID, "CID_type");
-        web_type_action.set(Tags.AbstractID, "AID_type");
-        // Right now, TESTAR creates compound actions which contains Type actions
-        for(Action innerAction : ((CompoundAction)web_type_action).getActions()) {
-            if(innerAction instanceof Type) {
-                ((Type)innerAction).set(Tags.InputText, "LLM_text");
-            }
-        }
-
-        // Derive a select combobox action
-        WidgetStub combobox_widget = new WidgetStub();
-        state.addChild(combobox_widget);
-        combobox_widget.setParent(state);
-        combobox_widget.set(Tags.Shape, Rect.fromCoordinates(1, 1, 1, 1));
-        combobox_widget.set(Tags.Role, WdRoles.WdSELECT);
-        combobox_widget.set(WdTags.WebTagName, "select");
-        combobox_widget.set(Tags.Path, "[0,0,1]");
-        combobox_widget.set(WdTags.WebId, "combobox_widget_web_id");
-        combobox_widget.set(Tags.Desc, "combobox_widget_desc");
-        combobox_widget.set(WdTags.WebInnerHTML, "<option value=\"volvo\">Volvo</option><option value=\"saab\">Saab</option>");
-        combobox_widget.set(Tags.ConcreteID, "CID_combobox_widget");
-        combobox_widget.set(Tags.AbstractID, "AID_combobox_widget");
-        web_select_action = new WdSelectListAction("combobox_widget_web_id", "Saab", combobox_widget, WdSelectListAction.JsTargetMethod.ID);
-        web_select_action.set(Tags.ConcreteID, "CID_select");
-        web_select_action.set(Tags.AbstractID, "AID_select");
-
-        // Derive an AndroidActionType action
-        WidgetStub android_edit_widget = new WidgetStub();
-        state.addChild(android_edit_widget);
-        android_edit_widget.setParent(state);
-        android_edit_widget.set(Tags.Shape, Rect.fromCoordinates(1, 1, 1, 1));
-        android_edit_widget.set(Tags.Role, AndroidRoles.AndroidWidget);
-        android_edit_widget.set(Tags.Path, "[0,0,1]");
-        android_edit_widget.set(AndroidTags.AndroidXpath, "//path[0]");
-        android_edit_widget.set(Tags.Desc, "android_edit_widget_desc");
-        android_edit_widget.set(Tags.ConcreteID, "CID_android_edit_widget");
-        android_edit_widget.set(Tags.AbstractID, "AID_android_edit_widget");
-        android_edit_widget.set(AndroidTags.AndroidAccessibilityId, "accessibilityId");
-        android_edit_widget.set(AndroidTags.AndroidClassName, "className");
-        android_type_action = new AndroidActionType(state, android_edit_widget, "default");
-        android_type_action.set(Tags.ConcreteID, "CID_android_action_type");
-        android_type_action.set(Tags.AbstractID, "AID_android_action_type");
-        android_type_action.set(Tags.InputText, "LLM_text");
-    }
-
     @Test
     public void test_history_web_click_action() {
+        Action web_click_action = createClickAction(
+            createState(), 
+            "clickable_widget_desc", 
+            "clickable_widget_web_id", 
+            "CID_clickable_widget", 
+            "AID_clickable_widget", 
+            "CID_click", 
+            "AID_click"
+        );
+
         ActionHistory actionHistory = new ActionHistory(1);
         actionHistory.addToHistory(web_click_action);
         assertTrue(actionHistory.getActions().contains(web_click_action));
@@ -117,6 +49,17 @@ public class TestActionHistory {
 
     @Test
     public void test_history_web_type_action() {
+        Action web_type_action = createTypeAction(
+                createState(),
+                "typeable_widget_desc",
+                "typeable_widget_web_id",
+                "CID_typeable_widget",
+                "AID_typeable_widget",
+                "CID_type",
+                "AID_type",
+                "input_text",
+                "LLM_text");
+
         ActionHistory actionHistory = new ActionHistory(1);
         actionHistory.addToHistory(web_type_action);
         assertTrue(actionHistory.getActions().contains(web_type_action));
@@ -126,6 +69,16 @@ public class TestActionHistory {
 
     @Test
     public void test_history_web_select_action() {
+        Action web_select_action = createSelectAction(
+                createState(),
+                "combobox_widget_desc",
+                "combobox_widget_web_id",
+                "CID_combobox_widget",
+                "AID_combobox_widget",
+                "CID_select",
+                "AID_select",
+                "Saab");
+
         ActionHistory actionHistory = new ActionHistory(1);
         actionHistory.addToHistory(web_select_action);
         assertTrue(actionHistory.getActions().contains(web_select_action));
@@ -135,6 +88,8 @@ public class TestActionHistory {
 
     @Test
     public void test_history_android_type_action() {
+        Action android_type_action = createAndroidTypeAction(createState());
+
         ActionHistory actionHistory = new ActionHistory(1);
         actionHistory.addToHistory(android_type_action);
         assertTrue(actionHistory.getActions().contains(android_type_action));
@@ -143,7 +98,78 @@ public class TestActionHistory {
     }
 
     @Test
+    public void test_history_web_remote_click_action() {
+        Action web_remote_click_action = createRemoteClickAction(
+                "remote_click_widget",
+                "remote_click_id",
+                "CID_remote_click",
+                "AID_remote_click");
+
+        ActionHistory actionHistory = new ActionHistory(1);
+        actionHistory.addToHistory(web_remote_click_action);
+        assertTrue(actionHistory.getActions().contains(web_remote_click_action));
+        assertTrue(actionHistory.toString().contains("This is the last action we executed: AID_remote_click:"));
+        assertTrue(actionHistory.toString().contains("Clicked on 'remote_click_widget'"));
+    }
+
+    @Test
+    public void test_history_web_remote_scroll_click_action() {
+        Action web_remote_scroll_click_action = createRemoteScrollClickAction(
+                "remote_scroll_click_widget",
+                "remote_scroll_click_id",
+                "CID_remote_scroll_click",
+                "AID_remote_scroll_click");
+
+        ActionHistory actionHistory = new ActionHistory(1);
+        actionHistory.addToHistory(web_remote_scroll_click_action);
+        assertTrue(actionHistory.getActions().contains(web_remote_scroll_click_action));
+        assertTrue(actionHistory.toString().contains("This is the last action we executed: AID_remote_scroll_click:"));
+        assertTrue(actionHistory.toString().contains("Clicked on 'remote_scroll_click_widget'"));
+    }
+
+    @Test
+    public void test_history_web_remote_type_action() {
+        Action web_remote_type_action = createRemoteTypeAction(
+                "remote_type_widget",
+                "remote_type_id",
+                "CID_remote_type",
+                "AID_remote_type",
+                "remote_text");
+
+        ActionHistory actionHistory = new ActionHistory(1);
+        actionHistory.addToHistory(web_remote_type_action);
+        assertTrue(actionHistory.getActions().contains(web_remote_type_action));
+        assertTrue(actionHistory.toString().contains("This is the last action we executed: AID_remote_type:"));
+        assertTrue(actionHistory.toString().contains("Typed 'remote_text' in TextField 'remote_type_widget'"));
+    }
+
+    @Test
+    public void test_history_web_remote_scroll_type_action() {
+        Action web_remote_scroll_type_action = createRemoteScrollTypeAction(
+                "remote_scroll_type_widget",
+                "remote_scroll_type_id",
+                "CID_remote_scroll_type",
+                "AID_remote_scroll_type",
+                "remote_scroll_text");
+
+        ActionHistory actionHistory = new ActionHistory(1);
+        actionHistory.addToHistory(web_remote_scroll_type_action);
+        assertTrue(actionHistory.getActions().contains(web_remote_scroll_type_action));
+        assertTrue(actionHistory.toString().contains("This is the last action we executed: AID_remote_scroll_type:"));
+        assertTrue(actionHistory.toString().contains("Typed 'remote_scroll_text' in TextField 'remote_scroll_type_widget'"));
+    }
+
+    @Test
     public void test_history_multiple_actions() {
+        StateStub state = createState();
+        Action web_click_action = createClickAction(state, "clickable_widget_desc", "clickable_widget_web_id",
+                "CID_clickable_widget", "AID_clickable_widget", "CID_click", "AID_click");
+        Action web_type_action = createTypeAction(state, "typeable_widget_desc", "typeable_widget_web_id",
+                "CID_typeable_widget", "AID_typeable_widget", "CID_type", "AID_type", "input_text", "LLM_text");
+        Action web_select_action = createSelectAction(state, "combobox_widget_desc", "combobox_widget_web_id",
+                "CID_combobox_widget", "AID_combobox_widget", "CID_select", "AID_select", "Saab");
+        Action android_type_action = createAndroidTypeAction(state);
+
         ActionHistory actionHistory = new ActionHistory(3);
         actionHistory.addToHistory(web_click_action);
         actionHistory.addToHistory(web_type_action);
@@ -161,6 +187,109 @@ public class TestActionHistory {
         assertTrue(actionHistory.toString().contains("These are the last 2 actions we executed:"));
         assertTrue(actionHistory.toString().contains("Set value of ComboBox 'combobox_widget_web_id' to 'Saab'"));
         assertTrue(actionHistory.toString().contains("Typed 'LLM_text' in TextField 'android_edit_widget_desc'"));
+    }
+
+    private static StateStub createState() {
+        StateStub createdState = new StateStub();
+        createdState.set(WdTags.WebTitle, "Page Title | State");
+        return createdState;
+    }
+
+    private static WidgetStub createWebWidget(StateStub parentState, org.testar.monkey.alayer.Role role, String description,
+            String webId, String concreteId, String abstractId) {
+        WidgetStub widget = new WidgetStub();
+        parentState.addChild(widget);
+        widget.setParent(parentState);
+        widget.set(Tags.Shape, Rect.fromCoordinates(1, 1, 1, 1));
+        widget.set(Tags.Role, role);
+        widget.set(Tags.Path, "[0,0,1]");
+        widget.set(WdTags.WebId, webId);
+        widget.set(Tags.Desc, description);
+        widget.set(Tags.ConcreteID, concreteId);
+        widget.set(Tags.AbstractID, abstractId);
+        return widget;
+    }
+
+    private static Action createClickAction(StateStub parentState, String description, String webId, String widgetConcreteId,
+            String widgetAbstractId, String actionConcreteId, String actionAbstractId) {
+        Action action = ac.leftClickAt(createWebWidget(parentState, WdRoles.WdA, description, webId, widgetConcreteId, widgetAbstractId));
+        action.set(Tags.ConcreteID, actionConcreteId);
+        action.set(Tags.AbstractID, actionAbstractId);
+        return action;
+    }
+
+    private static Action createTypeAction(StateStub parentState, String description, String webId, String widgetConcreteId,
+            String widgetAbstractId, String actionConcreteId, String actionAbstractId, String inputText, String llmText) {
+        Action action = ac.clickTypeInto(createWebWidget(parentState, WdRoles.WdTEXTAREA, description, webId, widgetConcreteId, widgetAbstractId),
+                inputText, false);
+        action.set(Tags.ConcreteID, actionConcreteId);
+        action.set(Tags.AbstractID, actionAbstractId);
+        for(Action innerAction : ((CompoundAction) action).getActions()) {
+            if(innerAction instanceof Type) {
+                ((Type) innerAction).set(Tags.InputText, llmText);
+            }
+        }
+        return action;
+    }
+
+    private static Action createSelectAction(StateStub parentState, String description, String webId, String widgetConcreteId,
+            String widgetAbstractId, String actionConcreteId, String actionAbstractId, String value) {
+        WidgetStub widget = createWebWidget(parentState, WdRoles.WdSELECT, description, webId, widgetConcreteId, widgetAbstractId);
+        widget.set(WdTags.WebTagName, "select");
+        widget.set(WdTags.WebInnerHTML, "<option value=\"volvo\">Volvo</option><option value=\"saab\">Saab</option>");
+        Action action = new WdSelectListAction(webId, value, widget, WdSelectListAction.JsTargetMethod.ID);
+        action.set(Tags.ConcreteID, actionConcreteId);
+        action.set(Tags.AbstractID, actionAbstractId);
+        return action;
+    }
+
+    private static Action createRemoteClickAction(String description, String remoteId, String concreteId, String abstractId) {
+        Action action = new WdRemoteClickAction(new WdWidgetStub(description, remoteId, WdRoles.WdA, "a"));
+        action.set(Tags.ConcreteID, concreteId);
+        action.set(Tags.AbstractID, abstractId);
+        return action;
+    }
+
+    private static Action createRemoteScrollClickAction(String description, String remoteId, String concreteId, String abstractId) {
+        Action action = new WdRemoteScrollClickAction(new WdWidgetStub(description, remoteId, WdRoles.WdA, "a"));
+        action.set(Tags.ConcreteID, concreteId);
+        action.set(Tags.AbstractID, abstractId);
+        return action;
+    }
+
+    private static Action createRemoteTypeAction(String description, String remoteId, String concreteId, String abstractId, String text) {
+        Action action = new WdRemoteTypeAction(new WdWidgetStub(description, remoteId, WdRoles.WdTEXTAREA, "textarea"), text);
+        action.set(Tags.ConcreteID, concreteId);
+        action.set(Tags.AbstractID, abstractId);
+        return action;
+    }
+
+    private static Action createRemoteScrollTypeAction(String description, String remoteId, String concreteId, String abstractId, String text) {
+        Action action = new WdRemoteScrollTypeAction(new WdWidgetStub(description, remoteId, WdRoles.WdTEXTAREA, "textarea"), text);
+        action.set(Tags.ConcreteID, concreteId);
+        action.set(Tags.AbstractID, abstractId);
+        return action;
+    }
+
+    private static Action createAndroidTypeAction(StateStub parentState) {
+        WidgetStub widget = new WidgetStub();
+        parentState.addChild(widget);
+        widget.setParent(parentState);
+        widget.set(Tags.Shape, Rect.fromCoordinates(1, 1, 1, 1));
+        widget.set(Tags.Role, AndroidRoles.AndroidWidget);
+        widget.set(Tags.Path, "[0,0,1]");
+        widget.set(AndroidTags.AndroidXpath, "//path[0]");
+        widget.set(Tags.Desc, "android_edit_widget_desc");
+        widget.set(Tags.ConcreteID, "CID_android_edit_widget");
+        widget.set(Tags.AbstractID, "AID_android_edit_widget");
+        widget.set(AndroidTags.AndroidAccessibilityId, "accessibilityId");
+        widget.set(AndroidTags.AndroidClassName, "className");
+
+        Action action = new AndroidActionType(parentState, widget, "default");
+        action.set(Tags.ConcreteID, "CID_android_action_type");
+        action.set(Tags.AbstractID, "AID_android_action_type");
+        action.set(Tags.InputText, "LLM_text");
+        return action;
     }
 
 }

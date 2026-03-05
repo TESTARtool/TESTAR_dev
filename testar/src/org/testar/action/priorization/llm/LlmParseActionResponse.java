@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2025 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2025 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -46,6 +46,7 @@ import org.testar.monkey.alayer.actions.CompoundAction;
 import org.testar.monkey.alayer.actions.NOP;
 import org.testar.monkey.alayer.actions.PasteText;
 import org.testar.monkey.alayer.actions.Type;
+import org.testar.monkey.alayer.actions.WdRemoteTypeAction;
 import org.testar.monkey.alayer.actions.WdSelectListAction;
 import org.testar.monkey.alayer.visualizers.TextVisualizer;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
@@ -178,6 +179,11 @@ public class LlmParseActionResponse {
     }
 
     private boolean updateTextAction(Action action, Action innerAction, String inputText) {
+        if(action instanceof WdRemoteTypeAction) {
+            ((WdRemoteTypeAction) action).setKeys(inputText);
+            return true;
+        }
+
         innerAction.set(Tags.InputText, inputText);
 
         String widgetDesc = action.get(Tags.OriginWidget).get(Tags.Desc, "<no description>");
