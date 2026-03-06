@@ -6,6 +6,7 @@
 - Remove old disabled Record mode code
 - Move ExtendedOracles logic to DefaultProtocol
 - Remove reflective process-listener handle
+- Fix ExtendedSettingsFile default value
 
 
 #TESTAR v2.7.23 (5-Mar-2026)
