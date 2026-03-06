@@ -1,3 +1,15 @@
+#TESTAR v2.8.1 (9-Mar-2026)
+- Refactor TESTAR internals from a single Verdict getVerdict to List<Verdict> getVerdicts
+- Report all Verdict issues per state independently
+- Remove Verdict join logic
+- Add a feature and a setting to ignore previously detected Verdicts
+- Remove old disabled Record mode code
+- Move ExtendedOracles logic to DefaultProtocol
+- Remove reflective process-listener handle
+- Fix ExtendedSettingsFile default value
+- Update widget-element description logic
+
+
 #TESTAR v2.7.23 (5-Mar-2026)
 - Update webdriver remote actions descriptions
 - Add webdriver remote actions to LLM conversation

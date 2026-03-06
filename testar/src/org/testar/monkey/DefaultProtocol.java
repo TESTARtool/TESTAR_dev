@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -34,9 +34,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.*;
 import org.testar.managers.NativeHookManager;
-import org.testar.monkey.alayer.Action;
-import org.testar.monkey.alayer.Canvas;
-import org.testar.monkey.alayer.Color;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.ActivateSystem;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
@@ -52,6 +49,7 @@ import org.testar.monkey.alayer.visualizers.ShapeVisualizer;
 import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
 import org.testar.monkey.alayer.windows.WinApiException;
 import org.testar.oracles.Oracle;
+import org.testar.oracles.OracleSelection;
 import org.testar.oracles.log.LogOracle;
 import org.testar.oracles.log.ProcessListenerOracle;
 import org.testar.plugin.NativeLinker;
@@ -66,14 +64,33 @@ import org.testar.settings.Settings;
 import org.testar.statemodel.StateModelManager;
 import org.testar.statemodel.StateModelManagerFactory;
 
-import javax.swing.*;
-import java.awt.*;
-import java.io.*;
+import java.awt.Desktop;
+import java.awt.GraphicsEnvironment;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
+import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 import static org.testar.monkey.alayer.Tags.*;
 
@@ -84,6 +101,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	protected boolean processListenerOracleEnabled;
 	protected Oracle processListenerOracle;
+	protected List<Oracle> extendedOraclesList = Collections.emptyList();
+
+	private VerdictProcessing verdictProcessing;
 
 	private State stateForClickFilterLayerProtocol;
 
@@ -97,27 +117,29 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	String generatedSequence;
-	public String getGeneratedSequenceName() {
-		return generatedSequence;
-	}
 
 	private File currentSeq;
 
 	protected Mouse mouse;
 
-	private Verdict replayVerdict;
+	private List<Verdict> replayVerdicts = Collections.singletonList(Verdict.OK);
 
-	public Verdict getReplayVerdict() {
-		return replayVerdict;
+	public List<Verdict> getReplayVerdicts() {
+		return replayVerdicts;
 	}
 
-	public void setReplayVerdict(Verdict replayVerdict) {
-		this.replayVerdict = replayVerdict;
+	public void setReplayVerdicts(List<Verdict> replayVerdicts) {
+		this.replayVerdicts = replayVerdicts;
 	}
 
-	Verdict finalVerdict = Verdict.OK;
-	public Verdict getFinalVerdict() {
-		return finalVerdict;
+	private List<Verdict> sequenceVerdicts = Collections.singletonList(Verdict.OK);
+
+	public List<Verdict> getSequenceVerdicts() {
+		return sequenceVerdicts;
+	}
+
+	protected void updateSequenceVerdicts(List<Verdict> stateVerdicts) {
+		sequenceVerdicts = verdictProcessing.filterDuplicates(stateVerdicts);
 	}
 
 	protected String lastPrintParentsOf = "null-id";
@@ -239,9 +261,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				new ReplayMode().runReplayLoop(this);
 			} else if (mode() == Modes.Spy) {
 				new SpyMode().runSpyLoop(this);
-			} else if(mode() == Modes.Record) {
-				//new RecordMode().runRecordLoop(this);
-				System.out.println("Dear User, TESTAR Record mode is disabled temporarily.");
 			} else if (mode() == Modes.Generate) {
 				new GenerateMode().runGenerateOuterLoop(this);
 			}
@@ -279,6 +298,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		startTime = Util.time();
 		this.settings = settings;
 		mode = settings.get(ConfigTags.Mode);
+		verdictProcessing = new VerdictProcessing(settings);
 
 		builder = NativeLinker.getNativeStateBuilder(
 				settings.get(ConfigTags.TimeToFreeze),
@@ -289,7 +309,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		logOracleEnabled = settings.get(ConfigTags.LogOracleEnabled, false);
 		processListenerOracleEnabled = settings.get(ConfigTags.ProcessListenerEnabled, false);
 
-		if ( mode() == Modes.Generate || /*mode() == Modes.Record ||*/ mode() == Modes.Replay ) {
+		if ( mode() == Modes.Generate || mode() == Modes.Replay ) {
 			//Create the output folders
 			OutputStructure.calculateOuterLoopDateString();
 			OutputStructure.sequenceInnerLoopCount = 0;
@@ -323,8 +343,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			FileInputStream     fis = new FileInputStream(seqFile);
 			BufferedInputStream bis = new BufferedInputStream(fis);
-			GZIPInputStream   gis = new GZIPInputStream(bis);
-			ObjectInputStream ois = new ObjectInputStream(gis);
+			ObjectInputStream ois = new ObjectInputStream(bis);
 
 			ois.readObject();
 			ois.close();
@@ -563,12 +582,30 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 	}
 
-	void classifyAndCopySequenceIntoAppropriateDirectory(Verdict finalVerdict){
-		// Check if user wants to save or not the sequences without faults
-		if (settings.get(ConfigTags.OnlySaveFaultySequences, false) && finalVerdict.severity() == Verdict.OK.severity()) {
-			LogSerialiser.log("Skipped generated sequence OK (\"" + this.generatedSequence + "\")\n", LogSerialiser.LogLevel.Info);
-		} else {
-			this.generatedSequence = FileHandling.copyClassifiedSequence(this.generatedSequence, currentSeq, finalVerdict);
+	void classifyAndCopySequenceIntoAppropriateDirectory(List<Verdict> verdicts){
+		List<Verdict> verdictList = (verdicts == null || verdicts.isEmpty())
+				? Collections.singletonList(Verdict.OK)
+				: verdicts;
+
+		int index = 1;
+		String firstTargetSequence = null;
+		for (Verdict verdict : verdictList) {
+			if (verdict == null) {
+				continue;
+			}
+			if (settings.get(ConfigTags.OnlySaveFaultySequences, false)
+					&& verdict.severity() == Verdict.OK.severity()) {
+				LogSerialiser.log("Skipped generated sequence OK (\"" + this.generatedSequence + "\")\n", LogSerialiser.LogLevel.Info);
+				continue;
+			}
+			String suffixName = String.format("_V%03d_%s", index++, verdict.verdictSeverityTitle());
+			String targetSequence = FileHandling.copyClassifiedSequence(this.generatedSequence, currentSeq, verdict, suffixName);
+			if (firstTargetSequence == null) {
+				firstTargetSequence = targetSequence;
+			}
+		}
+		if (firstTargetSequence != null) {
+			this.generatedSequence = firstTargetSequence;
 		}
 	}
 
@@ -590,7 +627,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	    fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
 	    fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
 	    fragment.set(SystemState, state);
-	    fragment.set(OracleVerdict, getFinalVerdict());
+	    fragment.set(OracleVerdicts, getSequenceVerdicts());
 
 	    //Find the target widget of the current action, and save the title into the fragment
 	    if (state != null && action.get(Tags.OriginWidget, null) != null){
@@ -669,6 +706,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			logOracle = createLogOracle(settings);
 			logOracle.initialize();
 		}
+		extendedOraclesList = OracleSelection.loadExtendedOracles(settings.get(ConfigTags.ExtendedOracles, ""));
+		for (Oracle oracle : extendedOraclesList) {
+			oracle.initialize();
+		}
 	}
 
 	/**
@@ -686,8 +727,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	@Override
 	protected void beginSequence(SUT system, State state){
-		// Reset the final verdict for the new sequence
-		finalVerdict = Verdict.OK;
+		// Reset the sequence verdict for the new sequence
+		sequenceVerdicts = Collections.singletonList(Verdict.OK);
 	}
 
 	@Override
@@ -738,7 +779,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	/**
 	 * This method gets the state of the SUT
-	 * It also call getVerdict() and saves it into the state
+	 * It also call getVerdicts() and saves it into the state
 	 *
 	 * @param system
 	 * @return
@@ -757,20 +798,22 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		if(settings.get(ConfigTags.Mode) == Modes.Spy)
 			return state;
 
+		List<Verdict> verdicts = getVerdicts(state);
+		updateSequenceVerdicts(verdictProcessing.filterDuplicates(verdicts));
+		state.set(Tags.OracleVerdicts, sequenceVerdicts);
+
+		// State screenshot is taken after the Verdicts are computed
+		// This might be relevant to determine the viewPort of the screenshot depending on the Verdict (e.g., ProtocolUtil)
 		setStateScreenshot(state);
 
-		Verdict verdict = getVerdict(state);
-		state.set(Tags.OracleVerdict, verdict);
-
-		if(mode() != Modes.Spy && verdict.severity() >= settings().get(ConfigTags.FaultThreshold))
-		{
-			LogSerialiser.log("Detected fault: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
-			// this was added to kill the SUT if it is frozen:
-			if(verdict.severity() == Verdict.Severity.NOT_RESPONDING.getValue())
-			{
-				//if the SUT is frozen, we should kill it!
-				LogSerialiser.log("SUT frozen, trying to kill it!\n", LogSerialiser.LogLevel.Critical);
-				SystemProcessHandling.killRunningProcesses(system, 100);
+		if (mode() != Modes.Spy) {
+			for (Verdict verdict : sequenceVerdicts) {
+				// this was added to kill the SUT if it is frozen:
+				if (verdict.severity() == Verdict.Severity.NOT_RESPONDING.getValue()) {
+					//if the SUT is frozen, we should kill it!
+					LogSerialiser.log("SUT frozen, trying to kill it!\n", LogSerialiser.LogLevel.Critical);
+					SystemProcessHandling.killRunningProcesses(system, 100);
+				}
 			}
 		}
 
@@ -808,26 +851,33 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	@Override
-	protected Verdict getVerdict(State state){
+	protected List<Verdict> getVerdicts(State state) {
 		Assert.notNull(state);
+		List<Verdict> verdicts = new ArrayList<>();
+
 		//-------------------
 		// ORACLES FOR FREE
 		//-------------------
 
 		if ( processListenerOracleEnabled ) {
-			Verdict processListenerVerdict = processListenerOracle.getVerdict(state);
-			if ( processListenerVerdict.severity() == Verdict.Severity.SUSPICIOUS_PROCESS.getValue() ) {
-				return processListenerVerdict;
+			List<Verdict> processListenerVerdicts = processListenerOracle.getVerdicts(state);
+			for (Verdict processListenerVerdict : processListenerVerdicts) {
+				if ( processListenerVerdict.severity() == Verdict.Severity.SUSPICIOUS_PROCESS.getValue() ) {
+					verdicts.add(processListenerVerdict);
+				}
 			}
 		}
 
 		// if the SUT is not running and closed unexpectedly, we assume it crashed
-		if(!state.get(IsRunning, false))
-			return new Verdict(Verdict.Severity.UNEXPECTEDCLOSE, "System is offline! Closed Unexpectedly! I assume it crashed!");
+		if(!state.get(IsRunning, false)) {
+			verdicts.add(new Verdict(Verdict.Severity.UNEXPECTEDCLOSE, "System is offline! Closed Unexpectedly! I assume it crashed!"));
+			return verdicts;
+		}
 
 		// if the SUT does not respond within a given amount of time, we assume it crashed
 		if(state.get(Tags.NotResponding, false)){
-			return new Verdict(Verdict.Severity.NOT_RESPONDING, "System is unresponsive! I assume something is wrong!");
+			verdicts.add(new Verdict(Verdict.Severity.NOT_RESPONDING, "System is unresponsive! I assume something is wrong!"));
+			return verdicts;
 		}
 
 		//------------------------
@@ -838,23 +888,37 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			this.suspiciousTitlesPattern = Pattern.compile(settings().get(ConfigTags.SuspiciousTags), Pattern.UNICODE_CHARACTER_CLASS);
 
 		// search all widgets for suspicious String Values
-		Verdict suspiciousValueVerdict = Verdict.OK;
 		for(Widget w : state) {
-			suspiciousValueVerdict = suspiciousStringValueMatcher(w);
+			Verdict suspiciousValueVerdict = suspiciousStringValueMatcher(w);
 			if(suspiciousValueVerdict.severity() == Verdict.Severity.SUSPICIOUS_TAG.getValue()) {
-				return suspiciousValueVerdict;
+				verdicts.add(suspiciousValueVerdict);
 			}
 		}
 
 		if ( logOracleEnabled ) {
-			Verdict logVerdict = logOracle.getVerdict(state);
-			if ( logVerdict.severity() == Verdict.Severity.SUSPICIOUS_LOG.getValue() ) {
-				return logVerdict;
+			List<Verdict> logVerdicts = logOracle.getVerdicts(state);
+			for (Verdict logVerdict : logVerdicts) {
+				if ( logVerdict.severity() == Verdict.Severity.SUSPICIOUS_LOG.getValue() ) {
+					verdicts.add(logVerdict);
+				}
 			}
 		}
 
-		// if everything was OK ...
-		return Verdict.OK;
+		if (extendedOraclesList != null) {
+			for (Oracle extendedOracle : extendedOraclesList) {
+				List<Verdict> extendedVerdicts = extendedOracle.getVerdicts(state);
+				if (extendedVerdicts != null) {
+					verdicts.addAll(extendedVerdicts);
+				}
+			}
+		}
+
+		// if empty at this point, everything was OK
+		if (verdicts.isEmpty()) {
+			verdicts.add(Verdict.OK);
+		}
+
+		return verdicts;
 	}
 
 	private Verdict suspiciousStringValueMatcher(Widget w) {
@@ -1105,8 +1169,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @return
 	 */
 	protected boolean moreActions(State state) {
-		Verdict stateVerdict = state.get(Tags.OracleVerdict, Verdict.OK);
-		boolean faultySequence = stateVerdict.severity() != Verdict.OK.severity();
+		List<Verdict> stateVerdicts = state.get(Tags.OracleVerdicts, Collections.singletonList(Verdict.OK));
+		boolean faultySequence = !Verdict.helperAreAllVerdictsOK(stateVerdicts);
 		return (!settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence) &&
 				state.get(Tags.IsRunning, false) && !state.get(Tags.NotResponding, false) &&
 				//actionCount() < settings().get(ConfigTags.SequenceLength) &&
@@ -1141,20 +1205,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	@Override
 	protected void postSequenceProcessing() {
-
-		String status = "";
 		String statusInfo = "";
 
-		if(mode() == Modes.Replay) {
-			reportManager.addTestVerdict(getReplayVerdict());
-			status = (getReplayVerdict()).verdictSeverityTitle();
-			statusInfo = (getReplayVerdict()).info();
-		}
-		else {
-			reportManager.addTestVerdict(getFinalVerdict());
-			status = (getFinalVerdict()).verdictSeverityTitle();
-			statusInfo = (getFinalVerdict()).info();
-		}
+		List<Verdict> verdicts = (mode() == Modes.Replay)
+				? getReplayVerdicts()
+				: getSequenceVerdicts();
+
+		reportManager.addTestVerdicts(verdicts);
+		statusInfo = buildStatusInfo(verdicts);
 
 		this.generatedSequence = OutputStructure.outerLoopOutputDir + File.separator + this.generatedSequence;
 		try {
@@ -1163,15 +1221,29 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			LogSerialiser.log("Error generating sequence canonical path for the index logger\n", LogSerialiser.LogLevel.Critical);
 		}
 
-		statusInfo = statusInfo.replace("\n"+Verdict.OK.info(), "");
-
-		//Timestamp(generated by logger) SUTname Mode SequenceFileObject Status "StatusInfo"
+		//Timestamp(generated by logger) SUTname Mode SequenceFileObject "StatusInfo"
 		INDEXLOG.info(OutputStructure.executedSUTname
 					  + " " + settings.get(ConfigTags.Mode, mode())
 					  + " " + this.generatedSequence
-					  + " " + status + " \"" + statusInfo + "\"" );
+					  + " " + statusInfo);
+
+		if(mode() == Modes.Generate) verdictProcessing.storeNewVerdicts(verdicts);
 
 		reportManager.finishReport();
+	}
+
+	private String buildStatusInfo(List<Verdict> verdicts) {
+		List<Verdict> normalized = (verdicts == null || verdicts.isEmpty())
+				? Collections.singletonList(Verdict.OK)
+				: verdicts;
+		if (normalized.size() == 1) {
+			return normalized.get(0).info();
+		}
+		StringJoiner joiner = new StringJoiner(" | ");
+		for (Verdict verdict : normalized) {
+			joiner.add("[" + verdict.verdictSeverityTitle() + "] " + verdict.info());
+		}
+		return joiner.toString();
 	}
 
 	/**

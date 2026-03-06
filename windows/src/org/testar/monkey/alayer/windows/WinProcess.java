@@ -35,7 +35,6 @@
 package org.testar.monkey.alayer.windows;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -157,10 +156,8 @@ public final class WinProcess extends SUTBase {
 			//Associate Output / Error from SUT
 
 			final Process process = Runtime.getRuntime().exec(path);
-			Field field = process.getClass().getDeclaredField("handle");
-			field.setAccessible(true);
-			
-			long processHandle = field.getLong(process);
+			long pid = process.pid();
+			long processHandle = Windows.OpenProcess(Windows.PROCESS_QUERY_INFORMATION, false, pid);
 			
 			//TODO: WaitForInputIdle is not working with java app, investigate this issue.
 			//TODO: Read Util.pause with new "Tags.SUTwaitInput" (think Tag name) from settings file
@@ -169,9 +166,7 @@ public final class WinProcess extends SUTBase {
 			else
 				Windows.WaitForInputIdle(processHandle);
 			
-			long pid = Windows.GetProcessId(processHandle);
-			
-			WinProcess returnProcess = fromPID(pid);
+			WinProcess returnProcess = new WinProcess(processHandle, false, SUTProcesses);
 			
 			returnProcess.set(Tags.StdErr,process.getErrorStream());
 			returnProcess.set(Tags.StdOut, process.getInputStream());
@@ -183,7 +178,7 @@ public final class WinProcess extends SUTBase {
 			returnProcess.set(Tags.Path, path);
 			returnProcess.set(Tags.Desc, path);
 			return returnProcess;
-		}catch(FruitException | IOException | NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException  fe){
+		}catch(FruitException | IOException fe){
 			throw new SystemStartException(fe);
 		}
 	}

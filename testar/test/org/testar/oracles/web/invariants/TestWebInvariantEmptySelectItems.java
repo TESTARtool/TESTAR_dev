@@ -57,9 +57,11 @@ public class TestWebInvariantEmptySelectItems {
 			Assert.isTrue(extendedOraclesList.get(0) instanceof WebInvariantEmptySelectItems);
 
 			// Assert the oracle verdict is WARNING_WEB_INVARIANT_FAULT
-			Verdict verdict = extendedOraclesList.get(0).getVerdict(state);
+			List<Verdict> verdicts = extendedOraclesList.get(0).getVerdicts(state);
+			Assert.isEquals(1, verdicts.size());
+			Verdict verdict = verdicts.get(0);
 			Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT.getTitle()));
-			Assert.isTrue(verdict.info().equals("Detected Select widgets 'selectid' ,  with empty or only one item!"));
+			Assert.isTrue(verdict.info().equals("Detected Select widget 'selectid' ,  with empty or only one item (count: 1)!"));
 		}
 	}
 
@@ -84,7 +86,9 @@ public class TestWebInvariantEmptySelectItems {
 			Assert.isTrue(extendedOraclesList.get(0) instanceof WebInvariantEmptySelectItems);
 
 			// Assert the oracle verdict is OK
-			Verdict verdict = extendedOraclesList.get(0).getVerdict(state);
+			List<Verdict> verdicts = extendedOraclesList.get(0).getVerdicts(state);
+			Assert.isEquals(1, verdicts.size());
+			Verdict verdict = verdicts.get(0);
 			Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.OK.getTitle()));
 			Assert.isTrue(verdict.info().equals("No problem detected."));
 		}

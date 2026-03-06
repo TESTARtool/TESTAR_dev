@@ -56,10 +56,11 @@ public class TestWebdriverRemoteActions {
 		Assert.isTrue(remoteClickAction.get(Tags.OriginWidget).equals(childWdWidget));
 		Assert.isTrue(remoteClickAction.get(Tags.Role).equals(WdActionRoles.RemoteClick));
 		Assert.isTrue(remoteClickAction.get(Tags.Desc).equals("Remote click " + "Widget Description"));
-		Assert.isTrue(remoteClickAction.toShortString().equals("Remote click " + childWdElement.name));
-		Assert.isTrue(remoteClickAction.toParametersString().equals("Remote click " + childWdElement.name));
-		Assert.isTrue(remoteClickAction.toString(new Role[0]).equals("Remote click " + childWdElement.name));
-		Assert.isTrue(remoteClickAction.toString().equals("Remote click " + childWdElement.name));
+		String elementDescription = childWdElement.getElementDescription();
+		Assert.isTrue(remoteClickAction.toShortString().equals("Remote click " + elementDescription));
+		Assert.isTrue(remoteClickAction.toParametersString().equals("Remote click " + elementDescription));
+		Assert.isTrue(remoteClickAction.toString(new Role[0]).equals("Remote click " + elementDescription));
+		Assert.isTrue(remoteClickAction.toString().equals("Remote click " + elementDescription));
 
 		// Verify that run the action invokes the remoteWebElement click event
 		remoteClickAction.run(Mockito.mock(SUT.class), Mockito.mock(State.class), 1);
@@ -80,10 +81,11 @@ public class TestWebdriverRemoteActions {
 		Assert.isTrue(remoteScrollClickAction.get(Tags.OriginWidget).equals(childWdWidget));
 		Assert.isTrue(remoteScrollClickAction.get(Tags.Role).equals(WdActionRoles.RemoteScrollClick));
 		Assert.isTrue(remoteScrollClickAction.get(Tags.Desc).equals("Remote scroll and click " + "Widget Description"));
-		Assert.isTrue(remoteScrollClickAction.toShortString().equals("Remote scroll and click " + childWdElement.name));
-		Assert.isTrue(remoteScrollClickAction.toParametersString().equals("Remote scroll and click " + childWdElement.name));
-		Assert.isTrue(remoteScrollClickAction.toString(new Role[0]).equals("Remote scroll and click " + childWdElement.name));
-		Assert.isTrue(remoteScrollClickAction.toString().equals("Remote scroll and click " + childWdElement.name));
+		String elementDescription = childWdElement.getElementDescription();
+		Assert.isTrue(remoteScrollClickAction.toShortString().equals("Remote scroll and click " + elementDescription));
+		Assert.isTrue(remoteScrollClickAction.toParametersString().equals("Remote scroll and click " + elementDescription));
+		Assert.isTrue(remoteScrollClickAction.toString(new Role[0]).equals("Remote scroll and click " + elementDescription));
+		Assert.isTrue(remoteScrollClickAction.toString().equals("Remote scroll and click " + elementDescription));
 
 		// Verify that run the action invokes the remoteWebElement click event
 		remoteScrollClickAction.run(Mockito.mock(SUT.class), Mockito.mock(State.class), 1);
@@ -105,10 +107,11 @@ public class TestWebdriverRemoteActions {
 		Assert.isTrue(remoteTypeAction.get(Tags.OriginWidget).equals(childWdWidget));
 		Assert.isTrue(remoteTypeAction.get(Tags.Role).equals(WdActionRoles.RemoteType));
 		Assert.isTrue(remoteTypeAction.get(Tags.Desc).equals("Remote type " + typedText + " to widget " + "Widget Description"));
-		Assert.isTrue(remoteTypeAction.toShortString().equals("Remote type " + typedText + " " + childWdElement.name));
-		Assert.isTrue(remoteTypeAction.toParametersString().equals("Remote type " + typedText + " " + childWdElement.name));
-		Assert.isTrue(remoteTypeAction.toString(new Role[0]).equals("Remote type " + typedText + " " + childWdElement.name));
-		Assert.isTrue(remoteTypeAction.toString().equals("Remote type " + typedText + " " + childWdElement.name));
+		String elementDescription = childWdElement.getElementDescription();
+		Assert.isTrue(remoteTypeAction.toShortString().equals("Remote type " + typedText + " " + elementDescription));
+		Assert.isTrue(remoteTypeAction.toParametersString().equals("Remote type " + typedText + " " + elementDescription));
+		Assert.isTrue(remoteTypeAction.toString(new Role[0]).equals("Remote type " + typedText + " " + elementDescription));
+		Assert.isTrue(remoteTypeAction.toString().equals("Remote type " + typedText + " " + elementDescription));
 
 		// Verify that run the action invokes the remoteWebElement sendKeys event
 		remoteTypeAction.run(Mockito.mock(SUT.class), Mockito.mock(State.class), 1);
@@ -130,10 +133,11 @@ public class TestWebdriverRemoteActions {
 		Assert.isTrue(remoteScrollTypeAction.get(Tags.OriginWidget).equals(childWdWidget));
 		Assert.isTrue(remoteScrollTypeAction.get(Tags.Role).equals(WdActionRoles.RemoteScrollType));
 		Assert.isTrue(remoteScrollTypeAction.get(Tags.Desc).equals("Remote scroll and type " + typedText + " to widget " + "Widget Description"));
-		Assert.isTrue(remoteScrollTypeAction.toShortString().equals("Remote scroll and type " + typedText + " " + childWdElement.name));
-		Assert.isTrue(remoteScrollTypeAction.toParametersString().equals("Remote scroll and type " + typedText + " " + childWdElement.name));
-		Assert.isTrue(remoteScrollTypeAction.toString(new Role[0]).equals("Remote scroll and type " + typedText + " " + childWdElement.name));
-		Assert.isTrue(remoteScrollTypeAction.toString().equals("Remote scroll and type " + typedText + " " + childWdElement.name));
+		String elementDescription = childWdElement.getElementDescription();
+		Assert.isTrue(remoteScrollTypeAction.toShortString().equals("Remote scroll and type " + typedText + " " + elementDescription));
+		Assert.isTrue(remoteScrollTypeAction.toParametersString().equals("Remote scroll and type " + typedText + " " + elementDescription));
+		Assert.isTrue(remoteScrollTypeAction.toString(new Role[0]).equals("Remote scroll and type " + typedText + " " + elementDescription));
+		Assert.isTrue(remoteScrollTypeAction.toString().equals("Remote scroll and type " + typedText + " " + elementDescription));
 
 		// Verify that run the action invokes the remoteWebElement sendKeys event
 		remoteScrollTypeAction.run(Mockito.mock(SUT.class), Mockito.mock(State.class), 1);

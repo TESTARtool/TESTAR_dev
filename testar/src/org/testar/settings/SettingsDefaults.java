@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2023 - 2025 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2023 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2023 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2023 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -49,7 +49,6 @@ public class SettingsDefaults {
 
 		defaults.add(Pair.from(ProcessesToKillDuringTest, "(?!x)x"));
 		defaults.add(Pair.from(ShowVisualSettingsDialogOnStartup, true));
-		defaults.add(Pair.from(FaultThreshold, 0.1));
 		defaults.add(Pair.from(LogLevel, 1));
 		defaults.add(Pair.from(Mode, RuntimeControlsProtocol.Modes.Spy));
 		defaults.add(Pair.from(OutputDir, Main.outputDir));
@@ -69,6 +68,7 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(SUTConnectorValue, ""));
 		defaults.add(Pair.from(Delete, new ArrayList<String>()));
 		defaults.add(Pair.from(CopyFromTo, new ArrayList<Pair<String, String>>()));
+		defaults.add(Pair.from(IgnoreDuplicatedVerdicts, false));
 		defaults.add(Pair.from(SuspiciousTags, "(?!x)x"));
 		defaults.add(Pair.from(ClickFilter, "(?!x)x"));
 		defaults.add(Pair.from(MyClassPath, Arrays.asList(Main.settingsDir)));

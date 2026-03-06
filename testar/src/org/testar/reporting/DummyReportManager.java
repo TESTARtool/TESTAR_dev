@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2025 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2025 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2025 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,6 +30,7 @@
 
 package org.testar.reporting;
 
+import java.util.List;
 import java.util.Set;
 
 import org.testar.monkey.alayer.Action;
@@ -59,7 +60,7 @@ public class DummyReportManager implements Reporting {
     }
 
     @Override
-    public void addTestVerdict(Verdict verdict) {
+    public void addTestVerdicts(List<Verdict> verdicts) {
 
     }
 

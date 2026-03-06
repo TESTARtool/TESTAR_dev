@@ -110,7 +110,7 @@ Some of the most interesting parameters that can help to integrate TESTAR as an 
 
 		ShowVisualSettingsDialogOnStartup -> To run TESTAR without the GUI
 
-		Mode -> TESTAR execution Mode (Spy, Generate, Record, Replay, View)
+		Mode -> TESTAR execution Mode (Spy, Generate, Replay, View)
 
 		SUTConnector & SUTConnectorValue -> The way to link with the desired application to be tested
 

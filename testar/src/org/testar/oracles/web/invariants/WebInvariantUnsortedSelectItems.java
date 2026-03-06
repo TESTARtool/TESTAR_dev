@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2025 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2025 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -71,8 +71,8 @@ public class WebInvariantUnsortedSelectItems implements Oracle {
 	}
 
 	@Override
-	public Verdict getVerdict(State state) {
-		List<Widget> unsortedSelectWidgets = new ArrayList<>();
+	public List<Verdict> getVerdicts(State state) {
+		List<Verdict> verdicts = new ArrayList<>();
 
 		for (Widget w : state) {
 			if (roles.contains(w.get(Tags.Role, Roles.Widget)) && !w.get(WdTags.WebId, "").isEmpty()) {
@@ -89,7 +89,17 @@ public class WebInvariantUnsortedSelectItems implements Oracle {
 
 					// Check if the options are sorted
 					if (selectOptionsList != null && !isSorted(selectOptionsList)) {
-						unsortedSelectWidgets.add(w);
+						String verdictMsg = String.format(
+								"Detected Select widget %s with unsorted elements!",
+								getDescriptionOfWidgets(Collections.singletonList(w), WdTags.WebId)
+								);
+						Visualizer visualizer = new RegionsVisualizer(
+								getRedPen(),
+								getWidgetRegions(Collections.singletonList(w)),
+								"Invariant Fault",
+								0.5, 0.5);
+
+						verdicts.add(new Verdict(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT, verdictMsg, visualizer));
 					}
 				} catch (Exception e) {
 					// Ignore webdriver execute script errors
@@ -97,23 +107,10 @@ public class WebInvariantUnsortedSelectItems implements Oracle {
 			}
 		}
 
-		if (!unsortedSelectWidgets.isEmpty()) {
-
-			String verdictMsg = String.format(
-					"Detected Select widgets %s with unsorted elements!",
-					getDescriptionOfWidgets(unsortedSelectWidgets, WdTags.WebId)
-					);
-
-			Visualizer visualizer = new RegionsVisualizer(
-					getRedPen(),
-					getWidgetRegions(unsortedSelectWidgets),
-					"Invariant Fault",
-					0.5, 0.5);
-
-			return new Verdict(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT, verdictMsg, visualizer);
+		if (!verdicts.isEmpty()) {
+			return verdicts;
 		}
-
-		return Verdict.OK;
+		return Collections.singletonList(Verdict.OK);
 	}
 
 	// Helper method to check if the list of strings is sorted

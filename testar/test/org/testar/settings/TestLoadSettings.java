@@ -73,4 +73,22 @@ public class TestLoadSettings {
 		Assert.isTrue(settings.get(ConfigTags.Discount) == 0.123);
 		Assert.isTrue(settings.get(ConfigTags.ApplicationName).equals("custom"));
 	}
+
+	@Test
+	public void loadExtendedSettings() throws IOException {
+		// Create a temporary folder and test.settings folder
+		tempFolder.newFolder("tempExtendedSettingsFolder");
+		File tempFile = tempFolder.newFile("test.settings");
+
+		// Write the test.settings content to the temporary file
+		try (FileWriter writer = new FileWriter(tempFile)) {
+			writer.write("ExtendedSettingsFile = \n");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		Settings settings = Settings.loadSettings(new String[] {}, tempFile.getCanonicalPath());
+
+		Assert.isTrue(settings.get(ConfigTags.ExtendedSettingsFile).endsWith("ExtendedSettings.xml"));
+	}
 }

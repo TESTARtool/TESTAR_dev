@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2021 - 2023 Open Universiteit - www.ou.nl
- * Copyright (c) 2021 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2021 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2021 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -34,6 +34,7 @@ import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Verdict;
 
+import java.util.List;
 import java.util.Set;
 
 public interface Reporting
@@ -42,6 +43,6 @@ public interface Reporting
     public void addActions(Set<Action> actions);
     public void addActionsAndUnvisitedActions(Set<Action> actions, Set<String> concreteIdsOfUnvisitedActions);
     public void addSelectedAction(State state, Action action);
-    public void addTestVerdict(Verdict verdict);
+    public void addTestVerdicts(List<Verdict> verdicts);
     public void finishReport();
 }

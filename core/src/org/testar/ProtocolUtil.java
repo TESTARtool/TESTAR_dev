@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2016 - 2025 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2019 - 2025 Open Universiteit - www.ou.nl
+* Copyright (c) 2016 - 2026 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2019 - 2026 Open Universiteit - www.ou.nl
 * 
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -49,6 +49,7 @@ import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.Widget;
 
 import java.awt.*;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -251,7 +252,8 @@ public class ProtocolUtil {
 		}
 		
 		//If the state Shape is not properly obtained, or the State has an error, use full monitor screen
-		if (viewPort == null || (state.get(Tags.OracleVerdict, Verdict.OK).severity() > Verdict.Severity.OK.getValue()))
+		List<Verdict> verdicts = state.get(Tags.OracleVerdicts, Collections.singletonList(Verdict.OK));
+		if (viewPort == null || !Verdict.helperAreAllVerdictsOK(verdicts))
 			viewPort = state.get(Tags.Shape, null); // get the SUT process canvas (usually, full monitor screen)
 
 		// Validate viewport dimensions before taking the screenshot

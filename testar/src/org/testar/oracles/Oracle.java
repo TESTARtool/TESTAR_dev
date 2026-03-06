@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2022 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2022 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2022 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2022 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -60,13 +60,13 @@ public interface Oracle {
     public abstract void initialize();
 
     /**
-     * Request that the Oracle determine a verdict about the current state of the SUT.
-     * This method would usually be called by the getVerdict method in the protocol.
+     * Request that the Oracle determine verdicts about the current state of the SUT.
+     * This method would usually be called by the getVerdicts method in the protocol.
      *
      * @param state
-     * @return verdict
+     * @return list of verdicts
      */
-    public abstract Verdict getVerdict(State state);
+    public abstract List<Verdict> getVerdicts(State state);
 
     /**
      * Provides a standard red pen for visual annotations. 
