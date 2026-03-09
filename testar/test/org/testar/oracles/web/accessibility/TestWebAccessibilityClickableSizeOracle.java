@@ -51,9 +51,11 @@ public class TestWebAccessibilityClickableSizeOracle {
 		Assert.isTrue(extendedOraclesList.get(0) instanceof WebAccessibilityClickableSizeOracle);
 
 		// Assert the oracle verdict is WARNING_ACCESSIBILITY_FAULT
-		Verdict verdict = extendedOraclesList.get(0).getVerdict(state);
+		List<Verdict> verdicts = extendedOraclesList.get(0).getVerdicts(state);
+		Assert.isEquals(1, verdicts.size());
+		Verdict verdict = verdicts.get(0);
 		Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.WARNING_ACCESSIBILITY_FAULT.getTitle()));
-		Assert.isTrue(verdict.info().equals("Clickable web widgets '&lt;a&gt;link&lt;/a&gt;' ,  are too small (Minimum: 24 px)."));
+		Assert.isTrue(verdict.info().equals("Clickable web widget '&lt;a&gt;link&lt;/a&gt;' ,  is too small (0x0 px). Minimum: 24 px."));
 	}
 
 	@Test
@@ -73,7 +75,9 @@ public class TestWebAccessibilityClickableSizeOracle {
 		Assert.isTrue(extendedOraclesList.get(0) instanceof WebAccessibilityClickableSizeOracle);
 
 		// Assert the oracle verdict is OK
-		Verdict verdict = extendedOraclesList.get(0).getVerdict(state);
+		List<Verdict> verdicts = extendedOraclesList.get(0).getVerdicts(state);
+		Assert.isEquals(1, verdicts.size());
+		Verdict verdict = verdicts.get(0);
 		Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.OK.getTitle()));
 		Assert.isTrue(verdict.info().equals("No problem detected."));
 	}

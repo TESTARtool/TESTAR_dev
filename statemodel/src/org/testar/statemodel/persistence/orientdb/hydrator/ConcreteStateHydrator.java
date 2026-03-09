@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -39,6 +39,10 @@ import org.testar.statemodel.persistence.orientdb.entity.PropertyValue;
 import org.testar.statemodel.persistence.orientdb.entity.TypeConvertor;
 import org.testar.statemodel.persistence.orientdb.entity.VertexEntity;
 import org.testar.statemodel.persistence.orientdb.util.Validation;
+
+import java.util.Collections;
+import java.util.List;
+
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.TaggableBase;
 import org.testar.monkey.alayer.Tags;
@@ -89,18 +93,13 @@ public class ConcreteStateHydrator implements EntityHydrator<VertexEntity>{
         }
 
         // get the oracle verdict and transform it into a custom code
-        Verdict verdict = attributes.get(Tags.OracleVerdict, null);
+        List<Verdict> verdicts = attributes.get(Tags.OracleVerdicts, Collections.singletonList(Verdict.OK));
         int oracleVerdictCode = 4; // default value
-        if (verdict != null) {
-            if (verdict.severity() == Verdict.Severity.OK.getValue()) {
-                oracleVerdictCode = 1;
-            }
-            else if (verdict.severity() == Verdict.Severity.FAIL.getValue()) {
-                oracleVerdictCode = 2;
-            }
-            else if (verdict.severity() > Verdict.Severity.OK.getValue() && verdict.severity() < Verdict.Severity.FAIL.getValue()) {
-                oracleVerdictCode = 3;
-            }
+        if (Verdict.helperAreAllVerdictsOK(verdicts)) {
+            oracleVerdictCode = 1;
+        }
+        else {
+            oracleVerdictCode = 2;
         }
         target.addPropertyValue("oracleVerdictCode", new PropertyValue(OType.INTEGER, oracleVerdictCode));
     }

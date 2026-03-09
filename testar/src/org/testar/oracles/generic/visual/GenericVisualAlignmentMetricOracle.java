@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2023 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2023 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2023 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2023 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,6 +31,8 @@
 package org.testar.oracles.generic.visual;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.testar.monkey.alayer.Shape;
 import org.testar.monkey.alayer.State;
@@ -65,7 +67,7 @@ public class GenericVisualAlignmentMetricOracle implements Oracle {
 	}
 
 	@Override
-	public Verdict getVerdict(State state) {
+	public List<Verdict> getVerdicts(State state) {
 		ArrayList<Shape> regions = MetricsHelper.getRegions(state);
 
 		double alignmentMetric = MetricsHelper.calculateAlignmentMetric(regions);
@@ -73,10 +75,10 @@ public class GenericVisualAlignmentMetricOracle implements Oracle {
 		if (alignmentMetric < thresholdValue) {
 			String verdictMsg = String.format("Alignment metric with value %f is below threshold value %f!", alignmentMetric, thresholdValue);
 			Visualizer visualizer = new RegionsVisualizer(getRedPen(), regions, "Alignment Metric Warning", 0.5, 0.5);
-			return new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, visualizer);
+			return Collections.singletonList(new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, visualizer));
 		}
 
-		return Verdict.OK;
+		return Collections.singletonList(Verdict.OK);
 	}
 
 }

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -39,9 +39,11 @@ import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 
+import java.io.File;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 
@@ -49,6 +51,8 @@ public class HtmlReporter implements Reporting
 {
     private HtmlFormatUtil htmlReportUtil;
     private int innerLoopCounter = 0;
+    private boolean deleteBaseReport = false;
+    private String baseReportPath;
 
     private final String openStateBlockContainer = "<div class='stateBlock' style='display:flex;flex-direction:column'>";
     private final String openDerivedBlockContainer = "<div class='derivedBlock' style='display:flex;flex-direction:column'>";
@@ -252,25 +256,53 @@ public class HtmlReporter implements Reporting
     }
 
     @Override
-    public void addTestVerdict(Verdict verdict)
+    public void addTestVerdicts(List<Verdict> verdicts)
     {
+        String baseFilePath = htmlReportUtil.getFile().getAbsolutePath();
+        deleteBaseReport = true;
+        baseReportPath = baseFilePath;
+        int index = 1;
+        for (Verdict verdict : verdicts) {
+            String suffixName = String.format("_V%03d_%s", index++, verdict.verdictSeverityTitle());
+            String verdictFilePath = appendSuffixToFile(baseFilePath, suffixName);
+
+            htmlReportUtil.duplicateFile(verdictFilePath);
+
+            HtmlFormatUtil verdictUtil = new HtmlFormatUtil(verdictFilePath);
+            addVerdictBlock(verdictUtil, verdict);
+            verdictUtil.addContent("</div>");
+            verdictUtil.addFooter();
+            verdictUtil.writeToFile();
+        }
+    }
+
+    private void addVerdictBlock(HtmlFormatUtil util, Verdict verdict) {
         String verdictInfo = StringEscapeUtils.escapeHtml(verdict.info());
         if(verdict.severity() > Verdict.OK.severity())
             verdictInfo = verdictInfo.replace(Verdict.OK.info(), "").replace("\n", "");
 
-        htmlReportUtil.addContent(openVerdictBlockContainer); // Open verdict block container
-        htmlReportUtil.addHeading(2, "Test verdict for this sequence: " + verdictInfo);
-        htmlReportUtil.addHeading(4, "Severity: " + verdict.severity());
-        htmlReportUtil.addContent("<h4 id='visualizer-rect' style='display: none;'>Visualizer: " + verdict.visualizer().getShapes() + "</h4>");
-        htmlReportUtil.addContent(closeContainer); // Close verdict block container
+        util.addContent(openVerdictBlockContainer); // Open verdict block container
+        util.addHeading(2, "Test verdict for this sequence: " + verdictInfo);
+        util.addHeading(4, "Severity: " + verdict.severity());
+        util.addContent("<h4 id='visualizer-rect' style='display: none;'>Visualizer: " + verdict.visualizer().getShapes() + "</h4>");
+        util.addContent(closeContainer); // Close verdict block container
+    }
 
-        htmlReportUtil.appendToFileName("_" + verdict.verdictSeverityTitle());
-        htmlReportUtil.writeToFile();
+    private String appendSuffixToFile(String filePath, String suffixName) {
+        int dotIndex = filePath.lastIndexOf('.');
+        if (dotIndex == -1) {
+            return filePath + suffixName;
+        }
+        return filePath.substring(0, dotIndex) + suffixName + filePath.substring(dotIndex);
     }
 
     @Override
     public void finishReport()
     {
+        if (deleteBaseReport && baseReportPath != null) {
+            new File(baseReportPath).delete();
+            return;
+        }
         htmlReportUtil.addContent("</div>"); // Close the main div container
         htmlReportUtil.addFooter();
 

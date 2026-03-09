@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -141,11 +141,13 @@ public class Protocol_webdriver_security_analysis extends WebdriverProtocol {
     }
 
     @Override
-    protected Verdict getVerdict(State state) {
+    protected List<Verdict> getVerdicts(State state) {
         securityResultWriter.WriteVisit(WdDriver.getCurrentUrl());
-        Verdict verdict = Verdict.OK;
-        oracleOrchestrator.getVerdict(verdict);
-        return verdict;
+        List<Verdict> verdicts = oracleOrchestrator.getVerdicts();
+        if (verdicts == null || verdicts.isEmpty()) {
+            return Collections.singletonList(Verdict.OK);
+        }
+        return verdicts;
     }
 
     @Override

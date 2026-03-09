@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2025 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2025 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,6 +31,7 @@
 package org.testar.oracles.web.invariants;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.testar.monkey.alayer.Roles;
@@ -63,8 +64,8 @@ public class WebInvariantManySelectItems implements Oracle {
 	}
 
 	@Override
-	public Verdict getVerdict(State state) {
-		List<Widget> selectWidgetsWithManyItems = new ArrayList<>();
+	public List<Verdict> getVerdicts(State state) {
+		List<Verdict> verdicts = new ArrayList<>();
 
 		for (Widget w : state) {
 			if (w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) && !w.get(WdTags.WebId, "").isEmpty()) {
@@ -75,7 +76,20 @@ public class WebInvariantManySelectItems implements Oracle {
 
 					// Check if the items of the select widget are more than the thresholdValue
 					if (selectItemsLength != null && selectItemsLength.intValue() > thresholdValue) {
-						selectWidgetsWithManyItems.add(w);
+						String verdictMsg = String.format(
+								"Detected Select widget %s which has %d items (threshold: %d)",
+								getDescriptionOfWidgets(Collections.singletonList(w), WdTags.WebId),
+								selectItemsLength.intValue(),
+								thresholdValue
+								);
+
+						Visualizer visualizer = new RegionsVisualizer(
+								getRedPen(),
+								getWidgetRegions(Collections.singletonList(w)),
+								"Invariant Fault",
+								0.5, 0.5);
+
+						verdicts.add(new Verdict(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT, verdictMsg, visualizer));
 					}
 
 				} catch (Exception e) {
@@ -84,23 +98,9 @@ public class WebInvariantManySelectItems implements Oracle {
 			}
 		}
 
-		if (!selectWidgetsWithManyItems.isEmpty()) {
-
-			String verdictMsg = String.format(
-					"Detected Select widgets %s which have more items than the threshold value of %d",
-					getDescriptionOfWidgets(selectWidgetsWithManyItems, WdTags.WebId),
-					thresholdValue
-					);
-
-			Visualizer visualizer = new RegionsVisualizer(
-					getRedPen(),
-					getWidgetRegions(selectWidgetsWithManyItems),
-					"Invariant Fault",
-					0.5, 0.5);
-
-			return new Verdict(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT, verdictMsg, visualizer);
+		if (!verdicts.isEmpty()) {
+			return verdicts;
 		}
-
-		return Verdict.OK;
+		return Collections.singletonList(Verdict.OK);
 	}
 }

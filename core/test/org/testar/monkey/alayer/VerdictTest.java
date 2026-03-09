@@ -35,28 +35,14 @@ import static org.junit.Assert.*;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
 import org.testar.monkey.alayer.visualizers.ShapeVisualizer;
 
 public class VerdictTest {
-
-	private final double DELTA = 0;
-
-	private final Visualizer dummyVisualizer = new Visualizer(){
-		private static final long serialVersionUID = -7830649624698071090L;
-		public void run(State s, Canvas c, Pen pen) {}	
-	};
 
 	private final Visualizer failVisualizer = new ShapeVisualizer(
 					Pen.PEN_RED, 
 					Rect.from(0, 0, 10, 10), 
 					"Fail Visualizer", 
-					0.5, 0.5);
-
-	private final Visualizer issueVisualizer = new RegionsVisualizer(
-					Pen.PEN_RED, 
-					Arrays.asList(Rect.from(0, 0, 10, 10)), 
-					"Issue Visualizer", 
 					0.5, 0.5);
 
 	@Test
@@ -67,54 +53,12 @@ public class VerdictTest {
 	}
 
 	@Test
-	public void testJoin() {
-		Verdict v1 = new Verdict(Verdict.Severity.OK, "Foo Bar");
-		Verdict v2 = new Verdict(Verdict.Severity.FAIL, "Bar", failVisualizer);
-		Verdict v3 = new Verdict(Verdict.Severity.OK, "Baz", dummyVisualizer);
-		Verdict v4 = new Verdict(Verdict.Severity.FAIL, "Exception", issueVisualizer);
-		Verdict emptyVisualizerVerdict = new Verdict(Verdict.Severity.FAIL, "Empty");
+	public void testVerdictHelperAreOK() {
+		Verdict ok = Verdict.OK;
+		Verdict warn = new Verdict(Verdict.Severity.SUSPICIOUS_TAG, "Issue", failVisualizer);
 
-		assertTrue("Joining two Verdicts shall create a new Verdict", 
-				v1 != v1.join(v2));
-
-		assertEquals("Joining two Verdicts shall set the severity to the maximum of both",
-				Verdict.Severity.FAIL.getValue(), v3.join(v2).severity(), DELTA);
-
-		assertEquals("If a Verdict's info contains the info of the Verdict to be joined with, " +
-				"then only the containing info shall be used",
-				"Foo Bar", v1.join(v2).info());
-
-		assertEquals("If a Verdict is OK and its info does not contain the info of the Verdict to be joined with, " +
-				"then the containing info shall be discarded",
-				"Baz", v1.join(v3).info());
-
-		assertEquals("If a Verdict is not OK and its info does not contain the info of the Verdict to be joined with, " +
-				"then both infos shall be included separated by a line break",
-				"Bar\nBaz", v2.join(v3).info());
-
-		assertTrue("Joining an OK and Fail Verdicts shall use the Visualizer of the Verdict with high severity",
-				v2.join(v1).visualizer() == failVisualizer);
-
-		assertTrue("Joining an OK and Fail Verdicts shall use the Visualizer of the Verdict with high severity",
-				v1.join(v2).visualizer() == failVisualizer);
-
-		assertTrue("Joining Fail and Issue Verdicts must contain Fail Shapes",
-				v2.join(v4).visualizer().getShapes().containsAll(failVisualizer.getShapes()));
-
-		assertTrue("Joining Issue and Fail Verdicts must contain Fail Shapes",
-				v4.join(v2).visualizer().getShapes().containsAll(failVisualizer.getShapes()));
-
-		assertTrue("Joining Fail and Issue Verdicts must contain Issue Shapes",
-				v2.join(v4).visualizer().getShapes().containsAll(issueVisualizer.getShapes()));
-
-		assertTrue("Joining Issue and Fail Verdicts must contain Issue Shapes",
-				v4.join(v2).visualizer().getShapes().containsAll(issueVisualizer.getShapes()));
-
-		assertTrue("Joining Fail and emptyVisualizerVerdict Verdicts must equal Fail visualizer",
-				v2.join(emptyVisualizerVerdict).visualizer() == failVisualizer);
-
-		assertTrue("Joining emptyVisualizerVerdict and Fail Verdicts must equal Fail visualizer",
-				emptyVisualizerVerdict.join(v2).visualizer() == failVisualizer);
+		assertTrue(Verdict.helperAreAllVerdictsOK(Arrays.asList(ok)));
+		assertFalse(Verdict.helperAreAllVerdictsOK(Arrays.asList(warn)));
 	}
 
 	@Test

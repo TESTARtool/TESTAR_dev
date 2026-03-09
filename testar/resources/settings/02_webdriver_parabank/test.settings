@@ -39,6 +39,12 @@ Sequences = 5
 SequenceLength = 20
 
 #################################################################
+# Ignore reporting duplicated verdicts for this protocol
+#################################################################
+
+IgnoreDuplicatedVerdicts = true
+
+#################################################################
 # Oracles based on suspicious tag values
 #
 # Regular expression and Tags to apply them
@@ -191,9 +197,9 @@ SwitchNewTabs = true
 # WebConsoleWarningPattern: Regular expressions ORACLE to find suspicious messages in the browser warning console
 #################################################################
 
-WebConsoleErrorOracle = false
+WebConsoleErrorOracle = true
 WebConsoleErrorPattern = .*.*
-WebConsoleWarningOracle = false
+WebConsoleWarningOracle = true
 WebConsoleWarningPattern = .*.*
 
 #################################################################

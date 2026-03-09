@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2022 - 2023 Open Universiteit - www.ou.nl
- * Copyright (c) 2022 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2022 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2022 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,6 +31,7 @@
 package org.testar.oracles.log;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.testar.monkey.ConfigTags;
@@ -63,13 +64,13 @@ public class LogOracle implements Oracle {
         checker.initialRead();
     }
 
-    public Verdict getVerdict(State state) {
+    public List<Verdict> getVerdicts(State state) {
         errorsList.addAll(checker.readAndCheck());
         if ( errorsList.size() == 0  ) {
-            return Verdict.OK;
+            return Collections.singletonList(Verdict.OK);
         }
         else {
-            return new Verdict(Verdict.Severity.SUSPICIOUS_LOG, String.join(";", errorsList));
+            return Collections.singletonList(new Verdict(Verdict.Severity.SUSPICIOUS_LOG, String.join(";", errorsList)));
         }
     }
 
