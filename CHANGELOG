@@ -1,3 +1,8 @@
+#TESTAR v2.8.2 (10-Mar-2026)
+- Fix ignoring ValuePattern tag for UIAEdit widgets
+- Remove unused comments and classes
+
+
 #TESTAR v2.8.1 (9-Mar-2026)
 - Refactor TESTAR internals from a single Verdict getVerdict to List<Verdict> getVerdicts
 - Report all Verdict issues per state independently
