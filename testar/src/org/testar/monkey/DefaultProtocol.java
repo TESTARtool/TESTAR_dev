@@ -535,10 +535,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		cv.release();
 		ScreenshotSerialiser.exit();
 		TestSerialiser.exit();
-		//        String stopDateString = Util.dateString(DATE_FORMAT);
-		//        String durationDateString = Util.diffDateString(DATE_FORMAT, startOfSutDateString, stopDateString);
-		//        LogSerialiser.log("TESTAR stopped execution at " + stopDateString + "\n", LogSerialiser.LogLevel.Critical);
-		//        LogSerialiser.log("Test duration was " + durationDateString + "\n", LogSerialiser.LogLevel.Critical);
 		LogSerialiser.flush();
 		LogSerialiser.finish();
 		LogSerialiser.exit();
@@ -938,7 +934,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					// Force the replacement of new line characters to avoid the usage of (?s) regex in the regular expression
 					tagValue = w.get(tag).toString().replace("\n", " ").replace("\r", " ");
 					break;
-					//System.out.println("DEBUG: tag found, "+tagToFilter+"="+tagValue);
 				}
 			}
 
@@ -1017,7 +1012,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return actions;
 	}
 
-	//TODO is this process handling Windows specific? move to SystemProcessHandling
 	/**
 	 * If unwanted processes need to be killed, the action returns an action to do that. If the SUT needs
 	 * to be put in the foreground, then the action that is returned is putting it in the foreground.
@@ -1027,8 +1021,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @return null if no preSelected actions are needed.
 	 */
 	protected Set<Action> preSelectAction(SUT system, State state, Set<Action> actions){
-		//Assert.isTrue(actions != null && !actions.isEmpty());
-
 		// TESTAR didn't find any actions in the State of the SUT
 		// It is set in a method actionExecuted that is not being called anywhere (yet?)
 		if (actions.isEmpty()){
