@@ -52,7 +52,7 @@ import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.oracles.llm.LlmOracle;
 import org.testar.protocols.WebdriverProtocol;
-import org.testar.reporting.StaticGraphExporter;
+import org.testar.reporting.graph.StaticGraphExporter;
 import org.testar.settings.Settings;
 import org.testar.statemodel.analysis.condition.BasicConditionEvaluator;
 import java.util.*;
@@ -394,7 +394,7 @@ public class Protocol_webdriver_b00_spark_llm extends WebdriverProtocol {
 		super.closeTestSession();
 
 		String runId = OutputStructure.startOuterLoopDateString + "_" + OutputStructure.executedSUTname;
-		StaticGraphExporter.exportStaticSite(settings, stateModelManager, runId);
+		StaticGraphExporter.exportStaticGraph(settings, stateModelManager, runId);
 	}
 
 }
