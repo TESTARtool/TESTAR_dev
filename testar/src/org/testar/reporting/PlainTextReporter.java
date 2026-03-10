@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2024 Open Universiteit - www.ou.nl
- * Copyright (c) 2024 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2024 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2024 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -39,6 +39,7 @@ import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 
@@ -46,6 +47,8 @@ public class PlainTextReporter implements Reporting
 {
     private PlainTextFormatUtil plainTextReportUtil;
     private int innerLoopCounter = 0;
+    private boolean deleteBaseReport = false;
+    private String baseReportPath;
     public PlainTextReporter(String fileName, boolean replay) //replay or generate mode
     {
         plainTextReportUtil = new PlainTextFormatUtil(fileName);
@@ -193,25 +196,51 @@ public class PlainTextReporter implements Reporting
     
         plainTextReportUtil.writeToFile();
     }
-    
+
     @Override
-    public void addTestVerdict(Verdict verdict)
+    public void addTestVerdicts(List<Verdict> verdicts)
     {
+        String baseFilePath = plainTextReportUtil.getFile().getAbsolutePath();
+        deleteBaseReport = true;
+        baseReportPath = baseFilePath;
+        int index = 1;
+        for (Verdict verdict : verdicts) {
+            String suffixName = String.format("_V%03d_%s", index++, verdict.verdictSeverityTitle());
+            String verdictFilePath = appendSuffixToFile(baseFilePath, suffixName);
+
+            plainTextReportUtil.duplicateFile(verdictFilePath);
+
+            PlainTextFormatUtil verdictUtil = new PlainTextFormatUtil(verdictFilePath);
+            addVerdictBlock(verdictUtil, verdict);
+            verdictUtil.writeToFile();
+        }
+    }
+
+    private void addVerdictBlock(PlainTextFormatUtil util, Verdict verdict) {
         String verdictInfo = verdict.info();
         if(verdict.severity() > Verdict.OK.severity())
             verdictInfo = verdictInfo.replace(Verdict.OK.info(), "");
-        
-        plainTextReportUtil.addHorizontalLine();
-        plainTextReportUtil.addHeading(3, "Test verdict for this sequence: " + verdictInfo);
-        plainTextReportUtil.addHeading(5, "Severity: " + verdict.severity());
-    
-        plainTextReportUtil.appendToFileName("_" + verdict.verdictSeverityTitle());
-        plainTextReportUtil.writeToFile();
+
+        util.addHorizontalLine();
+        util.addHeading(3, "Test verdict for this sequence: " + verdictInfo);
+        util.addHeading(5, "Severity: " + verdict.severity());
+    }
+
+    private String appendSuffixToFile(String filePath, String suffixName) {
+        int dotIndex = filePath.lastIndexOf('.');
+        if (dotIndex == -1) {
+            return filePath + suffixName;
+        }
+        return filePath.substring(0, dotIndex) + suffixName + filePath.substring(dotIndex);
     }
     
     @Override
     public void finishReport()
     {
+        if (deleteBaseReport && baseReportPath != null) {
+            new java.io.File(baseReportPath).delete();
+            return;
+        }
         plainTextReportUtil.writeToFile();
     }
 }

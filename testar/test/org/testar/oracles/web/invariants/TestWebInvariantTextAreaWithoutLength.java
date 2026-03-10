@@ -49,9 +49,11 @@ public class TestWebInvariantTextAreaWithoutLength {
 		Assert.isTrue(extendedOraclesList.get(0) instanceof WebInvariantTextAreaWithoutLength);
 
 		// Assert the oracle verdict is WARNING_WEB_INVARIANT_FAULT
-		Verdict verdict = extendedOraclesList.get(0).getVerdict(state);
+		List<Verdict> verdicts = extendedOraclesList.get(0).getVerdicts(state);
+		Assert.isEquals(1, verdicts.size());
+		Verdict verdict = verdicts.get(0);
 		Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT.getTitle()));
-		Assert.isTrue(verdict.info().equals("Detected TextArea widgets '&lt;textarea maxlength=0&gt;&lt;/textarea&gt;' ,  with 0 max length!"));
+		Assert.isTrue(verdict.info().equals("Detected TextArea widget '&lt;textarea maxlength=0&gt;&lt;/textarea&gt;' ,  with 0 max length!"));
 	}
 
 	@Test
@@ -70,7 +72,9 @@ public class TestWebInvariantTextAreaWithoutLength {
 		Assert.isTrue(extendedOraclesList.get(0) instanceof WebInvariantTextAreaWithoutLength);
 
 		// Assert the oracle verdict is OK
-		Verdict verdict = extendedOraclesList.get(0).getVerdict(state);
+		List<Verdict> verdicts = extendedOraclesList.get(0).getVerdicts(state);
+		Assert.isEquals(1, verdicts.size());
+		Verdict verdict = verdicts.get(0);
 		Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.OK.getTitle()));
 		Assert.isTrue(verdict.info().equals("No problem detected."));
 	}

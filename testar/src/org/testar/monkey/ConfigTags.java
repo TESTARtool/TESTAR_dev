@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -55,6 +55,9 @@ public final class ConfigTags {
 
 	public static final Tag<Integer> SequenceLength = Tag.from("SequenceLength", Integer.class, 
 			"For each test sequence, the number of GUI actions to perform");
+
+	public static final Tag<Boolean> IgnoreDuplicatedVerdicts = Tag.from("IgnoreDuplicatedVerdicts", Boolean.class,
+			"Sets whether to ignore reporting duplicate verdicts across sequences for the same protocol");
 
 	public static final Tag<String> SuspiciousTags = Tag.from("SuspiciousTags", String.class, 
 			"Regular expressions ORACLE to find suspicious messages in the GUI Tags");
@@ -348,8 +351,6 @@ public final class ConfigTags {
 	/**
 	 * Other settings
 	 */
-
-	public static final Tag<Double> FaultThreshold = Tag.from("FaultThreshold", Double.class);
 
 	@SuppressWarnings("unchecked")
 	public static final Tag<List<String>> Delete = Tag.from("Delete", (Class<List<String>>) (Class<?>) List.class);

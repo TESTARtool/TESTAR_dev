@@ -237,35 +237,70 @@ public class WdElement extends TaggableBase implements Serializable {
    * Check web element parameters and try to find an appropriate one to act as description
    */
   public String getElementDescription() {
-	  if(name != null && !name.isEmpty()) {
-		  return name;
-	  }
-	  else if(textContent != null && !textContent.isEmpty()) {
-		  return textContent;
-	  }
-	  else if(id != null && !id.isEmpty()) {
-		  return id;
-	  }
-	  else if(placeholder != null && !placeholder.isEmpty()) {
-		  return placeholder;
-	  }
-	  else if(value != null && !value.isEmpty()) {
-		  return value;
-	  }
-	  else if(type != null && !type.isEmpty()) {
-		  return type;
-	  }
-	  else if(tagName != null && !tagName.isEmpty()) {
-		  return tagName;
-	  }
-	  else if(title != null && !title.isEmpty()) {
-		  return title;
-	  }
-	  else if(href != null && !href.isEmpty()) {
-		  return href;
-	  }
+    // Role/tag context: "button", "input", "a", etc.
+    String roleDescription = normalizeDescription(tagName);
 
-	  return String.join(",", cssClasses);
+    // Visible/accessible semantic labels
+    String semanticDescription = "";
+    
+    if (hasText(innerText)) {
+      semanticDescription = normalizeDescription(innerText);
+    }
+    else if (hasText(textContent)) {
+      semanticDescription = normalizeDescription(textContent);
+    }
+    else if (hasText(getAttribute("aria-label"))) {
+      semanticDescription = normalizeDescription(getAttribute("aria-label"));
+    }
+    else if (hasText(getAttribute("aria-labelledby"))) {
+      semanticDescription = normalizeDescription(getAttribute("aria-labelledby"));
+    }
+    else if (hasText(placeholder)) {
+      semanticDescription = normalizeDescription(placeholder);
+    }
+    else if (hasText(title)) {
+      semanticDescription = normalizeDescription(title);
+    }
+    else if (hasText(alt)) {
+      semanticDescription = normalizeDescription(alt);
+    }
+    else if (hasText(value)) {
+      semanticDescription = normalizeDescription(value);
+    }
+    else if (hasText(name)) {
+      semanticDescription = normalizeDescription(name);
+    }
+
+    // Use technical properties if semantic descriptions are empty
+    if (semanticDescription.isEmpty() && hasText(id)) {
+      semanticDescription = normalizeDescription(id);
+    }
+    else if (semanticDescription.isEmpty() && hasText(href)) {
+      semanticDescription = normalizeDescription(href);
+    }
+
+    // If these combined description still empty, return css classes
+    if (roleDescription.isEmpty() && semanticDescription.isEmpty()) {
+      return String.join("_", cssClasses);
+    }
+    // Else return the combined role_semantic description
+    return roleDescription + "_" + semanticDescription;
+  }
+
+  private boolean hasText(String value) {
+    return value != null && !value.trim().isEmpty();
+  }
+
+  private String normalizeDescription(String value) {
+    String description = value == null ? "" : value.trim().toLowerCase();
+    description = description.replaceAll("\\s+", "_");
+    description = description.replaceAll("[^a-z0-9_./-]", "");
+    description = description.replaceAll("_+", "_");
+    return description;
+  }
+
+  private String getAttribute(String key) {
+    return (attributeMap == null) ? "" : attributeMap.getOrDefault(key, "");
   }
 
   private void setName() {

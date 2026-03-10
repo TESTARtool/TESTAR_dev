@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2025 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2025 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,6 +31,7 @@
 package org.testar.oracles.web.accessibility;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.testar.monkey.alayer.State;
@@ -65,8 +66,8 @@ public class WebAccessibilityFontSizeOracle implements Oracle {
 	}
 
 	@Override
-	public Verdict getVerdict(State state) {
-		List<Widget> incorrectWidgets = new ArrayList<>();
+	public List<Verdict> getVerdicts(State state) {
+		List<Verdict> verdicts = new ArrayList<>();
 
 		// Iterate over all widgets in the state
 		for (Widget widget : state) {
@@ -84,30 +85,26 @@ public class WebAccessibilityFontSizeOracle implements Oracle {
 
 				// Check if the font size is below the minimum threshold
 				if (fontSize > 0 && fontSize < minFontSizeThreshold) {
-					// If so, save it as incorrect widget
-					incorrectWidgets.add(widget);
+					String verdictMsg = String.format(
+							"Widget text %s is too small (%d px). Minimum recommended is %d px.",
+							getDescriptionOfWidgets(Collections.singletonList(widget), WdTags.WebTextContent),
+							fontSize,
+							minFontSizeThreshold
+							);
+					Visualizer visualizer = new RegionsVisualizer(
+							getRedPen(),
+							getWidgetRegions(Collections.singletonList(widget)),
+							"Accessibility Fault",
+							0.5, 0.5);
+					verdicts.add(new Verdict(Verdict.Severity.WARNING_ACCESSIBILITY_FAULT, verdictMsg, visualizer));
 				}
 			}
 		}
 
-		// If exists one or more incorrect widgets
-		if(!incorrectWidgets.isEmpty()) {
-			// Create and return a WARNING_ACCESSIBILITY_FAULT verdict
-			String verdictMsg = String.format(
-					"These widgets Text %s are too small. Minimum recommended is %s px.",
-					getDescriptionOfWidgets(incorrectWidgets, WdTags.WebTextContent), 
-					minFontSizeThreshold
-					);
-			Visualizer visualizer = new RegionsVisualizer(
-					getRedPen(), 
-					getWidgetRegions(incorrectWidgets), 
-					"Accessibility Fault", 
-					0.5, 0.5);
-			return new Verdict(Verdict.Severity.WARNING_ACCESSIBILITY_FAULT, verdictMsg, visualizer);
-		} else {
-			return Verdict.OK;
+		if(!verdicts.isEmpty()) {
+			return verdicts;
 		}
-
+		return Collections.singletonList(Verdict.OK);
 	}
 
 	/**

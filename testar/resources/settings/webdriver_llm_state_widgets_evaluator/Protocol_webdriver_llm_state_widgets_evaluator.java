@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2024 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2024 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2024 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2024 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -175,11 +175,7 @@ public class Protocol_webdriver_llm_state_widgets_evaluator extends WebdriverPro
 	 * @return oracle verdict, which determines whether the state is erroneous and why.
 	 */
 	@Override
-	protected Verdict getVerdict(State state) {
-		// System crashes, non-responsiveness and suspicious tags automatically detected!
-		// For web applications, web browser errors and warnings can also be enabled via settings
-		Verdict verdict = super.getVerdict(state);
-
+	protected List<Verdict> getVerdicts(State state) {
 		// Apply state conditions to check if the test goal has been completed
 		if(conditionEvaluator.evaluateConditions(state)) {
 			// Test goal was completed, retrieve next test goal from queue.
@@ -188,7 +184,7 @@ public class Protocol_webdriver_llm_state_widgets_evaluator extends WebdriverPro
 			// Poll returns null if there are no more items remaining in the queue.
 			if(currentTestGoal == null) {
 				// No more test goals remaining, terminate sequence.
-				return new Verdict(Verdict.Severity.CONDITION_COMPLETE, "All test goal conditions completed.");
+				return Collections.singletonList(new Verdict(Verdict.Severity.CONDITION_COMPLETE, "All test goal conditions completed."));
 			} else {
 				llmActionSelector.reset(currentTestGoal, true);
 				conditionEvaluator.clear();
@@ -197,7 +193,7 @@ public class Protocol_webdriver_llm_state_widgets_evaluator extends WebdriverPro
 			}
 		}
 
-		return verdict;
+		return super.getVerdicts(state);
 	}
 
 	/**

@@ -52,7 +52,6 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 
 	public enum Modes{
 		Spy,
-		Record,
 		Generate,
 		Quit,
 		View,
@@ -87,8 +86,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 	private final static double SLOW_MOTION = 2.0;
 	//TODO: key commands come through java.awt.event but are the key codes same for all OS? if they are the same, then move to platform independent protocol?
 	//TODO: Investigate better shortcut combinations to control TESTAR that does not interfere with SUT
-	// (e.g. SHIFT + 1 puts an ! in the notepad and hence interferes with SUT state, but the
-	// event is not recorded as a user event).
+	// (e.g. SHIFT + 1 puts an ! in the notepad and hence interferes with SUT state).
 	/**
 	 * Override the default keylistener to implement the TESTAR shortcuts
 	 * SHIFT + SPACE
@@ -136,15 +134,6 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 				System.setProperty("DEBUG_WINDOWS_PROCESS_NAMES","true");
 			}
 
-			// In Record mode you can press any key except SHIFT to add a user keyboard
-			// This is because SHIFT is used for the TESTAR shortcuts
-			// This is not ideal, because now special characters and capital letters and other events that needs SHIFT
-			// cannot be recorded as an user event in Record....
-			else if (!pressed.contains(KBKeys.VK_SHIFT) && mode() == Modes.Record && userEvent == null) {
-				//System.out.println("USER_EVENT key_down! " + key.toString());
-				userEvent = new Object[]{key}; // would be ideal to set it up at keyUp
-			}
-
 			// In ListeningManual mode you can press any key except SHIFT to add a user keyboard
 			// This is because SHIFT is used for the TESTAR shortcuts
 			// This is not ideal, because now special characters and capital letters and other events that needs SHIFT
@@ -187,7 +176,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 	@Override
 	public void mouseUp(MouseButtons btn, double x, double y){
 		// In Record or ListeningManual modes the user can add user events by clicking
-		if ((mode() == Modes.Record || mode() == Modes.ListeningManual) && userEvent == null){
+		if (mode() == Modes.ListeningManual && userEvent == null){
 			userEvent = new Object[]{
 					btn,
 					Double.valueOf(x),

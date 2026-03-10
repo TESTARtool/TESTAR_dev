@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2025 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2025 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,6 +31,7 @@
 package org.testar.oracles.web.invariants;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -55,8 +56,8 @@ public class WebInvariantDuplicateMenuItems implements Oracle {
 	}
 
 	@Override
-	public Verdict getVerdict(State state) {
-		List<Widget> menuWidgetsWithDuplicates = new ArrayList<>();
+	public List<Verdict> getVerdicts(State state) {
+		List<Verdict> verdicts = new ArrayList<>();
 
 		for (Widget w : state) {
 			// Check for UL elements with at least two children
@@ -78,29 +79,27 @@ public class WebInvariantDuplicateMenuItems implements Oracle {
 
 				// If duplicates are found, prepare the verdict message
 				if (duplicatesTexts.size() > 0) {
-					menuWidgetsWithDuplicates.add(w);
+					String verdictMsg = String.format(
+							"Detected a Unnumbered List (UL) web menu %s with duplicate option elements: %s",
+							getDescriptionOfWidgets(Collections.singletonList(w), WdTags.WebId),
+							duplicatesTexts
+							);
+
+					Visualizer visualizer = new RegionsVisualizer(
+							getRedPen(),
+							getWidgetRegions(Collections.singletonList(w)),
+							"Invariant Fault",
+							0.5, 0.5);
+
+					verdicts.add(new Verdict(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT, verdictMsg, visualizer));
 				}
 			}
 		}
 
-		// If exists one or more incorrect widgets
-		if (!menuWidgetsWithDuplicates.isEmpty()) {
-
-			String verdictMsg = String.format(
-					"Detected a Unnumbered List (UL) web menu %s with duplicate option elements!",
-					getDescriptionOfWidgets(menuWidgetsWithDuplicates, WdTags.WebId)
-					);
-
-			Visualizer visualizer = new RegionsVisualizer(
-					getRedPen(),
-					getWidgetRegions(menuWidgetsWithDuplicates),
-					"Invariant Fault",
-					0.5, 0.5);
-
-			return new Verdict(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT, verdictMsg, visualizer);
+		if (!verdicts.isEmpty()) {
+			return verdicts;
 		}
-
-		return Verdict.OK;
+		return Collections.singletonList(Verdict.OK);
 	}
 
 	// Helper method to find duplicates in a list

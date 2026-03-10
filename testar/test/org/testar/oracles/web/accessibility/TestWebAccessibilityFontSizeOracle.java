@@ -50,9 +50,11 @@ public class TestWebAccessibilityFontSizeOracle {
 		Assert.isTrue(extendedOraclesList.get(0) instanceof WebAccessibilityFontSizeOracle);
 
 		// Assert the oracle verdict is WARNING_ACCESSIBILITY_FAULT
-		Verdict verdict = extendedOraclesList.get(0).getVerdict(state);
+		List<Verdict> verdicts = extendedOraclesList.get(0).getVerdicts(state);
+		Assert.isEquals(1, verdicts.size());
+		Verdict verdict = verdicts.get(0);
 		Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.WARNING_ACCESSIBILITY_FAULT.getTitle()));
-		Assert.isTrue(verdict.info().equals("These widgets Text 'widgettext' ,  are too small. Minimum recommended is 12 px."));
+		Assert.isTrue(verdict.info().equals("Widget text 'widgettext' ,  is too small (11 px). Minimum recommended is 12 px."));
 	}
 
 	@Test
@@ -72,7 +74,9 @@ public class TestWebAccessibilityFontSizeOracle {
 		Assert.isTrue(extendedOraclesList.get(0) instanceof WebAccessibilityFontSizeOracle);
 
 		// Assert the oracle verdict is OK
-		Verdict verdict = extendedOraclesList.get(0).getVerdict(state);
+		List<Verdict> verdicts = extendedOraclesList.get(0).getVerdicts(state);
+		Assert.isEquals(1, verdicts.size());
+		Verdict verdict = verdicts.get(0);
 		Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.OK.getTitle()));
 		Assert.isTrue(verdict.info().equals("No problem detected."));
 	}
