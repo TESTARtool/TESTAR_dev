@@ -96,6 +96,7 @@ final class StaticGraphIndexPageBuilder {
             sb.append("  <ul class=\"runs\">\n");
             for (int i = 0; i < runDirs.length; i++) {
                 String run = runDirs[i];
+                String displayRun = StaticGraphRunMetadataProvider.normalizeRunName(run);
                 StaticGraphRunMeta meta = metas[i];
                 String verdictId = "verdict-" + i;
                 String goalsId = "goals-" + i;
@@ -104,7 +105,7 @@ final class StaticGraphIndexPageBuilder {
                 sb.append("      <span class=\"badge ").append(meta.isComplete() ? "ok" : "bad").append("\">")
                         .append(escapeHtml(meta.getVerdictTitle())).append("</span>\n");
                 sb.append("      <div style=\"flex:1; min-width:0;\">\n");
-                sb.append("        <div class=\"name\">").append(escapeHtml(run)).append("</div>\n");
+                sb.append("        <div class=\"name\">").append(escapeHtml(displayRun)).append("</div>\n");
                 if (meta.getModelIdentifier() != null && !meta.getModelIdentifier().isEmpty()) {
                     sb.append("        <div class=\"meta\">Model: ").append(escapeHtml(meta.getModelIdentifier())).append("</div>\n");
                 }
@@ -127,10 +128,10 @@ final class StaticGraphIndexPageBuilder {
                     sb.append("<ul class=\"goal-list\">");
                     for (String goal : goals) {
                         String[] lines = goal.split("\\r?\\n");
-                        String firstLine = lines.length > 0 ? lines[0] : "";
+                        String firstLine = lines.length > 0 ? StaticGraphRunMetadataProvider.normalizeRunName(lines[0]) : "";
                         sb.append("<li><div>").append(escapeAndLinkifyUrls(firstLine)).append("</div>");
                         for (int lineIndex = 1; lineIndex < lines.length; lineIndex++) {
-                            String extraLine = lines[lineIndex] == null ? "" : lines[lineIndex].trim();
+                            String extraLine = lines[lineIndex] == null ? "" : StaticGraphRunMetadataProvider.normalizeRunName(lines[lineIndex].trim());
                             if (!extraLine.isEmpty()) {
                                 sb.append("<div class=\"goal-line\">").append(escapeAndLinkifyUrls(extraLine)).append("</div>");
                             }

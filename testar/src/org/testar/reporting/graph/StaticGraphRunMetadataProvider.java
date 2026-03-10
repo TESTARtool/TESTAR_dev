@@ -11,8 +11,13 @@ import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 final class StaticGraphRunMetadataProvider {
+
+    private static final Pattern HOST_TIMESTAMP_APP_PATTERN = Pattern.compile(
+            "^([A-Za-z0-9-]+)_([0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}h[0-9]{2}m[0-9]{2}s)_(.+)$");
 
     private StaticGraphRunMetadataProvider() {}
 
@@ -68,6 +73,18 @@ final class StaticGraphRunMetadataProvider {
             if (!cleaned.isEmpty()) result.add(cleaned);
         }
         return result;
+    }
+
+    static String normalizeRunName(String value) {
+        if (value == null) return "";
+        String trimmed = value.trim();
+        if (trimmed.isEmpty()) return "";
+        Matcher matcher = HOST_TIMESTAMP_APP_PATTERN.matcher(trimmed);
+        if (!matcher.matches()) return trimmed;
+        String timestamp = matcher.group(2);
+        String appName = matcher.group(3);
+        if (appName == null || appName.trim().isEmpty()) return trimmed;
+        return appName + "_" + timestamp;
     }
 
     private static String normalizeRunKey(String runId) {
