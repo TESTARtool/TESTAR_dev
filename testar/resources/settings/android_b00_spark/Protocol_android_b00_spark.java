@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -40,6 +40,7 @@ import org.testar.monkey.alayer.android.actions.*;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 import org.testar.protocols.AndroidProtocol;
 
+import java.util.List;
 import java.util.Set;
 
 public class Protocol_android_b00_spark extends AndroidProtocol {
@@ -166,18 +167,18 @@ public class Protocol_android_b00_spark extends AndroidProtocol {
 	 * @return oracle verdict, which determines whether the state is erroneous and why.
 	 */
 	@Override
-	protected Verdict getVerdict(State state){
+	protected List<Verdict> getVerdicts(State state){
 		// The super methods implements the implicit online state oracles for:
 		// system crashes
 		// non-responsiveness
 		// suspicious tags
-		Verdict verdict = super.getVerdict(state);
+		List<Verdict> verdicts = super.getVerdicts(state);
 
 		//--------------------------------------------------------
 		// MORE SOPHISTICATED STATE ORACLES CAN BE PROGRAMMED HERE
 		//--------------------------------------------------------
 
-		return verdict;
+		return verdicts;
 	}
 
 	/**

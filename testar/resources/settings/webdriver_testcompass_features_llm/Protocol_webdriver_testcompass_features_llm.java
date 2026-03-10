@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -182,31 +182,29 @@ public class Protocol_webdriver_testcompass_features_llm extends WebdriverProtoc
 	 * @return oracle verdict, which determines whether the state is erroneous and why.
 	 */
 	@Override
-	protected Verdict getVerdict(State state) {
-		// System crashes, non-responsiveness and suspicious tags automatically detected!
-		// For web applications, web browser errors and warnings can also be enabled via settings
-		Verdict verdict = super.getVerdict(state);
-
+	protected List<Verdict> getVerdicts(State state) {
 		// Use the LLM as an Oracle to determine if the test goal has been completed
-		Verdict llmVerdict = llmOracle.getVerdict(state);
+		List<Verdict> llmVerdicts = llmOracle.getVerdicts(state);
 
-		if(llmVerdict.severity() == Verdict.Severity.LLM_COMPLETE.getValue()) {
-			// Test goal was completed, retrieve next test goal from queue.
-			currentTestGoal = testGoalQueue.poll();
+		for(Verdict llmVerdict : llmVerdicts) {
+			if(llmVerdict.severity() == Verdict.Severity.LLM_COMPLETE.getValue()) {
+				// Test goal was completed, retrieve next test goal from queue.
+				currentTestGoal = testGoalQueue.poll();
 
-			// Poll returns null if there are no more items remaining in the queue.
-			if(currentTestGoal == null) {
-				// No more test goals remaining, terminate sequence.
-				System.out.println("Test goal completed, but no more test goals.");
-				return llmVerdict;
-			} else {
-				System.out.println("Test goal completed, moving to next test goal.");
-				llmActionSelector.reset(currentTestGoal, true);
-				llmOracle.reset(currentTestGoal, true);
+				// Poll returns null if there are no more items remaining in the queue.
+				if(currentTestGoal == null) {
+					// No more test goals remaining, terminate sequence.
+					System.out.println("Test goal completed, but no more test goals.");
+					return Collections.singletonList(llmVerdict);
+				} else {
+					System.out.println("Test goal completed, moving to next test goal.");
+					llmActionSelector.reset(currentTestGoal, true);
+					llmOracle.reset(currentTestGoal, true);
+				}
 			}
 		}
 
-		return verdict;
+		return super.getVerdicts(state);
 	}
 
 	/**

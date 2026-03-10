@@ -39,6 +39,12 @@ Sequences = 10
 SequenceLength = 50
 
 #################################################################
+# Ignore reporting duplicated verdicts for this protocol
+#################################################################
+
+IgnoreDuplicatedVerdicts = true
+
+#################################################################
 # Oracles based on suspicious tag values
 #
 # Regular expression and Tags to apply them

@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -221,11 +221,7 @@ public class Protocol_webdriver_mendix_llm_state_model extends WebdriverProtocol
 	 * @return oracle verdict, which determines whether the state is erroneous and why.
 	 */
 	@Override
-	protected Verdict getVerdict(State state) {
-		// System crashes, non-responsiveness and suspicious tags automatically detected!
-		// For web applications, web browser errors and warnings can also be enabled via settings
-		Verdict verdict = super.getVerdict(state);
-
+	protected List<Verdict> getVerdicts(State state) {
 		String modelIdentifier = stateModelManager.getModelIdentifier();
 
 		if(conditionEvaluator.evaluateConditions(modelIdentifier, stateModelManager)) {
@@ -236,7 +232,7 @@ public class Protocol_webdriver_mendix_llm_state_model extends WebdriverProtocol
 			if(currentTestGoal == null) {
 				// No more test goals remaining, terminate sequence.
 				System.out.println("Test goal completed, but no more test goals.");
-				return new Verdict(Verdict.Severity.CONDITION_COMPLETE, "All test goal conditions completed.");
+				return Collections.singletonList(new Verdict(Verdict.Severity.CONDITION_COMPLETE, "All test goal conditions completed."));
 			} else {
 				System.out.println("Test goal completed, moving to next test goal.");
 				llmActionSelector.reset(currentTestGoal, true);
@@ -245,7 +241,7 @@ public class Protocol_webdriver_mendix_llm_state_model extends WebdriverProtocol
 			}
 		}
 
-		return verdict;
+		return super.getVerdicts(state);
 	}
 
 
