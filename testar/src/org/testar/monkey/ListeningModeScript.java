@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2023 - 2024 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2023 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2023 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2023 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -219,7 +219,7 @@ public class ListeningModeScript {
 		protocol.writeAndCloseFragmentForReplayableSequence();
 
 		//Copy sequence file into proper directory:
-		protocol.classifyAndCopySequenceIntoAppropriateDirectory(protocol.getFinalVerdict());
+		protocol.classifyAndCopySequenceIntoAppropriateDirectory(protocol.getSequenceVerdicts());
 
 		protocol.postSequenceProcessing();
 

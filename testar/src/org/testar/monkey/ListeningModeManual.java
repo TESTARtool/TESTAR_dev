@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2023 - 2024 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2023 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2023 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2023 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -35,7 +35,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.testar.ActionStatus;
 import org.testar.CodingManager;
 import org.testar.OutputStructure;
 import org.testar.SutVisualization;
@@ -196,7 +195,7 @@ public class ListeningModeManual {
 			protocol.writeAndCloseFragmentForReplayableSequence();
 
 			//Copy sequence file into proper directory:
-			protocol.classifyAndCopySequenceIntoAppropriateDirectory(protocol.getFinalVerdict());
+			protocol.classifyAndCopySequenceIntoAppropriateDirectory(protocol.getSequenceVerdicts());
 
 			protocol.postSequenceProcessing();
 
@@ -324,4 +323,31 @@ public class ListeningModeManual {
 		}
 		return null;
 	}
+}
+
+class ActionStatus {
+
+	private Action action;
+	private boolean userEventAction;
+
+	public ActionStatus(){
+		this.action = null;
+		this.userEventAction = false;		
+	}
+
+	public Action getAction() {
+		return action;
+	}
+
+	public void setAction(Action action) {
+		this.action = action;
+	}
+
+	public boolean isUserEventAction() {
+		return userEventAction;
+	}
+
+	public void setUserEventAction(boolean userEventAction) {
+		this.userEventAction = userEventAction;
+	}			
 }
