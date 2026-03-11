@@ -1,3 +1,7 @@
+#TESTAR v2.8.3 (11-Mar-2026)
+- Add aria properties to WdTags
+
+
 #TESTAR v2.8.2 (10-Mar-2026)
 - Fix ignoring ValuePattern tag for UIAEdit widgets
 - Remove unused comments and classes
