@@ -159,7 +159,7 @@ ResetDataStore = false
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
 
-AbstractStateAttributes = WebWidgetAlt,WebWidgetCssClasses,WebWidgetId,WebWidgetHref
+AbstractStateAttributes = WebWidgetAlt,WebWidgetCssClasses,WebWidgetId,WebWidgetHref,WebWidgetAriaLabel,WebWidgetAriaLabelledBy
 
 #################################################################
 # LLM agents settings
