@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -42,6 +42,7 @@ import java.util.Map;
 
 public class WdElement extends TaggableBase implements Serializable {
   private static final long serialVersionUID = 2695983969893321255L;
+  private static final int TEXT_DESC_MAX_LENGTH = 30;
 
   private static final List<String> scrollOn = Arrays.asList("auto", "scroll");
   private static final List<String> scrollOff = Arrays.asList("visible", "hidden", "clip");
@@ -274,13 +275,7 @@ public class WdElement extends TaggableBase implements Serializable {
     // Visible/accessible semantic labels
     String semanticDescription = "";
     
-    if (hasText(innerText)) {
-      semanticDescription = normalizeDescription(innerText);
-    }
-    else if (hasText(textContent)) {
-      semanticDescription = normalizeDescription(textContent);
-    }
-    else if (hasText(ariaLabel)) {
+    if (hasText(ariaLabel)) {
       semanticDescription = normalizeDescription(ariaLabel);
     }
     else if (hasText(ariaLabelledBy)) {
@@ -288,6 +283,12 @@ public class WdElement extends TaggableBase implements Serializable {
     }
     else if (hasText(placeholder)) {
       semanticDescription = normalizeDescription(placeholder);
+    }
+    else if (hasText(innerText)) {
+      semanticDescription = normalizeAndTruncateDescription(innerText, TEXT_DESC_MAX_LENGTH);
+    }
+    else if (hasText(textContent)) {
+      semanticDescription = normalizeAndTruncateDescription(textContent, TEXT_DESC_MAX_LENGTH);
     }
     else if (hasText(title)) {
       semanticDescription = normalizeDescription(title);
@@ -328,6 +329,14 @@ public class WdElement extends TaggableBase implements Serializable {
     description = description.replaceAll("[^a-z0-9_./-]", "");
     description = description.replaceAll("_+", "_");
     return description;
+  }
+
+  private String normalizeAndTruncateDescription(String value, int maxLen) {
+    String normalized = normalizeDescription(value);
+    if (normalized.length() <= maxLen) {
+      return normalized;
+    }
+    return normalized.substring(0, maxLen);
   }
 
   private String getAttribute(String key) {
