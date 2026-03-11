@@ -39,9 +39,28 @@ public class TestWdElementDescription {
   public void test_semantic_aria_label() {
     WdElement element = newElement();
     element.tagName = "input";
-    element.attributeMap.put("aria-label", "Search Product");
+    element.ariaLabel = "Search Product";
 
     Assert.assertEquals("input_search_product", element.getElementDescription());
+  }
+
+  @Test
+  public void test_semantic_aria_labelledby() {
+    WdElement element = newElement();
+    element.tagName = "input";
+    element.ariaLabelledBy = "Search Field";
+
+    Assert.assertEquals("input_search_field", element.getElementDescription());
+  }
+
+  @Test
+  public void test_semantic_priority_aria_label_over_aria_labelledby() {
+    WdElement element = newElement();
+    element.tagName = "input";
+    element.ariaLabel = "Primary Label";
+    element.ariaLabelledBy = "Secondary Label";
+
+    Assert.assertEquals("input_primary_label", element.getElementDescription());
   }
 
   @Test
