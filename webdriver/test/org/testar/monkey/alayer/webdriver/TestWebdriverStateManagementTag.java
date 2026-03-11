@@ -21,6 +21,16 @@ public class TestWebdriverStateManagementTag {
 	}
 
 	@Test
+	public void testWebdriverAriaMapping() {
+		WdState wdState = new WdState(null);
+		wdState.set(WdTags.WebAriaLabel, "this is an aria label");
+		wdState.set(WdTags.WebAriaLabelledBy, "and this an aria labelled by");
+
+		Assert.assertEquals(wdState.get(StateManagementTags.WebWidgetAriaLabel), "this is an aria label");
+		Assert.assertEquals(wdState.get(StateManagementTags.WebWidgetAriaLabelledBy), "and this an aria labelled by");
+	}
+
+	@Test
 	public void testWebdriverCodingIDs() {
 		Tag<?>[] abstractTags = new Tag<?>[]{StateManagementTags.WebWidgetId, StateManagementTags.WebWidgetHref};
 		CodingManager.setCustomTagsForAbstractId(abstractTags);
