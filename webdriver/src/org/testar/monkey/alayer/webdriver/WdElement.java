@@ -100,6 +100,13 @@ public class WdElement extends TaggableBase implements Serializable {
   public long naturalWidth, naturalHeight; 
   public long displayedWidth, displayedHeight;  
 
+  // Web aria properties
+  public String ariaLabel, ariaLabelledBy, ariaDescribedBy, ariaRole, ariaChecked, ariaInvalid;
+  public String ariaCurrent, ariaHasPopup, ariaControls, ariaLive;
+  public String ariaValueNow, ariaValueMin, ariaValueMax, ariaValueText;
+  public Boolean ariaDisabled, ariaHidden, ariaExpanded, ariaPressed, ariaSelected;
+  public Boolean ariaRequired, ariaReadOnly, ariaBusy, ariaModal;
+
   public transient RemoteWebElement remoteWebElement; // Reference to the remote Web Element
 
   public transient Map<String, String> attributeMap;
@@ -151,6 +158,30 @@ public class WdElement extends TaggableBase implements Serializable {
     disabled = attributeMap.containsKey("disabled");
     visibility = (packedElement.get("visibility") == null) ? "" : (String) packedElement.get("visibility");
     xpath = (packedElement.get("xpath") == null) ? "" : (String) packedElement.get("xpath");
+
+    ariaLabel = getAttribute("aria-label");
+    ariaLabelledBy = getAttribute("aria-labelledby");
+    ariaDescribedBy = getAttribute("aria-describedby");
+    ariaRole = getAttribute("role");
+    ariaDisabled = parseBoolean(getAttribute("aria-disabled"));
+    ariaHidden = parseBoolean(getAttribute("aria-hidden"));
+    ariaExpanded = parseBoolean(getAttribute("aria-expanded"));
+    ariaPressed = parseBoolean(getAttribute("aria-pressed"));
+    ariaSelected = parseBoolean(getAttribute("aria-selected"));
+    ariaChecked = getAttribute("aria-checked");
+    ariaRequired = parseBoolean(getAttribute("aria-required"));
+    ariaInvalid = getAttribute("aria-invalid");
+    ariaReadOnly = parseBoolean(getAttribute("aria-readonly"));
+    ariaCurrent = getAttribute("aria-current");
+    ariaHasPopup = getAttribute("aria-haspopup");
+    ariaControls = getAttribute("aria-controls");
+    ariaLive = getAttribute("aria-live");
+    ariaBusy = parseBoolean(getAttribute("aria-busy"));
+    ariaModal = parseBoolean(getAttribute("aria-modal"));
+    ariaValueNow = getAttribute("aria-valuenow");
+    ariaValueMin = getAttribute("aria-valuemin");
+    ariaValueMax = getAttribute("aria-valuemax");
+    ariaValueText = getAttribute("aria-valuetext");
 
     try {
     	maxLength = Integer.valueOf(attributeMap.getOrDefault("maxlength", "-1"));
@@ -245,11 +276,11 @@ public class WdElement extends TaggableBase implements Serializable {
     else if (hasText(textContent)) {
       semanticDescription = normalizeDescription(textContent);
     }
-    else if (hasText(getAttribute("aria-label"))) {
-      semanticDescription = normalizeDescription(getAttribute("aria-label"));
+    else if (hasText(ariaLabel)) {
+      semanticDescription = normalizeDescription(ariaLabel);
     }
-    else if (hasText(getAttribute("aria-labelledby"))) {
-      semanticDescription = normalizeDescription(getAttribute("aria-labelledby"));
+    else if (hasText(ariaLabelledBy)) {
+      semanticDescription = normalizeDescription(ariaLabelledBy);
     }
     else if (hasText(placeholder)) {
       semanticDescription = normalizeDescription(placeholder);
@@ -297,6 +328,15 @@ public class WdElement extends TaggableBase implements Serializable {
 
   private String getAttribute(String key) {
     return (attributeMap == null) ? "" : attributeMap.getOrDefault(key, "");
+  }
+
+  private Boolean parseBoolean(String value) {
+    if (value == null) return null;
+    String normalized = value.trim().toLowerCase();
+    if (normalized.isEmpty()) return null;
+    if (normalized.equals("true")) return true;
+    if (normalized.equals("false")) return false;
+    return null;
   }
 
   private void setName() {
