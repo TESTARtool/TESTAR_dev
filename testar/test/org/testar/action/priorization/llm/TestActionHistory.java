@@ -43,7 +43,8 @@ public class TestActionHistory {
         ActionHistory actionHistory = new ActionHistory(1);
         actionHistory.addToHistory(web_click_action);
         assertTrue(actionHistory.getActions().contains(web_click_action));
-        assertTrue(actionHistory.toString().contains("This is the last action we executed: AID_click:"));
+        assertTrue(actionHistory.toString().contains("This is the last action we executed:"));
+        assertTrue(!actionHistory.toString().contains("AID_click"));
         assertTrue(actionHistory.toString().contains("Clicked on 'clickable_widget_desc'"));
     }
 
@@ -63,7 +64,8 @@ public class TestActionHistory {
         ActionHistory actionHistory = new ActionHistory(1);
         actionHistory.addToHistory(web_type_action);
         assertTrue(actionHistory.getActions().contains(web_type_action));
-        assertTrue(actionHistory.toString().contains("This is the last action we executed: AID_type:"));
+        assertTrue(actionHistory.toString().contains("This is the last action we executed:"));
+        assertTrue(!actionHistory.toString().contains("AID_type"));
         assertTrue(actionHistory.toString().contains("Typed 'LLM_text' in TextField 'typeable_widget_desc'"));
     }
 
@@ -82,7 +84,8 @@ public class TestActionHistory {
         ActionHistory actionHistory = new ActionHistory(1);
         actionHistory.addToHistory(web_select_action);
         assertTrue(actionHistory.getActions().contains(web_select_action));
-        assertTrue(actionHistory.toString().contains("This is the last action we executed: AID_select:"));
+        assertTrue(actionHistory.toString().contains("This is the last action we executed:"));
+        assertTrue(!actionHistory.toString().contains("AID_select"));
         assertTrue(actionHistory.toString().contains("Set value of ComboBox 'combobox_widget_web_id' to 'Saab'"));
     }
 
@@ -93,7 +96,8 @@ public class TestActionHistory {
         ActionHistory actionHistory = new ActionHistory(1);
         actionHistory.addToHistory(android_type_action);
         assertTrue(actionHistory.getActions().contains(android_type_action));
-        assertTrue(actionHistory.toString().contains("This is the last action we executed: AID_android_action_type:"));
+        assertTrue(actionHistory.toString().contains("This is the last action we executed:"));
+        assertTrue(!actionHistory.toString().contains("AID_android_action_type"));
         assertTrue(actionHistory.toString().contains("Typed 'LLM_text' in TextField 'android_edit_widget_desc'"));
     }
 
@@ -108,7 +112,8 @@ public class TestActionHistory {
         ActionHistory actionHistory = new ActionHistory(1);
         actionHistory.addToHistory(web_remote_click_action);
         assertTrue(actionHistory.getActions().contains(web_remote_click_action));
-        assertTrue(actionHistory.toString().contains("This is the last action we executed: AID_remote_click:"));
+        assertTrue(actionHistory.toString().contains("This is the last action we executed:"));
+        assertTrue(!actionHistory.toString().contains("AID_remote_click"));
         assertTrue(actionHistory.toString().contains("Clicked on 'remote_click_widget'"));
     }
 
@@ -123,7 +128,8 @@ public class TestActionHistory {
         ActionHistory actionHistory = new ActionHistory(1);
         actionHistory.addToHistory(web_remote_scroll_click_action);
         assertTrue(actionHistory.getActions().contains(web_remote_scroll_click_action));
-        assertTrue(actionHistory.toString().contains("This is the last action we executed: AID_remote_scroll_click:"));
+        assertTrue(actionHistory.toString().contains("This is the last action we executed:"));
+        assertTrue(!actionHistory.toString().contains("AID_remote_scroll_click"));
         assertTrue(actionHistory.toString().contains("Clicked on 'remote_scroll_click_widget'"));
     }
 
@@ -139,7 +145,8 @@ public class TestActionHistory {
         ActionHistory actionHistory = new ActionHistory(1);
         actionHistory.addToHistory(web_remote_type_action);
         assertTrue(actionHistory.getActions().contains(web_remote_type_action));
-        assertTrue(actionHistory.toString().contains("This is the last action we executed: AID_remote_type:"));
+        assertTrue(actionHistory.toString().contains("This is the last action we executed:"));
+        assertTrue(!actionHistory.toString().contains("AID_remote_type"));
         assertTrue(actionHistory.toString().contains("Typed 'remote_text' in TextField 'remote_type_widget'"));
     }
 
@@ -155,7 +162,8 @@ public class TestActionHistory {
         ActionHistory actionHistory = new ActionHistory(1);
         actionHistory.addToHistory(web_remote_scroll_type_action);
         assertTrue(actionHistory.getActions().contains(web_remote_scroll_type_action));
-        assertTrue(actionHistory.toString().contains("This is the last action we executed: AID_remote_scroll_type:"));
+        assertTrue(actionHistory.toString().contains("This is the last action we executed:"));
+        assertTrue(!actionHistory.toString().contains("AID_remote_scroll_type"));
         assertTrue(actionHistory.toString().contains("Typed 'remote_scroll_text' in TextField 'remote_scroll_type_widget'"));
     }
 

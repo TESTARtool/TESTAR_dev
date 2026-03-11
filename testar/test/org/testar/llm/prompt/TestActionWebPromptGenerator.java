@@ -84,7 +84,7 @@ public class TestActionWebPromptGenerator {
 		Assert.isTrue(prompt.contains("AID_type: Type in TextField 'typeable_widget_web_id'"));
 		Assert.isTrue(prompt.contains("AID_click: Click on 'clickable_widget_web_id'"));
 		Assert.isTrue(prompt.contains("AID_select: Set ComboBox 'combobox_widget_web_id' to one of the following values: Volvo,Saab,"));
-		Assert.isTrue(prompt.contains("This is the last action we executed: AID_select: Set value of ComboBox 'combobox_widget_web_id' to 'Saab'"));
+		Assert.isTrue(prompt.contains("This is the last action we executed: Set value of ComboBox 'combobox_widget_web_id' to 'Saab'"));
 		Assert.isTrue(prompt.contains("Which action should be executed to accomplish the test goal?"));		
 	}
 
@@ -120,7 +120,7 @@ public class TestActionWebPromptGenerator {
 		Assert.isTrue(prompt.contains("We are currently on the following page: Page Title | State."));
 		Assert.isTrue(prompt.contains("The following actions are available:"));
 		Assert.isTrue(prompt.contains("AID_history: Go History back in the browser"));
-		Assert.isTrue(prompt.contains("This is the last action we executed: AID_closetab: Close current browser tab"));
+		Assert.isTrue(prompt.contains("This is the last action we executed: Close current browser tab"));
 		Assert.isTrue(prompt.contains("Which action should be executed to accomplish the test goal?"));		
 	}
 
@@ -156,7 +156,7 @@ public class TestActionWebPromptGenerator {
 		Assert.isTrue(prompt.contains("We are currently on the following page: Page Title | State."));
 		Assert.isTrue(prompt.contains("The following actions are available:"));
 		Assert.isTrue(prompt.contains("AID_closetab: Close current browser tab"));
-		Assert.isTrue(prompt.contains("This is the last action we executed: AID_history: Go History back in the browser"));
+		Assert.isTrue(prompt.contains("This is the last action we executed: Go History back in the browser"));
 		Assert.isTrue(prompt.contains("Which action should be executed to accomplish the test goal?"));		
 	}
 
