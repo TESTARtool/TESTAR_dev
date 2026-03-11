@@ -126,6 +126,10 @@ public class Protocol_webdriver_toolshop_random extends WebdriverProtocol {
                 String text = widget.get(WdTags.WebInnerText, "");
                 widget.set(Tags.Desc, "Card link " + text);
             }
+            if(isCheckboxInput(widget) && widget.parent() != null) {
+                String text = widget.parent().get(WdTags.WebInnerText, "");
+                widget.set(Tags.Desc, "Checkbox " + text);
+            }
         }
 
         return state;
@@ -134,6 +138,11 @@ public class Protocol_webdriver_toolshop_random extends WebdriverProtocol {
     // tool shop card links
     private boolean isCardLink(Widget w) {
         return w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdA) && w.get(WdTags.WebCssClasses, "").contains("card");
+    }
+
+    // tool shop checkbox inputs
+    private boolean isCheckboxInput(Widget w) {
+        return w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdINPUT) && w.get(WdTags.WebType, "").contains("checkbox");
     }
 
     /**
