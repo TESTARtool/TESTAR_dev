@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -320,8 +320,10 @@ public class StateManagementTags {
     public static final Tag<String> WebWidgetDisplay = Tag.from("Web Widget display", String.class);
     public static final Tag<Boolean> WebWidgetIsOffScreen = Tag.from("Web Widget Is Off Screen", Boolean.class);
     public static final Tag<String> WebWidgetSrc = Tag.from("Web Widget src", String.class);
-    public static final Tag<String> WebWidgetPlaceholder= Tag.from("Web Widget placeholder", String.class);
+    public static final Tag<String> WebWidgetPlaceholder = Tag.from("Web Widget placeholder", String.class);
     public static final Tag<Boolean> WebWidgetIsDisabled = Tag.from("Web Widget Is Disabled", Boolean.class);
+    public static final Tag<String> WebWidgetAriaLabel = Tag.from("Web Widget Aria Label", String.class);
+    public static final Tag<String> WebWidgetAriaLabelledBy = Tag.from("Web Widget Aria Labelled By", String.class);
     
     
     // a set containing the tags that are available for state management
@@ -413,6 +415,8 @@ public class StateManagementTags {
             add(WebWidgetSrc);
             add(WebWidgetPlaceholder);
             add(WebWidgetIsDisabled);
+            add(WebWidgetAriaLabel);
+            add(WebWidgetAriaLabelledBy);
         }
     };
 
@@ -510,6 +514,8 @@ public class StateManagementTags {
         settingsMap.put(WebWidgetSrc, "WebWidgetSrc");
         settingsMap.put(WebWidgetPlaceholder, "WebWidgetPlaceholder");
         settingsMap.put(WebWidgetIsDisabled, "WebWidgetIsDisabled");
+        settingsMap.put(WebWidgetAriaLabel, "WebWidgetAriaLabel");
+        settingsMap.put(WebWidgetAriaLabelledBy, "WebWidgetAriaLabelledBy");
     }
 
     // a mapping of a tag to its group
@@ -597,6 +603,8 @@ public class StateManagementTags {
             put(WebWidgetSrc, Group.WebDriver);
             put(WebWidgetPlaceholder, Group.WebDriver);
             put(WebWidgetIsDisabled, Group.WebDriver);
+            put(WebWidgetAriaLabel, Group.WebDriver);
+            put(WebWidgetAriaLabelledBy, Group.WebDriver);
         }
     };
 
