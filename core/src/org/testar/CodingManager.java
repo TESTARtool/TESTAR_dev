@@ -173,12 +173,18 @@ public class CodingManager {
 	 */
 	public static synchronized void buildIDs(State state, Set<Action> actions){
 	    for (Action a : actions) {
+	    	// Create the Action AbstractID based on: State AbstractID + Widget AbstractID + Action Role
+	    	a.set(Tags.AbstractID, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT +
+	    		lowCollisionID(state.get(Tags.AbstractID) + a.get(Tags.OriginWidget).get(Tags.AbstractID) + a.get(Tags.Role, ActionRoles.Action)));
+	    	// Create the Action ConcreteID based on: State ConcreteID + Widget ConcreteID + Action Role + Action description
 	        a.set(Tags.ConcreteID, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE +
-	                CodingManager.codify(state.get(Tags.ConcreteID), a));
+	        	lowCollisionID(state.get(Tags.ConcreteID) + a.get(Tags.OriginWidget).get(Tags.ConcreteID) + a.get(Tags.Role, ActionRoles.Action) + a.toString()));
+
 	    }
 
 		// for the abstract action identifier, we first sort the actions by their path in the widget tree
 		// and then set their ids using incremental counters
+		/*
 		Map<Role, Integer> roleCounter = new HashMap<>();
 		actions.stream().
 				filter(action -> {
@@ -200,6 +206,7 @@ public class CodingManager {
 							lowCollisionID(state.get(Tags.AbstractID) + getAbstractActionIdentifier(action, roleCounter)));
 				}
 		);
+		*/
 	}
 
 	/**
