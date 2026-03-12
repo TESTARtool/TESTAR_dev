@@ -110,7 +110,6 @@ public class ActionHistory {
         for (var action : actions) {
             Widget widget = action.get(Tags.OriginWidget);
             String type = action.get(Tags.Role).name();
-            String actionId = action.get(Tags.AbstractID, "Unknown ActionId");
             String description = widget.get(descriptionTag, "Unknown Widget");
 
             if(action instanceof WdSelectListAction) {
@@ -118,7 +117,7 @@ public class ActionHistory {
                 WdSelectListAction selectListAction = (WdSelectListAction) action;
                 String selectWidget = selectListAction.getTarget();
                 String value = selectListAction.getValue();
-                builder.append(String.format("%s: Set value of ComboBox '%s' to '%s'", actionId, selectWidget, value));
+                builder.append(String.format("Set value of ComboBox '%s' to '%s'", selectWidget, value));
             } else {
                 switch(type) {
                     case "ClickTypeInto":
@@ -127,24 +126,24 @@ public class ActionHistory {
                     case "RemoteScrollType":
                         String input = getCompoundActionInputText(action);
                         // TODO: Differentiate between types of input fields (numeric, password, etc.)
-                        builder.append(String.format("%s: Typed '%s' in TextField '%s'", actionId, input, description));
+                        builder.append(String.format("Typed '%s' in TextField '%s'", input, description));
                         break;
                     case "LeftClickAt":
                     case "RemoteClick":
                     case "RemoteScrollClick":
-                        builder.append(String.format("%s: Clicked on '%s'", actionId, description));
+                        builder.append(String.format("Clicked on '%s'", description));
                         break;
                     case "HistoryBackScript":
                         // TODO: Decide if it makes sense to rely on the LLM to make this control decision
-                        builder.append(String.format("%s: Go History back in the browser", actionId));
+                        builder.append("Go History back in the browser");
                         break;
                     case "CloseTabScript":
                         // TODO: Decide if it makes sense to rely on the LLM to make this control decision
-                        builder.append(String.format("%s: Close current browser tab", actionId));
+                        builder.append("Close current browser tab");
                         break;
                     case "HitESC":
                         // TODO: Decide if it makes sense to rely on the LLM to make this control decision
-                        builder.append(String.format("%s: Hit the ESC key", actionId));
+                        builder.append("Hit the ESC key");
                         break;
                     default:
                         logger.log(Level.WARN, "Unsupported action type for action history: " + type);

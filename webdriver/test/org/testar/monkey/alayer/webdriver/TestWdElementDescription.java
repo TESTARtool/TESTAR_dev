@@ -64,6 +64,16 @@ public class TestWdElementDescription {
   }
 
   @Test
+  public void test_semantic_priority_aria_label_over_inner_text() {
+    WdElement element = newElement();
+    element.tagName = "button";
+    element.ariaLabel = "Accessible Name";
+    element.innerText = "Very Long Inner Text Name";
+
+    Assert.assertEquals("button_accessible_name", element.getElementDescription());
+  }
+
+  @Test
   public void test_fallback_to_id() {
     WdElement element = newElement();
     element.tagName = "div";
@@ -96,6 +106,15 @@ public class TestWdElementDescription {
     element.innerText = "  Save   50%  NOW!  ";
 
     Assert.assertEquals("button_save_50_now", element.getElementDescription());
+  }
+
+  @Test
+  public void test_inner_text_fallback_is_truncated() {
+    WdElement element = newElement();
+    element.tagName = "select";
+    element.innerText = "these are all the options of the web select element";
+
+    Assert.assertEquals("select_these_are_all_the_options_of_t", element.getElementDescription());
   }
 
   private WdElement newElement() {

@@ -13,7 +13,7 @@
   },
   {
     "role": "user",
-    "content": "We are testing the \"Demo\" web application. The objective of the test is to log in with username \"Test\" and password \"Star\". The following actions are available: ACF6HU: Click Home, ACOP45: Hit the ESC key, ACKO87: Type into TextField Username, AC3B4T: Type into TextField Password, AC78TY: Click Log In, ACR11L: Click Register. This is the last action we executed: ACOP45: Hit the ESC key. Which action should be executed to accomplish the test goal?"
+    "content": "We are testing the \"Demo\" web application. The objective of the test is to log in with username \"Test\" and password \"Star\". The following actions are available: ACF6HU: Click Home, ACOP45: Hit the ESC key, ACKO87: Type into TextField Username, AC3B4T: Type into TextField Password, AC78TY: Click Log In, ACR11L: Click Register. This is the last action we executed: Hit the ESC key. Which action should be executed to accomplish the test goal?"
   },
   {
     "role": "assistant",
@@ -21,7 +21,7 @@
   },
   {
     "role": "user",
-    "content": "We are testing the \"Demo\" web application. The objective of the test is to log in with username \"Test\" and password \"Star\". The following actions are available: ACF6HU: Click Home, ACOP45: Hit the ESC key, ACKO87: Type into TextField Username, AC3B4T: Type into TextField Password, AC78TY: Click Log In, ACR11L: Click Register. These are the last 2 actions we executed: ACOP45: Hit the ESC key, ACKO87: Typed Test into TextField Username. Which action should be executed to accomplish the test goal?"
+    "content": "We are testing the \"Demo\" web application. The objective of the test is to log in with username \"Test\" and password \"Star\". The following actions are available: ACF6HU: Click Home, ACOP45: Hit the ESC key, ACKO87: Type into TextField Username, AC3B4T: Type into TextField Password, AC78TY: Click Log In, ACR11L: Click Register. These are the last 2 actions we executed: Hit the ESC key, Typed Test into TextField Username. Which action should be executed to accomplish the test goal?"
   },
   {
     "role": "assistant",
@@ -29,7 +29,7 @@
   },
   {
     "role": "user",
-    "content": "We are testing the \"Demo\" web application. The objective of the test is to log in with username \"Test\" and password \"Star\". The following actions are available: ACF6HU: Click Home, ACOP45: Hit the ESC key, ACKO87: Type into TextField Username, AC3B4T: Type into TextField Password, AC78TY: Click Log In, ACR11L: Click Register. These are the last 3 actions we executed: ACOP45: Hit the ESC key, ACKO87: Typed Test into TextField Username, AC3B4T: Typed Star into TextField Password. Which action should be executed to accomplish the test goal?"
+    "content": "We are testing the \"Demo\" web application. The objective of the test is to log in with username \"Test\" and password \"Star\". The following actions are available: ACF6HU: Click Home, ACOP45: Hit the ESC key, ACKO87: Type into TextField Username, AC3B4T: Type into TextField Password, AC78TY: Click Log In, ACR11L: Click Register. These are the last 3 actions we executed: Hit the ESC key, Typed Test into TextField Username, Typed Star into TextField Password. Which action should be executed to accomplish the test goal?"
   },
   {
     "role": "assistant",
