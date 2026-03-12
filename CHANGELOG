@@ -1,3 +1,9 @@
+#TESTAR v2.8.4 (12-Mar-2026)
+- Remove abstract actionIds from LLM ActionHistory
+- Update getElementDescription prioritty and length
+- Add web aria tags to state model abstraction tags
+
+
 #TESTAR v2.8.3 (11-Mar-2026)
 - Add aria properties to WdTags
 
