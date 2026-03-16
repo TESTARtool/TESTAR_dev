@@ -51,6 +51,7 @@ public class WdMapping {
 			put(WebWidgetName ,WdTags.WebName);
 			put(WebWidgetTagName, WdTags.WebTagName);
 			put(WebWidgetTextContent, WdTags.WebTextContent);
+			put(WebWidgetInnerText, WdTags.WebInnerText);
 			put(WebWidgetTitle, WdTags.WebTitle);
 			put(WebWidgetHref, WdTags.WebHref);
 			put(WebWidgetValue, WdTags.WebValue);
