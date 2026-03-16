@@ -115,6 +115,8 @@ final class StaticGraphRunMetadataProvider {
         if (runOutputDir == null || !Files.isDirectory(runOutputDir)) return "UNKNOWN";
         Path llmComplete = runOutputDir.resolve("sequences_llm_complete");
         if (Files.isDirectory(llmComplete)) return "LLM_COMPLETE";
+        Path llmInvalid = runOutputDir.resolve("sequences_llm_invalid");
+        if (Files.isDirectory(llmInvalid)) return "LLM_INVALID";
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(runOutputDir, "sequences_*")) {
             for (Path path : stream) {
                 if (Files.isDirectory(path)) {

@@ -25,11 +25,19 @@ final class StaticGraphIndexPageBuilder {
         Arrays.sort(runDirs, Comparator.reverseOrder());
 
         int completeCount = 0;
-        int failCount = 0;
+        int invalidCount = 0;
+        int otherCount = 0;
         StaticGraphRunMeta[] metas = new StaticGraphRunMeta[runDirs.length];
         for (int i = 0; i < runDirs.length; i++) {
             metas[i] = StaticGraphRunMetadataProvider.readRunMeta(runsRoot.resolve(runDirs[i]));
-            if (metas[i].isComplete()) completeCount++; else failCount++;
+            String verdictKind = verdictKind(metas[i]);
+            if ("complete".equals(verdictKind)) {
+                completeCount++;
+            } else if ("invalid".equals(verdictKind)) {
+                invalidCount++;
+            } else {
+                otherCount++;
+            }
         }
 
         StringBuilder sb = new StringBuilder();
@@ -40,27 +48,30 @@ final class StaticGraphIndexPageBuilder {
         sb.append("  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n");
         sb.append("  <title>TESTAR State Models</title>\n");
         sb.append("  <style>\n");
-        sb.append("    :root{--bg:#f6f7fb;--card:#fff;--line:#d9d9e3;--txt:#222;--muted:#666;--ok:#0f7b42;--bad:#b00020;--accent:#1c9099;}\n");
+        sb.append("    :root{--bg:#f6f7fb;--card:#fff;--line:#d9d9e3;--txt:#222;--muted:#666;--complete:#0f7b42;--invalid:#b00020;--other:#6f42c1;--accent:#1c9099;}\n");
         sb.append("    body{font-family:Segoe UI,Tahoma,Verdana,sans-serif;margin:24px;background:var(--bg);color:var(--txt);}\n");
         sb.append("    h1{font-size:22px;margin:0 0 10px 0;}\n");
         sb.append("    .top{display:flex;gap:12px;flex-wrap:wrap;align-items:stretch;margin-bottom:16px;}\n");
         sb.append("    .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;}\n");
         sb.append("    .summary{display:flex;gap:12px;align-items:center;flex-wrap:wrap;}\n");
         sb.append("    .pill{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px;}\n");
-        sb.append("    .pill.ok{background:#e7f6ee;color:var(--ok);}\n");
-        sb.append("    .pill.bad{background:#fde8ec;color:var(--bad);}\n");
+        sb.append("    .pill.complete{background:#e7f6ee;color:var(--complete);}\n");
+        sb.append("    .pill.invalid{background:#fde8ec;color:var(--invalid);}\n");
+        sb.append("    .pill.other{background:#efe7ff;color:var(--other);}\n");
         sb.append("    .bar{height:10px;border-radius:999px;background:#ececf5;overflow:hidden;flex:1;min-width:220px;}\n");
         sb.append("    .bar > span{display:block;height:100%;float:left;}\n");
-        sb.append("    .bar .ok{background:var(--ok);}\n");
-        sb.append("    .bar .bad{background:var(--bad);}\n");
+        sb.append("    .bar .complete{background:var(--complete);}\n");
+        sb.append("    .bar .invalid{background:var(--invalid);}\n");
+        sb.append("    .bar .other{background:var(--other);}\n");
         sb.append("    .runs{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px;}\n");
         sb.append("    .run-item{display:flex;flex-direction:column;gap:8px;}\n");
         sb.append("    .run{display:flex;gap:10px;align-items:center;}\n");
         sb.append("    .name{font-weight:800;flex:1;word-break:break-word;}\n");
         sb.append("    .meta{font-size:12px;color:var(--muted);}\n");
         sb.append("    .badge{font-size:11px;font-weight:900;padding:3px 8px;border-radius:999px;}\n");
-        sb.append("    .badge.ok{background:#e7f6ee;color:var(--ok);}\n");
-        sb.append("    .badge.bad{background:#fde8ec;color:var(--bad);}\n");
+        sb.append("    .badge.complete{background:#e7f6ee;color:var(--complete);}\n");
+        sb.append("    .badge.invalid{background:#fde8ec;color:var(--invalid);}\n");
+        sb.append("    .badge.other{background:#efe7ff;color:var(--other);}\n");
         sb.append("    .iconlink{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:#fbfbff;}\n");
         sb.append("    .iconlink:hover{border-color:#b8b8c7;}\n");
         sb.append("    .iconbtn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:#fbfbff;cursor:pointer;}\n");
@@ -78,14 +89,17 @@ final class StaticGraphIndexPageBuilder {
         sb.append("  <h1>TESTAR State Models</h1>\n");
         sb.append("  <div class=\"top\">\n");
         sb.append("    <div class=\"card summary\">\n");
-        sb.append("      <span class=\"pill ok\">&#10003; Complete: ").append(completeCount).append("</span>\n");
-        sb.append("      <span class=\"pill bad\">&#10007; Other: ").append(failCount).append("</span>\n");
-        double total = Math.max(1.0, completeCount + failCount);
-        int okPct = (int)Math.round((completeCount / total) * 100.0);
-        int badPct = Math.max(0, 100 - okPct);
-        sb.append("      <div class=\"bar\" title=\"").append(okPct).append("% complete\">\n");
-        sb.append("        <span class=\"ok\" style=\"width:").append(okPct).append("%\"></span>\n");
-        sb.append("        <span class=\"bad\" style=\"width:").append(badPct).append("%\"></span>\n");
+        sb.append("      <span class=\"pill complete\">&#10003; Complete: ").append(completeCount).append("</span>\n");
+        sb.append("      <span class=\"pill invalid\">&#10007; Invalid: ").append(invalidCount).append("</span>\n");
+        sb.append("      <span class=\"pill other\">&#9679; Other: ").append(otherCount).append("</span>\n");
+        double total = Math.max(1.0, completeCount + invalidCount + otherCount);
+        int completePct = (int)Math.round((completeCount / total) * 100.0);
+        int invalidPct = (int)Math.round((invalidCount / total) * 100.0);
+        int otherPct = Math.max(0, 100 - completePct - invalidPct);
+        sb.append("      <div class=\"bar\" title=\"").append(completePct).append("% complete\">\n");
+        sb.append("        <span class=\"complete\" style=\"width:").append(completePct).append("%\"></span>\n");
+        sb.append("        <span class=\"invalid\" style=\"width:").append(invalidPct).append("%\"></span>\n");
+        sb.append("        <span class=\"other\" style=\"width:").append(otherPct).append("%\"></span>\n");
         sb.append("      </div>\n");
         sb.append("    </div>\n");
         sb.append("  </div>\n");
@@ -98,11 +112,12 @@ final class StaticGraphIndexPageBuilder {
                 String run = runDirs[i];
                 String displayRun = StaticGraphRunMetadataProvider.normalizeRunName(run);
                 StaticGraphRunMeta meta = metas[i];
+                String verdictKind = verdictKind(meta);
                 String verdictId = "verdict-" + i;
                 String goalsId = "goals-" + i;
                 sb.append("    <li class=\"card run-item\">\n");
                 sb.append("      <div class=\"run\">\n");
-                sb.append("      <span class=\"badge ").append(meta.isComplete() ? "ok" : "bad").append("\">")
+                sb.append("      <span class=\"badge ").append(verdictKind).append("\">")
                         .append(escapeHtml(meta.getVerdictTitle())).append("</span>\n");
                 sb.append("      <div style=\"flex:1; min-width:0;\">\n");
                 sb.append("        <div class=\"name\">").append(escapeHtml(displayRun)).append("</div>\n");
@@ -153,6 +168,14 @@ final class StaticGraphIndexPageBuilder {
         sb.append("</html>\n");
 
         Files.write(publicRoot.resolve("index.html"), sb.toString().getBytes());
+    }
+
+    private static String verdictKind(StaticGraphRunMeta meta) {
+        if (meta == null || meta.getVerdictTitle() == null) return "other";
+        String verdict = meta.getVerdictTitle().trim().toUpperCase();
+        if ("LLM_COMPLETE".equals(verdict)) return "complete";
+        if ("LLM_INVALID".equals(verdict)) return "invalid";
+        return "other";
     }
 
     private static String escapeHtml(String s) {
