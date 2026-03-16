@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2024 - 2026 Open Universiteit - www.ou.nl
- * Copyright (c) 2024 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2026 Universitat Politecnica de Valencia - www.upv.e
+ * Copyright (c) 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,46 +30,29 @@
 
 package org.testar.oracles.llm;
 
-public class LlmVerdict {
-	private Boolean match;
-	private String status;
-	private String info;
+import java.util.Locale;
 
-	public LlmVerdict(Boolean match, String info) {
-		this(match, "", info);
-	}
+public enum LlmVerdictDecision {
+	CONTINUE,
+	COMPLETED,
+	INVALID,
+	UNKNOWN;
 
-	public LlmVerdict(Boolean match, String status, String info) {
-		this.match = match;
-		this.status = status;
-		this.info = info;
-	}
-
-	public Boolean match() {
-		return match;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public String getInfo() {
-		return info;
-	}
-
-	public LlmVerdictDecision getDecision() {
-		LlmVerdictDecision fromStatus = LlmVerdictDecision.fromStatus(status);
-		// Return a (CONTINUE | COMPLETED | INVALID) detected LLM Oracle decision
-		if (fromStatus != LlmVerdictDecision.UNKNOWN) {
-			return fromStatus;
+	public static LlmVerdictDecision fromStatus(String status) {
+		if (status == null || status.trim().isEmpty()) {
+			return UNKNOWN;
 		}
-		// Return a true/false detected LLM Oracle decision
-		if (Boolean.TRUE.equals(match)) {
-			return LlmVerdictDecision.COMPLETED;
+
+		String normalized = status.trim().toUpperCase(Locale.ROOT);
+		switch (normalized) {
+		case "CONTINUE":
+			return CONTINUE;
+		case "COMPLETED":
+			return COMPLETED;
+		case "INVALID":
+			return INVALID;
+		default:
+			return UNKNOWN;
 		}
-		if (Boolean.FALSE.equals(match)) {
-			return LlmVerdictDecision.CONTINUE;
-		}
-		return LlmVerdictDecision.UNKNOWN;
 	}
 }

@@ -31,7 +31,6 @@
 package org.testar.monkey.alayer;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -97,6 +96,7 @@ public final class Verdict implements Serializable {
 		/** FAIL (0.5 - 0.899) **/
 
 		UNREPLAYABLE(0.5, "UNREPLAYABLE"), // Sequence not replayable
+		LLM_INVALID(0.79, "LLM_INVALID"), // LLM detected objective steps were followed but resulting state is invalid
 		SUSPICIOUS_TAG(0.8, "SUSPICIOUS_TAG"), // Suspicious tag
 		SUSPICIOUS_PROCESS(0.87, "SUSPICIOUS_PROCESS"), // Suspicious message in the process standard output/error
 		SUSPICIOUS_LOG(0.89, "SUSPICIOUS_LOG"), // Suspicious message in log file or command output (LogOracle)

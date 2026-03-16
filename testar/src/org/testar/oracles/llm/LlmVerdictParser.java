@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2024 - 2026 Open Universiteit - www.ou.nl
- * Copyright (c) 2024 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2026 Universitat Politecnica de Valencia - www.upv.e
+ * Copyright (c) 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,46 +30,49 @@
 
 package org.testar.oracles.llm;
 
-public class LlmVerdict {
-	private Boolean match;
-	private String status;
-	private String info;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
-	public LlmVerdict(Boolean match, String info) {
-		this(match, "", info);
+public final class LlmVerdictParser {
+
+	private LlmVerdictParser() {}
+
+	public static LlmVerdict parse(String llmResponse) {
+		JsonObject object = JsonParser.parseString(llmResponse).getAsJsonObject();
+
+		String info = getStringValue(object, "info");
+		String status = getStringValue(object, "status");
+		Boolean match = getBooleanValue(object, "match");
+
+		return new LlmVerdict(match, status, info);
 	}
 
-	public LlmVerdict(Boolean match, String status, String info) {
-		this.match = match;
-		this.status = status;
-		this.info = info;
-	}
-
-	public Boolean match() {
-		return match;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public String getInfo() {
-		return info;
-	}
-
-	public LlmVerdictDecision getDecision() {
-		LlmVerdictDecision fromStatus = LlmVerdictDecision.fromStatus(status);
-		// Return a (CONTINUE | COMPLETED | INVALID) detected LLM Oracle decision
-		if (fromStatus != LlmVerdictDecision.UNKNOWN) {
-			return fromStatus;
+	private static String getStringValue(JsonObject object, String property) {
+		if (!object.has(property) || object.get(property).isJsonNull()) {
+			return "";
 		}
-		// Return a true/false detected LLM Oracle decision
-		if (Boolean.TRUE.equals(match)) {
-			return LlmVerdictDecision.COMPLETED;
+		JsonElement value = object.get(property);
+		if (value.isJsonPrimitive()) {
+			return value.getAsString();
 		}
-		if (Boolean.FALSE.equals(match)) {
-			return LlmVerdictDecision.CONTINUE;
+		return value.toString();
+	}
+
+	private static Boolean getBooleanValue(JsonObject object, String property) {
+		if (!object.has(property) || object.get(property).isJsonNull()) {
+			return null;
 		}
-		return LlmVerdictDecision.UNKNOWN;
+
+		JsonElement value = object.get(property);
+		try {
+			return value.getAsBoolean();
+		} catch (Exception ignored) {
+			try {
+				return Boolean.parseBoolean(value.getAsString());
+			} catch (Exception ignoredAgain) {
+				return null;
+			}
+		}
 	}
 }

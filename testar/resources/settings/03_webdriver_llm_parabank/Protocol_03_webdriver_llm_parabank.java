@@ -166,6 +166,12 @@ public class Protocol_03_webdriver_llm_parabank extends WebdriverProtocol {
 		List<Verdict> llmVerdicts = llmOracle.getVerdicts(state);
 
 		for(Verdict llmVerdict : llmVerdicts) {
+			if(llmVerdict.severity() == Verdict.Severity.LLM_INVALID.getValue()) {
+				// LLM detected an invalid final state for the current goal, terminate the test sequence.
+				System.out.println("LLM detected invalid behavior, stopping test sequence.");
+				return Collections.singletonList(llmVerdict);
+			}
+
 			if(llmVerdict.severity() == Verdict.Severity.LLM_COMPLETE.getValue()) {
 				// Test goal was completed, retrieve next test goal from queue.
 				currentTestGoal = testGoalQueue.poll();
@@ -337,6 +343,12 @@ public class Protocol_03_webdriver_llm_parabank extends WebdriverProtocol {
 	 */
 	@Override
 	protected boolean moreActions(State state) {
+		List<Verdict> stateVerdicts = state.get(Tags.OracleVerdicts, Collections.singletonList(Verdict.OK));
+		for (Verdict verdict : stateVerdicts) {
+			if (verdict != null && verdict.severity() == Verdict.Severity.LLM_INVALID.getValue()) {
+				return false;
+			}
+		}
 		return super.moreActions(state);
 	}
 
