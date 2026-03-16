@@ -32,6 +32,7 @@ import org.testar.CodingManager;
 import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
 import org.testar.llm.LlmTestGoal;
+import org.testar.llm.LlmTestGoalOrchestrator;
 import org.testar.llm.prompt.ActionWebPromptGenerator;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.alayer.*;
@@ -75,8 +76,7 @@ public class Protocol_webdriver_llm_state_model_evaluator extends WebdriverProto
 	private ConditionEvaluator conditionEvaluator;
 
 	private List<LlmTestGoal> testGoals = new ArrayList<>();
-	private Queue<LlmTestGoal> testGoalQueue;
-	private LlmTestGoal currentTestGoal;
+	private LlmTestGoalOrchestrator testGoalOrchestrator;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -101,6 +101,11 @@ public class Protocol_webdriver_llm_state_model_evaluator extends WebdriverProto
 		metricsManager = new MetricsManager(new LlmMetricsCollector(testGoals));
 
 		conditionEvaluator = new BasicConditionEvaluator();
+		testGoalOrchestrator = new LlmTestGoalOrchestrator(testGoals, (goal, appendPreviousGoal) -> {
+			llmActionSelector.reset(goal, appendPreviousGoal);
+			conditionEvaluator.clear();
+			conditionEvaluator.addConditions(goal.getCompletionConditions());
+		});
 	}
 
 	private void setupTestGoals(List<String> testGoalsList) {
@@ -117,16 +122,6 @@ public class Protocol_webdriver_llm_state_model_evaluator extends WebdriverProto
 	protected void preSequencePreparations() {
 		super.preSequencePreparations();
 
-		// Setup test goal queue
-		testGoalQueue = new LinkedList<>();
-		testGoalQueue.addAll(testGoals);
-		currentTestGoal = testGoalQueue.poll();
-		conditionEvaluator.clear();
-		conditionEvaluator.addConditions(currentTestGoal.getCompletionConditions());
-
-		// Reset llm action selector
-		llmActionSelector.reset(currentTestGoal, false);
-
 		// Use timestamp to create a unique new state model
 		String appName = settings.get(ConfigTags.ApplicationName, "");
 		String appVersion = settings.get(ConfigTags.ApplicationVersion, "");
@@ -136,6 +131,8 @@ public class Protocol_webdriver_llm_state_model_evaluator extends WebdriverProto
 		stateModelManager.notifyTestingEnded();
 		stateModelManager = StateModelManagerFactory.getStateModelManager(
 				appName, (appVersion + "_" + timestamp), settings);
+
+		testGoalOrchestrator.startSequence();
 	}
 
 	/**
@@ -190,26 +187,16 @@ public class Protocol_webdriver_llm_state_model_evaluator extends WebdriverProto
 	 */
 	@Override
 	protected List<Verdict> getVerdicts(State state) {
+		List<Verdict> verdicts = super.getVerdicts(state);
+
+		// Add the State Model Condition verdicts to determine if the test goal has been completed
 		String modelIdentifier = stateModelManager.getModelIdentifier();
+		List<Verdict> stateModelConditionVerdicts = conditionEvaluator.evaluateConditions(modelIdentifier, stateModelManager)
+				? Collections.singletonList(new Verdict(Verdict.Severity.CONDITION_COMPLETE, "Current test goal conditions completed."))
+				: Collections.singletonList(Verdict.OK);
+		verdicts.addAll(testGoalOrchestrator.processGoalVerdicts(stateModelConditionVerdicts));
 
-		if(conditionEvaluator.evaluateConditions(modelIdentifier, stateModelManager)) {
-			// Test goal was completed, retrieve next test goal from queue.
-			currentTestGoal = testGoalQueue.poll();
-
-			// Poll returns null if there are no more items remaining in the queue.
-			if(currentTestGoal == null) {
-				// No more test goals remaining, terminate sequence.
-				System.out.println("Test goal completed, but no more test goals.");
-				return Collections.singletonList(new Verdict(Verdict.Severity.CONDITION_COMPLETE, "All test goal conditions completed."));
-			} else {
-				System.out.println("Test goal completed, moving to next test goal.");
-				llmActionSelector.reset(currentTestGoal, true);
-				conditionEvaluator.clear();
-				conditionEvaluator.addConditions(currentTestGoal.getCompletionConditions());
-			}
-		}
-
-		return super.getVerdicts(state);
+		return verdicts;
 	}
 
 	/**
