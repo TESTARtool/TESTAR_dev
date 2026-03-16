@@ -30,6 +30,8 @@
 
 package org.testar.statemodel.analysis.condition;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.InvalidArgumentException;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tag;
@@ -42,12 +44,14 @@ import org.testar.statemodel.util.QueryHelper;
  * Simple condition that searches for a string in all states.
  */
 public class StateCondition extends TestCondition {
+    static final Logger logger = LogManager.getLogger();
+
     private final String field;
     private final String searchMessage;
 
     /**
      * Creates a new StateCondition.
-     * @param field The field in the state model to serach. Example: WebInnerHTML.
+     * @param field The field in the state model to search. Example: WebInnerHTML.
      * @param searchMessage The string to search for.
      * @param comparator The result of the query is compared to the threshold value using the selected operator.
      * @param threshold The result of the query is compared to this value.
@@ -115,12 +119,14 @@ public class StateCondition extends TestCondition {
     public boolean evaluate(State state) {
     	for(Widget widget : state) {
     		// For web apps check the widget is visible
-    		if(widget.get(WdTags.WebIsFullOnScreen, true)) {
+        	// The default value is true to avoid blocking SUT systems other than web apps
+    		if(widget.get(WdTags.WebIsFullOnScreen, true) && widget.get(WdTags.WebIsDisplayed, true)) {
     	    	for(Tag<?> tag : widget.tags()){
     	    		if(tag.name().equals(getField()) && widget.get(tag, null) != null){
     	    			try {
     	    				String tagValue = widget.get(tag).toString();
     	    				if(tagValue.contains(searchMessage)) {
+    	    					logger.info("State Condition Match for Tag Value: " + tagValue);
     	    					return true;
     	    				}
     	    			} catch (Exception e) {

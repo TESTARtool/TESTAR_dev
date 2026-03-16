@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2024 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2024 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2026 Universitat Politecnica de Valencia - www.upv.e
+ * Copyright (c) 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,35 +28,31 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.llm;
+package org.testar.oracles.llm;
 
-import org.testar.statemodel.analysis.condition.TestCondition;
+import java.util.Locale;
 
-import java.util.List;
+public enum LlmVerdictDecision {
+	CONTINUE,
+	COMPLETED,
+	INVALID,
+	UNKNOWN;
 
-/**
- * Contains a test goal for the llm to complete along with the conditions under which the test goal is considered
- * completed.
- */
-public class LlmTestGoal {
-    private String testGoal;
-    private List<TestCondition> completionConditions;
+	public static LlmVerdictDecision fromStatus(String status) {
+		if (status == null || status.trim().isEmpty()) {
+			return UNKNOWN;
+		}
 
-    /**
-     * Creates a new test goal object.
-     * @param testGoal The instructions for the llm to execute a task.
-     * @param completionConditions The conditions under which the task is considered completed.
-     */
-    public LlmTestGoal(String testGoal, List<TestCondition> completionConditions) {
-        this.testGoal = testGoal;
-        this.completionConditions = completionConditions;
-    }
-
-    public String getTestGoal() {
-        return testGoal;
-    }
-
-    public List<TestCondition> getCompletionConditions() {
-        return completionConditions;
-    }
+		String normalized = status.trim().toUpperCase(Locale.ROOT);
+		switch (normalized) {
+		case "CONTINUE":
+			return CONTINUE;
+		case "COMPLETED":
+			return COMPLETED;
+		case "INVALID":
+			return INVALID;
+		default:
+			return UNKNOWN;
+		}
+	}
 }

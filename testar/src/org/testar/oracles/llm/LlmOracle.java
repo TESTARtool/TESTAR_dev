@@ -66,8 +66,6 @@ import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
 import org.testar.settings.Settings;
 
-import com.google.gson.Gson;
-
 public class LlmOracle implements Oracle {
 
 	protected static final Logger logger = LogManager.getLogger();
@@ -173,9 +171,21 @@ public class LlmOracle implements Oracle {
 
 			String llmResponse = getResponseFromLlm(conversationJson);
 
-			LlmVerdict llmVerdict = new Gson().fromJson(llmResponse, LlmVerdict.class);
+			LlmVerdict llmVerdict = LlmVerdictParser.parse(llmResponse);
+			String info = llmVerdict.getInfo() == null ? "" : llmVerdict.getInfo();
 
-			if(llmVerdict.match()) return new Verdict(Verdict.Severity.LLM_COMPLETE, llmVerdict.getInfo());
+			switch (llmVerdict.getDecision()) {
+			case COMPLETED:
+				return new Verdict(Verdict.Severity.LLM_COMPLETE, info);
+			case INVALID:
+				return new Verdict(Verdict.Severity.LLM_INVALID, info);
+			case CONTINUE:
+				return Verdict.OK;
+			case UNKNOWN:
+			default:
+				logger.log(Level.WARN, "LLM oracle response did not include a recognized verdict status/match.");
+				return Verdict.OK;
+			}
 
 		} catch(Exception e) {
 			logger.log(Level.ERROR, "Error obtaining the verdict with the LLM");

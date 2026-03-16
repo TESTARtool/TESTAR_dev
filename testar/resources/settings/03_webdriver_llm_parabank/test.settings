@@ -147,7 +147,7 @@ DataStoreUser =
 DataStorePassword = 
 DataStoreMode = none
 ApplicationName = parabank
-ApplicationVersion = loan_denied
+ApplicationVersion = request_loan
 ActionSelectionAlgorithm = random
 StateModelStoreWidgets = false
 ResetDataStore = false
@@ -173,11 +173,11 @@ LlmReasoning = minimal
 LlmHostUrl = https://api.openai.com/v1/chat/completions
 LlmAuthorizationHeader = Bearer %OPENAI_API%
 LlmActionFewshotFile = prompts/fewshot_openai_action.json
-LlmOracleFewshotFile = prompts/fewshot_openai_oracle.json
+LlmOracleFewshotFile = prompts/fewshot_openai_oracle_goal_status.json
 LlmTemperature = 0.2
 LlmHistorySize = 5
 LlmStateless = true
-LlmTestGoals = As a user, I want to log in with the credentials john/demo\\nThen a Request Loan link is shown;As a user, I want to request a loan with an amount '999999', a down payment of '100', for the account '54321'\\nThen the loan is denied due to insufficient funds
+LlmTestGoals = As a user, I want to log in with the credentials john/demo\\nThen a Request Loan link is shown;As a user, I want to request a loan with an amount '999999', a down payment of '100', for the account '54321'\\nThen the loan is approved by the bank entity
 
 #################################################################
 # WebDriver features

@@ -1,3 +1,18 @@
+#TESTAR v2.8.5 (17-Mar-2026)
+- Bump io.appium:java-client from 10.0.0 to 10.1.0
+- Update JS getIsBlockedTestar logic
+- Add continue, completed, invalid, LLM Oracle logic
+- Add LlmTestGoalOrchestrator logic
+- Add WebIsDisplayed to StateCondition
+- Update selectAction in model evaluator protocols to avoid LLM select extra actions
+
+
+#TESTAR v2.8.4 (12-Mar-2026)
+- Remove abstract actionIds from LLM ActionHistory
+- Update getElementDescription prioritty and length
+- Add web aria tags to state model abstraction tags
+
+
 #TESTAR v2.8.3 (11-Mar-2026)
 - Add aria properties to WdTags
 

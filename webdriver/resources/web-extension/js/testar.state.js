@@ -392,8 +392,9 @@ function getIsBlockedTestar(element, xOffset, yOffset, clientRect) {
         return false;
     }
 
-    // Ignore encapsulated childs of <a>
-    if (element.tagName === "A" && element.contains(elem)) {
+    // If hit-testing returns the element itself or one of its descendants,
+    // then it is not blocked (e.g. <button><span>Text</span></button>).
+    if (elem === element || element.contains(elem)) {
         return false;
     }
 
@@ -402,18 +403,8 @@ function getIsBlockedTestar(element, xOffset, yOffset, clientRect) {
         return false;
     }
 
-    // Ignore blocking clickable elements that are obscured by child elements
-    if (
-        isClickableTestar(element) &&
-        ["BUTTON", "A", "DATALIST", "INPUT", "SELECT"].includes(element.tagName) &&
-        element.contains(elem)
-    ) {
-        return false;
-    }
-
-    // return whether obscured element has same parent node
-    // (will also return false if element === elem)
-    return elem.parentNode !== element.parentNode;
+    // Otherwise, treat as blocked by another element.
+    return true;
 }
 
 /*

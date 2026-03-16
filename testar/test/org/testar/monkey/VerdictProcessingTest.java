@@ -102,6 +102,25 @@ public class VerdictProcessingTest {
 	}
 
 	@Test
+	public void testDoesNotIgnoreDuplicateLlmInvalid() throws Exception {
+		File settingsDir = tempFolder.newFolder("settings_llm_invalid");
+		Settings.setSettingsPath(settingsDir.getAbsolutePath());
+
+		File ignoreFile = new File(settingsDir, "list_of_verdicts_with_failures.txt");
+		Files.write(ignoreFile.toPath(), Collections.singletonList("goal invalid by llm"), StandardCharsets.UTF_8);
+
+		Settings settings = new Settings();
+		settings.set(ConfigTags.IgnoreDuplicatedVerdicts, true);
+		VerdictProcessing processing = new VerdictProcessing(settings);
+
+		Verdict llmInvalid = new Verdict(Verdict.Severity.LLM_INVALID, "goal invalid by llm");
+		List<Verdict> filtered = processing.filterDuplicates(Collections.singletonList(llmInvalid));
+
+		assertEquals(1, filtered.size());
+		assertEquals(Verdict.Severity.LLM_INVALID.getValue(), filtered.get(0).severity(), 0.0);
+	}
+
+	@Test
 	public void testDoesNotIgnoreDuplicateConditionComplete() throws Exception {
 		File settingsDir = tempFolder.newFolder("settings_condition_complete");
 		Settings.setSettingsPath(settingsDir.getAbsolutePath());

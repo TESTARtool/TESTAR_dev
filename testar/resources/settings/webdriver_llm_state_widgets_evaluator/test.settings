@@ -126,7 +126,7 @@ MaxTime = 3.1536E7
 #################################################################
 
 ApplicationName = parabank
-ApplicationVersion = login
+ApplicationVersion = check_loan
 
 #################################################################
 # State model inference settings
@@ -185,7 +185,7 @@ LlmOracleFewshotFile =
 LlmTemperature = 0.2
 LlmHistorySize = 5
 LlmStateless = true
-LlmTestGoals = Use the username 'john' and the password 'demo' to log in the application\\nCheck: Welcome John Smith
+LlmTestGoals = Use the username 'john' and the password 'demo' to log in the application\\nCheck: Welcome John Smith;Apply for a loan of 999999 with a down payment of 100\\nCheck: We cannot grant a loan in that amount with your available funds
 
 #################################################################
 # WebDriver features
