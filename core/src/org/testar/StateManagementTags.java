@@ -308,7 +308,8 @@ public class StateManagementTags {
     public static final Tag<String> WebWidgetId = Tag.from("Web Widget id", String.class);
     public static final Tag<String> WebWidgetName = Tag.from("Web Widget name", String.class);
     public static final Tag<String> WebWidgetTagName = Tag.from("Web Widget tag name", String.class);
-    public static final Tag<String> WebWidgetTextContent= Tag.from("Web Widget text content", String.class);
+    public static final Tag<String> WebWidgetTextContent = Tag.from("Web Widget text content", String.class);
+    public static final Tag<String> WebWidgetInnerText = Tag.from("Web Widget inner text", String.class);
     public static final Tag<String> WebWidgetTitle = Tag.from("Web Widget title", String.class);
     public static final Tag<String> WebWidgetHref = Tag.from("Web Widget href", String.class);
     public static final Tag<String> WebWidgetValue = Tag.from("Web Widget value", String.class);
@@ -402,6 +403,7 @@ public class StateManagementTags {
             add(WebWidgetName);
             add(WebWidgetTagName);
             add(WebWidgetTextContent);
+            add(WebWidgetInnerText);
             add(WebWidgetTitle);
             add(WebWidgetHref);
             add(WebWidgetValue);
@@ -501,6 +503,7 @@ public class StateManagementTags {
         settingsMap.put(WebWidgetName, "WebWidgetName");
         settingsMap.put(WebWidgetTagName, "WebWidgetTagName");
         settingsMap.put(WebWidgetTextContent, "WebWidgetTextContent");
+        settingsMap.put(WebWidgetInnerText, "WebWidgetInnerText");
         settingsMap.put(WebWidgetTitle, "WebWidgetTitle");
         settingsMap.put(WebWidgetHref, "WebWidgetHref");
         settingsMap.put(WebWidgetValue, "WebWidgetValue");
@@ -590,6 +593,7 @@ public class StateManagementTags {
             put(WebWidgetName, Group.WebDriver);
             put(WebWidgetTagName, Group.WebDriver);
             put(WebWidgetTextContent, Group.WebDriver);
+            put(WebWidgetInnerText, Group.WebDriver);
             put(WebWidgetTitle, Group.WebDriver);
             put(WebWidgetHref, Group.WebDriver);
             put(WebWidgetValue, Group.WebDriver);
