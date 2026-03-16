@@ -96,7 +96,6 @@ public final class Verdict implements Serializable {
 		/** FAIL (0.5 - 0.899) **/
 
 		UNREPLAYABLE(0.5, "UNREPLAYABLE"), // Sequence not replayable
-		LLM_INVALID(0.79, "LLM_INVALID"), // LLM detected objective steps were followed but resulting state is invalid
 		SUSPICIOUS_TAG(0.8, "SUSPICIOUS_TAG"), // Suspicious tag
 		SUSPICIOUS_PROCESS(0.87, "SUSPICIOUS_PROCESS"), // Suspicious message in the process standard output/error
 		SUSPICIOUS_LOG(0.89, "SUSPICIOUS_LOG"), // Suspicious message in log file or command output (LogOracle)
@@ -104,6 +103,7 @@ public final class Verdict implements Serializable {
 		/** CRITICAL (0.9 - 1.0) **/
 
 		CRITICAL(0.9, "CRITICAL"),
+		LLM_INVALID(0.91, "LLM_INVALID"), // LLM detected objective steps were followed but resulting state is invalid
 		NOT_RESPONDING(0.99999990, "NOT_RESPONDING"), // Unresponsive
 		UNEXPECTEDCLOSE(0.99999999, "UNEXPECTEDCLOSE"), // Crash? Unexpected close?
 		FAIL(1.0, "FAIL");
