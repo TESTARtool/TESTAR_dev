@@ -310,19 +310,24 @@ public class Protocol_webdriver_llm_state_model_evaluator extends WebdriverProto
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions) {
+		// State model conditions are check one state behind, producing one extra selected action
+		// If the state model condition is done, avoid executing an extra step
+		if (conditionEvaluator.evaluateConditions(stateModelManager.getModelIdentifier(), stateModelManager)) {
+			return prepareActionForExecution(state, new NOP());
+		}
+
 		Action toExecute = llmActionSelector.selectAction(state, actions);
+		return prepareActionForExecution(state, toExecute);
+	}
 
-		// We need to set a state to NOP actions
-		if(toExecute instanceof NOP) {
-			toExecute.set(Tags.OriginWidget, state);
+	private Action prepareActionForExecution(State state, Action action) {
+		if (action instanceof NOP) {
+			action.set(Tags.OriginWidget, state);
 		}
-
-		// We need the AbstractID for the state model
-		if(toExecute.get(Tags.AbstractID, null) == null) {
-			CodingManager.buildIDs(state, Collections.singleton(toExecute));
+		if(action.get(Tags.AbstractID, null) == null) {
+			CodingManager.buildIDs(state, Collections.singleton(action));
 		}
-
-		return toExecute;
+		return action;
 	}
 
 	/**
