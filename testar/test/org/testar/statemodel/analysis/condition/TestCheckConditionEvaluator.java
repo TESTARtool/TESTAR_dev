@@ -77,6 +77,21 @@ public class TestCheckConditionEvaluator {
 	}
 
 	@Test
+	public void test_single_check_condition_unmatch_nondisplayed() {
+		StateStub state = new StateStub();
+		WidgetStub widget = new WidgetStub();
+		widget.set(WdTags.WebTitle, "this message is shown but the widget is non displayed");
+		widget.set(WdTags.WebIsDisplayed, false);
+		state.addChild(widget);
+		widget.setParent(state);
+
+		String testGoal = "Perform this action \n Check: this message is shown";
+		CheckConditionEvaluator checkEvaluator = new CheckConditionEvaluator(WdTags.WebTitle, testGoal);
+
+		Assert.isTrue(!checkEvaluator.evaluateConditions(state), "The state evaluator must unmatch for non displayed widgets");
+	}
+
+	@Test
 	public void test_multiple_check_conditions_loaded_messages() {
 		String testGoal = "Perform this action \n Check: this message is shown \n Check: also a second message";
 		CheckConditionEvaluator checkEvaluator = new CheckConditionEvaluator(WdTags.WebInnerHTML, testGoal);
