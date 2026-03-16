@@ -33,6 +33,7 @@ import org.testar.CodingManager;
 import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
 import org.testar.llm.LlmTestGoal;
+import org.testar.llm.LlmTestGoalOrchestrator;
 import org.testar.llm.prompt.ActionWebPromptGenerator;
 import org.testar.llm.prompt.OracleWebPromptGenerator;
 import org.testar.managers.InputDataManager;
@@ -60,12 +61,12 @@ public class Protocol_webdriver_mendix_llm extends WebdriverProtocol {
 
 	// The LLM Action selector needs to be initialize with the settings
 	private LlmActionSelector llmActionSelector;
-	private List<LlmTestGoal> testGoals = new ArrayList<>();
-	private Queue<LlmTestGoal> testGoalQueue;
-	private LlmTestGoal currentTestGoal;
 
 	// The LLM Oracle needs to be initialize with the settings
 	private LlmOracle llmOracle;
+
+	private List<LlmTestGoal> testGoals = new ArrayList<>();
+	private LlmTestGoalOrchestrator testGoalOrchestrator;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -85,6 +86,11 @@ public class Protocol_webdriver_mendix_llm extends WebdriverProtocol {
 
 		// Initialize the LlmOracle using the LLM settings
 		llmOracle = new LlmOracle(settings, new OracleWebPromptGenerator(true));
+
+		testGoalOrchestrator = new LlmTestGoalOrchestrator(testGoals, (goal, appendPreviousGoal) -> {
+			llmActionSelector.reset(goal, appendPreviousGoal);
+			llmOracle.reset(goal, appendPreviousGoal);
+		});
 	}
 
 	/**
@@ -93,16 +99,7 @@ public class Protocol_webdriver_mendix_llm extends WebdriverProtocol {
 	@Override
 	protected void preSequencePreparations() {
 		super.preSequencePreparations();
-
-		// Setup test goal queue
-		testGoalQueue = new LinkedList<>();
-		testGoalQueue.addAll(testGoals);
-		currentTestGoal = testGoalQueue.poll();
-
-		// Reset llm action selector
-		llmActionSelector.reset(currentTestGoal, false);
-		// Reset llm oracle
-		llmOracle.reset(currentTestGoal, false);
+		testGoalOrchestrator.startSequence();
 	}
 
 	private void setupTestGoals(List<String> testGoalsList) {
@@ -182,28 +179,12 @@ public class Protocol_webdriver_mendix_llm extends WebdriverProtocol {
 	 */
 	@Override
 	protected List<Verdict> getVerdicts(State state) {
-		// Use the LLM as an Oracle to determine if the test goal has been completed
-		List<Verdict> llmVerdicts = llmOracle.getVerdicts(state);
+		List<Verdict> verdicts = super.getVerdicts(state);
 
-		for(Verdict llmVerdict : llmVerdicts) {
-			if(llmVerdict.severity() == Verdict.Severity.LLM_COMPLETE.getValue()) {
-				// Test goal was completed, retrieve next test goal from queue.
-				currentTestGoal = testGoalQueue.poll();
+		// Add the LLM Oracle verdicts to determine if the test goal has been completed
+		verdicts.addAll(testGoalOrchestrator.processGoalVerdicts(llmOracle.getVerdicts(state)));
 
-				// Poll returns null if there are no more items remaining in the queue.
-				if(currentTestGoal == null) {
-					// No more test goals remaining, terminate sequence.
-					System.out.println("Test goal completed, but no more test goals.");
-					return Collections.singletonList(llmVerdict);
-				} else {
-					System.out.println("Test goal completed, moving to next test goal.");
-					llmActionSelector.reset(currentTestGoal, true);
-					llmOracle.reset(currentTestGoal, true);
-				}
-			}
-		}
-
-		return super.getVerdicts(state);
+		return verdicts;
 	}
 
 	/**
@@ -246,9 +227,6 @@ public class Protocol_webdriver_mendix_llm extends WebdriverProtocol {
 				}
 				continue;
 			}
-
-			// slides can happen, even though the widget might be blocked
-			// addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
 
 			// If the element is blocked, Testar can't click on or type in the widget
 			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
