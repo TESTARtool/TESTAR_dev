@@ -31,7 +31,6 @@
 package org.testar.monkey.alayer;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -104,6 +103,7 @@ public final class Verdict implements Serializable {
 		/** CRITICAL (0.9 - 1.0) **/
 
 		CRITICAL(0.9, "CRITICAL"),
+		LLM_INVALID(0.91, "LLM_INVALID"), // LLM detected objective steps were followed but resulting state is invalid
 		NOT_RESPONDING(0.99999990, "NOT_RESPONDING"), // Unresponsive
 		UNEXPECTEDCLOSE(0.99999999, "UNEXPECTEDCLOSE"), // Crash? Unexpected close?
 		FAIL(1.0, "FAIL");

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2024 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2024 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2026 Universitat Politecnica de Valencia - www.upv.e
+ * Copyright (c) 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,35 +28,51 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.llm;
+package org.testar.oracles.llm;
 
-import org.testar.statemodel.analysis.condition.TestCondition;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
-import java.util.List;
+public final class LlmVerdictParser {
 
-/**
- * Contains a test goal for the llm to complete along with the conditions under which the test goal is considered
- * completed.
- */
-public class LlmTestGoal {
-    private String testGoal;
-    private List<TestCondition> completionConditions;
+	private LlmVerdictParser() {}
 
-    /**
-     * Creates a new test goal object.
-     * @param testGoal The instructions for the llm to execute a task.
-     * @param completionConditions The conditions under which the task is considered completed.
-     */
-    public LlmTestGoal(String testGoal, List<TestCondition> completionConditions) {
-        this.testGoal = testGoal;
-        this.completionConditions = completionConditions;
-    }
+	public static LlmVerdict parse(String llmResponse) {
+		JsonObject object = JsonParser.parseString(llmResponse).getAsJsonObject();
 
-    public String getTestGoal() {
-        return testGoal;
-    }
+		String info = getStringValue(object, "info");
+		String status = getStringValue(object, "status");
+		Boolean match = getBooleanValue(object, "match");
 
-    public List<TestCondition> getCompletionConditions() {
-        return completionConditions;
-    }
+		return new LlmVerdict(match, status, info);
+	}
+
+	private static String getStringValue(JsonObject object, String property) {
+		if (!object.has(property) || object.get(property).isJsonNull()) {
+			return "";
+		}
+		JsonElement value = object.get(property);
+		if (value.isJsonPrimitive()) {
+			return value.getAsString();
+		}
+		return value.toString();
+	}
+
+	private static Boolean getBooleanValue(JsonObject object, String property) {
+		if (!object.has(property) || object.get(property).isJsonNull()) {
+			return null;
+		}
+
+		JsonElement value = object.get(property);
+		try {
+			return value.getAsBoolean();
+		} catch (Exception ignored) {
+			try {
+				return Boolean.parseBoolean(value.getAsString());
+			} catch (Exception ignoredAgain) {
+				return null;
+			}
+		}
+	}
 }
