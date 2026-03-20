@@ -215,7 +215,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 *
 	 * @param settings
 	 */
-	public final void run(final Settings settings) {
+	@Override
+	public final void accept(final Settings settings) {
 
 		//Associate start settings of the first TESTAR dialog
 		this.settings = settings;

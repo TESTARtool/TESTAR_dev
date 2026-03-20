@@ -32,8 +32,6 @@ package org.testar.monkey.alayer;
 
 import org.testar.CodingManager;
 import org.testar.monkey.Pair;
-import org.testar.monkey.Proc;
-import org.testar.monkey.UnFunc;
 import org.testar.monkey.alayer.devices.Keyboard;
 import org.testar.monkey.alayer.devices.Mouse;
 import org.testar.monkey.alayer.devices.ProcessHandle;
@@ -185,7 +183,7 @@ public final class Tags extends TagsBase {
 	/** Usually attached to systems. A system activator can bring a system to the foreground. E.g.: If another process is currently in the foreground,
 	 * the SystemActivator makes sure that the SUT gets focused again. */
 	@SuppressWarnings("unchecked")
-	public static final Tag<Proc> SystemActivator = from("SystemActivator", (Class<Proc>)(Class<?>)Proc.class);
+	public static final Tag<Runnable> SystemActivator = from("SystemActivator", (Class<Runnable>)(Class<?>)Runnable.class);
 
 	/**
 	 * The original widget that can be attached to things like actions

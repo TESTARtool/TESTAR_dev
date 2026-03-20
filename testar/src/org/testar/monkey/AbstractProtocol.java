@@ -42,6 +42,7 @@ import org.testar.settings.Settings;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * This is the abstract flow of TESTAR (generate mode):
@@ -65,7 +66,7 @@ import java.util.Set;
  * - CloseTestSession (after finishing the last sequence)
  *
  */
-public abstract class AbstractProtocol implements UnProc<Settings>	{
+public abstract class AbstractProtocol implements Consumer<Settings> {
 
 	protected Settings settings;
 	protected Settings settings(){ return settings; }

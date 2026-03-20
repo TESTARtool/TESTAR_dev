@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2026 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -31,9 +31,9 @@
 package org.testar.monkey.alayer.visualizers;
 
 import java.util.Iterator;
+import java.util.function.Function;
 
 import org.testar.monkey.Assert;
-import org.testar.monkey.UnFunc;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.Canvas;
 import org.testar.monkey.alayer.Pen;
@@ -47,14 +47,14 @@ import org.testar.monkey.alayer.Visualizer;
 public class TrajectoryVisualizer implements Visualizer {
 
 	private static final long serialVersionUID = 1107281202398264314L;
-	final UnFunc<State, Iterable<Point>> trajectory;
+	final Function<State, Iterable<Point>> trajectory;
 	final Pen pen;
 
 	public TrajectoryVisualizer(Pen pen, Position... positions){
 		this(new SplineTrajectory(10, positions), pen);
 	}
 	
-	public TrajectoryVisualizer(UnFunc<State, Iterable<Point>> trajectory, Pen pen){
+	public TrajectoryVisualizer(Function<State, Iterable<Point>> trajectory, Pen pen){
 		Assert.notNull(trajectory, pen);
 		Assert.isTrue(pen.strokeWidth() != null);
 		this.trajectory = trajectory;		
