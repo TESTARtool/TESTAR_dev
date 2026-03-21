@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,27 +28,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.screenshot;
 
-import java.util.Iterator;
-
+import org.testar.monkey.alayer.AWTCanvas;
+import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Widget;
-import org.testar.monkey.alayer.WidgetIterator;
 
-public class StateStub extends WidgetStub implements State {
-	private static final long serialVersionUID = -2972642849689796355L;
+public interface ScreenshotProvider {
 
-	public StateStub() {
-		setRoot(this);
-	}
+	AWTCanvas getStateshotBinary(State state);
 
-	public void setRoot(State root) {
-		super.setRoot(root);
-	}
+	String getActionshot(State state, Action action);
 
-	@Override
-	public Iterator<Widget> iterator() {
-		return new WidgetIterator(this);
-	}
 }

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2023 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -55,10 +55,24 @@ public class WidgetStub extends TaggableBase implements Widget {
 	private final List<Widget> widgets = new ArrayList<>();
 
 	private Widget parent = null;
+	private State root = null;
 
 	@Override
 	public State root() {
-		return (State)this;
+		if (root != null) {
+			return root;
+		}
+		if (parent != null) {
+			return parent.root();
+		}
+		if (this instanceof State) {
+			return (State) this;
+		}
+		return null;
+	}
+
+	public void setRoot(State root) {
+		this.root = root;
 	}
 
 	@Override

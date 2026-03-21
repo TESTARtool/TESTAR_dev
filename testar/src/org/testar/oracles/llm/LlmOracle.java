@@ -47,7 +47,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.llm.prompt.IPromptOracleGenerator;
-import org.testar.ProtocolUtil;
 import org.testar.llm.LlmConversation;
 import org.testar.llm.LlmFactory;
 import org.testar.llm.LlmResponse;
@@ -58,12 +57,8 @@ import org.testar.monkey.Main;
 import org.testar.monkey.alayer.AWTCanvas;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Verdict;
-import org.testar.monkey.alayer.android.AndroidProtocolUtil;
-import org.testar.monkey.alayer.ios.IOSProtocolUtil;
-import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
 import org.testar.oracles.Oracle;
-import org.testar.plugin.NativeLinker;
-import org.testar.plugin.OperatingSystems;
+import org.testar.screenshot.ScreenshotProviderFactory;
 import org.testar.settings.Settings;
 
 public class LlmOracle implements Oracle {
@@ -141,15 +136,7 @@ public class LlmOracle implements Oracle {
 		if (promptGenerator.attachImage()) {
 
 			ByteArrayOutputStream screenshotBytes = new ByteArrayOutputStream();
-			AWTCanvas screenshot;
-			if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
-				screenshot = WdProtocolUtil.getStateshotBinary(state);
-			} else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
-				screenshot = AndroidProtocolUtil.getStateshotBinary(state);
-			} else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
-				screenshot = IOSProtocolUtil.getStateshotBinary(state);
-			}
-			else screenshot = ProtocolUtil.getStateshotBinary(state);
+			AWTCanvas screenshot = ScreenshotProviderFactory.current().getStateshotBinary(state);
 
 			try {
 				screenshot.saveAsPng(screenshotBytes);
