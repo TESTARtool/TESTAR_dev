@@ -40,7 +40,7 @@
         <button onclick="queryModel()">Query Model</button>
         <button onclick="resetQuery()">Reset Query</button>
 
-        <button onclick="generateAMP()">Export AMP</button>
+        <button id="export-amp" type="button" onclick="generateAMP()">Export AMP</button>
         <button id="export-json" type="button" onclick="generateModelJSON()">Export JSON</button>
 	</div>
 
@@ -1408,7 +1408,37 @@
         const errBox = document.getElementById("multiQueryError");
         if (errBox) errBox.textContent = "";
     }
-	function generateAMP() {
+	function setExportButtonsState(isRunning) {
+		const exportAmpButton = document.getElementById("export-amp");
+		const exportJsonButton = document.getElementById("export-json");
+		const exportButtons = [exportAmpButton, exportJsonButton].filter(Boolean);
+
+		exportButtons.forEach((btn) => {
+			if (!btn.dataset.defaultLabel) {
+				btn.dataset.defaultLabel = btn.textContent;
+			}
+			btn.disabled = isRunning;
+			btn.textContent = isRunning ? "Exporting..." : btn.dataset.defaultLabel;
+		});
+	}
+
+	let exportInProgress = false;
+
+	function beginExport() {
+		if (exportInProgress) return false;
+		exportInProgress = true;
+		setExportButtonsState(true);
+		return true;
+	}
+
+	function endExport() {
+		exportInProgress = false;
+		setExportButtonsState(false);
+	}
+
+	async function generateAMP() {
+		if (!beginExport()) return;
+		try {
 		// Extract the information of the initial abstract state
 		let initialNodes = cy.$(".AbstractState").filter((ele) => ele.data("isInitial") === "true");
 		let initialAbstractId = initialNodes[0].data("stateId");
@@ -1481,20 +1511,22 @@
 			ConcreteTransitions: concreteTransitions,
 		};
 		// Invoke the TESTAR-AXINI transformer
-		fetch("http://localhost:8090/generate-amp", {
+		const res = await fetch("http://localhost:8090/generate-amp", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json"
 			},
 			body: JSON.stringify(jsonResult)
-		})
-		.then(res => res.text())
-		.then(ampCode => {
-			console.log("Original JSON:", JSON.stringify(jsonResult));
-			console.log("Generated AMP code:", ampCode);
-			downloadAmpFile(ampCode);
-		})
-		.catch(err => console.error("AMP generation failed:", err));
+		});
+		const ampCode = await res.text();
+		console.log("Original JSON:", JSON.stringify(jsonResult));
+		console.log("Generated AMP code:", ampCode);
+		downloadAmpFile(ampCode);
+		} catch (err) {
+			console.error("AMP generation failed:", err);
+		} finally {
+			endExport();
+		}
 	}
 	function downloadAmpFile(content, filename = "model.amp") {
 		const blob = new Blob([content], { type: "text/plain" });
@@ -1507,6 +1539,8 @@
 	}
 
     async function generateModelJSON() {
+		if (!beginExport()) return;
+		try {
 		// Extract the information of the initial abstract state
 		let initialNodes = cy.$(".AbstractState").filter((ele) => ele.data("isInitial") === "true");
 		let initialAbstractId = initialNodes[0].data("stateId");
@@ -1624,6 +1658,11 @@
 
 		// Download the JSON model file
 		downloadJsonFile(jsonResult, "model.json");
+		} catch (err) {
+			console.error("JSON model generation failed:", err);
+		} finally {
+			endExport();
+		}
 	}
 	
 	// Remove any <svg> and <path> elements from an HTML string
