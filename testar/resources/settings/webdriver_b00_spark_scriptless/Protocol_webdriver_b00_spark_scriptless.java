@@ -98,13 +98,6 @@ public class Protocol_webdriver_b00_spark_scriptless extends WebdriverProtocol {
 	@Override
 	protected SUT startSystem() throws SystemStartException {
 		SUT system = super.startSystem();
-
-		// Login steps
-		WdDriver.getRemoteWebDriver().findElement(By.name("id")).sendKeys("username"); // Replace with real username/email
-		WdDriver.getRemoteWebDriver().findElement(By.name("password")).sendKeys("password"); // Replace with real password
-		WdDriver.executeScript("document.querySelectorAll('input[type=submit]')[0].click();");
-		Util.pause(1);
-
 		return system;
 	}
 
@@ -117,6 +110,28 @@ public class Protocol_webdriver_b00_spark_scriptless extends WebdriverProtocol {
 	@Override
 	protected void beginSequence(SUT system, State state) {
 		super.beginSequence(system, state);
+
+		// Login steps for Generate mode
+
+		waitLeftClickAndTypeIntoWidgetWithMatchingTag("placeholder","Enter your username", "spark-user", state, system, 5, 1.0);
+
+		waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","password", "spar-password", state, system, 5, 1.0);
+
+		waitAndLeftClickWidgetWithMatchingTag("type", "submit", state, system, 5, 1.0);
+	}
+
+	@Override
+	protected boolean executeTriggeredAction(SUT system, State state, Action triggeredAction) {
+		// Save the state information in the model
+		stateModelManager.notifyNewStateReached(state, new HashSet<>(Collections.singletonList(triggeredAction)));
+
+		// Execute the desired triggeredAction
+		boolean executed = super.executeTriggeredAction(system, state, triggeredAction);
+
+		// Save the triggeredAction information in the model
+		stateModelManager.notifyActionExecution(triggeredAction);
+
+		return executed;
 	}
 
 	/**
@@ -153,79 +168,8 @@ public class Protocol_webdriver_b00_spark_scriptless extends WebdriverProtocol {
 
 		// ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
 
-		List<Verdict> overlapVerdicts = leafWidgetsOverlapping(state);
-		verdicts.addAll(overlapVerdicts);
-
 		return verdicts;
 	}
-
-	public List<Verdict> leafWidgetsOverlapping(State state) {
-		List<Verdict> verdicts = new ArrayList<>();
-
-		// Prepare a list that contains all the Rectangles from the leaf widgets
-		List<Pair<Widget, Rect>> leafWidgetsRects = new ArrayList<>();
-		for (Widget w : state) {
-			if (w.get(WdTags.WebIsFullOnScreen, false) 
-					&& w.childCount() < 1 
-					&& w.get(Tags.Shape, null) != null) {
-				leafWidgetsRects.add(new Pair<Widget, Rect>(w, (Rect)w.get(Tags.Shape)));
-			}
-		}
-		// Detect if the Rectangles of two leaf widgets are overlapping in an intersection
-		for (int i = 0; i < leafWidgetsRects.size(); i++) {
-			for (int j = i + 1; j < leafWidgetsRects.size(); j++) {
-				Rect rectOne = leafWidgetsRects.get(i).right();
-				Rect rectTwo = leafWidgetsRects.get(j).right();
-
-				if (Rect.overlap(rectOne, rectTwo)) {
-
-					Widget firstWidget = leafWidgetsRects.get(i).left();
-					Widget secondWidget = leafWidgetsRects.get(j).left();
-
-					String verdictMsg = String.format(
-							"Two leaf widgets are overlapping. First: %s, Second: %s",
-							firstWidget.get(WdTags.WebTextContent, ""),
-							secondWidget.get(WdTags.WebTextContent, "")
-							);
-
-					Visualizer visualizer = new RegionsVisualizer(
-							getRedPen(),
-							getWidgetRegions(Arrays.asList(firstWidget, secondWidget)),
-							"Invariant Fault",
-							0.5, 0.5);
-
-					Verdict clashVerdict = new Verdict(
-						Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, 
-						verdictMsg, 
-						visualizer);
-					verdicts.add(clashVerdict);
-				}
-			}
-		}
-
-		return verdicts;
-	}
-
-	private Pen getRedPen() {
-		return Pen.newPen()
-				.setColor(Color.Red)
-				.setFillPattern(FillPattern.None)
-				.setStrokePattern(StrokePattern.Solid)
-				.build();
-	}
-
-	private List<Shape> getWidgetRegions(List<Widget> widgets) {
-		if (widgets == null || widgets.isEmpty()) {
-			return new ArrayList<>();
-		}
-
-		return widgets.stream()
-				.map(widget -> widget.get(Tags.Shape, null))
-				.filter(shape -> shape != null)
-				.filter(shape -> shape instanceof Rect)
-				.collect(Collectors.toList());
-	}
-
 
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
@@ -268,11 +212,14 @@ public class Protocol_webdriver_b00_spark_scriptless extends WebdriverProtocol {
 				continue;
 			}
 
-			// slides can happen, even though the widget might be blocked
-			// addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
-
 			// If the element is blocked, Testar can't click on or type in the widget
-			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {
+			if (widget.get(Blocked, false) && 
+					(
+					!widget.get(WdTags.WebCssClasses, "").contains("MuiFab-label")
+					||
+					!widget.get(WdTags.WebCssClasses, "").contains("MuiSelect-selectMenu")
+					)
+			) {
 				continue;
 			}
 
@@ -302,6 +249,11 @@ public class Protocol_webdriver_b00_spark_scriptless extends WebdriverProtocol {
 			}
 		}
 
+		// Weird workaround for menus that do not have close actions
+		if (actions.size() <=5 ) {
+			actions.add(ac.hitESC(state));
+		}
+
 		// If we have forced actions, prioritize and filter the other ones
 		if (forcedActions != null && forcedActions.size() > 0) {
 			filteredActions = actions;
@@ -318,7 +270,22 @@ public class Protocol_webdriver_b00_spark_scriptless extends WebdriverProtocol {
 	protected boolean isClickable(Widget widget) {
 		// Various web elements which are clickable are no generic interactive widgets
 		if(!widget.get(WdTags.WebTextContent, "").isEmpty()
-				&& !widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdP)) {
+				&& widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdLI)) {
+			return true;
+		}
+		if(widget.get(WdTags.WebCssClasses, "").contains("MuiSelect-selectMenu")) {
+			return true;
+		}
+		if(widget.get(WdTags.WebCssClasses, "").contains("MuiTypography-root")) {
+			return true;
+		}
+		if(widget.get(WdTags.WebCssClasses, "").contains("projectMain")) {
+			return true;
+		}
+		if(widget.get(WdTags.WebCssClasses, "").contains("makeStyles-activityMain")) {
+			return true;
+		}
+		if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdOPTION)) {
 			return true;
 		}
 		return super.isClickable(widget);
