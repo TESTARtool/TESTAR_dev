@@ -1,6 +1,7 @@
-/**
- * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2026 Universitat Politecnica de Valencia - www.upv.es
+/***************************************************************************************************
+ *
+ * Copyright (c) 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -25,14 +26,18 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *
- */
+ *******************************************************************************************************/
 
-package org.testar.monkey.alayer.webdriver;
+package org.testar.screenshot;
 
-public final class WdProcessActivator implements Runnable {
+import org.testar.monkey.alayer.AWTCanvas;
+import org.testar.monkey.alayer.Action;
+import org.testar.monkey.alayer.State;
 
-  public void run() {
-    WdDriver.activate();
-  }
+public interface ScreenshotProvider {
+
+	AWTCanvas getStateshotBinary(State state);
+
+	String getActionshot(State state, Action action);
+
 }

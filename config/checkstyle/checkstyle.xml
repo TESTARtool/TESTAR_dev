@@ -56,11 +56,11 @@
 		
 
 		<!--module name="AvoidStarImport">
-			<property name="excludes" value="org.testar.monkey.dialog,javax.swing,javax.awt,java.io,java.net,java.lang.Math,org.testar,java.util,org.testar.monkey.alayer,org.testar.monkey.alayer.linux,org.testar.monkey.alayer.windows"/>
+			<property name="excludes" value="org.testar.monkey.dialog,javax.swing,javax.awt,java.io,java.net,java.lang.Math,org.testar,java.util,org.testar.monkey.alayer,org.testar.monkey.alayer.windows"/>
 		</module>
 
 		<module name="AvoidStaticImport">
-			<property name="excludes" value="org.testar.monkey.alayer.windows.UIARoles.*,org.testar.monkey.alayer.linux.AtSpiRolesWrapper.*"/>
+			<property name="excludes" value="org.testar.monkey.alayer.windows.UIARoles.*"/>
 		</module-->
 		
 		<module name="IllegalImport"/>

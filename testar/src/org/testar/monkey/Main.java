@@ -58,13 +58,14 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Consumer;
 
 import static org.testar.monkey.ConfigTags.*;
 import static org.testar.monkey.Util.compileProtocol;
 
 public class Main {
 
-	public static final String TESTAR_VERSION = "v2.8.5 (17-Mar-2026)";
+	public static final String TESTAR_VERSION = "v2.8.6 (24-Mar-2026)";
 
 	//public static final String TESTAR_DIR_PROPERTY = "DIRNAME"; //Use the OS environment to obtain TESTAR directory
 	public static final String SETTINGS_FILE = "test.settings";
@@ -377,13 +378,13 @@ public class Main {
 					"' with class path '" + Util.toString(cp) + "'\n", LogSerialiser.LogLevel.Debug);
 
 			@SuppressWarnings("unchecked")
-			UnProc<Settings> protocol = (UnProc<Settings>) loader.loadClass(protocolClass).getConstructor().newInstance();
+			Consumer<Settings> protocol = (Consumer<Settings>) loader.loadClass(protocolClass).getConstructor().newInstance();
 			LogSerialiser.log("TESTAR protocol loaded!\n", LogSerialiser.LogLevel.Debug);
 
 			LogSerialiser.log("Starting TESTAR protocol ...\n", LogSerialiser.LogLevel.Debug);
 
 			//Run TESTAR protocol with the selected settings
-			protocol.run(settings);
+			protocol.accept(settings);
 
 		} catch (InstantiationException e) {
 			e.printStackTrace();

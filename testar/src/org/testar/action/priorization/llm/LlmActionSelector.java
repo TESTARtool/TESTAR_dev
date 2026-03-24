@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2024 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2024 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2024 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2024 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -35,7 +35,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.IActionSelector;
-import org.testar.ProtocolUtil;
 import org.testar.llm.prompt.IPromptActionGenerator;
 import org.testar.llm.LlmConversation;
 import org.testar.llm.LlmFactory;
@@ -46,11 +45,7 @@ import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.*;
-import org.testar.monkey.alayer.android.AndroidProtocolUtil;
-import org.testar.monkey.alayer.ios.IOSProtocolUtil;
-import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
-import org.testar.plugin.NativeLinker;
-import org.testar.plugin.OperatingSystems;
+import org.testar.screenshot.ScreenshotProviderFactory;
 import org.testar.settings.Settings;
 
 import java.io.*;
@@ -179,15 +174,7 @@ public class LlmActionSelector implements IActionSelector {
         
         if (promptGenerator.attachImage()) {
             ByteArrayOutputStream screenshotBytes = new ByteArrayOutputStream();
-            AWTCanvas screenshot;
-            if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
-                screenshot = WdProtocolUtil.getStateshotBinary(state);
-            } else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
-                screenshot = AndroidProtocolUtil.getStateshotBinary(state);
-            } else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
-                screenshot = IOSProtocolUtil.getStateshotBinary(state);
-            }
-            else screenshot = ProtocolUtil.getStateshotBinary(state);
+            AWTCanvas screenshot = ScreenshotProviderFactory.current().getStateshotBinary(state);
 
             try {
                 screenshot.saveAsPng(screenshotBytes);

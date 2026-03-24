@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,12 +31,15 @@
 package org.testar.monkey;
 
 import org.testar.CodingManager;
-import org.testar.ProtocolUtil;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.plugin.NativeLinker;
+import org.testar.screenshot.ScreenshotProviderFactory;
+import org.testar.serialisation.ScreenshotSerialiser;
+import org.testar.util.IndexUtil;
 
+import java.awt.GraphicsEnvironment;
 import java.util.List;
 
 public class SutConnectorWindowTitle implements SutConnector {
@@ -55,21 +58,19 @@ public class SutConnectorWindowTitle implements SutConnector {
 
     @Override
     public SUT startOrConnectSut() throws SystemStartException {
-        List<SUT> suts = null;
-        State state; Role role; String title;
         long now = System.currentTimeMillis();
         do{
             Util.pauseMs(100);
-            suts = NativeLinker.getNativeProcesses();
+            List<SUT> suts = NativeLinker.getNativeProcesses();
             if (suts != null){
                 for (SUT theSUT : suts){
-                    state = getStateByWindowTitle(theSUT);
+                    State state = getStateByWindowTitle(theSUT);
                     // If the system is in the foreground or if the option to force to the foreground is enabled
                     if (state.get(Tags.Foreground) || forceToForeground){
                         for (Widget w : state){
-                            role = w.get(Tags.Role, null);
+                            Role role = w.get(Tags.Role, null);
                             if (role != null && Role.isOneOf(role, NativeLinker.getNativeRole_Window())){
-                                title = w.get(Tags.Title, null);
+                                String title = w.get(Tags.Title, null);
                                 if (title != null && title.contains(windowTitle)){
                                     System.out.println("SUT with Window Title -" + windowTitle + "- DETECTED!");
                                     return theSUT;
@@ -90,12 +91,16 @@ public class SutConnectorWindowTitle implements SutConnector {
         CodingManager.buildIDs(state);
 
         Shape viewPort = state.get(Tags.Shape, null);
-        if(viewPort != null){
-            state.set(Tags.ScreenshotPath, ProtocolUtil.getStateshot(state));
-            //Don't include WdProtocolUtil option because TESTAR doesn't connect to webdrivers through the windows title
+        if(!GraphicsEnvironment.isHeadless() && viewPort != null){
+			AWTCanvas screenshot = ScreenshotProviderFactory.current().getStateshotBinary(state);
+
+			if(screenshot != null) {
+				String screenshotPath = ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), screenshot);
+				state.set(Tags.ScreenshotPath, screenshotPath);
+			}
         }
 
-        state = ProtocolUtil.calculateZIndices(state);
+        state = IndexUtil.calculateZIndices(state);
 
         return state;
     }
