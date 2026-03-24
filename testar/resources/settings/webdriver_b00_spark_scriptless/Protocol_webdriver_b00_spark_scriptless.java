@@ -115,7 +115,7 @@ public class Protocol_webdriver_b00_spark_scriptless extends WebdriverProtocol {
 
 		waitLeftClickAndTypeIntoWidgetWithMatchingTag("placeholder","Enter your username", "spark-user", state, system, 5, 1.0);
 
-		waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","password", "spar-password", state, system, 5, 1.0);
+		waitLeftClickAndPasteIntoWidgetWithMatchingTag("name","password", "spark-password", state, system, 5, 1.0);
 
 		waitAndLeftClickWidgetWithMatchingTag("type", "submit", state, system, 5, 1.0);
 	}
@@ -213,13 +213,7 @@ public class Protocol_webdriver_b00_spark_scriptless extends WebdriverProtocol {
 			}
 
 			// If the element is blocked, Testar can't click on or type in the widget
-			if (widget.get(Blocked, false) && 
-					(
-					!widget.get(WdTags.WebCssClasses, "").contains("MuiFab-label")
-					||
-					!widget.get(WdTags.WebCssClasses, "").contains("MuiSelect-selectMenu")
-					)
-			) {
+			if (widget.get(Blocked, false)) {
 				continue;
 			}
 
@@ -268,15 +262,7 @@ public class Protocol_webdriver_b00_spark_scriptless extends WebdriverProtocol {
 
 	@Override
 	protected boolean isClickable(Widget widget) {
-		// Various web elements which are clickable are no generic interactive widgets
-		if(!widget.get(WdTags.WebTextContent, "").isEmpty()
-				&& widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdLI)) {
-			return true;
-		}
-		if(widget.get(WdTags.WebCssClasses, "").contains("MuiSelect-selectMenu")) {
-			return true;
-		}
-		if(widget.get(WdTags.WebCssClasses, "").contains("MuiTypography-root")) {
+		if(widget.get(WdTags.WebCssClasses, "").contains("Button")) {
 			return true;
 		}
 		if(widget.get(WdTags.WebCssClasses, "").contains("projectMain")) {
