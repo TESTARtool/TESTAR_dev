@@ -9,7 +9,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.testar.monkey.Assert;
 import org.testar.monkey.ConfigTags;
-import org.testar.monkey.RuntimeControlsProtocol.Modes;
+import org.testar.core.execution.TestarMode;
 
 public class TestLoadSettings {
 
@@ -61,7 +61,7 @@ public class TestLoadSettings {
 		Settings settings = Settings.loadSettings(new String[] {"Discount=0.123", "ApplicationName=custom"}, tempFile.getCanonicalPath());
 
 		// Verify default settings that were not modified
-		Assert.isTrue(settings.get(ConfigTags.Mode).equals(Modes.Spy));
+		Assert.isTrue(settings.get(ConfigTags.Mode).equals(TestarMode.Spy));
 		Assert.isTrue(settings.get(ConfigTags.SequenceLength) == 10);
 
 		// Verify settings loaded with test.settings file

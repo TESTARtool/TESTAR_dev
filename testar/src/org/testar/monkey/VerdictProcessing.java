@@ -30,6 +30,7 @@
 
 package org.testar.monkey;
 
+import org.testar.TestarDirectories;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.settings.Settings;
@@ -113,8 +114,9 @@ public class VerdictProcessing {
 	}
 
 	public static File resolveVerdictIgnoreFile() {
-		if (Main.SSE_ACTIVATED != null && !Main.SSE_ACTIVATED.isEmpty()) {
-			return new File(Main.settingsDir + Main.SSE_ACTIVATED, LIST_VERDICTS_FAILURES_FILENAME);
+		if (TestarDirectories.getSelectedSse() != null && !TestarDirectories.getSelectedSse().isEmpty()) {
+			return new File(TestarDirectories.getSettingsDir() + TestarDirectories.getSelectedSse(),
+					LIST_VERDICTS_FAILURES_FILENAME);
 		}
 		String settingsPath = Settings.getSettingsPath();
 		if (settingsPath != null && !settingsPath.isEmpty()) {

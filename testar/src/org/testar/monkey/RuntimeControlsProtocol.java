@@ -32,6 +32,7 @@ package org.testar.monkey;
 
 import org.testar.EventHandler;
 import org.testar.IEventListener;
+import org.testar.core.execution.TestarMode;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.devices.MouseButtons;
@@ -45,13 +46,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 	protected Object[] userEvent = null;
 	protected boolean visualizationOn = false;
 
-	public enum Modes{
-		Spy,
-		Generate,
-		Quit;
-	}
-
-	protected Modes mode;
+	protected TestarMode mode;
 	private Set<KBKeys> pressed = EnumSet.noneOf(KBKeys.class);
 
 	public EventHandler initializeEventHandler() {
@@ -62,7 +57,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 	 * Set the mode with the given parameter value
 	 * @param mode
 	 */
-	protected synchronized void setMode(Modes mode){
+	protected synchronized void setMode(TestarMode mode){
 		if (mode() == mode) return;
 		else this.mode = mode;
 	}
@@ -71,7 +66,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 	 * Return the mode TESTAR is currently in
 	 * @return
 	 */
-	public synchronized Modes mode(){ return mode; }
+	public synchronized TestarMode mode(){ return mode; }
 
 	private final static double SLOW_MOTION = 2.0;
 	//TODO: key commands come through java.awt.event but are the key codes same for all OS? if they are the same, then move to platform independent protocol?
@@ -107,7 +102,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 			// SHIFT + ARROW-DOWN --> stop TESTAR run
 			else if(key == KBKeys.VK_DOWN && pressed.contains(KBKeys.VK_SHIFT)){
 				LogSerialiser.log("User requested to stop monkey!\n", LogSerialiser.LogLevel.Info);
-				mode = Modes.Quit;
+				mode = TestarMode.Quit;
 			}
 
 			// SHIFT + ARROW-UP --> toggle visualization on / off

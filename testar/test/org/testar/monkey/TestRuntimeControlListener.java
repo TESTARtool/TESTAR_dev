@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.testar.EventHandler;
-import org.testar.monkey.RuntimeControlsProtocol.Modes;
+import org.testar.core.execution.TestarMode;
 import org.testar.settings.Settings;
 
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
@@ -29,7 +29,7 @@ public class TestRuntimeControlListener {
 		// Initialize the DefaultProtocol which extends from RuntimeControlsProtocol
 		defaultProtocol = new DefaultProtocol();
 		defaultProtocol.eventHandler = defaultProtocol.initializeEventHandler();
-		defaultProtocol.mode = Modes.Spy;
+		defaultProtocol.mode = TestarMode.Spy;
 	}
 
 	@Test
@@ -41,13 +41,13 @@ public class TestRuntimeControlListener {
 		defaultProtocol.settings = settings;
 
 		// TESTAR is running in SPY mode
-		Assert.isTrue(defaultProtocol.mode() == Modes.Spy);
+		Assert.isTrue(defaultProtocol.mode() == TestarMode.Spy);
 
 		// Then, after a fake user event, KeyBoard SHIFT + DOWN
 		simulateUserKeyEvent(defaultProtocol.eventHandler);
 
 		// TESTAR changed to QUIT mode because KeyBoardListener is enabled
-		Assert.isTrue(defaultProtocol.mode() == Modes.Quit);
+		Assert.isTrue(defaultProtocol.mode() == TestarMode.Quit);
 	}
 
 	@Test
@@ -59,13 +59,13 @@ public class TestRuntimeControlListener {
 		defaultProtocol.settings = settings;
 
 		// TESTAR is running in SPY mode
-		Assert.isTrue(defaultProtocol.mode() == Modes.Spy);
+		Assert.isTrue(defaultProtocol.mode() == TestarMode.Spy);
 
 		// Then, after a fake user event, KeyBoard SHIFT + DOWN
 		simulateUserKeyEvent(defaultProtocol.eventHandler);
 
 		// TESTAR still running in SPY mode because KeyBoardListener is disabled
-		Assert.isTrue(defaultProtocol.mode() == Modes.Spy);
+		Assert.isTrue(defaultProtocol.mode() == TestarMode.Spy);
 	}
 
 	/**

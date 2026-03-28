@@ -26,7 +26,7 @@ public class TestAndroidLogcatOracle {
 
     @Test
     public void spyMode_doesNothing() throws Exception {
-        Settings settings = buildSettings(RuntimeControlsProtocol.Modes.Spy, "(?i)(.*exception.*|.*error.*)");
+        Settings settings = buildSettings(TestarMode.Spy, "(?i)(.*exception.*|.*error.*)");
         AndroidLogcatOracle androidLogcatOracle = new AndroidLogcatOracle(settings);
 
         try (MockedStatic<AndroidAppiumFramework> mocked = Mockito.mockStatic(AndroidAppiumFramework.class)) {
@@ -42,7 +42,7 @@ public class TestAndroidLogcatOracle {
         OutputStructure.startInnerLoopDateString = "YYYY-MM-DD_hh-mm-ss";
         OutputStructure.executedSUTname = "test-sut";
 
-        Settings settings = buildSettings(RuntimeControlsProtocol.Modes.Generate, "(?i)(.*exception.*|.*error.*)");
+        Settings settings = buildSettings(TestarMode.Generate, "(?i)(.*exception.*|.*error.*)");
         AndroidLogcatOracle androidLogcatOracle = new AndroidLogcatOracle(settings);
 
         try (MockedStatic<AndroidAppiumFramework> mocked = Mockito.mockStatic(AndroidAppiumFramework.class)) {
@@ -66,7 +66,7 @@ public class TestAndroidLogcatOracle {
         OutputStructure.startInnerLoopDateString = "YYYY-MM-DD_hh-mm-ss";
         OutputStructure.executedSUTname = "test-sut";
 
-        Settings settings = buildSettings(RuntimeControlsProtocol.Modes.Generate, "(?i)(.*exception.*|.*error.*)");
+        Settings settings = buildSettings(TestarMode.Generate, "(?i)(.*exception.*|.*error.*)");
         AndroidLogcatOracle androidLogcatOracle = new AndroidLogcatOracle(settings);
         State state = Mockito.mock(State.class);
 
@@ -95,7 +95,7 @@ public class TestAndroidLogcatOracle {
         OutputStructure.startInnerLoopDateString = "YYYY-MM-DD_hh-mm-ss";
         OutputStructure.executedSUTname = "test-sut";
 
-        Settings settings = buildSettings(RuntimeControlsProtocol.Modes.Generate, "(?i)(.*exception.*|.*error.*)");
+        Settings settings = buildSettings(TestarMode.Generate, "(?i)(.*exception.*|.*error.*)");
         AndroidLogcatOracle androidLogcatOracle = new AndroidLogcatOracle(settings);
         State state = Mockito.mock(State.class);
 
@@ -129,7 +129,7 @@ public class TestAndroidLogcatOracle {
         OutputStructure.startInnerLoopDateString = "YYYY-MM-DD_hh-mm-ss";
         OutputStructure.executedSUTname = "test-sut";
 
-        Settings settings = buildSettings(RuntimeControlsProtocol.Modes.Generate, "(?i)(.*exception.*)");
+        Settings settings = buildSettings(TestarMode.Generate, "(?i)(.*exception.*)");
         AndroidLogcatOracle androidLogcatOracle = new AndroidLogcatOracle(settings);
         State state = Mockito.mock(State.class);
 
@@ -160,7 +160,7 @@ public class TestAndroidLogcatOracle {
         OutputStructure.startInnerLoopDateString = "YYYY-MM-DD_hh-mm-ss";
         OutputStructure.executedSUTname = "test-sut";
 
-        Settings settings = buildSettings(RuntimeControlsProtocol.Modes.Generate, "(?i)(.*Exception.*)");
+        Settings settings = buildSettings(TestarMode.Generate, "(?i)(.*Exception.*)");
         AndroidLogcatOracle androidLogcatOracle = new AndroidLogcatOracle(settings);
         State state = Mockito.mock(State.class);
 
@@ -190,7 +190,7 @@ public class TestAndroidLogcatOracle {
         OutputStructure.startInnerLoopDateString = "YYYY-MM-DD_hh-mm-ss";
         OutputStructure.executedSUTname = "test-sut";
 
-        Settings settings = buildSettings(RuntimeControlsProtocol.Modes.Generate, "(?i)(.*Exception.*)");
+        Settings settings = buildSettings(TestarMode.Generate, "(?i)(.*Exception.*)");
         AndroidLogcatOracle androidLogcatOracle = new AndroidLogcatOracle(settings);
         State state = Mockito.mock(State.class);
 
@@ -215,7 +215,7 @@ public class TestAndroidLogcatOracle {
         }
     }
 
-    private Settings buildSettings(RuntimeControlsProtocol.Modes mode, String regex) {
+    private Settings buildSettings(TestarMode mode, String regex) {
         List<Pair<?, ?>> tags = new ArrayList<>();
         tags.add(Pair.from(ConfigTags.Mode, mode));
         tags.add(Pair.from(ConfigTags.LogOracleRegex, regex));

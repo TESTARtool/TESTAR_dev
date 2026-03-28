@@ -35,6 +35,8 @@ import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.testar.TestarDirectories;
+import org.testar.core.execution.TestarMode;
 import org.testar.environment.Environment;
 import org.testar.monkey.*;
 import org.testar.monkey.alayer.*;
@@ -728,12 +730,12 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	 */
 	private void updateCssClassesFromTestSettingsFile() {
 		// Feature only for Spy mode
-		if(settings.get(ConfigTags.Mode) != Modes.Spy) {
+		if(settings.get(ConfigTags.Mode) != TestarMode.Spy) {
 			return;
 		}
 
 		try {
-			try(BufferedReader br = new BufferedReader(new FileReader(Main.getTestSettingsFile()))) {
+			try(BufferedReader br = new BufferedReader(new FileReader(TestarDirectories.getTestSettingsFile()))) {
 				for(String line; (line = br.readLine()) != null;) {
 					if(line.contains(ConfigTags.ClickableClasses.name())){
 						List<String> fileClickableClasses = Arrays.asList(line.split("=")[1].trim().split(";"));
@@ -766,7 +768,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	@Override
 	public void keyDown(KBKeys key) {
 		super.keyDown(key);
-		if (mode() == Modes.Spy){
+		if (mode() == TestarMode.Spy){
 			if (key == KBKeys.VK_RIGHT) {
 				try {
 					// Obtain the widget aimed with the mouse cursor
@@ -777,7 +779,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 						if(s!=null && !s.isEmpty())
 							clickableClasses.add(s);
 					// And save the new CSS class property in the test.setting file
-					Util.saveToFile(settings.toFileString(), Main.getTestSettingsFile());
+					Util.saveToFile(settings.toFileString(), TestarDirectories.getTestSettingsFile());
 				} catch(Exception e) {
 					System.out.println("ERROR adding the widget from point: " + "x(" + mouse.cursor().x() + "), y("+ mouse.cursor().y() +")");
 				}
@@ -793,7 +795,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 						if(s!=null && !s.isEmpty())
 							clickableClasses.remove(s);
 					// And save the new CSS class property in the test.setting file
-					Util.saveToFile(settings.toFileString(), Main.getTestSettingsFile());
+					Util.saveToFile(settings.toFileString(), TestarDirectories.getTestSettingsFile());
 				} catch(Exception e) {
 					System.out.println("ERROR removing the widget from point: " + "x(" + mouse.cursor().x() + "), y("+ mouse.cursor().y() +")");
 				}

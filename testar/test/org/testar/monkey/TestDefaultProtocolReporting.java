@@ -2,7 +2,7 @@ package org.testar.monkey;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.testar.monkey.RuntimeControlsProtocol.Modes;
+import org.testar.core.execution.TestarMode;
 import org.testar.reporting.DummyReportManager;
 import org.testar.reporting.ReportManager;
 import org.testar.settings.Settings;
@@ -20,7 +20,7 @@ public class TestDefaultProtocolReporting {
     public void testSpyModeDummyReporting() {
         DefaultProtocol protocol = new DefaultProtocol();
         protocol.settings = new Settings();
-        protocol.settings.set(ConfigTags.Mode, Modes.Spy);
+        protocol.settings.set(ConfigTags.Mode, TestarMode.Spy);
         protocol.preSequencePreparations();
         Assert.assertTrue(protocol.reportManager != null);
         Assert.assertTrue(protocol.reportManager instanceof DummyReportManager);
@@ -30,7 +30,7 @@ public class TestDefaultProtocolReporting {
     public void testGenerateModeReportManager() {
         DefaultProtocol protocol = new DefaultProtocol();
         protocol.settings = new Settings();
-        protocol.settings.set(ConfigTags.Mode, Modes.Generate);
+        protocol.settings.set(ConfigTags.Mode, TestarMode.Generate);
         protocol.settings.set(ConfigTags.ReportInHTML, false);
         protocol.settings.set(ConfigTags.ReportInPlainText, false);
         protocol.preSequencePreparations();

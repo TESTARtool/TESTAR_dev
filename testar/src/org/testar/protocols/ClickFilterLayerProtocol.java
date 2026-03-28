@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2026 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -35,6 +35,7 @@ import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.util.Set;
 
+import org.testar.core.execution.TestarMode;
 import org.testar.SutVisualization;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Canvas;
@@ -82,7 +83,7 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
     @Override
     public void keyDown(KBKeys key) {    	
         super.keyDown(key);        
-        if (mode() == Modes.Spy){ 
+        if (mode() == TestarMode.Spy){ 
         	if (key == KBKeys.VK_CAPS_LOCK || key == KBKeys.VK_ALT)
         		displayWhiteTabu = !displayWhiteTabu;
         	else if (key == KBKeys.VK_TAB)
@@ -99,7 +100,7 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
     @Override
     public void keyUp(KBKeys key) {    	
     	super.keyUp(key);
-        if (mode() == Modes.Spy){
+        if (mode() == TestarMode.Spy){
         	if (key == KBKeys.VK_SHIFT) {
 	    		shiftPressed = false;
         	} else if (key == KBKeys.VK_CONTROL && displayWhiteTabu){
@@ -120,7 +121,7 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
     @Override
 	protected void visualizeActions(Canvas canvas, State state, Set<Action> actions){
 		SutVisualization.visualizeActions(canvas, state, actions);
-    	if(displayWhiteTabu && (mode() == Modes.Spy)) {
+    	if(displayWhiteTabu && (mode() == TestarMode.Spy)) {
     		filteringManager.visualizeActions(canvas,state);
     	}
 	}

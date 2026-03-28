@@ -17,7 +17,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.testar.OutputStructure;
 import org.testar.monkey.Pair;
-import org.testar.monkey.RuntimeControlsProtocol.Modes;
+import org.testar.core.execution.TestarMode;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
@@ -65,7 +65,7 @@ public class TestProcessListenerOracle {
 		Mockito.when(system.get(Tags.StdOut)).thenReturn(new ByteArrayInputStream("exception output".getBytes()));
 
 		List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
-		tags.add(Pair.from(Mode, Modes.Spy));
+		tags.add(Pair.from(Mode, TestarMode.Spy));
 		tags.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
 		tags.add(Pair.from(SuspiciousProcessOutput, ".*exception.*"));
 		tags.add(Pair.from(ProcessLogs, ".*.*"));
@@ -90,7 +90,7 @@ public class TestProcessListenerOracle {
 		Mockito.when(system.get(Tags.StdOut)).thenReturn(new ByteArrayInputStream("exception output".getBytes()));
 
 		List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
-		tags.add(Pair.from(Mode, Modes.Generate));
+		tags.add(Pair.from(Mode, TestarMode.Generate));
 		tags.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_WINDOW_TITLE));
 		tags.add(Pair.from(SuspiciousProcessOutput, ".*exception.*"));
 		tags.add(Pair.from(ProcessLogs, ".*.*"));
@@ -115,7 +115,7 @@ public class TestProcessListenerOracle {
 		Mockito.when(system.get(Tags.StdOut)).thenReturn(new ByteArrayInputStream("exception output".getBytes()));
 
 		List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
-		tags.add(Pair.from(Mode, Modes.Generate));
+		tags.add(Pair.from(Mode, TestarMode.Generate));
 		tags.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_PROCESS_NAME));
 		tags.add(Pair.from(SuspiciousProcessOutput, ".*exception.*"));
 		tags.add(Pair.from(ProcessLogs, ".*.*"));
@@ -140,7 +140,7 @@ public class TestProcessListenerOracle {
 		Mockito.when(system.get(Tags.StdOut)).thenReturn(new ByteArrayInputStream("exception output".getBytes()));
 
 		List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
-		tags.add(Pair.from(Mode, Modes.Generate));
+		tags.add(Pair.from(Mode, TestarMode.Generate));
 		tags.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_WEBDRIVER));
 		tags.add(Pair.from(SuspiciousProcessOutput, ".*exception.*"));
 		tags.add(Pair.from(ProcessLogs, ".*.*"));
@@ -165,7 +165,7 @@ public class TestProcessListenerOracle {
 		Mockito.when(system.get(Tags.StdOut)).thenReturn(new ByteArrayInputStream("".getBytes()));
 
 		List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
-		tags.add(Pair.from(Mode, Modes.Generate));
+		tags.add(Pair.from(Mode, TestarMode.Generate));
 		tags.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
 		tags.add(Pair.from(SuspiciousProcessOutput, ".*exception.*"));
 		tags.add(Pair.from(ProcessLogs, ""));
@@ -191,7 +191,7 @@ public class TestProcessListenerOracle {
 		Mockito.when(system.get(Tags.StdOut)).thenReturn(new ByteArrayInputStream("exception output".getBytes()));
 
 		List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
-		tags.add(Pair.from(Mode, Modes.Generate));
+		tags.add(Pair.from(Mode, TestarMode.Generate));
 		tags.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
 		tags.add(Pair.from(SuspiciousProcessOutput, ".*exception.*"));
 		tags.add(Pair.from(ProcessLogs, ""));
@@ -217,7 +217,7 @@ public class TestProcessListenerOracle {
 		Mockito.when(system.get(Tags.StdOut)).thenReturn(new ByteArrayInputStream("exception output".getBytes()));
 
 		List<Pair<?, ?>> tags = new ArrayList<Pair<?, ?>>();
-		tags.add(Pair.from(Mode, Modes.Generate));
+		tags.add(Pair.from(Mode, TestarMode.Generate));
 		tags.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
 		tags.add(Pair.from(SuspiciousProcessOutput, ".*exception.*"));
 		tags.add(Pair.from(ProcessLogs, ""));

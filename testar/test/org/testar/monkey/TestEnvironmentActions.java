@@ -15,6 +15,7 @@ import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.actions.ActivateSystem;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
+import org.testar.monkey.alayer.actions.KillProcess;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.windows.WinProcessActivator;
 import org.testar.reporting.ReportManager;
@@ -50,6 +51,24 @@ public class TestEnvironmentActions extends DefaultProtocol {
 
 		// Build widget and state identifiers
 		buildStateIdentifiers(state);
+	}
+
+	@Test
+	public void testKillProcessActionIdentifier() {
+		settings.set(ConfigTags.ProcessesToKillDuringTest, "calc\\.exe");
+		SUT system = Mockito.mock(SUT.class);
+		Mockito.when(system.get(Tags.PID)).thenReturn(99L);
+		Mockito.when(system.getRunningProcesses()).thenReturn(
+				Collections.singletonList(Pair.from(100L, "calc.exe"))
+		);
+
+		Set<Action> actions = deriveActions(system, state);
+
+		Assert.isTrue(actions.size() == 1);
+		Action killAction = actions.iterator().next();
+		Assert.isTrue(killAction instanceof KillProcess);
+		Assert.isTrue("Kill Process with name 'calc.exe'".equals(killAction.get(Tags.Desc)));
+		Assert.notNull(killAction.get(Tags.OriginWidget));
 	}
 
 	@Test
@@ -99,7 +118,7 @@ public class TestEnvironmentActions extends DefaultProtocol {
 
 		// Because there exists an ActivateSystem action
 		// preSelectAction must force to return it
-		reportManager = Mockito.mock(ReportManager.class);
+		setReportManager(Mockito.mock(ReportManager.class));
 		Set<Action> preSelectedActions = preSelectAction(system, state, defaultActions);
 		Assert.isTrue(preSelectedActions.size() == 1);
 		Action forcedAction = preSelectedActions.iterator().next();
@@ -116,7 +135,7 @@ public class TestEnvironmentActions extends DefaultProtocol {
 
 		// Because there are no actions, this method returns a Set with one ESC key action
 		// This method already builds the environment action identifier
-		reportManager = Mockito.mock(ReportManager.class);
+		setReportManager(Mockito.mock(ReportManager.class));
 		Set<Action> preActions = preSelectAction(system, state, initialActions);
 		Assert.isTrue(preActions.size() == 1);
 
