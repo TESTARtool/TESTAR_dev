@@ -30,6 +30,7 @@
 
 package org.testar.oracles.log;
 
+import org.testar.core.execution.TestarMode;
 import org.testar.OutputStructure;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.RuntimeControlsProtocol;
@@ -78,7 +79,7 @@ public class AndroidLogcatOracle implements Oracle {
 
     @Override
     public void initialize() {
-        if (settings.get(ConfigTags.Mode) != RuntimeControlsProtocol.Modes.Generate) {
+        if (settings.get(ConfigTags.Mode) != TestarMode.Generate) {
             sequenceLogPath = null;
             return;
         }
@@ -106,7 +107,7 @@ public class AndroidLogcatOracle implements Oracle {
 
     @Override
     public List<Verdict> getVerdicts(State state) {
-        if (settings.get(ConfigTags.Mode) != RuntimeControlsProtocol.Modes.Generate) {
+        if (settings.get(ConfigTags.Mode) != TestarMode.Generate) {
             return Collections.singletonList(Verdict.OK);
         }
 

@@ -43,14 +43,13 @@ import java.util.regex.Pattern;
 
 import org.testar.OutputStructure;
 import org.testar.monkey.ConfigTags;
-import org.testar.monkey.DefaultProtocol;
 import org.testar.monkey.Util;
-import org.testar.monkey.RuntimeControlsProtocol.Modes;
+import org.testar.core.execution.TestarMode;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.oracles.Oracle;
+import org.testar.oracles.OracleExecutionContext;
 import org.testar.settings.Settings;
 
 public class ProcessListenerOracle implements Oracle {
@@ -77,7 +76,7 @@ public class ProcessListenerOracle implements Oracle {
 	@Override
 	public void initialize() {
 		//Disabled with Spy Mode, don't need for SUT exploration
-		if(settings.get(ConfigTags.Mode).equals(Modes.Spy)) {
+		if(settings.get(ConfigTags.Mode).equals(TestarMode.Spy)) {
 			System.out.println("INFO: Process Listeners feature is disabled in Spy Mode");
 			return;
 		}
@@ -138,10 +137,7 @@ public class ProcessListenerOracle implements Oracle {
 	private Verdict checkStream(BufferedReader reader, String logSuffix, String streamLabel) throws IOException {
 		String line;
 		while ((line = reader.ready() ? reader.readLine() : null) != null) {
-			String actionId = "unknown";
-			if (DefaultProtocol.lastExecutedAction != null) {
-				actionId = DefaultProtocol.lastExecutedAction.get(Tags.ConcreteID, "");
-			}
+			String actionId = OracleExecutionContext.getLastExecutedActionId();
 
 			Matcher oracleMatch = processOracles.matcher(line);
 			Matcher logMatch = processLogs.matcher(line);
