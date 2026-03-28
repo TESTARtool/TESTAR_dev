@@ -89,26 +89,6 @@ jobs:
         name: Java${{ matrix.java }}-runTestWebdriverParabankRemoteActions-artifact
         path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_remote_actions
 
-    - name: Run TESTAR Replay mode with a web page to check that replayed correctly
-      run: ./gradlew runTestWebdriverCorrectReplay
-    - name: Save runTestWebdriverCorrectReplay HTML report artifact
-      uses: actions/upload-artifact@v4
-      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
-      if: failure()
-      with:
-        name: Java${{ matrix.java }}-runTestWebdriverCorrectReplay-artifact
-        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_replay
-
-    - name: Run TESTAR Replay mode to detect a not replayable button
-      run: ./gradlew runTestWebdriverUnreplayable
-    - name: Save runTestWebdriverUnreplayable HTML report artifact
-      uses: actions/upload-artifact@v4
-      # Only upload GitHub Actions results if this task fails (Can be replaced with 'if: always()')
-      if: failure()
-      with:
-        name: Java${{ matrix.java }}-runTestWebdriverUnreplayable-artifact
-        path: D:/a/TESTAR_dev/TESTAR_dev/testar/target/install/testar/bin/webdriver_unreplayable
-
     - name: Check Firefox and Edge browsers paths
       run: |
         if (Test-Path "C:\Program Files\Mozilla Firefox\firefox.exe") {

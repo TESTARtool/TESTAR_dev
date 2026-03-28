@@ -41,7 +41,6 @@ import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.serialisation.ScreenshotSerialiser;
-import org.testar.serialisation.TestSerialiser;
 import org.testar.settings.Settings;
 import org.testar.settings.dialog.SettingsDialog;
 import org.testar.settings.dialog.tagsvisualization.ConcreteTagFilter;
@@ -65,7 +64,7 @@ import static org.testar.monkey.Util.compileProtocol;
 
 public class Main {
 
-	public static final String TESTAR_VERSION = "v2.8.6 (24-Mar-2026)";
+	public static final String TESTAR_VERSION = "v3.0.1 (date-to-determine)";
 
 	//public static final String TESTAR_DIR_PROPERTY = "DIRNAME"; //Use the OS environment to obtain TESTAR directory
 	public static final String SETTINGS_FILE = "test.settings";
@@ -432,7 +431,6 @@ public class Main {
 				}
 			}
 
-			TestSerialiser.exit();
 			ScreenshotSerialiser.exit();
 			LogSerialiser.exit();
 		}
@@ -445,7 +443,6 @@ public class Main {
 		//Unregister the JNativeHook library
 		NativeHookManager.unregisterNativeHook();
 
-		TestSerialiser.exit();
 		ScreenshotSerialiser.exit();
 		LogSerialiser.exit();
 

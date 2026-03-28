@@ -48,7 +48,7 @@ public class SettingsFileStructure {
 				, "#################################################################"
 				, "# TESTAR mode"
 				, "#"
-				, "# Set the mode you want TESTAR to start in: Spy, Generate, Replay"
+				, "# Set the mode you want TESTAR to start in: Spy, Generate"
 				, "#################################################################"
 				, ""
 				, ConfigTags.Mode.name() + " = "
@@ -365,19 +365,6 @@ public class SettingsFileStructure {
 				, ConfigTags.JacocoCoveragePort.name() + " = "
 				, ConfigTags.JacocoCoverageClasses.name() + " = "
 				, ConfigTags.JacocoCoverageAccumulate.name() + " = "
-				, ""
-				, "#################################################################"
-				, "# Replay mode features"
-				, "# GenerateReplayableSequence: " + ConfigTags.GenerateReplayableSequence.getDescription()
-				, "# PathToReplaySequence: " + ConfigTags.PathToReplaySequence.getDescription()
-				, "# ReplayRetryTime: " + ConfigTags.ReplayRetryTime.getDescription()
-				, "# UseRecordedActionDurationAndWaitTimeDuringReplay: " + ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay.getDescription()
-				, "#################################################################"
-				, ""
-				, ConfigTags.GenerateReplayableSequence.name() + " = "
-				, ConfigTags.PathToReplaySequence.name() + " = "
-				, ConfigTags.ReplayRetryTime.name() + " = "
-				, ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay.name() + " = "
 				, ""
 				);
 

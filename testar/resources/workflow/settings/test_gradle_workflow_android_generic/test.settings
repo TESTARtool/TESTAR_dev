@@ -1,7 +1,7 @@
 #################################################################
 # TESTAR mode
 #
-# Set the mode you want TESTAR to start in: Spy, Generate, Replay
+# Set the mode you want TESTAR to start in: Spy, Generate
 #################################################################
 
 Mode = Generate
@@ -134,9 +134,7 @@ ReportInPlainText = true
 #################################################################
 
 OutputDir = ./output
-PathToReplaySequence = ./output/temp
 TempDir = ./output/temp
-UseRecordedActionDurationAndWaitTimeDuringReplay = false
 ForceForeground = true
 LogLevel = 1
 FaultThreshold = 1.0E-9
@@ -144,7 +142,6 @@ MyClassPath = ./settings
 OnlySaveFaultySequences = false
 ActionDuration = 0.1
 ShowVisualSettingsDialogOnStartup = true
-ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
 TimeToWaitAfterAction = 2

@@ -74,8 +74,6 @@ public class SettingsDialog extends JFrame implements Observer {
   private JTabbedPane jTabsPane;
   private JButton btnGenerate;
   private JButton btnSpy;
-  private JButton btnReplay;
-  private JButton btnView;
   private JButton btnModel;
   private StateModelPanel modelPanel;
 
@@ -143,8 +141,8 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   /**
-   * This is the method that is called when you click on one of the big mode buttons in TESTAR dialog
-   * @param mode indicates the MODE button that was clicked.
+   * This method is called when one of the runtime mode buttons is clicked.
+   * @param mode indicates the runtime mode button that was clicked.
    */
   private void start(RuntimeControlsProtocol.Modes mode) {
     try {
@@ -249,8 +247,6 @@ public class SettingsDialog extends JFrame implements Observer {
     // Init start buttons
     btnGenerate = getBtnGenerate();
     btnSpy = getBtnSpy();
-    btnReplay = getBtnReplay();
-    btnView = getBtnView();
     btnModel = getBtnModel();
 
     jTabsPane = new JTabbedPane();
@@ -313,8 +309,6 @@ public class SettingsDialog extends JFrame implements Observer {
                     .addGroup(layout.createParallelGroup(Alignment.LEADING)
                             .addComponent(btnGenerate, PREFERRED_SIZE, 129, PREFERRED_SIZE)
                             .addComponent(btnSpy, PREFERRED_SIZE, 129, PREFERRED_SIZE)
-                            .addComponent(btnReplay, PREFERRED_SIZE, 129, PREFERRED_SIZE)
-                            .addComponent(btnView, PREFERRED_SIZE, 129, PREFERRED_SIZE)
                             .addComponent(btnModel, PREFERRED_SIZE, 129, PREFERRED_SIZE)
                     )
                 .addPreferredGap(RELATED)
@@ -329,10 +323,6 @@ public class SettingsDialog extends JFrame implements Observer {
     group.addComponent(btnSpy, 120, 120, 120);
     group.addGap(2, 2, 2);
     group.addComponent(btnGenerate, 120, 120, 120);
-    group.addGap(2, 2, 2);
-    group.addComponent(btnReplay, 120, 120, 120);
-    group.addGap(2, 2, 2);
-    group.addComponent(btnView, 120, 120, 120);
     group.addGap(2, 2, 2);
     group.addComponent(btnModel, 120, 120, 120);
     group.addGap(11, 11, 11);
@@ -366,50 +356,6 @@ public class SettingsDialog extends JFrame implements Observer {
 
   private void btnSpyActionPerformed(ActionEvent evt) {
     start(RuntimeControlsProtocol.Modes.Spy);
-  }
-
-  private JButton getBtnReplay() throws IOException {
-    JButton btn = new JButton();
-    btn.setBackground(new Color(255, 255, 255));
-    btn.setIcon(new ImageIcon(loadIcon("/icons/button_replay.png")));
-    btn.setToolTipText(ToolTipTexts.btnReplayTTT);
-    btn.setFocusPainted(false);
-    btn.addActionListener(this::btnReplayActionPerformed);
-    return btn;
-  }
-
-  private void btnReplayActionPerformed(ActionEvent evt) {
-    JFileChooser fd = new JFileChooser();
-    fd.setFileSelectionMode(JFileChooser.FILES_ONLY);
-    fd.setCurrentDirectory(new File(settings.get(ConfigTags.PathToReplaySequence)).getParentFile());
-
-    if (fd.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-      String file = fd.getSelectedFile().getAbsolutePath();
-      settings.set(ConfigTags.PathToReplaySequence, file);
-      start(RuntimeControlsProtocol.Modes.Replay);
-    }
-  }
-
-  private JButton getBtnView() throws IOException {
-    JButton btn = new JButton();
-    btn.setBackground(new Color(255, 255, 255));
-    btn.setIcon(new ImageIcon(loadIcon("/icons/view_report.png")));
-    btn.setToolTipText(ToolTipTexts.btnViewTTT);
-    btn.setFocusPainted(false);
-    btn.addActionListener(this::btnViewActionPerformed);
-    return btn;
-  }
-
-  private void btnViewActionPerformed(ActionEvent evt) {
-    JFileChooser fd = new JFileChooser();
-    fd.setFileSelectionMode(JFileChooser.FILES_ONLY);
-    fd.setCurrentDirectory(new File(settings.get(ConfigTags.PathToReplaySequence)).getParentFile());
-
-    if (fd.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-      String file = fd.getSelectedFile().getAbsolutePath();
-      settings.set(ConfigTags.PathToReplaySequence, file);
-      start(RuntimeControlsProtocol.Modes.View);
-    }
   }
 
   private JButton getBtnModel() throws IOException {

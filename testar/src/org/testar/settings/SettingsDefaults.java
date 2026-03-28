@@ -54,14 +54,11 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(OutputDir, Main.outputDir));
 		defaults.add(Pair.from(TempDir, Main.tempDir));
 		defaults.add(Pair.from(OnlySaveFaultySequences, false));
-		defaults.add(Pair.from(PathToReplaySequence, Main.tempDir));
-		defaults.add(Pair.from(GenerateReplayableSequence, true));
 		defaults.add(Pair.from(ActionDuration, 0.1));
 		defaults.add(Pair.from(TimeToWaitAfterAction, 0.1));
 		defaults.add(Pair.from(VisualizeActions, false));
 		defaults.add(Pair.from(KeyBoardListener, true));
 		defaults.add(Pair.from(SequenceLength, 10));
-		defaults.add(Pair.from(ReplayRetryTime, 30.0));
 		defaults.add(Pair.from(Sequences, 1));
 		defaults.add(Pair.from(MaxTime, 31536000.0));
 		defaults.add(Pair.from(StartupTime, 8.0));
@@ -74,7 +71,6 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(MyClassPath, Arrays.asList(Main.settingsDir)));
 		defaults.add(Pair.from(ProtocolClass, "org.testar.monkey.DefaultProtocol"));
 		defaults.add(Pair.from(ForceForeground, true));
-		defaults.add(Pair.from(UseRecordedActionDurationAndWaitTimeDuringReplay, true));
 		defaults.add(Pair.from(StopGenerationOnFault, true));
 		defaults.add(Pair.from(TimeToFreeze, 10.0));
 		defaults.add(Pair.from(RefreshSpyCanvas, 0.5));

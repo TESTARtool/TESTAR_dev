@@ -159,7 +159,7 @@ public class MiscPanel extends SettingsPanel {
         return types[columnIndex];
       }
     });
-    tblDelete.setToolTipText("<html>\nFiles to delete before SUT start: Certain SUTs generate configuration files, temporary files and files<br>\nthat save the system's state. This might be problematic during sequence replay, when you want a<br>\nsystem to always start in the same state. Therefore, you can specify these files, to be deleted<br>\nbefore the SUT gets started. If you double-click the text-area a file dialog will pop up which allows<br>\nselecting files and directories to be deleted.\n</html>");
+    tblDelete.setToolTipText("<html>\nFiles to delete before SUT start: Certain SUTs generate configuration files, temporary files and files<br>\nthat save the system's state. This might be problematic when you want the system to always start in<br>\nthe same state. Therefore, you can specify these files to be deleted before the SUT gets started.<br>\nIf you double-click the text-area a file dialog will pop up which allows selecting files and<br>\ndirectories to be deleted.\n</html>");
     tblDelete.addMouseListener(new MouseAdapter() {
       public void mouseClicked(MouseEvent evt) {
         tblDeleteMouseClicked(evt);

@@ -216,7 +216,7 @@ public class TestReportManager {
 		OutputStructure.sequenceInnerLoopCount = 1;
 
 		// Prepare a report only with the final verdict
-		ReportManager reportManager = new ReportManager(false, settings);
+		ReportManager reportManager = new ReportManager(settings);
 		Verdict failVerdict = new Verdict(Verdict.Severity.FAIL, "Failure is <script>something</script>");
 		reportManager.addTestVerdicts(Collections.singletonList(failVerdict));
 		reportManager.finishReport();
@@ -231,7 +231,7 @@ public class TestReportManager {
 	}
 
 	private ReportManager createReportManager(Settings settings) {
-		ReportManager reportManager = new ReportManager(false, settings);
+		ReportManager reportManager = new ReportManager(settings);
 		reportManager.addState(state);
 		reportManager.addActions(derivedActions);
 		reportManager.addSelectedAction(state, selectedAction);

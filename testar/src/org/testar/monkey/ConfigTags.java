@@ -39,7 +39,7 @@ public final class ConfigTags {
 	private ConfigTags() {}
 
 	public static final Tag<RuntimeControlsProtocol.Modes> Mode = Tag.from("Mode", RuntimeControlsProtocol.Modes.class, 
-			"Set the mode you want TESTAR to start in: Spy, Generate, Replay");
+			"Set the mode you want TESTAR to start in: Spy, Generate");
 
 	public static final Tag<String> SUTConnector = Tag.from("SUTConnector", String.class, 
 			"Indicate how you want to connect to the SUT: COMMAND_LINE, SUT_WINDOW_TITLE, SUT_PROCESS_NAME");
@@ -239,22 +239,6 @@ public final class ConfigTags {
 
 	public static final Tag<Boolean> JacocoCoverageAccumulate = Tag.from("JacocoCoverageAccumulate", Boolean.class,
 			"Sets whether Jacoco coverage will be accumulated across the run sequences");
-
-	/**
-	 * Replay settings
-	 */
-
-	public static final Tag<Boolean> GenerateReplayableSequence = Tag.from("GenerateReplayableSequence", Boolean.class,
-			"Sets whether TESTAR must create a replayable testar file during Generate mode (this consumes more memory during execution)");
-
-	public static final Tag<Double> ReplayRetryTime = Tag.from("ReplayRetryTime", Double.class, 
-			"Inside the replay mode, establishes the time window in seconds for trying to replay a UI action of a replayed test sequence");
-
-	public static final Tag<Boolean> UseRecordedActionDurationAndWaitTimeDuringReplay = Tag.from("UseRecordedActionDurationAndWaitTimeDuringReplay", Boolean.class, 
-			"Inside the replay mode sets whether to use the action duration (ActionDuration and TimeToWaitAfterAction) as specified in the generated test sequence");
-
-	public static final Tag<String> PathToReplaySequence = Tag.from("PathToReplaySequence", String.class, 
-			"The sequence to REPLAY is the one indicated in this parameter");
 
 	/**
 	 * Additional settings with descriptions

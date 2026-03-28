@@ -121,29 +121,7 @@ public class Protocol_test_gradle_workflow_desktop_generic extends DesktopProtoc
 	protected void postSequenceProcessing() {
 		super.postSequenceProcessing();
 
-		// If OnlySaveFaultySequences is enabled and the sequence verdict is OK, sequence_ok must not exist
-		if(settings().get(ConfigTags.OnlySaveFaultySequences) && Verdict.helperAreAllVerdictsOK(getSequenceVerdicts())) {
-			String sequencesOkFolderName = OutputStructure.outerLoopOutputDir + File.separator + "sequences_ok";
-			File sequencesOkFolder = null;
-			try {
-				sequencesOkFolder = new File(sequencesOkFolderName).getCanonicalFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			Assert.isTrue(!sequencesOkFolder.exists());
-		}
-		// Else, if OnlySaveFaultySequences enabled and sequence verdict is a failure,
-		// Or if OnlySaveFaultySequences disabled,
-		// sequence must have generated a .testar file
-		else {
-			Assert.isTrue(getSequenceVerdicts().size() > 0);
-			for (Verdict verdict : getSequenceVerdicts()) {
-				String sequencesFolderName = OutputStructure.outerLoopOutputDir + File.separator + "sequences_" + verdict.verdictSeverityTitle().toLowerCase();
-				File sequencesFolder = new File(sequencesFolderName);
-				File[] matchingFiles = sequencesFolder.listFiles((dir, name) -> name.contains("sequence_1") && name.endsWith(".testar"));
-				Assert.isTrue(matchingFiles != null && matchingFiles.length > 0);
-			}
-		}
+		Assert.isTrue(getSequenceVerdicts().size() > 0);
 
 		// Verify the JsonUtils created a JSON State file
 		if(jsonCreated) {

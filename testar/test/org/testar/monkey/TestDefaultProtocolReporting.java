@@ -37,15 +37,4 @@ public class TestDefaultProtocolReporting {
         Assert.assertTrue(protocol.reportManager instanceof ReportManager);
     }
 
-    @Test
-    public void testReplayModeReportManager() {
-        DefaultProtocol protocol = new DefaultProtocol();
-        protocol.settings = new Settings();
-        protocol.settings.set(ConfigTags.Mode, Modes.Replay);
-        protocol.settings.set(ConfigTags.ReportInHTML, false);
-        protocol.settings.set(ConfigTags.ReportInPlainText, false);
-        protocol.preSequencePreparations();
-        Assert.assertTrue(protocol.reportManager instanceof ReportManager);
-    }
-
 }

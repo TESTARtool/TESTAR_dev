@@ -98,7 +98,7 @@ Should not own:
 
 Owns:
 
-- generate, replay, and spy orchestration
+- generate and spy orchestration
 - compatibility layers during migration
 - service wiring
 
@@ -124,7 +124,7 @@ Rules:
 - avoid adding new features by extending the protocol chain if a service extraction is possible
 - when touching `GenericUtilsProtocol`, prefer extracting helpers into collaborators
 - when touching `DefaultProtocol`, prefer delegation to extracted services
-- when touching `GenerateMode`, `ReplayMode`, or `SpyMode`, move responsibilities out instead of adding more coupling
+- when touching `GenerateMode` or `SpyMode`, move responsibilities out instead of adding more coupling
 
 ## CLI Direction
 

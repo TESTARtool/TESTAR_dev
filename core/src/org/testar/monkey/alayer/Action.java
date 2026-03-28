@@ -53,7 +53,7 @@ import org.testar.CodingManager;
  * If it fails to do any of these tasks, it raises an exception.
  * Like states and systems, actions can have properties attached to them.
  * 
- * An action should be serializable, so that it can be stored and replayed.
+ * An action should be serializable, so that it can be stored.
  * 
  * @see SUT
  * @see State

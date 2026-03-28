@@ -38,7 +38,6 @@ import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
-import org.testar.monkey.alayer.actions.NOP;
 import org.testar.serialisation.LogSerialiser;
 
 import java.util.Arrays;
@@ -83,9 +82,7 @@ public class GenerateMode {
 			//starting system or connect to a running one
 			SUT system = protocol.startSUTandLogger();
 
-			//Generating the sequence file that can be replayed:
 			protocol.getAndStoreGeneratedSequence();
-			protocol.getAndStoreSequenceFile();
 
 			//initializing TESTAR and the protocol canvas for a new sequence:
 			protocol.startTestSequence(system);
@@ -110,9 +107,7 @@ public class GenerateMode {
 					// starting the INNER LOOP with the updated state after SUT modification
 					protocol.updateSequenceVerdicts(runGenerateInnerLoop(protocol, system, protocol.getState(system)));
 				} else {
-					// If failure exists in the initial state
-					// Saving the state with empty actions into replayable test sequence:
-					protocol.saveActionIntoFragmentForReplayableSequence(new NOP(), initialState, Collections.emptySet());
+					// If failure exists in the initial state, persist it only in the state model
 					// Save initial state information in the state model before finishing
 					protocol.stateModelManager.notifyNewStateReached(initialState, Collections.emptySet());
 				}
@@ -199,9 +194,6 @@ public class GenerateMode {
 			Util.clear(protocol.cv);
 			protocol.cv.end();
 
-			//Saving the actions and the executed action into replayable test sequence:
-			protocol.saveActionIntoFragmentForReplayableSequence(action, state, actions);
-
 			// fetch the new state
 			state = protocol.getState(system);
 
@@ -226,13 +218,8 @@ public class GenerateMode {
 		// Notify the state model manager of the sequence end
 		protocol.stateModelManager.notifyTestSequenceStopped();
 
-		protocol.writeAndCloseFragmentForReplayableSequence();
-
 		if (!Verdict.helperAreAllVerdictsOK(protocol.getSequenceVerdicts()))
 			LogSerialiser.log("Sequence contained faults!\n", LogSerialiser.LogLevel.Critical);
-
-		// Copy sequence file into proper directory:
-		protocol.classifyAndCopySequenceIntoAppropriateDirectory(protocol.getSequenceVerdicts());
 
 		// Calling postSequenceProcessing() to allow resetting test environment after test sequence, etc
 		protocol.postSequenceProcessing();

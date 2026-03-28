@@ -36,18 +36,13 @@ import org.testar.monkey.alayer.actions.NOP;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.actions.WdFillFormAction;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
-import org.testar.monkey.alayer.exceptions.InvalidSystemStateException;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.OutputStructure;
 import org.testar.protocols.WebdriverProtocol;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.*;
 
 /**
@@ -120,20 +115,6 @@ public class Protocol_test_gradle_workflow_webdriver_form_filling extends Webdri
 	protected void closeTestSession() {
 		super.closeTestSession();
 
-		// Verify the created sequence is readable
-		try {
-			String sequencesOkFolderName = OutputStructure.outerLoopOutputDir + File.separator + "sequences_ok";
-			File sequencesOkFolder = new File(sequencesOkFolderName).getCanonicalFile();
-			System.out.println("sequencesFolder: " + sequencesOkFolder);
-			File[] matchingFiles = sequencesOkFolder.listFiles((dir, name) -> name.contains("sequence_1") && name.endsWith(".testar"));
-			Assert.isTrue(matchingFiles.length == 1, "One replayable testar file was not created");
-			System.out.println("matchingFiles[0]: " + matchingFiles[0]);
-			Assert.isTrue(isValidReplayFile(matchingFiles[0]), "Replayable testar file was not serialized correctly!");
-		} catch(Exception e) {
-			e.printStackTrace();
-			throw new InvalidSystemStateException(e);
-		}
-
 		// Prepare the output folder to be uploaded to the CI environment
 		try {
 			File originalFolder = new File(OutputStructure.outerLoopOutputDir).getCanonicalFile();
@@ -141,24 +122,4 @@ public class Protocol_test_gradle_workflow_webdriver_form_filling extends Webdri
 			FileUtils.copyDirectory(originalFolder, artifactFolder);
 		} catch(Exception e) {System.out.println("ERROR: Creating Artifact Folder");}
 	}
-
-	private boolean isValidReplayFile(File replayFile){
-		try {
-			FileInputStream fis = new FileInputStream(replayFile);
-			BufferedInputStream bis = new BufferedInputStream(fis);
-			ObjectInputStream ois = new ObjectInputStream(bis);
-
-			ois.readObject();
-			ois.close();
-
-		} catch (ClassNotFoundException | IOException e) {
-			System.out.println("ERROR: File is not readable, please select a correct file (output/sequences)");
-			e.printStackTrace();
-
-			return false;
-		}
-
-		return true;
-	}
-
 }

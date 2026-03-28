@@ -44,8 +44,6 @@ public class TimingPanel extends SettingsPanel {
   private JSpinner spnActionWaitTime;
   private JSpinner spnSutStartupTime;
   private JSpinner spnMaxTime;
-  private JCheckBox checkUseRecordedTimes;
-
   public TimingPanel() {
     setLayout(null);
 
@@ -78,10 +76,6 @@ public class TimingPanel extends SettingsPanel {
     spnMaxTime.setToolTipText(ToolTipTexts.maxTestTimeTTT);
     add(spnMaxTime);
 
-    checkUseRecordedTimes = new JCheckBox();
-    checkUseRecordedTimes.setBounds(271, 177, 21, 21);
-    checkUseRecordedTimes.setToolTipText(ToolTipTexts.useRecordedTTT);
-    add(checkUseRecordedTimes);
   }
 
   private void addTimingLabels() {
@@ -129,10 +123,6 @@ public class TimingPanel extends SettingsPanel {
     jLabel23.setToolTipText(ToolTipTexts.maxTestTimeTTT);
     add(jLabel23);
 
-    JLabel jLabel24 = new JLabel("Use Recorded Action Timing during Replay:");
-    jLabel24.setBounds(10, 177, 255, 14);
-    jLabel24.setToolTipText(ToolTipTexts.useRecordedTTT);
-    add(jLabel24);
   }
 
   /**
@@ -142,7 +132,6 @@ public class TimingPanel extends SettingsPanel {
    */
   @Override
   public void populateFrom(final Settings settings) {
-    checkUseRecordedTimes.setSelected(settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay));
     spnActionWaitTime.setValue(settings.get(ConfigTags.TimeToWaitAfterAction));
     spnActionDuration.setValue(settings.get(ConfigTags.ActionDuration));
     spnSutStartupTime.setValue(settings.get(ConfigTags.StartupTime));
@@ -156,7 +145,6 @@ public class TimingPanel extends SettingsPanel {
    */
   @Override
   public void extractInformation(final Settings settings) {
-    settings.set(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay, checkUseRecordedTimes.isSelected());
     settings.set(ConfigTags.ActionDuration, (Double) spnActionDuration.getValue());
     settings.set(ConfigTags.TimeToWaitAfterAction, (Double) spnActionWaitTime.getValue());
     settings.set(ConfigTags.StartupTime, (Double) spnSutStartupTime.getValue());

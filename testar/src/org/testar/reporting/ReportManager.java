@@ -58,7 +58,7 @@ public class ReportManager implements Reporting
     	return fileName;
     }
 
-    public ReportManager(boolean replay, Settings settings)
+    public ReportManager(Settings settings)
     {
         //TODO put filename into settings, name with sequence number
         // creating a new file for the report
@@ -77,9 +77,9 @@ public class ReportManager implements Reporting
             reporters = new ArrayList<>();
     
             if(html)
-                reporters.add(new HtmlReporter(fileName, replay));
+                reporters.add(new HtmlReporter(fileName));
             if(plainText)
-                reporters.add(new PlainTextReporter(fileName, replay));
+                reporters.add(new PlainTextReporter(fileName));
         }
     }
     

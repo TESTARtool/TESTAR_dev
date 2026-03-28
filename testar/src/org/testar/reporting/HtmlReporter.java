@@ -32,7 +32,6 @@ package org.testar.reporting;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.testar.OutputStructure;
-import org.testar.monkey.ConfigTags;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
@@ -63,7 +62,7 @@ public class HtmlReporter implements Reporting
     private final String openCollapsibleContainer = "<div class='collapsibleContent'>";
     private final String closeContainer = "</div>";
 
-    public HtmlReporter(String fileName, boolean replay) //replay or generate mode
+    public HtmlReporter(String fileName)
     {
         htmlReportUtil = new HtmlFormatUtil(fileName);
 
@@ -71,13 +70,7 @@ public class HtmlReporter implements Reporting
         String headerTitle = "TESTAR execution sequence report";
         htmlReportUtil.addHeader(headerTitle, HtmlHelper.getHtmlScript(), HtmlHelper.getHtmlStyle());
 
-        if(replay)  addReplayHeading();
-        else        addGenerateHeading();
-    }
-
-    private void addReplayHeading()
-    {
-        htmlReportUtil.addHeading(1, "TESTAR replay sequence report for file " + ConfigTags.PathToReplaySequence);
+        addGenerateHeading();
     }
 
     private void addGenerateHeading()

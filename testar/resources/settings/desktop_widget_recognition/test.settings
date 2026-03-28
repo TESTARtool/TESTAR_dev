@@ -1,7 +1,7 @@
 #################################################################
 # TESTAR mode
 #
-# Set the mode you want TESTAR to start in: Spy, Generate, Replay
+# Set the mode you want TESTAR to start in: Spy, Generate
 #################################################################
 
 Mode = Generate
@@ -111,9 +111,7 @@ AbstractStateAttributes = WidgetControlType
 #################################################################
 CreateWidgetInfoJsonFile = true
 OutputDir = ./output
-PathToReplaySequence = ./output/temp
 TempDir = ./output/temp
-UseRecordedActionDurationAndWaitTimeDuringReplay = false
 ForceForeground = true
 LogLevel = 1
 FaultThreshold = 0.000000001
@@ -121,7 +119,6 @@ MyClassPath = ./settings
 OnlySaveFaultySequences = false
 ActionDuration = 1
 ShowVisualSettingsDialogOnStartup = true
-ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
 TimeToWaitAfterAction = 0.1

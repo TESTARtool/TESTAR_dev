@@ -48,9 +48,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 	public enum Modes{
 		Spy,
 		Generate,
-		Quit,
-		View,
-		Replay;
+		Quit;
 	}
 
 	protected Modes mode;

@@ -95,7 +95,6 @@ public final class Verdict implements Serializable {
 
 		/** FAIL (0.5 - 0.899) **/
 
-		UNREPLAYABLE(0.5, "UNREPLAYABLE"), // Sequence not replayable
 		SUSPICIOUS_TAG(0.8, "SUSPICIOUS_TAG"), // Suspicious tag
 		SUSPICIOUS_PROCESS(0.87, "SUSPICIOUS_PROCESS"), // Suspicious message in the process standard output/error
 		SUSPICIOUS_LOG(0.89, "SUSPICIOUS_LOG"), // Suspicious message in log file or command output (LogOracle)

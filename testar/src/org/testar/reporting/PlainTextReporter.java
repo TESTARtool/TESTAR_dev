@@ -32,7 +32,6 @@ package org.testar.reporting;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.testar.OutputStructure;
-import org.testar.monkey.ConfigTags;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
@@ -49,23 +48,17 @@ public class PlainTextReporter implements Reporting
     private int innerLoopCounter = 0;
     private boolean deleteBaseReport = false;
     private String baseReportPath;
-    public PlainTextReporter(String fileName, boolean replay) //replay or generate mode
+    public PlainTextReporter(String fileName)
     {
         plainTextReportUtil = new PlainTextFormatUtil(fileName);
         
         startReport();
-        if(replay)  addReplayHeading();
-        else        addGenerateHeading();
+        addGenerateHeading();
     }
     
     private void startReport()
     {
         plainTextReportUtil.addHeading(1, "TESTAR execution sequence report");
-    }
-    
-    private void addReplayHeading()
-    {
-        plainTextReportUtil.addHeading(2, "TESTAR replay sequence report for file " + ConfigTags.PathToReplaySequence);
     }
     
     private void addGenerateHeading()
