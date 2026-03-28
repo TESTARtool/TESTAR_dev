@@ -41,8 +41,6 @@ import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.android.spy_visualization.MobileVisualizationAndroid;
 import org.testar.monkey.alayer.android.util.AndroidScreenshotUtil;
-import org.testar.monkey.alayer.ios.spy_visualization.MobileVisualizationIOS;
-import org.testar.monkey.alayer.ios.util.IOSScreenshotUtil;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
 
@@ -59,12 +57,9 @@ public class SpyMode {
 
 		//TODO: this must stay here as there is no canvas function called in the original default protocol
 		MobileVisualizationAndroid mobileVisualizationAndroid = null;
-		MobileVisualizationIOS mobileVisualizationIOS = null;
 
 		if (isAndroid()) {
 			mobileVisualizationAndroid = setupAndroidVisualization(protocol, system);
-		} else if (isIOS()) {
-			mobileVisualizationIOS = setupIOSVisualization(protocol, system);
 		}
 
 		while(protocol.mode() == Modes.Spy && system.isRunning()) {
@@ -75,8 +70,6 @@ public class SpyMode {
 			//TODO: can we work this into sutvisualization/ canvas?
 			if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
 				updateAndroidVisualization(protocol, mobileVisualizationAndroid, system, state);
-			} else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
-				updateIOSVisualization(protocol, mobileVisualizationIOS, system, state);
 			} else {
 				updateDefaultVisualization(protocol, system, state);
 			}
@@ -97,11 +90,6 @@ public class SpyMode {
 			if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
 				assert mobileVisualizationAndroid != null;
 				if (mobileVisualizationAndroid.closedSpyVisualization) {
-					break;
-				}
-			} else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
-				assert mobileVisualizationIOS != null;
-				if (mobileVisualizationIOS.closedSpyVisualization) {
 					break;
 				}
 			}
@@ -129,10 +117,6 @@ public class SpyMode {
 		return NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID);
 	}
 
-	private boolean isIOS() {
-		return NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS);
-	}
-
 	private MobileVisualizationAndroid setupAndroidVisualization(DefaultProtocol protocol, SUT system) {
 		System.out.println("SPY MODE, CREATING JAVA JFRAME WINDOW Android");
 		State state = protocol.getState(system);
@@ -140,22 +124,10 @@ public class SpyMode {
 		return new MobileVisualizationAndroid(AndroidScreenshotUtil.getStateshotSpyMode(state), state, deriveActionsFunction);
 	}
 
-	private MobileVisualizationIOS setupIOSVisualization(DefaultProtocol protocol, SUT system) {
-		System.out.println("SPY MODE, CREATING JAVA JFRAME WINDOW iOS");
-		State state = protocol.getState(system);
-		return new MobileVisualizationIOS(IOSScreenshotUtil.getStateshotSpyMode(state), state);
-	}
-
 	private void updateAndroidVisualization(DefaultProtocol protocol, MobileVisualizationAndroid visualization, SUT system, State state) {
 		Util.clear(protocol.cv);
 		if (visualization == null) return;
 		visualization.updateVisualization(state);
-	}
-
-	private void updateIOSVisualization(DefaultProtocol protocol, MobileVisualizationIOS visualization, SUT system, State state) {
-		Util.clear(protocol.cv);
-		if (visualization == null) return;
-		visualization.updateStateVisualization(state);
 	}
 
 	private void updateDefaultVisualization(DefaultProtocol protocol, SUT system, State state) {

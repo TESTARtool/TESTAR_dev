@@ -36,7 +36,7 @@ public enum OperatingSystems {
     /**
      * Possible Operating Systems.
      */
-    UNKNOWN(0), WINDOWS(1), UNIX(2), MAC(3), ANDROID(4),
+    UNKNOWN(0), WINDOWS(1), LINUX(2), MAC(3), ANDROID(4),
     WINDOWS_7(5), WINDOWS_10(6), WEBDRIVER(7), IOS(8);
 
     // Internal value of the enum.
@@ -61,7 +61,7 @@ public enum OperatingSystems {
         } else if (value == 1) {
             return "Windows";
         } else if (value == 2) {
-            return "Unix";
+            return "Linux";
         } else if (value == 3) {
             return "Mac";
         } else if (value == 4) {

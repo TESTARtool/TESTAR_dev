@@ -3,6 +3,7 @@
 - Add initial development and checkstyle code style
 - Remove old Replay mode since this will be completely new, implemented as JSON files and StateModel replay capabilities
 - Remove old View mode since this will be completely new, implemented as a central view server mode
+- Remove iOS module temporally
 
 
 #TESTAR v2.8.6 (24-Mar-2026)

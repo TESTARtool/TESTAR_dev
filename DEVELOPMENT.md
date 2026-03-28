@@ -18,7 +18,7 @@ This repository still contains legacy protocol inheritance and mixed responsibil
 - do not add new business logic directly to `DefaultProtocol` unless it is temporary compatibility glue
 - keep `core` focused on contracts, value objects, and reusable abstractions
 - keep `testar` focused on orchestration, compatibility, and high-level runtime flow
-- keep platform-specific low-level behavior inside platform modules such as `windows`, `webdriver`, `android`, and `ios`
+- keep platform-specific low-level behavior inside platform modules such as `windows`, `webdriver`, and `android`
 - do not introduce a CLI-specific runtime that bypasses shared services
 - do not mix architectural refactors with large mechanical cleanup in one commit
 - do not remove old compatibility paths until extracted replacements are covered by tests

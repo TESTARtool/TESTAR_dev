@@ -44,10 +44,6 @@ import org.testar.monkey.alayer.android.AndroidCanvas;
 import org.testar.monkey.alayer.android.AndroidStateBuilder;
 import org.testar.monkey.alayer.android.enums.AndroidRoles;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
-import org.testar.monkey.alayer.ios.IOSAppiumFramework;
-import org.testar.monkey.alayer.ios.IOSCanvas;
-import org.testar.monkey.alayer.ios.IOSStateBuilder;
-import org.testar.monkey.alayer.ios.enums.IOSRoles;
 
 import java.util.*;
 
@@ -81,7 +77,7 @@ public class NativeLinker {
 			if (osName.contains("Windows"))
 				return EnumSet.of(OperatingSystems.WINDOWS);
 			else if(osName.contains("Linux"))
-				return EnumSet.of(OperatingSystems.UNIX);
+				return EnumSet.of(OperatingSystems.LINUX);
 			else
 				return EnumSet.of(OperatingSystems.UNKNOWN);
 		}
@@ -103,14 +99,6 @@ public class NativeLinker {
 		PLATFORM_OS.remove(OperatingSystems.ANDROID);
 	}
 
-	public static void addIOS() {
-		PLATFORM_OS.add(OperatingSystems.IOS);
-	}
-
-	public static void cleanIOS() {
-		PLATFORM_OS.remove(OperatingSystems.IOS);
-	}
-
 	public static Set<OperatingSystems> getPLATFORM_OS() {
 		return PLATFORM_OS;
 	}
@@ -128,9 +116,6 @@ public class NativeLinker {
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.ANDROID)) {
 			return new AndroidStateBuilder(timeToFreeze);
-		}
-		if (PLATFORM_OS.contains(OperatingSystems.IOS)) {
-			return new IOSStateBuilder(timeToFreeze);
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7)) {
@@ -162,9 +147,6 @@ public class NativeLinker {
 		if (PLATFORM_OS.contains(OperatingSystems.ANDROID)) {
 			return new AndroidCanvas(pen);
 		}
-		if (PLATFORM_OS.contains(OperatingSystems.IOS)) {
-			return new IOSCanvas(pen);
-		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			return GDIScreenCanvas.fromPrimaryMonitor(pen);
 		}
@@ -184,9 +166,6 @@ public class NativeLinker {
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.ANDROID)) {
 			return AndroidAppiumFramework.fromCapabilities(executableCommand);
-		}
-		if (PLATFORM_OS.contains(OperatingSystems.IOS)) {
-			return IOSAppiumFramework.fromCapabilities(executableCommand);
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7)) {
@@ -220,9 +199,6 @@ public class NativeLinker {
 		else if (PLATFORM_OS.contains(OperatingSystems.ANDROID)) {
 			return AndroidAppiumFramework.fromAll();
 		}
-		else if (PLATFORM_OS.contains(OperatingSystems.IOS)) {
-			return IOSAppiumFramework.fromAll();
-		}
 		else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return WinProcess.fromAll();
 
@@ -254,10 +230,6 @@ public class NativeLinker {
 			//TODO: Implement Emulator + internal android usage
 			return 0;
 		}
-		if (PLATFORM_OS.contains(OperatingSystems.IOS)) {
-			//TODO: Implement Emulator + internal android usage
-			return 0;
-		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return (int)(WinProcess.getMemUsage((WinProcess)nativeSUT) / 1024); // byte -> KB
 
@@ -278,10 +250,6 @@ public class NativeLinker {
 			//TODO: Implement Emulator + internal android usage
 			return new long[]{0, 0, 0};
 		}
-		if (PLATFORM_OS.contains(OperatingSystems.IOS)) {
-			//TODO: Implement Emulator + internal android usage
-			return new long[]{0, 0, 0};
-		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			long now = System.currentTimeMillis();
 			long cpuFrame = now - lastCPUquery;
@@ -299,9 +267,6 @@ public class NativeLinker {
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.ANDROID)) {
 			return AndroidRoles.rolesSet();
-		}
-		if (PLATFORM_OS.contains(OperatingSystems.IOS)) {
-			return IOSRoles.rolesSet();
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return UIARoles.rolesSet();

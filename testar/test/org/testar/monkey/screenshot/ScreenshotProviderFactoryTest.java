@@ -17,7 +17,6 @@ import org.testar.monkey.alayer.AWTCanvas;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.android.util.AndroidScreenshotUtil;
-import org.testar.monkey.alayer.ios.util.IOSScreenshotUtil;
 import org.testar.monkey.alayer.webdriver.util.WdScreenshotUtil;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
@@ -60,26 +59,6 @@ public class ScreenshotProviderFactoryTest {
             nativeLinker.when(NativeLinker::getPLATFORM_OS).thenReturn(EnumSet.of(OperatingSystems.ANDROID));
             android.when(() -> AndroidScreenshotUtil.getStateshotBinary(state)).thenReturn(expected_stateshot);
             android.when(() -> AndroidScreenshotUtil.getActionshot(state, action)).thenReturn(expected_actionshot);
-
-            ScreenshotProvider provider = ScreenshotProviderFactory.current();
-            assertSame(expected_stateshot, provider.getStateshotBinary(state));
-            assertSame(expected_actionshot, provider.getActionshot(state, action));
-        }
-    }
-
-    @Test
-    public void ios_provider() {
-        State state = mock(State.class);
-        Action action = mock(Action.class);
-        AWTCanvas expected_stateshot = mock(AWTCanvas.class);
-        String expected_actionshot = "ios-action-path";
-
-        try (MockedStatic<NativeLinker> nativeLinker = Mockito.mockStatic(NativeLinker.class);
-             MockedStatic<IOSScreenshotUtil> ios = Mockito.mockStatic(IOSScreenshotUtil.class)) {
-
-            nativeLinker.when(NativeLinker::getPLATFORM_OS).thenReturn(EnumSet.of(OperatingSystems.IOS));
-            ios.when(() -> IOSScreenshotUtil.getStateshotBinary(state)).thenReturn(expected_stateshot);
-            ios.when(() -> IOSScreenshotUtil.getActionshot(state, action)).thenReturn(expected_actionshot);
 
             ScreenshotProvider provider = ScreenshotProviderFactory.current();
             assertSame(expected_stateshot, provider.getStateshotBinary(state));
@@ -148,8 +127,7 @@ public class ScreenshotProviderFactoryTest {
         List<Set<OperatingSystems>> platforms = Arrays.asList(
                 EnumSet.of(OperatingSystems.WINDOWS),
                 EnumSet.of(OperatingSystems.WEBDRIVER),
-                EnumSet.of(OperatingSystems.ANDROID),
-                EnumSet.of(OperatingSystems.IOS)
+                EnumSet.of(OperatingSystems.ANDROID)
         );
 
         for (Set<OperatingSystems> platform : platforms) {
@@ -173,8 +151,7 @@ public class ScreenshotProviderFactoryTest {
         List<Set<OperatingSystems>> platforms = Arrays.asList(
                 EnumSet.of(OperatingSystems.WINDOWS),
                 EnumSet.of(OperatingSystems.WEBDRIVER),
-                EnumSet.of(OperatingSystems.ANDROID),
-                EnumSet.of(OperatingSystems.IOS)
+                EnumSet.of(OperatingSystems.ANDROID)
         );
 
         for (Set<OperatingSystems> platform : platforms) {
@@ -198,8 +175,7 @@ public class ScreenshotProviderFactoryTest {
         List<Set<OperatingSystems>> platforms = Arrays.asList(
                 EnumSet.of(OperatingSystems.WINDOWS),
                 EnumSet.of(OperatingSystems.WEBDRIVER),
-                EnumSet.of(OperatingSystems.ANDROID),
-                EnumSet.of(OperatingSystems.IOS)
+                EnumSet.of(OperatingSystems.ANDROID)
         );
 
         for (Set<OperatingSystems> platform : platforms) {

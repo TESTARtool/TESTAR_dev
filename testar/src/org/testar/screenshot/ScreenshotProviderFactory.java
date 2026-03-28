@@ -38,7 +38,6 @@ import java.util.Set;
 import org.testar.monkey.alayer.AWTCanvas;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.android.util.AndroidScreenshotUtil;
-import org.testar.monkey.alayer.ios.util.IOSScreenshotUtil;
 import org.testar.monkey.alayer.webdriver.util.WdScreenshotUtil;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
@@ -91,21 +90,6 @@ public final class ScreenshotProviderFactory {
 		}
 	};
 
-	private static final ScreenshotProvider IOS_PROVIDER = new ScreenshotProvider() {
-		@Override
-		public AWTCanvas getStateshotBinary(State state) {
-			Objects.requireNonNull(state, "State cannot be null");
-			return IOSScreenshotUtil.getStateshotBinary(state);
-		}
-
-		@Override
-		public String getActionshot(State state, Action action) {
-			Objects.requireNonNull(state, "State cannot be null");
-			Objects.requireNonNull(action, "Action cannot be null");
-			return IOSScreenshotUtil.getActionshot(state, action);
-		}
-	};
-
 	private ScreenshotProviderFactory() {
 	}
 
@@ -119,9 +103,6 @@ public final class ScreenshotProviderFactory {
 		}
 		if (platform.contains(OperatingSystems.ANDROID)) {
 			return ANDROID_PROVIDER;
-		}
-		if (platform.contains(OperatingSystems.IOS)) {
-			return IOS_PROVIDER;
 		}
 		return DEFAULT_PROVIDER;
 	}
