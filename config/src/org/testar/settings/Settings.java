@@ -39,6 +39,7 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.util.*;
+import org.testar.core.execution.TestarMode;
 import org.testar.monkey.*;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.TaggableBase;
@@ -112,9 +113,9 @@ public class Settings extends TaggableBase implements Serializable {
 			}catch(NumberFormatException nfe){
 				throw new ConfigParseException("Unable to parse value for tag " + tag);
 			}
-		}else if(tag.type().equals(RuntimeControlsProtocol.Modes.class)){
+		}else if(tag.type().equals(TestarMode.class)){
 			try{
-				return (T)RuntimeControlsProtocol.Modes.valueOf(stringValue);
+				return (T)TestarMode.valueOf(stringValue);
 			}catch(IllegalArgumentException iae){
 				throw new ConfigParseException("Unknown Mode!");
 			}

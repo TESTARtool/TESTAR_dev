@@ -5,6 +5,7 @@
 - Remove old View mode since this will be completely new, implemented as a central view server mode
 - Remove iOS module temporally
 - Remove ExtendedSettings framework since Settings will be refactored into JSON or YAML arch
+- Refactor settings into custom config module
 
 
 #TESTAR v2.8.6 (24-Mar-2026)

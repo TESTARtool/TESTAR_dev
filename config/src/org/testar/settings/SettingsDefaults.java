@@ -30,9 +30,9 @@
 
 package org.testar.settings;
 
-import org.testar.monkey.Main;
+import org.testar.TestarDirectories;
+import org.testar.core.execution.TestarMode;
 import org.testar.monkey.Pair;
-import org.testar.monkey.RuntimeControlsProtocol;
 import org.testar.statemodel.StateModelTags;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,9 +50,9 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(ProcessesToKillDuringTest, "(?!x)x"));
 		defaults.add(Pair.from(ShowVisualSettingsDialogOnStartup, true));
 		defaults.add(Pair.from(LogLevel, 1));
-		defaults.add(Pair.from(Mode, RuntimeControlsProtocol.Modes.Spy));
-		defaults.add(Pair.from(OutputDir, Main.outputDir));
-		defaults.add(Pair.from(TempDir, Main.tempDir));
+		defaults.add(Pair.from(Mode, TestarMode.Spy));
+		defaults.add(Pair.from(OutputDir, TestarDirectories.getOutputDir()));
+		defaults.add(Pair.from(TempDir, TestarDirectories.getTempDir()));
 		defaults.add(Pair.from(OnlySaveFaultySequences, false));
 		defaults.add(Pair.from(ActionDuration, 0.1));
 		defaults.add(Pair.from(TimeToWaitAfterAction, 0.1));
@@ -68,7 +68,7 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(IgnoreDuplicatedVerdicts, false));
 		defaults.add(Pair.from(SuspiciousTags, "(?!x)x"));
 		defaults.add(Pair.from(ClickFilter, "(?!x)x"));
-		defaults.add(Pair.from(MyClassPath, Arrays.asList(Main.settingsDir)));
+		defaults.add(Pair.from(MyClassPath, Arrays.asList(TestarDirectories.getSettingsDir())));
 		defaults.add(Pair.from(ProtocolClass, "org.testar.monkey.DefaultProtocol"));
 		defaults.add(Pair.from(ForceForeground, true));
 		defaults.add(Pair.from(StopGenerationOnFault, true));

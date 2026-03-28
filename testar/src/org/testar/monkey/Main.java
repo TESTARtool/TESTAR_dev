@@ -32,6 +32,8 @@ package org.testar.monkey;
 
 import org.testar.CodingManager;
 import org.testar.StateManagementTags;
+import org.testar.TestarDirectories;
+import org.testar.TestarInfo;
 import org.testar.environment.Environment;
 import org.testar.environment.UnknownEnvironment;
 import org.testar.managers.NativeHookManager;
@@ -48,14 +50,11 @@ import org.testar.settings.dialog.tagsvisualization.TagFilter;
 
 import javax.swing.*;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -64,32 +63,17 @@ import static org.testar.monkey.Util.compileProtocol;
 
 public class Main {
 
-	public static final String TESTAR_VERSION = "v3.0.1 (date-to-determine)";
-
-	//public static final String TESTAR_DIR_PROPERTY = "DIRNAME"; //Use the OS environment to obtain TESTAR directory
-	public static final String SETTINGS_FILE = "test.settings";
-	public static final String SUT_SETTINGS_EXT = ".sse";
+	public static final String TESTAR_VERSION = TestarInfo.VERSION;
+	public static final String SETTINGS_FILE = TestarDirectories.SETTINGS_FILE;
+	public static final String SUT_SETTINGS_EXT = TestarDirectories.SUT_SETTINGS_EXT;
 	public static String SSE_ACTIVATED = null;
-
-	//Default paths
-	private static final Path BASE_DIR = Paths.get(".").toAbsolutePath().normalize();
-
-	public static String testarDir = BASE_DIR.toString() + java.io.File.separator;
-	public static String settingsDir = BASE_DIR.resolve("settings").toString() + java.io.File.separator;
-	public static String outputDir = BASE_DIR.resolve("output").toString() + java.io.File.separator;
-	public static String tempDir = BASE_DIR.resolve("output").resolve("temp").toString() + java.io.File.separator;
 
 	/**
 	 * This method scans the settings directory of TESTAR for a file that end with extension SUT_SETTINGS_EXT
 	 * @return A list of file names that have extension SUT_SETTINGS_EXT
 	 */
 	public static String[] getSSE() {
-		return new File(settingsDir).list(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.endsWith(SUT_SETTINGS_EXT);
-			}
-		});
+		return TestarDirectories.getSseFiles();
 	}
 
 	/**
@@ -99,7 +83,7 @@ public class Main {
 	 * @return test.settings path
 	 */
 	public static String getTestSettingsFile() {
-		return settingsDir + SSE_ACTIVATED + File.separator + SETTINGS_FILE;
+		return TestarDirectories.getTestSettingsFile();
 	}
 
 	/**
@@ -180,7 +164,7 @@ public class Main {
 	private static void verifyTestarInitialDirectory() {
 		// Obtain Files name of current testarDir
 		Set<String> filesName = new HashSet<>();
-		File[] filesList = new File(testarDir).listFiles();
+		File[] filesList = new File(TestarDirectories.getTestarDir()).listFiles();
         for(File file : filesList){
         	filesName.add(file.getName());
         }
@@ -189,7 +173,8 @@ public class Main {
 		if(!filesName.contains("testar.bat")) {
 			System.out.println("WARNING: We cannot find testar.bat executable file.");
 			System.out.println("WARNING: Please change to /testar/bin/ folder (contains testar.bat) and try to execute testar again.");
-			System.out.println(String.format("WARNING: Current directory %s with existing files:", new File(testarDir).getAbsolutePath()));
+			System.out.println(String.format("WARNING: Current directory %s with existing files:",
+					new File(TestarDirectories.getTestarDir()).getAbsolutePath()));
 			filesName.forEach(System.out::println);
 			System.exit(-1);
 		}
@@ -208,8 +193,8 @@ public class Main {
 			System.out.println("Please execute TESTAR from their existing directory");
 		}*/
 
-		outputDir = settings.get(ConfigTags.OutputDir);
-		tempDir = settings.get(ConfigTags.TempDir);
+		TestarDirectories.setOutputDir(settings.get(ConfigTags.OutputDir));
+		TestarDirectories.setTempDir(settings.get(ConfigTags.TempDir));
 	}
 
 	/**
@@ -239,7 +224,8 @@ public class Main {
 		if (files != null && files.length > 1) {
 			System.out.println("Too many *.sse files - exactly one expected!");
 			for (String f : files) {
-				System.out.println("Delete file <" + f + "> = " + new File(settingsDir + f).delete());
+				System.out.println("Delete file <" + f + "> = "
+						+ new File(TestarDirectories.getSettingsDir() + f).delete());
 			}
 			files = null;
 		}
@@ -248,7 +234,8 @@ public class Main {
 		// Example: unknown.sse file exists but the settings/unknown folder does not
 		if(files != null && files.length == 1 && !existsSSE(files[0].replace(SUT_SETTINGS_EXT, ""))) {
 			System.out.println("Protocol of indicated .sse file does not exist");
-			System.out.println("Delete file <" + files[0] + "> = " + new File(settingsDir + files[0]).delete());
+			System.out.println("Delete file <" + files[0] + "> = "
+					+ new File(TestarDirectories.getSettingsDir() + files[0]).delete());
 			files = null;
 		}
 
@@ -262,6 +249,7 @@ public class Main {
 		else {
 			//Use the only file that was found
 			SSE_ACTIVATED = extractSSEName(files[0]);
+			TestarDirectories.setSelectedSse(SSE_ACTIVATED);
 		}
 	}
 
@@ -286,7 +274,7 @@ public class Main {
 	private static void settingsSelection() {
 
 		Set<String> sutSettings = new HashSet<String>();
-		for (File f : new File(settingsDir).listFiles()) {
+		for (File f : new File(TestarDirectories.getSettingsDir()).listFiles()) {
 			if (new File(f.getPath() + File.separator + SETTINGS_FILE).exists()) {
 				sutSettings.add(f.getName());
 			}
@@ -306,15 +294,17 @@ public class Main {
 
 			if (sseSelected == null) {
 				SSE_ACTIVATED = null;
+				TestarDirectories.setSelectedSse(null);
 				return;
 			}
 
 			final String sseFile = sseSelected + SUT_SETTINGS_EXT;
 
 			try {
-				File f = new File(settingsDir + File.separator + sseFile);
+				File f = new File(TestarDirectories.getSettingsDir() + File.separator + sseFile);
 				if (f.createNewFile()) {
 					SSE_ACTIVATED = sseSelected;
+					TestarDirectories.setSelectedSse(SSE_ACTIVATED);
 					return;
 				}
 			} catch (IOException e) {
@@ -323,6 +313,7 @@ public class Main {
 
 		}
 		SSE_ACTIVATED = null;
+		TestarDirectories.setSelectedSse(null);
 	}
 
 	/**
@@ -361,7 +352,7 @@ public class Main {
 		try {
 			// Compile the Java protocols if AlwaysCompile setting is true
 			if (settings.get(ConfigTags.AlwaysCompile)) {
-				compileProtocol(Main.settingsDir, pc, settings.get(ConfigTags.ProtocolCompileDirectory));
+					compileProtocol(TestarDirectories.getSettingsDir(), pc, settings.get(ConfigTags.ProtocolCompileDirectory));
 			}
 
 		    List<String> cp = new ArrayList<>(settings.get(MyClassPath));
@@ -465,12 +456,12 @@ public class Main {
 			String[] files = getSSE();
 			if (files != null) {
 				for (String f : files) 
-					new File(settingsDir+f).delete();
+					new File(TestarDirectories.getSettingsDir() + f).delete();
 
 			}
 
 			//Create the new sse file
-			String sseDir = settingsDir + sseName + SUT_SETTINGS_EXT;
+			String sseDir = TestarDirectories.getSettingsDir() + sseName + SUT_SETTINGS_EXT;
 			File f = new File(sseDir);
 			if(!f.exists())
 				f.createNewFile();
@@ -481,8 +472,8 @@ public class Main {
 	}
 	// Check if sse protocol exist
 	private static boolean existsSSE(String sseName) {
-		for (File f : new File(settingsDir).listFiles()) {
-			if (new File(settingsDir + sseName + File.separator + SETTINGS_FILE).exists()) {
+		for (File f : new File(TestarDirectories.getSettingsDir()).listFiles()) {
+			if (new File(TestarDirectories.getSettingsDir() + sseName + File.separator + SETTINGS_FILE).exists()) {
 				return true;
 			}
 		}
