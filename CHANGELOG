@@ -6,6 +6,7 @@
 - Remove iOS module temporally
 - Remove ExtendedSettings framework since Settings will be refactored into JSON or YAML arch
 - Refactor settings into custom config module
+- Refactor reporting into custom module
 
 
 #TESTAR v2.8.6 (24-Mar-2026)

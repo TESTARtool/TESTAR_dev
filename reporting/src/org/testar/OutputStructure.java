@@ -37,7 +37,6 @@ import java.nio.file.Paths;
 
 import org.testar.monkey.Util;
 import org.testar.monkey.ConfigTags;
-import org.testar.monkey.Main;
 import org.testar.settings.Settings;
 
 public class OutputStructure {
@@ -126,13 +125,13 @@ public class OutputStructure {
 
 	public static void createOutputFolders() {
 
-		outerLoopOutputDir = Main.outputDir + File.separator + startOuterLoopDateString + "_" + executedSUTname;
+		outerLoopOutputDir = TestarDirectories.getOutputDir() + File.separator + startOuterLoopDateString + "_" + executedSUTname;
 		File runDir = new File(outerLoopOutputDir);
 		runDir.mkdirs();
 
 		//Check if main output folder was created correctly, if not use unknown name with timestamp
 		if(!runDir.exists()) {
-			runDir = new File(Main.outputDir + File.separator + startOuterLoopDateString + "_unknown");
+			runDir = new File(TestarDirectories.getOutputDir() + File.separator + startOuterLoopDateString + "_unknown");
 			runDir.mkdirs();
 		}
 
@@ -187,7 +186,7 @@ public class OutputStructure {
 					+ " canWrite=" + parent.canWrite());
 		}
 		System.err.println("ERROR: Working directory: <" + cwd + ">");
-		System.err.println("ERROR: Config OutputDir: <" + Main.outputDir + ">");
+		System.err.println("ERROR: Config OutputDir: <" + TestarDirectories.getOutputDir() + ">");
 	}
 
 }
