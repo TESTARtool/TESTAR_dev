@@ -8,6 +8,7 @@
 - Refactor settings into custom config module
 - Refactor reporting into custom module
 - Refactor oracle into custom module
+- Refactor dialog into custom module
 
 
 #TESTAR v2.8.6 (24-Mar-2026)

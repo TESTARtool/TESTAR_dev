@@ -1,0 +1,9 @@
+dependencies {
+    implementation project(':core')
+    implementation project(':config')
+    implementation project(':oracle')
+    implementation project(':statemodel')
+    implementation project(':windows')
+    implementation project(':webdriver')
+    implementation files('../testar/lib/jsyntaxpane-1.1.5.jar')
+}
