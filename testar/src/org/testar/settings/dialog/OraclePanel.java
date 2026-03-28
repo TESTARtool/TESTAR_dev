@@ -36,8 +36,6 @@ import org.testar.settings.Settings;
 import org.testar.settings.dialog.components.RegexButton;
 import org.testar.settings.dialog.components.RestoreButton;
 import org.testar.settings.dialog.components.UndoTextArea;
-import org.testar.settings.extended.ExtendedSettingsFactory;
-import org.testar.visualvalidation.VisualValidationSettings;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -193,10 +191,6 @@ public class OraclePanel extends SettingsPanel {
         txtWebConsoleWarningPattern.setText(settings.get(ConfigTags.WebConsoleWarningPattern));
         // ExtendedOracles
         extendedOracles = settings.get(ConfigTags.ExtendedOracles);
-        // Visual validation elements
-        VisualValidationSettings visualSetting = ExtendedSettingsFactory.createVisualValidationSettings();
-        // Disable the visualization until the implementation is ready
-        //enableVisualValidationCheckBox.setSelected(visualSetting.enabled);
     }
 
     /**
@@ -217,9 +211,5 @@ public class OraclePanel extends SettingsPanel {
         settings.set(ConfigTags.WebConsoleWarningPattern, txtWebConsoleWarningPattern.getText());
         // ExtendedOracles
         settings.set(ConfigTags.ExtendedOracles, extendedOracles);
-        // Visual validation elements
-        VisualValidationSettings visualSetting = ExtendedSettingsFactory.createVisualValidationSettings();
-        // Disable the visualization until the implementation is ready
-        //visualSetting.enabled = enableVisualValidationCheckBox.isSelected();
     }
 }

@@ -206,9 +206,6 @@ public final class ConfigTags {
 	public static final Tag<String> OverrideWebDriverDisplayScale = Tag.from("OverrideWebDriverDisplayScale", String.class, 
 			"Overrides the displayscale obtained from the system for web SUTs");
 
-	public static final Tag<String> ExtendedSettingsFile = Tag.from("ExtendedSettingsFile", String.class, 
-			"Relative path to extended XML settings file");
-
 	// 5 settings that can be used in user specified TESTAR protocols for anything:
 	public static final Tag<String> ProtocolSpecificSetting_1 = Tag.from("ProtocolSpecificSetting_1", String.class, 
 			"Settings (string) that can be used for user specified protocols");

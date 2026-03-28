@@ -34,7 +34,6 @@ package org.testar.settings.dialog;
 import org.testar.monkey.*;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.settings.Settings;
-import org.testar.settings.extended.ExtendedSettingsFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -198,7 +197,6 @@ public class SettingsDialog extends JFrame implements Observer {
 
   private void saveCurrentSettings() {
     extractInformation(settings);
-    ExtendedSettingsFactory.SaveAll();
     try {
       Util.saveToFile(settings.toFileString(), settingsFile);
       Settings.setSettingsPath(settingsFile.substring(0,settingsFile.indexOf(Main.SETTINGS_FILE)-1));

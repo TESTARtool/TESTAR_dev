@@ -44,8 +44,6 @@ import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.TaggableBase;
 import org.testar.monkey.alayer.exceptions.FruitException;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
-import org.testar.settings.extended.ExtendedSettingFile;
-import org.testar.settings.extended.ExtendedSettingsFactory;
 
 import static java.util.stream.Collectors.toList;
 
@@ -178,13 +176,6 @@ public class Settings extends TaggableBase implements Serializable {
 		// Initialize the settings with the configured values
 		// Prioritize the argv > file > default
 		Settings settings = loadSettings(SettingsDefaults.getSettingsDefaults(), filePath, argv);
-
-		String extendedSettingsFile = settings.get(ConfigTags.ExtendedSettingsFile, "");
-		if (extendedSettingsFile.trim().isEmpty()) {
-			settings.set(ConfigTags.ExtendedSettingsFile, filePath.replace(Main.SETTINGS_FILE, ExtendedSettingFile.FileName));
-		}
-
-		ExtendedSettingsFactory.Initialize(settings.get(ConfigTags.ExtendedSettingsFile));
 
 		return settings;
 	}
