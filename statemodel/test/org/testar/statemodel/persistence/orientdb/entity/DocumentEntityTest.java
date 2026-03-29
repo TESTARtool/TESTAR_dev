@@ -3,14 +3,18 @@ package org.testar.statemodel.persistence.orientdb.entity;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class DocumentEntityTest {
 
     @Test
     public void testConstructorInitializesFields() {
         EntityClass entityClass = new EntityClass("TestEntity", EntityClass.EntityType.Vertex);
-        DocumentEntity document = new DocumentEntity(entityClass) {};
+        DocumentEntity document = new DocumentEntity(entityClass) { };
 
         assertNotNull(document.getEntityClass());
         assertEquals("TestEntity", document.getEntityClass().getClassName());
@@ -21,7 +25,7 @@ public class DocumentEntityTest {
     @Test
     public void testAddAndGetPropertyValue() {
         EntityClass entityClass = new EntityClass("TestEntity", EntityClass.EntityType.Vertex);
-        DocumentEntity document = new DocumentEntity(entityClass) {};
+        DocumentEntity document = new DocumentEntity(entityClass) { };
 
         PropertyValue value = new PropertyValue(OType.STRING, "example");
         document.addPropertyValue("key1", value);
@@ -33,7 +37,7 @@ public class DocumentEntityTest {
     @Test
     public void testGetMissingPropertyReturnsNull() {
         EntityClass entityClass = new EntityClass("TestEntity", EntityClass.EntityType.Vertex);
-        DocumentEntity document = new DocumentEntity(entityClass) {};
+        DocumentEntity document = new DocumentEntity(entityClass) { };
 
         assertNull(document.getPropertyValue("missing"));
     }
@@ -41,7 +45,7 @@ public class DocumentEntityTest {
     @Test
     public void testEnableUpdateFlag() {
         EntityClass entityClass = new EntityClass("TestEntity", EntityClass.EntityType.Vertex);
-        DocumentEntity document = new DocumentEntity(entityClass) {};
+        DocumentEntity document = new DocumentEntity(entityClass) { };
 
         document.enableUpdate(false);
         assertFalse(document.updateEnabled());
@@ -52,6 +56,6 @@ public class DocumentEntityTest {
 
     @Test(expected = NullPointerException.class)
     public void testConstructorWithNullEntityClass() {
-        new DocumentEntity(null) {};
+        new DocumentEntity(null) { };
     }
 }

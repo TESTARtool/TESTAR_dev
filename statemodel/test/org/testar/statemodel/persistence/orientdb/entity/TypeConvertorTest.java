@@ -4,9 +4,11 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 import java.util.Date;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 
 public class TypeConvertorTest {
 
@@ -57,7 +59,7 @@ public class TypeConvertorTest {
 
     @Test
     public void testUnknownJavaTypeReturnsAny() {
-        class UnknownType {}
+        class UnknownType { }
         OType result = convertor.getOrientDBType(UnknownType.class);
         assertEquals(OType.ANY, result);
     }

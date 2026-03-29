@@ -1,32 +1,8 @@
-/***************************************************************************************************
- *
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2025 Universitat Politecnica de Valencia - www.upv.es
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the copyright holder nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *******************************************************************************************************/
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2018-2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018-2026 Universitat Politecnica de Valencia - www.upv.es
+ */
 
 package org.testar.statemodel.persistence.orientdb.entity;
 
@@ -48,9 +24,15 @@ import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import org.testar.statemodel.exceptions.EntityNotFoundException;
 import org.testar.statemodel.persistence.orientdb.util.DependencyHelper;
-import org.testar.monkey.alayer.Visualizer;
+import org.testar.core.visualizers.Visualizer;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 public class EntityManager {
@@ -161,8 +143,7 @@ public class EntityManager {
         OResultSet rs;
         if (identifier != null) {
             rs = retrieveEdgeWithId(edgeEntity, db);
-        }
-        else {
+        } else {
             rs = retrieveEdgeWithoutId(edgeEntity, db);
         }
 
@@ -254,7 +235,9 @@ public class EntityManager {
         try (ODatabaseSession db = connection.getDatabaseSession()) {
             // check if the class already exists
             OClass oClass = db.getClass(entityClass.getClassName());
-            if (oClass != null) return;
+            if (oClass != null) {
+                return;
+            }
 
             // no class yet, let's create it
             String entitySuperClass = entityClass.isVertex() ? "V" : entityClass.isEdge() ? "E" : "";
@@ -291,12 +274,10 @@ public class EntityManager {
                 // binary types we do not create, as they will be stored as separate binary records
                 if (property.getPropertyType() == OType.BINARY) {
                     continue;
-                }
-                // for linked and embedded type a childtype needs to be specified
-                else if (property.getPropertyType().isEmbedded() || property.getPropertyType().isLink()) {
+                } else if (property.getPropertyType().isEmbedded() || property.getPropertyType().isLink()) {
+                    // for linked and embedded type a childtype needs to be specified
                     dbProperty = oClass.createProperty(property.getPropertyName(), property.getPropertyType(), property.getChildType());
-                }
-                else {
+                } else {
                     dbProperty = oClass.createProperty(property.getPropertyName(), property.getPropertyType());
                 }
 
@@ -322,8 +303,7 @@ public class EntityManager {
         try (ODatabaseSession db = connection.getDatabaseSession()) {
             if (entity.getEntityClass().isVertex()) {
                 saveVertexEntity((VertexEntity) entity, db);
-            }
-            else if (entity.getEntityClass().isEdge()) {
+            } else if (entity.getEntityClass().isEdge()) {
                 saveEdgeEntity((EdgeEntity) entity, db);
             }
         }
@@ -340,15 +320,16 @@ public class EntityManager {
         // check to see if the vertex already exists in the database
         try {
             oVertex = retrieveVertex(entity, db);
-        }
-        catch (EntityNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             // vertex doesn't exist yet. No problemo. We'll create one.
             oVertex = db.newVertex(entity.getEntityClass().getClassName());
             newVertex = true;
         }
 
         // check if we should process the properties
-        if (!(newVertex || entity.updateEnabled())) return;
+        if (!(newVertex || entity.updateEnabled())) {
+            return;
+        }
 
         // now we have to add or update properties!
         for (String propertyName : entity.getPropertyNames()) {
@@ -406,8 +387,7 @@ public class EntityManager {
         boolean newSourceVertex = false;
         try {
             sourceVertex = retrieveVertex(entity.getSourceEntity(), db);
-        }
-        catch (EntityNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             sourceVertex = db.newVertex(entity.getSourceEntity().getEntityClass().getClassName());
             newSourceVertex = true;
         }
@@ -438,8 +418,7 @@ public class EntityManager {
         boolean newTargetVertex = false;
         try {
             targetVertex = retrieveVertex(entity.getTargetEntity(), db);
-        }
-        catch (EntityNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             targetVertex = db.newVertex(entity.getTargetEntity().getEntityClass().getClassName());
             newTargetVertex = true;
         }
@@ -488,17 +467,17 @@ public class EntityManager {
     }
 
     public void deleteEntity(DocumentEntity entity) {
-            // we delete an entity based on its class and its id
-            EntityClass entityClass = entity.getEntityClass();
+        // we delete an entity based on its class and its id
+        EntityClass entityClass = entity.getEntityClass();
 
-            Property identifier = entityClass.getIdentifier();
-            if (identifier == null) {
-                // cannot delete without an id value
-                return;
-            }
-            Set<Object> idValues = new HashSet<>();
-            idValues.add(entity.getPropertyValue(identifier.getPropertyName()).getValue());
-            deleteEntities(entityClass, idValues);
+        Property identifier = entityClass.getIdentifier();
+        if (identifier == null) {
+            // cannot delete without an id value
+            return;
+        }
+        Set<Object> idValues = new HashSet<>();
+        idValues.add(entity.getPropertyValue(identifier.getPropertyName()).getValue());
+        deleteEntities(entityClass, idValues);
     }
 
     /**
@@ -511,11 +490,9 @@ public class EntityManager {
             String typeName;
             if (entityClass.getEntityType() == EntityClass.EntityType.Vertex) {
                 typeName = "VERTEX";
-            }
-            else if (entityClass.getEntityType() == EntityClass.EntityType.Edge) {
+            } else if (entityClass.getEntityType() == EntityClass.EntityType.Edge) {
                 typeName = "EDGE";
-            }
-            else {
+            } else {
                 // should not happen
                 return;
             }
@@ -542,39 +519,36 @@ public class EntityManager {
      * @param propertyValue
      */
     private void setProperty(OElement element, String propertyName, Object propertyValue, ODatabaseSession db) {
-        if (propertyValue instanceof Boolean)
+        if (propertyValue instanceof Boolean) {
             element.setProperty(propertyName, ((Boolean) propertyValue).booleanValue());
-        else if (propertyValue instanceof Byte)
+        } else if (propertyValue instanceof Byte) {
             element.setProperty(propertyName, ((Byte) propertyValue).byteValue());
-        else if (propertyValue instanceof Character)
+        } else if (propertyValue instanceof Character) {
             element.setProperty(propertyName, ((Character) propertyValue).charValue());
-        else if (propertyValue instanceof Double)
+        } else if (propertyValue instanceof Double) {
             element.setProperty(propertyName, ((Double) propertyValue).doubleValue());
-        else if (propertyValue instanceof Float)
+        } else if (propertyValue instanceof Float) {
             element.setProperty(propertyName, ((Float) propertyValue).floatValue());
-        else if (propertyValue instanceof Integer)
+        } else if (propertyValue instanceof Integer) {
             element.setProperty(propertyName, ((Integer) propertyValue).intValue());
-        else if (propertyValue instanceof Long)
+        } else if (propertyValue instanceof Long) {
             element.setProperty(propertyName, ((Long) propertyValue).longValue());
-        else if (propertyValue instanceof Short)
+        } else if (propertyValue instanceof Short) {
             element.setProperty(propertyName, ((Short) propertyValue).shortValue());
-        else if (propertyValue instanceof Visualizer) {
+        } else if (propertyValue instanceof Visualizer) {
             //skip Don't put visualizer in the graph since it has no meaning for graph.
             //It will get a meaning when we want to use the data for reply.
-        }
-        else if (propertyValue instanceof byte[]) {
+        } else if (propertyValue instanceof byte[]) {
             // for binary data we add a separate record and connect it to the element
             OBlob record = db.newBlob((byte[]) propertyValue);
             element.setProperty(propertyName, record);
-        }
-        else if (propertyValue instanceof Set) {
+        } else if (propertyValue instanceof Set) {
             element.setProperty(propertyName, propertyValue);
-        }
-        else if (propertyValue instanceof Date) {
+        } else if (propertyValue instanceof Date) {
             element.setProperty(propertyName, propertyValue);
-        }
-        else
+        } else {
             element.setProperty(propertyName, propertyValue.toString());
+        }
         //@todo need to make the linked and set types right here
     }
 
@@ -619,7 +593,7 @@ public class EntityManager {
                 convertedValue = OType.convert(valueToConvert, Set.class);
                 break;
         }
-        return  convertedValue;
+        return convertedValue;
     }
 
     /**
@@ -645,8 +619,7 @@ public class EntityManager {
                 }
                 stmt += stringJoiner.toString();
                 rs = db.query(stmt, params);
-            }
-            else {
+            } else {
                 rs = db.query(stmt);
             }
 
@@ -654,8 +627,7 @@ public class EntityManager {
                 OResult result = rs.next();
                 if (result.isVertex()) {
                     documents.add(extractVertexEntity(result, entityClass));
-                }
-                else if (result.isEdge()) {
+                } else if (result.isEdge()) {
                     documents.add(extractEdgeEntity(result));
                 }
                 // should not happen, but we just ignore the result
@@ -674,7 +646,9 @@ public class EntityManager {
         try (ODatabaseSession db = connection.getDatabaseSession()) {
             // first we have to retrieve the identifying field
             Property identifier = entityClass.getIdentifier();
-            if (identifier == null) return null; // cannot search without an id field
+            if (identifier == null) {
+                return null; // cannot search without an id field
+            }
 
             String idField = identifier.getPropertyName();
             // convert the id value to the correct type to use in the database query
@@ -696,11 +670,9 @@ public class EntityManager {
             OResult oResult = rs.next();
             if (oResult.isVertex()) {
                 return extractVertexEntity(oResult, entityClass);
-            }
-            else if (oResult.isEdge()) {
+            } else if (oResult.isEdge()) {
                 return extractEdgeEntity(oResult);
-            }
-            else {
+            } else {
                 return null;
             }
 
@@ -715,7 +687,9 @@ public class EntityManager {
      */
     private VertexEntity extractVertexEntity(OResult result, EntityClass entityClass) {
         Optional<OVertex> op = result.getVertex();
-        if (!op.isPresent()) return null;
+        if (!op.isPresent()) {
+            return null;
+        }
         OVertex oVertex = op.get();
         // first we set the attributes
         VertexEntity vertexEntity = new VertexEntity(entityClass);
@@ -725,14 +699,18 @@ public class EntityManager {
         for (OEdge edge : oVertex.getEdges(ODirection.OUT)) {
             // look up the entity class for the edge entity
             EdgeEntity edgeEntity = processEdgeEntity(vertexEntity, edge, true);
-            if (edgeEntity == null) continue;
+            if (edgeEntity == null) {
+                continue;
+            }
             vertexEntity.addOutgoingEdge(edgeEntity);
         }
 
         for (OEdge edge : oVertex.getEdges(ODirection.IN)) {
             // look up the entity class for the edge entity
             EdgeEntity edgeEntity = processEdgeEntity(vertexEntity, edge, false);
-            if (edgeEntity == null) continue;
+            if (edgeEntity == null) {
+                continue;
+            }
             vertexEntity.addIncomingEdge(edgeEntity);
         }
 
@@ -749,17 +727,23 @@ public class EntityManager {
     private EdgeEntity processEdgeEntity(VertexEntity vertexEntity, OEdge edge, boolean vertexIsSource) {
         Optional<OClass> opClass = edge.getSchemaType();
         // if the edge does not have a class for some reason, we cannot process it
-        if (!opClass.isPresent()) return null;
+        if (!opClass.isPresent()) {
+            return null;
+        }
         OClass oEdgeClass = opClass.get();
         EntityClassFactory.EntityClassName edgeClassName = EntityClassFactory.getEntityClassName(oEdgeClass.getName());
         EntityClass edgeEntityClass = EntityClassFactory.createEntityClass(edgeClassName);
-        if (edgeEntityClass == null) return null;
+        if (edgeEntityClass == null) {
+            return null;
+        }
 
         //@todo ideally the target entity would have a lazy loading implementation
         // get the vertex endpoint that we do not have yet
         OVertex targetVertex = vertexIsSource ? edge.getTo() : edge.getFrom();
         //get the class of the target
-        if (!targetVertex.getSchemaType().isPresent()) return null;
+        if (!targetVertex.getSchemaType().isPresent()) {
+            return null;
+        }
         OClass oTargetClass = targetVertex.getSchemaType().get();
         EntityClassFactory.EntityClassName targetClassName = EntityClassFactory.getEntityClassName(oTargetClass.getName());
         EntityClass targetEntityClass = EntityClassFactory.createEntityClass(targetClassName);
@@ -770,8 +754,7 @@ public class EntityManager {
         EdgeEntity edgeEntity;
         if (vertexIsSource) {
             edgeEntity = new EdgeEntity(edgeEntityClass, vertexEntity, targetEntity);
-        }
-        else {
+        } else {
             edgeEntity = new EdgeEntity(edgeEntityClass, targetEntity, vertexEntity);
         }
         // set the attributes on the edge
@@ -787,18 +770,24 @@ public class EntityManager {
      */
     private EdgeEntity extractEdgeEntity(OResult result) {
         // check if the result contains an edge
-        if (!result.getEdge().isPresent()) return null;
+        if (!result.getEdge().isPresent()) {
+            return null;
+        }
         OEdge oEdge = result.getEdge().get();
 
         // get the source vertex
         OVertex sourceVertex = oEdge.getFrom();
         // check for the presence of a class
-        if (!sourceVertex.getSchemaType().isPresent()) return null;
+        if (!sourceVertex.getSchemaType().isPresent()) {
+            return null;
+        }
 
         OClass sourceVertexClass = sourceVertex.getSchemaType().get();
         EntityClassFactory.EntityClassName sourceClassName = EntityClassFactory.getEntityClassName(sourceVertexClass.getName());
         EntityClass sourceClass = EntityClassFactory.createEntityClass(sourceClassName);
-        if (sourceClass == null) return null;
+        if (sourceClass == null) {
+            return null;
+        }
 
         VertexEntity sourceVertexEntity = new VertexEntity(sourceClass);
         // set the attributes

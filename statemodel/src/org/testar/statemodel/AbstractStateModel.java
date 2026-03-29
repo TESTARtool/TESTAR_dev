@@ -1,32 +1,8 @@
-/***************************************************************************************************
- *
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2025 Universitat Politecnica de Valencia - www.upv.es
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the copyright holder nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *******************************************************************************************************/
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2018-2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018-2026 Universitat Politecnica de Valencia - www.upv.es
+ */
 
 package org.testar.statemodel;
 
@@ -36,13 +12,13 @@ import org.testar.statemodel.event.StateModelEventType;
 import org.testar.statemodel.exceptions.InvalidStateIdException;
 import org.testar.statemodel.exceptions.StateModelException;
 import org.testar.statemodel.exceptions.StateNotFoundException;
-import org.testar.monkey.alayer.Tag;
+import org.testar.core.tag.Tag;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Set;
 
 public class AbstractStateModel {
@@ -124,7 +100,8 @@ public class AbstractStateModel {
      * @param executedAction
      * @throws StateModelException
      */
-    public void addTransition(AbstractState sourceState, AbstractState targetState, AbstractAction executedAction) throws StateModelException{
+    public void addTransition(AbstractState sourceState, AbstractState targetState, AbstractAction executedAction)
+            throws StateModelException {
         Objects.requireNonNull(sourceState, "AbstractStateModel source state cannot be null");
         Objects.requireNonNull(targetState, "AbstractStateModel target state cannot be null");
         Objects.requireNonNull(executedAction, "AbstractStateModel executed action cannot be null");
@@ -135,7 +112,7 @@ public class AbstractStateModel {
         // check if the transition already exists
         if (stateTransitionsBySource.containsKey(sourceState.getStateId())) {
             // loop through all the transitions that have the same source state and check for matches
-            for(AbstractStateTransition stateTransition : stateTransitionsBySource.get(sourceState.getStateId())) {
+            for (AbstractStateTransition stateTransition : stateTransitionsBySource.get(sourceState.getStateId())) {
                 if (targetState.getStateId().equals(stateTransition.getTargetStateId()) && executedAction.getActionId().equals(stateTransition.getActionId())) {
                     // the transition already exists. We send an update event to deal with changes in the states and actions
                     // now we notify our listeners of the possible update
@@ -193,13 +170,12 @@ public class AbstractStateModel {
             // provide the state with this state model's abstract identifier
             newState.setModelIdentifier(modelIdentifier);
             // provide the state with the event listeners from this state model
-            for (StateModelEventListener eventListener: eventListeners) {
+            for (StateModelEventListener eventListener : eventListeners) {
                 newState.addEventListener(eventListener);
             }
             this.states.put(newState.getStateId(), newState);
             emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_ADDED, newState));
-        }
-        else {
+        } else {
             emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_CHANGED, newState));
         }
 
@@ -246,7 +222,7 @@ public class AbstractStateModel {
      * @param initialState
      * @throws StateModelException
      */
-    private void addInitialState(AbstractState initialState) throws StateModelException{
+    private void addInitialState(AbstractState initialState) throws StateModelException {
         checkStateId(initialState.getStateId());
         if (!initialStates.containsKey(initialState.getStateId())) {
             initialState.setInitial(true);
@@ -259,7 +235,7 @@ public class AbstractStateModel {
      * @param abstractStateId identifier to verify
      * @throws StateModelException
      */
-    private void checkStateId(String abstractStateId) throws StateModelException{
+    private void checkStateId(String abstractStateId) throws StateModelException {
         if (abstractStateId == null || abstractStateId.equals("")) {
             throw new InvalidStateIdException();
         }
@@ -303,8 +279,10 @@ public class AbstractStateModel {
      * @param event
      */
     private void emitEvent(StateModelEvent event) {
-        if (!emitEvents) return;
-        for (StateModelEventListener eventListener: eventListeners) {
+        if (!emitEvents) {
+            return;
+        }
+        for (StateModelEventListener eventListener : eventListeners) {
             eventListener.eventReceived(event);
         }
     }

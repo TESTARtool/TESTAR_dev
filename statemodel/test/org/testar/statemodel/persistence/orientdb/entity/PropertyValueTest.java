@@ -3,10 +3,11 @@ package org.testar.statemodel.persistence.orientdb.entity;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class PropertyValueTest {
 

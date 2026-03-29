@@ -1,5 +1,6 @@
 dependencies {
     implementation project(':core')
+    implementation project(':config')
     // Analysis web servlet 
     implementation group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.30.v20200611'
     implementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.30.v20200611'

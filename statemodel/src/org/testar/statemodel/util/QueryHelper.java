@@ -1,3 +1,9 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2018-2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018-2026 Universitat Politecnica de Valencia - www.upv.es
+ */
+
 package org.testar.statemodel.util;
 
 import java.util.regex.Matcher;
@@ -9,7 +15,7 @@ import java.util.regex.Pattern;
 public class QueryHelper {
     /**
      * Method used for parsing simple count queries (see usages).
-     * TODO: Could be made more generic in the future to support more data types.
+     * 
      * @param output Output of the query.
      * @param field Name of the output field to parse.
      * @return Parsed query response.

@@ -7,7 +7,9 @@ import org.testar.statemodel.exceptions.ActionNotFoundException;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class AbstractStateTest {
 

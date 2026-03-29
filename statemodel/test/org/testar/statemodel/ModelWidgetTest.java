@@ -2,19 +2,21 @@ package org.testar.statemodel;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.testar.monkey.alayer.Action;
-import org.testar.monkey.alayer.Rect;
-import org.testar.monkey.alayer.Shape;
-import org.testar.monkey.alayer.Tag;
-import org.testar.monkey.alayer.Tags;
-import org.testar.monkey.alayer.Widget;
-import org.testar.monkey.alayer.actions.PasteText;
+import org.testar.core.action.Action;
+import org.testar.core.alayer.Rect;
+import org.testar.core.alayer.Shape;
+import org.testar.core.tag.Tag;
+import org.testar.core.tag.Tags;
+import org.testar.core.state.Widget;
+import org.testar.core.action.PasteText;
 import org.testar.stub.WidgetStub;
 
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ModelWidgetTest {
 
@@ -44,7 +46,7 @@ public class ModelWidgetTest {
     public void testAddBooleanAttribute() {
         Tag<Boolean> booleanTag = Tags.Enabled;
         modelWidget.addAttribute(booleanTag, false);
-        assertEquals(false, modelWidget.getAttributes().get(booleanTag));
+        assertEquals(Boolean.FALSE, modelWidget.getAttributes().get(booleanTag));
     }
 
     @Test

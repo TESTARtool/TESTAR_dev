@@ -1,54 +1,21 @@
-/***************************************************************************************************
- *
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2025 Universitat Politecnica de Valencia - www.upv.es
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the copyright holder nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *******************************************************************************************************/
-
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2018-2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018-2026 Universitat Politecnica de Valencia - www.upv.es
+ */
 package org.testar.statemodel.persistence.orientdb.entity;
-
 import com.orientechnologies.orient.core.metadata.schema.OType;
-
 import java.util.HashMap;
 import java.util.Map;
-
-
 public class EntityClassFactory {
-
-    public enum EntityClassName {AbstractState, AbstractAction, AbstractStateModel, Widget, ConcreteState, ConcreteAction, isParentOf, isChildOf, isAbstractedBy,
-        BlackHole, UnvisitedAbstractAction, TestSequence, SequenceNode, SequenceStep, Accessed, FirstNode}
-
+    public enum EntityClassName { AbstractState, AbstractAction, AbstractStateModel, Widget, ConcreteState, ConcreteAction, isParentOf, isChildOf, isAbstractedBy,
+        BlackHole, UnvisitedAbstractAction, TestSequence, SequenceNode, SequenceStep, Accessed, FirstNode }
     // a repo for generated classes, so we don't execute the same generation code over and over if not needed
     private static Map<EntityClassName, EntityClass> entityClasses = new HashMap<>();
-
     // mapping for the internal orientdb classname to our enum
     // we do not want the rest of our program to use the classNames directly, but want to be able
     // to look up the enum values when going from orientdb to the state model
     private static Map<String, EntityClassName> classNameMap;
-
     static {
         classNameMap = new HashMap<>();
         classNameMap.put("AbstractState", EntityClassName.AbstractState);
@@ -68,7 +35,6 @@ public class EntityClassFactory {
         classNameMap.put("Accessed", EntityClassName.Accessed);
         classNameMap.put("FirstNode", EntityClassName.FirstNode);
     }
-
     /**
      * This method will return an EntityClassName if it exists.
      * @param className
@@ -77,7 +43,6 @@ public class EntityClassFactory {
     public static EntityClassName getEntityClassName(String className) {
         return classNameMap.get(className);
     }
-
     /**
      * This method generates an EntityClass.
      * @param className
@@ -87,61 +52,43 @@ public class EntityClassFactory {
         if (entityClasses.containsKey(className)) {
             return entityClasses.get(className);
         }
-
         switch (className) {
             case AbstractState:
                 return createAbstractStateClass();
-
             case AbstractAction:
                 return createAbstractActionClass();
-
             case AbstractStateModel:
                 return createAbstractStateModelClass();
-
             case ConcreteState:
                 return createConcreteStateClass();
-
             case ConcreteAction:
                 return createConcreteActionClass();
-
             case Widget:
                 return createWidgetClass();
-
             case isParentOf:
                 return createIsParentOfClass();
-
             case isChildOf:
                 return createIsChildOfClass();
-
             case isAbstractedBy:
                 return createIsAbstractedByClass();
-
             case BlackHole:
                 return createBlackHoleClass();
-                
             case UnvisitedAbstractAction:
                 return createUnvisitedAbstractActionClass();
-
             case TestSequence:
                 return createTestSequenceClass();
-
             case SequenceNode:
                 return createSequenceNodeClass();
-
             case SequenceStep:
                 return createSequenceStepClass();
-
             case Accessed:
                 return createAccessedClass();
-
             case FirstNode:
                 return createFirstNodeClass();
-
             default:
                 return null;
         }
     }
-
     private static EntityClass createAbstractStateClass() {
         EntityClass abstractStateClass = new EntityClass("AbstractState", EntityClass.EntityType.Vertex);
         Property uniqueId = new Property("uid", OType.STRING);
@@ -175,7 +122,6 @@ public class EntityClassFactory {
         entityClasses.put(EntityClassName.AbstractState, abstractStateClass);
         return abstractStateClass;
     }
-
     private static EntityClass createAbstractActionClass() {
         EntityClass abstractActionClass = new EntityClass("AbstractAction", EntityClass.EntityType.Edge);
         Property uniqueId = new Property("uid", OType.STRING);
@@ -206,7 +152,6 @@ public class EntityClassFactory {
         entityClasses.put(EntityClassName.AbstractAction, abstractActionClass);
         return abstractActionClass;
     }
-
     private static EntityClass createAbstractStateModelClass() {
         EntityClass abstractStateModelClass = new EntityClass("AbstractStateModel", EntityClass.EntityType.Vertex);
         Property id = new Property("modelIdentifier", OType.STRING);
@@ -232,7 +177,6 @@ public class EntityClassFactory {
         entityClasses.put(EntityClassName.AbstractStateModel, abstractStateModelClass);
         return abstractStateModelClass;
     }
-
     private static EntityClass createConcreteStateClass() {
         EntityClass concreteStateClass = new EntityClass("ConcreteState", EntityClass.EntityType.Vertex);
         Property uniqueId = new Property("uid", OType.STRING);
@@ -267,7 +211,6 @@ public class EntityClassFactory {
         entityClasses.put(EntityClassName.ConcreteState, concreteStateClass);
         return concreteStateClass;
     }
-
     private static EntityClass createConcreteActionClass() {
         EntityClass concreteActionClass = new EntityClass("ConcreteAction", EntityClass.EntityType.Edge);
         Property uniqueId = new Property("uid", OType.STRING);
@@ -289,7 +232,6 @@ public class EntityClassFactory {
         entityClasses.put(EntityClassName.ConcreteAction, concreteActionClass);
         return concreteActionClass;
     }
-
     private static EntityClass createWidgetClass() {
         EntityClass widgetClass = new EntityClass("Widget", EntityClass.EntityType.Vertex);
         Property widgetId = new Property("widgetId", OType.STRING);
@@ -306,7 +248,6 @@ public class EntityClassFactory {
         entityClasses.put(EntityClassName.Widget, widgetClass);
         return widgetClass;
     }
-
     private static EntityClass createIsParentOfClass() {
         EntityClass parentClass = new EntityClass("isParentOf", EntityClass.EntityType.Edge);
         Property edgeId = new Property("parentEdgeId", OType.STRING);
@@ -323,7 +264,6 @@ public class EntityClassFactory {
         entityClasses.put(EntityClassName.isParentOf, parentClass);
         return parentClass;
     }
-
     private static EntityClass createIsChildOfClass() {
         EntityClass childClass = new EntityClass("isChildOf", EntityClass.EntityType.Edge);
         Property edgeId = new Property("childEdgeId", OType.STRING);
@@ -340,7 +280,6 @@ public class EntityClassFactory {
         entityClasses.put(EntityClassName.isChildOf, childClass);
         return childClass;
     }
-
     private static EntityClass createIsAbstractedByClass() {
         EntityClass entityClass = new EntityClass("isAbstractedBy", EntityClass.EntityType.Edge);
         Property edgeId = new Property("abstractedByEdgeId", OType.STRING);
@@ -357,7 +296,6 @@ public class EntityClassFactory {
         entityClasses.put(EntityClassName.isAbstractedBy, entityClass);
         return entityClass;
     }
-
     private static EntityClass createAccessedClass() {
         EntityClass entityClass = new EntityClass("Accessed", EntityClass.EntityType.Edge);
         Property accessId = new Property("accessId", OType.STRING);
@@ -374,7 +312,6 @@ public class EntityClassFactory {
         entityClasses.put(EntityClassName.Accessed, entityClass);
         return entityClass;
     }
-
     private static EntityClass createBlackHoleClass() {
         EntityClass entityClass = new EntityClass("BlackHole", EntityClass.EntityType.Vertex);
         Property blackHoleId = new Property("blackHoleId", OType.STRING);
@@ -386,7 +323,6 @@ public class EntityClassFactory {
         entityClasses.put(EntityClassName.BlackHole, entityClass);
         return entityClass;
     }
-
     private static EntityClass createUnvisitedAbstractActionClass() {
         EntityClass entityClass = new EntityClass("UnvisitedAbstractAction", EntityClass.EntityType.Edge);
         Property uniqueId = new Property("uid", OType.STRING);
@@ -412,7 +348,6 @@ public class EntityClassFactory {
         entityClasses.put(EntityClassName.UnvisitedAbstractAction, entityClass);
         return entityClass;
     }
-
     private static EntityClass createTestSequenceClass() {
         EntityClass entityClass = new EntityClass("TestSequence", EntityClass.EntityType.Vertex);
         Property identifier = new Property("sequenceId", OType.STRING);
@@ -450,7 +385,6 @@ public class EntityClassFactory {
         entityClasses.put(EntityClassName.TestSequence, entityClass);
         return entityClass;
     }
-
     private static EntityClass createSequenceNodeClass() {
         EntityClass entityClass = new EntityClass("SequenceNode", EntityClass.EntityType.Vertex);
         Property identifier = new Property("nodeId", OType.STRING);
@@ -501,7 +435,6 @@ public class EntityClassFactory {
         entityClasses.put(EntityClassName.SequenceNode, entityClass);
         return entityClass;
     }
-
     private static EntityClass createSequenceStepClass() {
         EntityClass entityClass = new EntityClass("SequenceStep", EntityClass.EntityType.Edge);
         Property identifier = new Property("stepId", OType.STRING);
@@ -547,7 +480,6 @@ public class EntityClassFactory {
         entityClasses.put(EntityClassName.SequenceStep, entityClass);
         return entityClass;
     }
-
     private static EntityClass createFirstNodeClass() {
         EntityClass entityClass = new EntityClass("FirstNode", EntityClass.EntityType.Edge);
         Property edgeId = new Property("firstNodeId", OType.STRING);
@@ -564,5 +496,4 @@ public class EntityClassFactory {
         entityClasses.put(EntityClassName.FirstNode, entityClass);
         return entityClass;
     }
-
 }
