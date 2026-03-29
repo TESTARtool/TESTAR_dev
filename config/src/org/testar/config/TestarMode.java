@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2026 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,12 +27,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
+package org.testar.config;
 
-package org.testar;
-
-public final class TestarInfo {
-
-	public static final String VERSION = "v3.0.1 (date-to-determine)";
-
-	private TestarInfo() {}
+public enum TestarMode {
+    Spy,
+    Generate,
+    Quit
 }
