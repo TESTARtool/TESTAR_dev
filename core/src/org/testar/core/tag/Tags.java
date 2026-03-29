@@ -189,6 +189,11 @@ public final class Tags extends TagsBase {
     public static final Tag<Double> StateRenderTime = from("StateRenderTime", Double.class);
 
     /**
+     * A link reference associated to the widget or state
+     */
+    public static final Tag<String> LinkReference = from("LinkReference", String.class);
+
+    /**
      * This method will return all the static tags that are available for use.
      * @return
      */
