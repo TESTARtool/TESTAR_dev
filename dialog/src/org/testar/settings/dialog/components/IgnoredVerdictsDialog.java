@@ -30,7 +30,7 @@
 
 package org.testar.settings.dialog.components;
 
-import org.testar.monkey.VerdictProcessing;
+import org.testar.verdict.VerdictProcessing;
 
 import javax.swing.JButton;
 import javax.swing.DefaultListModel;

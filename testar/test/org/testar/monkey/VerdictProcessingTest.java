@@ -17,6 +17,7 @@ import org.junit.rules.TemporaryFolder;
 import org.testar.TestarDirectories;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.settings.Settings;
+import org.testar.verdict.VerdictProcessing;
 
 public class VerdictProcessingTest {
 

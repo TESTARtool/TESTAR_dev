@@ -28,9 +28,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.monkey;
+package org.testar.verdict;
 
 import org.testar.TestarDirectories;
+import org.testar.monkey.ConfigTags;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.settings.Settings;
