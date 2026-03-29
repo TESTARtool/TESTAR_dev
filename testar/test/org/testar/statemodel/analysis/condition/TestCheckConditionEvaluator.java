@@ -1,4 +1,4 @@
-package org.testar.statemodel.analysis.condition;
+package org.testar.llm.condition;
 
 import org.junit.Test;
 import org.testar.monkey.Assert;

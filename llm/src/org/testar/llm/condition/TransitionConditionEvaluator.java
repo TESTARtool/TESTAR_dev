@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.statemodel.analysis.condition;
+package org.testar.llm.condition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.monkey.alayer.Tag;
-import org.testar.statemodel.analysis.condition.TestCondition.ConditionComparator;
+import org.testar.llm.condition.TestCondition.ConditionComparator;
 
 public class TransitionConditionEvaluator extends BasicConditionEvaluator {
 

@@ -48,9 +48,9 @@ import org.testar.monkey.Util;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.settings.Settings;
 import org.testar.statemodel.StateModelManagerFactory;
-import org.testar.statemodel.analysis.condition.BasicConditionEvaluator;
-import org.testar.statemodel.analysis.condition.ConditionEvaluator;
-import org.testar.statemodel.analysis.condition.TransitionConditionEvaluator;
+import org.testar.llm.condition.BasicConditionEvaluator;
+import org.testar.llm.condition.ConditionEvaluator;
+import org.testar.llm.condition.TransitionConditionEvaluator;
 import org.testar.statemodel.analysis.metric.LlmMetricsCollector;
 import org.testar.statemodel.analysis.metric.MetricsManager;
 

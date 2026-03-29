@@ -30,7 +30,7 @@
 
 package org.testar.llm;
 
-import org.testar.statemodel.analysis.condition.TestCondition;
+import org.testar.llm.condition.TestCondition;
 
 import java.util.List;
 

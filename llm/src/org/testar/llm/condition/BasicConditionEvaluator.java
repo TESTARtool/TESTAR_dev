@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.statemodel.analysis.condition;
+package org.testar.llm.condition;
 
 import org.testar.monkey.alayer.State;
 import org.testar.statemodel.StateModelManager;

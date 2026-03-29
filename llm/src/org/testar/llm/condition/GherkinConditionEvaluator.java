@@ -28,13 +28,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.statemodel.analysis.condition;
+package org.testar.llm.condition;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.monkey.alayer.Tag;
-import org.testar.statemodel.analysis.condition.TestCondition.ConditionComparator;
+import org.testar.llm.condition.TestCondition.ConditionComparator;
 
 /**
  * Gherkin condition evaluator that returns true when 'Then' conditions are met in a given state

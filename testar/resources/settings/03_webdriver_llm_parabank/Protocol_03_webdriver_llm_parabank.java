@@ -47,7 +47,7 @@ import org.testar.plugin.NativeLinker;
 import org.testar.monkey.ConfigTags;
 import org.testar.protocols.WebdriverProtocol;
 import org.testar.settings.Settings;
-import org.testar.statemodel.analysis.condition.BasicConditionEvaluator;
+import org.testar.llm.condition.BasicConditionEvaluator;
 import java.util.*;
 
 import static org.testar.monkey.alayer.Tags.Blocked;

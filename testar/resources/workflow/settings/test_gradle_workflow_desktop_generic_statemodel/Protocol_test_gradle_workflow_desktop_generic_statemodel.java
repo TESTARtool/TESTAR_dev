@@ -46,8 +46,8 @@ import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.protocols.DesktopProtocol;
-import org.testar.statemodel.analysis.condition.CheckConditionEvaluator;
-import org.testar.statemodel.analysis.condition.TransitionConditionEvaluator;
+import org.testar.llm.condition.CheckConditionEvaluator;
+import org.testar.llm.condition.TransitionConditionEvaluator;
 
 /**
  * This protocol is used to test TESTAR by executing a gradle CI workflow.

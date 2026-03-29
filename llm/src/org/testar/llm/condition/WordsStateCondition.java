@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.statemodel.analysis.condition;
+package org.testar.llm.condition;
 
 import org.openqa.selenium.InvalidArgumentException;
 import org.testar.statemodel.StateModelManager;

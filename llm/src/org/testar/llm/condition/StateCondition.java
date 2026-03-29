@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.statemodel.analysis.condition;
+package org.testar.llm.condition;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
