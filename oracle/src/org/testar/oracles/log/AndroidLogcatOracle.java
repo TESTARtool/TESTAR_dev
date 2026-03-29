@@ -33,7 +33,6 @@ package org.testar.oracles.log;
 import org.testar.core.execution.TestarMode;
 import org.testar.OutputStructure;
 import org.testar.monkey.ConfigTags;
-import org.testar.monkey.RuntimeControlsProtocol;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.android.AndroidAppiumFramework;

@@ -47,9 +47,9 @@ import org.testar.monkey.Util;
 import org.testar.core.execution.TestarMode;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.oracles.Oracle;
-import org.testar.oracles.OracleExecutionContext;
 import org.testar.settings.Settings;
 
 public class ProcessListenerOracle implements Oracle {
@@ -137,30 +137,28 @@ public class ProcessListenerOracle implements Oracle {
 	private Verdict checkStream(BufferedReader reader, String logSuffix, String streamLabel) throws IOException {
 		String line;
 		while ((line = reader.ready() ? reader.readLine() : null) != null) {
-			String actionId = OracleExecutionContext.getLastExecutedActionId();
-
 			Matcher oracleMatch = processOracles.matcher(line);
 			Matcher logMatch = processLogs.matcher(line);
 
 			if (oracleMatch.matches()) {
 				Verdict verdict = new Verdict(Verdict.Severity.SUSPICIOUS_PROCESS,
-						"Process Listener suspicious process: '" + line + "' on Action: '" + actionId + "'.");
-				logLine(line, logSuffix, actionId, streamLabel);
+						"Process Listener suspicious process: '" + line + "'.");
+				logLine(line, logSuffix, streamLabel);
 				return verdict;
 			} else if (logMatch.matches()) {
-				logLine(line, logSuffix, actionId, streamLabel);
+				logLine(line, logSuffix, streamLabel);
 			}
 		}
 		return Verdict.OK;
 	}
 
-	private void logLine(String line, String suffix, String actionId, String stream) {
+	private void logLine(String line, String suffix, String stream) {
 		String timestamp = Util.dateString(DATE_FORMAT);
 		String logFileName = logProcessListenerName + suffix;
 
 		try (PrintWriter writer = new PrintWriter(new FileWriter(logFileName, true))) {
 			System.out.println("SUT Log " + stream + ": " + line);
-			writer.println(timestamp + " on Action: " + actionId + " SUT " + stream + ": " + line);
+			writer.println(timestamp + " SUT " + stream + ": " + line);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
