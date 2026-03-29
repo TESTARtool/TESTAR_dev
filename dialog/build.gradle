@@ -1,6 +1,7 @@
 dependencies {
     implementation project(':core')
     implementation project(':config')
+    implementation project(':llm')
     implementation project(':oracle')
     implementation project(':statemodel')
     implementation project(':windows')

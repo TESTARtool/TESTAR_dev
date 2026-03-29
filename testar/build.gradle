@@ -91,6 +91,7 @@ dependencies {
     implementation project(':reporting')
     implementation project(':oracle')
     implementation project(':dialog')
+    implementation project(':llm')
     implementation project(':statemodel')
     implementation project(':webdriver')
     implementation project(':windows')

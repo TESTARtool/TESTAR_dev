@@ -1,0 +1,7 @@
+dependencies {
+    implementation project(':core')
+    implementation project(':statemodel')
+    implementation project(':webdriver')
+    implementation project(':android')
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+}
