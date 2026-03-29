@@ -28,28 +28,23 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.alayer;
 
-import java.util.Iterator;
+import java.io.Serializable;
 
 import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
+import org.testar.core.exceptions.PositionException;
 
-public class StateStub extends WidgetStub implements State {
+/**
+ * A position is a function that operates on a state and calculates a concrete point.
+ * For example: A position could calculate "The center of the Button with the title 'OK'".
+ * In order to do that, the position first needs to find the Button within the widget tree
+ * (i.e. the state). Then it will get the button's <code>Shape</code> tag and calculate
+ * the center position.
+ */
+public interface Position extends Serializable {
 
-    private static final long serialVersionUID = -2972642849689796355L;
+    Point apply(State state) throws PositionException;
 
-    public StateStub() {
-        setRoot(this);
-    }
-
-    public void setRoot(State root) {
-        super.setRoot(root);
-    }
-
-    @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
-    }
+    public void obscuredByChildFeature(boolean enable);
 }

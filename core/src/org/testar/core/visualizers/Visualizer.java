@@ -28,28 +28,57 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.visualizers;
 
-import java.util.Iterator;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
+import org.testar.core.Assert;
+import org.testar.core.alayer.Canvas;
+import org.testar.core.alayer.Pen;
+import org.testar.core.alayer.Rect;
+import org.testar.core.alayer.Shape;
+import org.testar.core.util.Util;
 
-public class StateStub extends WidgetStub implements State {
+public interface Visualizer extends Serializable {
 
-    private static final long serialVersionUID = -2972642849689796355L;
+    void run(State state, Canvas canvas, Pen pen);
 
-    public StateStub() {
-        setRoot(this);
+    default List<Shape> getShapes() {
+        return Arrays.asList(Rect.from(0, 0, 0, 0));
     }
 
-    public void setRoot(State root) {
-        super.setRoot(root);
-    }
+    static Visualizer join(Visualizer first, Visualizer second) {
+        if (first == second) {
+            return first;
+        }
+        if (first == Util.NullVisualizer) {
+            return second;
+        }
+        if (second == Util.NullVisualizer) {
+            return first;
+        }
 
-    @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
+        return new Visualizer() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void run(State state, Canvas canvas, Pen pen) {
+                Assert.notNull(state, canvas, pen);
+                first.run(state, canvas, pen);
+                second.run(state, canvas, pen);
+            }
+
+            @Override
+            public List<Shape> getShapes() {
+                ArrayList<Shape> merged = new ArrayList<>();
+                merged.addAll(first.getShapes());
+                merged.addAll(second.getShapes());
+                return merged;
+            }
+        };
     }
 }

@@ -28,28 +28,44 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core;
 
-import java.util.Iterator;
+public class Drag {
 
-import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
+    private final double fromX, fromY, toX, toY;
 
-public class StateStub extends WidgetStub implements State {
-
-    private static final long serialVersionUID = -2972642849689796355L;
-
-    public StateStub() {
-        setRoot(this);
+    public Drag(double fromX, double fromY, double toX, double toY) {
+        this.fromX = fromX;
+        this.fromY = fromY;
+        this.toX = toX;
+        this.toY = toY;
     }
 
-    public void setRoot(State root) {
-        super.setRoot(root);
+    public double getFromX() {
+        return fromX;
+    }
+
+    public double getFromY() {
+        return fromY;
+    }
+
+    public double getToX() {
+        return toX;
+    }
+
+    public double getToY() {
+        return toY;
     }
 
     @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Drag)) {
+            return false;
+        }
+        Drag other = (Drag) obj;
+        return Double.compare(fromX, other.fromX) == 0 &&
+                Double.compare(fromY, other.fromY) == 0 &&
+                Double.compare(toX, other.toX) == 0 &&
+                Double.compare(toY, other.toY) == 0;
     }
 }

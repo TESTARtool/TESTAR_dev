@@ -28,28 +28,54 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.action;
 
-import java.util.Iterator;
-
+import org.testar.core.alayer.Role;
+import org.testar.core.state.SUT;
 import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
+import org.testar.core.tag.TaggableBase;
+import org.testar.core.tag.Tags;
+import org.testar.core.util.Util;
 
-public class StateStub extends WidgetStub implements State {
+/**
+ * The 'No Operation' action.
+ */
+public class NOP extends TaggableBase implements Action {
 
-    private static final long serialVersionUID = -2972642849689796355L;
+    private static final long serialVersionUID = 8622084462407313716L;
 
-    public StateStub() {
-        setRoot(this);
+    public static final String NOP_ID = "No Operation";
+
+    public NOP() {
+        this.set(Tags.Desc, NOP_ID);
+        this.set(Tags.Role, ActionRoles.NOPAction);
     }
 
-    public void setRoot(State root) {
-        super.setRoot(root);
+    public void run(SUT system, State state, double duration) {
+        Util.pause(duration);
+    }
+
+    public String toString() {
+        return NOP_ID;
     }
 
     @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
+    public String toString(Role... discardParameters) {
+        return toString();
+    }
+
+    @Override
+    public String toShortString() {
+        Role r = get(Tags.Role, null);
+        if (r != null) {
+            return r.toString();
+        } else {
+            return toString();
+        }
+    }
+
+    @Override
+    public String toParametersString() {
+        return "";
     }
 }

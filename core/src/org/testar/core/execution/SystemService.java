@@ -28,28 +28,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.execution;
 
-import java.util.Iterator;
+import org.testar.core.exceptions.SystemStartException;
+import org.testar.core.state.SUT;
 
-import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
+public interface SystemService {
 
-public class StateStub extends WidgetStub implements State {
+    SUT startSystem() throws SystemStartException;
 
-    private static final long serialVersionUID = -2972642849689796355L;
-
-    public StateStub() {
-        setRoot(this);
-    }
-
-    public void setRoot(State root) {
-        super.setRoot(root);
-    }
-
-    @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
-    }
+    void stopSystem(SUT system);
 }

@@ -28,28 +28,36 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.environment;
 
-import java.util.Iterator;
+/**
+ * Provides access to the environment in which the application is running.
+ * This interface should be realized by an operating specific implementation. Since the core module is standalone module
+ * without dependencies towards other modules, we specific the interface in the core module so that we can
+ * use the IEnvironment within the core module. During the initialization phase of the application the realization of
+ * IEnvironment needs to be set. This construction creates an abstraction layer between the logic and the operating
+ * system on which the application is running.
+ */
+public class Environment {
 
-import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
+    private static IEnvironment instance;
 
-public class StateStub extends WidgetStub implements State {
-
-    private static final long serialVersionUID = -2972642849689796355L;
-
-    public StateStub() {
-        setRoot(this);
+    /**
+     * Get the environment interface.
+     * @return The environment interface or UnknownEnvironment.
+     */
+    public static IEnvironment getInstance() {
+        return (instance != null) ? instance : new UnknownEnvironment();
     }
 
-    public void setRoot(State root) {
-        super.setRoot(root);
-    }
-
-    @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
+    /**
+     * Sets the actual implementation of the interface.
+     * @param implementation The concrete implementation of the interface.
+     */
+    public static void setInstance(IEnvironment implementation) {
+        if (implementation == null) {
+            throw new IllegalArgumentException("Environment implementation cannot be set to null");
+        }
+        instance = implementation;
     }
 }

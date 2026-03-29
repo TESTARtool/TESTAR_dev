@@ -28,28 +28,39 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.util;
 
-import java.util.Iterator;
+import java.util.Objects;
 
 import org.testar.core.state.State;
+import org.testar.core.tag.Tags;
 import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
 
-public class StateStub extends WidgetStub implements State {
+public class IndexUtil {
 
-    private static final long serialVersionUID = -2972642849689796355L;
-
-    public StateStub() {
-        setRoot(this);
+    private IndexUtil() {
     }
 
-    public void setRoot(State root) {
-        super.setRoot(root);
-    }
-
-    @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
+    /**
+     * Calculate the max and the min ZIndex of all the widgets in a state
+     * 
+     * @param state
+     */
+    public static State calculateZIndices(State state) {
+        Objects.requireNonNull(state, "State cannot be null");
+        double minZIndex = Double.MAX_VALUE;
+        double maxZIndex = Double.MIN_VALUE;
+        for (Widget w : state) {
+            double zindex = w.get(Tags.ZIndex, 0.0).doubleValue();
+            if (zindex < minZIndex) {
+                minZIndex = zindex;
+            }
+            if (zindex > maxZIndex) {
+                maxZIndex = zindex;
+            }
+        }
+        state.set(Tags.MinZIndex, minZIndex);
+        state.set(Tags.MaxZIndex, maxZIndex);
+        return state;
     }
 }

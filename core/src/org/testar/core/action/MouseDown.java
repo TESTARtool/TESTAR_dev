@@ -28,28 +28,69 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.action;
 
-import java.util.Iterator;
-
+import org.testar.core.Assert;
+import org.testar.core.alayer.Role;
+import org.testar.core.devices.MouseButtons;
+import org.testar.core.exceptions.ActionFailedException;
+import org.testar.core.exceptions.NoSuchTagException;
+import org.testar.core.state.SUT;
 import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
+import org.testar.core.tag.TaggableBase;
+import org.testar.core.tag.Tags;
+import org.testar.core.util.Util;
 
-public class StateStub extends WidgetStub implements State {
+/**
+ * An action which presses a given Button on the StandardMouse of an SUT.
+ */
+public final class MouseDown extends TaggableBase implements Action {
 
-    private static final long serialVersionUID = -2972642849689796355L;
+    private static final long serialVersionUID = 259015065012204913L;
+    private final MouseButtons btn;
 
-    public StateStub() {
-        setRoot(this);
+    public MouseDown(MouseButtons btn) {
+        Assert.notNull(btn);
+        this.btn = btn;
     }
 
-    public void setRoot(State root) {
-        super.setRoot(root);
+    public String toString() {
+        return "Press Mouse Button " + btn;
     }
 
     @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
+    public String toString(Role... discardParameters) {
+        for (Role r : discardParameters) {
+            if (r.name().equals(ActionRoles.MouseDown.name())) {
+                return "Mouse button pressed";
+            }
+        }
+        return toString();
+    }
+
+    public void run(SUT system, State state, double duration) {
+        try {
+            Assert.notNull(system);
+            Util.pause(duration);
+            system.get(Tags.StandardMouse).press(btn);
+        } catch (NoSuchTagException tue) {
+            throw new ActionFailedException(tue);
+        }
+    }
+
+    @Override
+    public String toShortString() {
+        Role r = get(Tags.Role, null);
+        if (r != null) {
+            return r.toString();
+        } else {
+            return toString();
+        }
+    }
+
+    @Override
+    public String toParametersString() {
+        //return "(" + btn.toString() + ")";
+        return "";
     }
 }

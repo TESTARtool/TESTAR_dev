@@ -28,28 +28,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.devices;
 
-import java.util.Iterator;
+public enum MouseButtons {
 
-import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
+    BUTTON1(16), BUTTON2(8), BUTTON3(4);
 
-public class StateStub extends WidgetStub implements State {
+    private final int code;
 
-    private static final long serialVersionUID = -2972642849689796355L;
-
-    public StateStub() {
-        setRoot(this);
+    private MouseButtons(int code) {
+        this.code = code;
     }
 
-    public void setRoot(State root) {
-        super.setRoot(root);
-    }
-
-    @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
+    public int code() {
+        return code;
     }
 }

@@ -28,28 +28,29 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.alayer;
 
-import java.util.Iterator;
-
+import org.testar.core.Assert;
 import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
 
-public class StateStub extends WidgetStub implements State {
+public final class AbsolutePosition extends AbstractPosition {
+    private static final long serialVersionUID = -6784500620656208720L;
+    private final Point p;
 
-    private static final long serialVersionUID = -2972642849689796355L;
-
-    public StateStub() {
-        setRoot(this);
+    public AbsolutePosition(double x, double y) {
+        p = Point.from(x, y);
     }
 
-    public void setRoot(State root) {
-        super.setRoot(root);
+    public AbsolutePosition(Point point) {
+        Assert.notNull(point);
+        p = point;
     }
 
-    @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
+    public Point apply(State state) {
+        return p;
+    }
+
+    public String toString() {
+        return p.toString();
     }
 }

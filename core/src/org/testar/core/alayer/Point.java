@@ -28,28 +28,70 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.alayer;
 
-import java.util.Iterator;
+import org.testar.core.Assert;
 
-import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
+public final class Point implements Shape {
 
-public class StateStub extends WidgetStub implements State {
+    private static final long serialVersionUID = -8319702986528318327L;
 
-    private static final long serialVersionUID = -2972642849689796355L;
+    private final double x, y;
 
-    public StateStub() {
-        setRoot(this);
+    public static Point from(double x, double y) {
+        return new Point(x, y);
     }
 
-    public void setRoot(State root) {
-        super.setRoot(root);
+    private Point(double x, double y) {
+        this.x = x;
+        this.y = y;
     }
 
-    @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
+    public double x() {
+        return x;
+    }
+
+    public double y() {
+        return y;
+    }
+
+    public double width() {
+        return 0;
+    }
+
+    public double height() {
+        return 0;
+    }
+
+    public boolean contains(double x, double y) {
+        return this.x == x && this.y == y;
+    }
+
+    public void paint(Canvas canvas, Pen pen) {
+        Assert.notNull(canvas, pen);
+        double d = canvas.defaultPen().strokeWidth();
+        canvas.ellipse(Pen.merge(pen, Pen.PEN_FILL), x - d * 0.5, y - d * 0.5, d, d);
+    }
+
+    public String toString() {
+        return "(" + x + ", " + y + ")";
+    }
+
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o instanceof Point) {
+            Point po = (Point) o;
+            return x == po.x && y == po.y;
+        }
+        return false;
+    }
+
+    public int hashCode() {
+        long ret = Double.doubleToLongBits(x);
+        ret ^= Double.doubleToLongBits(y) * 31;
+        return (((int) ret) ^ ((int) (ret >> 32)));
     }
 }

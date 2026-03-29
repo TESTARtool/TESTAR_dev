@@ -28,28 +28,50 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.devices;
 
-import java.util.Iterator;
+import org.testar.core.alayer.Point;
 
-import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
+/**
+ *  Dummy Mouse for headless environments.
+ */
+public class DummyMouse implements Mouse {
 
-public class StateStub extends WidgetStub implements State {
-
-    private static final long serialVersionUID = -2972642849689796355L;
-
-    public StateStub() {
-        setRoot(this);
+    public static DummyMouse build() {
+        return new DummyMouse();
     }
 
-    public void setRoot(State root) {
-        super.setRoot(root);
+    private DummyMouse() {
+
     }
 
     @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
+    public void press(MouseButtons k) {
+
     }
+
+    @Override
+    public void release(MouseButtons k) {
+
+    }
+
+    @Override
+    public void setCursor(double x, double y) {
+
+    }
+
+    @Override
+    public Point cursor() {
+        return Point.from(0, 0);
+    }
+
+    @Override
+    public void setCursorDisplayScale(double displayScale) {
+
+    }
+
+    public String toString() {
+        return "Dummy Mouse";
+    }
+
 }

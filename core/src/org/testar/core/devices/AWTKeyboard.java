@@ -28,28 +28,46 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.devices;
 
-import java.util.Iterator;
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
 
-import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
+import org.testar.core.exceptions.FruitException;
 
-public class StateStub extends WidgetStub implements State {
+public final class AWTKeyboard implements Keyboard {
 
-    private static final long serialVersionUID = -2972642849689796355L;
-
-    public StateStub() {
-        setRoot(this);
+    public static AWTKeyboard build() throws FruitException {
+        return new AWTKeyboard();
     }
 
-    public void setRoot(State root) {
-        super.setRoot(root);
+    private final Robot robot;
+    
+    private AWTKeyboard() {
+        try {
+            robot = new Robot();
+        } catch (AWTException awte) {
+            throw new FruitException(awte);
+        }
+    }
+    
+    public String toString() {
+        return "AWT Keyboard";
     }
 
-    @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
+    public void press(KBKeys k) {
+        robot.keyPress(k.code());
+    }
+
+    public void release(KBKeys k) {
+        robot.keyRelease(k.code());
+    }
+
+    public void paste() {
+        robot.keyPress(KeyEvent.VK_CONTROL);
+        robot.keyPress(KeyEvent.VK_V);
+        robot.keyRelease(KeyEvent.VK_V);
+        robot.keyRelease(KeyEvent.VK_CONTROL);
     }
 }

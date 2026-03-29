@@ -28,28 +28,48 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.state;
 
-import java.util.Iterator;
+import java.io.Serializable;
 
-import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
+import org.testar.core.Drag;
+import org.testar.core.tag.Tag;
+import org.testar.core.tag.Taggable;
 
-public class StateStub extends WidgetStub implements State {
+/**
+ * A Widget is usually a control element of an <code>SUT</code>.
+ * Widgets have exactly one parent and can have several children.
+ * They are attached to a <code>State</code> and form a Widget Tree.
+ * In fact a <code>State</code> is a Widget itself and is the root
+ * of the Widget Tree.
+ * 
+ * @see State
+ */
+public interface Widget extends Taggable, Serializable {
 
-    private static final long serialVersionUID = -2972642849689796355L;
+    State root();
+    Widget parent();
+    Widget child(int i);
+    int childCount();
+    void remove();
+    void moveTo(Widget p, int idx);
+    Widget addChild();
 
-    public StateStub() {
-        setRoot(this);
-    }
+    /**
+     * For scrollable widgets, compute drag segments of scrolling options.
+     * @param scrollArrowSize The size of scrolling arrows.
+     * @param scrollThick The scroller thickness.
+     * @return 'null' for non-scrollable widgets or a set of drags, from (x1,y1) to (x2,y2), otherwise.
+     * @author: urueda
+     */
+    Drag[] scrollDrags(double scrollArrowSize, double scrollThick);
 
-    public void setRoot(State root) {
-        super.setRoot(root);
-    }
+    /**
+     * @param tab tabulator for indentation.
+     * @return Computes a string representation for the widget.
+     * @author urueda
+     */
+    public String getRepresentation(String tab);
 
-    @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
-    }
+    public abstract String toString(Tag<?>... tags);
 }

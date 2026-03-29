@@ -28,28 +28,54 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.visualizers;
 
 import java.util.Iterator;
+import java.util.function.Function;
 
+import org.testar.core.Assert;
+import org.testar.core.alayer.Canvas;
+import org.testar.core.alayer.Pen;
+import org.testar.core.alayer.Point;
+import org.testar.core.alayer.Position;
+import org.testar.core.alayer.SplineTrajectory;
 import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
+import org.testar.core.alayer.StrokeCaps;
+import org.testar.core.util.Util;
 
-public class StateStub extends WidgetStub implements State {
+public class TrajectoryVisualizer implements Visualizer {
 
-    private static final long serialVersionUID = -2972642849689796355L;
+    private static final long serialVersionUID = 1107281202398264314L;
+    final Function<State, Iterable<Point>> trajectory;
+    final Pen pen;
 
-    public StateStub() {
-        setRoot(this);
+    public TrajectoryVisualizer(Pen pen, Position... positions) {
+        this(new SplineTrajectory(10, positions), pen);
     }
-
-    public void setRoot(State root) {
-        super.setRoot(root);
+    
+    public TrajectoryVisualizer(Function<State, Iterable<Point>> trajectory, Pen pen) {
+        Assert.notNull(trajectory, pen);
+        Assert.isTrue(pen.strokeWidth() != null);
+        this.trajectory = trajectory;
+        this.pen = pen;
     }
-
-    @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
+    
+    public void run(State state, Canvas canvas, Pen pen) {
+        Assert.notNull(state, canvas, pen);
+        pen = Pen.merge(pen, this.pen);
+        Iterator<Point> iter = trajectory.apply(state).iterator();
+        Point last = iter.next();
+        
+        while (iter.hasNext()) {
+            Point current = iter.next();
+            
+            if (!iter.hasNext() && (pen.strokeCaps() == StrokeCaps._Arrow || pen.strokeCaps() == StrokeCaps.Arrow_)) {
+                Util.arrow(canvas, pen, last.x(), last.y(), current.x(), current.y(), 5 * pen.strokeWidth(), 5 * pen.strokeWidth());
+            } else {
+                canvas.line(pen, last.x(), last.y(), current.x(), current.y());
+            }
+            
+            last = current;
+        }
     }
 }

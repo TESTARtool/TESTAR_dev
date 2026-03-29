@@ -28,28 +28,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.alayer;
 
-import java.util.Iterator;
+import java.io.Serializable;
 
-import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
-
-public class StateStub extends WidgetStub implements State {
-
-    private static final long serialVersionUID = -2972642849689796355L;
-
-    public StateStub() {
-        setRoot(this);
-    }
-
-    public void setRoot(State root) {
-        super.setRoot(root);
-    }
-
-    @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
-    }
+public interface Image extends Serializable {
+    void paint(Canvas canvas, double x, double y, double width, double height);
+    void paint(Canvas canvas, Rect srcRect, Rect destRect);
+    double width();
+    double height();
 }

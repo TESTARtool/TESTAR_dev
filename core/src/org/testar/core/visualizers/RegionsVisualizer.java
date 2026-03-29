@@ -28,28 +28,46 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.visualizers;
 
-import java.util.Iterator;
+import java.util.List;
 
+import org.testar.core.Assert;
+import org.testar.core.alayer.Canvas;
+import org.testar.core.alayer.Pen;
+import org.testar.core.alayer.Shape;
 import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
 
-public class StateStub extends WidgetStub implements State {
+public final class RegionsVisualizer implements Visualizer {
+    private static final long serialVersionUID = 1L;
+    private final List<Shape> shapes;
+    private final String label;
+    private final double labelX, labelY;
+    private final Pen pen;
 
-    private static final long serialVersionUID = -2972642849689796355L;
-
-    public StateStub() {
-        setRoot(this);
-    }
-
-    public void setRoot(State root) {
-        super.setRoot(root);
+    public RegionsVisualizer(Pen pen, List<Shape> shapes, String label, double labelX, double labelY) {
+        Assert.notNull(shapes, pen);
+        this.shapes = shapes;
+        this.pen = pen;
+        this.label = label;
+        this.labelX = labelX;
+        this.labelY = labelY;
     }
 
     @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
+    public List<Shape> getShapes() {
+        return this.shapes;
+    }
+
+    public void run(State state, Canvas c, Pen pen) {
+        Assert.notNull(state, c, pen);
+        pen = Pen.merge(pen, this.pen);
+        
+        for (Shape shape : shapes) {
+            shape.paint(c, pen);
+            if (label != null) {
+                c.text(pen, shape.x() + shape.width() * labelX, shape.y() + shape.height() * labelY, 0, label);
+            }
+        }
     }
 }

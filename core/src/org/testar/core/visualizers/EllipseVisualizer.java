@@ -28,28 +28,38 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.visualizers;
 
-import java.util.Iterator;
-
+import org.testar.core.Assert;
+import org.testar.core.alayer.Canvas;
+import org.testar.core.alayer.Pen;
+import org.testar.core.alayer.Point;
+import org.testar.core.alayer.Position;
 import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
+import org.testar.core.exceptions.PositionException;
 
-public class StateStub extends WidgetStub implements State {
+public final class EllipseVisualizer implements Visualizer {
 
-    private static final long serialVersionUID = -2972642849689796355L;
-
-    public StateStub() {
-        setRoot(this);
+    private static final long serialVersionUID = -6006402344810634504L;
+    private final double width, height;
+    private final Pen pen;
+    private final Position position;
+    
+    public EllipseVisualizer(Position position, Pen pen, double width, double height) {
+        Assert.notNull(position, pen);
+        this.width = width;
+        this.height = height;
+        this.pen = pen;
+        this.position = position;
     }
-
-    public void setRoot(State root) {
-        super.setRoot(root);
-    }
-
-    @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
+    
+    public void run(State state, Canvas canvas, Pen pen) {
+        Assert.notNull(state, canvas, pen);
+        pen = Pen.merge(pen, this.pen);
+        try { // by urueda
+            Point p = position.apply(state);
+            canvas.ellipse(pen, p.x() - width * .5, p.y() - height * .5, width, height);
+        } catch (PositionException pe) {
+        }
     }
 }

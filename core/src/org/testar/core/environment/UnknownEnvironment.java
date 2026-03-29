@@ -28,28 +28,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.environment;
 
-import java.util.Iterator;
-
-import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
-
-public class StateStub extends WidgetStub implements State {
-
-    private static final long serialVersionUID = -2972642849689796355L;
-
-    public StateStub() {
-        setRoot(this);
-    }
-
-    public void setRoot(State root) {
-        super.setRoot(root);
-    }
+/**
+ * A default environment implementation. Can be used as fallback option when a OS specific environment implementation
+ * is missing.
+ * NOTE: This implementation prevents the application from crashing but doesn't guarantee correct behavior.
+ */
+public class UnknownEnvironment implements IEnvironment {
 
     @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
+    public double getDisplayScale(long windowHandle) {
+        return 1.0;
     }
 }

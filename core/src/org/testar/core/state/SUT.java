@@ -28,28 +28,61 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.state;
 
-import java.util.Iterator;
+import java.util.List;
 
-import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
+import org.testar.core.Pair;
+import org.testar.core.alayer.AutomationCache;
+import org.testar.core.exceptions.SystemStopException;
+import org.testar.core.tag.Taggable;
 
-public class StateStub extends WidgetStub implements State {
-
-    private static final long serialVersionUID = -2972642849689796355L;
-
-    public StateStub() {
-        setRoot(this);
-    }
-
-    public void setRoot(State root) {
-        super.setRoot(root);
-    }
-
-    @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
-    }
+/**
+ * An SUT is a System Under Test and can be a graphical application, a process, a collection of processes or
+ * even a collection of distributed services. A system is always in a specific <code>State</code>. <code>Action</code>'s
+ * operate on a system and its state.
+ * @see Action
+ * @see State
+ */
+public interface SUT extends Taggable {
+    
+    /**
+     * Stops execution of the system. Implementations should try to first shut down
+     * the system "gently" and gradually get more aggressive if that fails. If it is
+     * not possible to shutdown the system, implementors of this method are supposed to throw a
+     * <code>SystemStopException</code>.
+     * @throws SystemStopException if the system cannot be stopped
+     */
+    void stop() throws SystemStopException;
+    
+    /** Is the system running?
+     * @return returns whether the system is running
+     */
+    boolean isRunning();
+    
+    /**
+     * Retrieves a text representation of SUT status (i.e. CPU/memory usage).
+     * @return The status.
+     * @author urueda
+     */
+    String getStatus();
+    
+    /**
+     * Retrieves the running processes.
+     * @return A list of pairs &lt;PID,NAME&gt; with the PID/NAME of running processes.
+     * @author: urueda
+     */
+    List<Pair<Long, String>> getRunningProcesses();
+    
+    /**
+     * Sets a native automation cache.
+     * @author: urueda
+     */
+    void setNativeAutomationCache();
+    
+    /**
+     * Returns the native automation cache.
+     * @return
+     */
+    AutomationCache getNativeAutomationCache();
 }

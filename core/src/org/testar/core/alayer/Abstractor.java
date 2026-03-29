@@ -28,28 +28,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.alayer;
 
-import java.util.Iterator;
-
-import org.testar.core.state.State;
 import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
+import org.testar.core.exceptions.AbstractionException;
 
-public class StateStub extends WidgetStub implements State {
-
-    private static final long serialVersionUID = -2972642849689796355L;
-
-    public StateStub() {
-        setRoot(this);
-    }
-
-    public void setRoot(State root) {
-        super.setRoot(root);
-    }
-
-    @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
-    }
+/**
+ * An Abstractor takes a Widget and creates a <code>Finder</code> object, which can
+ * be used to find this widget in arbitrary <code>State</code>'s.
+ * @see Finder
+ */
+public interface Abstractor {
+    Finder apply(Widget widget) throws AbstractionException;
 }

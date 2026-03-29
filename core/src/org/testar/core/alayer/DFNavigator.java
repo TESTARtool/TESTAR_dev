@@ -28,28 +28,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.alayer;
 
-import java.util.Iterator;
+import java.util.LinkedList;
 
-import org.testar.core.state.State;
 import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
 
-public class StateStub extends WidgetStub implements State {
-
-    private static final long serialVersionUID = -2972642849689796355L;
-
-    public StateStub() {
-        setRoot(this);
-    }
-
-    public void setRoot(State root) {
-        super.setRoot(root);
-    }
-
+public class DFNavigator implements Navigator {
     @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
+    public void accept(LinkedList<Widget> buffer) {
+        Widget f = buffer.getFirst();
+        for (int i = f.childCount() - 1; i >= 0; i--) {
+            buffer.add(1, f.child(i));
+        }
     }
 }

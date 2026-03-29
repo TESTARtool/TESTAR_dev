@@ -28,28 +28,23 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.tag;
 
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
+public abstract class TagsBase {
 
-public class StateStub extends WidgetStub implements State {
+    protected static final Set<Tag<?>> tagSet = new HashSet<>();
 
-    private static final long serialVersionUID = -2972642849689796355L;
-
-    public StateStub() {
-        setRoot(this);
+    protected static <T> Tag<T> from(String name, Class<T> valueType) {
+        Tag<T> ret = Tag.from(name, valueType);
+        tagSet.add(ret);
+        return ret;
     }
 
-    public void setRoot(State root) {
-        super.setRoot(root);
-    }
-
-    @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
+    public static Set<Tag<?>> tagSet() {
+        return Collections.unmodifiableSet(tagSet);
     }
 }

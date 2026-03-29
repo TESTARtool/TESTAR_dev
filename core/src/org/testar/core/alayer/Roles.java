@@ -28,28 +28,33 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.alayer;
 
-import java.util.Iterator;
+public final class Roles {
 
-import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
-
-public class StateStub extends WidgetStub implements State {
-
-    private static final long serialVersionUID = -2972642849689796355L;
-
-    public StateStub() {
-        setRoot(this);
+    private Roles() {
     }
 
-    public void setRoot(State root) {
-        super.setRoot(root);
-    }
+    public static final Role
 
-    @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
-    }
+            Widget = Role.from("Widget"),
+            Invalid = Role.from("Invalid"),
+            Control = Role.from("Control", Widget),
+            Expander = Role.from("Expander", Control),
+            Hider = Role.from("Hider", Control),
+            Button = Role.from("Button", Control),
+            StateButton = Role.from("StateButton", Button),
+            ToggleButton = Role.from("ToggleButton", StateButton),
+            Item = Role.from("Item", Control),
+            ItemContainer = Role.from("ItemContainer", Control),
+            Text = Role.from("Text", Control),
+            Decoration = Role.from("Decoration", Control),
+            Slider = Role.from("Slider", Control),
+            Dialog = Role.from("Dialog", Control),
+            MessageBox = Role.from("MessageBox", Dialog),
+            DragSource = Role.from("DragSource", Control),
+            DropTarget = Role.from("DropTarget", Control),
+            SUT = Role.from("SUT"),
+            System = Role.from("System", Widget),
+            Process = Role.from("Process", System);
 }

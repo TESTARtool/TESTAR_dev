@@ -28,28 +28,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.exceptions;
 
-import java.util.Iterator;
+public class FruitException extends RuntimeException {
 
-import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
+    private static final long serialVersionUID = 8410136592237418299L;
 
-public class StateStub extends WidgetStub implements State {
-
-    private static final long serialVersionUID = -2972642849689796355L;
-
-    public StateStub() {
-        setRoot(this);
+    public FruitException(String message) {
+        this(message, null);
     }
 
-    public void setRoot(State root) {
-        super.setRoot(root);
+    public FruitException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
+    public FruitException(Throwable cause) {
+        super(cause);
     }
 }

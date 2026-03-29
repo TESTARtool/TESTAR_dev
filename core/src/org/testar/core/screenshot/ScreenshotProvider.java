@@ -28,28 +28,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.screenshot;
 
-import java.util.Iterator;
-
+import org.testar.core.alayer.AWTCanvas;
+import org.testar.core.action.Action;
 import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
 
-public class StateStub extends WidgetStub implements State {
+public interface ScreenshotProvider {
 
-    private static final long serialVersionUID = -2972642849689796355L;
+    AWTCanvas getStateshotBinary(State state);
 
-    public StateStub() {
-        setRoot(this);
-    }
+    String getActionshot(State state, Action action);
 
-    public void setRoot(State root) {
-        super.setRoot(root);
-    }
-
-    @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
-    }
 }

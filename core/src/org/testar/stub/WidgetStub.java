@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2013 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,14 +31,15 @@
 package org.testar.stub;
 
 import org.apache.commons.lang3.NotImplementedException;
-import org.testar.monkey.Assert;
-import org.testar.monkey.Drag;
-import org.testar.monkey.Util;
-import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.Tag;
-import org.testar.monkey.alayer.TaggableBase;
-import org.testar.monkey.alayer.Tags;
-import org.testar.monkey.alayer.Widget;
+import org.testar.core.Assert;
+import org.testar.core.Drag;
+import org.testar.core.state.State;
+import org.testar.core.tag.Tag;
+import org.testar.core.tag.TaggableBase;
+import org.testar.core.tag.Tags;
+import org.testar.core.state.Widget;
+import org.testar.core.util.Util;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -48,143 +49,144 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 public class WidgetStub extends TaggableBase implements Widget {
-	private static final long serialVersionUID = 1828072828801243863L;
 
-	Map<Tag<?>, Object> tags = Util.newHashMap();
+    private static final long serialVersionUID = 1828072828801243863L;
 
-	private final List<Widget> widgets = new ArrayList<>();
+    Map<Tag<?>, Object> tags = Util.newHashMap();
 
-	private Widget parent = null;
-	private State root = null;
+    private final List<Widget> widgets = new ArrayList<>();
 
-	@Override
-	public State root() {
-		if (root != null) {
-			return root;
-		}
-		if (parent != null) {
-			return parent.root();
-		}
-		if (this instanceof State) {
-			return (State) this;
-		}
-		return null;
-	}
+    private Widget parent = null;
+    private State root = null;
 
-	public void setRoot(State root) {
-		this.root = root;
-	}
+    @Override
+    public State root() {
+        if (root != null) {
+            return root;
+        }
+        if (parent != null) {
+            return parent.root();
+        }
+        if (this instanceof State) {
+            return (State) this;
+        }
+        return null;
+    }
 
-	@Override
-	public Widget parent() {
-		return parent;
-	}
-	public void setParent(Widget parent) {
-		this.parent = parent;
-	}
+    public void setRoot(State root) {
+        this.root = root;
+    }
 
-	@Override
-	public Widget child(int i) {
-		return widgets.get(i);
-	}
+    @Override
+    public Widget parent() {
+        return parent;
+    }
+    public void setParent(Widget parent) {
+        this.parent = parent;
+    }
 
-	@Override
-	public int childCount() {
-		return widgets.size();
-	}
+    @Override
+    public Widget child(int i) {
+        return widgets.get(i);
+    }
 
-	@Override
-	public void remove() {
-		throw new NotImplementedException("NotImplementedException");
-	}
+    @Override
+    public int childCount() {
+        return widgets.size();
+    }
 
-	@Override
-	public void moveTo(Widget p, int idx) {
-		throw new NotImplementedException("NotImplementedException");
-	}
+    @Override
+    public void remove() {
+        throw new NotImplementedException("NotImplementedException");
+    }
 
-	@Override
-	public Widget addChild() {
-		throw new NotImplementedException("NotImplementedException");
-	}
+    @Override
+    public void moveTo(Widget p, int idx) {
+        throw new NotImplementedException("NotImplementedException");
+    }
 
-	public Widget addChild(Widget widget) {
-		widgets.add(widget);
-		return this;
-	}
+    @Override
+    public Widget addChild() {
+        throw new NotImplementedException("NotImplementedException");
+    }
 
-	@Override
-	public Drag[] scrollDrags(double scrollArrowSize, double scrollThick) {
-		throw new NotImplementedException("NotImplementedException");
-	}
+    public Widget addChild(Widget widget) {
+        widgets.add(widget);
+        return this;
+    }
 
-	@Override
-	public String getRepresentation(String tab){
-		StringBuffer repr = new StringBuffer();
-		repr.append(tab + "WIDGET = " + this.get(Tags.ConcreteID) + ", " +
-				this.get(Tags.Abstract_R_ID) + ", " +
-				this.get(Tags.Abstract_R_T_ID) + ", " +
-				this.get(Tags.Abstract_R_T_P_ID) + "\n");
-		return repr.toString();
-	}
+    @Override
+    public Drag[] scrollDrags(double scrollArrowSize, double scrollThick) {
+        throw new NotImplementedException("NotImplementedException");
+    }
 
-	@Override
-	public String toString(Tag<?>... tags){
-		return Util.widgetDesc(this, tags);
-	}
+    @Override
+    public String getRepresentation(String tab) {
+        StringBuffer repr = new StringBuffer();
+        repr.append(tab + "WIDGET = " + this.get(Tags.ConcreteID) + ", " +
+                this.get(Tags.Abstract_R_ID) + ", " +
+                this.get(Tags.Abstract_R_T_ID) + ", " +
+                this.get(Tags.Abstract_R_T_P_ID) + "\n");
+        return repr.toString();
+    }
 
-	@Override
-	public void remove(Tag<?> tag) {
-		throw new NotImplementedException("NotImplementedException");
-	}
+    @Override
+    public String toString(Tag<?>... tags) {
+        return Util.widgetDesc(this, tags);
+    }
 
-	Iterable<Tag<?>> tags(final Widget w) {
-		Assert.notNull(w);
+    @Override
+    public void remove(Tag<?> tag) {
+        throw new NotImplementedException("NotImplementedException");
+    }
 
-		final Set<Tag<?>> queryTags = new HashSet<Tag<?>>();
-		queryTags.addAll(tags.keySet());
-		queryTags.addAll(Tags.tagSet());
+    Iterable<Tag<?>> tags(final Widget w) {
+        Assert.notNull(w);
 
-		Iterable<Tag<?>> ret = new Iterable<Tag<?>>() {
-			public Iterator<Tag<?>> iterator() {
-				return new Iterator<Tag<?>>() {
-					Iterator<Tag<?>> i = queryTags.iterator();
-					Widget target = w;
-					Tag<?> next;
+        final Set<Tag<?>> queryTags = new HashSet<Tag<?>>();
+        queryTags.addAll(tags.keySet());
+        queryTags.addAll(Tags.tagSet());
 
-					private Tag<?> fetchNext() {
-						if (next == null) {
-							while (i.hasNext()) {
-								next = i.next();
-								if (target.get(next, null) != null) {
-									return next;
-								}
-							}
-							next = null;
-						}
-						return next;
-					}
+        Iterable<Tag<?>> ret = new Iterable<Tag<?>>() {
+            public Iterator<Tag<?>> iterator() {
+                return new Iterator<Tag<?>>() {
+                    Iterator<Tag<?>> i = queryTags.iterator();
+                    Widget target = w;
+                    Tag<?> next;
 
-					public boolean hasNext() {
-						return fetchNext() != null;
-					}
+                    private Tag<?> fetchNext() {
+                        if (next == null) {
+                            while (i.hasNext()) {
+                                next = i.next();
+                                if (target.get(next, null) != null) {
+                                    return next;
+                                }
+                            }
+                            next = null;
+                        }
+                        return next;
+                    }
 
-					public Tag<?> next() {
-						Tag<?> ret = fetchNext();
-						if (ret == null) {
-							throw new NoSuchElementException();
-						}
-						next = null;
-						return ret;
-					}
+                    public boolean hasNext() {
+                        return fetchNext() != null;
+                    }
 
-					public void remove() {
-						throw new UnsupportedOperationException();
-					}
-				};
-			}
-		};
-		return ret;
-	}
+                    public Tag<?> next() {
+                        Tag<?> ret = fetchNext();
+                        if (ret == null) {
+                            throw new NoSuchElementException();
+                        }
+                        next = null;
+                        return ret;
+                    }
+
+                    public void remove() {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+            }
+        };
+        return ret;
+    }
 
 }

@@ -28,28 +28,45 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.state;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 
-import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
+import org.testar.core.Assert;
+import org.testar.core.alayer.BFNavigator;
+import org.testar.core.alayer.Navigator;
 
-public class StateStub extends WidgetStub implements State {
+public final class WidgetIterator implements Iterator<Widget> {
 
-    private static final long serialVersionUID = -2972642849689796355L;
+    private final LinkedList<Widget> buffer;
+    private final Navigator navi;
 
-    public StateStub() {
-        setRoot(this);
+    public WidgetIterator(Widget start) {
+        this(start, new BFNavigator());
     }
 
-    public void setRoot(State root) {
-        super.setRoot(root);
+    public WidgetIterator(Widget start, Navigator navi) {
+        Assert.notNull(start, navi);
+        this.buffer = new LinkedList<Widget>();
+        this.navi = navi;
+        this.buffer.add(start);
+        this.navi.accept(this.buffer);
     }
 
-    @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
+    public boolean hasNext() {
+        return !buffer.isEmpty();
+    }
+
+    public Widget next() {
+        Widget ret = buffer.remove();
+        if (!buffer.isEmpty()) {
+            navi.accept(buffer);
+        }
+        return ret;
+    }
+
+    public void remove() {
+        throw new UnsupportedOperationException();
     }
 }

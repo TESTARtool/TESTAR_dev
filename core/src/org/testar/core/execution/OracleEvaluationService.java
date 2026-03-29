@@ -28,28 +28,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.execution;
 
-import java.util.Iterator;
+import java.util.List;
 
 import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
+import org.testar.core.verdict.Verdict;
 
-public class StateStub extends WidgetStub implements State {
+public interface OracleEvaluationService {
 
-    private static final long serialVersionUID = -2972642849689796355L;
+    List<Verdict> getVerdicts(State state);
 
-    public StateStub() {
-        setRoot(this);
-    }
-
-    public void setRoot(State root) {
-        super.setRoot(root);
-    }
-
-    @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
-    }
+    void addVerdict(State state, Verdict verdict);
 }

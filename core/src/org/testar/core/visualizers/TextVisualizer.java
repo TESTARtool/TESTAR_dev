@@ -28,28 +28,57 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.visualizers;
 
-import java.util.Iterator;
-
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.testar.core.Assert;
+import org.testar.core.Pair;
+import org.testar.core.alayer.Canvas;
+import org.testar.core.alayer.Pen;
+import org.testar.core.alayer.Point;
+import org.testar.core.alayer.Position;
 import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
+import org.testar.core.exceptions.PositionException;
 
-public class StateStub extends WidgetStub implements State {
+public final class TextVisualizer implements Visualizer {
 
-    private static final long serialVersionUID = -2972642849689796355L;
+    private static final long serialVersionUID = 9156304220974950751L;
 
-    public StateStub() {
-        setRoot(this);
+    protected static final Logger logger = LogManager.getLogger();
+
+    final Position pos;
+    final String text;
+    final Pen pen;
+
+    public TextVisualizer(Position pos, String text, Pen pen) {
+        Assert.notNull(pos, text, pen);
+        this.pos = pos;
+        this.text = text;
+        this.pen = pen;
+    }
+    
+    public String getText() {
+        return text;
+    }
+    
+    public TextVisualizer withText(String newText, Pen newPen) {
+        Assert.notNull(newText, newPen);
+        return new TextVisualizer(this.pos, newText, newPen);
     }
 
-    public void setRoot(State root) {
-        super.setRoot(root);
-    }
-
-    @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
+    public void run(State state, Canvas cv, Pen pen) {
+        Assert.notNull(state, cv, pen);
+        pen = Pen.merge(pen, this.pen);
+        try {
+            Point p = pos.apply(state);
+            Pair<Double, Double> m = cv.textMetrics(pen, text);
+            cv.text(pen, p.x() - m.left() / 2, p.y() - m.right() / 2, 0, text);
+        } catch (PositionException pe) {
+            logger.log(Level.ERROR, pe);
+        } catch (NullPointerException ne) {
+            logger.log(Level.ERROR, ne);
+        }
     }
 }

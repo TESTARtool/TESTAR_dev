@@ -28,28 +28,48 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package org.testar.stub;
+package org.testar.core.action;
 
-import java.util.Iterator;
+import org.testar.core.devices.KBKeys;
+import org.testar.core.alayer.Role;
+import org.testar.core.state.SUT;
+import org.testar.core.tag.Tags;
 
-import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.state.WidgetIterator;
+/**
+ * An action which releases a given Key on the Keyboard.
+ */
+public final class KeyUp extends KeyAction {
 
-public class StateStub extends WidgetStub implements State {
+    private static final long serialVersionUID = -7035337967443813849L;
 
-    private static final long serialVersionUID = -2972642849689796355L;
-
-    public StateStub() {
-        setRoot(this);
+    public KeyUp(KBKeys key) {
+        super(key);
     }
 
-    public void setRoot(State root) {
-        super.setRoot(root);
+    public String toString() {
+        return "Release Key " + key;
     }
 
     @Override
-    public Iterator<Widget> iterator() {
-        return new WidgetIterator(this);
+    public String toString(Role... discardParameters) {
+        for (Role r : discardParameters) {
+            if (r.name().equals(ActionRoles.KeyUp.name())) {
+                return "Key released";
+            }
+        }
+        return toString();
+    }
+
+    @Override
+    protected void performKeyAction(SUT system, KBKeys key) {
+        system.get(Tags.StandardKeyboard).release(key);
+    }
+
+    @Override
+    protected void altNumpad(SUT system, String numpadCodes) { }
+
+    @Override
+    public boolean equals(Object o) {
+        return o == this || (o instanceof KeyUp && this.key.equals(((KeyUp) o).key));
     }
 }
