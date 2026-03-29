@@ -1,6 +1,7 @@
 package org.testar.core.action;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.testar.core.devices.KBKeys;
 import org.junit.Test;
