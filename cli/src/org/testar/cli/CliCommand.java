@@ -8,7 +8,9 @@ package org.testar.cli;
 
 enum CliCommand {
     HELP,
+    DAEMON,
     START_SESSION,
+    SESSION_STATUS,
     GET_STATE,
     GET_DERIVED_ACTIONS,
     EXECUTE_ACTION,
@@ -18,8 +20,14 @@ enum CliCommand {
         if (token == null || token.isEmpty()) {
             return HELP;
         }
+        if ("daemon".equalsIgnoreCase(token)) {
+            return DAEMON;
+        }
         if ("startSession".equalsIgnoreCase(token)) {
             return START_SESSION;
+        }
+        if ("sessionStatus".equalsIgnoreCase(token)) {
+            return SESSION_STATUS;
         }
         if ("getState".equalsIgnoreCase(token)) {
             return GET_STATE;

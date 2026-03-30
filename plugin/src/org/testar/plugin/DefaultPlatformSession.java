@@ -1,0 +1,65 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2026 Open Universiteit - www.ou.nl
+ */
+
+package org.testar.plugin;
+
+import java.util.Set;
+
+import org.testar.core.Assert;
+import org.testar.core.action.Action;
+import org.testar.core.state.SUT;
+import org.testar.core.state.State;
+
+final class DefaultPlatformSession implements PlatformSession {
+
+    private final PlatformServices services;
+    private final SUT system;
+
+    DefaultPlatformSession(PlatformServices services, SUT system) {
+        this.services = Assert.notNull(services);
+        this.system = Assert.notNull(system);
+    }
+
+    @Override
+    public SUT system() {
+        return system;
+    }
+
+    @Override
+    public State getState() {
+        return services.stateService().getState(system);
+    }
+
+    @Override
+    public Set<Action> getDerivedActions() {
+        return services.actionDerivationService().deriveActions(system, getState());
+    }
+
+    @Override
+    public boolean executeAction(Action action) {
+        return services.actionExecutionService().executeAction(system, getState(), Assert.notNull(action));
+    }
+
+    @Override
+    public void stopSystem() {
+        services.systemService().stopSystem(system);
+    }
+
+    @Override
+    public void close() {
+        closeStateService();
+    }
+
+    private void closeStateService() {
+        if (services.stateService() instanceof AutoCloseable) {
+            try {
+                ((AutoCloseable) services.stateService()).close();
+            } catch (Exception exception) {
+                throw new IllegalStateException("Unable to close state service", exception);
+            }
+        }
+    }
+}

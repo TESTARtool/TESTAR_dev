@@ -22,6 +22,10 @@ final class CliRequest {
         this.arguments = Collections.unmodifiableList(Assert.notNull(arguments));
     }
 
+    static CliRequest of(CliCommand command, List<String> arguments) {
+        return new CliRequest(command, arguments);
+    }
+
     static CliRequest parse(String[] args) {
         if (args == null || args.length == 0) {
             return new CliRequest(CliCommand.HELP, Collections.emptyList());

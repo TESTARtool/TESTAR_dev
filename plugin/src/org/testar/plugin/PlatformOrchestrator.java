@@ -7,10 +7,14 @@
 package org.testar.plugin;
 
 import org.testar.core.execution.SystemService;
+import org.testar.engine.action.DesktopActionDerivationFactory;
 import org.testar.engine.action.DefaultActionExecutionService;
 import org.testar.engine.state.DefaultStateService;
 import org.testar.windows.service.WindowsStateService;
 import org.testar.windows.service.WindowsSystemService;
+import org.testar.windows.action.policy.WindowsClickablePolicy;
+import org.testar.windows.action.policy.WindowsScrollablePolicy;
+import org.testar.windows.action.policy.WindowsTypeablePolicy;
 
 /**
  * TESTAR platform/plugin orchestration
@@ -35,6 +39,11 @@ public final class PlatformOrchestrator {
                         "Unsupported operating system: " + sessionSpec.getOperatingSystem()
                 );
         }
+    }
+
+    public static PlatformSession openSession(PlatformSessionSpec sessionSpec) {
+        PlatformServices services = resolve(sessionSpec);
+        return new DefaultPlatformSession(services, services.systemService().startSystem());
     }
 
     private static PlatformServices windows(PlatformSessionSpec sessionSpec) {
@@ -71,7 +80,13 @@ public final class PlatformOrchestrator {
                                 sessionSpec.getSutProcesses()
                         )
                 ),
-                WindowsDesktopActionDerivationFactory.create(sessionSpec.getProcessesToKillDuringTest()),
+                DesktopActionDerivationFactory.create(
+                        new WindowsClickablePolicy(),
+                        new WindowsTypeablePolicy(),
+                        new WindowsScrollablePolicy(),
+                        sessionSpec.getProcessesToKillDuringTest(),
+                        widget -> "TESTAR"
+                ),
                 new DefaultActionExecutionService()
         );
     }

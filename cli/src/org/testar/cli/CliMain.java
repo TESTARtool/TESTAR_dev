@@ -13,7 +13,11 @@ public final class CliMain {
 
     public static void main(String[] args) {
         CliRequest request = CliRequest.parse(args);
-        CliRunner runner = new CliRunner(System.out);
+        if (request.getCommand() == CliCommand.DAEMON) {
+            new CliDaemonServer().run();
+            return;
+        }
+        CliRunner runner = new CliRunner(System.out, new CliDaemonClient());
         int exitCode = runner.run(request);
         if (exitCode != 0) {
             System.exit(exitCode);
