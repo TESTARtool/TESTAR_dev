@@ -9,11 +9,11 @@ INCLUDES= /I "$(JAVA_HOME)\include"\
 # DLLFILE="..\bin\org\testar\monkey\alayer\windows\windows.dll"
 
 # by urueda
-DLLFILE="..\bin\windows.dll"
+DLLFILE="..\target\resources\main\windows.dll"
 
-JAVA_CLASSFILE = "..\bin\org\testar\monkey\alayer\windows\Windows.class"
+JAVA_CLASSFILE = "..\target\classes\java\main\org\testar\windows\Windows.class"
 
-JAVA_CLASS = Windows
+JAVA_CLASS = org.testar.windows.Windows
 
 OBJFILES= main_w7.obj\
 # by ferpasri
@@ -27,7 +27,7 @@ CPPFLAGS= /EHsc /O2 /MD /w # /Wall
 all: windows.h $(DLLFILE)
 
 windows.h: $(JAVA_CLASSFILE)
-	javah -jni -force -o windows.h -classpath ..\bin $(JAVA_CLASS)
+	javah -jni -force -o windows.h -classpath ..\target\classes\java\main;..\..\core\target\classes\java\main $(JAVA_CLASS)
 
 $(OBJFILES): windows.h
 

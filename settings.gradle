@@ -1,2 +1,2 @@
-include 'core', 'config', 'reporting', 'oracle', 'dialog', 'llm', 'windows', 'testar', 'webdriver', 'android', 'statemodel'
+include 'core', 'config', 'reporting', 'oracle', 'dialog', 'llm', 'windows', 'plugin', 'cli', 'testar', 'webdriver', 'android', 'statemodel'
 

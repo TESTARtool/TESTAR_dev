@@ -1,0 +1,13 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+dependencies {
+    implementation project(':core')
+    implementation project(':config')
+    implementation project(':plugin')
+    implementation project(':windows')
+}
+
+application {
+    mainClass = 'org.testar.cli.CliMain'
+}

@@ -201,25 +201,4 @@ runTestar.dependsOn(installDist)
 runTestarDebug.dependsOn(installDist)
 customZipDistribution.dependsOn(installDist)
 
-/**
- * Build TESTAR using Visual Studio Tools to create a windows.dll
- */
-task windowsDistribution(dependsOn:['buildWindows','installDist','distZip']){
-	group = 'distribution'
-	description ='Build TESTAR distribution for Windows'
-}
-
-task buildWindows(type: Exec) {
-    if( System.getProperty('os.name').toLowerCase().contains('windows 7')) {
-        workingDir '../windows/native_src'
-        commandLine 'cmd', '/c', 'compile_w7.bat'
-    } else if( System.getProperty('os.name').toLowerCase().contains('windows')) {
-        workingDir '../windows/native_src'
-        commandLine 'cmd', '/c', 'compile_w10.bat'
-    } else  {
-        commandLine './dummy.sh'
-    }
-}
-buildWindows.dependsOn classes
-
 mainClassName='org.testar.monkey.Main'

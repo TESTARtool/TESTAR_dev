@@ -17,8 +17,8 @@ INCLUDES= /I "$(JAVA_HOME)\include"\
 
 DLLFILE="..\target\resources\main\windows.dll"
 
-JAVA_CLASSFILE = "..\target\classes\java\main\org\testar\monkey\alayer\windows\Windows.class"
-JAVA_SOURCE = "..\src\org\testar\monkey\alayer\windows\Windows.java"
+JAVA_CLASSFILE = "..\target\classes\java\main\org\testar\windows\Windows.class"
+JAVA_SOURCE = "..\src\org\testar\windows\Windows.java"
 
 OBJFILES= main_w10.obj\
 		  AccessBridgeCalls.obj
@@ -30,7 +30,7 @@ CPPFLAGS= /EHsc /O2 /MD /wd4311 /wd4312
 all: windows.h $(DLLFILE)
 
 windows.h: $(JAVA_CLASSFILE)
-     javac -h  tmp -classpath  .;..\target\classes\java\main\;..\..\core\target\classes\java\main  $(JAVA_SOURCE)
+     javac -h tmp -classpath .;..\target\classes\java\main\;..\..\core\target\classes\java\main $(JAVA_SOURCE)
      move tmp\*.h .
      rename org*.h windows.h
      RD /S /Q tmp

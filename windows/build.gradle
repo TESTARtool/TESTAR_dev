@@ -13,20 +13,36 @@ dependencies {
     implementation 'com.google.guava:guava:16+'
 }
 
+task buildWindows(type: Exec) {
+    group = 'build'
+    description = 'Build the Windows native library'
+    if (System.getProperty('os.name').toLowerCase().contains('windows 7')) {
+        workingDir 'native_src'
+        commandLine 'cmd', '/c', 'compile_w7.bat'
+    } else if (System.getProperty('os.name').toLowerCase().contains('windows')) {
+        workingDir 'native_src'
+        commandLine 'cmd', '/c', 'compile_w10.bat'
+    } else {
+        commandLine './dummy.sh'
+    }
+}
+buildWindows.dependsOn classes
+
+task windowsDistribution(dependsOn: ['buildWindows']) {
+    group = 'distribution'
+    description = 'Build the Windows native distribution artifacts'
+}
+
 task cleanWindows(type: Exec) {
 	group = 'build'
 	description ='Clean the files created by windowsDistribution task'
     if( System.getProperty('os.name').toLowerCase().contains('windows 7')) {
-        workingDir '../windows/native_src'
+        workingDir 'native_src'
         commandLine 'cmd', '/c', 'clean_w7.bat'
     } else if( System.getProperty('os.name').toLowerCase().contains('windows')) {
-        workingDir '../windows/native_src'
+        workingDir 'native_src'
         commandLine 'cmd', '/c', 'clean_w10.bat'
     } else  {
         commandLine './dummy.sh'
     }
 }
-
-//jar.dependsOn buildWindows
-//clean.dependsOn cleanWindows
-
