@@ -26,6 +26,7 @@ public final class PlatformSessionSpec {
     private final String target;
     private final boolean processListenerEnabled;
     private final String sutProcesses;
+    private final String processesToKillDuringTest;
     private final double stateTimeoutSeconds;
     private final boolean accessBridgeEnabled;
 
@@ -35,6 +36,7 @@ public final class PlatformSessionSpec {
         this.target = Assert.notNull(builder.target);
         this.processListenerEnabled = builder.processListenerEnabled;
         this.sutProcesses = builder.sutProcesses;
+        this.processesToKillDuringTest = builder.processesToKillDuringTest;
         this.stateTimeoutSeconds = builder.stateTimeoutSeconds;
         this.accessBridgeEnabled = builder.accessBridgeEnabled;
     }
@@ -59,6 +61,10 @@ public final class PlatformSessionSpec {
         return sutProcesses;
     }
 
+    public String getProcessesToKillDuringTest() {
+        return processesToKillDuringTest;
+    }
+
     public double getStateTimeoutSeconds() {
         return stateTimeoutSeconds;
     }
@@ -78,6 +84,7 @@ public final class PlatformSessionSpec {
         private final String target;
         private boolean processListenerEnabled;
         private String sutProcesses = "";
+        private String processesToKillDuringTest = "";
         private double stateTimeoutSeconds = 10.0;
         private boolean accessBridgeEnabled;
 
@@ -94,6 +101,11 @@ public final class PlatformSessionSpec {
 
         public Builder withSutProcesses(String sutProcesses) {
             this.sutProcesses = sutProcesses == null ? "" : sutProcesses;
+            return this;
+        }
+
+        public Builder withProcessesToKillDuringTest(String processesToKillDuringTest) {
+            this.processesToKillDuringTest = processesToKillDuringTest == null ? "" : processesToKillDuringTest;
             return this;
         }
 

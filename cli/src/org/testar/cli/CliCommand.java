@@ -10,7 +10,9 @@ enum CliCommand {
     HELP,
     START_SESSION,
     GET_STATE,
-    STOP_SESSION;
+    GET_DERIVED_ACTIONS,
+    EXECUTE_ACTION,
+    STOP_SYSTEM;
 
     static CliCommand fromToken(String token) {
         if (token == null || token.isEmpty()) {
@@ -22,8 +24,14 @@ enum CliCommand {
         if ("getState".equalsIgnoreCase(token)) {
             return GET_STATE;
         }
-        if ("stopSession".equalsIgnoreCase(token)) {
-            return STOP_SESSION;
+        if ("getDerivedActions".equalsIgnoreCase(token)) {
+            return GET_DERIVED_ACTIONS;
+        }
+        if ("executeAction".equalsIgnoreCase(token)) {
+            return EXECUTE_ACTION;
+        }
+        if ("stopSession".equalsIgnoreCase(token) || "stopSystem".equalsIgnoreCase(token)) {
+            return STOP_SYSTEM;
         }
         return HELP;
     }

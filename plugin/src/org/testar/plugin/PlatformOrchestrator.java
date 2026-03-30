@@ -7,6 +7,8 @@
 package org.testar.plugin;
 
 import org.testar.core.execution.SystemService;
+import org.testar.engine.action.DefaultActionExecutionService;
+import org.testar.engine.state.DefaultStateService;
 import org.testar.windows.service.WindowsStateService;
 import org.testar.windows.service.WindowsSystemService;
 
@@ -62,11 +64,15 @@ public final class PlatformOrchestrator {
 
         return new PlatformServices(
                 systemService,
-                WindowsStateService.uiAutomation(
-                        sessionSpec.getStateTimeoutSeconds(),
-                        sessionSpec.isAccessBridgeEnabled(),
-                        sessionSpec.getSutProcesses()
-                )
+                new DefaultStateService(
+                        WindowsStateService.uiAutomation(
+                                sessionSpec.getStateTimeoutSeconds(),
+                                sessionSpec.isAccessBridgeEnabled(),
+                                sessionSpec.getSutProcesses()
+                        )
+                ),
+                WindowsDesktopActionDerivationFactory.create(sessionSpec.getProcessesToKillDuringTest()),
+                new DefaultActionExecutionService()
         );
     }
 }

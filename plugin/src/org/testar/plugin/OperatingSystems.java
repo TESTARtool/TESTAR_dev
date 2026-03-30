@@ -45,11 +45,11 @@ public enum OperatingSystems {
             return "Android";
         } else if (value == 5) {
             return "Windows 7";
-        } else if (value == 6){
+        } else if (value == 6) {
             return "Windows 10";
-        } else if (value == 7){
+        } else if (value == 7) {
             return "WebDriver";
-        } else if (value == 8){
+        } else if (value == 8) {
             return "iOS";
         } else {
             return super.toString();

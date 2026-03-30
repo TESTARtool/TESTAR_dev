@@ -11,6 +11,7 @@ import org.testar.core.exceptions.SystemStartException;
 import org.testar.core.exceptions.SystemStopException;
 import org.testar.core.execution.SystemService;
 import org.testar.core.state.SUT;
+import org.testar.core.tag.Tags;
 import org.testar.windows.state.WinProcess;
 
 /**
@@ -65,8 +66,12 @@ public final class WindowsSystemService implements SystemService {
         if (system == null) {
             return;
         }
+        Long pid = system.get(Tags.PID, null);
         try {
             system.stop();
+            if (pid != null && WinProcess.isRunning(pid)) {
+                WinProcess.killProcess(pid);
+            }
         } catch (SystemStopException exception) {
             throw new IllegalStateException("Unable to stop Windows system", exception);
         }
