@@ -8,8 +8,16 @@ package org.testar.plugin;
 
 import org.testar.core.execution.SystemService;
 import org.testar.engine.action.DesktopActionDerivationFactory;
+import org.testar.engine.action.DescriptionActionResolver;
 import org.testar.engine.action.DefaultActionExecutionService;
 import org.testar.engine.state.DefaultStateService;
+import org.testar.plugin.exceptions.UnsupportedPlatformException;
+import org.testar.webdriver.action.WebdriverActionDerivationFactory;
+import org.testar.webdriver.action.policy.WebdriverClickablePolicy;
+import org.testar.webdriver.action.policy.WebdriverScrollablePolicy;
+import org.testar.webdriver.action.policy.WebdriverTypeablePolicy;
+import org.testar.webdriver.service.WebdriverStateService;
+import org.testar.webdriver.service.WebdriverSystemService;
 import org.testar.windows.service.WindowsStateService;
 import org.testar.windows.service.WindowsSystemService;
 import org.testar.windows.action.policy.WindowsClickablePolicy;
@@ -34,6 +42,8 @@ public final class PlatformOrchestrator {
             case WINDOWS_7:
             case WINDOWS_10:
                 return windows(sessionSpec);
+            case WEBDRIVER:
+                return webdriver(sessionSpec);
             default:
                 throw new UnsupportedPlatformException(
                         "Unsupported operating system: " + sessionSpec.getOperatingSystem()
@@ -87,7 +97,31 @@ public final class PlatformOrchestrator {
                         sessionSpec.getProcessesToKillDuringTest(),
                         widget -> "TESTAR"
                 ),
-                new DefaultActionExecutionService()
+                new DefaultActionExecutionService(),
+                new DescriptionActionResolver()
+        );
+    }
+
+    private static PlatformServices webdriver(PlatformSessionSpec sessionSpec) {
+        if (sessionSpec.getTargetType() != PlatformSessionSpec.TargetType.EXECUTABLE) {
+            throw new UnsupportedPlatformException(
+                    "Unsupported WebDriver target type: " + sessionSpec.getTargetType()
+            );
+        }
+
+        return new PlatformServices(
+                WebdriverSystemService.fromSutConnector(sessionSpec.getTarget()),
+                new DefaultStateService(
+                        WebdriverStateService.browser(sessionSpec.getStateTimeoutSeconds())
+                ),
+                WebdriverActionDerivationFactory.create(
+                        new WebdriverClickablePolicy(),
+                        new WebdriverTypeablePolicy(),
+                        new WebdriverScrollablePolicy(),
+                        widget -> "TESTAR"
+                ),
+                new DefaultActionExecutionService(),
+                new DescriptionActionResolver()
         );
     }
 }

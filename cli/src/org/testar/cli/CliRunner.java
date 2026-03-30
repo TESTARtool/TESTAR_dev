@@ -43,14 +43,13 @@ final class CliRunner {
     private void printHelp() {
         output.println("TESTAR CLI");
         output.println("Usage:");
-        output.println("  startSession windows executable <path>");
-        output.println("  startSession windows process <name>");
-        output.println("  startSession windows pid <pid>");
-        output.println("  startSession windows uwp <appUserModelId>");
+        output.println("  startSession windows <path>");
+        output.println("  startSession webdriver <url>");
         output.println("  sessionStatus");
         output.println("  getState");
         output.println("  getDerivedActions");
-        output.println("  executeAction <actionIndex>");
+        output.println("  executeAction click <semanticText>");
+        output.println("  executeAction type <semanticText> <inputText>");
         output.println("  stopSystem");
     }
 

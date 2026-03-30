@@ -7,8 +7,10 @@
 package org.testar.plugin;
 
 import java.util.Set;
+import java.util.List;
 
 import org.testar.core.action.Action;
+import org.testar.core.action.ResolvedAction;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 
@@ -23,6 +25,8 @@ public interface PlatformSession extends AutoCloseable {
     State getState();
 
     Set<Action> getDerivedActions();
+
+    ResolvedAction resolveAction(List<String> arguments);
 
     boolean executeAction(Action action);
 

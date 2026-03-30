@@ -5,7 +5,7 @@ import java.util.Objects;
 import org.junit.Test;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
-import org.testar.monkey.Assert;
+import org.testar.core.Assert;
 
 public class SutConnectorParserTest {
 

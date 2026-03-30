@@ -11,3 +11,20 @@ dependencies {
 application {
     mainClass = 'org.testar.cli.CliMain'
 }
+
+distributions {
+    main {
+        contents {
+            from(project(':webdriver').file('resources/web-extension')) {
+                into 'web-extension'
+            }
+        }
+    }
+}
+
+tasks.register('cliDistribution') {
+    group = 'distribution'
+    description = 'Build the CLI distribution and archive.'
+    dependsOn tasks.named('installDist')
+    dependsOn tasks.named('distZip')
+}

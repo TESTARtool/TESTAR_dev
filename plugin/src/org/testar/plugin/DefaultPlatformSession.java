@@ -6,10 +6,12 @@
 
 package org.testar.plugin;
 
+import java.util.List;
 import java.util.Set;
 
 import org.testar.core.Assert;
 import org.testar.core.action.Action;
+import org.testar.core.action.ResolvedAction;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 
@@ -36,6 +38,11 @@ final class DefaultPlatformSession implements PlatformSession {
     @Override
     public Set<Action> getDerivedActions() {
         return services.actionDerivationService().deriveActions(system, getState());
+    }
+
+    @Override
+    public ResolvedAction resolveAction(List<String> arguments) {
+        return services.actionResolver().resolve(getDerivedActions(), Assert.notNull(arguments));
     }
 
     @Override

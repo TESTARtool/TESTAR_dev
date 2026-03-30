@@ -19,6 +19,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import org.testar.core.action.Action;
+import org.testar.core.action.ResolvedAction;
 import org.testar.core.state.State;
 import org.testar.core.state.Widget;
 import org.testar.core.tag.Tags;
@@ -151,26 +152,13 @@ final class CliDaemonServer {
 
     private CliResponse executeAction(CliRequest request) {
         try {
-            String actionIndexToken = request.argumentAt(0);
-            if (actionIndexToken == null) {
-                return new CliResponse(1, List.of("executeAction requires action index"));
-            }
-            int actionIndex = Integer.parseInt(actionIndexToken);
             PlatformSession session = requireActiveSession();
-            List<Action> orderedActions = orderedActions(session.getDerivedActions());
-            if (actionIndex < 0 || actionIndex >= orderedActions.size()) {
-                return new CliResponse(1, List.of(
-                        "executeAction failed: invalid action index " + actionIndex,
-                        "availableActions=" + orderedActions.size()
-                ));
-            }
-            Action action = orderedActions.get(actionIndex);
-            boolean executed = session.executeAction(action);
+            ResolvedAction resolvedAction = session.resolveAction(request.getArguments());
+            boolean executed = session.executeAction(resolvedAction.action());
             return new CliResponse(executed ? 0 : 1, List.of(
                     "actionExecuted",
-                    "index=" + actionIndex,
                     "success=" + executed,
-                    "desc=" + action.get(Tags.Desc, action.toString())
+                    "desc=" + resolvedAction.action().get(Tags.Desc, resolvedAction.action().toString())
             ));
         } catch (RuntimeException exception) {
             return new CliResponse(1, List.of("executeAction failed: " + exception.getMessage()));
@@ -223,16 +211,18 @@ final class CliDaemonServer {
 
     private PlatformSessionSpec buildSessionSpec(CliRequest request) {
         String platformToken = request.argumentAt(0);
-        String targetTypeToken = request.argumentAt(1);
-        String target = request.argumentAt(2);
+        String target = request.argumentAt(1);
 
-        if (platformToken == null || targetTypeToken == null || target == null) {
-            throw new IllegalArgumentException("Expected: <platform> <targetType> <target>");
+        if (platformToken == null) {
+            throw new IllegalArgumentException("Expected: startSession <platform> <target>");
+        }
+
+        if (target == null || request.argumentAt(2) != null) {
+            throw new IllegalArgumentException("Expected: startSession <platform> <target>");
         }
 
         OperatingSystems operatingSystem = parseOperatingSystem(platformToken);
-        TargetType targetType = parseTargetType(targetTypeToken);
-        return PlatformSessionSpec.builder(operatingSystem, targetType, target).build();
+        return PlatformSessionSpec.builder(operatingSystem, TargetType.EXECUTABLE, target).build();
     }
 
     private OperatingSystems parseOperatingSystem(String token) {
@@ -241,24 +231,10 @@ final class CliDaemonServer {
                 || "windows_10".equals(normalized)) {
             return OperatingSystems.WINDOWS;
         }
+        if ("webdriver".equals(normalized) || "web".equals(normalized)) {
+            return OperatingSystems.WEBDRIVER;
+        }
         throw new IllegalArgumentException("Unsupported platform token: " + token);
-    }
-
-    private TargetType parseTargetType(String token) {
-        String normalized = token.toLowerCase(Locale.ROOT);
-        if ("executable".equals(normalized)) {
-            return TargetType.EXECUTABLE;
-        }
-        if ("process".equals(normalized) || "processname".equals(normalized)) {
-            return TargetType.PROCESS_NAME;
-        }
-        if ("pid".equals(normalized)) {
-            return TargetType.PROCESS_ID;
-        }
-        if ("uwp".equals(normalized)) {
-            return TargetType.UWP;
-        }
-        throw new IllegalArgumentException("Unsupported target type: " + token);
     }
 
     private int countWidgets(State state) {

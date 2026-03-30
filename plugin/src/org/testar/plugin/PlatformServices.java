@@ -7,6 +7,7 @@
 package org.testar.plugin;
 
 import org.testar.core.Assert;
+import org.testar.core.action.ActionResolver;
 import org.testar.core.execution.ActionDerivationService;
 import org.testar.core.execution.ActionExecutionService;
 import org.testar.core.execution.StateService;
@@ -21,15 +22,18 @@ public final class PlatformServices {
     private final StateService stateService;
     private final ActionDerivationService actionDerivationService;
     private final ActionExecutionService actionExecutionService;
+    private final ActionResolver actionResolver;
 
     public PlatformServices(SystemService systemService,
                             StateService stateService,
                             ActionDerivationService actionDerivationService,
-                            ActionExecutionService actionExecutionService) {
+                            ActionExecutionService actionExecutionService,
+                            ActionResolver actionResolver) {
         this.systemService = Assert.notNull(systemService);
         this.stateService = Assert.notNull(stateService);
         this.actionDerivationService = Assert.notNull(actionDerivationService);
         this.actionExecutionService = Assert.notNull(actionExecutionService);
+        this.actionResolver = Assert.notNull(actionResolver);
     }
 
     public SystemService systemService() {
@@ -46,5 +50,9 @@ public final class PlatformServices {
 
     public ActionExecutionService actionExecutionService() {
         return actionExecutionService;
+    }
+
+    public ActionResolver actionResolver() {
+        return actionResolver;
     }
 }

@@ -4,8 +4,7 @@
  * Copyright (c) 2018-2026 Universitat Politecnica de Valencia - www.upv.es
  */
 
-package org.testar.plugin;
-
+package org.testar.plugin.exceptions;
 
 public class UnsupportedPlatformException extends RuntimeException {
 

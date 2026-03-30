@@ -8,6 +8,7 @@ sourceSets {
 
 dependencies {
     implementation project(':core')
+    implementation project(':engine')
 
     // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'

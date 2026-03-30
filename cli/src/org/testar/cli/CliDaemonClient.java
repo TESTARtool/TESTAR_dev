@@ -64,14 +64,17 @@ final class CliDaemonClient {
     private void startDaemonProcess() {
         String javaExecutable = Path.of(System.getProperty("java.home"), "bin", "java.exe").toString();
         String classPath = System.getProperty("java.class.path");
+        Path testarHome = resolveTestarHome();
         Path logFile = Path.of(System.getProperty("java.io.tmpdir"), "testar-cli-daemon.log");
         ProcessBuilder builder = new ProcessBuilder(
                 javaExecutable,
                 "-cp",
                 classPath,
+                "-Dtestar.home=" + testarHome,
                 CliMain.class.getName(),
                 "daemon"
         );
+        builder.directory(testarHome.toFile());
         builder.redirectErrorStream(true);
         builder.redirectOutput(logFile.toFile());
         try {
@@ -80,6 +83,20 @@ final class CliDaemonClient {
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to start CLI daemon", exception);
         }
+    }
+
+    private Path resolveTestarHome() {
+        String configuredHome = System.getProperty("testar.home");
+        if (configuredHome != null && !configuredHome.isBlank()) {
+            return Path.of(configuredHome).toAbsolutePath().normalize();
+        }
+
+        String configuredHomeEnv = System.getenv("TESTAR_HOME");
+        if (configuredHomeEnv != null && !configuredHomeEnv.isBlank()) {
+            return Path.of(configuredHomeEnv).toAbsolutePath().normalize();
+        }
+
+        return Path.of(".").toAbsolutePath().normalize();
     }
 
     private CliResponse sendOnce(CliRequest request) throws IOException {
