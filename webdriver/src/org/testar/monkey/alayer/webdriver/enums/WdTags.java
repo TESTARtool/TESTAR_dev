@@ -36,9 +36,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.openqa.selenium.WebElement;
-import org.testar.monkey.alayer.Rect;
-import org.testar.monkey.alayer.Tag;
-import org.testar.monkey.alayer.TagsBase;
+import org.testar.core.alayer.Rect;
+import org.testar.core.tag.Tag;
+import org.testar.core.tag.TagsBase;
 
 /**
  * Creates and holds tags specific to WEB info.

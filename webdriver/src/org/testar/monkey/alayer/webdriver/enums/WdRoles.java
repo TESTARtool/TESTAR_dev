@@ -30,8 +30,8 @@
 
 package org.testar.monkey.alayer.webdriver.enums;
 
-import org.testar.monkey.alayer.Role;
-import org.testar.monkey.alayer.Roles;
+import org.testar.core.alayer.Role;
+import org.testar.core.alayer.Roles;
 
 import java.util.*;
 
