@@ -1,7 +1,11 @@
 dependencies {
     implementation project(':core')
+    implementation project(':config')
     implementation project(':statemodel')
+    implementation project(':oracle')
+    implementation project(':windows')
     implementation project(':webdriver')
     implementation project(':android')
+    implementation project(':plugin')
     implementation 'org.apache.commons:commons-lang3:3.12.0'
 }

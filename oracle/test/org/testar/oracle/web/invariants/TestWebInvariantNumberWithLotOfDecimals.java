@@ -10,7 +10,7 @@ import org.testar.core.Assert;
 import org.testar.config.ConfigTags;
 import org.testar.core.Pair;
 import org.testar.core.verdict.Verdict;
-import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.webdriver.tag.WdTags;
 import org.testar.oracle.Oracle;
 import org.testar.oracle.OracleSelection;
 import org.testar.config.settings.Settings;

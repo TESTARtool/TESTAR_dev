@@ -13,7 +13,7 @@ import java.util.List;
 import org.testar.core.state.State;
 import org.testar.core.verdict.Verdict;
 import org.testar.core.visualizers.Visualizer;
-import org.testar.monkey.alayer.webdriver.enums.WdTags;
+import org.testar.webdriver.tag.WdTags;
 import org.testar.core.state.Widget;
 import org.testar.core.visualizers.RegionsVisualizer;
 import org.testar.oracle.Oracle;
