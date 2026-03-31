@@ -3,10 +3,10 @@ package org.testar;
 
 import org.junit.Test;
 import org.junit.Assert;
+import org.testar.dialog.tagsvisualization.ITagFilter;
+import org.testar.dialog.tagsvisualization.TagFilter;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Widget;
-import org.testar.settings.dialog.tagsvisualization.ITagFilter;
-import org.testar.settings.dialog.tagsvisualization.TagFilter;
 
 import java.util.HashSet;
 import java.util.Set;

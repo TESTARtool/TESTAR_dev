@@ -4,6 +4,7 @@ dependencies {
     implementation project(':llm')
     implementation project(':oracle')
     implementation project(':statemodel')
+    implementation project(':android')
     implementation project(':windows')
     implementation project(':webdriver')
     implementation files('../testar/lib/jsyntaxpane-1.1.5.jar')

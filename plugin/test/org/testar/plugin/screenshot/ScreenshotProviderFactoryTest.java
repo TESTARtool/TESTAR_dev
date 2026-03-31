@@ -1,4 +1,4 @@
-package org.testar.monkey.screenshot;
+package org.testar.plugin.screenshot;
 
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertEquals;
@@ -14,15 +14,14 @@ import org.junit.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.testar.android.util.AndroidScreenshotUtil;
-import org.testar.monkey.alayer.AWTCanvas;
-import org.testar.monkey.alayer.Action;
-import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.webdriver.util.WdScreenshotUtil;
+import org.testar.core.action.Action;
+import org.testar.core.alayer.AWTCanvas;
+import org.testar.core.screenshot.ScreenshotProvider;
+import org.testar.core.state.State;
+import org.testar.core.util.ScreenshotUtil;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
-import org.testar.plugin.screenshot.ScreenshotProvider;
-import org.testar.plugin.screenshot.ScreenshotProviderFactory;
-import org.testar.util.ScreenshotUtil;
+import org.testar.webdriver.util.WdScreenshotUtil;
 
 public class ScreenshotProviderFactoryTest {
 
