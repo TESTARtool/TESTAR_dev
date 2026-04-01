@@ -3,4 +3,6 @@ apply plugin: 'java'
 dependencies {
     implementation project(':core')
     implementation project(':config')
+    // https://mvnrepository.com/artifact/com.github.kwhat/jnativehook
+    implementation group: 'com.github.kwhat', name: 'jnativehook', version: '2.2.2'
 }
