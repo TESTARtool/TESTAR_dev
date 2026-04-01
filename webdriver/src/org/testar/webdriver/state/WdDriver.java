@@ -17,13 +17,12 @@ import org.testar.core.exceptions.SystemStopException;
 import org.testar.webdriver.manager.WdChromeManager;
 import org.testar.webdriver.manager.WdEdgeManager;
 import org.testar.webdriver.manager.WdFirefoxManager;
+import org.testar.webdriver.process.WdProcessActivator;
 import org.testar.webdriver.SutConnectorParser;
 import org.testar.webdriver.WebdriverPathResolver;
 import org.testar.webdriver.manager.WdBrowserManager;
 import org.testar.webdriver.alayer.WdCanvasDimensions;
 import org.testar.webdriver.alayer.WdMouse;
-import org.testar.webdriver.alayer.WdProcessActivator;
-
 import org.openqa.selenium.*;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.logging.LogEntries;

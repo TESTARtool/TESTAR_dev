@@ -22,7 +22,7 @@ import org.testar.core.alayer.Role;
 import org.testar.core.alayer.Shape;
 import org.testar.core.devices.Keyboard;
 import org.testar.core.devices.Mouse;
-import org.testar.core.devices.ProcessHandle;
+import org.testar.core.process.ProcessHandle;
 import org.testar.core.state.State;
 import org.testar.core.state.Widget;
 import org.testar.core.visualizers.Visualizer;

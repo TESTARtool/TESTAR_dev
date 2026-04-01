@@ -10,8 +10,8 @@ import java.util.Collections;
 
 import org.testar.core.Assert;
 import org.testar.core.alayer.Role;
-import org.testar.core.devices.ProcessHandle;
 import org.testar.core.exceptions.ActionFailedException;
+import org.testar.core.process.ProcessHandle;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 import org.testar.core.tag.TaggableBase;

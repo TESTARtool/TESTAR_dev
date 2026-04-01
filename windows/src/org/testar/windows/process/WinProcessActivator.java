@@ -4,7 +4,7 @@
  * Copyright (c) 2018-2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.windows;
+package org.testar.windows.process;
 
 import org.testar.core.exceptions.ActionFailedException;
 import org.testar.windows.exceptions.WinApiException;

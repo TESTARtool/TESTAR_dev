@@ -11,11 +11,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.testar.core.devices.ProcessHandle;
 import org.testar.core.Assert;
 import org.testar.core.Pair;
 import org.testar.core.alayer.AutomationCache;
 import org.testar.core.exceptions.NoSuchTagException;
+import org.testar.core.process.ProcessHandle;
 import org.testar.core.tag.Tag;
 import org.testar.core.tag.Tags;
 import org.testar.core.util.Util;

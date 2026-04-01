@@ -31,10 +31,10 @@ import org.testar.core.exceptions.SystemStopException;
 
 import org.testar.core.serialisation.LogSerialiser;
 import org.testar.windows.ActivateOptions;
-import org.testar.windows.WinProcHandle;
-import org.testar.windows.WinProcessActivator;
 import org.testar.windows.Windows;
 import org.testar.windows.exceptions.WinApiException;
+import org.testar.windows.process.WinProcHandle;
+import org.testar.windows.process.WinProcessActivator;
 
 public final class WinProcess extends SUTBase {
 

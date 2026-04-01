@@ -4,7 +4,7 @@
  * Copyright (c) 2018-2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.core.devices;
+package org.testar.core.process;
 
 import org.testar.core.exceptions.SystemStopException;
 

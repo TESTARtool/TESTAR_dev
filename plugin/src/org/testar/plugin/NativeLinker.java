@@ -23,12 +23,12 @@ import org.testar.core.alayer.Pen;
 import org.testar.core.alayer.Role;
 import org.testar.core.alayer.Roles;
 import org.testar.core.exceptions.NoSuchTagException;
+import org.testar.core.process.ProcessHandle;
 import org.testar.core.state.SUT;
 import org.testar.core.state.StateBuilder;
 import org.testar.core.state.Widget;
 import org.testar.core.tag.Tag;
 import org.testar.core.tag.Tags;
-import org.testar.core.devices.ProcessHandle;
 import org.testar.plugin.exceptions.UnsupportedPlatformException;
 import org.testar.webdriver.alayer.WdCanvas;
 import org.testar.webdriver.alayer.WdRoles;
@@ -206,7 +206,7 @@ public class NativeLinker {
 
 	public static ProcessHandle getNativeProcessHandle(long processPID){
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
-			return new org.testar.windows.WinProcHandle(processPID);
+			return new org.testar.windows.process.WinProcHandle(processPID);
 
 		throw new UnsupportedPlatformException();
 	}

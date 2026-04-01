@@ -4,9 +4,9 @@
  * Copyright (c) 2018-2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.windows;
+package org.testar.windows.process;
 
-import org.testar.core.devices.ProcessHandle;
+import org.testar.core.process.ProcessHandle;
 import org.testar.windows.exceptions.WinApiException;
 import org.testar.windows.state.WinProcess;
 
