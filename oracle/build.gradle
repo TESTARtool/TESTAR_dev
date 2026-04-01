@@ -5,5 +5,6 @@ dependencies {
     implementation project(':statemodel')
     implementation project(':webdriver')
     implementation project(':android')
+    implementation project(':plugin')
     implementation group: 'net.oneandone.reflections8', name: 'reflections8', version: '0.11.7'
 }

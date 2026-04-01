@@ -105,12 +105,6 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.12.0'
     implementation 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
     implementation group: 'com.sikulix', name: 'sikulixapi', version: '2.0.5'
-    // jacoco and maven dependencies for jacoco coverage
-    implementation group: 'org.apache.maven', name: 'maven-core', version: '3.9.8'
-    implementation group: 'org.apache.maven.reporting', name: 'maven-reporting-api', version: '3.1.1'
-    implementation group: 'org.jacoco', name: 'jacoco-maven-plugin', version: '0.8.12'
-    // https://mvnrepository.com/artifact/org.apache.commons/commons-csv
-    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.11.0'
     // https://mvnrepository.com/artifact/org.eclipse.angus/jakarta.mail
     implementation group: 'org.eclipse.angus', name: 'jakarta.mail', version: '2.0.3'
     // https://mvnrepository.com/artifact/org.checkerframework/checker

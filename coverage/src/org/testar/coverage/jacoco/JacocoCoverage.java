@@ -1,0 +1,76 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2024-2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2024-2026 Universitat Politecnica de Valencia - www.upv.es
+ */
+
+package org.testar.coverage.jacoco;
+
+import java.io.File;
+
+import org.testar.OutputStructure;
+import org.testar.config.ConfigTags;
+import org.testar.config.settings.Settings;
+import org.testar.coverage.CodeCoverage;
+
+public class JacocoCoverage implements CodeCoverage {
+
+	private String outputJacocoCoveragePath;
+	private MBeanClient mbeanClient;
+	private JacocoReportCSV jacocoReportCSV;
+	private MergeJacocoFiles mergeJacocoFiles;
+
+	public JacocoCoverage(Settings settings, String outputCoveragePath) {
+		// Create a file directory to store the jacoco coverage file results
+		outputJacocoCoveragePath = outputCoveragePath + File.separator + "jacoco";
+		File outputJacocoCoverageDir = new File(outputJacocoCoveragePath);
+		if(!outputJacocoCoverageDir.exists() && !outputJacocoCoverageDir.mkdirs()) {
+			System.err.println("ERROR: Failed to create JaCoCo output directory: <" + outputJacocoCoverageDir.getAbsolutePath() + ">");
+		}
+
+		// Initialize the MBeanClient that connects to the Jacoco agent port to extract coverage
+		mbeanClient = new MBeanClient(settings.get(ConfigTags.JacocoCoverageIpAddress), settings.get(ConfigTags.JacocoCoveragePort));
+
+		// Initialize the CSV reporter
+		jacocoReportCSV = new JacocoReportCSV(settings);
+
+		// Initialize MergeJacocoFiles if user wants to track accumulative Jacoco coverage
+		if(settings.get(ConfigTags.JacocoCoverageAccumulate, false)) {
+			mergeJacocoFiles = new MergeJacocoFiles();
+		}
+	}
+
+	@Override
+	public void getSequenceCoverage() {
+		// Create the default SUT + sequence name + sequence number to extract the jacoco coverage exec file
+		String destJacocoSequenceFileName = outputJacocoCoveragePath + File.separator 
+				+ OutputStructure.startOuterLoopDateString + "_" + OutputStructure.executedSUTname 
+				+ "_sequence_" + OutputStructure.sequenceInnerLoopCount;
+
+		String jacocoExecSequenceCoverage = mbeanClient.dumpJacocoReport(destJacocoSequenceFileName + ".exec");
+
+		// Once the exec file is created, prepare the CSV results
+		jacocoReportCSV.generateCSVresults(jacocoExecSequenceCoverage, destJacocoSequenceFileName + ".csv");
+	}
+
+	@Override
+	public void getActionCoverage(String actionCount) {
+		// Create the default SUT + sequence name + sequence number + action number to extract the jacoco coverage exec file
+		String destJacocoActionFileName = outputJacocoCoveragePath + File.separator 
+				+ OutputStructure.startOuterLoopDateString + "_" + OutputStructure.executedSUTname 
+				+ "_sequence_" + OutputStructure.sequenceInnerLoopCount 
+				+ "_action_" + actionCount;
+
+		String jacocoExecActionCoverage = mbeanClient.dumpJacocoReport(destJacocoActionFileName + ".exec");
+
+		// Once the exec file is created, prepare the CSV results
+		jacocoReportCSV.generateCSVresults(jacocoExecActionCoverage, destJacocoActionFileName + ".csv");
+
+		// Compute the accumulative Jacoco coverage if enabled by user
+		if(mergeJacocoFiles != null) {
+			mergeJacocoFiles.testarExecuteMojo(jacocoReportCSV, jacocoExecActionCoverage);
+			// Write an additional accumulative ratio coverage file
+			jacocoReportCSV.writeAccumulativeCoverage(outputJacocoCoveragePath, actionCount);
+		}
+	}
+}
