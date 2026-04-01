@@ -1,4 +1,4 @@
-package org.testar.otp;
+package org.testar.engine.otp;
 
 import org.junit.Before;
 import org.junit.Ignore;

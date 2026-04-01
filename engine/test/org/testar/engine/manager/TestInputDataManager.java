@@ -1,4 +1,4 @@
-package org.testar.managers;
+package org.testar.engine.manager;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -13,8 +13,6 @@ import org.junit.Test;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
-import org.testar.monkey.alayer.webdriver.enums.WdTags;
-import org.testar.stub.WidgetStub;
 
 public class TestInputDataManager {
 
@@ -136,18 +134,6 @@ public class TestInputDataManager {
 		assertTrue(outContent.size() > 0);
 		System.out.println("test emptyFileInputData(): " + outContent.toString());
 		System.out.println("test emptyFileInputData(): " + fileData);
-	}
-
-	@Test
-	@Repeat( times = 100 )
-	public void obtainInputDataFromWidget() {
-		WidgetStub widget = new WidgetStub();
-		widget.set(WdTags.WebType, "number");
-		String widgetNumber = InputDataManager.getRandomTextInputData(widget);
-		System.out.println("test obtainInputDataFromWidget(): " + widgetNumber);
-		assertNotNull(widgetNumber);
-		assertTrue(!widgetNumber.isEmpty());
-		assertTrue(isNumeric(widgetNumber));
 	}
 
 	private boolean isNumeric(String strNum) {
