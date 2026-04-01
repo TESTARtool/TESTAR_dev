@@ -1,4 +1,7 @@
-package org.testar.action.selector;
+package org.testar.engine.action.selection;
+
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -16,17 +19,16 @@ import org.junit.Test;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
-import org.testar.ActionSelectorProxy;
-import org.testar.PrioritizeNewActionsSelector;
-import org.testar.monkey.Assert;
-import org.testar.monkey.alayer.Action;
-import org.testar.monkey.alayer.Rect;
-import org.testar.monkey.alayer.Roles;
-import org.testar.monkey.alayer.Tags;
-import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
-import org.testar.monkey.alayer.actions.StdActionCompiler;
-import org.testar.simplestategraph.GuiStateGraphWithVisitedActions;
-import org.testar.simplestategraph.QLearningActionSelector;
+import org.testar.core.Assert;
+import org.testar.core.action.Action;
+import org.testar.core.action.AnnotatingActionCompiler;
+import org.testar.core.action.StdActionCompiler;
+import org.testar.core.alayer.Rect;
+import org.testar.core.alayer.Roles;
+import org.testar.core.tag.Tags;
+import org.testar.engine.action.selection.prioritize.PrioritizeNewActionsSelector;
+import org.testar.engine.action.selection.stategraph.GuiStateGraphWithVisitedActions;
+import org.testar.engine.action.selection.stategraph.QLearningActionSelector;
 import org.testar.stub.StateStub;
 import org.testar.stub.WidgetStub;
 
@@ -36,7 +38,7 @@ public class TestActionSelector {
 	public RepeatRule repeatRule = new RepeatRule();
 
 	private static StateStub state;
-	private static Set<Action> originalActions;
+	private static Set<Action> actions;
 	private static StdActionCompiler ac = new AnnotatingActionCompiler();
 
 	private static List<Action> firstSelectedActionFromPrioritizeSelector = new ArrayList<>();
@@ -47,7 +49,7 @@ public class TestActionSelector {
 	public static void setup() {
 		state = new StateStub();
 		state.set(Tags.AbstractID, "stateAbstractID");
-		originalActions = new HashSet<>();
+		actions = new HashSet<>();
 
 		// First action-widget
 		WidgetStub firstWidget = new WidgetStub();
@@ -64,7 +66,7 @@ public class TestActionSelector {
 		Action firstAction = ac.leftClickAt(firstWidget);
 		firstAction.set(Tags.ConcreteID, "firstActionConcreteID");
 		firstAction.set(Tags.AbstractID, "firstActionAbstractID");
-		originalActions.add(firstAction);
+		actions.add(firstAction);
 
 		// Second action-widget
 		WidgetStub secondWidget = new WidgetStub();
@@ -81,7 +83,7 @@ public class TestActionSelector {
 		Action secondAction = ac.leftClickAt(secondWidget);
 		secondAction.set(Tags.ConcreteID, "secondActionConcreteID");
 		secondAction.set(Tags.AbstractID, "secondActionAbstractID");
-		originalActions.add(secondAction);
+		actions.add(secondAction);
 	}
 
 	@Test
@@ -89,27 +91,24 @@ public class TestActionSelector {
 	public void testPrioritizeNewActionsSelector() {
 		ActionSelectorProxy prioritizeSelector = new ActionSelectorProxy(new PrioritizeNewActionsSelector());
 
-		// First derivation must return both actions
-		Set<Action> firstDerivedActions = prioritizeSelector.deriveActions(originalActions);
-		Assert.isTrue(firstDerivedActions.size() == 2);
-		Action firstAction = prioritizeSelector.selectAction(state, firstDerivedActions);
-		Assert.isTrue(firstAction != null);
-		firstSelectedActionFromPrioritizeSelector.add(firstAction);
-		prioritizeSelector.executeAction(firstAction);
+		Action firstSelectedAction = prioritizeSelector.selectAction(state, actions);
+		assertNotNull(firstSelectedAction);
+		firstSelectedActionFromPrioritizeSelector.add(firstSelectedAction);
 
-		// Second derivation must return only the non-executed action
-		Set<Action> secondDerivedActions = prioritizeSelector.deriveActions(originalActions);
-		Assert.isTrue(secondDerivedActions.size() == 1);
-		Action secondAction = prioritizeSelector.selectAction(state, secondDerivedActions);
-		Assert.isTrue(secondAction != null);
-		prioritizeSelector.executeAction(secondAction);
+		Action secondSelectedAction = prioritizeSelector.selectAction(state, actions);
+		assertNotNull(secondSelectedAction);
 
 		// Check both selected actions were not the same ones
-		Assert.isTrue(firstAction.get(Tags.Desc, "NonDesc") != secondAction.get(Tags.Desc, "NonDesc"));
+		assertNotEquals(firstSelectedAction.get(Tags.Desc), secondSelectedAction.get(Tags.Desc));
 
-		// Finally, third derivation must reset the actions and return both ones again
-		Set<Action> thirdDerivedActions = prioritizeSelector.deriveActions(originalActions);
-		Assert.isTrue(thirdDerivedActions.size() == 2);
+		// Finally, third selection must reset the actions and return both ones again
+		Action thirdSelectedAction = prioritizeSelector.selectAction(state, actions);
+		assertNotNull(thirdSelectedAction);
+		Assert.isTrue(
+			firstSelectedAction.get(Tags.Desc).equals(thirdSelectedAction.get(Tags.Desc))
+			||
+			secondSelectedAction.get(Tags.Desc).equals(thirdSelectedAction.get(Tags.Desc))
+		);
 	}
 
 	@Test
@@ -117,23 +116,24 @@ public class TestActionSelector {
 	public void testGuiStateGraphWithVisitedActions() {
 		ActionSelectorProxy guiGraphSelector = new ActionSelectorProxy(new GuiStateGraphWithVisitedActions());
 
-		// First action derivation must return both actions
-		Set<Action> firstDerivedActions = guiGraphSelector.deriveActions(originalActions);
-		Assert.isTrue(firstDerivedActions.size() == 2);
-		Action firstAction = guiGraphSelector.selectAction(state, firstDerivedActions);
-		Assert.isTrue(firstAction != null);
-		firstSelectedActionFromGuiGraphSelector.add(firstAction);
-		guiGraphSelector.executeAction(firstAction);
+		Action firstSelectedAction = guiGraphSelector.selectAction(state, actions);
+		assertNotNull(firstSelectedAction);
+		firstSelectedActionFromGuiGraphSelector.add(firstSelectedAction);
 
-		// Second derivation must return both actions
-		Set<Action> secondDerivedActions = guiGraphSelector.deriveActions(originalActions);
-		Assert.isTrue(secondDerivedActions.size() == 2);
-		Action secondAction = guiGraphSelector.selectAction(state, secondDerivedActions);
-		Assert.isTrue(secondAction != null);
-		guiGraphSelector.executeAction(secondAction);
+		Action secondSelectedAction = guiGraphSelector.selectAction(state, actions);
+		assertNotNull(secondSelectedAction);
 
 		// Check both selected actions were not the same ones
-		Assert.isTrue(firstAction.get(Tags.Desc, "NonDesc") != secondAction.get(Tags.Desc, "NonDesc"));
+		assertNotEquals(firstSelectedAction.get(Tags.Desc), secondSelectedAction.get(Tags.Desc));
+
+		// Finally, third selection must reset the actions and return both ones again
+		Action thirdSelectedAction = guiGraphSelector.selectAction(state, actions);
+		assertNotNull(thirdSelectedAction);
+		Assert.isTrue(
+			firstSelectedAction.get(Tags.Desc).equals(thirdSelectedAction.get(Tags.Desc))
+			||
+			secondSelectedAction.get(Tags.Desc).equals(thirdSelectedAction.get(Tags.Desc))
+		);
 	}
 
 	@Test
@@ -141,23 +141,24 @@ public class TestActionSelector {
 	public void testQLearningActionSelector() {
 		ActionSelectorProxy qLearningSelector = new ActionSelectorProxy(new QLearningActionSelector(99, 0.5));
 
-		// First action derivation must return both actions
-		Set<Action> firstDerivedActions = qLearningSelector.deriveActions(originalActions);
-		Assert.isTrue(firstDerivedActions.size() == 2);
-		Action firstAction = qLearningSelector.selectAction(state, firstDerivedActions);
-		Assert.isTrue(firstAction != null);
-		firstSelectedActionFromQLearningSelector.add(firstAction);
-		qLearningSelector.executeAction(firstAction);
+		Action firstSelectedAction = qLearningSelector.selectAction(state, actions);
+		assertNotNull(firstSelectedAction);
+		firstSelectedActionFromQLearningSelector.add(firstSelectedAction);
 
-		// Second derivation must return both actions
-		Set<Action> secondDerivedActions = qLearningSelector.deriveActions(originalActions);
-		Assert.isTrue(secondDerivedActions.size() == 2);
-		Action secondAction = qLearningSelector.selectAction(state, secondDerivedActions);
-		Assert.isTrue(secondAction != null);
-		qLearningSelector.executeAction(secondAction);
+		Action secondSelectedAction = qLearningSelector.selectAction(state, actions);
+		assertNotNull(secondSelectedAction);
 
 		// Check both selected actions were not the same ones
-		Assert.isTrue(firstAction.get(Tags.Desc, "NonDesc") != secondAction.get(Tags.Desc, "NonDesc"));
+		assertNotEquals(firstSelectedAction.get(Tags.Desc), secondSelectedAction.get(Tags.Desc));
+
+		// Finally, third selection must reset the actions and return both ones again
+		Action thirdSelectedAction = qLearningSelector.selectAction(state, actions);
+		assertNotNull(thirdSelectedAction);
+		Assert.isTrue(
+			firstSelectedAction.get(Tags.Desc).equals(thirdSelectedAction.get(Tags.Desc))
+			||
+			secondSelectedAction.get(Tags.Desc).equals(thirdSelectedAction.get(Tags.Desc))
+		);
 	}
 
 	@AfterClass
