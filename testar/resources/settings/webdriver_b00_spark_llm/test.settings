@@ -126,7 +126,7 @@ ResetDataStore = false
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WebWidgetTextContent,WebWidgetPlaceholder,WebWidgetInnerText
+AbstractStateAttributes = WebWidgetTextContent,WebWidgetPlaceholder,WebWidgetInnerText,WebWidgetTagName,WidgetPath
 
 #################################################################
 # LLM agents settings
