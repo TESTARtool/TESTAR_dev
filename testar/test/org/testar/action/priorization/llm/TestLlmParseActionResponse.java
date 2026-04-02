@@ -1,5 +1,7 @@
 package org.testar.action.priorization.llm;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -222,6 +224,18 @@ public class TestLlmParseActionResponse {
 		Assert.isTrue(innerText.equals("testar"));
 	}
 
+	@Test
+	public void test_parsing_hit_escape_action() {
+		String llmResponse = "```json{\"actionId\":\"AID_HitEsc\",\"input\":\"\"}```";
+		Set<Action> derivedActions = createDefaultDerivedActions(createState());
+
+		LlmParseActionResponse llmParseResponse = new LlmParseActionResponse();
+		LlmParseActionResult llmParseResult = llmParseResponse.parseLlmResponse(derivedActions, llmResponse);
+
+		assertEquals(LlmParseActionResult.ParseResult.SUCCESS, llmParseResult.getParseResult());
+		assertEquals("AID_HitEsc", llmParseResult.getActionToExecute().get(Tags.AbstractID));
+	}
+
 	private static StateStub createState() {
 		StateStub createdState = new StateStub();
 		createdState.set(WdTags.WebTitle, "Page Title | State");
@@ -241,6 +255,7 @@ public class TestLlmParseActionResponse {
 		derivedActions.add(createSelectAction(state, "combobox_widget_desc", "combobox_widget_web_id",
 				"CID_combobox_widget", "AID_combobox_widget", "CID_select", "AID_select", "Saab"));
 		derivedActions.add(createAndroidTypeAction(state));
+		derivedActions.add(createHitEscAction(state, "CID_HitEsc", "AID_HitEsc"));
 		return derivedActions;
 	}
 
@@ -318,6 +333,13 @@ public class TestLlmParseActionResponse {
 		Action action = new AndroidActionType(parentState, widget, "default");
 		action.set(Tags.ConcreteID, "CID_android_action_type");
 		action.set(Tags.AbstractID, "AID_android_action_type");
+		return action;
+	}
+
+	private static Action createHitEscAction(StateStub parentState, String actionConcreteId, String actionAbstractId) {
+		Action action = ac.hitESC(parentState);
+		action.set(Tags.ConcreteID, actionConcreteId);
+		action.set(Tags.AbstractID, actionAbstractId);
 		return action;
 	}
 
