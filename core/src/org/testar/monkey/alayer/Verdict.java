@@ -52,6 +52,8 @@ public final class Verdict implements Serializable {
 
 		// Test sequence completed without other PASS, WARNING, or FAIL, severity
 		OK(0.0, "OK"),
+		// LLM execution is not finished
+		INCOMPLETE(0.01, "INCOMPLETE"),
 		// LLM believes test goal has been accomplished
 		LLM_COMPLETE(0.04, "LLM_COMPLETE"),
 		// Test goal complete based on conditions

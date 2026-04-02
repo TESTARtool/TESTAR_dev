@@ -180,6 +180,8 @@ public class Protocol_webdriver_b00_spark_llm extends WebdriverProtocol {
 		// Add the LLM Oracle verdicts to determine if the test goal has been completed
 		verdicts.addAll(testGoalOrchestrator.processGoalVerdicts(llmOracle.getVerdicts(state)));
 
+		if(!moreActions(state)) verdicts.add(new Verdict(Verdict.Severity.INCOMPLETE, "LLM INCOMPLETE SEQUENCE"));
+
 		return verdicts;
 	}
 
