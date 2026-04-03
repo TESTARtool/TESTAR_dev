@@ -4,6 +4,7 @@ dependencies {
     implementation project(':core')
     implementation project(':config')
     implementation project(':engine')
+    implementation project(':reporting')
     implementation project(':statemodel')
     implementation project(':android')
     implementation project(':webdriver')

@@ -33,6 +33,16 @@ StartupTime = 2.0
 MaxTime = 3.1536E7
 
 #################################################################
+# Output and reporting settings
+#
+# OutputDir: The relative path to save TESTAR output results
+# ReportInHTML: Sets whether to create a HTML report
+#################################################################
+
+OutputDir = ./output
+ReportInHTML = true
+
+#################################################################
 # State model inference settings
 #
 # StateModelEnabled: Enable or disable the State Model feature
@@ -55,7 +65,6 @@ StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer = 
-OutputDir = ./output
 DataStoreDirectory = output/orientdb-community-3.2.38/databases
 DataStoreDB = testar
 DataStoreUser = testar

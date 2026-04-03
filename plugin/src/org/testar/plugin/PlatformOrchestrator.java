@@ -17,8 +17,10 @@ import org.testar.config.StateModelTags;
 import org.testar.config.settings.Settings;
 import org.testar.core.CodingManager;
 import org.testar.core.service.SystemService;
+import org.testar.core.state.SUT;
 import org.testar.engine.state.DefaultStateService;
 import org.testar.plugin.exceptions.UnsupportedPlatformException;
+import org.testar.plugin.reporting.SessionReportingManager;
 import org.testar.statemodel.DummyModelManager;
 import org.testar.statemodel.StateModelManager;
 import org.testar.statemodel.StateModelManagerFactory;
@@ -64,7 +66,21 @@ public final class PlatformOrchestrator {
 
     public static PlatformSession openSession(PlatformSessionSpec sessionSpec) {
         PlatformServices services = resolve(sessionSpec);
-        return new DefaultPlatformSession(services, services.systemService().startSystem());
+        return openSession(sessionSpec, services);
+    }
+
+    private static PlatformSession openSession(PlatformSessionSpec sessionSpec, PlatformServices services) {
+        SUT system = services.systemService().startSystem();
+        try {
+            SessionReportingManager sessionReportingManager = SessionReportingManager.start(
+                    sessionSpec.getSettings(),
+                    sessionSpec.getTarget()
+            );
+            return new DefaultPlatformSession(services, system, sessionReportingManager);
+        } catch (RuntimeException exception) {
+            services.systemService().stopSystem(system);
+            throw exception;
+        }
     }
 
     private static PlatformServices windows(PlatformSessionSpec sessionSpec) {
