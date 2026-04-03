@@ -89,7 +89,7 @@ public class TestActionSelector {
 	@Test
 	@Repeat( times = 100 ) // Repeat to deal with action selection randomness
 	public void testPrioritizeNewActionsSelector() {
-		ActionSelectorProxy prioritizeSelector = new ActionSelectorProxy(new PrioritizeNewActionsSelector());
+		FallbackActionSelectorService prioritizeSelector = new FallbackActionSelectorService(new PrioritizeNewActionsSelector());
 
 		Action firstSelectedAction = prioritizeSelector.selectAction(state, actions);
 		assertNotNull(firstSelectedAction);
@@ -114,7 +114,7 @@ public class TestActionSelector {
 	@Test
 	@Repeat( times = 100 ) // Repeat to deal with action selection randomness
 	public void testGuiStateGraphWithVisitedActions() {
-		ActionSelectorProxy guiGraphSelector = new ActionSelectorProxy(new GuiStateGraphWithVisitedActions());
+		FallbackActionSelectorService guiGraphSelector = new FallbackActionSelectorService(new GuiStateGraphWithVisitedActions());
 
 		Action firstSelectedAction = guiGraphSelector.selectAction(state, actions);
 		assertNotNull(firstSelectedAction);
@@ -139,7 +139,7 @@ public class TestActionSelector {
 	@Test
 	@Repeat( times = 100 ) // Repeat to deal with action selection randomness
 	public void testQLearningActionSelector() {
-		ActionSelectorProxy qLearningSelector = new ActionSelectorProxy(new QLearningActionSelector(99, 0.5));
+		FallbackActionSelectorService qLearningSelector = new FallbackActionSelectorService(new QLearningActionSelector(99, 0.5));
 
 		Action firstSelectedAction = qLearningSelector.selectAction(state, actions);
 		assertNotNull(firstSelectedAction);

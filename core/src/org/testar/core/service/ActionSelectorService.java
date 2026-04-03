@@ -4,14 +4,13 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.core.execution;
+package org.testar.core.service;
+
+import org.testar.core.action.Action;
+import org.testar.core.state.State;
 
 import java.util.Set;
 
-import org.testar.core.action.Action;
-import org.testar.core.state.SUT;
-import org.testar.core.state.State;
-
-public interface ActionDerivationService {
-    Set<Action> deriveActions(SUT system, State state);
+public interface ActionSelectorService {
+    Action selectAction(State state, Set<Action> actions);
 }

@@ -4,12 +4,12 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.core.execution;
+package org.testar.core.service;
 
+import org.testar.core.action.Action;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
-import org.testar.core.exceptions.StateBuildException;
 
-public interface StateService {
-    State getState(SUT system) throws StateBuildException;
+public interface ActionExecutionService {
+    boolean executeAction(SUT system, State state, Action action);
 }

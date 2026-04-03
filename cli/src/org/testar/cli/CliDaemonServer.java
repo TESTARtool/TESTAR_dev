@@ -13,13 +13,14 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
 import org.testar.core.action.Action;
+import org.testar.core.action.ActionRoles;
 import org.testar.core.action.ResolvedAction;
+import org.testar.core.alayer.Roles;
 import org.testar.core.state.State;
 import org.testar.core.state.Widget;
 import org.testar.core.tag.Tags;
@@ -82,8 +83,8 @@ final class CliDaemonServer {
                 return getDerivedActions();
             case EXECUTE_ACTION:
                 return executeAction(request);
-            case STOP_SYSTEM:
-                return stopSystem();
+            case STOP_SESSION:
+                return stopSession();
             case HELP:
             case DAEMON:
             default:
@@ -106,21 +107,6 @@ final class CliDaemonServer {
         }
     }
 
-    private CliResponse getState() {
-        try {
-            PlatformSession session = requireActiveSession();
-            State state = session.getState();
-            return new CliResponse(0, List.of(
-                    "stateFetched",
-                    "widgetCount=" + countWidgets(state),
-                    "stateRole=" + String.valueOf(state.get(Tags.Role, null)),
-                    "stateDesc=" + state.get(Tags.Desc, "")
-            ));
-        } catch (RuntimeException exception) {
-            return new CliResponse(1, List.of("getState failed: " + exception.getMessage()));
-        }
-    }
-
     private CliResponse sessionStatus() {
         if (activeSession == null) {
             return new CliResponse(0, List.of(
@@ -137,12 +123,21 @@ final class CliDaemonServer {
         ));
     }
 
+    private CliResponse getState() {
+        try {
+            State state = requireActiveSession().getState();
+            List<String> lines = new ArrayList<>();
+            lines.addAll(describeStateWidgets(state));
+            return new CliResponse(0, lines);
+        } catch (RuntimeException exception) {
+            return new CliResponse(1, List.of("getState failed: " + exception.getMessage()));
+        }
+    }
+
     private CliResponse getDerivedActions() {
         try {
             Set<Action> actions = requireActiveSession().getDerivedActions();
             List<String> lines = new ArrayList<>();
-            lines.add("derivedActionsFetched");
-            lines.add("count=" + actions.size());
             lines.addAll(describeActions(actions));
             return new CliResponse(0, lines);
         } catch (RuntimeException exception) {
@@ -165,7 +160,7 @@ final class CliDaemonServer {
         }
     }
 
-    private CliResponse stopSystem() {
+    private CliResponse stopSession() {
         try {
             PlatformSession session = requireActiveSession();
             long pid = session.system().get(Tags.PID, -1L);
@@ -176,7 +171,7 @@ final class CliDaemonServer {
                     "pid=" + pid
             ));
         } catch (RuntimeException exception) {
-            return new CliResponse(1, List.of("stopSystem failed: " + exception.getMessage()));
+            return new CliResponse(1, List.of("stopSession failed: " + exception.getMessage()));
         }
     }
 
@@ -237,33 +232,32 @@ final class CliDaemonServer {
         throw new IllegalArgumentException("Unsupported platform token: " + token);
     }
 
-    private int countWidgets(State state) {
-        int count = 0;
-        for (Widget ignored : state) {
-            count++;
+    private List<String> describeStateWidgets(State state) {
+        List<String> descriptions = new ArrayList<>();
+        for (Widget widget : state) {
+            descriptions.add(String.format(
+                    Locale.ROOT,
+                    "widget[%s]=role:%s;desc:%s",
+                    String.valueOf(widget.get(Tags.AbstractID, "InvalidAbstractID")),
+                    String.valueOf(widget.get(Tags.Role, Roles.Widget)),
+                    widget.get(Tags.Desc, widget.toString())
+            ));
         }
-        return count;
+        return descriptions;
     }
 
     private List<String> describeActions(Set<Action> actions) {
         List<String> descriptions = new ArrayList<>();
-        List<Action> orderedActions = orderedActions(actions);
-        for (int index = 0; index < orderedActions.size(); index++) {
-            Action action = orderedActions.get(index);
+        for (Action action : actions) {
             descriptions.add(String.format(
                     Locale.ROOT,
-                    "action[%d]=role:%s;desc:%s",
-                    index,
-                    String.valueOf(action.get(Tags.Role, null)),
+                    "action[%s]=role:%s;desc:%s",
+                    String.valueOf(action.get(Tags.AbstractID, "InvalidAbstractID")),
+                    String.valueOf(action.get(Tags.Role, ActionRoles.Action)),
                     action.get(Tags.Desc, action.toString())
             ));
         }
         return descriptions;
     }
 
-    private List<Action> orderedActions(Set<Action> actions) {
-        List<Action> orderedActions = new ArrayList<>(actions);
-        orderedActions.sort(Comparator.comparing(action -> action.get(Tags.Desc, action.toString())));
-        return orderedActions;
-    }
 }

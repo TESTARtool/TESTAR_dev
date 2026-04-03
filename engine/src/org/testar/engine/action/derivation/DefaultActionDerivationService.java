@@ -4,7 +4,7 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.engine.action;
+package org.testar.engine.action.derivation;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -18,7 +18,7 @@ import org.testar.core.action.policy.ClickablePolicy;
 import org.testar.core.action.policy.ScrollablePolicy;
 import org.testar.core.action.policy.TypeablePolicy;
 import org.testar.core.action.policy.WidgetFilterPolicy;
-import org.testar.core.execution.ActionDerivationService;
+import org.testar.core.service.ActionDerivationService;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 import org.testar.core.state.Widget;
@@ -29,8 +29,7 @@ import org.testar.engine.action.policy.CompositeTypeablePolicy;
 import org.testar.engine.action.policy.CompositeWidgetFilterPolicy;
 
 /**
- * Policy-based action derivation service intended to replace protocol-specific
- * derive-action inheritance over time.
+ * Default policy-based action derivation service.
  */
 public final class DefaultActionDerivationService implements ActionDerivationService {
 
@@ -106,19 +105,18 @@ public final class DefaultActionDerivationService implements ActionDerivationSer
     @Override
     public Set<Action> deriveActions(SUT system, State state) {
         Assert.notNull(state);
-        ensureStateIdentifiers(state);
         Set<Action> forcedActions = derive(system, state, forcedDerivers);
         if (!forcedActions.isEmpty()) {
-            assignIdentifiers(state, forcedActions);
+            buildActionsIdentifiers(state, forcedActions);
             return forcedActions;
         }
         Set<Action> defaultActions = derive(system, state, defaultDerivers);
         if (!defaultActions.isEmpty()) {
-            assignIdentifiers(state, defaultActions);
+            buildActionsIdentifiers(state, defaultActions);
             return defaultActions;
         }
         Set<Action> fallbackActions = derive(system, state, fallbackDerivers);
-        assignIdentifiers(state, fallbackActions);
+        buildActionsIdentifiers(state, fallbackActions);
         return fallbackActions;
     }
 
@@ -134,7 +132,7 @@ public final class DefaultActionDerivationService implements ActionDerivationSer
         return actions;
     }
 
-    private void assignIdentifiers(State state, Set<Action> actions) {
+    private void buildActionsIdentifiers(State state, Set<Action> actions) {
         if (actions.isEmpty()) {
             return;
         }
@@ -156,11 +154,5 @@ public final class DefaultActionDerivationService implements ActionDerivationSer
     private boolean hasOriginWidgetPath(Action action) {
         Widget originWidget = action.get(Tags.OriginWidget, null);
         return originWidget != null && originWidget.get(Tags.Path, null) != null;
-    }
-
-    private void ensureStateIdentifiers(State state) {
-        if (state.get(Tags.ConcreteID, null) == null || state.get(Tags.AbstractID, null) == null) {
-            CodingManager.buildIDs(state);
-        }
     }
 }

@@ -12,9 +12,9 @@ import org.testar.core.action.Action;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 import org.testar.core.state.Widget;
-import org.testar.engine.action.ActionDerivationContext;
 import org.testar.engine.action.TextInputProvider;
-import org.testar.engine.action.WidgetActionDeriver;
+import org.testar.engine.action.derivation.ActionDerivationContext;
+import org.testar.engine.action.derivation.WidgetActionDeriver;
 import org.testar.webdriver.state.WdWidget;
 
 /**

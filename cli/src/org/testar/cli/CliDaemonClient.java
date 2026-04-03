@@ -70,7 +70,6 @@ final class CliDaemonClient {
                 javaExecutable,
                 "-cp",
                 classPath,
-                "-Dtestar.home=" + testarHome,
                 CliMain.class.getName(),
                 "daemon"
         );
@@ -86,16 +85,6 @@ final class CliDaemonClient {
     }
 
     private Path resolveTestarHome() {
-        String configuredHome = System.getProperty("testar.home");
-        if (configuredHome != null && !configuredHome.isBlank()) {
-            return Path.of(configuredHome).toAbsolutePath().normalize();
-        }
-
-        String configuredHomeEnv = System.getenv("TESTAR_HOME");
-        if (configuredHomeEnv != null && !configuredHomeEnv.isBlank()) {
-            return Path.of(configuredHomeEnv).toAbsolutePath().normalize();
-        }
-
         return Path.of(".").toAbsolutePath().normalize();
     }
 

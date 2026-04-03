@@ -13,10 +13,10 @@ import org.testar.core.action.policy.ClickablePolicy;
 import org.testar.core.action.policy.ScrollablePolicy;
 import org.testar.core.action.policy.TypeablePolicy;
 import org.testar.core.action.policy.WidgetFilterPolicy;
-import org.testar.engine.action.DefaultActionDerivationService;
-import org.testar.engine.action.EscFallbackActionDeriver;
-import org.testar.engine.action.StateActionDeriver;
 import org.testar.engine.action.TextInputProvider;
+import org.testar.engine.action.derivation.DefaultActionDerivationService;
+import org.testar.engine.action.derivation.EscFallbackActionDeriver;
+import org.testar.engine.action.derivation.StateActionDeriver;
 import org.testar.engine.action.policy.EnabledWidgetFilterPolicy;
 import org.testar.engine.action.policy.UnblockedWidgetFilterPolicy;
 

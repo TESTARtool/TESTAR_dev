@@ -4,7 +4,7 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.engine.action;
+package org.testar.engine.action.derivation;
 
 import org.testar.core.Assert;
 import org.testar.core.action.policy.ClickablePolicy;

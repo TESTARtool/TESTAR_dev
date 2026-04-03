@@ -4,7 +4,7 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.engine.action;
+package org.testar.engine.action.derivation;
 
 import java.util.Set;
 
@@ -20,14 +20,12 @@ import org.testar.core.tag.Tags;
  */
 public final class ForegroundActionDeriver implements ActionDeriver {
 
-    private static final Role SYSTEM_ACTION_ROLE = Role.from("System");
-
     @Override
     public void derive(SUT system, State state, ActionDerivationContext context, Set<Action> actions) {
         if (!state.get(Tags.Foreground, true) && system != null && system.get(Tags.SystemActivator, null) != null) {
             Action foregroundAction = new ActivateSystem();
             foregroundAction.set(Tags.Desc, "Bring the system to the foreground.");
-            foregroundAction.set(Tags.Role, SYSTEM_ACTION_ROLE);
+            foregroundAction.set(Tags.Role, Role.from("System"));
             foregroundAction.mapOriginWidget(state);
             actions.add(foregroundAction);
         }

@@ -7,8 +7,6 @@
 package org.testar.cli;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.testar.core.Assert;
 
@@ -31,7 +29,7 @@ final class CliRunner {
             case GET_STATE:
             case GET_DERIVED_ACTIONS:
             case EXECUTE_ACTION:
-            case STOP_SYSTEM:
+            case STOP_SESSION:
                 return sendToDaemon(request);
             case HELP:
             default:
@@ -50,7 +48,7 @@ final class CliRunner {
         output.println("  getDerivedActions");
         output.println("  executeAction click <semanticText>");
         output.println("  executeAction type <semanticText> <inputText>");
-        output.println("  stopSystem");
+        output.println("  stopSession");
     }
 
     private int sendToDaemon(CliRequest request) {

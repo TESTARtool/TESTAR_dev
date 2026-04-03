@@ -4,7 +4,7 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.engine.action;
+package org.testar.core.service;
 
 import java.util.Set;
 
@@ -12,10 +12,6 @@ import org.testar.core.action.Action;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 
-/**
- * Contributes actions to a derivation run.
- */
-public interface ActionDeriver {
-
-    void derive(SUT system, State state, ActionDerivationContext context, Set<Action> actions);
+public interface ActionDerivationService {
+    Set<Action> deriveActions(SUT system, State state);
 }

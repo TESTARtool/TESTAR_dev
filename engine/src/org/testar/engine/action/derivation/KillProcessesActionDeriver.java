@@ -4,7 +4,7 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.engine.action;
+package org.testar.engine.action.derivation;
 
 import java.util.Collections;
 import java.util.List;

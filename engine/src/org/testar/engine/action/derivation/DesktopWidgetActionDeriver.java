@@ -4,7 +4,7 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.engine.action;
+package org.testar.engine.action.derivation;
 
 import java.util.Set;
 
@@ -17,22 +17,23 @@ import org.testar.core.alayer.Point;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 import org.testar.core.state.Widget;
+import org.testar.engine.action.TextInputProvider;
 
 /**
- * Default desktop-style widget action derivation.
+ * Desktop-style widget action derivation.
  */
-public final class DefaultDesktopWidgetActionDeriver implements WidgetActionDeriver {
+public final class DesktopWidgetActionDeriver implements WidgetActionDeriver {
 
     private final AnnotatingActionCompiler actionCompiler;
     private final TextInputProvider textInputProvider;
     private final double scrollArrowSize;
     private final double scrollThick;
 
-    public DefaultDesktopWidgetActionDeriver(TextInputProvider textInputProvider) {
+    public DesktopWidgetActionDeriver(TextInputProvider textInputProvider) {
         this(new AnnotatingActionCompiler(), textInputProvider, 36.0, 16.0);
     }
 
-    DefaultDesktopWidgetActionDeriver(AnnotatingActionCompiler actionCompiler,
+    DesktopWidgetActionDeriver(AnnotatingActionCompiler actionCompiler,
                                       TextInputProvider textInputProvider,
                                       double scrollArrowSize,
                                       double scrollThick) {

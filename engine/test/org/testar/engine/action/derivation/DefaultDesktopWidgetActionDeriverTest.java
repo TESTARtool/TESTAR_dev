@@ -4,7 +4,7 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.engine.action;
+package org.testar.engine.action.derivation;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -37,7 +37,7 @@ public final class DefaultDesktopWidgetActionDeriverTest {
         widget.set(org.testar.core.tag.Tags.Role, buttonRole);
         widget.set(org.testar.core.tag.Tags.Desc, "Button");
 
-        DefaultDesktopWidgetActionDeriver deriver = new DefaultDesktopWidgetActionDeriver(
+        DesktopWidgetActionDeriver deriver = new DesktopWidgetActionDeriver(
                 new TestActionCompiler(),
                 w -> "ignored",
                 36.0,
@@ -58,7 +58,7 @@ public final class DefaultDesktopWidgetActionDeriverTest {
         widget.set(org.testar.core.tag.Tags.Role, textRole);
         widget.set(org.testar.core.tag.Tags.Desc, "TextBox");
 
-        DefaultDesktopWidgetActionDeriver deriver = new DefaultDesktopWidgetActionDeriver(
+        DesktopWidgetActionDeriver deriver = new DesktopWidgetActionDeriver(
                 new TestActionCompiler(),
                 w -> "hello",
                 36.0,
@@ -75,7 +75,7 @@ public final class DefaultDesktopWidgetActionDeriverTest {
     @Test
     public void derivesScrollActionWhenWidgetSupportsDrags() {
         WidgetStub widget = new ScrollableWidgetStub(new Drag(1, 2, 3, 4));
-        DefaultDesktopWidgetActionDeriver deriver = new DefaultDesktopWidgetActionDeriver(
+        DesktopWidgetActionDeriver deriver = new DesktopWidgetActionDeriver(
                 new TestActionCompiler(),
                 w -> "ignored",
                 36.0,

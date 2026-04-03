@@ -8,10 +8,10 @@ package org.testar.plugin;
 
 import org.testar.core.Assert;
 import org.testar.core.action.ActionResolver;
-import org.testar.core.execution.ActionDerivationService;
-import org.testar.core.execution.ActionExecutionService;
-import org.testar.core.execution.StateService;
-import org.testar.core.execution.SystemService;
+import org.testar.core.service.ActionDerivationService;
+import org.testar.core.service.ActionExecutionService;
+import org.testar.core.service.StateService;
+import org.testar.core.service.SystemService;
 
 /**
  * Platform service bundle resolved by the orchestrator.

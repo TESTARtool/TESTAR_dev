@@ -8,13 +8,13 @@ package org.testar.engine.state;
 
 import org.testar.core.Assert;
 import org.testar.core.CodingManager;
-import org.testar.core.execution.StateService;
 import org.testar.core.exceptions.StateBuildException;
+import org.testar.core.service.StateService;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 
 /**
- * Engine-side state service decorator that prepares identifiers after the raw
+ * Engine-side state service that prepares state-widget identifiers after the raw
  * platform state is fetched.
  */
 public final class DefaultStateService implements StateService, AutoCloseable {

@@ -6,8 +6,8 @@
 
 package org.testar.engine.action.selection.stategraph;
 
-import org.testar.core.execution.ActionSelectorService;
 import org.testar.core.action.Action;
+import org.testar.core.service.ActionSelectorService;
 import org.testar.core.state.State;
 import org.testar.core.tag.Tags;
 import org.testar.engine.action.selection.random.RandomActionSelector;

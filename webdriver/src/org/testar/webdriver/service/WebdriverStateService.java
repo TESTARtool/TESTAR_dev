@@ -7,8 +7,8 @@
 package org.testar.webdriver.service;
 
 import org.testar.core.Assert;
-import org.testar.core.execution.StateService;
 import org.testar.core.exceptions.StateBuildException;
+import org.testar.core.service.StateService;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 import org.testar.core.state.StateBuilder;

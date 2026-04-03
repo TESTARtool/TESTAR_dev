@@ -4,7 +4,7 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.engine.action;
+package org.testar.engine.action.derivation;
 
 import java.util.Collections;
 import java.util.List;
@@ -13,6 +13,7 @@ import org.testar.core.action.policy.ClickablePolicy;
 import org.testar.core.action.policy.ScrollablePolicy;
 import org.testar.core.action.policy.TypeablePolicy;
 import org.testar.core.action.policy.WidgetFilterPolicy;
+import org.testar.engine.action.TextInputProvider;
 import org.testar.engine.action.policy.EnabledWidgetFilterPolicy;
 import org.testar.engine.action.policy.UnblockedWidgetFilterPolicy;
 
@@ -49,7 +50,7 @@ public final class DesktopActionDerivationFactory {
                 widgetFilters,
                 forcedDerivers,
                 Collections.singletonList(new StateActionDeriver(
-                        new DefaultDesktopWidgetActionDeriver(textInputProvider)
+                        new DesktopWidgetActionDeriver(textInputProvider)
                 )),
                 Collections.singletonList(new EscFallbackActionDeriver())
         );

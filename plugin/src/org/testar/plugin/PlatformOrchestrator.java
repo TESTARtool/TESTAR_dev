@@ -6,10 +6,10 @@
 
 package org.testar.plugin;
 
-import org.testar.core.execution.SystemService;
-import org.testar.engine.action.DesktopActionDerivationFactory;
+import org.testar.engine.action.execution.DefaultActionExecutionService;
 import org.testar.engine.action.DescriptionActionResolver;
-import org.testar.engine.action.DefaultActionExecutionService;
+import org.testar.engine.action.derivation.DesktopActionDerivationFactory;
+import org.testar.core.service.SystemService;
 import org.testar.engine.state.DefaultStateService;
 import org.testar.plugin.exceptions.UnsupportedPlatformException;
 import org.testar.webdriver.action.WebdriverActionDerivationFactory;
