@@ -14,6 +14,7 @@ enum CliCommand {
     GET_STATE,
     GET_DERIVED_ACTIONS,
     EXECUTE_ACTION,
+    STATE_MODEL_ANALYSIS,
     STOP_SESSION;
 
     static CliCommand fromToken(String token) {
@@ -37,6 +38,9 @@ enum CliCommand {
         }
         if ("executeAction".equalsIgnoreCase(token)) {
             return EXECUTE_ACTION;
+        }
+        if ("stateModelAnalysis".equalsIgnoreCase(token)) {
+            return STATE_MODEL_ANALYSIS;
         }
         if ("stopSession".equalsIgnoreCase(token)) {
             return STOP_SESSION;

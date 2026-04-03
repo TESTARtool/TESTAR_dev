@@ -6,6 +6,7 @@
 
 package org.testar.plugin;
 
+import org.testar.config.settings.Settings;
 import org.testar.core.Assert;
 
 /**
@@ -24,21 +25,13 @@ public final class PlatformSessionSpec {
     private final OperatingSystems operatingSystem;
     private final TargetType targetType;
     private final String target;
-    private final boolean processListenerEnabled;
-    private final String sutProcesses;
-    private final String processesToKillDuringTest;
-    private final double stateTimeoutSeconds;
-    private final boolean accessBridgeEnabled;
+    private final Settings settings;
 
     private PlatformSessionSpec(Builder builder) {
         this.operatingSystem = Assert.notNull(builder.operatingSystem);
         this.targetType = Assert.notNull(builder.targetType);
         this.target = Assert.notNull(builder.target);
-        this.processListenerEnabled = builder.processListenerEnabled;
-        this.sutProcesses = builder.sutProcesses;
-        this.processesToKillDuringTest = builder.processesToKillDuringTest;
-        this.stateTimeoutSeconds = builder.stateTimeoutSeconds;
-        this.accessBridgeEnabled = builder.accessBridgeEnabled;
+        this.settings = Assert.notNull(builder.settings);
     }
 
     public OperatingSystems getOperatingSystem() {
@@ -53,28 +46,12 @@ public final class PlatformSessionSpec {
         return target;
     }
 
-    public boolean isProcessListenerEnabled() {
-        return processListenerEnabled;
+    public Settings getSettings() {
+        return settings;
     }
 
-    public String getSutProcesses() {
-        return sutProcesses;
-    }
-
-    public String getProcessesToKillDuringTest() {
-        return processesToKillDuringTest;
-    }
-
-    public double getStateTimeoutSeconds() {
-        return stateTimeoutSeconds;
-    }
-
-    public boolean isAccessBridgeEnabled() {
-        return accessBridgeEnabled;
-    }
-
-    public static Builder builder(OperatingSystems operatingSystem, TargetType targetType, String target) {
-        return new Builder(operatingSystem, targetType, target);
+    public static Builder builder(OperatingSystems operatingSystem, TargetType targetType, String target, Settings settings) {
+        return new Builder(operatingSystem, targetType, target, settings);
     }
 
     public static final class Builder {
@@ -82,41 +59,13 @@ public final class PlatformSessionSpec {
         private final OperatingSystems operatingSystem;
         private final TargetType targetType;
         private final String target;
-        private boolean processListenerEnabled;
-        private String sutProcesses = "";
-        private String processesToKillDuringTest = "";
-        private double stateTimeoutSeconds = 10.0;
-        private boolean accessBridgeEnabled;
+        private final Settings settings;
 
-        private Builder(OperatingSystems operatingSystem, TargetType targetType, String target) {
+        private Builder(OperatingSystems operatingSystem, TargetType targetType, String target, Settings settings) {
             this.operatingSystem = Assert.notNull(operatingSystem);
             this.targetType = Assert.notNull(targetType);
             this.target = Assert.notNull(target);
-        }
-
-        public Builder withProcessListenerEnabled(boolean processListenerEnabled) {
-            this.processListenerEnabled = processListenerEnabled;
-            return this;
-        }
-
-        public Builder withSutProcesses(String sutProcesses) {
-            this.sutProcesses = sutProcesses == null ? "" : sutProcesses;
-            return this;
-        }
-
-        public Builder withProcessesToKillDuringTest(String processesToKillDuringTest) {
-            this.processesToKillDuringTest = processesToKillDuringTest == null ? "" : processesToKillDuringTest;
-            return this;
-        }
-
-        public Builder withStateTimeoutSeconds(double stateTimeoutSeconds) {
-            this.stateTimeoutSeconds = stateTimeoutSeconds;
-            return this;
-        }
-
-        public Builder withAccessBridgeEnabled(boolean accessBridgeEnabled) {
-            this.accessBridgeEnabled = accessBridgeEnabled;
-            return this;
+            this.settings = Assert.notNull(settings);
         }
 
         public PlatformSessionSpec build() {

@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import org.testar.cli.settings.CliSettingsLoader;
+import org.testar.config.settings.Settings;
 import org.testar.core.action.Action;
 import org.testar.core.action.ActionRoles;
 import org.testar.core.action.ResolvedAction;
@@ -108,14 +110,19 @@ final class CliDaemonServer {
     }
 
     private CliResponse sessionStatus() {
+        long daemonPid = ProcessHandle.current().pid();
         if (activeSession == null) {
             return new CliResponse(0, List.of(
                     "sessionStatus",
+                    "daemonRunning=true",
+                    "daemonPid=" + daemonPid,
                     "active=false"
             ));
         }
         return new CliResponse(0, List.of(
                 "sessionStatus",
+                "daemonRunning=true",
+                "daemonPid=" + daemonPid,
                 "active=true",
                 "platform=" + activeSessionSpec.getOperatingSystem().name().toLowerCase(Locale.ROOT),
                 "pid=" + activeSession.system().get(Tags.PID, -1L),
@@ -207,6 +214,7 @@ final class CliDaemonServer {
     private PlatformSessionSpec buildSessionSpec(CliRequest request) {
         String platformToken = request.argumentAt(0);
         String target = request.argumentAt(1);
+        Settings settings = CliSettingsLoader.load();
 
         if (platformToken == null) {
             throw new IllegalArgumentException("Expected: startSession <platform> <target>");
@@ -217,7 +225,7 @@ final class CliDaemonServer {
         }
 
         OperatingSystems operatingSystem = parseOperatingSystem(platformToken);
-        return PlatformSessionSpec.builder(operatingSystem, TargetType.EXECUTABLE, target).build();
+        return PlatformSessionSpec.builder(operatingSystem, TargetType.EXECUTABLE, target, settings).build();
     }
 
     private OperatingSystems parseOperatingSystem(String token) {

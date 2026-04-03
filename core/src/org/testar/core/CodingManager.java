@@ -9,7 +9,9 @@ package org.testar.core;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.zip.CRC32;
 
@@ -63,6 +65,24 @@ public class CodingManager {
     private static Tag<?>[] customTagsForConcreteId = new Tag<?>[] { };
     private static Tag<?>[] customTagsForAbstractId = new Tag<?>[] { };
     private static Tag<?>[] defaultAbstractStateTags = new Tag<?>[] { StateManagementTags.WidgetControlType };
+
+    /**
+     * This method initializes the coding manager with custom tags to use for constructing
+     * concrete and abstract state ids.
+     */
+    public static void initCodingManager(List<String> abstractStateAttributes) {
+        Set<Tag<?>> stateManagementTags = StateManagementTags.getAllTags();
+        // for the concrete state tags we use all the state management tags that are available
+        if (!stateManagementTags.isEmpty()) {
+            setCustomTagsForConcreteId(stateManagementTags.toArray(new Tag<?>[0]));
+        }
+
+        // then the attributes for the abstract state id
+        if (!abstractStateAttributes.isEmpty()) {
+            Tag<?>[] abstractTags = abstractStateAttributes.stream().map(StateManagementTags::getTagFromSettingsString).filter(Objects::nonNull).toArray(Tag<?>[]::new);
+            setCustomTagsForAbstractId(abstractTags);
+        }
+    }
 
     /**
      * Set the array of tags that should be used in constructing the concrete state id's.

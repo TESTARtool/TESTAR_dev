@@ -1,22 +1,59 @@
 apply plugin: 'java'
 apply plugin: 'application'
 
+buildDir = 'target'
+
+sourceSets {
+    main {
+        resources {
+            srcDirs = ['resources']
+        }
+    }
+}
+
 dependencies {
     implementation project(':core')
     implementation project(':config')
     implementation project(':plugin')
+    implementation project(':statemodel')
     implementation project(':windows')
 }
 
 application {
     mainClass = 'org.testar.cli.CliMain'
+    applicationName = 'testar-cli'
+}
+
+tasks.named('startScripts') {
+    applicationDefaultJvmArgs = ["-Dlog4j.configurationFile=log4j2.xml"]
+
+    doLast {
+        def windowsScriptFile = getWindowsScript()
+        def windowsScriptText = windowsScriptFile.text
+        windowsScriptText = windowsScriptText.replaceFirst(
+                /set CLASSPATH=.*/,
+                java.util.regex.Matcher.quoteReplacement(
+                        "rem original CLASSPATH declaration replaced by:\r\nset CLASSPATH=%APP_HOME%\\lib\\*"
+                )
+        )
+        windowsScriptFile.text = windowsScriptText
+    }
 }
 
 distributions {
     main {
         contents {
+            from(project(':statemodel').file('resources/graphs')) {
+                into 'bin/output/graphs'
+            }
             from(project(':webdriver').file('resources/web-extension')) {
                 into 'web-extension'
+            }
+            from('resources/settings') {
+                into 'bin/settings'
+            }
+            from('resources/log4j2.xml') {
+                into 'bin'
             }
         }
     }

@@ -8,6 +8,7 @@ package org.testar.cli;
 
 import java.io.PrintStream;
 
+import org.testar.cli.statemodel.CliStateModelAnalysis;
 import org.testar.core.Assert;
 
 final class CliRunner {
@@ -24,6 +25,8 @@ final class CliRunner {
         switch (request.getCommand()) {
             case DAEMON:
                 return 0;
+            case STATE_MODEL_ANALYSIS:
+                return new CliStateModelAnalysis(output).run();
             case START_SESSION:
             case SESSION_STATUS:
             case GET_STATE:

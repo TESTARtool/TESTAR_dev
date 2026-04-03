@@ -1,0 +1,113 @@
+#################################################################
+# Actionfilter
+#
+# Regular expression and Tags to apply them.
+# More filters can be added in Spy mode,
+# these will be added to the protocol_filter.xml file.
+#################################################################
+
+ClickFilter = 
+TagsToFilter = 
+
+#################################################################
+# Processfilter
+#
+# Regular expression. Kill the processes that your SUT can start up
+# but that you do not want to test.
+#################################################################
+
+ProcessesToKillDuringTest =
+
+#################################################################
+# Time configurations
+#
+# ActionDuration: Sets the speed, in seconds, at which a GUI action is performed
+# TimeToWaitAfterAction: Sets the delay, in seconds, between UI actions during a test
+# StartupTime: Sets how many seconds to wait for the SUT to be ready for testing
+# MaxTime: Sets a time, in seconds, after which the test run is finished (e.g. stop after an hour)
+#################################################################
+
+ActionDuration = 0.0
+TimeToWaitAfterAction = 0.3
+StartupTime = 2.0
+MaxTime = 3.1536E7
+
+#################################################################
+# State model inference settings
+#
+# StateModelEnabled: Enable or disable the State Model feature
+# DataStore: The graph database we use to store the State Model: OrientDB
+# DataStoreType: The mode we use to connect to the database: remote or plocal
+# DataStoreServer: IP address to connect if we desired to use remote mode
+# DataStoreDirectory: Path of the directory on which local OrientDB exists, if we use plocal mode
+# DataStoreDB: The name of the desired database on which we want to store the State Model.
+# DataStoreUser: User credential to authenticate TESTAR in OrientDB
+# DataStorePassword: Password credential to authenticate TESTAR in OrientDB
+# DataStoreMode: Indicate how TESTAR should store the model objects in the database: instant, delayed, hybrid, none
+# ApplicationName: Name to identify the SUT. Especially important to identify a State Model
+# ApplicationVersion: Version to identify the SUT. Especially important to identify a State Model
+# ActionSelectionAlgorithm: State Model Action Selection mechanism to explore the SUT: random or unvisited
+# StateModelStoreWidgets: Save all widget tree information in the State Model every time TESTAR discovers a new Concrete State
+# ResetDataStore: WARNING: Delete all existing State Models from the selected database before creating a new one
+#################################################################
+
+StateModelEnabled = true
+DataStore = OrientDB
+DataStoreType = plocal
+DataStoreServer = 
+OutputDir = ./output
+DataStoreDirectory = output/orientdb-community-3.2.38/databases
+DataStoreDB = testar
+DataStoreUser = testar
+DataStorePassword = testar
+DataStoreMode = instant
+ApplicationName = 
+ApplicationVersion = 
+ActionSelectionAlgorithm = random
+StateModelStoreWidgets = false
+ResetDataStore = false
+
+#################################################################
+# State identifier attributes
+#
+# Specify the widget attributes that you wish to use in constructing
+# the widget and state hash strings. Use a comma separated list.
+#################################################################
+AbstractStateAttributes = WebWidgetId,WebWidgetName
+
+#################################################################
+# WebDriver features
+#
+# ClickableClasses: Indicate which web CSS classes need to be considered clickable
+# TypeableClasses: Indicate which web CSS classes need to be considered typeable
+# DeniedExtensions: Indicate which web URL extensions need to be ignored when testing
+# WebDomainsAllowed: Indicate which web URL domains are allowed to explore when testing
+# WebPathsAllowed: Regular expressions to indicate which web URL paths are allowed to explore when testing
+# FollowLinks: Indicate if allowing to follow links opened in new tabs
+# BrowserFullScreen: Indicate if perform the web testing with the browser in full screen
+# SwitchNewTabs: Indicate if switch to a new web tab if opened
+#################################################################
+
+ClickableClasses = 
+TypeableClasses = 
+DeniedExtensions = pdf;jpg;png;pfx;xml
+WebDomainsAllowed = null
+WebPathsAllowed = null
+FollowLinks = false
+BrowserFullScreen = true
+SwitchNewTabs = true
+
+#################################################################
+# Sets whether to keep the SUTs GUI active in the screen (e.g. when its minimised or when a process is started and its UI is in front, etc.)
+#################################################################
+
+ForceForeground = true
+
+#################################################################
+# Other settings
+#################################################################
+
+TimeToFreeze=10.0
+ProcessListenerEnabled=false
+SUTProcesses=
+AccessBridgeEnabled=false

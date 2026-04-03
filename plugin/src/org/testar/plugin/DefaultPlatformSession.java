@@ -23,6 +23,7 @@ final class DefaultPlatformSession implements PlatformSession {
     DefaultPlatformSession(PlatformServices services, SUT system) {
         this.services = Assert.notNull(services);
         this.system = Assert.notNull(system);
+        this.services.stateModelService().notifyTestSequencedStarted();
     }
 
     @Override
@@ -37,7 +38,10 @@ final class DefaultPlatformSession implements PlatformSession {
 
     @Override
     public Set<Action> getDerivedActions() {
-        return services.actionDerivationService().deriveActions(system, getState());
+        State state = services.stateService().getState(system);
+        Set<Action> actions = services.actionDerivationService().deriveActions(system, state);
+        services.stateModelService().notifyNewStateReached(state, actions);
+        return actions;
     }
 
     @Override
@@ -47,16 +51,19 @@ final class DefaultPlatformSession implements PlatformSession {
 
     @Override
     public boolean executeAction(Action action) {
+        services.stateModelService().notifyActionExecution(action);
         return services.actionExecutionService().executeAction(system, getState(), Assert.notNull(action));
     }
 
     @Override
     public void stopSystem() {
+        services.stateModelService().notifyTestSequenceStopped();
         services.systemService().stopSystem(system);
     }
 
     @Override
     public void close() {
+        closeStateModelService();
         closeStateService();
     }
 
@@ -67,6 +74,14 @@ final class DefaultPlatformSession implements PlatformSession {
             } catch (Exception exception) {
                 throw new IllegalStateException("Unable to close state service", exception);
             }
+        }
+    }
+
+    private void closeStateModelService() {
+        try {
+            services.stateModelService().notifyTestingEnded();
+        } catch (Exception exception) {
+            throw new IllegalStateException("Unable to close state model service", exception);
         }
     }
 }

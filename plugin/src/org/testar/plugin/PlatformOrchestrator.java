@@ -9,9 +9,20 @@ package org.testar.plugin;
 import org.testar.engine.action.execution.DefaultActionExecutionService;
 import org.testar.engine.action.DescriptionActionResolver;
 import org.testar.engine.action.derivation.DesktopActionDerivationFactory;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import org.testar.config.ConfigTags;
+import org.testar.config.StateModelTags;
+import org.testar.config.settings.Settings;
+import org.testar.core.CodingManager;
 import org.testar.core.service.SystemService;
 import org.testar.engine.state.DefaultStateService;
 import org.testar.plugin.exceptions.UnsupportedPlatformException;
+import org.testar.statemodel.DummyModelManager;
+import org.testar.statemodel.StateModelManager;
+import org.testar.statemodel.StateModelManagerFactory;
+import org.testar.statemodel.StateModelStorageBootstrap;
 import org.testar.webdriver.action.WebdriverActionDerivationFactory;
 import org.testar.webdriver.action.policy.WebdriverClickablePolicy;
 import org.testar.webdriver.action.policy.WebdriverScrollablePolicy;
@@ -62,8 +73,8 @@ public final class PlatformOrchestrator {
             case EXECUTABLE:
                 systemService = WindowsSystemService.fromExecutable(
                         sessionSpec.getTarget(),
-                        sessionSpec.isProcessListenerEnabled(),
-                        sessionSpec.getSutProcesses()
+                        sessionSpec.getSettings().get(ConfigTags.ProcessListenerEnabled, false),
+                        sessionSpec.getSettings().get(ConfigTags.SUTProcesses, "")
                 );
                 break;
             case PROCESS_NAME:
@@ -85,16 +96,17 @@ public final class PlatformOrchestrator {
                 systemService,
                 new DefaultStateService(
                         WindowsStateService.uiAutomation(
-                                sessionSpec.getStateTimeoutSeconds(),
-                                sessionSpec.isAccessBridgeEnabled(),
-                                sessionSpec.getSutProcesses()
+                                sessionSpec.getSettings().get(ConfigTags.TimeToFreeze, 30.0),
+                                sessionSpec.getSettings().get(ConfigTags.AccessBridgeEnabled, false),
+                                sessionSpec.getSettings().get(ConfigTags.SUTProcesses, "")
                         )
                 ),
+                createStateModelService(sessionSpec),
                 DesktopActionDerivationFactory.create(
                         new WindowsClickablePolicy(),
                         new WindowsTypeablePolicy(),
                         new WindowsScrollablePolicy(),
-                        sessionSpec.getProcessesToKillDuringTest(),
+                        sessionSpec.getSettings().get(ConfigTags.ProcessesToKillDuringTest, ""),
                         widget -> "TESTAR"
                 ),
                 new DefaultActionExecutionService(),
@@ -112,8 +124,9 @@ public final class PlatformOrchestrator {
         return new PlatformServices(
                 WebdriverSystemService.fromSutConnector(sessionSpec.getTarget()),
                 new DefaultStateService(
-                        WebdriverStateService.browser(sessionSpec.getStateTimeoutSeconds())
+                        WebdriverStateService.browser(sessionSpec.getSettings().get(ConfigTags.TimeToFreeze, 30.0))
                 ),
+                createStateModelService(sessionSpec),
                 WebdriverActionDerivationFactory.create(
                         new WebdriverClickablePolicy(),
                         new WebdriverTypeablePolicy(),
@@ -122,6 +135,54 @@ public final class PlatformOrchestrator {
                 ),
                 new DefaultActionExecutionService(),
                 new DescriptionActionResolver()
+        );
+    }
+
+    private static StateModelManager createStateModelService(PlatformSessionSpec sessionSpec) {
+        Settings settings = sessionSpec.getSettings();
+
+        if (!settings.get(StateModelTags.StateModelEnabled , false)) {
+            return new DummyModelManager();
+        }
+
+        CodingManager.initCodingManager(settings.get(ConfigTags.AbstractStateAttributes));
+
+        bootstrapStateModelStorage(settings);
+
+        String modelName = settings.get(ConfigTags.ApplicationName, "");
+        if(modelName.isEmpty()) {
+            modelName = sessionSpec.getTarget().replaceAll("[^A-Za-z0-9]", "_");
+        }
+        String modelVersion = settings.get(ConfigTags.ApplicationVersion, "");
+        if(modelVersion.isEmpty()) {
+            modelVersion = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss"));
+        }
+
+        return StateModelManagerFactory.getStateModelManager(modelName, modelVersion, settings);
+    }
+
+    private static void bootstrapStateModelStorage(Settings settings) {
+        boolean stateModelEnabled = settings.get(StateModelTags.StateModelEnabled, false);
+        String dataStore = settings.get(StateModelTags.DataStore, "");
+        String dataStoreType = settings.get(StateModelTags.DataStoreType, "");
+
+        if (!stateModelEnabled) {
+            return;
+        }
+
+        if (!"OrientDB".equalsIgnoreCase(dataStore)) {
+            return;
+        }
+
+        if (!"plocal".equalsIgnoreCase(dataStoreType)) {
+            return;
+        }
+
+        StateModelStorageBootstrap.setupOrientDB(
+                settings.get(ConfigTags.OutputDir, ""),
+                settings.get(StateModelTags.DataStoreDB, ""),
+                settings.get(StateModelTags.DataStoreUser, ""),
+                settings.get(StateModelTags.DataStorePassword, "")
         );
     }
 }
