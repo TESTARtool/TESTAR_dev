@@ -7,6 +7,7 @@
 package org.testar.plugin;
 
 import org.testar.engine.action.execution.DefaultActionExecutionService;
+import org.testar.engine.manager.InputDataManager;
 import org.testar.engine.action.DescriptionActionResolver;
 import org.testar.engine.action.derivation.DesktopActionDerivationFactory;
 
@@ -123,7 +124,7 @@ public final class PlatformOrchestrator {
                         new WindowsTypeablePolicy(),
                         new WindowsScrollablePolicy(),
                         sessionSpec.getSettings().get(ConfigTags.ProcessesToKillDuringTest, ""),
-                        widget -> "TESTAR"
+                        widget -> InputDataManager.getRandomTextInputData()
                 ),
                 new DefaultActionExecutionService(),
                 new DescriptionActionResolver()
@@ -147,7 +148,7 @@ public final class PlatformOrchestrator {
                         new WebdriverClickablePolicy(),
                         new WebdriverTypeablePolicy(),
                         new WebdriverScrollablePolicy(),
-                        widget -> "TESTAR"
+                        widget -> InputDataManager.getRandomTextInputData()
                 ),
                 new DefaultActionExecutionService(),
                 new DescriptionActionResolver()
