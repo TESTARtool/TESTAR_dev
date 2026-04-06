@@ -36,6 +36,7 @@ import java.util.Set;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.testar.monkey.Util;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Color;
 import org.testar.monkey.alayer.FillPattern;
@@ -189,7 +190,7 @@ public class LlmParseActionResponse {
         String widgetDesc = action.get(Tags.OriginWidget).get(Tags.Desc, "<no description>");
         action.set(Tags.Desc, innerAction.getClass().getSimpleName() + " '" + inputText + "' into '" + widgetDesc + "'");
 
-        if(action.get(Tags.Visualizer) instanceof TextVisualizer) {
+        if(action.get(Tags.Visualizer, Util.NullVisualizer) instanceof TextVisualizer) {
             TextVisualizer textVisualizer = (TextVisualizer) action.get(Tags.Visualizer);
             Pen newPen = Pen.newPen().setColor(Color.Red).setFillPattern(FillPattern.Solid).setStrokeWidth(50).build();
             action.set(Tags.Visualizer, textVisualizer.withText(inputText, newPen));

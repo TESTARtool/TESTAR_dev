@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2025 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2025 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2025 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -102,6 +102,12 @@ public class WdChromeManager implements WdBrowserManager {
 		}
 		if(WdDriver.disableGPU) {
 			options.addArguments("--disable-gpu");
+		}
+		if(WdDriver.userDataDir != null && !WdDriver.userDataDir.isEmpty()) {
+			options.addArguments("--user-data-dir=" + WdDriver.userDataDir);
+		}
+		if(WdDriver.profileDirectory != null && !WdDriver.profileDirectory.isEmpty()) {
+			options.addArguments("--profile-directory=" + WdDriver.profileDirectory);
 		}
 
 		Map<String, Object> prefs = new HashMap<>();
