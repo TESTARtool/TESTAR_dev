@@ -15,7 +15,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.testar.core.Drag;
+import org.testar.core.action.policy.TypeablePolicy;
 import org.testar.core.util.Util;
+import org.testar.windows.action.policy.WindowsTypeablePolicy;
 import org.testar.windows.tag.UIATags;
 import org.testar.core.alayer.Role;
 import org.testar.core.alayer.Shape;
@@ -188,7 +190,30 @@ public class UIAWidget implements Widget, Serializable {
         repr.append(getPropertiesRepresentation(tab));
         return repr.toString();
     }
-    
+
+    public String getUIAWidgetDescription() {
+        if (uiaElement == null) {
+            return "";
+        }
+
+        boolean isTypeable = new WindowsTypeablePolicy().isTypeable((Widget) this);
+        String name = uiaElement.name;
+        String valuePattern = uiaElement.valuePattern;
+
+        if (!isTypeable) {
+            return name != null ? name : "";
+        }
+
+        if (name == null) {
+            return valuePattern != null ? valuePattern : "";
+        }
+        if (valuePattern == null) {
+            return name;
+        }
+
+        return name + ": " + valuePattern;
+    }
+
     @Override
     public String toString(Tag<?>... tags){
         return Util.widgetDesc(this, tags);

@@ -3,9 +3,75 @@ package org.testar.windows.state;
 import org.junit.Assert;
 import org.junit.Test;
 import org.testar.core.alayer.Rect;
+import org.testar.core.tag.Tags;
+import org.testar.windows.alayer.UIARoles;
 import org.testar.windows.tag.UIATags;
 
 public class TestUIAWidget {
+
+    @Test
+    public void testUIAWidgetDescWithoutElement() {
+        UIAWidget uiaWidget = createWidget(null);
+
+        Assert.assertEquals("", uiaWidget.getUIAWidgetDescription());
+    }
+
+    @Test
+    public void testUIAWidgetDescForClickable() {
+        UIAElement uiaElement = new UIAElement();
+        uiaElement.name = "Open";
+        uiaElement.valuePattern = "ignored";
+
+        UIAWidget uiaWidget = createWidget(uiaElement);
+        uiaWidget.set(Tags.Role, UIARoles.UIAButton);
+
+        Assert.assertEquals("Open", uiaWidget.getUIAWidgetDescription());
+    }
+
+    @Test
+    public void testUIAWidgetDescForClickableNullName() {
+        UIAElement uiaElement = new UIAElement();
+        uiaElement.name = null;
+        uiaElement.valuePattern = "ignored";
+
+        UIAWidget uiaWidget = createWidget(uiaElement);
+        uiaWidget.set(Tags.Role, UIARoles.UIAButton);
+
+        Assert.assertEquals("", uiaWidget.getUIAWidgetDescription());
+    }
+
+    @Test
+    public void testUIAWidgetDescForTypeable() {
+        UIAElement uiaElement = new UIAElement();
+        uiaElement.name = "Username";
+        uiaElement.valuePattern = "john";
+
+        UIAWidget uiaWidget = createTypeableWidget(uiaElement);
+
+        Assert.assertEquals("Username: john", uiaWidget.getUIAWidgetDescription());
+    }
+
+    @Test
+    public void testUIAWidgetDescForTypeableNullName() {
+        UIAElement uiaElement = new UIAElement();
+        uiaElement.name = null;
+        uiaElement.valuePattern = "john";
+
+        UIAWidget uiaWidget = createTypeableWidget(uiaElement);
+
+        Assert.assertEquals("john", uiaWidget.getUIAWidgetDescription());
+    }
+
+    @Test
+    public void testUIAWidgetDescForTypeableNullPattern() {
+        UIAElement uiaElement = new UIAElement();
+        uiaElement.name = "Username";
+        uiaElement.valuePattern = null;
+
+        UIAWidget uiaWidget = createTypeableWidget(uiaElement);
+
+        Assert.assertEquals("Username", uiaWidget.getUIAWidgetDescription());
+    }
 
 	@Test
 	public void testEmptyUIAWidgetToString() {
@@ -38,5 +104,19 @@ public class TestUIAWidget {
 				UIATags.UIAIsControlElement,
 				UIATags.UIABoundingRectangle), "uiaAutomationId,-1,true,Rect [x:0.0 y:2.0 w:10.0 h:8.0]");
 	}
+
+    private UIAWidget createWidget(UIAElement uiaElement) {
+        UIAState uiaState = new UIAState(null);
+        return new UIAWidget(uiaState, uiaState, uiaElement);
+    }
+
+    private UIAWidget createTypeableWidget(UIAElement uiaElement) {
+        UIAWidget uiaWidget = createWidget(uiaElement);
+        uiaWidget.set(Tags.Role, UIARoles.UIAEdit);
+        uiaWidget.set(UIATags.UIAIsKeyboardFocusable, true);
+        uiaWidget.set(UIATags.UIAIsValuePatternAvailable, true);
+        uiaWidget.set(UIATags.UIAValueIsReadOnly, false);
+        return uiaWidget;
+    }
 
 }

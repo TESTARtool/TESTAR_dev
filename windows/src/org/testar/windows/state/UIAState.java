@@ -106,7 +106,7 @@ public final class UIAState extends UIAWidget implements State {
         }
         
         if(tag.equals(Tags.Desc)){
-            returnObject = widget.uiaElement.name;
+            returnObject = widget.getUIAWidgetDescription();
         }else if(tag.equals(Tags.Role)){
             returnObject = UIARoles.fromTypeId(widget.uiaElement.ctrlId);
         }else if(tag.equals(Tags.HitTester)){
