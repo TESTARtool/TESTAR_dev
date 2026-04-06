@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,7 @@ import org.testar.config.ConfigTags;
 import org.testar.config.StateModelTags;
 import org.testar.config.settings.Settings;
 import org.testar.core.Assert;
+import org.testar.core.util.RuntimePathsUtil;
 import org.testar.statemodel.analysis.AnalysisManager;
 import org.testar.statemodel.analysis.webserver.JettyServer;
 import org.testar.statemodel.persistence.orientdb.entity.Config;
@@ -50,10 +52,13 @@ public final class CliStateModelAnalysis {
             config.setDatabase(settings.get(StateModelTags.DataStoreDB, ""));
             config.setUser(settings.get(StateModelTags.DataStoreUser, ""));
             config.setPassword(settings.get(StateModelTags.DataStorePassword, ""));
-            config.setDatabaseDirectory(settings.get(StateModelTags.DataStoreDirectory, ""));
-            AnalysisManager analysisManager = new AnalysisManager(config, resolveGraphsOutputDirectory(settings));
+
+            Path stateModelPath = RuntimePathsUtil.resolveAgainstTestarHome(settings.get(StateModelTags.DataStoreDirectory, ""));
+            config.setDatabaseDirectory(stateModelPath.toString());
+
+            AnalysisManager analysisManager = new AnalysisManager(config, resolveGraphsOutputDirectory());
             JettyServer jettyServer = new JettyServer();
-            jettyServer.start(resolveGraphsOutputDirectory(settings), analysisManager);
+            jettyServer.start(resolveGraphsOutputDirectory(), analysisManager);
             openBrowser();
             return 0;
         } catch (Exception exception) {
@@ -98,12 +103,8 @@ public final class CliStateModelAnalysis {
         return missingSettings;
     }
 
-    private String resolveGraphsOutputDirectory(Settings settings) {
-        String outputDirectory = settings.get(ConfigTags.OutputDir, "");
-        if (!outputDirectory.endsWith(File.separator)) {
-            outputDirectory += File.separator;
-        }
-        return outputDirectory + "graphs" + File.separator;
+    private String resolveGraphsOutputDirectory() {
+        return RuntimePathsUtil.resolveRuntimeDirectory().resolve("graphs").toString() + File.separator;
     }
 
     private void openBrowser() {

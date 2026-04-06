@@ -16,6 +16,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.testar.core.util.RuntimePathsUtil;
+
 final class CliDaemonClient {
 
     private static final int MAX_REQUEST_ATTEMPTS = 5;
@@ -62,12 +64,16 @@ final class CliDaemonClient {
     }
 
     private void startDaemonProcess() {
-        String javaExecutable = Path.of(System.getProperty("java.home"), "bin", "java.exe").toString();
+        String executableName = System.getProperty("os.name", "").toLowerCase().contains("windows")
+                ? "java.exe"
+                : "java";
+        String javaExecutable = Path.of(System.getProperty("java.home"), "bin", executableName).toString();
         String classPath = System.getProperty("java.class.path");
         Path testarHome = resolveTestarHome();
-        Path logFile = Path.of(System.getProperty("java.io.tmpdir"), "testar-cli-daemon.log");
+        Path logFile = RuntimePathsUtil.resolveRuntimeDirectory().resolve("logs").resolve("testar-cli-daemon.log");
         ProcessBuilder builder = new ProcessBuilder(
                 javaExecutable,
+                "-Dtestar.home=" + testarHome,
                 "-cp",
                 classPath,
                 CliMain.class.getName(),
@@ -85,7 +91,7 @@ final class CliDaemonClient {
     }
 
     private Path resolveTestarHome() {
-        return Path.of(".").toAbsolutePath().normalize();
+        return RuntimePathsUtil.resolveTestarHome();
     }
 
     private CliResponse sendOnce(CliRequest request) throws IOException {

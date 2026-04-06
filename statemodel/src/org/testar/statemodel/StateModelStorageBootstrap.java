@@ -11,12 +11,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.testar.core.util.RuntimePathsUtil;
 
 public class StateModelStorageBootstrap {
 
@@ -26,7 +28,14 @@ public class StateModelStorageBootstrap {
     }
 
     public static void setupOrientDB(String directoryPath, String database, String user, String pass) {
-        String extractedOrientDB = downloadOrientDB(directoryPath);
+        Path databaseDirectory = RuntimePathsUtil.resolveAgainstTestarHome(directoryPath);
+        Path orientDbHome = databaseDirectory.getParent();
+        Path installDirectory = orientDbHome == null ? databaseDirectory : orientDbHome.getParent();
+        if (installDirectory == null) {
+            installDirectory = RuntimePathsUtil.resolveRuntimeDirectory();
+        }
+
+        String extractedOrientDB = downloadOrientDB(installDirectory.toString());
         createOrientDB(extractedOrientDB, database, user, pass);
     }
 

@@ -8,6 +8,7 @@ package org.testar.plugin.reporting;
 
 import java.awt.GraphicsEnvironment;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -21,6 +22,7 @@ import org.testar.core.alayer.AWTCanvas;
 import org.testar.core.serialisation.ScreenshotSerialiser;
 import org.testar.core.state.State;
 import org.testar.core.tag.Tags;
+import org.testar.core.util.RuntimePathsUtil;
 import org.testar.core.verdict.Verdict;
 import org.testar.plugin.screenshot.ScreenshotProviderFactory;
 import org.testar.reporting.ReportManager;
@@ -86,7 +88,8 @@ public final class SessionReportingManager {
     }
 
     private static void configureOutputStructure(Settings settings, String target) {
-        TestarDirectories.setOutputDir(settings.get(ConfigTags.OutputDir, "./output"));
+        Path outputPath = RuntimePathsUtil.resolveAgainstTestarHome(settings.get(ConfigTags.OutputDir, "./output"));
+        TestarDirectories.setOutputDir(outputPath.toString());
         OutputStructure.calculateOuterLoopDateString();
         OutputStructure.sequenceInnerLoopCount = 1;
         OutputStructure.calculateInnerLoopDateString();

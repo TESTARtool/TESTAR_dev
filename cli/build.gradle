@@ -1,5 +1,4 @@
 apply plugin: 'java'
-apply plugin: 'application'
 
 buildDir = 'target'
 
@@ -19,49 +18,85 @@ dependencies {
     implementation project(':windows')
 }
 
-application {
-    mainClass = 'org.testar.cli.CliMain'
-    applicationName = 'testar-cli'
-}
+def distributionName = 'testar-cli'
+def installDirectory = layout.buildDirectory.dir("install/${distributionName}")
+def windowsLauncherFile = installDirectory.map { it.file('testar-cli.bat').asFile }
+def unixLauncherFile = installDirectory.map { it.file('testar-cli').asFile }
 
-tasks.named('startScripts') {
-    applicationDefaultJvmArgs = ["-Dlog4j.configurationFile=log4j2.xml"]
+task prepareCliDistribution(type: Sync) {
+    dependsOn tasks.named('jar')
+
+    into installDirectory
+
+    from(tasks.named('jar')) {
+        into '.runtime/lib'
+    }
+
+    from(configurations.runtimeClasspath) {
+        into '.runtime/lib'
+    }
+
+    from(project(':statemodel').file('resources/graphs')) {
+        into '.runtime/graphs'
+    }
+
+    from(project(':webdriver').file('resources/web-extension')) {
+        into '.runtime/web-extension'
+    }
+
+    from('resources/settings') {
+        into 'settings'
+    }
+
+    from('resources/log4j2.xml') {
+        into '.runtime'
+    }
 
     doLast {
-        def windowsScriptFile = getWindowsScript()
-        def windowsScriptText = windowsScriptFile.text
-        windowsScriptText = windowsScriptText.replaceFirst(
-                /set CLASSPATH=.*/,
-                java.util.regex.Matcher.quoteReplacement(
-                        "rem original CLASSPATH declaration replaced by:\r\nset CLASSPATH=%APP_HOME%\\lib\\*"
-                )
-        )
-        windowsScriptFile.text = windowsScriptText
+        File installRoot = installDirectory.get().asFile
+        File outputDirectory = new File(installRoot, 'output')
+        if (!outputDirectory.exists()) {
+            outputDirectory.mkdirs()
+        }
+
+        String windowsLauncher = '''@echo off
+setlocal
+set "APP_HOME=%~dp0"
+if "%APP_HOME:~-1%"=="\\" set "APP_HOME=%APP_HOME:~0,-1%"
+set "JAVA_EXE=java.exe"
+if defined JAVA_HOME set "JAVA_EXE=%JAVA_HOME%\\bin\\java.exe"
+"%JAVA_EXE%" -Dtestar.home="%APP_HOME%" -Dlog4j.configurationFile="%APP_HOME%\\.runtime\\log4j2.xml" -cp "%APP_HOME%\\.runtime\\lib\\*" org.testar.cli.CliMain %*
+'''.replace("\n", "\r\n")
+        windowsLauncherFile.get().text = windowsLauncher
+
+        String unixLauncher = '''#!/usr/bin/env sh
+set -eu
+APP_HOME=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+JAVA_EXE=java
+if [ -n "${JAVA_HOME:-}" ]; then
+    JAVA_EXE="$JAVA_HOME/bin/java"
+fi
+exec "$JAVA_EXE" -Dtestar.home="$APP_HOME" -Dlog4j.configurationFile="$APP_HOME/.runtime/log4j2.xml" -cp "$APP_HOME/.runtime/lib/*" org.testar.cli.CliMain "$@"
+'''
+        unixLauncherFile.get().text = unixLauncher
+        unixLauncherFile.get().setExecutable(true)
     }
 }
 
-distributions {
-    main {
-        contents {
-            from(project(':statemodel').file('resources/graphs')) {
-                into 'bin/output/graphs'
-            }
-            from(project(':webdriver').file('resources/web-extension')) {
-                into 'web-extension'
-            }
-            from('resources/settings') {
-                into 'bin/settings'
-            }
-            from('resources/log4j2.xml') {
-                into 'bin'
-            }
-        }
+task cliDistributionZip(type: Zip) {
+    dependsOn prepareCliDistribution
+
+    archiveFileName = "${distributionName}.zip"
+    destinationDirectory = layout.buildDirectory.dir('distributions')
+
+    from(installDirectory) {
+        into distributionName
     }
 }
 
 tasks.register('cliDistribution') {
     group = 'distribution'
     description = 'Build the CLI distribution and archive.'
-    dependsOn tasks.named('installDist')
-    dependsOn tasks.named('distZip')
+    dependsOn prepareCliDistribution
+    dependsOn cliDistributionZip
 }

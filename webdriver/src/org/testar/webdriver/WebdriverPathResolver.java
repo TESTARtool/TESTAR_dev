@@ -9,29 +9,24 @@ package org.testar.webdriver;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.testar.core.util.RuntimePathsUtil;
+
 public final class WebdriverPathResolver {
 
     private WebdriverPathResolver() {
     }
 
     public static Path resolveTestarHome() {
-        String configuredHome = System.getProperty("testar.home");
-        if (configuredHome != null && !configuredHome.isBlank()) {
-            return Path.of(configuredHome).toAbsolutePath().normalize();
-        }
-
-        return Path.of(".").toAbsolutePath().normalize();
+        return RuntimePathsUtil.resolveTestarHome();
     }
 
     public static Path resolveChromeDownloadDir() {
-        return resolveTestarHome().resolve("webdriver").resolve("chrome");
+        return RuntimePathsUtil.resolveRuntimeDirectory().resolve("webdriver").resolve("chrome");
     }
 
     public static Path resolveExtensionDir() {
-        Path testarHome = resolveTestarHome();
         Path[] candidates = new Path[]{
-                testarHome.resolve("web-extension"),
-                testarHome.resolve("webdriver").resolve("web-extension")
+                RuntimePathsUtil.resolveRuntimeDirectory().resolve("web-extension")
         };
 
         for (Path candidate : candidates) {

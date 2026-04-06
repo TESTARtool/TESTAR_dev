@@ -10,10 +10,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 import org.testar.config.settings.Settings;
+import org.testar.core.util.RuntimePathsUtil;
 
 public final class CliSettingsLoader {
 
@@ -49,6 +49,6 @@ public final class CliSettingsLoader {
     }
 
     private static Path resolveSettingsDirectory() {
-        return Paths.get(".").resolve("settings");
+        return RuntimePathsUtil.resolveTestarHome().resolve("settings");
     }
 }

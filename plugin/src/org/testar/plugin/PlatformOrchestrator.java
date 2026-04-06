@@ -195,7 +195,7 @@ public final class PlatformOrchestrator {
         }
 
         StateModelStorageBootstrap.setupOrientDB(
-                settings.get(ConfigTags.OutputDir, ""),
+                settings.get(StateModelTags.DataStoreDirectory, ""),
                 settings.get(StateModelTags.DataStoreDB, ""),
                 settings.get(StateModelTags.DataStoreUser, ""),
                 settings.get(StateModelTags.DataStorePassword, "")
