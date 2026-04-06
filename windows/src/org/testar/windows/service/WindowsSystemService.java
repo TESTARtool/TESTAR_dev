@@ -12,6 +12,8 @@ import org.testar.core.exceptions.SystemStopException;
 import org.testar.core.service.SystemService;
 import org.testar.core.state.SUT;
 import org.testar.core.tag.Tags;
+import org.testar.core.util.Util;
+import org.testar.windows.exceptions.WinApiException;
 import org.testar.windows.state.WinProcess;
 
 /**
@@ -58,7 +60,22 @@ public final class WindowsSystemService implements SystemService {
 
     @Override
     public SUT startSystem() throws SystemStartException {
-        return starter.start();
+        SUT system = starter.start();
+        Long pid = system.get(Tags.PID, null);
+        if (pid == null) {
+            return system;
+        }
+
+        try {
+            Util.pause(0.5d);
+            if (WinProcess.isRunning(pid) && !WinProcess.isForeground(pid)) {
+                WinProcess.toForeground(pid);
+            }
+        } catch (WinApiException exception) {
+            throw new SystemStartException(exception);
+        }
+
+        return system;
     }
 
     @Override
