@@ -101,7 +101,8 @@ public final class WebdriverClickablePolicy implements ClickablePolicy {
 
     private List<String> splitCssClasses(String cssClasses) {
         List<String> splitClasses = new ArrayList<>();
-        for (String cssClass : cssClasses.split("\\s+")) {
+        String normalizedCssClasses = cssClasses.replace('[', ' ').replace(']', ' ').replace(',', ' ');
+        for (String cssClass : normalizedCssClasses.split("\\s+")) {
             String normalizedClass = cssClass.trim();
             if (!normalizedClass.isEmpty()) {
                 splitClasses.add(normalizedClass);

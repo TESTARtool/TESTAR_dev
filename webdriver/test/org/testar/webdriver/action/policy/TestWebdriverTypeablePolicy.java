@@ -61,6 +61,15 @@ public class TestWebdriverTypeablePolicy {
     }
 
     @Test
+    public void testInputWithStateFormattedCssClassesIsTypeable() {
+        WebdriverTypeablePolicy policy = new WebdriverTypeablePolicy(Collections.singletonList("input"));
+        WidgetStub widget = createInputWidget("", true);
+        widget.set(WdTags.WebCssClasses, "[input]");
+
+        Assert.assertTrue(policy.isTypeable(widget));
+    }
+
+    @Test
     public void testNonTypeableRoleDoesNotBecomeTypeableFromConfiguredClass() {
         WebdriverTypeablePolicy policy = new WebdriverTypeablePolicy(Collections.singletonList("input"));
         WidgetStub widget = new WidgetStub();
