@@ -13,6 +13,8 @@ import org.testar.engine.action.derivation.DesktopActionDerivationFactory;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+
 import org.testar.config.ConfigTags;
 import org.testar.config.StateModelTags;
 import org.testar.config.settings.Settings;
@@ -157,8 +159,8 @@ public final class PlatformOrchestrator {
                 ),
                 createStateModelService(sessionSpec),
                 WebdriverActionDerivationFactory.create(
-                        new WebdriverClickablePolicy(),
-                        new WebdriverTypeablePolicy(),
+                        new WebdriverClickablePolicy(sessionSpec.getSettings().get(ConfigTags.ClickableClasses, Collections.emptyList())),
+                        new WebdriverTypeablePolicy(sessionSpec.getSettings().get(ConfigTags.TypeableClasses, Collections.emptyList())),
                         new WebdriverScrollablePolicy(),
                         widget -> InputDataManager.getRandomTextInputData()
                 ),
