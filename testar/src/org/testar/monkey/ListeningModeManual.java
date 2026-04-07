@@ -235,7 +235,7 @@ public class ListeningModeManual {
 			Util.clear(protocol.cv);
 
 			//In Listening-mode, we activate the visualization with Shift+ArrowUP:
-			if(protocol.visualizationOn) SutVisualization.visualizeState(false, protocol.markParentWidget, protocol.mouse, protocol.lastPrintParentsOf, protocol.cv, state);
+			if(protocol.visualizationOn) SutVisualization.visualizeState(false, protocol.mouse, protocol.lastPrintParentsOf, protocol.cv, state);
 
 			Set<Action> actions = protocol.deriveActions(system,state);
 			CodingManager.buildIDs(state, actions);
