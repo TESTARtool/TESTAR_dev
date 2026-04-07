@@ -1,6 +1,7 @@
-/**
- * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2026 Universitat Politecnica de Valencia - www.upv.es
+/***************************************************************************************************
+ *
+ * Copyright (c) 2016 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -25,14 +26,40 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *
- */
+ *******************************************************************************************************/
 
-package org.testar.monkey.alayer.webdriver;
+package org.testar.util;
 
-public final class WdProcessActivator implements Runnable {
+import java.util.Objects;
 
-  public void run() {
-    WdDriver.activate();
-  }
+import org.testar.monkey.alayer.State;
+import org.testar.monkey.alayer.Tags;
+import org.testar.monkey.alayer.Widget;
+
+public class IndexUtil {
+
+    private IndexUtil() {
+    }
+
+    /**
+     * Calculate the max and the min ZIndex of all the widgets in a state
+     * 
+     * @param state
+     */
+    public static State calculateZIndices(State state) {
+        Objects.requireNonNull(state, "State cannot be null");
+        double minZIndex = Double.MAX_VALUE;
+        double maxZIndex = Double.MIN_VALUE;
+        for (Widget w : state) {
+            double zindex = w.get(Tags.ZIndex, 0.0).doubleValue();
+            if (zindex < minZIndex)
+                minZIndex = zindex;
+            if (zindex > maxZIndex)
+                maxZIndex = zindex;
+        }
+        state.set(Tags.MinZIndex, minZIndex);
+        state.set(Tags.MaxZIndex, maxZIndex);
+        return state;
+    }
+
 }

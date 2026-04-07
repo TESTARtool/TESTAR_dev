@@ -14,6 +14,8 @@ import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.CompoundAction;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.actions.Type;
+import org.testar.monkey.alayer.actions.WdCloseTabAction;
+import org.testar.monkey.alayer.actions.WdHistoryBackAction;
 import org.testar.monkey.alayer.actions.WdRemoteScrollTypeAction;
 import org.testar.monkey.alayer.actions.WdRemoteTypeAction;
 import org.testar.monkey.alayer.actions.WdSelectListAction;
@@ -236,6 +238,30 @@ public class TestLlmParseActionResponse {
 		assertEquals("AID_HitEsc", llmParseResult.getActionToExecute().get(Tags.AbstractID));
 	}
 
+	@Test
+	public void test_parsing_wd_navigate_back_action() {
+		String llmResponse = "```json{\"actionId\":\"AID_NavBack\",\"input\":\"\"}```";
+		Set<Action> derivedActions = createDefaultDerivedActions(createState());
+
+		LlmParseActionResponse llmParseResponse = new LlmParseActionResponse();
+		LlmParseActionResult llmParseResult = llmParseResponse.parseLlmResponse(derivedActions, llmResponse);
+
+		assertEquals(LlmParseActionResult.ParseResult.SUCCESS, llmParseResult.getParseResult());
+		assertEquals("AID_NavBack", llmParseResult.getActionToExecute().get(Tags.AbstractID));
+	}
+
+	@Test
+	public void test_parsing_wd_close_tab_action() {
+		String llmResponse = "```json{\"actionId\":\"AID_CloseTab\",\"input\":\"\"}```";
+		Set<Action> derivedActions = createDefaultDerivedActions(createState());
+
+		LlmParseActionResponse llmParseResponse = new LlmParseActionResponse();
+		LlmParseActionResult llmParseResult = llmParseResponse.parseLlmResponse(derivedActions, llmResponse);
+
+		assertEquals(LlmParseActionResult.ParseResult.SUCCESS, llmParseResult.getParseResult());
+		assertEquals("AID_CloseTab", llmParseResult.getActionToExecute().get(Tags.AbstractID));
+	}
+
 	private static StateStub createState() {
 		StateStub createdState = new StateStub();
 		createdState.set(WdTags.WebTitle, "Page Title | State");
@@ -256,6 +282,8 @@ public class TestLlmParseActionResponse {
 				"CID_combobox_widget", "AID_combobox_widget", "CID_select", "AID_select", "Saab"));
 		derivedActions.add(createAndroidTypeAction(state));
 		derivedActions.add(createHitEscAction(state, "CID_HitEsc", "AID_HitEsc"));
+		derivedActions.add(createWdHistoryBackAction(state, "CID_NavBack", "AID_NavBack"));
+		derivedActions.add(createWdCloseTabAction(state, "CID_CloseTab", "AID_CloseTab"));
 		return derivedActions;
 	}
 
@@ -338,6 +366,20 @@ public class TestLlmParseActionResponse {
 
 	private static Action createHitEscAction(StateStub parentState, String actionConcreteId, String actionAbstractId) {
 		Action action = ac.hitESC(parentState);
+		action.set(Tags.ConcreteID, actionConcreteId);
+		action.set(Tags.AbstractID, actionAbstractId);
+		return action;
+	}
+
+	private static Action createWdHistoryBackAction(StateStub parentState, String actionConcreteId, String actionAbstractId) {
+		Action action = new WdHistoryBackAction(parentState);
+		action.set(Tags.ConcreteID, actionConcreteId);
+		action.set(Tags.AbstractID, actionAbstractId);
+		return action;
+	}
+
+	private static Action createWdCloseTabAction(StateStub parentState, String actionConcreteId, String actionAbstractId) {
+		Action action = new WdCloseTabAction(parentState);
 		action.set(Tags.ConcreteID, actionConcreteId);
 		action.set(Tags.AbstractID, actionAbstractId);
 		return action;

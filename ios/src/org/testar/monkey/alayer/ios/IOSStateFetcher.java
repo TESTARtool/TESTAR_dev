@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -35,6 +35,7 @@ import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.ios.enums.IOSTags;
 import org.testar.monkey.alayer.ios.util.IOSNodeParser;
+import org.testar.monkey.alayer.ios.util.IOSXpathUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -86,7 +87,7 @@ public class IOSStateFetcher implements Callable<IOSState> {
 
 		for (Widget w : root) {
 		    w.set(Tags.Path, Util.indexString(w));
-		    w.set(IOSTags.iosXpath, IOSProtocolUtil.constructXpath(w));
+		    w.set(IOSTags.iosXpath, IOSXpathUtil.constructXpath(w));
 		}
 
 		// get end time

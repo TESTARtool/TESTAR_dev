@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2023 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -38,6 +38,14 @@ import org.testar.monkey.alayer.WidgetIterator;
 
 public class StateStub extends WidgetStub implements State {
 	private static final long serialVersionUID = -2972642849689796355L;
+
+	public StateStub() {
+		setRoot(this);
+	}
+
+	public void setRoot(State root) {
+		super.setRoot(root);
+	}
 
 	@Override
 	public Iterator<Widget> iterator() {

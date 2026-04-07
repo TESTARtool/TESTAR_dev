@@ -38,15 +38,12 @@ import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.ActivateSystem;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.KillProcess;
-import org.testar.monkey.alayer.android.AndroidProtocolUtil;
 import org.testar.monkey.alayer.devices.AWTMouse;
 import org.testar.monkey.alayer.devices.DummyMouse;
 import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.devices.Mouse;
 import org.testar.monkey.alayer.exceptions.*;
-import org.testar.monkey.alayer.ios.IOSProtocolUtil;
 import org.testar.monkey.alayer.visualizers.ShapeVisualizer;
-import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
 import org.testar.monkey.alayer.windows.UIARoles;
 import org.testar.monkey.alayer.windows.WinApiException;
 import org.testar.oracles.Oracle;
@@ -54,16 +51,17 @@ import org.testar.oracles.OracleSelection;
 import org.testar.oracles.log.LogOracle;
 import org.testar.oracles.log.ProcessListenerOracle;
 import org.testar.plugin.NativeLinker;
-import org.testar.plugin.OperatingSystems;
 import org.testar.reporting.DummyReportManager;
 import org.testar.reporting.ReportManager;
 import org.testar.reporting.Reporting;
+import org.testar.screenshot.ScreenshotProviderFactory;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.serialisation.ScreenshotSerialiser;
 import org.testar.serialisation.TestSerialiser;
 import org.testar.settings.Settings;
 import org.testar.statemodel.StateModelManager;
 import org.testar.statemodel.StateModelManagerFactory;
+import org.testar.util.IndexUtil;
 
 import java.awt.Desktop;
 import java.awt.GraphicsEnvironment;
@@ -215,7 +213,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 *
 	 * @param settings
 	 */
-	public final void run(final Settings settings) {
+	@Override
+	public final void accept(final Settings settings) {
 
 		//Associate start settings of the first TESTAR dialog
 		this.settings = settings;
@@ -794,7 +793,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		State state = builder.apply(system);
 
 		buildStateIdentifiers(state);
-		state = ProtocolUtil.calculateZIndices(state);
+		state = IndexUtil.calculateZIndices(state);
 
 		setStateForClickFilterLayerProtocol(state);
 
@@ -832,19 +831,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private void setStateScreenshot(State state) {
 		// If the environment is not headless, take a screenshot
 		if (!GraphicsEnvironment.isHeadless()) {
-			AWTCanvas screenshot = null;
-			if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
-				screenshot = WdProtocolUtil.getStateshotBinary(state);
-			}
-			else if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
-				screenshot = AndroidProtocolUtil.getStateshotBinary(state);
-			}
-			else if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
-				screenshot = IOSProtocolUtil.getStateshotBinary(state);
-			}
-			else {
-				screenshot = ProtocolUtil.getStateshotBinary(state);
-			}
+			AWTCanvas screenshot = ScreenshotProviderFactory.current().getStateshotBinary(state);
 
 			if(screenshot != null) {
 				String screenshotPath = ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), screenshot);
@@ -1062,13 +1049,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		// adding the action that is going to be executed into report:
 		reportManager.addSelectedAction(state, action);
 
-		if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
-			WdProtocolUtil.getActionshot(state,action);
-		}else if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)){
-			AndroidProtocolUtil.getActionshot(state,action);
-		}else{
-			ProtocolUtil.getActionshot(state,action);
-		}
+		ScreenshotProviderFactory.current().getActionshot(state, action);
 
 		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction, 0.0);
 
@@ -1099,11 +1080,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	    reportManager.addSelectedAction(state, action);
 
 	    // Get an action screenshot based on the NativeLinker platform
-	    if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
-	        WdProtocolUtil.getActionshot(state,action);
-	    } else {
-	        ProtocolUtil.getActionshot(state,action);
-	    }
+	    ScreenshotProviderFactory.current().getActionshot(state, action);
 
 	    try{
 	        double halfWait = actionWaitTime == 0 ? 0.01 : actionWaitTime / 2.0; // seconds

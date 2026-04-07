@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -47,7 +47,6 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 
 	protected double delay = Double.MIN_VALUE;
 	protected Object[] userEvent = null;
-	protected boolean markParentWidget = false;
 	protected boolean visualizationOn = false;
 
 	public enum Modes{
@@ -141,11 +140,6 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 			else if (!pressed.contains(KBKeys.VK_SHIFT) && mode() == Modes.ListeningManual && userEvent == null) {
 				System.out.println("Listening user event key_down! " + key.toString());
 				listeningEvents.add(key);
-			}
-
-			// SHIFT + ALT --> Toggle widget-tree hierarchy display
-			if (pressed.contains(KBKeys.VK_ALT) && pressed.contains(KBKeys.VK_SHIFT)) {
-				markParentWidget = !markParentWidget;
 			}
 		}
 	}

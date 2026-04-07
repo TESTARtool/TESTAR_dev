@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -74,6 +74,8 @@ public class WdDriver extends SUTBase {
   public static boolean disableSecurity = false;
   public static boolean remoteDebugging = false;
   public static boolean disableGPU = true;
+  public static String userDataDir = "";
+  public static String profileDirectory = "";
 
   private final Keyboard kbd = AWTKeyboard.build();
   private final Mouse mouse = WdMouse.build();

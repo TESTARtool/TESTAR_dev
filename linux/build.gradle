@@ -1,5 +1,0 @@
-dependencies {
-    implementation files('./lib/libatspi.jar')
-    implementation files('./lib/junit-jupiter-api-5.0.0-M3.jar')
-    implementation project(':core')
-}

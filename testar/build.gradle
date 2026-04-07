@@ -90,7 +90,6 @@ dependencies {
     implementation project(':statemodel')
     implementation project(':webdriver')
     implementation project(':windows')
-    implementation project(':linux')
     implementation project(':ios')
     implementation project(':android')
     implementation files('./lib/jsyntaxpane-1.1.5.jar')
