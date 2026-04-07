@@ -11,6 +11,7 @@ import org.testar.webdriver.WebdriverPathResolver;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -28,6 +29,12 @@ public class ChromeDownloader {
 	public static String downloadChromeForTesting() {
 		try {
 			String platform = detectPlatform();
+			String localBinary = findExistingChromeBinary(platform);
+			if (localBinary != null) {
+				logger.log(Level.INFO, "Using existing Chrome for Testing: " + localBinary);
+				return localBinary;
+			}
+
 			String latestVersion = fetchLatestVersion();
 			String versionDir = DOWNLOAD_DIR + File.separator + latestVersion;
 			String extractPath = versionDir + File.separator + "chrome-" + platform;
@@ -90,6 +97,29 @@ public class ChromeDownloader {
 			logger.log(Level.ERROR, "Failed to download or locate Chrome for Testing", e);
 			return null;
 		}
+	}
+
+	private static String findExistingChromeBinary(String platform) {
+		File downloadDirectory = new File(DOWNLOAD_DIR);
+		if (!downloadDirectory.isDirectory()) {
+			return null;
+		}
+
+		String chromeExecutable = platform.contains("win") ? "chrome.exe" : "chrome";
+		File[] versionDirectories = downloadDirectory.listFiles(File::isDirectory);
+		if (versionDirectories == null || versionDirectories.length == 0) {
+			return null;
+		}
+
+		Arrays.sort(versionDirectories, (left, right) -> right.getName().compareTo(left.getName()));
+		for (File versionDirectory : versionDirectories) {
+			File candidate = new File(versionDirectory, "chrome-" + platform + File.separator + chromeExecutable);
+			if (candidate.isFile()) {
+				return candidate.getAbsolutePath();
+			}
+		}
+
+		return null;
 	}
 
 	private static String fetchLatestVersion() throws IOException {

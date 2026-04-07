@@ -66,8 +66,20 @@ public final class PlatformOrchestrator {
     }
 
     public static PlatformSession openSession(PlatformSessionSpec sessionSpec) {
+        configureNativePlatform(sessionSpec.getOperatingSystem());
         PlatformServices services = resolve(sessionSpec);
         return openSession(sessionSpec, services);
+    }
+
+    private static void configureNativePlatform(OperatingSystems operatingSystem) {
+        NativeLinker.cleanWdDriverOS();
+        NativeLinker.cleanAndroidOS();
+
+        if (operatingSystem == OperatingSystems.WEBDRIVER) {
+            NativeLinker.addWdDriverOS();
+        } else if (operatingSystem == OperatingSystems.ANDROID) {
+            NativeLinker.addAndroidOS();
+        }
     }
 
     private static PlatformSession openSession(PlatformSessionSpec sessionSpec, PlatformServices services) {
