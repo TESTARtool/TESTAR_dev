@@ -6,8 +6,8 @@
 
 package org.testar.windows.action.policy;
 
-import org.testar.core.action.policy.TypeablePolicy;
 import org.testar.core.alayer.Role;
+import org.testar.core.policy.TypeablePolicy;
 import org.testar.core.state.Widget;
 import org.testar.core.tag.Tags;
 import org.testar.windows.alayer.UIARoles;

@@ -4,13 +4,13 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.engine.action.policy;
+package org.testar.engine.policy;
 
 import java.util.Collections;
 import java.util.List;
 
 import org.testar.core.Assert;
-import org.testar.core.action.policy.ScrollablePolicy;
+import org.testar.core.policy.ScrollablePolicy;
 import org.testar.core.state.Widget;
 
 public final class CompositeScrollablePolicy implements ScrollablePolicy {
@@ -27,6 +27,7 @@ public final class CompositeScrollablePolicy implements ScrollablePolicy {
 
     @Override
     public boolean isScrollable(Widget widget) {
+        // ANY: one matching policy is enough to consider the widget scrollable.
         for (ScrollablePolicy policy : policies) {
             if (policy.isScrollable(widget)) {
                 return true;

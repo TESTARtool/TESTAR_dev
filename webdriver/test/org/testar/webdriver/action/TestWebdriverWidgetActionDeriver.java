@@ -7,9 +7,11 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 import org.testar.core.action.Action;
-import org.testar.core.action.policy.WidgetFilterPolicy;
+import org.testar.core.policy.WidgetFilterPolicy;
 import org.testar.core.tag.Tags;
 import org.testar.engine.action.derivation.ActionDerivationContext;
+import org.testar.engine.policy.CompositeBlockedPolicy;
+import org.testar.engine.policy.CompositeEnabledPolicy;
 import org.testar.webdriver.action.policy.WebdriverClickablePolicy;
 import org.testar.webdriver.action.policy.WebdriverScrollablePolicy;
 import org.testar.webdriver.action.policy.WebdriverTypeablePolicy;
@@ -33,6 +35,8 @@ public class TestWebdriverWidgetActionDeriver {
                 new WebdriverClickablePolicy(),
                 new WebdriverTypeablePolicy(Collections.singletonList("input")),
                 new WebdriverScrollablePolicy(),
+                CompositeEnabledPolicy.allowAll(),
+                CompositeBlockedPolicy.allowNone(),
                 allowAllWidgets()
         );
         Set<Action> actions = new LinkedHashSet<>();

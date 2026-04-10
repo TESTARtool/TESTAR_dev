@@ -12,10 +12,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.testar.core.action.Action;
-import org.testar.engine.action.policy.CompositeClickablePolicy;
-import org.testar.engine.action.policy.CompositeScrollablePolicy;
-import org.testar.engine.action.policy.CompositeTypeablePolicy;
-import org.testar.engine.action.policy.CompositeWidgetFilterPolicy;
+import org.testar.engine.policy.CompositeBlockedPolicy;
+import org.testar.engine.policy.CompositeClickablePolicy;
+import org.testar.engine.policy.CompositeEnabledPolicy;
+import org.testar.engine.policy.CompositeScrollablePolicy;
+import org.testar.engine.policy.CompositeTypeablePolicy;
+import org.testar.engine.policy.CompositeWidgetFilterPolicy;
+import org.testar.engine.policy.TagBlockedPolicy;
+import org.testar.engine.policy.TagEnabledPolicy;
 import org.testar.stub.StateStub;
 import org.testar.stub.WidgetStub;
 
@@ -57,11 +61,47 @@ public final class StateActionDeriverTest {
         Assert.assertEquals(2, visited.get());
     }
 
+    @Test
+    public void skipsWidgetsRejectedByEnabledPolicy() {
+        StateStub state = new StateStub();
+        WidgetStub disabled = new WidgetStub();
+        disabled.set(org.testar.core.tag.Tags.Enabled, false);
+        state.addChild(disabled);
+
+        AtomicInteger visited = new AtomicInteger();
+        StateActionDeriver deriver = new StateActionDeriver(
+                (system, currentState, widget, context, actions) -> visited.incrementAndGet()
+        );
+
+        deriver.derive(null, state, allowAllContext(), Collections.<Action>emptySet());
+
+        Assert.assertEquals(1, visited.get());
+    }
+
+    @Test
+    public void skipsWidgetsRejectedByBlockedPolicy() {
+        StateStub state = new StateStub();
+        WidgetStub blocked = new WidgetStub();
+        blocked.set(org.testar.core.tag.Tags.Blocked, true);
+        state.addChild(blocked);
+
+        AtomicInteger visited = new AtomicInteger();
+        StateActionDeriver deriver = new StateActionDeriver(
+                (system, currentState, widget, context, actions) -> visited.incrementAndGet()
+        );
+
+        deriver.derive(null, state, allowAllContext(), Collections.<Action>emptySet());
+
+        Assert.assertEquals(1, visited.get());
+    }
+
     private static ActionDerivationContext allowAllContext() {
         return new ActionDerivationContext(
                 CompositeClickablePolicy.empty(),
                 CompositeTypeablePolicy.empty(),
                 CompositeScrollablePolicy.empty(),
+                new CompositeEnabledPolicy(Collections.singletonList(new TagEnabledPolicy())),
+                new CompositeBlockedPolicy(Collections.singletonList(new TagBlockedPolicy())),
                 CompositeWidgetFilterPolicy.allowAll()
         );
     }
@@ -71,6 +111,8 @@ public final class StateActionDeriverTest {
                 CompositeClickablePolicy.empty(),
                 CompositeTypeablePolicy.empty(),
                 CompositeScrollablePolicy.empty(),
+                CompositeEnabledPolicy.allowAll(),
+                CompositeBlockedPolicy.allowNone(),
                 new CompositeWidgetFilterPolicy(Collections.singletonList(widget -> widget != filteredWidget))
         );
     }

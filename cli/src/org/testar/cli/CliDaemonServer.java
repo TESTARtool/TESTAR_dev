@@ -21,7 +21,7 @@ import org.testar.cli.settings.CliSettingsLoader;
 import org.testar.config.settings.Settings;
 import org.testar.core.action.Action;
 import org.testar.core.action.ActionRoles;
-import org.testar.core.action.ResolvedAction;
+import org.testar.core.action.resolver.ResolvedAction;
 import org.testar.core.alayer.Roles;
 import org.testar.core.state.State;
 import org.testar.core.state.Widget;

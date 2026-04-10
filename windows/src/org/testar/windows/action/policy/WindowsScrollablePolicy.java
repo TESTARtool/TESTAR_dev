@@ -6,7 +6,7 @@
 
 package org.testar.windows.action.policy;
 
-import org.testar.core.action.policy.ScrollablePolicy;
+import org.testar.core.policy.ScrollablePolicy;
 import org.testar.core.state.Widget;
 
 /**

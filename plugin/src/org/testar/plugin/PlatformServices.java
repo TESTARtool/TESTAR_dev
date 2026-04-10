@@ -7,7 +7,7 @@
 package org.testar.plugin;
 
 import org.testar.core.Assert;
-import org.testar.core.action.ActionResolver;
+import org.testar.core.action.resolver.ActionResolver;
 import org.testar.core.service.ActionDerivationService;
 import org.testar.core.service.ActionExecutionService;
 import org.testar.core.service.StateService;

@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import org.testar.core.action.policy.TypeablePolicy;
 import org.testar.core.alayer.Role;
+import org.testar.core.policy.TypeablePolicy;
 import org.testar.core.state.Widget;
 import org.testar.core.tag.Tags;
 import org.testar.webdriver.alayer.WdRoles;

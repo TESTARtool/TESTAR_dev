@@ -11,7 +11,7 @@ import java.util.Set;
 
 import org.testar.core.Assert;
 import org.testar.core.action.Action;
-import org.testar.core.action.ResolvedAction;
+import org.testar.core.action.resolver.ResolvedAction;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 import org.testar.plugin.reporting.SessionReportingManager;

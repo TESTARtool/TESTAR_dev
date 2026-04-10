@@ -4,12 +4,12 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.core.action.policy;
+package org.testar.core.policy;
 
 import org.testar.core.state.Widget;
 
 @FunctionalInterface
-public interface ScrollablePolicy {
+public interface EnabledPolicy {
 
-    boolean isScrollable(Widget widget);
+    boolean isEnabled(Widget widget);
 }

@@ -13,10 +13,10 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.testar.core.action.Action;
-import org.testar.core.action.ActionResolver;
 import org.testar.core.action.ActionRoles;
 import org.testar.core.action.AnnotatingActionCompiler;
-import org.testar.core.action.ResolvedAction;
+import org.testar.core.action.resolver.ActionResolver;
+import org.testar.core.action.resolver.ResolvedAction;
 import org.testar.core.alayer.Role;
 import org.testar.core.state.Widget;
 import org.testar.core.tag.Tags;

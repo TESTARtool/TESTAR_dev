@@ -4,13 +4,13 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.engine.action.policy;
+package org.testar.engine.policy;
 
 import java.util.Collections;
 import java.util.List;
 
 import org.testar.core.Assert;
-import org.testar.core.action.policy.WidgetFilterPolicy;
+import org.testar.core.policy.WidgetFilterPolicy;
 import org.testar.core.state.Widget;
 
 public final class CompositeWidgetFilterPolicy implements WidgetFilterPolicy {
@@ -27,6 +27,7 @@ public final class CompositeWidgetFilterPolicy implements WidgetFilterPolicy {
 
     @Override
     public boolean allows(Widget widget) {
+        // ALL: every filter must allow the widget to keep it in scope.
         for (WidgetFilterPolicy policy : policies) {
             if (!policy.allows(widget)) {
                 return false;

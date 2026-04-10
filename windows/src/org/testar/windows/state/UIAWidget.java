@@ -15,12 +15,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.testar.core.Drag;
-import org.testar.core.action.policy.TypeablePolicy;
 import org.testar.core.util.Util;
 import org.testar.windows.action.policy.WindowsTypeablePolicy;
 import org.testar.windows.tag.UIATags;
 import org.testar.core.alayer.Role;
 import org.testar.core.alayer.Shape;
+import org.testar.core.policy.TypeablePolicy;
 import org.testar.core.tag.Tag;
 import org.testar.core.tag.Tags;
 import org.testar.core.state.Widget;

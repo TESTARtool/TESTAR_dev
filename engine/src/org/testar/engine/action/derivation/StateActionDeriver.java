@@ -30,7 +30,9 @@ public final class StateActionDeriver implements ActionDeriver {
     public void derive(SUT system, State state, ActionDerivationContext context, Set<Action> actions) {
         Assert.notNull(state, context, actions);
         for (Widget widget : state) {
-            if (context.widgetFilterPolicy().allows(widget)) {
+            if (context.enabledPolicy().isEnabled(widget)
+                    && !context.blockedPolicy().isBlocked(widget)
+                    && context.widgetFilterPolicy().allows(widget)) {
                 widgetActionDeriver.derive(system, state, widget, context, actions);
             }
         }

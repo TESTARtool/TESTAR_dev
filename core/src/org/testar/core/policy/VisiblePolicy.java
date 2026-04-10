@@ -4,11 +4,12 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.core.action;
+package org.testar.core.policy;
 
-import java.util.List;
+import org.testar.core.state.Widget;
 
-public interface ActionResolver {
+@FunctionalInterface
+public interface VisiblePolicy {
 
-    ResolvedAction resolve(Iterable<Action> actions, List<String> arguments);
+    boolean isVisible(Widget widget);
 }

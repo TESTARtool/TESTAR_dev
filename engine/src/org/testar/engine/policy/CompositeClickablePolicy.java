@@ -4,13 +4,13 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.engine.action.policy;
+package org.testar.engine.policy;
 
 import java.util.Collections;
 import java.util.List;
 
 import org.testar.core.Assert;
-import org.testar.core.action.policy.ClickablePolicy;
+import org.testar.core.policy.ClickablePolicy;
 import org.testar.core.state.Widget;
 
 public final class CompositeClickablePolicy implements ClickablePolicy {
@@ -27,6 +27,7 @@ public final class CompositeClickablePolicy implements ClickablePolicy {
 
     @Override
     public boolean isClickable(Widget widget) {
+        // ANY: one matching policy is enough to consider the widget clickable.
         for (ClickablePolicy policy : policies) {
             if (policy.isClickable(widget)) {
                 return true;

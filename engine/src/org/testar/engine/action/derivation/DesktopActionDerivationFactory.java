@@ -9,13 +9,15 @@ package org.testar.engine.action.derivation;
 import java.util.Collections;
 import java.util.List;
 
-import org.testar.core.action.policy.ClickablePolicy;
-import org.testar.core.action.policy.ScrollablePolicy;
-import org.testar.core.action.policy.TypeablePolicy;
-import org.testar.core.action.policy.WidgetFilterPolicy;
+import org.testar.core.policy.BlockedPolicy;
+import org.testar.core.policy.ClickablePolicy;
+import org.testar.core.policy.EnabledPolicy;
+import org.testar.core.policy.ScrollablePolicy;
+import org.testar.core.policy.TypeablePolicy;
+import org.testar.core.policy.WidgetFilterPolicy;
 import org.testar.engine.action.TextInputProvider;
-import org.testar.engine.action.policy.EnabledWidgetFilterPolicy;
-import org.testar.engine.action.policy.UnblockedWidgetFilterPolicy;
+import org.testar.engine.policy.TagBlockedPolicy;
+import org.testar.engine.policy.TagEnabledPolicy;
 
 /**
  * Reusable default desktop derive-action composition.
@@ -38,15 +40,16 @@ public final class DesktopActionDerivationFactory {
                         )
                         : List.of(new ForegroundActionDeriver());
 
-        List<WidgetFilterPolicy> widgetFilters = List.of(
-                new EnabledWidgetFilterPolicy(),
-                new UnblockedWidgetFilterPolicy()
-        );
+        List<EnabledPolicy> enabledPolicies = List.of(new TagEnabledPolicy());
+        List<BlockedPolicy> blockedPolicies = List.of(new TagBlockedPolicy());
+        List<WidgetFilterPolicy> widgetFilters = Collections.emptyList();
 
         return DefaultActionDerivationService.prioritizedWithPolicies(
                 Collections.singletonList(clickablePolicy),
                 Collections.singletonList(typeablePolicy),
                 Collections.singletonList(scrollablePolicy),
+                enabledPolicies,
+                blockedPolicies,
                 widgetFilters,
                 forcedDerivers,
                 Collections.singletonList(new StateActionDeriver(

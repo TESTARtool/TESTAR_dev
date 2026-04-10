@@ -20,12 +20,12 @@ import org.testar.core.alayer.Position;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 import org.testar.core.tag.TaggableBase;
-import org.testar.engine.action.policy.CompositeClickablePolicy;
-import org.testar.engine.action.policy.CompositeScrollablePolicy;
-import org.testar.engine.action.policy.CompositeTypeablePolicy;
-import org.testar.engine.action.policy.CompositeWidgetFilterPolicy;
-import org.testar.engine.action.policy.PredicateTypeablePolicy;
-import org.testar.engine.action.policy.RoleBasedClickablePolicy;
+import org.testar.engine.policy.CompositeBlockedPolicy;
+import org.testar.engine.policy.CompositeClickablePolicy;
+import org.testar.engine.policy.CompositeEnabledPolicy;
+import org.testar.engine.policy.CompositeScrollablePolicy;
+import org.testar.engine.policy.CompositeTypeablePolicy;
+import org.testar.engine.policy.CompositeWidgetFilterPolicy;
 import org.testar.stub.WidgetStub;
 
 public final class DefaultDesktopWidgetActionDeriverTest {
@@ -94,14 +94,16 @@ public final class DefaultDesktopWidgetActionDeriverTest {
                 clickableRole == null
                         ? CompositeClickablePolicy.empty()
                         : new CompositeClickablePolicy(java.util.Collections.singletonList(
-                                new RoleBasedClickablePolicy(java.util.Collections.singletonList(clickableRole))
+                                widget -> clickableRole.equals(widget.get(org.testar.core.tag.Tags.Role, null))
                         )),
                 typeable
-                        ? new CompositeTypeablePolicy(java.util.Collections.singletonList(new PredicateTypeablePolicy(w -> true)))
+                        ? new CompositeTypeablePolicy(java.util.Collections.singletonList(widget -> true))
                         : CompositeTypeablePolicy.empty(),
                 scrollable
                         ? new CompositeScrollablePolicy(java.util.Collections.singletonList(w -> true))
                         : CompositeScrollablePolicy.empty(),
+                CompositeEnabledPolicy.allowAll(),
+                CompositeBlockedPolicy.allowNone(),
                 CompositeWidgetFilterPolicy.allowAll()
         );
     }

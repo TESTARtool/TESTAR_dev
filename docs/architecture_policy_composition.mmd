@@ -1,0 +1,74 @@
+flowchart LR
+    subgraph CorePolicyInterfaces["core policy interfaces"]
+        CP["ClickablePolicy"]
+        TP["TypeablePolicy"]
+        SP["ScrollablePolicy"]
+        EP["EnabledPolicy"]
+        BP["BlockedPolicy"]
+        WFP["WidgetFilterPolicy"]
+        VP["VisiblePolicy"]
+        ACP["AtCanvasPolicy"]
+        TLP["TopLevelPolicy"]
+    end
+
+    subgraph EnginePolicyComposites["engine policy composites"]
+        CCP["CompositeClickablePolicy<br/>semantics: ANY"]
+        CTP["CompositeTypeablePolicy<br/>semantics: ANY"]
+        CSP["CompositeScrollablePolicy<br/>semantics: ANY"]
+        CEP["CompositeEnabledPolicy<br/>semantics: ALL"]
+        CBP["CompositeBlockedPolicy<br/>semantics: ANY"]
+        CWFP["CompositeWidgetFilterPolicy<br/>semantics: ALL"]
+        CVP["CompositeVisiblePolicy<br/>semantics: ALL"]
+        CACP["CompositeAtCanvasPolicy<br/>semantics: ALL"]
+        CTLP["CompositeTopLevelPolicy<br/>semantics: ALL"]
+    end
+
+    subgraph GenericEnginePolicyImplementations["generic policy implementations"]
+        TEP["TagEnabledPolicy"]
+        TBP["TagBlockedPolicy"]
+        ConfWFP["ConfiguredWidgetFilterPolicy"]
+        ZITLP["ZIndexTopLevelPolicy"]
+    end
+
+    subgraph PlatformPolicyImplementations["platform policy implementations"]
+        PCP["PlatformClickablePolicy (WindowsClickablePolicy / WebdriverClickablePolicy / AndroidClickablePolicy)"]
+        PTP["PlatformTypeablePolicy (WindowsTypeablePolicy / WebdriverTypeablePolicy / AndroidTypeablePolicy)"]
+        PSP["PlatformScrollablePolicy (WindowsScrollablePolicy / WebdriverScrollablePolicy / AndroidScrollablePolicy)"]
+        PVP["PlatformVisiblePolicy (WindowsVisiblePolicy / WebdriverVisiblePolicy / AndroidVisiblePolicy)"]
+        PACP["PlatformAtCanvasPolicy (WebdriverAtCanvasPolicy / AndroidAtCanvasPolicy)"]
+    end
+
+    subgraph CompositeConsumers["composite context"]
+        CC["CompositeContext (StateVisibleWidgetsContext / ActionDerivationContext / OracleEvaluationContext)"]
+    end
+
+    PCP -. implements .-> CP
+    PTP -. implements .-> TP
+    PSP -. implements .-> SP
+    PVP -. implements .-> VP
+    PACP -. implements .-> ACP
+
+    TEP -. implements .-> EP
+    TBP -. implements .-> BP
+    ConfWFP -. implements .-> WFP
+    ZITLP -. implements .-> TLP
+
+    CP -- "1..n policies" --> CCP
+    TP -- "1..n policies" --> CTP
+    SP -- "1..n policies" --> CSP
+    EP -- "1..n policies" --> CEP
+    BP -- "1..n policies" --> CBP
+    WFP -- "1..n policies" --> CWFP
+    VP -- "1..n policies" --> CVP
+    ACP -- "1..n policies" --> CACP
+    TLP -- "1..n policies" --> CTLP
+
+    CCP --> CC
+    CTP --> CC
+    CSP --> CC
+    CEP --> CC
+    CBP --> CC
+    CWFP --> CC
+    CVP --> CC
+    CACP --> CC
+    CTLP --> CC

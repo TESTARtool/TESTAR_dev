@@ -9,8 +9,8 @@ package org.testar.windows.action.policy;
 import java.util.Collection;
 import java.util.List;
 
-import org.testar.core.action.policy.ClickablePolicy;
 import org.testar.core.alayer.Role;
+import org.testar.core.policy.ClickablePolicy;
 import org.testar.core.state.Widget;
 import org.testar.core.tag.Tags;
 import org.testar.windows.alayer.UIARoles;

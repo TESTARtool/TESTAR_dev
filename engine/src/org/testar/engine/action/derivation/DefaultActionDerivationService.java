@@ -14,19 +14,23 @@ import java.util.Set;
 import org.testar.core.Assert;
 import org.testar.core.CodingManager;
 import org.testar.core.action.Action;
-import org.testar.core.action.policy.ClickablePolicy;
-import org.testar.core.action.policy.ScrollablePolicy;
-import org.testar.core.action.policy.TypeablePolicy;
-import org.testar.core.action.policy.WidgetFilterPolicy;
+import org.testar.core.policy.BlockedPolicy;
+import org.testar.core.policy.ClickablePolicy;
+import org.testar.core.policy.EnabledPolicy;
+import org.testar.core.policy.ScrollablePolicy;
+import org.testar.core.policy.TypeablePolicy;
+import org.testar.core.policy.WidgetFilterPolicy;
 import org.testar.core.service.ActionDerivationService;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 import org.testar.core.state.Widget;
 import org.testar.core.tag.Tags;
-import org.testar.engine.action.policy.CompositeClickablePolicy;
-import org.testar.engine.action.policy.CompositeScrollablePolicy;
-import org.testar.engine.action.policy.CompositeTypeablePolicy;
-import org.testar.engine.action.policy.CompositeWidgetFilterPolicy;
+import org.testar.engine.policy.CompositeBlockedPolicy;
+import org.testar.engine.policy.CompositeClickablePolicy;
+import org.testar.engine.policy.CompositeEnabledPolicy;
+import org.testar.engine.policy.CompositeScrollablePolicy;
+import org.testar.engine.policy.CompositeTypeablePolicy;
+import org.testar.engine.policy.CompositeWidgetFilterPolicy;
 
 /**
  * Default policy-based action derivation service.
@@ -58,6 +62,8 @@ public final class DefaultActionDerivationService implements ActionDerivationSer
                         CompositeClickablePolicy.empty(),
                         CompositeTypeablePolicy.empty(),
                         CompositeScrollablePolicy.empty(),
+                        CompositeEnabledPolicy.allowAll(),
+                        CompositeBlockedPolicy.allowNone(),
                         CompositeWidgetFilterPolicy.allowAll()
                 ),
                 Collections.emptyList(),
@@ -69,12 +75,16 @@ public final class DefaultActionDerivationService implements ActionDerivationSer
     public static DefaultActionDerivationService withPolicies(List<ClickablePolicy> clickablePolicies,
                                                               List<TypeablePolicy> typeablePolicies,
                                                               List<ScrollablePolicy> scrollablePolicies,
+                                                              List<EnabledPolicy> enabledPolicies,
+                                                              List<BlockedPolicy> blockedPolicies,
                                                               List<WidgetFilterPolicy> widgetFilterPolicies,
                                                               List<ActionDeriver> derivers) {
         return prioritizedWithPolicies(
                 clickablePolicies,
                 typeablePolicies,
                 scrollablePolicies,
+                enabledPolicies,
+                blockedPolicies,
                 widgetFilterPolicies,
                 Collections.emptyList(),
                 derivers,
@@ -85,6 +95,8 @@ public final class DefaultActionDerivationService implements ActionDerivationSer
     public static DefaultActionDerivationService prioritizedWithPolicies(List<ClickablePolicy> clickablePolicies,
                                                                         List<TypeablePolicy> typeablePolicies,
                                                                         List<ScrollablePolicy> scrollablePolicies,
+                                                                        List<EnabledPolicy> enabledPolicies,
+                                                                        List<BlockedPolicy> blockedPolicies,
                                                                         List<WidgetFilterPolicy> widgetFilterPolicies,
                                                                         List<ActionDeriver> forcedDerivers,
                                                                         List<ActionDeriver> defaultDerivers,
@@ -94,6 +106,8 @@ public final class DefaultActionDerivationService implements ActionDerivationSer
                         new CompositeClickablePolicy(clickablePolicies),
                         new CompositeTypeablePolicy(typeablePolicies),
                         new CompositeScrollablePolicy(scrollablePolicies),
+                        new CompositeEnabledPolicy(enabledPolicies),
+                        new CompositeBlockedPolicy(blockedPolicies),
                         new CompositeWidgetFilterPolicy(widgetFilterPolicies)
                 ),
                 forcedDerivers,

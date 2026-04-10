@@ -4,9 +4,10 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.core.action;
+package org.testar.core.action.resolver;
 
 import org.testar.core.Assert;
+import org.testar.core.action.Action;
 
 public final class ResolvedAction {
 

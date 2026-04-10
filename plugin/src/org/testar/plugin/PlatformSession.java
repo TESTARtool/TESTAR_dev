@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.List;
 
 import org.testar.core.action.Action;
-import org.testar.core.action.ResolvedAction;
+import org.testar.core.action.resolver.ResolvedAction;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 

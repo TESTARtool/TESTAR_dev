@@ -4,12 +4,12 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.core.action.policy;
+package org.testar.core.policy;
 
 import org.testar.core.state.Widget;
 
 @FunctionalInterface
-public interface TypeablePolicy {
+public interface TopLevelPolicy {
 
-    boolean isTypeable(Widget widget);
+    boolean isTopLevel(Widget widget);
 }
