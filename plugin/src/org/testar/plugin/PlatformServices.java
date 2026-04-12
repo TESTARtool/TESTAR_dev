@@ -10,6 +10,7 @@ import org.testar.core.Assert;
 import org.testar.core.action.resolver.ActionResolver;
 import org.testar.core.service.ActionDerivationService;
 import org.testar.core.service.ActionExecutionService;
+import org.testar.core.service.ActionSelectorService;
 import org.testar.core.service.StateService;
 import org.testar.core.service.SystemService;
 import org.testar.statemodel.StateModelManager;
@@ -23,21 +24,24 @@ public final class PlatformServices {
     private final StateService stateService;
     private final StateModelManager stateModelService;
     private final ActionDerivationService actionDerivationService;
-    private final ActionExecutionService actionExecutionService;
+    private final ActionSelectorService actionSelectorService;
     private final ActionResolver actionResolver;
+    private final ActionExecutionService actionExecutionService;
 
     public PlatformServices(SystemService systemService,
                             StateService stateService,
                             StateModelManager stateModelService,
                             ActionDerivationService actionDerivationService,
-                            ActionExecutionService actionExecutionService,
-                            ActionResolver actionResolver) {
+                            ActionSelectorService actionSelectorService,
+                            ActionResolver actionResolver,
+                            ActionExecutionService actionExecutionService) {
         this.systemService = Assert.notNull(systemService);
         this.stateService = Assert.notNull(stateService);
         this.stateModelService = Assert.notNull(stateModelService);
         this.actionDerivationService = Assert.notNull(actionDerivationService);
-        this.actionExecutionService = Assert.notNull(actionExecutionService);
+        this.actionSelectorService = Assert.notNull(actionSelectorService);
         this.actionResolver = Assert.notNull(actionResolver);
+        this.actionExecutionService = Assert.notNull(actionExecutionService);
     }
 
     public SystemService systemService() {
@@ -56,11 +60,15 @@ public final class PlatformServices {
         return actionDerivationService;
     }
 
-    public ActionExecutionService actionExecutionService() {
-        return actionExecutionService;
+    public ActionSelectorService actionSelectorService() {
+        return actionSelectorService;
     }
 
     public ActionResolver actionResolver() {
         return actionResolver;
+    }
+
+    public ActionExecutionService actionExecutionService() {
+        return actionExecutionService;
     }
 }

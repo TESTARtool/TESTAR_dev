@@ -9,7 +9,7 @@ package org.testar.core.policy;
 import org.testar.core.state.Widget;
 
 @FunctionalInterface
-public interface EnabledPolicy {
+public interface EnabledPolicy extends Policy {
 
     boolean isEnabled(Widget widget);
 }

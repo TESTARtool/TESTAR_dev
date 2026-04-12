@@ -26,9 +26,11 @@ import org.testar.core.action.StdActionCompiler;
 import org.testar.core.alayer.Rect;
 import org.testar.core.alayer.Roles;
 import org.testar.core.tag.Tags;
+import org.testar.engine.action.selection.ActionSelectorPlan;
 import org.testar.engine.action.selection.prioritize.PrioritizeNewActionsSelector;
 import org.testar.engine.action.selection.stategraph.GuiStateGraphWithVisitedActions;
 import org.testar.engine.action.selection.stategraph.QLearningActionSelector;
+import org.testar.engine.service.ComposedActionSelectorService;
 import org.testar.stub.StateStub;
 import org.testar.stub.WidgetStub;
 
@@ -89,7 +91,9 @@ public class TestActionSelector {
 	@Test
 	@Repeat( times = 100 ) // Repeat to deal with action selection randomness
 	public void testPrioritizeNewActionsSelector() {
-		FallbackActionSelectorService prioritizeSelector = new FallbackActionSelectorService(new PrioritizeNewActionsSelector());
+		ComposedActionSelectorService prioritizeSelector = ComposedActionSelectorService.compose(
+			ActionSelectorPlan.basic(new PrioritizeNewActionsSelector())
+		);
 
 		Action firstSelectedAction = prioritizeSelector.selectAction(state, actions);
 		assertNotNull(firstSelectedAction);
@@ -114,7 +118,9 @@ public class TestActionSelector {
 	@Test
 	@Repeat( times = 100 ) // Repeat to deal with action selection randomness
 	public void testGuiStateGraphWithVisitedActions() {
-		FallbackActionSelectorService guiGraphSelector = new FallbackActionSelectorService(new GuiStateGraphWithVisitedActions());
+		ComposedActionSelectorService guiGraphSelector = ComposedActionSelectorService.compose(
+			ActionSelectorPlan.basic(new GuiStateGraphWithVisitedActions())
+		);
 
 		Action firstSelectedAction = guiGraphSelector.selectAction(state, actions);
 		assertNotNull(firstSelectedAction);
@@ -139,7 +145,9 @@ public class TestActionSelector {
 	@Test
 	@Repeat( times = 100 ) // Repeat to deal with action selection randomness
 	public void testQLearningActionSelector() {
-		FallbackActionSelectorService qLearningSelector = new FallbackActionSelectorService(new QLearningActionSelector(99, 0.5));
+		ComposedActionSelectorService qLearningSelector = ComposedActionSelectorService.compose(
+			ActionSelectorPlan.basic(new QLearningActionSelector(99, 0.5))
+		);
 
 		Action firstSelectedAction = qLearningSelector.selectAction(state, actions);
 		assertNotNull(firstSelectedAction);

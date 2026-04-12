@@ -9,7 +9,7 @@ package org.testar.core.policy;
 import org.testar.core.state.Widget;
 
 @FunctionalInterface
-public interface VisiblePolicy {
+public interface VisiblePolicy extends Policy {
 
     boolean isVisible(Widget widget);
 }

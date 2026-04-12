@@ -9,7 +9,7 @@ package org.testar.core.policy;
 import org.testar.core.state.Widget;
 
 @FunctionalInterface
-public interface TypeablePolicy {
+public interface TypeablePolicy extends Policy {
 
     boolean isTypeable(Widget widget);
 }

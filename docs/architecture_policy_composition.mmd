@@ -38,9 +38,19 @@ flowchart LR
         PACP["PlatformAtCanvasPolicy (WebdriverAtCanvasPolicy / AndroidAtCanvasPolicy)"]
     end
 
-    subgraph CompositeConsumers["composite context"]
-        CC["CompositeContext (StateVisibleWidgetsContext / ActionDerivationContext / OracleEvaluationContext)"]
+    subgraph CustomPolicyImplementations["custom policy implementations"]
+        CCPCSS["CustomClickablePolicy (CSSclasses)"]
+        CTPCSS["CustomTypeablePolicy (CSSclasses)"]
     end
+
+    subgraph SessionPolicyContext["session policy context"]
+        SPC["SessionPolicyContext"]
+    end
+
+    subgraph PluginDefaults["plugin policy defaults"]
+        PPC["PlatformPolicyContexts"]
+    end
+
 
     PCP -. implements .-> CP
     PTP -. implements .-> TP
@@ -53,6 +63,9 @@ flowchart LR
     ConfWFP -. implements .-> WFP
     ZITLP -. implements .-> TLP
 
+    CCPCSS -. implements .-> CP
+    CTPCSS -. implements .-> TP
+
     CP -- "1..n policies" --> CCP
     TP -- "1..n policies" --> CTP
     SP -- "1..n policies" --> CSP
@@ -63,12 +76,14 @@ flowchart LR
     ACP -- "1..n policies" --> CACP
     TLP -- "1..n policies" --> CTLP
 
-    CCP --> CC
-    CTP --> CC
-    CSP --> CC
-    CEP --> CC
-    CBP --> CC
-    CWFP --> CC
-    CVP --> CC
-    CACP --> CC
-    CTLP --> CC
+    CCP --> PPC
+    CTP --> PPC
+    CSP --> PPC
+    CEP --> PPC
+    CBP --> PPC
+    CWFP --> PPC
+    CVP --> PPC
+    CACP --> PPC
+    CTLP --> PPC
+
+    PPC --> SPC

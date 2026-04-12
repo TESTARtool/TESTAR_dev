@@ -1,0 +1,55 @@
+flowchart LR
+
+    subgraph PluginComposition["plugin state composition"]
+        Orchestrator["PlatformOrchestrator"]
+        PolicyContexts["PlatformPolicyContexts"]
+        PlanSelection["plan selection"]
+    end
+
+    subgraph SharedContexts["shared contexts"]
+        SessionPolicies["SessionPolicyContext"]
+        StatePlan["StateCompositionPlan"]
+    end
+
+    subgraph PlatformPlanProviders["platform plan providers"]
+        PlatformPlan["PlatformStateCompositionPlan (WindowsStateCompositionPlan/ WebdriverStateCompositionPlan/ AndroidStateCompositionPlan)"]
+    end
+
+    subgraph CustomPlanProviders["custom plan providers"]
+        CustomPlan["CustomStateCompositionPlan"]
+    end
+
+    subgraph CoreState["core service contract"]
+        StateService["StateService"]
+    end
+
+    subgraph ComposedState["composed state service"]
+        ComposedStateService["ComposedStateService"]
+    end
+
+    subgraph EngineState["engine state service"]
+        ProjectionSupport["StateProjectionSupport"]
+    end
+
+    subgraph PlatformStateProviders["platform state providers"]
+        PlatformStateService["PlatformStateService (WindowsStateService/ WebdriverStateService/ AndroidStateService)"]
+    end
+
+    Orchestrator --> PolicyContexts
+    Orchestrator --> PlanSelection
+
+    PolicyContexts --> SessionPolicies
+    PlanSelection --> StatePlan
+
+    PlatformStateService --> PlatformPlan
+    ProjectionSupport --> PlatformPlan
+
+    PlatformPlan --> StatePlan
+    CustomPlan --> StatePlan
+
+    ComposedStateService -. implements .-> StateService
+
+    SessionPolicies --> ComposedStateService
+    StatePlan --> ComposedStateService
+
+    ComposedStateService -- "produces" --> projectedState

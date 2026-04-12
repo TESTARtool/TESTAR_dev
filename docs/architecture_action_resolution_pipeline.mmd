@@ -1,0 +1,40 @@
+flowchart LR
+
+    subgraph PluginComposition["plugin or cli resolution composition"]
+        Orchestrator["PlatformOrchestrator / CLI session"]
+        PlanSelection["plan selection"]
+    end
+
+    subgraph SharedContexts["shared composition"]
+        ResolverPlan["ActionResolverPlan"]
+    end
+
+    subgraph EnginePlanProviders["engine resolver strategies"]
+        EngineResolvers["EngineActionResolver (DescriptionActionResolver / future role or semantic resolvers)"]
+    end
+
+    subgraph CustomPlanProviders["custom resolver providers"]
+        CustomResolver["CustomActionResolver"]
+    end
+
+    subgraph CoreResolution["core action resolution contract"]
+        ActionResolver["ActionResolver"]
+        ResolvedAction["ResolvedAction"]
+    end
+
+    subgraph ComposedResolution["composed action resolver"]
+        ComposedActionResolver["ComposedActionResolver"]
+    end
+
+    Orchestrator --> PlanSelection
+
+    PlanSelection --> ResolverPlan
+
+    EngineResolvers --> ResolverPlan
+    CustomResolver --> ResolverPlan
+
+    ComposedActionResolver -. implements .-> ActionResolver
+
+    ResolverPlan --> ComposedActionResolver
+
+    ComposedActionResolver -- "produces" --> ResolvedAction

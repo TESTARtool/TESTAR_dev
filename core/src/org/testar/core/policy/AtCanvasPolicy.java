@@ -9,7 +9,7 @@ package org.testar.core.policy;
 import org.testar.core.state.Widget;
 
 @FunctionalInterface
-public interface AtCanvasPolicy {
+public interface AtCanvasPolicy extends Policy {
 
     boolean isAtCanvas(Widget widget);
 }

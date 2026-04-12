@@ -1,0 +1,61 @@
+flowchart LR
+
+    subgraph CoreContracts["core service contracts"]
+        CoreSystem["SystemService"]
+        CoreState["StateService"]
+        CoreDerivation["ActionDerivationService"]
+        CoreChoose["ChooseAction (ActionSelectorService / ActionResolver)"]
+        CoreExecution["ActionExecutionService"]
+        CoreOracle["OracleEvaluationService"]
+    end
+
+    subgraph EngineComposition["engine composed services"]
+        ComposedSystem["ComposedSystemService"]
+        SystemPlan["SystemCompositionPlan"]
+        ComposedState["ComposedStateService"]
+        StatePlan["StateCompositionPlan"]
+        ComposedDerivation["ComposedActionDerivationService"]
+        DerivationPlan["ActionDerivationPlan"]
+        ComposedChoose["ComposedChooseAction (ComposedActionSelectorService / ComposedActionResolver)"]
+        ChoosePlan["ChooseActionPlan (ActionSelectorPlan / ActionResolverPlan)"]
+        ComposedExecution["ComposedActionExecutionService"]
+        ExecutionPlan["ActionExecutionPlan"]
+        ComposedOracle["ComposedOracleEvaluationService"]
+    end
+
+    subgraph PluginComposition["plugin session composition"]
+        Orchestrator["PlatformOrchestrator"]
+        PolicyContexts["PlatformPolicyContexts"]
+        ServiceSelection["service selection"]
+    end
+
+    ComposedSystem -. implements .-> CoreSystem
+    ComposedState -. implements .-> CoreState
+    ComposedDerivation -. implements .-> CoreDerivation
+    ComposedChoose -. implements .-> CoreChoose
+    ComposedExecution -. implements .-> CoreExecution
+    ComposedOracle -. implements .-> CoreOracle
+
+    Orchestrator --> PolicyContexts
+    Orchestrator --> ServiceSelection
+    ServiceSelection --> SystemPlan
+    ServiceSelection --> StatePlan
+    ServiceSelection --> DerivationPlan
+    ServiceSelection --> ChoosePlan
+    ServiceSelection --> ExecutionPlan
+    ServiceSelection --> ComposedSystem
+    ServiceSelection --> ComposedState
+    ServiceSelection --> ComposedDerivation
+    ServiceSelection --> ComposedChoose
+    ServiceSelection --> ComposedExecution
+
+    SystemPlan -. plan .-> ComposedSystem
+    StatePlan -. plan .-> ComposedState
+    DerivationPlan -. plan .-> ComposedDerivation
+    ChoosePlan -. plan .-> ComposedChoose
+    ExecutionPlan -. plan .-> ComposedExecution
+    ComposedSystem -. startSystem .-> ComposedState
+    ComposedState -. getState .-> ComposedDerivation
+    ComposedDerivation -. deriveActions .-> ComposedChoose
+    ComposedChoose -. select/resolve action .-> ComposedExecution
+    ComposedExecution -. executeAction .-> ComposedOracle

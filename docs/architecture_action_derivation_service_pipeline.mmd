@@ -1,0 +1,59 @@
+flowchart LR
+
+    subgraph PluginComposition["plugin derivation composition"]
+        Orchestrator["PlatformOrchestrator"]
+        PolicyContexts["PlatformPolicyContexts"]
+        PlanSelection["plan selection"]
+    end
+
+    subgraph SharedContexts["shared contexts"]
+        SessionPolicies["SessionPolicyContext"]
+        DerivationPlan["ActionDerivationPlan"]
+    end
+
+    subgraph PlatformPlanProviders["platform plan providers"]
+        PlatformPlan["PlatformActionDerivationPlan (WindowsActionDerivationPlan/ WebdriverActionDerivationPlan/ AndroidActionDerivationPlan)"]
+    end
+
+    subgraph CustomPlanProviders["custom plan providers"]
+        CustomPlan["CustomActionDerivationPlan"]
+    end
+
+    subgraph CoreDerivation["core service contract"]
+        ActionDerivationService["ActionDerivationService"]
+    end
+
+    subgraph ComposedDerivation["composed derivation service"]
+        ComposedActionDerivationService["ComposedActionDerivationService"]
+    end
+
+    subgraph EngineDerivation["engine derivation service"]
+        StateActionDeriver["StateActionDeriver"]
+    end
+
+    subgraph PlatformDerivers["platform widget derivation"]
+        PlatformWidgetActionDeriver["PlatformWidgetActionDeriver (WindowsWidgetActionDeriver/ WebdriverWidgetActionDeriver/ AndroidWidgetActionDeriver)"]
+    end
+
+    Orchestrator --> PolicyContexts
+    Orchestrator --> PlanSelection
+
+    PolicyContexts --> SessionPolicies
+    PlanSelection --> DerivationPlan
+
+    StateActionDeriver --> PlatformWidgetActionDeriver
+
+    ForcedActions --> PlatformPlan
+    PlatformWidgetActionDeriver --> PlatformPlan
+    FallbackActions --> PlatformPlan
+
+    PlatformPlan --> DerivationPlan
+
+    CustomPlan --> DerivationPlan
+
+    ComposedActionDerivationService -. implements .-> ActionDerivationService
+
+    SessionPolicies --> ComposedActionDerivationService
+    DerivationPlan --> ComposedActionDerivationService
+
+    ComposedActionDerivationService -- "produces" --> derivedActions

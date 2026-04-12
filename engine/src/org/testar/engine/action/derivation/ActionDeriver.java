@@ -11,11 +11,13 @@ import java.util.Set;
 import org.testar.core.action.Action;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
+import org.testar.engine.policy.SessionPolicyContext;
 
 /**
- * Contributes actions to a derivation run.
+ * Returns the actions produced for one derivation step in the current
+ * derivation phase.
  */
 public interface ActionDeriver {
 
-    void derive(SUT system, State state, ActionDerivationContext context, Set<Action> actions);
+    Set<Action> derive(SUT system, State state, SessionPolicyContext context);
 }

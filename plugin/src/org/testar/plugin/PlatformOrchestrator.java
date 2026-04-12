@@ -6,10 +6,19 @@
 
 package org.testar.plugin;
 
-import org.testar.engine.action.execution.DefaultActionExecutionService;
 import org.testar.engine.manager.InputDataManager;
-import org.testar.engine.action.DescriptionActionResolver;
-import org.testar.engine.action.derivation.DesktopActionDerivationFactory;
+import org.testar.engine.action.selection.ActionSelectorPlan;
+import org.testar.engine.action.selection.random.RandomActionSelector;
+import org.testar.engine.service.ComposedActionDerivationService;
+import org.testar.engine.service.ComposedActionExecutionService;
+import org.testar.engine.service.ComposedActionResolver;
+import org.testar.engine.service.ComposedActionSelectorService;
+import org.testar.engine.service.ComposedStateService;
+import org.testar.engine.service.ComposedSystemService;
+import org.testar.engine.action.resolver.ActionResolverPlan;
+import org.testar.engine.action.resolver.DescriptionActionResolver;
+import org.testar.engine.policy.SessionPolicyContext;
+import org.testar.plugin.policy.PlatformPolicyContexts;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,26 +28,24 @@ import org.testar.config.ConfigTags;
 import org.testar.config.StateModelTags;
 import org.testar.config.settings.Settings;
 import org.testar.core.CodingManager;
-import org.testar.core.service.SystemService;
 import org.testar.core.state.SUT;
-import org.testar.engine.state.DefaultStateService;
 import org.testar.plugin.exceptions.UnsupportedPlatformException;
 import org.testar.plugin.reporting.SessionReportingManager;
 import org.testar.statemodel.DummyModelManager;
 import org.testar.statemodel.StateModelManager;
 import org.testar.statemodel.StateModelManagerFactory;
 import org.testar.statemodel.StateModelStorageBootstrap;
-import org.testar.webdriver.action.WebdriverActionDerivationFactory;
-import org.testar.webdriver.action.policy.WebdriverClickablePolicy;
-import org.testar.webdriver.action.policy.WebdriverScrollablePolicy;
-import org.testar.webdriver.action.policy.WebdriverTypeablePolicy;
-import org.testar.webdriver.service.WebdriverStateService;
-import org.testar.webdriver.service.WebdriverSystemService;
-import org.testar.windows.service.WindowsStateService;
-import org.testar.windows.service.WindowsSystemService;
+import org.testar.webdriver.action.execution.WebdriverActionExecutionPlan;
+import org.testar.webdriver.action.derivation.WebdriverActionDerivationPlan;
+import org.testar.webdriver.system.WebdriverSystemCompositionPlan;
+import org.testar.webdriver.state.WebdriverStateCompositionPlan;
+import org.testar.windows.action.execution.WindowsActionExecutionPlan;
+import org.testar.windows.action.derivation.WindowsActionDerivationPlan;
 import org.testar.windows.action.policy.WindowsClickablePolicy;
 import org.testar.windows.action.policy.WindowsScrollablePolicy;
 import org.testar.windows.action.policy.WindowsTypeablePolicy;
+import org.testar.windows.system.WindowsSystemCompositionPlan;
+import org.testar.windows.tag.WindowsStateCompositionPlan;
 
 /**
  * TESTAR platform/plugin orchestration
@@ -99,49 +106,70 @@ public final class PlatformOrchestrator {
     }
 
     private static PlatformServices windows(PlatformSessionSpec sessionSpec) {
-        SystemService systemService;
+        ComposedSystemService systemService;
         switch (sessionSpec.getTargetType()) {
             case EXECUTABLE:
-                systemService = WindowsSystemService.fromExecutable(
-                        sessionSpec.getTarget(),
-                        sessionSpec.getSettings().get(ConfigTags.ProcessListenerEnabled, false),
-                        sessionSpec.getSettings().get(ConfigTags.SUTProcesses, "")
+                systemService = ComposedSystemService.compose(
+                        WindowsSystemCompositionPlan.fromExecutable(
+                                sessionSpec.getTarget(),
+                                sessionSpec.getSettings().get(ConfigTags.ProcessListenerEnabled, false),
+                                sessionSpec.getSettings().get(ConfigTags.SUTProcesses, "")
+                        )
                 );
                 break;
             case PROCESS_NAME:
-                systemService = WindowsSystemService.fromProcessName(sessionSpec.getTarget());
+                systemService = ComposedSystemService.compose(
+                        WindowsSystemCompositionPlan.fromProcessName(sessionSpec.getTarget())
+                );
                 break;
             case PROCESS_ID:
-                systemService = WindowsSystemService.fromProcessId(Long.parseLong(sessionSpec.getTarget()));
+                systemService = ComposedSystemService.compose(
+                        WindowsSystemCompositionPlan.fromProcessId(Long.parseLong(sessionSpec.getTarget()))
+                );
                 break;
             case UWP:
-                systemService = WindowsSystemService.fromExecutableUwp(sessionSpec.getTarget());
+                systemService = ComposedSystemService.compose(
+                        WindowsSystemCompositionPlan.fromExecutableUwp(sessionSpec.getTarget())
+                );
                 break;
             default:
                 throw new UnsupportedPlatformException(
                         "Unsupported Windows target type: " + sessionSpec.getTargetType()
                 );
         }
+        SessionPolicyContext sessionPolicyContext = PlatformPolicyContexts.desktopDefaults(
+                new WindowsClickablePolicy(),
+                new WindowsTypeablePolicy(),
+                new WindowsScrollablePolicy()
+        );
 
         return new PlatformServices(
                 systemService,
-                new DefaultStateService(
-                        WindowsStateService.uiAutomation(
+                ComposedStateService.compose(
+                        sessionPolicyContext,
+                        WindowsStateCompositionPlan.uiAutomation(
                                 sessionSpec.getSettings().get(ConfigTags.TimeToFreeze, 30.0),
                                 sessionSpec.getSettings().get(ConfigTags.AccessBridgeEnabled, false),
                                 sessionSpec.getSettings().get(ConfigTags.SUTProcesses, "")
                         )
                 ),
                 createStateModelService(sessionSpec),
-                DesktopActionDerivationFactory.create(
-                        new WindowsClickablePolicy(),
-                        new WindowsTypeablePolicy(),
-                        new WindowsScrollablePolicy(),
-                        sessionSpec.getSettings().get(ConfigTags.ProcessesToKillDuringTest, ""),
-                        widget -> InputDataManager.getRandomTextInputData()
+                ComposedActionDerivationService.compose(
+                        sessionPolicyContext,
+                        WindowsActionDerivationPlan.create(
+                                sessionSpec.getSettings().get(ConfigTags.ProcessesToKillDuringTest, ""),
+                                widget -> InputDataManager.getRandomTextInputData()
+                        )
                 ),
-                new DefaultActionExecutionService(),
-                new DescriptionActionResolver()
+                ComposedActionSelectorService.compose(
+                        ActionSelectorPlan.basic(new RandomActionSelector())
+                ),
+                ComposedActionResolver.compose(
+                        ActionResolverPlan.basic(new DescriptionActionResolver())
+                ),
+                ComposedActionExecutionService.compose(
+                    WindowsActionExecutionPlan.basic()
+                )
         );
     }
 
@@ -151,21 +179,37 @@ public final class PlatformOrchestrator {
                     "Unsupported WebDriver target type: " + sessionSpec.getTargetType()
             );
         }
+        SessionPolicyContext sessionPolicyContext = PlatformPolicyContexts.webdriverDefaults(
+                sessionSpec.getSettings().get(ConfigTags.ClickableClasses, Collections.emptyList()),
+                sessionSpec.getSettings().get(ConfigTags.TypeableClasses, Collections.emptyList())
+        );
 
         return new PlatformServices(
-                WebdriverSystemService.fromSutConnector(sessionSpec.getTarget()),
-                new DefaultStateService(
-                        WebdriverStateService.browser(sessionSpec.getSettings().get(ConfigTags.TimeToFreeze, 30.0))
+                ComposedSystemService.compose(
+                        WebdriverSystemCompositionPlan.fromSutConnector(sessionSpec.getTarget())
+                ),
+                ComposedStateService.compose(
+                        sessionPolicyContext,
+                        WebdriverStateCompositionPlan.browser(
+                                sessionSpec.getSettings().get(ConfigTags.TimeToFreeze, 30.0)
+                        )
                 ),
                 createStateModelService(sessionSpec),
-                WebdriverActionDerivationFactory.create(
-                        new WebdriverClickablePolicy(sessionSpec.getSettings().get(ConfigTags.ClickableClasses, Collections.emptyList())),
-                        new WebdriverTypeablePolicy(sessionSpec.getSettings().get(ConfigTags.TypeableClasses, Collections.emptyList())),
-                        new WebdriverScrollablePolicy(),
-                        widget -> InputDataManager.getRandomTextInputData()
+                ComposedActionDerivationService.compose(
+                        sessionPolicyContext,
+                        WebdriverActionDerivationPlan.create(
+                                widget -> InputDataManager.getRandomTextInputData()
+                        )
                 ),
-                new DefaultActionExecutionService(),
-                new DescriptionActionResolver()
+                ComposedActionSelectorService.compose(
+                        ActionSelectorPlan.basic(new RandomActionSelector())
+                ),
+                ComposedActionResolver.compose(
+                        ActionResolverPlan.basic(new DescriptionActionResolver())
+                ),
+                ComposedActionExecutionService.compose(
+                    WebdriverActionExecutionPlan.basic()
+                )
         );
     }
 

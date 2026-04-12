@@ -6,17 +6,25 @@
 
 package org.testar.engine.action.derivation;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.testar.core.Assert;
 import org.testar.core.action.Action;
+import org.testar.core.policy.AtCanvasPolicy;
+import org.testar.core.policy.BlockedPolicy;
+import org.testar.core.policy.EnabledPolicy;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 import org.testar.core.state.Widget;
+import org.testar.core.policy.TopLevelPolicy;
+import org.testar.core.policy.VisiblePolicy;
+import org.testar.core.policy.WidgetFilterPolicy;
+import org.testar.engine.policy.SessionPolicyContext;
 
 /**
- * Traverses the state and delegates action contribution for every
- * widget allowed by the active filter policy.
+ * Traverses the state and returns the actions produced for every widget
+ * allowed by the active derivation policies.
  */
 public final class StateActionDeriver implements ActionDeriver {
 
@@ -27,14 +35,25 @@ public final class StateActionDeriver implements ActionDeriver {
     }
 
     @Override
-    public void derive(SUT system, State state, ActionDerivationContext context, Set<Action> actions) {
-        Assert.notNull(state, context, actions);
+    public Set<Action> derive(SUT system, State state, SessionPolicyContext context) {
+        Assert.notNull(state, context);
+        Set<Action> actions = new LinkedHashSet<>();
+        EnabledPolicy enabledPolicy = context.require(EnabledPolicy.class);
+        BlockedPolicy blockedPolicy = context.require(BlockedPolicy.class);
+        WidgetFilterPolicy widgetFilterPolicy = context.require(WidgetFilterPolicy.class);
+        VisiblePolicy visiblePolicy = context.require(VisiblePolicy.class);
+        AtCanvasPolicy atCanvasPolicy = context.require(AtCanvasPolicy.class);
+        TopLevelPolicy topLevelPolicy = context.require(TopLevelPolicy.class);
         for (Widget widget : state) {
-            if (context.enabledPolicy().isEnabled(widget)
-                    && !context.blockedPolicy().isBlocked(widget)
-                    && context.widgetFilterPolicy().allows(widget)) {
-                widgetActionDeriver.derive(system, state, widget, context, actions);
+            if (enabledPolicy.isEnabled(widget)
+                    && !blockedPolicy.isBlocked(widget)
+                    && widgetFilterPolicy.allows(widget)
+                    && visiblePolicy.isVisible(widget)
+                    && atCanvasPolicy.isAtCanvas(widget)
+                    && topLevelPolicy.isTopLevel(widget)) {
+                actions.addAll(widgetActionDeriver.derive(system, state, widget, context));
             }
         }
+        return actions;
     }
 }

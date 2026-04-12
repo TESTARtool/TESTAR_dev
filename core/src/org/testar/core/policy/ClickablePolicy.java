@@ -9,7 +9,7 @@ package org.testar.core.policy;
 import org.testar.core.state.Widget;
 
 @FunctionalInterface
-public interface ClickablePolicy {
+public interface ClickablePolicy extends Policy {
 
     boolean isClickable(Widget widget);
 }

@@ -131,6 +131,9 @@ These contracts intentionally stay small. They define the capability boundary, n
 
 The main policy contracts are in `org.testar.core.policy`.
 
+- `Policy`
+  Root marker interface for policy families that can be registered in shared policy contexts.
+  File: `core/src/org/testar/core/policy/Policy.java`
 - `ClickablePolicy`
   Decides whether a widget should be considered clickable.
   File: `core/src/org/testar/core/policy/ClickablePolicy.java`
@@ -227,15 +230,6 @@ The policy composition classes are in:
 
 Current policy classes in that package are:
 
-- `CompositeClickablePolicy`
-- `CompositeTypeablePolicy`
-- `CompositeScrollablePolicy`
-- `CompositeEnabledPolicy`
-- `CompositeBlockedPolicy`
-- `CompositeWidgetFilterPolicy`
-- `CompositeVisiblePolicy`
-- `CompositeAtCanvasPolicy`
-- `CompositeTopLevelPolicy`
 - `TagEnabledPolicy`
 - `TagBlockedPolicy`
 - `ConfiguredWidgetFilterPolicy`
@@ -243,7 +237,7 @@ Current policy classes in that package are:
 
 ### Composite policy classes
 
-The `Composite...Policy` classes are not platform rules by themselves.
+The `Composite...Policy` classes in `org.testar.engine.policy.composite` are not platform rules by themselves.
 
 Their responsibility is to combine one or more concrete policies into a single runtime policy instance that can be consumed by an engine context.
 
@@ -272,6 +266,15 @@ Examples:
   Produces one `AtCanvasPolicy` from one or more canvas-scope rules.
 - `CompositeTopLevelPolicy`
   Produces one `TopLevelPolicy` from one or more top-level rules.
+
+The composite package also contains internal composition helpers:
+
+- `CompositePolicySupport`
+  Shared internal helper that evaluates policy lists with a composition rule.
+- `CompositePolicyRule`
+  Declares the composition rule used by a composite, such as `ANY` or `ALL`.
+
+These two classes reduce duplication across the named composite wrappers. Services and factories should depend on the named composites, not on these internal helpers directly.
 
 The composition semantics are intentionally different depending on the contract:
 
@@ -311,23 +314,48 @@ These classes are generic adapters from the shared tag model into the generic po
 
 The current policy composition is visible in:
 
-- `engine/src/org/testar/engine/action/derivation/ActionDerivationContext.java`
+- `engine/src/org/testar/engine/policy/SessionPolicyContext.java`
 
-That context currently groups:
+That shared context is now a typed policy registry.
 
-- `ClickablePolicy`
-- `TypeablePolicy`
-- `ScrollablePolicy`
-- `EnabledPolicy`
-- `BlockedPolicy`
-- `WidgetFilterPolicy`
+It stores effective policies by their policy-interface type, for example:
+
+- `ClickablePolicy.class`
+- `TypeablePolicy.class`
+- `ScrollablePolicy.class`
+- `EnabledPolicy.class`
+- `BlockedPolicy.class`
+- `WidgetFilterPolicy.class`
+- `VisiblePolicy.class`
+- `AtCanvasPolicy.class`
+- `TopLevelPolicy.class`
 
 This shows the intended role of `engine`:
 
 - the runtime consumes one effective policy of each kind
 - composite policies are the mechanism that joins multiple implementations before execution
+- the shared session context can grow with new policy families without adding one new field and getter per policy type
 
-Other runtime contexts may group different subsets of the same policy families. For example, a state query focused on visible widgets could consume `VisiblePolicy`, `AtCanvasPolicy`, and `TopLevelPolicy` without depending on action-derivation concerns.
+Services can consume different subsets of the same shared policy context. For example, action derivation may use clickable, typeable, visible, enabled, and top-level policies, while a state projection may use visible, at-canvas, top-level, and widget-filter policies.
+
+### Plugin default policy composition
+
+The `plugin` module now owns the default platform policy bundles that are used to build a session.
+
+Current default composition entry point:
+
+- `plugin/src/org/testar/plugin/policy/PlatformPolicyContexts.java`
+
+This means the layering is now:
+
+- `engine`
+  Defines the policy registry contract and the reusable composite implementations.
+- `plugin`
+  Decides which default policy bundle should be used for a platform session such as Windows or WebDriver.
+- `cli` and `testar`
+  Can later override or extend those defaults through higher-level configuration.
+
+This keeps `SessionPolicyContext` reusable while moving platform default choices out of engine service factories.
 
 ### Mermaid diagram
 
@@ -347,10 +375,346 @@ This diagram represents the current pattern at the policy-composition level:
 
 - `core` defines the contract type
 - platform modules and generic engine helpers provide concrete implementations
-- `engine.policy` composes them into one effective policy per capability
-- engine contexts consume those composed policies
+- `engine.policy.composite` composes them into one effective policy per capability
+- `plugin.policy` provides default platform bundles
+- engine contexts consume the resulting session policy context
 
 The diagram stays intentionally simple. It focuses on policy families and composition semantics rather than showing every concrete consumer or every concrete platform class in full detail.
+
+## Services
+
+The service architecture follows the same modular composition idea as the policy architecture.
+
+At the service level, the question is not "which widget rule applies?" but:
+
+- which runtime capability is needed
+- which layer owns the reusable implementation
+- which layer provides the platform-native implementation
+- which layer assembles the final service pipeline for a session
+
+### Service architecture overview
+
+The current service architecture is based on these rules:
+
+1. `core` defines service contracts.
+2. `engine` provides reusable service implementations and service-level orchestration.
+3. platform modules provide native implementations where platform access is required.
+4. `plugin` assembles the final service instances for a platform session.
+5. entry points such as `cli` and `testar` invoke the composed services.
+
+This means services follow a different responsibility split than policies:
+
+- policies refine runtime decisions
+- services execute runtime work
+
+Examples:
+
+- `StateService`
+  Captures or prepares a `State`.
+- `ActionDerivationService`
+  Produces available `Action` objects from a `State`.
+- `ActionExecutionService`
+  Executes a selected `Action`.
+- `ActionSelectorService`
+  Chooses one `Action` from the derived set.
+- `OracleEvaluationService`
+  Produces and stores `Verdict` information.
+
+### Current service contracts
+
+The current stable service families are:
+
+- `SystemService`
+  Starts and stops the SUT lifecycle.
+- `StateService`
+  Produces the current `State` from a running `SUT`.
+- `ActionDerivationService`
+  Produces the current `Action` set from a `SUT` and `State`.
+- `ActionExecutionService`
+  Executes an `Action` against a `SUT` and `State`.
+- `ActionSelectorService`
+  Chooses one `Action` from a derived action set.
+- `OracleEvaluationService`
+  Stores and retrieves `Verdict` information for a `State`.
+
+These contracts remain intentionally small. They describe capability boundaries, not algorithm details.
+
+### Service layering by module
+
+The current layering is:
+
+- `core`
+  Declares the service contracts.
+- `engine`
+  Implements reusable service logic that can run on top of native services or action/state objects.
+- platform modules such as `windows` and `webdriver`
+  Provide native service implementations where platform access is required.
+- `plugin`
+  Chooses and composes the concrete service instances for a session.
+
+This can be seen directly in the current code:
+
+- native state capture lives in platform modules
+  - `windows/src/org/testar/windows/service/WindowsStateService.java`
+  - `webdriver/src/org/testar/webdriver/service/WebdriverStateService.java`
+- reusable state composition lives in engine
+  - `engine/src/org/testar/engine/service/ComposedStateService.java`
+  - `engine/src/org/testar/engine/state/StateCompositionPlan.java`
+- reusable action derivation orchestration lives in engine
+  - `engine/src/org/testar/engine/service/ComposedActionDerivationService.java`
+  - `engine/src/org/testar/engine/action/derivation/StateActionDeriver.java`
+- platform session assembly lives in plugin
+  - `plugin/src/org/testar/plugin/PlatformOrchestrator.java`
+
+### Shared contexts versus service-specific dependencies
+
+The current architecture now has one shared session-level policy registry:
+
+- `engine/src/org/testar/engine/policy/SessionPolicyContext.java`
+
+Its responsibility is:
+
+- hold the effective policy set for one session
+- expose those policies by contract type
+- allow multiple services to consume the same runtime policy view
+
+That shared context is intentionally limited to policies.
+
+It should not become a generic container for all service runtime data.
+
+The current boundary is:
+
+- shared session context
+  - policy objects such as `ClickablePolicy`, `VisiblePolicy`, `EnabledPolicy`, `TopLevelPolicy`
+- service-specific dependencies
+  - derivers
+  - native delegates
+  - selector strategies
+  - text-input providers
+  - fallback strategies
+
+This keeps reuse high without turning the session context into an oversized runtime bag.
+
+### Current reusable engine services
+
+The current reusable engine service implementations are:
+
+- `ComposedSystemService`
+  Composes one native `SystemService` with a `SystemCompositionPlan` so session start/stop hooks can be added without changing the native platform service.
+- `ComposedStateService`
+  Applies engine-level state preparation and then delegates to a `StateCompositionPlan` using the shared `SessionPolicyContext`.
+- `ComposedActionDerivationService`
+  Runs action derivation in three ordered phases:
+  - forced derivers
+  - default derivers
+  - fallback derivers
+- `ComposedActionExecutionService`
+  Composes one base `ActionExecutionService` with an `ActionExecutionPlan` so execution hooks can be added around the base executor.
+- `ComposedActionSelectorService`
+  Composes one primary `ActionSelectorService` with a fallback selector through an `ActionSelectorPlan`.
+- `ComposedActionResolver`
+  Composes one `ActionResolver` strategy through an `ActionResolverPlan`.
+- `BasicActionExecutionService`
+  Provides the current minimal base executor used by the default execution plans.
+
+The important architectural point is that engine services do not own platform-native access.
+
+Instead, engine services operate on:
+
+- native services delegated from platform modules
+- shared domain objects such as `State`, `Widget`, and `Action`
+- shared policies from `SessionPolicyContext`
+- service-specific plans such as `SystemCompositionPlan`, `StateCompositionPlan`, `ActionDerivationPlan`, `ActionSelectorPlan`, `ActionExecutionPlan`, and `ActionResolverPlan`
+
+### First reference flow: system -> state -> derive actions -> select or resolve action -> execute action -> oracle
+
+This is the first service pipeline that should guide the architecture.
+
+#### Step 1: system
+
+Current flow:
+
+1. `plugin` chooses the native system service for the active platform.
+2. `plugin` wraps it with `ComposedSystemService`.
+3. the native service starts or connects to the SUT.
+4. optional lifecycle hooks are applied through `SystemCompositionPlan`.
+
+#### Step 2: state
+
+Current flow:
+
+1. `plugin` chooses the native state service for the active platform.
+2. `plugin` wraps it with `ComposedStateService`.
+3. the native service captures the raw platform `State`.
+4. `ComposedStateService` applies reusable engine-side processing and then runs the selected `StateCompositionPlan`.
+
+Current examples:
+
+- Windows session:
+  - `WindowsStateService.uiAutomation(...)`
+  - wrapped by `ComposedStateService`
+- WebDriver session:
+  - `WebdriverStateService.browser(...)`
+  - wrapped by `ComposedStateService`
+
+So the current state architecture already follows:
+
+- platform module captures
+- engine enriches
+- plugin composes
+
+#### Step 3: derive actions
+
+Current flow:
+
+1. `plugin` creates the `SessionPolicyContext` through `PlatformPolicyContexts`.
+2. `plugin` chooses the platform-appropriate derivation plan.
+3. `ComposedActionDerivationService` is created from the shared policy context and the derivation plan.
+4. `ComposedActionDerivationService` runs the configured derivation phases.
+5. `StateActionDeriver` traverses the `State`.
+6. `StateActionDeriver` asks the active policies whether a widget should participate.
+7. the platform-specific `WidgetActionDeriver` returns the platform-appropriate actions for each eligible widget.
+
+This is where policies and services meet most clearly.
+
+The current derivation gating in `StateActionDeriver` uses:
+
+- `EnabledPolicy`
+- `BlockedPolicy`
+- `WidgetFilterPolicy`
+- `VisiblePolicy`
+- `AtCanvasPolicy`
+- `TopLevelPolicy`
+
+Then the widget-level deriver uses capability policies such as:
+
+- `ClickablePolicy`
+- `TypeablePolicy`
+- `ScrollablePolicy`
+
+So the derive-actions architecture is:
+
+- service decides traversal and orchestration
+- policies decide eligibility and capabilities
+- platform widget derivers decide which concrete actions to build
+
+#### Step 4: select or resolve action
+
+Current flow:
+
+Current flow has two variants:
+
+1. a choose-action service receives the current `State` and derived `Action` set
+2. selector-based runtime flow:
+   `ComposedActionSelectorService` uses the selected `ActionSelectorPlan`
+3. resolver-based external-command flow:
+   `ComposedActionResolver` uses the selected `ActionResolverPlan`
+4. one concrete `Action` is selected or resolved for execution
+
+Current selector examples:
+
+- `RandomActionSelector`
+- `QLearningActionSelector`
+- `ComposedActionSelectorService`
+
+Current resolver examples:
+
+- `DescriptionActionResolver`
+- `ComposedActionResolver`
+
+Selection and resolution stay as separate contracts, but the overview architecture treats both as the same conceptual step:
+
+- choose one concrete action from the derived action set
+
+#### Step 5: execute action
+
+Current flow:
+
+1. the selected `Action` is passed to `ComposedActionExecutionService`
+2. the selected `ActionExecutionPlan` runs before-execution hooks
+3. the base execution service executes the concrete action
+4. after-execution hooks observe the execution result
+
+#### Step 6: oracle
+
+Current flow:
+
+1. oracle evaluation examines the current state after execution
+2. verdict information is produced and stored
+3. later reporting and higher-level orchestration consume those results
+
+### Service architecture rule of thumb
+
+When deciding where new logic belongs, use this split:
+
+- if the logic answers "should this widget be considered X?"
+  - it is probably a policy
+- if the logic answers "how do we build, derive, execute, or select?"
+  - it is probably a service
+- if the logic answers "which concrete implementations should be active in this session?"
+  - it belongs in composition, currently `plugin`
+
+### Action resolution architecture
+
+Action resolution is not modeled as the same contract as action selection, but it now follows the same composition pattern:
+
+- `core`
+  defines `ActionResolver` and `ResolvedAction`
+- `engine`
+  provides `ComposedActionResolver` and `ActionResolverPlan`
+- `plugin`
+  composes the active resolver strategy for the session
+
+This keeps the semantics separate:
+
+- selection
+  chooses one action autonomously from a derived set
+- resolution
+  matches one action against external arguments
+
+But it keeps the architecture aligned:
+
+- contract
+- plan
+- composed engine implementation
+- plugin composition
+
+`PlatformOrchestrator` now composes the active runtime services in this conceptual order:
+
+- system
+- state
+- derive actions
+- choose action
+- execute action
+- oracle
+
+### Mermaid diagram
+
+The service architecture is documented separately from the policy-composition diagram.
+
+Diagram file:
+
+- `docs/architecture_overview_service_pipeline.mmd`
+- `docs/architecture_action_derivation_service_pipeline.mmd`
+- `docs/architecture_action_selection_service_pipeline.mmd`
+- `docs/architecture_action_resolution_pipeline.mmd`
+
+The service overview diagram focuses on:
+
+- service contracts
+- engine reusable services
+- platform-native service implementations
+- plugin-side service assembly
+- the current `system -> state -> derive actions -> select or resolve action -> execute action -> oracle` flow
+
+The action-derivation diagram focuses on:
+
+- derivation plans
+- the shared session policy context
+- the composed derivation service
+- state traversal
+- platform-specific widget derivation
+- generic engine derivers used by desktop-style plans
 
 ## Next sections
 

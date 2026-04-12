@@ -1,0 +1,52 @@
+flowchart LR
+
+    subgraph PluginComposition["plugin system composition"]
+        Orchestrator["PlatformOrchestrator"]
+        PlanSelection["plan selection"]
+    end
+
+    subgraph SharedContexts["shared composition"]
+        SystemPlan["SystemCompositionPlan"]
+    end
+
+    subgraph PlatformPlanProviders["platform plan providers"]
+        PlatformPlan["PlatformSystemCompositionPlan (WindowsSystemCompositionPlan/ WebdriverSystemCompositionPlan/ AndroidSystemCompositionPlan)"]
+    end
+
+    subgraph CustomPlanProviders["custom plan providers"]
+        CustomPlan["CustomSystemCompositionPlan"]
+    end
+
+    subgraph CoreSystem["core service contract"]
+        SystemService["SystemService"]
+    end
+
+    subgraph ComposedSystem["composed system service"]
+        ComposedSystemService["ComposedSystemService"]
+    end
+
+    subgraph PlatformSystemProviders["platform system providers"]
+        PlatformSystemService["PlatformSystemService (WindowsSystemService/ WebdriverSystemService/ AndroidSystemService)"]
+    end
+
+    subgraph EngineHooks["engine lifecycle hooks"]
+        StartHooks["Start hooks"]
+        StopHooks["Stop hooks"]
+    end
+
+    Orchestrator --> PlanSelection
+
+    PlanSelection --> SystemPlan
+
+    PlatformSystemService --> PlatformPlan
+    StartHooks --> PlatformPlan
+    StopHooks --> PlatformPlan
+
+    PlatformPlan --> SystemPlan
+    CustomPlan --> SystemPlan
+
+    ComposedSystemService -. implements .-> SystemService
+
+    SystemPlan --> ComposedSystemService
+
+    ComposedSystemService -- "starts/stops" --> sutLifecycle

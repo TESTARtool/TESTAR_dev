@@ -1,0 +1,49 @@
+flowchart LR
+
+    subgraph PluginComposition["plugin action execution composition"]
+        Orchestrator["PlatformOrchestrator"]
+        PlanSelection["plan selection"]
+    end
+
+    subgraph SharedContexts["shared composition"]
+        ExecutionPlan["ActionExecutionPlan"]
+    end
+
+    subgraph PlatformPlanProviders["platform plan providers"]
+        PlatformPlan["PlatformActionExecutionPlan (WindowsActionExecutionPlan/ WebdriverActionExecutionPlan/ AndroidActionExecutionPlan)"]
+    end
+
+    subgraph CustomPlanProviders["custom plan providers"]
+        CustomPlan["CustomActionExecutionPlan"]
+    end
+
+    subgraph CoreExecution["core service contract"]
+        ActionExecutionService["ActionExecutionService"]
+    end
+
+    subgraph ComposedExecution["composed action execution service"]
+        ComposedActionExecutionService["ComposedActionExecutionService"]
+    end
+
+    subgraph EngineExecution["engine execution providers"]
+        BaseExecution["BaseActionExecutionService (BasicActionExecutionService)"]
+        BeforeHooks["Before execution hooks"]
+        AfterHooks["After execution hooks"]
+    end
+
+    Orchestrator --> PlanSelection
+
+    PlanSelection --> ExecutionPlan
+
+    BaseExecution --> PlatformPlan
+    BeforeHooks --> PlatformPlan
+    AfterHooks --> PlatformPlan
+
+    PlatformPlan --> ExecutionPlan
+    CustomPlan --> ExecutionPlan
+
+    ComposedActionExecutionService -. implements .-> ActionExecutionService
+
+    ExecutionPlan --> ComposedActionExecutionService
+
+    ComposedActionExecutionService -- "executes" --> executedAction

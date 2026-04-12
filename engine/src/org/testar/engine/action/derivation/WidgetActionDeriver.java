@@ -12,15 +12,15 @@ import org.testar.core.action.Action;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 import org.testar.core.state.Widget;
+import org.testar.engine.policy.SessionPolicyContext;
 
 /**
- * Contributes actions for one widget during a derivation run.
+ * Returns the actions produced for one widget during a derivation run.
  */
 public interface WidgetActionDeriver {
 
-    void derive(SUT system,
-                State state,
-                Widget widget,
-                ActionDerivationContext context,
-                Set<Action> actions);
+    Set<Action> derive(SUT system,
+                       State state,
+                       Widget widget,
+                       SessionPolicyContext context);
 }

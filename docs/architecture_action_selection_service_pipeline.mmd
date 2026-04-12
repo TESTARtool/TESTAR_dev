@@ -1,0 +1,44 @@
+flowchart LR
+
+    subgraph PluginComposition["plugin or runtime selector composition"]
+        Orchestrator["PlatformOrchestrator / TESTAR runtime"]
+        PlanSelection["plan selection"]
+    end
+
+    subgraph SharedContexts["shared composition"]
+        SelectorPlan["ActionSelectorPlan"]
+    end
+
+    subgraph EnginePlanProviders["engine selector strategies"]
+        EngineStrategies["EngineActionSelectorService (RandomActionSelector/ QLearningActionSelector/ PrioritizeNewActionsSelector/ SimilarityDetection)"]
+    end
+
+    subgraph CustomPlanProviders["custom selector providers"]
+        CustomSelector["CustomActionSelectorService"]
+    end
+
+    subgraph CoreSelection["core service contract"]
+        ActionSelectorService["ActionSelectorService"]
+    end
+
+    subgraph ComposedSelection["composed action selection service"]
+        ComposedActionSelectorService["ComposedActionSelectorService"]
+    end
+
+    subgraph EngineFallback["engine selection fallback"]
+        FallbackSelector["Fallback selector (RandomActionSelector or custom)"]
+    end
+
+    Orchestrator --> PlanSelection
+
+    PlanSelection --> SelectorPlan
+
+    EngineStrategies --> SelectorPlan
+    FallbackSelector --> SelectorPlan
+    CustomSelector --> SelectorPlan
+
+    ComposedActionSelectorService -. implements .-> ActionSelectorService
+
+    SelectorPlan --> ComposedActionSelectorService
+
+    ComposedActionSelectorService -- "selects" --> selectedAction

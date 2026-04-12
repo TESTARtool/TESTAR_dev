@@ -7,6 +7,7 @@
 package org.testar.engine.action.derivation;
 
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -18,6 +19,7 @@ import org.testar.core.action.KillProcess;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 import org.testar.core.tag.Tags;
+import org.testar.engine.policy.SessionPolicyContext;
 
 /**
  * Produces a forced kill-process action for matching non-SUT processes.
@@ -32,9 +34,10 @@ public final class KillProcessesActionDeriver implements ActionDeriver {
     }
 
     @Override
-    public void derive(SUT system, State state, ActionDerivationContext context, Set<Action> actions) {
+    public Set<Action> derive(SUT system, State state, SessionPolicyContext context) {
+        Set<Action> actions = new LinkedHashSet<>();
         if (system == null) {
-            return;
+            return Collections.emptySet();
         }
         Long sutPid = system.get(Tags.PID, null);
         List<Pair<Long, String>> runningProcesses = system.getRunningProcesses();
@@ -42,7 +45,7 @@ public final class KillProcessesActionDeriver implements ActionDeriver {
                 ? Collections.<Pair<Long, String>>emptyList()
                 : runningProcesses);
         if (runningProcesses == null) {
-            return;
+            return Collections.emptySet();
         }
         for (Pair<Long, String> process : runningProcesses) {
             if (process != null
@@ -54,8 +57,9 @@ public final class KillProcessesActionDeriver implements ActionDeriver {
                 action.set(Tags.Desc, "Kill Process with name '" + process.right() + "'");
                 action.mapOriginWidget(state);
                 actions.add(action);
-                return;
+                return Collections.unmodifiableSet(actions);
             }
         }
+        return Collections.emptySet();
     }
 }

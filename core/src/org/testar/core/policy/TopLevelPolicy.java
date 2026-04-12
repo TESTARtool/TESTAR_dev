@@ -9,7 +9,7 @@ package org.testar.core.policy;
 import org.testar.core.state.Widget;
 
 @FunctionalInterface
-public interface TopLevelPolicy {
+public interface TopLevelPolicy extends Policy {
 
     boolean isTopLevel(Widget widget);
 }

@@ -9,7 +9,7 @@ package org.testar.core.policy;
 import org.testar.core.state.Widget;
 
 @FunctionalInterface
-public interface ScrollablePolicy {
+public interface ScrollablePolicy extends Policy {
 
     boolean isScrollable(Widget widget);
 }
