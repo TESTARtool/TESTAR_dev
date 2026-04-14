@@ -36,16 +36,15 @@ import java.util.zip.CRC32;
 import org.apache.commons.io.FileUtils;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
-import org.testar.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.OutputStructure;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.protocols.DesktopProtocol;
-
+import org.testar.scriptless.ModeControlProtocol.Modes;
 import org.testar.CodingManager;
 import org.testar.DerivedActions;
-import org.testar.RandomActionSelector;
 import org.testar.SutVisualization;
+import org.testar.engine.action.selection.random.RandomActionSelector;
 
 /**
  * This protocol is used to test TESTAR by executing a gradle CI workflow.

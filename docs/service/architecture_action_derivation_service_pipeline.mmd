@@ -1,37 +1,48 @@
 flowchart LR
 
     subgraph PluginComposition["plugin derivation composition"]
+        direction TB
         Orchestrator["PlatformOrchestrator"]
         PolicyContexts["PlatformPolicyContexts"]
         PlanSelection["plan selection"]
     end
 
     subgraph SharedContexts["shared contexts"]
+        direction TB
         SessionPolicies["SessionPolicyContext"]
         DerivationPlan["ActionDerivationPlan"]
     end
 
+    subgraph ComposedDerivation["composed derivation service"]
+        direction TB
+        DefaultActionIdentifierService["DefaultActionIdentifierService"]
+        ComposedActionDerivationService["ComposedActionDerivationService"]
+        DefaultActionIdentifierService --> ComposedActionDerivationService
+    end
+
+    subgraph CoreDerivation["core service contract"]
+        direction TB
+        ActionIdentifierService["ActionIdentifierService"]
+        ActionDerivationService["ActionDerivationService"]
+    end
+
+    subgraph EngineDerivation["engine derivation service"]
+        direction TB
+        StateActionDeriver["StateActionDeriver"]
+    end
+
     subgraph PlatformPlanProviders["platform plan providers"]
+        direction TB
         PlatformPlan["PlatformActionDerivationPlan (WindowsActionDerivationPlan/ WebdriverActionDerivationPlan/ AndroidActionDerivationPlan)"]
     end
 
     subgraph CustomPlanProviders["custom plan providers"]
+        direction TB
         CustomPlan["CustomActionDerivationPlan"]
     end
 
-    subgraph CoreDerivation["core service contract"]
-        ActionDerivationService["ActionDerivationService"]
-    end
-
-    subgraph ComposedDerivation["composed derivation service"]
-        ComposedActionDerivationService["ComposedActionDerivationService"]
-    end
-
-    subgraph EngineDerivation["engine derivation service"]
-        StateActionDeriver["StateActionDeriver"]
-    end
-
     subgraph PlatformDerivers["platform widget derivation"]
+        direction TB
         PlatformWidgetActionDeriver["PlatformWidgetActionDeriver (WindowsWidgetActionDeriver/ WebdriverWidgetActionDeriver/ AndroidWidgetActionDeriver)"]
     end
 
@@ -52,8 +63,19 @@ flowchart LR
     CustomPlan --> DerivationPlan
 
     ComposedActionDerivationService -. implements .-> ActionDerivationService
+    DefaultActionIdentifierService -. implements .-> ActionIdentifierService
 
     SessionPolicies --> ComposedActionDerivationService
     DerivationPlan --> ComposedActionDerivationService
 
     ComposedActionDerivationService -- "produces" --> derivedActions
+
+    %% horizontal row nudges    
+    PluginComposition ~~~ SharedContexts
+    SharedContexts ~~~ ComposedDerivation
+    ComposedDerivation ~~~ CoreDerivation
+    PluginComposition ~~~ ComposedDerivation
+
+    PlatformDerivers ~~~ EngineDerivation
+    EngineDerivation ~~~ PlatformPlanProviders
+    PlatformPlanProviders ~~~ CustomPlanProviders

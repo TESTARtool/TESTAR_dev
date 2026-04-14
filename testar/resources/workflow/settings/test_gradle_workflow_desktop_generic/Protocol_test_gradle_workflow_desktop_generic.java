@@ -41,7 +41,6 @@ import org.apache.commons.io.FileUtils;
 import org.testar.monkey.Assert;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
-import org.testar.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.DerivedActions;
 import org.testar.OutputStructure;
 import org.testar.SutVisualization;
@@ -51,6 +50,7 @@ import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.protocols.DesktopProtocol;
 import org.testar.reporting.ReportManager;
 import org.testar.screenshotjson.JsonUtils;
+import org.testar.scriptless.ModeControlProtocol.Modes;
 
 /**
  * This protocol is used to test TESTAR by executing a gradle CI workflow.

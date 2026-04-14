@@ -11,7 +11,7 @@ task runTestWebdriverSuspiciousTagStateModelUbuntu(type: Exec, dependsOn: create
     group = 'test_testar_workflow'
     description ='runTestWebdriverSuspiciousTagStateModelUbuntu'
     workingDir 'target/install/testar/bin'
-    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_webdriver_generic SUTConnectorValue=" ""https://para.testar.org/parabank/cookies.htm"" " FlashFeedback=false AlwaysCompile=true ApplicationName="webdriver_suspicious_state_model" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[fF]orums.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
+    commandLine 'bash', '-c', './testar sse=test_gradle_workflow_webdriver_generic SUTConnectorValue=" ""https://para.testar.org/parabank/cookies.htm"" " AlwaysCompile=true ApplicationName="webdriver_suspicious_state_model" TagsForSuspiciousOracle="NotExist;ValuePattern" SuspiciousTags=".*[fF]orums.*" ShowVisualSettingsDialogOnStartup=false Mode=Generate Sequences=1 SequenceLength=2'
     doLast {
         String output = standardOutput.toString()
 

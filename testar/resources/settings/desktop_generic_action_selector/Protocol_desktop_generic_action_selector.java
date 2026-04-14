@@ -30,6 +30,9 @@
 
 import java.util.Set;
 import org.testar.*;
+import org.testar.engine.action.selection.ActionSelectorProxy;
+import org.testar.engine.action.selection.stategraph.GuiStateGraphWithVisitedActions;
+import org.testar.engine.action.selection.stategraph.QLearningActionSelector;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;
@@ -37,8 +40,6 @@ import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.protocols.DesktopProtocol;
 import org.testar.settings.Settings;
-import org.testar.simplestategraph.GuiStateGraphWithVisitedActions;
-import org.testar.simplestategraph.QLearningActionSelector;
 
 /**
  * This protocol provides additional implementation to improve TESTAR action selection mechanism. 

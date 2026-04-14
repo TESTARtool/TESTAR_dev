@@ -137,4 +137,3 @@ VisualizeActions = false
 MaxReward = 9999999
 Discount = .95
 UseSystemActions = false
-FlashFeedback = false

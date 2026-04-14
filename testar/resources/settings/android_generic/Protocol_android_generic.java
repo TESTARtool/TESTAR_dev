@@ -29,11 +29,11 @@
  *******************************************************************************************************/
 
 import org.testar.CodingManager;
-import org.testar.RandomActionSelector;
+import org.testar.engine.action.selection.random.RandomActionSelector;
+import org.testar.engine.action.selection.stategraph.QLearningActionSelector;
 import org.testar.managers.InputDataManager;
 import org.testar.screenshotjson.JsonUtils;
 import org.testar.settings.Settings;
-import org.testar.simplestategraph.QLearningActionSelector;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;

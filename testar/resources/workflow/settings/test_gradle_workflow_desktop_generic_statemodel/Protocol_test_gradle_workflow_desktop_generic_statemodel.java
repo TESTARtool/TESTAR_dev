@@ -36,7 +36,6 @@ import org.apache.commons.io.FileUtils;
 import org.testar.monkey.Assert;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
-import org.testar.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.DerivedActions;
 import org.testar.OutputStructure;
 import org.testar.SutVisualization;
@@ -46,6 +45,7 @@ import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.protocols.DesktopProtocol;
+import org.testar.scriptless.ModeControlProtocol.Modes;
 import org.testar.llm.condition.CheckConditionEvaluator;
 import org.testar.llm.condition.TransitionConditionEvaluator;
 

@@ -33,6 +33,42 @@ public final class WindowsSystemCompositionPlan {
         );
     }
 
+    public static SystemCompositionPlan fromExecutable(String path,
+                                                       boolean processListenerEnabled,
+                                                       String sutProcesses,
+                                                       double startupTimeSeconds,
+                                                       double stateTimeoutSeconds,
+                                                       boolean accessBridgeEnabled) {
+        return SystemCompositionPlan.basic(
+                WindowsSystemService.fromExecutable(
+                        path,
+                        processListenerEnabled,
+                        sutProcesses,
+                        startupTimeSeconds,
+                        stateTimeoutSeconds,
+                        accessBridgeEnabled
+                )
+        );
+    }
+
+    public static SystemCompositionPlan fromWindowTitle(String windowTitle,
+                                                        double maxEngageTimeSeconds,
+                                                        double stateTimeoutSeconds,
+                                                        boolean accessBridgeEnabled,
+                                                        String sutProcesses,
+                                                        boolean forceToForeground) {
+        return SystemCompositionPlan.basic(
+                WindowsSystemService.fromWindowTitle(
+                        windowTitle,
+                        maxEngageTimeSeconds,
+                        stateTimeoutSeconds,
+                        accessBridgeEnabled,
+                        sutProcesses,
+                        forceToForeground
+                )
+        );
+    }
+
     public static SystemCompositionPlan fromExecutableUwp(String appUserModelId) {
         return SystemCompositionPlan.basic(WindowsSystemService.fromExecutableUwp(appUserModelId));
     }

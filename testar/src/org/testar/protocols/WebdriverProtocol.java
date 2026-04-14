@@ -36,7 +36,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.TestarDirectories;
-import org.testar.core.execution.TestarMode;
+import org.testar.core.service.TestarMode;
 import org.testar.environment.Environment;
 import org.testar.monkey.*;
 import org.testar.monkey.alayer.*;

@@ -280,9 +280,6 @@ public final class ConfigTags {
     public static final Tag<Boolean> AlwaysCompile = Tag.from("AlwaysCompile", Boolean.class, 
             "Compile the protocol before launching the selected TESTAR mode");
 
-    public static final Tag<Boolean> FlashFeedback = Tag.from("FlashFeedback", Boolean.class, 
-            "Sets whether to draw a feedback message in the top-left corner of the screen");
-
     public static final Tag<Double> MaxReward = Tag.from("MaxReward", Double.class, 
             "MaxReward value for the QLearningActionSelector");
 

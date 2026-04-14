@@ -17,6 +17,7 @@ public final class PlatformSessionSpec {
 
     public enum TargetType {
         EXECUTABLE,
+        WINDOW_TITLE,
         PROCESS_NAME,
         PROCESS_ID,
         UWP

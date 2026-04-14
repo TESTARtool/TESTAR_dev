@@ -32,12 +32,12 @@ package org.testar.monkey;
 
 import org.testar.OutputStructure;
 import org.testar.SutVisualization;
-import org.testar.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
+import org.testar.scriptless.ModeControlProtocol.Modes;
 import org.testar.serialisation.LogSerialiser;
 
 import java.util.Arrays;
@@ -46,7 +46,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 
-public class GenerateMode {
+public class OldGenerateMode {
 
 	private boolean exceptionThrown = false;
 

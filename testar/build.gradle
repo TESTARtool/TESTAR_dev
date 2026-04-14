@@ -89,24 +89,20 @@ dependencies {
     implementation project(':core')
     implementation project(':config')
     implementation project(':reporting')
+    implementation project(':plugin')
+    implementation project(':engine')
     implementation project(':oracle')
     implementation project(':dialog')
+    implementation project(':coverage')
     implementation project(':llm')
     implementation project(':statemodel')
     implementation project(':webdriver')
     implementation project(':windows')
     implementation project(':android')
     implementation files('./lib/jsyntaxpane-1.1.5.jar')
-    implementation files('./lib/eye2.jar')
-    // https://mvnrepository.com/artifact/com.github.kwhat/jnativehook
-    implementation group: 'com.github.kwhat', name: 'jnativehook', version: '2.2.2'
     implementation 'com.google.guava:guava:26.0-jre'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
-    implementation 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
-    implementation group: 'com.sikulix', name: 'sikulixapi', version: '2.0.5'
-    // https://mvnrepository.com/artifact/org.eclipse.angus/jakarta.mail
-    implementation group: 'org.eclipse.angus', name: 'jakarta.mail', version: '2.0.3'
     // https://mvnrepository.com/artifact/org.checkerframework/checker
     implementation("org.checkerframework:checker:3.49.1")
 }

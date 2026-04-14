@@ -12,7 +12,6 @@ import java.util.List;
 import org.testar.engine.action.TextInputProvider;
 import org.testar.engine.action.derivation.ActionDerivationPlan;
 import org.testar.engine.action.derivation.ActionDeriver;
-import org.testar.engine.action.derivation.EscFallbackActionDeriver;
 import org.testar.engine.action.derivation.StateActionDeriver;
 
 /**
@@ -29,7 +28,7 @@ public final class WebdriverActionDerivationPlan {
                 new WebdriverWidgetActionDeriver(textInputProvider)
         );
         List<ActionDeriver> defaultDerivers = Collections.singletonList(defaultDeriver);
-        List<ActionDeriver> fallbackDerivers = Collections.singletonList(new EscFallbackActionDeriver());
+        List<ActionDeriver> fallbackDerivers = Collections.singletonList(new WdHistoryBackFallbackActionDeriver());
 
         return new ActionDerivationPlan(
                 Collections.emptyList(),

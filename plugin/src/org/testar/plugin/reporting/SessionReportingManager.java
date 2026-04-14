@@ -7,9 +7,14 @@
 package org.testar.plugin.reporting;
 
 import java.awt.GraphicsEnvironment;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.List;
+import java.io.PrintStream;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -19,6 +24,7 @@ import org.testar.config.TestarDirectories;
 import org.testar.config.settings.Settings;
 import org.testar.core.action.Action;
 import org.testar.core.alayer.AWTCanvas;
+import org.testar.core.serialisation.LogSerialiser;
 import org.testar.core.serialisation.ScreenshotSerialiser;
 import org.testar.core.state.State;
 import org.testar.core.tag.Tags;
@@ -33,7 +39,7 @@ import org.testar.reporting.Reporting;
  */
 public final class SessionReportingManager {
 
-    private final Reporting reporting;
+    private Reporting reporting;
     private final AtomicBoolean finished;
 
     private SessionReportingManager(Reporting reporting) {
@@ -41,10 +47,40 @@ public final class SessionReportingManager {
         this.finished = new AtomicBoolean(false);
     }
 
+    public static SessionReportingManager create() {
+        return new SessionReportingManager(null);
+    }
+
     public static SessionReportingManager start(Settings settings, String target) {
         configureOutputStructure(settings, target);
         startScreenshotSerialiser();
         return new SessionReportingManager(new ReportManager(settings));
+    }
+
+    public void bindReporting(Reporting reporting) {
+        this.reporting = reporting;
+    }
+
+    public void prepareGeneratedSequenceOutput(Settings settings) {
+        String sequenceCountDir = "_sequence_" + OutputStructure.sequenceInnerLoopCount;
+        String generatedSequence = OutputStructure.startInnerLoopDateString + "_"
+                + OutputStructure.executedSUTname + sequenceCountDir;
+        String logFileName = OutputStructure.logsOutputDir
+                + File.separator + OutputStructure.startInnerLoopDateString + "_"
+                + OutputStructure.executedSUTname + sequenceCountDir + ".log";
+        String screenshotsDirectory = OutputStructure.startInnerLoopDateString + "_"
+                + OutputStructure.executedSUTname + sequenceCountDir;
+
+        try {
+            LogSerialiser.start(
+                    new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(logFileName), true))),
+                    settings.get(ConfigTags.LogLevel)
+            );
+        } catch (FileNotFoundException exception) {
+            exception.printStackTrace();
+        }
+
+        ScreenshotSerialiser.start(OutputStructure.screenshotsOutputDir, screenshotsDirectory);
     }
 
     public void prepareState(State state) {
@@ -65,25 +101,83 @@ public final class SessionReportingManager {
     }
 
     public void addState(State state) {
-        reporting.addState(state);
+        if (reporting != null) {
+            reporting.addState(state);
+        }
     }
 
     public void addActions(Set<Action> actions) {
-        reporting.addActions(actions);
+        if (reporting != null) {
+            reporting.addActions(actions);
+        }
     }
 
     public void addSelectedAction(State state, Action action) {
-        reporting.addSelectedAction(state, action);
+        // Add the selected action information to the reports
         ScreenshotProviderFactory.current().getActionshot(state, action);
+        if (reporting != null) {
+            reporting.addSelectedAction(state, action);
+        }
+
+        // Add the selected action information to the trace logs
+        String[] actionRepresentation = Action.getActionRepresentation(state, action, "\t");
+
+        LogSerialiser.log(
+                String.format(
+                        "Selected Action: %s\n%s",
+                        "\n @Action ConcreteID = " + action.get(Tags.ConcreteID, "ConcreteID not available")
+                                + " AbstractID = " + action.get(Tags.AbstractID, "AbstractID not available") + "\n"
+                                + " @State ConcreteID = " + state.get(Tags.ConcreteID, "ConcreteID not available")
+                                + " AbstractID = " + state.get(Tags.AbstractID, "AbstractID not available") + "\n",
+                        actionRepresentation[0]
+                ) + "\n",
+                LogSerialiser.LogLevel.Info
+        );
+    }
+
+    public void addTestVerdicts(List<Verdict> verdicts) {
+        if (reporting != null) {
+            reporting.addTestVerdicts(verdicts);
+        }
+    }
+
+    public void finishReport() {
+        if (reporting != null) {
+            reporting.finishReport();
+            reporting = null;
+        }
+    }
+
+    public void endSequenceOutput() {
+        ScreenshotSerialiser.exit();
+        LogSerialiser.flush();
+        LogSerialiser.finish();
+        LogSerialiser.exit();
+    }
+
+    public void abortSequenceOutput(Exception exception) {
+        ScreenshotSerialiser.finish();
+        ScreenshotSerialiser.exit();
+        LogSerialiser.log(
+                "Exception <" + exception.getMessage() + "> has been caught\n",
+                LogSerialiser.LogLevel.Critical
+        );
+        LogSerialiser.flush();
+        LogSerialiser.finish();
+        LogSerialiser.exit();
     }
 
     public void finish() {
+        finish(Collections.singletonList(Verdict.OK));
+    }
+
+    public void finish(List<Verdict> verdicts) {
         if (!finished.compareAndSet(false, true)) {
             return;
         }
 
-        reporting.addTestVerdicts(Collections.singletonList(Verdict.OK));
-        reporting.finishReport();
+        addTestVerdicts(verdicts);
+        finishReport();
         ScreenshotSerialiser.exit();
     }
 

@@ -2,7 +2,7 @@ package org.testar.monkey;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.testar.core.execution.TestarMode;
+import org.testar.core.service.TestarMode;
 import org.testar.reporting.DummyReportManager;
 import org.testar.reporting.ReportManager;
 import org.testar.settings.Settings;

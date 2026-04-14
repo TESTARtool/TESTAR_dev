@@ -12,6 +12,7 @@ import org.testar.core.exceptions.SystemStopException;
 import org.testar.core.service.SystemService;
 import org.testar.core.state.SUT;
 import org.testar.core.tag.Tags;
+import org.testar.windows.system.WindowsSystemStartupSupport;
 import org.testar.windows.state.WinProcess;
 
 /**
@@ -49,6 +50,42 @@ public final class WindowsSystemService implements SystemService {
                                                       String sutProcesses) {
         return new WindowsSystemService(
                 () -> WinProcess.fromExecutable(path, processListenerEnabled, sutProcesses)
+        );
+    }
+
+    public static WindowsSystemService fromExecutable(String path,
+                                                      boolean processListenerEnabled,
+                                                      String sutProcesses,
+                                                      double startupTimeSeconds,
+                                                      double stateTimeoutSeconds,
+                                                      boolean accessBridgeEnabled) {
+        return new WindowsSystemService(
+                () -> WindowsSystemStartupSupport.startExecutableAndWaitUntilAccessible(
+                        path,
+                        processListenerEnabled,
+                        sutProcesses,
+                        startupTimeSeconds,
+                        stateTimeoutSeconds,
+                        accessBridgeEnabled
+                )
+        );
+    }
+
+    public static WindowsSystemService fromWindowTitle(String windowTitle,
+                                                       double maxEngageTimeSeconds,
+                                                       double stateTimeoutSeconds,
+                                                       boolean accessBridgeEnabled,
+                                                       String sutProcesses,
+                                                       boolean forceToForeground) {
+        return new WindowsSystemService(
+                () -> WindowsSystemStartupSupport.connectByWindowTitle(
+                        windowTitle,
+                        maxEngageTimeSeconds,
+                        stateTimeoutSeconds,
+                        accessBridgeEnabled,
+                        sutProcesses,
+                        forceToForeground
+                )
         );
     }
 

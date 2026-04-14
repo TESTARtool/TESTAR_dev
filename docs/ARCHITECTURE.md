@@ -11,6 +11,11 @@ The architecture is based on two complementary concepts:
 - `services`: runtime capabilities that operate on a running SUT, a captured state, or a set of actions
 - `policies`: decision rules that refine how reusable runtime logic behaves for a specific platform or mode
 
+The current codebase also uses two additional composition concepts:
+
+- `plans`: composition recipes used to assemble a concrete service from reusable engine logic and platform-native parts
+- `capabilities`: scriptless `testar` runtime modules that orchestrate TESTAR-specific flow around the composed services
+
 At a high level, the architecture separates responsibilities by layer:
 
 1. `core`
@@ -44,6 +49,54 @@ This means that:
 - platform modules define how those capabilities work on a concrete platform
 - `plugin` decides which implementations are assembled together for a session
 
+### Shared vocabulary
+
+The codebase now has four distinct architectural concepts. They should not be mixed.
+
+- `policy`
+  A rule that answers a behavioral question about widgets or state.
+  Examples:
+  - clickable
+  - typeable
+  - visible
+  - blocked
+  Policies are usually pure decision logic and are composed into a `SessionPolicyContext`.
+
+- `service`
+  A main runtime operation in the execution flow.
+  Examples:
+  - start or stop the system
+  - get state
+  - derive actions
+  - select or resolve an action
+  - execute an action
+  Services are reusable across entry points such as `cli` and `testar`.
+
+- `plan`
+  A composition-time object that tells the engine how to build one service.
+  Examples:
+  - `SystemCompositionPlan`
+  - `StateCompositionPlan`
+  - `ActionDerivationPlan`
+  - `ActionExecutionPlan`
+  Plans are used by `plugin` when composing a session.
+
+- `capability`
+  A scriptless `testar` runtime behavior module.
+  Examples:
+  - sequence lifecycle
+  - verdict evaluation
+  - stop criteria
+  - spy filtering and visualization support, when kept outside the shared services
+  Capabilities are specific to the `testar` protocol runtime. They are not core services and they are not policies.
+
+The practical distinction is:
+
+- policies answer `what is allowed or considered true`
+- services perform `main runtime operations`
+- plans define `how a service is assembled`
+- capabilities define `how scriptless TESTAR runs its protocol flow around those services`
+
 ### Current module roles
 
 The modules currently play these roles:
@@ -64,6 +117,14 @@ The modules currently play these roles:
   Owns command parsing, daemon communication, settings loading, and session-oriented automation commands.
 - `testar`
   Owns the classic TESTAR runtime modes and higher-level protocol orchestration.
+
+For the current scriptless runtime path inside `testar`, the role split is:
+
+- composed services come from `plugin` and `engine`
+- scriptless protocol classes in `testar` invoke those services
+- scriptless protocol capabilities in `testar` handle TESTAR-specific runtime behavior such as sequence lifecycle, verdict evaluation, and stop criteria
+- reporting and output side effects are coordinated through `SessionReportingManager`
+- state and action identifiers are assigned inside the shared state and action-derivation service pipelines
 
 ### Design intent
 
@@ -90,6 +151,35 @@ instead of:
 
 - hardcoding platform decisions inside reusable runtime logic
 
+For `testar`, the same idea applies one level higher:
+
+- scriptless protocols should delegate platform/runtime operations to composed services
+- scriptless capabilities should hold TESTAR runtime behavior that is not a reusable engine service
+- reporting and output ownership should move toward shared session-level managers instead of staying scattered in protocol classes
+
+### Main runtime flow
+
+At the conceptual level, the runtime flow is:
+
+1. `system`
+2. `state`
+3. `derive actions`
+4. `select or resolve action`
+5. `execute action`
+6. `oracle`
+
+This flow is represented in:
+
+- `docs/architecture_overview_service_pipeline.mmd`
+
+For the scriptless TESTAR runtime, the same service flow is wrapped by protocol capabilities that handle:
+
+- sequence lifecycle
+- verdict evaluation
+- stop criteria
+
+Visualization and spy-filter behavior may still exist as internal scriptless runtime classes, but they do not need to be modeled as shared capabilities unless they must be replaced or reused independently.
+
 ## Core contracts
 
 The `core` module defines the stable contracts that other modules implement or compose.
@@ -112,9 +202,15 @@ The primary runtime service contracts are in `org.testar.core.service`.
 - `StateService`
   Builds the current `State` for a running `SUT`.
   File: `core/src/org/testar/core/service/StateService.java`
+- `StateIdentifierService`
+  Assigns stable state identifiers inside the shared state pipeline.
+  File: `core/src/org/testar/core/service/StateIdentifierService.java`
 - `ActionDerivationService`
   Derives the currently available `Action` set from a `SUT` and a `State`.
   File: `core/src/org/testar/core/service/ActionDerivationService.java`
+- `ActionIdentifierService`
+  Assigns stable widget and environment action identifiers inside the shared derivation pipeline.
+  File: `core/src/org/testar/core/service/ActionIdentifierService.java`
 - `ActionExecutionService`
   Executes a selected `Action` against a `SUT` and `State`.
   File: `core/src/org/testar/core/service/ActionExecutionService.java`

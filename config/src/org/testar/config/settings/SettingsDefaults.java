@@ -30,7 +30,6 @@ import static org.testar.config.ConfigTags.Delete;
 import static org.testar.config.ConfigTags.DeniedExtensions;
 import static org.testar.config.ConfigTags.Discount;
 import static org.testar.config.ConfigTags.ExtendedOracles;
-import static org.testar.config.ConfigTags.FlashFeedback;
 import static org.testar.config.ConfigTags.FollowLinks;
 import static org.testar.config.ConfigTags.ForceForeground;
 import static org.testar.config.ConfigTags.FormFillingAction;
@@ -170,7 +169,6 @@ public class SettingsDefaults {
         defaults.add(Pair.from(ProtocolSpecificSetting_3, ""));
         defaults.add(Pair.from(ProtocolSpecificSetting_4, ""));
         defaults.add(Pair.from(ProtocolSpecificSetting_5, ""));
-        defaults.add(Pair.from(FlashFeedback, true));
         defaults.add(Pair.from(ProtocolCompileDirectory, "./settings"));
 
         defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {

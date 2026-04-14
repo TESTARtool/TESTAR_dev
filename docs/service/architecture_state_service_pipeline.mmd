@@ -1,37 +1,48 @@
 flowchart LR
 
     subgraph PluginComposition["plugin state composition"]
+        direction TB
         Orchestrator["PlatformOrchestrator"]
         PolicyContexts["PlatformPolicyContexts"]
         PlanSelection["plan selection"]
     end
 
     subgraph SharedContexts["shared contexts"]
+        direction TB
         SessionPolicies["SessionPolicyContext"]
         StatePlan["StateCompositionPlan"]
     end
 
+    subgraph ComposedState["composed state service"]
+        direction TB
+        DefaultStateIdentifierService["DefaultStateIdentifierService"]
+        ComposedStateService["ComposedStateService"]
+        DefaultStateIdentifierService --> ComposedStateService
+    end
+
+    subgraph CoreState["core service contract"]
+        direction TB
+        StateIdentifierService["StateIdentifierService"]
+        StateService["StateService"]
+    end
+
+    subgraph EngineState["engine state service"]
+        direction TB
+        ProjectionSupport["StateProjectionSupport"]
+    end
+
     subgraph PlatformPlanProviders["platform plan providers"]
+        direction TB
         PlatformPlan["PlatformStateCompositionPlan (WindowsStateCompositionPlan/ WebdriverStateCompositionPlan/ AndroidStateCompositionPlan)"]
     end
 
     subgraph CustomPlanProviders["custom plan providers"]
+        direction TB
         CustomPlan["CustomStateCompositionPlan"]
     end
 
-    subgraph CoreState["core service contract"]
-        StateService["StateService"]
-    end
-
-    subgraph ComposedState["composed state service"]
-        ComposedStateService["ComposedStateService"]
-    end
-
-    subgraph EngineState["engine state service"]
-        ProjectionSupport["StateProjectionSupport"]
-    end
-
     subgraph PlatformStateProviders["platform state providers"]
+        direction TB
         PlatformStateService["PlatformStateService (WindowsStateService/ WebdriverStateService/ AndroidStateService)"]
     end
 
@@ -47,9 +58,18 @@ flowchart LR
     PlatformPlan --> StatePlan
     CustomPlan --> StatePlan
 
-    ComposedStateService -. implements .-> StateService
-
     SessionPolicies --> ComposedStateService
     StatePlan --> ComposedStateService
 
+    DefaultStateIdentifierService -. implements .-> StateIdentifierService
+    ComposedStateService -. implements .-> StateService
+
     ComposedStateService -- "produces" --> projectedState
+
+    %% horizontal row nudges
+    PluginComposition ~~~ SharedContexts
+    SharedContexts ~~~ ComposedState
+    ComposedState ~~~ CoreState
+
+    EngineState ~~~ PlatformPlanProviders
+    PlatformPlanProviders ~~~ CustomPlanProviders

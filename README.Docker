@@ -10,7 +10,6 @@ Take care of the following settings in the used settings file:
 - SUTConnectorValue should indicate the web URL to test (TESTAR will automatically download chrome for testing)
 - VisualizeActions should be false
 - ShowVisualSettingsDialogOnStartup should be false
-- FlashFeedback should be false
 - ProtocolCompileDirectory should be set to a directory local to the image e.g. /tmp (this is where the compiled java files are written to)
 
 If NUNIT Output is desired set ReportingClass to NUNIT 3.0 Reporting

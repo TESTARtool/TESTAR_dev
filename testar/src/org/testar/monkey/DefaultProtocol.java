@@ -1,32 +1,8 @@
-/***************************************************************************************************
- *
- * Copyright (c) 2013 - 2026 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the copyright holder nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *******************************************************************************************************/
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2013-2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018-2026 Open Universiteit - www.ou.nl
+ */
 
 package org.testar.monkey;
 
@@ -34,33 +10,51 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.*;
 import org.testar.managers.NativeHookManager;
-import org.testar.monkey.alayer.*;
-import org.testar.monkey.alayer.actions.ActivateSystem;
-import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
-import org.testar.monkey.alayer.actions.KillProcess;
-import org.testar.monkey.alayer.devices.AWTMouse;
-import org.testar.monkey.alayer.devices.DummyMouse;
-import org.testar.monkey.alayer.devices.KBKeys;
-import org.testar.monkey.alayer.devices.Mouse;
-import org.testar.monkey.alayer.exceptions.*;
-import org.testar.monkey.alayer.visualizers.ShapeVisualizer;
-import org.testar.monkey.alayer.windows.UIARoles;
-import org.testar.monkey.alayer.windows.WinApiException;
-import org.testar.oracles.Oracle;
-import org.testar.oracles.OracleSelection;
-import org.testar.oracles.log.LogOracle;
-import org.testar.oracles.log.ProcessListenerOracle;
+import org.testar.core.alayer.*;
+import org.testar.core.Assert;
+import org.testar.core.CodingManager;
+import org.testar.core.action.Action;
+import org.testar.core.action.ActivateSystem;
+import org.testar.core.action.AnnotatingActionCompiler;
+import org.testar.core.action.KillProcess;
+import org.testar.core.devices.AWTMouse;
+import org.testar.core.devices.DummyMouse;
+import org.testar.core.devices.KBKeys;
+import org.testar.core.devices.Mouse;
+import org.testar.core.exceptions.*;
+import org.testar.core.process.ProcessInfo;
+import org.testar.core.visualizers.ShapeVisualizer;
+import org.testar.core.visualizers.Visualizer;
+import org.testar.engine.action.selection.random.RandomActionSelector;
+import org.testar.engine.devices.EventHandler;
+import org.testar.windows.alayer.UIARoles;
+import org.testar.windows.exceptions.WinApiException;
+import org.testar.oracle.Oracle;
+import org.testar.oracle.OracleSelection;
+import org.testar.oracle.generic.log.LogOracle;
+import org.testar.oracle.windows.log.ProcessListenerOracle;
 import org.testar.plugin.NativeLinker;
+import org.testar.plugin.process.SystemProcessHandling;
 import org.testar.reporting.DummyReportManager;
 import org.testar.reporting.ReportManager;
 import org.testar.reporting.Reporting;
-import org.testar.screenshot.ScreenshotProviderFactory;
-import org.testar.serialisation.LogSerialiser;
-import org.testar.serialisation.ScreenshotSerialiser;
-import org.testar.settings.Settings;
+import org.testar.scriptless.ModeControlProtocol;
+import org.testar.plugin.screenshot.ScreenshotProviderFactory;
+import org.testar.core.serialisation.LogSerialiser;
+import org.testar.core.serialisation.ScreenshotSerialiser;
+import org.testar.core.state.SUT;
+import org.testar.core.state.State;
+import org.testar.core.state.StateBuilder;
+import org.testar.config.ConfigTags;
+import org.testar.config.TestarMode;
+import org.testar.config.settings.Settings;
+import org.testar.config.verdict.VerdictProcessing;
 import org.testar.statemodel.StateModelManager;
 import org.testar.statemodel.StateModelManagerFactory;
-import org.testar.util.IndexUtil;
+import org.testar.core.util.IndexUtil;
+import org.testar.core.util.Util;
+import org.testar.core.verdict.Verdict;
+import org.testar.windows.service.WindowsSystemService;
 
 import java.awt.GraphicsEnvironment;
 import java.io.BufferedOutputStream;
@@ -85,9 +79,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import static org.testar.monkey.alayer.Tags.*;
+import static org.testar.core.tag.Tags.*;
 
-public class DefaultProtocol extends RuntimeControlsProtocol {
+public class DefaultProtocol extends ModeControlProtocol {
 
 	protected boolean logOracleEnabled;
 	protected Oracle logOracle;
@@ -215,10 +209,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		try {
 
-			if (mode() == Modes.Spy) {
-				new SpyMode().runSpyLoop(this);
-			} else if (mode() == Modes.Generate) {
-				new GenerateMode().runGenerateOuterLoop(this);
+			if (mode() == TestarMode.Spy) {
+				new OldSpyMode().runSpyLoop(this);
+			} else if (mode() == TestarMode.Generate) {
+				new OldGenerateMode().runGenerateOuterLoop(this);
 			}
 
 		}catch(WinApiException we) {
@@ -229,10 +223,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			we.printStackTrace();
 
-			this.mode = Modes.Quit;
+			this.mode = TestarMode.Quit;
 		}catch(SystemStartException SystemStartException) {
 			SystemStartException.printStackTrace();
-			this.mode = Modes.Quit;
+			this.mode = TestarMode.Quit;
 		}
 		// can there be other kind of exceptions?
 
@@ -265,7 +259,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		logOracleEnabled = settings.get(ConfigTags.LogOracleEnabled, false);
 		processListenerOracleEnabled = settings.get(ConfigTags.ProcessListenerEnabled, false);
 
-		if ( mode() == Modes.Generate ) {
+		if ( mode() == TestarMode.Generate ) {
 			//Create the output folders
 			OutputStructure.calculateOuterLoopDateString();
 			OutputStructure.sequenceInnerLoopCount = 0;
@@ -512,22 +506,40 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			throw new SystemStartException(msg);
 		}
 
+		return resolveWindowsSystemService(sutConnectorType).startSystem();
+	}
+
+	private WindowsSystemService resolveWindowsSystemService(String sutConnectorType) {
 		if (sutConnectorType.equals(Settings.SUT_CONNECTOR_WINDOW_TITLE)) {
-			SutConnectorWindowTitle sutConnector = new SutConnectorWindowTitle(settings().get(ConfigTags.SUTConnectorValue), 
-					Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), 
-					builder,
-					settings().get(ConfigTags.ForceForeground));
-			return sutConnector.startOrConnectSut();
+			return WindowsSystemService.fromWindowTitle(
+					settings().get(ConfigTags.SUTConnectorValue),
+					settings().get(ConfigTags.StartupTime),
+					settings().get(ConfigTags.TimeToFreeze),
+					settings().get(ConfigTags.AccessBridgeEnabled),
+					settings().get(ConfigTags.SUTProcesses),
+					settings().get(ConfigTags.ForceForeground)
+			).startSystem();
 		}else if (sutConnectorType.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME)) {
-			SutConnectorProcessName sutConnector = new SutConnectorProcessName(settings().get(ConfigTags.SUTConnectorValue), 
-					Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0));
-			return sutConnector.startOrConnectSut();
+			return WindowsSystemService.fromProcessName(settings().get(ConfigTags.SUTConnectorValue)).startSystem();
 		}else{
-			// for most windows applications and most jar files, this is where the SUT gets created!
-			SutConnectorCommandLine sutConnector = new SutConnectorCommandLine(builder, processListenerOracleEnabled, settings);
-			//TODO startupTime and maxEngageTime seems to be the same, except one is double and the other is long?
-			return sutConnector.startOrConnectSut();
+			return WindowsSystemService.fromExecutable(
+					settings().get(ConfigTags.SUTConnectorValue),
+					processListenerOracleEnabled,
+					settings().get(ConfigTags.SUTProcesses),
+					settings().get(ConfigTags.StartupTime),
+					settings().get(ConfigTags.TimeToFreeze),
+					settings().get(ConfigTags.AccessBridgeEnabled)
+			);
 		}
+
+		return WindowsSystemService.fromExecutable(
+				settings().get(ConfigTags.SUTConnectorValue),
+				processListenerOracleEnabled,
+				settings().get(ConfigTags.SUTProcesses),
+				settings().get(ConfigTags.StartupTime),
+				settings().get(ConfigTags.TimeToFreeze),
+				settings().get(ConfigTags.AccessBridgeEnabled)
+		);
 	}
 
 
@@ -886,7 +898,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	@Override
 	protected void stopSystem(SUT system) {
-
 		if (system != null){
 			AutomationCache ac = system.getNativeAutomationCache();
 			if (ac != null)

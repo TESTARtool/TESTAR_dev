@@ -31,6 +31,8 @@ import org.testar.engine.policy.composite.CompositeTopLevelPolicy;
 import org.testar.engine.policy.composite.CompositeTypeablePolicy;
 import org.testar.engine.policy.composite.CompositeVisiblePolicy;
 import org.testar.engine.policy.composite.CompositeWidgetFilterPolicy;
+import org.testar.webdriver.policy.ConfigurableWebdriverClickableClassPolicy;
+import org.testar.webdriver.policy.ConfigurableWebdriverTypeableClassPolicy;
 import org.testar.webdriver.policy.WebdriverClickablePolicy;
 import org.testar.webdriver.policy.WebdriverScrollablePolicy;
 import org.testar.webdriver.policy.WebdriverTypeablePolicy;
@@ -68,10 +70,29 @@ public final class PlatformPolicyContexts {
 
     public static SessionPolicyContext webdriverDefaults(Collection<String> customClickableClasses,
                                                          Collection<String> customTypeableClasses) {
-        return desktopDefaults(
-                new WebdriverClickablePolicy(customClickableClasses),
-                new WebdriverTypeablePolicy(customTypeableClasses),
-                new WebdriverScrollablePolicy()
+        List<EnabledPolicy> enabledPolicies = List.of(new TagEnabledPolicy());
+        List<BlockedPolicy> blockedPolicies = List.of(new TagBlockedPolicy());
+        List<WidgetFilterPolicy> widgetFilterPolicies = Collections.emptyList();
+        List<VisiblePolicy> visiblePolicies = Collections.singletonList(widget -> true);
+        List<AtCanvasPolicy> atCanvasPolicies = Collections.singletonList(widget -> true);
+        List<TopLevelPolicy> topLevelPolicies = Collections.singletonList(widget -> true);
+
+        return new SessionPolicyContext(
+                new CompositeClickablePolicy(List.of(
+                        new WebdriverClickablePolicy(),
+                        new ConfigurableWebdriverClickableClassPolicy(customClickableClasses)
+                )),
+                new CompositeTypeablePolicy(List.of(
+                        new WebdriverTypeablePolicy(),
+                        new ConfigurableWebdriverTypeableClassPolicy(customTypeableClasses)
+                )),
+                new CompositeScrollablePolicy(List.of(new WebdriverScrollablePolicy())),
+                new CompositeEnabledPolicy(enabledPolicies),
+                new CompositeBlockedPolicy(blockedPolicies),
+                new CompositeWidgetFilterPolicy(widgetFilterPolicies),
+                new CompositeVisiblePolicy(visiblePolicies),
+                new CompositeAtCanvasPolicy(atCanvasPolicies),
+                new CompositeTopLevelPolicy(topLevelPolicies)
         );
     }
 }

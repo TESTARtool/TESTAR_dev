@@ -1,7 +1,5 @@
 package org.testar.webdriver.policy;
 
-import java.util.Collections;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.testar.core.tag.Tags;
@@ -60,35 +58,8 @@ public class TestWebdriverClickablePolicy {
     }
 
     @Test
-    public void testInputRoleWithConfiguredClickableClassIsClickable() {
-        WebdriverClickablePolicy policy = new WebdriverClickablePolicy(Collections.singletonList("clickable"));
-        WidgetStub widget = createInputRoleWidget("");
-        widget.set(WdTags.WebCssClasses, "clickable");
-
-        Assert.assertTrue(policy.isClickable(widget));
-    }
-
-    @Test
-    public void testInputRoleWithMultipleCssClassesMatchesConfiguredClickableClass() {
-        WebdriverClickablePolicy policy = new WebdriverClickablePolicy(Collections.singletonList("clickable"));
-        WidgetStub widget = createInputRoleWidget("");
-        widget.set(WdTags.WebCssClasses, "[nav,clickable,highlighted]");
-
-        Assert.assertTrue(policy.isClickable(widget));
-    }
-
-    @Test
-    public void testCustomRoleWithConfiguredClickableClassIsClickable() {
-        WebdriverClickablePolicy policy = new WebdriverClickablePolicy(Collections.singletonList("clickable"));
-        WidgetStub widget = createRoleWidget(WdRoles.WdSPAN);
-        widget.set(WdTags.WebCssClasses, "clickable");
-
-        Assert.assertTrue(policy.isClickable(widget));
-    }
-
-    @Test
-    public void testCustomRoleWithoutConfiguredClickableClassIsNotClickable() {
-        WebdriverClickablePolicy policy = new WebdriverClickablePolicy(Collections.singletonList("clickable"));
+    public void testCustomRoleWithoutNativeOrExplicitClickableSignalIsNotClickable() {
+        WebdriverClickablePolicy policy = new WebdriverClickablePolicy();
         WidgetStub widget = createRoleWidget(WdRoles.WdSPAN);
 
         Assert.assertFalse(policy.isClickable(widget));

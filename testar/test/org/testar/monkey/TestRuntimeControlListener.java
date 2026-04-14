@@ -8,8 +8,8 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.testar.EventHandler;
-import org.testar.core.execution.TestarMode;
+import org.testar.core.service.TestarMode;
+import org.testar.engine.devices.EventHandler;
 import org.testar.settings.Settings;
 
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;

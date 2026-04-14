@@ -34,8 +34,6 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.testar.SutVisualization;
-import org.testar.SystemProcessHandling;
-import org.testar.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
@@ -43,8 +41,10 @@ import org.testar.monkey.alayer.android.spy_visualization.MobileVisualizationAnd
 import org.testar.monkey.alayer.android.util.AndroidScreenshotUtil;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
+import org.testar.plugin.process.SystemProcessHandling;
+import org.testar.scriptless.ModeControlProtocol.Modes;
 
-public class SpyMode {
+public class OldSpyMode {
 
 	/**
 	 * Run TESTAR on Spy Mode.

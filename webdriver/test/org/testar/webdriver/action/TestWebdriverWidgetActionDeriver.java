@@ -12,11 +12,14 @@ import org.testar.core.tag.Tags;
 import org.testar.engine.policy.SessionPolicyContext;
 import org.testar.engine.policy.composite.CompositeAtCanvasPolicy;
 import org.testar.engine.policy.composite.CompositeBlockedPolicy;
+import org.testar.engine.policy.composite.CompositeClickablePolicy;
 import org.testar.engine.policy.composite.CompositeEnabledPolicy;
 import org.testar.engine.policy.composite.CompositeTopLevelPolicy;
+import org.testar.engine.policy.composite.CompositeTypeablePolicy;
 import org.testar.engine.policy.composite.CompositeVisiblePolicy;
 import org.testar.webdriver.action.derivation.WebdriverWidgetActionDeriver;
 import org.testar.webdriver.alayer.WdRoles;
+import org.testar.webdriver.policy.ConfigurableWebdriverTypeableClassPolicy;
 import org.testar.webdriver.policy.WebdriverClickablePolicy;
 import org.testar.webdriver.policy.WebdriverScrollablePolicy;
 import org.testar.webdriver.policy.WebdriverTypeablePolicy;
@@ -36,8 +39,11 @@ public class TestWebdriverWidgetActionDeriver {
 
         WebdriverWidgetActionDeriver deriver = new WebdriverWidgetActionDeriver(ignoredWidget -> "100");
         SessionPolicyContext context = new SessionPolicyContext(
-                new WebdriverClickablePolicy(),
-                new WebdriverTypeablePolicy(Collections.singletonList("input")),
+                new CompositeClickablePolicy(Collections.singletonList(new WebdriverClickablePolicy())),
+                new CompositeTypeablePolicy(java.util.List.of(
+                        new WebdriverTypeablePolicy(),
+                        new ConfigurableWebdriverTypeableClassPolicy(Collections.singletonList("input"))
+                )),
                 new WebdriverScrollablePolicy(),
                 new CompositeEnabledPolicy(Collections.singletonList(widget -> true)),
                 new CompositeBlockedPolicy(Collections.singletonList(widget -> false)),

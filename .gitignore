@@ -5,7 +5,6 @@ target/
 *.obj
 /windows/native_src/windows.h
 *.iml
-doc/
 .project
 */.classpath
 .settings
@@ -21,4 +20,3 @@ build.bat
 /testar/testar.bat
 /testar/windows.dll
 /testar/index.log
-REFACTOR*.md

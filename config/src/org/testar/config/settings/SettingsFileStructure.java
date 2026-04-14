@@ -350,7 +350,6 @@ public class SettingsFileStructure {
         secondarySettingsList.add(ConfigTags.TimeToFreeze);
         secondarySettingsList.add(ConfigTags.UseSystemActions);
         secondarySettingsList.add(ConfigTags.RefreshSpyCanvas);
-        secondarySettingsList.add(ConfigTags.FlashFeedback);
         secondarySettingsList.add(ConfigTags.MaxReward);
         secondarySettingsList.add(ConfigTags.Discount);
         secondarySettingsList.add(ConfigTags.CreateWidgetInfoJsonFile);

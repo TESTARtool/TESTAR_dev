@@ -1,7 +1,5 @@
 package org.testar.webdriver.policy;
 
-import java.util.Collections;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.testar.core.tag.Tags;
@@ -35,44 +33,8 @@ public class TestWebdriverTypeablePolicy {
     }
 
     @Test
-    public void testInputRoleWithConfiguredTypeableClassIsTypeable() {
-        WebdriverTypeablePolicy policy = new WebdriverTypeablePolicy(Collections.singletonList("input"));
-        WidgetStub widget = createInputRoleWidget("");
-        widget.set(WdTags.WebCssClasses, "input");
-
-        Assert.assertTrue(policy.isTypeable(widget));
-    }
-
-    @Test
-    public void testInputRoleWithMultipleCssClassesMatchesConfiguredTypeableClass() {
-        WebdriverTypeablePolicy policy = new WebdriverTypeablePolicy(Collections.singletonList("input"));
-        WidgetStub widget = createInputRoleWidget("");
-        widget.set(WdTags.WebCssClasses, "field input amount");
-
-        Assert.assertTrue(policy.isTypeable(widget));
-    }
-
-    @Test
-    public void testInputRoleWithStateFormattedCssClassesMatchesConfiguredTypeableClass() {
-        WebdriverTypeablePolicy policy = new WebdriverTypeablePolicy(Collections.singletonList("input"));
-        WidgetStub widget = createInputRoleWidget("");
-        widget.set(WdTags.WebCssClasses, "[field,input,amount]");
-
-        Assert.assertTrue(policy.isTypeable(widget));
-    }
-
-    @Test
-    public void testCustomRoleWithConfiguredTypeableClassIsTypeable() {
-        WebdriverTypeablePolicy policy = new WebdriverTypeablePolicy(Collections.singletonList("input"));
-        WidgetStub widget = createRoleWidget(WdRoles.WdDIV);
-        widget.set(WdTags.WebCssClasses, "input");
-
-        Assert.assertTrue(policy.isTypeable(widget));
-    }
-
-    @Test
-    public void testCustomRoleWithoutConfiguredTypeableClassIsNotTypeable() {
-        WebdriverTypeablePolicy policy = new WebdriverTypeablePolicy(Collections.singletonList("input"));
+    public void testCustomRoleWithoutNativeTypeableSignalIsNotTypeable() {
+        WebdriverTypeablePolicy policy = new WebdriverTypeablePolicy();
         WidgetStub widget = createRoleWidget(WdRoles.WdDIV);
 
         Assert.assertFalse(policy.isTypeable(widget));
@@ -81,14 +43,6 @@ public class TestWebdriverTypeablePolicy {
     @Test
     public void testTextareaRoleIsTypeable() {
         WebdriverTypeablePolicy policy = new WebdriverTypeablePolicy();
-        WidgetStub widget = createRoleWidget(WdRoles.WdTEXTAREA);
-
-        Assert.assertTrue(policy.isTypeable(widget));
-    }
-
-    @Test
-    public void testTextareaRoleRemainsTypeableWhenCustomTypeableClassesAreConfigured() {
-        WebdriverTypeablePolicy policy = new WebdriverTypeablePolicy(Collections.singletonList("input"));
         WidgetStub widget = createRoleWidget(WdRoles.WdTEXTAREA);
 
         Assert.assertTrue(policy.isTypeable(widget));

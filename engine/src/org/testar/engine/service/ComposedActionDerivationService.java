@@ -12,13 +12,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.testar.core.Assert;
-import org.testar.core.CodingManager;
 import org.testar.core.action.Action;
+import org.testar.core.service.ActionIdentifierService;
 import org.testar.core.service.ActionDerivationService;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
-import org.testar.core.state.Widget;
-import org.testar.core.tag.Tags;
 import org.testar.engine.action.derivation.ActionDerivationPlan;
 import org.testar.engine.action.derivation.ActionDeriver;
 import org.testar.engine.policy.SessionPolicyContext;
@@ -33,24 +31,28 @@ public final class ComposedActionDerivationService implements ActionDerivationSe
     private final List<ActionDeriver> forcedDerivers;
     private final List<ActionDeriver> defaultDerivers;
     private final List<ActionDeriver> fallbackDerivers;
+    private final ActionIdentifierService actionIdentifierService;
 
     public ComposedActionDerivationService(SessionPolicyContext context, ActionDerivationPlan plan) {
         this(
                 context,
                 Assert.notNull(plan).forcedDerivers(),
                 plan.defaultDerivers(),
-                plan.fallbackDerivers()
+                plan.fallbackDerivers(),
+                new DefaultActionIdentifierService()
         );
     }
 
     ComposedActionDerivationService(SessionPolicyContext context,
-                                           List<ActionDeriver> forcedDerivers,
-                                           List<ActionDeriver> defaultDerivers,
-                                           List<ActionDeriver> fallbackDerivers) {
+                                    List<ActionDeriver> forcedDerivers,
+                                    List<ActionDeriver> defaultDerivers,
+                                    List<ActionDeriver> fallbackDerivers,
+                                    ActionIdentifierService actionIdentifierService) {
         this.context = Assert.notNull(context);
         this.forcedDerivers = Collections.unmodifiableList(Assert.notNull(forcedDerivers));
         this.defaultDerivers = Collections.unmodifiableList(Assert.notNull(defaultDerivers));
         this.fallbackDerivers = Collections.unmodifiableList(Assert.notNull(fallbackDerivers));
+        this.actionIdentifierService = Assert.notNull(actionIdentifierService);
     }
 
     public static ComposedActionDerivationService compose(SessionPolicyContext context, ActionDerivationPlan plan) {
@@ -62,17 +64,14 @@ public final class ComposedActionDerivationService implements ActionDerivationSe
         Assert.notNull(state);
         Set<Action> forcedActions = derive(system, state, forcedDerivers);
         if (!forcedActions.isEmpty()) {
-            buildActionsIdentifiers(state, forcedActions);
-            return forcedActions;
+            return actionIdentifierService.identifyActions(state, forcedActions);
         }
         Set<Action> defaultActions = derive(system, state, defaultDerivers);
         if (!defaultActions.isEmpty()) {
-            buildActionsIdentifiers(state, defaultActions);
-            return defaultActions;
+            return actionIdentifierService.identifyActions(state, defaultActions);
         }
         Set<Action> fallbackActions = derive(system, state, fallbackDerivers);
-        buildActionsIdentifiers(state, fallbackActions);
-        return fallbackActions;
+        return actionIdentifierService.identifyActions(state, fallbackActions);
     }
 
     public SessionPolicyContext context() {
@@ -85,29 +84,5 @@ public final class ComposedActionDerivationService implements ActionDerivationSe
             actions.addAll(deriver.derive(system, state, context));
         }
         return actions;
-    }
-
-    private void buildActionsIdentifiers(State state, Set<Action> actions) {
-        if (actions.isEmpty()) {
-            return;
-        }
-
-        Set<Action> widgetActions = new LinkedHashSet<>();
-        for (Action action : actions) {
-            if (hasOriginWidgetPath(action)) {
-                widgetActions.add(action);
-            } else {
-                CodingManager.buildEnvironmentActionIDs(state, action);
-            }
-        }
-
-        if (!widgetActions.isEmpty()) {
-            CodingManager.buildIDs(state, widgetActions);
-        }
-    }
-
-    private boolean hasOriginWidgetPath(Action action) {
-        Widget originWidget = action.get(Tags.OriginWidget, null);
-        return originWidget != null && originWidget.get(Tags.Path, null) != null;
     }
 }

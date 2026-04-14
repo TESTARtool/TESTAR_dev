@@ -30,7 +30,7 @@ import org.testar.plugin.OperatingSystems;
 import org.testar.plugin.PlatformOrchestrator;
 import org.testar.plugin.PlatformSession;
 import org.testar.plugin.PlatformSessionSpec;
-import org.testar.plugin.PlatformSessionSpec.TargetType;
+import org.testar.plugin.PlatformSessionSpecFactory;
 
 final class CliDaemonServer {
 
@@ -225,7 +225,12 @@ final class CliDaemonServer {
         }
 
         OperatingSystems operatingSystem = parseOperatingSystem(platformToken);
-        return PlatformSessionSpec.builder(operatingSystem, TargetType.EXECUTABLE, target, settings).build();
+        return PlatformSessionSpecFactory.create(
+                operatingSystem,
+                PlatformSessionSpec.TargetType.EXECUTABLE,
+                target,
+                settings
+        );
     }
 
     private OperatingSystems parseOperatingSystem(String token) {

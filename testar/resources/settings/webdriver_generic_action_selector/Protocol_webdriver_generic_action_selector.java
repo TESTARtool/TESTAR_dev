@@ -28,13 +28,13 @@
  *
  */
 
-import org.testar.ActionSelectorProxy;
+import org.testar.engine.action.selection.ActionSelectorProxy;
+import org.testar.engine.action.selection.similarity.SimilarityDetection;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.actions.StdActionCompiler;
 import org.testar.monkey.alayer.exceptions.ActionBuildException;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
-import org.testar.action.priorization.SimilarityDetection;
 import org.testar.managers.InputDataManager;
 import org.testar.protocols.WebdriverProtocol;
 
