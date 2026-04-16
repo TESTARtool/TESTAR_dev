@@ -141,7 +141,7 @@ public class VisualizationUtil {
         }
     }
 
-    public static void visualizeSelectedAction(Canvas canvas, State state, Action action, double actionDuration){
+    public static void visualizeSelectedAction(Canvas canvas, double actionDuration, State state, Action action){
         Pen redPen = Pen.newPen().setColor(Color.Red).setFillPattern(FillPattern.Solid).setStrokeWidth(20).build();
         try {
             Visualizer visualizer = action.get(Tags.Visualizer, Util.NullVisualizer);

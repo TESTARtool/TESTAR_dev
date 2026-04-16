@@ -4,40 +4,28 @@
  * Copyright (c) 2018-2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.scriptless;
+package org.testar.scriptless.listener;
 
-import org.testar.config.ConfigTags;
 import org.testar.config.TestarMode;
 import org.testar.core.devices.IEventListener;
 import org.testar.core.devices.KBKeys;
-import org.testar.core.devices.Mouse;
 import org.testar.core.devices.MouseButtons;
 import org.testar.core.serialisation.LogSerialiser;
-import org.testar.engine.devices.EventHandler;
+import org.testar.scriptless.RuntimeContext;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-public abstract class ModeControlProtocol extends AbstractProtocol implements IEventListener {
+public final class ModeListener implements IEventListener {
 
-	protected TestarMode mode;
-	protected synchronized void setMode(TestarMode mode){
-		if (mode() == mode) return;
-		else this.mode = mode;
-	}
-	public synchronized TestarMode mode(){
-		return mode;
-	}
+	private final Set<KBKeys> pressed = EnumSet.noneOf(KBKeys.class);
 
-    protected Mouse mouse;
-    public final Mouse mouse() {
-        return mouse;
-    }
+	private final RuntimeContext runtimeContext;
+	private final boolean keyBoardListener;
 
-	private Set<KBKeys> pressed = EnumSet.noneOf(KBKeys.class);
-
-	public EventHandler initializeEventHandler() {
-		return new EventHandler(this);
+	public ModeListener(RuntimeContext runtimeContext, boolean keyBoardListener) {
+		this.runtimeContext = runtimeContext;
+		this.keyBoardListener = keyBoardListener;
 	}
 
 	//TODO: key commands come through java.awt.event but are the key codes same for all OS? if they are the same, then move to platform independent protocol?
@@ -56,13 +44,13 @@ public abstract class ModeControlProtocol extends AbstractProtocol implements IE
 	 */
 	@Override
 	public void keyDown(KBKeys key){
-		if (settings.get(ConfigTags.KeyBoardListener)) {
+		if (keyBoardListener) {
 			pressed.add(key);
 
 			// SHIFT + ARROW-DOWN --> stop TESTAR run
 			if(key == KBKeys.VK_DOWN && pressed.contains(KBKeys.VK_SHIFT)){
 				LogSerialiser.log("User requested to stop monkey!\n", LogSerialiser.LogLevel.Info);
-				mode = TestarMode.Quit;
+				runtimeContext.setMode(TestarMode.Quit);
 			}
 
 			// SHIFT + 0 --> print in the PID, Windows Handle, and process name of the running applications
@@ -74,7 +62,7 @@ public abstract class ModeControlProtocol extends AbstractProtocol implements IE
 
 	@Override
 	public void keyUp(KBKeys key){
-		if (settings.get(ConfigTags.KeyBoardListener)) {
+		if (keyBoardListener) {
 			pressed.remove(key);
 		}
 	}

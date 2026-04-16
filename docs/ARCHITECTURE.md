@@ -84,8 +84,9 @@ The codebase now has four distinct architectural concepts. They should not be mi
 - `capability`
   A scriptless `testar` runtime behavior module.
   Examples:
-  - sequence lifecycle
-  - verdict evaluation
+  - settings initialization
+  - test-session lifecycle
+  - test-sequence lifecycle
   - stop criteria
   - spy filtering and visualization support, when kept outside the shared services
   Capabilities are specific to the `testar` protocol runtime. They are not core services and they are not policies.
@@ -122,7 +123,9 @@ For the current scriptless runtime path inside `testar`, the role split is:
 
 - composed services come from `plugin` and `engine`
 - scriptless protocol classes in `testar` invoke those services
-- scriptless protocol capabilities in `testar` handle TESTAR-specific runtime behavior such as sequence lifecycle, verdict evaluation, and stop criteria
+- scriptless protocol capabilities in `testar` handle TESTAR-specific runtime behavior such as settings initialization, test-session hooks, test-sequence hooks, and stop criteria
+- base oracle evaluation is now a shared service from the composed platform stack
+- scriptless adds runtime-specific oracle composition through scriptless-side service adapters/composers
 - reporting and output side effects are coordinated through `SessionReportingManager`
 - state and action identifiers are assigned inside the shared state and action-derivation service pipelines
 
@@ -174,8 +177,9 @@ This flow is represented in:
 
 For the scriptless TESTAR runtime, the same service flow is wrapped by protocol capabilities that handle:
 
-- sequence lifecycle
-- verdict evaluation
+- settings initialization
+- test-session lifecycle
+- test-sequence lifecycle
 - stop criteria
 
 Visualization and spy-filter behavior may still exist as internal scriptless runtime classes, but they do not need to be modeled as shared capabilities unless they must be replaced or reused independently.
@@ -317,6 +321,28 @@ That means `engine` sits between:
 - `core`, which defines the contracts
 - platform modules, which provide concrete policy implementations
 - composition layers such as `plugin`, which decide what should be assembled for a session
+
+For services, `engine` also provides reusable default and composed implementations for the shared runtime flow. This now includes oracle evaluation:
+
+- `DefaultOracleEvaluationService`
+  Provides the shared engine-side oracle evaluation that fits the generic service layer.
+  It currently covers:
+  - unexpected-close verdicts
+  - not-responding verdicts
+  - suspicious-tag evaluation
+  - verdict normalization and storage
+  File: `engine/src/org/testar/engine/service/DefaultOracleEvaluationService.java`
+- `ComposedOracleEvaluationService`
+  Aggregates one or more `OracleEvaluationService` implementations into one composed service.
+  This is the service-side seam for later platform-specific or entry-point-specific oracle extensions.
+  File: `engine/src/org/testar/engine/service/ComposedOracleEvaluationService.java`
+
+This keeps base oracle evaluation aligned with the rest of the runtime architecture:
+
+- `core` defines the oracle evaluation contract
+- `engine` provides reusable default and composed implementations
+- `plugin` carries the oracle service inside `PlatformServices`
+- entry points such as `cli` and `testar` consume that service instead of re-owning the base oracle logic
 
 ### Engine policy package
 

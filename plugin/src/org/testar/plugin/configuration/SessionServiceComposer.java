@@ -11,8 +11,10 @@ import org.testar.core.action.resolver.ActionResolver;
 import org.testar.core.service.ActionDerivationService;
 import org.testar.core.service.ActionExecutionService;
 import org.testar.core.service.ActionSelectorService;
+import org.testar.core.service.OracleEvaluationService;
 import org.testar.core.service.StateService;
 import org.testar.core.service.SystemService;
+import org.testar.config.settings.Settings;
 import org.testar.engine.action.derivation.ActionDerivationPlan;
 import org.testar.engine.action.execution.ActionExecutionPlan;
 import org.testar.engine.action.resolver.ActionResolverPlan;
@@ -23,6 +25,7 @@ import org.testar.engine.service.ComposedActionDerivationService;
 import org.testar.engine.service.ComposedActionExecutionService;
 import org.testar.engine.service.ComposedActionResolver;
 import org.testar.engine.service.ComposedActionSelectorService;
+import org.testar.engine.service.DefaultOracleEvaluationService;
 import org.testar.engine.service.ComposedStateService;
 import org.testar.engine.service.ComposedSystemService;
 import org.testar.engine.state.StateCompositionPlan;
@@ -39,7 +42,8 @@ public final class SessionServiceComposer {
     private SessionServiceComposer() {
     }
 
-    public static PlatformServices compose(SessionPolicyContext sessionPolicyContext,
+    public static PlatformServices compose(Settings settings,
+                                           SessionPolicyContext sessionPolicyContext,
                                            StateModelManager stateModelService,
                                            SessionServiceConfiguration configuration,
                                            SystemCompositionPlan defaultSystemCompositionPlan,
@@ -48,6 +52,7 @@ public final class SessionServiceComposer {
                                            ActionSelectorPlan defaultActionSelectorPlan,
                                            ActionResolverPlan defaultActionResolverPlan,
                                            ActionExecutionPlan defaultActionExecutionPlan) {
+        Assert.notNull(settings);
         Assert.notNull(sessionPolicyContext);
         Assert.notNull(stateModelService);
         Assert.notNull(configuration);
@@ -95,6 +100,7 @@ public final class SessionServiceComposer {
 
         SystemService systemService = ComposedSystemService.compose(systemCompositionPlan);
         StateService stateService = ComposedStateService.compose(sessionPolicyContext, stateCompositionPlan);
+        OracleEvaluationService oracleEvaluationService = new DefaultOracleEvaluationService(settings);
         ActionDerivationService actionDerivationService = ComposedActionDerivationService.compose(
                 sessionPolicyContext,
                 actionDerivationPlan
@@ -106,6 +112,7 @@ public final class SessionServiceComposer {
         return new PlatformServices(
                 systemService,
                 stateService,
+                oracleEvaluationService,
                 stateModelService,
                 actionDerivationService,
                 actionSelectorService,

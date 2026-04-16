@@ -1,0 +1,34 @@
+flowchart LR
+
+    subgraph PluginComposition["plugin or runtime oracle composition"]
+        Orchestrator["PlatformOrchestrator / <br> TESTAR runtime"]
+        ServiceSelection["service selection"]
+    end
+
+    subgraph ComposedOracle["composed oracle service"]
+        DefaultOracleEvaluationService["DefaultOracleEvaluationService"]
+        ComposedOracleEvaluationService["ComposedOracleEvaluationService"]
+        DefaultOracleEvaluationService --> ComposedOracleEvaluationService
+    end
+
+    subgraph CoreOracle["core service contract"]
+        OracleEvaluationService["OracleEvaluationService"]
+    end
+
+    subgraph CustomOracleProviders["custom oracle providers"]
+        CustomOracleService["CustomOracleEvaluationService"]
+    end
+
+    Orchestrator --> ServiceSelection
+    ServiceSelection --> ComposedOracleEvaluationService
+
+    CustomOracleService --> ComposedOracleEvaluationService
+
+    DefaultOracleEvaluationService -. implements .-> OracleEvaluationService
+    ComposedOracleEvaluationService -. implements .-> OracleEvaluationService
+
+    ComposedOracleEvaluationService -- "produces" --> verdicts
+
+    %% horizontal row nudges
+    ServiceSelection ~~~ ComposedOracle
+    CustomOracleService ~~~ ComposedOracle

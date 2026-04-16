@@ -11,6 +11,7 @@ import org.testar.core.action.resolver.ActionResolver;
 import org.testar.core.service.ActionDerivationService;
 import org.testar.core.service.ActionExecutionService;
 import org.testar.core.service.ActionSelectorService;
+import org.testar.core.service.OracleEvaluationService;
 import org.testar.core.service.StateService;
 import org.testar.core.service.SystemService;
 import org.testar.statemodel.StateModelManager;
@@ -22,6 +23,7 @@ public final class PlatformServices {
 
     private final SystemService systemService;
     private final StateService stateService;
+    private final OracleEvaluationService oracleEvaluationService;
     private final StateModelManager stateModelService;
     private final ActionDerivationService actionDerivationService;
     private final ActionSelectorService actionSelectorService;
@@ -30,6 +32,7 @@ public final class PlatformServices {
 
     public PlatformServices(SystemService systemService,
                             StateService stateService,
+                            OracleEvaluationService oracleEvaluationService,
                             StateModelManager stateModelService,
                             ActionDerivationService actionDerivationService,
                             ActionSelectorService actionSelectorService,
@@ -37,6 +40,7 @@ public final class PlatformServices {
                             ActionExecutionService actionExecutionService) {
         this.systemService = Assert.notNull(systemService);
         this.stateService = Assert.notNull(stateService);
+        this.oracleEvaluationService = Assert.notNull(oracleEvaluationService);
         this.stateModelService = Assert.notNull(stateModelService);
         this.actionDerivationService = Assert.notNull(actionDerivationService);
         this.actionSelectorService = Assert.notNull(actionSelectorService);
@@ -50,6 +54,10 @@ public final class PlatformServices {
 
     public StateService stateService() {
         return stateService;
+    }
+
+    public OracleEvaluationService oracleEvaluationService() {
+        return oracleEvaluationService;
     }
 
     public StateModelManager stateModelService() {

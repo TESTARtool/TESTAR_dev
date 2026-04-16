@@ -4,25 +4,27 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.scriptless.capability;
+package org.testar.engine.service;
 
 import org.testar.config.ConfigTags;
+import org.testar.config.settings.Settings;
+import org.testar.core.Assert;
 import org.testar.core.alayer.Color;
 import org.testar.core.alayer.FillPattern;
 import org.testar.core.alayer.Pen;
 import org.testar.core.alayer.Roles;
 import org.testar.core.alayer.Shape;
 import org.testar.core.alayer.StrokePattern;
+import org.testar.core.service.OracleEvaluationService;
+import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 import org.testar.core.state.Widget;
 import org.testar.core.tag.Tag;
 import org.testar.core.tag.Tags;
+import org.testar.core.util.Util;
 import org.testar.core.verdict.Verdict;
 import org.testar.core.visualizers.ShapeVisualizer;
 import org.testar.core.visualizers.Visualizer;
-import org.testar.oracle.Oracle;
-import org.testar.scriptless.ComposedProtocol;
-import org.testar.windows.alayer.UIARoles;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,62 +33,51 @@ import java.util.WeakHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.testar.core.tag.Tags.IsRunning;
+public final class DefaultOracleEvaluationService implements OracleEvaluationService {
 
-/**
- * Shared oracle evaluation for protocol implementations.
- */
-public final class StateVerdictCapability {
-
+    private final Settings settings;
     private final Map<String, Matcher> suspiciousTitlesMatchers = new WeakHashMap<String, Matcher>();
     private Pattern suspiciousTitlesPattern;
 
-    public List<Verdict> evaluateVerdicts(ComposedProtocol protocol, State state) {
+    public DefaultOracleEvaluationService(Settings settings) {
+        this.settings = Assert.notNull(settings);
+    }
+
+    @Override
+    public List<Verdict> getVerdicts(SUT system, State state) {
+        Assert.notNull(state);
+
         List<Verdict> verdicts = new ArrayList<Verdict>();
 
-        if (protocol.isProcessListenerOracleEnabled() && protocol.runtimeContext().processListenerOracle() != null) {
-            List<Verdict> processVerdicts = protocol.runtimeContext().processListenerOracle().getVerdicts(state);
-            for (Verdict processVerdict : processVerdicts) {
-                if (processVerdict.severity() == Verdict.Severity.SUSPICIOUS_PROCESS.getValue()) {
-                    verdicts.add(processVerdict);
-                }
-            }
-        }
-
-        if (!state.get(IsRunning, false)) {
-            verdicts.add(new Verdict(Verdict.Severity.UNEXPECTEDCLOSE, "System is offline! Closed Unexpectedly! I assume it crashed!"));
+        if (!state.get(Tags.IsRunning, false)) {
+            verdicts.add(new Verdict(
+                    Verdict.Severity.UNEXPECTEDCLOSE,
+                    "System is offline! Closed Unexpectedly! I assume it crashed!"
+            ));
+            state.set(Tags.OracleVerdicts, verdicts);
             return verdicts;
         }
 
         if (state.get(Tags.NotResponding, false)) {
-            verdicts.add(new Verdict(Verdict.Severity.NOT_RESPONDING, "System is unresponsive! I assume something is wrong!"));
+            verdicts.add(new Verdict(
+                    Verdict.Severity.NOT_RESPONDING,
+                    "System is unresponsive! I assume something is wrong!"
+            ));
+            state.set(Tags.OracleVerdicts, verdicts);
             return verdicts;
         }
 
-        ensureSuspiciousTitlesPattern(protocol);
+        if (suspiciousTitlesPattern == null) {
+            suspiciousTitlesPattern = Pattern.compile(
+                    settings.get(ConfigTags.SuspiciousTags),
+                    Pattern.UNICODE_CHARACTER_CLASS
+            );
+        }
 
         for (Widget widget : state) {
-            Verdict suspiciousValueVerdict = evaluateSuspiciousWidget(protocol, widget);
+            Verdict suspiciousValueVerdict = evaluateSuspiciousWidget(widget);
             if (suspiciousValueVerdict.severity() == Verdict.Severity.SUSPICIOUS_TAG.getValue()) {
                 verdicts.add(suspiciousValueVerdict);
-            }
-        }
-
-        if (protocol.isLogOracleEnabled() && protocol.runtimeContext().logOracle() != null) {
-            List<Verdict> logVerdicts = protocol.runtimeContext().logOracle().getVerdicts(state);
-            for (Verdict logVerdict : logVerdicts) {
-                if (logVerdict.severity() == Verdict.Severity.SUSPICIOUS_LOG.getValue()) {
-                    verdicts.add(logVerdict);
-                }
-            }
-        }
-
-        if (protocol.runtimeContext().extendedOraclesList() != null) {
-            for (Oracle extendedOracle : protocol.runtimeContext().extendedOraclesList()) {
-                List<Verdict> extendedVerdicts = extendedOracle.getVerdicts(state);
-                if (extendedVerdicts != null) {
-                    verdicts.addAll(extendedVerdicts);
-                }
             }
         }
 
@@ -94,22 +85,26 @@ public final class StateVerdictCapability {
             verdicts.add(Verdict.OK);
         }
 
+        state.set(Tags.OracleVerdicts, verdicts);
         return verdicts;
     }
 
-    private void ensureSuspiciousTitlesPattern(ComposedProtocol protocol) {
-        if (suspiciousTitlesPattern == null) {
-            suspiciousTitlesPattern = Pattern.compile(
-                    protocol.settings().get(ConfigTags.SuspiciousTags),
-                    Pattern.UNICODE_CHARACTER_CLASS
-            );
+    @Override
+    public void addVerdict(State state, Verdict verdict) {
+        Assert.notNull(state, verdict);
+
+        List<Verdict> verdicts = state.get(Tags.OracleVerdicts, new ArrayList<Verdict>());
+        if (verdicts.size() == 1 && verdicts.contains(Verdict.OK)) {
+            verdicts = new ArrayList<Verdict>();
         }
+
+        verdicts.add(verdict);
+        state.set(Tags.OracleVerdicts, verdicts);
     }
 
-    private Verdict evaluateSuspiciousWidget(ComposedProtocol protocol, Widget widget) {
-        for (String tagForSuspiciousOracle : protocol.settings().get(ConfigTags.TagsForSuspiciousOracle)) {
+    private Verdict evaluateSuspiciousWidget(Widget widget) {
+        for (String tagForSuspiciousOracle : settings.get(ConfigTags.TagsForSuspiciousOracle)) {
             String tagValue = findSuspiciousTagValue(widget, tagForSuspiciousOracle);
-
             if (tagValue.isEmpty()) {
                 continue;
             }
@@ -134,7 +129,7 @@ public final class StateVerdictCapability {
 
     private String findSuspiciousTagValue(Widget widget, String tagForSuspiciousOracle) {
         for (Tag<?> tag : widget.tags()) {
-            if (tag.name().equals("ValuePattern") && widget.get(Tags.Role, Roles.Widget).equals(UIARoles.UIAEdit)) {
+            if (ignoreEditWidget(widget, tag)) {
                 continue;
             }
 
@@ -146,10 +141,15 @@ public final class StateVerdictCapability {
         return "";
     }
 
+    private boolean ignoreEditWidget(Widget widget, Tag<?> tag) {
+        return tag.name().equals("ValuePattern")
+                && widget.get(Tags.Role, Roles.Widget).name().equals("UIAEdit");
+    }
+
     private Visualizer buildSuspiciousTagVisualizer(Widget widget) {
         Shape shape = widget.get(Tags.Shape, null);
         if (shape == null) {
-            return org.testar.core.util.Util.NullVisualizer;
+            return Util.NullVisualizer;
         }
 
         Pen redPen = Pen.newPen()

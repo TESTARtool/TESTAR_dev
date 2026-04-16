@@ -20,6 +20,7 @@ flowchart LR
         ChoosePlan["ChooseActionPlan (ActionSelectorPlan / ActionResolverPlan)"]
         ComposedExecution["ComposedActionExecutionService"]
         ExecutionPlan["ActionExecutionPlan"]
+        DefaultOracle["DefaultOracleEvaluationService"]
         ComposedOracle["ComposedOracleEvaluationService"]
     end
 
@@ -43,17 +44,20 @@ flowchart LR
     ServiceSelection --> DerivationPlan
     ServiceSelection --> ChoosePlan
     ServiceSelection --> ExecutionPlan
+    ServiceSelection --> DefaultOracle
     ServiceSelection --> ComposedSystem
     ServiceSelection --> ComposedState
     ServiceSelection --> ComposedDerivation
     ServiceSelection --> ComposedChoose
     ServiceSelection --> ComposedExecution
+    ServiceSelection --> ComposedOracle
 
     SystemPlan -. plan .-> ComposedSystem
     StatePlan -. plan .-> ComposedState
     DerivationPlan -. plan .-> ComposedDerivation
     ChoosePlan -. plan .-> ComposedChoose
     ExecutionPlan -. plan .-> ComposedExecution
+    DefaultOracle -. default implementation .-> ComposedOracle
     ComposedSystem -. startSystem .-> ComposedState
     ComposedState -. getState .-> ComposedDerivation
     ComposedDerivation -. deriveActions .-> ComposedChoose

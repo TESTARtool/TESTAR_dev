@@ -36,7 +36,9 @@ public final class WebdriverSystemService implements SystemService {
 
     @Override
     public SUT startSystem() throws SystemStartException {
-        return starter.start();
+        SUT system = starter.start();
+        WebdriverWindowHandleSupport.bindWindowHandle(system);
+        return system;
     }
 
     @Override

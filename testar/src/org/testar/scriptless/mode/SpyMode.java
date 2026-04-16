@@ -4,14 +4,17 @@
  * Copyright (c) 2022 - 2026 Universitat Politecnica de Valencia - www.upv.es
  */
 
-package org.testar.scriptless;
+package org.testar.scriptless.mode;
 
 import org.testar.config.ConfigTags;
 import org.testar.config.TestarMode;
 import org.testar.core.action.Action;
+import org.testar.core.alayer.Pen;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 import org.testar.core.util.Util;
+import org.testar.plugin.NativeLinker;
+import org.testar.scriptless.ComposedProtocol;
 
 import java.util.Set;
 
@@ -22,20 +25,20 @@ public class SpyMode {
 
     public void runSpyLoop(ComposedProtocol protocol) {
         SUT system = protocol.startSystem();
-        protocol.runtimeContext().setCanvas(protocol.buildCanvas());
+        protocol.runtimeContext().setCanvas(NativeLinker.getNativeCanvas(Pen.PEN_DEFAULT));
 
-        while (protocol.mode() == TestarMode.Spy && system.isRunning()) {
+        while (protocol.runtimeContext().mode() == TestarMode.Spy && system.isRunning()) {
             State state = protocol.getState(system);
             protocol.runtimeContext().canvas().begin();
 
             Set<Action> actions = protocol.deriveActions(system, state);
 
             Util.clear(protocol.runtimeContext().canvas());
-            protocol.visualizeState(protocol.runtimeContext().canvas(), state);
-            protocol.visualizeActions(protocol.runtimeContext().canvas(), state, actions);
+            protocol.visualizationListener().visualizeState(state);
+            protocol.visualizationListener().visualizeActions(state, actions);
             protocol.runtimeContext().canvas().end();
 
-            int refreshMs = (int) (protocol.settings().get(ConfigTags.RefreshSpyCanvas, 0.5) * 1000);
+            int refreshMs = (int) (protocol.runtimeContext().settings().get(ConfigTags.RefreshSpyCanvas, 0.5) * 1000);
             synchronized (this) {
                 try {
                     this.wait(refreshMs);
@@ -46,7 +49,7 @@ public class SpyMode {
         }
 
         if (!system.isRunning()) {
-            protocol.setMode(TestarMode.Quit);
+            protocol.runtimeContext().setMode(TestarMode.Quit);
         }
 
         Util.clear(protocol.runtimeContext().canvas());

@@ -4,7 +4,7 @@
  * Copyright (c) 2022 - 2026 Universitat Politecnica de Valencia - www.upv.es
  */
 
-package org.testar.scriptless;
+package org.testar.scriptless.mode;
 
 import org.testar.OutputStructure;
 import org.testar.config.TestarMode;
@@ -15,6 +15,7 @@ import org.testar.core.state.State;
 import org.testar.core.tag.Tags;
 import org.testar.core.util.Util;
 import org.testar.core.verdict.Verdict;
+import org.testar.scriptless.ComposedProtocol;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,9 +23,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 
-/**
- * Generate-mode loop.
- */
 public class GenerateMode {
 
     private boolean exceptionThrown = false;
@@ -33,7 +31,7 @@ public class GenerateMode {
         protocol.initializeTestSession();
         protocol.runtimeContext().setSequenceCount(1);
 
-        while (protocol.mode() != TestarMode.Quit && protocol.moreSequences()) {
+        while (protocol.runtimeContext().mode() != TestarMode.Quit && protocol.stopCriteriaTestSession()) {
             exceptionThrown = false;
             SUT system = null;
 
@@ -54,7 +52,7 @@ public class GenerateMode {
                 if (!Verdict.helperAreAllVerdictsOK(initialVerdicts)) {
                     // If failure exists in the initial state
                     // Save initial state information in the state model before finishing
-					protocol.stateModelManager.notifyNewStateReached(initialState, Collections.emptySet());
+					protocol.runtimeContext().stateModelManager().notifyNewStateReached(initialState, Collections.emptySet());
                     // Finish the test sequence and state model only with the initial state verdicts
                     finishGeneratedSequence(protocol, system, initialVerdicts);
                 } else {
@@ -74,26 +72,27 @@ public class GenerateMode {
                 StringJoiner stackTrace = new StringJoiner(System.lineSeparator());
                 stackTrace.add(message);
                 Arrays.stream(exception.getStackTrace()).map(StackTraceElement::toString).forEach(stackTrace::add);
-                protocol.stateModelManager.notifyTestSequenceInterruptedBySystem(stackTrace.toString());
+                protocol.runtimeContext().stateModelManager().notifyTestSequenceInterruptedBySystem(stackTrace.toString());
                 exceptionThrown = true;
-                protocol.emergencyTerminateTestSequence(system, exception);
+                Verdict unexpectedCloseVerdict = new Verdict(Verdict.Severity.UNEXPECTEDCLOSE, "System is offline! Closed Unexpectedly! I assume it crashed!");
+                finishGeneratedSequence(protocol, system, Arrays.asList(unexpectedCloseVerdict));
             }
         }
 
-        if (protocol.mode() == TestarMode.Quit && !exceptionThrown) {
-            protocol.stateModelManager.notifyTestSequenceInterruptedByUser();
+        if (protocol.runtimeContext().mode() == TestarMode.Quit && !exceptionThrown) {
+            protocol.runtimeContext().stateModelManager().notifyTestSequenceInterruptedByUser();
         }
 
-        protocol.stateModelManager.notifyTestingEnded();
-        protocol.setMode(TestarMode.Quit);
+        protocol.runtimeContext().stateModelManager().notifyTestingEnded();
+        protocol.runtimeContext().setMode(TestarMode.Quit);
     }
 
     private List<Verdict> runGenerateInnerLoop(ComposedProtocol protocol, SUT system, State state) throws Exception {
         Set<Action> actions = protocol.deriveActions(system, state);
-        protocol.runtimeServices().sessionReportingManager().addActions(actions);
-        protocol.stateModelManager.notifyNewStateReached(state, actions);
+        protocol.runtimeContext().sessionReportingManager().addActions(actions);
+        protocol.runtimeContext().stateModelManager().notifyNewStateReached(state, actions);
 
-        while (protocol.mode() != TestarMode.Quit && protocol.moreActions(state)) {
+        while (protocol.runtimeContext().mode() != TestarMode.Quit && protocol.stopCriteriaTestSequence(state)) {
             LogSerialiser.log("Obtained system state in inner loop of TESTAR...\n", LogSerialiser.LogLevel.Debug);
             protocol.runtimeContext().canvas().begin();
             Util.clear(protocol.runtimeContext().canvas());
@@ -101,12 +100,12 @@ public class GenerateMode {
             Action action = protocol.selectAction(state, actions);
 
             //Showing the actions if visualization is on:
-			if(protocol.isVisualizationEnabled()) {
-                protocol.visualizeActions(protocol.runtimeContext().canvas(), state, actions);
-                protocol.visualizeSelectedAction(protocol.runtimeContext().canvas(), state, action, protocol.settings());
+			if(protocol.runtimeContext().isVisualizationEnabled()) {
+                protocol.visualizationListener().visualizeActions(state, actions);
+                protocol.visualizationListener().visualizeSelectedAction(state, action);
             }
 
-            protocol.stateModelManager.notifyActionExecution(action);
+            protocol.runtimeContext().stateModelManager().notifyActionExecution(action);
             protocol.executeAction(system, state, action);
             protocol.runtimeContext().setActionCount(protocol.runtimeContext().actionCount() + 1);
 
@@ -114,16 +113,17 @@ public class GenerateMode {
             protocol.runtimeContext().canvas().end();
 
             state = protocol.getState(system);
+            protocol.getVerdicts(system, state);
             actions = protocol.deriveActions(system, state);
-            protocol.runtimeServices().sessionReportingManager().addActions(actions);
-            protocol.stateModelManager.notifyNewStateReached(state, actions);
+            protocol.runtimeContext().sessionReportingManager().addActions(actions);
+            protocol.runtimeContext().stateModelManager().notifyNewStateReached(state, actions);
         }
 
         return state.get(Tags.OracleVerdicts, Collections.singletonList(Verdict.OK));
     }
 
     private void finishGeneratedSequence(ComposedProtocol protocol, SUT system, List<Verdict> finalVerdicts) {
-        protocol.stateModelManager.notifyTestSequenceStopped();
+        protocol.runtimeContext().stateModelManager().notifyTestSequenceStopped();
 
         if (!Verdict.helperAreAllVerdictsOK(finalVerdicts)) {
             LogSerialiser.log("Sequence contained faults!\n", LogSerialiser.LogLevel.Critical);

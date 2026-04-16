@@ -126,6 +126,7 @@ public final class PlatformOrchestrator {
         );
 
         return SessionServiceComposer.compose(
+                sessionSpec.getSettings(),
                 sessionPolicyContext,
                 stateModelManager,
                 serviceConfiguration,
@@ -158,6 +159,7 @@ public final class PlatformOrchestrator {
         );
 
         return SessionServiceComposer.compose(
+                sessionSpec.getSettings(),
                 sessionPolicyContext,
                 stateModelManager,
                 serviceConfiguration,

@@ -8,12 +8,13 @@ package org.testar.core.service;
 
 import java.util.List;
 
+import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 import org.testar.core.verdict.Verdict;
 
 public interface OracleEvaluationService {
 
-    List<Verdict> getVerdicts(State state);
+    List<Verdict> getVerdicts(SUT system, State state);
 
     void addVerdict(State state, Verdict verdict);
 }

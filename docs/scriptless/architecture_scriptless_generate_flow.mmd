@@ -1,0 +1,34 @@
+flowchart LR
+
+    subgraph ScriptlessFlow["testar scriptless generate flow"]
+        SystemService["SystemService"]
+        StateService["StateService"]
+        OracleEvaluationService["OracleEvaluationService"]
+        ScriptlessOracleComposer["ScriptlessOracleComposer"]
+        ActionDerivationService["ActionDerivationService"]
+        ActionSelectorService["ActionSelectorService"]
+        ActionExecutionService["ActionExecutionService"]
+
+        SettingsCapability["SettingsCapability"]
+        TestSessionCapability["TestSessionCapability"]
+        TestSequenceCapability["TestSequenceCapability"]
+        StopCriteriaCapability["StopCriteriaCapability"]
+    end
+
+    SettingsCapability -. test settings .-> TestSessionCapability
+    TestSessionCapability -. session lifecycle .-> TestSequenceCapability
+    TestSequenceCapability -. sequence lifecycle .-> SystemService
+
+    SystemService -. start system .-> StateService
+
+    StateService -. current state .-> OracleEvaluationService
+    OracleEvaluationService -. base verdicts .-> ScriptlessOracleComposer
+
+    ScriptlessOracleComposer -. composed verdicts .-> StopCriteriaCapability
+    StopCriteriaCapability -. continue inner loop .-> ActionDerivationService
+
+    ActionDerivationService -. derived actions .-> ActionSelectorService
+
+    ActionSelectorService -. selected action .-> ActionExecutionService
+
+    ActionExecutionService -. next state cycle .-> StateService
