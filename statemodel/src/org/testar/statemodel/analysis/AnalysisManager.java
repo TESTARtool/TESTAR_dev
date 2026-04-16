@@ -639,7 +639,7 @@ public class AnalysisManager {
                         processScreenShot(stateVertex.getProperty("screenshot"), "n" + formatId(stateVertex.getIdentity().toString()), modelIdentifier);
                         continue;
                     }
-                    jsonVertex.addProperty(propertyName, stateVertex.getProperty(propertyName).toString());
+                    jsonVertex.addProperty(getExportPropertyName(propertyName), stateVertex.getProperty(propertyName).toString());
                 }
                 // optionally add a parent
                 if (parent != null) {
@@ -680,7 +680,7 @@ public class AnalysisManager {
                         // these are edge indicators. Ignore
                         continue;
                     }
-                    jsonEdge.addProperty(propertyName, actionEdge.getProperty(propertyName).toString());
+                    jsonEdge.addProperty(getExportPropertyName(propertyName), actionEdge.getProperty(propertyName).toString());
                 }
                 elements.add(new Element(Element.GROUP_EDGES, jsonEdge, className));
             }
@@ -722,6 +722,13 @@ public class AnalysisManager {
             e.printStackTrace();
         }
 
+    }
+
+    private String getExportPropertyName(String propertyName) {
+        if ("id".equals(propertyName)) {
+            return "attributeId";
+        }
+        return propertyName;
     }
 
     // this helper method formats the @RID property into something that can be used in a web frontend
