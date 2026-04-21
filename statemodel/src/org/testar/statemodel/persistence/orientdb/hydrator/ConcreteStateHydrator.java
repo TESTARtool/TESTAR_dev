@@ -77,7 +77,6 @@ public class ConcreteStateHydrator implements EntityHydrator<VertexEntity>{
 
         // we need to add a widgetId property, as this is inherited from the orientdb base class
         //@todo this is hardcoded in now to fix an inheritance issue. Ideally, this needs to be solved in the entity classes
-        String widgetId = ((ConcreteState) source).getId() + "-" + ((ConcreteState) source).getId();
         target.addPropertyValue("widgetId", new PropertyValue(OType.STRING, uniqueId));
 
         // add the screenshot
