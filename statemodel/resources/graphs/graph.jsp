@@ -1539,131 +1539,152 @@
 	}
 
     async function generateModelJSON() {
-		if (!beginExport()) return;
-		try {
-		// Extract the information of the initial abstract state
-		let initialNodes = cy.$(".AbstractState").filter((ele) => ele.data("isInitial") === "true");
-		let initialAbstractId = initialNodes[0].data("stateId");
-		let initialUrl = "";
-		let initialPage = "";
-		let concreteStates = [];
-		let concreteActions = [];
-		let concreteTransitions = [];
-		
-		// Iterate over each ConcreteState element in the graph
+        if (!beginExport()) return;
 
-		// 1) Collect unique states first (no async here)
-		const stateMap = new Map(); // AbstractID -> state data
+        try {
+            // Extract all initial abstract states
+            const initialNodes = cy.$(".AbstractState").filter((ele) => ele.data("isInitial") === "true");
 
-		cy.$(".ConcreteState").forEach((ele) => {
-		  const abstractID = ele.data("AbstractID");
-		  const webTitle   = ele.data("WebTitle");
-		  const webHref    = ele.data("WebHref");
+            // Deduplicate initial abstract state IDs
+            const initialAbstractIds = new Set();
+            initialNodes.forEach((ele) => {
+                initialAbstractIds.add(ele.data("stateId"));
+            });
 
-		  // CLEAN WebInnerHTML (remove svg/path)
-		  //const webInnerHTML = stripSvgAndPath(ele.data("WebInnerHTML"));
+            const initialStatesMap = new Map(); // AbstractID -> initial state data
 
-		  //const webInnerText = ele.data("WebInnerText");
+            let concreteStates = [];
+            let concreteActions = [];
+            let concreteTransitions = [];
 
-		  if (!stateMap.has(abstractID)) {
-			stateMap.set(abstractID, {
-			  AbstractID: abstractID,
-			  WebTitle: webTitle,
-			  WebHref: webHref,
-			  //WebInnerHTML: webInnerHTML,
-			  //WebInnerText: webInnerText,
-			  ConcreteStateId: ele.id()
-			});
-		  }
+            // Iterate over each ConcreteState element in the graph
 
-		  // initial state meta
-		  if (abstractID === initialAbstractId) {
-			initialUrl  = webHref;
-			initialPage = webTitle;
-		  }
-		});
+            // 1) Collect unique states first (no async here)
+            const stateMap = new Map(); // AbstractID -> state data
 
-		// 2) Resolve widget trees SEQUENTIALLY (in order)
-		const resolvedStates = [];
-		for (const s of stateMap.values()) {
-		  const elements = await getWidgetTreeForState(s.ConcreteStateId);
-		  const tree = buildWidgetTreeFromElements(elements);
-		  // const tree = extractWidgetsWithTextFromElements(elements);
-		  resolvedStates.push({ ...s, WidgetTree: tree });
-		}
+            cy.$(".ConcreteState").forEach((ele) => {
+                const abstractID = ele.data("AbstractID");
+				const concreteID = ele.data("ConcreteID");
+                const webTitle = ele.data("WebTitle");
+                const webHref = ele.data("WebHref");
 
-		// 3) Emit final ConcreteState array (omit ConcreteStateId)
-		for (const s of resolvedStates) {
-		  const { ConcreteStateId, ...clean } = s;
-		  concreteStates.push(clean);
-		}
+                // CLEAN WebInnerHTML (remove svg/path)
+                // const webInnerHTML = stripSvgAndPath(ele.data("WebInnerHTML"));
 
-		// Iterate over each ConcreteAction element in the graph
-		cy.$(".ConcreteAction").forEach((ele) => {
-			const abstractID = ele.data("AbstractID");
-			const webHref = ele.data("WebHref");
-			const webCssClasses= ele.data("WebCssClasses");
-			const webTagName= ele.data("WebTagName");
-			const desc = ele.data("Desc");
+                // const webInnerText = ele.data("WebInnerText");
 
-			// CLEAN WebOuterHTML (handles inline icons like <button>...<svg/>...</button>)
-			const webOuterHTML = stripSvgAndPath(ele.data("WebOuterHTML"));
+                if (!stateMap.has(abstractID)) {
+                    stateMap.set(abstractID, {
+                        AbstractID: abstractID,
+                        WebTitle: webTitle,
+                        WebHref: webHref,
+                        // WebInnerHTML: webInnerHTML,
+                        // WebInnerText: webInnerText,
+						CyElementId: ele.id()
+                    });
+                }
 
-			const webCssSelector = ele.data("WebCssSelector");
-			const inputText = ele.data("InputText");
+                // Collect all initial states, deduplicated by AbstractID
+                if (initialAbstractIds.has(abstractID) && !initialStatesMap.has(abstractID)) {
+                    initialStatesMap.set(abstractID, {
+                        AbstractID: abstractID,
+                        InitialUrl: webHref,
+                        InitialPage: webTitle
+                    });
+                }
+            });
 
-			// Check if the action already exists in concreteActions
-			if (!concreteActions.some(action => action.AbstractID === abstractID)) {
-				concreteActions.push({
-					AbstractID: abstractID,
-					WebHref: webHref,
-					WebCssClasses: webCssClasses,
-					WebTagName: webTagName,
-					Desc: desc,
-					WebOuterHTML: webOuterHTML,
-					WebCssSelector: webCssSelector,
-					InputText: inputText,
-				});
-			}
-		});
+            // 2) Resolve widget trees SEQUENTIALLY (in order)
+            const resolvedStates = [];
+            for (const s of stateMap.values()) {
+                const elements = await getWidgetTreeForState(s.CyElementId);
+                const tree = buildWidgetTreeFromElements(elements);
+                // const tree = extractWidgetsWithTextFromElements(elements);
+                resolvedStates.push({ ...s, WidgetTree: tree });
+            }
 
-		// Iterate over each ConcreteAction element to handle transitions
-		cy.$(".ConcreteAction").forEach((ele) => {
-			const sourceNode = ele.source();
-			const targetNode = ele.target();
-			if (sourceNode && targetNode) {
-				const transition = {
-					Source: sourceNode.data("AbstractID"),
-					Target: targetNode.data("AbstractID"),
-					Action: ele.data("AbstractID"),
-				};
-				// Check if the transition already exists
-				if (!concreteTransitions.some(t => 
-					t.Source === transition.Source && 
-					t.Target === transition.Target && 
-					t.Action === transition.Action)) {
-					concreteTransitions.push(transition);
-				}
-			}
-		});
+            // 3) Emit final ConcreteState array (omit CyElementId)
+            for (const s of resolvedStates) {
+                const { CyElementId, ...clean } = s;
+                concreteStates.push(clean);
+            }
 
-		// Construct the final JSON object
-		const jsonResult = {
-			InitialUrl: initialUrl,
-			InitialPage: initialPage,
-			ConcreteState: concreteStates,
-			ConcreteAction: concreteActions,
-			ConcreteTransitions: concreteTransitions,
-		};
+            // Iterate over each ConcreteAction element in the graph
+            cy.$(".ConcreteAction").forEach((ele) => {
+                const abstractID = ele.data("AbstractID"); // Comes from abstract widget
+				const concreteID = ele.data("ConcreteID"); // Comes from concrete widget
+				const actionId = ele.data("actionId");
+                const webHref = ele.data("WebHref");
+                const webCssClasses = ele.data("WebCssClasses");
+                const webTagName = ele.data("WebTagName");
+                const desc = ele.data("Desc");
 
-		// Download the JSON model file
-		downloadJsonFile(jsonResult, "model.json");
-		} catch (err) {
-			console.error("JSON model generation failed:", err);
-		} finally {
-			endExport();
-		}
-	}
+                // CLEAN WebOuterHTML (handles inline icons like <button>...<svg/>...</button>)
+                const webOuterHTML = stripSvgAndPath(ele.data("WebOuterHTML"));
+
+                const webCssSelector = ele.data("WebCssSelector");
+                const inputText = ele.data("InputText");
+
+                // Check if the action already exists in concreteActions
+                if (!concreteActions.some(action => action.actionId === actionId)) {
+                    concreteActions.push({
+                        AbstractID: abstractID,
+						ConcreteID: concreteID,
+						actionId: actionId,
+                        WebHref: webHref,
+                        WebCssClasses: webCssClasses,
+                        WebTagName: webTagName,
+                        Desc: desc,
+                        WebOuterHTML: webOuterHTML,
+                        WebCssSelector: webCssSelector,
+                        InputText: inputText,
+                    });
+                }
+            });
+
+            // Iterate over each ConcreteAction element to handle transitions
+            cy.$(".ConcreteAction").forEach((ele) => {
+                const sourceNode = ele.source();
+                const targetNode = ele.target();
+
+                if (sourceNode && targetNode) {
+                    const transition = {
+                        Source: sourceNode.data("AbstractID"),
+                        Target: targetNode.data("AbstractID"),
+                        ActionWA: ele.data("AbstractID"),
+                        ActionWC: ele.data("ConcreteID"),
+                        ActionId: ele.data("actionId"),
+                    };
+
+                    // Check if the transition already exists
+                    if (!concreteTransitions.some(t =>
+                        t.Source === transition.Source &&
+                        t.Target === transition.Target &&
+                        t.ActionWA === transition.ActionWA &&
+                        t.ActionWC === transition.ActionWC &&
+                        t.ActionId === transition.ActionId
+                    )) {
+                        concreteTransitions.push(transition);
+                    }
+                }
+            });
+
+            // Construct the final JSON object
+            const jsonResult = {
+                InitialStates: Array.from(initialStatesMap.values()),
+                ConcreteState: concreteStates,
+                ConcreteAction: concreteActions,
+                ConcreteTransitions: concreteTransitions,
+            };
+
+            // Download the JSON model file
+            downloadJsonFile(jsonResult, "model.json");
+        } catch (err) {
+            console.error("JSON model generation failed:", err);
+        } finally {
+            endExport();
+        }
+    }
 	
 	// Remove any <svg> and <path> elements from an HTML string
 	function stripSvgAndPath(html) {
