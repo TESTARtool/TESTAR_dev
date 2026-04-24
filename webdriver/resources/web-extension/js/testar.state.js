@@ -13,7 +13,7 @@ document.head.appendChild(cssSelectorScript );
 /*
  * Get the widget tree (Chrome, Firefox) or flattened tree (Edge)
  * @param {Array} array of tags that can be skipped, like <style>, <script> etc.
- * @param {Array} array of attributes to be skipped, like xpath, innerText etc.
+ * @param {Array} array of attributes to be skipped, like xpath, cssSelector, innerText etc.
  * @return {(Object | Array)}
  */
 var getStateTreeTestar = function (ignoredTags, ignoredAttributes) {
@@ -43,7 +43,7 @@ var getStateTreeTestar = function (ignoredTags, ignoredAttributes) {
  * @param {object} parentWrapped, the (wrapped) parent object
  * @param {node} rootElement, the body element
  * @param {object} ignoredTags, list of tags to skip, <style>, <script> etc.
- * @param {object} ignoredAttributes, list of attributes to skip, like xpath, innerText etc.
+ * @param {object} ignoredAttributes, list of attributes to skip, like xpath, cssSelector, innerText etc.
  */
 function traverseElementTestar(parentWrapped, rootElement, ignoredTags, ignoredAttributes) {
     var childNodes = getChildNodesTestar(parentWrapped);
@@ -110,7 +110,7 @@ function shouldDeleteElementForSerialization(element) {
  * @param {node} rootElement, the body element
  * @param {integer} parentId, index of the parent in the flattened array
  * @param {object} ignoredTags, array of tags to skip, <style>, <script> etc.
- * @param {object} ignoredAttributes, list of attributes to skip, like xpath, innerText etc.
+ * @param {object} ignoredAttributes, list of attributes to skip, like xpath, cssSelector, innerText etc.
  */
 function traverseElementArrayTestar(treeArray, parentWrapped, rootElement, parentId, ignoredTags, ignoredAttributes) {
     parentWrapped['parentId'] = parentId;
@@ -222,9 +222,10 @@ function wrapElementTestar(element, xOffset, yOffset, ignoredAttributes) {
         xOffset: xOffset,
         yOffset: yOffset,
 
-        cssSelector: typeof CssSelectorGenerator !== 'undefined'
-            ? CssSelectorGenerator.getCssSelector(element)
-            : ""
+        cssSelector: !ignoredAttributes.includes("cssSelector") &&
+                    typeof CssSelectorGenerator !== "undefined"
+        ? CssSelectorGenerator.getCssSelector(element)
+        : ""
     };
 }
 

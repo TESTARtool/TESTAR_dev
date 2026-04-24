@@ -177,6 +177,7 @@ public class SettingsDefaults {
 		defaults.add(Pair.from(WebIgnoredAttributes, new ArrayList<String>() {
 		    {
 		        add("xpath");
+				add("cssSelector");
 		    }
 		}));
 
