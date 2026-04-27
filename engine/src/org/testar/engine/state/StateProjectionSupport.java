@@ -6,12 +6,15 @@
 
 package org.testar.engine.state;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import org.testar.core.Assert;
 import org.testar.core.state.State;
 import org.testar.core.state.Widget;
 import org.testar.core.tag.Tag;
+import org.testar.core.tag.Tags;
 import org.testar.core.tag.Taggable;
 import org.testar.stub.StateStub;
 import org.testar.stub.WidgetStub;
@@ -53,6 +56,32 @@ final class StateProjectionSupport {
         }
         String text = widget.get(textTag, null);
         return text != null && !text.isBlank();
+    }
+
+    static State projectSemanticWidgets(State state, SemanticWidgetDescriptor descriptor) {
+        Assert.notNull(state);
+        Assert.notNull(descriptor);
+
+        StateStub projectedState = new StateStub();
+        copyTags(state, projectedState);
+
+        Set<String> uniqueDescriptions = new LinkedHashSet<>();
+        for (Widget widget : state) {
+            if (widget == state || !descriptor.shouldInclude(widget)) {
+                continue;
+            }
+
+            String semanticDescription = SemanticStateFormatter.describe(widget, descriptor);
+            if (semanticDescription.isBlank() || !uniqueDescriptions.add(semanticDescription)) {
+                continue;
+            }
+
+            WidgetStub copiedWidget = copyWidget(widget, projectedState);
+            copiedWidget.set(Tags.Desc, semanticDescription);
+            projectedState.addChild(copiedWidget);
+        }
+
+        return projectedState;
     }
 
     private static WidgetStub copyWidget(Widget sourceWidget, State rootState) {

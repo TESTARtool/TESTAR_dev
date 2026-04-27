@@ -65,6 +65,24 @@ public class TestWebdriverClickablePolicy {
         Assert.assertFalse(policy.isClickable(widget));
     }
 
+    @Test
+    public void testAriaButtonRoleIsClickable() {
+        WebdriverClickablePolicy policy = new WebdriverClickablePolicy();
+        WidgetStub widget = createRoleWidget(WdRoles.WdDIV);
+        widget.set(WdTags.WebAriaRole, "button");
+
+        Assert.assertTrue(policy.isClickable(widget));
+    }
+
+    @Test
+    public void testAriaMenuItemRoleIsClickable() {
+        WebdriverClickablePolicy policy = new WebdriverClickablePolicy();
+        WidgetStub widget = createRoleWidget(WdRoles.WdDIV);
+        widget.set(WdTags.WebAriaRole, "menuitem");
+
+        Assert.assertTrue(policy.isClickable(widget));
+    }
+
     private WidgetStub createInputRoleWidget(String inputType) {
         WidgetStub widget = new WidgetStub();
         widget.set(Tags.Role, WdRoles.WdINPUT);

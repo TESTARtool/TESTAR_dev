@@ -165,6 +165,25 @@ public class WdRoles {
   }
 
   /*
+   * These are aria interactive elements
+   */
+  public static List<String> ariaClickableRoles() {
+    return Arrays.asList(
+        "button",
+        "checkbox",
+        "combobox",
+        "link",
+        "menuitem",
+        "menuitemcheckbox",
+        "menuitemradio",
+        "option",
+        "radio",
+        "switch",
+        "tab"
+    );
+  }
+
+  /*
    * These are the HTML input types that are clickable
    */
   public static List<String> clickableInputTypes() {

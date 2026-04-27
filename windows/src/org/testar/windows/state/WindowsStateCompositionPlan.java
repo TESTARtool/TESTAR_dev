@@ -4,7 +4,7 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.windows.tag;
+package org.testar.windows.state;
 
 import org.testar.core.tag.Tags;
 import org.testar.engine.state.StateCompositionPlan;
@@ -56,6 +56,19 @@ public final class WindowsStateCompositionPlan {
                         sutProcesses
                 ),
                 Tags.Title
+        );
+    }
+
+    public static StateCompositionPlan uiAutomationSemanticWidgets(double timeoutSeconds,
+                                                                   boolean accessBridgeEnabled,
+                                                                   String sutProcesses) {
+        return StateCompositionPlan.semanticWidgets(
+                WindowsStateService.uiAutomation(
+                        timeoutSeconds,
+                        accessBridgeEnabled,
+                        sutProcesses
+                ),
+                new WindowsSemanticWidgetDescriptor()
         );
     }
 }

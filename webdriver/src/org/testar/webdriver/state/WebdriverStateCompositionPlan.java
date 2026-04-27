@@ -36,4 +36,11 @@ public final class WebdriverStateCompositionPlan {
                 WdTags.WebTextContent
         );
     }
+
+    public static StateCompositionPlan browserSemanticWidgets(double timeoutSeconds) {
+        return StateCompositionPlan.semanticWidgets(
+                WebdriverStateService.browser(timeoutSeconds),
+                new WebdriverSemanticWidgetDescriptor()
+        );
+    }
 }

@@ -22,7 +22,6 @@ import org.testar.config.settings.Settings;
 import org.testar.core.action.Action;
 import org.testar.core.action.ActionRoles;
 import org.testar.core.action.resolver.ResolvedAction;
-import org.testar.core.alayer.Roles;
 import org.testar.core.state.State;
 import org.testar.core.state.Widget;
 import org.testar.core.tag.Tags;
@@ -132,9 +131,9 @@ final class CliDaemonServer {
 
     private CliResponse getState() {
         try {
-            State state = requireActiveSession().getState();
-            List<String> lines = new ArrayList<>();
-            lines.addAll(describeStateWidgets(state));
+            State rawState = requireActiveSession().getState();
+            State semanticState = PlatformOrchestrator.projectCliState(activeSessionSpec, rawState);
+            List<String> lines = describeStateWidgets(semanticState);
             return new CliResponse(0, lines);
         } catch (RuntimeException exception) {
             return new CliResponse(1, List.of("getState failed: " + exception.getMessage()));
@@ -185,7 +184,7 @@ final class CliDaemonServer {
     private synchronized void replaceActiveSession(PlatformSessionSpec sessionSpec) {
         closeActiveSession();
         activeSessionSpec = sessionSpec;
-        activeSession = PlatformOrchestrator.openSession(sessionSpec);
+        activeSession = PlatformOrchestrator.openCliSession(sessionSpec);
     }
 
     private synchronized PlatformSession requireActiveSession() {
@@ -250,9 +249,11 @@ final class CliDaemonServer {
         for (Widget widget : state) {
             descriptions.add(String.format(
                     Locale.ROOT,
-                    "widget[%s]=role:%s;desc:%s",
-                    String.valueOf(widget.get(Tags.AbstractID, "InvalidAbstractID")),
-                    String.valueOf(widget.get(Tags.Role, Roles.Widget)),
+                    "widget[%s]",
+
+                    // Probably we dont need the widget abstraction context (by default)
+                    //String.valueOf(widget.get(Tags.AbstractID, "InvalidAbstractID")),
+
                     widget.get(Tags.Desc, widget.toString())
             ));
         }
@@ -264,9 +265,8 @@ final class CliDaemonServer {
         for (Action action : actions) {
             descriptions.add(String.format(
                     Locale.ROOT,
-                    "action[%s]=role:%s;desc:%s",
+                    "action[%s]desc=%s",
                     String.valueOf(action.get(Tags.AbstractID, "InvalidAbstractID")),
-                    String.valueOf(action.get(Tags.Role, ActionRoles.Action)),
                     action.get(Tags.Desc, action.toString())
             ));
         }

@@ -23,6 +23,9 @@ public final class WebdriverClickablePolicy implements ClickablePolicy {
     private static final Set<Role> NATIVE_CLICKABLE_ROLES =
             new HashSet<>(Arrays.asList(WdRoles.nativeClickableRoles()));
 
+    private static final Set<String> ARIA_CLICKABLE_ROLES =
+            new HashSet<>(WdRoles.ariaClickableRoles());
+
     @Override
     public boolean isClickable(Widget widget) {
         if (widget == null) {
@@ -32,13 +35,18 @@ public final class WebdriverClickablePolicy implements ClickablePolicy {
             return true;
         }
 
-        Role role = widget.get(Tags.Role, null);
-        if (role == null || !NATIVE_CLICKABLE_ROLES.contains(role)) {
+        String ariaRole = widget.get(WdTags.WebAriaRole, "");
+        if (!ariaRole.isEmpty() && ARIA_CLICKABLE_ROLES.contains(ariaRole)) {
+            return true;
+        }
+
+        Role nativeRole = widget.get(Tags.Role, null);
+        if (nativeRole == null || !NATIVE_CLICKABLE_ROLES.contains(nativeRole)) {
             return false;
         }
 
         String inputType = widget.get(WdTags.WebType, "");
-        if (!WdRoles.WdINPUT.equals(role)) {
+        if (!WdRoles.WdINPUT.equals(nativeRole)) {
             return true;
         }
         return WdRoles.clickableInputTypes().contains(inputType.toLowerCase(Locale.ROOT));

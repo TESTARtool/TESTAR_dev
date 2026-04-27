@@ -23,6 +23,7 @@ import org.testar.config.StateModelTags;
 import org.testar.config.settings.Settings;
 import org.testar.core.CodingManager;
 import org.testar.core.state.SUT;
+import org.testar.core.state.State;
 import org.testar.plugin.exceptions.UnsupportedPlatformException;
 import org.testar.plugin.reporting.SessionReportingManager;
 import org.testar.statemodel.DummyModelManager;
@@ -85,6 +86,11 @@ public final class PlatformOrchestrator {
         return openSession(sessionSpec, services);
     }
 
+    public static PlatformSession openCliSession(PlatformSessionSpec sessionSpec) {
+        configureNativePlatform(sessionSpec.getOperatingSystem());
+        return openSession(sessionSpec);
+    }
+
     private static void configureNativePlatform(OperatingSystems operatingSystem) {
         NativeLinker.cleanWdDriverOS();
         NativeLinker.cleanAndroidOS();
@@ -110,18 +116,33 @@ public final class PlatformOrchestrator {
         }
     }
 
+    public static State projectCliState(PlatformSessionSpec sessionSpec, State state) {
+        SessionPolicyContext sessionPolicyContext = buildSessionPolicyContext(sessionSpec);
+        switch (sessionSpec.getOperatingSystem()) {
+            case WINDOWS:
+            case WINDOWS_10:
+                return PlatformDefaultSessionConfigurations
+                        .windowsSemanticStateCompositionPlan(sessionSpec)
+                        .query(state, sessionPolicyContext);
+            case WEBDRIVER:
+                return PlatformDefaultSessionConfigurations
+                        .webdriverSemanticStateCompositionPlan(sessionSpec)
+                        .query(state, sessionPolicyContext);
+            default:
+                throw new UnsupportedPlatformException(
+                        "Unsupported operating system for CLI projection: " + sessionSpec.getOperatingSystem()
+                );
+        }
+    }
+
     private static PlatformServices windows(PlatformSessionSpec sessionSpec,
                                             SessionPolicyConfiguration policyConfiguration,
                                             SessionServiceConfiguration serviceConfiguration,
                                             StateModelManager stateModelManager) {
         SessionServiceConfiguration defaultServiceConfiguration =
                 PlatformDefaultSessionConfigurations.windowsServiceConfiguration(sessionSpec);
-        SessionPolicyContext sessionPolicyContext = SessionPolicyContextComposer.compose(
-                PlatformPolicyContexts.desktopDefaults(
-                        new WindowsClickablePolicy(),
-                        new WindowsTypeablePolicy(),
-                        new WindowsScrollablePolicy()
-                ),
+        SessionPolicyContext sessionPolicyContext = buildWindowsPolicyContext(
+                sessionSpec,
                 policyConfiguration
         );
 
@@ -150,11 +171,8 @@ public final class PlatformOrchestrator {
                     "Unsupported WebDriver target type: " + sessionSpec.getTargetType()
             );
         }
-        SessionPolicyContext sessionPolicyContext = SessionPolicyContextComposer.compose(
-                PlatformPolicyContexts.webdriverDefaults(
-                        sessionSpec.getSettings().get(ConfigTags.ClickableClasses, Collections.emptyList()),
-                        sessionSpec.getSettings().get(ConfigTags.TypeableClasses, Collections.emptyList())
-                ),
+        SessionPolicyContext sessionPolicyContext = buildWebdriverPolicyContext(
+                sessionSpec,
                 policyConfiguration
         );
 
@@ -169,6 +187,43 @@ public final class PlatformOrchestrator {
                 defaultServiceConfiguration.actionSelectorPlanOverride().orElseThrow(),
                 defaultServiceConfiguration.actionResolverPlanOverride().orElseThrow(),
                 defaultServiceConfiguration.actionExecutionPlanOverride().orElseThrow()
+        );
+    }
+
+    private static SessionPolicyContext buildSessionPolicyContext(PlatformSessionSpec sessionSpec) {
+        switch (sessionSpec.getOperatingSystem()) {
+            case WINDOWS:
+            case WINDOWS_10:
+                return buildWindowsPolicyContext(sessionSpec, SessionPolicyConfiguration.defaults());
+            case WEBDRIVER:
+                return buildWebdriverPolicyContext(sessionSpec, SessionPolicyConfiguration.defaults());
+            default:
+                throw new UnsupportedPlatformException(
+                        "Unsupported operating system for policy context: " + sessionSpec.getOperatingSystem()
+                );
+        }
+    }
+
+    private static SessionPolicyContext buildWindowsPolicyContext(PlatformSessionSpec sessionSpec,
+                                                                  SessionPolicyConfiguration policyConfiguration) {
+        return SessionPolicyContextComposer.compose(
+                PlatformPolicyContexts.desktopDefaults(
+                        new WindowsClickablePolicy(),
+                        new WindowsTypeablePolicy(),
+                        new WindowsScrollablePolicy()
+                ),
+                policyConfiguration
+        );
+    }
+
+    private static SessionPolicyContext buildWebdriverPolicyContext(PlatformSessionSpec sessionSpec,
+                                                                    SessionPolicyConfiguration policyConfiguration) {
+        return SessionPolicyContextComposer.compose(
+                PlatformPolicyContexts.webdriverDefaults(
+                        sessionSpec.getSettings().get(ConfigTags.ClickableClasses, Collections.emptyList()),
+                        sessionSpec.getSettings().get(ConfigTags.TypeableClasses, Collections.emptyList())
+                ),
+                policyConfiguration
         );
     }
 

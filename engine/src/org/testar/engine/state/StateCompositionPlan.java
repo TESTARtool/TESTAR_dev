@@ -59,6 +59,18 @@ public final class StateCompositionPlan {
         );
     }
 
+    public static StateCompositionPlan semanticWidgets(StateService stateService,
+                                                       SemanticWidgetDescriptor descriptor) {
+        Assert.notNull(descriptor);
+        return new StateCompositionPlan(
+                stateService,
+                (state, context) -> StateProjectionSupport.projectSemanticWidgets(
+                        state,
+                        descriptor
+                )
+        );
+    }
+
     public StateService stateService() {
         return stateService;
     }

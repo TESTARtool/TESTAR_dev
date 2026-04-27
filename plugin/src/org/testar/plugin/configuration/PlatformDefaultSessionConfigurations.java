@@ -13,15 +13,16 @@ import org.testar.engine.action.selection.ActionSelectorPlan;
 import org.testar.engine.action.selection.random.RandomActionSelector;
 import org.testar.engine.action.resolver.ActionResolverPlan;
 import org.testar.engine.action.resolver.DescriptionActionResolver;
+import org.testar.engine.state.StateCompositionPlan;
 import org.testar.plugin.PlatformSessionSpec;
 import org.testar.webdriver.action.execution.WebdriverActionExecutionPlan;
 import org.testar.webdriver.action.derivation.WebdriverActionDerivationPlan;
 import org.testar.webdriver.state.WebdriverStateCompositionPlan;
 import org.testar.webdriver.system.WebdriverSystemCompositionPlan;
 import org.testar.windows.action.execution.WindowsActionExecutionPlan;
+import org.testar.windows.state.WindowsStateCompositionPlan;
 import org.testar.windows.action.derivation.WindowsActionDerivationPlan;
 import org.testar.windows.system.WindowsSystemCompositionPlan;
-import org.testar.windows.tag.WindowsStateCompositionPlan;
 
 /**
  * Factory helpers for platform default session configurations.
@@ -124,5 +125,21 @@ public final class PlatformDefaultSessionConfigurations {
                 .overrideActionResolverPlan(ActionResolverPlan.basic(new DescriptionActionResolver()))
                 .overrideActionExecutionPlan(WebdriverActionExecutionPlan.basic())
                 .build();
+    }
+
+    public static StateCompositionPlan windowsSemanticStateCompositionPlan(PlatformSessionSpec sessionSpec) {
+        Settings settings = sessionSpec.getSettings();
+        return WindowsStateCompositionPlan.uiAutomationSemanticWidgets(
+                settings.get(ConfigTags.TimeToFreeze, 30.0),
+                settings.get(ConfigTags.AccessBridgeEnabled, false),
+                settings.get(ConfigTags.SUTProcesses, "")
+        );
+    }
+
+    public static StateCompositionPlan webdriverSemanticStateCompositionPlan(PlatformSessionSpec sessionSpec) {
+        Settings settings = sessionSpec.getSettings();
+        return WebdriverStateCompositionPlan.browserSemanticWidgets(
+                settings.get(ConfigTags.TimeToFreeze, 30.0)
+        );
     }
 }

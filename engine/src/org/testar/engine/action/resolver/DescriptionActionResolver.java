@@ -75,6 +75,16 @@ public final class DescriptionActionResolver implements ActionResolver {
                                                         String semanticText,
                                                         boolean typeAction) {
         String normalizedSemanticText = normalizeText(semanticText);
+        // Equals semantic
+        for (int index = 0; index < orderedActions.size(); index++) {
+            Action action = orderedActions.get(index);
+            if (typeAction ? isTypeAction(action) : isClickAction(action)) {
+                if (normalizeText(action.get(Tags.Desc, action.toString())).equals(normalizedSemanticText)) {
+                    return Optional.of(new ResolvedAction(action));
+                }
+            }
+        }
+        // Contains semantic
         for (int index = 0; index < orderedActions.size(); index++) {
             Action action = orderedActions.get(index);
             if (typeAction ? isTypeAction(action) : isClickAction(action)) {
@@ -108,9 +118,8 @@ public final class DescriptionActionResolver implements ActionResolver {
     }
 
     private boolean isWebdriverTypeAction(Action action) {
-        String className = action.getClass().getName();
-        return "org.testar.webdriver.action.WdRemoteTypeAction".equals(className)
-                || "org.testar.webdriver.action.WdRemoteScrollTypeAction".equals(className);
+        String className = action.getClass().getName().toLowerCase(Locale.ROOT);
+        return className.contains("remote") && className.contains("type");
     }
 
     private void applyWebdriverInputText(Action action, String inputText) {
