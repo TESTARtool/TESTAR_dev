@@ -249,39 +249,39 @@ public class WdElement extends TaggableBase implements Serializable {
     // Visible/accessible semantic labels
     String semanticDescription = "";
     
-    if (hasText(ariaLabel)) {
+    if (hasText(normalizeDescription(ariaLabel))) {
       semanticDescription = normalizeDescription(ariaLabel);
     }
-    else if (hasText(ariaLabelledBy)) {
+    else if (hasText(normalizeDescription(ariaLabelledBy))) {
       semanticDescription = normalizeDescription(ariaLabelledBy);
     }
-    else if (hasText(placeholder)) {
+    else if (hasText(normalizeDescription(placeholder))) {
       semanticDescription = normalizeDescription(placeholder);
     }
-    else if (hasText(innerText)) {
+    else if (hasText(normalizeDescription(innerText))) {
       semanticDescription = normalizeAndTruncateDescription(innerText, TEXT_DESC_MAX_LENGTH);
     }
-    else if (hasText(textContent)) {
+    else if (hasText(normalizeDescription(textContent))) {
       semanticDescription = normalizeAndTruncateDescription(textContent, TEXT_DESC_MAX_LENGTH);
     }
-    else if (hasText(title)) {
+    else if (hasText(normalizeDescription(title))) {
       semanticDescription = normalizeDescription(title);
     }
-    else if (hasText(alt)) {
+    else if (hasText(normalizeDescription(alt))) {
       semanticDescription = normalizeDescription(alt);
     }
-    else if (hasText(value)) {
+    else if (hasText(normalizeDescription(value))) {
       semanticDescription = normalizeDescription(value);
     }
-    else if (hasText(name)) {
+    else if (hasText(normalizeDescription(name))) {
       semanticDescription = normalizeDescription(name);
     }
 
     // Use technical properties if semantic descriptions are empty
-    if (semanticDescription.isEmpty() && hasText(id)) {
+    if (semanticDescription.isEmpty() && hasText(normalizeDescription(id))) {
       semanticDescription = normalizeDescription(id);
     }
-    else if (semanticDescription.isEmpty() && hasText(href)) {
+    else if (semanticDescription.isEmpty() && hasText(normalizeDescription(href))) {
       semanticDescription = normalizeDescription(href);
     }
 
