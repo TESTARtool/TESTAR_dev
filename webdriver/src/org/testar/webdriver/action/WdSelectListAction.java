@@ -6,6 +6,7 @@
 
 package org.testar.webdriver.action;
 
+import org.openqa.selenium.WebElement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.core.action.Action;
@@ -16,6 +17,7 @@ import org.testar.core.tag.TaggableBase;
 import org.testar.core.tag.Tags;
 import org.testar.core.state.Widget;
 import org.testar.webdriver.state.WdDriver;
+import org.testar.webdriver.tag.WdTags;
 
 public class WdSelectListAction extends TaggableBase implements Action {
     private static final long serialVersionUID = -5522966388178892530L;
@@ -41,17 +43,36 @@ public class WdSelectListAction extends TaggableBase implements Action {
 
     @Override
     public void run(SUT system, State state, double duration) {
+        Widget originWidget = get(Tags.OriginWidget, null);
+        WebElement fallbackElement = originWidget == null ? null : originWidget.get(WdTags.WebElementSelenium, null);
+
         switch(targetMethod) {
             case ID:
-                WdDriver.executeScript(String.format("const field = document.getElementById('%s');" +
-                        " field.value = '%s'; const event = new Event('change', { bubbles: true }); " +
-                        "field.dispatchEvent(event);", target, value));
+                WdDriver.executeScript(
+                        "const field = document.getElementById(arguments[0]);"
+                                + " const targetField = field || arguments[1];"
+                                + " if (!targetField) { throw new Error('Unable to locate select field by id or fallback element'); }"
+                                + " targetField.value = arguments[2];"
+                                + " const event = new Event('change', { bubbles: true });"
+                                + " targetField.dispatchEvent(event);",
+                        target,
+                        fallbackElement,
+                        value
+                );
                 break;
             case NAME:
                 // Problematic if multiple widgets match the same name, should only be used as last resort.
-                WdDriver.executeScript(String.format("const field = document.getElementsByName('%s')[0];" +
-                        " field.value = '%s'; const event = new Event('change', { bubbles: true }); " +
-                        "field.dispatchEvent(event);", target, value));
+                WdDriver.executeScript(
+                        "const field = document.getElementsByName(arguments[0])[0];"
+                                + " const targetField = field || arguments[1];"
+                                + " if (!targetField) { throw new Error('Unable to locate select field by name or fallback element'); }"
+                                + " targetField.value = arguments[2];"
+                                + " const event = new Event('change', { bubbles: true });"
+                                + " targetField.dispatchEvent(event);",
+                        target,
+                        fallbackElement,
+                        value
+                );
                 break;
             default:
                 logger.warn("WdSelectListAction targetMethod is null!");

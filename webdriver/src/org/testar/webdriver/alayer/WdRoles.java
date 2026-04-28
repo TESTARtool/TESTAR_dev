@@ -160,7 +160,7 @@ public class WdRoles {
    */
   public static Role[] nativeClickableRoles() {
     return new Role[]{
-        WdA, WdBUTTON, WdINPUT, WdLINK, WdMENU, WdOPTION, WdSELECT, WdDATALIST
+        WdA, WdBUTTON, WdINPUT, WdLINK, WdMENU, WdOPTION, WdDATALIST
     };
   }
 
@@ -201,5 +201,16 @@ public class WdRoles {
   public static List<String> typeableInputTypes() {
     return Arrays.asList("text", "password", "email",
         "date", "datetime-local", "month", "number", "search", "url", "tel");
+  }
+
+  /*
+   * These are the native selectable HTML elements
+   */
+  public static Role[] nativeSelectableRoles() {
+    return new Role[]{WdSELECT};
+  }
+
+  public static List<String> selectableTagNames() {
+    return Arrays.asList("select");
   }
 }

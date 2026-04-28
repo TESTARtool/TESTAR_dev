@@ -43,7 +43,7 @@ public final class DescriptionActionResolver implements ActionResolver {
 
         switch (mode) {
             case "click":
-                return findSemanticAction(orderedActions, semanticText, false)
+                return findSemanticAction(orderedActions, semanticText, false, false)
                         .orElseThrow(() -> new IllegalArgumentException(
                                 "no click action matched semantic text: " + semanticText
                         ));
@@ -52,11 +52,21 @@ public final class DescriptionActionResolver implements ActionResolver {
                 if (inputText == null || inputText.isBlank()) {
                     throw new IllegalArgumentException("executeAction type requires input text");
                 }
-                ResolvedAction matchedAction = findSemanticAction(orderedActions, semanticText, true)
+                ResolvedAction matchedAction = findSemanticAction(orderedActions, semanticText, true, false)
                         .orElseThrow(() -> new IllegalArgumentException(
                                 "no type action matched semantic text: " + semanticText
                         ));
                 return new ResolvedAction(buildTypedAction(matchedAction.action(), inputText));
+            case "select":
+                String selectedValue = joinArguments(arguments, 2);
+                if (selectedValue == null || selectedValue.isBlank()) {
+                    throw new IllegalArgumentException("executeAction select requires a value");
+                }
+                ResolvedAction matchedSelectAction = findSemanticAction(orderedActions, semanticText, false, true)
+                        .orElseThrow(() -> new IllegalArgumentException(
+                                "no select action matched semantic text: " + semanticText
+                        ));
+                return new ResolvedAction(buildSelectAction(matchedSelectAction.action(), selectedValue));
             default:
                 throw new IllegalArgumentException("Unsupported executeAction mode: " + selector);
         }
@@ -73,12 +83,13 @@ public final class DescriptionActionResolver implements ActionResolver {
 
     private Optional<ResolvedAction> findSemanticAction(List<Action> orderedActions,
                                                         String semanticText,
-                                                        boolean typeAction) {
+                                                        boolean typeAction,
+                                                        boolean selectAction) {
         String normalizedSemanticText = normalizeText(semanticText);
         // Equals semantic
         for (int index = 0; index < orderedActions.size(); index++) {
             Action action = orderedActions.get(index);
-            if (typeAction ? isTypeAction(action) : isClickAction(action)) {
+            if (matchesAction(action, typeAction, selectAction)) {
                 if (normalizeText(action.get(Tags.Desc, action.toString())).equals(normalizedSemanticText)) {
                     return Optional.of(new ResolvedAction(action));
                 }
@@ -87,7 +98,7 @@ public final class DescriptionActionResolver implements ActionResolver {
         // Contains semantic
         for (int index = 0; index < orderedActions.size(); index++) {
             Action action = orderedActions.get(index);
-            if (typeAction ? isTypeAction(action) : isClickAction(action)) {
+            if (matchesAction(action, typeAction, selectAction)) {
                 if (normalizeText(action.get(Tags.Desc, action.toString())).contains(normalizedSemanticText)) {
                     return Optional.of(new ResolvedAction(action));
                 }
@@ -117,6 +128,43 @@ public final class DescriptionActionResolver implements ActionResolver {
         );
     }
 
+    private Action buildSelectAction(Action templateAction, String selectedValue) {
+        Widget originWidget = templateAction.get(Tags.OriginWidget, null);
+        if (originWidget == null) {
+            throw new IllegalArgumentException("Matched select action does not have an origin widget");
+        }
+
+        try {
+            Class<?> supportClass = Class.forName("org.testar.webdriver.action.WebdriverSelectListSupport");
+            Object selectAction = supportClass
+                    .getMethod("createActionForInput", Widget.class, String.class)
+                    .invoke(null, originWidget, selectedValue);
+            if (selectAction instanceof Action) {
+                Action rebuiltAction = (Action) selectAction;
+                copyIdentityTags(templateAction, rebuiltAction);
+                return rebuiltAction;
+            }
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalArgumentException(
+                    "Matched select action cannot be rebuilt without WebDriver select support",
+                    exception
+            );
+        }
+        throw new IllegalArgumentException("Matched select action cannot be rebuilt due to missing target");
+    }
+
+    private void copyIdentityTags(Action sourceAction, Action targetAction) {
+        String abstractId = sourceAction.get(Tags.AbstractID, "");
+        if (!abstractId.isBlank()) {
+            targetAction.set(Tags.AbstractID, abstractId);
+        }
+
+        String concreteId = sourceAction.get(Tags.ConcreteID, "");
+        if (!concreteId.isBlank()) {
+            targetAction.set(Tags.ConcreteID, concreteId);
+        }
+    }
+
     private boolean isWebdriverTypeAction(Action action) {
         String className = action.getClass().getName().toLowerCase(Locale.ROOT);
         return className.contains("remote") && className.contains("type");
@@ -143,6 +191,19 @@ public final class DescriptionActionResolver implements ActionResolver {
         Role role = action.get(Tags.Role, null);
         String roleName = role == null ? "" : role.toString().toLowerCase(Locale.ROOT);
         return roleName.contains("type");
+    }
+
+    private boolean isSelectAction(Action action) {
+        Role role = action.get(Tags.Role, null);
+        String roleName = role == null ? "" : role.toString().toLowerCase(Locale.ROOT);
+        return roleName.contains("select");
+    }
+
+    private boolean matchesAction(Action action, boolean typeAction, boolean selectAction) {
+        if (selectAction) {
+            return isSelectAction(action);
+        }
+        return typeAction ? isTypeAction(action) : isClickAction(action);
     }
 
     private String normalizeText(String text) {

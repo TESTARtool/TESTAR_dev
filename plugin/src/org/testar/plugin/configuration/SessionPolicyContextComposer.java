@@ -18,6 +18,7 @@ import org.testar.core.policy.ClickablePolicy;
 import org.testar.core.policy.EnabledPolicy;
 import org.testar.core.policy.Policy;
 import org.testar.core.policy.ScrollablePolicy;
+import org.testar.core.policy.SelectablePolicy;
 import org.testar.core.policy.TopLevelPolicy;
 import org.testar.core.policy.TypeablePolicy;
 import org.testar.core.policy.VisiblePolicy;
@@ -27,6 +28,7 @@ import org.testar.engine.policy.composite.CompositeAtCanvasPolicy;
 import org.testar.engine.policy.composite.CompositeBlockedPolicy;
 import org.testar.engine.policy.composite.CompositeClickablePolicy;
 import org.testar.engine.policy.composite.CompositeEnabledPolicy;
+import org.testar.engine.policy.composite.CompositeSelectablePolicy;
 import org.testar.engine.policy.composite.CompositeScrollablePolicy;
 import org.testar.engine.policy.composite.CompositeTopLevelPolicy;
 import org.testar.engine.policy.composite.CompositeTypeablePolicy;
@@ -101,6 +103,9 @@ public final class SessionPolicyContextComposer {
         }
         if (policyType == ScrollablePolicy.class) {
             return new CompositeScrollablePolicy((List<ScrollablePolicy>) policies);
+        }
+        if (policyType == SelectablePolicy.class) {
+            return new CompositeSelectablePolicy((List<SelectablePolicy>) policies);
         }
         if (policyType == EnabledPolicy.class) {
             return new CompositeEnabledPolicy((List<EnabledPolicy>) policies);

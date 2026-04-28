@@ -23,7 +23,7 @@ import org.testar.core.action.NOP;
 import org.testar.core.action.PasteText;
 import org.testar.core.action.Type;
 import org.testar.webdriver.action.WdRemoteTypeAction;
-import org.testar.webdriver.action.WdSelectListAction;
+import org.testar.webdriver.action.WebdriverSelectListSupport;
 import org.testar.core.visualizers.TextVisualizer;
 import org.testar.webdriver.tag.WdTags;
 
@@ -71,19 +71,13 @@ public class LlmParseActionResponse {
                 if(Objects.equals(input, "")) {
                     return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.SL_MISSING_INPUT);
                 }
-
-                String target = widget.get(WdTags.WebId, "");
-                WdSelectListAction.JsTargetMethod method;
-                if (target.isEmpty()) {
-                    logger.warn("elementId is empty for select widget! Using name target method.");
-                    target = widget.get(WdTags.WebName, "");
-                    method = WdSelectListAction.JsTargetMethod.NAME;
-                } else {
-                    method = WdSelectListAction.JsTargetMethod.ID;
+                Action selectAction = WebdriverSelectListSupport.createActionForInput(widget, input);
+                if (selectAction == null) {
+                    logger.warn("Unable to create WdSelectListAction for select widget due to missing target.");
+                    return new LlmParseActionResult(null, LlmParseActionResult.ParseResult.INVALID_ACTION);
                 }
-
-                return new LlmParseActionResult(new WdSelectListAction(target, input, widget, method), 
-                        LlmParseActionResult.ParseResult.SUCCESS);
+                copyIdentityTags(selectedAction, selectAction);
+                return new LlmParseActionResult(selectAction, LlmParseActionResult.ParseResult.SUCCESS);
             }
 
             setCompoundActionInputText(selectedAction, input);
@@ -172,6 +166,18 @@ public class LlmParseActionResponse {
         }
 
         return true;
+    }
+
+    private void copyIdentityTags(Action sourceAction, Action targetAction) {
+        String abstractId = sourceAction.get(Tags.AbstractID, "");
+        if (!abstractId.isBlank()) {
+            targetAction.set(Tags.AbstractID, abstractId);
+        }
+
+        String concreteId = sourceAction.get(Tags.ConcreteID, "");
+        if (!concreteId.isBlank()) {
+            targetAction.set(Tags.ConcreteID, concreteId);
+        }
     }
 
 }

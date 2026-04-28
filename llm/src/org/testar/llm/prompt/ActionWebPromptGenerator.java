@@ -12,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.llm.action.ActionHistory;
 import org.testar.webdriver.tag.WdTags;
+import org.testar.webdriver.action.WebdriverSelectListSupport;
 import org.testar.core.action.Action;
 import org.testar.core.state.State;
 import org.testar.core.tag.Tag;
@@ -19,12 +20,9 @@ import org.testar.core.tag.Tags;
 import org.testar.core.state.Widget;
 import org.testar.core.exceptions.NoSuchTagException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Standard prompt generator for OpenAI and Gemini.
@@ -191,15 +189,9 @@ public class ActionWebPromptGenerator implements IPromptActionGenerator {
      * @return List of options.
      */
     private List<String> getComboBoxChoices(Widget combobox, State state) {
-        String innerHtml = combobox.get(WdTags.WebInnerHTML, "");
-
-        // Assumes there is a set of <choice> objects
-        Pattern choicePattern = Pattern.compile("<option[^>]*>(.*?)</option>");
-        Matcher matcher = choicePattern.matcher(innerHtml);
-        List<String> choices = new ArrayList<>();
-        while (matcher.find()) {
-            choices.add(matcher.group(1));
-        }
-        return choices;
+        return WebdriverSelectListSupport.extractOptions(combobox)
+                .stream()
+                .map(WebdriverSelectListSupport.SelectOption::label)
+                .toList();
     }
 }

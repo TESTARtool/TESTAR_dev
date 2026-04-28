@@ -15,6 +15,7 @@ import org.testar.core.policy.BlockedPolicy;
 import org.testar.core.policy.ClickablePolicy;
 import org.testar.core.policy.EnabledPolicy;
 import org.testar.core.policy.ScrollablePolicy;
+import org.testar.core.policy.SelectablePolicy;
 import org.testar.core.policy.TopLevelPolicy;
 import org.testar.core.policy.TypeablePolicy;
 import org.testar.core.policy.VisiblePolicy;
@@ -26,6 +27,7 @@ import org.testar.engine.policy.composite.CompositeAtCanvasPolicy;
 import org.testar.engine.policy.composite.CompositeBlockedPolicy;
 import org.testar.engine.policy.composite.CompositeClickablePolicy;
 import org.testar.engine.policy.composite.CompositeEnabledPolicy;
+import org.testar.engine.policy.composite.CompositeSelectablePolicy;
 import org.testar.engine.policy.composite.CompositeScrollablePolicy;
 import org.testar.engine.policy.composite.CompositeTopLevelPolicy;
 import org.testar.engine.policy.composite.CompositeTypeablePolicy;
@@ -34,6 +36,7 @@ import org.testar.engine.policy.composite.CompositeWidgetFilterPolicy;
 import org.testar.webdriver.policy.ConfigurableWebdriverClickableClassPolicy;
 import org.testar.webdriver.policy.ConfigurableWebdriverTypeableClassPolicy;
 import org.testar.webdriver.policy.WebdriverClickablePolicy;
+import org.testar.webdriver.policy.WebdriverSelectablePolicy;
 import org.testar.webdriver.policy.WebdriverScrollablePolicy;
 import org.testar.webdriver.policy.WebdriverTypeablePolicy;
 
@@ -59,6 +62,7 @@ public final class PlatformPolicyContexts {
                 new CompositeClickablePolicy(List.of(clickablePolicy)),
                 new CompositeTypeablePolicy(List.of(typeablePolicy)),
                 new CompositeScrollablePolicy(List.of(scrollablePolicy)),
+                new CompositeSelectablePolicy(Collections.<SelectablePolicy>emptyList()),
                 new CompositeEnabledPolicy(enabledPolicies),
                 new CompositeBlockedPolicy(blockedPolicies),
                 new CompositeWidgetFilterPolicy(widgetFilterPolicies),
@@ -87,6 +91,7 @@ public final class PlatformPolicyContexts {
                         new ConfigurableWebdriverTypeableClassPolicy(customTypeableClasses)
                 )),
                 new CompositeScrollablePolicy(List.of(new WebdriverScrollablePolicy())),
+                new CompositeSelectablePolicy(List.of(new WebdriverSelectablePolicy())),
                 new CompositeEnabledPolicy(enabledPolicies),
                 new CompositeBlockedPolicy(blockedPolicies),
                 new CompositeWidgetFilterPolicy(widgetFilterPolicies),

@@ -98,7 +98,7 @@ AbstractStateAttributes = WidgetControlType,WidgetTitle,WidgetPath
 #################################################################
 
 ClickableClasses = 
-TypeableClasses = 
+TypeableClasses = input
 DeniedExtensions = pdf;jpg;png;pfx;xml
 WebDomainsAllowed = null
 WebPathsAllowed = null

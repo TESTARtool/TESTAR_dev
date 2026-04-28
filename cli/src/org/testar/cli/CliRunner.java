@@ -51,6 +51,7 @@ final class CliRunner {
         output.println("  getDerivedActions");
         output.println("  executeAction click <semanticText>");
         output.println("  executeAction type <semanticText> <inputText>");
+        output.println("  executeAction select <semanticText> <value>");
         output.println("  stopSession");
     }
 
