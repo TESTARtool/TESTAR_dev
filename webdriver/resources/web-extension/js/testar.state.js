@@ -376,7 +376,7 @@ function getIsBlockedTestar(element, xOffset, yOffset, clientRect) {
     // get element at element's (click) position
     var x = clientRect.left + clientRect.width / 2 + xOffset;
     var y = clientRect.top + clientRect.height / 2 + yOffset;
-    var elem = document.elementFromPoint(x, y);
+    var elem = getDeepestElementFromPointTestar(document, x, y);
 
     // element is inside iframe(s)
     var outer = undefined;
@@ -393,7 +393,7 @@ function getIsBlockedTestar(element, xOffset, yOffset, clientRect) {
 
         // Elements from a cross-origin frame are not reachable
         try {
-            elem = elem.contentWindow.document.elementFromPoint(x, y);
+            elem = getDeepestElementFromPointTestar(elem.contentWindow.document, x, y);
         }
         catch(exception) {
             return true
@@ -405,9 +405,9 @@ function getIsBlockedTestar(element, xOffset, yOffset, clientRect) {
         return false;
     }
 
-    // If hit-testing returns the element itself or one of its descendants,
-    // then it is not blocked (e.g. <button><span>Text</span></button>).
-    if (elem === element || element.contains(elem)) {
+    // If hit-testing returns the element itself or something within the same
+    // composed control tree, then it is not blocked.
+    if (elem === element || isComposedDescendantTestar(elem, element)) {
         return false;
     }
 
@@ -418,6 +418,62 @@ function getIsBlockedTestar(element, xOffset, yOffset, clientRect) {
 
     // Otherwise, treat as blocked by another element.
     return true;
+}
+
+function getDeepestElementFromPointTestar(rootNode, x, y) {
+    if (rootNode === null || rootNode.elementFromPoint === undefined) {
+        return null;
+    }
+
+    var element = rootNode.elementFromPoint(x, y);
+    while (element !== null
+            && element.shadowRoot !== undefined
+            && element.shadowRoot !== null
+            && element.shadowRoot.elementFromPoint !== undefined) {
+        var shadowElement = element.shadowRoot.elementFromPoint(x, y);
+        if (shadowElement === null || shadowElement === element) {
+            break;
+        }
+        element = shadowElement;
+    }
+
+    return element;
+}
+
+function isComposedDescendantTestar(element, ancestor) {
+    if (element === null || ancestor === null) {
+        return false;
+    }
+
+    var currentElement = element;
+    while (currentElement !== null) {
+        if (currentElement === ancestor) {
+            return true;
+        }
+        currentElement = getComposedParentTestar(currentElement);
+    }
+    return false;
+}
+
+function getComposedParentTestar(element) {
+    if (element === null) {
+        return null;
+    }
+    if (element.assignedSlot !== undefined && element.assignedSlot !== null) {
+        return element.assignedSlot;
+    }
+    if (element.parentNode !== undefined && element.parentNode !== null) {
+        return element.parentNode;
+    }
+    if (element.getRootNode === undefined) {
+        return null;
+    }
+
+    var rootNode = element.getRootNode();
+    if (rootNode === null || rootNode.host === undefined || rootNode.host === null) {
+        return null;
+    }
+    return rootNode.host;
 }
 
 /*

@@ -29,6 +29,10 @@ public final class WebdriverTypeablePolicy implements TypeablePolicy {
             return false;
         }
 
+        if (hasTypeableType(widget)) {
+            return true;
+        }
+
         Role role = widget.get(Tags.Role, null);
         if (role == null || !NATIVE_TYPEABLE_ROLES.contains(role)) {
             return false;
@@ -39,6 +43,14 @@ public final class WebdriverTypeablePolicy implements TypeablePolicy {
         }
 
         String inputType = widget.get(WdTags.WebType, "");
+        return WdRoles.typeableInputTypes().contains(inputType.toLowerCase(Locale.ROOT));
+    }
+
+    private boolean hasTypeableType(Widget widget) {
+        String inputType = widget.get(WdTags.WebType, "");
+        if (inputType == null || inputType.isBlank()) {
+            return false;
+        }
         return WdRoles.typeableInputTypes().contains(inputType.toLowerCase(Locale.ROOT));
     }
 }

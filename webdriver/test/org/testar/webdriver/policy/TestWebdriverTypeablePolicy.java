@@ -48,6 +48,15 @@ public class TestWebdriverTypeablePolicy {
         Assert.assertTrue(policy.isTypeable(widget));
     }
 
+    @Test
+    public void testCustomRoleWithTypeableTypeIsTypeable() {
+        WebdriverTypeablePolicy policy = new WebdriverTypeablePolicy();
+        WidgetStub widget = createRoleWidget(WdRoles.WdDIV);
+        widget.set(WdTags.WebType, "text");
+
+        Assert.assertTrue(policy.isTypeable(widget));
+    }
+
     private WidgetStub createInputRoleWidget(String inputType) {
         WidgetStub widget = new WidgetStub();
         widget.set(Tags.Role, WdRoles.WdINPUT);

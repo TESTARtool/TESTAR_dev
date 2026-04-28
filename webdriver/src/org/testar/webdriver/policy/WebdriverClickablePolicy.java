@@ -40,6 +40,10 @@ public final class WebdriverClickablePolicy implements ClickablePolicy {
             return true;
         }
 
+        if (hasClickableType(widget)) {
+            return true;
+        }
+
         Role nativeRole = widget.get(Tags.Role, null);
         if (nativeRole == null || !NATIVE_CLICKABLE_ROLES.contains(nativeRole)) {
             return false;
@@ -48,6 +52,14 @@ public final class WebdriverClickablePolicy implements ClickablePolicy {
         String inputType = widget.get(WdTags.WebType, "");
         if (!WdRoles.WdINPUT.equals(nativeRole)) {
             return true;
+        }
+        return WdRoles.clickableInputTypes().contains(inputType.toLowerCase(Locale.ROOT));
+    }
+
+    private boolean hasClickableType(Widget widget) {
+        String inputType = widget.get(WdTags.WebType, "");
+        if (inputType == null || inputType.isBlank()) {
+            return false;
         }
         return WdRoles.clickableInputTypes().contains(inputType.toLowerCase(Locale.ROOT));
     }

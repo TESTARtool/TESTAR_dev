@@ -83,6 +83,15 @@ public class TestWebdriverClickablePolicy {
         Assert.assertTrue(policy.isClickable(widget));
     }
 
+    @Test
+    public void testCustomRoleWithClickableTypeIsClickable() {
+        WebdriverClickablePolicy policy = new WebdriverClickablePolicy();
+        WidgetStub widget = createRoleWidget(WdRoles.WdDIV);
+        widget.set(WdTags.WebType, "radio");
+
+        Assert.assertTrue(policy.isClickable(widget));
+    }
+
     private WidgetStub createInputRoleWidget(String inputType) {
         WidgetStub widget = new WidgetStub();
         widget.set(Tags.Role, WdRoles.WdINPUT);
