@@ -287,6 +287,7 @@ public class WdTags extends TagsBase {
    */
   public static final Tag<Boolean> WebIsFullOnScreen = from("WebIsFullOnScreen", Boolean.class);
   public static final Tag<Boolean> WebIsOffScreen = from("WebIsOffScreen", Boolean.class);
+  public static final Tag<Boolean> WebIsActuallyVisible = from("WebIsActuallyVisible", Boolean.class);
 
   /**
    * Whether this widget can be focused, such that it will receive keyboard input.

@@ -60,7 +60,7 @@ public class WdElement extends TaggableBase implements Serializable {
   public Rect rect;
   public boolean scrollPattern, hScroll, vScroll;
   public double hScrollViewSize, vScrollViewSize, hScrollPercent, vScrollPercent;
-  public boolean isFullVisibleOnScreen;
+  public boolean isFullVisibleOnScreen, isActuallyVisible;
 
   public boolean checked, selected;
 
@@ -190,6 +190,7 @@ public class WdElement extends TaggableBase implements Serializable {
     fillDimensions(packedElement);
     
     isFullVisibleOnScreen = isFullVisibleAtCanvasBrowser();
+    isActuallyVisible = (Boolean) packedElement.getOrDefault("isActuallyVisible", true);
 
     blocked = (Boolean) packedElement.get("isBlocked");
     isClickable = (Boolean) packedElement.get("isClickable");

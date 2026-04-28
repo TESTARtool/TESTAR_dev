@@ -187,6 +187,7 @@ function wrapElementTestar(element, xOffset, yOffset, ignoredAttributes) {
         value: element.value,
         checked: element.checked,
         selected: element.selected,
+        isActuallyVisible: isActuallyVisible(element, computedStyle, clientRect),
         display: computedStyle.display,
         visibility: computedStyle.visibility,
         styleOverflow: computedStyle.overflow,
@@ -215,6 +216,29 @@ function wrapElementTestar(element, xOffset, yOffset, ignoredAttributes) {
         xOffset: xOffset,
         yOffset: yOffset
     };
+}
+
+function isActuallyVisible(el, style, rect) {
+  if (!el) return false;
+  if (!style) return false;
+  if (!rect) return false;
+
+  const cssVisible =
+    style.display !== 'none' &&
+    style.visibility !== 'hidden' &&
+    Number(style.opacity) > 0;
+
+  const hasSize = rect.width > 0 && rect.height > 0;
+
+  const inViewport =
+    rect.bottom > 0 &&
+    rect.right > 0 &&
+    rect.top < window.innerHeight &&
+    rect.left < window.innerWidth;
+
+  const dialogOpen = el.tagName.toLowerCase() !== 'dialog' || el.open === true;
+
+  return cssVisible && hasSize && inViewport && dialogOpen;
 }
 
 /*

@@ -224,6 +224,9 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(WdTags.WebIsOffScreen)) {
 			ret = !w.element.isFullVisibleOnScreen;
 		}
+		else if (t.equals(WdTags.WebIsActuallyVisible)) {
+			ret = w.element.isActuallyVisible;
+		}
 		else if (t.equals(WdTags.WebIsKeyboardFocusable)) {
 			ret = w.element.isKeyboardFocusable;
 		}

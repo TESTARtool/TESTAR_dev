@@ -143,7 +143,10 @@ final class WebdriverSemanticWidgetDescriptor implements SemanticWidgetDescripto
         if (widget.get(WdTags.WebIsHidden, false)) {
             return false;
         }
-        return widget.get(WdTags.WebIsDisplayed, true);
+        if (!widget.get(WdTags.WebIsDisplayed, true)) {
+            return false;
+        }
+        return widget.get(WdTags.WebIsActuallyVisible, true);
     }
 
     private String lower(String value) {
