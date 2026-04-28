@@ -80,6 +80,8 @@ final class CliDaemonServer {
                 return sessionStatus();
             case GET_STATE:
                 return getState();
+            case GET_STATE_SCREENSHOT:
+                return getStateScreenshot();
             case GET_DERIVED_ACTIONS:
                 return getDerivedActions();
             case EXECUTE_ACTION:
@@ -137,6 +139,19 @@ final class CliDaemonServer {
             return new CliResponse(0, lines);
         } catch (RuntimeException exception) {
             return new CliResponse(1, List.of("getState failed: " + exception.getMessage()));
+        }
+    }
+
+    private CliResponse getStateScreenshot() {
+        try {
+            State state = requireActiveSession().getState();
+            String screenshotPath = state.get(Tags.ScreenshotPath, "");
+            if (screenshotPath.isBlank()) {
+                return new CliResponse(1, List.of("getStateScreenshot failed: screenshot path unavailable"));
+            }
+            return new CliResponse(0, List.of("screenshotPath=" + screenshotPath));
+        } catch (RuntimeException exception) {
+            return new CliResponse(1, List.of("getStateScreenshot failed: " + exception.getMessage()));
         }
     }
 

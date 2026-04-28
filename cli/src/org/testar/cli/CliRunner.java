@@ -30,6 +30,7 @@ final class CliRunner {
             case START_SESSION:
             case SESSION_STATUS:
             case GET_STATE:
+            case GET_STATE_SCREENSHOT:
             case GET_DERIVED_ACTIONS:
             case EXECUTE_ACTION:
             case STOP_SESSION:
@@ -48,6 +49,7 @@ final class CliRunner {
         output.println("  startSession webdriver <url>");
         output.println("  sessionStatus");
         output.println("  getState");
+        output.println("  getStateScreenshot");
         output.println("  getDerivedActions");
         output.println("  executeAction click <semanticText>");
         output.println("  executeAction type <semanticText> <inputText>");

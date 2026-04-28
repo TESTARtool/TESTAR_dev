@@ -12,6 +12,7 @@ enum CliCommand {
     START_SESSION,
     SESSION_STATUS,
     GET_STATE,
+    GET_STATE_SCREENSHOT,
     GET_DERIVED_ACTIONS,
     EXECUTE_ACTION,
     STATE_MODEL_ANALYSIS,
@@ -32,6 +33,9 @@ enum CliCommand {
         }
         if ("getState".equalsIgnoreCase(token)) {
             return GET_STATE;
+        }
+        if ("getStateScreenshot".equalsIgnoreCase(token)) {
+            return GET_STATE_SCREENSHOT;
         }
         if ("getDerivedActions".equalsIgnoreCase(token)) {
             return GET_DERIVED_ACTIONS;
