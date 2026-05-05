@@ -59,7 +59,8 @@ public class GeneralPanel extends SettingsPanel implements Observer {
         Settings.SUT_CONNECTOR_CMDLINE,
         Settings.SUT_CONNECTOR_PROCESS_NAME,
         Settings.SUT_CONNECTOR_WINDOW_TITLE,
-        Settings.SUT_CONNECTOR_WEBDRIVER
+        Settings.SUT_CONNECTOR_WEBDRIVER,
+        Settings.SUT_CONNECTOR_ANDROID_APPIUM
     }));
     cboxSUTconnector.setSelectedIndex(0);
     cboxSUTconnector.setBounds(114, 12, 171, 25);

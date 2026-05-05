@@ -19,7 +19,7 @@ public final class ConfigTags {
             "Set the mode you want TESTAR to start in: Spy, Generate");
 
     public static final Tag<String> SUTConnector = Tag.from("SUTConnector", String.class, 
-            "Indicate how you want to connect to the SUT: COMMAND_LINE, SUT_WINDOW_TITLE, SUT_PROCESS_NAME");
+            "Indicate how you want to connect to the SUT: COMMAND_LINE, SUT_WINDOW_TITLE, SUT_PROCESS_NAME, WEB_DRIVER, ANDROID_APPIUM");
 
     public static final Tag<String> SUTConnectorValue = Tag.from("SUTConnectorValue", String.class, 
             "The connector value: executable path, windows title, process name");
@@ -193,6 +193,58 @@ public final class ConfigTags {
     // Note: Defined the tag as string on purpose so we can leave the default value empty in the pre defined settings.
     public static final Tag<String> OverrideWebDriverDisplayScale = Tag.from("OverrideWebDriverDisplayScale", String.class, 
             "Overrides the displayscale obtained from the system for web SUTs");
+
+    /**
+     * Android-Appium settings 
+     */
+
+    public static final Tag<String> AppiumPlatformName = Tag.from("AppiumPlatformName", String.class,
+            "The mobile platform name used by Appium");
+
+    public static final Tag<Boolean> AppiumIsApkInstalled = Tag.from("AppiumIsApkInstalled", Boolean.class,
+            "Sets whether the SUT-APK is already installed in the device");
+
+    public static final Tag<String> AppiumApp = Tag.from("AppiumApp", String.class,
+            "The SUT-APK local or remote file");
+
+    public static final Tag<String> AppiumAppPackage = Tag.from("AppiumAppPackage", String.class,
+            "The Android application package name when the APK is already installed in the device");
+
+    public static final Tag<String> AppiumAppActivity = Tag.from("AppiumAppActivity", String.class,
+            "The Android launcher activity when the APK is already installed in the device");
+
+    public static final Tag<Boolean> AppiumIsEmulatorDocker = Tag.from("AppiumIsEmulatorDocker", Boolean.class,
+            "Sets whether the Android emulator is running inside a Docker container");
+
+    public static final Tag<String> AppiumIpAddress = Tag.from("AppiumIpAddress", String.class,
+            "The IP address of the remote Appium server used by a Docker-based Android emulator");
+
+    public static final Tag<String> AppiumDeviceName = Tag.from("AppiumDeviceName", String.class,
+            "The Android device name reported to Appium");
+
+    public static final Tag<String> AppiumAutomationName = Tag.from("AppiumAutomationName", String.class,
+            "The Appium automation engine name");
+
+    public static final Tag<Integer> AppiumNewCommandTimeout = Tag.from("AppiumNewCommandTimeout", Integer.class,
+            "The Appium new command timeout in seconds");
+
+    public static final Tag<Boolean> AppiumAutoGrantPermissions = Tag.from("AppiumAutoGrantPermissions", Boolean.class,
+            "Sets whether Appium automatically grants runtime permissions to the Android application");
+
+    public static final Tag<Boolean> AppiumAllowInvisibleElements = Tag.from("AppiumAllowInvisibleElements", Boolean.class,
+            "Sets whether Appium should expose invisible Android elements");
+
+    public static final Tag<Boolean> AppiumIgnoreHiddenApiPolicyError = Tag.from("AppiumIgnoreHiddenApiPolicyError", Boolean.class,
+            "Sets whether Appium should ignore hidden API policy errors on Android");
+
+    public static final Tag<Integer> AppiumAdbExecTimeout = Tag.from("AppiumAdbExecTimeout", Integer.class,
+            "The ADB execution timeout in milliseconds");
+
+    public static final Tag<Integer> AppiumUiautomator2ServerInstallTimeout = Tag.from("AppiumUiautomator2ServerInstallTimeout", Integer.class,
+            "The UiAutomator2 server installation timeout in milliseconds");
+
+    public static final Tag<Integer> AppiumUiautomator2ServerLaunchTimeout = Tag.from("AppiumUiautomator2ServerLaunchTimeout", Integer.class,
+            "The UiAutomator2 server launch timeout in milliseconds");
 
     // 5 settings that can be used in user specified TESTAR protocols for anything:
     public static final Tag<String> ProtocolSpecificSetting_1 = Tag.from("ProtocolSpecificSetting_1", String.class, 

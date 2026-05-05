@@ -6,76 +6,63 @@
 
 package org.testar.android;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import org.testar.config.ConfigTags;
+import org.testar.config.settings.Settings;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Objects;
 
 /**
- * Factory responsible for creating Appium DesiredCapabilities 
- * and determining the Appium server URL from a JSON configuration. 
+ * Factory responsible for creating Appium DesiredCapabilities
+ * and determining the Appium server URL from TESTAR settings.
  */
 public class AndroidCapabilitiesFactory {
 
     private final String defaultAppiumUrl;
 
     /**
-     * @param defaultAppiumUrl the URL that will be used when the JSON does not override it. 
+     * @param defaultAppiumUrl the URL that will be used when the settings do not override it.
      */
     public AndroidCapabilitiesFactory(String defaultAppiumUrl) {
         this.defaultAppiumUrl = Objects.requireNonNull(defaultAppiumUrl);
     }
 
-    public Result fromJsonFile(String capabilitiesJsonFile) {
-        try (FileReader reader = new FileReader(capabilitiesJsonFile)) {
-            JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
-            return fromJsonObject(json);
-        } catch (IOException | IllegalStateException e) {
-            System.err.println("ERROR: Exception reading Appium Desired Capabilities from JSON file: " + capabilitiesJsonFile);
-            e.printStackTrace();
-
-            // Preserve previous behaviour: return empty capabilities and keep the default URL.
-            return new Result(new DesiredCapabilities(), defaultAppiumUrl);
-        }
-    }
-
-    Result fromJsonObject(JsonObject json) {
+    public Result fromSettings(Settings settings) {
+        Objects.requireNonNull(settings, "settings");
         DesiredCapabilities cap = new DesiredCapabilities();
 
         // https://appium.io/docs/en/2.0/guides/caps/
-        cap.setCapability("platformName", getString(json, "platformName", "Android"));
+        cap.setCapability("platformName", settings.get(ConfigTags.AppiumPlatformName));
 
-        cap.setCapability("appium:deviceName", getString(json, "deviceName", "Android Emulator"));
-        cap.setCapability("appium:automationName", getString(json, "automationName", "UiAutomator2"));
-        cap.setCapability("appium:newCommandTimeout", getInt(json, "newCommandTimeout", 600));
-        cap.setCapability("appium:autoGrantPermissions", getBool(json, "autoGrantPermissions", false));
+        cap.setCapability("appium:deviceName", settings.get(ConfigTags.AppiumDeviceName));
+        cap.setCapability("appium:automationName", settings.get(ConfigTags.AppiumAutomationName));
+        cap.setCapability("appium:newCommandTimeout", settings.get(ConfigTags.AppiumNewCommandTimeout));
+        cap.setCapability("appium:autoGrantPermissions", settings.get(ConfigTags.AppiumAutoGrantPermissions));
 
-        cap.setCapability("appium:settings[allowInvisibleElements]", getBool(json, "allowInvisibleElements", false));
+        cap.setCapability("appium:settings[allowInvisibleElements]", settings.get(ConfigTags.AppiumAllowInvisibleElements));
 
-        cap.setCapability("appium:ignoreHiddenApiPolicyError", getBool(json, "ignoreHiddenApiPolicyError", false));
+        cap.setCapability("appium:ignoreHiddenApiPolicyError", settings.get(ConfigTags.AppiumIgnoreHiddenApiPolicyError));
 
         // ADB / server timeouts
-        cap.setCapability("appium:adbExecTimeout", getInt(json, "adbExecTimeout", 120000));
-        cap.setCapability("appium:uiautomator2ServerInstallTimeout", getInt(json, "uiautomator2ServerInstallTimeout", 120000));
-        cap.setCapability("appium:uiautomator2ServerLaunchTimeout", getInt(json, "uiautomator2ServerLaunchTimeout", 120000));
+        cap.setCapability("appium:adbExecTimeout", settings.get(ConfigTags.AppiumAdbExecTimeout));
+        cap.setCapability("appium:uiautomator2ServerInstallTimeout", settings.get(ConfigTags.AppiumUiautomator2ServerInstallTimeout));
+        cap.setCapability("appium:uiautomator2ServerLaunchTimeout", settings.get(ConfigTags.AppiumUiautomator2ServerLaunchTimeout));
 
         String appiumUrl = defaultAppiumUrl;
 
         // If the APK is already installed we use appPackage identifier
-        if (getBool(json, "isApkInstalled", false)) {
-            String appPackage = getString(json, "appPackage", null);
-            String appActivity = getString(json, "appActivity", null);
+        if (settings.get(ConfigTags.AppiumIsApkInstalled)) {
+            String appPackage = settings.get(ConfigTags.AppiumAppPackage);
+            String appActivity = settings.get(ConfigTags.AppiumAppActivity);
 
-            if (appPackage == null || appPackage.isEmpty()) {
-                throw new IllegalArgumentException("When isApkInstalled=true, 'appPackage' is required.");
+            if (appPackage == null || appPackage.isBlank()) {
+                throw new IllegalArgumentException("When AppiumIsApkInstalled=true, 'AppiumAppPackage' is required.");
             }
-            if (appActivity == null || appActivity.isEmpty()) {
+            if (appActivity == null || appActivity.isBlank()) {
                 throw new IllegalArgumentException(String.join("\n",
-                        "When isApkInstalled=true, 'appActivity' is required (multiple launcher activities can exist).",
+                        "When AppiumIsApkInstalled=true, 'AppiumAppActivity' is required (multiple launcher activities can exist).",
                         "",
                         "How to find it on Windows:",
                         "1) Manually open the app on the emulator.",
@@ -89,17 +76,17 @@ public class AndroidCapabilitiesFactory {
             cap.setCapability("appium:appActivity", appActivity);
         } else {
             // Else we need to install the APK
-            String appPath = getString(json, "app", null);
-            if (appPath == null || appPath.isEmpty()) {
+            String appPath = settings.get(ConfigTags.AppiumApp);
+            if (appPath == null || appPath.isBlank()) {
                 throw new IllegalArgumentException(
-                        "When isApkInstalled=false, 'app' (APK path or URL) must be provided.");
+                        "When AppiumIsApkInstalled=false, 'AppiumApp' must be provided.");
             }
 
-            boolean isEmulatorDocker = getBool(json, "isEmulatorDocker", false);
-            String ipAddressAppium = getString(json, "ipAddressAppium", null);
+            boolean isEmulatorDocker = settings.get(ConfigTags.AppiumIsEmulatorDocker);
+            String ipAddressAppium = settings.get(ConfigTags.AppiumIpAddress);
 
             // If emulator is running inside a docker use the APK raw URL
-            if (isEmulatorDocker && ipAddressAppium != null && !ipAddressAppium.isEmpty()) {
+            if (isEmulatorDocker && ipAddressAppium != null && !ipAddressAppium.isBlank()) {
                 // Docker container (budtmo/docker-android) + Appium v2 do not use /wd/hub suffix anymore
                 // It can be enabled using the APPIUM_ADDITIONAL_ARGS "--base-path /wd/hub" command
                 cap.setCapability("appium:app", appPath);
@@ -117,18 +104,6 @@ public class AndroidCapabilitiesFactory {
         }
 
         return new Result(cap, appiumUrl);
-    }
-
-    private static String getString(JsonObject json, String key, String def) {
-        return json.has(key) && !json.get(key).isJsonNull() ? json.get(key).getAsString() : def;
-    }
-
-    private static boolean getBool(JsonObject json, String key, boolean def) {
-        return json.has(key) && !json.get(key).isJsonNull() ? json.get(key).getAsBoolean() : def;
-    }
-
-    private static int getInt(JsonObject json, String key, int def) {
-        return json.has(key) && !json.get(key).isJsonNull() ? json.get(key).getAsInt() : def;
     }
 
     /**

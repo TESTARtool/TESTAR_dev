@@ -22,8 +22,8 @@ Mode = Spy
 # SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.
 # The SUT must be manually started and closed.
 #################################################################
-SUTConnector = COMMAND_LINE
-SUTConnectorValue = ./settings/android_generic/DesiredCapabilities.json
+SUTConnector = ANDROID_APPIUM
+SUTConnectorValue =
 
 #################################################################
 # Sequences
@@ -112,6 +112,26 @@ ProtocolClass = android_generic/Protocol_android_generic
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
 AbstractStateAttributes = WidgetControlType
+
+#################################################################
+# Android-Appium settings
+#################################################################
+AppiumPlatformName = Android
+AppiumIsApkInstalled = false
+AppiumApp = suts/ApiDemos-debug.apk
+AppiumAppPackage =
+AppiumAppActivity =
+AppiumIsEmulatorDocker = false
+AppiumIpAddress =
+AppiumDeviceName = Android Emulator
+AppiumAutomationName = UiAutomator2
+AppiumNewCommandTimeout = 600
+AppiumAutoGrantPermissions = false
+AppiumAllowInvisibleElements = false
+AppiumIgnoreHiddenApiPolicyError = false
+AppiumAdbExecTimeout = 120000
+AppiumUiautomator2ServerInstallTimeout = 120000
+AppiumUiautomator2ServerLaunchTimeout = 120000
 
 #################################################################
 # Other more advanced settings

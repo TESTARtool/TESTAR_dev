@@ -7,6 +7,7 @@
 package org.testar.android;
 
 import com.google.common.collect.ImmutableMap;
+import org.testar.config.settings.Settings;
 import org.testar.core.serialisation.ScreenshotSerialiser;
 import org.testar.core.state.SUT;
 import org.testar.core.state.SUTBase;
@@ -103,14 +104,14 @@ public class AndroidAppiumFramework extends SUTBase {
 		}
 	}
 
-	public static AndroidAppiumFramework fromCapabilities(String capabilitesJsonFile) {
+	public static AndroidAppiumFramework fromSettings(Settings settings) {
 		if (androidSUT != null) {
 			androidSUT.stop();
 		}
 
 		AndroidCapabilitiesFactory factory = new AndroidCapabilitiesFactory(androidAppiumURL);
 
-		AndroidCapabilitiesFactory.Result result = factory.fromJsonFile(capabilitesJsonFile);
+		AndroidCapabilitiesFactory.Result result = factory.fromSettings(settings);
 
 		androidAppiumURL = result.getAppiumServerUrl();
 

@@ -1,9 +1,0 @@
-{
-  "deviceName": "Android Emulator",
-  "platformName": "Android",
-  "app": "suts/ApiDemos-debug.apk",
-  "automationName" : "UiAutomator2",
-  "newCommandTimeout": 600,
-  "autoGrantPermissions": false,
-  "allowInvisibleElements": false
-}

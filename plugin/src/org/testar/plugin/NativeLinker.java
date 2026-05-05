@@ -18,6 +18,7 @@ import org.testar.android.alayer.AndroidCanvas;
 import org.testar.android.alayer.AndroidRoles;
 import org.testar.android.state.AndroidStateBuilder;
 import org.testar.android.tag.AndroidTags;
+import org.testar.config.settings.Settings;
 import org.testar.core.alayer.Canvas;
 import org.testar.core.alayer.Pen;
 import org.testar.core.alayer.Role;
@@ -152,12 +153,12 @@ public class NativeLinker {
 	 * @param executableCommand The application/ process/ command that will be run.
 	 * @return A handle to the process in a SUT object.
 	 */
-	public static SUT getNativeSUT(String executableCommand, boolean ProcessListenerEnabled, String SUTProcesses) {
+	public static SUT getNativeSUT(String executableCommand, boolean ProcessListenerEnabled, String SUTProcesses, Settings settings) {
 		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
 			return WdDriver.fromExecutable(executableCommand);
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.ANDROID)) {
-			return AndroidAppiumFramework.fromCapabilities(executableCommand);
+			return AndroidAppiumFramework.fromSettings(settings);
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7)) {

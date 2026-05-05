@@ -39,6 +39,7 @@ public class Settings extends TaggableBase implements Serializable {
     public static final String SUT_CONNECTOR_PROCESS_NAME = "SUT_PROCESS_NAME";
     public static final String SUT_CONNECTOR_CMDLINE = "COMMAND_LINE";
     public static final String SUT_CONNECTOR_WEBDRIVER = "WEB_DRIVER";
+    public static final String SUT_CONNECTOR_ANDROID_APPIUM = "ANDROID_APPIUM";
 
     private static String settingsPath;
 

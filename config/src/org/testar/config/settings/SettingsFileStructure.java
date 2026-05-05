@@ -302,6 +302,44 @@ public class SettingsFileStructure {
                 , ConfigTags.OverrideWebDriverDisplayScale.name() + " = "
                 , ""
                 , "#################################################################"
+                , "# Android-Appium settings"
+                , "#"
+                , "# AppiumPlatformName: " + ConfigTags.AppiumPlatformName.getDescription()
+                , "# AppiumIsApkInstalled: " + ConfigTags.AppiumIsApkInstalled.getDescription()
+                , "# AppiumApp: " + ConfigTags.AppiumApp.getDescription()
+                , "# AppiumAppPackage: " + ConfigTags.AppiumAppPackage.getDescription()
+                , "# AppiumAppActivity: " + ConfigTags.AppiumAppActivity.getDescription()
+                , "# AppiumIsEmulatorDocker: " + ConfigTags.AppiumIsEmulatorDocker.getDescription()
+                , "# AppiumIpAddress: " + ConfigTags.AppiumIpAddress.getDescription()
+                , "# AppiumDeviceName: " + ConfigTags.AppiumDeviceName.getDescription()
+                , "# AppiumAutomationName: " + ConfigTags.AppiumAutomationName.getDescription()
+                , "# AppiumNewCommandTimeout: " + ConfigTags.AppiumNewCommandTimeout.getDescription()
+                , "# AppiumAutoGrantPermissions: " + ConfigTags.AppiumAutoGrantPermissions.getDescription()
+                , "# AppiumAllowInvisibleElements: " + ConfigTags.AppiumAllowInvisibleElements.getDescription()
+                , "# AppiumIgnoreHiddenApiPolicyError: " + ConfigTags.AppiumIgnoreHiddenApiPolicyError.getDescription()
+                , "# AppiumAdbExecTimeout: " + ConfigTags.AppiumAdbExecTimeout.getDescription()
+                , "# AppiumUiautomator2ServerInstallTimeout: " + ConfigTags.AppiumUiautomator2ServerInstallTimeout.getDescription()
+                , "# AppiumUiautomator2ServerLaunchTimeout: " + ConfigTags.AppiumUiautomator2ServerLaunchTimeout.getDescription()
+                , "#################################################################"
+                , ""
+                , ConfigTags.AppiumPlatformName.name() + " = "
+                , ConfigTags.AppiumIsApkInstalled.name() + " = "
+                , ConfigTags.AppiumApp.name() + " = "
+                , ConfigTags.AppiumAppPackage.name() + " = "
+                , ConfigTags.AppiumAppActivity.name() + " = "
+                , ConfigTags.AppiumIsEmulatorDocker.name() + " = "
+                , ConfigTags.AppiumIpAddress.name() + " = "
+                , ConfigTags.AppiumDeviceName.name() + " = "
+                , ConfigTags.AppiumAutomationName.name() + " = "
+                , ConfigTags.AppiumNewCommandTimeout.name() + " = "
+                , ConfigTags.AppiumAutoGrantPermissions.name() + " = "
+                , ConfigTags.AppiumAllowInvisibleElements.name() + " = "
+                , ConfigTags.AppiumIgnoreHiddenApiPolicyError.name() + " = "
+                , ConfigTags.AppiumAdbExecTimeout.name() + " = "
+                , ConfigTags.AppiumUiautomator2ServerInstallTimeout.name() + " = "
+                , ConfigTags.AppiumUiautomator2ServerLaunchTimeout.name() + " = "
+                , ""
+                , "#################################################################"
                 , "# Settings (string) that can be used for user specified protocols"
                 , "#################################################################"
                 , ""

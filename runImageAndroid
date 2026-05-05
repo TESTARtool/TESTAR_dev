@@ -4,5 +4,5 @@ echo "Start Xvfb"
 /opt/bin/start-xvfb.sh &
 sleep 2
 cd /testar/bin
-./testar sse=android_generic SUTConnectorValue="./settings/android_generic/DesiredCapabilitiesDockerEmulator.json" ShowVisualSettingsDialogOnStartup=false ShowSettingsAfterTest=false VisualizeSelectedAction=false UseSystemActions=false ApplicationName="Android_generic" ApplicationVersion=1 Sequences=2 SequenceLength=5 StateModelEnabled=false Mode=Generate > debug_android_generic.txt
+./testar sse=android_generic SUTConnector=ANDROID_APPIUM AppiumPlatformName=Android AppiumIsApkInstalled=false AppiumApp="https://github.com/appium/android-apidemos/releases/download/v3.1.0/ApiDemos-debug.apk" AppiumIsEmulatorDocker=true AppiumIpAddress=10.102.0.198 AppiumDeviceName="Samsung Galaxy S6" AppiumAutomationName=UiAutomator2 AppiumNewCommandTimeout=600 AppiumAutoGrantPermissions=true AppiumAllowInvisibleElements=false ShowVisualSettingsDialogOnStartup=false ShowSettingsAfterTest=false VisualizeSelectedAction=false UseSystemActions=false ApplicationName="Android_generic" ApplicationVersion=1 Sequences=2 SequenceLength=5 StateModelEnabled=false Mode=Generate > debug_android_generic.txt
 #sh -c "while true; do sleep 1; done"

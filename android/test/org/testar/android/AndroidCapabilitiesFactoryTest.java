@@ -2,29 +2,34 @@ package org.testar.android;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Properties;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.DesiredCapabilities;
-
-import com.google.gson.JsonObject;
+import org.testar.config.ConfigTags;
+import org.testar.config.settings.Settings;
+import org.testar.config.settings.SettingsDefaults;
 
 public class AndroidCapabilitiesFactoryTest {
 
     private static final String DEFAULT_URL = "http://127.0.0.1:4723/wd/hub";
 
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     @Test
     public void buildsCapabilitiesForInstalledApp() {
-        JsonObject json = new JsonObject();
-        json.addProperty("isApkInstalled", true);
-        json.addProperty("platformName", "Android");
-        json.addProperty("appPackage", "com.example.app");
-        json.addProperty("appActivity", "com.example.app.MainActivity");
+        Settings settings = defaultSettings();
+        settings.set(ConfigTags.AppiumIsApkInstalled, true);
+        settings.set(ConfigTags.AppiumAppPackage, "com.example.app");
+        settings.set(ConfigTags.AppiumAppActivity, "com.example.app.MainActivity");
 
         AndroidCapabilitiesFactory factory = new AndroidCapabilitiesFactory(DEFAULT_URL);
 
-        AndroidCapabilitiesFactory.Result result = factory.fromJsonObject(json);
+        AndroidCapabilitiesFactory.Result result = factory.fromSettings(settings);
         DesiredCapabilities caps = result.getCapabilities();
 
         assertEquals(Platform.ANDROID, caps.getCapability("platformName"));
@@ -35,15 +40,15 @@ public class AndroidCapabilitiesFactoryTest {
 
     @Test
     public void buildsCapabilitiesForDockerEmulator() {
-        JsonObject json = new JsonObject();
-        json.addProperty("isApkInstalled", false);
-        json.addProperty("app", "http://somewhere/sample.apk");
-        json.addProperty("isEmulatorDocker", true);
-        json.addProperty("ipAddressAppium", "10.1.2.34");
+        Settings settings = defaultSettings();
+        settings.set(ConfigTags.AppiumIsApkInstalled, false);
+        settings.set(ConfigTags.AppiumApp, "http://somewhere/sample.apk");
+        settings.set(ConfigTags.AppiumIsEmulatorDocker, true);
+        settings.set(ConfigTags.AppiumIpAddress, "10.1.2.34");
 
         AndroidCapabilitiesFactory factory = new AndroidCapabilitiesFactory(DEFAULT_URL);
 
-        AndroidCapabilitiesFactory.Result result = factory.fromJsonObject(json);
+        AndroidCapabilitiesFactory.Result result = factory.fromSettings(settings);
         DesiredCapabilities caps = result.getCapabilities();
 
         assertEquals(Platform.ANDROID, caps.getCapability("platformName"));
@@ -51,95 +56,93 @@ public class AndroidCapabilitiesFactoryTest {
         assertEquals("http://10.1.2.34:4723/wd/hub", result.getAppiumServerUrl());
     }
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     @Test
     public void apkInstalledWithoutAppPackage_throwsIllegalArgumentException() {
-        JsonObject json = new JsonObject();
-        json.addProperty("isApkInstalled", true);
-        // appPackage missing
-        json.addProperty("appActivity", "com.example.app.MainActivity");
+        Settings settings = defaultSettings();
+        settings.set(ConfigTags.AppiumIsApkInstalled, true);
+        settings.set(ConfigTags.AppiumAppActivity, "com.example.app.MainActivity");
 
         AndroidCapabilitiesFactory factory = new AndroidCapabilitiesFactory(DEFAULT_URL);
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("When isApkInstalled=true, 'appPackage' is required.");
+        thrown.expectMessage("When AppiumIsApkInstalled=true, 'AppiumAppPackage' is required.");
 
-        factory.fromJsonObject(json);
+        factory.fromSettings(settings);
     }
 
     @Test
     public void apkInstalledWithEmptyAppPackage_throwsIllegalArgumentException() {
-        JsonObject json = new JsonObject();
-        json.addProperty("isApkInstalled", true);
-        json.addProperty("appPackage", ""); // empty
-        json.addProperty("appActivity", "com.example.app.MainActivity");
+        Settings settings = defaultSettings();
+        settings.set(ConfigTags.AppiumIsApkInstalled, true);
+        settings.set(ConfigTags.AppiumAppPackage, "");
+        settings.set(ConfigTags.AppiumAppActivity, "com.example.app.MainActivity");
 
         AndroidCapabilitiesFactory factory = new AndroidCapabilitiesFactory(DEFAULT_URL);
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("When isApkInstalled=true, 'appPackage' is required.");
+        thrown.expectMessage("When AppiumIsApkInstalled=true, 'AppiumAppPackage' is required.");
 
-        factory.fromJsonObject(json);
+        factory.fromSettings(settings);
     }
 
     @Test
     public void apkInstalledWithoutAppActivity_throwsIllegalArgumentException() {
-        JsonObject json = new JsonObject();
-        json.addProperty("isApkInstalled", true);
-        json.addProperty("appPackage", "com.example.app");
-        // appActivity missing
+        Settings settings = defaultSettings();
+        settings.set(ConfigTags.AppiumIsApkInstalled, true);
+        settings.set(ConfigTags.AppiumAppPackage, "com.example.app");
 
         AndroidCapabilitiesFactory factory = new AndroidCapabilitiesFactory(DEFAULT_URL);
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("When isApkInstalled=true, 'appActivity' is required");
+        thrown.expectMessage("When AppiumIsApkInstalled=true, 'AppiumAppActivity' is required");
 
-        factory.fromJsonObject(json);
+        factory.fromSettings(settings);
     }
 
     @Test
     public void apkInstalledWithEmptyAppActivity_throwsIllegalArgumentException() {
-        JsonObject json = new JsonObject();
-        json.addProperty("isApkInstalled", true);
-        json.addProperty("appPackage", "com.example.app");
-        json.addProperty("appActivity", ""); // empty
+        Settings settings = defaultSettings();
+        settings.set(ConfigTags.AppiumIsApkInstalled, true);
+        settings.set(ConfigTags.AppiumAppPackage, "com.example.app");
+        settings.set(ConfigTags.AppiumAppActivity, "");
 
         AndroidCapabilitiesFactory factory = new AndroidCapabilitiesFactory(DEFAULT_URL);
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("When isApkInstalled=true, 'appActivity' is required");
+        thrown.expectMessage("When AppiumIsApkInstalled=true, 'AppiumAppActivity' is required");
 
-        factory.fromJsonObject(json);
+        factory.fromSettings(settings);
     }
 
     @Test
     public void apkNotInstalledAndAppMissing_throwsIllegalArgumentException() {
-        JsonObject json = new JsonObject();
-        json.addProperty("isApkInstalled", false);
-        // "app" missing
+        Settings settings = defaultSettings();
+        settings.set(ConfigTags.AppiumIsApkInstalled, false);
 
         AndroidCapabilitiesFactory factory = new AndroidCapabilitiesFactory(DEFAULT_URL);
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("When isApkInstalled=false, 'app' (APK path or URL) must be provided.");
+        thrown.expectMessage("When AppiumIsApkInstalled=false, 'AppiumApp' must be provided.");
 
-        factory.fromJsonObject(json);
+        factory.fromSettings(settings);
     }
 
     @Test
     public void apkNotInstalledAndAppEmpty_throwsIllegalArgumentException() {
-        JsonObject json = new JsonObject();
-        json.addProperty("isApkInstalled", false);
-        json.addProperty("app", ""); // empty
+        Settings settings = defaultSettings();
+        settings.set(ConfigTags.AppiumIsApkInstalled, false);
+        settings.set(ConfigTags.AppiumApp, "");
 
         AndroidCapabilitiesFactory factory = new AndroidCapabilitiesFactory(DEFAULT_URL);
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("When isApkInstalled=false, 'app' (APK path or URL) must be provided.");
+        thrown.expectMessage("When AppiumIsApkInstalled=false, 'AppiumApp' must be provided.");
 
-        factory.fromJsonObject(json);
+        factory.fromSettings(settings);
+    }
+
+    private static Settings defaultSettings() {
+        return new Settings(SettingsDefaults.getSettingsDefaults(), new Properties());
     }
 
 }

@@ -21,6 +21,22 @@ import static org.testar.config.ConfigTags.ActionDuration;
 import static org.testar.config.ConfigTags.AlwaysCompile;
 import static org.testar.config.ConfigTags.ApplicationName;
 import static org.testar.config.ConfigTags.ApplicationVersion;
+import static org.testar.config.ConfigTags.AppiumAdbExecTimeout;
+import static org.testar.config.ConfigTags.AppiumAllowInvisibleElements;
+import static org.testar.config.ConfigTags.AppiumApp;
+import static org.testar.config.ConfigTags.AppiumAppActivity;
+import static org.testar.config.ConfigTags.AppiumAppPackage;
+import static org.testar.config.ConfigTags.AppiumAutomationName;
+import static org.testar.config.ConfigTags.AppiumAutoGrantPermissions;
+import static org.testar.config.ConfigTags.AppiumDeviceName;
+import static org.testar.config.ConfigTags.AppiumIgnoreHiddenApiPolicyError;
+import static org.testar.config.ConfigTags.AppiumIpAddress;
+import static org.testar.config.ConfigTags.AppiumIsApkInstalled;
+import static org.testar.config.ConfigTags.AppiumIsEmulatorDocker;
+import static org.testar.config.ConfigTags.AppiumNewCommandTimeout;
+import static org.testar.config.ConfigTags.AppiumPlatformName;
+import static org.testar.config.ConfigTags.AppiumUiautomator2ServerInstallTimeout;
+import static org.testar.config.ConfigTags.AppiumUiautomator2ServerLaunchTimeout;
 import static org.testar.config.ConfigTags.BrowserFullScreen;
 import static org.testar.config.ConfigTags.ClickFilter;
 import static org.testar.config.ConfigTags.ClickableClasses;
@@ -40,7 +56,6 @@ import static org.testar.config.ConfigTags.JacocoCoverageClasses;
 import static org.testar.config.ConfigTags.JacocoCoverageIpAddress;
 import static org.testar.config.ConfigTags.JacocoCoveragePort;
 import static org.testar.config.ConfigTags.KeyBoardListener;
-import static org.testar.config.ConfigTags.ClickFilter;
 import static org.testar.config.ConfigTags.LlmActionFewshotFile;
 import static org.testar.config.ConfigTags.LlmAuthorizationHeader;
 import static org.testar.config.ConfigTags.LlmHistorySize;
@@ -163,6 +178,25 @@ public class SettingsDefaults {
         defaults.add(Pair.from(WebConsoleErrorPattern, ".*.*"));
         defaults.add(Pair.from(WebConsoleWarningOracle, false));
         defaults.add(Pair.from(WebConsoleWarningPattern, ".*.*"));
+
+        // Android-Appium default settings
+
+        defaults.add(Pair.from(AppiumPlatformName, "Android"));
+        defaults.add(Pair.from(AppiumIsApkInstalled, false));
+        defaults.add(Pair.from(AppiumApp, ""));
+        defaults.add(Pair.from(AppiumAppPackage, ""));
+        defaults.add(Pair.from(AppiumAppActivity, ""));
+        defaults.add(Pair.from(AppiumIsEmulatorDocker, false));
+        defaults.add(Pair.from(AppiumIpAddress, ""));
+        defaults.add(Pair.from(AppiumDeviceName, "Android Emulator"));
+        defaults.add(Pair.from(AppiumAutomationName, "UiAutomator2"));
+        defaults.add(Pair.from(AppiumNewCommandTimeout, 600));
+        defaults.add(Pair.from(AppiumAutoGrantPermissions, false));
+        defaults.add(Pair.from(AppiumAllowInvisibleElements, false));
+        defaults.add(Pair.from(AppiumIgnoreHiddenApiPolicyError, false));
+        defaults.add(Pair.from(AppiumAdbExecTimeout, 120000));
+        defaults.add(Pair.from(AppiumUiautomator2ServerInstallTimeout, 120000));
+        defaults.add(Pair.from(AppiumUiautomator2ServerLaunchTimeout, 120000));
 
         defaults.add(Pair.from(ProtocolSpecificSetting_1, ""));
         defaults.add(Pair.from(ProtocolSpecificSetting_2, ""));
