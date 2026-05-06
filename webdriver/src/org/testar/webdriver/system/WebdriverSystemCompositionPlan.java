@@ -6,6 +6,7 @@
 
 package org.testar.webdriver.system;
 
+import org.testar.config.settings.Settings;
 import org.testar.engine.system.SystemCompositionPlan;
 import org.testar.webdriver.service.WebdriverSystemService;
 
@@ -17,7 +18,7 @@ public final class WebdriverSystemCompositionPlan {
     private WebdriverSystemCompositionPlan() {
     }
 
-    public static SystemCompositionPlan fromSutConnector(String sutConnector) {
-        return SystemCompositionPlan.basic(WebdriverSystemService.fromSutConnector(sutConnector));
+    public static SystemCompositionPlan fromSettings(Settings settings) {
+        return SystemCompositionPlan.basic(WebdriverSystemService.fromSettings(settings));
     }
 }

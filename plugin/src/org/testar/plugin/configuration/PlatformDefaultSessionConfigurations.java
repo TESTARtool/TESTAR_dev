@@ -109,7 +109,7 @@ public final class PlatformDefaultSessionConfigurations {
 
         return SessionServiceConfiguration.builder()
                 .overrideSystemCompositionPlan(
-                        WebdriverSystemCompositionPlan.fromSutConnector(sessionSpec.getTarget())
+                        WebdriverSystemCompositionPlan.fromSettings(settings)
                 )
                 .overrideStateCompositionPlan(
                         WebdriverStateCompositionPlan.browser(

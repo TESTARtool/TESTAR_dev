@@ -9,6 +9,8 @@ package org.testar.webdriver.state;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.testar.config.ConfigTags;
+import org.testar.config.settings.Settings;
 import org.testar.core.devices.AWTKeyboard;
 import org.testar.core.devices.Keyboard;
 import org.testar.core.devices.Mouse;
@@ -214,6 +216,15 @@ public class WdDriver extends SUTBase {
       if (remoteWebDriver != null) remoteWebDriver.quit();
       throw new SystemStartException(wde);
     }
+  }
+
+  public static WdDriver fromSettings(Settings settings) throws SystemStartException {
+    if (settings == null) {
+      throw new IllegalArgumentException("settings cannot be null");
+    }
+
+    String sutConnector = settings.get(ConfigTags.SUTConnectorValue, "");
+    return fromExecutable(sutConnector);
   }
 
   @SuppressWarnings("unchecked")

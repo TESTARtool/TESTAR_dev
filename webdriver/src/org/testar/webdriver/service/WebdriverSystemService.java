@@ -6,6 +6,7 @@
 
 package org.testar.webdriver.service;
 
+import org.testar.config.settings.Settings;
 import org.testar.core.Assert;
 import org.testar.core.exceptions.SystemStartException;
 import org.testar.core.exceptions.SystemStopException;
@@ -14,8 +15,7 @@ import org.testar.core.state.SUT;
 import org.testar.webdriver.state.WdDriver;
 
 /**
- * WebDriver implementation of {@link SystemService} backed by a SUT connector
- * string.
+ * WebDriver implementation of {@link SystemService} backed by TESTAR settings.
  */
 public final class WebdriverSystemService implements SystemService {
 
@@ -30,8 +30,9 @@ public final class WebdriverSystemService implements SystemService {
         this.starter = Assert.notNull(starter);
     }
 
-    public static WebdriverSystemService fromSutConnector(String sutConnector) {
-        return new WebdriverSystemService(() -> WdDriver.fromExecutable(sutConnector));
+    public static WebdriverSystemService fromSettings(Settings settings) {
+        Assert.notNull(settings);
+        return new WebdriverSystemService(() -> WdDriver.fromSettings(settings));
     }
 
     @Override
