@@ -115,7 +115,8 @@ public class AndroidAppiumFramework extends SUTBase {
 
 		androidAppiumURL = result.getAppiumServerUrl();
 
-		return new AndroidAppiumFramework(result.getCapabilities());
+		androidSUT = new AndroidAppiumFramework(result.getCapabilities());
+		return androidSUT;
 	}
 
 	public static AndroidDriver getDriver() {
@@ -610,8 +611,11 @@ public class AndroidAppiumFramework extends SUTBase {
 
 	@Override
 	public void stop() throws SystemStopException {
-		driver.quit();
-		driver = null;
+		if (driver != null) {
+			driver.quit();
+			driver = null;
+		}
+		androidSUT = null;
 	}
 
 	@Override
