@@ -30,9 +30,6 @@ import org.testar.statemodel.DummyModelManager;
 import org.testar.statemodel.StateModelManager;
 import org.testar.statemodel.StateModelManagerFactory;
 import org.testar.statemodel.StateModelStorageBootstrap;
-import org.testar.windows.action.policy.WindowsClickablePolicy;
-import org.testar.windows.action.policy.WindowsScrollablePolicy;
-import org.testar.windows.action.policy.WindowsTypeablePolicy;
 
 /**
  * TESTAR platform/plugin orchestration
@@ -68,6 +65,8 @@ public final class PlatformOrchestrator {
         configureNativePlatform(sessionSpec.getOperatingSystem());
 
         switch (sessionSpec.getOperatingSystem()) {
+            case ANDROID:
+                return android(sessionSpec, policyConfiguration, serviceConfiguration, stateModelManager);
             case WINDOWS:
             case WINDOWS_10:
                 return windows(sessionSpec, policyConfiguration, serviceConfiguration, stateModelManager);
@@ -119,6 +118,10 @@ public final class PlatformOrchestrator {
     public static State projectCliState(PlatformSessionSpec sessionSpec, State state) {
         SessionPolicyContext sessionPolicyContext = buildSessionPolicyContext(sessionSpec);
         switch (sessionSpec.getOperatingSystem()) {
+            case ANDROID:
+                return PlatformDefaultSessionConfigurations
+                        .androidSemanticStateCompositionPlan(sessionSpec)
+                        .query(state, sessionPolicyContext);
             case WINDOWS:
             case WINDOWS_10:
                 return PlatformDefaultSessionConfigurations
@@ -142,6 +145,36 @@ public final class PlatformOrchestrator {
         SessionServiceConfiguration defaultServiceConfiguration =
                 PlatformDefaultSessionConfigurations.windowsServiceConfiguration(sessionSpec);
         SessionPolicyContext sessionPolicyContext = buildWindowsPolicyContext(
+                sessionSpec,
+                policyConfiguration
+        );
+
+        return SessionServiceComposer.compose(
+                sessionSpec.getSettings(),
+                sessionPolicyContext,
+                stateModelManager,
+                serviceConfiguration,
+                defaultServiceConfiguration.systemCompositionPlanOverride().orElseThrow(),
+                defaultServiceConfiguration.stateCompositionPlanOverride().orElseThrow(),
+                defaultServiceConfiguration.actionDerivationPlanOverride().orElseThrow(),
+                defaultServiceConfiguration.actionSelectorPlanOverride().orElseThrow(),
+                defaultServiceConfiguration.actionResolverPlanOverride().orElseThrow(),
+                defaultServiceConfiguration.actionExecutionPlanOverride().orElseThrow()
+        );
+    }
+
+    private static PlatformServices android(PlatformSessionSpec sessionSpec,
+                                            SessionPolicyConfiguration policyConfiguration,
+                                            SessionServiceConfiguration serviceConfiguration,
+                                            StateModelManager stateModelManager) {
+        SessionServiceConfiguration defaultServiceConfiguration =
+                PlatformDefaultSessionConfigurations.androidServiceConfiguration(sessionSpec);
+        if (sessionSpec.getTargetType() != PlatformSessionSpec.TargetType.EXECUTABLE) {
+            throw new UnsupportedPlatformException(
+                    "Unsupported Android target type: " + sessionSpec.getTargetType()
+            );
+        }
+        SessionPolicyContext sessionPolicyContext = buildAndroidPolicyContext(
                 sessionSpec,
                 policyConfiguration
         );
@@ -192,6 +225,8 @@ public final class PlatformOrchestrator {
 
     private static SessionPolicyContext buildSessionPolicyContext(PlatformSessionSpec sessionSpec) {
         switch (sessionSpec.getOperatingSystem()) {
+            case ANDROID:
+                return buildAndroidPolicyContext(sessionSpec, SessionPolicyConfiguration.defaults());
             case WINDOWS:
             case WINDOWS_10:
                 return buildWindowsPolicyContext(sessionSpec, SessionPolicyConfiguration.defaults());
@@ -207,11 +242,15 @@ public final class PlatformOrchestrator {
     private static SessionPolicyContext buildWindowsPolicyContext(PlatformSessionSpec sessionSpec,
                                                                   SessionPolicyConfiguration policyConfiguration) {
         return SessionPolicyContextComposer.compose(
-                PlatformPolicyContexts.desktopDefaults(
-                        new WindowsClickablePolicy(),
-                        new WindowsTypeablePolicy(),
-                        new WindowsScrollablePolicy()
-                ),
+                PlatformPolicyContexts.desktopDefaults(),
+                policyConfiguration
+        );
+    }
+
+    private static SessionPolicyContext buildAndroidPolicyContext(PlatformSessionSpec sessionSpec,
+                                                                  SessionPolicyConfiguration policyConfiguration) {
+        return SessionPolicyContextComposer.compose(
+                PlatformPolicyContexts.androidDefaults(),
                 policyConfiguration
         );
     }

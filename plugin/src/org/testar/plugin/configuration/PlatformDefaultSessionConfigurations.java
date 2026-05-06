@@ -6,6 +6,10 @@
 
 package org.testar.plugin.configuration;
 
+import org.testar.android.action.derivation.AndroidActionDerivationPlan;
+import org.testar.android.action.execution.AndroidActionExecutionPlan;
+import org.testar.android.state.AndroidStateCompositionPlan;
+import org.testar.android.system.AndroidSystemCompositionPlan;
 import org.testar.config.ConfigTags;
 import org.testar.config.settings.Settings;
 import org.testar.engine.manager.InputDataManager;
@@ -127,6 +131,30 @@ public final class PlatformDefaultSessionConfigurations {
                 .build();
     }
 
+    public static SessionServiceConfiguration androidServiceConfiguration(PlatformSessionSpec sessionSpec) {
+        Settings settings = sessionSpec.getSettings();
+
+        return SessionServiceConfiguration.builder()
+                .overrideSystemCompositionPlan(
+                        AndroidSystemCompositionPlan.fromSettings(settings)
+                )
+                .overrideStateCompositionPlan(
+                        AndroidStateCompositionPlan.appium(
+                                settings.get(ConfigTags.TimeToFreeze, 30.0)
+                        )
+                )
+                .overrideActionDerivationPlan(
+                        AndroidActionDerivationPlan.create(
+                                widget -> InputDataManager.getRandomTextInputData(),
+                                settings.get(ConfigTags.UseSystemActions, false)
+                        )
+                )
+                .overrideActionSelectorPlan(ActionSelectorPlan.basic(new RandomActionSelector()))
+                .overrideActionResolverPlan(ActionResolverPlan.basic(new DescriptionActionResolver()))
+                .overrideActionExecutionPlan(AndroidActionExecutionPlan.basic())
+                .build();
+    }
+
     public static StateCompositionPlan windowsSemanticStateCompositionPlan(PlatformSessionSpec sessionSpec) {
         Settings settings = sessionSpec.getSettings();
         return WindowsStateCompositionPlan.uiAutomationSemanticWidgets(
@@ -139,6 +167,13 @@ public final class PlatformDefaultSessionConfigurations {
     public static StateCompositionPlan webdriverSemanticStateCompositionPlan(PlatformSessionSpec sessionSpec) {
         Settings settings = sessionSpec.getSettings();
         return WebdriverStateCompositionPlan.browserSemanticWidgets(
+                settings.get(ConfigTags.TimeToFreeze, 30.0)
+        );
+    }
+
+    public static StateCompositionPlan androidSemanticStateCompositionPlan(PlatformSessionSpec sessionSpec) {
+        Settings settings = sessionSpec.getSettings();
+        return AndroidStateCompositionPlan.appiumSemanticWidgets(
                 settings.get(ConfigTags.TimeToFreeze, 30.0)
         );
     }
