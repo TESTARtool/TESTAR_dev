@@ -37,8 +37,8 @@ public final class AndroidClickablePolicy implements ClickablePolicy {
             return false;
         }
 
-        return widget.get(AndroidTags.AndroidClickable, false)
-                && widget.get(AndroidTags.AndroidEnabled, false)
-                && widget.get(AndroidTags.AndroidDisplayed, false);
+        return widget.get(AndroidTags.AndroidClickable, true)
+                && widget.get(AndroidTags.AndroidEnabled, true)
+                && widget.get(AndroidTags.AndroidDisplayed, true);
     }
 }

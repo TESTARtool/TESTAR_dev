@@ -37,8 +37,8 @@ public final class AndroidTypeablePolicy implements TypeablePolicy {
             return false;
         }
 
-        return widget.get(AndroidTags.AndroidEnabled, false)
-                && widget.get(AndroidTags.AndroidFocusable, false)
-                && widget.get(AndroidTags.AndroidDisplayed, false);
+        return widget.get(AndroidTags.AndroidEnabled, true)
+                && widget.get(AndroidTags.AndroidFocusable, true)
+                && widget.get(AndroidTags.AndroidDisplayed, true);
     }
 }

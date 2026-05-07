@@ -46,6 +46,11 @@ final class AndroidActionDescriptions {
             return "resource-id '" + resourceId + "'";
         }
 
+        String hint = trim(widget.get(AndroidTags.AndroidHint, ""));
+        if (!hint.isEmpty()) {
+            return "hint '" + hint + "'";
+        }
+
         String xpath = trim(widget.get(AndroidTags.AndroidXpath, ""));
         if (!xpath.isEmpty()) {
             return "xpath '" + xpath + "'";

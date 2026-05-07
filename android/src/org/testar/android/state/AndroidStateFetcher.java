@@ -118,7 +118,7 @@ public class AndroidStateFetcher implements Callable<AndroidState> {
 		childElement.zindex = parent.zindex + 1;
 		childElement.enabled = AndroidNodeParser.getBooleanAttribute(xmlNode, "enabled");
 		childElement.ignore = false;
-		childElement.blocked = AndroidNodeParser.getBooleanAttribute(xmlNode, "focusable"); 
+		childElement.blocked = false; 
 
 		childElement.nodeIndex = AndroidNodeParser.getIntegerAttribute(xmlNode, "index");
 		childElement.text = AndroidNodeParser.getStringAttribute(xmlNode, "text");
