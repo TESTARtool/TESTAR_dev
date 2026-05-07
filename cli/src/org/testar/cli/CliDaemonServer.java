@@ -18,9 +18,9 @@ import java.util.Locale;
 import java.util.Set;
 
 import org.testar.cli.settings.CliSettingsLoader;
+import org.testar.config.ConfigTags;
 import org.testar.config.settings.Settings;
 import org.testar.core.action.Action;
-import org.testar.core.action.ActionRoles;
 import org.testar.core.action.resolver.ResolvedAction;
 import org.testar.core.state.State;
 import org.testar.core.state.Widget;
@@ -226,9 +226,13 @@ final class CliDaemonServer {
     }
 
     private PlatformSessionSpec buildSessionSpec(CliRequest request) {
+        Settings settings = CliSettingsLoader.load();
+        return buildSessionSpec(request, settings);
+    }
+
+    PlatformSessionSpec buildSessionSpec(CliRequest request, Settings settings) {
         String platformToken = request.argumentAt(0);
         String target = request.argumentAt(1);
-        Settings settings = CliSettingsLoader.load();
 
         if (platformToken == null) {
             throw new IllegalArgumentException("Expected: startSession <platform> <target>");
@@ -239,6 +243,13 @@ final class CliDaemonServer {
         }
 
         OperatingSystems operatingSystem = parseOperatingSystem(platformToken);
+        if (operatingSystem == OperatingSystems.ANDROID) {
+            settings.set(ConfigTags.AppiumIsApkInstalled, false);
+            settings.set(ConfigTags.AppiumApp, target);
+        } else if (operatingSystem == OperatingSystems.WEBDRIVER) {
+            settings.set(ConfigTags.SUTConnectorValue, target);
+        }
+
         return PlatformSessionSpecFactory.create(
                 operatingSystem,
                 PlatformSessionSpec.TargetType.EXECUTABLE,
@@ -255,6 +266,9 @@ final class CliDaemonServer {
         }
         if ("webdriver".equals(normalized) || "web".equals(normalized)) {
             return OperatingSystems.WEBDRIVER;
+        }
+        if ("android".equals(normalized) || "appium".equals(normalized)) {
+            return OperatingSystems.ANDROID;
         }
         throw new IllegalArgumentException("Unsupported platform token: " + token);
     }

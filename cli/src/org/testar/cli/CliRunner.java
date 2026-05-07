@@ -47,6 +47,7 @@ final class CliRunner {
         output.println("Usage:");
         output.println("  startSession windows <path>");
         output.println("  startSession webdriver <url>");
+        output.println("  startSession android <apk>");
         output.println("  sessionStatus");
         output.println("  getState");
         output.println("  getStateScreenshot");
