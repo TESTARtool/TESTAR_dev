@@ -31,15 +31,15 @@ public class AndroidSystemActionText extends TaggableBase implements Action {
         try {
             AndroidAppiumFramework.generateText();
         } catch(Exception e) {
-            System.out.println("Exception trying to generate text message on SUT: ");
-            System.out.println(e.getMessage());
+            System.err.println("Exception trying to execute : " + toShortString());
+            System.err.println(e.getMessage());
             throw new ActionFailedException(toShortString());
         }
     }
 
     @Override
     public String toShortString() {
-        return "Execute Android system event: text message";
+        return AndroidActionDescriptions.describeSystemAction("system event: text message");
     }
 
     @Override

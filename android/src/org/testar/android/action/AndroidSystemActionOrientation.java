@@ -31,15 +31,15 @@ public class AndroidSystemActionOrientation extends TaggableBase implements Acti
         try {
             AndroidAppiumFramework.changeOrientation();
         } catch(Exception e) {
-            System.out.println("Exception trying to change orientation SUT: ");
-            System.out.println(e.getMessage());
+            System.err.println("Exception trying to execute : " + toShortString());
+            System.err.println(e.getMessage());
             throw new ActionFailedException(toShortString());
         }
     }
 
     @Override
     public String toShortString() {
-        return "Execute Android orientation change (portrait vs landscape)";
+        return AndroidActionDescriptions.describeSystemAction("orientation change (portrait vs landscape)");
     }
 
     @Override

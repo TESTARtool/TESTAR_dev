@@ -8,7 +8,6 @@ package org.testar.android.action;
 
 import org.testar.android.AndroidAppiumFramework;
 import org.testar.android.alayer.AndroidRoles;
-import org.testar.android.tag.AndroidTags;
 import org.testar.core.alayer.*;
 import org.testar.core.action.Action;
 import org.testar.core.exceptions.ActionFailedException;
@@ -23,13 +22,11 @@ public class AndroidActionScroll extends TaggableBase implements Action {
     private static final long serialVersionUID = 6205133391190145934L;
 
     private final int scrollDistance = 500;
-    private final String accessibilityId;
     private final Widget widget;
 
     public AndroidActionScroll(State state, Widget w) {
         this.set(Tags.Role, AndroidRoles.AndroidWidget);
         this.mapOriginWidget(w);
-        this.accessibilityId = w.get(AndroidTags.AndroidAccessibilityId, "");
         this.widget = w;
         this.set(Tags.Desc, toShortString());
     }
@@ -37,17 +34,17 @@ public class AndroidActionScroll extends TaggableBase implements Action {
     @Override
     public void run(SUT system, State state, double duration) throws ActionFailedException {
         try {
-            AndroidAppiumFramework.scrollElementById(this.accessibilityId, this.widget, this.scrollDistance);
+            AndroidAppiumFramework.scrollElementById(this.widget, this.scrollDistance);
         } catch(Exception e) {
-            System.out.println("Exception trying to scroll Element By Id : " + this.accessibilityId);
-            System.out.println(e.getMessage());
+            System.err.println("Exception trying to execute : " + toShortString());
+            System.err.println(e.getMessage());
             throw new ActionFailedException(toShortString());
         }
     }
 
     @Override
     public String toShortString() {
-        return "Execute Android Scroll on the system under test";
+        return AndroidActionDescriptions.describeWidgetAction("scroll", this.widget);
     }
 
     @Override

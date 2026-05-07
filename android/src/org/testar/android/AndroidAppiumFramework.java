@@ -155,7 +155,8 @@ public class AndroidAppiumFramework extends SUTBase {
 	 * @param w
 	 * @return android web element
 	 */
-	public static WebElement resolveElementByIdOrXPath(String id, Widget w) {
+	public static WebElement resolveElementByIdOrXPath(Widget w) {
+		String id = w.get(AndroidTags.AndroidAccessibilityId, "");
 		if (id != null && !id.isEmpty()) {
 			// Try by accessibility id only if non-null and non-empty
 			List<WebElement> elements = driver.findElements(new AppiumBy.ByAccessibilityId(id));
@@ -182,7 +183,7 @@ public class AndroidAppiumFramework extends SUTBase {
 		return driver.findElement(new By.ByXPath(xpathString));
 	}
 
-	public static void scrollElementById(String id, Widget w, int scrollDistance) {
+	public static void scrollElementById(Widget w, int scrollDistance) {
 		Duration NO_TIME = Duration.ofMillis(0);
 		Duration STEP_DURATION = Duration.ofMillis(20);
 
@@ -216,7 +217,8 @@ public class AndroidAppiumFramework extends SUTBase {
 		}
 	}
 
-	public static void longClickElementById(String id, Widget w) {
+	public static void longClickElementById(Widget w) {
+		String id = w.get(AndroidTags.AndroidAccessibilityId, "");
 		WebElement el;
 		if (!id.equals("")) {
 			el = driver.findElement(new AppiumBy.ByAccessibilityId(id));

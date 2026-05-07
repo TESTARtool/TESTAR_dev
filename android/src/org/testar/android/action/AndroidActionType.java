@@ -8,8 +8,6 @@ package org.testar.android.action;
 
 import org.openqa.selenium.WebElement;
 import org.testar.android.AndroidAppiumFramework;
-import org.testar.android.alayer.AndroidRoles;
-import org.testar.android.tag.AndroidTags;
 import org.testar.core.alayer.*;
 import org.testar.core.action.Action;
 import org.testar.core.action.ActionRoles;
@@ -26,10 +24,7 @@ public class AndroidActionType extends TaggableBase implements Action {
 
 	private static final long serialVersionUID = 6685918140970666660L;
 
-	private final String accessibilityId;
 	private final Widget widget;
-	private final String widgetClass;
-	private final String xpath;
 
 	private static final Pen TypePen = Pen.newPen().setColor(Color.Blue)
 			.setFillPattern(FillPattern.None).setStrokeWidth(3).build(); // use default font size
@@ -39,10 +34,7 @@ public class AndroidActionType extends TaggableBase implements Action {
 		this.set(Tags.Role, ActionRoles.ClickTypeInto);
 		this.mapOriginWidget(w);
 		this.set(Tags.InputText, typeText);
-		this.accessibilityId = w.get(AndroidTags.AndroidAccessibilityId, "");
 		this.widget = w;
-		this.widgetClass = w.get(AndroidTags.AndroidClassName, "");
-		this.xpath = w.get(AndroidTags.AndroidXpath);
 		double relX = w.get(Tags.Shape).x() + w.get(Tags.Shape).width()/2;
 		double relY = w.get(Tags.Shape).y() + w.get(Tags.Shape).height()/2;
 		Position position = new AbsolutePosition(relX, relY);
@@ -54,11 +46,11 @@ public class AndroidActionType extends TaggableBase implements Action {
 	public void run(SUT system, State state, double duration) throws ActionFailedException {
 		String typeText = this.get(Tags.InputText, "");
 		try {
-			WebElement element = AndroidAppiumFramework.resolveElementByIdOrXPath(this.accessibilityId, this.widget);
+			WebElement element = AndroidAppiumFramework.resolveElementByIdOrXPath(this.widget);
 			element.clear();
 			element.sendKeys(typeText);
 		} catch(Exception e) {
-			System.err.println("Exception trying to Type " + typeText + " in the Element with Id : " + this.accessibilityId);
+			System.err.println("Exception trying to execute : " + toShortString());
 			System.err.println(e.getMessage());
 			throw new ActionFailedException(toShortString());
 		}
@@ -67,7 +59,7 @@ public class AndroidActionType extends TaggableBase implements Action {
 	@Override
 	public String toShortString() {
 		String typeText = this.get(Tags.InputText, "");
-		return "Execute Android type on Widget of type: '" + this.widgetClass + "', with Id: '" + this.accessibilityId + "', with xPath: '" + this.xpath + "', typing text: " + typeText;
+		return AndroidActionDescriptions.describeWidgetActionWithInput("type", this.widget, typeText);
 	}
 
 	@Override

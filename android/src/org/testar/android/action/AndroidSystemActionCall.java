@@ -31,15 +31,15 @@ public class AndroidSystemActionCall extends TaggableBase implements Action {
         try {
             AndroidAppiumFramework.generatePhoneCall();
         } catch(Exception e) {
-            System.out.println("Exception trying to generate phone call on SUT: ");
-            System.out.println(e.getMessage());
+            System.err.println("Exception trying to execute : " + toShortString());
+            System.err.println(e.getMessage());
             throw new ActionFailedException(toShortString());
         }
     }
 
     @Override
     public String toShortString() {
-        return "Execute Android system event: Call";
+        return AndroidActionDescriptions.describeSystemAction("system event: Call");
     }
 
     @Override

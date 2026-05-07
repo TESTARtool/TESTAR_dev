@@ -31,15 +31,15 @@ public class AndroidBackAction extends TaggableBase implements Action {
         try {
             AndroidAppiumFramework.clickBackButton();
         } catch(Exception e) {
-            System.out.println("Exception trying to click Android back button: ");
-            System.out.println(e.getMessage());
+            System.err.println("Exception trying to execute : " + toShortString());
+            System.err.println(e.getMessage());
             throw new ActionFailedException(toShortString());
         }
     }
 
     @Override
     public String toShortString() {
-        return "Execute click Android back button";
+        return AndroidActionDescriptions.describeSystemAction("back button click");
     }
 
     @Override

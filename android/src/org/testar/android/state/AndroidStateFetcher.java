@@ -50,7 +50,7 @@ public class AndroidStateFetcher implements Callable<AndroidState> {
 		AndroidRootElement rootElement = buildAndroidSkeleton(system);
 
 		if (rootElement == null) {
-			system.set(Tags.Desc, " ");
+			system.set(Tags.Desc, "Android empty system");
 			return new AndroidState(null);
 		}
 

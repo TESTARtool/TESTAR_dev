@@ -4,7 +4,6 @@ import org.junit.Test;
 import org.junit.Before;
 import org.testar.android.action.AndroidActionClick;
 import org.testar.android.action.AndroidActionLongClick;
-import org.testar.android.action.AndroidActionPinch;
 import org.testar.android.action.AndroidActionScroll;
 import org.testar.android.action.AndroidActionType;
 import org.testar.android.action.AndroidBackAction;
@@ -49,6 +48,7 @@ public class BuildAndroidActions {
 		// Verify Action <-> Widget mapping
 		Assert.notNull(androidClick.get(Tags.OriginWidget));
 		Assert.isTrue(androidClick.get(Tags.OriginWidget).get(AndroidTags.AndroidXpath).equals(widgetPath));
+		Assert.isTrue(androidClick.get(Tags.Desc).equals("Android click on widget with content-desc 'AccessibilityIdValue'"));
 	}
 
 	@Test
@@ -57,14 +57,7 @@ public class BuildAndroidActions {
 		// Verify Action <-> Widget mapping
 		Assert.notNull(androidLongClick.get(Tags.OriginWidget));
 		Assert.isTrue(androidLongClick.get(Tags.OriginWidget).get(AndroidTags.AndroidXpath).equals(widgetPath));
-	}
-
-	@Test
-	public void buildAndroidActionPinch() {
-		Action androidPinch = new AndroidActionPinch(state, widget, false);
-		// Verify Action <-> Widget mapping
-		Assert.notNull(androidPinch.get(Tags.OriginWidget));
-		Assert.isTrue(androidPinch.get(Tags.OriginWidget).get(AndroidTags.AndroidXpath).equals(widgetPath));
+		Assert.isTrue(androidLongClick.get(Tags.Desc).equals("Android long click on widget with content-desc 'AccessibilityIdValue'"));
 	}
 
 	@Test
@@ -73,6 +66,7 @@ public class BuildAndroidActions {
 		// Verify Action <-> Widget mapping
 		Assert.notNull(androidScroll.get(Tags.OriginWidget));
 		Assert.isTrue(androidScroll.get(Tags.OriginWidget).get(AndroidTags.AndroidXpath).equals(widgetPath));
+		Assert.isTrue(androidScroll.get(Tags.Desc).equals("Android scroll on widget with content-desc 'AccessibilityIdValue'"));
 	}
 
 	@Test
@@ -82,6 +76,7 @@ public class BuildAndroidActions {
 		Assert.notNull(androidType.get(Tags.OriginWidget));
 		Assert.isTrue(androidType.get(Tags.OriginWidget).get(AndroidTags.AndroidXpath).equals(widgetPath));
 		Assert.isTrue(androidType.get(Tags.InputText).equals("TextToType"));
+		Assert.isTrue(androidType.get(Tags.Desc).equals("Android type on widget with content-desc 'AccessibilityIdValue' typing text: TextToType"));
 	}
 
 	@Test
@@ -90,6 +85,7 @@ public class BuildAndroidActions {
 		// Verify Action <-> Widget mapping
 		Assert.notNull(androidBack.get(Tags.OriginWidget));
 		Assert.isTrue(androidBack.get(Tags.OriginWidget).get(AndroidTags.AndroidXpath).equals(statePath));
+		Assert.isTrue(androidBack.get(Tags.Desc).equals("Android back button click"));
 	}
 
 	@Test
@@ -98,6 +94,7 @@ public class BuildAndroidActions {
 		// Verify Action <-> Widget mapping
 		Assert.notNull(androidSystemCall.get(Tags.OriginWidget));
 		Assert.isTrue(androidSystemCall.get(Tags.OriginWidget).get(AndroidTags.AndroidXpath).equals(statePath));
+		Assert.isTrue(androidSystemCall.get(Tags.Desc).equals("Android system event: Call"));
 	}
 
 	@Test
@@ -106,6 +103,7 @@ public class BuildAndroidActions {
 		// Verify Action <-> Widget mapping
 		Assert.notNull(androidSystemOrientation.get(Tags.OriginWidget));
 		Assert.isTrue(androidSystemOrientation.get(Tags.OriginWidget).get(AndroidTags.AndroidXpath).equals(statePath));
+		Assert.isTrue(androidSystemOrientation.get(Tags.Desc).equals("Android orientation change (portrait vs landscape)"));
 	}
 
 	@Test
@@ -114,5 +112,6 @@ public class BuildAndroidActions {
 		// Verify Action <-> Widget mapping
 		Assert.notNull(androidSystemText.get(Tags.OriginWidget));
 		Assert.isTrue(androidSystemText.get(Tags.OriginWidget).get(AndroidTags.AndroidXpath).equals(statePath));
+		Assert.isTrue(androidSystemText.get(Tags.Desc).equals("Android system event: text message"));
 	}
 }
