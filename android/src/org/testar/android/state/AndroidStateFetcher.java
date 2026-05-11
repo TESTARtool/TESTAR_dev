@@ -132,7 +132,7 @@ public class AndroidStateFetcher implements Callable<AndroidState> {
 		childElement.focusable = AndroidNodeParser.getBooleanAttribute(xmlNode, "focusable");
 		childElement.focused = AndroidNodeParser.getBooleanAttribute(xmlNode, "focused");
 		childElement.scrollable = AndroidNodeParser.getBooleanAttribute(xmlNode, "scrollable");
-		childElement.longclicklable = AndroidNodeParser.getBooleanAttribute(xmlNode, "long-clicklable");
+		childElement.longclicklable = AndroidNodeParser.getBooleanAttribute(xmlNode, "long-clickable");
 		childElement.password = AndroidNodeParser.getBooleanAttribute(xmlNode, "password");
 		childElement.selected = AndroidNodeParser.getBooleanAttribute(xmlNode, "selected");
 		childElement.accessibilityID = AndroidNodeParser.getStringAttribute(xmlNode, "content-desc");
