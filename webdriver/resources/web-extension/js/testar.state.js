@@ -482,10 +482,23 @@ function getComposedParentTestar(element) {
  * @return {bool} true if the element is clickable
  */
 function isClickableTestar(element) {
+    if (!element) return false;
+
     // onClick defined as tag attribute
     if (element.getAttribute("onclick") !== null) {
         return true;
     }
+
+    // onclick property
+    if (typeof element.onclick === "function") {
+        return true;
+    }
+
+    // Chrome DevTools
+    if (typeof getEventListeners === "function") {
+        return !!getEventListeners(element).click?.length;
+    }
+
     // No prototype patching within dynamically loaded iFrames
     if (element.getEventListeners === undefined) {
         return false;
