@@ -67,6 +67,7 @@ public class AndroidRoles {
 	AndroidLinearLayout = from("android.widget.LinearLayout", "AndroidLinearLayout", AndroidWidget, Roles.Control),
 	AndroidRelativeLayout = from("android.widget.RelativeLayout", "AndroidRelativeLayout", AndroidWidget, Roles.Control),
 	AndroidView = from("android.view.View", "AndroidView", AndroidWidget, Roles.Control),
+	AndroidMenuItem = from("android.view.MenuItem", "AndroidMenuItem", AndroidWidget, Roles.Control),
 	AndroidViewGroup = from("android.view.ViewGroup", "AndroidViewGroup", AndroidWidget, Roles.Control),
 	AndroidMediaController = from("android.widget.MediaController", "AndroidMediaController", AndroidWidget, Roles.Control),
 	AndroidStackView = from("android.widget.StackView", "AndroidStackView", AndroidWidget, Roles.Control),
@@ -126,7 +127,8 @@ public class AndroidRoles {
 				AndroidRelativeLayout,
 				AndroidView,
 				AndroidViewGroup,
-				AndroidMediaController
+				AndroidMediaController,
+				AndroidMenuItem
 		};
 	}
 
