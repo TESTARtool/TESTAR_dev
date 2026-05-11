@@ -75,6 +75,16 @@ public final class WebdriverSemanticWidgetDescriptorTest {
     }
 
     @Test
+    public void shouldNotIncludeWidgetWithoutSemanticDescription() {
+        StateStub state = new StateStub();
+        WidgetStub widget = child(state);
+        widget.set(WdTags.WebTagName, "span");
+        widget.set(Tags.Desc, "span_");
+
+        Assert.assertFalse(descriptor.shouldInclude(widget));
+    }
+
+    @Test
     public void testWidgetTreeCompound() {
         StateStub state = new StateStub();
 

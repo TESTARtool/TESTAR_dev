@@ -19,13 +19,12 @@ final class AndroidActionDescriptions {
     }
 
     static String describeWidgetAction(String actionType, Widget widget) {
-        return "Android " + actionType + " on widget with " + describeWidgetTarget(widget);
+        return "Android " + actionType + " on widget " + describeWidgetTarget(widget);
     }
 
     static String describeWidgetActionWithInput(String actionType, Widget widget, String inputText) {
-        return "Android " + actionType
-                + " on widget with " + describeTextInputTarget(widget)
-                + " typing text: " + inputText;
+        return "Android " + actionType + " text " + inputText
+                + " on widget " + describeTextInputTarget(widget);
     }
 
     private static String describeWidgetTarget(Widget widget) {
@@ -41,9 +40,10 @@ final class AndroidActionDescriptions {
             return "unknown widget";
         }
 
+        String role = semanticRole(widget);
         String accessibilityId = trim(widget.get(AndroidTags.AndroidAccessibilityId, ""));
         if (!accessibilityId.isEmpty()) {
-            return "content-desc '" + accessibilityId + "'";
+            return roleSemantic(role, accessibilityId);
         }
 
         String hint = trim(widget.get(AndroidTags.AndroidHint, ""));
@@ -52,30 +52,30 @@ final class AndroidActionDescriptions {
         // For typing actions: content-desc > hint > text > resource-id > class > xpath
         if (preferHintOverText) {
             if (!hint.isEmpty()) {
-                return "hint '" + hint + "'";
+                return roleSemantic(role, hint);
             }
             if (!text.isEmpty()) {
-                return "text '" + text + "'";
+                return roleSemantic(role, text);
             }
         } 
         // Otherwise: content-desc > text > hint > resource-id > class > xpath
         else {
             if (!text.isEmpty()) {
-                return "text '" + text + "'";
+                return roleSemantic(role, text);
             }
             if (!hint.isEmpty()) {
-                return "hint '" + hint + "'";
+                return roleSemantic(role, hint);
             }
         }
 
         String resourceId = trim(widget.get(AndroidTags.AndroidResourceId, ""));
         if (!resourceId.isEmpty()) {
-            return "resource-id '" + resourceId + "'";
+            return roleSemantic(role, resourceId);
         }
 
         String className = trim(widget.get(AndroidTags.AndroidClassName, ""));
         if (!className.isEmpty()) {
-            return "type '" + className + "'";
+            return semanticRole(widget);
         }
 
         String xpath = trim(widget.get(AndroidTags.AndroidXpath, ""));
@@ -88,5 +88,37 @@ final class AndroidActionDescriptions {
 
     private static String trim(String value) {
         return value == null ? "" : value.trim();
+    }
+
+    private static String semanticRole(Widget widget) {
+        String className = trim(widget.get(AndroidTags.AndroidClassName, ""));
+        if (className.isEmpty()) {
+            return "widget";
+        }
+
+        int separatorIndex = className.lastIndexOf('.');
+        String simpleName = separatorIndex >= 0 ? className.substring(separatorIndex + 1) : className;
+        return normalize(simpleName);
+    }
+
+    private static String roleSemantic(String role, String semanticValue) {
+        String semantic = normalize(semanticValue);
+        if (semantic.isEmpty()) {
+            return role;
+        }
+        return role + "_" + semantic;
+    }
+
+    private static String normalize(String value) {
+        String trimmed = trim(value).toLowerCase();
+        if (trimmed.isEmpty()) {
+            return "";
+        }
+
+        String normalized = trimmed.replaceAll("\\s+", "_");
+        normalized = normalized.replaceAll("[\\?\\*\\u2022\\u2023\\u25e6\\u2043\\u2219\\u25cf\\ufffd]{2,}", "??????");
+        normalized = normalized.replaceAll("[^a-z0-9_./?-]", "");
+        normalized = normalized.replaceAll("_+", "_");
+        return normalized;
     }
 }

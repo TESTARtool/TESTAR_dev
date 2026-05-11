@@ -6,7 +6,9 @@
 
 package org.testar.engine.state;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -65,19 +67,28 @@ final class StateProjectionSupport {
         StateStub projectedState = new StateStub();
         copyTags(state, projectedState);
 
-        Set<String> uniqueDescriptions = new LinkedHashSet<>();
+        List<StateSemanticDisambiguator.SemanticWidgetProjection> semanticProjections = new ArrayList<>();
         for (Widget widget : state) {
             if (widget == state || !descriptor.shouldInclude(widget)) {
                 continue;
             }
 
             String semanticDescription = SemanticStateFormatter.describe(widget, descriptor);
-            if (semanticDescription.isBlank() || !uniqueDescriptions.add(semanticDescription)) {
+            if (semanticDescription.isBlank()) {
+                continue;
+            }
+            semanticProjections.add(new StateSemanticDisambiguator.SemanticWidgetProjection(widget, semanticDescription));
+        }
+
+        new StateSemanticDisambiguator().disambiguate(semanticProjections);
+        Set<String> uniqueDescriptions = new LinkedHashSet<>();
+        for (StateSemanticDisambiguator.SemanticWidgetProjection projection : semanticProjections) {
+            if (!uniqueDescriptions.add(projection.description())) {
                 continue;
             }
 
-            WidgetStub copiedWidget = copyWidget(widget, projectedState);
-            copiedWidget.set(Tags.Desc, semanticDescription);
+            WidgetStub copiedWidget = copyWidget(projection.widget(), projectedState);
+            copiedWidget.set(Tags.Desc, projection.description());
             projectedState.addChild(copiedWidget);
         }
 

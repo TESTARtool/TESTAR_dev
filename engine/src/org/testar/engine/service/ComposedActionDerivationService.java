@@ -32,6 +32,7 @@ public final class ComposedActionDerivationService implements ActionDerivationSe
     private final List<ActionDeriver> defaultDerivers;
     private final List<ActionDeriver> fallbackDerivers;
     private final ActionIdentifierService actionIdentifierService;
+    private final ActionSemanticDisambiguator actionSemanticDisambiguator;
 
     public ComposedActionDerivationService(SessionPolicyContext context, ActionDerivationPlan plan) {
         this(
@@ -39,7 +40,8 @@ public final class ComposedActionDerivationService implements ActionDerivationSe
                 Assert.notNull(plan).forcedDerivers(),
                 plan.defaultDerivers(),
                 plan.fallbackDerivers(),
-                new DefaultActionIdentifierService()
+                new DefaultActionIdentifierService(),
+                new ActionSemanticDisambiguator()
         );
     }
 
@@ -47,12 +49,14 @@ public final class ComposedActionDerivationService implements ActionDerivationSe
                                     List<ActionDeriver> forcedDerivers,
                                     List<ActionDeriver> defaultDerivers,
                                     List<ActionDeriver> fallbackDerivers,
-                                    ActionIdentifierService actionIdentifierService) {
+                                    ActionIdentifierService actionIdentifierService,
+                                    ActionSemanticDisambiguator actionSemanticDisambiguator) {
         this.context = Assert.notNull(context);
         this.forcedDerivers = Collections.unmodifiableList(Assert.notNull(forcedDerivers));
         this.defaultDerivers = Collections.unmodifiableList(Assert.notNull(defaultDerivers));
         this.fallbackDerivers = Collections.unmodifiableList(Assert.notNull(fallbackDerivers));
         this.actionIdentifierService = Assert.notNull(actionIdentifierService);
+        this.actionSemanticDisambiguator = Assert.notNull(actionSemanticDisambiguator);
     }
 
     public static ComposedActionDerivationService compose(SessionPolicyContext context, ActionDerivationPlan plan) {
@@ -64,14 +68,14 @@ public final class ComposedActionDerivationService implements ActionDerivationSe
         Assert.notNull(state);
         Set<Action> forcedActions = derive(system, state, forcedDerivers);
         if (!forcedActions.isEmpty()) {
-            return actionIdentifierService.identifyActions(state, forcedActions);
+            return identifyAndDisambiguate(state, forcedActions);
         }
         Set<Action> defaultActions = derive(system, state, defaultDerivers);
         if (!defaultActions.isEmpty()) {
-            return actionIdentifierService.identifyActions(state, defaultActions);
+            return identifyAndDisambiguate(state, defaultActions);
         }
         Set<Action> fallbackActions = derive(system, state, fallbackDerivers);
-        return actionIdentifierService.identifyActions(state, fallbackActions);
+        return identifyAndDisambiguate(state, fallbackActions);
     }
 
     public SessionPolicyContext context() {
@@ -84,5 +88,11 @@ public final class ComposedActionDerivationService implements ActionDerivationSe
             actions.addAll(deriver.derive(system, state, context));
         }
         return actions;
+    }
+
+    private Set<Action> identifyAndDisambiguate(State state, Set<Action> actions) {
+        Set<Action> identifiedActions = actionIdentifierService.identifyActions(state, actions);
+        actionSemanticDisambiguator.disambiguate(identifiedActions);
+        return identifiedActions;
     }
 }

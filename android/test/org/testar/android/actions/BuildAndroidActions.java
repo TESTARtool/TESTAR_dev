@@ -38,7 +38,7 @@ public class BuildAndroidActions {
 
 		widget.set(AndroidTags.AndroidText, "TextValue");
 		widget.set(AndroidTags.AndroidAccessibilityId, "AccessibilityIdValue");
-		widget.set(AndroidTags.AndroidClassName, "ClassNameValue");
+		widget.set(AndroidTags.AndroidClassName, "android.widget.CheckBox");
 		widget.set(AndroidTags.AndroidXpath, widgetPath);
 	}
 
@@ -48,7 +48,7 @@ public class BuildAndroidActions {
 		// Verify Action <-> Widget mapping
 		Assert.notNull(androidClick.get(Tags.OriginWidget));
 		Assert.isTrue(androidClick.get(Tags.OriginWidget).get(AndroidTags.AndroidXpath).equals(widgetPath));
-		Assert.isTrue(androidClick.get(Tags.Desc).equals("Android click on widget with content-desc 'AccessibilityIdValue'"));
+		Assert.isTrue(androidClick.get(Tags.Desc).equals("Android click on widget checkbox_accessibilityidvalue"));
 	}
 
 	@Test
@@ -57,7 +57,7 @@ public class BuildAndroidActions {
 		// Verify Action <-> Widget mapping
 		Assert.notNull(androidLongClick.get(Tags.OriginWidget));
 		Assert.isTrue(androidLongClick.get(Tags.OriginWidget).get(AndroidTags.AndroidXpath).equals(widgetPath));
-		Assert.isTrue(androidLongClick.get(Tags.Desc).equals("Android long click on widget with content-desc 'AccessibilityIdValue'"));
+		Assert.isTrue(androidLongClick.get(Tags.Desc).equals("Android long click on widget checkbox_accessibilityidvalue"));
 	}
 
 	@Test
@@ -66,7 +66,7 @@ public class BuildAndroidActions {
 		// Verify Action <-> Widget mapping
 		Assert.notNull(androidScroll.get(Tags.OriginWidget));
 		Assert.isTrue(androidScroll.get(Tags.OriginWidget).get(AndroidTags.AndroidXpath).equals(widgetPath));
-		Assert.isTrue(androidScroll.get(Tags.Desc).equals("Android scroll on widget with content-desc 'AccessibilityIdValue'"));
+		Assert.isTrue(androidScroll.get(Tags.Desc).equals("Android scroll on widget checkbox_accessibilityidvalue"));
 	}
 
 	@Test
@@ -76,7 +76,59 @@ public class BuildAndroidActions {
 		Assert.notNull(androidType.get(Tags.OriginWidget));
 		Assert.isTrue(androidType.get(Tags.OriginWidget).get(AndroidTags.AndroidXpath).equals(widgetPath));
 		Assert.isTrue(androidType.get(Tags.InputText).equals("TextToType"));
-		Assert.isTrue(androidType.get(Tags.Desc).equals("Android type on widget with content-desc 'AccessibilityIdValue' typing text: TextToType"));
+		Assert.isTrue(androidType.get(Tags.Desc).equals("Android type text TextToType on widget checkbox_accessibilityidvalue"));
+	}
+
+	@Test
+	public void buildAndroidActionClickUsesButtonRoleAndTextFallback() {
+		widget.set(AndroidTags.AndroidAccessibilityId, "");
+		widget.set(AndroidTags.AndroidText, "Save draft");
+		widget.set(AndroidTags.AndroidHint, "");
+		widget.set(AndroidTags.AndroidResourceId, "");
+		widget.set(AndroidTags.AndroidClassName, "android.widget.Button");
+
+		Action androidClick = new AndroidActionClick(state, widget);
+
+		Assert.isTrue(androidClick.get(Tags.Desc).equals("Android click on widget button_save_draft"));
+	}
+
+	@Test
+	public void buildAndroidActionTypePrefersHintForEditText() {
+		widget.set(AndroidTags.AndroidAccessibilityId, "");
+		widget.set(AndroidTags.AndroidText, "Current value");
+		widget.set(AndroidTags.AndroidHint, "Type your answer here");
+		widget.set(AndroidTags.AndroidResourceId, "");
+		widget.set(AndroidTags.AndroidClassName, "android.widget.EditText");
+
+		Action androidType = new AndroidActionType(state, widget, "TextToType");
+
+		Assert.isTrue(androidType.get(Tags.Desc).equals("Android type text TextToType on widget edittext_type_your_answer_here"));
+	}
+
+	@Test
+	public void buildAndroidActionTypePreservesMaskedHintCharacters() {
+		widget.set(AndroidTags.AndroidAccessibilityId, "");
+		widget.set(AndroidTags.AndroidText, "");
+		widget.set(AndroidTags.AndroidHint, "\u2022\u2022\u2022\u2022\u2022\u2022");
+		widget.set(AndroidTags.AndroidResourceId, "");
+		widget.set(AndroidTags.AndroidClassName, "android.widget.EditText");
+
+		Action androidType = new AndroidActionType(state, widget, "foo-boo@foo.com");
+
+		Assert.isTrue(androidType.get(Tags.Desc).equals("Android type text foo-boo@foo.com on widget edittext_??????"));
+	}
+
+	@Test
+	public void buildAndroidActionScrollUsesResourceIdFallbackForSwitch() {
+		widget.set(AndroidTags.AndroidAccessibilityId, "");
+		widget.set(AndroidTags.AndroidText, "");
+		widget.set(AndroidTags.AndroidHint, "");
+		widget.set(AndroidTags.AndroidResourceId, "project-toggle");
+		widget.set(AndroidTags.AndroidClassName, "android.widget.Switch");
+
+		Action androidScroll = new AndroidActionScroll(state, widget);
+
+		Assert.isTrue(androidScroll.get(Tags.Desc).equals("Android scroll on widget switch_project-toggle"));
 	}
 
 	@Test

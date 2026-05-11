@@ -32,6 +32,27 @@ public final class StateCompositionPlanTest {
         Assert.assertEquals("root", projectedState.get(Tags.Title, null));
     }
 
+    @Test
+    public void semanticWidgetsPlanDisambiguatesDuplicateDescriptions() {
+        StateStub state = new StateStub();
+        WidgetStub container = child(state, "Question group");
+        container.set(Tags.Desc, "Question group");
+
+        WidgetStub firstField = child(container, "field-1");
+        firstField.set(Tags.AbstractID, "widget-1");
+
+        WidgetStub secondField = child(container, "field-2");
+        secondField.set(Tags.AbstractID, "widget-2");
+
+        State projectedState = StateCompositionPlan.semanticWidgets(system -> state, new DuplicateDescriptor())
+                .query(state, new SessionPolicyContext());
+
+        List<String> descriptions = widgetDescriptions(projectedState);
+        Assert.assertEquals(2, descriptions.size());
+        Assert.assertTrue(descriptions.contains("role=input:text;label=Type your answer here.. [within 'Question group' #1]"));
+        Assert.assertTrue(descriptions.contains("role=input:text;label=Type your answer here.. [within 'Question group' #2]"));
+    }
+
     private static WidgetStub child(StateStub parentState, String title) {
         WidgetStub child = new WidgetStub();
         child.setRoot(parentState);
@@ -59,5 +80,39 @@ public final class StateCompositionPlanTest {
             widgetTitles.add(widget.get(Tags.Title, null));
         }
         return widgetTitles;
+    }
+
+    private static List<String> widgetDescriptions(State state) {
+        List<String> widgetDescriptions = new ArrayList<>();
+        for (Widget widget : state) {
+            if (widget == state) {
+                continue;
+            }
+            widgetDescriptions.add(widget.get(Tags.Desc, null));
+        }
+        return widgetDescriptions;
+    }
+
+    private static final class DuplicateDescriptor implements SemanticWidgetDescriptor {
+
+        @Override
+        public boolean shouldInclude(Widget widget) {
+            return widget.root() != widget && widget.childCount() == 0;
+        }
+
+        @Override
+        public String roleOf(Widget widget) {
+            return "input:text";
+        }
+
+        @Override
+        public String labelOf(Widget widget) {
+            return "Type your answer here..";
+        }
+
+        @Override
+        public String valueOf(Widget widget) {
+            return "";
+        }
     }
 }

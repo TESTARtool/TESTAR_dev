@@ -64,8 +64,7 @@ final class WebdriverSemanticWidgetDescriptor implements SemanticWidgetDescripto
                 widget.get(WdTags.WebInnerText, ""),
                 widget.get(Tags.Title, ""),
                 widget.get(WdTags.WebTitle, ""),
-                widget.get(WdTags.WebName, ""),
-                widget.get(Tags.Desc, "")
+                widget.get(WdTags.WebName, "")
         };
 
         for (String candidate : candidates) {
