@@ -23,10 +23,20 @@ final class AndroidActionDescriptions {
     }
 
     static String describeWidgetActionWithInput(String actionType, Widget widget, String inputText) {
-        return describeWidgetAction(actionType, widget) + " typing text: " + inputText;
+        return "Android " + actionType
+                + " on widget with " + describeTextInputTarget(widget)
+                + " typing text: " + inputText;
     }
 
     private static String describeWidgetTarget(Widget widget) {
+        return describeWidgetTarget(widget, false);
+    }
+
+    private static String describeTextInputTarget(Widget widget) {
+        return describeWidgetTarget(widget, true);
+    }
+
+    private static String describeWidgetTarget(Widget widget, boolean preferHintOverText) {
         if (widget == null) {
             return "unknown widget";
         }
@@ -36,9 +46,26 @@ final class AndroidActionDescriptions {
             return "content-desc '" + accessibilityId + "'";
         }
 
+        String hint = trim(widget.get(AndroidTags.AndroidHint, ""));
         String text = trim(widget.get(AndroidTags.AndroidText, ""));
-        if (!text.isEmpty()) {
-            return "text '" + text + "'";
+
+        // For typing actions: content-desc > hint > text > resource-id > class > xpath
+        if (preferHintOverText) {
+            if (!hint.isEmpty()) {
+                return "hint '" + hint + "'";
+            }
+            if (!text.isEmpty()) {
+                return "text '" + text + "'";
+            }
+        } 
+        // Otherwise: content-desc > text > hint > resource-id > class > xpath
+        else {
+            if (!text.isEmpty()) {
+                return "text '" + text + "'";
+            }
+            if (!hint.isEmpty()) {
+                return "hint '" + hint + "'";
+            }
         }
 
         String resourceId = trim(widget.get(AndroidTags.AndroidResourceId, ""));
@@ -46,19 +73,14 @@ final class AndroidActionDescriptions {
             return "resource-id '" + resourceId + "'";
         }
 
-        String hint = trim(widget.get(AndroidTags.AndroidHint, ""));
-        if (!hint.isEmpty()) {
-            return "hint '" + hint + "'";
+        String className = trim(widget.get(AndroidTags.AndroidClassName, ""));
+        if (!className.isEmpty()) {
+            return "type '" + className + "'";
         }
 
         String xpath = trim(widget.get(AndroidTags.AndroidXpath, ""));
         if (!xpath.isEmpty()) {
             return "xpath '" + xpath + "'";
-        }
-
-        String className = trim(widget.get(AndroidTags.AndroidClassName, ""));
-        if (!className.isEmpty()) {
-            return "type '" + className + "'";
         }
 
         return "unknown widget";
