@@ -243,8 +243,8 @@ public class SettingsFileStructure {
                 , "#################################################################"
                 , "# WebDriver features"
                 , "#"
-                , "# ClickableClasses: " + ConfigTags.ClickableClasses.getDescription()
-                , "# TypeableClasses: " + ConfigTags.TypeableClasses.getDescription()
+                , "# WebClickableClasses: " + ConfigTags.WebClickableClasses.getDescription()
+                , "# WebTypeableClasses: " + ConfigTags.WebTypeableClasses.getDescription()
                 , "# DeniedExtensions: " + ConfigTags.DeniedExtensions.getDescription()
                 , "# WebDomainsAllowed: " + ConfigTags.WebDomainsAllowed.getDescription()
                 , "# WebPathsAllowed: " + ConfigTags.WebPathsAllowed.getDescription()
@@ -253,8 +253,8 @@ public class SettingsFileStructure {
                 , "# SwitchNewTabs: " + ConfigTags.SwitchNewTabs.getDescription()
                 , "#################################################################"
                 , ""
-                , ConfigTags.ClickableClasses.name() + " = "
-                , ConfigTags.TypeableClasses.name() + " = "
+                , ConfigTags.WebClickableClasses.name() + " = "
+                , ConfigTags.WebTypeableClasses.name() + " = "
                 , ConfigTags.DeniedExtensions.name() + " = "
                 , ConfigTags.WebDomainsAllowed.name() + " = "
                 , ConfigTags.WebPathsAllowed.name() + " = "
@@ -320,6 +320,8 @@ public class SettingsFileStructure {
                 , "# AppiumAdbExecTimeout: " + ConfigTags.AppiumAdbExecTimeout.getDescription()
                 , "# AppiumUiautomator2ServerInstallTimeout: " + ConfigTags.AppiumUiautomator2ServerInstallTimeout.getDescription()
                 , "# AppiumUiautomator2ServerLaunchTimeout: " + ConfigTags.AppiumUiautomator2ServerLaunchTimeout.getDescription()
+                , "# AndroidClickableClasses: " + ConfigTags.AndroidClickableClasses.getDescription()
+                , "# AndroidTypeableClasses: " + ConfigTags.AndroidTypeableClasses.getDescription()
                 , "#################################################################"
                 , ""
                 , ConfigTags.AppiumPlatformName.name() + " = "
@@ -338,6 +340,8 @@ public class SettingsFileStructure {
                 , ConfigTags.AppiumAdbExecTimeout.name() + " = "
                 , ConfigTags.AppiumUiautomator2ServerInstallTimeout.name() + " = "
                 , ConfigTags.AppiumUiautomator2ServerLaunchTimeout.name() + " = "
+                , ConfigTags.AndroidClickableClasses.name() + " = "
+                , ConfigTags.AndroidTypeableClasses.name() + " = "
                 , ""
                 , "#################################################################"
                 , "# Settings (string) that can be used for user specified protocols"

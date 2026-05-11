@@ -842,7 +842,7 @@ The action-derivation diagram focuses on:
 
 The next sections of this document should describe:
 
-- platform modules such as `windows` and `webdriver`
+- platform modules such as `android`, `windows` and `webdriver`
 - `plugin`
 - `cli`
 - `testar`

@@ -104,10 +104,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		super.initialize(settings);
 
 		// Classes that are deemed clickable by the web framework
-		clickableClasses = settings.get(ConfigTags.ClickableClasses);
+		clickableClasses = settings.get(ConfigTags.WebClickableClasses);
 
 		// Classes that are deemed typeable by the web framework
-		typeableClasses = settings.get(ConfigTags.TypeableClasses);
+		typeableClasses = settings.get(ConfigTags.WebTypeableClasses);
 
 		// Disallow links and pages with these extensions
 		// Set to null to ignore this feature
@@ -725,7 +725,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	}
 
 	/**
-	 * Read the ClickableClasses property from test.settings file 
+	 * Read the WebClickableClasses property from test.settings file 
 	 * to update the clickableClasses while TESTAR is running in Spy mode. 
 	 */
 	private void updateCssClassesFromTestSettingsFile() {
@@ -737,14 +737,14 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		try {
 			try(BufferedReader br = new BufferedReader(new FileReader(TestarDirectories.getTestSettingsFile()))) {
 				for(String line; (line = br.readLine()) != null;) {
-					if(line.contains(ConfigTags.ClickableClasses.name())){
+					if(line.contains(ConfigTags.WebClickableClasses.name())){
 						List<String> fileClickableClasses = Arrays.asList(line.split("=")[1].trim().split(";"));
 						// Check if user added new CSS Classes from test settings file to update the clickableClasses
 						for(String webClass : fileClickableClasses) {
 							if(!webClass.isEmpty() && !clickableClasses.contains(webClass)) {
 								System.out.println("Adding new clickable class from settings file: " + webClass);
 								clickableClasses.add(webClass);
-								settings.set(ConfigTags.ClickableClasses, clickableClasses);
+								settings.set(ConfigTags.WebClickableClasses, clickableClasses);
 							}
 						}
 						// Check if user removed CSS Classes from test settings file to update the clickableClasses
@@ -752,7 +752,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 							if(!clickClass.isEmpty() && !fileClickableClasses.contains(clickClass)) {
 								System.out.println("Removing the clickable class: " + clickClass);
 								clickableClasses.remove(clickClass);
-								settings.set(ConfigTags.ClickableClasses, clickableClasses);
+								settings.set(ConfigTags.WebClickableClasses, clickableClasses);
 							}
 						}
 					}

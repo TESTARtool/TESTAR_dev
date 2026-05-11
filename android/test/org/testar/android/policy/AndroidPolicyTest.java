@@ -1,4 +1,4 @@
-package org.testar.android.action.policy;
+package org.testar.android.policy;
 
 import org.junit.Assert;
 import org.junit.Test;

@@ -4,7 +4,7 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.android.action.policy;
+package org.testar.android.policy;
 
 import org.testar.android.tag.AndroidTags;
 import org.testar.core.policy.ScrollablePolicy;

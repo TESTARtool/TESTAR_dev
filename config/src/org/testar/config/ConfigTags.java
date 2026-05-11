@@ -137,12 +137,12 @@ public final class ConfigTags {
      */
 
     @SuppressWarnings("unchecked")
-    public static final Tag<List<String>> ClickableClasses = Tag.from("ClickableClasses",
+    public static final Tag<List<String>> WebClickableClasses = Tag.from("WebClickableClasses",
             (Class<List<String>>) (Class<?>) List.class,
             "Indicate which web CSS classes need to be considered clickable");
 
     @SuppressWarnings("unchecked")
-    public static final Tag<List<String>> TypeableClasses = Tag.from("TypeableClasses",
+    public static final Tag<List<String>> WebTypeableClasses = Tag.from("WebTypeableClasses",
             (Class<List<String>>) (Class<?>) List.class,
             "Indicate which web CSS classes need to be considered typeable");
 
@@ -245,6 +245,16 @@ public final class ConfigTags {
 
     public static final Tag<Integer> AppiumUiautomator2ServerLaunchTimeout = Tag.from("AppiumUiautomator2ServerLaunchTimeout", Integer.class,
             "The UiAutomator2 server launch timeout in milliseconds");
+
+    @SuppressWarnings("unchecked")
+    public static final Tag<List<String>> AndroidClickableClasses = Tag.from("AndroidClickableClasses",
+            (Class<List<String>>) (Class<?>) List.class,
+            "Indicate which Android className values need to be considered clickable");
+
+    @SuppressWarnings("unchecked")
+    public static final Tag<List<String>> AndroidTypeableClasses = Tag.from("AndroidTypeableClasses",
+            (Class<List<String>>) (Class<?>) List.class,
+            "Indicate which Android className values need to be considered typeable");
 
     // 5 settings that can be used in user specified TESTAR protocols for anything:
     public static final Tag<String> ProtocolSpecificSetting_1 = Tag.from("ProtocolSpecificSetting_1", String.class, 

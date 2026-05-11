@@ -3,7 +3,6 @@ package org.testar.android.alayer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.testar.android.alayer.AndroidRoles;
 import org.testar.android.state.AndroidElement;
 import org.testar.android.state.AndroidState;
 import org.testar.android.state.AndroidWidget;
@@ -70,6 +69,7 @@ public class TestAndroidRoles {
             {"android.widget.LinearLayout", AndroidRoles.AndroidLinearLayout},
             {"android.widget.RelativeLayout", AndroidRoles.AndroidRelativeLayout},
             {"android.view.View", AndroidRoles.AndroidView},
+            {"android.view.MenuItem", AndroidRoles.AndroidMenuItem},
             {"android.view.ViewGroup", AndroidRoles.AndroidViewGroup},
             {"android.widget.MediaController", AndroidRoles.AndroidMediaController},
             {"android.widget.StackView", AndroidRoles.AndroidStackView},

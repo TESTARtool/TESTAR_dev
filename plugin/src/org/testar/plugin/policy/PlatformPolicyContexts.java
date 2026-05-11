@@ -10,9 +10,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.testar.android.action.policy.AndroidClickablePolicy;
-import org.testar.android.action.policy.AndroidScrollablePolicy;
-import org.testar.android.action.policy.AndroidTypeablePolicy;
+import org.testar.android.policy.AndroidClickablePolicy;
+import org.testar.android.policy.AndroidScrollablePolicy;
+import org.testar.android.policy.AndroidTypeablePolicy;
+import org.testar.android.policy.ConfigurableAndroidClickableClassPolicy;
+import org.testar.android.policy.ConfigurableAndroidTypeableClassPolicy;
 import org.testar.core.policy.AtCanvasPolicy;
 import org.testar.core.policy.BlockedPolicy;
 import org.testar.core.policy.EnabledPolicy;
@@ -102,7 +104,8 @@ public final class PlatformPolicyContexts {
         );
     }
 
-    public static SessionPolicyContext androidDefaults() {
+    public static SessionPolicyContext androidDefaults(Collection<String> customClickableClasses,
+                                                       Collection<String> customTypeableClasses) {
         List<EnabledPolicy> enabledPolicies = List.of(new TagEnabledPolicy());
         List<BlockedPolicy> blockedPolicies = List.of(new TagBlockedPolicy());
         List<WidgetFilterPolicy> widgetFilterPolicies = Collections.emptyList();
@@ -111,8 +114,14 @@ public final class PlatformPolicyContexts {
         List<TopLevelPolicy> topLevelPolicies = Collections.singletonList(widget -> true);
 
         return new SessionPolicyContext(
-                new CompositeClickablePolicy(List.of(new AndroidClickablePolicy())),
-                new CompositeTypeablePolicy(List.of(new AndroidTypeablePolicy())),
+                new CompositeClickablePolicy(List.of(
+                        new AndroidClickablePolicy(),
+                        new ConfigurableAndroidClickableClassPolicy(customClickableClasses)
+                )),
+                new CompositeTypeablePolicy(List.of(
+                        new AndroidTypeablePolicy(),
+                        new ConfigurableAndroidTypeableClassPolicy(customTypeableClasses)
+                )),
                 new CompositeScrollablePolicy(List.of(new AndroidScrollablePolicy())),
                 new CompositeSelectablePolicy(Collections.<SelectablePolicy>emptyList()),
                 new CompositeEnabledPolicy(enabledPolicies),

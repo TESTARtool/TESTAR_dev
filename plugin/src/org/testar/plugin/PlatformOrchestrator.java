@@ -250,7 +250,10 @@ public final class PlatformOrchestrator {
     private static SessionPolicyContext buildAndroidPolicyContext(PlatformSessionSpec sessionSpec,
                                                                   SessionPolicyConfiguration policyConfiguration) {
         return SessionPolicyContextComposer.compose(
-                PlatformPolicyContexts.androidDefaults(),
+                PlatformPolicyContexts.androidDefaults(
+                        sessionSpec.getSettings().get(ConfigTags.AndroidClickableClasses, Collections.emptyList()),
+                        sessionSpec.getSettings().get(ConfigTags.AndroidTypeableClasses, Collections.emptyList())
+                ),
                 policyConfiguration
         );
     }
@@ -259,8 +262,8 @@ public final class PlatformOrchestrator {
                                                                     SessionPolicyConfiguration policyConfiguration) {
         return SessionPolicyContextComposer.compose(
                 PlatformPolicyContexts.webdriverDefaults(
-                        sessionSpec.getSettings().get(ConfigTags.ClickableClasses, Collections.emptyList()),
-                        sessionSpec.getSettings().get(ConfigTags.TypeableClasses, Collections.emptyList())
+                        sessionSpec.getSettings().get(ConfigTags.WebClickableClasses, Collections.emptyList()),
+                        sessionSpec.getSettings().get(ConfigTags.WebTypeableClasses, Collections.emptyList())
                 ),
                 policyConfiguration
         );

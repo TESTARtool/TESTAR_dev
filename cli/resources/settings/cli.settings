@@ -87,8 +87,8 @@ AbstractStateAttributes = WidgetControlType,WidgetTitle,WidgetPath
 #################################################################
 # WebDriver features
 #
-# ClickableClasses: Indicate which web CSS classes need to be considered clickable
-# TypeableClasses: Indicate which web CSS classes need to be considered typeable
+# WebClickableClasses: Indicate which web CSS classes need to be considered clickable
+# WebTypeableClasses: Indicate which web CSS classes need to be considered typeable
 # DeniedExtensions: Indicate which web URL extensions need to be ignored when testing
 # WebDomainsAllowed: Indicate which web URL domains are allowed to explore when testing
 # WebPathsAllowed: Regular expressions to indicate which web URL paths are allowed to explore when testing
@@ -97,8 +97,8 @@ AbstractStateAttributes = WidgetControlType,WidgetTitle,WidgetPath
 # SwitchNewTabs: Indicate if switch to a new web tab if opened
 #################################################################
 
-ClickableClasses = 
-TypeableClasses = input
+WebClickableClasses = 
+WebTypeableClasses = input
 DeniedExtensions = pdf;jpg;png;pfx;xml
 WebDomainsAllowed = null
 WebPathsAllowed = null
@@ -126,6 +126,8 @@ AppiumIgnoreHiddenApiPolicyError = false
 AppiumAdbExecTimeout = 120000
 AppiumUiautomator2ServerInstallTimeout = 120000
 AppiumUiautomator2ServerLaunchTimeout = 120000
+AndroidClickableClasses = android.widget.TextView
+AndroidTypeableClasses =
 
 #################################################################
 # Sets whether to keep the SUTs GUI active in the screen (e.g. when its minimised or when a process is started and its UI is in front, etc.)

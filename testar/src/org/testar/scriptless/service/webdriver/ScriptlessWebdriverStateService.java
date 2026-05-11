@@ -53,17 +53,17 @@ public final class ScriptlessWebdriverStateService implements StateService {
             return;
         }
 
-        List<String> clickableClasses = runtimeContext.settings().get(ConfigTags.ClickableClasses);
+        List<String> clickableClasses = runtimeContext.settings().get(ConfigTags.WebClickableClasses);
         try (BufferedReader reader = new BufferedReader(new FileReader(TestarDirectories.getTestSettingsFile()))) {
             for (String line; (line = reader.readLine()) != null; ) {
-                if (line.contains(ConfigTags.ClickableClasses.name())) {
+                if (line.contains(ConfigTags.WebClickableClasses.name())) {
                     List<String> fileClickableClasses = Arrays.asList(line.split("=")[1].trim().split(";"));
 
                     for (String webClass : fileClickableClasses) {
                         if (!webClass.isEmpty() && !clickableClasses.contains(webClass)) {
                             System.out.println("Adding new clickable class from settings file: " + webClass);
                             clickableClasses.add(webClass);
-                            runtimeContext.settings().set(ConfigTags.ClickableClasses, clickableClasses);
+                            runtimeContext.settings().set(ConfigTags.WebClickableClasses, clickableClasses);
                         }
                     }
 
@@ -71,7 +71,7 @@ public final class ScriptlessWebdriverStateService implements StateService {
                         if (!clickableClass.isEmpty() && !fileClickableClasses.contains(clickableClass)) {
                             System.out.println("Removing the clickable class: " + clickableClass);
                             clickableClasses.remove(clickableClass);
-                            runtimeContext.settings().set(ConfigTags.ClickableClasses, clickableClasses);
+                            runtimeContext.settings().set(ConfigTags.WebClickableClasses, clickableClasses);
                         }
                     }
                 }

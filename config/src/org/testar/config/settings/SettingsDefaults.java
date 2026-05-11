@@ -37,9 +37,11 @@ import static org.testar.config.ConfigTags.AppiumNewCommandTimeout;
 import static org.testar.config.ConfigTags.AppiumPlatformName;
 import static org.testar.config.ConfigTags.AppiumUiautomator2ServerInstallTimeout;
 import static org.testar.config.ConfigTags.AppiumUiautomator2ServerLaunchTimeout;
+import static org.testar.config.ConfigTags.AndroidClickableClasses;
+import static org.testar.config.ConfigTags.AndroidTypeableClasses;
 import static org.testar.config.ConfigTags.BrowserFullScreen;
 import static org.testar.config.ConfigTags.ClickFilter;
-import static org.testar.config.ConfigTags.ClickableClasses;
+import static org.testar.config.ConfigTags.WebClickableClasses;
 import static org.testar.config.ConfigTags.CopyFromTo;
 import static org.testar.config.ConfigTags.CreateWidgetInfoJsonFile;
 import static org.testar.config.ConfigTags.Delete;
@@ -109,7 +111,7 @@ import static org.testar.config.ConfigTags.TagsToFilter;
 import static org.testar.config.ConfigTags.TempDir;
 import static org.testar.config.ConfigTags.TimeToFreeze;
 import static org.testar.config.ConfigTags.TimeToWaitAfterAction;
-import static org.testar.config.ConfigTags.TypeableClasses;
+import static org.testar.config.ConfigTags.WebTypeableClasses;
 import static org.testar.config.ConfigTags.VisualizeActions;
 import static org.testar.config.ConfigTags.WebConsoleErrorOracle;
 import static org.testar.config.ConfigTags.WebConsoleErrorPattern;
@@ -197,6 +199,8 @@ public class SettingsDefaults {
         defaults.add(Pair.from(AppiumAdbExecTimeout, 120000));
         defaults.add(Pair.from(AppiumUiautomator2ServerInstallTimeout, 120000));
         defaults.add(Pair.from(AppiumUiautomator2ServerLaunchTimeout, 120000));
+        defaults.add(Pair.from(AndroidClickableClasses, new ArrayList<String>()));
+        defaults.add(Pair.from(AndroidTypeableClasses, new ArrayList<String>()));
 
         defaults.add(Pair.from(ProtocolSpecificSetting_1, ""));
         defaults.add(Pair.from(ProtocolSpecificSetting_2, ""));
@@ -211,14 +215,14 @@ public class SettingsDefaults {
             }
         }));
 
-        defaults.add(Pair.from(ClickableClasses, new ArrayList<String>() {
+        defaults.add(Pair.from(WebClickableClasses, new ArrayList<String>() {
             {
                 add("v-menubar-menuitem");
                 add("v-menubar-menuitem-caption");
             }
         }));
 
-        defaults.add(Pair.from(TypeableClasses, new ArrayList<String>()));
+        defaults.add(Pair.from(WebTypeableClasses, new ArrayList<String>()));
 
         defaults.add(Pair.from(DeniedExtensions, new ArrayList<String>() {
             {
