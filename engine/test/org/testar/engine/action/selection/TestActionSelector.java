@@ -26,7 +26,6 @@ import org.testar.core.action.StdActionCompiler;
 import org.testar.core.alayer.Rect;
 import org.testar.core.alayer.Roles;
 import org.testar.core.tag.Tags;
-import org.testar.engine.action.selection.ActionSelectorPlan;
 import org.testar.engine.action.selection.prioritize.PrioritizeNewActionsSelector;
 import org.testar.engine.action.selection.stategraph.GuiStateGraphWithVisitedActions;
 import org.testar.engine.action.selection.stategraph.QLearningActionSelector;
