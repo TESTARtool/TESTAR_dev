@@ -22,6 +22,16 @@ public final class WebdriverSemanticWidgetDescriptorTest {
     }
 
     @Test
+    public void shouldIncludeMeaningfulTextualDivWithoutDescendants() {
+        StateStub state = new StateStub();
+        WidgetStub widget = child(state);
+        widget.set(WdTags.WebTagName, "div");
+        widget.set(WdTags.WebInnerText, "This is text");
+
+        Assert.assertTrue(descriptor.shouldInclude(widget));
+    }
+
+    @Test
     public void shouldNotIncludeNonTextualWidget() {
         StateStub state = new StateStub();
         WidgetStub container = child(state);

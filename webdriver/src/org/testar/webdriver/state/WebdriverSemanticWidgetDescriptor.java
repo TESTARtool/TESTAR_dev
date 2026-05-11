@@ -18,7 +18,6 @@ import org.testar.webdriver.tag.WdTags;
 final class WebdriverSemanticWidgetDescriptor implements SemanticWidgetDescriptor {
 
     private static final Set<String> WEB_UNMEANINGFUL_TAGS = Set.of(
-            "div",
             "path",
             "svg"
     );
@@ -109,7 +108,26 @@ final class WebdriverSemanticWidgetDescriptor implements SemanticWidgetDescripto
 
     private boolean isIgnoredUnmeaningful(Widget widget) {
         String tagName = lower(widget.get(WdTags.WebTagName, ""));
-        return WEB_UNMEANINGFUL_TAGS.contains(tagName);
+        if ("div".equals(tagName)) {
+            return isContainerWithMeaningfulDescendant(widget);
+        }
+        return isUnmeaningfulTag(tagName);
+    }
+
+    private boolean isContainerWithMeaningfulDescendant(Widget widget) {
+        for (int i = 0; i < widget.childCount(); i++) {
+            Widget child = widget.child(i);
+            if (!isVisible(child)) {
+                continue;
+            }
+            if (shouldInclude(child)) {
+                return true;
+            }
+            if (isContainerWithMeaningfulDescendant(child)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean isShadowedByMeaningfulAncestor(Widget widget) {
@@ -128,7 +146,7 @@ final class WebdriverSemanticWidgetDescriptor implements SemanticWidgetDescripto
             String parentLabel = labelOf(parent);
             if (!parentLabel.isBlank()
                     && widgetLabel.equals(parentLabel)
-                    && !isIgnoredUnmeaningful(parent)) {
+                    && !isUnmeaningfulTag(lower(parent.get(WdTags.WebTagName, "")))) {
                 return true;
             }
             parent = parent.parent();
@@ -151,5 +169,9 @@ final class WebdriverSemanticWidgetDescriptor implements SemanticWidgetDescripto
 
     private String lower(String value) {
         return SemanticStateFormatter.sanitize(value).toLowerCase();
+    }
+
+    private boolean isUnmeaningfulTag(String tagName) {
+        return WEB_UNMEANINGFUL_TAGS.contains(tagName);
     }
 }
