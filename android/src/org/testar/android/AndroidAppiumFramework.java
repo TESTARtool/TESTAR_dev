@@ -43,7 +43,6 @@ import javax.imageio.ImageIO;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.MalformedURLException;
@@ -430,33 +429,48 @@ public class AndroidAppiumFramework extends SUTBase {
 			markDriverUnresponsive(wde);
 			throw new IOException("Exception: AndroidDriver getScreenshotAction failed", wde);
 		}
-
-		// Highlight the action on the screenshot:
-		BufferedImage newBi = ImageIO.read(is);
-		// get the Graphics context for this single BufferedImage object
-		Graphics2D g = (Graphics2D) newBi.getGraphics();
-
-		Widget widget = action.get(Tags.OriginWidget);
-
-		Rect bounds = widget.get(AndroidTags.AndroidBounds);
-		int xLocation = ((int)(bounds.x() + (bounds.width()/2.0))-1);
-		int yLocation = ((int)(bounds.y() + (bounds.height()/2.0))-1);
-
-		g.setColor(new java.awt.Color(255, 0, 0, 130));
-		g.drawOval(xLocation, yLocation, 20, 20);
-		g.setColor(new java.awt.Color(255, 0, 0, 130));
-		g.fillOval(xLocation, yLocation, 20, 20);
-		g.setColor(new java.awt.Color(255, 0, 0, 130));
-		g.setStroke(new BasicStroke(6));
-		g.drawRect((int)bounds.x(), (int)bounds.y(), (int)bounds.width(), (int)bounds.height());
-		g.dispose();  // get rid of the Graphics context to save resources
+		BufferedImage screenshot = ImageIO.read(is);
+		BufferedImage actionImage = cropActionImage(screenshot, action.get(Tags.OriginWidget, null));
 
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		ImageIO.write(newBi, "png", os);
-		InputStream is2 = new ByteArrayInputStream(os.toByteArray());
+		ImageIO.write(actionImage, "png", os);
+		InputStream actionStream = new ByteArrayInputStream(os.toByteArray());
 
-		AWTCanvas canvas = AWTCanvas.fromInputStream(is2);
+		AWTCanvas canvas = AWTCanvas.fromInputStream(actionStream);
 		return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), action.get(Tags.ConcreteID, "NoConcreteIdAvailable"), canvas);
+	}
+
+	private static BufferedImage cropActionImage(BufferedImage screenshot, Widget widget) {
+		if (screenshot == null || widget == null) {
+			return screenshot;
+		}
+
+		Rect bounds = widget.get(AndroidTags.AndroidBounds, null);
+		if (bounds == null) {
+			return screenshot;
+		}
+
+		int x = (int)Math.floor(bounds.x());
+		int y = (int)Math.floor(bounds.y());
+		int width = (int)Math.ceil(bounds.width());
+		int height = (int)Math.ceil(bounds.height());
+
+		if (width <= 0 || height <= 0) {
+			return screenshot;
+		}
+
+		int clampedX = Math.max(0, x);
+		int clampedY = Math.max(0, y);
+		int clampedMaxX = Math.min(screenshot.getWidth(), x + width);
+		int clampedMaxY = Math.min(screenshot.getHeight(), y + height);
+		int clampedWidth = clampedMaxX - clampedX;
+		int clampedHeight = clampedMaxY - clampedY;
+
+		if (clampedWidth <= 0 || clampedHeight <= 0) {
+			return screenshot;
+		}
+
+		return screenshot.getSubimage(clampedX, clampedY, clampedWidth, clampedHeight);
 	}
 
 	public static AWTCanvas getScreenshotBinary(State state) throws IOException {
