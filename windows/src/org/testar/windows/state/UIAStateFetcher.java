@@ -75,6 +75,9 @@ public class UIAStateFetcher implements Callable<UIAState>{
         UIAState root = createWidgetTree(uiaRoot);
         root.set(Tags.Role, Roles.Process);
         root.set(Tags.NotResponding, false);
+
+        root.set(Tags.Title, topLevelForegroundWindowTitle(root));
+        root.set(Tags.Desc, system.get(Tags.Desc, ""));
         root.set(Tags.Representation, generateXmlRepresentation(root, 0));
 
         for (Widget w : root)
@@ -85,6 +88,39 @@ public class UIAStateFetcher implements Callable<UIAState>{
         Windows.CoUninitialize();
         
         return root;
+    }
+
+    private String topLevelForegroundWindowTitle(UIAState root) {
+        if (root == null) {
+            return "";
+        }
+
+        UIAWidget bestTopLevelWidget = null;
+        double highestZIndex = Double.NEGATIVE_INFINITY;
+
+        for (int index = 0; index < root.childCount(); index++) {
+            UIAWidget child = root.child(index);
+            if (child == null || child.uiaElement == null || !child.uiaElement.isTopLevelContainer) {
+                continue;
+            }
+
+            String title = child.get(Tags.Title, "");
+            if (title == null || title.trim().isEmpty()) {
+                continue;
+            }
+
+            double zIndex = child.uiaElement.zindex;
+            if (bestTopLevelWidget == null || zIndex > highestZIndex) {
+                bestTopLevelWidget = child;
+                highestZIndex = zIndex;
+            }
+        }
+
+        if (bestTopLevelWidget != null) {
+            return bestTopLevelWidget.get(Tags.Title, "");
+        }
+
+        return system.get(Tags.Desc, "");
     }
     
     /**

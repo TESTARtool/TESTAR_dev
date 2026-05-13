@@ -109,8 +109,15 @@ public class WdStateFetcher implements Callable<WdState> {
     WdState root = createWidgetTree(rootElement);
     root.set(Tags.Role, Roles.Process);
     root.set(Tags.NotResponding, false);
-    root.set(WdTags.WebHref, WdDriver.getCurrentUrl());
-    root.set(WdTags.WebTitle, WdDriver.getTitle());
+
+    String pageUrl = WdDriver.getCurrentUrl();
+    root.set(Tags.LinkReference, pageUrl);
+    root.set(WdTags.WebHref, pageUrl);
+
+    String pageTitle = WdDriver.getTitle();
+    root.set(Tags.Title, pageTitle);
+    root.set(WdTags.WebTitle, pageTitle);
+
     root.set(Tags.StateRenderTime, rootElement.largestContentfulPaint);
 
     for (Widget w : root) {

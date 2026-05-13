@@ -60,6 +60,9 @@ public class AndroidStateFetcher implements Callable<AndroidState> {
 		root.set(Tags.Role, Roles.Process);
 		root.set(Tags.NotResponding, false);
 
+		root.set(Tags.Title, androidActivityVar);
+		root.set(Tags.Desc, "Android system");
+
 		// After create the widget tree, set widgets Path
 		for (Widget w : root) {
 		    w.set(Tags.Path, Util.indexString(w));

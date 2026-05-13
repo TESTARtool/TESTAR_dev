@@ -33,6 +33,7 @@ import org.testar.core.verdict.Verdict;
 import org.testar.plugin.screenshot.ScreenshotProviderFactory;
 import org.testar.reporting.ReportManager;
 import org.testar.reporting.Reporting;
+import org.testar.reporting.sequence.SequenceTraceSession;
 
 /**
  * Manages per-session screenshots and report generation for CLI sessions.
@@ -41,20 +42,30 @@ public final class SessionReportingManager {
 
     private Reporting reporting;
     private final AtomicBoolean finished;
+    private final SequenceTraceSession sequenceTraceSession;
 
-    private SessionReportingManager(Reporting reporting) {
+    private SessionReportingManager(Reporting reporting, SequenceTraceSession sequenceTraceSession) {
         this.reporting = reporting;
         this.finished = new AtomicBoolean(false);
+        this.sequenceTraceSession = sequenceTraceSession;
     }
 
     public static SessionReportingManager create() {
-        return new SessionReportingManager(null);
+        return new SessionReportingManager(null, SequenceTraceSession.disabled());
     }
 
     public static SessionReportingManager start(Settings settings, String target) {
         configureOutputStructure(settings, target);
         startScreenshotSerialiser();
-        return new SessionReportingManager(new ReportManager(settings));
+        String sequenceId = currentSequenceId();
+        return new SessionReportingManager(
+                new ReportManager(settings),
+                SequenceTraceSession.create(
+                        sequenceId,
+                        target,
+                        Path.of(OutputStructure.htmlOutputDir, sequenceId + ".json")
+                )
+        );
     }
 
     public void bindReporting(Reporting reporting) {
@@ -63,8 +74,6 @@ public final class SessionReportingManager {
 
     public void prepareGeneratedSequenceOutput(Settings settings) {
         String sequenceCountDir = "_sequence_" + OutputStructure.sequenceInnerLoopCount;
-        String generatedSequence = OutputStructure.startInnerLoopDateString + "_"
-                + OutputStructure.executedSUTname + sequenceCountDir;
         String logFileName = OutputStructure.logsOutputDir
                 + File.separator + OutputStructure.startInnerLoopDateString + "_"
                 + OutputStructure.executedSUTname + sequenceCountDir + ".log";
@@ -133,6 +142,8 @@ public final class SessionReportingManager {
                 ) + "\n",
                 LogSerialiser.LogLevel.Info
         );
+
+        sequenceTraceSession.recordSelectedAction(state, action);
     }
 
     public void addTestVerdicts(List<Verdict> verdicts) {
@@ -176,6 +187,7 @@ public final class SessionReportingManager {
             return;
         }
 
+        sequenceTraceSession.finish();
         addTestVerdicts(verdicts);
         finishReport();
         ScreenshotSerialiser.exit();
@@ -200,6 +212,12 @@ public final class SessionReportingManager {
         String screenshotsDirectory = OutputStructure.startInnerLoopDateString + "_"
                 + OutputStructure.executedSUTname + "_sequence_" + OutputStructure.sequenceInnerLoopCount;
         ScreenshotSerialiser.start(OutputStructure.screenshotsOutputDir, screenshotsDirectory);
+    }
+
+    private static String currentSequenceId() {
+        return OutputStructure.startInnerLoopDateString + "_"
+                + OutputStructure.executedSUTname
+                + "_sequence_" + OutputStructure.sequenceInnerLoopCount;
     }
 
     private static String sanitizeTarget(String target) {
