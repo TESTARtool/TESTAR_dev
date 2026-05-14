@@ -33,6 +33,8 @@ import org.testar.scriptless.service.webdriver.ScriptlessWebdriverActionSelector
 import org.testar.scriptless.service.webdriver.ScriptlessWebdriverStateService;
 import org.testar.scriptless.service.webdriver.ScriptlessWebdriverOracleComposer;
 import org.testar.scriptless.service.webdriver.ScriptlessWebdriverSystemService;
+import org.testar.scriptless.service.windows.ScriptlessWindowsActionDerivationService;
+import org.testar.scriptless.service.windows.ScriptlessWindowsStateService;
 import org.testar.statemodel.StateModelManager;
 
 /**
@@ -80,6 +82,19 @@ public final class ScriptlessFactory {
             serviceConfiguration = SessionServiceConfiguration.builder()
                     .overrideStateCompositionPlan(scriptlessWebdriverStatePlan)
                     .build();
+        } else if (sessionSpec.getOperatingSystem() == OperatingSystems.WINDOWS
+                || sessionSpec.getOperatingSystem() == OperatingSystems.WINDOWS_10) {
+            StateCompositionPlan defaultStatePlan = PlatformDefaultSessionConfigurations
+                    .windowsServiceConfiguration(sessionSpec)
+                    .stateCompositionPlanOverride()
+                    .orElseThrow();
+            StateCompositionPlan scriptlessWindowsStatePlan = new StateCompositionPlan(
+                    new ScriptlessWindowsStateService(defaultStatePlan.stateService(), runtimeContext),
+                    defaultStatePlan::query
+            );
+            serviceConfiguration = SessionServiceConfiguration.builder()
+                    .overrideStateCompositionPlan(scriptlessWindowsStatePlan)
+                    .build();
         }
 
         // Resolve the final platform service bundle from plugin/engine and then
@@ -93,6 +108,10 @@ public final class ScriptlessFactory {
 
         if (sessionSpec.getOperatingSystem() == OperatingSystems.WEBDRIVER) {
             return webdriverTestingServices(platformServices, runtimeContext, sessionReportingManager);
+        }
+        if (sessionSpec.getOperatingSystem() == OperatingSystems.WINDOWS
+                || sessionSpec.getOperatingSystem() == OperatingSystems.WINDOWS_10) {
+            return windowsTestingServices(platformServices, sessionReportingManager);
         }
 
         return TestingServices.fromPlatformServices(platformServices, sessionReportingManager);
@@ -150,6 +169,32 @@ public final class ScriptlessFactory {
                 platformServices.actionSelectorService(),
                 runtimeContext
         );
+        ActionResolver actionResolver = platformServices.actionResolver();
+        ActionExecutionService actionExecutionService = platformServices.actionExecutionService();
+
+        return new TestingServices(
+                systemService,
+                stateService,
+                oracleEvaluationService,
+                stateModelManager,
+                actionDerivationService,
+                actionSelectorService,
+                actionResolver,
+                actionExecutionService,
+                sessionReportingManager
+        );
+    }
+
+    private static TestingServices windowsTestingServices(PlatformServices platformServices,
+                                                          SessionReportingManager sessionReportingManager) {
+        SystemService systemService = platformServices.systemService();
+        StateService stateService = platformServices.stateService();
+        OracleEvaluationService oracleEvaluationService = platformServices.oracleEvaluationService();
+        StateModelManager stateModelManager = platformServices.stateModelService();
+        ActionDerivationService actionDerivationService = new ScriptlessWindowsActionDerivationService(
+                platformServices.actionDerivationService()
+        );
+        ActionSelectorService actionSelectorService = platformServices.actionSelectorService();
         ActionResolver actionResolver = platformServices.actionResolver();
         ActionExecutionService actionExecutionService = platformServices.actionExecutionService();
 

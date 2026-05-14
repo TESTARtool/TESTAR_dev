@@ -37,15 +37,23 @@ public final class ConfiguredWidgetFilterPolicy implements WidgetFilterPolicy {
 
     @Override
     public boolean allows(Widget widget) {
+        // Check whether the widget can be hit
+        // If not, it should be filtered
         if (!Util.hitTest(widget, 0.5, 0.5)) {
             return false;
         }
 
         for (String tagName : tagsToFilter) {
             String tagValue = findTagValue(widget, tagName);
+
+            // Check whether the Tag value is empty or null
+            // If it is, it is unfiltered
+            // Because it cannot match the regular expression of the Action Filter.
             if (tagValue == null || tagValue.isEmpty()) {
-                continue;
+                continue; // no action, isFiltered is still false (cannot return directly if other Tags are checked)
             }
+
+            // Check whether the tag value matches any of the clickFilterPatterns
             if (clickFilterPattern.matcher(tagValue).matches()) {
                 return false;
             }
