@@ -7,6 +7,7 @@
 package org.testar.scriptless.capability;
 
 import org.testar.engine.manager.NativeHookManager;
+import org.testar.plugin.NativeLinker;
 import org.testar.scriptless.RuntimeContext;
 
 public class TestSessionCapability {
@@ -17,6 +18,7 @@ public class TestSessionCapability {
 
     public void closeTestSession(RuntimeContext runtimeContext) {
         NativeHookManager.unregisterNativeListener(runtimeContext.eventHandler());
+        NativeLinker.cleanWdDriverOS();
     }
 
 }

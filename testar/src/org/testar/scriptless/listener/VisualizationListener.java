@@ -16,6 +16,7 @@ import org.testar.config.TestarMode;
 import org.testar.core.action.Action;
 import org.testar.core.devices.IEventListener;
 import org.testar.core.devices.KBKeys;
+import org.testar.core.devices.MouseButtons;
 import org.testar.core.state.State;
 import org.testar.core.tag.Tag;
 import org.testar.core.util.VisualizationUtil;
@@ -92,14 +93,14 @@ public final class VisualizationListener implements IEventListener {
 
     @Override
     public void keyDown(KBKeys key) {   
-        if (runtimeContext.mode() == TestarMode.Spy){ 
+        if (runtimeContext.mode() == TestarMode.Spy) { 
         	if (key == KBKeys.VK_CAPS_LOCK || key == KBKeys.VK_ALT)
         		displayWhiteTabu = !displayWhiteTabu;
         	else if (key == KBKeys.VK_TAB)
         		preciseCoding = !preciseCoding;
         	else if (key == KBKeys.VK_SHIFT)
         		shiftPressed = true;
-	    	else if (key == KBKeys.VK_CONTROL){
+	    	else if (key == KBKeys.VK_CONTROL) {
 	    		filterArea[0] = mouseX;
 	    		filterArea[1] = mouseY;
 	    	}
@@ -108,10 +109,10 @@ public final class VisualizationListener implements IEventListener {
 
     @Override
     public void keyUp(KBKeys key) {
-        if (runtimeContext.mode() == TestarMode.Spy){
+        if (runtimeContext.mode() == TestarMode.Spy) {
         	if (key == KBKeys.VK_SHIFT) {
 	    		shiftPressed = false;
-        	} else if (key == KBKeys.VK_CONTROL && displayWhiteTabu){
+        	} else if (key == KBKeys.VK_CONTROL && displayWhiteTabu) {
 	    		filterArea[2] = mouseX;
 	    		filterArea[3] = mouseY;
 	    		whiteTabuMode = shiftPressed;
@@ -127,11 +128,11 @@ public final class VisualizationListener implements IEventListener {
     }
 
     @Override
-    public void mouseDown(org.testar.core.devices.MouseButtons btn, double x, double y) {
+    public void mouseDown(MouseButtons btn, double x, double y) {
     }
 
     @Override
-    public void mouseUp(org.testar.core.devices.MouseButtons btn, double x, double y) {
+    public void mouseUp(MouseButtons btn, double x, double y) {
     }
 
 	@Override

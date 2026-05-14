@@ -245,7 +245,7 @@ public class SettingsFileStructure {
                 , "#"
                 , "# WebClickableClasses: " + ConfigTags.WebClickableClasses.getDescription()
                 , "# WebTypeableClasses: " + ConfigTags.WebTypeableClasses.getDescription()
-                , "# DeniedExtensions: " + ConfigTags.DeniedExtensions.getDescription()
+                , "# WebDeniedExtensions: " + ConfigTags.WebDeniedExtensions.getDescription()
                 , "# WebDomainsAllowed: " + ConfigTags.WebDomainsAllowed.getDescription()
                 , "# WebPathsAllowed: " + ConfigTags.WebPathsAllowed.getDescription()
                 , "# FollowLinks: " + ConfigTags.FollowLinks.getDescription()
@@ -255,7 +255,7 @@ public class SettingsFileStructure {
                 , ""
                 , ConfigTags.WebClickableClasses.name() + " = "
                 , ConfigTags.WebTypeableClasses.name() + " = "
-                , ConfigTags.DeniedExtensions.name() + " = "
+                , ConfigTags.WebDeniedExtensions.name() + " = "
                 , ConfigTags.WebDomainsAllowed.name() + " = "
                 , ConfigTags.WebPathsAllowed.name() + " = "
                 , ConfigTags.FollowLinks.name() + " = "

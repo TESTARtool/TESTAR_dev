@@ -30,6 +30,7 @@ import org.testar.plugin.process.SystemProcessHandling;
 import org.testar.scriptless.listener.ModeListener;
 import org.testar.scriptless.listener.EventListener;
 import org.testar.scriptless.listener.VisualizationListener;
+import org.testar.scriptless.listener.webdriver.CssCustomizationListener;
 import org.testar.scriptless.mode.GenerateMode;
 import org.testar.scriptless.mode.SpyMode;
 
@@ -90,6 +91,11 @@ public abstract class ComposedProtocol implements Consumer<Settings> {
         return Assert.notNull(visualizationListener);
     }
 
+    protected CssCustomizationListener cssCustomizationListener;
+    public final CssCustomizationListener cssCustomizationListener() {
+        return Assert.notNull(cssCustomizationListener);
+    }
+
     @Override
     public final void accept(final Settings protocolSettings) {
         if (!GraphicsEnvironment.isHeadless()) {
@@ -115,7 +121,7 @@ public abstract class ComposedProtocol implements Consumer<Settings> {
 
         modeListener = new ModeListener(runtimeContext, runtimeContext.settings().get(ConfigTags.KeyBoardListener, false));
         visualizationListener = new VisualizationListener(runtimeContext);
-        EventHandler eventHandler = new EventHandler(new EventListener(modeListener(), visualizationListener()));
+        EventHandler eventHandler = new EventHandler(new EventListener(modeListener(), visualizationListener(), cssCustomizationListener()));
         runtimeContext.setEventHandler(eventHandler);
 
         // Build the core testing services

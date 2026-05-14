@@ -52,7 +52,7 @@ Under _System Preferences_, _Security & Privacy_, _Accessibility_ allow the term
 
 While the webdriver tries to find all clickable elements on the page via the _onclick_ attribute or eventlistener, this is not sufficient for certain web frameworks that use global eventlisteners. Global eventListeners use class attributes to determine the required actions when the element is clicked. The protocol allows the tester to add these attributes to _clickableClasses_.
 
-Because the webdriver is dependent on the use of the (Javascript) web extension, it fails when the browser encounters PDFs or images. With the _deniedExtensions_ option the testar can deny these URLs.
+Because the webdriver is dependent on the use of the (Javascript) web extension, it fails when the browser encounters PDFs or images. With the _webDeniedExtensions_ option the testar can deny these URLs.
 
 While testing web applications, it is desirable to keep the testing on the same domain. Many applications have links pointing to domains outside the scope. When the browser reaches a domain not defined in _webDomainsAllowed_ it will try to go back to the last allowed page. Related to this is the _followLinks_ option to follow links opened in new tabs or stay with the original tab. 
 

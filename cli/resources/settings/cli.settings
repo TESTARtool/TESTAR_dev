@@ -89,7 +89,7 @@ AbstractStateAttributes = WidgetControlType,WidgetTitle,WidgetPath
 #
 # WebClickableClasses: Indicate which web CSS classes need to be considered clickable
 # WebTypeableClasses: Indicate which web CSS classes need to be considered typeable
-# DeniedExtensions: Indicate which web URL extensions need to be ignored when testing
+# WebDeniedExtensions: Indicate which web URL extensions need to be ignored when testing
 # WebDomainsAllowed: Indicate which web URL domains are allowed to explore when testing
 # WebPathsAllowed: Regular expressions to indicate which web URL paths are allowed to explore when testing
 # FollowLinks: Indicate if allowing to follow links opened in new tabs
@@ -99,7 +99,7 @@ AbstractStateAttributes = WidgetControlType,WidgetTitle,WidgetPath
 
 WebClickableClasses = 
 WebTypeableClasses = input
-DeniedExtensions = pdf;jpg;png;pfx;xml
+WebDeniedExtensions = pdf;jpg;png;pfx;xml
 WebDomainsAllowed = null
 WebPathsAllowed = null
 FollowLinks = false

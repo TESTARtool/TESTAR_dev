@@ -45,7 +45,7 @@ import static org.testar.config.ConfigTags.WebClickableClasses;
 import static org.testar.config.ConfigTags.CopyFromTo;
 import static org.testar.config.ConfigTags.CreateWidgetInfoJsonFile;
 import static org.testar.config.ConfigTags.Delete;
-import static org.testar.config.ConfigTags.DeniedExtensions;
+import static org.testar.config.ConfigTags.WebDeniedExtensions;
 import static org.testar.config.ConfigTags.Discount;
 import static org.testar.config.ConfigTags.ExtendedOracles;
 import static org.testar.config.ConfigTags.FollowLinks;
@@ -224,7 +224,7 @@ public class SettingsDefaults {
 
         defaults.add(Pair.from(WebTypeableClasses, new ArrayList<String>()));
 
-        defaults.add(Pair.from(DeniedExtensions, new ArrayList<String>() {
+        defaults.add(Pair.from(WebDeniedExtensions, new ArrayList<String>() {
             {
                 add("pdf");
                 add("jpg");

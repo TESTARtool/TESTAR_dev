@@ -9,6 +9,13 @@ package org.testar.scriptless;
 import org.testar.config.ConfigTags;
 import org.testar.config.settings.Settings;
 import org.testar.core.Assert;
+import org.testar.core.action.resolver.ActionResolver;
+import org.testar.core.service.ActionDerivationService;
+import org.testar.core.service.ActionExecutionService;
+import org.testar.core.service.ActionSelectorService;
+import org.testar.core.service.OracleEvaluationService;
+import org.testar.core.service.StateService;
+import org.testar.core.service.SystemService;
 import org.testar.engine.state.StateCompositionPlan;
 import org.testar.plugin.OperatingSystems;
 import org.testar.plugin.PlatformOrchestrator;
@@ -21,8 +28,12 @@ import org.testar.plugin.configuration.SessionServiceConfiguration;
 import org.testar.plugin.reporting.SessionReportingManager;
 import org.testar.scriptless.capability.webdriver.WebdriverSettingsCapability;
 import org.testar.scriptless.capability.webdriver.WebdriverTestSessionCapability;
+import org.testar.scriptless.service.webdriver.ScriptlessWebdriverActionDerivationService;
+import org.testar.scriptless.service.webdriver.ScriptlessWebdriverActionSelectorService;
 import org.testar.scriptless.service.webdriver.ScriptlessWebdriverStateService;
 import org.testar.scriptless.service.webdriver.ScriptlessWebdriverOracleComposer;
+import org.testar.scriptless.service.webdriver.ScriptlessWebdriverSystemService;
+import org.testar.statemodel.StateModelManager;
 
 /**
  * Builds the two composition layers used by the scriptless runtime:
@@ -80,6 +91,10 @@ public final class ScriptlessFactory {
         );
         SessionReportingManager sessionReportingManager = SessionReportingManager.create();
 
+        if (sessionSpec.getOperatingSystem() == OperatingSystems.WEBDRIVER) {
+            return webdriverTestingServices(platformServices, runtimeContext, sessionReportingManager);
+        }
+
         return TestingServices.fromPlatformServices(platformServices, sessionReportingManager);
     }
 
@@ -115,5 +130,39 @@ public final class ScriptlessFactory {
                 )
                 .withStopCriteriaCapability(capabilities.stopCriteriaCapability())
                 .build();
+    }
+
+    private static TestingServices webdriverTestingServices(PlatformServices platformServices,
+                                                            RuntimeContext runtimeContext,
+                                                            SessionReportingManager sessionReportingManager) {
+        SystemService systemService = new ScriptlessWebdriverSystemService(
+                platformServices.systemService(),
+                runtimeContext
+        );
+        StateService stateService = platformServices.stateService();
+        OracleEvaluationService oracleEvaluationService = platformServices.oracleEvaluationService();
+        StateModelManager stateModelManager = platformServices.stateModelService();
+        ActionDerivationService actionDerivationService = new ScriptlessWebdriverActionDerivationService(
+                platformServices.actionDerivationService(),
+                runtimeContext
+        );
+        ActionSelectorService actionSelectorService = new ScriptlessWebdriverActionSelectorService(
+                platformServices.actionSelectorService(),
+                runtimeContext
+        );
+        ActionResolver actionResolver = platformServices.actionResolver();
+        ActionExecutionService actionExecutionService = platformServices.actionExecutionService();
+
+        return new TestingServices(
+                systemService,
+                stateService,
+                oracleEvaluationService,
+                stateModelManager,
+                actionDerivationService,
+                actionSelectorService,
+                actionResolver,
+                actionExecutionService,
+                sessionReportingManager
+        );
     }
 }

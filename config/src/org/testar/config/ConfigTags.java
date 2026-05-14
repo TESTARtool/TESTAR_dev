@@ -147,7 +147,7 @@ public final class ConfigTags {
             "Indicate which web CSS classes need to be considered typeable");
 
     @SuppressWarnings("unchecked")
-    public static final Tag<List<String>> DeniedExtensions = Tag.from("DeniedExtensions",
+    public static final Tag<List<String>> WebDeniedExtensions = Tag.from("WebDeniedExtensions",
             (Class<List<String>>) (Class<?>) List.class,
             "Indicate which web URL extensions need to be ignored when testing");
 
