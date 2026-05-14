@@ -7,6 +7,7 @@
 package org.testar.scriptless.service;
 
 import org.testar.config.ConfigTags;
+import org.testar.core.Assert;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 import org.testar.core.tag.Tags;
@@ -20,7 +21,12 @@ import java.util.List;
 
 public class ScriptlessOracleComposer {
 
-    public List<Verdict> composeVerdicts(RuntimeContext runtimeContext, SUT system, State state, List<Verdict> verdicts) {
+    public List<Verdict> composeVerdicts(RuntimeContext runtimeContext,
+                                         SUT system,
+                                         State state,
+                                         List<Verdict> verdicts) {
+        Assert.notNull(runtimeContext);
+        Assert.notNull(system, state, verdicts);
         List<Verdict> composedVerdicts = new ArrayList<Verdict>(verdicts);
 
         if (runtimeContext.settings().get(ConfigTags.ProcessListenerEnabled, false)) {

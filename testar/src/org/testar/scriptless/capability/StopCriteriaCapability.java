@@ -7,6 +7,7 @@
 package org.testar.scriptless.capability;
 
 import org.testar.config.ConfigTags;
+import org.testar.core.Assert;
 import org.testar.core.state.State;
 import org.testar.core.tag.Tags;
 import org.testar.core.util.Util;
@@ -16,9 +17,10 @@ import org.testar.scriptless.RuntimeContext;
 import java.util.Collections;
 import java.util.List;
 
-public final class StopCriteriaCapability {
+public class StopCriteriaCapability {
 
     public boolean stopTestSequence(RuntimeContext runtimeContext, State state) {
+        Assert.notNull(runtimeContext, state);
         List<Verdict> stateVerdicts = state.get(Tags.OracleVerdicts, Collections.singletonList(Verdict.OK));
         boolean faultySequence = !Verdict.helperAreAllVerdictsOK(stateVerdicts);
 
@@ -30,6 +32,7 @@ public final class StopCriteriaCapability {
     }
 
     public boolean stopTestSession(RuntimeContext runtimeContext) {
+        Assert.notNull(runtimeContext);
         return runtimeContext.sequenceCount() <= runtimeContext.settings().get(ConfigTags.Sequences)
                 && (Util.time() - runtimeContext.startTime()) < runtimeContext.settings().get(ConfigTags.MaxTime);
     }

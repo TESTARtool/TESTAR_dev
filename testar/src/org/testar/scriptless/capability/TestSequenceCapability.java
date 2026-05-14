@@ -14,6 +14,7 @@ import java.util.StringJoiner;
 import org.testar.OutputStructure;
 import org.testar.config.ConfigTags;
 import org.testar.config.TestarMode;
+import org.testar.core.Assert;
 import org.testar.core.alayer.Pen;
 import org.testar.core.serialisation.LogSerialiser;
 import org.testar.core.serialisation.ScreenshotSerialiser;
@@ -33,6 +34,7 @@ import org.testar.scriptless.RuntimeContext;
 public class TestSequenceCapability {
 
     public void startTestSequence(RuntimeContext runtimeContext) {
+        Assert.notNull(runtimeContext);
         String sequenceCountDir = "_sequence_" + OutputStructure.sequenceInnerLoopCount;
         String generatedSequence = OutputStructure.startInnerLoopDateString + "_"
                 + OutputStructure.executedSUTname + sequenceCountDir;
@@ -73,6 +75,7 @@ public class TestSequenceCapability {
     }
 
     public void beginSequence(RuntimeContext runtimeContext, SUT system, State initialState) {
+        Assert.notNull(runtimeContext, system, initialState);
         LogSerialiser.finish();
         LogSerialiser.exit();
         LogSerialiser.log(Util.dateString(ComposedProtocol.DATE_FORMAT) + " Starting SUT ...\n", LogSerialiser.LogLevel.Info);
@@ -87,6 +90,7 @@ public class TestSequenceCapability {
     }
 
     public void finishTestSequence(RuntimeContext runtimeContext, List<Verdict> verdicts) {
+        Assert.notNull(runtimeContext, verdicts);
         runtimeContext.sessionReportingManager().addTestVerdicts(verdicts);
         String statusInfo = buildStatusInfo(verdicts);
 

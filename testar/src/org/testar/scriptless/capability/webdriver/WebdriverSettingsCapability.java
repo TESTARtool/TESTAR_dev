@@ -14,7 +14,7 @@ import org.testar.scriptless.capability.SettingsCapability;
 import org.testar.webdriver.state.WdDriver;
 import org.testar.webdriver.util.WdConstants;
 
-public final class WebdriverSettingsCapability extends SettingsCapability {
+public class WebdriverSettingsCapability extends SettingsCapability {
 
     private final SettingsCapability delegate;
 
@@ -24,8 +24,8 @@ public final class WebdriverSettingsCapability extends SettingsCapability {
 
     @Override
     public Settings initializeSettings(Settings settings) {
+        Assert.notNull(settings);
         NativeLinker.addWdDriverOS();
-
         settings = delegate.initializeSettings(settings);
 
         // If true, follow links opened in new tabs

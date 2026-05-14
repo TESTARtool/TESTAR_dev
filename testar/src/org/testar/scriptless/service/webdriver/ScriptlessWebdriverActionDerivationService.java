@@ -37,7 +37,7 @@ import org.testar.webdriver.tag.WdTags;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
-public final class ScriptlessWebdriverActionDerivationService implements ActionDerivationService {
+public class ScriptlessWebdriverActionDerivationService implements ActionDerivationService {
 
     private final ActionDerivationService delegate;
     private final RuntimeContext runtimeContext;

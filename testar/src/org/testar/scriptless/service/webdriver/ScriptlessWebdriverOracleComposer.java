@@ -25,7 +25,7 @@ import org.testar.windows.state.WinProcess;
 import java.util.Arrays;
 import java.util.List;
 
-public final class ScriptlessWebdriverOracleComposer extends ScriptlessOracleComposer {
+public class ScriptlessWebdriverOracleComposer extends ScriptlessOracleComposer {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -38,7 +38,12 @@ public final class ScriptlessWebdriverOracleComposer extends ScriptlessOracleCom
     }
 
     @Override
-    public List<Verdict> composeVerdicts(RuntimeContext runtimeContext, SUT system, State state, List<Verdict> verdicts) {
+    public List<Verdict> composeVerdicts(RuntimeContext runtimeContext,
+                                         SUT system,
+                                         State state,
+                                         List<Verdict> verdicts) {
+        Assert.notNull(runtimeContext);
+        Assert.notNull(system, state, verdicts);
         List<Verdict> composedVerdicts = delegate.composeVerdicts(runtimeContext, system, state, verdicts);
 
         if (system != null

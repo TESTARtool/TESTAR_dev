@@ -25,18 +25,35 @@ import org.testar.plugin.configuration.SessionPolicyConfiguration;
 import org.testar.plugin.configuration.SessionServiceConfiguration;
 import org.testar.plugin.reporting.SessionReportingManager;
 import org.testar.scriptless.capability.android.AndroidSettingsCapability;
+import org.testar.scriptless.capability.android.AndroidStopCriteriaCapability;
 import org.testar.scriptless.capability.android.AndroidTestSequenceCapability;
 import org.testar.scriptless.capability.android.AndroidTestSessionCapability;
+import org.testar.scriptless.capability.webdriver.WebdriverStopCriteriaCapability;
+import org.testar.scriptless.capability.webdriver.WebdriverTestSequenceCapability;
 import org.testar.scriptless.capability.webdriver.WebdriverSettingsCapability;
 import org.testar.scriptless.capability.webdriver.WebdriverTestSessionCapability;
+import org.testar.scriptless.capability.windows.WindowsSettingsCapability;
+import org.testar.scriptless.capability.windows.WindowsStopCriteriaCapability;
+import org.testar.scriptless.capability.windows.WindowsTestSequenceCapability;
+import org.testar.scriptless.capability.windows.WindowsTestSessionCapability;
+import org.testar.scriptless.service.android.ScriptlessAndroidActionDerivationService;
+import org.testar.scriptless.service.android.ScriptlessAndroidActionExecutionService;
 import org.testar.scriptless.service.android.ScriptlessAndroidOracleComposer;
+import org.testar.scriptless.service.android.ScriptlessAndroidActionSelectorService;
+import org.testar.scriptless.service.android.ScriptlessAndroidStateService;
+import org.testar.scriptless.service.android.ScriptlessAndroidSystemService;
 import org.testar.scriptless.service.webdriver.ScriptlessWebdriverActionDerivationService;
+import org.testar.scriptless.service.webdriver.ScriptlessWebdriverActionExecutionService;
 import org.testar.scriptless.service.webdriver.ScriptlessWebdriverActionSelectorService;
 import org.testar.scriptless.service.webdriver.ScriptlessWebdriverStateService;
 import org.testar.scriptless.service.webdriver.ScriptlessWebdriverOracleComposer;
 import org.testar.scriptless.service.webdriver.ScriptlessWebdriverSystemService;
 import org.testar.scriptless.service.windows.ScriptlessWindowsActionDerivationService;
+import org.testar.scriptless.service.windows.ScriptlessWindowsActionExecutionService;
+import org.testar.scriptless.service.windows.ScriptlessWindowsActionSelectorService;
+import org.testar.scriptless.service.windows.ScriptlessWindowsOracleComposer;
 import org.testar.scriptless.service.windows.ScriptlessWindowsStateService;
+import org.testar.scriptless.service.windows.ScriptlessWindowsSystemService;
 import org.testar.statemodel.StateModelManager;
 
 /**
@@ -111,6 +128,9 @@ public final class ScriptlessFactory {
         if (sessionSpec.getOperatingSystem() == OperatingSystems.WEBDRIVER) {
             return webdriverTestingServices(platformServices, runtimeContext, sessionReportingManager);
         }
+        if (sessionSpec.getOperatingSystem() == OperatingSystems.ANDROID) {
+            return androidTestingServices(platformServices, sessionReportingManager);
+        }
         if (sessionSpec.getOperatingSystem() == OperatingSystems.WINDOWS
                 || sessionSpec.getOperatingSystem() == OperatingSystems.WINDOWS_10) {
             return windowsTestingServices(platformServices, sessionReportingManager);
@@ -135,14 +155,18 @@ public final class ScriptlessFactory {
                     .withTestSessionCapability(
                             new WebdriverTestSessionCapability(capabilities.testSessionCapability())
                     )
-                    .withTestSequenceCapability(capabilities.testSequenceCapability())
+                    .withTestSequenceCapability(
+                            new WebdriverTestSequenceCapability(capabilities.testSequenceCapability())
+                    )
                     .withScriptlessOracleComposer(
                             new ScriptlessWebdriverOracleComposer(
                                     capabilities.scriptlessOracleComposer(),
                                     runtimeContext.settings()
                             )
                     )
-                    .withStopCriteriaCapability(capabilities.stopCriteriaCapability())
+                    .withStopCriteriaCapability(
+                            new WebdriverStopCriteriaCapability(capabilities.stopCriteriaCapability())
+                    )
                     .build();
         }
 
@@ -160,7 +184,30 @@ public final class ScriptlessFactory {
                     .withScriptlessOracleComposer(
                             new ScriptlessAndroidOracleComposer(capabilities.scriptlessOracleComposer())
                     )
-                    .withStopCriteriaCapability(capabilities.stopCriteriaCapability())
+                    .withStopCriteriaCapability(
+                            new AndroidStopCriteriaCapability(capabilities.stopCriteriaCapability())
+                    )
+                    .build();
+        }
+
+        if (operatingSystem == OperatingSystems.WINDOWS
+                || operatingSystem == OperatingSystems.WINDOWS_10) {
+            return ScriptlessCapabilities.builder()
+                    .withSettingsCapability(
+                            new WindowsSettingsCapability(capabilities.settingsCapability())
+                    )
+                    .withTestSessionCapability(
+                            new WindowsTestSessionCapability(capabilities.testSessionCapability())
+                    )
+                    .withTestSequenceCapability(
+                            new WindowsTestSequenceCapability(capabilities.testSequenceCapability())
+                    )
+                    .withScriptlessOracleComposer(
+                            new ScriptlessWindowsOracleComposer(capabilities.scriptlessOracleComposer())
+                    )
+                    .withStopCriteriaCapability(
+                            new WindowsStopCriteriaCapability(capabilities.stopCriteriaCapability())
+                    )
                     .build();
         }
 
@@ -186,7 +233,9 @@ public final class ScriptlessFactory {
                 runtimeContext
         );
         ActionResolver actionResolver = platformServices.actionResolver();
-        ActionExecutionService actionExecutionService = platformServices.actionExecutionService();
+        ActionExecutionService actionExecutionService = new ScriptlessWebdriverActionExecutionService(
+                platformServices.actionExecutionService()
+        );
 
         return new TestingServices(
                 systemService,
@@ -203,16 +252,56 @@ public final class ScriptlessFactory {
 
     private static TestingServices windowsTestingServices(PlatformServices platformServices,
                                                           SessionReportingManager sessionReportingManager) {
-        SystemService systemService = platformServices.systemService();
+        SystemService systemService = new ScriptlessWindowsSystemService(
+                platformServices.systemService()
+        );
         StateService stateService = platformServices.stateService();
         OracleEvaluationService oracleEvaluationService = platformServices.oracleEvaluationService();
         StateModelManager stateModelManager = platformServices.stateModelService();
         ActionDerivationService actionDerivationService = new ScriptlessWindowsActionDerivationService(
                 platformServices.actionDerivationService()
         );
-        ActionSelectorService actionSelectorService = platformServices.actionSelectorService();
+        ActionSelectorService actionSelectorService = new ScriptlessWindowsActionSelectorService(
+                platformServices.actionSelectorService()
+        );
         ActionResolver actionResolver = platformServices.actionResolver();
-        ActionExecutionService actionExecutionService = platformServices.actionExecutionService();
+        ActionExecutionService actionExecutionService = new ScriptlessWindowsActionExecutionService(
+                platformServices.actionExecutionService()
+        );
+
+        return new TestingServices(
+                systemService,
+                stateService,
+                oracleEvaluationService,
+                stateModelManager,
+                actionDerivationService,
+                actionSelectorService,
+                actionResolver,
+                actionExecutionService,
+                sessionReportingManager
+        );
+    }
+
+    private static TestingServices androidTestingServices(PlatformServices platformServices,
+                                                          SessionReportingManager sessionReportingManager) {
+        SystemService systemService = new ScriptlessAndroidSystemService(
+                platformServices.systemService()
+        );
+        StateService stateService = new ScriptlessAndroidStateService(
+                platformServices.stateService()
+        );
+        OracleEvaluationService oracleEvaluationService = platformServices.oracleEvaluationService();
+        StateModelManager stateModelManager = platformServices.stateModelService();
+        ActionDerivationService actionDerivationService = new ScriptlessAndroidActionDerivationService(
+                platformServices.actionDerivationService()
+        );
+        ActionSelectorService actionSelectorService = new ScriptlessAndroidActionSelectorService(
+                platformServices.actionSelectorService()
+        );
+        ActionResolver actionResolver = platformServices.actionResolver();
+        ActionExecutionService actionExecutionService = new ScriptlessAndroidActionExecutionService(
+                platformServices.actionExecutionService()
+        );
 
         return new TestingServices(
                 systemService,

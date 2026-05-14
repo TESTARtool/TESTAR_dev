@@ -17,7 +17,7 @@ import org.testar.core.service.ActionDerivationService;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 
-public final class ScriptlessWindowsActionDerivationService implements ActionDerivationService {
+public class ScriptlessWindowsActionDerivationService implements ActionDerivationService {
 
     private final ActionDerivationService delegate;
 

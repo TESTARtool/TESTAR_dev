@@ -4,25 +4,29 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.scriptless.capability.android;
+package org.testar.scriptless.capability.windows;
 
 import org.testar.core.Assert;
-import org.testar.plugin.NativeLinker;
 import org.testar.scriptless.RuntimeContext;
 import org.testar.scriptless.capability.TestSessionCapability;
 
-public class AndroidTestSessionCapability extends TestSessionCapability {
+public class WindowsTestSessionCapability extends TestSessionCapability {
 
     private final TestSessionCapability delegate;
 
-    public AndroidTestSessionCapability(TestSessionCapability delegate) {
+    public WindowsTestSessionCapability(TestSessionCapability delegate) {
         this.delegate = Assert.notNull(delegate);
+    }
+
+    @Override
+    public void initializeTestSession(RuntimeContext runtimeContext) {
+        Assert.notNull(runtimeContext);
+        delegate.initializeTestSession(runtimeContext);
     }
 
     @Override
     public void closeTestSession(RuntimeContext runtimeContext) {
         Assert.notNull(runtimeContext);
         delegate.closeTestSession(runtimeContext);
-        NativeLinker.cleanAndroidOS();
     }
 }

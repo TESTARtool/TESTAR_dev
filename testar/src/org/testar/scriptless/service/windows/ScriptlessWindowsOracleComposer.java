@@ -4,7 +4,7 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.scriptless.service.android;
+package org.testar.scriptless.service.windows;
 
 import java.util.List;
 
@@ -15,11 +15,11 @@ import org.testar.core.verdict.Verdict;
 import org.testar.scriptless.RuntimeContext;
 import org.testar.scriptless.service.ScriptlessOracleComposer;
 
-public class ScriptlessAndroidOracleComposer extends ScriptlessOracleComposer {
+public class ScriptlessWindowsOracleComposer extends ScriptlessOracleComposer {
 
     private final ScriptlessOracleComposer delegate;
 
-    public ScriptlessAndroidOracleComposer(ScriptlessOracleComposer delegate) {
+    public ScriptlessWindowsOracleComposer(ScriptlessOracleComposer delegate) {
         this.delegate = Assert.notNull(delegate);
     }
 

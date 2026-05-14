@@ -15,7 +15,7 @@ import org.testar.core.state.SUT;
 import org.testar.core.tag.Tags;
 import org.testar.scriptless.RuntimeContext;
 
-public final class ScriptlessWebdriverSystemService implements SystemService {
+public class ScriptlessWebdriverSystemService implements SystemService {
 
     private final SystemService delegate;
     private final RuntimeContext runtimeContext;
@@ -38,6 +38,7 @@ public final class ScriptlessWebdriverSystemService implements SystemService {
 
     @Override
     public void stopSystem(SUT system) {
+        Assert.notNull(system);
         delegate.stopSystem(system);
     }
 

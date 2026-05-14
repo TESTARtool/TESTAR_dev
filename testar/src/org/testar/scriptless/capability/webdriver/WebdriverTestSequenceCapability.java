@@ -4,12 +4,9 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.scriptless.capability.android;
+package org.testar.scriptless.capability.webdriver;
 
-import org.testar.config.ConfigTags;
 import org.testar.core.Assert;
-import org.testar.oracle.Oracle;
-import org.testar.oracle.android.log.AndroidLogcatOracle;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 import org.testar.core.verdict.Verdict;
@@ -18,11 +15,11 @@ import org.testar.scriptless.capability.TestSequenceCapability;
 
 import java.util.List;
 
-public class AndroidTestSequenceCapability extends TestSequenceCapability {
+public class WebdriverTestSequenceCapability extends TestSequenceCapability {
 
     private final TestSequenceCapability delegate;
 
-    public AndroidTestSequenceCapability(TestSequenceCapability delegate) {
+    public WebdriverTestSequenceCapability(TestSequenceCapability delegate) {
         this.delegate = Assert.notNull(delegate);
     }
 
@@ -30,12 +27,6 @@ public class AndroidTestSequenceCapability extends TestSequenceCapability {
     public void startTestSequence(RuntimeContext runtimeContext) {
         Assert.notNull(runtimeContext);
         delegate.startTestSequence(runtimeContext);
-
-        if (runtimeContext.settings().get(ConfigTags.LogOracleEnabled, false)) {
-            Oracle logOracle = new AndroidLogcatOracle(runtimeContext.settings());
-            logOracle.initialize();
-            runtimeContext.setLogOracle(logOracle);
-        }
     }
 
     @Override

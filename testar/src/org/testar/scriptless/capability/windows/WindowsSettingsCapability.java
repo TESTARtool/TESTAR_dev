@@ -4,25 +4,23 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.scriptless.capability.android;
+package org.testar.scriptless.capability.windows;
 
 import org.testar.config.settings.Settings;
 import org.testar.core.Assert;
-import org.testar.plugin.NativeLinker;
 import org.testar.scriptless.capability.SettingsCapability;
 
-public class AndroidSettingsCapability extends SettingsCapability {
+public class WindowsSettingsCapability extends SettingsCapability {
 
     private final SettingsCapability delegate;
 
-    public AndroidSettingsCapability(SettingsCapability delegate) {
+    public WindowsSettingsCapability(SettingsCapability delegate) {
         this.delegate = Assert.notNull(delegate);
     }
 
     @Override
     public Settings initializeSettings(Settings settings) {
         Assert.notNull(settings);
-        NativeLinker.addAndroidOS();
         return delegate.initializeSettings(settings);
     }
 }
