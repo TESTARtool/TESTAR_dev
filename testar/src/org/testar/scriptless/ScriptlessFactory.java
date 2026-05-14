@@ -6,8 +6,6 @@
 
 package org.testar.scriptless;
 
-import org.testar.config.ConfigTags;
-import org.testar.config.settings.Settings;
 import org.testar.core.Assert;
 import org.testar.core.action.resolver.ActionResolver;
 import org.testar.core.service.ActionDerivationService;
@@ -26,8 +24,12 @@ import org.testar.plugin.configuration.PlatformDefaultSessionConfigurations;
 import org.testar.plugin.configuration.SessionPolicyConfiguration;
 import org.testar.plugin.configuration.SessionServiceConfiguration;
 import org.testar.plugin.reporting.SessionReportingManager;
+import org.testar.scriptless.capability.android.AndroidSettingsCapability;
+import org.testar.scriptless.capability.android.AndroidTestSequenceCapability;
+import org.testar.scriptless.capability.android.AndroidTestSessionCapability;
 import org.testar.scriptless.capability.webdriver.WebdriverSettingsCapability;
 import org.testar.scriptless.capability.webdriver.WebdriverTestSessionCapability;
+import org.testar.scriptless.service.android.ScriptlessAndroidOracleComposer;
 import org.testar.scriptless.service.webdriver.ScriptlessWebdriverActionDerivationService;
 import org.testar.scriptless.service.webdriver.ScriptlessWebdriverActionSelectorService;
 import org.testar.scriptless.service.webdriver.ScriptlessWebdriverStateService;
@@ -121,34 +123,48 @@ public final class ScriptlessFactory {
         Assert.notNull(runtimeContext.settings());
 
         ScriptlessCapabilities capabilities = ScriptlessCapabilities.defaults();
+        OperatingSystems operatingSystem = PlatformSessionSpecFactory
+                .fromSettings(runtimeContext.settings())
+                .getOperatingSystem();
 
-        if (!Settings.SUT_CONNECTOR_WEBDRIVER.equals(runtimeContext.settings().get(ConfigTags.SUTConnector, ""))) {
-            // For non-WebDriver runs, keep the capability bundle unchanged.
-            return capabilities;
+        if (operatingSystem == OperatingSystems.WEBDRIVER) {
+            return ScriptlessCapabilities.builder()
+                    .withSettingsCapability(
+                            new WebdriverSettingsCapability(capabilities.settingsCapability())
+                    )
+                    .withTestSessionCapability(
+                            new WebdriverTestSessionCapability(capabilities.testSessionCapability())
+                    )
+                    .withTestSequenceCapability(capabilities.testSequenceCapability())
+                    .withScriptlessOracleComposer(
+                            new ScriptlessWebdriverOracleComposer(
+                                    capabilities.scriptlessOracleComposer(),
+                                    runtimeContext.settings()
+                            )
+                    )
+                    .withStopCriteriaCapability(capabilities.stopCriteriaCapability())
+                    .build();
         }
 
-        // Capabilities are layered by wrapping the current ones. This lets the
-        // scriptless runtime keep the shared default behavior and add only the
-        // WebDriver-specific hooks that differ:
-        // - settings initialization
-        // - test-session behavior after the browser starts
-        // - scriptless-side oracle composition
-        return ScriptlessCapabilities.builder()
-                .withSettingsCapability(
-                        new WebdriverSettingsCapability(capabilities.settingsCapability())
-                )
-                .withTestSessionCapability(
-                        new WebdriverTestSessionCapability(capabilities.testSessionCapability())
-                )
-                .withTestSequenceCapability(capabilities.testSequenceCapability())
-                .withScriptlessOracleComposer(
-                        new ScriptlessWebdriverOracleComposer(
-                                capabilities.scriptlessOracleComposer(),
-                                runtimeContext.settings()
-                        )
-                )
-                .withStopCriteriaCapability(capabilities.stopCriteriaCapability())
-                .build();
+        if (operatingSystem == OperatingSystems.ANDROID) {
+            return ScriptlessCapabilities.builder()
+                    .withSettingsCapability(
+                            new AndroidSettingsCapability(capabilities.settingsCapability())
+                    )
+                    .withTestSessionCapability(
+                            new AndroidTestSessionCapability(capabilities.testSessionCapability())
+                    )
+                    .withTestSequenceCapability(
+                            new AndroidTestSequenceCapability(capabilities.testSequenceCapability())
+                    )
+                    .withScriptlessOracleComposer(
+                            new ScriptlessAndroidOracleComposer(capabilities.scriptlessOracleComposer())
+                    )
+                    .withStopCriteriaCapability(capabilities.stopCriteriaCapability())
+                    .build();
+        }
+
+        return capabilities;
     }
 
     private static TestingServices webdriverTestingServices(PlatformServices platformServices,
