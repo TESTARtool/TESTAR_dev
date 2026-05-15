@@ -104,7 +104,10 @@ public final class PlatformDefaultSessionConfigurations {
                 )
                 .overrideActionSelectorPlan(ActionSelectorPlan.basic(new RandomActionSelector()))
                 .overrideActionResolverPlan(ActionResolverPlan.basic(new DescriptionActionResolver()))
-                .overrideActionExecutionPlan(WindowsActionExecutionPlan.basic())
+                .overrideActionExecutionPlan(WindowsActionExecutionPlan.basic(
+                        settings.get(ConfigTags.ActionDuration, 0.0d),
+                        settings.get(ConfigTags.TimeToWaitAfterAction, 0.0d)
+                ))
                 .build();
     }
 
@@ -127,7 +130,10 @@ public final class PlatformDefaultSessionConfigurations {
                 )
                 .overrideActionSelectorPlan(ActionSelectorPlan.basic(new RandomActionSelector()))
                 .overrideActionResolverPlan(ActionResolverPlan.basic(new DescriptionActionResolver()))
-                .overrideActionExecutionPlan(WebdriverActionExecutionPlan.basic())
+                .overrideActionExecutionPlan(WebdriverActionExecutionPlan.basic(
+                        settings.get(ConfigTags.ActionDuration, 0.0d),
+                        settings.get(ConfigTags.TimeToWaitAfterAction, 0.0d)
+                ))
                 .build();
     }
 
@@ -151,7 +157,10 @@ public final class PlatformDefaultSessionConfigurations {
                 )
                 .overrideActionSelectorPlan(ActionSelectorPlan.basic(new RandomActionSelector()))
                 .overrideActionResolverPlan(ActionResolverPlan.basic(new DescriptionActionResolver()))
-                .overrideActionExecutionPlan(AndroidActionExecutionPlan.basic())
+                .overrideActionExecutionPlan(AndroidActionExecutionPlan.basic(
+                        settings.get(ConfigTags.ActionDuration, 0.0d),
+                        settings.get(ConfigTags.TimeToWaitAfterAction, 0.0d)
+                ))
                 .build();
     }
 

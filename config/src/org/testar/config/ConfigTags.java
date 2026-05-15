@@ -8,7 +8,6 @@ package org.testar.config;
 
 import java.util.List;
 
-import org.testar.core.Pair;
 import org.testar.core.tag.Tag;
 
 public final class ConfigTags {
@@ -375,25 +374,9 @@ public final class ConfigTags {
             "Select extended oracles to be applied during runtime for testing");
 
     /**
-     * Other settings
+     * Spy mode settings
      */
-
-    @SuppressWarnings("unchecked")
-    public static final Tag<List<String>> Delete = Tag.from("Delete",
-            (Class<List<String>>) (Class<?>) List.class);
-
-    @SuppressWarnings("unchecked")
-    public static final Tag<List<Pair<String, String>>> CopyFromTo = Tag.from("CopyFromTo",
-            (Class<List<Pair<String, String>>>) (Class<?>) List.class);
 
     public static final Tag<List<String>> SpyTagAttributes = Tag.from("SpyTagAttributes", (Class<List<String>>) (Class<?>) List.class,
             "Specify the widget attributes that you wish to visualize during Spy Mode. Use a semicolon separated list.");
-
-    /*
-    //TODO web driver settings for login feature
-    public static final Tag<Pair<String, String>> Login = Tag.from("Login", (Class<Pair<String, String>>) (Class<?>) Pair.class);
-    // Pair.from("https://login.awo.ou.nl/SSO/login", "OUinloggen");
-    public static final Tag<Pair<String, String>> Username = Tag.from("Username", (Class<Pair<String, String>>) (Class<?>) Pair.class);
-    public static final Tag<Pair<String, String>> Password = Tag.from("Password", (Class<Pair<String, String>>) (Class<?>) Pair.class);
-     */
 }

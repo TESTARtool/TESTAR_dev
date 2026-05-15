@@ -25,7 +25,6 @@ import org.testar.core.verdict.Verdict;
 import org.testar.oracle.Oracle;
 import org.testar.oracle.OracleSelection;
 import org.testar.oracle.generic.log.LogOracle;
-import org.testar.oracle.windows.log.ProcessListenerOracle;
 import org.testar.plugin.NativeLinker;
 import org.testar.reporting.ReportManager;
 import org.testar.scriptless.ComposedProtocol;
@@ -81,12 +80,6 @@ public class TestSequenceCapability {
         LogSerialiser.log(Util.dateString(ComposedProtocol.DATE_FORMAT) + " Starting SUT ...\n", LogSerialiser.LogLevel.Info);
         LogSerialiser.log("SUT is running!\n", LogSerialiser.LogLevel.Debug);
         LogSerialiser.log("Building canvas...\n", LogSerialiser.LogLevel.Debug);
-
-        if (runtimeContext.settings().get(ConfigTags.ProcessListenerEnabled, false)) {
-            Oracle processListenerOracle = new ProcessListenerOracle(system, runtimeContext.settings());
-            processListenerOracle.initialize();
-            runtimeContext.setProcessListenerOracle(processListenerOracle);
-        }
     }
 
     public void finishTestSequence(RuntimeContext runtimeContext, List<Verdict> verdicts) {

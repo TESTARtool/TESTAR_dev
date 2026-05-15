@@ -19,7 +19,6 @@ import org.testar.engine.action.derivation.ActionDerivationPlan;
 import org.testar.engine.action.execution.ActionExecutionPlan;
 import org.testar.engine.action.resolver.ActionResolverPlan;
 import org.testar.engine.action.selection.ActionSelectorPlan;
-import org.testar.engine.action.selection.StateModelActionSelector;
 import org.testar.engine.policy.SessionPolicyContext;
 import org.testar.engine.service.ComposedActionDerivationService;
 import org.testar.engine.service.ComposedActionExecutionService;
@@ -93,10 +92,6 @@ public final class SessionServiceComposer {
                 configuration.includePlatformDefaults(),
                 "action execution"
         );
-        ActionSelectorPlan effectiveActionSelectorPlan = ActionSelectorPlan.withFallback(
-                new StateModelActionSelector(stateModelService),
-                ComposedActionSelectorService.compose(actionSelectorPlan)
-        );
 
         SystemService systemService = ComposedSystemService.compose(systemCompositionPlan);
         StateService stateService = ComposedStateService.compose(sessionPolicyContext, stateCompositionPlan);
@@ -105,7 +100,7 @@ public final class SessionServiceComposer {
                 sessionPolicyContext,
                 actionDerivationPlan
         );
-        ActionSelectorService actionSelectorService = ComposedActionSelectorService.compose(effectiveActionSelectorPlan);
+        ActionSelectorService actionSelectorService = ComposedActionSelectorService.compose(actionSelectorPlan);
         ActionResolver actionResolver = ComposedActionResolver.compose(actionResolverPlan);
         ActionExecutionService actionExecutionService = ComposedActionExecutionService.compose(actionExecutionPlan);
 

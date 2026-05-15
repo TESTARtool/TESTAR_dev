@@ -6,13 +6,10 @@
 
 package org.testar.scriptless.service.windows;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.testar.core.Assert;
 import org.testar.core.action.Action;
-import org.testar.core.action.NOP;
 import org.testar.core.service.ActionDerivationService;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
@@ -28,12 +25,6 @@ public class ScriptlessWindowsActionDerivationService implements ActionDerivatio
     @Override
     public Set<Action> deriveActions(SUT system, State state) {
         Assert.notNull(system, state);
-
-        Set<Action> actions = delegate.deriveActions(system, state);
-        if (actions.isEmpty()) {
-            return new HashSet<>(Collections.singletonList(new NOP()));
-        }
-
-        return actions;
+        return delegate.deriveActions(system, state);
     }
 }

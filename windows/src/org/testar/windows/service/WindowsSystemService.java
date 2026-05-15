@@ -103,6 +103,9 @@ public final class WindowsSystemService implements SystemService {
         if (system == null) {
             return;
         }
+        if (system.getNativeAutomationCache() != null) {
+            system.getNativeAutomationCache().releaseCachedAutomationElements();
+        }
         Long pid = system.get(Tags.PID, null);
         try {
             system.stop();

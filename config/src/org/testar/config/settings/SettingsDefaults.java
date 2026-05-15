@@ -42,9 +42,7 @@ import static org.testar.config.ConfigTags.AndroidTypeableClasses;
 import static org.testar.config.ConfigTags.BrowserFullScreen;
 import static org.testar.config.ConfigTags.ClickFilter;
 import static org.testar.config.ConfigTags.WebClickableClasses;
-import static org.testar.config.ConfigTags.CopyFromTo;
 import static org.testar.config.ConfigTags.CreateWidgetInfoJsonFile;
-import static org.testar.config.ConfigTags.Delete;
 import static org.testar.config.ConfigTags.WebDeniedExtensions;
 import static org.testar.config.ConfigTags.Discount;
 import static org.testar.config.ConfigTags.ExtendedOracles;
@@ -146,8 +144,6 @@ public class SettingsDefaults {
         defaults.add(Pair.from(MaxTime, 31536000.0));
         defaults.add(Pair.from(StartupTime, 8.0));
         defaults.add(Pair.from(SUTConnectorValue, ""));
-        defaults.add(Pair.from(Delete, new ArrayList<String>()));
-        defaults.add(Pair.from(CopyFromTo, new ArrayList<Pair<String, String>>()));
         defaults.add(Pair.from(IgnoreDuplicatedVerdicts, false));
         defaults.add(Pair.from(SuspiciousTags, "(?!x)x"));
         defaults.add(Pair.from(ClickFilter, "(?!x)x"));

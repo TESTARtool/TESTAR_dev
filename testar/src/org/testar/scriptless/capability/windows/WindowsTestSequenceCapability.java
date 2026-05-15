@@ -12,6 +12,9 @@ import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 import org.testar.core.tag.Tags;
 import org.testar.core.verdict.Verdict;
+import org.testar.oracle.Oracle;
+import org.testar.oracle.windows.log.ProcessListenerOracle;
+import org.testar.config.ConfigTags;
 import org.testar.scriptless.RuntimeContext;
 import org.testar.scriptless.capability.TestSequenceCapability;
 
@@ -35,6 +38,12 @@ public class WindowsTestSequenceCapability extends TestSequenceCapability {
     public void beginSequence(RuntimeContext runtimeContext, SUT system, State initialState) {
         Assert.notNull(runtimeContext, system, initialState);
         delegate.beginSequence(runtimeContext, system, initialState);
+
+        if (runtimeContext.settings().get(ConfigTags.ProcessListenerEnabled, false)) {
+            Oracle processListenerOracle = new ProcessListenerOracle(system, runtimeContext.settings());
+            processListenerOracle.initialize();
+            runtimeContext.setProcessListenerOracle(processListenerOracle);
+        }
 
         double displayScale = Environment.getInstance().getDisplayScale(initialState.child(0).get(Tags.HWND, (long)0));
         runtimeContext.mouse().setCursorDisplayScale(displayScale);

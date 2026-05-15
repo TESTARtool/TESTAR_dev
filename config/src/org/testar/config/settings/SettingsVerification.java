@@ -31,10 +31,86 @@ public class SettingsVerification {
      * @param settings
      */
     public static void verifySettings(Settings settings) {
+        verifySutConnectorSettings(settings);
         verifyStateModelSettings(settings);
         verifyRegularExpressionSettings(settings);
         escapeSpecialCharactersInFileWritingSettings(settings);
         verifyJacocoCoverageSettings(settings);
+    }
+
+    /**
+     * This method will check if the provided sut connector settings are valid.
+     */
+    private static void verifySutConnectorSettings(Settings settings) {
+        String sutConnectorType = settings.get(ConfigTags.SUTConnector, "");
+
+        if (sutConnectorType.isBlank()) {
+            throw new IllegalStateException("SUTConnector cannot be empty.");
+        }
+
+        if (Settings.SUT_CONNECTOR_ANDROID_APPIUM.equals(sutConnectorType)) {
+            verifyAndroidSutConnectorSettings(settings);
+            return;
+        }
+
+        if (!isSupportedSutConnector(sutConnectorType)) {
+            throw new IllegalStateException(
+                    "Unsupported SUTConnector value: " + sutConnectorType
+                            + ". Supported values are: "
+                            + Settings.SUT_CONNECTOR_CMDLINE + ", "
+                            + Settings.SUT_CONNECTOR_WINDOW_TITLE + ", "
+                            + Settings.SUT_CONNECTOR_PROCESS_NAME + ", "
+                            + Settings.SUT_CONNECTOR_WEBDRIVER + ", "
+                            + Settings.SUT_CONNECTOR_ANDROID_APPIUM
+            );
+        }
+
+        String connectorValue = settings.get(ConfigTags.SUTConnectorValue, "");
+        if (connectorValue.isBlank()) {
+            throw new IllegalStateException(
+                    "SUTConnectorValue cannot be empty when SUTConnector="
+                            + sutConnectorType + "."
+            );
+        }
+    }
+
+    private static boolean isSupportedSutConnector(String sutConnectorType) {
+        return Settings.SUT_CONNECTOR_CMDLINE.equals(sutConnectorType)
+                || Settings.SUT_CONNECTOR_WINDOW_TITLE.equals(sutConnectorType)
+                || Settings.SUT_CONNECTOR_PROCESS_NAME.equals(sutConnectorType)
+                || Settings.SUT_CONNECTOR_WEBDRIVER.equals(sutConnectorType)
+                || Settings.SUT_CONNECTOR_ANDROID_APPIUM.equals(sutConnectorType);
+    }
+
+    private static void verifyAndroidSutConnectorSettings(Settings settings) {
+        if (settings.get(ConfigTags.AppiumIsApkInstalled, false)) {
+            String appPackage = settings.get(ConfigTags.AppiumAppPackage, "");
+            String appActivity = settings.get(ConfigTags.AppiumAppActivity, "");
+
+            if (appPackage.isBlank()) {
+                throw new IllegalStateException(
+                        "When SUTConnector=ANDROID_APPIUM and AppiumIsApkInstalled=true, "
+                                + "AppiumAppPackage is required."
+                );
+            }
+
+            if (appActivity.isBlank()) {
+                throw new IllegalStateException(
+                        "When SUTConnector=ANDROID_APPIUM and AppiumIsApkInstalled=true, "
+                                + "AppiumAppActivity is required."
+                );
+            }
+
+            return;
+        }
+
+        String app = settings.get(ConfigTags.AppiumApp, "");
+        if (app.isBlank()) {
+            throw new IllegalStateException(
+                    "When SUTConnector=ANDROID_APPIUM and AppiumIsApkInstalled=false, "
+                            + "AppiumApp is required."
+            );
+        }
     }
 
     /**

@@ -15,7 +15,6 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -28,8 +27,6 @@ import org.testar.core.exceptions.NoSuchTagException;
 import org.testar.core.tag.Tag;
 import org.testar.core.tag.TaggableBase;
 import org.testar.core.util.Util;
-
-import static java.util.stream.Collectors.toList;
 
 public class Settings extends TaggableBase implements Serializable {
 
@@ -60,7 +57,7 @@ public class Settings extends TaggableBase implements Serializable {
     }
 
     public static <T> String print(Tag<T> tag, T value) {
-        if (tag.type().equals(List.class) && !tag.equals(ConfigTags.CopyFromTo)) {
+        if (tag.type().equals(List.class)) {
             StringBuilder sb = new StringBuilder();
             String stringSeparator = getStringSeparator(tag);
             List<?> l = (List<?>) value;
@@ -71,20 +68,6 @@ public class Settings extends TaggableBase implements Serializable {
                     sb.append(stringSeparator);
                 }
                 sb.append(Util.toString(o));
-                i++;
-            }
-            return sb.toString();
-        } else if (tag.type().equals(List.class) && tag.equals(ConfigTags.CopyFromTo)) {
-            StringBuilder sb = new StringBuilder();
-            @SuppressWarnings("unchecked")
-            List<Pair<String, String>> l = (List<Pair<String, String>>) value;
-
-            int i = 0;
-            for (Pair<String, String> p : l) {
-                if (i > 0) {
-                    sb.append(';');
-                }
-                sb.append(p.left()).append(';').append(p.right());
                 i++;
             }
             return sb.toString();
@@ -126,25 +109,6 @@ public class Settings extends TaggableBase implements Serializable {
             }
         } else if (tag.type().equals(String.class)) {
             return (T) stringValue;
-        } else if (tag.type().equals(List.class) && !tag.equals(ConfigTags.CopyFromTo)) {
-            if (stringValue.trim().length() == 0) {
-                return (T) new ArrayList<String>();
-            }
-            return (T) (Arrays.asList(stringValue.split(getStringSeparator(tag))).stream()
-                    .map(String::trim).collect(toList()));
-        } else if (tag.type().equals(List.class) && tag.equals(ConfigTags.CopyFromTo)) {
-            if (stringValue.trim().length() == 0) {
-                return (T) new ArrayList<Pair<String, String>>();
-            }
-            List<String> pathList = Arrays.asList(stringValue.split(";"));
-            if (pathList.size() % 2 != 0) {
-                throw new ConfigParseException("The number of paths must be even!");
-            }
-            List<Pair<String, String>> ret = new ArrayList<>();
-            for (int i = 0; i < pathList.size(); i += 2) {
-                ret.add(Pair.from(pathList.get(i), pathList.get(i + 1)));
-            }
-            return (T) ret;
         }
         throw new ConfigParseException("");
     }

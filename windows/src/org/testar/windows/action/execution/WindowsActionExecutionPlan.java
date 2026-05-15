@@ -17,7 +17,12 @@ public final class WindowsActionExecutionPlan {
     private WindowsActionExecutionPlan() {
     }
 
-    public static ActionExecutionPlan basic() {
-        return ActionExecutionPlan.basic(new BasicActionExecutionService());
+    public static ActionExecutionPlan basic(double actionDuration, double timeToWaitAfterAction) {
+        return ActionExecutionPlan.basic(
+                new WindowsActionExecutionService(
+                        new BasicActionExecutionService(actionDuration, timeToWaitAfterAction),
+                        timeToWaitAfterAction
+                )
+        );
     }
 }

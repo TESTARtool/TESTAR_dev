@@ -17,7 +17,10 @@ public final class WebdriverActionExecutionPlan {
     private WebdriverActionExecutionPlan() {
     }
 
-    public static ActionExecutionPlan basic() {
-        return ActionExecutionPlan.basic(new BasicActionExecutionService());
+    public static ActionExecutionPlan basic(double actionDuration, double timeToWaitAfterAction) {
+        return ActionExecutionPlan.basic(new BasicActionExecutionService(
+                actionDuration,
+                timeToWaitAfterAction
+        ));
     }
 }

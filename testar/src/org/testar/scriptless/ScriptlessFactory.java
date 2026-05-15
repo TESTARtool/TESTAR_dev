@@ -38,8 +38,8 @@ import org.testar.scriptless.capability.windows.WindowsTestSequenceCapability;
 import org.testar.scriptless.capability.windows.WindowsTestSessionCapability;
 import org.testar.scriptless.service.android.ScriptlessAndroidActionDerivationService;
 import org.testar.scriptless.service.android.ScriptlessAndroidActionExecutionService;
-import org.testar.scriptless.service.android.ScriptlessAndroidOracleComposer;
 import org.testar.scriptless.service.android.ScriptlessAndroidActionSelectorService;
+import org.testar.scriptless.service.android.ScriptlessAndroidOracleComposer;
 import org.testar.scriptless.service.android.ScriptlessAndroidStateService;
 import org.testar.scriptless.service.android.ScriptlessAndroidSystemService;
 import org.testar.scriptless.service.webdriver.ScriptlessWebdriverActionDerivationService;
@@ -229,8 +229,8 @@ public final class ScriptlessFactory {
                 runtimeContext
         );
         ActionSelectorService actionSelectorService = new ScriptlessWebdriverActionSelectorService(
-                platformServices.actionSelectorService(),
-                runtimeContext
+                stateModelManager,
+                platformServices.actionSelectorService()
         );
         ActionResolver actionResolver = platformServices.actionResolver();
         ActionExecutionService actionExecutionService = new ScriptlessWebdriverActionExecutionService(
@@ -262,6 +262,7 @@ public final class ScriptlessFactory {
                 platformServices.actionDerivationService()
         );
         ActionSelectorService actionSelectorService = new ScriptlessWindowsActionSelectorService(
+                stateModelManager,
                 platformServices.actionSelectorService()
         );
         ActionResolver actionResolver = platformServices.actionResolver();
@@ -296,6 +297,7 @@ public final class ScriptlessFactory {
                 platformServices.actionDerivationService()
         );
         ActionSelectorService actionSelectorService = new ScriptlessAndroidActionSelectorService(
+                stateModelManager,
                 platformServices.actionSelectorService()
         );
         ActionResolver actionResolver = platformServices.actionResolver();
