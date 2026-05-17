@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -42,6 +42,7 @@ import java.util.Map;
 
 public class WdElement extends TaggableBase implements Serializable {
   private static final long serialVersionUID = 2695983969893321255L;
+  private static final int TEXT_DESC_MAX_LENGTH = 30;
 
   private static final List<String> scrollOn = Arrays.asList("auto", "scroll");
   private static final List<String> scrollOff = Arrays.asList("visible", "hidden", "clip");
@@ -100,6 +101,13 @@ public class WdElement extends TaggableBase implements Serializable {
   public long naturalWidth, naturalHeight; 
   public long displayedWidth, displayedHeight;  
 
+  // Web aria properties
+  public String ariaLabel, ariaLabelledBy, ariaDescribedBy, ariaRole, ariaChecked, ariaInvalid;
+  public String ariaCurrent, ariaHasPopup, ariaControls, ariaLive;
+  public String ariaValueNow, ariaValueMin, ariaValueMax, ariaValueText;
+  public Boolean ariaDisabled, ariaHidden, ariaExpanded, ariaPressed, ariaSelected;
+  public Boolean ariaRequired, ariaReadOnly, ariaBusy, ariaModal;
+
   public transient RemoteWebElement remoteWebElement; // Reference to the remote Web Element
 
   public transient Map<String, String> attributeMap;
@@ -151,6 +159,30 @@ public class WdElement extends TaggableBase implements Serializable {
     disabled = attributeMap.containsKey("disabled");
     visibility = (packedElement.get("visibility") == null) ? "" : (String) packedElement.get("visibility");
     xpath = (packedElement.get("xpath") == null) ? "" : (String) packedElement.get("xpath");
+
+    ariaLabel = getAttribute("aria-label");
+    ariaLabelledBy = getAttribute("aria-labelledby");
+    ariaDescribedBy = getAttribute("aria-describedby");
+    ariaRole = getAttribute("role");
+    ariaDisabled = parseBoolean(getAttribute("aria-disabled"));
+    ariaHidden = parseBoolean(getAttribute("aria-hidden"));
+    ariaExpanded = parseBoolean(getAttribute("aria-expanded"));
+    ariaPressed = parseBoolean(getAttribute("aria-pressed"));
+    ariaSelected = parseBoolean(getAttribute("aria-selected"));
+    ariaChecked = getAttribute("aria-checked");
+    ariaRequired = parseBoolean(getAttribute("aria-required"));
+    ariaInvalid = getAttribute("aria-invalid");
+    ariaReadOnly = parseBoolean(getAttribute("aria-readonly"));
+    ariaCurrent = getAttribute("aria-current");
+    ariaHasPopup = getAttribute("aria-haspopup");
+    ariaControls = getAttribute("aria-controls");
+    ariaLive = getAttribute("aria-live");
+    ariaBusy = parseBoolean(getAttribute("aria-busy"));
+    ariaModal = parseBoolean(getAttribute("aria-modal"));
+    ariaValueNow = getAttribute("aria-valuenow");
+    ariaValueMin = getAttribute("aria-valuemin");
+    ariaValueMax = getAttribute("aria-valuemax");
+    ariaValueText = getAttribute("aria-valuetext");
 
     try {
     	maxLength = Integer.valueOf(attributeMap.getOrDefault("maxlength", "-1"));
@@ -233,32 +265,87 @@ public class WdElement extends TaggableBase implements Serializable {
    * Check web element parameters and try to find an appropriate one to act as description
    */
   public String getElementDescription() {
-	  if(name != null && !name.isEmpty()) {
-		  return name;
-	  }
-	  else if(textContent != null && !textContent.isEmpty()) {
-		  return textContent;
-	  }
-	  else if(id != null && !id.isEmpty()) {
-		  return id;
-	  }
-	  else if(placeholder != null && !placeholder.isEmpty()) {
-		  return placeholder;
-	  }
-	  else if(value != null && !value.isEmpty()) {
-		  return value;
-	  }
-	  else if(tagName != null && !tagName.isEmpty()) {
-		  return tagName;
-	  }
-	  else if(title != null && !title.isEmpty()) {
-		  return title;
-	  }
-	  else if(href != null && !href.isEmpty()) {
-		  return href;
-	  }
+    // Role/tag context: "button", "input", "a", etc.
+    String roleDescription = normalizeDescription(tagName);
 
-	  return String.join(",", cssClasses);
+    // Visible/accessible semantic labels
+    String semanticDescription = "";
+    
+    if (hasText(ariaLabel)) {
+      semanticDescription = normalizeDescription(ariaLabel);
+    }
+    else if (hasText(ariaLabelledBy)) {
+      semanticDescription = normalizeDescription(ariaLabelledBy);
+    }
+    else if (hasText(placeholder)) {
+      semanticDescription = normalizeDescription(placeholder);
+    }
+    else if (hasText(innerText)) {
+      semanticDescription = normalizeAndTruncateDescription(innerText, TEXT_DESC_MAX_LENGTH);
+    }
+    else if (hasText(textContent)) {
+      semanticDescription = normalizeAndTruncateDescription(textContent, TEXT_DESC_MAX_LENGTH);
+    }
+    else if (hasText(title)) {
+      semanticDescription = normalizeDescription(title);
+    }
+    else if (hasText(alt)) {
+      semanticDescription = normalizeDescription(alt);
+    }
+    else if (hasText(value)) {
+      semanticDescription = normalizeDescription(value);
+    }
+    else if (hasText(name)) {
+      semanticDescription = normalizeDescription(name);
+    }
+
+    // Use technical properties if semantic descriptions are empty
+    if (semanticDescription.isEmpty() && hasText(id)) {
+      semanticDescription = normalizeDescription(id);
+    }
+    else if (semanticDescription.isEmpty() && hasText(href)) {
+      semanticDescription = normalizeDescription(href);
+    }
+
+    // If these combined description still empty, return css classes
+    if (roleDescription.isEmpty() && semanticDescription.isEmpty()) {
+      return String.join("_", cssClasses);
+    }
+    // Else return the combined role_semantic description
+    return roleDescription + "_" + semanticDescription;
+  }
+
+  private boolean hasText(String value) {
+    return value != null && !value.trim().isEmpty();
+  }
+
+  private String normalizeDescription(String value) {
+    String description = value == null ? "" : value.trim().toLowerCase();
+    description = description.replaceAll("\\s+", "_");
+    description = description.replaceAll("[^a-z0-9_./-]", "");
+    description = description.replaceAll("_+", "_");
+    return description;
+  }
+
+  private String normalizeAndTruncateDescription(String value, int maxLen) {
+    String normalized = normalizeDescription(value);
+    if (normalized.length() <= maxLen) {
+      return normalized;
+    }
+    return normalized.substring(0, maxLen);
+  }
+
+  private String getAttribute(String key) {
+    return (attributeMap == null) ? "" : attributeMap.getOrDefault(key, "");
+  }
+
+  private Boolean parseBoolean(String value) {
+    if (value == null) return null;
+    String normalized = value.trim().toLowerCase();
+    if (normalized.isEmpty()) return null;
+    if (normalized.equals("true")) return true;
+    if (normalized.equals("false")) return false;
+    return null;
   }
 
   private void setName() {

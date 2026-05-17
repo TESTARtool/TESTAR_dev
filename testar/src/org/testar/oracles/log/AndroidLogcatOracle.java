@@ -46,6 +46,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -104,9 +105,9 @@ public class AndroidLogcatOracle implements Oracle {
     }
 
     @Override
-    public Verdict getVerdict(State state) {
+    public List<Verdict> getVerdicts(State state) {
         if (settings.get(ConfigTags.Mode) != RuntimeControlsProtocol.Modes.Generate) {
-            return Verdict.OK;
+            return Collections.singletonList(Verdict.OK);
         }
 
         String packageName = AndroidAppiumFramework.getAppPackageFromCapabilitiesOrCurrent();
@@ -114,7 +115,7 @@ public class AndroidLogcatOracle implements Oracle {
 
         if (dump == null || dump.isBlank()) {
             AndroidAppiumFramework.clearLogcat();
-            return Verdict.OK;
+            return Collections.singletonList(Verdict.OK);
         }
 
         List<String> relevantLines = dump == null ? List.of() : List.of(dump.split("\\r?\\n"));
@@ -133,7 +134,7 @@ public class AndroidLogcatOracle implements Oracle {
         List<String> matches = detectRegexMatches(newLines, regex);
         if (matches.isEmpty()) {
             AndroidAppiumFramework.clearLogcat();
-            return Verdict.OK;
+            return Collections.singletonList(Verdict.OK);
         }
 
         Set<String> uniqueSorted = new TreeSet<>(matches);
@@ -142,7 +143,7 @@ public class AndroidLogcatOracle implements Oracle {
         info.append(String.join(" | ", uniqueSorted));
 
         AndroidAppiumFramework.clearLogcat();
-        return new Verdict(Verdict.Severity.SUSPICIOUS_LOG, info.toString().trim());
+        return Collections.singletonList(new Verdict(Verdict.Severity.SUSPICIOUS_LOG, info.toString().trim()));
     }
 
     private void appendToSequenceLog(List<String> lines) {

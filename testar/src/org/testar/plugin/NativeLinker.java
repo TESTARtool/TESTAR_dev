@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -33,7 +33,6 @@ package org.testar.plugin;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.devices.ProcessHandle;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
-import org.testar.monkey.alayer.linux.*;
 import org.testar.monkey.alayer.webdriver.WdCanvas;
 import org.testar.monkey.alayer.webdriver.WdDriver;
 import org.testar.monkey.alayer.webdriver.WdStateBuilder;
@@ -52,7 +51,6 @@ import org.testar.monkey.alayer.ios.enums.IOSRoles;
 
 import java.util.*;
 
-import static org.testar.monkey.alayer.linux.AtSpiRolesWrapper.*;
 import static org.testar.monkey.alayer.windows.UIARoles.*;
 
 /**
@@ -146,10 +144,8 @@ public class NativeLinker {
 				System.out.println("TESTAR detected OS: " + osName + " and this is not yet full supported. If the detected OS is wrong, please contact the TESTAR team at info@testar.org.");
 				return new UIAStateBuilder(timeToFreeze, accessBridgeEnabled, SUTProcesses);
 			}
-		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
-			return new AtSpiStateBuilder(timeToFreeze);
 		}
-		
+
 		System.out.println("TESTAR detected OS: " + osName + " and this is not yet supported. If the detected OS is wrong, please contact the TESTAR team at info@testar.org. Exiting with Exception.");
 		throw new UnsupportedPlatformException();
 	}
@@ -171,12 +167,8 @@ public class NativeLinker {
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			return GDIScreenCanvas.fromPrimaryMonitor(pen);
-			//return JavaScreenCanvas.fromPrimaryMonitor(pen);
-		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
-			// TODO: spy mode on linux still needs to be implemented - The Canvas is also being used by Test mode.
-			return new GdkScreenCanvas();
-			//return JavaScreenCanvas.fromPrimaryMonitor(pen);
 		}
+
 		throw new UnsupportedPlatformException();
 	}
 
@@ -213,9 +205,7 @@ public class NativeLinker {
 				return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled, SUTProcesses);
 			}
 		}
-		else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
-			return LinuxProcess.fromExecutable(executableCommand);
-		}
+
 		throw new UnsupportedPlatformException();
 	}
 
@@ -235,24 +225,21 @@ public class NativeLinker {
 		}
 		else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return WinProcess.fromAll();
-		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
-			return LinuxProcess.fromAll();
+
 		throw new UnsupportedPlatformException();
 	}
 
 	public static SUT getNativeProcess(String processName){
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return WinProcess.fromProcName(processName);
-		//else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
-		// TODO
+
 		throw new UnsupportedPlatformException();
 	}
 
 	public static ProcessHandle getNativeProcessHandle(long processPID){
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return new WinProcHandle(processPID);
-		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
-			return new LinuxProcessHandle(processPID);
+
 		throw new UnsupportedPlatformException();
 	}
 
@@ -273,8 +260,7 @@ public class NativeLinker {
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return (int)(WinProcess.getMemUsage((WinProcess)nativeSUT) / 1024); // byte -> KB
-		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
-			return (int)(LinuxProcess.getMemUsage((LinuxProcess)nativeSUT) / 1024);
+
 		throw new UnsupportedPlatformException();
 	}
 
@@ -302,12 +288,8 @@ public class NativeLinker {
 			lastCPUquery = now;
 			long[] cpums = WinProcess.getCPUsage((WinProcess)nativeSUT);
 			return new long[]{ cpums[0], cpums[1], cpuFrame };
-		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
-			// TODO: this probably needs to change somehow...
-			return new long[] { (long)(LinuxProcess.getCpuUsage((LinuxProcess)nativeSUT)),
-					(long)(LinuxProcess.getCpuUsage((LinuxProcess)nativeSUT)),
-					(long)(LinuxProcess.getCpuUsage((LinuxProcess)nativeSUT))};
 		}
+
 		throw new UnsupportedPlatformException();
 	}
 
@@ -323,8 +305,7 @@ public class NativeLinker {
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return UIARoles.rolesSet();
-		// else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
-		// TODO
+
 		throw new UnsupportedPlatformException();
 	}
 
@@ -355,8 +336,7 @@ public class NativeLinker {
 	public static Role getNativeRole_Window(){
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return UIARoles.UIAWindow;
-		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
-			return AtSpiRolesWrapper.AtSpiWindow;
+
 		throw new UnsupportedPlatformException();
 	}
 
@@ -371,8 +351,7 @@ public class NativeLinker {
 			return AndroidTags.tagSet();
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return UIATags.tagSet();
-		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
-			return AtSpiTags.tagSet();
+
 		throw new UnsupportedPlatformException();
 	}
 
@@ -422,11 +401,8 @@ public class NativeLinker {
 					UIATabItem, UIAHyperlink, UIADataItem, UIATree, UIATreeItem,
 					UIASlider, UIASpinner, UIAScrollBar, UIASplitButton,
 					UIACustomControl}; // be careful on custom control (we do not know what they are)
-		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
-			return new Role[]{AtSpiCheckBox, AtSpiCheckMenuItem, AtSpiComboBox, AtSpiMenuItem,
-					AtSpiListItem, AtSpiSpinButton, AtSpiToggleButton, AtSpiTreeItem, AtSpiListBox,
-					AtSpiPushButton, AtSpiLink, AtSpiScrollBar};
 		}
+
 		throw new UnsupportedPlatformException();
 	}
 
@@ -441,9 +417,7 @@ public class NativeLinker {
 			return AndroidRoles.nativeTypeableRoles();
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return new Role[]{UIADocument, UIAEdit, UIAText};
-		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
-			return new Role[]{AtSpiPasswordText, AtSpiText, AtSpiDocumentText, AtSpiDocumentWeb,
-					AtSpiDocumentEmail};
+
 		throw new UnsupportedPlatformException();
 	}
 
@@ -457,8 +431,7 @@ public class NativeLinker {
 			return false;
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return w.get(UIATags.UIAIsKeyboardFocusable);
-		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
-			return w.get(AtSpiTags.AtSpiIsFocusable);
+
 		throw new UnsupportedPlatformException();
 	}
 }

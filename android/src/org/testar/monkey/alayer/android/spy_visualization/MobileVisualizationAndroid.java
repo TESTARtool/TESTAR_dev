@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,7 +32,7 @@ package org.testar.monkey.alayer.android.spy_visualization;
 
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.android.AndroidProtocolUtil;
+import org.testar.monkey.alayer.android.util.AndroidScreenshotUtil;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -138,7 +138,7 @@ public class MobileVisualizationAndroid {
     /** Method called when the overlay needs to be updated when the state changes. */
     private void updateScreen() {
         // Updates screenshot and overlay
-        String screenshotPath = AndroidProtocolUtil.getStateshotSpyMode(usedState);
+        String screenshotPath = AndroidScreenshotUtil.getStateshotSpyMode(usedState);
         imagePanel.updateSc(screenshotPath, treeVizInstance.tree, deriveActionsFunction.apply(usedState));
 
         frame.revalidate();

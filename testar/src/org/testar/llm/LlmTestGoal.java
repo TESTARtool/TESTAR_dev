@@ -36,7 +36,7 @@ import java.util.List;
 
 /**
  * Contains a test goal for the llm to complete along with the conditions under which the test goal is considered
- * completed. TODO: Rework GUI to support this new structure.
+ * completed.
  */
 public class LlmTestGoal {
     private String testGoal;

@@ -35,6 +35,7 @@ import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.exceptions.StateBuildException;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 import org.testar.monkey.alayer.android.util.AndroidNodeParser;
+import org.testar.monkey.alayer.android.util.AndroidXpathUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -82,7 +83,7 @@ public class AndroidStateFetcher implements Callable<AndroidState> {
 		// After create the widget tree, set widgets Path
 		for (Widget w : root) {
 		    w.set(Tags.Path, Util.indexString(w));
-		    w.set(AndroidTags.AndroidXpath, AndroidProtocolUtil.constructXpath(w));
+		    w.set(AndroidTags.AndroidXpath, AndroidXpathUtil.constructXpath(w));
 		}
 
 		return root;

@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013 - 2026 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -27,14 +28,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.testar.monkey.alayer.actions;
 
 import org.testar.monkey.Assert;
-import org.testar.monkey.Proc;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Role;
@@ -54,7 +50,7 @@ public class ActivateSystem extends TaggableBase implements Action {
 		
 		try{
 			double start = Util.time();
-			Proc activator = system.get(Tags.SystemActivator);
+			Runnable activator = system.get(Tags.SystemActivator);
 			activator.run();
 			Util.pause(duration - (Util.time() - start));
 		}catch(NoSuchTagException nste){
@@ -64,13 +60,11 @@ public class ActivateSystem extends TaggableBase implements Action {
 	
 	public String toString(){ return "Bring the system to the foreground."; }
 
-	// by urueda
 	@Override
 	public String toString(Role... discardParameters) {
 		return toString();
 	}
-	
-	// by urueda
+
 	@Override
 	public String toShortString() {
 		Role r = get(Tags.Role, null);
@@ -80,7 +74,6 @@ public class ActivateSystem extends TaggableBase implements Action {
 			return toString();
 	}
 
-	// by urueda
 	@Override
 	public String toParametersString() {
 		return "";

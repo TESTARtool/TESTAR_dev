@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2022 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 - 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,7 +31,7 @@
 package org.testar.monkey.alayer.ios.spy_visualization;
 
 import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.ios.IOSProtocolUtil;
+import org.testar.monkey.alayer.ios.util.IOSScreenshotUtil;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -136,7 +136,7 @@ public class MobileVisualizationIOS {
         // Updates screenshot and overlay
         LocalTime startTime = LocalTime.now();
         System.out.println("start updateScreen spy mode: " + startTime);
-        String screenshotPath = IOSProtocolUtil.getStateshotSpyMode(usedState);
+        String screenshotPath = IOSScreenshotUtil.getStateshotSpyMode(usedState);
         imagePanel.updateSc(screenshotPath, treeVizInstance.tree);
         LocalTime endTime = LocalTime.now();
         System.out.println("end updateScreen spy mode: " + endTime);

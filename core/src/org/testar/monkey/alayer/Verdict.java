@@ -97,12 +97,17 @@ public final class Verdict implements Serializable {
 		// WARNING GROUP: ACCESSIBILITY
 		WARNING_ACCESSIBILITY_FAULT(0.4, "WARNING_ACCESSIBILITY_FAULT"),
 
-		/** FAIL (0.5 - 1.0) **/
+		/** FAIL (0.5 - 0.899) **/
 
 		UNREPLAYABLE(0.5, "UNREPLAYABLE"), // Sequence not replayable
 		SUSPICIOUS_TAG(0.8, "SUSPICIOUS_TAG"), // Suspicious tag
 		SUSPICIOUS_PROCESS(0.87, "SUSPICIOUS_PROCESS"), // Suspicious message in the process standard output/error
 		SUSPICIOUS_LOG(0.89, "SUSPICIOUS_LOG"), // Suspicious message in log file or command output (LogOracle)
+
+		/** CRITICAL (0.9 - 1.0) **/
+
+		CRITICAL(0.9, "CRITICAL"),
+		LLM_INVALID(0.91, "LLM_INVALID"), // LLM detected objective steps were followed but resulting state is invalid
 		NOT_RESPONDING(0.99999990, "NOT_RESPONDING"), // Unresponsive
 		UNEXPECTEDCLOSE(0.99999999, "UNEXPECTEDCLOSE"), // Crash? Unexpected close?
 		FAIL(1.0, "FAIL");
@@ -229,44 +234,22 @@ public final class Verdict implements Serializable {
 		return visualizer;
 	}
 
+	/**
+	 * Indicates if this verdict is critical (SUT froze or crashed).
+	 *
+	 * @return true if verdict is critical
+	 */
+	public boolean isCritical() {
+		return this.severity() >= Severity.CRITICAL.getValue();
+	}
+
+	public boolean isCompletion() {
+		return this.severity() == Severity.LLM_COMPLETE.getValue() || this.severity() == Severity.CONDITION_COMPLETE.getValue();
+	}
+
 	@Override
 	public String toString() {
 		return "severity: " + severity + " info: " + info;
-	}
-
-	/**
-	 * Retrieves the verdict result of joining two verdicts.
-	 * @param verdict A verdict to join with current verdict.
-	 * 
-	 * @return A new verdict that is the result of joining the current verdict with the provided verdict.
-	 */
-	public Verdict join(Verdict verdict) {
-		List<Rect> jointHighlights = new ArrayList<>();
-		jointHighlights.addAll(this.visualtHighlights);
-		jointHighlights.addAll(verdict.getVisualtHighlights());
-
-		Severity joinedSeverity = Arrays.stream(Severity.values())
-				.filter(s -> s.getValue() == Math.max(this.severity, verdict.severity()))
-				.findFirst()
-				.orElse(Severity.FAIL);
-
-		String joinedInfo = this.info.contains(verdict.info()) ? this.info
-				: (this.severity == Severity.OK.getValue() ? "" : this.info + "\n") + verdict.info();
-
-		Visualizer joinedVisualizer = Visualizer.join(this.visualizer(), verdict.visualizer());
-
-		Verdict jointVerdict = new Verdict(joinedSeverity, joinedInfo, joinedVisualizer, jointHighlights);
-		jointVerdict.setDescription(concatWithNewline(this.description(), verdict.description()));
-
-		return jointVerdict;
-	}
-
-	private String concatWithNewline(String a, String b) {
-		String a1 = a == null ? "" : a.trim();
-		String b1 = b == null ? "" : b.trim();
-		if (a1.isEmpty()) return b1;
-		if (b1.isEmpty()) return a1;
-		return a1 + "\n" + b1;
 	}
 
 	/**
@@ -285,6 +268,17 @@ public final class Verdict implements Serializable {
 		return this.severity == other.severity
 				&& this.info.equals(other.info)
 				&& this.visualizer.equals(other.visualizer);
+	}
+
+	public static boolean helperAreAllVerdictsOK(List<Verdict> verdicts) {
+		if(verdicts == null || verdicts.isEmpty()) return true;
+
+		for (Verdict verdict : verdicts) {
+			if (verdict.severity() > Severity.OK.getValue()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 }

@@ -348,6 +348,121 @@ public class WdTags extends TagsBase {
   public static final Tag<String> WebPlaceholder = from("WebPlaceholder", String.class);
 
   /**
+   * ARIA label text (aria-label).
+   */
+  public static final Tag<String> WebAriaLabel = from("WebAriaLabel", String.class);
+
+  /**
+   * ARIA labelled-by reference (aria-labelledby).
+   */
+  public static final Tag<String> WebAriaLabelledBy = from("WebAriaLabelledBy", String.class);
+
+  /**
+   * ARIA described-by reference (aria-describedby).
+   */
+  public static final Tag<String> WebAriaDescribedBy = from("WebAriaDescribedBy", String.class);
+
+  /**
+   * ARIA role (role attribute).
+   */
+  public static final Tag<String> WebAriaRole = from("WebAriaRole", String.class);
+
+  /**
+   * ARIA disabled state (aria-disabled).
+   */
+  public static final Tag<Boolean> WebAriaDisabled = from("WebAriaDisabled", Boolean.class);
+
+  /**
+   * ARIA hidden state (aria-hidden).
+   */
+  public static final Tag<Boolean> WebAriaHidden = from("WebAriaHidden", Boolean.class);
+
+  /**
+   * ARIA expanded state (aria-expanded).
+   */
+  public static final Tag<Boolean> WebAriaExpanded = from("WebAriaExpanded", Boolean.class);
+
+  /**
+   * ARIA pressed state (aria-pressed).
+   */
+  public static final Tag<Boolean> WebAriaPressed = from("WebAriaPressed", Boolean.class);
+
+  /**
+   * ARIA selected state (aria-selected).
+   */
+  public static final Tag<Boolean> WebAriaSelected = from("WebAriaSelected", Boolean.class);
+
+  /**
+   * ARIA checked state (aria-checked), including possible mixed values.
+   */
+  public static final Tag<String> WebAriaChecked = from("WebAriaChecked", String.class);
+
+  /**
+   * ARIA required state (aria-required).
+   */
+  public static final Tag<Boolean> WebAriaRequired = from("WebAriaRequired", Boolean.class);
+
+  /**
+   * ARIA invalid state (aria-invalid).
+   */
+  public static final Tag<String> WebAriaInvalid = from("WebAriaInvalid", String.class);
+
+  /**
+   * ARIA readonly state (aria-readonly).
+   */
+  public static final Tag<Boolean> WebAriaReadOnly = from("WebAriaReadOnly", Boolean.class);
+
+  /**
+   * ARIA current state (aria-current).
+   */
+  public static final Tag<String> WebAriaCurrent = from("WebAriaCurrent", String.class);
+
+  /**
+   * ARIA haspopup state (aria-haspopup).
+   */
+  public static final Tag<String> WebAriaHasPopup = from("WebAriaHasPopup", String.class);
+
+  /**
+   * ARIA controls reference (aria-controls).
+   */
+  public static final Tag<String> WebAriaControls = from("WebAriaControls", String.class);
+
+  /**
+   * ARIA live region setting (aria-live).
+   */
+  public static final Tag<String> WebAriaLive = from("WebAriaLive", String.class);
+
+  /**
+   * ARIA busy state (aria-busy).
+   */
+  public static final Tag<Boolean> WebAriaBusy = from("WebAriaBusy", Boolean.class);
+
+  /**
+   * ARIA modal state (aria-modal).
+   */
+  public static final Tag<Boolean> WebAriaModal = from("WebAriaModal", Boolean.class);
+
+  /**
+   * ARIA current numeric value (aria-valuenow).
+   */
+  public static final Tag<String> WebAriaValueNow = from("WebAriaValueNow", String.class);
+
+  /**
+   * ARIA minimum numeric value (aria-valuemin).
+   */
+  public static final Tag<String> WebAriaValueMin = from("WebAriaValueMin", String.class);
+
+  /**
+   * ARIA maximum numeric value (aria-valuemax).
+   */
+  public static final Tag<String> WebAriaValueMax = from("WebAriaValueMax", String.class);
+
+  /**
+   * ARIA textual value (aria-valuetext).
+   */
+  public static final Tag<String> WebAriaValueText = from("WebAriaValueText", String.class);
+
+  /**
    * Represents the remote web element object obtained with Selenium framework
    */
   public static final Tag<WebElement> WebElementSelenium = from("WebElementSelenium", WebElement.class);

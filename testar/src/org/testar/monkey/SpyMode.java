@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2022 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2022 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2022 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2022 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -39,10 +39,10 @@ import org.testar.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
-import org.testar.monkey.alayer.android.AndroidProtocolUtil;
 import org.testar.monkey.alayer.android.spy_visualization.MobileVisualizationAndroid;
-import org.testar.monkey.alayer.ios.IOSProtocolUtil;
+import org.testar.monkey.alayer.android.util.AndroidScreenshotUtil;
 import org.testar.monkey.alayer.ios.spy_visualization.MobileVisualizationIOS;
+import org.testar.monkey.alayer.ios.util.IOSScreenshotUtil;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
 
@@ -137,13 +137,13 @@ public class SpyMode {
 		System.out.println("SPY MODE, CREATING JAVA JFRAME WINDOW Android");
 		State state = protocol.getState(system);
 		Function<State, Set<Action>> deriveActionsFunction = s -> protocol.deriveActions(system, s);
-		return new MobileVisualizationAndroid(AndroidProtocolUtil.getStateshotSpyMode(state), state, deriveActionsFunction);
+		return new MobileVisualizationAndroid(AndroidScreenshotUtil.getStateshotSpyMode(state), state, deriveActionsFunction);
 	}
 
 	private MobileVisualizationIOS setupIOSVisualization(DefaultProtocol protocol, SUT system) {
 		System.out.println("SPY MODE, CREATING JAVA JFRAME WINDOW iOS");
 		State state = protocol.getState(system);
-		return new MobileVisualizationIOS(IOSProtocolUtil.getStateshotSpyMode(state), state);
+		return new MobileVisualizationIOS(IOSScreenshotUtil.getStateshotSpyMode(state), state);
 	}
 
 	private void updateAndroidVisualization(DefaultProtocol protocol, MobileVisualizationAndroid visualization, SUT system, State state) {
@@ -168,7 +168,6 @@ public class SpyMode {
 		//in Spy-mode, always visualize the widget info under the mouse cursor:
 		SutVisualization.visualizeState(
 				protocol.visualizationOn,
-				protocol.markParentWidget,
 				protocol.mouse,
 				protocol.lastPrintParentsOf,
 				protocol.cv,

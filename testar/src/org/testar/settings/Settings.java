@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -179,9 +179,8 @@ public class Settings extends TaggableBase implements Serializable {
 		// Prioritize the argv > file > default
 		Settings settings = loadSettings(SettingsDefaults.getSettingsDefaults(), filePath, argv);
 
-		try{
-			settings.get(ConfigTags.ExtendedSettingsFile);
-		} catch (NoSuchTagException e){
+		String extendedSettingsFile = settings.get(ConfigTags.ExtendedSettingsFile, "");
+		if (extendedSettingsFile.trim().isEmpty()) {
 			settings.set(ConfigTags.ExtendedSettingsFile, filePath.replace(Main.SETTINGS_FILE, ExtendedSettingFile.FileName));
 		}
 

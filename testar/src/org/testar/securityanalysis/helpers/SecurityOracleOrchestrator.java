@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2022 Open Universiteit - www.ou.nl
- * Copyright (c) 2022 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2022 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2022 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -38,6 +38,7 @@ import org.testar.monkey.alayer.Verdict;
 import org.testar.securityanalysis.SecurityResultWriter;
 import org.testar.securityanalysis.oracles.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -118,16 +119,21 @@ public class SecurityOracleOrchestrator {
             securityOracle.addListener(devTools);
     }
 
-    public Verdict getVerdict(Verdict verdict)
+    public List<Verdict> getVerdicts()
     {
+        List<Verdict> verdicts = new ArrayList<>();
         for (BaseSecurityOracle securityOracle : securityOracles) {
             Verdict newVerdict = securityOracle.getVerdict();
-            if (newVerdict != null)
-                verdict.join(newVerdict);
+            if (newVerdict != null && newVerdict.severity() > Verdict.Severity.OK.getValue()) {
+                verdicts.add(newVerdict);
+            }
         }
-        if (activeSecurityOracle != null)
-            verdict.join(activeSecurityOracle.getVerdict());
-
-        return verdict;
+        if (activeSecurityOracle != null) {
+            Verdict activeVerdict = activeSecurityOracle.getVerdict();
+            if (activeVerdict != null && activeVerdict.severity() > Verdict.Severity.OK.getValue()) {
+                verdicts.add(activeVerdict);
+            }
+        }
+        return verdicts;
     }
 }

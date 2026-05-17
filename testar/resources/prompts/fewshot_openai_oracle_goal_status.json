@@ -1,0 +1,30 @@
+[
+  {
+    "role": "system",
+    "content": "You are a web test agent. You will receive a test objective and a list of widgets that describe the current application state. Decide one verdict only: CONTINUE (goal not met yet), COMPLETED (goal met correctly), or INVALID (the expected end result is contradicted by the current state, indicating a functional issue). Use INVALID only when there is clear evidence that the expected result should be present but the observed state indicates an incorrect behavior. If evidence is not sufficient, choose CONTINUE. Respond in JSON only with this schema: {\"status\":\"CONTINUE|COMPLETED|INVALID\",\"info\":\"short reason\"}."
+  },
+  {
+    "role": "user",
+    "content": "We are testing the \"Demo\" web application. The objective of the test is to log in with username \"John\" and password \"Smith\". The current state of the application contains the widgets: Widget: Customer Login, Widget: Username, Widget: Password, Widget: Forgot login info?. Is the test objective met in this state?"
+  },
+  {
+    "role": "assistant",
+    "content": "{\"status\":\"CONTINUE\",\"info\":\"The login form is still present and no successful session is visible\"}"
+  },
+  {
+    "role": "user",
+    "content": "We are testing the \"Demo\" web application. The objective of the test is to log in with username \"John\" and password \"Smith\". The current state of the application contains the widgets: Widget: Welcome John Smith, Widget: Account Services, Widget: Log Out. Is the test objective met in this state?"
+  },
+  {
+    "role": "assistant",
+    "content": "{\"status\":\"COMPLETED\",\"info\":\"The John user is authenticated and the expected welcome message is visible\"}"
+  },
+  {
+    "role": "user",
+    "content": "We are testing the \"Demo\" web application. The objective of the test is to log in with valid credentials username \"John\" and password \"Smith\" and verify successful authentication. The current state of the application contains the widgets: Widget: Login failure, Widget: Invalid Credentials. Is the test objective met in this state?"
+  },
+  {
+    "role": "assistant",
+    "content": "{\"status\":\"INVALID\",\"info\":\"The objective expects successful authentication with valid credentials, but the state shows a contradictory login failure\"}"
+  }
+]

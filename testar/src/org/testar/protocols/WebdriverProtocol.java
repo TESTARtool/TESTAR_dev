@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -35,8 +35,6 @@ import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.logging.LogEntries;
-import org.openqa.selenium.logging.LogEntry;
 import org.testar.environment.Environment;
 import org.testar.monkey.*;
 import org.testar.monkey.alayer.*;
@@ -53,6 +51,7 @@ import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.monkey.alayer.windows.WinApiException;
 import org.testar.monkey.alayer.windows.WinProcess;
 import org.testar.monkey.alayer.windows.Windows;
+import org.testar.oracles.log.WebBrowserConsoleOracle;
 import org.testar.plugin.NativeLinker;
 import org.testar.serialisation.LogSerialiser;
 import org.testar.settings.Settings;
@@ -61,8 +60,6 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
@@ -88,9 +85,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 	// List of attributes to identify and close policy popups
 	protected Multimap<String, String> policyAttributes = ArrayListMultimap.create();
-
-	// Verdict obtained from messages coming from the web browser console
-	protected Verdict webConsoleVerdict = Verdict.OK;
+	// Oracle to obtain verdicts from messages coming from the web browser console
+	protected WebBrowserConsoleOracle webBrowserConsoleOracle;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -139,6 +135,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
 		// List of web attributes that TESTAR should ignore when obtaining the web state
 		Constants.setIgnoredAttributes(settings.get(ConfigTags.WebIgnoredAttributes));
+
+		webBrowserConsoleOracle = new WebBrowserConsoleOracle(settings);
 	}
 	
 	/**
@@ -147,8 +145,6 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	@Override
 	protected void preSequencePreparations() {
 		super.preSequencePreparations();
-		// reset web browser console verdict
-		webConsoleVerdict = Verdict.OK;
 	}
     
     /**
@@ -282,8 +278,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     	        WinProcess.toForeground(system.get(Tags.PID), 0.3, 100);
     	    } catch (WinApiException wae) {
     	        logger.log(org.apache.logging.log4j.Level.WARN, wae);
-    	        Verdict verdict = new Verdict(Verdict.Severity.NOT_RESPONDING, "Unable to bring the browser to foreground!");
-    	        state.set(Tags.OracleVerdict, verdict);
+    	        Verdict notRespondingVerdict = new Verdict(Verdict.Severity.NOT_RESPONDING, "Unable to bring the browser to foreground!");
+    	        state.set(Tags.OracleVerdicts, Collections.singletonList(notRespondingVerdict));
     	    }
     	}
 
@@ -291,56 +287,22 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     }
 
     /**
-     * The getVerdict methods implements the online state oracles that
-     * examine the SUT's current state and returns an oracle verdict.
+     * The getVerdicts methods implements the online state oracles that
+     * examine the SUT's current state and returns a list of oracle verdicts.
      *
-     * @return oracle verdict, which determines whether the state is erroneous and why.
+     * @return list of oracle verdicts
      */
     @Override
-    protected Verdict getVerdict(State state) {
-    	Verdict stateVerdict = super.getVerdict(state);
+    protected List<Verdict> getVerdicts(State state) {
+    	List<Verdict> verdicts = super.getVerdicts(state);
+		List<Verdict> browserConsoleVerdicts = webBrowserConsoleOracle.getVerdicts(state);
+		for (Verdict browserVerdict : browserConsoleVerdicts) {
+			if (browserVerdict.severity() > Verdict.OK.severity()) {
+				verdicts.add(browserVerdict);
+			}
+		}
 
-    	LogEntries logEntries = WdDriver.getBrowserLogs();
-
-    	// If Web Console Error Oracle is enabled and we have some pattern to match
-    	if(settings.get(ConfigTags.WebConsoleErrorOracle, false) && !settings.get(ConfigTags.WebConsoleErrorPattern, "").isEmpty()) {
-    		// Load the web console error pattern
-    		Pattern errorPattern = Pattern.compile(settings.get(ConfigTags.WebConsoleErrorPattern), Pattern.UNICODE_CHARACTER_CLASS);
-    		// Check Severe messages in the WebDriver logs
-    		for(LogEntry logEntry : logEntries) {
-    			if(logEntry.getLevel().equals(Level.SEVERE)) {
-    				// Check if the severe error message matches with the web console error pattern
-    				String consoleErrorMsg = logEntry.getMessage();
-    				Matcher matcherError = errorPattern.matcher(consoleErrorMsg);
-    				if(matcherError.matches()) {
-    					webConsoleVerdict = new Verdict(Verdict.Severity.SUSPICIOUS_TAG, "Web Browser Console Error: " + consoleErrorMsg);
-    				}
-    			}
-    		}
-    		// Join GUI verdict with WebDriver console verdict
-    		stateVerdict = stateVerdict.join(webConsoleVerdict);
-    	}
-
-    	// If Web Console Warning Oracle is enabled and we have some pattern to match
-    	if(settings.get(ConfigTags.WebConsoleWarningOracle, false) && !settings.get(ConfigTags.WebConsoleWarningPattern, "").isEmpty()) {
-    		// Load the web console warning pattern
-    		Pattern warningPattern = Pattern.compile(settings.get(ConfigTags.WebConsoleWarningPattern), Pattern.UNICODE_CHARACTER_CLASS);
-    		// Check Warning messages in the WebDriver logs
-    		for(LogEntry logEntry : logEntries) {
-    			if(logEntry.getLevel().equals(Level.WARNING)) {
-    				// Check if the warning message matches with the web console error pattern
-    				String consoleWarningMsg = logEntry.getMessage();
-    				Matcher matcherWarning = warningPattern.matcher(consoleWarningMsg);
-    				if(matcherWarning.matches()) {
-    					webConsoleVerdict = new Verdict(Verdict.Severity.SUSPICIOUS_TAG, "Web Browser Console Warning: " + consoleWarningMsg);
-    				}
-    			}
-    		}
-    		// Join GUI verdict with WebDriver console verdict
-    		stateVerdict = stateVerdict.join(webConsoleVerdict);
-    	}
-
-    	return stateVerdict;
+    	return verdicts;
     }
 
     /**

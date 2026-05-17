@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2024 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2024 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2024 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2024 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,6 +32,7 @@ import org.testar.CodingManager;
 import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
 import org.testar.llm.LlmTestGoal;
+import org.testar.llm.LlmTestGoalOrchestrator;
 import org.testar.llm.prompt.ActionWebPromptGenerator;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.alayer.*;
@@ -67,8 +68,6 @@ import java.util.zip.ZipInputStream;
 
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
-import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
-import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 public class Protocol_webdriver_llm_state_widgets_evaluator extends WebdriverProtocol {
 
@@ -77,8 +76,7 @@ public class Protocol_webdriver_llm_state_widgets_evaluator extends WebdriverPro
 	private ConditionEvaluator conditionEvaluator;
 
 	private List<LlmTestGoal> testGoals = new ArrayList<>();
-	private Queue<LlmTestGoal> testGoalQueue;
-	private LlmTestGoal currentTestGoal;
+	private LlmTestGoalOrchestrator testGoalOrchestrator;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -97,11 +95,16 @@ public class Protocol_webdriver_llm_state_widgets_evaluator extends WebdriverPro
 		llmActionSelector = new LlmActionSelector(settings, new ActionWebPromptGenerator());
 
 		conditionEvaluator = new BasicConditionEvaluator();
+		testGoalOrchestrator = new LlmTestGoalOrchestrator(testGoals, (goal, appendPreviousGoal) -> {
+			llmActionSelector.reset(goal, appendPreviousGoal);
+			conditionEvaluator.clear();
+			conditionEvaluator.addConditions(goal.getCompletionConditions());
+		});
 	}
 
 	private void setupTestGoals(List<String> testGoalsList) {
 		for(String testGoal : testGoalsList) {
-			CheckConditionEvaluator checkEvaluator = new CheckConditionEvaluator(WdTags.WebInnerHTML, testGoal);
+			CheckConditionEvaluator checkEvaluator = new CheckConditionEvaluator(WdTags.WebTextContent, testGoal);
 			testGoals.add(new LlmTestGoal(testGoal, checkEvaluator.getConditions()));
 		}
 	}
@@ -112,16 +115,7 @@ public class Protocol_webdriver_llm_state_widgets_evaluator extends WebdriverPro
 	@Override
 	protected void preSequencePreparations() {
 		super.preSequencePreparations();
-
-		// Setup test goal queue
-		testGoalQueue = new LinkedList<>();
-		testGoalQueue.addAll(testGoals);
-		currentTestGoal = testGoalQueue.poll();
-		conditionEvaluator.clear();
-		conditionEvaluator.addConditions(currentTestGoal.getCompletionConditions());
-
-		// Reset llm action selector
-		llmActionSelector.reset(currentTestGoal, false);
+		testGoalOrchestrator.startSequence();
 	}
 
 	/**
@@ -175,29 +169,16 @@ public class Protocol_webdriver_llm_state_widgets_evaluator extends WebdriverPro
 	 * @return oracle verdict, which determines whether the state is erroneous and why.
 	 */
 	@Override
-	protected Verdict getVerdict(State state) {
-		// System crashes, non-responsiveness and suspicious tags automatically detected!
-		// For web applications, web browser errors and warnings can also be enabled via settings
-		Verdict verdict = super.getVerdict(state);
+	protected List<Verdict> getVerdicts(State state) {
+		List<Verdict> verdicts = super.getVerdicts(state);
 
-		// Apply state conditions to check if the test goal has been completed
-		if(conditionEvaluator.evaluateConditions(state)) {
-			// Test goal was completed, retrieve next test goal from queue.
-			currentTestGoal = testGoalQueue.poll();
+		// Add the State Model Condition verdicts to determine if the test goal has been completed
+		List<Verdict> stateConditionVerdicts = conditionEvaluator.evaluateConditions(state)
+				? Collections.singletonList(new Verdict(Verdict.Severity.CONDITION_COMPLETE, "Current test goal conditions completed."))
+				: Collections.singletonList(Verdict.OK);
+		verdicts.addAll(testGoalOrchestrator.processGoalVerdicts(stateConditionVerdicts));
 
-			// Poll returns null if there are no more items remaining in the queue.
-			if(currentTestGoal == null) {
-				// No more test goals remaining, terminate sequence.
-				return new Verdict(Verdict.Severity.CONDITION_COMPLETE, "All test goal conditions completed.");
-			} else {
-				llmActionSelector.reset(currentTestGoal, true);
-				conditionEvaluator.clear();
-				conditionEvaluator.addConditions(currentTestGoal.getCompletionConditions());
-				System.out.println("Test goal completed, moving to next test goal: " + currentTestGoal.getTestGoal());
-			}
-		}
-
-		return verdict;
+		return verdicts;
 	}
 
 	/**
@@ -242,9 +223,6 @@ public class Protocol_webdriver_llm_state_widgets_evaluator extends WebdriverPro
 				}
 				continue;
 			}
-
-			// slides can happen, even though the widget might be blocked
-			//addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
 
 			// If the element is blocked, Testar can't click on or type in the widget
 			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {

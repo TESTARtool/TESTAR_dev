@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -34,8 +35,7 @@ public class TestReportManager {
 	private static StateStub state;
 	private static Set<Action> derivedActions;
 	private static Action selectedAction;
-
-	private static Verdict finalVerdict;
+	private static List<Verdict> finalVerdicts = Collections.singletonList(Verdict.OK);
 
 	@Before
 	public void setUp() throws IOException {
@@ -64,12 +64,6 @@ public class TestReportManager {
 
 		Action emptyTagsAction = new Type("emptyTagsAction");
 		derivedActions.add(emptyTagsAction);
-
-		Verdict fooVerdict = new Verdict(Verdict.Severity.FAIL, "Foo");
-		fooVerdict.setDescription("This is a Foo verdict description");
-		Verdict booVerdict = new Verdict(Verdict.Severity.FAIL, "Boo");
-		booVerdict.setDescription("This is a Boo verdict description");
-		finalVerdict = fooVerdict.join(booVerdict);
 	}
 
 	@Test
@@ -106,7 +100,7 @@ public class TestReportManager {
 		ReportManager reportManager = createReportManager(settings);
 
 		// Verify the html report file was created with the state and actions information
-		File htmlReportFile = new File(reportManager.getReportFileName().concat("_FAIL.html"));
+		File htmlReportFile = new File(reportManager.getReportFileName().concat("_V001_OK.html"));
 		System.out.println("testHtmlReport: " + htmlReportFile.getPath());
 		Assert.assertTrue(htmlReportFile.exists());
 
@@ -129,7 +123,7 @@ public class TestReportManager {
 		Assert.assertTrue(fileContains("This is a Boo verdict description", htmlReportFile));
 
 		// Verify the plain txt report was not created
-		File txtReportFile = new File(reportManager.getReportFileName().concat("_FAIL.txt"));
+		File txtReportFile = new File(reportManager.getReportFileName().concat("_V001_OK.txt"));
 		Assert.assertTrue(!txtReportFile.exists());
 	}
 
@@ -151,11 +145,12 @@ public class TestReportManager {
 		ReportManager reportManager = createReportManager(settings);
 
 		// Verify the html report was not created
-		File htmlReportFile = new File(reportManager.getReportFileName().concat("_FAIL.html"));
+		File htmlReportFile = new File(reportManager.getReportFileName().concat("_V001_OK.html"));
 		Assert.assertTrue(!htmlReportFile.exists());
 
 		// Verify the txt report file was created with the state and actions information
-		File txtReportFile = new File(reportManager.getReportFileName().concat("_FAIL.txt"));
+		File txtReportFile = new File(reportManager.getReportFileName().concat("_V001_OK.txt"));
+		System.out.println("testPlainReport: " + txtReportFile.getPath());
 		Assert.assertTrue(txtReportFile.exists());
 
 		// Verify state information
@@ -197,7 +192,7 @@ public class TestReportManager {
 		ReportManager reportManager = createReportManager(settings);
 
 		// Verify the html report file was created with the state and actions information
-		File htmlReportFile = new File(reportManager.getReportFileName().concat("_FAIL.html"));
+		File htmlReportFile = new File(reportManager.getReportFileName().concat("_V001_OK.html"));
 		System.out.println("testHtmlReportWithoutScreenshot: " + htmlReportFile.getPath());
 		Assert.assertTrue(htmlReportFile.exists());
 
@@ -226,11 +221,12 @@ public class TestReportManager {
 
 		// Prepare a report only with the final verdict
 		ReportManager reportManager = new ReportManager(false, settings);
-		reportManager.addTestVerdict(state, new Verdict(Verdict.Severity.FAIL, "Failure is <script>something</script>"));
+		Verdict failVerdict = new Verdict(Verdict.Severity.FAIL, "Failure is <script>something</script>");
+		reportManager.addTestVerdicts(Collections.singletonList(failVerdict));
 		reportManager.finishReport();
 
 		// Verify the html report file was created
-		File htmlReportFile = new File(reportManager.getReportFileName().concat("_FAIL.html"));
+		File htmlReportFile = new File(reportManager.getReportFileName().concat("_V001_FAIL.html"));
 		System.out.println("testSpecialCharacters: " + htmlReportFile.getPath());
 		Assert.assertTrue(htmlReportFile.exists());
 
@@ -243,7 +239,7 @@ public class TestReportManager {
 		reportManager.addState(state);
 		reportManager.addActions(derivedActions);
 		reportManager.addSelectedAction(state, selectedAction);
-		reportManager.addTestVerdict(state, finalVerdict);
+		reportManager.addTestVerdicts(finalVerdicts);
 		reportManager.finishReport();
 		return reportManager;
 	}

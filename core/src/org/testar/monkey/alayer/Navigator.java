@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013 - 2026 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -27,16 +28,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.testar.monkey.alayer;
 
 import java.util.LinkedList;
+import java.util.function.Consumer;
 
-import org.testar.monkey.UnProc;
-
-public interface Navigator extends UnProc<LinkedList<Widget>> {
-	void run(LinkedList<Widget> buffer);
+public interface Navigator extends Consumer<LinkedList<Widget>> {
+	@Override
+	void accept(LinkedList<Widget> buffer);
 }

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2025 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2025 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -67,8 +67,8 @@ public class WebInvariantDuplicateSelectItems implements Oracle {
 	}
 
 	@Override
-	public Verdict getVerdict(State state) {
-		List<Widget> selectWidgetsWithDuplicates = new ArrayList<>();
+	public List<Verdict> getVerdicts(State state) {
+		List<Verdict> verdicts = new ArrayList<>();
 
 		for (Widget w : state) {
 			if (roles.contains(w.get(Tags.Role, Roles.Widget)) && !w.get(WdTags.WebId, "").isEmpty()) {
@@ -89,7 +89,19 @@ public class WebInvariantDuplicateSelectItems implements Oracle {
 								.collect(Collectors.toSet());
 
 						if (!duplicatesTexts.isEmpty()) {
-							selectWidgetsWithDuplicates.add(w);
+							String verdictMsg = String.format(
+									"Detected Select widget %s with duplicate values: %s",
+									getDescriptionOfWidgets(Collections.singletonList(w), WdTags.WebId),
+									duplicatesTexts
+									);
+
+							Visualizer visualizer = new RegionsVisualizer(
+									getRedPen(),
+									getWidgetRegions(Collections.singletonList(w)),
+									"Invariant Fault",
+									0.5, 0.5);
+
+							verdicts.add(new Verdict(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT, verdictMsg, visualizer));
 						}
 					}
 				} catch (Exception e) {
@@ -98,23 +110,9 @@ public class WebInvariantDuplicateSelectItems implements Oracle {
 			}
 		}
 
-		// If exists one or more incorrect widgets
-		if (!selectWidgetsWithDuplicates.isEmpty()) {
-
-			String verdictMsg = String.format(
-					"Detected Select widgets %s with duplicate values!",
-					getDescriptionOfWidgets(selectWidgetsWithDuplicates, WdTags.WebId)
-					);
-
-			Visualizer visualizer = new RegionsVisualizer(
-					getRedPen(),
-					getWidgetRegions(selectWidgetsWithDuplicates),
-					"Invariant Fault",
-					0.5, 0.5);
-
-			return new Verdict(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT, verdictMsg, visualizer);
+		if (!verdicts.isEmpty()) {
+			return verdicts;
 		}
-
-		return Verdict.OK;
+		return Collections.singletonList(Verdict.OK);
 	}
 }

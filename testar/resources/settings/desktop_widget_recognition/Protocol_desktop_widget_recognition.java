@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2024 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -34,7 +34,6 @@ import eye.Match;
 import org.sikuli.script.FindFailed;
 import org.sikuli.script.Screen;
 import org.testar.DerivedActions;
-import org.testar.ProtocolUtil;
 import org.testar.SutVisualization;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Util;
@@ -49,6 +48,7 @@ import org.testar.monkey.alayer.exceptions.WidgetNotFoundException;
 import org.testar.protocols.DesktopProtocol;
 import org.testar.settings.Settings;
 import org.testar.simplestategraph.GuiStateGraphWithVisitedActions;
+import org.testar.util.ScreenshotUtil;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -179,7 +179,7 @@ public class Protocol_desktop_widget_recognition extends DesktopProtocol {
 			// You can increase the ActionDuration settings time for visual debugging
 			Util.clear(cv); cv.end();
 
-			String widgetScreenshotPath = ProtocolUtil.getActionshot(state, action);
+			String widgetScreenshotPath = ScreenshotUtil.getActionshot(state, action);
 			System.out.println("widgetScreenshotPath " + widgetScreenshotPath);
 
 			if (detector == Detector.EYE) {

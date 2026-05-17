@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2026 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -28,16 +28,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-/**
- *  @author Sebastian Bauersfeld
- */
-
 package org.testar.monkey.alayer;
 
 import org.testar.CodingManager;
 import org.testar.monkey.Pair;
-import org.testar.monkey.Proc;
-import org.testar.monkey.UnFunc;
 import org.testar.monkey.alayer.devices.Keyboard;
 import org.testar.monkey.alayer.devices.Mouse;
 import org.testar.monkey.alayer.devices.ProcessHandle;
@@ -63,11 +57,6 @@ public final class Tags extends TagsBase {
 	 * by other widgets (use the <code>HitTester</code> Tag instead!) */
 	public static final Tag<Shape> Shape = from("Shape", Shape.class);	
 
-	/** Usually attached to widgets. It tells whether this widget this widget is rendered.
-	 * If so, it does not necessarily mean that it is also visible, since it could still
-	 * be obfuscated by other controls. */
-	public static final Tag<Boolean> Rendered = from("Rendered", Boolean.class);
-	
 	/** A short human-readable descriptive text for a widget / action / or system */
 	public static final Tag<String> Desc = from("Desc", String.class);
 	
@@ -113,10 +102,7 @@ public final class Tags extends TagsBase {
 	
 	/** Usually attached to window widgets. Determines whether the widget is modal (blocks other widgets) */ 
 	public static final Tag<Boolean> Modal = from("Modal", Boolean.class);
-	
-	/** Usually attached to sliders or scrollbars. Determines the orientation (horizontal, vertical or an arbitrary angle) */
-	public static final Tag<Double> Angle = from("Angle", Double.class);
-	
+
 	/** The text of a widget (e.g. the text within a text box) */
 	public static final Tag<String> Text = from("Text", String.class);
 
@@ -129,9 +115,6 @@ public final class Tags extends TagsBase {
 	public static final Tag<String> Abstract_R_ID = from(CodingManager.ABSTRACT_R_ID, String.class);
 	public static final Tag<String> Abstract_R_T_ID = from(CodingManager.ABSTRACT_R_T_ID, String.class);
 	public static final Tag<String> Abstract_R_T_P_ID = from(CodingManager.ABSTRACT_R_T_P_ID, String.class);
-	
-	@SuppressWarnings("unchecked")
-	public static final Tag<UnFunc<SUT, String>> DynDesc = from("DynDesc", (Class<UnFunc<SUT, String>>)(Class<?>)UnFunc.class);
 
 	/** A visualizer, which visualizes a widget or an action, so that one can get an idea of what the action will do when executed */
 	public static final Tag<Visualizer> Visualizer = from("Visualizer", Visualizer.class);
@@ -161,9 +144,9 @@ public final class Tags extends TagsBase {
 	/** Usually attached to an object of {@link State}. The value is a screenshot of the state. */
 	public static final Tag<String> ScreenshotPath = from("ScreenshotPath", String.class);
 
-	/** Usually attached to a {@link State} object. The value is an outcome of a test oracle for that state. It is
-	 * used to mark states as 'suspicious' or 'erroneous' */
-	public static final Tag<Verdict> OracleVerdict = from("OracleVerdict", Verdict.class);
+	/** Usually attached to a {@link State} object. The value is a list of outcomes of test oracles for that state. */
+	@SuppressWarnings("unchecked")
+	public static final Tag<List<Verdict>> OracleVerdicts = from("OracleVerdicts", (Class<List<Verdict>>)(Class<?>)List.class);
 
 	/** The standard mouse object. Usually attached to systems */
 	public static final Tag<Mouse> StandardMouse = from("StandardMouse", Mouse.class);
@@ -187,7 +170,6 @@ public final class Tags extends TagsBase {
 	public static final Tag<Action> ExecutedAction = from("ExecutedAction", Action.class);
 	public static final Tag<Double> ActionDuration = from("ActionDuration", Double.class);
 	public static final Tag<Double> ActionDelay = from("ActionDelay", Double.class);
-	public static final Tag<String> UsedResources = from("Resources", String.class);
 	public static final Tag<String> Representation = from("Representation",String.class);
 
 	/** A list of process handles. Usually attached to a system. Process handles allow to  obtain information about and stop the processes that they refer to. */ 
@@ -201,7 +183,7 @@ public final class Tags extends TagsBase {
 	/** Usually attached to systems. A system activator can bring a system to the foreground. E.g.: If another process is currently in the foreground,
 	 * the SystemActivator makes sure that the SUT gets focused again. */
 	@SuppressWarnings("unchecked")
-	public static final Tag<Proc> SystemActivator = from("SystemActivator", (Class<Proc>)(Class<?>)Proc.class);
+	public static final Tag<Runnable> SystemActivator = from("SystemActivator", (Class<Runnable>)(Class<?>)Runnable.class);
 
 	/**
 	 * The original widget that can be attached to things like actions

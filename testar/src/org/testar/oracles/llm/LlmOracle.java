@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2024 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2024 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2024 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2024 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -40,12 +40,13 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.llm.prompt.IPromptOracleGenerator;
-import org.testar.ProtocolUtil;
 import org.testar.llm.LlmConversation;
 import org.testar.llm.LlmFactory;
 import org.testar.llm.LlmResponse;
@@ -56,15 +57,9 @@ import org.testar.monkey.Main;
 import org.testar.monkey.alayer.AWTCanvas;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Verdict;
-import org.testar.monkey.alayer.android.AndroidProtocolUtil;
-import org.testar.monkey.alayer.ios.IOSProtocolUtil;
-import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
 import org.testar.oracles.Oracle;
-import org.testar.plugin.NativeLinker;
-import org.testar.plugin.OperatingSystems;
+import org.testar.screenshot.ScreenshotProviderFactory;
 import org.testar.settings.Settings;
-
-import com.google.gson.Gson;
 
 public class LlmOracle implements Oracle {
 
@@ -127,11 +122,11 @@ public class LlmOracle implements Oracle {
 	}
 
 	@Override
-	public Verdict getVerdict(State state) {
+	public List<Verdict> getVerdicts(State state) {
 		// If the stateless option is enabled, initialize a new prompt to reduce tokens usage
 		if(this.stateless) initialize();
 
-		return getVerdictWithLlm(state);
+		return Collections.singletonList(getVerdictWithLlm(state));
 	}
 
 	private Verdict getVerdictWithLlm(State state) {
@@ -141,15 +136,7 @@ public class LlmOracle implements Oracle {
 		if (promptGenerator.attachImage()) {
 
 			ByteArrayOutputStream screenshotBytes = new ByteArrayOutputStream();
-			AWTCanvas screenshot;
-			if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
-				screenshot = WdProtocolUtil.getStateshotBinary(state);
-			} else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
-				screenshot = AndroidProtocolUtil.getStateshotBinary(state);
-			} else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
-				screenshot = IOSProtocolUtil.getStateshotBinary(state);
-			}
-			else screenshot = ProtocolUtil.getStateshotBinary(state);
+			AWTCanvas screenshot = ScreenshotProviderFactory.current().getStateshotBinary(state);
 
 			try {
 				screenshot.saveAsPng(screenshotBytes);
@@ -171,9 +158,21 @@ public class LlmOracle implements Oracle {
 
 			String llmResponse = getResponseFromLlm(conversationJson);
 
-			LlmVerdict llmVerdict = new Gson().fromJson(llmResponse, LlmVerdict.class);
+			LlmVerdict llmVerdict = LlmVerdictParser.parse(llmResponse);
+			String info = llmVerdict.getInfo() == null ? "" : llmVerdict.getInfo();
 
-			if(llmVerdict.match()) return new Verdict(Verdict.Severity.LLM_COMPLETE, llmVerdict.getInfo());
+			switch (llmVerdict.getDecision()) {
+			case COMPLETED:
+				return new Verdict(Verdict.Severity.LLM_COMPLETE, info);
+			case INVALID:
+				return new Verdict(Verdict.Severity.LLM_INVALID, info);
+			case CONTINUE:
+				return Verdict.OK;
+			case UNKNOWN:
+			default:
+				logger.log(Level.WARN, "LLM oracle response did not include a recognized verdict status/match.");
+				return Verdict.OK;
+			}
 
 		} catch(Exception e) {
 			logger.log(Level.ERROR, "Error obtaining the verdict with the LLM");

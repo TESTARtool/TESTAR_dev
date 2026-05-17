@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2019 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,6 +32,7 @@ import org.testar.CodingManager;
 import org.testar.SutVisualization;
 import org.testar.action.priorization.llm.LlmActionSelector;
 import org.testar.llm.LlmTestGoal;
+import org.testar.llm.LlmTestGoalOrchestrator;
 import org.testar.llm.prompt.OracleWebPromptGenerator;
 import org.testar.llm.prompt.ActionWebPromptGenerator;
 import org.testar.managers.InputDataManager;
@@ -51,19 +52,17 @@ import java.util.*;
 
 import static org.testar.monkey.alayer.Tags.Blocked;
 import static org.testar.monkey.alayer.Tags.Enabled;
-import static org.testar.monkey.alayer.webdriver.Constants.scrollArrowSize;
-import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 public class Protocol_03_webdriver_llm_parabank extends WebdriverProtocol {
 
 	// The LLM Action selector needs to be initialize with the settings
 	private LlmActionSelector llmActionSelector;
-	private List<LlmTestGoal> testGoals = new ArrayList<>();
-	private Queue<LlmTestGoal> testGoalQueue;
-	private LlmTestGoal currentTestGoal;
 
 	// The LLM Oracle needs to be initialize with the settings
 	private LlmOracle llmOracle;
+
+	private List<LlmTestGoal> testGoals = new ArrayList<>();
+	private LlmTestGoalOrchestrator testGoalOrchestrator;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -83,6 +82,11 @@ public class Protocol_03_webdriver_llm_parabank extends WebdriverProtocol {
 
 		// Initialize the LlmOracle using the LLM settings
 		llmOracle = new LlmOracle(settings, new OracleWebPromptGenerator());
+
+		testGoalOrchestrator = new LlmTestGoalOrchestrator(testGoals, (goal, appendPreviousGoal) -> {
+			llmActionSelector.reset(goal, appendPreviousGoal);
+			llmOracle.reset(goal, appendPreviousGoal);
+		});
 	}
 
 	/**
@@ -91,16 +95,7 @@ public class Protocol_03_webdriver_llm_parabank extends WebdriverProtocol {
 	@Override
 	protected void preSequencePreparations() {
 		super.preSequencePreparations();
-
-		// Setup test goal queue
-		testGoalQueue = new LinkedList<>();
-		testGoalQueue.addAll(testGoals);
-		currentTestGoal = testGoalQueue.poll();
-
-		// Reset llm action selector
-		llmActionSelector.reset(currentTestGoal, false);
-		// Reset llm oracle
-		llmOracle.reset(currentTestGoal, false);
+		testGoalOrchestrator.startSequence();
 	}
 
 	private void setupTestGoals(List<String> testGoalsList) {
@@ -161,31 +156,13 @@ public class Protocol_03_webdriver_llm_parabank extends WebdriverProtocol {
 	 * @return oracle verdict, which determines whether the state is erroneous and why.
 	 */
 	@Override
-	protected Verdict getVerdict(State state) {
-		// System crashes, non-responsiveness and suspicious tags automatically detected!
-		// For web applications, web browser errors and warnings can also be enabled via settings
-		Verdict verdict = super.getVerdict(state);
+	protected List<Verdict> getVerdicts(State state) {
+		List<Verdict> verdicts = super.getVerdicts(state);
 
-		// Use the LLM as an Oracle to determine if the test goal has been completed
-		Verdict llmVerdict = llmOracle.getVerdict(state);
+		// Add the LLM Oracle verdicts to determine if the test goal has been completed
+		verdicts.addAll(testGoalOrchestrator.processGoalVerdicts(llmOracle.getVerdicts(state)));
 
-		if(llmVerdict.severity() == Verdict.Severity.LLM_COMPLETE.getValue()) {
-			// Test goal was completed, retrieve next test goal from queue.
-			currentTestGoal = testGoalQueue.poll();
-
-			// Poll returns null if there are no more items remaining in the queue.
-			if(currentTestGoal == null) {
-				// No more test goals remaining, terminate sequence.
-				System.out.println("Test goal completed, but no more test goals.");
-				return llmVerdict;
-			} else {
-				System.out.println("Test goal completed, moving to next test goal.");
-				llmActionSelector.reset(currentTestGoal, true);
-				llmOracle.reset(currentTestGoal, true);
-			}
-		}
-
-		return verdict;
+		return verdicts;
 	}
 
 	/**
@@ -230,9 +207,6 @@ public class Protocol_03_webdriver_llm_parabank extends WebdriverProtocol {
 				}
 				continue;
 			}
-
-			// slides can happen, even though the widget might be blocked
-			//addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
 
 			// If the element is blocked, Testar can't click on or type in the widget
 			if (widget.get(Blocked, false) && !widget.get(WdTags.WebIsShadow, false)) {

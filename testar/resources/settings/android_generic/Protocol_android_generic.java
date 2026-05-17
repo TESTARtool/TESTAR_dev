@@ -48,6 +48,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class Protocol_android_generic extends AndroidProtocol {
@@ -156,18 +157,18 @@ public class Protocol_android_generic extends AndroidProtocol {
 	 * @return oracle verdict, which determines whether the state is erroneous and why.
 	 */
 	@Override
-	protected Verdict getVerdict(State state){
+	protected List<Verdict> getVerdicts(State state){
 		// The super methods implements the implicit online state oracles for:
 		// system crashes
 		// non-responsiveness
 		// suspicious tags
-		Verdict verdict = super.getVerdict(state);
+		List<Verdict> verdicts = super.getVerdicts(state);
 
 		//--------------------------------------------------------
 		// MORE SOPHISTICATED STATE ORACLES CAN BE PROGRAMMED HERE
 		//--------------------------------------------------------
 
-		return verdict;
+		return verdicts;
 	}
 
 	/**

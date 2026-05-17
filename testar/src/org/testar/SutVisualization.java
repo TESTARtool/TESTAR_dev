@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2025 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,12 +31,12 @@
 package org.testar;
 
 import org.testar.settings.dialog.tagsvisualization.TagFilter;
+import org.testar.util.VisualizationUtil;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.devices.Mouse;
 import org.testar.monkey.ConfigTags;
 import org.testar.settings.Settings;
-import java.util.Iterator;
 import java.util.Set;
 import static org.testar.monkey.alayer.Tags.Role;
 import static org.testar.monkey.alayer.Tags.Visualizer;
@@ -65,13 +65,12 @@ public class SutVisualization {
     /**
      *
      * @param showExtendedWidgetInfo
-     * @param markParentWidget
      * @param mouse
      * @param lastPrintParentsOf
      * @param canvas
      * @param state
      */
-    public static synchronized void visualizeState(boolean showExtendedWidgetInfo, boolean markParentWidget, Mouse mouse, String lastPrintParentsOf, Canvas canvas, State state){
+    public static synchronized void visualizeState(boolean showExtendedWidgetInfo, Mouse mouse, String lastPrintParentsOf, Canvas canvas, State state){
         Point cursor = mouse.cursor();
         Widget cursorWidget = Util.widgetFromPoint(state, cursor.x(), cursor.y(), null);
 
@@ -109,7 +108,7 @@ public class SutVisualization {
                 	Shape minicwShape = Rect.from(cwShape.x() + cwShape.width()/2 + 32,
                 			cwShape.y() + cwShape.height()/2 + 32,
                 			miniwidgetInfoW, miniwidgetInfoH);
-                	Shape repositionShape = ProtocolUtil.calculateWidgetInfoShape(canvas,minicwShape, miniwidgetInfoW, miniwidgetInfoH);
+                	Shape repositionShape = VisualizationUtil.calculateWidgetInfoShape(canvas,minicwShape, miniwidgetInfoW, miniwidgetInfoH);
                 	if (repositionShape != minicwShape){
                 		double x = repositionShape.x() - repositionShape.width() - 32,
                 				y = repositionShape.y() - repositionShape.height() - 32;
@@ -129,56 +128,19 @@ public class SutVisualization {
                 	canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 120, 0, pathText);
                 }
 
-                // TODO: Check if this is useful. If not, just remove it.
-                // SHIFT + ALT --> Toggle widget-tree hierarchy display
-                if (markParentWidget){
-                    String cursorWidgetID = cursorWidget.get(Tags.ConcreteID);
-                    boolean print = !cursorWidgetID.equals(lastPrintParentsOf);
-                    if (print){
-                        lastPrintParentsOf = cursorWidgetID;
-                        System.out.println("Parents of: " + cursorWidget.get(Tags.Title));
-                    }
-                    int lvls = ProtocolUtil.markParents(canvas,cursorWidget,ProtocolUtil.ancestorsMarkingColors.keySet().iterator(),0,print);
-                    if (lvls > 0){
-                        Shape legendShape = ProtocolUtil.repositionShape(canvas,Rect.from(cursor.x(), cursor.y(), 110, lvls*25));
-                        canvas.rect(Pen.PEN_WHITE_ALPHA, legendShape.x(), legendShape.y(), legendShape.width(), legendShape.height());
-                        canvas.rect(Pen.PEN_BLACK, legendShape.x(), legendShape.y(), legendShape.width(), legendShape.height());
-                        int shadow = 2;
-                        String l;
-                        Iterator<String> it = ProtocolUtil.ancestorsMarkingColors.keySet().iterator();
-                        for (int i=0; i<lvls; i++){
-                            l = it.next();
-                            Pen lpen = Pen.newPen().setColor(ProtocolUtil.ancestorsMarkingColors.get(l)).build();
-                            canvas.text(lpen, legendShape.x() - shadow, legendShape.y() - shadow + i*25, 0, l);
-                            canvas.text(lpen, legendShape.x() + shadow, legendShape.y() - shadow + i*25, 0, l);
-                            canvas.text(lpen, legendShape.x() + shadow, legendShape.y() + shadow + i*25, 0, l);
-                            canvas.text(lpen, legendShape.x() - shadow, legendShape.y() + shadow + i*25, 0, l);
-                            canvas.text(Pen.PEN_BLACK, legendShape.x()         , legendShape.y() + i*25         , 0, l);
-                        }
-                    }
-                }
-
                 int MAX_ANCESTORS_PERLINE = 6;
                 double widgetInfoW = canvas.width() / 2;
                 double widgetInfoH = (1 + calculateNumberOfTagsToShow(cursorWidget) + Util.size(Util.ancestors(cursorWidget)) / MAX_ANCESTORS_PERLINE) * 20;
-                cwShape = ProtocolUtil.calculateWidgetInfoShape(canvas, cwShape, widgetInfoW, widgetInfoH);
+                cwShape = VisualizationUtil.calculateWidgetInfoShape(canvas, cwShape, widgetInfoW, widgetInfoH);
 
-                if(showExtendedWidgetInfo){
-                    //canvas.rect(wpen, cwShape.x(), cwShape.y() - 20, 550, Util.size(cursorWidget.tags()) * 25);
-                    //canvas.rect(apen, cwShape.x(), cwShape.y() - 20, 550, Util.size(cursorWidget.tags()) * 25);
+                if(showExtendedWidgetInfo) {
                     canvas.rect(Pen.PEN_WHITE_ALPHA, cwShape.x(), cwShape.y(), widgetInfoW, widgetInfoH);
                     canvas.rect(Pen.PEN_BLACK, cwShape.x(), cwShape.y(), widgetInfoW, widgetInfoH);
 
-                    //canvas.text(Pen.PEN_RED, cwShape.x(), cwShape.y(), 0, "Role: " + cursorWidget.get(Role, Roles.Widget).toString());
-                    //canvas.text(Pen.PEN_RED, cwShape.x(), cwShape.y() - 20, 0, "Path: " + Util.indexString(cursorWidget));
                     int pos = -20;
                     StringBuilder sb = new StringBuilder();
                     sb.append("Ancestors: ");
 
-                    //for(Widget p : Util.ancestors(cursorWidget))
-                    //	sb.append("::").append(p.get(Role, Roles.Widget));
-                    //canvas.text(apen, cwShape.x(), cwShape.y() + (pos+=20), 0, sb.toString());
-                    // (fix too many ancestors)
                     int i=0;
                     for(Widget p : Util.ancestors(cursorWidget)){
                         sb.append("::").append(p.get(Role, Roles.Widget));

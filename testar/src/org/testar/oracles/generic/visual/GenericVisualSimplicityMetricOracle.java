@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2023 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2023 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2023 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2023 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,6 +31,8 @@
 package org.testar.oracles.generic.visual;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.testar.monkey.alayer.Rect;
 import org.testar.monkey.alayer.Shape;
@@ -67,19 +69,19 @@ public class GenericVisualSimplicityMetricOracle implements Oracle {
 	}
 
 	@Override
-	public Verdict getVerdict(State state) {
+	public List<Verdict> getVerdicts(State state) {
 		if (state.childCount() == 0) {
-			return Verdict.OK; // State has no children, no need for balance metric evaluation
+			return Collections.singletonList(Verdict.OK); // State has no children, no need for balance metric evaluation
 		}
 
 		Shape sutShape = state.child(0).get(Tags.Shape, null);
 		if (sutShape == null) {
-			return Verdict.OK; // SUT has no shape, no need for balance metric evaluation
+			return Collections.singletonList(Verdict.OK); // SUT has no shape, no need for balance metric evaluation
 		}
 
 		Rect sutRect = (Rect) sutShape;
 		if (sutRect.width() <= 0 || sutRect.height() <= 0) {
-			return Verdict.OK; // Invalid shape dimensions, skip evaluation
+			return Collections.singletonList(Verdict.OK); // Invalid shape dimensions, skip evaluation
 		}
 
 		ArrayList<Shape> regions = MetricsHelper.getRegions(state);
@@ -89,10 +91,10 @@ public class GenericVisualSimplicityMetricOracle implements Oracle {
 		if (simplicityMetric < thresholdValue) {
 			String verdictMsg = String.format("Simplicity metric with value %f is below threshold value %f!", simplicityMetric, thresholdValue);
 			Visualizer visualizer = new RegionsVisualizer(getRedPen(), regions, "Simplicity Warning", 0.5, 0.5);
-			return new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, visualizer);
+			return Collections.singletonList(new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, visualizer));
 		}
 
-		return Verdict.OK;
+		return Collections.singletonList(Verdict.OK);
 	}
 
 }

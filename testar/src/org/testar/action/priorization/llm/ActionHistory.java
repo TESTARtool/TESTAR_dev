@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2024 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2024 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2024 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2024 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -40,6 +40,7 @@ import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.actions.CompoundAction;
 import org.testar.monkey.alayer.actions.PasteText;
 import org.testar.monkey.alayer.actions.Type;
+import org.testar.monkey.alayer.actions.WdRemoteTypeAction;
 import org.testar.monkey.alayer.actions.WdSelectListAction;
 
 import java.util.ArrayList;
@@ -109,7 +110,6 @@ public class ActionHistory {
         for (var action : actions) {
             Widget widget = action.get(Tags.OriginWidget);
             String type = action.get(Tags.Role).name();
-            String actionId = action.get(Tags.AbstractID, "Unknown ActionId");
             String description = widget.get(descriptionTag, "Unknown Widget");
 
             if(action instanceof WdSelectListAction) {
@@ -117,29 +117,33 @@ public class ActionHistory {
                 WdSelectListAction selectListAction = (WdSelectListAction) action;
                 String selectWidget = selectListAction.getTarget();
                 String value = selectListAction.getValue();
-                builder.append(String.format("%s: Set value of ComboBox '%s' to '%s'", actionId, selectWidget, value));
+                builder.append(String.format("Set value of ComboBox '%s' to '%s'", selectWidget, value));
             } else {
                 switch(type) {
                     case "ClickTypeInto":
                     case "PasteTextInto":
+                    case "RemoteType":
+                    case "RemoteScrollType":
                         String input = getCompoundActionInputText(action);
                         // TODO: Differentiate between types of input fields (numeric, password, etc.)
-                        builder.append(String.format("%s: Typed '%s' in TextField '%s'", actionId, input, description));
+                        builder.append(String.format("Typed '%s' in TextField '%s'", input, description));
                         break;
                     case "LeftClickAt":
-                        builder.append(String.format("%s: Clicked on '%s'", actionId, description));
+                    case "RemoteClick":
+                    case "RemoteScrollClick":
+                        builder.append(String.format("Clicked on '%s'", description));
                         break;
                     case "HistoryBackScript":
                         // TODO: Decide if it makes sense to rely on the LLM to make this control decision
-                        builder.append(String.format("%s: Go History back in the browser", actionId));
+                        builder.append("Go History back in the browser");
                         break;
                     case "CloseTabScript":
                         // TODO: Decide if it makes sense to rely on the LLM to make this control decision
-                        builder.append(String.format("%s: Close current browser tab", actionId));
+                        builder.append("Close current browser tab");
                         break;
                     case "HitESC":
                         // TODO: Decide if it makes sense to rely on the LLM to make this control decision
-                        builder.append(String.format("%s: Hit the ESC key", actionId));
+                        builder.append("Hit the ESC key");
                         break;
                     default:
                         logger.log(Level.WARN, "Unsupported action type for action history: " + type);
@@ -174,6 +178,11 @@ public class ActionHistory {
                     return ((PasteText)innerAction).get(Tags.InputText, "Unknown Paste Input");
                 }
             }
+        }
+
+        if(action instanceof WdRemoteTypeAction) {
+            CharSequence input = ((WdRemoteTypeAction) action).getKeys();
+            return input == null ? "Unknown Action Input" : input.toString();
         }
 
         return action.get(Tags.InputText, "Unknown Action Input");

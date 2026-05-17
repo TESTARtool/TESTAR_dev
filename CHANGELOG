@@ -1,3 +1,75 @@
+#TESTAR v2.8.10 (12-May-2026)
+- Bump io.appium:java-client from 10.1.0 to 10.1.1
+
+
+#TESTAR v2.8.9 (21-Apr-2026)
+- Bump org.seleniumhq.selenium:selenium-java from 4.41.0 to 4.43.0
+- Fix id bug when analyzing state models
+
+
+#TESTAR v2.8.8 (16-Apr-2026)
+- Update dockerfiles
+
+
+#TESTAR v2.8.7 (6-Apr-2026)
+- Bump io.github.bonigarcia:webdrivermanager from 6.3.3 to 6.3.4
+- Fix parse llm selected ESC action
+- Add WdDriver configurable user data and profile
+
+
+#TESTAR v2.8.6 (24-Mar-2026)
+- Remove linux AtSpi subproject
+- Remove unused Tags
+- Refactor custom interfaces with Java functions
+- Refactor ProtocolUtil and add ScreenshotProvider
+
+
+#TESTAR v2.8.5 (17-Mar-2026)
+- Bump io.appium:java-client from 10.0.0 to 10.1.0
+- Update JS getIsBlockedTestar logic
+- Add continue, completed, invalid, LLM Oracle logic
+- Add LlmTestGoalOrchestrator logic
+- Add WebIsDisplayed to StateCondition
+- Update selectAction in model evaluator protocols to avoid LLM select extra actions
+
+
+#TESTAR v2.8.4 (12-Mar-2026)
+- Remove abstract actionIds from LLM ActionHistory
+- Update getElementDescription prioritty and length
+- Add web aria tags to state model abstraction tags
+
+
+#TESTAR v2.8.3 (11-Mar-2026)
+- Add aria properties to WdTags
+
+
+#TESTAR v2.8.2 (10-Mar-2026)
+- Fix ignoring ValuePattern tag for UIAEdit widgets
+- Remove unused comments and classes
+
+
+#TESTAR v2.8.1 (9-Mar-2026)
+- Refactor TESTAR internals from a single Verdict getVerdict to List<Verdict> getVerdicts
+- Report all Verdict issues per state independently
+- Remove Verdict join logic
+- Add a feature and a setting to ignore previously detected Verdicts
+- Remove old disabled Record mode code
+- Move ExtendedOracles logic to DefaultProtocol
+- Remove reflective process-listener handle
+- Fix ExtendedSettingsFile default value
+- Update widget-element description logic
+
+
+#TESTAR v2.7.23 (5-Mar-2026)
+- Update webdriver remote actions descriptions
+- Add webdriver remote actions to LLM conversation
+
+#TESTAR v2.7.22 (24-Feb-2026)
+- Bump org.seleniumhq.selenium:selenium-java from 4.40.0 to 4.41.0
+- Update devtools dependencies to v145
+- Ignore dynamic numbers when deduplicating AndroidLogcatOracle messages
+
+
 #TESTAR v2.7.21 (17-Feb-2026)
 - Add logic to detect Android logcat suspicious messages
 - Refactor the GenerateMode logic to report initialState issues

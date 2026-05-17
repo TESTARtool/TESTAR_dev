@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2025 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -36,6 +36,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -109,9 +111,9 @@ public class ProcessListenerOracle implements Oracle {
 	}
 
 	@Override
-	public Verdict getVerdict(State state) {
+	public List<Verdict> getVerdicts(State state) {
 		if (!processListenerEnabled) {
-			return Verdict.OK;
+			return Collections.singletonList(Verdict.OK);
 		}
 
 		try {
@@ -120,17 +122,17 @@ public class ProcessListenerOracle implements Oracle {
 			Verdict standardOutputVerdict = checkStream(standardOutputReader, "_StdOut.log", "StdOut");
 
 			if (standardErrorVerdict.severity() != Verdict.Severity.OK.getValue())
-				return standardErrorVerdict;
+				return Collections.singletonList(standardErrorVerdict);
 
 			if (standardOutputVerdict.severity() != Verdict.Severity.OK.getValue())
-				return standardOutputVerdict;
+				return Collections.singletonList(standardOutputVerdict);
 
 		} catch (IOException e) {
 			System.err.println("Unable to read the SUT process buffer");
-			return Verdict.OK;
+			return Collections.singletonList(Verdict.OK);
 		}
 
-		return Verdict.OK;
+		return Collections.singletonList(Verdict.OK);
 	}
 
 	private Verdict checkStream(BufferedReader reader, String logSuffix, String streamLabel) throws IOException {

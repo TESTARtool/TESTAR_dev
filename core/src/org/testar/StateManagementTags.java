@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -308,7 +308,8 @@ public class StateManagementTags {
     public static final Tag<String> WebWidgetId = Tag.from("Web Widget id", String.class);
     public static final Tag<String> WebWidgetName = Tag.from("Web Widget name", String.class);
     public static final Tag<String> WebWidgetTagName = Tag.from("Web Widget tag name", String.class);
-    public static final Tag<String> WebWidgetTextContent= Tag.from("Web Widget text content", String.class);
+    public static final Tag<String> WebWidgetTextContent = Tag.from("Web Widget text content", String.class);
+    public static final Tag<String> WebWidgetInnerText = Tag.from("Web Widget inner text", String.class);
     public static final Tag<String> WebWidgetTitle = Tag.from("Web Widget title", String.class);
     public static final Tag<String> WebWidgetHref = Tag.from("Web Widget href", String.class);
     public static final Tag<String> WebWidgetValue = Tag.from("Web Widget value", String.class);
@@ -320,8 +321,10 @@ public class StateManagementTags {
     public static final Tag<String> WebWidgetDisplay = Tag.from("Web Widget display", String.class);
     public static final Tag<Boolean> WebWidgetIsOffScreen = Tag.from("Web Widget Is Off Screen", Boolean.class);
     public static final Tag<String> WebWidgetSrc = Tag.from("Web Widget src", String.class);
-    public static final Tag<String> WebWidgetPlaceholder= Tag.from("Web Widget placeholder", String.class);
+    public static final Tag<String> WebWidgetPlaceholder = Tag.from("Web Widget placeholder", String.class);
     public static final Tag<Boolean> WebWidgetIsDisabled = Tag.from("Web Widget Is Disabled", Boolean.class);
+    public static final Tag<String> WebWidgetAriaLabel = Tag.from("Web Widget Aria Label", String.class);
+    public static final Tag<String> WebWidgetAriaLabelledBy = Tag.from("Web Widget Aria Labelled By", String.class);
     
     
     // a set containing the tags that are available for state management
@@ -400,6 +403,7 @@ public class StateManagementTags {
             add(WebWidgetName);
             add(WebWidgetTagName);
             add(WebWidgetTextContent);
+            add(WebWidgetInnerText);
             add(WebWidgetTitle);
             add(WebWidgetHref);
             add(WebWidgetValue);
@@ -413,6 +417,8 @@ public class StateManagementTags {
             add(WebWidgetSrc);
             add(WebWidgetPlaceholder);
             add(WebWidgetIsDisabled);
+            add(WebWidgetAriaLabel);
+            add(WebWidgetAriaLabelledBy);
         }
     };
 
@@ -497,6 +503,7 @@ public class StateManagementTags {
         settingsMap.put(WebWidgetName, "WebWidgetName");
         settingsMap.put(WebWidgetTagName, "WebWidgetTagName");
         settingsMap.put(WebWidgetTextContent, "WebWidgetTextContent");
+        settingsMap.put(WebWidgetInnerText, "WebWidgetInnerText");
         settingsMap.put(WebWidgetTitle, "WebWidgetTitle");
         settingsMap.put(WebWidgetHref, "WebWidgetHref");
         settingsMap.put(WebWidgetValue, "WebWidgetValue");
@@ -510,6 +517,8 @@ public class StateManagementTags {
         settingsMap.put(WebWidgetSrc, "WebWidgetSrc");
         settingsMap.put(WebWidgetPlaceholder, "WebWidgetPlaceholder");
         settingsMap.put(WebWidgetIsDisabled, "WebWidgetIsDisabled");
+        settingsMap.put(WebWidgetAriaLabel, "WebWidgetAriaLabel");
+        settingsMap.put(WebWidgetAriaLabelledBy, "WebWidgetAriaLabelledBy");
     }
 
     // a mapping of a tag to its group
@@ -584,6 +593,7 @@ public class StateManagementTags {
             put(WebWidgetName, Group.WebDriver);
             put(WebWidgetTagName, Group.WebDriver);
             put(WebWidgetTextContent, Group.WebDriver);
+            put(WebWidgetInnerText, Group.WebDriver);
             put(WebWidgetTitle, Group.WebDriver);
             put(WebWidgetHref, Group.WebDriver);
             put(WebWidgetValue, Group.WebDriver);
@@ -597,6 +607,8 @@ public class StateManagementTags {
             put(WebWidgetSrc, Group.WebDriver);
             put(WebWidgetPlaceholder, Group.WebDriver);
             put(WebWidgetIsDisabled, Group.WebDriver);
+            put(WebWidgetAriaLabel, Group.WebDriver);
+            put(WebWidgetAriaLabelledBy, Group.WebDriver);
         }
     };
 

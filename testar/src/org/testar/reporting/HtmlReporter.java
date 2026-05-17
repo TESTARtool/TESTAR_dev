@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -34,32 +34,28 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.testar.OutputStructure;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
-import org.testar.monkey.Util;
 import org.testar.monkey.alayer.Action;
-import org.testar.monkey.alayer.Rect;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 
-import java.awt.BasicStroke;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
-
-import javax.imageio.ImageIO;
 
 public class HtmlReporter implements Reporting
 {
     private HtmlFormatUtil htmlReportUtil;
     private int innerLoopCounter = 0;
+    private boolean deleteBaseReport = false;
+    private String baseReportPath;
 
     private final String openStateBlockContainer = "<div class='stateBlock' style='display:flex;flex-direction:column'>";
     private final String openDerivedBlockContainer = "<div class='derivedBlock' style='display:flex;flex-direction:column'>";
@@ -308,109 +304,54 @@ public class HtmlReporter implements Reporting
     }
 
     @Override
-    public void addTestVerdict(State state, Verdict verdict)
+    public void addTestVerdicts(List<Verdict> verdicts)
     {
-    	if(!verdict.getVisualtHighlights().isEmpty()) {
-    		highlightVerdictState(state, verdict);
-    	}
+        String baseFilePath = htmlReportUtil.getFile().getAbsolutePath();
+        deleteBaseReport = true;
+        baseReportPath = baseFilePath;
+        int index = 1;
+        for (Verdict verdict : verdicts) {
+            String suffixName = String.format("_V%03d_%s", index++, verdict.verdictSeverityTitle());
+            String verdictFilePath = appendSuffixToFile(baseFilePath, suffixName);
 
+            htmlReportUtil.duplicateFile(verdictFilePath);
+
+            HtmlFormatUtil verdictUtil = new HtmlFormatUtil(verdictFilePath);
+            addVerdictBlock(verdictUtil, verdict);
+            verdictUtil.addContent("</div>");
+            verdictUtil.addFooter();
+            verdictUtil.writeToFile();
+        }
+    }
+
+    private void addVerdictBlock(HtmlFormatUtil util, Verdict verdict) {
         String verdictInfo = StringEscapeUtils.escapeHtml(verdict.info());
 
         if(verdict.severity() > Verdict.OK.severity())
             verdictInfo = verdictInfo.replace(Verdict.OK.info(), "").replace("\n", "");
 
-        htmlReportUtil.addContent(openVerdictBlockContainer); // Open verdict block container
-        htmlReportUtil.addHeading(2, "Test verdict for this sequence: " + verdictInfo);
-        htmlReportUtil.addContent("<pre>");
-        htmlReportUtil.addContent(verdict.description());
-        htmlReportUtil.addContent("</pre>");
-        htmlReportUtil.addHeading(4, "Severity: " + verdict.severity());
-        htmlReportUtil.addContent("<h4 id='visualizer-rect' style='display: none;'>Visualizer: " + verdict.visualizer().getShapes() + "</h4>");
-        htmlReportUtil.addContent(closeContainer); // Close verdict block container
-
-        htmlReportUtil.appendToFileName("_" + verdict.verdictSeverityTitle());
-        htmlReportUtil.writeToFile();
+        util.addContent(openVerdictBlockContainer); // Open verdict block container
+        util.addHeading(2, "Test verdict for this sequence: " + verdictInfo);
+        util.addHeading(4, "Severity: " + verdict.severity());
+        util.addContent("<h4 id='visualizer-rect' style='display: none;'>Visualizer: " + verdict.visualizer().getShapes() + "</h4>");
+        util.addContent(closeContainer); // Close verdict block container
     }
 
-    private void makeGrayScaleImg(BufferedImage image)
-    {
-        int width = image.getWidth();
-        int height = image.getHeight();
-
-        for(int i=0; i<height; i++) {
-
-           for(int j=0; j<width; j++) {
-
-        	  java.awt.Color c = new java.awt.Color(image.getRGB(j, i));
-              int red = (int)(c.getRed() * 0.299);
-              int green = (int)(c.getGreen() * 0.587);
-              int blue = (int)(c.getBlue() *0.114);
-              java.awt.Color newColor = new java.awt.Color(red+green+blue,red+green+blue,red+green+blue);
-
-              image.setRGB(j,i,newColor.getRGB());
-           }
+    private String appendSuffixToFile(String filePath, String suffixName) {
+        int dotIndex = filePath.lastIndexOf('.');
+        if (dotIndex == -1) {
+            return filePath + suffixName;
         }
-    }
-
-    /**
-     * If a verdict highlight was defined, paint it in the last state screenshot.
-     * 
-     * @param state
-     */
-    private void highlightVerdictState(State state, Verdict verdict) {
-    	// Load the image path that exists in the output directory
-    	String imagePath = state.get(Tags.ScreenshotPath);
-    	File imageFile = new File(imagePath);
-
-        // Retry up to 10 times, pausing 1s between attempts
-        for (int i = 0; i < 10 && !imageFile.exists(); i++) {
-            Util.pause(1);
-        }
-
-        // If after retries the file still doesn't exist, stop
-        if (!imageFile.exists()) {
-            return;
-        }
-
-    	try {
-    		// Draw in top of the state screenshot to highlight the erroneous widget
-            BufferedImage img = ImageIO.read(imageFile);
-            Graphics2D g2d = img.createGraphics();
-
-           // Check if transparant color is used, then make screenshot gray
-            for(Rect r : verdict.getVisualtHighlights()) {
-    			// If the color is not opaque, fill a Rect with the color
-    			if(r.getColor().getAlpha() > 1 && r.getColor().getAlpha() < 255) {
-    				makeGrayScaleImg(img);
-    				break;
-    			}
-            }
-
-    		g2d.setStroke(new BasicStroke(3));
-    		for(Rect r : verdict.getVisualtHighlights()) {
-    			g2d.setColor(r.getColor());
-    			// If the color is not opaque, fill a Rect with the color
-    			if(r.getColor().getAlpha() > 1 && r.getColor().getAlpha() < 255) {
-    				g2d.drawRect((int)r.x(), (int)r.y(), (int)r.width(), (int)r.height());
-    				g2d.setColor(new java.awt.Color(r.getColor().getRed(), r.getColor().getGreen(), r.getColor().getBlue(), r.getColor().getAlpha() / 2));
-    				g2d.fillRect((int)r.x(), (int)r.y(), (int)r.width(), (int)r.height());
-    			} 
-    			// Else (is opaque), draw a Rect with the color
-    			else {
-    				g2d.drawRect((int)r.x(), (int)r.y(), (int)r.width(), (int)r.height());
-    			}
-    		}
-    		g2d.dispose();
-    		// Save the new image
-    		ImageIO.write(img, "png", imageFile);
-    	} catch(Exception e) {
-    		e.printStackTrace();
-    	}
+        return filePath.substring(0, dotIndex) + suffixName + filePath.substring(dotIndex);
     }
 
     @Override
     public void finishReport()
     {
+        if (deleteBaseReport && baseReportPath != null) {
+            new File(baseReportPath).delete();
+            return;
+        }
         htmlReportUtil.addContent("</div>"); // Close the main div container
         htmlReportUtil.addFooter();
 

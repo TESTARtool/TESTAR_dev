@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.testar.monkey.Assert;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Pair;
+import org.testar.monkey.alayer.Rect;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
@@ -44,6 +45,7 @@ public class TestWebInvariantDuplicatedRowsInTable {
 
 		WidgetStub firstRow = new WidgetStub();
 		firstRow.set(Tags.Role, WdRoles.WdTR);
+		firstRow.set(Tags.Shape, Rect.fromCoordinates(0, 0, 10, 10));
 		widgetTable.addChild(firstRow);
 
 		WidgetStub firstHeader = new WidgetStub();
@@ -58,6 +60,7 @@ public class TestWebInvariantDuplicatedRowsInTable {
 
 		WidgetStub secondRow = new WidgetStub();
 		secondRow.set(Tags.Role, WdRoles.WdTR);
+		secondRow.set(Tags.Shape, Rect.fromCoordinates(0, 0, 10, 10));
 		widgetTable.addChild(secondRow);
 
 		WidgetStub secondHeader = new WidgetStub();
@@ -75,9 +78,13 @@ public class TestWebInvariantDuplicatedRowsInTable {
 		Assert.isTrue(extendedOraclesList.get(0) instanceof WebInvariantDuplicatedRowsInTable);
 
 		// Assert the oracle verdict is WARNING_WEB_INVARIANT_FAULT
-		Verdict verdict = extendedOraclesList.get(0).getVerdict(state);
+		List<Verdict> verdicts = extendedOraclesList.get(0).getVerdicts(state);
+		Assert.isEquals(1, verdicts.size());
+
+		Verdict verdict = verdicts.get(0);
 		Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT.getTitle()));
-		Assert.isTrue(verdict.info().contains("Detected a duplicated rows in a Table for the widgets: [_header_content_data_content, _header_content_data_content]"));
+		Assert.isTrue(verdict.info().contains("Detected duplicated row in a Table for the widget: _header_content_data_content"));
+		Assert.isEquals(2, verdict.visualizer().getShapes().size());
 	}
 
 	@Test
@@ -122,8 +129,64 @@ public class TestWebInvariantDuplicatedRowsInTable {
 		Assert.isTrue(extendedOraclesList.get(0) instanceof WebInvariantDuplicatedRowsInTable);
 
 		// Assert the oracle verdict is OK
-		Verdict verdict = extendedOraclesList.get(0).getVerdict(state);
+		List<Verdict> verdicts = extendedOraclesList.get(0).getVerdicts(state);
+		Assert.isEquals(1, verdicts.size());
+		Verdict verdict = verdicts.get(0);
 		Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.OK.getTitle()));
 		Assert.isTrue(verdict.info().equals("No problem detected."));
+	}
+
+	@Test
+	public void test_detection_web_invariant_duplicated_rows_multiple_tables() {
+		StateStub state = new StateStub();
+
+		WidgetStub tableOne = createTable(state, "table1");
+		addDuplicatedRowPair(tableOne, "headerA", "dataA");
+		addDuplicatedRowPair(tableOne, "headerB", "dataB");
+
+		WidgetStub tableTwo = createTable(state, "table2");
+		addDuplicatedRowPair(tableTwo, "headerC", "dataC");
+		addDuplicatedRowPair(tableTwo, "headerD", "dataD");
+
+		Assert.isTrue(extendedOraclesList.size() == 1);
+		Assert.isTrue(extendedOraclesList.get(0) instanceof WebInvariantDuplicatedRowsInTable);
+
+		List<Verdict> verdicts = extendedOraclesList.get(0).getVerdicts(state);
+		Assert.isEquals(4, verdicts.size());
+		for (Verdict verdict : verdicts) {
+			Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT.getTitle()));
+			Assert.isEquals(2, verdict.visualizer().getShapes().size());
+		}
+	}
+
+	private WidgetStub createTable(StateStub state, String tableId) {
+		WidgetStub widgetTable = new WidgetStub();
+		widgetTable.set(Tags.Role, WdRoles.WdTABLE);
+		widgetTable.set(WdTags.WebId, tableId);
+		state.addChild(widgetTable);
+		widgetTable.setParent(state);
+		return widgetTable;
+	}
+
+	private void addDuplicatedRowPair(WidgetStub table, String headerText, String dataText) {
+		addRow(table, headerText, dataText);
+		addRow(table, headerText, dataText);
+	}
+
+	private void addRow(WidgetStub table, String headerText, String dataText) {
+		WidgetStub row = new WidgetStub();
+		row.set(Tags.Role, WdRoles.WdTR);
+		row.set(Tags.Shape, Rect.fromCoordinates(0, 0, 10, 10));
+		table.addChild(row);
+
+		WidgetStub header = new WidgetStub();
+		header.set(Tags.Role, WdRoles.WdTH);
+		header.set(WdTags.WebTextContent, headerText);
+		row.addChild(header);
+
+		WidgetStub data = new WidgetStub();
+		data.set(Tags.Role, WdRoles.WdTD);
+		data.set(WdTags.WebTextContent, dataText);
+		row.addChild(data);
 	}
 }

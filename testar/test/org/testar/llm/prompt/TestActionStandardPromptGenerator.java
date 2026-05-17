@@ -117,7 +117,7 @@ public class TestActionStandardPromptGenerator {
 		Assert.isTrue(prompt.contains("The following actions are available:"));
 		Assert.isTrue(prompt.contains("AID_type: Type in Field 'typeable_widget_title'"));
 		Assert.isTrue(prompt.contains("AID_click: Click on 'clickable_widget_title'"));
-		Assert.isTrue(prompt.contains("This is the last action we executed: AID_type: Typed 'LLM_text' in TextField 'typeable_widget_title'"));
+		Assert.isTrue(prompt.contains("This is the last action we executed: Typed 'LLM_text' in TextField 'typeable_widget_title'"));
 		Assert.isTrue(prompt.contains("Which action should be executed to accomplish the test goal?"));		
 	}
 }

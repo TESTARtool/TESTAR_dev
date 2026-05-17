@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013 - 2025 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,15 +32,16 @@
 package org.testar;
 
 import org.testar.serialisation.LogSerialiser;
-import org.testar.monkey.Util;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 public class FileHandling {
 
-    public static String copyClassifiedSequence(String generatedSequence, File currentSeq, Verdict verdict) {
+    public static String copyClassifiedSequence(String generatedSequence, File currentSeq, Verdict verdict, String suffixName) {
         // Generate the target folder names based on the severity title
         String targetFolder = "sequences_" + verdict.verdictSeverityTitle().toLowerCase();
         String targetSequence = targetFolder + File.separator + generatedSequence;
@@ -74,9 +75,9 @@ public class FileHandling {
 
         // If it exists, copy to the specific classification folder
         try {
-            copyToOutputDir(currentSeq, targetFolder);
+            copyToOutputDirWithSuffix(currentSeq, targetFolder, suffixName);
         } catch (NoSuchTagException | IOException e) {
-            LogSerialiser.log("Error copying classified test sequence: " + e.getMessage() + "\n", 
+            LogSerialiser.log("Error copying classified test sequence: " + e.getMessage() + "\n",
                     LogSerialiser.LogLevel.Critical
                     );
         }
@@ -94,14 +95,24 @@ public class FileHandling {
      *
      * @param file The sequence file to copy.
      * @param folderName The target folder name.
+     * @param suffixName The verdict suffix name (number + title). 
      * @throws IOException If an I/O error occurs.
      * @throws NoSuchTagException If the specified tag does not exist.
      */
-    private static void copyToOutputDir(File file, String folderName) throws IOException, NoSuchTagException {
-        Util.copyToDirectory(
-                file.getCanonicalPath(),
-                OutputStructure.outerLoopOutputDir + File.separator + folderName,
-                true
-                );
+    private static void copyToOutputDirWithSuffix(File file, String folderName, String suffixName) throws IOException, NoSuchTagException {
+        String outputDir = OutputStructure.outerLoopOutputDir + File.separator + folderName;
+        File targetDir = new File(outputDir);
+        if (!targetDir.exists()) {
+            targetDir.mkdirs();
+        }
+
+        String fileName = file.getName();
+        int dotIndex = fileName.lastIndexOf('.');
+        String newName = (dotIndex == -1)
+                ? fileName + suffixName
+                : fileName.substring(0, dotIndex) + suffixName + fileName.substring(dotIndex);
+
+        File destination = new File(outputDir + File.separator + newName);
+        Files.copy(file.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
 }

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -43,12 +43,10 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 
 	protected double delay = Double.MIN_VALUE;
 	protected Object[] userEvent = null;
-	protected boolean markParentWidget = false;
 	protected boolean visualizationOn = false;
 
 	public enum Modes{
 		Spy,
-		Record,
 		Generate,
 		Quit,
 		View,
@@ -80,8 +78,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 	private final static double SLOW_MOTION = 2.0;
 	//TODO: key commands come through java.awt.event but are the key codes same for all OS? if they are the same, then move to platform independent protocol?
 	//TODO: Investigate better shortcut combinations to control TESTAR that does not interfere with SUT
-	// (e.g. SHIFT + 1 puts an ! in the notepad and hence interferes with SUT state, but the
-	// event is not recorded as a user event).
+	// (e.g. SHIFT + 1 puts an ! in the notepad and hence interferes with SUT state).
 	/**
 	 * Override the default keylistener to implement the TESTAR shortcuts
 	 * SHIFT + SPACE
@@ -128,20 +125,6 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 			else if (key == KBKeys.VK_0  && pressed.contains(KBKeys.VK_SHIFT)) {
 				System.setProperty("DEBUG_WINDOWS_PROCESS_NAMES","true");
 			}
-
-			// In Record mode you can press any key except SHIFT to add a user keyboard
-			// This is because SHIFT is used for the TESTAR shortcuts
-			// This is not ideal, because now special characters and capital letters and other events that needs SHIFT
-			// cannot be recorded as an user event in Record....
-			else if (!pressed.contains(KBKeys.VK_SHIFT) && mode() == Modes.Record && userEvent == null) {
-				//System.out.println("USER_EVENT key_down! " + key.toString());
-				userEvent = new Object[]{key}; // would be ideal to set it up at keyUp
-			}
-
-			// SHIFT + ALT --> Toggle widget-tree hierarchy display
-			if (pressed.contains(KBKeys.VK_ALT) && pressed.contains(KBKeys.VK_SHIFT)) {
-				markParentWidget = !markParentWidget;
-			}
 		}
 	}
 
@@ -162,23 +145,8 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 	@Override
 	public void mouseDown(MouseButtons btn, double x, double y){}
 
-	/**
-	 * In Record mode the user can add user events by clicking and the event is added when releasing the mouse
-	 * @param btn
-	 * @param x
-	 * @param y
-	 */
 	@Override
-	public void mouseUp(MouseButtons btn, double x, double y){
-		// In GenerateManual the user can add user events by clicking
-		if (mode() == Modes.Record && userEvent == null){
-			userEvent = new Object[]{
-					btn,
-					Double.valueOf(x),
-					Double.valueOf(y)
-			};
-		}
-	}
+	public void mouseUp(MouseButtons btn, double x, double y){}
 
 	@Override
 	public void mouseMoved(double x, double y) {}

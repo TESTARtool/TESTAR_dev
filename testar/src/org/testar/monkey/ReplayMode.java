@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2022 - 2023 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2022 - 2023 Open Universiteit - www.ou.nl
+ * Copyright (c) 2022 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2022 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -38,9 +38,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.zip.GZIPInputStream;
 
 import org.testar.OutputStructure;
 import org.testar.SutVisualization;
@@ -65,10 +65,10 @@ public class ReplayMode {
 	 * Read the replayable file, repeat saved actions and generate new sequences, oracles and logs
 	 */
 	public void runReplayLoop(DefaultProtocol protocol) {
+		VerdictProcessing verdictProcessing = new VerdictProcessing(protocol.settings());
 
 		FileInputStream fis = null;
 		BufferedInputStream bis = null;
-		GZIPInputStream gis = null;
 		ObjectInputStream ois = null;
 
 		protocol.actionCount = 1;
@@ -92,8 +92,7 @@ public class ReplayMode {
 
 			fis = new FileInputStream(seqFile);
 			bis = new BufferedInputStream(fis);
-			gis = new GZIPInputStream(bis);
-			ois = new ObjectInputStream(gis);
+			ois = new ObjectInputStream(bis);
 
 			/**
 			 * Initialize the fragment to create a new sequence and logs
@@ -106,7 +105,7 @@ public class ReplayMode {
 			protocol.cv = protocol.buildCanvas();
 			State state = protocol.getState(system);
 
-			protocol.setReplayVerdict(protocol.getVerdict(state));
+			protocol.setReplayVerdicts(verdictProcessing.filterDuplicates(protocol.getVerdicts(state)));
 
 			// notify the statemodelmanager
 			protocol.stateModelManager.notifyTestSequencedStarted();
@@ -114,7 +113,7 @@ public class ReplayMode {
 			double rrt = protocol.settings().get(ConfigTags.ReplayRetryTime);
 
 			while(success 
-					&& protocol.getReplayVerdict().severity() == Verdict.OK.severity() 
+					&& Verdict.helperAreAllVerdictsOK(protocol.getReplayVerdicts())
 					&& protocol.mode() == Modes.Replay) {
 
 				//Initialize local fragment and read saved action of PathToReplaySequence File
@@ -131,14 +130,14 @@ public class ReplayMode {
 					} else {
 						success = false;
 						String msg = "Exception " + ioe.getMessage() + " reading TESTAR replayableFragment: " + seqFile;
-						protocol.setReplayVerdict(new Verdict(Verdict.Severity.UNREPLAYABLE, msg));
+						protocol.setReplayVerdicts(Collections.singletonList(new Verdict(Verdict.Severity.UNREPLAYABLE, msg)));
 						protocol.stateModelManager.notifyTestSequenceInterruptedBySystem(ioe.toString());
 						break;
 					}
 				} catch(NullPointerException npe) {
 					success = false;
 					String msg = "Null exception replaying TESTAR action";
-					protocol.setReplayVerdict(new Verdict(Verdict.Severity.UNREPLAYABLE, msg));
+					protocol.setReplayVerdicts(Collections.singletonList(new Verdict(Verdict.Severity.UNREPLAYABLE, msg)));
 					protocol.stateModelManager.notifyTestSequenceInterruptedBySystem(npe.toString());
 					break;
 				}
@@ -200,7 +199,7 @@ public class ReplayMode {
 						+ " of the replayed sequence can not been replayed into "
 						+ " the State " + state.get(Tags.ConcreteID, state.toString());
 
-						protocol.setReplayVerdict(new Verdict(Verdict.Severity.UNREPLAYABLE, msg));
+						protocol.setReplayVerdicts(Collections.singletonList(new Verdict(Verdict.Severity.UNREPLAYABLE, msg)));
 
 						break;
 					}
@@ -249,7 +248,7 @@ public class ReplayMode {
 
 									state = protocol.getState(system);
 
-									protocol.setReplayVerdict(protocol.getVerdict(state));
+									protocol.setReplayVerdicts(verdictProcessing.filterDuplicates(protocol.getVerdicts(state)));
 				}
 			}
 
@@ -269,9 +268,6 @@ public class ReplayMode {
 			if (ois != null){
 				try { ois.close(); } catch (IOException e) { e.printStackTrace(); }
 			}
-			if (gis != null){
-				try { gis.close(); } catch (IOException e) { e.printStackTrace(); }
-			}
 			if (bis != null){
 				try { bis.close(); } catch (IOException e) { e.printStackTrace(); }
 			}
@@ -284,8 +280,10 @@ public class ReplayMode {
 				system.stop();
 		}
 
-		if(protocol.getReplayVerdict().severity() != Verdict.OK.severity()) {
-			String msg = "Replayed Sequence contains Errors: "+ protocol.getReplayVerdict().info();
+		List<Verdict> replayVerdicts = verdictProcessing.filterDuplicates(protocol.getReplayVerdicts());
+		protocol.setReplayVerdicts(replayVerdicts);
+		if(!Verdict.helperAreAllVerdictsOK(replayVerdicts)) {
+			String msg = "Replayed Sequence contains Errors: " + buildVerdictsInfo(replayVerdicts);
 			System.out.println(msg);
 			LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);
 
@@ -294,9 +292,10 @@ public class ReplayMode {
 			System.out.println(msg);
 			LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);
 
-		}else if(protocol.getReplayVerdict().severity() == Verdict.Severity.UNREPLAYABLE.getValue()){
-			System.out.println(protocol.getReplayVerdict().info());
-			LogSerialiser.log(protocol.getReplayVerdict().info(), LogSerialiser.LogLevel.Critical);
+		}else if(replayVerdicts.stream().anyMatch(v -> v.severity() == Verdict.Severity.UNREPLAYABLE.getValue())){
+			String info = buildVerdictsInfo(replayVerdicts);
+			System.out.println(info);
+			LogSerialiser.log(info, LogSerialiser.LogLevel.Critical);
 
 		}else{
 			String msg = "Fail replaying sequence.\n";
@@ -314,7 +313,7 @@ public class ReplayMode {
 		protocol.writeAndCloseFragmentForReplayableSequence();
 
 		//Copy sequence file into proper directory:
-		protocol.classifyAndCopySequenceIntoAppropriateDirectory(protocol.getReplayVerdict());
+		protocol.classifyAndCopySequenceIntoAppropriateDirectory(replayVerdicts);
 
 		LogSerialiser.finish();
 
@@ -328,5 +327,20 @@ public class ReplayMode {
 
 		// Going back to TESTAR settings dialog if it was used to start replay:
 		protocol.mode = Modes.Quit;
+	}
+
+	private String buildVerdictsInfo(List<Verdict> verdicts) {
+		if (verdicts == null || verdicts.isEmpty()) return "";
+		if (verdicts.size() == 1) {
+			return verdicts.get(0).info();
+		}
+		StringBuilder builder = new StringBuilder();
+		for (Verdict verdict : verdicts) {
+			if (builder.length() > 0) {
+				builder.append(" | ");
+			}
+			builder.append("[").append(verdict.verdictSeverityTitle()).append("] ").append(verdict.info());
+		}
+		return builder.toString();
 	}
 }

@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2021 - 2023 Open Universiteit - www.ou.nl
- * Copyright (c) 2021 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2021 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2021 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -49,7 +49,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.*;
-import java.util.zip.GZIPInputStream;
 
 /**
  * This protocol is used to test TESTAR by executing a gradle CI workflow.
@@ -59,9 +58,9 @@ import java.util.zip.GZIPInputStream;
 public class Protocol_test_gradle_workflow_webdriver_form_filling extends WebdriverProtocol {
 
 	@Override
-	protected Verdict getVerdict(State state) {
+	protected List<Verdict> getVerdicts(State state) {
 		// For custom CI testing purposes, force these generated sequences be OK
-		return Verdict.OK;
+		return Collections.singletonList(Verdict.OK);
 	}
 
 	@Override
@@ -126,7 +125,7 @@ public class Protocol_test_gradle_workflow_webdriver_form_filling extends Webdri
 			String sequencesOkFolderName = OutputStructure.outerLoopOutputDir + File.separator + "sequences_ok";
 			File sequencesOkFolder = new File(sequencesOkFolderName).getCanonicalFile();
 			System.out.println("sequencesFolder: " + sequencesOkFolder);
-			File[] matchingFiles = sequencesOkFolder.listFiles((dir, name) -> name.endsWith("sequence_1.testar"));
+			File[] matchingFiles = sequencesOkFolder.listFiles((dir, name) -> name.contains("sequence_1") && name.endsWith(".testar"));
 			Assert.isTrue(matchingFiles.length == 1, "One replayable testar file was not created");
 			System.out.println("matchingFiles[0]: " + matchingFiles[0]);
 			Assert.isTrue(isValidReplayFile(matchingFiles[0]), "Replayable testar file was not serialized correctly!");
@@ -147,8 +146,7 @@ public class Protocol_test_gradle_workflow_webdriver_form_filling extends Webdri
 		try {
 			FileInputStream fis = new FileInputStream(replayFile);
 			BufferedInputStream bis = new BufferedInputStream(fis);
-			GZIPInputStream gis = new GZIPInputStream(bis);
-			ObjectInputStream ois = new ObjectInputStream(gis);
+			ObjectInputStream ois = new ObjectInputStream(bis);
 
 			ois.readObject();
 			ois.close();

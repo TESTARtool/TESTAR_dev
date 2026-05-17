@@ -1,6 +1,7 @@
 package org.testar.monkey;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -27,7 +28,7 @@ public class TestMoreActionsLogic {
 		protocol.startTime = Util.time();
 
 		StateStub state = new StateStub();
-		state.set(Tags.OracleVerdict, new Verdict(Verdict.Severity.OK, "State is OK"));
+		state.set(Tags.OracleVerdicts, Collections.singletonList(new Verdict(Verdict.Severity.OK, "State is OK")));
 		state.set(Tags.IsRunning, true);
 		state.set(Tags.NotResponding, false);
 
@@ -50,7 +51,7 @@ public class TestMoreActionsLogic {
 		protocol.startTime = Util.time() - 70.0;
 
 		StateStub state = new StateStub();
-		state.set(Tags.OracleVerdict, new Verdict(Verdict.Severity.OK, "State is OK"));
+		state.set(Tags.OracleVerdicts, Collections.singletonList(new Verdict(Verdict.Severity.OK, "State is OK")));
 		state.set(Tags.IsRunning, true);
 		state.set(Tags.NotResponding, false);
 
@@ -73,7 +74,7 @@ public class TestMoreActionsLogic {
 		protocol.startTime = Util.time();
 
 		StateStub state = new StateStub();
-		state.set(Tags.OracleVerdict, new Verdict(Verdict.Severity.SUSPICIOUS_TAG, "State contains suspicious message"));
+		state.set(Tags.OracleVerdicts, Collections.singletonList(new Verdict(Verdict.Severity.SUSPICIOUS_TAG, "State contains suspicious message")));
 		state.set(Tags.IsRunning, true);
 		state.set(Tags.NotResponding, false);
 
@@ -96,7 +97,7 @@ public class TestMoreActionsLogic {
 		protocol.startTime = Util.time();
 
 		StateStub state = new StateStub();
-		state.set(Tags.OracleVerdict, new Verdict(Verdict.Severity.SUSPICIOUS_TAG, "State contains suspicious message"));
+		state.set(Tags.OracleVerdicts, Collections.singletonList(new Verdict(Verdict.Severity.SUSPICIOUS_TAG, "State contains suspicious message")));
 		state.set(Tags.IsRunning, true);
 		state.set(Tags.NotResponding, false);
 
@@ -119,7 +120,7 @@ public class TestMoreActionsLogic {
 		protocol.startTime = Util.time();
 
 		StateStub state = new StateStub();
-		state.set(Tags.OracleVerdict, new Verdict(Verdict.Severity.OK, "State is OK"));
+		state.set(Tags.OracleVerdicts, Collections.singletonList(new Verdict(Verdict.Severity.OK, "State is OK")));
 		state.set(Tags.IsRunning, false);
 		state.set(Tags.NotResponding, false);
 
@@ -142,7 +143,7 @@ public class TestMoreActionsLogic {
 		protocol.startTime = Util.time();
 
 		StateStub state = new StateStub();
-		state.set(Tags.OracleVerdict, new Verdict(Verdict.Severity.OK, "State is OK"));
+		state.set(Tags.OracleVerdicts, Collections.singletonList(new Verdict(Verdict.Severity.OK, "State is OK")));
 		state.set(Tags.IsRunning, true);
 		state.set(Tags.NotResponding, true);
 

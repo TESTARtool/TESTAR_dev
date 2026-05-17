@@ -1,5 +1,6 @@
 package org.testar.monkey;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -50,16 +51,16 @@ public class TestSuspiciousTagsVerdict {
         widget.set(Tags.Role, Roles.Text);
         widget.set(Tags.Title, "Everything is fine");
         widget.set(Tags.ValuePattern, "");
-        Verdict verdict = defaultProtocol.getVerdict(state);
-        assertTrue(verdict.equals(Verdict.OK));
-        assertTrue(verdict.severity() == Verdict.OK.severity());
+        List<Verdict> verdicts = defaultProtocol.getVerdicts(state);
+        assertEquals(1, verdicts.size());
+        assertEquals(Verdict.OK, verdicts.get(0));
     }
 
     @Test
     public void test_verdict_ok_empty_tags() {
-        Verdict verdict = defaultProtocol.getVerdict(state);
-        assertTrue(verdict.equals(Verdict.OK));
-        assertTrue(verdict.severity() == Verdict.OK.severity());
+        List<Verdict> verdicts = defaultProtocol.getVerdicts(state);
+        assertEquals(1, verdicts.size());
+        assertEquals(Verdict.OK, verdicts.get(0));
     }
 
     @Test
@@ -67,10 +68,11 @@ public class TestSuspiciousTagsVerdict {
         widget.set(Tags.Role, Roles.Text);
         widget.set(Tags.Title, "This is an Exception in the SUT");
         widget.set(Tags.ValuePattern, "");
-        Verdict verdict = defaultProtocol.getVerdict(state);
-        assertTrue(verdict.verdictSeverityTitle().equals("SUSPICIOUS_TAG"));
-        assertTrue(verdict.severity() == Verdict.Severity.SUSPICIOUS_TAG.getValue());
-        assertTrue(verdict.info().contains("Discovered suspicious widget 'Title' : 'This is an Exception in the SUT'."));
+        List<Verdict> verdicts = defaultProtocol.getVerdicts(state);
+        assertEquals(1, verdicts.size());
+        assertTrue(verdicts.get(0).verdictSeverityTitle().equals("SUSPICIOUS_TAG"));
+        assertTrue(verdicts.get(0).severity() == Verdict.Severity.SUSPICIOUS_TAG.getValue());
+        assertTrue(verdicts.get(0).info().contains("Discovered suspicious widget 'Title' : 'This is an Exception in the SUT'."));
     }
 
     @Test
@@ -78,10 +80,11 @@ public class TestSuspiciousTagsVerdict {
         widget.set(Tags.Role, Roles.Text);
         widget.set(Tags.Title, "Everything is fine");
         widget.set(Tags.ValuePattern, "ValuePattern internal error");
-        Verdict verdict = defaultProtocol.getVerdict(state);
-        assertTrue(verdict.verdictSeverityTitle().equals("SUSPICIOUS_TAG"));
-        assertTrue(verdict.severity() == Verdict.Severity.SUSPICIOUS_TAG.getValue());
-        assertTrue(verdict.info().contains("Discovered suspicious widget 'ValuePattern' : 'ValuePattern internal error'."));
+        List<Verdict> verdicts = defaultProtocol.getVerdicts(state);
+        assertEquals(1, verdicts.size());
+        assertTrue(verdicts.get(0).verdictSeverityTitle().equals("SUSPICIOUS_TAG"));
+        assertTrue(verdicts.get(0).severity() == Verdict.Severity.SUSPICIOUS_TAG.getValue());
+        assertTrue(verdicts.get(0).info().contains("Discovered suspicious widget 'ValuePattern' : 'ValuePattern internal error'."));
     }
 
     @Test
@@ -89,9 +92,10 @@ public class TestSuspiciousTagsVerdict {
         widget.set(Tags.Role, UIARoles.UIAEdit);
         widget.set(Tags.Title, "Everything is fine");
         widget.set(Tags.ValuePattern, "TESTAR writes an error message in the edit widget");
-        Verdict verdict = defaultProtocol.getVerdict(state);
-        assertTrue(verdict.equals(Verdict.OK));
-        assertTrue(verdict.severity() == Verdict.OK.severity());
+        List<Verdict> verdicts = defaultProtocol.getVerdicts(state);
+        assertEquals(1, verdicts.size());
+        assertTrue(verdicts.get(0).equals(Verdict.OK));
+        assertTrue(verdicts.get(0).severity() == Verdict.OK.severity());
     }
 
     @Test
@@ -99,10 +103,11 @@ public class TestSuspiciousTagsVerdict {
         widget.set(Tags.Role, Roles.Text);
         widget.set(Tags.Title, "Line1\nerror\rLine3");
         widget.set(Tags.ValuePattern, "");
-        Verdict verdict = defaultProtocol.getVerdict(state);
-        assertTrue(verdict.verdictSeverityTitle().equals("SUSPICIOUS_TAG"));
-        assertTrue(verdict.severity() == Verdict.Severity.SUSPICIOUS_TAG.getValue());
-        assertTrue(verdict.info().contains("Discovered suspicious widget 'Title' : 'Line1 error Line3'."));
+        List<Verdict> verdicts = defaultProtocol.getVerdicts(state);
+        assertEquals(1, verdicts.size());
+        assertTrue(verdicts.get(0).verdictSeverityTitle().equals("SUSPICIOUS_TAG"));
+        assertTrue(verdicts.get(0).severity() == Verdict.Severity.SUSPICIOUS_TAG.getValue());
+        assertTrue(verdicts.get(0).info().contains("Discovered suspicious widget 'Title' : 'Line1 error Line3'."));
     }
 
     @Test
@@ -110,9 +115,10 @@ public class TestSuspiciousTagsVerdict {
         widget.set(Tags.Role, Roles.Text);
         widget.set(Tags.Title, "This contains ERROR in caps");
         widget.set(Tags.ValuePattern, "This contains ERROR in caps");
-        Verdict verdict = defaultProtocol.getVerdict(state);
-        assertTrue(verdict.equals(Verdict.OK));
-        assertTrue(verdict.severity() == Verdict.OK.severity());
+        List<Verdict> verdicts = defaultProtocol.getVerdicts(state);
+        assertEquals(1, verdicts.size());
+        assertTrue(verdicts.get(0).equals(Verdict.OK));
+        assertTrue(verdicts.get(0).severity() == Verdict.OK.severity());
     }
 
 }

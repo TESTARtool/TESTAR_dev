@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2025 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2025 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,6 +31,7 @@
 package org.testar.oracles.web.accessibility;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.testar.monkey.alayer.Roles;
@@ -58,36 +59,31 @@ public class WebAccessibilityImagesAltOracle implements Oracle {
 	}
 
 	@Override
-	public Verdict getVerdict(State state) {
-		List<Widget> incorrectWidgets = new ArrayList<>();
+	public List<Verdict> getVerdicts(State state) {
+		List<Verdict> verdicts = new ArrayList<>();
 
 		// Check if some widget of the state
 		for(Widget widget : state) {
 			//  Is a widget image (<img>) and if it lacks alternative text
 			if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdIMG)
 					&& (widget.get(WdTags.WebAlt, null) == null || widget.get(WdTags.WebAlt, "").isBlank())) {
-				// If so, save it as incorrect widget
-				incorrectWidgets.add(widget);
+				String verdictMsg = String.format(
+						"Detected web image widget %s without alternative text!",
+						getDescriptionOfWidgets(Collections.singletonList(widget), WdTags.WebOuterHTML)
+						);
+				Visualizer visualizer = new RegionsVisualizer(
+						getRedPen(),
+						getWidgetRegions(Collections.singletonList(widget)),
+						"Accessibility Fault",
+						0.5, 0.5);
+				verdicts.add(new Verdict(Verdict.Severity.WARNING_ACCESSIBILITY_FAULT, verdictMsg, visualizer));
 			}
 		}
 
-		// If exists one or more incorrect widgets
-		if(!incorrectWidgets.isEmpty()) {
-			// Create and return a WARNING_ACCESSIBILITY_FAULT verdict
-			String verdictMsg = String.format(
-					"Detected web image widgets '%s' without alternative text!", 
-					getDescriptionOfWidgets(incorrectWidgets, WdTags.WebOuterHTML)
-					);
-			Visualizer visualizer = new RegionsVisualizer(
-					getRedPen(), 
-					getWidgetRegions(incorrectWidgets), 
-					"Accessibility Fault", 
-					0.5, 0.5);
-			return new Verdict(Verdict.Severity.WARNING_ACCESSIBILITY_FAULT, verdictMsg, visualizer);
-		} else {
-			return Verdict.OK;
+		if(!verdicts.isEmpty()) {
+			return verdicts;
 		}
-
+		return Collections.singletonList(Verdict.OK);
 	}
 
 }

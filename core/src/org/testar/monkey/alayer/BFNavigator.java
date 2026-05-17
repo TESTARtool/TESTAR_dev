@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013 - 2026 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -27,15 +28,13 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.testar.monkey.alayer;
 
 import java.util.LinkedList;
 
 public class BFNavigator implements Navigator {
-	public void run(LinkedList<Widget> buffer) {
+	@Override
+	public void accept(LinkedList<Widget> buffer) {
 		Widget w = buffer.getFirst();
 		for(int i = 0; i < w.childCount(); i++)
 			buffer.add(w.child(i));

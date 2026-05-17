@@ -75,7 +75,9 @@ public class TestProcessListenerOracle {
 		processOracle.initialize();
 
 		State state = Mockito.mock(State.class);
-		Verdict processVerdict = processOracle.getVerdict(state);
+		List<Verdict> verdicts = processOracle.getVerdicts(state);
+		Assert.assertEquals(1, verdicts.size());
+		Verdict processVerdict = verdicts.get(0);
 
 		// Verify that the processVerdict is OK because we are in spy mode
 		Assert.assertTrue(processVerdict.severity() == Verdict.Severity.OK.getValue());
@@ -98,7 +100,9 @@ public class TestProcessListenerOracle {
 		processOracle.initialize();
 
 		State state = Mockito.mock(State.class);
-		Verdict processVerdict = processOracle.getVerdict(state);
+		List<Verdict> verdicts = processOracle.getVerdicts(state);
+		Assert.assertEquals(1, verdicts.size());
+		Verdict processVerdict = verdicts.get(0);
 
 		// Verify that the processVerdict is OK because we connect with title
 		Assert.assertTrue(processVerdict.severity() == Verdict.Severity.OK.getValue());
@@ -121,7 +125,9 @@ public class TestProcessListenerOracle {
 		processOracle.initialize();
 
 		State state = Mockito.mock(State.class);
-		Verdict processVerdict = processOracle.getVerdict(state);
+		List<Verdict> verdicts = processOracle.getVerdicts(state);
+		Assert.assertEquals(1, verdicts.size());
+		Verdict processVerdict = verdicts.get(0);
 
 		// Verify that the processVerdict is OK because we connect with process name
 		Assert.assertTrue(processVerdict.severity() == Verdict.Severity.OK.getValue());
@@ -144,7 +150,9 @@ public class TestProcessListenerOracle {
 		processOracle.initialize();
 
 		State state = Mockito.mock(State.class);
-		Verdict processVerdict = processOracle.getVerdict(state);
+		List<Verdict> verdicts = processOracle.getVerdicts(state);
+		Assert.assertEquals(1, verdicts.size());
+		Verdict processVerdict = verdicts.get(0);
 
 		// Verify that the processVerdict is OK because we connect with web apps
 		Assert.assertTrue(processVerdict.severity() == Verdict.Severity.OK.getValue());
@@ -167,7 +175,9 @@ public class TestProcessListenerOracle {
 		processOracle.initialize();
 
 		State state = Mockito.mock(State.class);
-		Verdict processVerdict = processOracle.getVerdict(state);
+		List<Verdict> verdicts = processOracle.getVerdicts(state);
+		Assert.assertEquals(1, verdicts.size());
+		Verdict processVerdict = verdicts.get(0);
 
 		// Verify that the processVerdict detects an error in the error buffer
 		Assert.assertTrue(processVerdict.severity() == Verdict.Severity.SUSPICIOUS_PROCESS.getValue());
@@ -191,7 +201,9 @@ public class TestProcessListenerOracle {
 		processOracle.initialize();
 
 		State state = Mockito.mock(State.class);
-		Verdict processVerdict = processOracle.getVerdict(state);
+		List<Verdict> verdicts = processOracle.getVerdicts(state);
+		Assert.assertEquals(1, verdicts.size());
+		Verdict processVerdict = verdicts.get(0);
 
 		// Verify that the processVerdict detects an error in the output buffer
 		Assert.assertTrue(processVerdict.severity() == Verdict.Severity.SUSPICIOUS_PROCESS.getValue());
@@ -215,7 +227,9 @@ public class TestProcessListenerOracle {
 		processOracle.initialize();
 
 		State state = Mockito.mock(State.class);
-		Verdict processVerdict = processOracle.getVerdict(state);
+		List<Verdict> verdicts = processOracle.getVerdicts(state);
+		Assert.assertEquals(1, verdicts.size());
+		Verdict processVerdict = verdicts.get(0);
 
 		// Verify that the processVerdict detects an error
 		Assert.assertTrue(processVerdict.severity() == Verdict.Severity.SUSPICIOUS_PROCESS.getValue());

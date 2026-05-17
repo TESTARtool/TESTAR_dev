@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013 - 2026 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -27,10 +28,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.testar.monkey.alayer;
 
 import java.util.Iterator;
@@ -52,7 +49,7 @@ public final class WidgetIterator implements Iterator<Widget> {
 		this.buffer = new LinkedList<Widget>();
 		this.navi = navi;
 		this.buffer.add(start);
-		this.navi.run(this.buffer);
+		this.navi.accept(this.buffer);
 	}
 
 	public boolean hasNext() { return !buffer.isEmpty(); }
@@ -60,7 +57,7 @@ public final class WidgetIterator implements Iterator<Widget> {
 	public Widget next() {
 		Widget ret = buffer.remove();
 		if(!buffer.isEmpty())
-			navi.run(buffer);
+			navi.accept(buffer);
 		return ret;
 	}
 

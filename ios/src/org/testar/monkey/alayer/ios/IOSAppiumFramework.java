@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2024 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2024 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -309,7 +309,7 @@ public class IOSAppiumFramework extends SUTBase {
 	}
 
 	// Note that besides obtaining a screenshot of the SUT it also highlights which action was clicked!
-	public static AWTCanvas getScreenshotBinary(State state, Widget widget) throws IOException {
+	public static AWTCanvas getScreenshotBinary(State state) throws IOException {
 		byte[] byteImage = driver.getScreenshotAs(OutputType.BYTES);
 		InputStream is = new ByteArrayInputStream(byteImage);
 		return AWTCanvas.fromInputStream(is);

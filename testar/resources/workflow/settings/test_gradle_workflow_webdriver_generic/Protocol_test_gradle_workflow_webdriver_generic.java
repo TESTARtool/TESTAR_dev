@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2021 - 2023 Open Universiteit - www.ou.nl
- * Copyright (c) 2021 - 2023 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2021 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2021 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -170,19 +170,24 @@ public class Protocol_test_gradle_workflow_webdriver_generic extends WebdriverPr
 
     	// Verify html and txt report files were created
     	Assert.isTrue(reportManager instanceof ReportManager);
-    	File htmlReportFile = new File(((ReportManager)reportManager).getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".html"));
-    	File txtReportFile = new File(((ReportManager)reportManager).getReportFileName().concat("_" + getFinalVerdict().verdictSeverityTitle() + ".txt"));
-    	System.out.println("htmlReportFile: " + htmlReportFile.getPath());
-    	System.out.println("txtReportFile: " + txtReportFile.getPath());
-    	Assert.isTrue(htmlReportFile.exists());
-    	Assert.isTrue(txtReportFile.exists());
+        Assert.isTrue(getSequenceVerdicts().size() > 0);
+    	int index = 1;
+    	for (Verdict verdict : getSequenceVerdicts()) {
+    		String suffixName = String.format("_V%03d_%s", index++, verdict.verdictSeverityTitle());
+    		File htmlReportFile = new File(((ReportManager)reportManager).getReportFileName().concat(suffixName + ".html"));
+    		File txtReportFile = new File(((ReportManager)reportManager).getReportFileName().concat(suffixName + ".txt"));
+    		System.out.println("htmlReportFile: " + htmlReportFile.getPath());
+    		System.out.println("txtReportFile: " + txtReportFile.getPath());
+    		Assert.isTrue(htmlReportFile.exists());
+    		Assert.isTrue(txtReportFile.exists());
 
-    	// Verify report information
-    	Assert.isTrue(fileContains("<h1>TESTAR execution sequence report for sequence 1</h1>", htmlReportFile));
-    	Assert.isTrue(fileContains("TESTAR execution sequence report for sequence 1", txtReportFile));
+    		// Verify report information
+    		Assert.isTrue(fileContains("<h1>TESTAR execution sequence report for sequence 1</h1>", htmlReportFile));
+    		Assert.isTrue(fileContains("TESTAR execution sequence report for sequence 1", txtReportFile));
 
-    	Assert.isTrue(fileContains("<h2>Test verdict for this sequence:", htmlReportFile));
-    	Assert.isTrue(fileContains("Test verdict for this sequence:", txtReportFile));
+    		Assert.isTrue(fileContains("<h2>Test verdict for this sequence:", htmlReportFile));
+    		Assert.isTrue(fileContains("Test verdict for this sequence:", txtReportFile));
+    	}
     }
 
     private boolean fileContains(String searchText, File file) {

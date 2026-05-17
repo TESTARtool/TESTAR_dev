@@ -363,6 +363,75 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(WdTags.WebPlaceholder)) {
 			ret = w.element.placeholder;
 		}
+		else if (t.equals(WdTags.WebAriaLabel)) {
+			ret = w.element.ariaLabel;
+		}
+		else if (t.equals(WdTags.WebAriaLabelledBy)) {
+			ret = w.element.ariaLabelledBy;
+		}
+		else if (t.equals(WdTags.WebAriaDescribedBy)) {
+			ret = w.element.ariaDescribedBy;
+		}
+		else if (t.equals(WdTags.WebAriaRole)) {
+			ret = w.element.ariaRole;
+		}
+		else if (t.equals(WdTags.WebAriaDisabled)) {
+			ret = w.element.ariaDisabled;
+		}
+		else if (t.equals(WdTags.WebAriaHidden)) {
+			ret = w.element.ariaHidden;
+		}
+		else if (t.equals(WdTags.WebAriaExpanded)) {
+			ret = w.element.ariaExpanded;
+		}
+		else if (t.equals(WdTags.WebAriaPressed)) {
+			ret = w.element.ariaPressed;
+		}
+		else if (t.equals(WdTags.WebAriaSelected)) {
+			ret = w.element.ariaSelected;
+		}
+		else if (t.equals(WdTags.WebAriaChecked)) {
+			ret = w.element.ariaChecked;
+		}
+		else if (t.equals(WdTags.WebAriaRequired)) {
+			ret = w.element.ariaRequired;
+		}
+		else if (t.equals(WdTags.WebAriaInvalid)) {
+			ret = w.element.ariaInvalid;
+		}
+		else if (t.equals(WdTags.WebAriaReadOnly)) {
+			ret = w.element.ariaReadOnly;
+		}
+		else if (t.equals(WdTags.WebAriaCurrent)) {
+			ret = w.element.ariaCurrent;
+		}
+		else if (t.equals(WdTags.WebAriaHasPopup)) {
+			ret = w.element.ariaHasPopup;
+		}
+		else if (t.equals(WdTags.WebAriaControls)) {
+			ret = w.element.ariaControls;
+		}
+		else if (t.equals(WdTags.WebAriaLive)) {
+			ret = w.element.ariaLive;
+		}
+		else if (t.equals(WdTags.WebAriaBusy)) {
+			ret = w.element.ariaBusy;
+		}
+		else if (t.equals(WdTags.WebAriaModal)) {
+			ret = w.element.ariaModal;
+		}
+		else if (t.equals(WdTags.WebAriaValueNow)) {
+			ret = w.element.ariaValueNow;
+		}
+		else if (t.equals(WdTags.WebAriaValueMin)) {
+			ret = w.element.ariaValueMin;
+		}
+		else if (t.equals(WdTags.WebAriaValueMax)) {
+			ret = w.element.ariaValueMax;
+		}
+		else if (t.equals(WdTags.WebAriaValueText)) {
+			ret = w.element.ariaValueText;
+		}
 		else if (t.equals(WdTags.WebElementSelenium)) {
 			ret = w.element.remoteWebElement;
 		}

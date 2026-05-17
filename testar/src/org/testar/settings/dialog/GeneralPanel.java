@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013 - 2024 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 - 2024 Open Universiteit - www.ou.nl
+* Copyright (c) 2013 - 2026 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -33,6 +33,7 @@ package org.testar.settings.dialog;
 
 import org.testar.monkey.*;
 import org.testar.settings.Settings;
+import org.testar.settings.dialog.components.IgnoredVerdictsDialog;
 import org.testar.settings.dialog.components.UndoTextArea;
 
 import javax.swing.*;
@@ -56,7 +57,8 @@ public class GeneralPanel extends SettingsPanel implements Observer {
   private JSpinner spnSequenceLength;
   //private JCheckBox checkStopOnFault;
   private JComboBox<String> comboBoxProtocol;
-  private JCheckBox compileCheckBox, checkActionVisualization;
+  private JCheckBox compileCheckBox, checkActionVisualization, checkIgnoreDuplicatedVerdict;
+  private JButton btnManageIgnoredVerdicts;
   
   private JLabel labelAppName = new JLabel("Application name");
   private JLabel labelAppVersion = new JLabel("Application version");
@@ -134,7 +136,18 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     checkActionVisualization.setBounds(10, 240, 192, 21);
     //checkActionVisualization.setToolTipText(checkStopOnFaultTTT);
     add(checkActionVisualization);
-    
+
+    checkIgnoreDuplicatedVerdict = new JCheckBox("Ignore duplicated verdicts");
+    checkIgnoreDuplicatedVerdict.setBounds(10, 262, 192, 21);
+    checkIgnoreDuplicatedVerdict.setToolTipText(ConfigTags.IgnoreDuplicatedVerdicts.getDescription());
+    add(checkIgnoreDuplicatedVerdict);
+
+    btnManageIgnoredVerdicts = new JButton("Manage ignored verdicts");
+    btnManageIgnoredVerdicts.setBounds(10, 286, 192, 25);
+    btnManageIgnoredVerdicts.setToolTipText("Open a modal dialog to check or clear existing ignored verdicts");
+    btnManageIgnoredVerdicts.addActionListener(this::btnManageIgnoredVerdictsActionPerformed);
+    add(btnManageIgnoredVerdicts);
+
     labelAppName.setBounds(330, 242, 150, 27);
     labelAppName.setToolTipText(ToolTipTexts.applicationNameTTT);
     add(labelAppName);
@@ -242,6 +255,12 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     dialog.setVisible(true);
   }
 
+  private void btnManageIgnoredVerdictsActionPerformed(ActionEvent evt) {
+    JDialog dialog = new IgnoredVerdictsDialog();
+    dialog.setModalityType(JDialog.ModalityType.APPLICATION_MODAL);
+    dialog.setVisible(true);
+  }
+
   /**
    * Populate JPanelGeneral from Settings structure.
    *
@@ -254,6 +273,7 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     cboxSUTconnector.setSelectedItem(settings.get(ConfigTags.SUTConnector));
     //checkStopOnFault.setSelected(settings.get(ConfigTags.StopGenerationOnFault));
     checkActionVisualization.setSelected(settings.get(ConfigTags.VisualizeActions));
+    checkIgnoreDuplicatedVerdict.setSelected(settings.get(ConfigTags.IgnoreDuplicatedVerdicts));
     txtSutPath.setInitialText(settings.get(ConfigTags.SUTConnectorValue));
     comboBoxProtocol.setSelectedItem(settings.get(ConfigTags.ProtocolClass).split("/")[0]);
     spnNumSequences.setValue(settings.get(ConfigTags.Sequences));
@@ -275,6 +295,7 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     settings.set(ConfigTags.SUTConnectorValue, txtSutPath.getText());
     //settings.set(ConfigTags.StopGenerationOnFault, checkStopOnFault.isSelected());
     settings.set(ConfigTags.VisualizeActions, checkActionVisualization.isSelected());
+    settings.set(ConfigTags.IgnoreDuplicatedVerdicts, checkIgnoreDuplicatedVerdict.isSelected());
     settings.set(ConfigTags.Sequences, (Integer) spnNumSequences.getValue());
     settings.set(ConfigTags.SequenceLength, (Integer) spnSequenceLength.getValue());
     settings.set(ConfigTags.AlwaysCompile, compileCheckBox.isSelected());

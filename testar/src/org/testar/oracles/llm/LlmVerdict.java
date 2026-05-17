@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2024 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2024 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2024 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2024 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,10 +32,16 @@ package org.testar.oracles.llm;
 
 public class LlmVerdict {
 	private Boolean match;
+	private String status;
 	private String info;
 
 	public LlmVerdict(Boolean match, String info) {
+		this(match, "", info);
+	}
+
+	public LlmVerdict(Boolean match, String status, String info) {
 		this.match = match;
+		this.status = status;
 		this.info = info;
 	}
 
@@ -43,7 +49,27 @@ public class LlmVerdict {
 		return match;
 	}
 
+	public String getStatus() {
+		return status;
+	}
+
 	public String getInfo() {
 		return info;
+	}
+
+	public LlmVerdictDecision getDecision() {
+		LlmVerdictDecision fromStatus = LlmVerdictDecision.fromStatus(status);
+		// Return a (CONTINUE | COMPLETED | INVALID) detected LLM Oracle decision
+		if (fromStatus != LlmVerdictDecision.UNKNOWN) {
+			return fromStatus;
+		}
+		// Return a true/false detected LLM Oracle decision
+		if (Boolean.TRUE.equals(match)) {
+			return LlmVerdictDecision.COMPLETED;
+		}
+		if (Boolean.FALSE.equals(match)) {
+			return LlmVerdictDecision.CONTINUE;
+		}
+		return LlmVerdictDecision.UNKNOWN;
 	}
 }

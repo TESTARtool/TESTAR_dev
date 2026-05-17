@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2025 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2025 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,6 +32,8 @@
 package org.testar.oracles.web.accessibility;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.testar.monkey.alayer.Rect;
@@ -71,8 +73,8 @@ public class WebAccessibilityClickableSizeOracle implements Oracle {
 	}
 
 	@Override
-	public Verdict getVerdict(State state) {
-		List<Widget> incorrectWidgets = new ArrayList<>();
+	public List<Verdict> getVerdicts(State state) {
+		List<Verdict> verdicts = new ArrayList<>();
 
 		// Iterate over all widgets in the state
 		for (Widget widget : state) {
@@ -87,30 +89,27 @@ public class WebAccessibilityClickableSizeOracle implements Oracle {
 
 				// Check if the widget is smaller than the recommended pixels
 				if (width < minClickableThreshold || height < minClickableThreshold) {
-					// If so, save it as incorrect widget
-					incorrectWidgets.add(widget);
+					String verdictMsg = String.format(
+							"Clickable web widget %s is too small (%sx%s px). Minimum: %s px.",
+							getDescriptionOfWidgets(Collections.singletonList(widget), WdTags.WebOuterHTML),
+							width.intValue(),
+							height.intValue(),
+							minClickableThreshold
+							);
+					Visualizer visualizer = new RegionsVisualizer(
+							getRedPen(), 
+							getWidgetRegions(Arrays.asList(widget)), 
+							"Accessibility Fault", 
+							0.5, 0.5);
+					verdicts.add(new Verdict(Verdict.Severity.WARNING_ACCESSIBILITY_FAULT, verdictMsg, visualizer));
 				}
 			}
 		}
 
-		// If exists one or more incorrect widgets
-		if(!incorrectWidgets.isEmpty()) {
-			// Create and return a WARNING_ACCESSIBILITY_FAULT verdict
-			String verdictMsg = String.format(
-					"Clickable web widgets %s are too small (Minimum: %s px).",
-					getDescriptionOfWidgets(incorrectWidgets, WdTags.WebOuterHTML),
-					minClickableThreshold
-					);
-			Visualizer visualizer = new RegionsVisualizer(
-					getRedPen(), 
-					getWidgetRegions(incorrectWidgets), 
-					"Accessibility Fault", 
-					0.5, 0.5);
-			return new Verdict(Verdict.Severity.WARNING_ACCESSIBILITY_FAULT, verdictMsg, visualizer);
-		} else {
-			return Verdict.OK;
+		if(!verdicts.isEmpty()) {
+			return verdicts;
 		}
-
+		return Collections.singletonList(Verdict.OK);
 	}
 
 }
