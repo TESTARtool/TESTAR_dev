@@ -86,9 +86,6 @@ public class Protocol_android_digioffice extends AndroidProtocol {
 
     private String XPATH_FILTER_FILE = "/android_digioffice_xpath_filter.txt";
 
-    private String VERDICT_LIST_FILE = "/android_digioffice_verdict_list.txt";
-    private List<String> listErrorVerdictInfo = new ArrayList<>();
-
     private List<Oracle> extendedOraclesList = new ArrayList<>();
 
     /**
@@ -328,29 +325,6 @@ public class Protocol_android_digioffice extends AndroidProtocol {
     @Override
     protected void beginSequence(SUT system, State state) {
         super.beginSequence(system, state);
-
-        // Load known verdict list
-        VERDICT_LIST_FILE = Settings.getSettingsPath() + "/android_digioffice_verdict_list.txt";
-        loadVerdictListFile();
-    }
-
-    private void loadVerdictListFile() {
-        ObjectInputStream ois = null;
-        try {
-            File verdictListFile = new File(VERDICT_LIST_FILE);
-            if (verdictListFile.exists()) {
-                FileInputStream fis = new FileInputStream(verdictListFile);
-                ois = new ObjectInputStream(fis);
-                listErrorVerdictInfo = (List) ois.readObject();
-                ois.close();
-                return;
-            }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        listErrorVerdictInfo = new ArrayList<>();
     }
 
     private State updateStateModals(State state) {
@@ -433,117 +407,86 @@ public class Protocol_android_digioffice extends AndroidProtocol {
      *         why.
      */
     @Override
-    protected Verdict getVerdict(State state) {
+    protected List<Verdict> getVerdicts(State state) {
         state = updateStateModals(state);
+        List<Verdict> verdicts = new ArrayList<>();
 
         // 1) The super methods implements the implicit online state oracles for
         // suspicious tags (exception, error messages, logcat suspicious messages)
-        Verdict verdict = super.getVerdict(state);
-        if (shouldReturnVerdict(verdict)) {
-            return verdict;
-        }
+        addNewVerdicts(verdicts, super.getVerdicts(state));
 
         // 2) If we unexpectedly navigated to the emulator default activity
         // This is executed as second in case the logcat discovers internal crash message
         if (state.get(AndroidTags.AndroidActivity, "").contains("NexusLauncherActivity")) {
             // We assume the DigiOffice app has crashed
-            return new Verdict(Verdict.Severity.UNEXPECTEDCLOSE,
-                    "Android app offline! Closed Unexpectedly! I assume it crashed!");
+            verdicts.add(new Verdict(Verdict.Severity.UNEXPECTEDCLOSE,
+                    "Android app offline! Closed Unexpectedly! I assume it crashed!"));
+            return verdicts;
         }
 
         // 3) Custom invariant oracle for duplicated elements
         Oracle duplicatedViewGroupOracle = new AndroidDigiOfficeInvariantDuplicatedViewGroup();
-        Verdict duplicatedViewGroupVerdict = duplicatedViewGroupOracle.getVerdict(state);
-        if (shouldReturnVerdict(duplicatedViewGroupVerdict)) {
-            return duplicatedViewGroupVerdict;
-        }
+        addNewVerdicts(verdicts, duplicatedViewGroupOracle.getVerdicts(state));
 
         // 4) Header Is Not Empty Not NA
         Oracle headerOracle = new AndroidDigiOfficeHeaderIsNotEmptyNotNA();
-        Verdict headerVerdict = headerOracle.getVerdict(state);
-        if (shouldReturnVerdict(headerVerdict)) {
-            return headerVerdict;
-        }
+        addNewVerdicts(verdicts, headerOracle.getVerdicts(state));
 
         // 5) Person Name Is Not Empty Not NA
         Oracle personNameOracle = new AndroidDigiOfficePersonNameIsNotEmptyNotNA();
-        Verdict personNameVerdict = personNameOracle.getVerdict(state);
-        if (shouldReturnVerdict(personNameVerdict)) {
-            return personNameVerdict;
-        }
+        addNewVerdicts(verdicts, personNameOracle.getVerdicts(state));
 
         // 6) Company Name Is Not Empty Not NA
         Oracle companyNameOracle = new AndroidDigiOfficeCompanyNameIsNotEmptyNotNA();
-        Verdict companyNameVerdict = companyNameOracle.getVerdict(state);
-        if (shouldReturnVerdict(companyNameVerdict)) {
-            return companyNameVerdict;
-        }
+        addNewVerdicts(verdicts, companyNameOracle.getVerdicts(state));
 
         // 7) Widget Is Not Empty
         Oracle widgetIsNotEmptyOracle = new AndroidDigiOfficeWidgetIsNotEmpty();
-        Verdict widgetIsNotEmptyVerdict = widgetIsNotEmptyOracle.getVerdict(state);
-        if (shouldReturnVerdict(widgetIsNotEmptyVerdict)) {
-            return widgetIsNotEmptyVerdict;
-        }
+        addNewVerdicts(verdicts, widgetIsNotEmptyOracle.getVerdicts(state));
 
         // 8) Phone Text Is Not Valid
         Oracle phoneOracle = new AndroidDigiOfficePhoneTextIsNotValid();
-        Verdict phoneVerdict = phoneOracle.getVerdict(state);
-        if (shouldReturnVerdict(phoneVerdict)) {
-            return phoneVerdict;
-        }
+        addNewVerdicts(verdicts, phoneOracle.getVerdicts(state));
 
         // 9) Mobile Text Is Not Valid
         Oracle mobileOracle = new AndroidDigiOfficeMobileTextIsNotValid();
-        Verdict mobileVerdict = mobileOracle.getVerdict(state);
-        if (shouldReturnVerdict(mobileVerdict)) {
-            return mobileVerdict;
-        }
+        addNewVerdicts(verdicts, mobileOracle.getVerdicts(state));
 
         // 10) Email Text Is Not Valid
         Oracle emailOracle = new AndroidDigiOfficeEmailTextIsNotValid();
-        Verdict emailVerdict = emailOracle.getVerdict(state);
-        if (shouldReturnVerdict(emailVerdict)) {
-            return emailVerdict;
-        }
+        addNewVerdicts(verdicts, emailOracle.getVerdicts(state));
 
         // 11) Website Text Is Not Valid
         Oracle websiteOracle = new AndroidDigiOfficeWebsiteTextIsNotValid();
-        Verdict websiteVerdict = websiteOracle.getVerdict(state);
-        if (shouldReturnVerdict(websiteVerdict)) {
-            return websiteVerdict;
-        }
+        addNewVerdicts(verdicts, websiteOracle.getVerdicts(state));
 
         // 12) Search bar contains clear option
         Oracle searchClearOracle = new AndroidDigiOfficeSearchBarContainsClear();
-        Verdict searchClearVerdict = searchClearOracle.getVerdict(state);
-        if (shouldReturnVerdict(searchClearVerdict)) {
-            return searchClearVerdict;
-        }
+        addNewVerdicts(verdicts, searchClearOracle.getVerdicts(state));
 
         // "ExtendedOracles" offered by TESTAR in the test.settings or Oracles GUI
         // dialog
         for (Oracle extendedOracle : extendedOraclesList) {
-            Verdict extendedVerdict = extendedOracle.getVerdict(state);
-
-            // If the Custom Verdict is not OK and was not detected in a previous sequence
-            // return verdict with failure state
-            if (shouldReturnVerdict(extendedVerdict)) {
-                return extendedVerdict;
-            }
-
+            addNewVerdicts(verdicts, extendedOracle.getVerdicts(state));
         }
 
-        return Verdict.OK;
+        if (verdicts.isEmpty()) {
+            return Collections.singletonList(Verdict.OK);
+        }
+
+        return verdicts;
     }
 
-    /**
-     * We want to return the verdict if it is not OK,
-     * and not on the detected failures list (it's a new failure).
-     */
-    private boolean shouldReturnVerdict(Verdict verdict) {
-        return verdict.severity() > Verdict.Severity.OK.getValue()
-                && listErrorVerdictInfo.stream().noneMatch(info -> info.contains(verdict.info().replace("\n", " ")));
+    private void addNewVerdicts(List<Verdict> verdicts, List<Verdict> candidates) {
+        if (candidates == null) {
+            return;
+        }
+
+        for (Verdict verdict : candidates) {
+            if (verdict != null && verdict.severity() > Verdict.OK.severity()) {
+                verdicts.add(verdict);
+            }
+        }
     }
 
     /**
@@ -711,24 +654,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
     @Override
     protected void finishSequence() {
         super.finishSequence();
-        // If the final Verdict is not OK and the verdict is not saved in the list
-        // This is a new run fail verdict
-        if (getFinalVerdict().severity() > Verdict.Severity.OK.getValue()
-                && !listErrorVerdictInfo.contains(getFinalVerdict().info().replace("\n", " "))) {
-            listErrorVerdictInfo.add(getFinalVerdict().info().replace("\n", " "));
-            saveVerdictListFile();
-        }
     }
-
-    private void saveVerdictListFile() {
-        try (FileOutputStream fos = new FileOutputStream(VERDICT_LIST_FILE);
-                ObjectOutputStream oos = new ObjectOutputStream(fos);) {
-            oos.writeObject(listErrorVerdictInfo);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
 }
 
 class AndroidDigiOfficeInvariantDuplicatedViewGroup implements Oracle {
@@ -738,8 +664,8 @@ class AndroidDigiOfficeInvariantDuplicatedViewGroup implements Oracle {
     }
 
     @Override
-    public Verdict getVerdict(State state) {
-        Verdict finalVerdict = Verdict.OK;
+    public List<Verdict> getVerdicts(State state) {
+        List<Verdict> verdicts = new ArrayList<>();
 
         // 1) Join clickable AndroidViewGroup with non-empty accessibility id and a
         // parent
@@ -795,10 +721,14 @@ class AndroidDigiOfficeInvariantDuplicatedViewGroup implements Oracle {
             Verdict duplicatedVerdict = new Verdict(
                     Verdict.Severity.WARNING_DUPLICATED_RESOURCE_ISSUE,
                     verdictMsg, visualizer);
-            finalVerdict = finalVerdict.join(duplicatedVerdict);
+            verdicts.add(duplicatedVerdict);
         }
 
-        return finalVerdict;
+        if (verdicts.isEmpty()) {
+            return Collections.singletonList(Verdict.OK);
+        }
+
+        return verdicts;
     }
 
 }
@@ -826,8 +756,8 @@ class AndroidDigiOfficeHeaderIsNotEmptyNotNA implements Oracle {
     }
 
     @Override
-    public Verdict getVerdict(State state) {
-        Verdict finalVerdict = Verdict.OK;
+    public List<Verdict> getVerdicts(State state) {
+        List<Verdict> verdicts = new ArrayList<>();
 
         for (Widget w : state) {
             String resId = w.get(AndroidTags.AndroidResourceId, "");
@@ -853,11 +783,15 @@ class AndroidDigiOfficeHeaderIsNotEmptyNotNA implements Oracle {
                         Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT,
                         verdictMsg,
                         visualizer);
-                finalVerdict = finalVerdict.join(headerVerdict);
+                verdicts.add(headerVerdict);
             }
         }
 
-        return finalVerdict;
+        if (verdicts.isEmpty()) {
+            return Collections.singletonList(Verdict.OK);
+        }
+
+        return verdicts;
     }
 }
 
@@ -885,8 +819,8 @@ class AndroidDigiOfficePersonNameIsNotEmptyNotNA implements Oracle {
     }
 
     @Override
-    public Verdict getVerdict(State state) {
-        Verdict finalVerdict = Verdict.OK;
+    public List<Verdict> getVerdicts(State state) {
+        List<Verdict> verdicts = new ArrayList<>();
 
         for (Widget w : state) {
             String resId = w.get(AndroidTags.AndroidResourceId, "");
@@ -912,11 +846,15 @@ class AndroidDigiOfficePersonNameIsNotEmptyNotNA implements Oracle {
                         Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT,
                         verdictMsg,
                         visualizer);
-                finalVerdict = finalVerdict.join(personNameVerdict);
+                verdicts.add(personNameVerdict);
             }
         }
 
-        return finalVerdict;
+        if (verdicts.isEmpty()) {
+            return Collections.singletonList(Verdict.OK);
+        }
+
+        return verdicts;
     }
 }
 
@@ -943,8 +881,8 @@ class AndroidDigiOfficeCompanyNameIsNotEmptyNotNA implements Oracle {
     }
 
     @Override
-    public Verdict getVerdict(State state) {
-        Verdict finalVerdict = Verdict.OK;
+    public List<Verdict> getVerdicts(State state) {
+        List<Verdict> verdicts = new ArrayList<>();
 
         for (Widget w : state) {
             String resId = w.get(AndroidTags.AndroidResourceId, "");
@@ -970,11 +908,15 @@ class AndroidDigiOfficeCompanyNameIsNotEmptyNotNA implements Oracle {
                         Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT,
                         verdictMsg,
                         visualizer);
-                finalVerdict = finalVerdict.join(companyNameVerdict);
+                verdicts.add(companyNameVerdict);
             }
         }
 
-        return finalVerdict;
+        if (verdicts.isEmpty()) {
+            return Collections.singletonList(Verdict.OK);
+        }
+
+        return verdicts;
     }
 }
 
@@ -998,8 +940,8 @@ class AndroidDigiOfficeWidgetIsNotEmpty implements Oracle {
     }
 
     @Override
-    public Verdict getVerdict(State state) {
-        Verdict finalVerdict = Verdict.OK;
+    public List<Verdict> getVerdicts(State state) {
+        List<Verdict> verdicts = new ArrayList<>();
 
         for (Widget w : state) {
             String resId = w.get(AndroidTags.AndroidResourceId, "");
@@ -1025,11 +967,15 @@ class AndroidDigiOfficeWidgetIsNotEmpty implements Oracle {
                         Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT,
                         verdictMsg,
                         visualizer);
-                finalVerdict = finalVerdict.join(widgetEmptyVerdict);
+                verdicts.add(widgetEmptyVerdict);
             }
         }
 
-        return finalVerdict;
+        if (verdicts.isEmpty()) {
+            return Collections.singletonList(Verdict.OK);
+        }
+
+        return verdicts;
     }
 }
 
@@ -1060,8 +1006,8 @@ class AndroidDigiOfficePhoneTextIsNotValid implements Oracle {
     }
 
     @Override
-    public Verdict getVerdict(State state) {
-        Verdict finalVerdict = Verdict.OK;
+    public List<Verdict> getVerdicts(State state) {
+        List<Verdict> verdicts = new ArrayList<>();
 
         for (Widget w : state) {
             String resId = w.get(AndroidTags.AndroidResourceId, "");
@@ -1087,11 +1033,15 @@ class AndroidDigiOfficePhoneTextIsNotValid implements Oracle {
                         Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT,
                         verdictMsg,
                         visualizer);
-                finalVerdict = finalVerdict.join(phoneTextVerdict);
+                verdicts.add(phoneTextVerdict);
             }
         }
 
-        return finalVerdict;
+        if (verdicts.isEmpty()) {
+            return Collections.singletonList(Verdict.OK);
+        }
+
+        return verdicts;
     }
 }
 
@@ -1122,8 +1072,8 @@ class AndroidDigiOfficeMobileTextIsNotValid implements Oracle {
     }
 
     @Override
-    public Verdict getVerdict(State state) {
-        Verdict finalVerdict = Verdict.OK;
+    public List<Verdict> getVerdicts(State state) {
+        List<Verdict> verdicts = new ArrayList<>();
 
         for (Widget w : state) {
             String resId = w.get(AndroidTags.AndroidResourceId, "");
@@ -1149,11 +1099,15 @@ class AndroidDigiOfficeMobileTextIsNotValid implements Oracle {
                         Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT,
                         verdictMsg,
                         visualizer);
-                finalVerdict = finalVerdict.join(mobileTextVerdict);
+                verdicts.add(mobileTextVerdict);
             }
         }
 
-        return finalVerdict;
+        if (verdicts.isEmpty()) {
+            return Collections.singletonList(Verdict.OK);
+        }
+
+        return verdicts;
     }
 }
 
@@ -1185,8 +1139,8 @@ class AndroidDigiOfficeEmailTextIsNotValid implements Oracle {
     }
 
     @Override
-    public Verdict getVerdict(State state) {
-        Verdict finalVerdict = Verdict.OK;
+    public List<Verdict> getVerdicts(State state) {
+        List<Verdict> verdicts = new ArrayList<>();
 
         for (Widget w : state) {
             String resId = w.get(AndroidTags.AndroidResourceId, "");
@@ -1212,11 +1166,15 @@ class AndroidDigiOfficeEmailTextIsNotValid implements Oracle {
                         Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT,
                         verdictMsg,
                         visualizer);
-                finalVerdict = finalVerdict.join(emailTextVerdict);
+                verdicts.add(emailTextVerdict);
             }
         }
 
-        return finalVerdict;
+        if (verdicts.isEmpty()) {
+            return Collections.singletonList(Verdict.OK);
+        }
+
+        return verdicts;
     }
 }
 
@@ -1245,8 +1203,8 @@ class AndroidDigiOfficeWebsiteTextIsNotValid implements Oracle {
     }
 
     @Override
-    public Verdict getVerdict(State state) {
-        Verdict finalVerdict = Verdict.OK;
+    public List<Verdict> getVerdicts(State state) {
+        List<Verdict> verdicts = new ArrayList<>();
 
         for (Widget w : state) {
             String resId = w.get(AndroidTags.AndroidResourceId, "");
@@ -1272,11 +1230,15 @@ class AndroidDigiOfficeWebsiteTextIsNotValid implements Oracle {
                         Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT,
                         verdictMsg,
                         visualizer);
-                finalVerdict = finalVerdict.join(websiteTextVerdict);
+                verdicts.add(websiteTextVerdict);
             }
         }
 
-        return finalVerdict;
+        if (verdicts.isEmpty()) {
+            return Collections.singletonList(Verdict.OK);
+        }
+
+        return verdicts;
     }
 }
 
@@ -1293,8 +1255,8 @@ class AndroidDigiOfficeSearchBarContainsClear implements Oracle {
     }
 
     @Override
-    public Verdict getVerdict(State state) {
-        Verdict finalVerdict = Verdict.OK;
+    public List<Verdict> getVerdicts(State state) {
+        List<Verdict> verdicts = new ArrayList<>();
 
         for (Widget w : state) {
             String resId = w.get(AndroidTags.AndroidResourceId, "");
@@ -1319,11 +1281,15 @@ class AndroidDigiOfficeSearchBarContainsClear implements Oracle {
                         Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT,
                         verdictMsg,
                         visualizer);
-                finalVerdict = finalVerdict.join(searchBarVerdict);
+                verdicts.add(searchBarVerdict);
             }
         }
 
-        return finalVerdict;
+        if (verdicts.isEmpty()) {
+            return Collections.singletonList(Verdict.OK);
+        }
+
+        return verdicts;
     }
 
     private boolean containsClearRecursive(Widget w, java.util.regex.Pattern clearPattern) {

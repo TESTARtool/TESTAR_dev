@@ -126,17 +126,29 @@ public class GenericVerdict {
         return !text.isEmpty() && !spellingIgnoreList.contains(text);
     }
 
-    public static Verdict SpellChecker(State state, Tag<String> tagTextChecker, Language languageChecker, String ignorePatternRegEx) {
+    private static List<Verdict> okVerdicts() {
+        return Collections.singletonList(Verdict.OK);
+    }
+
+    private static List<Verdict> finalizeVerdicts(List<Verdict> verdicts) {
+        if (verdicts.isEmpty()) {
+            return okVerdicts();
+        }
+
+        return verdicts;
+    }
+
+    public static List<Verdict> SpellChecker(State state, Tag<String> tagTextChecker, Language languageChecker, String ignorePatternRegEx) {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledVerdicts.contains(methodName)) return okVerdicts();
 
         loadSpellingIgnoreListFromFile();
 
         Pattern ignorePattern = Pattern.compile(ignorePatternRegEx);
 
         // If it is enabled, then execute the verdict implementation
-        Verdict spellCheckerVerdict = Verdict.OK;
+        List<Verdict> spellCheckerVerdicts = new ArrayList<>();
         JLanguageTool langTool = new JLanguageTool(languageChecker);
         // Iterate through all the widgets of the state to apply the spell checker in the desired String Tag
         for(Widget w : state) {
@@ -160,7 +172,9 @@ public class GenericVerdict {
                             if (!spellingIgnoreList.contains(spellingSuspect)) {
                                 spellingIgnoreList.add(spellingSuspect);
                             }
-                            spellCheckerVerdict = spellCheckerVerdict.join(new Verdict(Verdict.Severity.WARNING_UI_TRANSLATION_OR_SPELLING_ISSUE, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+                            Verdict spellCheckerVerdict = new Verdict(Verdict.Severity.WARNING_UI_TRANSLATION_OR_SPELLING_ISSUE, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+                            spellCheckerVerdict.setDescription("spell_checking_verdict");
+                            spellCheckerVerdicts.add(spellCheckerVerdict);
                         }
 
                     }
@@ -172,9 +186,8 @@ public class GenericVerdict {
             }
         }
 
-        spellCheckerVerdict.setDescription("spell_checking_verdict");
         saveSpellingIgnoreListToFile();
-        return spellCheckerVerdict;
+        return finalizeVerdicts(spellCheckerVerdicts);
     }
 
 
@@ -186,13 +199,13 @@ public class GenericVerdict {
     // When programmers debugging a program where they could only notice the problem in an other environment than the developer machine,
     // then they sometimes add code which show a message or value with a phrase or word such as 'debug' or 'test'. If the programmer
     // forget to remove that temporary code, then this text can be shown in a production release of the software.
-    public static Verdict CommonTestOrDummyPhrases(State state, Tag<String> tagTextChecker)
+    public static List<Verdict> CommonTestOrDummyPhrases(State state, Tag<String> tagTextChecker)
     {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledVerdicts.contains(methodName)) return okVerdicts();
 
-        Verdict verdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
 
         try {
             String patternRegex = "[Dd]ummy|[Tt]est][Dd]ebug";
@@ -205,14 +218,14 @@ public class GenericVerdict {
                 if (matcher.find()) {
                     String verdictMsg = String.format("Detected debug or test data values! Role: %s , Path: %s , %s: %s", 
                             w.get(Tags.Role), w.get(Tags.Path), tagTextChecker, desc);
-                    verdict = verdict.join(new Verdict(Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+                    verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
                 }
             }
         } catch (Exception e) {
             logger.log(Level.ERROR, "GenericVerdict CommonTestOrDummyPhrases exception", e);
         }
 
-        return verdict;
+        return finalizeVerdicts(verdicts);
     }
 
     // Detect UI items that contain sensitive texts, such as passwords
@@ -225,13 +238,13 @@ public class GenericVerdict {
     // 1. Fill a ../Settings/SensitiveDataList.txt file with all sensitive text.
     // 2. Give a regular expression with matches sensitive text
     // Using the SensitiveDataList.txt file is the preferred way, because the sensitive data is then not in the protocol and you don't have to rewrite the data as a regular expression.
-    public static Verdict SensitiveData(State state, Tag<String> tagTextChecker, String sensitiveTextPatternRegEx)
+    public static List<Verdict> SensitiveData(State state, Tag<String> tagTextChecker, String sensitiveTextPatternRegEx)
     {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledVerdicts.contains(methodName)) return okVerdicts();
 
-        Verdict verdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
 
         try {
             Pattern pattern = Pattern.compile(sensitiveTextPatternRegEx);
@@ -244,14 +257,14 @@ public class GenericVerdict {
                 {
                     String verdictMsg = String.format("Detected sensitive data values!  Role: %s , Path: %s , %s: %s", 
                             w.get(Tags.Role), w.get(Tags.Path), tagTextChecker, desc);
-                    verdict = verdict.join(new Verdict(Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+                    verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
                 }
             }
         } catch (Exception e) {
             logger.log(Level.ERROR, "GenericVerdict SensitiveData exception", e);
         }
 
-        return verdict;
+        return finalizeVerdicts(verdicts);
     }
 
     // Load the sensitive data file from the settings directory
@@ -296,13 +309,13 @@ public class GenericVerdict {
     // BAD:  �
     //       f�r
     // GOOD: für
-    public static Verdict UnicodeReplacementCharacter(State state, Tag<String> tagTextChecker)
+    public static List<Verdict> UnicodeReplacementCharacter(State state, Tag<String> tagTextChecker)
     {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledVerdicts.contains(methodName)) return okVerdicts();
 
-        Verdict verdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
 
         try {
             String patternRegex = ".*\\uFFFD.*"; // Look for a Unicode Replacement character: .*\uFFFD.*
@@ -315,14 +328,14 @@ public class GenericVerdict {
                 if (matcher.find()) {
                     String verdictMsg = String.format("Detected Unicode Replacement Character in widget! Role: %s , Path: %s , %s: %s", 
                             w.get(Tags.Role), w.get(Tags.Path), tagTextChecker, desc);
-                    verdict = verdict.join(new Verdict(Verdict.Severity.WARNING_UI_TRANSLATION_OR_SPELLING_ISSUE, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+                    verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_TRANSLATION_OR_SPELLING_ISSUE, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
                 }
             }
         } catch (Exception e) {
             logger.log(Level.ERROR, "GenericVerdict UnicodeReplacementCharacter exception", e);
         }
 
-        return verdict;
+        return finalizeVerdicts(verdicts);
     }
 
     private static ArrayList<Rect> getRegions(State state)
@@ -341,12 +354,12 @@ public class GenericVerdict {
     // Calculates an aesthetic value between 0.00 (bad) and 100.0 (perfect) alignment of widgets and give warning if threshold is breached
     // based on the work of "Towards an evaluation of graphical user interfaces aesthetics based on metrics" Zen, Mathieu ; Vanderdonckt, Jean
     // A default threshold value is around 50.0   
-    public static Verdict WidgetAlignmentMetric(State state, double thresholdValue) {
+    public static List<Verdict> WidgetAlignmentMetric(State state, double thresholdValue) {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledVerdicts.contains(methodName)) return okVerdicts();
 
-        Verdict widgetAlignmentMetricVerdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
 
         try {
             ArrayList<Rect> regions = getRegions(state);
@@ -357,25 +370,24 @@ public class GenericVerdict {
             if (alignmentMetric < thresholdValue)
             {
                 String verdictMsg = String.format("Alignment metric with value %f is below threshold value %f!",  alignmentMetric, thresholdValue);
-                Verdict verdict = new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
-                widgetAlignmentMetricVerdict = widgetAlignmentMetricVerdict.join(verdict);
+                verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions));
             }
         } catch (Exception e) {
             logger.log(Level.ERROR, "GenericVerdict WidgetAlignmentMetric exception", e);
         }
 
-        return widgetAlignmentMetricVerdict;
+        return finalizeVerdicts(verdicts);
     }
 
     // Calculates an aesthetic value between 0.00 (bad) and 100.0 (perfect) the balance of widgets and give warning if threshold is breached
     // based on the work of "Towards an evaluation of graphical user interfaces aesthetics based on metrics" Zen, Mathieu ; Vanderdonckt, Jean
     // A default threshold value is around 50.0
-    public static Verdict WidgetBalanceMetric(State state, double tresholdValue) {
+    public static List<Verdict> WidgetBalanceMetric(State state, double tresholdValue) {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledVerdicts.contains(methodName)) return okVerdicts();
 
-        Verdict widgetBalanceMetricVerdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
 
         try {
             Rect sutRect = (Rect) state.child(0).get(Tags.Shape, null);
@@ -388,26 +400,25 @@ public class GenericVerdict {
                 if (balanceMetric < tresholdValue)
                 {
                     String verdictMsg = String.format("Balance metric with value %f is below treshold value %f!",  balanceMetric, tresholdValue);
-                    Verdict verdict = new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
-                    widgetBalanceMetricVerdict = widgetBalanceMetricVerdict.join(verdict);
+                    verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions));
                 }
             }
         } catch (Exception e) {
             logger.log(Level.ERROR, "GenericVerdict WidgetBalanceMetric exception", e);
         }
 
-        return widgetBalanceMetricVerdict;
+        return finalizeVerdicts(verdicts);
     }
 
     // Calculates an aesthetic value between 0.00 (bad) and 100.0 (perfect) center alignment of widgets and give warning if threshold is breached
     // based on the work of "Towards an evaluation of graphical user interfaces aesthetics based on metrics" Zen, Mathieu ; Vanderdonckt, Jean
     // A default threshold value is around 50.0
-    public static Verdict WidgetCenterAlignmentMetric(State state, double tresholdValue) {
+    public static List<Verdict> WidgetCenterAlignmentMetric(State state, double tresholdValue) {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledVerdicts.contains(methodName)) return okVerdicts();
 
-        Verdict widgetCenterAlignmentVerdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
 
         try {
             ArrayList<Rect> regions = getRegions(state);
@@ -418,25 +429,24 @@ public class GenericVerdict {
             if (metric < tresholdValue)
             {
                 String verdictMsg = String.format("Center alignment metric with value %f is below treshold value %f!",  metric, tresholdValue);
-                Verdict verdict = new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
-                widgetCenterAlignmentVerdict = widgetCenterAlignmentVerdict.join(verdict);
+                verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions));
             }
         } catch (Exception e) {
             logger.log(Level.ERROR, "GenericVerdict WidgetCenterAlignmentMetric exception", e);
         }
 
-        return widgetCenterAlignmentVerdict;
+        return finalizeVerdicts(verdicts);
     }
 
     // Calculates an aesthetic value between 0.00 (bad) and 100.0 (perfect) Concentricity of widgets and give warning if threshold is breached
     // based on the work of "Towards an evaluation of graphical user interfaces aesthetics based on metrics" Zen, Mathieu ; Vanderdonckt, Jean
     // A default threshold value is around 50.0
-    public static Verdict WidgetConcentricityMetric(State state, double tresholdValue) {
+    public static List<Verdict> WidgetConcentricityMetric(State state, double tresholdValue) {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledVerdicts.contains(methodName)) return okVerdicts();
 
-        Verdict widgetConcentricityVerdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
 
         try {
             Rect sutRect = (Rect) state.child(0).get(Tags.Shape, null);
@@ -450,26 +460,25 @@ public class GenericVerdict {
                 if (metric < tresholdValue)
                 {
                     String verdictMsg = String.format("Concentricity metric with value %f is below treshold value %f!",  metric, tresholdValue);
-                    Verdict verdict = new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
-                    widgetConcentricityVerdict = widgetConcentricityVerdict.join(verdict);
+                    verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions));
                 }
             }
         } catch (Exception e) {
             logger.log(Level.ERROR, "GenericVerdict WidgetConcentricityMetric exception", e);
         }
 
-        return widgetConcentricityVerdict;
+        return finalizeVerdicts(verdicts);
     }
 
     // Calculates an aesthetic value between 0.00 (bad) and 100.0 (perfect) Density of widgets and give warning if threshold is breached
     // based on the work of "Towards an evaluation of graphical user interfaces aesthetics based on metrics" Zen, Mathieu ; Vanderdonckt, Jean
     // A default threshold value is around minValue: 25, maxValue 75
-    public static Verdict WidgetDensityMetric(State state, double tresholdMinValue, double tresholdMaxValue) {
+    public static List<Verdict> WidgetDensityMetric(State state, double tresholdMinValue, double tresholdMaxValue) {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledVerdicts.contains(methodName)) return okVerdicts();
 
-        Verdict widgetDensityVerdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
 
         try {
             Rect sutRect = (Rect) state.child(0).get(Tags.Shape, null);
@@ -483,33 +492,31 @@ public class GenericVerdict {
                 if (metric < tresholdMinValue)
                 {
                     String verdictMsg = String.format("Density metric with value %f is below treshold minimum value %f! Design too simple.", metric, tresholdMinValue);
-                    Verdict verdict = new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
-                    widgetDensityVerdict = widgetDensityVerdict.join(verdict);
+                    verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions));
                 }
 
                 if (metric > tresholdMaxValue)
                 {
                     String verdictMsg = String.format("Density metric with value %f is higher then treshold maximum value %f! Design too complex.",  metric, tresholdMaxValue);
-                    Verdict verdict = new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
-                    widgetDensityVerdict = widgetDensityVerdict.join(verdict);
+                    verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions));
                 }
             }
         } catch (Exception e) {
             logger.log(Level.ERROR, "GenericVerdict WidgetDensityMetric exception", e);
         }
 
-        return widgetDensityVerdict;
+        return finalizeVerdicts(verdicts);
     }
 
     // Calculates an aesthetic value between 0.00 (complex) and 100.0 (simple) simplicity of widgets and give warning if threshold is breached
     // based on the work of "Towards an evaluation of graphical user interfaces aesthetics based on metrics" Zen, Mathieu ; Vanderdonckt, Jean
     // A default threshold value is around 50.0
-    public static Verdict WidgetSimplicityMetric(State state, double tresholdValue) {
+    public static List<Verdict> WidgetSimplicityMetric(State state, double tresholdValue) {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledVerdicts.contains(methodName)) return okVerdicts();
 
-        Verdict widgetSimplicityVerdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
 
         try {
             Rect sutRect = (Rect) state.child(0).get(Tags.Shape, null);
@@ -522,15 +529,14 @@ public class GenericVerdict {
                 if (metric < tresholdValue)
                 {
                     String verdictMsg = String.format("Simplicity metric with value %f is below treshold value %f!",  metric, tresholdValue);
-                    Verdict verdict = new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions);
-                    widgetSimplicityVerdict = widgetSimplicityVerdict.join(verdict);
+                    verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, regions));
                 }
             }
         } catch (Exception e) {
             logger.log(Level.ERROR, "GenericVerdict WidgetSimplicityMetric exception", e);
         }
 
-        return widgetSimplicityVerdict;
+        return finalizeVerdicts(verdicts);
     }
 
     /**
@@ -547,12 +553,14 @@ public class GenericVerdict {
      * @param checkWebStyles
      * @return
      */
-    public static Verdict WidgetClashDetection(State state,  List<Role> ignoredRoles,  List<String> ignoredClasses, boolean joinVerdicts, boolean checkLeafWidgetsOnly, boolean checkWebStyles) {
+    public static List<Verdict> WidgetClashDetection(State state,  List<Role> ignoredRoles,  List<String> ignoredClasses, boolean joinVerdicts, boolean checkLeafWidgetsOnly, boolean checkWebStyles) {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledVerdicts.contains(methodName)) return okVerdicts();
 
-        Verdict widgetsClasDetectionVerdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
+        List<String> joinedMessages = new ArrayList<>();
+        List<Rect> joinedRects = new ArrayList<>();
 
         try {
             // Prepare a list that contains all the Rectangles from the leaf widgets
@@ -586,7 +594,7 @@ public class GenericVerdict {
                 }
             }
 
-            List<String> reported = new ArrayList();
+            List<String> reported = new ArrayList<>();
             for(int i = 0; i < leafWidgetsRects.size(); i++) {
                 for(int j = i + 1; j < leafWidgetsRects.size(); j++) {
                     if(leafWidgetsRects.get(i) != leafWidgetsRects.get(j)) {
@@ -622,10 +630,12 @@ public class GenericVerdict {
                                 secondWidgetRect.setColor(transparentBlue);
 
                                 if (joinVerdicts) {
-                                    widgetsClasDetectionVerdict = widgetsClasDetectionVerdict.join(new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList(firstWidgetRect, secondWidgetRect)));
+                                    joinedMessages.add(verdictMsg);
+                                    joinedRects.add(firstWidgetRect);
+                                    joinedRects.add(secondWidgetRect);
                                 }
                                 else {
-                                    widgetsClasDetectionVerdict = new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList(firstWidgetRect, secondWidgetRect));
+                                    verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList(firstWidgetRect, secondWidgetRect)));
                                 }
                                 reported.add(firstMsg + secondMsg);
                             }
@@ -637,7 +647,14 @@ public class GenericVerdict {
             logger.log(Level.ERROR, "GenericVerdict WidgetClashDetection exception", e);
         }
 
-        return widgetsClasDetectionVerdict;
+        if (joinVerdicts && !joinedMessages.isEmpty()) {
+            verdicts.add(new Verdict(
+                    Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT,
+                    String.join(System.lineSeparator(), joinedMessages),
+                    joinedRects));
+        }
+
+        return finalizeVerdicts(verdicts);
     }
 
     private static String clashedWidgetMsg(Widget widget, Rect rect)

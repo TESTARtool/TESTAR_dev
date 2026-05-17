@@ -30,7 +30,10 @@
 
 package org.testar.oracles.generic.invariants;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.testar.monkey.alayer.State;
@@ -79,8 +82,8 @@ public class GenericUnicodeReplacementCharacter implements Oracle {
     }
 
     @Override
-    public Verdict getVerdict(State state) {
-        Verdict finalVerdict = Verdict.OK;
+    public List<Verdict> getVerdicts(State state) {
+        List<Verdict> verdicts = new ArrayList<>();
 
         for (Widget w : state) {
             String desc = w.get(textTag, "");
@@ -100,11 +103,15 @@ public class GenericUnicodeReplacementCharacter implements Oracle {
                         Verdict.Severity.WARNING_UI_TRANSLATION_OR_SPELLING_ISSUE,
                         verdictMsg,
                         visualizer);
-                finalVerdict = finalVerdict.join(unicodeVerdict);
+                verdicts.add(unicodeVerdict);
             }
         }
 
-        return finalVerdict;
+        if (!verdicts.isEmpty()) {
+            return verdicts;
+        }
+
+        return Collections.singletonList(Verdict.OK);
     }
 
 }

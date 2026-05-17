@@ -30,7 +30,11 @@
 
 package org.testar.oracles.android.accessibility;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.Visualizer;
@@ -46,8 +50,8 @@ public class AndroidClickableElementWithoutDescription implements Oracle {
     }
 
     @Override
-    public Verdict getVerdict(State state) {
-        Verdict finalVerdict = Verdict.OK;
+    public List<Verdict> getVerdicts(State state) {
+        List<Verdict> verdicts = new ArrayList<>();
 
         for (Widget w : state) {
             if (w.get(AndroidTags.AndroidClickable, false)
@@ -70,11 +74,15 @@ public class AndroidClickableElementWithoutDescription implements Oracle {
                         Verdict.Severity.WARNING_ACCESSIBILITY_FAULT,
                         verdictMsg,
                         visualizer);
-                finalVerdict = finalVerdict.join(accessibilityVerdict);
+                verdicts.add(accessibilityVerdict);
             }
         }
 
-        return finalVerdict;
+        if (!verdicts.isEmpty()) {
+            return verdicts;
+        }
+
+        return Collections.singletonList(Verdict.OK);
     }
 
 }

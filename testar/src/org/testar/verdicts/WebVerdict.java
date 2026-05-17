@@ -72,13 +72,25 @@ public class WebVerdict {
             .map(java.lang.reflect.Method::getName)
             .collect(Collectors.toList());
 
-    public static Verdict AlertSuspiciousMessage(State state, String pattern, Action lastExecutedAction) {
+    private static List<Verdict> okVerdicts() {
+        return Collections.singletonList(Verdict.OK);
+    }
+
+    private static List<Verdict> finalizeVerdicts(List<Verdict> verdicts) {
+        if (verdicts.isEmpty()) {
+            return okVerdicts();
+        }
+
+        return verdicts;
+    }
+
+    public static List<Verdict> AlertSuspiciousMessage(State state, String pattern, Action lastExecutedAction) {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledWebVerdicts.contains(methodName)) return okVerdicts();
 
         // If it is enabled, then execute the verdict implementation
-        Verdict alertVerdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
 
         try {
             if(!WdDriver.alertMessage.isEmpty()) {
@@ -94,14 +106,14 @@ public class WebVerdict {
                     String verdictMsg = String.format("Detected an alert with a suspicious message %s ! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
                             WdDriver.alertMessage, w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
 
-                    alertVerdict = alertVerdict.join(new Verdict(Verdict.Severity.SUSPICIOUS_ALERT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+                    verdicts.add(new Verdict(Verdict.Severity.SUSPICIOUS_ALERT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
                 }
             }
         } catch (Exception e) {
             logger.log(Level.ERROR, "WebVerdict AlertSuspiciousMessage exception", e);
         }
 
-        return alertVerdict;
+        return finalizeVerdicts(verdicts);
     }
 
     // Detect a number with more than given maxDecimals.
@@ -113,13 +125,13 @@ public class WebVerdict {
     // BAD: 100.0003
     // This is possibly wrong because the number should have been nicely formatted. 
     // In rare cases a number with more than 2 decimals is required.
-    public static Verdict NumberWithLotOfDecimals(State state, int maxDecimals, boolean englishCulture) {
+    public static List<Verdict> NumberWithLotOfDecimals(State state, int maxDecimals, boolean englishCulture) {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledWebVerdicts.contains(methodName)) return okVerdicts();
 
         // If it is enabled, then execute the verdict implementation
-        Verdict decimalsVerdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
 
         for(Widget w : state) {
             try {
@@ -147,7 +159,7 @@ public class WebVerdict {
                             String verdictMsg = String.format("Widget with more than %s decimals! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
                                     maxDecimals, w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
 
-                            decimalsVerdict = decimalsVerdict.join(new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+                            verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
                         }
                     }
                 }
@@ -156,7 +168,7 @@ public class WebVerdict {
             }
         }
 
-        return decimalsVerdict;
+        return finalizeVerdicts(verdicts);
     }
 
     private static boolean isNumeric(String strNum) {
@@ -181,13 +193,13 @@ public class WebVerdict {
     // The user cannot distinguish one row from another.
     // The underlying bug could be a technical issue (i.e. all cells have an 'undefined' value) or
     // is more functional, such as a missing column which should make the rows unique and distinguishable
-    public static Verdict DuplicatedRowsInTable(State state) {
+    public static List<Verdict> DuplicatedRowsInTable(State state) {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledWebVerdicts.contains(methodName)) return okVerdicts();
 
         // If it is enabled, then execute the verdict implementation
-        Verdict duplicateRowsInTableVerdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
 
         for(Widget w : state) {
             try {
@@ -213,7 +225,7 @@ public class WebVerdict {
                                 String verdictMsg = String.format("Detected a duplicated rows in a Table! Role: %s , WebId: %s, Description: %s", 
                                         duplicatedWidget.left().get(Tags.Role), duplicatedWidget.left().get(WdTags.WebId, ""), duplicatedWidget.right());
 
-                                duplicateRowsInTableVerdict = duplicateRowsInTableVerdict.join(new Verdict(Verdict.Severity.WARNING_DATA_FILTERING_FAULT, verdictMsg, Arrays.asList((Rect)duplicatedWidget.left().get(Tags.Shape))));
+                                verdicts.add(new Verdict(Verdict.Severity.WARNING_DATA_FILTERING_FAULT, verdictMsg, Arrays.asList((Rect)duplicatedWidget.left().get(Tags.Shape))));
                             }
                         }
                     }
@@ -224,7 +236,7 @@ public class WebVerdict {
             }
         }
 
-        return duplicateRowsInTableVerdict;
+        return finalizeVerdicts(verdicts);
     }
 
     private static void extractAllRowDescriptionsFromTable(Widget w, List<Pair<Widget, String>> rowElementsDescription) {
@@ -257,13 +269,13 @@ public class WebVerdict {
     // It should be better to disable the widget or make it invisible until there are 2 or more items to choose from.
     // The underlying issue could be a technical issue, i.e. a function wasn't called that should fillup the items or
     // a query filter from the database didn't lead to any results	
-    public static Verdict EmptySelectItems(State state) {
+    public static List<Verdict> EmptySelectItems(State state) {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledWebVerdicts.contains(methodName)) return okVerdicts();
 
         // If it is enabled, then execute the verdict implementation
-        Verdict emptySelectListVerdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
 
 
         for(Widget w : state) {
@@ -278,7 +290,7 @@ public class WebVerdict {
                         String verdictMsg = String.format("Empty select element detected! Role: %s , Path: %s , Desc: %s", 
                                 w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
 
-                        emptySelectListVerdict = new Verdict(Verdict.Severity.WARNING_UI_ITEM_VISIBILITY_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+                        verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_ITEM_VISIBILITY_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
                     }
                 }
             } catch (Exception e) {
@@ -286,7 +298,7 @@ public class WebVerdict {
             }
         }
 
-        return emptySelectListVerdict;
+        return finalizeVerdicts(verdicts);
     }
 
     // Detects duplicate or repeated text in descriptions of widgets
@@ -303,13 +315,13 @@ public class WebVerdict {
     // For example, the TO field of an e-mail should only have unique e-mailadresses, or the Authors field of a report should only have unique authors
     // This could be a technical issue, where a boundary of a loop is off, or concatenating a string value twice.
     // If False positives arise, the ignorePatternRegEx could be used to fine-tune the detection by ignoring these false positives with a anti-pattern
-    public static Verdict DuplicateText(State state, String ignorePatternRegEx)
+    public static List<Verdict> DuplicateText(State state, String ignorePatternRegEx)
     {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledWebVerdicts.contains(methodName)) return okVerdicts();
 
-        Verdict verdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
 
         try {
             // The expression looks only if the start of the text is repeated somewhere else in the text
@@ -326,14 +338,14 @@ public class WebVerdict {
                 if (matcher.find() && (ignorePatternRegEx == "" || !ignoreMatcher.find())) {
                     String verdictMsg = String.format("Detected duplicated or repeated text in description of widget! Role: %s , Path: %s , WebId: %s , Desc: %s , WebTextContent: %s", 
                             w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebTextContent, ""));
-                    verdict = verdict.join(new Verdict(Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+                    verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
                 }
             }
         } catch (Exception e) {
             logger.log(Level.ERROR, "WebVerdict DuplicateText exception", e);
         }
 
-        return verdict;
+        return finalizeVerdicts(verdicts);
     }
 
     // Detect HTML or XML tags in description of widget.
@@ -343,13 +355,13 @@ public class WebVerdict {
     // The idea is that a description should not show markup tags, but should probably show the text in bold, italic, and so on.
     // If there are html tags which can be ignored, then this can be specified in the ignorePatternRegEx parameter
     // If False positives arise, the ignorePatternRegEx could be used to fine-tune the detection by ignoring these false positives with an anti-pattern
-    public static Verdict HTMLOrXMLTagsInText(State state, String ignorePatternRegEx)
+    public static List<Verdict> HTMLOrXMLTagsInText(State state, String ignorePatternRegEx)
     {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledWebVerdicts.contains(methodName)) return okVerdicts();
 
-        Verdict verdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
 
         try {
             String patternRegex = "\\&.*\\;|\\w\\%\\w\\w|<[^>]*>"; // \&.*\;|\w\%\w\w|<[^>]*>
@@ -365,22 +377,22 @@ public class WebVerdict {
                 if (matcher.find() && (ignorePatternRegEx == "" || !ignoreMatcher.find())) {
                     String verdictMsg = String.format("Detected HTML or XML tags in description of widget! Role: %s , Path: %s , WebId: %s , Desc: %s , WebTextContent: %s", 
                             w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebTextContent, ""));
-                    verdict = verdict.join(new Verdict(Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+                    verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
                 }
             }
         } catch (Exception e) {
             logger.log(Level.ERROR, "WebVerdict HTMLOrXMLTagsInText exception", e);
         }
 
-        return verdict;
+        return finalizeVerdicts(verdicts);
     }
 
-    public static Verdict SingleSelectItems(State state) {
+    public static List<Verdict> SingleSelectItems(State state) {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledWebVerdicts.contains(methodName)) return okVerdicts();
 
-        Verdict selectElementVerdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
 
         for(Widget w : state) {
             try {
@@ -394,7 +406,7 @@ public class WebVerdict {
                         String verdictMsg = String.format("Only one item in select element detected! Role: %s , Path: %s , Desc: %s", 
                                 w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
 
-                        selectElementVerdict = new Verdict(Verdict.Severity.WARNING_UI_ITEM_VISIBILITY_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+                        verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_ITEM_VISIBILITY_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
                     }
                 }
             } catch (Exception e) {
@@ -402,15 +414,15 @@ public class WebVerdict {
             }
         }
 
-        return selectElementVerdict;
+        return finalizeVerdicts(verdicts);
     }
 
-    public static Verdict TooManyItemSelectItems(State state, int thresholdValue) {
+    public static List<Verdict> TooManyItemSelectItems(State state, int thresholdValue) {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledWebVerdicts.contains(methodName)) return okVerdicts();
 
-        Verdict selectElementVerdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
 
         for(Widget w : state) {
             try {
@@ -425,7 +437,7 @@ public class WebVerdict {
                         String verdictMsg = String.format("Dropdownlist has %d items, which is more than theshold value of %s! Role: %s , Path: %s , Desc: %s", 
                                 selectItemsLength.intValue(), thresholdValue, w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
 
-                        selectElementVerdict = new Verdict(Verdict.Severity.WARNING_DATA_FILTERING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+                        verdicts.add(new Verdict(Verdict.Severity.WARNING_DATA_FILTERING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
                     }
                 }
             } catch (Exception e) {
@@ -433,7 +445,7 @@ public class WebVerdict {
             }
         }
 
-        return selectElementVerdict;
+        return finalizeVerdicts(verdicts);
     }
 
     // TODO: Give optionally a list of Custom comparators, such as 'Security level'
@@ -446,13 +458,13 @@ public class WebVerdict {
     // BAD:  B, C, A
     // Note that there are different sorting types, such as natural, alphabetic, ascii, numerical, dictionary, logical orders. 
     // This verdict tests with natural order.
-    public static Verdict UnsortedSelectItems(State state) {
+    public static List<Verdict> UnsortedSelectItems(State state) {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledWebVerdicts.contains(methodName)) return okVerdicts();
 
         // If it is enabled, then execute the verdict implementation
-        Verdict unsortedSelectElementVerdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
 
         for(Widget w : state) {
             try {
@@ -473,8 +485,7 @@ public class WebVerdict {
                             String verdictMsg = String.format("Detected a Select web element with unsorted elements! Role: %s , Path: %s , WebId: %s", 
                                     w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""));
 
-                            Verdict matchVerdict = new Verdict(Verdict.Severity.WARNING_DATA_SORTING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
-                            unsortedSelectElementVerdict = unsortedSelectElementVerdict.join(matchVerdict);
+                            verdicts.add(new Verdict(Verdict.Severity.WARNING_DATA_SORTING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
                         }
                     }
                 }
@@ -483,7 +494,7 @@ public class WebVerdict {
             }
         }
 
-        return unsortedSelectElementVerdict;
+        return finalizeVerdicts(verdicts);
     }
 
     // Detect duplicated items in a Select (dropdownlist/listbox)
@@ -495,13 +506,13 @@ public class WebVerdict {
     // The user cannot distinguish one item from another.
     // The underlying bug could be a technical issue (i.e. all or some items have an 'undefined' value) or
     // is functional, such as the items should have a more distinguishable display value
-    public static Verdict DuplicateSelectItems(State state) {
+    public static List<Verdict> DuplicateSelectItems(State state) {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledWebVerdicts.contains(methodName)) return okVerdicts();
 
         // If it is enabled, then execute the verdict implementation
-        Verdict duplicateSelectItemsVerdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
 
         for(Widget w : state) {
             try {
@@ -527,14 +538,14 @@ public class WebVerdict {
                             String verdictMsg = String.format("Detected a Select web element with duplicate display value elements! Role: %s , Path: %s , WebId: %s , Duplicate item(s): %s", 
                                     w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), String.join(",", duplicatesTexts));
 
-                            return new Verdict(Verdict.Severity.WARNING_DATA_FILTERING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+                            verdicts.add(new Verdict(Verdict.Severity.WARNING_DATA_FILTERING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
                         }
                         if(duplicatesValues.size() > 0)
                         {
                             String verdictMsg = String.format("Detected a Select web element with duplicate underlying value elements! Role: %s , Path: %s , WebId: %s , Duplicate item(s): %s", 
                                     w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), String.join(",", duplicatesValues));
 
-                            return new Verdict(Verdict.Severity.WARNING_DATA_FILTERING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+                            verdicts.add(new Verdict(Verdict.Severity.WARNING_DATA_FILTERING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
                         }
                     }
                 }
@@ -543,7 +554,7 @@ public class WebVerdict {
             }
         }
 
-        return duplicateSelectItemsVerdict;
+        return finalizeVerdicts(verdicts);
     }
 
     // Detect duplicated items in an unnumbered lists (UL)
@@ -555,10 +566,10 @@ public class WebVerdict {
     // The user cannot distinguish one item from another.
     // The underlying bug could be a technical issue (i.e. all or some items have an 'undefined' value) or
     // is functional, such as the items should have a more distinguishable display value
-    public static Verdict DuplicateULItems(State state) {
+    public static List<Verdict> DuplicateULItems(State state) {
 
         // If it is enabled, then execute the verdict implementation
-        Verdict duplicateItemsVerdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
 
         for(Widget w : state) {
             try {
@@ -582,7 +593,7 @@ public class WebVerdict {
                         String verdictMsg = String.format("Detected a Unnumbered List (UL) web element with duplicate option elements! Role: %s , Path: %s , WebId: %s , Duplicate item(s): %s", 
                                 w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), String.join(",", duplicatesTexts));
 
-                        duplicateItemsVerdict = duplicateItemsVerdict.join(new Verdict(Verdict.Severity.WARNING_DATA_FILTERING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+                        verdicts.add(new Verdict(Verdict.Severity.WARNING_DATA_FILTERING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
                     }
                 }
             } catch (Exception e) {
@@ -590,7 +601,7 @@ public class WebVerdict {
             }
         }
 
-        return duplicateItemsVerdict;
+        return finalizeVerdicts(verdicts);
     }
 
     private static Set<String> findDuplicates(List<String> list) {
@@ -626,7 +637,7 @@ public class WebVerdict {
         List<String> copyListOfStrings = new ArrayList<>(original);
         Collator coll = Collator.getInstance(Locale.US);
         // Primary: a vs b
-        // SECONDARY: a vs ä
+        // SECONDARY: a vs Ã¤
         // TERTIARY: a vs A
         // IDENTICAL: unicode comparison
         coll.setStrength(Collator.PRIMARY);
@@ -645,13 +656,13 @@ public class WebVerdict {
         return original.equals(copyListOfStrings);
     }
 
-    public static Verdict TextAreaWithoutLength(State state, List<Role> roles) {
+    public static List<Verdict> TextAreaWithoutLength(State state, List<Role> roles) {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledWebVerdicts.contains(methodName)) return okVerdicts();
 
         // If it is enabled, then execute the verdict implementation
-        Verdict textAreaVerdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
 
         for(Widget w : state) {
             try {
@@ -660,25 +671,25 @@ public class WebVerdict {
                     String verdictMsg = String.format("TextArea Widget with 0 Length detected! Role: %s , Path: %s , WebId: %s", 
                             w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""));
 
-                    textAreaVerdict = textAreaVerdict.join(new Verdict(Verdict.Severity.WARNING_UI_FLOW_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+                    verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_FLOW_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
                 }
             } catch (Exception e) {
                 logger.log(Level.ERROR, "WebVerdict TextAreaWithoutLength exception", e);
             }
         }
 
-        return textAreaVerdict;
+        return finalizeVerdicts(verdicts);
     }
 
     //TODO: Check bug fixed by Robin (for example some div exists and will be filled later)
     // TODO: Improve this element without children using white list and black list using the class name to filtering out
-    public static Verdict ElementWithoutChildren(State state, List<Role> roles) {
+    public static List<Verdict> ElementWithoutChildren(State state, List<Role> roles) {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledWebVerdicts.contains(methodName)) return okVerdicts();
 
         // If it is enabled, then execute the verdict implementation
-        Verdict emptyChildrenVerdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
 
         for(Widget w : state) {
             try {
@@ -687,24 +698,24 @@ public class WebVerdict {
                     String verdictMsg = String.format("Detected a Web element without child elements! Role: %s , Path: %s , WebId: %s", 
                             w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""));
 
-                    emptyChildrenVerdict = emptyChildrenVerdict.join(new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+                    verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
                 }
             } catch (Exception e) {
                 logger.log(Level.ERROR, "WebVerdict ElementWithoutChildren exception", e);
             }
         }
 
-        return emptyChildrenVerdict;
+        return finalizeVerdicts(verdicts);
     }
 
 
-    public static Verdict SingleRadioInput(State state) {
+    public static List<Verdict> SingleRadioInput(State state) {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledWebVerdicts.contains(methodName)) return okVerdicts();
 
         // If it is enabled, then execute the verdict implementation
-        Verdict radioInputVerdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
 
         for(Widget w : state) {
             try {
@@ -724,7 +735,7 @@ public class WebVerdict {
 
                             String verdictMsg = String.format("Detected a Web radio input element with a Unique option! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
                                     w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
-                            radioInputVerdict = radioInputVerdict.join(new Verdict(Verdict.Severity.WARNING_UI_ITEM_VISIBILITY_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+                            verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_ITEM_VISIBILITY_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
                         }
                     }
                 }
@@ -733,7 +744,7 @@ public class WebVerdict {
             }
         }
 
-        return radioInputVerdict;
+        return finalizeVerdicts(verdicts);
     }
 
     private static Widget findParentByRole(Widget w, Role role)
@@ -767,13 +778,13 @@ public class WebVerdict {
     // GOOD: 
     // If zero values are shown in tables/grids, then this clutter the grid. It is better to don't display zero values. 
     // Exception to this rule may be row totals or column totals. 
-    public static Verdict ZeroNumbersInTable(State state)
+    public static List<Verdict> ZeroNumbersInTable(State state)
     {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledWebVerdicts.contains(methodName)) return okVerdicts();
 
-        Verdict verdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
 
         try {
             String patternRegex = "\\s0[\\.,]0\\s";
@@ -788,7 +799,7 @@ public class WebVerdict {
                     if (matcher.find()) {
                         String verdictMsg = String.format("Detected zero values in table/grids! Role: %s , Path: %s , WebId: %s , Desc: %s , WebTextContent: %s", 
                                 w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.Desc, ""), w.get(WdTags.WebTextContent, ""));
-                        verdict = verdict.join(new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+                        verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
                     }
                 }
             }
@@ -796,7 +807,7 @@ public class WebVerdict {
             logger.log(Level.ERROR, "WebVerdict ZeroNumbersInTable exception", e);
         }
 
-        return verdict;
+        return finalizeVerdicts(verdicts);
     }
 
     private static boolean isSonOfTD(Widget widget) {
@@ -814,13 +825,13 @@ public class WebVerdict {
     //	   Displayed size: 2000 x 2000 px
     // GOOD: Natural size : 1000 x 1000 px
     //	   Displayed size: 1000 x 1000 px
-    public static Verdict imageResolutionDifferences(State state, long minimalWidth, long minimalHeight)
+    public static List<Verdict> imageResolutionDifferences(State state, long minimalWidth, long minimalHeight)
     {
         // If this method is NOT enabled, just return verdict OK
         String methodName = new Object() {}.getClass().getEnclosingMethod().getName();
-        if(!enabledWebVerdicts.contains(methodName)) return Verdict.OK;
+        if(!enabledWebVerdicts.contains(methodName)) return okVerdicts();
 
-        Verdict verdict = Verdict.OK;
+        List<Verdict> verdicts = new ArrayList<>();
 
         for (Widget w : state){
             try {
@@ -839,7 +850,7 @@ public class WebVerdict {
                             String verdictMsg = String.format("Detected image resolution difference! Role: %s , Path: %s , Natural size %d x %d px , Displayed size: %d x %d px, Src: %s, Alt: %s",
                                     w.get(Tags.Role), w.get(Tags.Path), naturalWidth, naturalHeight, displayedWidth, displayedHeight, w.get(WdTags.WebSrc), w.get(WdTags.WebAlt));
 
-                            verdict = verdict.join(new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList(widgetRect)));
+                            verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT, verdictMsg, Arrays.asList(widgetRect)));
                         }
                     }
                 }
@@ -848,6 +859,6 @@ public class WebVerdict {
             }
         }
 
-        return verdict;
+        return finalizeVerdicts(verdicts);
     }
 }

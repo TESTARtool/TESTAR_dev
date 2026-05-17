@@ -32,6 +32,7 @@ package org.testar.oracles.android.invariants;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.testar.monkey.Pair;
@@ -54,8 +55,8 @@ public class AndroidClashClickableWidgets implements Oracle {
     }
 
     @Override
-    public Verdict getVerdict(State state) {
-        Verdict finalVerdict = Verdict.OK;
+    public List<Verdict> getVerdicts(State state) {
+        List<Verdict> verdicts = new ArrayList<>();
 
         // Prepare a list that contains all the Rectangles from the clickable (and displayed) widgets
         List<Pair<Widget, Rect>> clickableWidgetsRects = new ArrayList<>();
@@ -105,12 +106,16 @@ public class AndroidClashClickableWidgets implements Oracle {
                             Verdict.Severity.WARNING_UI_VISUAL_OR_RENDERING_FAULT,
                             verdictMsg,
                             visualizer);
-                    finalVerdict = finalVerdict.join(clashVerdict);
+                    verdicts.add(clashVerdict);
                 }
             }
         }
 
-        return finalVerdict;
+        if (!verdicts.isEmpty()) {
+            return verdicts;
+        }
+
+        return Collections.singletonList(Verdict.OK);
     }
 
     private String widgetDesc(Widget w) {

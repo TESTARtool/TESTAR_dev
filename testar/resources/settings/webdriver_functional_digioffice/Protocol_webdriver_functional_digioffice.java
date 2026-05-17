@@ -136,8 +136,6 @@ import static org.testar.monkey.alayer.webdriver.Constants.scrollThick;
 
 public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol {
 	private Action functionalAction = null;
-	private Verdict functionalVerdict = Verdict.OK;
-	private List<String> listErrorVerdictInfo = new ArrayList<>();
 
 	// Watcher service
 	Path downloadsPath;
@@ -180,61 +178,14 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 		super.initialize(settings);
 	}
 
-
 	/**
 	 * This method is called before the first test sequence, allowing for example setting up the test environment
 	 */
 	@Override
 	protected void initTestSession() {
 		super.initTestSession();
-		listErrorVerdictInfo = new ArrayList<>();
-
-       
 	}
 
-    private String errorVerdictInfoFilePath()
-    {
-        return Main.settingsDir + File.separator + "webdriver_functional_digioffice" + File.separator + "ErrorVerdictInfo.txt";
-    }
-
-    private void loadErrorVerdictInfoFile()
-    {   
-         ObjectInputStream ois = null;
-         try
-         {
-            File errorVerdictInfoFile = new File(errorVerdictInfoFilePath()).getCanonicalFile();
-            if (errorVerdictInfoFile.exists())
-            {
-                FileInputStream fis = new FileInputStream(errorVerdictInfoFile);
-                ois = new ObjectInputStream(fis);
-                listErrorVerdictInfo  = (List) ois.readObject();
-                ois.close();
-            }
-            
-        }
-        catch(ClassNotFoundException e)            
-        {
-            e.printStackTrace();
-        }
-        catch(IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
-    
-
-    private void saveErrorVerdictInfoFile()
-    {   
-        try (FileOutputStream fos = new FileOutputStream(errorVerdictInfoFilePath());
-            ObjectOutputStream oos = new ObjectOutputStream(fos);) {
-            oos.writeObject(listErrorVerdictInfo);
-
-        } 
-        catch (IOException e) {
-           e.printStackTrace();
-        }
-    }
-    
 	/**
 	 * This methods is called before each test sequence, before startSystem(),
 	 * allowing for example using external profiling software on the SUT
@@ -265,7 +216,6 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 
 		// Reset the functional action and verdict
 		functionalAction = null;
-		functionalVerdict = Verdict.OK;
 		// Reset the form track for the new sequence
 		// This will allow to check again the formButtonMustBeDisabledIfNoChangesVerdict verdict
 		_pristineStateForm = true;
@@ -336,9 +286,6 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 	protected void beginSequence(SUT system, State state) {
 		super.beginSequence(system, state);
 
-        // Load known errors in list
-        loadErrorVerdictInfoFile();
-        
 		// Reset the list of downloaded files
 		watchEventDownloadedFiles = new ArrayList<>();
 		// Create a watch service to check which files are downloaded when testing the SUT
@@ -450,37 +397,22 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 	 * @return oracle verdict, which determines whether the state is erroneous and why.
 	 */
 	@Override
-	protected Verdict getVerdict(State state) {
-		// Obtain suspicious title verdicts
-		Verdict verdict = super.getVerdict(state);
-
-		// If the suspicious title Verdict is not OK but was already detected in a previous sequence
-		// Consider as OK and continue the checking functional Verdicts
-		// Else return the suspicious Verdict
-		String suspiciousTitleVerdictInfo = verdict.info().replace("\n", " ");
-		if( listErrorVerdictInfo.stream().anyMatch( verdictInfo -> verdictInfo.contains( suspiciousTitleVerdictInfo ))) {
-			verdict = Verdict.OK;
-			webConsoleVerdict = Verdict.OK;
-		} else if (verdict.severity() != Verdict.OK.severity()) {
-			return verdict;
-		}
-
-		verdict = getUniqueFunctionalVerdict(verdict, state);
-
-		// If the functional Verdict is not OK but was already detected in a previous sequence
-		// Consider as OK and continue the checking future state
-		String functionalVerdictInfo = verdict.info().replace("\n", " ");
-		if( listErrorVerdictInfo.stream().anyMatch( verdictInfo -> verdictInfo.contains( functionalVerdictInfo ))) {
-			verdict = Verdict.OK;
-		}
+	protected List<Verdict> getVerdicts(State state) {
+		List<Verdict> verdicts = new ArrayList<>();
+		addNewVerdicts(verdicts, super.getVerdicts(state));
+		addNewVerdicts(verdicts, getFunctionalVerdicts(state));
 
 		// Uncomment when you want to write a 3D OBJ file to the settings directory. https://en.wikipedia.org/wiki/Wavefront_.obj_file
 		// The obj file can be inserted as a 3D model in PowerPoint or can be used in modeling tool such as Blender to animate and give it texture.
 		// Nice to have: It would have been nice to have a hotkey in Spy mode to export the 3D model instead of using it in test loop.
 		// Nice to have: Use it in visual clash detection and color the clashing widgets.
         //build3DObjectFileFromGuiState(state);
+
+		if (verdicts.isEmpty()) {
+			return Collections.singletonList(Verdict.OK);
+		}
         
-		return verdict;
+		return verdicts;
 	}
 
 
@@ -495,25 +427,26 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 
         writeTextToFile(obj3DFilePath(),objBuilder.toString());
     }
-	/**
-	 * We want to return the verdict if it is not OK, 
-	 * and not on the detected failures list (it's a new failure). 
-	 * 
-	 * @param verdict
-	 * @return
-	 */
-	private boolean shouldReturnVerdict(Verdict verdict) {
-		return verdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch(info -> info.contains(verdict.info().replace("\n", " ")));
-	}
 
+    private void addNewVerdicts(List<Verdict> verdicts, List<Verdict> candidates) {
+        if (candidates == null) {
+            return;
+        }
+
+        for (Verdict verdict : candidates) {
+            if (verdict != null && verdict.severity() > Verdict.OK.severity()) {
+                verdicts.add(verdict);
+            }
+        }
+    }
 
 	// Detect text decorated with ^ characters, this means in DigiOffice that this text has no translation key and will not be translated when UI language is changed in DigiOffice
 	// BAD:  ^Untranslated text^
     //       ^UntranslatedText^
 	// GOOD: Untranslated text
-	private Verdict detectUntranslatedText(State state)
+	private List<Verdict> detectUntranslatedText(State state)
 	{
-		Verdict verdict = Verdict.OK;
+		List<Verdict> verdicts = new ArrayList<>();
 		String patternRegex = "\\^.*\\^";
 		Pattern pattern = Pattern.compile(patternRegex);
 		
@@ -524,10 +457,10 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 			if (matcher.find()) {
 				String verdictMsg = String.format("Detected untranslated tags in widget! Role: %s , Path: %s , Desc: %s , WebTextContent: %s", 
 						w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.Desc, ""), w.get(WdTags.WebTextContent, ""));
-				verdict = verdict.join(new Verdict(Verdict.Severity.WARNING_UI_TRANSLATION_OR_SPELLING_ISSUE, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+				verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_TRANSLATION_OR_SPELLING_ISSUE, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
 			}
 		}
-		return verdict;
+		return verdicts;
 	}
 
 	// Detect widgets that should be in sync
@@ -538,9 +471,9 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 	//       Warning icon should match the warning message
     //		 Focused navigation item should match Title
 	//
-	private Verdict detectWidgetsThatShouldBeInSync(State state)
+	private List<Verdict> detectWidgetsThatShouldBeInSync(State state)
 	{
-		Verdict verdict = Verdict.OK;
+		List<Verdict> verdicts = new ArrayList<>();
 
 		// Page title
 		String queryPageTitle = "return document.navContent.document.querySelector('#ctl00_cphDetail_ctl00_pnlMenu > div.ContentTitle').innerText";
@@ -558,7 +491,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 			{
 				String verdictMsg = String.format("Page title and navigation title are not the same! PageTitle: %s , NavigationItem: %s", 
 						pageTitle, navItem);
-				verdict = verdict.join(new Verdict(Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT, verdictMsg));
+				verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT, verdictMsg));
 			}
 		}
 
@@ -568,15 +501,17 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
         if (checkTableTDsAndTableCountMessage != null && !checkTableTDsAndTableCountMessage.isEmpty())
         {
             System.out.println("Comparing checkTableTDsAndTableCountMessage: " + checkTableTDsAndTableCountMessage);
-            verdict = verdict.join(new Verdict(Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT, checkTableTDsAndTableCountMessage));
+            verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT, checkTableTDsAndTableCountMessage));
         }
-		return verdict;
+		return verdicts;
 	}
 
 
     // TODO: Gives false positives when opening Div style forms, such as Notitie fields. The OK button seems to be working in the UI, but TESTAR doesn't see that as a change.'
     // Dummy button
-	private Verdict functionalButtonVerdict(State state, String ignorePatternRegEx) {
+	private List<Verdict> functionalButtonVerdict(State state, String ignorePatternRegEx) {
+        List<Verdict> verdicts = new ArrayList<>();
+
 		// If the last executed action is a click on a web button
 		if(functionalAction != null 
 				&& functionalAction.get(Tags.OriginWidget, null) != null 
@@ -603,7 +538,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 				    String verdictMsg = String.format("Dummy Button detected! Role: %s , Path: %s , Desc: %s", 
 						w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
 
-				    functionalVerdict = new Verdict(Verdict.Severity.WARNING_UI_FLOW_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+				    verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_FLOW_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
                 }
 			}
 
@@ -614,7 +549,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 			functionalAction = null;
 		}
 
-		return functionalVerdict;
+		return verdicts;
 	}
 
 	// https://www.baeldung.com/java-file-extension
@@ -624,8 +559,8 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 	      .map(f -> f.substring(filename.lastIndexOf(".") + 1));
 	}
 
-	private Verdict watcherFileEmptyFile() {
-		Verdict watcherEmptyfileVerdict = Verdict.OK;
+	private List<Verdict> watcherFileEmptyFile() {
+		List<Verdict> verdicts = new ArrayList<>();
 
 		try {
 			// If the register watcher detected some downloaded file
@@ -643,7 +578,7 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
     					{
     						String verdictMsg = String.format("Detected a downloaded file '%s' without file extension!", file);
     
-    						watcherEmptyfileVerdict = watcherEmptyfileVerdict.join(new Verdict(Verdict.Severity.WARNING_DATA_DATA_VALUE_NOT_STORED_OR_DELETED, verdictMsg));
+    						verdicts.add(new Verdict(Verdict.Severity.WARNING_DATA_DATA_VALUE_NOT_STORED_OR_DELETED, verdictMsg));
     					}
     					
     					BufferedReader br = new BufferedReader(new FileReader(filePath));     
@@ -655,13 +590,13 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
     							String verdictMsg = String.format("Detected a downloaded file of 0kb after interacting with! Role: %s , Path: %s , WebId: %s , WebTextContent: %s", 
     									WdDriver.alertMessage, w.get(Tags.Role), w.get(Tags.Path), w.get(WdTags.WebId, ""), w.get(WdTags.WebTextContent, ""));
     
-    							watcherEmptyfileVerdict = watcherEmptyfileVerdict.join(new Verdict(Verdict.Severity.WARNING_DATA_DATA_VALUE_NOT_STORED_OR_DELETED, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
+    							verdicts.add(new Verdict(Verdict.Severity.WARNING_DATA_DATA_VALUE_NOT_STORED_OR_DELETED, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
     						} 
     						// If there is no widget in the last executed action, just report a message
     						else {
     							String verdictMsg = String.format("Detected a downloaded file of 0kb!");
     
-    							watcherEmptyfileVerdict = watcherEmptyfileVerdict.join(new Verdict(Verdict.Severity.WARNING_DATA_DATA_VALUE_NOT_STORED_OR_DELETED, verdictMsg));
+    							verdicts.add(new Verdict(Verdict.Severity.WARNING_DATA_DATA_VALUE_NOT_STORED_OR_DELETED, verdictMsg));
     						}
     
     					}
@@ -670,10 +605,11 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 			}
 		} catch(Exception e) {}
 
-		return watcherEmptyfileVerdict;
+		return verdicts;
 	}
 
-	private Verdict formButtonEnabledAfterTypingChangesVerdict(State state) {
+	private List<Verdict> formButtonEnabledAfterTypingChangesVerdict(State state) {
+        List<Verdict> verdicts = new ArrayList<>();
 		List<String> descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges = new ArrayList<>();
 		descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("btnOpslaan");
 		descriptionsOfWidgetsThatShouldBeEnabledWhenFormHasUnsavedChanges.add("btnOpslaanEnSluiten");
@@ -697,13 +633,13 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 					if (isDisabled(w))	{
 						String verdictMsg = String.format("Form widget is not enabled while it should be! Role: %s , Path: %s , Desc: %s", 
 								w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
-						return new Verdict(Verdict.Severity.WARNING_UI_ITEM_VISIBILITY_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+						verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_ITEM_VISIBILITY_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
 					}
 				}
 			}
 		}
 
-		return Verdict.OK;
+		return verdicts;
 	}
 	
 	private boolean isDisabled(Widget w)
@@ -712,7 +648,8 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
         return w.get(WdTags.WebCssClasses, "").contains("item-disabled");
 	}
 
-	private Verdict formButtonMustBeDisabledIfNoChangesVerdict(State state) {
+	private List<Verdict> formButtonMustBeDisabledIfNoChangesVerdict(State state) {
+        List<Verdict> verdicts = new ArrayList<>();
 		List<String> descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges = new ArrayList<>();
 		descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges.add("btnOpslaan");
 		descriptionsOfWidgetsThatShouldBeDisabledIfFormHasNoChanges.add("btnOpslaanEnSluiten");
@@ -727,14 +664,14 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 					if (!isDisabled(w))	{
 						String verdictMsg = String.format("Form widget is enabled while it should not be! Role: %s , Path: %s , Desc: %s", 
 								w.get(Tags.Role), w.get(Tags.Path), w.get(Tags.Desc, ""));
-						return new Verdict(Verdict.Severity.WARNING_UI_ITEM_VISIBILITY_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape)));
+						verdicts.add(new Verdict(Verdict.Severity.WARNING_UI_ITEM_VISIBILITY_FAULT, verdictMsg, Arrays.asList((Rect)w.get(Tags.Shape))));
 					}
 
 				}
 			}
 		}
 
-		return Verdict.OK;
+		return verdicts;
 	}
 
 	private boolean isSonOfFormWidget(Widget widget) {
@@ -924,67 +861,56 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
 	@Override
 	protected void finishSequence() {
 		super.finishSequence();
-		// If the final Verdict is not OK and the verdict is not saved in the list
-		// This is a new run fail verdict
-		if(getFinalVerdict().severity() > Verdict.Severity.OK.getValue() && !listErrorVerdictInfo.contains(getFinalVerdict().info().replace("\n", " "))) {
-			listErrorVerdictInfo.add(getFinalVerdict().info().replace("\n", " "));
-            saveErrorVerdictInfoFile();
-		}
 	}
     
 	/**
-	 * This method returns a unique functional failure verdict of one state. 
-	 * We do not join and do not report multiple failures together.
-	 * 
-	 * @param verdict
+	 * This method returns the functional failure verdicts of one state.
+	 *
 	 * @param state
 	 * @return
 	 */
-	private Verdict getUniqueFunctionalVerdict(Verdict verdict, State state) {
+	private List<Verdict> getFunctionalVerdicts(State state) {
+		List<Verdict> verdicts = new ArrayList<>();
     
 		// Check the functional Verdict that detects the spell checking.
 		// Instead of stop the sequence and report a warning verdict,
 		// report the information in a specific HTML report
 		// and continue testing
-		
-		//Verdict spellCheckerVerdict = GenericVerdict.SpellChecker(state, WdTags.WebTextContent, new Dutch(), "Pagina generatietijd.*|\\d\\d.*");
-		//if(spellCheckerVerdict != Verdict.OK) HTMLStateVerdictReport.reportStateVerdict(actionCount, state, spellCheckerVerdict);
+
+		/*
+		List<Verdict> spellCheckerVerdicts = GenericVerdict.SpellChecker(state, WdTags.WebTextContent, new Dutch(), "Pagina generatietijd.*|\\d\\d.*");
+		for (Verdict spellCheckerVerdict : spellCheckerVerdicts) {
+			if (spellCheckerVerdict.severity() > Verdict.OK.severity()) {
+				HTMLStateVerdictReport.reportStateVerdict(actionCount, state, spellCheckerVerdict);
+			}
+		}
+		*/
 
 		// Check the functional Verdict that detects if a form button is disabled after modifying the form inputs.
-		//verdict = formButtonEnabledAfterTypingChangesVerdict(state);
-		//if (shouldReturnVerdict(verdict)) return verdict;
+        //addNewVerdicts(verdicts, formButtonEnabledAfterTypingChangesVerdict(state));
 
 		// Check the functional Verdict that detects if a form button is enabled when it must not.
-		//verdict = formButtonMustBeDisabledIfNoChangesVerdict(state);
-		//if (shouldReturnVerdict(verdict)) return verdict;
+        //addNewVerdicts(verdicts, formButtonMustBeDisabledIfNoChangesVerdict(state));
         
-        verdict = WebVerdict.imageResolutionDifferences(state,2,2);
-        if (shouldReturnVerdict(verdict)) return verdict;
+        addNewVerdicts(verdicts, WebVerdict.imageResolutionDifferences(state,2,2));
         
-        verdict = GenericVerdict.WidgetAlignmentMetric(state, 50.0);
-        if (shouldReturnVerdict(verdict)) return verdict;
+        addNewVerdicts(verdicts, GenericVerdict.WidgetAlignmentMetric(state, 50.0));
         
         /*
-        verdict = GenericVerdict.WidgetBalanceMetric(state, 50.0);
-        if (shouldReturnVerdict(verdict)) return verdict;
+        addNewVerdicts(verdicts, GenericVerdict.WidgetBalanceMetric(state, 50.0));
         
-        verdict = GenericVerdict.WidgetCenterAlignmentMetric(state, 50.0);
-        if (shouldReturnVerdict(verdict)) return verdict;
+        addNewVerdicts(verdicts, GenericVerdict.WidgetCenterAlignmentMetric(state, 50.0));
         
-        verdict = GenericVerdict.WidgetConcentricityMetric(state, 50.0);
-        if (shouldReturnVerdict(verdict)) return verdict;
-       
+        addNewVerdicts(verdicts, GenericVerdict.WidgetConcentricityMetric(state, 50.0));
         
-        verdict = GenericVerdict.WidgetDensityMetric(state, 10.0, 90.0);
-        if (shouldReturnVerdict(verdict)) return verdict;
+        addNewVerdicts(verdicts, GenericVerdict.WidgetDensityMetric(state, 10.0, 90.0));
         
-        verdict = GenericVerdict.WidgetSimplicityMetric(state, 50.0);
-        if (shouldReturnVerdict(verdict)) return verdict;
+        addNewVerdicts(verdicts, GenericVerdict.WidgetSimplicityMetric(state, 50.0));
         */
         
         // Check the functional Verdict that detects if two widgets overlap
 		// Also, add the roles or the classes of the widget sub-trees are needed to ignore
- 		verdict = GenericVerdict.WidgetClashDetection(state, 
+ 		addNewVerdicts(verdicts, GenericVerdict.WidgetClashDetection(state, 
 				Arrays.asList(WdRoles.WdCOL, WdRoles.WdCOLGROUP), // ignoredRoles, 
                 Arrays.asList(
                 /* whitelist: */
@@ -1048,98 +974,75 @@ public class Protocol_webdriver_functional_digioffice extends WebdriverProtocol 
                              ), //ignoredClasses
                 true, // joinVerdicts	
                 false,  // checkOnlyLeafWidgets
-                true); // checkWebStyles	
- 		if (shouldReturnVerdict(verdict)) return verdict;
+                true)); // checkWebStyles	
         
-		//verdict = detectWidgetsThatShouldBeInSync(state);
-		//if (shouldReturnVerdict(verdict)) return verdict;
+		//addNewVerdicts(verdicts, detectWidgetsThatShouldBeInSync(state));
 		
-        verdict = GenericVerdict.CommonTestOrDummyPhrases(state, WdTags.WebTextContent);
-        if (shouldReturnVerdict(verdict)) return verdict;
+        addNewVerdicts(verdicts, GenericVerdict.CommonTestOrDummyPhrases(state, WdTags.WebTextContent));
         
         // Checks for zero numbers in tables
-        verdict = WebVerdict.ZeroNumbersInTable(state);
-        if (shouldReturnVerdict(verdict)) return verdict;
+        addNewVerdicts(verdicts, WebVerdict.ZeroNumbersInTable(state));
 
 		// Check the functional Verdict that detects if a downloaded file is empty.
-		verdict = watcherFileEmptyFile();
-		if (shouldReturnVerdict(verdict)) return verdict;
+		addNewVerdicts(verdicts, watcherFileEmptyFile());
 
 		// Check the functional Verdict that detects dummy buttons to the current state verdict.
-		verdict = functionalButtonVerdict(state, "download|zoomOut|zoomIn|viewFind|Keyboard shortcuts|print|button|secondaryToolbarToggle|sidebarToggle|viewThumbnail");
-		if (shouldReturnVerdict(verdict)) return verdict;
+		addNewVerdicts(verdicts, functionalButtonVerdict(state, "download|zoomOut|zoomIn|viewFind|Keyboard shortcuts|print|button|secondaryToolbarToggle|sidebarToggle|viewThumbnail"));
 
 		// Check the functional Verdict that detects duplicate or repeated text in descriptions of widgets, ignore some common terms of DigiOffice, date, datetime, 3 phone formats and postal code
-		verdict = WebVerdict.DuplicateText(state, "Project - Project met.*|RelatieRelatie|GebruikerGebruiker|DocumentDocument|AdresAdres|ElmElm|zzdp@zzdp\\.nl|RelID \\(RelID\\)|\\b [\\+>&] \\b|Vonk Vonk|Piet Piet|Arthur Arthur|[A-Z]\\.[A-Z]\\.|[A-Z][A-Z]|A{261}|0\\.0\\.0|0,0,0|Logo;Logo|DocDoc|DossierDossier|GebrGebr|RelRel|\\d\\d:\\d\\d:\\d\\d|\\d\\d-\\d\\d-\\d\\d\\d\\d\\s\\d\\d:\\d\\d:\\d\\d|\\d\\d-\\d\\d-\\d\\d\\d*\\d*|\\d\\d - \\d\\d \\d\\d \\d\\d \\d\\d|\\(?\\d\\d\\d\\)? -? ?\\d\\d\\d \\d\\d \\d\\d|\\(?\\d\\d\\d\\d\\)? -? ?\\d\\d \\d\\d \\d\\d|\\d\\d\\d\\d [A-Z][A-Z]|\\d\\d-\\d\\d-\\d\\d|0\\.0\\/0\\.0|0,0\\/0,0");
-		if (shouldReturnVerdict(verdict)) return verdict;
+		addNewVerdicts(verdicts, WebVerdict.DuplicateText(state, "Project - Project met.*|RelatieRelatie|GebruikerGebruiker|DocumentDocument|AdresAdres|ElmElm|zzdp@zzdp\\.nl|RelID \\(RelID\\)|\\b [\\+>&] \\b|Vonk Vonk|Piet Piet|Arthur Arthur|[A-Z]\\.[A-Z]\\.|[A-Z][A-Z]|A{261}|0\\.0\\.0|0,0,0|Logo;Logo|DocDoc|DossierDossier|GebrGebr|RelRel|\\d\\d:\\d\\d:\\d\\d|\\d\\d-\\d\\d-\\d\\d\\d\\d\\s\\d\\d:\\d\\d:\\d\\d|\\d\\d-\\d\\d-\\d\\d\\d*\\d*|\\d\\d - \\d\\d \\d\\d \\d\\d \\d\\d|\\(?\\d\\d\\d\\)? -? ?\\d\\d\\d \\d\\d \\d\\d|\\(?\\d\\d\\d\\d\\)? -? ?\\d\\d \\d\\d \\d\\d|\\d\\d\\d\\d [A-Z][A-Z]|\\d\\d-\\d\\d-\\d\\d|0\\.0\\/0\\.0|0,0\\/0,0"));
 		
 		// Check the functional Verdict that detects HTML or XML tags in descriptions of widgets
-		verdict = WebVerdict.HTMLOrXMLTagsInText(state,".* <> .*|<niet ingevuld>|&gt;|.*Postverwerking<\\/a>|<Nieuw>|%3Cscript%3Econsole\\.error%28%27XSS%20is%20possible%27%29%3B%3C%2Fscript%3E|.*\\.Config|.*_DMS_.*|.*_Bouw_.*|.*_CRM_.*|.*_Beheer_.*|ZoekFilter_.*|<memo>alpha beta gamma|.*>console\\.error\\(.*|<HuisstijlDir>|<VersieEnDatum>|<<major version>>\\.<<minor version>>|<<version>> \\(<<version date>>\\)");
-		if (shouldReturnVerdict(verdict)) return verdict;
+		addNewVerdicts(verdicts, WebVerdict.HTMLOrXMLTagsInText(state,".* <> .*|<niet ingevuld>|&gt;|.*Postverwerking<\\/a>|<Nieuw>|%3Cscript%3Econsole\\.error%28%27XSS%20is%20possible%27%29%3B%3C%2Fscript%3E|.*\\.Config|.*_DMS_.*|.*_Bouw_.*|.*_CRM_.*|.*_Beheer_.*|ZoekFilter_.*|<memo>alpha beta gamma|.*>console\\.error\\(.*|<HuisstijlDir>|<VersieEnDatum>|<<major version>>\\.<<minor version>>|<<version>> \\(<<version date>>\\)"));
 
         // Check the functional Verdict that detects sensitive data, such as passwords or client secrets
         // https://en.wikipedia.org/wiki/List_of_the_most_common_passwords
-        //verdict = detectSensitiveData(state, "123456|123456789|12345|qwerty|password|12345678|111111|123123|1234567890|1234567|qwerty123|000000|1q2w3e|aa12345678|abc123|password1|1234|qwertyuiop|123321|password123");
-        verdict = GenericVerdict.SensitiveData(state, WdTags.WebTextContent, "qwerty123");
-        if (shouldReturnVerdict(verdict)) return verdict;
+        //"123456|123456789|12345|qwerty|password|12345678|111111|123123|1234567890|1234567|qwerty123|000000|1q2w3e|aa12345678|abc123|password1|1234|qwertyuiop|123321|password123"
+        addNewVerdicts(verdicts, GenericVerdict.SensitiveData(state, WdTags.WebTextContent, "qwerty123"));
         
 		// Check the functional Verdict that detects select elements without items to the current state verdict.
-		verdict = WebVerdict.EmptySelectItems(state);
-		if (shouldReturnVerdict(verdict)) return verdict;
+		addNewVerdicts(verdicts, WebVerdict.EmptySelectItems(state));
 
 		// Add the functional Verdict that detects select elements with only one item to the current state verdict.
-		verdict = WebVerdict.SingleSelectItems(state);
-		if (shouldReturnVerdict(verdict)) return verdict;
+		addNewVerdicts(verdicts, WebVerdict.SingleSelectItems(state));
 
 		// Add the functional Verdict that detect that dropdownlist has more than theshold value items
-		verdict = WebVerdict.TooManyItemSelectItems(state, 50);
-		if (shouldReturnVerdict(verdict)) return verdict;
+		addNewVerdicts(verdicts, WebVerdict.TooManyItemSelectItems(state, 50));
 
 		// Check the functional Verdict that detects select elements with unsorted items to the current state verdict.
-		verdict = WebVerdict.UnsortedSelectItems(state);
-		if (shouldReturnVerdict(verdict)) return verdict;
+		addNewVerdicts(verdicts, WebVerdict.UnsortedSelectItems(state));
 
 		// Check the functional Verdict that detects select elements with duplicate items to the current state verdict.
-		verdict = WebVerdict.DuplicateSelectItems(state);
-		if (shouldReturnVerdict(verdict)) return verdict;
+		addNewVerdicts(verdicts, WebVerdict.DuplicateSelectItems(state));
 
 		// Check the functional Verdict that detects Unnumbered List (UL) child elements with duplicate items to the current state verdict.
-		verdict = WebVerdict.DuplicateULItems(state);
-		if (shouldReturnVerdict(verdict)) return verdict;
+		addNewVerdicts(verdicts, WebVerdict.DuplicateULItems(state));
 
 		// Check the functional Verdict that detects if exists a number with more than X decimals.
-		verdict = WebVerdict.NumberWithLotOfDecimals(state, 3, false);
-		if (shouldReturnVerdict(verdict)) return verdict;
+		addNewVerdicts(verdicts, WebVerdict.NumberWithLotOfDecimals(state, 3, false));
 
 		// Check the functional Verdict that detects if exists a textArea Widget without length.
-		verdict = WebVerdict.TextAreaWithoutLength(state, Arrays.asList(WdRoles.WdTEXTAREA, WdRoles.WdINPUT));
-		if (shouldReturnVerdict(verdict)) return verdict;
+		addNewVerdicts(verdicts, WebVerdict.TextAreaWithoutLength(state, Arrays.asList(WdRoles.WdTEXTAREA, WdRoles.WdINPUT)));
 
 		// Check the functional Verdict that detects if a web element does not contain children.
-		//verdict = WebVerdict.ElementWithoutChildren(state, Arrays.asList(WdRoles.WdFORM, WdRoles.WdSELECT, WdRoles.WdTR, WdRoles.WdOPTGROUP, WdRoles.WdCOLGROUP, WdRoles.WdFIELDSET, WdRoles.WdDL, WdRoles.WdDATALIST, WdRoles.WdBODY));
-		verdict = WebVerdict.ElementWithoutChildren(state, Arrays.asList(WdRoles.WdSELECT, WdRoles.WdTR, WdRoles.WdOPTGROUP, WdRoles.WdCOLGROUP, WdRoles.WdFIELDSET, WdRoles.WdDL, WdRoles.WdDATALIST));
-		if (shouldReturnVerdict(verdict)) return verdict;
+		//Arrays.asList(WdRoles.WdFORM, WdRoles.WdSELECT, WdRoles.WdTR, WdRoles.WdOPTGROUP, WdRoles.WdCOLGROUP, WdRoles.WdFIELDSET, WdRoles.WdDL, WdRoles.WdDATALIST, WdRoles.WdBODY)
+		addNewVerdicts(verdicts, WebVerdict.ElementWithoutChildren(state, Arrays.asList(WdRoles.WdSELECT, WdRoles.WdTR, WdRoles.WdOPTGROUP, WdRoles.WdCOLGROUP, WdRoles.WdFIELDSET, WdRoles.WdDL, WdRoles.WdDATALIST)));
 
 		// Check the functional Verdict that detects if a web radio input contains a single option.
-		//verdict = WebVerdict.SingleRadioInput(state);
-		//if (shouldReturnVerdict(verdict)) return verdict;
+        //addNewVerdicts(verdicts, WebVerdict.SingleRadioInput(state));
 
 		// Check the functional Verdict that detects if a web alert contains a suspicious message.
-		verdict = WebVerdict.AlertSuspiciousMessage(state, ".*[lL]ogin.*|.*[eE]rror.*|.*[eE]xcepti[o?]n.*|.*[Ee]xceptie.*|.*[fF]out.*|.*[pP]robleem.*", lastExecutedAction);
-		if (shouldReturnVerdict(verdict)) return verdict;
+		addNewVerdicts(verdicts, WebVerdict.AlertSuspiciousMessage(state, ".*[lL]ogin.*|.*[eE]rror.*|.*[eE]xcepti[o?]n.*|.*[Ee]xceptie.*|.*[fF]out.*|.*[pP]robleem.*", lastExecutedAction));
 
 		// Check the functional Verdict that detects if web table contains duplicated rows.
-		verdict = WebVerdict.DuplicatedRowsInTable(state);
-		if (shouldReturnVerdict(verdict)) return verdict;
+		addNewVerdicts(verdicts, WebVerdict.DuplicatedRowsInTable(state));
 
 		// Check untranslated text tags
-		verdict = detectUntranslatedText(state);
-		if (shouldReturnVerdict(verdict)) return verdict;
+		addNewVerdicts(verdicts, detectUntranslatedText(state));
         
 		// Check The replacement character ? (often displayed as a black rhombus with a white question mark) is a symbol found in the Unicode standard at code point U+FFFD in the Specials table. It is used to indicate problems when a system is unable to render a stream of data to correct symbols
-		verdict = GenericVerdict.UnicodeReplacementCharacter(state, WdTags.WebTextContent);
-		if (shouldReturnVerdict(verdict)) return verdict;
+		addNewVerdicts(verdicts, GenericVerdict.UnicodeReplacementCharacter(state, WdTags.WebTextContent));
 
-		return verdict;
+		return verdicts;
 	}
 }

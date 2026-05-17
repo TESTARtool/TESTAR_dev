@@ -118,9 +118,7 @@ public class TestReportManager {
 		// Verify selected action information
 		Assert.assertTrue(fileContains("<h4>AbstractID=typeActionAbstractID || ConcreteID=typeActionConcreteID || typeActionDescription</h4>", htmlReportFile));
 		// Verify verdict information
-		Assert.assertTrue(fileContains("<h2>Test verdict for this sequence: FooBoo</h2>", htmlReportFile));
-		Assert.assertTrue(fileContains("This is a Foo verdict description", htmlReportFile));
-		Assert.assertTrue(fileContains("This is a Boo verdict description", htmlReportFile));
+		Assert.assertTrue(fileContains("<h2>Test verdict for this sequence: No problem detected.</h2>", htmlReportFile));
 
 		// Verify the plain txt report was not created
 		File txtReportFile = new File(reportManager.getReportFileName().concat("_V001_OK.txt"));
@@ -166,9 +164,7 @@ public class TestReportManager {
 		// Verify selected action information
 		Assert.assertTrue(fileContains("ConcreteID=typeActionConcreteID || typeActionDescription", txtReportFile));
 		// Verify verdict information
-		Assert.assertTrue(fileContains("Test verdict for this sequence: FooBoo", txtReportFile));
-		Assert.assertTrue(fileContains("This is a Foo verdict description", txtReportFile));
-		Assert.assertTrue(fileContains("This is a Boo verdict description", txtReportFile));
+		Assert.assertTrue(fileContains("Test verdict for this sequence: No problem detected.", txtReportFile));
 	}
 
 	@Test

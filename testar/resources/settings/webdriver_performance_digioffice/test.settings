@@ -55,6 +55,12 @@ Sequences = 150
 SequenceLength = 300
 
 #################################################################
+# Ignore reporting duplicated verdicts for this protocol
+#################################################################
+
+IgnoreDuplicatedVerdicts = true
+
+#################################################################
 # SUT Protocol
 #
 # ProtocolClass: Indicate the location of the protocol class for your specific SUT

@@ -71,8 +71,6 @@ import static org.testar.monkey.alayer.Tags.Enabled;
  */
 public class Protocol_webdriver_performance_digioffice extends WebdriverProtocol {
 
-    private List<String> listErrorVerdictInfo = new ArrayList<>();
-
     private NetworkMonitor monitor;
 
     /**
@@ -115,7 +113,6 @@ public class Protocol_webdriver_performance_digioffice extends WebdriverProtocol
     @Override
     protected void initTestSession() {
         super.initTestSession();
-        listErrorVerdictInfo = new ArrayList<>();
     }
 
     /**
@@ -174,9 +171,9 @@ public class Protocol_webdriver_performance_digioffice extends WebdriverProtocol
      * @return oracle verdict, which determines whether the state is erroneous and why.
      */
     @Override
-    protected Verdict getVerdict(State state) {
-        // Obtain suspicious title verdicts
-        Verdict verdict = super.getVerdict(state);
+    protected List<Verdict> getVerdicts(State state) {
+        List<Verdict> verdicts = new ArrayList<>();
+        addNewVerdicts(verdicts, super.getVerdicts(state));
 
         NetworkSummary networkSummary = monitor.getSummary();
         List<NetworkRecord> networkRecordList = monitor.getCurrentFinishedActionRecords();
@@ -184,26 +181,26 @@ public class Protocol_webdriver_performance_digioffice extends WebdriverProtocol
         monitor.endMeasurement();
 
         // 1 - Oracle for web items performance issues
-        Verdict itemPerformanceVerdict = itemPerformanceVerdict(state, networkRecordList);
-        if (shouldReturnVerdict(itemPerformanceVerdict)) return itemPerformanceVerdict;
+        addNewVerdicts(verdicts, itemPerformanceVerdict(state, networkRecordList));
 
         // 2 - Oracle for duplicated web resources at network level
-        Verdict duplicatedResourceVerdict = duplicatedResourceVerdict(state, networkRecordList);
-        if (shouldReturnVerdict(duplicatedResourceVerdict)) return duplicatedResourceVerdict;
+        addNewVerdicts(verdicts, duplicatedResourceVerdict(state, networkRecordList));
 
         // 3 - Oracle for high web items size at network level
-        Verdict itemSizeVerdict = itemSizeVerdict(state, networkRecordList);
-        if (shouldReturnVerdict(itemSizeVerdict)) return itemSizeVerdict;
+        addNewVerdicts(verdicts, itemSizeVerdict(state, networkRecordList));
 
         // 4 - Oracle for web state performance issues
-        Verdict statePerformanceVerdict = statePerformanceVerdict(state, networkSummary);
-        if (shouldReturnVerdict(statePerformanceVerdict)) return statePerformanceVerdict;
+        addNewVerdicts(verdicts, statePerformanceVerdict(state, networkSummary));
 
-        return verdict;
+        if (verdicts.isEmpty()) {
+            return Collections.singletonList(Verdict.OK);
+        }
+
+        return verdicts;
     }
 
-    private Verdict itemPerformanceVerdict(State state, List<NetworkRecord> networkRecordList) {
-        Verdict groupItemsPerformanceVerdict = Verdict.OK;
+    private List<Verdict> itemPerformanceVerdict(State state, List<NetworkRecord> networkRecordList) {
+        List<Verdict> verdicts = new ArrayList<>();
         long itemThreshold = 1000L; // 1 second for each web item
 
         // Iterate through all web items because multiple might have performance issues
@@ -217,16 +214,15 @@ public class Protocol_webdriver_performance_digioffice extends WebdriverProtocol
                 itemDescription = itemDescription.concat(r.toLine() + "\n");
                 singleItemVerdict.setDescription(itemDescription);
 
-                // Join the single item Verdict with the possible group of affected items
-                groupItemsPerformanceVerdict = groupItemsPerformanceVerdict.join(singleItemVerdict);
+                verdicts.add(singleItemVerdict);
             }
         }
 
-        return groupItemsPerformanceVerdict;
+        return verdicts;
     }
 
-    private Verdict itemSizeVerdict(State state, List<NetworkRecord> networkRecordList) {
-        Verdict groupItemsSizeVerdict = Verdict.OK;
+    private List<Verdict> itemSizeVerdict(State state, List<NetworkRecord> networkRecordList) {
+        List<Verdict> verdicts = new ArrayList<>();
         long itemBytesThreshold = 102400L; // 100KB = 102400 bytes value
 
         // Iterate through all web items because multiple might have size issues
@@ -240,15 +236,14 @@ public class Protocol_webdriver_performance_digioffice extends WebdriverProtocol
                 itemDescription = itemDescription.concat(r.toLine() + "\n");
                 singleItemVerdict.setDescription(itemDescription);
 
-                // Join the single item Verdict with the possible group of affected items
-                groupItemsSizeVerdict = groupItemsSizeVerdict.join(singleItemVerdict);
+                verdicts.add(singleItemVerdict);
             }
         }
 
-        return groupItemsSizeVerdict;
+        return verdicts;
     }
 
-    private Verdict duplicatedResourceVerdict(State state, List<NetworkRecord> networkRecordList) {
+    private List<Verdict> duplicatedResourceVerdict(State state, List<NetworkRecord> networkRecordList) {
         // Prepare a filtering of interesting record candidates
         List<NetworkRecord> candidates = networkRecordList.stream()
                 .filter(Objects::nonNull)
@@ -271,7 +266,7 @@ public class Protocol_webdriver_performance_digioffice extends WebdriverProtocol
                 .collect(Collectors.toList());
 
         if (duplicatedResourcesOrdered.isEmpty()) {
-            return Verdict.OK;
+            return Collections.emptyList();
         }
 
         // All records whose (method + url) is duplicated (keep duplicates, preserve order)
@@ -296,10 +291,10 @@ public class Protocol_webdriver_performance_digioffice extends WebdriverProtocol
         }
         duplicatedResourceVerdict.setDescription(duplicatedDescription.toString());
 
-        return duplicatedResourceVerdict;
+        return Collections.singletonList(duplicatedResourceVerdict);
     }
 
-    private Verdict statePerformanceVerdict(State state, NetworkSummary networkSummary) {
+    private List<Verdict> statePerformanceVerdict(State state, NetworkSummary networkSummary) {
         long stateThreshold = 5000L; // 5 second for each web item
         if(networkSummary.stateDurationMs > stateThreshold) {
             String stateId = state.get(WdTags.WebHref, state.get(WdTags.WebTitle, state.get(Tags.ConcreteID, "")));
@@ -310,21 +305,22 @@ public class Protocol_webdriver_performance_digioffice extends WebdriverProtocol
             stateDescription = stateDescription.concat(monitor.getSummaryAndRequestsString());
             statePerformanceVerdict.setDescription(stateDescription);
 
-            return statePerformanceVerdict;
+            return Collections.singletonList(statePerformanceVerdict);
         } else {
-            return Verdict.OK;
+            return Collections.emptyList();
         }
     }
 
-    /**
-     * We want to return the verdict if it is not OK, 
-     * and not on the detected failures list (it's a new failure). 
-     * 
-     * @param verdict
-     * @return
-     */
-    private boolean shouldReturnVerdict(Verdict verdict) {
-        return verdict != Verdict.OK && listErrorVerdictInfo.stream().noneMatch(info -> info.contains(verdict.info().replace("\n", " ")));
+    private void addNewVerdicts(List<Verdict> verdicts, List<Verdict> candidates) {
+        if (candidates == null) {
+            return;
+        }
+
+        for (Verdict verdict : candidates) {
+            if (verdict != null && verdict.severity() > Verdict.OK.severity()) {
+                verdicts.add(verdict);
+            }
+        }
     }
 
     /**
@@ -506,11 +502,6 @@ public class Protocol_webdriver_performance_digioffice extends WebdriverProtocol
     @Override
     protected void finishSequence() {
         super.finishSequence();
-        // If the final Verdict is not OK and the verdict is not saved in the list
-        // This is a new run fail verdict
-        if(getFinalVerdict().severity() > Verdict.Severity.OK.getValue() && !listErrorVerdictInfo.contains(getFinalVerdict().info().replace("\n", " "))) {
-            listErrorVerdictInfo.add(getFinalVerdict().info().replace("\n", " "));
-        }
     }
 
 }

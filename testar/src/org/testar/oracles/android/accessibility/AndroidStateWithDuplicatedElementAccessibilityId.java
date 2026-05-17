@@ -30,8 +30,11 @@
 
 package org.testar.oracles.android.accessibility;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.testar.monkey.alayer.State;
@@ -49,8 +52,8 @@ public class AndroidStateWithDuplicatedElementAccessibilityId implements Oracle 
     }
 
     @Override
-    public Verdict getVerdict(State state) {
-        Verdict finalVerdict = Verdict.OK;
+    public List<Verdict> getVerdicts(State state) {
+        List<Verdict> verdicts = new ArrayList<>();
 
         Set<String> seenIds = new HashSet<>();
 
@@ -74,11 +77,15 @@ public class AndroidStateWithDuplicatedElementAccessibilityId implements Oracle 
                         Verdict.Severity.WARNING_ACCESSIBILITY_FAULT,
                         verdictMsg,
                         visualizer);
-                finalVerdict = finalVerdict.join(accessibilityVerdict);
+                verdicts.add(accessibilityVerdict);
             }
         }
 
-        return finalVerdict;
+        if (!verdicts.isEmpty()) {
+            return verdicts;
+        }
+
+        return Collections.singletonList(Verdict.OK);
     }
 
 }

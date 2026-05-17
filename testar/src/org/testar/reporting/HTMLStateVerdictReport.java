@@ -42,7 +42,6 @@ import java.io.UnsupportedEncodingException;
 import javax.imageio.ImageIO;
 
 import org.testar.OutputStructure;
-import org.testar.ProtocolUtil;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.AWTCanvas;
 import org.testar.monkey.alayer.Rect;
@@ -50,13 +49,9 @@ import org.testar.monkey.alayer.Shape;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
-import org.testar.monkey.alayer.android.AndroidProtocolUtil;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
-import org.testar.monkey.alayer.ios.IOSProtocolUtil;
-import org.testar.monkey.alayer.webdriver.WdProtocolUtil;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
-import org.testar.plugin.NativeLinker;
-import org.testar.plugin.OperatingSystems;
+import org.testar.screenshot.ScreenshotProviderFactory;
 
 public class HTMLStateVerdictReport {
 
@@ -144,20 +139,8 @@ public class HTMLStateVerdictReport {
 		String screenshotFile = OutputStructure.screenshotsOutputDir + File.separator + screenshotsDir + File.separator + screenshotName + ".png";
 
 		Shape viewPort = state.get(Tags.Shape, null);
-		if(viewPort != null){
-			AWTCanvas screenshot;
-			if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)){
-				screenshot = WdProtocolUtil.getStateshotBinary(state);
-			}
-			else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.ANDROID)) {
-				screenshot = AndroidProtocolUtil.getStateshotBinary(state);
-			}
-			else if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.IOS)) {
-				screenshot = IOSProtocolUtil.getStateshotBinary(state);
-			}
-			else{
-				screenshot = ProtocolUtil.getStateshotBinary(state);
-			}
+		if(viewPort != null) {
+			AWTCanvas screenshot = ScreenshotProviderFactory.current().getStateshotBinary(state);
 			screenshot.saveAsPng(screenshotFile);
 		}
 
