@@ -1,4 +1,3 @@
-
 /***************************************************************************************************
  *
  * Copyright (c) 2025 - 2026 Universitat Politecnica de Valencia - www.upv.es
@@ -45,7 +44,6 @@ import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
 import org.testar.monkey.alayer.webdriver.enums.WdRoles;
 import org.testar.monkey.alayer.webdriver.enums.WdTags;
 import org.testar.oracles.Oracle;
-import org.testar.oracles.OracleSelection;
 import org.testar.monkey.ConfigTags;
 import org.testar.monkey.Main;
 import org.testar.monkey.Pair;
@@ -86,8 +84,6 @@ public class Protocol_android_digioffice extends AndroidProtocol {
 
     private String XPATH_FILTER_FILE = "/android_digioffice_xpath_filter.txt";
 
-    private List<Oracle> extendedOraclesList = new ArrayList<>();
-
     /**
      * Called once during the life time of TESTAR
      * This method can be used to perform initial setup work
@@ -111,7 +107,6 @@ public class Protocol_android_digioffice extends AndroidProtocol {
     @Override
     protected void preSequencePreparations() {
         super.preSequencePreparations();
-        extendedOraclesList = OracleSelection.loadExtendedOracles(settings.get(ConfigTags.ExtendedOracles));
     }
 
     @Override
@@ -463,12 +458,6 @@ public class Protocol_android_digioffice extends AndroidProtocol {
         // 12) Search bar contains clear option
         Oracle searchClearOracle = new AndroidDigiOfficeSearchBarContainsClear();
         addNewVerdicts(verdicts, searchClearOracle.getVerdicts(state));
-
-        // "ExtendedOracles" offered by TESTAR in the test.settings or Oracles GUI
-        // dialog
-        for (Oracle extendedOracle : extendedOraclesList) {
-            addNewVerdicts(verdicts, extendedOracle.getVerdicts(state));
-        }
 
         if (verdicts.isEmpty()) {
             return Collections.singletonList(Verdict.OK);
