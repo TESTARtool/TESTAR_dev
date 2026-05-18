@@ -91,7 +91,7 @@ public class AndroidLogcatOracle implements Oracle {
         try {
             String logcatFileName = OutputStructure.logsOutputDir
                     + File.separator + OutputStructure.startInnerLoopDateString + "_"
-                    + OutputStructure.executedSUTname + sequenceNumber + "_android_logcat.log";
+                    + OutputStructure.executedSUTname + "_" + sequenceNumber + "_android_logcat.log";
             sequenceLogPath = Paths.get(logcatFileName);
 
             Files.writeString(sequenceLogPath,
