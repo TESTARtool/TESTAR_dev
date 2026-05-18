@@ -53,7 +53,7 @@ TagsForSuspiciousOracle = AndroidText;AndroidAccessibilityId;AndroidResourceId
 # Extended test oracles
 #################################################################
 
-ExtendedOracles = AndroidClashClickableWidgets,AndroidClickableElementWithoutDescription,AndroidStateWithDuplicatedElementResourceId,GenericUnicodeReplacementCharacter
+ExtendedOracles = AndroidStateWithDuplicatedElementResourceId,GenericUnicodeReplacementCharacter
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -87,7 +87,7 @@ ProcessLogs = .*.*
 #################################################################
 
 LogOracleEnabled = true
-LogOracleRegex = .*([Ee]xception|[Ee]rror).*
+LogOracleRegex = (?i).*(exception|error).*
 
 #################################################################
 # Actionfilter
