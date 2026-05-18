@@ -217,6 +217,8 @@ public class Protocol_webdriver_b00_spark_scriptless extends WebdriverProtocol {
 				continue;
 			}
 
+			// Disable typing actions
+			/*
 			// type into text boxes
 			if (isAtBrowserCanvas(widget) && isTypeable(widget)) {
 				if(whiteListed(widget) || isUnfiltered(widget)){
@@ -226,6 +228,7 @@ public class Protocol_webdriver_b00_spark_scriptless extends WebdriverProtocol {
 					filteredActions.add(ac.clickTypeInto(widget, InputDataManager.getRandomTextInputData(), true));
 				}
 			}
+			*/
 
 			// left clicks, but ignore links outside domain
 			if (isAtBrowserCanvas(widget) && isClickable(widget)) {
@@ -241,11 +244,6 @@ public class Protocol_webdriver_b00_spark_scriptless extends WebdriverProtocol {
 					filteredActions.add(ac.leftClickAt(widget));
 				}
 			}
-		}
-
-		// Weird workaround for menus that do not have close actions
-		if (actions.size() <=5 ) {
-			actions.add(ac.hitESC(state));
 		}
 
 		// If we have forced actions, prioritize and filter the other ones
@@ -272,6 +270,9 @@ public class Protocol_webdriver_b00_spark_scriptless extends WebdriverProtocol {
 			return true;
 		}
 		if(widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdOPTION)) {
+			return true;
+		}
+		if(widget.get(WdTags.WebAriaRole, "").equals("button")) {
 			return true;
 		}
 		return super.isClickable(widget);

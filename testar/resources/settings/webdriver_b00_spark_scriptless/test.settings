@@ -35,8 +35,8 @@ SUTConnectorValue = "https://spark.testar.org/"
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 30
-SequenceLength = 10
+Sequences = 100
+SequenceLength = 4
 
 #################################################################
 # Ignore reporting duplicated verdicts for this protocol
