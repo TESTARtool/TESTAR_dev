@@ -79,8 +79,14 @@ public final class ConfigTags {
     public static final Tag<String> ProcessesToKillDuringTest = Tag.from("ProcessesToKillDuringTest", String.class, 
             "Regular expressions to kill processes that can start up and interfere when testing the SUT");
 
-    public static final Tag<String> ProtocolClass = Tag.from("ProtocolClass", String.class, 
-            "Indicate the location of the protocol class for your specific SUT");
+    public static final Tag<String> CompositionProfile = Tag.from("CompositionProfile", String.class,
+            "Select the scriptless composition profile: windows_composition, webdriver_composition, android_composition");
+
+    public static final Tag<String> CustomCompositionResource = Tag.from("CustomCompositionResource", String.class,
+            "Optional properties resource that describes a custom scriptless composition");
+
+    public static final Tag<String> CustomPoliciesResource = Tag.from("CustomPoliciesResource", String.class,
+            "Optional properties resource that describes additive custom scriptless policies");
 
     public static final Tag<String> ApplicationName = Tag.from("ApplicationName", String.class, 
             "Name to identify the SUT.");
@@ -338,9 +344,6 @@ public final class ConfigTags {
     public static final Tag<Double> RefreshSpyCanvas = Tag.from("RefreshSpyCanvas", Double.class, 
             "Time in milliseconds that indicates the frequency of refreshing the screen in SPY mode");
 
-    public static final Tag<Boolean> AlwaysCompile = Tag.from("AlwaysCompile", Boolean.class, 
-            "Compile the protocol before launching the selected TESTAR mode");
-
     public static final Tag<Double> MaxReward = Tag.from("MaxReward", Double.class, 
             "MaxReward value for the QLearningActionSelector");
 
@@ -349,14 +352,6 @@ public final class ConfigTags {
 
     public static final Tag<Boolean> CreateWidgetInfoJsonFile = Tag.from("CreateWidgetInfoJsonFile", Boolean.class, 
             "Sets whether create a JSON file with information about widgets and their location on the screenshot");
-
-    @SuppressWarnings("unchecked")
-    public static final Tag<List<String>> MyClassPath = Tag.from("MyClassPath",
-            (Class<List<String>>) (Class<?>) List.class,
-            "The relative path that contains the TESTAR protocols");
-
-    public static final Tag<String> ProtocolCompileDirectory = Tag.from("ProtocolCompileDirectory", String.class, 
-            "The relative path on which compile the TESTAR protocols and create the class files");
 
     public static final Tag<String> OutputDir = Tag.from("OutputDir", String.class, 
             "The relative path to save TESTAR output results");

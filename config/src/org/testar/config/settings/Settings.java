@@ -107,6 +107,21 @@ public class Settings extends TaggableBase implements Serializable {
             } catch (NumberFormatException nfe) {
                 throw new ConfigParseException("Unable to parse value for tag " + tag);
             }
+        } else if (tag.type().equals(List.class)) {
+            List<String> values = new ArrayList<String>();
+            if (stringValue == null || stringValue.isBlank()) {
+                return (T) values;
+            }
+
+            String separator = getStringSeparator(tag);
+            for (String token : stringValue.split(separator)) {
+                String trimmedToken = token.trim();
+                if (!trimmedToken.isEmpty()) {
+                    values.add(trimmedToken);
+                }
+            }
+
+            return (T) values;
         } else if (tag.type().equals(String.class)) {
             return (T) stringValue;
         }

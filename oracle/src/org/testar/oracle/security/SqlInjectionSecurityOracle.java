@@ -7,7 +7,7 @@
 package org.testar.oracle.security;
 
 import org.openqa.selenium.devtools.DevTools;
-import org.openqa.selenium.devtools.v145.network.Network;
+import org.openqa.selenium.devtools.v148.network.Network;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testar.core.verdict.Verdict;
 import org.testar.webdriver.action.WdSecurityInjectionAction;

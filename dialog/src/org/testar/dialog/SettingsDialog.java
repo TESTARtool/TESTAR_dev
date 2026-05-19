@@ -48,6 +48,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private Settings settings;
   //TODO: what is this ret variable. Cant you just return settings in the run method?
   private Settings ret;
+  private boolean populatingSettings;
 
   private JTabbedPane jTabsPane;
   private JButton btnGenerate;
@@ -61,8 +62,10 @@ public class SettingsDialog extends JFrame implements Observer {
   private static final int TIMES_TAB_INDEX = 4;
   private static final int MODEL_TAB_INDEX = 5;
   private static final int LLM_TAB_INDEX = 6;
-  private static final int SPY_TAB_INDEX = 7;
-  private static final int ADVANCED_TAB_INDEX = 8;
+  private static final int MODULES_TAB_INDEX = 7;
+  private static final int POLICIES_TAB_INDEX = 8;
+  private static final int SPY_TAB_INDEX = 9;
+  private static final int ADVANCED_TAB_INDEX = 10;
   private final Map<Integer, Pair<String, SettingsPanel>> settingPanels = new HashMap<>();
 
   /**
@@ -175,6 +178,10 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   private void saveCurrentSettings() {
+    if (populatingSettings) {
+      return;
+    }
+
     extractInformation(settings);
     try {
       Util.saveToFile(settings.toFileString(), settingsFile);
@@ -190,6 +197,10 @@ public class SettingsDialog extends JFrame implements Observer {
    * @param sutSettings
    */
   private void switchSettings(String sutSettings) {
+    if (populatingSettings) {
+      return;
+    }
+
     String previousSSE = TestarDirectories.getSseFiles()[0];
     String sse = sutSettings + TestarDirectories.SUT_SETTINGS_EXT;
     if (previousSSE.equals(sse)) {
@@ -213,7 +224,13 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   private void populateInformation(Settings settings) {
-    settingPanels.forEach((k,v) -> v.right().populateFrom(settings));
+    populatingSettings = true;
+    try {
+      settingPanels.forEach((k,v) -> v.right().populateFrom(settings));
+    }
+    finally {
+      populatingSettings = false;
+    }
   }
 
   private void extractInformation(Settings settings) {
@@ -234,6 +251,8 @@ public class SettingsDialog extends JFrame implements Observer {
     settingPanels.put(TIMES_TAB_INDEX, new Pair<>("Time Settings", new TimingPanel()));
     settingPanels.put(MODEL_TAB_INDEX, new Pair<>("State Model", modelPanel = StateModelPanel.createStateModelPanel()));
     settingPanels.put(LLM_TAB_INDEX, new Pair<>("LLMs", new LlmPanel()));
+    settingPanels.put(MODULES_TAB_INDEX, new Pair<>("Modules", new ModulesPanel()));
+    settingPanels.put(POLICIES_TAB_INDEX, new Pair<>("Policies", new PoliciesPanel()));
     settingPanels.put(SPY_TAB_INDEX, new Pair<>("Spy mode", new SpyModePanel()));
     settingPanels.put(ADVANCED_TAB_INDEX, new Pair<>("Advanced Options", new AdvancedPanel()));
 
@@ -352,6 +371,10 @@ public class SettingsDialog extends JFrame implements Observer {
 
   @Override
   public void update(Observable o, Object arg) {
+    if (populatingSettings) {
+      return;
+    }
+
     switchSettings((String) arg);
   }
 }

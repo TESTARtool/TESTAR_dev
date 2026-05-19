@@ -10,23 +10,26 @@ import org.testar.core.Assert;
 import org.testar.core.exceptions.SystemStartException;
 import org.testar.core.service.SystemService;
 import org.testar.core.state.SUT;
+import org.testar.plugin.process.SystemProcessHandling;
+import org.testar.scriptless.RuntimeContext;
+import org.testar.scriptless.service.ScriptlessSystemService;
 
-public class ScriptlessWindowsSystemService implements SystemService {
+public class ScriptlessWindowsSystemService extends ScriptlessSystemService {
 
-    private final SystemService delegate;
-
-    public ScriptlessWindowsSystemService(SystemService delegate) {
-        this.delegate = Assert.notNull(delegate);
+    public ScriptlessWindowsSystemService(SystemService delegate, RuntimeContext runtimeContext) {
+        super(delegate, runtimeContext);
     }
 
     @Override
     public SUT startSystem() throws SystemStartException {
-        return delegate.startSystem();
+        runtimeContext.setContextRunningProcesses(SystemProcessHandling.getRunningProcesses("START"));
+        return super.startSystem();
     }
 
     @Override
     public void stopSystem(SUT system) {
         Assert.notNull(system);
-        delegate.stopSystem(system);
+        SystemProcessHandling.killTestLaunchedProcesses(runtimeContext.contextRunningProcesses());
+        super.stopSystem(system);
     }
 }

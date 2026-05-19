@@ -6,10 +6,10 @@
 
 package org.testar.dialog;
 
+import org.testar.config.CompositionProfiles;
 import org.testar.dialog.components.IgnoredVerdictsDialog;
 import org.testar.dialog.components.UndoTextArea;
 import org.testar.config.ConfigTags;
-import org.testar.config.TestarDirectories;
 import org.testar.config.settings.Settings;
 
 import javax.swing.*;
@@ -18,7 +18,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
-import java.util.Arrays;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -31,9 +30,8 @@ public class GeneralPanel extends SettingsPanel implements Observer {
   private UndoTextArea txtSutPath = new UndoTextArea();
   private JSpinner spnNumSequences;
   private JSpinner spnSequenceLength;
-  //private JCheckBox checkStopOnFault;
-  private JComboBox<String> comboBoxProtocol;
-  private JCheckBox compileCheckBox, checkActionVisualization, checkIgnoreDuplicatedVerdict;
+  private JComboBox<String> comboBoxCompositionProfile;
+  private JCheckBox checkActionVisualization, checkIgnoreDuplicatedVerdict;
   private JButton btnManageIgnoredVerdicts;
   
   private JLabel labelAppName = new JLabel("Application name");
@@ -83,26 +81,17 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     spnSequenceLength.setToolTipText(ToolTipTexts.sequencesActionsTTT);
     add(spnSequenceLength);
 
-    comboBoxProtocol = new JComboBox<>();
-    comboBoxProtocol.setBounds(350, 161, 260, 25);
-    String[] sutSettings = new File(TestarDirectories.getSettingsDir())
-        .list((current, name) -> new File(current, name).isDirectory());
-    Arrays.sort(sutSettings);
-    comboBoxProtocol.setModel(new DefaultComboBoxModel<>(sutSettings));
-    comboBoxProtocol.setMaximumRowCount(sutSettings.length > 16 ? 16 : sutSettings.length);
-    
     // Pass button click to settings dialog
     MyItemListener myItemListener = new MyItemListener();
     myItemListener.addObserver(settingsDialog);
     myItemListener.addObserver(this);
-    comboBoxProtocol.addItemListener(myItemListener);
-    comboBoxProtocol.setToolTipText(ToolTipTexts.comboBoxProtocolTTT);
-    add(comboBoxProtocol);
+    cboxSUTconnector.addItemListener(myItemListener);
 
-    compileCheckBox = new JCheckBox("Always compile protocol");
-    compileCheckBox.setBounds(286, 199, 192, 21);
-    compileCheckBox.setToolTipText(ToolTipTexts.lblCompileTTT);
-    add(compileCheckBox);
+    comboBoxCompositionProfile = new JComboBox<>();
+    comboBoxCompositionProfile.setBounds(350, 161, 260, 25);
+    comboBoxCompositionProfile.setModel(new DefaultComboBoxModel<>(CompositionProfiles.values()));
+    comboBoxCompositionProfile.setToolTipText(ConfigTags.CompositionProfile.getDescription());
+    add(comboBoxCompositionProfile);
 
     /*checkStopOnFault = new JCheckBox("Stop Test on Fault");
     checkStopOnFault.setBounds(10, 240, 192, 21);
@@ -166,16 +155,7 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     btnSutPath.addActionListener(this::btnSutPathActionPerformed);
     btnSutPath.setToolTipText(ToolTipTexts.btnSelectSUTTTT);
     add(btnSutPath);
-
-    JButton btnEditProtocol = new JButton("Edit Protocol");
-    btnEditProtocol.setBounds(510, 199, 100, 25);
-    btnEditProtocol.addActionListener(this::btnEditProtocolActionPerformed);
-    btnEditProtocol.setToolTipText(ToolTipTexts.btnEditProtocolTTT);
-    btnEditProtocol.setMaximumSize(new Dimension(160, 35));
-    btnEditProtocol.setMinimumSize(new Dimension(160, 35));
-    btnEditProtocol.setPreferredSize(new Dimension(160, 35));
-    add(btnEditProtocol);
-
+    
     JScrollPane scrollPane = new JScrollPane();
     scrollPane.setBounds(10, 42, 600, 108);
     add(scrollPane);
@@ -198,10 +178,10 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     lblSequenceActions.setToolTipText(ToolTipTexts.sequencesActionsTTT);
     add(lblSequenceActions);
 
-    JLabel lblProtocol = new JLabel("Protocol:");
-    lblProtocol.setBounds(286, 164, 64, 14);
-    lblProtocol.setToolTipText(ToolTipTexts.comboBoxProtocolTTT);
-    add(lblProtocol);
+    JLabel lblCompositionProfile = new JLabel("Profile:");
+    lblCompositionProfile.setBounds(286, 164, 64, 14);
+    lblCompositionProfile.setToolTipText(ConfigTags.CompositionProfile.getDescription());
+    add(lblCompositionProfile);
   }
 
   private void btnSutPathActionPerformed(ActionEvent evt) {
@@ -226,12 +206,6 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     }
   }
 
-  private void btnEditProtocolActionPerformed(ActionEvent evt) {
-    JDialog dialog = new ProtocolEditor(TestarDirectories.getSettingsDir(), settings.get(ConfigTags.ProtocolClass));
-    dialog.setModalityType(JDialog.ModalityType.APPLICATION_MODAL);
-    dialog.setVisible(true);
-  }
-
   private void btnManageIgnoredVerdictsActionPerformed(ActionEvent evt) {
     JDialog dialog = new IgnoredVerdictsDialog();
     dialog.setModalityType(JDialog.ModalityType.APPLICATION_MODAL);
@@ -252,10 +226,9 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     checkActionVisualization.setSelected(settings.get(ConfigTags.VisualizeActions));
     checkIgnoreDuplicatedVerdict.setSelected(settings.get(ConfigTags.IgnoreDuplicatedVerdicts));
     txtSutPath.setInitialText(settings.get(ConfigTags.SUTConnectorValue));
-    comboBoxProtocol.setSelectedItem(settings.get(ConfigTags.ProtocolClass).split("/")[0]);
+    comboBoxCompositionProfile.setSelectedItem(settings.get(ConfigTags.CompositionProfile));
     spnNumSequences.setValue(settings.get(ConfigTags.Sequences));
     spnSequenceLength.setValue(settings.get(ConfigTags.SequenceLength));
-    compileCheckBox.setSelected(settings.get(ConfigTags.AlwaysCompile));
     applicationNameField.setText(settings.get(ConfigTags.ApplicationName));
     applicationVersionField.setText(settings.get(ConfigTags.ApplicationVersion));
     overrideWebDriverDisplayScaleField.setText(settings.get(ConfigTags.OverrideWebDriverDisplayScale));
@@ -273,9 +246,9 @@ public class GeneralPanel extends SettingsPanel implements Observer {
     //settings.set(ConfigTags.StopGenerationOnFault, checkStopOnFault.isSelected());
     settings.set(ConfigTags.VisualizeActions, checkActionVisualization.isSelected());
     settings.set(ConfigTags.IgnoreDuplicatedVerdicts, checkIgnoreDuplicatedVerdict.isSelected());
+    settings.set(ConfigTags.CompositionProfile, (String) comboBoxCompositionProfile.getSelectedItem());
     settings.set(ConfigTags.Sequences, (Integer) spnNumSequences.getValue());
     settings.set(ConfigTags.SequenceLength, (Integer) spnSequenceLength.getValue());
-    settings.set(ConfigTags.AlwaysCompile, compileCheckBox.isSelected());
     settings.set(ConfigTags.ApplicationName, applicationNameField.getText());
     settings.set(ConfigTags.ApplicationVersion, applicationVersionField.getText());
     settings.set(ConfigTags.OverrideWebDriverDisplayScale, overrideWebDriverDisplayScaleField.getText());

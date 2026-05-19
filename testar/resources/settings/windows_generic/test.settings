@@ -1,26 +1,27 @@
 #################################################################
-# Android generic sample
+# Windows generic sample
 #
-# This sample uses the built-in Android composition and points to
+# This sample uses the built-in Windows composition and points to
 # a resource file where users can register delegate-based capability
 # and service wrappers.
 #################################################################
 
 Mode = Spy
 
-SUTConnector = ANDROID_APPIUM
-SUTConnectorValue =
+SUTConnector = COMMAND_LINE
+SUTConnectorValue = c:\\windows\\system32\\notepad.exe
 SUTProcesses =
+AccessBridgeEnabled = false
 
-Sequences = 5
+Sequences = 8
 SequenceLength = 10
 
-CompositionProfile = android_composition
-CustomCompositionResource = ./settings/android_generic/composition.properties
-CustomPoliciesResource = ./settings/android_generic/policies.properties
+CompositionProfile = windows_composition
+CustomCompositionResource = ./settings/windows_generic/composition.properties
+CustomPoliciesResource = ./settings/windows_generic/policies.properties
 
-ClickFilter = .*Graphics.*
-TagsToFilter = AndroidAccessibilityId;AndroidText
+ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*
+TagsToFilter = Title
 ProcessesToKillDuringTest =
 
 IgnoreDuplicatedVerdicts = false
@@ -34,14 +35,14 @@ ProcessLogs = .*.*
 LogOracleEnabled = false
 LogOracleRegex = .*([Ee]xception|[Ee]rror).*
 LogOracleCommands =
-LogOracleFiles =
+LogOracleFiles = test_print_exception.log;../../testar/bin/test_print_error.log
 
 ActionDuration = 0.1
-TimeToWaitAfterAction = 2.0
-StartupTime = 2.0
+TimeToWaitAfterAction = 0.1
+StartupTime = 10.0
 MaxTime = 3.1536E7
 
-ApplicationName = Android Generic
+ApplicationName = Windows Generic
 ApplicationVersion =
 
 StateModelEnabled = false
@@ -58,25 +59,6 @@ StateModelStoreWidgets = false
 ResetDataStore = false
 
 AbstractStateAttributes = WidgetControlType
-
-AppiumPlatformName = Android
-AppiumIsApkInstalled = false
-AppiumApp = suts/ApiDemos-debug.apk
-AppiumAppPackage =
-AppiumAppActivity =
-AppiumIsEmulatorDocker = false
-AppiumIpAddress =
-AppiumDeviceName = Android Emulator
-AppiumAutomationName = UiAutomator2
-AppiumNewCommandTimeout = 600
-AppiumAutoGrantPermissions = false
-AppiumAllowInvisibleElements = false
-AppiumIgnoreHiddenApiPolicyError = false
-AppiumAdbExecTimeout = 120000
-AppiumUiautomator2ServerInstallTimeout = 120000
-AppiumUiautomator2ServerLaunchTimeout = 120000
-AndroidClickableClasses =
-AndroidTypeableClasses =
 
 ProtocolSpecificSetting_1 =
 ProtocolSpecificSetting_2 =
@@ -99,6 +81,6 @@ UseSystemActions = false
 RefreshSpyCanvas = 1.0
 MaxReward = 9999999
 Discount = .95
-CreateWidgetInfoJsonFile = false
+CreateWidgetInfoJsonFile = true
 OutputDir = ./output
 TempDir = ./output/temp

@@ -19,6 +19,7 @@ import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 import org.testar.core.StateManagementTags;
+import org.testar.config.CompositionProfiles;
 import org.testar.config.ConfigTags;
 import org.testar.core.tag.Tag;
 import org.testar.core.exceptions.NoSuchTagException;
@@ -32,6 +33,7 @@ public class SettingsVerification {
      */
     public static void verifySettings(Settings settings) {
         verifySutConnectorSettings(settings);
+        verifyCompositionProfileSettings(settings);
         verifyStateModelSettings(settings);
         verifyRegularExpressionSettings(settings);
         escapeSpecialCharactersInFileWritingSettings(settings);
@@ -110,6 +112,26 @@ public class SettingsVerification {
                     "When SUTConnector=ANDROID_APPIUM and AppiumIsApkInstalled=false, "
                             + "AppiumApp is required."
             );
+        }
+    }
+
+    private static void verifyCompositionProfileSettings(Settings settings) {
+        String compositionProfile = settings.get(ConfigTags.CompositionProfile, CompositionProfiles.WINDOWS_COMPOSITION);
+
+        if (!CompositionProfiles.isSupported(compositionProfile)) {
+            throw new IllegalStateException(
+                    "Unsupported CompositionProfile value: " + compositionProfile
+                            + ". Supported values are: "
+                            + String.join(", ", CompositionProfiles.values())
+            );
+        }
+
+        String customCompositionResource = settings.get(ConfigTags.CustomCompositionResource, "");
+        if (!customCompositionResource.isBlank()) {
+            File resourceFile = new File(customCompositionResource);
+            if (!resourceFile.exists()) {
+                System.err.println("*** WARNING: CustomCompositionResource does not exist: " + customCompositionResource);
+            }
         }
     }
 

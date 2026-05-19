@@ -7,39 +7,29 @@
 package org.testar.scriptless.service.webdriver;
 
 import org.testar.config.ConfigTags;
-import org.testar.core.Assert;
 import org.testar.core.environment.Environment;
 import org.testar.core.exceptions.SystemStartException;
-import org.testar.core.service.SystemService;
 import org.testar.core.state.SUT;
 import org.testar.core.tag.Tags;
 import org.testar.scriptless.RuntimeContext;
+import org.testar.scriptless.service.ScriptlessSystemService;
+import org.testar.core.service.SystemService;
 
-public class ScriptlessWebdriverSystemService implements SystemService {
-
-    private final SystemService delegate;
-    private final RuntimeContext runtimeContext;
+public class ScriptlessWebdriverSystemService extends ScriptlessSystemService {
 
     public ScriptlessWebdriverSystemService(SystemService delegate, RuntimeContext runtimeContext) {
-        this.delegate = Assert.notNull(delegate);
-        this.runtimeContext = Assert.notNull(runtimeContext);
+        super(delegate, runtimeContext);
     }
 
     @Override
     public SUT startSystem() throws SystemStartException {
-        SUT system = delegate.startSystem();
+        SUT system = super.startSystem();
 
         double displayScale = getDisplayScale(system);
         runtimeContext.setMouse(system.get(Tags.StandardMouse));
         runtimeContext.mouse().setCursorDisplayScale(displayScale);
 
         return system;
-    }
-
-    @Override
-    public void stopSystem(SUT system) {
-        Assert.notNull(system);
-        delegate.stopSystem(system);
     }
 
     private double getDisplayScale(SUT system) {

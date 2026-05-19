@@ -29,6 +29,7 @@ import org.testar.scriptless.RuntimeContext;
  */
 public final class VisualizationListener implements IEventListener {
 
+    private boolean showExtendedWidgetInfo = false;
     private boolean preciseCoding = false; // false =>  CodingManager.ABSTRACT_R_T_ID; true => CodingManager.ABSTRACT_R_T_P_ID
     private boolean displayWhiteTabu = false;
     private boolean whiteTabuMode = false; // true => white, false = tabu
@@ -59,7 +60,7 @@ public final class VisualizationListener implements IEventListener {
 
     public final void visualizeState(State state) {
         VisualizationUtil.visualizeState(
-            runtimeContext.isVisualizationEnabled(),
+            showExtendedWidgetInfo,
             runtimeContext.mouse(),
             runtimeContext.canvas(),
             state,
@@ -94,28 +95,30 @@ public final class VisualizationListener implements IEventListener {
     @Override
     public void keyDown(KBKeys key) {   
         if (runtimeContext.mode() == TestarMode.Spy) { 
-        	if (key == KBKeys.VK_CAPS_LOCK || key == KBKeys.VK_ALT)
-        		displayWhiteTabu = !displayWhiteTabu;
-        	else if (key == KBKeys.VK_TAB)
-        		preciseCoding = !preciseCoding;
-        	else if (key == KBKeys.VK_SHIFT)
-        		shiftPressed = true;
-	    	else if (key == KBKeys.VK_CONTROL) {
-	    		filterArea[0] = mouseX;
-	    		filterArea[1] = mouseY;
-	    	}
+            if (key == KBKeys.VK_CAPS_LOCK || key == KBKeys.VK_ALT) {
+                displayWhiteTabu = !displayWhiteTabu;
+            } else if (key == KBKeys.VK_TAB) {
+                preciseCoding = !preciseCoding;
+            } else if (key == KBKeys.VK_SHIFT) {
+                shiftPressed = true;
+            } else if (key == KBKeys.VK_UP && shiftPressed) {
+                showExtendedWidgetInfo = !showExtendedWidgetInfo;
+            } else if (key == KBKeys.VK_CONTROL) {
+                filterArea[0] = mouseX;
+                filterArea[1] = mouseY;
+            }
         }
     }
 
     @Override
     public void keyUp(KBKeys key) {
         if (runtimeContext.mode() == TestarMode.Spy) {
-        	if (key == KBKeys.VK_SHIFT) {
-	    		shiftPressed = false;
-        	} else if (key == KBKeys.VK_CONTROL && displayWhiteTabu) {
-	    		filterArea[2] = mouseX;
-	    		filterArea[3] = mouseY;
-	    		whiteTabuMode = shiftPressed;
+            if (key == KBKeys.VK_SHIFT) {
+                shiftPressed = false;
+            } else if (key == KBKeys.VK_CONTROL && displayWhiteTabu) {
+                filterArea[2] = mouseX;
+                filterArea[3] = mouseY;
+                whiteTabuMode = shiftPressed;
                 filteringManager.manageWhiteTabuLists(
                     runtimeContext.latestState(),
                     runtimeContext.mouse(),
@@ -123,7 +126,7 @@ public final class VisualizationListener implements IEventListener {
                     whiteTabuMode,
                     preciseCoding
                 );
-	    	}
+            }
         }
     }
 

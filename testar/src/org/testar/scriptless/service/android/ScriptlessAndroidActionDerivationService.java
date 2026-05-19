@@ -6,11 +6,8 @@
 
 package org.testar.scriptless.service.android;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
-import org.testar.android.action.AndroidBackAction;
 import org.testar.core.Assert;
 import org.testar.core.action.Action;
 import org.testar.core.service.ActionDerivationService;

@@ -26,7 +26,9 @@ public final class WebdriverPathResolver {
 
     public static Path resolveExtensionDir() {
         Path[] candidates = new Path[]{
-                RuntimePathsUtil.resolveRuntimeDirectory().resolve("web-extension")
+                RuntimePathsUtil.resolveRuntimeDirectory().resolve("web-extension"),
+                RuntimePathsUtil.resolveTestarHome().resolve("web-extension"),
+                RuntimePathsUtil.resolveTestarHome().resolve("..").normalize().resolve("web-extension")
         };
 
         for (Path candidate : candidates) {

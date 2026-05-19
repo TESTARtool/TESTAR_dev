@@ -78,14 +78,16 @@ public class SettingsFileStructure {
                 , ConfigTags.SequenceLength.name() + " = "
                 , ""
                 , "#################################################################"
-                , "# SUT Protocol"
+                , "# Scriptless composition"
                 , "#"
-                , "# ProtocolClass: " + ConfigTags.ProtocolClass.getDescription()
-                , "# AlwaysCompile: " + ConfigTags.AlwaysCompile.getDescription()
+                , "# CompositionProfile: " + ConfigTags.CompositionProfile.getDescription()
+                , "# CustomCompositionResource: " + ConfigTags.CustomCompositionResource.getDescription()
+                , "# CustomPoliciesResource: " + ConfigTags.CustomPoliciesResource.getDescription()
                 , "#################################################################"
                 , ""
-                , ConfigTags.ProtocolClass.name() + " = "
-                , ConfigTags.AlwaysCompile.name() + " = "
+                , ConfigTags.CompositionProfile.name() + " = "
+                , ConfigTags.CustomCompositionResource.name() + " = "
+                , ConfigTags.CustomPoliciesResource.name() + " = "
                 , ""
                 , "#################################################################"
                 , "# Actionfilter"
@@ -395,8 +397,6 @@ public class SettingsFileStructure {
         secondarySettingsList.add(ConfigTags.MaxReward);
         secondarySettingsList.add(ConfigTags.Discount);
         secondarySettingsList.add(ConfigTags.CreateWidgetInfoJsonFile);
-        secondarySettingsList.add(ConfigTags.MyClassPath);
-        secondarySettingsList.add(ConfigTags.ProtocolCompileDirectory);
         secondarySettingsList.add(ConfigTags.OutputDir);
         secondarySettingsList.add(ConfigTags.TempDir);
 

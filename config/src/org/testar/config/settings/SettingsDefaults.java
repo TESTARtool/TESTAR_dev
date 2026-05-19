@@ -6,6 +6,7 @@
 
 package org.testar.config.settings;
 
+import org.testar.config.CompositionProfiles;
 import org.testar.config.StateModelTags;
 import org.testar.config.TestarDirectories;
 import org.testar.config.TestarMode;
@@ -18,7 +19,6 @@ import java.util.List;
 import static org.testar.config.ConfigTags.AbstractStateAttributes;
 import static org.testar.config.ConfigTags.AccessBridgeEnabled;
 import static org.testar.config.ConfigTags.ActionDuration;
-import static org.testar.config.ConfigTags.AlwaysCompile;
 import static org.testar.config.ConfigTags.ApplicationName;
 import static org.testar.config.ConfigTags.ApplicationVersion;
 import static org.testar.config.ConfigTags.AppiumAdbExecTimeout;
@@ -41,8 +41,11 @@ import static org.testar.config.ConfigTags.AndroidClickableClasses;
 import static org.testar.config.ConfigTags.AndroidTypeableClasses;
 import static org.testar.config.ConfigTags.BrowserFullScreen;
 import static org.testar.config.ConfigTags.ClickFilter;
+import static org.testar.config.ConfigTags.CompositionProfile;
 import static org.testar.config.ConfigTags.WebClickableClasses;
 import static org.testar.config.ConfigTags.CreateWidgetInfoJsonFile;
+import static org.testar.config.ConfigTags.CustomCompositionResource;
+import static org.testar.config.ConfigTags.CustomPoliciesResource;
 import static org.testar.config.ConfigTags.WebDeniedExtensions;
 import static org.testar.config.ConfigTags.Discount;
 import static org.testar.config.ConfigTags.ExtendedOracles;
@@ -75,15 +78,12 @@ import static org.testar.config.ConfigTags.LogOracleRegex;
 import static org.testar.config.ConfigTags.MaxReward;
 import static org.testar.config.ConfigTags.MaxTime;
 import static org.testar.config.ConfigTags.Mode;
-import static org.testar.config.ConfigTags.MyClassPath;
 import static org.testar.config.ConfigTags.OnlySaveFaultySequences;
 import static org.testar.config.ConfigTags.OutputDir;
 import static org.testar.config.ConfigTags.OverrideWebDriverDisplayScale;
 import static org.testar.config.ConfigTags.ProcessListenerEnabled;
 import static org.testar.config.ConfigTags.ProcessLogs;
 import static org.testar.config.ConfigTags.ProcessesToKillDuringTest;
-import static org.testar.config.ConfigTags.ProtocolClass;
-import static org.testar.config.ConfigTags.ProtocolCompileDirectory;
 import static org.testar.config.ConfigTags.ProtocolSpecificSetting_1;
 import static org.testar.config.ConfigTags.ProtocolSpecificSetting_2;
 import static org.testar.config.ConfigTags.ProtocolSpecificSetting_3;
@@ -147,8 +147,9 @@ public class SettingsDefaults {
         defaults.add(Pair.from(IgnoreDuplicatedVerdicts, false));
         defaults.add(Pair.from(SuspiciousTags, "(?!x)x"));
         defaults.add(Pair.from(ClickFilter, "(?!x)x"));
-        defaults.add(Pair.from(MyClassPath, Arrays.asList(TestarDirectories.getSettingsDir())));
-        defaults.add(Pair.from(ProtocolClass, "org.testar.monkey.DefaultProtocol"));
+        defaults.add(Pair.from(CompositionProfile, CompositionProfiles.WINDOWS_COMPOSITION));
+        defaults.add(Pair.from(CustomCompositionResource, ""));
+        defaults.add(Pair.from(CustomPoliciesResource, ""));
         defaults.add(Pair.from(ForceForeground, true));
         defaults.add(Pair.from(StopGenerationOnFault, true));
         defaults.add(Pair.from(TimeToFreeze, 10.0));
@@ -160,7 +161,6 @@ public class SettingsDefaults {
         defaults.add(Pair.from(SUTProcesses, ""));
         defaults.add(Pair.from(ApplicationName, ""));
         defaults.add(Pair.from(ApplicationVersion, ""));
-        defaults.add(Pair.from(AlwaysCompile, true));
         defaults.add(Pair.from(ProcessListenerEnabled, false));
         defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
         defaults.add(Pair.from(ProcessLogs, ".*.*"));
@@ -203,8 +203,6 @@ public class SettingsDefaults {
         defaults.add(Pair.from(ProtocolSpecificSetting_3, ""));
         defaults.add(Pair.from(ProtocolSpecificSetting_4, ""));
         defaults.add(Pair.from(ProtocolSpecificSetting_5, ""));
-        defaults.add(Pair.from(ProtocolCompileDirectory, "./settings"));
-
         defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
             {
                 add("WidgetControlType");

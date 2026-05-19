@@ -22,7 +22,10 @@ public class StopCriteriaCapability {
     public boolean stopTestSequence(RuntimeContext runtimeContext, State state) {
         Assert.notNull(runtimeContext, state);
         List<Verdict> stateVerdicts = state.get(Tags.OracleVerdicts, Collections.singletonList(Verdict.OK));
-        boolean faultySequence = !Verdict.helperAreAllVerdictsOK(stateVerdicts);
+
+        List<Verdict> filteredVerdicts = runtimeContext.verdictProcessing().filterDuplicates(stateVerdicts);
+
+        boolean faultySequence = !Verdict.helperAreAllVerdictsOK(filteredVerdicts);
 
         return (!runtimeContext.settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence)
                 && state.get(Tags.IsRunning, false)

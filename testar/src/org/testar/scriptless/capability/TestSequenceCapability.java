@@ -84,8 +84,11 @@ public class TestSequenceCapability {
 
     public void finishTestSequence(RuntimeContext runtimeContext, List<Verdict> verdicts) {
         Assert.notNull(runtimeContext, verdicts);
-        runtimeContext.sessionReportingManager().addTestVerdicts(verdicts);
-        String statusInfo = buildStatusInfo(verdicts);
+
+        List<Verdict> filteredVerdicts = runtimeContext.verdictProcessing().filterDuplicates(verdicts);
+
+        runtimeContext.sessionReportingManager().addTestVerdicts(filteredVerdicts);
+        String statusInfo = buildStatusInfo(filteredVerdicts);
 
         runtimeContext.setGeneratedSequence(
                 OutputStructure.outerLoopOutputDir + File.separator + runtimeContext.generatedSequence()
@@ -98,9 +101,7 @@ public class TestSequenceCapability {
                         + " " + statusInfo
         );
 
-        if (runtimeContext.mode() == TestarMode.Generate) {
-            runtimeContext.verdictProcessing().storeNewVerdicts(verdicts);
-        }
+        runtimeContext.verdictProcessing().storeNewVerdicts(filteredVerdicts);
 
         runtimeContext.sessionReportingManager().finishReport();
 

@@ -26,7 +26,6 @@ import org.testar.core.state.State;
 import org.testar.core.util.Util;
 import org.testar.core.verdict.Verdict;
 import org.testar.engine.devices.EventHandler;
-import org.testar.plugin.process.SystemProcessHandling;
 import org.testar.scriptless.listener.ModeListener;
 import org.testar.scriptless.listener.EventListener;
 import org.testar.scriptless.listener.VisualizationListener;
@@ -106,7 +105,11 @@ public abstract class ComposedProtocol implements Consumer<Settings> {
             runtimeContext().setMouse(DummyMouse.build());
         }
 
+        runtimeContext.setSettings(protocolSettings);
+        scriptlessCapabilities = ScriptlessFactory.buildCapabilities(runtimeContext);
         runtimeContext.setSettings(initializeSettings(protocolSettings));
+        scriptlessCapabilities = ScriptlessFactory.buildCapabilities(runtimeContext);
+        runtimeContext.setMode(runtimeContext.settings().get(ConfigTags.Mode));
 
         if (runtimeContext().mode() == TestarMode.Generate) {
             OutputStructure.calculateOuterLoopDateString();
@@ -115,13 +118,13 @@ public abstract class ComposedProtocol implements Consumer<Settings> {
             OutputStructure.createOutputFolders();
         }
 
-        runtimeContext.setMode(runtimeContext.settings().get(ConfigTags.Mode));
         runtimeContext.setStartTime(Util.time());
         runtimeContext.setVisualizationEnabled(runtimeContext.settings().get(ConfigTags.VisualizeActions));
         runtimeContext.setVerdictProcessing(new VerdictProcessing(runtimeContext.settings()));
 
         modeListener = new ModeListener(runtimeContext, runtimeContext.settings().get(ConfigTags.KeyBoardListener, false));
         visualizationListener = new VisualizationListener(runtimeContext);
+        cssCustomizationListener = new CssCustomizationListener(runtimeContext);
         EventHandler eventHandler = new EventHandler(new EventListener(modeListener(), visualizationListener(), cssCustomizationListener()));
         runtimeContext.setEventHandler(eventHandler);
 
@@ -184,7 +187,6 @@ public abstract class ComposedProtocol implements Consumer<Settings> {
      * @throws SystemStartException
      */
     public SUT startSystem() throws SystemStartException {
-        runtimeContext.setContextRunningProcesses(SystemProcessHandling.getRunningProcesses("START"));
         return testingServices.systemService().startSystem();
     }
 
@@ -319,7 +321,6 @@ public abstract class ComposedProtocol implements Consumer<Settings> {
      */
     public void stopSystem(SUT system) {
         Assert.notNull(system);
-        SystemProcessHandling.killTestLaunchedProcesses(runtimeContext.contextRunningProcesses());
         testingServices.systemService().stopSystem(system);
     }
 
