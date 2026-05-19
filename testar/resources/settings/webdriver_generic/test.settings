@@ -39,7 +39,7 @@ TimeToWaitAfterAction = 0.5
 StartupTime = 2.0
 MaxTime = 3.1536E7
 
-ApplicationName = Webdriver_Parabank
+ApplicationName = webdriver_parabank
 ApplicationVersion = 1
 
 StateModelEnabled = false
@@ -80,7 +80,8 @@ ProtocolSpecificSetting_4 =
 ProtocolSpecificSetting_5 =
 
 ReportInHTML = true
-ReportInPlainText = true
+ReportInPlainText = false
+
 ExtendedOracles = WebAccessibilityFontSizeOracle,WebAccessibilityImagesAltOracle,WebInvariantDuplicateMenuItems,WebInvariantDuplicateSelectItems,WebInvariantDuplicatedRowsInTable,WebInvariantEmptySelectItems,WebInvariantManySelectItems,WebInvariantNumberWithLotOfDecimals,WebInvariantTextAreaWithoutLength,WebInvariantUnsortedSelectItems
 
 ShowVisualSettingsDialogOnStartup = true

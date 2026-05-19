@@ -47,12 +47,15 @@ public class GenerateMode {
 
                 LogSerialiser.log("Obtaining system initial state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
                 State initialState = protocol.getState(system);
-                List<Verdict> initialVerdicts = protocol.getVerdicts(system, initialState);
+                List<Verdict> initialVerdicts = filterSequenceVerdicts(
+                        protocol,
+                        protocol.getVerdicts(system, initialState)
+                );
 
                 if (!Verdict.helperAreAllVerdictsOK(initialVerdicts)) {
                     // If failure exists in the initial state
                     // Save initial state information in the state model before finishing
-					protocol.runtimeContext().stateModelManager().notifyNewStateReached(initialState, Collections.emptySet());
+                    protocol.runtimeContext().stateModelManager().notifyNewStateReached(initialState, Collections.emptySet());
                     // Finish the test sequence and state model only with the initial state verdicts
                     finishGeneratedSequence(protocol, system, initialVerdicts);
                 } else {
@@ -100,7 +103,7 @@ public class GenerateMode {
             Action action = protocol.selectAction(state, actions);
 
             //Showing the actions if visualization is on:
-			if(protocol.runtimeContext().isVisualizationEnabled()) {
+            if (protocol.runtimeContext().isVisualizationEnabled()) {
                 protocol.visualizationListener().visualizeActions(state, actions);
                 protocol.visualizationListener().visualizeSelectedAction(state, action);
             }
@@ -119,10 +122,14 @@ public class GenerateMode {
             protocol.runtimeContext().stateModelManager().notifyNewStateReached(state, actions);
         }
 
-        return state.get(Tags.OracleVerdicts, Collections.singletonList(Verdict.OK));
+        return filterSequenceVerdicts(
+                protocol,
+                state.get(Tags.OracleVerdicts, Collections.singletonList(Verdict.OK))
+        );
     }
 
     private void finishGeneratedSequence(ComposedProtocol protocol, SUT system, List<Verdict> finalVerdicts) {
+        finalVerdicts = filterSequenceVerdicts(protocol, finalVerdicts);
         protocol.runtimeContext().stateModelManager().notifyTestSequenceStopped();
 
         if (!Verdict.helperAreAllVerdictsOK(finalVerdicts)) {
@@ -134,5 +141,9 @@ public class GenerateMode {
         protocol.stopSystem(system);
         LogSerialiser.log("... SUT has been shut down!\n", LogSerialiser.LogLevel.Debug);
         protocol.runtimeContext().setSequenceCount(protocol.runtimeContext().sequenceCount() + 1);
+    }
+
+    private List<Verdict> filterSequenceVerdicts(ComposedProtocol protocol, List<Verdict> verdicts) {
+        return protocol.runtimeContext().verdictProcessing().filterDuplicates(verdicts);
     }
 }

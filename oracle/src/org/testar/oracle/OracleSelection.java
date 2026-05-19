@@ -16,9 +16,9 @@ import org.reflections8.Reflections;
 public class OracleSelection {
 
 	private static String[] oraclePackages = {
-			"org.testar.oracles.generic.visual",
-			"org.testar.oracles.web.accessibility",
-			"org.testar.oracles.web.invariants",
+			"org.testar.oracle.generic.visual",
+			"org.testar.oracle.web.accessibility",
+			"org.testar.oracle.web.invariants",
 	};
 
 	public static List<String> getAvailableOracles() {

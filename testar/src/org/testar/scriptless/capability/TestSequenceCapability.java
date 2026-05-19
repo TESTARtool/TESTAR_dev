@@ -17,7 +17,6 @@ import org.testar.config.TestarMode;
 import org.testar.core.Assert;
 import org.testar.core.alayer.Pen;
 import org.testar.core.serialisation.LogSerialiser;
-import org.testar.core.serialisation.ScreenshotSerialiser;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 import org.testar.core.util.Util;
@@ -75,8 +74,6 @@ public class TestSequenceCapability {
 
     public void beginSequence(RuntimeContext runtimeContext, SUT system, State initialState) {
         Assert.notNull(runtimeContext, system, initialState);
-        LogSerialiser.finish();
-        LogSerialiser.exit();
         LogSerialiser.log(Util.dateString(ComposedProtocol.DATE_FORMAT) + " Starting SUT ...\n", LogSerialiser.LogLevel.Info);
         LogSerialiser.log("SUT is running!\n", LogSerialiser.LogLevel.Debug);
         LogSerialiser.log("Building canvas...\n", LogSerialiser.LogLevel.Debug);
@@ -105,12 +102,9 @@ public class TestSequenceCapability {
 
         runtimeContext.sessionReportingManager().finishReport();
 
-		LogSerialiser.log("Releasing canvas...\n", LogSerialiser.LogLevel.Debug);
-		runtimeContext.canvas().release();
-		ScreenshotSerialiser.exit();
-		LogSerialiser.flush();
-		LogSerialiser.finish();
-		LogSerialiser.exit();
+        LogSerialiser.log("Releasing canvas...\n", LogSerialiser.LogLevel.Debug);
+        runtimeContext.canvas().release();
+        runtimeContext.sessionReportingManager().endSequenceOutput();
     }
 
     private String buildStatusInfo(List<Verdict> verdicts) {
