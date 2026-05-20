@@ -17,6 +17,7 @@ import org.testar.config.CompositionProfiles;
 import org.testar.config.ConfigTags;
 import org.testar.config.settings.Settings;
 import org.testar.core.Assert;
+import org.testar.scriptless.util.ExternalJavaClassSupport;
 
 public final class ScriptlessCompositionLoader {
 
@@ -72,10 +73,12 @@ public final class ScriptlessCompositionLoader {
     }
 
     public static <T> T loadDelegateWrapper(Optional<String> wrapperClassName,
+                                            Optional<String> customCompositionResourcePath,
                                             Class<T> expectedType,
                                             T delegate,
                                             Object[]... extraArgumentOptions) {
         Assert.notNull(wrapperClassName);
+        Assert.notNull(customCompositionResourcePath);
         Assert.notNull(expectedType);
         Assert.notNull(delegate);
         Assert.notNull(extraArgumentOptions);
@@ -86,7 +89,7 @@ public final class ScriptlessCompositionLoader {
 
         String className = wrapperClassName.get();
         try {
-            Class<?> wrapperClass = Class.forName(className);
+            Class<?> wrapperClass = ExternalJavaClassSupport.loadClass(className, customCompositionResourcePath);
 
             for (Object[] extraArguments : extraArgumentOptions) {
                 Object[] constructorArguments = prepend(delegate, extraArguments);

@@ -18,15 +18,6 @@ sourceSets {
             excludes = ['settings/']
         }
     }
-
-    oracle {
-        java {
-            srcDirs =['resources/settings']
-        }
-
-        compileClasspath += main.output
-        compileClasspath += main.compileClasspath
-    }
 }
 
 /**
@@ -103,11 +94,6 @@ task prepareSUTs(type: Copy) {
     into 'target/scripts/suts'
 }
 
-task prepareOracles(type: Copy) {
-    from 'target/classes/java/oracle'
-    into 'target/scripts/settings'
-}
-
 task prepareOutputFolder(type: Copy) {
     from 'resources/output'
     into 'target/scripts/output'
@@ -145,8 +131,6 @@ applicationDistribution.from("../webdriver/resources/web-extension") {
 applicationDistribution.from("../webdriver/resources/web-extension.xpi") {
     into "/"
 }
-
-prepareOracles.dependsOn(oracleClasses)
 
 /**
  * Set the arguments of the jvm in the start scripts.

@@ -20,6 +20,7 @@ import org.testar.config.ConfigTags;
 import org.testar.config.settings.Settings;
 import org.testar.core.Assert;
 import org.testar.core.policy.Policy;
+import org.testar.scriptless.util.ExternalJavaClassSupport;
 
 public final class ScriptlessPolicyLoader {
 
@@ -86,17 +87,19 @@ public final class ScriptlessPolicyLoader {
         }
 
         List<T> policies = new ArrayList<>();
+        Optional<String> resourcePath = optionalValue(settings.get(ConfigTags.CustomPoliciesResource, "").trim());
         for (String className : policyClassNames) {
-            policies.add(loadPolicy(className, expectedType, settings));
+            policies.add(loadPolicy(className, expectedType, settings, resourcePath));
         }
         return Collections.unmodifiableList(policies);
     }
 
     private static <T extends Policy> T loadPolicy(String className,
                                                    Class<T> expectedType,
-                                                   Settings settings) {
+                                                   Settings settings,
+                                                   Optional<String> resourcePath) {
         try {
-            Class<?> policyClass = Class.forName(className);
+            Class<?> policyClass = ExternalJavaClassSupport.loadClass(className, resourcePath);
 
             if (!expectedType.isAssignableFrom(policyClass)) {
                 throw new IllegalStateException(

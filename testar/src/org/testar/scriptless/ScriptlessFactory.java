@@ -350,6 +350,7 @@ public final class ScriptlessFactory {
 
         systemService = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.systemServiceClass(),
+                compositionDescriptor.customCompositionResource(),
                 SystemService.class,
                 systemService,
                 new Object[]{runtimeContext},
@@ -358,6 +359,7 @@ public final class ScriptlessFactory {
         );
         stateService = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.stateServiceClass(),
+                compositionDescriptor.customCompositionResource(),
                 StateService.class,
                 stateService,
                 new Object[]{runtimeContext},
@@ -366,6 +368,7 @@ public final class ScriptlessFactory {
         );
         actionDerivationService = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.actionDerivationServiceClass(),
+                compositionDescriptor.customCompositionResource(),
                 ActionDerivationService.class,
                 actionDerivationService,
                 new Object[]{runtimeContext},
@@ -374,6 +377,7 @@ public final class ScriptlessFactory {
         );
         actionSelectorService = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.actionSelectorServiceClass(),
+                compositionDescriptor.customCompositionResource(),
                 ActionSelectorService.class,
                 actionSelectorService,
                 new Object[]{stateModelManager},
@@ -383,6 +387,7 @@ public final class ScriptlessFactory {
         );
         actionExecutionService = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.actionExecutionServiceClass(),
+                compositionDescriptor.customCompositionResource(),
                 ActionExecutionService.class,
                 actionExecutionService,
                 new Object[]{runtimeContext},
@@ -425,6 +430,7 @@ public final class ScriptlessFactory {
 
         settingsCapability = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.settingsCapabilityClass(),
+                compositionDescriptor.customCompositionResource(),
                 SettingsCapability.class,
                 settingsCapability,
                 new Object[]{runtimeContext.settings()},
@@ -433,6 +439,7 @@ public final class ScriptlessFactory {
         );
         testSessionCapability = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.testSessionCapabilityClass(),
+                compositionDescriptor.customCompositionResource(),
                 TestSessionCapability.class,
                 testSessionCapability,
                 new Object[]{runtimeContext},
@@ -441,6 +448,7 @@ public final class ScriptlessFactory {
         );
         testSequenceCapability = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.testSequenceCapabilityClass(),
+                compositionDescriptor.customCompositionResource(),
                 TestSequenceCapability.class,
                 testSequenceCapability,
                 new Object[]{runtimeContext},
@@ -449,6 +457,7 @@ public final class ScriptlessFactory {
         );
         scriptlessOracleComposer = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.oracleComposerClass(),
+                compositionDescriptor.customCompositionResource(),
                 ScriptlessOracleComposer.class,
                 scriptlessOracleComposer,
                 new Object[]{runtimeContext.settings()},
@@ -457,6 +466,7 @@ public final class ScriptlessFactory {
         );
         stopCriteriaCapability = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.stopCriteriaCapabilityClass(),
+                compositionDescriptor.customCompositionResource(),
                 StopCriteriaCapability.class,
                 stopCriteriaCapability,
                 new Object[]{runtimeContext},
@@ -498,6 +508,7 @@ public final class ScriptlessFactory {
 
         systemService = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.systemServiceClass(),
+                compositionDescriptor.customCompositionResource(),
                 SystemService.class,
                 systemService,
                 new Object[]{runtimeContext},
@@ -506,6 +517,7 @@ public final class ScriptlessFactory {
         );
         stateService = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.stateServiceClass(),
+                compositionDescriptor.customCompositionResource(),
                 StateService.class,
                 stateService,
                 new Object[]{runtimeContext},
@@ -514,6 +526,7 @@ public final class ScriptlessFactory {
         );
         actionDerivationService = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.actionDerivationServiceClass(),
+                compositionDescriptor.customCompositionResource(),
                 ActionDerivationService.class,
                 actionDerivationService,
                 new Object[]{runtimeContext},
@@ -522,6 +535,7 @@ public final class ScriptlessFactory {
         );
         actionSelectorService = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.actionSelectorServiceClass(),
+                compositionDescriptor.customCompositionResource(),
                 ActionSelectorService.class,
                 actionSelectorService,
                 new Object[]{stateModelManager},
@@ -531,6 +545,7 @@ public final class ScriptlessFactory {
         );
         actionExecutionService = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.actionExecutionServiceClass(),
+                compositionDescriptor.customCompositionResource(),
                 ActionExecutionService.class,
                 actionExecutionService,
                 new Object[]{runtimeContext},
@@ -578,6 +593,7 @@ public final class ScriptlessFactory {
 
         systemService = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.systemServiceClass(),
+                compositionDescriptor.customCompositionResource(),
                 SystemService.class,
                 systemService,
                 new Object[]{runtimeContext},
@@ -586,6 +602,7 @@ public final class ScriptlessFactory {
         );
         stateService = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.stateServiceClass(),
+                compositionDescriptor.customCompositionResource(),
                 StateService.class,
                 stateService,
                 new Object[]{runtimeContext},
@@ -594,6 +611,7 @@ public final class ScriptlessFactory {
         );
         actionDerivationService = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.actionDerivationServiceClass(),
+                compositionDescriptor.customCompositionResource(),
                 ActionDerivationService.class,
                 actionDerivationService,
                 new Object[]{runtimeContext},
@@ -602,6 +620,7 @@ public final class ScriptlessFactory {
         );
         actionSelectorService = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.actionSelectorServiceClass(),
+                compositionDescriptor.customCompositionResource(),
                 ActionSelectorService.class,
                 actionSelectorService,
                 new Object[]{stateModelManager},
@@ -611,6 +630,7 @@ public final class ScriptlessFactory {
         );
         actionExecutionService = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.actionExecutionServiceClass(),
+                compositionDescriptor.customCompositionResource(),
                 ActionExecutionService.class,
                 actionExecutionService,
                 new Object[]{runtimeContext},
@@ -652,6 +672,7 @@ public final class ScriptlessFactory {
 
         settingsCapability = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.settingsCapabilityClass(),
+                compositionDescriptor.customCompositionResource(),
                 SettingsCapability.class,
                 settingsCapability,
                 new Object[]{runtimeContext.settings()},
@@ -660,6 +681,7 @@ public final class ScriptlessFactory {
         );
         testSessionCapability = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.testSessionCapabilityClass(),
+                compositionDescriptor.customCompositionResource(),
                 TestSessionCapability.class,
                 testSessionCapability,
                 new Object[]{runtimeContext},
@@ -668,6 +690,7 @@ public final class ScriptlessFactory {
         );
         testSequenceCapability = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.testSequenceCapabilityClass(),
+                compositionDescriptor.customCompositionResource(),
                 TestSequenceCapability.class,
                 testSequenceCapability,
                 new Object[]{runtimeContext},
@@ -676,6 +699,7 @@ public final class ScriptlessFactory {
         );
         scriptlessOracleComposer = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.oracleComposerClass(),
+                compositionDescriptor.customCompositionResource(),
                 ScriptlessOracleComposer.class,
                 scriptlessOracleComposer,
                 new Object[]{runtimeContext.settings()},
@@ -684,6 +708,7 @@ public final class ScriptlessFactory {
         );
         stopCriteriaCapability = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.stopCriteriaCapabilityClass(),
+                compositionDescriptor.customCompositionResource(),
                 StopCriteriaCapability.class,
                 stopCriteriaCapability,
                 new Object[]{runtimeContext},
@@ -721,6 +746,7 @@ public final class ScriptlessFactory {
 
         settingsCapability = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.settingsCapabilityClass(),
+                compositionDescriptor.customCompositionResource(),
                 SettingsCapability.class,
                 settingsCapability,
                 new Object[]{runtimeContext.settings()},
@@ -729,6 +755,7 @@ public final class ScriptlessFactory {
         );
         testSessionCapability = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.testSessionCapabilityClass(),
+                compositionDescriptor.customCompositionResource(),
                 TestSessionCapability.class,
                 testSessionCapability,
                 new Object[]{runtimeContext},
@@ -737,6 +764,7 @@ public final class ScriptlessFactory {
         );
         testSequenceCapability = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.testSequenceCapabilityClass(),
+                compositionDescriptor.customCompositionResource(),
                 TestSequenceCapability.class,
                 testSequenceCapability,
                 new Object[]{runtimeContext},
@@ -745,6 +773,7 @@ public final class ScriptlessFactory {
         );
         scriptlessOracleComposer = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.oracleComposerClass(),
+                compositionDescriptor.customCompositionResource(),
                 ScriptlessOracleComposer.class,
                 scriptlessOracleComposer,
                 new Object[]{runtimeContext.settings()},
@@ -753,6 +782,7 @@ public final class ScriptlessFactory {
         );
         stopCriteriaCapability = ScriptlessCompositionLoader.loadDelegateWrapper(
                 compositionDescriptor.stopCriteriaCapabilityClass(),
+                compositionDescriptor.customCompositionResource(),
                 StopCriteriaCapability.class,
                 stopCriteriaCapability,
                 new Object[]{runtimeContext},
