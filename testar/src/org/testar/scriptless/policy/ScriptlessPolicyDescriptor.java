@@ -23,7 +23,6 @@ public final class ScriptlessPolicyDescriptor {
     private final boolean replaceBlockedPolicies;
     private final boolean replaceWidgetFilterPolicies;
     private final boolean replaceVisiblePolicies;
-    private final boolean replaceAtCanvasPolicies;
     private final boolean replaceTopLevelPolicies;
     private final List<String> clickablePolicies;
     private final List<String> typeablePolicies;
@@ -33,7 +32,6 @@ public final class ScriptlessPolicyDescriptor {
     private final List<String> blockedPolicies;
     private final List<String> widgetFilterPolicies;
     private final List<String> visiblePolicies;
-    private final List<String> atCanvasPolicies;
     private final List<String> topLevelPolicies;
 
     public ScriptlessPolicyDescriptor(Optional<String> policiesResourcePath,
@@ -45,7 +43,6 @@ public final class ScriptlessPolicyDescriptor {
                                       boolean replaceBlockedPolicies,
                                       boolean replaceWidgetFilterPolicies,
                                       boolean replaceVisiblePolicies,
-                                      boolean replaceAtCanvasPolicies,
                                       boolean replaceTopLevelPolicies,
                                       List<String> clickablePolicies,
                                       List<String> typeablePolicies,
@@ -55,7 +52,6 @@ public final class ScriptlessPolicyDescriptor {
                                       List<String> blockedPolicies,
                                       List<String> widgetFilterPolicies,
                                       List<String> visiblePolicies,
-                                      List<String> atCanvasPolicies,
                                       List<String> topLevelPolicies) {
         this.policiesResourcePath = Assert.notNull(policiesResourcePath);
         this.replaceClickablePolicies = replaceClickablePolicies;
@@ -66,7 +62,6 @@ public final class ScriptlessPolicyDescriptor {
         this.replaceBlockedPolicies = replaceBlockedPolicies;
         this.replaceWidgetFilterPolicies = replaceWidgetFilterPolicies;
         this.replaceVisiblePolicies = replaceVisiblePolicies;
-        this.replaceAtCanvasPolicies = replaceAtCanvasPolicies;
         this.replaceTopLevelPolicies = replaceTopLevelPolicies;
         this.clickablePolicies = immutableList(clickablePolicies);
         this.typeablePolicies = immutableList(typeablePolicies);
@@ -76,7 +71,6 @@ public final class ScriptlessPolicyDescriptor {
         this.blockedPolicies = immutableList(blockedPolicies);
         this.widgetFilterPolicies = immutableList(widgetFilterPolicies);
         this.visiblePolicies = immutableList(visiblePolicies);
-        this.atCanvasPolicies = immutableList(atCanvasPolicies);
         this.topLevelPolicies = immutableList(topLevelPolicies);
     }
 
@@ -116,10 +110,6 @@ public final class ScriptlessPolicyDescriptor {
         return replaceVisiblePolicies;
     }
 
-    public boolean replaceAtCanvasPolicies() {
-        return replaceAtCanvasPolicies;
-    }
-
     public boolean replaceTopLevelPolicies() {
         return replaceTopLevelPolicies;
     }
@@ -154,10 +144,6 @@ public final class ScriptlessPolicyDescriptor {
 
     public List<String> visiblePolicies() {
         return visiblePolicies;
-    }
-
-    public List<String> atCanvasPolicies() {
-        return atCanvasPolicies;
     }
 
     public List<String> topLevelPolicies() {

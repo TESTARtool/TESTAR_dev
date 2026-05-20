@@ -36,8 +36,6 @@ public final class PolicyWorkspaceHelper {
                     "org.testar.core.policy.WidgetFilterPolicy", "allows", "return true;"),
             new PolicyDefinition("visiblePolicies", "Visible policies", "VisiblePolicy",
                     "org.testar.core.policy.VisiblePolicy", "isVisible", "return true;"),
-            new PolicyDefinition("atCanvasPolicies", "At-canvas policies", "AtCanvasPolicy",
-                    "org.testar.core.policy.AtCanvasPolicy", "isAtCanvas", "return true;"),
             new PolicyDefinition("topLevelPolicies", "Top-level policies", "TopLevelPolicy",
                     "org.testar.core.policy.TopLevelPolicy", "isTopLevel", "return true;")
     };

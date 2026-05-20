@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.testar.core.Assert;
-import org.testar.core.policy.AtCanvasPolicy;
 import org.testar.core.policy.BlockedPolicy;
 import org.testar.core.policy.ClickablePolicy;
 import org.testar.core.policy.EnabledPolicy;
@@ -24,7 +23,6 @@ import org.testar.core.policy.TypeablePolicy;
 import org.testar.core.policy.VisiblePolicy;
 import org.testar.core.policy.WidgetFilterPolicy;
 import org.testar.engine.policy.SessionPolicyContext;
-import org.testar.engine.policy.composite.CompositeAtCanvasPolicy;
 import org.testar.engine.policy.composite.CompositeBlockedPolicy;
 import org.testar.engine.policy.composite.CompositeClickablePolicy;
 import org.testar.engine.policy.composite.CompositeEnabledPolicy;
@@ -118,9 +116,6 @@ public final class SessionPolicyContextComposer {
         }
         if (policyType == VisiblePolicy.class) {
             return new CompositeVisiblePolicy((List<VisiblePolicy>) policies);
-        }
-        if (policyType == AtCanvasPolicy.class) {
-            return new CompositeAtCanvasPolicy((List<AtCanvasPolicy>) policies);
         }
         if (policyType == TopLevelPolicy.class) {
             return new CompositeTopLevelPolicy((List<TopLevelPolicy>) policies);

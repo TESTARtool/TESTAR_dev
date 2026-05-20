@@ -39,8 +39,6 @@ public final class ScriptlessPolicyLoader {
     private static final String PROPERTY_REPLACE_WIDGET_FILTER_POLICIES = "replaceWidgetFilterPolicies";
     private static final String PROPERTY_VISIBLE_POLICIES = "visiblePolicies";
     private static final String PROPERTY_REPLACE_VISIBLE_POLICIES = "replaceVisiblePolicies";
-    private static final String PROPERTY_AT_CANVAS_POLICIES = "atCanvasPolicies";
-    private static final String PROPERTY_REPLACE_AT_CANVAS_POLICIES = "replaceAtCanvasPolicies";
     private static final String PROPERTY_TOP_LEVEL_POLICIES = "topLevelPolicies";
     private static final String PROPERTY_REPLACE_TOP_LEVEL_POLICIES = "replaceTopLevelPolicies";
 
@@ -63,7 +61,6 @@ public final class ScriptlessPolicyLoader {
                 parseBoolean(resourceProperties.getProperty(PROPERTY_REPLACE_BLOCKED_POLICIES, "false")),
                 parseBoolean(resourceProperties.getProperty(PROPERTY_REPLACE_WIDGET_FILTER_POLICIES, "false")),
                 parseBoolean(resourceProperties.getProperty(PROPERTY_REPLACE_VISIBLE_POLICIES, "false")),
-                parseBoolean(resourceProperties.getProperty(PROPERTY_REPLACE_AT_CANVAS_POLICIES, "false")),
                 parseBoolean(resourceProperties.getProperty(PROPERTY_REPLACE_TOP_LEVEL_POLICIES, "false")),
                 parseClassList(resourceProperties.getProperty(PROPERTY_CLICKABLE_POLICIES, "")),
                 parseClassList(resourceProperties.getProperty(PROPERTY_TYPEABLE_POLICIES, "")),
@@ -73,7 +70,6 @@ public final class ScriptlessPolicyLoader {
                 parseClassList(resourceProperties.getProperty(PROPERTY_BLOCKED_POLICIES, "")),
                 parseClassList(resourceProperties.getProperty(PROPERTY_WIDGET_FILTER_POLICIES, "")),
                 parseClassList(resourceProperties.getProperty(PROPERTY_VISIBLE_POLICIES, "")),
-                parseClassList(resourceProperties.getProperty(PROPERTY_AT_CANVAS_POLICIES, "")),
                 parseClassList(resourceProperties.getProperty(PROPERTY_TOP_LEVEL_POLICIES, ""))
         );
     }

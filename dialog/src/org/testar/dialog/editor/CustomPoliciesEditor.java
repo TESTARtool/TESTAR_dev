@@ -36,8 +36,6 @@ public final class CustomPoliciesEditor extends AbstractTextFileEditor {
                         "widgetFilterPolicies=",
                         "replaceVisiblePolicies=false",
                         "visiblePolicies=",
-                        "replaceAtCanvasPolicies=false",
-                        "atCanvasPolicies=",
                         "replaceTopLevelPolicies=false",
                         "topLevelPolicies=",
                         ""

@@ -11,7 +11,6 @@ import java.util.Set;
 
 import org.testar.core.Assert;
 import org.testar.core.action.Action;
-import org.testar.core.policy.AtCanvasPolicy;
 import org.testar.core.policy.BlockedPolicy;
 import org.testar.core.policy.EnabledPolicy;
 import org.testar.core.state.SUT;
@@ -42,14 +41,12 @@ public final class StateActionDeriver implements ActionDeriver {
         BlockedPolicy blockedPolicy = context.require(BlockedPolicy.class);
         WidgetFilterPolicy widgetFilterPolicy = context.require(WidgetFilterPolicy.class);
         VisiblePolicy visiblePolicy = context.require(VisiblePolicy.class);
-        AtCanvasPolicy atCanvasPolicy = context.require(AtCanvasPolicy.class);
         TopLevelPolicy topLevelPolicy = context.require(TopLevelPolicy.class);
         for (Widget widget : state) {
             if (enabledPolicy.isEnabled(widget)
                     && !blockedPolicy.isBlocked(widget)
                     && widgetFilterPolicy.allows(widget)
                     && visiblePolicy.isVisible(widget)
-                    && atCanvasPolicy.isAtCanvas(widget)
                     && topLevelPolicy.isTopLevel(widget)) {
                 actions.addAll(widgetActionDeriver.derive(system, state, widget, context));
             }

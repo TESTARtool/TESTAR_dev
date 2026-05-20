@@ -10,7 +10,6 @@ import org.junit.Test;
 import org.testar.core.action.Action;
 import org.testar.core.action.ActionRoles;
 import org.testar.core.alayer.Role;
-import org.testar.core.policy.AtCanvasPolicy;
 import org.testar.core.policy.BlockedPolicy;
 import org.testar.core.policy.ClickablePolicy;
 import org.testar.core.policy.EnabledPolicy;
@@ -25,7 +24,6 @@ import org.testar.core.state.Widget;
 import org.testar.core.tag.TaggableBase;
 import org.testar.core.tag.Tags;
 import org.testar.engine.policy.SessionPolicyContext;
-import org.testar.engine.policy.composite.CompositeAtCanvasPolicy;
 import org.testar.engine.policy.composite.CompositeBlockedPolicy;
 import org.testar.engine.policy.composite.CompositeClickablePolicy;
 import org.testar.engine.policy.composite.CompositeEnabledPolicy;
@@ -133,7 +131,6 @@ public final class ComposedActionDerivationServiceTest {
         BlockedPolicy blocked = widget -> false;
         WidgetFilterPolicy filter = widget -> true;
         VisiblePolicy visible = widget -> true;
-        AtCanvasPolicy atCanvas = widget -> true;
         TopLevelPolicy topLevel = widget -> true;
 
         ComposedActionDerivationService service = new ComposedActionDerivationService(
@@ -145,7 +142,6 @@ public final class ComposedActionDerivationServiceTest {
                         Arrays.asList(blocked),
                         Arrays.asList(filter),
                         Arrays.asList(visible),
-                        Arrays.asList(atCanvas),
                         Arrays.asList(topLevel)
                 ),
                 new ActionDerivationPlan(
@@ -163,7 +159,6 @@ public final class ComposedActionDerivationServiceTest {
         Assert.assertFalse(service.context().require(BlockedPolicy.class).isBlocked(widget));
         Assert.assertTrue(service.context().require(WidgetFilterPolicy.class).allows(widget));
         Assert.assertTrue(service.context().require(VisiblePolicy.class).isVisible(widget));
-        Assert.assertTrue(service.context().require(AtCanvasPolicy.class).isAtCanvas(widget));
         Assert.assertTrue(service.context().require(TopLevelPolicy.class).isTopLevel(widget));
     }
 
@@ -316,7 +311,6 @@ public final class ComposedActionDerivationServiceTest {
                 blockedPolicies,
                 widgetFilterPolicies,
                 Collections.singletonList(widget -> true),
-                Collections.singletonList(widget -> true),
                 Collections.singletonList(widget -> true)
         );
     }
@@ -328,7 +322,6 @@ public final class ComposedActionDerivationServiceTest {
                                          java.util.List<BlockedPolicy> blockedPolicies,
                                          java.util.List<WidgetFilterPolicy> widgetFilterPolicies,
                                          java.util.List<VisiblePolicy> visiblePolicies,
-                                         java.util.List<AtCanvasPolicy> atCanvasPolicies,
                                          java.util.List<TopLevelPolicy> topLevelPolicies) {
         return new SessionPolicyContext(
                 new CompositeClickablePolicy(clickablePolicies),
@@ -338,7 +331,6 @@ public final class ComposedActionDerivationServiceTest {
                 new CompositeBlockedPolicy(blockedPolicies),
                 new CompositeWidgetFilterPolicy(widgetFilterPolicies),
                 new CompositeVisiblePolicy(visiblePolicies),
-                new CompositeAtCanvasPolicy(atCanvasPolicies),
                 new CompositeTopLevelPolicy(topLevelPolicies)
         );
     }

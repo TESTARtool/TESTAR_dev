@@ -255,9 +255,6 @@ The main policy contracts are in `org.testar.core.policy`.
 - `VisiblePolicy`
   Decides whether a widget should be considered visible for state, action, oracle, or reporting logic.
   File: `core/src/org/testar/core/policy/VisiblePolicy.java`
-- `AtCanvasPolicy`
-  Decides whether a widget should be considered inside the actionable or inspectable canvas area.
-  File: `core/src/org/testar/core/policy/AtCanvasPolicy.java`
 - `TopLevelPolicy`
   Decides whether a widget should be treated as a top-level widget for higher-level queries or orchestration.
   File: `core/src/org/testar/core/policy/TopLevelPolicy.java`
@@ -384,8 +381,6 @@ Examples:
   Produces one `WidgetFilterPolicy` from one or more explicit widget-filter rules.
 - `CompositeVisiblePolicy`
   Produces one `VisiblePolicy` from one or more visibility rules.
-- `CompositeAtCanvasPolicy`
-  Produces one `AtCanvasPolicy` from one or more canvas-scope rules.
 - `CompositeTopLevelPolicy`
   Produces one `TopLevelPolicy` from one or more top-level rules.
 
@@ -449,7 +444,6 @@ It stores effective policies by their policy-interface type, for example:
 - `BlockedPolicy.class`
 - `WidgetFilterPolicy.class`
 - `VisiblePolicy.class`
-- `AtCanvasPolicy.class`
 - `TopLevelPolicy.class`
 
 This shows the intended role of `engine`:
@@ -705,7 +699,6 @@ The current derivation gating in `StateActionDeriver` uses:
 - `BlockedPolicy`
 - `WidgetFilterPolicy`
 - `VisiblePolicy`
-- `AtCanvasPolicy`
 - `TopLevelPolicy`
 
 Then the widget-level deriver uses capability policies such as:

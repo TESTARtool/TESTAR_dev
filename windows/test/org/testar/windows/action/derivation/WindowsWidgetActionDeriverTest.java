@@ -21,7 +21,6 @@ import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 import org.testar.core.tag.TaggableBase;
 import org.testar.engine.policy.SessionPolicyContext;
-import org.testar.engine.policy.composite.CompositeAtCanvasPolicy;
 import org.testar.engine.policy.composite.CompositeBlockedPolicy;
 import org.testar.engine.policy.composite.CompositeClickablePolicy;
 import org.testar.engine.policy.composite.CompositeEnabledPolicy;
@@ -104,7 +103,6 @@ public final class WindowsWidgetActionDeriverTest {
                 new CompositeBlockedPolicy(java.util.Collections.singletonList(widget -> false)),
                 new CompositeWidgetFilterPolicy(java.util.Collections.singletonList(widget -> true)),
                 new CompositeVisiblePolicy(java.util.Collections.singletonList(widget -> true)),
-                new CompositeAtCanvasPolicy(java.util.Collections.singletonList(widget -> true)),
                 new CompositeTopLevelPolicy(java.util.Collections.singletonList(widget -> true))
         );
     }

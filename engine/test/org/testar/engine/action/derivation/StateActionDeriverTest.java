@@ -16,7 +16,6 @@ import org.testar.core.action.Action;
 import org.testar.engine.policy.SessionPolicyContext;
 import org.testar.engine.policy.TagBlockedPolicy;
 import org.testar.engine.policy.TagEnabledPolicy;
-import org.testar.engine.policy.composite.CompositeAtCanvasPolicy;
 import org.testar.engine.policy.composite.CompositeBlockedPolicy;
 import org.testar.engine.policy.composite.CompositeClickablePolicy;
 import org.testar.engine.policy.composite.CompositeEnabledPolicy;
@@ -125,7 +124,6 @@ public final class StateActionDeriverTest {
                 new CompositeBlockedPolicy(Collections.singletonList(new TagBlockedPolicy())),
                 new CompositeWidgetFilterPolicy(Collections.singletonList(widget -> true)),
                 new CompositeVisiblePolicy(Collections.singletonList(widget -> true)),
-                new CompositeAtCanvasPolicy(Collections.singletonList(widget -> true)),
                 new CompositeTopLevelPolicy(Collections.singletonList(widget -> true))
         );
     }
@@ -139,7 +137,6 @@ public final class StateActionDeriverTest {
                 new CompositeBlockedPolicy(Collections.singletonList(widget -> false)),
                 new CompositeWidgetFilterPolicy(Collections.singletonList(widget -> widget != filteredWidget)),
                 new CompositeVisiblePolicy(Collections.singletonList(widget -> true)),
-                new CompositeAtCanvasPolicy(Collections.singletonList(widget -> true)),
                 new CompositeTopLevelPolicy(Collections.singletonList(widget -> true))
         );
     }

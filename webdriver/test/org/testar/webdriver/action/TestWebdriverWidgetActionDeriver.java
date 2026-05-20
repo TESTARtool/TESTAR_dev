@@ -9,7 +9,6 @@ import org.testar.core.action.Action;
 import org.testar.core.policy.WidgetFilterPolicy;
 import org.testar.core.tag.Tags;
 import org.testar.engine.policy.SessionPolicyContext;
-import org.testar.engine.policy.composite.CompositeAtCanvasPolicy;
 import org.testar.engine.policy.composite.CompositeBlockedPolicy;
 import org.testar.engine.policy.composite.CompositeClickablePolicy;
 import org.testar.engine.policy.composite.CompositeEnabledPolicy;
@@ -51,7 +50,6 @@ public class TestWebdriverWidgetActionDeriver {
                 new CompositeBlockedPolicy(Collections.singletonList(widget -> false)),
                 allowAllWidgets(),
                 new CompositeVisiblePolicy(Collections.singletonList(widget -> true)),
-                new CompositeAtCanvasPolicy(Collections.singletonList(widget -> true)),
                 new CompositeTopLevelPolicy(Collections.singletonList(widget -> true))
         );
         Set<Action> actions = deriver.derive(null, wdWidget.root(), wdWidget, context);
@@ -81,7 +79,6 @@ public class TestWebdriverWidgetActionDeriver {
                 new CompositeBlockedPolicy(Collections.singletonList(widget -> false)),
                 allowAllWidgets(),
                 new CompositeVisiblePolicy(Collections.singletonList(widget -> true)),
-                new CompositeAtCanvasPolicy(Collections.singletonList(widget -> true)),
                 new CompositeTopLevelPolicy(Collections.singletonList(widget -> true))
         );
         Set<Action> actions = deriver.derive(null, wdWidget.root(), wdWidget, context);

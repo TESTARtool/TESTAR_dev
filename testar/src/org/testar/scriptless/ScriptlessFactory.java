@@ -10,7 +10,6 @@ import org.testar.core.Assert;
 import org.testar.config.ConfigTags;
 import org.testar.config.settings.Settings;
 import org.testar.core.action.resolver.ActionResolver;
-import org.testar.core.policy.AtCanvasPolicy;
 import org.testar.core.policy.BlockedPolicy;
 import org.testar.core.policy.ClickablePolicy;
 import org.testar.core.policy.EnabledPolicy;
@@ -306,19 +305,6 @@ public final class ScriptlessFactory {
         } else {
             for (VisiblePolicy policy : visiblePolicies) {
                 builder.addPolicy(VisiblePolicy.class, policy);
-            }
-        }
-
-        List<AtCanvasPolicy> atCanvasPolicies = ScriptlessPolicyLoader.loadPolicies(
-                policyDescriptor.atCanvasPolicies(),
-                AtCanvasPolicy.class,
-                runtimeContext.settings()
-        );
-        if (policyDescriptor.replaceAtCanvasPolicies()) {
-            builder.replacePolicies(AtCanvasPolicy.class, atCanvasPolicies);
-        } else {
-            for (AtCanvasPolicy policy : atCanvasPolicies) {
-                builder.addPolicy(AtCanvasPolicy.class, policy);
             }
         }
 

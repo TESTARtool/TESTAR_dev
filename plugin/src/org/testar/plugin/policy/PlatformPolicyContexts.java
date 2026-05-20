@@ -15,7 +15,6 @@ import org.testar.android.policy.AndroidScrollablePolicy;
 import org.testar.android.policy.AndroidTypeablePolicy;
 import org.testar.android.policy.ConfigurableAndroidClickableClassPolicy;
 import org.testar.android.policy.ConfigurableAndroidTypeableClassPolicy;
-import org.testar.core.policy.AtCanvasPolicy;
 import org.testar.core.policy.BlockedPolicy;
 import org.testar.core.policy.EnabledPolicy;
 import org.testar.core.policy.SelectablePolicy;
@@ -25,7 +24,6 @@ import org.testar.core.policy.WidgetFilterPolicy;
 import org.testar.engine.policy.SessionPolicyContext;
 import org.testar.engine.policy.TagBlockedPolicy;
 import org.testar.engine.policy.TagEnabledPolicy;
-import org.testar.engine.policy.composite.CompositeAtCanvasPolicy;
 import org.testar.engine.policy.composite.CompositeBlockedPolicy;
 import org.testar.engine.policy.composite.CompositeClickablePolicy;
 import org.testar.engine.policy.composite.CompositeEnabledPolicy;
@@ -58,7 +56,6 @@ public final class PlatformPolicyContexts {
         List<BlockedPolicy> blockedPolicies = List.of(new TagBlockedPolicy());
         List<WidgetFilterPolicy> widgetFilterPolicies = Collections.emptyList();
         List<VisiblePolicy> visiblePolicies = Collections.singletonList(widget -> true);
-        List<AtCanvasPolicy> atCanvasPolicies = Collections.singletonList(widget -> true);
         List<TopLevelPolicy> topLevelPolicies = Collections.singletonList(widget -> true);
 
         return new SessionPolicyContext(
@@ -70,7 +67,6 @@ public final class PlatformPolicyContexts {
                 new CompositeBlockedPolicy(blockedPolicies),
                 new CompositeWidgetFilterPolicy(widgetFilterPolicies),
                 new CompositeVisiblePolicy(visiblePolicies),
-                new CompositeAtCanvasPolicy(atCanvasPolicies),
                 new CompositeTopLevelPolicy(topLevelPolicies)
         );
     }
@@ -81,7 +77,6 @@ public final class PlatformPolicyContexts {
         List<BlockedPolicy> blockedPolicies = List.of(new TagBlockedPolicy());
         List<WidgetFilterPolicy> widgetFilterPolicies = Collections.emptyList();
         List<VisiblePolicy> visiblePolicies = Collections.singletonList(widget -> true);
-        List<AtCanvasPolicy> atCanvasPolicies = Collections.singletonList(widget -> true);
         List<TopLevelPolicy> topLevelPolicies = Collections.singletonList(widget -> true);
 
         return new SessionPolicyContext(
@@ -99,7 +94,6 @@ public final class PlatformPolicyContexts {
                 new CompositeBlockedPolicy(blockedPolicies),
                 new CompositeWidgetFilterPolicy(widgetFilterPolicies),
                 new CompositeVisiblePolicy(visiblePolicies),
-                new CompositeAtCanvasPolicy(atCanvasPolicies),
                 new CompositeTopLevelPolicy(topLevelPolicies)
         );
     }
@@ -110,7 +104,6 @@ public final class PlatformPolicyContexts {
         List<BlockedPolicy> blockedPolicies = List.of(new TagBlockedPolicy());
         List<WidgetFilterPolicy> widgetFilterPolicies = Collections.emptyList();
         List<VisiblePolicy> visiblePolicies = Collections.singletonList(widget -> true);
-        List<AtCanvasPolicy> atCanvasPolicies = Collections.singletonList(widget -> true);
         List<TopLevelPolicy> topLevelPolicies = Collections.singletonList(widget -> true);
 
         return new SessionPolicyContext(
@@ -128,7 +121,6 @@ public final class PlatformPolicyContexts {
                 new CompositeBlockedPolicy(blockedPolicies),
                 new CompositeWidgetFilterPolicy(widgetFilterPolicies),
                 new CompositeVisiblePolicy(visiblePolicies),
-                new CompositeAtCanvasPolicy(atCanvasPolicies),
                 new CompositeTopLevelPolicy(topLevelPolicies)
         );
     }
