@@ -9,6 +9,7 @@ package org.testar.webdriver.action.derivation;
 import java.util.Collections;
 import java.util.List;
 
+import org.testar.config.settings.Settings;
 import org.testar.engine.action.TextInputProvider;
 import org.testar.engine.action.derivation.ActionDerivationPlan;
 import org.testar.engine.action.derivation.ActionDeriver;
@@ -23,7 +24,10 @@ public final class WebdriverActionDerivationPlan {
     private WebdriverActionDerivationPlan() {
     }
 
-    public static ActionDerivationPlan create(TextInputProvider textInputProvider) {
+    public static ActionDerivationPlan create(Settings settings, TextInputProvider textInputProvider) {
+        List<ActionDeriver> forcedDerivers = Collections.singletonList(
+                new WebdriverForcedActionDeriver(new WdDeniedUrlForcedActionDeriver(settings))
+        );
         ActionDeriver defaultDeriver = new StateActionDeriver(
                 new WebdriverWidgetActionDeriver(textInputProvider)
         );
@@ -31,7 +35,7 @@ public final class WebdriverActionDerivationPlan {
         List<ActionDeriver> fallbackDerivers = Collections.singletonList(new WdHistoryBackFallbackActionDeriver());
 
         return new ActionDerivationPlan(
-                Collections.emptyList(),
+                forcedDerivers,
                 defaultDerivers,
                 fallbackDerivers
         );

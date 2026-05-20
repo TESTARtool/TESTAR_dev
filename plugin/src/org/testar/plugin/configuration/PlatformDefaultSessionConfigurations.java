@@ -125,6 +125,7 @@ public final class PlatformDefaultSessionConfigurations {
                 )
                 .overrideActionDerivationPlan(
                         WebdriverActionDerivationPlan.create(
+                                settings,
                                 widget -> InputDataManager.getRandomTextInputData()
                         )
                 )
