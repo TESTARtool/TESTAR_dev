@@ -6,15 +6,11 @@ flowchart LR
     end
 
     subgraph SharedContexts["shared composition"]
-        SystemPlan["SystemCompositionPlan"]
+        SystemPlan["SystemCompositionPlan (Wrapper)"]
     end
 
     subgraph PlatformPlanProviders["platform plan providers"]
         PlatformPlan["PlatformSystemCompositionPlan (WindowsSystemCompositionPlan/ WebdriverSystemCompositionPlan/ AndroidSystemCompositionPlan)"]
-    end
-
-    subgraph CustomPlanProviders["custom plan providers"]
-        CustomPlan["CustomSystemCompositionPlan"]
     end
 
     subgraph CoreSystem["core service contract"]
@@ -29,21 +25,13 @@ flowchart LR
         PlatformSystemService["PlatformSystemService (WindowsSystemService/ WebdriverSystemService/ AndroidSystemService)"]
     end
 
-    subgraph EngineHooks["engine lifecycle hooks"]
-        StartHooks["Start hooks"]
-        StopHooks["Stop hooks"]
-    end
-
     Orchestrator --> PlanSelection
 
     PlanSelection --> SystemPlan
 
     PlatformSystemService --> PlatformPlan
-    StartHooks --> PlatformPlan
-    StopHooks --> PlatformPlan
 
     PlatformPlan --> SystemPlan
-    CustomPlan --> SystemPlan
 
     ComposedSystemService -. implements .-> SystemService
 

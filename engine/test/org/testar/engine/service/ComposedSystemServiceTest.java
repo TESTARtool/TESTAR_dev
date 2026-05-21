@@ -1,8 +1,8 @@
 package org.testar.engine.service;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -19,28 +19,21 @@ import org.testar.engine.system.SystemCompositionPlan;
 public final class ComposedSystemServiceTest {
 
     @Test
-    public void startSystemDelegatesAndRunsHooks() throws SystemStartException {
+    public void startSystemDelegatesToConfiguredService() throws SystemStartException {
         TestSut expectedSystem = new TestSut();
-        AtomicReference<SUT> receivedSystem = new AtomicReference<>();
         ComposedSystemService service = ComposedSystemService.compose(
-                new SystemCompositionPlan(
-                        new TestSystemService(expectedSystem),
-                        Collections.singletonList(receivedSystem::set),
-                        Collections.emptyList()
-                )
+                new SystemCompositionPlan(new TestSystemService(expectedSystem))
         );
 
         SUT system = service.startSystem();
 
         Assert.assertSame(expectedSystem, system);
-        Assert.assertSame(expectedSystem, receivedSystem.get());
     }
 
     @Test
-    public void stopSystemRunsHooksBeforeDelegating() {
-        AtomicBoolean hookCalled = new AtomicBoolean(false);
-        AtomicBoolean delegateCalled = new AtomicBoolean(false);
+    public void stopSystemDelegatesToConfiguredService() {
         TestSut system = new TestSut();
+        AtomicBoolean delegateCalled = new AtomicBoolean(false);
         SystemService delegate = new SystemService() {
             @Override
             public SUT startSystem() {
@@ -49,16 +42,12 @@ public final class ComposedSystemServiceTest {
 
             @Override
             public void stopSystem(SUT currentSystem) {
-                Assert.assertTrue(hookCalled.get());
+                Assert.assertSame(system, currentSystem);
                 delegateCalled.set(true);
             }
         };
         ComposedSystemService service = ComposedSystemService.compose(
-                new SystemCompositionPlan(
-                        delegate,
-                        Collections.emptyList(),
-                        Collections.singletonList(currentSystem -> hookCalled.set(true))
-                )
+                new SystemCompositionPlan(delegate)
         );
 
         service.stopSystem(system);
@@ -85,7 +74,7 @@ public final class ComposedSystemServiceTest {
         }
 
         @Override
-        public java.util.List<Pair<Long, String>> getRunningProcesses() {
+        public List<Pair<Long, String>> getRunningProcesses() {
             return Collections.emptyList();
         }
 

@@ -11,7 +11,8 @@ import org.testar.core.service.ActionSelectorService;
 import org.testar.engine.action.selection.random.RandomActionSelector;
 
 /**
- * Minimal composition contract for action selection orchestration.
+ * Orchestrates action selection by pairing a primary selector with a fallback
+ * selector used when the primary selector does not choose an action.
  */
 public final class ActionSelectorPlan {
 

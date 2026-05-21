@@ -14,8 +14,7 @@ import org.testar.core.state.State;
 import org.testar.engine.action.execution.ActionExecutionPlan;
 
 /**
- * Engine-side action execution service that composes a base executor with
- * execution hooks.
+ * Engine-side action execution service that delegates to the configured executor.
  */
 public final class ComposedActionExecutionService implements ActionExecutionService {
 
@@ -31,14 +30,7 @@ public final class ComposedActionExecutionService implements ActionExecutionServ
 
     @Override
     public boolean executeAction(SUT system, State state, Action action) {
-        for (ActionExecutionPlan.BeforeExecutionHook beforeExecutionHook : plan.beforeExecutionHooks()) {
-            beforeExecutionHook.beforeExecute(system, state, action);
-        }
-        boolean executed = plan.actionExecutionService().executeAction(system, state, action);
-        for (ActionExecutionPlan.AfterExecutionHook afterExecutionHook : plan.afterExecutionHooks()) {
-            afterExecutionHook.afterExecute(system, state, action, executed);
-        }
-        return executed;
+        return plan.actionExecutionService().executeAction(system, state, action);
     }
 
     public ActionExecutionPlan plan() {

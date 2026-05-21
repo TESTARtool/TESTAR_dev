@@ -10,7 +10,7 @@ import org.testar.core.Assert;
 import org.testar.core.action.resolver.ActionResolver;
 
 /**
- * Minimal composition contract for action resolution orchestration.
+ * Orchestrator wrapper for the configured action resolver.
  */
 public final class ActionResolverPlan {
 

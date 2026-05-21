@@ -13,8 +13,7 @@ import org.testar.core.state.SUT;
 import org.testar.engine.system.SystemCompositionPlan;
 
 /**
- * Engine-side system service that composes a native system service with
- * lifecycle hooks.
+ * Engine-side system service that delegates to the configured system service.
  */
 public final class ComposedSystemService implements SystemService {
 
@@ -30,18 +29,11 @@ public final class ComposedSystemService implements SystemService {
 
     @Override
     public SUT startSystem() throws SystemStartException {
-        SUT system = plan.systemService().startSystem();
-        for (SystemCompositionPlan.StartHook startHook : plan.startHooks()) {
-            startHook.afterStart(system);
-        }
-        return system;
+        return plan.systemService().startSystem();
     }
 
     @Override
     public void stopSystem(SUT system) {
-        for (SystemCompositionPlan.StopHook stopHook : plan.stopHooks()) {
-            stopHook.beforeStop(system);
-        }
         plan.systemService().stopSystem(system);
     }
 

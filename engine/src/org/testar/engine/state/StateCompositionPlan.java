@@ -13,7 +13,8 @@ import org.testar.core.tag.Tag;
 import org.testar.engine.policy.SessionPolicyContext;
 
 /**
- * Defines how a state service captures and projects state for a concrete state query.
+ * Orchestrates state capture and projection by pairing one state service with
+ * the state-shaping rule that turns the captured state into the engine view.
  */
 public final class StateCompositionPlan {
 

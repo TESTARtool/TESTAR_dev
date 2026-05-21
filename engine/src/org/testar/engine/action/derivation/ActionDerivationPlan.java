@@ -12,7 +12,8 @@ import java.util.List;
 import org.testar.core.Assert;
 
 /**
- * Action-derivation phases grouped as one composition plan.
+ * Orchestrates action derivation by defining the forced, default, and fallback
+ * derivation phases executed by the engine.
  */
 public final class ActionDerivationPlan {
 
