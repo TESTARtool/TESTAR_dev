@@ -5,6 +5,14 @@ flowchart LR
         ServiceSelection["service selection"]
     end
 
+    subgraph CustomOracleProviders["custom oracle providers"]
+        CustomOracleService["CustomOracleEvaluationService"]
+    end
+
+    subgraph SharedContexts["shared composition"]
+        OraclePlan["OracleEvaluationPlan (Wrapper)"]
+    end
+
     subgraph ComposedOracle["composed oracle service"]
         DefaultOracleEvaluationService["DefaultOracleEvaluationService"]
         ComposedOracleEvaluationService["ComposedOracleEvaluationService"]
@@ -15,14 +23,11 @@ flowchart LR
         OracleEvaluationService["OracleEvaluationService"]
     end
 
-    subgraph CustomOracleProviders["custom oracle providers"]
-        CustomOracleService["CustomOracleEvaluationService"]
-    end
-
     Orchestrator --> ServiceSelection
-    ServiceSelection --> ComposedOracleEvaluationService
+    ServiceSelection --> OraclePlan
+    OraclePlan --> ComposedOracleEvaluationService
 
-    CustomOracleService --> ComposedOracleEvaluationService
+    CustomOracleService --> OraclePlan
 
     DefaultOracleEvaluationService -. implements .-> OracleEvaluationService
     ComposedOracleEvaluationService -. implements .-> OracleEvaluationService
@@ -30,5 +35,4 @@ flowchart LR
     ComposedOracleEvaluationService -- "produces" --> verdicts
 
     %% horizontal row nudges
-    ServiceSelection ~~~ ComposedOracle
-    CustomOracleService ~~~ ComposedOracle
+    SharedContexts ~~~ ComposedOracle

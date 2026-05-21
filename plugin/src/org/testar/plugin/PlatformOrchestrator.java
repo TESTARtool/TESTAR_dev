@@ -8,6 +8,8 @@ package org.testar.plugin;
 
 import org.testar.engine.policy.SessionPolicyContext;
 import org.testar.plugin.configuration.PlatformDefaultSessionConfigurations;
+import org.testar.plugin.configuration.PlatformDefaultServicePlans;
+import org.testar.plugin.configuration.PlatformSessionAssembly;
 import org.testar.plugin.configuration.SessionPolicyConfiguration;
 import org.testar.plugin.configuration.SessionPolicyContextComposer;
 import org.testar.plugin.configuration.SessionServiceComposer;
@@ -16,7 +18,6 @@ import org.testar.plugin.policy.PlatformPolicyContexts;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 
 import org.testar.config.ConfigTags;
 import org.testar.config.StateModelTags;
@@ -54,7 +55,7 @@ public final class PlatformOrchestrator {
                 sessionSpec,
                 policyConfiguration,
                 serviceConfiguration,
-                createStateModelService(sessionSpec)
+                createStateModelManager(sessionSpec)
         );
     }
 
@@ -64,6 +65,7 @@ public final class PlatformOrchestrator {
                                            StateModelManager stateModelManager) {
         configureNativePlatform(sessionSpec.getOperatingSystem());
 
+        // Resolve the platform-specific defaults first, then compose the final services.
         switch (sessionSpec.getOperatingSystem()) {
             case ANDROID:
                 return android(sessionSpec, policyConfiguration, serviceConfiguration, stateModelManager);
@@ -79,18 +81,13 @@ public final class PlatformOrchestrator {
         }
     }
 
-    public static PlatformSession openSession(PlatformSessionSpec sessionSpec) {
-        configureNativePlatform(sessionSpec.getOperatingSystem());
-        PlatformServices services = resolve(sessionSpec);
-        return openSession(sessionSpec, services);
-    }
-
     public static PlatformSession openCliSession(PlatformSessionSpec sessionSpec) {
-        configureNativePlatform(sessionSpec.getOperatingSystem());
-        return openSession(sessionSpec);
+        // CLI opens a full platform session after resolving the shared services.
+        return openSession(sessionSpec, resolve(sessionSpec));
     }
 
     private static void configureNativePlatform(OperatingSystems operatingSystem) {
+        // Reset platform flags before enabling the one required by this session.
         NativeLinker.cleanWdDriverOS();
         NativeLinker.cleanAndroidOS();
 
@@ -102,6 +99,7 @@ public final class PlatformOrchestrator {
     }
 
     private static PlatformSession openSession(PlatformSessionSpec sessionSpec, PlatformServices services) {
+        // Start the SUT first so reporting only begins for a live session.
         SUT system = services.systemService().startSystem();
         try {
             SessionReportingManager sessionReportingManager = SessionReportingManager.start(
@@ -116,6 +114,8 @@ public final class PlatformOrchestrator {
     }
 
     public static State projectCliState(PlatformSessionSpec sessionSpec, State state) {
+        // CLI state projection uses the same platform defaults, but only applies
+        // the semantic state shaping step to an already captured state.
         SessionPolicyContext sessionPolicyContext = buildSessionPolicyContext(sessionSpec);
         switch (sessionSpec.getOperatingSystem()) {
             case ANDROID:
@@ -142,24 +142,11 @@ public final class PlatformOrchestrator {
                                             SessionPolicyConfiguration policyConfiguration,
                                             SessionServiceConfiguration serviceConfiguration,
                                             StateModelManager stateModelManager) {
-        SessionServiceConfiguration defaultServiceConfiguration =
-                PlatformDefaultSessionConfigurations.windowsServiceConfiguration(sessionSpec);
-        SessionPolicyContext sessionPolicyContext = buildWindowsPolicyContext(
+        return composePlatformServices(
                 sessionSpec,
-                policyConfiguration
-        );
-
-        return SessionServiceComposer.compose(
-                sessionSpec.getSettings(),
-                sessionPolicyContext,
-                stateModelManager,
                 serviceConfiguration,
-                defaultServiceConfiguration.systemCompositionPlanOverride().orElseThrow(),
-                defaultServiceConfiguration.stateCompositionPlanOverride().orElseThrow(),
-                defaultServiceConfiguration.actionDerivationPlanOverride().orElseThrow(),
-                defaultServiceConfiguration.actionSelectorPlanOverride().orElseThrow(),
-                defaultServiceConfiguration.actionResolverPlanOverride().orElseThrow(),
-                defaultServiceConfiguration.actionExecutionPlanOverride().orElseThrow()
+                stateModelManager,
+                buildWindowsAssembly(sessionSpec, policyConfiguration)
         );
     }
 
@@ -167,29 +154,16 @@ public final class PlatformOrchestrator {
                                             SessionPolicyConfiguration policyConfiguration,
                                             SessionServiceConfiguration serviceConfiguration,
                                             StateModelManager stateModelManager) {
-        SessionServiceConfiguration defaultServiceConfiguration =
-                PlatformDefaultSessionConfigurations.androidServiceConfiguration(sessionSpec);
         if (sessionSpec.getTargetType() != PlatformSessionSpec.TargetType.EXECUTABLE) {
             throw new UnsupportedPlatformException(
                     "Unsupported Android target type: " + sessionSpec.getTargetType()
             );
         }
-        SessionPolicyContext sessionPolicyContext = buildAndroidPolicyContext(
+        return composePlatformServices(
                 sessionSpec,
-                policyConfiguration
-        );
-
-        return SessionServiceComposer.compose(
-                sessionSpec.getSettings(),
-                sessionPolicyContext,
-                stateModelManager,
                 serviceConfiguration,
-                defaultServiceConfiguration.systemCompositionPlanOverride().orElseThrow(),
-                defaultServiceConfiguration.stateCompositionPlanOverride().orElseThrow(),
-                defaultServiceConfiguration.actionDerivationPlanOverride().orElseThrow(),
-                defaultServiceConfiguration.actionSelectorPlanOverride().orElseThrow(),
-                defaultServiceConfiguration.actionResolverPlanOverride().orElseThrow(),
-                defaultServiceConfiguration.actionExecutionPlanOverride().orElseThrow()
+                stateModelManager,
+                buildAndroidAssembly(sessionSpec, policyConfiguration)
         );
     }
 
@@ -197,33 +171,22 @@ public final class PlatformOrchestrator {
                                               SessionPolicyConfiguration policyConfiguration,
                                               SessionServiceConfiguration serviceConfiguration,
                                               StateModelManager stateModelManager) {
-        SessionServiceConfiguration defaultServiceConfiguration =
-                PlatformDefaultSessionConfigurations.webdriverServiceConfiguration(sessionSpec);
         if (sessionSpec.getTargetType() != PlatformSessionSpec.TargetType.EXECUTABLE) {
             throw new UnsupportedPlatformException(
                     "Unsupported WebDriver target type: " + sessionSpec.getTargetType()
             );
         }
-        SessionPolicyContext sessionPolicyContext = buildWebdriverPolicyContext(
+        return composePlatformServices(
                 sessionSpec,
-                policyConfiguration
-        );
-
-        return SessionServiceComposer.compose(
-                sessionSpec.getSettings(),
-                sessionPolicyContext,
-                stateModelManager,
                 serviceConfiguration,
-                defaultServiceConfiguration.systemCompositionPlanOverride().orElseThrow(),
-                defaultServiceConfiguration.stateCompositionPlanOverride().orElseThrow(),
-                defaultServiceConfiguration.actionDerivationPlanOverride().orElseThrow(),
-                defaultServiceConfiguration.actionSelectorPlanOverride().orElseThrow(),
-                defaultServiceConfiguration.actionResolverPlanOverride().orElseThrow(),
-                defaultServiceConfiguration.actionExecutionPlanOverride().orElseThrow()
+                stateModelManager,
+                buildWebdriverAssembly(sessionSpec, policyConfiguration)
         );
     }
 
     private static SessionPolicyContext buildSessionPolicyContext(PlatformSessionSpec sessionSpec) {
+        // Build only the default policy context for cases that need projection without
+        // resolving a full platform session.
         switch (sessionSpec.getOperatingSystem()) {
             case ANDROID:
                 return buildAndroidPolicyContext(sessionSpec, SessionPolicyConfiguration.defaults());
@@ -239,10 +202,57 @@ public final class PlatformOrchestrator {
         }
     }
 
+    private static PlatformServices composePlatformServices(PlatformSessionSpec sessionSpec,
+                                                            SessionServiceConfiguration serviceConfiguration,
+                                                            StateModelManager stateModelManager,
+                                                            PlatformSessionAssembly assembly) {
+        // Compose the final session services from one platform assembly plus optional overrides.
+        return SessionServiceComposer.compose(
+                sessionSpec.getSettings(),
+                assembly.sessionPolicyContext(),
+                stateModelManager,
+                serviceConfiguration,
+                assembly.defaultServicePlans()
+        );
+    }
+
+    private static PlatformSessionAssembly buildWindowsAssembly(PlatformSessionSpec sessionSpec,
+                                                                SessionPolicyConfiguration policyConfiguration) {
+        // Windows combines desktop policy defaults with the default Windows plan set.
+        return new PlatformSessionAssembly(
+                buildWindowsPolicyContext(sessionSpec, policyConfiguration),
+                PlatformDefaultServicePlans.fromConfiguration(
+                        PlatformDefaultSessionConfigurations.windowsServiceConfiguration(sessionSpec)
+                )
+        );
+    }
+
+    private static PlatformSessionAssembly buildAndroidAssembly(PlatformSessionSpec sessionSpec,
+                                                                SessionPolicyConfiguration policyConfiguration) {
+        // Android combines Android-specific policy defaults with the default Android plan set.
+        return new PlatformSessionAssembly(
+                buildAndroidPolicyContext(sessionSpec, policyConfiguration),
+                PlatformDefaultServicePlans.fromConfiguration(
+                        PlatformDefaultSessionConfigurations.androidServiceConfiguration(sessionSpec)
+                )
+        );
+    }
+
+    private static PlatformSessionAssembly buildWebdriverAssembly(PlatformSessionSpec sessionSpec,
+                                                                  SessionPolicyConfiguration policyConfiguration) {
+        // WebDriver combines browser policy defaults with the default WebDriver plan set.
+        return new PlatformSessionAssembly(
+                buildWebdriverPolicyContext(sessionSpec, policyConfiguration),
+                PlatformDefaultServicePlans.fromConfiguration(
+                        PlatformDefaultSessionConfigurations.webdriverServiceConfiguration(sessionSpec)
+                )
+        );
+    }
+
     private static SessionPolicyContext buildWindowsPolicyContext(PlatformSessionSpec sessionSpec,
                                                                   SessionPolicyConfiguration policyConfiguration) {
         return SessionPolicyContextComposer.compose(
-                PlatformPolicyContexts.desktopDefaults(),
+                PlatformPolicyContexts.desktopDefaults(sessionSpec.getSettings()),
                 policyConfiguration
         );
     }
@@ -250,10 +260,7 @@ public final class PlatformOrchestrator {
     private static SessionPolicyContext buildAndroidPolicyContext(PlatformSessionSpec sessionSpec,
                                                                   SessionPolicyConfiguration policyConfiguration) {
         return SessionPolicyContextComposer.compose(
-                PlatformPolicyContexts.androidDefaults(
-                        sessionSpec.getSettings().get(ConfigTags.AndroidClickableClasses, Collections.emptyList()),
-                        sessionSpec.getSettings().get(ConfigTags.AndroidTypeableClasses, Collections.emptyList())
-                ),
+                PlatformPolicyContexts.androidDefaults(sessionSpec.getSettings()),
                 policyConfiguration
         );
     }
@@ -261,17 +268,15 @@ public final class PlatformOrchestrator {
     private static SessionPolicyContext buildWebdriverPolicyContext(PlatformSessionSpec sessionSpec,
                                                                     SessionPolicyConfiguration policyConfiguration) {
         return SessionPolicyContextComposer.compose(
-                PlatformPolicyContexts.webdriverDefaults(
-                        sessionSpec.getSettings().get(ConfigTags.WebClickableClasses, Collections.emptyList()),
-                        sessionSpec.getSettings().get(ConfigTags.WebTypeableClasses, Collections.emptyList())
-                ),
+                PlatformPolicyContexts.webdriverDefaults(sessionSpec.getSettings()),
                 policyConfiguration
         );
     }
 
-    private static StateModelManager createStateModelService(PlatformSessionSpec sessionSpec) {
+    private static StateModelManager createStateModelManager(PlatformSessionSpec sessionSpec) {
         Settings settings = sessionSpec.getSettings();
 
+        // Skip model initialization entirely when the state model is disabled.
         if (!settings.get(StateModelTags.StateModelEnabled , false)) {
             return new DummyModelManager();
         }
@@ -293,6 +298,7 @@ public final class PlatformOrchestrator {
     }
 
     private static void bootstrapStateModelStorage(Settings settings) {
+        // Bootstrap the local OrientDB storage only for the matching configuration.
         boolean stateModelEnabled = settings.get(StateModelTags.StateModelEnabled, false);
         String dataStore = settings.get(StateModelTags.DataStore, "");
         String dataStoreType = settings.get(StateModelTags.DataStoreType, "");

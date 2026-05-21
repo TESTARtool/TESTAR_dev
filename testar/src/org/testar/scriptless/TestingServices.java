@@ -30,40 +30,36 @@ public final class TestingServices {
     private final ActionExecutionService actionExecutionService;
     private final SessionReportingManager sessionReportingManager;
 
-    public TestingServices(SystemService systemService,
-                           StateService stateService,
-                           OracleEvaluationService oracleEvaluationService,
-                           StateModelManager stateModelManager,
-                           ActionDerivationService actionDerivationService,
-                           ActionSelectorService actionSelectorService,
-                           ActionResolver actionResolver,
-                           ActionExecutionService actionExecutionService,
-                           SessionReportingManager sessionReportingManager) {
-        this.systemService = Assert.notNull(systemService);
-        this.stateService = Assert.notNull(stateService);
-        this.oracleEvaluationService = Assert.notNull(oracleEvaluationService);
-        this.stateModelManager = Assert.notNull(stateModelManager);
-        this.actionDerivationService = Assert.notNull(actionDerivationService);
-        this.actionSelectorService = Assert.notNull(actionSelectorService);
-        this.actionResolver = Assert.notNull(actionResolver);
-        this.actionExecutionService = Assert.notNull(actionExecutionService);
-        this.sessionReportingManager = Assert.notNull(sessionReportingManager);
+    private TestingServices(Builder builder) {
+        this.systemService = Assert.notNull(builder.systemService);
+        this.stateService = Assert.notNull(builder.stateService);
+        this.oracleEvaluationService = Assert.notNull(builder.oracleEvaluationService);
+        this.stateModelManager = Assert.notNull(builder.stateModelManager);
+        this.actionDerivationService = Assert.notNull(builder.actionDerivationService);
+        this.actionSelectorService = Assert.notNull(builder.actionSelectorService);
+        this.actionResolver = Assert.notNull(builder.actionResolver);
+        this.actionExecutionService = Assert.notNull(builder.actionExecutionService);
+        this.sessionReportingManager = Assert.notNull(builder.sessionReportingManager);
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     public static TestingServices fromPlatformServices(PlatformServices platformServices, SessionReportingManager sessionReportingManager) {
         Assert.notNull(platformServices);
 
-        return new TestingServices(
-                platformServices.systemService(),
-                platformServices.stateService(),
-                platformServices.oracleEvaluationService(),
-                platformServices.stateModelService(),
-                platformServices.actionDerivationService(),
-                platformServices.actionSelectorService(),
-                platformServices.actionResolver(),
-                platformServices.actionExecutionService(),
-                sessionReportingManager
-        );
+        return builder()
+                .withSystemService(platformServices.systemService())
+                .withStateService(platformServices.stateService())
+                .withOracleEvaluationService(platformServices.oracleEvaluationService())
+                .withStateModelManager(platformServices.stateModelManager())
+                .withActionDerivationService(platformServices.actionDerivationService())
+                .withActionSelectorService(platformServices.actionSelectorService())
+                .withActionResolver(platformServices.actionResolver())
+                .withActionExecutionService(platformServices.actionExecutionService())
+                .withSessionReportingManager(sessionReportingManager)
+                .build();
     }
 
     public SystemService systemService() {
@@ -100,5 +96,67 @@ public final class TestingServices {
 
     public SessionReportingManager sessionReportingManager() {
         return sessionReportingManager;
+    }
+
+    public static final class Builder {
+
+        private SystemService systemService;
+        private StateService stateService;
+        private OracleEvaluationService oracleEvaluationService;
+        private StateModelManager stateModelManager;
+        private ActionDerivationService actionDerivationService;
+        private ActionSelectorService actionSelectorService;
+        private ActionResolver actionResolver;
+        private ActionExecutionService actionExecutionService;
+        private SessionReportingManager sessionReportingManager;
+
+        public Builder withSystemService(SystemService systemService) {
+            this.systemService = systemService;
+            return this;
+        }
+
+        public Builder withStateService(StateService stateService) {
+            this.stateService = stateService;
+            return this;
+        }
+
+        public Builder withOracleEvaluationService(OracleEvaluationService oracleEvaluationService) {
+            this.oracleEvaluationService = oracleEvaluationService;
+            return this;
+        }
+
+        public Builder withStateModelManager(StateModelManager stateModelManager) {
+            this.stateModelManager = stateModelManager;
+            return this;
+        }
+
+        public Builder withActionDerivationService(ActionDerivationService actionDerivationService) {
+            this.actionDerivationService = actionDerivationService;
+            return this;
+        }
+
+        public Builder withActionSelectorService(ActionSelectorService actionSelectorService) {
+            this.actionSelectorService = actionSelectorService;
+            return this;
+        }
+
+        public Builder withActionResolver(ActionResolver actionResolver) {
+            this.actionResolver = actionResolver;
+            return this;
+        }
+
+        public Builder withActionExecutionService(ActionExecutionService actionExecutionService) {
+            this.actionExecutionService = actionExecutionService;
+            return this;
+        }
+
+        public Builder withSessionReportingManager(SessionReportingManager sessionReportingManager) {
+            this.sessionReportingManager = sessionReportingManager;
+            return this;
+        }
+
+        public TestingServices build() {
+            return new TestingServices(this);
+        }
     }
 }

@@ -6,10 +6,11 @@
 
 package org.testar.plugin.policy;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.testar.config.ConfigTags;
+import org.testar.config.settings.Settings;
 import org.testar.android.policy.AndroidClickablePolicy;
 import org.testar.android.policy.AndroidScrollablePolicy;
 import org.testar.android.policy.AndroidTypeablePolicy;
@@ -21,6 +22,7 @@ import org.testar.core.policy.SelectablePolicy;
 import org.testar.core.policy.TopLevelPolicy;
 import org.testar.core.policy.VisiblePolicy;
 import org.testar.core.policy.WidgetFilterPolicy;
+import org.testar.engine.policy.ConfiguredWidgetFilterPolicy;
 import org.testar.engine.policy.SessionPolicyContext;
 import org.testar.engine.policy.TagBlockedPolicy;
 import org.testar.engine.policy.TagEnabledPolicy;
@@ -51,10 +53,10 @@ public final class PlatformPolicyContexts {
     private PlatformPolicyContexts() {
     }
 
-    public static SessionPolicyContext desktopDefaults() {
+    public static SessionPolicyContext desktopDefaults(Settings settings) {
         List<EnabledPolicy> enabledPolicies = List.of(new TagEnabledPolicy());
         List<BlockedPolicy> blockedPolicies = List.of(new TagBlockedPolicy());
-        List<WidgetFilterPolicy> widgetFilterPolicies = Collections.emptyList();
+        List<WidgetFilterPolicy> widgetFilterPolicies = List.of(new ConfiguredWidgetFilterPolicy(settings));
         List<VisiblePolicy> visiblePolicies = Collections.singletonList(widget -> true);
         List<TopLevelPolicy> topLevelPolicies = Collections.singletonList(widget -> true);
 
@@ -71,22 +73,21 @@ public final class PlatformPolicyContexts {
         );
     }
 
-    public static SessionPolicyContext webdriverDefaults(Collection<String> customClickableClasses,
-                                                         Collection<String> customTypeableClasses) {
+    public static SessionPolicyContext webdriverDefaults(Settings settings) {
         List<EnabledPolicy> enabledPolicies = List.of(new TagEnabledPolicy());
         List<BlockedPolicy> blockedPolicies = List.of(new TagBlockedPolicy());
-        List<WidgetFilterPolicy> widgetFilterPolicies = Collections.emptyList();
+        List<WidgetFilterPolicy> widgetFilterPolicies = List.of(new ConfiguredWidgetFilterPolicy(settings));
         List<VisiblePolicy> visiblePolicies = Collections.singletonList(widget -> true);
         List<TopLevelPolicy> topLevelPolicies = Collections.singletonList(widget -> true);
 
         return new SessionPolicyContext(
                 new CompositeClickablePolicy(List.of(
                         new WebdriverClickablePolicy(),
-                        new ConfigurableWebdriverClickableClassPolicy(customClickableClasses)
+                        new ConfigurableWebdriverClickableClassPolicy(settings.get(ConfigTags.WebClickableClasses, Collections.emptyList()))
                 )),
                 new CompositeTypeablePolicy(List.of(
                         new WebdriverTypeablePolicy(),
-                        new ConfigurableWebdriverTypeableClassPolicy(customTypeableClasses)
+                        new ConfigurableWebdriverTypeableClassPolicy(settings.get(ConfigTags.WebTypeableClasses, Collections.emptyList()))
                 )),
                 new CompositeScrollablePolicy(List.of(new WebdriverScrollablePolicy())),
                 new CompositeSelectablePolicy(List.of(new WebdriverSelectablePolicy())),
@@ -98,22 +99,21 @@ public final class PlatformPolicyContexts {
         );
     }
 
-    public static SessionPolicyContext androidDefaults(Collection<String> customClickableClasses,
-                                                       Collection<String> customTypeableClasses) {
+    public static SessionPolicyContext androidDefaults(Settings settings) {
         List<EnabledPolicy> enabledPolicies = List.of(new TagEnabledPolicy());
         List<BlockedPolicy> blockedPolicies = List.of(new TagBlockedPolicy());
-        List<WidgetFilterPolicy> widgetFilterPolicies = Collections.emptyList();
+        List<WidgetFilterPolicy> widgetFilterPolicies = List.of(new ConfiguredWidgetFilterPolicy(settings));
         List<VisiblePolicy> visiblePolicies = Collections.singletonList(widget -> true);
         List<TopLevelPolicy> topLevelPolicies = Collections.singletonList(widget -> true);
 
         return new SessionPolicyContext(
                 new CompositeClickablePolicy(List.of(
                         new AndroidClickablePolicy(),
-                        new ConfigurableAndroidClickableClassPolicy(customClickableClasses)
+                        new ConfigurableAndroidClickableClassPolicy(settings.get(ConfigTags.AndroidClickableClasses, Collections.emptyList()))
                 )),
                 new CompositeTypeablePolicy(List.of(
                         new AndroidTypeablePolicy(),
-                        new ConfigurableAndroidTypeableClassPolicy(customTypeableClasses)
+                        new ConfigurableAndroidTypeableClassPolicy(settings.get(ConfigTags.AndroidTypeableClasses, Collections.emptyList()))
                 )),
                 new CompositeScrollablePolicy(List.of(new AndroidScrollablePolicy())),
                 new CompositeSelectablePolicy(Collections.<SelectablePolicy>emptyList()),

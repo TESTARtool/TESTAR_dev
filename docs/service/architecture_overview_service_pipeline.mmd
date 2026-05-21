@@ -11,15 +11,16 @@ flowchart LR
 
     subgraph EngineComposition["engine composed services"]
         ComposedSystem["ComposedSystemService"]
-        SystemPlan["SystemCompositionPlan"]
+        SystemPlan["SystemCompositionPlan (Wrapper)"]
         ComposedState["ComposedStateService <br> + StateIdentifierService"]
-        StatePlan["StateCompositionPlan"]
+        StatePlan["StateCompositionPlan (Orchestrator)"]
         ComposedDerivation["ComposedActionDerivationService <br> + ActionIdentifierService"]
-        DerivationPlan["ActionDerivationPlan"]
+        DerivationPlan["ActionDerivationPlan (Orchestrator)"]
         ComposedChoose["ComposedChooseAction (ComposedActionSelectorService / ComposedActionResolver)"]
-        ChoosePlan["ChooseActionPlan (ActionSelectorPlan / ActionResolverPlan)"]
+        ChoosePlan["ActionSelectorPlan (Orchestrator) / ActionResolverPlan (Wrapper)"]
         ComposedExecution["ComposedActionExecutionService"]
-        ExecutionPlan["ActionExecutionPlan"]
+        ExecutionPlan["ActionExecutionPlan (Wrapper)"]
+        OraclePlan["OracleEvaluationPlan (Wrapper)"]
         DefaultOracle["DefaultOracleEvaluationService"]
         ComposedOracle["ComposedOracleEvaluationService"]
     end
@@ -44,7 +45,7 @@ flowchart LR
     ServiceSelection --> DerivationPlan
     ServiceSelection --> ChoosePlan
     ServiceSelection --> ExecutionPlan
-    ServiceSelection --> DefaultOracle
+    ServiceSelection --> OraclePlan
     ServiceSelection --> ComposedSystem
     ServiceSelection --> ComposedState
     ServiceSelection --> ComposedDerivation
@@ -57,7 +58,8 @@ flowchart LR
     DerivationPlan -. plan .-> ComposedDerivation
     ChoosePlan -. plan .-> ComposedChoose
     ExecutionPlan -. plan .-> ComposedExecution
-    DefaultOracle -. default implementation .-> ComposedOracle
+    OraclePlan -. plan .-> ComposedOracle
+    DefaultOracle -. default implementation .-> OraclePlan
     ComposedSystem -. startSystem .-> ComposedState
     ComposedState -. getState .-> ComposedDerivation
     ComposedDerivation -. deriveActions .-> ComposedChoose

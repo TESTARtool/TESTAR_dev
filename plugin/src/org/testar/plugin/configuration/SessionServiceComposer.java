@@ -19,12 +19,13 @@ import org.testar.engine.action.derivation.ActionDerivationPlan;
 import org.testar.engine.action.execution.ActionExecutionPlan;
 import org.testar.engine.action.resolver.ActionResolverPlan;
 import org.testar.engine.action.selection.ActionSelectorPlan;
+import org.testar.engine.oracle.OracleEvaluationPlan;
 import org.testar.engine.policy.SessionPolicyContext;
 import org.testar.engine.service.ComposedActionDerivationService;
 import org.testar.engine.service.ComposedActionExecutionService;
+import org.testar.engine.service.ComposedOracleEvaluationService;
 import org.testar.engine.service.ComposedActionResolver;
 import org.testar.engine.service.ComposedActionSelectorService;
-import org.testar.engine.service.DefaultOracleEvaluationService;
 import org.testar.engine.service.ComposedStateService;
 import org.testar.engine.service.ComposedSystemService;
 import org.testar.engine.state.StateCompositionPlan;
@@ -43,63 +44,65 @@ public final class SessionServiceComposer {
 
     public static PlatformServices compose(Settings settings,
                                            SessionPolicyContext sessionPolicyContext,
-                                           StateModelManager stateModelService,
+                                           StateModelManager stateModelManager,
                                            SessionServiceConfiguration configuration,
-                                           SystemCompositionPlan defaultSystemCompositionPlan,
-                                           StateCompositionPlan defaultStateCompositionPlan,
-                                           ActionDerivationPlan defaultActionDerivationPlan,
-                                           ActionSelectorPlan defaultActionSelectorPlan,
-                                           ActionResolverPlan defaultActionResolverPlan,
-                                           ActionExecutionPlan defaultActionExecutionPlan) {
+                                           PlatformDefaultServicePlans defaultServicePlans) {
         Assert.notNull(settings);
         Assert.notNull(sessionPolicyContext);
-        Assert.notNull(stateModelService);
+        Assert.notNull(stateModelManager);
         Assert.notNull(configuration);
+        Assert.notNull(defaultServicePlans);
 
+        // Choose the effective plan for each service family, preferring explicit
+        // session overrides and otherwise falling back to the platform defaults.
         SystemCompositionPlan systemCompositionPlan = choosePlan(
                 configuration.systemCompositionPlanOverride().orElse(null),
-                defaultSystemCompositionPlan,
+                defaultServicePlans.systemCompositionPlan(),
                 configuration.includePlatformDefaults(),
                 "system composition"
         );
         StateCompositionPlan stateCompositionPlan = choosePlan(
                 configuration.stateCompositionPlanOverride().orElse(null),
-                defaultStateCompositionPlan,
+                defaultServicePlans.stateCompositionPlan(),
                 configuration.includePlatformDefaults(),
                 "state composition"
         );
         ActionDerivationPlan actionDerivationPlan = choosePlan(
                 configuration.actionDerivationPlanOverride().orElse(null),
-                defaultActionDerivationPlan,
+                defaultServicePlans.actionDerivationPlan(),
                 configuration.includePlatformDefaults(),
                 "action derivation"
         );
         ActionSelectorPlan actionSelectorPlan = choosePlan(
                 configuration.actionSelectorPlanOverride().orElse(null),
-                defaultActionSelectorPlan,
+                defaultServicePlans.actionSelectorPlan(),
                 configuration.includePlatformDefaults(),
                 "action selector"
         );
         ActionResolverPlan actionResolverPlan = choosePlan(
                 configuration.actionResolverPlanOverride().orElse(null),
-                defaultActionResolverPlan,
+                defaultServicePlans.actionResolverPlan(),
                 configuration.includePlatformDefaults(),
                 "action resolver"
         );
         ActionExecutionPlan actionExecutionPlan = choosePlan(
                 configuration.actionExecutionPlanOverride().orElse(null),
-                defaultActionExecutionPlan,
+                defaultServicePlans.actionExecutionPlan(),
                 configuration.includePlatformDefaults(),
                 "action execution"
         );
+        OracleEvaluationPlan oracleEvaluationPlan = choosePlan(
+                configuration.oracleEvaluationPlanOverride().orElse(null),
+                defaultServicePlans.oracleEvaluationPlan(),
+                configuration.includePlatformDefaults(),
+                "oracle evaluation"
+        );
 
+        // Build the final shared engine services that the entry-point modules consume.
         SystemService systemService = ComposedSystemService.compose(systemCompositionPlan);
         StateService stateService = ComposedStateService.compose(sessionPolicyContext, stateCompositionPlan);
-        OracleEvaluationService oracleEvaluationService = new DefaultOracleEvaluationService(settings);
-        ActionDerivationService actionDerivationService = ComposedActionDerivationService.compose(
-                sessionPolicyContext,
-                actionDerivationPlan
-        );
+        OracleEvaluationService oracleEvaluationService = ComposedOracleEvaluationService.compose(oracleEvaluationPlan);
+        ActionDerivationService actionDerivationService = ComposedActionDerivationService.compose(sessionPolicyContext, actionDerivationPlan);
         ActionSelectorService actionSelectorService = ComposedActionSelectorService.compose(actionSelectorPlan);
         ActionResolver actionResolver = ComposedActionResolver.compose(actionResolverPlan);
         ActionExecutionService actionExecutionService = ComposedActionExecutionService.compose(actionExecutionPlan);
@@ -108,7 +111,7 @@ public final class SessionServiceComposer {
                 systemService,
                 stateService,
                 oracleEvaluationService,
-                stateModelService,
+                stateModelManager,
                 actionDerivationService,
                 actionSelectorService,
                 actionResolver,
@@ -120,6 +123,7 @@ public final class SessionServiceComposer {
                                     T defaultPlan,
                                     boolean includePlatformDefaults,
                                     String planName) {
+        // Use the explicit override when present, otherwise keep the platform default.
         if (overridePlan != null) {
             return overridePlan;
         }

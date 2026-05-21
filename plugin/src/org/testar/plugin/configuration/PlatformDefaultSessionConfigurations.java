@@ -17,7 +17,9 @@ import org.testar.engine.action.selection.ActionSelectorPlan;
 import org.testar.engine.action.selection.random.RandomActionSelector;
 import org.testar.engine.action.resolver.ActionResolverPlan;
 import org.testar.engine.action.resolver.DescriptionActionResolver;
+import org.testar.engine.oracle.OracleEvaluationPlan;
 import org.testar.engine.state.StateCompositionPlan;
+import org.testar.engine.service.DefaultOracleEvaluationService;
 import org.testar.plugin.PlatformSessionSpec;
 import org.testar.webdriver.action.execution.WebdriverActionExecutionPlan;
 import org.testar.webdriver.action.derivation.WebdriverActionDerivationPlan;
@@ -40,6 +42,7 @@ public final class PlatformDefaultSessionConfigurations {
         return SessionPolicyConfiguration.defaults();
     }
 
+    // Build the full set of Windows default service plans for one session target.
     public static SessionServiceConfiguration windowsServiceConfiguration(PlatformSessionSpec sessionSpec) {
         Settings settings = sessionSpec.getSettings();
         SessionServiceConfiguration.Builder builder = SessionServiceConfiguration.builder();
@@ -108,9 +111,11 @@ public final class PlatformDefaultSessionConfigurations {
                         settings.get(ConfigTags.ActionDuration, 0.0d),
                         settings.get(ConfigTags.TimeToWaitAfterAction, 0.0d)
                 ))
+                .overrideOracleEvaluationPlan(OracleEvaluationPlan.basic(new DefaultOracleEvaluationService(settings)))
                 .build();
     }
 
+    // Build the full set of WebDriver default service plans for one session target.
     public static SessionServiceConfiguration webdriverServiceConfiguration(PlatformSessionSpec sessionSpec) {
         Settings settings = sessionSpec.getSettings();
 
@@ -135,9 +140,11 @@ public final class PlatformDefaultSessionConfigurations {
                         settings.get(ConfigTags.ActionDuration, 0.0d),
                         settings.get(ConfigTags.TimeToWaitAfterAction, 0.0d)
                 ))
+                .overrideOracleEvaluationPlan(OracleEvaluationPlan.basic(new DefaultOracleEvaluationService(settings)))
                 .build();
     }
 
+    // Build the full set of Android default service plans for one session target.
     public static SessionServiceConfiguration androidServiceConfiguration(PlatformSessionSpec sessionSpec) {
         Settings settings = sessionSpec.getSettings();
 
@@ -162,9 +169,11 @@ public final class PlatformDefaultSessionConfigurations {
                         settings.get(ConfigTags.ActionDuration, 0.0d),
                         settings.get(ConfigTags.TimeToWaitAfterAction, 0.0d)
                 ))
+                .overrideOracleEvaluationPlan(OracleEvaluationPlan.basic(new DefaultOracleEvaluationService(settings)))
                 .build();
     }
 
+    // Build the Windows semantic projection used when CLI wants a readable state view.
     public static StateCompositionPlan windowsSemanticStateCompositionPlan(PlatformSessionSpec sessionSpec) {
         Settings settings = sessionSpec.getSettings();
         return WindowsStateCompositionPlan.uiAutomationSemanticWidgets(
@@ -174,6 +183,7 @@ public final class PlatformDefaultSessionConfigurations {
         );
     }
 
+    // Build the WebDriver semantic projection used when CLI wants a readable state view.
     public static StateCompositionPlan webdriverSemanticStateCompositionPlan(PlatformSessionSpec sessionSpec) {
         Settings settings = sessionSpec.getSettings();
         return WebdriverStateCompositionPlan.browserSemanticWidgets(
@@ -181,6 +191,7 @@ public final class PlatformDefaultSessionConfigurations {
         );
     }
 
+    // Build the Android semantic projection used when CLI wants a readable state view.
     public static StateCompositionPlan androidSemanticStateCompositionPlan(PlatformSessionSpec sessionSpec) {
         Settings settings = sessionSpec.getSettings();
         return AndroidStateCompositionPlan.appiumSemanticWidgets(

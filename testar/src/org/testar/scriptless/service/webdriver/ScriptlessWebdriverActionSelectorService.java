@@ -28,8 +28,8 @@ public class ScriptlessWebdriverActionSelectorService implements ActionSelectorS
     public Action selectAction(State state, Set<Action> actions) {
         Assert.notNull(state, actions);
 
-         Action selectedAction = stateModelManager.getAbstractActionToExecute(actions);
-       if (selectedAction != null) {
+        Action selectedAction = stateModelManager.getAbstractActionToExecute(actions);
+        if (selectedAction != null) {
             return selectedAction;
         }
         return delegate.selectAction(state, actions);

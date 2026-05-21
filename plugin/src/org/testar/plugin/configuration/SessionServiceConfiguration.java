@@ -13,6 +13,7 @@ import org.testar.engine.action.derivation.ActionDerivationPlan;
 import org.testar.engine.action.execution.ActionExecutionPlan;
 import org.testar.engine.action.resolver.ActionResolverPlan;
 import org.testar.engine.action.selection.ActionSelectorPlan;
+import org.testar.engine.oracle.OracleEvaluationPlan;
 import org.testar.engine.state.StateCompositionPlan;
 import org.testar.engine.system.SystemCompositionPlan;
 
@@ -29,6 +30,7 @@ public final class SessionServiceConfiguration {
     private final Optional<ActionSelectorPlan> actionSelectorPlanOverride;
     private final Optional<ActionResolverPlan> actionResolverPlanOverride;
     private final Optional<ActionExecutionPlan> actionExecutionPlanOverride;
+    private final Optional<OracleEvaluationPlan> oracleEvaluationPlanOverride;
 
     private SessionServiceConfiguration(boolean includePlatformDefaults,
                                         Optional<SystemCompositionPlan> systemCompositionPlanOverride,
@@ -36,7 +38,8 @@ public final class SessionServiceConfiguration {
                                         Optional<ActionDerivationPlan> actionDerivationPlanOverride,
                                         Optional<ActionSelectorPlan> actionSelectorPlanOverride,
                                         Optional<ActionResolverPlan> actionResolverPlanOverride,
-                                        Optional<ActionExecutionPlan> actionExecutionPlanOverride) {
+                                        Optional<ActionExecutionPlan> actionExecutionPlanOverride,
+                                        Optional<OracleEvaluationPlan> oracleEvaluationPlanOverride) {
         this.includePlatformDefaults = includePlatformDefaults;
         this.systemCompositionPlanOverride = Assert.notNull(systemCompositionPlanOverride);
         this.stateCompositionPlanOverride = Assert.notNull(stateCompositionPlanOverride);
@@ -44,6 +47,7 @@ public final class SessionServiceConfiguration {
         this.actionSelectorPlanOverride = Assert.notNull(actionSelectorPlanOverride);
         this.actionResolverPlanOverride = Assert.notNull(actionResolverPlanOverride);
         this.actionExecutionPlanOverride = Assert.notNull(actionExecutionPlanOverride);
+        this.oracleEvaluationPlanOverride = Assert.notNull(oracleEvaluationPlanOverride);
     }
 
     public static Builder builder() {
@@ -82,6 +86,10 @@ public final class SessionServiceConfiguration {
         return actionExecutionPlanOverride;
     }
 
+    public Optional<OracleEvaluationPlan> oracleEvaluationPlanOverride() {
+        return oracleEvaluationPlanOverride;
+    }
+
     public static final class Builder {
 
         private boolean includePlatformDefaults = true;
@@ -91,11 +99,13 @@ public final class SessionServiceConfiguration {
         private Optional<ActionSelectorPlan> actionSelectorPlanOverride = Optional.empty();
         private Optional<ActionResolverPlan> actionResolverPlanOverride = Optional.empty();
         private Optional<ActionExecutionPlan> actionExecutionPlanOverride = Optional.empty();
+        private Optional<OracleEvaluationPlan> oracleEvaluationPlanOverride = Optional.empty();
 
         private Builder() {
         }
 
         public Builder includePlatformDefaults(boolean includePlatformDefaults) {
+            // When false, every required plan must be provided explicitly by overrides.
             this.includePlatformDefaults = includePlatformDefaults;
             return this;
         }
@@ -130,6 +140,11 @@ public final class SessionServiceConfiguration {
             return this;
         }
 
+        public Builder overrideOracleEvaluationPlan(OracleEvaluationPlan oracleEvaluationPlan) {
+            this.oracleEvaluationPlanOverride = Optional.of(Assert.notNull(oracleEvaluationPlan));
+            return this;
+        }
+
         public SessionServiceConfiguration build() {
             return new SessionServiceConfiguration(
                     includePlatformDefaults,
@@ -138,7 +153,8 @@ public final class SessionServiceConfiguration {
                     actionDerivationPlanOverride,
                     actionSelectorPlanOverride,
                     actionResolverPlanOverride,
-                    actionExecutionPlanOverride
+                    actionExecutionPlanOverride,
+                    oracleEvaluationPlanOverride
             );
         }
     }

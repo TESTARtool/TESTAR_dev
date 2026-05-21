@@ -6,6 +6,7 @@
 
 package org.testar.engine.policy;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -23,7 +24,7 @@ public final class SessionPolicyContext {
     private final Map<Class<? extends Policy>, Policy> policies;
 
     public SessionPolicyContext(Policy... policies) {
-        this(java.util.Arrays.asList(Assert.notNull(policies)));
+        this(Arrays.asList(Assert.notNull(policies)));
     }
 
     public SessionPolicyContext(Collection<? extends Policy> policies) {

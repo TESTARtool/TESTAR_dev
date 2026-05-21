@@ -24,7 +24,7 @@ public final class PlatformServices {
     private final SystemService systemService;
     private final StateService stateService;
     private final OracleEvaluationService oracleEvaluationService;
-    private final StateModelManager stateModelService;
+    private final StateModelManager stateModelManager;
     private final ActionDerivationService actionDerivationService;
     private final ActionSelectorService actionSelectorService;
     private final ActionResolver actionResolver;
@@ -33,7 +33,7 @@ public final class PlatformServices {
     public PlatformServices(SystemService systemService,
                             StateService stateService,
                             OracleEvaluationService oracleEvaluationService,
-                            StateModelManager stateModelService,
+                            StateModelManager stateModelManager,
                             ActionDerivationService actionDerivationService,
                             ActionSelectorService actionSelectorService,
                             ActionResolver actionResolver,
@@ -41,7 +41,7 @@ public final class PlatformServices {
         this.systemService = Assert.notNull(systemService);
         this.stateService = Assert.notNull(stateService);
         this.oracleEvaluationService = Assert.notNull(oracleEvaluationService);
-        this.stateModelService = Assert.notNull(stateModelService);
+        this.stateModelManager = Assert.notNull(stateModelManager);
         this.actionDerivationService = Assert.notNull(actionDerivationService);
         this.actionSelectorService = Assert.notNull(actionSelectorService);
         this.actionResolver = Assert.notNull(actionResolver);
@@ -60,8 +60,8 @@ public final class PlatformServices {
         return oracleEvaluationService;
     }
 
-    public StateModelManager stateModelService() {
-        return stateModelService;
+    public StateModelManager stateModelManager() {
+        return stateModelManager;
     }
 
     public ActionDerivationService actionDerivationService() {

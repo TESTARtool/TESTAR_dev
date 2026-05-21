@@ -6,43 +6,36 @@
 
 package org.testar.engine.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.testar.core.Assert;
 import org.testar.core.service.OracleEvaluationService;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
 import org.testar.core.tag.Tags;
 import org.testar.core.verdict.Verdict;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import org.testar.engine.oracle.OracleEvaluationPlan;
 
 public final class ComposedOracleEvaluationService implements OracleEvaluationService {
 
-    private final List<OracleEvaluationService> oracleEvaluationServices;
+    private final OracleEvaluationPlan plan;
 
-    public ComposedOracleEvaluationService(List<OracleEvaluationService> oracleEvaluationServices) {
-        Assert.notNull(oracleEvaluationServices);
-        Assert.isTrue(!oracleEvaluationServices.isEmpty());
-        this.oracleEvaluationServices = Collections.unmodifiableList(new ArrayList<OracleEvaluationService>(oracleEvaluationServices));
+    public ComposedOracleEvaluationService(OracleEvaluationPlan plan) {
+        this.plan = Assert.notNull(plan);
     }
 
-    public static ComposedOracleEvaluationService compose(OracleEvaluationService... oracleEvaluationServices) {
-        Assert.notNull(oracleEvaluationServices);
-        return new ComposedOracleEvaluationService(Arrays.asList(oracleEvaluationServices));
+    public static ComposedOracleEvaluationService compose(OracleEvaluationPlan plan) {
+        return new ComposedOracleEvaluationService(plan);
     }
 
     @Override
     public List<Verdict> getVerdicts(SUT system, State state) {
         Assert.notNull(state);
 
-        List<Verdict> verdicts = new ArrayList<Verdict>();
-        for (OracleEvaluationService oracleEvaluationService : oracleEvaluationServices) {
-            List<Verdict> serviceVerdicts = oracleEvaluationService.getVerdicts(system, state);
-            if (serviceVerdicts != null) {
-                verdicts.addAll(serviceVerdicts);
-            }
+        List<Verdict> verdicts = plan.oracleEvaluationService().getVerdicts(system, state);
+        if (verdicts == null) {
+            verdicts = new ArrayList<Verdict>();
         }
 
         normalizeVerdicts(verdicts);
@@ -52,15 +45,7 @@ public final class ComposedOracleEvaluationService implements OracleEvaluationSe
 
     @Override
     public void addVerdict(State state, Verdict verdict) {
-        Assert.notNull(state, verdict);
-
-        List<Verdict> verdicts = state.get(Tags.OracleVerdicts, new ArrayList<Verdict>());
-        if (verdicts.size() == 1 && verdicts.contains(Verdict.OK)) {
-            verdicts = new ArrayList<Verdict>();
-        }
-
-        verdicts.add(verdict);
-        state.set(Tags.OracleVerdicts, verdicts);
+        plan.oracleEvaluationService().addVerdict(state, verdict);
     }
 
     private void normalizeVerdicts(List<Verdict> verdicts) {

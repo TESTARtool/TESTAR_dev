@@ -38,7 +38,7 @@ final class StateModelSessionFlow {
     void syncObservationBeforeExecution(State currentState) {
         if (lastObservedState == null) {
             Set<Action> actions = services.actionDerivationService().deriveActions(system, currentState);
-            services.stateModelService().notifyNewStateReached(currentState, actions);
+            services.stateModelManager().notifyNewStateReached(currentState, actions);
             lastObservedState = currentState;
             return;
         }
@@ -50,8 +50,8 @@ final class StateModelSessionFlow {
         if (hasStateChanged(currentState)) {
             Set<Action> actions = services.actionDerivationService().deriveActions(system, currentState);
             Action observationAction = createObservationAction(lastObservedState, currentState);
-            services.stateModelService().notifyActionExecution(observationAction);
-            services.stateModelService().notifyNewStateReached(currentState, actions);
+            services.stateModelManager().notifyActionExecution(observationAction);
+            services.stateModelManager().notifyNewStateReached(currentState, actions);
             lastObservedState = currentState;
         }
     }
@@ -76,14 +76,14 @@ final class StateModelSessionFlow {
 
     private void notifyStateModelObservation(State state, Set<Action> actions) {
         if (lastObservedState == null) {
-            services.stateModelService().notifyNewStateReached(state, actions);
+            services.stateModelManager().notifyNewStateReached(state, actions);
             lastObservedState = state;
             return;
         }
 
         if (pendingExecutedAction != null) {
-            services.stateModelService().notifyActionExecution(pendingExecutedAction);
-            services.stateModelService().notifyNewStateReached(state, actions);
+            services.stateModelManager().notifyActionExecution(pendingExecutedAction);
+            services.stateModelManager().notifyNewStateReached(state, actions);
             pendingExecutedAction = null;
             lastObservedState = state;
             return;
@@ -91,8 +91,8 @@ final class StateModelSessionFlow {
 
         if (hasStateChanged(state)) {
             Action observationAction = createObservationAction(lastObservedState, state);
-            services.stateModelService().notifyActionExecution(observationAction);
-            services.stateModelService().notifyNewStateReached(state, actions);
+            services.stateModelManager().notifyActionExecution(observationAction);
+            services.stateModelManager().notifyNewStateReached(state, actions);
             lastObservedState = state;
         }
     }

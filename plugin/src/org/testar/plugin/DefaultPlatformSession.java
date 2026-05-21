@@ -28,7 +28,7 @@ final class DefaultPlatformSession implements PlatformSession {
         this.system = Assert.notNull(system);
         this.sessionReportingManager = Assert.notNull(sessionReportingManager);
         this.stateModelSessionFlow = new StateModelSessionFlow(services, system);
-        this.services.stateModelService().notifyTestSequencedStarted();
+        this.services.stateModelManager().notifyTestSequencedStarted();
     }
 
     @Override
@@ -79,7 +79,7 @@ final class DefaultPlatformSession implements PlatformSession {
             sessionReportingManager.addState(state);
             sessionReportingManager.addActions(actions);
             stateModelSessionFlow.finalizePendingObservation(state, actions);
-            services.stateModelService().notifyTestSequenceStopped();
+            services.stateModelManager().notifyTestSequenceStopped();
             services.systemService().stopSystem(system);
         } finally {
             sessionReportingManager.finish();
@@ -89,7 +89,7 @@ final class DefaultPlatformSession implements PlatformSession {
     @Override
     public void close() {
         sessionReportingManager.finish();
-        closeStateModelService();
+        closeStateModelManager();
         closeStateService();
     }
 
@@ -103,9 +103,9 @@ final class DefaultPlatformSession implements PlatformSession {
         }
     }
 
-    private void closeStateModelService() {
+    private void closeStateModelManager() {
         try {
-            services.stateModelService().notifyTestingEnded();
+            services.stateModelManager().notifyTestingEnded();
         } catch (Exception exception) {
             throw new IllegalStateException("Unable to close state model service", exception);
         }

@@ -47,6 +47,8 @@ public final class SessionPolicyContextComposer {
         Assert.notNull(platformDefaults);
         Assert.notNull(configuration);
 
+        // Merge every policy family that appears either in platform defaults or in
+        // the session-specific additions/replacements.
         Set<Class<? extends Policy>> policyTypes = new LinkedHashSet<>();
         policyTypes.addAll(platformDefaults.policies().keySet());
         policyTypes.addAll(configuration.additionalPolicies().keySet());
@@ -66,11 +68,13 @@ public final class SessionPolicyContextComposer {
     private static Policy composePolicy(Class<? extends Policy> policyType,
                                         SessionPolicyContext platformDefaults,
                                         SessionPolicyConfiguration configuration) {
+        // Replacement policies take full ownership of one policy family.
         List<? extends Policy> replacementPolicies = configuration.replacementPolicies(policyType);
         if (!replacementPolicies.isEmpty()) {
             return composePolicies(policyType, replacementPolicies);
         }
 
+        // Otherwise compose platform defaults plus additional session policies.
         List<Policy> policies = new ArrayList<>();
         if (configuration.includePlatformDefaults()) {
             Policy defaultPolicy = platformDefaults.get(policyType);
@@ -90,6 +94,7 @@ public final class SessionPolicyContextComposer {
     @SuppressWarnings("unchecked")
     private static Policy composePolicies(Class<? extends Policy> policyType,
                                           List<? extends Policy> policies) {
+        // One policy needs no composite. Multiple policies require the family-specific composite.
         if (policies.size() == 1) {
             return policies.get(0);
         }
