@@ -2,7 +2,7 @@
 
 This document defines the current modular architecture of `TESTAR_dev`.
 
-It describes the architecture that is already present in the codebase today. It is not a proposal for a future ideal architecture. Some parts are still transitional, but the contracts and layering described here are the active foundation that new modules should follow.
+It describes the active architecture of the codebase. It is not a proposal document. The contracts and layering described here are the foundation that new modules follow.
 
 ## Overview
 
@@ -15,6 +15,11 @@ The current codebase also uses two additional composition concepts:
 
 - `plans`: composition recipes used to assemble a concrete service from reusable engine logic and platform-native parts
 - `capabilities`: scriptless `testar` runtime modules that orchestrate TESTAR-specific flow around the composed services
+
+The current user-facing customization model adds two external resource concepts on top of that:
+
+- `composition resources`: external `composition.properties` files that declare service and capability wrapper classes
+- `policies resources`: external `policies.properties` files that declare additive or replacement policy classes
 
 At a high level, the architecture separates responsibilities by layer:
 
@@ -32,6 +37,24 @@ At a high level, the architecture separates responsibilities by layer:
    Exposes the architecture through the classic TESTAR runtime and user-interface driven execution model.
 
 Supporting modules such as `config`, `statemodel`, `reporting`, `dialog`, `oracle`, `coverage`, and `llm` provide additional capabilities around this main service-and-policy architecture.
+
+### Interaction modes
+
+The architecture exposes two main ways to interact with TESTAR:
+
+- `cli`
+  - command-driven interaction
+  - daemon and session oriented
+  - suitable for external automation, scripting, and AI-agent usage
+- `testar-scriptless`
+  - interactive TESTAR runtime
+  - dialog and settings driven
+  - the runtime behind the `testar` launcher
+  - supports scriptless runtime modes such as `Spy` and `Generate`
+
+These are two different entry-point styles built on top of the same underlying modular architecture.
+
+They share the same composed service and policy stack while keeping their own mode-specific orchestration where needed.
 
 ### Service and policy flow
 
@@ -51,7 +74,7 @@ This means that:
 
 ### Shared vocabulary
 
-The codebase now has four distinct architectural concepts. They should not be mixed.
+The codebase has four distinct architectural concepts. They should not be mixed.
 
 - `policy`
   A rule that answers a behavioral question about widgets or state.
@@ -60,6 +83,7 @@ The codebase now has four distinct architectural concepts. They should not be mi
   - typeable
   - visible
   - blocked
+  - widget filtering
   Policies are usually pure decision logic and are composed into a `SessionPolicyContext`.
 
 - `service`
@@ -79,6 +103,7 @@ The codebase now has four distinct architectural concepts. They should not be mi
   - `StateCompositionPlan`
   - `ActionDerivationPlan`
   - `ActionExecutionPlan`
+  - `OracleEvaluationPlan`
   Plans are used by `plugin` when composing a session.
 
 - `capability`
@@ -97,10 +122,11 @@ The practical distinction is:
 - services perform `main runtime operations`
 - plans define `how a service is assembled`
 - capabilities define `how scriptless TESTAR runs its protocol flow around those services`
+- composition and policies resources define `which external wrappers should extend the current baseline`
 
-### Current module roles
+### Module roles
 
-The modules currently play these roles:
+The modules play these roles:
 
 - `core`
   Owns the stable contracts and base domain model.
@@ -119,7 +145,7 @@ The modules currently play these roles:
 - `testar`
   Owns the classic TESTAR runtime modes and higher-level protocol orchestration.
 
-For the current scriptless runtime path inside `testar`, the role split is:
+For the scriptless runtime path inside `testar`, the role split is:
 
 - composed services come from `plugin` and `engine`
 - scriptless protocol classes in `testar` invoke those services
@@ -128,6 +154,7 @@ For the current scriptless runtime path inside `testar`, the role split is:
 - scriptless adds runtime-specific oracle composition through scriptless-side service adapters/composers
 - reporting and output side effects are coordinated through `SessionReportingManager`
 - state and action identifiers are assigned inside the shared state and action-derivation service pipelines
+- optional external composition and policies resources can wrap services, capabilities, and policies without changing internal modules
 
 ### Design intent
 
@@ -157,8 +184,9 @@ instead of:
 For `testar`, the same idea applies one level higher:
 
 - scriptless protocols should delegate platform/runtime operations to composed services
-- scriptless capabilities should hold TESTAR runtime behavior that is not a reusable engine service
-- reporting and output ownership should move toward shared session-level managers instead of staying scattered in protocol classes
+- scriptless capabilities hold TESTAR runtime behavior that is not a reusable engine service
+- reporting and output ownership belongs to shared session-level managers instead of scattered protocol classes
+- SUT-specific customization should live in external settings resources instead of internal protocol subclasses
 
 ### Main runtime flow
 
@@ -182,7 +210,165 @@ For the scriptless TESTAR runtime, the same service flow is wrapped by protocol 
 - test-sequence lifecycle
 - stop criteria
 
-Visualization and spy-filter behavior may still exist as internal scriptless runtime classes, but they do not need to be modeled as shared capabilities unless they must be replaced or reused independently.
+Visualization and spy-filter behavior may exist as internal scriptless runtime classes, but they are modeled as shared capabilities only when they need independent replacement or reuse.
+
+## User customization model
+
+The scriptless architecture does not expect users to provide a Java protocol class.
+
+The user-facing model is:
+
+- basic user
+  - chooses one `CompositionProfile`
+  - edits `test.settings`
+- intermediate user
+  - chooses one `CompositionProfile`
+  - adds a `CustomCompositionResource`
+  - adds a `CustomPoliciesResource`
+  - creates Java wrappers for the already defined:
+    - services
+    - capabilities
+    - policies
+  - creates a user-owned workspace for the target SUT
+- advanced TESTAR developer
+  - does not just use the distribution
+  - edits internal modules
+  - adapts or creates:
+    - plans
+    - internal compositions
+    - deeper architecture pieces
+
+The main settings are:
+
+- `CompositionProfile`
+  Selects the generic baseline composition.
+- `CustomCompositionResource`
+  Points to an external `composition.properties` file.
+- `CustomPoliciesResource`
+  Points to an external `policies.properties` file.
+
+The built-in baseline profiles are:
+
+- `windows_composition`
+- `webdriver_composition`
+- `android_composition`
+
+The design rule is:
+
+- internal modules own only generic baseline behavior
+- SUT-specific behavior lives in external settings resources and user-owned Java wrappers
+- the TESTAR distribution supports user extension through:
+  - services
+  - capabilities
+  - policies
+- plans and internal composition stay internal by default
+
+### Composition resources
+
+`composition.properties` declares wrapper classes for:
+
+- services
+  - `systemServiceClass`
+  - `stateServiceClass`
+  - `actionDerivationServiceClass`
+  - `actionSelectorServiceClass`
+  - `actionExecutionServiceClass`
+  - `oracleComposerClass`
+- capabilities
+  - `settingsCapabilityClass`
+  - `testSessionCapabilityClass`
+  - `testSequenceCapabilityClass`
+  - `stopCriteriaCapabilityClass`
+
+The runtime builds the default baseline object first, then optionally wraps it with the user class declared in the composition resource.
+
+### Policies resources
+
+`policies.properties` declares policy classes for the supported policy seams.
+
+Current supported seams are:
+
+- `clickablePolicies`
+- `typeablePolicies`
+- `scrollablePolicies`
+- `selectablePolicies`
+- `enabledPolicies`
+- `blockedPolicies`
+- `widgetFilterPolicies`
+- `visiblePolicies`
+- `topLevelPolicies`
+
+Multiple policy classes can be declared with `;`.
+
+For each seam, policy composition supports:
+
+- additive mode
+  - custom policies are appended to the built-in defaults
+- replacement mode
+  - `replace...=true` discards the built-in defaults for that seam
+
+This mechanism is used by external examples such as:
+
+- `testar/resources/settings/webdriver_generic/WebdriverLinkDeniedFilterPolicy.java`
+- `testar/resources/settings/webdriver_generic/WebdriverCanvasVisiblePolicy.java`
+
+### Resource loading rules
+
+The scriptless runtime uses:
+
+- `ScriptlessCompositionLoader`
+  - loads `CompositionProfile`
+  - loads `CustomCompositionResource`
+  - instantiates service and capability wrappers
+- `ScriptlessPolicyLoader`
+  - loads `CustomPoliciesResource`
+  - instantiates policy classes
+  - supports either a no-args constructor or a constructor that receives `Settings`
+
+This gives the current architecture a clear boundary:
+
+- generic defaults stay internal
+- SUT-specific wrappers stay external
+
+The loading path is documented in:
+
+- `docs/scriptless/architecture_scriptless_loader_flow.mmd`
+
+## Dialog extension model
+
+The dialog flow exposes the customization model directly.
+
+The relevant tabs are:
+
+- `General`
+  - connector
+  - `CompositionProfile`
+- `Modules`
+  - `CustomCompositionResource`
+  - on-demand creation and editing of service and capability wrappers
+- `Policies`
+  - `CustomPoliciesResource`
+  - on-demand creation and editing of policy classes
+
+This replaces the old protocol-editing model as the active extension workflow.
+
+The design intent is:
+
+- users should not edit one monolithic protocol class
+- users should create only the wrappers they actually need
+- TESTAR should provide editors and templates for these wrappers inside the dialog
+- the functional model remains the same across dialog implementations
+
+The supporting dialog infrastructure includes:
+
+- `ModulesPanel`
+- `PoliciesPanel`
+- `CustomCompositionEditor`
+- `CustomPoliciesEditor`
+- `ModuleSourceEditor`
+- helper classes under `org.testar.dialog.helper`
+
+That means the customization architecture is now a first-class product feature, not just a hidden settings convention.
 
 ## Core contracts
 
@@ -323,7 +509,7 @@ For services, `engine` also provides reusable default and composed implementatio
 
 - `DefaultOracleEvaluationService`
   Provides the shared engine-side oracle evaluation that fits the generic service layer.
-  It currently covers:
+  It covers:
   - unexpected-close verdicts
   - not-responding verdicts
   - suspicious-tag evaluation
@@ -331,13 +517,16 @@ For services, `engine` also provides reusable default and composed implementatio
   File: `engine/src/org/testar/engine/service/DefaultOracleEvaluationService.java`
 - `ComposedOracleEvaluationService`
   Aggregates one or more `OracleEvaluationService` implementations into one composed service.
-  This is the service-side seam for later platform-specific or entry-point-specific oracle extensions.
+  This is the service-side seam for platform-specific or entry-point-specific oracle extensions.
   File: `engine/src/org/testar/engine/service/ComposedOracleEvaluationService.java`
+- `OracleEvaluationPlan`
+  Wraps the configured oracle evaluation service so oracle composition follows the same plan model as the other main services.
+  File: `engine/src/org/testar/engine/oracle/OracleEvaluationPlan.java`
 
 This keeps base oracle evaluation aligned with the rest of the runtime architecture:
 
 - `core` defines the oracle evaluation contract
-- `engine` provides reusable default and composed implementations
+- `engine` provides reusable default and composed implementations plus a thin oracle plan wrapper
 - `plugin` carries the oracle service inside `PlatformServices`
 - entry points such as `cli` and `testar` consume that service instead of re-owning the base oracle logic
 
@@ -405,8 +594,6 @@ The composition semantics are intentionally different depending on the contract:
   - if one policy rejects the widget, the composed filter rejects it
 - visible acts as a visibility intersection
   - if one policy says the widget is not visible, the composed visible result is false
-- at-canvas acts as a scope intersection
-  - if one policy says the widget is outside the active canvas, the composed result is false
 - top-level acts as a top-layer intersection
   - if one policy says the widget is not part of the top-level set, the composed result is false
 
@@ -446,17 +633,17 @@ It stores effective policies by their policy-interface type, for example:
 - `VisiblePolicy.class`
 - `TopLevelPolicy.class`
 
-This shows the intended role of `engine`:
+This shows the role of `engine`:
 
 - the runtime consumes one effective policy of each kind
 - composite policies are the mechanism that joins multiple implementations before execution
 - the shared session context can grow with new policy families without adding one new field and getter per policy type
 
-Services can consume different subsets of the same shared policy context. For example, action derivation may use clickable, typeable, visible, enabled, and top-level policies, while a state projection may use visible, at-canvas, top-level, and widget-filter policies.
+Services can consume different subsets of the same shared policy context. For example, action derivation may use clickable, typeable, visible, enabled, top-level, and widget-filter policies, while a state projection may use visible, top-level, and widget-filter policies.
 
 ### Plugin default policy composition
 
-The `plugin` module now owns the default platform policy bundles that are used to build a session.
+The `plugin` module owns the default platform policy bundles that are used to build a session.
 
 Current default composition entry point:
 
@@ -467,9 +654,9 @@ This means the layering is now:
 - `engine`
   Defines the policy registry contract and the reusable composite implementations.
 - `plugin`
-  Decides which default policy bundle should be used for a platform session such as Windows or WebDriver.
+  Decides which default policy bundle is used for a platform session such as Windows or WebDriver.
 - `cli` and `testar`
-  Can later override or extend those defaults through higher-level configuration.
+  Override or extend those defaults through higher-level configuration.
 
 This keeps `SessionPolicyContext` reusable while moving platform default choices out of engine service factories.
 
@@ -477,7 +664,7 @@ This keeps `SessionPolicyContext` reusable while moving platform default choices
 
 The following diagram focuses only on how services or contexts consume a composed policy view.
 
-It intentionally ignores, for now:
+It intentionally ignores:
 
 - deriver internals
 - state-service internals
@@ -582,9 +769,15 @@ This can be seen directly in the current code:
 - platform session assembly lives in plugin
   - `plugin/src/org/testar/plugin/PlatformOrchestrator.java`
 
+The plugin-side composition and session flows are documented in:
+
+- `docs/plugin/architecture_plugin_overview.mmd`
+- `docs/plugin/architecture_plugin_cli_session_flow.mmd`
+- `docs/plugin/architecture_plugin_sriptless_session_flow.mmd`
+
 ### Shared contexts versus service-specific dependencies
 
-The current architecture now has one shared session-level policy registry:
+The architecture has one shared session-level policy registry:
 
 - `engine/src/org/testar/engine/policy/SessionPolicyContext.java`
 
@@ -598,7 +791,7 @@ That shared context is intentionally limited to policies.
 
 It should not become a generic container for all service runtime data.
 
-The current boundary is:
+The boundary is:
 
 - shared session context
   - policy objects such as `ClickablePolicy`, `VisiblePolicy`, `EnabledPolicy`, `TopLevelPolicy`
@@ -613,10 +806,10 @@ This keeps reuse high without turning the session context into an oversized runt
 
 ### Current reusable engine services
 
-The current reusable engine service implementations are:
+The reusable engine service implementations are:
 
 - `ComposedSystemService`
-  Composes one native `SystemService` with a `SystemCompositionPlan` so session start/stop hooks can be added without changing the native platform service.
+  Delegates system lifecycle operations through a `SystemCompositionPlan` to the configured platform-native `SystemService`.
 - `ComposedStateService`
   Applies engine-level state preparation and then delegates to a `StateCompositionPlan` using the shared `SessionPolicyContext`.
 - `ComposedActionDerivationService`
@@ -625,7 +818,7 @@ The current reusable engine service implementations are:
   - default derivers
   - fallback derivers
 - `ComposedActionExecutionService`
-  Composes one base `ActionExecutionService` with an `ActionExecutionPlan` so execution hooks can be added around the base executor.
+  Delegates action execution through an `ActionExecutionPlan` to the configured `ActionExecutionService`.
 - `ComposedActionSelectorService`
   Composes one primary `ActionSelectorService` with a fallback selector through an `ActionSelectorPlan`.
 - `ComposedActionResolver`
@@ -640,11 +833,11 @@ Instead, engine services operate on:
 - native services delegated from platform modules
 - shared domain objects such as `State`, `Widget`, and `Action`
 - shared policies from `SessionPolicyContext`
-- service-specific plans such as `SystemCompositionPlan`, `StateCompositionPlan`, `ActionDerivationPlan`, `ActionSelectorPlan`, `ActionExecutionPlan`, and `ActionResolverPlan`
+- service-specific plans such as `SystemCompositionPlan`, `StateCompositionPlan`, `ActionDerivationPlan`, `ActionSelectorPlan`, `ActionExecutionPlan`, `ActionResolverPlan`, and `OracleEvaluationPlan`
 
 ### First reference flow: system -> state -> derive actions -> select or resolve action -> execute action -> oracle
 
-This is the first service pipeline that should guide the architecture.
+This is the first service pipeline that guides the architecture.
 
 #### Step 1: system
 
@@ -653,7 +846,7 @@ Current flow:
 1. `plugin` chooses the native system service for the active platform.
 2. `plugin` wraps it with `ComposedSystemService`.
 3. the native service starts or connects to the SUT.
-4. optional lifecycle hooks are applied through `SystemCompositionPlan`.
+4. `SystemCompositionPlan` acts as the current plan wrapper for the configured system lifecycle service.
 
 #### Step 2: state
 
@@ -717,7 +910,7 @@ So the derive-actions architecture is:
 
 Current flow:
 
-Current flow has two variants:
+The flow has two variants:
 
 1. a choose-action service receives the current `State` and derived `Action` set
 2. selector-based runtime flow:
@@ -746,9 +939,8 @@ Selection and resolution stay as separate contracts, but the overview architectu
 Current flow:
 
 1. the selected `Action` is passed to `ComposedActionExecutionService`
-2. the selected `ActionExecutionPlan` runs before-execution hooks
-3. the base execution service executes the concrete action
-4. after-execution hooks observe the execution result
+2. the selected `ActionExecutionPlan` provides the configured execution service
+3. the configured execution service executes the concrete action
 
 #### Step 6: oracle
 
@@ -756,7 +948,7 @@ Current flow:
 
 1. oracle evaluation examines the current state after execution
 2. verdict information is produced and stored
-3. later reporting and higher-level orchestration consume those results
+3. reporting and higher-level orchestration consume those results
 
 ### Service architecture rule of thumb
 
@@ -767,7 +959,7 @@ When deciding where new logic belongs, use this split:
 - if the logic answers "how do we build, derive, execute, or select?"
   - it is probably a service
 - if the logic answers "which concrete implementations should be active in this session?"
-  - it belongs in composition, currently `plugin`
+  - it belongs in composition, in `plugin`
 
 ### Action resolution architecture
 
@@ -831,11 +1023,92 @@ The action-derivation diagram focuses on:
 - platform-specific widget derivation
 - generic engine derivers used by desktop-style plans
 
-## Next sections
+## Scriptless TESTAR runtime
 
-The next sections of this document should describe:
+The `testar` module now has a clearer internal split between:
 
-- platform modules such as `android`, `windows` and `webdriver`
-- `plugin`
-- `cli`
-- `testar`
+- composed runtime services
+- scriptless protocol capabilities
+
+The main entry path is:
+
+- `org.testar.scriptless.Main`
+- `org.testar.scriptless.ComposedProtocol`
+- `org.testar.scriptless.ScriptlessFactory`
+
+### Runtime split
+
+`ScriptlessFactory` builds two objects:
+
+- `TestingServices`
+  - the service bundle used by the scriptless runtime
+  - starts from `PlatformServices` resolved by `plugin`
+  - applies scriptless-side wrappers where needed
+- `ScriptlessCapabilities`
+  - settings initialization
+  - test-session lifecycle
+  - test-sequence lifecycle
+  - stop criteria
+  - scriptless-side oracle composition
+
+This means the current `testar` runtime no longer behaves like a monolithic protocol implementation.
+
+Instead, the active structure is:
+
+1. `plugin` composes platform defaults
+2. `ScriptlessFactory` resolves optional external wrappers
+3. `ComposedProtocol` orchestrates TESTAR runtime flow using:
+   - `TestingServices`
+   - `ScriptlessCapabilities`
+
+The high-level scriptless runtime flows are documented in:
+
+- `docs/scriptless/architecture_scriptless_generate_flow.mmd`
+- `docs/scriptless/architecture_scriptless_loader_flow.mmd`
+
+### Current scriptless responsibility split
+
+The current rule is:
+
+- reusable platform/runtime work belongs in services, plans, and policies
+- TESTAR-specific lifecycle behavior belongs in scriptless capabilities
+- external SUT-specific customization belongs in external composition and policies resources
+
+Examples:
+
+- `SystemService`, `StateService`, `ActionDerivationService`, `ActionExecutionService`
+  - shared runtime services
+- `TestSessionCapability`, `TestSequenceCapability`, `StopCriteriaCapability`
+  - scriptless runtime lifecycle behavior
+- `SessionReportingManager`
+  - shared session-level reporting/output ownership
+
+### WebDriver example
+
+The current WebDriver path shows the intended layering clearly.
+
+Policy-level customization:
+
+- `WebdriverLinkDeniedFilterPolicy`
+  - external `WidgetFilterPolicy`
+  - filters denied navigation links early
+- `WebdriverCanvasVisiblePolicy`
+  - external `VisiblePolicy`
+  - keeps only widgets fully visible on the browser canvas
+
+Plan-level runtime flow:
+
+- `WebdriverActionDerivationPlan`
+  - owns forced/default/fallback derivation phases
+- `WebdriverForcedActionDeriver`
+  - prioritizes foreground activation first
+  - then denied-current-url recovery
+- `WdDeniedUrlForcedActionDeriver`
+  - returns recovery actions such as history-back or close-tab for denied current pages
+
+The architectural meaning of this example is:
+
+- URL and link filtering is policy logic
+- action recovery ordering is derivation-plan logic
+- the scriptless service wrapper stays thin
+- individual scriptless runtime modes such as `Generate` and `Spy`

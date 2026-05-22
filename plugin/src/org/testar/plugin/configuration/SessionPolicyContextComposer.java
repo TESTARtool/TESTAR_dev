@@ -47,15 +47,8 @@ public final class SessionPolicyContextComposer {
         Assert.notNull(platformDefaults);
         Assert.notNull(configuration);
 
-        // Merge every policy family that appears either in platform defaults or in
-        // the session-specific additions/replacements.
-        Set<Class<? extends Policy>> policyTypes = new LinkedHashSet<>();
-        policyTypes.addAll(platformDefaults.policies().keySet());
-        policyTypes.addAll(configuration.additionalPolicies().keySet());
-        policyTypes.addAll(configuration.replacementPolicies().keySet());
-
         List<Policy> effectivePolicies = new ArrayList<>();
-        for (Class<? extends Policy> policyType : policyTypes) {
+        for (Class<? extends Policy> policyType : collectPolicyTypes(platformDefaults, configuration)) {
             Policy effectivePolicy = composePolicy(policyType, platformDefaults, configuration);
             if (effectivePolicy != null) {
                 effectivePolicies.add(effectivePolicy);
@@ -65,16 +58,37 @@ public final class SessionPolicyContextComposer {
         return new SessionPolicyContext(effectivePolicies);
     }
 
+    private static Set<Class<? extends Policy>> collectPolicyTypes(SessionPolicyContext platformDefaults,
+                                                                   PolicySessionConfiguration configuration) {
+        // Consider every policy family mentioned either by platform defaults or by the session-specific configuration.
+        Set<Class<? extends Policy>> policyTypes = new LinkedHashSet<>();
+        policyTypes.addAll(platformDefaults.policies().keySet());
+        policyTypes.addAll(configuration.additionalPolicies().keySet());
+        policyTypes.addAll(configuration.replacementPolicies().keySet());
+        return policyTypes;
+    }
+
     private static Policy composePolicy(Class<? extends Policy> policyType,
                                         SessionPolicyContext platformDefaults,
                                         PolicySessionConfiguration configuration) {
-        // Replacement policies take full ownership of one policy family.
-        List<? extends Policy> replacementPolicies = configuration.replacementPolicies(policyType);
-        if (!replacementPolicies.isEmpty()) {
-            return composePolicies(policyType, replacementPolicies);
+        List<? extends Policy> effectivePolicies = effectivePoliciesFor(policyType, platformDefaults, configuration);
+        if (effectivePolicies.isEmpty()) {
+            return null;
         }
 
-        // Otherwise compose platform defaults plus additional session policies.
+        return composePolicies(policyType, effectivePolicies);
+    }
+
+    private static List<? extends Policy> effectivePoliciesFor(Class<? extends Policy> policyType,
+                                                               SessionPolicyContext platformDefaults,
+                                                               PolicySessionConfiguration configuration) {
+        // Replacement policies fully own one family and bypass platform defaults plus additive policies.
+        List<? extends Policy> replacementPolicies = configuration.replacementPolicies(policyType);
+        if (!replacementPolicies.isEmpty()) {
+            return replacementPolicies;
+        }
+
+        // Otherwise extend the platform baseline with any additional session-specific policies.
         List<Policy> policies = new ArrayList<>();
         if (configuration.includePlatformDefaults()) {
             Policy defaultPolicy = platformDefaults.get(policyType);
@@ -83,18 +97,13 @@ public final class SessionPolicyContextComposer {
             }
         }
         policies.addAll(configuration.additionalPolicies(policyType));
-
-        if (policies.isEmpty()) {
-            return null;
-        }
-
-        return composePolicies(policyType, policies);
+        return policies;
     }
 
     @SuppressWarnings("unchecked")
     private static Policy composePolicies(Class<? extends Policy> policyType,
                                           List<? extends Policy> policies) {
-        // One policy needs no composite. Multiple policies require the family-specific composite.
+        // One policy instance needs no composite. Multiple instances require the family-specific composite wrapper.
         if (policies.size() == 1) {
             return policies.get(0);
         }

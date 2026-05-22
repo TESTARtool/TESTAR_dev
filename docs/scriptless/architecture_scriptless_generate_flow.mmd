@@ -1,5 +1,11 @@
 flowchart LR
 
+    Main["Main"]
+    ComposedProtocol["ComposedProtocol"]
+    TestingServices["TestingServices"]
+    ScriptlessCapabilities["ScriptlessCapabilities"]
+    GenerateMode["GenerateMode"]
+
     subgraph ScriptlessFlow["testar scriptless generate flow"]
         SystemService["SystemService"]
         StateService["StateService"]
@@ -14,6 +20,14 @@ flowchart LR
         TestSequenceCapability["TestSequenceCapability"]
         StopCriteriaCapability["StopCriteriaCapability"]
     end
+
+    Main --> ComposedProtocol
+    TestingServices --> ComposedProtocol
+    ScriptlessCapabilities --> ComposedProtocol
+    ComposedProtocol --> GenerateMode
+
+    GenerateMode -. uses services .-> SystemService
+    GenerateMode -. uses capabilities .-> SettingsCapability
 
     SettingsCapability -. test settings .-> TestSessionCapability
     TestSessionCapability -. session lifecycle .-> TestSequenceCapability

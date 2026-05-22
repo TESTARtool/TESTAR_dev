@@ -49,29 +49,29 @@ public final class ScriptlessPolicyLoader {
     public static ScriptlessPolicyDescriptor loadDescriptor(Settings settings) {
         Assert.notNull(settings);
 
-        String configuredResource = settings.get(ConfigTags.CustomPoliciesResource, "").trim();
+        String configuredResource = configuredPoliciesResource(settings);
         Properties resourceProperties = loadResourceProperties(configuredResource);
 
         return new ScriptlessPolicyDescriptor(
                 optionalValue(configuredResource),
-                parseBoolean(resourceProperties.getProperty(PROPERTY_REPLACE_CLICKABLE_POLICIES, "false")),
-                parseBoolean(resourceProperties.getProperty(PROPERTY_REPLACE_TYPEABLE_POLICIES, "false")),
-                parseBoolean(resourceProperties.getProperty(PROPERTY_REPLACE_SCROLLABLE_POLICIES, "false")),
-                parseBoolean(resourceProperties.getProperty(PROPERTY_REPLACE_SELECTABLE_POLICIES, "false")),
-                parseBoolean(resourceProperties.getProperty(PROPERTY_REPLACE_ENABLED_POLICIES, "false")),
-                parseBoolean(resourceProperties.getProperty(PROPERTY_REPLACE_BLOCKED_POLICIES, "false")),
-                parseBoolean(resourceProperties.getProperty(PROPERTY_REPLACE_WIDGET_FILTER_POLICIES, "false")),
-                parseBoolean(resourceProperties.getProperty(PROPERTY_REPLACE_VISIBLE_POLICIES, "false")),
-                parseBoolean(resourceProperties.getProperty(PROPERTY_REPLACE_TOP_LEVEL_POLICIES, "false")),
-                parseClassList(resourceProperties.getProperty(PROPERTY_CLICKABLE_POLICIES, "")),
-                parseClassList(resourceProperties.getProperty(PROPERTY_TYPEABLE_POLICIES, "")),
-                parseClassList(resourceProperties.getProperty(PROPERTY_SCROLLABLE_POLICIES, "")),
-                parseClassList(resourceProperties.getProperty(PROPERTY_SELECTABLE_POLICIES, "")),
-                parseClassList(resourceProperties.getProperty(PROPERTY_ENABLED_POLICIES, "")),
-                parseClassList(resourceProperties.getProperty(PROPERTY_BLOCKED_POLICIES, "")),
-                parseClassList(resourceProperties.getProperty(PROPERTY_WIDGET_FILTER_POLICIES, "")),
-                parseClassList(resourceProperties.getProperty(PROPERTY_VISIBLE_POLICIES, "")),
-                parseClassList(resourceProperties.getProperty(PROPERTY_TOP_LEVEL_POLICIES, ""))
+                booleanProperty(resourceProperties, PROPERTY_REPLACE_CLICKABLE_POLICIES),
+                booleanProperty(resourceProperties, PROPERTY_REPLACE_TYPEABLE_POLICIES),
+                booleanProperty(resourceProperties, PROPERTY_REPLACE_SCROLLABLE_POLICIES),
+                booleanProperty(resourceProperties, PROPERTY_REPLACE_SELECTABLE_POLICIES),
+                booleanProperty(resourceProperties, PROPERTY_REPLACE_ENABLED_POLICIES),
+                booleanProperty(resourceProperties, PROPERTY_REPLACE_BLOCKED_POLICIES),
+                booleanProperty(resourceProperties, PROPERTY_REPLACE_WIDGET_FILTER_POLICIES),
+                booleanProperty(resourceProperties, PROPERTY_REPLACE_VISIBLE_POLICIES),
+                booleanProperty(resourceProperties, PROPERTY_REPLACE_TOP_LEVEL_POLICIES),
+                classListProperty(resourceProperties, PROPERTY_CLICKABLE_POLICIES),
+                classListProperty(resourceProperties, PROPERTY_TYPEABLE_POLICIES),
+                classListProperty(resourceProperties, PROPERTY_SCROLLABLE_POLICIES),
+                classListProperty(resourceProperties, PROPERTY_SELECTABLE_POLICIES),
+                classListProperty(resourceProperties, PROPERTY_ENABLED_POLICIES),
+                classListProperty(resourceProperties, PROPERTY_BLOCKED_POLICIES),
+                classListProperty(resourceProperties, PROPERTY_WIDGET_FILTER_POLICIES),
+                classListProperty(resourceProperties, PROPERTY_VISIBLE_POLICIES),
+                classListProperty(resourceProperties, PROPERTY_TOP_LEVEL_POLICIES)
         );
     }
 
@@ -87,7 +87,7 @@ public final class ScriptlessPolicyLoader {
         }
 
         List<T> policies = new ArrayList<>();
-        Optional<String> resourcePath = optionalValue(settings.get(ConfigTags.CustomPoliciesResource, "").trim());
+        Optional<String> resourcePath = optionalValue(configuredPoliciesResource(settings));
         for (String className : policyClassNames) {
             policies.add(loadPolicy(className, expectedType, settings, resourcePath));
         }
@@ -99,44 +99,59 @@ public final class ScriptlessPolicyLoader {
                                                    Settings settings,
                                                    Optional<String> resourcePath) {
         try {
+            // Policy classes are resolved from the configured settings workspace first,
+            // then from the packaged runtime classpath.
             Class<?> policyClass = ExternalJavaClassSupport.loadClass(className, resourcePath);
-
-            if (!expectedType.isAssignableFrom(policyClass)) {
-                throw new IllegalStateException(
-                        "Configured policy class " + className
-                                + " does not implement " + expectedType.getName()
-                );
-            }
+            verifyPolicyType(className, expectedType, policyClass);
 
             Constructor<?> settingsConstructor = findConstructor(policyClass, Settings.class);
             if (settingsConstructor != null) {
-                Object instance = settingsConstructor.newInstance(settings);
-                return expectedType.cast(instance);
+                return expectedType.cast(settingsConstructor.newInstance(settings));
             }
 
             Constructor<?> emptyConstructor = findConstructor(policyClass);
             if (emptyConstructor != null) {
-                Object instance = emptyConstructor.newInstance();
-                return expectedType.cast(instance);
+                return expectedType.cast(emptyConstructor.newInstance());
             }
 
             throw new IllegalStateException(
                     "Configured policy class " + className
                             + " must expose either a no-args constructor or a Settings constructor"
             );
-        }
-        catch (ReflectiveOperationException exception) {
+        } catch (ReflectiveOperationException exception) {
             throw new IllegalStateException("Unable to instantiate policy class " + className, exception);
+        }
+    }
+
+    private static String configuredPoliciesResource(Settings settings) {
+        return settings.get(ConfigTags.CustomPoliciesResource, "").trim();
+    }
+
+    private static void verifyPolicyType(String className,
+                                         Class<? extends Policy> expectedType,
+                                         Class<?> policyClass) {
+        if (!expectedType.isAssignableFrom(policyClass)) {
+            throw new IllegalStateException(
+                    "Configured policy class " + className
+                            + " does not implement " + expectedType.getName()
+            );
         }
     }
 
     private static Constructor<?> findConstructor(Class<?> type, Class<?>... parameterTypes) {
         try {
             return type.getConstructor(parameterTypes);
-        }
-        catch (NoSuchMethodException exception) {
+        } catch (NoSuchMethodException exception) {
             return null;
         }
+    }
+
+    private static boolean booleanProperty(Properties properties, String propertyName) {
+        return parseBoolean(properties.getProperty(propertyName, "false"));
+    }
+
+    private static List<String> classListProperty(Properties properties, String propertyName) {
+        return parseClassList(properties.getProperty(propertyName, ""));
     }
 
     private static List<String> parseClassList(String value) {
@@ -166,10 +181,11 @@ public final class ScriptlessPolicyLoader {
         }
 
         try (FileInputStream inputStream = new FileInputStream(resourceFile)) {
+            // Policy resources are optional. When present, they add or replace
+            // the baseline platform policies for the configured seams.
             properties.load(inputStream);
             return properties;
-        }
-        catch (IOException exception) {
+        } catch (IOException exception) {
             throw new IllegalStateException("Unable to read policies resource: " + configuredResource, exception);
         }
     }

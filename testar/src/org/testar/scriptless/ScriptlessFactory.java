@@ -68,19 +68,20 @@ public final class ScriptlessFactory {
         Assert.notNull(runtimeContext);
 
         PlatformSessionSpecification sessionSpec = PlatformSessionSpecFactory.fromSettings(runtimeContext.settings());
-        ScriptlessCompositionDescriptor compositionDescriptor = ScriptlessCompositionLoader
-                .loadDescriptor(runtimeContext.settings());
-        ScriptlessPolicyDescriptor policyDescriptor = ScriptlessPolicyLoader
-                .loadDescriptor(runtimeContext.settings());
+        ScriptlessCompositionDescriptor compositionDescriptor = loadCompositionDescriptor(runtimeContext);
+        ScriptlessPolicyDescriptor policyDescriptor = loadPolicyDescriptor(runtimeContext);
         ScriptlessPlatformRuntime platformRuntime = runtimeFor(sessionSpec);
 
         ServiceSessionConfiguration serviceConfiguration = platformRuntime
                 .createServiceConfiguration(sessionSpec, runtimeContext);
-        PlatformServices platformServices = PlatformOrchestrator.resolve(
+        // Scriptless reuses the shared plugin resolution path and only supplies its session-specific overrides.
+        PlatformServices platformServices = resolvePlatformServices(
+                runtimeContext,
                 sessionSpec,
-                buildPolicyConfiguration(runtimeContext, policyDescriptor),
+                policyDescriptor,
                 serviceConfiguration
         );
+        // Reporting becomes fully active when a sequence starts, but the runtime keeps one manager instance throughout.
         SessionReportingManager sessionReportingManager = SessionReportingManager.deferred(sessionSpec.getTarget());
 
         return platformRuntime.createTestingServices(
@@ -94,8 +95,7 @@ public final class ScriptlessFactory {
     public static SettingsCapability buildSettingsCapability(RuntimeContext runtimeContext) {
         Assert.notNull(runtimeContext);
 
-        ScriptlessCompositionDescriptor compositionDescriptor = ScriptlessCompositionLoader
-                .loadDescriptor(runtimeContext.settings());
+        ScriptlessCompositionDescriptor compositionDescriptor = loadCompositionDescriptor(runtimeContext);
         ScriptlessPlatformRuntime platformRuntime = runtimeFor(runtimeContext.settings());
 
         return platformRuntime.createSettingsCapability(runtimeContext, compositionDescriptor);
@@ -104,8 +104,7 @@ public final class ScriptlessFactory {
     public static ScriptlessCapabilities buildScriptlessCapabilities(RuntimeContext runtimeContext) {
         Assert.notNull(runtimeContext);
 
-        ScriptlessCompositionDescriptor compositionDescriptor = ScriptlessCompositionLoader
-                .loadDescriptor(runtimeContext.settings());
+        ScriptlessCompositionDescriptor compositionDescriptor = loadCompositionDescriptor(runtimeContext);
         ScriptlessPlatformRuntime platformRuntime = runtimeFor(runtimeContext.settings());
 
         return platformRuntime.createCapabilities(
@@ -115,102 +114,99 @@ public final class ScriptlessFactory {
         );
     }
 
+    private static PlatformServices resolvePlatformServices(RuntimeContext runtimeContext,
+                                                            PlatformSessionSpecification sessionSpec,
+                                                            ScriptlessPolicyDescriptor policyDescriptor,
+                                                            ServiceSessionConfiguration serviceConfiguration) {
+        return PlatformOrchestrator.resolve(
+                sessionSpec,
+                buildPolicyConfiguration(runtimeContext, policyDescriptor),
+                serviceConfiguration
+        );
+    }
+
     private static PolicySessionConfiguration buildPolicyConfiguration(RuntimeContext runtimeContext,
                                                                       ScriptlessPolicyDescriptor policyDescriptor) {
         PolicySessionConfiguration.Builder builder = PolicySessionConfiguration.builder();
 
-        applyPolicies(
+        loadAndApplyPolicies(
                 builder,
                 ClickablePolicy.class,
                 policyDescriptor.replaceClickablePolicies(),
-                ScriptlessPolicyLoader.loadPolicies(
-                        policyDescriptor.clickablePolicies(),
-                        ClickablePolicy.class,
-                        runtimeContext.settings()
-                )
+                policyDescriptor.clickablePolicies(),
+                runtimeContext
         );
-        applyPolicies(
+        loadAndApplyPolicies(
                 builder,
                 TypeablePolicy.class,
                 policyDescriptor.replaceTypeablePolicies(),
-                ScriptlessPolicyLoader.loadPolicies(
-                        policyDescriptor.typeablePolicies(),
-                        TypeablePolicy.class,
-                        runtimeContext.settings()
-                )
+                policyDescriptor.typeablePolicies(),
+                runtimeContext
         );
-        applyPolicies(
+        loadAndApplyPolicies(
                 builder,
                 ScrollablePolicy.class,
                 policyDescriptor.replaceScrollablePolicies(),
-                ScriptlessPolicyLoader.loadPolicies(
-                        policyDescriptor.scrollablePolicies(),
-                        ScrollablePolicy.class,
-                        runtimeContext.settings()
-                )
+                policyDescriptor.scrollablePolicies(),
+                runtimeContext
         );
-        applyPolicies(
+        loadAndApplyPolicies(
                 builder,
                 SelectablePolicy.class,
                 policyDescriptor.replaceSelectablePolicies(),
-                ScriptlessPolicyLoader.loadPolicies(
-                        policyDescriptor.selectablePolicies(),
-                        SelectablePolicy.class,
-                        runtimeContext.settings()
-                )
+                policyDescriptor.selectablePolicies(),
+                runtimeContext
         );
-        applyPolicies(
+        loadAndApplyPolicies(
                 builder,
                 EnabledPolicy.class,
                 policyDescriptor.replaceEnabledPolicies(),
-                ScriptlessPolicyLoader.loadPolicies(
-                        policyDescriptor.enabledPolicies(),
-                        EnabledPolicy.class,
-                        runtimeContext.settings()
-                )
+                policyDescriptor.enabledPolicies(),
+                runtimeContext
         );
-        applyPolicies(
+        loadAndApplyPolicies(
                 builder,
                 BlockedPolicy.class,
                 policyDescriptor.replaceBlockedPolicies(),
-                ScriptlessPolicyLoader.loadPolicies(
-                        policyDescriptor.blockedPolicies(),
-                        BlockedPolicy.class,
-                        runtimeContext.settings()
-                )
+                policyDescriptor.blockedPolicies(),
+                runtimeContext
         );
-        applyPolicies(
+        loadAndApplyPolicies(
                 builder,
                 WidgetFilterPolicy.class,
                 policyDescriptor.replaceWidgetFilterPolicies(),
-                ScriptlessPolicyLoader.loadPolicies(
-                        policyDescriptor.widgetFilterPolicies(),
-                        WidgetFilterPolicy.class,
-                        runtimeContext.settings()
-                )
+                policyDescriptor.widgetFilterPolicies(),
+                runtimeContext
         );
-        applyPolicies(
+        loadAndApplyPolicies(
                 builder,
                 VisiblePolicy.class,
                 policyDescriptor.replaceVisiblePolicies(),
-                ScriptlessPolicyLoader.loadPolicies(
-                        policyDescriptor.visiblePolicies(),
-                        VisiblePolicy.class,
-                        runtimeContext.settings()
-                )
+                policyDescriptor.visiblePolicies(),
+                runtimeContext
         );
-        applyPolicies(
+        loadAndApplyPolicies(
                 builder,
                 TopLevelPolicy.class,
                 policyDescriptor.replaceTopLevelPolicies(),
-                ScriptlessPolicyLoader.loadPolicies(
-                        policyDescriptor.topLevelPolicies(),
-                        TopLevelPolicy.class,
-                        runtimeContext.settings()
-                )
+                policyDescriptor.topLevelPolicies(),
+                runtimeContext
         );
 
         return builder.build();
+    }
+
+    private static <T extends Policy> void loadAndApplyPolicies(PolicySessionConfiguration.Builder builder,
+                                                                Class<T> policyType,
+                                                                boolean replaceBuiltIns,
+                                                                List<String> policyClassNames,
+                                                                RuntimeContext runtimeContext) {
+        List<T> policies = ScriptlessPolicyLoader.loadPolicies(
+                policyClassNames,
+                policyType,
+                runtimeContext.settings()
+        );
+        applyPolicies(builder, policyType, replaceBuiltIns, policies);
     }
 
     private static <T extends Policy> void applyPolicies(PolicySessionConfiguration.Builder builder,
@@ -250,5 +246,13 @@ public final class ScriptlessFactory {
             return ANDROID_RUNTIME;
         }
         return WINDOWS_RUNTIME;
+    }
+
+    private static ScriptlessCompositionDescriptor loadCompositionDescriptor(RuntimeContext runtimeContext) {
+        return ScriptlessCompositionLoader.loadDescriptor(runtimeContext.settings());
+    }
+
+    private static ScriptlessPolicyDescriptor loadPolicyDescriptor(RuntimeContext runtimeContext) {
+        return ScriptlessPolicyLoader.loadDescriptor(runtimeContext.settings());
     }
 }

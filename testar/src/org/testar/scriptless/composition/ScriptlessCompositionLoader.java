@@ -40,35 +40,27 @@ public final class ScriptlessCompositionLoader {
     public static ScriptlessCompositionDescriptor loadDescriptor(Settings settings) {
         Assert.notNull(settings);
 
-        String configuredProfile = settings.get(ConfigTags.CompositionProfile, CompositionProfiles.WINDOWS_COMPOSITION);
-        String configuredResource = settings.get(ConfigTags.CustomCompositionResource, "").trim();
+        String configuredProfile = settings.get(
+                ConfigTags.CompositionProfile,
+                CompositionProfiles.WINDOWS_COMPOSITION
+        );
+        String configuredResource = configuredCompositionResource(settings);
         Properties resourceProperties = loadResourceProperties(configuredResource);
-        String resourceProfile = resourceProperties.getProperty(PROPERTY_BASE_PROFILE, "").trim();
-
-        String selectedProfile = configuredProfile;
-        if (!resourceProfile.isBlank()) {
-            selectedProfile = resourceProfile;
-        }
-
-        if (!CompositionProfiles.isSupported(selectedProfile)) {
-            throw new IllegalStateException("Unsupported composition profile: " + selectedProfile);
-        }
-
-        String resolvedProfile = CompositionProfiles.resolve(selectedProfile, settings.get(ConfigTags.SUTConnector, ""));
+        String resolvedProfile = resolveProfile(settings, configuredProfile, resourceProperties);
 
         return new ScriptlessCompositionDescriptor(
                 resolvedProfile,
                 optionalValue(configuredResource),
-                optionalValue(resourceProperties.getProperty(PROPERTY_SETTINGS_CAPABILITY_CLASS, "").trim()),
-                optionalValue(resourceProperties.getProperty(PROPERTY_TEST_SESSION_CAPABILITY_CLASS, "").trim()),
-                optionalValue(resourceProperties.getProperty(PROPERTY_TEST_SEQUENCE_CAPABILITY_CLASS, "").trim()),
-                optionalValue(resourceProperties.getProperty(PROPERTY_STOP_CRITERIA_CAPABILITY_CLASS, "").trim()),
-                optionalValue(resourceProperties.getProperty(PROPERTY_SYSTEM_SERVICE_CLASS, "").trim()),
-                optionalValue(resourceProperties.getProperty(PROPERTY_STATE_SERVICE_CLASS, "").trim()),
-                optionalValue(resourceProperties.getProperty(PROPERTY_ACTION_DERIVATION_SERVICE_CLASS, "").trim()),
-                optionalValue(resourceProperties.getProperty(PROPERTY_ACTION_SELECTOR_SERVICE_CLASS, "").trim()),
-                optionalValue(resourceProperties.getProperty(PROPERTY_ACTION_EXECUTION_SERVICE_CLASS, "").trim()),
-                optionalValue(resourceProperties.getProperty(PROPERTY_ORACLE_COMPOSER_CLASS, "").trim())
+                optionalProperty(resourceProperties, PROPERTY_SETTINGS_CAPABILITY_CLASS),
+                optionalProperty(resourceProperties, PROPERTY_TEST_SESSION_CAPABILITY_CLASS),
+                optionalProperty(resourceProperties, PROPERTY_TEST_SEQUENCE_CAPABILITY_CLASS),
+                optionalProperty(resourceProperties, PROPERTY_STOP_CRITERIA_CAPABILITY_CLASS),
+                optionalProperty(resourceProperties, PROPERTY_SYSTEM_SERVICE_CLASS),
+                optionalProperty(resourceProperties, PROPERTY_STATE_SERVICE_CLASS),
+                optionalProperty(resourceProperties, PROPERTY_ACTION_DERIVATION_SERVICE_CLASS),
+                optionalProperty(resourceProperties, PROPERTY_ACTION_SELECTOR_SERVICE_CLASS),
+                optionalProperty(resourceProperties, PROPERTY_ACTION_EXECUTION_SERVICE_CLASS),
+                optionalProperty(resourceProperties, PROPERTY_ORACLE_COMPOSER_CLASS)
         );
     }
 
@@ -89,19 +81,21 @@ public final class ScriptlessCompositionLoader {
 
         String className = wrapperClassName.get();
         try {
+            // Wrapper classes are resolved from the configured settings workspace first,
+            // then from the packaged runtime classpath.
             Class<?> wrapperClass = ExternalJavaClassSupport.loadClass(className, customCompositionResourcePath);
 
             for (Object[] extraArguments : extraArgumentOptions) {
                 Object[] constructorArguments = prepend(delegate, extraArguments);
                 Constructor<?> constructor = findMatchingConstructor(wrapperClass, constructorArguments);
                 if (constructor != null) {
-                    Object instance = constructor.newInstance(constructorArguments);
-                    if (!expectedType.isInstance(instance)) {
-                        throw new IllegalStateException(
-                                "Custom wrapper must implement " + expectedType.getName() + ": " + className
-                        );
-                    }
-                    return expectedType.cast(instance);
+                    return instantiateWrapper(
+                            wrapperClass,
+                            constructor,
+                            expectedType,
+                            className,
+                            constructorArguments
+                    );
                 }
             }
 
@@ -111,6 +105,44 @@ public final class ScriptlessCompositionLoader {
         } catch (ReflectiveOperationException exception) {
             throw new IllegalStateException("Unable to load custom wrapper class: " + className, exception);
         }
+    }
+
+    private static String configuredCompositionResource(Settings settings) {
+        return settings.get(ConfigTags.CustomCompositionResource, "").trim();
+    }
+
+    private static String resolveProfile(Settings settings,
+                                         String configuredProfile,
+                                         Properties resourceProperties) {
+        String resourceProfile = resourceProperties.getProperty(PROPERTY_BASE_PROFILE, "").trim();
+        String selectedProfile = resourceProfile.isBlank() ? configuredProfile : resourceProfile;
+        if (!CompositionProfiles.isSupported(selectedProfile)) {
+            throw new IllegalStateException("Unsupported composition profile: " + selectedProfile);
+        }
+
+        return CompositionProfiles.resolve(
+                selectedProfile,
+                settings.get(ConfigTags.SUTConnector, "")
+        );
+    }
+
+    private static Optional<String> optionalProperty(Properties properties, String propertyName) {
+        return optionalValue(properties.getProperty(propertyName, "").trim());
+    }
+
+    private static <T> T instantiateWrapper(Class<?> wrapperClass,
+                                            Constructor<?> constructor,
+                                            Class<T> expectedType,
+                                            String className,
+                                            Object[] constructorArguments)
+            throws ReflectiveOperationException {
+        Object instance = constructor.newInstance(constructorArguments);
+        if (!expectedType.isInstance(instance)) {
+            throw new IllegalStateException(
+                    "Custom wrapper must implement " + expectedType.getName() + ": " + className
+            );
+        }
+        return expectedType.cast(instance);
     }
 
     private static Properties loadResourceProperties(String customCompositionResource) {
@@ -126,6 +158,8 @@ public final class ScriptlessCompositionLoader {
         }
 
         try (FileInputStream inputStream = new FileInputStream(resourceFile)) {
+            // Resource files are optional. When present, they override or extend
+            // the baseline composition selected through the profile.
             properties.load(inputStream);
             return properties;
         } catch (IOException exception) {

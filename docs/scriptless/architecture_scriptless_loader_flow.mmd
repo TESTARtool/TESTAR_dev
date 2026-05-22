@@ -1,0 +1,58 @@
+flowchart LR
+
+    subgraph Inputs["configuration inputs"]
+        direction TB
+        CompositionProfile["CompositionProfile"]
+        Settings["Settings"]
+        CompositionResource["CustomCompositionResource"]
+        PoliciesResource["CustomPoliciesResource"]
+    end
+
+    subgraph Loaders["scriptless loaders"]
+        direction TB
+        CompositionLoader["ScriptlessCompositionLoader"]
+        PolicyLoader["ScriptlessPolicyLoader"]
+        ExternalJava["ExternalJavaClassSupport"]
+    end
+
+    subgraph Descriptors["resolved descriptors"]
+        direction TB
+        CompositionDescriptor["ScriptlessCompositionDescriptor"]
+        PolicyDescriptor["ScriptlessPolicyDescriptor"]
+    end
+
+    subgraph Consumers["runtime runtime"]
+        direction TB
+        ScriptlessFactory["ScriptlessFactory buildServices(...) buildSettingsCapability(...) buildScriptlessCapabilities(...)"]
+        SettingsCapability["SettingsCapability"]
+        ScriptlessCapabilities["ScriptlessCapabilities"]
+        PlatformSessionSpecification["PlatformSessionSpecification"]
+        PolicyConfiguration["PolicySessionConfiguration"]
+        ServiceConfiguration["ServiceSessionConfiguration"]
+        PlatformOrchestrator["PlatformOrchestrator.resolve(...)"]
+    end
+
+    Settings --> CompositionLoader
+    Settings --> PolicyLoader
+    CompositionProfile --> CompositionLoader
+    CompositionResource --> ExternalJava
+    PoliciesResource --> ExternalJava
+
+    CompositionLoader --> CompositionDescriptor
+    PolicyLoader --> PolicyDescriptor
+
+    CompositionDescriptor --> ScriptlessFactory
+    PolicyDescriptor --> ScriptlessFactory
+
+    ExternalJava --> CompositionLoader
+    ExternalJava --> PolicyLoader
+
+    ScriptlessFactory --> SettingsCapability
+    ScriptlessFactory --> ScriptlessCapabilities
+    ScriptlessFactory --> PlatformSessionSpecification
+    ScriptlessFactory --> PolicyConfiguration
+    ScriptlessFactory --> ServiceConfiguration
+
+    PlatformSessionSpecification --> PlatformOrchestrator
+    PolicyConfiguration --> PlatformOrchestrator
+    ServiceConfiguration --> PlatformOrchestrator
