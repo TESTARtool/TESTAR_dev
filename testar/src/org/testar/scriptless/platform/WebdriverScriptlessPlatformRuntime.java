@@ -15,9 +15,9 @@ import org.testar.core.service.StateService;
 import org.testar.core.service.SystemService;
 import org.testar.engine.state.StateCompositionPlan;
 import org.testar.plugin.PlatformServices;
-import org.testar.plugin.PlatformSessionSpec;
+import org.testar.plugin.configuration.PlatformSessionSpecification;
 import org.testar.plugin.configuration.PlatformDefaultSessionConfigurations;
-import org.testar.plugin.configuration.SessionServiceConfiguration;
+import org.testar.plugin.configuration.ServiceSessionConfiguration;
 import org.testar.plugin.reporting.SessionReportingManager;
 import org.testar.scriptless.RuntimeContext;
 import org.testar.scriptless.ScriptlessCapabilities;
@@ -43,7 +43,7 @@ import org.testar.statemodel.StateModelManager;
 public final class WebdriverScriptlessPlatformRuntime extends AbstractScriptlessPlatformRuntime {
 
     @Override
-    public SessionServiceConfiguration createServiceConfiguration(PlatformSessionSpec sessionSpec, RuntimeContext runtimeContext) {
+    public ServiceSessionConfiguration createServiceConfiguration(PlatformSessionSpecification sessionSpec, RuntimeContext runtimeContext) {
         StateCompositionPlan defaultStatePlan = PlatformDefaultSessionConfigurations
                 .webdriverServiceConfiguration(sessionSpec)
                 .stateCompositionPlanOverride()
@@ -52,7 +52,7 @@ public final class WebdriverScriptlessPlatformRuntime extends AbstractScriptless
                 new ScriptlessWebdriverStateService(defaultStatePlan.stateService(), runtimeContext),
                 defaultStatePlan::query
         );
-        return SessionServiceConfiguration.builder()
+        return ServiceSessionConfiguration.builder()
                 .overrideStateCompositionPlan(scriptlessStatePlan)
                 .build();
     }

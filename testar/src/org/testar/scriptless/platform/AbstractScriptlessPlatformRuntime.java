@@ -15,8 +15,8 @@ import org.testar.core.service.ActionSelectorService;
 import org.testar.core.service.OracleEvaluationService;
 import org.testar.core.service.StateService;
 import org.testar.core.service.SystemService;
-import org.testar.plugin.PlatformSessionSpec;
-import org.testar.plugin.configuration.SessionServiceConfiguration;
+import org.testar.plugin.configuration.PlatformSessionSpecification;
+import org.testar.plugin.configuration.ServiceSessionConfiguration;
 import org.testar.plugin.reporting.SessionReportingManager;
 import org.testar.scriptless.RuntimeContext;
 import org.testar.scriptless.ScriptlessCapabilities;
@@ -33,8 +33,8 @@ import org.testar.statemodel.StateModelManager;
 abstract class AbstractScriptlessPlatformRuntime implements ScriptlessPlatformRuntime {
 
     @Override
-    public SessionServiceConfiguration createServiceConfiguration(PlatformSessionSpec sessionSpec, RuntimeContext runtimeContext) {
-        return SessionServiceConfiguration.defaults();
+    public ServiceSessionConfiguration createServiceConfiguration(PlatformSessionSpecification sessionSpec, RuntimeContext runtimeContext) {
+        return ServiceSessionConfiguration.defaults();
     }
 
     protected final <T> T wrap(OptionalWrapper<T> optionalWrapper) {

@@ -36,35 +36,35 @@ import org.testar.reporting.Reporting;
 import org.testar.reporting.sequence.SequenceTraceSession;
 
 /**
- * Manages per-session screenshots and report generation for CLI sessions.
+ * Manages reporting assets for CLI sessions and scriptless test sequences.
  */
 public final class SessionReportingManager {
 
     private Reporting reporting;
     private final AtomicBoolean finished;
-    private final SequenceTraceSession sequenceTraceSession;
+    private SequenceTraceSession sequenceTraceSession;
+    private final String target;
 
-    private SessionReportingManager(Reporting reporting, SequenceTraceSession sequenceTraceSession) {
+    private SessionReportingManager(Reporting reporting,
+                                    String target,
+                                    SequenceTraceSession sequenceTraceSession) {
         this.reporting = reporting;
+        this.target = target;
         this.finished = new AtomicBoolean(false);
         this.sequenceTraceSession = sequenceTraceSession;
     }
 
-    public static SessionReportingManager create() {
-        return new SessionReportingManager(null, SequenceTraceSession.disabled());
+    public static SessionReportingManager deferred(String target) {
+        return new SessionReportingManager(null, target, SequenceTraceSession.disabled());
     }
 
     public static SessionReportingManager start(Settings settings, String target) {
         configureOutputStructure(settings, target);
         startScreenshotSerialiser();
-        String sequenceId = currentSequenceId();
         return new SessionReportingManager(
                 new ReportManager(settings),
-                SequenceTraceSession.create(
-                        sequenceId,
-                        target,
-                        Path.of(OutputStructure.htmlOutputDir, sequenceId + ".json")
-                )
+                target,
+                createSequenceTraceSession(target)
         );
     }
 
@@ -73,6 +73,7 @@ public final class SessionReportingManager {
     }
 
     public void prepareGeneratedSequenceOutput(Settings settings) {
+        sequenceTraceSession = createSequenceTraceSession(target);
         String sequenceCountDir = "_sequence_" + OutputStructure.sequenceInnerLoopCount;
         String logFileName = OutputStructure.logsOutputDir
                 + File.separator + OutputStructure.startInnerLoopDateString + "_"
@@ -160,6 +161,7 @@ public final class SessionReportingManager {
     }
 
     public void endSequenceOutput() {
+        finishSequenceTrace();
         ScreenshotSerialiser.exit();
         LogSerialiser.flush();
         LogSerialiser.finish();
@@ -167,6 +169,7 @@ public final class SessionReportingManager {
     }
 
     public void abortSequenceOutput(Exception exception) {
+        finishSequenceTrace();
         ScreenshotSerialiser.finish();
         ScreenshotSerialiser.exit();
         LogSerialiser.log(
@@ -187,7 +190,7 @@ public final class SessionReportingManager {
             return;
         }
 
-        sequenceTraceSession.finish();
+        finishSequenceTrace();
         addTestVerdicts(verdicts);
         finishReport();
         ScreenshotSerialiser.exit();
@@ -218,6 +221,20 @@ public final class SessionReportingManager {
         return OutputStructure.startInnerLoopDateString + "_"
                 + OutputStructure.executedSUTname
                 + "_sequence_" + OutputStructure.sequenceInnerLoopCount;
+    }
+
+    private static SequenceTraceSession createSequenceTraceSession(String target) {
+        String sequenceId = currentSequenceId();
+        return SequenceTraceSession.create(
+                sequenceId,
+                target,
+                Path.of(OutputStructure.htmlOutputDir, sequenceId + ".json")
+        );
+    }
+
+    private void finishSequenceTrace() {
+        sequenceTraceSession.finish();
+        sequenceTraceSession = SequenceTraceSession.disabled();
     }
 
     private static String sanitizeTarget(String target) {

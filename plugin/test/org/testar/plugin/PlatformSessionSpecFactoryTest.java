@@ -10,6 +10,7 @@ import org.mockito.Mockito;
 import org.testar.config.ConfigTags;
 import org.testar.config.settings.Settings;
 import org.testar.config.settings.SettingsDefaults;
+import org.testar.plugin.configuration.PlatformSessionSpecification;
 
 public class PlatformSessionSpecFactoryTest {
 
@@ -23,10 +24,10 @@ public class PlatformSessionSpecFactoryTest {
         try (MockedStatic<NativeLinker> nativeLinker = Mockito.mockStatic(NativeLinker.class)) {
             nativeLinker.when(NativeLinker::getPLATFORM_OS).thenReturn(EnumSet.of(OperatingSystems.ANDROID));
 
-            PlatformSessionSpec sessionSpec = PlatformSessionSpecFactory.fromSettings(settings);
+            PlatformSessionSpecification sessionSpec = PlatformSessionSpecFactory.fromSettings(settings);
 
             assertEquals(OperatingSystems.ANDROID, sessionSpec.getOperatingSystem());
-            assertEquals(PlatformSessionSpec.TargetType.EXECUTABLE, sessionSpec.getTargetType());
+            assertEquals(PlatformSessionSpecification.TargetType.EXECUTABLE, sessionSpec.getTargetType());
             assertEquals("com.example.app", sessionSpec.getTarget());
         }
     }
@@ -41,7 +42,7 @@ public class PlatformSessionSpecFactoryTest {
         try (MockedStatic<NativeLinker> nativeLinker = Mockito.mockStatic(NativeLinker.class)) {
             nativeLinker.when(NativeLinker::getPLATFORM_OS).thenReturn(EnumSet.of(OperatingSystems.ANDROID));
 
-            PlatformSessionSpec sessionSpec = PlatformSessionSpecFactory.fromSettings(settings);
+            PlatformSessionSpecification sessionSpec = PlatformSessionSpecFactory.fromSettings(settings);
 
             assertEquals("/tmp/sample.apk", sessionSpec.getTarget());
         }
@@ -56,7 +57,7 @@ public class PlatformSessionSpecFactoryTest {
         try (MockedStatic<NativeLinker> nativeLinker = Mockito.mockStatic(NativeLinker.class)) {
             nativeLinker.when(NativeLinker::getPLATFORM_OS).thenReturn(EnumSet.of(OperatingSystems.ANDROID));
 
-            PlatformSessionSpec sessionSpec = PlatformSessionSpecFactory.fromSettings(settings);
+            PlatformSessionSpecification sessionSpec = PlatformSessionSpecFactory.fromSettings(settings);
 
             assertEquals("android-generic", sessionSpec.getTarget());
         }
@@ -70,7 +71,7 @@ public class PlatformSessionSpecFactoryTest {
         try (MockedStatic<NativeLinker> nativeLinker = Mockito.mockStatic(NativeLinker.class)) {
             nativeLinker.when(NativeLinker::getPLATFORM_OS).thenReturn(EnumSet.of(OperatingSystems.ANDROID));
 
-            PlatformSessionSpec sessionSpec = PlatformSessionSpecFactory.fromSettings(settings);
+            PlatformSessionSpecification sessionSpec = PlatformSessionSpecFactory.fromSettings(settings);
 
             assertEquals("android", sessionSpec.getTarget());
         }

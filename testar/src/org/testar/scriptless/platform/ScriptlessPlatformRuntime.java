@@ -7,8 +7,8 @@
 package org.testar.scriptless.platform;
 
 import org.testar.plugin.PlatformServices;
-import org.testar.plugin.PlatformSessionSpec;
-import org.testar.plugin.configuration.SessionServiceConfiguration;
+import org.testar.plugin.configuration.PlatformSessionSpecification;
+import org.testar.plugin.configuration.ServiceSessionConfiguration;
 import org.testar.plugin.reporting.SessionReportingManager;
 import org.testar.scriptless.RuntimeContext;
 import org.testar.scriptless.ScriptlessCapabilities;
@@ -17,7 +17,7 @@ import org.testar.scriptless.composition.ScriptlessCompositionDescriptor;
 
 public interface ScriptlessPlatformRuntime {
 
-    SessionServiceConfiguration createServiceConfiguration(PlatformSessionSpec sessionSpec, RuntimeContext runtimeContext);
+    ServiceSessionConfiguration createServiceConfiguration(PlatformSessionSpecification sessionSpec, RuntimeContext runtimeContext);
 
     TestingServices createTestingServices(PlatformServices platformServices,
                                           RuntimeContext runtimeContext,

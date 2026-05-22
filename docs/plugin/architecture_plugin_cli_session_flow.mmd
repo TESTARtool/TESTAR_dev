@@ -1,0 +1,48 @@
+flowchart LR
+
+    subgraph CliEntry["cli session entry"]
+        direction TB
+        Cli["cli daemon / commands"]
+        CliDaemon["CliDaemonServer"]
+    end
+
+    subgraph PluginFlow["plugin session flow"]
+        direction TB
+        OpenCliSession["PlatformOrchestrator.openCliSession(sessionSpec)"]
+        Resolve["PlatformOrchestrator.resolve(sessionSpec)"]
+        PolicyDefaults["PolicySessionConfiguration.defaults()"]
+        ServiceDefaults["ServiceSessionConfiguration.defaults()"]
+        StateModelManager["createStateModelManager(...)"]
+        PlatformServices["PlatformServices"]
+        StartSystem["systemService.startSystem()"]
+        Reporting["SessionReportingManager.start(...)"]
+        DefaultPlatformSession["DefaultPlatformSession"]
+    end
+
+    subgraph SessionOps["session operations"]
+        direction TB
+        PlatformSession["PlatformSession"]
+        GetState["getState()"]
+        Derive["getDerivedActions()"]
+        Execute["executeAction()"]
+        Stop["stopSystem()"]
+    end
+
+    Cli --> CliDaemon
+    CliDaemon --> OpenCliSession
+    OpenCliSession --> Resolve
+
+    PolicyDefaults --> Resolve
+    ServiceDefaults --> Resolve
+    StateModelManager --> Resolve
+    Resolve --> PlatformServices
+
+    PlatformServices --> StartSystem
+    StartSystem --> DefaultPlatformSession
+    Reporting --> DefaultPlatformSession
+    DefaultPlatformSession -. implements .-> PlatformSession
+
+    DefaultPlatformSession --> GetState
+    DefaultPlatformSession --> Derive
+    DefaultPlatformSession --> Execute
+    DefaultPlatformSession --> Stop

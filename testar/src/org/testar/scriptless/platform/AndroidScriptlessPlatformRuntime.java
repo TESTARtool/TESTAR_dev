@@ -14,8 +14,8 @@ import org.testar.core.service.OracleEvaluationService;
 import org.testar.core.service.StateService;
 import org.testar.core.service.SystemService;
 import org.testar.plugin.PlatformServices;
-import org.testar.plugin.PlatformSessionSpec;
-import org.testar.plugin.configuration.SessionServiceConfiguration;
+import org.testar.plugin.configuration.PlatformSessionSpecification;
+import org.testar.plugin.configuration.ServiceSessionConfiguration;
 import org.testar.plugin.reporting.SessionReportingManager;
 import org.testar.scriptless.RuntimeContext;
 import org.testar.scriptless.ScriptlessCapabilities;
@@ -41,8 +41,8 @@ import org.testar.statemodel.StateModelManager;
 public final class AndroidScriptlessPlatformRuntime extends AbstractScriptlessPlatformRuntime {
 
     @Override
-    public SessionServiceConfiguration createServiceConfiguration(PlatformSessionSpec sessionSpec, RuntimeContext runtimeContext) {
-        return SessionServiceConfiguration.defaults();
+    public ServiceSessionConfiguration createServiceConfiguration(PlatformSessionSpecification sessionSpec, RuntimeContext runtimeContext) {
+        return ServiceSessionConfiguration.defaults();
     }
 
     @Override

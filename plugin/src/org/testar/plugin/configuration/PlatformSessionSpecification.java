@@ -4,16 +4,17 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.plugin;
+package org.testar.plugin.configuration;
 
 import org.testar.config.settings.Settings;
 import org.testar.core.Assert;
+import org.testar.plugin.OperatingSystems;
 
 /**
  * Minimal platform session specification used by CLI and future composition
  * layers to request platform services for a concrete startup/attach strategy.
  */
-public final class PlatformSessionSpec {
+public final class PlatformSessionSpecification {
 
     public enum TargetType {
         EXECUTABLE,
@@ -28,7 +29,7 @@ public final class PlatformSessionSpec {
     private final String target;
     private final Settings settings;
 
-    private PlatformSessionSpec(Builder builder) {
+    private PlatformSessionSpecification(Builder builder) {
         this.operatingSystem = Assert.notNull(builder.operatingSystem);
         this.targetType = Assert.notNull(builder.targetType);
         this.target = Assert.notNull(builder.target);
@@ -69,8 +70,8 @@ public final class PlatformSessionSpec {
             this.settings = Assert.notNull(settings);
         }
 
-        public PlatformSessionSpec build() {
-            return new PlatformSessionSpec(this);
+        public PlatformSessionSpecification build() {
+            return new PlatformSessionSpecification(this);
         }
     }
 }

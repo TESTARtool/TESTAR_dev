@@ -44,7 +44,7 @@ public final class PlatformDefaultServicePlans {
         this.oracleEvaluationPlan = Assert.notNull(oracleEvaluationPlan);
     }
 
-    public static PlatformDefaultServicePlans fromConfiguration(SessionServiceConfiguration configuration) {
+    public static PlatformDefaultServicePlans fromConfiguration(ServiceSessionConfiguration configuration) {
         Assert.notNull(configuration);
         return new PlatformDefaultServicePlans(
                 configuration.systemCompositionPlanOverride().orElseThrow(),

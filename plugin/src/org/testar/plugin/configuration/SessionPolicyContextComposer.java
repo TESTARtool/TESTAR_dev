@@ -43,7 +43,7 @@ public final class SessionPolicyContextComposer {
     }
 
     public static SessionPolicyContext compose(SessionPolicyContext platformDefaults,
-                                               SessionPolicyConfiguration configuration) {
+                                               PolicySessionConfiguration configuration) {
         Assert.notNull(platformDefaults);
         Assert.notNull(configuration);
 
@@ -67,7 +67,7 @@ public final class SessionPolicyContextComposer {
 
     private static Policy composePolicy(Class<? extends Policy> policyType,
                                         SessionPolicyContext platformDefaults,
-                                        SessionPolicyConfiguration configuration) {
+                                        PolicySessionConfiguration configuration) {
         // Replacement policies take full ownership of one policy family.
         List<? extends Policy> replacementPolicies = configuration.replacementPolicies(policyType);
         if (!replacementPolicies.isEmpty()) {

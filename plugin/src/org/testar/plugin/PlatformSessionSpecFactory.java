@@ -9,10 +9,11 @@ package org.testar.plugin;
 import org.testar.config.ConfigTags;
 import org.testar.config.settings.Settings;
 import org.testar.core.Assert;
+import org.testar.plugin.configuration.PlatformSessionSpecification;
 import org.testar.plugin.exceptions.UnsupportedPlatformException;
 
 /**
- * Central factory for converting TESTAR settings into a platform session
+ * Central factory for converting TESTAR settings into one platform session
  * specification.
  */
 public final class PlatformSessionSpecFactory {
@@ -20,11 +21,11 @@ public final class PlatformSessionSpecFactory {
     private PlatformSessionSpecFactory() {
     }
 
-    public static PlatformSessionSpec fromSettings(Settings settings) {
+    public static PlatformSessionSpecification fromSettings(Settings settings) {
         Assert.notNull(settings);
 
         OperatingSystems operatingSystem = detectOperatingSystem();
-        PlatformSessionSpec.TargetType targetType = detectTargetType(
+        PlatformSessionSpecification.TargetType targetType = detectTargetType(
                 operatingSystem,
                 settings.get(ConfigTags.SUTConnector, "")
         );
@@ -34,7 +35,7 @@ public final class PlatformSessionSpecFactory {
             throw new UnsupportedPlatformException("Platform session target cannot be empty");
         }
 
-        return PlatformSessionSpec.builder(
+        return PlatformSessionSpecification.builder(
                 operatingSystem,
                 targetType,
                 target,
@@ -42,8 +43,8 @@ public final class PlatformSessionSpecFactory {
         ).build();
     }
 
-    public static PlatformSessionSpec create(OperatingSystems operatingSystem,
-                                             PlatformSessionSpec.TargetType targetType,
+    public static PlatformSessionSpecification create(OperatingSystems operatingSystem,
+                                             PlatformSessionSpecification.TargetType targetType,
                                              String target,
                                              Settings settings) {
         Assert.notNull(operatingSystem);
@@ -54,7 +55,7 @@ public final class PlatformSessionSpecFactory {
             throw new UnsupportedPlatformException("Platform session target cannot be empty");
         }
 
-        return PlatformSessionSpec.builder(
+        return PlatformSessionSpecification.builder(
                 operatingSystem,
                 targetType,
                 target,
@@ -80,22 +81,22 @@ public final class PlatformSessionSpecFactory {
         );
     }
 
-    private static PlatformSessionSpec.TargetType detectTargetType(OperatingSystems operatingSystem,
+    private static PlatformSessionSpecification.TargetType detectTargetType(OperatingSystems operatingSystem,
                                                                    String sutConnector) {
         if (operatingSystem == OperatingSystems.ANDROID) {
-            return PlatformSessionSpec.TargetType.EXECUTABLE;
+            return PlatformSessionSpecification.TargetType.EXECUTABLE;
         }
         if (operatingSystem == OperatingSystems.WEBDRIVER) {
-            return PlatformSessionSpec.TargetType.EXECUTABLE;
+            return PlatformSessionSpecification.TargetType.EXECUTABLE;
         }
         if (Settings.SUT_CONNECTOR_CMDLINE.equals(sutConnector)) {
-            return PlatformSessionSpec.TargetType.EXECUTABLE;
+            return PlatformSessionSpecification.TargetType.EXECUTABLE;
         }
         if (Settings.SUT_CONNECTOR_WINDOW_TITLE.equals(sutConnector)) {
-            return PlatformSessionSpec.TargetType.WINDOW_TITLE;
+            return PlatformSessionSpecification.TargetType.WINDOW_TITLE;
         }
         if (Settings.SUT_CONNECTOR_PROCESS_NAME.equals(sutConnector)) {
-            return PlatformSessionSpec.TargetType.PROCESS_NAME;
+            return PlatformSessionSpecification.TargetType.PROCESS_NAME;
         }
         throw new UnsupportedPlatformException(
                 "Unsupported platform session connector: " + sutConnector

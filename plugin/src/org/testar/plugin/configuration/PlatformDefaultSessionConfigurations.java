@@ -20,7 +20,6 @@ import org.testar.engine.action.resolver.DescriptionActionResolver;
 import org.testar.engine.oracle.OracleEvaluationPlan;
 import org.testar.engine.state.StateCompositionPlan;
 import org.testar.engine.service.DefaultOracleEvaluationService;
-import org.testar.plugin.PlatformSessionSpec;
 import org.testar.webdriver.action.execution.WebdriverActionExecutionPlan;
 import org.testar.webdriver.action.derivation.WebdriverActionDerivationPlan;
 import org.testar.webdriver.state.WebdriverStateCompositionPlan;
@@ -38,14 +37,14 @@ public final class PlatformDefaultSessionConfigurations {
     private PlatformDefaultSessionConfigurations() {
     }
 
-    public static SessionPolicyConfiguration defaultPolicyConfiguration() {
-        return SessionPolicyConfiguration.defaults();
+    public static PolicySessionConfiguration defaultPolicyConfiguration() {
+        return PolicySessionConfiguration.defaults();
     }
 
     // Build the full set of Windows default service plans for one session target.
-    public static SessionServiceConfiguration windowsServiceConfiguration(PlatformSessionSpec sessionSpec) {
+    public static ServiceSessionConfiguration windowsServiceConfiguration(PlatformSessionSpecification sessionSpec) {
         Settings settings = sessionSpec.getSettings();
-        SessionServiceConfiguration.Builder builder = SessionServiceConfiguration.builder();
+        ServiceSessionConfiguration.Builder builder = ServiceSessionConfiguration.builder();
 
         switch (sessionSpec.getTargetType()) {
             case EXECUTABLE:
@@ -116,10 +115,10 @@ public final class PlatformDefaultSessionConfigurations {
     }
 
     // Build the full set of WebDriver default service plans for one session target.
-    public static SessionServiceConfiguration webdriverServiceConfiguration(PlatformSessionSpec sessionSpec) {
+    public static ServiceSessionConfiguration webdriverServiceConfiguration(PlatformSessionSpecification sessionSpec) {
         Settings settings = sessionSpec.getSettings();
 
-        return SessionServiceConfiguration.builder()
+        return ServiceSessionConfiguration.builder()
                 .overrideSystemCompositionPlan(
                         WebdriverSystemCompositionPlan.fromSettings(settings)
                 )
@@ -145,10 +144,10 @@ public final class PlatformDefaultSessionConfigurations {
     }
 
     // Build the full set of Android default service plans for one session target.
-    public static SessionServiceConfiguration androidServiceConfiguration(PlatformSessionSpec sessionSpec) {
+    public static ServiceSessionConfiguration androidServiceConfiguration(PlatformSessionSpecification sessionSpec) {
         Settings settings = sessionSpec.getSettings();
 
-        return SessionServiceConfiguration.builder()
+        return ServiceSessionConfiguration.builder()
                 .overrideSystemCompositionPlan(
                         AndroidSystemCompositionPlan.fromSettings(settings)
                 )
@@ -174,7 +173,7 @@ public final class PlatformDefaultSessionConfigurations {
     }
 
     // Build the Windows semantic projection used when CLI wants a readable state view.
-    public static StateCompositionPlan windowsSemanticStateCompositionPlan(PlatformSessionSpec sessionSpec) {
+    public static StateCompositionPlan windowsSemanticStateCompositionPlan(PlatformSessionSpecification sessionSpec) {
         Settings settings = sessionSpec.getSettings();
         return WindowsStateCompositionPlan.uiAutomationSemanticWidgets(
                 settings.get(ConfigTags.TimeToFreeze, 30.0),
@@ -184,7 +183,7 @@ public final class PlatformDefaultSessionConfigurations {
     }
 
     // Build the WebDriver semantic projection used when CLI wants a readable state view.
-    public static StateCompositionPlan webdriverSemanticStateCompositionPlan(PlatformSessionSpec sessionSpec) {
+    public static StateCompositionPlan webdriverSemanticStateCompositionPlan(PlatformSessionSpecification sessionSpec) {
         Settings settings = sessionSpec.getSettings();
         return WebdriverStateCompositionPlan.browserSemanticWidgets(
                 settings.get(ConfigTags.TimeToFreeze, 30.0)
@@ -192,7 +191,7 @@ public final class PlatformDefaultSessionConfigurations {
     }
 
     // Build the Android semantic projection used when CLI wants a readable state view.
-    public static StateCompositionPlan androidSemanticStateCompositionPlan(PlatformSessionSpec sessionSpec) {
+    public static StateCompositionPlan androidSemanticStateCompositionPlan(PlatformSessionSpecification sessionSpec) {
         Settings settings = sessionSpec.getSettings();
         return AndroidStateCompositionPlan.appiumSemanticWidgets(
                 settings.get(ConfigTags.TimeToFreeze, 30.0)

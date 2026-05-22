@@ -28,13 +28,13 @@ import org.testar.core.tag.Tags;
 import org.testar.plugin.OperatingSystems;
 import org.testar.plugin.PlatformOrchestrator;
 import org.testar.plugin.PlatformSession;
-import org.testar.plugin.PlatformSessionSpec;
+import org.testar.plugin.configuration.PlatformSessionSpecification;
 import org.testar.plugin.PlatformSessionSpecFactory;
 
 final class CliDaemonServer {
 
     private PlatformSession activeSession;
-    private PlatformSessionSpec activeSessionSpec;
+    private PlatformSessionSpecification activeSessionSpec;
 
     void run() {
         try (ServerSocket serverSocket = new ServerSocket(CliDaemonConfig.PORT, 50)) {
@@ -97,7 +97,7 @@ final class CliDaemonServer {
 
     private CliResponse startSession(CliRequest request) {
         try {
-            PlatformSessionSpec sessionSpec = buildSessionSpec(request);
+            PlatformSessionSpecification sessionSpec = buildSessionSpec(request);
             replaceActiveSession(sessionSpec);
             return new CliResponse(0, List.of(
                     "sessionStarted",
@@ -196,7 +196,7 @@ final class CliDaemonServer {
         }
     }
 
-    private synchronized void replaceActiveSession(PlatformSessionSpec sessionSpec) {
+    private synchronized void replaceActiveSession(PlatformSessionSpecification sessionSpec) {
         closeActiveSession();
         activeSessionSpec = sessionSpec;
         activeSession = PlatformOrchestrator.openCliSession(sessionSpec);
@@ -225,12 +225,12 @@ final class CliDaemonServer {
         }
     }
 
-    private PlatformSessionSpec buildSessionSpec(CliRequest request) {
+    private PlatformSessionSpecification buildSessionSpec(CliRequest request) {
         Settings settings = CliSettingsLoader.load();
         return buildSessionSpec(request, settings);
     }
 
-    PlatformSessionSpec buildSessionSpec(CliRequest request, Settings settings) {
+    PlatformSessionSpecification buildSessionSpec(CliRequest request, Settings settings) {
         String platformToken = request.argumentAt(0);
         String target = request.argumentAt(1);
 
@@ -252,7 +252,7 @@ final class CliDaemonServer {
 
         return PlatformSessionSpecFactory.create(
                 operatingSystem,
-                PlatformSessionSpec.TargetType.EXECUTABLE,
+                PlatformSessionSpecification.TargetType.EXECUTABLE,
                 target,
                 settings
         );

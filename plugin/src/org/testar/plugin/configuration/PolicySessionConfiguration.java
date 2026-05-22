@@ -19,13 +19,13 @@ import org.testar.core.policy.Policy;
  * Plugin-side configuration contract that describes how a session policy
  * context should be composed.
  */
-public final class SessionPolicyConfiguration {
+public final class PolicySessionConfiguration {
 
     private final boolean includePlatformDefaults;
     private final Map<Class<? extends Policy>, List<Policy>> additionalPolicies;
     private final Map<Class<? extends Policy>, List<Policy>> replacementPolicies;
 
-    private SessionPolicyConfiguration(boolean includePlatformDefaults,
+    private PolicySessionConfiguration(boolean includePlatformDefaults,
                                        Map<Class<? extends Policy>, List<Policy>> additionalPolicies,
                                        Map<Class<? extends Policy>, List<Policy>> replacementPolicies) {
         this.includePlatformDefaults = includePlatformDefaults;
@@ -37,7 +37,7 @@ public final class SessionPolicyConfiguration {
         return new Builder();
     }
 
-    public static SessionPolicyConfiguration defaults() {
+    public static PolicySessionConfiguration defaults() {
         return builder().build();
     }
 
@@ -105,8 +105,8 @@ public final class SessionPolicyConfiguration {
             return this;
         }
 
-        public SessionPolicyConfiguration build() {
-            return new SessionPolicyConfiguration(
+        public PolicySessionConfiguration build() {
+            return new PolicySessionConfiguration(
                     includePlatformDefaults,
                     additionalPolicies,
                     replacementPolicies

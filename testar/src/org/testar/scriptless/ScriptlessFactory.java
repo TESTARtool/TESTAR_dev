@@ -22,10 +22,10 @@ import org.testar.core.policy.WidgetFilterPolicy;
 import org.testar.plugin.OperatingSystems;
 import org.testar.plugin.PlatformOrchestrator;
 import org.testar.plugin.PlatformServices;
-import org.testar.plugin.PlatformSessionSpec;
+import org.testar.plugin.configuration.PlatformSessionSpecification;
 import org.testar.plugin.PlatformSessionSpecFactory;
-import org.testar.plugin.configuration.SessionPolicyConfiguration;
-import org.testar.plugin.configuration.SessionServiceConfiguration;
+import org.testar.plugin.configuration.PolicySessionConfiguration;
+import org.testar.plugin.configuration.ServiceSessionConfiguration;
 import org.testar.plugin.reporting.SessionReportingManager;
 import org.testar.scriptless.composition.ScriptlessCompositionDescriptor;
 import org.testar.scriptless.composition.ScriptlessCompositionLoader;
@@ -66,21 +66,21 @@ public final class ScriptlessFactory {
     public static TestingServices buildServices(RuntimeContext runtimeContext) {
         Assert.notNull(runtimeContext);
 
-        PlatformSessionSpec sessionSpec = PlatformSessionSpecFactory.fromSettings(runtimeContext.settings());
+        PlatformSessionSpecification sessionSpec = PlatformSessionSpecFactory.fromSettings(runtimeContext.settings());
         ScriptlessCompositionDescriptor compositionDescriptor = ScriptlessCompositionLoader
                 .loadDescriptor(runtimeContext.settings());
         ScriptlessPolicyDescriptor policyDescriptor = ScriptlessPolicyLoader
                 .loadDescriptor(runtimeContext.settings());
         ScriptlessPlatformRuntime platformRuntime = runtimeFor(sessionSpec);
 
-        SessionServiceConfiguration serviceConfiguration = platformRuntime
+        ServiceSessionConfiguration serviceConfiguration = platformRuntime
                 .createServiceConfiguration(sessionSpec, runtimeContext);
         PlatformServices platformServices = PlatformOrchestrator.resolve(
                 sessionSpec,
                 buildPolicyConfiguration(runtimeContext, policyDescriptor),
                 serviceConfiguration
         );
-        SessionReportingManager sessionReportingManager = SessionReportingManager.create();
+        SessionReportingManager sessionReportingManager = SessionReportingManager.deferred(sessionSpec.getTarget());
 
         return platformRuntime.createTestingServices(
                 platformServices,
@@ -104,9 +104,9 @@ public final class ScriptlessFactory {
         );
     }
 
-    private static SessionPolicyConfiguration buildPolicyConfiguration(RuntimeContext runtimeContext,
+    private static PolicySessionConfiguration buildPolicyConfiguration(RuntimeContext runtimeContext,
                                                                       ScriptlessPolicyDescriptor policyDescriptor) {
-        SessionPolicyConfiguration.Builder builder = SessionPolicyConfiguration.builder();
+        PolicySessionConfiguration.Builder builder = PolicySessionConfiguration.builder();
 
         applyPolicies(
                 builder,
@@ -202,7 +202,7 @@ public final class ScriptlessFactory {
         return builder.build();
     }
 
-    private static <T extends Policy> void applyPolicies(SessionPolicyConfiguration.Builder builder,
+    private static <T extends Policy> void applyPolicies(PolicySessionConfiguration.Builder builder,
                                                          Class<T> policyType,
                                                          boolean replaceBuiltIns,
                                                          List<T> policies) {
@@ -216,7 +216,7 @@ public final class ScriptlessFactory {
         }
     }
 
-    private static ScriptlessPlatformRuntime runtimeFor(PlatformSessionSpec sessionSpec) {
+    private static ScriptlessPlatformRuntime runtimeFor(PlatformSessionSpecification sessionSpec) {
         OperatingSystems operatingSystem = sessionSpec.getOperatingSystem();
         if (operatingSystem == OperatingSystems.WEBDRIVER) {
             return WEBDRIVER_RUNTIME;

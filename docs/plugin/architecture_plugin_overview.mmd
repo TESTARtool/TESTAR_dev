@@ -1,0 +1,51 @@
+flowchart LR
+
+    subgraph Inputs["session inputs"]
+        direction TB
+        SessionSpec["PlatformSessionSpecification"]
+        PolicyConfig["PolicySessionConfiguration"]
+        ServiceConfig["ServiceSessionConfiguration"]
+    end
+
+    subgraph PluginLayer["plugin orchestration"]
+        direction TB
+        Orchestrator["PlatformOrchestrator"]
+        PlatformPolicyContexts["PlatformPolicyContexts"]
+        PlatformDefaultSession["PlatformDefaultSessionConfigurations"]
+        PolicyComposer["SessionPolicyContextComposer"]
+        ServiceComposer["SessionServiceComposer"]
+    end
+
+    subgraph ComposedOutputs["plugin outputs"]
+        direction TB
+        PlatformServices["PlatformServices"]
+        DefaultPlatformSession["DefaultPlatformSession"]
+    end
+
+    subgraph Consumers["entry-point consumers"]
+        direction TB
+        Cli["cli"]
+        Scriptless["testar-scriptless"]
+    end
+
+    SessionSpec --> Orchestrator
+    PolicyConfig --> Orchestrator
+    ServiceConfig --> Orchestrator
+
+    Orchestrator --> PlatformPolicyContexts
+    Orchestrator --> PlatformDefaultSession
+    PlatformPolicyContexts --> PolicyComposer
+    PlatformDefaultSession --> ServiceComposer
+    PolicyComposer --> ServiceComposer
+
+    ServiceComposer --> PlatformServices
+    PlatformServices --> DefaultPlatformSession
+    DefaultPlatformSession -. implements .-> PlatformSession
+
+    PlatformServices --> Scriptless
+    DefaultPlatformSession --> Cli
+
+    %% horizontal row nudges
+    Inputs ~~~ PluginLayer
+    PluginLayer ~~~ ComposedOutputs
+    ComposedOutputs ~~~ Consumers

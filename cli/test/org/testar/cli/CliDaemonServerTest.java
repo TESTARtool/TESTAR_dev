@@ -9,7 +9,7 @@ import org.testar.config.ConfigTags;
 import org.testar.config.settings.Settings;
 import org.testar.config.settings.SettingsDefaults;
 import org.testar.plugin.OperatingSystems;
-import org.testar.plugin.PlatformSessionSpec;
+import org.testar.plugin.configuration.PlatformSessionSpecification;
 
 public class CliDaemonServerTest {
 
@@ -18,13 +18,13 @@ public class CliDaemonServerTest {
         CliDaemonServer server = new CliDaemonServer();
         Settings settings = defaultSettings();
 
-        PlatformSessionSpec sessionSpec = server.buildSessionSpec(
+        PlatformSessionSpecification sessionSpec = server.buildSessionSpec(
                 CliRequest.of(CliCommand.START_SESSION, List.of("android", "/tmp/example.apk")),
                 settings
         );
 
         Assert.assertEquals(OperatingSystems.ANDROID, sessionSpec.getOperatingSystem());
-        Assert.assertEquals(PlatformSessionSpec.TargetType.EXECUTABLE, sessionSpec.getTargetType());
+        Assert.assertEquals(PlatformSessionSpecification.TargetType.EXECUTABLE, sessionSpec.getTargetType());
         Assert.assertEquals("/tmp/example.apk", sessionSpec.getTarget());
         Assert.assertFalse(settings.get(ConfigTags.AppiumIsApkInstalled));
         Assert.assertEquals("/tmp/example.apk", settings.get(ConfigTags.AppiumApp));
@@ -35,7 +35,7 @@ public class CliDaemonServerTest {
         CliDaemonServer server = new CliDaemonServer();
         Settings settings = defaultSettings();
 
-        PlatformSessionSpec sessionSpec = server.buildSessionSpec(
+        PlatformSessionSpecification sessionSpec = server.buildSessionSpec(
                 CliRequest.of(CliCommand.START_SESSION, List.of("webdriver", "https://example.org")),
                 settings
         );
@@ -50,7 +50,7 @@ public class CliDaemonServerTest {
         CliDaemonServer server = new CliDaemonServer();
         Settings settings = defaultSettings();
 
-        PlatformSessionSpec sessionSpec = server.buildSessionSpec(
+        PlatformSessionSpecification sessionSpec = server.buildSessionSpec(
                 CliRequest.of(CliCommand.START_SESSION, List.of("windows", "notepad.exe")),
                 settings
         );

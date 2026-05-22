@@ -1,0 +1,49 @@
+flowchart LR
+
+    subgraph ScriptlessEntry["testar-scriptless service build"]
+        direction TB
+        RuntimeContext["RuntimeContext"]
+        BuildServices["ScriptlessFactory.buildServices(runtimeContext)"]
+        BuildCapabilities["ScriptlessFactory.buildCapabilities(runtimeContext)"]
+    end
+
+    subgraph PluginFlow["plugin resolve flow"]
+        direction TB
+        SessionSpec["PlatformSessionSpecification"]
+        PolicyConfig["PolicySessionConfiguration"]
+        ServiceConfig["ServiceSessionConfiguration"]
+        Resolve["PlatformOrchestrator.resolve(...)"]
+        StateModelManager["createStateModelManager(...)"]
+        PlatformServices["PlatformServices"]
+    end
+
+    subgraph ScriptlessAssembly["scriptless runtime assembly"]
+        direction TB
+        Reporting["SessionReportingManager.deferred(target)"]
+        TestingServices["TestingServices"]
+        ScriptlessCapabilities["ScriptlessCapabilities"]
+        ComposedProtocol["ComposedProtocol"]
+
+        Reporting --> TestingServices
+        TestingServices --> ComposedProtocol
+        ScriptlessCapabilities --> ComposedProtocol
+    end
+
+    RuntimeContext --> BuildServices
+    RuntimeContext --> BuildCapabilities
+
+    BuildServices --> SessionSpec
+    BuildServices --> PolicyConfig
+    BuildServices --> ServiceConfig
+
+    SessionSpec --> Resolve
+    PolicyConfig --> Resolve
+    ServiceConfig --> Resolve
+    StateModelManager --> Resolve
+
+    Resolve --> PlatformServices
+
+    PlatformServices --> TestingServices
+    BuildCapabilities --> ScriptlessCapabilities
+
+    PlatformServices ~~~ ScriptlessAssembly

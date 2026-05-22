@@ -21,7 +21,7 @@ import org.testar.engine.system.SystemCompositionPlan;
  * Plugin-side configuration contract that describes how session services
  * should be composed from platform defaults and service plans.
  */
-public final class SessionServiceConfiguration {
+public final class ServiceSessionConfiguration {
 
     private final boolean includePlatformDefaults;
     private final Optional<SystemCompositionPlan> systemCompositionPlanOverride;
@@ -32,7 +32,7 @@ public final class SessionServiceConfiguration {
     private final Optional<ActionExecutionPlan> actionExecutionPlanOverride;
     private final Optional<OracleEvaluationPlan> oracleEvaluationPlanOverride;
 
-    private SessionServiceConfiguration(boolean includePlatformDefaults,
+    private ServiceSessionConfiguration(boolean includePlatformDefaults,
                                         Optional<SystemCompositionPlan> systemCompositionPlanOverride,
                                         Optional<StateCompositionPlan> stateCompositionPlanOverride,
                                         Optional<ActionDerivationPlan> actionDerivationPlanOverride,
@@ -54,7 +54,7 @@ public final class SessionServiceConfiguration {
         return new Builder();
     }
 
-    public static SessionServiceConfiguration defaults() {
+    public static ServiceSessionConfiguration defaults() {
         return builder().build();
     }
 
@@ -145,8 +145,8 @@ public final class SessionServiceConfiguration {
             return this;
         }
 
-        public SessionServiceConfiguration build() {
-            return new SessionServiceConfiguration(
+        public ServiceSessionConfiguration build() {
+            return new ServiceSessionConfiguration(
                     includePlatformDefaults,
                     systemCompositionPlanOverride,
                     stateCompositionPlanOverride,

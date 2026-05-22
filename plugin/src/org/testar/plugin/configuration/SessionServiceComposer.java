@@ -45,7 +45,7 @@ public final class SessionServiceComposer {
     public static PlatformServices compose(Settings settings,
                                            SessionPolicyContext sessionPolicyContext,
                                            StateModelManager stateModelManager,
-                                           SessionServiceConfiguration configuration,
+                                           ServiceSessionConfiguration configuration,
                                            PlatformDefaultServicePlans defaultServicePlans) {
         Assert.notNull(settings);
         Assert.notNull(sessionPolicyContext);
