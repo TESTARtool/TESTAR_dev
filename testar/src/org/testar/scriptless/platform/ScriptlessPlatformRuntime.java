@@ -13,11 +13,14 @@ import org.testar.plugin.reporting.SessionReportingManager;
 import org.testar.scriptless.RuntimeContext;
 import org.testar.scriptless.ScriptlessCapabilities;
 import org.testar.scriptless.TestingServices;
+import org.testar.scriptless.capability.SettingsCapability;
 import org.testar.scriptless.composition.ScriptlessCompositionDescriptor;
 
 public interface ScriptlessPlatformRuntime {
 
     ServiceSessionConfiguration createServiceConfiguration(PlatformSessionSpecification sessionSpec, RuntimeContext runtimeContext);
+
+    SettingsCapability createSettingsCapability(RuntimeContext runtimeContext, ScriptlessCompositionDescriptor compositionDescriptor);
 
     TestingServices createTestingServices(PlatformServices platformServices,
                                           RuntimeContext runtimeContext,

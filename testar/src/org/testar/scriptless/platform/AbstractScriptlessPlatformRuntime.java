@@ -188,6 +188,19 @@ abstract class AbstractScriptlessPlatformRuntime implements ScriptlessPlatformRu
         return bundle;
     }
 
+    @Override
+    public SettingsCapability createSettingsCapability(RuntimeContext runtimeContext, ScriptlessCompositionDescriptor compositionDescriptor) {
+        return wrap(wrapper(
+                compositionDescriptor.settingsCapabilityClass(),
+                compositionDescriptor,
+                SettingsCapability.class,
+                new SettingsCapability(),
+                new Object[]{runtimeContext.settings()},
+                new Object[]{runtimeContext},
+                new Object[]{}
+        ));
+    }
+
     protected final ServiceBundle serviceBundle(SystemService systemService,
                                                 StateService stateService,
                                                 OracleEvaluationService oracleEvaluationService,

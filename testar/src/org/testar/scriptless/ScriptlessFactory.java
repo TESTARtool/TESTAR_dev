@@ -27,6 +27,7 @@ import org.testar.plugin.PlatformSessionSpecFactory;
 import org.testar.plugin.configuration.PolicySessionConfiguration;
 import org.testar.plugin.configuration.ServiceSessionConfiguration;
 import org.testar.plugin.reporting.SessionReportingManager;
+import org.testar.scriptless.capability.SettingsCapability;
 import org.testar.scriptless.composition.ScriptlessCompositionDescriptor;
 import org.testar.scriptless.composition.ScriptlessCompositionLoader;
 import org.testar.scriptless.platform.AndroidScriptlessPlatformRuntime;
@@ -90,7 +91,17 @@ public final class ScriptlessFactory {
         );
     }
 
-    public static ScriptlessCapabilities buildCapabilities(RuntimeContext runtimeContext) {
+    public static SettingsCapability buildSettingsCapability(RuntimeContext runtimeContext) {
+        Assert.notNull(runtimeContext);
+
+        ScriptlessCompositionDescriptor compositionDescriptor = ScriptlessCompositionLoader
+                .loadDescriptor(runtimeContext.settings());
+        ScriptlessPlatformRuntime platformRuntime = runtimeFor(runtimeContext.settings());
+
+        return platformRuntime.createSettingsCapability(runtimeContext, compositionDescriptor);
+    }
+
+    public static ScriptlessCapabilities buildScriptlessCapabilities(RuntimeContext runtimeContext) {
         Assert.notNull(runtimeContext);
 
         ScriptlessCompositionDescriptor compositionDescriptor = ScriptlessCompositionLoader

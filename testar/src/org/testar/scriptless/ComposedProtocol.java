@@ -32,6 +32,7 @@ import org.testar.scriptless.listener.VisualizationListener;
 import org.testar.scriptless.listener.webdriver.CssCustomizationListener;
 import org.testar.scriptless.mode.GenerateMode;
 import org.testar.scriptless.mode.SpyMode;
+import org.testar.scriptless.capability.SettingsCapability;
 import org.testar.windows.exceptions.WinApiException;
 
 import java.awt.GraphicsEnvironment;
@@ -76,6 +77,11 @@ public abstract class ComposedProtocol implements Consumer<Settings> {
         return Assert.notNull(scriptlessCapabilities);
     }
 
+    protected SettingsCapability settingsCapability;
+    public final SettingsCapability settingsCapability() {
+        return Assert.notNull(settingsCapability);
+    }
+
     protected final RuntimeContext runtimeContext = new RuntimeContext();
     public final RuntimeContext runtimeContext() {
         return Assert.notNull(runtimeContext);
@@ -98,6 +104,7 @@ public abstract class ComposedProtocol implements Consumer<Settings> {
 
     @Override
     public final void accept(final Settings protocolSettings) {
+        // Initialize the runtime devices before any capability or service uses them
         if (!GraphicsEnvironment.isHeadless()) {
             runtimeContext().setMouse(AWTMouse.build());
         } else {
@@ -105,10 +112,11 @@ public abstract class ComposedProtocol implements Consumer<Settings> {
             runtimeContext().setMouse(DummyMouse.build());
         }
 
+        // Build the settings capability first so settings initialization
+        // goes through the configured capability seam
         runtimeContext.setSettings(protocolSettings);
-        scriptlessCapabilities = ScriptlessFactory.buildCapabilities(runtimeContext);
+        settingsCapability = ScriptlessFactory.buildSettingsCapability(runtimeContext);
         runtimeContext.setSettings(initializeSettings(protocolSettings));
-        scriptlessCapabilities = ScriptlessFactory.buildCapabilities(runtimeContext);
         runtimeContext.setMode(runtimeContext.settings().get(ConfigTags.Mode));
 
         if (runtimeContext().mode() == TestarMode.Generate) {
@@ -122,6 +130,8 @@ public abstract class ComposedProtocol implements Consumer<Settings> {
         runtimeContext.setVisualizationEnabled(runtimeContext.settings().get(ConfigTags.VisualizeActions));
         runtimeContext.setVerdictProcessing(new VerdictProcessing(runtimeContext.settings()));
 
+        // Runtime listeners are protocol concerns: 
+        // they translate mode-specific UI events and visualization into the shared runtime context
         modeListener = new ModeListener(runtimeContext, runtimeContext.settings().get(ConfigTags.KeyBoardListener, false));
         visualizationListener = new VisualizationListener(runtimeContext);
         cssCustomizationListener = new CssCustomizationListener(runtimeContext);
@@ -133,8 +143,9 @@ public abstract class ComposedProtocol implements Consumer<Settings> {
         runtimeContext.setSessionReportingManager(testingServices.sessionReportingManager());
         runtimeContext.setStateModelManager(testingServices.stateModelManager());
 
-        // Build the scriptless testing services
-        scriptlessCapabilities = ScriptlessFactory.buildCapabilities(runtimeContext);
+        // Build the full scriptless capability bundle 
+        // once the runtime context already contains the managers that later capabilities depend on
+        scriptlessCapabilities = ScriptlessFactory.buildScriptlessCapabilities(runtimeContext);
 
         LogSerialiser.log("'" + runtimeContext().mode() + "' mode active.\n", LogSerialiser.LogLevel.Info);
 
@@ -158,7 +169,7 @@ public abstract class ComposedProtocol implements Consumer<Settings> {
      */
     public Settings initializeSettings(Settings settings) {
         Assert.notNull(settings);
-        return scriptlessCapabilities.settingsCapability().initializeSettings(settings);
+        return settingsCapability().initializeSettings(settings);
     }
 
     /**
@@ -221,6 +232,8 @@ public abstract class ComposedProtocol implements Consumer<Settings> {
         State state = testingServices.stateService().getState(system);
         runtimeContext.setLatestState(state);
 
+        // Reporting stays at protocol level so service pipelines remain reusable
+        // across entry points with different output/reporting needs
         testingServices.sessionReportingManager().prepareState(state);
         testingServices.sessionReportingManager().addState(state);
 
@@ -267,6 +280,7 @@ public abstract class ComposedProtocol implements Consumer<Settings> {
         Action selectedAction = testingServices.actionSelectorService().selectAction(state, actions);
         Assert.notNull(selectedAction);
 
+        // The protocol reports the selected action after the shared selector chooses it
         testingServices.sessionReportingManager().addSelectedAction(state, selectedAction);
 
         return selectedAction;
