@@ -7,7 +7,6 @@
 package org.testar.scriptless.capability.android;
 
 import org.testar.core.Assert;
-import org.testar.plugin.NativeLinker;
 import org.testar.scriptless.RuntimeContext;
 import org.testar.scriptless.capability.TestSessionCapability;
 
@@ -23,6 +22,5 @@ public class AndroidTestSessionCapability extends TestSessionCapability {
     public void closeTestSession(RuntimeContext runtimeContext) {
         Assert.notNull(runtimeContext);
         delegate.closeTestSession(runtimeContext);
-        NativeLinker.cleanAndroidOS();
     }
 }

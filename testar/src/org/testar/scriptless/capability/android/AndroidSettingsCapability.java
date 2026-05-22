@@ -8,7 +8,6 @@ package org.testar.scriptless.capability.android;
 
 import org.testar.config.settings.Settings;
 import org.testar.core.Assert;
-import org.testar.plugin.NativeLinker;
 import org.testar.scriptless.capability.SettingsCapability;
 
 public class AndroidSettingsCapability extends SettingsCapability {
@@ -22,7 +21,6 @@ public class AndroidSettingsCapability extends SettingsCapability {
     @Override
     public Settings initializeSettings(Settings settings) {
         Assert.notNull(settings);
-        NativeLinker.addAndroidOS();
         return delegate.initializeSettings(settings);
     }
 }

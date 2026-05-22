@@ -24,7 +24,7 @@ public final class PlatformSessionSpecFactory {
     public static PlatformSessionSpecification fromSettings(Settings settings) {
         Assert.notNull(settings);
 
-        OperatingSystems operatingSystem = detectOperatingSystem();
+        OperatingSystems operatingSystem = detectOperatingSystem(settings);
         PlatformSessionSpecification.TargetType targetType = detectTargetType(
                 operatingSystem,
                 settings.get(ConfigTags.SUTConnector, "")
@@ -63,7 +63,14 @@ public final class PlatformSessionSpecFactory {
         ).build();
     }
 
-    private static OperatingSystems detectOperatingSystem() {
+    private static OperatingSystems detectOperatingSystem(Settings settings) {
+        String sutConnector = settings.get(ConfigTags.SUTConnector, "");
+        if (Settings.SUT_CONNECTOR_WEBDRIVER.equals(sutConnector)) {
+            return OperatingSystems.WEBDRIVER;
+        }
+        if (Settings.SUT_CONNECTOR_ANDROID_APPIUM.equals(sutConnector)) {
+            return OperatingSystems.ANDROID;
+        }
         if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER)) {
             return OperatingSystems.WEBDRIVER;
         }

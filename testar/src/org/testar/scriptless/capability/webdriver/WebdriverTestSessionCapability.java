@@ -9,7 +9,6 @@ package org.testar.scriptless.capability.webdriver;
 import org.apache.commons.lang3.ArrayUtils;
 import org.testar.config.ConfigTags;
 import org.testar.core.Assert;
-import org.testar.plugin.NativeLinker;
 import org.testar.scriptless.RuntimeContext;
 import org.testar.scriptless.capability.TestSessionCapability;
 import org.testar.webdriver.state.WdDriver;
@@ -36,7 +35,6 @@ public class WebdriverTestSessionCapability extends TestSessionCapability {
     public void closeTestSession(RuntimeContext runtimeContext) {
         Assert.notNull(runtimeContext);
         delegate.closeTestSession(runtimeContext);
-        NativeLinker.cleanWdDriverOS();
     }
 
     /*
