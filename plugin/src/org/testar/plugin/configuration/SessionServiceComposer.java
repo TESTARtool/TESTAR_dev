@@ -10,8 +10,10 @@ import org.testar.core.Assert;
 import org.testar.core.action.resolver.ActionResolver;
 import org.testar.core.service.ActionDerivationService;
 import org.testar.core.service.ActionExecutionService;
+import org.testar.core.service.ActionIdentifierService;
 import org.testar.core.service.ActionSelectorService;
 import org.testar.core.service.OracleEvaluationService;
+import org.testar.core.service.StateIdentifierService;
 import org.testar.core.service.StateService;
 import org.testar.core.service.SystemService;
 import org.testar.config.settings.Settings;
@@ -28,6 +30,8 @@ import org.testar.engine.service.ComposedActionResolver;
 import org.testar.engine.service.ComposedActionSelectorService;
 import org.testar.engine.service.ComposedStateService;
 import org.testar.engine.service.ComposedSystemService;
+import org.testar.engine.service.DefaultActionIdentifierService;
+import org.testar.engine.service.DefaultStateIdentifierService;
 import org.testar.engine.state.StateCompositionPlan;
 import org.testar.engine.system.SystemCompositionPlan;
 import org.testar.plugin.PlatformServices;
@@ -97,12 +101,24 @@ public final class SessionServiceComposer {
                 configuration.includePlatformDefaults(),
                 "oracle evaluation"
         );
+        StateIdentifierService stateIdentifierService = configuration.stateIdentifierServiceOverride()
+                .orElseGet(DefaultStateIdentifierService::new);
+        ActionIdentifierService actionIdentifierService = configuration.actionIdentifierServiceOverride()
+                .orElseGet(DefaultActionIdentifierService::new);
 
         // Build the final shared engine services that the entry-point modules consume.
         SystemService systemService = ComposedSystemService.compose(systemCompositionPlan);
-        StateService stateService = ComposedStateService.compose(sessionPolicyContext, stateCompositionPlan);
+        StateService stateService = ComposedStateService.compose(
+                sessionPolicyContext,
+                stateCompositionPlan,
+                stateIdentifierService
+        );
         OracleEvaluationService oracleEvaluationService = ComposedOracleEvaluationService.compose(oracleEvaluationPlan);
-        ActionDerivationService actionDerivationService = ComposedActionDerivationService.compose(sessionPolicyContext, actionDerivationPlan);
+        ActionDerivationService actionDerivationService = ComposedActionDerivationService.compose(
+                sessionPolicyContext,
+                actionDerivationPlan,
+                actionIdentifierService
+        );
         ActionSelectorService actionSelectorService = ComposedActionSelectorService.compose(actionSelectorPlan);
         ActionResolver actionResolver = ComposedActionResolver.compose(actionResolverPlan);
         ActionExecutionService actionExecutionService = ComposedActionExecutionService.compose(actionExecutionPlan);

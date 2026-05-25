@@ -16,8 +16,12 @@ flowchart LR
     subgraph ComposedDerivation["composed derivation service"]
         direction TB
         DefaultActionIdentifierService["DefaultActionIdentifierService"]
+        ActionIdentification["action identification"]
+        SemanticDisambiguation["semantic disambiguation"]
         ComposedActionDerivationService["ComposedActionDerivationService"]
-        DefaultActionIdentifierService --> ComposedActionDerivationService
+        DefaultActionIdentifierService --> ActionIdentification
+        ActionIdentification --> SemanticDisambiguation
+        SemanticDisambiguation --> ComposedActionDerivationService
     end
 
     subgraph CoreDerivation["core service contract"]
@@ -68,7 +72,7 @@ flowchart LR
     SessionPolicies --> ComposedActionDerivationService
     DerivationPlan --> ComposedActionDerivationService
 
-    ComposedActionDerivationService -- "produces" --> derivedActions
+    ComposedActionDerivationService -- "produces identified actions" --> derivedActions
 
     %% horizontal row nudges    
     PluginComposition ~~~ SharedContexts

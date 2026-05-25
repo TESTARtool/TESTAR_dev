@@ -9,12 +9,16 @@ package org.testar.scriptless.platform;
 import java.util.Optional;
 
 import org.testar.core.action.resolver.ActionResolver;
+import org.testar.core.service.ActionIdentifierService;
 import org.testar.core.service.ActionDerivationService;
 import org.testar.core.service.ActionExecutionService;
 import org.testar.core.service.ActionSelectorService;
 import org.testar.core.service.OracleEvaluationService;
+import org.testar.core.service.StateIdentifierService;
 import org.testar.core.service.StateService;
 import org.testar.core.service.SystemService;
+import org.testar.engine.service.DefaultActionIdentifierService;
+import org.testar.engine.service.DefaultStateIdentifierService;
 import org.testar.plugin.configuration.PlatformSessionSpecification;
 import org.testar.plugin.configuration.ServiceSessionConfiguration;
 import org.testar.plugin.reporting.SessionReportingManager;
@@ -33,8 +37,10 @@ import org.testar.statemodel.StateModelManager;
 abstract class AbstractScriptlessPlatformRuntime implements ScriptlessPlatformRuntime {
 
     @Override
-    public ServiceSessionConfiguration createServiceConfiguration(PlatformSessionSpecification sessionSpec, RuntimeContext runtimeContext) {
-        return ServiceSessionConfiguration.defaults();
+    public ServiceSessionConfiguration createServiceConfiguration(PlatformSessionSpecification sessionSpec,
+                                                                 RuntimeContext runtimeContext,
+                                                                 ScriptlessCompositionDescriptor compositionDescriptor) {
+        return serviceConfigurationBuilder(runtimeContext, compositionDescriptor).build();
     }
 
     protected final <T> T wrap(OptionalWrapper<T> optionalWrapper) {
@@ -83,6 +89,32 @@ abstract class AbstractScriptlessPlatformRuntime implements ScriptlessPlatformRu
                 bundle.scriptlessOracleComposer,
                 bundle.stopCriteriaCapability
         );
+    }
+
+    protected final ServiceSessionConfiguration.Builder serviceConfigurationBuilder(RuntimeContext runtimeContext,
+                                                                                    ScriptlessCompositionDescriptor compositionDescriptor) {
+        StateIdentifierService stateIdentifierService = wrap(wrapper(
+                compositionDescriptor.stateIdentifierServiceClass(),
+                compositionDescriptor,
+                StateIdentifierService.class,
+                new DefaultStateIdentifierService(),
+                new Object[]{runtimeContext},
+                new Object[]{runtimeContext.settings()},
+                new Object[]{}
+        ));
+        ActionIdentifierService actionIdentifierService = wrap(wrapper(
+                compositionDescriptor.actionIdentifierServiceClass(),
+                compositionDescriptor,
+                ActionIdentifierService.class,
+                new DefaultActionIdentifierService(),
+                new Object[]{runtimeContext},
+                new Object[]{runtimeContext.settings()},
+                new Object[]{}
+        ));
+
+        return ServiceSessionConfiguration.builder()
+                .overrideStateIdentifierService(stateIdentifierService)
+                .overrideActionIdentifierService(actionIdentifierService);
     }
 
     protected final ServiceBundle wrapServices(ServiceBundle bundle,

@@ -2,7 +2,7 @@
 
 This document defines the current modular architecture of `TESTAR_dev`.
 
-It describes the active architecture of the codebase. It is not a proposal document. The contracts and layering described here are the foundation that new modules follow.
+It describes the active architecture of the codebase. The contracts and layering described here are the foundation that new modules follow.
 
 ## Overview
 
@@ -42,7 +42,7 @@ Supporting modules such as `config`, `statemodel`, `reporting`, `dialog`, `oracl
 
 The architecture exposes two main ways to interact with TESTAR:
 
-- `cli`
+- `testar-cli`
   - command-driven interaction
   - daemon and session oriented
   - suitable for external automation, scripting, and AI-agent usage
@@ -74,7 +74,7 @@ This means that:
 
 ### Shared vocabulary
 
-The codebase has four distinct architectural concepts. They should not be mixed.
+The codebase has four distinct architectural concepts.
 
 - `policy`
   A rule that answers a behavioral question about widgets or state.
@@ -84,6 +84,7 @@ The codebase has four distinct architectural concepts. They should not be mixed.
   - visible
   - blocked
   - widget filtering
+
   Policies are usually pure decision logic and are composed into a `SessionPolicyContext`.
 
 - `service`
@@ -94,6 +95,7 @@ The codebase has four distinct architectural concepts. They should not be mixed.
   - derive actions
   - select or resolve an action
   - execute an action
+
   Services are reusable across entry points such as `cli` and `testar`.
 
 - `plan`
@@ -104,6 +106,7 @@ The codebase has four distinct architectural concepts. They should not be mixed.
   - `ActionDerivationPlan`
   - `ActionExecutionPlan`
   - `OracleEvaluationPlan`
+
   Plans are used by `plugin` when composing a session.
 
 - `capability`
@@ -114,6 +117,7 @@ The codebase has four distinct architectural concepts. They should not be mixed.
   - test-sequence lifecycle
   - stop criteria
   - spy filtering and visualization support, when kept outside the shared services
+
   Capabilities are specific to the `testar` protocol runtime. They are not core services and they are not policies.
 
 The practical distinction is:
@@ -270,7 +274,9 @@ The design rule is:
 - services
   - `systemServiceClass`
   - `stateServiceClass`
+  - `stateIdentifierServiceClass`
   - `actionDerivationServiceClass`
+  - `actionIdentifierServiceClass`
   - `actionSelectorServiceClass`
   - `actionExecutionServiceClass`
   - `oracleComposerClass`
@@ -281,6 +287,13 @@ The design rule is:
   - `stopCriteriaCapabilityClass`
 
 The runtime builds the default baseline object first, then optionally wraps it with the user class declared in the composition resource.
+
+For identifier customization, the service-side composition resources can also wrap:
+
+- `StateIdentifierService`
+- `ActionIdentifierService`
+
+These two seams belong to the shared engine/plugin identification pipeline. They adapt how states and actions receive stable identifiers before downstream reporting, state modeling, selection, or execution consume them.
 
 ### Policies resources
 
@@ -812,11 +825,13 @@ The reusable engine service implementations are:
   Delegates system lifecycle operations through a `SystemCompositionPlan` to the configured platform-native `SystemService`.
 - `ComposedStateService`
   Applies engine-level state preparation and then delegates to a `StateCompositionPlan` using the shared `SessionPolicyContext`.
+  The state pipeline also applies the configured `StateIdentifierService` before projection.
 - `ComposedActionDerivationService`
   Runs action derivation in three ordered phases:
   - forced derivers
   - default derivers
   - fallback derivers
+  The derivation pipeline also applies the configured `ActionIdentifierService` before semantic disambiguation.
 - `ComposedActionExecutionService`
   Delegates action execution through an `ActionExecutionPlan` to the configured `ActionExecutionService`.
 - `ComposedActionSelectorService`

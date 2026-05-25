@@ -73,7 +73,7 @@ public final class ScriptlessFactory {
         ScriptlessPlatformRuntime platformRuntime = runtimeFor(sessionSpec);
 
         ServiceSessionConfiguration serviceConfiguration = platformRuntime
-                .createServiceConfiguration(sessionSpec, runtimeContext);
+                .createServiceConfiguration(sessionSpec, runtimeContext, compositionDescriptor);
         // Scriptless reuses the shared plugin resolution path and only supplies its session-specific overrides.
         PlatformServices platformServices = resolvePlatformServices(
                 runtimeContext,

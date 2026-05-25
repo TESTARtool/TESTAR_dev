@@ -9,6 +9,8 @@ package org.testar.plugin.configuration;
 import java.util.Optional;
 
 import org.testar.core.Assert;
+import org.testar.core.service.ActionIdentifierService;
+import org.testar.core.service.StateIdentifierService;
 import org.testar.engine.action.derivation.ActionDerivationPlan;
 import org.testar.engine.action.execution.ActionExecutionPlan;
 import org.testar.engine.action.resolver.ActionResolverPlan;
@@ -26,7 +28,9 @@ public final class ServiceSessionConfiguration {
     private final boolean includePlatformDefaults;
     private final Optional<SystemCompositionPlan> systemCompositionPlanOverride;
     private final Optional<StateCompositionPlan> stateCompositionPlanOverride;
+    private final Optional<StateIdentifierService> stateIdentifierServiceOverride;
     private final Optional<ActionDerivationPlan> actionDerivationPlanOverride;
+    private final Optional<ActionIdentifierService> actionIdentifierServiceOverride;
     private final Optional<ActionSelectorPlan> actionSelectorPlanOverride;
     private final Optional<ActionResolverPlan> actionResolverPlanOverride;
     private final Optional<ActionExecutionPlan> actionExecutionPlanOverride;
@@ -35,7 +39,9 @@ public final class ServiceSessionConfiguration {
     private ServiceSessionConfiguration(boolean includePlatformDefaults,
                                         Optional<SystemCompositionPlan> systemCompositionPlanOverride,
                                         Optional<StateCompositionPlan> stateCompositionPlanOverride,
+                                        Optional<StateIdentifierService> stateIdentifierServiceOverride,
                                         Optional<ActionDerivationPlan> actionDerivationPlanOverride,
+                                        Optional<ActionIdentifierService> actionIdentifierServiceOverride,
                                         Optional<ActionSelectorPlan> actionSelectorPlanOverride,
                                         Optional<ActionResolverPlan> actionResolverPlanOverride,
                                         Optional<ActionExecutionPlan> actionExecutionPlanOverride,
@@ -43,7 +49,9 @@ public final class ServiceSessionConfiguration {
         this.includePlatformDefaults = includePlatformDefaults;
         this.systemCompositionPlanOverride = Assert.notNull(systemCompositionPlanOverride);
         this.stateCompositionPlanOverride = Assert.notNull(stateCompositionPlanOverride);
+        this.stateIdentifierServiceOverride = Assert.notNull(stateIdentifierServiceOverride);
         this.actionDerivationPlanOverride = Assert.notNull(actionDerivationPlanOverride);
+        this.actionIdentifierServiceOverride = Assert.notNull(actionIdentifierServiceOverride);
         this.actionSelectorPlanOverride = Assert.notNull(actionSelectorPlanOverride);
         this.actionResolverPlanOverride = Assert.notNull(actionResolverPlanOverride);
         this.actionExecutionPlanOverride = Assert.notNull(actionExecutionPlanOverride);
@@ -70,8 +78,16 @@ public final class ServiceSessionConfiguration {
         return stateCompositionPlanOverride;
     }
 
+    public Optional<StateIdentifierService> stateIdentifierServiceOverride() {
+        return stateIdentifierServiceOverride;
+    }
+
     public Optional<ActionDerivationPlan> actionDerivationPlanOverride() {
         return actionDerivationPlanOverride;
+    }
+
+    public Optional<ActionIdentifierService> actionIdentifierServiceOverride() {
+        return actionIdentifierServiceOverride;
     }
 
     public Optional<ActionSelectorPlan> actionSelectorPlanOverride() {
@@ -95,7 +111,9 @@ public final class ServiceSessionConfiguration {
         private boolean includePlatformDefaults = true;
         private Optional<SystemCompositionPlan> systemCompositionPlanOverride = Optional.empty();
         private Optional<StateCompositionPlan> stateCompositionPlanOverride = Optional.empty();
+        private Optional<StateIdentifierService> stateIdentifierServiceOverride = Optional.empty();
         private Optional<ActionDerivationPlan> actionDerivationPlanOverride = Optional.empty();
+        private Optional<ActionIdentifierService> actionIdentifierServiceOverride = Optional.empty();
         private Optional<ActionSelectorPlan> actionSelectorPlanOverride = Optional.empty();
         private Optional<ActionResolverPlan> actionResolverPlanOverride = Optional.empty();
         private Optional<ActionExecutionPlan> actionExecutionPlanOverride = Optional.empty();
@@ -120,8 +138,18 @@ public final class ServiceSessionConfiguration {
             return this;
         }
 
+        public Builder overrideStateIdentifierService(StateIdentifierService stateIdentifierService) {
+            this.stateIdentifierServiceOverride = Optional.of(Assert.notNull(stateIdentifierService));
+            return this;
+        }
+
         public Builder overrideActionDerivationPlan(ActionDerivationPlan actionDerivationPlan) {
             this.actionDerivationPlanOverride = Optional.of(Assert.notNull(actionDerivationPlan));
+            return this;
+        }
+
+        public Builder overrideActionIdentifierService(ActionIdentifierService actionIdentifierService) {
+            this.actionIdentifierServiceOverride = Optional.of(Assert.notNull(actionIdentifierService));
             return this;
         }
 
@@ -150,7 +178,9 @@ public final class ServiceSessionConfiguration {
                     includePlatformDefaults,
                     systemCompositionPlanOverride,
                     stateCompositionPlanOverride,
+                    stateIdentifierServiceOverride,
                     actionDerivationPlanOverride,
+                    actionIdentifierServiceOverride,
                     actionSelectorPlanOverride,
                     actionResolverPlanOverride,
                     actionExecutionPlanOverride,

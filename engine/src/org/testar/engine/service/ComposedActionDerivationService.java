@@ -45,6 +45,19 @@ public final class ComposedActionDerivationService implements ActionDerivationSe
         );
     }
 
+    public ComposedActionDerivationService(SessionPolicyContext context,
+                                           ActionDerivationPlan plan,
+                                           ActionIdentifierService actionIdentifierService) {
+        this(
+                context,
+                Assert.notNull(plan).forcedDerivers(),
+                plan.defaultDerivers(),
+                plan.fallbackDerivers(),
+                actionIdentifierService,
+                new ActionSemanticDisambiguator()
+        );
+    }
+
     ComposedActionDerivationService(SessionPolicyContext context,
                                     List<ActionDeriver> forcedDerivers,
                                     List<ActionDeriver> defaultDerivers,
@@ -61,6 +74,12 @@ public final class ComposedActionDerivationService implements ActionDerivationSe
 
     public static ComposedActionDerivationService compose(SessionPolicyContext context, ActionDerivationPlan plan) {
         return new ComposedActionDerivationService(context, plan);
+    }
+
+    public static ComposedActionDerivationService compose(SessionPolicyContext context,
+                                                          ActionDerivationPlan plan,
+                                                          ActionIdentifierService actionIdentifierService) {
+        return new ComposedActionDerivationService(context, plan, actionIdentifierService);
     }
 
     @Override

@@ -29,7 +29,9 @@ public final class ScriptlessCompositionLoader {
 
     private static final String PROPERTY_SYSTEM_SERVICE_CLASS = "systemServiceClass";
     private static final String PROPERTY_STATE_SERVICE_CLASS = "stateServiceClass";
+    private static final String PROPERTY_STATE_IDENTIFIER_SERVICE_CLASS = "stateIdentifierServiceClass";
     private static final String PROPERTY_ACTION_DERIVATION_SERVICE_CLASS = "actionDerivationServiceClass";
+    private static final String PROPERTY_ACTION_IDENTIFIER_SERVICE_CLASS = "actionIdentifierServiceClass";
     private static final String PROPERTY_ACTION_SELECTOR_SERVICE_CLASS = "actionSelectorServiceClass";
     private static final String PROPERTY_ACTION_EXECUTION_SERVICE_CLASS = "actionExecutionServiceClass";
     private static final String PROPERTY_ORACLE_COMPOSER_CLASS = "oracleComposerClass";
@@ -57,7 +59,9 @@ public final class ScriptlessCompositionLoader {
                 optionalProperty(resourceProperties, PROPERTY_STOP_CRITERIA_CAPABILITY_CLASS),
                 optionalProperty(resourceProperties, PROPERTY_SYSTEM_SERVICE_CLASS),
                 optionalProperty(resourceProperties, PROPERTY_STATE_SERVICE_CLASS),
+                optionalProperty(resourceProperties, PROPERTY_STATE_IDENTIFIER_SERVICE_CLASS),
                 optionalProperty(resourceProperties, PROPERTY_ACTION_DERIVATION_SERVICE_CLASS),
+                optionalProperty(resourceProperties, PROPERTY_ACTION_IDENTIFIER_SERVICE_CLASS),
                 optionalProperty(resourceProperties, PROPERTY_ACTION_SELECTOR_SERVICE_CLASS),
                 optionalProperty(resourceProperties, PROPERTY_ACTION_EXECUTION_SERVICE_CLASS),
                 optionalProperty(resourceProperties, PROPERTY_ORACLE_COMPOSER_CLASS)

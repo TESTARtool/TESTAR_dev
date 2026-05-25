@@ -41,8 +41,10 @@ import org.testar.statemodel.StateModelManager;
 public final class AndroidScriptlessPlatformRuntime extends AbstractScriptlessPlatformRuntime {
 
     @Override
-    public ServiceSessionConfiguration createServiceConfiguration(PlatformSessionSpecification sessionSpec, RuntimeContext runtimeContext) {
-        return ServiceSessionConfiguration.defaults();
+    public ServiceSessionConfiguration createServiceConfiguration(PlatformSessionSpecification sessionSpec,
+                                                                 RuntimeContext runtimeContext,
+                                                                 ScriptlessCompositionDescriptor compositionDescriptor) {
+        return serviceConfigurationBuilder(runtimeContext, compositionDescriptor).build();
     }
 
     @Override

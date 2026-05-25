@@ -26,7 +26,9 @@ public final class ModuleWorkspaceHelper {
             new ModuleDefinition("stopCriteriaCapabilityClass", "Stop criteria capability", "StopCriteriaCapability"),
             new ModuleDefinition("systemServiceClass", "System service", "SystemService"),
             new ModuleDefinition("stateServiceClass", "State service", "StateService"),
+            new ModuleDefinition("stateIdentifierServiceClass", "State identifier service", "StateIdentifierService"),
             new ModuleDefinition("actionDerivationServiceClass", "Action derivation service", "ActionDerivationService"),
+            new ModuleDefinition("actionIdentifierServiceClass", "Action identifier service", "ActionIdentifierService"),
             new ModuleDefinition("actionSelectorServiceClass", "Action selector service", "ActionSelectorService"),
             new ModuleDefinition("actionExecutionServiceClass", "Action execution service", "ActionExecutionService"),
             new ModuleDefinition("oracleComposerClass", "Oracle composer", "OracleComposer")
@@ -70,7 +72,9 @@ public final class ModuleWorkspaceHelper {
         builder.append("# Optional service wrappers.").append(System.lineSeparator());
         builder.append("systemServiceClass=").append(properties.getProperty("systemServiceClass", "")).append(System.lineSeparator());
         builder.append("stateServiceClass=").append(properties.getProperty("stateServiceClass", "")).append(System.lineSeparator());
+        builder.append("stateIdentifierServiceClass=").append(properties.getProperty("stateIdentifierServiceClass", "")).append(System.lineSeparator());
         builder.append("actionDerivationServiceClass=").append(properties.getProperty("actionDerivationServiceClass", "")).append(System.lineSeparator());
+        builder.append("actionIdentifierServiceClass=").append(properties.getProperty("actionIdentifierServiceClass", "")).append(System.lineSeparator());
         builder.append("actionSelectorServiceClass=").append(properties.getProperty("actionSelectorServiceClass", "")).append(System.lineSeparator());
         builder.append("actionExecutionServiceClass=").append(properties.getProperty("actionExecutionServiceClass", "")).append(System.lineSeparator());
         builder.append("oracleComposerClass=").append(properties.getProperty("oracleComposerClass", "")).append(System.lineSeparator());
@@ -357,6 +361,26 @@ public final class ModuleWorkspaceHelper {
                             "}",
                             ""
                     );
+                case "stateIdentifierServiceClass":
+                    return String.join(System.lineSeparator(),
+                            "import org.testar.core.service.StateIdentifierService;",
+                            "import org.testar.core.state.State;",
+                            "",
+                            "public final class " + simpleClassName + " implements StateIdentifierService {",
+                            "",
+                            "    private final StateIdentifierService delegate;",
+                            "",
+                            "    public " + simpleClassName + "(StateIdentifierService delegate) {",
+                            "        this.delegate = delegate;",
+                            "    }",
+                            "",
+                            "    @Override",
+                            "    public State identifyState(State state) {",
+                            "        return delegate.identifyState(state);",
+                            "    }",
+                            "}",
+                            ""
+                    );
                 case "actionDerivationServiceClass":
                     return String.join(System.lineSeparator(),
                             "import java.util.Set;",
@@ -377,6 +401,34 @@ public final class ModuleWorkspaceHelper {
                             "    @Override",
                             "    public Set<Action> deriveActions(SUT system, State state) {",
                             "        return delegate.deriveActions(system, state);",
+                            "    }",
+                            "}",
+                            ""
+                    );
+                case "actionIdentifierServiceClass":
+                    return String.join(System.lineSeparator(),
+                            "import java.util.Set;",
+                            "",
+                            "import org.testar.core.action.Action;",
+                            "import org.testar.core.service.ActionIdentifierService;",
+                            "import org.testar.core.state.State;",
+                            "",
+                            "public final class " + simpleClassName + " implements ActionIdentifierService {",
+                            "",
+                            "    private final ActionIdentifierService delegate;",
+                            "",
+                            "    public " + simpleClassName + "(ActionIdentifierService delegate) {",
+                            "        this.delegate = delegate;",
+                            "    }",
+                            "",
+                            "    @Override",
+                            "    public Set<Action> identifyActions(State state, Set<Action> actions) {",
+                            "        return delegate.identifyActions(state, actions);",
+                            "    }",
+                            "",
+                            "    @Override",
+                            "    public Action identifyEnvironmentAction(State state, Action action) {",
+                            "        return delegate.identifyEnvironmentAction(state, action);",
                             "    }",
                             "}",
                             ""

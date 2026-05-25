@@ -44,6 +44,12 @@ public final class ComposedStateService implements StateService, AutoCloseable {
         return new ComposedStateService(context, plan);
     }
 
+    public static ComposedStateService compose(SessionPolicyContext context,
+                                               StateCompositionPlan plan,
+                                               StateIdentifierService stateIdentifierService) {
+        return new ComposedStateService(context, plan, stateIdentifierService);
+    }
+
     @Override
     public State getState(SUT system) throws StateBuildException {
         State capturedState = plan.stateService().getState(system);

@@ -22,7 +22,9 @@ public final class ScriptlessCompositionDescriptor {
 
     private final Optional<String> systemServiceClass;
     private final Optional<String> stateServiceClass;
+    private final Optional<String> stateIdentifierServiceClass;
     private final Optional<String> actionDerivationServiceClass;
+    private final Optional<String> actionIdentifierServiceClass;
     private final Optional<String> actionSelectorServiceClass;
     private final Optional<String> actionExecutionServiceClass;
     private final Optional<String> oracleComposerClass;
@@ -35,7 +37,9 @@ public final class ScriptlessCompositionDescriptor {
                                           Optional<String> stopCriteriaCapabilityClass,
                                           Optional<String> systemServiceClass,
                                           Optional<String> stateServiceClass,
+                                          Optional<String> stateIdentifierServiceClass,
                                           Optional<String> actionDerivationServiceClass,
+                                          Optional<String> actionIdentifierServiceClass,
                                           Optional<String> actionSelectorServiceClass,
                                           Optional<String> actionExecutionServiceClass,
                                           Optional<String> oracleComposerClass) {
@@ -47,7 +51,9 @@ public final class ScriptlessCompositionDescriptor {
         this.stopCriteriaCapabilityClass = Assert.notNull(stopCriteriaCapabilityClass);
         this.systemServiceClass = Assert.notNull(systemServiceClass);
         this.stateServiceClass = Assert.notNull(stateServiceClass);
+        this.stateIdentifierServiceClass = Assert.notNull(stateIdentifierServiceClass);
         this.actionDerivationServiceClass = Assert.notNull(actionDerivationServiceClass);
+        this.actionIdentifierServiceClass = Assert.notNull(actionIdentifierServiceClass);
         this.actionSelectorServiceClass = Assert.notNull(actionSelectorServiceClass);
         this.actionExecutionServiceClass = Assert.notNull(actionExecutionServiceClass);
         this.oracleComposerClass = Assert.notNull(oracleComposerClass);
@@ -85,8 +91,16 @@ public final class ScriptlessCompositionDescriptor {
         return stateServiceClass;
     }
 
+    public Optional<String> stateIdentifierServiceClass() {
+        return stateIdentifierServiceClass;
+    }
+
     public Optional<String> actionDerivationServiceClass() {
         return actionDerivationServiceClass;
+    }
+
+    public Optional<String> actionIdentifierServiceClass() {
+        return actionIdentifierServiceClass;
     }
 
     public Optional<String> actionSelectorServiceClass() {

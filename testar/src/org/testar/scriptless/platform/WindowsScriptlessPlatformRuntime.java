@@ -43,7 +43,9 @@ import org.testar.statemodel.StateModelManager;
 public final class WindowsScriptlessPlatformRuntime extends AbstractScriptlessPlatformRuntime {
 
     @Override
-    public ServiceSessionConfiguration createServiceConfiguration(PlatformSessionSpecification sessionSpec, RuntimeContext runtimeContext) {
+    public ServiceSessionConfiguration createServiceConfiguration(PlatformSessionSpecification sessionSpec,
+                                                                 RuntimeContext runtimeContext,
+                                                                 ScriptlessCompositionDescriptor compositionDescriptor) {
         StateCompositionPlan defaultStatePlan = PlatformDefaultSessionConfigurations
                 .windowsServiceConfiguration(sessionSpec)
                 .stateCompositionPlanOverride()
@@ -52,7 +54,7 @@ public final class WindowsScriptlessPlatformRuntime extends AbstractScriptlessPl
                 new ScriptlessWindowsStateService(defaultStatePlan.stateService(), runtimeContext),
                 defaultStatePlan::query
         );
-        return ServiceSessionConfiguration.builder()
+        return serviceConfigurationBuilder(runtimeContext, compositionDescriptor)
                 .overrideStateCompositionPlan(scriptlessStatePlan)
                 .build();
     }

@@ -16,8 +16,10 @@ flowchart LR
     subgraph ComposedState["composed state service"]
         direction TB
         DefaultStateIdentifierService["DefaultStateIdentifierService"]
+        StateIdentification["state identification"]
         ComposedStateService["ComposedStateService"]
-        DefaultStateIdentifierService --> ComposedStateService
+        DefaultStateIdentifierService --> StateIdentification
+        StateIdentification --> ComposedStateService
     end
 
     subgraph CoreState["core service contract"]
@@ -64,7 +66,7 @@ flowchart LR
     DefaultStateIdentifierService -. implements .-> StateIdentifierService
     ComposedStateService -. implements .-> StateService
 
-    ComposedStateService -- "produces" --> projectedState
+    ComposedStateService -- "produces projected state" --> projectedState
 
     %% horizontal row nudges
     PluginComposition ~~~ SharedContexts

@@ -4,14 +4,14 @@ flowchart LR
         direction TB
         RuntimeContext["RuntimeContext"]
         BuildServices["ScriptlessFactory.buildServices(runtimeContext)"]
-        BuildCapabilities["ScriptlessFactory.buildCapabilities(runtimeContext)"]
+        BuildCapabilities["ScriptlessFactory.buildScriptlessCapabilities(runtimeContext)"]
     end
 
     subgraph PluginFlow["plugin resolve flow"]
         direction TB
         SessionSpec["PlatformSessionSpecification"]
         PolicyConfig["PolicySessionConfiguration"]
-        ServiceConfig["ServiceSessionConfiguration"]
+        ServiceConfig["ServiceSessionConfiguration identifier overrides <br> + plan overrides"]
         Resolve["PlatformOrchestrator.resolve(...)"]
         StateModelManager["createStateModelManager(...)"]
         PlatformServices["PlatformServices"]

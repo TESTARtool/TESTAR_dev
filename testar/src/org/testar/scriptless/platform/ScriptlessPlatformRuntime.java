@@ -18,7 +18,9 @@ import org.testar.scriptless.composition.ScriptlessCompositionDescriptor;
 
 public interface ScriptlessPlatformRuntime {
 
-    ServiceSessionConfiguration createServiceConfiguration(PlatformSessionSpecification sessionSpec, RuntimeContext runtimeContext);
+    ServiceSessionConfiguration createServiceConfiguration(PlatformSessionSpecification sessionSpec,
+                                                           RuntimeContext runtimeContext,
+                                                           ScriptlessCompositionDescriptor compositionDescriptor);
 
     SettingsCapability createSettingsCapability(RuntimeContext runtimeContext, ScriptlessCompositionDescriptor compositionDescriptor);
 
