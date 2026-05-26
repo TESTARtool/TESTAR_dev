@@ -150,10 +150,13 @@ public class WdDriver extends SUTBase {
     }
 
     WdCanvasDimensions.stopThread();
-    
+
+    // This logic is not safe in case users are using other chrome browser instances
+    /*
     if(this.get(Tags.PID, -1L) != -1L) {
       stopProcessTree(this.get(Tags.PID));
     }
+    */
   }
 
   private void stopProcessTree(long pid) {
