@@ -192,6 +192,34 @@ For `testar`, the same idea applies one level higher:
 - reporting and output ownership belongs to shared session-level managers instead of scattered protocol classes
 - SUT-specific customization should live in external settings resources instead of internal protocol subclasses
 
+### Architecture invariants
+
+The following invariants are used when reviewing changes and deciding where new logic belongs:
+
+- `core` does not depend on `engine`, platform modules, `plugin`, `cli`, or `testar`
+- `engine` does not hardcode platform heuristics that belong in `windows`, `webdriver`, or `android`
+- platform modules provide native implementations but do not orchestrate full sessions
+- `plugin` owns session composition and platform/service assembly
+- `ComposedProtocol` remains a scriptless runtime orchestrator, not a container for low-level platform logic
+- SUT-specific customization should prefer external resources and wrappers before internal module edits
+
+### Where code goes
+
+When deciding where to implement a new change, use this guide:
+
+- new widget rule or eligibility decision
+  - use a `policy`
+- new runtime operation such as capture, derive, select, execute, or evaluate
+  - use a `service`
+- new TESTAR runtime lifecycle hook such as session or sequence behavior
+  - use a scriptless `capability`
+- new session assembly or implementation-selection decision
+  - use `plugin` composition
+- new native platform access or platform-specific low-level behavior
+  - use the relevant platform module
+- new SUT-specific customization
+  - prefer external wrappers or settings resources when the existing extension seams are sufficient
+
 ### Main runtime flow
 
 At the conceptual level, the runtime flow is:
@@ -266,6 +294,10 @@ The design rule is:
   - capabilities
   - policies
 - plans and internal composition stay internal by default
+
+The practical configuration workflow for these seams is documented in:
+
+- `docs/SCRIPTLESS_CONFIGURATION_GUIDE.md`
 
 ### Composition resources
 
@@ -346,6 +378,7 @@ This gives the current architecture a clear boundary:
 The loading path is documented in:
 
 - `docs/scriptless/architecture_scriptless_loader_flow.mmd`
+- `docs/SCRIPTLESS_CONFIGURATION_GUIDE.md`
 
 ## Dialog extension model
 
