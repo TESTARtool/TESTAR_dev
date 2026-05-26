@@ -140,6 +140,7 @@ public abstract class ComposedProtocol implements Consumer<Settings> {
 
         // Build the core testing services
         testingServices = ScriptlessFactory.buildServices(runtimeContext);
+        runtimeContext.setTestingServices(testingServices);
         runtimeContext.setSessionReportingManager(testingServices.sessionReportingManager());
         runtimeContext.setStateModelManager(testingServices.stateModelManager());
 

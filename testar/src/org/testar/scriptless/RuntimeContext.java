@@ -39,6 +39,10 @@ public final class RuntimeContext {
 	    else this.mode = mode;
 	}
 
+    private TestingServices testingServices;
+    public final TestingServices testingServices() { return testingServices; }
+    protected void setTestingServices(TestingServices testingServices) { this.testingServices = testingServices; }
+
     private SessionReportingManager sessionReportingManager;
 	public final SessionReportingManager sessionReportingManager() { return sessionReportingManager; }
     protected void setSessionReportingManager(SessionReportingManager sessionReportingManager) { this.sessionReportingManager = sessionReportingManager; }

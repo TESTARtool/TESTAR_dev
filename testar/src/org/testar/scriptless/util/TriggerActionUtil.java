@@ -8,6 +8,7 @@ package org.testar.scriptless.util;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import org.testar.core.Assert;
 import org.testar.core.action.Action;
@@ -21,6 +22,8 @@ import org.testar.core.tag.Tags;
 import org.testar.core.util.Util;
 import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
+import org.testar.scriptless.RuntimeContext;
+import org.testar.scriptless.TestingServices;
 
 public final class TriggerActionUtil {
 
@@ -40,15 +43,15 @@ public final class TriggerActionUtil {
      * @param waitBetween
      * @return
      */
-    public static boolean waitAndLeftClickWidgetWithMatchingTag(String tagName,
-                                                                String value,
-                                                                State state,
-                                                                SUT system,
-                                                                TriggerActionRuntime runtime,
-                                                                int maxNumberOfRetries,
-                                                                double waitBetween) {
+    public static boolean clickMatchingWidget(String tagName,
+                                              String value,
+                                              State state,
+                                              SUT system,
+                                              RuntimeContext runtimeContext,
+                                              int maxNumberOfRetries,
+                                              double waitBetween) {
         Assert.notNull(tagName, value);
-        Assert.notNull(state, system, runtime);
+        Assert.notNull(state, system, runtimeContext);
 
         // If the state has no children return false
         // This may happen because the state has no GUI elements, for example a XML page
@@ -64,12 +67,12 @@ public final class TriggerActionUtil {
 
         for(Tag<?> tag : state.child(0).tags()) {
             if(tag.name().equalsIgnoreCase(tagName)) {
-                return waitAndLeftClickWidgetWithMatchingTag(
+                return clickMatchingWidget(
                         tag,
                         value,
                         state,
                         system,
-                        runtime,
+                        runtimeContext,
                         maxNumberOfRetries,
                         waitBetween
                 );
@@ -92,14 +95,15 @@ public final class TriggerActionUtil {
      * @param maxNumberOfRetries int number of times
      * @param waitBetween double in seconds
      */
-    public static boolean waitAndLeftClickWidgetWithMatchingTags(Map<String,String> tagValues,
-                                                                 State state,
-                                                                 SUT system,
-                                                                 TriggerActionRuntime runtime,
-                                                                 int maxNumberOfRetries,
-                                                                 double waitBetween) {
+    public static boolean clickMatchingWidget(Map<String,String> tagValues,
+                                              State state,
+                                              SUT system,
+                                              RuntimeContext runtimeContext,
+                                              int maxNumberOfRetries,
+                                              double waitBetween) {
         Assert.notNull(tagValues);
-        Assert.notNull(state, system, runtime);
+        Assert.notNull(state, system, runtimeContext);
+        TriggerActionRuntime runtime = triggerActionRuntime(runtimeContext);
 
         int numberOfRetries = 0;
         while (numberOfRetries < maxNumberOfRetries) {
@@ -136,15 +140,16 @@ public final class TriggerActionUtil {
      * @param waitBetween double in seconds
      * @return
      */
-    public static boolean waitAndLeftClickWidgetWithMatchingTag(Tag<?> tag,
-                                                                String value,
-                                                                State state,
-                                                                SUT system,
-                                                                TriggerActionRuntime runtime,
-                                                                int maxNumberOfRetries,
-                                                                double waitBetween) {
+    public static boolean clickMatchingWidget(Tag<?> tag,
+                                              String value,
+                                              State state,
+                                              SUT system,
+                                              RuntimeContext runtimeContext,
+                                              int maxNumberOfRetries,
+                                              double waitBetween) {
         Assert.notNull(tag, value);
-        Assert.notNull(state, system, runtime);
+        Assert.notNull(state, system, runtimeContext);
+        TriggerActionRuntime runtime = triggerActionRuntime(runtimeContext);
 
         int numberOfRetries = 0;
         while(numberOfRetries < maxNumberOfRetries) {
@@ -185,17 +190,16 @@ public final class TriggerActionUtil {
      * @param waitBetween
      * @return
      */
-    public static boolean waitLeftClickAndTypeIntoWidgetWithMatchingTag(String tagName,
-                                                                        String value,
-                                                                        String textToType,
-                                                                        State state,
-                                                                        SUT system,
-                                                                        TriggerActionRuntime runtime,
-                                                                        int maxNumberOfRetries,
-                                                                        double waitBetween) {
+    public static boolean typeMatchingWidget(String tagName,
+                                             String value,
+                                             String textToType,
+                                             State state,
+                                             SUT system,
+                                             RuntimeContext runtimeContext,
+                                             int maxNumberOfRetries,
+                                             double waitBetween) {
         Assert.notNull(tagName, value, textToType);
-        Assert.notNull(state, system, runtime);
-
+        Assert.notNull(state, system, runtimeContext);
         // If the state has no children return false
         // This may happen because the state has no GUI elements, for example a XML page
         if(state.childCount() == 0) {
@@ -210,13 +214,13 @@ public final class TriggerActionUtil {
 
         for(Tag<?> tag : state.child(0).tags()) {
             if(tag.name().equalsIgnoreCase(tagName)) {
-                return waitLeftClickAndTypeIntoWidgetWithMatchingTag(
+                return typeMatchingWidget(
                         tag,
                         value,
                         textToType,
                         state,
                         system,
-                        runtime,
+                        runtimeContext,
                         maxNumberOfRetries,
                         waitBetween
                 );
@@ -241,15 +245,16 @@ public final class TriggerActionUtil {
      * @param waitBetween double in seconds
      * @return
      */
-    public static boolean waitLeftClickAndTypeIntoWidgetWithMatchingTags(Map<String,String> tagValues,
-                                                                         String textToType,
-                                                                         State state,
-                                                                         SUT system,
-                                                                         TriggerActionRuntime runtime,
-                                                                         int maxNumberOfRetries,
-                                                                         double waitBetween) {
+    public static boolean typeMatchingWidget(Map<String,String> tagValues,
+                                             String textToType,
+                                             State state,
+                                             SUT system,
+                                             RuntimeContext runtimeContext,
+                                             int maxNumberOfRetries,
+                                             double waitBetween) {
         Assert.notNull(tagValues, textToType);
-        Assert.notNull(state, system, runtime);
+        Assert.notNull(state, system, runtimeContext);
+        TriggerActionRuntime runtime = triggerActionRuntime(runtimeContext);
 
         int numberOfRetries = 0;
         while(numberOfRetries < maxNumberOfRetries) {
@@ -287,16 +292,17 @@ public final class TriggerActionUtil {
      * @param waitBetween double in seconds
      * @return
      */
-    public static boolean waitLeftClickAndTypeIntoWidgetWithMatchingTag(Tag<?> tag,
-                                                                        String value,
-                                                                        String textToType,
-                                                                        State state,
-                                                                        SUT system,
-                                                                        TriggerActionRuntime runtime,
-                                                                        int maxNumberOfRetries,
-                                                                        double waitBetween) {
+    public static boolean typeMatchingWidget(Tag<?> tag,
+                                             String value,
+                                             String textToType,
+                                             State state,
+                                             SUT system,
+                                             RuntimeContext runtimeContext,
+                                             int maxNumberOfRetries,
+                                             double waitBetween) {
         Assert.notNull(tag, value, textToType);
-        Assert.notNull(state, system, runtime);
+        Assert.notNull(state, system, runtimeContext);
+        TriggerActionRuntime runtime = triggerActionRuntime(runtimeContext);
 
         int numberOfRetries = 0;
         while(numberOfRetries < maxNumberOfRetries) {
@@ -338,16 +344,16 @@ public final class TriggerActionUtil {
      * @param waitBetween
      * @return
      */
-    public static boolean waitLeftClickAndPasteIntoWidgetWithMatchingTag(String tagName,
-                                                                         String value,
-                                                                         String textToPaste,
-                                                                         State state,
-                                                                         SUT system,
-                                                                         TriggerActionRuntime runtime,
-                                                                         int maxNumberOfRetries,
-                                                                         double waitBetween) {
+    public static boolean pasteMatchingWidget(String tagName,
+                                              String value,
+                                              String textToPaste,
+                                              State state,
+                                              SUT system,
+                                              RuntimeContext runtimeContext,
+                                              int maxNumberOfRetries,
+                                              double waitBetween) {
         Assert.notNull(tagName, value, textToPaste);
-        Assert.notNull(state, system, runtime);
+        Assert.notNull(state, system, runtimeContext);
 
         // If the state has no children return false
         // This may happen because the state has no GUI elements, for example a XML page
@@ -362,13 +368,13 @@ public final class TriggerActionUtil {
         }
         for(Tag<?> tag : state.child(0).tags()) {
             if(tag.name().equalsIgnoreCase(tagName)) {
-                return waitLeftClickAndPasteIntoWidgetWithMatchingTag(
+                return pasteMatchingWidget(
                         tag,
                         value,
                         textToPaste,
                         state,
                         system,
-                        runtime,
+                        runtimeContext,
                         maxNumberOfRetries,
                         waitBetween
                 );
@@ -393,15 +399,16 @@ public final class TriggerActionUtil {
      * @param waitBetween double in seconds
      * @return
      */
-    public static boolean waitLeftClickAndPasteIntoWidgetWithMatchingTags(Map<String,String> tagValues,
-                                                                          String textToPaste,
-                                                                          State state,
-                                                                          SUT system,
-                                                                          TriggerActionRuntime runtime,
-                                                                          int maxNumberOfRetries,
-                                                                          double waitBetween) {
+    public static boolean pasteMatchingWidget(Map<String,String> tagValues,
+                                              String textToPaste,
+                                              State state,
+                                              SUT system,
+                                              RuntimeContext runtimeContext,
+                                              int maxNumberOfRetries,
+                                              double waitBetween) {
         Assert.notNull(tagValues, textToPaste);
-        Assert.notNull(state, system, runtime);
+        Assert.notNull(state, system, runtimeContext);
+        TriggerActionRuntime runtime = triggerActionRuntime(runtimeContext);
 
         int numberOfRetries = 0;
         while(numberOfRetries < maxNumberOfRetries) {
@@ -439,16 +446,17 @@ public final class TriggerActionUtil {
      * @param waitBetween double in seconds
      * @return
      */
-    public static boolean waitLeftClickAndPasteIntoWidgetWithMatchingTag(Tag<?> tag,
-                                                                         String value,
-                                                                         String textToPaste,
-                                                                         State state,
-                                                                         SUT system,
-                                                                         TriggerActionRuntime runtime,
-                                                                         int maxNumberOfRetries,
-                                                                         double waitBetween) {
+    public static boolean pasteMatchingWidget(Tag<?> tag,
+                                              String value,
+                                              String textToPaste,
+                                              State state,
+                                              SUT system,
+                                              RuntimeContext runtimeContext,
+                                              int maxNumberOfRetries,
+                                              double waitBetween) {
         Assert.notNull(tag, value, textToPaste);
-        Assert.notNull(state, system, runtime);
+        Assert.notNull(state, system, runtimeContext);
+        TriggerActionRuntime runtime = triggerActionRuntime(runtimeContext);
 
         int numberOfRetries = 0;
         while(numberOfRetries < maxNumberOfRetries) {
@@ -514,5 +522,26 @@ public final class TriggerActionUtil {
     public static Action triggeredPasteAction(State state, Widget widget, String textToPaste, boolean replaceText) {
     	StdActionCompiler ac = new AnnotatingActionCompiler();
     	return ac.pasteTextInto(widget, textToPaste, replaceText);
+    }
+
+    private static TriggerActionRuntime triggerActionRuntime(RuntimeContext runtimeContext) {
+        TestingServices testingServices = Assert.notNull(runtimeContext.testingServices());
+
+        return new TriggerActionRuntime() {
+            @Override
+            public State refreshState(SUT system) {
+                return testingServices.stateService().getState(system);
+            }
+
+            @Override
+            public Set<Action> refreshActions(State state, Set<Action> actions) {
+                return actions;
+            }
+
+            @Override
+            public boolean executeTriggerAction(SUT system, State state, Action action) {
+                return testingServices.actionExecutionService().executeAction(system, state, action);
+            }
+        };
     }
 }
