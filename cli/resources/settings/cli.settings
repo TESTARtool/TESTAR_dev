@@ -139,6 +139,8 @@ ForceForeground = true
 # Other settings
 #################################################################
 
+SUTConnector = WEB_DRIVER
+SUTConnectorValue = about:blank
 TimeToFreeze=10.0
 ProcessListenerEnabled=false
 SUTProcesses=

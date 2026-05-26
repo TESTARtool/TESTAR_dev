@@ -244,9 +244,14 @@ final class CliDaemonServer {
 
         OperatingSystems operatingSystem = parseOperatingSystem(platformToken);
         if (operatingSystem == OperatingSystems.ANDROID) {
+            settings.set(ConfigTags.SUTConnector, Settings.SUT_CONNECTOR_ANDROID_APPIUM);
             settings.set(ConfigTags.AppiumIsApkInstalled, false);
             settings.set(ConfigTags.AppiumApp, target);
         } else if (operatingSystem == OperatingSystems.WEBDRIVER) {
+            settings.set(ConfigTags.SUTConnector, Settings.SUT_CONNECTOR_WEBDRIVER);
+            settings.set(ConfigTags.SUTConnectorValue, target);
+        } else {
+            settings.set(ConfigTags.SUTConnector, Settings.SUT_CONNECTOR_CMDLINE);
             settings.set(ConfigTags.SUTConnectorValue, target);
         }
 
