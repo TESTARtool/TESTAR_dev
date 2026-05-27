@@ -1553,18 +1553,20 @@
 
             const initialStatesMap = new Map(); // AbstractID -> initial state data
 
-            let concreteStates = [];
-            let concreteActions = [];
-            let concreteTransitions = [];
+            const concreteStates = [];
+            const concreteActions = [];
+            const concreteTransitions = [];
+            const screenshotExports = [];
+
+            // 1) Collect abstract states, actions, and transitions data
+            const stateMap = new Map(); // AbstractID -> state data
+            const actionMap = new Map(); // Abstract action ID -> action data
+            const transitionMap = new Map(); // Abstract transition tuple -> transition data
 
             // Iterate over each ConcreteState element in the graph
-
-            // 1) Collect unique states first (no async here)
-            const stateMap = new Map(); // AbstractID -> state data
-
             cy.$(".ConcreteState").forEach((ele) => {
                 const abstractID = ele.data("AbstractID");
-				const concreteID = ele.data("ConcreteID");
+                const concreteID = ele.data("ConcreteID");
                 const webTitle = ele.data("WebTitle");
                 const webHref = ele.data("WebHref");
 
@@ -1580,14 +1582,25 @@
                         WebHref: webHref,
                         // WebInnerHTML: webInnerHTML,
                         // WebInnerText: webInnerText,
-						CyElementId: ele.id()
+                        // Representative concrete state used to fetch one widget tree for this abstract state.
+                        RepresentativeConcreteID: concreteID,
+                        // Traceability to every concrete state merged into this abstract state.
+                        ConcreteIDs: [],
+                        CyElementId: ele.id()
                     });
+                }
+
+                // Save the concrete id in the abstract state of the map
+                const state = stateMap.get(abstractID);
+                if (!state.ConcreteIDs.includes(concreteID)) {
+                    state.ConcreteIDs.push(concreteID);
                 }
 
                 // Collect all initial states, deduplicated by AbstractID
                 if (initialAbstractIds.has(abstractID) && !initialStatesMap.has(abstractID)) {
                     initialStatesMap.set(abstractID, {
                         AbstractID: abstractID,
+                        RepresentativeConcreteID: concreteID,
                         InitialUrl: webHref,
                         InitialPage: webTitle
                     });
@@ -1605,6 +1618,11 @@
 
             // 3) Emit final ConcreteState array (omit CyElementId)
             for (const s of resolvedStates) {
+                screenshotExports.push({
+                    SourceImageName: s.CyElementId + ".png",
+                    OutputImageName: s.RepresentativeConcreteID + ".png"
+                });
+
                 const { CyElementId, ...clean } = s;
                 concreteStates.push(clean);
             }
@@ -1612,8 +1630,8 @@
             // Iterate over each ConcreteAction element in the graph
             cy.$(".ConcreteAction").forEach((ele) => {
                 const abstractID = ele.data("AbstractID"); // Comes from abstract widget
-				const concreteID = ele.data("ConcreteID"); // Comes from concrete widget
-				const actionId = ele.data("actionId");
+                const concreteID = ele.data("ConcreteID"); // Comes from concrete widget
+                const actionId = ele.data("actionId");
                 const webHref = ele.data("WebHref");
                 const webCssClasses = ele.data("WebCssClasses");
                 const webTagName = ele.data("WebTagName");
@@ -1625,12 +1643,24 @@
                 const webCssSelector = ele.data("WebCssSelector");
                 const inputText = ele.data("InputText");
 
-                // Check if the action already exists in concreteActions
-                if (!concreteActions.some(action => action.actionId === actionId)) {
-                    concreteActions.push({
+                const sourceNode = ele.source();
+                const targetNode = ele.target();
+                // Concrete execution instance kept under one abstract action entry.
+                const actionInstance = {
+                    ConcreteID: concreteID,
+                    ActionId: actionId,
+                    SourceAbstractID: sourceNode ? sourceNode.data("AbstractID") : undefined,
+                    SourceConcreteID: sourceNode ? sourceNode.data("ConcreteID") : undefined,
+                    TargetAbstractID: targetNode ? targetNode.data("AbstractID") : undefined,
+                    TargetConcreteID: targetNode ? targetNode.data("ConcreteID") : undefined
+                };
+                
+                if (!actionMap.has(abstractID)) {
+                    actionMap.set(abstractID, {
                         AbstractID: abstractID,
-						ConcreteID: concreteID,
-						actionId: actionId,
+                        // Representative concrete widget/action used to expose SUT-facing fields once.
+                        RepresentativeConcreteID: concreteID,
+                        RepresentativeActionId: actionId,
                         WebHref: webHref,
                         WebCssClasses: webCssClasses,
                         WebTagName: webTagName,
@@ -1638,8 +1668,26 @@
                         WebOuterHTML: webOuterHTML,
                         WebCssSelector: webCssSelector,
                         InputText: inputText,
+                        ConcreteInstances: [],
                     });
                 }
+
+                // Check if the action instance already exists in the action map
+                const action = actionMap.get(abstractID);
+                const instanceExists = action.ConcreteInstances.some((instance) =>
+                    instance.ConcreteID === actionInstance.ConcreteID &&
+                    instance.ActionId === actionInstance.ActionId &&
+                    instance.SourceConcreteID === actionInstance.SourceConcreteID &&
+                    instance.TargetConcreteID === actionInstance.TargetConcreteID
+                );
+
+                if (!instanceExists) {
+                    action.ConcreteInstances.push(actionInstance);
+                }
+            });
+
+            actionMap.forEach((action) => {
+                concreteActions.push(action);
             });
 
             // Iterate over each ConcreteAction element to handle transitions
@@ -1648,37 +1696,65 @@
                 const targetNode = ele.target();
 
                 if (sourceNode && targetNode) {
-                    const transition = {
-                        Source: sourceNode.data("AbstractID"),
-                        Target: targetNode.data("AbstractID"),
-                        ActionWA: ele.data("AbstractID"),
+                    const sourceAbstractID = sourceNode.data("AbstractID");
+                    const targetAbstractID = targetNode.data("AbstractID");
+                    const actionAbstractID = ele.data("AbstractID");
+                    // Export one abstract transition and attach all concrete occurrences below it.
+                    const transitionKey = [
+                        sourceAbstractID,
+                        targetAbstractID,
+                        actionAbstractID
+                    ].join("::");
+
+                    if (!transitionMap.has(transitionKey)) {
+                        transitionMap.set(transitionKey, {
+                            Source: sourceAbstractID,
+                            Target: targetAbstractID,
+                            ActionWA: actionAbstractID,
+                            ConcreteInstances: [],
+                        });
+                    }
+
+                    const transition = transitionMap.get(transitionKey);
+                    // Concrete provenance for one abstract transition occurrence.
+                    const concreteInstance = {
+                        SourceConcreteID: sourceNode.data("ConcreteID"),
+                        TargetConcreteID: targetNode.data("ConcreteID"),
                         ActionWC: ele.data("ConcreteID"),
                         ActionId: ele.data("actionId"),
                     };
 
-                    // Check if the transition already exists
-                    if (!concreteTransitions.some(t =>
-                        t.Source === transition.Source &&
-                        t.Target === transition.Target &&
-                        t.ActionWA === transition.ActionWA &&
-                        t.ActionWC === transition.ActionWC &&
-                        t.ActionId === transition.ActionId
-                    )) {
-                        concreteTransitions.push(transition);
+                    const transitionExists = transition.ConcreteInstances.some((instance) =>
+                        instance.SourceConcreteID === concreteInstance.SourceConcreteID &&
+                        instance.TargetConcreteID === concreteInstance.TargetConcreteID &&
+                        instance.ActionWC === concreteInstance.ActionWC &&
+                        instance.ActionId === concreteInstance.ActionId
+                    );
+
+                    if (!transitionExists) {
+                        transition.ConcreteInstances.push(concreteInstance);
                     }
                 }
             });
 
-            // Construct the final JSON object
-            const jsonResult = {
+            transitionMap.forEach((transition) => {
+                concreteTransitions.push(transition);
+            });
+
+            // Construct the hybrid JSON object
+            const hybridJsonResult = {
                 InitialStates: Array.from(initialStatesMap.values()),
                 ConcreteState: concreteStates,
                 ConcreteAction: concreteActions,
                 ConcreteTransitions: concreteTransitions,
             };
 
-            // Download the JSON model file
-            downloadJsonFile(jsonResult, "model.json");
+            // Construct the abstract JSON object
+            const abstractJsonResult = buildAbstractModelExport(hybridJsonResult);
+
+            // Persist the hybrid and abstract exports on the server, including representative screenshots.
+            const exportResult = await persistModelExports(hybridJsonResult, abstractJsonResult, screenshotExports);
+            showModelExportResult(exportResult);
         } catch (err) {
             console.error("JSON model generation failed:", err);
         } finally {
@@ -1912,6 +1988,84 @@
 	  a.click();
 	  URL.revokeObjectURL(url);
 	}
+
+    function buildAbstractModelExport(hybridJsonObject) {
+      return {
+        InitialStates: (hybridJsonObject.InitialStates || []).map((state) => ({
+          AbstractID: state.AbstractID,
+          InitialUrl: state.InitialUrl,
+          InitialPage: state.InitialPage
+        })),
+        ConcreteState: (hybridJsonObject.ConcreteState || []).map((state) => ({
+          AbstractID: state.AbstractID,
+          WebTitle: state.WebTitle,
+          WebHref: state.WebHref,
+          WidgetTree: state.WidgetTree
+        })),
+        ConcreteAction: (hybridJsonObject.ConcreteAction || []).map((action) => ({
+          AbstractID: action.AbstractID,
+          WebHref: action.WebHref,
+          WebCssClasses: action.WebCssClasses,
+          WebTagName: action.WebTagName,
+          Desc: action.Desc,
+          WebOuterHTML: action.WebOuterHTML,
+          WebCssSelector: action.WebCssSelector,
+          InputText: action.InputText
+        })),
+        ConcreteTransitions: (hybridJsonObject.ConcreteTransitions || []).map((transition) => ({
+          Source: transition.Source,
+          Target: transition.Target,
+          ActionWA: transition.ActionWA
+        }))
+      };
+    }
+
+    async function persistModelExports(hybridJsonObject, abstractJsonObject, screenshotExports) {
+      const response = await fetch("graph?format=model-json-export&modelIdentifier=${contentFolder}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({
+          hybridFilename: "model_hybrid.json",
+          abstractFilename: "model_abstract.json",
+          hybridJsonModel: hybridJsonObject,
+          abstractJsonModel: abstractJsonObject,
+          screenshotExports: screenshotExports
+        })
+      });
+
+      if (!response.ok) {
+        const message = await response.text().catch(() => "");
+        throw new Error("Hybrid export failed: " + response.status + " " + message);
+      }
+
+      return response.json();
+    }
+
+    function showModelExportResult(exportResult) {
+      if (!exportResult) {
+        alert("JSON export finished.");
+        return;
+      }
+
+      const lines = [
+        "JSON export finished.",
+        "",
+        "Hybrid file: " + (exportResult.hybridFilename || "model_hybrid.json"),
+        "Abstract file: " + (exportResult.abstractFilename || "model_abstract.json"),
+        "Export folder: " + (exportResult.exportFolder || ""),
+        "Screenshot folder: " + (exportResult.screenshotFolder || ""),
+        "Screenshots exported: " + (exportResult.screenshotCount ?? 0)
+      ];
+
+      if (Array.isArray(exportResult.missingScreenshots) && exportResult.missingScreenshots.length > 0) {
+        lines.push("Missing screenshots: " + exportResult.missingScreenshots.length);
+      }
+
+      alert(lines.join("\n"));
+    }
 
 </script>
 </body>

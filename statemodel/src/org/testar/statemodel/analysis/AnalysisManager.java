@@ -612,6 +612,23 @@ public class AnalysisManager {
         }
     }
 
+    public ModelJsonExportUtil.ModelJsonExportResult exportHybridModel(String modelIdentifier,
+                                                                       String hybridFilename,
+                                                                       Object hybridJsonModel,
+                                                                       String abstractFilename,
+                                                                       Object abstractJsonModel,
+                                                                       List<ModelJsonExportUtil.ScreenshotExport> screenshotExports) {
+        return ModelJsonExportUtil.exportModelFiles(
+                outputDir,
+                modelIdentifier,
+                hybridFilename,
+                hybridJsonModel,
+                abstractFilename,
+                abstractJsonModel,
+                screenshotExports
+        );
+    }
+
     /**
      * This method transforms a resultset of nodes into elements.
      * @param resultSet

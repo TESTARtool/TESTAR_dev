@@ -61,6 +61,11 @@ public class GraphServlet extends HttpServlet {
         AnalysisManager analysisManager = (AnalysisManager)servletContext.getAttribute("analysisManager");
 
         if (modelIdentifier != null) {
+            if ("model-json-export".equalsIgnoreCase(format)) {
+                ModelJsonExportServletUtil.handleExportRequest(request, response, analysisManager, modelIdentifier);
+                return;
+            }
+
             // this is the controller logic for the overall model graph
 
             // check if there were any layers requested
