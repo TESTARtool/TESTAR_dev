@@ -1,3 +1,12 @@
+#TESTAR v2.8.11 (25-May-2026)
+- Bump org.seleniumhq.selenium:selenium-java from 4.43.0 to 4.44.0
+- Update devtools dependencies to v148
+
+
+#TESTAR v2.8.10 (12-May-2026)
+- Bump io.appium:java-client from 10.1.0 to 10.1.1
+
+
 #TESTAR v2.8.9 (21-Apr-2026)
 - Bump org.seleniumhq.selenium:selenium-java from 4.41.0 to 4.43.0
 - Fix id bug when analyzing state models
