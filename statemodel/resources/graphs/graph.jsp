@@ -1682,6 +1682,8 @@
                         // Representative concrete widget/action used to expose SUT-facing fields once.
                         RepresentativeConcreteID: concreteID,
                         RepresentativeActionId: actionId,
+                        // Representative concrete action edge used to export one screenshot for this abstract action.
+                        RepresentativeCyElementId: ele.id(),
                         WebHref: webHref,
                         WebCssClasses: webCssClasses,
                         WebTagName: webTagName,
@@ -1708,6 +1710,13 @@
             });
 
             actionMap.forEach((action) => {
+                screenshotExports.push({
+                    SourceImageName: action.RepresentativeCyElementId + ".png",
+                    OutputImageName: action.RepresentativeConcreteID + ".png",
+                    ExportType: "action"
+                });
+
+                delete action.RepresentativeCyElementId;
                 concreteActions.push(action);
             });
 
@@ -2071,14 +2080,20 @@
         return;
       }
 
+      const exportFolder = normalizeDisplayPath(exportResult.exportFolder || "");
+      const stateScreenshotCount = exportResult.stateScreenshotCount ?? 0;
+      const actionScreenshotCount = exportResult.actionScreenshotCount ?? 0;
+      const totalScreenshotCount = exportResult.screenshotCount ?? (stateScreenshotCount + actionScreenshotCount);
+
       const lines = [
         "JSON export finished.",
         "",
-        "Hybrid file: " + (exportResult.hybridFilename || "model_hybrid.json"),
-        "Abstract file: " + (exportResult.abstractFilename || "model_abstract.json"),
-        "Export folder: " + (exportResult.exportFolder || ""),
-        "Screenshot folder: " + (exportResult.screenshotFolder || ""),
-        "Screenshots exported: " + (exportResult.screenshotCount ?? 0)
+        "Exported directory:",
+        exportFolder,
+        "",
+        "State screenshots exported: " + stateScreenshotCount,
+        "Action screenshots exported: " + actionScreenshotCount,
+        "Total screenshots exported: " + totalScreenshotCount
       ];
 
       if (Array.isArray(exportResult.missingScreenshots) && exportResult.missingScreenshots.length > 0) {
@@ -2086,6 +2101,16 @@
       }
 
       alert(lines.join("\n"));
+    }
+
+    function normalizeDisplayPath(path) {
+      if (typeof path !== "string" || path.trim() === "") {
+        return "";
+      }
+
+      return path
+        .replace(/[\\/]\.[\\/]/g, "\\")
+        .replace(/\//g, "\\");
     }
 
 </script>
