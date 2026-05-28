@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,12 +30,23 @@
 
 package org.testar.statemodel;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.testar.monkey.Util;
 import org.testar.monkey.alayer.Action;
 import org.testar.monkey.alayer.Tag;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Widget;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public class ConcreteActionFactory {
+
+    protected static final Logger logger = LogManager.getLogger();
 
     public static ConcreteAction createConcreteAction(Action action, AbstractAction abstractAction) {
         ConcreteAction concreteAction =  new ConcreteAction(action.get(Tags.ConcreteID), abstractAction);
@@ -55,6 +66,29 @@ public class ConcreteActionFactory {
         // if so, set this InputText to the current ConcreteAction
         if(action.get(Tags.InputText, null) != null)
         	setSpecificAttribute(concreteAction, Tags.InputText, action.get(Tags.InputText));
+
+        // get a screenshot for this concrete action
+        // in a headless environment, there may not be screenshots
+        String srcPath = action.get(Tags.ActionScreenshotPath, null);
+        if (srcPath != null && !srcPath.isEmpty()) {
+            Path normalizePath = Paths.get(srcPath).normalize();
+
+            // wait for action screenshot to be saved (max ~2s)
+            for (int i = 0; i < 20 && !Files.isRegularFile(normalizePath); i++) {
+                Util.pause(0.1);
+            }
+
+            try {
+                if (Files.isRegularFile(normalizePath)) {
+                    byte[] bytes = Files.readAllBytes(normalizePath);
+                    concreteAction.setScreenshot(bytes);
+                } else {
+                    logger.log(Level.WARN,"Action screenshot file not found: {}", normalizePath.toAbsolutePath());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         return concreteAction;
     }

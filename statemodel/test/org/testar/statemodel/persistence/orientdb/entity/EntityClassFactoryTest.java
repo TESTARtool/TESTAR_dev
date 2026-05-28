@@ -39,6 +39,7 @@ public class EntityClassFactoryTest {
         assertEquals("ConcreteState", entityClass.getClassName());
         assertEquals(EntityClass.EntityType.Vertex, entityClass.getEntityType());
         assertFalse(entityClass.getProperties().isEmpty());
+        assertTrue(entityClass.getProperties().stream().anyMatch(property -> "screenshot".equals(property.getPropertyName())));
     }
 
     @Test
@@ -48,6 +49,7 @@ public class EntityClassFactoryTest {
         assertEquals("ConcreteAction", entityClass.getClassName());
         assertEquals(EntityClass.EntityType.Edge, entityClass.getEntityType());
         assertFalse(entityClass.getProperties().isEmpty());
+        assertTrue(entityClass.getProperties().stream().anyMatch(property -> "screenshot".equals(property.getPropertyName())));
     }
 
     @Test

@@ -187,11 +187,12 @@ public class GenerateMode {
 				protocol.cv.paintBatch();
 			}
 
-			//before action execution, pass it to the state model manager
-			protocol.stateModelManager.notifyActionExecution(action);
-
 			//Executing the selected action:
 			protocol.executeAction(system, state, action);
+
+			// pass the executed action execution to the state model manager
+			protocol.stateModelManager.notifyActionExecution(action);
+
 			DefaultProtocol.lastExecutedAction = action;
 			protocol.actionCount++;
 

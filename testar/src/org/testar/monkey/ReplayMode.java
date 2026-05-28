@@ -231,10 +231,10 @@ public class ReplayMode {
 
 										protocol.preSelectAction(system, state, actions);
 
-										//before action execution, pass it to the state model manager
-										protocol.stateModelManager.notifyActionExecution(actionToReplay);
-
 										protocol.replayAction(system, state, actionToReplay, actionDelay, actionDuration);
+
+										// pass the replayed action execution to the state model manager
+										protocol.stateModelManager.notifyActionExecution(actionToReplay);
 
 										success = true;
 										protocol.actionCount++;

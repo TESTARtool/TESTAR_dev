@@ -144,6 +144,9 @@ public final class Tags extends TagsBase {
 	/** Usually attached to an object of {@link State}. The value is a screenshot of the state. */
 	public static final Tag<String> ScreenshotPath = from("ScreenshotPath", String.class);
 
+	/** Usually attached to an object of {@link Action}. The value is a screenshot of the action target area. */
+	public static final Tag<String> ActionScreenshotPath = from("ActionScreenshotPath", String.class);
+
 	/** Usually attached to a {@link State} object. The value is a list of outcomes of test oracles for that state. */
 	@SuppressWarnings("unchecked")
 	public static final Tag<List<Verdict>> OracleVerdicts = from("OracleVerdicts", (Class<List<Verdict>>)(Class<?>)List.class);

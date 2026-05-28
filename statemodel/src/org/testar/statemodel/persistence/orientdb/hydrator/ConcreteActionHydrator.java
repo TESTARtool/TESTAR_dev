@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -74,6 +74,11 @@ public class ConcreteActionHydrator implements EntityHydrator<EdgeEntity> {
 
         // add the action id
         edgeEntity.addPropertyValue("actionId", new PropertyValue(OType.STRING, ((ConcreteAction) source).getActionId()));
+
+        // add the screenshot
+        if (((ConcreteAction) source).getScreenshot() != null) {
+            edgeEntity.addPropertyValue("screenshot", new PropertyValue(OType.BINARY, ((ConcreteAction) source).getScreenshot()));
+        }
 
         // loop through the tagged attributes for this state and add them
         TaggableBase attributes = ((ConcreteAction) source).getAttributes();
