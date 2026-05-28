@@ -412,12 +412,11 @@ public class WdElement extends TaggableBase implements Serializable {
 	  boolean isVisibleAtCanvas = rect.x() >= 0 && rect.x() + rect.width() <= CanvasDimensions.getCanvasWidth() 
 			  && rect.y() >= 0 && rect.y() + rect.height() <= CanvasDimensions.getInnerHeight();
 
-	  // If the web element is a <select><option>, check the selected option visibility
-	  if (tagName != null && tagName.equalsIgnoreCase("option") && outerHTML != null) {
-		  if (outerHTML.contains("<option") && (outerHTML.contains("selected>") || outerHTML.contains("selected="))) {
-			  return isVisibleAtCanvas;
-		  } else {
-			  return false;
+	  // Native <select> controls only render the selected option when collapsed.
+	  // Custom listbox/menu widgets should rely on their actual geometry instead.
+	  if (tagName != null && tagName.equalsIgnoreCase("option")) {
+		  if (parent != null && parent.tagName != null && parent.tagName.equalsIgnoreCase("select")) {
+			  return (selected || Boolean.TRUE.equals(ariaSelected)) && isVisibleAtCanvas;
 		  }
 	  }
 
