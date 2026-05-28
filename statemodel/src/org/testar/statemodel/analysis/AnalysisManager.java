@@ -452,7 +452,7 @@ public class AnalysisManager {
         // concrete actions
         stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').outE('ConcreteAction') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteAction'";
         resultSet = db.query(stmt, params);
-        elements.addAll(fetchEdges(resultSet, "ConcreteAction"));
+        elements.addAll(fetchConcreteActionEdges(resultSet, modelIdentifier));
         resultSet.close();
 
         return elements;
@@ -700,6 +700,33 @@ public class AnalysisManager {
                     jsonEdge.addProperty(getExportPropertyName(propertyName), actionEdge.getProperty(propertyName).toString());
                 }
                 elements.add(new Element(Element.GROUP_EDGES, jsonEdge, className));
+            }
+        }
+        return elements;
+    }
+
+    private ArrayList<Element> fetchConcreteActionEdges(OResultSet resultSet, String modelIdentifier) {
+        ArrayList<Element> elements = new ArrayList<>();
+        while (resultSet.hasNext()) {
+            OResult result = resultSet.next();
+            if (result.isEdge()) {
+                Optional<OEdge> op = result.getEdge();
+                if (!op.isPresent()) continue;
+                OEdge actionEdge = op.get();
+                OVertexDocument source = actionEdge.getProperty("out");
+                OVertexDocument target = actionEdge.getProperty("in");
+                Edge jsonEdge = new Edge("e" + formatId(actionEdge.getIdentity().toString()), "n" + formatId(source.getIdentity().toString()), "n" + formatId(target.getIdentity().toString()));
+                for (String propertyName : actionEdge.getPropertyNames()) {
+                    if (propertyName.contains("in") || propertyName.contains("out")) {
+                        continue;
+                    }
+                    if (propertyName.equals("screenshot")) {
+                        processScreenShot(actionEdge.getProperty("screenshot"), "e" + formatId(actionEdge.getIdentity().toString()), modelIdentifier);
+                        continue;
+                    }
+                    jsonEdge.addProperty(getExportPropertyName(propertyName), actionEdge.getProperty(propertyName).toString());
+                }
+                elements.add(new Element(Element.GROUP_EDGES, jsonEdge, "ConcreteAction"));
             }
         }
         return elements;
