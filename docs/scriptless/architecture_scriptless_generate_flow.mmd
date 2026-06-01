@@ -1,24 +1,27 @@
-flowchart LR
+flowchart TB
 
     Main["Main"]
-    ComposedProtocol["ComposedProtocol"]
     TestingServices["TestingServices"]
     ScriptlessCapabilities["ScriptlessCapabilities"]
+    ComposedProtocol["ComposedProtocol"]
     GenerateMode["GenerateMode"]
 
-    subgraph ScriptlessFlow["testar scriptless generate flow"]
-        SystemService["SystemService"]
-        StateService["StateService"]
-        OracleEvaluationService["OracleEvaluationService"]
-        ScriptlessOracleComposer["ScriptlessOracleComposer"]
-        ActionDerivationService["ActionDerivationService"]
-        ActionSelectorService["ActionSelectorService"]
-        ActionExecutionService["ActionExecutionService"]
+    subgraph ScriptlessFlow["scriptless generate flow"]
+        direction TB
 
         SettingsCapability["SettingsCapability"]
         TestSessionCapability["TestSessionCapability"]
         TestSequenceCapability["TestSequenceCapability"]
+
+        SystemService["SystemService"]
+        StateService["StateService"]
+        OracleEvaluationService["OracleEvaluationService"]
+        ScriptlessOracleComposer["ScriptlessOracleComposer"]
         StopCriteriaCapability["StopCriteriaCapability"]
+
+        ActionDerivationService["ActionDerivationService"]
+        ActionSelectorService["ActionSelectorService"]
+        ActionExecutionService["ActionExecutionService"]
     end
 
     Main --> ComposedProtocol
@@ -26,23 +29,20 @@ flowchart LR
     ScriptlessCapabilities --> ComposedProtocol
     ComposedProtocol --> GenerateMode
 
-    GenerateMode -. uses services .-> SystemService
-    GenerateMode -. uses capabilities .-> SettingsCapability
+    GenerateMode -. "uses services" .-> SystemService
+    GenerateMode -. "uses capabilities" .-> SettingsCapability
 
-    SettingsCapability -. test settings .-> TestSessionCapability
-    TestSessionCapability -. session lifecycle .-> TestSequenceCapability
-    TestSequenceCapability -. sequence lifecycle .-> SystemService
+    SettingsCapability -. "test settings" .-> TestSessionCapability
+    TestSessionCapability -. "session lifecycle" .-> TestSequenceCapability
+    TestSequenceCapability -. "sequence lifecycle" .-> SystemService
 
-    SystemService -. start system .-> StateService
+    SystemService -. "start system" .-> StateService
 
-    StateService -. current state .-> OracleEvaluationService
-    OracleEvaluationService -. base verdicts .-> ScriptlessOracleComposer
+    StateService -. "current state" .-> OracleEvaluationService
+    OracleEvaluationService -. "base verdicts" .-> ScriptlessOracleComposer
+    ScriptlessOracleComposer -. "composed verdicts" .-> StopCriteriaCapability
 
-    ScriptlessOracleComposer -. composed verdicts .-> StopCriteriaCapability
-    StopCriteriaCapability -. continue inner loop .-> ActionDerivationService
-
-    ActionDerivationService -. derived actions .-> ActionSelectorService
-
-    ActionSelectorService -. selected action .-> ActionExecutionService
-
-    ActionExecutionService -. next state cycle .-> StateService
+    StopCriteriaCapability -. "continue inner loop" .-> ActionDerivationService
+    ActionDerivationService -. "derived actions" .-> ActionSelectorService
+    ActionSelectorService -. "selected action" .-> ActionExecutionService
+    ActionExecutionService -. "next state cycle" .-> StateService

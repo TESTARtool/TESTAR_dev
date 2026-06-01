@@ -35,19 +35,17 @@ flowchart LR
         StateActionDeriver["StateActionDeriver"]
     end
 
-    subgraph PlatformPlanProviders["platform plan providers"]
+    subgraph PlatformPlanProviders["platform deriver and plan providers"]
         direction TB
+        PlatformWidgetActionDeriver["PlatformWidgetActionDeriver (WindowsWidgetActionDeriver/ WebdriverWidgetActionDeriver/ AndroidWidgetActionDeriver)"]
+        ForcedActions["Forced derivers <br> (generic or platform-specific)"]
         PlatformPlan["PlatformActionDerivationPlan (WindowsActionDerivationPlan/ WebdriverActionDerivationPlan/ AndroidActionDerivationPlan)"]
+        FallbackActions["Fallback derivers <br> (generic or platform-specific)"]
     end
 
     subgraph CustomPlanProviders["custom plan providers"]
         direction TB
-        CustomPlan["CustomActionDerivationPlan"]
-    end
-
-    subgraph PlatformDerivers["platform widget derivation"]
-        direction TB
-        PlatformWidgetActionDeriver["PlatformWidgetActionDeriver (WindowsWidgetActionDeriver/ WebdriverWidgetActionDeriver/ AndroidWidgetActionDeriver)"]
+        CustomPlan["CustomActionDerivationPlan <br> (advanced internal extension)"]
     end
 
     Orchestrator --> PolicyContexts
@@ -74,12 +72,11 @@ flowchart LR
 
     ComposedActionDerivationService -- "produces identified actions" --> derivedActions
 
-    %% horizontal row nudges    
+    %% horizontal row nudges
     PluginComposition ~~~ SharedContexts
     SharedContexts ~~~ ComposedDerivation
     ComposedDerivation ~~~ CoreDerivation
     PluginComposition ~~~ ComposedDerivation
 
-    PlatformDerivers ~~~ EngineDerivation
     EngineDerivation ~~~ PlatformPlanProviders
     PlatformPlanProviders ~~~ CustomPlanProviders

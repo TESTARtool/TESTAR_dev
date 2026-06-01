@@ -3,6 +3,7 @@ flowchart LR
         CP["ClickablePolicy"]
         TP["TypeablePolicy"]
         SP["ScrollablePolicy"]
+        SelP["SelectablePolicy"]
         EP["EnabledPolicy"]
         BP["BlockedPolicy"]
         WFP["WidgetFilterPolicy"]
@@ -14,6 +15,7 @@ flowchart LR
         CCP["CompositeClickablePolicy<br/>semantics: ANY"]
         CTP["CompositeTypeablePolicy<br/>semantics: ANY"]
         CSP["CompositeScrollablePolicy<br/>semantics: ANY"]
+        CSelP["CompositeSelectablePolicy<br/>semantics: ANY"]
         CEP["CompositeEnabledPolicy<br/>semantics: ALL"]
         CBP["CompositeBlockedPolicy<br/>semantics: ANY"]
         CWFP["CompositeWidgetFilterPolicy<br/>semantics: ALL"]
@@ -22,16 +24,17 @@ flowchart LR
     end
 
     subgraph GenericEnginePolicyImplementations["generic policy implementations"]
-        TEP["TagEnabledPolicy"]
-        TBP["TagBlockedPolicy"]
-        ConfWFP["ConfiguredWidgetFilterPolicy"]
-        ZITLP["ZIndexTopLevelPolicy"]
+        TEP["TagEnabledPolicy <br> set in platform/state logic"]
+        TBP["TagBlockedPolicy <br> set in platform/state logic"]
+        ConfWFP["ConfiguredWidgetFilterPolicy <br> set in settings/state logic"]
+        ZITLP["ZIndexTopLevelPolicy <br> set in state logic"]
     end
 
     subgraph PlatformPolicyImplementations["platform policy implementations"]
         PCP["PlatformClickablePolicy (WindowsClickablePolicy / WebdriverClickablePolicy / AndroidClickablePolicy)"]
         PTP["PlatformTypeablePolicy (WindowsTypeablePolicy / WebdriverTypeablePolicy / AndroidTypeablePolicy)"]
         PSP["PlatformScrollablePolicy (WindowsScrollablePolicy / WebdriverScrollablePolicy / AndroidScrollablePolicy)"]
+        PSelP["PlatformSelectablePolicy (WindowsSelectablePolicy / WebdriverSelectablePolicy / AndroidSelectablePolicy)"]
         PVP["PlatformVisiblePolicy (WindowsVisiblePolicy / WebdriverVisiblePolicy / AndroidVisiblePolicy)"]
     end
 
@@ -52,6 +55,7 @@ flowchart LR
     PCP -. implements .-> CP
     PTP -. implements .-> TP
     PSP -. implements .-> SP
+    PSelP -. implements .-> SelP
     PVP -. implements .-> VP
 
     TEP -. implements .-> EP
@@ -65,6 +69,7 @@ flowchart LR
     CP -- "1..n policies" --> CCP
     TP -- "1..n policies" --> CTP
     SP -- "1..n policies" --> CSP
+    SelP -- "1..n policies" --> CSelP
     EP -- "1..n policies" --> CEP
     BP -- "1..n policies" --> CBP
     WFP -- "1..n policies" --> CWFP
@@ -74,6 +79,7 @@ flowchart LR
     CCP --> PPC
     CTP --> PPC
     CSP --> PPC
+    CSelP --> PPC
     CEP --> PPC
     CBP --> PPC
     CWFP --> PPC
