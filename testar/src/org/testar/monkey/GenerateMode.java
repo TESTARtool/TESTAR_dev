@@ -38,7 +38,7 @@ import org.testar.monkey.alayer.SUT;
 import org.testar.monkey.alayer.State;
 import org.testar.monkey.alayer.Tags;
 import org.testar.monkey.alayer.Verdict;
-import org.testar.serialisation.LogSerialiser;
+import org.testar.settings.backend.LogSerialiser;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -93,7 +93,7 @@ public class GenerateMode {
 				State state = protocol.getState(system);
 
 				// beginSequence() - a script to interact with GUI, for example login screen
-				LogSerialiser.log("Starting sequence " + protocol.sequenceCount 
+				LogSerialiser.log("Starting sequence " + protocol.sequenceCount
 						+ " (output as: " + protocol.generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
 				protocol.beginSequence(system, state);
 

@@ -32,7 +32,7 @@
 package org.testar.settings.dialog;
 
 import org.testar.monkey.*;
-import org.testar.serialisation.LogSerialiser;
+import org.testar.settings.backend.LogSerialiser;
 import org.testar.settings.Settings;
 import org.testar.settings.extended.ExtendedSettingsFactory;
 
@@ -229,7 +229,7 @@ public class SettingsDialog extends JFrame implements Observer {
       populateInformation(settings);
       System.out.println("Switched to <" + settingsFile + ">");
       Main.SSE_ACTIVATED = sutSettings;
-      
+
     } catch (IOException ioe) {
     	String msg = "Unable to switch to <" + sutSettings + "> settings!";
     	LogSerialiser.log(msg);

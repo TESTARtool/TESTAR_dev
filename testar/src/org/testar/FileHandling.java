@@ -31,7 +31,7 @@
 
 package org.testar;
 
-import org.testar.serialisation.LogSerialiser;
+import org.testar.settings.backend.LogSerialiser;
 import org.testar.monkey.Util;
 import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.exceptions.NoSuchTagException;
@@ -76,7 +76,7 @@ public class FileHandling {
         try {
             copyToOutputDir(currentSeq, targetFolder);
         } catch (NoSuchTagException | IOException e) {
-            LogSerialiser.log("Error copying classified test sequence: " + e.getMessage() + "\n", 
+            LogSerialiser.log("Error copying classified test sequence: " + e.getMessage() + "\n",
                     LogSerialiser.LogLevel.Critical
                     );
         }

@@ -32,7 +32,7 @@ package org.testar.monkey;
 
 import org.testar.EventHandler;
 import org.testar.IEventListener;
-import org.testar.serialisation.LogSerialiser;
+import org.testar.settings.backend.LogSerialiser;
 import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.devices.MouseButtons;
 import java.util.EnumSet;

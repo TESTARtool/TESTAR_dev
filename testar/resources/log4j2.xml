@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN">
+<Configuration status="WARN" packages="org.testar.settings.backend">
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{yyyy-MM-dd-HH:mm:ss.SSS} %msg%n"/>
-			<Filters>
+            <Filters>
                 <!-- Allow only messages with level DEBUG and above to be printed to the console -->
                 <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
             </Filters>
@@ -16,12 +16,20 @@
                 <SizeBasedTriggeringPolicy size="10 MB" />
             </Policies>
         </RollingFile>
+        <WebSocket name="WebSocketAppender">
+            <PatternLayout pattern="%d{yyyy-MM-dd-HH:mm:ss.SSS} %msg%n"/>
+            <Filters>
+                <!-- Only send INFO and above to websocket to avoid overwhelming clients -->
+                <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </WebSocket>
     </Appenders>
     <Loggers>
-		<Logger name="io.netty" level="off"/> <!-- Ignore ugly warning https://github.com/netty/netty/issues/7817 -->
+        <Logger name="io.netty" level="off"/> <!-- Ignore ugly warning https://github.com/netty/netty/issues/7817 -->
         <Root level="ALL">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="RollingFile"/>
+            <AppenderRef ref="WebSocketAppender"/>
         </Root>
     </Loggers>
 </Configuration>

@@ -177,3 +177,44 @@ https://github.com/TESTARtool/TESTAR_dev/blob/master/CHANGELOG
 
 ## Required tools to create a windows.dll to update UIAutomation API
 https://github.com/TESTARtool/TESTAR_dev/wiki/Development:-Update-Windows-UIAutomation-(windows.dll)
+
+## API documentation
+
+TESTAR uses Javalin 6.7.0 to handle communication between the web interface and TESTAR. The following endpoints are used:
+
+- `POST /api/start` - Runs TESTAR in a new thread.
+  - Returns 409 if no protocol is configured or TESTAR is already running.
+- `GET /api/conf` - Returns all currently configured settings as a JSON map (tag names to values). 
+  - Returns 409 if no protocol is configured.
+- `POST /api/conf` - Saves (updates) settings specified in the request body (a JSON body of key-value pairs) in TESTAR. If a key is not provided, the corresponding setting is not updated.
+  - Returns 400 for invalid values.
+  - Returns 409 if no protocol is configured.
+- `GET /api/conf/spy/tags` - Returns Spy Mode tags. Tags are grouped by type (UIATags, WdTags, Tags).
+- `POST /api/conf/protocol` - Changes TESTAR protocol to what is specified in the request body (a file path). Creates a new SSE file for the protocol.
+  - Returns 500 on failure.
+- `GET /api/conf/protocol` - Returns the filepath of the selected protocol if configured, or a message indicating none is configured.
+- `GET /api/conf/protocol/available` - Returns a map of all available protocols (protocol names with corresponding filepaths).
+  - Returns 409 if settings directory is not found.
+- `GET /api/conf/{mode}/available` - Returns the available settings for the given mode.
+  - Returns 404 if the mode is unknown.
+- `GET /results/download` - Downloads the latest results as a zip file.
+  - Returns 409 if no tests have been run or the output directory does not exist.
+- `GET /api/reports` - Returns JSON object containing the reports directory path, the sequence ID, and a list of the available HTML (report) files.
+  - Returns 409 if no such reports directory exists.
+- `GET /api/reports/get?file=path` - Returns content of HTML file at the specified file path.
+  - Returns 400 if the file parameter is missing.
+  - Returns 403 if the file is not readable.
+  - Returns 404 if the file does not exist.
+
+### API Testing
+The API testing is done using RestAssured. The test cases are located in `org/testar/settings/backend/TestApi.java`.
+The test cases are highly expandable and can be executed with the command `gradlew :testar:test --tests "org.testar.settings.backend.TestApi"` or from the IDE.
+The following endpoints are tested:
+- `POST /api/conf/protocol`
+- `POST /api/conf`
+- `GET /api/conf`
+- `GET /api/conf/{mode}/available`
+- `GET /api/conf/protocol/available`
+
+## Known issues
+- "State Model" is not supported yet. Javalin uses a different version of Jetty than the one used in the State Model feature, which causes compatibility issues. Ideally, the State Model should be refactored to use the same version of Jetty.

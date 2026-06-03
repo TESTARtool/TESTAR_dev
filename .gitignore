@@ -1,5 +1,9 @@
+# GIPHOUSE, file changed by team
 .idea
+.vscode/
 .gradle/
+node_modules/
+.svelte-kit/
 bin/
 target/
 *.obj
@@ -21,3 +25,5 @@ build.bat
 /testar/testar.bat
 /testar/windows.dll
 /testar/index.log
+/testar/resources/dist
+.vscode

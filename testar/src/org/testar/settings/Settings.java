@@ -1,3 +1,4 @@
+// GIPHOUSE, file changed by team
 /***************************************************************************************************
  *
  * Copyright (c) 2013 - 2023 Universitat Politecnica de Valencia - www.upv.es
@@ -189,6 +190,15 @@ public class Settings extends TaggableBase implements Serializable {
 
 		return settings;
 	}
+	/**
+	* Get the string separator for a certain tag
+    * @param tag
+    * @return Separator String
+    */
+	public static String getStringSeparator(Tag<?> tag) {
+		return tag.equals(ConfigTags.AbstractStateAttributes)
+				? "," : ";";
+	}
 
 	private static Settings loadSettings(List<Pair<?, ?>> defaults, String filePath, String[] argv) throws IOException {
 		// If user use command line to input properties, mix file settings with cmd properties
@@ -213,7 +223,7 @@ public class Settings extends TaggableBase implements Serializable {
 		InputStreamReader isw = new InputStreamReader(fis, "UTF-8");
 		Reader in = new BufferedReader(isw);
 		props.load(in);
-		in.close();			
+		in.close();
 		if (isw != null) isw.close();
 		if (fis != null) fis.close();
 
@@ -236,7 +246,7 @@ public class Settings extends TaggableBase implements Serializable {
 			props.load(sr);
 		}
 
-		in.close();			
+		in.close();
 		if (isw != null) isw.close();
 		if (fis != null) fis.close();
 
@@ -323,10 +333,4 @@ public class Settings extends TaggableBase implements Serializable {
 	}
 
 	private String escapeBackslash(String string){ return string.replace("\\", "\\\\");	}
-
-	private static String getStringSeparator(Tag<?> tag) {
-		return tag.equals(ConfigTags.AbstractStateAttributes)
-				? "," : ";";
-	}
-
 }

@@ -39,7 +39,7 @@ import org.testar.monkey.alayer.actions.AnnotatingActionCompiler;
 import org.testar.monkey.alayer.devices.KBKeys;
 import org.testar.monkey.alayer.devices.MouseButtons;
 import org.testar.monkey.alayer.exceptions.WidgetNotFoundException;
-import org.testar.serialisation.LogSerialiser;
+import org.testar.settings.backend.LogSerialiser;
 
 import java.util.Collections;
 import java.util.List;
@@ -184,11 +184,11 @@ public class RecordMode {
 
 			//In Record-mode, we activate the visualization with Shift+ArrowUP:
 			if(protocol.visualizationOn) {
-				SutVisualization.visualizeState(false, 
-						protocol.markParentWidget, 
-						protocol.mouse, 
-						protocol.lastPrintParentsOf, 
-						protocol.cv, 
+				SutVisualization.visualizeState(false,
+						protocol.markParentWidget,
+						protocol.mouse,
+						protocol.lastPrintParentsOf,
+						protocol.cv,
 						state);
 			}
 

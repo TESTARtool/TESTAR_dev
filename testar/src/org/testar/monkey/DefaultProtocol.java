@@ -59,7 +59,7 @@ import org.testar.plugin.OperatingSystems;
 import org.testar.reporting.DummyReportManager;
 import org.testar.reporting.ReportManager;
 import org.testar.reporting.Reporting;
-import org.testar.serialisation.LogSerialiser;
+import org.testar.settings.backend.LogSerialiser;
 import org.testar.serialisation.ScreenshotSerialiser;
 import org.testar.serialisation.TestSerialiser;
 import org.testar.settings.Settings;
@@ -472,7 +472,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	/**
-	 * This method calls the startSystem() and starts the LogSerialiser. 
+	 * This method calls the startSystem() and starts the LogSerialiser.
 	 *
 	 * @return SUT system
 	 */
@@ -718,13 +718,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		if (sutConnectorType.equals(Settings.SUT_CONNECTOR_WINDOW_TITLE)) {
-			SutConnectorWindowTitle sutConnector = new SutConnectorWindowTitle(settings().get(ConfigTags.SUTConnectorValue), 
-					Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0), 
+			SutConnectorWindowTitle sutConnector = new SutConnectorWindowTitle(settings().get(ConfigTags.SUTConnectorValue),
+					Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0),
 					builder,
 					settings().get(ConfigTags.ForceForeground));
 			return sutConnector.startOrConnectSut();
 		}else if (sutConnectorType.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME)) {
-			SutConnectorProcessName sutConnector = new SutConnectorProcessName(settings().get(ConfigTags.SUTConnectorValue), 
+			SutConnectorProcessName sutConnector = new SutConnectorProcessName(settings().get(ConfigTags.SUTConnectorValue),
 					Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0));
 			return sutConnector.startOrConnectSut();
 		}else{
@@ -1079,9 +1079,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	/**
-	 * Select one of the available actions using the action selection algorithm of your choice. 
-	 * The default select action mechanism tries to use the state model action selector. 
-	 * If the state model is not enabled, it returns a random action. 
+	 * Select one of the available actions using the action selection algorithm of your choice.
+	 * The default select action mechanism tries to use the state model action selector.
+	 * If the state model is not enabled, it returns a random action.
 	 *
 	 * @param state the SUT's current state
 	 * @param actions the set of derived actions
@@ -1135,7 +1135,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			system.stop();
 		}
 	}
-	
+
 	/**
 	 * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
 	 */

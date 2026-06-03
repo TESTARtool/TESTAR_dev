@@ -1,5 +1,7 @@
+// GIPHOUSE, file changed by team
 plugins {
     id "de.undercouch.download" version "4.1.1"
+    id "com.github.node-gradle.node" version "7.1.0"
 }
 
 apply plugin: 'application'
@@ -10,6 +12,24 @@ apply from: 'workflow_windows_webdriver.gradle'
 apply from: 'workflow_ubuntu_webdriver.gradle'
 apply from: 'workflow_ubuntu_android.gradle'
 apply from: 'workflow_macos_webdriver.gradle'
+
+node {
+    version = '22.13.0'
+    npmVersion = '11.10.0'
+    download = true
+    workDir = file("../.gradle/nodejs")
+    nodeProjectDir = file("../TESTAR-WebInterface")
+}
+
+
+// Make Java resources depend on frontend build
+processResources {
+    dependsOn("npm_run_build")
+
+    doFirst {
+        mkdir "${projectDir}/target/resources/main/dist"
+    }
+}
 
 sourceSets {
     main {
@@ -86,6 +106,7 @@ task customZipDistribution(type: Zip) {
 }
 
 dependencies {
+    implementation("io.javalin:javalin:6.7.0")
     implementation project(':core')
     implementation project(':statemodel')
     implementation project(':webdriver')
@@ -168,6 +189,8 @@ applicationDistribution.from("../webdriver/resources/web-extension.xpi") {
 }
 
 prepareOracles.dependsOn(oracleClasses)
+
+test.dependsOn(prepareSettings)
 
 /**
  * Set the arguments of the jvm in the start scripts.

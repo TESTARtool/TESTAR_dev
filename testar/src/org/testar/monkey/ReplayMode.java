@@ -55,7 +55,7 @@ import org.testar.monkey.alayer.Verdict;
 import org.testar.monkey.alayer.Widget;
 import org.testar.monkey.alayer.exceptions.ActionFailedException;
 import org.testar.monkey.alayer.exceptions.WidgetNotFoundException;
-import org.testar.serialisation.LogSerialiser;
+import org.testar.settings.backend.LogSerialiser;
 
 public class ReplayMode {
 
@@ -113,8 +113,8 @@ public class ReplayMode {
 
 			double rrt = protocol.settings().get(ConfigTags.ReplayRetryTime);
 
-			while(success 
-					&& protocol.getReplayVerdict().severity() == Verdict.OK.severity() 
+			while(success
+					&& protocol.getReplayVerdict().severity() == Verdict.OK.severity()
 					&& protocol.mode() == Modes.Replay) {
 
 				//Initialize local fragment and read saved action of PathToReplaySequence File
@@ -186,7 +186,7 @@ public class ReplayMode {
 											widgetTitleFound = true;
 									}
 								} catch(WidgetNotFoundException e) {
-									LogSerialiser.log("WidgetNotFoundException when trying to replay the widget: " + widgetStringToFind + "\n", 
+									LogSerialiser.log("WidgetNotFoundException when trying to replay the widget: " + widgetStringToFind + "\n",
 											LogSerialiser.LogLevel.Critical);
 								}
 							}
@@ -207,9 +207,9 @@ public class ReplayMode {
 
 					// In Replay-mode, we only show the red dot if visualizationOn is true:
 					if(protocol.visualizationOn) {
-						SutVisualization.visualizeSelectedAction(protocol.settings(), 
-								protocol.cv, 
-								state, 
+						SutVisualization.visualizeSelectedAction(protocol.settings(),
+								protocol.cv,
+								state,
 								actionToReplay);
 					}
 

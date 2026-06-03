@@ -29,4 +29,3 @@ task cleanWindows(type: Exec) {
 
 //jar.dependsOn buildWindows
 //clean.dependsOn cleanWindows
-

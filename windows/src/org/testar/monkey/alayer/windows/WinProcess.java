@@ -58,6 +58,7 @@ import org.testar.monkey.alayer.exceptions.FruitException;
 import org.testar.monkey.alayer.exceptions.SystemStartException;
 import org.testar.monkey.alayer.exceptions.SystemStopException;
 
+// TODO use backend LogSerializer to send logs over websocket.
 import org.testar.serialisation.LogSerialiser;
 
 public final class WinProcess extends SUTBase {
@@ -67,7 +68,7 @@ public final class WinProcess extends SUTBase {
 	public static boolean politelyToForeground(long hwnd) throws WinApiException{
 		return Windows.SetForegroundWindow(hwnd);
 	}
-	
+
 	public static void toForeground(long pid) throws WinApiException{
 		toForeground(pid, 0.3, 100);
 	}
@@ -86,7 +87,7 @@ public final class WinProcess extends SUTBase {
 			}
 			kb.release(KBKeys.VK_ALT);
 			Util.pause(foregroundEstablishTime);
-		}	
+		}
 
 		if(!isForeground(pid) && isRunning(pid))
 			throw new WinApiException("Unable to bring process to foreground!");
@@ -111,7 +112,7 @@ public final class WinProcess extends SUTBase {
 		}
 		throw new SystemStartException("Process '" + processName + "' not found!");
 	}
-	
+
 	// by urueda
 	public static List<SUT> fromAll(){
 		List<WinProcHandle> processes = runningProcesses();
@@ -127,10 +128,10 @@ public final class WinProcess extends SUTBase {
 	}
 
 	/**
-	 * Execute the indicated SUT path and create a handle to the SUT process. 
-	 * Optionally connect with the SUT output and error buffer if ProcessListenerEnabled is enabled. 
-	 * Optionally indicate a regex expression for multi SUTProcesses. 
-	 * 
+	 * Execute the indicated SUT path and create a handle to the SUT process.
+	 * Optionally connect with the SUT output and error buffer if ProcessListenerEnabled is enabled.
+	 * Optionally indicate a regex expression for multi SUTProcesses.
+	 *
 	 * @param path
 	 * @param ProcessListenerEnabled
 	 * @param SUTProcesses
@@ -153,33 +154,33 @@ public final class WinProcess extends SUTBase {
 				ret.set(Tags.Desc, path);
 				return ret;
 			}
-			
+
 			//Associate Output / Error from SUT
 
 			final Process process = Runtime.getRuntime().exec(path);
 			Field field = process.getClass().getDeclaredField("handle");
 			field.setAccessible(true);
-			
+
 			long processHandle = field.getLong(process);
-			
+
 			//TODO: WaitForInputIdle is not working with java app, investigate this issue.
 			//TODO: Read Util.pause with new "Tags.SUTwaitInput" (think Tag name) from settings file
 			if(path.contains("java -jar"))
 				Util.pause(5);
 			else
 				Windows.WaitForInputIdle(processHandle);
-			
+
 			long pid = Windows.GetProcessId(processHandle);
-			
+
 			WinProcess returnProcess = fromPID(pid);
-			
+
 			returnProcess.set(Tags.StdErr,process.getErrorStream());
 			returnProcess.set(Tags.StdOut, process.getInputStream());
 			returnProcess.set(Tags.StdIn, process.getOutputStream());
-		    
+
 			//Investigate why this cause issue with cpu
 		    //Windows.CloseHandle(procHandle);
-			
+
 			returnProcess.set(Tags.Path, path);
 			returnProcess.set(Tags.Desc, path);
 			return returnProcess;
@@ -189,7 +190,7 @@ public final class WinProcess extends SUTBase {
 	}
 
 	// begin by wcoux
-	
+
 	public static WinProcess fromExecutableUwp(String appUserModelId) throws SystemStartException{
 		try{
 
@@ -304,7 +305,7 @@ public final class WinProcess extends SUTBase {
 		}
 		return Windows.GetProcessMemoryInfo(pid);
 	}
-	
+
 	/**
 	 * by urueda
 	 */
@@ -318,7 +319,7 @@ public final class WinProcess extends SUTBase {
 		}
 		return Windows.GetProcessTimes(pid);
 	}
-	
+
 	long hProcess;
 	final boolean stopProcess;
 	final Keyboard kbd = AWTKeyboard.build();
@@ -379,7 +380,7 @@ public final class WinProcess extends SUTBase {
 	}
 
 	public boolean isRunning() {
-		return (hProcess != 0 && Windows.GetExitCodeProcess(hProcess) == Windows.STILL_ACTIVE) 
+		return (hProcess != 0 && Windows.GetExitCodeProcess(hProcess) == Windows.STILL_ACTIVE)
 				|| multiProcessRunning();
 	}
 
@@ -414,9 +415,9 @@ public final class WinProcess extends SUTBase {
 
 	public boolean isForeground(){ return isForeground(pid()); }
 	public void toForeground(){ toForeground(pid()); }
-	
+
 	@SuppressWarnings("unchecked")
-	protected <T> T fetch(Tag<T> tag){		
+	protected <T> T fetch(Tag<T> tag){
 		if(tag.equals(Tags.StandardKeyboard))
 			return (T)kbd;
 		else if(tag.equals(Tags.StandardMouse))
@@ -433,7 +434,7 @@ public final class WinProcess extends SUTBase {
 			return (T) new WinProcessActivator(pid);
 		return null;
 	}
-	
+
 	protected Set<Tag<?>> tagDomain(){
 		Set<Tag<?>> ret = Util.newHashSet();
 		ret.add(Tags.StandardKeyboard);
@@ -443,7 +444,7 @@ public final class WinProcess extends SUTBase {
 		ret.add(Tags.SystemActivator);
 		return ret;
 	}
-	
+
 	public String getStatus(){
 		return "PID[ " + this.pid + " ] & HANDLE[ " + this.hProcess + " ] ... " + this.get(Tags.Desc,"");
 	}

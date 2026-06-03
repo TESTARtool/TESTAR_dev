@@ -54,7 +54,7 @@ import org.testar.monkey.alayer.windows.WinApiException;
 import org.testar.monkey.alayer.windows.WinProcess;
 import org.testar.monkey.alayer.windows.Windows;
 import org.testar.plugin.NativeLinker;
-import org.testar.serialisation.LogSerialiser;
+import org.testar.settings.backend.LogSerialiser;
 import org.testar.settings.Settings;
 
 import java.io.*;
@@ -131,7 +131,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		WdDriver.fullScreen = settings.get(ConfigTags.BrowserFullScreen);
 
 		//Force webdriver to switch to a new tab if opened
-		//This feature can block the correct display of select dropdown elements 
+		//This feature can block the correct display of select dropdown elements
 		WdDriver.forceActivateTab = settings.get(ConfigTags.SwitchNewTabs);
 
 		// List of HTML tags that TESTAR should ignore when obtaining the web state
@@ -140,7 +140,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		// List of web attributes that TESTAR should ignore when obtaining the web state
 		Constants.setIgnoredAttributes(settings.get(ConfigTags.WebIgnoredAttributes));
 	}
-	
+
 	/**
 	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
 	 */
@@ -150,7 +150,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		// reset web browser console verdict
 		webConsoleVerdict = Verdict.OK;
 	}
-    
+
     /**
      * This method is called when TESTAR starts the System Under Test (SUT). The method should
      * take care of
@@ -183,9 +183,9 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     }
 
     /**
-     * A workaround to obtain the browsers window handle, ideally this information is acquired when starting the 
-     * webdriver in the constructor of WdDriver. 
-     * A possible solution could be creating a snapshot of the running browser processes before and after. 
+     * A workaround to obtain the browsers window handle, ideally this information is acquired when starting the
+     * webdriver in the constructor of WdDriver.
+     * A possible solution could be creating a snapshot of the running browser processes before and after.
      */
     private void setWindowHandleForWebdriverBrowser(SUT sut) {
     	try {
@@ -243,7 +243,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected void beginSequence(SUT system, State state) {
     	super.beginSequence(system, state);
     }
-    
+
     /**
      * This method is called when the TESTAR requests the state of the SUT.
      * Here you can add additional information to the SUT's state or write your
@@ -269,10 +269,10 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 
     	if(settings.get(ConfigTags.ForceForeground)
     			&& System.getProperty("os.name").contains("Windows")
-    			&& state.get(Tags.IsRunning, false) 
+    			&& state.get(Tags.IsRunning, false)
     			&& !state.get(Tags.NotResponding, false)
-    			&& system.get(Tags.PID, (long)-1) != (long)-1 
-    			&& WinProcess.procName(system.get(Tags.PID)).contains("chrome") 
+    			&& system.get(Tags.PID, (long)-1) != (long)-1
+    			&& WinProcess.procName(system.get(Tags.PID)).contains("chrome")
     			&& !WinProcess.isForeground(system.get(Tags.PID))){
 
     	    String msg = "Trying to set the browser to Foreground... " + system.get(Tags.PID, -1L);
@@ -377,7 +377,7 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
     protected Action selectAction(State state, Set<Action> actions) {
     	return super.selectAction(state, actions);
     }
-    
+
     @Override
 	protected void finishSequence(){
 		//With webdriver version we don't use the call SystemProcessHandling.killTestLaunchedProcesses
@@ -542,14 +542,14 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		}
 
 		// Only allow pre-approved web domains
-		if(webDomainsAllowed != null 
+		if(webDomainsAllowed != null
 				&& !webDomainsAllowed.contains(getDomain(currentUrl))) {
 			return true;
 		}
 
 		// Only allow pre-approved web paths
-		if (webPathsAllowed != null 
-				&& !webPathsAllowed.isEmpty() 
+		if (webPathsAllowed != null
+				&& !webPathsAllowed.isEmpty()
 				// Empty web paths or generic / paths are allowed
 				&& !getPath(currentUrl).isEmpty()
 				&& !getPath(currentUrl).equals("/")) {
@@ -591,20 +591,20 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 		// For web links (e.g., https://para.testar.org/)
 		if ((linkUrl.startsWith("https://") || linkUrl.startsWith("http://"))) {
 			// Only allow pre-approved web domains (e.g., para.testar.org)
-			if(webDomainsAllowed != null 
+			if(webDomainsAllowed != null
 					&& !webDomainsAllowed.contains(getDomain(linkUrl))) {
 				return true;
 			}
 		}
 
 		// Check if webPathsAllowed is not empty and valid
-		if (webPathsAllowed != null 
+		if (webPathsAllowed != null
 				&& !webPathsAllowed.isEmpty()
 				&& !linkUrl.isEmpty()) {
 			// Create a regex pattern from the allowed paths
 			Pattern pattern = Pattern.compile(webPathsAllowed);
 
-			// When checking the allowed paths, 
+			// When checking the allowed paths,
 			// we need to transform possible relative urls to absolute urls
 			String absoluteUrl = resolveRelativeUrl(linkUrl, WdDriver.getCurrentUrl());
 
@@ -761,8 +761,8 @@ public class WebdriverProtocol extends GenericUtilsProtocol {
 	}
 
 	/**
-	 * Read the ClickableClasses property from test.settings file 
-	 * to update the clickableClasses while TESTAR is running in Spy mode. 
+	 * Read the ClickableClasses property from test.settings file
+	 * to update the clickableClasses while TESTAR is running in Spy mode.
 	 */
 	private void updateCssClassesFromTestSettingsFile() {
 		// Feature only for Spy mode

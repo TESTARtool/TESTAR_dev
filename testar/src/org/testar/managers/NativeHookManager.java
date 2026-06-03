@@ -34,7 +34,7 @@ import java.awt.GraphicsEnvironment;
 import java.util.logging.Level;
 
 import org.testar.EventHandler;
-import org.testar.serialisation.LogSerialiser;
+import org.testar.settings.backend.LogSerialiser;
 
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;

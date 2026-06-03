@@ -1,0 +1,33 @@
+name: Ubuntu TESTAR API CI tests
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+jobs:
+  linux:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-22.04
+    timeout-minutes: 2
+
+    strategy:
+      fail-fast: false
+      matrix:
+        java: [ '11' ]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java ${{ matrix.java }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: ${{ matrix.java }}
+          cache: 'gradle'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Run TestApi
+        run: ./gradlew :testar:test --tests org.testar.settings.backend.TestApi -x :testar:npm_run_build --build-cache --info --stacktrace

@@ -1,0 +1,30 @@
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #F5F5FF;
+  color: #222;
+}
+
+.content-block-design {
+  background-color: #eaebff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  width: 33%;
+}
+
+.btn {
+  background-color: #D9D9D9;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  color: #000;
+  font-weight: bold;
+}
+
+.btn:hover {
+  background-color: #C0C0C0;
+}

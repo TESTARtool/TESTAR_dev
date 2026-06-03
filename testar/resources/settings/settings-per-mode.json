@@ -1,0 +1,267 @@
+{
+    "StateModelSettings": {
+        "Mode": [
+            "Generate",
+            "Replay",
+            "AnalysisManager"
+        ],
+        "tags": {
+            "StateModelEnabled": "value",
+            "DataStore": "value",
+            "DataStoreType": "value",
+            "DataStoreServer": "value",
+            "DataStoreDirectory": "value",
+            "DataStoreDB": "value",
+            "DataStoreUser": "value",
+            "DataStorePassword": "value",
+            "DataStoreMode": "value",
+            "ActionSelectionAlgorithm": "value",
+            "StateModelStoreWidgets": "value",
+            "ResetDataStore": "value"
+        }
+    },
+    "AbstractionAttributes": {
+        "Mode": [
+            "Spy",
+            "Generate",
+            "Replay"
+        ],
+        "tags": {
+            "AbstractStateAttributes": "value"
+        }
+    },
+    "ReplayAndViewFile": {
+        "Mode": [
+            "Replay",
+            "View"
+        ],
+        "tags": {
+            "PathToReplaySequence": "value"
+        }
+    },
+    "GenerateReplayArtifact": {
+        "Mode": [
+            "Generate"
+        ],
+        "tags": {
+            "GenerateReplayableSequence": "value"
+        }
+    },
+    "ReplayTimes": {
+        "Mode": [
+            "Replay"
+        ],
+        "tags": {
+            "ReplayRetryTime": "value",
+            "UseRecordedActionDurationAndWaitTimeDuringReplay": "value"
+        }
+    },
+    "SpyVisualization": {
+        "Mode": [
+            "Spy"
+        ],
+        "tags": {
+            "RefreshSpyCanvas": "value",
+            "SpyTagAttributes": "value"
+        }
+    },
+    "VisualizeActions": {
+        "Mode": [
+            "Spy",
+            "Generate",
+            "Replay"
+        ],
+        "tags": {
+            "VisualizeActions": "value"
+        }
+    },
+    "LLMSettings": {
+        "Mode": [
+            "Generate"
+        ],
+        "tags": {
+            "LlmPlatform": "value",
+            "LlmModel": "value",
+            "LlmReasoning": "value",
+            "LlmHostUrl": "value",
+            "LlmAuthorizationHeader": "value",
+            "LlmTestGoals": "value",
+            "LlmActionFewshotFile": "value",
+            "LlmOracleFewshotFile": "value",
+            "LlmTemperature": "value",
+            "LlmHistorySize": "value",
+            "LlmStateless": "value"
+        }
+    },
+    "Coverage": {
+        "Mode": [
+            "Generate",
+            "Replay"
+        ],
+        "tags": {
+            "JacocoCoverage": "value",
+            "JacocoCoverageIpAddress": "value",
+            "JacocoCoveragePort": "value",
+            "JacocoCoverageClasses": "value",
+            "JacocoCoverageAccumulate": "value"
+        }
+    },
+    "SUTConnection": {
+        "Mode": [
+            "Spy",
+            "Generate",
+            "Replay"
+        ],
+        "tags": {
+            "SUTConnector": "value",
+            "SUTConnectorValue": "value",
+            "AlwaysCompile": "value",
+            "MyClassPath": "value",
+            "ProtocolClass": "value",
+            "ProtocolCompileDirectory": "value",
+            "StartupTime": "value",
+            "SUTProcesses": "value",
+            "AccessBridgeEnabled": "value",
+            "FlashFeedback": "value"
+        }
+    },
+    "SUTExecutionControl": {
+        "Mode": [
+            "Generate",
+            "Replay"
+        ],
+        "tags": {
+            "ForceForeground": "value",
+            "ProcessesToKillDuringTest": "value",
+            "UseSystemActions": "value",
+            "KeyBoardListener": "value"
+        }
+    },
+    "SUTFiltering": {
+        "Mode": [
+            "Spy",
+            "Generate",
+            "Replay"
+        ],
+        "tags": {
+            "ClickFilter": "value",
+            "TagsToFilter": "value"
+        }
+    },
+    "ExecutionLength": {
+        "Mode": [
+            "Generate",
+            "Replay"
+        ],
+        "tags": {
+            "Sequences": "value",
+            "SequenceLength": "value",
+            "MaxTime": "value"
+        }
+    },
+    "ActionsTimes": {
+        "Mode": [
+            "Generate",
+            "Replay"
+        ],
+        "tags": {
+            "ActionDuration": "value",
+            "TimeToWaitAfterAction": "value"
+        }
+    },
+    "ReinforcementLearning": {
+        "Mode": [
+            "Generate"
+        ],
+        "tags": {
+            "MaxReward": "value",
+            "Discount": "value"
+        }
+    },
+    "TestOracles": {
+        "Mode": [
+            "Generate",
+            "Replay"
+        ],
+        "tags": {
+            "SuspiciousTags": "value",
+            "TagsForSuspiciousOracle": "value",
+            "ProcessListenerEnabled": "value",
+            "SuspiciousProcessOutput": "value",
+            "ProcessLogs": "value",
+            "LogOracleEnabled": "value",
+            "LogOracleRegex": "value",
+            "LogOracleCommands": "value",
+            "LogOracleFiles": "value",
+            "WebConsoleErrorOracle": "value",
+            "WebConsoleErrorPattern": "value",
+            "WebConsoleWarningOracle": "value",
+            "WebConsoleWarningPattern": "value",
+            "FaultThreshold": "value",
+            "OnlySaveFaultySequences": "value",
+            "StopGenerationOnFault": "value",
+            "TimeToFreeze": "value",
+            "ExtendedOracles": "value"
+        }
+    },
+    "OutputAndReporting": {
+        "Mode": [
+            "Generate",
+            "Replay"
+        ],
+        "tags": {
+            "ApplicationName": "value",
+            "ApplicationVersion": "value",
+            "OutputDir": "value",
+            "TempDir": "value",
+            "ReportInHTML": "value",
+            "ReportInPlainText": "value",
+            "CreateWidgetInfoJsonFile": "value",
+            "Delete": "value",
+            "CopyFromTo": "value",
+            "LogLevel": "value"
+        }
+    },
+    "WebDriverInteraction": {
+        "Mode": [
+            "Spy",
+            "Generate",
+            "Replay"
+        ],
+        "tags": {
+            "ClickableClasses": "value",
+            "TypeableClasses": "value",
+            "DeniedExtensions": "value",
+            "WebDomainsAllowed": "value",
+            "WebPathsAllowed": "value",
+            "FollowLinks": "value",
+            "BrowserFullScreen": "value",
+            "SwitchNewTabs": "value",
+            "WebIgnoredTags": "value",
+            "WebIgnoredAttributes": "value",
+            "OverrideWebDriverDisplayScale": "value",
+            "FormFillingAction": "value"
+        }
+    },
+    "ProtocolSpecific": {
+        "Mode": [
+            "Spy",
+            "Generate",
+            "Replay"
+        ],
+        "tags": {
+            "ProtocolSpecificSetting_1": "value",
+            "ProtocolSpecificSetting_2": "value"
+        }
+    },
+    "ExtendedSettingsFile": {
+        "Mode": [
+            "Spy",
+            "Generate",
+            "Replay"
+        ],
+        "tags": {
+            "ExtendedSettingsFile": "value"
+        }
+    }
+}
