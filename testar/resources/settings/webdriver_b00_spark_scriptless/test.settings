@@ -88,7 +88,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[lL]ogout.*|.*account.*|.*[dD]elete.*
+ClickFilter = .*[lL]ogout.*|.*account.*|.*[dD]elete.*|.*[aA]ctive.*
 TagsToFilter = Title;WebName;WebTagName;WebHref;WebTextContent;Desc
 
 #################################################################
@@ -132,7 +132,8 @@ ResetDataStore = false
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WebWidgetTextContent,WebWidgetPlaceholder,WebWidgetInnerText
+
+AbstractStateAttributes = WebWidgetTextContent,WebWidgetInnerText,WebWidgetTagName,WebWidgetPlaceholder,WebWidgetType
 
 #################################################################
 # LLM agents settings

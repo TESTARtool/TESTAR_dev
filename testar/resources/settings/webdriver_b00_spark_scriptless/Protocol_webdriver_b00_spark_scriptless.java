@@ -246,6 +246,15 @@ public class Protocol_webdriver_b00_spark_scriptless extends WebdriverProtocol {
 			}
 		}
 
+		// Clicking ESC or doing history back can provoke non-determinism
+		// So, in this specific inference strategy, we execute a NOP action
+		if(actions.size() < 1){
+			NOP nop = new NOP();
+			nop.set(Tags.OriginWidget, state);
+			actions.add(nop);
+		}
+
+
 		// If we have forced actions, prioritize and filter the other ones
 		if (forcedActions != null && forcedActions.size() > 0) {
 			filteredActions = actions;
@@ -260,7 +269,8 @@ public class Protocol_webdriver_b00_spark_scriptless extends WebdriverProtocol {
 
 	@Override
 	protected boolean isClickable(Widget widget) {
-		if(widget.get(WdTags.WebCssClasses, "").contains("Button")) {
+		if(widget.get(WdTags.WebCssClasses, "").contains("Button")
+			&& widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdLI)) {
 			return true;
 		}
 		if(widget.get(WdTags.WebCssClasses, "").contains("projectMain")) {
