@@ -164,7 +164,8 @@ ResetDataStore = false
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
-AbstractStateAttributes = WebWidgetId
+
+AbstractStateAttributes = WebWidgetValue,WebWidgetId,WebWidgetName
 
 #################################################################
 # WebDriver features

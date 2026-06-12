@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -610,6 +610,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         // get the concrete state and make a vertex out of it
         EntityClass concreteStateClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.ConcreteState);
         VertexEntity stateEntity = new VertexEntity(concreteStateClass);
+        stateEntity.enableUpdate(false);
 
         // hydrate the entity to a format the orient database can store
         try {

@@ -167,6 +167,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		ret.set(Tags.Desc, "Type '" + Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "...") + "' into '" + widget.get(Tags.Desc, "<no description>" + "'")); // by urueda
 		ret.set(Tags.InputText, text);
 		ret.mapOriginWidget(widget);
+		ret.set(Tags.InputText, text);
         return ret;
 	}
 
