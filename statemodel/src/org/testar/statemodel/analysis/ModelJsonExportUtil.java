@@ -54,70 +54,49 @@ public final class ModelJsonExportUtil {
                                                          Object hybridJsonModel,
                                                          String abstractFilename,
                                                          Object abstractJsonModel,
-                                                         List<ScreenshotExport> screenshotExports) {
-        String safeHybridFilename = (hybridFilename == null || hybridFilename.trim().isEmpty()) ? "model_hybrid.json" : hybridFilename;
-        String safeAbstractFilename = (abstractFilename == null || abstractFilename.trim().isEmpty()) ? "model_abstract.json" : abstractFilename;
-        String screenshotFolderName = removeJsonExtension(safeHybridFilename) + "_screenshots";
+                                                         List<ScreenshotExport> hybridScreenshotExports,
+                                                         List<ScreenshotExport> abstractScreenshotExports) {
+        String safeHybridFilename = hybridJsonModel == null ? null :
+                ((hybridFilename == null || hybridFilename.trim().isEmpty()) ? "model_hybrid.json" : hybridFilename);
+        String safeAbstractFilename = abstractJsonModel == null ? null :
+                ((abstractFilename == null || abstractFilename.trim().isEmpty()) ? "model_abstract.json" : abstractFilename);
+        String hybridScreenshotFolderName = safeHybridFilename == null ? null : removeJsonExtension(safeHybridFilename) + "_screenshots";
+        String abstractScreenshotFolderName = safeAbstractFilename == null ? null : removeJsonExtension(safeAbstractFilename) + "_screenshots";
         File graphFolder = ensureOutputSubFolder(outputDir, modelIdentifier);
         File exportFolder = ensureOutputSubFolder(outputDir, modelIdentifier + File.separator + "json_exported");
-        File screenshotFolder = ensureOutputSubFolder(outputDir, modelIdentifier + File.separator + "json_exported" + File.separator + screenshotFolderName);
-        File hybridOutputFile = new File(exportFolder, safeHybridFilename);
-        File abstractOutputFile = new File(exportFolder, safeAbstractFilename);
+        File hybridScreenshotFolder = hybridScreenshotFolderName == null ? null :
+                ensureOutputSubFolder(outputDir, modelIdentifier + File.separator + "json_exported" + File.separator + hybridScreenshotFolderName);
+        File abstractScreenshotFolder = abstractScreenshotFolderName == null ? null :
+                ensureOutputSubFolder(outputDir, modelIdentifier + File.separator + "json_exported" + File.separator + abstractScreenshotFolderName);
+        File hybridOutputFile = safeHybridFilename == null ? null : new File(exportFolder, safeHybridFilename);
+        File abstractOutputFile = safeAbstractFilename == null ? null : new File(exportFolder, safeAbstractFilename);
 
         ModelJsonExportResult result = new ModelJsonExportResult();
         result.hybridFilename = safeHybridFilename;
         result.abstractFilename = safeAbstractFilename;
         result.exportFolder = normalizePath(exportFolder);
-        result.screenshotFolder = normalizePath(screenshotFolder);
+        result.hybridScreenshotFolder = normalizePath(hybridScreenshotFolder);
+        result.abstractScreenshotFolder = normalizePath(abstractScreenshotFolder);
         result.screenshotCount = 0;
+        result.hybridScreenshotCount = 0;
+        result.abstractScreenshotCount = 0;
         result.stateScreenshotCount = 0;
         result.actionScreenshotCount = 0;
         result.missingScreenshots = new ArrayList<>();
 
         try {
-            OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValue(hybridOutputFile, hybridJsonModel);
-            OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValue(abstractOutputFile, abstractJsonModel);
+            if (hybridOutputFile != null) {
+                OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValue(hybridOutputFile, hybridJsonModel);
+            }
+            if (abstractOutputFile != null) {
+                OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValue(abstractOutputFile, abstractJsonModel);
+            }
         } catch (IOException e) {
             throw new RuntimeException("Unable to write model json exports", e);
         }
 
-        if (screenshotExports != null) {
-            for (ScreenshotExport screenshotExport : screenshotExports) {
-                if (screenshotExport == null) {
-                    continue;
-                }
-
-                String sourceImageName = screenshotExport.SourceImageName;
-                String outputImageName = screenshotExport.OutputImageName;
-
-                if (sourceImageName == null || sourceImageName.trim().isEmpty()) {
-                    continue;
-                }
-                if (outputImageName == null || outputImageName.trim().isEmpty()) {
-                    continue;
-                }
-
-                File sourceFile = new File(graphFolder, sourceImageName);
-                File targetFile = new File(screenshotFolder, outputImageName);
-
-                if (!sourceFile.isFile()) {
-                    result.missingScreenshots.add(sourceImageName);
-                    continue;
-                }
-
-                try {
-                    copyFile(sourceFile.toPath(), targetFile.toPath());
-                    result.screenshotCount++;
-                    if ("action".equalsIgnoreCase(screenshotExport.ExportType)) {
-                        result.actionScreenshotCount++;
-                    } else {
-                        result.stateScreenshotCount++;
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException("Unable to copy model export screenshot " + sourceImageName, e);
-                }
-            }
-        }
+        exportScreenshots(graphFolder, hybridScreenshotFolder, hybridScreenshotExports, result, true);
+        exportScreenshots(graphFolder, abstractScreenshotFolder, abstractScreenshotExports, result, false);
 
         return result;
     }
@@ -152,7 +131,64 @@ public final class ModelJsonExportUtil {
         Files.copy(sourceFile, targetFile, StandardCopyOption.REPLACE_EXISTING);
     }
 
+    private static void exportScreenshots(File graphFolder,
+                                          File targetFolder,
+                                          List<ScreenshotExport> screenshotExports,
+                                          ModelJsonExportResult result,
+                                          boolean hybridFolder) {
+        if (screenshotExports == null) {
+            return;
+        }
+        if (targetFolder == null) {
+            return;
+        }
+
+        for (ScreenshotExport screenshotExport : screenshotExports) {
+            if (screenshotExport == null) {
+                continue;
+            }
+
+            String sourceImageName = screenshotExport.SourceImageName;
+            String outputImageName = screenshotExport.OutputImageName;
+
+            if (sourceImageName == null || sourceImageName.trim().isEmpty()) {
+                continue;
+            }
+            if (outputImageName == null || outputImageName.trim().isEmpty()) {
+                continue;
+            }
+
+            File sourceFile = new File(graphFolder, sourceImageName);
+            File targetFile = new File(targetFolder, outputImageName);
+
+            if (!sourceFile.isFile()) {
+                result.missingScreenshots.add(sourceImageName);
+                continue;
+            }
+
+            try {
+                copyFile(sourceFile.toPath(), targetFile.toPath());
+                result.screenshotCount++;
+                if (hybridFolder) {
+                    result.hybridScreenshotCount++;
+                } else {
+                    result.abstractScreenshotCount++;
+                }
+                if ("action".equalsIgnoreCase(screenshotExport.ExportType)) {
+                    result.actionScreenshotCount++;
+                } else {
+                    result.stateScreenshotCount++;
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to copy model export screenshot " + sourceImageName, e);
+            }
+        }
+    }
+
     private static String normalizePath(File file) {
+        if (file == null) {
+            return null;
+        }
         try {
             return file.toPath().toAbsolutePath().normalize().toString();
         } catch (Exception e) {
@@ -170,8 +206,11 @@ public final class ModelJsonExportUtil {
         public String hybridFilename;
         public String abstractFilename;
         public String exportFolder;
-        public String screenshotFolder;
+        public String hybridScreenshotFolder;
+        public String abstractScreenshotFolder;
         public int screenshotCount;
+        public int hybridScreenshotCount;
+        public int abstractScreenshotCount;
         public int stateScreenshotCount;
         public int actionScreenshotCount;
         public List<String> missingScreenshots;

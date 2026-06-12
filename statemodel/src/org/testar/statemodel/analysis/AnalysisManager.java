@@ -612,12 +612,13 @@ public class AnalysisManager {
         }
     }
 
-    public ModelJsonExportUtil.ModelJsonExportResult exportHybridModel(String modelIdentifier,
-                                                                       String hybridFilename,
-                                                                       Object hybridJsonModel,
-                                                                       String abstractFilename,
-                                                                       Object abstractJsonModel,
-                                                                       List<ModelJsonExportUtil.ScreenshotExport> screenshotExports) {
+    public ModelJsonExportUtil.ModelJsonExportResult exportModelFiles(String modelIdentifier,
+                                                                      String hybridFilename,
+                                                                      Object hybridJsonModel,
+                                                                      String abstractFilename,
+                                                                      Object abstractJsonModel,
+                                                                      List<ModelJsonExportUtil.ScreenshotExport> hybridScreenshotExports,
+                                                                      List<ModelJsonExportUtil.ScreenshotExport> abstractScreenshotExports) {
         return ModelJsonExportUtil.exportModelFiles(
                 outputDir,
                 modelIdentifier,
@@ -625,7 +626,8 @@ public class AnalysisManager {
                 hybridJsonModel,
                 abstractFilename,
                 abstractJsonModel,
-                screenshotExports
+                hybridScreenshotExports,
+                abstractScreenshotExports
         );
     }
 

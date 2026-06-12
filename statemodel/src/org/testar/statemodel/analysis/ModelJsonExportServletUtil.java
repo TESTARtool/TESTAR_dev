@@ -49,13 +49,14 @@ public final class ModelJsonExportServletUtil {
                                            AnalysisManager analysisManager,
                                            String modelIdentifier) throws IOException {
         ModelJsonExportRequest exportRequest = OBJECT_MAPPER.readValue(request.getInputStream(), ModelJsonExportRequest.class);
-        ModelJsonExportUtil.ModelJsonExportResult exportResult = analysisManager.exportHybridModel(
+        ModelJsonExportUtil.ModelJsonExportResult exportResult = analysisManager.exportModelFiles(
                 modelIdentifier,
                 exportRequest.hybridFilename,
                 exportRequest.hybridJsonModel,
                 exportRequest.abstractFilename,
                 exportRequest.abstractJsonModel,
-                exportRequest.screenshotExports
+                exportRequest.hybridScreenshotExports,
+                exportRequest.abstractScreenshotExports
         );
 
         response.setContentType("application/json");
@@ -68,6 +69,7 @@ public final class ModelJsonExportServletUtil {
         public String abstractFilename;
         public Object hybridJsonModel;
         public Object abstractJsonModel;
-        public List<ModelJsonExportUtil.ScreenshotExport> screenshotExports;
+        public List<ModelJsonExportUtil.ScreenshotExport> hybridScreenshotExports;
+        public List<ModelJsonExportUtil.ScreenshotExport> abstractScreenshotExports;
     }
 }
