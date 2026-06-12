@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,6 +30,7 @@
 
 package org.testar.statemodel;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class ConcreteAction extends ModelWidget {
@@ -43,6 +44,9 @@ public class ConcreteAction extends ModelWidget {
      * The abstract action that abstracts this concrete action.
      */
     private final AbstractAction abstractAction;
+
+    // a byte array holding the screenshot for this action
+    private byte[] screenshot;
 
     /**
      * Constructor.
@@ -63,5 +67,21 @@ public class ConcreteAction extends ModelWidget {
 
     public AbstractAction getAbstractAction() {
         return abstractAction;
+    }
+
+    /**
+     * Retrieves the screenshot data for this action.
+     * @return
+     */
+    public byte[] getScreenshot() {
+        return screenshot != null ? Arrays.copyOf(screenshot, screenshot.length) : new byte[0];
+    }
+
+    /**
+     * Sets the screenshot data for this action.
+     * @param screenshot
+     */
+    public void setScreenshot(byte[] screenshot) {
+        this.screenshot = screenshot != null ? Arrays.copyOf(screenshot, screenshot.length) : null;
     }
 }

@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2018 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -281,6 +281,11 @@ public class EntityClassFactory {
         actionId.setNullable(false);
         actionId.setIdentifier(false);
         concreteActionClass.addProperty(actionId);
+        Property screenshot = new Property("screenshot", OType.BINARY);
+        screenshot.setMandatory(false);
+        screenshot.setNullable(true);
+        screenshot.setIdentifier(false);
+        concreteActionClass.addProperty(screenshot);
         Property counter = new Property("counter", OType.INTEGER);
         counter.setMandatory(true);
         counter.setNullable(false);

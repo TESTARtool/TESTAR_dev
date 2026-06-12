@@ -105,23 +105,16 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 	protected void beginSequence(SUT system, State state) {
 		super.beginSequence(system, state);
 
-		// Add your login sequence here
+		// Add your login sequence here 
+		// The login sequence can be saved in the state model if enabled (due to executeTriggeredAction logic)
+		// NOTE: We pass a refreshed state for correctly mapping the transitions
 		/*
-		waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","username", "john", state, system, 5,1.0);
+		waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","username", "john", getState(system), system, 5,1.0);
 
-		waitLeftClickAndTypeIntoWidgetWithMatchingTag("name","password", "demo", state, system, 5,1.0);
+		waitLeftClickAndPasteIntoWidgetWithMatchingTag("name","password", "demo", getState(system), system, 5,1.0);
 
-		waitAndLeftClickWidgetWithMatchingTag("value", "Log In", state, system, 5, 1.0);
+		waitAndLeftClickWidgetWithMatchingTag("value", "Log In", getState(system), system, 5, 1.0);
 		 */
-
-		/*
-		 * If you have issues typing special characters
-		 * 
-		 * Try to use Paste Action with method:
-		 * waitLeftClickAndPasteIntoWidgetWithMatchingTag
-		 */
-		// waitLeftClickAndPasteIntoWidgetWithMatchingTag("name", "username", "john", state, system, 5,1.0);
-
 
 		/*
 		 * You can also use multiple Tags to find the correct widget. 
@@ -133,8 +126,22 @@ public class Protocol_02_webdriver_parabank extends WebdriverProtocol {
 		mapParabank.put("TextContent", "About Us");
 		mapParabank.put("Display", "inline");
 
-		waitAndLeftClickWidgetWithMatchingTags(mapParabank, state, system, 5, 1.0);
+		waitAndLeftClickWidgetWithMatchingTags(mapParabank, getState(system), system, 5, 1.0);
 		 */
+	}
+
+	@Override
+	protected boolean executeTriggeredAction(SUT system, State state, Action triggeredAction) {
+		// Save the state information in the model
+		stateModelManager.notifyNewStateReached(state, new HashSet<>(Collections.singletonList(triggeredAction)));
+
+		// Execute the desired triggeredAction (click, type, paste)
+		boolean executed = super.executeTriggeredAction(system, state, triggeredAction);
+
+		// Save the triggeredAction information in the model
+		stateModelManager.notifyActionExecution(triggeredAction);
+
+		return executed;
 	}
 
 	/**

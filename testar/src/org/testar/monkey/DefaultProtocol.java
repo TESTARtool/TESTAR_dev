@@ -834,6 +834,19 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 	}
 
+	/**
+	 * Take a Screenshot of the Action and associate the path into action tag
+	 */
+	private void setActionScreenshot(State state, Action action) {
+		// If the environment is not headless, take a screenshot
+		if (!GraphicsEnvironment.isHeadless()) {
+		    String actionScreenshotPath = ScreenshotProviderFactory.current().getActionshot(state, action);
+		    if (actionScreenshotPath != null && !actionScreenshotPath.isEmpty()) {
+			    action.set(Tags.ActionScreenshotPath, actionScreenshotPath);
+		    }
+	    }
+	}
+
 	@Override
 	protected List<Verdict> getVerdicts(State state) {
 		Assert.notNull(state);
@@ -1043,7 +1056,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		// adding the action that is going to be executed into report:
 		reportManager.addSelectedAction(state, action);
 
-		ScreenshotProviderFactory.current().getActionshot(state, action);
+		setActionScreenshot(state, action);
 
 		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction);
 
@@ -1076,7 +1089,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	    reportManager.addSelectedAction(state, action);
 
 	    // Get an action screenshot based on the NativeLinker platform
-	    ScreenshotProviderFactory.current().getActionshot(state, action);
+	    setActionScreenshot(state, action);
 
 	    try{
 	        double halfWait = actionWaitTime == 0 ? 0.01 : actionWaitTime / 2.0; // seconds
