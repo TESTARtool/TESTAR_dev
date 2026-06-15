@@ -437,7 +437,7 @@
 
                     {#if selectedSourceFile?.category === "policy"}
                         <div class="composition-modal-backdrop" on:click|self={closePolicyModal} role="presentation">
-                            <div class="composition-modal" role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="policy-modal-title">
+                            <div class="composition-modal composition-modal-policy" role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="policy-modal-title">
                                 <div class="composition-modal-header">
                                     <div>
                                         <span class="flow-node-kicker">Policy Source</span>

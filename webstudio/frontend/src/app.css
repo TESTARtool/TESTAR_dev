@@ -10,6 +10,7 @@
     --radius: 18px;
     --mono: "Cascadia Code", "Consolas", monospace;
     --sans: "Segoe UI", "Trebuchet MS", sans-serif;
+    --studio-workbench-height: calc(100vh - 110px);
 }
 
 * {
@@ -84,7 +85,13 @@ body {
     display: grid;
     grid-template-columns: 320px minmax(0, 1fr);
     gap: 16px;
-    align-items: start;
+    align-items: stretch;
+}
+
+.studio-layout > .panel {
+    min-height: var(--studio-workbench-height);
+    max-height: var(--studio-workbench-height);
+    overflow-y: auto;
 }
 
 .panel {
@@ -225,7 +232,7 @@ input[type="search"] {
 
 textarea {
     width: 100%;
-    min-height: 456px;
+    min-height: 750px;
     margin-top: 12px;
     padding: 14px;
     resize: vertical;
@@ -361,6 +368,11 @@ button:disabled {
 .content-panel {
     display: grid;
     gap: 18px;
+    align-content: start;
+}
+
+.editor-section {
+    min-height: 100%;
 }
 
 .settings-toolbar {
@@ -950,12 +962,18 @@ button:disabled {
     box-shadow: 0 28px 56px rgba(20, 30, 42, 0.24);
 }
 
+.composition-modal-policy {
+    min-height: calc(100vh - 116px);
+    display: flex;
+    flex-direction: column;
+}
+
 .composition-modal-header {
     display: flex;
     justify-content: space-between;
     gap: 16px;
     align-items: flex-start;
-    margin-bottom: 14px;
+    margin-bottom: 4px;
 }
 
 .composition-modal-actions {
@@ -966,11 +984,15 @@ button:disabled {
 }
 
 .composition-modal-body {
-    margin-top: 18px;
+    margin-top: 4px;
+}
+
+.composition-modal-policy .composition-modal-body {
+    flex: 1 1 auto;
 }
 
 .composition-modal-body textarea {
-    min-height: 560px;
+    min-height: 580px;
 }
 
 .composition-modal-empty {
