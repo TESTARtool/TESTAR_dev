@@ -160,6 +160,12 @@
         }
     }
 
+    $: flowStartNodes = compositionFlowNodes.slice(0, 4);
+    $: flowStopNode = compositionFlowNodes[4];
+    $: flowStateNodes = compositionFlowNodes.slice(5, 9);
+    $: flowActionNodes = compositionFlowNodes.slice(9, 13);
+    $: flowExtraNodes = compositionFlowNodes.slice(13);
+
 </script>
 
 <main class="studio-layout">
@@ -474,10 +480,102 @@
                         </div>
 
                         {#if compositionFlowNodes.length > 0}
-                            <div class="flow-graph flow-graph-circular">
-                                <div class="flow-top-pipeline">
-                                    {#each compositionFlowNodes.slice(0, 4) as flowNode, index}
-                                        <article class="flow-graph-step flow-top-step">
+                            <div class="flow-graph flow-graph-clock">
+                                <svg class="flow-clock-connectors" viewBox="0 0 1000 420" preserveAspectRatio="none" aria-hidden="true">
+                                    <defs>
+                                        <marker id="flow-clock-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                                            <path d="M 0 0 L 10 5 L 0 10 z"></path>
+                                        </marker>
+                                    </defs>
+                                    <!-- SystemService -> StopCriteriaCapability -->
+                                    <path class="flow-clock-path" d="M130 75 C285 30 445 40 520 30" marker-end="url(#flow-clock-arrow)"></path>
+                                    <!-- ActionDerivationService -> StopCriteriaCapability -->
+                                    <path class="flow-clock-path" d="M390 75 C455 42 485 50 520 50" marker-end="url(#flow-clock-arrow)"></path>
+                                    <!-- StopCriteriaCapability -> StateService -->
+                                    <path class="flow-clock-path" d="M730 40 C810 50 830 65 860 75" marker-end="url(#flow-clock-arrow)"></path>
+                                    <!-- Custom Oracle Services -> ActionExecutionService -->
+                                    <path class="flow-clock-path" d="M750 390 C725 405 590 405 510 390" marker-end="url(#flow-clock-arrow)"></path>
+                                </svg>
+
+                                <section class="flow-group flow-group-start flow-group-up" aria-label="Composition setup">
+                                    {#each flowStartNodes.slice().reverse() as flowNode}
+                                        <button
+                                            class="flow-node"
+                                            class:flow-default={flowMode(flowNode) === "default"}
+                                            class:flow-custom={flowMode(flowNode) === "custom"}
+                                            class:flow-oracle={flowMode(flowNode) === "oracle"}
+                                            class:flow-invalid={flowMode(flowNode) === "invalid"}
+                                            class:flow-selected={selectedCompositionFlowNode === flowNode}
+                                            on:click={() => selectCompositionFlowNode(flowNode)}
+                                        >
+                                            <span class="flow-node-kicker">{flowRole(flowNode)}</span>
+                                            <strong>{flowNodeTitle(flowNode)}</strong>
+                                            <small>{flowImplementation(flowNode)}</small>
+                                            <span class="flow-badge">{flowModeLabel(flowNode)}</span>
+                                        </button>
+                                    {/each}
+                                </section>
+
+                                {#if flowStopNode}
+                                    <section class="flow-group flow-group-stop" aria-label="Stop criteria gate">
+                                        <button
+                                            class="flow-node"
+                                            class:flow-default={flowMode(flowStopNode) === "default"}
+                                            class:flow-custom={flowMode(flowStopNode) === "custom"}
+                                            class:flow-oracle={flowMode(flowStopNode) === "oracle"}
+                                            class:flow-invalid={flowMode(flowStopNode) === "invalid"}
+                                            class:flow-selected={selectedCompositionFlowNode === flowStopNode}
+                                            on:click={() => selectCompositionFlowNode(flowStopNode)}
+                                        >
+                                            <span class="flow-node-kicker">{flowRole(flowStopNode)}</span>
+                                            <strong>{flowNodeTitle(flowStopNode)}</strong>
+                                            <small>{flowImplementation(flowStopNode)}</small>
+                                            <span class="flow-badge">{flowModeLabel(flowStopNode)}</span>
+                                        </button>
+                                    </section>
+                                {/if}
+
+                                <section class="flow-group flow-group-state flow-group-down" aria-label="State and oracle services">
+                                    {#each flowStateNodes as flowNode}
+                                        <button
+                                            class="flow-node"
+                                            class:flow-default={flowMode(flowNode) === "default"}
+                                            class:flow-custom={flowMode(flowNode) === "custom"}
+                                            class:flow-oracle={flowMode(flowNode) === "oracle"}
+                                            class:flow-invalid={flowMode(flowNode) === "invalid"}
+                                            class:flow-selected={selectedCompositionFlowNode === flowNode}
+                                            on:click={() => selectCompositionFlowNode(flowNode)}
+                                        >
+                                            <span class="flow-node-kicker">{flowRole(flowNode)}</span>
+                                            <strong>{flowNodeTitle(flowNode)}</strong>
+                                            <small>{flowImplementation(flowNode)}</small>
+                                            <span class="flow-badge">{flowModeLabel(flowNode)}</span>
+                                        </button>
+                                    {/each}
+                                </section>
+
+                                <section class="flow-group flow-group-actions flow-group-up" aria-label="Action services">
+                                    {#each flowActionNodes as flowNode}
+                                        <button
+                                            class="flow-node"
+                                            class:flow-default={flowMode(flowNode) === "default"}
+                                            class:flow-custom={flowMode(flowNode) === "custom"}
+                                            class:flow-oracle={flowMode(flowNode) === "oracle"}
+                                            class:flow-invalid={flowMode(flowNode) === "invalid"}
+                                            class:flow-selected={selectedCompositionFlowNode === flowNode}
+                                            on:click={() => selectCompositionFlowNode(flowNode)}
+                                        >
+                                            <span class="flow-node-kicker">{flowRole(flowNode)}</span>
+                                            <strong>{flowNodeTitle(flowNode)}</strong>
+                                            <small>{flowImplementation(flowNode)}</small>
+                                            <span class="flow-badge">{flowModeLabel(flowNode)}</span>
+                                        </button>
+                                    {/each}
+                                </section>
+
+                                {#if flowExtraNodes.length > 0}
+                                    <section class="flow-group flow-group-extra" aria-label="Additional composition nodes">
+                                        {#each flowExtraNodes as flowNode}
                                             <button
                                                 class="flow-node"
                                                 class:flow-default={flowMode(flowNode) === "default"}
@@ -492,120 +590,8 @@
                                                 <small>{flowImplementation(flowNode)}</small>
                                                 <span class="flow-badge">{flowModeLabel(flowNode)}</span>
                                             </button>
-
-                                            {#if index < 3}
-                                                <div class="flow-edge" aria-hidden="true">
-                                                    <svg class="flow-edge-svg" viewBox="0 0 80 54" preserveAspectRatio="none">
-                                                        <defs>
-                                                            <marker id={`flow-arrow-top-${index}`} viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-                                                                <path d="M 0 0 L 10 5 L 0 10 z"></path>
-                                                            </marker>
-                                                        </defs>
-                                                        <path d="M40 2 C40 18 40 34 40 48" marker-end={`url(#flow-arrow-top-${index})`}></path>
-                                                    </svg>
-                                                    <span class="flow-edge-label">{flowEdgeLabel(flowNode, index)}</span>
-                                                </div>
-                                            {/if}
-                                        </article>
-                                    {/each}
-                                </div>
-
-                                {#if compositionFlowNodes.length > 4}
-                                    <div class="flow-circular-stage" aria-label="Composition loop">
-                                        <svg class="flow-circular-connectors" viewBox="0 0 1000 720" preserveAspectRatio="none" aria-hidden="true">
-                                            <defs>
-                                                <marker id="flow-circular-arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-                                                    <path d="M 0 0 L 10 5 L 0 10 z"></path>
-                                                </marker>
-                                            </defs>
-                                            <path class="flow-circular-path" d="M500 0 C500 55 315 35 250 86" marker-end="url(#flow-circular-arrow)"></path>
-                                            <path class="flow-circular-path" d="M250 164 C250 205 250 229 250 270" marker-end="url(#flow-circular-arrow)"></path>
-                                            <path class="flow-circular-path" d="M250 348 C250 389 250 413 250 454" marker-end="url(#flow-circular-arrow)"></path>
-                                            <path class="flow-circular-path" d="M250 532 C250 590 335 612 430 626" marker-end="url(#flow-circular-arrow)"></path>
-                                            <path class="flow-circular-path" d="M570 626 C665 612 750 590 750 532" marker-end="url(#flow-circular-arrow)"></path>
-                                            <path class="flow-circular-path" d="M750 454 C750 413 750 389 750 348" marker-end="url(#flow-circular-arrow)"></path>
-                                            <path class="flow-circular-path" d="M750 270 C750 229 750 205 750 164" marker-end="url(#flow-circular-arrow)"></path>
-                                            <path class="flow-circular-path" d="M750 86 C685 35 500 55 500 0" marker-end="url(#flow-circular-arrow)"></path>
-                                        </svg>
-
-                                        {#each compositionFlowNodes.slice(4, 8) as flowNode, localIndex}
-                                            <article class="flow-circular-node-slot flow-left-step" style={`grid-row: ${localIndex + 1};`}>
-                                                <button
-                                                    class="flow-node"
-                                                    class:flow-default={flowMode(flowNode) === "default"}
-                                                    class:flow-custom={flowMode(flowNode) === "custom"}
-                                                    class:flow-oracle={flowMode(flowNode) === "oracle"}
-                                                    class:flow-invalid={flowMode(flowNode) === "invalid"}
-                                                    class:flow-selected={selectedCompositionFlowNode === flowNode}
-                                                    on:click={() => selectCompositionFlowNode(flowNode)}
-                                                >
-                                                    <span class="flow-node-kicker">{flowRole(flowNode)}</span>
-                                                    <strong>{flowNodeTitle(flowNode)}</strong>
-                                                    <small>{flowImplementation(flowNode)}</small>
-                                                    <span class="flow-badge">{flowModeLabel(flowNode)}</span>
-                                                </button>
-                                            </article>
                                         {/each}
-
-                                        {#if compositionFlowNodes[8]}
-                                            <article class="flow-circular-node-slot flow-bottom-step">
-                                                <button
-                                                    class="flow-node"
-                                                    class:flow-default={flowMode(compositionFlowNodes[8]) === "default"}
-                                                    class:flow-custom={flowMode(compositionFlowNodes[8]) === "custom"}
-                                                    class:flow-oracle={flowMode(compositionFlowNodes[8]) === "oracle"}
-                                                    class:flow-invalid={flowMode(compositionFlowNodes[8]) === "invalid"}
-                                                    class:flow-selected={selectedCompositionFlowNode === compositionFlowNodes[8]}
-                                                    on:click={() => selectCompositionFlowNode(compositionFlowNodes[8])}
-                                                >
-                                                    <span class="flow-node-kicker">{flowRole(compositionFlowNodes[8])}</span>
-                                                    <strong>{flowNodeTitle(compositionFlowNodes[8])}</strong>
-                                                    <small>{flowImplementation(compositionFlowNodes[8])}</small>
-                                                    <span class="flow-badge">{flowModeLabel(compositionFlowNodes[8])}</span>
-                                                </button>
-                                            </article>
-                                        {/if}
-
-                                        {#each compositionFlowNodes.slice(9, 13) as flowNode, localIndex}
-                                            <article class="flow-circular-node-slot flow-right-step" style={`grid-row: ${4 - localIndex};`}>
-                                                <button
-                                                    class="flow-node"
-                                                    class:flow-default={flowMode(flowNode) === "default"}
-                                                    class:flow-custom={flowMode(flowNode) === "custom"}
-                                                    class:flow-oracle={flowMode(flowNode) === "oracle"}
-                                                    class:flow-invalid={flowMode(flowNode) === "invalid"}
-                                                    class:flow-selected={selectedCompositionFlowNode === flowNode}
-                                                    on:click={() => selectCompositionFlowNode(flowNode)}
-                                                >
-                                                    <span class="flow-node-kicker">{flowRole(flowNode)}</span>
-                                                    <strong>{flowNodeTitle(flowNode)}</strong>
-                                                    <small>{flowImplementation(flowNode)}</small>
-                                                    <span class="flow-badge">{flowModeLabel(flowNode)}</span>
-                                                </button>
-                                            </article>
-                                        {/each}
-
-                                        {#if compositionFlowNodes.length > 13}
-                                            {#each compositionFlowNodes.slice(13) as flowNode, index}
-                                                <article class="flow-circular-node-slot flow-extra-step" style={`grid-row: ${index + 1};`}>
-                                                    <button
-                                                        class="flow-node"
-                                                        class:flow-default={flowMode(flowNode) === "default"}
-                                                        class:flow-custom={flowMode(flowNode) === "custom"}
-                                                        class:flow-oracle={flowMode(flowNode) === "oracle"}
-                                                        class:flow-invalid={flowMode(flowNode) === "invalid"}
-                                                        class:flow-selected={selectedCompositionFlowNode === flowNode}
-                                                        on:click={() => selectCompositionFlowNode(flowNode)}
-                                                    >
-                                                        <span class="flow-node-kicker">{flowRole(flowNode)}</span>
-                                                        <strong>{flowNodeTitle(flowNode)}</strong>
-                                                        <small>{flowImplementation(flowNode)}</small>
-                                                        <span class="flow-badge">{flowModeLabel(flowNode)}</span>
-                                                    </button>
-                                                </article>
-                                            {/each}
-                                        {/if}
-                                    </div>
+                                    </section>
                                 {/if}
                             </div>
                         {:else}
@@ -651,7 +637,6 @@
                                         <div class="section-header">
                                             <div>
                                                 <h3>{selectedSourceFile.name}</h3>
-                                                <p>Edit the selected service or capability source directly in this modal.</p>
                                             </div>
                                             <button class="secondary" disabled={saving} on:click={saveSelectedSource}>
                                                 Save Composition
