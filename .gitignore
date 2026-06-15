@@ -3,6 +3,7 @@
 .vscode
 bin/
 target/
+node_modules/
 *.obj
 /windows/native_src/windows.h
 *.iml

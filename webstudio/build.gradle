@@ -1,0 +1,192 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+buildDir = 'target'
+
+def configuredWebStudioPort = (findProperty('webstudioPort') ?: '8888').toString()
+def frontendDirectory = file("${projectDir}/frontend")
+def frontendSourceDirectory = file("${frontendDirectory}/src")
+def frontendGeneratedResourcesRoot = file("${buildDir}/generated/webstudio-frontend")
+def frontendOutputDirectory = file("${frontendGeneratedResourcesRoot}/web")
+def frontendPackageJson = file("${frontendDirectory}/package.json")
+def frontendPackageLock = file("${frontendDirectory}/package-lock.json")
+def frontendIndexHtml = file("${frontendDirectory}/index.html")
+def frontendViteConfig = file("${frontendDirectory}/vite.config.js")
+def frontendSvelteConfig = file("${frontendDirectory}/svelte.config.js")
+def frontendNodeModules = file("${frontendDirectory}/node_modules")
+def frontendNpmExecutable = System.getProperty('os.name').toLowerCase().contains('windows') ? 'npm.cmd' : 'npm'
+
+sourceSets {
+    main {
+        resources {
+            srcDirs = ['resources']
+        }
+    }
+}
+
+dependencies {
+    implementation project(':core')
+    implementation project(':config')
+    implementation project(':plugin')
+    implementation project(':cli')
+    implementation project(':testar')
+    // https://mvnrepository.com/artifact/io.javalin/javalin/7.2.2
+    implementation("io.javalin:javalin:7.2.2")
+}
+
+application {
+    mainClass = 'org.testar.webstudio.WebStudioMain'
+}
+
+tasks.named('run') {
+    group = 'application'
+    description = 'Run TESTAR Web Studio using the currently available frontend assets.'
+    systemProperty 'testar.webstudio.settingsRoot', project(':testar').file('resources/settings').absolutePath
+    systemProperty 'testar.webstudio.port', configuredWebStudioPort
+}
+
+tasks.named('clean') {
+    delete frontendGeneratedResourcesRoot
+}
+
+tasks.register('checkWebStudioFrontendTooling') {
+    group = 'build'
+    description = 'Check that the Web Studio frontend tooling is available.'
+
+    doLast {
+        if (!frontendDirectory.isDirectory()) {
+            throw new GradleException("Missing frontend directory: ${frontendDirectory}")
+        }
+
+        if (!frontendPackageJson.isFile()) {
+            throw new GradleException("Missing frontend package.json: ${frontendPackageJson}")
+        }
+
+        def npmVersionOutput = new ByteArrayOutputStream()
+        def npmVersionResult = exec {
+            commandLine frontendNpmExecutable, '--version'
+            workingDir frontendDirectory
+            standardOutput = npmVersionOutput
+            errorOutput = npmVersionOutput
+            ignoreExitValue = true
+        }
+
+        if (npmVersionResult.exitValue != 0) {
+            throw new GradleException(
+                "npm is required to build the Web Studio frontend. " +
+                "Checked command '${frontendNpmExecutable} --version' and it failed with: ${npmVersionOutput.toString().trim()}"
+            )
+        }
+    }
+}
+
+tasks.register('npmInstallWebStudioFrontend', Exec) {
+    group = 'build'
+    description = 'Install the Web Studio frontend dependencies.'
+    dependsOn tasks.named('checkWebStudioFrontendTooling')
+    workingDir frontendDirectory
+    commandLine frontendNpmExecutable, 'install'
+    inputs.file(frontendPackageJson)
+    if (frontendPackageLock.exists()) {
+        inputs.file(frontendPackageLock)
+    }
+    outputs.dir(frontendNodeModules)
+}
+
+tasks.register('buildWebStudioFrontend', Exec) {
+    group = 'build'
+    description = 'Build the Web Studio frontend into static assets.'
+    dependsOn tasks.named('npmInstallWebStudioFrontend')
+    workingDir frontendDirectory
+    commandLine frontendNpmExecutable, 'run', 'build'
+    inputs.file(frontendPackageJson)
+    inputs.file(frontendIndexHtml)
+    inputs.file(frontendViteConfig)
+    inputs.file(frontendSvelteConfig)
+    inputs.files(fileTree(dir: frontendSourceDirectory))
+    if (frontendPackageLock.exists()) {
+        inputs.file(frontendPackageLock)
+    }
+    outputs.dir(frontendGeneratedResourcesRoot)
+}
+
+tasks.register('checkWebStudioFrontendAssets') {
+    group = 'verification'
+    description = 'Check that the Web Studio frontend assets exist.'
+
+    doLast {
+        if (!frontendOutputDirectory.isDirectory()) {
+            throw new GradleException(
+                "Missing built frontend directory: ${frontendOutputDirectory}. " +
+                "Run ':webstudio:buildWebStudioFrontend' first."
+            )
+        }
+
+        if (!file("${frontendOutputDirectory}/index.html").isFile()) {
+            throw new GradleException(
+                "Missing built frontend entry file: ${frontendOutputDirectory}/index.html. " +
+                "Run ':webstudio:buildWebStudioFrontend' first."
+            )
+        }
+    }
+}
+
+tasks.register('stopWebStudioServer') {
+    group = 'application'
+    description = 'Stop processes listening on the configured TESTAR Web Studio port.'
+    outputs.upToDateWhen { false }
+
+    doLast {
+        def listenerOutput = new ByteArrayOutputStream()
+        exec {
+            commandLine 'cmd', '/c', "netstat -ano | findstr :${configuredWebStudioPort}"
+            standardOutput = listenerOutput
+            errorOutput = listenerOutput
+            ignoreExitValue = true
+        }
+
+        def processIds = listenerOutput
+            .toString()
+            .readLines()
+            .findAll { line -> line.contains('LISTENING') }
+            .collect { line -> line.trim().split(/\s+/)[-1] }
+            .findAll { processId -> processId?.isInteger() }
+            .unique()
+
+        if (processIds.isEmpty()) {
+            println "No listening process found on port ${configuredWebStudioPort}."
+            return
+        }
+
+        processIds.each { processId ->
+            println "Stopping process ${processId} on port ${configuredWebStudioPort}."
+            exec {
+                commandLine 'taskkill', '/PID', processId, '/F'
+            }
+        }
+    }
+}
+
+tasks.register('runWebStudioServer', JavaExec) {
+    group = 'application'
+    description = 'Run the TESTAR Web Studio backend using the current frontend assets.'
+    dependsOn tasks.named('classes')
+    dependsOn tasks.named('checkWebStudioFrontendAssets')
+    classpath = sourceSets.main.runtimeClasspath + files(frontendGeneratedResourcesRoot)
+    mainClass = application.mainClass
+    systemProperty 'testar.webstudio.settingsRoot', project(':testar').file('resources/settings').absolutePath
+    systemProperty 'testar.webstudio.port', configuredWebStudioPort
+    standardInput = System.in
+}
+
+tasks.register('runWebStudio', JavaExec) {
+    group = 'application'
+    description = 'Build the TESTAR Web Studio frontend and then run the backend.'
+    dependsOn tasks.named('buildWebStudioFrontend')
+    dependsOn tasks.named('classes')
+    classpath = sourceSets.main.runtimeClasspath + files(frontendGeneratedResourcesRoot)
+    mainClass = application.mainClass
+    systemProperty 'testar.webstudio.settingsRoot', project(':testar').file('resources/settings').absolutePath
+    systemProperty 'testar.webstudio.port', configuredWebStudioPort
+    standardInput = System.in
+}
