@@ -203,26 +203,47 @@
         return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     }
 
+    function shouldPersistVisualSetting(setting) {
+        const settingValue = (setting?.value ?? "").trim();
+        const settingType = setting?.type || "string";
+
+        if (settingValue !== "") {
+            return true;
+        }
+
+        return settingType === "string" || settingType === "list";
+    }
+
     function buildTestSettingsContent(currentContent, settingsGroups) {
         const settingsEntries = [];
 
         for (const settingsGroup of settingsGroups || []) {
             for (const setting of settingsGroup.settings || []) {
-                settingsEntries.push([setting.key, setting.value ?? ""]);
+                settingsEntries.push({
+                    key: setting.key,
+                    value: setting.value ?? "",
+                    persist: shouldPersistVisualSetting(setting)
+                });
             }
         }
 
         let nextContent = currentContent || "";
         const missingEntries = [];
 
-        for (const [key, value] of settingsEntries) {
+        for (const settingEntry of settingsEntries) {
+            const key = settingEntry.key;
+            const value = settingEntry.value;
             const escapedKey = escapeRegExp(key);
-            const propertyPattern = new RegExp(`^(\\s*${escapedKey}\\s*=\\s*).*$`, "m");
+            const propertyPattern = new RegExp(`^\\s*${escapedKey}\\s*=.*(?:\\r?\\n|$)`, "gm");
 
-            if (propertyPattern.test(nextContent)) {
-                nextContent = nextContent.replace(propertyPattern, `$1${value}`);
+            if (settingEntry.persist) {
+                if (propertyPattern.test(nextContent)) {
+                    nextContent = nextContent.replace(propertyPattern, `${key} = ${value}\n`);
+                } else {
+                    missingEntries.push(`${key} = ${value}`);
+                }
             } else {
-                missingEntries.push(`${key} = ${value}`);
+                nextContent = nextContent.replace(propertyPattern, "");
             }
         }
 
