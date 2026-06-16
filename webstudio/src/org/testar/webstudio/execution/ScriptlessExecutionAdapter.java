@@ -17,12 +17,15 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.testar.core.verdict.Verdict;
 import org.testar.webstudio.api.dto.ExecutionStatusDto;
 import org.testar.webstudio.api.dto.ResultFileDto;
 import org.testar.webstudio.api.dto.ResultFileSummaryDto;
@@ -36,6 +39,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
     private static final long COMPLETED_RUN_IDLE_GRACE_MILLIS = 8000L;
     private static final Pattern SEQUENCE_SUMMARY_PATTERN = Pattern.compile("_sequence_(\\d+)");
     private static final Pattern SEQUENCE_OUTPUT_PATH_PATTERN = Pattern.compile("Generate\\s+([^\\s]+_sequence_(\\d+))");
+    private static final Set<String> NON_OK_VERDICT_TITLES = buildNonOkVerdictTitles();
 
     private Process currentProcess;
     private Path currentInstallBinDirectory;
@@ -364,15 +368,17 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
     }
 
     private void processSequenceLine(String line) {
-        if (line.contains("Sequence contained faults!")) {
+        if (isSequenceFailureSignal(line)) {
             currentSequenceFailed = true;
         }
+
+        boolean explicitOkSequenceLine = line != null && line.contains("No problem detected.");
 
         Matcher pathMatcher = SEQUENCE_OUTPUT_PATH_PATTERN.matcher(line);
         if (pathMatcher.find()) {
             int sequenceNumber = Integer.parseInt(pathMatcher.group(2));
             String outputPath = resolveSequenceOutputPath(pathMatcher.group(1));
-            boolean failedSequence = currentSequenceFailed || line.contains("[");
+            boolean failedSequence = explicitOkSequenceLine ? false : (currentSequenceFailed || line.contains("["));
             recordSequenceOutcome(sequenceNumber, failedSequence ? "failed" : "ok", outputPath);
             currentSequenceFailed = false;
             return;
@@ -381,7 +387,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         Matcher summaryMatcher = SEQUENCE_SUMMARY_PATTERN.matcher(line);
         if (summaryMatcher.find()) {
             int sequenceNumber = Integer.parseInt(summaryMatcher.group(1));
-            boolean failedSequence = currentSequenceFailed || line.contains("[");
+            boolean failedSequence = explicitOkSequenceLine ? false : (currentSequenceFailed || line.contains("["));
             recordSequenceOutcome(sequenceNumber, failedSequence ? "failed" : "ok", null);
             currentSequenceFailed = false;
             return;
@@ -391,6 +397,46 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
             recordSequenceOutcome(sequenceOutcomes.size() + 1, currentSequenceFailed ? "failed" : "ok", null);
             currentSequenceFailed = false;
         }
+    }
+
+    private boolean isSequenceFailureSignal(String line) {
+        if (line == null || line.isBlank()) {
+            return false;
+        }
+
+        if (line.contains("No problem detected.")) {
+            return false;
+        }
+
+        return line.contains("Sequence contained faults!")
+            || isNonOkVerdictSummaryLine(line)
+            || containsNonOkVerdictTitle(line);
+    }
+
+    private boolean isNonOkVerdictSummaryLine(String line) {
+        return line.contains("Test verdict for this sequence:");
+    }
+
+    private boolean containsNonOkVerdictTitle(String line) {
+        for (String verdictTitle : NON_OK_VERDICT_TITLES) {
+            if (line.contains(verdictTitle)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static Set<String> buildNonOkVerdictTitles() {
+        Set<String> verdictTitles = new HashSet<>();
+
+        for (Verdict.Severity severity : Verdict.Severity.values()) {
+            if (severity.getValue() > Verdict.Severity.OK.getValue()) {
+                verdictTitles.add(severity.getTitle());
+            }
+        }
+
+        return verdictTitles;
     }
 
     private boolean shouldStopCompletedButStuckRun() {
