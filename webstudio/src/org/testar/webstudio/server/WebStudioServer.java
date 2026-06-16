@@ -148,6 +148,11 @@ public final class WebStudioServer {
                 context.queryParam("path")
             )
         ));
+        routes.get("/api/execution/scriptless/result-asset", context -> {
+            String assetPath = context.queryParam("path");
+            context.contentType(executionController.scriptlessResultAssetContentType(assetPath));
+            context.result(executionController.scriptlessResultAsset(assetPath));
+        });
         routes.post("/api/execution/scriptless/generate/{workspace}", context -> handle(context, () -> {
             String workspace = context.pathParam("workspace");
             return executionController.startGenerate(workspace, workspaceController.settingsRoot());

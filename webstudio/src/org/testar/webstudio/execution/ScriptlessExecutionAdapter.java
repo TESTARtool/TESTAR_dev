@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -39,6 +40,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
     private static final long COMPLETED_RUN_IDLE_GRACE_MILLIS = 8000L;
     private static final Pattern SEQUENCE_SUMMARY_PATTERN = Pattern.compile("_sequence_(\\d+)");
     private static final Pattern SEQUENCE_OUTPUT_PATH_PATTERN = Pattern.compile("Generate\\s+([^\\s]+_sequence_(\\d+))");
+    private static final Pattern HTML_RESOURCE_ATTRIBUTE_PATTERN = Pattern.compile("(\\b(?:src|href)\\s*=\\s*[\"'])(?![a-zA-Z][a-zA-Z0-9+.-]*:|//|#)([^\"'#][^\"']*)([\"'])");
     private static final Set<String> NON_OK_VERDICT_TITLES = buildNonOkVerdictTitles();
 
     private Process currentProcess;
@@ -179,15 +181,39 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
 
         Path resultFilePath = Paths.get(summary.path()).normalize();
         try {
+            String content = Files.readString(resultFilePath, StandardCharsets.UTF_8);
+            if ("text/html".equals(summary.contentType())) {
+                content = rewriteHtmlAssetUrls(content, resultFilePath);
+            }
             return new ResultFileDto(
                 summary.name(),
                 summary.path(),
                 summary.contentType(),
-                Files.readString(resultFilePath, StandardCharsets.UTF_8)
+                content
             );
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to read scriptless result file: " + resultFilePath, exception);
         }
+    }
+
+    public synchronized Path resolveScriptlessResultAsset(String filePath) {
+        if (filePath == null || filePath.isBlank()) {
+            throw new IllegalArgumentException("Result asset path is required");
+        }
+
+        Path installBinDirectory = resolveInstallBinDirectory();
+        Path outputDirectory = installBinDirectory.resolve("output").toAbsolutePath().normalize();
+        Path assetPath = Paths.get(filePath).toAbsolutePath().normalize();
+
+        if (!assetPath.startsWith(outputDirectory)) {
+            throw new IllegalArgumentException("Invalid result asset path: " + assetPath);
+        }
+
+        if (!Files.isRegularFile(assetPath)) {
+            throw new IllegalArgumentException("Result asset not found: " + assetPath.getFileName());
+        }
+
+        return assetPath;
     }
 
     private Path resolveInstallBinDirectory() {
@@ -564,11 +590,13 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         List<ResultFileSummaryDto> files = new ArrayList<>();
         collectPreviewableFiles(reportsDirectory, null, files);
         files.sort(Comparator.comparing(ResultFileSummaryDto::path));
+        int totalSequenceCount = countSequenceLogs(outputGroupDirectory.resolve("logs"));
 
         return new ResultOutputGroupDto(
             outputGroupDirectory.getFileName().toString(),
             outputGroupDirectory.toString(),
             resultStatusFor(files),
+            totalSequenceCount,
             files
         );
     }
@@ -583,8 +611,9 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
 
     private String resultStatusFor(Path path) {
         String upperCaseFileName = path.getFileName().toString().toUpperCase();
-        if (upperCaseFileName.contains("_V")) {
-            return "failed";
+        Matcher verdictMatcher = Pattern.compile("_V\\d+_([^.]+)\\.HTML?$").matcher(upperCaseFileName);
+        if (verdictMatcher.find()) {
+            return "OK".equals(verdictMatcher.group(1)) ? "ok" : "failed";
         }
 
         return "ok";
@@ -618,5 +647,48 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         String fileName = path.getFileName().toString().toLowerCase();
         return fileName.endsWith(".html")
             || fileName.endsWith(".htm");
+    }
+
+    private int countSequenceLogs(Path logsDirectory) {
+        if (!Files.isDirectory(logsDirectory)) {
+            return 0;
+        }
+
+        try (var children = Files.list(logsDirectory)) {
+            return (int) children
+                .filter(Files::isRegularFile)
+                .filter(path -> path.getFileName().toString().matches(".*_sequence_\\d+\\.log$"))
+                .count();
+        } catch (IOException exception) {
+            return 0;
+        }
+    }
+
+    private String rewriteHtmlAssetUrls(String htmlContent, Path htmlFilePath) {
+        Matcher matcher = HTML_RESOURCE_ATTRIBUTE_PATTERN.matcher(htmlContent);
+        StringBuffer rewrittenHtml = new StringBuffer();
+
+        while (matcher.find()) {
+            String attributePrefix = matcher.group(1);
+            String relativeAssetPath = matcher.group(2).trim();
+            String attributeSuffix = matcher.group(3);
+
+            Path resolvedAssetPath = htmlFilePath.getParent().resolve(relativeAssetPath).normalize();
+            String replacement = matcher.group(0);
+
+            try {
+                Path validAssetPath = resolveScriptlessResultAsset(resolvedAssetPath.toString());
+                String encodedAssetPath = URLEncoder.encode(validAssetPath.toString(), StandardCharsets.UTF_8);
+                String assetUrl = "/api/execution/scriptless/result-asset?path=" + encodedAssetPath;
+                replacement = attributePrefix + assetUrl + attributeSuffix;
+            } catch (IllegalArgumentException ignored) {
+                replacement = matcher.group(0);
+            }
+
+            matcher.appendReplacement(rewrittenHtml, Matcher.quoteReplacement(replacement));
+        }
+
+        matcher.appendTail(rewrittenHtml);
+        return rewrittenHtml.toString();
     }
 }

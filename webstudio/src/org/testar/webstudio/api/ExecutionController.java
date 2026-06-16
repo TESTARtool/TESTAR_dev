@@ -7,6 +7,7 @@
 package org.testar.webstudio.api;
 
 import java.nio.file.Path;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,6 +53,37 @@ public final class ExecutionController {
 
     public ResultFileDto scriptlessResultFile(String fileName, String filePath) {
         return scriptlessExecutionAdapter().readScriptlessResultFile(fileName, filePath);
+    }
+
+    public byte[] scriptlessResultAsset(String filePath) {
+        try {
+            return Files.readAllBytes(scriptlessExecutionAdapter().resolveScriptlessResultAsset(filePath));
+        } catch (Exception exception) {
+            throw new IllegalStateException("Unable to read scriptless result asset: " + filePath, exception);
+        }
+    }
+
+    public String scriptlessResultAssetContentType(String filePath) {
+        String lowerCasePath = filePath == null ? "" : filePath.toLowerCase();
+        if (lowerCasePath.endsWith(".png")) {
+            return "image/png";
+        }
+        if (lowerCasePath.endsWith(".jpg") || lowerCasePath.endsWith(".jpeg")) {
+            return "image/jpeg";
+        }
+        if (lowerCasePath.endsWith(".gif")) {
+            return "image/gif";
+        }
+        if (lowerCasePath.endsWith(".svg")) {
+            return "image/svg+xml";
+        }
+        if (lowerCasePath.endsWith(".css")) {
+            return "text/css";
+        }
+        if (lowerCasePath.endsWith(".js")) {
+            return "application/javascript";
+        }
+        return "application/octet-stream";
     }
 
     private ScriptlessExecutionAdapter scriptlessExecutionAdapter() {

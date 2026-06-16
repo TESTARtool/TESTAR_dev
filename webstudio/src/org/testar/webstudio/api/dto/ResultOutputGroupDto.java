@@ -13,12 +13,14 @@ public final class ResultOutputGroupDto {
     private final String name;
     private final String path;
     private final String status;
+    private final int totalSequenceCount;
     private final List<ResultFileSummaryDto> files;
 
-    public ResultOutputGroupDto(String name, String path, String status, List<ResultFileSummaryDto> files) {
+    public ResultOutputGroupDto(String name, String path, String status, int totalSequenceCount, List<ResultFileSummaryDto> files) {
         this.name = name;
         this.path = path;
         this.status = status;
+        this.totalSequenceCount = totalSequenceCount;
         this.files = files;
     }
 
@@ -32,6 +34,10 @@ public final class ResultOutputGroupDto {
 
     public String status() {
         return status;
+    }
+
+    public int totalSequenceCount() {
+        return totalSequenceCount;
     }
 
     public List<ResultFileSummaryDto> files() {
