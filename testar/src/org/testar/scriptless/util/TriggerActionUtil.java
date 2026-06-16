@@ -24,6 +24,9 @@ import org.testar.plugin.NativeLinker;
 import org.testar.plugin.OperatingSystems;
 import org.testar.scriptless.RuntimeContext;
 import org.testar.scriptless.TestingServices;
+import org.testar.webdriver.action.WdRemoteScrollClickAction;
+import org.testar.webdriver.action.WdRemoteScrollTypeAction;
+import org.testar.webdriver.state.WdWidget;
 
 public final class TriggerActionUtil {
 
@@ -504,6 +507,10 @@ public final class TriggerActionUtil {
      * By default, trigger click widget using LeftClickAt (Windows level). 
      */
     public static Action triggeredClickAction(State state, Widget widget) {
+        if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER) && widget instanceof WdWidget wdWidget) {
+            return new WdRemoteScrollClickAction(wdWidget);
+        }
+
     	StdActionCompiler ac = new AnnotatingActionCompiler();
     	return ac.leftClickAt(widget);
     }
@@ -512,6 +519,10 @@ public final class TriggerActionUtil {
      * By default, trigger click and type text using ClickTypeInto (Windows level). 
      */
     public static Action triggeredTypeAction(State state, Widget widget, String textToType, boolean replaceText) {
+        if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER) && widget instanceof WdWidget wdWidget) {
+            return new WdRemoteScrollTypeAction(wdWidget, textToType);
+        }
+
     	StdActionCompiler ac = new AnnotatingActionCompiler();
     	return ac.clickTypeInto(widget, textToType, replaceText);
     }
@@ -520,6 +531,10 @@ public final class TriggerActionUtil {
      * By default, trigger click and paste text using ClickPasteInto (Windows level). 
      */
     public static Action triggeredPasteAction(State state, Widget widget, String textToPaste, boolean replaceText) {
+        if (NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER) && widget instanceof WdWidget wdWidget) {
+            return new WdRemoteScrollTypeAction(wdWidget, textToPaste);
+        }
+
     	StdActionCompiler ac = new AnnotatingActionCompiler();
     	return ac.pasteTextInto(widget, textToPaste, replaceText);
     }
