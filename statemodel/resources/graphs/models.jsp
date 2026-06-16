@@ -10,7 +10,13 @@
     <link rel="stylesheet" href="css/magnific-popup.css">
 </head>
 <body>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="java.util.List" %>
+<%@ page import="org.testar.statemodel.analysis.representation.AbstractStateModel" %>
+<%@ page import="org.testar.statemodel.analysis.representation.TestSequence" %>
+<%
+    List<AbstractStateModel> models = (List<AbstractStateModel>) request.getAttribute("models");
+    int i = 1;
+%>
 <div class="container">
     <div class="row">
         <div class="col-3">
@@ -27,19 +33,15 @@
         <div class="col-3"><strong>Abstraction Attributes</strong></div>
         <div class="col-2"></div>
     </div>
-    <%
-        int i = 1;
-    %>
-    <c:forEach var="model" items="${models}">
+    <% for (AbstractStateModel model : models) { %>
         <div class="row">
-            <div class="col-3"><a data-toggle="collapse" href="#sequenceRow<%= i%>"><span class="fas fa-angle-down"></span></a>&nbsp;${model.modelIdentifier}</div>
-            <div class="col-2">${model.applicationName}</div>
-            <div class="col-2">${model.applicationVersion}</div>
-            <div class="col-3">${model.abstractionAttributesAsString}</div>
+            <div class="col-3"><a data-toggle="collapse" href="#sequenceRow<%= i %>"><span class="fas fa-angle-down"></span></a>&nbsp;<%= model.getModelIdentifier() %></div>
+            <div class="col-2"><%= model.getApplicationName() %></div>
+            <div class="col-2"><%= model.getApplicationVersion() %></div>
+            <div class="col-3"><%= model.getAbstractionAttributesAsString() %></div>
             <div class="col1"><a data-toggle="modal" data-target="#sequenceModal<%= i %>"><span class="fas fa-layer-group"></span></a></div>
             <div class="col-1"></div>
         </div>
-        <!-- Collapse block -->
         <div class="collapse" id="sequenceRow<%= i %>">
             <div class="row">
                 <div class="col-6 mt-1"><h5>Sequences</h5></div>
@@ -52,30 +54,29 @@
                 <div class="col-2"><strong>Deterministic run</strong></div>
                 <div class="col-1"></div>
             </div>
-            <c:forEach var="seq" items="${model.sequences}">
+            <% for (TestSequence seq : model.getSequences()) { %>
                 <div class="row">
-                    <div class="col-1 text-right"><span class="fas ${seq.verdictIcon}" title="${seq.verdictTooltip}"></span></div>
-                    <div class="col-3">${seq.startDateTime}</div>
-                    <div class="col-2">${seq.numberOfSteps}</div>
-                    <div class="col-2">${seq.nrOfErrors}</div>
-                    <div class="col-2"><span class="fas ${seq.deterministicIcon}"></span></div>
-                    <div class="col-1"><span class="fas fa-eye" data-sequenceId="${seq.sequenceId}"></span></div>
+                    <div class="col-1 text-right"><span class="fas <%= seq.getVerdictIcon() %>" title="<%= seq.getVerdictTooltip() %>"></span></div>
+                    <div class="col-3"><%= seq.getStartDateTime() %></div>
+                    <div class="col-2"><%= seq.getNumberOfSteps() %></div>
+                    <div class="col-2"><%= seq.getNrOfErrors() %></div>
+                    <div class="col-2"><span class="fas <%= seq.getDeterministicIcon() %>"></span></div>
+                    <div class="col-1"><span class="fas fa-eye" data-sequenceId="<%= seq.getSequenceId() %>"></span></div>
                 </div>
-            </c:forEach>
+            <% } %>
         </div>
 
-        <!-- Modal block -->
-        <div class="modal fade" id="sequenceModal<%= i%>" tabindex="-1" role="dialog" aria-labelledby="sequenceModalLabel<%= i %>" aria-hidden="true">
+        <div class="modal fade" id="sequenceModal<%= i %>" tabindex="-1" role="dialog" aria-labelledby="sequenceModalLabel<%= i %>" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="sequenceModalLabel<%= i++ %>">Select the model layers</h5>
+                        <h5 class="modal-title" id="sequenceModalLabel<%= i %>">Select the model layers</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <form target="_blank" method="post" action="graph">
-                        <input type="hidden" value="${model.modelIdentifier}" name="modelIdentifier">
+                        <input type="hidden" value="<%= model.getModelIdentifier() %>" name="modelIdentifier">
                         <div class="modal-body">
                             <div class="row">
                                 <div class="col-12">
@@ -116,8 +117,7 @@
                 </div>
             </div>
         </div>
-
-    </c:forEach>
+    <% i++; } %>
 </div>
 
 <script src="js/jquery-3.2.1.min.js"></script>

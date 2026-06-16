@@ -997,6 +997,21 @@ button:disabled {
     flex: 1 1 auto;
 }
 
+.state-model-dialog {
+    width: min(720px, 100%);
+}
+
+.state-model-dialog p {
+    margin: 8px 0 0;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.state-model-dialog .composition-modal-actions {
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+
 .composition-modal-body textarea {
     min-height: 580px;
 }

@@ -49,12 +49,18 @@ public class StateModelStorageBootstrap {
         String downloadUrl = "https://repo1.maven.org/maven2/com/orientechnologies/orientdb-community/3.2.38/orientdb-community-3.2.38.zip";
         String zipFilePath = directoryPath + "/orientdb-community-3.2.38.zip";
         String extractedOrientDB = directoryPath + "/orientdb-community-3.2.38";
+        File orientDbHome = new File(extractedOrientDB);
+        File orientDbConsole = new File(orientDbHome, "bin/console.bat");
 
-        // If OrientDB already exists, we dont need to download anything
-        if(new File(extractedOrientDB).exists()) {
+        // Reuse an existing OrientDB installation only when the launcher is present.
+        if (orientDbConsole.isFile()) {
             logger.log(Level.INFO, "Using existing OrientDB: " + extractedOrientDB);
             return extractedOrientDB;
-    }
+        }
+
+        if (orientDbHome.exists()) {
+            logger.log(Level.INFO, "OrientDB directory exists but is incomplete, completing extraction: " + extractedOrientDB);
+        }
 
         try {
             // Create the directory if it doesn't exist
@@ -109,10 +115,16 @@ public class StateModelStorageBootstrap {
 
     private static void createOrientDB(String extractedOrientDB, String database, String user, String pass) {
         try {
+            File binDirectory = new File(extractedOrientDB, "bin");
+            File consoleLauncher = new File(binDirectory, "console.bat");
+            if (!consoleLauncher.isFile()) {
+                throw new IllegalStateException("OrientDB console launcher not found: " + consoleLauncher.getAbsolutePath());
+            }
+
             // Change to the bin directory and execute the command
             logger.log(Level.INFO, "Creating OrientDB database... " + database);
             ProcessBuilder processBuilder = new ProcessBuilder("cmd", "/c", "console.bat", "CREATE", "DATABASE", "plocal:../databases/" + database, user, pass);
-            processBuilder.directory(new File(extractedOrientDB + "/bin"));
+            processBuilder.directory(binDirectory);
             processBuilder.inheritIO();
             Process process = processBuilder.start();
 

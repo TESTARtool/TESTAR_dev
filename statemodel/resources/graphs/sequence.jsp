@@ -1,9 +1,15 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="java.util.List" %>
+<%@ page import="org.testar.statemodel.analysis.representation.ActionViz" %>
+<%
+    List<ActionViz> visualizations = (List<ActionViz>) request.getAttribute("visualizations");
+    String contentFolder = (String) request.getAttribute("contentFolder");
+%>
 <div id="content">
-    <c:forEach var="viz" items="${visualizations}">
+    <% for (ActionViz viz : visualizations) { %>
         <div class="edge-popup mfp-hide">
-            <div class="screenshot"><img src="${contentFolder}/${viz.screenshotSource}.png" alt="Source screenshot"><div class="top-left-text">${viz.counterSource}</div></div>
-            <div class="action"><c:if test="${!viz.deterministic}">Non-deterministic! - </c:if>${viz.actionDescription}</div>
-            <div class="screenshot"><img src="${contentFolder}/${viz.screenshotTarget}.png" alt="Target screenshot"><div class="top-left-text">${viz.counterTarget}</div></div>
+            <div class="screenshot"><img src="<%= contentFolder %>/<%= viz.getScreenshotSource() %>.png" alt="Source screenshot"><div class="top-left-text"><%= viz.getCounterSource() %></div></div>
+            <div class="action"><% if (!viz.isDeterministic()) { %>Non-deterministic! - <% } %><%= viz.getActionDescription() %></div>
+            <div class="screenshot"><img src="<%= contentFolder %>/<%= viz.getScreenshotTarget() %>.png" alt="Target screenshot"><div class="top-left-text"><%= viz.getCounterTarget() %></div></div>
         </div>
-    </c:forEach></div>
+    <% } %>
+</div>

@@ -3,6 +3,9 @@
     import TestConfigurationView from "./TestConfigurationView.svelte";
     import RunTestarView from "./RunTestarView.svelte";
     import TestResultsView from "./TestResultsView.svelte";
+    import StateModelIcon from "./icons/StateModelIcon.svelte";
+
+    const STATE_MODEL_URL = "http://localhost:8090/models";
 
     let workspaces = [];
     let selectedWorkspaceName = "";
@@ -27,6 +30,11 @@
     let inactivePolicySourceFiles = [];
     let compositionFlowNodes = [];
     let selectedCompositionFlowNode = null;
+    let stateModelDialog = {
+        open: false,
+        title: "",
+        message: ""
+    };
 
     function reportClientError(context, clientError) {
         console.error(`[WebStudio] ${context}`, clientError);
@@ -41,6 +49,46 @@
             message = "";
             messageTimeoutHandle = null;
         }, 2000);
+    }
+
+    function openStateModelDialog(title, dialogMessage) {
+        stateModelDialog = {
+            open: true,
+            title,
+            message: dialogMessage
+        };
+    }
+
+    function closeStateModelDialog() {
+        stateModelDialog = {
+            open: false,
+            title: "",
+            message: ""
+        };
+    }
+
+    function closeStateModelDialogFromBackdrop(event) {
+        if (event.currentTarget === event.target) {
+            closeStateModelDialog();
+        }
+    }
+
+    function stateModelDialogMessage(openError) {
+        const errorMessage = openError?.message || "";
+
+        if (errorMessage.includes("No generated state model was found yet")
+            || errorMessage.includes("Cannot open the storage")
+            || errorMessage.includes("because it does not exist")) {
+            return {
+                title: "State Model Not Available",
+                message: "Dear user, before opening the analysis mode, TESTAR must execute a Generate run with the state model enabled. Currently there are no generated state models available."
+            };
+        }
+
+        return {
+            title: "Unable To Open State Model",
+            message: "Dear user, before opening the analysis mode, TESTAR must execute a Generate run with the state model enabled. Currently there are no generated state models available."
+        };
     }
 
     async function loadJson(path, options = {}) {
@@ -353,6 +401,33 @@
         loadResults();
     }
 
+    function openStateModelExternalTab(url = STATE_MODEL_URL) {
+        window.open(url, "_blank", "noopener,noreferrer");
+    }
+
+    async function navigateToStateModel() {
+        if (!selectedWorkspaceName) {
+            return;
+        }
+
+        saving = true;
+        message = "";
+
+        try {
+            const response = await loadJson(`/api/statemodel/open/${selectedWorkspaceName}`, {
+                method: "POST"
+            });
+            openStateModelExternalTab(response.url || STATE_MODEL_URL);
+            showTemporaryMessage(response.message || "State model analysis opened.");
+        } catch (openError) {
+            reportClientError("Unable to open state model analysis", openError);
+            const dialogContent = stateModelDialogMessage(openError);
+            openStateModelDialog(dialogContent.title, dialogContent.message);
+        } finally {
+            saving = false;
+        }
+    }
+
     function isSelectedEditor(editorId) {
         return selectedEditor === editorId;
     }
@@ -613,6 +688,10 @@
         <button class:secondary={currentPage !== "results"} on:click={navigateToResults}>
             👁️ View Test Results
         </button>
+        <button type="button" on:click={navigateToStateModel}>
+            <StateModelIcon size={18} title="State model" />
+            <span>View State Model</span>
+        </button>
     </nav>
 
     {#if currentPage === "configuration"}
@@ -668,6 +747,29 @@
     {#if message}
         <div class="toast-message">
             {message}
+        </div>
+    {/if}
+
+    {#if stateModelDialog.open}
+        <div class="composition-modal-backdrop" role="presentation" on:click={closeStateModelDialogFromBackdrop}>
+            <div
+                class="composition-modal state-model-dialog"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="state-model-dialog-title"
+            >
+                <div class="composition-modal-header">
+                    <div>
+                        <h2 id="state-model-dialog-title">{stateModelDialog.title}</h2>
+                        <p>{stateModelDialog.message}</p>
+                    </div>
+                </div>
+                <div class="composition-modal-actions">
+                    <button type="button" class="secondary" on:click={closeStateModelDialog}>
+                        Close
+                    </button>
+                </div>
+            </div>
         </div>
     {/if}
 </div>

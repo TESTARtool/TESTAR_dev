@@ -59,6 +59,19 @@ public final class WorkspaceService {
         return settingsRoot;
     }
 
+    public Path testarHomeDirectory() {
+        Path parent = settingsRoot.getParent();
+        if (parent == null) {
+            throw new IllegalStateException("Unable to resolve TESTAR home from settings root: " + settingsRoot);
+        }
+
+        return parent.toAbsolutePath().normalize();
+    }
+
+    public Path workspaceDirectory(String workspaceName) {
+        return resolveWorkspaceDirectory(workspaceName);
+    }
+
     public WorkspaceDocumentDto readWorkspaceDocument(String workspaceName) {
         Path workspaceDirectory = resolveWorkspaceDirectory(workspaceName);
         WorkspaceFileDto testSettings = readWorkspaceFile(workspaceName, TEST_SETTINGS_FILE, "settings");

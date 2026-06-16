@@ -6,12 +6,13 @@
 
 package org.testar.statemodel.analysis;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
 public class GraphServlet extends HttpServlet {
@@ -50,10 +51,9 @@ public class GraphServlet extends HttpServlet {
                 request.setAttribute("contentFolder", modelIdentifier);
                 RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/graph.jsp");
                 dispatcher.forward(request, response);
-            } catch (ServletException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Throwable throwable) {
+                StateModelDebugLog.log("GraphServlet.doPost failed while rendering a model graph.", throwable);
+                throw new ServletException("Unable to render model graph", throwable);
             }
         } else if (concreteStateIdentifier != null) {
             // this is the controller logic for the widget tree graph.
@@ -67,10 +67,9 @@ public class GraphServlet extends HttpServlet {
                 request.setAttribute("contentFolder", concreteStateIdentifier);
                 RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/graph.jsp");
                 dispatcher.forward(request, response);
-            } catch (ServletException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Throwable throwable) {
+                StateModelDebugLog.log("GraphServlet.doPost failed while rendering a widget graph.", throwable);
+                throw new ServletException("Unable to render widget graph", throwable);
             }
         } else {
             response.sendRedirect("/models");

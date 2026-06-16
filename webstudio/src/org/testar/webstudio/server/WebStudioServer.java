@@ -16,9 +16,11 @@ import io.javalin.http.Context;
 import io.javalin.http.staticfiles.Location;
 import io.javalin.router.JavalinDefaultRoutingApi;
 import org.testar.webstudio.api.ExecutionController;
+import org.testar.webstudio.api.StateModelAnalysisController;
 import org.testar.webstudio.api.ValidationController;
 import org.testar.webstudio.api.WorkspaceController;
 import org.testar.webstudio.api.dto.WorkspaceFileUpdateDto;
+import org.testar.webstudio.analysis.StateModelAnalysisService;
 import org.testar.webstudio.execution.CliExecutionAdapter;
 import org.testar.webstudio.execution.ExecutionAdapter;
 import org.testar.webstudio.execution.ExecutionAdapterRegistry;
@@ -35,6 +37,7 @@ public final class WebStudioServer {
     private final WorkspaceController workspaceController;
     private final ValidationController validationController;
     private final ExecutionController executionController;
+    private final StateModelAnalysisController stateModelAnalysisController;
     private final Gson gson;
     private Javalin app;
 
@@ -42,10 +45,12 @@ public final class WebStudioServer {
         WorkspaceService workspaceService = new WorkspaceService();
         ValidationService validationService = new ValidationService(workspaceService);
         ExecutionAdapterRegistry executionAdapters = new ExecutionAdapterRegistry(defaultExecutionAdapters());
+        StateModelAnalysisService stateModelAnalysisService = new StateModelAnalysisService(workspaceService);
 
         this.workspaceController = new WorkspaceController(workspaceService);
         this.validationController = new ValidationController(validationService);
         this.executionController = new ExecutionController(executionAdapters);
+        this.stateModelAnalysisController = new StateModelAnalysisController(stateModelAnalysisService);
         this.gson = new Gson();
     }
 
@@ -141,6 +146,9 @@ public final class WebStudioServer {
             return executionController.startGenerate(workspace, workspaceController.settingsRoot());
         }));
         routes.post("/api/execution/scriptless/stop", context -> handle(context, executionController::stopScriptlessRun));
+        routes.post("/api/statemodel/open/{workspace}", context -> handle(context, () ->
+            stateModelAnalysisController.open(context.pathParam("workspace"))
+        ));
     }
 
     private void writeJson(Context context, Object payload) {

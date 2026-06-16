@@ -11,15 +11,15 @@ import org.testar.statemodel.analysis.representation.ActionViz;
 
 import com.orientechnologies.orient.core.exception.OCommandExecutionException;
 
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.List;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 public class StateModelServlet extends HttpServlet {
 
@@ -38,10 +38,6 @@ public class StateModelServlet extends HttpServlet {
             request.setAttribute("models", models);
             RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/models.jsp");
             dispatcher.forward(request, response);
-        } catch (ServletException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (OCommandExecutionException e) {
             // If user tried to analyze an OrientDB database without models, launch an info web page
             if (e.getMessage() != null && e.getMessage().contains("Class not found: AbstractStateModel")) {
@@ -49,8 +45,12 @@ public class StateModelServlet extends HttpServlet {
                 RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/warning.jsp");
                 dispatcher.forward(request, response);
             } else {
-                e.printStackTrace();
+                StateModelDebugLog.log("State model query failed while loading /models.", e);
+                throw e;
             }
+        } catch (Throwable throwable) {
+            StateModelDebugLog.log("StateModelServlet.doGet failed.", throwable);
+            throw new ServletException("Unable to render state model page", throwable);
         }
     }
 
@@ -69,10 +69,9 @@ public class StateModelServlet extends HttpServlet {
 
             RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/sequence.jsp");
             dispatcher.forward(request, response);
-        } catch (ServletException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Throwable throwable) {
+            StateModelDebugLog.log("StateModelServlet.doPost failed.", throwable);
+            throw new ServletException("Unable to render test sequence preview", throwable);
         }
     }
 }

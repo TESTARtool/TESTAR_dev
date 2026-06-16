@@ -30,9 +30,8 @@ dependencies {
     implementation project(':config')
     implementation project(':plugin')
     implementation project(':cli')
+    implementation project(':statemodel')
     implementation project(':testar')
-    // https://mvnrepository.com/artifact/io.javalin/javalin/7.2.2
-    implementation("io.javalin:javalin:7.2.2")
 }
 
 application {

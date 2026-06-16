@@ -90,8 +90,12 @@ public class AnalysisManager {
      * Shuts down the orientDB connection.
      */
     public void shutdown() {
-        if (orientDB.isOpen()) {
-            orientDB.close();
+        if (orientDB != null && orientDB.isOpen()) {
+            try {
+                orientDB.close();
+            } catch (RuntimeException exception) {
+                StateModelDebugLog.log("Unable to close OrientDB analysis connection cleanly.", exception);
+            }
         }
     }
 
@@ -99,7 +103,8 @@ public class AnalysisManager {
      * Checks whether the connection should be shutdown.
      */
     private void checkShutDown() {
-        if (dbConfig.getConnectionType().equals(Config.CONNECTION_TYPE_LOCAL)) {
+        if (dbConfig.getConnectionType().equals(Config.CONNECTION_TYPE_LOCAL)
+                && !Boolean.getBoolean("testar.analysis.keepOrientDbOpen")) {
             shutdown();
         }
     }
