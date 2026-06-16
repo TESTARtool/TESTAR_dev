@@ -95,6 +95,13 @@ public final class WebStudioServer {
             "workspaceCount", workspaceController.listWorkspaces().size()
         )));
         routes.get("/api/workspaces", context -> handle(context, workspaceController::listWorkspaces));
+        routes.get("/api/debug-files", context -> handle(context, workspaceController::listDebugFiles));
+        routes.get("/api/debug-files/{fileName}", context -> handle(context, () ->
+            workspaceController.readDebugFile(
+                context.pathParam("fileName"),
+                context.queryParam("path")
+            )
+        ));
         routes.get("/api/workspaces/{workspace}", context -> handle(context, () -> {
             String workspace = context.pathParam("workspace");
             return workspaceController.readWorkspaceDocument(workspace);

@@ -129,6 +129,10 @@ body {
     gap: 8px;
 }
 
+.page-nav-right {
+    margin-left: auto;
+}
+
 .status-panel {
     display: grid;
     gap: 18px;
@@ -1102,6 +1106,19 @@ button:disabled {
 .result-file-item.selected {
     outline: 2px solid rgba(255, 255, 255, 0.75);
     outline-offset: 1px;
+}
+
+.debug-file-item {
+    width: 100%;
+    color: var(--text);
+    border: 1px solid rgba(35, 52, 79, 0.12);
+    background: rgba(255, 255, 255, 0.92);
+}
+
+.debug-file-item.selected {
+    background: rgba(15, 91, 120, 0.12);
+    border-color: rgba(15, 91, 120, 0.3);
+    outline: none;
 }
 
 .result-file-ok {

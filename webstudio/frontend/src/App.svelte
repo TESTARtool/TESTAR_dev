@@ -3,6 +3,7 @@
     import TestConfigurationView from "./TestConfigurationView.svelte";
     import RunTestarView from "./RunTestarView.svelte";
     import TestResultsView from "./TestResultsView.svelte";
+    import InspectLogsView from "./InspectLogsView.svelte";
     import StateModelIcon from "./icons/StateModelIcon.svelte";
 
     const STATE_MODEL_URL = "http://localhost:8090/models";
@@ -23,6 +24,8 @@
     let selectedResultGroup = null;
     let selectedResultFile = null;
     let selectedEditor = "java-composition";
+    let debugFiles = [];
+    let selectedDebugFile = null;
     let policySourceFiles = [];
     let compositionSourceFiles = [];
     let currentEditorDocument = null;
@@ -401,6 +404,11 @@
         loadResults();
     }
 
+    async function navigateToLogs() {
+        currentPage = "logs";
+        await loadDebugFiles();
+    }
+
     function openStateModelExternalTab(url = STATE_MODEL_URL) {
         window.open(url, "_blank", "noopener,noreferrer");
     }
@@ -552,6 +560,40 @@
         }
     }
 
+    async function loadDebugFiles() {
+        try {
+            debugFiles = await loadJson("/api/debug-files");
+            if (debugFiles.length > 0) {
+                await loadDebugFile(debugFiles[0]);
+            } else {
+                selectedDebugFile = null;
+            }
+        } catch (debugFilesError) {
+            reportClientError("Unable to load debug files", debugFilesError);
+            debugFiles = [];
+            selectedDebugFile = null;
+        }
+    }
+
+    async function loadDebugFile(debugFile) {
+        if (!debugFile?.name) {
+            selectedDebugFile = null;
+            return;
+        }
+
+        try {
+            const debugFilePath = encodeURIComponent(debugFile.path);
+            selectedDebugFile = await loadJson(`/api/debug-files/${debugFile.name}?path=${debugFilePath}`);
+        } catch (debugFileError) {
+            selectedDebugFile = {
+                name: debugFile.name,
+                path: debugFile.path,
+                content: debugFileError?.message || "Unable to load the selected debug file."
+            };
+            reportClientError(`Unable to load debug file ${debugFile.name}`, debugFileError);
+        }
+    }
+
     $: if (workspaceDocument?.sourceFiles) {
         policySourceFiles = workspaceDocument.sourceFiles.filter((sourceFile) => sourceFile.category === "policy");
         compositionSourceFiles = workspaceDocument.sourceFiles.filter((sourceFile) =>
@@ -688,9 +730,12 @@
         <button class:secondary={currentPage !== "results"} on:click={navigateToResults}>
             👁️ View Test Results
         </button>
-        <button type="button" on:click={navigateToStateModel}>
+        <button class="secondary" type="button" on:click={navigateToStateModel}>
             <StateModelIcon size={18} title="State model" />
             <span>View State Model</span>
+        </button>
+        <button class:secondary={currentPage !== "logs"} class="page-nav-right" type="button" on:click={navigateToLogs}>
+            🧾 Inspect Debug Files
         </button>
     </nav>
 
@@ -741,6 +786,14 @@
             selectedResultFile={selectedResultFile}
             selectedResultGroup={selectedResultGroup}
             selectResultGroup={selectResultGroup}
+        />
+    {/if}
+
+    {#if currentPage === "logs"}
+        <InspectLogsView
+            debugFiles={debugFiles}
+            loadDebugFile={loadDebugFile}
+            selectedDebugFile={selectedDebugFile}
         />
     {/if}
 

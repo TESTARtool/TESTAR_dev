@@ -9,6 +9,8 @@ package org.testar.webstudio.api;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.testar.webstudio.api.dto.DebugFileDto;
+import org.testar.webstudio.api.dto.DebugFileSummaryDto;
 import org.testar.webstudio.api.dto.WorkspaceDocumentDto;
 import org.testar.webstudio.api.dto.WorkspaceFileDto;
 import org.testar.webstudio.api.dto.WorkspaceSummaryDto;
@@ -32,6 +34,14 @@ public final class WorkspaceController {
 
     public WorkspaceDocumentDto readWorkspaceDocument(String workspaceName) {
         return workspaceService.readWorkspaceDocument(workspaceName);
+    }
+
+    public List<DebugFileSummaryDto> listDebugFiles() {
+        return workspaceService.listDebugFiles();
+    }
+
+    public DebugFileDto readDebugFile(String fileName, String filePath) {
+        return workspaceService.readDebugFile(fileName, filePath);
     }
 
     public WorkspaceFileDto saveTestSettings(String workspaceName, String content) {

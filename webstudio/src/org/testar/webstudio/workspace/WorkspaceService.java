@@ -7,6 +7,7 @@
 package org.testar.webstudio.workspace;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,6 +23,8 @@ import java.util.stream.Stream;
 import org.testar.webstudio.api.dto.WorkspaceDocumentDto;
 import org.testar.webstudio.api.dto.WorkspaceFileDto;
 import org.testar.webstudio.api.dto.WorkspaceSummaryDto;
+import org.testar.webstudio.api.dto.DebugFileDto;
+import org.testar.webstudio.api.dto.DebugFileSummaryDto;
 
 public final class WorkspaceService {
 
@@ -70,6 +73,60 @@ public final class WorkspaceService {
 
     public Path workspaceDirectory(String workspaceName) {
         return resolveWorkspaceDirectory(workspaceName);
+    }
+
+    public List<DebugFileSummaryDto> listDebugFiles() {
+        Path testarHomeDirectory = testarHomeDirectory();
+        if (!Files.isDirectory(testarHomeDirectory)) {
+            return List.of();
+        }
+
+        try (Stream<Path> children = Files.list(testarHomeDirectory)) {
+            return children
+                .filter(Files::isRegularFile)
+                .filter(path -> path.getFileName().toString().toLowerCase().endsWith(".log"))
+                .sorted(Comparator.comparing(path -> path.getFileName().toString().toLowerCase()))
+                .map(path -> new DebugFileSummaryDto(
+                    path.getFileName().toString(),
+                    path.toAbsolutePath().normalize().toString()
+                ))
+                .collect(Collectors.toList());
+        } catch (IOException exception) {
+            throw new IllegalStateException("Unable to list debug files under: " + testarHomeDirectory, exception);
+        }
+    }
+
+    public DebugFileDto readDebugFile(String fileName, String filePath) {
+        Path testarHomeDirectory = testarHomeDirectory();
+        Path resolvedFile;
+
+        if (filePath != null && !filePath.isBlank()) {
+            resolvedFile = Path.of(filePath).toAbsolutePath().normalize();
+        } else {
+            resolvedFile = testarHomeDirectory.resolve(fileName).toAbsolutePath().normalize();
+        }
+
+        if (!resolvedFile.startsWith(testarHomeDirectory)) {
+            throw new IllegalArgumentException("Invalid debug file path: " + resolvedFile);
+        }
+
+        if (!resolvedFile.getFileName().toString().toLowerCase().endsWith(".log")) {
+            throw new IllegalArgumentException("Invalid debug file name: " + resolvedFile.getFileName());
+        }
+
+        if (!Files.isRegularFile(resolvedFile)) {
+            throw new IllegalArgumentException("Debug file not found: " + resolvedFile.getFileName());
+        }
+
+        try {
+            return new DebugFileDto(
+                resolvedFile.getFileName().toString(),
+                resolvedFile.toString(),
+                readDebugFileContent(resolvedFile)
+            );
+        } catch (IOException exception) {
+            throw new IllegalStateException("Unable to read debug file: " + resolvedFile, exception);
+        }
     }
 
     public WorkspaceDocumentDto readWorkspaceDocument(String workspaceName) {
@@ -291,5 +348,19 @@ public final class WorkspaceService {
         if (sourceName.contains("/") || sourceName.contains("\\") || !sourceName.endsWith(".java")) {
             throw new IllegalArgumentException("Invalid workspace source name: " + sourceName);
         }
+    }
+
+    private String readDebugFileContent(Path file) throws IOException {
+        IOException lastException = null;
+
+        for (Charset charset : List.of(StandardCharsets.UTF_8, Charset.defaultCharset(), Charset.forName("windows-1252"))) {
+            try {
+                return Files.readString(file, charset);
+            } catch (IOException exception) {
+                lastException = exception;
+            }
+        }
+
+        throw lastException != null ? lastException : new IOException("Unable to read debug file content: " + file);
     }
 }

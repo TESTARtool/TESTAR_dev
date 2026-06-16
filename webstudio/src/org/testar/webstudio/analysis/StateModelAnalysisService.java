@@ -38,7 +38,7 @@ public final class StateModelAnalysisService {
     }
 
     public synchronized StateModelLaunchDto open(String workspaceName) {
-        Path debugLogPath = workspaceService.testarHomeDirectory().resolve("debug.log");
+        Path debugLogPath = workspaceService.testarHomeDirectory().resolve("state-model-debug.log");
         StateModelDebugLog.install(debugLogPath);
         System.clearProperty("testar.analysis.keepOrientDbOpen");
         StateModelDebugLog.log("Opening state model analysis for workspace: " + workspaceName);

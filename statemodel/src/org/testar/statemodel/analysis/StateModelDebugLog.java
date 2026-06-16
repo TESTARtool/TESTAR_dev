@@ -91,6 +91,6 @@ public final class StateModelDebugLog {
             return Path.of(configuredPath).toAbsolutePath().normalize();
         }
 
-        return RuntimePathsUtil.resolveTestarHome().resolve("debug.log").toAbsolutePath().normalize();
+        return RuntimePathsUtil.resolveTestarHome().resolve("state-model-debug.log").toAbsolutePath().normalize();
     }
 }
