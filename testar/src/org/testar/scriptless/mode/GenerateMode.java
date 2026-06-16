@@ -91,6 +91,7 @@ public class GenerateMode {
     }
 
     private List<Verdict> runGenerateInnerLoop(ComposedProtocol protocol, SUT system, State state) throws Exception {
+        protocol.getVerdicts(system, state);
         Set<Action> actions = protocol.deriveActions(system, state);
         protocol.runtimeContext().sessionReportingManager().addActions(actions);
         protocol.runtimeContext().stateModelManager().notifyNewStateReached(state, actions);
