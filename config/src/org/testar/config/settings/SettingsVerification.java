@@ -128,9 +128,17 @@ public class SettingsVerification {
 
         String customCompositionResource = settings.get(ConfigTags.CustomCompositionResource, "");
         if (!customCompositionResource.isBlank()) {
-            File resourceFile = new File(customCompositionResource);
+            File resourceFile = SettingsResourceResolver.resolve(customCompositionResource);
             if (!resourceFile.exists()) {
                 System.err.println("*** WARNING: CustomCompositionResource does not exist: " + customCompositionResource);
+            }
+        }
+
+        String customPoliciesResource = settings.get(ConfigTags.CustomPoliciesResource, "");
+        if (!customPoliciesResource.isBlank()) {
+            File resourceFile = SettingsResourceResolver.resolve(customPoliciesResource);
+            if (!resourceFile.exists()) {
+                System.err.println("*** WARNING: CustomPoliciesResource does not exist: " + customPoliciesResource);
             }
         }
     }

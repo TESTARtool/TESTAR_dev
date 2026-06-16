@@ -16,6 +16,7 @@ import java.util.Properties;
 import org.testar.config.CompositionProfiles;
 import org.testar.config.ConfigTags;
 import org.testar.config.settings.Settings;
+import org.testar.config.settings.SettingsResourceResolver;
 import org.testar.core.Assert;
 import org.testar.scriptless.util.ExternalJavaClassSupport;
 
@@ -156,7 +157,7 @@ public final class ScriptlessCompositionLoader {
             return properties;
         }
 
-        File resourceFile = new File(customCompositionResource);
+        File resourceFile = SettingsResourceResolver.resolve(customCompositionResource);
         if (!resourceFile.exists()) {
             return properties;
         }

@@ -29,6 +29,12 @@ public class StateModelStorageBootstrap {
 
     public static void setupOrientDB(String directoryPath, String database, String user, String pass) {
         Path databaseDirectory = RuntimePathsUtil.resolveAgainstTestarHome(directoryPath);
+        Path databasePath = databaseDirectory.resolve(database);
+        if (new File(databasePath.toString()).exists()) {
+            logger.log(Level.INFO, "Using existing OrientDB database: " + databasePath);
+            return;
+        }
+
         Path orientDbHome = databaseDirectory.getParent();
         Path installDirectory = orientDbHome == null ? databaseDirectory : orientDbHome.getParent();
         if (installDirectory == null) {

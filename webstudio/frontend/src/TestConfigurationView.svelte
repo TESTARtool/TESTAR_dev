@@ -55,10 +55,14 @@
     }
 
     function flowImplementation(flowNode) {
+        const sourceFileName = typeof flowNode?.sourceFile === "string"
+            ? flowNode.sourceFile
+            : flowNode?.sourceFile?.name;
+
         return (
             flowNode?.configuredClassName ||
             flowNode?.className ||
-            flowNode?.sourceFile ||
+            sourceFileName ||
             flowNode?.fileName ||
             flowNode?.description ||
             "Default implementation"
@@ -86,7 +90,9 @@
         }
 
         const sourceName =
-            selectedCompositionFlowNode.sourceFile ||
+            (typeof selectedCompositionFlowNode.sourceFile === "string"
+                ? selectedCompositionFlowNode.sourceFile
+                : selectedCompositionFlowNode.sourceFile?.name) ||
             selectedCompositionFlowNode.fileName ||
             selectedCompositionFlowNode.name;
 
@@ -97,7 +103,10 @@
 
     $: selectedCompositionMode = flowMode(selectedCompositionFlowNode);
     $: selectedCompositionHasSource = Boolean(
-        selectedCompositionFlowNode?.sourceFile || selectedCompositionFlowNode?.fileName || selectedCompositionFlowNode?.name
+        selectedCompositionFlowNode?.sourceFile?.name
+            || selectedCompositionFlowNode?.sourceFile
+            || selectedCompositionFlowNode?.fileName
+            || selectedCompositionFlowNode?.name
     );
 
     function closeCompositionModal() {

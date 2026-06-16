@@ -10,6 +10,12 @@
     let consoleOutputElement = null;
     let lastRenderedConsoleOutput = "";
 
+    $: completedSequenceCount = scriptlessStatus?.sequenceOutcomes?.length || 0;
+    $: plannedSequenceCount = scriptlessStatus?.plannedSequenceCount || 0;
+    $: testResultsOutcomeTitle = plannedSequenceCount > 0
+        ? `Test Results Outcomes (${completedSequenceCount}/${plannedSequenceCount})`
+        : "Test Results Outcomes";
+
     $: if (consoleOutputElement && scriptlessStatus?.consoleOutput !== undefined) {
         const currentConsoleOutput = scriptlessStatus.consoleOutput || "";
         if (currentConsoleOutput !== lastRenderedConsoleOutput) {
@@ -58,7 +64,7 @@
         </section>
 
         <section class="status-card">
-            <h3>Sequence Outcomes</h3>
+            <h3>{testResultsOutcomeTitle}</h3>
             <div class="sequence-graph">
                 {#if scriptlessStatus?.sequenceOutcomes?.length > 0}
                     {#each scriptlessStatus.sequenceOutcomes as sequenceOutcome}

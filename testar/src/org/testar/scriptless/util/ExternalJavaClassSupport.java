@@ -7,6 +7,7 @@
 package org.testar.scriptless.util;
 
 import org.testar.config.TestarDirectories;
+import org.testar.config.settings.SettingsResourceResolver;
 import org.testar.core.Assert;
 
 import javax.tools.Diagnostic;
@@ -223,7 +224,7 @@ public final class ExternalJavaClassSupport {
     }
 
     private static Path resolveSourceRoot(String resourcePath) {
-        File resourceFile = new File(resourcePath);
+        File resourceFile = SettingsResourceResolver.resolve(resourcePath);
         File parentDirectory = resourceFile.getParentFile();
         if (parentDirectory == null || !parentDirectory.exists()) {
             return null;

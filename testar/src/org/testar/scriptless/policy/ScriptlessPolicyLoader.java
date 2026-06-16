@@ -18,6 +18,7 @@ import java.util.Properties;
 
 import org.testar.config.ConfigTags;
 import org.testar.config.settings.Settings;
+import org.testar.config.settings.SettingsResourceResolver;
 import org.testar.core.Assert;
 import org.testar.core.policy.Policy;
 import org.testar.scriptless.util.ExternalJavaClassSupport;
@@ -175,7 +176,7 @@ public final class ScriptlessPolicyLoader {
             return properties;
         }
 
-        File resourceFile = new File(configuredResource);
+        File resourceFile = SettingsResourceResolver.resolve(configuredResource);
         if (!resourceFile.exists()) {
             return properties;
         }

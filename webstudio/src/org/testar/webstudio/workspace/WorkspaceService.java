@@ -145,6 +145,17 @@ public final class WorkspaceService {
         Path current = workingDirectory;
 
         while (current != null) {
+            Path candidate = current.resolve("testar").resolve("target").resolve("install").resolve("testar").resolve("bin").resolve("settings");
+            if (Files.isDirectory(candidate)) {
+                return candidate;
+            }
+
+            current = current.getParent();
+        }
+
+        current = workingDirectory;
+
+        while (current != null) {
             Path candidate = current.resolve("testar").resolve("resources").resolve("settings");
             if (Files.isDirectory(candidate)) {
                 return candidate;
@@ -153,7 +164,7 @@ public final class WorkspaceService {
             current = current.getParent();
         }
 
-        return workingDirectory.resolve("testar").resolve("resources").resolve("settings");
+        return workingDirectory.resolve("testar").resolve("target").resolve("install").resolve("testar").resolve("bin").resolve("settings");
     }
 
     private Path resolveWorkspaceDirectory(String workspaceName) {

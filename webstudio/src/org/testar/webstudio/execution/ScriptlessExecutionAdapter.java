@@ -207,6 +207,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         Path installSettingsDirectory = installBinDirectory.resolve("settings");
         Path targetWorkspace = installSettingsDirectory.resolve(workspaceName);
         Path markerFile = installSettingsDirectory.resolve(workspaceName + ".sse");
+        boolean workspaceAlreadyInInstallDirectory = sourceWorkspace.equals(targetWorkspace);
 
         if (!Files.isDirectory(sourceWorkspace)) {
             throw new IllegalArgumentException("Workspace not found: " + workspaceName);
@@ -215,7 +216,9 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         try {
             Files.createDirectories(installSettingsDirectory);
             clearExistingMarkers(installSettingsDirectory);
-            replaceDirectory(targetWorkspace, sourceWorkspace);
+            if (!workspaceAlreadyInInstallDirectory) {
+                replaceDirectory(targetWorkspace, sourceWorkspace);
+            }
             patchTestSettings(targetWorkspace.resolve("test.settings"), mode);
             plannedSequenceCount = readPlannedSequenceCount(targetWorkspace.resolve("test.settings"));
             Files.writeString(markerFile, "", StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
@@ -309,8 +312,8 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
             currentWorkspace,
             currentMode,
             consoleOutput(),
-            startedAtEpochMillis > 0L ? startedAtEpochMillis : null
-            ,
+            startedAtEpochMillis > 0L ? startedAtEpochMillis : null,
+            plannedSequenceCount > 0 ? plannedSequenceCount : null,
             List.copyOf(sequenceOutcomes)
         );
     }

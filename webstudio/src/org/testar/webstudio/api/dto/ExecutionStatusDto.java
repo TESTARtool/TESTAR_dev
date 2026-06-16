@@ -15,10 +15,11 @@ public final class ExecutionStatusDto {
     private final String mode;
     private final String consoleOutput;
     private final Long startedAtEpochMillis;
+    private final Integer plannedSequenceCount;
     private final java.util.List<SequenceOutcomeDto> sequenceOutcomes;
 
     public ExecutionStatusDto(String backend, String status, String message) {
-        this(backend, status, message, null, null, "", null, java.util.List.of());
+        this(backend, status, message, null, null, "", null, null, java.util.List.of());
     }
 
     public ExecutionStatusDto(
@@ -29,6 +30,7 @@ public final class ExecutionStatusDto {
         String mode,
         String consoleOutput,
         Long startedAtEpochMillis,
+        Integer plannedSequenceCount,
         java.util.List<SequenceOutcomeDto> sequenceOutcomes
     ) {
         this.backend = backend;
@@ -38,6 +40,7 @@ public final class ExecutionStatusDto {
         this.mode = mode;
         this.consoleOutput = consoleOutput;
         this.startedAtEpochMillis = startedAtEpochMillis;
+        this.plannedSequenceCount = plannedSequenceCount;
         this.sequenceOutcomes = sequenceOutcomes;
     }
 
@@ -67,6 +70,10 @@ public final class ExecutionStatusDto {
 
     public Long startedAtEpochMillis() {
         return startedAtEpochMillis;
+    }
+
+    public Integer plannedSequenceCount() {
+        return plannedSequenceCount;
     }
 
     public java.util.List<SequenceOutcomeDto> sequenceOutcomes() {

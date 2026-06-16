@@ -422,7 +422,7 @@
         const isCustom = configuredClassName !== "";
         const color = nodeDefinition.kind === "oracle"
             ? "oracle"
-            : (isCustom ? "custom" : "default");
+            : (isCustom ? (sourceFile ? "custom" : "invalid") : "default");
 
         return {
             id: nodeDefinition.id,
@@ -448,7 +448,7 @@
         }
 
         selectedCompositionFlowNode = flowNode;
-        if (flowNode.sourceFile) {
+        if (flowNode.sourceFile?.name) {
             selectSource(flowNode.sourceFile.name, "java-composition");
             return;
         }
