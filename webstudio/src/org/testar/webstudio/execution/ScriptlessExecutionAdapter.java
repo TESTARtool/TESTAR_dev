@@ -41,6 +41,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
     private static final Pattern SEQUENCE_SUMMARY_PATTERN = Pattern.compile("_sequence_(\\d+)");
     private static final Pattern SEQUENCE_OUTPUT_PATH_PATTERN = Pattern.compile("Generate\\s+([^\\s]+_sequence_(\\d+))");
     private static final Pattern HTML_RESOURCE_ATTRIBUTE_PATTERN = Pattern.compile("(\\b(?:src|href)\\s*=\\s*[\"'])(?![a-zA-Z][a-zA-Z0-9+.-]*:|//|#)([^\"'#][^\"']*)([\"'])");
+    private static final Pattern STATIC_HTML_ASSET_PATTERN = Pattern.compile(".+\\.(?:html?|css|js|png|jpe?g|gif|svg|ico|bmp|webp|woff2?|ttf|eot)$", Pattern.CASE_INSENSITIVE);
     private static final Set<String> NON_OK_VERDICT_TITLES = buildNonOkVerdictTitles();
 
     private Process currentProcess;
@@ -672,9 +673,14 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
             String attributePrefix = matcher.group(1);
             String relativeAssetPath = matcher.group(2).trim();
             String attributeSuffix = matcher.group(3);
+            String replacement = matcher.group(0);
+
+            if (!isStaticHtmlAssetReference(relativeAssetPath)) {
+                matcher.appendReplacement(rewrittenHtml, Matcher.quoteReplacement(replacement));
+                continue;
+            }
 
             Path resolvedAssetPath = htmlFilePath.getParent().resolve(relativeAssetPath).normalize();
-            String replacement = matcher.group(0);
 
             try {
                 Path validAssetPath = resolveScriptlessResultAsset(resolvedAssetPath.toString());
@@ -690,5 +696,29 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
 
         matcher.appendTail(rewrittenHtml);
         return rewrittenHtml.toString();
+    }
+
+    private boolean isStaticHtmlAssetReference(String relativeAssetPath) {
+        if (relativeAssetPath == null || relativeAssetPath.isBlank()) {
+            return false;
+        }
+
+        if (relativeAssetPath.contains("&")
+            || relativeAssetPath.contains("?")
+            || relativeAssetPath.contains("+")
+            || relativeAssetPath.contains("<")
+            || relativeAssetPath.contains(">")
+            || relativeAssetPath.contains("{")
+            || relativeAssetPath.contains("}")
+            || relativeAssetPath.contains("(")
+            || relativeAssetPath.contains(")")
+            || relativeAssetPath.contains("\n")
+            || relativeAssetPath.contains("\r")
+            || relativeAssetPath.contains("\t")) {
+            return false;
+        }
+
+        String normalizedAssetPath = relativeAssetPath.replace('\\', '/');
+        return STATIC_HTML_ASSET_PATTERN.matcher(normalizedAssetPath).matches();
     }
 }
