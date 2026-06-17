@@ -27,6 +27,20 @@
         return verdictKey;
     }
 
+    function formatResultFileLabel(fileName) {
+        if (!fileName) {
+            return "";
+        }
+
+        const trimmedExtension = fileName.replace(/\.html?$/i, "");
+        const sequenceIndex = trimmedExtension.indexOf("_sequence_");
+        if (sequenceIndex >= 0) {
+            return trimmedExtension.substring(sequenceIndex + 1);
+        }
+
+        return trimmedExtension;
+    }
+
     function colorForVerdict(verdictKey) {
         if (!verdictKey) {
             return verdictColorPalette[0];
@@ -102,64 +116,49 @@
     $: totalOutcomeCount = Math.max(resultSummary.okCount + resultSummary.failedVerdictCount, 1);
 </script>
 
-<section class="panel panel-wide status-panel">
-    <div class="results-top-layout">
-        <section class="status-card results-groups-card">
-            <h4 class="eyebrow">Generated Test Output Results</h4>
-            <div class="source-list result-list result-list-tall">
-                {#if scriptlessResults?.groups?.length > 0}
-                    {#each scriptlessResults.groups as resultGroup}
-                        <button
-                            class:selected={selectedResultGroup?.path === resultGroup.path}
-                            class:result-file-failed={resultGroup.status === "failed"}
-                            class:result-file-ok={resultGroup.status !== "failed"}
-                            class="source-item result-file-item"
-                            on:click={() => selectResultGroup(resultGroup)}
-                        >
-                            <span>{resultGroup.name}</span>
-                        </button>
-                    {/each}
-                {:else}
-                    <p class="progress-message">No generated output groups detected yet.</p>
-                {/if}
-            </div>
-        </section>
+<section class="panel panel-wide status-panel results-workspace">
+    <div class="results-workspace-layout">
+        <aside class="status-card results-sidebar">
+            <section class="results-sidebar-section">
+                <h4 class="eyebrow">Generated Test Output Results</h4>
+                <div class="source-list result-list result-list-tall">
+                    {#if scriptlessResults?.groups?.length > 0}
+                        {#each scriptlessResults.groups as resultGroup}
+                            <button
+                                class:selected={selectedResultGroup?.path === resultGroup.path}
+                                class:result-file-failed={resultGroup.status === "failed"}
+                                class:result-file-ok={resultGroup.status !== "failed"}
+                                class="source-item result-file-item"
+                                on:click={() => selectResultGroup(resultGroup)}
+                            >
+                                <span>{resultGroup.name}</span>
+                            </button>
+                        {/each}
+                    {:else}
+                        <p class="progress-message">No generated output groups detected yet.</p>
+                    {/if}
+                </div>
+            </section>
 
-        <section class="status-card results-summary-card">
-            <div class="verdict-summary-grid">
-                <section class="verdict-summary-section verdict-summary-section-outcomes">
-                    <div class="verdict-summary-section-header">
+            <section class="results-sidebar-section status-card results-summary-card">
+                <div class="verdict-summary-grid">
+                    <div class="verdict-summary-header-inline">
                         <span class="eyebrow">Verdict Outcomes</span>
-                    </div>
-
-                    <div class="verdict-outcome-card">
-                        <div class="verdict-outcome-stats">
-                            <article class="verdict-outcome-stat verdict-outcome-stat-ok">
-                                <span class="verdict-summary-label">OK</span>
-                                <strong>{resultSummary.okCount}</strong>
-                            </article>
-                            <article class="verdict-outcome-stat verdict-outcome-stat-failed">
-                                <span class="verdict-summary-label">FAILED</span>
-                                <strong>{resultSummary.failedVerdictCount}</strong>
-                            </article>
-                        </div>
-
-                        <div class="verdict-outcome-track" aria-hidden="true">
-                            <div
-                                class="verdict-outcome-segment verdict-outcome-segment-ok"
-                                style={`width: ${(resultSummary.okCount / totalOutcomeCount) * 100}%`}
-                            ></div>
-                            <div
-                                class="verdict-outcome-segment verdict-outcome-segment-failed"
-                                style={`width: ${(resultSummary.failedVerdictCount / totalOutcomeCount) * 100}%`}
-                            ></div>
+                        <div class="verdict-summary-totals">
+                            <span class="verdict-total verdict-total-ok">{resultSummary.okCount} OK</span>
+                            <span class="verdict-total verdict-total-failed">{resultSummary.failedVerdictCount} FAILED</span>
                         </div>
                     </div>
-                </section>
 
-                <section class="verdict-summary-section verdict-summary-section-types verdict-types-section">
-                    <div class="verdict-summary-section-header">
-                        <span class="eyebrow">Failure Verdict Types</span>
+                    <div class="verdict-outcome-track" aria-hidden="true">
+                        <div
+                            class="verdict-outcome-segment verdict-outcome-segment-ok"
+                            style={`width: ${(resultSummary.okCount / totalOutcomeCount) * 100}%`}
+                        ></div>
+                        <div
+                            class="verdict-outcome-segment verdict-outcome-segment-failed"
+                            style={`width: ${(resultSummary.failedVerdictCount / totalOutcomeCount) * 100}%`}
+                        ></div>
                     </div>
 
                     {#if resultSummary.verdictGroups.length > 0}
@@ -182,37 +181,49 @@
                     {:else}
                         <p class="progress-message">No test result files were generated with failures.</p>
                     {/if}
-                </section>
+                </div>
+            </section>
+
+            <section class="results-sidebar-section">
+                <h4 class="eyebrow">Generated Files</h4>
+                <div class="source-list result-list result-list-medium">
+                    {#if selectedResultGroup?.files?.length > 0}
+                        {#each selectedResultGroup.files as resultFile}
+                            <button
+                                class:selected={selectedResultFile?.name === resultFile.name}
+                                class:result-file-failed={resultFile.status === "failed"}
+                                class:result-file-ok={resultFile.status !== "failed"}
+                                class="source-item result-file-item"
+                                title={resultFile.name}
+                                on:click={() => loadResultFile(resultFile)}
+                            >
+                                <span>{formatResultFileLabel(resultFile.name)}</span>
+                            </button>
+                        {/each}
+                    {:else}
+                        <p class="progress-message">No generated files detected for this output group.</p>
+                    {/if}
+                </div>
+            </section>
+        </aside>
+
+        <section class="status-card results-report-panel">
+            <header class="results-report-header">
+                <div>
+                    <h4 class="eyebrow">Result Preview</h4>
+                </div>
+                {#if selectedResultGroup}
+                    <p class="results-report-meta">{selectedResultFile?.name || "No result file selected."}</p>
+                {/if}
+            </header>
+
+            <div class="status-console results-preview">
+                {#if selectedResultFile?.contentType === "text/html"}
+                    <iframe class="result-frame" title={selectedResultFile.name} srcdoc={selectedResultFile.content}></iframe>
+                {:else}
+                    <pre class="code console-output">{selectedResultFile?.content || "No result file selected."}</pre>
+                {/if}
             </div>
         </section>
     </div>
-
-    <section class="status-card results-files-card">
-        <h4 class="eyebrow">Generated Files</h4>
-        <div class="source-list result-list result-list-medium">
-            {#if selectedResultGroup?.files?.length > 0}
-                {#each selectedResultGroup.files as resultFile}
-                    <button
-                        class:selected={selectedResultFile?.name === resultFile.name}
-                        class:result-file-failed={resultFile.status === "failed"}
-                        class:result-file-ok={resultFile.status !== "failed"}
-                        class="source-item result-file-item"
-                        on:click={() => loadResultFile(resultFile)}
-                    >
-                        <span>{resultFile.name}</span>
-                    </button>
-                {/each}
-            {:else}
-                <p class="progress-message">No generated files detected for this output group.</p>
-            {/if}
-        </div>
-    </section>
-
-    <section class="status-console results-preview">
-        {#if selectedResultFile?.contentType === "text/html"}
-            <iframe class="result-frame" title={selectedResultFile.name} srcdoc={selectedResultFile.content}></iframe>
-        {:else}
-            <pre class="code console-output">{selectedResultFile?.content || "No result file selected."}</pre>
-        {/if}
-    </section>
 </section>
