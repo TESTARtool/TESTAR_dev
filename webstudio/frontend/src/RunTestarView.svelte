@@ -10,11 +10,37 @@
     let consoleOutputElement = null;
     let lastRenderedConsoleOutput = "";
 
+    function formatSequenceOutcomeLabel(sequenceOutcome) {
+        if (!sequenceOutcome) {
+            return "";
+        }
+
+        if (sequenceOutcome.label) {
+            return sequenceOutcome.label;
+        }
+
+        if (sequenceOutcome.outputPath) {
+            const outputPathSegments = sequenceOutcome.outputPath.split(/[\\/]/);
+            const fileName = outputPathSegments[outputPathSegments.length - 1] || "";
+            const trimmedExtension = fileName.replace(/\.html?$/i, "");
+            const sequenceIndex = trimmedExtension.indexOf("_sequence_");
+            if (sequenceIndex >= 0) {
+                return trimmedExtension.substring(sequenceIndex + 1);
+            }
+
+            if (trimmedExtension) {
+                return trimmedExtension;
+            }
+        }
+
+        return `sequence_${sequenceOutcome.sequenceNumber}`;
+    }
+
     $: completedSequenceCount = scriptlessStatus?.sequenceOutcomes?.length || 0;
     $: plannedSequenceCount = scriptlessStatus?.plannedSequenceCount || 0;
-    $: testResultsOutcomeTitle = plannedSequenceCount > 0
-        ? `Test Results Outcomes (${completedSequenceCount}/${plannedSequenceCount})`
-        : "Test Results Outcomes";
+    $: testResultsOutcomeProgress = plannedSequenceCount > 0
+        ? `${completedSequenceCount}/${plannedSequenceCount}`
+        : null;
 
     $: if (consoleOutputElement && scriptlessStatus?.consoleOutput !== undefined) {
         const currentConsoleOutput = scriptlessStatus.consoleOutput || "";
@@ -33,11 +59,11 @@
     <div class="status-panel-header">
         <div>
             <p class="eyebrow">Runtime</p>
-            <h2>Generate Run</h2>
+            <h2>Generate Mode Run</h2>
         </div>
         <div class="button-row">
             <button on:click={startGenerate} disabled={!selectedWorkspaceName || saving || scriptlessStatus?.status === "running"}>
-                Run Generate
+                Run Generate Mode
             </button>
             <button class="secondary" on:click={stopGenerate} disabled={saving}>
                 Stop
@@ -45,12 +71,58 @@
         </div>
     </div>
 
-    <div class="status-grid">
-        <section class="status-card">
-            <div class="progress-panel">
-                <div class="progress-header">
-                    <strong>{scriptlessStatus?.status || "idle"}</strong>
+    <div class="status-grid run-status-grid">
+        <section class="status-card run-outcomes-card">
+            <div class="run-outcomes-header">
+                <h3>Test Results Outcomes</h3>
+                {#if testResultsOutcomeProgress}
+                    <span class="run-outcomes-progress">{testResultsOutcomeProgress}</span>
+                {/if}
+            </div>
+            {#if scriptlessStatus?.sequenceOutcomes?.length > 0}
+                <div class="run-outcomes-layout">
+                    <section class="run-outcomes-panel">
+                        <div class="sequence-graph run-sequence-graph">
+                            {#each scriptlessStatus.sequenceOutcomes as sequenceOutcome}
+                                <div
+                                    class:sequence-failed={sequenceOutcome.status === "failed"}
+                                    class:sequence-ok={sequenceOutcome.status !== "failed"}
+                                    class="sequence-block"
+                                    title={`Sequence ${sequenceOutcome.sequenceNumber}: ${sequenceOutcome.status === "failed" ? "Failed" : "OK"}`}
+                                >
+                                    <span>{sequenceOutcome.sequenceNumber}</span>
+                                </div>
+                            {/each}
+                        </div>
+                    </section>
+
+                    <section class="run-outcomes-panel">
+                        <div class="run-outcome-list">
+                            {#each scriptlessStatus.sequenceOutcomes as sequenceOutcome}
+                                <article
+                                    class:run-outcome-item-failed={sequenceOutcome.status === "failed"}
+                                    class:run-outcome-item-ok={sequenceOutcome.status !== "failed"}
+                                    class="run-outcome-item"
+                                >
+                                    <div class="run-outcome-item-copy">
+                                        <span>{formatSequenceOutcomeLabel(sequenceOutcome)}</span>
+                                    </div>
+                                    <span class="run-outcome-item-status">{sequenceOutcome.status === "failed" ? "FAILED" : "OK"}</span>
+                                </article>
+                            {/each}
+                        </div>
+                    </section>
                 </div>
+            {:else}
+                <p class="progress-message">No completed sequences yet.</p>
+            {/if}
+        </section>
+    </div>
+
+    <section class="status-console">
+        <div class="section-header">
+            <div>
+                <h3>Console Output</h3>
                 <div class="progress-track">
                     <div
                         class:progress-running={scriptlessStatus?.status === "running"}
@@ -60,35 +132,6 @@
                     ></div>
                 </div>
                 <p class="progress-message">{scriptlessStatus?.message || "No scriptless status available."}</p>
-            </div>
-        </section>
-
-        <section class="status-card">
-            <h3>{testResultsOutcomeTitle}</h3>
-            <div class="sequence-graph">
-                {#if scriptlessStatus?.sequenceOutcomes?.length > 0}
-                    {#each scriptlessStatus.sequenceOutcomes as sequenceOutcome}
-                        <div
-                            class:sequence-failed={sequenceOutcome.status === "failed"}
-                            class:sequence-ok={sequenceOutcome.status !== "failed"}
-                            class="sequence-block"
-                            title={`Sequence ${sequenceOutcome.sequenceNumber}: ${sequenceOutcome.status === "failed" ? "Failed" : "OK"}`}
-                        >
-                            <span>{sequenceOutcome.sequenceNumber}</span>
-                        </div>
-                    {/each}
-                {:else}
-                    <p class="progress-message">No completed sequences yet.</p>
-                {/if}
-            </div>
-        </section>
-    </div>
-
-    <section class="status-console">
-        <div class="section-header">
-            <div>
-                <h3>Console Output</h3>
-                <p>Live TESTAR process output captured by Web Studio.</p>
             </div>
         </div>
         <pre bind:this={consoleOutputElement} class="code console-output">{scriptlessStatus?.consoleOutput || "No console output yet."}</pre>

@@ -11,15 +11,21 @@ public final class SequenceOutcomeDto {
     private final int sequenceNumber;
     private final String status;
     private final String outputPath;
+    private final String label;
 
     public SequenceOutcomeDto(int sequenceNumber, String status) {
-        this(sequenceNumber, status, null);
+        this(sequenceNumber, status, null, null);
     }
 
     public SequenceOutcomeDto(int sequenceNumber, String status, String outputPath) {
+        this(sequenceNumber, status, outputPath, null);
+    }
+
+    public SequenceOutcomeDto(int sequenceNumber, String status, String outputPath, String label) {
         this.sequenceNumber = sequenceNumber;
         this.status = status;
         this.outputPath = outputPath;
+        this.label = label;
     }
 
     public int sequenceNumber() {
@@ -32,5 +38,9 @@ public final class SequenceOutcomeDto {
 
     public String outputPath() {
         return outputPath;
+    }
+
+    public String label() {
+        return label;
     }
 }

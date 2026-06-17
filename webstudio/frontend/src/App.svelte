@@ -725,7 +725,7 @@
             ⚙️ Test Configuration
         </button>
         <button class:secondary={currentPage !== "run"} on:click={navigateToRun}>
-            🔄 Run TESTAR tool
+            🔄 Run Generate Mode
         </button>
         <button class:secondary={currentPage !== "results"} on:click={navigateToResults}>
             👁️ View Test Results

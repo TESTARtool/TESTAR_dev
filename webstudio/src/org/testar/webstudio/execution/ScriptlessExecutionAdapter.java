@@ -479,6 +479,8 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
     }
 
     private void recordSequenceOutcome(int sequenceNumber, String status, String outputPath) {
+        String resolvedLabel = resolveSequenceOutcomeLabel(sequenceNumber, status, outputPath);
+
         for (int index = 0; index < sequenceOutcomes.size(); index++) {
             if (sequenceOutcomes.get(index).sequenceNumber() == sequenceNumber) {
                 String existingStatus = sequenceOutcomes.get(index).status();
@@ -487,12 +489,82 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
                 }
 
                 String resolvedOutputPath = outputPath != null ? outputPath : sequenceOutcomes.get(index).outputPath();
-                sequenceOutcomes.set(index, new SequenceOutcomeDto(sequenceNumber, status, resolvedOutputPath));
+                String existingLabel = sequenceOutcomes.get(index).label();
+                String effectiveLabel = resolvedLabel != null ? resolvedLabel : existingLabel;
+                sequenceOutcomes.set(index, new SequenceOutcomeDto(sequenceNumber, status, resolvedOutputPath, effectiveLabel));
                 return;
             }
         }
 
-        sequenceOutcomes.add(new SequenceOutcomeDto(sequenceNumber, status, outputPath));
+        sequenceOutcomes.add(new SequenceOutcomeDto(sequenceNumber, status, outputPath, resolvedLabel));
+    }
+
+    private String resolveSequenceOutcomeLabel(int sequenceNumber, String status, String outputPath) {
+        if (outputPath == null || outputPath.isBlank()) {
+            return fallbackSequenceOutcomeLabel(sequenceNumber);
+        }
+
+        try {
+            Path outputBasePath = Paths.get(outputPath).normalize();
+            Path runOutputDirectory = outputBasePath.getParent();
+            if (runOutputDirectory == null) {
+                return fallbackSequenceOutcomeLabel(sequenceNumber);
+            }
+
+            Path reportsDirectory = runOutputDirectory.resolve("reports");
+            if (!Files.isDirectory(reportsDirectory)) {
+                return fallbackSequenceOutcomeLabel(sequenceNumber);
+            }
+
+            String baseName = outputBasePath.getFileName() == null ? null : outputBasePath.getFileName().toString();
+            List<ResultFileSummaryDto> files = new ArrayList<>();
+            collectPreviewableFiles(reportsDirectory, baseName, files);
+            if (files.isEmpty()) {
+                return fallbackSequenceOutcomeLabel(sequenceNumber);
+            }
+
+            files.sort(Comparator.comparing(ResultFileSummaryDto::path));
+            ResultFileSummaryDto selectedFile = selectSequenceOutcomeFile(files, status);
+            return formatSequenceOutcomeLabel(selectedFile.name(), sequenceNumber);
+        } catch (Exception ignored) {
+            return fallbackSequenceOutcomeLabel(sequenceNumber);
+        }
+    }
+
+    private ResultFileSummaryDto selectSequenceOutcomeFile(List<ResultFileSummaryDto> files, String status) {
+        if ("failed".equals(status)) {
+            for (ResultFileSummaryDto file : files) {
+                if ("failed".equals(file.status())) {
+                    return file;
+                }
+            }
+        }
+
+        for (ResultFileSummaryDto file : files) {
+            if ("ok".equals(file.status())) {
+                return file;
+            }
+        }
+
+        return files.get(0);
+    }
+
+    private String formatSequenceOutcomeLabel(String fileName, int sequenceNumber) {
+        if (fileName == null || fileName.isBlank()) {
+            return fallbackSequenceOutcomeLabel(sequenceNumber);
+        }
+
+        String trimmedExtension = fileName.replaceAll("\\.html?$", "");
+        int sequenceIndex = trimmedExtension.indexOf("_sequence_");
+        if (sequenceIndex >= 0) {
+            return trimmedExtension.substring(sequenceIndex + 1);
+        }
+
+        return trimmedExtension;
+    }
+
+    private String fallbackSequenceOutcomeLabel(int sequenceNumber) {
+        return "sequence_" + sequenceNumber;
     }
 
     private void destroyProcessTree(Process process) {
