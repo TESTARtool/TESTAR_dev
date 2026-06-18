@@ -4,7 +4,7 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.scriptless.policy;
+package org.testar.config.policy;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,11 +19,11 @@ import java.util.Properties;
 import org.testar.config.ConfigTags;
 import org.testar.config.settings.Settings;
 import org.testar.config.settings.SettingsResourceResolver;
+import org.testar.config.util.ExternalJavaClassSupport;
 import org.testar.core.Assert;
 import org.testar.core.policy.Policy;
-import org.testar.scriptless.util.ExternalJavaClassSupport;
 
-public final class ScriptlessPolicyLoader {
+public final class PolicyLoader {
 
     private static final String PROPERTY_CLICKABLE_POLICIES = "clickablePolicies";
     private static final String PROPERTY_REPLACE_CLICKABLE_POLICIES = "replaceClickablePolicies";
@@ -44,16 +44,16 @@ public final class ScriptlessPolicyLoader {
     private static final String PROPERTY_TOP_LEVEL_POLICIES = "topLevelPolicies";
     private static final String PROPERTY_REPLACE_TOP_LEVEL_POLICIES = "replaceTopLevelPolicies";
 
-    private ScriptlessPolicyLoader() {
+    private PolicyLoader() {
     }
 
-    public static ScriptlessPolicyDescriptor loadDescriptor(Settings settings) {
+    public static PolicyDescriptor loadDescriptor(Settings settings) {
         Assert.notNull(settings);
 
         String configuredResource = configuredPoliciesResource(settings);
         Properties resourceProperties = loadResourceProperties(configuredResource);
 
-        return new ScriptlessPolicyDescriptor(
+        return new PolicyDescriptor(
                 optionalValue(configuredResource),
                 booleanProperty(resourceProperties, PROPERTY_REPLACE_CLICKABLE_POLICIES),
                 booleanProperty(resourceProperties, PROPERTY_REPLACE_TYPEABLE_POLICIES),
@@ -87,7 +87,7 @@ public final class ScriptlessPolicyLoader {
             return Collections.emptyList();
         }
 
-        List<T> policies = new ArrayList<>();
+        List<T> policies = new ArrayList<T>();
         Optional<String> resourcePath = optionalValue(configuredPoliciesResource(settings));
         for (String className : policyClassNames) {
             policies.add(loadPolicy(className, expectedType, settings, resourcePath));
@@ -100,8 +100,6 @@ public final class ScriptlessPolicyLoader {
                                                    Settings settings,
                                                    Optional<String> resourcePath) {
         try {
-            // Policy classes are resolved from the configured settings workspace first,
-            // then from the packaged runtime classpath.
             Class<?> policyClass = ExternalJavaClassSupport.loadClass(className, resourcePath);
             verifyPolicyType(className, expectedType, policyClass);
 
@@ -160,7 +158,7 @@ public final class ScriptlessPolicyLoader {
             return Collections.emptyList();
         }
 
-        List<String> classNames = new ArrayList<>();
+        List<String> classNames = new ArrayList<String>();
         for (String token : value.split(";")) {
             String trimmed = token.trim();
             if (!trimmed.isEmpty()) {
@@ -182,8 +180,6 @@ public final class ScriptlessPolicyLoader {
         }
 
         try (FileInputStream inputStream = new FileInputStream(resourceFile)) {
-            // Policy resources are optional. When present, they add or replace
-            // the baseline platform policies for the configured seams.
             properties.load(inputStream);
             return properties;
         } catch (IOException exception) {

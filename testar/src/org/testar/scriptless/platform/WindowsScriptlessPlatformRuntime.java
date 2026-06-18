@@ -6,6 +6,7 @@
 
 package org.testar.scriptless.platform;
 
+import org.testar.config.composition.CompositionDescriptor;
 import org.testar.core.action.resolver.ActionResolver;
 import org.testar.core.service.ActionDerivationService;
 import org.testar.core.service.ActionExecutionService;
@@ -30,7 +31,6 @@ import org.testar.scriptless.capability.windows.WindowsSettingsCapability;
 import org.testar.scriptless.capability.windows.WindowsStopCriteriaCapability;
 import org.testar.scriptless.capability.windows.WindowsTestSequenceCapability;
 import org.testar.scriptless.capability.windows.WindowsTestSessionCapability;
-import org.testar.scriptless.composition.ScriptlessCompositionDescriptor;
 import org.testar.scriptless.service.ScriptlessOracleComposer;
 import org.testar.scriptless.service.windows.ScriptlessWindowsActionDerivationService;
 import org.testar.scriptless.service.windows.ScriptlessWindowsActionExecutionService;
@@ -45,7 +45,7 @@ public final class WindowsScriptlessPlatformRuntime extends AbstractScriptlessPl
     @Override
     public ServiceSessionConfiguration createServiceConfiguration(PlatformSessionSpecification sessionSpec,
                                                                  RuntimeContext runtimeContext,
-                                                                 ScriptlessCompositionDescriptor compositionDescriptor) {
+                                                                 CompositionDescriptor compositionDescriptor) {
         StateCompositionPlan defaultStatePlan = PlatformDefaultSessionConfigurations
                 .windowsServiceConfiguration(sessionSpec)
                 .stateCompositionPlanOverride()
@@ -62,7 +62,7 @@ public final class WindowsScriptlessPlatformRuntime extends AbstractScriptlessPl
     @Override
     public TestingServices createTestingServices(PlatformServices platformServices,
                                                  RuntimeContext runtimeContext,
-                                                 ScriptlessCompositionDescriptor compositionDescriptor,
+                                                 CompositionDescriptor compositionDescriptor,
                                                  SessionReportingManager sessionReportingManager) {
         SystemService systemService = new ScriptlessWindowsSystemService(
                 platformServices.systemService(),
@@ -98,7 +98,7 @@ public final class WindowsScriptlessPlatformRuntime extends AbstractScriptlessPl
 
     @Override
     public ScriptlessCapabilities createCapabilities(RuntimeContext runtimeContext,
-                                                     ScriptlessCompositionDescriptor compositionDescriptor,
+                                                     CompositionDescriptor compositionDescriptor,
                                                      ScriptlessCapabilities capabilities) {
         SettingsCapability settingsCapability = new WindowsSettingsCapability(
                 capabilities.settingsCapability()

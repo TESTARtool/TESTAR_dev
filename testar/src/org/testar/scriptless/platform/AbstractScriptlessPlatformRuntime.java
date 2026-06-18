@@ -8,6 +8,8 @@ package org.testar.scriptless.platform;
 
 import java.util.Optional;
 
+import org.testar.config.composition.CompositionDescriptor;
+import org.testar.config.composition.CompositionLoader;
 import org.testar.core.action.resolver.ActionResolver;
 import org.testar.core.service.ActionIdentifierService;
 import org.testar.core.service.ActionDerivationService;
@@ -29,8 +31,6 @@ import org.testar.scriptless.capability.SettingsCapability;
 import org.testar.scriptless.capability.StopCriteriaCapability;
 import org.testar.scriptless.capability.TestSequenceCapability;
 import org.testar.scriptless.capability.TestSessionCapability;
-import org.testar.scriptless.composition.ScriptlessCompositionDescriptor;
-import org.testar.scriptless.composition.ScriptlessCompositionLoader;
 import org.testar.scriptless.service.ScriptlessOracleComposer;
 import org.testar.statemodel.StateModelManager;
 
@@ -39,12 +39,12 @@ abstract class AbstractScriptlessPlatformRuntime implements ScriptlessPlatformRu
     @Override
     public ServiceSessionConfiguration createServiceConfiguration(PlatformSessionSpecification sessionSpec,
                                                                  RuntimeContext runtimeContext,
-                                                                 ScriptlessCompositionDescriptor compositionDescriptor) {
+                                                                 CompositionDescriptor compositionDescriptor) {
         return serviceConfigurationBuilder(runtimeContext, compositionDescriptor).build();
     }
 
     protected final <T> T wrap(OptionalWrapper<T> optionalWrapper) {
-        return ScriptlessCompositionLoader.loadDelegateWrapper(
+        return CompositionLoader.loadDelegateWrapper(
                 optionalWrapper.wrapperClassName,
                 optionalWrapper.compositionDescriptor.customCompositionResource(),
                 optionalWrapper.expectedType,
@@ -92,7 +92,7 @@ abstract class AbstractScriptlessPlatformRuntime implements ScriptlessPlatformRu
     }
 
     protected final ServiceSessionConfiguration.Builder serviceConfigurationBuilder(RuntimeContext runtimeContext,
-                                                                                    ScriptlessCompositionDescriptor compositionDescriptor) {
+                                                                                    CompositionDescriptor compositionDescriptor) {
         StateIdentifierService stateIdentifierService = wrap(wrapper(
                 compositionDescriptor.stateIdentifierServiceClass(),
                 compositionDescriptor,
@@ -119,7 +119,7 @@ abstract class AbstractScriptlessPlatformRuntime implements ScriptlessPlatformRu
 
     protected final ServiceBundle wrapServices(ServiceBundle bundle,
                                                RuntimeContext runtimeContext,
-                                               ScriptlessCompositionDescriptor compositionDescriptor) {
+                                               CompositionDescriptor compositionDescriptor) {
         bundle.systemService = wrap(wrapper(
                 compositionDescriptor.systemServiceClass(),
                 compositionDescriptor,
@@ -171,7 +171,7 @@ abstract class AbstractScriptlessPlatformRuntime implements ScriptlessPlatformRu
 
     protected final CapabilityBundle wrapCapabilities(CapabilityBundle bundle,
                                                       RuntimeContext runtimeContext,
-                                                      ScriptlessCompositionDescriptor compositionDescriptor) {
+                                                      CompositionDescriptor compositionDescriptor) {
         bundle.settingsCapability = wrap(wrapper(
                 compositionDescriptor.settingsCapabilityClass(),
                 compositionDescriptor,
@@ -221,7 +221,7 @@ abstract class AbstractScriptlessPlatformRuntime implements ScriptlessPlatformRu
     }
 
     @Override
-    public SettingsCapability createSettingsCapability(RuntimeContext runtimeContext, ScriptlessCompositionDescriptor compositionDescriptor) {
+    public SettingsCapability createSettingsCapability(RuntimeContext runtimeContext, CompositionDescriptor compositionDescriptor) {
         return wrap(wrapper(
                 compositionDescriptor.settingsCapabilityClass(),
                 compositionDescriptor,
@@ -272,13 +272,13 @@ abstract class AbstractScriptlessPlatformRuntime implements ScriptlessPlatformRu
     protected static final class OptionalWrapper<T> {
 
         private final Optional<String> wrapperClassName;
-        private final ScriptlessCompositionDescriptor compositionDescriptor;
+        private final CompositionDescriptor compositionDescriptor;
         private final Class<T> expectedType;
         private final T delegate;
         private final Object[][] extraArgumentOptions;
 
         private OptionalWrapper(Optional<String> wrapperClassName,
-                                ScriptlessCompositionDescriptor compositionDescriptor,
+                                CompositionDescriptor compositionDescriptor,
                                 Class<T> expectedType,
                                 T delegate,
                                 Object[]... extraArgumentOptions) {
@@ -291,7 +291,7 @@ abstract class AbstractScriptlessPlatformRuntime implements ScriptlessPlatformRu
     }
 
     protected final <T> OptionalWrapper<T> wrapper(Optional<String> wrapperClassName,
-                                                   ScriptlessCompositionDescriptor compositionDescriptor,
+                                                   CompositionDescriptor compositionDescriptor,
                                                    Class<T> expectedType,
                                                    T delegate,
                                                    Object[]... extraArgumentOptions) {

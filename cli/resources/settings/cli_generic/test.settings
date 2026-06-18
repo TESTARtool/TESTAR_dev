@@ -1,0 +1,73 @@
+#################################################################
+# CLI generic profile
+#
+# This profile is intended for manual and agent-driven TESTAR CLI
+# sessions. Platform-specific target details are still provided
+# through the CLI command arguments.
+#################################################################
+
+ActionDuration = 0.0
+TimeToWaitAfterAction = 0.3
+StartupTime = 2.0
+MaxTime = 3.1536E7
+
+OutputDir = ./output
+ReportInHTML = false
+
+StateModelEnabled = false
+DataStore = OrientDB
+DataStoreType = plocal
+DataStoreServer =
+DataStoreDirectory = .runtime/orientdb-community-3.2.38/databases
+DataStoreDB = testar
+DataStoreUser = testar
+DataStorePassword = testar
+DataStoreMode = instant
+ApplicationName =
+ApplicationVersion =
+ActionSelectionAlgorithm = random
+StateModelStoreWidgets = false
+ResetDataStore = false
+
+AbstractStateAttributes = WidgetControlType,WidgetTitle,WidgetPath
+
+WebClickableClasses =
+WebTypeableClasses = input
+WebDeniedExtensions = pdf;jpg;png;pfx;xml
+WebDomainsAllowed = null
+WebPathsAllowed = null
+FollowLinks = false
+BrowserFullScreen = true
+SwitchNewTabs = true
+
+AppiumPlatformName = Android
+AppiumIsApkInstalled = false
+AppiumApp =
+AppiumAppPackage =
+AppiumAppActivity =
+AppiumIsEmulatorDocker = false
+AppiumIpAddress =
+AppiumDeviceName = Android Emulator
+AppiumAutomationName = UiAutomator2
+AppiumNewCommandTimeout = 600
+AppiumAutoGrantPermissions = true
+AppiumAllowInvisibleElements = false
+AppiumIgnoreHiddenApiPolicyError = false
+AppiumAdbExecTimeout = 120000
+AppiumUiautomator2ServerInstallTimeout = 120000
+AppiumUiautomator2ServerLaunchTimeout = 120000
+AndroidClickableClasses = android.widget.TextView
+AndroidTypeableClasses =
+
+ForceForeground = true
+TimeToFreeze = 10.0
+ProcessListenerEnabled = false
+SUTProcesses =
+AccessBridgeEnabled = false
+
+CompositionProfile = 
+CustomCompositionResource = composition.properties
+CustomPoliciesResource = policies.properties
+
+SUTConnector = WEB_DRIVER
+SUTConnectorValue = about:blank

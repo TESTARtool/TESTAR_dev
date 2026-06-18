@@ -4,7 +4,7 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.scriptless.util;
+package org.testar.config.util;
 
 import org.testar.config.TestarDirectories;
 import org.testar.config.settings.SettingsResourceResolver;

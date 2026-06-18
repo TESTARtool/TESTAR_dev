@@ -6,6 +6,7 @@
 
 package org.testar.scriptless.platform;
 
+import org.testar.config.composition.CompositionDescriptor;
 import org.testar.core.action.resolver.ActionResolver;
 import org.testar.core.service.ActionDerivationService;
 import org.testar.core.service.ActionExecutionService;
@@ -28,7 +29,6 @@ import org.testar.scriptless.capability.android.AndroidSettingsCapability;
 import org.testar.scriptless.capability.android.AndroidStopCriteriaCapability;
 import org.testar.scriptless.capability.android.AndroidTestSequenceCapability;
 import org.testar.scriptless.capability.android.AndroidTestSessionCapability;
-import org.testar.scriptless.composition.ScriptlessCompositionDescriptor;
 import org.testar.scriptless.service.ScriptlessOracleComposer;
 import org.testar.scriptless.service.android.ScriptlessAndroidActionDerivationService;
 import org.testar.scriptless.service.android.ScriptlessAndroidActionExecutionService;
@@ -43,14 +43,14 @@ public final class AndroidScriptlessPlatformRuntime extends AbstractScriptlessPl
     @Override
     public ServiceSessionConfiguration createServiceConfiguration(PlatformSessionSpecification sessionSpec,
                                                                  RuntimeContext runtimeContext,
-                                                                 ScriptlessCompositionDescriptor compositionDescriptor) {
+                                                                 CompositionDescriptor compositionDescriptor) {
         return serviceConfigurationBuilder(runtimeContext, compositionDescriptor).build();
     }
 
     @Override
     public TestingServices createTestingServices(PlatformServices platformServices,
                                                  RuntimeContext runtimeContext,
-                                                 ScriptlessCompositionDescriptor compositionDescriptor,
+                                                 CompositionDescriptor compositionDescriptor,
                                                  SessionReportingManager sessionReportingManager) {
         SystemService systemService = new ScriptlessAndroidSystemService(
                 platformServices.systemService(),
@@ -88,7 +88,7 @@ public final class AndroidScriptlessPlatformRuntime extends AbstractScriptlessPl
 
     @Override
     public ScriptlessCapabilities createCapabilities(RuntimeContext runtimeContext,
-                                                     ScriptlessCompositionDescriptor compositionDescriptor,
+                                                     CompositionDescriptor compositionDescriptor,
                                                      ScriptlessCapabilities capabilities) {
         SettingsCapability settingsCapability = new AndroidSettingsCapability(
                 capabilities.settingsCapability()

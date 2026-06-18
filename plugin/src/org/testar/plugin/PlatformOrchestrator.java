@@ -88,6 +88,17 @@ public final class PlatformOrchestrator {
         return openSession(sessionSpec, resolve(sessionSpec));
     }
 
+    public static PlatformSession openCliSession(PlatformSessionSpecification sessionSpec,
+                                                 PolicySessionConfiguration policyConfiguration,
+                                                 ServiceSessionConfiguration serviceConfiguration) {
+        return openSession(sessionSpec, resolve(sessionSpec, policyConfiguration, serviceConfiguration));
+    }
+
+    public static PlatformSession openCliSession(PlatformSessionSpecification sessionSpec,
+                                                 PlatformServices services) {
+        return openSession(sessionSpec, services);
+    }
+
     public static PlatformSession openSpySession(PlatformSessionSpecification sessionSpec) {
         // Spy Mode needs a live platform session without generating TESTAR reports.
         return openSession(sessionSpec, resolve(sessionSpec), false);
@@ -126,10 +137,16 @@ public final class PlatformOrchestrator {
     }
 
     public static State projectCliState(PlatformSessionSpecification sessionSpec, State state) {
+        return projectCliState(sessionSpec, state, PolicySessionConfiguration.defaults());
+    }
+
+    public static State projectCliState(PlatformSessionSpecification sessionSpec,
+                                        State state,
+                                        PolicySessionConfiguration policyConfiguration) {
         // CLI state projection uses the same platform defaults, but only applies
         // the semantic state shaping step to an already captured state.
         initializeCodingManager(sessionSpec.getSettings());
-        SessionPolicyContext sessionPolicyContext = buildSessionPolicyContext(sessionSpec);
+        SessionPolicyContext sessionPolicyContext = buildSessionPolicyContext(sessionSpec, policyConfiguration);
         switch (sessionSpec.getOperatingSystem()) {
             case ANDROID:
                 return PlatformDefaultSessionConfigurations
@@ -198,16 +215,21 @@ public final class PlatformOrchestrator {
     }
 
     private static SessionPolicyContext buildSessionPolicyContext(PlatformSessionSpecification sessionSpec) {
+        return buildSessionPolicyContext(sessionSpec, PolicySessionConfiguration.defaults());
+    }
+
+    private static SessionPolicyContext buildSessionPolicyContext(PlatformSessionSpecification sessionSpec,
+                                                                  PolicySessionConfiguration policyConfiguration) {
         // Build only the default policy context for cases that need projection without
         // resolving a full platform session.
         switch (sessionSpec.getOperatingSystem()) {
             case ANDROID:
-                return buildAndroidPolicyContext(sessionSpec, PolicySessionConfiguration.defaults());
+                return buildAndroidPolicyContext(sessionSpec, policyConfiguration);
             case WINDOWS:
             case WINDOWS_10:
-                return buildWindowsPolicyContext(sessionSpec, PolicySessionConfiguration.defaults());
+                return buildWindowsPolicyContext(sessionSpec, policyConfiguration);
             case WEBDRIVER:
-                return buildWebdriverPolicyContext(sessionSpec, PolicySessionConfiguration.defaults());
+                return buildWebdriverPolicyContext(sessionSpec, policyConfiguration);
             default:
                 throw new UnsupportedPlatformException(
                         "Unsupported operating system for policy context: " + sessionSpec.getOperatingSystem()

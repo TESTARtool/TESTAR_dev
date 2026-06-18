@@ -4,7 +4,7 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.scriptless.composition;
+package org.testar.config.composition;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,10 +17,10 @@ import org.testar.config.CompositionProfiles;
 import org.testar.config.ConfigTags;
 import org.testar.config.settings.Settings;
 import org.testar.config.settings.SettingsResourceResolver;
+import org.testar.config.util.ExternalJavaClassSupport;
 import org.testar.core.Assert;
-import org.testar.scriptless.util.ExternalJavaClassSupport;
 
-public final class ScriptlessCompositionLoader {
+public final class CompositionLoader {
 
     private static final String PROPERTY_BASE_PROFILE = "baseProfile";
     private static final String PROPERTY_SETTINGS_CAPABILITY_CLASS = "settingsCapabilityClass";
@@ -37,10 +37,10 @@ public final class ScriptlessCompositionLoader {
     private static final String PROPERTY_ACTION_EXECUTION_SERVICE_CLASS = "actionExecutionServiceClass";
     private static final String PROPERTY_ORACLE_COMPOSER_CLASS = "oracleComposerClass";
 
-    private ScriptlessCompositionLoader() {
+    private CompositionLoader() {
     }
 
-    public static ScriptlessCompositionDescriptor loadDescriptor(Settings settings) {
+    public static CompositionDescriptor loadDescriptor(Settings settings) {
         Assert.notNull(settings);
 
         String configuredProfile = settings.get(
@@ -51,7 +51,7 @@ public final class ScriptlessCompositionLoader {
         Properties resourceProperties = loadResourceProperties(configuredResource);
         String resolvedProfile = resolveProfile(settings, configuredProfile, resourceProperties);
 
-        return new ScriptlessCompositionDescriptor(
+        return new CompositionDescriptor(
                 resolvedProfile,
                 optionalValue(configuredResource),
                 optionalProperty(resourceProperties, PROPERTY_SETTINGS_CAPABILITY_CLASS),
@@ -86,8 +86,6 @@ public final class ScriptlessCompositionLoader {
 
         String className = wrapperClassName.get();
         try {
-            // Wrapper classes are resolved from the configured settings workspace first,
-            // then from the packaged runtime classpath.
             Class<?> wrapperClass = ExternalJavaClassSupport.loadClass(className, customCompositionResourcePath);
 
             for (Object[] extraArguments : extraArgumentOptions) {
@@ -163,8 +161,6 @@ public final class ScriptlessCompositionLoader {
         }
 
         try (FileInputStream inputStream = new FileInputStream(resourceFile)) {
-            // Resource files are optional. When present, they override or extend
-            // the baseline composition selected through the profile.
             properties.load(inputStream);
             return properties;
         } catch (IOException exception) {

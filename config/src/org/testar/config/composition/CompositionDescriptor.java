@@ -4,13 +4,13 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.scriptless.composition;
+package org.testar.config.composition;
 
 import java.util.Optional;
 
 import org.testar.core.Assert;
 
-public final class ScriptlessCompositionDescriptor {
+public final class CompositionDescriptor {
 
     private final String compositionProfile;
     private final Optional<String> customCompositionResource;
@@ -29,20 +29,20 @@ public final class ScriptlessCompositionDescriptor {
     private final Optional<String> actionExecutionServiceClass;
     private final Optional<String> oracleComposerClass;
 
-    public ScriptlessCompositionDescriptor(String compositionProfile,
-                                          Optional<String> customCompositionResource,
-                                          Optional<String> settingsCapabilityClass,
-                                          Optional<String> testSessionCapabilityClass,
-                                          Optional<String> testSequenceCapabilityClass,
-                                          Optional<String> stopCriteriaCapabilityClass,
-                                          Optional<String> systemServiceClass,
-                                          Optional<String> stateServiceClass,
-                                          Optional<String> stateIdentifierServiceClass,
-                                          Optional<String> actionDerivationServiceClass,
-                                          Optional<String> actionIdentifierServiceClass,
-                                          Optional<String> actionSelectorServiceClass,
-                                          Optional<String> actionExecutionServiceClass,
-                                          Optional<String> oracleComposerClass) {
+    public CompositionDescriptor(String compositionProfile,
+                                 Optional<String> customCompositionResource,
+                                 Optional<String> settingsCapabilityClass,
+                                 Optional<String> testSessionCapabilityClass,
+                                 Optional<String> testSequenceCapabilityClass,
+                                 Optional<String> stopCriteriaCapabilityClass,
+                                 Optional<String> systemServiceClass,
+                                 Optional<String> stateServiceClass,
+                                 Optional<String> stateIdentifierServiceClass,
+                                 Optional<String> actionDerivationServiceClass,
+                                 Optional<String> actionIdentifierServiceClass,
+                                 Optional<String> actionSelectorServiceClass,
+                                 Optional<String> actionExecutionServiceClass,
+                                 Optional<String> oracleComposerClass) {
         this.compositionProfile = Assert.notNull(compositionProfile);
         this.customCompositionResource = Assert.notNull(customCompositionResource);
         this.settingsCapabilityClass = Assert.notNull(settingsCapabilityClass);

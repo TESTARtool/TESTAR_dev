@@ -4,7 +4,7 @@
  * Copyright (c) 2026 Open Universiteit - www.ou.nl
  */
 
-package org.testar.scriptless.policy;
+package org.testar.config.policy;
 
 import java.util.Collections;
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.Optional;
 
 import org.testar.core.Assert;
 
-public final class ScriptlessPolicyDescriptor {
+public final class PolicyDescriptor {
 
     private final Optional<String> policiesResourcePath;
     private final boolean replaceClickablePolicies;
@@ -34,25 +34,25 @@ public final class ScriptlessPolicyDescriptor {
     private final List<String> visiblePolicies;
     private final List<String> topLevelPolicies;
 
-    public ScriptlessPolicyDescriptor(Optional<String> policiesResourcePath,
-                                      boolean replaceClickablePolicies,
-                                      boolean replaceTypeablePolicies,
-                                      boolean replaceScrollablePolicies,
-                                      boolean replaceSelectablePolicies,
-                                      boolean replaceEnabledPolicies,
-                                      boolean replaceBlockedPolicies,
-                                      boolean replaceWidgetFilterPolicies,
-                                      boolean replaceVisiblePolicies,
-                                      boolean replaceTopLevelPolicies,
-                                      List<String> clickablePolicies,
-                                      List<String> typeablePolicies,
-                                      List<String> scrollablePolicies,
-                                      List<String> selectablePolicies,
-                                      List<String> enabledPolicies,
-                                      List<String> blockedPolicies,
-                                      List<String> widgetFilterPolicies,
-                                      List<String> visiblePolicies,
-                                      List<String> topLevelPolicies) {
+    public PolicyDescriptor(Optional<String> policiesResourcePath,
+                            boolean replaceClickablePolicies,
+                            boolean replaceTypeablePolicies,
+                            boolean replaceScrollablePolicies,
+                            boolean replaceSelectablePolicies,
+                            boolean replaceEnabledPolicies,
+                            boolean replaceBlockedPolicies,
+                            boolean replaceWidgetFilterPolicies,
+                            boolean replaceVisiblePolicies,
+                            boolean replaceTopLevelPolicies,
+                            List<String> clickablePolicies,
+                            List<String> typeablePolicies,
+                            List<String> scrollablePolicies,
+                            List<String> selectablePolicies,
+                            List<String> enabledPolicies,
+                            List<String> blockedPolicies,
+                            List<String> widgetFilterPolicies,
+                            List<String> visiblePolicies,
+                            List<String> topLevelPolicies) {
         this.policiesResourcePath = Assert.notNull(policiesResourcePath);
         this.replaceClickablePolicies = replaceClickablePolicies;
         this.replaceTypeablePolicies = replaceTypeablePolicies;

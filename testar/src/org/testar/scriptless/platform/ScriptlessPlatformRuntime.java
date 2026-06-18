@@ -6,6 +6,7 @@
 
 package org.testar.scriptless.platform;
 
+import org.testar.config.composition.CompositionDescriptor;
 import org.testar.plugin.PlatformServices;
 import org.testar.plugin.configuration.PlatformSessionSpecification;
 import org.testar.plugin.configuration.ServiceSessionConfiguration;
@@ -14,22 +15,21 @@ import org.testar.scriptless.RuntimeContext;
 import org.testar.scriptless.ScriptlessCapabilities;
 import org.testar.scriptless.TestingServices;
 import org.testar.scriptless.capability.SettingsCapability;
-import org.testar.scriptless.composition.ScriptlessCompositionDescriptor;
 
 public interface ScriptlessPlatformRuntime {
 
     ServiceSessionConfiguration createServiceConfiguration(PlatformSessionSpecification sessionSpec,
                                                            RuntimeContext runtimeContext,
-                                                           ScriptlessCompositionDescriptor compositionDescriptor);
+                                                           CompositionDescriptor compositionDescriptor);
 
-    SettingsCapability createSettingsCapability(RuntimeContext runtimeContext, ScriptlessCompositionDescriptor compositionDescriptor);
+    SettingsCapability createSettingsCapability(RuntimeContext runtimeContext, CompositionDescriptor compositionDescriptor);
 
     TestingServices createTestingServices(PlatformServices platformServices,
                                           RuntimeContext runtimeContext,
-                                          ScriptlessCompositionDescriptor compositionDescriptor,
+                                          CompositionDescriptor compositionDescriptor,
                                           SessionReportingManager sessionReportingManager);
 
     ScriptlessCapabilities createCapabilities(RuntimeContext runtimeContext,
-                                              ScriptlessCompositionDescriptor compositionDescriptor,
+                                              CompositionDescriptor compositionDescriptor,
                                               ScriptlessCapabilities capabilities);
 }

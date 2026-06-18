@@ -18,6 +18,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import org.testar.cli.settings.CliSettingsLoader;
+import org.testar.config.CompositionProfiles;
 import org.testar.config.ConfigTags;
 import org.testar.config.settings.Settings;
 import org.testar.core.action.Action;
@@ -25,16 +26,21 @@ import org.testar.core.action.resolver.ResolvedAction;
 import org.testar.core.state.State;
 import org.testar.core.state.Widget;
 import org.testar.core.tag.Tags;
+import org.testar.cli.profile.CliProfileConfiguration;
+import org.testar.cli.profile.CliProfileConfigurationLoader;
 import org.testar.plugin.OperatingSystems;
 import org.testar.plugin.PlatformOrchestrator;
 import org.testar.plugin.PlatformSession;
+import org.testar.plugin.PlatformServices;
 import org.testar.plugin.configuration.PlatformSessionSpecification;
+import org.testar.plugin.configuration.PolicySessionConfiguration;
 import org.testar.plugin.PlatformSessionSpecFactory;
 
 final class CliDaemonServer {
 
     private PlatformSession activeSession;
     private PlatformSessionSpecification activeSessionSpec;
+    private PolicySessionConfiguration activePolicyConfiguration = PolicySessionConfiguration.defaults();
 
     void run() {
         try (ServerSocket serverSocket = new ServerSocket(CliDaemonConfig.PORT, 50)) {
@@ -97,8 +103,9 @@ final class CliDaemonServer {
 
     private CliResponse startSession(CliRequest request) {
         try {
-            PlatformSessionSpecification sessionSpec = buildSessionSpec(request);
-            replaceActiveSession(sessionSpec);
+            CliPreparedSession preparedSession = buildPreparedSession(request);
+            replaceActiveSession(preparedSession);
+            PlatformSessionSpecification sessionSpec = preparedSession.sessionSpec();
             return new CliResponse(0, List.of(
                     "sessionStarted",
                     "platform=" + sessionSpec.getOperatingSystem().name().toLowerCase(Locale.ROOT),
@@ -134,7 +141,11 @@ final class CliDaemonServer {
     private CliResponse getState() {
         try {
             State rawState = requireActiveSession().getState();
-            State semanticState = PlatformOrchestrator.projectCliState(activeSessionSpec, rawState);
+            State semanticState = PlatformOrchestrator.projectCliState(
+                    activeSessionSpec,
+                    rawState,
+                    activePolicyConfiguration
+            );
             List<String> lines = describeStateWidgets(semanticState);
             return new CliResponse(0, lines);
         } catch (RuntimeException exception) {
@@ -196,10 +207,18 @@ final class CliDaemonServer {
         }
     }
 
-    private synchronized void replaceActiveSession(PlatformSessionSpecification sessionSpec) {
+    private synchronized void replaceActiveSession(CliPreparedSession preparedSession) {
         closeActiveSession();
-        activeSessionSpec = sessionSpec;
-        activeSession = PlatformOrchestrator.openCliSession(sessionSpec);
+        activeSessionSpec = preparedSession.sessionSpec();
+        activePolicyConfiguration = preparedSession.profileConfiguration().policyConfiguration();
+
+        PlatformServices resolvedServices = PlatformOrchestrator.resolve(
+                activeSessionSpec,
+                preparedSession.profileConfiguration().policyConfiguration(),
+                preparedSession.profileConfiguration().serviceConfiguration()
+        );
+        PlatformServices wrappedServices = preparedSession.profileConfiguration().applyServiceWrappers(resolvedServices);
+        activeSession = PlatformOrchestrator.openCliSession(activeSessionSpec, wrappedServices);
     }
 
     private synchronized PlatformSession requireActiveSession() {
@@ -221,13 +240,9 @@ final class CliDaemonServer {
             } finally {
                 activeSession = null;
                 activeSessionSpec = null;
+                activePolicyConfiguration = PolicySessionConfiguration.defaults();
             }
         }
-    }
-
-    private PlatformSessionSpecification buildSessionSpec(CliRequest request) {
-        Settings settings = CliSettingsLoader.load();
-        return buildSessionSpec(request, settings);
     }
 
     PlatformSessionSpecification buildSessionSpec(CliRequest request, Settings settings) {
@@ -235,23 +250,26 @@ final class CliDaemonServer {
         String target = request.argumentAt(1);
 
         if (platformToken == null) {
-            throw new IllegalArgumentException("Expected: startSession <platform> <target>");
+            throw new IllegalArgumentException("Expected: startSession <platform> <target> [profile]");
         }
 
-        if (target == null || request.argumentAt(2) != null) {
-            throw new IllegalArgumentException("Expected: startSession <platform> <target>");
+        if (target == null || request.argumentAt(3) != null) {
+            throw new IllegalArgumentException("Expected: startSession <platform> <target> [profile]");
         }
 
         OperatingSystems operatingSystem = parseOperatingSystem(platformToken);
         if (operatingSystem == OperatingSystems.ANDROID) {
             settings.set(ConfigTags.SUTConnector, Settings.SUT_CONNECTOR_ANDROID_APPIUM);
+            settings.set(ConfigTags.CompositionProfile, CompositionProfiles.ANDROID_COMPOSITION);
             settings.set(ConfigTags.AppiumIsApkInstalled, false);
             settings.set(ConfigTags.AppiumApp, target);
         } else if (operatingSystem == OperatingSystems.WEBDRIVER) {
             settings.set(ConfigTags.SUTConnector, Settings.SUT_CONNECTOR_WEBDRIVER);
+            settings.set(ConfigTags.CompositionProfile, CompositionProfiles.WEBDRIVER_COMPOSITION);
             settings.set(ConfigTags.SUTConnectorValue, target);
         } else {
             settings.set(ConfigTags.SUTConnector, Settings.SUT_CONNECTOR_CMDLINE);
+            settings.set(ConfigTags.CompositionProfile, CompositionProfiles.WINDOWS_COMPOSITION);
             settings.set(ConfigTags.SUTConnectorValue, target);
         }
 
@@ -261,6 +279,21 @@ final class CliDaemonServer {
                 target,
                 settings
         );
+    }
+
+    private CliPreparedSession buildPreparedSession(CliRequest request) {
+        String profileName = request.argumentAt(2);
+        String normalizedProfileName = profileName == null || profileName.isBlank()
+                ? CliSettingsLoader.defaultProfileName()
+                : profileName.trim();
+
+        Settings profileSettings = CliSettingsLoader.loadProfile(normalizedProfileName);
+        PlatformSessionSpecification sessionSpec = buildSessionSpec(request, profileSettings);
+        CliProfileConfiguration profileConfiguration = CliProfileConfigurationLoader.load(
+                normalizedProfileName,
+                profileSettings
+        );
+        return new CliPreparedSession(sessionSpec, profileConfiguration);
     }
 
     private OperatingSystems parseOperatingSystem(String token) {
@@ -305,6 +338,26 @@ final class CliDaemonServer {
             ));
         }
         return descriptions;
+    }
+
+    private static final class CliPreparedSession {
+
+        private final PlatformSessionSpecification sessionSpec;
+        private final CliProfileConfiguration profileConfiguration;
+
+        private CliPreparedSession(PlatformSessionSpecification sessionSpec,
+                                   CliProfileConfiguration profileConfiguration) {
+            this.sessionSpec = sessionSpec;
+            this.profileConfiguration = profileConfiguration;
+        }
+
+        private PlatformSessionSpecification sessionSpec() {
+            return sessionSpec;
+        }
+
+        private CliProfileConfiguration profileConfiguration() {
+            return profileConfiguration;
+        }
     }
 
 }

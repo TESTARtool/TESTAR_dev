@@ -35,7 +35,7 @@ public final class CliStateModelAnalysis {
     }
 
     public int run() {
-        Settings settings = CliSettingsLoader.load();
+        Settings settings = CliSettingsLoader.loadProfile(CliSettingsLoader.defaultProfileName());
         List<String> missingSettings = validateSettings(settings);
         if (!missingSettings.isEmpty()) {
             output.println("stateModelServer failed: missing settings");

@@ -6,6 +6,7 @@
 
 package org.testar.scriptless.platform;
 
+import org.testar.config.composition.CompositionDescriptor;
 import org.testar.core.action.resolver.ActionResolver;
 import org.testar.core.service.ActionDerivationService;
 import org.testar.core.service.ActionExecutionService;
@@ -30,7 +31,6 @@ import org.testar.scriptless.capability.webdriver.WebdriverSettingsCapability;
 import org.testar.scriptless.capability.webdriver.WebdriverStopCriteriaCapability;
 import org.testar.scriptless.capability.webdriver.WebdriverTestSequenceCapability;
 import org.testar.scriptless.capability.webdriver.WebdriverTestSessionCapability;
-import org.testar.scriptless.composition.ScriptlessCompositionDescriptor;
 import org.testar.scriptless.service.ScriptlessOracleComposer;
 import org.testar.scriptless.service.webdriver.ScriptlessWebdriverActionDerivationService;
 import org.testar.scriptless.service.webdriver.ScriptlessWebdriverActionExecutionService;
@@ -45,7 +45,7 @@ public final class WebdriverScriptlessPlatformRuntime extends AbstractScriptless
     @Override
     public ServiceSessionConfiguration createServiceConfiguration(PlatformSessionSpecification sessionSpec,
                                                                  RuntimeContext runtimeContext,
-                                                                 ScriptlessCompositionDescriptor compositionDescriptor) {
+                                                                 CompositionDescriptor compositionDescriptor) {
         StateCompositionPlan defaultStatePlan = PlatformDefaultSessionConfigurations
                 .webdriverServiceConfiguration(sessionSpec)
                 .stateCompositionPlanOverride()
@@ -62,7 +62,7 @@ public final class WebdriverScriptlessPlatformRuntime extends AbstractScriptless
     @Override
     public TestingServices createTestingServices(PlatformServices platformServices,
                                                  RuntimeContext runtimeContext,
-                                                 ScriptlessCompositionDescriptor compositionDescriptor,
+                                                 CompositionDescriptor compositionDescriptor,
                                                  SessionReportingManager sessionReportingManager) {
         SystemService systemService = new ScriptlessWebdriverSystemService(
                 platformServices.systemService(),
@@ -99,7 +99,7 @@ public final class WebdriverScriptlessPlatformRuntime extends AbstractScriptless
 
     @Override
     public ScriptlessCapabilities createCapabilities(RuntimeContext runtimeContext,
-                                                     ScriptlessCompositionDescriptor compositionDescriptor,
+                                                     CompositionDescriptor compositionDescriptor,
                                                      ScriptlessCapabilities capabilities) {
         SettingsCapability settingsCapability = new WebdriverSettingsCapability(
                 capabilities.settingsCapability()

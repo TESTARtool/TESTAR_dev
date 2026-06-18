@@ -6,6 +6,12 @@
 
 package org.testar.scriptless;
 
+import java.util.List;
+
+import org.testar.config.composition.CompositionDescriptor;
+import org.testar.config.composition.CompositionLoader;
+import org.testar.config.policy.PolicyDescriptor;
+import org.testar.config.policy.PolicyLoader;
 import org.testar.config.ConfigTags;
 import org.testar.config.settings.Settings;
 import org.testar.core.Assert;
@@ -28,16 +34,10 @@ import org.testar.plugin.configuration.PolicySessionConfiguration;
 import org.testar.plugin.configuration.ServiceSessionConfiguration;
 import org.testar.plugin.reporting.SessionReportingManager;
 import org.testar.scriptless.capability.SettingsCapability;
-import org.testar.scriptless.composition.ScriptlessCompositionDescriptor;
-import org.testar.scriptless.composition.ScriptlessCompositionLoader;
 import org.testar.scriptless.platform.AndroidScriptlessPlatformRuntime;
 import org.testar.scriptless.platform.ScriptlessPlatformRuntime;
 import org.testar.scriptless.platform.WebdriverScriptlessPlatformRuntime;
 import org.testar.scriptless.platform.WindowsScriptlessPlatformRuntime;
-import org.testar.scriptless.policy.ScriptlessPolicyDescriptor;
-import org.testar.scriptless.policy.ScriptlessPolicyLoader;
-
-import java.util.List;
 
 /**
  * Builds the two composition layers used by the scriptless runtime:
@@ -68,8 +68,8 @@ public final class ScriptlessFactory {
         Assert.notNull(runtimeContext);
 
         PlatformSessionSpecification sessionSpec = PlatformSessionSpecFactory.fromSettings(runtimeContext.settings());
-        ScriptlessCompositionDescriptor compositionDescriptor = loadCompositionDescriptor(runtimeContext);
-        ScriptlessPolicyDescriptor policyDescriptor = loadPolicyDescriptor(runtimeContext);
+        CompositionDescriptor compositionDescriptor = loadCompositionDescriptor(runtimeContext);
+        PolicyDescriptor policyDescriptor = loadPolicyDescriptor(runtimeContext);
         ScriptlessPlatformRuntime platformRuntime = runtimeFor(sessionSpec);
 
         ServiceSessionConfiguration serviceConfiguration = platformRuntime
@@ -95,7 +95,7 @@ public final class ScriptlessFactory {
     public static SettingsCapability buildSettingsCapability(RuntimeContext runtimeContext) {
         Assert.notNull(runtimeContext);
 
-        ScriptlessCompositionDescriptor compositionDescriptor = loadCompositionDescriptor(runtimeContext);
+        CompositionDescriptor compositionDescriptor = loadCompositionDescriptor(runtimeContext);
         ScriptlessPlatformRuntime platformRuntime = runtimeFor(runtimeContext.settings());
 
         return platformRuntime.createSettingsCapability(runtimeContext, compositionDescriptor);
@@ -104,7 +104,7 @@ public final class ScriptlessFactory {
     public static ScriptlessCapabilities buildScriptlessCapabilities(RuntimeContext runtimeContext) {
         Assert.notNull(runtimeContext);
 
-        ScriptlessCompositionDescriptor compositionDescriptor = loadCompositionDescriptor(runtimeContext);
+        CompositionDescriptor compositionDescriptor = loadCompositionDescriptor(runtimeContext);
         ScriptlessPlatformRuntime platformRuntime = runtimeFor(runtimeContext.settings());
 
         return platformRuntime.createCapabilities(
@@ -116,7 +116,7 @@ public final class ScriptlessFactory {
 
     private static PlatformServices resolvePlatformServices(RuntimeContext runtimeContext,
                                                             PlatformSessionSpecification sessionSpec,
-                                                            ScriptlessPolicyDescriptor policyDescriptor,
+                                                            PolicyDescriptor policyDescriptor,
                                                             ServiceSessionConfiguration serviceConfiguration) {
         return PlatformOrchestrator.resolve(
                 sessionSpec,
@@ -126,7 +126,7 @@ public final class ScriptlessFactory {
     }
 
     private static PolicySessionConfiguration buildPolicyConfiguration(RuntimeContext runtimeContext,
-                                                                      ScriptlessPolicyDescriptor policyDescriptor) {
+                                                                      PolicyDescriptor policyDescriptor) {
         PolicySessionConfiguration.Builder builder = PolicySessionConfiguration.builder();
 
         loadAndApplyPolicies(
@@ -201,7 +201,7 @@ public final class ScriptlessFactory {
                                                                 boolean replaceBuiltIns,
                                                                 List<String> policyClassNames,
                                                                 RuntimeContext runtimeContext) {
-        List<T> policies = ScriptlessPolicyLoader.loadPolicies(
+        List<T> policies = PolicyLoader.loadPolicies(
                 policyClassNames,
                 policyType,
                 runtimeContext.settings()
@@ -248,11 +248,11 @@ public final class ScriptlessFactory {
         return WINDOWS_RUNTIME;
     }
 
-    private static ScriptlessCompositionDescriptor loadCompositionDescriptor(RuntimeContext runtimeContext) {
-        return ScriptlessCompositionLoader.loadDescriptor(runtimeContext.settings());
+    private static CompositionDescriptor loadCompositionDescriptor(RuntimeContext runtimeContext) {
+        return CompositionLoader.loadDescriptor(runtimeContext.settings());
     }
 
-    private static ScriptlessPolicyDescriptor loadPolicyDescriptor(RuntimeContext runtimeContext) {
-        return ScriptlessPolicyLoader.loadDescriptor(runtimeContext.settings());
+    private static PolicyDescriptor loadPolicyDescriptor(RuntimeContext runtimeContext) {
+        return PolicyLoader.loadDescriptor(runtimeContext.settings());
     }
 }
