@@ -2,6 +2,7 @@
     import { onDestroy, onMount } from "svelte";
     import TestConfigurationView from "./TestConfigurationView.svelte";
     import RunTestarView from "./RunTestarView.svelte";
+    import SpyModeView from "./SpyModeView.svelte";
     import TestResultsView from "./TestResultsView.svelte";
     import InspectLogsView from "./InspectLogsView.svelte";
     import StateModelIcon from "./icons/StateModelIcon.svelte";
@@ -26,6 +27,7 @@
     let selectedEditor = "java-composition";
     let debugFiles = [];
     let selectedDebugFile = null;
+    let spyState = null;
     let policySourceFiles = [];
     let compositionSourceFiles = [];
     let currentEditorDocument = null;
@@ -114,13 +116,15 @@
     }
 
     async function refreshInitialData() {
-        const [workspaceResponse, scriptlessResponse] = await Promise.all([
+        const [workspaceResponse, scriptlessResponse, spyResponse] = await Promise.all([
             loadJson("/api/workspaces"),
-            loadJson("/api/execution/status/scriptless")
+            loadJson("/api/execution/status/scriptless"),
+            loadJson("/api/spy/status")
         ]);
 
         workspaces = workspaceResponse;
         scriptlessStatus = scriptlessResponse;
+        spyState = spyResponse;
     }
 
     async function loadWorkspace(workspaceName) {
@@ -373,6 +377,10 @@
         scriptlessStatus = await loadJson("/api/execution/status/scriptless");
     }
 
+    async function refreshRemoteSpyStatus() {
+        spyState = await loadJson("/api/spy/status");
+    }
+
     function startScriptlessPolling() {
         stopScriptlessPolling();
         scriptlessPollHandle = window.setInterval(async () => {
@@ -397,6 +405,11 @@
 
     function navigateToRun() {
         currentPage = "run";
+    }
+
+    async function navigateToSpy() {
+        currentPage = "spy";
+        await refreshRemoteSpyStatus();
     }
 
     function navigateToResults() {
@@ -698,6 +711,156 @@
         }
     }
 
+    async function startRemoteSpyMode() {
+        if (!selectedWorkspaceName) {
+            return;
+        }
+
+        saving = true;
+        message = "";
+        currentPage = "spy";
+
+        try {
+            spyState = await loadJson(`/api/spy/start/${selectedWorkspaceName}`, {
+                method: "POST"
+            });
+            showTemporaryMessage(spyState.message || "Remote Spy Mode started.");
+        } catch (spyError) {
+            reportClientError("Unable to start remote Spy Mode", spyError);
+        } finally {
+            saving = false;
+        }
+    }
+
+    async function refreshRemoteSpyMode() {
+        saving = true;
+        message = "";
+
+        try {
+            spyState = await loadJson("/api/spy/refresh", {
+                method: "POST"
+            });
+        } catch (spyError) {
+            reportClientError("Unable to refresh remote Spy Mode", spyError);
+        } finally {
+            saving = false;
+        }
+    }
+
+    async function stopRemoteSpyMode() {
+        saving = true;
+        message = "";
+
+        try {
+            spyState = await loadJson("/api/spy/stop", {
+                method: "POST"
+            });
+            showTemporaryMessage(spyState.message || "Remote Spy Mode stopped.");
+        } catch (spyError) {
+            reportClientError("Unable to stop remote Spy Mode", spyError);
+        } finally {
+            saving = false;
+        }
+    }
+
+    async function executeSpyAction(actionId) {
+        if (!actionId) {
+            return;
+        }
+
+        saving = true;
+        message = "";
+
+        try {
+            spyState = await loadJson(`/api/spy/actions/${encodeURIComponent(actionId)}`, {
+                method: "POST"
+            });
+        } catch (spyError) {
+            reportClientError(`Unable to execute Spy Mode action ${actionId}`, spyError);
+        } finally {
+            saving = false;
+        }
+    }
+
+    async function executeSpyWidgetDefaultAction(widgetId) {
+        if (!widgetId) {
+            return;
+        }
+
+        saving = true;
+        message = "";
+
+        try {
+            spyState = await loadJson(`/api/spy/widgets/${encodeURIComponent(widgetId)}/default-action`, {
+                method: "POST"
+            });
+        } catch (spyError) {
+            reportClientError(`Unable to execute default Spy Mode action for ${widgetId}`, spyError);
+        } finally {
+            saving = false;
+        }
+    }
+
+    async function startLocalSpyMode() {
+        if (!selectedWorkspaceName) {
+            return;
+        }
+
+        saving = true;
+        message = "";
+        currentPage = "spy";
+
+        try {
+            scriptlessStatus = await loadJson(`/api/execution/scriptless/local-spy/${selectedWorkspaceName}`, {
+                method: "POST"
+            });
+            showTemporaryMessage(scriptlessStatus.message || "Local Spy Mode started.");
+        } catch (spyError) {
+            reportClientError("Unable to start local Spy Mode", spyError);
+        } finally {
+            saving = false;
+        }
+    }
+
+    async function stopLocalSpyMode() {
+        saving = true;
+        message = "";
+
+        try {
+            scriptlessStatus = await loadJson("/api/execution/scriptless/stop", {
+                method: "POST"
+            });
+            showTemporaryMessage(scriptlessStatus.message || "Local Spy Mode stopped.");
+        } catch (spyError) {
+            reportClientError("Unable to stop local Spy Mode", spyError);
+        } finally {
+            saving = false;
+        }
+    }
+
+    async function executeSpyWidgetDirectType(widgetId, text) {
+        if (!widgetId) {
+            return;
+        }
+
+        saving = true;
+        message = "";
+
+        try {
+            spyState = await loadJson(`/api/spy/widgets/${encodeURIComponent(widgetId)}/direct-type`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ text })
+            });
+        } catch (spyError) {
+            reportClientError(`Unable to type into Spy Mode widget ${widgetId}`, spyError);
+        } finally {
+            saving = false;
+        }
+    }
+
     onMount(async () => {
         startScriptlessPolling();
         try {
@@ -721,8 +884,22 @@
 
 <div class="page">
     <nav class="panel panel-wide page-nav">
+        <div class="page-nav-workspace">
+            <select
+                id="page-workspace-select"
+                value={selectedWorkspaceName}
+                on:change={(event) => loadWorkspace(event.currentTarget.value)}
+            >
+                {#each workspaces as workspace}
+                    <option value={workspace.name}>{workspace.name}</option>
+                {/each}
+            </select>
+        </div>
         <button class:secondary={currentPage !== "configuration"} on:click={navigateToConfiguration}>
             ⚙️ Test Configuration
+        </button>
+        <button class:secondary={currentPage !== "spy"} on:click={navigateToSpy}>
+            🔍 Run Spy Mode
         </button>
         <button class:secondary={currentPage !== "run"} on:click={navigateToRun}>
             🔄 Run Generate Mode
@@ -762,10 +939,7 @@
             selectedEditor={selectedEditor}
             selectedCompositionFlowNode={selectedCompositionFlowNode}
             selectedSourceFile={selectedSourceFile}
-            selectedWorkspaceName={selectedWorkspaceName}
             workspaceDocument={workspaceDocument}
-            workspaces={workspaces}
-            loadWorkspace={loadWorkspace}
         />
     {/if}
 
@@ -776,6 +950,23 @@
             selectedWorkspaceName={selectedWorkspaceName}
             startGenerate={startGenerate}
             stopGenerate={stopGenerate}
+        />
+    {/if}
+
+    {#if currentPage === "spy"}
+        <SpyModeView
+            scriptlessStatus={scriptlessStatus}
+            saving={saving}
+            selectedWorkspaceName={selectedWorkspaceName}
+            spyState={spyState}
+            startRemoteSpyMode={startRemoteSpyMode}
+            refreshRemoteSpyMode={refreshRemoteSpyMode}
+            stopRemoteSpyMode={stopRemoteSpyMode}
+            startLocalSpyMode={startLocalSpyMode}
+            stopLocalSpyMode={stopLocalSpyMode}
+            executeSpyAction={executeSpyAction}
+            executeSpyWidgetDefaultAction={executeSpyWidgetDefaultAction}
+            executeSpyWidgetDirectType={executeSpyWidgetDirectType}
         />
     {/if}
 

@@ -65,6 +65,7 @@ public final class PlatformOrchestrator {
                                            ServiceSessionConfiguration serviceConfiguration,
                                            StateModelManager stateModelManager) {
         configureNativePlatform(sessionSpec.getOperatingSystem());
+        initializeCodingManager(sessionSpec.getSettings());
 
         // Resolve the platform-specific defaults first, then compose the final services.
         switch (sessionSpec.getOperatingSystem()) {
@@ -87,6 +88,11 @@ public final class PlatformOrchestrator {
         return openSession(sessionSpec, resolve(sessionSpec));
     }
 
+    public static PlatformSession openSpySession(PlatformSessionSpecification sessionSpec) {
+        // Spy Mode needs a live platform session without generating TESTAR reports.
+        return openSession(sessionSpec, resolve(sessionSpec), false);
+    }
+
     private static void configureNativePlatform(OperatingSystems operatingSystem) {
         // Reset platform flags before enabling the one required by this session.
         NativeLinker.cleanWdDriverOS();
@@ -100,14 +106,19 @@ public final class PlatformOrchestrator {
     }
 
     private static PlatformSession openSession(PlatformSessionSpecification sessionSpec, PlatformServices services) {
+        return openSession(sessionSpec, services, true);
+    }
+
+    private static PlatformSession openSession(PlatformSessionSpecification sessionSpec,
+                                               PlatformServices services,
+                                               boolean reportingEnabled) {
         // Start the SUT first so reporting only begins for a live session.
         SUT system = services.systemService().startSystem();
         try {
-            SessionReportingManager sessionReportingManager = SessionReportingManager.start(
-                    sessionSpec.getSettings(),
-                    sessionSpec.getTarget()
-            );
-            return new DefaultPlatformSession(services, system, sessionReportingManager);
+            SessionReportingManager sessionReportingManager = reportingEnabled
+                    ? SessionReportingManager.start(sessionSpec.getSettings(), sessionSpec.getTarget())
+                    : SessionReportingManager.deferred(sessionSpec.getTarget());
+            return new DefaultPlatformSession(services, system, sessionReportingManager, reportingEnabled);
         } catch (RuntimeException exception) {
             services.systemService().stopSystem(system);
             throw exception;
@@ -117,6 +128,7 @@ public final class PlatformOrchestrator {
     public static State projectCliState(PlatformSessionSpecification sessionSpec, State state) {
         // CLI state projection uses the same platform defaults, but only applies
         // the semantic state shaping step to an already captured state.
+        initializeCodingManager(sessionSpec.getSettings());
         SessionPolicyContext sessionPolicyContext = buildSessionPolicyContext(sessionSpec);
         switch (sessionSpec.getOperatingSystem()) {
             case ANDROID:
@@ -282,8 +294,6 @@ public final class PlatformOrchestrator {
             return new DummyModelManager();
         }
 
-        CodingManager.initCodingManager(settings.get(ConfigTags.AbstractStateAttributes));
-
         bootstrapStateModelStorage(settings);
 
         String modelName = settings.get(ConfigTags.ApplicationName, "");
@@ -322,5 +332,9 @@ public final class PlatformOrchestrator {
                 settings.get(StateModelTags.DataStoreUser, ""),
                 settings.get(StateModelTags.DataStorePassword, "")
         );
+    }
+
+    private static void initializeCodingManager(Settings settings) {
+        CodingManager.initCodingManager(settings.get(ConfigTags.AbstractStateAttributes));
     }
 }

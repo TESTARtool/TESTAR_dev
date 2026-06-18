@@ -42,7 +42,7 @@ MaxTime = 3.1536E7
 ApplicationName = webdriver_parabank
 ApplicationVersion = 1
 
-StateModelEnabled = true
+StateModelEnabled = false
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer = 

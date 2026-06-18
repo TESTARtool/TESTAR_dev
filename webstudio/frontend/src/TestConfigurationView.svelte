@@ -20,10 +20,7 @@
     export let selectedEditor = "";
     export let selectedCompositionFlowNode = null;
     export let selectedSourceFile = null;
-    export let selectedWorkspaceName = "";
     export let workspaceDocument = null;
-    export let workspaces = [];
-    export let loadWorkspace;
 
     const compositionFlowGroups = [
         { label: "Capabilities", match: /capability/i },
@@ -182,15 +179,6 @@
         <section class="sidebar-section">
             <h3>Composition profile</h3>
             <div class="source-list">
-                <select
-                    id="workspace-select"
-                    value={selectedWorkspaceName}
-                    on:change={(event) => loadWorkspace(event.currentTarget.value)}
-                >
-                    {#each workspaces as workspace}
-                        <option value={workspace.name}>{workspace.name}</option>
-                    {/each}
-                </select>
                 <button
                     class:selected={isSelectedEditor("composition-properties")}
                     class="source-item"

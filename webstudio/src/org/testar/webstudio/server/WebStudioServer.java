@@ -16,9 +16,11 @@ import io.javalin.http.Context;
 import io.javalin.http.staticfiles.Location;
 import io.javalin.router.JavalinDefaultRoutingApi;
 import org.testar.webstudio.api.ExecutionController;
+import org.testar.webstudio.api.RemoteSpyController;
 import org.testar.webstudio.api.StateModelAnalysisController;
 import org.testar.webstudio.api.ValidationController;
 import org.testar.webstudio.api.WorkspaceController;
+import org.testar.webstudio.api.dto.SpyTypeRequestDto;
 import org.testar.webstudio.api.dto.WorkspaceFileUpdateDto;
 import org.testar.webstudio.analysis.StateModelAnalysisService;
 import org.testar.webstudio.execution.CliExecutionAdapter;
@@ -27,6 +29,7 @@ import org.testar.webstudio.execution.ExecutionAdapterRegistry;
 import org.testar.webstudio.execution.ExecutionBackend;
 import org.testar.webstudio.execution.RemoteExecutionAdapter;
 import org.testar.webstudio.execution.ScriptlessExecutionAdapter;
+import org.testar.webstudio.spy.RemoteSpyService;
 import org.testar.webstudio.validation.ValidationService;
 import org.testar.webstudio.workspace.WorkspaceService;
 
@@ -37,19 +40,23 @@ public final class WebStudioServer {
     private final WorkspaceController workspaceController;
     private final ValidationController validationController;
     private final ExecutionController executionController;
+    private final RemoteSpyController remoteSpyController;
     private final StateModelAnalysisController stateModelAnalysisController;
     private final Gson gson;
     private Javalin app;
 
     public WebStudioServer() {
         WorkspaceService workspaceService = new WorkspaceService();
+        System.setProperty("testar.home", workspaceService.testarHomeDirectory().toString());
         ValidationService validationService = new ValidationService(workspaceService);
         ExecutionAdapterRegistry executionAdapters = new ExecutionAdapterRegistry(defaultExecutionAdapters());
         StateModelAnalysisService stateModelAnalysisService = new StateModelAnalysisService(workspaceService);
+        RemoteSpyService remoteSpyService = new RemoteSpyService(workspaceService);
 
         this.workspaceController = new WorkspaceController(workspaceService);
         this.validationController = new ValidationController(validationService);
         this.executionController = new ExecutionController(executionAdapters);
+        this.remoteSpyController = new RemoteSpyController(remoteSpyService);
         this.stateModelAnalysisController = new StateModelAnalysisController(stateModelAnalysisService);
         this.gson = new Gson();
     }
@@ -157,7 +164,35 @@ public final class WebStudioServer {
             String workspace = context.pathParam("workspace");
             return executionController.startGenerate(workspace, workspaceController.settingsRoot());
         }));
+        routes.post("/api/execution/scriptless/local-spy/{workspace}", context -> handle(context, () -> {
+            String workspace = context.pathParam("workspace");
+            return executionController.startLocalSpy(workspace, workspaceController.settingsRoot());
+        }));
         routes.post("/api/execution/scriptless/stop", context -> handle(context, executionController::stopScriptlessRun));
+        routes.get("/api/spy/status", context -> handle(context, remoteSpyController::remoteSpyStatus));
+        routes.post("/api/spy/start/{workspace}", context -> handle(context, () ->
+            remoteSpyController.startRemoteSpy(context.pathParam("workspace"))
+        ));
+        routes.post("/api/spy/refresh", context -> handle(context, remoteSpyController::refreshRemoteSpy));
+        routes.post("/api/spy/actions/{actionId}", context -> handle(context, () ->
+            remoteSpyController.executeRemoteSpyAction(context.pathParam("actionId"))
+        ));
+        routes.post("/api/spy/widgets/{widgetId}/default-action", context -> handle(context, () ->
+            remoteSpyController.executeRemoteSpyDefaultWidgetAction(context.pathParam("widgetId"))
+        ));
+        routes.post("/api/spy/widgets/{widgetId}/direct-type", context -> handle(context, () -> {
+            SpyTypeRequestDto request = gson.fromJson(context.body(), SpyTypeRequestDto.class);
+            return remoteSpyController.executeRemoteSpyDirectType(
+                context.pathParam("widgetId"),
+                request == null ? "" : request.text()
+            );
+        }));
+        routes.post("/api/spy/stop", context -> handle(context, remoteSpyController::stopRemoteSpy));
+        routes.get("/api/spy/screenshot", context -> {
+            String screenshotPath = context.queryParam("path");
+            context.contentType("image/png");
+            context.result(remoteSpyController.screenshot(screenshotPath));
+        });
         routes.post("/api/statemodel/open/{workspace}", context -> handle(context, () ->
             stateModelAnalysisController.open(context.pathParam("workspace"))
         ));

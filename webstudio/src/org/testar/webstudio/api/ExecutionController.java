@@ -43,6 +43,10 @@ public final class ExecutionController {
         return scriptlessExecutionAdapter().startGenerate(workspaceName, settingsRoot);
     }
 
+    public ExecutionStatusDto startLocalSpy(String workspaceName, Path settingsRoot) {
+        return scriptlessExecutionAdapter().startLocalSpy(workspaceName, settingsRoot);
+    }
+
     public ExecutionStatusDto stopScriptlessRun() {
         return scriptlessExecutionAdapter().stop();
     }

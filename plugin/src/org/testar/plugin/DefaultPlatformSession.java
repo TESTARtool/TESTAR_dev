@@ -22,11 +22,20 @@ final class DefaultPlatformSession implements PlatformSession {
     private final SUT system;
     private final SessionReportingManager sessionReportingManager;
     private final StateModelSessionFlow stateModelSessionFlow;
+    private final boolean reportingEnabled;
 
     DefaultPlatformSession(PlatformServices services, SUT system, SessionReportingManager sessionReportingManager) {
+        this(services, system, sessionReportingManager, true);
+    }
+
+    DefaultPlatformSession(PlatformServices services,
+                           SUT system,
+                           SessionReportingManager sessionReportingManager,
+                           boolean reportingEnabled) {
         this.services = Assert.notNull(services);
         this.system = Assert.notNull(system);
         this.sessionReportingManager = Assert.notNull(sessionReportingManager);
+        this.reportingEnabled = reportingEnabled;
         this.stateModelSessionFlow = new StateModelSessionFlow(services, system);
         this.services.stateModelManager().notifyTestSequencedStarted();
     }
@@ -39,18 +48,24 @@ final class DefaultPlatformSession implements PlatformSession {
     @Override
     public State getState() {
         State state = services.stateService().getState(system);
-        sessionReportingManager.prepareState(state);
-        sessionReportingManager.addState(state);
+        if (reportingEnabled) {
+            sessionReportingManager.prepareState(state);
+            sessionReportingManager.addState(state);
+        }
         return state;
     }
 
     @Override
     public Set<Action> getDerivedActions() {
         State state = services.stateService().getState(system);
-        sessionReportingManager.prepareState(state);
+        if (reportingEnabled) {
+            sessionReportingManager.prepareState(state);
+        }
         Set<Action> actions = services.actionDerivationService().deriveActions(system, state);
-        sessionReportingManager.addState(state);
-        sessionReportingManager.addActions(actions);
+        if (reportingEnabled) {
+            sessionReportingManager.addState(state);
+            sessionReportingManager.addActions(actions);
+        }
         stateModelSessionFlow.observeState(state, actions);
         return actions;
     }
@@ -63,8 +78,10 @@ final class DefaultPlatformSession implements PlatformSession {
     @Override
     public boolean executeAction(Action action) {
         State state = services.stateService().getState(system);
-        sessionReportingManager.prepareState(state);
-        sessionReportingManager.addSelectedAction(state, action);
+        if (reportingEnabled) {
+            sessionReportingManager.prepareState(state);
+            sessionReportingManager.addSelectedAction(state, action);
+        }
         stateModelSessionFlow.syncObservationBeforeExecution(state);
         stateModelSessionFlow.markPendingExecutedAction(action);
         return services.actionExecutionService().executeAction(system, state, action);
@@ -74,21 +91,29 @@ final class DefaultPlatformSession implements PlatformSession {
     public void stopSystem() {
         try {
             State state = services.stateService().getState(system);
-            sessionReportingManager.prepareState(state);
+            if (reportingEnabled) {
+                sessionReportingManager.prepareState(state);
+            }
             Set<Action> actions = services.actionDerivationService().deriveActions(system, state);
-            sessionReportingManager.addState(state);
-            sessionReportingManager.addActions(actions);
+            if (reportingEnabled) {
+                sessionReportingManager.addState(state);
+                sessionReportingManager.addActions(actions);
+            }
             stateModelSessionFlow.finalizePendingObservation(state, actions);
             services.stateModelManager().notifyTestSequenceStopped();
             services.systemService().stopSystem(system);
         } finally {
-            sessionReportingManager.finish();
+            if (reportingEnabled) {
+                sessionReportingManager.finish();
+            }
         }
     }
 
     @Override
     public void close() {
-        sessionReportingManager.finish();
+        if (reportingEnabled) {
+            sessionReportingManager.finish();
+        }
         closeStateModelManager();
         closeStateService();
     }

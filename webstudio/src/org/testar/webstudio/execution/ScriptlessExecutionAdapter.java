@@ -72,6 +72,12 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
             int exitCode = currentProcess.exitValue();
             currentProcess = null;
             currentInstallBinDirectory = null;
+            currentWorkspace = null;
+            currentMode = null;
+            startedAtEpochMillis = 0L;
+            lastOutputEpochMillis = 0L;
+            plannedSequenceCount = 0;
+            currentSequenceFailed = false;
             lastMessage = "Scriptless run finished with exit code " + exitCode;
         }
 
@@ -83,6 +89,14 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
     }
 
     public synchronized ExecutionStatusDto startGenerate(String workspaceName, Path settingsRoot) {
+        return startMode(workspaceName, settingsRoot, "Generate");
+    }
+
+    public synchronized ExecutionStatusDto startLocalSpy(String workspaceName, Path settingsRoot) {
+        return startMode(workspaceName, settingsRoot, "Spy");
+    }
+
+    private synchronized ExecutionStatusDto startMode(String workspaceName, Path settingsRoot, String mode) {
         if (currentProcess != null && currentProcess.isAlive()) {
             return buildStatus("running", "A scriptless run is already active for workspace " + currentWorkspace);
         }
@@ -91,7 +105,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         try {
             resetConsoleOutput();
             installBinDirectory = resolveInstallBinDirectory();
-            prepareWorkspaceForRun(workspaceName, settingsRoot, installBinDirectory, "Generate");
+            prepareWorkspaceForRun(workspaceName, settingsRoot, installBinDirectory, mode);
             currentInstallBinDirectory = installBinDirectory;
         } catch (RuntimeException exception) {
             currentProcess = null;
@@ -99,7 +113,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
             currentWorkspace = null;
             currentMode = null;
             startedAtEpochMillis = 0L;
-            lastMessage = "Unable to prepare Generate mode: " + exception.getMessage();
+            lastMessage = "Unable to prepare " + mode + " mode: " + exception.getMessage();
             appendConsoleLine(lastMessage);
             return buildStatus("error", lastMessage);
         }
@@ -111,10 +125,10 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         try {
             currentProcess = processBuilder.start();
             currentWorkspace = workspaceName;
-            currentMode = "Generate";
+            currentMode = mode;
             startedAtEpochMillis = System.currentTimeMillis();
             lastOutputEpochMillis = startedAtEpochMillis;
-            lastMessage = "Started Generate mode for workspace " + workspaceName;
+            lastMessage = "Started " + mode + " mode for workspace " + workspaceName;
             appendConsoleLine(lastMessage);
             startOutputDrain(currentProcess);
             return status();
@@ -124,7 +138,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
             currentWorkspace = null;
             currentMode = null;
             startedAtEpochMillis = 0L;
-            lastMessage = "Unable to start Generate mode: " + exception.getMessage();
+            lastMessage = "Unable to start " + mode + " mode: " + exception.getMessage();
             appendConsoleLine(lastMessage);
             return buildStatus("error", lastMessage);
         }
