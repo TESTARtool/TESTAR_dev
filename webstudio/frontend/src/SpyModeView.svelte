@@ -2,6 +2,7 @@
     export let scriptlessStatus = null;
     export let saving = false;
     export let selectedWorkspaceName = "";
+    export let selectedWorkspaceAvailableInTestar = false;
     export let spyState = null;
     export let startLocalSpyMode;
     export let startRemoteSpyMode;
@@ -323,13 +324,13 @@
         <div class="button-row">
             <button
                 on:click={startLocalSpyMode}
-                disabled={!selectedWorkspaceName || saving || anySpyRunning}
+                disabled={!selectedWorkspaceName || !selectedWorkspaceAvailableInTestar || saving || anySpyRunning}
             >
                 Run Local Spy Mode
             </button>
             <button
                 on:click={startRemoteSpyMode}
-                disabled={!selectedWorkspaceName || saving || anySpyRunning}
+                disabled={!selectedWorkspaceName || !selectedWorkspaceAvailableInTestar || saving || anySpyRunning}
             >
                 Run Remote Spy Mode
             </button>

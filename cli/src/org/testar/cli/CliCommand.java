@@ -16,7 +16,8 @@ enum CliCommand {
     GET_DERIVED_ACTIONS,
     EXECUTE_ACTION,
     STATE_MODEL_ANALYSIS,
-    STOP_SESSION;
+    STOP_SESSION,
+    SHUTDOWN_DAEMON;
 
     static CliCommand fromToken(String token) {
         if (token == null || token.isEmpty()) {
@@ -48,6 +49,9 @@ enum CliCommand {
         }
         if ("stopSession".equalsIgnoreCase(token)) {
             return STOP_SESSION;
+        }
+        if ("shutdownDaemon".equalsIgnoreCase(token)) {
+            return SHUTDOWN_DAEMON;
         }
         return HELP;
     }

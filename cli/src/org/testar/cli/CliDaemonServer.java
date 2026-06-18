@@ -41,21 +41,31 @@ final class CliDaemonServer {
     private PlatformSession activeSession;
     private PlatformSessionSpecification activeSessionSpec;
     private PolicySessionConfiguration activePolicyConfiguration = PolicySessionConfiguration.defaults();
+    private volatile boolean running = true;
+    private volatile boolean shutdownRequested;
+    private ServerSocket serverSocket;
 
     void run() {
-        try (ServerSocket serverSocket = new ServerSocket(CliDaemonConfig.PORT, 50)) {
+        try (ServerSocket boundServerSocket = new ServerSocket(CliDaemonConfig.PORT, 50)) {
+            this.serverSocket = boundServerSocket;
             Runtime.getRuntime().addShutdownHook(new Thread(this::closeActiveSession));
-            while (true) {
+            while (running) {
                 try (Socket socket = serverSocket.accept()) {
                     handle(socket);
                 } catch (EOFException exception) {
                     // Reachability probes may connect and close immediately.
                 } catch (IOException exception) {
+                    if (!running) {
+                        break;
+                    }
                     // Keep the daemon alive for subsequent requests.
                 }
             }
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to start CLI daemon server", exception);
+        } finally {
+            serverSocket = null;
+            exitProcessIfRequested();
         }
     }
 
@@ -76,6 +86,8 @@ final class CliDaemonServer {
             }
             output.flush();
         }
+
+        shutdownIfRequested();
     }
 
     private CliResponse handle(CliRequest request) {
@@ -94,6 +106,8 @@ final class CliDaemonServer {
                 return executeAction(request);
             case STOP_SESSION:
                 return stopSession();
+            case SHUTDOWN_DAEMON:
+                return shutdownDaemon();
             case HELP:
             case DAEMON:
             default:
@@ -207,6 +221,15 @@ final class CliDaemonServer {
         }
     }
 
+    private synchronized CliResponse shutdownDaemon() {
+        closeActiveSession();
+        shutdownRequested = true;
+        return new CliResponse(0, List.of(
+                "daemonStopped",
+                "daemonRunning=false"
+        ));
+    }
+
     private synchronized void replaceActiveSession(CliPreparedSession preparedSession) {
         closeActiveSession();
         activeSessionSpec = preparedSession.sessionSpec();
@@ -243,6 +266,36 @@ final class CliDaemonServer {
                 activePolicyConfiguration = PolicySessionConfiguration.defaults();
             }
         }
+    }
+
+    private void shutdownIfRequested() {
+        if (!shutdownRequested) {
+            return;
+        }
+
+        running = false;
+        ServerSocket socket = serverSocket;
+        if (socket == null || socket.isClosed()) {
+            return;
+        }
+
+        try {
+            socket.close();
+        } catch (IOException exception) {
+            // Ignore close failures during daemon shutdown.
+        }
+    }
+
+    private void exitProcessIfRequested() {
+        if (!shutdownRequested || !isDedicatedDaemonProcess()) {
+            return;
+        }
+
+        System.exit(0);
+    }
+
+    private boolean isDedicatedDaemonProcess() {
+        return Boolean.parseBoolean(System.getProperty(CliDaemonConfig.DAEMON_MODE_PROPERTY, "false"));
     }
 
     PlatformSessionSpecification buildSessionSpec(CliRequest request, Settings settings) {

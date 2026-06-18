@@ -1,2 +1,2 @@
-include 'core', 'config', 'reporting', 'coverage', 'oracle', 'dialog', 'llm', 'windows', 'engine', 'plugin', 'cli', 'testar', 'webdriver', 'android', 'statemodel', 'webstudio'
+include 'core', 'config', 'reporting', 'coverage', 'oracle', 'dialog', 'llm', 'windows', 'engine', 'plugin', 'cli', 'testar', 'webdriver', 'android', 'statemodel', 'agent', 'webstudio'
 

@@ -12,7 +12,7 @@ StartupTime = 2.0
 MaxTime = 3.1536E7
 
 OutputDir = ./output
-ReportInHTML = false
+ReportInHTML = true
 
 StateModelEnabled = false
 DataStore = OrientDB

@@ -23,6 +23,10 @@ final class CliDaemonClient {
     private static final int MAX_REQUEST_ATTEMPTS = 5;
 
     CliResponse send(CliRequest request) {
+        if (request.getCommand() == CliCommand.SHUTDOWN_DAEMON) {
+            return sendWithoutStarting(request);
+        }
+
         ensureDaemonRunning();
         IOException lastException = null;
         for (int attempt = 0; attempt < MAX_REQUEST_ATTEMPTS; attempt++) {
@@ -33,6 +37,26 @@ final class CliDaemonClient {
                 sleepQuietly(200L);
             }
         }
+        throw new IllegalStateException("Unable to communicate with CLI daemon", lastException);
+    }
+
+    private CliResponse sendWithoutStarting(CliRequest request) {
+        if (!isDaemonReachable()) {
+            return new CliResponse(0, List.of("daemonStopped", "daemonRunning=false"));
+        }
+
+        IOException lastException = null;
+        for (int attempt = 0; attempt < MAX_REQUEST_ATTEMPTS; attempt++) {
+            try {
+                CliResponse response = sendOnce(request);
+                waitForDaemonShutdown();
+                return response;
+            } catch (IOException exception) {
+                lastException = exception;
+                sleepQuietly(200L);
+            }
+        }
+
         throw new IllegalStateException("Unable to communicate with CLI daemon", lastException);
     }
 
@@ -74,6 +98,7 @@ final class CliDaemonClient {
         ProcessBuilder builder = new ProcessBuilder(
                 javaExecutable,
                 "-Dtestar.home=" + testarHome,
+                "-D" + CliDaemonConfig.DAEMON_MODE_PROPERTY + "=true",
                 "-cp",
                 classPath,
                 CliMain.class.getName(),
@@ -126,5 +151,17 @@ final class CliDaemonClient {
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    private void waitForDaemonShutdown() {
+        long deadline = System.currentTimeMillis() + CliDaemonConfig.SHUTDOWN_TIMEOUT_MS;
+        while (System.currentTimeMillis() < deadline) {
+            if (!isDaemonReachable()) {
+                return;
+            }
+            sleepQuietly(200L);
+        }
+
+        throw new IllegalStateException("CLI daemon did not stop in time");
     }
 }

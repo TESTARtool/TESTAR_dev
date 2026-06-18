@@ -4,6 +4,7 @@
     export let saving = false;
     export let scriptlessStatus = null;
     export let selectedWorkspaceName = "";
+    export let selectedWorkspaceAvailableInTestar = false;
     export let startGenerate;
     export let stopGenerate;
 
@@ -62,7 +63,7 @@
             <h2>Generate Mode Run</h2>
         </div>
         <div class="button-row">
-            <button on:click={startGenerate} disabled={!selectedWorkspaceName || saving || scriptlessStatus?.status === "running"}>
+            <button on:click={startGenerate} disabled={!selectedWorkspaceName || !selectedWorkspaceAvailableInTestar || saving || scriptlessStatus?.status === "running"}>
                 Run Generate Mode
             </button>
             <button class="secondary" on:click={stopGenerate} disabled={saving}>

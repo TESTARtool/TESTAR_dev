@@ -1,0 +1,8 @@
+{
+    "name": "testar-codex-runtime",
+    "private": true,
+    "type": "module",
+    "dependencies": {
+        "@openai/codex-sdk": "0.139.0"
+    }
+}

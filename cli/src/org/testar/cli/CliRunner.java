@@ -34,6 +34,7 @@ final class CliRunner {
             case GET_DERIVED_ACTIONS:
             case EXECUTE_ACTION:
             case STOP_SESSION:
+            case SHUTDOWN_DAEMON:
                 return sendToDaemon(request);
             case HELP:
             default:
@@ -56,6 +57,7 @@ final class CliRunner {
         output.println("  executeAction type <semanticText> <inputText>");
         output.println("  executeAction select <semanticText> <value>");
         output.println("  stopSession");
+        output.println("  shutdownDaemon");
     }
 
     private int sendToDaemon(CliRequest request) {

@@ -107,6 +107,45 @@ Build the frontend and then run the backend:
 
 This is the normal integrated command.
 
+## CLI mode prerequisites
+
+The Web Studio `Run CLI Mode` page depends on the CLI distribution artifacts.
+
+Before using CLI mode, prepare both the main TESTAR install distribution and the CLI distribution:
+
+```powershell
+.\gradlew.bat :testar:installDist
+.\gradlew.bat :cli:cliDistribution
+```
+
+If you want to use the agent-driven CLI execution, also install the Codex agent runtime:
+
+```powershell
+.\gradlew.bat :agent:installCodexAgent
+```
+
+The CLI distribution now includes a profile-aware example under:
+
+- `cli_generic`
+
+CLI profiles are separate from the scriptless workspace selector used by the rest of Web Studio.
+
+Web Studio `Run CLI Mode` starts manual sessions against one selected CLI profile, for example:
+
+```text
+startSession webdriver https://para.testar.org/ cli_generic
+```
+
+If the CLI profile is omitted, the default is:
+
+- `settings/cli_generic/test.settings`
+
+If CLI mode still fails, inspect `cli-debug.log` from the Web Studio debug files view.
+
+For agent-driven CLI execution, also ensure the environment where Web Studio runs has the required API key configured, for example:
+
+- `OPENAI_API_KEY`
+
 ### Stop the running backend
 
 Stop processes listening on the configured Web Studio port:

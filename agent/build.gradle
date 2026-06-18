@@ -1,0 +1,61 @@
+apply plugin: 'java'
+
+buildDir = 'target'
+
+def codexRuntimeDirectory = file("${projectDir}/resources/codex")
+def codexPackageJson = file("${codexRuntimeDirectory}/package.json")
+def codexPackageLock = file("${codexRuntimeDirectory}/package-lock.json")
+def codexNodeModules = file("${codexRuntimeDirectory}/node_modules")
+def npmExecutable = System.getProperty('os.name').toLowerCase().contains('windows') ? 'npm.cmd' : 'npm'
+
+sourceSets {
+    main {
+        resources {
+            srcDirs = ['resources']
+        }
+    }
+}
+
+tasks.register('checkCodexAgentRuntimeTooling') {
+    group = 'build'
+    description = 'Check that the Codex agent runtime tooling is available.'
+
+    doLast {
+        if (!codexRuntimeDirectory.isDirectory()) {
+            throw new GradleException("Missing Codex runtime directory: ${codexRuntimeDirectory}")
+        }
+
+        if (!codexPackageJson.isFile()) {
+            throw new GradleException("Missing Codex runtime package.json: ${codexPackageJson}")
+        }
+
+        def npmVersionOutput = new ByteArrayOutputStream()
+        def npmVersionResult = exec {
+            commandLine npmExecutable, '--version'
+            workingDir codexRuntimeDirectory
+            standardOutput = npmVersionOutput
+            errorOutput = npmVersionOutput
+            ignoreExitValue = true
+        }
+
+        if (npmVersionResult.exitValue != 0) {
+            throw new GradleException(
+                "npm is required to install the Codex agent runtime dependencies. " +
+                "Checked command '${npmExecutable} --version' and it failed with: ${npmVersionOutput.toString().trim()}"
+            )
+        }
+    }
+}
+
+tasks.register('installCodexAgent', Exec) {
+    group = 'build'
+    description = 'Install the Codex agent runtime npm dependencies.'
+    dependsOn tasks.named('checkCodexAgentRuntimeTooling')
+    workingDir codexRuntimeDirectory
+    commandLine npmExecutable, 'install'
+    inputs.file(codexPackageJson)
+    if (codexPackageLock.exists()) {
+        inputs.file(codexPackageLock)
+    }
+    outputs.dir(codexNodeModules)
+}

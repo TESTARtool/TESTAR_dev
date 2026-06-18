@@ -27,6 +27,7 @@ sourceSets {
 
 dependencies {
     implementation project(':core')
+    implementation project(':agent')
     implementation project(':config')
     implementation project(':plugin')
     implementation project(':cli')

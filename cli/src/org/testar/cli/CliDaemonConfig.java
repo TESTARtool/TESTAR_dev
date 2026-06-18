@@ -12,6 +12,8 @@ final class CliDaemonConfig {
     static final int PORT = 47327;
     static final int START_TIMEOUT_MS = 15000;
     static final int CONNECT_TIMEOUT_MS = 1000;
+    static final int SHUTDOWN_TIMEOUT_MS = 5000;
+    static final String DAEMON_MODE_PROPERTY = "testar.cli.daemon";
 
     private CliDaemonConfig() {
     }

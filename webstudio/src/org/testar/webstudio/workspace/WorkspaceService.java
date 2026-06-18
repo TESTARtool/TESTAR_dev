@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -33,33 +34,34 @@ public final class WorkspaceService {
     private static final String POLICIES_FILE = "policies.properties";
 
     private final Path settingsRoot;
+    private final Path cliSettingsRoot;
 
     public WorkspaceService() {
-        this(resolveDefaultSettingsRoot());
+        this(resolveDefaultSettingsRoot(), resolveDefaultCliSettingsRoot());
     }
 
     public WorkspaceService(Path settingsRoot) {
+        this(settingsRoot, resolveDefaultCliSettingsRoot());
+    }
+
+    public WorkspaceService(Path settingsRoot, Path cliSettingsRoot) {
         this.settingsRoot = settingsRoot;
+        this.cliSettingsRoot = cliSettingsRoot;
     }
 
     public List<WorkspaceSummaryDto> listWorkspaces() {
-        if (!Files.isDirectory(settingsRoot)) {
-            return List.of();
-        }
-
-        try (Stream<Path> children = Files.list(settingsRoot)) {
-            return children
-                .filter(Files::isDirectory)
-                .sorted(Comparator.comparing(path -> path.getFileName().toString()))
-                .map(path -> new WorkspaceSummaryDto(path.getFileName().toString(), path.toString()))
-                .collect(Collectors.toList());
-        } catch (IOException e) {
-            throw new IllegalStateException("Unable to list settings workspaces under: " + settingsRoot, e);
-        }
+        Map<String, WorkspaceSummaryDto> summaries = new TreeMap<>();
+        collectWorkspaceSummaries(summaries, settingsRoot, true, false);
+        collectWorkspaceSummaries(summaries, cliSettingsRoot, false, true);
+        return List.copyOf(summaries.values());
     }
 
     public Path settingsRoot() {
         return settingsRoot;
+    }
+
+    public Path cliSettingsRoot() {
+        return cliSettingsRoot;
     }
 
     public Path testarHomeDirectory() {
@@ -237,17 +239,46 @@ public final class WorkspaceService {
         return workingDirectory.resolve("testar").resolve("target").resolve("install").resolve("testar").resolve("bin").resolve("settings");
     }
 
+    private static Path resolveDefaultCliSettingsRoot() {
+        Path workingDirectory = Paths.get(System.getProperty("user.dir")).toAbsolutePath().normalize();
+        Path current = workingDirectory;
+
+        while (current != null) {
+            Path candidate = current.resolve("cli").resolve("target").resolve("install").resolve("testar-cli").resolve("settings");
+            if (Files.isDirectory(candidate)) {
+                return candidate;
+            }
+
+            current = current.getParent();
+        }
+
+        current = workingDirectory;
+
+        while (current != null) {
+            Path candidate = current.resolve("cli").resolve("resources").resolve("settings");
+            if (Files.isDirectory(candidate)) {
+                return candidate;
+            }
+
+            current = current.getParent();
+        }
+
+        return workingDirectory.resolve("cli").resolve("target").resolve("install").resolve("testar-cli").resolve("settings");
+    }
+
     private Path resolveWorkspaceDirectory(String workspaceName) {
-        Path workspaceDirectory = settingsRoot.resolve(workspaceName).normalize();
-        if (!workspaceDirectory.startsWith(settingsRoot)) {
-            throw new IllegalArgumentException("Invalid workspace name: " + workspaceName);
+        for (Path root : List.of(settingsRoot, cliSettingsRoot)) {
+            Path workspaceDirectory = root.resolve(workspaceName).normalize();
+            if (!workspaceDirectory.startsWith(root)) {
+                continue;
+            }
+
+            if (Files.isDirectory(workspaceDirectory)) {
+                return workspaceDirectory;
+            }
         }
 
-        if (!Files.isDirectory(workspaceDirectory)) {
-            throw new IllegalArgumentException("Workspace not found: " + workspaceName);
-        }
-
-        return workspaceDirectory;
+        throw new IllegalArgumentException("Workspace not found: " + workspaceName);
     }
 
     private List<WorkspaceFileDto> listWorkspaceSourceFiles(
@@ -262,11 +293,74 @@ public final class WorkspaceService {
                 .map(path -> {
                     String sourceName = path.getFileName().toString();
                     String category = inferSourceCategory(sourceName, compositionProperties, policyProperties);
-                    return readWorkspaceFile(workspaceDirectory.getFileName().toString(), sourceName, category);
+                    return readWorkspaceFile(workspaceDirectory, sourceName, category);
                 })
                 .collect(Collectors.toList());
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to list workspace sources under: " + workspaceDirectory, exception);
+        }
+    }
+
+    private WorkspaceFileDto readWorkspaceFile(Path workspaceDirectory, String fileName, String category) {
+        Path file = workspaceDirectory.resolve(fileName).normalize();
+        if (!file.startsWith(workspaceDirectory)) {
+            throw new IllegalArgumentException("Invalid workspace file path: " + fileName);
+        }
+
+        if (!Files.isRegularFile(file)) {
+            return new WorkspaceFileDto(fileName, file.toString(), "", category);
+        }
+
+        try {
+            String content = Files.readString(file, StandardCharsets.UTF_8);
+            return new WorkspaceFileDto(file.getFileName().toString(), file.toString(), content, category);
+        } catch (IOException exception) {
+            throw new IllegalStateException("Unable to read workspace file: " + file, exception);
+        }
+    }
+
+    private void collectWorkspaceSummaries(Map<String, WorkspaceSummaryDto> summaries,
+                                           Path root,
+                                           boolean availableInTestar,
+                                           boolean availableInCli) {
+        if (!Files.isDirectory(root)) {
+            return;
+        }
+
+        try (Stream<Path> children = Files.list(root)) {
+            List<Path> directories = children
+                    .filter(Files::isDirectory)
+                    .sorted(Comparator.comparing(path -> path.getFileName().toString()))
+                    .collect(Collectors.toList());
+
+            for (Path directory : directories) {
+                String workspaceName = directory.getFileName().toString();
+                WorkspaceSummaryDto existingSummary = summaries.get(workspaceName);
+                if (existingSummary == null) {
+                    summaries.put(
+                            workspaceName,
+                            new WorkspaceSummaryDto(
+                                    workspaceName,
+                                    directory.toString(),
+                                    availableInTestar,
+                                    availableInCli
+                            )
+                    );
+                    continue;
+                }
+
+                summaries.put(
+                        workspaceName,
+                        new WorkspaceSummaryDto(
+                                workspaceName,
+                                existingSummary.location(),
+                                existingSummary.availableInTestar() || availableInTestar,
+                                existingSummary.availableInCli() || availableInCli
+                        )
+                );
+            }
+        } catch (IOException exception) {
+            throw new IllegalStateException("Unable to list settings workspaces under: " + root, exception);
         }
     }
 

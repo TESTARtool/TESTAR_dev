@@ -40,7 +40,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
     private static final long COMPLETED_RUN_IDLE_GRACE_MILLIS = 8000L;
     private static final Pattern SEQUENCE_SUMMARY_PATTERN = Pattern.compile("_sequence_(\\d+)");
     private static final Pattern SEQUENCE_OUTPUT_PATH_PATTERN = Pattern.compile("Generate\\s+([^\\s]+_sequence_(\\d+))");
-    private static final Pattern HTML_RESOURCE_ATTRIBUTE_PATTERN = Pattern.compile("(\\b(?:src|href)\\s*=\\s*[\"'])(?![a-zA-Z][a-zA-Z0-9+.-]*:|//|#)([^\"'#][^\"']*)([\"'])");
+    private static final Pattern HTML_RESOURCE_ATTRIBUTE_PATTERN = Pattern.compile("(\\b(?:src|href)\\s*=\\s*[\"'])([^\"']*)([\"'])");
     private static final Pattern STATIC_HTML_ASSET_PATTERN = Pattern.compile(".+\\.(?:html?|css|js|png|jpe?g|gif|svg|ico|bmp|webp|woff2?|ttf|eot)$", Pattern.CASE_INSENSITIVE);
     private static final Set<String> NON_OK_VERDICT_TITLES = buildNonOkVerdictTitles();
 
@@ -789,22 +789,34 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
             return false;
         }
 
-        if (relativeAssetPath.contains("&")
-            || relativeAssetPath.contains("?")
-            || relativeAssetPath.contains("+")
-            || relativeAssetPath.contains("<")
-            || relativeAssetPath.contains(">")
-            || relativeAssetPath.contains("{")
-            || relativeAssetPath.contains("}")
-            || relativeAssetPath.contains("(")
-            || relativeAssetPath.contains(")")
-            || relativeAssetPath.contains("\n")
-            || relativeAssetPath.contains("\r")
-            || relativeAssetPath.contains("\t")) {
+        String trimmedAssetPath = relativeAssetPath.trim();
+        String lowerCaseAssetPath = trimmedAssetPath.toLowerCase();
+
+        if (lowerCaseAssetPath.startsWith("http:")
+            || lowerCaseAssetPath.startsWith("https:")
+            || lowerCaseAssetPath.startsWith("data:")
+            || lowerCaseAssetPath.startsWith("javascript:")
+            || lowerCaseAssetPath.startsWith("//")
+            || lowerCaseAssetPath.startsWith("#")) {
             return false;
         }
 
-        String normalizedAssetPath = relativeAssetPath.replace('\\', '/');
+        if (trimmedAssetPath.contains("&")
+            || trimmedAssetPath.contains("?")
+            || trimmedAssetPath.contains("+")
+            || trimmedAssetPath.contains("<")
+            || trimmedAssetPath.contains(">")
+            || trimmedAssetPath.contains("{")
+            || trimmedAssetPath.contains("}")
+            || trimmedAssetPath.contains("(")
+            || trimmedAssetPath.contains(")")
+            || trimmedAssetPath.contains("\n")
+            || trimmedAssetPath.contains("\r")
+            || trimmedAssetPath.contains("\t")) {
+            return false;
+        }
+
+        String normalizedAssetPath = trimmedAssetPath.replace('\\', '/');
         return STATIC_HTML_ASSET_PATTERN.matcher(normalizedAssetPath).matches();
     }
 }

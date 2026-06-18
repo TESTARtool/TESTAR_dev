@@ -1,8 +1,10 @@
 <script>
     export let loadResultFile;
-    export let scriptlessResults = null;
+    export let resultsData = null;
+    export let resultSource = "generate";
     export let selectedResultFile = null;
     export let selectedResultGroup = null;
+    export let selectResultSource;
     export let selectResultGroup;
 
     const verdictPattern = /_V\d+_([^.]+)\.html$/i;
@@ -120,10 +122,28 @@
     <div class="results-workspace-layout">
         <aside class="status-card results-sidebar">
             <section class="results-sidebar-section">
-                <h4 class="eyebrow">Generated Test Output Results</h4>
+                <div class="results-source-header">
+                    <h4 class="eyebrow">Output Results</h4>
+                    <div class="button-row results-source-toggle">
+                        <button
+                            type="button"
+                            class:secondary={resultSource !== "generate"}
+                            on:click={() => selectResultSource("generate")}
+                        >
+                            Generate
+                        </button>
+                        <button
+                            type="button"
+                            class:secondary={resultSource !== "cli"}
+                            on:click={() => selectResultSource("cli")}
+                        >
+                            CLI
+                        </button>
+                    </div>
+                </div>
                 <div class="source-list result-list result-list-tall">
-                    {#if scriptlessResults?.groups?.length > 0}
-                        {#each scriptlessResults.groups as resultGroup}
+                    {#if resultsData?.groups?.length > 0}
+                        {#each resultsData.groups as resultGroup}
                             <button
                                 class:selected={selectedResultGroup?.path === resultGroup.path}
                                 class:result-file-failed={resultGroup.status === "failed"}
@@ -135,7 +155,7 @@
                             </button>
                         {/each}
                     {:else}
-                        <p class="progress-message">No generated output groups detected yet.</p>
+                        <p class="progress-message">No {resultSource === "cli" ? "CLI" : "Generate"} output groups detected yet.</p>
                     {/if}
                 </div>
             </section>

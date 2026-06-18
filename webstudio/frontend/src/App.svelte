@@ -1,5 +1,6 @@
 <script>
     import { onDestroy, onMount } from "svelte";
+    import CliModeView from "./CliModeView.svelte";
     import TestConfigurationView from "./TestConfigurationView.svelte";
     import RunTestarView from "./RunTestarView.svelte";
     import SpyModeView from "./SpyModeView.svelte";
@@ -11,9 +12,23 @@
 
     let workspaces = [];
     let selectedWorkspaceName = "";
+    let selectedWorkspaceSummary = null;
     let workspaceDocument = null;
     let selectedSourceName = "";
     let selectedSourceFile = null;
+    let cliStatus = null;
+    let cliAgentSettings = {
+        apiKeyEnvVarName: "OPENAI_API",
+        baseUrl: "",
+        model: "gpt-5.4-mini",
+        reasoningEffort: "medium",
+        sandboxMode: "danger-full-access",
+        approvalPolicy: "never",
+        networkAccessEnabled: false,
+        skipGitRepoCheck: true,
+        promptTitle: "CLI Agent Goal",
+        promptText: ""
+    };
     let scriptlessStatus = null;
     let loading = false;
     let saving = false;
@@ -21,7 +36,8 @@
     let messageTimeoutHandle = null;
     let scriptlessPollHandle = null;
     let currentPage = "configuration";
-    let scriptlessResults = null;
+    let resultsData = null;
+    let resultSource = "generate";
     let selectedResultGroup = null;
     let selectedResultFile = null;
     let selectedEditor = "java-composition";
@@ -116,19 +132,24 @@
     }
 
     async function refreshInitialData() {
-        const [workspaceResponse, scriptlessResponse, spyResponse] = await Promise.all([
+        const [workspaceResponse, cliStatusResponse, cliAgentSettingsResponse, scriptlessResponse, spyResponse] = await Promise.all([
             loadJson("/api/workspaces"),
+            loadJson("/api/execution/status/cli"),
+            loadJson("/api/execution/cli/agent-settings"),
             loadJson("/api/execution/status/scriptless"),
             loadJson("/api/spy/status")
         ]);
 
         workspaces = workspaceResponse;
+        cliStatus = cliStatusResponse;
+        cliAgentSettings = cliAgentSettingsResponse;
         scriptlessStatus = scriptlessResponse;
         spyState = spyResponse;
     }
 
     async function loadWorkspace(workspaceName) {
         if (!workspaceName) {
+            selectedWorkspaceSummary = null;
             workspaceDocument = null;
             selectedSourceName = "";
             selectedSourceFile = null;
@@ -143,6 +164,7 @@
         try {
             workspaceDocument = await loadJson(`/api/workspaces/${workspaceName}`);
             selectedWorkspaceName = workspaceName;
+            selectedWorkspaceSummary = workspaces.find((workspace) => workspace.name === workspaceName) || null;
             selectedSourceName = "";
             selectedSourceFile = null;
             selectedEditor = "java-composition";
@@ -333,7 +355,7 @@
     }
 
     async function startGenerate() {
-        if (!selectedWorkspaceName) {
+        if (!selectedWorkspaceName || !workspaceAvailableInTestar()) {
             return;
         }
 
@@ -377,6 +399,10 @@
         scriptlessStatus = await loadJson("/api/execution/status/scriptless");
     }
 
+    async function refreshCliStatus() {
+        cliStatus = await loadJson("/api/execution/status/cli");
+    }
+
     async function refreshRemoteSpyStatus() {
         spyState = await loadJson("/api/spy/status");
     }
@@ -385,9 +411,10 @@
         stopScriptlessPolling();
         scriptlessPollHandle = window.setInterval(async () => {
             try {
+                await refreshCliStatus();
                 await refreshScriptlessStatus();
             } catch (pollError) {
-                reportClientError("Unable to refresh scriptless status", pollError);
+                reportClientError("Unable to refresh execution status", pollError);
             }
         }, 1000);
     }
@@ -407,6 +434,10 @@
         currentPage = "run";
     }
 
+    function navigateToCli() {
+        currentPage = "cli";
+    }
+
     async function navigateToSpy() {
         currentPage = "spy";
         await refreshRemoteSpyStatus();
@@ -414,7 +445,7 @@
 
     function navigateToResults() {
         currentPage = "results";
-        loadResults();
+        loadResults(resultSource);
     }
 
     async function navigateToLogs() {
@@ -426,8 +457,28 @@
         window.open(url, "_blank", "noopener,noreferrer");
     }
 
+    function workspaceAvailableInTestar(workspaceSummary = selectedWorkspaceSummary) {
+        return workspaceSummary?.availableInTestar === true;
+    }
+
+    function workspaceAvailableInCli(workspaceSummary = selectedWorkspaceSummary) {
+        return workspaceSummary?.availableInCli === true;
+    }
+
+    function workspaceSelectionInvalidForCurrentPage() {
+        if (currentPage === "cli") {
+            return !workspaceAvailableInCli();
+        }
+
+        if (currentPage === "run" || currentPage === "spy") {
+            return !workspaceAvailableInTestar();
+        }
+
+        return false;
+    }
+
     async function navigateToStateModel() {
-        if (!selectedWorkspaceName) {
+        if (!selectedWorkspaceName || !workspaceAvailableInTestar()) {
             return;
         }
 
@@ -558,10 +609,15 @@
         return selectedEditor === "java-policies" && selectedSourceName === sourceFile.name;
     }
 
-    async function loadResults() {
+    async function loadResults(source = resultSource) {
         try {
-            scriptlessResults = await loadJson("/api/execution/scriptless/results");
-            const resultGroups = scriptlessResults.groups || [];
+            resultSource = source;
+            resultsData = await loadJson(
+                source === "cli"
+                    ? "/api/execution/cli/results"
+                    : "/api/execution/scriptless/results"
+            );
+            const resultGroups = resultsData.groups || [];
             if (resultGroups.length > 0) {
                 await selectResultGroup(resultGroups[resultGroups.length - 1]);
             } else {
@@ -569,7 +625,7 @@
                 selectedResultFile = null;
             }
         } catch (resultsError) {
-            reportClientError("Unable to load scriptless results", resultsError);
+            reportClientError(`Unable to load ${source} results`, resultsError);
         }
     }
 
@@ -704,15 +760,25 @@
         try {
             const resultPath = encodeURIComponent(resultFile.path);
             selectedResultFile = await loadJson(
-                `/api/execution/scriptless/results/${resultFile.name}?path=${resultPath}`
+                resultSource === "cli"
+                    ? `/api/execution/cli/results/${resultFile.name}?path=${resultPath}`
+                    : `/api/execution/scriptless/results/${resultFile.name}?path=${resultPath}`
             );
         } catch (fileError) {
             reportClientError(`Unable to load result file ${resultFile.name}`, fileError);
         }
     }
 
+    async function selectResultSource(source) {
+        if (resultSource === source && currentPage === "results") {
+            return;
+        }
+
+        await loadResults(source);
+    }
+
     async function startRemoteSpyMode() {
-        if (!selectedWorkspaceName) {
+        if (!selectedWorkspaceName || !workspaceAvailableInTestar()) {
             return;
         }
 
@@ -802,7 +868,7 @@
     }
 
     async function startLocalSpyMode() {
-        if (!selectedWorkspaceName) {
+        if (!selectedWorkspaceName || !workspaceAvailableInTestar()) {
             return;
         }
 
@@ -861,6 +927,129 @@
         }
     }
 
+    async function startCliManualSession(platform, target) {
+        if (!selectedWorkspaceName || !workspaceAvailableInCli()) {
+            return;
+        }
+
+        saving = true;
+        message = "";
+        currentPage = "cli";
+
+        try {
+            cliStatus = await loadJson(`/api/execution/cli/manual/start/${selectedWorkspaceName}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ platform, target })
+            });
+            showTemporaryMessage(cliStatus.message || "Manual CLI session started.");
+        } catch (cliError) {
+            reportClientError("Unable to start manual CLI session", cliError);
+        } finally {
+            saving = false;
+        }
+    }
+
+    async function startCliAgentSession(platform, target) {
+        if (!selectedWorkspaceName || !workspaceAvailableInCli()) {
+            return;
+        }
+
+        saving = true;
+        message = "";
+        currentPage = "cli";
+
+        try {
+            cliStatus = await loadJson(`/api/execution/cli/agent/start/${selectedWorkspaceName}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ platform, target })
+            });
+            showTemporaryMessage(cliStatus.message || "Agent CLI execution started.");
+        } catch (cliError) {
+            reportClientError("Unable to start agent CLI execution", cliError);
+        } finally {
+            saving = false;
+        }
+    }
+
+    async function runCliManualCommand(commandLine) {
+        saving = true;
+        message = "";
+
+        try {
+            cliStatus = await loadJson("/api/execution/cli/manual/command", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ commandLine })
+            });
+        } catch (cliError) {
+            reportClientError(`Unable to execute CLI command ${commandLine}`, cliError);
+        } finally {
+            saving = false;
+        }
+    }
+
+    async function stopCliManualSession() {
+        saving = true;
+        message = "";
+
+        try {
+            cliStatus = await loadJson("/api/execution/cli/manual/stop", {
+                method: "POST"
+            });
+            showTemporaryMessage(cliStatus.message || "Manual CLI session stopped.");
+        } catch (cliError) {
+            reportClientError("Unable to stop manual CLI session", cliError);
+        } finally {
+            saving = false;
+        }
+    }
+
+    async function stopCliAgentSession() {
+        saving = true;
+        message = "";
+
+        try {
+            cliStatus = await loadJson("/api/execution/cli/agent/stop", {
+                method: "POST"
+            });
+            showTemporaryMessage(cliStatus.message || "Agent CLI execution stopped.");
+        } catch (cliError) {
+            reportClientError("Unable to stop agent CLI execution", cliError);
+        } finally {
+            saving = false;
+        }
+    }
+
+    async function saveCliAgentSettings() {
+        saving = true;
+        message = "";
+
+        try {
+            cliAgentSettings = await loadJson("/api/execution/cli/agent-settings", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(cliAgentSettings || {})
+            });
+            showTemporaryMessage("Agent CLI settings saved.");
+        } catch (cliError) {
+            reportClientError("Unable to save Agent CLI settings", cliError);
+        } finally {
+            saving = false;
+        }
+    }
+
+    $: selectedWorkspaceSummary = workspaces.find((workspace) => workspace.name === selectedWorkspaceName) || null;
+
     onMount(async () => {
         startScriptlessPolling();
         try {
@@ -888,6 +1077,7 @@
             <select
                 id="page-workspace-select"
                 value={selectedWorkspaceName}
+                class:workspace-select-invalid={workspaceSelectionInvalidForCurrentPage()}
                 on:change={(event) => loadWorkspace(event.currentTarget.value)}
             >
                 {#each workspaces as workspace}
@@ -899,21 +1089,26 @@
             ⚙️ Test Configuration
         </button>
         <button class:secondary={currentPage !== "spy"} on:click={navigateToSpy}>
-            🔍 Run Spy Mode
+            🔍 Spy Mode
         </button>
         <button class:secondary={currentPage !== "run"} on:click={navigateToRun}>
-            🔄 Run Generate Mode
+            🔄 Generate Mode
         </button>
-        <button class:secondary={currentPage !== "results"} on:click={navigateToResults}>
+        <button class:secondary={currentPage !== "cli"} on:click={navigateToCli}>
+            >_ CLI Mode
+        </button>
+        <div class="page-nav-right-group">
+        <button class:secondary={currentPage !== "results"} type="button" on:click={navigateToResults}>
             👁️ View Test Results
         </button>
         <button class="secondary" type="button" on:click={navigateToStateModel}>
             <StateModelIcon size={18} title="State model" />
             <span>View State Model</span>
         </button>
-        <button class:secondary={currentPage !== "logs"} class="page-nav-right" type="button" on:click={navigateToLogs}>
+        <button class:secondary={currentPage !== "logs"} type="button" on:click={navigateToLogs}>
             🧾 Inspect Debug Files
         </button>
+        </div>
     </nav>
 
     {#if currentPage === "configuration"}
@@ -948,6 +1143,7 @@
             saving={saving}
             scriptlessStatus={scriptlessStatus}
             selectedWorkspaceName={selectedWorkspaceName}
+            selectedWorkspaceAvailableInTestar={workspaceAvailableInTestar()}
             startGenerate={startGenerate}
             stopGenerate={stopGenerate}
         />
@@ -958,6 +1154,7 @@
             scriptlessStatus={scriptlessStatus}
             saving={saving}
             selectedWorkspaceName={selectedWorkspaceName}
+            selectedWorkspaceAvailableInTestar={workspaceAvailableInTestar()}
             spyState={spyState}
             startRemoteSpyMode={startRemoteSpyMode}
             refreshRemoteSpyMode={refreshRemoteSpyMode}
@@ -970,12 +1167,29 @@
         />
     {/if}
 
+    {#if currentPage === "cli"}
+        <CliModeView
+            cliAgentSettings={cliAgentSettings}
+            cliStatus={cliStatus}
+            saving={saving}
+            saveCliAgentSettings={saveCliAgentSettings}
+            selectedWorkspaceAvailableInCli={workspaceAvailableInCli()}
+            startCliAgentSession={startCliAgentSession}
+            startCliManualSession={startCliManualSession}
+            runCliManualCommand={runCliManualCommand}
+            stopCliAgentSession={stopCliAgentSession}
+            stopCliManualSession={stopCliManualSession}
+        />
+    {/if}
+
     {#if currentPage === "results"}
         <TestResultsView
             loadResultFile={loadResultFile}
-            scriptlessResults={scriptlessResults}
+            resultsData={resultsData}
+            resultSource={resultSource}
             selectedResultFile={selectedResultFile}
             selectedResultGroup={selectedResultGroup}
+            selectResultSource={selectResultSource}
             selectResultGroup={selectResultGroup}
         />
     {/if}

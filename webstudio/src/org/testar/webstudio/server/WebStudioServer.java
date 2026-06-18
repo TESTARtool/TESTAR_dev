@@ -20,6 +20,9 @@ import org.testar.webstudio.api.RemoteSpyController;
 import org.testar.webstudio.api.StateModelAnalysisController;
 import org.testar.webstudio.api.ValidationController;
 import org.testar.webstudio.api.WorkspaceController;
+import org.testar.webstudio.api.dto.CliAgentSettingsDto;
+import org.testar.webstudio.api.dto.CliManualCommandRequestDto;
+import org.testar.webstudio.api.dto.CliManualSessionRequestDto;
 import org.testar.webstudio.api.dto.SpyTypeRequestDto;
 import org.testar.webstudio.api.dto.WorkspaceFileUpdateDto;
 import org.testar.webstudio.analysis.StateModelAnalysisService;
@@ -49,7 +52,11 @@ public final class WebStudioServer {
         WorkspaceService workspaceService = new WorkspaceService();
         System.setProperty("testar.home", workspaceService.testarHomeDirectory().toString());
         ValidationService validationService = new ValidationService(workspaceService);
-        ExecutionAdapterRegistry executionAdapters = new ExecutionAdapterRegistry(defaultExecutionAdapters());
+        ExecutionAdapterRegistry executionAdapters = new ExecutionAdapterRegistry(List.of(
+            new CliExecutionAdapter(workspaceService),
+            new ScriptlessExecutionAdapter(),
+            new RemoteExecutionAdapter()
+        ));
         StateModelAnalysisService stateModelAnalysisService = new StateModelAnalysisService(workspaceService);
         RemoteSpyService remoteSpyService = new RemoteSpyService(workspaceService);
 
@@ -74,14 +81,6 @@ public final class WebStudioServer {
         app.start(port);
 
         System.out.println("TESTAR web studio started at http://localhost:" + port);
-    }
-
-    private List<ExecutionAdapter> defaultExecutionAdapters() {
-        return List.of(
-            new CliExecutionAdapter(),
-            new ScriptlessExecutionAdapter(),
-            new RemoteExecutionAdapter()
-        );
     }
 
     private int configuredPort() {
@@ -144,10 +143,42 @@ public final class WebStudioServer {
             return validationController.validateWorkspace(workspace);
         }));
         routes.get("/api/execution/backends", context -> handle(context, executionController::availableBackends));
+        routes.get("/api/execution/cli/profiles", context -> handle(context, executionController::cliProfiles));
         routes.get("/api/execution/status/{backend}", context -> handle(context, () -> {
             ExecutionBackend backend = ExecutionBackend.fromId(context.pathParam("backend"));
             return executionController.status(backend);
         }));
+        routes.get("/api/execution/cli/agent-settings", context -> handle(context, executionController::cliAgentSettings));
+        routes.put("/api/execution/cli/agent-settings", context -> handle(context, () -> {
+            CliAgentSettingsDto update = gson.fromJson(context.body(), CliAgentSettingsDto.class);
+            return executionController.saveCliAgentSettings(update);
+        }));
+        routes.post("/api/execution/cli/manual/start/{profile}", context -> handle(context, () -> {
+            CliManualSessionRequestDto request = gson.fromJson(context.body(), CliManualSessionRequestDto.class);
+            return executionController.startCliManualSession(context.pathParam("profile"), request);
+        }));
+        routes.post("/api/execution/cli/agent/start/{profile}", context -> handle(context, () -> {
+            CliManualSessionRequestDto request = gson.fromJson(context.body(), CliManualSessionRequestDto.class);
+            return executionController.startCliAgentSession(context.pathParam("profile"), request);
+        }));
+        routes.post("/api/execution/cli/manual/command", context -> handle(context, () -> {
+            CliManualCommandRequestDto request = gson.fromJson(context.body(), CliManualCommandRequestDto.class);
+            return executionController.runCliManualCommand(request == null ? "" : request.commandLine());
+        }));
+        routes.post("/api/execution/cli/manual/stop", context -> handle(context, executionController::stopCliManualSession));
+        routes.post("/api/execution/cli/agent/stop", context -> handle(context, executionController::stopCliAgentSession));
+        routes.get("/api/execution/cli/results", context -> handle(context, executionController::cliResults));
+        routes.get("/api/execution/cli/results/{fileName}", context -> handle(context, () ->
+            executionController.cliResultFile(
+                context.pathParam("fileName"),
+                context.queryParam("path")
+            )
+        ));
+        routes.get("/api/execution/cli/result-asset", context -> {
+            String assetPath = context.queryParam("path");
+            context.contentType(executionController.cliResultAssetContentType(assetPath));
+            context.result(executionController.cliResultAsset(assetPath));
+        });
         routes.get("/api/execution/scriptless/results", context -> handle(context, executionController::scriptlessResults));
         routes.get("/api/execution/scriptless/results/{fileName}", context -> handle(context, () ->
             executionController.scriptlessResultFile(

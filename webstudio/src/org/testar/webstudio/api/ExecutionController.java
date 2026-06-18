@@ -11,9 +11,12 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.testar.webstudio.api.dto.CliAgentSettingsDto;
+import org.testar.webstudio.api.dto.CliManualSessionRequestDto;
 import org.testar.webstudio.api.dto.ExecutionStatusDto;
 import org.testar.webstudio.api.dto.ResultFileDto;
 import org.testar.webstudio.api.dto.ScriptlessResultsDto;
+import org.testar.webstudio.execution.CliExecutionAdapter;
 import org.testar.webstudio.execution.ExecutionAdapter;
 import org.testar.webstudio.execution.ExecutionAdapterRegistry;
 import org.testar.webstudio.execution.ExecutionBackend;
@@ -39,12 +42,72 @@ public final class ExecutionController {
         return adapter.status();
     }
 
+    public List<String> cliProfiles() {
+        return cliExecutionAdapter().profiles();
+    }
+
     public ExecutionStatusDto startGenerate(String workspaceName, Path settingsRoot) {
         return scriptlessExecutionAdapter().startGenerate(workspaceName, settingsRoot);
     }
 
     public ExecutionStatusDto startLocalSpy(String workspaceName, Path settingsRoot) {
         return scriptlessExecutionAdapter().startLocalSpy(workspaceName, settingsRoot);
+    }
+
+    public ExecutionStatusDto startCliManualSession(String profileName, CliManualSessionRequestDto request) {
+        return cliExecutionAdapter().startManualSession(
+            profileName,
+            request == null ? "" : request.platform(),
+            request == null ? "" : request.target()
+        );
+    }
+
+    public ExecutionStatusDto startCliAgentSession(String profileName, CliManualSessionRequestDto request) {
+        return cliExecutionAdapter().startAgentSession(
+            profileName,
+            request == null ? "" : request.platform(),
+            request == null ? "" : request.target()
+        );
+    }
+
+    public ExecutionStatusDto runCliManualCommand(String commandLine) {
+        return cliExecutionAdapter().runManualCommand(commandLine);
+    }
+
+    public ExecutionStatusDto stopCliManualSession() {
+        return cliExecutionAdapter().stopManualSession();
+    }
+
+    public ExecutionStatusDto stopCliAgentSession() {
+        return cliExecutionAdapter().stopAgentSession();
+    }
+
+    public ScriptlessResultsDto cliResults() {
+        return cliExecutionAdapter().cliResults();
+    }
+
+    public ResultFileDto cliResultFile(String fileName, String filePath) {
+        return cliExecutionAdapter().readCliResultFile(fileName, filePath);
+    }
+
+    public byte[] cliResultAsset(String filePath) {
+        try {
+            return Files.readAllBytes(cliExecutionAdapter().resolveCliResultAsset(filePath));
+        } catch (Exception exception) {
+            throw new IllegalStateException("Unable to read CLI result asset: " + filePath, exception);
+        }
+    }
+
+    public String cliResultAssetContentType(String filePath) {
+        return cliExecutionAdapter().cliResultAssetContentType(filePath);
+    }
+
+    public CliAgentSettingsDto cliAgentSettings() {
+        return cliExecutionAdapter().loadAgentSettings();
+    }
+
+    public CliAgentSettingsDto saveCliAgentSettings(CliAgentSettingsDto settings) {
+        return cliExecutionAdapter().saveAgentSettings(settings);
     }
 
     public ExecutionStatusDto stopScriptlessRun() {
@@ -92,5 +155,9 @@ public final class ExecutionController {
 
     private ScriptlessExecutionAdapter scriptlessExecutionAdapter() {
         return (ScriptlessExecutionAdapter) executionAdapters.adapterFor(ExecutionBackend.SCRIPTLESS);
+    }
+
+    private CliExecutionAdapter cliExecutionAdapter() {
+        return (CliExecutionAdapter) executionAdapters.adapterFor(ExecutionBackend.CLI);
     }
 }
