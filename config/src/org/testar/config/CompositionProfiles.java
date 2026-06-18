@@ -13,11 +13,13 @@ public final class CompositionProfiles {
     public static final String WINDOWS_COMPOSITION = "windows_composition";
     public static final String WEBDRIVER_COMPOSITION = "webdriver_composition";
     public static final String ANDROID_COMPOSITION = "android_composition";
+    public static final String CLI_COMPOSITION = "cli_composition";
 
     private static final String[] VALUES = new String[]{
             WINDOWS_COMPOSITION,
             WEBDRIVER_COMPOSITION,
-            ANDROID_COMPOSITION
+            ANDROID_COMPOSITION,
+            CLI_COMPOSITION
     };
 
     private CompositionProfiles() {

@@ -65,7 +65,7 @@ ProcessListenerEnabled = false
 SUTProcesses =
 AccessBridgeEnabled = false
 
-CompositionProfile = 
+CompositionProfile = cli_composition
 CustomCompositionResource = composition.properties
 CustomPoliciesResource = policies.properties
 
