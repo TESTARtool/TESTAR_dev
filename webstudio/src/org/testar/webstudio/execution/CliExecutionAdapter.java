@@ -433,16 +433,16 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
 
     private CliAgentSettingsDto defaultAgentSettings() {
         return new CliAgentSettingsDto(
-            "OPENAI_API_KEY",
+            "OPENAI_API",
             "",
-            "gpt-5.4",
+            "gpt-5.4-mini",
             "medium",
-            "workspace-write",
+            "danger-full-access",
             "never",
             Boolean.FALSE,
             Boolean.TRUE,
-            "CLI Agent Goal",
-            ""
+            "Test Parabank Login",
+            "As a test agent verify that you can log in with the credentials john/demo. Then the Welcome John Smith message is shown."
         );
     }
 
@@ -646,34 +646,28 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
                                     String platform,
                                     String target,
                                     Path cliLauncher) {
+        Path skillDirectory = resolveCliSkillDirectory();
+        Path skillFile = skillDirectory.resolve("SKILL.md");
+        String skillInstructions = readCliSkillInstructions(skillDirectory);
         StringBuilder prompt = new StringBuilder();
         prompt.append(settings.promptTitle()).append('\n').append('\n');
         prompt.append("You are controlling TESTAR through testar-cli.").append('\n');
-        prompt.append("Selected CLI profile: ").append(workspaceName).append('\n');
         prompt.append("Platform: ").append(platform).append('\n');
         prompt.append("Target: ").append(target).append('\n');
         prompt.append("TESTAR CLI launcher: ").append(cliLauncher).append('\n');
-        prompt.append("Repository root: ").append(resolveProjectRoot()).append('\n').append('\n');
-        prompt.append("Required execution rules:").append('\n');
-        prompt.append("1. Start the session with the selected platform, target, and profile.").append('\n');
-        prompt.append("2. Use only testar-cli commands to inspect state and execute actions.").append('\n');
-        prompt.append("3. Prefer semantic commands such as getState, getDerivedActions, and executeAction.").append('\n');
-        prompt.append("4. If you start a session, finish with stopSession and then shutdownDaemon.").append('\n');
-        prompt.append("5. Report what you did and why.").append('\n').append('\n');
-        prompt.append("Useful command examples:").append('\n');
-        prompt.append("\"").append(cliLauncher).append("\" startSession ").append(platform).append(" ").append(target).append(" ").append(workspaceName).append('\n');
-        prompt.append("\"").append(cliLauncher).append("\" sessionStatus").append('\n');
-        prompt.append("\"").append(cliLauncher).append("\" getState").append('\n');
-        prompt.append("\"").append(cliLauncher).append("\" getDerivedActions").append('\n');
-        prompt.append("\"").append(cliLauncher).append("\" executeAction click \"Log In\"").append('\n');
-        prompt.append("\"").append(cliLauncher).append("\" stopSession").append('\n');
-        prompt.append("\"").append(cliLauncher).append("\" shutdownDaemon").append('\n').append('\n');
+        prompt.append("Repository root: ").append(resolveProjectRoot()).append('\n');
+        prompt.append("CLI skill directory: ").append(skillDirectory).append('\n');
+        prompt.append("CLI skill file: ").append(skillFile).append('\n').append('\n');
+        prompt.append("Execution rule: read and follow the TESTAR CLI skill instructions before issuing commands.").append('\n');
+        prompt.append("Use the selected platform and target for this run.").append('\n').append('\n');
         if (!settings.apiKeyEnvVarName().isBlank()) {
             prompt.append("Expected API key environment variable for Codex authentication: ")
                 .append(settings.apiKeyEnvVarName())
                 .append('\n')
                 .append('\n');
         }
+        prompt.append("Authoritative TESTAR CLI skill instructions:").append('\n');
+        prompt.append(skillInstructions).append('\n').append('\n');
         prompt.append("User goal:").append('\n');
         prompt.append(
             settings.promptText().isBlank()
@@ -685,6 +679,49 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
 
     private Path resolveProjectRoot() {
         return Paths.get(System.getProperty("user.dir")).toAbsolutePath().normalize();
+    }
+
+    private Path resolveCliSkillDirectory() {
+        Path skillDirectory = resolveCliInstallDirectory()
+            .resolve(".agents")
+            .resolve("skills")
+            .resolve("testar-cli");
+
+        if (!Files.isDirectory(skillDirectory)) {
+            throw new IllegalStateException(
+                "CLI skill directory not found: " + skillDirectory + ". Run :cli:cliDistribution again."
+            );
+        }
+
+        return skillDirectory;
+    }
+
+    private String readCliSkillInstructions(Path skillDirectory) {
+        try (Stream<Path> files = Files.list(skillDirectory)) {
+            List<Path> markdownFiles = files
+                .filter(Files::isRegularFile)
+                .filter(path -> path.getFileName().toString().toLowerCase().endsWith(".md"))
+                .sorted(Comparator.comparing(path -> path.getFileName().toString()))
+                .collect(Collectors.toList());
+
+            if (markdownFiles.isEmpty()) {
+                throw new IllegalStateException("No CLI skill markdown files found in: " + skillDirectory);
+            }
+
+            StringBuilder content = new StringBuilder();
+            for (Path markdownFile : markdownFiles) {
+                if (content.length() > 0) {
+                    content.append('\n').append('\n');
+                }
+
+                content.append("File: ").append(markdownFile.getFileName()).append('\n').append('\n');
+                content.append(Files.readString(markdownFile, StandardCharsets.UTF_8).trim());
+            }
+
+            return content.toString();
+        } catch (IOException exception) {
+            throw new IllegalStateException("Unable to read CLI skill instructions from: " + skillDirectory, exception);
+        }
     }
 
     private Path resolveCliInstallDirectory() {

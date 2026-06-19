@@ -49,6 +49,10 @@ task prepareCliDistribution(type: Sync) {
         into 'settings'
     }
 
+    from(project(':agent').file('resources/skills/testar-cli')) {
+        into '.agents/skills/testar-cli'
+    }
+
     from('resources/log4j2.xml') {
         into '.runtime'
     }

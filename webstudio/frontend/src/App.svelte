@@ -26,8 +26,8 @@
         approvalPolicy: "never",
         networkAccessEnabled: false,
         skipGitRepoCheck: true,
-        promptTitle: "CLI Agent Goal",
-        promptText: ""
+        promptTitle: "Test Parabank Login",
+        promptText: "As a test agent verify that you can log in with the credentials john/demo. Then the Welcome John Smith message is shown."
     };
     let scriptlessStatus = null;
     let loading = false;
