@@ -41,6 +41,7 @@
     let selectedResultGroup = null;
     let selectedResultFile = null;
     let selectedEditor = "java-composition";
+    let selectedSettingsGroupId = "";
     let debugFiles = [];
     let selectedDebugFile = null;
     let spyState = null;
@@ -154,6 +155,7 @@
             selectedSourceName = "";
             selectedSourceFile = null;
             selectedEditor = "java-composition";
+            selectedSettingsGroupId = "";
             selectedCompositionFlowNode = null;
             return;
         }
@@ -168,6 +170,7 @@
             selectedSourceName = "";
             selectedSourceFile = null;
             selectedEditor = "java-composition";
+            selectedSettingsGroupId = workspaceDocument?.settingsGroups?.[0]?.id || "";
             selectedCompositionFlowNode = null;
         } catch (loadError) {
             reportClientError(`Unable to load workspace ${workspaceName}`, loadError);
@@ -203,6 +206,9 @@
 
     function openVisualSettings() {
         openEditor("settings-form");
+        if (!selectedSettingsGroupId && workspaceDocument?.settingsGroups?.length > 0) {
+            selectedSettingsGroupId = workspaceDocument.settingsGroups[0].id;
+        }
     }
 
     function openPoliciesProperties() {
@@ -233,6 +239,14 @@
         selectedEditor = editorId;
         if (selectedCompositionFlowNode) {
             selectedCompositionFlowNode = compositionFlowNodes.find((flowNode) => flowNode.id === selectedCompositionFlowNode.id) || selectedCompositionFlowNode;
+        }
+        if (workspaceDocument?.settingsGroups?.length > 0) {
+            const matchingSettingsGroup = workspaceDocument.settingsGroups.find((settingsGroup) => settingsGroup.id === selectedSettingsGroupId);
+            if (!matchingSettingsGroup) {
+                selectedSettingsGroupId = workspaceDocument.settingsGroups[0].id;
+            }
+        } else {
+            selectedSettingsGroupId = "";
         }
         if (sourceName) {
             await selectSource(sourceName, editorId);
@@ -742,6 +756,14 @@
         currentEditorDocument = null;
     }
 
+    function selectSettingsGroup(groupId) {
+        selectedSettingsGroupId = groupId || "";
+    }
+
+    $: if (selectedEditor === "settings-form" && !selectedSettingsGroupId && workspaceDocument?.settingsGroups?.length > 0) {
+        selectedSettingsGroupId = workspaceDocument.settingsGroups[0].id;
+    }
+
     async function selectResultGroup(resultGroup) {
         selectedResultGroup = resultGroup;
         if (resultGroup?.files?.length > 0) {
@@ -1131,8 +1153,10 @@
             saving={saving}
             selectSource={selectSource}
             selectCompositionFlowNode={selectCompositionFlowNode}
+            selectSettingsGroup={selectSettingsGroup}
             selectedEditor={selectedEditor}
             selectedCompositionFlowNode={selectedCompositionFlowNode}
+            selectedSettingsGroupId={selectedSettingsGroupId}
             selectedSourceFile={selectedSourceFile}
             workspaceDocument={workspaceDocument}
         />

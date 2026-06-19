@@ -41,7 +41,7 @@ public final class WorkspaceSettingsCatalog {
             ),
             group(
                 "execution",
-                "Execution Basics",
+                "SUT Execution",
                 "Sequence and action execution count and timing.",
                 settingsProperties,
                 ConfigTags.Sequences,
@@ -66,7 +66,7 @@ public final class WorkspaceSettingsCatalog {
             ),*/
             group(
                 "reporting",
-                "Reporting And Output",
+                "Reporting",
                 "How TESTAR stores reports, logs, widget information, and generated outputs.",
                 settingsProperties,
                 //ConfigTags.OutputDir,
@@ -125,7 +125,7 @@ public final class WorkspaceSettingsCatalog {
             ),
             group(
                 "state-identification",
-                "State Abstract Identification",
+                "Abstract Identification",
                 "State abstract identifier attributes.",
                 settingsProperties,
                 ConfigTags.AbstractStateAttributes

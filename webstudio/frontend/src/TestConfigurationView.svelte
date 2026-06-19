@@ -17,8 +17,10 @@
     export let saving = false;
     export let selectSource;
     export let selectCompositionFlowNode;
+    export let selectSettingsGroup;
     export let selectedEditor = "";
     export let selectedCompositionFlowNode = null;
+    export let selectedSettingsGroupId = "";
     export let selectedSourceFile = null;
     export let workspaceDocument = null;
 
@@ -146,6 +148,17 @@
         };
     }
 
+    function openSettingsGroup(groupId) {
+        if (groupId) {
+            openVisualSettings();
+            selectSettingsGroup(groupId);
+            expandedSettingsGroups = {
+                ...expandedSettingsGroups,
+                [groupId]: true
+            };
+        }
+    }
+
     $: normalizedSettingsSearch = normalizedSearchText(settingsSearch);
 
     $: filteredSettingsGroups = (workspaceDocument?.settingsGroups || [])
@@ -154,6 +167,11 @@
             settings: (settingsGroup.settings || []).filter((setting) => matchesSettingsSearch(setting, settingsSearch))
         }))
         .filter((settingsGroup) => settingsGroup.settings.length > 0);
+
+    $: settingsNavigationGroups = workspaceDocument?.settingsGroups || [];
+    $: visibleSettingsGroups = normalizedSettingsSearch
+        ? filteredSettingsGroups
+        : filteredSettingsGroups.filter((settingsGroup) => settingsGroup.id === selectedSettingsGroupId);
 
     $: {
         const nextWorkspaceKey = workspaceDocument?.workspaceName || "";
@@ -184,34 +202,14 @@
                     class="source-item"
                     on:click={openCompositionProperties}
                 >
-                    <span>Edit composition.properties</span>
+                    <span>Edit composition.properties file</span>
                 </button>
                 <button
                     class:selected={isSelectedEditor("java-composition")}
                     class="source-item"
                     on:click={openJavaComposition}
                 >
-                    <span>Edit Java Composition</span>
-                </button>
-            </div>
-        </section>
-
-        <section class="sidebar-section">
-            <h3>Test Settings</h3>
-            <div class="source-list">
-                <button
-                    class:selected={isSelectedEditor("settings-form")}
-                    class="source-item"
-                    on:click={openVisualSettings}
-                >
-                    <span>Edit Settings</span>
-                </button>
-                <button
-                    class:selected={isSelectedEditor("test-settings")}
-                    class="source-item"
-                    on:click={openTestSettings}
-                >
-                    <span>Edit test.settings</span>
+                    <span>Edit Java Composition Flow</span>
                 </button>
             </div>
         </section>
@@ -224,7 +222,7 @@
                     class="source-item"
                     on:click={openPoliciesProperties}
                 >
-                    <span>Edit policies.properties</span>
+                    <span>Edit policies.properties file</span>
                 </button>
                 <button
                     class:selected={isSelectedEditor("java-policies")}
@@ -234,6 +232,42 @@
                     <span>Edit Java Policies</span>
                     <small>{policySourceFiles.length}</small>
                 </button>
+            </div>
+        </section>
+
+        <section class="sidebar-section">
+            <h3>Test Settings</h3>
+            <div class="source-list">
+                <button
+                    class:selected={isSelectedEditor("test-settings")}
+                    class="source-item"
+                    on:click={openTestSettings}
+                >
+                    <span>Edit test.settings file</span>
+                </button>
+            </div>
+            <div class="settings-sidebar-tree">
+                <button
+                    class:selected={isSelectedEditor("settings-form")}
+                    class="source-item settings-tree-root"
+                    on:click={openVisualSettings}
+                >
+                    <span>Edit Settings</span>
+                </button>
+                {#if settingsNavigationGroups.length > 0}
+                    <div class="settings-sidebar-nav">
+                        {#each settingsNavigationGroups as settingsGroup}
+                            <button
+                                type="button"
+                                class="source-item settings-nav-item"
+                                class:selected={selectedEditor === "settings-form" && selectedSettingsGroupId === settingsGroup.id}
+                                on:click={() => openSettingsGroup(settingsGroup.id)}
+                            >
+                                <span>{settingsGroup.title}</span>
+                            </button>
+                        {/each}
+                    </div>
+                {/if}
             </div>
         </section>
     </section>
@@ -264,11 +298,26 @@
                                 placeholder="Search by key, value, type, or description"
                             />
                         </div>
+                        {#if settingsNavigationGroups.length > 0}
+                            <div class="settings-tabs" role="tablist" aria-label="Settings categories">
+                                {#each settingsNavigationGroups as settingsGroup}
+                                    <button
+                                        type="button"
+                                        class="settings-tab"
+                                        class:selected={selectedSettingsGroupId === settingsGroup.id}
+                                        aria-pressed={selectedSettingsGroupId === settingsGroup.id}
+                                        on:click={() => openSettingsGroup(settingsGroup.id)}
+                                    >
+                                        <span>{settingsGroup.title}</span>
+                                    </button>
+                                {/each}
+                            </div>
+                        {/if}
                     </section>
 
                     <section class="settings-groups top-gap">
-                        {#if filteredSettingsGroups.length > 0}
-                            {#each filteredSettingsGroups as settingsGroup (settingsGroup.id)}
+                        {#if visibleSettingsGroups.length > 0}
+                            {#each visibleSettingsGroups as settingsGroup (settingsGroup.id)}
                                 <article class="settings-group-card">
                                     <button
                                         type="button"
@@ -297,7 +346,11 @@
                                     {#if normalizedSettingsSearch ? true : Boolean(expandedSettingsGroups[settingsGroup.id])}
                                         <div class="settings-fields">
                                             {#each settingsGroup.settings as setting}
-                                                <label class="settings-field">
+                                                <label
+                                                    class="settings-field"
+                                                    class:settings-field-wide={setting.type === "list"}
+                                                    class:settings-field-boolean={setting.type === "boolean"}
+                                                >
                                                     <span class="settings-field-label">{setting.key}</span>
 
                                                     {#if setting.type === "boolean"}
@@ -359,7 +412,13 @@
                                 </article>
                             {/each}
                         {:else}
-                            <p class="progress-message">No settings matched the current search.</p>
+                            <p class="progress-message">
+                                {#if normalizedSettingsSearch}
+                                    No settings matched the current search.
+                                {:else}
+                                    Select a settings category to inspect its fields.
+                                {/if}
+                            </p>
                         {/if}
                     </section>
                 </section>
