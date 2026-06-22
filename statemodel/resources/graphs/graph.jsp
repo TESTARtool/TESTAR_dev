@@ -831,6 +831,20 @@
         contentPanelHeader.appendChild(closeButton);
 
         if (targetEdge.hasClass('ConcreteAction')) {
+            // add the concrete action screenshot in the side panel
+            let actionPopupAnchor = document.createElement("a");
+            actionPopupAnchor.href = "${contentFolder}/" + targetEdge.id() + ".png";
+            $(actionPopupAnchor).magnificPopup(
+                {type: "image"}
+            );
+
+            let actionImage = document.createElement("img");
+            actionImage.alt = "Image for edge " + targetEdge.id();
+            actionImage.src = "${contentFolder}/" + targetEdge.id() + ".png";
+            actionImage.classList.add("node-img-full");
+            actionPopupAnchor.appendChild(actionImage);
+            contentPanel.appendChild(actionPopupAnchor);
+
             // if it is a concrete action edge, we add a popup
             // first the content
             let popupContent = document.createElement("div");
@@ -849,6 +863,12 @@
             targetDiv.classList.add('screenshot');
             targetDiv.appendChild(targetImg);
 
+            let actionDiv = document.createElement("div");
+            let actionImg = document.createElement("img");
+            actionImg.src = "${contentFolder}/" + targetEdge.id() + ".png";
+            actionDiv.classList.add('screenshot');
+            actionDiv.appendChild(actionImg);
+
             // add the edge text
             let descDiv = document.createElement("div");
             descDiv.appendChild(document.createTextNode(targetEdge.data('Desc')));
@@ -856,6 +876,7 @@
 
             // add the divs in order
             popupContent.appendChild(sourceDiv);
+            popupContent.appendChild(actionDiv);
             popupContent.appendChild(descDiv);
             popupContent.appendChild(targetDiv);
             contentPanelHeader.appendChild(popupContent);

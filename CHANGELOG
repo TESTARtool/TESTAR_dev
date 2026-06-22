@@ -1,3 +1,16 @@
+#TESTAR v2.8.12 (1-Jun-2026)
+- Add executeTriggeredAction in GenericUtilsProtocol
+- Update parabank protocol to save login sequence in the state model
+- Set Tag.InputText to action and concrete action
+- Add screenshot to ConcreteAction
+- Update web isFullVisibleAtCanvasBrowser logic
+
+
+#TESTAR v2.8.11 (25-May-2026)
+- Bump org.seleniumhq.selenium:selenium-java from 4.43.0 to 4.44.0
+- Update devtools dependencies to v148
+
+
 #TESTAR v2.8.10 (12-May-2026)
 - Bump io.appium:java-client from 10.1.0 to 10.1.1
 
