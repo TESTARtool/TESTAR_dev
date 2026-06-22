@@ -23,6 +23,7 @@ import org.testar.webstudio.api.WorkspaceController;
 import org.testar.webstudio.api.dto.CliAgentSettingsDto;
 import org.testar.webstudio.api.dto.CliManualCommandRequestDto;
 import org.testar.webstudio.api.dto.CliManualSessionRequestDto;
+import org.testar.webstudio.api.dto.RegexValidationRequestDto;
 import org.testar.webstudio.api.dto.SpyTypeRequestDto;
 import org.testar.webstudio.api.dto.WorkspaceFileUpdateDto;
 import org.testar.webstudio.analysis.StateModelAnalysisService;
@@ -137,6 +138,29 @@ public final class WebStudioServer {
             String sourceName = context.pathParam("sourceName");
             WorkspaceFileUpdateDto update = gson.fromJson(context.body(), WorkspaceFileUpdateDto.class);
             return workspaceController.saveWorkspaceSourceFile(workspace, sourceName, update.content());
+        }));
+        routes.post("/api/workspaces/{workspace}/sources/{sourceName}/compile", context -> handle(context, () -> {
+            String workspace = context.pathParam("workspace");
+            String sourceName = context.pathParam("sourceName");
+            return workspaceController.compileWorkspaceSource(workspace, sourceName);
+        }));
+        routes.post("/api/workspaces/{workspace}/compile-profile", context -> handle(context, () -> {
+            String workspace = context.pathParam("workspace");
+            return workspaceController.compileWorkspaceProfile(workspace);
+        }));
+        routes.post("/api/workspaces/{workspace}/composition/modules/{propertyKey}/source", context -> handle(context, () -> {
+            String workspace = context.pathParam("workspace");
+            String propertyKey = context.pathParam("propertyKey");
+            return workspaceController.createOrOpenModuleSource(workspace, propertyKey);
+        }));
+        routes.post("/api/workspaces/{workspace}/policies/{propertyKey}/source", context -> handle(context, () -> {
+            String workspace = context.pathParam("workspace");
+            String propertyKey = context.pathParam("propertyKey");
+            return workspaceController.createOrOpenPolicySource(workspace, propertyKey);
+        }));
+        routes.post("/api/settings/regex/validate", context -> handle(context, () -> {
+            RegexValidationRequestDto request = gson.fromJson(context.body(), RegexValidationRequestDto.class);
+            return workspaceController.validateRegex(request == null ? "" : request.value());
         }));
         routes.get("/api/validation/{workspace}", context -> handle(context, () -> {
             String workspace = context.pathParam("workspace");

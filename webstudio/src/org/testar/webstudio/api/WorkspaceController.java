@@ -8,11 +8,15 @@ package org.testar.webstudio.api;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.testar.webstudio.api.dto.DebugFileDto;
 import org.testar.webstudio.api.dto.DebugFileSummaryDto;
+import org.testar.webstudio.api.dto.RegexValidationResultDto;
 import org.testar.webstudio.api.dto.WorkspaceDocumentDto;
 import org.testar.webstudio.api.dto.WorkspaceFileDto;
+import org.testar.webstudio.api.dto.WorkspaceJavaCompileResultDto;
 import org.testar.webstudio.api.dto.WorkspaceSummaryDto;
 import org.testar.webstudio.workspace.WorkspaceService;
 
@@ -62,5 +66,34 @@ public final class WorkspaceController {
 
     public WorkspaceFileDto saveWorkspaceSourceFile(String workspaceName, String sourceName, String content) {
         return workspaceService.saveWorkspaceSourceFile(workspaceName, sourceName, content);
+    }
+
+    public WorkspaceFileDto createOrOpenModuleSource(String workspaceName, String propertyKey) {
+        return workspaceService.createOrOpenModuleSource(workspaceName, propertyKey);
+    }
+
+    public WorkspaceFileDto createOrOpenPolicySource(String workspaceName, String propertyKey) {
+        return workspaceService.createOrOpenPolicySource(workspaceName, propertyKey);
+    }
+
+    public WorkspaceJavaCompileResultDto compileWorkspaceSource(String workspaceName, String sourceName) {
+        return workspaceService.compileWorkspaceSource(workspaceName, sourceName);
+    }
+
+    public WorkspaceJavaCompileResultDto compileWorkspaceProfile(String workspaceName) {
+        return workspaceService.compileWorkspaceProfile(workspaceName);
+    }
+
+    public RegexValidationResultDto validateRegex(String value) {
+        if (value == null || value.isBlank()) {
+            return new RegexValidationResultDto(true, "Empty expression", null);
+        }
+
+        try {
+            Pattern.compile(value);
+            return new RegexValidationResultDto(true, "Valid regular expression", null);
+        } catch (PatternSyntaxException exception) {
+            return new RegexValidationResultDto(false, exception.getDescription(), exception.getIndex());
+        }
     }
 }

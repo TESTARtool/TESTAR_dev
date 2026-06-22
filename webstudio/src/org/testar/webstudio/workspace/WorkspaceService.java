@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,8 +22,23 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.tools.Diagnostic;
+import javax.tools.DiagnosticCollector;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
+
+import org.testar.config.composition.helper.ModuleWorkspaceHelper;
+import org.testar.config.policy.helper.PolicyWorkspaceHelper;
+import org.testar.config.settings.Settings;
+import org.testar.config.settings.SettingsDefaults;
 import org.testar.webstudio.api.dto.WorkspaceDocumentDto;
 import org.testar.webstudio.api.dto.WorkspaceFileDto;
+import org.testar.webstudio.api.dto.WorkspaceJavaCompileDiagnosticDto;
+import org.testar.webstudio.api.dto.WorkspaceJavaCompileResultDto;
+import org.testar.webstudio.api.dto.WorkspaceModuleDefinitionDto;
+import org.testar.webstudio.api.dto.WorkspacePolicyDefinitionDto;
 import org.testar.webstudio.api.dto.WorkspaceSummaryDto;
 import org.testar.webstudio.api.dto.DebugFileDto;
 import org.testar.webstudio.api.dto.DebugFileSummaryDto;
@@ -149,7 +165,9 @@ public final class WorkspaceService {
             policies,
             sourceFiles,
             collectReferences(compositionProperties, policyProperties),
-            WorkspaceSettingsCatalog.buildSettingsGroups(settingsProperties)
+            WorkspaceSettingsCatalog.buildSettingsGroups(settingsProperties),
+            buildModuleDefinitions(compositionProperties),
+            buildPolicyDefinitions(policyProperties)
         );
     }
 
@@ -205,6 +223,58 @@ public final class WorkspaceService {
         Properties policyProperties = loadProperties(workspaceDirectory.resolve(POLICIES_FILE));
         String category = inferSourceCategory(sourceName, compositionProperties, policyProperties);
         return saveWorkspaceFile(workspaceName, sourceName, category, content);
+    }
+
+    public WorkspaceFileDto createOrOpenModuleSource(String workspaceName, String propertyKey) {
+        ModuleWorkspaceHelper.ModuleDefinition moduleDefinition = findModuleDefinition(propertyKey);
+        Path workspaceDirectory = resolveWorkspaceDirectory(workspaceName);
+        String resourcePath = workspaceDirectory.resolve(COMPOSITION_FILE).toString();
+        Properties properties = ModuleWorkspaceHelper.loadCompositionProperties(resourcePath);
+        String className = properties.getProperty(moduleDefinition.propertyKey, "").trim();
+        Settings settings = loadWorkspaceSettings(workspaceDirectory);
+
+        if (className.isEmpty()) {
+            className = ModuleWorkspaceHelper.buildDefaultClassName(resourcePath, moduleDefinition);
+            properties.setProperty(moduleDefinition.propertyKey, className);
+            ModuleWorkspaceHelper.saveCompositionProperties(resourcePath, properties, settings);
+        }
+
+        java.io.File sourceFile = ModuleWorkspaceHelper.ensureModuleSourceFile(resourcePath, className, moduleDefinition);
+        return readWorkspaceFile(
+            sourceFile.toPath().getParent() == null ? workspaceDirectory : sourceFile.toPath().getParent(),
+            sourceFile.getName(),
+            inferSourceCategory(sourceFile.getName(), properties, loadProperties(workspaceDirectory.resolve(POLICIES_FILE)))
+        );
+    }
+
+    public WorkspaceFileDto createOrOpenPolicySource(String workspaceName, String propertyKey) {
+        PolicyWorkspaceHelper.PolicyDefinition policyDefinition = findPolicyDefinition(propertyKey);
+        Path workspaceDirectory = resolveWorkspaceDirectory(workspaceName);
+        String resourcePath = workspaceDirectory.resolve(POLICIES_FILE).toString();
+        Properties properties = PolicyWorkspaceHelper.loadPoliciesProperties(resourcePath);
+        List<String> classNames = PolicyWorkspaceHelper.parseClassList(properties.getProperty(policyDefinition.propertyKey, ""));
+        String className = PolicyWorkspaceHelper.buildDefaultClassName(resourcePath, policyDefinition, classNames.size());
+        classNames.add(className);
+        properties.setProperty(policyDefinition.propertyKey, PolicyWorkspaceHelper.joinClassNames(classNames));
+        PolicyWorkspaceHelper.savePoliciesProperties(resourcePath, properties);
+
+        java.io.File sourceFile = PolicyWorkspaceHelper.ensurePolicySourceFile(resourcePath, className, policyDefinition);
+        return readWorkspaceFile(
+            sourceFile.toPath().getParent() == null ? workspaceDirectory : sourceFile.toPath().getParent(),
+            sourceFile.getName(),
+            "policy"
+        );
+    }
+
+    public WorkspaceJavaCompileResultDto compileWorkspaceSource(String workspaceName, String sourceName) {
+        ensureJavaSourceName(sourceName);
+        Path workspaceDirectory = resolveWorkspaceDirectory(workspaceName);
+        return compileWorkspaceJava(workspaceDirectory, "source", sourceName);
+    }
+
+    public WorkspaceJavaCompileResultDto compileWorkspaceProfile(String workspaceName) {
+        Path workspaceDirectory = resolveWorkspaceDirectory(workspaceName);
+        return compileWorkspaceJava(workspaceDirectory, "profile", workspaceName);
     }
 
     private static Path resolveDefaultSettingsRoot() {
@@ -319,6 +389,137 @@ public final class WorkspaceService {
         }
     }
 
+    private WorkspaceJavaCompileResultDto compileWorkspaceJava(Path workspaceDirectory, String scope, String targetName) {
+        List<Path> javaFiles = listWorkspaceJavaFiles(workspaceDirectory);
+        if (javaFiles.isEmpty()) {
+            return new WorkspaceJavaCompileResultDto(
+                false,
+                scope,
+                targetName,
+                "No Java source files were found in the selected workspace.",
+                List.of()
+            );
+        }
+
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        if (compiler == null) {
+            return new WorkspaceJavaCompileResultDto(
+                false,
+                scope,
+                targetName,
+                "Java compiler is not available. Run Web Studio with a JDK.",
+                List.of()
+            );
+        }
+
+        Path outputDirectory = testarHomeDirectory()
+            .resolve(".runtime")
+            .resolve("webstudio-compile")
+            .resolve(workspaceDirectory.getFileName().toString());
+
+        try {
+            Files.createDirectories(outputDirectory);
+        } catch (IOException exception) {
+            throw new IllegalStateException("Unable to create Java compile output directory: " + outputDirectory, exception);
+        }
+
+        DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
+        try (StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null)) {
+            Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromFiles(
+                javaFiles.stream().map(Path::toFile).collect(Collectors.toList())
+            );
+
+            List<String> options = List.of(
+                "-classpath",
+                System.getProperty("java.class.path"),
+                "-d",
+                outputDirectory.toAbsolutePath().toString()
+            );
+
+            Boolean success = compiler.getTask(
+                null,
+                fileManager,
+                diagnostics,
+                options,
+                null,
+                compilationUnits
+            ).call();
+
+            List<WorkspaceJavaCompileDiagnosticDto> diagnosticDtos = diagnostics.getDiagnostics()
+                .stream()
+                .map(diagnostic -> toCompileDiagnostic(workspaceDirectory, diagnostic))
+                .collect(Collectors.toList());
+
+            return new WorkspaceJavaCompileResultDto(
+                Boolean.TRUE.equals(success),
+                scope,
+                targetName,
+                buildCompileMessage(Boolean.TRUE.equals(success), scope, targetName, diagnosticDtos),
+                diagnosticDtos
+            );
+        } catch (IOException exception) {
+            throw new IllegalStateException("Unable to compile Java sources under: " + workspaceDirectory, exception);
+        }
+    }
+
+    private List<Path> listWorkspaceJavaFiles(Path workspaceDirectory) {
+        try (Stream<Path> children = Files.walk(workspaceDirectory)) {
+            return children
+                .filter(Files::isRegularFile)
+                .filter(path -> path.getFileName().toString().endsWith(".java"))
+                .sorted(Comparator.comparing(path -> path.toAbsolutePath().normalize().toString()))
+                .collect(Collectors.toList());
+        } catch (IOException exception) {
+            throw new IllegalStateException("Unable to list Java source files under: " + workspaceDirectory, exception);
+        }
+    }
+
+    private WorkspaceJavaCompileDiagnosticDto toCompileDiagnostic(Path workspaceDirectory,
+                                                                  Diagnostic<? extends JavaFileObject> diagnostic) {
+        String fileName = "";
+        String relativePath = "";
+
+        if (diagnostic.getSource() != null && diagnostic.getSource().toUri() != null) {
+            Path sourcePath = Path.of(diagnostic.getSource().toUri()).toAbsolutePath().normalize();
+            fileName = sourcePath.getFileName() == null ? "" : sourcePath.getFileName().toString();
+            relativePath = sourcePath.startsWith(workspaceDirectory)
+                ? workspaceDirectory.relativize(sourcePath).toString()
+                : sourcePath.toString();
+        }
+
+        return new WorkspaceJavaCompileDiagnosticDto(
+            fileName,
+            relativePath,
+            diagnostic.getLineNumber(),
+            diagnostic.getColumnNumber(),
+            diagnostic.getKind().name(),
+            diagnostic.getMessage(null)
+        );
+    }
+
+    private String buildCompileMessage(boolean success,
+                                       String scope,
+                                       String targetName,
+                                       List<WorkspaceJavaCompileDiagnosticDto> diagnostics) {
+        if (success) {
+            if ("profile".equals(scope)) {
+                return "Compile Profile succeeded.";
+            }
+
+            return "Compile Java succeeded for " + targetName + ".";
+        }
+
+        long errorCount = diagnostics.stream()
+            .filter(diagnostic -> "ERROR".equals(diagnostic.severity()))
+            .count();
+
+        if ("profile".equals(scope)) {
+            return "Compile Profile failed with " + errorCount + " error(s).";
+        }
+
+        return "Compile Java failed for " + targetName + " with " + errorCount + " error(s).";
+    }
+
     private void collectWorkspaceSummaries(Map<String, WorkspaceSummaryDto> summaries,
                                            Path root,
                                            boolean availableInTestar,
@@ -376,6 +577,47 @@ public final class WorkspaceService {
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to read properties file: " + file, exception);
         }
+    }
+
+    private Settings loadWorkspaceSettings(Path workspaceDirectory) {
+        return new Settings(
+            SettingsDefaults.getSettingsDefaults(),
+            loadProperties(workspaceDirectory.resolve(TEST_SETTINGS_FILE))
+        );
+    }
+
+    private List<WorkspaceModuleDefinitionDto> buildModuleDefinitions(Properties compositionProperties) {
+        return Arrays.stream(ModuleWorkspaceHelper.MODULE_DEFINITIONS)
+            .map(moduleDefinition -> new WorkspaceModuleDefinitionDto(
+                moduleDefinition.propertyKey,
+                moduleDefinition.label,
+                compositionProperties.getProperty(moduleDefinition.propertyKey, "").trim()
+            ))
+            .collect(Collectors.toList());
+    }
+
+    private List<WorkspacePolicyDefinitionDto> buildPolicyDefinitions(Properties policyProperties) {
+        return Arrays.stream(PolicyWorkspaceHelper.POLICY_DEFINITIONS)
+            .map(policyDefinition -> new WorkspacePolicyDefinitionDto(
+                policyDefinition.propertyKey,
+                policyDefinition.label,
+                PolicyWorkspaceHelper.parseClassList(policyProperties.getProperty(policyDefinition.propertyKey, ""))
+            ))
+            .collect(Collectors.toList());
+    }
+
+    private ModuleWorkspaceHelper.ModuleDefinition findModuleDefinition(String propertyKey) {
+        return Arrays.stream(ModuleWorkspaceHelper.MODULE_DEFINITIONS)
+            .filter(moduleDefinition -> moduleDefinition.propertyKey.equals(propertyKey))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Unknown composition module property: " + propertyKey));
+    }
+
+    private PolicyWorkspaceHelper.PolicyDefinition findPolicyDefinition(String propertyKey) {
+        return Arrays.stream(PolicyWorkspaceHelper.POLICY_DEFINITIONS)
+            .filter(policyDefinition -> policyDefinition.propertyKey.equals(propertyKey))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Unknown policy property: " + propertyKey));
     }
 
     private Map<String, List<String>> collectReferences(Properties compositionProperties, Properties policyProperties) {

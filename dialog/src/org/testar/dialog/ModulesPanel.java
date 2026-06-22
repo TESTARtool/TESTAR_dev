@@ -7,10 +7,10 @@
 package org.testar.dialog;
 
 import org.testar.config.ConfigTags;
+import org.testar.config.composition.helper.ModuleWorkspaceHelper;
 import org.testar.config.settings.Settings;
 import org.testar.dialog.editor.CustomCompositionEditor;
 import org.testar.dialog.editor.ModuleSourceEditor;
-import org.testar.dialog.helper.ModuleWorkspaceHelper;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;

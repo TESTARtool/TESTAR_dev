@@ -27,6 +27,11 @@ body {
         linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
 }
 
+h3 {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
 .page {
     max-width: 1920px;
     margin: 0 auto;
@@ -876,7 +881,7 @@ input[type="search"] {
 textarea {
     width: 100%;
     min-height: 800px;
-    margin-top: 12px;
+    margin-top: 4px;
     padding: 14px;
     resize: vertical;
     border-radius: 14px;
@@ -1127,41 +1132,6 @@ button:disabled {
     max-width: 520px;
 }
 
-.settings-tabs {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    align-items: center;
-}
-
-.settings-tab {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 40px;
-    padding: 8px 14px;
-    border-radius: 999px;
-    border: 1px solid rgba(15, 91, 120, 0.16);
-    background: rgba(255, 255, 255, 0.76);
-    color: var(--muted);
-    font-size: 0.86rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.settings-tab:hover {
-    border-color: rgba(15, 91, 120, 0.3);
-    color: var(--text);
-}
-
-.settings-tab.selected {
-    border-color: rgba(15, 91, 120, 0.34);
-    background: rgba(15, 91, 120, 0.1);
-    color: var(--accent);
-    box-shadow: inset 0 0 0 1px rgba(15, 91, 120, 0.06);
-}
-
 .settings-groups {
     display: grid;
     gap: 16px;
@@ -1248,6 +1218,14 @@ button:disabled {
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.52);
 }
 
+.settings-field-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
 .settings-field-wide {
     grid-column: 1 / -1;
 }
@@ -1263,10 +1241,79 @@ button:disabled {
     letter-spacing: 0.01em;
 }
 
+.settings-field-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-left: auto;
+}
+
+.settings-action-button {
+    min-height: 32px;
+    padding: 6px 10px;
+    font-size: 0.76rem;
+}
+
+.settings-field-default {
+    color: var(--accent);
+    font-size: 0.78rem;
+    line-height: 1.35;
+}
+
+.settings-field-footer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
+}
+
 .settings-field-help {
     color: var(--muted);
     line-height: 1.4;
     font-size: 0.82rem;
+}
+
+.settings-validation-message {
+    display: flex;
+    align-items: center;
+    min-height: 32px;
+    padding: 6px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(35, 52, 79, 0.12);
+    font-size: 0.76rem;
+    line-height: 1.25;
+}
+
+.settings-validation-inline {
+    flex: 1 1 220px;
+    min-width: 0;
+    max-width: 420px;
+}
+
+.settings-validation-inline span {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.settings-validation-valid {
+    border-color: rgba(47, 158, 68, 0.24);
+    background: rgba(233, 250, 236, 0.92);
+    color: #1f6b2d;
+}
+
+.settings-validation-invalid {
+    border-color: rgba(201, 42, 42, 0.22);
+    background: rgba(255, 241, 241, 0.92);
+    color: #8c1d1d;
+}
+
+.settings-validation-idle {
+    border-color: rgba(35, 52, 79, 0.08);
+    background: rgba(245, 248, 251, 0.92);
+    color: var(--muted);
 }
 
 .settings-checkbox-row {
@@ -1320,7 +1367,7 @@ button:disabled {
 }
 
 .manager-card {
-    padding: 16px;
+    padding: 10px;
     border-radius: 14px;
     background: rgba(255, 255, 255, 0.74);
     border: 1px solid rgba(15, 91, 120, 0.12);
@@ -1329,6 +1376,169 @@ button:disabled {
 .manager-card h3 {
     margin: 0 0 10px;
     font-size: 0.98rem;
+}
+
+.policy-definition-list {
+    display: grid;
+    gap: 10px;
+}
+
+.policy-definition-columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.policy-definition-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 14px;
+    border: 1px solid rgba(15, 91, 120, 0.1);
+    background: rgba(255, 255, 255, 0.82);
+}
+
+.policy-definition-item strong {
+    display: block;
+    margin: 0 0 4px;
+    font-size: 0.88rem;
+}
+
+.policy-definition-item small {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.78rem;
+}
+
+.policy-definition-actions {
+    display: grid;
+    justify-items: end;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+
+.policy-definition-actions small {
+    color: var(--muted);
+    font-size: 0.74rem;
+}
+
+.compile-results-panel {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 4px;
+    margin: 4px 0;
+    padding: 6px 6px;
+    min-height: 100px;
+    max-height: 100px;
+    overflow: hidden;
+    border-radius: 14px;
+    border: 1px solid rgba(35, 52, 79, 0.12);
+    background: rgba(255, 255, 255, 0.86);
+}
+
+.compile-results-success {
+    border-color: rgba(47, 158, 68, 0.24);
+    background: rgba(233, 250, 236, 0.92);
+}
+
+.compile-results-failed {
+    border-color: rgba(201, 42, 42, 0.24);
+    background: rgba(255, 241, 241, 0.92);
+}
+
+.compile-results-idle {
+    border-color: rgba(35, 52, 79, 0.08);
+    background: rgba(245, 248, 251, 0.92);
+}
+
+.compile-results-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+}
+
+.compile-diagnostics-list {
+    display: grid;
+    gap: 10px;
+    min-height: 0;
+    height: 100%;
+    max-height: none;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.compile-diagnostic-row {
+    display: grid;
+    gap: 4px;
+    padding: 6px 6px;
+    border-radius: 12px;
+    border: 1px solid rgba(35, 52, 79, 0.1);
+    background: rgba(255, 255, 255, 0.82);
+}
+
+.compile-diagnostic-row > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+}
+
+.compile-diagnostic-row span,
+.compile-diagnostic-row small {
+    color: var(--muted);
+    font-size: 0.78rem;
+}
+
+.compile-diagnostic-row p {
+    margin: 0;
+    color: var(--text);
+    font-size: 0.84rem;
+    line-height: 1.4;
+}
+
+.compile-results-empty {
+    display: grid;
+    align-content: center;
+    min-height: 0;
+    height: 100%;
+}
+
+.compile-results-empty p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.86rem;
+    line-height: 1.5;
+}
+
+.manager-inline-action {
+    flex: 0 0 auto;
+    min-height: 28px;
+    padding: 5px 10px;
+    font-size: 0.74rem;
+}
+
+.manager-source-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+}
+
+.manager-source-open {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    text-align: left;
 }
 
 .manager-list {
@@ -1340,7 +1550,7 @@ button:disabled {
 .composition-flow {
     position: relative;
     overflow: hidden;
-    padding: 16px;
+    padding: 8px;
     border-radius: 14px;
     background:
         radial-gradient(circle at 20% 0%, rgba(15, 91, 120, 0.08), transparent 28%),
@@ -1409,7 +1619,7 @@ button:disabled {
 .flow-graph {
     display: grid;
     justify-items: center;
-    margin-top: 14px;
+    margin-top: 4px;
 }
 
 
@@ -1423,14 +1633,15 @@ button:disabled {
     gap: clamp(16px, 2vw, 34px);
     width: 100%;
     min-height: 420px;
-    padding: 8px 4px 4px;
+    padding: 4px 4px 4px;
+    margin-top: 16px;
 }
 
 .flow-group {
     position: relative;
     z-index: 1;
     display: grid;
-    gap: 30px;
+    gap: 25px;
     align-content: start;
     min-width: 0;
 }
@@ -1439,7 +1650,7 @@ button:disabled {
 .flow-group-start,
 .flow-group-state,
 .flow-group-actions {
-    margin-top: 120px;
+    margin-top: 100px;
 }
 
 .flow-group-start {
@@ -2228,6 +2439,14 @@ button:disabled {
 }
 
 @media (max-width: 980px) {
+    .settings-field-footer {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .policy-definition-columns {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
     .composition-flow-header {
         flex-direction: column;
     }

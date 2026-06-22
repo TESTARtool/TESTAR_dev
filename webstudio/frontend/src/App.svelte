@@ -52,6 +52,8 @@
     let inactivePolicySourceFiles = [];
     let compositionFlowNodes = [];
     let selectedCompositionFlowNode = null;
+    let regexValidationResults = {};
+    let javaCompileResult = null;
     let stateModelDialog = {
         open: false,
         title: "",
@@ -157,6 +159,8 @@
             selectedEditor = "java-composition";
             selectedSettingsGroupId = "";
             selectedCompositionFlowNode = null;
+            regexValidationResults = {};
+            javaCompileResult = null;
             return;
         }
 
@@ -172,6 +176,8 @@
             selectedEditor = "java-composition";
             selectedSettingsGroupId = workspaceDocument?.settingsGroups?.[0]?.id || "";
             selectedCompositionFlowNode = null;
+            regexValidationResults = {};
+            javaCompileResult = null;
         } catch (loadError) {
             reportClientError(`Unable to load workspace ${workspaceName}`, loadError);
         } finally {
@@ -189,12 +195,14 @@
         selectedSourceName = sourceName;
         selectedSourceFile = await loadJson(`/api/workspaces/${selectedWorkspaceName}/sources/${sourceName}`);
         selectedEditor = editorId || `source:${sourceName}`;
+        javaCompileResult = null;
     }
 
     function openEditor(editorId) {
         selectedSourceName = "";
         selectedSourceFile = null;
         selectedEditor = editorId;
+        javaCompileResult = null;
         if (editorId !== "java-composition") {
             selectedCompositionFlowNode = null;
         }
@@ -290,8 +298,88 @@
         );
     }
 
+    async function persistSelectedSourceForCompile() {
+        if (!selectedWorkspaceName || !selectedSourceFile?.name) {
+            return;
+        }
+
+        const activeEditorId = selectedEditor;
+        const activeSourceName = selectedSourceName;
+
+        await loadJson(
+            `/api/workspaces/${selectedWorkspaceName}/sources/${selectedSourceFile.name}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    content: selectedSourceFile.content
+                })
+            }
+        );
+
+        await refreshWorkspaceDocument();
+        await restoreEditorState(activeEditorId, activeSourceName);
+    }
+
+    async function compileSelectedJavaSource() {
+        if (!selectedWorkspaceName || !selectedSourceFile?.name) {
+            return;
+        }
+
+        saving = true;
+        message = "";
+
+        try {
+            await persistSelectedSourceForCompile();
+            javaCompileResult = await loadJson(
+                `/api/workspaces/${selectedWorkspaceName}/sources/${encodeURIComponent(selectedSourceFile.name)}/compile`,
+                {
+                    method: "POST"
+                }
+            );
+        } catch (compileError) {
+            reportClientError(`Unable to compile Java source ${selectedSourceFile.name}`, compileError);
+        } finally {
+            saving = false;
+        }
+    }
+
+    async function compileWorkspaceProfile() {
+        if (!selectedWorkspaceName) {
+            return;
+        }
+
+        saving = true;
+        message = "";
+
+        try {
+            await persistSelectedSourceForCompile();
+            javaCompileResult = await loadJson(
+                `/api/workspaces/${selectedWorkspaceName}/compile-profile`,
+                {
+                    method: "POST"
+                }
+            );
+        } catch (compileError) {
+            reportClientError(`Unable to compile workspace profile ${selectedWorkspaceName}`, compileError);
+        } finally {
+            saving = false;
+        }
+    }
+
     function escapeRegExp(text) {
         return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
+
+    function touchWorkspaceDocument() {
+        workspaceDocument = workspaceDocument
+            ? {
+                ...workspaceDocument,
+                settingsGroups: [...(workspaceDocument.settingsGroups || [])]
+            }
+            : workspaceDocument;
     }
 
     function shouldPersistVisualSetting(setting) {
@@ -366,6 +454,55 @@
             `/api/workspaces/${selectedWorkspaceName}/test-settings`,
             nextContent
         );
+    }
+
+    async function validateRegexExpression(setting) {
+        if (!setting?.key) {
+            return;
+        }
+
+        touchWorkspaceDocument();
+
+        try {
+            const validationResult = await loadJson("/api/settings/regex/validate", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    value: setting.value || ""
+                })
+            });
+
+            regexValidationResults = {
+                ...regexValidationResults,
+                [setting.key]: validationResult
+            };
+            setting.regexValidation = validationResult;
+            touchWorkspaceDocument();
+        } catch (validationError) {
+            reportClientError(`Unable to validate regex for ${setting.key}`, validationError);
+        }
+    }
+
+    function restoreSettingDefault(setting) {
+        if (!setting?.key) {
+            return;
+        }
+
+        if (setting.key === "SuspiciousTags" || setting.key === "SuspiciousProcessOutput") {
+            if ((setting.value || "").trim() !== "") {
+                return;
+            }
+        }
+
+        setting.value = setting.defaultValue || "";
+        setting.regexValidation = null;
+        touchWorkspaceDocument();
+        regexValidationResults = {
+            ...regexValidationResults,
+            [setting.key]: null
+        };
     }
 
     async function startGenerate() {
@@ -546,6 +683,11 @@
         return sourceFiles.filter((sourceFile) => !configuredClassNames.has(sourceClassName(sourceFile)));
     }
 
+    function setSettingValue(setting, value) {
+        setting.value = value;
+        touchWorkspaceDocument();
+    }
+
     function parsePropertiesContent(content) {
         const properties = {};
         if (!content) {
@@ -565,6 +707,13 @@
         }
 
         return properties;
+    }
+
+    function toPropertiesContent(properties) {
+        return Object.entries(properties)
+            .map(([key, value]) => `${key}=${value}`)
+            .join("\n")
+            .concat("\n");
     }
 
     function sourceFileByClassName(className) {
@@ -621,6 +770,71 @@
 
     function isPolicySourceSelected(sourceFile) {
         return selectedEditor === "java-policies" && selectedSourceName === sourceFile.name;
+    }
+
+    function policyInterfaceSimpleName(propertyKey) {
+        const interfaceByPropertyKey = {
+            clickablePolicies: "ClickablePolicy",
+            typeablePolicies: "TypeablePolicy",
+            scrollablePolicies: "ScrollablePolicy",
+            selectablePolicies: "SelectablePolicy",
+            enabledPolicies: "EnabledPolicy",
+            blockedPolicies: "BlockedPolicy",
+            widgetFilterPolicies: "WidgetFilterPolicy",
+            visiblePolicies: "VisiblePolicy",
+            topLevelPolicies: "TopLevelPolicy"
+        };
+
+        return interfaceByPropertyKey[propertyKey] || "";
+    }
+
+    function inferPolicyPropertyKey(sourceFile) {
+        const className = sourceClassName(sourceFile);
+        for (const policyDefinition of workspaceDocument?.policyDefinitions || []) {
+            if ((policyDefinition.configuredClassNames || []).includes(className)) {
+                return policyDefinition.propertyKey;
+            }
+        }
+
+        const content = sourceFile?.content || "";
+        for (const policyDefinition of workspaceDocument?.policyDefinitions || []) {
+            const interfaceName = policyInterfaceSimpleName(policyDefinition.propertyKey);
+            if (interfaceName && content.includes(`implements ${interfaceName}`)) {
+                return policyDefinition.propertyKey;
+            }
+        }
+
+        return "";
+    }
+
+    async function togglePolicySourceActivation(sourceFile, enablePolicy) {
+        if (!selectedWorkspaceName || !workspaceDocument?.policiesProperties?.content || !sourceFile) {
+            return;
+        }
+
+        const propertyKey = inferPolicyPropertyKey(sourceFile);
+        if (!propertyKey) {
+            reportClientError(`Unable to infer policy seam for ${sourceFile.name}`, new Error("Unknown policy seam"));
+            return;
+        }
+
+        const className = sourceClassName(sourceFile);
+        const properties = parsePropertiesContent(workspaceDocument.policiesProperties.content);
+        const existingValues = (properties[propertyKey] || "")
+            .split(";")
+            .map((value) => value.trim())
+            .filter((value) => value !== "" && value !== className);
+
+        if (enablePolicy) {
+            existingValues.push(className);
+        }
+
+        properties[propertyKey] = existingValues.join("; ");
+
+        await saveWorkspaceFile(
+            `/api/workspaces/${selectedWorkspaceName}/policies-properties`,
+            toPropertiesContent(properties)
+        );
     }
 
     async function loadResults(source = resultSource) {
@@ -815,6 +1029,62 @@
             showTemporaryMessage(spyState.message || "Remote Spy Mode started.");
         } catch (spyError) {
             reportClientError("Unable to start remote Spy Mode", spyError);
+        } finally {
+            saving = false;
+        }
+    }
+
+    async function createCompositionModuleSource(flowNode) {
+        if (!selectedWorkspaceName || !flowNode?.propertyKey) {
+            return;
+        }
+
+        saving = true;
+        message = "";
+
+        try {
+            const sourceFile = await loadJson(
+                `/api/workspaces/${selectedWorkspaceName}/composition/modules/${encodeURIComponent(flowNode.propertyKey)}/source`,
+                {
+                    method: "POST"
+                }
+            );
+
+            await refreshWorkspaceDocument();
+            selectedSourceName = sourceFile.name;
+            selectedSourceFile = sourceFile;
+            selectedEditor = "java-composition";
+            showTemporaryMessage(`${sourceFile.name} ready for editing.`);
+        } catch (sourceError) {
+            reportClientError(`Unable to create or open source for ${flowNode.title}`, sourceError);
+        } finally {
+            saving = false;
+        }
+    }
+
+    async function createPolicySource(policyDefinition) {
+        if (!selectedWorkspaceName || !policyDefinition?.propertyKey) {
+            return;
+        }
+
+        saving = true;
+        message = "";
+
+        try {
+            const sourceFile = await loadJson(
+                `/api/workspaces/${selectedWorkspaceName}/policies/${encodeURIComponent(policyDefinition.propertyKey)}/source`,
+                {
+                    method: "POST"
+                }
+            );
+
+            await refreshWorkspaceDocument();
+            selectedSourceName = sourceFile.name;
+            selectedSourceFile = sourceFile;
+            selectedEditor = "java-policies";
+            showTemporaryMessage(`${sourceFile.name} ready for editing.`);
+        } catch (sourceError) {
+            reportClientError(`Unable to create or open policy source for ${policyDefinition.label}`, sourceError);
         } finally {
             saving = false;
         }
@@ -1149,8 +1419,15 @@
             openTestSettings={openTestSettings}
             openVisualSettings={openVisualSettings}
             policySourceFiles={policySourceFiles}
+            compileSelectedJavaSource={compileSelectedJavaSource}
+            compileWorkspaceProfile={compileWorkspaceProfile}
+            createCompositionModuleSource={createCompositionModuleSource}
+            createPolicySource={createPolicySource}
+            javaCompileResult={javaCompileResult}
+            regexValidationResults={regexValidationResults}
             saveSelectedSource={saveSelectedSource}
             saving={saving}
+            setSettingValue={setSettingValue}
             selectSource={selectSource}
             selectCompositionFlowNode={selectCompositionFlowNode}
             selectSettingsGroup={selectSettingsGroup}
@@ -1158,6 +1435,9 @@
             selectedCompositionFlowNode={selectedCompositionFlowNode}
             selectedSettingsGroupId={selectedSettingsGroupId}
             selectedSourceFile={selectedSourceFile}
+            restoreSettingDefault={restoreSettingDefault}
+            togglePolicySourceActivation={togglePolicySourceActivation}
+            validateRegexExpression={validateRegexExpression}
             workspaceDocument={workspaceDocument}
         />
     {/if}

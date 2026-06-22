@@ -7,10 +7,10 @@
 package org.testar.dialog;
 
 import org.testar.config.ConfigTags;
+import org.testar.config.policy.helper.PolicyWorkspaceHelper;
 import org.testar.config.settings.Settings;
 import org.testar.dialog.editor.CustomPoliciesEditor;
 import org.testar.dialog.editor.ModuleSourceEditor;
-import org.testar.dialog.helper.PolicyWorkspaceHelper;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;

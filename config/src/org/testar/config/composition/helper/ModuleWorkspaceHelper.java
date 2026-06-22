@@ -4,7 +4,7 @@
  * Copyright (c) 2026 Universitat Politecnica de Valencia - www.upv.es
  */
 
-package org.testar.dialog.helper;
+package org.testar.config.composition.helper;
 
 import org.testar.config.CompositionProfiles;
 import org.testar.config.ConfigTags;

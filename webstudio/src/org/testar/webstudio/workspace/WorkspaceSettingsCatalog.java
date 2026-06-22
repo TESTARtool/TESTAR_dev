@@ -11,15 +11,32 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.testar.config.ConfigTags;
 import org.testar.config.StateModelTags;
+import org.testar.config.settings.Settings;
+import org.testar.config.settings.SettingsDefaults;
 import org.testar.core.tag.Tag;
+import org.testar.core.Pair;
 import org.testar.webstudio.api.dto.WorkspaceSettingDto;
 import org.testar.webstudio.api.dto.WorkspaceSettingsGroupDto;
 
 public final class WorkspaceSettingsCatalog {
+
+    private static final Map<String, String> DEFAULT_VALUES = buildDefaultValues();
+    private static final Set<String> REGEX_SETTING_KEYS = Set.of(
+        ConfigTags.ProcessesToKillDuringTest.name(),
+        ConfigTags.ClickFilter.name(),
+        ConfigTags.SuspiciousTags.name(),
+        ConfigTags.SuspiciousProcessOutput.name(),
+        ConfigTags.ProcessLogs.name(),
+        ConfigTags.LogOracleRegex.name(),
+        ConfigTags.WebPathsAllowed.name(),
+        ConfigTags.WebConsoleErrorPattern.name(),
+        ConfigTags.WebConsoleWarningPattern.name()
+    );
 
     private WorkspaceSettingsCatalog() { }
 
@@ -253,8 +270,23 @@ public final class WorkspaceSettingsCatalog {
             value,
             inferType(tag),
             tag.getDescription(),
-            optionsFor(tag)
+            optionsFor(tag),
+            DEFAULT_VALUES.getOrDefault(tag.name(), ""),
+            REGEX_SETTING_KEYS.contains(tag.name())
         );
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, String> buildDefaultValues() {
+        Map<String, String> defaultValues = new LinkedHashMap<>();
+
+        for (Pair<?, ?> pair : SettingsDefaults.getSettingsDefaults()) {
+            Tag<Object> tag = (Tag<Object>) pair.left();
+            Object value = pair.right();
+            defaultValues.put(tag.name(), Settings.print(tag, value));
+        }
+
+        return defaultValues;
     }
 
     private static String inferType(Tag<?> tag) {

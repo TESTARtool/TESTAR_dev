@@ -145,7 +145,7 @@ public class SettingsDefaults {
         defaults.add(Pair.from(StartupTime, 8.0));
         defaults.add(Pair.from(SUTConnectorValue, ""));
         defaults.add(Pair.from(IgnoreDuplicatedVerdicts, false));
-        defaults.add(Pair.from(SuspiciousTags, "(?!x)x"));
+        defaults.add(Pair.from(SuspiciousTags, ".*[eE]rror.*|.*[eE]xcepti[o?]n.*"));
         defaults.add(Pair.from(ClickFilter, "(?!x)x"));
         defaults.add(Pair.from(CompositionProfile, CompositionProfiles.WINDOWS_COMPOSITION));
         defaults.add(Pair.from(CustomCompositionResource, ""));
@@ -162,7 +162,7 @@ public class SettingsDefaults {
         defaults.add(Pair.from(ApplicationName, ""));
         defaults.add(Pair.from(ApplicationVersion, ""));
         defaults.add(Pair.from(ProcessListenerEnabled, false));
-        defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
+        defaults.add(Pair.from(SuspiciousProcessOutput, ".*[eE]rror.*|.*[eE]xcepti[o?]n.*"));
         defaults.add(Pair.from(ProcessLogs, ".*.*"));
         defaults.add(Pair.from(OverrideWebDriverDisplayScale, ""));
         defaults.add(Pair.from(CreateWidgetInfoJsonFile, false));

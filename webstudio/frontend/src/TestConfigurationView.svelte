@@ -13,8 +13,15 @@
     export let openTestSettings;
     export let openVisualSettings;
     export let policySourceFiles = [];
+    export let compileSelectedJavaSource;
+    export let compileWorkspaceProfile;
+    export let createCompositionModuleSource;
+    export let createPolicySource;
+    export let javaCompileResult = null;
+    export let regexValidationResults = {};
     export let saveSelectedSource;
     export let saving = false;
+    export let setSettingValue;
     export let selectSource;
     export let selectCompositionFlowNode;
     export let selectSettingsGroup;
@@ -22,6 +29,9 @@
     export let selectedCompositionFlowNode = null;
     export let selectedSettingsGroupId = "";
     export let selectedSourceFile = null;
+    export let restoreSettingDefault;
+    export let togglePolicySourceActivation;
+    export let validateRegexExpression;
     export let workspaceDocument = null;
 
     const compositionFlowGroups = [
@@ -116,8 +126,38 @@
         openJavaPolicies();
     }
 
+    function regexValidation(setting) {
+        return setting?.regexValidation || regexValidationResults?.[setting?.key] || null;
+    }
+
+    function canRestoreSetting(setting) {
+        return setting?.key === "SuspiciousTags" || setting?.key === "SuspiciousProcessOutput";
+    }
+
     function normalizedSearchText(text) {
         return (text || "").trim().toLowerCase();
+    }
+
+    function leftPolicyDefinitions() {
+        const leftPolicyKeys = new Set([
+            "clickablePolicies",
+            "typeablePolicies",
+            "scrollablePolicies",
+            "selectablePolicies"
+        ]);
+
+        return (workspaceDocument?.policyDefinitions || []).filter((policyDefinition) => leftPolicyKeys.has(policyDefinition.propertyKey));
+    }
+
+    function rightPolicyDefinitions() {
+        const leftPolicyKeys = new Set([
+            "clickablePolicies",
+            "typeablePolicies",
+            "scrollablePolicies",
+            "selectablePolicies"
+        ]);
+
+        return (workspaceDocument?.policyDefinitions || []).filter((policyDefinition) => !leftPolicyKeys.has(policyDefinition.propertyKey));
     }
 
     function matchesSettingsSearch(setting, searchText) {
@@ -290,7 +330,7 @@
 
                     <section class="settings-toolbar top-gap">
                         <div class="settings-search">
-                            <label class="field-label" for="settings-search">Search settings</label>
+                            <label class="field-label" for="settings-search">Search in all settings</label>
                             <input
                                 id="settings-search"
                                 type="search"
@@ -298,21 +338,6 @@
                                 placeholder="Search by key, value, type, or description"
                             />
                         </div>
-                        {#if settingsNavigationGroups.length > 0}
-                            <div class="settings-tabs" role="tablist" aria-label="Settings categories">
-                                {#each settingsNavigationGroups as settingsGroup}
-                                    <button
-                                        type="button"
-                                        class="settings-tab"
-                                        class:selected={selectedSettingsGroupId === settingsGroup.id}
-                                        aria-pressed={selectedSettingsGroupId === settingsGroup.id}
-                                        on:click={() => openSettingsGroup(settingsGroup.id)}
-                                    >
-                                        <span>{settingsGroup.title}</span>
-                                    </button>
-                                {/each}
-                            </div>
-                        {/if}
                     </section>
 
                     <section class="settings-groups top-gap">
@@ -346,26 +371,67 @@
                                     {#if normalizedSettingsSearch ? true : Boolean(expandedSettingsGroups[settingsGroup.id])}
                                         <div class="settings-fields">
                                             {#each settingsGroup.settings as setting}
-                                                <label
+                                                <div
                                                     class="settings-field"
                                                     class:settings-field-wide={setting.type === "list"}
                                                     class:settings-field-boolean={setting.type === "boolean"}
                                                 >
-                                                    <span class="settings-field-label">{setting.key}</span>
+                                                    <div class="settings-field-header">
+                                                        <span class="settings-field-label">{setting.key}</span>
+                                                        {#if setting.regexCapable}
+                                                            <div
+                                                                class="settings-validation-message settings-validation-inline"
+                                                                class:settings-validation-valid={regexValidation(setting)?.valid}
+                                                                class:settings-validation-invalid={regexValidation(setting) && !regexValidation(setting).valid}
+                                                                class:settings-validation-idle={!regexValidation(setting)}
+                                                            >
+                                                                {#if regexValidation(setting)}
+                                                                    <span>{regexValidation(setting).message}</span>
+                                                                {:else}
+                                                                    <span>No validation executed yet.</span>
+                                                                {/if}
+                                                            </div>
+                                                        {/if}
+                                                        <div class="settings-field-actions">
+                                                            {#if setting.regexCapable}
+                                                                <button
+                                                                    type="button"
+                                                                    class="secondary settings-action-button"
+                                                                    on:click={() => validateRegexExpression(setting)}
+                                                                >
+                                                                    Check Regex
+                                                                </button>
+                                                            {/if}
+                                                            {#if canRestoreSetting(setting)}
+                                                                <button
+                                                                    type="button"
+                                                                    class="secondary settings-action-button"
+                                                                    on:click={() => restoreSettingDefault(setting)}
+                                                                >
+                                                                    Restore Default
+                                                                </button>
+                                                            {/if}
+                                                        </div>
+                                                    </div>
 
                                                     {#if setting.type === "boolean"}
                                                         <span class="settings-checkbox-row">
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={setting.value === "true"}
-                                                                on:change={(event) => {
-                                                                    setting.value = event.currentTarget.checked ? "true" : "false";
-                                                                }}
-                                                            />
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={setting.value === "true"}
+                                                                    on:change={(event) => {
+                                                                        setSettingValue(setting, event.currentTarget.checked ? "true" : "false");
+                                                                    }}
+                                                                />
                                                             <span>{setting.value === "true" ? "Enabled" : "Disabled"}</span>
                                                         </span>
                                                     {:else if setting.options?.length > 0}
-                                                        <select bind:value={setting.value}>
+                                                        <select
+                                                            value={setting.value}
+                                                            on:change={(event) => {
+                                                                setSettingValue(setting, event.currentTarget.value);
+                                                            }}
+                                                        >
                                                             <option value=""></option>
                                                             {#each setting.options as option}
                                                                 <option value={option}>{option}</option>
@@ -374,7 +440,10 @@
                                                     {:else if setting.type === "list"}
                                                         <textarea
                                                             class="settings-list-input"
-                                                            bind:value={setting.value}
+                                                            value={setting.value}
+                                                            on:input={(event) => {
+                                                                setSettingValue(setting, event.currentTarget.value);
+                                                            }}
                                                             placeholder="Keep TESTAR list syntax here"
                                                         ></textarea>
                                                     {:else if setting.type === "integer"}
@@ -383,7 +452,7 @@
                                                             step="1"
                                                             value={setting.value}
                                                             on:input={(event) => {
-                                                                setting.value = event.currentTarget.value;
+                                                                setSettingValue(setting, event.currentTarget.value);
                                                             }}
                                                         />
                                                     {:else if setting.type === "number"}
@@ -392,20 +461,31 @@
                                                             step="any"
                                                             value={setting.value}
                                                             on:input={(event) => {
-                                                                setting.value = event.currentTarget.value;
+                                                                setSettingValue(setting, event.currentTarget.value);
                                                             }}
                                                         />
                                                     {:else}
                                                         <input
                                                             type="text"
-                                                            bind:value={setting.value}
+                                                            value={setting.value}
+                                                            on:input={(event) => {
+                                                                setSettingValue(setting, event.currentTarget.value);
+                                                            }}
                                                         />
                                                     {/if}
 
-                                                    {#if setting.description}
-                                                        <small class="settings-field-help">{setting.description}</small>
+                                                    {#if canRestoreSetting(setting)}
+                                                        <small class="settings-field-default">
+                                                            Default: {setting.defaultValue === "" ? "(empty)" : setting.defaultValue}
+                                                        </small>
                                                     {/if}
-                                                </label>
+
+                                                    <div class="settings-field-footer">
+                                                        {#if setting.description}
+                                                            <small class="settings-field-help">{setting.description}</small>
+                                                        {/if}
+                                                    </div>
+                                                </div>
                                             {/each}
                                         </div>
                                     {/if}
@@ -447,23 +527,106 @@
                     <div class="section-header">
                         <div>
                             <h2>Edit Java Policies</h2>
-                            <p>Review the policy classes resolved from policies.properties and open them for editing.</p>
+                            <p>Review the policy classes resolved from policies.properties and create new policy implementations directly from each policy seam.</p>
                         </div>
+                        <button class="secondary" disabled={saving} on:click={compileWorkspaceProfile}>
+                            Compile Profile
+                        </button>
                     </div>
+
+                    <section class="compile-results-panel top-gap" class:compile-results-success={javaCompileResult?.scope === "profile" && javaCompileResult.success} class:compile-results-failed={javaCompileResult?.scope === "profile" && !javaCompileResult.success} class:compile-results-idle={javaCompileResult?.scope !== "profile"}>
+                        {#if javaCompileResult?.scope === "profile" && javaCompileResult.diagnostics?.length > 0}
+                            <div class="compile-diagnostics-list">
+                                {#each javaCompileResult.diagnostics as diagnostic}
+                                    <article class="compile-diagnostic-row">
+                                        <div>
+                                            <strong>{diagnostic.fileName || "workspace"}</strong>
+                                            <span>{diagnostic.relativePath}</span>
+                                        </div>
+                                        <small>{diagnostic.severity} {diagnostic.line > 0 ? `L${diagnostic.line}` : ""}{diagnostic.column > 0 ? `:${diagnostic.column}` : ""}</small>
+                                        <p>{diagnostic.message}</p>
+                                    </article>
+                                {/each}
+                            </div>
+                        {:else if javaCompileResult?.scope === "profile" && javaCompileResult.success}
+                            <div class="compile-results-empty">
+                                <p>Java profile compilation succeeded for the current policy composition profile.</p>
+                            </div>
+                        {:else}
+                            <div class="compile-results-empty">
+                                <p>Run "Compile Profile" to validate every Java policy in this composition profile.</p>
+                            </div>
+                        {/if}
+                    </section>
+
+                    <section class="manager-card top-gap">
+                        <div class="policy-definition-columns">
+                            <div class="policy-definition-list">
+                                {#each leftPolicyDefinitions() as policyDefinition}
+                                    <article class="policy-definition-item">
+                                        <div>
+                                            <strong>{policyDefinition.label}</strong>
+                                            <small>{policyDefinition.configuredClassNames?.length || 0} configured</small>
+                                        </div>
+                                        <div class="policy-definition-actions">
+                                            <button
+                                                type="button"
+                                                class="secondary"
+                                                disabled={saving}
+                                                on:click={() => createPolicySource(policyDefinition)}
+                                            >
+                                                Add Java Policy
+                                            </button>
+                                        </div>
+                                    </article>
+                                {/each}
+                            </div>
+                            <div class="policy-definition-list">
+                                {#each rightPolicyDefinitions() as policyDefinition}
+                                    <article class="policy-definition-item">
+                                        <div>
+                                            <strong>{policyDefinition.label}</strong>
+                                            <small>{policyDefinition.configuredClassNames?.length || 0} configured</small>
+                                        </div>
+                                        <div class="policy-definition-actions">
+                                            <button
+                                                type="button"
+                                                class="secondary"
+                                                disabled={saving}
+                                                on:click={() => createPolicySource(policyDefinition)}
+                                            >
+                                                Add Java Policy
+                                            </button>
+                                        </div>
+                                    </article>
+                                {/each}
+                            </div>
+                        </div>
+                    </section>
 
                     <section class="manager-card top-gap">
                         <h3>Policies Active In Profile</h3>
                         <div class="source-list manager-list">
                             {#if activePolicySourceFiles.length > 0}
                                 {#each activePolicySourceFiles as sourceFile}
-                                    <button
-                                        class:selected={isPolicySourceSelected(sourceFile)}
-                                        class="source-item"
-                                        on:click={() => selectSource(sourceFile.name, "java-policies")}
-                                    >
-                                        <span>{sourceFile.name}</span>
-                                        <small>active</small>
-                                    </button>
+                                    <div class="source-item manager-source-item" class:selected={isPolicySourceSelected(sourceFile)}>
+                                        <button
+                                            type="button"
+                                            class="manager-source-open"
+                                            on:click={() => selectSource(sourceFile.name, "java-policies")}
+                                        >
+                                            <span>{sourceFile.name}</span>
+                                            <small>active</small>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="secondary manager-inline-action"
+                                            disabled={saving}
+                                            on:click={() => togglePolicySourceActivation(sourceFile, false)}
+                                        >
+                                            Disable
+                                        </button>
+                                    </div>
                                 {/each}
                             {:else}
                                 <p class="progress-message">No referenced Java policies were resolved in this workspace.</p>
@@ -476,14 +639,24 @@
                         <div class="source-list manager-list">
                             {#if inactivePolicySourceFiles.length > 0}
                                 {#each inactivePolicySourceFiles as sourceFile}
-                                    <button
-                                        class:selected={isPolicySourceSelected(sourceFile)}
-                                        class="source-item"
-                                        on:click={() => selectSource(sourceFile.name, "java-policies")}
-                                    >
-                                        <span>{sourceFile.name}</span>
-                                        <small>available</small>
-                                    </button>
+                                    <div class="source-item manager-source-item" class:selected={isPolicySourceSelected(sourceFile)}>
+                                        <button
+                                            type="button"
+                                            class="manager-source-open"
+                                            on:click={() => selectSource(sourceFile.name, "java-policies")}
+                                        >
+                                            <span>{sourceFile.name}</span>
+                                            <small>available</small>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="secondary manager-inline-action"
+                                            disabled={saving}
+                                            on:click={() => togglePolicySourceActivation(sourceFile, true)}
+                                        >
+                                            Enable
+                                        </button>
+                                    </div>
                                 {/each}
                             {:else}
                                 <p class="progress-message">No extra policy Java files were found in this workspace.</p>
@@ -510,10 +683,39 @@
                                             <h3>Policy Source Editor</h3>
                                             <p>Edit the selected policy source directly in this modal.</p>
                                         </div>
-                                        <button class="secondary" disabled={saving} on:click={saveSelectedSource}>
-                                            Save Policy
-                                        </button>
+                                        <div class="button-row">
+                                            <button class="secondary" disabled={saving} on:click={compileSelectedJavaSource}>
+                                                Compile Java
+                                            </button>
+                                            <button class="secondary" disabled={saving} on:click={saveSelectedSource}>
+                                                Save Policy
+                                            </button>
+                                        </div>
                                     </div>
+                                    <section class="compile-results-panel" class:compile-results-success={javaCompileResult?.scope === "source" && javaCompileResult.success} class:compile-results-failed={javaCompileResult?.scope === "source" && !javaCompileResult.success} class:compile-results-idle={javaCompileResult?.scope !== "source"}>
+                                        {#if javaCompileResult?.scope === "source" && javaCompileResult.diagnostics?.length > 0}
+                                            <div class="compile-diagnostics-list">
+                                                {#each javaCompileResult.diagnostics as diagnostic}
+                                                    <article class="compile-diagnostic-row">
+                                                        <div>
+                                                            <strong>{diagnostic.fileName || javaCompileResult.targetName}</strong>
+                                                            <span>{diagnostic.relativePath}</span>
+                                                        </div>
+                                                        <small>{diagnostic.severity} {diagnostic.line > 0 ? `L${diagnostic.line}` : ""}{diagnostic.column > 0 ? `:${diagnostic.column}` : ""}</small>
+                                                        <p>{diagnostic.message}</p>
+                                                    </article>
+                                                    {/each}
+                                                </div>
+                                        {:else if javaCompileResult?.scope === "source" && javaCompileResult.success}
+                                            <div class="compile-results-empty">
+                                                <p>Java compilation succeeded for the current policy source file.</p>
+                                            </div>
+                                        {:else}
+                                            <div class="compile-results-empty">
+                                                <p>Run "Compile Java" to validate the current policy source file.</p>
+                                            </div>
+                                        {/if}
+                                    </section>
                                     <textarea bind:value={selectedSourceFile.content}></textarea>
                                 </div>
                             </div>
@@ -525,9 +727,12 @@
                     <section class="composition-flow top-gap" aria-label="Composition architecture graph">
                         <div class="composition-flow-header">
                             <div>
-                                <h3>Edit Java Composition</h3>
+                                <h3>Edit Java Composition Flow</h3>
                                 <p>Click a node to inspect and configure a TESTAR service or capability.</p>
                             </div>
+                            <button class="secondary" disabled={saving} on:click={compileWorkspaceProfile}>
+                                Compile Profile
+                            </button>
                             <div class="flow-legend" aria-label="Node state legend">
                                 <span><i class="legend-dot legend-default"></i>Default</span>
                                 <span><i class="legend-dot legend-custom"></i>Custom</span>
@@ -544,11 +749,11 @@
                                         </marker>
                                     </defs>
                                     <!-- SystemService -> StopCriteriaCapability -->
-                                    <path class="flow-clock-path" d="M130 75 C285 30 445 40 520 30" marker-end="url(#flow-clock-arrow)"></path>
+                                    <path class="flow-clock-path" d="M130 65 C285 30 445 40 520 30" marker-end="url(#flow-clock-arrow)"></path>
                                     <!-- ActionDerivationService -> StopCriteriaCapability -->
-                                    <path class="flow-clock-path" d="M390 75 C455 42 485 50 520 50" marker-end="url(#flow-clock-arrow)"></path>
+                                    <path class="flow-clock-path" d="M390 65 C455 42 485 50 520 50" marker-end="url(#flow-clock-arrow)"></path>
                                     <!-- StopCriteriaCapability -> StateService -->
-                                    <path class="flow-clock-path" d="M730 40 C810 50 830 65 860 75" marker-end="url(#flow-clock-arrow)"></path>
+                                    <path class="flow-clock-path" d="M730 40 C810 45 830 55 860 65" marker-end="url(#flow-clock-arrow)"></path>
                                     <!-- Custom Oracle Services -> ActionExecutionService -->
                                     <path class="flow-clock-path" d="M750 390 C725 405 590 405 510 390" marker-end="url(#flow-clock-arrow)"></path>
                                 </svg>
@@ -678,13 +883,16 @@
                                 </div>
 
                                 <div class="inspector-actions">
-                                    {#if selectedCompositionMode === "default"}
-                                        <button class="secondary" disabled title="Backend action not wired in this UI pass">Create New Java Class</button>
-                                        <button class="secondary" disabled title="Backend action not wired in this UI pass">Use Existing Java Class</button>
-                                    {:else}
-                                        <button class="secondary" disabled={!selectedCompositionHasSource} on:click={openSelectedCompositionSource}>Refresh Source</button>
-                                        <button class="secondary" disabled title="Backend action not wired in this UI pass">Replace Implementation</button>
-                                        <button class="secondary" disabled title="Backend action not wired in this UI pass">Reset To Default</button>
+                                    {#if selectedCompositionFlowNode.propertyKey && selectedCompositionMode === "default"}
+                                        <button
+                                            class="secondary"
+                                            disabled={saving}
+                                            on:click={() => createCompositionModuleSource(selectedCompositionFlowNode)}
+                                        >
+                                            Create Java Class
+                                        </button>
+                                    {:else if !selectedCompositionFlowNode.propertyKey}
+                                        <button class="secondary" disabled title="This flow node is driven by the composed runtime and has no dedicated override property">No direct override</button>
                                     {/if}
                                 </div>
 
@@ -694,10 +902,46 @@
                                             <div>
                                                 <h3>{selectedSourceFile.name}</h3>
                                             </div>
-                                            <button class="secondary" disabled={saving} on:click={saveSelectedSource}>
-                                                Save Composition
-                                            </button>
+                                            <div class="button-row">
+                                                <button
+                                                    class="secondary"
+                                                    disabled={saving}
+                                                    on:click={() => createCompositionModuleSource(selectedCompositionFlowNode)}
+                                                >
+                                                    Open Java
+                                                </button>
+                                                <button class="secondary" disabled={saving} on:click={compileSelectedJavaSource}>
+                                                    Compile Java
+                                                </button>
+                                                <button class="secondary" disabled={saving} on:click={saveSelectedSource}>
+                                                    Save Composition
+                                                </button>
+                                            </div>
                                         </div>
+                                        <section class="compile-results-panel" class:compile-results-success={javaCompileResult?.scope === "source" && javaCompileResult.success} class:compile-results-failed={javaCompileResult?.scope === "source" && !javaCompileResult.success} class:compile-results-idle={javaCompileResult?.scope !== "source"}>
+                                            {#if javaCompileResult?.scope === "source" && javaCompileResult.diagnostics?.length > 0}
+                                                <div class="compile-diagnostics-list">
+                                                    {#each javaCompileResult.diagnostics as diagnostic}
+                                                        <article class="compile-diagnostic-row">
+                                                            <div>
+                                                                <strong>{diagnostic.fileName || javaCompileResult.targetName}</strong>
+                                                                <span>{diagnostic.relativePath}</span>
+                                                            </div>
+                                                            <small>{diagnostic.severity} {diagnostic.line > 0 ? `L${diagnostic.line}` : ""}{diagnostic.column > 0 ? `:${diagnostic.column}` : ""}</small>
+                                                            <p>{diagnostic.message}</p>
+                                                        </article>
+                                                        {/each}
+                                                    </div>
+                                            {:else if javaCompileResult?.scope === "source" && javaCompileResult.success}
+                                                <div class="compile-results-empty">
+                                                    <p>Java compilation succeeded for the current composition source file.</p>
+                                                </div>
+                                            {:else}
+                                                <div class="compile-results-empty">
+                                                    <p>Run "Compile Java" to validate the current composition source file.</p>
+                                                </div>
+                                            {/if}
+                                        </section>
                                         <textarea bind:value={selectedSourceFile.content}></textarea>
                                     {:else}
                                         <div class="composition-modal-empty">
@@ -711,6 +955,30 @@
                             </div>
                         </div>
                     {/if}
+                    <section class="compile-results-panel top-gap" class:compile-results-success={javaCompileResult?.scope === "profile" && javaCompileResult.success} class:compile-results-failed={javaCompileResult?.scope === "profile" && !javaCompileResult.success} class:compile-results-idle={javaCompileResult?.scope !== "profile"}>
+                        {#if javaCompileResult?.scope === "profile" && javaCompileResult.diagnostics?.length > 0}
+                            <div class="compile-diagnostics-list">
+                                {#each javaCompileResult.diagnostics as diagnostic}
+                                    <article class="compile-diagnostic-row">
+                                        <div>
+                                            <strong>{diagnostic.fileName || "workspace"}</strong>
+                                            <span>{diagnostic.relativePath}</span>
+                                        </div>
+                                        <small>{diagnostic.severity} {diagnostic.line > 0 ? `L${diagnostic.line}` : ""}{diagnostic.column > 0 ? `:${diagnostic.column}` : ""}</small>
+                                        <p>{diagnostic.message}</p>
+                                    </article>
+                                {/each}
+                            </div>
+                        {:else if javaCompileResult?.scope === "profile" && javaCompileResult.success}
+                            <div class="compile-results-empty">
+                                <p>Java profile compilation succeeded for the current composition profile.</p>
+                            </div>
+                        {:else}
+                            <div class="compile-results-empty">
+                                <p>Run "Compile Profile" to validate every Java composition class in this profile.</p>
+                            </div>
+                        {/if}
+                    </section>
                 </section>
             {/if}
         {/if}

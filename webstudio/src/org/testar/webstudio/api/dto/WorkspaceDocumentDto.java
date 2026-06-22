@@ -19,6 +19,8 @@ public final class WorkspaceDocumentDto {
     private final List<WorkspaceFileDto> sourceFiles;
     private final Map<String, List<String>> references;
     private final List<WorkspaceSettingsGroupDto> settingsGroups;
+    private final List<WorkspaceModuleDefinitionDto> moduleDefinitions;
+    private final List<WorkspacePolicyDefinitionDto> policyDefinitions;
 
     public WorkspaceDocumentDto(
         String workspaceName,
@@ -28,7 +30,9 @@ public final class WorkspaceDocumentDto {
         WorkspaceFileDto policiesProperties,
         List<WorkspaceFileDto> sourceFiles,
         Map<String, List<String>> references,
-        List<WorkspaceSettingsGroupDto> settingsGroups
+        List<WorkspaceSettingsGroupDto> settingsGroups,
+        List<WorkspaceModuleDefinitionDto> moduleDefinitions,
+        List<WorkspacePolicyDefinitionDto> policyDefinitions
     ) {
         this.workspaceName = workspaceName;
         this.location = location;
@@ -38,6 +42,8 @@ public final class WorkspaceDocumentDto {
         this.sourceFiles = sourceFiles;
         this.references = references;
         this.settingsGroups = settingsGroups;
+        this.moduleDefinitions = moduleDefinitions;
+        this.policyDefinitions = policyDefinitions;
     }
 
     public String workspaceName() {
@@ -70,5 +76,13 @@ public final class WorkspaceDocumentDto {
 
     public List<WorkspaceSettingsGroupDto> settingsGroups() {
         return settingsGroups;
+    }
+
+    public List<WorkspaceModuleDefinitionDto> moduleDefinitions() {
+        return moduleDefinitions;
+    }
+
+    public List<WorkspacePolicyDefinitionDto> policyDefinitions() {
+        return policyDefinitions;
     }
 }

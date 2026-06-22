@@ -15,13 +15,23 @@ public final class WorkspaceSettingDto {
     private final String type;
     private final String description;
     private final List<String> options;
+    private final String defaultValue;
+    private final boolean regexCapable;
 
-    public WorkspaceSettingDto(String key, String value, String type, String description, List<String> options) {
+    public WorkspaceSettingDto(String key,
+                               String value,
+                               String type,
+                               String description,
+                               List<String> options,
+                               String defaultValue,
+                               boolean regexCapable) {
         this.key = key;
         this.value = value;
         this.type = type;
         this.description = description;
         this.options = options;
+        this.defaultValue = defaultValue;
+        this.regexCapable = regexCapable;
     }
 
     public String key() {
@@ -42,5 +52,13 @@ public final class WorkspaceSettingDto {
 
     public List<String> options() {
         return options;
+    }
+
+    public String defaultValue() {
+        return defaultValue;
+    }
+
+    public boolean regexCapable() {
+        return regexCapable;
     }
 }
