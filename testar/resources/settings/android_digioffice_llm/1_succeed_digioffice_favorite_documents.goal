@@ -1,0 +1,14 @@
+Feature: User has favorite documents
+  As a DigiOffice user
+  I want to check my favorite documents
+  So that I can verify that my favorite documents are available
+
+  Background:
+    Given I am a DigiOffice user
+    And I have started the DigiOffice mobile application
+    And I can see the DigiOffice documents menu
+
+  Scenario: Verify that favorite documents are listed
+    When I navigate to 'My favorite documents'
+    Then the 'My favorite documents' view is shown
+    And at least one favorite document is listed

@@ -1,0 +1,14 @@
+Feature: User has no favorite documents
+  As a DigiOffice user
+  I want to check my favorite documents
+  So that I can verify that I have no favorite documents
+
+  Background:
+    Given I am a DigiOffice user
+    And I have started the DigiOffice mobile application
+    And I can see the DigiOffice documents menu
+
+  Scenario: Verify that no favorite documents are listed
+    When I navigate to 'My favorite documents'
+    Then the 'My favorite documents' view is shown
+    And no documents are listed because I have no favorite documents

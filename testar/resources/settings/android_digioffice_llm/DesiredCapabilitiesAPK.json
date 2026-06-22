@@ -1,0 +1,15 @@
+{
+  "deviceName": "DigiOffice_Device",
+  "platformName": "Android",
+  "app": "suts/digioffice.apk",
+  "appPackage": "com.digioffice.app",
+  "appActivity": ".MainActivity",
+  "automationName" : "UiAutomator2",
+  "newCommandTimeout": 600,
+  "autoGrantPermissions": true,
+  "allowInvisibleElements": false,
+  "ignoreHiddenApiPolicyError": true,
+  "adbExecTimeout": 120000,
+  "uiautomator2ServerInstallTimeout": 120000,
+  "uiautomator2ServerLaunchTimeout": 120000
+}
