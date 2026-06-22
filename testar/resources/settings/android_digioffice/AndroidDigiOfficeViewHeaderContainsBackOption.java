@@ -9,8 +9,10 @@ import java.util.List;
 public class AndroidDigiOfficeViewHeaderContainsBackOption implements Oracle {
 
     private static final String HEADER_TITLE_RESOURCE_ID = "header-title";
+    private static final String APP_HEADER_RESOURCE_ID = "app-header";
     private static final String HEADER_BACK_RESOURCE_ID = "header-back";
     private static final String GO_BACK_ACCESSIBILITY_ID = "Go back";
+    private static final String NAVIGATE_UP_ACCESSIBILITY_ID = "Navigate up";
 
     @Override
     public void initialize() {
@@ -27,6 +29,12 @@ public class AndroidDigiOfficeViewHeaderContainsBackOption implements Oracle {
                 continue;
             }
 
+            // The main view with app-header is ignored
+            if (ignoreIfSiblingWithResourceId(widget, APP_HEADER_RESOURCE_ID)) {
+                continue;
+            }
+
+            // Other views must contain some possible back option
             if (!hasBackOptionSibling(widget)) {
                 String verdictMsg = String.format(
                         "Detected view header without back option sibling (resId=%s) %s",
@@ -59,6 +67,7 @@ public class AndroidDigiOfficeViewHeaderContainsBackOption implements Oracle {
             return false;
         }
 
+        // First, we check the back option siblings
         Widget parent = widget.parent();
         for (int i = 0; i < parent.childCount(); i++) {
             Widget sibling = parent.child(i);
@@ -72,6 +81,51 @@ public class AndroidDigiOfficeViewHeaderContainsBackOption implements Oracle {
 
             if (HEADER_BACK_RESOURCE_ID.equals(siblingResourceId)
                     || GO_BACK_ACCESSIBILITY_ID.equals(siblingAccessibilityId)) {
+                return true;
+            }
+        }
+
+        // But is also possible to find a Navigate up parent-sibling option
+        return hasParentSiblingWithAccessibilityId(parent, NAVIGATE_UP_ACCESSIBILITY_ID);
+    }
+
+    private boolean ignoreIfSiblingWithResourceId(Widget widget, String expectedSiblingResourceId) {
+        if (widget.parent() == null) {
+            return false;
+        }
+
+        Widget parent = widget.parent();
+        for (int i = 0; i < parent.childCount(); i++) {
+            Widget sibling = parent.child(i);
+
+            if (sibling == null || sibling == widget) {
+                continue;
+            }
+
+            String siblingResourceId = sibling.get(AndroidTags.AndroidResourceId, "");
+            if (expectedSiblingResourceId.equals(siblingResourceId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean hasParentSiblingWithAccessibilityId(Widget parent, String expectedAccessibilityId) {
+        if (parent.parent() == null) {
+            return false;
+        }
+
+        Widget grandParent = parent.parent();
+        for (int i = 0; i < grandParent.childCount(); i++) {
+            Widget parentSibling = grandParent.child(i);
+
+            if (parentSibling == null || parentSibling == parent) {
+                continue;
+            }
+
+            String accessibilityId = parentSibling.get(AndroidTags.AndroidAccessibilityId, "");
+            if (expectedAccessibilityId.equals(accessibilityId)) {
                 return true;
             }
         }
