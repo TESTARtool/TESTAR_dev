@@ -1,4 +1,8 @@
 <script>
+    import TestCompositionView from "./TestCompositionView.svelte";
+    import TestPoliciesView from "./TestPoliciesView.svelte";
+    import TestSettingsView from "./TestSettingsView.svelte";
+
     export let activePolicySourceFiles = [];
     export let compositionFlowNodes = [];
     export let currentEditorDocument = null;
@@ -13,13 +17,14 @@
     export let openTestSettings;
     export let openVisualSettings;
     export let policySourceFiles = [];
+    export let closeCompositionSourceEditor;
+    export let closePolicySourceEditor;
     export let compileSelectedJavaSource;
     export let compileWorkspaceProfile;
     export let createCompositionModuleSource;
     export let createPolicySource;
     export let javaCompileResult = null;
     export let regexValidationResults = {};
-    export let saveSelectedSource;
     export let saving = false;
     export let setSettingValue;
     export let selectSource;
@@ -34,475 +39,153 @@
     export let validateRegexExpression;
     export let workspaceDocument = null;
 
-    const compositionFlowGroups = [
-        { label: "Capabilities", match: /capability/i },
-        { label: "Services", match: /service/i },
-        { label: "Oracle", match: /oracle/i },
-        { label: "Action loop", match: /action/i }
-    ];
-
-    function flowMode(flowNode) {
-        return flowNode?.mode || flowNode?.color || "default";
+    function isCompositionEditor(editorId) {
+        return editorId === "composition-properties" || editorId === "java-composition";
     }
 
-    function flowModeLabel(flowNode) {
-        const mode = flowMode(flowNode);
-
-        if (mode === "custom") {
-            return "Custom";
-        }
-
-        if (mode === "oracle") {
-            return "Oracle group";
-        }
-
-        if (mode === "invalid") {
-            return "Missing reference";
-        }
-
-        return "Default";
+    function isPoliciesEditor(editorId) {
+        return editorId === "policies-properties" || editorId === "java-policies";
     }
 
-    function flowImplementation(flowNode) {
-        const sourceFileName = typeof flowNode?.sourceFile === "string"
-            ? flowNode.sourceFile
-            : flowNode?.sourceFile?.name;
-
-        return (
-            flowNode?.configuredClassName ||
-            flowNode?.className ||
-            sourceFileName ||
-            flowNode?.fileName ||
-            flowNode?.description ||
-            "Default implementation"
-        );
+    function isSettingsEditor(editorId) {
+        return editorId === "settings-form" || editorId === "test-settings";
     }
-
-    function flowRole(flowNode) {
-        const title = flowNode?.title || flowNode?.label || "Flow node";
-        const group = compositionFlowGroups.find((item) => item.match.test(title));
-
-        return flowNode?.role || group?.label || "Composition node";
-    }
-
-    function flowNodeTitle(flowNode) {
-        return flowNode?.title || flowNode?.label || "Composition node";
-    }
-
-    function flowEdgeLabel(flowNode, index) {
-        return flowNode?.edgeLabel || compositionFlowNodes[index + 1]?.incomingLabel || "next";
-    }
-
-    function openSelectedCompositionSource() {
-        if (!selectedCompositionFlowNode) {
-            return;
-        }
-
-        const sourceName =
-            (typeof selectedCompositionFlowNode.sourceFile === "string"
-                ? selectedCompositionFlowNode.sourceFile
-                : selectedCompositionFlowNode.sourceFile?.name) ||
-            selectedCompositionFlowNode.fileName ||
-            selectedCompositionFlowNode.name;
-
-        if (sourceName) {
-            selectSource(sourceName, "java-composition");
-        }
-    }
-
-    $: selectedCompositionMode = flowMode(selectedCompositionFlowNode);
-    $: selectedCompositionHasSource = Boolean(
-        selectedCompositionFlowNode?.sourceFile?.name
-            || selectedCompositionFlowNode?.sourceFile
-            || selectedCompositionFlowNode?.fileName
-            || selectedCompositionFlowNode?.name
-    );
-
-    function closeCompositionModal() {
-        selectCompositionFlowNode(null);
-    }
-
-    function closePolicyModal() {
-        openJavaPolicies();
-    }
-
-    function regexValidation(setting) {
-        return setting?.regexValidation || regexValidationResults?.[setting?.key] || null;
-    }
-
-    function canRestoreSetting(setting) {
-        return setting?.key === "SuspiciousTags" || setting?.key === "SuspiciousProcessOutput";
-    }
-
-    function normalizedSearchText(text) {
-        return (text || "").trim().toLowerCase();
-    }
-
-    function leftPolicyDefinitions() {
-        const leftPolicyKeys = new Set([
-            "clickablePolicies",
-            "typeablePolicies",
-            "scrollablePolicies",
-            "selectablePolicies"
-        ]);
-
-        return (workspaceDocument?.policyDefinitions || []).filter((policyDefinition) => leftPolicyKeys.has(policyDefinition.propertyKey));
-    }
-
-    function rightPolicyDefinitions() {
-        const leftPolicyKeys = new Set([
-            "clickablePolicies",
-            "typeablePolicies",
-            "scrollablePolicies",
-            "selectablePolicies"
-        ]);
-
-        return (workspaceDocument?.policyDefinitions || []).filter((policyDefinition) => !leftPolicyKeys.has(policyDefinition.propertyKey));
-    }
-
-    function matchesSettingsSearch(setting, searchText) {
-        const normalized = normalizedSearchText(searchText);
-
-        if (!normalized) {
-            return true;
-        }
-
-        return [
-            setting?.key,
-            setting?.type,
-            setting?.value,
-            setting?.description
-        ]
-            .filter(Boolean)
-            .some((item) => item.toLowerCase().includes(normalized));
-    }
-
-    let settingsSearch = "";
-    let expandedSettingsGroups = {};
-    let settingsExpansionWorkspaceKey = "";
-
-    function toggleSettingsGroup(groupId) {
-        expandedSettingsGroups = {
-            ...expandedSettingsGroups,
-            [groupId]: !expandedSettingsGroups[groupId]
-        };
-    }
-
-    function openSettingsGroup(groupId) {
-        if (groupId) {
-            openVisualSettings();
-            selectSettingsGroup(groupId);
-            expandedSettingsGroups = {
-                ...expandedSettingsGroups,
-                [groupId]: true
-            };
-        }
-    }
-
-    $: normalizedSettingsSearch = normalizedSearchText(settingsSearch);
-
-    $: filteredSettingsGroups = (workspaceDocument?.settingsGroups || [])
-        .map((settingsGroup) => ({
-            ...settingsGroup,
-            settings: (settingsGroup.settings || []).filter((setting) => matchesSettingsSearch(setting, settingsSearch))
-        }))
-        .filter((settingsGroup) => settingsGroup.settings.length > 0);
-
-    $: settingsNavigationGroups = workspaceDocument?.settingsGroups || [];
-    $: visibleSettingsGroups = normalizedSettingsSearch
-        ? filteredSettingsGroups
-        : filteredSettingsGroups.filter((settingsGroup) => settingsGroup.id === selectedSettingsGroupId);
-
-    $: {
-        const nextWorkspaceKey = workspaceDocument?.workspaceName || "";
-
-        if (nextWorkspaceKey !== settingsExpansionWorkspaceKey) {
-            settingsExpansionWorkspaceKey = nextWorkspaceKey;
-            expandedSettingsGroups = workspaceDocument?.settingsGroups?.length > 0
-                ? { [workspaceDocument.settingsGroups[0].id]: true }
-                : {};
-        }
-    }
-
-    $: flowStartNodes = compositionFlowNodes.slice(0, 4);
-    $: flowStopNode = compositionFlowNodes[4];
-    $: flowStateNodes = compositionFlowNodes.slice(5, 9);
-    $: flowActionNodes = compositionFlowNodes.slice(9, 13);
-    $: flowExtraNodes = compositionFlowNodes.slice(13);
-
 </script>
 
 <main class="studio-layout">
     <section class="panel sidebar">
-        <section class="sidebar-section">
-            <h3>Composition profile</h3>
-            <div class="source-list">
-                <button
-                    class:selected={isSelectedEditor("composition-properties")}
-                    class="source-item"
-                    on:click={openCompositionProperties}
-                >
-                    <span>Edit composition.properties file</span>
-                </button>
-                <button
-                    class:selected={isSelectedEditor("java-composition")}
-                    class="source-item"
-                    on:click={openJavaComposition}
-                >
-                    <span>Edit Java Composition Flow</span>
-                </button>
-            </div>
-        </section>
+        <TestCompositionView
+            compositionFlowNodes={compositionFlowNodes}
+            currentEditorDocument={currentEditorDocument}
+            isSelectedEditor={isSelectedEditor}
+            openCompositionProperties={openCompositionProperties}
+            openJavaComposition={openJavaComposition}
+            compileSelectedJavaSource={compileSelectedJavaSource}
+            compileWorkspaceProfile={compileWorkspaceProfile}
+            createCompositionModuleSource={createCompositionModuleSource}
+            javaCompileResult={javaCompileResult}
+            closeCompositionSourceEditor={closeCompositionSourceEditor}
+            renderContent={false}
+            renderSidebar={true}
+            saving={saving}
+            selectCompositionFlowNode={selectCompositionFlowNode}
+            selectedCompositionFlowNode={selectedCompositionFlowNode}
+            selectedEditor={selectedEditor}
+            selectedSourceFile={selectedSourceFile}
+            workspaceDocument={workspaceDocument}
+        />
 
-        <section class="sidebar-section">
-            <h3>Test Policies</h3>
-            <div class="source-list">
-                <button
-                    class:selected={isSelectedEditor("policies-properties")}
-                    class="source-item"
-                    on:click={openPoliciesProperties}
-                >
-                    <span>Edit policies.properties file</span>
-                </button>
-                <button
-                    class:selected={isSelectedEditor("java-policies")}
-                    class="source-item"
-                    on:click={openJavaPolicies}
-                >
-                    <span>Edit Java Policies</span>
-                    <small>{policySourceFiles.length}</small>
-                </button>
-            </div>
-        </section>
+        <TestPoliciesView
+            activePolicySourceFiles={activePolicySourceFiles}
+            currentEditorDocument={currentEditorDocument}
+            inactivePolicySourceFiles={inactivePolicySourceFiles}
+            isPolicySourceSelected={isPolicySourceSelected}
+            isSelectedEditor={isSelectedEditor}
+            openJavaPolicies={openJavaPolicies}
+            openPoliciesProperties={openPoliciesProperties}
+            policySourceFiles={policySourceFiles}
+            closePolicySourceEditor={closePolicySourceEditor}
+            compileSelectedJavaSource={compileSelectedJavaSource}
+            compileWorkspaceProfile={compileWorkspaceProfile}
+            createPolicySource={createPolicySource}
+            javaCompileResult={javaCompileResult}
+            renderContent={false}
+            renderSidebar={true}
+            saving={saving}
+            selectSource={selectSource}
+            selectedEditor={selectedEditor}
+            selectedSourceFile={selectedSourceFile}
+            togglePolicySourceActivation={togglePolicySourceActivation}
+            workspaceDocument={workspaceDocument}
+        />
 
-        <section class="sidebar-section">
-            <h3>Test Settings</h3>
-            <div class="source-list">
-                <button
-                    class:selected={isSelectedEditor("test-settings")}
-                    class="source-item"
-                    on:click={openTestSettings}
-                >
-                    <span>Edit test.settings file</span>
-                </button>
-            </div>
-            <div class="settings-sidebar-tree">
-                <button
-                    class:selected={isSelectedEditor("settings-form")}
-                    class="source-item settings-tree-root"
-                    on:click={openVisualSettings}
-                >
-                    <span>Edit Settings</span>
-                </button>
-                {#if settingsNavigationGroups.length > 0}
-                    <div class="settings-sidebar-nav">
-                        {#each settingsNavigationGroups as settingsGroup}
-                            <button
-                                type="button"
-                                class="source-item settings-nav-item"
-                                class:selected={selectedEditor === "settings-form" && selectedSettingsGroupId === settingsGroup.id}
-                                on:click={() => openSettingsGroup(settingsGroup.id)}
-                            >
-                                <span>{settingsGroup.title}</span>
-                            </button>
-                        {/each}
-                    </div>
-                {/if}
-            </div>
-        </section>
+        <TestSettingsView
+            currentEditorDocument={currentEditorDocument}
+            loading={loading}
+            openTestSettings={openTestSettings}
+            openVisualSettings={openVisualSettings}
+            regexValidationResults={regexValidationResults}
+            renderContent={false}
+            renderSidebar={true}
+            saving={saving}
+            setSettingValue={setSettingValue}
+            selectSettingsGroup={selectSettingsGroup}
+            selectedEditor={selectedEditor}
+            selectedSettingsGroupId={selectedSettingsGroupId}
+            restoreSettingDefault={restoreSettingDefault}
+            validateRegexExpression={validateRegexExpression}
+            workspaceDocument={workspaceDocument}
+        />
     </section>
 
     <section class="panel content-panel">
         {#if loading}
             <p>Loading workspace...</p>
         {:else if workspaceDocument}
-            {#if selectedEditor === "settings-form" && currentEditorDocument}
-                <section class="editor-section">
-                    <div class="section-header">
-                        <div>
-                            <h2>{currentEditorDocument.title}</h2>
-                            <p>Main common TESTAR settings with grouped controls. Use the test.settings editor for advanced control.</p>
-                        </div>
-                        <button class="secondary" disabled={saving} on:click={currentEditorDocument.save}>
-                            {currentEditorDocument.saveLabel}
-                        </button>
-                    </div>
-
-                    <section class="settings-toolbar top-gap">
-                        <div class="settings-search">
-                            <label class="field-label" for="settings-search">Search in all settings</label>
-                            <input
-                                id="settings-search"
-                                type="search"
-                                bind:value={settingsSearch}
-                                placeholder="Search by key, value, type, or description"
-                            />
-                        </div>
-                    </section>
-
-                    <section class="settings-groups top-gap">
-                        {#if visibleSettingsGroups.length > 0}
-                            {#each visibleSettingsGroups as settingsGroup (settingsGroup.id)}
-                                <article class="settings-group-card">
-                                    <button
-                                        type="button"
-                                        class="settings-group-toggle"
-                                        aria-expanded={normalizedSettingsSearch ? true : Boolean(expandedSettingsGroups[settingsGroup.id])}
-                                        on:click={() => toggleSettingsGroup(settingsGroup.id)}
-                                    >
-                                        <div class="settings-group-header">
-                                            <div>
-                                                <h3>{settingsGroup.title}</h3>
-                                                <p>{settingsGroup.description}</p>
-                                            </div>
-                                            <div class="settings-group-summary">
-                                                <span class="settings-group-count">{settingsGroup.settings.length}</span>
-                                                <span class="settings-group-chevron">
-                                                    {#if normalizedSettingsSearch ? true : Boolean(expandedSettingsGroups[settingsGroup.id])}
-                                                        Hide
-                                                    {:else}
-                                                        Show
-                                                    {/if}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </button>
-
-                                    {#if normalizedSettingsSearch ? true : Boolean(expandedSettingsGroups[settingsGroup.id])}
-                                        <div class="settings-fields">
-                                            {#each settingsGroup.settings as setting}
-                                                <div
-                                                    class="settings-field"
-                                                    class:settings-field-wide={setting.type === "list"}
-                                                    class:settings-field-boolean={setting.type === "boolean"}
-                                                >
-                                                    <div class="settings-field-header">
-                                                        <span class="settings-field-label">{setting.key}</span>
-                                                        {#if setting.regexCapable}
-                                                            <div
-                                                                class="settings-validation-message settings-validation-inline"
-                                                                class:settings-validation-valid={regexValidation(setting)?.valid}
-                                                                class:settings-validation-invalid={regexValidation(setting) && !regexValidation(setting).valid}
-                                                                class:settings-validation-idle={!regexValidation(setting)}
-                                                            >
-                                                                {#if regexValidation(setting)}
-                                                                    <span>{regexValidation(setting).message}</span>
-                                                                {:else}
-                                                                    <span>No validation executed yet.</span>
-                                                                {/if}
-                                                            </div>
-                                                        {/if}
-                                                        <div class="settings-field-actions">
-                                                            {#if setting.regexCapable}
-                                                                <button
-                                                                    type="button"
-                                                                    class="secondary settings-action-button"
-                                                                    on:click={() => validateRegexExpression(setting)}
-                                                                >
-                                                                    Check Regex
-                                                                </button>
-                                                            {/if}
-                                                            {#if canRestoreSetting(setting)}
-                                                                <button
-                                                                    type="button"
-                                                                    class="secondary settings-action-button"
-                                                                    on:click={() => restoreSettingDefault(setting)}
-                                                                >
-                                                                    Restore Default
-                                                                </button>
-                                                            {/if}
-                                                        </div>
-                                                    </div>
-
-                                                    {#if setting.type === "boolean"}
-                                                        <span class="settings-checkbox-row">
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={setting.value === "true"}
-                                                                    on:change={(event) => {
-                                                                        setSettingValue(setting, event.currentTarget.checked ? "true" : "false");
-                                                                    }}
-                                                                />
-                                                            <span>{setting.value === "true" ? "Enabled" : "Disabled"}</span>
-                                                        </span>
-                                                    {:else if setting.options?.length > 0}
-                                                        <select
-                                                            value={setting.value}
-                                                            on:change={(event) => {
-                                                                setSettingValue(setting, event.currentTarget.value);
-                                                            }}
-                                                        >
-                                                            <option value=""></option>
-                                                            {#each setting.options as option}
-                                                                <option value={option}>{option}</option>
-                                                            {/each}
-                                                        </select>
-                                                    {:else if setting.type === "list"}
-                                                        <textarea
-                                                            class="settings-list-input"
-                                                            value={setting.value}
-                                                            on:input={(event) => {
-                                                                setSettingValue(setting, event.currentTarget.value);
-                                                            }}
-                                                            placeholder="Keep TESTAR list syntax here"
-                                                        ></textarea>
-                                                    {:else if setting.type === "integer"}
-                                                        <input
-                                                            type="number"
-                                                            step="1"
-                                                            value={setting.value}
-                                                            on:input={(event) => {
-                                                                setSettingValue(setting, event.currentTarget.value);
-                                                            }}
-                                                        />
-                                                    {:else if setting.type === "number"}
-                                                        <input
-                                                            type="number"
-                                                            step="any"
-                                                            value={setting.value}
-                                                            on:input={(event) => {
-                                                                setSettingValue(setting, event.currentTarget.value);
-                                                            }}
-                                                        />
-                                                    {:else}
-                                                        <input
-                                                            type="text"
-                                                            value={setting.value}
-                                                            on:input={(event) => {
-                                                                setSettingValue(setting, event.currentTarget.value);
-                                                            }}
-                                                        />
-                                                    {/if}
-
-                                                    {#if canRestoreSetting(setting)}
-                                                        <small class="settings-field-default">
-                                                            Default: {setting.defaultValue === "" ? "(empty)" : setting.defaultValue}
-                                                        </small>
-                                                    {/if}
-
-                                                    <div class="settings-field-footer">
-                                                        {#if setting.description}
-                                                            <small class="settings-field-help">{setting.description}</small>
-                                                        {/if}
-                                                    </div>
-                                                </div>
-                                            {/each}
-                                        </div>
-                                    {/if}
-                                </article>
-                            {/each}
-                        {:else}
-                            <p class="progress-message">
-                                {#if normalizedSettingsSearch}
-                                    No settings matched the current search.
-                                {:else}
-                                    Select a settings category to inspect its fields.
-                                {/if}
-                            </p>
-                        {/if}
-                    </section>
-                </section>
-            {:else if currentEditorDocument}
+            {#if isCompositionEditor(selectedEditor)}
+                <TestCompositionView
+                    compositionFlowNodes={compositionFlowNodes}
+                    currentEditorDocument={currentEditorDocument}
+                    isSelectedEditor={isSelectedEditor}
+                    openCompositionProperties={openCompositionProperties}
+                    openJavaComposition={openJavaComposition}
+                    compileSelectedJavaSource={compileSelectedJavaSource}
+                    compileWorkspaceProfile={compileWorkspaceProfile}
+                    createCompositionModuleSource={createCompositionModuleSource}
+                    javaCompileResult={javaCompileResult}
+                    closeCompositionSourceEditor={closeCompositionSourceEditor}
+                    renderContent={true}
+                    renderSidebar={false}
+                    saving={saving}
+                    selectCompositionFlowNode={selectCompositionFlowNode}
+                    selectedCompositionFlowNode={selectedCompositionFlowNode}
+                    selectedEditor={selectedEditor}
+                    selectedSourceFile={selectedSourceFile}
+                    workspaceDocument={workspaceDocument}
+                />
+            {:else if isPoliciesEditor(selectedEditor)}
+                <TestPoliciesView
+                    activePolicySourceFiles={activePolicySourceFiles}
+                    currentEditorDocument={currentEditorDocument}
+                    inactivePolicySourceFiles={inactivePolicySourceFiles}
+                    isPolicySourceSelected={isPolicySourceSelected}
+                    isSelectedEditor={isSelectedEditor}
+                    openJavaPolicies={openJavaPolicies}
+                    openPoliciesProperties={openPoliciesProperties}
+                    policySourceFiles={policySourceFiles}
+                    closePolicySourceEditor={closePolicySourceEditor}
+                    compileSelectedJavaSource={compileSelectedJavaSource}
+                    compileWorkspaceProfile={compileWorkspaceProfile}
+                    createPolicySource={createPolicySource}
+                    javaCompileResult={javaCompileResult}
+                    renderContent={true}
+                    renderSidebar={false}
+                    saving={saving}
+                    selectSource={selectSource}
+                    selectedEditor={selectedEditor}
+                    selectedSourceFile={selectedSourceFile}
+                    togglePolicySourceActivation={togglePolicySourceActivation}
+                    workspaceDocument={workspaceDocument}
+                />
+            {:else if isSettingsEditor(selectedEditor) && currentEditorDocument}
+                <TestSettingsView
+                    currentEditorDocument={currentEditorDocument}
+                    loading={loading}
+                    openTestSettings={openTestSettings}
+                    openVisualSettings={openVisualSettings}
+                    regexValidationResults={regexValidationResults}
+                    renderContent={true}
+                    renderSidebar={false}
+                    saving={saving}
+                    setSettingValue={setSettingValue}
+                    selectSettingsGroup={selectSettingsGroup}
+                    selectedEditor={selectedEditor}
+                    selectedSettingsGroupId={selectedSettingsGroupId}
+                    restoreSettingDefault={restoreSettingDefault}
+                    validateRegexExpression={validateRegexExpression}
+                    workspaceDocument={workspaceDocument}
+                />
+            {:else if currentEditorDocument && selectedSourceFile}
                 <section class="editor-section">
                     <div class="section-header">
                         <div>
@@ -512,473 +195,7 @@
                             {currentEditorDocument.saveLabel}
                         </button>
                     </div>
-                    {#if selectedEditor === "test-settings"}
-                        <textarea bind:value={workspaceDocument.testSettings.content}></textarea>
-                    {:else if selectedEditor === "policies-properties"}
-                        <textarea bind:value={workspaceDocument.policiesProperties.content}></textarea>
-                    {:else if selectedEditor === "composition-properties"}
-                        <textarea bind:value={workspaceDocument.compositionProperties.content}></textarea>
-                    {:else if selectedSourceFile}
-                        <textarea bind:value={selectedSourceFile.content}></textarea>
-                    {/if}
-                </section>
-            {:else if selectedEditor === "java-policies"}
-                <section class="editor-section">
-                    <div class="section-header">
-                        <div>
-                            <h2>Edit Java Policies</h2>
-                            <p>Review the policy classes resolved from policies.properties and create new policy implementations directly from each policy seam.</p>
-                        </div>
-                        <button class="secondary" disabled={saving} on:click={compileWorkspaceProfile}>
-                            Compile Profile
-                        </button>
-                    </div>
-
-                    <section class="compile-results-panel top-gap" class:compile-results-success={javaCompileResult?.scope === "profile" && javaCompileResult.success} class:compile-results-failed={javaCompileResult?.scope === "profile" && !javaCompileResult.success} class:compile-results-idle={javaCompileResult?.scope !== "profile"}>
-                        {#if javaCompileResult?.scope === "profile" && javaCompileResult.diagnostics?.length > 0}
-                            <div class="compile-diagnostics-list">
-                                {#each javaCompileResult.diagnostics as diagnostic}
-                                    <article class="compile-diagnostic-row">
-                                        <div>
-                                            <strong>{diagnostic.fileName || "workspace"}</strong>
-                                            <span>{diagnostic.relativePath}</span>
-                                        </div>
-                                        <small>{diagnostic.severity} {diagnostic.line > 0 ? `L${diagnostic.line}` : ""}{diagnostic.column > 0 ? `:${diagnostic.column}` : ""}</small>
-                                        <p>{diagnostic.message}</p>
-                                    </article>
-                                {/each}
-                            </div>
-                        {:else if javaCompileResult?.scope === "profile" && javaCompileResult.success}
-                            <div class="compile-results-empty">
-                                <p>Java profile compilation succeeded for the current policy composition profile.</p>
-                            </div>
-                        {:else}
-                            <div class="compile-results-empty">
-                                <p>Run "Compile Profile" to validate every Java policy in this composition profile.</p>
-                            </div>
-                        {/if}
-                    </section>
-
-                    <section class="manager-card top-gap">
-                        <div class="policy-definition-columns">
-                            <div class="policy-definition-list">
-                                {#each leftPolicyDefinitions() as policyDefinition}
-                                    <article class="policy-definition-item">
-                                        <div>
-                                            <strong>{policyDefinition.label}</strong>
-                                            <small>{policyDefinition.configuredClassNames?.length || 0} configured</small>
-                                        </div>
-                                        <div class="policy-definition-actions">
-                                            <button
-                                                type="button"
-                                                class="secondary"
-                                                disabled={saving}
-                                                on:click={() => createPolicySource(policyDefinition)}
-                                            >
-                                                Add Java Policy
-                                            </button>
-                                        </div>
-                                    </article>
-                                {/each}
-                            </div>
-                            <div class="policy-definition-list">
-                                {#each rightPolicyDefinitions() as policyDefinition}
-                                    <article class="policy-definition-item">
-                                        <div>
-                                            <strong>{policyDefinition.label}</strong>
-                                            <small>{policyDefinition.configuredClassNames?.length || 0} configured</small>
-                                        </div>
-                                        <div class="policy-definition-actions">
-                                            <button
-                                                type="button"
-                                                class="secondary"
-                                                disabled={saving}
-                                                on:click={() => createPolicySource(policyDefinition)}
-                                            >
-                                                Add Java Policy
-                                            </button>
-                                        </div>
-                                    </article>
-                                {/each}
-                            </div>
-                        </div>
-                    </section>
-
-                    <section class="manager-card top-gap">
-                        <h3>Policies Active In Profile</h3>
-                        <div class="source-list manager-list">
-                            {#if activePolicySourceFiles.length > 0}
-                                {#each activePolicySourceFiles as sourceFile}
-                                    <div class="source-item manager-source-item" class:selected={isPolicySourceSelected(sourceFile)}>
-                                        <button
-                                            type="button"
-                                            class="manager-source-open"
-                                            on:click={() => selectSource(sourceFile.name, "java-policies")}
-                                        >
-                                            <span>{sourceFile.name}</span>
-                                            <small>active</small>
-                                        </button>
-                                        <button
-                                            type="button"
-                                            class="secondary manager-inline-action"
-                                            disabled={saving}
-                                            on:click={() => togglePolicySourceActivation(sourceFile, false)}
-                                        >
-                                            Disable
-                                        </button>
-                                    </div>
-                                {/each}
-                            {:else}
-                                <p class="progress-message">No referenced Java policies were resolved in this workspace.</p>
-                            {/if}
-                        </div>
-                    </section>
-
-                    <section class="manager-card top-gap">
-                        <h3>Available Policy Files Not In Profile</h3>
-                        <div class="source-list manager-list">
-                            {#if inactivePolicySourceFiles.length > 0}
-                                {#each inactivePolicySourceFiles as sourceFile}
-                                    <div class="source-item manager-source-item" class:selected={isPolicySourceSelected(sourceFile)}>
-                                        <button
-                                            type="button"
-                                            class="manager-source-open"
-                                            on:click={() => selectSource(sourceFile.name, "java-policies")}
-                                        >
-                                            <span>{sourceFile.name}</span>
-                                            <small>available</small>
-                                        </button>
-                                        <button
-                                            type="button"
-                                            class="secondary manager-inline-action"
-                                            disabled={saving}
-                                            on:click={() => togglePolicySourceActivation(sourceFile, true)}
-                                        >
-                                            Enable
-                                        </button>
-                                    </div>
-                                {/each}
-                            {:else}
-                                <p class="progress-message">No extra policy Java files were found in this workspace.</p>
-                            {/if}
-                        </div>
-                    </section>
-
-                    {#if selectedSourceFile?.category === "policy"}
-                        <div class="composition-modal-backdrop" on:click|self={closePolicyModal} role="presentation">
-                            <div class="composition-modal composition-modal-policy" role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="policy-modal-title">
-                                <div class="composition-modal-header">
-                                    <div>
-                                        <span class="flow-node-kicker">Policy Source</span>
-                                        <h3 id="policy-modal-title">{selectedSourceFile.name}</h3>
-                                    </div>
-                                    <div class="composition-modal-actions">
-                                        <button class="secondary" on:click={closePolicyModal}>Close</button>
-                                    </div>
-                                </div>
-
-                                <div class="composition-modal-body">
-                                    <div class="section-header">
-                                        <div>
-                                            <h3>Policy Source Editor</h3>
-                                            <p>Edit the selected policy source directly in this modal.</p>
-                                        </div>
-                                        <div class="button-row">
-                                            <button class="secondary" disabled={saving} on:click={compileSelectedJavaSource}>
-                                                Compile Java
-                                            </button>
-                                            <button class="secondary" disabled={saving} on:click={saveSelectedSource}>
-                                                Save Policy
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <section class="compile-results-panel" class:compile-results-success={javaCompileResult?.scope === "source" && javaCompileResult.success} class:compile-results-failed={javaCompileResult?.scope === "source" && !javaCompileResult.success} class:compile-results-idle={javaCompileResult?.scope !== "source"}>
-                                        {#if javaCompileResult?.scope === "source" && javaCompileResult.diagnostics?.length > 0}
-                                            <div class="compile-diagnostics-list">
-                                                {#each javaCompileResult.diagnostics as diagnostic}
-                                                    <article class="compile-diagnostic-row">
-                                                        <div>
-                                                            <strong>{diagnostic.fileName || javaCompileResult.targetName}</strong>
-                                                            <span>{diagnostic.relativePath}</span>
-                                                        </div>
-                                                        <small>{diagnostic.severity} {diagnostic.line > 0 ? `L${diagnostic.line}` : ""}{diagnostic.column > 0 ? `:${diagnostic.column}` : ""}</small>
-                                                        <p>{diagnostic.message}</p>
-                                                    </article>
-                                                    {/each}
-                                                </div>
-                                        {:else if javaCompileResult?.scope === "source" && javaCompileResult.success}
-                                            <div class="compile-results-empty">
-                                                <p>Java compilation succeeded for the current policy source file.</p>
-                                            </div>
-                                        {:else}
-                                            <div class="compile-results-empty">
-                                                <p>Run "Compile Java" to validate the current policy source file.</p>
-                                            </div>
-                                        {/if}
-                                    </section>
-                                    <textarea bind:value={selectedSourceFile.content}></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    {/if}
-                </section>
-            {:else if selectedEditor === "java-composition"}
-                <section class="editor-section">
-                    <section class="composition-flow top-gap" aria-label="Composition architecture graph">
-                        <div class="composition-flow-header">
-                            <div>
-                                <h3>Edit Java Composition Flow</h3>
-                                <p>Click a node to inspect and configure a TESTAR service or capability.</p>
-                            </div>
-                            <button class="secondary" disabled={saving} on:click={compileWorkspaceProfile}>
-                                Compile Profile
-                            </button>
-                            <div class="flow-legend" aria-label="Node state legend">
-                                <span><i class="legend-dot legend-default"></i>Default</span>
-                                <span><i class="legend-dot legend-custom"></i>Custom</span>
-                                <span><i class="legend-dot legend-oracle"></i>Oracle</span>
-                            </div>
-                        </div>
-
-                        {#if compositionFlowNodes.length > 0}
-                            <div class="flow-graph flow-graph-clock">
-                                <svg class="flow-clock-connectors" viewBox="0 0 1000 420" preserveAspectRatio="none" aria-hidden="true">
-                                    <defs>
-                                        <marker id="flow-clock-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-                                            <path d="M 0 0 L 10 5 L 0 10 z"></path>
-                                        </marker>
-                                    </defs>
-                                    <!-- SystemService -> StopCriteriaCapability -->
-                                    <path class="flow-clock-path" d="M130 65 C285 30 445 40 520 30" marker-end="url(#flow-clock-arrow)"></path>
-                                    <!-- ActionDerivationService -> StopCriteriaCapability -->
-                                    <path class="flow-clock-path" d="M390 65 C455 42 485 50 520 50" marker-end="url(#flow-clock-arrow)"></path>
-                                    <!-- StopCriteriaCapability -> StateService -->
-                                    <path class="flow-clock-path" d="M730 40 C810 45 830 55 860 65" marker-end="url(#flow-clock-arrow)"></path>
-                                    <!-- Custom Oracle Services -> ActionExecutionService -->
-                                    <path class="flow-clock-path" d="M750 390 C725 405 590 405 510 390" marker-end="url(#flow-clock-arrow)"></path>
-                                </svg>
-
-                                <section class="flow-group flow-group-start flow-group-up" aria-label="Composition setup">
-                                    {#each flowStartNodes.slice().reverse() as flowNode}
-                                        <button
-                                            class="flow-node"
-                                            class:flow-default={flowMode(flowNode) === "default"}
-                                            class:flow-custom={flowMode(flowNode) === "custom"}
-                                            class:flow-oracle={flowMode(flowNode) === "oracle"}
-                                            class:flow-invalid={flowMode(flowNode) === "invalid"}
-                                            class:flow-selected={selectedCompositionFlowNode === flowNode}
-                                            on:click={() => selectCompositionFlowNode(flowNode)}
-                                        >
-                                            <span class="flow-node-kicker">{flowRole(flowNode)}</span>
-                                            <strong>{flowNodeTitle(flowNode)}</strong>
-                                            <small>{flowImplementation(flowNode)}</small>
-                                            <span class="flow-badge">{flowModeLabel(flowNode)}</span>
-                                        </button>
-                                    {/each}
-                                </section>
-
-                                {#if flowStopNode}
-                                    <section class="flow-group flow-group-stop" aria-label="Stop criteria gate">
-                                        <button
-                                            class="flow-node"
-                                            class:flow-default={flowMode(flowStopNode) === "default"}
-                                            class:flow-custom={flowMode(flowStopNode) === "custom"}
-                                            class:flow-oracle={flowMode(flowStopNode) === "oracle"}
-                                            class:flow-invalid={flowMode(flowStopNode) === "invalid"}
-                                            class:flow-selected={selectedCompositionFlowNode === flowStopNode}
-                                            on:click={() => selectCompositionFlowNode(flowStopNode)}
-                                        >
-                                            <span class="flow-node-kicker">{flowRole(flowStopNode)}</span>
-                                            <strong>{flowNodeTitle(flowStopNode)}</strong>
-                                            <small>{flowImplementation(flowStopNode)}</small>
-                                            <span class="flow-badge">{flowModeLabel(flowStopNode)}</span>
-                                        </button>
-                                    </section>
-                                {/if}
-
-                                <section class="flow-group flow-group-state flow-group-down" aria-label="State and oracle services">
-                                    {#each flowStateNodes as flowNode}
-                                        <button
-                                            class="flow-node"
-                                            class:flow-default={flowMode(flowNode) === "default"}
-                                            class:flow-custom={flowMode(flowNode) === "custom"}
-                                            class:flow-oracle={flowMode(flowNode) === "oracle"}
-                                            class:flow-invalid={flowMode(flowNode) === "invalid"}
-                                            class:flow-selected={selectedCompositionFlowNode === flowNode}
-                                            on:click={() => selectCompositionFlowNode(flowNode)}
-                                        >
-                                            <span class="flow-node-kicker">{flowRole(flowNode)}</span>
-                                            <strong>{flowNodeTitle(flowNode)}</strong>
-                                            <small>{flowImplementation(flowNode)}</small>
-                                            <span class="flow-badge">{flowModeLabel(flowNode)}</span>
-                                        </button>
-                                    {/each}
-                                </section>
-
-                                <section class="flow-group flow-group-actions flow-group-up" aria-label="Action services">
-                                    {#each flowActionNodes as flowNode}
-                                        <button
-                                            class="flow-node"
-                                            class:flow-default={flowMode(flowNode) === "default"}
-                                            class:flow-custom={flowMode(flowNode) === "custom"}
-                                            class:flow-oracle={flowMode(flowNode) === "oracle"}
-                                            class:flow-invalid={flowMode(flowNode) === "invalid"}
-                                            class:flow-selected={selectedCompositionFlowNode === flowNode}
-                                            on:click={() => selectCompositionFlowNode(flowNode)}
-                                        >
-                                            <span class="flow-node-kicker">{flowRole(flowNode)}</span>
-                                            <strong>{flowNodeTitle(flowNode)}</strong>
-                                            <small>{flowImplementation(flowNode)}</small>
-                                            <span class="flow-badge">{flowModeLabel(flowNode)}</span>
-                                        </button>
-                                    {/each}
-                                </section>
-
-                                {#if flowExtraNodes.length > 0}
-                                    <section class="flow-group flow-group-extra" aria-label="Additional composition nodes">
-                                        {#each flowExtraNodes as flowNode}
-                                            <button
-                                                class="flow-node"
-                                                class:flow-default={flowMode(flowNode) === "default"}
-                                                class:flow-custom={flowMode(flowNode) === "custom"}
-                                                class:flow-oracle={flowMode(flowNode) === "oracle"}
-                                                class:flow-invalid={flowMode(flowNode) === "invalid"}
-                                                class:flow-selected={selectedCompositionFlowNode === flowNode}
-                                                on:click={() => selectCompositionFlowNode(flowNode)}
-                                            >
-                                                <span class="flow-node-kicker">{flowRole(flowNode)}</span>
-                                                <strong>{flowNodeTitle(flowNode)}</strong>
-                                                <small>{flowImplementation(flowNode)}</small>
-                                                <span class="flow-badge">{flowModeLabel(flowNode)}</span>
-                                            </button>
-                                        {/each}
-                                    </section>
-                                {/if}
-                            </div>
-                        {:else}
-                            <p class="progress-message">No active service or capability classes were resolved for this composition.</p>
-                        {/if}
-                    </section>
-
-                    {#if selectedCompositionFlowNode}
-                        <div class="composition-modal-backdrop" on:click|self={closeCompositionModal} role="presentation">
-                            <div class="composition-modal" role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="composition-modal-title">
-                                <div class="composition-modal-header">
-                                    <div>
-                                        <span class="flow-node-kicker">Composition Node</span>
-                                        <h3 id="composition-modal-title">{flowNodeTitle(selectedCompositionFlowNode)}</h3>
-                                    </div>
-                                    <div class="composition-modal-actions">
-                                        <span
-                                            class="inspector-mode"
-                                            class:flow-default={selectedCompositionMode === "default"}
-                                            class:flow-custom={selectedCompositionMode === "custom"}
-                                            class:flow-oracle={selectedCompositionMode === "oracle"}
-                                            class:flow-invalid={selectedCompositionMode === "invalid"}
-                                        >
-                                            {flowModeLabel(selectedCompositionFlowNode)}
-                                        </span>
-                                        <button class="secondary" on:click={closeCompositionModal}>Close</button>
-                                    </div>
-                                </div>
-
-                                <div class="inspector-actions">
-                                    {#if selectedCompositionFlowNode.propertyKey && selectedCompositionMode === "default"}
-                                        <button
-                                            class="secondary"
-                                            disabled={saving}
-                                            on:click={() => createCompositionModuleSource(selectedCompositionFlowNode)}
-                                        >
-                                            Create Java Class
-                                        </button>
-                                    {:else if !selectedCompositionFlowNode.propertyKey}
-                                        <button class="secondary" disabled title="This flow node is driven by the composed runtime and has no dedicated override property">No direct override</button>
-                                    {/if}
-                                </div>
-
-                                <div class="composition-modal-body">
-                                    {#if selectedSourceFile && (selectedSourceFile.category === "service" || selectedSourceFile.category === "capability")}
-                                        <div class="section-header">
-                                            <div>
-                                                <h3>{selectedSourceFile.name}</h3>
-                                            </div>
-                                            <div class="button-row">
-                                                <button
-                                                    class="secondary"
-                                                    disabled={saving}
-                                                    on:click={() => createCompositionModuleSource(selectedCompositionFlowNode)}
-                                                >
-                                                    Open Java
-                                                </button>
-                                                <button class="secondary" disabled={saving} on:click={compileSelectedJavaSource}>
-                                                    Compile Java
-                                                </button>
-                                                <button class="secondary" disabled={saving} on:click={saveSelectedSource}>
-                                                    Save Composition
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <section class="compile-results-panel" class:compile-results-success={javaCompileResult?.scope === "source" && javaCompileResult.success} class:compile-results-failed={javaCompileResult?.scope === "source" && !javaCompileResult.success} class:compile-results-idle={javaCompileResult?.scope !== "source"}>
-                                            {#if javaCompileResult?.scope === "source" && javaCompileResult.diagnostics?.length > 0}
-                                                <div class="compile-diagnostics-list">
-                                                    {#each javaCompileResult.diagnostics as diagnostic}
-                                                        <article class="compile-diagnostic-row">
-                                                            <div>
-                                                                <strong>{diagnostic.fileName || javaCompileResult.targetName}</strong>
-                                                                <span>{diagnostic.relativePath}</span>
-                                                            </div>
-                                                            <small>{diagnostic.severity} {diagnostic.line > 0 ? `L${diagnostic.line}` : ""}{diagnostic.column > 0 ? `:${diagnostic.column}` : ""}</small>
-                                                            <p>{diagnostic.message}</p>
-                                                        </article>
-                                                        {/each}
-                                                    </div>
-                                            {:else if javaCompileResult?.scope === "source" && javaCompileResult.success}
-                                                <div class="compile-results-empty">
-                                                    <p>Java compilation succeeded for the current composition source file.</p>
-                                                </div>
-                                            {:else}
-                                                <div class="compile-results-empty">
-                                                    <p>Run "Compile Java" to validate the current composition source file.</p>
-                                                </div>
-                                            {/if}
-                                        </section>
-                                        <textarea bind:value={selectedSourceFile.content}></textarea>
-                                    {:else}
-                                        <div class="composition-modal-empty">
-                                            <h4>No custom source file is assigned</h4>
-                                            <p>
-                                                This node is currently using the default implementation. To edit code here, create or assign a custom Java implementation for this composition node.
-                                            </p>
-                                        </div>
-                                    {/if}
-                                </div>
-                            </div>
-                        </div>
-                    {/if}
-                    <section class="compile-results-panel top-gap" class:compile-results-success={javaCompileResult?.scope === "profile" && javaCompileResult.success} class:compile-results-failed={javaCompileResult?.scope === "profile" && !javaCompileResult.success} class:compile-results-idle={javaCompileResult?.scope !== "profile"}>
-                        {#if javaCompileResult?.scope === "profile" && javaCompileResult.diagnostics?.length > 0}
-                            <div class="compile-diagnostics-list">
-                                {#each javaCompileResult.diagnostics as diagnostic}
-                                    <article class="compile-diagnostic-row">
-                                        <div>
-                                            <strong>{diagnostic.fileName || "workspace"}</strong>
-                                            <span>{diagnostic.relativePath}</span>
-                                        </div>
-                                        <small>{diagnostic.severity} {diagnostic.line > 0 ? `L${diagnostic.line}` : ""}{diagnostic.column > 0 ? `:${diagnostic.column}` : ""}</small>
-                                        <p>{diagnostic.message}</p>
-                                    </article>
-                                {/each}
-                            </div>
-                        {:else if javaCompileResult?.scope === "profile" && javaCompileResult.success}
-                            <div class="compile-results-empty">
-                                <p>Java profile compilation succeeded for the current composition profile.</p>
-                            </div>
-                        {:else}
-                            <div class="compile-results-empty">
-                                <p>Run "Compile Profile" to validate every Java composition class in this profile.</p>
-                            </div>
-                        {/if}
-                    </section>
+                    <textarea bind:value={selectedSourceFile.content}></textarea>
                 </section>
             {/if}
         {/if}

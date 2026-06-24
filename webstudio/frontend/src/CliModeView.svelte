@@ -74,12 +74,9 @@
         <section class="status-card cli-mode-column cli-mode-column-left">
             <div class="cli-mode-section cli-mode-section-compact">
                 <div class="cli-mode-section-header">
-                    <span class="eyebrow">Manual CLI Session</span>
+                    <span class="eyebrow">Target CLI Session</span>
                 </div>
                 <p class="progress-message">Start a CLI session, then inspect state, derive actions, execute actions, and stop the session.</p>
-                {#if !selectedWorkspaceAvailableInCli}
-                    <p class="progress-message">The selected profile is not available in the CLI settings distribution.</p>
-                {/if}
                 <label class="field-label" for="cli-manual-platform">Platform</label>
                 <select id="cli-manual-platform" bind:value={manualPlatform}>
                     <option value="webdriver">webdriver</option>

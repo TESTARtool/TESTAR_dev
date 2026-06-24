@@ -7,6 +7,8 @@
     import TestResultsView from "./TestResultsView.svelte";
     import InspectLogsView from "./InspectLogsView.svelte";
     import StateModelIcon from "./icons/StateModelIcon.svelte";
+    import { shouldGuardConfigurationTransition } from "./configurationGuard.js";
+    import { clearSelectedSourceState } from "./policyEditorState.js";
 
     const STATE_MODEL_URL = "http://localhost:8090/models";
 
@@ -14,6 +16,7 @@
     let selectedWorkspaceName = "";
     let selectedWorkspaceSummary = null;
     let workspaceDocument = null;
+    let selectedWorkspaceSutConnectorValue = "";
     let selectedSourceName = "";
     let selectedSourceFile = null;
     let cliStatus = null;
@@ -59,6 +62,18 @@
         title: "",
         message: ""
     };
+    let visualSettingsDirty = false;
+    let unsavedSettingsDialog = {
+        open: false,
+        title: "",
+        message: "",
+        saveLabel: "Save"
+    };
+    let savedTestSettingsContent = "";
+    let savedCompositionPropertiesContent = "";
+    let savedPoliciesPropertiesContent = "";
+    let savedSourceContents = {};
+    let pendingConfigurationAction = null;
 
     function reportClientError(context, clientError) {
         console.error(`[WebStudio] ${context}`, clientError);
@@ -94,6 +109,31 @@
     function closeStateModelDialogFromBackdrop(event) {
         if (event.currentTarget === event.target) {
             closeStateModelDialog();
+        }
+    }
+
+    function openUnsavedSettingsDialog(title, dialogMessage, saveLabel = "Save") {
+        unsavedSettingsDialog = {
+            open: true,
+            title,
+            message: dialogMessage,
+            saveLabel
+        };
+    }
+
+    function closeUnsavedSettingsDialog() {
+        unsavedSettingsDialog = {
+            open: false,
+            title: "",
+            message: "",
+            saveLabel: "Save"
+        };
+        pendingConfigurationAction = null;
+    }
+
+    function closeUnsavedSettingsDialogFromBackdrop(event) {
+        if (event.currentTarget === event.target) {
+            closeUnsavedSettingsDialog();
         }
     }
 
@@ -153,7 +193,11 @@
     async function loadWorkspace(workspaceName) {
         if (!workspaceName) {
             selectedWorkspaceSummary = null;
+            selectedWorkspaceName = "";
             workspaceDocument = null;
+            selectedWorkspaceSutConnectorValue = "";
+            savedTestSettingsContent = "";
+            visualSettingsDirty = false;
             selectedSourceName = "";
             selectedSourceFile = null;
             selectedEditor = "java-composition";
@@ -166,11 +210,20 @@
 
         loading = true;
         message = "";
+        selectedWorkspaceName = workspaceName;
+        selectedWorkspaceSummary = workspaces.find((workspace) => workspace.name === workspaceName) || null;
 
         try {
             workspaceDocument = await loadJson(`/api/workspaces/${workspaceName}`);
-            selectedWorkspaceName = workspaceName;
-            selectedWorkspaceSummary = workspaces.find((workspace) => workspace.name === workspaceName) || null;
+            savedTestSettingsContent = workspaceDocument?.testSettings?.content || "";
+            savedCompositionPropertiesContent = workspaceDocument?.compositionProperties?.content || "";
+            savedPoliciesPropertiesContent = workspaceDocument?.policiesProperties?.content || "";
+            savedSourceContents = {};
+            visualSettingsDirty = false;
+            selectedWorkspaceSutConnectorValue = normalizeSettingDisplayValue(
+                parsePropertiesContent(workspaceDocument?.testSettings?.content || "").SUTConnectorValue
+                    || workspaceSettingValue("SUTConnectorValue")
+            );
             selectedSourceName = "";
             selectedSourceFile = null;
             selectedEditor = "java-composition";
@@ -194,11 +247,41 @@
 
         selectedSourceName = sourceName;
         selectedSourceFile = await loadJson(`/api/workspaces/${selectedWorkspaceName}/sources/${sourceName}`);
+        savedSourceContents = {
+            ...savedSourceContents,
+            [sourceName]: selectedSourceFile?.content || ""
+        };
         selectedEditor = editorId || `source:${sourceName}`;
         javaCompileResult = null;
     }
 
-    function openEditor(editorId) {
+    function clearSelectedSource() {
+        const nextState = clearSelectedSourceState({
+            selectedSourceName,
+            selectedSourceFile,
+            javaCompileResult
+        });
+
+        selectedSourceName = nextState.selectedSourceName;
+        selectedSourceFile = nextState.selectedSourceFile;
+        javaCompileResult = nextState.javaCompileResult;
+    }
+
+    async function closeCompositionSourceEditor() {
+        await guardConfigurationTransition(async () => {
+            selectedCompositionFlowNode = null;
+            clearSelectedSource();
+        }, "__close-composition-source__");
+    }
+
+    async function closePolicySourceEditor() {
+        await guardConfigurationTransition(async () => {
+            clearSelectedSource();
+            await openJavaPolicies();
+        }, "__close-policy-source__");
+    }
+
+    function openEditorImmediate(editorId) {
         selectedSourceName = "";
         selectedSourceFile = null;
         selectedEditor = editorId;
@@ -208,31 +291,41 @@
         }
     }
 
-    function openTestSettings() {
-        openEditor("test-settings");
+    async function openEditor(editorId) {
+        if (selectedEditor === editorId) {
+            return;
+        }
+
+        await guardConfigurationTransition(async () => {
+            openEditorImmediate(editorId);
+        }, editorId);
     }
 
-    function openVisualSettings() {
-        openEditor("settings-form");
+    async function openTestSettings() {
+        await openEditor("test-settings");
+    }
+
+    async function openVisualSettings() {
+        await openEditor("settings-form");
         if (!selectedSettingsGroupId && workspaceDocument?.settingsGroups?.length > 0) {
             selectedSettingsGroupId = workspaceDocument.settingsGroups[0].id;
         }
     }
 
-    function openPoliciesProperties() {
-        openEditor("policies-properties");
+    async function openPoliciesProperties() {
+        await openEditor("policies-properties");
     }
 
-    function openCompositionProperties() {
-        openEditor("composition-properties");
+    async function openCompositionProperties() {
+        await openEditor("composition-properties");
     }
 
-    function openJavaPolicies() {
-        openEditor("java-policies");
+    async function openJavaPolicies() {
+        await openEditor("java-policies");
     }
 
-    function openJavaComposition() {
-        openEditor("java-composition");
+    async function openJavaComposition() {
+        await openEditor("java-composition");
     }
 
     async function refreshWorkspaceDocument() {
@@ -241,6 +334,14 @@
         }
 
         workspaceDocument = await loadJson(`/api/workspaces/${selectedWorkspaceName}`);
+        savedTestSettingsContent = workspaceDocument?.testSettings?.content || "";
+        savedCompositionPropertiesContent = workspaceDocument?.compositionProperties?.content || "";
+        savedPoliciesPropertiesContent = workspaceDocument?.policiesProperties?.content || "";
+        visualSettingsDirty = false;
+        selectedWorkspaceSutConnectorValue = normalizeSettingDisplayValue(
+            parsePropertiesContent(workspaceDocument?.testSettings?.content || "").SUTConnectorValue
+                || workspaceSettingValue("SUTConnectorValue")
+        );
     }
 
     async function restoreEditorState(editorId, sourceName) {
@@ -279,6 +380,8 @@
             await refreshWorkspaceDocument();
             await restoreEditorState(activeEditorId, activeSourceName);
             await refreshScriptlessStatus();
+            savedTestSettingsContent = workspaceDocument?.testSettings?.content || "";
+            visualSettingsDirty = false;
             showTemporaryMessage("Workspace file saved.");
         } catch (saveError) {
             reportClientError(`Unable to save ${endpoint}`, saveError);
@@ -325,7 +428,7 @@
 
     async function compileSelectedJavaSource() {
         if (!selectedWorkspaceName || !selectedSourceFile?.name) {
-            return;
+            return null;
         }
 
         saving = true;
@@ -339,8 +442,10 @@
                     method: "POST"
                 }
             );
+            return javaCompileResult;
         } catch (compileError) {
             reportClientError(`Unable to compile Java source ${selectedSourceFile.name}`, compileError);
+            return null;
         } finally {
             saving = false;
         }
@@ -348,7 +453,7 @@
 
     async function compileWorkspaceProfile() {
         if (!selectedWorkspaceName) {
-            return;
+            return null;
         }
 
         saving = true;
@@ -362,8 +467,10 @@
                     method: "POST"
                 }
             );
+            return javaCompileResult;
         } catch (compileError) {
             reportClientError(`Unable to compile workspace profile ${selectedWorkspaceName}`, compileError);
+            return null;
         } finally {
             saving = false;
         }
@@ -498,6 +605,7 @@
 
         setting.value = setting.defaultValue || "";
         setting.regexValidation = null;
+        visualSettingsDirty = true;
         touchWorkspaceDocument();
         regexValidationResults = {
             ...regexValidationResults,
@@ -577,31 +685,67 @@
         }
     }
 
-    function navigateToConfiguration() {
-        currentPage = "configuration";
+    async function navigateToConfiguration() {
+        if (currentPage === "configuration") {
+            return;
+        }
+
+        await guardConfigurationTransition(async () => {
+            currentPage = "configuration";
+        });
     }
 
-    function navigateToRun() {
-        currentPage = "run";
+    async function navigateToRun() {
+        if (currentPage === "run") {
+            return;
+        }
+
+        await guardConfigurationTransition(async () => {
+            currentPage = "run";
+        });
     }
 
-    function navigateToCli() {
-        currentPage = "cli";
+    async function navigateToCli() {
+        if (currentPage === "cli") {
+            return;
+        }
+
+        await guardConfigurationTransition(async () => {
+            currentPage = "cli";
+        });
     }
 
     async function navigateToSpy() {
-        currentPage = "spy";
-        await refreshRemoteSpyStatus();
+        if (currentPage === "spy") {
+            return;
+        }
+
+        await guardConfigurationTransition(async () => {
+            currentPage = "spy";
+            await refreshRemoteSpyStatus();
+        });
     }
 
-    function navigateToResults() {
-        currentPage = "results";
-        loadResults(resultSource);
+    async function navigateToResults() {
+        if (currentPage === "results") {
+            return;
+        }
+
+        await guardConfigurationTransition(async () => {
+            currentPage = "results";
+            loadResults(resultSource);
+        });
     }
 
     async function navigateToLogs() {
-        currentPage = "logs";
-        await loadDebugFiles();
+        if (currentPage === "logs") {
+            return;
+        }
+
+        await guardConfigurationTransition(async () => {
+            currentPage = "logs";
+            await loadDebugFiles();
+        });
     }
 
     function openStateModelExternalTab(url = STATE_MODEL_URL) {
@@ -616,9 +760,42 @@
         return workspaceSummary?.availableInCli === true;
     }
 
+    function workspaceSupportsCli() {
+        if (workspaceAvailableInCli()) {
+            return true;
+        }
+
+        return selectedWorkspaceName.startsWith("cli_");
+    }
+
+    function workspaceSettingValue(settingKey) {
+        for (const settingsGroup of workspaceDocument?.settingsGroups || []) {
+            for (const setting of settingsGroup.settings || []) {
+                if (setting.key === settingKey) {
+                    return setting.value || "";
+                }
+            }
+        }
+
+        return "";
+    }
+
+    function normalizeSettingDisplayValue(value) {
+        const text = String(value || "").trim();
+        if (text.length >= 2) {
+            const hasDoubleQuotes = text.startsWith("\"") && text.endsWith("\"");
+            const hasSingleQuotes = text.startsWith("'") && text.endsWith("'");
+            if (hasDoubleQuotes || hasSingleQuotes) {
+                return text.slice(1, -1).trim();
+            }
+        }
+
+        return text;
+    }
+
     function workspaceSelectionInvalidForCurrentPage() {
         if (currentPage === "cli") {
-            return !workspaceAvailableInCli();
+            return !workspaceSupportsCli();
         }
 
         if (currentPage === "run" || currentPage === "spy") {
@@ -626,6 +803,199 @@
         }
 
         return false;
+    }
+
+    function settingsEditorId(editorId) {
+        return editorId === "settings-form" || editorId === "test-settings";
+    }
+
+    function settingsEditorSelected() {
+        return settingsEditorId(selectedEditor);
+    }
+
+    function hasSettingsChanges() {
+        const persistedContent = savedTestSettingsContent || "";
+        const currentContent = workspaceDocument?.testSettings?.content || "";
+        if (currentContent !== persistedContent) {
+            return true;
+        }
+
+        return visualSettingsDirty;
+    }
+
+    function hasCompositionPropertiesChanges() {
+        return (workspaceDocument?.compositionProperties?.content || "") !== (savedCompositionPropertiesContent || "");
+    }
+
+    function hasPoliciesPropertiesChanges() {
+        return (workspaceDocument?.policiesProperties?.content || "") !== (savedPoliciesPropertiesContent || "");
+    }
+
+    function hasSelectedSourceChanges(categoryNames) {
+        if (!selectedSourceFile?.name || !categoryNames.includes(selectedSourceFile.category)) {
+            return false;
+        }
+
+        return (selectedSourceFile.content || "") !== (savedSourceContents[selectedSourceFile.name] || "");
+    }
+
+    function configurationDirtyAreas() {
+        return {
+            settings: hasSettingsChanges(),
+            "composition-file": hasCompositionPropertiesChanges(),
+            "composition-flow": hasSelectedSourceChanges(["service", "capability"]),
+            "policies-file": hasPoliciesPropertiesChanges(),
+            "policies-flow": hasSelectedSourceChanges(["policy"])
+        };
+    }
+
+    function activeGuardDialogDetails() {
+        if (settingsEditorSelected()) {
+            return {
+                title: "Unsaved Settings Changes",
+                message: "Detected unsaved settings changes. Save them before continuing, discard them, or cancel this navigation.",
+                saveLabel: "Save"
+            };
+        }
+
+        if (selectedEditor === "composition-properties") {
+            return {
+                title: "Unsaved Composition File Changes",
+                message: "Detected unsaved composition.properties changes. Save them before continuing, discard them, or cancel this navigation.",
+                saveLabel: "Save"
+            };
+        }
+
+        if (selectedEditor === "policies-properties") {
+            return {
+                title: "Unsaved Policies File Changes",
+                message: "Detected unsaved policies.properties changes. Save them before continuing, discard them, or cancel this navigation.",
+                saveLabel: "Save"
+            };
+        }
+
+        if (selectedEditor === "java-composition") {
+            return {
+                title: "Unsaved and Uncompiled Composition Changes",
+                message: "Detected unsaved Java composition changes. Save and compile before continuing, discard them, or cancel this navigation.",
+                saveLabel: "Save and Compile"
+            };
+        }
+
+        if (selectedEditor === "java-policies") {
+            return {
+                title: "Unsaved and Uncompiled Policy Changes",
+                message: "Detected unsaved Java policy changes. Save and compile before continuing, discard them, or cancel this navigation.",
+                saveLabel: "Save and Compile"
+            };
+        }
+
+        return {
+            title: "Unsaved Changes",
+            message: "Detected unsaved changes. Save them before continuing, discard them, or cancel this navigation.",
+            saveLabel: "Save"
+        };
+    }
+
+    async function saveCurrentSettingsEditor() {
+        if (selectedEditor === "settings-form") {
+            await saveVisualSettings();
+            return;
+        }
+
+        if (selectedEditor === "test-settings" && workspaceDocument?.testSettings) {
+            await saveWorkspaceFile(
+                `/api/workspaces/${selectedWorkspaceName}/test-settings`,
+                workspaceDocument.testSettings.content
+            );
+        }
+    }
+
+    async function saveCurrentGuardedEditor() {
+        if (settingsEditorSelected()) {
+            await saveCurrentSettingsEditor();
+            return true;
+        }
+
+        if (selectedEditor === "composition-properties" && workspaceDocument?.compositionProperties) {
+            await saveWorkspaceFile(
+                `/api/workspaces/${selectedWorkspaceName}/composition-properties`,
+                workspaceDocument.compositionProperties.content
+            );
+            return true;
+        }
+
+        if (selectedEditor === "policies-properties" && workspaceDocument?.policiesProperties) {
+            await saveWorkspaceFile(
+                `/api/workspaces/${selectedWorkspaceName}/policies-properties`,
+                workspaceDocument.policiesProperties.content
+            );
+            return true;
+        }
+
+        if (selectedEditor === "java-composition" || selectedEditor === "java-policies") {
+            const selectedSourceCategories = selectedEditor === "java-composition"
+                ? ["service", "capability"]
+                : ["policy"];
+            const compileResult = selectedSourceFile?.name && selectedSourceCategories.includes(selectedSourceFile.category)
+                ? await compileSelectedJavaSource()
+                : await compileWorkspaceProfile();
+            return compileResult?.success === true;
+        }
+
+        return true;
+    }
+
+    function hasCurrentGuardedChanges() {
+        return shouldGuardConfigurationTransition({
+            currentPage,
+            currentEditor: selectedEditor,
+            nextEditor: "__leave__",
+            dirtyAreas: configurationDirtyAreas()
+        });
+    }
+
+    async function guardConfigurationTransition(action, nextEditor = "__leave__") {
+        if (!shouldGuardConfigurationTransition({
+            currentPage,
+            currentEditor: selectedEditor,
+            nextEditor,
+            dirtyAreas: configurationDirtyAreas()
+        })) {
+            await action();
+            return;
+        }
+
+        pendingConfigurationAction = action;
+        const dialogDetails = activeGuardDialogDetails();
+        openUnsavedSettingsDialog(dialogDetails.title, dialogDetails.message, dialogDetails.saveLabel);
+    }
+
+    async function discardUnsavedConfigurationChanges() {
+        const action = pendingConfigurationAction;
+        await refreshWorkspaceDocument();
+        closeUnsavedSettingsDialog();
+        if (action) {
+            await action();
+        }
+    }
+
+    async function saveUnsavedConfigurationChanges() {
+        const action = pendingConfigurationAction;
+        const saved = await saveCurrentGuardedEditor();
+        if (!saved) {
+            closeUnsavedSettingsDialog();
+            return;
+        }
+
+        if (hasCurrentGuardedChanges()) {
+            return;
+        }
+
+        closeUnsavedSettingsDialog();
+        if (action) {
+            await action();
+        }
     }
 
     async function navigateToStateModel() {
@@ -684,7 +1054,12 @@
     }
 
     function setSettingValue(setting, value) {
+        if (!setting || setting.value === value) {
+            return;
+        }
+
         setting.value = value;
+        visualSettingsDirty = true;
         touchWorkspaceDocument();
     }
 
@@ -929,7 +1304,7 @@
         currentEditorDocument = null;
     } else if (selectedEditor === "test-settings") {
         currentEditorDocument = {
-            title: "Edit test.settings",
+            title: "Edit test.settings file",
             saveLabel: "Save test.settings",
             save: () => saveWorkspaceFile(
                 `/api/workspaces/${selectedWorkspaceName}/test-settings`,
@@ -1220,7 +1595,7 @@
     }
 
     async function startCliManualSession(platform, target) {
-        if (!selectedWorkspaceName || !workspaceAvailableInCli()) {
+        if (!selectedWorkspaceName || !workspaceSupportsCli()) {
             return;
         }
 
@@ -1245,7 +1620,7 @@
     }
 
     async function startCliAgentSession(platform, target) {
-        if (!selectedWorkspaceName || !workspaceAvailableInCli()) {
+        if (!selectedWorkspaceName || !workspaceSupportsCli()) {
             return;
         }
 
@@ -1347,7 +1722,8 @@
         try {
             await refreshInitialData();
             if (workspaces.length > 0) {
-                await loadWorkspace(workspaces[0].name);
+                const defaultWorkspace = workspaces.find((workspace) => workspace.name === "webdriver_generic") || workspaces[0];
+                await loadWorkspace(defaultWorkspace.name);
             }
         } catch (loadError) {
             reportClientError("Unable to initialize Web Studio", loadError);
@@ -1370,7 +1746,12 @@
                 id="page-workspace-select"
                 value={selectedWorkspaceName}
                 class:workspace-select-invalid={workspaceSelectionInvalidForCurrentPage()}
-                on:change={(event) => loadWorkspace(event.currentTarget.value)}
+                on:change={(event) => {
+                    const nextWorkspaceName = event.currentTarget.value;
+                    guardConfigurationTransition(async () => {
+                        await loadWorkspace(nextWorkspaceName);
+                    });
+                }}
             >
                 {#each workspaces as workspace}
                     <option value={workspace.name}>{workspace.name}</option>
@@ -1419,13 +1800,14 @@
             openTestSettings={openTestSettings}
             openVisualSettings={openVisualSettings}
             policySourceFiles={policySourceFiles}
+            closeCompositionSourceEditor={closeCompositionSourceEditor}
+            closePolicySourceEditor={closePolicySourceEditor}
             compileSelectedJavaSource={compileSelectedJavaSource}
             compileWorkspaceProfile={compileWorkspaceProfile}
             createCompositionModuleSource={createCompositionModuleSource}
             createPolicySource={createPolicySource}
             javaCompileResult={javaCompileResult}
             regexValidationResults={regexValidationResults}
-            saveSelectedSource={saveSelectedSource}
             saving={saving}
             setSettingValue={setSettingValue}
             selectSource={selectSource}
@@ -1448,6 +1830,7 @@
             scriptlessStatus={scriptlessStatus}
             selectedWorkspaceName={selectedWorkspaceName}
             selectedWorkspaceAvailableInTestar={workspaceAvailableInTestar()}
+            selectedWorkspaceSutConnectorValue={selectedWorkspaceSutConnectorValue}
             startGenerate={startGenerate}
             stopGenerate={stopGenerate}
         />
@@ -1459,6 +1842,7 @@
             saving={saving}
             selectedWorkspaceName={selectedWorkspaceName}
             selectedWorkspaceAvailableInTestar={workspaceAvailableInTestar()}
+            selectedWorkspaceSutConnectorValue={selectedWorkspaceSutConnectorValue}
             spyState={spyState}
             startRemoteSpyMode={startRemoteSpyMode}
             refreshRemoteSpyMode={refreshRemoteSpyMode}
@@ -1472,18 +1856,20 @@
     {/if}
 
     {#if currentPage === "cli"}
-        <CliModeView
-            cliAgentSettings={cliAgentSettings}
-            cliStatus={cliStatus}
-            saving={saving}
-            saveCliAgentSettings={saveCliAgentSettings}
-            selectedWorkspaceAvailableInCli={workspaceAvailableInCli()}
-            startCliAgentSession={startCliAgentSession}
-            startCliManualSession={startCliManualSession}
-            runCliManualCommand={runCliManualCommand}
-            stopCliAgentSession={stopCliAgentSession}
-            stopCliManualSession={stopCliManualSession}
-        />
+        {#key `cli:${selectedWorkspaceName}`}
+            <CliModeView
+                cliAgentSettings={cliAgentSettings}
+                cliStatus={cliStatus}
+                saving={saving}
+                saveCliAgentSettings={saveCliAgentSettings}
+                selectedWorkspaceAvailableInCli={workspaceSupportsCli()}
+                startCliAgentSession={startCliAgentSession}
+                startCliManualSession={startCliManualSession}
+                runCliManualCommand={runCliManualCommand}
+                stopCliAgentSession={stopCliAgentSession}
+                stopCliManualSession={stopCliManualSession}
+            />
+        {/key}
     {/if}
 
     {#if currentPage === "results"}
@@ -1529,6 +1915,35 @@
                 <div class="composition-modal-actions">
                     <button type="button" class="secondary" on:click={closeStateModelDialog}>
                         Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    {/if}
+
+    {#if unsavedSettingsDialog.open}
+        <div class="composition-modal-backdrop" role="presentation" on:click={closeUnsavedSettingsDialogFromBackdrop}>
+            <div
+                class="composition-modal state-model-dialog"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="unsaved-settings-dialog-title"
+            >
+                <div class="composition-modal-header">
+                    <div>
+                        <h2 id="unsaved-settings-dialog-title">{unsavedSettingsDialog.title}</h2>
+                        <p>{unsavedSettingsDialog.message}</p>
+                    </div>
+                </div>
+                <div class="composition-modal-actions">
+                    <button type="button" on:click={saveUnsavedConfigurationChanges} disabled={saving}>
+                        {unsavedSettingsDialog.saveLabel}
+                    </button>
+                    <button type="button" class="secondary" on:click={discardUnsavedConfigurationChanges} disabled={saving}>
+                        Discard
+                    </button>
+                    <button type="button" class="secondary" on:click={closeUnsavedSettingsDialog} disabled={saving}>
+                        Cancel
                     </button>
                 </div>
             </div>

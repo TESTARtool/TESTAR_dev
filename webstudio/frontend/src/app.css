@@ -176,13 +176,74 @@ h3 {
 
 .status-panel-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: 16px;
     align-items: flex-start;
+    flex-wrap: wrap;
 }
 
 .status-panel-header h2 {
     margin: 0;
+}
+
+.status-panel-title-group {
+    display: grid;
+    grid-template-columns: 180px minmax(0, 1fr);
+    column-gap: 12px;
+    align-items: start;
+    width: min(680px, 100%);
+}
+
+.status-run-indicator {
+    width: 100px;
+    align-self: center;
+}
+
+.status-run-track {
+    height: 12px;
+}
+
+.status-run-progress {
+    width: 100%;
+}
+
+.status-run-label {
+    align-self: center;
+    width: 350px;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.status-panel-context {
+    display: grid;
+    gap: 4px;
+    min-width: 220px;
+    max-width: 420px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(15, 91, 120, 0.12);
+    background: rgba(255, 255, 255, 0.68);
+}
+
+.status-panel-context-label {
+    color: var(--muted);
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.status-panel-context-value {
+    color: var(--text);
+    font-size: 0.88rem;
+    font-weight: 600;
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+.status-panel-header > .button-row:last-child {
+    margin-left: auto;
 }
 
 .status-grid {
@@ -390,7 +451,7 @@ h3 {
 }
 
 .spy-run-indicator {
-    width: 92px;
+    width: 100px;
     align-self: center;
 }
 
@@ -409,6 +470,7 @@ h3 {
     font-size: 0.82rem;
     white-space: nowrap;
     align-self: center;
+    width: 350px;
     text-transform: lowercase;
 }
 

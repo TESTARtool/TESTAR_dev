@@ -3,6 +3,7 @@
     export let saving = false;
     export let selectedWorkspaceName = "";
     export let selectedWorkspaceAvailableInTestar = false;
+    export let selectedWorkspaceSutConnectorValue = "";
     export let spyState = null;
     export let startLocalSpyMode;
     export let startRemoteSpyMode;
@@ -307,9 +308,15 @@
 
 <section class="panel panel-wide status-panel spy-mode-panel">
     <div class="status-panel-header">
-        <div>
-            <p class="eyebrow">Inspector</p>
-            <h2>Spy Mode Run</h2>
+        <div class="status-panel-title-group">
+            <div>
+                <p class="eyebrow">Inspector</p>
+                <h2>Spy Mode Run</h2>
+            </div>
+            <div class="status-panel-context" title={selectedWorkspaceSutConnectorValue || "No SUT configured."}>
+                <span class="status-panel-context-label">SUTConnectorValue</span>
+                <span class="status-panel-context-value">{selectedWorkspaceSutConnectorValue || "No SUT configured."}</span>
+            </div>
         </div>
         <div class="spy-run-indicator" aria-hidden="true">
             <div class="progress-track spy-run-track">

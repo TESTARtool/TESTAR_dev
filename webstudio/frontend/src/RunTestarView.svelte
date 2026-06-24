@@ -5,6 +5,7 @@
     export let scriptlessStatus = null;
     export let selectedWorkspaceName = "";
     export let selectedWorkspaceAvailableInTestar = false;
+    export let selectedWorkspaceSutConnectorValue = "";
     export let startGenerate;
     export let stopGenerate;
 
@@ -42,6 +43,9 @@
     $: testResultsOutcomeProgress = plannedSequenceCount > 0
         ? `${completedSequenceCount}/${plannedSequenceCount}`
         : null;
+    $: generateRunActive = scriptlessStatus?.status === "running";
+    $: generateRunError = scriptlessStatus?.status === "error";
+    $: generateRunLabel = scriptlessStatus?.message || "No scriptless status available.";
 
     $: if (consoleOutputElement && scriptlessStatus?.consoleOutput !== undefined) {
         const currentConsoleOutput = scriptlessStatus.consoleOutput || "";
@@ -58,10 +62,27 @@
 
 <section class="panel panel-wide status-panel">
     <div class="status-panel-header">
-        <div>
-            <p class="eyebrow">Runtime</p>
-            <h2>Generate Mode Run</h2>
+        <div class="status-panel-title-group">
+            <div>
+                <p class="eyebrow">Runtime</p>
+                <h2>Generate Mode Run</h2>
+            </div>
+            <div class="status-panel-context" title={selectedWorkspaceSutConnectorValue || "No SUT configured."}>
+                <span class="status-panel-context-label">SUTConnectorValue</span>
+                <span class="status-panel-context-value">{selectedWorkspaceSutConnectorValue || "No SUT configured."}</span>
+            </div>
         </div>
+        <div class="status-run-indicator" aria-hidden="true">
+            <div class="progress-track status-run-track">
+                <div
+                    class:progress-running={generateRunActive}
+                    class:progress-error={generateRunError}
+                    class:progress-idle={!generateRunActive && !generateRunError}
+                    class="progress-bar status-run-progress"
+                ></div>
+            </div>
+        </div>
+        <span class="status-run-label">{generateRunLabel}</span>
         <div class="button-row">
             <button on:click={startGenerate} disabled={!selectedWorkspaceName || !selectedWorkspaceAvailableInTestar || saving || scriptlessStatus?.status === "running"}>
                 Run Generate Mode
@@ -124,15 +145,6 @@
         <div class="section-header">
             <div>
                 <h3>Console Output</h3>
-                <div class="progress-track">
-                    <div
-                        class:progress-running={scriptlessStatus?.status === "running"}
-                        class:progress-error={scriptlessStatus?.status === "error"}
-                        class:progress-idle={scriptlessStatus?.status !== "running" && scriptlessStatus?.status !== "error"}
-                        class="progress-bar"
-                    ></div>
-                </div>
-                <p class="progress-message">{scriptlessStatus?.message || "No scriptless status available."}</p>
             </div>
         </div>
         <pre bind:this={consoleOutputElement} class="code console-output">{scriptlessStatus?.consoleOutput || "No console output yet."}</pre>
