@@ -76,7 +76,7 @@
                 <div class="cli-mode-section-header">
                     <span class="eyebrow">Target CLI Session</span>
                 </div>
-                <p class="progress-message">Start a CLI session, then inspect state, derive actions, execute actions, and stop the session.</p>
+                <p class="progress-message">Start a CLI session for the selected target.</p>
                 <label class="field-label" for="cli-manual-platform">Platform</label>
                 <select id="cli-manual-platform" bind:value={manualPlatform}>
                     <option value="webdriver">webdriver</option>
@@ -105,12 +105,12 @@
                 </div>
                 <div class="cli-quick-actions cli-quick-actions-grid">
                     <span>Default Control Commands</span>
-                    <button class="secondary" type="button" on:click={() => runCliManualCommand("sessionStatus")} disabled={saving || agentSessionRunning}>sessionStatus</button>
-                    <button class="secondary" type="button" on:click={() => runCliManualCommand("getState")} disabled={saving || agentSessionRunning}>getState</button>
-                    <button class="secondary" type="button" on:click={() => runCliManualCommand("getStateScreenshot")} disabled={saving || agentSessionRunning}>getStateScreenshot</button>
-                    <button class="secondary" type="button" on:click={() => runCliManualCommand("getDerivedActions")} disabled={saving || agentSessionRunning}>getDerivedActions</button>
-                    <button class="secondary" type="button" on:click={() => runCliManualCommand("stopSession")} disabled={saving || agentSessionRunning}>stopSession</button>
-                    <button class="secondary" type="button" on:click={() => runCliManualCommand("shutdownDaemon")} disabled={saving || agentSessionRunning}>stopDaemon</button>
+                    <button class="secondary" type="button" title="sessionStatus" on:click={() => runCliManualCommand("sessionStatus")} disabled={saving || agentSessionRunning}>sessionStatus</button>
+                    <button class="secondary" type="button" title="getState" on:click={() => runCliManualCommand("getState")} disabled={saving || agentSessionRunning}>getState</button>
+                    <button class="secondary" type="button" title="getStateScreenshot" on:click={() => runCliManualCommand("getStateScreenshot")} disabled={saving || agentSessionRunning}>getStateScreenshot</button>
+                    <button class="secondary" type="button" title="getDerivedActions" on:click={() => runCliManualCommand("getDerivedActions")} disabled={saving || agentSessionRunning}>getDerivedActions</button>
+                    <button class="secondary" type="button" title="stopSession" on:click={() => runCliManualCommand("stopSession")} disabled={saving || agentSessionRunning}>stopSession</button>
+                    <button class="secondary" type="button" title="shutdownDaemon" on:click={() => runCliManualCommand("shutdownDaemon")} disabled={saving || agentSessionRunning}>stopDaemon</button>
                 </div>
                 <div class="cli-command-help">
                     <span>Execute Action Examples</span>

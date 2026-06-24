@@ -13,9 +13,13 @@
     </div>
 
     <div class="results-layout">
-        <section class="status-card">
-            <h3>Available Log Files</h3>
-            <div class="source-list result-list">
+        <section class="status-card debug-files-card">
+            <div class="debug-files-header">
+                <h3>Available Log Files</h3>
+                <span>{debugFiles?.length || 0} files</span>
+            </div>
+            <p class="progress-message">Select a log file to inspect. The list scrolls when more files are available.</p>
+            <div class="source-list debug-file-list">
                 {#if debugFiles?.length > 0}
                     {#each debugFiles as debugFile}
                         <button
@@ -27,7 +31,7 @@
                         </button>
                     {/each}
                 {:else}
-                    <p class="progress-message">No debug log files are currently available in the TESTAR runtime directory.</p>
+                    <p class="progress-message debug-file-empty">No debug log files are currently available in the TESTAR runtime directory.</p>
                 {/if}
             </div>
         </section>

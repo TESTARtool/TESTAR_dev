@@ -114,3 +114,50 @@ Acceptance:
 - failed compile from the guard closes the guard dialog
 - failed compile does not execute the pending navigation
 - Java source editor stays visible with compilation diagnostics
+
+### WS-005 CLI Target Session Panel Shows Accidental Tiny Scrollbar
+
+- Area: CLI Mode
+- Status: fixed
+
+Reproduction:
+
+1. Open CLI Mode in the default desktop layout.
+2. Inspect the `Target CLI Session` panel.
+
+Expected:
+
+- static helper text and controls fit without a vertical scrollbar
+
+Bug:
+
+- the panel showed a tiny vertical scrollbar caused by non-essential helper text occupying too much vertical space
+
+Acceptance:
+
+- the static target session panel does not show an accidental scrollbar in the default desktop layout
+- helper text remains concise
+
+### WS-006 Debug Log List Reserved Space Looked Like Uncontrolled Growth
+
+- Area: Inspect Debug Files
+- Status: fixed
+
+Reproduction:
+
+1. Open `Inspect Debug Files`.
+2. Inspect the `Available Log Files` panel.
+
+Expected:
+
+- the list area communicates that it has fixed capacity and scrolls when more files exist
+
+Bug:
+
+- the panel had empty space at the bottom that looked like it would dynamically grow as logs appeared
+
+Acceptance:
+
+- log file rows have fixed height
+- the list area has fixed height and scrolls internally
+- the panel shows file count and explanatory helper text

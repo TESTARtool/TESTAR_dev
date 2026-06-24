@@ -145,6 +145,7 @@
         <div class="section-header">
             <div>
                 <h3>Console Output</h3>
+                <p>Runtime messages and process output for the active Generate execution.</p>
             </div>
         </div>
         <pre bind:this={consoleOutputElement} class="code console-output">{scriptlessStatus?.consoleOutput || "No console output yet."}</pre>
