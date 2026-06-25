@@ -198,6 +198,12 @@ public final class WebStudioServer {
                 context.queryParam("path")
             )
         ));
+        routes.delete("/api/execution/cli/results/{fileName}", context -> handle(context, () ->
+            executionController.deleteCliResultFile(context.queryParam("path"))
+        ));
+        routes.delete("/api/execution/cli/result-groups", context -> handle(context, () ->
+            executionController.deleteCliResultGroup(context.queryParam("path"))
+        ));
         routes.get("/api/execution/cli/result-asset", context -> {
             String assetPath = context.queryParam("path");
             context.contentType(executionController.cliResultAssetContentType(assetPath));
@@ -209,6 +215,12 @@ public final class WebStudioServer {
                 context.pathParam("fileName"),
                 context.queryParam("path")
             )
+        ));
+        routes.delete("/api/execution/scriptless/results/{fileName}", context -> handle(context, () ->
+            executionController.deleteScriptlessResultFile(context.queryParam("path"))
+        ));
+        routes.delete("/api/execution/scriptless/result-groups", context -> handle(context, () ->
+            executionController.deleteScriptlessResultGroup(context.queryParam("path"))
         ));
         routes.get("/api/execution/scriptless/result-asset", context -> {
             String assetPath = context.queryParam("path");

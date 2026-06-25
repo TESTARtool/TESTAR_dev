@@ -1379,11 +1379,11 @@
 
     async function selectResultGroup(resultGroup) {
         selectedResultGroup = resultGroup;
-        if (resultGroup?.files?.length > 0) {
-            await loadResultFile(resultGroup.files[0]);
-        } else {
-            selectedResultFile = null;
-        }
+        selectedResultFile = null;
+    }
+
+    function showResultSummary() {
+        selectedResultFile = null;
     }
 
     async function loadResultFile(resultFile) {
@@ -1410,6 +1410,58 @@
         }
 
         await loadResults(source);
+    }
+
+    function applyRefreshedResults(refreshedResults, preferredGroupPath = "") {
+        resultsData = refreshedResults;
+        const resultGroups = resultsData?.groups || [];
+        if (resultGroups.length > 0) {
+            selectedResultGroup = resultGroups.find((resultGroup) => resultGroup.path === preferredGroupPath)
+                || resultGroups[resultGroups.length - 1];
+        } else {
+            selectedResultGroup = null;
+        }
+
+        selectedResultFile = null;
+    }
+
+    async function deleteResultFile(resultFile) {
+        if (!resultFile?.path) {
+            return;
+        }
+
+        try {
+            const resultPath = encodeURIComponent(resultFile.path);
+            const currentGroupPath = selectedResultGroup?.path || "";
+            const refreshedResults = await loadJson(
+                resultSource === "cli"
+                    ? `/api/execution/cli/results/${resultFile.name}?path=${resultPath}`
+                    : `/api/execution/scriptless/results/${resultFile.name}?path=${resultPath}`,
+                { method: "DELETE" }
+            );
+            applyRefreshedResults(refreshedResults, currentGroupPath);
+        } catch (deleteError) {
+            reportClientError(`Unable to delete result file ${resultFile.name}`, deleteError);
+        }
+    }
+
+    async function deleteResultGroup(resultGroup) {
+        if (!resultGroup?.path) {
+            return;
+        }
+
+        try {
+            const resultPath = encodeURIComponent(resultGroup.path);
+            const refreshedResults = await loadJson(
+                resultSource === "cli"
+                    ? `/api/execution/cli/result-groups?path=${resultPath}`
+                    : `/api/execution/scriptless/result-groups?path=${resultPath}`,
+                { method: "DELETE" }
+            );
+            applyRefreshedResults(refreshedResults);
+        } catch (deleteError) {
+            reportClientError(`Unable to delete result output folder ${resultGroup.name}`, deleteError);
+        }
     }
 
     async function startRemoteSpyMode() {
@@ -1899,6 +1951,8 @@
 
     {#if currentPage === "results"}
         <TestResultsView
+            deleteResultFile={deleteResultFile}
+            deleteResultGroup={deleteResultGroup}
             loadResultFile={loadResultFile}
             resultsData={resultsData}
             resultSource={resultSource}
@@ -1906,6 +1960,7 @@
             selectedResultGroup={selectedResultGroup}
             selectResultSource={selectResultSource}
             selectResultGroup={selectResultGroup}
+            showResultSummary={showResultSummary}
         />
     {/if}
 

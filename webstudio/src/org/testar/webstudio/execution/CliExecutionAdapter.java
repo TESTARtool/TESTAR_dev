@@ -338,6 +338,18 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
         }
     }
 
+    public synchronized ScriptlessResultsDto deleteCliResultFile(String filePath) {
+        Path outputDirectory = resolveCliInstallDirectory().resolve("output").toAbsolutePath().normalize();
+        ResultArtifactDeletion.deleteResultFile(outputDirectory, filePath);
+        return cliResults();
+    }
+
+    public synchronized ScriptlessResultsDto deleteCliResultGroup(String groupPath) {
+        Path outputDirectory = resolveCliInstallDirectory().resolve("output").toAbsolutePath().normalize();
+        ResultArtifactDeletion.deleteResultGroup(outputDirectory, groupPath);
+        return cliResults();
+    }
+
     public synchronized Path resolveCliResultAsset(String filePath) {
         if (filePath == null || filePath.isBlank()) {
             throw new IllegalArgumentException("Result asset path is required");

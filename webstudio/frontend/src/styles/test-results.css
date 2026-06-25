@@ -1,6 +1,12 @@
 ﻿.results-workspace {
+    grid-template-rows: minmax(0, 1fr);
+    height: var(--studio-workbench-height);
     min-height: var(--studio-workbench-height);
     max-height: var(--studio-workbench-height);
+    overflow: hidden;
+}
+
+.studio-layout > .results-workspace {
     overflow: hidden;
 }
 
@@ -8,22 +14,48 @@
     display: grid;
     grid-template-columns: minmax(340px, 500px) minmax(0, 1fr);
     gap: 8px;
-    min-height: 100%;
+    height: 100%;
+    min-height: 0;
     max-height: 100%;
+    overflow: hidden;
 }
 
 .results-sidebar {
-    display: grid;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
     gap: 8px;
-    align-content: start;
+    height: 100%;
     min-height: 0;
-    overflow-y: auto;
+    max-height: 100%;
+    overflow: hidden;
     padding-right: 10px;
 }
 
 .results-sidebar-section {
-    display: grid;
-    gap: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.results-sidebar-section:first-child {
+    flex: 4 1 0;
+}
+
+.results-sidebar-section:last-child {
+    flex: 6 1 0;
+}
+
+.results-sidebar-section .result-list {
+    flex: 1 1 0;
+    min-height: 0;
+    max-height: 100%;
+    height: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    align-content: start;
 }
 
 .results-source-header {
@@ -37,8 +69,42 @@
     justify-content: flex-end;
 }
 
-.results-sidebar-section:last-child {
-    margin-top: 8px;
+.results-filter-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.results-filter-row-single {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.results-filter-row label {
+    display: grid;
+    gap: 4px;
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.results-filter-row select {
+    min-height: 34px;
+    padding: 6px 8px;
+    font-size: 0.8rem;
+}
+
+.results-delete-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.results-delete-actions button,
+.results-source-header > button {
+    min-height: 34px;
+    padding: 7px 10px;
+    font-size: 0.78rem;
 }
 
 .results-report-panel {
@@ -52,7 +118,7 @@
     display: flex;
     justify-content: space-between;
     gap: 16px;
-    align-items: flex-start;
+    align-items: center;
 }
 
 .results-report-header p {
@@ -111,3 +177,18 @@
     height: 100%;
 }
 
+.results-empty-state {
+    height: 100%;
+}
+
+.results-delete-dialog-target {
+    display: block;
+    margin: 12px auto;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    text-align: center;
+}
+
+.results-delete-dialog-actions {
+    justify-content: flex-end;
+}

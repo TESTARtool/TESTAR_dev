@@ -90,6 +90,14 @@ public final class ExecutionController {
         return cliExecutionAdapter().readCliResultFile(fileName, filePath);
     }
 
+    public ScriptlessResultsDto deleteCliResultFile(String filePath) {
+        return cliExecutionAdapter().deleteCliResultFile(filePath);
+    }
+
+    public ScriptlessResultsDto deleteCliResultGroup(String groupPath) {
+        return cliExecutionAdapter().deleteCliResultGroup(groupPath);
+    }
+
     public byte[] cliResultAsset(String filePath) {
         try {
             return Files.readAllBytes(cliExecutionAdapter().resolveCliResultAsset(filePath));
@@ -120,6 +128,14 @@ public final class ExecutionController {
 
     public ResultFileDto scriptlessResultFile(String fileName, String filePath) {
         return scriptlessExecutionAdapter().readScriptlessResultFile(fileName, filePath);
+    }
+
+    public ScriptlessResultsDto deleteScriptlessResultFile(String filePath) {
+        return scriptlessExecutionAdapter().deleteScriptlessResultFile(filePath);
+    }
+
+    public ScriptlessResultsDto deleteScriptlessResultGroup(String groupPath) {
+        return scriptlessExecutionAdapter().deleteScriptlessResultGroup(groupPath);
     }
 
     public byte[] scriptlessResultAsset(String filePath) {

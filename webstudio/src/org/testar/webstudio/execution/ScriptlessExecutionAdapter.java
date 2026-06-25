@@ -211,6 +211,18 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         }
     }
 
+    public synchronized ScriptlessResultsDto deleteScriptlessResultFile(String filePath) {
+        Path outputDirectory = resolveInstallBinDirectory().resolve("output").toAbsolutePath().normalize();
+        ResultArtifactDeletion.deleteResultFile(outputDirectory, filePath);
+        return scriptlessResults();
+    }
+
+    public synchronized ScriptlessResultsDto deleteScriptlessResultGroup(String groupPath) {
+        Path outputDirectory = resolveInstallBinDirectory().resolve("output").toAbsolutePath().normalize();
+        ResultArtifactDeletion.deleteResultGroup(outputDirectory, groupPath);
+        return scriptlessResults();
+    }
+
     public synchronized Path resolveScriptlessResultAsset(String filePath) {
         if (filePath == null || filePath.isBlank()) {
             throw new IllegalArgumentException("Result asset path is required");

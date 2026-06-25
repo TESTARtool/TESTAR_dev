@@ -31,6 +31,36 @@
     overflow: hidden;
 }
 
+.results-summary-dashboard {
+    display: grid;
+    grid-template-columns: minmax(360px, 1fr) minmax(220px, 0.45fr);
+    gap: 14px;
+    height: 100%;
+    min-height: 0;
+}
+
+.results-run-metadata {
+    display: grid;
+    gap: 10px;
+    align-content: start;
+}
+
+.results-run-metadata article {
+    display: grid;
+    gap: 6px;
+    padding: 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(35, 52, 79, 0.1);
+    background: rgba(255, 255, 255, 0.78);
+}
+
+.results-run-metadata strong {
+    color: var(--text);
+    font-size: 1rem;
+    line-height: 1.35;
+    word-break: break-word;
+}
+
 .results-summary-header {
     display: flex;
     gap: 16px;

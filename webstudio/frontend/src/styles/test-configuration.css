@@ -979,11 +979,12 @@
 }
 
 .state-model-dialog {
-    width: min(720px, 100%);
+    width: min(999px, 100%);
 }
 
 .state-model-dialog p {
     margin: 8px 0 0;
+    margin-bottom: 16px;
     color: var(--muted);
     line-height: 1.6;
 }

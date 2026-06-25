@@ -237,20 +237,52 @@ The results page should provide fast visual understanding of output health.
 
 Expected behavior:
 
-- output source can switch between Generate and CLI
+- the left panel contains `Output Results`
+- `Output Results` allows switching between Generate and CLI
+- `Output Results` includes sorting and filtering controls without hiding the selected source context
+- the left panel also contains `Generated Files` for the selected output result
+- selecting an output result folder shows a run-level verdict outcome summary in the right preview area
+- selecting an output result folder does not automatically select the first generated file
+- selecting a generated file replaces the summary with the HTML report preview
+- the user can return from HTML report preview to the run-level verdict outcome summary
+- output folders can be sorted, with latest first as the default
+- output folders can be filtered without deleting or modifying files
+- generated files can be filtered without deleting or modifying files
 - green/red status color is consistent
 - selected result remains visually distinct
-- verdict outcome summary has fixed height
-- failure type rows scroll internally
-- generated files panel has fixed height
+- summary cards have fixed or predictable height
+- failure type rows scroll internally when needed
+- generated files panel has fixed height and scrolls internally when needed
 - generated file rows keep fixed or predictable size
 - report preview uses the remaining stable area
+- destructive delete actions are not embedded as tiny accidental row buttons
+- delete actions use a modal confirmation
+- unclear confirmation always cancels deletion
+- empty states keep the left panel visible and replace stale preview content with clear guidance
 
 Avoid:
 
 - panel height changing based on number of verdicts
 - horizontal scrolling for generated file names where a shorter label, ellipsis, or detail tooltip can preserve context
 - ambiguous color semantics
+- stale selected folders, files, summaries, or HTML reports after filtering or deletion
+
+Deletion confirmation behavior:
+
+- deleting one generated file must name the selected file
+- deleting one output result folder must name the selected folder
+- deleting one output result folder must use stronger wording than deleting one generated file
+- `Cancel` or closing the modal must not delete anything
+- if the user does not clearly confirm the exact destructive action, Web Studio must not delete anything
+- after deleting a generated file, the preview returns to the run-level verdict outcome summary
+- after deleting an output result folder, stale selections are cleared before the list is refreshed
+
+Empty state behavior:
+
+- no output result folders shows an empty message in the right preview area
+- filters hiding all output result folders show an empty filtered-results message
+- no generated files for a selected output folder shows an empty message in the `Generated Files` panel
+- deleting the last output result folder shows the default Test Results empty view
 
 ## State Model UX Contract
 

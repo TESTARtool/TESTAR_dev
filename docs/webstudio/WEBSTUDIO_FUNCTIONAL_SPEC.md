@@ -343,13 +343,93 @@ Workspace compatibility:
 
 ## Test Results
 
-The results page supports:
+The Test Results page supports inspection of Generate and CLI output folders.
+
+### Output Result Selection
+
+The page must support:
 
 - source toggle between Generate and CLI outputs
-- output result group selection
-- generated file selection
-- HTML report rendering
+- output result folder selection
+- output result folder sorting
+- output result folder filtering
+- generated file listing for the selected output folder
+- generated file filtering
 - verdict outcome summarization
+- HTML report rendering
+
+Default behavior:
+
+- output result folders are sorted latest first
+- selecting an output folder shows a run-level verdict outcome summary by default
+- selecting an output folder must not automatically select the first generated file
+- selecting a generated test sequence file manually shows the HTML report rendering
+
+### Results Preview
+
+When an output result folder is selected and no generated file is selected, the right preview area must show a run-level verdict outcome summary.
+
+The summary should include:
+
+- verdict outcomes
+- failure type distribution
+- sequence status overview
+- enough metadata to understand which run is selected
+
+When a generated file is selected, the right preview area must show the corresponding HTML report.
+
+The user must be able to return from the HTML report preview to the run-level verdict outcome summary.
+
+### Empty State
+
+The Test Results page must support an empty state.
+
+The empty state is shown when:
+
+- no output result folders exist for the selected source
+- filters hide all available output result folders
+- the last output result folder was deleted
+
+Expected empty-state behavior:
+
+- the left panel remains visible
+- `Output Results` remains available
+- `Generated Files` shows an empty message
+- the right preview area shows a clear empty-state message
+- no stale folder, file, summary, or HTML report remains selected
+
+### Filtering
+
+Output result folder filtering should support:
+
+- all folders
+- folders with failures
+- folders with only OK sequences
+
+Generated file filtering should support:
+
+- all files
+- failed files
+- OK files
+
+Filtering must not delete files. It only changes visibility in Web Studio.
+
+Removing the filtering category restores the visibility of all folders and files.
+
+### Deletion
+
+The page may support deleting generated result artifacts.
+
+Deletion rules:
+
+- deleting a generated file deletes only the selected test sequence report file
+- deleting an output result folder deletes the whole selected run folder
+- deleting an output result folder is more destructive than deleting a generated file
+- delete actions must require a modal confirmation
+- if confirmation is not explicit and clear, Web Studio must not delete anything
+- after deleting a selected generated file, Web Studio must clear the selected file and return to the run-level verdict outcome summary
+- after deleting a selected output result folder, Web Studio must refresh the output folder list and clear stale selections
+- if deleting an output result folder removes all existing run-level reports, WebStudio must show the default Test Results empty view
 
 ## State Model
 
