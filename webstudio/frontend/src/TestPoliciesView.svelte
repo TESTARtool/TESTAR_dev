@@ -90,7 +90,7 @@
         <div class="section-header">
             <div>
                 <h2>Edit Java Policies</h2>
-                <p>Review the policy classes resolved from policies.properties and create new policy implementations directly from each policy seam.</p>
+                <p>Policies define how TESTAR <strong>derives executable actions</strong> and how <strong>CLI/agent state projection</strong> selects relevant widgets.</p>
             </div>
             <button class="secondary" disabled={saving} on:click={compileWorkspaceProfile}>
                 Compile Profile
@@ -125,6 +125,9 @@
         <section class="manager-card top-gap">
             <div class="policy-definition-columns">
                 <div class="policy-definition-list">
+                    <p class="policy-definition-column-summary">
+                        Interaction policies: clickable, typeable, scrollable, and selectable candidates.
+                    </p>
                     {#each leftPolicyDefinitions() as policyDefinition}
                         <article class="policy-definition-item">
                             <div>
@@ -145,6 +148,9 @@
                     {/each}
                 </div>
                 <div class="policy-definition-list">
+                    <p class="policy-definition-column-summary">
+                        Eligibility policies: visibility, filtering, and top-level checks used to keep candidates valid.
+                    </p>
                     {#each rightPolicyDefinitions() as policyDefinition}
                         <article class="policy-definition-item">
                             <div>
