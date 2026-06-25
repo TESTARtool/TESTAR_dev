@@ -1,0 +1,82 @@
+﻿:root {
+    --bg-top: #f4efe5;
+    --bg-bottom: #dfe6ef;
+    --panel: rgba(255, 255, 255, 0.78);
+    --panel-border: rgba(35, 52, 79, 0.14);
+    --text: #1f2a3a;
+    --muted: #5b6878;
+    --accent: #0f5b78;
+    --shadow: 0 20px 40px rgba(31, 42, 58, 0.08);
+    --radius: 18px;
+    --mono: "Cascadia Code", "Consolas", monospace;
+    --sans: "Segoe UI", "Trebuchet MS", sans-serif;
+    --studio-workbench-height: calc(100vh - 80px);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--sans);
+    color: var(--text);
+    background:
+        radial-gradient(circle at top left, rgba(15, 91, 120, 0.12), transparent 30%),
+        linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+}
+
+h3 {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.page {
+    max-width: 1920px;
+    margin: 0 auto;
+    padding: 10px 10px 10px;
+}
+
+.toast-message {
+    position: fixed;
+    left: 24px;
+    bottom: 24px;
+    z-index: 1000;
+    min-width: 220px;
+    max-width: 360px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(47, 158, 68, 0.28);
+    background: rgba(233, 250, 236, 0.96);
+    color: #1f6b2d;
+    box-shadow: 0 18px 36px rgba(31, 42, 58, 0.12);
+}
+
+.hero {
+    margin-bottom: 28px;
+}
+
+.eyebrow {
+    margin: 0 0 12px;
+    color: var(--accent);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.hero h1 {
+    margin: 0;
+    font-size: clamp(2.4rem, 5vw, 4.4rem);
+    line-height: 0.95;
+}
+
+.intro {
+    max-width: 700px;
+    margin: 16px 0 0;
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+

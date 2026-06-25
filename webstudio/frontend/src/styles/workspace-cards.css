@@ -1,0 +1,58 @@
+﻿.source-item small {
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.reference-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.reference-card {
+    padding: 14px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.86);
+    border: 1px solid rgba(15, 91, 120, 0.12);
+}
+
+.reference-card h3 {
+    margin: 0 0 10px;
+    font-size: 0.95rem;
+    text-transform: capitalize;
+}
+
+.reference-card ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.workspace-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+}
+
+.workspace-card {
+    padding: 16px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(215, 237, 244, 0.85));
+    border: 1px solid rgba(15, 91, 120, 0.12);
+}
+
+.workspace-card h3 {
+    margin: 0 0 8px;
+    font-size: 1rem;
+}
+
+.workspace-card p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+

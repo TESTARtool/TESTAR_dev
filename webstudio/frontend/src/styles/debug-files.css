@@ -1,0 +1,59 @@
+﻿.debug-file-item {
+    width: 100%;
+    min-height: 30px;
+    max-height: 30px;
+    color: var(--text);
+    border: 1px solid rgba(35, 52, 79, 0.12);
+    background: rgba(255, 255, 255, 0.92);
+}
+
+.debug-file-item span {
+    display: block;
+    flex: 1 1 auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.debug-file-item.selected {
+    background: rgba(15, 91, 120, 0.12);
+    border-color: rgba(15, 91, 120, 0.3);
+    outline: none;
+}
+
+.debug-files-card {
+    display: grid;
+    grid-template-rows: auto auto minmax(140px, 140px);
+    gap: 6px;
+}
+
+.debug-files-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.debug-files-header h3 {
+    margin: 0;
+}
+
+.debug-files-header span {
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.debug-file-list {
+    min-height: 140px;
+    max-height: 140px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 6px;
+}
+
+.debug-file-empty {
+    align-self: start;
+}

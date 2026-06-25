@@ -1,0 +1,212 @@
+﻿@media (max-width: 1280px) {
+    .flow-graph-clock {
+        grid-template-columns: minmax(150px, 1fr) minmax(135px, 0.78fr) minmax(165px, 1fr) minmax(165px, 1fr);
+        gap: 12px;
+        min-height: 390px;
+    }
+
+    .flow-node {
+        min-height: 70px;
+        padding: 9px 10px 10px;
+    }
+
+    .flow-node small {
+        font-size: 0.74rem;
+    }
+
+    .flow-badge,
+    .inspector-mode {
+        padding: 3px 7px;
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 1120px) {
+    .flow-circular-stage {
+        column-gap: 22px;
+        width: min(100%, 1080px);
+    }
+
+    .flow-right-step {
+        transform: translateX(-20px);
+    }
+
+    .flow-bottom-step {
+        width: min(100%, 460px);
+        transform: translateX(-44px);
+    }
+
+    .flow-circular-path {
+        stroke-width: 3;
+    }
+}
+
+@media (max-width: 980px) {
+    .settings-field-footer {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .policy-definition-columns {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .composition-flow-header {
+        flex-direction: column;
+    }
+
+    .flow-graph-clock {
+        grid-template-columns: minmax(0, 1fr);
+        min-height: 0;
+        width: min(100%, 560px);
+        margin-left: auto;
+        margin-right: auto;
+        padding: 0;
+    }
+
+    .flow-group,
+    .flow-group-stop,
+    .flow-group-extra {
+        grid-column: 1;
+        grid-area: auto;
+        margin-top: 0;
+        padding-top: 0;
+    }
+
+    .flow-clock-connectors {
+        display: none;
+    }
+
+    .flow-group:not(:last-child)::after {
+        content: "";
+        justify-self: center;
+        width: 2px;
+        height: 24px;
+        background: rgba(15, 91, 120, 0.66);
+    }
+
+    .flow-legend {
+        justify-content: flex-start;
+    }
+
+    .flow-circular-stage {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: none;
+        row-gap: 0;
+        width: min(100%, 560px);
+        padding: 0;
+    }
+
+    .flow-circular-connectors {
+        display: none;
+    }
+
+    .flow-circular-node-slot,
+    .flow-left-step,
+    .flow-bottom-step,
+    .flow-right-step,
+    .flow-extra-step {
+        grid-column: 1;
+        grid-row: auto !important;
+        width: 100%;
+        transform: none;
+    }
+
+    .flow-circular-node-slot:not(:last-child)::after {
+        content: "";
+        justify-self: center;
+        width: 2px;
+        height: 34px;
+        margin: 0 0 0;
+        background: rgba(15, 91, 120, 0.66);
+    }
+}
+
+@media (max-width: 760px) {
+    .layout,
+    .studio-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .status-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .results-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .results-top-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .spy-layout {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+
+    .spy-mode-panel {
+        min-height: auto;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .results-workspace {
+        min-height: auto;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .results-workspace-layout {
+        grid-template-columns: 1fr;
+        min-height: auto;
+        max-height: none;
+    }
+
+    .results-sidebar,
+    .results-report-panel {
+        overflow: visible;
+    }
+
+    .results-report-header {
+        flex-direction: column;
+    }
+
+    .manager-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        position: static;
+    }
+
+    .section-header,
+    .status-panel-header {
+        flex-direction: column;
+    }
+
+    .composition-modal-backdrop {
+        padding: 12px;
+    }
+
+    .composition-modal {
+        max-height: calc(100vh - 24px);
+    }
+
+    .toast-message {
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+        max-width: none;
+    }
+}
+
+@keyframes webstudio-progress-slide {
+    0% {
+        transform: translateX(-110%);
+    }
+
+    100% {
+        transform: translateX(220%);
+    }
+}

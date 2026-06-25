@@ -1,0 +1,216 @@
+﻿.field-label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+select,
+input,
+textarea,
+button {
+    font: inherit;
+}
+
+select,
+input[type="text"],
+input[type="number"],
+input[type="search"] {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--panel-border);
+    background: rgba(255, 255, 255, 0.9);
+}
+
+textarea {
+    width: 100%;
+    min-height: 800px;
+    margin-top: 4px;
+    padding: 14px;
+    resize: vertical;
+    border-radius: 14px;
+    border: 1px solid rgba(35, 52, 79, 0.18);
+    background: rgba(255, 255, 255, 0.92);
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+button {
+    padding: 8px 12px;
+    border: 0;
+    border-radius: 12px;
+    border: 1px solid var(--panel-border);
+    background: #0f5b78;
+    color: white;
+    cursor: pointer;
+}
+
+button.secondary {
+    background: #324052;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.button-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.top-gap {
+    margin-top: 16px;
+}
+
+.composition-flow.top-gap {
+    margin-top: 0px;
+}
+
+.progress-panel {
+    display: grid;
+    gap: 10px;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    font-size: 0.92rem;
+}
+
+.progress-track {
+    overflow: hidden;
+    height: 12px;
+    border-radius: 999px;
+    background: rgba(35, 52, 79, 0.12);
+}
+
+.progress-bar {
+    height: 100%;
+    width: 100%;
+    border-radius: 999px;
+}
+
+.progress-running {
+    width: 45%;
+    background: linear-gradient(90deg, rgba(15, 91, 120, 0.15), rgba(15, 91, 120, 0.95), rgba(15, 91, 120, 0.15));
+    animation: webstudio-progress-slide 1.6s linear infinite;
+}
+
+.progress-error {
+    background: linear-gradient(90deg, #b33939, #d64545);
+}
+
+.progress-idle {
+    background: linear-gradient(90deg, rgba(91, 104, 120, 0.18), rgba(91, 104, 120, 0.28));
+}
+
+.progress-message {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.sequence-graph {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+.run-sequence-graph {
+    max-height: 100%;
+    overflow-y: auto;
+    align-content: start;
+    padding-right: 4px;
+}
+
+.run-outcome-list {
+    display: grid;
+    gap: 0px;
+    grid-auto-rows: 52px;
+    height: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+}
+
+.run-outcome-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    min-height: 40px;
+    max-height: 40px;
+    padding: 6px 8px;
+    border-radius: 12px;
+    border: 1px solid rgba(35, 52, 79, 0.12);
+    background: rgba(255, 255, 255, 0.86);
+    overflow: hidden;
+}
+
+.run-outcome-item-ok {
+    background: linear-gradient(135deg, rgba(47, 158, 68, 0.16), rgba(47, 158, 68, 0.06));
+    border-color: rgba(47, 158, 68, 0.24);
+}
+
+.run-outcome-item-failed {
+    background: linear-gradient(135deg, rgba(201, 42, 42, 0.16), rgba(201, 42, 42, 0.06));
+    border-color: rgba(201, 42, 42, 0.24);
+}
+
+.run-outcome-item-copy {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+}
+
+.run-outcome-item-copy strong {
+    font-size: 0.9rem;
+}
+
+.run-outcome-item-copy span {
+    color: var(--muted);
+    font-size: 0.82rem;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.run-outcome-item-status {
+    flex: 0 0 auto;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.sequence-block {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 42px;
+    min-height: 42px;
+    padding: 8px 10px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 700;
+    box-shadow: 0 10px 20px rgba(31, 42, 58, 0.12);
+}
+
+.sequence-ok {
+    background: linear-gradient(180deg, #2f9e44, #237a33);
+}
+
+.sequence-failed {
+    background: linear-gradient(180deg, #c92a2a, #9f1f1f);
+}
+

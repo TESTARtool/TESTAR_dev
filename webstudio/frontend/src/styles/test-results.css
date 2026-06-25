@@ -1,0 +1,113 @@
+﻿.results-workspace {
+    min-height: var(--studio-workbench-height);
+    max-height: var(--studio-workbench-height);
+    overflow: hidden;
+}
+
+.results-workspace-layout {
+    display: grid;
+    grid-template-columns: minmax(340px, 500px) minmax(0, 1fr);
+    gap: 8px;
+    min-height: 100%;
+    max-height: 100%;
+}
+
+.results-sidebar {
+    display: grid;
+    gap: 8px;
+    align-content: start;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.results-sidebar-section {
+    display: grid;
+    gap: 4px;
+}
+
+.results-source-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+}
+
+.results-source-toggle {
+    justify-content: flex-end;
+}
+
+.results-sidebar-section:last-child {
+    margin-top: 8px;
+}
+
+.results-report-panel {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 14px;
+    min-height: 0;
+}
+
+.results-report-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.results-report-header p {
+    margin: 0;
+}
+
+.results-report-title {
+    color: var(--text);
+    font-size: 0.98rem;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.results-report-meta {
+    max-width: 900px;
+    color: var(--muted);
+    font-size: 0.86rem;
+    line-height: 1.45;
+    text-align: right;
+    word-break: break-word;
+}
+
+.results-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+}
+
+.results-top-layout {
+    display: grid;
+    grid-template-columns: minmax(280px, 0.9fr) minmax(0, 2.1fr);
+    gap: 16px;
+    align-items: stretch;
+}
+
+.code {
+    margin: 0;
+    padding: 14px;
+    border-radius: 12px;
+    background: #17212c;
+    color: #edf6ff;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 0.9rem;
+}
+
+.console-output {
+    height: 480px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.results-preview {
+    min-height: 0;
+    height: 100%;
+}
+

@@ -1,0 +1,163 @@
+﻿.spy-mode-panel {
+    min-height: var(--studio-workbench-height);
+    max-height: var(--studio-workbench-height);
+    overflow: hidden;
+    grid-template-rows: auto minmax(0, 1fr);
+    align-content: start;
+}
+
+.spy-run-indicator {
+    width: 100px;
+    align-self: center;
+}
+
+.spy-run-track {
+    width: 100%;
+    height: 8px;
+}
+
+.spy-run-progress {
+    width: 100%;
+    height: 8px;
+}
+
+.spy-run-label {
+    color: var(--muted);
+    font-size: 0.82rem;
+    white-space: nowrap;
+    align-self: center;
+    width: 350px;
+    text-transform: lowercase;
+}
+
+.spy-local-console {
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    margin: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.spy-local-stage {
+    align-items: stretch;
+    justify-content: stretch;
+    padding: 12px;
+}
+
+.spy-local-stage .spy-local-console {
+    min-height: 0;
+}
+
+.spy-layout {
+    display: grid;
+    grid-template-columns: minmax(280px, 360px) minmax(0, 1fr) minmax(280px, 360px);
+    gap: 16px;
+    min-height: 0;
+    height: 100%;
+    max-height: 100%;
+    align-self: start;
+    align-items: stretch;
+}
+
+.spy-canvas-panel {
+    min-height: 0;
+    height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+}
+
+.spy-inspector-panel {
+    min-height: 0;
+    height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 16px;
+}
+
+.spy-inspector-panel-left {
+    grid-template-rows: minmax(320px, 1.35fr) minmax(180px, 0.65fr);
+}
+
+.spy-inspector-panel-right {
+    grid-template-rows: minmax(0, 1fr);
+}
+
+.spy-inspector-section {
+    min-height: 0;
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    gap: 12px;
+    overflow: hidden;
+}
+
+.spy-inspector-section-widget {
+    grid-template-rows: auto auto auto minmax(0, 1fr);
+}
+
+.spy-inspector-section-actions {
+    grid-template-rows: auto minmax(0, 1fr);
+}
+
+.spy-canvas-panel {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 12px;
+    align-items: stretch;
+    align-content: start;
+}
+
+.spy-canvas-header p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 0.86rem;
+}
+
+.spy-screenshot-stage {
+    position: relative;
+    min-height: 0;
+    height: 100%;
+    max-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 8px;
+    border-radius: 14px;
+    border: 1px solid rgba(15, 91, 120, 0.12);
+    background: rgba(245, 248, 252, 0.8);
+}
+
+.spy-screenshot-frame {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 auto;
+}
+
+.spy-screenshot-button {
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+
+.spy-screenshot-image {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    cursor: crosshair;
+}
+

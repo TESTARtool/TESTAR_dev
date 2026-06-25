@@ -1,0 +1,143 @@
+﻿.spy-widget-outline {
+    position: absolute;
+    border: 2px solid rgba(15, 91, 120, 0.92);
+    background: rgba(15, 91, 120, 0.14);
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+.spy-widget-outline.selected {
+    border-color: rgba(201, 42, 42, 0.96);
+    background: rgba(201, 42, 42, 0.18);
+}
+
+.spy-hover-panel-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.spy-hover-panel-header h4 {
+    margin: 2px 0 0;
+    font-size: 1rem;
+}
+
+.spy-hover-panel-header h3 {
+    margin: 2px 0 0;
+    font-size: 1rem;
+}
+
+.spy-hover-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(201, 42, 42, 0.12);
+    color: #a82222;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.spy-hover-badge-live {
+    background: rgba(15, 91, 120, 0.12);
+    color: var(--accent);
+}
+
+.spy-hover-panel-copy {
+    display: grid;
+    gap: 4px;
+    color: var(--muted);
+    font-size: 0.84rem;
+}
+
+.spy-inspector-copy {
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(245, 248, 252, 0.9);
+    border: 1px solid rgba(35, 52, 79, 0.08);
+}
+
+.spy-action-controls {
+    display: grid;
+    gap: 10px;
+    flex: 0 0 auto;
+}
+
+.spy-direct-type-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: center;
+}
+
+.spy-hover-properties {
+    display: grid;
+    gap: 8px;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+}
+
+.spy-hover-property-row {
+    display: grid;
+    gap: 4px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(245, 248, 252, 0.9);
+    border: 1px solid rgba(35, 52, 79, 0.08);
+}
+
+.spy-hover-property-row strong {
+    font-size: 0.8rem;
+    color: var(--accent);
+}
+
+.spy-hover-property-row span {
+    color: var(--muted);
+    font-size: 0.84rem;
+    word-break: break-word;
+}
+
+.spy-inspector-properties,
+.spy-candidate-list {
+    min-height: 0;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+}
+
+.spy-candidate-list {
+    display: grid;
+    gap: 8px;
+    align-content: start;
+}
+
+.spy-candidate-item {
+    width: 100%;
+    display: grid;
+    justify-items: start;
+    gap: 4px;
+}
+
+.spy-candidate-item small {
+    color: var(--muted);
+    font-size: 0.74rem;
+}
+
+.result-frame {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    border: 1px solid rgba(35, 52, 79, 0.18);
+    border-radius: 12px;
+    background: white;
+}
+
+.metric {
+    margin: 0;
+    font-size: clamp(2rem, 6vw, 4rem);
+    font-weight: 700;
+}
