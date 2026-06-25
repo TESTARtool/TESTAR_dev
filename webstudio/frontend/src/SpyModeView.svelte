@@ -314,7 +314,7 @@
                 <h2>Spy Mode Run</h2>
             </div>
             <div class="status-panel-context" title={selectedWorkspaceSutConnectorValue || "No SUT configured."}>
-                <span class="status-panel-context-label">SUTConnectorValue</span>
+                <span class="status-panel-context-label">SUT_Connector_Value</span>
                 <span class="status-panel-context-value">{selectedWorkspaceSutConnectorValue || "No SUT configured."}</span>
             </div>
         </div>

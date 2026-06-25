@@ -124,6 +124,7 @@ LogOracleFiles =
 #################################################################
 
 AbstractStateAttributes = WidgetControlType,WebWidgetId
+StateObservationMode = FULL_STATE
 
 #################################################################
 # State model inference settings

@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import org.testar.config.ConfigTags;
+import org.testar.config.StateObservationMode;
 import org.testar.config.StateModelTags;
 import org.testar.config.settings.Settings;
 import org.testar.core.CodingManager;
@@ -147,20 +148,24 @@ public final class PlatformOrchestrator {
         // the semantic state shaping step to an already captured state.
         initializeCodingManager(sessionSpec.getSettings());
         SessionPolicyContext sessionPolicyContext = buildSessionPolicyContext(sessionSpec, policyConfiguration);
+        StateObservationMode observationMode = sessionSpec.getSettings().get(
+                ConfigTags.StateObservationMode,
+                StateObservationMode.FULL_STATE
+        );
         switch (sessionSpec.getOperatingSystem()) {
             case ANDROID:
                 return PlatformDefaultSessionConfigurations
                         .androidSemanticStateCompositionPlan(sessionSpec)
-                        .query(state, sessionPolicyContext);
+                        .projectState(state, observationMode, sessionPolicyContext);
             case WINDOWS:
             case WINDOWS_10:
                 return PlatformDefaultSessionConfigurations
                         .windowsSemanticStateCompositionPlan(sessionSpec)
-                        .query(state, sessionPolicyContext);
+                        .projectState(state, observationMode, sessionPolicyContext);
             case WEBDRIVER:
                 return PlatformDefaultSessionConfigurations
                         .webdriverSemanticStateCompositionPlan(sessionSpec)
-                        .query(state, sessionPolicyContext);
+                        .projectState(state, observationMode, sessionPolicyContext);
             default:
                 throw new UnsupportedPlatformException(
                         "Unsupported operating system for CLI projection: " + sessionSpec.getOperatingSystem()

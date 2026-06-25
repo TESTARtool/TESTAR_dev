@@ -81,6 +81,32 @@ The `Edit test.settings file` view is treated as one logical editing area for un
 - `Edit Settings` renders the content of the `test.settings` file into a visual grouped form of settings.
 The `Edit Settings` view is treated as one logical editing area for unsaved-change behavior.
 
+### State Observation Mode
+
+`StateObservationMode` controls how a captured TESTAR state is projected for consumers. Currently, it is applied to CLI/agent state output.
+
+The setting must not redefine the canonical captured state used by TESTAR internals.
+
+Available modes:
+
+- `FULL_STATE`: expose the captured state without observation filtering
+- `LEAF_WIDGETS`: expose leaf widgets only
+- `SEMANTIC_WIDGETS`: expose widgets selected by the semantic descriptor
+- `INTERACTIVE_WIDGETS`: expose widgets with interaction capability, such as clickable, typeable, scrollable, or selectable widgets
+- `INTERACTIVE_SEMANTIC_WIDGETS`: expose interaction-capable widgets plus semantic widgets
+- `ACTIONABLE_WIDGETS`: expose widgets that are interaction-capable and currently action-eligible
+- `ACTIONABLE_SEMANTIC_WIDGETS`: expose action-eligible widgets plus semantic widgets
+- `TEXTUAL_CONTEXT`: expose semantic textual context
+
+The distinction between interactive and actionable is intentional:
+
+- interactive means the widget has an interaction capability
+- actionable means the widget is interactive and also passes enabled, non-blocked, visible, widget-filter, and top-level policies
+
+The default value is `FULL_STATE`.
+
+The `Edit Settings` view must render `StateObservationMode` as a dropdown using the available enum values.
+
 ## Navigation Rules
 
 ### Workspace Selection

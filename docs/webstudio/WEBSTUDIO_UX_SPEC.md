@@ -192,6 +192,7 @@ Expected behavior:
 - search is global and labelled as `Search in all settings`
 - setting-specific feedback appears near the corresponding setting
 - restore actions only appear for settings that support restore behavior
+- enum settings use dropdowns with concrete values only and must not include a leading blank option
 
 ## Runtime UX Contract
 

@@ -161,3 +161,37 @@ Acceptance:
 - log file rows have fixed height
 - the list area has fixed height and scrolls internally
 - the panel shows file count and explanatory helper text
+
+### WS-007 Settings Dropdowns Rendered Empty Options
+
+- Area: Test Configuration / Edit Settings
+- Status: fixed
+
+Reproduction:
+
+1. Open `Edit Settings`.
+2. Inspect dropdown settings backed by configured option lists, such as `SUTConnector` or `DataStoreType`.
+
+Expected:
+
+- configured dropdown settings show only valid selectable values
+- enum dropdown settings show only enum values
+
+Bug:
+
+- string-backed dropdown settings rendered an empty option before the configured values
+
+Affected settings:
+
+- `SUTConnector`
+- `LlmReasoning`
+- `DataStoreType`
+- `DataStoreMode`
+- `ActionSelectionAlgorithm`
+
+Acceptance:
+
+- configured dropdown settings do not render a blank option
+- enum dropdown settings do not render a blank option
+- optional non-dropdown string settings can still render a blank option
+- regression test `settingsSelectOptions.test.js` passes

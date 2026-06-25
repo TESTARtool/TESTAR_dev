@@ -99,6 +99,9 @@ public final class ConfigTags {
             (Class<List<String>>) (Class<?>) List.class,
             "Specify the widget attributes that you wish to use in constructing the widget and state hash strings. Use a comma separated list.");
 
+    public static final Tag<StateObservationMode> StateObservationMode = Tag.from("StateObservationMode", StateObservationMode.class,
+            "Controls how the captured state is projected for CLI/agents. Interactive and actionable modes use the active Java policies.");
+
     /**
      * Large Language Models settings 
      */

@@ -30,6 +30,7 @@ StateModelStoreWidgets = false
 ResetDataStore = false
 
 AbstractStateAttributes = WidgetControlType,WidgetTitle,WidgetPath
+StateObservationMode = INTERACTIVE_SEMANTIC_WIDGETS
 
 WebClickableClasses =
 WebTypeableClasses = input

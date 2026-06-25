@@ -58,6 +58,7 @@ StateModelStoreWidgets = false
 ResetDataStore = false
 
 AbstractStateAttributes = WidgetControlType
+StateObservationMode = FULL_STATE
 
 AppiumPlatformName = Android
 AppiumIsApkInstalled = false

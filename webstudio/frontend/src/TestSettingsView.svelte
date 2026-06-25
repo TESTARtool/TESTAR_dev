@@ -1,4 +1,6 @@
 <script>
+    import { shouldShowBlankSelectOption } from "./settingsSelectOptions.js";
+
     export let currentEditorDocument = null;
     export let loading = false;
     export let openTestSettings;
@@ -254,7 +256,9 @@
                                                         setSettingValue(setting, event.currentTarget.value);
                                                     }}
                                                 >
-                                                    <option value=""></option>
+                                                    {#if shouldShowBlankSelectOption(setting)}
+                                                        <option value=""></option>
+                                                    {/if}
                                                     {#each setting.options as option}
                                                         <option value={option}>{option}</option>
                                                     {/each}

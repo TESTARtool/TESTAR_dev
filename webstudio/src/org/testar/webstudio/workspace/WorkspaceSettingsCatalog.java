@@ -142,10 +142,11 @@ public final class WorkspaceSettingsCatalog {
             ),
             group(
                 "state-identification",
-                "Abstract Identification",
-                "State abstract identifier attributes.",
+                "Abstract Identification and Observation",
+                "State identity attributes and CLI/agent observation views.",
                 settingsProperties,
-                ConfigTags.AbstractStateAttributes
+                ConfigTags.AbstractStateAttributes,
+                ConfigTags.StateObservationMode
             ),
             /*group(
                 "spy",

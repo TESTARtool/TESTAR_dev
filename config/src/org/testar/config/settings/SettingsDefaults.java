@@ -97,6 +97,8 @@ import static org.testar.config.ConfigTags.Sequences;
 import static org.testar.config.ConfigTags.ShowVisualSettingsDialogOnStartup;
 import static org.testar.config.ConfigTags.SpyTagAttributes;
 import static org.testar.config.ConfigTags.StartupTime;
+import static org.testar.config.ConfigTags.StateObservationMode;
+import static org.testar.config.StateObservationMode.FULL_STATE;
 import static org.testar.config.ConfigTags.StopGenerationOnFault;
 import static org.testar.config.ConfigTags.SuspiciousProcessOutput;
 import static org.testar.config.ConfigTags.SuspiciousTags;
@@ -208,6 +210,7 @@ public class SettingsDefaults {
                 add("WidgetControlType");
             }
         }));
+        defaults.add(Pair.from(StateObservationMode, FULL_STATE));
 
         defaults.add(Pair.from(WebClickableClasses, new ArrayList<String>() {
             {

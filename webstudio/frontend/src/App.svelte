@@ -17,6 +17,7 @@
     let selectedWorkspaceSummary = null;
     let workspaceDocument = null;
     let selectedWorkspaceSutConnectorValue = "";
+    let selectedWorkspaceObservationMode = "";
     let selectedSourceName = "";
     let selectedSourceFile = null;
     let cliStatus = null;
@@ -196,6 +197,7 @@
             selectedWorkspaceName = "";
             workspaceDocument = null;
             selectedWorkspaceSutConnectorValue = "";
+            selectedWorkspaceObservationMode = "";
             savedTestSettingsContent = "";
             visualSettingsDirty = false;
             selectedSourceName = "";
@@ -223,6 +225,10 @@
             selectedWorkspaceSutConnectorValue = normalizeSettingDisplayValue(
                 parsePropertiesContent(workspaceDocument?.testSettings?.content || "").SUTConnectorValue
                     || workspaceSettingValue("SUTConnectorValue")
+            );
+            selectedWorkspaceObservationMode = normalizeSettingDisplayValue(
+                parsePropertiesContent(workspaceDocument?.testSettings?.content || "").StateObservationMode
+                    || workspaceSettingValue("StateObservationMode")
             );
             selectedSourceName = "";
             selectedSourceFile = null;
@@ -341,6 +347,10 @@
         selectedWorkspaceSutConnectorValue = normalizeSettingDisplayValue(
             parsePropertiesContent(workspaceDocument?.testSettings?.content || "").SUTConnectorValue
                 || workspaceSettingValue("SUTConnectorValue")
+        );
+        selectedWorkspaceObservationMode = normalizeSettingDisplayValue(
+            parsePropertiesContent(workspaceDocument?.testSettings?.content || "").StateObservationMode
+                || workspaceSettingValue("StateObservationMode")
         );
     }
 
@@ -1059,6 +1069,12 @@
         }
 
         setting.value = value;
+        if (setting.key === "SUTConnectorValue") {
+            selectedWorkspaceSutConnectorValue = normalizeSettingDisplayValue(value);
+        }
+        if (setting.key === "StateObservationMode") {
+            selectedWorkspaceObservationMode = normalizeSettingDisplayValue(value);
+        }
         visualSettingsDirty = true;
         touchWorkspaceDocument();
     }
@@ -1862,6 +1878,7 @@
                 cliStatus={cliStatus}
                 saving={saving}
                 saveCliAgentSettings={saveCliAgentSettings}
+                selectedWorkspaceObservationMode={selectedWorkspaceObservationMode}
                 selectedWorkspaceAvailableInCli={workspaceSupportsCli()}
                 startCliAgentSession={startCliAgentSession}
                 startCliManualSession={startCliManualSession}

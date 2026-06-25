@@ -188,10 +188,11 @@ h3 {
 
 .status-panel-title-group {
     display: grid;
-    grid-template-columns: 180px minmax(0, 1fr);
+    grid-template-columns: 180px 420px;
     column-gap: 12px;
     align-items: start;
-    width: min(680px, 100%);
+    flex: 0 0 auto;
+    max-width: 100%;
 }
 
 .status-run-indicator {
@@ -218,8 +219,9 @@ h3 {
 .status-panel-context {
     display: grid;
     gap: 4px;
-    min-width: 220px;
-    max-width: 420px;
+    width: 420px;
+    max-width: 100%;
+    box-sizing: border-box;
     padding: 10px 12px;
     border-radius: 12px;
     border: 1px solid rgba(15, 91, 120, 0.12);
