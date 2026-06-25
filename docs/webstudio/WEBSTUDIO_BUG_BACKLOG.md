@@ -195,3 +195,31 @@ Acceptance:
 - enum dropdown settings do not render a blank option
 - optional non-dropdown string settings can still render a blank option
 - regression test `settingsSelectOptions.test.js` passes
+
+### WS-008 View State Model Did Nothing For Unsupported Workspace
+
+- Area: Navigation / State Model Analysis
+- Status: fixed
+
+Reproduction:
+
+1. Select a workspace that is not available in either the TESTAR runtime or the CLI runtime.
+2. Click `View State Model`.
+
+Expected:
+
+- WebStudio shows a user-facing dialog explaining why state model analysis cannot be opened for the selected workspace
+
+Bug:
+
+- the button action returned silently when the selected workspace was not available in the TESTAR runtime workspace list
+- the check was too strict because CLI workspaces can also generate state models
+
+Acceptance:
+
+- incompatible workspaces show an `Unable To Open State Model` dialog
+- missing workspace selection shows an `Unable To Open State Model` dialog
+- TESTAR-compatible workspaces continue to call the state model open API
+- CLI-compatible workspaces continue to call the state model open API
+- state model analysis resolves datastore paths against the selected workspace runtime home
+- regression test `stateModelNavigation.test.js` passes

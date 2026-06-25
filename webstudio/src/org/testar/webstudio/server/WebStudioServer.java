@@ -249,7 +249,7 @@ public final class WebStudioServer {
             context.result(remoteSpyController.screenshot(screenshotPath));
         });
         routes.post("/api/statemodel/open/{workspace}", context -> handle(context, () ->
-            stateModelAnalysisController.open(context.pathParam("workspace"))
+            stateModelAnalysisController.open(context.pathParam("workspace"), context.queryParam("runtime"))
         ));
     }
 

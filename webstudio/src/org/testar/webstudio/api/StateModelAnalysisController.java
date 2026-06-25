@@ -17,7 +17,7 @@ public final class StateModelAnalysisController {
         this.service = service;
     }
 
-    public StateModelLaunchDto open(String workspaceName) {
-        return service.open(workspaceName);
+    public StateModelLaunchDto open(String workspaceName, String runtime) {
+        return service.open(workspaceName, runtime);
     }
 }

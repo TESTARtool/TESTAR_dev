@@ -9,6 +9,7 @@
     import StateModelIcon from "./icons/StateModelIcon.svelte";
     import { shouldGuardConfigurationTransition } from "./configurationGuard.js";
     import { clearSelectedSourceState } from "./policyEditorState.js";
+    import { stateModelRuntime, stateModelWorkspaceDialog } from "./stateModelNavigation.js";
 
     const STATE_MODEL_URL = "http://localhost:8090/models";
 
@@ -1009,7 +1010,13 @@
     }
 
     async function navigateToStateModel() {
-        if (!selectedWorkspaceName || !workspaceAvailableInTestar()) {
+        const workspaceDialog = stateModelWorkspaceDialog(
+            selectedWorkspaceName,
+            workspaceAvailableInTestar(),
+            workspaceAvailableInCli()
+        );
+        if (workspaceDialog) {
+            openStateModelDialog(workspaceDialog.title, workspaceDialog.message);
             return;
         }
 
@@ -1017,7 +1024,8 @@
         message = "";
 
         try {
-            const response = await loadJson(`/api/statemodel/open/${selectedWorkspaceName}`, {
+            const runtime = stateModelRuntime(currentPage, workspaceAvailableInTestar(), workspaceAvailableInCli());
+            const response = await loadJson(`/api/statemodel/open/${selectedWorkspaceName}?runtime=${encodeURIComponent(runtime)}`, {
                 method: "POST"
             });
             openStateModelExternalTab(response.url || STATE_MODEL_URL);

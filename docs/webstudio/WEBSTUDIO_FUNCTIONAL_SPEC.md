@@ -353,9 +353,33 @@ The results page supports:
 
 ## State Model
 
-The state model action opens the external analysis mode URL after server-side preparation.
+State model generation and analysis are runtime-specific.
 
-If the model is missing, the user sees a friendly modal dialog instead of a raw error.
+Scriptless Generate mode and CLI mode can generate state models when the selected workspace enables state model settings.
+
+The runtime execution is responsible for automatic OrientDB preparation, including download/bootstrap when required by the configured state model storage settings.
+
+`View State Model` opens the external analysis mode URL after server-side preparation.
+
+The user must see a friendly modal dialog instead of raw server or browser console errors when analysis cannot be opened.
+
+### Runtime Resolution
+
+- Each runtime owns its state model storage relative to its runtime home.
+- Scriptless TESTAR runtime home is `testar/target/install/testar/bin`.
+- CLI runtime home is `cli/target/install/testar-cli`.
+- `View State Model` must resolve the selected workspace to the runtime where it is available.
+- If the workspace is available in the TESTAR runtime, analysis uses TESTAR runtime settings and datastore paths.
+- If the workspace is available in the CLI runtime, analysis uses CLI runtime settings and datastore paths.
+- If the same workspace name exists in both runtimes, WebStudio must pass the intended runtime to the state model endpoint.
+- When `View State Model` is clicked from CLI mode, WebStudio must request CLI runtime analysis when the selected workspace is CLI-compatible.
+
+### Error Handling
+
+- If no workspace is selected, WebStudio must show an `Unable To Open State Model` dialog.
+- If the selected workspace is unavailable in both installed runtimes, WebStudio must show an `Unable To Open State Model` dialog.
+- If the selected workspace is available but no generated model exists yet, WebStudio must show a dialog asking the user to run Generate or CLI execution with state model enabled first.
+- If analysis startup fails for another reason, WebStudio must show a user-facing `Unable To Open State Model` dialog and log details server-side.
 
 ## Debug Files
 

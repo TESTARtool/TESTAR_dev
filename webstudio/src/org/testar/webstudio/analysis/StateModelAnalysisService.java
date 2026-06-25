@@ -37,11 +37,14 @@ public final class StateModelAnalysisService {
         this.workspaceService = workspaceService;
     }
 
-    public synchronized StateModelLaunchDto open(String workspaceName) {
-        Path debugLogPath = workspaceService.testarHomeDirectory().resolve("state-model-debug.log");
+    public synchronized StateModelLaunchDto open(String workspaceName, String runtime) {
+        Path runtimeHome = workspaceService.workspaceRuntimeHomeDirectory(workspaceName, runtime);
+        Path debugLogPath = runtimeHome.resolve("state-model-debug.log");
         StateModelDebugLog.install(debugLogPath);
         System.clearProperty("testar.analysis.keepOrientDbOpen");
         StateModelDebugLog.log("Opening state model analysis for workspace: " + workspaceName);
+        StateModelDebugLog.log("Requested state model analysis runtime: " + runtime);
+        StateModelDebugLog.log("State model analysis runtime home: " + runtimeHome);
 
         if (jettyServer != null && jettyServer.isRunning()) {
             StateModelDebugLog.log("Reusing in-process state model analysis server instance.");
@@ -61,8 +64,7 @@ public final class StateModelAnalysisService {
             Settings settings = Settings.loadSettings(new String[0], testSettingsFile.toString());
             validateSettings(settings);
 
-            Path testarHome = workspaceService.testarHomeDirectory();
-            Path graphsDirectory = resolveGraphsDirectory(testarHome, settings);
+            Path graphsDirectory = resolveGraphsDirectory(runtimeHome, settings);
             Files.createDirectories(graphsDirectory);
 
             Config config = new Config();
@@ -72,7 +74,7 @@ public final class StateModelAnalysisService {
             config.setUser(settings.get(StateModelTags.DataStoreUser, ""));
             config.setPassword(settings.get(StateModelTags.DataStorePassword, ""));
             config.setDatabaseDirectory(resolveAgainstTestarHome(
-                testarHome,
+                runtimeHome,
                 settings.get(StateModelTags.DataStoreDirectory, "")
             ).toString());
 

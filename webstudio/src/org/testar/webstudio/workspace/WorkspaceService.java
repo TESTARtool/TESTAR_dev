@@ -89,8 +89,33 @@ public final class WorkspaceService {
         return parent.toAbsolutePath().normalize();
     }
 
+    public Path cliHomeDirectory() {
+        Path parent = cliSettingsRoot.getParent();
+        if (parent == null) {
+            throw new IllegalStateException("Unable to resolve TESTAR CLI home from settings root: " + cliSettingsRoot);
+        }
+
+        return parent.toAbsolutePath().normalize();
+    }
+
     public Path workspaceDirectory(String workspaceName) {
         return resolveWorkspaceDirectory(workspaceName);
+    }
+
+    public Path workspaceRuntimeHomeDirectory(String workspaceName) {
+        return resolveWorkspaceRuntimeHomeDirectory(workspaceName);
+    }
+
+    public Path workspaceRuntimeHomeDirectory(String workspaceName, String runtime) {
+        if ("testar".equalsIgnoreCase(runtime)) {
+            return resolveRuntimeHomeDirectory(workspaceName, settingsRoot, testarHomeDirectory(), "TESTAR");
+        }
+
+        if ("cli".equalsIgnoreCase(runtime)) {
+            return resolveRuntimeHomeDirectory(workspaceName, cliSettingsRoot, cliHomeDirectory(), "CLI");
+        }
+
+        return resolveWorkspaceRuntimeHomeDirectory(workspaceName);
     }
 
     public List<DebugFileSummaryDto> listDebugFiles() {
@@ -349,6 +374,29 @@ public final class WorkspaceService {
         }
 
         throw new IllegalArgumentException("Workspace not found: " + workspaceName);
+    }
+
+    private Path resolveWorkspaceRuntimeHomeDirectory(String workspaceName) {
+        Path testarWorkspaceDirectory = settingsRoot.resolve(workspaceName).normalize();
+        if (testarWorkspaceDirectory.startsWith(settingsRoot) && Files.isDirectory(testarWorkspaceDirectory)) {
+            return testarHomeDirectory();
+        }
+
+        Path cliWorkspaceDirectory = cliSettingsRoot.resolve(workspaceName).normalize();
+        if (cliWorkspaceDirectory.startsWith(cliSettingsRoot) && Files.isDirectory(cliWorkspaceDirectory)) {
+            return cliHomeDirectory();
+        }
+
+        throw new IllegalArgumentException("Workspace not found: " + workspaceName);
+    }
+
+    private Path resolveRuntimeHomeDirectory(String workspaceName, Path root, Path homeDirectory, String runtimeName) {
+        Path workspaceDirectory = root.resolve(workspaceName).normalize();
+        if (!workspaceDirectory.startsWith(root) || !Files.isDirectory(workspaceDirectory)) {
+            throw new IllegalArgumentException("Workspace not found in " + runtimeName + " runtime: " + workspaceName);
+        }
+
+        return homeDirectory;
     }
 
     private List<WorkspaceFileDto> listWorkspaceSourceFiles(
