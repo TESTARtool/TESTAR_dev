@@ -93,18 +93,160 @@
     min-height: 34px;
     padding: 6px 8px;
     font-size: 0.8rem;
+    border-color: rgba(35, 52, 79, 0.12);
+    background: rgba(255, 255, 255, 0.84);
 }
 
 .results-delete-actions {
     display: flex;
     justify-content: flex-end;
+    padding-top: 2px;
+    border-top: 1px solid rgba(35, 52, 79, 0.08);
 }
 
 .results-delete-actions button,
 .results-source-header > button {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
     min-height: 34px;
     padding: 7px 10px;
     font-size: 0.78rem;
+}
+
+.results-delete-actions button.secondary {
+    border-color: rgba(201, 42, 42, 0.16);
+    background: #324052;
+    color: #ffffff;
+}
+
+.results-delete-actions button.secondary:not(:disabled):hover {
+    border-color: rgba(201, 42, 42, 0.28);
+    background: rgba(255, 241, 241, 0.88);
+}
+
+.results-sidebar .result-file-item {
+    justify-content: flex-start;
+    gap: 10px;
+    min-height: 34px;
+    padding: 7px 10px;
+    border-color: rgba(201, 42, 42, 0.16);
+    border-radius: 10px;
+    background: rgba(255, 245, 245, 0.72);
+    box-shadow: none;
+}
+
+.results-sidebar .result-file-item.result-file-ok {
+    border-color: rgba(47, 158, 68, 0.18);
+    background: rgba(244, 252, 245, 0.76);
+}
+
+.results-sidebar .result-file-item.selected {
+    border-color: rgba(201, 42, 42, 0.46);
+    outline: none;
+    box-shadow: inset 0 0 0 1px rgba(201, 42, 42, 0.22);
+}
+
+.results-sidebar .result-file-item.result-file-ok.selected {
+    border-color: rgba(47, 158, 68, 0.42);
+    box-shadow: inset 0 0 0 1px rgba(47, 158, 68, 0.2);
+}
+
+.results-sidebar .result-item-label {
+    display: block;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    color: #3f4a60;
+    font-size: 0.84rem;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.result-list-icon {
+    position: relative;
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
+    color: #647187;
+}
+
+.result-list-icon-folder::before {
+    content: "";
+    position: absolute;
+    left: 1px;
+    top: 5px;
+    width: 14px;
+    height: 9px;
+    border: 1.5px solid currentColor;
+    border-radius: 2px;
+}
+
+.result-list-icon-folder::after {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 3px;
+    width: 7px;
+    height: 4px;
+    border: 1.5px solid currentColor;
+    border-bottom: 0;
+    border-radius: 2px 2px 0 0;
+}
+
+.result-list-icon-file::before {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 1px;
+    width: 10px;
+    height: 14px;
+    border: 1.5px solid currentColor;
+    border-radius: 2px;
+}
+
+.result-list-icon-file::after {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 5px;
+    width: 5px;
+    height: 1.5px;
+    background: currentColor;
+    box-shadow: 0 4px 0 currentColor;
+}
+
+.result-delete-icon {
+    position: relative;
+    flex: 0 0 auto;
+    width: 15px;
+    height: 15px;
+    color: #ff7a7a;
+}
+
+.result-delete-icon::before {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 5px;
+    width: 7px;
+    height: 8px;
+    border: 1.5px solid currentColor;
+    border-top: 0;
+    border-radius: 0 0 2px 2px;
+}
+
+.result-delete-icon::after {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 2px;
+    width: 9px;
+    height: 2px;
+    border-top: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
 }
 
 .results-report-panel {

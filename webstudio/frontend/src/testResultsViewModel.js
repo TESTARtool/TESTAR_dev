@@ -1,15 +1,17 @@
 const verdictPattern = /_V\d+_([^.]+)\.html$/i;
 const verdictColorPalette = [
-    "#c26a2d",
     "#d44949",
-    "#7d5bd6",
-    "#2b7a9a",
-    "#8f4da8",
-    "#d27b2c",
-    "#4f7d47",
-    "#9c4f36",
+    "#f47b32",
+    "#f3bc2f",
+    "#64a83f",
+    "#28b4b7",
+    "#2f85dd",
     "#5a6fc7",
-    "#b6577e"
+    "#7d5bd6",
+    "#a95ad8",
+    "#b6577e",
+    "#8b6f61",
+    "#6f7d8c"
 ];
 
 export function formatResultFileLabel(fileName) {
@@ -66,10 +68,13 @@ export function summarizeResultGroup(resultGroup) {
         .map(([key, count]) => ({
             key,
             label: key,
-            count,
-            color: colorForVerdict(key)
+            count
         }))
-        .sort((left, right) => right.count - left.count || left.label.localeCompare(right.label));
+        .sort((left, right) => right.count - left.count || left.label.localeCompare(right.label))
+        .map((group, index) => ({
+            ...group,
+            color: verdictColorPalette[index % verdictColorPalette.length]
+        }));
 
     return {
         okCount,
@@ -124,16 +129,3 @@ export function filterResultFiles(files, filterMode = "all") {
     });
 }
 
-function colorForVerdict(verdictKey) {
-    if (!verdictKey) {
-        return verdictColorPalette[0];
-    }
-
-    let hash = 0;
-    for (let index = 0; index < verdictKey.length; index += 1) {
-        hash = ((hash << 5) - hash) + verdictKey.charCodeAt(index);
-        hash |= 0;
-    }
-
-    return verdictColorPalette[Math.abs(hash) % verdictColorPalette.length];
-}

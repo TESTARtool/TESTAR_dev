@@ -92,7 +92,8 @@
     $: visibleResultFiles = filterResultFiles(selectedResultGroup?.files || [], fileFilterMode);
     $: resultSummary = summarizeResultGroup(selectedResultGroup);
     $: maxVerdictCount = Math.max(...resultSummary.verdictGroups.map((group) => group.count), 1);
-    $: totalOutcomeCount = Math.max(resultSummary.okCount + resultSummary.failedVerdictCount, 1);
+    $: totalVerdictOutcomeCount = resultSummary.okCount + resultSummary.failedVerdictCount;
+    $: totalOutcomeCount = Math.max(totalVerdictOutcomeCount, 1);
     $: showingReport = selectedResultFile !== null;
 </script>
 
@@ -149,7 +150,8 @@
                                 class="source-item result-file-item"
                                 on:click={() => selectResultGroup(resultGroup)}
                             >
-                                <span>{resultGroup.name}</span>
+                                <span class="result-list-icon result-list-icon-folder" aria-hidden="true"></span>
+                                <span class="result-item-label">{resultGroup.name}</span>
                             </button>
                         {/each}
                     {:else if resultsData?.groups?.length > 0}
@@ -166,6 +168,7 @@
                         disabled={!selectedResultGroup}
                         on:click={openDeleteGroupDialog}
                     >
+                        <span class="result-delete-icon" aria-hidden="true"></span>
                         Delete Output Folder
                     </button>
                 </div>
@@ -196,7 +199,8 @@
                                 title={resultFile.name}
                                 on:click={() => loadResultFile(resultFile)}
                             >
-                                <span>{formatResultFileLabel(resultFile.name)}</span>
+                                <span class="result-list-icon result-list-icon-file" aria-hidden="true"></span>
+                                <span class="result-item-label">{formatResultFileLabel(resultFile.name)}</span>
                             </button>
                         {/each}
                     {:else if selectedResultGroup}
@@ -212,6 +216,7 @@
                         disabled={!selectedResultFile}
                         on:click={openDeleteFileDialog}
                     >
+                        <span class="result-delete-icon" aria-hidden="true"></span>
                         Delete File
                     </button>
                 </div>
@@ -242,32 +247,45 @@
                     <section class="results-summary-dashboard">
                         <section class="results-summary-card">
                             <div class="verdict-summary-grid">
-                                <div class="verdict-summary-header-inline">
-                                    <span class="eyebrow">Verdict Outcomes</span>
-                                    <div class="verdict-summary-totals">
-                                        <span class="verdict-total verdict-total-ok">{resultSummary.okCount} OK</span>
-                                        <span class="verdict-total verdict-total-failed">{resultSummary.failedVerdictCount} FAILED</span>
+                                <div class="results-summary-hero">
+                                    <article class="results-summary-total-card">
+                                        <span class="results-summary-icon">Summary</span>
+                                        <div>
+                                            <strong>{totalVerdictOutcomeCount}</strong>
+                                            <span>Total Outcomes</span>
+                                        </div>
+                                    </article>
+                                    <article class="verdict-total verdict-total-ok">
+                                        <strong>{resultSummary.okCount} OK</strong>
+                                        <span>{((resultSummary.okCount / totalOutcomeCount) * 100).toFixed(1)}%</span>
+                                    </article>
+                                    <article class="verdict-total verdict-total-failed">
+                                        <strong>{resultSummary.failedVerdictCount} FAILED</strong>
+                                        <span>{((resultSummary.failedVerdictCount / totalOutcomeCount) * 100).toFixed(1)}%</span>
+                                    </article>
+                                    <div class="verdict-outcome-track" aria-hidden="true">
+                                        <div
+                                            class="verdict-outcome-segment verdict-outcome-segment-ok"
+                                            style={`width: ${(resultSummary.okCount / totalOutcomeCount) * 100}%`}
+                                        ></div>
+                                        <div
+                                            class="verdict-outcome-segment verdict-outcome-segment-failed"
+                                            style={`width: ${(resultSummary.failedVerdictCount / totalOutcomeCount) * 100}%`}
+                                        ></div>
                                     </div>
                                 </div>
 
-                                <div class="verdict-outcome-track" aria-hidden="true">
-                                    <div
-                                        class="verdict-outcome-segment verdict-outcome-segment-ok"
-                                        style={`width: ${(resultSummary.okCount / totalOutcomeCount) * 100}%`}
-                                    ></div>
-                                    <div
-                                        class="verdict-outcome-segment verdict-outcome-segment-failed"
-                                        style={`width: ${(resultSummary.failedVerdictCount / totalOutcomeCount) * 100}%`}
-                                    ></div>
+                                <div class="verdict-summary-header-inline">
+                                    <span class="eyebrow">Verdict Outcomes</span>
                                 </div>
 
                                 {#if resultSummary.verdictGroups.length > 0}
                                     <div class="verdict-types-scroll">
                                         {#each resultSummary.verdictGroups as verdictGroup}
                                             <article class="verdict-type-row">
+                                                <span class="verdict-type-icon" style={`background: ${verdictGroup.color};`}>!</span>
                                                 <div class="verdict-summary-copy">
                                                     <span class="verdict-summary-label">{verdictGroup.label}</span>
-                                                    <strong>{verdictGroup.count}</strong>
                                                 </div>
                                                 <div class="verdict-summary-bar-track">
                                                     <div
@@ -275,6 +293,8 @@
                                                         style={`width: ${(verdictGroup.count / maxVerdictCount) * 100}%; background: linear-gradient(90deg, ${verdictGroup.color}, ${verdictGroup.color});`}
                                                     ></div>
                                                 </div>
+                                                <strong class="verdict-type-count">{verdictGroup.count}</strong>
+                                                <span class="verdict-type-percent">{((verdictGroup.count / totalOutcomeCount) * 100).toFixed(1)}%</span>
                                             </article>
                                         {/each}
                                     </div>
@@ -282,20 +302,6 @@
                                     <p class="progress-message">No test result files were generated with failures.</p>
                                 {/if}
                             </div>
-                        </section>
-                        <section class="results-run-metadata">
-                            <article>
-                                <span class="eyebrow">Selected Run</span>
-                                <strong>{selectedResultGroup.name}</strong>
-                            </article>
-                            <article>
-                                <span class="eyebrow">Generated Verdict Files</span>
-                                <strong>{selectedResultGroup.files?.length || 0}</strong>
-                            </article>
-                            <article>
-                                <span class="eyebrow">Sequences</span>
-                                <strong>{selectedResultGroup.totalSequenceCount || selectedResultGroup.files?.length || 0}</strong>
-                            </article>
                         </section>
                     </section>
                 {:else}
