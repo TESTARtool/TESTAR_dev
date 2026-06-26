@@ -42,6 +42,7 @@ application {
 tasks.named('run') {
     group = 'application'
     description = 'Run TESTAR Web Studio using the currently available frontend assets.'
+    dependsOn project(':cli').tasks.named('installCliIntoTestarDistribution')
     systemProperty 'testar.webstudio.settingsRoot', configuredWebStudioSettingsRoot
     systemProperty 'testar.webstudio.port', configuredWebStudioPort
 }
@@ -173,6 +174,7 @@ tasks.register('runWebStudioServer', JavaExec) {
     description = 'Run the TESTAR Web Studio backend using the current frontend assets.'
     dependsOn tasks.named('classes')
     dependsOn tasks.named('checkWebStudioFrontendAssets')
+    dependsOn project(':cli').tasks.named('installCliIntoTestarDistribution')
     classpath = sourceSets.main.runtimeClasspath + files(frontendGeneratedResourcesRoot)
     mainClass = application.mainClass
     systemProperty 'testar.webstudio.settingsRoot', configuredWebStudioSettingsRoot
@@ -185,6 +187,7 @@ tasks.register('runWebStudio', JavaExec) {
     description = 'Build the TESTAR Web Studio frontend and then run the backend.'
     dependsOn tasks.named('buildWebStudioFrontend')
     dependsOn tasks.named('classes')
+    dependsOn project(':cli').tasks.named('installCliIntoTestarDistribution')
     classpath = sourceSets.main.runtimeClasspath + files(frontendGeneratedResourcesRoot)
     mainClass = application.mainClass
     systemProperty 'testar.webstudio.settingsRoot', configuredWebStudioSettingsRoot

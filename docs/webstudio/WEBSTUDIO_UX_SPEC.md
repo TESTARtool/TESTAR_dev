@@ -51,7 +51,7 @@ The user should always understand:
 - which workspace/profile is selected
 - which Web Studio page is active, such as Configuration, Generate, Spy, CLI, Results, State Model, or Debug Files
 - which SUT target is configured
-- whether the current profile is compatible with the selected execution mode, such as Generate/Spy vs CLI
+- whether the selected workspace is loaded and which SUT target it configures
 - whether an action is idle, waiting, running, failed, or complete
 
 ### Visual Feedback
@@ -228,7 +228,6 @@ Expected behavior:
 - manual CLI controls, agent settings, and console remain in stable panels
 - console output scrolls internally
 - session start/stop does not shift panels
-- workspace compatibility updates immediately when workspace selection changes
 - command buttons do not overflow horizontally
 
 ## Test Results UX Contract
@@ -238,8 +237,8 @@ The results page should provide fast visual understanding of output health.
 Expected behavior:
 
 - the left panel contains `Output Results`
-- `Output Results` allows switching between Generate and CLI
-- `Output Results` includes sorting and filtering controls without hiding the selected source context
+- `Output Results` reads from the shared Generate and CLI output folder
+- `Output Results` includes sorting and filtering controls
 - the left panel also contains `Generated Files` for the selected output result
 - selecting an output result folder shows a run-level verdict outcome summary in the right preview area
 - selecting an output result folder does not automatically select the first generated file

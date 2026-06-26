@@ -59,7 +59,7 @@ StateModelStoreWidgets = false
 ResetDataStore = false
 
 AbstractStateAttributes = WidgetControlType
-StateObservationMode = FULL_STATE
+StateObservationMode = INTERACTIVE_SEMANTIC_WIDGETS
 
 ProtocolSpecificSetting_1 =
 ProtocolSpecificSetting_2 =

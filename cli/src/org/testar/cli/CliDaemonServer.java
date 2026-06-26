@@ -120,12 +120,15 @@ final class CliDaemonServer {
             CliPreparedSession preparedSession = buildPreparedSession(request);
             replaceActiveSession(preparedSession);
             PlatformSessionSpecification sessionSpec = preparedSession.sessionSpec();
-            return new CliResponse(0, List.of(
-                    "sessionStarted",
-                    "platform=" + sessionSpec.getOperatingSystem().name().toLowerCase(Locale.ROOT),
-                    "pid=" + activeSession.system().get(Tags.PID, -1L),
-                    "desc=" + activeSession.system().get(Tags.Desc, "")
-            ));
+            List<String> lines = new ArrayList<>();
+            lines.add("sessionStarted");
+            lines.add("platform=" + sessionSpec.getOperatingSystem().name().toLowerCase(Locale.ROOT));
+            lines.add("pid=" + activeSession.system().get(Tags.PID, -1L));
+            lines.add("desc=" + activeSession.system().get(Tags.Desc, ""));
+            for (String warning : preparedSession.profileConfiguration().compatibilityWarnings()) {
+                lines.add("warning=" + warning);
+            }
+            return new CliResponse(0, lines);
         } catch (RuntimeException exception) {
             return new CliResponse(1, List.of("startSession failed: " + exception.getMessage()));
         }
@@ -303,11 +306,11 @@ final class CliDaemonServer {
         String target = request.argumentAt(1);
 
         if (platformToken == null) {
-            throw new IllegalArgumentException("Expected: startSession <platform> <target> [profile]");
+            throw new IllegalArgumentException("Expected: startSession <workspace> or startSession <platform> <target> [workspace]");
         }
 
         if (target == null || request.argumentAt(3) != null) {
-            throw new IllegalArgumentException("Expected: startSession <platform> <target> [profile]");
+            throw new IllegalArgumentException("Expected: startSession <workspace> or startSession <platform> <target> [workspace]");
         }
 
         OperatingSystems operatingSystem = parseOperatingSystem(platformToken);
@@ -335,6 +338,31 @@ final class CliDaemonServer {
     }
 
     private CliPreparedSession buildPreparedSession(CliRequest request) {
+        if (request.argumentAt(1) == null) {
+            return buildPreparedSessionFromWorkspace(request);
+        }
+
+        return buildPreparedSessionFromExplicitTarget(request);
+    }
+
+    private CliPreparedSession buildPreparedSessionFromWorkspace(CliRequest request) {
+        String normalizedProfileName = normalizeProfileName(request.argumentAt(0));
+        Settings profileSettings = CliSettingsLoader.loadProfile(normalizedProfileName);
+        CliSessionTarget sessionTarget = CliSessionTargetResolver.resolve(profileSettings);
+        PlatformSessionSpecification sessionSpec = PlatformSessionSpecFactory.create(
+                sessionTarget.operatingSystem(),
+                PlatformSessionSpecification.TargetType.EXECUTABLE,
+                sessionTarget.target(),
+                profileSettings
+        );
+        CliProfileConfiguration profileConfiguration = CliProfileConfigurationLoader.load(
+                normalizedProfileName,
+                profileSettings
+        );
+        return new CliPreparedSession(sessionSpec, profileConfiguration);
+    }
+
+    private CliPreparedSession buildPreparedSessionFromExplicitTarget(CliRequest request) {
         String profileName = request.argumentAt(2);
         String normalizedProfileName = profileName == null || profileName.isBlank()
                 ? CliSettingsLoader.defaultProfileName()
@@ -347,6 +375,14 @@ final class CliDaemonServer {
                 profileSettings
         );
         return new CliPreparedSession(sessionSpec, profileConfiguration);
+    }
+
+    private String normalizeProfileName(String profileName) {
+        if (profileName == null || profileName.isBlank()) {
+            throw new IllegalArgumentException("Expected: startSession <workspace> or startSession <platform> <target> [workspace]");
+        }
+
+        return profileName.trim();
     }
 
     private OperatingSystems parseOperatingSystem(String token) {

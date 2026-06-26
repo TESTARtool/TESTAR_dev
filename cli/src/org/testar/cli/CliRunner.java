@@ -46,9 +46,10 @@ final class CliRunner {
     private void printHelp() {
         output.println("TESTAR CLI");
         output.println("Usage:");
-        output.println("  startSession windows <path>");
-        output.println("  startSession webdriver <url>");
-        output.println("  startSession android <apk>");
+        output.println("  startSession <workspace>");
+        output.println("  startSession windows <path> [workspace]");
+        output.println("  startSession webdriver <url> [workspace]");
+        output.println("  startSession android <apk> [workspace]");
         output.println("  sessionStatus");
         output.println("  getState");
         output.println("  getStateScreenshot");

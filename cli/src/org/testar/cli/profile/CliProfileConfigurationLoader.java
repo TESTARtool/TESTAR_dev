@@ -6,6 +6,7 @@
 
 package org.testar.cli.profile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,14 +38,15 @@ public final class CliProfileConfigurationLoader {
     public static CliProfileConfiguration load(String profileName, Settings settings) {
         String resolvedProfileName = normalizeProfileName(profileName);
         CompositionDescriptor compositionDescriptor = CompositionLoader.loadDescriptor(settings);
-        validateCliSupportedComposition(compositionDescriptor);
+        List<String> compatibilityWarnings = collectCliCompatibilityWarnings(compositionDescriptor);
 
         CliProfileConfiguration profileConfiguration = new CliProfileConfiguration(
                 resolvedProfileName,
                 settings,
                 buildPolicyConfiguration(settings),
                 buildServiceConfiguration(settings, compositionDescriptor),
-                compositionDescriptor
+                compositionDescriptor,
+                compatibilityWarnings
         );
 
         return profileConfiguration;
@@ -132,7 +134,8 @@ public final class CliProfileConfigurationLoader {
                 settings,
                 PolicySessionConfiguration.defaults(),
                 ServiceSessionConfiguration.defaults(),
-                compositionDescriptor
+                compositionDescriptor,
+                List.of()
         );
 
         return ServiceSessionConfiguration.builder()
@@ -166,32 +169,41 @@ public final class CliProfileConfigurationLoader {
         }
     }
 
-    private static void validateCliSupportedComposition(CompositionDescriptor compositionDescriptor) {
-        rejectUnsupported(
+    private static List<String> collectCliCompatibilityWarnings(CompositionDescriptor compositionDescriptor) {
+        List<String> warnings = new ArrayList<>();
+        addUnsupportedWarning(
+                warnings,
                 compositionDescriptor.settingsCapabilityClass(),
                 "CLI profiles do not support settingsCapabilityClass. Use test.settings directly."
         );
-        rejectUnsupported(
+        addUnsupportedWarning(
+                warnings,
                 compositionDescriptor.testSessionCapabilityClass(),
                 "CLI profiles do not support testSessionCapabilityClass."
         );
-        rejectUnsupported(
+        addUnsupportedWarning(
+                warnings,
                 compositionDescriptor.testSequenceCapabilityClass(),
                 "CLI profiles do not support testSequenceCapabilityClass."
         );
-        rejectUnsupported(
+        addUnsupportedWarning(
+                warnings,
                 compositionDescriptor.stopCriteriaCapabilityClass(),
                 "CLI profiles do not support stopCriteriaCapabilityClass."
         );
-        rejectUnsupported(
+        addUnsupportedWarning(
+                warnings,
                 compositionDescriptor.oracleComposerClass(),
                 "CLI profiles do not support oracleComposerClass."
         );
+        return List.copyOf(warnings);
     }
 
-    private static void rejectUnsupported(Optional<String> configuredClass, String message) {
+    private static void addUnsupportedWarning(List<String> warnings,
+                                              Optional<String> configuredClass,
+                                              String message) {
         if (configuredClass.isPresent()) {
-            throw new IllegalStateException(message + " Configured class: " + configuredClass.get());
+            warnings.add(message + " Ignoring configured class: " + configuredClass.get());
         }
     }
 

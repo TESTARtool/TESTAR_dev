@@ -26,10 +26,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Set;
 import java.util.stream.Stream;
 
 public final class ExternalJavaClassSupport {
@@ -48,7 +49,7 @@ public final class ExternalJavaClassSupport {
             if (sourceRoot != null) {
                 Path expectedSource = sourceRoot.resolve(className.replace('.', File.separatorChar) + ".java");
                 if (Files.exists(expectedSource)) {
-                    URLClassLoader classLoader = ensureCompiledClassLoader(sourceRoot);
+                    URLClassLoader classLoader = ensureCompiledClassLoader(sourceRoot, className);
                     return Class.forName(className, true, classLoader);
                 }
             }
@@ -66,39 +67,46 @@ public final class ExternalJavaClassSupport {
                 throw exception;
             }
 
-            URLClassLoader classLoader = ensureCompiledClassLoader(sourceRoot);
+            URLClassLoader classLoader = ensureCompiledClassLoader(sourceRoot, className);
             return Class.forName(className, true, classLoader);
         }
     }
 
-    private static synchronized URLClassLoader ensureCompiledClassLoader(Path sourceRoot) {
+    private static synchronized URLClassLoader ensureCompiledClassLoader(Path sourceRoot, String className) {
         long sourceStamp = computeSourceStamp(sourceRoot);
         String sourceRootKey = sourceRoot.toAbsolutePath().normalize().toString();
 
         LoadedSourceRoot loadedSourceRoot = LOADED_SOURCE_ROOTS.get(sourceRootKey);
-        if (loadedSourceRoot != null && loadedSourceRoot.sourceStamp == sourceStamp) {
+        if (loadedSourceRoot != null
+                && loadedSourceRoot.sourceStamp == sourceStamp
+                && loadedSourceRoot.compiledClassNames.contains(className)) {
             return loadedSourceRoot.classLoader;
         }
 
         Path outputDirectory = runtimeOutputDirectory(sourceRoot);
-        compileSourceRoot(sourceRoot, outputDirectory);
+        compileExternalClass(sourceRoot, outputDirectory, className);
 
         try {
             URLClassLoader classLoader = new URLClassLoader(
                     new URL[]{outputDirectory.toUri().toURL()},
                     ExternalJavaClassSupport.class.getClassLoader()
             );
-            LOADED_SOURCE_ROOTS.put(sourceRootKey, new LoadedSourceRoot(sourceStamp, classLoader));
+            Set<String> compiledClassNames = new HashSet<String>();
+            if (loadedSourceRoot != null && loadedSourceRoot.sourceStamp == sourceStamp) {
+                compiledClassNames.addAll(loadedSourceRoot.compiledClassNames);
+            }
+            compiledClassNames.add(className);
+            LOADED_SOURCE_ROOTS.put(sourceRootKey, new LoadedSourceRoot(sourceStamp, classLoader, compiledClassNames));
             return classLoader;
         } catch (MalformedURLException exception) {
             throw new IllegalStateException("Unable to create class loader for source root: " + sourceRoot, exception);
         }
     }
 
-    private static void compileSourceRoot(Path sourceRoot, Path outputDirectory) {
-        List<File> javaFiles = listJavaFiles(sourceRoot);
+    private static void compileExternalClass(Path sourceRoot, Path outputDirectory, String className) {
+        List<File> javaFiles = listJavaFiles(sourceRoot, className);
         if (javaFiles.isEmpty()) {
-            throw new IllegalStateException("No Java source files found under: " + sourceRoot);
+            throw new IllegalStateException("No Java source file found for " + className + " under: " + sourceRoot);
         }
 
         try {
@@ -118,6 +126,8 @@ public final class ExternalJavaClassSupport {
             List<String> options = new ArrayList<String>();
             options.add("-classpath");
             options.add(System.getProperty("java.class.path"));
+            options.add("-sourcepath");
+            options.add(sourceRoot.toAbsolutePath().toString());
             options.add("-d");
             options.add(outputDirectory.toAbsolutePath().toString());
 
@@ -156,16 +166,13 @@ public final class ExternalJavaClassSupport {
         return builder.toString();
     }
 
-    private static List<File> listJavaFiles(Path sourceRoot) {
-        try (Stream<Path> pathStream = Files.walk(sourceRoot)) {
-            return pathStream
-                    .filter(Files::isRegularFile)
-                    .filter(path -> path.getFileName().toString().endsWith(".java"))
-                    .map(Path::toFile)
-                    .collect(Collectors.toList());
-        } catch (IOException exception) {
-            throw new IllegalStateException("Unable to list Java source files under: " + sourceRoot, exception);
+    private static List<File> listJavaFiles(Path sourceRoot, String className) {
+        Path sourcePath = sourceRoot.resolve(className.replace('.', File.separatorChar) + ".java");
+        if (!Files.isRegularFile(sourcePath)) {
+            return List.of();
         }
+
+        return List.of(sourcePath.toFile());
     }
 
     private static long computeSourceStamp(Path sourceRoot) {
@@ -237,10 +244,12 @@ public final class ExternalJavaClassSupport {
 
         private final long sourceStamp;
         private final URLClassLoader classLoader;
+        private final Set<String> compiledClassNames;
 
-        private LoadedSourceRoot(long sourceStamp, URLClassLoader classLoader) {
+        private LoadedSourceRoot(long sourceStamp, URLClassLoader classLoader, Set<String> compiledClassNames) {
             this.sourceStamp = sourceStamp;
             this.classLoader = classLoader;
+            this.compiledClassNames = compiledClassNames;
         }
     }
 }

@@ -103,31 +103,23 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
         return buildStatus(lastStatus, lastMessage);
     }
 
-    public synchronized ExecutionStatusDto startManualSession(String workspaceName, String platform, String target) {
-        debugLog.log("startManualSession workspace=" + workspaceName + ", platform=" + platform + ", target=" + target);
+    public synchronized ExecutionStatusDto startManualSession(String workspaceName) {
+        debugLog.log("startManualSession workspace=" + workspaceName);
         if (isAgentExecutionRunning()) {
             throw new IllegalStateException("Stop the agent CLI execution before starting a manual CLI session.");
         }
 
         if (workspaceName == null || workspaceName.isBlank()) {
-            throw new IllegalArgumentException("CLI profile is required");
-        }
-
-        if (platform == null || platform.isBlank()) {
-            throw new IllegalArgumentException("CLI platform is required");
-        }
-
-        if (target == null || target.isBlank()) {
-            throw new IllegalArgumentException("CLI target is required");
+            throw new IllegalArgumentException("CLI workspace is required");
         }
 
         currentWorkspace = workspaceName;
         currentCliMode = "manual";
 
-        CliInvocationResult result = invokeCliCommand(List.of("startSession", platform, target, workspaceName), true);
+        CliInvocationResult result = invokeCliCommand(List.of("startSession", workspaceName), true);
         manualSessionExpected = result.exitCode() == 0;
         lastMessage = manualSessionExpected
-            ? "Manual CLI session started for profile " + workspaceName
+            ? "Manual CLI session started for workspace " + workspaceName
             : "Unable to start manual CLI session";
         lastStatus = manualSessionExpected ? "running" : "error";
         return status();
@@ -216,8 +208,8 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
         return buildStatus(lastStatus, lastMessage);
     }
 
-    public synchronized ExecutionStatusDto startAgentSession(String workspaceName, String platform, String target) {
-        debugLog.log("startAgentSession workspace=" + workspaceName + ", platform=" + platform + ", target=" + target);
+    public synchronized ExecutionStatusDto startAgentSession(String workspaceName) {
+        debugLog.log("startAgentSession workspace=" + workspaceName);
         if (manualSessionExpected) {
             throw new IllegalStateException("Stop the manual CLI session before starting an agent CLI execution.");
         }
@@ -227,23 +219,15 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
         }
 
         if (workspaceName == null || workspaceName.isBlank()) {
-            throw new IllegalArgumentException("CLI profile is required");
-        }
-
-        if (platform == null || platform.isBlank()) {
-            throw new IllegalArgumentException("CLI platform is required");
-        }
-
-        if (target == null || target.isBlank()) {
-            throw new IllegalArgumentException("CLI target is required");
+            throw new IllegalArgumentException("CLI workspace is required");
         }
 
         CliAgentSettingsDto settings = loadAgentSettings();
         Path projectRoot = resolveProjectRoot();
         Path cliLauncher = resolveCliLauncher();
-        String prompt = buildAgentPrompt(settings, workspaceName, platform, target, cliLauncher);
+        String prompt = buildAgentPrompt(settings, workspaceName, cliLauncher);
 
-        appendConsoleLine("> agent profile=" + workspaceName + " platform=" + platform + " target=" + target);
+        appendConsoleLine("> agent workspace=" + workspaceName);
         appendConsoleLine("> Codex SDK runner");
         appendConsoleLine("> working directory: " + projectRoot);
 
@@ -270,7 +254,7 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
             currentCliMode = "agent";
             agentStartedAtEpochMillis = System.currentTimeMillis();
             lastStatus = "running";
-            lastMessage = "Agent CLI execution started for profile " + workspaceName;
+            lastMessage = "Agent CLI execution started for workspace " + workspaceName;
             return buildStatus(lastStatus, lastMessage);
         } catch (IOException | RuntimeException exception) {
             debugLog.log("startAgentSession failed", exception);
@@ -445,7 +429,7 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
 
     private CliAgentSettingsDto defaultAgentSettings() {
         return new CliAgentSettingsDto(
-            "OPENAI_API",
+            "OPENAI_API_KEY",
             "",
             "gpt-5.4-mini",
             "medium",
@@ -655,8 +639,6 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
 
     private String buildAgentPrompt(CliAgentSettingsDto settings,
                                     String workspaceName,
-                                    String platform,
-                                    String target,
                                     Path cliLauncher) {
         Path skillDirectory = resolveCliSkillDirectory();
         Path skillFile = skillDirectory.resolve("SKILL.md");
@@ -664,14 +646,16 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
         StringBuilder prompt = new StringBuilder();
         prompt.append(settings.promptTitle()).append('\n').append('\n');
         prompt.append("You are controlling TESTAR through testar-cli.").append('\n');
-        prompt.append("Platform: ").append(platform).append('\n');
-        prompt.append("Target: ").append(target).append('\n');
+        prompt.append("Selected workspace: ").append(workspaceName).append('\n');
         prompt.append("TESTAR CLI launcher: ").append(cliLauncher).append('\n');
         prompt.append("Repository root: ").append(resolveProjectRoot()).append('\n');
         prompt.append("CLI skill directory: ").append(skillDirectory).append('\n');
         prompt.append("CLI skill file: ").append(skillFile).append('\n').append('\n');
         prompt.append("Execution rule: read and follow the TESTAR CLI skill instructions before issuing commands.").append('\n');
-        prompt.append("Use the selected platform and target for this run.").append('\n').append('\n');
+        prompt.append("Use startSession ").append(workspaceName)
+            .append(" so TESTAR CLI derives platform and target from the selected workspace settings.")
+            .append('\n')
+            .append('\n');
         if (!settings.apiKeyEnvVarName().isBlank()) {
             prompt.append("Expected API key environment variable for Codex authentication: ")
                 .append(settings.apiKeyEnvVarName())
@@ -701,7 +685,7 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
 
         if (!Files.isDirectory(skillDirectory)) {
             throw new IllegalStateException(
-                "CLI skill directory not found: " + skillDirectory + ". Run :cli:cliDistribution again."
+                "CLI skill directory not found: " + skillDirectory + ". Run :cli:installCliIntoTestarDistribution again."
             );
         }
 
@@ -742,6 +726,12 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
         Path current = workingDirectory;
 
         while (current != null) {
+            Path sharedCandidate = current.resolve("testar").resolve("target").resolve("install").resolve("testar").resolve("bin");
+            if (Files.isRegularFile(sharedCandidate.resolve(isWindows() ? "testar-cli.bat" : "testar-cli"))) {
+                debugLog.log("resolveCliInstallDirectory found shared distribution at " + sharedCandidate);
+                return sharedCandidate;
+            }
+
             Path candidate = current.resolve("cli").resolve("target").resolve("install").resolve("testar-cli");
             if (Files.isDirectory(candidate)) {
                 debugLog.log("resolveCliInstallDirectory found existing distribution at " + candidate);
@@ -752,7 +742,7 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
         }
 
         debugLog.log("resolveCliInstallDirectory failed. CLI distribution not found.");
-        throw new IllegalStateException("Unable to find cli/target/install/testar-cli. Run :cli:cliDistribution first.");
+        throw new IllegalStateException("Unable to find TESTAR CLI launcher. Run :cli:installCliIntoTestarDistribution first.");
     }
 
     private Path resolveCliLauncher() {

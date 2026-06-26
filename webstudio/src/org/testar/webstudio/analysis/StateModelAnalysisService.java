@@ -37,13 +37,12 @@ public final class StateModelAnalysisService {
         this.workspaceService = workspaceService;
     }
 
-    public synchronized StateModelLaunchDto open(String workspaceName, String runtime) {
-        Path runtimeHome = workspaceService.workspaceRuntimeHomeDirectory(workspaceName, runtime);
+    public synchronized StateModelLaunchDto open(String workspaceName) {
+        Path runtimeHome = workspaceService.workspaceRuntimeHomeDirectory(workspaceName);
         Path debugLogPath = runtimeHome.resolve("state-model-debug.log");
         StateModelDebugLog.install(debugLogPath);
         System.clearProperty("testar.analysis.keepOrientDbOpen");
         StateModelDebugLog.log("Opening state model analysis for workspace: " + workspaceName);
-        StateModelDebugLog.log("Requested state model analysis runtime: " + runtime);
         StateModelDebugLog.log("State model analysis runtime home: " + runtimeHome);
 
         if (jettyServer != null && jettyServer.isRunning()) {

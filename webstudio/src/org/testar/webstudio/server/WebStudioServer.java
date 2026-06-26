@@ -22,13 +22,11 @@ import org.testar.webstudio.api.ValidationController;
 import org.testar.webstudio.api.WorkspaceController;
 import org.testar.webstudio.api.dto.CliAgentSettingsDto;
 import org.testar.webstudio.api.dto.CliManualCommandRequestDto;
-import org.testar.webstudio.api.dto.CliManualSessionRequestDto;
 import org.testar.webstudio.api.dto.RegexValidationRequestDto;
 import org.testar.webstudio.api.dto.SpyTypeRequestDto;
 import org.testar.webstudio.api.dto.WorkspaceFileUpdateDto;
 import org.testar.webstudio.analysis.StateModelAnalysisService;
 import org.testar.webstudio.execution.CliExecutionAdapter;
-import org.testar.webstudio.execution.ExecutionAdapter;
 import org.testar.webstudio.execution.ExecutionAdapterRegistry;
 import org.testar.webstudio.execution.ExecutionBackend;
 import org.testar.webstudio.execution.RemoteExecutionAdapter;
@@ -178,12 +176,10 @@ public final class WebStudioServer {
             return executionController.saveCliAgentSettings(update);
         }));
         routes.post("/api/execution/cli/manual/start/{profile}", context -> handle(context, () -> {
-            CliManualSessionRequestDto request = gson.fromJson(context.body(), CliManualSessionRequestDto.class);
-            return executionController.startCliManualSession(context.pathParam("profile"), request);
+            return executionController.startCliManualSession(context.pathParam("profile"), null);
         }));
         routes.post("/api/execution/cli/agent/start/{profile}", context -> handle(context, () -> {
-            CliManualSessionRequestDto request = gson.fromJson(context.body(), CliManualSessionRequestDto.class);
-            return executionController.startCliAgentSession(context.pathParam("profile"), request);
+            return executionController.startCliAgentSession(context.pathParam("profile"), null);
         }));
         routes.post("/api/execution/cli/manual/command", context -> handle(context, () -> {
             CliManualCommandRequestDto request = gson.fromJson(context.body(), CliManualCommandRequestDto.class);
@@ -261,7 +257,7 @@ public final class WebStudioServer {
             context.result(remoteSpyController.screenshot(screenshotPath));
         });
         routes.post("/api/statemodel/open/{workspace}", context -> handle(context, () ->
-            stateModelAnalysisController.open(context.pathParam("workspace"), context.queryParam("runtime"))
+            stateModelAnalysisController.open(context.pathParam("workspace"))
         ));
     }
 

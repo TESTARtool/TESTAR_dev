@@ -109,13 +109,13 @@ This is the normal integrated command.
 
 ## CLI mode prerequisites
 
-The Web Studio `Run CLI Mode` page depends on the CLI distribution artifacts.
+The Web Studio `Run CLI Mode` page depends on the shared TESTAR distribution containing the `testar-cli` launcher.
 
-Before using CLI mode, prepare both the main TESTAR install distribution and the CLI distribution:
+Before using CLI mode, prepare the main TESTAR install distribution and install the CLI launcher into it:
 
 ```powershell
 .\gradlew.bat :testar:installDist
-.\gradlew.bat :cli:cliDistribution
+.\gradlew.bat :cli:installCliIntoTestarDistribution
 ```
 
 If you want to use the agent-driven CLI execution, also install the Codex agent runtime:
@@ -126,19 +126,27 @@ If you want to use the agent-driven CLI execution, also install the Codex agent 
 
 The CLI distribution now includes a profile-aware example under:
 
-- `cli_generic`
+- `testar/target/install/testar/bin/testar-cli.bat`
+- `testar/target/install/testar/bin/settings`
+- `testar/target/install/testar/bin/output`
 
-CLI profiles are separate from the scriptless workspace selector used by the rest of Web Studio.
-
-Web Studio `Run CLI Mode` starts manual sessions against one selected CLI profile, for example:
+Web Studio `Run CLI Mode` starts manual sessions against the selected workspace.
+The CLI derives platform and target from the workspace `SUTConnector` settings.
+For example, with `webdriver_generic` selected:
 
 ```text
-startSession webdriver https://para.testar.org/ cli_generic
+startSession webdriver_generic
 ```
 
-If the CLI profile is omitted, the default is:
+Standalone `testar-cli` usage can also start sessions with explicit platform and target arguments:
 
-- `settings/cli_generic/test.settings`
+```text
+startSession webdriver https://para.testar.org/ webdriver_generic
+startSession windows notepad.exe windows_generic
+startSession android ApiDemos-debug.apk android_generic
+```
+
+The optional workspace argument loads that workspace's settings, policies, and services, while the explicit platform and target come from the command.
 
 If CLI mode still fails, inspect `cli-debug.log` from the Web Studio debug files view.
 

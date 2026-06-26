@@ -11,10 +11,8 @@
     export let deleteResultGroup;
     export let loadResultFile;
     export let resultsData = null;
-    export let resultSource = "generate";
     export let selectedResultFile = null;
     export let selectedResultGroup = null;
-    export let selectResultSource;
     export let selectResultGroup;
     export let showResultSummary;
 
@@ -103,22 +101,6 @@
             <section class="results-sidebar-section">
                 <div class="results-source-header">
                     <h4 class="eyebrow">Output Results</h4>
-                    <div class="button-row results-source-toggle">
-                        <button
-                            type="button"
-                            class:secondary={resultSource !== "generate"}
-                            on:click={() => selectResultSource("generate")}
-                        >
-                            Generate
-                        </button>
-                        <button
-                            type="button"
-                            class:secondary={resultSource !== "cli"}
-                            on:click={() => selectResultSource("cli")}
-                        >
-                            CLI
-                        </button>
-                    </div>
                 </div>
 
                 <div class="results-filter-row">
@@ -157,7 +139,7 @@
                     {:else if resultsData?.groups?.length > 0}
                         <p class="progress-message">No output results match the current filter.</p>
                     {:else}
-                        <p class="progress-message">No {resultSource === "cli" ? "CLI" : "Generate"} output groups detected yet.</p>
+                        <p class="progress-message">No output groups detected yet.</p>
                     {/if}
                 </div>
 

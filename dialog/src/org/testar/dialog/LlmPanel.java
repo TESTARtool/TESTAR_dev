@@ -113,7 +113,7 @@ public class LlmPanel extends SettingsPanel {
 					fieldLlmModel.setText("gpt-5-mini");
 					llmReasoningBox.setSelectedItem("minimal");
 					buttonLlmConnection.setBackground(null);
-					fieldLlmAuthorizationHeader.setText("Bearer %OPENAI_API%");
+					fieldLlmAuthorizationHeader.setText("Bearer %OPENAI_API_KEY%");
 					fieldLlmActionFewshot.setText("prompts/fewshot_openai_action.json");
 					fieldLlmOracleFewshot.setText("prompts/fewshot_openai_oracle.json");
 					break;

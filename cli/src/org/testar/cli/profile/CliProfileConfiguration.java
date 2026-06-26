@@ -6,6 +6,8 @@
 
 package org.testar.cli.profile;
 
+import java.util.List;
+
 import org.testar.config.composition.CompositionDescriptor;
 import org.testar.config.composition.CompositionLoader;
 import org.testar.config.settings.Settings;
@@ -30,17 +32,20 @@ public final class CliProfileConfiguration {
     private final PolicySessionConfiguration policyConfiguration;
     private final ServiceSessionConfiguration serviceConfiguration;
     private final CompositionDescriptor compositionDescriptor;
+    private final List<String> compatibilityWarnings;
 
     public CliProfileConfiguration(String profileName,
                                    Settings settings,
                                    PolicySessionConfiguration policyConfiguration,
                                    ServiceSessionConfiguration serviceConfiguration,
-                                   CompositionDescriptor compositionDescriptor) {
+                                   CompositionDescriptor compositionDescriptor,
+                                   List<String> compatibilityWarnings) {
         this.profileName = Assert.notNull(profileName);
         this.settings = Assert.notNull(settings);
         this.policyConfiguration = Assert.notNull(policyConfiguration);
         this.serviceConfiguration = Assert.notNull(serviceConfiguration);
         this.compositionDescriptor = Assert.notNull(compositionDescriptor);
+        this.compatibilityWarnings = List.copyOf(Assert.notNull(compatibilityWarnings));
     }
 
     public String profileName() {
@@ -57,6 +62,10 @@ public final class CliProfileConfiguration {
 
     public ServiceSessionConfiguration serviceConfiguration() {
         return serviceConfiguration;
+    }
+
+    public List<String> compatibilityWarnings() {
+        return compatibilityWarnings;
     }
 
     public PlatformServices applyServiceWrappers(PlatformServices services) {

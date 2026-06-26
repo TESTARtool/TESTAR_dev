@@ -19,8 +19,8 @@ The Web Studio frontend is a client of the Web Studio server. The server coordin
 - CLI distribution usage
 - Spy session orchestration with the TESTAR install distribution
 - Scriptless Generate session execution with the TESTAR install distribution
-- Test result and debug file access for TESTAR and CLI distributions
-- State model analysis for TESTAR and CLI distributions
+- test result and debug file access from the shared distribution output/runtime
+- state model analysis from the selected shared distribution workspace
 
 ## Core Concepts
 
@@ -336,20 +336,20 @@ CLI Mode supports:
 - CLI command execution
 - CLI session stop
 
-Workspace compatibility:
+Workspace selection:
 
-- a workspace is CLI-compatible when backend summary says `availableInCli = true`
-- `cli_*` workspaces are also treated as CLI-compatible in frontend guard logic
+- WebStudio uses the shared workspace list for CLI mode with other testar modes
+- WebStudio sends the selected workspace to CLI startup
+- CLI validates connector values server-side and reports startup errors to the user
 
 ## Test Results
 
-The Test Results page supports inspection of Generate and CLI output folders.
+The Test Results page supports inspection of output folders from the shared TESTAR distribution.
 
 ### Output Result Selection
 
 The page must support:
 
-- source toggle between Generate and CLI outputs
 - output result folder selection
 - output result folder sorting
 - output result folder filtering
@@ -386,7 +386,7 @@ The Test Results page must support an empty state.
 
 The empty state is shown when:
 
-- no output result folders exist for the selected source
+- no output result folders exist
 - filters hide all available output result folders
 - the last output result folder was deleted
 
@@ -433,11 +433,9 @@ Deletion rules:
 
 ## State Model
 
-State model generation and analysis are runtime-specific.
-
 Scriptless Generate mode and CLI mode can generate state models when the selected workspace enables state model settings.
 
-The runtime execution is responsible for automatic OrientDB preparation, including download/bootstrap when required by the configured state model storage settings.
+The execution mode is responsible for automatic OrientDB preparation, including download/bootstrap when required by the configured state model storage settings.
 
 `View State Model` opens the external analysis mode URL after server-side preparation.
 
@@ -445,19 +443,16 @@ The user must see a friendly modal dialog instead of raw server or browser conso
 
 ### Runtime Resolution
 
-- Each runtime owns its state model storage relative to its runtime home.
-- Scriptless TESTAR runtime home is `testar/target/install/testar/bin`.
-- CLI runtime home is `cli/target/install/testar-cli`.
-- `View State Model` must resolve the selected workspace to the runtime where it is available.
-- If the workspace is available in the TESTAR runtime, analysis uses TESTAR runtime settings and datastore paths.
-- If the workspace is available in the CLI runtime, analysis uses CLI runtime settings and datastore paths.
-- If the same workspace name exists in both runtimes, WebStudio must pass the intended runtime to the state model endpoint.
-- When `View State Model` is clicked from CLI mode, WebStudio must request CLI runtime analysis when the selected workspace is CLI-compatible.
+- State model analysis uses the selected workspace and the shared distribution runtime home.
+- The shared runtime home is `testar/target/install/testar/bin`.
+- State model datastore paths are resolved from the selected workspace settings against the shared runtime home.
+- `View State Model` uses the selected shared workspace directly.
+- Generate and CLI executions can both contribute state model data to the same configured datastore when they use the same selected workspace and datastore settings.
 
 ### Error Handling
 
 - If no workspace is selected, WebStudio must show an `Unable To Open State Model` dialog.
-- If the selected workspace is unavailable in both installed runtimes, WebStudio must show an `Unable To Open State Model` dialog.
+- If the selected workspace is unavailable in the shared runtime, WebStudio must show an `Unable To Open State Model` dialog.
 - If the selected workspace is available but no generated model exists yet, WebStudio must show a dialog asking the user to run Generate or CLI execution with state model enabled first.
 - If analysis startup fails for another reason, WebStudio must show a user-facing `Unable To Open State Model` dialog and log details server-side.
 

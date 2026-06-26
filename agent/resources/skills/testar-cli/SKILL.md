@@ -28,9 +28,10 @@ Treat the CLI distribution as an operational environment, not as a source-code w
 ## Public commands
 
 - `sessionStatus`
-- `startSession windows <path>`
-- `startSession webdriver <url>`
-- `startSession android <apk>`
+- `startSession <workspace>`
+- `startSession windows <path> [workspace]`
+- `startSession webdriver <url> [workspace]`
+- `startSession android <target> [workspace]`
 - `getState`
 - `getStateScreenshot`
 - `getDerivedActions`
@@ -60,7 +61,7 @@ Use short meaningful text that is likely to appear in the action description, fo
 ## Workflow
 
 1. Work from the CLI distribution root.
-2. Start one session with the selected platform and target.
+2. Start one session with either a workspace or an explicit platform and target.
 3. Use `getState`, `getStateScreenshot`, and `getDerivedActions` to inspect the live UI.
 4. Execute actions one at a time.
 5. Re-check state for execution evidence.
@@ -90,10 +91,10 @@ Only execute an action after the relevant action appears in the latest `getDeriv
 
 ## Session examples
 
-Windows testing:
+Workspace-driven Windows testing:
 
 - `testar-cli.bat sessionStatus`
-- `testar-cli.bat startSession windows notepad.exe`
+- `testar-cli.bat startSession windows_generic`
 - `testar-cli.bat getState`
 - `testar-cli.bat getStateScreenshot`
 - `testar-cli.bat getDerivedActions`
@@ -102,10 +103,10 @@ Windows testing:
 - `testar-cli.bat stopSession`
 - `testar-cli.bat shutdownDaemon`
 
-WebDriver testing:
+Workspace-driven WebDriver testing:
 
 - `testar-cli.bat sessionStatus`
-- `testar-cli.bat startSession webdriver https://para.testar.org/`
+- `testar-cli.bat startSession webdriver_generic`
 - `testar-cli.bat getState`
 - `testar-cli.bat getStateScreenshot`
 - `testar-cli.bat getDerivedActions`
@@ -115,10 +116,10 @@ WebDriver testing:
 - `testar-cli.bat stopSession`
 - `testar-cli.bat shutdownDaemon`
 
-Android testing:
+Workspace-driven Android testing:
 
 - `testar-cli.bat sessionStatus`
-- `testar-cli.bat startSession android ApiDemos-debug.apk`
+- `testar-cli.bat startSession android_generic`
 - `testar-cli.bat getState`
 - `testar-cli.bat getStateScreenshot`
 - `testar-cli.bat getDerivedActions`
@@ -127,10 +128,24 @@ Android testing:
 - `testar-cli.bat stopSession`
 - `testar-cli.bat shutdownDaemon`
 
+Explicit standalone startup wihtout workspace:
+
+- `testar-cli.bat startSession windows notepad.exe`
+- `testar-cli.bat startSession webdriver https://para.testar.org/`
+- `testar-cli.bat startSession android ApiDemos-debug.apk`
+
+Explicit standalone startup with workspace:
+
+- `testar-cli.bat startSession windows notepad.exe windows_generic`
+- `testar-cli.bat startSession webdriver https://para.testar.org/ webdriver_generic`
+- `testar-cli.bat startSession android ApiDemos-debug.apk android_generic`
+
 ## Operational rules
 
 - Use one stable session per goal when possible.
 - Run commands sequentially.
+- `startSession <workspace>` derives platform and target from `SUTConnector` and related settings in the selected workspace.
+- `startSession <platform> <target> [workspace]` is valid for standalone multi-platform control. If `[workspace]` is provided, load that workspace and override platform and target from the command.
 - Treat `startSession`, `stopSession`, and `shutdownDaemon` as the public lifecycle commands.
 - Prefer observing the live state through CLI commands.
 - Keep evidence grounded in command outputs.

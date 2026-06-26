@@ -15,7 +15,7 @@ public class WorkspaceServiceRuntimeHomeTest {
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Test
-    public void returnsTestarRuntimeHomeForTestarWorkspace() throws IOException {
+    public void returnsSharedRuntimeHomeForSelectedWorkspace() throws IOException {
         TestWorkspaceRoots roots = createWorkspaceRoots();
         Files.createDirectories(roots.testarSettingsRoot.resolve("webdriver_generic"));
 
@@ -31,7 +31,7 @@ public class WorkspaceServiceRuntimeHomeTest {
     }
 
     @Test
-    public void returnsCliRuntimeHomeForCliWorkspace() throws IOException {
+    public void keepsCompatibilityWithCliOnlyWorkspaceRoots() throws IOException {
         TestWorkspaceRoots roots = createWorkspaceRoots();
         Files.createDirectories(roots.cliSettingsRoot.resolve("cli_generic"));
 
@@ -47,7 +47,7 @@ public class WorkspaceServiceRuntimeHomeTest {
     }
 
     @Test
-    public void returnsExplicitTestarRuntimeHomeWhenWorkspaceExistsInBothRuntimes() throws IOException {
+    public void sharedWorkspaceNamesResolveToSharedTestarRuntimeHome() throws IOException {
         TestWorkspaceRoots roots = createWorkspaceRoots();
         Files.createDirectories(roots.testarSettingsRoot.resolve("shared_generic"));
         Files.createDirectories(roots.cliSettingsRoot.resolve("shared_generic"));
@@ -59,24 +59,23 @@ public class WorkspaceServiceRuntimeHomeTest {
 
         Assert.assertEquals(
             roots.testarHome,
-            workspaceService.workspaceRuntimeHomeDirectory("shared_generic", "testar")
+            workspaceService.workspaceRuntimeHomeDirectory("shared_generic")
         );
     }
 
     @Test
-    public void returnsExplicitCliRuntimeHomeWhenWorkspaceExistsInBothRuntimes() throws IOException {
+    public void returnsSharedRuntimeHomeWhenTestarAndCliUseSameSettingsRoot() throws IOException {
         TestWorkspaceRoots roots = createWorkspaceRoots();
-        Files.createDirectories(roots.testarSettingsRoot.resolve("shared_generic"));
-        Files.createDirectories(roots.cliSettingsRoot.resolve("shared_generic"));
+        Files.createDirectories(roots.testarSettingsRoot.resolve("webdriver_generic"));
 
         WorkspaceService workspaceService = new WorkspaceService(
             roots.testarSettingsRoot,
-            roots.cliSettingsRoot
+            roots.testarSettingsRoot
         );
 
         Assert.assertEquals(
-            roots.cliHome,
-            workspaceService.workspaceRuntimeHomeDirectory("shared_generic", "cli")
+            roots.testarHome,
+            workspaceService.workspaceRuntimeHomeDirectory("webdriver_generic")
         );
     }
 

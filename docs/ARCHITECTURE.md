@@ -56,6 +56,33 @@ These are two different entry-point styles built on top of the same underlying m
 
 They share the same composed service and policy stack while keeping their own mode-specific orchestration where needed.
 
+### Distribution and workspace model
+
+The target packaging model is one installed TESTAR distribution with separate entry points.
+
+The distribution can contain both launchers:
+
+- `testar`
+- `testar-cli`
+
+This is a packaging unification, not an architecture merge.
+
+The internal runtime boundaries remain:
+
+- `testar` keeps scriptless runtime modes such as `Spy` and `Generate`
+- `testar-cli` keeps daemon/session-oriented command execution
+- mode-specific loaders and orchestration remain separate when their execution model differs
+
+The intended workspace model is shared:
+
+- WebStudio shows one workspace list, such as `webdriver_generic`, `windows_generic`, and `android_generic`
+- both entry points can use the same `settings` workspaces
+- shared runtime paths such as `.runtime`, `output`, and state model storage are resolved from the installed distribution
+
+The detailed distribution and workspace rules are documented in:
+
+- `docs/architecture_distribution_workspace.md`
+
 ### Service and policy flow
 
 The intended flow is:

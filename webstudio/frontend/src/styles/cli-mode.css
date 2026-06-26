@@ -58,6 +58,36 @@
     align-content: start;
 }
 
+.cli-derived-target {
+    display: grid;
+    gap: 8px;
+}
+
+.cli-derived-target > div {
+    display: grid;
+    gap: 4px;
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid var(--surface-border);
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.cli-derived-target span {
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.cli-derived-target strong {
+    min-width: 0;
+    color: var(--text);
+    font-size: 0.84rem;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
 .cli-mode-section-agent {
     grid-template-rows: auto auto auto auto auto auto auto auto auto auto auto auto auto minmax(88px, 1fr) auto;
 }

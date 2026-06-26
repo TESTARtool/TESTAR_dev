@@ -55,7 +55,7 @@ public final class CliAgentSettingsDto {
     }
 
     public String model() {
-        return valueOrDefault(model, "gpt-5.4");
+        return valueOrDefault(model, "gpt-5.4-mini");
     }
 
     public String reasoningEffort() {
@@ -63,7 +63,7 @@ public final class CliAgentSettingsDto {
     }
 
     public String sandboxMode() {
-        return valueOrDefault(sandboxMode, "workspace-write");
+        return valueOrDefault(sandboxMode, "danger-full-access");
     }
 
     public String approvalPolicy() {
@@ -79,11 +79,11 @@ public final class CliAgentSettingsDto {
     }
 
     public String promptTitle() {
-        return valueOrDefault(promptTitle, "CLI Agent Goal");
+        return valueOrDefault(promptTitle, "Test Parabank Login");
     }
 
     public String promptText() {
-        return valueOrDefault(promptText, "");
+        return valueOrDefault(promptText, "As a test agent verify that you can log in with the credentials john/demo. Then the Welcome John Smith message is shown.");
     }
 
     private String valueOrDefault(String value, String defaultValue) {

@@ -1,4 +1,4 @@
-export function stateModelWorkspaceDialog(selectedWorkspaceName, workspaceAvailableInTestar, workspaceAvailableInCli) {
+export function stateModelWorkspaceDialog(selectedWorkspaceName, workspaceAvailable) {
     if (!selectedWorkspaceName) {
         return {
             title: "Unable To Open State Model",
@@ -6,28 +6,12 @@ export function stateModelWorkspaceDialog(selectedWorkspaceName, workspaceAvaila
         };
     }
 
-    if (!workspaceAvailableInTestar && !workspaceAvailableInCli) {
+    if (!workspaceAvailable) {
         return {
             title: "Unable To Open State Model",
-            message: `Dear user, the selected workspace "${selectedWorkspaceName}" is not available in the TESTAR or CLI runtime. Select a workspace with a generated state model before opening the analysis mode.`
+            message: `Dear user, the selected workspace "${selectedWorkspaceName}" is not available in the shared TESTAR runtime. Select a workspace with a generated state model before opening the analysis mode.`
         };
     }
 
     return null;
-}
-
-export function stateModelRuntime(currentPage, workspaceAvailableInTestar, workspaceAvailableInCli) {
-    if (currentPage === "cli" && workspaceAvailableInCli) {
-        return "cli";
-    }
-
-    if (workspaceAvailableInTestar) {
-        return "testar";
-    }
-
-    if (workspaceAvailableInCli) {
-        return "cli";
-    }
-
-    return "";
 }

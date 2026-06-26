@@ -9,21 +9,23 @@
     import StateModelIcon from "./icons/StateModelIcon.svelte";
     import { shouldGuardConfigurationTransition } from "./configurationGuard.js";
     import { clearSelectedSourceState } from "./policyEditorState.js";
-    import { stateModelRuntime, stateModelWorkspaceDialog } from "./stateModelNavigation.js";
+    import { stateModelWorkspaceDialog } from "./stateModelNavigation.js";
 
     const STATE_MODEL_URL = "http://localhost:8090/models";
 
     let workspaces = [];
     let selectedWorkspaceName = "";
     let selectedWorkspaceSummary = null;
+    let selectedWorkspaceAvailableInTestar = false;
     let workspaceDocument = null;
+    let selectedWorkspaceSutConnector = "";
     let selectedWorkspaceSutConnectorValue = "";
     let selectedWorkspaceObservationMode = "";
     let selectedSourceName = "";
     let selectedSourceFile = null;
     let cliStatus = null;
     let cliAgentSettings = {
-        apiKeyEnvVarName: "OPENAI_API",
+        apiKeyEnvVarName: "OPENAI_API_KEY",
         baseUrl: "",
         model: "gpt-5.4-mini",
         reasoningEffort: "medium",
@@ -42,7 +44,6 @@
     let scriptlessPollHandle = null;
     let currentPage = "configuration";
     let resultsData = null;
-    let resultSource = "generate";
     let selectedResultGroup = null;
     let selectedResultFile = null;
     let selectedEditor = "java-composition";
@@ -197,6 +198,7 @@
             selectedWorkspaceSummary = null;
             selectedWorkspaceName = "";
             workspaceDocument = null;
+            selectedWorkspaceSutConnector = "";
             selectedWorkspaceSutConnectorValue = "";
             selectedWorkspaceObservationMode = "";
             savedTestSettingsContent = "";
@@ -223,6 +225,10 @@
             savedPoliciesPropertiesContent = workspaceDocument?.policiesProperties?.content || "";
             savedSourceContents = {};
             visualSettingsDirty = false;
+            selectedWorkspaceSutConnector = normalizeSettingDisplayValue(
+                parsePropertiesContent(workspaceDocument?.testSettings?.content || "").SUTConnector
+                    || workspaceSettingValue("SUTConnector")
+            );
             selectedWorkspaceSutConnectorValue = normalizeSettingDisplayValue(
                 parsePropertiesContent(workspaceDocument?.testSettings?.content || "").SUTConnectorValue
                     || workspaceSettingValue("SUTConnectorValue")
@@ -345,6 +351,10 @@
         savedCompositionPropertiesContent = workspaceDocument?.compositionProperties?.content || "";
         savedPoliciesPropertiesContent = workspaceDocument?.policiesProperties?.content || "";
         visualSettingsDirty = false;
+        selectedWorkspaceSutConnector = normalizeSettingDisplayValue(
+            parsePropertiesContent(workspaceDocument?.testSettings?.content || "").SUTConnector
+                || workspaceSettingValue("SUTConnector")
+        );
         selectedWorkspaceSutConnectorValue = normalizeSettingDisplayValue(
             parsePropertiesContent(workspaceDocument?.testSettings?.content || "").SUTConnectorValue
                 || workspaceSettingValue("SUTConnectorValue")
@@ -625,7 +635,7 @@
     }
 
     async function startGenerate() {
-        if (!selectedWorkspaceName || !workspaceAvailableInTestar()) {
+        if (!selectedWorkspaceName || !selectedWorkspaceAvailableInTestar) {
             return;
         }
 
@@ -744,7 +754,7 @@
 
         await guardConfigurationTransition(async () => {
             currentPage = "results";
-            loadResults(resultSource);
+            loadResults();
         });
     }
 
@@ -767,17 +777,7 @@
         return workspaceSummary?.availableInTestar === true;
     }
 
-    function workspaceAvailableInCli(workspaceSummary = selectedWorkspaceSummary) {
-        return workspaceSummary?.availableInCli === true;
-    }
-
-    function workspaceSupportsCli() {
-        if (workspaceAvailableInCli()) {
-            return true;
-        }
-
-        return selectedWorkspaceName.startsWith("cli_");
-    }
+    $: selectedWorkspaceAvailableInTestar = workspaceAvailableInTestar();
 
     function workspaceSettingValue(settingKey) {
         for (const settingsGroup of workspaceDocument?.settingsGroups || []) {
@@ -802,18 +802,6 @@
         }
 
         return text;
-    }
-
-    function workspaceSelectionInvalidForCurrentPage() {
-        if (currentPage === "cli") {
-            return !workspaceSupportsCli();
-        }
-
-        if (currentPage === "run" || currentPage === "spy") {
-            return !workspaceAvailableInTestar();
-        }
-
-        return false;
     }
 
     function settingsEditorId(editorId) {
@@ -1012,8 +1000,7 @@
     async function navigateToStateModel() {
         const workspaceDialog = stateModelWorkspaceDialog(
             selectedWorkspaceName,
-            workspaceAvailableInTestar(),
-            workspaceAvailableInCli()
+            selectedWorkspaceAvailableInTestar
         );
         if (workspaceDialog) {
             openStateModelDialog(workspaceDialog.title, workspaceDialog.message);
@@ -1024,8 +1011,7 @@
         message = "";
 
         try {
-            const runtime = stateModelRuntime(currentPage, workspaceAvailableInTestar(), workspaceAvailableInCli());
-            const response = await loadJson(`/api/statemodel/open/${selectedWorkspaceName}?runtime=${encodeURIComponent(runtime)}`, {
+            const response = await loadJson(`/api/statemodel/open/${selectedWorkspaceName}`, {
                 method: "POST"
             });
             openStateModelExternalTab(response.url || STATE_MODEL_URL);
@@ -1077,6 +1063,9 @@
         }
 
         setting.value = value;
+        if (setting.key === "SUTConnector") {
+            selectedWorkspaceSutConnector = normalizeSettingDisplayValue(value);
+        }
         if (setting.key === "SUTConnectorValue") {
             selectedWorkspaceSutConnectorValue = normalizeSettingDisplayValue(value);
         }
@@ -1236,14 +1225,9 @@
         );
     }
 
-    async function loadResults(source = resultSource) {
+    async function loadResults() {
         try {
-            resultSource = source;
-            resultsData = await loadJson(
-                source === "cli"
-                    ? "/api/execution/cli/results"
-                    : "/api/execution/scriptless/results"
-            );
+            resultsData = await loadJson("/api/execution/scriptless/results");
             const resultGroups = resultsData.groups || [];
             if (resultGroups.length > 0) {
                 await selectResultGroup(resultGroups[resultGroups.length - 1]);
@@ -1252,7 +1236,7 @@
                 selectedResultFile = null;
             }
         } catch (resultsError) {
-            reportClientError(`Unable to load ${source} results`, resultsError);
+            reportClientError("Unable to load output results", resultsError);
         }
     }
 
@@ -1394,22 +1378,10 @@
 
         try {
             const resultPath = encodeURIComponent(resultFile.path);
-            selectedResultFile = await loadJson(
-                resultSource === "cli"
-                    ? `/api/execution/cli/results/${resultFile.name}?path=${resultPath}`
-                    : `/api/execution/scriptless/results/${resultFile.name}?path=${resultPath}`
-            );
+            selectedResultFile = await loadJson(`/api/execution/scriptless/results/${resultFile.name}?path=${resultPath}`);
         } catch (fileError) {
             reportClientError(`Unable to load result file ${resultFile.name}`, fileError);
         }
-    }
-
-    async function selectResultSource(source) {
-        if (resultSource === source && currentPage === "results") {
-            return;
-        }
-
-        await loadResults(source);
     }
 
     function applyRefreshedResults(refreshedResults, preferredGroupPath = "") {
@@ -1433,12 +1405,9 @@
         try {
             const resultPath = encodeURIComponent(resultFile.path);
             const currentGroupPath = selectedResultGroup?.path || "";
-            const refreshedResults = await loadJson(
-                resultSource === "cli"
-                    ? `/api/execution/cli/results/${resultFile.name}?path=${resultPath}`
-                    : `/api/execution/scriptless/results/${resultFile.name}?path=${resultPath}`,
-                { method: "DELETE" }
-            );
+            const refreshedResults = await loadJson(`/api/execution/scriptless/results/${resultFile.name}?path=${resultPath}`, {
+                method: "DELETE"
+            });
             applyRefreshedResults(refreshedResults, currentGroupPath);
         } catch (deleteError) {
             reportClientError(`Unable to delete result file ${resultFile.name}`, deleteError);
@@ -1452,12 +1421,9 @@
 
         try {
             const resultPath = encodeURIComponent(resultGroup.path);
-            const refreshedResults = await loadJson(
-                resultSource === "cli"
-                    ? `/api/execution/cli/result-groups?path=${resultPath}`
-                    : `/api/execution/scriptless/result-groups?path=${resultPath}`,
-                { method: "DELETE" }
-            );
+            const refreshedResults = await loadJson(`/api/execution/scriptless/result-groups?path=${resultPath}`, {
+                method: "DELETE"
+            });
             applyRefreshedResults(refreshedResults);
         } catch (deleteError) {
             reportClientError(`Unable to delete result output folder ${resultGroup.name}`, deleteError);
@@ -1465,7 +1431,7 @@
     }
 
     async function startRemoteSpyMode() {
-        if (!selectedWorkspaceName || !workspaceAvailableInTestar()) {
+        if (!selectedWorkspaceName || !selectedWorkspaceAvailableInTestar) {
             return;
         }
 
@@ -1611,7 +1577,7 @@
     }
 
     async function startLocalSpyMode() {
-        if (!selectedWorkspaceName || !workspaceAvailableInTestar()) {
+        if (!selectedWorkspaceName || !selectedWorkspaceAvailableInTestar) {
             return;
         }
 
@@ -1670,8 +1636,8 @@
         }
     }
 
-    async function startCliManualSession(platform, target) {
-        if (!selectedWorkspaceName || !workspaceSupportsCli()) {
+    async function startCliManualSession() {
+        if (!selectedWorkspaceName) {
             return;
         }
 
@@ -1684,8 +1650,7 @@
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ platform, target })
+                }
             });
             showTemporaryMessage(cliStatus.message || "Manual CLI session started.");
         } catch (cliError) {
@@ -1695,8 +1660,8 @@
         }
     }
 
-    async function startCliAgentSession(platform, target) {
-        if (!selectedWorkspaceName || !workspaceSupportsCli()) {
+    async function startCliAgentSession() {
+        if (!selectedWorkspaceName) {
             return;
         }
 
@@ -1709,8 +1674,7 @@
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ platform, target })
+                }
             });
             showTemporaryMessage(cliStatus.message || "Agent CLI execution started.");
         } catch (cliError) {
@@ -1821,7 +1785,6 @@
             <select
                 id="page-workspace-select"
                 value={selectedWorkspaceName}
-                class:workspace-select-invalid={workspaceSelectionInvalidForCurrentPage()}
                 on:change={(event) => {
                     const nextWorkspaceName = event.currentTarget.value;
                     guardConfigurationTransition(async () => {
@@ -1905,7 +1868,7 @@
             saving={saving}
             scriptlessStatus={scriptlessStatus}
             selectedWorkspaceName={selectedWorkspaceName}
-            selectedWorkspaceAvailableInTestar={workspaceAvailableInTestar()}
+            selectedWorkspaceAvailableInTestar={selectedWorkspaceAvailableInTestar}
             selectedWorkspaceSutConnectorValue={selectedWorkspaceSutConnectorValue}
             startGenerate={startGenerate}
             stopGenerate={stopGenerate}
@@ -1917,7 +1880,7 @@
             scriptlessStatus={scriptlessStatus}
             saving={saving}
             selectedWorkspaceName={selectedWorkspaceName}
-            selectedWorkspaceAvailableInTestar={workspaceAvailableInTestar()}
+            selectedWorkspaceAvailableInTestar={selectedWorkspaceAvailableInTestar}
             selectedWorkspaceSutConnectorValue={selectedWorkspaceSutConnectorValue}
             spyState={spyState}
             startRemoteSpyMode={startRemoteSpyMode}
@@ -1938,8 +1901,10 @@
                 cliStatus={cliStatus}
                 saving={saving}
                 saveCliAgentSettings={saveCliAgentSettings}
+                selectedWorkspaceSutConnector={selectedWorkspaceSutConnector}
+                selectedWorkspaceSutConnectorValue={selectedWorkspaceSutConnectorValue}
                 selectedWorkspaceObservationMode={selectedWorkspaceObservationMode}
-                selectedWorkspaceAvailableInCli={workspaceSupportsCli()}
+                selectedWorkspaceAvailableInCli={Boolean(selectedWorkspaceName)}
                 startCliAgentSession={startCliAgentSession}
                 startCliManualSession={startCliManualSession}
                 runCliManualCommand={runCliManualCommand}
@@ -1955,10 +1920,8 @@
             deleteResultGroup={deleteResultGroup}
             loadResultFile={loadResultFile}
             resultsData={resultsData}
-            resultSource={resultSource}
             selectedResultFile={selectedResultFile}
             selectedResultGroup={selectedResultGroup}
-            selectResultSource={selectResultSource}
             selectResultGroup={selectResultGroup}
             showResultSummary={showResultSummary}
         />

@@ -106,18 +106,6 @@ public final class WorkspaceService {
         return resolveWorkspaceRuntimeHomeDirectory(workspaceName);
     }
 
-    public Path workspaceRuntimeHomeDirectory(String workspaceName, String runtime) {
-        if ("testar".equalsIgnoreCase(runtime)) {
-            return resolveRuntimeHomeDirectory(workspaceName, settingsRoot, testarHomeDirectory(), "TESTAR");
-        }
-
-        if ("cli".equalsIgnoreCase(runtime)) {
-            return resolveRuntimeHomeDirectory(workspaceName, cliSettingsRoot, cliHomeDirectory(), "CLI");
-        }
-
-        return resolveWorkspaceRuntimeHomeDirectory(workspaceName);
-    }
-
     public List<DebugFileSummaryDto> listDebugFiles() {
         Path testarHomeDirectory = testarHomeDirectory();
         if (!Files.isDirectory(testarHomeDirectory)) {
@@ -339,6 +327,20 @@ public final class WorkspaceService {
         Path current = workingDirectory;
 
         while (current != null) {
+            Path sharedBinDirectory = current.resolve("testar").resolve("target").resolve("install").resolve("testar").resolve("bin");
+            Path sharedSettingsDirectory = sharedBinDirectory.resolve("settings");
+            if (Files.isDirectory(sharedSettingsDirectory)
+                    && (Files.isRegularFile(sharedBinDirectory.resolve("testar-cli.bat"))
+                    || Files.isRegularFile(sharedBinDirectory.resolve("testar-cli")))) {
+                return sharedSettingsDirectory;
+            }
+
+            current = current.getParent();
+        }
+
+        current = workingDirectory;
+
+        while (current != null) {
             Path candidate = current.resolve("cli").resolve("target").resolve("install").resolve("testar-cli").resolve("settings");
             if (Files.isDirectory(candidate)) {
                 return candidate;
@@ -388,15 +390,6 @@ public final class WorkspaceService {
         }
 
         throw new IllegalArgumentException("Workspace not found: " + workspaceName);
-    }
-
-    private Path resolveRuntimeHomeDirectory(String workspaceName, Path root, Path homeDirectory, String runtimeName) {
-        Path workspaceDirectory = root.resolve(workspaceName).normalize();
-        if (!workspaceDirectory.startsWith(root) || !Files.isDirectory(workspaceDirectory)) {
-            throw new IllegalArgumentException("Workspace not found in " + runtimeName + " runtime: " + workspaceName);
-        }
-
-        return homeDirectory;
     }
 
     private List<WorkspaceFileDto> listWorkspaceSourceFiles(

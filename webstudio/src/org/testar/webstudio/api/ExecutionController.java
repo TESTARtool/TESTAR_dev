@@ -55,19 +55,11 @@ public final class ExecutionController {
     }
 
     public ExecutionStatusDto startCliManualSession(String profileName, CliManualSessionRequestDto request) {
-        return cliExecutionAdapter().startManualSession(
-            profileName,
-            request == null ? "" : request.platform(),
-            request == null ? "" : request.target()
-        );
+        return cliExecutionAdapter().startManualSession(profileName);
     }
 
     public ExecutionStatusDto startCliAgentSession(String profileName, CliManualSessionRequestDto request) {
-        return cliExecutionAdapter().startAgentSession(
-            profileName,
-            request == null ? "" : request.platform(),
-            request == null ? "" : request.target()
-        );
+        return cliExecutionAdapter().startAgentSession(profileName);
     }
 
     public ExecutionStatusDto runCliManualCommand(String commandLine) {

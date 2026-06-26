@@ -5,14 +5,14 @@
     export let selectedWorkspaceAvailableInCli = false;
     export let selectedWorkspaceObservationMode = "";
     export let saveCliAgentSettings;
+    export let selectedWorkspaceSutConnector = "";
+    export let selectedWorkspaceSutConnectorValue = "";
     export let startCliAgentSession;
     export let startCliManualSession;
     export let runCliManualCommand;
     export let stopCliAgentSession;
     export let stopCliManualSession;
 
-    let manualPlatform = "webdriver";
-    let manualTarget = "";
     let manualCommandLine = "sessionStatus";
 
     $: manualSessionRunning = cliStatus?.status === "running" && cliStatus?.mode === "manual";
@@ -20,11 +20,11 @@
     $: cliSessionRunning = manualSessionRunning || agentSessionRunning;
 
     function startSession() {
-        startCliManualSession(manualPlatform, manualTarget);
+        startCliManualSession();
     }
 
     function startAgentSession() {
-        startCliAgentSession(manualPlatform, manualTarget);
+        startCliAgentSession();
     }
 
     function runCommand() {
@@ -56,13 +56,13 @@
             </div>
         </div>
         <div class="button-row">
-            <button on:click={startSession} disabled={saving || cliSessionRunning || !selectedWorkspaceAvailableInCli || !manualTarget.trim()}>
+            <button on:click={startSession} disabled={saving || cliSessionRunning || !selectedWorkspaceAvailableInCli}>
                 Start Manual CLI Session
             </button>
             <button
                 type="button"
                 on:click={startAgentSession}
-                disabled={saving || cliSessionRunning || !selectedWorkspaceAvailableInCli || !manualTarget.trim()}
+                disabled={saving || cliSessionRunning || !selectedWorkspaceAvailableInCli}
             >
                 Start Agent CLI Execution
             </button>
@@ -83,15 +83,17 @@
                 <div class="cli-mode-section-header">
                     <span class="eyebrow">Target CLI Session</span>
                 </div>
-                <p class="progress-message">Start a CLI session for the selected target.</p>
-                <label class="field-label" for="cli-manual-platform">Platform</label>
-                <select id="cli-manual-platform" bind:value={manualPlatform}>
-                    <option value="webdriver">webdriver</option>
-                    <option value="windows">windows</option>
-                    <option value="android">android</option>
-                </select>
-                <label class="field-label" for="cli-manual-target">Target</label>
-                <input id="cli-manual-target" bind:value={manualTarget} placeholder="https://para.testar.org/ or notepad.exe" />
+                <p class="progress-message">CLI derives platform and target from the selected workspace SUT settings.</p>
+                <div class="cli-derived-target">
+                    <div>
+                        <span>Connector</span>
+                        <strong>{selectedWorkspaceSutConnector || "Not configured"}</strong>
+                    </div>
+                    <div>
+                        <span>Target</span>
+                        <strong>{selectedWorkspaceSutConnectorValue || "Not configured"}</strong>
+                    </div>
+                </div>
             </div>
 
             <div class="cli-mode-section cli-mode-section-commands">

@@ -72,13 +72,6 @@
     min-width: 220px;
 }
 
-.page-nav-workspace select.workspace-select-invalid {
-    border-color: rgba(201, 42, 42, 0.52);
-    background: linear-gradient(135deg, rgba(255, 241, 241, 0.94), rgba(245, 212, 212, 0.9));
-    color: #8c1d1d;
-    box-shadow: inset 0 0 0 1px rgba(201, 42, 42, 0.08);
-}
-
 .page-nav-right-group {
     margin-left: auto;
     display: flex;
