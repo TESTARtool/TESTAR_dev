@@ -154,7 +154,7 @@ Manual CLI execution may use:
 stopSession
 ```
 
-Plain `stopSession` defaults the final session verdict to `OK`.
+Plain `stopSession` defaults the final session verdict to `LLM_COMPLETE` and is intended for manual CLI sessions.
 
 Agent CLI execution must finish each test goal with an explicit LLM verdict:
 
@@ -172,6 +172,17 @@ The reason is free text and should explain the final decision.
 If reporting is enabled, the final CLI verdict must be written to the generated report artifacts.
 
 The `testar-cli` skill documentation is the operational source that tells agents how to use this contract.
+
+## Output Folder Naming
+
+Generated output folders must include the execution mode after the timestamp.
+
+Examples:
+
+- `2026-06-29_13h23m23s_generate_webdriver_parabank_1`
+- `2026-06-29_13h23m23s_cli_webdriver_parabank_1`
+
+The mode token allows WebStudio to present mode-specific result summaries while keeping one shared output folder.
 
 ## Shared Settings
 

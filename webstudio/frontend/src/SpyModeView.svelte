@@ -1,8 +1,9 @@
 <script>
+    import { canStartRuntimeMode } from "./runtimeModeControls.js";
+
     export let scriptlessStatus = null;
     export let saving = false;
     export let selectedWorkspaceName = "";
-    export let selectedWorkspaceAvailableInTestar = false;
     export let selectedWorkspaceSutConnectorValue = "";
     export let spyState = null;
     export let startLocalSpyMode;
@@ -301,6 +302,11 @@
     $: localSpyRunning = scriptlessStatus?.status === "running" && scriptlessStatus?.mode === "Spy";
     $: remoteSpyRunning = spyState?.status === "running";
     $: anySpyRunning = localSpyRunning || remoteSpyRunning;
+    $: canStartSpyMode = canStartRuntimeMode({
+        selectedWorkspaceName,
+        saving,
+        running: anySpyRunning
+    });
     $: spyRunLabel = localSpyRunning
         ? "running spy local"
         : (remoteSpyRunning ? "running spy remote" : "waiting user execution");
@@ -331,13 +337,13 @@
         <div class="button-row">
             <button
                 on:click={startLocalSpyMode}
-                disabled={!selectedWorkspaceName || !selectedWorkspaceAvailableInTestar || saving || anySpyRunning}
+                disabled={!canStartSpyMode}
             >
                 Run Local Spy Mode
             </button>
             <button
                 on:click={startRemoteSpyMode}
-                disabled={!selectedWorkspaceName || !selectedWorkspaceAvailableInTestar || saving || anySpyRunning}
+                disabled={!canStartSpyMode}
             >
                 Run Remote Spy Mode
             </button>

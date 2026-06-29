@@ -81,6 +81,12 @@ Use double quotes around target, text, and value when they contain spaces or spe
 6. Stop the session when the goal is finished.
 7. Shutdown the daemon after stopping the session.
 
+After executing one or multiple test goal sessions, always run:
+
+- `shutdownDaemon`
+
+Do this after the final `stopSession ...` command so no daemon or SUT-driver process remains active.
+
 ## Test goal verdicts
 
 Agent CLI executions must finish each test goal with exactly one explicit verdict command:

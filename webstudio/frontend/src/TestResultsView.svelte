@@ -18,6 +18,7 @@
 
     let outputSortMode = "latest";
     let outputFilterMode = "all";
+    let outputModeFilter = "all";
     let fileFilterMode = "all";
     let deleteDialog = {
         open: false,
@@ -86,7 +87,7 @@
     }
 
     $: sortedGroups = sortedResultGroups(resultsData?.groups || [], outputSortMode);
-    $: visibleResultGroups = filterResultGroups(sortedGroups, outputFilterMode);
+    $: visibleResultGroups = filterResultGroups(sortedGroups, outputFilterMode, outputModeFilter);
     $: visibleResultFiles = filterResultFiles(selectedResultGroup?.files || [], fileFilterMode);
     $: resultSummary = summarizeResultGroup(selectedResultGroup);
     $: maxVerdictCount = Math.max(...resultSummary.verdictGroups.map((group) => group.count), 1);
@@ -113,11 +114,19 @@
                         </select>
                     </label>
                     <label>
+                        <span>Mode</span>
+                        <select bind:value={outputModeFilter}>
+                            <option value="all">All</option>
+                            <option value="generate">Generate</option>
+                            <option value="cli">CLI</option>
+                        </select>
+                    </label>
+                    <label>
                         <span>Filter</span>
                         <select bind:value={outputFilterMode}>
                             <option value="all">All</option>
-                            <option value="failed">Failures</option>
-                            <option value="ok">OK only</option>
+                            <option value="failed">Issues only</option>
+                            <option value="ok">Successful only</option>
                         </select>
                     </label>
                 </div>
@@ -158,15 +167,15 @@
 
             <section class="results-sidebar-section">
                 <div class="results-source-header">
-                    <h4 class="eyebrow">Generated Verdict Files</h4>
+                    <h4 class="eyebrow">Test Verdict Files</h4>
                 </div>
                 <div class="results-filter-row results-filter-row-single">
                     <label>
                         <span>Filter</span>
                         <select bind:value={fileFilterMode}>
                             <option value="all">All</option>
-                            <option value="failed">Failures</option>
-                            <option value="ok">OK only</option>
+                            <option value="failed">Issues only</option>
+                            <option value="ok">Successful only</option>
                         </select>
                     </label>
                 </div>
@@ -238,11 +247,11 @@
                                         </div>
                                     </article>
                                     <article class="verdict-total verdict-total-ok">
-                                        <strong>{resultSummary.okCount} OK</strong>
+                                        <strong>{resultSummary.okCount} {resultSummary.successLabel}</strong>
                                         <span>{((resultSummary.okCount / totalOutcomeCount) * 100).toFixed(1)}%</span>
                                     </article>
                                     <article class="verdict-total verdict-total-failed">
-                                        <strong>{resultSummary.failedVerdictCount} FAILED</strong>
+                                        <strong>{resultSummary.failedVerdictCount} {resultSummary.failureLabel}</strong>
                                         <span>{((resultSummary.failedVerdictCount / totalOutcomeCount) * 100).toFixed(1)}%</span>
                                     </article>
                                     <div class="verdict-outcome-track" aria-hidden="true">
@@ -281,7 +290,7 @@
                                         {/each}
                                     </div>
                                 {:else}
-                                    <p class="progress-message">No test result files were generated with failures.</p>
+                                    <p class="progress-message">No test result files were generated with {resultSummary.failureLabel.toLowerCase()} outcomes.</p>
                                 {/if}
                             </div>
                         </section>

@@ -4,6 +4,7 @@ import {
     filterResultFiles,
     filterResultGroups,
     formatResultFileLabel,
+    resultGroupMode,
     sortedResultGroups,
     summarizeResultGroup
 } from "../src/testResultsViewModel.js";
@@ -20,6 +21,31 @@ test("selecting an output group can show summary without selecting first file", 
     assert.equal(summary.okCount, 1);
     assert.equal(summary.failedSequenceCount, 1);
     assert.equal(summary.failedVerdictCount, 1);
+});
+
+test("summarizes CLI output groups as completed and invalid outcomes", () => {
+    const summary = summarizeResultGroup({
+        name: "2026-06-29_13h23m23s_cli_webdriver_parabank_1",
+        totalSequenceCount: 2,
+        files: [
+            { name: "run_sequence_1_V001_LLM_COMPLETE.html", status: "ok" },
+            { name: "run_sequence_2_V001_LLM_INVALID.html", status: "failed" }
+        ]
+    });
+
+    assert.equal(summary.mode, "cli");
+    assert.equal(summary.successLabel, "COMPLETED");
+    assert.equal(summary.failureLabel, "INVALID");
+    assert.equal(summary.okCount, 1);
+    assert.equal(summary.failedSequenceCount, 1);
+    assert.equal(summary.failedVerdictCount, 1);
+    assert.deepEqual(summary.verdictGroups.map((group) => group.label), ["LLM_INVALID"]);
+});
+
+test("detects result group mode from output folder name", () => {
+    assert.equal(resultGroupMode({ name: "2026-06-29_13h23m23s_cli_webdriver_parabank_1" }), "cli");
+    assert.equal(resultGroupMode({ name: "2026-06-29_13h23m23s_generate_webdriver_parabank_1" }), "generate");
+    assert.equal(resultGroupMode({ name: "2026-06-29_13h23m23s_webdriver_parabank_1" }), "generate");
 });
 
 test("sorts output result groups latest first by default", () => {
@@ -46,6 +72,46 @@ test("filters failed output result groups and generated files", () => {
             { name: "failed.html", status: "failed" }
         ], "failed").map((file) => file.name),
         ["failed.html"]
+    );
+});
+
+test("filters LLM complete output result groups and generated files as successful", () => {
+    assert.deepEqual(
+        filterResultGroups([
+            { name: "2026-06-29_13h23m23s_cli_webdriver_parabank_1", status: "ok" },
+            { name: "2026-06-29_13h25m23s_cli_webdriver_parabank_1", status: "failed" }
+        ], "ok", "cli").map((group) => group.name),
+        ["2026-06-29_13h23m23s_cli_webdriver_parabank_1"]
+    );
+
+    assert.deepEqual(
+        filterResultFiles([
+            { name: "sequence_1_V001_LLM_COMPLETE.html", status: "ok" },
+            { name: "sequence_2_V001_LLM_INVALID.html", status: "failed" }
+        ], "ok").map((file) => file.name),
+        ["sequence_1_V001_LLM_COMPLETE.html"]
+    );
+});
+
+test("filters output result groups by execution mode", () => {
+    const groups = [
+        { name: "2026-06-29_13h23m23s_generate_webdriver_parabank_1", status: "ok" },
+        { name: "2026-06-29_13h25m23s_cli_webdriver_parabank_1", status: "failed" }
+    ];
+
+    assert.deepEqual(
+        filterResultGroups(groups, "all", "generate").map((group) => group.name),
+        ["2026-06-29_13h23m23s_generate_webdriver_parabank_1"]
+    );
+
+    assert.deepEqual(
+        filterResultGroups(groups, "all", "cli").map((group) => group.name),
+        ["2026-06-29_13h25m23s_cli_webdriver_parabank_1"]
+    );
+
+    assert.deepEqual(
+        filterResultGroups(groups, "failed", "cli").map((group) => group.name),
+        ["2026-06-29_13h25m23s_cli_webdriver_parabank_1"]
     );
 });
 

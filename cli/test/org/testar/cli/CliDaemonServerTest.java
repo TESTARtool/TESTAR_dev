@@ -143,7 +143,7 @@ public class CliDaemonServerTest {
     }
 
     @Test
-    public void stopSessionWithoutVerdictDefaultsToOk() {
+    public void stopSessionWithoutVerdictDefaultsToLlmComplete() {
         CliDaemonServer server = new CliDaemonServer();
 
         List<Verdict> verdicts = server.finalVerdictsFromStopRequest(
@@ -151,7 +151,8 @@ public class CliDaemonServerTest {
         );
 
         Assert.assertEquals(1, verdicts.size());
-        Assert.assertEquals(Verdict.OK, verdicts.get(0));
+        Assert.assertEquals(Verdict.Severity.LLM_COMPLETE.getValue(), verdicts.get(0).severity(), 0.0);
+        Assert.assertEquals("Manual CLI session completed.", verdicts.get(0).info());
     }
 
     @Test

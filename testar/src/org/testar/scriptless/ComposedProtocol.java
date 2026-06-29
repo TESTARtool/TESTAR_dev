@@ -123,6 +123,7 @@ public abstract class ComposedProtocol implements Consumer<Settings> {
             OutputStructure.calculateOuterLoopDateString();
             OutputStructure.sequenceInnerLoopCount = 0;
             OutputStructure.createOutputSUTname(runtimeContext.settings());
+            OutputStructure.setExecutionModeName("generate");
             OutputStructure.createOutputFolders();
         }
 

@@ -208,6 +208,7 @@ public final class SessionReportingManager {
             OutputStructure.executedSUTname = sanitizeTarget(target);
         }
 
+        OutputStructure.setExecutionModeName("cli");
         OutputStructure.createOutputFolders();
     }
 

@@ -11,7 +11,9 @@ Each bug entry should contain:
 - bug behavior
 - status
 
-## List of Bugs
+## Archived bugs
+
+Bugs fixed during previous designs that no longer map to current UI concepts.
 
 ### WS-001 CLI Buttons Not Recomputed After Workspace Change
 
@@ -35,6 +37,36 @@ Bug:
 Acceptance:
 
 - CLI availability recomputes immediately when workspace changes
+
+### WS-008 View State Model Did Nothing For Unsupported Workspace
+
+- Area: Navigation / State Model Analysis
+- Status: archived after shared runtime refactor
+
+Reproduction:
+
+1. Select a workspace that is not available in either the TESTAR runtime or the CLI runtime.
+2. Click `View State Model`.
+
+Expected:
+
+- WebStudio shows a user-facing dialog explaining why state model analysis cannot be opened for the selected workspace
+
+Bug:
+
+- the button action returned silently when the selected workspace was not available in the TESTAR runtime workspace list
+- the check was too strict because CLI workspaces can also generate state models
+
+Reason archived:
+
+- WebStudio now uses the selected shared workspace/runtime model
+- the separate TESTAR-vs-CLI runtime availability concept no longer maps to the current State Model flow
+- current expected behavior is specified in `WEBSTUDIO_FUNCTIONAL_SPEC.md`
+- current dialog behavior remains covered by `stateModelNavigation.test.js`
+
+## List of Bugs
+
+Bugs fixed which are still relevant to current designs or behaviors.
 
 ### WS-002 Runtime Pages Missing SUT Target Summary
 
@@ -196,30 +228,59 @@ Acceptance:
 - optional non-dropdown string settings can still render a blank option
 - regression test `settingsSelectOptions.test.js` passes
 
-### WS-008 View State Model Did Nothing For Unsupported Workspace
+### WS-009 Generate And Spy Buttons Disabled By Stale Runtime-Origin Gate
 
-- Area: Navigation / State Model Analysis
+- Area: Generate Mode / Spy Mode
 - Status: fixed
 
 Reproduction:
 
-1. Select a workspace that is not available in either the TESTAR runtime or the CLI runtime.
-2. Click `View State Model`.
+1. Select a workspace after the shared runtime/workspace refactor.
+2. Open Generate Mode or Spy Mode.
+3. Observe the run buttons.
 
 Expected:
 
-- WebStudio shows a user-facing dialog explaining why state model analysis cannot be opened for the selected workspace
+- Generate and Spy start buttons enable when a workspace is selected and no execution is already running
+- workspace origin metadata must not disable scriptless runtime controls
 
 Bug:
 
-- the button action returned silently when the selected workspace was not available in the TESTAR runtime workspace list
-- the check was too strict because CLI workspaces can also generate state models
+- Generate and Spy still required `availableInTestar`
+- workspaces not marked with that old TESTAR-only flag left the buttons disabled
 
 Acceptance:
 
-- incompatible workspaces show an `Unable To Open State Model` dialog
-- missing workspace selection shows an `Unable To Open State Model` dialog
-- TESTAR-compatible workspaces continue to call the state model open API
-- CLI-compatible workspaces continue to call the state model open API
-- state model analysis resolves datastore paths against the selected workspace runtime home
-- regression test `stateModelNavigation.test.js` passes
+- Generate and Spy buttons use selected shared workspace availability
+- no selected workspace still disables the buttons
+- saving or active execution still disables the buttons
+- regression test `runtimeModeControls.test.js` passes
+
+### WS-010 LLM Complete Results Shown As Issues
+
+- Area: Test Results / CLI Reports
+- Status: fixed
+
+Reproduction:
+
+1. Run an Agent CLI execution that finishes with `LLM_COMPLETE`.
+2. Open `View Test Results`.
+3. Inspect `Output Results`, `Test Verdict Files`, and success/issue filters.
+
+Expected:
+
+- `LLM_COMPLETE` result files are successful outcomes
+- output folders containing only `LLM_COMPLETE` files are successful
+- `Successful only` includes `LLM_COMPLETE`
+- `Issues only` excludes `LLM_COMPLETE`
+
+Bug:
+
+- shared result listing still treated only `OK` as successful
+- `LLM_COMPLETE` files were marked as failed, causing red rows and incorrect filters
+
+Acceptance:
+
+- shared result status classification treats `OK` and `LLM_COMPLETE` as successful
+- `LLM_INVALID` and non-success verdicts remain issue outcomes
+- regression test `ResultVerdictStatusTest` passes

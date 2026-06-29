@@ -307,6 +307,7 @@ Header information:
 
 Runtime behavior:
 
+- run controls are enabled when a shared workspace is selected and no Generate execution is already running
 - start calls the server execution endpoint for scriptless generate
 - stop calls the scriptless stop endpoint
 - polling updates console output and sequence outcomes
@@ -320,6 +321,8 @@ Spy Mode supports:
 - state screenshot inspection
 - widget hover and selection
 - derived/default/direct actions on widgets
+
+Run controls are enabled when a shared workspace is selected and no Spy execution is already running.
 
 Header information:
 
@@ -364,7 +367,7 @@ Dialog actions:
 
 Manual CLI execution may stop a session with plain `stopSession`.
 
-Plain `stopSession` must finalize the session with an `OK` verdict.
+Plain `stopSession` must finalize the session with an `LLM_COMPLETE` verdict.
 
 Agent CLI execution must stop a session with an explicit LLM verdict:
 
@@ -385,13 +388,24 @@ When CLI reporting is enabled, generated report artifacts must include the final
 
 The Test Results page supports inspection of output folders from the shared TESTAR distribution.
 
+Output result folder names must include the execution mode token after the timestamp:
+
+- `generate` for scriptless Generate mode
+- `cli` for CLI mode
+
+Example names:
+
+- `2026-06-29_13h23m23s_generate_webdriver_parabank_1`
+- `2026-06-29_13h23m23s_cli_webdriver_parabank_1`
+
 ### Output Result Selection
 
 The page must support:
 
 - output result folder selection
-- output result folder sorting
-- output result folder filtering
+- output result folder sorting by date or name
+- output result folder filtering by result type
+- output result folder filtering by execution mode
 - generated file listing for the selected output folder
 - generated file filtering
 - verdict outcome summarization
@@ -414,6 +428,18 @@ The summary should include:
 - failure type distribution
 - sequence status overview
 - enough metadata to understand which run is selected
+
+Generate output summaries use `OK` and `FAILED` labels.
+
+`OK` result files are successful outcomes.
+
+`FAILED` result files are issue outcomes.
+
+CLI output summaries use `COMPLETED` and `INVALID` labels.
+
+`LLM_COMPLETE` result files are successful outcomes.
+
+`LLM_INVALID` result files are issue outcomes.
 
 When a generated file is selected, the right preview area must show the corresponding HTML report.
 
@@ -442,14 +468,17 @@ Expected empty-state behavior:
 Output result folder filtering should support:
 
 - all folders
-- folders with failures
-- folders with only OK sequences
+- folders with issues
+- folders with only successful sequences
+- all execution modes
+- Generate execution mode
+- CLI execution mode
 
 Generated file filtering should support:
 
 - all files
-- failed files
-- OK files
+- issue files
+- successful files
 
 Filtering must not delete files. It only changes visibility in Web Studio.
 

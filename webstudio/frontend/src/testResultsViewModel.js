@@ -1,4 +1,14 @@
 const verdictPattern = /_V\d+_([^.]+)\.html$/i;
+const resultModeLabels = {
+    cli: {
+        success: "COMPLETED",
+        failure: "INVALID"
+    },
+    generate: {
+        success: "OK",
+        failure: "FAILED"
+    }
+};
 const verdictColorPalette = [
     "#d44949",
     "#f47b32",
@@ -28,9 +38,34 @@ export function formatResultFileLabel(fileName) {
     return trimmedExtension;
 }
 
+export function resultGroupMode(resultGroup) {
+    const groupName = resultGroup?.name || "";
+    const modeMatch = groupName.match(/_\d{2}h\d{2}m\d{2}s_(cli|generate)_/i);
+
+    if (modeMatch) {
+        return modeMatch[1].toLowerCase();
+    }
+
+    return "generate";
+}
+
+function isSuccessfulVerdict(verdictKey, mode) {
+    if (mode === "cli") {
+        return verdictKey === "LLM_COMPLETE" || verdictKey === "OK";
+    }
+
+    return verdictKey === "OK";
+}
+
 export function summarizeResultGroup(resultGroup) {
+    const mode = resultGroupMode(resultGroup);
+    const labels = resultModeLabels[mode] || resultModeLabels.generate;
+
     if (!resultGroup) {
         return {
+            mode,
+            successLabel: labels.success,
+            failureLabel: labels.failure,
             okCount: 0,
             failedSequenceCount: 0,
             failedVerdictCount: 0,
@@ -49,7 +84,7 @@ export function summarizeResultGroup(resultGroup) {
         }
 
         const verdictKey = verdictMatch[1];
-        if (verdictKey === "OK") {
+        if (isSuccessfulVerdict(verdictKey, mode)) {
             explicitOkCount += 1;
             continue;
         }
@@ -77,6 +112,9 @@ export function summarizeResultGroup(resultGroup) {
         }));
 
     return {
+        mode,
+        successLabel: labels.success,
+        failureLabel: labels.failure,
         okCount,
         failedSequenceCount: failedSequences.size,
         failedVerdictCount: verdictGroups.reduce((total, group) => total + group.count, 0),
@@ -101,8 +139,12 @@ export function sortedResultGroups(groups, sortMode = "latest") {
     return sortedGroups;
 }
 
-export function filterResultGroups(groups, filterMode = "all") {
+export function filterResultGroups(groups, filterMode = "all", modeFilter = "all") {
     return (groups || []).filter((group) => {
+        if (modeFilter !== "all" && resultGroupMode(group) !== modeFilter) {
+            return false;
+        }
+
         if (filterMode === "failed") {
             return group.status === "failed";
         }

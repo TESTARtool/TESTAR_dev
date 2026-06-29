@@ -239,9 +239,13 @@ Expected behavior:
 
 - the left panel contains `Output Results`
 - `Output Results` reads from the shared Generate and CLI output folder
-- `Output Results` includes sorting and filtering controls
+- `Output Results` includes sorting by date or name
+- `Output Results` includes filtering by the result type
+- `Output Results` can be filtered by execution mode: All, Generate, or CLI
 - the left panel also contains `Generated Files` for the selected output result
 - selecting an output result folder shows a run-level verdict outcome summary in the right preview area
+- Generate summaries use `OK` and `FAILED` wording
+- CLI summaries use `COMPLETED` and `INVALID` wording
 - selecting an output result folder does not automatically select the first generated file
 - selecting a generated file replaces the summary with the HTML report preview
 - the user can return from HTML report preview to the run-level verdict outcome summary

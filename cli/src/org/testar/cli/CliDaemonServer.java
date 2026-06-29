@@ -533,7 +533,7 @@ final class CliDaemonServer {
     List<Verdict> finalVerdictsFromStopRequest(CliRequest request) {
         String verdictName = request.argumentAt(0);
         if (verdictName == null || verdictName.isBlank()) {
-            return List.of(Verdict.OK);
+            return List.of(new Verdict(Verdict.Severity.LLM_COMPLETE, "Manual CLI session completed."));
         }
 
         Verdict.Severity severity = parseFinalVerdictSeverity(verdictName);

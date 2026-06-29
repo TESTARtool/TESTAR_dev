@@ -709,13 +709,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
     }
 
     private String resultStatusFor(Path path) {
-        String upperCaseFileName = path.getFileName().toString().toUpperCase();
-        Matcher verdictMatcher = Pattern.compile("_V\\d+_([^.]+)\\.HTML?$").matcher(upperCaseFileName);
-        if (verdictMatcher.find()) {
-            return "OK".equals(verdictMatcher.group(1)) ? "ok" : "failed";
-        }
-
-        return "ok";
+        return ResultVerdictStatus.forResultFile(path);
     }
 
     private String resultStatusFor(List<ResultFileSummaryDto> files) {

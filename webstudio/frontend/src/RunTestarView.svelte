@@ -1,10 +1,10 @@
 <script>
     import { tick } from "svelte";
+    import { canStartRuntimeMode } from "./runtimeModeControls.js";
 
     export let saving = false;
     export let scriptlessStatus = null;
     export let selectedWorkspaceName = "";
-    export let selectedWorkspaceAvailableInTestar = false;
     export let selectedWorkspaceSutConnectorValue = "";
     export let startGenerate;
     export let stopGenerate;
@@ -46,6 +46,11 @@
     $: generateRunActive = scriptlessStatus?.status === "running";
     $: generateRunError = scriptlessStatus?.status === "error";
     $: generateRunLabel = scriptlessStatus?.message || "No scriptless status available.";
+    $: canStartGenerate = canStartRuntimeMode({
+        selectedWorkspaceName,
+        saving,
+        running: generateRunActive
+    });
 
     $: if (consoleOutputElement && scriptlessStatus?.consoleOutput !== undefined) {
         const currentConsoleOutput = scriptlessStatus.consoleOutput || "";
@@ -84,7 +89,7 @@
         </div>
         <span class="status-run-label">{generateRunLabel}</span>
         <div class="button-row">
-            <button on:click={startGenerate} disabled={!selectedWorkspaceName || !selectedWorkspaceAvailableInTestar || saving || scriptlessStatus?.status === "running"}>
+            <button on:click={startGenerate} disabled={!canStartGenerate}>
                 Run Generate Mode
             </button>
             <button class="secondary" on:click={stopGenerate} disabled={saving}>

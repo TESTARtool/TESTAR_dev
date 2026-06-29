@@ -25,6 +25,7 @@ public class OutputStructure {
     public static String startInnerLoopDateString;
 
     public static String executedSUTname;
+    public static String executionModeName = "";
     public static int sequenceInnerLoopCount;
 
     public static String outerLoopOutputDir;
@@ -93,9 +94,18 @@ public class OutputStructure {
         }
     }
 
+    public static void setExecutionModeName(String modeName) {
+        executionModeName = sanitizeOutputName(modeName);
+    }
+
     public static void createOutputFolders() {
+        String outputName = executedSUTname;
+        if (executionModeName != null && !executionModeName.isEmpty()) {
+            outputName = executionModeName + "_" + outputName;
+        }
+
         outerLoopOutputDir = TestarDirectories.getOutputDir() + File.separator + startOuterLoopDateString
-                + "_" + executedSUTname;
+                + "_" + outputName;
         File runDir = new File(outerLoopOutputDir);
         runDir.mkdirs();
 
@@ -139,6 +149,10 @@ public class OutputStructure {
         if (!procListDir.exists() && !procListDir.mkdirs()) {
             reportDirectoryCreationFailure("process listener directory", procListDir);
         }
+    }
+
+    private static String sanitizeOutputName(String name) {
+        return name == null ? "" : name.trim().replaceAll("[^A-Za-z0-9_-]", "_");
     }
 
     private static void reportDirectoryCreationFailure(String purpose, File directory) {

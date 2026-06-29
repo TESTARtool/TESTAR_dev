@@ -40,7 +40,7 @@
     let workspaces = [];
     let selectedWorkspaceName = "";
     let selectedWorkspaceSummary = null;
-    let selectedWorkspaceAvailableInTestar = false;
+    let selectedWorkspaceAvailableInSharedRuntime = false;
     let workspaceDocument = null;
     let selectedWorkspaceSutConnector = "";
     let selectedWorkspaceSutConnectorValue = "";
@@ -631,7 +631,7 @@
     }
 
     async function startGenerate() {
-        if (!selectedWorkspaceName || !selectedWorkspaceAvailableInTestar) {
+        if (!selectedWorkspaceName) {
             return;
         }
 
@@ -769,11 +769,11 @@
         window.open(url, "_blank", "noopener,noreferrer");
     }
 
-    function workspaceAvailableInTestar(workspaceSummary = selectedWorkspaceSummary) {
-        return workspaceSummary?.availableInTestar === true;
+    function workspaceAvailableInSharedRuntime(workspaceSummary = selectedWorkspaceSummary) {
+        return Boolean(workspaceSummary);
     }
 
-    $: selectedWorkspaceAvailableInTestar = workspaceAvailableInTestar();
+    $: selectedWorkspaceAvailableInSharedRuntime = workspaceAvailableInSharedRuntime();
 
     function workspaceSettingValue(settingKey) {
         for (const settingsGroup of workspaceDocument?.settingsGroups || []) {
@@ -1131,7 +1131,7 @@
     async function navigateToStateModel() {
         const workspaceDialog = stateModelWorkspaceDialog(
             selectedWorkspaceName,
-            selectedWorkspaceAvailableInTestar
+            selectedWorkspaceAvailableInSharedRuntime
         );
         if (workspaceDialog) {
             openStateModelDialog(workspaceDialog.title, workspaceDialog.message);
@@ -1565,7 +1565,7 @@
     }
 
     async function startRemoteSpyMode() {
-        if (!selectedWorkspaceName || !selectedWorkspaceAvailableInTestar) {
+        if (!selectedWorkspaceName) {
             return;
         }
 
@@ -1711,7 +1711,7 @@
     }
 
     async function startLocalSpyMode() {
-        if (!selectedWorkspaceName || !selectedWorkspaceAvailableInTestar) {
+        if (!selectedWorkspaceName) {
             return;
         }
 
@@ -2023,7 +2023,6 @@
             saving={saving}
             scriptlessStatus={scriptlessStatus}
             selectedWorkspaceName={selectedWorkspaceName}
-            selectedWorkspaceAvailableInTestar={selectedWorkspaceAvailableInTestar}
             selectedWorkspaceSutConnectorValue={selectedWorkspaceSutConnectorValue}
             startGenerate={startGenerate}
             stopGenerate={stopGenerate}
@@ -2035,7 +2034,6 @@
             scriptlessStatus={scriptlessStatus}
             saving={saving}
             selectedWorkspaceName={selectedWorkspaceName}
-            selectedWorkspaceAvailableInTestar={selectedWorkspaceAvailableInTestar}
             selectedWorkspaceSutConnectorValue={selectedWorkspaceSutConnectorValue}
             spyState={spyState}
             startRemoteSpyMode={startRemoteSpyMode}

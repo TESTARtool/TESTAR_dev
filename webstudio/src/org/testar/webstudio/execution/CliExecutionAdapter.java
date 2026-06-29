@@ -661,6 +661,8 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
             .append('\n')
             .append("Do not finish an agent-controlled test goal with plain stopSession.")
             .append('\n')
+            .append("After the final stopSession command, after one or multiple test goal sessions are finished, execute shutdownDaemon so no TESTAR CLI daemon remains active.")
+            .append('\n')
             .append('\n');
         if (!settings.apiKeyEnvVarName().isBlank()) {
             prompt.append("Expected API key environment variable for Codex authentication: ")
@@ -855,13 +857,7 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
     }
 
     private String resultStatusFor(Path path) {
-        String upperCaseFileName = path.getFileName().toString().toUpperCase();
-        Matcher verdictMatcher = Pattern.compile("_V\\d+_([^.]+)\\.HTML?$").matcher(upperCaseFileName);
-        if (verdictMatcher.find()) {
-            return "OK".equals(verdictMatcher.group(1)) ? "ok" : "failed";
-        }
-
-        return "ok";
+        return ResultVerdictStatus.forResultFile(path);
     }
 
     private String resultStatusFor(List<ResultFileSummaryDto> files) {
