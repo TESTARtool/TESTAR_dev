@@ -142,7 +142,36 @@ This prevents CLI from failing only because unrelated scriptless-only Java files
 
 Oracle composer entries are scriptless-only.
 
-CLI agent runs should use the agent as the oracle for LLM-complete verdicts, such as `LLM_COMPLETE_VALID` and `LLM_COMPLETE_INVALID`.
+CLI agent runs should use the agent as the oracle for LLM verdicts, such as `LLM_COMPLETE` and `LLM_INVALID`.
+
+## CLI Session Verdict Contract
+
+`stopSession` is the CLI session finalization command.
+
+Manual CLI execution may use:
+
+```text
+stopSession
+```
+
+Plain `stopSession` defaults the final session verdict to `OK`.
+
+Agent CLI execution must finish each test goal with an explicit LLM verdict:
+
+```text
+stopSession LLM_COMPLETE <reason>
+stopSession LLM_INVALID <reason>
+```
+
+`LLM_COMPLETE` means the agent completed the requested test goal and verified the expected result with CLI evidence.
+
+`LLM_INVALID` means the agent reached an invalid result, found a bug, could not verify the expected result, or could not complete the goal with reliable CLI evidence.
+
+The reason is free text and should explain the final decision.
+
+If reporting is enabled, the final CLI verdict must be written to the generated report artifacts.
+
+The `testar-cli` skill documentation is the operational source that tells agents how to use this contract.
 
 ## Shared Settings
 

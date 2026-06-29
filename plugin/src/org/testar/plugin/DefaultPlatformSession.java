@@ -14,6 +14,7 @@ import org.testar.core.action.Action;
 import org.testar.core.action.resolver.ResolvedAction;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
+import org.testar.core.verdict.Verdict;
 import org.testar.plugin.reporting.SessionReportingManager;
 
 final class DefaultPlatformSession implements PlatformSession {
@@ -88,7 +89,7 @@ final class DefaultPlatformSession implements PlatformSession {
     }
 
     @Override
-    public void stopSystem() {
+    public void stopSystem(List<Verdict> finalVerdicts) {
         try {
             State state = services.stateService().getState(system);
             if (reportingEnabled) {
@@ -104,7 +105,7 @@ final class DefaultPlatformSession implements PlatformSession {
             services.systemService().stopSystem(system);
         } finally {
             if (reportingEnabled) {
-                sessionReportingManager.finish();
+                sessionReportingManager.finish(finalVerdicts);
             }
         }
     }

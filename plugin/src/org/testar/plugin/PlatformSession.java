@@ -6,13 +6,14 @@
 
 package org.testar.plugin;
 
-import java.util.Set;
 import java.util.List;
+import java.util.Set;
 
 import org.testar.core.action.Action;
 import org.testar.core.action.resolver.ResolvedAction;
 import org.testar.core.state.SUT;
 import org.testar.core.state.State;
+import org.testar.core.verdict.Verdict;
 
 /**
  * Live platform session holding the started system plus the composed services
@@ -30,7 +31,11 @@ public interface PlatformSession extends AutoCloseable {
 
     boolean executeAction(Action action);
 
-    void stopSystem();
+    default void stopSystem() {
+        stopSystem(List.of(Verdict.OK));
+    }
+
+    void stopSystem(List<Verdict> finalVerdicts);
 
     @Override
     void close();

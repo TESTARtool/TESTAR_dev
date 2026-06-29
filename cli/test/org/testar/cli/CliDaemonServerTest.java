@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.testar.config.ConfigTags;
 import org.testar.config.settings.Settings;
 import org.testar.config.settings.SettingsDefaults;
+import org.testar.core.verdict.Verdict;
 import org.testar.plugin.OperatingSystems;
 import org.testar.plugin.configuration.PlatformSessionSpecification;
 
@@ -138,6 +139,60 @@ public class CliDaemonServerTest {
             Assert.fail("Expected unsupported connector failure");
         } catch (IllegalArgumentException exception) {
             Assert.assertTrue(exception.getMessage().contains("Unsupported SUTConnector"));
+        }
+    }
+
+    @Test
+    public void stopSessionWithoutVerdictDefaultsToOk() {
+        CliDaemonServer server = new CliDaemonServer();
+
+        List<Verdict> verdicts = server.finalVerdictsFromStopRequest(
+                CliRequest.of(CliCommand.STOP_SESSION, List.of())
+        );
+
+        Assert.assertEquals(1, verdicts.size());
+        Assert.assertEquals(Verdict.OK, verdicts.get(0));
+    }
+
+    @Test
+    public void stopSessionAcceptsLlmCompleteWithReason() {
+        CliDaemonServer server = new CliDaemonServer();
+
+        List<Verdict> verdicts = server.finalVerdictsFromStopRequest(
+                CliRequest.of(CliCommand.STOP_SESSION, List.of("LLM_COMPLETE", "Login", "verified"))
+        );
+
+        Assert.assertEquals(1, verdicts.size());
+        Assert.assertEquals(Verdict.Severity.LLM_COMPLETE.getValue(), verdicts.get(0).severity(), 0.0);
+        Assert.assertEquals("Login verified", verdicts.get(0).info());
+    }
+
+    @Test
+    public void stopSessionAcceptsLlmInvalidWithReason() {
+        CliDaemonServer server = new CliDaemonServer();
+
+        List<Verdict> verdicts = server.finalVerdictsFromStopRequest(
+                CliRequest.of(CliCommand.STOP_SESSION, List.of("LLM_INVALID", "Welcome message was not shown"))
+        );
+
+        Assert.assertEquals(1, verdicts.size());
+        Assert.assertEquals(Verdict.Severity.LLM_INVALID.getValue(), verdicts.get(0).severity(), 0.0);
+        Assert.assertEquals("Welcome message was not shown", verdicts.get(0).info());
+    }
+
+    @Test
+    public void stopSessionRejectsUnsupportedFinalVerdict() {
+        CliDaemonServer server = new CliDaemonServer();
+
+        try {
+            server.finalVerdictsFromStopRequest(
+                    CliRequest.of(CliCommand.STOP_SESSION, List.of("WARNING", "Not valid for agent finalization"))
+            );
+            Assert.fail("Expected unsupported stopSession verdict failure");
+        } catch (IllegalArgumentException exception) {
+            Assert.assertTrue(exception.getMessage().contains("Unsupported stopSession verdict"));
+            Assert.assertTrue(exception.getMessage().contains("LLM_COMPLETE"));
+            Assert.assertTrue(exception.getMessage().contains("LLM_INVALID"));
         }
     }
 

@@ -38,7 +38,8 @@ Treat the CLI distribution as an operational environment, not as a source-code w
 - `executeAction click <semanticText>`
 - `executeAction type <semanticText> <inputText>`
 - `executeAction select <semanticText> <value>`
-- `stopSession`
+- `stopSession LLM_COMPLETE <reason>`
+- `stopSession LLM_INVALID <reason>`
 - `shutdownDaemon`
 
 ## Semantic action matching
@@ -67,6 +68,19 @@ Use short meaningful text that is likely to appear in the action description, fo
 5. Re-check state for execution evidence.
 6. Stop the session when the goal is finished.
 7. Shutdown the daemon after stopping the session.
+
+## Test goal verdicts
+
+Agent CLI executions must finish each test goal with exactly one explicit verdict command:
+
+- `stopSession LLM_COMPLETE <reason>`
+- `stopSession LLM_INVALID <reason>`
+
+Use `LLM_COMPLETE` only when the requested test goal was completed and the expected result was verified with CLI evidence.
+
+Use `LLM_INVALID` when the expected result is not verified, a bug or invalid state is observed, the goal cannot be completed, or the available evidence is not reliable enough to declare completion.
+
+The `<reason>` must briefly explain the final decision using observed CLI evidence.
 
 ## Resilience and retry behavior rules
 
@@ -100,7 +114,7 @@ Workspace-driven Windows testing:
 - `testar-cli.bat getDerivedActions`
 - `testar-cli.bat executeAction click Open`
 - `testar-cli.bat executeAction type Editor Writing_text_in_Notepad`
-- `testar-cli.bat stopSession`
+- `testar-cli.bat stopSession LLM_COMPLETE "Notepad opened and text was entered successfully."`
 - `testar-cli.bat shutdownDaemon`
 
 Workspace-driven WebDriver testing:
@@ -113,7 +127,7 @@ Workspace-driven WebDriver testing:
 - `testar-cli.bat executeAction click a_about`
 - `testar-cli.bat executeAction type input_contact This_is_a_message`
 - `testar-cli.bat executeAction select select_amount 99999`
-- `testar-cli.bat stopSession`
+- `testar-cli.bat stopSession LLM_INVALID "There is no confirmation that the transaction was sent successfully."`
 - `testar-cli.bat shutdownDaemon`
 
 Workspace-driven Android testing:
@@ -125,7 +139,7 @@ Workspace-driven Android testing:
 - `testar-cli.bat getDerivedActions`
 - `testar-cli.bat executeAction click Graphics`
 - `testar-cli.bat executeAction type username Writing_text_in_Android`
-- `testar-cli.bat stopSession`
+- `testar-cli.bat stopSession LLM_COMPLETE "The expected Android state was verified."`
 - `testar-cli.bat shutdownDaemon`
 
 Explicit standalone startup wihtout workspace:

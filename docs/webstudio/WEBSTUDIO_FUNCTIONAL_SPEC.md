@@ -360,6 +360,27 @@ Dialog actions:
 - `Discard`: restore the last persisted Agent CLI settings in the CLI panel, then continue the pending action
 - `Cancel`: keep the user in CLI mode and abort the pending action
 
+### CLI Verdict Finalization
+
+Manual CLI execution may stop a session with plain `stopSession`.
+
+Plain `stopSession` must finalize the session with an `OK` verdict.
+
+Agent CLI execution must stop a session with an explicit LLM verdict:
+
+- `stopSession LLM_COMPLETE <reason>`
+- `stopSession LLM_INVALID <reason>`
+
+`LLM_COMPLETE` means the agent completed the test goal and verified the expected result.
+
+`LLM_INVALID` means the agent found an invalid result, could not verify the expected result, or could not complete the goal with reliable evidence.
+
+WebStudio must include this finalization rule in the Agent CLI prompt contract.
+
+If an Agent CLI execution ends without an explicit LLM verdict, WebStudio should treat the execution as incomplete or invalid and surface that status to the user.
+
+When CLI reporting is enabled, generated report artifacts must include the final CLI verdict and reason.
+
 ## Test Results
 
 The Test Results page supports inspection of output folders from the shared TESTAR distribution.

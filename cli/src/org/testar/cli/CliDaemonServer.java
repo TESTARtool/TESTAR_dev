@@ -26,6 +26,7 @@ import org.testar.core.action.resolver.ResolvedAction;
 import org.testar.core.state.State;
 import org.testar.core.state.Widget;
 import org.testar.core.tag.Tags;
+import org.testar.core.verdict.Verdict;
 import org.testar.cli.profile.CliProfileConfiguration;
 import org.testar.cli.profile.CliProfileConfigurationLoader;
 import org.testar.plugin.OperatingSystems;
@@ -105,7 +106,7 @@ final class CliDaemonServer {
             case EXECUTE_ACTION:
                 return executeAction(request);
             case STOP_SESSION:
-                return stopSession();
+                return stopSession(request);
             case SHUTDOWN_DAEMON:
                 return shutdownDaemon();
             case HELP:
@@ -125,9 +126,6 @@ final class CliDaemonServer {
             lines.add("platform=" + sessionSpec.getOperatingSystem().name().toLowerCase(Locale.ROOT));
             lines.add("pid=" + activeSession.system().get(Tags.PID, -1L));
             lines.add("desc=" + activeSession.system().get(Tags.Desc, ""));
-            for (String warning : preparedSession.profileConfiguration().compatibilityWarnings()) {
-                lines.add("warning=" + warning);
-            }
             return new CliResponse(0, lines);
         } catch (RuntimeException exception) {
             return new CliResponse(1, List.of("startSession failed: " + exception.getMessage()));
@@ -209,15 +207,22 @@ final class CliDaemonServer {
         }
     }
 
-    private CliResponse stopSession() {
+    private CliResponse stopSession(CliRequest request) {
         try {
+            List<Verdict> finalVerdicts = finalVerdictsFromStopRequest(request);
             PlatformSession session = requireActiveSession();
             long pid = session.system().get(Tags.PID, -1L);
-            session.stopSystem();
-            closeActiveSession();
+            try {
+                session.stopSystem(finalVerdicts);
+            } finally {
+                closeStoppedSession(session);
+            }
+            Verdict finalVerdict = finalVerdicts.get(0);
             return new CliResponse(0, List.of(
                     "systemStopped",
-                    "pid=" + pid
+                    "pid=" + pid,
+                    "verdict=" + finalVerdict.verdictSeverityTitle(),
+                    "info=" + finalVerdict.info()
             ));
         } catch (RuntimeException exception) {
             return new CliResponse(1, List.of("stopSession failed: " + exception.getMessage()));
@@ -264,6 +269,18 @@ final class CliDaemonServer {
             try {
                 activeSession.close();
             } finally {
+                activeSession = null;
+                activeSessionSpec = null;
+                activePolicyConfiguration = PolicySessionConfiguration.defaults();
+            }
+        }
+    }
+
+    private synchronized void closeStoppedSession(PlatformSession session) {
+        try {
+            session.close();
+        } finally {
+            if (activeSession == session) {
                 activeSession = null;
                 activeSessionSpec = null;
                 activePolicyConfiguration = PolicySessionConfiguration.defaults();
@@ -398,6 +415,42 @@ final class CliDaemonServer {
             return OperatingSystems.ANDROID;
         }
         throw new IllegalArgumentException("Unsupported platform token: " + token);
+    }
+
+    List<Verdict> finalVerdictsFromStopRequest(CliRequest request) {
+        String verdictName = request.argumentAt(0);
+        if (verdictName == null || verdictName.isBlank()) {
+            return List.of(Verdict.OK);
+        }
+
+        Verdict.Severity severity = parseFinalVerdictSeverity(verdictName);
+        String info = buildFinalVerdictInfo(request, severity);
+        return List.of(new Verdict(severity, info));
+    }
+
+    private Verdict.Severity parseFinalVerdictSeverity(String verdictName) {
+        String normalizedVerdictName = verdictName.trim().toUpperCase(Locale.ROOT);
+        if (Verdict.Severity.LLM_COMPLETE.name().equals(normalizedVerdictName)) {
+            return Verdict.Severity.LLM_COMPLETE;
+        }
+        if (Verdict.Severity.LLM_INVALID.name().equals(normalizedVerdictName)) {
+            return Verdict.Severity.LLM_INVALID;
+        }
+
+        throw new IllegalArgumentException(
+                "Unsupported stopSession verdict: " + verdictName + ". Expected LLM_COMPLETE or LLM_INVALID."
+        );
+    }
+
+    private String buildFinalVerdictInfo(CliRequest request, Verdict.Severity severity) {
+        List<String> arguments = request.getArguments();
+        if (arguments.size() <= 1) {
+            return severity == Verdict.Severity.LLM_COMPLETE
+                    ? "Agent completed the test goal."
+                    : "Agent marked the test goal as invalid.";
+        }
+
+        return String.join(" ", arguments.subList(1, arguments.size())).trim();
     }
 
     private List<String> describeStateWidgets(State state) {

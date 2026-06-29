@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -15,8 +16,12 @@ import org.testar.OutputStructure;
 import org.testar.config.ConfigTags;
 import org.testar.config.settings.Settings;
 import org.testar.core.Pair;
+import org.testar.core.action.Action;
 import org.testar.core.action.Type;
+import org.testar.core.state.State;
 import org.testar.core.tag.Tags;
+import org.testar.core.verdict.Verdict;
+import org.testar.reporting.Reporting;
 import org.testar.stub.StateStub;
 import org.testar.stub.WidgetStub;
 
@@ -64,13 +69,60 @@ public class SessionReportingManagerTest {
         Assert.assertTrue(json.contains("\"input\": \"secret\""));
     }
 
+    @Test
+    public void finishUsesProvidedFinalVerdicts() {
+        SessionReportingManager manager = SessionReportingManager.deferred("https://example.org/login");
+        CapturingReporting reporting = new CapturingReporting();
+        manager.bindReporting(reporting);
+        Verdict verdict = new Verdict(Verdict.Severity.LLM_COMPLETE, "Login goal verified");
+
+        manager.finish(List.of(verdict));
+
+        Assert.assertEquals(List.of(verdict), reporting.verdicts);
+        Assert.assertEquals(1, reporting.finishCount);
+    }
+
     private Settings settings() {
         List<Pair<?, ?>> tags = new ArrayList<>();
         tags.add(Pair.from(ConfigTags.OutputDir, temporaryFolder.getRoot().getAbsolutePath()));
         tags.add(Pair.from(ConfigTags.ApplicationName, "testSequenceTrace"));
         tags.add(Pair.from(ConfigTags.ReportInHTML, false));
         tags.add(Pair.from(ConfigTags.ReportInPlainText, false));
+        tags.add(Pair.from(ConfigTags.SUTConnector, Settings.SUT_CONNECTOR_WEBDRIVER));
         tags.add(Pair.from(ConfigTags.SUTConnectorValue, "https://example.org/login"));
         return new Settings(tags, new Properties());
+    }
+
+    private static final class CapturingReporting implements Reporting {
+
+        private List<Verdict> verdicts = List.of();
+        private int finishCount;
+
+        @Override
+        public void addState(State state) {
+        }
+
+        @Override
+        public void addActions(Set<Action> actions) {
+        }
+
+        @Override
+        public void addActionsAndUnvisitedActions(Set<Action> actions,
+                                                  Set<String> concreteIdsOfUnvisitedActions) {
+        }
+
+        @Override
+        public void addSelectedAction(State state, Action action) {
+        }
+
+        @Override
+        public void addTestVerdicts(List<Verdict> verdicts) {
+            this.verdicts = verdicts;
+        }
+
+        @Override
+        public void finishReport() {
+            finishCount++;
+        }
     }
 }

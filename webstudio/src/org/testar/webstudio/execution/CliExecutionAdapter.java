@@ -614,6 +614,7 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
             lastStatus = "idle";
             lastMessage = "Agent CLI execution finished with error: " + exception.getMessage();
         } finally {
+            finalizeUnstoppedAgentSessionAsInvalidBestEffort();
             shutdownDaemonBestEffort(false);
             currentCliMode = null;
             agentStartedAtEpochMillis = null;
@@ -653,6 +654,12 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
         prompt.append("Execution rule: read and follow the TESTAR CLI skill instructions before issuing commands.").append('\n');
         prompt.append("Use startSession ").append(workspaceName)
             .append(" so TESTAR CLI derives platform and target from the selected workspace settings.")
+            .append('\n')
+            .append('\n');
+        prompt.append("Finalization rule: finish the test goal with exactly one explicit verdict command: ")
+            .append("stopSession LLM_COMPLETE <reason> or stopSession LLM_INVALID <reason>.")
+            .append('\n')
+            .append("Do not finish an agent-controlled test goal with plain stopSession.")
             .append('\n')
             .append('\n');
         if (!settings.apiKeyEnvVarName().isBlank()) {
@@ -772,6 +779,24 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
         }
         manualSessionExpected = false;
         currentCliMode = null;
+    }
+
+    private void finalizeUnstoppedAgentSessionAsInvalidBestEffort() {
+        try {
+            CliInvocationResult statusResult = invokeCliCommand(List.of("sessionStatus"), false, false);
+            if (!isActiveSession(statusResult.lines())) {
+                return;
+            }
+
+            appendConsoleLine("[agent] finalizing active session as LLM_INVALID because no explicit agent verdict was declared");
+            invokeCliCommand(List.of(
+                "stopSession",
+                "LLM_INVALID",
+                "Agent execution finished without declaring an explicit test-goal verdict."
+            ), true);
+        } catch (RuntimeException exception) {
+            debugLog.log("finalizeUnstoppedAgentSessionAsInvalidBestEffort failed", exception);
+        }
     }
 
     private List<ResultOutputGroupDto> loadResultGroups() {
