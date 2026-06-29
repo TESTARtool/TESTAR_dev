@@ -76,11 +76,11 @@ jobs:
         EMULATOR_TIMEOUT=$EMULATOR_TIMEOUT EMULATOR_NAME=$EMULATOR_NAME ./.github/workflows/start_emu_headless.sh
 
     # https://github.com/TESTARtool/TESTAR_dev/wiki/TESTAR-and-Appium-for-Mobile-Systems#installing-appium
-    - name: Install Appium
+    - name: Install Appium 2.19.0 and UIAutomator 4.2.8
       run: |
-        npm i -g appium@next
+        npm i -g appium@2.19.0
         appium --version
-        appium driver install uiautomator2
+        appium driver install uiautomator2@4.2.8
         appium driver list --installed
 
     - name: Start Appium Server
