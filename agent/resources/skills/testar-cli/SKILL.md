@@ -35,22 +35,34 @@ Treat the CLI distribution as an operational environment, not as a source-code w
 - `getState`
 - `getStateScreenshot`
 - `getDerivedActions`
-- `executeAction click <semanticText>`
-- `executeAction type <semanticText> <inputText>`
-- `executeAction select <semanticText> <value>`
+- `executeAction click --target <semanticText>`
+- `executeAction type --target <semanticText> --text <inputText>`
+- `executeAction select --target <semanticText> --value <value>`
 - `stopSession LLM_COMPLETE <reason>`
 - `stopSession LLM_INVALID <reason>`
 - `shutdownDaemon`
 
 ## Semantic action matching
 
-For `executeAction click`, `executeAction type`, and WebDriver-only `executeAction select`, `<semanticText>` is intended to match the derived action description text.
+For `executeAction click`, `executeAction type`, and WebDriver-only `executeAction select`, `--target <semanticText>` is intended to match the derived action description text.
 
 Use short meaningful text that is likely to appear in the action description, for example:
 
-- `executeAction click Open`
-- `executeAction type input_contact This_is_a_message`
-- `executeAction select select_amount 99999`
+- `executeAction click --target "Open"`
+- `executeAction type --target "input_contact" --text "This_is_a_message"`
+- `executeAction select --target "select_amount" --value "99999"`
+
+Use named options exactly as documented.
+
+Wrong:
+
+- `executeAction type widget input_username john`
+
+Correct:
+
+- `executeAction type --target "input_username" --text "john"`
+
+Use double quotes around target, text, and value when they contain spaces or special shell characters.
 
 ## Action availability
 
@@ -112,8 +124,8 @@ Workspace-driven Windows testing:
 - `testar-cli.bat getState`
 - `testar-cli.bat getStateScreenshot`
 - `testar-cli.bat getDerivedActions`
-- `testar-cli.bat executeAction click Open`
-- `testar-cli.bat executeAction type Editor Writing_text_in_Notepad`
+- `testar-cli.bat executeAction click --target "Open"`
+- `testar-cli.bat executeAction type --target "Editor" --text "Writing text in Notepad"`
 - `testar-cli.bat stopSession LLM_COMPLETE "Notepad opened and text was entered successfully."`
 - `testar-cli.bat shutdownDaemon`
 
@@ -124,9 +136,9 @@ Workspace-driven WebDriver testing:
 - `testar-cli.bat getState`
 - `testar-cli.bat getStateScreenshot`
 - `testar-cli.bat getDerivedActions`
-- `testar-cli.bat executeAction click a_about`
-- `testar-cli.bat executeAction type input_contact This_is_a_message`
-- `testar-cli.bat executeAction select select_amount 99999`
+- `testar-cli.bat executeAction click --target "a_about"`
+- `testar-cli.bat executeAction type --target "input_contact" --text "This is a message"`
+- `testar-cli.bat executeAction select --target "select_amount" --value "99999"`
 - `testar-cli.bat stopSession LLM_INVALID "There is no confirmation that the transaction was sent successfully."`
 - `testar-cli.bat shutdownDaemon`
 
@@ -137,8 +149,8 @@ Workspace-driven Android testing:
 - `testar-cli.bat getState`
 - `testar-cli.bat getStateScreenshot`
 - `testar-cli.bat getDerivedActions`
-- `testar-cli.bat executeAction click Graphics`
-- `testar-cli.bat executeAction type username Writing_text_in_Android`
+- `testar-cli.bat executeAction click --target "Graphics"`
+- `testar-cli.bat executeAction type --target "username" --text "Writing text in Android"`
 - `testar-cli.bat stopSession LLM_COMPLETE "The expected Android state was verified."`
 - `testar-cli.bat shutdownDaemon`
 

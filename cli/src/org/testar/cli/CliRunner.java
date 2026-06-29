@@ -54,9 +54,9 @@ final class CliRunner {
         output.println("  getState");
         output.println("  getStateScreenshot");
         output.println("  getDerivedActions");
-        output.println("  executeAction click <semanticText>");
-        output.println("  executeAction type <semanticText> <inputText>");
-        output.println("  executeAction select <semanticText> <value>");
+        output.println("  executeAction click --target <semanticText>");
+        output.println("  executeAction type --target <semanticText> --text <inputText>");
+        output.println("  executeAction select --target <semanticText> --value <value>");
         output.println("  stopSession [LLM_COMPLETE|LLM_INVALID <reason>]");
         output.println("  shutdownDaemon");
     }

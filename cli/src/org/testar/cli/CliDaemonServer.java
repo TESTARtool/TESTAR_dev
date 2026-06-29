@@ -13,8 +13,10 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import org.testar.cli.settings.CliSettingsLoader;
@@ -195,7 +197,7 @@ final class CliDaemonServer {
     private CliResponse executeAction(CliRequest request) {
         try {
             PlatformSession session = requireActiveSession();
-            ResolvedAction resolvedAction = session.resolveAction(request.getArguments());
+            ResolvedAction resolvedAction = session.resolveAction(resolveExecuteActionArguments(request));
             boolean executed = session.executeAction(resolvedAction.action());
             return new CliResponse(executed ? 0 : 1, List.of(
                     "actionExecuted",
@@ -204,6 +206,117 @@ final class CliDaemonServer {
             ));
         } catch (RuntimeException exception) {
             return new CliResponse(1, List.of("executeAction failed: " + exception.getMessage()));
+        }
+    }
+
+    List<String> resolveExecuteActionArguments(CliRequest request) {
+        String mode = request.argumentAt(0);
+        if (mode == null || mode.isBlank()) {
+            throw new IllegalArgumentException("executeAction requires a mode: click, type, or select.");
+        }
+
+        String normalizedMode = mode.trim().toLowerCase(Locale.ROOT);
+        switch (normalizedMode) {
+            case "click":
+                return List.of(normalizedMode, requiredOptionValue(request, "--target"));
+            case "type":
+                return List.of(
+                        normalizedMode,
+                        requiredOptionValue(request, "--target"),
+                        requiredOptionValue(request, "--text")
+                );
+            case "select":
+                return List.of(
+                        normalizedMode,
+                        requiredOptionValue(request, "--target"),
+                        requiredOptionValue(request, "--value")
+                );
+            default:
+                throw new IllegalArgumentException(
+                        "Unsupported executeAction mode: " + mode + ". Expected click, type, or select."
+                );
+        }
+    }
+
+    private String requiredOptionValue(CliRequest request, String requiredOptionName) {
+        ExecuteActionOptions options = parseExecuteActionOptions(request);
+        String value = options.value(requiredOptionName);
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException(
+                    "executeAction " + request.argumentAt(0) + " requires " + requiredOptionName
+                            + " <value>. Expected syntax: " + expectedExecuteActionSyntax(request.argumentAt(0))
+            );
+        }
+
+        return value;
+    }
+
+    private ExecuteActionOptions parseExecuteActionOptions(CliRequest request) {
+        ExecuteActionOptions options = new ExecuteActionOptions();
+        List<String> arguments = request.getArguments();
+        int index = 1;
+        while (index < arguments.size()) {
+            String optionName = arguments.get(index);
+            if (!isExecuteActionOption(optionName)) {
+                throw new IllegalArgumentException(
+                        "Unexpected executeAction argument: " + optionName
+                                + ". Use named options only. Expected syntax: "
+                                + expectedExecuteActionSyntax(request.argumentAt(0))
+                );
+            }
+
+            if (index + 1 >= arguments.size() || isExecuteActionOption(arguments.get(index + 1))) {
+                throw new IllegalArgumentException(
+                        "Missing value for executeAction option " + optionName
+                                + ". Expected syntax: " + expectedExecuteActionSyntax(request.argumentAt(0))
+                );
+            }
+
+            options.put(optionName, arguments.get(index + 1));
+            index += 2;
+        }
+
+        validateAllowedExecuteActionOptions(request.argumentAt(0), options);
+        return options;
+    }
+
+    private void validateAllowedExecuteActionOptions(String mode, ExecuteActionOptions options) {
+        String normalizedMode = mode == null ? "" : mode.trim().toLowerCase(Locale.ROOT);
+        for (String optionName : options.names()) {
+            if ("click".equals(normalizedMode) && !"--target".equals(optionName)) {
+                throw unsupportedExecuteActionOption(mode, optionName);
+            }
+            if ("type".equals(normalizedMode) && !("--target".equals(optionName) || "--text".equals(optionName))) {
+                throw unsupportedExecuteActionOption(mode, optionName);
+            }
+            if ("select".equals(normalizedMode) && !("--target".equals(optionName) || "--value".equals(optionName))) {
+                throw unsupportedExecuteActionOption(mode, optionName);
+            }
+        }
+    }
+
+    private IllegalArgumentException unsupportedExecuteActionOption(String mode, String optionName) {
+        return new IllegalArgumentException(
+                "Unsupported executeAction " + mode + " option: " + optionName
+                        + ". Expected syntax: " + expectedExecuteActionSyntax(mode)
+        );
+    }
+
+    private boolean isExecuteActionOption(String token) {
+        return "--target".equals(token) || "--text".equals(token) || "--value".equals(token);
+    }
+
+    private String expectedExecuteActionSyntax(String mode) {
+        String normalizedMode = mode == null ? "" : mode.trim().toLowerCase(Locale.ROOT);
+        switch (normalizedMode) {
+            case "click":
+                return "executeAction click --target \"semantic text\"";
+            case "type":
+                return "executeAction type --target \"semantic text\" --text \"input text\"";
+            case "select":
+                return "executeAction select --target \"semantic text\" --value \"selected value\"";
+            default:
+                return "executeAction <click|type|select> --target \"semantic text\"";
         }
     }
 
@@ -499,6 +612,26 @@ final class CliDaemonServer {
 
         private CliProfileConfiguration profileConfiguration() {
             return profileConfiguration;
+        }
+    }
+
+    private static final class ExecuteActionOptions {
+
+        private final Map<String, String> values = new LinkedHashMap<>();
+
+        private void put(String name, String value) {
+            if (values.containsKey(name)) {
+                throw new IllegalArgumentException("Duplicate executeAction option: " + name);
+            }
+            values.put(name, value);
+        }
+
+        private String value(String name) {
+            return values.get(name);
+        }
+
+        private Set<String> names() {
+            return values.keySet();
         }
     }
 

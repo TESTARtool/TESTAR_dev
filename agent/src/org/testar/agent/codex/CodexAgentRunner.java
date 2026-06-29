@@ -120,12 +120,12 @@ public final class CodexAgentRunner {
         private final AtomicBoolean stopRequested;
         private final CountDownLatch streamLatch;
 
-        private RunningCodexRun(Process process,
-                                Path runDirectory,
-                                Path stdoutFile,
-                                Path stderrFile,
-                                Path resultFile,
-                                LogListener logListener) {
+        RunningCodexRun(Process process,
+                        Path runDirectory,
+                        Path stdoutFile,
+                        Path stderrFile,
+                        Path resultFile,
+                        LogListener logListener) {
             this.process = process;
             this.runDirectory = runDirectory;
             this.stdoutFile = stdoutFile;
@@ -141,7 +141,11 @@ public final class CodexAgentRunner {
         }
 
         public boolean isAlive() {
-            return process.isAlive();
+            return process.isAlive() && !hasResult();
+        }
+
+        public boolean hasResult() {
+            return Files.exists(resultFile);
         }
 
         public void requestStop() {
@@ -157,6 +161,7 @@ public final class CodexAgentRunner {
         }
 
         public CodexRunResult awaitCompletion() throws InterruptedException, IOException {
+            stopProcessIfResultExists();
             int exitCode = process.waitFor();
             streamLatch.await();
 
@@ -210,6 +215,18 @@ public final class CodexAgentRunner {
                     runDirectory,
                     usage
             );
+        }
+
+        private void stopProcessIfResultExists() {
+            if (!Files.exists(resultFile) || !process.isAlive()) {
+                return;
+            }
+
+            destroyProcessTree(process.toHandle());
+            process.destroy();
+            if (process.isAlive()) {
+                process.destroyForcibly();
+            }
         }
 
         private void startStreaming() throws IOException {

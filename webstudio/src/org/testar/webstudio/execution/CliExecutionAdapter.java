@@ -579,7 +579,7 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
     }
 
     private boolean isAgentExecutionRunning() {
-        return activeAgentRun != null && activeAgentRun.isAlive();
+        return activeAgentRun != null && activeAgentRun.isAlive() && !activeAgentRun.hasResult();
     }
 
     private void completeAgentExecution() {

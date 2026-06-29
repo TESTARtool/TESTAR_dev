@@ -106,7 +106,7 @@
                     <input
                         id="cli-manual-command"
                         bind:value={manualCommandLine}
-                        placeholder='getState, getDerivedActions, executeAction click "Log In"'
+                        placeholder='getState, getDerivedActions, executeAction click --target "log_in"'
                     />
                     <button class="secondary" type="button" on:click={runCommand} disabled={saving || agentSessionRunning || !manualCommandLine.trim()}>
                         Run
@@ -123,9 +123,9 @@
                 </div>
                 <div class="cli-command-help">
                     <span>Execute Action Examples</span>
-                    <code>executeAction click "Log In"</code>
-                    <code>executeAction type "username" "john"</code>
-                    <code>executeAction select "account" "12345"</code>
+                    <code>executeAction click --target "log_in"</code>
+                    <code>executeAction type --target "username" --text "john"</code>
+                    <code>executeAction select --target "account" --value "12345"</code>
                 </div>
             </div>
         </section>

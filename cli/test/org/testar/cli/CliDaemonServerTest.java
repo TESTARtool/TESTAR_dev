@@ -196,6 +196,99 @@ public class CliDaemonServerTest {
         }
     }
 
+    @Test
+    public void executeActionClickRequiresNamedTarget() {
+        CliDaemonServer server = new CliDaemonServer();
+
+        List<String> arguments = server.resolveExecuteActionArguments(
+                CliRequest.of(CliCommand.EXECUTE_ACTION, List.of("click", "--target", "input_login"))
+        );
+
+        Assert.assertEquals(List.of("click", "input_login"), arguments);
+    }
+
+    @Test
+    public void executeActionTypeRequiresNamedTargetAndText() {
+        CliDaemonServer server = new CliDaemonServer();
+
+        List<String> arguments = server.resolveExecuteActionArguments(
+                CliRequest.of(CliCommand.EXECUTE_ACTION, List.of("type", "--target", "input_username", "--text", "john"))
+        );
+
+        Assert.assertEquals(List.of("type", "input_username", "john"), arguments);
+    }
+
+    @Test
+    public void executeActionSelectRequiresNamedTargetAndValue() {
+        CliDaemonServer server = new CliDaemonServer();
+
+        List<String> arguments = server.resolveExecuteActionArguments(
+                CliRequest.of(CliCommand.EXECUTE_ACTION, List.of("select", "--target", "account", "--value", "12345"))
+        );
+
+        Assert.assertEquals(List.of("select", "account", "12345"), arguments);
+    }
+
+    @Test
+    public void executeActionRejectsPositionalArguments() {
+        CliDaemonServer server = new CliDaemonServer();
+
+        try {
+            server.resolveExecuteActionArguments(
+                    CliRequest.of(CliCommand.EXECUTE_ACTION, List.of("type", "widget", "input_username", "john"))
+            );
+            Assert.fail("Expected executeAction positional syntax failure");
+        } catch (IllegalArgumentException exception) {
+            Assert.assertTrue(exception.getMessage().contains("Unexpected executeAction argument: widget"));
+            Assert.assertTrue(exception.getMessage().contains("--target"));
+            Assert.assertTrue(exception.getMessage().contains("--text"));
+        }
+    }
+
+    @Test
+    public void executeActionRejectsMissingOptionValue() {
+        CliDaemonServer server = new CliDaemonServer();
+
+        try {
+            server.resolveExecuteActionArguments(
+                    CliRequest.of(CliCommand.EXECUTE_ACTION, List.of("type", "--target", "input_username", "--text"))
+            );
+            Assert.fail("Expected executeAction missing value failure");
+        } catch (IllegalArgumentException exception) {
+            Assert.assertTrue(exception.getMessage().contains("Missing value"));
+            Assert.assertTrue(exception.getMessage().contains("--text"));
+        }
+    }
+
+    @Test
+    public void executeActionRejectsUnsupportedOptionForMode() {
+        CliDaemonServer server = new CliDaemonServer();
+
+        try {
+            server.resolveExecuteActionArguments(
+                    CliRequest.of(CliCommand.EXECUTE_ACTION, List.of("click", "--target", "login", "--text", "john"))
+            );
+            Assert.fail("Expected executeAction unsupported option failure");
+        } catch (IllegalArgumentException exception) {
+            Assert.assertTrue(exception.getMessage().contains("Unsupported executeAction click option: --text"));
+            Assert.assertTrue(exception.getMessage().contains("executeAction click --target"));
+        }
+    }
+
+    @Test
+    public void executeActionRejectsDuplicateOption() {
+        CliDaemonServer server = new CliDaemonServer();
+
+        try {
+            server.resolveExecuteActionArguments(
+                    CliRequest.of(CliCommand.EXECUTE_ACTION, List.of("click", "--target", "login", "--target", "submit"))
+            );
+            Assert.fail("Expected executeAction duplicate option failure");
+        } catch (IllegalArgumentException exception) {
+            Assert.assertTrue(exception.getMessage().contains("Duplicate executeAction option: --target"));
+        }
+    }
+
     private static Settings defaultSettings() {
         Properties properties = new Properties();
         properties.setProperty(ConfigTags.SUTConnectorValue.name(), "notepad.exe");
