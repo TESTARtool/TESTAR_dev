@@ -142,11 +142,27 @@ public final class WorkspaceSettingsCatalog {
             ),
             group(
                 "state-identification",
-                "Abstract Identification and Observation",
-                "State identity attributes and CLI/agent observation views.",
+                "Abstract Identification",
+                "State identity attributes used to build abstract state identifiers.",
                 settingsProperties,
-                ConfigTags.AbstractStateAttributes,
-                ConfigTags.StateObservationMode
+                ConfigTags.AbstractStateAttributes
+            ),
+            group(
+                "agent-cli",
+                "Agent CLI",
+                "CLI state projection and Codex settings for agent-controlled CLI execution.",
+                settingsProperties,
+                ConfigTags.CliStateProjectionMode,
+                ConfigTags.AgentCLIApiKeyEnvVar,
+                ConfigTags.AgentCLIBaseUrl,
+                ConfigTags.AgentCLIModel,
+                ConfigTags.AgentCLIReasoningEffort,
+                ConfigTags.AgentCLISandboxMode,
+                ConfigTags.AgentCLIApprovalPolicy,
+                ConfigTags.AgentCLINetworkAccessEnabled,
+                ConfigTags.AgentCLISkipGitRepoCheck,
+                ConfigTags.AgentCLIPromptTitle,
+                ConfigTags.AgentCLIPromptText
             ),
             /*group(
                 "spy",
@@ -316,6 +332,9 @@ public final class WorkspaceSettingsCatalog {
         Map<String, List<String>> configuredOptions = new LinkedHashMap<>();
         configuredOptions.put(ConfigTags.SUTConnector.name(), List.of("COMMAND_LINE", "SUT_WINDOW_TITLE", "SUT_PROCESS_NAME", "WEB_DRIVER", "ANDROID_APPIUM"));
         configuredOptions.put(ConfigTags.LlmReasoning.name(), List.of("low", "medium", "high"));
+        configuredOptions.put(ConfigTags.AgentCLIReasoningEffort.name(), List.of("low", "medium", "high"));
+        configuredOptions.put(ConfigTags.AgentCLISandboxMode.name(), List.of("read-only", "workspace-write", "danger-full-access"));
+        configuredOptions.put(ConfigTags.AgentCLIApprovalPolicy.name(), List.of("never", "on-request", "on-failure", "untrusted"));
         configuredOptions.put(StateModelTags.DataStoreType.name(), List.of("remote", "plocal"));
         configuredOptions.put(StateModelTags.DataStoreMode.name(), List.of("instant", "delayed", "hybrid", "none"));
         configuredOptions.put(StateModelTags.ActionSelectionAlgorithm.name(), List.of("random", "unvisited"));

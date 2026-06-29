@@ -3,7 +3,7 @@
     export let cliStatus = null;
     export let saving = false;
     export let selectedWorkspaceAvailableInCli = false;
-    export let selectedWorkspaceObservationMode = "";
+    export let selectedWorkspaceCliStateProjectionMode = "";
     export let saveCliAgentSettings;
     export let selectedWorkspaceSutConnector = "";
     export let selectedWorkspaceSutConnectorValue = "";
@@ -50,9 +50,9 @@
                 <p class="eyebrow">CLI</p>
                 <h2>Run CLI Mode</h2>
             </div>
-            <div class="status-panel-context" title={selectedWorkspaceObservationMode || "No observation mode configured."}>
-                <span class="status-panel-context-label">State_Observation_Mode</span>
-                <span class="status-panel-context-value">{selectedWorkspaceObservationMode || "No observation mode configured."}</span>
+            <div class="status-panel-context" title={selectedWorkspaceCliStateProjectionMode || "No CLI projection mode configured."}>
+                <span class="status-panel-context-label">Cli_State_Projection_Mode</span>
+                <span class="status-panel-context-value">{selectedWorkspaceCliStateProjectionMode || "No CLI projection mode configured."}</span>
             </div>
         </div>
         <div class="button-row">

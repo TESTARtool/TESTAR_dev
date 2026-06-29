@@ -11,7 +11,6 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.testar.webstudio.api.dto.CliAgentSettingsDto;
 import org.testar.webstudio.api.dto.CliManualSessionRequestDto;
 import org.testar.webstudio.api.dto.ExecutionStatusDto;
 import org.testar.webstudio.api.dto.ResultFileDto;
@@ -100,14 +99,6 @@ public final class ExecutionController {
 
     public String cliResultAssetContentType(String filePath) {
         return cliExecutionAdapter().cliResultAssetContentType(filePath);
-    }
-
-    public CliAgentSettingsDto cliAgentSettings() {
-        return cliExecutionAdapter().loadAgentSettings();
-    }
-
-    public CliAgentSettingsDto saveCliAgentSettings(CliAgentSettingsDto settings) {
-        return cliExecutionAdapter().saveAgentSettings(settings);
     }
 
     public ExecutionStatusDto stopScriptlessRun() {

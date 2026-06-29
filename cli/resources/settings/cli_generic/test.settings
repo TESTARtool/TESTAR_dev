@@ -30,7 +30,18 @@ StateModelStoreWidgets = false
 ResetDataStore = false
 
 AbstractStateAttributes = WidgetControlType,WidgetTitle,WidgetPath
-StateObservationMode = INTERACTIVE_SEMANTIC_WIDGETS
+
+CliStateProjectionMode = INTERACTIVE_SEMANTIC_WIDGETS
+AgentCLIApiKeyEnvVar = OPENAI_API_KEY
+AgentCLIBaseUrl =
+AgentCLIModel = gpt-5.4-mini
+AgentCLIReasoningEffort = medium
+AgentCLISandboxMode = danger-full-access
+AgentCLIApprovalPolicy = never
+AgentCLINetworkAccessEnabled = false
+AgentCLISkipGitRepoCheck = true
+AgentCLIPromptTitle = Test Parabank Login
+AgentCLIPromptText = As a test agent verify that you can log in with the credentials john/demo. Then the Welcome John Smith message is shown.
 
 WebClickableClasses =
 WebTypeableClasses = input

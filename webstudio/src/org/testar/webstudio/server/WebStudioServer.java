@@ -20,7 +20,6 @@ import org.testar.webstudio.api.RemoteSpyController;
 import org.testar.webstudio.api.StateModelAnalysisController;
 import org.testar.webstudio.api.ValidationController;
 import org.testar.webstudio.api.WorkspaceController;
-import org.testar.webstudio.api.dto.CliAgentSettingsDto;
 import org.testar.webstudio.api.dto.CliManualCommandRequestDto;
 import org.testar.webstudio.api.dto.RegexValidationRequestDto;
 import org.testar.webstudio.api.dto.SpyTypeRequestDto;
@@ -169,11 +168,6 @@ public final class WebStudioServer {
         routes.get("/api/execution/status/{backend}", context -> handle(context, () -> {
             ExecutionBackend backend = ExecutionBackend.fromId(context.pathParam("backend"));
             return executionController.status(backend);
-        }));
-        routes.get("/api/execution/cli/agent-settings", context -> handle(context, executionController::cliAgentSettings));
-        routes.put("/api/execution/cli/agent-settings", context -> handle(context, () -> {
-            CliAgentSettingsDto update = gson.fromJson(context.body(), CliAgentSettingsDto.class);
-            return executionController.saveCliAgentSettings(update);
         }));
         routes.post("/api/execution/cli/manual/start/{profile}", context -> handle(context, () -> {
             return executionController.startCliManualSession(context.pathParam("profile"), null);

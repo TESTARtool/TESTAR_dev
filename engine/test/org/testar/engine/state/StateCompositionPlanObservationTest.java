@@ -15,7 +15,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.junit.Test;
-import org.testar.config.StateObservationMode;
+import org.testar.config.CliStateProjectionMode;
 import org.testar.core.policy.BlockedPolicy;
 import org.testar.core.policy.ClickablePolicy;
 import org.testar.core.policy.EnabledPolicy;
@@ -41,7 +41,7 @@ public class StateCompositionPlanObservationTest {
 
         State projectedState = plan.projectState(
                 state,
-                StateObservationMode.FULL_STATE,
+                CliStateProjectionMode.FULL_STATE,
                 policyContext()
         );
 
@@ -58,7 +58,7 @@ public class StateCompositionPlanObservationTest {
         StateCompositionPlan plan = semanticPlan();
         State projectedState = plan.projectState(
                 state,
-                StateObservationMode.LEAF_WIDGETS,
+                CliStateProjectionMode.LEAF_WIDGETS,
                 policyContext()
         );
 
@@ -76,7 +76,7 @@ public class StateCompositionPlanObservationTest {
 
         State projectedState = plan.projectState(
                 state,
-                StateObservationMode.SEMANTIC_WIDGETS,
+                CliStateProjectionMode.SEMANTIC_WIDGETS,
                 policyContext()
         );
 
@@ -92,7 +92,7 @@ public class StateCompositionPlanObservationTest {
 
         State projectedState = plan.projectState(
                 state,
-                StateObservationMode.TEXTUAL_CONTEXT,
+                CliStateProjectionMode.TEXTUAL_CONTEXT,
                 policyContext()
         );
 
@@ -111,7 +111,7 @@ public class StateCompositionPlanObservationTest {
         StateCompositionPlan plan = semanticPlan();
         State interactiveState = plan.projectState(
                 state,
-                StateObservationMode.INTERACTIVE_WIDGETS,
+                CliStateProjectionMode.INTERACTIVE_WIDGETS,
                 policyContext()
         );
 
@@ -134,7 +134,7 @@ public class StateCompositionPlanObservationTest {
         StateCompositionPlan plan = semanticPlan();
         State projectedState = plan.projectState(
                 state,
-                StateObservationMode.INTERACTIVE_WIDGETS,
+                CliStateProjectionMode.INTERACTIVE_WIDGETS,
                 policyContext()
         );
 
@@ -161,7 +161,7 @@ public class StateCompositionPlanObservationTest {
         StateCompositionPlan plan = semanticPlan();
         State actionableState = plan.projectState(
                 state,
-                StateObservationMode.ACTIONABLE_WIDGETS,
+                CliStateProjectionMode.ACTIONABLE_WIDGETS,
                 policyContext()
         );
 
@@ -180,7 +180,7 @@ public class StateCompositionPlanObservationTest {
         StateCompositionPlan plan = semanticPlan();
         State projectedState = plan.projectState(
                 state,
-                StateObservationMode.INTERACTIVE_SEMANTIC_WIDGETS,
+                CliStateProjectionMode.INTERACTIVE_SEMANTIC_WIDGETS,
                 policyContext()
         );
 
@@ -201,7 +201,7 @@ public class StateCompositionPlanObservationTest {
         StateCompositionPlan plan = semanticPlan();
         State projectedState = plan.projectState(
                 state,
-                StateObservationMode.ACTIONABLE_SEMANTIC_WIDGETS,
+                CliStateProjectionMode.ACTIONABLE_SEMANTIC_WIDGETS,
                 policyContext()
         );
 
@@ -219,7 +219,7 @@ public class StateCompositionPlanObservationTest {
 
         nonSemanticPlan.projectState(
                 state,
-                StateObservationMode.SEMANTIC_WIDGETS,
+                CliStateProjectionMode.SEMANTIC_WIDGETS,
                 policyContext()
         );
     }
@@ -231,7 +231,7 @@ public class StateCompositionPlanObservationTest {
 
         nonSemanticPlan.projectState(
                 state,
-                StateObservationMode.ACTIONABLE_SEMANTIC_WIDGETS,
+                CliStateProjectionMode.ACTIONABLE_SEMANTIC_WIDGETS,
                 policyContext()
         );
     }

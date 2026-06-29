@@ -81,9 +81,9 @@ The `Edit test.settings file` view is treated as one logical editing area for un
 - `Edit Settings` renders the content of the `test.settings` file into a visual grouped form of settings.
 The `Edit Settings` view is treated as one logical editing area for unsaved-change behavior.
 
-### State Observation Mode
+### CLI State Projection Mode
 
-`StateObservationMode` controls how a captured TESTAR state is projected for consumers. Currently, it is applied to CLI/agent state output.
+`CliStateProjectionMode` controls how a captured TESTAR state is projected for CLI/agent consumers.
 
 The setting must not redefine the canonical captured state used by TESTAR internals.
 
@@ -103,9 +103,9 @@ The distinction between interactive and actionable is intentional:
 - interactive means the widget has an interaction capability
 - actionable means the widget is interactive and also passes enabled, non-blocked, visible, widget-filter, and top-level policies
 
-The default value is `FULL_STATE`.
+The default value is `INTERACTIVE_SEMANTIC_WIDGETS`.
 
-The `Edit Settings` view must render `StateObservationMode` as a dropdown using the available enum values.
+The `Edit Settings` view must render `CliStateProjectionMode` as a dropdown using the available enum values.
 
 ## Navigation Rules
 
@@ -335,12 +335,30 @@ CLI Mode supports:
 - agent CLI execution start
 - CLI command execution
 - CLI session stop
+- focused editing of Agent CLI settings stored in the selected workspace `test.settings`
 
 Workspace selection:
 
 - WebStudio uses the shared workspace list for CLI mode with other testar modes
 - WebStudio sends the selected workspace to CLI startup
 - CLI validates connector values server-side and reports startup errors to the user
+- Manual and Agent CLI execution use the selected workspace settings, including `CliStateProjectionMode` and `AgentCLI...` values
+
+### Agent CLI Settings
+
+Agent CLI settings are stored in the selected workspace `test.settings` file with `AgentCLI...` names.
+
+The `Edit Settings` view must expose these settings in an `Agent CLI` group.
+
+The CLI mode view may also expose a focused `Agent CLI Settings` panel for the same settings.
+
+If users edit Agent CLI settings in CLI mode and then leave CLI mode, change workspace, or start Manual/Agent CLI execution, WebStudio must show an unsaved settings dialog.
+
+Dialog actions:
+
+- `Save`: persist Agent CLI settings to the selected workspace `test.settings`, then continue the pending action
+- `Discard`: restore the last persisted Agent CLI settings in the CLI panel, then continue the pending action
+- `Cancel`: keep the user in CLI mode and abort the pending action
 
 ## Test Results
 

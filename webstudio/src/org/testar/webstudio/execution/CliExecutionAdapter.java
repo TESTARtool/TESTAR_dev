@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -27,6 +28,7 @@ import com.google.gson.GsonBuilder;
 import org.testar.agent.codex.CodexAgentRunner;
 import org.testar.agent.codex.CodexAgentSettings;
 import org.testar.agent.codex.CodexRunResult;
+import org.testar.config.ConfigTags;
 import org.testar.webstudio.api.dto.ResultFileDto;
 import org.testar.webstudio.api.dto.ResultFileSummaryDto;
 import org.testar.webstudio.api.dto.ResultOutputGroupDto;
@@ -222,7 +224,7 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
             throw new IllegalArgumentException("CLI workspace is required");
         }
 
-        CliAgentSettingsDto settings = loadAgentSettings();
+        CliAgentSettingsDto settings = loadAgentSettings(workspaceName);
         Path projectRoot = resolveProjectRoot();
         Path cliLauncher = resolveCliLauncher();
         String prompt = buildAgentPrompt(settings, workspaceName, cliLauncher);
@@ -376,39 +378,40 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
         return "application/octet-stream";
     }
 
-    public synchronized CliAgentSettingsDto loadAgentSettings() {
-        debugLog.log("loadAgentSettings invoked");
-        Path settingsFile = agentSettingsFile();
+    private CliAgentSettingsDto loadAgentSettings(String workspaceName) {
+        Path settingsFile = workspaceService.workspaceDirectory(workspaceName).resolve("test.settings");
         if (!Files.isRegularFile(settingsFile)) {
             return defaultAgentSettings();
         }
 
-        try {
-            String content = Files.readString(settingsFile, StandardCharsets.UTF_8);
-            CliAgentSettingsDto loadedSettings = gson.fromJson(content, CliAgentSettingsDto.class);
-            if (loadedSettings == null) {
-                return defaultAgentSettings();
-            }
-
-            return normalizeAgentSettings(loadedSettings);
+        Properties properties = new Properties();
+        try (BufferedReader reader = Files.newBufferedReader(settingsFile, StandardCharsets.UTF_8)) {
+            properties.load(reader);
         } catch (IOException exception) {
-            throw new IllegalStateException("Unable to read CLI agent settings: " + settingsFile, exception);
+            throw new IllegalStateException("Unable to read Agent CLI settings from: " + settingsFile, exception);
         }
+
+        return normalizeAgentSettings(new CliAgentSettingsDto(
+            properties.getProperty(ConfigTags.AgentCLIApiKeyEnvVar.name()),
+            properties.getProperty(ConfigTags.AgentCLIBaseUrl.name()),
+            properties.getProperty(ConfigTags.AgentCLIModel.name()),
+            properties.getProperty(ConfigTags.AgentCLIReasoningEffort.name()),
+            properties.getProperty(ConfigTags.AgentCLISandboxMode.name()),
+            properties.getProperty(ConfigTags.AgentCLIApprovalPolicy.name()),
+            booleanProperty(properties, ConfigTags.AgentCLINetworkAccessEnabled.name()),
+            booleanProperty(properties, ConfigTags.AgentCLISkipGitRepoCheck.name()),
+            properties.getProperty(ConfigTags.AgentCLIPromptTitle.name()),
+            properties.getProperty(ConfigTags.AgentCLIPromptText.name())
+        ));
     }
 
-    public synchronized CliAgentSettingsDto saveAgentSettings(CliAgentSettingsDto settings) {
-        debugLog.log("saveAgentSettings invoked");
-        CliAgentSettingsDto normalizedSettings = normalizeAgentSettings(settings);
-        Path settingsFile = agentSettingsFile();
-
-        try {
-            Files.createDirectories(settingsFile.getParent());
-            Files.writeString(settingsFile, gson.toJson(normalizedSettings), StandardCharsets.UTF_8);
-            lastMessage = "CLI agent settings saved";
-            return normalizedSettings;
-        } catch (IOException exception) {
-            throw new IllegalStateException("Unable to save CLI agent settings: " + settingsFile, exception);
+    private Boolean booleanProperty(Properties properties, String key) {
+        String value = properties.getProperty(key);
+        if (value == null || value.isBlank()) {
+            return null;
         }
+
+        return Boolean.parseBoolean(value.trim());
     }
 
     private CliAgentSettingsDto normalizeAgentSettings(CliAgentSettingsDto settings) {
@@ -440,10 +443,6 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
             "Test Parabank Login",
             "As a test agent verify that you can log in with the credentials john/demo. Then the Welcome John Smith message is shown."
         );
-    }
-
-    private Path agentSettingsFile() {
-        return workspaceService.testarHomeDirectory().resolve("webstudio-cli-agent-settings.json");
     }
 
     private CliInvocationResult invokeCliCommand(List<String> arguments, boolean recordOutput) {

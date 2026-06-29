@@ -7,10 +7,10 @@
 package org.testar.config;
 
 /**
- * Consumer-facing state views used by CLI/agents.
+ * Consumer-facing state projections used by CLI/agents.
  * These modes do not change the canonical captured TESTAR state.
  */
-public enum StateObservationMode {
+public enum CliStateProjectionMode {
     FULL_STATE,
     LEAF_WIDGETS,
     SEMANTIC_WIDGETS,

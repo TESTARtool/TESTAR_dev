@@ -158,11 +158,12 @@ Examples:
 - `Sequences` and `SequenceLength`
   - scriptless `Generate` settings
   - not required by manual CLI sessions
-- `StateObservationMode`
+- `CliStateProjectionMode`
   - currently used by CLI and agent state projection
 - agent CLI settings
   - used by agent CLI mode
   - ignored by scriptless `Generate` and `Spy`
+  - stored as `AgentCLI...` values in shared `test.settings`
 
 ## Policies and Semantics
 

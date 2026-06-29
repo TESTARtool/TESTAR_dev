@@ -99,8 +99,46 @@ public final class ConfigTags {
             (Class<List<String>>) (Class<?>) List.class,
             "Specify the widget attributes that you wish to use in constructing the widget and state hash strings. Use a comma separated list.");
 
-    public static final Tag<StateObservationMode> StateObservationMode = Tag.from("StateObservationMode", StateObservationMode.class,
-            "Controls how the captured state is projected for CLI/agents. Interactive and actionable modes use the active Java policies.");
+    /**
+     * CLI State Projection settings 
+     */
+
+    public static final Tag<CliStateProjectionMode> CliStateProjectionMode = Tag.from("CliStateProjectionMode", org.testar.config.CliStateProjectionMode.class,
+            "Controls how captured state is projected for CLI/agent consumers. Interactive and actionable modes use the active Java policies.");
+
+    /**
+     * Agent settings that enables CLI control
+     */
+
+    public static final Tag<String> AgentCLIApiKeyEnvVar = Tag.from("AgentCLIApiKeyEnvVar", String.class,
+            "Environment variable name that contains the API key for Agent CLI execution.");
+
+    public static final Tag<String> AgentCLIBaseUrl = Tag.from("AgentCLIBaseUrl", String.class,
+            "Optional base URL for the Agent CLI model provider.");
+
+    public static final Tag<String> AgentCLIModel = Tag.from("AgentCLIModel", String.class,
+            "Model used by Agent CLI execution.");
+
+    public static final Tag<String> AgentCLIReasoningEffort = Tag.from("AgentCLIReasoningEffort", String.class,
+            "Reasoning effort used by Agent CLI execution.");
+
+    public static final Tag<String> AgentCLISandboxMode = Tag.from("AgentCLISandboxMode", String.class,
+            "Sandbox mode used by Agent CLI execution.");
+
+    public static final Tag<String> AgentCLIApprovalPolicy = Tag.from("AgentCLIApprovalPolicy", String.class,
+            "Approval policy used by Agent CLI execution.");
+
+    public static final Tag<Boolean> AgentCLINetworkAccessEnabled = Tag.from("AgentCLINetworkAccessEnabled", Boolean.class,
+            "Allow Agent CLI execution to request network access.");
+
+    public static final Tag<Boolean> AgentCLISkipGitRepoCheck = Tag.from("AgentCLISkipGitRepoCheck", Boolean.class,
+            "Skip the Agent CLI git repository check.");
+
+    public static final Tag<String> AgentCLIPromptTitle = Tag.from("AgentCLIPromptTitle", String.class,
+            "Title used for the Agent CLI prompt.");
+
+    public static final Tag<String> AgentCLIPromptText = Tag.from("AgentCLIPromptText", String.class,
+            "User goal sent to Agent CLI execution.");
 
     /**
      * Large Language Models settings 

@@ -12,19 +12,19 @@
     import { stateModelWorkspaceDialog } from "./stateModelNavigation.js";
 
     const STATE_MODEL_URL = "http://localhost:8090/models";
-
-    let workspaces = [];
-    let selectedWorkspaceName = "";
-    let selectedWorkspaceSummary = null;
-    let selectedWorkspaceAvailableInTestar = false;
-    let workspaceDocument = null;
-    let selectedWorkspaceSutConnector = "";
-    let selectedWorkspaceSutConnectorValue = "";
-    let selectedWorkspaceObservationMode = "";
-    let selectedSourceName = "";
-    let selectedSourceFile = null;
-    let cliStatus = null;
-    let cliAgentSettings = {
+    const CLI_AGENT_SETTING_KEYS = {
+        apiKeyEnvVarName: "AgentCLIApiKeyEnvVar",
+        baseUrl: "AgentCLIBaseUrl",
+        model: "AgentCLIModel",
+        reasoningEffort: "AgentCLIReasoningEffort",
+        sandboxMode: "AgentCLISandboxMode",
+        approvalPolicy: "AgentCLIApprovalPolicy",
+        networkAccessEnabled: "AgentCLINetworkAccessEnabled",
+        skipGitRepoCheck: "AgentCLISkipGitRepoCheck",
+        promptTitle: "AgentCLIPromptTitle",
+        promptText: "AgentCLIPromptText"
+    };
+    const DEFAULT_CLI_AGENT_SETTINGS = {
         apiKeyEnvVarName: "OPENAI_API_KEY",
         baseUrl: "",
         model: "gpt-5.4-mini",
@@ -36,6 +36,20 @@
         promptTitle: "Test Parabank Login",
         promptText: "As a test agent verify that you can log in with the credentials john/demo. Then the Welcome John Smith message is shown."
     };
+
+    let workspaces = [];
+    let selectedWorkspaceName = "";
+    let selectedWorkspaceSummary = null;
+    let selectedWorkspaceAvailableInTestar = false;
+    let workspaceDocument = null;
+    let selectedWorkspaceSutConnector = "";
+    let selectedWorkspaceSutConnectorValue = "";
+    let selectedWorkspaceCliStateProjectionMode = "";
+    let selectedSourceName = "";
+    let selectedSourceFile = null;
+    let cliStatus = null;
+    let cliAgentSettings = { ...DEFAULT_CLI_AGENT_SETTINGS };
+    let savedCliAgentSettings = { ...DEFAULT_CLI_AGENT_SETTINGS };
     let scriptlessStatus = null;
     let loading = false;
     let saving = false;
@@ -77,6 +91,7 @@
     let savedPoliciesPropertiesContent = "";
     let savedSourceContents = {};
     let pendingConfigurationAction = null;
+    let pendingGuardKind = "configuration";
 
     function reportClientError(context, clientError) {
         console.error(`[WebStudio] ${context}`, clientError);
@@ -132,6 +147,7 @@
             saveLabel: "Save"
         };
         pendingConfigurationAction = null;
+        pendingGuardKind = "configuration";
     }
 
     function closeUnsavedSettingsDialogFromBackdrop(event) {
@@ -178,17 +194,15 @@
     }
 
     async function refreshInitialData() {
-        const [workspaceResponse, cliStatusResponse, cliAgentSettingsResponse, scriptlessResponse, spyResponse] = await Promise.all([
+        const [workspaceResponse, cliStatusResponse, scriptlessResponse, spyResponse] = await Promise.all([
             loadJson("/api/workspaces"),
             loadJson("/api/execution/status/cli"),
-            loadJson("/api/execution/cli/agent-settings"),
             loadJson("/api/execution/status/scriptless"),
             loadJson("/api/spy/status")
         ]);
 
         workspaces = workspaceResponse;
         cliStatus = cliStatusResponse;
-        cliAgentSettings = cliAgentSettingsResponse;
         scriptlessStatus = scriptlessResponse;
         spyState = spyResponse;
     }
@@ -200,7 +214,9 @@
             workspaceDocument = null;
             selectedWorkspaceSutConnector = "";
             selectedWorkspaceSutConnectorValue = "";
-            selectedWorkspaceObservationMode = "";
+            selectedWorkspaceCliStateProjectionMode = "";
+            cliAgentSettings = { ...DEFAULT_CLI_AGENT_SETTINGS };
+            savedCliAgentSettings = { ...DEFAULT_CLI_AGENT_SETTINGS };
             savedTestSettingsContent = "";
             visualSettingsDirty = false;
             selectedSourceName = "";
@@ -225,18 +241,8 @@
             savedPoliciesPropertiesContent = workspaceDocument?.policiesProperties?.content || "";
             savedSourceContents = {};
             visualSettingsDirty = false;
-            selectedWorkspaceSutConnector = normalizeSettingDisplayValue(
-                parsePropertiesContent(workspaceDocument?.testSettings?.content || "").SUTConnector
-                    || workspaceSettingValue("SUTConnector")
-            );
-            selectedWorkspaceSutConnectorValue = normalizeSettingDisplayValue(
-                parsePropertiesContent(workspaceDocument?.testSettings?.content || "").SUTConnectorValue
-                    || workspaceSettingValue("SUTConnectorValue")
-            );
-            selectedWorkspaceObservationMode = normalizeSettingDisplayValue(
-                parsePropertiesContent(workspaceDocument?.testSettings?.content || "").StateObservationMode
-                    || workspaceSettingValue("StateObservationMode")
-            );
+            syncWorkspaceRuntimeSettings();
+            savedCliAgentSettings = normalizedCliAgentSettings(cliAgentSettings);
             selectedSourceName = "";
             selectedSourceFile = null;
             selectedEditor = "java-composition";
@@ -351,18 +357,8 @@
         savedCompositionPropertiesContent = workspaceDocument?.compositionProperties?.content || "";
         savedPoliciesPropertiesContent = workspaceDocument?.policiesProperties?.content || "";
         visualSettingsDirty = false;
-        selectedWorkspaceSutConnector = normalizeSettingDisplayValue(
-            parsePropertiesContent(workspaceDocument?.testSettings?.content || "").SUTConnector
-                || workspaceSettingValue("SUTConnector")
-        );
-        selectedWorkspaceSutConnectorValue = normalizeSettingDisplayValue(
-            parsePropertiesContent(workspaceDocument?.testSettings?.content || "").SUTConnectorValue
-                || workspaceSettingValue("SUTConnectorValue")
-        );
-        selectedWorkspaceObservationMode = normalizeSettingDisplayValue(
-            parsePropertiesContent(workspaceDocument?.testSettings?.content || "").StateObservationMode
-                || workspaceSettingValue("StateObservationMode")
-        );
+        syncWorkspaceRuntimeSettings();
+        savedCliAgentSettings = normalizedCliAgentSettings(cliAgentSettings);
     }
 
     async function restoreEditorState(editorId, sourceName) {
@@ -711,7 +707,7 @@
             return;
         }
 
-        await guardConfigurationTransition(async () => {
+        await guardApplicationTransition(async () => {
             currentPage = "configuration";
         });
     }
@@ -721,7 +717,7 @@
             return;
         }
 
-        await guardConfigurationTransition(async () => {
+        await guardApplicationTransition(async () => {
             currentPage = "run";
         });
     }
@@ -731,7 +727,7 @@
             return;
         }
 
-        await guardConfigurationTransition(async () => {
+        await guardApplicationTransition(async () => {
             currentPage = "cli";
         });
     }
@@ -741,7 +737,7 @@
             return;
         }
 
-        await guardConfigurationTransition(async () => {
+        await guardApplicationTransition(async () => {
             currentPage = "spy";
             await refreshRemoteSpyStatus();
         });
@@ -752,7 +748,7 @@
             return;
         }
 
-        await guardConfigurationTransition(async () => {
+        await guardApplicationTransition(async () => {
             currentPage = "results";
             loadResults();
         });
@@ -763,7 +759,7 @@
             return;
         }
 
-        await guardConfigurationTransition(async () => {
+        await guardApplicationTransition(async () => {
             currentPage = "logs";
             await loadDebugFiles();
         });
@@ -789,6 +785,107 @@
         }
 
         return "";
+    }
+
+    function workspaceSettingBoolean(settingKey, defaultValue = false) {
+        const value = workspaceSettingValue(settingKey);
+        if (value === "") {
+            return defaultValue;
+        }
+
+        return value === true || `${value}`.toLowerCase() === "true";
+    }
+
+    function workspaceSettingDefaultValue(settingKey) {
+        const setting = findWorkspaceSetting(settingKey);
+        return setting?.defaultValue || "";
+    }
+
+    function normalizedCliAgentSettings(settings) {
+        const source = settings || {};
+        const valueOrDefault = (value, defaultValue) => {
+            if (value === null || value === undefined || value === "") {
+                return defaultValue;
+            }
+
+            return value;
+        };
+
+        return {
+            apiKeyEnvVarName: valueOrDefault(source.apiKeyEnvVarName, DEFAULT_CLI_AGENT_SETTINGS.apiKeyEnvVarName),
+            baseUrl: source.baseUrl ?? DEFAULT_CLI_AGENT_SETTINGS.baseUrl,
+            model: valueOrDefault(source.model, DEFAULT_CLI_AGENT_SETTINGS.model),
+            reasoningEffort: valueOrDefault(source.reasoningEffort, DEFAULT_CLI_AGENT_SETTINGS.reasoningEffort),
+            sandboxMode: valueOrDefault(source.sandboxMode, DEFAULT_CLI_AGENT_SETTINGS.sandboxMode),
+            approvalPolicy: valueOrDefault(source.approvalPolicy, DEFAULT_CLI_AGENT_SETTINGS.approvalPolicy),
+            networkAccessEnabled: Boolean(source.networkAccessEnabled),
+            skipGitRepoCheck: source.skipGitRepoCheck !== false,
+            promptTitle: valueOrDefault(source.promptTitle, DEFAULT_CLI_AGENT_SETTINGS.promptTitle),
+            promptText: valueOrDefault(source.promptText, DEFAULT_CLI_AGENT_SETTINGS.promptText)
+        };
+    }
+
+    function cliAgentSettingsFromWorkspace() {
+        return normalizedCliAgentSettings({
+            apiKeyEnvVarName: workspaceSettingValue(CLI_AGENT_SETTING_KEYS.apiKeyEnvVarName),
+            baseUrl: workspaceSettingValue(CLI_AGENT_SETTING_KEYS.baseUrl),
+            model: workspaceSettingValue(CLI_AGENT_SETTING_KEYS.model),
+            reasoningEffort: workspaceSettingValue(CLI_AGENT_SETTING_KEYS.reasoningEffort),
+            sandboxMode: workspaceSettingValue(CLI_AGENT_SETTING_KEYS.sandboxMode),
+            approvalPolicy: workspaceSettingValue(CLI_AGENT_SETTING_KEYS.approvalPolicy),
+            networkAccessEnabled: workspaceSettingBoolean(
+                CLI_AGENT_SETTING_KEYS.networkAccessEnabled,
+                DEFAULT_CLI_AGENT_SETTINGS.networkAccessEnabled
+            ),
+            skipGitRepoCheck: workspaceSettingBoolean(
+                CLI_AGENT_SETTING_KEYS.skipGitRepoCheck,
+                DEFAULT_CLI_AGENT_SETTINGS.skipGitRepoCheck
+            ),
+            promptTitle: workspaceSettingValue(CLI_AGENT_SETTING_KEYS.promptTitle),
+            promptText: workspaceSettingValue(CLI_AGENT_SETTING_KEYS.promptText)
+        });
+    }
+
+    function syncWorkspaceRuntimeSettings() {
+        selectedWorkspaceSutConnector = normalizeSettingDisplayValue(
+            parsePropertiesContent(workspaceDocument?.testSettings?.content || "").SUTConnector
+                || workspaceSettingValue("SUTConnector")
+        );
+        selectedWorkspaceSutConnectorValue = normalizeSettingDisplayValue(
+            parsePropertiesContent(workspaceDocument?.testSettings?.content || "").SUTConnectorValue
+                || workspaceSettingValue("SUTConnectorValue")
+        );
+        selectedWorkspaceCliStateProjectionMode = normalizeSettingDisplayValue(
+            parsePropertiesContent(workspaceDocument?.testSettings?.content || "").CliStateProjectionMode
+                || workspaceSettingValue("CliStateProjectionMode")
+                || workspaceSettingDefaultValue("CliStateProjectionMode")
+        );
+        cliAgentSettings = cliAgentSettingsFromWorkspace();
+    }
+
+    function findWorkspaceSetting(settingKey) {
+        for (const settingsGroup of workspaceDocument?.settingsGroups || []) {
+            const setting = (settingsGroup.settings || []).find((candidate) => candidate.key === settingKey);
+            if (setting) {
+                return setting;
+            }
+        }
+
+        return null;
+    }
+
+    function setWorkspaceSettingByKey(settingKey, value) {
+        const setting = findWorkspaceSetting(settingKey);
+        if (!setting) {
+            return;
+        }
+
+        setSettingValue(setting, `${value}`);
+    }
+
+    function hasCliAgentSettingsChanges() {
+        return JSON.stringify(normalizedCliAgentSettings(cliAgentSettings))
+            !== JSON.stringify(normalizedCliAgentSettings(savedCliAgentSettings));
     }
 
     function normalizeSettingDisplayValue(value) {
@@ -970,9 +1067,41 @@
         openUnsavedSettingsDialog(dialogDetails.title, dialogDetails.message, dialogDetails.saveLabel);
     }
 
+    async function guardApplicationTransition(action, nextEditor = "__leave__") {
+        if (currentPage === "cli" && hasCliAgentSettingsChanges()) {
+            openCliAgentSettingsGuard(action);
+            return;
+        }
+
+        await guardConfigurationTransition(action, nextEditor);
+    }
+
+    async function guardCliAgentSettingsTransition(action) {
+        if (hasCliAgentSettingsChanges()) {
+            openCliAgentSettingsGuard(action);
+            return;
+        }
+
+        await action();
+    }
+
+    function openCliAgentSettingsGuard(action) {
+        pendingConfigurationAction = action;
+        pendingGuardKind = "cli-agent";
+        openUnsavedSettingsDialog(
+            "Unsaved Agent CLI Settings",
+            "Detected unsaved Agent CLI settings. Save them before continuing, discard them, or cancel this navigation.",
+            "Save"
+        );
+    }
+
     async function discardUnsavedConfigurationChanges() {
         const action = pendingConfigurationAction;
-        await refreshWorkspaceDocument();
+        if (pendingGuardKind === "cli-agent") {
+            cliAgentSettings = normalizedCliAgentSettings(savedCliAgentSettings);
+        } else {
+            await refreshWorkspaceDocument();
+        }
         closeUnsavedSettingsDialog();
         if (action) {
             await action();
@@ -981,13 +1110,15 @@
 
     async function saveUnsavedConfigurationChanges() {
         const action = pendingConfigurationAction;
-        const saved = await saveCurrentGuardedEditor();
+        const saved = pendingGuardKind === "cli-agent"
+            ? await saveCliAgentSettings()
+            : await saveCurrentGuardedEditor();
         if (!saved) {
             closeUnsavedSettingsDialog();
             return;
         }
 
-        if (hasCurrentGuardedChanges()) {
+        if (pendingGuardKind !== "cli-agent" && hasCurrentGuardedChanges()) {
             return;
         }
 
@@ -1069,8 +1200,11 @@
         if (setting.key === "SUTConnectorValue") {
             selectedWorkspaceSutConnectorValue = normalizeSettingDisplayValue(value);
         }
-        if (setting.key === "StateObservationMode") {
-            selectedWorkspaceObservationMode = normalizeSettingDisplayValue(value);
+        if (setting.key === "CliStateProjectionMode") {
+            selectedWorkspaceCliStateProjectionMode = normalizeSettingDisplayValue(value);
+        }
+        if (Object.values(CLI_AGENT_SETTING_KEYS).includes(setting.key)) {
+            cliAgentSettings = cliAgentSettingsFromWorkspace();
         }
         visualSettingsDirty = true;
         touchWorkspaceDocument();
@@ -1637,6 +1771,10 @@
     }
 
     async function startCliManualSession() {
+        await guardCliAgentSettingsTransition(startCliManualSessionNow);
+    }
+
+    async function startCliManualSessionNow() {
         if (!selectedWorkspaceName) {
             return;
         }
@@ -1661,6 +1799,10 @@
     }
 
     async function startCliAgentSession() {
+        await guardCliAgentSettingsTransition(startCliAgentSessionNow);
+    }
+
+    async function startCliAgentSessionNow() {
         if (!selectedWorkspaceName) {
             return;
         }
@@ -1736,20 +1878,33 @@
     }
 
     async function saveCliAgentSettings() {
+        if (!workspaceDocument?.settingsGroups) {
+            return false;
+        }
+
         saving = true;
         message = "";
 
         try {
-            cliAgentSettings = await loadJson("/api/execution/cli/agent-settings", {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(cliAgentSettings || {})
-            });
+            const normalizedSettings = normalizedCliAgentSettings(cliAgentSettings);
+            setWorkspaceSettingByKey(CLI_AGENT_SETTING_KEYS.apiKeyEnvVarName, normalizedSettings.apiKeyEnvVarName);
+            setWorkspaceSettingByKey(CLI_AGENT_SETTING_KEYS.baseUrl, normalizedSettings.baseUrl);
+            setWorkspaceSettingByKey(CLI_AGENT_SETTING_KEYS.model, normalizedSettings.model);
+            setWorkspaceSettingByKey(CLI_AGENT_SETTING_KEYS.reasoningEffort, normalizedSettings.reasoningEffort);
+            setWorkspaceSettingByKey(CLI_AGENT_SETTING_KEYS.sandboxMode, normalizedSettings.sandboxMode);
+            setWorkspaceSettingByKey(CLI_AGENT_SETTING_KEYS.approvalPolicy, normalizedSettings.approvalPolicy);
+            setWorkspaceSettingByKey(CLI_AGENT_SETTING_KEYS.networkAccessEnabled, normalizedSettings.networkAccessEnabled);
+            setWorkspaceSettingByKey(CLI_AGENT_SETTING_KEYS.skipGitRepoCheck, normalizedSettings.skipGitRepoCheck);
+            setWorkspaceSettingByKey(CLI_AGENT_SETTING_KEYS.promptTitle, normalizedSettings.promptTitle);
+            setWorkspaceSettingByKey(CLI_AGENT_SETTING_KEYS.promptText, normalizedSettings.promptText);
+            await saveVisualSettings();
+            cliAgentSettings = normalizedSettings;
+            savedCliAgentSettings = normalizedSettings;
             showTemporaryMessage("Agent CLI settings saved.");
+            return true;
         } catch (cliError) {
             reportClientError("Unable to save Agent CLI settings", cliError);
+            return false;
         } finally {
             saving = false;
         }
@@ -1787,7 +1942,7 @@
                 value={selectedWorkspaceName}
                 on:change={(event) => {
                     const nextWorkspaceName = event.currentTarget.value;
-                    guardConfigurationTransition(async () => {
+                    guardApplicationTransition(async () => {
                         await loadWorkspace(nextWorkspaceName);
                     });
                 }}
@@ -1903,7 +2058,7 @@
                 saveCliAgentSettings={saveCliAgentSettings}
                 selectedWorkspaceSutConnector={selectedWorkspaceSutConnector}
                 selectedWorkspaceSutConnectorValue={selectedWorkspaceSutConnectorValue}
-                selectedWorkspaceObservationMode={selectedWorkspaceObservationMode}
+                selectedWorkspaceCliStateProjectionMode={selectedWorkspaceCliStateProjectionMode}
                 selectedWorkspaceAvailableInCli={Boolean(selectedWorkspaceName)}
                 startCliAgentSession={startCliAgentSession}
                 startCliManualSession={startCliManualSession}

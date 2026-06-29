@@ -97,8 +97,18 @@ import static org.testar.config.ConfigTags.Sequences;
 import static org.testar.config.ConfigTags.ShowVisualSettingsDialogOnStartup;
 import static org.testar.config.ConfigTags.SpyTagAttributes;
 import static org.testar.config.ConfigTags.StartupTime;
-import static org.testar.config.ConfigTags.StateObservationMode;
-import static org.testar.config.StateObservationMode.FULL_STATE;
+import static org.testar.config.ConfigTags.AgentCLIApiKeyEnvVar;
+import static org.testar.config.ConfigTags.AgentCLIApprovalPolicy;
+import static org.testar.config.ConfigTags.AgentCLIBaseUrl;
+import static org.testar.config.ConfigTags.AgentCLIModel;
+import static org.testar.config.ConfigTags.AgentCLINetworkAccessEnabled;
+import static org.testar.config.ConfigTags.AgentCLIPromptText;
+import static org.testar.config.ConfigTags.AgentCLIPromptTitle;
+import static org.testar.config.ConfigTags.AgentCLIReasoningEffort;
+import static org.testar.config.ConfigTags.AgentCLISandboxMode;
+import static org.testar.config.ConfigTags.AgentCLISkipGitRepoCheck;
+import static org.testar.config.ConfigTags.CliStateProjectionMode;
+import static org.testar.config.CliStateProjectionMode.INTERACTIVE_SEMANTIC_WIDGETS;
 import static org.testar.config.ConfigTags.StopGenerationOnFault;
 import static org.testar.config.ConfigTags.SuspiciousProcessOutput;
 import static org.testar.config.ConfigTags.SuspiciousTags;
@@ -210,7 +220,17 @@ public class SettingsDefaults {
                 add("WidgetControlType");
             }
         }));
-        defaults.add(Pair.from(StateObservationMode, FULL_STATE));
+        defaults.add(Pair.from(CliStateProjectionMode, INTERACTIVE_SEMANTIC_WIDGETS));
+        defaults.add(Pair.from(AgentCLIApiKeyEnvVar, "OPENAI_API_KEY"));
+        defaults.add(Pair.from(AgentCLIBaseUrl, ""));
+        defaults.add(Pair.from(AgentCLIModel, "gpt-5.4-mini"));
+        defaults.add(Pair.from(AgentCLIReasoningEffort, "medium"));
+        defaults.add(Pair.from(AgentCLISandboxMode, "danger-full-access"));
+        defaults.add(Pair.from(AgentCLIApprovalPolicy, "never"));
+        defaults.add(Pair.from(AgentCLINetworkAccessEnabled, false));
+        defaults.add(Pair.from(AgentCLISkipGitRepoCheck, true));
+        defaults.add(Pair.from(AgentCLIPromptTitle, "Test Parabank Login"));
+        defaults.add(Pair.from(AgentCLIPromptText, "As a test agent verify that you can log in with the credentials john/demo. Then the Welcome John Smith message is shown."));
 
         defaults.add(Pair.from(WebClickableClasses, new ArrayList<String>() {
             {

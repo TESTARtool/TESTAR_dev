@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.testar.config.ConfigTags;
-import org.testar.config.StateObservationMode;
+import org.testar.config.CliStateProjectionMode;
 import org.testar.config.TestarMode;
 import org.testar.core.Assert;
 import org.testar.core.Pair;
@@ -90,11 +90,11 @@ public class Settings extends TaggableBase implements Serializable {
             } catch (IllegalArgumentException iae) {
                 throw new ConfigParseException("Unknown Mode!");
             }
-        } else if (tag.type().equals(StateObservationMode.class)) {
+        } else if (tag.type().equals(CliStateProjectionMode.class)) {
             try {
-                return (T) StateObservationMode.valueOf(stringValue);
+                return (T) CliStateProjectionMode.valueOf(stringValue);
             } catch (IllegalArgumentException iae) {
-                throw new ConfigParseException("Unknown StateObservationMode!");
+                throw new ConfigParseException("Unknown CliStateProjectionMode!");
             }
         } else if (tag.type().equals(Integer.class)) {
             try {

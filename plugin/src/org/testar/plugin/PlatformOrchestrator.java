@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import org.testar.config.ConfigTags;
-import org.testar.config.StateObservationMode;
+import org.testar.config.CliStateProjectionMode;
 import org.testar.config.StateModelTags;
 import org.testar.config.settings.Settings;
 import org.testar.core.CodingManager;
@@ -148,24 +148,24 @@ public final class PlatformOrchestrator {
         // the semantic state shaping step to an already captured state.
         initializeCodingManager(sessionSpec.getSettings());
         SessionPolicyContext sessionPolicyContext = buildSessionPolicyContext(sessionSpec, policyConfiguration);
-        StateObservationMode observationMode = sessionSpec.getSettings().get(
-                ConfigTags.StateObservationMode,
-                StateObservationMode.FULL_STATE
+        CliStateProjectionMode projectionMode = sessionSpec.getSettings().get(
+                ConfigTags.CliStateProjectionMode,
+                CliStateProjectionMode.INTERACTIVE_SEMANTIC_WIDGETS
         );
         switch (sessionSpec.getOperatingSystem()) {
             case ANDROID:
                 return PlatformDefaultSessionConfigurations
                         .androidSemanticStateCompositionPlan(sessionSpec)
-                        .projectState(state, observationMode, sessionPolicyContext);
+                        .projectState(state, projectionMode, sessionPolicyContext);
             case WINDOWS:
             case WINDOWS_10:
                 return PlatformDefaultSessionConfigurations
                         .windowsSemanticStateCompositionPlan(sessionSpec)
-                        .projectState(state, observationMode, sessionPolicyContext);
+                        .projectState(state, projectionMode, sessionPolicyContext);
             case WEBDRIVER:
                 return PlatformDefaultSessionConfigurations
                         .webdriverSemanticStateCompositionPlan(sessionSpec)
-                        .projectState(state, observationMode, sessionPolicyContext);
+                        .projectState(state, projectionMode, sessionPolicyContext);
             default:
                 throw new UnsupportedPlatformException(
                         "Unsupported operating system for CLI projection: " + sessionSpec.getOperatingSystem()

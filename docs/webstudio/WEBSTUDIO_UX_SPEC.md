@@ -229,6 +229,7 @@ Expected behavior:
 - console output scrolls internally
 - session start/stop does not shift panels
 - command buttons do not overflow horizontally
+- Agent CLI settings edited in CLI mode use the same unsaved-change dialog pattern as configuration settings
 
 ## Test Results UX Contract
 

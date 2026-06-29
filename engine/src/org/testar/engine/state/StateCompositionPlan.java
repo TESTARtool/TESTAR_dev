@@ -6,7 +6,7 @@
 
 package org.testar.engine.state;
 
-import org.testar.config.StateObservationMode;
+import org.testar.config.CliStateProjectionMode;
 import org.testar.core.Assert;
 import org.testar.core.service.StateService;
 import org.testar.core.state.State;
@@ -91,13 +91,13 @@ public final class StateCompositionPlan {
     }
 
     public State projectState(State originalState,
-                              StateObservationMode observationMode,
+                              CliStateProjectionMode projectionMode,
                               SessionPolicyContext policyContext) {
         Assert.notNull(originalState);
-        Assert.notNull(observationMode);
+        Assert.notNull(projectionMode);
         Assert.notNull(policyContext);
 
-        switch (observationMode) {
+        switch (projectionMode) {
             case FULL_STATE:
                 return originalState;
             case LEAF_WIDGETS:
@@ -109,14 +109,14 @@ public final class StateCompositionPlan {
             case TEXTUAL_CONTEXT:
                 return StateProjectionSupport.projectSemanticWidgets(
                         originalState,
-                        requireSemanticWidgetDescriptor(observationMode)
+                        requireSemanticWidgetDescriptor(projectionMode)
                 );
             case INTERACTIVE_WIDGETS:
                 return StateProjectionSupport.projectInteractiveWidgets(originalState, policyContext);
             case INTERACTIVE_SEMANTIC_WIDGETS:
                 return StateProjectionSupport.projectInteractiveSemanticWidgets(
                         originalState,
-                        requireSemanticWidgetDescriptor(observationMode),
+                        requireSemanticWidgetDescriptor(projectionMode),
                         policyContext
                 );
             case ACTIONABLE_WIDGETS:
@@ -124,18 +124,18 @@ public final class StateCompositionPlan {
             case ACTIONABLE_SEMANTIC_WIDGETS:
                 return StateProjectionSupport.projectActionableSemanticWidgets(
                         originalState,
-                        requireSemanticWidgetDescriptor(observationMode),
+                        requireSemanticWidgetDescriptor(projectionMode),
                         policyContext
                 );
             default:
-                throw new IllegalArgumentException("Unsupported state observation mode: " + observationMode);
+                throw new IllegalArgumentException("Unsupported CLI state projection mode: " + projectionMode);
         }
     }
 
-    private SemanticWidgetDescriptor requireSemanticWidgetDescriptor(StateObservationMode observationMode) {
+    private SemanticWidgetDescriptor requireSemanticWidgetDescriptor(CliStateProjectionMode projectionMode) {
         if (semanticWidgetDescriptor == null) {
             throw new IllegalStateException(
-                    "State observation mode requires a semantic descriptor: " + observationMode
+                    "CLI state projection mode requires a semantic descriptor: " + projectionMode
             );
         }
         return semanticWidgetDescriptor;

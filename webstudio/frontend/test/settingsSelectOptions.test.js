@@ -5,7 +5,7 @@ import { shouldShowBlankSelectOption } from "../src/settingsSelectOptions.js";
 test("does not show a blank option for enum settings", () => {
     assert.equal(
         shouldShowBlankSelectOption({
-            key: "StateObservationMode",
+            key: "CliStateProjectionMode",
             type: "enum"
         }),
         false
