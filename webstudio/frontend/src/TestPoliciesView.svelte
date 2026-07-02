@@ -1,4 +1,6 @@
 <script>
+    import { contentChanged } from "./editorDirtyState.js";
+    import { editorModalCanClose } from "./editorModalState.js";
     import { policySourceModalVisible } from "./policyEditorState.js";
 
     export let activePolicySourceFiles = [];
@@ -20,10 +22,24 @@
     export let selectSource;
     export let selectedEditor = "";
     export let selectedSourceFile = null;
+    export let selectedSourceSavedContent = "";
+    export let savedPoliciesPropertiesContent = "";
     export let togglePolicySourceActivation;
     export let workspaceDocument = null;
 
+    $: selectedSourceDirty = selectedSourceFile
+        ? contentChanged(selectedSourceFile.content, selectedSourceSavedContent)
+        : false;
+    $: policiesPropertiesDirty = contentChanged(
+        workspaceDocument?.policiesProperties?.content,
+        savedPoliciesPropertiesContent
+    );
+
     function closePolicyModal() {
+        if (!editorModalCanClose(saving)) {
+            return;
+        }
+
         closePolicySourceEditor();
     }
 
@@ -79,7 +95,7 @@
             <div>
                 <h2>{currentEditorDocument.title}</h2>
             </div>
-            <button class="secondary" disabled={saving} on:click={currentEditorDocument.save}>
+            <button class="secondary" disabled={saving || !policiesPropertiesDirty} on:click={currentEditorDocument.save}>
                 {currentEditorDocument.saveLabel}
             </button>
         </div>
@@ -242,7 +258,7 @@
                             <h3 id="policy-modal-title">{selectedSourceFile.name}</h3>
                         </div>
                         <div class="composition-modal-actions">
-                            <button class="secondary" on:click={closePolicyModal}>Close</button>
+                            <button class="secondary" disabled={saving} on:click={closePolicyModal}>Close</button>
                         </div>
                     </div>
 
@@ -253,7 +269,7 @@
                                 <p>Edit the selected policy source directly in this modal.</p>
                             </div>
                             <div class="button-row">
-                                <button class="secondary" disabled={saving} on:click={compileSelectedJavaSource}>
+                                <button class="secondary" disabled={saving || !selectedSourceDirty} on:click={compileSelectedJavaSource}>
                                     Save and Compile
                                 </button>
                             </div>

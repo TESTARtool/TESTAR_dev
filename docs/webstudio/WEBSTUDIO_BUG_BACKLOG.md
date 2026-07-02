@@ -311,3 +311,60 @@ Acceptance:
 - folder selection is stored in the parent Test Goals state
 - selecting a folder clears the selected YAML file after the unsaved-change guard is resolved
 - regression test `testGoalFolderSelectionState` passes
+
+### WS-012 Save Buttons Stayed Disabled After Editor Changes
+
+- Area: Test Configuration / CLI Mode
+- Status: fixed
+
+Reproduction:
+
+1. Open `Edit composition.properties` and modify the raw properties content.
+2. Observe that `Save composition.properties` remains disabled.
+3. Repeat with `Edit policies.properties`.
+4. Open CLI Mode, modify `Agent CLI Settings`, save once, then modify the settings again.
+
+Expected:
+
+- save buttons enable immediately when the corresponding editor content differs from the saved baseline
+- after saving Agent CLI settings, a later edit is detected as dirty again
+- unsaved-change guards and save-button enablement use the same dirty-state semantics
+
+Bug:
+
+- nested bound values changed inside child components without reliably invalidating parent dirty props
+- after saving Agent CLI settings, the editable settings object and saved baseline shared the same object reference, so later edits mutated both and were not detected
+
+Acceptance:
+
+- raw composition, raw policies, raw settings, and Agent CLI save buttons compute dirty state from local editor content against saved snapshots
+- Agent CLI settings save stores independent editable and saved object snapshots
+- regression test `editorDirtyState.test.js` passes
+
+### WS-013 Java Source Modal Could Close During Save And Compile
+
+- Area: Test Configuration / Java Composition and Java Policies
+- Status: fixed
+
+Reproduction:
+
+1. Open a Java composition or policy source editor modal.
+2. Modify the Java source.
+3. Click `Save and Compile`.
+4. Immediately click `Close` or click the modal backdrop.
+
+Expected:
+
+- source editor modal remains open while save and compile is running
+- `Close` is disabled during the operation
+- backdrop click-away is ignored during the operation
+- compile diagnostics remain visible after the operation completes
+
+Bug:
+
+- the modal close button and backdrop close handler were still active while save and compile was running
+
+Acceptance:
+
+- Java composition and policy source modals use the same close guard while `saving` is active
+- regression test `editorModalState.test.js` passes

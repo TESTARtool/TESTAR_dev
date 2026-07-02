@@ -46,7 +46,6 @@ The configuration area exposes multiple editors:
 - `Edit policies.properties file`
 - `Edit Java Policies`
 
-- `Edit test.settings file`
 - `Edit Settings`
 
 - source editors for the related Composition and Policies Java files
@@ -71,15 +70,24 @@ The `Edit policies.properties file` view is treated as one logical editing area 
 - `Edit Java Policies` renders the existing Java policies and lists them as active or available.
 The `Edit Java Policies` view is treated as one logical editing area for unsaved-change and uncompiled-change behavior.
 
-### Settings Views
+### Settings View
 
-The two settings views are:
+The settings editor is exposed as one left-sidebar entry:
 
-- `Edit test.settings file` allows users to edit the file content directly.
-The `Edit test.settings file` view is treated as one logical editing area for unsaved-change behavior.
+- `Edit Settings`
 
-- `Edit Settings` renders the content of the `test.settings` file into a visual grouped form of settings.
-The `Edit Settings` view is treated as one logical editing area for unsaved-change behavior.
+The `Edit Settings` view has two internal representations of the same selected workspace `test.settings` data:
+
+- visual settings form
+- raw `test.settings` text editor
+
+The visual settings form is the default representation.
+
+The user can switch between the two representations using a toggle inside the `Edit Settings` view header.
+
+Both representations share the same `Save Settings` action.
+
+The `Edit Settings` view is treated as one logical editing area for unsaved-change behavior, regardless of which internal representation is active.
 
 ### CLI State Projection Mode
 
@@ -266,34 +274,48 @@ Invalid compilation:
 
 ### Unsaved Settings Behavior
 
-Unsaved settings protection applies to the settings editing areas.
+Unsaved settings protection applies to the `Edit Settings` view.
 
 Protected views:
 
-- `Edit test.settings file`
 - `Edit Settings`
 
-The unsaved dialog must appear when leaving one of the settings editing areas, or switching between settings views while there are unsaved changes.
+The unsaved dialog must appear when leaving or toggling `Edit Settings` while there are unsaved changes.
 
 It must appear when:
 
-- leaving the settings configuration view for another top-level page while one of the settings views is dirty
-- changing workspace while one of the settings views is dirty
-- switching from a settings view to a non-settings configuration editor
-- switching from `Edit test.settings` to `Edit Settings`
-- switching from `Edit Settings` to `Edit test.settings`
+- leaving `Edit Settings` for another top-level page while settings are dirty
+- changing workspace while settings are dirty
+- switching from `Edit Settings` to a non-settings configuration editor
+- toggling between the visual settings form and raw `test.settings` text editor while settings are dirty
 
 It must not appear when:
 
 - switching to another view without changing anything
-- navigating to a settings view after the user already left the settings page
-- changing settings without leaving the `Edit Settings` form view
+- navigating to `Edit Settings` after the user already left the settings page
+- changing settings without leaving or toggling inside `Edit Settings`
 
 Dialog actions:
 
 - `Save`: persist current settings changes, then continue the pending navigation
 - `Discard`: restore persisted settings state, then continue the pending navigation
 - `Cancel`: keep the user in the current settings editor and abort the pending navigation
+
+### Save Action Enablement
+
+Configuration save actions are enabled only when their corresponding editor is dirty.
+
+Examples:
+
+- `Save Settings` is enabled only when the selected workspace settings differ from the persisted settings state
+- composition file save actions are enabled only when `composition.properties` differs from the persisted composition state
+- Java composition `Save and Compile` is enabled only when the selected Java composition source or composition flow state differs from the persisted/compiled state
+- policies file save actions are enabled only when `policies.properties` differs from the persisted policies state
+- Java policy `Save and Compile` is enabled only when the selected Java policy source or Java policies state differs from the persisted/compiled state
+
+Dirty-state save enablement must use the same underlying change detection as the unsaved-change guards.
+
+If a user attempts to leave a dirty editor without saving, the guard dialog must still appear even when the save action is enabled.
 
 ## Generate Mode
 

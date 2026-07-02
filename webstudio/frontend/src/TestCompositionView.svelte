@@ -1,4 +1,7 @@
 <script>
+    import { contentChanged } from "./editorDirtyState.js";
+    import { editorModalCanClose } from "./editorModalState.js";
+
     export let compositionFlowNodes = [];
     export let currentEditorDocument = null;
     export let isSelectedEditor;
@@ -16,6 +19,8 @@
     export let selectedCompositionFlowNode = null;
     export let selectedEditor = "";
     export let selectedSourceFile = null;
+    export let selectedSourceSavedContent = "";
+    export let savedCompositionPropertiesContent = "";
     export let workspaceDocument = null;
 
     const compositionFlowGroups = [
@@ -74,10 +79,21 @@
     }
 
     function closeCompositionModal() {
+        if (!editorModalCanClose(saving)) {
+            return;
+        }
+
         closeCompositionSourceEditor();
     }
 
     $: selectedCompositionMode = flowMode(selectedCompositionFlowNode);
+    $: selectedSourceDirty = selectedSourceFile
+        ? contentChanged(selectedSourceFile.content, selectedSourceSavedContent)
+        : false;
+    $: compositionPropertiesDirty = contentChanged(
+        workspaceDocument?.compositionProperties?.content,
+        savedCompositionPropertiesContent
+    );
     $: flowStartNodes = compositionFlowNodes.slice(0, 4);
     $: flowStopNode = compositionFlowNodes[4];
     $: flowStateNodes = compositionFlowNodes.slice(5, 9);
@@ -113,7 +129,7 @@
             <div>
                 <h2>{currentEditorDocument.title}</h2>
             </div>
-            <button class="secondary" disabled={saving} on:click={currentEditorDocument.save}>
+            <button class="secondary" disabled={saving || !compositionPropertiesDirty} on:click={currentEditorDocument.save}>
                 {currentEditorDocument.saveLabel}
             </button>
         </div>
@@ -271,7 +287,7 @@
                             >
                                 {flowModeLabel(selectedCompositionFlowNode)}
                             </span>
-                            <button class="secondary" on:click={closeCompositionModal}>Close</button>
+                            <button class="secondary" disabled={saving} on:click={closeCompositionModal}>Close</button>
                         </div>
                     </div>
 
@@ -303,7 +319,7 @@
                                     >
                                         Refresh Java
                                     </button>
-                                    <button class="secondary" disabled={saving} on:click={compileSelectedJavaSource}>
+                                    <button class="secondary" disabled={saving || !selectedSourceDirty} on:click={compileSelectedJavaSource}>
                                         Save and Compile
                                     </button>
                                 </div>

@@ -1,6 +1,9 @@
 <script>
+    import { objectChanged } from "./editorDirtyState.js";
+
     export let cliAgentSettings = null;
     export let cliStatus = null;
+    export let savedCliAgentSettings = null;
     export let saving = false;
     export let selectedWorkspaceAvailableInCli = false;
     export let selectedWorkspaceCliStateProjectionMode = "";
@@ -18,6 +21,7 @@
     $: manualSessionRunning = cliStatus?.status === "running" && cliStatus?.mode === "manual";
     $: agentSessionRunning = cliStatus?.status === "running" && cliStatus?.mode === "agent";
     $: cliSessionRunning = manualSessionRunning || agentSessionRunning;
+    $: cliAgentSettingsDirty = objectChanged(cliAgentSettings, savedCliAgentSettings);
 
     function startSession() {
         startCliManualSession();
@@ -192,7 +196,7 @@
                 <label class="field-label" for="cli-agent-prompt">Prompt</label>
                 <textarea id="cli-agent-prompt" bind:value={cliAgentSettings.promptText} rows="4"></textarea>
                 <div class="button-row cli-mode-section-footer">
-                    <button type="button" on:click={saveCliAgentSettings} disabled={saving}>
+                    <button type="button" on:click={saveCliAgentSettings} disabled={saving || !cliAgentSettingsDirty}>
                         Save Agent CLI Settings
                     </button>
                 </div>

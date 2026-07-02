@@ -12,6 +12,7 @@
     import { shouldGuardConfigurationTransition } from "./configurationGuard.js";
     import { clearSelectedSourceState } from "./policyEditorState.js";
     import { stateModelWorkspaceDialog } from "./stateModelNavigation.js";
+    import { objectSnapshot } from "./editorDirtyState.js";
 
     const STATE_MODEL_URL = "http://localhost:8090/models";
     const CLI_AGENT_SETTING_KEYS = {
@@ -345,6 +346,16 @@
         if (!selectedSettingsGroupId && workspaceDocument?.settingsGroups?.length > 0) {
             selectedSettingsGroupId = workspaceDocument.settingsGroups[0].id;
         }
+    }
+
+    async function openVisualSettingsGroup(groupId) {
+        await guardConfigurationTransition(async () => {
+            openEditorImmediate("settings-form");
+            selectedSettingsGroupId = groupId || selectedSettingsGroupId;
+            if (!selectedSettingsGroupId && workspaceDocument?.settingsGroups?.length > 0) {
+                selectedSettingsGroupId = workspaceDocument.settingsGroups[0].id;
+            }
+        }, "settings-form");
     }
 
     async function openPoliciesProperties() {
@@ -960,6 +971,14 @@
         }
 
         return (selectedSourceFile.content || "") !== (savedSourceContents[selectedSourceFile.name] || "");
+    }
+
+    function hasCurrentSelectedSourceChanges() {
+        if (!selectedSourceFile?.category) {
+            return false;
+        }
+
+        return hasSelectedSourceChanges([selectedSourceFile.category]);
     }
 
     function configurationDirtyAreas() {
@@ -1675,8 +1694,9 @@
         currentEditorDocument = null;
     } else if (selectedEditor === "test-settings") {
         currentEditorDocument = {
-            title: "Edit test.settings file",
-            saveLabel: "Save test.settings",
+            title: "Edit Settings",
+            saveLabel: "Save Settings",
+            dirty: hasSettingsChanges(),
             save: () => saveWorkspaceFile(
                 `/api/workspaces/${selectedWorkspaceName}/test-settings`,
                 workspaceDocument.testSettings.content
@@ -1685,13 +1705,15 @@
     } else if (selectedEditor === "settings-form") {
         currentEditorDocument = {
             title: "Edit Settings",
-            saveLabel: "Save settings",
+            saveLabel: "Save Settings",
+            dirty: hasSettingsChanges(),
             save: saveVisualSettings
         };
     } else if (selectedEditor === "policies-properties") {
         currentEditorDocument = {
             title: "Edit policies.properties",
             saveLabel: "Save policies.properties",
+            dirty: hasPoliciesPropertiesChanges(),
             save: () => saveWorkspaceFile(
                 `/api/workspaces/${selectedWorkspaceName}/policies-properties`,
                 workspaceDocument.policiesProperties.content
@@ -1701,6 +1723,7 @@
         currentEditorDocument = {
             title: "Edit composition.properties",
             saveLabel: "Save composition.properties",
+            dirty: hasCompositionPropertiesChanges(),
             save: () => saveWorkspaceFile(
                 `/api/workspaces/${selectedWorkspaceName}/composition-properties`,
                 workspaceDocument.compositionProperties.content
@@ -1710,14 +1733,11 @@
         currentEditorDocument = {
             title: selectedSourceFile.name,
             saveLabel: "Save source",
+            dirty: hasSelectedSourceChanges([selectedSourceFile.category]),
             save: saveSelectedSource
         };
     } else {
         currentEditorDocument = null;
-    }
-
-    function selectSettingsGroup(groupId) {
-        selectedSettingsGroupId = groupId || "";
     }
 
     $: if (selectedEditor === "settings-form" && !selectedSettingsGroupId && workspaceDocument?.settingsGroups?.length > 0) {
@@ -2127,8 +2147,8 @@
             setWorkspaceSettingByKey(CLI_AGENT_SETTING_KEYS.promptTitle, normalizedSettings.promptTitle);
             setWorkspaceSettingByKey(CLI_AGENT_SETTING_KEYS.promptText, normalizedSettings.promptText);
             await saveVisualSettings();
-            cliAgentSettings = normalizedSettings;
-            savedCliAgentSettings = normalizedSettings;
+            cliAgentSettings = objectSnapshot(normalizedSettings);
+            savedCliAgentSettings = objectSnapshot(normalizedSettings);
             showTemporaryMessage("Agent CLI settings saved.");
             return true;
         } catch (cliError) {
@@ -2225,6 +2245,7 @@
             openPoliciesProperties={openPoliciesProperties}
             openTestSettings={openTestSettings}
             openVisualSettings={openVisualSettings}
+            openVisualSettingsGroup={openVisualSettingsGroup}
             policySourceFiles={policySourceFiles}
             closeCompositionSourceEditor={closeCompositionSourceEditor}
             closePolicySourceEditor={closePolicySourceEditor}
@@ -2234,15 +2255,19 @@
             createPolicySource={createPolicySource}
             javaCompileResult={javaCompileResult}
             regexValidationResults={regexValidationResults}
+            savedCompositionPropertiesContent={savedCompositionPropertiesContent}
+            savedPoliciesPropertiesContent={savedPoliciesPropertiesContent}
+            savedTestSettingsContent={savedTestSettingsContent}
             saving={saving}
             setSettingValue={setSettingValue}
             selectSource={selectSource}
             selectCompositionFlowNode={selectCompositionFlowNode}
-            selectSettingsGroup={selectSettingsGroup}
             selectedEditor={selectedEditor}
             selectedCompositionFlowNode={selectedCompositionFlowNode}
             selectedSettingsGroupId={selectedSettingsGroupId}
             selectedSourceFile={selectedSourceFile}
+            selectedSourceDirty={hasCurrentSelectedSourceChanges()}
+            selectedSourceSavedContent={selectedSourceFile?.name ? savedSourceContents[selectedSourceFile.name] || "" : ""}
             restoreSettingDefault={restoreSettingDefault}
             togglePolicySourceActivation={togglePolicySourceActivation}
             validateRegexExpression={validateRegexExpression}
@@ -2284,6 +2309,7 @@
             <CliModeView
                 cliAgentSettings={cliAgentSettings}
                 cliStatus={cliStatus}
+                savedCliAgentSettings={savedCliAgentSettings}
                 saving={saving}
                 saveCliAgentSettings={saveCliAgentSettings}
                 selectedWorkspaceSutConnector={selectedWorkspaceSutConnector}

@@ -147,8 +147,7 @@ The left sidebar is the primary navigation for:
 - Java composition flow
 - policy files
 - Java policies
-- test settings
-- settings groups
+- Edit Settings
 
 The default Test Configuration landing view is `Edit Java Composition Flow`.
 
@@ -179,10 +178,18 @@ Expected behavior:
 
 ### Settings
 
-The settings area has two representations of the same data:
+The left sidebar shows a single `Edit Settings` entry for workspace settings.
 
-- raw `test.settings` text
-- structured `Edit Settings` form
+The `Edit Settings` panel has two representations of the same data:
+
+- visual settings form
+- raw `test.settings` text editor
+
+The visual settings form is shown by default.
+
+A compact toggle near the `Edit Settings` heading switches between the visual form and raw text editor.
+
+The toggle must not add a second left-sidebar entry and must not resize the surrounding layout.
 
 Expected behavior:
 
@@ -193,6 +200,21 @@ Expected behavior:
 - setting-specific feedback appears near the corresponding setting
 - restore actions only appear for settings that support restore behavior
 - enum settings use dropdowns with concrete values only and must not include a leading blank option
+- both settings representations share one `Save Settings` action
+- `Save Settings` is disabled while settings match the persisted state
+- `Save Settings` becomes enabled when either representation changes settings
+- toggling between representations while settings are dirty uses the same save/discard/cancel guard pattern
+
+### Save Buttons
+
+Save actions should communicate whether there is work to persist.
+
+Expected behavior:
+
+- save buttons are disabled when the corresponding editor has no detected changes
+- save buttons become enabled when the same dirty-state logic used by guard dialogs detects changes
+- disabled save buttons remain visible to preserve layout stability
+- guard dialogs still appear when users leave dirty editors without saving
 
 ## Runtime UX Contract
 

@@ -16,6 +16,7 @@
     export let openPoliciesProperties;
     export let openTestSettings;
     export let openVisualSettings;
+    export let openVisualSettingsGroup;
     export let policySourceFiles = [];
     export let closeCompositionSourceEditor;
     export let closePolicySourceEditor;
@@ -26,14 +27,18 @@
     export let javaCompileResult = null;
     export let regexValidationResults = {};
     export let saving = false;
+    export let savedCompositionPropertiesContent = "";
+    export let savedPoliciesPropertiesContent = "";
+    export let savedTestSettingsContent = "";
     export let setSettingValue;
     export let selectSource;
     export let selectCompositionFlowNode;
-    export let selectSettingsGroup;
     export let selectedEditor = "";
     export let selectedCompositionFlowNode = null;
     export let selectedSettingsGroupId = "";
     export let selectedSourceFile = null;
+    export let selectedSourceDirty = false;
+    export let selectedSourceSavedContent = "";
     export let restoreSettingDefault;
     export let togglePolicySourceActivation;
     export let validateRegexExpression;
@@ -72,6 +77,8 @@
             selectedCompositionFlowNode={selectedCompositionFlowNode}
             selectedEditor={selectedEditor}
             selectedSourceFile={selectedSourceFile}
+            selectedSourceSavedContent={selectedSourceSavedContent}
+            savedCompositionPropertiesContent={savedCompositionPropertiesContent}
             workspaceDocument={workspaceDocument}
         />
 
@@ -95,6 +102,8 @@
             selectSource={selectSource}
             selectedEditor={selectedEditor}
             selectedSourceFile={selectedSourceFile}
+            selectedSourceSavedContent={selectedSourceSavedContent}
+            savedPoliciesPropertiesContent={savedPoliciesPropertiesContent}
             togglePolicySourceActivation={togglePolicySourceActivation}
             workspaceDocument={workspaceDocument}
         />
@@ -104,12 +113,13 @@
             loading={loading}
             openTestSettings={openTestSettings}
             openVisualSettings={openVisualSettings}
+            openVisualSettingsGroup={openVisualSettingsGroup}
             regexValidationResults={regexValidationResults}
             renderContent={false}
             renderSidebar={true}
+            savedTestSettingsContent={savedTestSettingsContent}
             saving={saving}
             setSettingValue={setSettingValue}
-            selectSettingsGroup={selectSettingsGroup}
             selectedEditor={selectedEditor}
             selectedSettingsGroupId={selectedSettingsGroupId}
             restoreSettingDefault={restoreSettingDefault}
@@ -141,6 +151,8 @@
                     selectedCompositionFlowNode={selectedCompositionFlowNode}
                     selectedEditor={selectedEditor}
                     selectedSourceFile={selectedSourceFile}
+                    selectedSourceSavedContent={selectedSourceSavedContent}
+                    savedCompositionPropertiesContent={savedCompositionPropertiesContent}
                     workspaceDocument={workspaceDocument}
                 />
             {:else if isPoliciesEditor(selectedEditor)}
@@ -164,6 +176,8 @@
                     selectSource={selectSource}
                     selectedEditor={selectedEditor}
                     selectedSourceFile={selectedSourceFile}
+                    selectedSourceSavedContent={selectedSourceSavedContent}
+                    savedPoliciesPropertiesContent={savedPoliciesPropertiesContent}
                     togglePolicySourceActivation={togglePolicySourceActivation}
                     workspaceDocument={workspaceDocument}
                 />
@@ -173,12 +187,13 @@
                     loading={loading}
                     openTestSettings={openTestSettings}
                     openVisualSettings={openVisualSettings}
+                    openVisualSettingsGroup={openVisualSettingsGroup}
                     regexValidationResults={regexValidationResults}
                     renderContent={true}
                     renderSidebar={false}
+                    savedTestSettingsContent={savedTestSettingsContent}
                     saving={saving}
                     setSettingValue={setSettingValue}
-                    selectSettingsGroup={selectSettingsGroup}
                     selectedEditor={selectedEditor}
                     selectedSettingsGroupId={selectedSettingsGroupId}
                     restoreSettingDefault={restoreSettingDefault}
@@ -191,7 +206,7 @@
                         <div>
                             <h2>{currentEditorDocument.title}</h2>
                         </div>
-                        <button class="secondary" disabled={saving} on:click={currentEditorDocument.save}>
+                        <button class="secondary" disabled={saving || !selectedSourceDirty} on:click={currentEditorDocument.save}>
                             {currentEditorDocument.saveLabel}
                         </button>
                     </div>

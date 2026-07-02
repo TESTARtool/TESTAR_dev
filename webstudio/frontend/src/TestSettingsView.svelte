@@ -1,16 +1,18 @@
 <script>
+    import { contentChanged } from "./editorDirtyState.js";
     import { shouldShowBlankSelectOption } from "./settingsSelectOptions.js";
 
     export let currentEditorDocument = null;
     export let loading = false;
     export let openTestSettings;
     export let openVisualSettings;
+    export let openVisualSettingsGroup;
     export let regexValidationResults = {};
     export let renderContent = true;
     export let renderSidebar = true;
+    export let savedTestSettingsContent = "";
     export let saving = false;
     export let setSettingValue;
-    export let selectSettingsGroup;
     export let selectedEditor = "";
     export let selectedSettingsGroupId = "";
     export let restoreSettingDefault;
@@ -57,15 +59,23 @@
         };
     }
 
-    function openSettingsGroup(groupId) {
+    async function openSettingsGroup(groupId) {
         if (groupId) {
-            openVisualSettings();
-            selectSettingsGroup(groupId);
+            await openVisualSettingsGroup(groupId);
             expandedSettingsGroups = {
                 ...expandedSettingsGroups,
                 [groupId]: true
             };
         }
+    }
+
+    function toggleSettingsRepresentation() {
+        if (selectedEditor === "test-settings") {
+            openVisualSettings();
+            return;
+        }
+
+        openTestSettings();
     }
 
     $: normalizedSettingsSearch = normalizedSearchText(settingsSearch);
@@ -81,6 +91,7 @@
     $: visibleSettingsGroups = normalizedSettingsSearch
         ? filteredSettingsGroups
         : filteredSettingsGroups.filter((settingsGroup) => settingsGroup.id === selectedSettingsGroupId);
+    $: rawSettingsDirty = contentChanged(workspaceDocument?.testSettings?.content, savedTestSettingsContent);
 
     $: {
         const nextWorkspaceKey = workspaceDocument?.workspaceName || "";
@@ -101,18 +112,9 @@
 {:else if renderSidebar && workspaceDocument}
     <section class="sidebar-section">
         <h3>Test Settings</h3>
-        <div class="source-list">
-            <button
-                class:selected={selectedEditor === "test-settings"}
-                class="source-item"
-                on:click={openTestSettings}
-            >
-                <span>Edit test.settings file</span>
-            </button>
-        </div>
         <div class="settings-sidebar-tree">
             <button
-                class:selected={selectedEditor === "settings-form"}
+                class:selected={selectedEditor === "settings-form" || selectedEditor === "test-settings"}
                 class="source-item settings-tree-root"
                 on:click={openVisualSettings}
             >
@@ -147,9 +149,23 @@
                     <h2>{currentEditorDocument.title}</h2>
                     <p>Main common TESTAR settings with grouped controls. Use the test.settings editor for advanced control.</p>
                 </div>
-                <button class="secondary" disabled={saving} on:click={currentEditorDocument.save}>
-                    {currentEditorDocument.saveLabel}
-                </button>
+                <div class="button-row">
+                    <button
+                        type="button"
+                        class="secondary"
+                        on:click={toggleSettingsRepresentation}
+                        disabled={saving}
+                    >
+                        Swtich test.settings file
+                    </button>
+                    <button
+                        class="secondary"
+                        disabled={saving || !currentEditorDocument.dirty}
+                        on:click={currentEditorDocument.save}
+                    >
+                        {currentEditorDocument.saveLabel}
+                    </button>
+                </div>
             </div>
 
             <section class="settings-toolbar top-gap">
@@ -333,10 +349,25 @@
             <div class="section-header">
                 <div>
                     <h2>{currentEditorDocument.title}</h2>
+                    <p>Classic raw test.settings editor for advanced users.</p>
                 </div>
-                <button class="secondary" disabled={saving} on:click={currentEditorDocument.save}>
-                    {currentEditorDocument.saveLabel}
-                </button>
+                <div class="button-row">
+                    <button
+                        type="button"
+                        class="secondary"
+                        on:click={toggleSettingsRepresentation}
+                        disabled={saving}
+                    >
+                        Swtich Settings Form
+                    </button>
+                    <button
+                        class="secondary"
+                        disabled={saving || !rawSettingsDirty}
+                        on:click={currentEditorDocument.save}
+                    >
+                        {currentEditorDocument.saveLabel}
+                    </button>
+                </div>
             </div>
             <textarea bind:value={workspaceDocument.testSettings.content}></textarea>
         </section>

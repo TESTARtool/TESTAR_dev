@@ -612,15 +612,6 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         }
     }
 
-    private String latestSequenceOutputPath() {
-        if (sequenceOutcomes.isEmpty()) {
-            return "";
-        }
-
-        SequenceOutcomeDto lastOutcome = sequenceOutcomes.get(sequenceOutcomes.size() - 1);
-        return lastOutcome.outputPath() == null ? "" : lastOutcome.outputPath();
-    }
-
     private String resolveSequenceOutputPath(String loggedPath) {
         Path basePath = Paths.get(loggedPath).normalize();
         if (basePath.isAbsolute()) {
@@ -698,14 +689,6 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
             totalSequenceCount,
             files
         );
-    }
-
-    private String resolveLatestResultsPath(List<ResultFileSummaryDto> files) {
-        if (!files.isEmpty()) {
-            return files.get(files.size() - 1).path();
-        }
-
-        return latestSequenceOutputPath();
     }
 
     private String resultStatusFor(Path path) {

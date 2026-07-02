@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { shouldGuardConfigurationTransition } from "../src/configurationGuard.js";
 
-test("guards switching from Edit test.settings to Edit Settings when settings are dirty", () => {
+test("guards toggling from raw test.settings to visual settings when settings are dirty", () => {
     assert.equal(
         shouldGuardConfigurationTransition({
             currentPage: "configuration",
@@ -16,7 +16,7 @@ test("guards switching from Edit test.settings to Edit Settings when settings ar
     );
 });
 
-test("does not guard switching from Edit test.settings to Edit Settings when settings are clean", () => {
+test("does not guard toggling from raw test.settings to visual settings when settings are clean", () => {
     assert.equal(
         shouldGuardConfigurationTransition({
             currentPage: "configuration",
@@ -30,7 +30,7 @@ test("does not guard switching from Edit test.settings to Edit Settings when set
     );
 });
 
-test("guards switching from Edit Settings to Edit test.settings when settings are dirty", () => {
+test("guards toggling from visual settings to raw test.settings when settings are dirty", () => {
     assert.equal(
         shouldGuardConfigurationTransition({
             currentPage: "configuration",
