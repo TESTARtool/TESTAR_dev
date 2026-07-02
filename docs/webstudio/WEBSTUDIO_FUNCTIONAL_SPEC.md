@@ -339,6 +339,7 @@ CLI Mode supports:
 - CLI command execution
 - CLI session stop
 - focused editing of Agent CLI settings stored in the selected workspace `test.settings`
+- prompt-driven execution of managed Test Goals stored in the selected workspace
 
 Workspace selection:
 
@@ -346,6 +347,126 @@ Workspace selection:
 - WebStudio sends the selected workspace to CLI startup
 - CLI validates connector values server-side and reports startup errors to the user
 - Manual and Agent CLI execution use the selected workspace settings, including `CliStateProjectionMode` and `AgentCLI...` values
+
+## Test Goals
+
+Test Goals are reusable goal definitions consumed by AI guided execution modes (e.g., CLI mode).
+
+Test Goals are workspace assets. Each workspace may contain its own `test_goals` folder next to its settings, composition, policies, and Java sources.
+
+Repository defaults live under:
+
+- `testar/resources/settings/{workspace}/test_goals`
+
+The distributed editable copy lives under:
+
+- `testar/target/install/testar/bin/settings/{workspace}/test_goals`
+
+WebStudio works with the distributed `test_goals` folder for the selected workspace.
+
+Changing the selected workspace changes the Test Goals tree. WebStudio must not mix Test Goals from different workspaces in the same view.
+
+### Supported Goal Files
+
+Managed executable test goals use YAML files.
+
+Allowed executable extensions:
+
+- `.yaml`
+- `.yml`
+
+### YAML Contract
+
+Each executable goal file must use this shape:
+
+```yaml
+version: 1
+goals:
+  - id: unique-goal-id
+    title: Human readable title
+    category: functional
+    narrative: >
+      Optional user story or context.
+    objective: Clear objective the agent must complete.
+    inputs:
+      platform: webdriver
+      sut: https://example.org/
+    prerequisites:
+      - Optional setup condition.
+    expected_outcomes:
+      - Observable expected outcome.
+    validation_notes:
+      - Optional validation guidance.
+```
+
+Required fields:
+
+- `version`
+- `goals`
+- `goals[].id`
+- `goals[].title`
+- `goals[].objective`
+- `goals[].expected_outcomes`
+
+Recommended fields:
+
+- `goals[].category`
+- `goals[].inputs.platform`
+- `goals[].inputs.sut`
+- `goals[].validation_notes`
+
+Goal identifiers should use kebab-case.
+
+### Authoring Behavior
+
+WebStudio should provide a dedicated `Test Goals` view.
+
+The view should support:
+
+- browsing folders and YAML goal files under the selected workspace `test_goals` folder
+- creating folders
+- creating YAML goal files
+- editing YAML goal files
+- deleting folders and files with confirmation
+- saving edited YAML goal files
+- discarding unsaved edits
+- validating the required YAML shape before saving or before execution
+
+All file operations must stay inside the selected workspace `test_goals` folder.
+
+Path traversal, absolute paths, and unsafe symlink escapes must be rejected.
+
+If the selected workspace has no Test Goals yet, the view should show a stable empty state and allow creating folders or YAML files under that workspace.
+
+### CLI Mode Integration
+
+Test Goals are not selected for execution in the authoring view.
+
+The `Test Goals` view is only responsible for creating, editing, deleting, and organizing YAML goal files and directories.
+
+CLI Mode remains prompt-driven.
+
+The user prompt can instruct the agent to execute:
+
+- one named YAML test goal file
+- multiple named YAML test goal files
+- the YAML test goals in one named directory
+- the YAML test goals in multiple named directories
+- all YAML test goals under a named parent directory
+
+WebStudio must include the selected workspace `test_goals` root path in the generated Agent CLI prompt so the agent can resolve the user-requested goal files or directories.
+
+The Agent CLI prompt contract must tell the agent:
+
+- to resolve user-referenced goal paths relative to the selected workspace `test_goals` root
+- to read the requested YAML goal files before execution
+- to execute every goal defined in each requested YAML file
+- to execute all matching YAML goal files when the user instruction is broad or matches multiple goals
+- to use recursive directory execution when the user asks for all goals in a directory
+
+Directory execution means recursive YAML discovery when the user asks for all goals in a directory.
+
+Agent CLI execution must still finalize each goal session with `LLM_COMPLETE` or `LLM_INVALID` and execute `shutdownDaemon` after the final goal session.
 
 ### Agent CLI Settings
 

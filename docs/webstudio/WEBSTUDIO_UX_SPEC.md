@@ -231,6 +231,29 @@ Expected behavior:
 - command buttons do not overflow horizontally
 - Agent CLI settings edited in CLI mode use the same unsaved-change dialog pattern as configuration settings
 
+### Test Goals
+
+Expected behavior:
+
+- Test Goals use a dedicated authoring view
+- the left panel shows a folder/file tree rooted at the selected workspace `test_goals` folder
+- changing the selected workspace refreshes the Test Goals tree for that workspace
+- the editor panel shows the selected YAML goal file
+- folder and file lists have fixed panel size and scroll internally
+- the view contains only file and folder management controls
+- delete actions require modal confirmation
+- unclear confirmation always cancels deletion
+- unsaved YAML edits use the same save/discard/cancel guard pattern as other editors
+- YAML validation feedback appears in a stable panel and does not resize the layout dynamically
+- unsupported files may be shown as grey non-executable reference files
+
+Avoid:
+
+- adding execution controls to the Test Goals view
+- allowing file operations outside the selected workspace `test_goals` folder
+- mixing Test Goals from multiple workspaces in one tree
+- treating arbitrary free-text files as managed executable goals
+
 ## Test Results UX Contract
 
 The results page should provide fast visual understanding of output health.

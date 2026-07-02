@@ -173,6 +173,26 @@ If reporting is enabled, the final CLI verdict must be written to the generated 
 
 The `testar-cli` skill documentation is the operational source that tells agents how to use this contract.
 
+## Test Goals
+
+Reusable Test Goals for AI guided execution modes (e.g., CLI mode) are workspace assets stored as YAML files.
+
+Repository defaults live under:
+
+- `testar/resources/settings/{workspace}/test_goals`
+
+Distribution editable goals live under:
+
+- `testar/target/install/testar/bin/settings/{workspace}/test_goals`
+
+The distribution process should copy each workspace's Test Goals together with the rest of that workspace.
+
+WebStudio should edit only the selected workspace's distributed `test_goals` copy.
+
+Executable managed goal files use `.yaml` or `.yml`.
+
+The YAML contract is intentionally structured so WebStudio can validate required fields and agents can consume goal content reliably.
+
 ## Output Folder Naming
 
 Generated output folders must include the execution mode after the timestamp.

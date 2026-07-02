@@ -1,0 +1,24 @@
+version: 1
+goals:
+  - id: apidemos-media-player-streaming-button-exists
+    title: Play Streaming Video button exists in MediaPlayer
+    category: functional
+    narrative: >
+      As an Android API Demos user, I want to open the MediaPlayer demo screen and confirm that the Play Streaming Video button is available. 
+    objective: Open API Demos, navigate to Media > MediaPlayer, and verify that the Play Streaming Video button exists.
+    inputs:
+      sut: ApiDemos-debug.apk
+      platform: android
+      navigation_path:
+        - API Demos
+        - Media
+        - MediaPlayer
+      target_option: Play Streaming Video
+    expected_outcomes:
+      - The API Demos application launches successfully.
+      - The Media category is visible and can be opened.
+      - The MediaPlayer demo screen is opened.
+      - A button or selectable button labeled "Play Streaming Video" is visible on the MediaPlayer screen.
+    validation_notes:
+      - This is a dynamic Android UI goal.
+      - Agents should validate the presence of the button by visible text or accessibility label.

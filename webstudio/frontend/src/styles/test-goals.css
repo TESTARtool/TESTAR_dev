@@ -1,0 +1,215 @@
+.test-goals-page {
+    display: flex;
+    flex-direction: column;
+    height: var(--studio-workbench-height);
+    overflow: hidden;
+    min-height: 0;
+}
+
+.test-goals-layout {
+    display: grid;
+    grid-template-columns: minmax(320px, 0.35fr) minmax(0, 0.65fr);
+    gap: 18px;
+    min-height: 0;
+    flex: 1;
+}
+
+.test-goals-browser,
+.test-goals-editor {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.test-goals-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.test-goals-card-header h3 {
+    margin: 0;
+}
+
+.test-goals-card-header p {
+    margin: 4px 0 0;
+    color: var(--muted);
+}
+
+.test-goals-create-panel {
+    display: grid;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid var(--panel-border);
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--panel) 88%, var(--accent) 12%);
+}
+
+.test-goals-create-panel > span {
+    color: var(--muted);
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.test-goals-create-panel > strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.test-goals-create-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+}
+
+.test-goals-create-row input {
+    min-width: 0;
+}
+
+.test-goals-tree {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
+    overflow: auto;
+    padding-right: 4px;
+}
+
+.test-goals-tree-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: stretch;
+    padding-left: calc(var(--goal-depth, 0) * 16px);
+}
+
+.test-goals-tree-row > button:first-child {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: center;
+    justify-items: start;
+    min-width: 0;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid var(--panel-border);
+    background: var(--panel);
+    color: var(--text);
+    text-align: left;
+}
+
+.test-goals-tree-row > button:first-child:disabled {
+    cursor: default;
+    opacity: 1;
+}
+
+.test-goals-tree-row strong {
+    overflow: hidden;
+    max-width: 100%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.test-goals-tree-row span,
+.test-goals-tree-row small {
+    color: var(--muted);
+    font-size: 0.76rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.test-goal-selected {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.test-goal-folder-selected {
+    border-color: var(--accent) !important;
+    background: color-mix(in srgb, var(--panel) 78%, var(--accent) 22%) !important;
+}
+
+.test-goal-folder {
+    background: color-mix(in srgb, var(--panel) 90%, var(--accent) 10%) !important;
+}
+
+.test-goal-reference {
+    color: var(--muted) !important;
+    background: color-mix(in srgb, var(--panel) 92%, var(--muted) 8%) !important;
+}
+
+.test-goal-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-width: 76px;
+    padding-inline: 10px;
+    border-color: rgba(201, 42, 42, 0.16);
+    background: #324052;
+    color: #ffffff;
+}
+
+.test-goal-delete .result-delete-icon,
+.danger-button .result-delete-icon {
+    color: #ff7a7a;
+}
+
+.test-goal-root-lock {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 76px;
+    padding: 0 10px;
+    border-radius: 12px;
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.test-goals-textarea {
+    flex: 1;
+    min-height: 0;
+    resize: none;
+    font-family: "JetBrains Mono", "Cascadia Code", monospace;
+    line-height: 1.5;
+    white-space: pre;
+    overflow: auto;
+}
+
+.test-goals-editor-actions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-top: 14px;
+}
+
+.test-goals-empty-editor {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.danger-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-color: rgba(201, 42, 42, 0.16);
+    background: #324052;
+    color: #ffffff;
+}
+
+@media (max-width: 1080px) {
+    .test-goals-layout {
+        grid-template-columns: 1fr;
+    }
+}

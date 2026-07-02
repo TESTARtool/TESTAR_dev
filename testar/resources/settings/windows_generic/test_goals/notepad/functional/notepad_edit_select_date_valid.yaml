@@ -1,0 +1,24 @@
+version: 1
+goals:
+  - id: notepad-edit-select-date
+    title: Selecting the date option in edit mode
+    category: functional
+    narrative: >
+      As a Notepad user, I want to open the Edit menu and choose the Date/Time option.
+      Then Notepad inserts the current system date and time into the text editor.
+    objective: Open Notepad, select Edit > Time/Date, and verify that the editor receives the current date and time.
+    inputs:
+      sut: notepad.exe
+      platform: windows
+      menu_path:
+        - Edit
+        - Time/Date
+    expected_outcomes:
+      - The Notepad editor is focused and available for text insertion.
+      - The Edit menu can be opened.
+      - The "Time/Date" command is selected from the Edit menu.
+      - Notepad inserts text into the editor.
+      - The inserted text corresponds to the current system date and time shown in the operating-system locale format.
+    validation_notes:
+      - This is a dynamic desktop goal.
+      - Agents should compare the text inserted into the editor with the current local system date/time instead of relying on one fixed literal string.

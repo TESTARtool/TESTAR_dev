@@ -18,6 +18,7 @@ import io.javalin.router.JavalinDefaultRoutingApi;
 import org.testar.webstudio.api.ExecutionController;
 import org.testar.webstudio.api.RemoteSpyController;
 import org.testar.webstudio.api.StateModelAnalysisController;
+import org.testar.webstudio.api.TestGoalController;
 import org.testar.webstudio.api.ValidationController;
 import org.testar.webstudio.api.WorkspaceController;
 import org.testar.webstudio.api.dto.CliManualCommandRequestDto;
@@ -31,6 +32,7 @@ import org.testar.webstudio.execution.ExecutionBackend;
 import org.testar.webstudio.execution.RemoteExecutionAdapter;
 import org.testar.webstudio.execution.ScriptlessExecutionAdapter;
 import org.testar.webstudio.spy.RemoteSpyService;
+import org.testar.webstudio.testgoal.TestGoalService;
 import org.testar.webstudio.validation.ValidationService;
 import org.testar.webstudio.workspace.WorkspaceService;
 
@@ -43,6 +45,7 @@ public final class WebStudioServer {
     private final ExecutionController executionController;
     private final RemoteSpyController remoteSpyController;
     private final StateModelAnalysisController stateModelAnalysisController;
+    private final TestGoalController testGoalController;
     private final Gson gson;
     private Javalin app;
 
@@ -57,12 +60,14 @@ public final class WebStudioServer {
         ));
         StateModelAnalysisService stateModelAnalysisService = new StateModelAnalysisService(workspaceService);
         RemoteSpyService remoteSpyService = new RemoteSpyService(workspaceService);
+        TestGoalService testGoalService = new TestGoalService(workspaceService.testarHomeDirectory());
 
         this.workspaceController = new WorkspaceController(workspaceService);
         this.validationController = new ValidationController(validationService);
         this.executionController = new ExecutionController(executionAdapters);
         this.remoteSpyController = new RemoteSpyController(remoteSpyService);
         this.stateModelAnalysisController = new StateModelAnalysisController(stateModelAnalysisService);
+        this.testGoalController = new TestGoalController(testGoalService);
         this.gson = new Gson();
     }
 
@@ -163,6 +168,29 @@ public final class WebStudioServer {
             String workspace = context.pathParam("workspace");
             return validationController.validateWorkspace(workspace);
         }));
+        routes.get("/api/workspaces/{workspace}/test-goals", context -> handle(context, () ->
+            testGoalController.tree(context.pathParam("workspace"))
+        ));
+        routes.get("/api/workspaces/{workspace}/test-goals/file", context -> handle(context, () ->
+            testGoalController.readFile(context.pathParam("workspace"), context.queryParam("path"))
+        ));
+        routes.put("/api/workspaces/{workspace}/test-goals/file", context -> handle(context, () -> {
+            WorkspaceFileUpdateDto update = gson.fromJson(context.body(), WorkspaceFileUpdateDto.class);
+            return testGoalController.saveFile(
+                context.pathParam("workspace"),
+                context.queryParam("path"),
+                update == null ? "" : update.content()
+            );
+        }));
+        routes.post("/api/workspaces/{workspace}/test-goals/file", context -> handle(context, () ->
+            testGoalController.createFile(context.pathParam("workspace"), context.queryParam("path"))
+        ));
+        routes.post("/api/workspaces/{workspace}/test-goals/folder", context -> handle(context, () ->
+            testGoalController.createFolder(context.pathParam("workspace"), context.queryParam("path"))
+        ));
+        routes.delete("/api/workspaces/{workspace}/test-goals", context -> handle(context, () ->
+            testGoalController.delete(context.pathParam("workspace"), context.queryParam("path"))
+        ));
         routes.get("/api/execution/backends", context -> handle(context, executionController::availableBackends));
         routes.get("/api/execution/cli/profiles", context -> handle(context, executionController::cliProfiles));
         routes.get("/api/execution/status/{backend}", context -> handle(context, () -> {

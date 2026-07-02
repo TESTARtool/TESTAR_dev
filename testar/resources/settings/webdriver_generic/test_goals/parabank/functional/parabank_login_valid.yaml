@@ -1,0 +1,17 @@
+version: 1
+goals:
+  - id: parabank_login_valid
+    title: Login with demo credentials
+    category: functional
+    narrative: >
+      As a user, I want to log in with the credentials john/demo.
+      Then the Welcome John Smith message is shown.
+    objective: Log in successfully as the user john.
+    inputs:
+      sut: https://para.testar.org/
+      platform: webdriver
+      username: john
+      password: demo
+    expected_outcomes:
+      - A successful authenticated session is established.
+      - A welcome message containing "Welcome John Smith" is shown.

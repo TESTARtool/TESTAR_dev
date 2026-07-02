@@ -284,3 +284,30 @@ Acceptance:
 - shared result status classification treats `OK` and `LLM_COMPLETE` as successful
 - `LLM_INVALID` and non-success verdicts remain issue outcomes
 - regression test `ResultVerdictStatusTest` passes
+
+### WS-011 Test Goals Folder Selection Kept YAML Editor Open
+
+- Area: Test Goals
+- Status: fixed
+
+Reproduction:
+
+1. Open `Test Goals`.
+2. Select a YAML goal file.
+3. Select a folder in the goal tree.
+
+Expected:
+
+- the right panel switches from YAML editing to the selected-folder creation panel
+- if the YAML editor has unsaved changes, the unsaved-change guard appears before switching
+
+Bug:
+
+- folder selection was local to the view while YAML file selection was stored in the parent view state
+- selecting a folder did not clear the selected YAML file, so the right panel kept showing the YAML editor
+
+Acceptance:
+
+- folder selection is stored in the parent Test Goals state
+- selecting a folder clears the selected YAML file after the unsaved-change guard is resolved
+- regression test `testGoalFolderSelectionState` passes

@@ -1,0 +1,22 @@
+version: 1
+goals:
+  - id: parabank-find-transaction
+    title: Find at least one transaction with amount 100
+    category: functional
+    narrative: >
+      As an authenticated user, I want to access my banking data after logging in
+      with the demo credentials john/demo.
+      Then I can verify that there is at least one transaction with amount 100.
+    objective: Log in as john and verify that at least one transaction of 100 can be found.
+    inputs:
+      sut: https://para.testar.org/
+      platform: webdriver
+      username: john
+      password: demo
+    prerequisites:
+      - Log in successfully using username "john" and password "demo".
+      - An authenticated session is established before transaction verification begins.
+    expected_outcomes:
+      - A successful authenticated session is established.
+      - The application allows access to transaction data after login.
+      - At least one transaction with amount "100" is present and can be found.

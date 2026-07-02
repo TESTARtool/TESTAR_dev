@@ -6,7 +6,9 @@
     import SpyModeView from "./SpyModeView.svelte";
     import TestResultsView from "./TestResultsView.svelte";
     import InspectLogsView from "./InspectLogsView.svelte";
+    import TestGoalsView from "./TestGoalsView.svelte";
     import StateModelIcon from "./icons/StateModelIcon.svelte";
+    import { testGoalFolderSelectionState } from "./testGoalsModel.js";
     import { shouldGuardConfigurationTransition } from "./configurationGuard.js";
     import { clearSelectedSourceState } from "./policyEditorState.js";
     import { stateModelWorkspaceDialog } from "./stateModelNavigation.js";
@@ -64,6 +66,11 @@
     let selectedSettingsGroupId = "";
     let debugFiles = [];
     let selectedDebugFile = null;
+    let testGoalTree = null;
+    let selectedTestGoalFile = null;
+    let selectedTestGoalFolderPath = "";
+    let testGoalDraftContent = "";
+    let savedTestGoalContent = "";
     let spyState = null;
     let policySourceFiles = [];
     let compositionSourceFiles = [];
@@ -92,6 +99,9 @@
     let savedSourceContents = {};
     let pendingConfigurationAction = null;
     let pendingGuardKind = "configuration";
+
+    $: testGoalDirty = selectedTestGoalFile !== null
+        && testGoalDraftContent !== savedTestGoalContent;
 
     function reportClientError(context, clientError) {
         console.error(`[WebStudio] ${context}`, clientError);
@@ -226,6 +236,8 @@
             selectedCompositionFlowNode = null;
             regexValidationResults = {};
             javaCompileResult = null;
+            resetTestGoalSelection();
+            testGoalTree = null;
             return;
         }
 
@@ -250,6 +262,10 @@
             selectedCompositionFlowNode = null;
             regexValidationResults = {};
             javaCompileResult = null;
+            resetTestGoalSelection();
+            if (currentPage === "test-goals") {
+                await loadTestGoalTree(workspaceName);
+            }
         } catch (loadError) {
             reportClientError(`Unable to load workspace ${workspaceName}`, loadError);
         } finally {
@@ -732,6 +748,17 @@
         });
     }
 
+    async function navigateToTestGoals() {
+        if (currentPage === "test-goals") {
+            return;
+        }
+
+        await guardApplicationTransition(async () => {
+            currentPage = "test-goals";
+            await loadTestGoalTree();
+        });
+    }
+
     async function navigateToSpy() {
         if (currentPage === "spy") {
             return;
@@ -1068,6 +1095,11 @@
     }
 
     async function guardApplicationTransition(action, nextEditor = "__leave__") {
+        if (currentPage === "test-goals" && testGoalDirty) {
+            openTestGoalGuard(action);
+            return;
+        }
+
         if (currentPage === "cli" && hasCliAgentSettingsChanges()) {
             openCliAgentSettingsGuard(action);
             return;
@@ -1095,10 +1127,22 @@
         );
     }
 
+    function openTestGoalGuard(action) {
+        pendingConfigurationAction = action;
+        pendingGuardKind = "test-goal";
+        openUnsavedSettingsDialog(
+            "Unsaved Test Goal Changes",
+            "Detected unsaved Test Goal changes. Save them before continuing, discard them, or cancel this navigation.",
+            "Save"
+        );
+    }
+
     async function discardUnsavedConfigurationChanges() {
         const action = pendingConfigurationAction;
         if (pendingGuardKind === "cli-agent") {
             cliAgentSettings = normalizedCliAgentSettings(savedCliAgentSettings);
+        } else if (pendingGuardKind === "test-goal") {
+            discardTestGoalChanges();
         } else {
             await refreshWorkspaceDocument();
         }
@@ -1110,9 +1154,14 @@
 
     async function saveUnsavedConfigurationChanges() {
         const action = pendingConfigurationAction;
-        const saved = pendingGuardKind === "cli-agent"
-            ? await saveCliAgentSettings()
-            : await saveCurrentGuardedEditor();
+        let saved;
+        if (pendingGuardKind === "cli-agent") {
+            saved = await saveCliAgentSettings();
+        } else if (pendingGuardKind === "test-goal") {
+            saved = await saveTestGoalFile();
+        } else {
+            saved = await saveCurrentGuardedEditor();
+        }
         if (!saved) {
             closeUnsavedSettingsDialog();
             return;
@@ -1405,6 +1454,186 @@
                 content: debugFileError?.message || "Unable to load the selected debug file."
             };
             reportClientError(`Unable to load debug file ${debugFile.name}`, debugFileError);
+        }
+    }
+
+    function resetTestGoalSelection() {
+        selectedTestGoalFile = null;
+        selectedTestGoalFolderPath = "";
+        testGoalDraftContent = "";
+        savedTestGoalContent = "";
+    }
+
+    function testGoalApiPath(workspaceName, suffix = "") {
+        const encodedWorkspaceName = encodeURIComponent(workspaceName || selectedWorkspaceName);
+        return `/api/workspaces/${encodedWorkspaceName}/test-goals${suffix}`;
+    }
+
+    async function loadTestGoalTree(workspaceName = selectedWorkspaceName) {
+        if (!workspaceName) {
+            testGoalTree = null;
+            return;
+        }
+
+        try {
+            testGoalTree = await loadJson(testGoalApiPath(workspaceName));
+        } catch (testGoalError) {
+            reportClientError("Unable to load Test Goals", testGoalError);
+            testGoalTree = null;
+        }
+    }
+
+    async function loadTestGoalFileNow(goalFile) {
+        if (!goalFile?.path) {
+            selectedTestGoalFile = null;
+            selectedTestGoalFolderPath = "";
+            testGoalDraftContent = "";
+            savedTestGoalContent = "";
+            return;
+        }
+
+        try {
+            const goalPath = encodeURIComponent(goalFile.path);
+            selectedTestGoalFile = await loadJson(`${testGoalApiPath(selectedWorkspaceName, "/file")}?path=${goalPath}`);
+            selectedTestGoalFolderPath = null;
+            testGoalDraftContent = selectedTestGoalFile.content || "";
+            savedTestGoalContent = selectedTestGoalFile.content || "";
+        } catch (testGoalError) {
+            reportClientError(`Unable to load Test Goal ${goalFile.path}`, testGoalError);
+        }
+    }
+
+    async function loadTestGoalFile(goalFile) {
+        if (testGoalDirty) {
+            openTestGoalGuard(() => loadTestGoalFileNow(goalFile));
+            return;
+        }
+
+        await loadTestGoalFileNow(goalFile);
+    }
+
+    async function selectTestGoalFolder(folderPath) {
+        if (testGoalDirty) {
+            openTestGoalGuard(() => selectTestGoalFolderNow(folderPath));
+            return;
+        }
+
+        selectTestGoalFolderNow(folderPath);
+    }
+
+    function selectTestGoalFolderNow(folderPath) {
+        const nextState = testGoalFolderSelectionState(folderPath);
+        selectedTestGoalFolderPath = nextState.selectedTestGoalFolderPath;
+        selectedTestGoalFile = nextState.selectedTestGoalFile;
+        testGoalDraftContent = nextState.testGoalDraftContent;
+        savedTestGoalContent = nextState.savedTestGoalContent;
+    }
+
+    function setTestGoalDraftContent(content) {
+        testGoalDraftContent = content;
+    }
+
+    function discardTestGoalChanges() {
+        testGoalDraftContent = savedTestGoalContent;
+    }
+
+    async function saveTestGoalFile() {
+        if (!selectedTestGoalFile?.path) {
+            return false;
+        }
+
+        saving = true;
+        message = "";
+
+        try {
+            const goalPath = encodeURIComponent(selectedTestGoalFile.path);
+            selectedTestGoalFile = await loadJson(`${testGoalApiPath(selectedWorkspaceName, "/file")}?path=${goalPath}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ content: testGoalDraftContent })
+            });
+            testGoalDraftContent = selectedTestGoalFile.content || "";
+            savedTestGoalContent = selectedTestGoalFile.content || "";
+            await loadTestGoalTree();
+            showTemporaryMessage("Test goal saved.");
+            return true;
+        } catch (testGoalError) {
+            reportClientError(`Unable to save Test Goal ${selectedTestGoalFile.path}`, testGoalError);
+            return false;
+        } finally {
+            saving = false;
+        }
+    }
+
+    async function createTestGoalFile(path) {
+        if (testGoalDirty) {
+            openTestGoalGuard(() => createTestGoalFile(path));
+            return;
+        }
+
+        saving = true;
+        message = "";
+
+        try {
+            const goalPath = encodeURIComponent(path);
+            selectedTestGoalFile = await loadJson(`${testGoalApiPath(selectedWorkspaceName, "/file")}?path=${goalPath}`, {
+                method: "POST"
+            });
+            testGoalDraftContent = selectedTestGoalFile.content || "";
+            savedTestGoalContent = selectedTestGoalFile.content || "";
+            await loadTestGoalTree();
+            selectedTestGoalFolderPath = null;
+            showTemporaryMessage("Test goal created.");
+        } catch (testGoalError) {
+            reportClientError(`Unable to create Test Goal ${path}`, testGoalError);
+        } finally {
+            saving = false;
+        }
+    }
+
+    async function createTestGoalFolder(path) {
+        saving = true;
+        message = "";
+
+        try {
+            const goalPath = encodeURIComponent(path);
+            testGoalTree = await loadJson(`${testGoalApiPath(selectedWorkspaceName, "/folder")}?path=${goalPath}`, {
+                method: "POST"
+            });
+            showTemporaryMessage("Test goal folder created.");
+        } catch (testGoalError) {
+            reportClientError(`Unable to create Test Goal folder ${path}`, testGoalError);
+        } finally {
+            saving = false;
+        }
+    }
+
+    async function deleteTestGoalPath(path) {
+        if (!path) {
+            return;
+        }
+
+        saving = true;
+        message = "";
+
+        try {
+            const goalPath = encodeURIComponent(path);
+            testGoalTree = await loadJson(`${testGoalApiPath(selectedWorkspaceName)}?path=${goalPath}`, {
+                method: "DELETE"
+            });
+            if (selectedTestGoalFile?.path === path || selectedTestGoalFile?.path?.startsWith(`${path}/`)) {
+                selectedTestGoalFile = null;
+                selectedTestGoalFolderPath = "";
+                testGoalDraftContent = "";
+                savedTestGoalContent = "";
+            }
+            showTemporaryMessage("Test goal item deleted.");
+        } catch (testGoalError) {
+            reportClientError(`Unable to delete Test Goal item ${path}`, testGoalError);
+        } finally {
+            saving = false;
         }
     }
 
@@ -1955,6 +2184,9 @@
         <button class:secondary={currentPage !== "configuration"} on:click={navigateToConfiguration}>
             ⚙️ Test Configuration
         </button>
+        <button class:secondary={currentPage !== "test-goals"} on:click={navigateToTestGoals}>
+            🎯 Test Goals
+        </button>
         <button class:secondary={currentPage !== "spy"} on:click={navigateToSpy}>
             🔍 Spy Mode
         </button>
@@ -2065,6 +2297,26 @@
                 stopCliManualSession={stopCliManualSession}
             />
         {/key}
+    {/if}
+
+    {#if currentPage === "test-goals"}
+        <TestGoalsView
+            testGoalDraftContent={testGoalDraftContent}
+            testGoalDirty={testGoalDirty}
+            testGoalTree={testGoalTree}
+            createTestGoalFile={createTestGoalFile}
+            createTestGoalFolder={createTestGoalFolder}
+            deleteTestGoalPath={deleteTestGoalPath}
+            discardTestGoalChanges={discardTestGoalChanges}
+            loadTestGoalFile={loadTestGoalFile}
+            saveTestGoalFile={saveTestGoalFile}
+            saving={saving}
+            selectedWorkspaceName={selectedWorkspaceName}
+            selectedTestGoalFolderPath={selectedTestGoalFolderPath}
+            selectedTestGoalFile={selectedTestGoalFile}
+            selectTestGoalFolder={selectTestGoalFolder}
+            setTestGoalDraftContent={setTestGoalDraftContent}
+        />
     {/if}
 
     {#if currentPage === "results"}

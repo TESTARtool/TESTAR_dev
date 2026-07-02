@@ -15,11 +15,6 @@ Treat the CLI distribution as an operational environment, not as a source-code w
 - The task requires step-by-step control of a live Windows, WebDriver, or Android session.
 - The task requires using `getState`, `getStateScreenshot`, and `getDerivedActions` as execution evidence.
 
-## Runtime layout
-
-- Distribution root contains the public launcher.
-- This skill is copied into `.agents/skills/testar-cli/` inside the CLI distribution.
-
 ## Public launcher paths
 
 - Windows: `testar-cli.bat`

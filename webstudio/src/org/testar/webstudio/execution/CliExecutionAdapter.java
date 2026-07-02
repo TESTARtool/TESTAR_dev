@@ -642,6 +642,7 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
                                     Path cliLauncher) {
         Path skillDirectory = resolveCliSkillDirectory();
         Path skillFile = skillDirectory.resolve("SKILL.md");
+        Path testGoalsDirectory = resolveWorkspaceTestGoalsDirectory(workspaceName);
         String skillInstructions = readCliSkillInstructions(skillDirectory);
         StringBuilder prompt = new StringBuilder();
         prompt.append(settings.promptTitle()).append('\n').append('\n');
@@ -651,6 +652,11 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
         prompt.append("Repository root: ").append(resolveProjectRoot()).append('\n');
         prompt.append("CLI skill directory: ").append(skillDirectory).append('\n');
         prompt.append("CLI skill file: ").append(skillFile).append('\n').append('\n');
+        prompt.append("Selected workspace Test Goals directory: ").append(testGoalsDirectory).append('\n');
+        prompt.append("Resolve user-requested managed Test Goal files and folders relative to that workspace Test Goals directory.").append('\n');
+        prompt.append("When a user asks for a Test Goal folder, recursively discover .yaml and .yml files in that folder.").append('\n');
+        prompt.append("When a YAML file contains multiple goals, execute every goal in that file.").append('\n');
+        prompt.append("When a broad user instruction matches multiple YAML goal files, execute all matching files instead of guessing one.").append('\n').append('\n');
         prompt.append("Execution rule: read and follow the TESTAR CLI skill instructions before issuing commands.").append('\n');
         prompt.append("Use startSession ").append(workspaceName)
             .append(" so TESTAR CLI derives platform and target from the selected workspace settings.")
@@ -679,6 +685,22 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
                 : settings.promptText()
         ).append('\n');
         return prompt.toString();
+    }
+
+    private Path resolveWorkspaceTestGoalsDirectory(String workspaceName) {
+        String normalizedWorkspaceName = workspaceName == null ? "" : workspaceName.trim();
+        if (normalizedWorkspaceName.isBlank()
+                || normalizedWorkspaceName.contains("/")
+                || normalizedWorkspaceName.contains("\\")) {
+            throw new IllegalArgumentException("Invalid CLI workspace: " + workspaceName);
+        }
+
+        return workspaceService.testarHomeDirectory()
+            .resolve("settings")
+            .resolve(normalizedWorkspaceName)
+            .resolve("test_goals")
+            .toAbsolutePath()
+            .normalize();
     }
 
     private Path resolveProjectRoot() {
