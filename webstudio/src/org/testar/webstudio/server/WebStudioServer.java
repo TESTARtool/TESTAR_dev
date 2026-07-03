@@ -26,6 +26,7 @@ import org.testar.webstudio.api.dto.RegexValidationRequestDto;
 import org.testar.webstudio.api.dto.SpyTypeRequestDto;
 import org.testar.webstudio.api.dto.WorkspaceCreateRequestDto;
 import org.testar.webstudio.api.dto.WorkspaceFileUpdateDto;
+import org.testar.webstudio.api.dto.WorkspaceRenameRequestDto;
 import org.testar.webstudio.analysis.StateModelAnalysisService;
 import org.testar.webstudio.execution.CliExecutionAdapter;
 import org.testar.webstudio.execution.ExecutionAdapterRegistry;
@@ -108,6 +109,11 @@ public final class WebStudioServer {
         routes.post("/api/workspaces", context -> handle(context, () -> {
             WorkspaceCreateRequestDto request = gson.fromJson(context.body(), WorkspaceCreateRequestDto.class);
             return workspaceController.createWorkspace(request);
+        }));
+        routes.put("/api/workspaces/{workspace}/rename", context -> handle(context, () -> {
+            String workspace = context.pathParam("workspace");
+            WorkspaceRenameRequestDto request = gson.fromJson(context.body(), WorkspaceRenameRequestDto.class);
+            return workspaceController.renameWorkspace(workspace, request);
         }));
         routes.get("/api/debug-files", context -> handle(context, workspaceController::listDebugFiles));
         routes.get("/api/debug-files/{fileName}", context -> handle(context, () ->

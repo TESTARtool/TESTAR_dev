@@ -65,7 +65,14 @@ The workspace is user-facing.
 
 The execution mode is implementation-facing.
 
-## Workspace Creation
+## Workspace Management
+
+WebStudio can manage workspace folders from the shared workspace selector.
+
+Workspace management includes:
+
+- creating a workspace by cloning an existing workspace
+- renaming an existing workspace
 
 WebStudio can create a new workspace by cloning an existing workspace.
 
@@ -81,6 +88,20 @@ The new workspace copy includes configuration assets:
 Copying Test Goals is optional and enabled by default.
 
 The objective is a cloned executable workspace while avoiding copied historical execution artifacts.
+
+WebStudio can rename an existing workspace by renaming the workspace folder under the shared settings root.
+
+Workspace rename also moves the matching generated output workspace folder when it exists:
+
+```text
+output/<old-workspace>/ -> output/<new-workspace>/
+```
+
+This keeps configuration, Test Goals, generated reports, and state model related settings associated with the same workspace name.
+
+Workspace names must remain safe folder names and must be unique.
+
+After a create or rename operation, WebStudio should refresh the workspace list and select the affected workspace.
 
 ## CLI Startup Contracts
 

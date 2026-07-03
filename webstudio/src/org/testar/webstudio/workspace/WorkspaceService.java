@@ -141,6 +141,104 @@ public final class WorkspaceService {
         }
     }
 
+    public WorkspaceSummaryDto renameWorkspace(String currentWorkspaceName, String newWorkspaceName) {
+        String normalizedCurrentWorkspaceName = normalizeExistingWorkspaceName(
+            currentWorkspaceName,
+            "Current workspace name is required."
+        );
+        String normalizedNewWorkspaceName = normalizeNewWorkspaceName(newWorkspaceName);
+
+        if (normalizedCurrentWorkspaceName.equals(normalizedNewWorkspaceName)) {
+            throw new IllegalArgumentException("New workspace name must be different from the current workspace name.");
+        }
+
+        Path sourceDirectory = settingsRoot.resolve(normalizedCurrentWorkspaceName).normalize();
+        Path targetDirectory = settingsRoot.resolve(normalizedNewWorkspaceName).normalize();
+        Path sourceOutputDirectory = workspaceOutputDirectory(normalizedCurrentWorkspaceName);
+        Path targetOutputDirectory = workspaceOutputDirectory(normalizedNewWorkspaceName);
+
+        if (!sourceDirectory.startsWith(settingsRoot) || !targetDirectory.startsWith(settingsRoot)) {
+            throw new IllegalArgumentException("Invalid workspace name.");
+        }
+
+        if (!Files.isDirectory(sourceDirectory)) {
+            if (workspaceExists(cliSettingsRoot, normalizedCurrentWorkspaceName)) {
+                throw new IllegalArgumentException(
+                    "Workspace cannot be renamed because it is not available in the shared settings root: "
+                        + normalizedCurrentWorkspaceName
+                );
+            }
+
+            throw new IllegalArgumentException("Workspace not found: " + normalizedCurrentWorkspaceName);
+        }
+
+        if (workspaceExists(settingsRoot, normalizedNewWorkspaceName) || workspaceExists(cliSettingsRoot, normalizedNewWorkspaceName)) {
+            throw new IllegalArgumentException("Workspace already exists: " + normalizedNewWorkspaceName);
+        }
+
+        if (Files.exists(targetOutputDirectory)) {
+            throw new IllegalArgumentException("Output results already exist for workspace: " + normalizedNewWorkspaceName);
+        }
+
+        try {
+            Files.move(sourceDirectory, targetDirectory);
+            moveWorkspaceOutputDirectory(sourceOutputDirectory, targetOutputDirectory, sourceDirectory, targetDirectory);
+            return listWorkspaces().stream()
+                .filter(workspace -> normalizedNewWorkspaceName.equals(workspace.name()))
+                .findFirst()
+                .orElseGet(() -> new WorkspaceSummaryDto(
+                    normalizedNewWorkspaceName,
+                    targetDirectory.toString(),
+                    true,
+                    workspaceExists(cliSettingsRoot, normalizedNewWorkspaceName)
+                ));
+        } catch (IOException exception) {
+            throw new IllegalStateException(
+                "Unable to rename workspace " + normalizedCurrentWorkspaceName + " to " + normalizedNewWorkspaceName,
+                exception
+            );
+        }
+    }
+
+    private Path workspaceOutputDirectory(String workspaceName) {
+        Path outputRoot = testarHomeDirectory().resolve("output").toAbsolutePath().normalize();
+        Path workspaceOutputDirectory = outputRoot.resolve(workspaceName).normalize();
+        if (!workspaceOutputDirectory.startsWith(outputRoot)) {
+            throw new IllegalArgumentException("Invalid workspace output name: " + workspaceName);
+        }
+
+        return workspaceOutputDirectory;
+    }
+
+    private void moveWorkspaceOutputDirectory(Path sourceOutputDirectory,
+                                              Path targetOutputDirectory,
+                                              Path sourceWorkspaceDirectory,
+                                              Path targetWorkspaceDirectory) throws IOException {
+        if (!Files.exists(sourceOutputDirectory)) {
+            return;
+        }
+
+        try {
+            Files.createDirectories(targetOutputDirectory.getParent());
+            Files.move(sourceOutputDirectory, targetOutputDirectory);
+        } catch (IOException outputMoveException) {
+            rollbackWorkspaceDirectoryRename(sourceWorkspaceDirectory, targetWorkspaceDirectory);
+            throw outputMoveException;
+        }
+    }
+
+    private void rollbackWorkspaceDirectoryRename(Path sourceWorkspaceDirectory, Path targetWorkspaceDirectory) {
+        if (Files.exists(sourceWorkspaceDirectory) || !Files.exists(targetWorkspaceDirectory)) {
+            return;
+        }
+
+        try {
+            Files.move(targetWorkspaceDirectory, sourceWorkspaceDirectory);
+        } catch (IOException rollbackException) {
+            throw new IllegalStateException("Unable to rollback workspace rename after output move failure.", rollbackException);
+        }
+    }
+
     public List<DebugFileSummaryDto> listDebugFiles() {
         Path testarHomeDirectory = testarHomeDirectory();
         if (!Files.isDirectory(testarHomeDirectory)) {

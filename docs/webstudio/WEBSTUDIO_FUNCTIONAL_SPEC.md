@@ -123,13 +123,22 @@ The `Edit Settings` view must render `CliStateProjectionMode` as a dropdown usin
 - If no `webdriver_xxx` workspace is available, the first workspace is selected.
 - Changing the selected workspace reloads the workspace document and resets editor state.
 
+### Workspace Management
+
+WebStudio must expose workspace-level management from the workspace selector area.
+
+The workspace selector area must include a `Workspace` action that opens a workspace management dialog.
+
+The workspace management dialog must support:
+
+- creating a new workspace
+- renaming the currently selected workspace
+
 ### Workspace Creation
 
 WebStudio must allow creating a new workspace by cloning an existing workspace.
 
-The creation action is launched from the workspace selector area.
-
-The creation dialog must require:
+The creation panel must require:
 
 - new workspace name
 - base workspace
@@ -170,6 +179,39 @@ After successful creation:
 - the default configuration editor is `Edit Java Composition Flow`
 
 If creation fails, WebStudio must keep the creation dialog open and show the error.
+
+### Workspace Rename
+
+WebStudio must allow renaming the currently selected workspace.
+
+The rename panel must show:
+
+- current workspace name
+- new workspace name
+
+The new workspace name must use the same safe folder name rules as workspace creation.
+
+The new workspace name must not already exist.
+
+The new workspace name must be different from the current workspace name.
+
+After successful rename:
+
+- WebStudio refreshes the workspace list
+- WebStudio selects the renamed workspace
+- WebStudio opens Test Configuration
+- the default configuration editor is `Edit Java Composition Flow`
+
+Workspace rename must also rename the matching output results workspace folder when it exists.
+
+Output rename behavior:
+
+- `output/<old-workspace>` becomes `output/<new-workspace>`
+- existing generated result folders remain inside the renamed output workspace folder
+- if `output/<old-workspace>` does not exist, rename still succeeds
+- if `output/<new-workspace>` already exists, rename fails and the current workspace name remains unchanged
+
+If rename fails, WebStudio must keep the workspace management dialog open and show the error.
 
 ### Page Navigation
 

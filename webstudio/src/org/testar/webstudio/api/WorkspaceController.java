@@ -18,6 +18,7 @@ import org.testar.webstudio.api.dto.WorkspaceCreateRequestDto;
 import org.testar.webstudio.api.dto.WorkspaceDocumentDto;
 import org.testar.webstudio.api.dto.WorkspaceFileDto;
 import org.testar.webstudio.api.dto.WorkspaceJavaCompileResultDto;
+import org.testar.webstudio.api.dto.WorkspaceRenameRequestDto;
 import org.testar.webstudio.api.dto.WorkspaceSummaryDto;
 import org.testar.webstudio.workspace.WorkspaceService;
 
@@ -43,6 +44,14 @@ public final class WorkspaceController {
             request.baseWorkspace(),
             request.copyTestGoals()
         );
+    }
+
+    public WorkspaceSummaryDto renameWorkspace(String workspaceName, WorkspaceRenameRequestDto request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Workspace rename request is required.");
+        }
+
+        return workspaceService.renameWorkspace(workspaceName, request.name());
     }
 
     public Path settingsRoot() {

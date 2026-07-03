@@ -77,20 +77,22 @@ Examples:
 
 ## Workspace Selector UX Contract
 
-The workspace selector area is the primary place for workspace selection and creation.
+The workspace selector area is the primary place for workspace selection and workspace management.
 
 Expected behavior:
 
-- an `Add` action to the left of the workspace selector opens a create-workspace modal
-- the modal asks whether the user wants to create a new workspace
-- the modal requires a new workspace name
-- the modal requires selecting an existing workspace as the base
-- `Copy Test Goals` is visible, checked by default, and can be unchecked
+- a `Workspace` action to the left of the workspace selector opens a workspace management modal
+- the modal exposes separate areas or tabs for `Create Workspace` and `Rename Workspace`
+- `Create Workspace` requires a new workspace name and an existing workspace as base
+- `Create Workspace` shows `Copy Test Goals`, checked by default, and allows unchecking it
 - `Create` remains disabled until the workspace name and base workspace are valid
-- `Discard` closes the modal without creating anything
-- after creation, the new workspace is selected automatically
+- `Rename Workspace` shows the current workspace name and requires a new valid workspace name
+- `Rename Workspace` indicates that existing output results for the current workspace will move to the renamed workspace
+- `Rename` remains disabled until the new name is valid, unique, and different from the current workspace name
+- `Discard` closes the modal without applying changes
+- after creation or rename, the affected workspace is selected automatically
 
-The create-workspace modal must not resize the page layout.
+The workspace management modal must not resize the page layout.
 
 Validation feedback appears inside the modal.
 

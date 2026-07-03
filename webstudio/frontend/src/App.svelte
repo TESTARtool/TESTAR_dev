@@ -15,10 +15,13 @@
     import { objectSnapshot } from "./editorDirtyState.js";
     import { resultFileUrl, resultGroupDeleteUrl, resultListUrl } from "./resultApi.js";
     import {
-        defaultWorkspaceCreationDraft,
-        workspaceCreationRequest,
-        workspaceCreationValidation
-    } from "./workspaceCreationModel.js";
+        defaultWorkspaceCreateDraft,
+        defaultWorkspaceRenameDraft,
+        workspaceCreateRequest,
+        workspaceCreateValidation,
+        workspaceRenameRequest,
+        workspaceRenameValidation
+    } from "./workspaceManagementModel.js";
 
     const STATE_MODEL_URL = "http://localhost:8090/models";
     const CLI_AGENT_SETTING_KEYS = {
@@ -100,9 +103,11 @@
         message: "",
         saveLabel: "Save"
     };
-    let workspaceCreationDialogOpen = false;
-    let workspaceCreationDraft = defaultWorkspaceCreationDraft([], "");
-    let workspaceCreationError = "";
+    let workspaceManagementDialogOpen = false;
+    let workspaceManagementTab = "create";
+    let workspaceCreateDraft = defaultWorkspaceCreateDraft([], "");
+    let workspaceRenameDraft = defaultWorkspaceRenameDraft("");
+    let workspaceManagementError = "";
     let savedTestSettingsContent = "";
     let savedCompositionPropertiesContent = "";
     let savedPoliciesPropertiesContent = "";
@@ -817,42 +822,44 @@
         });
     }
 
-    async function openWorkspaceCreationDialog() {
+    async function openWorkspaceManagementDialog() {
         await guardApplicationTransition(async () => {
-            workspaceCreationDraft = defaultWorkspaceCreationDraft(workspaces, selectedWorkspaceName);
-            workspaceCreationError = "";
-            workspaceCreationDialogOpen = true;
+            workspaceCreateDraft = defaultWorkspaceCreateDraft(workspaces, selectedWorkspaceName);
+            workspaceRenameDraft = defaultWorkspaceRenameDraft(selectedWorkspaceName);
+            workspaceManagementTab = "create";
+            workspaceManagementError = "";
+            workspaceManagementDialogOpen = true;
         });
     }
 
-    function closeWorkspaceCreationDialog() {
+    function closeWorkspaceManagementDialog() {
         if (saving) {
             return;
         }
 
-        workspaceCreationDialogOpen = false;
-        workspaceCreationError = "";
+        workspaceManagementDialogOpen = false;
+        workspaceManagementError = "";
     }
 
-    function closeWorkspaceCreationDialogFromBackdrop(event) {
+    function closeWorkspaceManagementDialogFromBackdrop(event) {
         if (event.target === event.currentTarget) {
-            closeWorkspaceCreationDialog();
+            closeWorkspaceManagementDialog();
         }
     }
 
     async function createWorkspaceFromDialog() {
-        const validation = workspaceCreationValidation(workspaceCreationDraft, workspaces);
+        const validation = workspaceCreateValidation(workspaceCreateDraft, workspaces);
         if (!validation.valid) {
-            workspaceCreationError = validation.message;
+            workspaceManagementError = validation.message;
             return;
         }
 
         saving = true;
-        workspaceCreationError = "";
+        workspaceManagementError = "";
         message = "";
 
         try {
-            const request = workspaceCreationRequest(workspaceCreationDraft);
+            const request = workspaceCreateRequest(workspaceCreateDraft);
             const createdWorkspace = await loadJson("/api/workspaces", {
                 method: "POST",
                 headers: {
@@ -863,11 +870,44 @@
             await refreshInitialData();
             currentPage = "configuration";
             await loadWorkspace(createdWorkspace?.name || request.name);
-            workspaceCreationDialogOpen = false;
+            workspaceManagementDialogOpen = false;
             showTemporaryMessage(`Workspace ${request.name} created.`);
         } catch (createError) {
             reportClientError("Unable to create workspace", createError);
-            workspaceCreationError = createError.message || "Unable to create workspace.";
+            workspaceManagementError = createError.message || "Unable to create workspace.";
+        } finally {
+            saving = false;
+        }
+    }
+
+    async function renameWorkspaceFromDialog() {
+        const validation = workspaceRenameValidation(workspaceRenameDraft, selectedWorkspaceName, workspaces);
+        if (!validation.valid) {
+            workspaceManagementError = validation.message;
+            return;
+        }
+
+        saving = true;
+        workspaceManagementError = "";
+        message = "";
+
+        try {
+            const request = workspaceRenameRequest(workspaceRenameDraft);
+            const renamedWorkspace = await loadJson(`/api/workspaces/${selectedWorkspaceName}/rename`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(request)
+            });
+            await refreshInitialData();
+            currentPage = "configuration";
+            await loadWorkspace(renamedWorkspace?.name || request.name);
+            workspaceManagementDialogOpen = false;
+            showTemporaryMessage(`Workspace renamed to ${request.name}.`);
+        } catch (renameError) {
+            reportClientError("Unable to rename workspace", renameError);
+            workspaceManagementError = renameError.message || "Unable to rename workspace.";
         } finally {
             saving = false;
         }
@@ -2234,7 +2274,8 @@
     }
 
     $: selectedWorkspaceSummary = workspaces.find((workspace) => workspace.name === selectedWorkspaceName) || null;
-    $: workspaceCreationValidationState = workspaceCreationValidation(workspaceCreationDraft, workspaces);
+    $: workspaceCreateValidationState = workspaceCreateValidation(workspaceCreateDraft, workspaces);
+    $: workspaceRenameValidationState = workspaceRenameValidation(workspaceRenameDraft, selectedWorkspaceName, workspaces);
 
     onMount(async () => {
         startScriptlessPolling();
@@ -2261,8 +2302,8 @@
 <div class="page">
     <nav class="panel panel-wide page-nav">
         <div class="page-nav-workspace">
-            <button type="button" class="secondary page-workspace-add" on:click={openWorkspaceCreationDialog}>
-                New
+            <button type="button" class="secondary page-workspace-action" on:click={openWorkspaceManagementDialog}>
+                Workspace
             </button>
             <select
                 id="page-workspace-select"
@@ -2450,61 +2491,119 @@
         </div>
     {/if}
 
-    {#if workspaceCreationDialogOpen}
-        <div class="composition-modal-backdrop" role="presentation" on:click={closeWorkspaceCreationDialogFromBackdrop}>
+    {#if workspaceManagementDialogOpen}
+        <div class="composition-modal-backdrop" role="presentation" on:click={closeWorkspaceManagementDialogFromBackdrop}>
             <div
-                class="composition-modal state-model-dialog workspace-creation-dialog"
+                class="composition-modal state-model-dialog workspace-management-dialog"
                 role="dialog"
                 aria-modal="true"
-                aria-labelledby="workspace-creation-dialog-title"
+                aria-labelledby="workspace-management-dialog-title"
             >
                 <div class="composition-modal-header">
                     <div>
-                        <h2 id="workspace-creation-dialog-title">Create New Workspace</h2>
-                        <p>Select an existing workspace as base. WebStudio clones its settings, composition, policies, and Java files.</p>
+                        <h2 id="workspace-management-dialog-title">Manage Workspace</h2>
+                        <p>Create a workspace from an existing base, or rename the selected workspace.</p>
                     </div>
                 </div>
-                <div class="composition-modal-body workspace-creation-form">
-                    <label>
-                        <span>Workspace name</span>
-                        <input
-                            type="text"
-                            bind:value={workspaceCreationDraft.name}
-                            placeholder="platform_application (e.g., webdriver_parabank)"
-                            disabled={saving}
-                        />
-                    </label>
-                    <label>
-                        <span>Base workspace</span>
-                        <select bind:value={workspaceCreationDraft.baseWorkspace} disabled={saving}>
-                            {#each workspaces as workspace}
-                                <option value={workspace.name}>{workspace.name}</option>
-                            {/each}
-                        </select>
-                    </label>
-                    <label class="workspace-creation-checkbox">
-                        <input
-                            type="checkbox"
-                            bind:checked={workspaceCreationDraft.copyTestGoals}
-                            disabled={saving}
-                        />
-                        <span>Copy Test Goals from base workspace</span>
-                    </label>
-                    {#if workspaceCreationError || workspaceCreationValidationState.message}
-                        <p class:settings-validation-invalid={workspaceCreationError || !workspaceCreationValidationState.valid}>
-                            {workspaceCreationError || workspaceCreationValidationState.message}
+                <div class="workspace-management-tabs" role="tablist" aria-label="Workspace management actions">
+                    <button
+                        type="button"
+                        class:secondary={workspaceManagementTab !== "create"}
+                        on:click={() => {
+                            workspaceManagementTab = "create";
+                            workspaceManagementError = "";
+                        }}
+                        disabled={saving}
+                    >
+                        Create Workspace
+                    </button>
+                    <button
+                        type="button"
+                        class:secondary={workspaceManagementTab !== "rename"}
+                        on:click={() => {
+                            workspaceManagementTab = "rename";
+                            workspaceManagementError = "";
+                        }}
+                        disabled={saving || !selectedWorkspaceName}
+                    >
+                        Rename Workspace
+                    </button>
+                </div>
+                <div class="composition-modal-body workspace-management-form">
+                    {#if workspaceManagementTab === "create"}
+                        <label>
+                            <span>Workspace name</span>
+                            <input
+                                type="text"
+                                bind:value={workspaceCreateDraft.name}
+                                placeholder="platform_application (e.g., webdriver_parabank)"
+                                disabled={saving}
+                            />
+                        </label>
+                        <label>
+                            <span>Base workspace</span>
+                            <select bind:value={workspaceCreateDraft.baseWorkspace} disabled={saving}>
+                                {#each workspaces as workspace}
+                                    <option value={workspace.name}>{workspace.name}</option>
+                                {/each}
+                            </select>
+                        </label>
+                        <label class="workspace-management-checkbox">
+                            <input
+                                type="checkbox"
+                                bind:checked={workspaceCreateDraft.copyTestGoals}
+                                disabled={saving}
+                            />
+                            <span>Copy Test Goals from base workspace</span>
+                        </label>
+                        {#if workspaceManagementError || workspaceCreateValidationState.message}
+                            <p class:settings-validation-invalid={workspaceManagementError || !workspaceCreateValidationState.valid}>
+                                {workspaceManagementError || workspaceCreateValidationState.message}
+                            </p>
+                        {/if}
+                    {:else}
+                        <label>
+                            <span>Current workspace</span>
+                            <input type="text" value={selectedWorkspaceName} disabled />
+                        </label>
+                        <label>
+                            <span>New workspace name</span>
+                            <input
+                                type="text"
+                                bind:value={workspaceRenameDraft.name}
+                                placeholder="platform_application (e.g., webdriver_parabank)"
+                                disabled={saving}
+                            />
+                        </label>
+                        <p class="workspace-management-note">
+                            Existing output results for {selectedWorkspaceName} will move to the renamed workspace.
                         </p>
+                        {#if workspaceManagementError || workspaceRenameValidationState.message}
+                            <p class:settings-validation-invalid={workspaceManagementError || !workspaceRenameValidationState.valid}>
+                                {workspaceManagementError || workspaceRenameValidationState.message}
+                            </p>
+                        {/if}
                     {/if}
                 </div>
                 <div class="composition-modal-actions">
-                    <button
-                        type="button"
-                        on:click={createWorkspaceFromDialog}
-                        disabled={saving || !workspaceCreationValidationState.valid}
-                    >
-                        Create
-                    </button>
-                    <button type="button" class="secondary" on:click={closeWorkspaceCreationDialog} disabled={saving}>
+                    {#if workspaceManagementTab === "create"}
+                        <button
+                            type="button"
+                            on:click={createWorkspaceFromDialog}
+                            disabled={saving || !workspaceCreateValidationState.valid}
+                        >
+                            Create
+                        </button>
+                    {:else}
+                        <button
+                            type="button"
+                            on:click={renameWorkspaceFromDialog}
+                            disabled={saving || !workspaceRenameValidationState.valid}
+                        >
+                            Rename
+                        </button>
+                    {/if}
+                    <button type="button" class="secondary" on:click={closeWorkspaceManagementDialog} disabled={saving}>
                         Discard
                     </button>
                 </div>
