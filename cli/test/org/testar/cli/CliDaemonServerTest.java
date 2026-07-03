@@ -92,6 +92,16 @@ public class CliDaemonServerTest {
     }
 
     @Test
+    public void applyWorkspaceOutputDirectoryScopesResultsToWorkspace() {
+        CliDaemonServer server = new CliDaemonServer();
+        Settings settings = defaultSettings();
+
+        server.applyWorkspaceOutputDirectory(settings, "webdriver_generic");
+
+        Assert.assertEquals("./output/webdriver_generic", settings.get(ConfigTags.OutputDir));
+    }
+
+    @Test
     public void resolveCliTargetFromWebdriverConnector() {
         Settings settings = defaultSettings();
         settings.set(ConfigTags.SUTConnector, Settings.SUT_CONNECTOR_WEBDRIVER);

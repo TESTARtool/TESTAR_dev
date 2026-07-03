@@ -34,6 +34,9 @@ target/install/testar/
     windows_generic/
     android_generic/
   output/
+    webdriver_generic/
+    windows_generic/
+    android_generic/
   .runtime/
 ```
 
@@ -193,16 +196,40 @@ Executable managed goal files use `.yaml` or `.yml`.
 
 The YAML contract is intentionally structured so WebStudio can validate required fields and agents can consume goal content reliably.
 
+## Workspace-Scoped Output Results
+
+Generated output results are workspace assets.
+
+Each workspace writes and reads results under its own output directory:
+
+```text
+target/install/testar/bin/output/{workspace}/
+```
+
+Examples:
+
+- `target/install/testar/bin/output/webdriver_generic/`
+- `target/install/testar/bin/output/windows_generic/`
+- `target/install/testar/bin/output/android_generic/`
+
+Generate and CLI executions share the same runtime root, but they must not mix output results across workspaces.
+
+WebStudio result inspection uses the selected workspace to resolve the output result directory.
+
+Changing the selected workspace changes the visible output results.
+
+This keeps workspace configuration, test goals, generated reports, and state model settings aligned.
+
 ## Output Folder Naming
 
 Generated output folders must include the execution mode after the timestamp.
 
 Examples:
 
-- `2026-06-29_13h23m23s_generate_webdriver_parabank_1`
-- `2026-06-29_13h23m23s_cli_webdriver_parabank_1`
+- `output/webdriver_generic/2026-06-29_13h23m23s_generate_webdriver_parabank_1`
+- `output/webdriver_generic/2026-06-29_13h23m23s_cli_webdriver_parabank_1`
 
-The mode token allows WebStudio to present mode-specific result summaries while keeping one shared output folder.
+The mode token allows WebStudio to present mode-specific result summaries inside the selected workspace output area.
 
 ## Shared Settings
 
@@ -270,6 +297,6 @@ WebStudio should:
 - start CLI sessions with the workspace-driven contract, `startSession <workspace>`
 - show warnings when mode-specific entries are ignored
 - keep mode-specific controls in their own views
-- read generated output results from the shared distribution output folder
+- read generated output results from the selected workspace output folder
 
 WebStudio reuses equivalent workspaces across execution modes.

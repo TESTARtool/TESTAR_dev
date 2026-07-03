@@ -13,6 +13,7 @@
     import { clearSelectedSourceState } from "./policyEditorState.js";
     import { stateModelWorkspaceDialog } from "./stateModelNavigation.js";
     import { objectSnapshot } from "./editorDirtyState.js";
+    import { resultFileUrl, resultGroupDeleteUrl, resultListUrl } from "./resultApi.js";
 
     const STATE_MODEL_URL = "http://localhost:8090/models";
     const CLI_AGENT_SETTING_KEYS = {
@@ -239,6 +240,9 @@
             javaCompileResult = null;
             resetTestGoalSelection();
             testGoalTree = null;
+            resultsData = null;
+            selectedResultGroup = null;
+            selectedResultFile = null;
             return;
         }
 
@@ -266,6 +270,8 @@
             resetTestGoalSelection();
             if (currentPage === "test-goals") {
                 await loadTestGoalTree(workspaceName);
+            } else if (currentPage === "results") {
+                await loadResults(workspaceName);
             }
         } catch (loadError) {
             reportClientError(`Unable to load workspace ${workspaceName}`, loadError);
@@ -1427,9 +1433,16 @@
         );
     }
 
-    async function loadResults() {
+    async function loadResults(workspaceName = selectedWorkspaceName) {
+        if (!workspaceName) {
+            resultsData = null;
+            selectedResultGroup = null;
+            selectedResultFile = null;
+            return;
+        }
+
         try {
-            resultsData = await loadJson("/api/execution/scriptless/results");
+            resultsData = await loadJson(resultListUrl(workspaceName));
             const resultGroups = resultsData.groups || [];
             if (resultGroups.length > 0) {
                 await selectResultGroup(resultGroups[resultGroups.length - 1]);
@@ -1760,8 +1773,7 @@
         }
 
         try {
-            const resultPath = encodeURIComponent(resultFile.path);
-            selectedResultFile = await loadJson(`/api/execution/scriptless/results/${resultFile.name}?path=${resultPath}`);
+            selectedResultFile = await loadJson(resultFileUrl(selectedWorkspaceName, resultFile));
         } catch (fileError) {
             reportClientError(`Unable to load result file ${resultFile.name}`, fileError);
         }
@@ -1786,9 +1798,8 @@
         }
 
         try {
-            const resultPath = encodeURIComponent(resultFile.path);
             const currentGroupPath = selectedResultGroup?.path || "";
-            const refreshedResults = await loadJson(`/api/execution/scriptless/results/${resultFile.name}?path=${resultPath}`, {
+            const refreshedResults = await loadJson(resultFileUrl(selectedWorkspaceName, resultFile), {
                 method: "DELETE"
             });
             applyRefreshedResults(refreshedResults, currentGroupPath);
@@ -1803,8 +1814,7 @@
         }
 
         try {
-            const resultPath = encodeURIComponent(resultGroup.path);
-            const refreshedResults = await loadJson(`/api/execution/scriptless/result-groups?path=${resultPath}`, {
+            const refreshedResults = await loadJson(resultGroupDeleteUrl(selectedWorkspaceName, resultGroup), {
                 method: "DELETE"
             });
             applyRefreshedResults(refreshedResults);

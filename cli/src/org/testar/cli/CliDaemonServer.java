@@ -478,6 +478,7 @@ final class CliDaemonServer {
     private CliPreparedSession buildPreparedSessionFromWorkspace(CliRequest request) {
         String normalizedProfileName = normalizeProfileName(request.argumentAt(0));
         Settings profileSettings = CliSettingsLoader.loadProfile(normalizedProfileName);
+        applyWorkspaceOutputDirectory(profileSettings, normalizedProfileName);
         CliSessionTarget sessionTarget = CliSessionTargetResolver.resolve(profileSettings);
         PlatformSessionSpecification sessionSpec = PlatformSessionSpecFactory.create(
                 sessionTarget.operatingSystem(),
@@ -499,6 +500,7 @@ final class CliDaemonServer {
                 : profileName.trim();
 
         Settings profileSettings = CliSettingsLoader.loadProfile(normalizedProfileName);
+        applyWorkspaceOutputDirectory(profileSettings, normalizedProfileName);
         PlatformSessionSpecification sessionSpec = buildSessionSpec(request, profileSettings);
         CliProfileConfiguration profileConfiguration = CliProfileConfigurationLoader.load(
                 normalizedProfileName,
@@ -513,6 +515,10 @@ final class CliDaemonServer {
         }
 
         return profileName.trim();
+    }
+
+    void applyWorkspaceOutputDirectory(Settings settings, String workspaceName) {
+        settings.set(ConfigTags.OutputDir, "./output/" + normalizeProfileName(workspaceName));
     }
 
     private OperatingSystems parseOperatingSystem(String token) {

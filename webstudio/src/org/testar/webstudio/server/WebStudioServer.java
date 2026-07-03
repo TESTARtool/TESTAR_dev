@@ -209,41 +209,47 @@ public final class WebStudioServer {
         }));
         routes.post("/api/execution/cli/manual/stop", context -> handle(context, executionController::stopCliManualSession));
         routes.post("/api/execution/cli/agent/stop", context -> handle(context, executionController::stopCliAgentSession));
-        routes.get("/api/execution/cli/results", context -> handle(context, executionController::cliResults));
+        routes.get("/api/execution/cli/results", context -> handle(context, () ->
+            executionController.cliResults(context.queryParam("workspace"))
+        ));
         routes.get("/api/execution/cli/results/{fileName}", context -> handle(context, () ->
             executionController.cliResultFile(
+                context.queryParam("workspace"),
                 context.pathParam("fileName"),
                 context.queryParam("path")
             )
         ));
         routes.delete("/api/execution/cli/results/{fileName}", context -> handle(context, () ->
-            executionController.deleteCliResultFile(context.queryParam("path"))
+            executionController.deleteCliResultFile(context.queryParam("workspace"), context.queryParam("path"))
         ));
         routes.delete("/api/execution/cli/result-groups", context -> handle(context, () ->
-            executionController.deleteCliResultGroup(context.queryParam("path"))
+            executionController.deleteCliResultGroup(context.queryParam("workspace"), context.queryParam("path"))
         ));
         routes.get("/api/execution/cli/result-asset", context -> {
             String assetPath = context.queryParam("path");
             context.contentType(executionController.cliResultAssetContentType(assetPath));
-            context.result(executionController.cliResultAsset(assetPath));
+            context.result(executionController.cliResultAsset(context.queryParam("workspace"), assetPath));
         });
-        routes.get("/api/execution/scriptless/results", context -> handle(context, executionController::scriptlessResults));
+        routes.get("/api/execution/scriptless/results", context -> handle(context, () ->
+            executionController.scriptlessResults(context.queryParam("workspace"))
+        ));
         routes.get("/api/execution/scriptless/results/{fileName}", context -> handle(context, () ->
             executionController.scriptlessResultFile(
+                context.queryParam("workspace"),
                 context.pathParam("fileName"),
                 context.queryParam("path")
             )
         ));
         routes.delete("/api/execution/scriptless/results/{fileName}", context -> handle(context, () ->
-            executionController.deleteScriptlessResultFile(context.queryParam("path"))
+            executionController.deleteScriptlessResultFile(context.queryParam("workspace"), context.queryParam("path"))
         ));
         routes.delete("/api/execution/scriptless/result-groups", context -> handle(context, () ->
-            executionController.deleteScriptlessResultGroup(context.queryParam("path"))
+            executionController.deleteScriptlessResultGroup(context.queryParam("workspace"), context.queryParam("path"))
         ));
         routes.get("/api/execution/scriptless/result-asset", context -> {
             String assetPath = context.queryParam("path");
             context.contentType(executionController.scriptlessResultAssetContentType(assetPath));
-            context.result(executionController.scriptlessResultAsset(assetPath));
+            context.result(executionController.scriptlessResultAsset(context.queryParam("workspace"), assetPath));
         });
         routes.post("/api/execution/scriptless/generate/{workspace}", context -> handle(context, () -> {
             String workspace = context.pathParam("workspace");

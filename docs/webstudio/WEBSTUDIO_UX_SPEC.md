@@ -283,7 +283,9 @@ The results page should provide fast visual understanding of output health.
 Expected behavior:
 
 - the left panel contains `Output Results`
-- `Output Results` reads from the shared Generate and CLI output folder
+- `Output Results` reads from the selected workspace output folder
+- changing the selected workspace refreshes `Output Results`
+- results from other workspaces are not shown in the selected workspace list
 - `Output Results` includes sorting by date or name
 - `Output Results` includes filtering by the result type
 - `Output Results` can be filtered by execution mode: All, Generate, or CLI
@@ -328,7 +330,7 @@ Deletion confirmation behavior:
 
 Empty state behavior:
 
-- no output result folders shows an empty message in the right preview area
+- no output result folders for the selected workspace shows an empty message in the right preview area
 - filters hiding all output result folders show an empty filtered-results message
 - no generated files for a selected output folder shows an empty message in the `Generated Files` panel
 - deleting the last output result folder shows the default Test Results empty view

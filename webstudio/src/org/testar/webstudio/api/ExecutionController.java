@@ -73,25 +73,25 @@ public final class ExecutionController {
         return cliExecutionAdapter().stopAgentSession();
     }
 
-    public ScriptlessResultsDto cliResults() {
-        return cliExecutionAdapter().cliResults();
+    public ScriptlessResultsDto cliResults(String workspaceName) {
+        return cliExecutionAdapter().cliResults(workspaceName);
     }
 
-    public ResultFileDto cliResultFile(String fileName, String filePath) {
-        return cliExecutionAdapter().readCliResultFile(fileName, filePath);
+    public ResultFileDto cliResultFile(String workspaceName, String fileName, String filePath) {
+        return cliExecutionAdapter().readCliResultFile(workspaceName, fileName, filePath);
     }
 
-    public ScriptlessResultsDto deleteCliResultFile(String filePath) {
-        return cliExecutionAdapter().deleteCliResultFile(filePath);
+    public ScriptlessResultsDto deleteCliResultFile(String workspaceName, String filePath) {
+        return cliExecutionAdapter().deleteCliResultFile(workspaceName, filePath);
     }
 
-    public ScriptlessResultsDto deleteCliResultGroup(String groupPath) {
-        return cliExecutionAdapter().deleteCliResultGroup(groupPath);
+    public ScriptlessResultsDto deleteCliResultGroup(String workspaceName, String groupPath) {
+        return cliExecutionAdapter().deleteCliResultGroup(workspaceName, groupPath);
     }
 
-    public byte[] cliResultAsset(String filePath) {
+    public byte[] cliResultAsset(String workspaceName, String filePath) {
         try {
-            return Files.readAllBytes(cliExecutionAdapter().resolveCliResultAsset(filePath));
+            return Files.readAllBytes(cliExecutionAdapter().resolveCliResultAsset(workspaceName, filePath));
         } catch (Exception exception) {
             throw new IllegalStateException("Unable to read CLI result asset: " + filePath, exception);
         }
@@ -105,25 +105,25 @@ public final class ExecutionController {
         return scriptlessExecutionAdapter().stop();
     }
 
-    public ScriptlessResultsDto scriptlessResults() {
-        return scriptlessExecutionAdapter().scriptlessResults();
+    public ScriptlessResultsDto scriptlessResults(String workspaceName) {
+        return scriptlessExecutionAdapter().scriptlessResults(workspaceName);
     }
 
-    public ResultFileDto scriptlessResultFile(String fileName, String filePath) {
-        return scriptlessExecutionAdapter().readScriptlessResultFile(fileName, filePath);
+    public ResultFileDto scriptlessResultFile(String workspaceName, String fileName, String filePath) {
+        return scriptlessExecutionAdapter().readScriptlessResultFile(workspaceName, fileName, filePath);
     }
 
-    public ScriptlessResultsDto deleteScriptlessResultFile(String filePath) {
-        return scriptlessExecutionAdapter().deleteScriptlessResultFile(filePath);
+    public ScriptlessResultsDto deleteScriptlessResultFile(String workspaceName, String filePath) {
+        return scriptlessExecutionAdapter().deleteScriptlessResultFile(workspaceName, filePath);
     }
 
-    public ScriptlessResultsDto deleteScriptlessResultGroup(String groupPath) {
-        return scriptlessExecutionAdapter().deleteScriptlessResultGroup(groupPath);
+    public ScriptlessResultsDto deleteScriptlessResultGroup(String workspaceName, String groupPath) {
+        return scriptlessExecutionAdapter().deleteScriptlessResultGroup(workspaceName, groupPath);
     }
 
-    public byte[] scriptlessResultAsset(String filePath) {
+    public byte[] scriptlessResultAsset(String workspaceName, String filePath) {
         try {
-            return Files.readAllBytes(scriptlessExecutionAdapter().resolveScriptlessResultAsset(filePath));
+            return Files.readAllBytes(scriptlessExecutionAdapter().resolveScriptlessResultAsset(workspaceName, filePath));
         } catch (Exception exception) {
             throw new IllegalStateException("Unable to read scriptless result asset: " + filePath, exception);
         }

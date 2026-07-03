@@ -162,8 +162,8 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         return buildStatus("idle", lastMessage);
     }
 
-    public synchronized ScriptlessResultsDto scriptlessResults() {
-        List<ResultOutputGroupDto> groups = loadResultGroups();
+    public synchronized ScriptlessResultsDto scriptlessResults(String workspaceName) {
+        List<ResultOutputGroupDto> groups = loadResultGroups(workspaceName);
         if (groups.isEmpty()) {
             return new ScriptlessResultsDto("", List.of(), List.of());
         }
@@ -172,8 +172,8 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         return new ScriptlessResultsDto(latestGroup.path(), groups, latestGroup.files());
     }
 
-    public synchronized ResultFileDto readScriptlessResultFile(String fileName, String filePath) {
-        ScriptlessResultsDto results = scriptlessResults();
+    public synchronized ResultFileDto readScriptlessResultFile(String workspaceName, String fileName, String filePath) {
+        ScriptlessResultsDto results = scriptlessResults(workspaceName);
         ResultFileSummaryDto summary = null;
 
         if (filePath != null && !filePath.isBlank()) {
@@ -198,7 +198,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         try {
             String content = Files.readString(resultFilePath, StandardCharsets.UTF_8);
             if ("text/html".equals(summary.contentType())) {
-                content = rewriteHtmlAssetUrls(content, resultFilePath);
+                content = rewriteHtmlAssetUrls(workspaceName, content, resultFilePath);
             }
             return new ResultFileDto(
                 summary.name(),
@@ -211,25 +211,25 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         }
     }
 
-    public synchronized ScriptlessResultsDto deleteScriptlessResultFile(String filePath) {
-        Path outputDirectory = resolveInstallBinDirectory().resolve("output").toAbsolutePath().normalize();
+    public synchronized ScriptlessResultsDto deleteScriptlessResultFile(String workspaceName, String filePath) {
+        Path outputDirectory = ResultWorkspacePaths.workspaceOutputDirectory(resolveInstallBinDirectory(), workspaceName);
         ResultArtifactDeletion.deleteResultFile(outputDirectory, filePath);
-        return scriptlessResults();
+        return scriptlessResults(workspaceName);
     }
 
-    public synchronized ScriptlessResultsDto deleteScriptlessResultGroup(String groupPath) {
-        Path outputDirectory = resolveInstallBinDirectory().resolve("output").toAbsolutePath().normalize();
+    public synchronized ScriptlessResultsDto deleteScriptlessResultGroup(String workspaceName, String groupPath) {
+        Path outputDirectory = ResultWorkspacePaths.workspaceOutputDirectory(resolveInstallBinDirectory(), workspaceName);
         ResultArtifactDeletion.deleteResultGroup(outputDirectory, groupPath);
-        return scriptlessResults();
+        return scriptlessResults(workspaceName);
     }
 
-    public synchronized Path resolveScriptlessResultAsset(String filePath) {
+    public synchronized Path resolveScriptlessResultAsset(String workspaceName, String filePath) {
         if (filePath == null || filePath.isBlank()) {
             throw new IllegalArgumentException("Result asset path is required");
         }
 
         Path installBinDirectory = resolveInstallBinDirectory();
-        Path outputDirectory = installBinDirectory.resolve("output").toAbsolutePath().normalize();
+        Path outputDirectory = ResultWorkspacePaths.workspaceOutputDirectory(installBinDirectory, workspaceName);
         Path assetPath = Paths.get(filePath).toAbsolutePath().normalize();
 
         if (!assetPath.startsWith(outputDirectory)) {
@@ -276,7 +276,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
             if (!workspaceAlreadyInInstallDirectory) {
                 replaceDirectory(targetWorkspace, sourceWorkspace);
             }
-            patchTestSettings(targetWorkspace.resolve("test.settings"), mode);
+            patchTestSettings(targetWorkspace.resolve("test.settings"), workspaceName, mode);
             plannedSequenceCount = readPlannedSequenceCount(targetWorkspace.resolve("test.settings"));
             Files.writeString(markerFile, "", StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException exception) {
@@ -315,11 +315,12 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         }
     }
 
-    private void patchTestSettings(Path testSettingsFile, String mode) throws IOException {
+    private void patchTestSettings(Path testSettingsFile, String workspaceName, String mode) throws IOException {
         List<String> lines = Files.readAllLines(testSettingsFile, StandardCharsets.UTF_8);
         List<String> updatedLines = new ArrayList<>();
         boolean modeUpdated = false;
         boolean dialogUpdated = false;
+        boolean outputDirUpdated = false;
 
         for (String line : lines) {
             if (line.trim().startsWith("Mode")) {
@@ -328,6 +329,9 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
             } else if (line.trim().startsWith("ShowVisualSettingsDialogOnStartup")) {
                 updatedLines.add("ShowVisualSettingsDialogOnStartup = false");
                 dialogUpdated = true;
+            } else if (line.trim().startsWith("OutputDir")) {
+                updatedLines.add("OutputDir = " + ResultWorkspacePaths.workspaceOutputSettingValue(workspaceName));
+                outputDirUpdated = true;
             } else {
                 updatedLines.add(line);
             }
@@ -339,6 +343,10 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
 
         if (!dialogUpdated) {
             updatedLines.add("ShowVisualSettingsDialogOnStartup = false");
+        }
+
+        if (!outputDirUpdated) {
+            updatedLines.add("OutputDir = " + ResultWorkspacePaths.workspaceOutputSettingValue(workspaceName));
         }
 
         Files.write(testSettingsFile, updatedLines, StandardCharsets.UTF_8);
@@ -644,7 +652,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         }
     }
 
-    private List<ResultOutputGroupDto> loadResultGroups() {
+    private List<ResultOutputGroupDto> loadResultGroups(String workspaceName) {
         Path installBinDirectory;
         try {
             installBinDirectory = resolveInstallBinDirectory();
@@ -652,7 +660,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
             return List.of();
         }
 
-        Path outputDirectory = installBinDirectory.resolve("output");
+        Path outputDirectory = ResultWorkspacePaths.workspaceOutputDirectory(installBinDirectory, workspaceName);
         if (!Files.isDirectory(outputDirectory)) {
             return List.of();
         }
@@ -740,7 +748,7 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
         }
     }
 
-    private String rewriteHtmlAssetUrls(String htmlContent, Path htmlFilePath) {
+    private String rewriteHtmlAssetUrls(String workspaceName, String htmlContent, Path htmlFilePath) {
         Matcher matcher = HTML_RESOURCE_ATTRIBUTE_PATTERN.matcher(htmlContent);
         StringBuffer rewrittenHtml = new StringBuffer();
 
@@ -758,9 +766,11 @@ public final class ScriptlessExecutionAdapter implements ExecutionAdapter {
             Path resolvedAssetPath = htmlFilePath.getParent().resolve(relativeAssetPath).normalize();
 
             try {
-                Path validAssetPath = resolveScriptlessResultAsset(resolvedAssetPath.toString());
+                Path validAssetPath = resolveScriptlessResultAsset(workspaceName, resolvedAssetPath.toString());
                 String encodedAssetPath = URLEncoder.encode(validAssetPath.toString(), StandardCharsets.UTF_8);
-                String assetUrl = "/api/execution/scriptless/result-asset?path=" + encodedAssetPath;
+                String encodedWorkspaceName = URLEncoder.encode(workspaceName, StandardCharsets.UTF_8);
+                String assetUrl = "/api/execution/scriptless/result-asset?workspace=" + encodedWorkspaceName
+                    + "&path=" + encodedAssetPath;
                 replacement = attributePrefix + assetUrl + attributeSuffix;
             } catch (IllegalArgumentException ignored) {
                 replacement = matcher.group(0);

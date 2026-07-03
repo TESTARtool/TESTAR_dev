@@ -280,8 +280,8 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
         return buildStatus(lastStatus, lastMessage);
     }
 
-    public synchronized ScriptlessResultsDto cliResults() {
-        List<ResultOutputGroupDto> groups = loadResultGroups();
+    public synchronized ScriptlessResultsDto cliResults(String workspaceName) {
+        List<ResultOutputGroupDto> groups = loadResultGroups(workspaceName);
         if (groups.isEmpty()) {
             return new ScriptlessResultsDto("", List.of(), List.of());
         }
@@ -290,8 +290,8 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
         return new ScriptlessResultsDto(latestGroup.path(), groups, latestGroup.files());
     }
 
-    public synchronized ResultFileDto readCliResultFile(String fileName, String filePath) {
-        ScriptlessResultsDto results = cliResults();
+    public synchronized ResultFileDto readCliResultFile(String workspaceName, String fileName, String filePath) {
+        ScriptlessResultsDto results = cliResults(workspaceName);
         ResultFileSummaryDto summary = null;
 
         if (filePath != null && !filePath.isBlank()) {
@@ -316,7 +316,7 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
         try {
             String content = Files.readString(resultFilePath, StandardCharsets.UTF_8);
             if ("text/html".equals(summary.contentType())) {
-                content = rewriteHtmlAssetUrls(content, resultFilePath);
+                content = rewriteHtmlAssetUrls(workspaceName, content, resultFilePath);
             }
             return new ResultFileDto(summary.name(), summary.path(), summary.contentType(), content);
         } catch (IOException exception) {
@@ -324,24 +324,24 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
         }
     }
 
-    public synchronized ScriptlessResultsDto deleteCliResultFile(String filePath) {
-        Path outputDirectory = resolveCliInstallDirectory().resolve("output").toAbsolutePath().normalize();
+    public synchronized ScriptlessResultsDto deleteCliResultFile(String workspaceName, String filePath) {
+        Path outputDirectory = ResultWorkspacePaths.workspaceOutputDirectory(resolveCliInstallDirectory(), workspaceName);
         ResultArtifactDeletion.deleteResultFile(outputDirectory, filePath);
-        return cliResults();
+        return cliResults(workspaceName);
     }
 
-    public synchronized ScriptlessResultsDto deleteCliResultGroup(String groupPath) {
-        Path outputDirectory = resolveCliInstallDirectory().resolve("output").toAbsolutePath().normalize();
+    public synchronized ScriptlessResultsDto deleteCliResultGroup(String workspaceName, String groupPath) {
+        Path outputDirectory = ResultWorkspacePaths.workspaceOutputDirectory(resolveCliInstallDirectory(), workspaceName);
         ResultArtifactDeletion.deleteResultGroup(outputDirectory, groupPath);
-        return cliResults();
+        return cliResults(workspaceName);
     }
 
-    public synchronized Path resolveCliResultAsset(String filePath) {
+    public synchronized Path resolveCliResultAsset(String workspaceName, String filePath) {
         if (filePath == null || filePath.isBlank()) {
             throw new IllegalArgumentException("Result asset path is required");
         }
 
-        Path outputDirectory = resolveCliInstallDirectory().resolve("output").toAbsolutePath().normalize();
+        Path outputDirectory = ResultWorkspacePaths.workspaceOutputDirectory(resolveCliInstallDirectory(), workspaceName);
         Path assetPath = Paths.get(filePath).toAbsolutePath().normalize();
 
         if (!assetPath.startsWith(outputDirectory)) {
@@ -823,8 +823,8 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
         }
     }
 
-    private List<ResultOutputGroupDto> loadResultGroups() {
-        Path outputDirectory = resolveCliInstallDirectory().resolve("output");
+    private List<ResultOutputGroupDto> loadResultGroups(String workspaceName) {
+        Path outputDirectory = ResultWorkspacePaths.workspaceOutputDirectory(resolveCliInstallDirectory(), workspaceName);
         if (!Files.isDirectory(outputDirectory)) {
             return List.of();
         }
@@ -905,7 +905,7 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
         return fileName.endsWith(".html") || fileName.endsWith(".htm");
     }
 
-    private String rewriteHtmlAssetUrls(String htmlContent, Path htmlFilePath) {
+    private String rewriteHtmlAssetUrls(String workspaceName, String htmlContent, Path htmlFilePath) {
         Matcher matcher = HTML_RESOURCE_ATTRIBUTE_PATTERN.matcher(htmlContent);
         StringBuffer rewrittenHtml = new StringBuffer();
 
@@ -923,9 +923,11 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
             Path resolvedAssetPath = htmlFilePath.getParent().resolve(relativeAssetPath).normalize();
 
             try {
-                Path validAssetPath = resolveCliResultAsset(resolvedAssetPath.toString());
+                Path validAssetPath = resolveCliResultAsset(workspaceName, resolvedAssetPath.toString());
                 String encodedAssetPath = URLEncoder.encode(validAssetPath.toString(), StandardCharsets.UTF_8);
-                String assetUrl = "/api/execution/cli/result-asset?path=" + encodedAssetPath;
+                String encodedWorkspaceName = URLEncoder.encode(workspaceName, StandardCharsets.UTF_8);
+                String assetUrl = "/api/execution/cli/result-asset?workspace=" + encodedWorkspaceName
+                    + "&path=" + encodedAssetPath;
                 replacement = attributePrefix + assetUrl + attributeSuffix;
             } catch (IllegalArgumentException ignored) {
                 replacement = matcher.group(0);

@@ -529,7 +529,19 @@ When CLI reporting is enabled, generated report artifacts must include the final
 
 ## Test Results
 
-The Test Results page supports inspection of output folders from the shared TESTAR distribution.
+The Test Results page supports inspection of output folders for the selected workspace.
+
+Output results are workspace-scoped artifacts.
+
+WebStudio must resolve result folders from:
+
+- `testar/target/install/testar/bin/output/<workspace>`
+
+Generate and CLI executions both write results for the selected workspace into that workspace output area.
+
+Changing the selected workspace changes the visible Test Results list.
+
+WebStudio must not mix output results from different workspaces in the selected workspace result list.
 
 Output result folder names must include the execution mode token after the timestamp:
 
@@ -538,8 +550,8 @@ Output result folder names must include the execution mode token after the times
 
 Example names:
 
-- `2026-06-29_13h23m23s_generate_webdriver_parabank_1`
-- `2026-06-29_13h23m23s_cli_webdriver_parabank_1`
+- `output/webdriver_generic/2026-06-29_13h23m23s_generate_webdriver_parabank_1`
+- `output/webdriver_generic/2026-06-29_13h23m23s_cli_webdriver_parabank_1`
 
 ### Output Result Selection
 
@@ -556,6 +568,7 @@ The page must support:
 
 Default behavior:
 
+- output result folders are loaded for the selected workspace
 - output result folders are sorted latest first
 - selecting an output folder shows a run-level verdict outcome summary by default
 - selecting an output folder must not automatically select the first generated file
@@ -594,7 +607,7 @@ The Test Results page must support an empty state.
 
 The empty state is shown when:
 
-- no output result folders exist
+- no output result folders exist for the selected workspace
 - filters hide all available output result folders
 - the last output result folder was deleted
 
