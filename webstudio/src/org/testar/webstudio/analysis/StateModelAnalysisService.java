@@ -101,8 +101,8 @@ public final class StateModelAnalysisService {
 
     private void validateSettings(Settings settings) {
         List<String> missingSettings = new ArrayList<>();
-        if (!settings.get(StateModelTags.StateModelEnabled, false)) {
-            missingSettings.add("StateModelEnabled=true");
+        if (!settings.get(StateModelTags.StateModelInference, false)) {
+            missingSettings.add("StateModelInference=true");
         }
 
         String dataStoreType = settings.get(StateModelTags.DataStoreType, "");

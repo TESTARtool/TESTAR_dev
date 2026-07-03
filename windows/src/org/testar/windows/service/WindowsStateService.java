@@ -40,11 +40,11 @@ public final class WindowsStateService implements StateService, AutoCloseable {
     }
 
     public static WindowsStateService uiAutomation(double timeoutSeconds,
-                                                   boolean accessBridgeEnabled,
+                                                   boolean javaAccessBridge,
                                                    String sutProcesses) {
         return new WindowsStateService(new UIAStateBuilder(
                 timeoutSeconds,
-                accessBridgeEnabled,
+                javaAccessBridge,
                 sutProcesses
         ));
     }

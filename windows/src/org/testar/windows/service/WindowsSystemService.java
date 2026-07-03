@@ -46,27 +46,27 @@ public final class WindowsSystemService implements SystemService {
     }
 
     public static WindowsSystemService fromExecutable(String path,
-                                                      boolean processListenerEnabled,
+                                                      boolean processListener,
                                                       String sutProcesses) {
         return new WindowsSystemService(
-                () -> WinProcess.fromExecutable(path, processListenerEnabled, sutProcesses)
+                () -> WinProcess.fromExecutable(path, processListener, sutProcesses)
         );
     }
 
     public static WindowsSystemService fromExecutable(String path,
-                                                      boolean processListenerEnabled,
+                                                      boolean processListener,
                                                       String sutProcesses,
                                                       double startupTimeSeconds,
                                                       double stateTimeoutSeconds,
-                                                      boolean accessBridgeEnabled) {
+                                                      boolean javaAccessBridge) {
         return new WindowsSystemService(
                 () -> WindowsSystemStartupSupport.startExecutableAndWaitUntilAccessible(
                         path,
-                        processListenerEnabled,
+                        processListener,
                         sutProcesses,
                         startupTimeSeconds,
                         stateTimeoutSeconds,
-                        accessBridgeEnabled
+                        javaAccessBridge
                 )
         );
     }
@@ -74,7 +74,7 @@ public final class WindowsSystemService implements SystemService {
     public static WindowsSystemService fromWindowTitle(String windowTitle,
                                                        double maxEngageTimeSeconds,
                                                        double stateTimeoutSeconds,
-                                                       boolean accessBridgeEnabled,
+                                                       boolean javaAccessBridge,
                                                        String sutProcesses,
                                                        boolean forceToForeground) {
         return new WindowsSystemService(
@@ -82,7 +82,7 @@ public final class WindowsSystemService implements SystemService {
                         windowTitle,
                         maxEngageTimeSeconds,
                         stateTimeoutSeconds,
-                        accessBridgeEnabled,
+                        javaAccessBridge,
                         sutProcesses,
                         forceToForeground
                 )

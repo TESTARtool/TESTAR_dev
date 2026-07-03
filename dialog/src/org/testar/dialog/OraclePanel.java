@@ -155,7 +155,7 @@ public class OraclePanel extends SettingsPanel {
     public void populateFrom(final Settings settings) {
     	txtSuspTagsRegex.setInitialText(settings.get(ConfigTags.SuspiciousTags));
         txtApplySuspTags.setInitialText(StringUtils.join(settings.get(ConfigTags.TagsForSuspiciousOracle), ";"));
-        suspiciousProcessCheckBox.setSelected(settings.get(ConfigTags.ProcessListenerEnabled));
+        suspiciousProcessCheckBox.setSelected(settings.get(ConfigTags.ProcessListener));
         txtSuspProccesRegex.setInitialText(settings.get(ConfigTags.SuspiciousProcessOutput));
         spnFreezeTime.setValue(settings.get(ConfigTags.TimeToFreeze));
         // Web Browser Console Oracles elements
@@ -175,7 +175,7 @@ public class OraclePanel extends SettingsPanel {
     public void extractInformation(final Settings settings) {
         settings.set(ConfigTags.SuspiciousTags, txtSuspTagsRegex.getText());
         settings.set(ConfigTags.TagsForSuspiciousOracle, Arrays.asList(txtApplySuspTags.getText().split(";")));
-        settings.set(ConfigTags.ProcessListenerEnabled, suspiciousProcessCheckBox.isSelected());
+        settings.set(ConfigTags.ProcessListener, suspiciousProcessCheckBox.isSelected());
         settings.set(ConfigTags.SuspiciousProcessOutput, txtSuspProccesRegex.getText());
         settings.set(ConfigTags.TimeToFreeze, (Double) spnFreezeTime.getValue());
         // Web Browser Console Oracles elements

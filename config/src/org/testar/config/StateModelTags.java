@@ -19,8 +19,8 @@ public class StateModelTags extends TaggableBase {
      * State Model settings 
      */
 
-    public static final Tag<Boolean> StateModelEnabled = Tag.from("StateModelEnabled", Boolean.class, 
-            "Enable or disable the State Model feature");
+    public static final Tag<Boolean> StateModelInference = Tag.from("StateModelInference", Boolean.class, 
+            "Enable or disable the State Model inference feature");
 
     public static final Tag<String> DataStore = Tag.from("DataStore", String.class, 
             "The graph database we use to store the State Model: OrientDB");

@@ -398,7 +398,7 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
             properties.getProperty(ConfigTags.AgentCLIReasoningEffort.name()),
             properties.getProperty(ConfigTags.AgentCLISandboxMode.name()),
             properties.getProperty(ConfigTags.AgentCLIApprovalPolicy.name()),
-            booleanProperty(properties, ConfigTags.AgentCLINetworkAccessEnabled.name()),
+            booleanProperty(properties, ConfigTags.AgentCLIAllowNetworkAccess.name()),
             booleanProperty(properties, ConfigTags.AgentCLISkipGitRepoCheck.name()),
             properties.getProperty(ConfigTags.AgentCLIPromptTitle.name()),
             properties.getProperty(ConfigTags.AgentCLIPromptText.name())
@@ -423,7 +423,7 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
             source.reasoningEffort(),
             source.sandboxMode(),
             source.approvalPolicy(),
-            source.networkAccessEnabled(),
+            source.allowNetworkAccess(),
             source.skipGitRepoCheck(),
             source.promptTitle(),
             source.promptText()
@@ -630,7 +630,7 @@ public final class CliExecutionAdapter implements ExecutionAdapter {
             settings.reasoningEffort(),
             settings.sandboxMode(),
             settings.approvalPolicy(),
-            Boolean.TRUE.equals(settings.networkAccessEnabled()),
+            Boolean.TRUE.equals(settings.allowNetworkAccess()),
             Boolean.TRUE.equals(settings.skipGitRepoCheck()),
             settings.promptTitle(),
             settings.promptText()

@@ -51,11 +51,11 @@ public final class PlatformDefaultSessionConfigurations {
                 builder.overrideSystemCompositionPlan(
                         WindowsSystemCompositionPlan.fromExecutable(
                                 sessionSpec.getTarget(),
-                                settings.get(ConfigTags.ProcessListenerEnabled, false),
+                                settings.get(ConfigTags.ProcessListener, false),
                                 settings.get(ConfigTags.SUTProcesses, ""),
                                 settings.get(ConfigTags.StartupTime, 10.0),
                                 settings.get(ConfigTags.TimeToFreeze, 30.0),
-                                settings.get(ConfigTags.AccessBridgeEnabled, false)
+                                settings.get(ConfigTags.JavaAccessBridge, false)
                         )
                 );
                 break;
@@ -65,7 +65,7 @@ public final class PlatformDefaultSessionConfigurations {
                                 sessionSpec.getTarget(),
                                 settings.get(ConfigTags.StartupTime, 10.0),
                                 settings.get(ConfigTags.TimeToFreeze, 30.0),
-                                settings.get(ConfigTags.AccessBridgeEnabled, false),
+                                settings.get(ConfigTags.JavaAccessBridge, false),
                                 settings.get(ConfigTags.SUTProcesses, ""),
                                 settings.get(ConfigTags.ForceForeground, false)
                         )
@@ -94,7 +94,7 @@ public final class PlatformDefaultSessionConfigurations {
                 .overrideStateCompositionPlan(
                         WindowsStateCompositionPlan.uiAutomation(
                                 settings.get(ConfigTags.TimeToFreeze, 30.0),
-                                settings.get(ConfigTags.AccessBridgeEnabled, false),
+                                settings.get(ConfigTags.JavaAccessBridge, false),
                                 settings.get(ConfigTags.SUTProcesses, "")
                         )
                 )
@@ -177,7 +177,7 @@ public final class PlatformDefaultSessionConfigurations {
         Settings settings = sessionSpec.getSettings();
         return WindowsStateCompositionPlan.uiAutomationSemanticWidgets(
                 settings.get(ConfigTags.TimeToFreeze, 30.0),
-                settings.get(ConfigTags.AccessBridgeEnabled, false),
+                settings.get(ConfigTags.JavaAccessBridge, false),
                 settings.get(ConfigTags.SUTProcesses, "")
         );
     }

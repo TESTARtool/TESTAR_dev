@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.testar.config.ConfigTags.AbstractStateAttributes;
-import static org.testar.config.ConfigTags.AccessBridgeEnabled;
+import static org.testar.config.ConfigTags.JavaAccessBridge;
 import static org.testar.config.ConfigTags.ActionDuration;
 import static org.testar.config.ConfigTags.ApplicationName;
 import static org.testar.config.ConfigTags.ApplicationVersion;
@@ -72,7 +72,7 @@ import static org.testar.config.ConfigTags.LlmTemperature;
 import static org.testar.config.ConfigTags.LlmTestGoals;
 import static org.testar.config.ConfigTags.LogLevel;
 import static org.testar.config.ConfigTags.LogOracleCommands;
-import static org.testar.config.ConfigTags.LogOracleEnabled;
+import static org.testar.config.ConfigTags.LogOracle;
 import static org.testar.config.ConfigTags.LogOracleFiles;
 import static org.testar.config.ConfigTags.LogOracleRegex;
 import static org.testar.config.ConfigTags.MaxReward;
@@ -81,7 +81,7 @@ import static org.testar.config.ConfigTags.Mode;
 import static org.testar.config.ConfigTags.OnlySaveFaultySequences;
 import static org.testar.config.ConfigTags.OutputDir;
 import static org.testar.config.ConfigTags.OverrideWebDriverDisplayScale;
-import static org.testar.config.ConfigTags.ProcessListenerEnabled;
+import static org.testar.config.ConfigTags.ProcessListener;
 import static org.testar.config.ConfigTags.ProcessLogs;
 import static org.testar.config.ConfigTags.ProcessesToKillDuringTest;
 import static org.testar.config.ConfigTags.ProtocolSpecificSetting_1;
@@ -101,7 +101,7 @@ import static org.testar.config.ConfigTags.AgentCLIApiKeyEnvVar;
 import static org.testar.config.ConfigTags.AgentCLIApprovalPolicy;
 import static org.testar.config.ConfigTags.AgentCLIBaseUrl;
 import static org.testar.config.ConfigTags.AgentCLIModel;
-import static org.testar.config.ConfigTags.AgentCLINetworkAccessEnabled;
+import static org.testar.config.ConfigTags.AgentCLIAllowNetworkAccess;
 import static org.testar.config.ConfigTags.AgentCLIPromptText;
 import static org.testar.config.ConfigTags.AgentCLIPromptTitle;
 import static org.testar.config.ConfigTags.AgentCLIReasoningEffort;
@@ -169,11 +169,11 @@ public class SettingsDefaults {
         defaults.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
         defaults.add(Pair.from(MaxReward, 9999999.0));
         defaults.add(Pair.from(Discount, .95));
-        defaults.add(Pair.from(AccessBridgeEnabled, false));
+        defaults.add(Pair.from(JavaAccessBridge, false));
         defaults.add(Pair.from(SUTProcesses, ""));
         defaults.add(Pair.from(ApplicationName, ""));
         defaults.add(Pair.from(ApplicationVersion, ""));
-        defaults.add(Pair.from(ProcessListenerEnabled, false));
+        defaults.add(Pair.from(ProcessListener, false));
         defaults.add(Pair.from(SuspiciousProcessOutput, ".*[eE]rror.*|.*[eE]xcepti[o?]n.*"));
         defaults.add(Pair.from(ProcessLogs, ".*.*"));
         defaults.add(Pair.from(OverrideWebDriverDisplayScale, ""));
@@ -227,7 +227,7 @@ public class SettingsDefaults {
         defaults.add(Pair.from(AgentCLIReasoningEffort, "medium"));
         defaults.add(Pair.from(AgentCLISandboxMode, "danger-full-access"));
         defaults.add(Pair.from(AgentCLIApprovalPolicy, "never"));
-        defaults.add(Pair.from(AgentCLINetworkAccessEnabled, false));
+        defaults.add(Pair.from(AgentCLIAllowNetworkAccess, false));
         defaults.add(Pair.from(AgentCLISkipGitRepoCheck, true));
         defaults.add(Pair.from(AgentCLIPromptTitle, "Test Parabank Login"));
         defaults.add(Pair.from(AgentCLIPromptText, "As a test agent verify that you can log in with the credentials john/demo. Then the Welcome John Smith message is shown."));
@@ -305,7 +305,7 @@ public class SettingsDefaults {
          */
 
         // Settings for LogOracle
-        defaults.add(Pair.from(LogOracleEnabled, false));
+        defaults.add(Pair.from(LogOracle, false));
         defaults.add(Pair.from(LogOracleRegex, ".*([Ee]xception|[Ee]rror).*"));
         defaults.add(Pair.from(LogOracleCommands, new ArrayList<String>()));
         defaults.add(Pair.from(LogOracleFiles, new ArrayList<String>()));
@@ -318,7 +318,7 @@ public class SettingsDefaults {
         defaults.add(Pair.from(JacocoCoverageAccumulate, false));
 
         // State Model settings defaults
-        defaults.add(Pair.from(StateModelTags.StateModelEnabled, false));
+        defaults.add(Pair.from(StateModelTags.StateModelInference, false));
         defaults.add(Pair.from(StateModelTags.DataStore, ""));
         defaults.add(Pair.from(StateModelTags.DataStoreType, ""));
         defaults.add(Pair.from(StateModelTags.DataStoreServer, ""));

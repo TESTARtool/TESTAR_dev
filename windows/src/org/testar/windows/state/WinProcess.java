@@ -104,21 +104,21 @@ public final class WinProcess extends SUTBase {
 
     /**
      * Execute the indicated SUT path and create a handle to the SUT process. 
-     * Optionally connect with the SUT output and error buffer if ProcessListenerEnabled is enabled. 
+     * Optionally connect with the SUT output and error buffer if ProcessListener is enabled. 
      * Optionally indicate a regex expression for multi SUTProcesses. 
      * 
      * @param path
-     * @param ProcessListenerEnabled
+     * @param ProcessListener
      * @param SUTProcesses
      * @return
      * @throws SystemStartException
      */
-    public static WinProcess fromExecutable(String path, boolean ProcessListenerEnabled, String SUTProcesses) throws SystemStartException{
+    public static WinProcess fromExecutable(String path, boolean ProcessListener, String SUTProcesses) throws SystemStartException{
         try{
             Assert.notNull(path);
 
             //Disabled with browsers, only allow it with desktop applications executed with command_line
-            if(!ProcessListenerEnabled) {
+            if(!ProcessListener) {
 
                 long handles[] = Windows.CreateProcess(null, path, false, 0, null, null, null, "unknown title", new long[14]);
                 long processHandle = handles[0];

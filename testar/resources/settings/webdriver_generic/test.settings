@@ -91,7 +91,7 @@ TagsForSuspiciousOracle = Title;WebTextContent
 # of what is considered to be suspicious output.
 #################################################################
 
-ProcessListenerEnabled = false
+ProcessListener = false
 SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
 
 #################################################################
@@ -111,7 +111,7 @@ ProcessLogs = .*.*
 # Oracles based on suspicious titles in SUT output files
 #################################################################
 
-LogOracleEnabled = false
+LogOracle = false
 LogOracleRegex = .*([Ee]xception|[Ee]rror).*
 LogOracleCommands =
 LogOracleFiles =
@@ -131,7 +131,7 @@ AgentCLIModel = gpt-5.4-mini
 AgentCLIReasoningEffort = medium
 AgentCLISandboxMode = danger-full-access
 AgentCLIApprovalPolicy = never
-AgentCLINetworkAccessEnabled = false
+AgentCLIAllowNetworkAccess = false
 AgentCLISkipGitRepoCheck = true
 AgentCLIPromptTitle = Test Parabank Login
 AgentCLIPromptText = As a test agent verify that you can log in with the credentials john/demo. Then the Welcome John Smith message is shown.
@@ -142,7 +142,7 @@ AgentCLIPromptText = As a test agent verify that you can log in with the credent
 # ApplicationName: Name to identify the SUT. Especially important to identify a State Model
 # ApplicationVersion: Version to identify the SUT. Especially important to identify a State Model
 #
-# StateModelEnabled: Enable or disable the State Model feature
+# StateModelInference: Enable or disable the State Model feature
 # DataStore: The graph database we use to store the State Model: OrientDB
 # DataStoreType: The mode we use to connect to the database: remote or plocal
 # DataStoreServer: IP address to connect if we desired to use remote mode
@@ -159,7 +159,7 @@ AgentCLIPromptText = As a test agent verify that you can log in with the credent
 ApplicationName = webdriver_parabank
 ApplicationVersion = 1
 
-StateModelEnabled = false
+StateModelInference = false
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer = 

@@ -26,7 +26,7 @@ public final class SetupStateModelSettingsCapability extends SettingsCapability 
     }
 
     private void prepareStateModelOrientDB(Settings settings) {
-        if (!settings.get(StateModelTags.StateModelEnabled, false)) {
+        if (!settings.get(StateModelTags.StateModelInference, false)) {
             return;
         }
 

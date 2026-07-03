@@ -23,36 +23,36 @@ public final class WindowsStateCompositionPlan {
     }
 
     public static StateCompositionPlan uiAutomation(double timeoutSeconds,
-                                                    boolean accessBridgeEnabled,
+                                                    boolean javaAccessBridge,
                                                     String sutProcesses) {
         return StateCompositionPlan.fullState(
                 WindowsStateService.uiAutomation(
                         timeoutSeconds,
-                        accessBridgeEnabled,
+                        javaAccessBridge,
                         sutProcesses
                 )
         );
     }
 
     public static StateCompositionPlan uiAutomationLeafWidgets(double timeoutSeconds,
-                                                               boolean accessBridgeEnabled,
+                                                               boolean javaAccessBridge,
                                                                String sutProcesses) {
         return StateCompositionPlan.leafWidgets(
                 WindowsStateService.uiAutomation(
                         timeoutSeconds,
-                        accessBridgeEnabled,
+                        javaAccessBridge,
                         sutProcesses
                 )
         );
     }
 
     public static StateCompositionPlan uiAutomationTextWidgets(double timeoutSeconds,
-                                                               boolean accessBridgeEnabled,
+                                                               boolean javaAccessBridge,
                                                                String sutProcesses) {
         return StateCompositionPlan.widgetsWithText(
                 WindowsStateService.uiAutomation(
                         timeoutSeconds,
-                        accessBridgeEnabled,
+                        javaAccessBridge,
                         sutProcesses
                 ),
                 Tags.Title
@@ -60,12 +60,12 @@ public final class WindowsStateCompositionPlan {
     }
 
     public static StateCompositionPlan uiAutomationSemanticWidgets(double timeoutSeconds,
-                                                                   boolean accessBridgeEnabled,
+                                                                   boolean javaAccessBridge,
                                                                    String sutProcesses) {
         return StateCompositionPlan.semanticWidgets(
                 WindowsStateService.uiAutomation(
                         timeoutSeconds,
-                        accessBridgeEnabled,
+                        javaAccessBridge,
                         sutProcesses
                 ),
                 new WindowsSemanticWidgetDescriptor()

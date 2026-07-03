@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 public class StateModelPanel extends SettingsPanel {
 
 	private static final long serialVersionUID = -2815422165938356237L;
-    private JLabel label1 = new JLabel("State model enabled");
+    private JLabel label1 = new JLabel("Enable State model inference");
     private JLabel label2 = new JLabel("DataStore");
     private JLabel label3 = new JLabel("DataStoreType");
     private JLabel label4 = new JLabel("DataStoreServer");
@@ -53,7 +53,7 @@ public class StateModelPanel extends SettingsPanel {
     private JLabel label16 = new JLabel("Store Widgets");
 
 
-    private JCheckBox stateModelEnabledChkBox = new JCheckBox();
+    private JCheckBox stateModelInferenceChkBox = new JCheckBox();
     private JCheckBox stateModelWidgetStoreChkBox = new JCheckBox();
     private JTextField dataStoreTextfield = new JTextField();
     private JTextField dataStoreServerTextfield = new JTextField();
@@ -116,18 +116,18 @@ public class StateModelPanel extends SettingsPanel {
         setLayout(null);
         label1.setBounds(10, 14, 150, 27);
         add(label1);
-        stateModelEnabledChkBox.setBounds(160, 14, 50, 27);
-        stateModelEnabledChkBox.addItemListener(new ItemListener() {
+        stateModelInferenceChkBox.setBounds(160, 14, 50, 27);
+        stateModelInferenceChkBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                components.forEach((component) -> component.setEnabled(stateModelEnabledChkBox.isSelected()));
-                if (stateModelEnabledChkBox.isSelected()) {
+                components.forEach((component) -> component.setEnabled(stateModelInferenceChkBox.isSelected()));
+                if (stateModelInferenceChkBox.isSelected()) {
                     checkDataType();
                 }
                 checkAnalysisButtonActive();
             }
         });
-        add(stateModelEnabledChkBox);
+        add(stateModelInferenceChkBox);
 
         label2.setBounds(10, 52, 150, 27);
         add(label2);
@@ -231,7 +231,7 @@ public class StateModelPanel extends SettingsPanel {
      * @param settings The settings to load.
      */
     public void populateFrom(final Settings settings) {
-        stateModelEnabledChkBox.setSelected(settings.get(StateModelTags.StateModelEnabled));
+        stateModelInferenceChkBox.setSelected(settings.get(StateModelTags.StateModelInference));
         stateModelWidgetStoreChkBox.setSelected(settings.get(StateModelTags.StateModelStoreWidgets));
         dataStoreTextfield.setText(settings.get(StateModelTags.DataStore));
         dataStoreServerTextfield.setText(settings.get(StateModelTags.DataStoreServer));
@@ -251,7 +251,7 @@ public class StateModelPanel extends SettingsPanel {
             }
         }
         // check if the fields should be enabled or not
-        components.forEach((component) -> component.setEnabled(stateModelEnabledChkBox.isSelected()));
+        components.forEach((component) -> component.setEnabled(stateModelInferenceChkBox.isSelected()));
         checkDataType();
         checkAnalysisButtonActive();
         outputDir = settings.get(ConfigTags.OutputDir);
@@ -290,7 +290,7 @@ public class StateModelPanel extends SettingsPanel {
      * @param settings reference to the object where the settings will be stored.
      */
     public void extractInformation(final Settings settings) {
-        settings.set(StateModelTags.StateModelEnabled, stateModelEnabledChkBox.isSelected());
+        settings.set(StateModelTags.StateModelInference, stateModelInferenceChkBox.isSelected());
         settings.set(StateModelTags.StateModelStoreWidgets, stateModelWidgetStoreChkBox.isSelected());
         settings.set(StateModelTags.DataStore, dataStoreTextfield.getText());
         settings.set(StateModelTags.DataStoreServer, dataStoreServerTextfield.getText());
@@ -326,14 +326,14 @@ public class StateModelPanel extends SettingsPanel {
 
     // make sure the right text fields are enabled based on the selected data store type (remote or local)
     private void checkDataType() {
-        dataStoreServerTextfield.setEnabled(dataStoreTypeBox.getSelectedItem().equals("remote") && stateModelEnabledChkBox.isSelected());
+        dataStoreServerTextfield.setEnabled(dataStoreTypeBox.getSelectedItem().equals("remote") && stateModelInferenceChkBox.isSelected());
         dataStoreDirectoryField.setEnabled(dataStoreTypeBox.getSelectedItem().equals("plocal"));
         dirButton.setEnabled(dataStoreTypeBox.getSelectedItem().equals("plocal"));
     }
 
     // helper method to ensure that the state model enabled box is selected
     private void checkAnalysisButtonActive() {
-        analysisButton.setEnabled(stateModelEnabledChkBox.isSelected());
+        analysisButton.setEnabled(stateModelInferenceChkBox.isSelected());
     }
 
     // show a file dialog to choose the directory where the local install of OrientDB is located

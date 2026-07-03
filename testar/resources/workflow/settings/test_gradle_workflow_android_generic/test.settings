@@ -46,20 +46,20 @@ TagsForSuspiciousOracle = Title
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
 #
-# Requires ProcessListenerEnabled
+# Requires ProcessListener
 # (Only available for desktop applications through COMMAND_LINE)
 #
 # Regular expression SuspiciousProcessOutput contains the specification
 # of what is considered to be suspicious output.
 #################################################################
 
-ProcessListenerEnabled = false
+ProcessListener = false
 SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
 
 #################################################################
 # Process Logs
 #
-# Requires ProcessListenerEnabled
+# Requires ProcessListener
 # (Only available for desktop applications through COMMAND_LINE)
 #
 # Allow TESTAR to store execution logs coming from the processes.
@@ -101,7 +101,7 @@ ProtocolClass = test_gradle_workflow_android_generic/Protocol_test_gradle_workfl
 #################################################################
 # State model inference settings
 #################################################################
-StateModelEnabled = false
+StateModelInference = false
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer = localhost

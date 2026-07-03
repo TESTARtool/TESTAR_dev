@@ -47,7 +47,7 @@ public class TestSequenceCapability {
             runtimeContext.sessionReportingManager().bindReporting(new ReportManager(runtimeContext.settings()));
         }
 
-        if (runtimeContext.settings().get(ConfigTags.LogOracleEnabled, false)) {
+        if (runtimeContext.settings().get(ConfigTags.LogOracle, false)) {
             Oracle logOracle = new LogOracle(runtimeContext.settings());
             logOracle.initialize();
             runtimeContext.setLogOracle(logOracle);

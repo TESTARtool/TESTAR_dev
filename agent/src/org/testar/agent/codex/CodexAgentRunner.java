@@ -74,7 +74,7 @@ public final class CodexAgentRunner {
         request.put("reasoningEffort", settings.reasoningEffort());
         request.put("sandboxMode", settings.sandboxMode());
         request.put("approvalPolicy", settings.approvalPolicy());
-        request.put("networkAccessEnabled", settings.networkAccessEnabled());
+        request.put("allowNetworkAccess", settings.allowNetworkAccess());
         request.put("skipGitRepoCheck", settings.skipGitRepoCheck());
         request.put("workingDirectory", workingDirectory.toAbsolutePath().normalize().toString());
         request.put("additionalDirectories", normalizeAdditionalDirectories(additionalDirectories));

@@ -14,7 +14,7 @@ public final class CodexAgentSettings {
     private final String reasoningEffort;
     private final String sandboxMode;
     private final String approvalPolicy;
-    private final boolean networkAccessEnabled;
+    private final boolean allowNetworkAccess;
     private final boolean skipGitRepoCheck;
     private final String promptTitle;
     private final String promptText;
@@ -25,7 +25,7 @@ public final class CodexAgentSettings {
                               String reasoningEffort,
                               String sandboxMode,
                               String approvalPolicy,
-                              boolean networkAccessEnabled,
+                              boolean allowNetworkAccess,
                               boolean skipGitRepoCheck,
                               String promptTitle,
                               String promptText) {
@@ -35,7 +35,7 @@ public final class CodexAgentSettings {
         this.reasoningEffort = reasoningEffort == null ? "" : reasoningEffort.trim();
         this.sandboxMode = sandboxMode == null ? "" : sandboxMode.trim();
         this.approvalPolicy = approvalPolicy == null ? "" : approvalPolicy.trim();
-        this.networkAccessEnabled = networkAccessEnabled;
+        this.allowNetworkAccess = allowNetworkAccess;
         this.skipGitRepoCheck = skipGitRepoCheck;
         this.promptTitle = promptTitle == null ? "" : promptTitle.trim();
         this.promptText = promptText == null ? "" : promptText.trim();
@@ -65,8 +65,8 @@ public final class CodexAgentSettings {
         return approvalPolicy;
     }
 
-    public boolean networkAccessEnabled() {
-        return networkAccessEnabled;
+    public boolean allowNetworkAccess() {
+        return allowNetworkAccess;
     }
 
     public boolean skipGitRepoCheck() {

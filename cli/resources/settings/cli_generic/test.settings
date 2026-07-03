@@ -14,7 +14,7 @@ MaxTime = 3.1536E7
 OutputDir = ./output
 ReportInHTML = true
 
-StateModelEnabled = false
+StateModelInference = false
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer =
@@ -38,7 +38,7 @@ AgentCLIModel = gpt-5.4-mini
 AgentCLIReasoningEffort = medium
 AgentCLISandboxMode = danger-full-access
 AgentCLIApprovalPolicy = never
-AgentCLINetworkAccessEnabled = false
+AgentCLIAllowNetworkAccess = false
 AgentCLISkipGitRepoCheck = true
 AgentCLIPromptTitle = Test Parabank Login
 AgentCLIPromptText = As a test agent verify that you can log in with the credentials john/demo. Then the Welcome John Smith message is shown.
@@ -73,9 +73,9 @@ AndroidTypeableClasses =
 
 ForceForeground = true
 TimeToFreeze = 10.0
-ProcessListenerEnabled = false
+ProcessListener = false
 SUTProcesses =
-AccessBridgeEnabled = false
+JavaAccessBridge = false
 
 CompositionProfile = cli_composition
 CustomCompositionResource = composition.properties

@@ -317,7 +317,7 @@ public final class PlatformOrchestrator {
         Settings settings = sessionSpec.getSettings();
 
         // Skip model initialization entirely when the state model is disabled.
-        if (!settings.get(StateModelTags.StateModelEnabled , false)) {
+        if (!settings.get(StateModelTags.StateModelInference , false)) {
             return new DummyModelManager();
         }
 
@@ -337,11 +337,11 @@ public final class PlatformOrchestrator {
 
     private static void bootstrapStateModelStorage(Settings settings) {
         // Bootstrap the local OrientDB storage only for the matching configuration.
-        boolean stateModelEnabled = settings.get(StateModelTags.StateModelEnabled, false);
+        boolean stateModelInference = settings.get(StateModelTags.StateModelInference, false);
         String dataStore = settings.get(StateModelTags.DataStore, "");
         String dataStoreType = settings.get(StateModelTags.DataStoreType, "");
 
-        if (!stateModelEnabled) {
+        if (!stateModelInference) {
             return;
         }
 

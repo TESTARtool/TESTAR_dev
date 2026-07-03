@@ -22,7 +22,7 @@
         reasoningEffort: "AgentCLIReasoningEffort",
         sandboxMode: "AgentCLISandboxMode",
         approvalPolicy: "AgentCLIApprovalPolicy",
-        networkAccessEnabled: "AgentCLINetworkAccessEnabled",
+        allowNetworkAccess: "AgentCLIAllowNetworkAccess",
         skipGitRepoCheck: "AgentCLISkipGitRepoCheck",
         promptTitle: "AgentCLIPromptTitle",
         promptText: "AgentCLIPromptText"
@@ -34,7 +34,7 @@
         reasoningEffort: "medium",
         sandboxMode: "danger-full-access",
         approvalPolicy: "never",
-        networkAccessEnabled: false,
+        allowNetworkAccess: false,
         skipGitRepoCheck: true,
         promptTitle: "Test Parabank Login",
         promptText: "As a test agent verify that you can log in with the credentials john/demo. Then the Welcome John Smith message is shown."
@@ -856,7 +856,7 @@
             reasoningEffort: valueOrDefault(source.reasoningEffort, DEFAULT_CLI_AGENT_SETTINGS.reasoningEffort),
             sandboxMode: valueOrDefault(source.sandboxMode, DEFAULT_CLI_AGENT_SETTINGS.sandboxMode),
             approvalPolicy: valueOrDefault(source.approvalPolicy, DEFAULT_CLI_AGENT_SETTINGS.approvalPolicy),
-            networkAccessEnabled: Boolean(source.networkAccessEnabled),
+            allowNetworkAccess: Boolean(source.allowNetworkAccess),
             skipGitRepoCheck: source.skipGitRepoCheck !== false,
             promptTitle: valueOrDefault(source.promptTitle, DEFAULT_CLI_AGENT_SETTINGS.promptTitle),
             promptText: valueOrDefault(source.promptText, DEFAULT_CLI_AGENT_SETTINGS.promptText)
@@ -871,9 +871,9 @@
             reasoningEffort: workspaceSettingValue(CLI_AGENT_SETTING_KEYS.reasoningEffort),
             sandboxMode: workspaceSettingValue(CLI_AGENT_SETTING_KEYS.sandboxMode),
             approvalPolicy: workspaceSettingValue(CLI_AGENT_SETTING_KEYS.approvalPolicy),
-            networkAccessEnabled: workspaceSettingBoolean(
-                CLI_AGENT_SETTING_KEYS.networkAccessEnabled,
-                DEFAULT_CLI_AGENT_SETTINGS.networkAccessEnabled
+            allowNetworkAccess: workspaceSettingBoolean(
+                CLI_AGENT_SETTING_KEYS.allowNetworkAccess,
+                DEFAULT_CLI_AGENT_SETTINGS.allowNetworkAccess
             ),
             skipGitRepoCheck: workspaceSettingBoolean(
                 CLI_AGENT_SETTING_KEYS.skipGitRepoCheck,
@@ -2142,7 +2142,7 @@
             setWorkspaceSettingByKey(CLI_AGENT_SETTING_KEYS.reasoningEffort, normalizedSettings.reasoningEffort);
             setWorkspaceSettingByKey(CLI_AGENT_SETTING_KEYS.sandboxMode, normalizedSettings.sandboxMode);
             setWorkspaceSettingByKey(CLI_AGENT_SETTING_KEYS.approvalPolicy, normalizedSettings.approvalPolicy);
-            setWorkspaceSettingByKey(CLI_AGENT_SETTING_KEYS.networkAccessEnabled, normalizedSettings.networkAccessEnabled);
+            setWorkspaceSettingByKey(CLI_AGENT_SETTING_KEYS.allowNetworkAccess, normalizedSettings.allowNetworkAccess);
             setWorkspaceSettingByKey(CLI_AGENT_SETTING_KEYS.skipGitRepoCheck, normalizedSettings.skipGitRepoCheck);
             setWorkspaceSettingByKey(CLI_AGENT_SETTING_KEYS.promptTitle, normalizedSettings.promptTitle);
             setWorkspaceSettingByKey(CLI_AGENT_SETTING_KEYS.promptText, normalizedSettings.promptText);

@@ -27,11 +27,11 @@ IgnoreDuplicatedVerdicts = false
 SuspiciousTags = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
 TagsForSuspiciousOracle = Title
 
-ProcessListenerEnabled = false
+ProcessListener = false
 SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
 ProcessLogs = .*.*
 
-LogOracleEnabled = false
+LogOracle = false
 LogOracleRegex = .*([Ee]xception|[Ee]rror).*
 LogOracleCommands =
 LogOracleFiles =
@@ -44,7 +44,7 @@ MaxTime = 3.1536E7
 ApplicationName = Android Generic
 ApplicationVersion =
 
-StateModelEnabled = false
+StateModelInference = false
 DataStore =
 DataStoreType = remote
 DataStoreServer =
@@ -65,7 +65,7 @@ AgentCLIModel = gpt-5.4-mini
 AgentCLIReasoningEffort = medium
 AgentCLISandboxMode = danger-full-access
 AgentCLIApprovalPolicy = never
-AgentCLINetworkAccessEnabled = false
+AgentCLIAllowNetworkAccess = false
 AgentCLISkipGitRepoCheck = true
 AgentCLIPromptTitle = Test Parabank Login
 AgentCLIPromptText = As a test agent verify that you can log in with the credentials john/demo. Then the Welcome John Smith message is shown.

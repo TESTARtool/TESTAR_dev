@@ -187,7 +187,7 @@
                         </select>
                     </div>
                     <div class="cli-agent-flags">
-                        <label><input type="checkbox" bind:checked={cliAgentSettings.networkAccessEnabled} /> Network access</label>
+                        <label><input type="checkbox" bind:checked={cliAgentSettings.allowNetworkAccess} /> Allow Network access</label>
                         <label><input type="checkbox" bind:checked={cliAgentSettings.skipGitRepoCheck} /> Skip git repo check</label>
                     </div>
                 </div>

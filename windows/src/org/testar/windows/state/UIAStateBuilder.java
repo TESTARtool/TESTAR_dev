@@ -30,18 +30,18 @@ public final class UIAStateBuilder implements StateBuilder {
     final double timeOut; // seconds
     transient ExecutorService executor;
     transient long automationPointer, treeFilterConditionPointer, cacheRequestPointer;
-    boolean accessBridgeEnabled;
+    boolean javaAccessBridge;
     String SUTProcesses; // regex
 
     public UIAStateBuilder(){ this(10/*seconds*/,false,"");    }
 
-    public UIAStateBuilder(double timeOut, boolean accessBridgeEnabled, String SUTProcesses){ // seconds
+    public UIAStateBuilder(double timeOut, boolean javaAccessBridge, String SUTProcesses){ // seconds
         Assert.isTrue(timeOut > 0);
         this.timeOut = timeOut;
         initialize();
-        this.accessBridgeEnabled = accessBridgeEnabled;
+        this.javaAccessBridge = javaAccessBridge;
         this.SUTProcesses = SUTProcesses;
-        if (accessBridgeEnabled)
+        if (javaAccessBridge)
             new Thread(){ public void run(){ Windows.InitializeAccessBridge(); } }.start();
         executor = Executors.newFixedThreadPool(1);
     }
@@ -159,7 +159,7 @@ public final class UIAStateBuilder implements StateBuilder {
 
     public UIAState apply(SUT system) throws StateBuildException {
         try {
-            Future<UIAState> future = executor.submit(new UIAStateFetcher(system, automationPointer, cacheRequestPointer, this.accessBridgeEnabled, this.SUTProcesses));
+            Future<UIAState> future = executor.submit(new UIAStateFetcher(system, automationPointer, cacheRequestPointer, this.javaAccessBridge, this.SUTProcesses));
             return future.get((long)(timeOut * 1000.0), TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             throw new StateBuildException(e);

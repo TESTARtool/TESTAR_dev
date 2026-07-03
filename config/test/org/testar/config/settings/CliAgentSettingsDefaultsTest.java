@@ -36,7 +36,7 @@ public class CliAgentSettingsDefaultsTest {
         Assert.isTrue(settings.get(ConfigTags.AgentCLIReasoningEffort).equals("medium"));
         Assert.isTrue(settings.get(ConfigTags.AgentCLISandboxMode).equals("danger-full-access"));
         Assert.isTrue(settings.get(ConfigTags.AgentCLIApprovalPolicy).equals("never"));
-        Assert.isTrue(!settings.get(ConfigTags.AgentCLINetworkAccessEnabled));
+        Assert.isTrue(!settings.get(ConfigTags.AgentCLIAllowNetworkAccess));
         Assert.isTrue(settings.get(ConfigTags.AgentCLISkipGitRepoCheck));
     }
 

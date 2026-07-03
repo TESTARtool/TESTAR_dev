@@ -14,7 +14,7 @@ public final class CliAgentSettingsDto {
     private String reasoningEffort;
     private String sandboxMode;
     private String approvalPolicy;
-    private Boolean networkAccessEnabled;
+    private Boolean allowNetworkAccess;
     private Boolean skipGitRepoCheck;
     private String promptTitle;
     private String promptText;
@@ -29,7 +29,7 @@ public final class CliAgentSettingsDto {
         String reasoningEffort,
         String sandboxMode,
         String approvalPolicy,
-        Boolean networkAccessEnabled,
+        Boolean allowNetworkAccess,
         Boolean skipGitRepoCheck,
         String promptTitle,
         String promptText
@@ -40,7 +40,7 @@ public final class CliAgentSettingsDto {
         this.reasoningEffort = reasoningEffort;
         this.sandboxMode = sandboxMode;
         this.approvalPolicy = approvalPolicy;
-        this.networkAccessEnabled = networkAccessEnabled;
+        this.allowNetworkAccess = allowNetworkAccess;
         this.skipGitRepoCheck = skipGitRepoCheck;
         this.promptTitle = promptTitle;
         this.promptText = promptText;
@@ -70,8 +70,8 @@ public final class CliAgentSettingsDto {
         return valueOrDefault(approvalPolicy, "never");
     }
 
-    public Boolean networkAccessEnabled() {
-        return networkAccessEnabled != null ? networkAccessEnabled : Boolean.FALSE;
+    public Boolean allowNetworkAccess() {
+        return allowNetworkAccess != null ? allowNetworkAccess : Boolean.FALSE;
     }
 
     public Boolean skipGitRepoCheck() {

@@ -23,7 +23,7 @@ public final class ConfigTags {
     public static final Tag<String> SUTConnectorValue = Tag.from("SUTConnectorValue", String.class, 
             "The connector value: executable path, windows title, process name");
 
-    public static final Tag<Boolean> AccessBridgeEnabled = Tag.from("AccessBridgeEnabled", Boolean.class, 
+    public static final Tag<Boolean> JavaAccessBridge = Tag.from("JavaAccessBridge", Boolean.class, 
             "Enable Java Access Bridge to test Java Swing applications");
 
     public static final Tag<Integer> Sequences = Tag.from("Sequences", Integer.class, 
@@ -43,8 +43,8 @@ public final class ConfigTags {
             (Class<List<String>>) (Class<?>) List.class,
             "The Tags to apply the SuspiciousTags regex expressions");
 
-    public static final Tag<Boolean> ProcessListenerEnabled = Tag.from("ProcessListenerEnabled", Boolean.class, 
-            "Enable  the feature to read the process buffer of the SUT (Only for desktop applications through COMMAND_LINE)");
+    public static final Tag<Boolean> ProcessListener = Tag.from("ProcessListener", Boolean.class, 
+            "Enable the feature to read the process buffer of the SUT (Only for desktop applications through COMMAND_LINE)");
 
     public static final Tag<String> SuspiciousProcessOutput = Tag.from("SuspiciousProcessOutput", String.class, 
             "Regular expressions ORACLE to find suspicious messages in the process buffer of the SUT");
@@ -52,7 +52,7 @@ public final class ConfigTags {
     public static final Tag<String> ProcessLogs = Tag.from("ProcessLogs", String.class, 
             "Regular expressions to store execution logs coming from the processes");
 
-    public static final Tag<Boolean> LogOracleEnabled = Tag.from("LogOracleEnabled", Boolean.class, 
+    public static final Tag<Boolean> LogOracle = Tag.from("LogOracle", Boolean.class, 
             "Enable the Oracle for detecting suspicious messages in log files and standard output of commands");
 
     public static final Tag<String> LogOracleRegex = Tag.from("LogOracleRegex", String.class, 
@@ -128,7 +128,7 @@ public final class ConfigTags {
     public static final Tag<String> AgentCLIApprovalPolicy = Tag.from("AgentCLIApprovalPolicy", String.class,
             "Approval policy used by Agent CLI execution.");
 
-    public static final Tag<Boolean> AgentCLINetworkAccessEnabled = Tag.from("AgentCLINetworkAccessEnabled", Boolean.class,
+    public static final Tag<Boolean> AgentCLIAllowNetworkAccess = Tag.from("AgentCLIAllowNetworkAccess", Boolean.class,
             "Allow Agent CLI execution to request network access.");
 
     public static final Tag<Boolean> AgentCLISkipGitRepoCheck = Tag.from("AgentCLISkipGitRepoCheck", Boolean.class,

@@ -229,7 +229,7 @@ async function main() {
             workingDirectory: normalizeValue(config.workingDirectory),
             skipGitRepoCheck: Boolean(config.skipGitRepoCheck),
             modelReasoningEffort: normalizeValue(config.reasoningEffort),
-            networkAccessEnabled: Boolean(config.networkAccessEnabled),
+            allowNetworkAccess: Boolean(config.allowNetworkAccess),
             approvalPolicy: normalizeValue(config.approvalPolicy),
             additionalDirectories: Array.isArray(config.additionalDirectories)
                     ? config.additionalDirectories

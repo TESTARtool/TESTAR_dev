@@ -31,7 +31,7 @@ public class AndroidTestSequenceCapability extends TestSequenceCapability {
         Assert.notNull(runtimeContext);
         delegate.startTestSequence(runtimeContext);
 
-        if (runtimeContext.settings().get(ConfigTags.LogOracleEnabled, false)) {
+        if (runtimeContext.settings().get(ConfigTags.LogOracle, false)) {
             Oracle logOracle = new AndroidLogcatOracle(runtimeContext.settings());
             logOracle.initialize();
             runtimeContext.setLogOracle(logOracle);

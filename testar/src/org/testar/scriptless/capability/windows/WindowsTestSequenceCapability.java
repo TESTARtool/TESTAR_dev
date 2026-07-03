@@ -39,7 +39,7 @@ public class WindowsTestSequenceCapability extends TestSequenceCapability {
         Assert.notNull(runtimeContext, system, initialState);
         delegate.beginSequence(runtimeContext, system, initialState);
 
-        if (runtimeContext.settings().get(ConfigTags.ProcessListenerEnabled, false)) {
+        if (runtimeContext.settings().get(ConfigTags.ProcessListener, false)) {
             Oracle processListenerOracle = new ProcessListenerOracle(system, runtimeContext.settings());
             processListenerOracle.initialize();
             runtimeContext.setProcessListenerOracle(processListenerOracle);

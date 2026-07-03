@@ -29,7 +29,7 @@ public class ScriptlessOracleComposer {
         Assert.notNull(system, state, verdicts);
         List<Verdict> composedVerdicts = new ArrayList<Verdict>(verdicts);
 
-        if (runtimeContext.settings().get(ConfigTags.ProcessListenerEnabled, false)) {
+        if (runtimeContext.settings().get(ConfigTags.ProcessListener, false)) {
             List<Verdict> processVerdicts = runtimeContext.processListenerOracle().getVerdicts(state);
             for (Verdict processVerdict : processVerdicts) {
                 if (processVerdict.severity() == Verdict.Severity.SUSPICIOUS_PROCESS.getValue()) {
@@ -38,7 +38,7 @@ public class ScriptlessOracleComposer {
             }
         }
 
-        if (runtimeContext.settings().get(ConfigTags.LogOracleEnabled, false)) {
+        if (runtimeContext.settings().get(ConfigTags.LogOracle, false)) {
             List<Verdict> logVerdicts = runtimeContext.logOracle().getVerdicts(state);
             for (Verdict logVerdict : logVerdicts) {
                 if (logVerdict.severity() == Verdict.Severity.SUSPICIOUS_LOG.getValue()) {

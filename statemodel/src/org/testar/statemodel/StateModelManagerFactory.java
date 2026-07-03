@@ -27,7 +27,7 @@ public class StateModelManagerFactory {
 
     public static StateModelManager getStateModelManager(String applicationName, String applicationVersion, TaggableBase configTags) {
         // first check if the state model module is enabled
-        if (!configTags.get(StateModelTags.StateModelEnabled)) {
+        if (!configTags.get(StateModelTags.StateModelInference)) {
             return new DummyModelManager();
         }
 

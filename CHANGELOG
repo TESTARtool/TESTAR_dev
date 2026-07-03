@@ -931,7 +931,7 @@ Fixes:
 		-> "System is offline! I assume it crashed": automatic detection/kill of running SUT processes
 		-> Swing for Java (light-weight widgets) is now supported
 			--> How to:
-				- add the line "AccessBridgeEnabled = true" to test.settings
+				- add the line "JavaAccessBridge = true" to test.settings
 				- Activate native Java Access Bridge (e.g. Windows: Control panel -> Accessibility -> Accessibility center -> Help to use the machine -> Activate Java Access Bridge at page bottom)
 			
 	- General stability fixes

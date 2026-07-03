@@ -35,7 +35,7 @@ public class ProcessListenerOracle implements Oracle {
 	private final SUT system;
 	private final Settings settings;
 
-	private boolean processListenerEnabled = false;
+	private boolean processListener = false;
 
 	private Pattern processOracles;
 	private Pattern processLogs;
@@ -81,13 +81,13 @@ public class ProcessListenerOracle implements Oracle {
 		standardErrorReader = new BufferedReader(new InputStreamReader(system.get(Tags.StdErr)));
 		standardOutputReader = new BufferedReader(new InputStreamReader(system.get(Tags.StdOut)));
 
-		processListenerEnabled = true;
+		processListener = true;
 		System.out.println("Process Listener enabled correctly");
 	}
 
 	@Override
 	public List<Verdict> getVerdicts(State state) {
-		if (!processListenerEnabled) {
+		if (!processListener) {
 			return Collections.singletonList(Verdict.OK);
 		}
 

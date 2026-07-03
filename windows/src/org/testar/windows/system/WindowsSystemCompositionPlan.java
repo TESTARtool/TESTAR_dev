@@ -26,27 +26,27 @@ public final class WindowsSystemCompositionPlan {
     }
 
     public static SystemCompositionPlan fromExecutable(String path,
-                                                       boolean processListenerEnabled,
+                                                       boolean processListener,
                                                        String sutProcesses) {
         return SystemCompositionPlan.basic(
-                WindowsSystemService.fromExecutable(path, processListenerEnabled, sutProcesses)
+                WindowsSystemService.fromExecutable(path, processListener, sutProcesses)
         );
     }
 
     public static SystemCompositionPlan fromExecutable(String path,
-                                                       boolean processListenerEnabled,
+                                                       boolean processListener,
                                                        String sutProcesses,
                                                        double startupTimeSeconds,
                                                        double stateTimeoutSeconds,
-                                                       boolean accessBridgeEnabled) {
+                                                       boolean javaAccessBridge) {
         return SystemCompositionPlan.basic(
                 WindowsSystemService.fromExecutable(
                         path,
-                        processListenerEnabled,
+                        processListener,
                         sutProcesses,
                         startupTimeSeconds,
                         stateTimeoutSeconds,
-                        accessBridgeEnabled
+                        javaAccessBridge
                 )
         );
     }
@@ -54,7 +54,7 @@ public final class WindowsSystemCompositionPlan {
     public static SystemCompositionPlan fromWindowTitle(String windowTitle,
                                                         double maxEngageTimeSeconds,
                                                         double stateTimeoutSeconds,
-                                                        boolean accessBridgeEnabled,
+                                                        boolean javaAccessBridge,
                                                         String sutProcesses,
                                                         boolean forceToForeground) {
         return SystemCompositionPlan.basic(
@@ -62,7 +62,7 @@ public final class WindowsSystemCompositionPlan {
                         windowTitle,
                         maxEngageTimeSeconds,
                         stateTimeoutSeconds,
-                        accessBridgeEnabled,
+                        javaAccessBridge,
                         sutProcesses,
                         forceToForeground
                 )

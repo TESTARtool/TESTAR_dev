@@ -53,7 +53,7 @@ public final class WorkspaceSettingsCatalog {
                 ConfigTags.ApplicationVersion
                 //,
                 //ConfigTags.SUTProcesses,
-                //ConfigTags.AccessBridgeEnabled,
+                //ConfigTags.JavaAccessBridge,
                 //ConfigTags.ForceForeground
             ),
             group(
@@ -113,10 +113,10 @@ public final class WorkspaceSettingsCatalog {
                 ConfigTags.SuspiciousTags,
                 ConfigTags.TagsForSuspiciousOracle,
                 ConfigTags.TimeToFreeze,
-                ConfigTags.ProcessListenerEnabled,
+                ConfigTags.ProcessListener,
                 ConfigTags.SuspiciousProcessOutput,
                 ConfigTags.ProcessLogs,
-                ConfigTags.LogOracleEnabled,
+                ConfigTags.LogOracle,
                 ConfigTags.LogOracleRegex,
                 ConfigTags.LogOracleCommands,
                 ConfigTags.LogOracleFiles,
@@ -127,7 +127,7 @@ public final class WorkspaceSettingsCatalog {
                 "State Model",
                 "State model persistence configuration.",
                 settingsProperties,
-                StateModelTags.StateModelEnabled,
+                StateModelTags.StateModelInference,
                 StateModelTags.DataStore,
                 StateModelTags.DataStoreType,
                 StateModelTags.DataStoreServer,
@@ -159,7 +159,7 @@ public final class WorkspaceSettingsCatalog {
                 ConfigTags.AgentCLIReasoningEffort,
                 ConfigTags.AgentCLISandboxMode,
                 ConfigTags.AgentCLIApprovalPolicy,
-                ConfigTags.AgentCLINetworkAccessEnabled,
+                ConfigTags.AgentCLIAllowNetworkAccess,
                 ConfigTags.AgentCLISkipGitRepoCheck,
                 ConfigTags.AgentCLIPromptTitle,
                 ConfigTags.AgentCLIPromptText

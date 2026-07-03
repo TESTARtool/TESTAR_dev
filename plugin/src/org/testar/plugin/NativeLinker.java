@@ -99,11 +99,11 @@ public class NativeLinker {
 	/**
 	 * Retrieves a StateBuilder instance which will be used to determine the state of the application.
 	 * @param timeToFreeze The time after which requesting the state of an application will time out.
-	 * @param accessBridgeEnabled Whether to activate the AccessBridge (Java/Swing SUTs).
+	 * @param javaAccessBridge Whether to activate the AccessBridge (Java/Swing SUTs).
 	 * @param SUTProcesses A regex of the set of processes that conform the SUT.
 	 * @return A StateBuilder instance.
 	 */
-	public static StateBuilder getNativeStateBuilder(Double timeToFreeze, boolean accessBridgeEnabled, String SUTProcesses) {
+	public static StateBuilder getNativeStateBuilder(Double timeToFreeze, boolean javaAccessBridge, String SUTProcesses) {
 		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
 			return new WdStateBuilder(timeToFreeze);
 		}
@@ -112,15 +112,15 @@ public class NativeLinker {
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7)) {
-				return new UIAStateBuilder(timeToFreeze, accessBridgeEnabled, SUTProcesses);
+				return new UIAStateBuilder(timeToFreeze, javaAccessBridge, SUTProcesses);
 			}
 			else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_10)) {
 				// TODO: a win10 state builder might make use of the new CUI8 Automation object.
-				return new UIAStateBuilder(timeToFreeze, accessBridgeEnabled, SUTProcesses);
+				return new UIAStateBuilder(timeToFreeze, javaAccessBridge, SUTProcesses);
 			}
 			else {
 				System.out.println("TESTAR detected OS: " + osName + " and this is not yet full supported. If the detected OS is wrong, please contact the TESTAR team at info@testar.org.");
-				return new UIAStateBuilder(timeToFreeze, accessBridgeEnabled, SUTProcesses);
+				return new UIAStateBuilder(timeToFreeze, javaAccessBridge, SUTProcesses);
 			}
 		}
 
@@ -153,7 +153,7 @@ public class NativeLinker {
 	 * @param executableCommand The application/ process/ command that will be run.
 	 * @return A handle to the process in a SUT object.
 	 */
-	public static SUT getNativeSUT(String executableCommand, boolean ProcessListenerEnabled, String SUTProcesses, Settings settings) {
+	public static SUT getNativeSUT(String executableCommand, boolean ProcessListener, String SUTProcesses, Settings settings) {
 		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
 			return WdDriver.fromExecutable(executableCommand);
 		}
@@ -162,11 +162,11 @@ public class NativeLinker {
 		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7)) {
-				return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled, SUTProcesses);
+				return WinProcess.fromExecutable(executableCommand, ProcessListener, SUTProcesses);
 			}
 			else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_10)) {
 				if (executableCommand.toLowerCase().contains(".exe") || executableCommand.contains(".jar")) {
-					return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled, SUTProcesses);
+					return WinProcess.fromExecutable(executableCommand, ProcessListener, SUTProcesses);
 				}
 				else {
 					return WinProcess.fromExecutableUwp(executableCommand);
@@ -174,7 +174,7 @@ public class NativeLinker {
 			}
 			else {
 				System.out.println("TESTAR detected OS: " + osName + " and this is not yet full supported.");
-				return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled, SUTProcesses);
+				return WinProcess.fromExecutable(executableCommand, ProcessListener, SUTProcesses);
 			}
 		}
 

@@ -35,15 +35,15 @@ public class UIAStateFetcher implements Callable<UIAState>{
 
     private boolean releaseCachedAutomatinElement;
     
-    private boolean accessBridgeEnabled;
+    private boolean javaAccessBridge;
     
     private static Pattern sutProcessesMatcher;
     
-    public UIAStateFetcher(SUT system, long automationPointer, long cacheRequestPointer, boolean accessBridgeEnabled, String SUTProcesses){
+    public UIAStateFetcher(SUT system, long automationPointer, long cacheRequestPointer, boolean javaAccessBridge, String SUTProcesses){
         this.system = system;
         this.automationPointer = automationPointer;
         this.cacheRequestPointer = cacheRequestPointer;
-        this.accessBridgeEnabled = accessBridgeEnabled;
+        this.javaAccessBridge = javaAccessBridge;
         if (SUTProcesses == null || SUTProcesses.isEmpty())
             UIAStateFetcher.sutProcessesMatcher = null;
         else
@@ -173,7 +173,7 @@ public class UIAStateFetcher implements Callable<UIAState>{
                 uiaRoot.isForeground = uiaRoot.isForeground || WinProcess.isForeground(windowProcessId); // ( SUT as a set of windows/processes )
                 if(!isOwnedWindow){
                     //uiaDescend(uiaCacheWindowTree(windowHandle), uiaRoot);
-                    modalElement = this.accessBridgeEnabled ? abDescend(windowHandle, uiaCacheWindowTree(windowHandle), uiaRoot, 0, 0) :
+                    modalElement = this.javaAccessBridge ? abDescend(windowHandle, uiaCacheWindowTree(windowHandle), uiaRoot, 0, 0) :
                                                               uiaDescend(windowHandle, uiaCacheWindowTree(windowHandle), uiaRoot);
                 } else
                     ownedWindows.add(windowHandle);
@@ -186,7 +186,7 @@ public class UIAStateFetcher implements Callable<UIAState>{
                 //uiaDescend(uiaCacheWindowTree(windowHandle), uiaRoot);
                 UIAElement modalE;
 
-                if ((modalE = this.accessBridgeEnabled ? abDescend(windowHandle, uiaCacheWindowTree(windowHandle), uiaRoot, 0, 0) :
+                if ((modalE = this.javaAccessBridge ? abDescend(windowHandle, uiaCacheWindowTree(windowHandle), uiaRoot, 0, 0) :
                                                          uiaDescend(windowHandle, uiaCacheWindowTree(windowHandle), uiaRoot)) != null)
                     modalElement = modalE;
 
@@ -671,7 +671,7 @@ public class UIAStateFetcher implements Callable<UIAState>{
 
     private void calculateZIndices(UIAElement el){
         if (el.parent != null){
-            if (this.accessBridgeEnabled) // TLC are not exposed as visible desktop controls
+            if (this.javaAccessBridge) // TLC are not exposed as visible desktop controls
                 el.zindex = el.parent.zindex + (el.parent.isTopLevelContainer ? 1 : 0);
             else if (!el.isTopLevelContainer)        
                 el.zindex = el.parent.zindex;

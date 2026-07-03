@@ -32,22 +32,22 @@ public final class WindowsSystemStartupSupport {
     }
 
     public static SUT startExecutableAndWaitUntilAccessible(String path,
-                                                            boolean processListenerEnabled,
+                                                            boolean processListener,
                                                             String sutProcesses,
                                                             double startupTimeSeconds,
                                                             double stateTimeoutSeconds,
-                                                            boolean accessBridgeEnabled) throws SystemStartException {
+                                                            boolean javaAccessBridge) throws SystemStartException {
         Assert.notNull(path);
 
         boolean retryAfterStop = true;
 
         while (true) {
-            SUT system = WinProcess.fromExecutable(path, processListenerEnabled, sutProcesses);
+            SUT system = WinProcess.fromExecutable(path, processListener, sutProcesses);
             long engageTimeMs = Math.round(startupTimeSeconds * 1000.0);
 
             try (WindowsStateService stateService = WindowsStateService.uiAutomation(
                     stateTimeoutSeconds,
-                    accessBridgeEnabled,
+                    javaAccessBridge,
                     sutProcesses
             )) {
                 long startedAt = System.currentTimeMillis();
@@ -69,7 +69,7 @@ public final class WindowsSystemStartupSupport {
             if (path.contains("java -jar")) {
                 String message = "Exception trying to launch: " + path + "\n"
                         + "1. Check whether current SUTs path is correctly defined \n";
-                if (accessBridgeEnabled) {
+                if (javaAccessBridge) {
                     throw new SystemStartException(
                             message + "2. Check if Java Access Bridge is enabled in the host systems"
                     );
@@ -85,7 +85,7 @@ public final class WindowsSystemStartupSupport {
     public static SUT connectByWindowTitle(String windowTitle,
                                            double maxEngageTimeSeconds,
                                            double stateTimeoutSeconds,
-                                           boolean accessBridgeEnabled,
+                                           boolean javaAccessBridge,
                                            String sutProcesses,
                                            boolean forceToForeground) throws SystemStartException {
         Assert.notNull(windowTitle);
@@ -95,7 +95,7 @@ public final class WindowsSystemStartupSupport {
 
         try (WindowsStateService stateService = WindowsStateService.uiAutomation(
                 stateTimeoutSeconds,
-                accessBridgeEnabled,
+                javaAccessBridge,
                 sutProcesses
         )) {
             while (System.currentTimeMillis() - startedAt < maxEngageTimeMs) {

@@ -69,8 +69,8 @@ public final class CliStateModelAnalysis {
 
     private List<String> validateSettings(Settings settings) {
         List<String> missingSettings = new ArrayList<>();
-        if (!settings.get(StateModelTags.StateModelEnabled, false)) {
-            missingSettings.add("StateModelEnabled=false");
+        if (!settings.get(StateModelTags.StateModelInference, false)) {
+            missingSettings.add("StateModelInference=false");
         }
 
         String dataStoreType = settings.get(StateModelTags.DataStoreType, "");
