@@ -14,6 +14,11 @@
     import { stateModelWorkspaceDialog } from "./stateModelNavigation.js";
     import { objectSnapshot } from "./editorDirtyState.js";
     import { resultFileUrl, resultGroupDeleteUrl, resultListUrl } from "./resultApi.js";
+    import {
+        defaultWorkspaceCreationDraft,
+        workspaceCreationRequest,
+        workspaceCreationValidation
+    } from "./workspaceCreationModel.js";
 
     const STATE_MODEL_URL = "http://localhost:8090/models";
     const CLI_AGENT_SETTING_KEYS = {
@@ -95,6 +100,9 @@
         message: "",
         saveLabel: "Save"
     };
+    let workspaceCreationDialogOpen = false;
+    let workspaceCreationDraft = defaultWorkspaceCreationDraft([], "");
+    let workspaceCreationError = "";
     let savedTestSettingsContent = "";
     let savedCompositionPropertiesContent = "";
     let savedPoliciesPropertiesContent = "";
@@ -807,6 +815,62 @@
             currentPage = "logs";
             await loadDebugFiles();
         });
+    }
+
+    async function openWorkspaceCreationDialog() {
+        await guardApplicationTransition(async () => {
+            workspaceCreationDraft = defaultWorkspaceCreationDraft(workspaces, selectedWorkspaceName);
+            workspaceCreationError = "";
+            workspaceCreationDialogOpen = true;
+        });
+    }
+
+    function closeWorkspaceCreationDialog() {
+        if (saving) {
+            return;
+        }
+
+        workspaceCreationDialogOpen = false;
+        workspaceCreationError = "";
+    }
+
+    function closeWorkspaceCreationDialogFromBackdrop(event) {
+        if (event.target === event.currentTarget) {
+            closeWorkspaceCreationDialog();
+        }
+    }
+
+    async function createWorkspaceFromDialog() {
+        const validation = workspaceCreationValidation(workspaceCreationDraft, workspaces);
+        if (!validation.valid) {
+            workspaceCreationError = validation.message;
+            return;
+        }
+
+        saving = true;
+        workspaceCreationError = "";
+        message = "";
+
+        try {
+            const request = workspaceCreationRequest(workspaceCreationDraft);
+            const createdWorkspace = await loadJson("/api/workspaces", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(request)
+            });
+            await refreshInitialData();
+            currentPage = "configuration";
+            await loadWorkspace(createdWorkspace?.name || request.name);
+            workspaceCreationDialogOpen = false;
+            showTemporaryMessage(`Workspace ${request.name} created.`);
+        } catch (createError) {
+            reportClientError("Unable to create workspace", createError);
+            workspaceCreationError = createError.message || "Unable to create workspace.";
+        } finally {
+            saving = false;
+        }
     }
 
     function openStateModelExternalTab(url = STATE_MODEL_URL) {
@@ -2170,6 +2234,7 @@
     }
 
     $: selectedWorkspaceSummary = workspaces.find((workspace) => workspace.name === selectedWorkspaceName) || null;
+    $: workspaceCreationValidationState = workspaceCreationValidation(workspaceCreationDraft, workspaces);
 
     onMount(async () => {
         startScriptlessPolling();
@@ -2196,6 +2261,9 @@
 <div class="page">
     <nav class="panel panel-wide page-nav">
         <div class="page-nav-workspace">
+            <button type="button" class="secondary page-workspace-add" on:click={openWorkspaceCreationDialog}>
+                New
+            </button>
             <select
                 id="page-workspace-select"
                 value={selectedWorkspaceName}
@@ -2379,6 +2447,68 @@
     {#if message}
         <div class="toast-message">
             {message}
+        </div>
+    {/if}
+
+    {#if workspaceCreationDialogOpen}
+        <div class="composition-modal-backdrop" role="presentation" on:click={closeWorkspaceCreationDialogFromBackdrop}>
+            <div
+                class="composition-modal state-model-dialog workspace-creation-dialog"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="workspace-creation-dialog-title"
+            >
+                <div class="composition-modal-header">
+                    <div>
+                        <h2 id="workspace-creation-dialog-title">Create New Workspace</h2>
+                        <p>Select an existing workspace as base. WebStudio clones its settings, composition, policies, and Java files.</p>
+                    </div>
+                </div>
+                <div class="composition-modal-body workspace-creation-form">
+                    <label>
+                        <span>Workspace name</span>
+                        <input
+                            type="text"
+                            bind:value={workspaceCreationDraft.name}
+                            placeholder="platform_application (e.g., webdriver_parabank)"
+                            disabled={saving}
+                        />
+                    </label>
+                    <label>
+                        <span>Base workspace</span>
+                        <select bind:value={workspaceCreationDraft.baseWorkspace} disabled={saving}>
+                            {#each workspaces as workspace}
+                                <option value={workspace.name}>{workspace.name}</option>
+                            {/each}
+                        </select>
+                    </label>
+                    <label class="workspace-creation-checkbox">
+                        <input
+                            type="checkbox"
+                            bind:checked={workspaceCreationDraft.copyTestGoals}
+                            disabled={saving}
+                        />
+                        <span>Copy Test Goals from base workspace</span>
+                    </label>
+                    {#if workspaceCreationError || workspaceCreationValidationState.message}
+                        <p class:settings-validation-invalid={workspaceCreationError || !workspaceCreationValidationState.valid}>
+                            {workspaceCreationError || workspaceCreationValidationState.message}
+                        </p>
+                    {/if}
+                </div>
+                <div class="composition-modal-actions">
+                    <button
+                        type="button"
+                        on:click={createWorkspaceFromDialog}
+                        disabled={saving || !workspaceCreationValidationState.valid}
+                    >
+                        Create
+                    </button>
+                    <button type="button" class="secondary" on:click={closeWorkspaceCreationDialog} disabled={saving}>
+                        Discard
+                    </button>
+                </div>
+            </div>
         </div>
     {/if}
 

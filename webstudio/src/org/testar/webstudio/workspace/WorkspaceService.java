@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,6 +49,8 @@ public final class WorkspaceService {
     private static final String TEST_SETTINGS_FILE = "test.settings";
     private static final String COMPOSITION_FILE = "composition.properties";
     private static final String POLICIES_FILE = "policies.properties";
+    private static final String TEST_GOALS_DIRECTORY = "test_goals";
+    private static final Pattern WORKSPACE_NAME_PATTERN = Pattern.compile("[A-Za-z0-9_-]+");
 
     private final Path settingsRoot;
     private final Path cliSettingsRoot;
@@ -104,6 +107,38 @@ public final class WorkspaceService {
 
     public Path workspaceRuntimeHomeDirectory(String workspaceName) {
         return resolveWorkspaceRuntimeHomeDirectory(workspaceName);
+    }
+
+    public WorkspaceSummaryDto createWorkspace(String workspaceName, String baseWorkspaceName, boolean copyTestGoals) {
+        String normalizedWorkspaceName = normalizeNewWorkspaceName(workspaceName);
+        String normalizedBaseWorkspaceName = normalizeExistingWorkspaceName(baseWorkspaceName, "Base workspace is required.");
+        Path sourceDirectory = resolveWorkspaceDirectory(normalizedBaseWorkspaceName);
+        Path targetDirectory = settingsRoot.resolve(normalizedWorkspaceName).normalize();
+
+        if (!targetDirectory.startsWith(settingsRoot)) {
+            throw new IllegalArgumentException("Invalid workspace name: " + normalizedWorkspaceName);
+        }
+
+        if (workspaceExists(settingsRoot, normalizedWorkspaceName) || workspaceExists(cliSettingsRoot, normalizedWorkspaceName)) {
+            throw new IllegalArgumentException("Workspace already exists: " + normalizedWorkspaceName);
+        }
+
+        try {
+            Files.createDirectories(settingsRoot);
+            copyWorkspaceDirectory(sourceDirectory, targetDirectory, copyTestGoals);
+            Files.createDirectories(targetDirectory.resolve(TEST_GOALS_DIRECTORY));
+            return listWorkspaces().stream()
+                .filter(workspace -> normalizedWorkspaceName.equals(workspace.name()))
+                .findFirst()
+                .orElseGet(() -> new WorkspaceSummaryDto(
+                    normalizedWorkspaceName,
+                    targetDirectory.toString(),
+                    true,
+                    workspaceExists(cliSettingsRoot, normalizedWorkspaceName)
+                ));
+        } catch (IOException exception) {
+            throw new IllegalStateException("Unable to create workspace: " + normalizedWorkspaceName, exception);
+        }
     }
 
     public List<DebugFileSummaryDto> listDebugFiles() {
@@ -376,6 +411,63 @@ public final class WorkspaceService {
         }
 
         throw new IllegalArgumentException("Workspace not found: " + workspaceName);
+    }
+
+    private String normalizeNewWorkspaceName(String workspaceName) {
+        String normalizedWorkspaceName = normalizeExistingWorkspaceName(workspaceName, "Workspace name is required.");
+        if (!WORKSPACE_NAME_PATTERN.matcher(normalizedWorkspaceName).matches()) {
+            throw new IllegalArgumentException(
+                "Workspace name can only contain letters, numbers, underscores, and hyphens."
+            );
+        }
+
+        return normalizedWorkspaceName;
+    }
+
+    private String normalizeExistingWorkspaceName(String workspaceName, String emptyMessage) {
+        if (workspaceName == null || workspaceName.isBlank()) {
+            throw new IllegalArgumentException(emptyMessage);
+        }
+
+        return workspaceName.trim();
+    }
+
+    private boolean workspaceExists(Path root, String workspaceName) {
+        Path workspaceDirectory = root.resolve(workspaceName).normalize();
+        return workspaceDirectory.startsWith(root) && Files.exists(workspaceDirectory);
+    }
+
+    private void copyWorkspaceDirectory(Path sourceDirectory, Path targetDirectory, boolean copyTestGoals) throws IOException {
+        try (Stream<Path> sourcePaths = Files.walk(sourceDirectory)) {
+            List<Path> paths = sourcePaths
+                .filter(path -> shouldCopyWorkspacePath(sourceDirectory, path, copyTestGoals))
+                .sorted(Comparator.comparingInt(path -> path.getNameCount()))
+                .collect(Collectors.toList());
+
+            for (Path sourcePath : paths) {
+                Path relativePath = sourceDirectory.relativize(sourcePath);
+                Path targetPath = targetDirectory.resolve(relativePath).normalize();
+                if (!targetPath.startsWith(targetDirectory)) {
+                    throw new IOException("Invalid workspace clone target path: " + targetPath);
+                }
+
+                if (Files.isDirectory(sourcePath)) {
+                    Files.createDirectories(targetPath);
+                } else {
+                    Files.createDirectories(targetPath.getParent());
+                    Files.copy(sourcePath, targetPath);
+                }
+            }
+        }
+    }
+
+    private boolean shouldCopyWorkspacePath(Path sourceDirectory, Path sourcePath, boolean copyTestGoals) {
+        if (copyTestGoals) {
+            return true;
+        }
+
+        Path testGoalsDirectory = sourceDirectory.resolve(TEST_GOALS_DIRECTORY).normalize();
+        return !sourcePath.normalize().startsWith(testGoalsDirectory);
     }
 
     private Path resolveWorkspaceRuntimeHomeDirectory(String workspaceName) {

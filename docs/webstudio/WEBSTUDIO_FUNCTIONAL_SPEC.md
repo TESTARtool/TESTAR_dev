@@ -123,6 +123,54 @@ The `Edit Settings` view must render `CliStateProjectionMode` as a dropdown usin
 - If no `webdriver_xxx` workspace is available, the first workspace is selected.
 - Changing the selected workspace reloads the workspace document and resets editor state.
 
+### Workspace Creation
+
+WebStudio must allow creating a new workspace by cloning an existing workspace.
+
+The creation action is launched from the workspace selector area.
+
+The creation dialog must require:
+
+- new workspace name
+- base workspace
+
+The base workspace must be one of the existing workspaces.
+
+The new workspace name must be a safe folder name.
+
+Allowed characters:
+
+- letters
+- numbers
+- underscore
+- hyphen
+
+The new workspace name must not already exist.
+
+The cloned workspace must copy:
+
+- `test.settings`
+- `composition.properties`
+- `policies.properties`
+- Java services, capabilities, and policies
+
+The dialog must include an option to copy Test Goals.
+
+Copy Test Goals behavior:
+
+- enabled by default
+- if enabled, copy the base workspace `test_goals` folder
+- if disabled, create an empty `test_goals` folder for the new workspace
+
+After successful creation:
+
+- WebStudio refreshes the workspace list
+- WebStudio selects the new workspace
+- WebStudio opens Test Configuration
+- the default configuration editor is `Edit Java Composition Flow`
+
+If creation fails, WebStudio must keep the creation dialog open and show the error.
+
 ### Page Navigation
 
 Main pages:

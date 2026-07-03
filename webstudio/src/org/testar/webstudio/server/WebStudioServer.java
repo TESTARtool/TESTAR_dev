@@ -24,6 +24,7 @@ import org.testar.webstudio.api.WorkspaceController;
 import org.testar.webstudio.api.dto.CliManualCommandRequestDto;
 import org.testar.webstudio.api.dto.RegexValidationRequestDto;
 import org.testar.webstudio.api.dto.SpyTypeRequestDto;
+import org.testar.webstudio.api.dto.WorkspaceCreateRequestDto;
 import org.testar.webstudio.api.dto.WorkspaceFileUpdateDto;
 import org.testar.webstudio.analysis.StateModelAnalysisService;
 import org.testar.webstudio.execution.CliExecutionAdapter;
@@ -104,6 +105,10 @@ public final class WebStudioServer {
             "workspaceCount", workspaceController.listWorkspaces().size()
         )));
         routes.get("/api/workspaces", context -> handle(context, workspaceController::listWorkspaces));
+        routes.post("/api/workspaces", context -> handle(context, () -> {
+            WorkspaceCreateRequestDto request = gson.fromJson(context.body(), WorkspaceCreateRequestDto.class);
+            return workspaceController.createWorkspace(request);
+        }));
         routes.get("/api/debug-files", context -> handle(context, workspaceController::listDebugFiles));
         routes.get("/api/debug-files/{fileName}", context -> handle(context, () ->
             workspaceController.readDebugFile(

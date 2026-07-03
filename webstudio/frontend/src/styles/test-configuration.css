@@ -994,6 +994,41 @@
     margin-top: 16px;
 }
 
+.workspace-creation-dialog {
+    width: min(720px, 100%);
+}
+
+.workspace-creation-form {
+    display: grid;
+    gap: 14px;
+}
+
+.workspace-creation-form label {
+    display: grid;
+    gap: 6px;
+    color: var(--text);
+    font-weight: 700;
+}
+
+.workspace-creation-form label span {
+    font-size: 0.88rem;
+}
+
+.workspace-creation-checkbox {
+    display: flex !important;
+    grid-template-columns: none;
+    align-items: center;
+    gap: 10px !important;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(235, 238, 242, 0.72);
+    border: 1px solid rgba(35, 52, 79, 0.1);
+}
+
+.workspace-creation-checkbox input {
+    width: auto;
+}
+
 .composition-modal-body textarea {
     min-height: 600px;
 }

@@ -14,6 +14,7 @@ import java.util.regex.PatternSyntaxException;
 import org.testar.webstudio.api.dto.DebugFileDto;
 import org.testar.webstudio.api.dto.DebugFileSummaryDto;
 import org.testar.webstudio.api.dto.RegexValidationResultDto;
+import org.testar.webstudio.api.dto.WorkspaceCreateRequestDto;
 import org.testar.webstudio.api.dto.WorkspaceDocumentDto;
 import org.testar.webstudio.api.dto.WorkspaceFileDto;
 import org.testar.webstudio.api.dto.WorkspaceJavaCompileResultDto;
@@ -30,6 +31,18 @@ public final class WorkspaceController {
 
     public List<WorkspaceSummaryDto> listWorkspaces() {
         return workspaceService.listWorkspaces();
+    }
+
+    public WorkspaceSummaryDto createWorkspace(WorkspaceCreateRequestDto request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Workspace creation request is required.");
+        }
+
+        return workspaceService.createWorkspace(
+            request.name(),
+            request.baseWorkspace(),
+            request.copyTestGoals()
+        );
     }
 
     public Path settingsRoot() {

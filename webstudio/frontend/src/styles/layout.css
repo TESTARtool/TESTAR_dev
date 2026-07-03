@@ -55,8 +55,9 @@
 }
 
 .page-nav-workspace {
-    display: grid;
-    gap: 6px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
     min-width: 220px;
 }
 
@@ -70,6 +71,11 @@
 
 .page-nav-workspace select {
     min-width: 220px;
+}
+
+.page-workspace-add {
+    min-height: 39px;
+    white-space: nowrap;
 }
 
 .page-nav-right-group {

@@ -65,6 +65,23 @@ The workspace is user-facing.
 
 The execution mode is implementation-facing.
 
+## Workspace Creation
+
+WebStudio can create a new workspace by cloning an existing workspace.
+
+The base workspace is required.
+
+The new workspace copy includes configuration assets:
+
+- `test.settings`
+- `composition.properties`
+- `policies.properties`
+- Java services, capabilities, and policies
+
+Copying Test Goals is optional and enabled by default.
+
+The objective is a cloned executable workspace while avoiding copied historical execution artifacts.
+
 ## CLI Startup Contracts
 
 TESTAR CLI supports two startup contracts.
