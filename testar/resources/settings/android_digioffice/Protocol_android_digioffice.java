@@ -508,19 +508,23 @@ public class Protocol_android_digioffice extends AndroidProtocol {
         Oracle documentUploadInfoAllowDashOracle = new AndroidDigiOfficeDocumentUploadInfoIsNotEmptyNotNAAllowDash();
         addNewVerdicts(state, verdicts, documentUploadInfoAllowDashOracle.getVerdicts(state));
 
-        // 25) Document list item info is not empty not NA
+        // 25) Document upload list item info is not empty not NA
+        Oracle documentUploadListItemInfoOracle = new AndroidDigiOfficeDocumentUploadListItemInfoIsNotEmptyNotNA();
+        addNewVerdicts(state, verdicts, documentUploadListItemInfoOracle.getVerdicts(state));
+
+        // 26) Document list item info is not empty not NA
         Oracle documentListItemInfoOracle = new AndroidDigiOfficeDocumentListItemInfoIsNotEmptyNotNA();
         addNewVerdicts(state, verdicts, documentListItemInfoOracle.getVerdicts(state));
 
-        // 26) Task list item info is not empty not NA
+        // 27) Task list item info is not empty not NA
         Oracle taskListItemInfoOracle = new AndroidDigiOfficeTaskListItemInfoIsNotEmptyNotNA();
         addNewVerdicts(state, verdicts, taskListItemInfoOracle.getVerdicts(state));
 
-        // 27) Task info row is not empty not NA
+        // 28) Task info row is not empty not NA
         Oracle taskInfoRowOracle = new AndroidDigiOfficeTaskInfoRowIsNotEmptyNotNA();
         addNewVerdicts(state, verdicts, taskInfoRowOracle.getVerdicts(state));
 
-        // 28) Task info row is not empty not NA and allows dash
+        // 29) Task info row is not empty not NA and allows dash
         Oracle taskInfoRowAllowDashOracle = new AndroidDigiOfficeTaskInfoRowIsNotEmptyNotNAAllowDash();
         addNewVerdicts(state, verdicts, taskInfoRowAllowDashOracle.getVerdicts(state));
 
