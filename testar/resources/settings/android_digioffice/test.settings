@@ -47,7 +47,7 @@ IgnoreDuplicatedVerdicts = true
 #################################################################
 
 SuspiciousTags = .*[eE]rror.*|.*[eE]xcepti[o?]n.*|.*[fF]ailed.*|.*[iI]nvalid.*|.*[fF]out.*|.*[pP]robleem.*|.*[oO]ngeldig.*|.*[wW]aarschuwing.*|.*[vV]erkeerd.*|.*[gG]efaald.*
-TagsForSuspiciousOracle = AndroidText;AndroidAccessibilityId;AndroidResourceId
+TagsForSuspiciousOracle = AndroidText;AndroidAccessibilityId
 
 #################################################################
 # Extended test oracles
