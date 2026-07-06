@@ -496,19 +496,34 @@ public class AndroidAppiumFramework extends SUTBase {
 	 * 
 	 * @return Document with DOM representation
 	 */
-	public static Document getAndroidPageSource() {
+	public static AndroidPageSourceResult getAndroidPageSource() {
 		try {
 			String appiumState = driver.getPageSource();
-			return loadXML(appiumState);
+			Document document = loadXML(appiumState);
+			return new AndroidPageSourceResult(document, "");
 		} catch (WebDriverException wde) {
-			System.err.println("ERROR: Exception trying to obtain driver.getPageSource()");
+			String feedback = "Exception trying to obtain driver.getPageSource()";
+			if (wde.getMessage() != null && !wde.getMessage().isEmpty()) {
+				feedback += ": " + wde.getMessage();
+			}
+			System.err.println("ERROR: " + feedback);
+			return new AndroidPageSourceResult(null, feedback);
 		} catch (ParserConfigurationException | SAXException | IOException doce) {
-			System.err.println("ERROR: Exception parsing Android Driver Page Source to XML Document");
+			String feedback = "Exception parsing Android Driver Page Source to XML Document";
+			if (doce.getMessage() != null && !doce.getMessage().isEmpty()) {
+				feedback += ": " + doce.getMessage();
+			}
+			System.err.println("ERROR: " + feedback);
+			return new AndroidPageSourceResult(null, feedback);
 		} catch (Exception e) {
-			System.err.println("ERROR: Unknown Exception AppiumFramework getAndroidPageSource()");
+			String feedback = "Unknown Exception AppiumFramework getAndroidPageSource()";
+			if (e.getMessage() != null && !e.getMessage().isEmpty()) {
+				feedback += ": " + e.getMessage();
+			}
+			System.err.println("ERROR: " + feedback);
 			e.printStackTrace();
+			return new AndroidPageSourceResult(null, feedback);
 		}
-		return null;
 	}
 
 	private static Document loadXML(String xml) throws ParserConfigurationException, SAXException, IOException {
