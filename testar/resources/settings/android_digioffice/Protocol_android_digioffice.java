@@ -83,6 +83,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
     }
 
     private String XPATH_FILTER_FILE = "/android_digioffice_xpath_filter.txt";
+    private final String digiofficeDomainPackage = "com.digioffice.app";
 
     /**
      * Called once during the life time of TESTAR
@@ -408,7 +409,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
 
         // 1) The super methods implements the implicit online state oracles for
         // suspicious tags (exception, error messages, logcat suspicious messages)
-        addNewVerdicts(verdicts, super.getVerdicts(state));
+        addNewVerdicts(state, verdicts, super.getVerdicts(state));
 
         // 2) If we unexpectedly navigated to the emulator default activity
         // This is executed as second in case the logcat discovers internal crash message
@@ -421,83 +422,83 @@ public class Protocol_android_digioffice extends AndroidProtocol {
 
         // 3) Custom invariant oracle for duplicated elements
         Oracle duplicatedViewGroupOracle = new AndroidDigiOfficeInvariantDuplicatedViewGroup();
-        addNewVerdicts(verdicts, duplicatedViewGroupOracle.getVerdicts(state));
+        addNewVerdicts(state, verdicts, duplicatedViewGroupOracle.getVerdicts(state));
 
         // 4) Header Is Not Empty Not NA
         Oracle headerOracle = new AndroidDigiOfficeHeaderIsNotEmptyNotNA();
-        addNewVerdicts(verdicts, headerOracle.getVerdicts(state));
+        addNewVerdicts(state, verdicts, headerOracle.getVerdicts(state));
 
         // 5) Person Name Is Not Empty Not NA
         Oracle personNameOracle = new AndroidDigiOfficePersonNameIsNotEmptyNotNA();
-        addNewVerdicts(verdicts, personNameOracle.getVerdicts(state));
+        addNewVerdicts(state, verdicts, personNameOracle.getVerdicts(state));
 
         // 6) Company Name Is Not Empty Not NA
         Oracle companyNameOracle = new AndroidDigiOfficeCompanyNameIsNotEmptyNotNA();
-        addNewVerdicts(verdicts, companyNameOracle.getVerdicts(state));
+        addNewVerdicts(state, verdicts, companyNameOracle.getVerdicts(state));
 
         // 7) Widget Is Not Empty
         Oracle widgetIsNotEmptyOracle = new AndroidDigiOfficeWidgetIsNotEmpty();
-        addNewVerdicts(verdicts, widgetIsNotEmptyOracle.getVerdicts(state));
+        addNewVerdicts(state, verdicts, widgetIsNotEmptyOracle.getVerdicts(state));
 
         // 8) Phone Text Is Not Valid
         Oracle phoneOracle = new AndroidDigiOfficePhoneTextIsNotValid();
-        addNewVerdicts(verdicts, phoneOracle.getVerdicts(state));
+        addNewVerdicts(state, verdicts, phoneOracle.getVerdicts(state));
 
         // 9) Mobile Text Is Not Valid
         Oracle mobileOracle = new AndroidDigiOfficeMobileTextIsNotValid();
-        addNewVerdicts(verdicts, mobileOracle.getVerdicts(state));
+        addNewVerdicts(state, verdicts, mobileOracle.getVerdicts(state));
 
         // 10) Email Text Is Not Valid
         Oracle emailOracle = new AndroidDigiOfficeEmailTextIsNotValid();
-        addNewVerdicts(verdicts, emailOracle.getVerdicts(state));
+        addNewVerdicts(state, verdicts, emailOracle.getVerdicts(state));
 
         // 11) Website Text Is Not Valid
         Oracle websiteOracle = new AndroidDigiOfficeWebsiteTextIsNotValid();
-        addNewVerdicts(verdicts, websiteOracle.getVerdicts(state));
+        addNewVerdicts(state, verdicts, websiteOracle.getVerdicts(state));
 
         // 12) Search bar contains clear option
         Oracle searchClearOracle = new AndroidDigiOfficeSearchBarContainsClear();
-        addNewVerdicts(verdicts, searchClearOracle.getVerdicts(state));
+        addNewVerdicts(state, verdicts, searchClearOracle.getVerdicts(state));
 
         // 13) App header is sibling of header logo
         Oracle appHeaderSiblingOracle = new AndroidDigiOfficeAppHeaderIsSiblingOfHeaderLogo();
-        addNewVerdicts(verdicts, appHeaderSiblingOracle.getVerdicts(state));
+        addNewVerdicts(state, verdicts, appHeaderSiblingOracle.getVerdicts(state));
 
         // 14) View header contains a back option
         Oracle viewHeaderBackOptionOracle = new AndroidDigiOfficeViewHeaderContainsBackOption();
-        addNewVerdicts(verdicts, viewHeaderBackOptionOracle.getVerdicts(state));
+        addNewVerdicts(state, verdicts, viewHeaderBackOptionOracle.getVerdicts(state));
 
         // 15) Document attachment, share, and favorite are siblings
         Oracle documentActionSiblingsOracle = new AndroidDigiOfficeDocumentActionButtonsAreSiblings();
-        addNewVerdicts(verdicts, documentActionSiblingsOracle.getVerdicts(state));
+        addNewVerdicts(state, verdicts, documentActionSiblingsOracle.getVerdicts(state));
 
         // 16) Task attachment and share are siblings
         Oracle taskActionSiblingsOracle = new AndroidDigiOfficeTaskActionButtonsAreSiblings();
-        addNewVerdicts(verdicts, taskActionSiblingsOracle.getVerdicts(state));
+        addNewVerdicts(state, verdicts, taskActionSiblingsOracle.getVerdicts(state));
 
         // 17) Document search fields contain a unique clear widget container
         Oracle documentSearchClearContainerOracle = new AndroidDigiOfficeDocumentSearchFieldContainsUniqueClearWidget();
-        addNewVerdicts(verdicts, documentSearchClearContainerOracle.getVerdicts(state));
+        addNewVerdicts(state, verdicts, documentSearchClearContainerOracle.getVerdicts(state));
 
         // 18) Document list filters are siblings of a search field container
         Oracle documentFilterSearchSiblingOracle = new AndroidDigiOfficeDocumentListFilterIsSiblingOfSearchFieldContainer();
-        addNewVerdicts(verdicts, documentFilterSearchSiblingOracle.getVerdicts(state));
+        addNewVerdicts(state, verdicts, documentFilterSearchSiblingOracle.getVerdicts(state));
 
         // 19) Document explorer container contains a close button
         Oracle documentExplorerCloseOracle = new AndroidDigiOfficeDocumentExplorerContainerContainsCloseButton();
-        addNewVerdicts(verdicts, documentExplorerCloseOracle.getVerdicts(state));
+        addNewVerdicts(state, verdicts, documentExplorerCloseOracle.getVerdicts(state));
 
         // 20) Document explorer back option implies search option
         Oracle documentExplorerBackSearchOracle = new AndroidDigiOfficeDocumentExplorerBackRequiresSearchOption();
-        addNewVerdicts(verdicts, documentExplorerBackSearchOracle.getVerdicts(state));
+        addNewVerdicts(state, verdicts, documentExplorerBackSearchOracle.getVerdicts(state));
 
         // 21) Main bottom navigation widgets are siblings
         Oracle mainBottomNavigationOracle = new AndroidDigiOfficeMainBottomNavigationWidgetsAreSiblings();
-        addNewVerdicts(verdicts, mainBottomNavigationOracle.getVerdicts(state));
+        addNewVerdicts(state, verdicts, mainBottomNavigationOracle.getVerdicts(state));
 
         // 22) Documents bottom navigation widgets are siblings
         Oracle documentsBottomNavigationOracle = new AndroidDigiOfficeDocumentsBottomNavigationWidgetsAreSiblings();
-        addNewVerdicts(verdicts, documentsBottomNavigationOracle.getVerdicts(state));
+        addNewVerdicts(state, verdicts, documentsBottomNavigationOracle.getVerdicts(state));
 
         if (verdicts.isEmpty()) {
             return Collections.singletonList(Verdict.OK);
@@ -506,12 +507,24 @@ public class Protocol_android_digioffice extends AndroidProtocol {
         return verdicts;
     }
 
-    private void addNewVerdicts(List<Verdict> verdicts, List<Verdict> candidates) {
+    private void addNewVerdicts(State state, List<Verdict> verdicts, List<Verdict> candidates) {
         if (candidates == null) {
             return;
         }
 
+        boolean inDigiOfficeState = widgetTreePackageMatches(state, digiofficeDomainPackage);
+
         for (Verdict verdict : candidates) {
+            if (verdict == null || verdict.severity() <= Verdict.OK.severity()) {
+                continue;
+            }
+
+            // If we are not in the DigiOffice state, only consider high-severity verdicts
+            // This discards detecting invariants in external states like Google Drive
+            if (!inDigiOfficeState && verdict.severity() < 0.8) {
+                continue;
+            }
+
             if (verdict != null && verdict.severity() > Verdict.OK.severity()) {
                 verdicts.add(verdict);
             }
@@ -623,8 +636,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
         Set<Action> actionsToReturn = super.preSelectAction(system, state, actions);
 
         // If we are not anymore in the DigiOffice state
-        String domainPackage = "com.digioffice.app";
-        if (!widgetTreePackageMatches(state, domainPackage)) {
+        if (!widgetTreePackageMatches(state, digiofficeDomainPackage)) {
 
             if (lastExecutedAction != null && lastExecutedAction.get(Tags.OriginWidget, null) != null) {
                 Widget lastExecutedWidget = lastExecutedAction.get(Tags.OriginWidget);
