@@ -41,7 +41,11 @@ public class AndroidDigiOfficePersonNameIsNotEmptyNotNA implements Oracle {
                 continue;
             }
 
-            String value = w.get(AndroidTags.AndroidAccessibilityId, "");
+            // The value can exist in the accessibility id or in the text content
+            String accessibilityValue = w.get(AndroidTags.AndroidAccessibilityId, "");
+            String textValue = w.get(AndroidTags.AndroidText, "");
+
+            String value = accessibilityValue.isEmpty() ? textValue : accessibilityValue;
 
             if (isInvalidValue(value)) {
                 String verdictMsg = String.format(
