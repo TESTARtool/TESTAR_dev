@@ -173,6 +173,12 @@ public class HtmlReporter implements Reporting
             htmlReportUtil.addContent(htmlStateURL);
         }
 
+        // Add state feedback if exists
+        if(!state.get(Tags.StateFeedback, "").isEmpty()) {
+            String feedback = StringEscapeUtils.escapeHtml(state.get(Tags.StateFeedback, ""));
+            htmlReportUtil.addContent("<p><strong>State Feedback:</strong> " + feedback + "</p>");
+        }
+
         // Add state screenshot
         String altText = "screenshot: state=" + innerLoopCounter + ", ConcreteID=" + concreteID+", AbstractID=" + abstractID;
         htmlReportUtil.addParagraph("<img src=\"" + imagePath + "\" alt=\"" + altText + "\">");
