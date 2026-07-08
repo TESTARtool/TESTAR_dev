@@ -70,6 +70,8 @@ public class AndroidLogcatOracle implements Oracle {
             "^\\d{2}-\\d{2}\\s+\\d{2}:\\d{2}:\\d{2}\\.\\d{3}\\s+\\d+\\s+\\d+\\s+([VDIWEAF])\\s+([^:]+):\\s*(.*)$"
     );
     private static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+");
+    private static final Pattern NORMALIZABLE_NUMBER_PATTERN = Pattern.compile("(?<![A-Za-z])\\d+(?![A-Za-z])");
+    private static final Pattern JAVA_OBJECT_IDENTITY_PATTERN = Pattern.compile("@(?i:[a-f0-9]{6,})");
     private static final Pattern ANDROID_ABSOLUTE_PATH_PATTERN = Pattern.compile(
             "((?:/data/user/\\d+|/data/data|/storage/emulated/\\d+|/sdcard|/mnt/sdcard|/cache|/system|/vendor|/product|/apex)"
                     + "(?:/[^\\s:(),]+)+)"
@@ -211,13 +213,25 @@ public class AndroidLogcatOracle implements Oracle {
         line = line.trim();
         Matcher m = THREADTIME_PATTERN.matcher(line);
         if (!m.matches()) {
-            return normalizeNumbers(normalizeAndroidPaths(line.replaceAll("\\s+", " ")));
+            return normalizeNumbers(normalizeDynamicObjectIdentities(normalizeAndroidPaths(line.replaceAll("\\s+", " "))));
         }
 
         String tag = m.group(2).trim();
-        String msg = normalizeNumbers(normalizeAndroidPaths(m.group(3).trim().replaceAll("\\s+", " ")));
+        String msg = normalizeNumbers(
+                normalizeDynamicObjectIdentities(
+                        normalizeAndroidPaths(m.group(3).trim().replaceAll("\\s+", " "))
+                )
+        );
 
         return tag + ": " + msg;
+    }
+
+    private String normalizeDynamicObjectIdentities(String text) {
+        if (text == null || text.isEmpty()) {
+            return "";
+        }
+
+        return JAVA_OBJECT_IDENTITY_PATTERN.matcher(text).replaceAll("@<id>");
     }
 
     private String normalizeAndroidPaths(String text) {
@@ -339,7 +353,7 @@ public class AndroidLogcatOracle implements Oracle {
         if (text == null || text.isEmpty()) {
             return "";
         }
-        Matcher matcher = NUMBER_PATTERN.matcher(text);
+        Matcher matcher = NORMALIZABLE_NUMBER_PATTERN.matcher(text);
         StringBuffer sb = new StringBuffer();
         while (matcher.find()) {
             String num = matcher.group();

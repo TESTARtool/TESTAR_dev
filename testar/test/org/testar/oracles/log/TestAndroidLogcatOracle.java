@@ -311,6 +311,40 @@ public class TestAndroidLogcatOracle {
         }
     }
 
+    @Test
+    public void generateModeVerdict_NormalizesJavaObjectIdentitySuffixes() {
+        OutputStructure.logsOutputDir = Path.of("target").toString();
+        OutputStructure.startInnerLoopDateString = "YYYY-MM-DD_hh-mm-ss";
+        OutputStructure.executedSUTname = "test-sut";
+
+        Settings settings = buildSettings(RuntimeControlsProtocol.Modes.Generate, "(?i)(.*Integrations.*)");
+        AndroidLogcatOracle androidLogcatOracle = new AndroidLogcatOracle(settings);
+        State state = Mockito.mock(State.class);
+
+        String line1 = "07-06 11:48:55.095 29813 29884 E RNSentry: Native Integrations "
+                + "'[io.sentry.UncaughtExceptionHandlerIntegration@6d8322a, "
+                + "io.sentry.android.replay.ReplayIntegration@5c9d785]'";
+        String line2 = "07-06 11:48:56.095 29813 29884 E RNSentry: Native Integrations "
+                + "'[io.sentry.UncaughtExceptionHandlerIntegration@123abcd, "
+                + "io.sentry.android.replay.ReplayIntegration@8de45f6]'";
+
+        try (MockedStatic<AndroidAppiumFramework> mocked = Mockito.mockStatic(AndroidAppiumFramework.class)) {
+            mocked.when(AndroidAppiumFramework::getAppPackageFromCapabilitiesOrCurrent).thenReturn("org.testar.app");
+            mocked.when(() -> AndroidAppiumFramework.dumpLogcatThreadtimeForPackage("org.testar.app"))
+                    .thenReturn(line1 + "\n" + line2);
+
+            androidLogcatOracle.initialize();
+            List<Verdict> verdicts = androidLogcatOracle.getVerdicts(state);
+            Assert.assertEquals(1, verdicts.size());
+            Verdict verdict = verdicts.get(0);
+
+            String expected = "Suspicious Android logcat line(s) detected "
+                    + "RNSentry: Native Integrations '[io.sentry.UncaughtExceptionHandlerIntegration@<id>, "
+                    + "io.sentry.android.replay.ReplayIntegration@<id>]'";
+            Assert.assertEquals(expected, verdict.info());
+        }
+    }
+
     private Settings buildSettings(RuntimeControlsProtocol.Modes mode, String regex) {
         List<Pair<?, ?>> tags = new ArrayList<>();
         tags.add(Pair.from(ConfigTags.Mode, mode));
