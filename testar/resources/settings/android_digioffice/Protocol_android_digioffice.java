@@ -33,6 +33,7 @@ import org.openqa.selenium.logging.LogEntry;
 import org.testar.managers.InputDataManager;
 import org.testar.settings.Settings;
 
+import android_digioffice.oracles.*;
 import io.appium.java_client.android.nativekey.AndroidKey;
 import io.appium.java_client.android.nativekey.KeyEvent;
 
@@ -85,6 +86,40 @@ public class Protocol_android_digioffice extends AndroidProtocol {
     private String XPATH_FILTER_FILE = "/android_digioffice_xpath_filter.txt";
     private final String digiofficeDomainPackage = "com.digioffice.app";
 
+    // List of active DigiOffice oracles to be applied and tracked during testing
+    private final List<Oracle> digiOfficeOracles = Arrays.asList(
+                new AndroidDigiOfficeInvariantDuplicatedViewGroup(), // duplicated elements in view groups
+                new AndroidDigiOfficeHeaderIsNotEmptyNotNA(), // Header Is Not Empty Not NA
+                new AndroidDigiOfficePersonNameIsNotEmptyNotNA(), // Person Name Is Not Empty Not NA
+                new AndroidDigiOfficeCompanyNameIsNotEmptyNotNA(), // Company Name Is Not Empty Not NA
+                new AndroidDigiOfficeWidgetIsNotEmpty(), // Widget Is Not Empty
+                new AndroidDigiOfficePhoneTextIsNotValid(), // Phone Text Is Not Valid
+                new AndroidDigiOfficeMobileTextIsNotValid(), // Mobile Text Is Not Valid
+                new AndroidDigiOfficeEmailTextIsNotValid(), // Email Text Is Not Valid
+                new AndroidDigiOfficeWebsiteTextIsNotValid(), // Website Text Is Not Valid
+                new AndroidDigiOfficeSearchBarContainsClear(), // Search bar contains clear option
+                new AndroidDigiOfficeAppHeaderIsSiblingOfHeaderLogo(), // App header is sibling of header logo
+                new AndroidDigiOfficeViewHeaderContainsBackOption(), // View header contains a back option
+                new AndroidDigiOfficeDocumentActionButtonsAreSiblings(), // Document attachment and overflow are siblings
+                new AndroidDigiOfficeTaskActionButtonsAreSiblings(), // Task attachment and overflow are siblings
+                new AndroidDigiOfficeDocumentListFilterIsSiblingOfSearchFieldContainer(), // Document list filters are siblings of a search field container
+                new AndroidDigiOfficeDocumentExplorerContainerContainsCloseButton(), // Document explorer container contains a close button
+                new AndroidDigiOfficeDocumentExplorerBackRequiresSearchOption(), // Document explorer back option implies search option
+                new AndroidDigiOfficeMainBottomNavigationWidgetsAreSiblings(), // Main navigation widgets (documents, tasks, contacts, settings) are siblings
+                new AndroidDigiOfficeDocumentsBottomNavigationWidgetsAreSiblings(), // Documents navigation widgets (Preview, Info) are siblings
+                new AndroidDigiOfficeDocumentUploadInfoIsNotEmptyNotNA(), // Document upload info is not empty not NA
+                new AndroidDigiOfficeDocumentUploadInfoIsNotEmptyNotNAAllowDash(), // Document upload info is not empty not NA and allows dash
+                new AndroidDigiOfficeDocumentUploadListItemInfoIsNotEmptyNotNA(), // Document upload list item info is not empty not NA
+                new AndroidDigiOfficeDocumentListItemInfoIsNotEmptyNotNA(), // Document list item info is not empty not NA
+                new AndroidDigiOfficeTaskListItemInfoIsNotEmptyNotNA(), // Task list item info is not empty not NA
+                new AndroidDigiOfficeTaskInfoRowIsNotEmptyNotNA(), // Task info row is not empty not NA
+                new AndroidDigiOfficeTaskInfoRowIsNotEmptyNotNAAllowDash() // Task info row is not empty not NA and allows dash
+        );
+    private final List<AbstractAndroidDigiOfficeOracle> trackedDigiOfficeOracles = digiOfficeOracles.stream()
+            .filter(AbstractAndroidDigiOfficeOracle.class::isInstance)
+            .map(AbstractAndroidDigiOfficeOracle.class::cast)
+            .collect(Collectors.toList());
+
     /**
      * Called once during the life time of TESTAR
      * This method can be used to perform initial setup work
@@ -112,12 +147,22 @@ public class Protocol_android_digioffice extends AndroidProtocol {
 
     @Override
     protected SUT startSystem() throws SystemStartException {
+        SUT system = super.startSystem();
+        if(this.mode().equals(Modes.Spy)) loginDigiOffice(system);
+        return system;
+    }
+
+    @Override
+    protected void beginSequence(SUT system, State state) {
+        super.beginSequence(system, state);
+        if(this.mode().equals(Modes.Generate)) loginDigiOffice(system);
+    }
+
+    private boolean loginDigiOffice(SUT system) {
         if(!checkDigiOfficeEnvironmentVariables()) {
             System.err.println("Skipping DigiOffice login: missing env vars.");
-            return super.startSystem();
+            return false;
         }
-
-        SUT system = super.startSystem();
 
         try {
             // Load the DigiOffice name and URL for the account endpoint
@@ -137,7 +182,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
                 pressEnterToContinueMicrosoftPickAccount(system);
             } else {
                 System.err.println("Invalid Authentication process");
-                return system;
+                return false;
             }
 
             // Finally wait until the DigiOffice state after the login appears
@@ -145,9 +190,11 @@ public class Protocol_android_digioffice extends AndroidProtocol {
         } catch (Exception e) {
             System.err.println("DigiOffice login failed...");
             e.printStackTrace(System.err);
+            return false;
         }
 
-        return system;
+        System.out.println("DigiOffice login completed!");
+        return true;
     }
 
     private boolean checkDigiOfficeEnvironmentVariables() {
@@ -309,20 +356,6 @@ public class Protocol_android_digioffice extends AndroidProtocol {
         }
     }
 
-    /**
-     * This method is invoked each time the TESTAR starts the SUT to generate a new
-     * sequence.
-     * This can be used for example for bypassing a login screen by filling the
-     * username and password
-     * or bringing the system into a specific start state which is identical on each
-     * start (e.g. one has to delete or restore
-     * the SUT's configuration files etc.)
-     */
-    @Override
-    protected void beginSequence(SUT system, State state) {
-        super.beginSequence(system, state);
-    }
-
     private State updateStateModals(State state) {
         Widget modalWidget = state;
 
@@ -420,113 +453,9 @@ public class Protocol_android_digioffice extends AndroidProtocol {
             return verdicts;
         }
 
-        // 3) Custom invariant oracle for duplicated elements
-        Oracle duplicatedViewGroupOracle = new AndroidDigiOfficeInvariantDuplicatedViewGroup();
-        addNewVerdicts(state, verdicts, duplicatedViewGroupOracle.getVerdicts(state));
-
-        // 4) Header Is Not Empty Not NA
-        Oracle headerOracle = new AndroidDigiOfficeHeaderIsNotEmptyNotNA();
-        addNewVerdicts(state, verdicts, headerOracle.getVerdicts(state));
-
-        // 5) Person Name Is Not Empty Not NA
-        Oracle personNameOracle = new AndroidDigiOfficePersonNameIsNotEmptyNotNA();
-        addNewVerdicts(state, verdicts, personNameOracle.getVerdicts(state));
-
-        // 6) Company Name Is Not Empty Not NA
-        Oracle companyNameOracle = new AndroidDigiOfficeCompanyNameIsNotEmptyNotNA();
-        addNewVerdicts(state, verdicts, companyNameOracle.getVerdicts(state));
-
-        // 7) Widget Is Not Empty
-        Oracle widgetIsNotEmptyOracle = new AndroidDigiOfficeWidgetIsNotEmpty();
-        addNewVerdicts(state, verdicts, widgetIsNotEmptyOracle.getVerdicts(state));
-
-        // 8) Phone Text Is Not Valid
-        Oracle phoneOracle = new AndroidDigiOfficePhoneTextIsNotValid();
-        addNewVerdicts(state, verdicts, phoneOracle.getVerdicts(state));
-
-        // 9) Mobile Text Is Not Valid
-        Oracle mobileOracle = new AndroidDigiOfficeMobileTextIsNotValid();
-        addNewVerdicts(state, verdicts, mobileOracle.getVerdicts(state));
-
-        // 10) Email Text Is Not Valid
-        Oracle emailOracle = new AndroidDigiOfficeEmailTextIsNotValid();
-        addNewVerdicts(state, verdicts, emailOracle.getVerdicts(state));
-
-        // 11) Website Text Is Not Valid
-        Oracle websiteOracle = new AndroidDigiOfficeWebsiteTextIsNotValid();
-        addNewVerdicts(state, verdicts, websiteOracle.getVerdicts(state));
-
-        // 12) Search bar contains clear option
-        Oracle searchClearOracle = new AndroidDigiOfficeSearchBarContainsClear();
-        addNewVerdicts(state, verdicts, searchClearOracle.getVerdicts(state));
-
-        // 13) App header is sibling of header logo
-        Oracle appHeaderSiblingOracle = new AndroidDigiOfficeAppHeaderIsSiblingOfHeaderLogo();
-        addNewVerdicts(state, verdicts, appHeaderSiblingOracle.getVerdicts(state));
-
-        // 14) View header contains a back option
-        Oracle viewHeaderBackOptionOracle = new AndroidDigiOfficeViewHeaderContainsBackOption();
-        addNewVerdicts(state, verdicts, viewHeaderBackOptionOracle.getVerdicts(state));
-
-        // 15) Document attachment, share, and favorite are siblings
-        Oracle documentActionSiblingsOracle = new AndroidDigiOfficeDocumentActionButtonsAreSiblings();
-        addNewVerdicts(state, verdicts, documentActionSiblingsOracle.getVerdicts(state));
-
-        // 16) Task attachment and share are siblings
-        Oracle taskActionSiblingsOracle = new AndroidDigiOfficeTaskActionButtonsAreSiblings();
-        addNewVerdicts(state, verdicts, taskActionSiblingsOracle.getVerdicts(state));
-
-        // 17) Document search fields contain a unique clear widget container
-        Oracle documentSearchClearContainerOracle = new AndroidDigiOfficeDocumentSearchFieldContainsUniqueClearWidget();
-        addNewVerdicts(state, verdicts, documentSearchClearContainerOracle.getVerdicts(state));
-
-        // 18) Document list filters are siblings of a search field container
-        Oracle documentFilterSearchSiblingOracle = new AndroidDigiOfficeDocumentListFilterIsSiblingOfSearchFieldContainer();
-        addNewVerdicts(state, verdicts, documentFilterSearchSiblingOracle.getVerdicts(state));
-
-        // 19) Document explorer container contains a close button
-        Oracle documentExplorerCloseOracle = new AndroidDigiOfficeDocumentExplorerContainerContainsCloseButton();
-        addNewVerdicts(state, verdicts, documentExplorerCloseOracle.getVerdicts(state));
-
-        // 20) Document explorer back option implies search option
-        Oracle documentExplorerBackSearchOracle = new AndroidDigiOfficeDocumentExplorerBackRequiresSearchOption();
-        addNewVerdicts(state, verdicts, documentExplorerBackSearchOracle.getVerdicts(state));
-
-        // 21) Main bottom navigation widgets are siblings
-        Oracle mainBottomNavigationOracle = new AndroidDigiOfficeMainBottomNavigationWidgetsAreSiblings();
-        addNewVerdicts(state, verdicts, mainBottomNavigationOracle.getVerdicts(state));
-
-        // 22) Documents bottom navigation widgets are siblings
-        Oracle documentsBottomNavigationOracle = new AndroidDigiOfficeDocumentsBottomNavigationWidgetsAreSiblings();
-        addNewVerdicts(state, verdicts, documentsBottomNavigationOracle.getVerdicts(state));
-
-        // 23) Document upload info is not empty not NA
-        Oracle documentUploadInfoOracle = new AndroidDigiOfficeDocumentUploadInfoIsNotEmptyNotNA();
-        addNewVerdicts(state, verdicts, documentUploadInfoOracle.getVerdicts(state));
-
-        // 24) Document upload info is not empty not NA and allows dash
-        Oracle documentUploadInfoAllowDashOracle = new AndroidDigiOfficeDocumentUploadInfoIsNotEmptyNotNAAllowDash();
-        addNewVerdicts(state, verdicts, documentUploadInfoAllowDashOracle.getVerdicts(state));
-
-        // 25) Document upload list item info is not empty not NA
-        Oracle documentUploadListItemInfoOracle = new AndroidDigiOfficeDocumentUploadListItemInfoIsNotEmptyNotNA();
-        addNewVerdicts(state, verdicts, documentUploadListItemInfoOracle.getVerdicts(state));
-
-        // 26) Document list item info is not empty not NA
-        Oracle documentListItemInfoOracle = new AndroidDigiOfficeDocumentListItemInfoIsNotEmptyNotNA();
-        addNewVerdicts(state, verdicts, documentListItemInfoOracle.getVerdicts(state));
-
-        // 27) Task list item info is not empty not NA
-        Oracle taskListItemInfoOracle = new AndroidDigiOfficeTaskListItemInfoIsNotEmptyNotNA();
-        addNewVerdicts(state, verdicts, taskListItemInfoOracle.getVerdicts(state));
-
-        // 28) Task info row is not empty not NA
-        Oracle taskInfoRowOracle = new AndroidDigiOfficeTaskInfoRowIsNotEmptyNotNA();
-        addNewVerdicts(state, verdicts, taskInfoRowOracle.getVerdicts(state));
-
-        // 29) Task info row is not empty not NA and allows dash
-        Oracle taskInfoRowAllowDashOracle = new AndroidDigiOfficeTaskInfoRowIsNotEmptyNotNAAllowDash();
-        addNewVerdicts(state, verdicts, taskInfoRowAllowDashOracle.getVerdicts(state));
+        for (Oracle oracle : digiOfficeOracles) {
+            addNewVerdicts(state, verdicts, oracle.getVerdicts(state));
+        }
 
         if (verdicts.isEmpty()) {
             return Collections.singletonList(Verdict.OK);
@@ -550,6 +479,11 @@ public class Protocol_android_digioffice extends AndroidProtocol {
             // If we are not in the DigiOffice state, only consider high-severity verdicts
             // This discards detecting invariants in external states like Google Drive
             if (!inDigiOfficeState && verdict.severity() < 0.8) {
+                String ignoreMsg = "TESTAR is not in the DigiOffice package domain, ignoring verdict: " + verdict.info() + System.lineSeparator();
+                System.out.print(ignoreMsg);
+                String feedback = state.get(Tags.StateFeedback, "");
+                feedback += ignoreMsg;
+                state.set(Tags.StateFeedback, feedback);
                 continue;
             }
 
@@ -601,8 +535,9 @@ public class Protocol_android_digioffice extends AndroidProtocol {
 
             // type into text boxes
             if (isTypeable(widget)) {
-                String randomInput = InputDataManager.getRandomTextInputData(widget);
-                actions.add(new AndroidActionType(state, widget, randomInput));
+                //String randomInput = InputDataManager.getRandomTextInputData(widget);
+                String customInput = InputDataManager.getRandomTextFromCustomInputDataFile(System.getProperty("user.dir") + "/settings/custom_input_data.txt");
+                actions.add(new AndroidActionType(state, widget, customInput));
             }
 
             // left clicks
@@ -723,5 +658,22 @@ public class Protocol_android_digioffice extends AndroidProtocol {
     @Override
     protected void finishSequence() {
         super.finishSequence();
+    }
+
+	/**
+	 * This method is called after the last sequence, 
+     * to allow for example handling the reporting of the session
+	 */
+	@Override
+	protected void closeTestSession() {
+        printTrackedOracleSummary();
+		super.closeTestSession();
+	}
+
+    private void printTrackedOracleSummary() {
+        System.out.println("DigiOffice tracked oracle summary:");
+        for (AbstractAndroidDigiOfficeOracle oracle : trackedDigiOfficeOracles) {
+            System.out.println(oracle.getSummaryLine());
+        }
     }
 }

@@ -1,26 +1,36 @@
+package android_digioffice.oracles;
+
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
-import org.testar.oracles.Oracle;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class AndroidDigiOfficeDocumentsBottomNavigationWidgetsAreSiblings implements Oracle {
+public class AndroidDigiOfficeDocumentsBottomNavigationWidgetsAreSiblings extends AbstractAndroidDigiOfficeOracle {
 
-    private static final String VIEW_CLASS_NAME = "View";
-    private static final List<String> REQUIRED_ACCESSIBILITY_IDS = Arrays.asList(
+    private static final String VIEW_CLASS_NAME = "android.view.View";
+    private static final List<String> REQUIRED_ACCESSIBILITY_IDS = List.of(
             "Preview",
-            "Comments",
             "Info");
 
-    @Override
-    public void initialize() {
+    public AndroidDigiOfficeDocumentsBottomNavigationWidgetsAreSiblings() {
+        super("AndroidDigiOfficeDocumentsBottomNavigationWidgetsAreSiblings");
     }
 
     @Override
-    public List<Verdict> getVerdicts(State state) {
+    protected boolean isApplicable(State state) {
+        for (Widget widget : state) {
+            if (isExactViewAccessibilityWidget(widget, "Preview")) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    protected List<Verdict> check(State state) {
         List<Verdict> verdicts = new ArrayList<>();
 
         for (Widget widget : state) {
@@ -82,11 +92,7 @@ public class AndroidDigiOfficeDocumentsBottomNavigationWidgetsAreSiblings implem
             }
 
             String accessibilityId = sibling.get(AndroidTags.AndroidAccessibilityId, "");
-            if ("Comments".equals(expectedAccessibilityId)) {
-                if (accessibilityId.contains(expectedAccessibilityId)) {
-                    return true;
-                }
-            } else if (expectedAccessibilityId.equals(accessibilityId)) {
+            if (expectedAccessibilityId.equals(accessibilityId)) {
                 return true;
             }
         }

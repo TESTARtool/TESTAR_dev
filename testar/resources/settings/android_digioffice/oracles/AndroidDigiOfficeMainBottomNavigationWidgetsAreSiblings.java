@@ -1,27 +1,39 @@
+package android_digioffice.oracles;
+
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
-import org.testar.oracles.Oracle;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class AndroidDigiOfficeMainBottomNavigationWidgetsAreSiblings implements Oracle {
+public class AndroidDigiOfficeMainBottomNavigationWidgetsAreSiblings extends AbstractAndroidDigiOfficeOracle {
 
-    private static final String VIEW_CLASS_NAME = "View";
+    private static final String VIEW_CLASS_NAME = "android.view.View";
     private static final List<String> REQUIRED_ACCESSIBILITY_IDS = Arrays.asList(
             "Documents",
             "Tasks",
             "Contacts",
             "Settings");
 
-    @Override
-    public void initialize() {
+    public AndroidDigiOfficeMainBottomNavigationWidgetsAreSiblings() {
+        super("AndroidDigiOfficeMainBottomNavigationWidgetsAreSiblings");
     }
 
     @Override
-    public List<Verdict> getVerdicts(State state) {
+    protected boolean isApplicable(State state) {
+        for (Widget widget : state) {
+            if (isExactViewAccessibilityWidget(widget, "Documents")) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    protected List<Verdict> check(State state) {
         List<Verdict> verdicts = new ArrayList<>();
 
         for (Widget widget : state) {
@@ -29,7 +41,7 @@ public class AndroidDigiOfficeMainBottomNavigationWidgetsAreSiblings implements 
                 continue;
             }
 
-            if (!hasAllSiblingAccessibilityIds(widget, REQUIRED_ACCESSIBILITY_IDS, false)) {
+            if (!hasAllSiblingAccessibilityIds(widget, REQUIRED_ACCESSIBILITY_IDS)) {
                 String verdictMsg = String.format(
                         "Detected main bottom navigation without required sibling widgets %s",
                         widget.get(AndroidTags.AndroidXpath, ""));
@@ -55,13 +67,13 @@ public class AndroidDigiOfficeMainBottomNavigationWidgetsAreSiblings implements 
         return verdicts;
     }
 
-    private boolean hasAllSiblingAccessibilityIds(Widget widget, List<String> accessibilityIds, boolean commentsContains) {
+    private boolean hasAllSiblingAccessibilityIds(Widget widget, List<String> accessibilityIds) {
         if (widget.parent() == null) {
             return false;
         }
 
         for (String accessibilityId : accessibilityIds) {
-            if (!hasSiblingWithAccessibilityId(widget, accessibilityId, commentsContains)) {
+            if (!hasSiblingWithAccessibilityId(widget, accessibilityId)) {
                 return false;
             }
         }
@@ -69,7 +81,7 @@ public class AndroidDigiOfficeMainBottomNavigationWidgetsAreSiblings implements 
         return true;
     }
 
-    private boolean hasSiblingWithAccessibilityId(Widget widget, String expectedAccessibilityId, boolean commentsContains) {
+    private boolean hasSiblingWithAccessibilityId(Widget widget, String expectedAccessibilityId) {
         Widget parent = widget.parent();
         for (int i = 0; i < parent.childCount(); i++) {
             Widget sibling = parent.child(i);
@@ -83,11 +95,7 @@ public class AndroidDigiOfficeMainBottomNavigationWidgetsAreSiblings implements 
             }
 
             String accessibilityId = sibling.get(AndroidTags.AndroidAccessibilityId, "");
-            if (commentsContains && "Comments".equals(expectedAccessibilityId)) {
-                if (accessibilityId.contains(expectedAccessibilityId)) {
-                    return true;
-                }
-            } else if (expectedAccessibilityId.equals(accessibilityId)) {
+            if (expectedAccessibilityId.equals(accessibilityId)) {
                 return true;
             }
         }

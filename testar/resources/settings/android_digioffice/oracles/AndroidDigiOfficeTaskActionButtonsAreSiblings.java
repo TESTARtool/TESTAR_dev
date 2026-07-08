@@ -1,32 +1,48 @@
+package android_digioffice.oracles;
+
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
-import org.testar.oracles.Oracle;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class AndroidDigiOfficeTaskActionButtonsAreSiblings implements Oracle {
+public class AndroidDigiOfficeTaskActionButtonsAreSiblings extends AbstractAndroidDigiOfficeOracle {
 
     private static final String TASK_ATTACHMENTS_MENU_RESOURCE_ID = "task-attachments-menu";
-    private static final String TASK_SHARE_BUTTON_RESOURCE_ID = "task-share-button";
+    private static final String TASK_TABS_OVERFLOW_BUTTON_RESOURCE_ID = "task-tabs-overflow-button";
 
-    @Override
-    public void initialize() {
+    public AndroidDigiOfficeTaskActionButtonsAreSiblings() {
+        super("AndroidDigiOfficeTaskActionButtonsAreSiblings");
+    }
+
+    private boolean isTaskAttachmentsMenuWidget(Widget widget) {
+        String resourceId = widget.get(AndroidTags.AndroidResourceId, "");
+        return TASK_ATTACHMENTS_MENU_RESOURCE_ID.equals(resourceId);
     }
 
     @Override
-    public List<Verdict> getVerdicts(State state) {
+    protected boolean isApplicable(State state) {
+        for (Widget widget : state) {
+            if (isTaskAttachmentsMenuWidget(widget)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    protected List<Verdict> check(State state) {
         List<Verdict> verdicts = new ArrayList<>();
 
         for (Widget widget : state) {
-            String resourceId = widget.get(AndroidTags.AndroidResourceId, "");
-
-            if (!TASK_ATTACHMENTS_MENU_RESOURCE_ID.equals(resourceId)) {
+            if (!isTaskAttachmentsMenuWidget(widget)) {
                 continue;
             }
 
-            if (!hasSiblingWithResourceId(widget, TASK_SHARE_BUTTON_RESOURCE_ID)) {
+            String resourceId = widget.get(AndroidTags.AndroidResourceId, "");
+            if (!hasSiblingWithResourceId(widget, TASK_TABS_OVERFLOW_BUTTON_RESOURCE_ID)) {
                 String verdictMsg = String.format(
                         "Detected task attachments menu without share button sibling (resId=%s) %s",
                         resourceId,

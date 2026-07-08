@@ -1,12 +1,13 @@
+package android_digioffice.oracles;
+
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
-import org.testar.oracles.Oracle;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class AndroidDigiOfficeSearchBarContainsClear implements Oracle {
+public class AndroidDigiOfficeSearchBarContainsClear extends AbstractAndroidDigiOfficeOracle {
 
     private static final java.util.regex.Pattern SEARCH_WIDGET_ID_PATTERN = java.util.regex.Pattern
             .compile(".*list-search$");
@@ -14,25 +15,40 @@ public class AndroidDigiOfficeSearchBarContainsClear implements Oracle {
     private static final java.util.regex.Pattern CLEAR_WIDGET_ID_PATTERN = java.util.regex.Pattern
             .compile(".*list-clear.*");
 
-    @Override
-    public void initialize() {
+    public AndroidDigiOfficeSearchBarContainsClear() {
+        super("AndroidDigiOfficeSearchBarContainsClear");
+    }
+
+    private boolean isSearchWidget(Widget widget) {
+        String resourceId = widget.get(AndroidTags.AndroidResourceId, "");
+        return SEARCH_WIDGET_ID_PATTERN.matcher(resourceId).matches();
     }
 
     @Override
-    public List<Verdict> getVerdicts(State state) {
+    protected boolean isApplicable(State state) {
+        for (Widget w : state) {
+            if (isSearchWidget(w)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    protected List<Verdict> check(State state) {
         List<Verdict> verdicts = new ArrayList<>();
 
         for (Widget w : state) {
-            String resId = w.get(AndroidTags.AndroidResourceId, "");
-
-            if (!SEARCH_WIDGET_ID_PATTERN.matcher(resId).matches()) {
+            if (!isSearchWidget(w)) {
                 continue;
             }
 
+            String resourceId = w.get(AndroidTags.AndroidResourceId, "");
             if (!containsClearRecursive(w, CLEAR_WIDGET_ID_PATTERN)) {
                 String verdictMsg = String.format(
                         "Detected Search element without clear option (resId=%s) %s",
-                        resId,
+                        resourceId,
                         w.get(AndroidTags.AndroidXpath, ""));
 
                 Visualizer visualizer = new RegionsVisualizer(

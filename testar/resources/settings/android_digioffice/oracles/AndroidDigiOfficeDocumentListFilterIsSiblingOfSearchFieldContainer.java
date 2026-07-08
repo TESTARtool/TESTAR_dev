@@ -1,35 +1,51 @@
+package android_digioffice.oracles;
+
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
-import org.testar.oracles.Oracle;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class AndroidDigiOfficeDocumentSearchFieldContainsUniqueClearWidget implements Oracle {
+public class AndroidDigiOfficeDocumentListFilterIsSiblingOfSearchFieldContainer extends AbstractAndroidDigiOfficeOracle {
 
+    private static final String DOCUMENT_LIST_FILTER_RESOURCE_ID = "dms-document-list-list-filter-open";
     private static final String DOCUMENT_SEARCH_INPUT_RESOURCE_ID = "dms-document-list-list-search-input";
-    private static final String DOCUMENT_CLEAR_RESOURCE_ID = "dms-document-list-list-clear";
     private static final String VIEW_GROUP_CLASS_NAME = "ViewGroup";
 
-    @Override
-    public void initialize() {
+    public AndroidDigiOfficeDocumentListFilterIsSiblingOfSearchFieldContainer() {
+        super("AndroidDigiOfficeDocumentListFilterIsSiblingOfSearchFieldContainer");
+    }
+
+    private boolean isDocumentListFilterWidget(Widget widget) {
+        String resourceId = widget.get(AndroidTags.AndroidResourceId, "");
+        return DOCUMENT_LIST_FILTER_RESOURCE_ID.equals(resourceId);
     }
 
     @Override
-    public List<Verdict> getVerdicts(State state) {
+    protected boolean isApplicable(State state) {
+        for (Widget widget : state) {
+            if (isDocumentListFilterWidget(widget)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    protected List<Verdict> check(State state) {
         List<Verdict> verdicts = new ArrayList<>();
 
         for (Widget widget : state) {
-            String resourceId = widget.get(AndroidTags.AndroidResourceId, "");
-
-            if (!DOCUMENT_SEARCH_INPUT_RESOURCE_ID.equals(resourceId)) {
+            if (!isDocumentListFilterWidget(widget)) {
                 continue;
             }
 
-            if (!hasUniqueClearWidgetContainerSibling(widget)) {
+            String resourceId = widget.get(AndroidTags.AndroidResourceId, "");
+            if (!hasSearchFieldContainerSibling(widget)) {
                 String verdictMsg = String.format(
-                        "Detected document search input without unique clear widget container sibling (resId=%s) %s",
+                        "Detected document list filter without search field container sibling (resId=%s) %s",
                         resourceId,
                         widget.get(AndroidTags.AndroidXpath, ""));
 
@@ -39,11 +55,11 @@ public class AndroidDigiOfficeDocumentSearchFieldContainsUniqueClearWidget imple
                         "Invariant Fault",
                         0.5, 0.5);
 
-                Verdict documentSearchClearContainerVerdict = new Verdict(
+                Verdict documentFilterSearchSiblingVerdict = new Verdict(
                         Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT,
                         verdictMsg,
                         visualizer);
-                verdicts.add(documentSearchClearContainerVerdict);
+                verdicts.add(documentFilterSearchSiblingVerdict);
             }
         }
 
@@ -54,12 +70,11 @@ public class AndroidDigiOfficeDocumentSearchFieldContainsUniqueClearWidget imple
         return verdicts;
     }
 
-    private boolean hasUniqueClearWidgetContainerSibling(Widget widget) {
+    private boolean hasSearchFieldContainerSibling(Widget widget) {
         if (widget.parent() == null) {
             return false;
         }
 
-        int matchingSiblings = 0;
         Widget parent = widget.parent();
         for (int i = 0; i < parent.childCount(); i++) {
             Widget sibling = parent.child(i);
@@ -72,12 +87,12 @@ public class AndroidDigiOfficeDocumentSearchFieldContainsUniqueClearWidget imple
                 continue;
             }
 
-            if (containsResourceIdRecursive(sibling, DOCUMENT_CLEAR_RESOURCE_ID)) {
-                matchingSiblings++;
+            if (containsResourceIdRecursive(sibling, DOCUMENT_SEARCH_INPUT_RESOURCE_ID)) {
+                return true;
             }
         }
 
-        return matchingSiblings == 1;
+        return false;
     }
 
     private boolean isViewGroup(Widget widget) {

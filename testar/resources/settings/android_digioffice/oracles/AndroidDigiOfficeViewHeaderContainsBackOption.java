@@ -1,12 +1,13 @@
+package android_digioffice.oracles;
+
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
-import org.testar.oracles.Oracle;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class AndroidDigiOfficeViewHeaderContainsBackOption implements Oracle {
+public class AndroidDigiOfficeViewHeaderContainsBackOption extends AbstractAndroidDigiOfficeOracle {
 
     private static final String HEADER_TITLE_RESOURCE_ID = "header-title";
     private static final String APP_HEADER_RESOURCE_ID = "app-header";
@@ -14,26 +15,38 @@ public class AndroidDigiOfficeViewHeaderContainsBackOption implements Oracle {
     private static final String GO_BACK_ACCESSIBILITY_ID = "Go back";
     private static final String NAVIGATE_UP_ACCESSIBILITY_ID = "Navigate up";
 
-    @Override
-    public void initialize() {
+    public AndroidDigiOfficeViewHeaderContainsBackOption() {
+        super("AndroidDigiOfficeViewHeaderContainsBackOption");
+    }
+
+    private boolean isRelevantHeaderTitleWidget(Widget widget) {
+        String resourceId = widget.get(AndroidTags.AndroidResourceId, "");
+        return HEADER_TITLE_RESOURCE_ID.equals(resourceId)
+                // The main view with app-header is ignored
+                && !ignoreIfSiblingWithResourceId(widget, APP_HEADER_RESOURCE_ID);
     }
 
     @Override
-    public List<Verdict> getVerdicts(State state) {
+    protected boolean isApplicable(State state) {
+        for (Widget widget : state) {
+            if (isRelevantHeaderTitleWidget(widget)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    protected List<Verdict> check(State state) {
         List<Verdict> verdicts = new ArrayList<>();
 
         for (Widget widget : state) {
+            if (!isRelevantHeaderTitleWidget(widget)) {
+                continue;
+            }
+
             String resourceId = widget.get(AndroidTags.AndroidResourceId, "");
-
-            if (!HEADER_TITLE_RESOURCE_ID.equals(resourceId)) {
-                continue;
-            }
-
-            // The main view with app-header is ignored
-            if (ignoreIfSiblingWithResourceId(widget, APP_HEADER_RESOURCE_ID)) {
-                continue;
-            }
-
             // Other views must contain some possible back option
             if (!hasBackOptionSibling(widget)) {
                 String verdictMsg = String.format(

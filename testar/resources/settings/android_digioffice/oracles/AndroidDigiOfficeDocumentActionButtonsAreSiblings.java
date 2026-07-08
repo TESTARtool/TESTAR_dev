@@ -1,34 +1,50 @@
+package android_digioffice.oracles;
+
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
-import org.testar.oracles.Oracle;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class AndroidDigiOfficeAppHeaderIsSiblingOfHeaderLogo implements Oracle {
+public class AndroidDigiOfficeDocumentActionButtonsAreSiblings extends AbstractAndroidDigiOfficeOracle {
 
-    private static final String APP_HEADER_RESOURCE_ID = "app-header";
-    private static final String HEADER_LOGO_RESOURCE_ID = "header-logo";
+    private static final String DOCUMENT_ATTACHMENTS_MENU_RESOURCE_ID = "document-attachments-menu";
+    private static final String DOCUMENT_TABS_OVERFLOW_BUTTON_RESOURCE_ID = "document-tabs-overflow-button";
 
-    @Override
-    public void initialize() {
+    public AndroidDigiOfficeDocumentActionButtonsAreSiblings() {
+        super("AndroidDigiOfficeDocumentActionButtonsAreSiblings");
+    }
+
+    private boolean isDocumentAttachmentsMenuWidget(Widget widget) {
+        String resourceId = widget.get(AndroidTags.AndroidResourceId, "");
+        return DOCUMENT_ATTACHMENTS_MENU_RESOURCE_ID.equals(resourceId);
     }
 
     @Override
-    public List<Verdict> getVerdicts(State state) {
+    protected boolean isApplicable(State state) {
+        for (Widget widget : state) {
+            if (isDocumentAttachmentsMenuWidget(widget)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    protected List<Verdict> check(State state) {
         List<Verdict> verdicts = new ArrayList<>();
 
         for (Widget widget : state) {
-            String resourceId = widget.get(AndroidTags.AndroidResourceId, "");
-
-            if (!APP_HEADER_RESOURCE_ID.equals(resourceId)) {
+            if (!isDocumentAttachmentsMenuWidget(widget)) {
                 continue;
             }
 
-            if (!hasSiblingWithResourceId(widget, HEADER_LOGO_RESOURCE_ID)) {
+            String resourceId = widget.get(AndroidTags.AndroidResourceId, "");
+            if (!hasSiblingWithResourceId(widget, DOCUMENT_TABS_OVERFLOW_BUTTON_RESOURCE_ID)) {
                 String verdictMsg = String.format(
-                        "Detected app header without header logo sibling (resId=%s) %s",
+                        "Detected document attachments menu without required sibling buttons (resId=%s) %s",
                         resourceId,
                         widget.get(AndroidTags.AndroidXpath, ""));
 
@@ -38,11 +54,11 @@ public class AndroidDigiOfficeAppHeaderIsSiblingOfHeaderLogo implements Oracle {
                         "Invariant Fault",
                         0.5, 0.5);
 
-                Verdict appHeaderSiblingVerdict = new Verdict(
+                Verdict documentActionSiblingsVerdict = new Verdict(
                         Verdict.Severity.WARNING_UI_ITEM_WRONG_VALUE_FAULT,
                         verdictMsg,
                         visualizer);
-                verdicts.add(appHeaderSiblingVerdict);
+                verdicts.add(documentActionSiblingsVerdict);
             }
         }
 

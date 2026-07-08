@@ -1,13 +1,14 @@
+package android_digioffice.oracles;
+
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
-import org.testar.oracles.Oracle;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class AndroidDigiOfficeDocumentUploadInfoIsNotEmptyNotNAAllowDash implements Oracle {
+public class AndroidDigiOfficeDocumentUploadInfoIsNotEmptyNotNAAllowDash extends AbstractAndroidDigiOfficeOracle {
 
     private static final java.util.regex.Pattern DOCUMENT_UPLOAD_INFO_WIDGET_ID_PATTERN = java.util.regex.Pattern
             .compile(".*dms-documentUpload-info-(description|notes)-body.*");
@@ -23,21 +24,36 @@ public class AndroidDigiOfficeDocumentUploadInfoIsNotEmptyNotNAAllowDash impleme
                 || upperValue.contains("N\\A");
     }
 
-    @Override
-    public void initialize() {
+    public AndroidDigiOfficeDocumentUploadInfoIsNotEmptyNotNAAllowDash() {
+        super("AndroidDigiOfficeDocumentUploadInfoIsNotEmptyNotNAAllowDash");
+    }
+
+    private boolean isDocumentUploadInfoWidget(Widget widget) {
+        String resourceId = widget.get(AndroidTags.AndroidResourceId, "");
+        return DOCUMENT_UPLOAD_INFO_WIDGET_ID_PATTERN.matcher(resourceId).matches();
     }
 
     @Override
-    public List<Verdict> getVerdicts(State state) {
+    protected boolean isApplicable(State state) {
+        for (Widget w : state) {
+            if (isDocumentUploadInfoWidget(w)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    protected List<Verdict> check(State state) {
         List<Verdict> verdicts = new ArrayList<>();
 
         for (Widget w : state) {
-            String resId = w.get(AndroidTags.AndroidResourceId, "");
-
-            if (!DOCUMENT_UPLOAD_INFO_WIDGET_ID_PATTERN.matcher(resId).matches()) {
+            if (!isDocumentUploadInfoWidget(w)) {
                 continue;
             }
 
+            String resourceId = w.get(AndroidTags.AndroidResourceId, "");
             // The value can exist in the accessibility id or in the text content.
             String accessibilityValue = w.get(AndroidTags.AndroidAccessibilityId, "");
             String textValue = w.get(AndroidTags.AndroidText, "");
@@ -47,7 +63,7 @@ public class AndroidDigiOfficeDocumentUploadInfoIsNotEmptyNotNAAllowDash impleme
             if (isInvalidValue(value)) {
                 String verdictMsg = String.format(
                         "Detected document upload info with invalid content allowing dash (resId=%s, value='%s') %s",
-                        resId, value, w.get(AndroidTags.AndroidXpath));
+                        resourceId, value, w.get(AndroidTags.AndroidXpath));
 
                 Visualizer visualizer = new RegionsVisualizer(
                         getRedPen(),

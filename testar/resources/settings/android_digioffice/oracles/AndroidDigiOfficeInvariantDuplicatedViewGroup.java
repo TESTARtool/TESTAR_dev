@@ -1,6 +1,7 @@
+package android_digioffice.oracles;
+
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
-import org.testar.oracles.Oracle;
 import org.testar.monkey.alayer.android.enums.AndroidRoles;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 import java.util.ArrayList;
@@ -11,24 +12,39 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class AndroidDigiOfficeInvariantDuplicatedViewGroup implements Oracle {
+public class AndroidDigiOfficeInvariantDuplicatedViewGroup extends AbstractAndroidDigiOfficeOracle {
 
-    @Override
-    public void initialize() {
+    public AndroidDigiOfficeInvariantDuplicatedViewGroup() {
+        super("AndroidDigiOfficeInvariantDuplicatedViewGroup");
+    }
+
+    private boolean isCandidateViewGroup(Widget widget) {
+        return widget.get(Tags.Role, Roles.Widget).equals(AndroidRoles.AndroidViewGroup)
+                && !widget.get(AndroidTags.AndroidAccessibilityId, "").isEmpty()
+                && widget.get(AndroidTags.AndroidClickable, false)
+                && widget.parent() != null;
     }
 
     @Override
-    public List<Verdict> getVerdicts(State state) {
+    protected boolean isApplicable(State state) {
+        for (Widget w : state) {
+            if (isCandidateViewGroup(w)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    protected List<Verdict> check(State state) {
         List<Verdict> verdicts = new ArrayList<>();
 
         // 1) Join clickable AndroidViewGroup with non-empty accessibility id and a
         // parent
         List<Widget> viewGroupList = new ArrayList<>();
         for (Widget w : state) {
-            if (w.get(Tags.Role, Roles.Widget).equals(AndroidRoles.AndroidViewGroup)
-                    && !w.get(AndroidTags.AndroidAccessibilityId, "").isEmpty()
-                    && w.get(AndroidTags.AndroidClickable, false)
-                    && w.parent() != null) {
+            if (isCandidateViewGroup(w)) {
                 viewGroupList.add(w);
             }
         }

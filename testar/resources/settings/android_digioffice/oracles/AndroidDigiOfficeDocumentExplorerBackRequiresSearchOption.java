@@ -1,33 +1,50 @@
+package android_digioffice.oracles;
+
 import org.testar.monkey.alayer.*;
 import org.testar.monkey.alayer.visualizers.RegionsVisualizer;
-import org.testar.oracles.Oracle;
 import org.testar.monkey.alayer.android.enums.AndroidTags;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class AndroidDigiOfficeDocumentExplorerBackRequiresSearchOption implements Oracle {
+public class AndroidDigiOfficeDocumentExplorerBackRequiresSearchOption extends AbstractAndroidDigiOfficeOracle {
 
     private static final String DOCUMENT_EXPLORER_CONTAINER_RESOURCE_ID = "dms-document-list-list-explorer-container";
     private static final String DOCUMENT_EXPLORER_BACK_RESOURCE_ID = "dms-document-list-list-explorer-header-back";
     private static final String DOCUMENT_EXPLORER_SEARCH_RESOURCE_ID = "dms-document-list-list-explorer-content-search";
-    private static final String VIEW_GROUP_CLASS_NAME = "ViewGroup";
+    private static final String VIEW_GROUP_CLASS_NAME = "android.view.ViewGroup";
 
-    @Override
-    public void initialize() {
+    public AndroidDigiOfficeDocumentExplorerBackRequiresSearchOption() {
+        super("AndroidDigiOfficeDocumentExplorerBackRequiresSearchOption");
+    }
+
+    private boolean isDocumentExplorerContainer(Widget widget) {
+        String resourceId = widget.get(AndroidTags.AndroidResourceId, "");
+        return DOCUMENT_EXPLORER_CONTAINER_RESOURCE_ID.equals(resourceId);
     }
 
     @Override
-    public List<Verdict> getVerdicts(State state) {
+    protected boolean isApplicable(State state) {
+        for (Widget widget : state) {
+            if (isDocumentExplorerContainer(widget)
+                    && containsResourceIdRecursive(widget, DOCUMENT_EXPLORER_BACK_RESOURCE_ID)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    protected List<Verdict> check(State state) {
         List<Verdict> verdicts = new ArrayList<>();
 
         for (Widget widget : state) {
-            String resourceId = widget.get(AndroidTags.AndroidResourceId, "");
-
-            if (!DOCUMENT_EXPLORER_CONTAINER_RESOURCE_ID.equals(resourceId)) {
+            if (!isDocumentExplorerContainer(widget)) {
                 continue;
             }
 
+            String resourceId = widget.get(AndroidTags.AndroidResourceId, "");
             if (!containsResourceIdRecursive(widget, DOCUMENT_EXPLORER_BACK_RESOURCE_ID)) {
                 continue;
             }
