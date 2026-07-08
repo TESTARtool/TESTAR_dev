@@ -215,6 +215,102 @@ public class TestAndroidLogcatOracle {
         }
     }
 
+    @Test
+    public void generateModeVerdict_NormalizesDynamicAndroidPaths() {
+        OutputStructure.logsOutputDir = Path.of("target").toString();
+        OutputStructure.startInnerLoopDateString = "YYYY-MM-DD_hh-mm-ss";
+        OutputStructure.executedSUTname = "test-sut";
+
+        Settings settings = buildSettings(RuntimeControlsProtocol.Modes.Generate, "(?i)(.*Exception.*)");
+        AndroidLogcatOracle androidLogcatOracle = new AndroidLogcatOracle(settings);
+        State state = Mockito.mock(State.class);
+
+        String line = "07-06 11:48:55.095 29813 29884 E BitmapFactory: Unable to decode file: java.io.FileNotFoundException: "
+                + "/data/user/0/com.example.app/cache/sentry/83a56134754ad7e27d5f94754e5a842865257057/"
+                + "replay_053d15c452f042f9a7049bb22a6860ca/1783338523682.jpg: open failed: ENOENT (No such file or directory)";
+
+        try (MockedStatic<AndroidAppiumFramework> mocked = Mockito.mockStatic(AndroidAppiumFramework.class)) {
+            mocked.when(AndroidAppiumFramework::getAppPackageFromCapabilitiesOrCurrent).thenReturn("org.testar.app");
+            mocked.when(() -> AndroidAppiumFramework.dumpLogcatThreadtimeForPackage("org.testar.app"))
+                    .thenReturn(line);
+
+            androidLogcatOracle.initialize();
+            List<Verdict> verdicts = androidLogcatOracle.getVerdicts(state);
+            Assert.assertEquals(1, verdicts.size());
+            Verdict verdict = verdicts.get(0);
+
+            String expected = "Suspicious Android logcat line(s) detected "
+                    + "BitmapFactory: Unable to decode file: java.io.FileNotFoundException: "
+                    + "/data/user/<num>/<package>/cache/<path>/<id>/replay_<id>/<file>.jpg: "
+                    + "open failed: ENOENT (No such file or directory)";
+            Assert.assertEquals(expected, verdict.info());
+        }
+    }
+
+    @Test
+    public void generateModeVerdict_DeduplicatesDifferentDynamicAndroidPaths() {
+        OutputStructure.logsOutputDir = Path.of("target").toString();
+        OutputStructure.startInnerLoopDateString = "YYYY-MM-DD_hh-mm-ss";
+        OutputStructure.executedSUTname = "test-sut";
+
+        Settings settings = buildSettings(RuntimeControlsProtocol.Modes.Generate, "(?i)(.*Exception.*)");
+        AndroidLogcatOracle androidLogcatOracle = new AndroidLogcatOracle(settings);
+        State state = Mockito.mock(State.class);
+
+        String line1 = "07-06 11:48:55.095 29813 29884 E BitmapFactory: Unable to decode file: java.io.FileNotFoundException: "
+                + "/data/user/0/com.example.app/cache/sentry/83a56134754ad7e27d5f94754e5a842865257057/"
+                + "replay_053d15c452f042f9a7049bb22a6860ca/1783338523682.jpg: open failed: ENOENT (No such file or directory)";
+        String line2 = "07-06 11:48:56.095 29813 29884 E BitmapFactory: Unable to decode file: java.io.FileNotFoundException: "
+                + "/data/user/0/com.example.app/cache/sentry/9f3d44b21234ad7e27d5f94754e5a842812345678/"
+                + "replay_77aa22bb33cc44dd55ee66ff77889900/1888888888888.jpg: open failed: ENOENT (No such file or directory)";
+
+        try (MockedStatic<AndroidAppiumFramework> mocked = Mockito.mockStatic(AndroidAppiumFramework.class)) {
+            mocked.when(AndroidAppiumFramework::getAppPackageFromCapabilitiesOrCurrent).thenReturn("org.testar.app");
+            mocked.when(() -> AndroidAppiumFramework.dumpLogcatThreadtimeForPackage("org.testar.app"))
+                    .thenReturn(line1 + "\n" + line2);
+
+            androidLogcatOracle.initialize();
+            List<Verdict> verdicts = androidLogcatOracle.getVerdicts(state);
+            Assert.assertEquals(1, verdicts.size());
+            Verdict verdict = verdicts.get(0);
+
+            String expected = "Suspicious Android logcat line(s) detected "
+                    + "BitmapFactory: Unable to decode file: java.io.FileNotFoundException: "
+                    + "/data/user/<num>/<package>/cache/<path>/<id>/replay_<id>/<file>.jpg: "
+                    + "open failed: ENOENT (No such file or directory)";
+            Assert.assertEquals(expected, verdict.info());
+        }
+    }
+
+    @Test
+    public void generateModeVerdict_NormalizesDifferentAndroidPrivateStorageRoots() {
+        OutputStructure.logsOutputDir = Path.of("target").toString();
+        OutputStructure.startInnerLoopDateString = "YYYY-MM-DD_hh-mm-ss";
+        OutputStructure.executedSUTname = "test-sut";
+
+        Settings settings = buildSettings(RuntimeControlsProtocol.Modes.Generate, "(?i)(.*error.*)");
+        AndroidLogcatOracle androidLogcatOracle = new AndroidLogcatOracle(settings);
+        State state = Mockito.mock(State.class);
+
+        String line1 = "07-06 11:48:55.095 29813 29884 E SQLite: error opening db /data/data/com.example.app/databases/550e8400-e29b-41d4-a716-446655440000.db";
+        String line2 = "07-06 11:48:56.095 29813 29884 E SQLite: error opening db /data/data/com.other.app/databases/123e4567-e89b-12d3-a456-426614174000.db";
+
+        try (MockedStatic<AndroidAppiumFramework> mocked = Mockito.mockStatic(AndroidAppiumFramework.class)) {
+            mocked.when(AndroidAppiumFramework::getAppPackageFromCapabilitiesOrCurrent).thenReturn("org.testar.app");
+            mocked.when(() -> AndroidAppiumFramework.dumpLogcatThreadtimeForPackage("org.testar.app"))
+                    .thenReturn(line1 + "\n" + line2);
+
+            androidLogcatOracle.initialize();
+            List<Verdict> verdicts = androidLogcatOracle.getVerdicts(state);
+            Assert.assertEquals(1, verdicts.size());
+            Verdict verdict = verdicts.get(0);
+
+            String expected = "Suspicious Android logcat line(s) detected "
+                    + "SQLite: error opening db /data/data/<package>/databases/<file>.db";
+            Assert.assertEquals(expected, verdict.info());
+        }
+    }
+
     private Settings buildSettings(RuntimeControlsProtocol.Modes mode, String regex) {
         List<Pair<?, ?>> tags = new ArrayList<>();
         tags.add(Pair.from(ConfigTags.Mode, mode));
