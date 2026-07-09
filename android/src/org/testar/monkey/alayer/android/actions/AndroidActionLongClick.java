@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,6 +31,7 @@
 package org.testar.monkey.alayer.android.actions;
 
 import org.testar.monkey.alayer.*;
+import org.testar.monkey.alayer.actions.ActionRoles;
 import org.testar.monkey.alayer.exceptions.ActionFailedException;
 import org.testar.monkey.alayer.android.AndroidAppiumFramework;
 import org.testar.monkey.alayer.android.enums.AndroidRoles;
@@ -51,9 +52,9 @@ public class AndroidActionLongClick extends TaggableBase implements Action {
         this.mapOriginWidget(w);
         this.accessibilityId = w.get(AndroidTags.AndroidAccessibilityId, "");
         this.widget = w;
-        this.widgetClass = w.get(AndroidTags.AndroidClassName);
-        this.xpath = w.get(AndroidTags.AndroidXpath);
-        this.text = w.get(AndroidTags.AndroidText);
+        this.widgetClass = w.get(AndroidTags.AndroidClassName, "");
+        this.xpath = w.get(AndroidTags.AndroidXpath, "");
+        this.text = w.get(AndroidTags.AndroidText, "");
         this.set(Tags.Desc, toShortString());
 
     }
@@ -74,14 +75,20 @@ public class AndroidActionLongClick extends TaggableBase implements Action {
         return "Execute Android Longclick on Widget of type: '" + this.widgetClass + "', with text: '" + this.text + "', with Id: '" + this.accessibilityId + "', with xPath: " + this.xpath;
     }
 
-    @Override
-    public String toParametersString() {
-        return "";
-    }
+	@Override
+	public String toParametersString() {
+		String widgetConcreteId = widget.get(Tags.ConcreteID, "NoWidgetConcreteIdAvailable");
+		return "role=" + this.get(Tags.Role, ActionRoles.LeftClickAt)
+				+ ",widget=" + widgetConcreteId
+				+ ",widgetClass=" + this.widgetClass
+				+ ",text=" + this.text
+				+ ",accessibilityId=" + this.accessibilityId
+				+ ",xpath=" + this.xpath;
+	}
 
     @Override
     public String toString(Role... discardParameters) {
-        return "";
+        return toParametersString();
     }
 
     public Widget getWidget(){

@@ -38,10 +38,12 @@ import org.testar.monkey.alayer.android.enums.AndroidRoles;
 public class AndroidSystemActionOrientation extends TaggableBase implements Action {
 
     private static final long serialVersionUID = 138171508205790215L;
+    private final State originState;
 
     public AndroidSystemActionOrientation(State state) {
         this.set(Tags.Role, AndroidRoles.AndroidWidget);
         this.mapOriginWidget(state);
+        this.originState = state;
         this.set(Tags.Desc, toShortString());
     }
 
@@ -63,12 +65,15 @@ public class AndroidSystemActionOrientation extends TaggableBase implements Acti
 
     @Override
     public String toParametersString() {
-        return "";
+        String stateConcreteId = this.originState.get(Tags.ConcreteID, "NoStateConcreteIdAvailable");
+        return "role=" + this.get(Tags.Role, AndroidRoles.AndroidWidget)
+                + ",state=" + stateConcreteId
+                + ",action=systemOrientation";
     }
 
     @Override
     public String toString(Role... discardParameters) {
-        return "";
+        return this.toParametersString();
     }
 
 }

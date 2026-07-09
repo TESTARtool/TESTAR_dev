@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -41,30 +41,30 @@ public class AndroidActionClick extends TaggableBase implements Action {
 
 	private static final long serialVersionUID = 6663144395605910140L;
 
-	private String text;
-	private String accessibilityID;
-	private Widget widget;
-	private String widgetClass;
-	private String xpath;
+	private final String text;
+	private final String accessibilityId;
+	private final Widget widget;
+	private final String widgetClass;
+	private final String xpath;
 
 	public AndroidActionClick(State state, Widget w) {
 		this.set(Tags.Role, ActionRoles.LeftClickAt);
 		this.mapOriginWidget(w);
 		this.text = w.get(AndroidTags.AndroidText, "");
-		this.accessibilityID = w.get(AndroidTags.AndroidAccessibilityId, "");
+		this.accessibilityId = w.get(AndroidTags.AndroidAccessibilityId, "");
 		this.widget = w;
-		this.widgetClass = w.get(AndroidTags.AndroidClassName);
-		this.xpath = w.get(AndroidTags.AndroidXpath);
+		this.widgetClass = w.get(AndroidTags.AndroidClassName, "");
+		this.xpath = w.get(AndroidTags.AndroidXpath, "");
 		this.set(Tags.Desc, toShortString());
 	}
 
 	@Override
 	public void run(SUT system, State state, double duration) throws ActionFailedException {
 		try {
-			WebElement element = AndroidAppiumFramework.resolveElementByIdOrXPath(this.accessibilityID, this.widget);
+			WebElement element = AndroidAppiumFramework.resolveElementByIdOrXPath(this.accessibilityId, this.widget);
 			element.click();
 		} catch(Exception e) {
-			System.out.println("Exception trying to click Element By Id : " + this.accessibilityID);
+			System.out.println("Exception trying to click Element By Id : " + this.accessibilityId);
 			System.out.println(e.getMessage());
 			throw new ActionFailedException(toShortString());
 		}
@@ -72,17 +72,23 @@ public class AndroidActionClick extends TaggableBase implements Action {
 
 	@Override
 	public String toShortString() {
-		return "Execute Android click on Widget of type: '" + this.widgetClass + "', with text: '" + text + "', with Id: '" + accessibilityID + "', with xPath: " + xpath;
+		return "Execute Android click on Widget of type: '" + this.widgetClass + "', with text: '" + this.text + "', with Id: '" + this.accessibilityId + "', with xPath: " + this.xpath;
 	}
 
 	@Override
 	public String toParametersString() {
-		return "";
+		String widgetConcreteId = widget.get(Tags.ConcreteID, "NoWidgetConcreteIdAvailable");
+		return "role=" + this.get(Tags.Role, ActionRoles.LeftClickAt)
+				+ ",widget=" + widgetConcreteId
+				+ ",widgetClass=" + this.widgetClass
+				+ ",text=" + this.text
+				+ ",accessibilityId=" + this.accessibilityId
+				+ ",xpath=" + this.xpath;
 	}
 
 	@Override
 	public String toString(Role... discardParameters) {
-		return "";
+		return toParametersString();
 	}
 
 	public Widget getWidget(){
