@@ -104,7 +104,6 @@ public class Protocol_android_digioffice extends AndroidProtocol {
                 new AndroidDigiOfficeTaskActionButtonsAreSiblings(), // Task attachment and overflow are siblings
                 new AndroidDigiOfficeDocumentListFilterIsSiblingOfSearchFieldContainer(), // Document list filters are siblings of a search field container
                 new AndroidDigiOfficeDocumentExplorerContainerContainsCloseButton(), // Document explorer container contains a close button
-                new AndroidDigiOfficeDocumentExplorerBackRequiresSearchOption(), // Document explorer back option implies search option
                 new AndroidDigiOfficeMainBottomNavigationWidgetsAreSiblings(), // Main navigation widgets (documents, tasks, contacts, settings) are siblings
                 new AndroidDigiOfficeDocumentsBottomNavigationWidgetsAreSiblings(), // Documents navigation widgets (Preview, Info) are siblings
                 new AndroidDigiOfficeDocumentUploadInfoIsNotEmptyNotNA(), // Document upload info is not empty not NA

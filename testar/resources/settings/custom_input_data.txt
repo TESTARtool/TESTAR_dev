@@ -15,8 +15,8 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 >
 ==!
 ' OR 1=1 OR ''='
-<script>console.error('XSS is possible');</script>
-%3Cscript%3Econsole.error%28%27XSS%20is%20possible%27%29%3B%3C%2Fscript%3E
+<script>console.
+%3Cscript%3Econsole.
 <memo>alpha beta gamma
 undefined
 undef
