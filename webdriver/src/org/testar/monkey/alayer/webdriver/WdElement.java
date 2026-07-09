@@ -398,8 +398,8 @@ public class WdElement extends TaggableBase implements Serializable {
 
   public boolean visibleAt(double x, double y) {
     int scrollLeft = (root == null) ? 0 : (int) root.scrollLeft;
-    int scrollHeight = (root == null) ? 0 : (int) root.scrollHeight;
-    return rect != null && rect.contains(x - scrollLeft, y - scrollHeight);
+    int scrollTop = (root == null) ? 0 : (int) root.scrollTop;
+    return rect != null && rect.contains(x - scrollLeft, y - scrollTop);
   }
 
   public boolean visibleAt(double x, double y, boolean obscuredByChildFeature) {
