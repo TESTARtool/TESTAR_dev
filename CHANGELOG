@@ -1,3 +1,8 @@
+#TESTAR v2.8.13 (29-Jun-2026)
+- Bump org.seleniumhq.selenium:selenium-java from 4.44.0 to 4.45.0
+- Update devtools dependencies to v149
+
+
 #TESTAR v2.8.12 (1-Jun-2026)
 - Add executeTriggeredAction in GenericUtilsProtocol
 - Update parabank protocol to save login sequence in the state model
