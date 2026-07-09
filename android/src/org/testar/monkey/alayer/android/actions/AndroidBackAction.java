@@ -38,10 +38,12 @@ import org.testar.monkey.alayer.android.enums.AndroidRoles;
 public class AndroidBackAction extends TaggableBase implements Action {
 
     private static final long serialVersionUID = 6808185819403073531L;
+    private final State originState;
 
     public AndroidBackAction(State state) {
         this.set(Tags.Role, AndroidRoles.AndroidWidget);
         this.mapOriginWidget(state);
+        this.originState = state;
         this.set(Tags.Desc, toShortString());
     }
 
@@ -63,11 +65,14 @@ public class AndroidBackAction extends TaggableBase implements Action {
 
     @Override
     public String toParametersString() {
-        return "";
+        String stateConcreteId = this.originState.get(Tags.ConcreteID, "NoStateConcreteIdAvailable");
+        return "role=" + this.get(Tags.Role, AndroidRoles.AndroidWidget)
+                + ",state=" + stateConcreteId
+                + ",action=back";
     }
 
     @Override
     public String toString(Role... discardParameters) {
-        return "";
+        return this.toParametersString();
     }
 }
