@@ -73,6 +73,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class Protocol_android_digioffice extends AndroidProtocol {
@@ -85,6 +86,10 @@ public class Protocol_android_digioffice extends AndroidProtocol {
 
     private String XPATH_FILTER_FILE = "/android_digioffice_xpath_filter.txt";
     private final String digiofficeDomainPackage = "com.digioffice.app";
+
+    private static final String TESTAR_UUID_SEARCH = "TESTAR_UUID_SEARCH";
+    private final AndroidDigiOfficeRandomSearchShowsEmptyListOrFallback searchRandomUUIDEmptyListOrFallbackOracle =
+            new AndroidDigiOfficeRandomSearchShowsEmptyListOrFallback("Testar User");
 
     // List of active DigiOffice oracles to be applied and tracked during testing
     private final List<Oracle> digiOfficeOracles = Arrays.asList(
@@ -112,7 +117,8 @@ public class Protocol_android_digioffice extends AndroidProtocol {
                 new AndroidDigiOfficeDocumentListItemInfoIsNotEmptyNotNA(), // Document list item info is not empty not NA
                 new AndroidDigiOfficeTaskListItemInfoIsNotEmptyNotNA(), // Task list item info is not empty not NA
                 new AndroidDigiOfficeTaskInfoRowIsNotEmptyNotNA(), // Task info row is not empty not NA
-                new AndroidDigiOfficeTaskInfoRowIsNotEmptyNotNAAllowDash() // Task info row is not empty not NA and allows dash
+                new AndroidDigiOfficeTaskInfoRowIsNotEmptyNotNAAllowDash(), // Task info row is not empty not NA and allows dash
+                searchRandomUUIDEmptyListOrFallbackOracle // Search a random UUID should show a list-empty-text or fallback user in following states
         );
     private final List<AbstractAndroidDigiOfficeOracle> trackedDigiOfficeOracles = digiOfficeOracles.stream()
             .filter(AbstractAndroidDigiOfficeOracle.class::isInstance)
@@ -154,6 +160,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
     @Override
     protected void beginSequence(SUT system, State state) {
         super.beginSequence(system, state);
+        searchRandomUUIDEmptyListOrFallbackOracle.deactivate(); // Initially disable the AndroidDigiOfficeRandomSearchShowsEmptyListOrFallback
         if(this.mode().equals(Modes.Generate)) loginDigiOffice(system);
     }
 
@@ -537,6 +544,11 @@ public class Protocol_android_digioffice extends AndroidProtocol {
                 //String randomInput = InputDataManager.getRandomTextInputData(widget);
                 String customInput = InputDataManager.getRandomTextFromCustomInputDataFile(System.getProperty("user.dir") + "/settings/custom_input_data.txt");
                 actions.add(new AndroidActionType(state, widget, customInput));
+
+                // In the search states, derive an action to trigger the AndroidDigiOfficeRandomSearchShowsEmptyListOrFallback
+                if (isSearchTypeableWidget(widget)) {
+                    actions.add(new AndroidActionType(state, widget, buildRandomLongSearchInput()));
+                }
             }
 
             // left clicks
@@ -558,6 +570,22 @@ public class Protocol_android_digioffice extends AndroidProtocol {
         }
 
         return actions;
+    }
+
+    @Override
+    protected boolean executeAction(SUT system, State state, Action action) {
+        boolean executed = super.executeAction(system, state, action);
+
+        if (executed) {
+            // Enable/Disable the AndroidDigiOfficeRandomSearchShowsEmptyListOrFallback if the trigger search action is executed
+            if (isSearchEmptyResultAction(action)) {
+                searchRandomUUIDEmptyListOrFallbackOracle.activate();
+            } else {
+                searchRandomUUIDEmptyListOrFallbackOracle.deactivate();
+            }
+        }
+
+        return executed;
     }
 
     @Override
@@ -656,6 +684,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
      */
     @Override
     protected void finishSequence() {
+        searchRandomUUIDEmptyListOrFallbackOracle.deactivate(); // Disable the AndroidDigiOfficeRandomSearchShowsEmptyListOrFallback at the end
         super.finishSequence();
     }
 
@@ -674,5 +703,27 @@ public class Protocol_android_digioffice extends AndroidProtocol {
         for (AbstractAndroidDigiOfficeOracle oracle : trackedDigiOfficeOracles) {
             System.out.println(oracle.getSummaryLine());
         }
+    }
+
+    private boolean isSearchTypeableWidget(Widget widget) {
+        return widget.get(AndroidTags.AndroidHint, "").equals("Search");
+    }
+
+    private String buildRandomLongSearchInput() {
+        return TESTAR_UUID_SEARCH + UUID.randomUUID();
+    }
+
+    private boolean isSearchEmptyResultAction(Action action) {
+        if (!(action instanceof AndroidActionType)) {
+            return false;
+        }
+
+        Widget originWidget = action.get(Tags.OriginWidget, null);
+        if (originWidget == null || !isSearchTypeableWidget(originWidget)) {
+            return false;
+        }
+
+        String inputText = action.get(Tags.InputText, "");
+        return inputText.startsWith(TESTAR_UUID_SEARCH);
     }
 }
