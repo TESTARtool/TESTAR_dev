@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2015 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,6 +31,9 @@
 
 package org.testar.serialisation;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -44,9 +47,10 @@ import org.testar.monkey.alayer.AWTCanvas;
 
 /**
  * SUT screenshots serialiser
- *
  */
 public class ScreenshotSerialiser extends Thread {
+
+	protected static final Logger logger = LogManager.getLogger();
 
 	public static final String SCRSHOTS = "scrshots";
 	private static String testSequenceFolder = null;
@@ -128,9 +132,15 @@ public class ScreenshotSerialiser extends Thread {
 				}
 			}
 		}
-		synchronized(testSequenceFolder){
+		String currentTestSequenceFolder = testSequenceFolder;
+		if (currentTestSequenceFolder != null){
+			synchronized(currentTestSequenceFolder){
+				singletonScreenshotSerialiser = null;
+				currentTestSequenceFolder.notifyAll();
+			}
+		} else {
+			logger.error("ScreenshotSerialiser finished without a test sequence folder.");
 			singletonScreenshotSerialiser = null;
-			testSequenceFolder.notifyAll();
 		}
 	}
 
@@ -159,11 +169,17 @@ public class ScreenshotSerialiser extends Thread {
 	public static void exit(){
 		if (singletonScreenshotSerialiser != null){
 			ScreenshotSerialiser.finish();
+			String currentTestSequenceFolder = testSequenceFolder;
+			if (currentTestSequenceFolder == null){
+				logger.error("ScreenshotSerialiser.exit() called while testSequenceFolder is null.");
+				singletonScreenshotSerialiser = null;
+				return;
+			}
 			try {
-				synchronized(testSequenceFolder){
+				synchronized(currentTestSequenceFolder){
 					while (singletonScreenshotSerialiser != null){
 						try {
-							testSequenceFolder.wait(10);
+							currentTestSequenceFolder.wait(10);
 						} catch (InterruptedException e) {
 							System.out.println("ScreenshotSerialiser exit interrupted");
 						}
