@@ -52,12 +52,17 @@ public class AndroidDigiOfficeTaskTabsDrawerContainsExpectedActions extends Abst
             boolean hasStartSidestepWorkflow = containsTextRecursive(widget, REQUIRED_START_SIDESTEP_WORKFLOW_TEXT);
             boolean hasSharePdf = containsTextRecursive(widget, REQUIRED_SHARE_PDF_TEXT);
 
-            if (hasSubmitForReview && hasStartSidestepWorkflow && hasSharePdf) {
+            // Both must exist or do not exist
+            boolean reviewWorkflowPairIsConsistent =
+                    (hasSubmitForReview && hasStartSidestepWorkflow)
+                    || (!hasSubmitForReview && !hasStartSidestepWorkflow);
+
+            if (hasSharePdf && reviewWorkflowPairIsConsistent) {
                 continue;
             }
 
             String verdictMsg = String.format(
-                    "Detected task tabs drawer without required subtree texts 'submit for review', 'start sidestep workflow', and 'Share PDF' (resId=%s) %s",
+                    "Detected task tabs drawer without required 'share pdf' text or with inconsistent optional workflow texts 'submit for review' and 'start sidestep workflow' (resId=%s) %s",
                     widget.get(AndroidTags.AndroidResourceId, ""),
                     widget.get(AndroidTags.AndroidXpath, ""));
 
