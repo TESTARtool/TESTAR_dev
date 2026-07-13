@@ -35,7 +35,7 @@ import org.languagetool.language.Dutch;
 //import org.openqa.selenium.remote.RemoteWebDriver;
 //import org.openqa.selenium.devtools.DevTools;
 //import org.openqa.selenium.devtools.HasDevTools;
-//import org.openqa.selenium.devtools.v137.network.Network;
+//import org.openqa.selenium.devtools.v150.network.Network;
 import org.testar.SutVisualization;
 import org.testar.managers.InputDataManager;
 import org.testar.monkey.Pair;
