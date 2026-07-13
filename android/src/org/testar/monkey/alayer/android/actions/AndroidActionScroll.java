@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
- * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -40,22 +40,28 @@ public class AndroidActionScroll extends TaggableBase implements Action {
 
     private static final long serialVersionUID = 6205133391190145934L;
 
-    private final int scrollDistance = 500;
+    private static final int SCROLL_DISTANCE = 500;
     private final String accessibilityId;
     private final Widget widget;
+    private final String widgetClass;
+    private final String text;
+    private final String xpath;
 
     public AndroidActionScroll(State state, Widget w) {
         this.set(Tags.Role, AndroidRoles.AndroidWidget);
         this.mapOriginWidget(w);
         this.accessibilityId = w.get(AndroidTags.AndroidAccessibilityId, "");
         this.widget = w;
+        this.widgetClass = w.get(AndroidTags.AndroidClassName, "");
+        this.text = w.get(AndroidTags.AndroidText, "");
+        this.xpath = w.get(AndroidTags.AndroidXpath, "");
         this.set(Tags.Desc, toShortString());
     }
 
     @Override
     public void run(SUT system, State state, double duration) throws ActionFailedException {
         try {
-            AndroidAppiumFramework.scrollElementById(this.accessibilityId, this.widget, this.scrollDistance);
+            AndroidAppiumFramework.scrollElementById(this.accessibilityId, this.widget, SCROLL_DISTANCE);
         } catch(Exception e) {
             System.out.println("Exception trying to scroll Element By Id : " + this.accessibilityId);
             System.out.println(e.getMessage());
@@ -70,15 +76,22 @@ public class AndroidActionScroll extends TaggableBase implements Action {
 
     @Override
     public String toParametersString() {
-        return "";
+        String widgetConcreteId = this.widget.get(Tags.ConcreteID, "NoWidgetConcreteIdAvailable");
+        return "role=" + this.get(Tags.Role, AndroidRoles.AndroidWidget)
+                + ",widget=" + widgetConcreteId
+                + ",widgetClass=" + this.widgetClass
+                + ",text=" + this.text
+                + ",accessibilityId=" + this.accessibilityId
+                + ",xpath=" + this.xpath
+                + ",scrollDistance=" + SCROLL_DISTANCE;
     }
 
     @Override
     public String toString(Role... discardParameters) {
-        return "";
+        return this.toParametersString();
     }
 
     public Widget getWidget(){
-        return widget;
+        return this.widget;
     }
 }

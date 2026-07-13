@@ -14,7 +14,12 @@ function addCanvasTestar() {
     // Create canvas, get reference to context
     testar_canvas = document.createElement('canvas');
     testar_canvas.id = 'testar_canvas';
-    document.body.appendChild(testar_canvas);
+    testar_canvas.style.position = 'fixed';
+    testar_canvas.style.margin = '0px';
+    testar_canvas.style.padding = '0px';
+    testar_canvas.style.border = '0px';
+    testar_canvas.style.pointerEvents = 'none';
+    testar_canvas.style.zIndex = '2147483647';
     testarCtx = testar_canvas.getContext('2d');
 
     // Set canvas to complete viewport
@@ -23,6 +28,12 @@ function addCanvasTestar() {
     // Make sure canvas keeps size of viewport on resize or scroll
     window.addEventListener('resize', resizeCanvasTestar, true);
     window.addEventListener('scroll', resizeCanvasTestar, true);
+    new MutationObserver(ensureCanvasOnTop).observe(document.documentElement, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['open', 'popover']
+    });
 
     ensureCanvasOnTop();
     return typeof testar_canvas;
@@ -33,12 +44,32 @@ function addCanvasTestar() {
  * will try to get their element the highest z-index
  */
 function ensureCanvasOnTop() {
-    var lengths = Array.from(document.querySelectorAll('body *'))
-        .map(a => parseFloat(window.getComputedStyle(a).zIndex))
-        .filter(a => !isNaN(a));
-    var maxIndex = Math.max.apply(null, lengths);
-    if (testar_canvas.style.zIndex < maxIndex) {
-        testar_canvas.style.zIndex = maxIndex + 1;
+    if (typeof testar_canvas !== 'object') {
+        return;
+    }
+
+    var canvasHost = document.body;
+
+    try {
+        var popoverHost = document.querySelector(':popover-open');
+        if (popoverHost) {
+            canvasHost = popoverHost;
+        }
+    } catch (error) {
+    }
+
+    if (canvasHost === document.body) {
+        try {
+            var modalHost = document.querySelector(':modal');
+            if (modalHost) {
+                canvasHost = modalHost;
+            }
+        } catch (error) {
+        }
+    }
+
+    if (testar_canvas.parentNode !== canvasHost || canvasHost.lastElementChild !== testar_canvas) {
+        canvasHost.appendChild(testar_canvas);
     }
 }
 

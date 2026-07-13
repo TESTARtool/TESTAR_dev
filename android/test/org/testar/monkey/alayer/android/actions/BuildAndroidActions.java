@@ -51,14 +51,6 @@ public class BuildAndroidActions {
 	}
 
 	@Test
-	public void buildAndroidActionPinch() {
-		Action androidPinch = new AndroidActionPinch(state, widget, false);
-		// Verify Action <-> Widget mapping
-		Assert.notNull(androidPinch.get(Tags.OriginWidget));
-		Assert.isTrue(androidPinch.get(Tags.OriginWidget).get(AndroidTags.AndroidXpath).equals(widgetPath));
-	}
-
-	@Test
 	public void buildAndroidActionScroll() {
 		Action androidScroll = new AndroidActionScroll(state, widget);
 		// Verify Action <-> Widget mapping

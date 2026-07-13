@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2020 - 2025 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2020 - 2025 Open Universiteit - www.ou.nl
+ * Copyright (c) 2020 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2020 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -46,11 +46,12 @@ public class AndroidActionType extends TaggableBase implements Action {
 	private final String accessibilityId;
 	private final Widget widget;
 	private final String widgetClass;
+	private final String text;
 	private final String xpath;
 
 	private static final Pen TypePen = Pen.newPen().setColor(Color.Blue)
 			.setFillPattern(FillPattern.None).setStrokeWidth(3).build(); // use default font size
-	private final int DISPLAY_TEXT_MAX_LENGTH = 16;
+	private static final int DISPLAY_TEXT_MAX_LENGTH = 16;
 
 	public AndroidActionType(State state, Widget w, String typeText) {
 		this.set(Tags.Role, ActionRoles.ClickTypeInto);
@@ -59,7 +60,8 @@ public class AndroidActionType extends TaggableBase implements Action {
 		this.accessibilityId = w.get(AndroidTags.AndroidAccessibilityId, "");
 		this.widget = w;
 		this.widgetClass = w.get(AndroidTags.AndroidClassName, "");
-		this.xpath = w.get(AndroidTags.AndroidXpath);
+		this.text = w.get(AndroidTags.AndroidText, "");
+		this.xpath = w.get(AndroidTags.AndroidXpath, "");
 		double relX = w.get(Tags.Shape).x() + w.get(Tags.Shape).width()/2;
 		double relY = w.get(Tags.Shape).y() + w.get(Tags.Shape).height()/2;
 		Position position = new AbsolutePosition(relX, relY);
@@ -89,16 +91,24 @@ public class AndroidActionType extends TaggableBase implements Action {
 
 	@Override
 	public String toParametersString() {
-		return "";
+		String widgetConcreteId = this.widget.get(Tags.ConcreteID, "NoWidgetConcreteIdAvailable");
+		String inputText = this.get(Tags.InputText, "");
+		return "role=" + this.get(Tags.Role, ActionRoles.ClickTypeInto)
+				+ ",widget=" + widgetConcreteId
+				+ ",widgetClass=" + this.widgetClass
+				+ ",text=" + this.text
+				+ ",accessibilityId=" + this.accessibilityId
+				+ ",xpath=" + this.xpath
+				+ ",inputText=" + inputText;
 	}
 
 	@Override
 	public String toString(Role... discardParameters) {
-		return "";
+		return this.toParametersString();
 	}
 
 	public Widget getWidget(){
-		return widget;
+		return this.widget;
 	}
 
 }

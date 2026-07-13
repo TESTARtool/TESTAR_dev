@@ -94,6 +94,20 @@ public class TestAndroidDriverUnresponsive {
         Assert.assertTrue(notResponding.get(Tags.NotResponding, false));
     }
 
+    @Test
+    public void getAndroidPageSource_WhenDriverThrows_ReturnsFeedbackResult() throws Exception {
+        AndroidDriver driver = mock(AndroidDriver.class);
+        when(driver.getPageSource()).thenThrow(new WebDriverException("page source timeout"));
+        setStaticDriver(driver);
+
+        AndroidPageSourceResult result = AndroidAppiumFramework.getAndroidPageSource();
+
+        Assert.assertFalse(result.hasDocument());
+        Assert.assertNull(result.getDocument());
+        Assert.assertTrue(result.getFeedback().contains("Exception trying to obtain driver.getPageSource()"));
+        Assert.assertTrue(result.getFeedback().contains("page source timeout"));
+    }
+
     private State buildStateWithUnresponsiveFlag() throws Exception {
         SUT system = Mockito.mock(SUT.class);
         when(system.isRunning()).thenReturn(true);

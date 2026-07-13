@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2016, 2017, 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2016 - 2026 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 - 2026 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,6 +31,9 @@
 
 package org.testar.serialisation;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.LinkedList;
@@ -39,9 +42,11 @@ import org.testar.monkey.Assert;
 import org.testar.monkey.alayer.TaggableBase;
 
 /**
- * Tests serialiser..
+ * Tests serialiser.
  */
 public class TestSerialiser extends Thread {
+
+	protected static final Logger logger = LogManager.getLogger();
 
 	private static ObjectOutputStream test;
 	private static int fragmentTimes;
@@ -98,22 +103,28 @@ public class TestSerialiser extends Thread {
 				writethis(fragment);
 			}
 		}
-		try {
-			test.flush();
-			test.close();
-		} catch (IOException e) {
-			LogSerialiser.log("I/O exception serialising test file!\n", LogSerialiser.LogLevel.Critical);
-		} finally{
+		ObjectOutputStream currentTest = test;
+		if (currentTest != null){
 			try {
-				test.close();
+				currentTest.flush();
+				currentTest.close();
 			} catch (IOException e) {
-				LogSerialiser.log("I/O exception closing serialisation of test file!\n", LogSerialiser.LogLevel.Critical);				
+				LogSerialiser.log("I/O exception serialising test file!\n", LogSerialiser.LogLevel.Critical);
+			} finally{
+				try {
+					currentTest.close();
+				} catch (IOException e) {
+					LogSerialiser.log("I/O exception closing serialisation of test file!\n", LogSerialiser.LogLevel.Critical);				
+				}
 			}
-		}
-		synchronized(test){
-			//System.out.println("TestSerialiser finished");
+			synchronized(currentTest){
+				//System.out.println("TestSerialiser finished");
+				singletonTestSerialiser = null;
+				currentTest.notifyAll();
+			}
+		} else {
+			logger.error("TestSerialiser finished without an active ObjectOutputStream.");
 			singletonTestSerialiser = null;
-			test.notifyAll();
 		}
 	}
 
@@ -127,6 +138,10 @@ public class TestSerialiser extends Thread {
 
 	private static void writethis(TaggableBase fragment){
 		Assert.notNull(fragment);
+		if (test == null){
+			logger.error("TestSerialiser skipped writing a fragment because the ObjectOutputStream is null.");
+			return;
+		}
 		try {
 			test.writeObject(fragment);
 		} catch (IOException e) {
@@ -147,11 +162,17 @@ public class TestSerialiser extends Thread {
 	public static void exit(){
 		if (singletonTestSerialiser != null){
 			TestSerialiser.finish();
+			ObjectOutputStream currentTest = test;
+			if (currentTest == null){
+				logger.error("TestSerialiser.exit() called while test stream is null.");
+				singletonTestSerialiser = null;
+				return;
+			}
 			try {
-				synchronized(test){
+				synchronized(currentTest){
 					while (singletonTestSerialiser != null){
 						try {
-							test.wait();
+							currentTest.wait();
 						} catch (InterruptedException e) {
 							System.out.println("TestSerialiser exit interrupted");
 						}
