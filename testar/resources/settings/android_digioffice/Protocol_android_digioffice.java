@@ -109,6 +109,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
                 new AndroidDigiOfficeTaskActionButtonsAreSiblings(), // Task attachment and overflow are siblings
                 new AndroidDigiOfficeDocumentListFilterIsSiblingOfSearchFieldContainer(), // Document list filters are siblings of a search field container
                 new AndroidDigiOfficeDocumentExplorerContainerContainsCloseButton(), // Document explorer container contains a close button
+                new AndroidDigiOfficeDocumentTabsDrawerContainsExpectedActions(), // Document drawer subtree contains share and favorite actions
                 new AndroidDigiOfficeMainBottomNavigationWidgetsAreSiblings(), // Main navigation widgets (documents, tasks, contacts, settings) are siblings
                 new AndroidDigiOfficeDocumentsBottomNavigationWidgetsAreSiblings(), // Documents navigation widgets (Preview, Info) are siblings
                 new AndroidDigiOfficeDocumentUploadInfoIsNotEmptyNotNA(), // Document upload info is not empty not NA
@@ -116,6 +117,7 @@ public class Protocol_android_digioffice extends AndroidProtocol {
                 new AndroidDigiOfficeDocumentUploadListItemInfoIsNotEmptyNotNA(), // Document upload list item info is not empty not NA
                 new AndroidDigiOfficeDocumentListItemInfoIsNotEmptyNotNA(), // Document list item info is not empty not NA
                 new AndroidDigiOfficeTaskListItemInfoIsNotEmptyNotNA(), // Task list item info is not empty not NA
+                new AndroidDigiOfficeTaskTabsDrawerContainsExpectedActions(), // Task drawer subtree contains submit, start, and share actions
                 new AndroidDigiOfficeTaskInfoRowIsNotEmptyNotNA(), // Task info row is not empty not NA
                 new AndroidDigiOfficeTaskInfoRowIsNotEmptyNotNAAllowDash(), // Task info row is not empty not NA and allows dash
                 searchRandomUUIDEmptyListOrFallbackOracle // Search a random UUID should show a list-empty-text or fallback user in following states
@@ -375,6 +377,8 @@ public class Protocol_android_digioffice extends AndroidProtocol {
                 modalWidget = widget;
             } else if (isPickerContentSiblingOfDialog(widget)) {
                 modalWidget = widget;
+            } else if (isTabsDrawerContent(widget)) {
+                modalWidget = widget;
             }
         }
 
@@ -406,6 +410,14 @@ public class Protocol_android_digioffice extends AndroidProtocol {
             if (sibling.get(AndroidTags.AndroidResourceId, "").contains("picker-dialog")) {
                 return true;
             }
+        }
+        return false;
+    }
+
+    private boolean isTabsDrawerContent(Widget widget) {
+        String resourceId = widget.get(AndroidTags.AndroidResourceId, "");
+        if(resourceId.contains("tabs-drawer-content")) {
+            return true;
         }
         return false;
     }
