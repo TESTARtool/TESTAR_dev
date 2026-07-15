@@ -42,13 +42,14 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testar.statemodel.analysis.condition.StateModelTraceCondition.StateModelTrace;
+import org.testar.statemodel.analysis.condition.StateModelTraceCondition.StateModelTracePath;
 import org.testar.statemodel.analysis.condition.StateModelTraceCondition.TraceCriteria;
 import org.testar.statemodel.analysis.condition.StateModelTraceCondition.TraceCriterion;
 import org.testar.statemodel.analysis.condition.StateModelTraceCondition.TraceOperator;
 import org.testar.statemodel.analysis.condition.TestCondition.ConditionComparator;
 
 /**
- * Builds transition-completion conditions from a JSON StateModelTraces block.
+ * Builds transition-completion conditions from JSON state-model trace blocks.
  */
 public class TransitionConditionEvaluator extends BasicConditionEvaluator {
 
@@ -74,7 +75,7 @@ public class TransitionConditionEvaluator extends BasicConditionEvaluator {
 		}
 
 		checkContent = normalizeGoalContent(checkContent);
-		JsonBlockBounds jsonBlockBounds = findStateModelTracesJsonBlockBounds(checkContent);
+		JsonBlockBounds jsonBlockBounds = findStateModelTracePathsJsonBlockBounds(checkContent);
 
 		if (jsonBlockBounds == null) {
 			return checkContent.strip();
@@ -94,34 +95,29 @@ public class TransitionConditionEvaluator extends BasicConditionEvaluator {
 		String jsonContent = extractJsonContent(checkContent);
 
 		if (jsonContent == null) {
-			logger.log(Level.WARN, "TransitionConditionEvaluator: No StateModelTraces JSON block found.");
+			logger.log(Level.WARN, "TransitionConditionEvaluator: No state model traces JSON block found.");
 			return;
 		}
 
 		try {
 			JsonObject root = new JsonParser().parse(jsonContent).getAsJsonObject();
 
-			if (!root.has("StateModelTraces") || !root.get("StateModelTraces").isJsonArray()) {
-				logger.log(Level.WARN, "TransitionConditionEvaluator: JSON block does not contain a StateModelTraces array.");
+			List<StateModelTracePath> tracePaths = parseStateModelTracePaths(root);
+
+			if (tracePaths.isEmpty()) {
+				logger.log(Level.WARN, "TransitionConditionEvaluator: JSON did not contain valid state model traces.");
 				return;
 			}
 
-			List<StateModelTrace> traces = parseStateModelTraces(root.getAsJsonArray("StateModelTraces"));
-
-			if (traces.isEmpty()) {
-				logger.log(Level.WARN, "TransitionConditionEvaluator: StateModelTraces JSON did not contain valid traces.");
-				return;
-			}
-
-			addCondition(new StateModelTraceCondition(traces, comparator, threshold));
-			logger.log(Level.INFO, String.format("TransitionConditionEvaluator: Loaded %d state model trace conditions.", traces.size()));
+			addCondition(StateModelTraceCondition.fromTracePaths(tracePaths, comparator, threshold));
+			logger.log(Level.INFO, String.format("TransitionConditionEvaluator: Loaded %d state model trace path conditions.", tracePaths.size()));
 		} catch (IllegalStateException | JsonSyntaxException e) {
-			logger.log(Level.WARN, String.format("TransitionConditionEvaluator: Unable to parse StateModelTraces JSON: %s", e.getMessage()));
+			logger.log(Level.WARN, String.format("TransitionConditionEvaluator: Unable to parse state model traces JSON: %s", e.getMessage()));
 		}
 	}
 
 	private String extractJsonContent(String checkContent) {
-		JsonBlockBounds jsonBlockBounds = findStateModelTracesJsonBlockBounds(checkContent);
+		JsonBlockBounds jsonBlockBounds = findStateModelTracePathsJsonBlockBounds(checkContent);
 
 		if (jsonBlockBounds == null) {
 			return null;
@@ -130,8 +126,8 @@ public class TransitionConditionEvaluator extends BasicConditionEvaluator {
 		return checkContent.substring(jsonBlockBounds.start, jsonBlockBounds.end + 1);
 	}
 
-	private static JsonBlockBounds findStateModelTracesJsonBlockBounds(String checkContent) {
-		// Goal text can contain ordinary braces; only a valid StateModelTraces object is a condition block.
+	private static JsonBlockBounds findStateModelTracePathsJsonBlockBounds(String checkContent) {
+		// Goal text can contain ordinary braces; only a valid state-model traces object is a condition block.
 		for (int start = 0; start < checkContent.length(); start++) {
 			if (checkContent.charAt(start) != '{') {
 				continue;
@@ -145,7 +141,7 @@ public class TransitionConditionEvaluator extends BasicConditionEvaluator {
 
 			String candidate = checkContent.substring(start, end + 1);
 
-			if (hasStateModelTracesArray(candidate)) {
+			if (hasStateModelTracePathsArray(candidate)) {
 				return new JsonBlockBounds(start, end);
 			}
 		}
@@ -194,7 +190,7 @@ public class TransitionConditionEvaluator extends BasicConditionEvaluator {
 		return -1;
 	}
 
-	private static boolean hasStateModelTracesArray(String candidate) {
+	private static boolean hasStateModelTracePathsArray(String candidate) {
 		try {
 			JsonElement element = new JsonParser().parse(candidate);
 
@@ -203,13 +199,55 @@ public class TransitionConditionEvaluator extends BasicConditionEvaluator {
 			}
 
 			JsonObject object = element.getAsJsonObject();
-			return object.has("StateModelTraces") && object.get("StateModelTraces").isJsonArray();
+			return hasJsonArray(object, "StateModelTracePaths");
 		} catch (IllegalStateException | JsonSyntaxException e) {
 			return false;
 		}
 	}
 
-	private List<StateModelTrace> parseStateModelTraces(JsonArray traceElements) {
+	private static boolean hasJsonArray(JsonObject object, String fieldName) {
+		return object.has(fieldName) && object.get(fieldName).isJsonArray();
+	}
+
+	private List<StateModelTracePath> parseStateModelTracePaths(JsonObject root) {
+		if (hasJsonArray(root, "StateModelTracePaths")) {
+			return parseExplicitTracePaths(root.getAsJsonArray("StateModelTracePaths"));
+		}
+
+		logger.log(Level.WARN, "TransitionConditionEvaluator: JSON block does not contain StateModelTracePaths.");
+		return new ArrayList<>();
+	}
+
+	private List<StateModelTracePath> parseExplicitTracePaths(JsonArray pathElements) {
+		List<StateModelTracePath> tracePaths = new ArrayList<>();
+
+		for (JsonElement pathElement : pathElements) {
+			if (!pathElement.isJsonObject()) {
+				logger.log(Level.WARN, "TransitionConditionEvaluator: Ignoring non-object trace path entry.");
+				continue;
+			}
+
+			JsonObject pathObject = pathElement.getAsJsonObject();
+
+			if (!hasJsonArray(pathObject, "traces")) {
+				logger.log(Level.WARN, "TransitionConditionEvaluator: Ignoring trace path without traces array.");
+				continue;
+			}
+
+			List<StateModelTrace> traces = parseTraces(pathObject.getAsJsonArray("traces"));
+
+			if (traces.isEmpty()) {
+				logger.log(Level.WARN, "TransitionConditionEvaluator: Ignoring trace path without valid traces.");
+				continue;
+			}
+
+			tracePaths.add(new StateModelTracePath(getString(pathObject, "name"), traces));
+		}
+
+		return tracePaths;
+	}
+
+	private List<StateModelTrace> parseTraces(JsonArray traceElements) {
 		List<StateModelTrace> traces = new ArrayList<>();
 
 		for (JsonElement traceElement : traceElements) {

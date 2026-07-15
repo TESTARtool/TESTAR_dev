@@ -99,10 +99,10 @@ public class Protocol_test_gradle_workflow_desktop_generic_statemodel extends De
 
 		// TransitionCondition feature
 		TransitionConditionEvaluator transitionEvaluator = new TransitionConditionEvaluator(
-				"{\"StateModelTraces\":[{\"name\":\"Format to Font transition\"," +
+				"{\"StateModelTracePaths\":[{\"name\":\"Format to Font path\",\"traces\":[{\"name\":\"Format to Font transition\"," +
 				"\"originState\":{\"include\":[{\"tag\":\"Representation\",\"value\":\"Format\"}],\"exclude\":[]}," +
 				"\"action\":{\"include\":[{\"tag\":\"Desc\",\"value\":\"Format\"}],\"exclude\":[]}," +
-				"\"targetState\":{\"include\":[{\"tag\":\"Representation\",\"value\":\"Font...\"}],\"exclude\":[]}}]}"
+				"\"targetState\":{\"include\":[{\"tag\":\"Representation\",\"value\":\"Font...\"}],\"exclude\":[]}}]}]}"
 				);
 		boolean transitionCondition = transitionEvaluator.evaluateConditions(stateModelManager.getModelIdentifier(), stateModelManager);
 		Assert.isTrue(transitionCondition, "TransitionCondition successfully detected a Format -> Font... transition in the model");

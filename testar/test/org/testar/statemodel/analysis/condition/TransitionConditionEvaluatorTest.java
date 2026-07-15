@@ -36,7 +36,7 @@ public class TransitionConditionEvaluatorTest {
         String testGoal = "OriginState: StateA\nAction: ClickButton\nTargetState: StateB";
         TransitionConditionEvaluator evaluator = new TransitionConditionEvaluator(testGoal);
 
-        assertEquals("Only JSON StateModelTraces goals should be loaded.",
+        assertEquals("Only JSON StateModelTracePaths goals should be loaded.",
                 0, evaluator.getConditions().size());
     }
 
@@ -61,14 +61,41 @@ public class TransitionConditionEvaluatorTest {
     }
 
     @Test
+    public void test_json_trace_paths_condition_loaded() {
+        TransitionConditionEvaluator evaluator = new TransitionConditionEvaluator(getTracePathsJsonGoal());
+
+        assertEquals("Exactly one trace-path condition should be loaded from the JSON goal.",
+                1, evaluator.getConditions().size());
+        assertTrue(evaluator.getConditions().get(0) instanceof StateModelTraceCondition);
+
+        StateModelTraceCondition condition = (StateModelTraceCondition)evaluator.getConditions().get(0);
+
+        assertEquals(2, condition.getTracePaths().size());
+        assertEquals("First possible request loan path", condition.getTracePaths().get(0).getName());
+        assertEquals(1, condition.getTracePaths().get(0).getTraces().size());
+        assertEquals("Second possible request loan path", condition.getTracePaths().get(1).getName());
+        assertEquals(2, condition.getTracePaths().get(1).getTraces().size());
+    }
+
+    @Test
     public void test_extract_action_selection_goal_removes_json_trace_block() {
         String actionSelectionGoal = TransitionConditionEvaluator.extractActionSelectionGoal(getTraceJsonGoal());
 
         assertTrue(actionSelectionGoal.contains("Given the login page is displayed"));
         assertTrue(actionSelectionGoal.contains("When I log in with the username \"john\" and password \"demo\""));
-        assertFalse(actionSelectionGoal.contains("StateModelTraces"));
+        assertFalse(actionSelectionGoal.contains("StateModelTracePaths"));
         assertFalse(actionSelectionGoal.contains("Login Transition"));
         assertFalse(actionSelectionGoal.contains("\"originState\""));
+    }
+
+    @Test
+    public void test_extract_action_selection_goal_removes_json_trace_paths_block() {
+        String actionSelectionGoal = TransitionConditionEvaluator.extractActionSelectionGoal(getTracePathsJsonGoal());
+
+        assertTrue(actionSelectionGoal.contains("Given the user requests a loan"));
+        assertFalse(actionSelectionGoal.contains("StateModelTracePaths"));
+        assertFalse(actionSelectionGoal.contains("First possible request loan path"));
+        assertFalse(actionSelectionGoal.contains("\"traces\""));
     }
 
     @Test
@@ -77,7 +104,7 @@ public class TransitionConditionEvaluatorTest {
 
         TransitionConditionEvaluator evaluator = new TransitionConditionEvaluator(testGoal);
 
-        assertEquals("Escaped inline LlmTestGoals content should load the StateModelTraces JSON block.",
+        assertEquals("Escaped inline LlmTestGoals content should load the StateModelTracePaths JSON block.",
                 1, evaluator.getConditions().size());
     }
 
@@ -89,7 +116,7 @@ public class TransitionConditionEvaluatorTest {
 
         assertTrue(actionSelectionGoal.contains("Given the login page is displayed"));
         assertFalse(actionSelectionGoal.contains("\\n"));
-        assertFalse(actionSelectionGoal.contains("StateModelTraces"));
+        assertFalse(actionSelectionGoal.contains("StateModelTracePaths"));
         assertFalse(actionSelectionGoal.contains("\"originState\""));
     }
 
@@ -122,7 +149,7 @@ public class TransitionConditionEvaluatorTest {
 
         assertTrue(actionSelectionGoal.contains("Given I type {test}"));
         assertTrue(actionSelectionGoal.contains("Given the login page is displayed"));
-        assertFalse(actionSelectionGoal.contains("StateModelTraces"));
+        assertFalse(actionSelectionGoal.contains("StateModelTracePaths"));
         assertEquals(1, evaluator.getConditions().size());
     }
 
@@ -135,7 +162,7 @@ public class TransitionConditionEvaluatorTest {
 
     @Test
     public void test_extract_action_selection_goal_keeps_text_after_json_block() {
-        String testGoal = "Before\n{\"StateModelTraces\": []}\nAfter";
+        String testGoal = "Before\n{\"StateModelTracePaths\": []}\nAfter";
 
         String actionSelectionGoal = TransitionConditionEvaluator.extractActionSelectionGoal(testGoal);
 
@@ -145,12 +172,17 @@ public class TransitionConditionEvaluatorTest {
     @Test
     public void test_json_trace_condition_supports_default_contains_operator() {
         String testGoal = "{\n" +
-                "  \"StateModelTraces\": [\n" +
+                "  \"StateModelTracePaths\": [\n" +
                 "    {\n" +
-                "      \"name\": \"Default Operator\",\n" +
-                "      \"originState\": { \"include\": [ { \"tag\": \"WebInnerHTML\", \"value\": \"Customer Login\" } ] },\n" +
-                "      \"action\": { \"include\": [ { \"tag\": \"Desc\", \"value\": \"Log In\" } ] },\n" +
-                "      \"targetState\": { \"include\": [ { \"tag\": \"WebInnerHTML\", \"value\": \"Welcome\" } ] }\n" +
+                "      \"name\": \"Single path\",\n" +
+                "      \"traces\": [\n" +
+                "        {\n" +
+                "          \"name\": \"Default Operator\",\n" +
+                "          \"originState\": { \"include\": [ { \"tag\": \"WebInnerHTML\", \"value\": \"Customer Login\" } ] },\n" +
+                "          \"action\": { \"include\": [ { \"tag\": \"Desc\", \"value\": \"Log In\" } ] },\n" +
+                "          \"targetState\": { \"include\": [ { \"tag\": \"WebInnerHTML\", \"value\": \"Welcome\" } ] }\n" +
+                "        }\n" +
+                "      ]\n" +
                 "    }\n" +
                 "  ]\n" +
                 "}";
@@ -194,10 +226,15 @@ public class TransitionConditionEvaluatorTest {
     @Test
     public void test_json_trace_condition_does_not_backslash_escape_like_underscore() {
         String testGoal = "{\n" +
-                "  \"StateModelTraces\": [\n" +
+                "  \"StateModelTracePaths\": [\n" +
                 "    {\n" +
-                "      \"name\": \"Input Action\",\n" +
-                "      \"action\": { \"include\": [ { \"tag\": \"Desc\", \"value\": \"type input_field\" } ] }\n" +
+                "      \"name\": \"Single path\",\n" +
+                "      \"traces\": [\n" +
+                "        {\n" +
+                "          \"name\": \"Input Action\",\n" +
+                "          \"action\": { \"include\": [ { \"tag\": \"Desc\", \"value\": \"type input_field\" } ] }\n" +
+                "        }\n" +
+                "      ]\n" +
                 "    }\n" +
                 "  ]\n" +
                 "}";
@@ -239,93 +276,171 @@ public class TransitionConditionEvaluatorTest {
         verify(stateModelManager, times(3)).queryStateModel(anyString());
     }
 
+    @Test
+    public void test_json_trace_paths_condition_completes_when_first_path_completes() {
+        TransitionConditionEvaluator evaluator = new TransitionConditionEvaluator(getTracePathsJsonGoal());
+        StateModelTraceCondition condition = (StateModelTraceCondition)evaluator.getConditions().get(0);
+        StateModelManager stateModelManager = mock(StateModelManager.class);
+        when(stateModelManager.queryStateModel(anyString())).thenReturn("{found: 1}");
+
+        boolean result = condition.evaluate("model", stateModelManager);
+
+        assertTrue(result);
+        assertEquals(1, condition.getTracePaths().get(0).getCurrentTraceIndex());
+        assertEquals(0, condition.getTracePaths().get(1).getCurrentTraceIndex());
+        verify(stateModelManager, times(1)).queryStateModel(anyString());
+    }
+
+    @Test
+    public void test_json_trace_paths_condition_checks_second_path_when_first_is_pending() {
+        TransitionConditionEvaluator evaluator = new TransitionConditionEvaluator(getTracePathsJsonGoal());
+        StateModelTraceCondition condition = (StateModelTraceCondition)evaluator.getConditions().get(0);
+        StateModelManager stateModelManager = mock(StateModelManager.class);
+        when(stateModelManager.queryStateModel(anyString())).thenReturn(
+                "{found: 0}",
+                "{found: 1}",
+                "{found: 0}",
+                "{found: 0}",
+                "{found: 1}");
+
+        assertFalse(condition.evaluate("model", stateModelManager));
+        assertEquals(0, condition.getTracePaths().get(0).getCurrentTraceIndex());
+        assertEquals(1, condition.getTracePaths().get(1).getCurrentTraceIndex());
+
+        assertTrue(condition.evaluate("model", stateModelManager));
+        assertEquals(0, condition.getTracePaths().get(0).getCurrentTraceIndex());
+        assertEquals(2, condition.getTracePaths().get(1).getCurrentTraceIndex());
+        verify(stateModelManager, times(5)).queryStateModel(anyString());
+    }
+
     private String getTraceJsonGoal() {
         return "Given the login page is displayed\n" +
                 "When I log in with the username \"john\" and password \"demo\"\n" +
                 "{\n" +
-                "  \"StateModelTraces\": [\n" +
+                "  \"StateModelTracePaths\": [\n" +
                 "    {\n" +
-                "      \"name\": \"Login Transition\",\n" +
-                "      \"originState\": {\n" +
-                "        \"include\": [\n" +
-                "          {\n" +
-                "            \"tag\": \"WebInnerHTML\",\n" +
-                "            \"operator\": \"contains\",\n" +
-                "            \"value\": \"Customer Login\"\n" +
+                "      \"name\": \"Login and denied loan path\",\n" +
+                "      \"traces\": [\n" +
+                "        {\n" +
+                "          \"name\": \"Login Transition\",\n" +
+                "          \"originState\": {\n" +
+                "            \"include\": [\n" +
+                "              {\n" +
+                "                \"tag\": \"WebInnerHTML\",\n" +
+                "                \"operator\": \"contains\",\n" +
+                "                \"value\": \"Customer Login\"\n" +
+                "              }\n" +
+                "            ],\n" +
+                "            \"exclude\": []\n" +
+                "          },\n" +
+                "          \"action\": {\n" +
+                "            \"include\": [\n" +
+                "              {\n" +
+                "                \"tag\": \"Desc\",\n" +
+                "                \"operator\": \"equals\",\n" +
+                "                \"value\": \"Left Click at 'input_log_in'\"\n" +
+                "              }\n" +
+                "            ],\n" +
+                "            \"exclude\": []\n" +
+                "          },\n" +
+                "          \"targetState\": {\n" +
+                "            \"include\": [\n" +
+                "              {\n" +
+                "                \"tag\": \"WebInnerHTML\",\n" +
+                "                \"operator\": \"contains\",\n" +
+                "                \"value\": \"Welcome John Smith\"\n" +
+                "              }\n" +
+                "            ],\n" +
+                "            \"exclude\": [\n" +
+                "              {\n" +
+                "                \"tag\": \"WebInnerHTML\",\n" +
+                "                \"operator\": \"contains\",\n" +
+                "                \"value\": \"Customer Login\"\n" +
+                "              }\n" +
+                "            ]\n" +
                 "          }\n" +
-                "        ],\n" +
-                "        \"exclude\": []\n" +
-                "      },\n" +
-                "      \"action\": {\n" +
-                "        \"include\": [\n" +
-                "          {\n" +
-                "            \"tag\": \"Desc\",\n" +
-                "            \"operator\": \"equals\",\n" +
-                "            \"value\": \"Left Click at 'input_log_in'\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"name\": \"Denied Loan Transition\",\n" +
+                "          \"originState\": {\n" +
+                "            \"include\": [\n" +
+                "              {\n" +
+                "                \"tag\": \"WebInnerHTML\",\n" +
+                "                \"operator\": \"contains\",\n" +
+                "                \"value\": \"Apply for a Loan\"\n" +
+                "              }\n" +
+                "            ],\n" +
+                "            \"exclude\": []\n" +
+                "          },\n" +
+                "          \"action\": {\n" +
+                "            \"include\": [\n" +
+                "              {\n" +
+                "                \"tag\": \"Desc\",\n" +
+                "                \"operator\": \"contains\",\n" +
+                "                \"value\": \"Apply Now\"\n" +
+                "              }\n" +
+                "            ],\n" +
+                "            \"exclude\": []\n" +
+                "          },\n" +
+                "          \"targetState\": {\n" +
+                "            \"include\": [\n" +
+                "              {\n" +
+                "                \"tag\": \"WebInnerHTML\",\n" +
+                "                \"operator\": \"contains\",\n" +
+                "                \"value\": \"Denied\"\n" +
+                "              },\n" +
+                "              {\n" +
+                "                \"tag\": \"WebInnerHTML\",\n" +
+                "                \"operator\": \"regex\",\n" +
+                "                \"value\": \".*cannot grant a loan in that amount.*\"\n" +
+                "              }\n" +
+                "            ],\n" +
+                "            \"exclude\": [\n" +
+                "              {\n" +
+                "                \"tag\": \"WebInnerHTML\",\n" +
+                "                \"operator\": \"contains\",\n" +
+                "                \"value\": \"Approved\"\n" +
+                "              }\n" +
+                "            ]\n" +
                 "          }\n" +
-                "        ],\n" +
-                "        \"exclude\": []\n" +
-                "      },\n" +
-                "      \"targetState\": {\n" +
-                "        \"include\": [\n" +
-                "          {\n" +
-                "            \"tag\": \"WebInnerHTML\",\n" +
-                "            \"operator\": \"contains\",\n" +
-                "            \"value\": \"Welcome John Smith\"\n" +
-                "          }\n" +
-                "        ],\n" +
-                "        \"exclude\": [\n" +
-                "          {\n" +
-                "            \"tag\": \"WebInnerHTML\",\n" +
-                "            \"operator\": \"contains\",\n" +
-                "            \"value\": \"Customer Login\"\n" +
-                "          }\n" +
-                "        ]\n" +
-                "      }\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+    }
+
+    private String getTracePathsJsonGoal() {
+        return "Given the user requests a loan\n" +
+                "{\n" +
+                "  \"StateModelTracePaths\": [\n" +
+                "    {\n" +
+                "      \"name\": \"First possible request loan path\",\n" +
+                "      \"traces\": [\n" +
+                "        {\n" +
+                "          \"name\": \"Denied Loan Transition\",\n" +
+                "          \"originState\": { \"include\": [ { \"tag\": \"WebInnerText\", \"operator\": \"contains\", \"value\": \"Apply for a Loan\" } ], \"exclude\": [] },\n" +
+                "          \"action\": { \"include\": [ { \"tag\": \"Desc\", \"operator\": \"contains\", \"value\": \"input_apply_now\" } ], \"exclude\": [] },\n" +
+                "          \"targetState\": { \"include\": [ { \"tag\": \"WebInnerText\", \"operator\": \"contains\", \"value\": \"We cannot grant a loan in that amount with your available funds.\" } ], \"exclude\": [] }\n" +
+                "        }\n" +
+                "      ]\n" +
                 "    },\n" +
                 "    {\n" +
-                "      \"name\": \"Denied Loan Transition\",\n" +
-                "      \"originState\": {\n" +
-                "        \"include\": [\n" +
-                "          {\n" +
-                "            \"tag\": \"WebInnerHTML\",\n" +
-                "            \"operator\": \"contains\",\n" +
-                "            \"value\": \"Apply for a Loan\"\n" +
-                "          }\n" +
-                "        ],\n" +
-                "        \"exclude\": []\n" +
-                "      },\n" +
-                "      \"action\": {\n" +
-                "        \"include\": [\n" +
-                "          {\n" +
-                "            \"tag\": \"Desc\",\n" +
-                "            \"operator\": \"contains\",\n" +
-                "            \"value\": \"Apply Now\"\n" +
-                "          }\n" +
-                "        ],\n" +
-                "        \"exclude\": []\n" +
-                "      },\n" +
-                "      \"targetState\": {\n" +
-                "        \"include\": [\n" +
-                "          {\n" +
-                "            \"tag\": \"WebInnerHTML\",\n" +
-                "            \"operator\": \"contains\",\n" +
-                "            \"value\": \"Denied\"\n" +
-                "          },\n" +
-                "          {\n" +
-                "            \"tag\": \"WebInnerHTML\",\n" +
-                "            \"operator\": \"regex\",\n" +
-                "            \"value\": \".*cannot grant a loan in that amount.*\"\n" +
-                "          }\n" +
-                "        ],\n" +
-                "        \"exclude\": [\n" +
-                "          {\n" +
-                "            \"tag\": \"WebInnerHTML\",\n" +
-                "            \"operator\": \"contains\",\n" +
-                "            \"value\": \"Approved\"\n" +
-                "          }\n" +
-                "        ]\n" +
-                "      }\n" +
+                "      \"name\": \"Second possible request loan path\",\n" +
+                "      \"traces\": [\n" +
+                "        {\n" +
+                "          \"name\": \"Login Transition\",\n" +
+                "          \"originState\": { \"include\": [ { \"tag\": \"WebInnerText\", \"operator\": \"contains\", \"value\": \"Customer Login\" } ], \"exclude\": [] },\n" +
+                "          \"action\": { \"include\": [ { \"tag\": \"Desc\", \"operator\": \"contains\", \"value\": \"input_log_in\" } ], \"exclude\": [] },\n" +
+                "          \"targetState\": { \"include\": [ { \"tag\": \"WebInnerText\", \"operator\": \"contains\", \"value\": \"Welcome John Smith\" } ], \"exclude\": [ { \"tag\": \"WebInnerText\", \"operator\": \"contains\", \"value\": \"Customer Login\" } ] }\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"name\": \"Denied Loan Transition\",\n" +
+                "          \"originState\": { \"include\": [ { \"tag\": \"WebInnerText\", \"operator\": \"contains\", \"value\": \"Apply for a Loan\" } ], \"exclude\": [] },\n" +
+                "          \"action\": { \"include\": [ { \"tag\": \"Desc\", \"operator\": \"contains\", \"value\": \"input_apply_now\" } ], \"exclude\": [] },\n" +
+                "          \"targetState\": { \"include\": [ { \"tag\": \"WebInnerText\", \"operator\": \"contains\", \"value\": \"We cannot grant a loan in that amount with your available funds\" } ], \"exclude\": [] }\n" +
+                "        }\n" +
+                "      ]\n" +
                 "    }\n" +
                 "  ]\n" +
                 "}";

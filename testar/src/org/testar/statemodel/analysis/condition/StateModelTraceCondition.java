@@ -42,48 +42,84 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Ordered transition condition that acknowledges traces one by one.
+ * Transition condition that acknowledges ordered traces and alternative trace paths.
  */
 public class StateModelTraceCondition extends TestCondition {
     private static final Logger logger = LogManager.getLogger();
 
-    private final List<StateModelTrace> traces;
-    private int currentTraceIndex;
+    private final List<StateModelTracePath> tracePaths;
 
-    public StateModelTraceCondition(List<StateModelTrace> traces, ConditionComparator comparator, int threshold) {
+    public static StateModelTraceCondition fromTracePaths(List<StateModelTracePath> tracePaths,
+                                                          ConditionComparator comparator,
+                                                          int threshold) {
+        return new StateModelTraceCondition(tracePaths, comparator, threshold);
+    }
+
+    private StateModelTraceCondition(List<StateModelTracePath> tracePaths,
+                                     ConditionComparator comparator,
+                                     int threshold) {
         super(comparator, threshold);
-        this.traces = traces == null ? Collections.emptyList() : new ArrayList<>(traces);
-        this.currentTraceIndex = 0;
+        this.tracePaths = tracePaths == null ? Collections.emptyList() : new ArrayList<>(tracePaths);
     }
 
     public List<StateModelTrace> getTraces() {
-        return Collections.unmodifiableList(traces);
+        if (tracePaths.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return tracePaths.get(0).getTraces();
+    }
+
+    public List<StateModelTracePath> getTracePaths() {
+        return Collections.unmodifiableList(tracePaths);
     }
 
     public int getCurrentTraceIndex() {
-        return currentTraceIndex;
+        if (tracePaths.isEmpty()) {
+            return 0;
+        }
+
+        return tracePaths.get(0).getCurrentTraceIndex();
     }
 
     @Override
     public boolean evaluate(String modelIdentifier, StateModelManager stateModelManager) {
-        // A single model check can acknowledge several already-satisfied traces.
-        while (currentTraceIndex < traces.size()) {
-            StateModelTrace trace = traces.get(currentTraceIndex);
+        for (StateModelTracePath tracePath : tracePaths) {
+            if (advanceTracePath(tracePath, modelIdentifier, stateModelManager)) {
+                return true;
+            }
+        }
+
+        return tracePaths.isEmpty();
+    }
+
+    @Override
+    public boolean evaluate(State state) {
+        for (StateModelTracePath tracePath : tracePaths) {
+            if (tracePath.isComplete()) {
+                return true;
+            }
+        }
+
+        return tracePaths.isEmpty();
+    }
+
+    private boolean advanceTracePath(StateModelTracePath tracePath,
+                                     String modelIdentifier,
+                                     StateModelManager stateModelManager) {
+        // A single model check can acknowledge several already-satisfied traces in one path.
+        while (!tracePath.isComplete()) {
+            StateModelTrace trace = tracePath.getCurrentTrace();
 
             if (!evaluateTrace(trace, modelIdentifier, stateModelManager)) {
                 return false;
             }
 
-            currentTraceIndex++;
-            logger.info(String.format("State model trace completed: %s", trace.getName()));
+            tracePath.acknowledgeCurrentTrace();
+            logger.info(String.format("State model trace completed in path '%s': %s", tracePath.getName(), trace.getName()));
         }
 
         return true;
-    }
-
-    @Override
-    public boolean evaluate(State state) {
-        return traces.isEmpty();
     }
 
     private boolean evaluateTrace(StateModelTrace trace, String modelIdentifier, StateModelManager stateModelManager) {
@@ -201,6 +237,45 @@ public class StateModelTraceCondition extends TestCondition {
         }
 
         return value;
+    }
+
+    /**
+     * One possible ordered route to complete the transition condition.
+     */
+    public static class StateModelTracePath {
+        private final String name;
+        private final List<StateModelTrace> traces;
+        private int currentTraceIndex;
+
+        public StateModelTracePath(String name, List<StateModelTrace> traces) {
+            this.name = name;
+            this.traces = traces == null ? Collections.emptyList() : new ArrayList<>(traces);
+            this.currentTraceIndex = 0;
+        }
+
+        public String getName() {
+            return name == null || name.isBlank() ? "Unnamed trace path" : name;
+        }
+
+        public List<StateModelTrace> getTraces() {
+            return Collections.unmodifiableList(traces);
+        }
+
+        public int getCurrentTraceIndex() {
+            return currentTraceIndex;
+        }
+
+        private boolean isComplete() {
+            return currentTraceIndex >= traces.size();
+        }
+
+        private StateModelTrace getCurrentTrace() {
+            return traces.get(currentTraceIndex);
+        }
+
+        private void acknowledgeCurrentTrace() {
+            currentTraceIndex++;
+        }
     }
 
     /**
