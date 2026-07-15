@@ -110,13 +110,9 @@ public class Protocol_webdriver_llm_state_model_transition_evaluator extends Web
 
 	private void setupTestGoals(List<String> testGoalsList) {
 		for(String testGoal : testGoalsList) {
-			TransitionConditionEvaluator checkEvaluator = new TransitionConditionEvaluator(
-					WdTags.WebInnerHTML, 
-					Tags.Desc, 
-					WdTags.WebInnerHTML, 
-					testGoal
-					);
-			testGoals.add(new LlmTestGoal(testGoal, checkEvaluator.getConditions()));
+			TransitionConditionEvaluator checkEvaluator = new TransitionConditionEvaluator(testGoal);
+			String actionSelectionGoal = TransitionConditionEvaluator.extractActionSelectionGoal(testGoal);
+			testGoals.add(new LlmTestGoal(actionSelectionGoal, checkEvaluator.getConditions()));
 		}
 	}
 

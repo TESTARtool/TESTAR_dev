@@ -1,0 +1,90 @@
+Given the login page is displayed
+When I log in with the username "john" and password "demo"
+And I request a loan with the amount "999999"
+And I enter the down payment "100"
+And I select the account "54321"
+And I request to apply the loan
+Then the bank should deny the loan for the John Smith user 
+
+{
+  "StateModelTraces": [
+    {
+      "name": "Login Transition",
+      "originState": {
+        "include": [
+          {
+            "tag": "WebInnerText",
+            "operator": "contains",
+            "value": "Customer Login"
+          }
+        ],
+        "exclude": []
+      },
+      "action": {
+        "include": [
+          {
+            "tag": "Desc",
+            "operator": "contains",
+            "value": "input_log_in"
+          }
+        ],
+        "exclude": []
+      },
+      "targetState": {
+        "include": [
+          {
+            "tag": "WebInnerText",
+            "operator": "contains",
+            "value": "Welcome John Smith"
+          }
+        ],
+        "exclude": [
+          {
+            "tag": "WebInnerText",
+            "operator": "contains",
+            "value": "Customer Login"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Denied Loan Transition",
+      "originState": {
+        "include": [
+          {
+            "tag": "WebInnerText",
+            "operator": "contains",
+            "value": "Apply for a Loan"
+          }
+        ],
+        "exclude": []
+      },
+      "action": {
+        "include": [
+          {
+            "tag": "Desc",
+            "operator": "contains",
+            "value": "input_apply_now"
+          }
+        ],
+        "exclude": []
+      },
+      "targetState": {
+        "include": [
+          {
+            "tag": "WebInnerText",
+            "operator": "contains",
+            "value": "Denied"
+          }
+        ],
+        "exclude": [
+          {
+            "tag": "WebInnerText",
+            "operator": "contains",
+            "value": "Approved"
+          }
+        ]
+      }
+    }
+  ]
+}
