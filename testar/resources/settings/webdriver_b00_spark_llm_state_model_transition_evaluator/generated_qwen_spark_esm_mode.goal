@@ -1,0 +1,28 @@
+1. **Simple Mode (ESM/EMA Mode)**
+   - Given the user is in the Simple mode
+   - When the user selects the "ESM/EMA Mode" option
+   - Then the dashboard should display the following widgets: "Overview", "Activities", "Triggers"
+
+{
+  "StateModelTracePaths": [
+    { "name": "ESM/EMA to ESM/EMA mode path",
+      "traces": [
+        { "name": "Open Settings",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "settings" } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "button_settings" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "ESM/EMA Mode" } ], "exclude": [] }
+        },
+        { "name": "Open Mode Selector", 
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "ESM/EMA Mode" } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "button_esm/ema_mode" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "Set mode to..." } ], "exclude": [] }
+        },
+        { "name": "Select ESM/EMA Mode",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "Set mode to..." } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "li_esm/ema_mode" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "ESM/EMA Mode" }, { "tag": "WebInnerText", "value": "Overview" } ], "exclude": [ { "tag": "WebInnerText", "value": "Data Analytics" } ] }
+        }
+      ]
+    }
+  ]
+}

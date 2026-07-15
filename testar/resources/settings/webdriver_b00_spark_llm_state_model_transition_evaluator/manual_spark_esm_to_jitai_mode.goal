@@ -1,0 +1,31 @@
+Given that the user observes the project's dashboard
+When I navigate to the organisation settings options
+And the ESM/EMA organisation mode is selected
+And I open the organisation mode selector
+And I chose the JITAI mode
+Then the Projects page should NOT show the tab Overview
+And the Projects page should NOT show the tab Data Analytics
+
+{
+  "StateModelTracePaths": [
+    { "name": "ESM/EMA to JITAI mode path",
+      "traces": [
+        { "name": "Open Settings",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "settings" } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "button_settings" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "ESM/EMA Mode" } ], "exclude": [] }
+        },
+        { "name": "Open Mode Selector",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "ESM/EMA Mode" } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "button_esm/ema_mode" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "Set mode to..." } ], "exclude": [] }
+        },
+        { "name": "Select JITAI Mode",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "Set mode to..." } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "li_jitai" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "JITAI" } ], "exclude": [ { "tag": "WebInnerText", "value": "Overview" }, { "tag": "WebInnerText", "value": "Data Analytics" } ] }
+        }
+      ]
+    }
+  ]
+}

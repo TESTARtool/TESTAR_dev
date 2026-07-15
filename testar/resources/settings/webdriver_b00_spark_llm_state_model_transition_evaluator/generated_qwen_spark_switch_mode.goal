@@ -1,0 +1,180 @@
+4. **Switching Between Modes**
+   - Given the user is in any mode
+   - When the user switches to another mode (e.g., from Simple to Advanced)
+   - Then the dashboard should update to show the widgets corresponding to the selected mode
+
+{
+  "StateModelTracePaths": [
+    { "name": "ESM/EMA to ESM/EMA mode path",
+      "traces": [
+        { "name": "Open Settings",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "settings" } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "button_settings" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "ESM/EMA Mode" } ], "exclude": [] }
+        },
+        { "name": "Open Mode Selector",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "ESM/EMA Mode" } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "button_esm/ema_mode" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "Set mode to..." } ], "exclude": [] }
+        },
+        { "name": "Select ESM/EMA Mode",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "Set mode to..." } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "li_esm/ema_mode" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "ESM/EMA Mode" }, { "tag": "WebInnerText", "value": "Overview" } ], "exclude": [ { "tag": "WebInnerText", "value": "Data Analytics" } ] }
+        }
+      ]
+    },
+    { "name": "ESM/EMA to JITAI mode path",
+      "traces": [
+        { "name": "Open Settings",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "settings" } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "button_settings" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "ESM/EMA Mode" } ], "exclude": [] }
+        },
+        { "name": "Open Mode Selector",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "ESM/EMA Mode" } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "button_esm/ema_mode" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "Set mode to..." } ], "exclude": [] }
+        },
+        { "name": "Select JITAI Mode",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "Set mode to..." } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "li_jitai" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "JITAI" } ], "exclude": [ { "tag": "WebInnerText", "value": "Overview" }, { "tag": "WebInnerText", "value": "Data Analytics" } ] }
+        }
+      ]
+    },
+    { "name": "ESM/EMA to Advanced mode path",
+      "traces": [
+        { "name": "Open Settings",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "settings" } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "button_settings" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "ESM/EMA Mode" } ], "exclude": [] }
+        },
+        { "name": "Open Mode Selector",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "ESM/EMA Mode" } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "button_esm/ema_mode" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "Set mode to..." } ], "exclude": [] }
+        },
+        { "name": "Select Advanced Mode",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "Set mode to..." } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "li_advanced_mode" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "Advanced Mode" }, { "tag": "WebInnerText", "value": "Overview" }, { "tag": "WebInnerText", "value": "Data Analytics" } ], "exclude": [] }
+        }
+      ]
+    },
+    { "name": "JITAI to ESM/EMA mode path",
+      "traces": [
+        { "name": "Open Settings",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "settings" } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "button_settings" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "JITAI" } ], "exclude": [] }
+        },
+        { "name": "Open Mode Selector",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "JITAI" } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "button_jitai" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "Set mode to..." } ], "exclude": [] }
+        },
+        { "name": "Select ESM/EMA Mode",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "Set mode to..." } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "li_esm/ema_mode" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "ESM/EMA Mode" }, { "tag": "WebInnerText", "value": "Overview" } ], "exclude": [ { "tag": "WebInnerText", "value": "Data Analytics" } ] }
+        }
+      ]
+    },
+    { "name": "JITAI to JITAI mode path",
+      "traces": [
+        { "name": "Open Settings",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "settings" } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "button_settings" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "JITAI" } ], "exclude": [] }
+        },
+        { "name": "Open Mode Selector",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "JITAI" } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "button_jitai" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "Set mode to..." } ], "exclude": [] }
+        },
+        { "name": "Select JITAI Mode",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "Set mode to..." } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "li_jitai" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "JITAI" } ], "exclude": [ { "tag": "WebInnerText", "value": "Overview" }, { "tag": "WebInnerText", "value": "Data Analytics" } ] }
+        }
+      ]
+    },
+    { "name": "JITAI to Advanced mode path",
+      "traces": [
+        { "name": "Open Settings",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "settings" } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "button_settings" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "JITAI" } ], "exclude": [] }
+        },
+        { "name": "Open Mode Selector",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "JITAI" } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "button_jitai" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "Set mode to..." } ], "exclude": [] }
+        },
+        { "name": "Select Advanced Mode",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "Set mode to..." } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "li_advanced_mode" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "Advanced Mode" }, { "tag": "WebInnerText", "value": "Overview" }, { "tag": "WebInnerText", "value": "Data Analytics" } ], "exclude": [] }
+        }
+      ]
+    },
+    { "name": "Advanced to ESM/EMA mode path",
+      "traces": [
+        { "name": "Open Settings",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "settings" } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "button_settings" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "Advanced Mode" } ], "exclude": [] }
+        },
+        { "name": "Open Mode Selector",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "Advanced Mode" } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "button_advanced_mode" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "Set mode to..." } ], "exclude": [] }
+        },
+        { "name": "Select ESM/EMA Mode",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "Set mode to..." } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "li_esm/ema_mode" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "ESM/EMA Mode" }, { "tag": "WebInnerText", "value": "Overview" } ], "exclude": [ { "tag": "WebInnerText", "value": "Data Analytics" } ] }
+        }
+      ]
+    },
+    { "name": "Advanced to JITAI mode path",
+      "traces": [
+        { "name": "Open Settings",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "settings" } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "button_settings" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "Advanced Mode" } ], "exclude": [] }
+        },
+        { "name": "Open Mode Selector",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "Advanced Mode" } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "button_advanced_mode" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "Set mode to..." } ], "exclude": [] }
+        },
+        { "name": "Select JITAI Mode",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "Set mode to..." } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "li_jitai" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "JITAI" } ], "exclude": [ { "tag": "WebInnerText", "value": "Overview" }, { "tag": "WebInnerText", "value": "Data Analytics" } ] }
+        }
+      ]
+    },
+    { "name": "Advanced to Advanced mode path",
+      "traces": [
+        { "name": "Open Settings",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "settings" } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "button_settings" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "Advanced Mode" } ], "exclude": [] }
+        },
+        { "name": "Open Mode Selector",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "Advanced Mode" } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "button_advanced_mode" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "Set mode to..." } ], "exclude": [] }
+        },
+        { "name": "Select Advanced Mode",
+          "originState": { "include": [ { "tag": "WebInnerText", "value": "Set mode to..." } ], "exclude": [] },
+          "action": { "include": [ { "tag": "Desc", "value": "li_advanced_mode" } ], "exclude": [] },
+          "targetState": { "include": [ { "tag": "WebInnerText", "value": "Advanced Mode" }, { "tag": "WebInnerText", "value": "Overview" }, { "tag": "WebInnerText", "value": "Data Analytics" } ], "exclude": [] }
+        }
+      ]
+    }
+  ]
+}
