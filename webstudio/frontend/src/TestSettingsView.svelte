@@ -156,7 +156,7 @@
                         on:click={toggleSettingsRepresentation}
                         disabled={saving}
                     >
-                        Swtich test.settings file
+                        Show settings file
                     </button>
                     <button
                         class="secondary"
@@ -263,7 +263,7 @@
                                                             setSettingValue(setting, event.currentTarget.checked ? "true" : "false");
                                                         }}
                                                     />
-                                                    <span>{setting.value === "true" ? "Enabled" : "Disabled"}</span>
+                                                    <span>Enabled</span>
                                                 </span>
                                             {:else if setting.options?.length > 0}
                                                 <select
@@ -358,7 +358,7 @@
                         on:click={toggleSettingsRepresentation}
                         disabled={saving}
                     >
-                        Swtich Settings Form
+                        Show settings form
                     </button>
                     <button
                         class="secondary"
