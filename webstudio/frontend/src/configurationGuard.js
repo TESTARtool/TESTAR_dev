@@ -28,7 +28,7 @@ export function shouldGuardConfigurationTransition({
     nextEditor,
     dirtyAreas = {}
 }) {
-    if (currentPage !== "configuration") {
+    if (currentPage !== "configuration" && currentPage !== "basic-settings") {
         return false;
     }
 

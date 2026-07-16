@@ -36,6 +36,104 @@ For CLI execution, the workspace is resolved from:
 
 - `cli/target/install/testar-cli/settings/<workspace>`
 
+### User Roles
+
+Web Studio should support role-based user experiences.
+
+The role defines which workflows and configuration options are primary in the frontend.
+
+The role must not change the underlying workspace data model.
+
+The selected role is a frontend preference.
+
+The selected role must be persisted locally in the browser.
+
+Changing role must use the same unsaved-change guard as normal page navigation when the current view has unsaved changes.
+
+#### Advanced Role
+
+The Advanced role is the current full-control Web Studio experience.
+
+Advanced users can configure everything exposed by Web Studio, including:
+
+- workspace management
+- raw `test.settings` editing
+- visual settings editing
+- `composition.properties`
+- Java composition services and capabilities
+- `policies.properties`
+- Java policies
+- Test Goals
+- Spy mode
+- Generate mode
+- CLI mode
+- test results
+- state model analysis
+- debug files
+
+Advanced role behavior is the compatibility baseline for existing Web Studio functionality.
+
+#### Basic Role
+
+The Basic role is the first task-oriented role to design and implement.
+
+Basic users should configure and execute tests through workflow-oriented panels instead of low-level files first.
+
+Initial Basic role implementation:
+
+- reuse Test Goals
+- reuse Spy mode
+- reuse Scriptless Generate mode
+- reuse CLI mode
+- reuse Test Results
+- add a Basic `Test Configuration` page that shows the visual settings form and explicit oracle composition editing
+
+The Basic `Test Configuration` page must not expose the raw `test.settings` file toggle.
+
+The Basic `Test Configuration` page must show only these settings groups:
+
+- `SUT Connection`
+- `SUT Execution`
+- `Filters`
+- `Oracles`
+- `Agent CLI`
+- `WebDriver`
+- `Android Appium`
+
+The Basic `Test Configuration` page must include a `Composition Profile` area with `Edit Oracle Composition`.
+
+`Edit Oracle Composition` must open the existing Java composition editor constrained to the `Custom Oracle Services` node.
+
+The constrained oracle editor must use the same source creation, source editing, and `Save and Compile` behavior as the Advanced Java composition flow.
+
+The constrained oracle editor should not expose the full composition flow as the primary Basic interaction.
+
+Initial Basic role scope:
+
+- configure SUT connection, including connector and target value
+- configure begin sequences or test sequences
+- configure Test Goals
+- configure Test Oracles using simplified controls
+- configure regex-based oracles
+- configure LogOracle
+- inspect and toggle active oracles
+- access Java or future DSL oracle editing only as an explicit advanced action inside the oracle workflow
+- run Spy mode
+- run Scriptless Generate mode
+- run CLI mode
+- support future MCP mode
+- view Test Results
+
+The Basic role should preserve the same workspace files and settings used by Advanced mode.
+
+Changes made in Basic role must remain visible and editable in Advanced role.
+
+#### Intermediate Role
+
+The Intermediate role is a future decision.
+
+No functional behavior is required for Intermediate until its scope is explicitly specified.
+
 ### Editors
 
 The configuration area exposes multiple editors:

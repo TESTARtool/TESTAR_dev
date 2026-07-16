@@ -3,6 +3,8 @@
     import { shouldShowBlankSelectOption } from "./settingsSelectOptions.js";
 
     export let currentEditorDocument = null;
+    export let allowedSettingsGroupIds = null;
+    export let allowSettingsFileToggle = true;
     export let loading = false;
     export let openTestSettings;
     export let openVisualSettings;
@@ -15,6 +17,7 @@
     export let setSettingValue;
     export let selectedEditor = "";
     export let selectedSettingsGroupId = "";
+    export let settingsDescription = "Main common TESTAR settings with grouped controls. Use the test.settings editor for advanced control.";
     export let restoreSettingDefault;
     export let validateRegexExpression;
     export let workspaceDocument = null;
@@ -80,14 +83,21 @@
 
     $: normalizedSettingsSearch = normalizedSearchText(settingsSearch);
 
-    $: filteredSettingsGroups = (workspaceDocument?.settingsGroups || [])
+    $: allowedSettingsGroupSet = Array.isArray(allowedSettingsGroupIds)
+        ? new Set(allowedSettingsGroupIds)
+        : null;
+
+    $: roleFilteredSettingsGroups = (workspaceDocument?.settingsGroups || [])
+        .filter((settingsGroup) => !allowedSettingsGroupSet || allowedSettingsGroupSet.has(settingsGroup.id));
+
+    $: filteredSettingsGroups = roleFilteredSettingsGroups
         .map((settingsGroup) => ({
             ...settingsGroup,
             settings: (settingsGroup.settings || []).filter((setting) => matchesSettingsSearch(setting, settingsSearch))
         }))
         .filter((settingsGroup) => settingsGroup.settings.length > 0);
 
-    $: settingsNavigationGroups = workspaceDocument?.settingsGroups || [];
+    $: settingsNavigationGroups = roleFilteredSettingsGroups;
     $: visibleSettingsGroups = normalizedSettingsSearch
         ? filteredSettingsGroups
         : filteredSettingsGroups.filter((settingsGroup) => settingsGroup.id === selectedSettingsGroupId);
@@ -147,17 +157,19 @@
             <div class="section-header">
                 <div>
                     <h2>{currentEditorDocument.title}</h2>
-                    <p>Main common TESTAR settings with grouped controls. Use the test.settings editor for advanced control.</p>
+                    <p>{settingsDescription}</p>
                 </div>
                 <div class="button-row">
-                    <button
-                        type="button"
-                        class="secondary"
-                        on:click={toggleSettingsRepresentation}
-                        disabled={saving}
-                    >
-                        Show settings file
-                    </button>
+                    {#if allowSettingsFileToggle}
+                        <button
+                            type="button"
+                            class="secondary"
+                            on:click={toggleSettingsRepresentation}
+                            disabled={saving}
+                        >
+                            Show settings file
+                        </button>
+                    {/if}
                     <button
                         class="secondary"
                         disabled={saving || !currentEditorDocument.dirty}
@@ -352,14 +364,16 @@
                     <p>Classic raw test.settings editor for advanced users.</p>
                 </div>
                 <div class="button-row">
-                    <button
-                        type="button"
-                        class="secondary"
-                        on:click={toggleSettingsRepresentation}
-                        disabled={saving}
-                    >
-                        Show settings form
-                    </button>
+                    {#if allowSettingsFileToggle}
+                        <button
+                            type="button"
+                            class="secondary"
+                            on:click={toggleSettingsRepresentation}
+                            disabled={saving}
+                        >
+                            Show settings form
+                        </button>
+                    {/if}
                     <button
                         class="secondary"
                         disabled={saving || !rawSettingsDirty}

@@ -588,6 +588,17 @@
     margin-top: 16px;
 }
 
+.flow-graph-single {
+    width: 100%;
+    min-height: 240px;
+    align-content: center;
+    justify-items: center;
+}
+
+.flow-graph-single .flow-node {
+    width: min(340px, 100%);
+}
+
 .flow-group {
     position: relative;
     z-index: 1;

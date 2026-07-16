@@ -54,6 +54,11 @@
     gap: 8px;
 }
 
+.page-nav-placeholder {
+    visibility: hidden;
+    pointer-events: none;
+}
+
 .page-nav-workspace {
     display: flex;
     gap: 8px;
@@ -76,6 +81,24 @@
 .page-workspace-action {
     min-height: 39px;
     white-space: nowrap;
+}
+
+.page-nav-role {
+    display: grid;
+    gap: 4px;
+    min-width: 120px;
+}
+
+.page-nav-role label {
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.page-nav-role select {
+    min-width: 120px;
 }
 
 .page-nav-right-group {

@@ -9,7 +9,9 @@
     export let openJavaComposition;
     export let compileSelectedJavaSource;
     export let compileWorkspaceProfile;
+    export let compositionFlowDescription = "Click a node to inspect and configure a TESTAR service or capability.";
     export let createCompositionModuleSource;
+    export let compositionFlowTitle = "Edit Java Composition Flow";
     export let javaCompileResult = null;
     export let closeCompositionSourceEditor;
     export let renderContent = true;
@@ -21,6 +23,8 @@
     export let selectedSourceFile = null;
     export let selectedSourceSavedContent = "";
     export let savedCompositionPropertiesContent = "";
+    export let showCompositionProfileCompile = true;
+    export let singleNodeFlow = false;
     export let workspaceDocument = null;
 
     const compositionFlowGroups = [
@@ -103,7 +107,7 @@
 
 {#if renderSidebar && workspaceDocument}
     <section class="sidebar-section">
-        <h3>Composition profile</h3>
+        <h3>Composition Profile</h3>
         <div class="source-list">
             <button
                 class:selected={isSelectedEditor("composition-properties")}
@@ -140,12 +144,14 @@
         <section class="composition-flow top-gap" aria-label="Composition architecture graph">
             <div class="composition-flow-header">
                 <div>
-                    <h3>Edit Java Composition Flow</h3>
-                    <p>Click a node to inspect and configure a TESTAR service or capability.</p>
+                    <h3>{compositionFlowTitle}</h3>
+                    <p>{compositionFlowDescription}</p>
                 </div>
-                <button class="secondary" disabled={saving} on:click={compileWorkspaceProfile}>
-                    Compile Profile
-                </button>
+                {#if showCompositionProfileCompile}
+                    <button class="secondary" disabled={saving} on:click={compileWorkspaceProfile}>
+                        Compile Profile
+                    </button>
+                {/if}
                 <div class="flow-legend" aria-label="Node state legend">
                     <span><i class="legend-dot legend-default"></i>Default</span>
                     <span><i class="legend-dot legend-custom"></i>Custom</span>
@@ -153,7 +159,26 @@
                 </div>
             </div>
 
-            {#if compositionFlowNodes.length > 0}
+            {#if compositionFlowNodes.length > 0 && singleNodeFlow}
+                <div class="flow-graph flow-graph-single">
+                    {#each compositionFlowNodes as flowNode}
+                        <button
+                            class="flow-node"
+                            class:flow-default={flowMode(flowNode) === "default"}
+                            class:flow-custom={flowMode(flowNode) === "custom"}
+                            class:flow-oracle={flowMode(flowNode) === "oracle"}
+                            class:flow-invalid={flowMode(flowNode) === "invalid"}
+                            class:flow-selected={selectedCompositionFlowNode === flowNode}
+                            on:click={() => selectCompositionFlowNode(flowNode)}
+                        >
+                            <span class="flow-node-kicker">{flowRole(flowNode)}</span>
+                            <strong>{flowNodeTitle(flowNode)}</strong>
+                            <small>{flowImplementation(flowNode)}</small>
+                            <span class="flow-badge">{flowModeLabel(flowNode)}</span>
+                        </button>
+                    {/each}
+                </div>
+            {:else if compositionFlowNodes.length > 0}
                 <div class="flow-graph flow-graph-clock">
                     <svg class="flow-clock-connectors" viewBox="0 0 1000 420" preserveAspectRatio="none" aria-hidden="true">
                         <defs>
@@ -362,29 +387,31 @@
             </div>
         {/if}
 
-        <section class="compile-results-panel top-gap" class:compile-results-success={javaCompileResult?.scope === "profile" && javaCompileResult.success} class:compile-results-failed={javaCompileResult?.scope === "profile" && !javaCompileResult.success} class:compile-results-idle={javaCompileResult?.scope !== "profile"}>
-            {#if javaCompileResult?.scope === "profile" && javaCompileResult.diagnostics?.length > 0}
-                <div class="compile-diagnostics-list">
-                    {#each javaCompileResult.diagnostics as diagnostic}
-                        <article class="compile-diagnostic-row">
-                            <div>
-                                <strong>{diagnostic.fileName || "workspace"}</strong>
-                                <span>{diagnostic.relativePath}</span>
-                            </div>
-                            <small>{diagnostic.severity} {diagnostic.line > 0 ? `L${diagnostic.line}` : ""}{diagnostic.column > 0 ? `:${diagnostic.column}` : ""}</small>
-                            <p>{diagnostic.message}</p>
-                        </article>
-                    {/each}
-                </div>
-            {:else if javaCompileResult?.scope === "profile" && javaCompileResult.success}
-                <div class="compile-results-empty">
-                    <p>Java profile compilation succeeded for the current composition profile.</p>
-                </div>
-            {:else}
-                <div class="compile-results-empty">
-                    <p>Run "Compile Profile" to validate every Java composition class in this profile.</p>
-                </div>
-            {/if}
-        </section>
+        {#if showCompositionProfileCompile}
+            <section class="compile-results-panel top-gap" class:compile-results-success={javaCompileResult?.scope === "profile" && javaCompileResult.success} class:compile-results-failed={javaCompileResult?.scope === "profile" && !javaCompileResult.success} class:compile-results-idle={javaCompileResult?.scope !== "profile"}>
+                {#if javaCompileResult?.scope === "profile" && javaCompileResult.diagnostics?.length > 0}
+                    <div class="compile-diagnostics-list">
+                        {#each javaCompileResult.diagnostics as diagnostic}
+                            <article class="compile-diagnostic-row">
+                                <div>
+                                    <strong>{diagnostic.fileName || "workspace"}</strong>
+                                    <span>{diagnostic.relativePath}</span>
+                                </div>
+                                <small>{diagnostic.severity} {diagnostic.line > 0 ? `L${diagnostic.line}` : ""}{diagnostic.column > 0 ? `:${diagnostic.column}` : ""}</small>
+                                <p>{diagnostic.message}</p>
+                            </article>
+                        {/each}
+                    </div>
+                {:else if javaCompileResult?.scope === "profile" && javaCompileResult.success}
+                    <div class="compile-results-empty">
+                        <p>Java profile compilation succeeded for the current composition profile.</p>
+                    </div>
+                {:else}
+                    <div class="compile-results-empty">
+                        <p>Run "Compile Profile" to validate every Java composition class in this profile.</p>
+                    </div>
+                {/if}
+            </section>
+        {/if}
     </section>
 {/if}

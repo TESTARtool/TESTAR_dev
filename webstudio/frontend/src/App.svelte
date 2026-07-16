@@ -1,5 +1,6 @@
 <script>
     import { onDestroy, onMount } from "svelte";
+    import BasicSettingsView from "./BasicSettingsView.svelte";
     import CliModeView from "./CliModeView.svelte";
     import TestConfigurationView from "./TestConfigurationView.svelte";
     import RunTestarView from "./RunTestarView.svelte";
@@ -9,6 +10,7 @@
     import TestGoalsView from "./TestGoalsView.svelte";
     import StateModelIcon from "./icons/StateModelIcon.svelte";
     import { testGoalFolderSelectionState } from "./testGoalsModel.js";
+    import { ORACLE_COMPOSITION_NODE_ID } from "./basicConfigurationModel.js";
     import { shouldGuardConfigurationTransition } from "./configurationGuard.js";
     import { clearSelectedSourceState } from "./policyEditorState.js";
     import { stateModelWorkspaceDialog } from "./stateModelNavigation.js";
@@ -22,8 +24,15 @@
         workspaceRenameRequest,
         workspaceRenameValidation
     } from "./workspaceManagementModel.js";
+    import {
+        BASIC_ROLE_SETTINGS_GROUP_IDS,
+        WEB_STUDIO_ROLES,
+        normalizeWebStudioRole,
+        pageForRole
+    } from "./webStudioRoles.js";
 
     const STATE_MODEL_URL = "http://localhost:8090/models";
+    const ROLE_STORAGE_KEY = "testar-webstudio-role";
     const CLI_AGENT_SETTING_KEYS = {
         apiKeyEnvVarName: "AgentCLIApiKeyEnvVar",
         baseUrl: "AgentCLIBaseUrl",
@@ -69,6 +78,7 @@
     let messageTimeoutHandle = null;
     let scriptlessPollHandle = null;
     let currentPage = "configuration";
+    let currentRole = WEB_STUDIO_ROLES.ADVANCED;
     let resultsData = null;
     let selectedResultGroup = null;
     let selectedResultFile = null;
@@ -285,6 +295,8 @@
                 await loadTestGoalTree(workspaceName);
             } else if (currentPage === "results") {
                 await loadResults(workspaceName);
+            } else if (currentPage === "basic-settings") {
+                openBasicSettingsImmediate();
             }
         } catch (loadError) {
             reportClientError(`Unable to load workspace ${workspaceName}`, loadError);
@@ -748,13 +760,87 @@
         }
     }
 
+    function storedWebStudioRole() {
+        if (typeof window === "undefined") {
+            return WEB_STUDIO_ROLES.ADVANCED;
+        }
+
+        return normalizeWebStudioRole(window.localStorage.getItem(ROLE_STORAGE_KEY));
+    }
+
+    function storeWebStudioRole(role) {
+        if (typeof window !== "undefined") {
+            window.localStorage.setItem(ROLE_STORAGE_KEY, normalizeWebStudioRole(role));
+        }
+    }
+
+    function firstBasicSettingsGroupId() {
+        const availableGroupIds = new Set((workspaceDocument?.settingsGroups || []).map((settingsGroup) => settingsGroup.id));
+        return BASIC_ROLE_SETTINGS_GROUP_IDS.find((groupId) => availableGroupIds.has(groupId))
+            || workspaceDocument?.settingsGroups?.[0]?.id
+            || "";
+    }
+
+    function openBasicSettingsImmediate() {
+        openEditorImmediate("settings-form");
+        if (!BASIC_ROLE_SETTINGS_GROUP_IDS.includes(selectedSettingsGroupId)) {
+            selectedSettingsGroupId = firstBasicSettingsGroupId();
+        }
+    }
+
+    async function openBasicOracleComposition() {
+        await guardConfigurationTransition(async () => {
+            openEditorImmediate("java-composition");
+            const oracleNode = compositionFlowNodes.find((flowNode) => flowNode.id === ORACLE_COMPOSITION_NODE_ID);
+            if (oracleNode) {
+                selectCompositionFlowNode(oracleNode);
+            }
+        }, "java-composition");
+    }
+
+    async function activatePageImmediate(page) {
+        currentPage = page;
+        if (page === "basic-settings") {
+            openBasicSettingsImmediate();
+        } else if (page === "test-goals") {
+            await loadTestGoalTree();
+        } else if (page === "spy") {
+            await refreshRemoteSpyStatus();
+        } else if (page === "results") {
+            loadResults();
+        }
+    }
+
+    async function changeWebStudioRole(nextRole) {
+        const normalizedRole = normalizeWebStudioRole(nextRole);
+        if (normalizedRole === currentRole) {
+            return;
+        }
+
+        await guardApplicationTransition(async () => {
+            currentRole = normalizedRole;
+            storeWebStudioRole(currentRole);
+            await activatePageImmediate(pageForRole(currentRole, currentPage));
+        });
+    }
+
+    async function navigateToBasicSettings() {
+        if (currentPage === "basic-settings") {
+            return;
+        }
+
+        await guardApplicationTransition(async () => {
+            await activatePageImmediate("basic-settings");
+        }, "settings-form");
+    }
+
     async function navigateToConfiguration() {
         if (currentPage === "configuration") {
             return;
         }
 
         await guardApplicationTransition(async () => {
-            currentPage = "configuration";
+            await activatePageImmediate("configuration");
         });
     }
 
@@ -764,7 +850,7 @@
         }
 
         await guardApplicationTransition(async () => {
-            currentPage = "run";
+            await activatePageImmediate("run");
         });
     }
 
@@ -774,7 +860,7 @@
         }
 
         await guardApplicationTransition(async () => {
-            currentPage = "cli";
+            await activatePageImmediate("cli");
         });
     }
 
@@ -784,8 +870,7 @@
         }
 
         await guardApplicationTransition(async () => {
-            currentPage = "test-goals";
-            await loadTestGoalTree();
+            await activatePageImmediate("test-goals");
         });
     }
 
@@ -795,8 +880,7 @@
         }
 
         await guardApplicationTransition(async () => {
-            currentPage = "spy";
-            await refreshRemoteSpyStatus();
+            await activatePageImmediate("spy");
         });
     }
 
@@ -806,8 +890,7 @@
         }
 
         await guardApplicationTransition(async () => {
-            currentPage = "results";
-            loadResults();
+            await activatePageImmediate("results");
         });
     }
 
@@ -817,7 +900,7 @@
         }
 
         await guardApplicationTransition(async () => {
-            currentPage = "logs";
+            await activatePageImmediate("logs");
             await loadDebugFiles();
         });
     }
@@ -2280,10 +2363,15 @@
     onMount(async () => {
         startScriptlessPolling();
         try {
+            currentRole = storedWebStudioRole();
+            currentPage = pageForRole(currentRole, currentPage);
             await refreshInitialData();
             if (workspaces.length > 0) {
                 const defaultWorkspace = workspaces.find((workspace) => workspace.name === "webdriver_generic") || workspaces[0];
                 await loadWorkspace(defaultWorkspace.name);
+                if (currentPage === "basic-settings") {
+                    openBasicSettingsImmediate();
+                }
             }
         } catch (loadError) {
             reportClientError("Unable to initialize Web Studio", loadError);
@@ -2320,6 +2408,34 @@
                 {/each}
             </select>
         </div>
+        <div class="page-nav-role">
+            <label for="page-role-select">Role</label>
+            <select
+                id="page-role-select"
+                value={currentRole}
+                on:change={(event) => changeWebStudioRole(event.currentTarget.value)}
+            >
+                <option value={WEB_STUDIO_ROLES.BASIC}>Basic</option>
+                <option value={WEB_STUDIO_ROLES.ADVANCED}>Advanced</option>
+            </select>
+        </div>
+        {#if currentRole === WEB_STUDIO_ROLES.BASIC}
+            <button class:secondary={currentPage !== "basic-settings"} on:click={navigateToBasicSettings}>
+                ⚙️ Test Configuration
+            </button>
+            <button class:secondary={currentPage !== "test-goals"} on:click={navigateToTestGoals}>
+                🎯 Test Goals
+            </button>
+            <button class:secondary={currentPage !== "spy"} on:click={navigateToSpy}>
+                🔍 Spy Mode
+            </button>
+            <button class:secondary={currentPage !== "run"} on:click={navigateToRun}>
+                🔄 Generate Mode
+            </button>
+            <button class:secondary={currentPage !== "cli"} on:click={navigateToCli}>
+                >_ CLI Mode
+            </button>
+        {:else}
         <button class:secondary={currentPage !== "configuration"} on:click={navigateToConfiguration}>
             ⚙️ Test Configuration
         </button>
@@ -2335,10 +2451,12 @@
         <button class:secondary={currentPage !== "cli"} on:click={navigateToCli}>
             >_ CLI Mode
         </button>
+        {/if}
         <div class="page-nav-right-group">
         <button class:secondary={currentPage !== "results"} type="button" on:click={navigateToResults}>
             👁️ View Test Results
         </button>
+        {#if currentRole === WEB_STUDIO_ROLES.ADVANCED}
         <button class="secondary" type="button" on:click={navigateToStateModel}>
             <StateModelIcon size={18} title="State model" />
             <span>View State Model</span>
@@ -2346,8 +2464,47 @@
         <button class:secondary={currentPage !== "logs"} type="button" on:click={navigateToLogs}>
             🧾 Inspect Debug Files
         </button>
+        {:else}
+        <button class="secondary page-nav-placeholder" type="button" aria-hidden="true" tabindex="-1">
+            <StateModelIcon size={18} title="State model" />
+            <span>View State Model</span>
+        </button>
+        <button class="secondary page-nav-placeholder" type="button" aria-hidden="true" tabindex="-1">
+            🧾 Inspect Debug Files
+        </button>
+        {/if}
         </div>
     </nav>
+
+    {#if currentPage === "basic-settings"}
+        <BasicSettingsView
+            compositionFlowNodes={compositionFlowNodes}
+            currentEditorDocument={currentEditorDocument}
+            compileSelectedJavaSource={compileSelectedJavaSource}
+            compileWorkspaceProfile={compileWorkspaceProfile}
+            createCompositionModuleSource={createCompositionModuleSource}
+            javaCompileResult={javaCompileResult}
+            closeCompositionSourceEditor={closeCompositionSourceEditor}
+            openBasicOracleComposition={openBasicOracleComposition}
+            loading={loading}
+            openTestSettings={openTestSettings}
+            openVisualSettings={openVisualSettings}
+            openVisualSettingsGroup={openVisualSettingsGroup}
+            regexValidationResults={regexValidationResults}
+            savedTestSettingsContent={savedTestSettingsContent}
+            saving={saving}
+            setSettingValue={setSettingValue}
+            selectCompositionFlowNode={selectCompositionFlowNode}
+            selectedEditor={selectedEditor}
+            selectedCompositionFlowNode={selectedCompositionFlowNode}
+            selectedSettingsGroupId={selectedSettingsGroupId}
+            selectedSourceFile={selectedSourceFile}
+            selectedSourceSavedContent={selectedSourceFile?.name ? savedSourceContents[selectedSourceFile.name] || "" : ""}
+            restoreSettingDefault={restoreSettingDefault}
+            validateRegexExpression={validateRegexExpression}
+            workspaceDocument={workspaceDocument}
+        />
+    {/if}
 
     {#if currentPage === "configuration"}
         <TestConfigurationView

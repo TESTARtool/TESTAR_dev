@@ -44,6 +44,20 @@ test("guards toggling from visual settings to raw test.settings when settings ar
     );
 });
 
+test("guards leaving dirty basic settings", () => {
+    assert.equal(
+        shouldGuardConfigurationTransition({
+            currentPage: "basic-settings",
+            currentEditor: "settings-form",
+            nextEditor: "__leave__",
+            dirtyAreas: {
+                settings: true
+            }
+        }),
+        true
+    );
+});
+
 test("does not guard navigating into settings after already leaving the settings area", () => {
     assert.equal(
         shouldGuardConfigurationTransition({

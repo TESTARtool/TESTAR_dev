@@ -75,6 +75,99 @@ Examples:
 
 - runtime pages may show `SUTConnectorValue`, but editing remains in configuration
 
+## Role-Based UX
+
+Web Studio should support role-based user experiences.
+
+The selected role changes which workflows and configuration options are primary, but must not create a different workspace format.
+
+The role selector belongs in the top navigation near the workspace selector.
+
+Changing role should preserve the selected workspace.
+
+Changing role should use the same unsaved-change modal as page navigation when the current view is dirty.
+
+### Advanced Role UX
+
+Advanced role keeps the current detailed Web Studio interface.
+
+Advanced users can access low-level files and implementation-oriented editors directly.
+
+Examples:
+
+- raw `test.settings`
+- `composition.properties`
+- Java composition flow
+- `policies.properties`
+- Java policies
+- debug files
+
+### Basic Role UX
+
+Basic role should be workflow-oriented.
+
+Basic users should see labels and panels based on testing tasks rather than internal file names.
+
+Initial Basic navigation:
+
+- `Test Configuration`
+- `Test Goals`
+- `Spy Mode`
+- `Generate Mode`
+- `CLI Mode`
+- `View Test Results`
+
+Shared navigation labels and icons should remain consistent between Basic and Advanced roles.
+
+Top navigation should avoid shifting shared buttons when users switch roles.
+
+The first Basic implementation may reuse existing stable views for Test Goals, Spy Mode, Generate Mode, CLI Mode, and Test Results.
+
+The first Basic implementation should introduce a Basic `Test Configuration` page backed by the visual settings form and a focused oracle composition bridge.
+
+The Basic `Test Configuration` page should show only the agreed Basic settings groups and should not expose the raw settings file toggle.
+
+The Basic `Test Configuration` sidebar should include a `Composition Profile` group with `Edit Oracle Composition`.
+
+`Edit Oracle Composition` should show the `Custom Oracle Services` Java composition node without making the full composition graph the primary Basic workflow.
+
+The oracle composition editor should keep the same static panel behavior as the Advanced composition editor.
+
+Initial Basic workflow groups:
+
+- `Test Configuration`
+- `Test Goals`
+- `Test Oracles`
+- `Run`
+- `Results`
+
+Basic role should prioritize:
+
+- configuring the SUT connector and target
+- configuring begin sequences or test sequences
+- creating and editing Test Goals
+- configuring regex and log-based oracles
+- toggling active oracles
+- editing Java oracle composition through an explicit `Edit Oracle Composition` action
+- running Spy, Generate, CLI, and future MCP modes
+- inspecting Test Results
+
+Basic role should avoid making raw files the first interaction.
+
+Low-level editors can still exist as explicit advanced actions inside the relevant workflow.
+
+Examples:
+
+- `Edit Java Oracle`
+- `Open advanced settings`
+- future `Edit DSL`
+
+### Intermediate Role UX
+
+Intermediate role is a future decision.
+
+Do not implement Intermediate-specific UI until its scope is defined.
+
 ## Workspace Selector UX Contract
 
 The workspace selector area is the primary place for workspace selection and workspace management.
