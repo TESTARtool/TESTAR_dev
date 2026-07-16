@@ -56,7 +56,7 @@ Workspace selection and workspace management are shared capabilities available f
 
 The Advanced role is the current full-control Web Studio experience.
 
-Advanced users can configure everything exposed by Web Studio, including:
+Advanced users can access the full Web Studio configuration and inspection surface, including:
 
 - Test configuration raw `test.settings` editing
 - Test configuration visual settings editing
@@ -69,7 +69,7 @@ Advanced users can configure everything exposed by Web Studio, including:
 - Spy mode
 - Run Generate mode
 - Run CLI mode
-- Run MCP mode
+- MCP mode entry when implemented
 - View test reports
 - View state model analysis
 - View debug files
@@ -82,23 +82,26 @@ The Basic role is the first task-oriented role to design and implement.
 
 Basic users should configure and execute tests through workflow-oriented panels instead of low-level files first.
 
-Initial Basic role implementation:
+Basic role includes a custom `Test Configuration` form settings page.
 
-- A custom Basic `Test Configuration` form settings page that must show only these settings groups:
--- `SUT Connection`
--- `SUT Execution`
--- `Filters`
--- `Agent CLI`
--- `WebDriver`
--- `Android Appium`
+The Basic `Test Configuration` form shows these settings groups:
 
-- reuse and configure Test Oracles
-- reuse and configure Test Goals
-- reuse the Spy mode
-- reuse and run Generate mode
-- reuse and run CLI mode
-- reuse and run MCP mode
-- reuse and view Test Reports
+- `SUT Connection`
+- `SUT Execution`
+- `Filters`
+- `Agent CLI`
+- `WebDriver`
+- `Android Appium`
+
+Basic role also includes these workflows:
+
+- configure Test Oracles
+- configure Test Goals
+- use Spy mode
+- run Generate mode
+- run CLI mode
+- show the MCP mode entry as a future runtime mode until implemented
+- view Test Reports
 
 The Basic role should preserve the same workspace files and settings used by Advanced mode.
 
@@ -128,17 +131,9 @@ The `Test Configuration` area exposes separate pages for settings, composition, 
 - `Edit policies.properties file`
 - `Edit Java Policies`
 
-`Test Oracles` exposes:
+Java source editors are used by the composition and policies pages for their related Java files.
 
-- `Active Oracles`
-- `GUI Regex Oracles`
-- `Windows Process Oracles`
-- `WebDriver Console Oracles`
-- `Log Regex Oracles`
-- `Extended Oracles`
-- `Java Oracle Composition`
-
-- source editors for the related Composition and Policies Java files
+`Test Oracles` exposes the oracle workflow described in the `Test Oracles View` section.
 
 ### Composition Views
 
@@ -342,7 +337,7 @@ Top-level navigation:
 
 ## Test Oracles View
 
-The `Test Oracles` view aggregates oracle-oriented configuration.
+The `Test Oracles` view is available in Basic and Advanced roles.
 
 Left panel order:
 

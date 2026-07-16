@@ -163,9 +163,9 @@ Shared navigation labels and icons should remain consistent between Basic and Ad
 
 Top navigation should avoid shifting shared buttons when users switch roles.
 
-The Basic implementation may reuse existing stable views for Test Oracles, Test Goals, Spy Mode, Generate Mode, CLI Mode, MCP Mode, and Test Results.
+Basic role uses the stable Test Oracles, Test Goals, Spy Mode, Generate Mode, CLI Mode, MCP Mode, and Test Results views.
 
-The Basic implementation should introduce a Basic `Test Configuration` page backed by the visual settings form.
+The Basic implementation includes a Basic `Test Configuration` page backed by the visual settings form.
 
 The Basic `Test Configuration` page should show only the agreed Basic settings groups.
 
@@ -175,7 +175,7 @@ Oracle-related settings should appear in `Test Oracles`.
 
 The visual WebDriver settings form should hide browser-console oracle controls because those belong to `Test Oracles`.
 
-Initial Basic workflow groups:
+Basic workflow groups:
 
 - `Test Settings`
 - `Test Oracles`
