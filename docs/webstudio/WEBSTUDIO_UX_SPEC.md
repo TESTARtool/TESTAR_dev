@@ -87,6 +87,53 @@ Changing role should preserve the selected workspace.
 
 Changing role should use the same unsaved-change modal as page navigation when the current view is dirty.
 
+Workspace selection and workspace management belong to the shared top navigation and are available in every role.
+
+## Top Navigation UX
+
+The top navigation should group pages by workflow intent instead of exposing every page as a flat button.
+
+Target top navigation:
+
+- `Workspace <selected workspace>`
+- `Role <selected role>`
+- `Test Configuration`
+- `Test Oracles`
+- `Test Goals`
+- `Spy Mode`
+- `Run Modes`
+- `View Results`
+
+`Test Configuration` should contain core configuration views:
+
+- `Test Settings`
+- `Composition Flow`
+- `Policies`
+
+`Test Oracles` should be a direct top-level workflow because oracle configuration is central to test design.
+
+`Test Goals` should be a direct top-level workflow because goal authoring is central to CLI and future agentic execution.
+
+`Spy Mode` should remain a direct top-level action.
+
+`Run Modes` should contain execution views:
+
+- `Generate Mode`
+- `CLI Mode`
+- `MCP Mode` (disabled until implemented)
+
+`View Results` should contain inspection views:
+
+- `Test Reports`
+- `State Model`
+- `Debug Files`
+
+Role changes should keep the top-level navigation groups in stable positions.
+
+Role-specific visibility should be applied inside dropdown menus when possible.
+
+Basic role can hide or simplify advanced dropdown entries, but should keep the same top-level group positions as Advanced role.
+
 ### Advanced Role UX
 
 Advanced role keeps the current detailed Web Studio interface.
@@ -108,65 +155,69 @@ Basic role should be workflow-oriented.
 
 Basic users should see labels and panels based on testing tasks rather than internal file names.
 
-Initial Basic navigation:
+Basic navigation should use the same top-level groups as Advanced navigation.
 
-- `Test Configuration`
-- `Test Goals`
-- `Spy Mode`
-- `Generate Mode`
-- `CLI Mode`
-- `View Test Results`
+Basic dropdown contents may hide or simplify advanced entries.
 
 Shared navigation labels and icons should remain consistent between Basic and Advanced roles.
 
 Top navigation should avoid shifting shared buttons when users switch roles.
 
-The first Basic implementation may reuse existing stable views for Test Goals, Spy Mode, Generate Mode, CLI Mode, and Test Results.
+The Basic implementation may reuse existing stable views for Test Oracles, Test Goals, Spy Mode, Generate Mode, CLI Mode, MCP Mode, and Test Results.
 
-The first Basic implementation should introduce a Basic `Test Configuration` page backed by the visual settings form and a focused oracle composition bridge.
+The Basic implementation should introduce a Basic `Test Configuration` page backed by the visual settings form.
 
-The Basic `Test Configuration` page should show only the agreed Basic settings groups and should not expose the raw settings file toggle.
+The Basic `Test Configuration` page should show only the agreed Basic settings groups.
 
-The Basic `Test Configuration` sidebar should include a `Composition Profile` group with `Edit Oracle Composition`.
+Raw `test.settings` editing belongs to the Advanced `Test Settings` page.
 
-`Edit Oracle Composition` should show the `Custom Oracle Services` Java composition node without making the full composition graph the primary Basic workflow.
+Oracle-related settings should appear in `Test Oracles`.
 
-The oracle composition editor should keep the same static panel behavior as the Advanced composition editor.
+The visual WebDriver settings form should hide browser-console oracle controls because those belong to `Test Oracles`.
 
 Initial Basic workflow groups:
 
-- `Test Configuration`
-- `Test Goals`
+- `Test Settings`
 - `Test Oracles`
-- `Run`
-- `Results`
+- `Test Goals`
+- `Spy Mode`
+- `Run Modes`
+- `View Results`
 
 Basic role should prioritize:
 
 - configuring the SUT connector and target
 - configuring begin sequences or test sequences
+- configuring Test Oracles
 - creating and editing Test Goals
-- configuring regex and log-based oracles
-- toggling active oracles
-- editing Java oracle composition through an explicit `Edit Oracle Composition` action
-- running Spy, Generate, CLI, and future MCP modes
+- running Spy, Generate, CLI, and MCP modes
 - inspecting Test Results
 
 Basic role should avoid making raw files the first interaction.
 
 Low-level editors can still exist as explicit advanced actions inside the relevant workflow.
 
-Examples:
-
-- `Edit Java Oracle`
-- `Open advanced settings`
-- future `Edit DSL`
-
 ### Intermediate Role UX
 
 Intermediate role is a future decision.
 
 Do not implement Intermediate-specific UI until its scope is defined.
+
+## Test Oracles View
+
+The `Test Oracles` view should provide a left-panel workflow in this order:
+
+- `Active Oracles`
+- `GUI Regex Oracles`
+- `Windows Process Oracles`
+- `WebDriver Console Oracles`
+- `Log Regex Oracles`
+- `Extended Oracles`
+- `Java Oracle Composition`
+
+`Active Oracles` should be the default panel and should be read-only.
+
+`Active Oracles` should show configured or inactive status without editing controls.
 
 ## Workspace Selector UX Contract
 
@@ -253,17 +304,17 @@ If compilation fails from a guard dialog:
 
 ## Configuration UX Contract
 
-The Test Configuration page is the main authoring surface.
+The `Test Configuration` area is the main technical configuration surface.
 
-The left sidebar is the primary navigation for:
+The `Test Configuration` dropdown routes to focused pages:
 
-- composition profile files
-- Java composition flow
-- policy files
-- Java policies
-- Edit Settings
+- `Test Settings`
+- `Composition Flow`
+- `Policies`
 
-The default Test Configuration landing view is `Edit Java Composition Flow`.
+`Test Settings`, `Composition Flow`, and `Policies` should be separate page-level views.
+
+The default configuration landing view is `Test Settings`.
 
 ### Composition
 

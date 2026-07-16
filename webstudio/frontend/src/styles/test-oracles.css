@@ -1,0 +1,56 @@
+.oracle-panel-section {
+    display: grid;
+    gap: 16px;
+}
+
+.oracle-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.oracle-summary-card {
+    display: grid;
+    gap: 12px;
+    min-height: 118px;
+    padding: 16px;
+    border: 1px solid rgba(165, 53, 52, 0.18);
+    border-radius: 16px;
+    background: rgba(255, 246, 246, 0.78);
+}
+
+.oracle-summary-card.oracle-summary-active {
+    border-color: rgba(47, 158, 68, 0.22);
+    background: rgba(233, 250, 236, 0.78);
+}
+
+.oracle-summary-card > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.oracle-summary-card strong {
+    color: var(--text);
+    font-size: 0.95rem;
+}
+
+.oracle-summary-card span {
+    flex: 0 0 auto;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.7);
+    color: var(--muted);
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.oracle-summary-card p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.45;
+    word-break: break-word;
+}

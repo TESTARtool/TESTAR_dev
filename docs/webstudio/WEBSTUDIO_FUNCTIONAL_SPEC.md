@@ -50,26 +50,29 @@ The selected role must be persisted locally in the browser.
 
 Changing role must use the same unsaved-change guard as normal page navigation when the current view has unsaved changes.
 
+Workspace selection and workspace management are shared capabilities available from the top navigation for all roles.
+
 #### Advanced Role
 
 The Advanced role is the current full-control Web Studio experience.
 
 Advanced users can configure everything exposed by Web Studio, including:
 
-- workspace management
-- raw `test.settings` editing
-- visual settings editing
-- `composition.properties`
-- Java composition services and capabilities
-- `policies.properties`
-- Java policies
-- Test Goals
+- Test configuration raw `test.settings` editing
+- Test configuration visual settings editing
+- Test configuration `composition.properties`
+- Test configuration Java composition services and capabilities
+- Test configuration `policies.properties`
+- Test configuration Java policies
+- configure Test Oracles
+- configure Test Goals
 - Spy mode
-- Generate mode
-- CLI mode
-- test results
-- state model analysis
-- debug files
+- Run Generate mode
+- Run CLI mode
+- Run MCP mode
+- View test reports
+- View state model analysis
+- View debug files
 
 Advanced role behavior is the compatibility baseline for existing Web Studio functionality.
 
@@ -81,48 +84,21 @@ Basic users should configure and execute tests through workflow-oriented panels 
 
 Initial Basic role implementation:
 
-- reuse Test Goals
-- reuse Spy mode
-- reuse Scriptless Generate mode
-- reuse CLI mode
-- reuse Test Results
-- add a Basic `Test Configuration` page that shows the visual settings form and explicit oracle composition editing
+- A custom Basic `Test Configuration` form settings page that must show only these settings groups:
+-- `SUT Connection`
+-- `SUT Execution`
+-- `Filters`
+-- `Agent CLI`
+-- `WebDriver`
+-- `Android Appium`
 
-The Basic `Test Configuration` page must not expose the raw `test.settings` file toggle.
-
-The Basic `Test Configuration` page must show only these settings groups:
-
-- `SUT Connection`
-- `SUT Execution`
-- `Filters`
-- `Oracles`
-- `Agent CLI`
-- `WebDriver`
-- `Android Appium`
-
-The Basic `Test Configuration` page must include a `Composition Profile` area with `Edit Oracle Composition`.
-
-`Edit Oracle Composition` must open the existing Java composition editor constrained to the `Custom Oracle Services` node.
-
-The constrained oracle editor must use the same source creation, source editing, and `Save and Compile` behavior as the Advanced Java composition flow.
-
-The constrained oracle editor should not expose the full composition flow as the primary Basic interaction.
-
-Initial Basic role scope:
-
-- configure SUT connection, including connector and target value
-- configure begin sequences or test sequences
-- configure Test Goals
-- configure Test Oracles using simplified controls
-- configure regex-based oracles
-- configure LogOracle
-- inspect and toggle active oracles
-- access Java or future DSL oracle editing only as an explicit advanced action inside the oracle workflow
-- run Spy mode
-- run Scriptless Generate mode
-- run CLI mode
-- support future MCP mode
-- view Test Results
+- reuse and configure Test Oracles
+- reuse and configure Test Goals
+- reuse the Spy mode
+- reuse and run Generate mode
+- reuse and run CLI mode
+- reuse and run MCP mode
+- reuse and view Test Reports
 
 The Basic role should preserve the same workspace files and settings used by Advanced mode.
 
@@ -136,15 +112,31 @@ No functional behavior is required for Intermediate until its scope is explicitl
 
 ### Editors
 
-The configuration area exposes multiple editors:
+The `Test Configuration` area exposes separate pages for settings, composition, and policies.
+
+`Test Settings` exposes:
+
+- `Edit Settings`
+
+`Composition Flow` exposes:
 
 - `Edit composition.properties file`
 - `Edit Java Composition Flow`
 
+`Policies` exposes:
+
 - `Edit policies.properties file`
 - `Edit Java Policies`
 
-- `Edit Settings`
+`Test Oracles` exposes:
+
+- `Active Oracles`
+- `GUI Regex Oracles`
+- `Windows Process Oracles`
+- `WebDriver Console Oracles`
+- `Log Regex Oracles`
+- `Extended Oracles`
+- `Java Oracle Composition`
 
 - source editors for the related Composition and Policies Java files
 
@@ -273,8 +265,8 @@ After successful creation:
 
 - WebStudio refreshes the workspace list
 - WebStudio selects the new workspace
-- WebStudio opens Test Configuration
-- the default configuration editor is `Edit Java Composition Flow`
+- WebStudio opens `Test Settings`
+- the default settings editor is `Edit Settings`
 
 If creation fails, WebStudio must keep the creation dialog open and show the error.
 
@@ -297,8 +289,8 @@ After successful rename:
 
 - WebStudio refreshes the workspace list
 - WebStudio selects the renamed workspace
-- WebStudio opens Test Configuration
-- the default configuration editor is `Edit Java Composition Flow`
+- WebStudio opens `Test Settings`
+- the default settings editor is `Edit Settings`
 
 Workspace rename must also rename the matching output results workspace folder when it exists.
 
@@ -313,15 +305,62 @@ If rename fails, WebStudio must keep the workspace management dialog open and sh
 
 ### Page Navigation
 
-Main pages:
+WebStudio top navigation should be grouped by user intent.
 
-- Test Configuration
-- Spy Mode
-- Generate Mode
-- CLI Mode
-- View Test Results
-- View State Model
-- Inspect Debug Files
+Top-level navigation:
+
+- `Workspace <selected workspace>`
+- `Role <selected role>`
+- `Test Configuration`
+- `Test Oracles`
+- `Test Goals`
+- `Spy Mode`
+- `Run Modes`
+- `View Results`
+
+`Test Configuration` entries:
+
+- `Test Settings`
+- `Composition Flow`
+- `Policies`
+
+`Test Oracles` view aggregates oracle-oriented configuration.
+
+`Spy Mode` remains a direct top-level action because interactive inspection is a frequent standalone workflow.
+
+`Run Modes` entries:
+
+- `Generate Mode`
+- `CLI Mode`
+- `MCP Mode` (disabled until implemented)
+
+`View Results` entries:
+
+- `Test Reports`
+- `State Model`
+- `Debug Files`
+
+## Test Oracles View
+
+The `Test Oracles` view aggregates oracle-oriented configuration.
+
+Left panel order:
+
+- `Active Oracles`
+- `GUI Regex Oracles`
+- `Windows Process Oracles`
+- `WebDriver Console Oracles`
+- `Log Regex Oracles`
+- `Extended Oracles`
+- `Java Oracle Composition`
+
+`Active Oracles` is the default panel when opening `Test Oracles`.
+
+`Active Oracles` must be read-only and must summarize active or configured oracle mechanisms.
+
+`Java Oracle Composition` must reuse the `Custom Oracle Services` composition node editing behavior.
+
+Future DSL oracle authoring may be added as an additional panel.
 
 ## Test Configuration
 

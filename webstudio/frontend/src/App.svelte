@@ -2,15 +2,17 @@
     import { onDestroy, onMount } from "svelte";
     import BasicSettingsView from "./BasicSettingsView.svelte";
     import CliModeView from "./CliModeView.svelte";
-    import TestConfigurationView from "./TestConfigurationView.svelte";
+    import TestCompositionPageView from "./TestCompositionPageView.svelte";
+    import TestPoliciesPageView from "./TestPoliciesPageView.svelte";
+    import TestSettingsPageView from "./TestSettingsPageView.svelte";
     import RunTestarView from "./RunTestarView.svelte";
     import SpyModeView from "./SpyModeView.svelte";
     import TestResultsView from "./TestResultsView.svelte";
     import InspectLogsView from "./InspectLogsView.svelte";
     import TestGoalsView from "./TestGoalsView.svelte";
-    import StateModelIcon from "./icons/StateModelIcon.svelte";
+    import TestOraclesView from "./TestOraclesView.svelte";
     import { testGoalFolderSelectionState } from "./testGoalsModel.js";
-    import { ORACLE_COMPOSITION_NODE_ID } from "./basicConfigurationModel.js";
+    import { ORACLE_COMPOSITION_NODE_ID, TEST_ORACLE_PANEL_IDS, oracleSettingsGroupId } from "./testOraclesModel.js";
     import { shouldGuardConfigurationTransition } from "./configurationGuard.js";
     import { clearSelectedSourceState } from "./policyEditorState.js";
     import { stateModelWorkspaceDialog } from "./stateModelNavigation.js";
@@ -26,10 +28,17 @@
     } from "./workspaceManagementModel.js";
     import {
         BASIC_ROLE_SETTINGS_GROUP_IDS,
+        TEST_SETTINGS_GROUP_IDS,
         WEB_STUDIO_ROLES,
         normalizeWebStudioRole,
         pageForRole
     } from "./webStudioRoles.js";
+    import {
+        menuHasActivePage,
+        resultMenuItems,
+        runModeMenuItems,
+        testConfigurationMenuItems
+    } from "./webStudioNavigation.js";
 
     const STATE_MODEL_URL = "http://localhost:8090/models";
     const ROLE_STORAGE_KEY = "testar-webstudio-role";
@@ -77,8 +86,10 @@
     let message = "";
     let messageTimeoutHandle = null;
     let scriptlessPollHandle = null;
-    let currentPage = "configuration";
+    let currentPage = "settings";
     let currentRole = WEB_STUDIO_ROLES.ADVANCED;
+    let activeNavMenu = "";
+    let selectedOraclePanelId = TEST_ORACLE_PANEL_IDS.ACTIVE;
     let resultsData = null;
     let selectedResultGroup = null;
     let selectedResultFile = null;
@@ -297,6 +308,12 @@
                 await loadResults(workspaceName);
             } else if (currentPage === "basic-settings") {
                 openBasicSettingsImmediate();
+            } else if (currentPage === "settings") {
+                await openVisualSettings();
+            } else if (currentPage === "composition") {
+                await openJavaComposition();
+            } else if (currentPage === "policies") {
+                await openJavaPolicies();
             }
         } catch (loadError) {
             reportClientError(`Unable to load workspace ${workspaceName}`, loadError);
@@ -774,34 +791,65 @@
         }
     }
 
-    function firstBasicSettingsGroupId() {
+    function firstSettingsGroupId(allowedSettingsGroupIds) {
         const availableGroupIds = new Set((workspaceDocument?.settingsGroups || []).map((settingsGroup) => settingsGroup.id));
-        return BASIC_ROLE_SETTINGS_GROUP_IDS.find((groupId) => availableGroupIds.has(groupId))
+        return allowedSettingsGroupIds.find((groupId) => availableGroupIds.has(groupId))
             || workspaceDocument?.settingsGroups?.[0]?.id
             || "";
     }
 
-    function openBasicSettingsImmediate() {
+    function openAllowedSettingsImmediate(allowedSettingsGroupIds) {
         openEditorImmediate("settings-form");
-        if (!BASIC_ROLE_SETTINGS_GROUP_IDS.includes(selectedSettingsGroupId)) {
-            selectedSettingsGroupId = firstBasicSettingsGroupId();
+        if (!allowedSettingsGroupIds.includes(selectedSettingsGroupId)) {
+            selectedSettingsGroupId = firstSettingsGroupId(allowedSettingsGroupIds);
         }
     }
 
-    async function openBasicOracleComposition() {
+    function openBasicSettingsImmediate() {
+        openAllowedSettingsImmediate(BASIC_ROLE_SETTINGS_GROUP_IDS);
+    }
+
+    function openTestSettingsImmediate() {
+        openAllowedSettingsImmediate(TEST_SETTINGS_GROUP_IDS);
+    }
+
+    function openOracleCompositionImmediate() {
+        openEditorImmediate("java-composition");
+        const oracleNode = compositionFlowNodes.find((flowNode) => flowNode.id === ORACLE_COMPOSITION_NODE_ID);
+        if (oracleNode) {
+            selectCompositionFlowNode(oracleNode);
+        }
+    }
+
+    async function openOraclePanel(panelId) {
         await guardConfigurationTransition(async () => {
-            openEditorImmediate("java-composition");
-            const oracleNode = compositionFlowNodes.find((flowNode) => flowNode.id === ORACLE_COMPOSITION_NODE_ID);
-            if (oracleNode) {
-                selectCompositionFlowNode(oracleNode);
+            selectedOraclePanelId = panelId;
+            if (panelId === TEST_ORACLE_PANEL_IDS.ACTIVE) {
+                return;
             }
-        }, "java-composition");
+
+            if (panelId === TEST_ORACLE_PANEL_IDS.JAVA_COMPOSITION) {
+                openOracleCompositionImmediate();
+                return;
+            }
+
+            openEditorImmediate("settings-form");
+            selectedSettingsGroupId = oracleSettingsGroupId(panelId);
+        }, `oracle-panel:${panelId}`);
     }
 
     async function activatePageImmediate(page) {
         currentPage = page;
         if (page === "basic-settings") {
             openBasicSettingsImmediate();
+        } else if (page === "oracles") {
+            await openOraclePanel(selectedOraclePanelId || TEST_ORACLE_PANEL_IDS.ACTIVE);
+        } else if (page === "settings") {
+            openTestSettingsImmediate();
+        } else if (page === "composition") {
+            await openJavaComposition();
+        } else if (page === "policies") {
+            await openJavaPolicies();
         } else if (page === "test-goals") {
             await loadTestGoalTree();
         } else if (page === "spy") {
@@ -834,13 +882,47 @@
         }, "settings-form");
     }
 
-    async function navigateToConfiguration() {
-        if (currentPage === "configuration") {
+    async function navigateToSettings() {
+        if (currentPage === "settings") {
             return;
         }
 
         await guardApplicationTransition(async () => {
-            await activatePageImmediate("configuration");
+            await activatePageImmediate("settings");
+        }, "settings-form");
+    }
+
+    async function navigateToAdvancedCompositionFlow() {
+        if (currentPage === "composition") {
+            await openJavaComposition();
+            return;
+        }
+
+        await guardApplicationTransition(async () => {
+            await activatePageImmediate("composition");
+        }, "java-composition");
+    }
+
+    async function navigateToAdvancedPolicies() {
+        if (currentPage === "policies") {
+            await openJavaPolicies();
+            return;
+        }
+
+        await guardApplicationTransition(async () => {
+            await activatePageImmediate("policies");
+        }, "java-policies");
+    }
+
+    async function navigateToTestOracles() {
+        activeNavMenu = "";
+        if (currentPage === "oracles") {
+            return;
+        }
+
+        await guardApplicationTransition(async () => {
+            selectedOraclePanelId = TEST_ORACLE_PANEL_IDS.ACTIVE;
+            await activatePageImmediate("oracles");
         });
     }
 
@@ -869,6 +951,7 @@
             return;
         }
 
+        activeNavMenu = "";
         await guardApplicationTransition(async () => {
             await activatePageImmediate("test-goals");
         });
@@ -879,6 +962,7 @@
             return;
         }
 
+        activeNavMenu = "";
         await guardApplicationTransition(async () => {
             await activatePageImmediate("spy");
         });
@@ -903,6 +987,42 @@
             await activatePageImmediate("logs");
             await loadDebugFiles();
         });
+    }
+
+    function toggleNavMenu(menuId) {
+        activeNavMenu = activeNavMenu === menuId ? "" : menuId;
+    }
+
+    async function navigateFromMenu(item) {
+        if (item.disabled) {
+            return;
+        }
+
+        activeNavMenu = "";
+
+        if (item.id === "basic-settings") {
+            await navigateToBasicSettings();
+        } else if (item.id === "settings") {
+            await navigateToSettings();
+        } else if (item.id === "basic-oracles" || item.id === "advanced-oracles") {
+            await navigateToTestOracles();
+        } else if (item.id === "test-goals") {
+            await navigateToTestGoals();
+        } else if (item.id === "composition") {
+            await navigateToAdvancedCompositionFlow();
+        } else if (item.id === "policies") {
+            await navigateToAdvancedPolicies();
+        } else if (item.id === "run") {
+            await navigateToRun();
+        } else if (item.id === "cli") {
+            await navigateToCli();
+        } else if (item.id === "results") {
+            await navigateToResults();
+        } else if (item.id === "state-model") {
+            await navigateToStateModel();
+        } else if (item.id === "logs") {
+            await navigateToLogs();
+        }
     }
 
     async function openWorkspaceManagementDialog() {
@@ -951,7 +1071,7 @@
                 body: JSON.stringify(request)
             });
             await refreshInitialData();
-            currentPage = "configuration";
+            currentPage = "settings";
             await loadWorkspace(createdWorkspace?.name || request.name);
             workspaceManagementDialogOpen = false;
             showTemporaryMessage(`Workspace ${request.name} created.`);
@@ -984,7 +1104,7 @@
                 body: JSON.stringify(request)
             });
             await refreshInitialData();
-            currentPage = "configuration";
+            currentPage = "settings";
             await loadWorkspace(renamedWorkspace?.name || request.name);
             workspaceManagementDialogOpen = false;
             showTemporaryMessage(`Workspace renamed to ${request.name}.`);
@@ -2419,25 +2539,26 @@
                 <option value={WEB_STUDIO_ROLES.ADVANCED}>Advanced</option>
             </select>
         </div>
-        {#if currentRole === WEB_STUDIO_ROLES.BASIC}
-            <button class:secondary={currentPage !== "basic-settings"} on:click={navigateToBasicSettings}>
-                ⚙️ Test Configuration
+        <div class="page-nav-menu">
+            <button
+                class:secondary={!menuHasActivePage(testConfigurationMenuItems(currentRole), currentPage)}
+                type="button"
+                on:click={() => toggleNavMenu("configure")}
+            >
+                ⚙️ Test Configuration ▼
             </button>
-            <button class:secondary={currentPage !== "test-goals"} on:click={navigateToTestGoals}>
-                🎯 Test Goals
-            </button>
-            <button class:secondary={currentPage !== "spy"} on:click={navigateToSpy}>
-                🔍 Spy Mode
-            </button>
-            <button class:secondary={currentPage !== "run"} on:click={navigateToRun}>
-                🔄 Generate Mode
-            </button>
-            <button class:secondary={currentPage !== "cli"} on:click={navigateToCli}>
-                >_ CLI Mode
-            </button>
-        {:else}
-        <button class:secondary={currentPage !== "configuration"} on:click={navigateToConfiguration}>
-            ⚙️ Test Configuration
+            {#if activeNavMenu === "configure"}
+                <div class="page-nav-dropdown">
+                    {#each testConfigurationMenuItems(currentRole) as item}
+                        <button type="button" class:secondary={item.id !== currentPage} disabled={item.disabled} on:click={() => navigateFromMenu(item)}>
+                            {item.label}
+                        </button>
+                    {/each}
+                </div>
+            {/if}
+        </div>
+        <button class:secondary={currentPage !== "oracles"} on:click={navigateToTestOracles}>
+            🔮 Test Oracles
         </button>
         <button class:secondary={currentPage !== "test-goals"} on:click={navigateToTestGoals}>
             🎯 Test Goals
@@ -2445,47 +2566,47 @@
         <button class:secondary={currentPage !== "spy"} on:click={navigateToSpy}>
             🔍 Spy Mode
         </button>
-        <button class:secondary={currentPage !== "run"} on:click={navigateToRun}>
-            🔄 Generate Mode
-        </button>
-        <button class:secondary={currentPage !== "cli"} on:click={navigateToCli}>
-            >_ CLI Mode
-        </button>
-        {/if}
-        <div class="page-nav-right-group">
-        <button class:secondary={currentPage !== "results"} type="button" on:click={navigateToResults}>
-            👁️ View Test Results
-        </button>
-        {#if currentRole === WEB_STUDIO_ROLES.ADVANCED}
-        <button class="secondary" type="button" on:click={navigateToStateModel}>
-            <StateModelIcon size={18} title="State model" />
-            <span>View State Model</span>
-        </button>
-        <button class:secondary={currentPage !== "logs"} type="button" on:click={navigateToLogs}>
-            🧾 Inspect Debug Files
-        </button>
-        {:else}
-        <button class="secondary page-nav-placeholder" type="button" aria-hidden="true" tabindex="-1">
-            <StateModelIcon size={18} title="State model" />
-            <span>View State Model</span>
-        </button>
-        <button class="secondary page-nav-placeholder" type="button" aria-hidden="true" tabindex="-1">
-            🧾 Inspect Debug Files
-        </button>
-        {/if}
+        <div class="page-nav-menu">
+            <button
+                class:secondary={!menuHasActivePage(runModeMenuItems(), currentPage)}
+                type="button"
+                on:click={() => toggleNavMenu("run")}
+            >
+                🔄 Run Modes ▼
+            </button>
+            {#if activeNavMenu === "run"}
+                <div class="page-nav-dropdown">
+                    {#each runModeMenuItems() as item}
+                        <button type="button" class:secondary={item.id !== currentPage} disabled={item.disabled} on:click={() => navigateFromMenu(item)}>
+                            {item.label}
+                        </button>
+                    {/each}
+                </div>
+            {/if}
+        </div>
+        <div class="page-nav-menu">
+            <button
+                class:secondary={!menuHasActivePage(resultMenuItems(currentRole), currentPage)}
+                type="button"
+                on:click={() => toggleNavMenu("results")}
+            >
+                👁️ View Results ▼
+            </button>
+            {#if activeNavMenu === "results"}
+                <div class="page-nav-dropdown">
+                    {#each resultMenuItems(currentRole) as item}
+                        <button type="button" class:secondary={item.id !== currentPage} disabled={item.disabled} on:click={() => navigateFromMenu(item)}>
+                            {item.label}
+                        </button>
+                    {/each}
+                </div>
+            {/if}
         </div>
     </nav>
 
     {#if currentPage === "basic-settings"}
         <BasicSettingsView
-            compositionFlowNodes={compositionFlowNodes}
             currentEditorDocument={currentEditorDocument}
-            compileSelectedJavaSource={compileSelectedJavaSource}
-            compileWorkspaceProfile={compileWorkspaceProfile}
-            createCompositionModuleSource={createCompositionModuleSource}
-            javaCompileResult={javaCompileResult}
-            closeCompositionSourceEditor={closeCompositionSourceEditor}
-            openBasicOracleComposition={openBasicOracleComposition}
             loading={loading}
             openTestSettings={openTestSettings}
             openVisualSettings={openVisualSettings}
@@ -2494,9 +2615,36 @@
             savedTestSettingsContent={savedTestSettingsContent}
             saving={saving}
             setSettingValue={setSettingValue}
-            selectCompositionFlowNode={selectCompositionFlowNode}
             selectedEditor={selectedEditor}
+            selectedSettingsGroupId={selectedSettingsGroupId}
+            restoreSettingDefault={restoreSettingDefault}
+            validateRegexExpression={validateRegexExpression}
+            workspaceDocument={workspaceDocument}
+        />
+    {/if}
+
+    {#if currentPage === "oracles"}
+        <TestOraclesView
+            compositionFlowNodes={compositionFlowNodes}
+            currentEditorDocument={currentEditorDocument}
+            compileSelectedJavaSource={compileSelectedJavaSource}
+            compileWorkspaceProfile={compileWorkspaceProfile}
+            createCompositionModuleSource={createCompositionModuleSource}
+            javaCompileResult={javaCompileResult}
+            closeCompositionSourceEditor={closeCompositionSourceEditor}
+            loading={loading}
+            openOraclePanel={openOraclePanel}
+            openTestSettings={openTestSettings}
+            openVisualSettings={openVisualSettings}
+            openVisualSettingsGroup={openVisualSettingsGroup}
+            regexValidationResults={regexValidationResults}
+            savedTestSettingsContent={savedTestSettingsContent}
+            saving={saving}
+            selectedOraclePanelId={selectedOraclePanelId}
+            setSettingValue={setSettingValue}
+            selectCompositionFlowNode={selectCompositionFlowNode}
             selectedCompositionFlowNode={selectedCompositionFlowNode}
+            selectedEditor={selectedEditor}
             selectedSettingsGroupId={selectedSettingsGroupId}
             selectedSourceFile={selectedSourceFile}
             selectedSourceSavedContent={selectedSourceFile?.name ? savedSourceContents[selectedSourceFile.name] || "" : ""}
@@ -2506,47 +2654,70 @@
         />
     {/if}
 
-    {#if currentPage === "configuration"}
-        <TestConfigurationView
-            activePolicySourceFiles={activePolicySourceFiles}
+    {#if currentPage === "settings"}
+        <TestSettingsPageView
+            currentEditorDocument={currentEditorDocument}
+            loading={loading}
+            openTestSettings={openTestSettings}
+            openVisualSettings={openVisualSettings}
+            openVisualSettingsGroup={openVisualSettingsGroup}
+            regexValidationResults={regexValidationResults}
+            savedTestSettingsContent={savedTestSettingsContent}
+            saving={saving}
+            setSettingValue={setSettingValue}
+            selectedEditor={selectedEditor}
+            selectedSettingsGroupId={selectedSettingsGroupId}
+            restoreSettingDefault={restoreSettingDefault}
+            validateRegexExpression={validateRegexExpression}
+            workspaceDocument={workspaceDocument}
+        />
+    {/if}
+
+    {#if currentPage === "composition"}
+        <TestCompositionPageView
             compositionFlowNodes={compositionFlowNodes}
+            currentEditorDocument={currentEditorDocument}
+            isSelectedEditor={isSelectedEditor}
+            openCompositionProperties={openCompositionProperties}
+            openJavaComposition={openJavaComposition}
+            compileSelectedJavaSource={compileSelectedJavaSource}
+            compileWorkspaceProfile={compileWorkspaceProfile}
+            createCompositionModuleSource={createCompositionModuleSource}
+            javaCompileResult={javaCompileResult}
+            closeCompositionSourceEditor={closeCompositionSourceEditor}
+            saving={saving}
+            selectCompositionFlowNode={selectCompositionFlowNode}
+            selectedCompositionFlowNode={selectedCompositionFlowNode}
+            selectedEditor={selectedEditor}
+            selectedSourceFile={selectedSourceFile}
+            selectedSourceSavedContent={selectedSourceFile?.name ? savedSourceContents[selectedSourceFile.name] || "" : ""}
+            savedCompositionPropertiesContent={savedCompositionPropertiesContent}
+            workspaceDocument={workspaceDocument}
+        />
+    {/if}
+
+    {#if currentPage === "policies"}
+        <TestPoliciesPageView
+            activePolicySourceFiles={activePolicySourceFiles}
             currentEditorDocument={currentEditorDocument}
             inactivePolicySourceFiles={inactivePolicySourceFiles}
             isPolicySourceSelected={isPolicySourceSelected}
             isSelectedEditor={isSelectedEditor}
-            loading={loading}
-            openCompositionProperties={openCompositionProperties}
-            openJavaComposition={openJavaComposition}
             openJavaPolicies={openJavaPolicies}
             openPoliciesProperties={openPoliciesProperties}
-            openTestSettings={openTestSettings}
-            openVisualSettings={openVisualSettings}
-            openVisualSettingsGroup={openVisualSettingsGroup}
             policySourceFiles={policySourceFiles}
-            closeCompositionSourceEditor={closeCompositionSourceEditor}
             closePolicySourceEditor={closePolicySourceEditor}
             compileSelectedJavaSource={compileSelectedJavaSource}
             compileWorkspaceProfile={compileWorkspaceProfile}
-            createCompositionModuleSource={createCompositionModuleSource}
             createPolicySource={createPolicySource}
             javaCompileResult={javaCompileResult}
-            regexValidationResults={regexValidationResults}
-            savedCompositionPropertiesContent={savedCompositionPropertiesContent}
             savedPoliciesPropertiesContent={savedPoliciesPropertiesContent}
-            savedTestSettingsContent={savedTestSettingsContent}
             saving={saving}
-            setSettingValue={setSettingValue}
             selectSource={selectSource}
-            selectCompositionFlowNode={selectCompositionFlowNode}
             selectedEditor={selectedEditor}
-            selectedCompositionFlowNode={selectedCompositionFlowNode}
-            selectedSettingsGroupId={selectedSettingsGroupId}
             selectedSourceFile={selectedSourceFile}
-            selectedSourceDirty={hasCurrentSelectedSourceChanges()}
             selectedSourceSavedContent={selectedSourceFile?.name ? savedSourceContents[selectedSourceFile.name] || "" : ""}
-            restoreSettingDefault={restoreSettingDefault}
             togglePolicySourceActivation={togglePolicySourceActivation}
-            validateRegexExpression={validateRegexExpression}
             workspaceDocument={workspaceDocument}
         />
     {/if}

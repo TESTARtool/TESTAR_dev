@@ -28,7 +28,16 @@ export function shouldGuardConfigurationTransition({
     nextEditor,
     dirtyAreas = {}
 }) {
-    if (currentPage !== "configuration" && currentPage !== "basic-settings") {
+    const configurationPages = new Set([
+        "configuration",
+        "basic-settings",
+        "oracles",
+        "settings",
+        "composition",
+        "policies"
+    ]);
+
+    if (!configurationPages.has(currentPage)) {
         return false;
     }
 

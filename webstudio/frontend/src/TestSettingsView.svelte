@@ -4,6 +4,8 @@
 
     export let currentEditorDocument = null;
     export let allowedSettingsGroupIds = null;
+    export let allowedSettingKeys = null;
+    export let excludedSettingKeys = null;
     export let allowSettingsFileToggle = true;
     export let loading = false;
     export let openTestSettings;
@@ -86,14 +88,28 @@
     $: allowedSettingsGroupSet = Array.isArray(allowedSettingsGroupIds)
         ? new Set(allowedSettingsGroupIds)
         : null;
+    $: allowedSettingKeySet = Array.isArray(allowedSettingKeys)
+        ? new Set(allowedSettingKeys)
+        : null;
+    $: excludedSettingKeySet = Array.isArray(excludedSettingKeys)
+        ? new Set(excludedSettingKeys)
+        : null;
 
     $: roleFilteredSettingsGroups = (workspaceDocument?.settingsGroups || [])
-        .filter((settingsGroup) => !allowedSettingsGroupSet || allowedSettingsGroupSet.has(settingsGroup.id));
+        .filter((settingsGroup) => !allowedSettingsGroupSet || allowedSettingsGroupSet.has(settingsGroup.id))
+        .map((settingsGroup) => ({
+            ...settingsGroup,
+            settings: (settingsGroup.settings || [])
+                .filter((setting) => !excludedSettingKeySet || !excludedSettingKeySet.has(setting.key))
+        }))
+        .filter((settingsGroup) => settingsGroup.settings.length > 0);
 
     $: filteredSettingsGroups = roleFilteredSettingsGroups
         .map((settingsGroup) => ({
             ...settingsGroup,
-            settings: (settingsGroup.settings || []).filter((setting) => matchesSettingsSearch(setting, settingsSearch))
+            settings: (settingsGroup.settings || [])
+                .filter((setting) => !allowedSettingKeySet || allowedSettingKeySet.has(setting.key))
+                .filter((setting) => matchesSettingsSearch(setting, settingsSearch))
         }))
         .filter((settingsGroup) => settingsGroup.settings.length > 0);
 

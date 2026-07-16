@@ -7,14 +7,35 @@ export const BASIC_ROLE_SETTINGS_GROUP_IDS = [
     "sut-connection",
     "execution",
     "filters",
-    "oracles",
     "agent-cli",
     "webdriver",
     "appium"
 ];
 
+export const TEST_SETTINGS_GROUP_IDS = [
+    "sut-connection",
+    "execution",
+    "reporting",
+    "filters",
+    "state-model",
+    "state-identification",
+    "agent-cli",
+    "webdriver",
+    "appium",
+    "llm",
+    "coverage"
+];
+
+export const TEST_SETTINGS_EXCLUDED_SETTING_KEYS = [
+    "WebConsoleErrorOracle",
+    "WebConsoleErrorPattern",
+    "WebConsoleWarningOracle",
+    "WebConsoleWarningPattern"
+];
+
 const BASIC_PAGES = new Set([
     "basic-settings",
+    "oracles",
     "test-goals",
     "spy",
     "run",
@@ -23,7 +44,10 @@ const BASIC_PAGES = new Set([
 ]);
 
 const ADVANCED_PAGES = new Set([
-    "configuration",
+    "settings",
+    "oracles",
+    "composition",
+    "policies",
     "test-goals",
     "spy",
     "run",
@@ -45,7 +69,7 @@ export function pageForRole(role, currentPage) {
         return BASIC_PAGES.has(currentPage) ? currentPage : "basic-settings";
     }
 
-    return ADVANCED_PAGES.has(currentPage) ? currentPage : "configuration";
+    return ADVANCED_PAGES.has(currentPage) ? currentPage : "settings";
 }
 
 export function pageAvailableForRole(role, page) {

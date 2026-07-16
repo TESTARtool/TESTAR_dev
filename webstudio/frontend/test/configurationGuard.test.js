@@ -58,6 +58,34 @@ test("guards leaving dirty basic settings", () => {
     );
 });
 
+test("guards leaving dirty split settings page", () => {
+    assert.equal(
+        shouldGuardConfigurationTransition({
+            currentPage: "settings",
+            currentEditor: "settings-form",
+            nextEditor: "__leave__",
+            dirtyAreas: {
+                settings: true
+            }
+        }),
+        true
+    );
+});
+
+test("guards leaving dirty test oracles settings panel", () => {
+    assert.equal(
+        shouldGuardConfigurationTransition({
+            currentPage: "oracles",
+            currentEditor: "settings-form",
+            nextEditor: "oracle-panel:active-oracles",
+            dirtyAreas: {
+                settings: true
+            }
+        }),
+        true
+    );
+});
+
 test("does not guard navigating into settings after already leaving the settings area", () => {
     assert.equal(
         shouldGuardConfigurationTransition({
@@ -86,12 +114,40 @@ test("guards leaving dirty composition properties for Java composition flow", ()
     );
 });
 
+test("guards leaving dirty split composition page", () => {
+    assert.equal(
+        shouldGuardConfigurationTransition({
+            currentPage: "composition",
+            currentEditor: "java-composition",
+            nextEditor: "__leave__",
+            dirtyAreas: {
+                "composition-flow": true
+            }
+        }),
+        true
+    );
+});
+
 test("guards leaving dirty Java policies for policies properties", () => {
     assert.equal(
         shouldGuardConfigurationTransition({
             currentPage: "configuration",
             currentEditor: "java-policies",
             nextEditor: "policies-properties",
+            dirtyAreas: {
+                "policies-flow": true
+            }
+        }),
+        true
+    );
+});
+
+test("guards leaving dirty split policies page", () => {
+    assert.equal(
+        shouldGuardConfigurationTransition({
+            currentPage: "policies",
+            currentEditor: "java-policies",
+            nextEditor: "__leave__",
             dirtyAreas: {
                 "policies-flow": true
             }

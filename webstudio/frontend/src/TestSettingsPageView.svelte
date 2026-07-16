@@ -1,6 +1,6 @@
 <script>
     import TestSettingsView from "./TestSettingsView.svelte";
-    import { BASIC_ROLE_SETTINGS_GROUP_IDS, TEST_SETTINGS_EXCLUDED_SETTING_KEYS } from "./webStudioRoles.js";
+    import { TEST_SETTINGS_EXCLUDED_SETTING_KEYS, TEST_SETTINGS_GROUP_IDS } from "./webStudioRoles.js";
 
     export let currentEditorDocument = null;
     export let loading = false;
@@ -16,15 +16,12 @@
     export let restoreSettingDefault;
     export let validateRegexExpression;
     export let workspaceDocument = null;
-
-    const settingsDescription = "Basic setup for SUT connection, execution, filters, Agent CLI, WebDriver, and Android Appium.";
 </script>
 
 <main class="studio-layout">
     <section class="panel sidebar">
         <TestSettingsView
-            allowedSettingsGroupIds={BASIC_ROLE_SETTINGS_GROUP_IDS}
-            allowSettingsFileToggle={false}
+            allowedSettingsGroupIds={TEST_SETTINGS_GROUP_IDS}
             excludedSettingKeys={TEST_SETTINGS_EXCLUDED_SETTING_KEYS}
             currentEditorDocument={currentEditorDocument}
             loading={loading}
@@ -39,7 +36,6 @@
             setSettingValue={setSettingValue}
             selectedEditor={selectedEditor}
             selectedSettingsGroupId={selectedSettingsGroupId}
-            settingsDescription={settingsDescription}
             restoreSettingDefault={restoreSettingDefault}
             validateRegexExpression={validateRegexExpression}
             workspaceDocument={workspaceDocument}
@@ -48,8 +44,7 @@
 
     <section class="panel content-panel">
         <TestSettingsView
-            allowedSettingsGroupIds={BASIC_ROLE_SETTINGS_GROUP_IDS}
-            allowSettingsFileToggle={false}
+            allowedSettingsGroupIds={TEST_SETTINGS_GROUP_IDS}
             excludedSettingKeys={TEST_SETTINGS_EXCLUDED_SETTING_KEYS}
             currentEditorDocument={currentEditorDocument}
             loading={loading}
@@ -64,7 +59,6 @@
             setSettingValue={setSettingValue}
             selectedEditor={selectedEditor}
             selectedSettingsGroupId={selectedSettingsGroupId}
-            settingsDescription={settingsDescription}
             restoreSettingDefault={restoreSettingDefault}
             validateRegexExpression={validateRegexExpression}
             workspaceDocument={workspaceDocument}
