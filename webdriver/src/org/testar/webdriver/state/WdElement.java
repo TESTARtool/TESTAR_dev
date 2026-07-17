@@ -8,10 +8,14 @@ package org.testar.webdriver.state;
 
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.testar.core.alayer.Rect;
+import org.testar.core.alayer.Role;
 import org.testar.core.tag.TaggableBase;
 import org.testar.webdriver.alayer.WdCanvasDimensions;
+import org.testar.webdriver.alayer.WdRoles;
+import org.testar.webdriver.util.ColorUtil;
 import org.testar.webdriver.util.WdConstants;
 
+import java.awt.Color;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,7 +48,7 @@ public class WdElement extends TaggableBase implements Serializable {
   public List<String> cssClasses = new ArrayList<>();
   public String display, type;
   public String innerHTML, outerHTML;
-  public int maxLength;
+  public int length, maxLength;
 
   public boolean enabled, ignore, disabled;
   public boolean isClickable;
@@ -63,9 +67,12 @@ public class WdElement extends TaggableBase implements Serializable {
   public boolean isFullVisibleOnScreen, isActuallyVisible;
 
   public boolean checked, selected;
+  public boolean multiple;
 
   // ComputedStyle properties
   public String computedFontSize;
+  public Color computedColor, computedBackgroundColor;
+  public String computedColorName, computedBackgroundColorName;
 
   // Keep these here for fillScrollValues
   protected String overflowX, overflowY;
@@ -169,12 +176,17 @@ public class WdElement extends TaggableBase implements Serializable {
     	maxLength = -1;
     }
 
+    length = ((Number) packedElement.getOrDefault("length", -1)).intValue();
+
     innerHTML = (String) packedElement.getOrDefault("innerHTML", "");
     outerHTML = (String) packedElement.getOrDefault("outerHTML", "");
 
     remoteWebElement = (RemoteWebElement)packedElement.get("element");
     checked = asBool(packedElement.getOrDefault("checked", false));
     selected = asBool(packedElement.getOrDefault("selected", false));
+    disabled = asBool(packedElement.getOrDefault("disabled", false));
+
+    multiple = asBool(packedElement.getOrDefault("multiple", false));
 
     String classesString = attributeMap.getOrDefault("class", "");
     if (classesString != null) {
@@ -182,6 +194,10 @@ public class WdElement extends TaggableBase implements Serializable {
     }
     display = (String) packedElement.get("display");
     computedFontSize = (String) packedElement.getOrDefault("computedFontSize", "");
+    computedColor = ColorUtil.rgbToColor((String) packedElement.getOrDefault("computedColor", ""));
+    computedBackgroundColor = ColorUtil.rgbToColor((String) packedElement.getOrDefault("computedBackgroundColor", ""));
+    computedColorName = ColorUtil.colorToName(computedColor);
+    computedBackgroundColorName = ColorUtil.colorToName(computedBackgroundColor);
 
     styleOpacity = castObjectToDouble(packedElement.get("styleOpacity"),1.0);
 
@@ -193,7 +209,7 @@ public class WdElement extends TaggableBase implements Serializable {
     isActuallyVisible = (Boolean) packedElement.getOrDefault("isActuallyVisible", true);
 
     blocked = (Boolean) packedElement.get("isBlocked");
-    isClickable = (Boolean) packedElement.get("isClickable");
+    isClickable = isClickable(packedElement);
     isShadow = (parent != null && parent.isShadow) || (Boolean) packedElement.get("isShadowElement");
     isKeyboardFocusable = getIsFocusable();
     hasKeyboardFocus = (Boolean) packedElement.get("hasKeyboardFocus");
@@ -228,7 +244,13 @@ public class WdElement extends TaggableBase implements Serializable {
 
   private boolean asBool(Object o) {
     if (o == null) return false;
-    else return (Boolean)o;
+    else if (o instanceof Boolean) {
+      return (Boolean) o;
+    }
+    else if (o instanceof String) {
+      return Boolean.parseBoolean((String) o);
+    }
+    return false;
   }
 
   private void writeObject(ObjectOutputStream oos) throws IOException {
@@ -332,6 +354,21 @@ public class WdElement extends TaggableBase implements Serializable {
     }
   }
 
+  private boolean isClickable(Map<String, Object> packedElement) {
+      // Check native clickable web elements
+      Role role = WdRoles.fromTypeId(tagName);
+      if (Role.isOneOf(role, WdRoles.nativeClickableRoles())) {
+          // Input type are special...
+          if (role.equals(WdRoles.WdINPUT)) {
+              return WdRoles.clickableInputTypes().contains(type);
+          }
+          return true;
+      }
+
+      // Else, return onclick and event listener events 
+      return (Boolean) packedElement.get("isClickable");
+  }
+
   public boolean getIsFocusable() {
     // It's much more complex than this
     // https://allyjs.io/data-tables/focusable.html#document-elements
@@ -380,23 +417,39 @@ public class WdElement extends TaggableBase implements Serializable {
     return visibleAt(x, y);
   }
   
+  private boolean isFullyVisible(Rect rect) {
+      return rect != null &&
+              rect.x() >= 0 &&
+              rect.x() + rect.width() <= WdCanvasDimensions.getCanvasWidth() &&
+              rect.y() >= 0 &&
+              rect.y() + rect.height() <= WdCanvasDimensions.getInnerHeight();
+  }
+
   private boolean isFullVisibleAtCanvasBrowser() {
-	  if (rect == null) return false;
+      if (rect == null) return false;
 
-	  boolean isVisibleAtCanvas = rect.x() >= 0 && rect.x() + rect.width() <= WdCanvasDimensions.getCanvasWidth() 
-			  && rect.y() >= 0 && rect.y() + rect.height() <= WdCanvasDimensions.getInnerHeight();
+      boolean isVisibleAtCanvas = isFullyVisible(rect);
 
-	  // If the web element is a <select><option>, check the selected option visibility
-	  if (tagName != null && tagName.equalsIgnoreCase("option") && outerHTML != null) {
-		  if (outerHTML.contains("<option") && (outerHTML.contains("selected>") || outerHTML.contains("selected="))) {
-			  return isVisibleAtCanvas;
-		  } else {
-			  return false;
-		  }
-	  }
+      // If the web element is a <select><option>, check the selected option visibility
+      if (tagName != null && tagName.equalsIgnoreCase("option") && outerHTML != null) {
 
-	  // For other web elements, only check if fully visible in the canvas
-	  return isVisibleAtCanvas;
+          // In multi-selects, visibility is determined only by canvas visibility
+          if(parent != null && parent.multiple) {
+              return isVisibleAtCanvas;
+          }
+
+          boolean isSelected = outerHTML.contains("selected>") || outerHTML.contains("selected=");
+          if (outerHTML.contains("<option") && isSelected) {
+              // Select web elements have empty rect values (0,0,0,0)
+              // We need to check the parent element rect values
+              return parent != null ? isFullyVisible(parent.rect) : isVisibleAtCanvas;
+          } else {
+              return false;
+          }
+      }
+
+      // For other web elements, only check if fully visible in the canvas
+      return isVisibleAtCanvas;
   }
 
   public boolean isHidden() {

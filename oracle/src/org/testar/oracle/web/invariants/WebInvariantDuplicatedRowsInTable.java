@@ -31,11 +31,6 @@ public class WebInvariantDuplicatedRowsInTable implements Oracle {
 	public WebInvariantDuplicatedRowsInTable() {}
 
 	@Override
-	public void initialize() {
-		// Nothing to initialize
-	}
-
-	@Override
 	public List<Verdict> getVerdicts(State state) {
 		List<Verdict> verdicts = new ArrayList<>();
 

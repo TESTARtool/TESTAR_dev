@@ -42,11 +42,6 @@ public class GenericVisualDensityMetricOracle implements Oracle {
 	}
 
 	@Override
-	public void initialize() {
-		// Nothing to initialize
-	}
-
-	@Override
 	public List<Verdict> getVerdicts(State state) {
 		if (state.childCount() == 0) {
 			return Collections.singletonList(Verdict.OK); // State has no children, no need for balance metric evaluation

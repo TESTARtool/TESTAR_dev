@@ -409,6 +409,9 @@ public final class ConfigTags {
     public static final Tag<String> ExtendedOracles = Tag.from("ExtendedOracles", String.class,
             "Select extended oracles to be applied during runtime for testing");
 
+    public static final Tag<String> ExternalOracles = Tag.from("ExternalOracles", String.class,
+            "Select external oracles to be applied during runtime for testing");
+
     /**
      * Spy mode settings
      */

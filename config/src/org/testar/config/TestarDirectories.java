@@ -20,6 +20,7 @@ public final class TestarDirectories {
 
     private static String testarDir = BASE_DIR.toString() + File.separator;
     private static String settingsDir = BASE_DIR.resolve("settings").toString() + File.separator;
+    private static String oraclesDir = BASE_DIR.resolve("oracles").toString() + File.separator;
     private static String outputDir = BASE_DIR.resolve("output").toString() + File.separator;
     private static String tempDir = BASE_DIR.resolve("output").resolve("temp").toString() + File.separator;
     private static String selectedSse;
@@ -40,6 +41,14 @@ public final class TestarDirectories {
 
     public static void setSettingsDir(String directory) {
         settingsDir = directory;
+    }
+
+    public static String getOraclesDir() {
+        return oraclesDir;
+    }
+
+    public static void setOraclesDir(String directory) {
+        oraclesDir = directory;
     }
 
     public static String getOutputDir() {

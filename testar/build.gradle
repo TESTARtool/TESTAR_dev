@@ -68,6 +68,7 @@ dependencies {
     implementation project(':reporting')
     implementation project(':plugin')
     implementation project(':engine')
+    implementation project(':rascal')
     implementation project(':oracle')
     implementation project(':dialog')
     implementation project(':coverage')
@@ -93,6 +94,13 @@ task prepareSUTs(type: Copy) {
     from 'distributionSUTs'
     into 'target/scripts/suts'
 }
+
+/*
+task prepareOracles(type: Copy) {
+    from 'resources/oracles'
+    into 'target/scripts/oracles'
+}
+*/
 
 task prepareOutputFolder(type: Copy) {
     from 'resources/output'
@@ -123,6 +131,12 @@ task prepareWindowsDLL(type: Copy) {
 applicationDistribution.from("../statemodel/resources/graphs") {
     into "bin/output/graphs"
 }
+
+/*
+applicationDistribution.from("../rascal/testar-oracle") {
+    into "rascal-modules/testar-oracle"
+}
+*/
 
 applicationDistribution.from("../webdriver/resources/web-extension") {
     into "web-extension"

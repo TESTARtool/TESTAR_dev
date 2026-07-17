@@ -7,4 +7,8 @@ dependencies {
     implementation project(':android')
     implementation project(':plugin')
     implementation group: 'net.oneandone.reflections8', name: 'reflections8', version: '0.11.7'
+    // https://mvnrepository.com/artifact/org.languagetool/languagetool-core
+    implementation group: 'org.languagetool', name: 'languagetool-core', version: '5.8'
+    // https://mvnrepository.com/artifact/org.languagetool/language-all
+    implementation group: 'org.languagetool', name: 'language-all', version: '5.8'
 }

@@ -11,7 +11,15 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.testar.core.Assert;
+import org.testar.core.alayer.Color;
+import org.testar.core.alayer.FillPattern;
+import org.testar.core.alayer.Pen;
+import org.testar.core.alayer.Rect;
+import org.testar.core.alayer.StrokePattern;
+import org.testar.core.state.Widget;
+import org.testar.core.tag.Tags;
 import org.testar.core.util.Util;
+import org.testar.core.visualizers.ShapeVisualizer;
 import org.testar.core.visualizers.Visualizer;
 
 /**
@@ -26,6 +34,11 @@ public final class Verdict implements Serializable {
      * Enum representing different levels of severity for a test verdict.
      */
     public enum Severity {
+        /** VACUOUS_PASS (< 0.0) **/
+
+        // Assertion or condition passes without actually checking its intended conditions
+        VACUOUS_PASS(-0.1, "VACUOUS_PASS"),
+
         /** PASS (0.0 - 0.099) **/
 
         // Test sequence completed without other PASS, WARNING, or FAIL, severity
@@ -129,17 +142,36 @@ public final class Verdict implements Serializable {
     }
 
     public Verdict(Severity severity, String info, Visualizer visualizer) {
-        Assert.isTrue(severity.getValue() >= Severity.OK.getValue() && severity.getValue() <= Severity.FAIL.getValue());
+        Assert.isTrue(severity.getValue() >= Severity.VACUOUS_PASS.getValue() && severity.getValue() <= Severity.FAIL.getValue());
         Assert.notNull(info, visualizer);
         this.severity = severity.getValue();
         this.info = info;
         this.visualizer = visualizer;
     }
 
+	public Verdict(Severity severity, String info, Widget w) {
+		this(
+				severity,
+				info.concat(" (in widget: " + w.get(Tags.Desc, "") + ") "),
+				new ShapeVisualizer(
+						Pen.newPen()
+						.setColor(Color.Red)
+						.setFillPattern(FillPattern.None)
+						.setStrokePattern(StrokePattern.Solid)
+						.build(),
+						w.get(Tags.Shape, Rect.from(0, 0, 0, 0)),
+						info,
+						0.5,
+						0.5
+						)
+				);
+	}
+
     /**
-     * Returns the likelihood of the state being erroneous (value within interval [0, 1]).
+     * Returns the verdict severity value.
+     * Problem likelihood values are within [0, 1]; VACUOUS_PASS is a diagnostic value below OK.
      *
-     * @return A value within [0, 1] representing the error likelihood.
+     * @return The verdict severity value.
      */
     public double severity() {
         return severity;

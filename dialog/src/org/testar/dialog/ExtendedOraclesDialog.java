@@ -55,7 +55,7 @@ public class ExtendedOraclesDialog extends JDialog {
 		add(label, BorderLayout.NORTH);
 
 		// Load available oracles dynamically and sort alphabetically
-		List<String> availableOracles = OracleSelection.getAvailableOracles();
+		List<String> availableOracles = OracleSelection.getAvailableExtendedOracles();
 		Collections.sort(availableOracles);
 
 		// Load activated oracles from settings

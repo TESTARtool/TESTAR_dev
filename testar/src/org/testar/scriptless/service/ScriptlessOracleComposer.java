@@ -27,7 +27,8 @@ public class ScriptlessOracleComposer {
                                          List<Verdict> verdicts) {
         Assert.notNull(runtimeContext);
         Assert.notNull(system, state, verdicts);
-        List<Verdict> composedVerdicts = new ArrayList<Verdict>(verdicts);
+        List<Verdict> composedVerdicts = new ArrayList<Verdict>();
+        addSequenceVerdicts(composedVerdicts, verdicts);
 
         if (runtimeContext.settings().get(ConfigTags.ProcessListener, false)) {
             List<Verdict> processVerdicts = runtimeContext.processListenerOracle().getVerdicts(state);
@@ -50,7 +51,7 @@ public class ScriptlessOracleComposer {
         for (Oracle extendedOracle : runtimeContext.extendedOraclesList()) {
             List<Verdict> extendedVerdicts = extendedOracle.getVerdicts(state);
             if (extendedVerdicts != null) {
-                composedVerdicts.addAll(extendedVerdicts);
+                addSequenceVerdicts(composedVerdicts, extendedVerdicts);
             }
         }
 
@@ -69,5 +70,17 @@ public class ScriptlessOracleComposer {
         }
 
         return composedVerdicts;
+    }
+
+    private void addSequenceVerdicts(List<Verdict> composedVerdicts, List<Verdict> verdicts) {
+        for (Verdict verdict : verdicts) {
+            if (isSequenceVerdict(verdict)) {
+                composedVerdicts.add(verdict);
+            }
+        }
+    }
+
+    private boolean isSequenceVerdict(Verdict verdict) {
+        return verdict != null && verdict.severity() != Verdict.Severity.VACUOUS_PASS.getValue();
     }
 }

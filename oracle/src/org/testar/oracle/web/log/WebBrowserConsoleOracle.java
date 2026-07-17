@@ -41,11 +41,6 @@ public class WebBrowserConsoleOracle implements Oracle {
     }
 
     @Override
-    public void initialize() {
-        // Nothing extra to initialize
-    }
-
-    @Override
     public List<Verdict> getVerdicts(State state) {
         List<Verdict> verdicts = new ArrayList<>();
 

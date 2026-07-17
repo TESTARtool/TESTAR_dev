@@ -6,6 +6,7 @@
 
 package org.testar.webdriver.tag;
 
+import java.awt.Color;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -154,6 +155,18 @@ public class WdTags extends TagsBase {
    * Web computed font size of a widget.
    */
   public static final Tag<String> WebComputedFontSize = from("WebComputedFontSize", String.class);
+
+  /**
+   * Web computed color of a widget.
+   */
+  public static final Tag<Color> WebComputedColor = from("WebComputedColor", Color.class);
+  public static final Tag<String> WebComputedColorName = from("WebComputedColorName", String.class);
+
+  /**
+   * Web computed backgroundColor of a widget.
+   */
+  public static final Tag<Color> WebComputedBackgroundColor = from("WebComputedBackgroundColor", Color.class);
+  public static final Tag<String> WebComputedBackgroundColorName = from("WebComputedBackgroundColorName", String.class);
 
   /**
    * Web type of input of a widget.
@@ -310,6 +323,11 @@ public class WdTags extends TagsBase {
   public static final Tag<Integer> WebMaxLength = from("WebMaxLength", Integer.class);
 
   /**
+   * The length of a web widget, such as a select or form.
+   */
+  public static final Tag<Integer> WebLength = from("WebLength", Integer.class);
+
+  /**
    * Represents the inner HTML content of a web widget-element as a string.
    */
   public static final Tag<String> WebInnerHTML = from("WebInnerHTML", String.class);
@@ -323,6 +341,21 @@ public class WdTags extends TagsBase {
    * Represents the placeholder text in an <input> or <textarea> element.
    */
   public static final Tag<String> WebPlaceholder = from("WebPlaceholder", String.class);
+
+  /**
+   * Represents if an option is selected in a <select> element.
+   */
+  public static final Tag<Boolean> WebIsSelected = from("WebIsSelected", Boolean.class);
+
+  /**
+   * Represents if an <input> element is checked.
+   */
+  public static final Tag<Boolean> WebIsChecked = from("WebIsChecked", Boolean.class);
+
+  /**
+   * Represents if an element contains the multiple attribute.
+   */
+  public static final Tag<Boolean> WebIsMultiple = from("WebIsMultiple", Boolean.class);
 
   /**
    * ARIA label text (aria-label).

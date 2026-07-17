@@ -36,6 +36,15 @@ public class VerdictTest {
     }
 
     @Test
+    public void testVacuousPassVerdictCanBeConstructed() {
+        Verdict vacuousPass = new Verdict(Verdict.Severity.VACUOUS_PASS, "Oracle was not applied.");
+
+        assertEquals(Verdict.Severity.VACUOUS_PASS.getValue(), vacuousPass.severity(), 0.0);
+        assertEquals("VACUOUS_PASS", vacuousPass.verdictSeverityTitle());
+        assertTrue(Verdict.helperAreAllVerdictsOK(Arrays.asList(vacuousPass)));
+    }
+
+    @Test
     public void testEquals() {
         Verdict v1 = Verdict.OK;
         Verdict v2 = Verdict.FAIL;

@@ -293,6 +293,18 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(WdTags.WebComputedFontSize)) {
 			ret = w.element.computedFontSize;
 		}
+		else if (t.equals(WdTags.WebComputedColor)) {
+			ret = w.element.computedColor;
+		}
+		else if (t.equals(WdTags.WebComputedBackgroundColor)) {
+			ret = w.element.computedBackgroundColor;
+		}
+		else if (t.equals(WdTags.WebComputedColorName)) {
+		    ret = w.element.computedColorName;
+		}
+		else if (t.equals(WdTags.WebComputedBackgroundColorName)) {
+		    ret = w.element.computedBackgroundColorName;
+		}
 		else if (t.equals(WdTags.WebType)) {
 			ret = w.element.type;
 		}
@@ -335,6 +347,9 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(WdTags.WebMaxLength)) {
 			ret = w.element.maxLength;
 		}
+		else if (t.equals(WdTags.WebLength)) {
+			ret = w.element.length;
+		}
 		else if (t.equals(WdTags.WebInnerHTML)) {
 			ret = w.element.innerHTML;
 		}
@@ -343,6 +358,15 @@ public final class WdState extends WdWidget implements State {
 		}
 		else if (t.equals(WdTags.WebPlaceholder)) {
 			ret = w.element.placeholder;
+		}
+		else if (t.equals(WdTags.WebIsSelected)) {
+			ret = w.element.selected;
+		}
+		else if (t.equals(WdTags.WebIsChecked)) {
+			ret = w.element.checked;
+		}
+		else if (t.equals(WdTags.WebIsMultiple)) {
+			ret = w.element.multiple;
 		}
 		else if (t.equals(WdTags.WebAriaLabel)) {
 			ret = w.element.ariaLabel;

@@ -1,0 +1,508 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2025-2026 Open Universiteit - www.ou.nl
+ * Copyright (c) 2025-2026 Universitat Politecnica de Valencia - www.upv.es
+ */
+
+package org.testar.oracle;
+
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
+import org.languagetool.JLanguageTool;
+import org.languagetool.Languages;
+import org.languagetool.rules.RuleMatch;
+import org.testar.core.alayer.Role;
+import org.testar.core.alayer.Roles;
+import org.testar.core.state.State;
+import org.testar.core.state.Widget;
+import org.testar.core.tag.Tag;
+import org.testar.core.tag.Tags;
+import org.testar.webdriver.alayer.WdRoles;
+import org.testar.webdriver.tag.WdTags;
+
+public interface OracleWidgetsMapping {
+
+	default List<Widget> getWidgets(String elementType, State state) {
+		List<Widget> matched = new ArrayList<>();
+		List<RoleMatcher> matchers = OracleMappingModel.getElementRoles(elementType);
+
+		for (Widget w : state) {
+			for (RoleMatcher matcher : matchers) {
+				if (matcher.matches(w)) {
+					matched.add(w);
+					break;
+				}
+			}
+		}
+		return matched;
+	}
+
+	default List<Widget> getWidgets(String elementType, Widget constraintWidget) {
+	    List<Widget> matched = new ArrayList<>();
+	    List<RoleMatcher> matchers = OracleMappingModel.getElementRoles(elementType);
+
+	    // DFS using an explicit stack
+	    Deque<Widget> stack = new ArrayDeque<>();
+	    stack.push(constraintWidget);
+
+	    while (!stack.isEmpty()) {
+	        Widget widget = stack.pop();
+
+	        // Check this widget against all matchers
+	        for (RoleMatcher matcher : matchers) {
+	            if (matcher.matches(widget)) {
+	                matched.add(widget);
+	                break; // no need to check other matchers for this widget
+	            }
+	        }
+
+	        // Descend into children using childCount / child(i)
+	        for (int i = 0; i < widget.childCount(); i++) {
+	            Widget child = widget.child(i);
+	            if (child != null) {
+	                stack.push(child);
+	            }
+	        }
+	    }
+
+	    return matched;
+	}
+
+	default Widget getWidget(String elementType, String selector, State state) {
+		List<Tag<?>> tagPriority = OracleMappingModel.getSelectorTags(elementType);
+
+		// First do an exact equals search
+		for (Widget w : getWidgets(elementType, state)) {
+			for (Tag<?> tag : tagPriority) {
+				Object tagValue = w.get(tag, null);
+				if (tagValue instanceof String && selector.equals(tagValue)) {
+					return w;
+				}
+			}
+		}
+
+		// If an exact search does not match, make an approximation search
+		for (Widget w : getWidgets(elementType, state)) {
+			for (Tag<?> tag : tagPriority) {
+				Object tagValue = w.get(tag, null);
+				if (tagValue instanceof String && ((String) tagValue).contains(selector)) {
+					return w;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	default Widget getWidget(String elementType, String selector, Widget constraintWidget) {
+	    List<Tag<?>> tagPriority = OracleMappingModel.getSelectorTags(elementType);
+	    List<RoleMatcher> matchers = OracleMappingModel.getElementRoles(elementType);
+
+	    Deque<Widget> stack = new ArrayDeque<>();
+	    stack.push(constraintWidget);
+
+	    Widget approximateMatch = null; // first "contains" match, used as fallback
+
+	    while (!stack.isEmpty()) {
+	        Widget widget = stack.pop();
+
+	        // Check if this widget matches the elementType via its role
+	        boolean elementMatches = false;
+	        for (RoleMatcher matcher : matchers) {
+	            if (matcher.matches(widget)) {
+	                elementMatches = true;
+	                break;
+	            }
+	        }
+
+	        if (elementMatches) {
+	            // First look for an exact match on the configured tags
+	            for (Tag<?> tag : tagPriority) {
+	                Object tagValue = widget.get(tag, null);
+	                if (tagValue instanceof String) {
+	                    String value = (String) tagValue;
+
+	                    // If exact match, then return immediately
+	                    if (selector.equals(value)) {
+	                        return widget;
+	                    }
+
+	                    // Approximate match: remember the first "contains" match
+	                    if (approximateMatch == null && value.contains(selector)) {
+	                        approximateMatch = widget;
+	                    }
+	                }
+	            }
+	        }
+
+	        // Descend into children using childCount() / child(i)
+	        for (int i = 0; i < widget.childCount(); i++) {
+	            Widget child = widget.child(i);
+	            if (child != null) {
+	                stack.push(child);
+	            }
+	        }
+	    }
+
+	    // No exact match found; return first approximate match (may be null)
+	    return approximateMatch;
+	}
+
+	default Object getProperty(Widget w, String property) {
+		List<Tag<?>> tagPriority = OracleMappingModel.getAttributeTags(property);
+
+		for (Tag<?> tag : tagPriority) {
+			Object value = w.get(tag, null);
+
+			if (value instanceof String) {
+				if (!((String) value).isEmpty()) {
+					return value;
+				}
+			} else if (tag.name().equals(Tags.WidgetChildren.name())) {
+				return getWidgetChildren(w);
+			} else if (tag.name().equals(DSLTags.DSLTableHeaderText.name())) {
+			    return getTableHeaderText(w);
+			} else if (value != null) {
+				return value;
+			}
+		}
+
+		return new Object();
+	}
+
+	default Object getProperty(Object obj, String property) {
+	    if (property.equals("length") && obj instanceof List<?> && !((List<?>)obj).isEmpty()) {
+	        return ((List<?>)obj).size();
+	    }
+
+	    return null;
+	}
+
+	default Boolean evaluateAreStatus(List<Object> listObj, String status) {
+		if (listObj == null || listObj.isEmpty()) return false;
+
+		// TODO: The logic of this joint status might be different based on status properties
+		// enabled vs disable
+		// empty vs filled
+		Boolean result = true;
+		for (Object obj : listObj) {
+			result = (result && evaluateIsStatus(obj, status));
+		}
+		return result;
+	}
+
+	default Boolean evaluateIsStatus(Object obj, String status) {
+		// User wants to evaluate the status if a widget
+		if (obj instanceof Widget) {
+			return evaluateIsStatus(((Widget)obj), status);
+		}
+		// TODO: Think if there are other non-widget objects status
+
+		return false;
+	}
+
+	default Boolean evaluateIsStatus(Widget w, String status) {
+		List<Tag<?>> tagPriority = OracleMappingModel.getStatusTags(status);
+
+		for (Tag<?> tag : tagPriority) {
+			Object value = w.get(tag, null);
+
+			// Special cases first
+			if (status.equals("empty")) {
+				if (value instanceof Integer && !value.equals(-1)) {
+					return value.equals(0);
+				} else if (value instanceof String) {
+					return ((String) value).isEmpty();
+				}
+			} else if (status.equals("filled")) {
+				if (value instanceof String) {
+					return !((String) value).isEmpty();
+				}
+			} else if (status.equals("readonly")) {
+				if (value instanceof Boolean) {
+					return !((Boolean) value);
+				}
+			} else {
+				// The rest is gewoon boolean case (e.g. visible, enabled, selected...)
+				if (value instanceof Boolean) {
+					return (Boolean) value;
+				}
+			}
+		}
+
+		// None of the tags confirmed the status
+		// TODO: Do we want to return null or false?
+		// TODO: Can this affect the logic and return a false positive?
+		return false;
+	}
+
+	default boolean evaluateHasAttribute(Object obj, String attr) {
+		// User wants to evaluate if a widget has an attribute
+		if (obj instanceof Widget) {
+			return evaluateHasAttribute(((Widget)obj), attr);
+		}
+
+		// User wants to evaluate if in a list of widgets
+		if (obj instanceof List<?>) {
+			List<?> list = (List<?>) obj;
+			for (Object item : list) {
+				if (item instanceof Widget) {
+					if (evaluateHasAttribute((Widget) item, attr)) {
+						return true; // At least one widget has the attribute
+					}
+				}
+			}
+		}
+
+		// TODO: Think other taggable objects like actions
+
+		return false; 
+	}
+
+	default boolean evaluateHasAttribute(Widget w, String attr) {
+		List<Tag<?>> tagPriority = OracleMappingModel.getAttributeTags(attr);
+
+		for (Tag<?> tag : tagPriority) {
+			Object value = w.get(tag, null);
+
+			if (value instanceof String) {
+				return !((String) value).isEmpty(); //it has the attribute and it is not empty
+			} else {
+			    return Objects.nonNull(value);
+			}
+		}
+
+		// Attribute was not found
+		return false; 
+	}
+
+	default boolean evaluateContains(Object obj, String contain) {
+		// User wants to evaluate if the widget contains a string
+		if (obj instanceof Widget) {
+			return evaluateContains(((Widget)obj), contain);
+		}
+		// User wants to evaluate a String Tag
+		else if (obj instanceof String 
+				&& !((String) obj).isEmpty()
+				&& ((String) obj).contains(contain)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	default boolean evaluateContains(Widget w, String contain) {
+		if (w == null || contain == null || contain.isEmpty() || w.tags() == null) {
+			return false;
+		}
+
+		for (Tag<?> tag : w.tags()) {
+			Object value = w.get(tag);
+			if (value instanceof String 
+					&& !((String) value).isEmpty()
+					&& ((String) value).contains(contain)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	default boolean evaluateMatches(Object obj, String regex) {
+		// User wants to evaluate if the widget matches a regex
+		if (obj instanceof Widget) {
+			return evaluateMatches(((Widget)obj), regex);
+		}
+		// User wants to evaluate a String Tag
+		else if (obj instanceof String 
+				&& !((String) obj).isEmpty()) {
+
+			Pattern pattern;
+			try {
+				pattern = Pattern.compile(regex);
+			} catch (PatternSyntaxException e) {
+				return false;
+			}
+
+			Matcher matcher = pattern.matcher((String) obj);
+			if (matcher.find()) {
+				return true;
+			}
+
+		}
+
+		return false;
+	}
+
+	default boolean evaluateMatches(Widget w, String regex) {
+		if (w == null || regex == null || regex.isEmpty() || w.tags() == null) {
+			return false;
+		}
+
+		Pattern pattern;
+		try {
+			pattern = Pattern.compile(regex);
+		} catch (PatternSyntaxException e) {
+			return false;
+		}
+
+		for (Tag<?> tag : w.tags()) {
+			Object value = w.get(tag);
+			if (value instanceof String 
+					&& !((String) value).isEmpty()) {
+				Matcher matcher = pattern.matcher((String) value);
+				if (matcher.find()) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	default boolean evaluateMatchesWithName(Object obj, String regex, String name) {
+		// TODO: Do we need the regex pattern name for something?
+		return evaluateMatches(obj, regex);
+	}
+
+	default boolean evaluateMatchesWithName(Widget w, String regex, String name) {
+		// TODO: Do we need the regex pattern name for something?
+		return evaluateMatches(w, regex);
+	}
+
+	default boolean evaluateIsEqualTo(Object obj, Object compare) {
+		return Objects.equals(obj, compare);
+	}
+
+	default boolean evaluateIsEqualTo(Object obj, Supplier<Object> compareSupplier) {
+		return Objects.equals(obj, compareSupplier.get());
+	}
+
+	default boolean evaluateSpellChecks(Object obj, String locale) {
+		if(obj != null && locale != null && obj instanceof String) {
+			return evaluateSpellChecks((String)obj, locale);
+		}
+		else {
+			return true;
+		}
+	}
+
+	default boolean evaluateSpellChecks(String text, String locale) {
+		if(text != null && locale != null) {
+			try {
+				JLanguageTool langTool = new JLanguageTool(Languages.getLanguageForShortCode(locale.replace("_", "-")));
+				List<RuleMatch> matches = langTool.check(text);
+				return matches.size() <= 0;
+			} catch (Exception e) {
+				e.printStackTrace();
+				return true;
+			}
+		} else {
+			return true;
+		}
+	}
+
+	private List<Widget> getWidgetChildren(Widget w) {
+		List<Widget> children = new ArrayList<>();
+		for(int i = 0; i < w.childCount(); i++) {
+			children.add(w.child(i));
+		}
+		return children;
+	}
+
+	/** Helper methods to extract header text of tables **/
+	private String getTableHeaderText(Widget w) {
+	    if (!WdRoles.WdTABLE.equals(w.get(Tags.Role, Roles.Widget))) return "";
+	    return extractAllHeaderTextFromTable(w);
+	}
+
+	private String extractAllHeaderTextFromTable(Widget table) {
+	    StringBuilder headers = new StringBuilder();
+	    collectHeaderText(table, table, headers);
+	    return headers.toString().replaceAll("\\s+", " ").trim();
+	}
+
+	private void collectHeaderText(Widget node, Widget tableRoot, StringBuilder out) {
+	    Role role = node.get(Tags.Role, Roles.Widget);
+
+	    // If we encounter a table that is not the root, skip its entire subtree
+	    if (node != tableRoot && WdRoles.WdTABLE.equals(role)) {
+	        return;
+	    }
+
+	    // If this node is a header cell, collect all of its text
+	    if (WdRoles.WdTH.equals(role)) {
+	        String text = obtainHeaderTextDescription(node).trim();
+	        if (!text.isEmpty()) {
+	            if (out.length() > 0) out.append(' ');
+	            out.append(text);
+	        }
+	    }
+
+	    // Recurse into children
+	    for (int i = 0; i < node.childCount(); i++) {
+	        collectHeaderText(node.child(i), tableRoot, out);
+	    }
+	}
+
+	private String obtainHeaderTextDescription(Widget w) {
+	    String headerText = w.get(WdTags.WebTextContent, "").trim();
+	    for (int i = 0; i < w.childCount(); i++) {
+	        String childText = obtainHeaderTextDescription(w.child(i)).trim();
+	        if (!childText.isEmpty()) {
+	            if (!headerText.isEmpty()) headerText += " ";
+	            headerText += childText;
+	        }
+	    }
+	    return headerText;
+	}
+
+	default List<Widget> runWidgetSelector(State state, String roleString, String rawString)
+	{
+		List<Tag<?>> tagPrioList  = OracleMappingModel.getSelectorTags(roleString);
+		List<Widget> foundWidgets = new ArrayList<>();
+		// get widgets with the correct role
+		List<Widget> widgets = getWidgets(roleString, state);
+		// prepare string for search
+		String searchString = rawString.toLowerCase(Locale.ROOT).strip(); // lower case, and remove trailing and leading spaces
+
+		if(tagPrioList == null || tagPrioList.isEmpty())
+			return foundWidgets;
+
+		for(int mode = 0; mode < 3; mode++) // matching modes: exact, starts with, partial (contains)
+		{
+			for(Tag<?> tag : tagPrioList) //run a round of search per tag in priority list
+			{
+				for(Widget widget : widgets)
+				{
+					Object tagValue = widget.get(tag, null);
+					if(!foundWidgets.contains(widget) && tagValue instanceof String)
+					{
+						switch(mode) // apply the correct matching mode
+						{
+							case 0: // exact
+								if(((String) tagValue).strip().equalsIgnoreCase(searchString))
+									foundWidgets.add(widget);
+								break;
+							case 1: // starts with
+								if(((String) tagValue).toLowerCase(Locale.ROOT).strip().startsWith(searchString))
+									foundWidgets.add(widget);
+								break;
+							default: // partial (contains)
+								if(((String) tagValue).toLowerCase(Locale.ROOT).strip().contains(searchString))
+									foundWidgets.add(widget);
+						}
+					}
+				}
+				if(!foundWidgets.isEmpty())
+					break; // is at least one widget is found during this round, stop the search
+			}
+		}
+		
+		return foundWidgets;
+	}
+}

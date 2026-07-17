@@ -10,6 +10,7 @@ import org.testar.dialog.components.RegexButton;
 import org.testar.dialog.components.RestoreButton;
 import org.testar.dialog.components.UndoTextArea;
 import org.testar.config.ConfigTags;
+import org.testar.rascal.DslOracleStudio;
 import org.testar.config.settings.Settings;
 import org.apache.commons.lang3.StringUtils;
 
@@ -50,6 +51,12 @@ public class OraclePanel extends SettingsPanel {
     private String extendedOracles = "";
     private JButton extendedOraclesButton = new JButton("ExtendedOracles");
     private ExtendedOraclesDialog extendedOraclesDialog;
+
+    private String externalOracles = "";
+    private JButton externalOraclesButton = new JButton("ExternalOracles");
+    private ExternalOraclesDialog externalOraclesDialog;
+
+    private JButton dslOracleStudioButton = new JButton("DslOracleStudio");
 
     private JCheckBox enableVisualValidationCheckBox;
 
@@ -125,7 +132,7 @@ public class OraclePanel extends SettingsPanel {
         secondsLabel.setBounds(500, 275, 50, 27);
         add(secondsLabel);
 
-        extendedOraclesButton.setBounds(210, 330, 150, 27);
+        extendedOraclesButton.setBounds(50, 330, 150, 27);
         extendedOraclesButton.setToolTipText("Open Extended Oracles dialog");
         extendedOraclesButton.addActionListener(new ActionListener() {
             @Override
@@ -134,6 +141,26 @@ public class OraclePanel extends SettingsPanel {
             }
         });
         add(extendedOraclesButton);
+
+        externalOraclesButton.setBounds(250, 330, 150, 27);
+        externalOraclesButton.setToolTipText("Open External Oracles dialog");
+        externalOraclesButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	openExternalOraclesDialog();
+            }
+        });
+        add(externalOraclesButton);
+
+        dslOracleStudioButton.setBounds(450, 330, 150, 27);
+        dslOracleStudioButton.setToolTipText("Open the DSL Oracle studio");
+        dslOracleStudioButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openDslOracleStudio();
+            }
+        });
+        add(dslOracleStudioButton);
     }
 
     private void openExtendedOraclesDialog() {
@@ -143,6 +170,29 @@ public class OraclePanel extends SettingsPanel {
             public void windowClosing(WindowEvent e) {
                 // tell the manager to shut down its connection
             	extendedOracles = extendedOraclesDialog.getSavedExtendedOracles();
+            }
+        });
+    }
+
+    private void openExternalOraclesDialog() {
+    	externalOraclesDialog = new ExternalOraclesDialog(externalOracles);
+    	externalOraclesDialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                // tell the manager to shut down its connection
+            	externalOracles = externalOraclesDialog.getSavedExternalOracles();
+            }
+        });
+    }
+
+    private void openDslOracleStudio() {
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            try {
+                DslOracleStudio studio = new DslOracleStudio();
+                studio.setLocationRelativeTo(SwingUtilities.getWindowAncestor(this));
+                studio.setVisible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }
@@ -163,8 +213,9 @@ public class OraclePanel extends SettingsPanel {
         txtWebConsoleErrorPattern.setText(settings.get(ConfigTags.WebConsoleErrorPattern));
         enableWebConsoleWarningOracle.setSelected(settings.get(ConfigTags.WebConsoleWarningOracle));
         txtWebConsoleWarningPattern.setText(settings.get(ConfigTags.WebConsoleWarningPattern));
-        // ExtendedOracles
+        // Advanced Oracles
         extendedOracles = settings.get(ConfigTags.ExtendedOracles);
+        externalOracles = settings.get(ConfigTags.ExternalOracles);
     }
 
     /**
@@ -183,7 +234,8 @@ public class OraclePanel extends SettingsPanel {
         settings.set(ConfigTags.WebConsoleErrorPattern, txtWebConsoleErrorPattern.getText());
         settings.set(ConfigTags.WebConsoleWarningOracle, enableWebConsoleWarningOracle.isSelected());
         settings.set(ConfigTags.WebConsoleWarningPattern, txtWebConsoleWarningPattern.getText());
-        // ExtendedOracles
+        // Advanced Oracles
         settings.set(ConfigTags.ExtendedOracles, extendedOracles);
+        settings.set(ConfigTags.ExternalOracles, externalOracles);
     }
 }

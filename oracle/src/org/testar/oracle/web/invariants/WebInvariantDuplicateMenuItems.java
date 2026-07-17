@@ -27,11 +27,6 @@ public class WebInvariantDuplicateMenuItems implements Oracle {
 	public WebInvariantDuplicateMenuItems() {}
 
 	@Override
-	public void initialize() {
-		// Nothing to initialize
-	}
-
-	@Override
 	public List<Verdict> getVerdicts(State state) {
 		List<Verdict> verdicts = new ArrayList<>();
 

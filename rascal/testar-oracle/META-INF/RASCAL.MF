@@ -1,0 +1,5 @@
+Manifest-Version: 0.0.1
+Project-Name: testar-oracle
+Source: src/main/rascal
+Require-Libraries: |lib://rascal-lsp|
+

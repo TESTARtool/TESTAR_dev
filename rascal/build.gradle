@@ -1,0 +1,21 @@
+repositories {
+    maven { url = uri("https://releases.usethesource.io/maven/") } // Rascal maven repo
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src', 'testar-oracle']
+        }
+    }
+    test {
+        java {
+            srcDirs = ['test']
+        }
+    }
+}
+
+dependencies {
+    // https://mvnrepository.com/artifact/org.rascalmpl
+    implementation group: 'org.rascalmpl', name: 'rascal', version: '0.40.17'
+}

@@ -2,6 +2,7 @@ dependencies {
     implementation project(':core')
     implementation project(':config')
     implementation project(':llm')
+    implementation project(':rascal')
     implementation project(':oracle')
     implementation project(':statemodel')
     implementation project(':android')

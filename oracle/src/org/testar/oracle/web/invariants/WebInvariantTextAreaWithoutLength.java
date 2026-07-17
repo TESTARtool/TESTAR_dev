@@ -35,11 +35,6 @@ public class WebInvariantTextAreaWithoutLength implements Oracle {
 	}
 
 	@Override
-	public void initialize() {
-		// Nothing to initialize
-	}
-
-	@Override
 	public List<Verdict> getVerdicts(State state) {
 		List<Verdict> verdicts = new ArrayList<>();
 
