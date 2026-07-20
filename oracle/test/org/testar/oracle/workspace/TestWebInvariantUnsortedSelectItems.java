@@ -19,165 +19,165 @@ import org.testar.stub.WidgetStub;
 
 public class TestWebInvariantUnsortedSelectItems extends WorkspaceOracleTestSupport {
 
-	@Test
-	public void test_detection_web_invariant_unsorted_select_items_month() {
-		Oracle oracle = loadWorkspaceOracle("WebInvariantUnsortedSelectItems");
-		StateStub state = new StateStub();
-		WidgetStub widget = new WidgetStub();
-		state.addChild(widget);
-		widget.setParent(state);
+    @Test
+    public void test_detection_web_invariant_unsorted_select_items_month() {
+        Oracle oracle = loadWorkspaceOracle("WebInvariantUnsortedSelectItems");
+        StateStub state = new StateStub();
+        WidgetStub widget = new WidgetStub();
+        state.addChild(widget);
+        widget.setParent(state);
 
-		widget.set(Tags.Role, WdRoles.WdSELECT);
-		widget.set(WdTags.WebId, "selectid");
+        widget.set(Tags.Role, WdRoles.WdSELECT);
+        widget.set(WdTags.WebId, "selectid");
 
-		// Create a mocked static version of WdDriver
-		try (MockedStatic<WdDriver> mockedStatic = Mockito.mockStatic(WdDriver.class)) {
-			// Mock the static method executeScript(query)
-			List<String> mockOptions = Arrays.asList("January", "March", "February");
-			mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
-			.thenReturn(new ArrayList<>(mockOptions));
+        // Create a mocked static version of WdDriver
+        try (MockedStatic<WdDriver> mockedStatic = Mockito.mockStatic(WdDriver.class)) {
+            // Mock the static method executeScript(query)
+            List<String> mockOptions = Arrays.asList("January", "March", "February");
+            mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
+            .thenReturn(new ArrayList<>(mockOptions));
 
-			// Assert the oracle verdict is WARNING_WEB_INVARIANT_FAULT
-			List<Verdict> verdicts = oracle.getVerdicts(state);
-			Assert.isEquals(1, verdicts.size());
-			Verdict verdict = verdicts.get(0);
-			Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT.getTitle()));
-			Assert.isTrue(verdict.info().equals("Detected Select widget 'selectid' ,  with unsorted elements!"));
-		}
-	}
+            // Assert the oracle verdict is WARNING_WEB_INVARIANT_FAULT
+            List<Verdict> verdicts = oracle.getVerdicts(state);
+            Assert.isEquals(1, verdicts.size());
+            Verdict verdict = verdicts.get(0);
+            Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT.getTitle()));
+            Assert.isTrue(verdict.info().equals("Detected Select widget 'selectid' ,  with unsorted elements!"));
+        }
+    }
 
-	@Test
-	public void test_detection_web_invariant_unsorted_select_items_natural() {
-		Oracle oracle = loadWorkspaceOracle("WebInvariantUnsortedSelectItems");
-		StateStub state = new StateStub();
-		WidgetStub widget = new WidgetStub();
-		state.addChild(widget);
-		widget.setParent(state);
+    @Test
+    public void test_detection_web_invariant_unsorted_select_items_natural() {
+        Oracle oracle = loadWorkspaceOracle("WebInvariantUnsortedSelectItems");
+        StateStub state = new StateStub();
+        WidgetStub widget = new WidgetStub();
+        state.addChild(widget);
+        widget.setParent(state);
 
-		widget.set(Tags.Role, WdRoles.WdSELECT);
-		widget.set(WdTags.WebId, "selectid");
+        widget.set(Tags.Role, WdRoles.WdSELECT);
+        widget.set(WdTags.WebId, "selectid");
 
-		// Create a mocked static version of WdDriver
-		try (MockedStatic<WdDriver> mockedStatic = Mockito.mockStatic(WdDriver.class)) {
-			// Mock the static method executeScript(query)
-			List<String> mockOptions = Arrays.asList("Banana", "Apple", "Orange");
-			mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
-			.thenReturn(new ArrayList<>(mockOptions));
+        // Create a mocked static version of WdDriver
+        try (MockedStatic<WdDriver> mockedStatic = Mockito.mockStatic(WdDriver.class)) {
+            // Mock the static method executeScript(query)
+            List<String> mockOptions = Arrays.asList("Banana", "Apple", "Orange");
+            mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
+            .thenReturn(new ArrayList<>(mockOptions));
 
-			// Assert the oracle verdict is WARNING_WEB_INVARIANT_FAULT
-			List<Verdict> verdicts = oracle.getVerdicts(state);
-			Assert.isEquals(1, verdicts.size());
-			Verdict verdict = verdicts.get(0);
-			Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT.getTitle()));
-			Assert.isTrue(verdict.info().equals("Detected Select widget 'selectid' ,  with unsorted elements!"));
-		}
-	}
+            // Assert the oracle verdict is WARNING_WEB_INVARIANT_FAULT
+            List<Verdict> verdicts = oracle.getVerdicts(state);
+            Assert.isEquals(1, verdicts.size());
+            Verdict verdict = verdicts.get(0);
+            Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT.getTitle()));
+            Assert.isTrue(verdict.info().equals("Detected Select widget 'selectid' ,  with unsorted elements!"));
+        }
+    }
 
-	@Test
-	public void test_detection_web_invariant_unsorted_select_items_numeric() {
-		Oracle oracle = loadWorkspaceOracle("WebInvariantUnsortedSelectItems");
-		StateStub state = new StateStub();
-		WidgetStub widget = new WidgetStub();
-		state.addChild(widget);
-		widget.setParent(state);
+    @Test
+    public void test_detection_web_invariant_unsorted_select_items_numeric() {
+        Oracle oracle = loadWorkspaceOracle("WebInvariantUnsortedSelectItems");
+        StateStub state = new StateStub();
+        WidgetStub widget = new WidgetStub();
+        state.addChild(widget);
+        widget.setParent(state);
 
-		widget.set(Tags.Role, WdRoles.WdSELECT);
-		widget.set(WdTags.WebId, "selectid");
+        widget.set(Tags.Role, WdRoles.WdSELECT);
+        widget.set(WdTags.WebId, "selectid");
 
-		// Create a mocked static version of WdDriver
-		try (MockedStatic<WdDriver> mockedStatic = Mockito.mockStatic(WdDriver.class)) {
-			// Mock the static method executeScript(query)
-			List<String> mockOptions = Arrays.asList("12345", "12367", "123");
-			mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
-			.thenReturn(new ArrayList<>(mockOptions));
+        // Create a mocked static version of WdDriver
+        try (MockedStatic<WdDriver> mockedStatic = Mockito.mockStatic(WdDriver.class)) {
+            // Mock the static method executeScript(query)
+            List<String> mockOptions = Arrays.asList("12345", "12367", "123");
+            mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
+            .thenReturn(new ArrayList<>(mockOptions));
 
-			// Assert the oracle verdict is WARNING_WEB_INVARIANT_FAULT
-			List<Verdict> verdicts = oracle.getVerdicts(state);
-			Assert.isEquals(1, verdicts.size());
-			Verdict verdict = verdicts.get(0);
-			Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT.getTitle()));
-			Assert.isTrue(verdict.info().equals("Detected Select widget 'selectid' ,  with unsorted elements!"));
-		}
-	}
+            // Assert the oracle verdict is WARNING_WEB_INVARIANT_FAULT
+            List<Verdict> verdicts = oracle.getVerdicts(state);
+            Assert.isEquals(1, verdicts.size());
+            Verdict verdict = verdicts.get(0);
+            Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT.getTitle()));
+            Assert.isTrue(verdict.info().equals("Detected Select widget 'selectid' ,  with unsorted elements!"));
+        }
+    }
 
-	@Test
-	public void test_undetection_web_invariant_unsorted_select_items_month() {
-		Oracle oracle = loadWorkspaceOracle("WebInvariantUnsortedSelectItems");
-		StateStub state = new StateStub();
-		WidgetStub widget = new WidgetStub();
-		state.addChild(widget);
-		widget.setParent(state);
+    @Test
+    public void test_undetection_web_invariant_unsorted_select_items_month() {
+        Oracle oracle = loadWorkspaceOracle("WebInvariantUnsortedSelectItems");
+        StateStub state = new StateStub();
+        WidgetStub widget = new WidgetStub();
+        state.addChild(widget);
+        widget.setParent(state);
 
-		widget.set(Tags.Role, WdRoles.WdSELECT);
-		widget.set(WdTags.WebId, "selectid");
+        widget.set(Tags.Role, WdRoles.WdSELECT);
+        widget.set(WdTags.WebId, "selectid");
 
-		// Create a mocked static version of WdDriver
-		try (MockedStatic<WdDriver> mockedStatic = Mockito.mockStatic(WdDriver.class)) {
-			// Mock the static method executeScript(query)
-			List<String> mockOptions = Arrays.asList("January", "February", "March");
-			mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
-			.thenReturn(new ArrayList<>(mockOptions));
+        // Create a mocked static version of WdDriver
+        try (MockedStatic<WdDriver> mockedStatic = Mockito.mockStatic(WdDriver.class)) {
+            // Mock the static method executeScript(query)
+            List<String> mockOptions = Arrays.asList("January", "February", "March");
+            mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
+            .thenReturn(new ArrayList<>(mockOptions));
 
-			// Assert the oracle verdict is OK
-			List<Verdict> verdicts = oracle.getVerdicts(state);
-			Assert.isEquals(1, verdicts.size());
-			Verdict verdict = verdicts.get(0);
-			Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.OK.getTitle()));
-			Assert.isTrue(verdict.info().equals("No problem detected."));
-		}
-	}
+            // Assert the oracle verdict is OK
+            List<Verdict> verdicts = oracle.getVerdicts(state);
+            Assert.isEquals(1, verdicts.size());
+            Verdict verdict = verdicts.get(0);
+            Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.OK.getTitle()));
+            Assert.isTrue(verdict.info().equals("No problem detected."));
+        }
+    }
 
-	@Test
-	public void test_undetection_web_invariant_unsorted_select_items_natural() {
-		Oracle oracle = loadWorkspaceOracle("WebInvariantUnsortedSelectItems");
-		StateStub state = new StateStub();
-		WidgetStub widget = new WidgetStub();
-		state.addChild(widget);
-		widget.setParent(state);
+    @Test
+    public void test_undetection_web_invariant_unsorted_select_items_natural() {
+        Oracle oracle = loadWorkspaceOracle("WebInvariantUnsortedSelectItems");
+        StateStub state = new StateStub();
+        WidgetStub widget = new WidgetStub();
+        state.addChild(widget);
+        widget.setParent(state);
 
-		widget.set(Tags.Role, WdRoles.WdSELECT);
-		widget.set(WdTags.WebId, "selectid");
+        widget.set(Tags.Role, WdRoles.WdSELECT);
+        widget.set(WdTags.WebId, "selectid");
 
-		// Create a mocked static version of WdDriver
-		try (MockedStatic<WdDriver> mockedStatic = Mockito.mockStatic(WdDriver.class)) {
-			// Mock the static method executeScript(query)
-			List<String> mockOptions = Arrays.asList("Apple", "Banana", "Orange");
-			mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
-			.thenReturn(new ArrayList<>(mockOptions));
+        // Create a mocked static version of WdDriver
+        try (MockedStatic<WdDriver> mockedStatic = Mockito.mockStatic(WdDriver.class)) {
+            // Mock the static method executeScript(query)
+            List<String> mockOptions = Arrays.asList("Apple", "Banana", "Orange");
+            mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
+            .thenReturn(new ArrayList<>(mockOptions));
 
-			// Assert the oracle verdict is OK
-			List<Verdict> verdicts = oracle.getVerdicts(state);
-			Assert.isEquals(1, verdicts.size());
-			Verdict verdict = verdicts.get(0);
-			Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.OK.getTitle()));
-			Assert.isTrue(verdict.info().equals("No problem detected."));
-		}
-	}
+            // Assert the oracle verdict is OK
+            List<Verdict> verdicts = oracle.getVerdicts(state);
+            Assert.isEquals(1, verdicts.size());
+            Verdict verdict = verdicts.get(0);
+            Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.OK.getTitle()));
+            Assert.isTrue(verdict.info().equals("No problem detected."));
+        }
+    }
 
-	@Test
-	public void test_undetection_web_invariant_unsorted_select_items_numeric() {
-		Oracle oracle = loadWorkspaceOracle("WebInvariantUnsortedSelectItems");
-		StateStub state = new StateStub();
-		WidgetStub widget = new WidgetStub();
-		state.addChild(widget);
-		widget.setParent(state);
+    @Test
+    public void test_undetection_web_invariant_unsorted_select_items_numeric() {
+        Oracle oracle = loadWorkspaceOracle("WebInvariantUnsortedSelectItems");
+        StateStub state = new StateStub();
+        WidgetStub widget = new WidgetStub();
+        state.addChild(widget);
+        widget.setParent(state);
 
-		widget.set(Tags.Role, WdRoles.WdSELECT);
-		widget.set(WdTags.WebId, "selectid");
+        widget.set(Tags.Role, WdRoles.WdSELECT);
+        widget.set(WdTags.WebId, "selectid");
 
-		// Create a mocked static version of WdDriver
-		try (MockedStatic<WdDriver> mockedStatic = Mockito.mockStatic(WdDriver.class)) {
-			// Mock the static method executeScript(query)
-			List<String> mockOptions = Arrays.asList("123", "12345", "12367");
-			mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
-			.thenReturn(new ArrayList<>(mockOptions));
+        // Create a mocked static version of WdDriver
+        try (MockedStatic<WdDriver> mockedStatic = Mockito.mockStatic(WdDriver.class)) {
+            // Mock the static method executeScript(query)
+            List<String> mockOptions = Arrays.asList("123", "12345", "12367");
+            mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
+            .thenReturn(new ArrayList<>(mockOptions));
 
-			// Assert the oracle verdict is OK
-			List<Verdict> verdicts = oracle.getVerdicts(state);
-			Assert.isEquals(1, verdicts.size());
-			Verdict verdict = verdicts.get(0);
-			Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.OK.getTitle()));
-			Assert.isTrue(verdict.info().equals("No problem detected."));
-		}
-	}
+            // Assert the oracle verdict is OK
+            List<Verdict> verdicts = oracle.getVerdicts(state);
+            Assert.isEquals(1, verdicts.size());
+            Verdict verdict = verdicts.get(0);
+            Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.OK.getTitle()));
+            Assert.isTrue(verdict.info().equals("No problem detected."));
+        }
+    }
 }

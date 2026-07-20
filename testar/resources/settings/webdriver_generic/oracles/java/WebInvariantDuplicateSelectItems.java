@@ -25,66 +25,66 @@ import org.testar.oracle.Oracle;
 
 public class WebInvariantDuplicateSelectItems implements Oracle {
 
-	private final List<Role> roles;
+    private final List<Role> roles;
 
-	public WebInvariantDuplicateSelectItems() {
-		this(List.of(WdRoles.WdSELECT));
-	}
+    public WebInvariantDuplicateSelectItems() {
+        this(List.of(WdRoles.WdSELECT));
+    }
 
-	public WebInvariantDuplicateSelectItems(List<Role> roles) {
-		this.roles = roles;
-	}
+    public WebInvariantDuplicateSelectItems(List<Role> roles) {
+        this.roles = roles;
+    }
 
-	@Override
-	public List<Verdict> getVerdicts(State state) {
-		List<Verdict> verdicts = new ArrayList<>();
+    @Override
+    public List<Verdict> getVerdicts(State state) {
+        List<Verdict> verdicts = new ArrayList<>();
 
-		for (Widget w : state) {
-			if (roles.contains(w.get(Tags.Role, Roles.Widget)) && !w.get(WdTags.WebId, "").isEmpty()) {
-				try {
-					String elementId = w.get(WdTags.WebId);
-					String query = String.format(
-							"var el = document.getElementById('%s');" +
-									"if (el && el.options && el.options.length > 1) {" +
-									"    return [...el.options].map(o => o.text);" +
-									"} else { return null; }", 
-									elementId);
-					@SuppressWarnings("unchecked")
-					ArrayList<String> selectOptionsTextsList = (ArrayList<String>) WdDriver.executeScript(query);
+        for (Widget w : state) {
+            if (roles.contains(w.get(Tags.Role, Roles.Widget)) && !w.get(WdTags.WebId, "").isEmpty()) {
+                try {
+                    String elementId = w.get(WdTags.WebId);
+                    String query = String.format(
+                            "var el = document.getElementById('%s');" +
+                                    "if (el && el.options && el.options.length > 1) {" +
+                                    "    return [...el.options].map(o => o.text);" +
+                                    "} else { return null; }", 
+                                    elementId);
+                    @SuppressWarnings("unchecked")
+                    ArrayList<String> selectOptionsTextsList = (ArrayList<String>) WdDriver.executeScript(query);
 
-					if (selectOptionsTextsList != null) {
+                    if (selectOptionsTextsList != null) {
 
-						markAsNonVacuous();
+                        markAsNonVacuous();
 
-						Set<String> duplicatesTexts = selectOptionsTextsList.stream()
-								.filter(s -> Collections.frequency(selectOptionsTextsList, s) > 1)
-								.collect(Collectors.toSet());
+                        Set<String> duplicatesTexts = selectOptionsTextsList.stream()
+                                .filter(s -> Collections.frequency(selectOptionsTextsList, s) > 1)
+                                .collect(Collectors.toSet());
 
-						if (!duplicatesTexts.isEmpty()) {
-							String verdictMsg = String.format(
-									"Detected Select widget %s with duplicate values: %s",
-									getDescriptionOfWidgets(Collections.singletonList(w), WdTags.WebId),
-									duplicatesTexts
-									);
+                        if (!duplicatesTexts.isEmpty()) {
+                            String verdictMsg = String.format(
+                                    "Detected Select widget %s with duplicate values: %s",
+                                    getDescriptionOfWidgets(Collections.singletonList(w), WdTags.WebId),
+                                    duplicatesTexts
+                                    );
 
-							Visualizer visualizer = new RegionsVisualizer(
-									getRedPen(),
-									getWidgetRegions(Collections.singletonList(w)),
-									"Invariant Fault",
-									0.5, 0.5);
+                            Visualizer visualizer = new RegionsVisualizer(
+                                    getRedPen(),
+                                    getWidgetRegions(Collections.singletonList(w)),
+                                    "Invariant Fault",
+                                    0.5, 0.5);
 
-							verdicts.add(new Verdict(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT, verdictMsg, visualizer));
-						}
-					}
-				} catch (Exception e) {
-					// Ignore webdriver execute script errors
-				}
-			}
-		}
+                            verdicts.add(new Verdict(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT, verdictMsg, visualizer));
+                        }
+                    }
+                } catch (Exception e) {
+                    // Ignore webdriver execute script errors
+                }
+            }
+        }
 
-		if (!verdicts.isEmpty()) {
-			return verdicts;
-		}
-		return Collections.singletonList(Verdict.OK);
-	}
+        if (!verdicts.isEmpty()) {
+            return verdicts;
+        }
+        return Collections.singletonList(Verdict.OK);
+    }
 }

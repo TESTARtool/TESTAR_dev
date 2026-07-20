@@ -23,57 +23,57 @@ import org.testar.oracle.Oracle;
 
 public class WebInvariantEmptySelectItems implements Oracle {
 
-	private final List<Role> roles;
+    private final List<Role> roles;
 
-	public WebInvariantEmptySelectItems() {
-		this(List.of(WdRoles.WdSELECT));
-	}
+    public WebInvariantEmptySelectItems() {
+        this(List.of(WdRoles.WdSELECT));
+    }
 
-	public WebInvariantEmptySelectItems(List<Role> roles) {
-		this.roles = roles;
-	}
+    public WebInvariantEmptySelectItems(List<Role> roles) {
+        this.roles = roles;
+    }
 
-	@Override
-	public List<Verdict> getVerdicts(State state) {
-		List<Verdict> verdicts = new ArrayList<>();
+    @Override
+    public List<Verdict> getVerdicts(State state) {
+        List<Verdict> verdicts = new ArrayList<>();
 
-		for (Widget w : state) {
-			if (roles.contains(w.get(Tags.Role, Roles.Widget)) && !w.get(WdTags.WebId, "").isEmpty()) {
-				try {
-					String elementId = w.get(WdTags.WebId);
-					String query = String.format("return document.getElementById('%s').length", elementId);
-					Long selectItemsLength = (Long) WdDriver.executeScript(query);
+        for (Widget w : state) {
+            if (roles.contains(w.get(Tags.Role, Roles.Widget)) && !w.get(WdTags.WebId, "").isEmpty()) {
+                try {
+                    String elementId = w.get(WdTags.WebId);
+                    String query = String.format("return document.getElementById('%s').length", elementId);
+                    Long selectItemsLength = (Long) WdDriver.executeScript(query);
 
-					if (selectItemsLength != null) {
+                    if (selectItemsLength != null) {
 
-						markAsNonVacuous();
+                        markAsNonVacuous();
 
-						// If the select contains 0 or 1 item
-						if (selectItemsLength.intValue() <= 1) {
-							String verdictMsg = String.format(
-									"Detected Select widget %s with empty or only one item (count: %d)!",
-									getDescriptionOfWidgets(Collections.singletonList(w), WdTags.WebId),
-									selectItemsLength.intValue()
-									);
+                        // If the select contains 0 or 1 item
+                        if (selectItemsLength.intValue() <= 1) {
+                            String verdictMsg = String.format(
+                                    "Detected Select widget %s with empty or only one item (count: %d)!",
+                                    getDescriptionOfWidgets(Collections.singletonList(w), WdTags.WebId),
+                                    selectItemsLength.intValue()
+                                    );
 
-							Visualizer visualizer = new RegionsVisualizer(
-									getRedPen(),
-									getWidgetRegions(Collections.singletonList(w)),
-									"Invariant Fault",
-									0.5, 0.5);
+                            Visualizer visualizer = new RegionsVisualizer(
+                                    getRedPen(),
+                                    getWidgetRegions(Collections.singletonList(w)),
+                                    "Invariant Fault",
+                                    0.5, 0.5);
 
-							verdicts.add(new Verdict(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT, verdictMsg, visualizer));
-						}
-					}
-				} catch (Exception e) {
-					// Ignore webdriver execute script errors
-				}
-			}
-		}
+                            verdicts.add(new Verdict(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT, verdictMsg, visualizer));
+                        }
+                    }
+                } catch (Exception e) {
+                    // Ignore webdriver execute script errors
+                }
+            }
+        }
 
-		if (!verdicts.isEmpty()) {
-			return verdicts;
-		}
-		return Collections.singletonList(Verdict.OK);
-	}
+        if (!verdicts.isEmpty()) {
+            return verdicts;
+        }
+        return Collections.singletonList(Verdict.OK);
+    }
 }

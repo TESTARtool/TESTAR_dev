@@ -19,57 +19,57 @@ import org.testar.stub.WidgetStub;
 
 public class TestWebInvariantDuplicateSelectItems extends WorkspaceOracleTestSupport {
 
-	@Test
-	public void test_detection_web_invariant_duplicate_select_items() {
-		Oracle oracle = loadWorkspaceOracle("WebInvariantDuplicateSelectItems");
-		StateStub state = new StateStub();
-		WidgetStub widget = new WidgetStub();
-		state.addChild(widget);
-		widget.setParent(state);
+    @Test
+    public void test_detection_web_invariant_duplicate_select_items() {
+        Oracle oracle = loadWorkspaceOracle("WebInvariantDuplicateSelectItems");
+        StateStub state = new StateStub();
+        WidgetStub widget = new WidgetStub();
+        state.addChild(widget);
+        widget.setParent(state);
 
-		widget.set(Tags.Role, WdRoles.WdSELECT);
-		widget.set(WdTags.WebId, "selectid");
+        widget.set(Tags.Role, WdRoles.WdSELECT);
+        widget.set(WdTags.WebId, "selectid");
 
-		// Create a mocked static version of WdDriver
-		try (MockedStatic<WdDriver> mockedStatic = Mockito.mockStatic(WdDriver.class)) {
-			// Mock the static method executeScript(query)
-			List<String> mockOptions = Arrays.asList("Renault", "Volvo", "Renault");
-			mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
-			.thenReturn(new ArrayList<>(mockOptions));
+        // Create a mocked static version of WdDriver
+        try (MockedStatic<WdDriver> mockedStatic = Mockito.mockStatic(WdDriver.class)) {
+            // Mock the static method executeScript(query)
+            List<String> mockOptions = Arrays.asList("Renault", "Volvo", "Renault");
+            mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
+            .thenReturn(new ArrayList<>(mockOptions));
 
-			// Assert the oracle verdict is WARNING_WEB_INVARIANT_FAULT
-			List<Verdict> verdicts = oracle.getVerdicts(state);
-			Assert.isEquals(1, verdicts.size());
-			Verdict verdict = verdicts.get(0);
-			Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT.getTitle()));
-			Assert.isTrue(verdict.info().equals("Detected Select widget 'selectid' ,  with duplicate values: [Renault]"));
-		}
-	}
+            // Assert the oracle verdict is WARNING_WEB_INVARIANT_FAULT
+            List<Verdict> verdicts = oracle.getVerdicts(state);
+            Assert.isEquals(1, verdicts.size());
+            Verdict verdict = verdicts.get(0);
+            Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT.getTitle()));
+            Assert.isTrue(verdict.info().equals("Detected Select widget 'selectid' ,  with duplicate values: [Renault]"));
+        }
+    }
 
-	@Test
-	public void test_undetection_web_invariant_duplicate_select_items() {
-		Oracle oracle = loadWorkspaceOracle("WebInvariantDuplicateSelectItems");
-		StateStub state = new StateStub();
-		WidgetStub widget = new WidgetStub();
-		state.addChild(widget);
-		widget.setParent(state);
+    @Test
+    public void test_undetection_web_invariant_duplicate_select_items() {
+        Oracle oracle = loadWorkspaceOracle("WebInvariantDuplicateSelectItems");
+        StateStub state = new StateStub();
+        WidgetStub widget = new WidgetStub();
+        state.addChild(widget);
+        widget.setParent(state);
 
-		widget.set(Tags.Role, WdRoles.WdSELECT);
-		widget.set(WdTags.WebId, "selectid");
+        widget.set(Tags.Role, WdRoles.WdSELECT);
+        widget.set(WdTags.WebId, "selectid");
 
-		// Create a mocked static version of WdDriver
-		try (MockedStatic<WdDriver> mockedStatic = Mockito.mockStatic(WdDriver.class)) {
-			// Mock the static method executeScript(query)
-			List<String> mockOptions = Arrays.asList("Renault", "Volvo", "Opel");
-			mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
-			.thenReturn(new ArrayList<>(mockOptions));
+        // Create a mocked static version of WdDriver
+        try (MockedStatic<WdDriver> mockedStatic = Mockito.mockStatic(WdDriver.class)) {
+            // Mock the static method executeScript(query)
+            List<String> mockOptions = Arrays.asList("Renault", "Volvo", "Opel");
+            mockedStatic.when(() -> WdDriver.executeScript(Mockito.anyString()))
+            .thenReturn(new ArrayList<>(mockOptions));
 
-			// Assert the oracle verdict is OK
-			List<Verdict> verdicts = oracle.getVerdicts(state);
-			Assert.isEquals(1, verdicts.size());
-			Verdict verdict = verdicts.get(0);
-			Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.OK.getTitle()));
-			Assert.isTrue(verdict.info().equals("No problem detected."));
-		}
-	}
+            // Assert the oracle verdict is OK
+            List<Verdict> verdicts = oracle.getVerdicts(state);
+            Assert.isEquals(1, verdicts.size());
+            Verdict verdict = verdicts.get(0);
+            Assert.isTrue(verdict.verdictSeverityTitle().equals(Verdict.Severity.OK.getTitle()));
+            Assert.isTrue(verdict.info().equals("No problem detected."));
+        }
+    }
 }

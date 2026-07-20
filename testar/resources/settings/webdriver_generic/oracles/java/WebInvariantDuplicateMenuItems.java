@@ -22,70 +22,70 @@ import org.testar.oracle.Oracle;
 
 public class WebInvariantDuplicateMenuItems implements Oracle {
 
-	public WebInvariantDuplicateMenuItems() {}
+    public WebInvariantDuplicateMenuItems() {}
 
-	@Override
-	public List<Verdict> getVerdicts(State state) {
-		List<Verdict> verdicts = new ArrayList<>();
+    @Override
+    public List<Verdict> getVerdicts(State state) {
+        List<Verdict> verdicts = new ArrayList<>();
 
-		for (Widget w : state) {
-			// Check for UL elements with at least two children
-			if (w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdUL) && w.childCount() > 1) {
+        for (Widget w : state) {
+            // Check for UL elements with at least two children
+            if (w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdUL) && w.childCount() > 1) {
 
-				markAsNonVacuous();
+                markAsNonVacuous();
 
-				ArrayList<String> selectOptionsTextsList = new ArrayList<>();
+                ArrayList<String> selectOptionsTextsList = new ArrayList<>();
 
-				// Gather the text of each LI child
-				for (int i = 0; i < w.childCount(); i++) {
-					String itemText = w.child(i).get(WdTags.WebTextContent);
+                // Gather the text of each LI child
+                for (int i = 0; i < w.childCount(); i++) {
+                    String itemText = w.child(i).get(WdTags.WebTextContent);
 
-					// Only consider LI elements with non-empty text
-					if (w.child(i).get(Tags.Role, Roles.Widget).equals(WdRoles.WdLI) && !itemText.isEmpty()) {
-						selectOptionsTextsList.add(itemText);
-					}
-				}
+                    // Only consider LI elements with non-empty text
+                    if (w.child(i).get(Tags.Role, Roles.Widget).equals(WdRoles.WdLI) && !itemText.isEmpty()) {
+                        selectOptionsTextsList.add(itemText);
+                    }
+                }
 
-				// Find duplicates in the list of item texts
-				Set<String> duplicatesTexts = findDuplicates(selectOptionsTextsList);
+                // Find duplicates in the list of item texts
+                Set<String> duplicatesTexts = findDuplicates(selectOptionsTextsList);
 
-				// If duplicates are found, prepare the verdict message
-				if (duplicatesTexts.size() > 0) {
-					String verdictMsg = String.format(
-							"Detected a Unnumbered List (UL) web menu %s with duplicate option elements: %s",
-							getDescriptionOfWidgets(Collections.singletonList(w), WdTags.WebId),
-							duplicatesTexts
-							);
+                // If duplicates are found, prepare the verdict message
+                if (duplicatesTexts.size() > 0) {
+                    String verdictMsg = String.format(
+                            "Detected a Unnumbered List (UL) web menu %s with duplicate option elements: %s",
+                            getDescriptionOfWidgets(Collections.singletonList(w), WdTags.WebId),
+                            duplicatesTexts
+                            );
 
-					Visualizer visualizer = new RegionsVisualizer(
-							getRedPen(),
-							getWidgetRegions(Collections.singletonList(w)),
-							"Invariant Fault",
-							0.5, 0.5);
+                    Visualizer visualizer = new RegionsVisualizer(
+                            getRedPen(),
+                            getWidgetRegions(Collections.singletonList(w)),
+                            "Invariant Fault",
+                            0.5, 0.5);
 
-					verdicts.add(new Verdict(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT, verdictMsg, visualizer));
-				}
-			}
-		}
+                    verdicts.add(new Verdict(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT, verdictMsg, visualizer));
+                }
+            }
+        }
 
-		if (!verdicts.isEmpty()) {
-			return verdicts;
-		}
-		return Collections.singletonList(Verdict.OK);
-	}
+        if (!verdicts.isEmpty()) {
+            return verdicts;
+        }
+        return Collections.singletonList(Verdict.OK);
+    }
 
-	// Helper method to find duplicates in a list
-	private static Set<String> findDuplicates(List<String> list) {
-		Set<String> set = new HashSet<>();
-		Set<String> duplicates = new HashSet<>();
-		for (String s : list) {
-			// If the item is already in the set, it is a duplicate
-			if (set.contains(s)) {
-				duplicates.add(s);
-			}
-			// Add item to the set
-			set.add(s);
-		}
-		return duplicates;
-	}
+    // Helper method to find duplicates in a list
+    private static Set<String> findDuplicates(List<String> list) {
+        Set<String> set = new HashSet<>();
+        Set<String> duplicates = new HashSet<>();
+        for (String s : list) {
+            // If the item is already in the set, it is a duplicate
+            if (set.contains(s)) {
+                duplicates.add(s);
+            }
+            // Add item to the set
+            set.add(s);
+        }
+        return duplicates;
+    }
 }

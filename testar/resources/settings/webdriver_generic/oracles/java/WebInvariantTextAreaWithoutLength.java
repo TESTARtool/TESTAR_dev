@@ -22,44 +22,44 @@ import org.testar.oracle.Oracle;
 
 public class WebInvariantTextAreaWithoutLength implements Oracle {
 
-	private final List<Role> roles;
+    private final List<Role> roles;
 
-	public WebInvariantTextAreaWithoutLength() {
-		this(List.of(WdRoles.WdTEXTAREA));
-	}
+    public WebInvariantTextAreaWithoutLength() {
+        this(List.of(WdRoles.WdTEXTAREA));
+    }
 
-	public WebInvariantTextAreaWithoutLength(List<Role> roles) {
-		this.roles = roles;
-	}
+    public WebInvariantTextAreaWithoutLength(List<Role> roles) {
+        this.roles = roles;
+    }
 
-	@Override
-	public List<Verdict> getVerdicts(State state) {
-		List<Verdict> verdicts = new ArrayList<>();
+    @Override
+    public List<Verdict> getVerdicts(State state) {
+        List<Verdict> verdicts = new ArrayList<>();
 
-		for (Widget w : state) {
-			if (roles.contains(w.get(Tags.Role, Roles.Widget))) {
+        for (Widget w : state) {
+            if (roles.contains(w.get(Tags.Role, Roles.Widget))) {
 
-				markAsNonVacuous();
+                markAsNonVacuous();
 
-				if (w.get(WdTags.WebMaxLength, -1) == 0) {
-					String verdictMsg = String.format(
-							"Detected TextArea widget %s with 0 max length!",
-							getDescriptionOfWidgets(Collections.singletonList(w), WdTags.WebOuterHTML)
-							);
-					Visualizer visualizer = new RegionsVisualizer(
-							getRedPen(),
-							getWidgetRegions(Collections.singletonList(w)),
-							"Invariant Fault",
-							0.5, 0.5);
+                if (w.get(WdTags.WebMaxLength, -1) == 0) {
+                    String verdictMsg = String.format(
+                            "Detected TextArea widget %s with 0 max length!",
+                            getDescriptionOfWidgets(Collections.singletonList(w), WdTags.WebOuterHTML)
+                            );
+                    Visualizer visualizer = new RegionsVisualizer(
+                            getRedPen(),
+                            getWidgetRegions(Collections.singletonList(w)),
+                            "Invariant Fault",
+                            0.5, 0.5);
 
-					verdicts.add(new Verdict(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT, verdictMsg, visualizer));
-				}
-			}
-		}
+                    verdicts.add(new Verdict(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT, verdictMsg, visualizer));
+                }
+            }
+        }
 
-		if (!verdicts.isEmpty()) {
-			return verdicts;
-		}
-		return Collections.singletonList(Verdict.OK);
-	}
+        if (!verdicts.isEmpty()) {
+            return verdicts;
+        }
+        return Collections.singletonList(Verdict.OK);
+    }
 }

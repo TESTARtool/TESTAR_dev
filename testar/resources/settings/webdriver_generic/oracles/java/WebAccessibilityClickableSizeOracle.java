@@ -29,57 +29,57 @@ import org.testar.webdriver.tag.WdTags;
  */
 public class WebAccessibilityClickableSizeOracle implements Oracle {
 
-	// Minimum recommended clickable size (W3C Web Content Accessibility Guidelines)
-	private final int minClickableThreshold;
+    // Minimum recommended clickable size (W3C Web Content Accessibility Guidelines)
+    private final int minClickableThreshold;
 
-	public WebAccessibilityClickableSizeOracle() {
-		this(24);
-	}
+    public WebAccessibilityClickableSizeOracle() {
+        this(24);
+    }
 
-	public WebAccessibilityClickableSizeOracle(int minClickableThreshold) {
-		this.minClickableThreshold = minClickableThreshold;
-	}
+    public WebAccessibilityClickableSizeOracle(int minClickableThreshold) {
+        this.minClickableThreshold = minClickableThreshold;
+    }
 
-	@Override
-	public List<Verdict> getVerdicts(State state) {
-		List<Verdict> verdicts = new ArrayList<>();
+    @Override
+    public List<Verdict> getVerdicts(State state) {
+        List<Verdict> verdicts = new ArrayList<>();
 
-		// Iterate over all widgets in the state
-		for (Widget widget : state) {
-			// Check if the widget is a clickable visible element
-			if (Role.isOneOf(widget.get(Tags.Role, Roles.Widget), WdRoles.nativeClickableRoles())
-					&& widget.get(WdTags.WebIsFullOnScreen, false)
-					&& widget.get(Tags.Shape, null) != null) {
+        // Iterate over all widgets in the state
+        for (Widget widget : state) {
+            // Check if the widget is a clickable visible element
+            if (Role.isOneOf(widget.get(Tags.Role, Roles.Widget), WdRoles.nativeClickableRoles())
+                    && widget.get(WdTags.WebIsFullOnScreen, false)
+                    && widget.get(Tags.Shape, null) != null) {
 
-				markAsNonVacuous();
+                markAsNonVacuous();
 
-				// Get width and height of the clickable element
-				Double width = ((Rect)widget.get(Tags.Shape)).width();
-				Double height = ((Rect)widget.get(Tags.Shape)).height();
+                // Get width and height of the clickable element
+                Double width = ((Rect)widget.get(Tags.Shape)).width();
+                Double height = ((Rect)widget.get(Tags.Shape)).height();
 
-				// Check if the widget is smaller than the recommended pixels
-				if (width < minClickableThreshold || height < minClickableThreshold) {
-					String verdictMsg = String.format(
-							"Clickable web widget %s is too small (%sx%s px). Minimum: %s px.",
-							getDescriptionOfWidgets(Collections.singletonList(widget), WdTags.WebOuterHTML),
-							width.intValue(),
-							height.intValue(),
-							minClickableThreshold
-							);
-					Visualizer visualizer = new RegionsVisualizer(
-							getRedPen(), 
-							getWidgetRegions(Arrays.asList(widget)), 
-							"Accessibility Fault", 
-							0.5, 0.5);
-					verdicts.add(new Verdict(Verdict.Severity.WARNING_ACCESSIBILITY_FAULT, verdictMsg, visualizer));
-				}
-			}
-		}
+                // Check if the widget is smaller than the recommended pixels
+                if (width < minClickableThreshold || height < minClickableThreshold) {
+                    String verdictMsg = String.format(
+                            "Clickable web widget %s is too small (%sx%s px). Minimum: %s px.",
+                            getDescriptionOfWidgets(Collections.singletonList(widget), WdTags.WebOuterHTML),
+                            width.intValue(),
+                            height.intValue(),
+                            minClickableThreshold
+                            );
+                    Visualizer visualizer = new RegionsVisualizer(
+                            getRedPen(), 
+                            getWidgetRegions(Arrays.asList(widget)), 
+                            "Accessibility Fault", 
+                            0.5, 0.5);
+                    verdicts.add(new Verdict(Verdict.Severity.WARNING_ACCESSIBILITY_FAULT, verdictMsg, visualizer));
+                }
+            }
+        }
 
-		if(!verdicts.isEmpty()) {
-			return verdicts;
-		}
-		return Collections.singletonList(Verdict.OK);
-	}
+        if(!verdicts.isEmpty()) {
+            return verdicts;
+        }
+        return Collections.singletonList(Verdict.OK);
+    }
 
 }

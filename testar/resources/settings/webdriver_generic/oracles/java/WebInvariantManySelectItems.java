@@ -21,58 +21,58 @@ import org.testar.core.visualizers.RegionsVisualizer;
 import org.testar.oracle.Oracle;
 public class WebInvariantManySelectItems implements Oracle {
 
-	private final int thresholdValue;
+    private final int thresholdValue;
 
-	public WebInvariantManySelectItems() {
-		this(100);
-	}
+    public WebInvariantManySelectItems() {
+        this(100);
+    }
 
-	public WebInvariantManySelectItems(int thresholdValue) {
-		this.thresholdValue = thresholdValue;
-	}
+    public WebInvariantManySelectItems(int thresholdValue) {
+        this.thresholdValue = thresholdValue;
+    }
 
-	@Override
-	public List<Verdict> getVerdicts(State state) {
-		List<Verdict> verdicts = new ArrayList<>();
+    @Override
+    public List<Verdict> getVerdicts(State state) {
+        List<Verdict> verdicts = new ArrayList<>();
 
-		for (Widget w : state) {
-			if (w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) && !w.get(WdTags.WebId, "").isEmpty()) {
-				try {
-					String elementId = w.get(WdTags.WebId);
-					String query = String.format("return ((document.getElementById('%s') != null) ? document.getElementById('%s').length : 1)", elementId, elementId);
-					Long selectItemsLength = (Long) WdDriver.executeScript(query);
+        for (Widget w : state) {
+            if (w.get(Tags.Role, Roles.Widget).equals(WdRoles.WdSELECT) && !w.get(WdTags.WebId, "").isEmpty()) {
+                try {
+                    String elementId = w.get(WdTags.WebId);
+                    String query = String.format("return ((document.getElementById('%s') != null) ? document.getElementById('%s').length : 1)", elementId, elementId);
+                    Long selectItemsLength = (Long) WdDriver.executeScript(query);
 
-					if (selectItemsLength != null) {
+                    if (selectItemsLength != null) {
 
-						markAsNonVacuous();
+                        markAsNonVacuous();
 
-						// Check if the items of the select widget are more than the thresholdValue
-						if (selectItemsLength.intValue() > thresholdValue) {
-							String verdictMsg = String.format(
-									"Detected Select widget %s which has %d items (threshold: %d)",
-									getDescriptionOfWidgets(Collections.singletonList(w), WdTags.WebId),
-									selectItemsLength.intValue(),
-									thresholdValue
-									);
+                        // Check if the items of the select widget are more than the thresholdValue
+                        if (selectItemsLength.intValue() > thresholdValue) {
+                            String verdictMsg = String.format(
+                                    "Detected Select widget %s which has %d items (threshold: %d)",
+                                    getDescriptionOfWidgets(Collections.singletonList(w), WdTags.WebId),
+                                    selectItemsLength.intValue(),
+                                    thresholdValue
+                                    );
 
-							Visualizer visualizer = new RegionsVisualizer(
-									getRedPen(),
-									getWidgetRegions(Collections.singletonList(w)),
-									"Invariant Fault",
-									0.5, 0.5);
+                            Visualizer visualizer = new RegionsVisualizer(
+                                    getRedPen(),
+                                    getWidgetRegions(Collections.singletonList(w)),
+                                    "Invariant Fault",
+                                    0.5, 0.5);
 
-							verdicts.add(new Verdict(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT, verdictMsg, visualizer));
-						}
-					}
-				} catch (Exception e) {
-					// Ignore webdriver execute script errors
-				}
-			}
-		}
+                            verdicts.add(new Verdict(Verdict.Severity.WARNING_WEB_INVARIANT_FAULT, verdictMsg, visualizer));
+                        }
+                    }
+                } catch (Exception e) {
+                    // Ignore webdriver execute script errors
+                }
+            }
+        }
 
-		if (!verdicts.isEmpty()) {
-			return verdicts;
-		}
-		return Collections.singletonList(Verdict.OK);
-	}
+        if (!verdicts.isEmpty()) {
+            return verdicts;
+        }
+        return Collections.singletonList(Verdict.OK);
+    }
 }

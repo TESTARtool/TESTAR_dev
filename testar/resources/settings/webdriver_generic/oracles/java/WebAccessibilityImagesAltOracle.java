@@ -25,38 +25,38 @@ import org.testar.oracle.Oracle;
  */
 public class WebAccessibilityImagesAltOracle implements Oracle {
 
-	public WebAccessibilityImagesAltOracle() {}
+    public WebAccessibilityImagesAltOracle() {}
 
-	@Override
-	public List<Verdict> getVerdicts(State state) {
-		List<Verdict> verdicts = new ArrayList<>();
+    @Override
+    public List<Verdict> getVerdicts(State state) {
+        List<Verdict> verdicts = new ArrayList<>();
 
-		// Check if some widget of the state
-		for(Widget widget : state) {
-			//  Is a widget image (<img>) and if it lacks alternative text
-			if (widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdIMG)) {
+        // Check if some widget of the state
+        for(Widget widget : state) {
+            //  Is a widget image (<img>) and if it lacks alternative text
+            if (widget.get(Tags.Role, Roles.Widget).equals(WdRoles.WdIMG)) {
 
-				markAsNonVacuous();
+                markAsNonVacuous();
 
-				if (widget.get(WdTags.WebAlt, null) == null || widget.get(WdTags.WebAlt, "").isBlank()) {
-					String verdictMsg = String.format(
-							"Detected web image widget %s without alternative text!",
-							getDescriptionOfWidgets(Collections.singletonList(widget), WdTags.WebOuterHTML)
-							);
-					Visualizer visualizer = new RegionsVisualizer(
-							getRedPen(),
-							getWidgetRegions(Collections.singletonList(widget)),
-							"Accessibility Fault",
-							0.5, 0.5);
-					verdicts.add(new Verdict(Verdict.Severity.WARNING_ACCESSIBILITY_FAULT, verdictMsg, visualizer));
-				}
-			}
-		}
+                if (widget.get(WdTags.WebAlt, null) == null || widget.get(WdTags.WebAlt, "").isBlank()) {
+                    String verdictMsg = String.format(
+                            "Detected web image widget %s without alternative text!",
+                            getDescriptionOfWidgets(Collections.singletonList(widget), WdTags.WebOuterHTML)
+                            );
+                    Visualizer visualizer = new RegionsVisualizer(
+                            getRedPen(),
+                            getWidgetRegions(Collections.singletonList(widget)),
+                            "Accessibility Fault",
+                            0.5, 0.5);
+                    verdicts.add(new Verdict(Verdict.Severity.WARNING_ACCESSIBILITY_FAULT, verdictMsg, visualizer));
+                }
+            }
+        }
 
-		if(!verdicts.isEmpty()) {
-			return verdicts;
-		}
-		return Collections.singletonList(Verdict.OK);
-	}
+        if(!verdicts.isEmpty()) {
+            return verdicts;
+        }
+        return Collections.singletonList(Verdict.OK);
+    }
 
 }
